@@ -161,9 +161,9 @@ class ReviewMappingController < ApplicationController
         flash[:error] = "You have already taken that quiz."
       else
         @map = QuizResponseMap.new
-        @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
+        @map.reviewee_id = Questionnaire.find_as_type(params[:questionnaire_id]).instructor_id
         @map.reviewer_id = params[:participant_id]
-        @map.reviewed_object_id = Questionnaire.find_by(instructor_id: @map.reviewee_id).id
+        @map.reviewed_object_id = Questionnaire.find_by_as_type(instructor_id: @map.reviewee_id).id
         @map.save
       end
     rescue StandardError => e

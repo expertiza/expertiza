@@ -37,26 +37,26 @@ class QuestionnaireNode < Node
   end
 
   def get_name
-    Questionnaire.find_by(id: self.node_object_id).try(:name)
+    Questionnaire.find_by_as_type(id: self.node_object_id).try(:name)
   end
 
   # this method return instructor id associated with a questionnaire
   # expects no arguments
   # returns int
   def get_instructor_id
-    Questionnaire.find_by(id: self.node_object_id).try(:instructor_id)
+    Questionnaire.find_by_as_type(id: self.node_object_id).try(:instructor_id)
   end
 
   def get_private
-    Questionnaire.find_by(id: self.node_object_id).try(:private)
+    Questionnaire.find_by_as_type(id: self.node_object_id).try(:private)
   end
 
   def get_creation_date
-    Questionnaire.find_by(id: self.node_object_id).try(:created_at)
+    Questionnaire.find_by_as_type(id: self.node_object_id).try(:created_at)
   end
 
   def get_modified_date
-    Questionnaire.find_by(id: self.node_object_id).try(:updated_at)
+    Questionnaire.find_by_as_type(id: self.node_object_id).try(:updated_at)
   end
 
   def is_leaf

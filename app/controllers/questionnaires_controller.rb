@@ -12,7 +12,7 @@ class QuestionnairesController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'edit'
-      @questionnaire = Questionnaire.find(params[:id])
+      @questionnaire = Questionnaire.find_as_type(params[:id])
       current_user_has_admin_privileges? ||
           (current_user_is_a?('Instructor') && current_user_id?(@questionnaire.try(:instructor_id))) ||
           (current_user_is_a?('Teaching Assistant') && session[:user].instructor_id == @questionnaire.try(:instructor_id))
@@ -39,7 +39,7 @@ class QuestionnairesController < ApplicationController
   end
 
   def view
-    @questionnaire = Questionnaire.find(params[:id])
+    @questionnaire = Questionnaire.find_as_type(params[:id])
   end
 
   def new
@@ -70,7 +70,7 @@ class QuestionnairesController < ApplicationController
 
   # Edit a questionnaire
   def edit
-    @questionnaire = Questionnaire.find(params[:id])
+    @questionnaire = Questionnaire.find_as_type(params[:id])
     redirect_to Questionnaire if @questionnaire.nil?
     session[:return_to] = request.original_url
   end
@@ -82,7 +82,7 @@ class QuestionnairesController < ApplicationController
     elsif params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     else
-      @questionnaire = Questionnaire.find(params[:id])
+      @questionnaire = Questionnaire.find_as_type(params[:id])
       begin
         # Save questionnaire information
         @questionnaire.update_attributes(questionnaire_params)
@@ -109,7 +109,7 @@ class QuestionnairesController < ApplicationController
 
   # Remove a given questionnaire
   def delete
-    @questionnaire = Questionnaire.find(params[:id])
+    @questionnaire = Questionnaire.find_as_type(params[:id])
     if @questionnaire
       begin
         name = @questionnaire.name
@@ -140,7 +140,7 @@ class QuestionnairesController < ApplicationController
 
   # Toggle the access permission for this assignment from public to private, or vice versa
   def toggle_access
-    @questionnaire = Questionnaire.find(params[:id])
+    @questionnaire = Questionnaire.find_as_type(params[:id])
     @questionnaire.private = !@questionnaire.private
     @questionnaire.save
     @access = @questionnaire.private == true ? "private" : "public"
@@ -158,7 +158,7 @@ class QuestionnairesController < ApplicationController
       flash[:success] = "You have successfully added a new question."
     end
 
-    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
+    num_of_existed_questions = Questionnaire.find_as_type(questionnaire_id).questions.size
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
       if question.is_a? ScoredQuestion

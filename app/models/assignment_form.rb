@@ -279,7 +279,7 @@ class AssignmentForm
   # Find a questionnaire for the given AQ and questionnaire type
   def questionnaire(assignment_questionnaire, questionnaire_type)
     return Object.const_get(questionnaire_type).new if assignment_questionnaire.nil?
-    questionnaire = Questionnaire.find_by(id: assignment_questionnaire.questionnaire_id)
+    questionnaire =Questionnaire.find_by_as_type(id: assignment_questionnaire.questionnaire_id)
     return questionnaire unless questionnaire.nil?
     Object.const_get(questionnaire_type).new
   end

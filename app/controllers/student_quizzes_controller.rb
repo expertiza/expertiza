@@ -51,7 +51,7 @@ class StudentQuizzesController < ApplicationController
 
   # the way 'answers' table store the results of quiz
   def calculate_score(map, response)
-    questionnaire = Questionnaire.find(map.reviewed_object_id)
+    questionnaire = Questionnaire.find_as_type(map.reviewed_object_id)
     scores = []
     valid = true
     questions = Question.where(questionnaire_id: questionnaire.id)

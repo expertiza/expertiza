@@ -7,7 +7,7 @@ class AdviceController < ApplicationController
 
   # Modify the advice associated with a questionnaire
   def edit_advice
-    @questionnaire = Questionnaire.find(params[:id])
+    @questionnaire = Questionnaire.find_as_type(params[:id])
 
     @questionnaire.questions.each do |question|
       num_questions = if question.is_a?(ScoredQuestion)
@@ -29,7 +29,7 @@ class AdviceController < ApplicationController
 
   # save the advice for a questionnaire
   def save_advice
-    @questionnaire = Questionnaire.find(params[:id])
+    @questionnaire = Questionnaire.find_as_type(params[:id])
     begin
       unless params[:advice].nil?
         params[:advice].each_key do |advice_key|

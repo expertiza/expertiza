@@ -94,7 +94,7 @@ class Question < ActiveRecord::Base
                             "(first and last name, not seperated with the delimiter), and your email."
     end
     # questionnaire = Questionnaire.find_by_id(_id)
-    questionnaire = Questionnaire.find_by(id: q_id)
+    questionnaire =Questionnaire.find_by_as_type(id: q_id)
     raise ArgumentError, "Questionnaire Not Found" if questionnaire.nil?
     questions = questionnaire.questions
     qid = 0

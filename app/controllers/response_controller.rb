@@ -168,7 +168,7 @@ class ResponseController < ApplicationController
     map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
     @map = ResponseMap.find(map_id)
     if params[:review][:questionnaire_id]
-      @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
+      @questionnaire = Questionnaire.find_as_type(params[:review][:questionnaire_id])
       @round = params[:review][:round]
     else
       @round = nil

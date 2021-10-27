@@ -14,7 +14,7 @@ class PopupController < ApplicationController
     first_question_in_questionnaire = Answer.where(response_id: @response_id).first
     unless @response_id.nil? or first_question_in_questionnaire.nil?
       questionnaire_id = Question.find(first_question_in_questionnaire.question_id).questionnaire_id
-      questionnaire = Questionnaire.find(questionnaire_id)
+      questionnaire = Questionnaire.find_as_type(questionnaire_id)
       @maxscore = questionnaire.max_question_score
       @scores = Answer.where(response_id: @response_id)
       @response = Response.find(@response_id)
@@ -105,7 +105,7 @@ class PopupController < ApplicationController
     unless @response_id.nil?
       first_question_in_questionnaire = Answer.where(response_id: @response_id).first.question_id
       questionnaire_id = Question.find(first_question_in_questionnaire).questionnaire_id
-      questionnaire = Questionnaire.find(questionnaire_id)
+      questionnaire = Questionnaire.find_as_type(questionnaire_id)
       @maxscore = questionnaire.max_question_score
       @scores = Answer.where(response_id: @response_id)
       @response = Response.find(@response_id)

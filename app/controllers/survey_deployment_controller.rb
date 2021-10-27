@@ -81,7 +81,7 @@ class SurveyDeploymentController < ApplicationController
     @survey_deployments = SurveyDeployment.all
     @survey_questionnaires = {}
     @survey_deployments.each do |sd|
-      corresp_questionnaire_name = Questionnaire.find(sd.questionnaire_id).name
+      corresp_questionnaire_name = Questionnaire.find_as_type(sd.questionnaire_id).name
       @survey_questionnaires[sd.id] = corresp_questionnaire_name
     end
   end
@@ -100,9 +100,9 @@ class SurveyDeploymentController < ApplicationController
   def generate_statistics
     @sd = SurveyDeployment.find(params[:id])
     questionnaire = if params[:global_survey] == 'true'
-                      Questionnaire.find(@sd.global_survey_id)
+                      Questionnaire.find_as_type(@sd.global_survey_id)
                     else
-                      Questionnaire.find(@sd.questionnaire_id)
+                      Questionnaire.find_as_type(@sd.questionnaire_id)
                     end
     @range_of_scores = (questionnaire.min_question_score..questionnaire.max_question_score).to_a
     @questions = Question.where(questionnaire_id: questionnaire.id)
@@ -151,7 +151,7 @@ class SurveyDeploymentController < ApplicationController
         survey_deployments.each do |survey_deployment|
           next unless survey_deployment && Time.zone.now > survey_deployment.start_date && Time.zone.now < survey_deployment.end_date
           @surveys <<
-              ['survey' => Questionnaire.find(survey_deployment.questionnaire_id),
+              ['survey' => Questionnaire.find_as_type(survey_deployment.questionnaire_id),
                'survey_deployment_id' => survey_deployment.id,
                'start_date' => survey_deployment.start_date,
                'end_date' => survey_deployment.end_date,

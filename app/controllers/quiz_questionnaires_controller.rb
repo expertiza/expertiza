@@ -4,7 +4,7 @@ class QuizQuestionnairesController < QuestionnairesController
   #Quiz questionnaire edit option to be allowed for student
   def action_allowed?
     if params[:action] == "edit"
-      @questionnaire = Questionnaire.find(params[:id])
+      @questionnaire = Questionnaire.find_as_type(params[:id])
       current_user_has_admin_privileges? || current_user_is_a?("Student")
     else
       current_user_has_student_privileges?
@@ -13,7 +13,7 @@ class QuizQuestionnairesController < QuestionnairesController
 
   # View a quiz questionnaire
   def view
-    @questionnaire = Questionnaire.find(params[:id])
+    @questionnaire = Questionnaire.find_as_type(params[:id])
     @participant = Participant.find(params[:pid]) # creating an instance variable since it needs to be sent to submitted_content/edit
     render :view
   end
@@ -73,7 +73,7 @@ class QuizQuestionnairesController < QuestionnairesController
 
   # edit a quiz questionnaire
   def edit
-    @questionnaire = Questionnaire.find(params[:id])
+    @questionnaire = Questionnaire.find_as_type(params[:id])
     unless @questionnaire.taken_by_anyone? # quiz can be edited only if its not taken by anyone
       render :'questionnaires/edit'
     else
@@ -84,7 +84,7 @@ class QuizQuestionnairesController < QuestionnairesController
 
   # save an updated quiz questionnaire to the database
   def update
-    @questionnaire = Questionnaire.find(params[:id])
+    @questionnaire = Questionnaire.find_as_type(params[:id])
     if @questionnaire.nil?
       redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
       return

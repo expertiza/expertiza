@@ -81,9 +81,23 @@ class Questionnaire < ActiveRecord::Base
     results[0].max_score
   end
 
+  def find_by_as_type(arg, *args)
+    q = Questionnaire.find_by_as_type(arg, args)
+    q.type.constantize.find_by(arg, args) if QUESTIONNAIRE_TYPES.include? q.type
+  end
+
+  def find_as_type(*args)
+    q = Questionnaire.find(args)
+    q.type.constantize.find(args) if QUESTIONNAIRE_TYPES.include? q.type
+  end
+
   # clones the contents of a questionnaire, including the questions and associated advice
   def self.copy_questionnaire_details(params, instructor_id)
-    orig_questionnaire = Questionnaire.find(params[:id])
+    if QUESTIONNAIRE_TYPES.include? params[:type]
+      orig_questionnaire = params[:type].constantize.find(params[:id])
+    else
+      raise StandardError.new 'Invalid Questionnaire Type'
+    end
     questions = Question.where(questionnaire_id: params[:id])
     questionnaire = orig_questionnaire.dup
     questionnaire.instructor_id = instructor_id

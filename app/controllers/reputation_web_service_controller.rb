@@ -141,6 +141,7 @@ class ReputationWebServiceController < ApplicationController
     redirect_to action: 'client'
   end
 
+  # sending the post request to calculate reputation scores of review grades.
   def send_post_request
     # https://www.socialtext.net/open/very_simple_rest_in_ruby_part_3_post_to_create_a_new_workspace
     req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader = {'Content-Type' => 'application/json', 'charset' => 'utf-8'})
@@ -163,6 +164,7 @@ class ReputationWebServiceController < ApplicationController
       @additional_info = 'add initial lauw reputation values'
     elsif params[:checkbox][:quiz] == 'Add quiz scores'
       @additional_info = 'add quiz scores'
+      # generating the json request body based upon the parameters.
       quiz_str = generate_json(params[:assignment_id].to_i, params[:another_assignment_id].to_i, params[:round_num].to_i, 'quiz scores').to_json
       quiz_str[0] = ''
       quiz_str.prepend('"quiz_scores":{')
@@ -182,6 +184,7 @@ class ReputationWebServiceController < ApplicationController
     @request_body = req.body
     # Encryption
     req.body = encrypt_review_data(req.body)  # AES symmetric algorithm encrypts raw data
+    # sending the post request.
     response = Net::HTTP.new('peerlogic.csc.ncsu.edu').start {|http| http.request(req) }
     # Decryption
     response.body = decrypt_review_data(response.body)
@@ -191,7 +194,9 @@ class ReputationWebServiceController < ApplicationController
     update_reputation(response.body)
   end
 
+  # returns the encrypted public key
   def rsa_public_key1(data)
+    # obtains the public key file from config folder
     public_key_file = 'public1.pem'
     public_key = OpenSSL::PKey::RSA.new(File.read(public_key_file))
     encrypted_string = Base64.encode64(public_key.public_encrypt(data))

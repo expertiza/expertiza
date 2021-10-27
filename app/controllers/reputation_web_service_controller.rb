@@ -7,6 +7,7 @@ require 'base64'
 class ReputationWebServiceController < ApplicationController
   include AuthorizationHelper
 
+  # checks the privilege access before updating the reputation.
   def action_allowed?
     current_user_has_ta_privileges?
   end
@@ -63,7 +64,7 @@ class ReputationWebServiceController < ApplicationController
     assignment_ids << another_assignment_id unless another_assignment_id.zero?
     teams = AssignmentTeam.where('parent_id in (?)', assignment_ids)
     team_ids = []
-    teams.each {|team| team_ids << team.id }
+    teams.each {|team| team_ids << team.id } #obtaining the team ids.
     quiz_questionnnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
     quiz_questionnnaire_ids = []
     quiz_questionnnaires.each {|questionnaire| quiz_questionnnaire_ids << questionnaire.id }
@@ -130,6 +131,7 @@ class ReputationWebServiceController < ApplicationController
     aes_decrypt(aes_encrypted_response_data, key, vi)
   end
 
+  # update reputation once it is calculated using send post request.
   def update_reputation(body)
     JSON.parse(body.to_s).each do |alg, list|
       next unless alg == "Hamer" || alg == "Lauw"
@@ -138,6 +140,7 @@ class ReputationWebServiceController < ApplicationController
         Participant.find_by(user_id: id).update(alg.to_sym => rep) unless /leniency/ =~ id.to_s
       end
     end
+    # redirecting to client html page once the reputation is updated.
     redirect_to action: 'client'
   end
 
@@ -148,6 +151,7 @@ class ReputationWebServiceController < ApplicationController
     curr_assignment_id = (params[:assignment_id].empty? ? '754' : params[:assignment_id])
     req.body = generate_json(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
     req.body[0] = '' # remove the first '{'
+    # update the class variables based on the parameters entered in client html file.
     @assignment = params[:assignment_id]
     @round_num = params[:round_num]
     @algorithm = params[:algorithm]

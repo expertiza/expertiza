@@ -30,8 +30,7 @@ describe AssignmentForm do
       attributes = {
         assignment: {
           late_policy_id: 1,
-          simicheck: true,
-          simicheck_threshold: '2'
+          simicheck: true
         },
         assignment_questionnaire: [assignment_questionnaire1, assignment_questionnaire2],
         due_date: [double('DueDate'), double('DueDate')]
@@ -40,9 +39,9 @@ describe AssignmentForm do
       allow_any_instance_of(AssignmentForm).to receive(:update_assignment_questionnaires).with(attributes[:assignment_questionnaire]).and_return(true)
       allow_any_instance_of(AssignmentForm).to receive(:update_assignment_questionnaires).with(attributes[:topic_questionnaire]).and_return(true)
       allow_any_instance_of(AssignmentForm).to receive(:update_due_dates).with(attributes[:due_date], user).and_return(true)
-      # allow_any_instance_of(AssignmentForm).to receive(:add_simicheck_to_delayed_queue).with(attributes[:assignment][:simicheck]).and_return(true)
-      # allow_any_instance_of(AssignmentForm).to receive(:delete_from_delayed_queue).and_return(true)
-      # allow_any_instance_of(AssignmentForm).to receive(:add_to_delayed_queue).and_return(true)
+      allow_any_instance_of(AssignmentForm).to receive(:add_simicheck_to_delayed_queue).with(attributes[:assignment][:simicheck]).and_return(true)
+      allow_any_instance_of(AssignmentForm).to receive(:delete_from_delayed_queue).and_return(true)
+      allow_any_instance_of(AssignmentForm).to receive(:add_to_delayed_queue).and_return(true)
       expect(assignment_form.update(attributes, user)).to be true
     end
   end
@@ -610,6 +609,18 @@ describe AssignmentForm do
     end
   end
 
+  describe '#add_to_simicheck_delayed_queue' do
+    it 'adds a simicheck delayed job and changes the # of DelayedJob by 1' do
+      Sidekiq::Testing.fake!
+      Sidekiq::RetrySet.new.clear
+      Sidekiq::ScheduledSet.new.clear
+      Sidekiq::Stats.new.reset
+      Sidekiq::DeadSet.new.clear
+      queue = Sidekiq::Queues["jobs"]
+      simicheck_delay_hours = '2'
+      expect { assignment_form.add_simicheck_to_delayed_queue(simicheck_delay_hours) }.to change { queue.size }.by(1)
+    end
+  end
 
   describe '#assignment_questionnaire' do
     context 'when multiple active records of assignment_questionnaire are found for a given assignment_id, used_in_round, and topic_id' do

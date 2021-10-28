@@ -125,10 +125,18 @@
       <td></td>
       <% @assignments.each do |assignment|%>
         <% if @show_meta_reviews %>
-          <td><%= "#{@overall_meta_review_grades[assignment.id] / @overall_meta_review_count[assignment.id]}%" %></td>
+          <% if @overall_meta_review_grades[assignment.id].nil? %>
+            <td><%= "-" %></td>
+          <% else %>
+            <td><%= "#{@overall_meta_review_grades[assignment.id] / @overall_meta_review_count[assignment.id]}%" %></td>
+          <% end %>
         <% end %>
         <% if @show_teammate_reviews %>
-          <td><%= "#{@overall_teammate_review_grades[assignment.id] / @overall_teammate_review_count[assignment.id]}%" %></td>
+          <% if @overall_teammate_review_grades[assignment.id].nil? %>
+            <td><%= "-" %></td>
+          <% else %>
+            <td><%= "#{@overall_teammate_review_grades[assignment.id] / @overall_teammate_review_count[assignment.id]}%" %></td>
+          <% end %>
         <% end %>
         <% if @show_topics%>
           <td><%= "—" %></td>

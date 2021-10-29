@@ -37,7 +37,7 @@ class MailWorker
     assignment = Assignment.find(self.assignment_id)
     subject = "Message regarding #{deadline_type} for assignment #{assignment.name}"
 
-    # Defining the body of mail
+    # Defining the body of mail 
     body = "This is a reminder to complete #{deadline_type} for assignment #{assignment.name}.\n"
 
     emails.each do |mail|

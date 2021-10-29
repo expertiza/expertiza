@@ -35,7 +35,6 @@ class AccountRequestController < ApplicationController
     users.each do |user|
       requested_user = AccountRequest.find_by(id: user.first)
       requested_user.status = is_approved
-      puts "Here"
       if requested_user.status.nil?
         flash[:error] = "Please Approve or Reject before submitting"
       elsif requested_user.update_attributes(params[:user])
@@ -62,7 +61,6 @@ class AccountRequestController < ApplicationController
 
   # Creates a new user if their request is approved
   def user_new(requested_user)
-    puts requested_user.inspect
     new_user = User.new
     new_user.name = requested_user.name
     new_user.role_id = requested_user.role_id

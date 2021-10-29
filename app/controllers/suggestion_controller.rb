@@ -124,6 +124,7 @@ class SuggestionController < ApplicationController
     # if proposer's signup_pref is yes, has a team, does not hold a topic yet --> assign topic
     # if proposer's signup_pref is yes, has a team and topic --> send email says that 'approved'
     # if proposer's signup_pref is no --> send email says that 'approved'
+    #-------------how to simplify?------------------------------------------------------------------------------
     if @suggestion.signup_preference == 'Y'
       # if this user do not have team in this assignment, create one for him/her and assign this topic to this team.
       if @team_id.nil?

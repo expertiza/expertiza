@@ -12,7 +12,7 @@ class ReputationWebServiceController < ApplicationController
     current_user_has_ta_privileges?
   end
 
-  # calculating the grade for each review
+  # calculating the grade for each  review
   def calculate_peer_grade(response)
     answers = Answer.where(response_id: response.id)
     max_question_score = answers.first.question.questionnaire.max_question_score rescue 1

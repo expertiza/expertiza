@@ -595,7 +595,7 @@ describe AssignmentForm do
     end
 
     context "when there are no jobs with the assignment id that is to be deleted" do
-      it 'does not change the # of DelayedJob' do
+      it 'does not change the # of DelayedJobs' do
         allow(DeadlineType).to receive(:find).with(1).and_return(double('DeadlineType', name: 'review'))
         Sidekiq::Testing.fake!
         Sidekiq::RetrySet.new.clear
@@ -610,7 +610,7 @@ describe AssignmentForm do
   end
 
   describe '#add_to_simicheck_delayed_queue' do
-    it 'adds a simicheck delayed job and changes the # of DelayedJob by 1' do
+    it 'adds a simicheck delayed job and changes the # of DelayedJobs by 1' do
       Sidekiq::Testing.fake!
       Sidekiq::RetrySet.new.clear
       Sidekiq::ScheduledSet.new.clear

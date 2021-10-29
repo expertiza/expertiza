@@ -9,7 +9,7 @@
           <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
       <table>
           <tr>
-            <%bgcolor2 = "#00FF00" %>
+            <% bgcolor2 = "#00FF00" %>
             <% status_mappings.each do |status_map| %>
               <% if status_map.review_object_id == map.reviewed_object_id and status_map.reviewee_id == map.reviewee_id  %>
                 <% if status_map.status == "Ready" %>

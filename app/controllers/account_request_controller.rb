@@ -47,7 +47,7 @@ class AccountRequestController < ApplicationController
       # If the user's request is denied, their entry is updated in the database and
       # a confirmation message is given saying their request has been denied
       elsif requested_user.status == "Rejected"
-        # If the user request has been rejected, a flash message is shown and redirected to review page
+        #  If the user request has been rejected, a flash message is shown and redirected to review page
         if requested_user.update_columns(status: is_approved)
           flash[:success] = "The user \"#{requested_user.name}\" has been Rejected."
           # redirect_to action: 'list_pending_requested'

@@ -130,3 +130,4 @@ class StudentQuizzesController < ApplicationController
     end
   end
 end
+

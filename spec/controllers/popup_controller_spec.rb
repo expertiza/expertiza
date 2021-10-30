@@ -50,7 +50,7 @@ describe PopupController do
     end
   end
 
-  # this can be called from "response_report" by clicking student names from instructor end.
+  # this can be called from "response_report" by clicking student names from instructor end
   describe '#author_feedback_popup' do
     context 'when response_id does not exist' do
       it 'fail to get any info' do; expect(controller.send(:author_feedback_popup)).to be nil; end

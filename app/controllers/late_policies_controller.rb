@@ -10,7 +10,7 @@ class LatePoliciesController < ApplicationController
       current_user.instructor_id == instructor_id
     end
   end
-
+  # empty commit
   # GET /late_policies
   # GET /late_policies.xml
   def index

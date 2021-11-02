@@ -1,25 +1,32 @@
+require 'rails_helper'
 describe GradesHelper, type: :helper do
   let(:review_response) { build(:response, id: 1, map_id: 1) }
   let(:question) { build(:question) }
   let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
-  let(:assignment) { build(:assignment, id: 1, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
+  let(:single_assignment) { build(:assignment, id: 1, max_team_size: 1, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
+  let(:team_assignment) { build(:assignment, id: 2, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
   let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
-  
-  
-  # describe 'accordion_title' do
-  #   it 'should render is_first:true if last_topic is nil' do
-  #    accordion_title(nil, 'last question')
-  #    expect(response).to render_template(partial: 'response/_accordion', locals: {title: 'last question', is_first: true})
-  #  end
-  #  it 'should render is_first:false if last_topic is not equal to next_topic' do
-  #    accordion_title('last question', 'next question')
-  #    expect(response).to render_template(partial: 'response/_accordion', locals: {title: 'next question', is_first: false})
-  #  end
-  #  it 'should render nothing if last_topic is equal to next_topic' do
-  #    accordion_title('question', 'question')
-  #    expect(response).to render_template(nil)
-  #  end
-  # end  
+  let(:questionnaire1) { build(:questionnaire, id: 1, questions: [question]) }
+  let(:questionnaire2) { build(:questionnaire, id: 2, questions: [question]) }
+  let(:questionnaires) { [questionnaire1, questionnaire2] }
+  let(:aq1) { build(:assignment_questionnaire, id: 1, used_in_round: 1) }
+  let(:aq2) { build(:assignment_questionnaire, id: 2) }
+  let(:helper) { Class.new { extend GradesHelper } }
+
+  describe 'accordion_title' do
+    it 'should render is_first:true if last_topic is nil' do
+     title_html = accordion_title(nil, 'last question')
+     expect(title_html).to include('last question')
+   end
+   it 'should render is_first:false if last_topic is not equal to next_topic' do
+     title_html = accordion_title('last question', 'next question')
+     expect(title_html).to include('next question')
+   end
+   it 'should render nothing if last_topic is equal to next_topic' do
+     title_html = accordion_title('next question', 'next question')
+     expect(title_html).to eq(nil)
+   end
+  end
 
   describe 'get_css_style_for_X_reputation' do
     hamer_input = [-0.1, 0, 0.5, 1, 1.5, 2, 2.1]
@@ -130,6 +137,59 @@ describe GradesHelper, type: :helper do
         }
         expect(vector(scores)).to eq([75, 65]) 
       end 
+    end
+  end
+
+  describe 'has_team_and_metareview' do
+    context 'when query assignment is personal work and does not have metareview' do
+      it 'return true_num with 0' do
+        params = {action: 'view', id: 1}
+        allow(helper).to receive(:params).and_return(params)
+        allow(Assignment).to receive(:find).with(1).and_return(single_assignment)
+        allow(AssignmentDueDate).to receive(:exists?).with(any_args).and_return(false)
+        expect(helper.has_team_and_metareview?).to eq({has_team: false, has_metareview: false, true_num: 0})
+      end
+    end
+    context 'when query assignment is team work and does not have metareview' do
+      it 'return true_num with 1' do
+        params = {action: 'view', id: 2}
+        allow(helper).to receive(:params).and_return(params)
+        allow(Assignment).to receive(:find).with(2).and_return(team_assignment)
+        allow(AssignmentDueDate).to receive(:exists?).with(any_args).and_return(false)
+        expect(helper.has_team_and_metareview?).to eq({has_team: true, has_metareview: false, true_num: 1})
+      end
+    end
+    context 'when query assignment is personal work and has metareview' do
+      it 'return true_num with 0' do
+        params = {action: 'view', id: 1}
+        allow(helper).to receive(:params).and_return(params)
+        allow(Assignment).to receive(:find).with(1).and_return(single_assignment)
+        allow(AssignmentDueDate).to receive(:exists?).with(any_args).and_return(true)
+        expect(helper.has_team_and_metareview?).to eq({has_team: false, has_metareview: true, true_num: 1})
+      end
+    end
+    context 'when query assignment is team work and has metareview' do
+      it 'return true_num with 0' do
+        params = {action: 'view', id: 2}
+        allow(helper).to receive(:params).and_return(params)
+        allow(Assignment).to receive(:find).with(2).and_return(team_assignment)
+        allow(AssignmentDueDate).to receive(:exists?).with(any_args).and_return(true)
+        expect(helper.has_team_and_metareview?).to eq({has_team: true, has_metareview: true, true_num: 2})
+      end
+    end
+  end
+
+  describe 'retrieve_questions' do
+    context 'when give a list of questionnaires' do
+      it 'return the map the questions' do
+        allow(questionnaire1). to receive(:symbol).and_return("test1")
+        allow(questionnaire2). to receive(:symbol).and_return("test2")
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return(aq1)
+        allow(aq1).to receive(:first).and_return(aq1)
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 2).and_return(aq2)
+        allow(aq2).to receive(:first).and_return(aq2)
+        expect(retrieve_questions(questionnaires, 1)).to eq({test11: questionnaire1.questions, 'test2'=> questionnaire2.questions})
+      end
     end
   end
 end

@@ -3,6 +3,7 @@ class PasswordRetrievalController < ApplicationController
     true
   end
 
+
   def forgotten
     render template: "password_retrieval/forgotten"
   end

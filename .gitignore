@@ -212,4 +212,4 @@ pg_data
 mysql2psql.yml
 *.pem
 t.csv
-./db/schema.rb
+db/schema.rb

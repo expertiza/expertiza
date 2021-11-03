@@ -75,9 +75,13 @@
                     <% part = Participant.find_by(id: rmap.reviewee_id) %>
                     console.log(`Reviewee`);
                     console.log(`<%= part.pretty_inspect.html_safe %>`);
+                    <% reviewee_student = User.find_by(id: part.user_id) %>
+                    console.log(`<%= reviewee_student.pretty_inspect.html_safe %>`)
                     console.log(`Reviewer`)
                     <% reviewer = Participant.find_by(id: rmap.reviewer_id) %>
                     console.log(`<%= reviewer.pretty_inspect.html_safe %>`);
+                    <% reviewer_student = User.find_by(id: part.user_id) %>
+                    console.log(`<%= reviewer_student.pretty_inspect.html_safe %>`)
                     console.groupEnd()
                   <% end %>
                   console.log(`end loggin`)

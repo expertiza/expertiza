@@ -169,9 +169,10 @@
             <!-- additionally, there are hidden rows (expandable) which are also generated via iteration. -->
             <% vm.list_of_rows.each do |row| %>
 
-                <script type="text/javascript">
+                <!-- <script type="text/javascript">
                   console.log("<%= row %>");
                 </script>
+                -->
 
                 <!-- notice the data-target. because we're toggling via looped code, we need to dynamically generate the identifier. -->
                 <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= row.question_id.to_s + vm.round.to_s %>">

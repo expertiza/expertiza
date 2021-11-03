@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  duty_name: MyString
+  max_duty_limit: 1
+  assignment_id: 
+
+two:
+  duty_name: MyString
+  max_duty_limit: 1
+  assignment_id: 

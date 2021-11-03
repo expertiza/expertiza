@@ -1,0 +1,31 @@
+<% @assignment = Assignment.find(params[:id]) %>
+<% if flash[:notice] %>
+    <div class="flash_note"><%= flash_message :notice %></div>
+<% end %>
+
+<% @duties = Duty.where(['assignment_id = ?', @assignment.id]) %>
+
+
+<% if @duties.size != 0 %>
+    <table class="table table-striped">
+      <tr><%= render :partial => '/duties/table_header' %></tr>
+
+      <% i=1 %>
+      <% for duty in @duties %>
+          <tr>
+            <%= render :partial => '/duties/table_line', :locals => {:i=>i, :duty=>duty} %>
+          </tr>
+          <% i=i+1 %>
+      <% end %>
+
+    </table>
+<% else %>
+    <div class="flash_note alert alert-danger">
+      <%= "Roles have not yet been created." %>
+    </div>
+<% end %>
+
+<% session[:return_to] = request.url %>
+<br/><br/>
+
+<%= render :partial => '/duties/add_duty' %>

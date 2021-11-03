@@ -1,5 +1,6 @@
 
 Expertiza::Application.routes.draw do
+  resources :duties
   ###
   # Please insert new routes alphabetically!
   ###

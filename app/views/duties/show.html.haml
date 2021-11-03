@@ -1,0 +1,15 @@
+%p#notice= notice
+
+%p
+  %b Duty name:
+  = @duty.duty_name
+%p
+  %b Max duty limit:
+  = @duty.max_duty_limit
+%p
+  %b Assignment:
+  = @duty.assignment
+
+= link_to 'Edit', edit_duty_path(@duty)
+\|
+= link_to 'Back', duties_path

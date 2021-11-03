@@ -148,7 +148,8 @@
       <img src="/assets/info.png" title='Select if you want a person to allow review their own submission'>
     </td>
   </tr>
-
+  <!-- #E2147 -->
+  <%= render '/duties/checkbox' %>
   <!--#E1870-->
   <% if @assignment_form.assignment.rounds_of_reviews > 1 %>
     <tr>
@@ -183,6 +184,17 @@
         } else {
             meta_reviews_allowed_field.attr('hidden', true);
             jQuery('#assignment_form_assignment_num_metareviews_allowed').val('-1');
+        }
+    }
+    function hasDutiesChanged() {
+        var checkbox = jQuery('#is_duty_checkbox');
+        var add_duties_div = jQuery('#add_duties');
+
+        if (checkbox.is(':checked')) {
+            add_duties_div.removeAttr('hidden');
+        }
+        else {
+            add_duties_div.attr('hidden', true);
         }
     }
 </script>

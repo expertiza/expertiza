@@ -64,10 +64,14 @@
                 <% if vm.questionnaire_display_type == "Teammate Review" %>
                   console.log('ss')
                   console.log(`<%= vm.pretty_inspect.html_safe %>`);
-                  console.log(`<%= vm.list_of_reviews[0].pretty_inspect.html_safe %>`);
+                  console.log(`@Participant`)
+                  console.log(`<%= @participant.pretty_inspect.html_safe %>`)
+                  //console.log(`<#%= vm.list_of_reviews[0].pretty_inspect.html_safe %>`);
                   <% vm.list_of_reviews.each_with_index do |r, i|%>
 
-                    console.group(`<%= "Review #{i}"%>`)
+                    console.groupCollapsed(`<%= "Review #{i}"%>`)
+                    console.log('Response')
+                    console.log(`<%= r.pretty_inspect.html_safe %>`)
                     <% map_id = r.map_id%>
                     // teammate response
                     <% rmap = ResponseMap.find_by(id: map_id) %>

@@ -191,7 +191,12 @@ class GradesController < ApplicationController
     vmquestions = questionnaire.questions
     vm.add_questions(vmquestions)
     vm.add_team_members(@team)
-    vm.add_reviews(@participant, @team, @assignment.vary_by_round)
+    # Need to iterate over the whole team to get everyone's reviews
+    # @participant.team == AssignmentTeam
+    @participant.team.participants.each do |p|
+    vm.add_reviews(p, @team, @assignment.vary_by_round)
+    end
+    # vm.add_reviews(@participant, @team, @assignment.vary_by_round)
     vm.number_of_comments_greater_than_10_words
     vm
   end

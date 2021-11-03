@@ -222,7 +222,7 @@ class AssignmentForm
   end
 
   # Find an AQ based on the given values
-  def assignment_questionnaire(questionnaire_type, round_number, topic_id)
+  def assignment_questionnaire(questionnaire_type, round_number, topic_id, duty_id=nil)
     round_number = nil if round_number.blank?
     topic_id = nil if topic_id.blank?
     if @assignment.vary_by_round && @assignment.vary_by_topic
@@ -246,6 +246,13 @@ class AssignmentForm
           # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
           return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
         end
+    elsif @assignment.questionnaire_varies_by_duty
+      # Get all AQs for the assignment and specified duty_id
+      assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, duty_id: duty_id)
+      assignment_questionnaires.each do |aq|
+        # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
+        return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+      end
     else
         # Get all AQs for the assignment
         assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id)

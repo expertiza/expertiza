@@ -79,6 +79,7 @@ class AssignmentsController < ApplicationController
     @assigned_badges = @assignment_form.assignment.badges
     @badges = Badge.all
     @use_bookmark = @assignment.use_bookmark
+    @duties = Duty.where(assignment_id:@assignment_form.assignment.id)
 
   end
 

@@ -8,10 +8,9 @@
 
         var i;
         var html = '<tr id=' + row_id + '>';
-
         html += '<input name="assignment_form[assignment_questionnaire][][assignment_id]" type="hidden" value="' + '<%= @assignment_form.assignment.id %>' +'">';
         if (duty_id != undefined) {
-            html += '<input name="assignment_form[assignment_questionnaire][][assignment_id]" type="hidden" value="' + duty_id +'">';
+            html += '<input name="assignment_form[assignment_questionnaire][][duty_id]" type="hidden" value="' + duty_id +'">';
         }
         //Rubric name
         if (round_no == null && duty_id == undefined) {
@@ -370,7 +369,7 @@
 <!--Add a review varies by duties (role in the UI) checkbox. -->
 <!-- This is questionnaire_varies_by_duty attribute of assignment created by migration -->
 <input name="assignment_form[assignment][questionnaire_varies_by_duty]" type="hidden" value="false" />
-<%= check_box_tag('assignment_form[assignment][vary_by_round]', 'true', @assignment_form.assignment.questionnaire_varies_by_duty, onclick: "handleCheckReviewVaryByDuty(this)") %>
+<%= check_box_tag('assignment_form[assignment][questionnaire_varies_by_duty]', 'true', @assignment_form.assignment.questionnaire_varies_by_duty, {:id => "rubric_vary_by_duty_chkbx", onclick: "handleCheckReviewVaryByDuty(this)"}) %>
 <%= label_tag('assignment_form[assignment][questionnaire_varies_by_duty]', 'Review rubric varies by role?') %>
 
 <div>
@@ -436,16 +435,37 @@
               null
           );
           var team_assignment_checkbox = jQuery('#team_assignment');
+          var rubric_vary_by_duty_checkbox = jQuery('#rubric_vary_by_duty_chkbx')
           if (team_assignment_checkbox.is(':checked')) {
-              <% assignment_questionnaire = @assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil) %>
-              <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'TeammateReviewQuestionnaire') %>
-              addQuestionnaireTableRow(
-                  'TeammateReviewQuestionnaire',
-                  <%= assignment_questionnaire.to_json.html_safe %>,
-                  <%= questionnaire.to_json.html_safe %>,
-                  <%= questionnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>,
-                  null
-              );
+              // if condition whether vary by duty is checked or not. If unchecked, show TeammateReviewQuestionnaire
+              // otherwise if checked, show the duty and their corresponding questionnaire that is selected
+              if (team_assignment_checkbox.is(':checked')) {
+                  <% @duties.each do |duty| %>
+                  <% assignment_questionnaire = @assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil, duty.id) %>
+                  <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'TeammateReviewQuestionnaire') %>
+
+                  addQuestionnaireTableRow(
+                      'TeammateReviewQuestionnaire',
+                      <%= assignment_questionnaire.to_json.html_safe %>,
+                      <%= questionnaire.to_json.html_safe %>,
+                      <%= questionnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>,
+                      null,
+                      '<%= duty.id %>',
+                      '<%= duty.duty_name %>'
+                  );
+                  <%end%>
+
+              } else {
+                  <% assignment_questionnaire = @assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil) %>
+                  <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'TeammateReviewQuestionnaire') %>
+                  addQuestionnaireTableRow(
+                      'TeammateReviewQuestionnaire',
+                      <%= assignment_questionnaire.to_json.html_safe %>,
+                      <%= questionnaire.to_json.html_safe %>,
+                      <%= questionnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>,
+                      null
+                  );
+              }
           }
           var bookmark_checkbox = jQuery('#assignment_form_assignment_use_bookmark');
           if (bookmark_checkbox.is(':checked')) {

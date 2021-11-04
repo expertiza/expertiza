@@ -104,7 +104,8 @@ class AssignmentForm
         unless attr[:questionnaire_id].blank?
           questionnaire_type = Questionnaire.find(attr[:questionnaire_id]).type
           topic_id = attr[:topic_id] if attr.key?(:topic_id)
-          aq = assignment_questionnaire(questionnaire_type, attr[:used_in_round], topic_id)
+          duty_id = attr[:duty_id] if attr.key?(:duty_id)
+          aq = assignment_questionnaire(questionnaire_type, attr[:used_in_round], topic_id, duty_id)
           if aq.id.nil?
             unless aq.save
               @errors = @assignment.errors.to_s
@@ -225,7 +226,14 @@ class AssignmentForm
   def assignment_questionnaire(questionnaire_type, round_number, topic_id, duty_id=nil)
     round_number = nil if round_number.blank?
     topic_id = nil if topic_id.blank?
-    if @assignment.vary_by_round && @assignment.vary_by_topic
+    if duty_id !=nil and @assignment.questionnaire_varies_by_duty
+      # Get all AQs for the assignment and specified duty_id
+      assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, duty_id: duty_id)
+      assignment_questionnaires.each do |aq|
+        # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
+        return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+      end
+    elsif @assignment.vary_by_round && @assignment.vary_by_topic
         # Get all AQs for the assignment and specified round number and topic
         assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number, topic_id: topic_id)
         assignment_questionnaires.each do |aq|
@@ -246,13 +254,6 @@ class AssignmentForm
           # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
           return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
         end
-    elsif @assignment.questionnaire_varies_by_duty
-      # Get all AQs for the assignment and specified duty_id
-      assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, duty_id: duty_id)
-      assignment_questionnaires.each do |aq|
-        # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-        return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
-      end
     else
         # Get all AQs for the assignment
         assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id)

@@ -119,6 +119,8 @@
               <h4 style="display:inline-block;"><%= vm.questionnaire_display_type %>
                 <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
                     (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
+                <% elsif vm.questionnaire_type == "TeammateReviewQuestionnaire" %>
+                    (For: <%= vm.reviewee_name.inspect.html_safe %>)
                 <%end %>
               </h4>
               <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>

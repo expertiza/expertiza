@@ -1,0 +1,15 @@
+// Place all the styles related to the UserPastebins controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+.ui-widget td,th{
+  border: 1px solid #eee;
+  padding: .6em 10px;
+  text-align: left;}
+
+.inline-transparent{
+  display:inline-block;
+}
+
+.inline-transparent td,th{
+  border: 0px;
+  }

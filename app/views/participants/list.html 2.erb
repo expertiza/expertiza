@@ -1,0 +1,13 @@
+<div id="flash_message"></div>
+<h1><%= @model %> Participants: <%= @parent.name %></h1>
+
+<br/>
+<%= render :partial => 'links' %>
+<div id="part_list" >
+<%= render :partial => '/shared_scripts/user_list',
+           :locals => {:controller => 'participants', 
+                       :user_list => @participants} %>
+<br/>
+</div>
+<% session[:return_to] = request.url %>
+<%= render :partial => 'links' %>

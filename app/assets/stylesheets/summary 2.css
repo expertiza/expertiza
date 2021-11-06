@@ -1,0 +1,27 @@
+.arrow_icon{
+    padding-right: 20px;
+}
+.fake-link {
+    font-size: smaller;
+    color: #94672d;
+    cursor: pointer;
+}
+
+.fake-link-large {
+    font-size: larger;
+    color: #94672d;
+    cursor: pointer;
+}
+
+.fake-link-large:hover{
+    text-decoration: underline;
+    color: #eb0000;
+    cursor: pointer;
+}
+.data_column {
+	padding: 0 !important;
+}
+
+.question {
+
+}

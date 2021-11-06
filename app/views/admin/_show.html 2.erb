@@ -1,0 +1,17 @@
+<h1>User: <%=h @user.name(session[:ip]) %></h1>
+
+<table>
+
+  <tr><th>Full Name:</th>
+    <td><%= @user.fullname(session[:ip]) %></td>
+  </tr>
+
+  <tr><th>Email Address:</th>
+    <td><%= @user.email(session[:ip]) %></td>
+  </tr>
+
+  <tr><th>Role:</th>
+    <td><%= @role.name %></td>
+  </tr>
+
+</table>

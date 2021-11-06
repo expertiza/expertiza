@@ -1,0 +1,11 @@
+<p><label for="comments_for_advertisement" >Please describe the qualifications you are looking for in a teammate.</label><br/>
+  <%#= text_area(:comment,"") %>
+  <% ad_content = Team.find(params[:team_id]).comments_for_advertisement %>
+
+  <%= text_field_tag 'comments_for_advertisement',ad_content%>
+
+</p>
+
+
+<%#= render :partial => 'user', :locals => { :new_user => true } %>
+<%#= submit_tag "Advertise" %>

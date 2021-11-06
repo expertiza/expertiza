@@ -2,7 +2,9 @@
 <BR/>
 <B>Created by:</B> <%= link_to @questionnaire.instructor_id,"mailto:"+@questionnaire.instructor_id.to_s %><BR/>
 <B>Created at:</B> <%= @questionnaire.created_at %><BR/>
-<B>Last modified at:</B> <%= @questionnaire.updated_at %>
+<B>Last modified at:</B> <%= @questionnaire.updated_at %><BR/>
+<B>Max quiz score:</B> <%= @questionnaire.max_question_score %><BR/>
+<B>Min quiz score:</B> <%= @questionnaire.min_question_score %><BR/>
 <BR/><BR/>
 
 <TABLE>

@@ -98,6 +98,15 @@ class User < ActiveRecord::Base
     false
   end
 
+  # E1991 : This function returns original name of the user 
+  # from their anonymized names. The process of obtaining
+  # real name is exactly opposite of what we'd do to get
+  # anonymized name from their real name.
+  def self.real_user_from_anonymized_name(anonymized_name)
+    user = User.find_by(name: anonymized_name)
+    return user
+  end
+
   def name(ip_address = nil)
     User.anonymized_view?(ip_address) ? self.role.name + ' ' + self.id.to_s : self[:name]
   end
@@ -216,8 +225,8 @@ class User < ActiveRecord::Base
     # when replacing an existing key, update any digital signatures made previously with the new key
     if replacing_key
       participants = AssignmentParticipant.where(user_id: self.id)
-      for participant in participants
-        AssignmentParticipant.grant_publishing_rights(new_key.to_pem, [participant]) if participant.permission_granted
+      participants.each do |participant|
+        participant.assign_copyright(new_key.to_pem) if participant.permission_granted
       end
     end
 
@@ -232,6 +241,7 @@ class User < ActiveRecord::Base
     @email_on_submission = true
     @email_on_review_of_review = true
     @copy_of_emails = false
+    @preference_home_flag = true
   end
 
   def self.export(csv, _parent_id, options)
@@ -243,6 +253,7 @@ class User < ActiveRecord::Base
       tcsv.push(user.parent.name) if options["parent"] == "true"
       tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails) if options["email_options"] == "true"
       tcsv.push(user.handle) if options["handle"] == "true"
+      tcsv.push(user.preference_home_flag) if options["preference_home_flag"] == "true"
       csv << tcsv
     end
   end
@@ -286,7 +297,7 @@ class User < ActiveRecord::Base
   end
 
   def teaching_assistant?
-    return true if self.role.ta?
+    true if self.role.ta?
   end
 
   def self.search_users(role, user_id, letter, search_by)

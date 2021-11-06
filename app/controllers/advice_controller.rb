@@ -2,10 +2,6 @@ class AdviceController < ApplicationController
   include AuthorizationHelper
 
   def action_allowed?
-    questionnaire = Questionnaire.find(params[:id])
-    if(user_logged_in? && questionnaire.owner?(session[:user].id))
-      return true
-    end
     current_user_has_ta_privileges?
   end
 

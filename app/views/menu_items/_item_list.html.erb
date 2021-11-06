@@ -1,5 +1,5 @@
 <% counter = 0
-for item_id in items do
+items.each do | item_id |
   item = @menu.get_item(item_id) -%>
 <tr class="depth<%= depth %>">
   <td> <div class="menu_title"><%= link_to item.label, :action =>  'edit',
@@ -30,7 +30,7 @@ for item_id in items do
 <% end %></td>
 
 <td>
-  <% if not item.children or item.children.length == 0 -%>
+  <% unless item.children && !item.children.length.zero? -%>
     <%= link_to image_tag("/assets/delete.png"),
       {:action => 'destroy', :id => item.id},
       :confirm => 'Delete this menu item?', :method => :post %>

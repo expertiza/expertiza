@@ -9,7 +9,7 @@ class StudentTaskController < ApplicationController
 
   def impersonating_as_admin?
     original_user = session[:original_user]
-    admin_role_ids = Role.where(name:['Administrator','Super-Administrator']).pluck(:id)
+    admin_role_ids = Role.where(name:%w[Administrator Super-Administrator]).pluck(:id)
     admin_role_ids.include? original_user.role_id
   end
 
@@ -43,7 +43,7 @@ class StudentTaskController < ApplicationController
   end
 
   def view
-    student_task = StudentTask.from_participant_id params[:id]
+    StudentTask.from_participant_id params[:id]
     @participant = AssignmentParticipant.find(params[:id])
     @can_submit = @participant.can_submit
     @can_review = @participant.can_review
@@ -58,9 +58,6 @@ class StudentTaskController < ApplicationController
     @use_bookmark = @assignment.use_bookmark
     # Timeline feature
     @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
-    # Revision plan feature
-    @can_submit_revision_plan = student_task.can_submit_revision_plan?
-    @revision_plan_questionnaire_id = student_task.revision_plan_questionnaire_id
   end
 
   def others_work
@@ -87,5 +84,18 @@ class StudentTaskController < ApplicationController
     @review_of_review_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
   end
 
+  def publishing_rights_update
+	@participant = AssignmentParticipant.find(params[:id])
+        @participant.permission_granted = params[:status]
+	@participant.save
+	respond_to do |format|
+		format.html {head :no_content}
+	end
+   end  
+
+  
+
+  
+  
   def your_work; end
 end

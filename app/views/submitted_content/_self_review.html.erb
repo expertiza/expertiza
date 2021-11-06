@@ -9,7 +9,7 @@
     <!--Heading-->
     <td><b>Self Review:</b><BR/></td>
     <% @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-    <% @review_phase = @assignment.get_current_stage(@topic_id) %>
+    <% @review_phase = @assignment.current_stage(@topic_id) %>
     <% @review_mappings = SelfReviewResponseMap.where(reviewer_id: @participant.id) %>
     <% if !@review_mappings.nil? && !@review_mappings.empty? %>
         <!--If there is a review mapping (requested a self-review) that already exists, then show options such as Begin/View/Edit/Update -->
@@ -25,7 +25,7 @@
             <% end %>
             <!--The code above helps in retrieving any exsiting responses for self-review-->
             <!--The if condition below ensures that responses are retrieved and can be viewed by user when 'View' option is selected-->
-            <% if (array_not_empty == 1) %>
+            <% if array_not_empty == 1 %>
                 <% @sorted_responses = @sorted_responses.sort_by { |obj| obj.updated_at } %>
                 <!--^the latest should be at the last-->
                 <% @latest_response = @sorted_responses.last %>
@@ -42,12 +42,12 @@
                 <td><%= link_to 'View', {:controller => 'response', :action => 'view', :id => @latest_response.id} %></td>
                 <td>&nbsp;&nbsp;</td>
 
-                <% if @assignment.get_current_stage(@topic_id) != 'Finished' %>
+                <% if @assignment.current_stage(@topic_id) != 'Finished' %>
                     <!--show the link as edit when latest review is done in current deadline-->
                     <!--show link as update when latest review is done in different deadline than current phase-->
-                    <% if (last_response_round == current_round) %>
+                    <% if last_response_round == current_round %>
                         <td>
-                          <% if (!@latest_response.is_submitted) %>
+                          <% unless @latest_response.is_submitted %>
                               <%= link_to 'Edit', {:controller => 'response', :action => 'edit', :return=>"selfreview", :id => @latest_response.id} %>
                           <% end %>
                         </td>
@@ -56,11 +56,11 @@
                     <% end %>
                 <% end %>
             <% end %>
-        <% elsif @assignment.get_current_stage(@topic_id) != 'Complete' && @assignment.submission_allowed(@topic_id) %>
+        <% elsif @assignment.current_stage(@topic_id) != 'Complete' && @assignment.submission_allowed(@topic_id) %>
             <td>&nbsp;&nbsp;</td>
             <td><%= link_to 'Begin', {:controller => 'response', :action => 'new', :id => @review_mappings[0].id} %></td>
         <% end %>
-    <% elsif @assignment.get_current_stage(@topic_id) != 'Complete' && @assignment.submission_allowed(@topic_id) %>
+    <% elsif @assignment.current_stage(@topic_id) != 'Complete' && @assignment.submission_allowed(@topic_id) %>
         <!--If the reviewer is yet to request a self-review, then the controller reaches this point-->
         <%= form_tag :controller => 'review_mapping',
                      :action => 'start_self_review',

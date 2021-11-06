@@ -22,7 +22,7 @@
         <td><a href="<%= record.content %>" target="_blank"><%= record.content %></a><br/></td>
 
         <% else %>
-            <td><%= record.content.split("\/").last() %></td>
+            <td><%= record.content.split("\/").last %></td>
          <% end %>
         <td><%= record.created_at %></td>
       </tr>

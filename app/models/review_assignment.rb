@@ -50,12 +50,12 @@ module ReviewAssignment
 
     # If this is an assignment with quiz required
     if self.require_quiz?
-      signups = SignedUpTeam.where(team_id: team.id)
-      signups.each do |signup|
-        signuptopic = SignUpTopic.find(signup.topic_id)
-        if signuptopic.assignment_id == self.id
-          contributors_signup_topic = signuptopic
-          return contributors_signup_topic
+      sign_ups = SignedUpTeam.where(team_id: team.id)
+      sign_ups.each do |sign_up|
+        sign_up_topic = SignUpTopic.find(sign_up.topic_id)
+        if sign_up_topic.assignment_id == self.id
+          contributors_sign_up_topic = sign_up_topic
+          return contributors_sign_up_topic
         end
       end
     end
@@ -142,7 +142,7 @@ module ReviewAssignment
 
   def reject_by_deadline(contributor_set)
     contributor_set.reject! do |contributor|
-      contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'Complete' or
+      contributor.assignment.current_stage(signed_up_topic(contributor).id) == 'Complete' or
           !contributor.assignment.can_review(signed_up_topic(contributor).id)
     end
     contributor_set

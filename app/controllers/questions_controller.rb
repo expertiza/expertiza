@@ -12,15 +12,7 @@ class QuestionsController < ApplicationController
     render action: 'list'
   end
 
-  # Update authorization code to allow a user to remove questions 
-  # from his teams revision plan.
   def action_allowed?
-    if ['destroy'].include?(params[:action])
-      question = Question.find(params[:id])
-      if(user_logged_in? && question.questionnaire.owner?(session[:user].id))
-        return true
-      end
-    end
     current_user_has_ta_privileges?
   end
 
@@ -78,18 +70,19 @@ class QuestionsController < ApplicationController
   def destroy
     question = Question.find(params[:id])
     questionnaire_id = question.questionnaire_id
+
+    if AnswerHelper.check_and_delete_responses(questionnaire_id)
+      flash[:success] = "You have successfully deleted the question. Any existing reviews for the questionnaire have been deleted!"
+    else
+      flash[:success] = "You have successfully deleted the question!"
+    end
+
     begin
       question.destroy
-      flash[:success] = "You have successfully deleted the question!"
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
-
-    if(question.questionnaire.type == 'RevisionPlanQuestionnaire')
-      redirect_to edit_revision_plan_questionnaire_path(questionnaire_id.to_s.to_sym)
-    else
-      redirect_to edit_questionnaire_path(questionnaire_id.to_s.to_sym)
-    end
+    redirect_to edit_questionnaire_path(questionnaire_id.to_s.to_sym)
   end
 
   # required for answer tagging

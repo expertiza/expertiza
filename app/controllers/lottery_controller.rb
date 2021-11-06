@@ -31,7 +31,7 @@ class LotteryController < ApplicationController
       teams = JSON.parse(response)["teams"]
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Team formation info for assignment #{assignment.name}: #{teams}", request)
       create_new_teams_for_bidding_response(teams, assignment, users_bidding_info)
-      remove_empty_teams(assignment)
+      assignment.remove_empty_teams
       match_new_teams_to_topics(assignment)
     rescue StandardError => e
       flash[:error] = e.message
@@ -84,88 +84,10 @@ class LotteryController < ApplicationController
   # teams
   def create_new_teams_for_bidding_response(teams, assignment, users_bidding_info)
     teams.each do |user_ids|
-      # Create new team and team node
-      new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s, parent_id: assignment.id)
-      team_node = TeamNode.create(parent_id: assignment.id, node_object_id: new_team.id)
-
-      user_ids.each do |user_id|
-        remove_user_from_previous_team(assignment.id, user_id)
-
-        # Create new team_user and team_user node
-        new_team_user = TeamsUser.create(user_id: user_id, team_id: new_team.id)
-        TeamUserNode.create(parent_id: team_node.id, node_object_id: new_team_user.id)
-
-        merge_bids_from_different_previous_teams(assignment.sign_up_topics, new_team.id, user_ids, users_bidding_info)
-      end
-    end
-  end
-
-  # Removes the specified user from any team of the specified assignment
-  def remove_user_from_previous_team(assignment_id, user_id)
-    team_user = TeamsUser.where(user_id: user_id).find {|team_user| team_user.team.parent_id == assignment_id }
-    team_user.team_user_node.destroy rescue nil
-    team_user.destroy rescue nil
-  end
-
-  # Destroy teams which no longer contain any team members
-  def remove_empty_teams(assignment)
-    assignment.teams.reload.each do |team|
-      if team.teams_users.empty?
-        TeamNode.where(parent_id: assignment.id, node_object_id: team.id).destroy_all rescue nil
-        team.destroy
-      end
-    end
-  end
-
-  # Create new bids for team based on `ranks` variable for each team member
-  # Currently, it is possible (already proved by db records) that
-  # some teams have multiple 1st priority, multiply 2nd priority.
-  # these multiple identical priorities come from different
-  # previous teams
-  # [Future work]: we need to find a better way to merge bids
-  # that came from different previous teams
-  def merge_bids_from_different_previous_teams(sign_up_topics, team_id, user_ids, users_bidding_info)
-    # Select data from `users_bidding_info` variable that only related to team members in current team and transpose it.
-    # For example, below matrix shows 4 topics (key) and corresponding priorities given by 3 team members (value).
-    # {
-    #   1: [1, 2, 3],
-    #   2: [0, 1, 2],
-    #   3: [2, 3, 1],
-    #   4: [2, 0, 1]
-    # }
-    bidding_matrix = Hash.new {|hash, key| hash[key] = [] }
-    current_team_members_info = users_bidding_info.select {|info| user_ids.include? info[:pid] }
-    current_team_members_info.map {|info| info[:ranks] }.each do |bids|
-      sign_up_topics.each_with_index do |topic, index|
-        bidding_matrix[topic.id] << bids[index]
-      end
-    end
-
-    # Below is the structure of matrix summary
-    # The first value is the number of nonzero item, the second value is the sum of priorities, the third value of the topic_id.
-    # [
-    #   [3, 6, 1],
-    #   [2, 3, 2],
-    #   [3, 6, 3],
-    #   [2, 3, 4]
-    # ]
-    bidding_matrix_summary = []
-    bidding_matrix.each do |topic_id, value|
-      # Exclude topics that no one bidded
-      bidding_matrix_summary << [value.count {|i| i != 0 }, value.inject(:+), topic_id] unless value.inject(:+).zero?
-    end
-    bidding_matrix_summary.sort! {|b1, b2| [b2[0], b1[1]] <=> [b1[0], b2[1]] }
-    # Result of sorting first element descendingly and second element ascendingly.
-    # We want the topic with most people bidded and lowest sum of priorities at the top.
-    # [
-    #   [3, 6, 1],
-    #   [3, 6, 3],
-    #   [2, 3, 2],
-    #   [2, 3, 4]
-    # ]
-    # Therefore the bidding priority of these 4 topics is 1 -> 3 -> 2 -> 4
-    bidding_matrix_summary.each_with_index do |b, index|
-      Bid.create(topic_id: b[2], team_id: team_id, priority: index + 1)
+      new_team = AssignmentTeam.create_team_with_users(assignment.id, user_ids)
+      # Select data from `users_bidding_info` variable that only related to team members in current team
+      current_team_members_info = users_bidding_info.select { |info| user_ids.include? info[:pid] }.map { |info| info[:ranks] }
+      Bid.merge_bids_from_different_users(new_team.id, assignment.sign_up_topics, current_team_members_info)
     end
   end
 

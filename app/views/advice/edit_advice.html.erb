@@ -66,8 +66,4 @@ function show_horizontal_questions(question_id){
   <%= submit_tag "Save and redisplay advice", :name=>"save_advice" %>
 <% end %>
 <br>
-<% if @questionnaire.type == 'RevisionPlanQuestionnaire'%>
-  <%= link_to 'Back to questionnaire', :controller => 'revision_plan_questionnaires', :action => 'edit', :id => @questionnaire.id %>
-<% else %>
-  <%= link_to 'Back to questionnaire', :controller => 'questionnaires', :action => 'edit', :id => @questionnaire.id %>
-<% end %>
+<%= link_to 'Back to questionnaire', :controller => 'questionnaires', :action => 'edit', :id => @questionnaire.id %>

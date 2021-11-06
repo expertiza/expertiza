@@ -259,10 +259,10 @@ describe 'AssignmentTeam' do
         allow(team).to receive(:submitted_hyperlinks=)
         allow(team).to receive(:save)
         allow(Net::HTTP).to receive(:get_response).and_return("0")
-        allow(YAML).to receive(:dump).with(["https://expertiza.ncsu.edu", "www.ncsu.edu"])
+        allow(YAML).to receive(:dump).with(%w[https://expertiza.ncsu.edu www.ncsu.edu])
         expect(team).to receive(:submitted_hyperlinks=)
         expect(team).to receive(:save)
-        expect(YAML).to receive(:dump).with(["https://expertiza.ncsu.edu", "http://www.ncsu.edu"])
+        expect(YAML).to receive(:dump).with(%w[https://expertiza.ncsu.edu http://www.ncsu.edu])
         team.submit_hyperlink("www.ncsu.edu  ")
       end
     end
@@ -271,7 +271,7 @@ describe 'AssignmentTeam' do
   describe "#remove_hyperlink" do
     context "when the hyperlink is in the assignment team's hyperlinks" do
       it "is removed from the team's list of hyperlinks" do
-        allow(team).to receive(:hyperlinks).and_return(["https://expertiza.ncsu.edu", "https://www.ncsu.edu"])
+        allow(team).to receive(:hyperlinks).and_return(%w[https://expertiza.ncsu.edu https://www.ncsu.edu])
         expect(team).to receive(:submitted_hyperlinks=)
         expect(team).to receive(:save)
         expect(YAML).to receive(:dump).with(["https://expertiza.ncsu.edu"])
@@ -386,13 +386,32 @@ describe 'AssignmentTeam' do
 
         allow(team.assignment).to receive(:questionnaires).with(no_args).and_return([questionnaire1, questionnaire2])
         allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team.id).and_return(review_response_map)
-        allow(Answer).to receive(:compute_scores).with(scores[:questionnaire1][:assessments], questions[:questionnaire1]).and_return(5)
-        allow(Answer).to receive(:compute_scores).with(scores[:questionnaire2][:assessments], questions[:questionnaire2]).and_return(5)
+        allow(Response).to receive(:compute_scores).with(scores[:questionnaire1][:assessments], questions[:questionnaire1]).and_return(5)
+        allow(Response).to receive(:compute_scores).with(scores[:questionnaire2][:assessments], questions[:questionnaire2]).and_return(5)
         allow(questionnaire1).to receive(:symbol).with(no_args).and_return(:questionnaire1)
         allow(questionnaire2).to receive(:symbol).with(no_args).and_return(:questionnaire2)
         allow(team.assignment).to receive(:compute_total_score).with(scores.except(:total_score)).and_return(10)
         expect(team.scores(questions)).to eq(scores)
       end
+    end
+  end
+
+  describe "create team with users" do
+    before(:each) do
+      @assignment = create(:assignment)
+      @student = create(:student)
+      @team = create(:assignment_team, parent_id: @assignment.id)
+      @team_user = create(:team_user, team_id: @team.id, user_id: @student.id)
+    end
+    it 'should create a team with users' do
+      new_team = AssignmentTeam.create_team_with_users(@assignment.id, [ @student.id ])
+      expect(new_team.users).to include @student
+    end
+
+    it 'should remove user from previous team'  do
+      expect(@team.users).to include @student
+      new_team = AssignmentTeam.create_team_with_users(@assignment.id, [ @student.id ])
+      expect(@team.users).to_not include @student
     end
   end
 end

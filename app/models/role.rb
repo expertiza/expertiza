@@ -119,7 +119,7 @@ class Role < ActiveRecord::Base
     while current
       role = Role.find(current)
       if role
-        if !seen.key?(role.id)
+        unless seen.key?(role.id)
           parents << role
           seen[role.id] = true
           current = role.parent_id

@@ -3,7 +3,9 @@ module ReportFormatterHelper
   # E1936 team recommends this method be REMOVED (it does not seem to be used anywhere in Expertiza as of 4/21/19)
   def summary_by_reviewee_and_criteria(params, _session = nil)
     assign_basics(params)
-    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, @summary_ws_url)
+    # E1991 : pass extra session variable to address anonymized view
+    # note that this is already passed from parent method in _session
+    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, @summary_ws_url, _session)
     @summary = sum.summary
     @reviewers = sum.reviewers
     @avg_scores_by_reviewee = sum.avg_scores_by_reviewee
@@ -107,7 +109,8 @@ module ReportFormatterHelper
 
   def user_summary_report(line)
     if @user_tagging_report[line.user.name].nil?
-      @user_tagging_report[line.user.name] = VmUserAnswerTagging.new(line.user, line.percentage, line.no_tagged, line.no_not_tagged, line.no_tagable)
+      # E2082 Adding extra field of interval array into data structure
+      @user_tagging_report[line.user.name] = VmUserAnswerTagging.new(line.user, line.percentage, line.no_tagged, line.no_not_tagged, line.no_tagable, line.tag_update_intervals)
     else
       @user_tagging_report[line.user.name].no_tagged += line.no_tagged
       @user_tagging_report[line.user.name].no_not_tagged += line.no_not_tagged

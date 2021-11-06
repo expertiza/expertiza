@@ -10,12 +10,21 @@ describe QuestionnairesController do
   let(:instructor) { build(:instructor, id: 6) }
   let(:instructor2) { build(:instructor, id: 66) }
   let(:ta) { build(:teaching_assistant, id: 8) }
+  let(:questionnaire1) {build(questionnaire, id: 1, assignment_id: 1, questionnaire_id: 1, used_in_round: 1)}
+  let(:questionnaire2) {build(questionnaire, id: 2, assignment_id: 1, questionnaire_id: 2, used_in_round: 2)}
+  let(:assignment) {build(assignment, id: 1)}
+  let(:due_date1) {build(due_date, id: 1, due_at: '2019-11-30 23:30:12', deadline_type_id: 1, parent_id: 1, round: 1)}
+  let(:due_date2) {build(due_date, id: 2, due_at: '2500-12-30 23:30:12', deadline_type_id: 2, parent_id: 1, round: 1)}
+  let(:due_date3) {build(due_date, id: 3, due_at: '2019-01-30 23:30:12', deadline_type_id: 1, parent_id: 1, round: 2)}
+  let(:due_date4) {build(due_date, id: 4, due_at: '2019-02-28 23:30:12', deadline_type_id: 2, parent_id: 1, round: 2)}
+  let(:assignment_questionnaire1) {build(assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 1, used_in_round: 1)}
+  let(:assignment_questionnaire2) {build(assignment_questionnaire, id: 2, assignment_id: 1, questionnaire_id: 2, used_in_round: 2)}
   before(:each) do
     allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
 
-  def check_access username
+  def check_access(username)
     stub_current_user(username, username.role.name, username.role)
     expect(controller.send(:action_allowed?))
   end
@@ -113,7 +122,7 @@ describe QuestionnairesController do
       session = {user: instructor}
       get :copy, params, session
       expect(response).to redirect_to('/questionnaires/view?id=2')
-      expect(controller.instance_variable_get(:@questionnaire).name).to eq ('Copy of ' + questionnaire.name)
+      expect(controller.instance_variable_get(:@questionnaire).name).to eq('Copy of ' + questionnaire.name)
       expect(controller.instance_variable_get(:@questionnaire).private).to eq false
       expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
       expect(controller.instance_variable_get(:@questionnaire).max_question_score).to eq 5
@@ -144,6 +153,22 @@ describe QuestionnairesController do
     context 'when params[:model] does not have whitespace in it' do
       it 'creates new questionnaire object and renders questionnaires#new page' do
         params = {model: 'ReviewQuestionnaire'}
+        get :new, params
+        expect(response).to render_template(:new)
+      end
+    end
+
+    context 'when the questionnaire is a bookmark rating rubric' do
+      it 'creates new questionnaire object and renders questionnaires#new page' do
+        params = {model: 'BookmarkRatingQuestionnaire'}
+        get :new, params
+        expect(response).to render_template(:new)
+      end
+    end
+
+    context 'when the questionnaire is a bookmark rating rubric and has whitespace' do
+      it 'creates new questionnaire object and renders questionnaires#new page' do
+        params = {model: 'Bookmark RatingQuestionnaire'}
         get :new, params
         expect(response).to render_template(:new)
       end
@@ -367,10 +392,14 @@ describe QuestionnairesController do
   end
 
   describe '#add_new_questions' do
+
+    let(:criterion) { Criterion.new(id: 2, weight: 1, max_label: '', min_label: '', size: '', alternatives: '') }
+    let(:dropdown) { Dropdown.new(id: 3, size: '', alternatives: '') }
+
     context 'when adding ScoredQuestion' do
       it 'redirects to questionnaires#edit page after adding new questions' do
-        question = double('Criterion', weight: 1, max_label: '', min_label: '', size: '', alternatives: '')
-        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', id: 1, questions: [question]))
+        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', id: 1, questions: [criterion]))
+        allow_any_instance_of(Array).to receive(:ids).and_return([2]) # need to stub since .ids isn't recognized in the context of testing
         allow(question).to receive(:save).and_return(true)
         params = {id: 1,
                   question: {total_num: 2,
@@ -382,14 +411,37 @@ describe QuestionnairesController do
 
     context 'when adding unScoredQuestion' do
       it 'redirects to questionnaires#edit page after adding new questions' do
-        question = double('Dropdown', size: '', alternatives: '')
-        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', id: 1, questions: [question]))
+        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', id: 1, questions: [dropdown]))
+        allow_any_instance_of(Array).to receive(:ids).and_return([3]) # need to stub since .ids isn't recognized in the context of testing
         allow(question).to receive(:save).and_return(true)
         params = {id: 1,
                   question: {total_num: 2,
                              type: 'Dropdown'}}
         post :add_new_questions, params
         expect(response).to redirect_to('/questionnaires/1/edit')
+      end
+    end
+    
+    context 'when add_new_questions is called and the change is not in the period.' do
+      it 'AnswerHelper.in_active_period should be called to check if this change is in the period.' do
+        allow(AnswerHelper).to receive(:in_active_period).with('1').and_return(false)
+        expect(AnswerHelper).to receive(:in_active_period).with('1')
+        params = {id: 1,
+                  question: {total_num: 2,
+                             type: 'Criterion'}}
+        post :add_new_questions, params
+      end
+    end
+
+    context 'when add_new_questions is called and the change is in the period.' do
+      it 'AnswerHelper.delete_existing_responses should be called to check if this change is in the period.' do
+        allow(AnswerHelper).to receive(:in_active_period).with('1').and_return(true)
+        allow(AnswerHelper).to receive(:delete_existing_responses).with([], '1')
+        expect(AnswerHelper).to receive(:delete_existing_responses).with([], '1')
+        params = {id: 1,
+                  question: {total_num: 2,
+                             type: 'Criterion'}}
+        post :add_new_questions, params
       end
     end
   end

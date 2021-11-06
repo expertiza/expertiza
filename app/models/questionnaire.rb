@@ -27,15 +27,15 @@ class Questionnaire < ActiveRecord::Base
                          'GlobalSurveyQuestionnaire',
                          'Course SurveyQuestionnaire',
                          'CourseSurveyQuestionnaire',
+                         'Bookmark RatingQuestionnaire',
                          'BookmarkRatingQuestionnaire',
-                         'QuizQuestionnaire',
-                         'RevisionPlanQuestionnaire'].freeze
+                         'QuizQuestionnaire'].freeze
   has_paper_trail
 
   def get_weighted_score(assignment, scores)
     # create symbol for "varying rubrics" feature -Yang
     round = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: self.id).used_in_round
-    questionnaire_symbol = if !round.nil?
+    questionnaire_symbol = unless round.nil?
                              (self.symbol.to_s + round.to_s).to_sym
                            else
                              self.symbol
@@ -45,7 +45,7 @@ class Questionnaire < ActiveRecord::Base
 
   def compute_weighted_score(symbol, assignment, scores)
     aq = self.assignment_questionnaires.find_by(assignment_id: assignment.id)
-    if !scores[symbol][:scores][:avg].nil?
+    unless scores[symbol][:scores][:avg].nil?
       scores[symbol][:scores][:avg] * aq.questionnaire_weight / 100.0
     else
       0
@@ -107,19 +107,10 @@ class Questionnaire < ActiveRecord::Base
   # validate the entries for this questionnaire
   def validate_questionnaire
     errors.add(:max_question_score, "The maximum question score must be a positive integer.") if max_question_score < 1
-    errors.add(:min_question_score, "The minimum question score must be less than the maximum") if min_question_score >= max_question_score
+    errors.add(:min_question_score, "The minimum question score must be a positive integer.") if min_question_score < 0
+    errors.add(:min_question_score, "The minimum question score must be less than the maximum.") if min_question_score >= max_question_score
 
     results = Questionnaire.where("id <> ? and name = ? and instructor_id = ?", id, name, instructor_id)
     errors.add(:name, "Questionnaire names must be unique.") if results.present?
-  end
-
-  # Display questionnaire heading in response view
-  def display_heading?
-    return false
-  end
-
-  # Return true if user owns questionnaire
-  def owner?(user_id)
-    instructor_id == user_id
   end
 end

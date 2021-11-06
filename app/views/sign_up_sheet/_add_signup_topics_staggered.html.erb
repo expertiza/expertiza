@@ -18,7 +18,7 @@
     </thead>
     <tbody>
       <% i=1 %>
-      <% for topic in @sign_up_topics %>
+      <% @sign_up_topics.each do | topic | %>
         <tr>
           <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
         </tr>
@@ -35,7 +35,8 @@
 <br/><br/>
 <%= render :partial => '/sign_up_sheet/add_topics' %>
 
-<% if @assignment.staggered_deadline == true %>
+<%# The show and hide start/end due date link will only show up if there is any topic on the page. %>
+<% if @assignment.staggered_deadline == true and @sign_up_topics.size != 0 %>
   <a href="#due_date" onClick="toggleVis('due_date');">
     <span class="inline" id="due_date_show">Show start/due date</span>
     <span class="inline" id="due_date_hide" style="display: none">Hide start/due date</span>

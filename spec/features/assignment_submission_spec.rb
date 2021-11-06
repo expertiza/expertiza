@@ -83,57 +83,61 @@ describe "assignment submisstion test" do
 
   it "is able to submit single valid file" do
     signup_topic
-    file_path = Rails.root + "spec/features/assignment_submission_files/valid_assignment_file.jpg"
+    file_path = Rails.root + "spec/features/assignment_submission_txts/valid_assignment_file.txt"
     attach_file('uploaded_file', file_path)
     click_on 'Upload file'
-    expect(page).to have_content "valid_assignment_file.jpg"
+    expect(page).to have_content "valid_assignment_file.txt"
 
     # check content of the uploaded file
-    file_upload_path = Rails.root + "pg_data/instructor6/csc517/test/Assignment1684/0/valid_assignment_file.jpg"
+    file_upload_path = Rails.root + "pg_data/instructor6/csc517/test/Assignment1684/0/valid_assignment_file.txt"
     expect(File).to exist(file_upload_path)
-    expect(File.open(file_upload_path, 'rb').read).to eql File.open(file_path, 'rb').read
+    expect(File.read(file_upload_path)).to have_content "valid_assignment_file: This is a .txt file to test assignment submission."
   end
 
   it "is able to submit multiple valid files" do
     signup_topic
     # upload file1
-    image_file_path = Rails.root + "spec/features/assignment_submission_files/valid_assignment_file.jpg"
-    attach_file('uploaded_file', image_file_path)
+    file_path = Rails.root + "spec/features/assignment_submission_txts/valid_assignment_file.txt"
+    attach_file('uploaded_file', file_path)
     click_on 'Upload file'
     # upload file2
-    pdf_file_path = Rails.root + "spec/features/assignment_submission_files/valid_assignment_file.pdf"
-    attach_file('uploaded_file', pdf_file_path)
+    file_path = Rails.root + "spec/features/assignment_submission_txts/valid_assignment_file2.txt"
+    attach_file('uploaded_file', file_path)
     click_on 'Upload file'
-    expect(page).to have_content "valid_assignment_file.jpg"
-    expect(page).to have_content "valid_assignment_file.pdf"
+    expect(page).to have_content "valid_assignment_file.txt"
+    expect(page).to have_content "valid_assignment_file2.txt"
 
     # check content of the uploaded files
     # file1
-    file_upload_path = Rails.root + "pg_data/instructor6/csc517/test/Assignment1684/0/valid_assignment_file.jpg"
+    file_upload_path = Rails.root + "pg_data/instructor6/csc517/test/Assignment1684/0/valid_assignment_file.txt"
     expect(File).to exist(file_upload_path)
-    expect(File.open(file_upload_path, 'rb').read).to eql File.open(image_file_path, 'rb').read
+    expect(File.read(file_upload_path)).to have_content "valid_assignment_file: This is a .txt file to test assignment submission."
     # file2
-    file_upload_path = Rails.root + "pg_data/instructor6/csc517/test/Assignment1684/0/valid_assignment_file.pdf"
+    file_upload_path = Rails.root + "pg_data/instructor6/csc517/test/Assignment1684/0/valid_assignment_file2.txt"
     expect(File).to exist(file_upload_path)
-    expect(File.open(file_upload_path, 'rb').read).to eql File.open(pdf_file_path, 'rb').read
+    expect(File.read(file_upload_path)).to have_content "valid_assignment_file2: This is a .txt file to test assignment submission."
   end
 
-
-  it "should not submit large file" do
+  it "is able to update already uploaded file" do
     signup_topic
     # upload file
-    file_path = Rails.root + "spec/features/assignment_submission_files/invalid_assignment_file.jpg"
+    file_path = Rails.root + "spec/features/assignment_submission_txts/valid_assignment_file3.txt"
+    file_write = File.open(file_path, 'w')
+    file_write.puts "This is the original file."
+    file_write.close
     attach_file('uploaded_file', file_path)
     click_on 'Upload file'
-    expect(page).to have_content "File size must smaller than"
-  end
+    file_upload_path = Rails.root + "pg_data/instructor6/csc517/test/Assignment1684/0/valid_assignment_file3.txt"
+    expect(File).to exist(file_upload_path)
+    expect(File.read(file_upload_path)).to have_content "This is the original file."
 
-  it "should not submit invalid file" do
-    signup_topic
-    # upload file
-    file_path = Rails.root + "spec/features/assignment_submission_files/invalid_assignment_file.txt"
+    # update file
+    file_write = File.open(file_path, 'w')
+    file_write.puts "This is the updated file."
+    file_write.close
     attach_file('uploaded_file', file_path)
     click_on 'Upload file'
-    expect(page).to have_content "File type error"
+    expect(File).to exist(file_upload_path)
+    expect(File.read(file_upload_path)).to have_content "This is the updated file."
   end
 end

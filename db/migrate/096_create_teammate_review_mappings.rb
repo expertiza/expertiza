@@ -14,15 +14,19 @@ class CreateTeammateReviewMappings < ActiveRecord::Migration
        reviewer = AssignmentParticipant.where(user_id: review["reviewer_id"], parent_id:  review["assignment_id"]).first
        if reviewer.nil?
          reviewer = AssignmentParticipant.create(:user_id => review["reviewer_id"], :parent_id => review["assignment_id"])
-         reviewer.set_handle
+         reviewer.set_handle()
        end
        reviewee = AssignmentParticipant.where(user_id: review["reviewer_id"], parent_id:  review["assignment_id"]).first
        if reviewee.nil?
          reviewee = AssignmentParticipant.create(:user_id => review["reviewer_id"], :parent_id => review["assignment_id"])
-         reviewee.set_handle
+         reviewee.set_handle()
        end
-       unless reviewer.nil? || reviewee.nil?
+       if reviewer != nil and reviewee != nil
           map = TeammateReviewMapping.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => review["assignment_id"])
+       else
+          puts "REVIEWER: #{review["reviewer_id"]}"
+          puts "REVIEWEE: #{review["reviewe3_id"]}"
+          puts review.id
        end
        execute "update `teammate_reviews` set `mapping_id` = #{map.id} where `id` = #{review["id"]}"           
     }

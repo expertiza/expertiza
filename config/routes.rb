@@ -88,7 +88,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :course, controller: 'courses', only: %i[new create edit update] do
+  resources :course, only: %i[new create edit update] do
     collection do
       get :toggle_access
       get :copy
@@ -203,7 +203,7 @@ resources :institution, except: [:destroy] do
       get :add
       post :add
       get :auto_complete_for_user_name
-      get :delete
+      get :delete_assignment_participant
       get :list
       get :change_handle
       get :inherit
@@ -274,7 +274,13 @@ resources :institution, except: [:destroy] do
   resources :global_survey_questionnaires, controller: :questionnaires
   resources :course_survey_questionnaires, controller: :questionnaires
   resources :bookmark_rating_questionnaires, controller: :questionnaires
-
+  resources :revision_plan_questionnaires, controller: :revision_plan_questionnaires, only: %i[new edit update] do
+    collection do
+      post :add_new_questions
+      post :save_all_questions
+    end
+  end
+  
   resources :questions do
     collection do
       get :types
@@ -370,7 +376,6 @@ resources :institution, except: [:destroy] do
       post :signup_as_instructor_action
       post :set_priority
       post :save_topic_deadlines
-      post :delete_all_selected_topics
     end
   end
 
@@ -401,8 +406,6 @@ resources :institution, except: [:destroy] do
     collection do
       get :list
       get :view
-      put :publishing_rights_update
-      #added a new route for updating publishing rights
       get '/*other', to: redirect('/student_task/list')
     end
   end
@@ -477,7 +480,7 @@ resources :institution, except: [:destroy] do
     collection do
       post :list
       get :get_folder_contents
-      post :get_sub_folder_contents
+      get :get_sub_folder_contents
       get :session_last_open_tab
       get :set_session_last_open_tab
     end
@@ -499,8 +502,7 @@ resources :institution, except: [:destroy] do
     collection do
       get :list
       post :list
-      post :list_pending_requested
-      post :list_pending_requested_finalized
+      get :list_pending_requested
       post ':id', action: :update
       get :auto_complete_for_user_name
       get :set_anonymized_view
@@ -518,7 +520,6 @@ resources :institution, except: [:destroy] do
     end
   end
 
-  resources :conference
   root to: 'content_pages#view', page_name: 'home'
   post :login, to: 'auth#login'
   post :logout, to: 'auth#logout'
@@ -538,7 +539,6 @@ resources :institution, except: [:destroy] do
   post '/response_toggle_permission/:id' => 'response#toggle_permission'
   post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
   post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
-  post 'student_task/publishing_rights_update', controller: :student_task, action: :publishing_rights_update,method: :put
-  #updated route and added specific controller action upon accessing this route
+
 end
 

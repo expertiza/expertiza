@@ -20,12 +20,6 @@ class ProfileController < ApplicationController
     end
     if @user.update_attributes(params[:user])
       ExpertizaLogger.info LoggerMessage.new(controller_name, @user.name, "Your profile was successfully updated.", request)
-      if params[:no_show_action] == 'not_show_actions'
-        @user.preference_home_flag = false
-      else
-        @user.preference_home_flag = true
-      end
-      @user.save!
       flash[:success] = 'Your profile was successfully updated.'
     else
       ExpertizaLogger.error LoggerMessage.new(controller_name, @user.name, "An error occurred and your profile could not updated.", request)
@@ -35,7 +29,6 @@ class ProfileController < ApplicationController
     redirect_to controller: :profile, action: :edit
   end
 
-  
   private
 
   def user_params
@@ -59,7 +52,6 @@ class ProfileController < ApplicationController
                                  :timezonepref,
                                  :public_key,
                                  :copy_of_emails,
-                                 :institution_id,
-                                 :preference_home_flag)
+                                 :institution_id)
   end
 end

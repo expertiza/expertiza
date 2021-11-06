@@ -92,7 +92,6 @@ class AssignmentsController < ApplicationController
     assignment_staggered_deadline?
     nil_timezone_update
     update_feedback_attributes
-    query_participants_and_alert
 
     # What to do next depends on how we got here
     if params['button'].nil?
@@ -502,20 +501,10 @@ class AssignmentsController < ApplicationController
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
     elsif @assignment_form.update_attributes(assignment_form_params, current_user)
       flash[:note] = 'The assignment was successfully saved....'
-      if @assignment_form.rubric_weight_error(assignment_form_params)
-        flash[:error] = "A rubric has no ScoredQuestions, but still has a weight. Please change the weight to 0."
-      end
     else
-      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.to_s}"
+      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
     end
     ExpertizaLogger.info LoggerMessage.new("", session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)
-  end
-
-  def query_participants_and_alert
-    assignment = Assignment.find(params[:id])
-    if assignment.participants.size == 0
-      flash[:error] = %Q[Saved assignment is missing participants. Add them <a href="/participants/list?id=#{assignment.id}&model=Assignment">here</a>]
-    end
   end
 
   # sets values allowed for the assignment form

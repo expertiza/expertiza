@@ -1,6 +1,6 @@
 describe AccountRequestController do
   let(:admin) { build(:admin, id: 3) }
-  let(:super_admin) {build(:superadmin)}
+  let(:super_admin) {build (:superadmin)}
   let(:instructor) { build(:instructor, id: 2) }
   let(:student1) { build(:student, id: 1, name: :lily) }
   let(:student2) { build(:student) }
@@ -27,8 +27,8 @@ describe AccountRequestController do
 
     it 'the input status is nil and original status is nil' do
       params = {
-          selection: nil,
-          commit: 'Reject'
+          id: 4,
+          status: nil
       }
       post :create_approved_user, params
       expect(flash[:error]).to eq 'Please Approve or Reject before submitting'
@@ -38,8 +38,8 @@ describe AccountRequestController do
     it 'the input status is Approved' do
       session = {user: admin}
       params = {
-          selection: {"4" => true},
-          commit: 'Accept'
+          id: 4,
+          status: 'Approved'
       }
       post :create_approved_user, params, session
       allow_any_instance_of(AccountRequest).to receive(:undo_link).with('The user "requester1" has been successfully created. ').and_return(true)
@@ -51,8 +51,8 @@ describe AccountRequestController do
       expect_any_instance_of(User).to receive(:save).and_return(false)
       session = {user: admin}
       params = {
-          selection: {"4" => true},
-          commit: 'Accept'
+          id: 4,
+          status: 'Approved'
       }
       post :create_approved_user, params, session
       expect(flash[:success]).to eq 'The user "requester1" has been successfully updated.'
@@ -61,8 +61,8 @@ describe AccountRequestController do
 
     it 'the input status is Rejected' do
       params = {
-          selection: {"4" => true},
-          commit: 'Reject'
+          id: 4,
+          status: 'Rejected'
       }
       post :create_approved_user, params
       expect(flash[:success]).to eq 'The user "requester1" has been Rejected.' or 'The user "requester1" has been successfully updated.'
@@ -72,8 +72,8 @@ describe AccountRequestController do
       it 'the input status is Rejected but update_colums fails' do
       expect_any_instance_of(AccountRequest).to receive(:update_columns).and_return(false)
       params = {
-          selection: {"4" => true},
-          commit: 'Reject'
+          id: 4,
+          status: 'Rejected'
       }
       post :create_approved_user, params
       expect(flash[:success]).to eq 'The user "requester1" has been successfully updated.'
@@ -83,18 +83,10 @@ describe AccountRequestController do
   end
 
   context "#list_pending_requested" do
-    it 'test list_pending_requested view' do
+    it 'test list_pednign_requested view' do
       stub_current_user(super_admin, super_admin.role.name, super_admin.role)
       get :list_pending_requested
       expect(response).to render_template(:list_pending_requested)
-    end
-  end
-
-  context "#list_pending_requested_finalized" do
-    it 'test list_pending_requested_finalized view' do
-      stub_current_user(super_admin, super_admin.role.name, super_admin.role)
-      get :list_pending_requested_finalized
-      expect(response).to render_template(:list_pending_requested_finalized)
     end
   end
 
@@ -102,8 +94,8 @@ describe AccountRequestController do
     it '1' do
       allow(Role).to receive(:find_by).with(name: 'instructor').and_return('instructor')
       params = {role: 'instructor'}
-      post :new, params
-      expect(response).to render_template(:new)
+      post :request_new, params
+      expect(response).to render_template(:request_new)
     end
   end
 
@@ -134,7 +126,7 @@ describe AccountRequestController do
       }
       post :create_requested_user_record, params
       expect(flash[:error]).to eq 'The account you are requesting has already existed in Expertiza.'
-      expect(response).to redirect_to('http://test.host/account_request/new?role=Student')
+      expect(response).to redirect_to('http://test.host/account_request/request_new?role=Student')
     end
 
     it 'if requested user is not saved' do
@@ -148,7 +140,7 @@ describe AccountRequestController do
           requested_user: {self_introduction: 'I am good'}
       }
       post :create_requested_user_record, params
-      expect(response).to redirect_to('http://test.host/account_request/new?role=Student')
+      expect(response).to redirect_to('http://test.host/account_request/request_new?role=Student')
     end
 
     it 'if user not exists, requested user is saved and params[:user][:institution_id] is empty' do

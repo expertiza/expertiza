@@ -2,13 +2,7 @@
 require 'active_support/time_with_zone'
 
 class AssignmentForm
-  attr_accessor :assignment,
-                :assignment_questionnaires,
-                :due_dates,
-                :tag_prompt_deployments,
-                :is_conference_assignment,
-                :auto_assign_mentor
-
+  attr_accessor :assignment, :assignment_questionnaires, :due_dates, :tag_prompt_deployments
   attr_accessor :errors
 
   DEFAULT_MAX_TEAM_SIZE = 1
@@ -34,25 +28,6 @@ class AssignmentForm
     assignment_form.set_up_assignment_review
     assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: assignment_id)
     assignment_form
-  end
-
-  def rubric_weight_error(attributes)
-    error = false
-    attributes[:assignment_questionnaire].each do |assignment_questionnaire|
-      # Check rubrics to make sure weight is 0 if there are no Scored Questions
-      scored_questionnaire = false
-      questionnaire = Questionnaire.find(assignment_questionnaire[:questionnaire_id])
-      questions = Question.where(questionnaire_id: questionnaire.id)
-      questions.each do |question|
-        if question.is_a? ScoredQuestion
-          scored_questionnaire = true
-        end
-      end
-      unless scored_questionnaire || assignment_questionnaire[:questionnaire_weight].to_i.zero?
-        error = true
-      end
-    end
-    error
   end
 
   def update(attributes, user, vary_by_topic_desired = false)
@@ -295,7 +270,8 @@ class AssignmentForm
 
   # add DelayedJob into queue and return it
   def add_delayed_job(_assignment, deadline_type, due_date, min_left)
-    MailWorker.perform_in(min_left * 60, due_date.parent_id, deadline_type, due_date.due_at)
+    delayed_job_id = MailWorker.perform_in(min_left * 60, due_date.parent_id, deadline_type, due_date.due_at)
+    delayed_job_id
   end
 
   # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue
@@ -324,7 +300,9 @@ class AssignmentForm
   def find_min_from_now(due_at)
     curr_time = DateTime.now.in_time_zone(zone = 'UTC').to_s(:db)
     curr_time = Time.parse(curr_time)
-    ((due_at - curr_time).to_i / 60)
+    time_in_min = ((due_at - curr_time).to_i / 60)
+    # time_in_min = 1
+    time_in_min
   end
 
   # Save the assignment

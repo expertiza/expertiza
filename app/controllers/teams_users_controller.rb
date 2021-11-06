@@ -30,7 +30,7 @@ class TeamsUsersController < ApplicationController
 
     team = Team.find(params[:id])
 
-    unless user.nil?
+    if !user.nil?
       if team.is_a?(AssignmentTeam)
         assignment = Assignment.find(team.parent_id)
         if AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id).nil?
@@ -40,16 +40,8 @@ class TeamsUsersController < ApplicationController
           add_member_return = team.add_member(user, team.parent_id)
           flash[:error] = "This team already has the maximum number of members." if add_member_return == false
   
-          user = TeamsUser.last
-          undo_link("The team @teams_user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
-
-          # E2115 Mentor Management
-          # Kick off the Mentor Management workflow
-          # Note: this is _not_ supported for CourseTeams which is why the other
-          # half of this if block does not include the same code
-          if add_member_return
-            MentorManagement.assign_mentor(assignment.id, team.id)
-          end
+          @teams_user = TeamsUser.last
+          undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
         end
       else # CourseTeam
         course = Course.find(team.parent_id)
@@ -59,6 +51,7 @@ class TeamsUsersController < ApplicationController
         else
           add_member_return = team.add_member(user)
           flash[:error] = "This team already has the maximum number of members." if add_member_return == false
+  
           @teams_user = TeamsUser.last
           undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
         end

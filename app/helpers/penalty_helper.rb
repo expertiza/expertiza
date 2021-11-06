@@ -17,7 +17,7 @@ module PenaltyHelper
     # use its value to check if the penalty is to be calculated for the assignment or not
     if calculate_penalty == true
       topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
-      stage = @assignment.current_stage(topic_id)
+      stage = @assignment.get_current_stage(topic_id)
       if stage == "Finished"
         penalties[:submission] = calculate_submission_penalty
         penalties[:review] = calculate_review_penalty

@@ -24,7 +24,8 @@ class LatePolicy < ActiveRecord::Base
     @policy = LatePolicy.where(policy_name: late_policy_name)
     if @policy.present?
       @policy.each do |p|
-        return true if p.instructor_id == instructor_id
+        next unless p.instructor_id == instructor_id
+        return true
       end
     end
     false

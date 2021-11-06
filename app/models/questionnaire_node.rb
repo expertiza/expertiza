@@ -19,7 +19,7 @@ class QuestionnaireNode < Node
                    '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
                  end
 
-    values = unless User.find(user_id).role.name == "Teaching Assistant"
+    values = if User.find(user_id).role.name != "Teaching Assistant"
                user_id
              else
                Ta.get_mapped_instructor_ids(user_id)

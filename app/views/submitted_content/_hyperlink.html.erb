@@ -1,5 +1,5 @@
 <%= form_for :hyperlinks, url: '/submitted_content/remove_hyperlink' do |f| %>
-  <% unless stage == "Finished" %>
+  <% if stage != "Finished" %>
     <% team_id = TeamsUser.team_id(participant.parent_id, participant.user_id) %>
     <% display_to_author = Team.exists?(team_id) && Team.find(team_id).user?(@current_user)%>
 
@@ -18,7 +18,7 @@
     <ul>
       <% participant.team.hyperlinks.each_with_index {
         |link, index| %>
-      <% unless stage == "Complete" %>
+      <% if stage != "Complete" %>
         <% if display_to_author%>
           <% if index == 0 %>
             <input type="radio" id='chk_links' name='chk_links' checked value="<%= index %>"/>

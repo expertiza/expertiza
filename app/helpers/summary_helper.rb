@@ -8,7 +8,8 @@ module SummaryHelper
   class Summary
     attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion, :summary_ws_url
 
-    def summarize_reviews_by_reviewee(questions, assignment, reviewee_id, summary_ws_url, session = nil)
+    # produce average score and summary of comments for reviews by a reviewer for each question
+    def summarize_reviews_by_reviewee(questions, assignment, reviewee_id, summary_ws_url)
       self.summary = ({})
       self.avg_scores_by_round = ({})
       self.avg_scores_by_criterion = ({})
@@ -53,7 +54,7 @@ module SummaryHelper
       self.summary = self.avg_scores_by_criterion = self.avg_scores_by_round = Array.new(assignment.rounds_of_reviews)
       rubric = get_questions_by_assignment(assignment)
 
-      (0..assignment.num_review_rounds - 1).each do |round|
+      (0..nround - 1).each do |round|
         self.avg_scores_by_round[round] = 0.0
         self.summary[round] = {}
         self.avg_scores_by_criterion[round] = {}
@@ -86,12 +87,7 @@ module SummaryHelper
     #   it does not seem to be used anywhere in Expertiza as of 4/21/19
     #   aside from in methods which are themselves not used anywhere in Expertiza as of 4/21/19
     # produce summaries for instructor and students. It sum up the feedback by criterion for each reviewee
-    def summarize_reviews_by_reviewees(assignment, summary_ws_url, session = nil)
-      # @summary[reviewee][round][question]
-      # @reviewers[team][reviewer]
-      # @avg_scores_by_reviewee[team]
-      # @avg_score_round[reviewee][round]
-      # @avg_scores_by_criterion[reviewee][round][criterion]
+    def summarize_reviews_by_reviewees(assignment, summary_ws_url)
       self.summary = ({})
       self.avg_scores_by_reviewee = ({})
       self.avg_scores_by_round = ({})
@@ -104,52 +100,10 @@ module SummaryHelper
 
       # get all teams in this assignment
       teams = Team.select(:id, :name).where(parent_id: assignment.id).order(:name)
-      
-      threads = []
-      
+
       teams.each do |reviewee|
-        reviewee_name = session ? reviewee.name(session[:ip]) : reviewee.name
-        self.summary[reviewee_name] = []
-        self.avg_scores_by_reviewee[reviewee_name] = 0.0
-        self.avg_scores_by_round[reviewee_name] = []
-        self.avg_scores_by_criterion[reviewee_name] = []
-
-        # get the name of reviewers for display only
-        self.reviewers[reviewee_name] = get_reviewers_by_reviewee_and_assignment(reviewee, assignment.id, session)
-
-        # get answers of each reviewer by rubric
-        (0..assignment.rounds_of_reviews - 1).each do |round|
-          self.summary[reviewee_name][round] = {}
-          self.avg_scores_by_round[reviewee_name][round] = 0.0
-          self.avg_scores_by_criterion[reviewee_name][round] = {}
-
-          # iterate each round and get answers
-          # if use the same rubric, only use rubric[0]
-          rubric_questions_used = rubric[assignment.varying_rubrics_by_round? ? round : 0]
-          rubric_questions_used.each do |q|
-            next if q.type.eql?("SectionHeader")
-            summary[reviewee_name][round][q.txt] = ""
-            self.avg_scores_by_criterion[reviewee_name][round][q.txt] = 0.0
-
-            # get all answers to this question
-            question_answers = Answer.answers_by_question_for_reviewee_in_round(assignment.id, reviewee.id, q.id, round + 1)
-            # get max score of this rubric
-            q_max_score = get_max_score_for_question(q)
-
-            comments = break_up_comments_to_sentences(question_answers)
-            # get score and summary of answers for each question
-            self.avg_scores_by_criterion[reviewee_name][round][q.txt] = calculate_avg_score_by_criterion(question_answers, q_max_score)
-
-            # summarize the comments by calling the summarization Web Service
-
-            # since it'll do a lot of request, do this in seperate threads
-            threads << Thread.new do
-              summary[reviewee_name][round][q.txt] = summarize_sentences(comments, summary_ws_url) unless comments.empty?
-            end
-          end
-          self.avg_scores_by_round[reviewee_name][round] = calculate_avg_score_by_round(self.avg_scores_by_criterion[reviewee_name][round], rubric_questions_used)
-        end
-        self.avg_scores_by_reviewee[reviewee_name] = calculate_avg_score_by_reviewee(self.avg_scores_by_round[reviewee_name], assignment.rounds_of_reviews)
+        summarize_reviews_by_team_reviewee(assignment, reviewee, rubric)
+        self.avg_scores_by_reviewee[reviewee.name] = calculate_avg_score_by_reviewee(self.avg_scores_by_round[reviewee.name], assignment.rounds_of_reviews)
       end
 
       self
@@ -202,8 +156,7 @@ module SummaryHelper
     end
 
     def summarize_sentences(comments, summary_ws_url)
-      logger = Logger.new(STDOUT)
-      logger.level = Logger::WARN
+      summary = ""
       param = {sentences: comments}
       # call web service
       begin
@@ -213,15 +166,16 @@ module SummaryHelper
         ps = PragmaticSegmenter::Segmenter.new(text: summary)
         return ps.segment
       rescue StandardError => err
-        logger.warn "Standard Error: #{err.inspect}"
+        summary = [err.message]
       end
     end
 
-    # convert answers to each question to sentences
     def get_sentences(ans)
-      sentences = ans.comments.gsub!(/[.?!]/, '\1|').try(:split, '|') || nil unless ans.nil? or ans.comments.nil?
-      sentences.map!(&:strip) unless sentences.nil?
-      sentences
+      unless ans.comments.nil?
+        ans.comments.gsub!(/[.?!]/, '\1|')
+        sentences = ans.comments.split('|')
+        sentences.map!(&:strip)
+      end
     end
 
     def break_up_comments_to_sentences(question_answers)
@@ -262,17 +216,12 @@ module SummaryHelper
       rubric
     end
 
-    # E1991 : Adding anonymized view condition for report generation logic
-    # We will now pass session wherever name method of user object is called
-    def get_reviewers_by_reviewee_and_assignment(reviewee, assignment_id, session)
-      reviewers = User.select(" DISTINCT users.name, users.id")
+    def get_reviewers_by_reviewee_and_assignment(reviewee, assignment_id)
+      reviewers = User.select(" DISTINCT users.name")
                       .joins("JOIN participants ON participants.user_id = users.id")
                       .joins("JOIN response_maps ON response_maps.reviewer_id = participants.id")
                       .where("response_maps.reviewee_id = ? and response_maps.reviewed_object_id = ?", reviewee.id, assignment_id)
-      reviewers.each do |reviewer|
-        reviewer.role_id = User.find(reviewer.id).role_id
-      end
-      reviewers.map{|r| r.name(session[:ip])}
+      reviewers.map(&:name)
     end
 
     def calculate_avg_score_by_criterion(question_answers, q_max_score)

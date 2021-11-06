@@ -2,7 +2,6 @@ require 'will_paginate/array'
 
 class UsersController < ApplicationController
   include AuthorizationHelper
-  include ConferenceHelper
 
   autocomplete :user, :name
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
@@ -13,13 +12,13 @@ class UsersController < ApplicationController
     case params[:action]
     when 'list_pending_requested'
       current_user_has_admin_privileges?
-    when 'new', 'create_requested_user_record'
+    when 'request_new', 'create_requested_user_record'
       true
     when 'keys', 'index'
       # These action methods are all written with the clear expectation
       # that a student should be allowed to proceed
       current_user_has_student_privileges?
-    when 'show', 'set_anonymized_view'
+    when 'show'
       # This action method is written with the clear expectation
       # that a student should be allowed to proceed
       # Furthermore, there is an RSPec test that a 'student' with no role id
@@ -116,9 +115,12 @@ class UsersController < ApplicationController
     # if the user name already exists, register the user by email address
     check = User.find_by(name: params[:user][:name])
     params[:user][:name] = params[:user][:email] unless check.nil?
-    is_user=true
-    # Assign all user params for creating user using assign_user_params function
-    @user=assign_user_params(is_user)
+    @user = User.new(user_params)
+    @user.institution_id = params[:user][:institution_id]
+    # record the person who created this new user
+    @user.parent_id = session[:user].id
+    # set the user's timezone to its parent's
+    @user.timezonepref = User.find(@user.parent_id).timezonepref
     if @user.save
       password = @user.reset_password # the password is reset
       prepared_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)
@@ -164,7 +166,7 @@ class UsersController < ApplicationController
       flash[:error] = requested_user.errors.full_messages.to_sentence
     end
     ExpertizaLogger.error LoggerMessage.new(controller_name, requested_user.name, flash[:error], request)
-    redirect_to controller: 'users', action: 'new', role: 'Student'
+    redirect_to controller: 'users', action: 'request_new', role: 'Student'
   end
 
   def create_approved_user
@@ -262,7 +264,7 @@ class UsersController < ApplicationController
   end
 
   private
- #add user preference_home_flag
+
   def user_params
     params.require(:user).permit(:name,
                                  :crypted_password,
@@ -284,8 +286,7 @@ class UsersController < ApplicationController
                                  :timezonepref,
                                  :public_key,
                                  :copy_of_emails,
-                                 :institution_id,
-                                 :preference_home_flag)
+                                 :institution_id)
   end
 
   #to find the role of a given user object and set the @role accordingly

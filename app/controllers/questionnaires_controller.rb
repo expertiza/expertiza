@@ -127,7 +127,7 @@ class QuestionnairesController < ApplicationController
             # example of 'v' value
             # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
             v.each_pair do |key, value|
-              @question.send(key + '=', value) unless @question.send(key) == value
+              @question.send(key + '=', value) if @question.send(key) != value
             end
             @question.save
           end
@@ -184,13 +184,6 @@ class QuestionnairesController < ApplicationController
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
     questionnaire_id = params[:id] unless params[:id].nil?
-    # If the questionnaire is being used in the active period of an assignment, delete existing responses before adding new questions
-    if AnswerHelper.check_and_delete_responses(questionnaire_id)
-      flash[:success] = "You have successfully added a new question. Any existing reviews for the questionnaire have been deleted!"
-    else
-      flash[:success] = "You have successfully added a new question."
-    end
-
     num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
@@ -199,20 +192,17 @@ class QuestionnairesController < ApplicationController
         question.max_label = 'Strongly agree'
         question.min_label = 'Strongly disagree'
       end
-
       question.size = '50, 3' if question.is_a? Criterion
-      question.size = '50, 3' if question.is_a? Cake
       question.alternatives = '0|1|2|3|4|5' if question.is_a? Dropdown
       question.size = '60, 5' if question.is_a? TextArea
       question.size = '30' if question.is_a? TextField
-
       begin
         question.save
       rescue StandardError
         flash[:error] = $ERROR_INFO
       end
     end
-    redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+    redirect_to action: 'edit', id: questionnaire_id.to_sym
   end
 
   # Zhewei: This method is used to save all questions in current questionnaire.
@@ -225,7 +215,7 @@ class QuestionnairesController < ApplicationController
           # example of 'v' value
           # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
           v.each_pair do |key, value|
-            @question.send(key + '=', value) unless @question.send(key) == value
+            @question.send(key + '=', value) if @question.send(key) != value
           end
 
           @question.save
@@ -238,8 +228,8 @@ class QuestionnairesController < ApplicationController
 
     if params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
-    elsif questionnaire_id
-      redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+    elsif !questionnaire_id.nil?
+      redirect_to action: 'edit', id: questionnaire_id.to_sym
     end
   end
 
@@ -249,9 +239,9 @@ class QuestionnairesController < ApplicationController
   def save
     @questionnaire.save!
 
-    save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
+    save_questions @questionnaire.id if !@questionnaire.id.nil? and @questionnaire.id > 0
     # We do not create node for quiz questionnaires
-    unless @questionnaire.type == "QuizQuestionnaire"
+    if @questionnaire.type != "QuizQuestionnaire"
       p_folder = TreeFolder.find_by(name: @questionnaire.display_type)
       parent = FolderNode.find_by(node_object_id: p_folder.id)
       # create_new_node_if_necessary(parent)

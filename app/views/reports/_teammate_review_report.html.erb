@@ -1,56 +1,37 @@
-<script>
-  $(function () {
-    /*E2084: Function for sorting the table */
-    $("#teammateReviewTable").tablesorter({
-
-      dateFormat : "mmddyyyy", //E2084: set the default date format
-      sortList: [[0,0]], // E2084: sort First Column by default when page loads
-      widgets: ['zebra'], // Make sure to update the css when column is sorted
-    });
-  });
-</script>
-
- <!--E2084: table teammateReviewTable modified-->
- <div class = 'reviewreport'>
- <table id= "teammateReviewTable" cellspacing='0' cellpadding='2' border=0 class="table table-striped">
- <thead>
- <!--E2084: "sorter-true" included to sort the table using each attribute-->
-  <tr bgcolor='#CCCCCC'>
-  <th class="sorter-true" >Reviewer</th>
-  <th class="sorter-true" ># teammate reviews done</th>
-  <th class="sorter-true" >Teammate reviewed</th>
-  <th class="sorter-true" >Last reviewed at</th>
-  </tr>
- </thead>
-
+<%= create_report_table_header("Reviewer" => "16%",
+                               "# teammate reviews done" => "14%",
+                               "Teammate reviewed" => "20%",
+                               "Last reviewed at" => "20%") %>
     <%@l = -1 %>
 
-    <% @reviewers.each do |reviewer| %>
-      <% @teammate_review_response_maps = ResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and type = ?", @id, reviewer.reviewer_id, @type]) %>
-      <% @user = User.find(Participant.find(reviewer.reviewer_id).user_id) %>
+    <% @reviewers.each do |r| %>
+      <% @teammate_review_response_maps = ResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and type = ?", @id, r.reviewer_id, @type]) %>
+      <% @user = User.find(Participant.find(r.reviewer_id).user_id) %>
       <% @team_id = TeamsUser.team_id(@id.to_i, @user.id) %>
-      <% @team_member_count = TeammateReviewResponseMap.where(reviewer_id: reviewer.reviewer_id, reviewed_object_id: @id).count %>
+      <% @team_member_count = TeammateReviewResponseMap.where(reviewer_id: r.reviewer_id, reviewed_object_id: @id).count %>
       <tr>
         <% @count = 0 %>
         <% @rspan = 0 %>
+        <%@l = @l+1 %>
+        <% (@l % 2 == 0) ? @bgcolor = "#ffffff" : @bgcolor = "#f9f9f9" %>
 
-        <% @teammate_review_response_maps.each do |response_map| %>
+        <% @teammate_review_response_maps.each do |rm| %>
         <!--count means the teammate reviews one student completed.-->
-          <% if Response.exists?(map_id: response_map.id) %>
+          <% if Response.exists?(map_id: rm.id) %>
             <% @count = @count + 1 %>
           <% end %>
         <%end %>
         <!--rspan means the all teammate reviews one student should finish, here is the num of team members minus 1.-->
         <% @team_member_count > 1 ? @rspan = @team_member_count : @rspan = 1 %>      
-        <!-- for a valid reviewer -->
-        <%if Participant.exists?(id: reviewer.reviewer_id) %>
+
+        <%if Participant.exists?(id: r.reviewer_id) %>
           <% @reviewer_name = @user.fullname(session[:ip]) %>
           <!--Reviewer-->
-          <td rowspan= <%= @rspan %>>
-            <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => reviewer.reviewer_id, :assignment_id => @id%>
+          <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan %>>
+            <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id => @id%>
           </td>
           <!--# teammate reviews done-->
-          <td  align = "left" rowspan= <%= @rspan %>>
+          <td bgcolor=<%= @bgcolor %>  align = "left" rowspan= <%= @rspan %>>
             <% if @team_member_count == 1 %>
               <%= '--' %>
             <% else %>
@@ -65,17 +46,17 @@
             <% if !@teammate_review_response.blank? %>
               <% @reviewee = rm.reviewee.user %>
                 <!--Teammate reviewed-->
-                <td id = "green" align = 'left' colspan=1>
+                <td id = "green" bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
                   <%= link_to @reviewee.name(session[:ip]), impersonate_impersonate_path(:user => {:name => @reviewee.name}), :method => :post, :title => "Click here to impersonate this user" %>
                   (<%= @reviewee.fullname(session[:ip]) %>)
                 </td>
                 <!--Last reviewed at-->
-                <td align = 'left'>
+                <td bgcolor=<%= @bgcolor %> align = 'left'>
                   <%= @teammate_review_response.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
-                </td></tr><tr class="tablesorter-childRow">
+                </td></tr><tr>
             <% else %>
               <!-- Teammate reviewed-->
-              <td id = "green" style="color:#DD3300" align = 'left' colspan=1>
+              <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>
                 <% if @team_member_count == 1 %>
                   <%= 'N/A' %>
                 <% else %>
@@ -85,7 +66,7 @@
                 <% end %>
               </td>
               <!--Last reviewed at-->
-              <td style="color:#DD3300" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
+              <td bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left'>No</td></tr><tr>
             <% end %>
           <% end %>
           </tr>

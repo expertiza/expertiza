@@ -3,7 +3,7 @@ require_relative 'helpers/assignment_creation_helper'
 describe "Assignment creation topics tab", js: true do
 	include AssignmentCreationHelper
 	before(:each) do
-		create_deadline_types
+		create_deadline_types()
 		(1..3).each do |i|
 			create(:course, name: "Course #{i}")
 		end
@@ -13,28 +13,7 @@ describe "Assignment creation topics tab", js: true do
 		check("assignment_has_topics")
 		click_link 'Topics'
 	end
-	it 'Selects all the checkboxes when select all checkbox clicked' do
-		assignment = Assignment.where(name: 'public assignment for test').first
-		create(:topic, assignment_id: assignment.id)
-		create(:topic, assignment_id: assignment.id)
-		visit "/assignments/#{assignment.id}/edit"
-		click_link 'Topics'
-        expect(page).to have_field('select_all')
-		check('select_all')
-		expect(page).to have_checked_field('topic_check')        
-	end
-	it 'Deletes nothing when select all checkbox is not clicked and none of the topics are selected', js: true do
-		assignment = Assignment.where(name: 'public assignment for test').first
-		create(:topic, assignment_id: assignment.id)
-		create(:topic, assignment_id: assignment.id)
-		visit "/assignments/#{assignment.id}/edit"
-	 	click_link 'Topics'
-	 	click_button 'Delete selected topics'
-	    page.driver.browser.switch_to.alert.accept
-        sleep 3
-	 	topics_exist = SignUpTopic.where(assignment_id: assignment.id).count
-        expect(topics_exist).to be_eql 2
-    end
+
 	it "can edit topics properties" do
 		check("assignment_form_assignment_allow_suggestions")
 		check("assignment_form_assignment_is_intelligent")

@@ -48,15 +48,9 @@
         <!--Team name-->
         <% if @assignment.max_team_size > 1 %>
           <% team_name_color = get_team_name_color_in_list_submission(team) %>
-          <td><p style = <%="color:#{team_name_color}"%>><%= team.name(session[:ip]) %></p>
+          <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
           <% unless participants.empty? %>
-            <!-- “Assign Grade” will show if the final deadline of this assignment pass -->
-            <% if @assignment.current_stage == "Finished" %>
-              <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
-            <!-- if current user(TA/instructor) is participant in assignment then the user can perform review -->
-            <%elsif current_user_is_assignment_participant?(@assignment.id) %>
-              <%= render :partial => 'responses', :locals => {:team => team ,:topic_id => topic_identifier, :title => 'Review'} %>
-            <% end %>
+            <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
           <% end %>
         <% end %>
 
@@ -79,7 +73,7 @@
           <% end %>
           <br>
           <!--Display submitted files-->
-          <% team.submitted_files %>
+          <% p team.submitted_files %>
           <% if participant and !team.submitted_files.empty? %>
             <% files = team.submitted_files %>
             <%= display_directory_tree(participant, files, true).html_safe if files and files.length > 0 %>

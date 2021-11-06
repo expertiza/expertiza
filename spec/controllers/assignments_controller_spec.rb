@@ -228,7 +228,7 @@ describe AssignmentsController do
           },
           assignment_form: {
             assignment_questionnaire: [{"assignment_id" => "1", "questionnaire_id" => "666", "dropdown" => "true",
-                                        "questionnaire_weight" => "0", "notification_limit" => "15", "used_in_round" => "1"}],
+                                        "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
             assignment: {
               instructor_id: 2,
               course_id: 1,
@@ -271,17 +271,6 @@ describe AssignmentsController do
           post :update, @params, session
           expect(flash[:note]).to eq('The assignment was successfully saved....')
           expect(flash[:error]).to be nil
-          expect(response).to render_template('assignments/edit/_topics')
-        end
-      end
-
-      context 'when update assignment_form is called on an empty questionnaire of non-zero weight' do
-        it 'shows an error message and redirects to assignments#edit page' do
-          @params[:assignment_form][:assignment_questionnaire][0]["questionnaire_weight"] = "100"
-          session = {user: instructor}
-          post :update, @params, session
-          expect(flash[:note]).to eq('The assignment was successfully saved....')
-          expect(flash[:error]).to eq("A rubric has no ScoredQuestions, but still has a weight. Please change the weight to 0.")
           expect(response).to render_template('assignments/edit/_topics')
         end
       end

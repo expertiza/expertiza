@@ -67,7 +67,7 @@ class AssignmentTeam < Team
 
   # E-1973 If a team is being treated as a reviewer of an assignment, then they are the reviewer
   def get_reviewer
-    self
+    return self
   end
 
   # Evaluates whether any contribution by this team was reviewed by reviewer
@@ -166,7 +166,7 @@ class AssignmentTeam < Team
     assignment.questionnaires.each do |questionnaire|
       scores[questionnaire.symbol] = {}
       scores[questionnaire.symbol][:assessments] = ReviewResponseMap.where(reviewee_id: self.id)
-      scores[questionnaire.symbol][:scores] = Response.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+      scores[questionnaire.symbol][:scores] = Answer.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
     end
     scores[:total_score] = assignment.compute_total_score(scores)
     scores
@@ -276,12 +276,12 @@ class AssignmentTeam < Team
         return participant.id
       end
     end
-    nil
+    return nil
   end
 
   # determines if the team contains a participant who is currently logged in
   def current_user_is_reviewer?(current_user_id)
-    get_logged_in_reviewer_id(current_user_id) != nil
+    return get_logged_in_reviewer_id(current_user_id) != nil
   end
 
 end

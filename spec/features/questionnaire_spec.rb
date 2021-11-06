@@ -22,7 +22,7 @@ describe "Questionnaire tests for instructor interface" do
     end
   end
 
-  def make_questionnaire(private)
+  def make_questionnaire private
     login_as("instructor6")
     visit '/questionnaires/new?model=ReviewQuestionnaire&private=' + (private ? '1' : '0')
     fill_in('questionnaire_name', with: 'Review 1')
@@ -56,7 +56,7 @@ describe "Questionnaire tests for instructor interface" do
     click_button "Create"
   end
 
-  def load_question(question_type)
+  def load_question question_type
     load_questionnaire
     fill_in('question_total_num', with: '1')
     select(question_type, from: 'question_type')
@@ -86,7 +86,7 @@ describe "Questionnaire tests for instructor interface" do
     expect(page).to have_content('You have successfully deleted the question!')
   end
 
-  def choose_check_type(command_type)
+  def choose_check_type command_type
     if command_type == 'edit'
       edit_created_question
     else

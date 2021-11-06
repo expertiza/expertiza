@@ -4,7 +4,7 @@ require_relative 'helpers/assignment_creation_helper'
 describe "Assignment creation rubrics tab", js: true do
 	include AssignmentCreationHelper
 	before(:each) do
-		create_deadline_types
+		create_deadline_types()
 		@assignment = create(:assignment)
 		create_list(:participant, 3)
 		# Create an assignment due date

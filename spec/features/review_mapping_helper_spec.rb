@@ -52,11 +52,11 @@ describe "Test Author feedback report" do
   end
 
   it "can display Review response rejoined" do
-    expect(page).to have_content('Review responded to')
+    expect(page).to have_content('Review response rejoined ')
   end
 
   it "can display Last rejoined at" do
-    expect(page).to have_content('Last responded at')
+    expect(page).to have_content('Last rejoined at')
   end
 end
 

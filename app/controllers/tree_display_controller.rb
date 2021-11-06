@@ -10,12 +10,12 @@ class TreeDisplayController < ApplicationController
 
   # refactored method to provide direct access to parameters
   # added an argument prevTab for sending the respective tab to be highlighted on homepage
-  def goto_controller(name_parameter, prev_tab)
+  def goto_controller(name_parameter, prevTab)
     node_object = TreeFolder.find_by(name: name_parameter)
     session[:root] = FolderNode.find_by(node_object_id: node_object.id).id
     # if we have to highlight a tab, we store this arg. to the last_open_tab elements of session
-    unless prev_tab.nil?
-      session[:last_open_tab] = prev_tab
+    if(prevTab!=nil)
+      session[:last_open_tab] = prevTab
     end
     redirect_to controller: 'tree_display', action: 'list', currCtlr: name_parameter
   end
@@ -51,9 +51,8 @@ class TreeDisplayController < ApplicationController
     # to view. Top level folders include Questionaires, Courses, and Assignments.
     folders = {}
     FolderNode.get.each do |folder_node|
-    
       child_nodes = folder_node.get_children(nil, nil, session[:user].id, nil, nil)
-      # Serialize the contents of each node so it can be displayed on the UI
+       # Serialize the contents of each node so it can be displayed on the UI
       contents = []
       child_nodes.each do |node|
         contents.push(serialize_folder_to_json(folder_node.get_name, node))
@@ -65,47 +64,6 @@ class TreeDisplayController < ApplicationController
 
     respond_to do |format| 
       format.html { render json: folders } 
-    end
-  end
-  
-  # Returns the contents of only the specified folder
-  def get_specific_folder_contents
-    # Get all child nodes associated with a top level folder that the logged in user is authorized
-    # to view. Top level folders include Questionaires, Courses, and Assignments.
-    folders = {}
-    FolderNode.get.each do |folder_node|
-      child_nodes = folder_node.get_children(nil, nil, session[:user].id, nil, nil)
-      # Serialize the contents of each node so it can be displayed on the UI
-      contents = []
-      child_nodes.each do |node|
-        # TODO: INCLUDE THE CHILDREN NODES HERE, ITS FILTERING TOO MUCH AND NOT RETRIEVING ANYTHING USEFUL INT EH CHILDREN SECTION OF THE REACT REFERENCE HERE
-        contents.push(serialize_folder_to_json(folder_node.get_name, node))
-      end
-      
-      # Store contents according to the root level folder.
-      folders[folder_node.get_name] = contents
-    end
-
-    respond_to do |format| 
-      format.html { render json: folders } 
-    end
-  end
-  
-  # for child nodes
-  def children_node_ng
-    flash[:error] = "Invalid JSON in the TreeList" unless json_valid? params[:reactParams][:child_nodes]
-    child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
-    tmp_res = {}
-    begin
-      child_nodes.each do |node|
-        initialize_fnode_update_children(params, node, tmp_res)
-      end
-      flash[:error] = "Invalid child nodes in the TreeList"
-    rescue
-    end
-    
-    respond_to do |format|
-      format.html { render json: contents }
     end
   end
 
@@ -119,34 +77,28 @@ class TreeDisplayController < ApplicationController
     
     # Get all of the children in the sub-folder.
     child_nodes = folder_node.get_children(nil, nil, session[:user].id, nil, nil)
-    
     # Serialize the contents of each node so it can be displayed on the UI
     contents = []
     child_nodes.each do |node|
       contents.push(serialize_sub_folder_to_json(node))
     end
+  end
+  # for child nodes
+  def children_node_ng
+    flash[:error] = "Invalid JSON in the TreeList" unless json_valid? params[:reactParams][:child_nodes]
+    child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
+    tmp_res = {}
+    unless child_nodes.blank?
+      child_nodes.each do |node|
+        initialize_fnode_update_children(params, node, tmp_res)
+      end
+    end
+    res = res_node_for_child(tmp_res)
+    res['Assignments'] = res['Assignments'].sort_by {|x| [x['instructor'], -1 * x['creation_date'].to_i] } if res.key?('Assignments')
     respond_to do |format|
-      format.html { render json: contents }
+      format.html { render json: res }
     end
   end
-
-   
-  
-  # # for child nodes
-  # def children_node_2_ng
-  #   child_nodes = child_nodes_from_params(params[:reactParams2][:child_nodes])
-  #   res = get_tmp_res(params, child_nodes)
-  #   respond_to do |format|
-  #     format.html { render json: res }
-  #   end
-  # end
-  # ^^^ original method for "handleExpandClick"
-  # For the questionnaire's handleExpandClick function, it appears that the get_sub_folder_contents method is not capable of returning the data.
-  # We fixed the courses by rendering the json properly on the return to the jquery post request from the front-end
-  # The assignments tab did not have any data when we used the react debuging extension (i.e. the childNodes attribute was null)
-  # From this, we assumed there was no data to display underneath each assignment
-  # After debugging, we found that the "nodeType" attribute in the :reactParams field of the post request identifies the type of childNodes to be retrieved (i.e. "courses" or "Questionnaires")
-  # We found that a "FolderNode" value for this attribute equates to a questionnaire
 
   # check if nodetype is coursenode
   def course_node_for_current_ta?(ta_mappings, node)
@@ -280,8 +232,8 @@ class TreeDisplayController < ApplicationController
       "type" => node.type
     }
     
-    if folder_type == "Courses" || folder_type == "Assignments"
-      json.merge!({
+    if folder_type == "Courses" or folder_type == "Assignments"
+      json.merge! ({
         "directory" => node.get_directory,
         "creation_date" => node.get_creation_date,
         "updated_date" => node.get_modified_date,
@@ -295,8 +247,8 @@ class TreeDisplayController < ApplicationController
         serialize_assignment_to_json(node, json)
       end
     end
-
-    json
+    
+    return json
   end
   
   # Creates a json object that can be displayed by the UI
@@ -320,8 +272,8 @@ class TreeDisplayController < ApplicationController
         serialize_assignment_to_json(node, json)
       end
     end
-
-    json
+    
+    return json
   end
 
   # Checks if the user is the instructor for the course or assignment node provided.

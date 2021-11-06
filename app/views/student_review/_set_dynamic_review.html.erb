@@ -9,7 +9,7 @@
     }
 </SCRIPT>
 <% if assignment.topics? && assignment.can_choose_topic_to_review? %>
-  <% unless assignment.current_stage == "Finished" %>
+  <%if assignment.get_current_stage()!="Finished" %>
     <%= form_tag :controller => 'review_mapping',
                  :action => 'assign_reviewer_dynamically',
                  :assignment_id => assignment.id,
@@ -46,7 +46,7 @@
   <%end%>
 <% else %>
     
-    <%unless assignment.current_stage == "Finished" %>
+    <%if assignment.get_current_stage()!="Finished" %>
     <%= form_tag :controller => 'review_mapping',
                  :action => 'assign_reviewer_dynamically',
                  :assignment_id => assignment.id,

@@ -43,7 +43,7 @@
     <!--And if one reviewer did not do first-round review and did second round directly, Expertiza will display only second round.-->
     <!--If another reviewer only finished first-round review and did not do second round, Expertiza will display only first round.-->
     <!--If this assignment does not support varying rubrics by round, Expertiza will display last round review.--> 
-    <% rounds = [] %>
+    <% rounds = Array.new %>
     <% rscore[:assessments].uniq{|response| response.round }.each do |response| %>
         <% rounds << response.round %>
     <% end %>

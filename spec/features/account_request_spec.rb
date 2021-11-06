@@ -10,10 +10,10 @@ describe 'new user request' do
 
   context 'request account feature' do
     it 'works correctly', js: true do
-      # click 'REQUEST ACCOUNT' button on root path, redirect to users# new page
+      # click 'REQUEST ACCOUNT' button on root path, redirect to users#request_new page
       visit '/'
       click_link 'Request account'
-      expect(page).to have_current_path('/account_request/new?role=Instructor')
+      expect(page).to have_current_path('/account_request/request_new?role=Instructor')
       fill_in 'user_name', with: 'requester'
       fill_in 'user_fullname', with: 'requester, requester'
       # a new user is able to add a new institution
@@ -54,7 +54,38 @@ describe 'new user request' do
       expect(page).to have_link('requester1@test.com')
     end
 
+    context 'when super-admin or admin rejects a requester' do
+      it 'displays \'Rejected\' as status' do
+        visit '/'
+        login_as 'super_administrator2'
+        visit '/account_request/list_pending_requested'
+        expect(page).to have_content('requester1')
+        choose(name: 'status', option: 'Rejected')
+        click_on('Submit')
+        expect(page).to have_content('The user "requester1" has been Rejected.')
+        expect(AccountRequest.first.status).to eq('Rejected')
+        expect(page).to have_content('requester1')
+        expect(page).to have_content('Rejected')
+      end
+    end
+
     context 'when super-admin or admin accepts a requester' do
+      it 'displays \'Accept\' as status and sends an email with randomly-generated password to the new user' do
+        visit '/'
+        login_as 'super_administrator2'
+        visit '/account_request/list_pending_requested'
+        ActionMailer::Base.deliveries.clear
+        expect(page).to have_content('requester1')
+        expect(AccountRequest.first.status).to eq('Under Review')
+        choose(name: 'status', option: 'Approved')
+        click_on('Submit')
+        expect(page).to have_content('requester1')
+        # the size of mailing queue changes by 1
+        expect(ActionMailer::Base.deliveries.count).to eq(2)
+        expect(ActionMailer::Base.deliveries.first.subject).to eq("Your Expertiza account and password has been created")
+        expect(ActionMailer::Base.deliveries.first.to).to eq(["expertiza.development@gmail.com"])
+      end
+
       context 'using name as username and password in the email' do
         it 'allows the new user to login Expertiza' do
           create(:student, name: 'approved_requster1', password: "password")

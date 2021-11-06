@@ -16,7 +16,7 @@ describe QuizQuestionnairesController do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
 
-  def check_access(username)
+  def check_access username
     stub_current_user(username, username.role.name, username.role)
     expect(controller.send(:action_allowed?))
   end
@@ -32,6 +32,79 @@ describe QuizQuestionnairesController do
         expect(controller.validate_quiz).to eq('Please specify quiz name (please do not use your name or id).')
       end
     end
+# describe '#create_quiz_questionnaire, #create_questionnaire and #save' do
+#     context 'when quiz is valid' do
+#       before(:each) do
+#         # create_quiz_questionnaire
+#         allow_any_instance_of(QuizQuestionnaireController).to receive(:valid_quiz).and_return('valid')
+#       end
+#       context 'when questionnaire type is QuizQuestionnaire' do
+#         it 'redirects to submitted_content#edit page' do
+#           params = {aid: 1,
+#                     pid: 1,
+#                     questionnaire: {name: 'Test questionnaire',
+#                                     type: 'QuizQuestionnaire'}}
+#           # create_questionnaire
+#           participant = double('Participant')
+#           allow(Participant).to receive(:find).with('1').and_return(participant)
+#           allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', id: 6))
+#           allow_any_instance_of(QuizQuestionnaireController).to receive(:save_choices).with(1).and_return(true)
+#           # save
+#           allow_any_instance_of(QuizQuestionnaireController).to receive(:save_questions).with(1).and_return(true)
+#           allow_any_instance_of(QuizQuestionnaireController).to receive(:undo_link).with(any_args).and_return('')
+#           post :create_quiz_questionnaire, params
+#           expect(flash[:note]).to eq('The quiz was successfully created.')
+#           expect(response).to redirect_to('/submitted_content/1/edit')
+#           expect(controller.instance_variable_get(:@questionnaire).private).to eq false
+#           expect(controller.instance_variable_get(:@questionnaire).name).to eq 'Test questionnaire'
+#           expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
+#           expect(controller.instance_variable_get(:@questionnaire).max_question_score).to eq 1
+#           expect(controller.instance_variable_get(:@questionnaire).type).to eq 'QuizQuestionnaire'
+#           expect(controller.instance_variable_get(:@questionnaire).instructor_id).to eq 6
+#         end
+#       end
+
+#       context 'when questionnaire type is not QuizQuestionnaire' do
+#         it 'redirects to submitted_content#edit page' do
+#           params = {aid: 1,
+#                     pid: 1,
+#                     questionnaire: {name: 'Test questionnaire',
+#                                     type: 'ReviewQuestionnaire'}}
+#           # create_questionnaire
+#           allow(ReviewQuestionnaire).to receive(:new).with(any_args).and_return(review_questionnaire)
+#           session = {user: build(:teaching_assistant, id: 1)}
+#           allow(Ta).to receive(:get_my_instructor).with(1).and_return(6)
+#           # save
+#           allow(TreeFolder).to receive(:find_by).with(name: 'Review').and_return(double('TreeFolder', id: 1))
+#           allow(FolderNode).to receive(:find_by).with(node_object_id: 1).and_return(double('FolderNode'))
+#           allow_any_instance_of(QuizQuestionnaireController).to receive(:undo_link).with(any_args).and_return('')
+#           post :create_quiz_questionnaire, params, session
+#           expect(flash[:note]).to be nil
+#           expect(response).to redirect_to('/tree_display/list')
+#           expect(controller.instance_variable_get(:@questionnaire).private).to eq false
+#           expect(controller.instance_variable_get(:@questionnaire).name).to eq 'Test questionnaire'
+#           expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
+#           expect(controller.instance_variable_get(:@questionnaire).max_question_score).to eq 5
+#           expect(controller.instance_variable_get(:@questionnaire).type).to eq 'ReviewQuestionnaire'
+#           expect(controller.instance_variable_get(:@questionnaire).instructor_id).to eq 6
+#         end
+#       end
+#     end
+#     context 'when quiz is invalid and questionnaire type is QuizQuestionnaire' do
+#       it 'redirects to submitted_content#edit page' do
+#         params = {aid: 1,
+#                   pid: 1,
+#                   questionnaire: {name: 'test questionnaire',
+#                                   type: 'QuizQuestionnaire'}}
+#         # create_quiz_questionnaire
+#         allow_any_instance_of(QuizQuestionnaireController).to receive(:valid_quiz).and_return('Please select a correct answer for all questions')
+#         request.env['HTTP_REFERER'] = 'www.google.com'
+# post :create_quiz_questionnaire, params
+#         expect(flash[:error]).to eq('Please select a correct answer for all questions')
+#         expect(response).to redirect_to('www.google.com')
+#       end
+#     end
+#   end
 
   describe '#create and #save' do
     context 'when quiz is valid' do
@@ -44,16 +117,11 @@ describe QuizQuestionnairesController do
           params = {aid: 1,
                     pid: 1,
                     questionnaire: {name: 'Test questionnaire',
-                                    type: 'QuizQuestionnaire',
-                                    min_question_score: 0,
-                                    max_question_score: 5
-                                    }}
+                                    type: 'QuizQuestionnaire'}}
           # create_questionnaire
           participant = double('Participant')
           allow(Participant).to receive(:find).with('1').and_return(participant)
-          allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', rspid: 6))
           allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', id: 6))
-          #allow(AssignmentTeam).to receive(:id).with(participant).and_return(double('AssignmentTeam', id: 6))
           allow_any_instance_of(QuizQuestionnairesController).to receive(:save_choices).with(1).and_return(true)
           # save
           allow_any_instance_of(QuizQuestionnairesController).to receive(:save_questions).with(1).and_return(true)
@@ -64,73 +132,11 @@ describe QuizQuestionnairesController do
           expect(controller.instance_variable_get(:@questionnaire).private).to eq false
           expect(controller.instance_variable_get(:@questionnaire).name).to eq 'Test questionnaire'
           expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
-          expect(controller.instance_variable_get(:@questionnaire).max_question_score).to eq 5
+          expect(controller.instance_variable_get(:@questionnaire).max_question_score).to eq 1
           expect(controller.instance_variable_get(:@questionnaire).type).to eq 'QuizQuestionnaire'
           expect(controller.instance_variable_get(:@questionnaire).instructor_id).to eq 6
-
         end
       end
-
-      context 'when questionnaire type is QuizQuestionnaire and max_question_score value is negative' do
-        it 'creates error: The maximum question score must be a positive integer.' do
-          params = {aid: 1,
-                    pid: 1,
-                    questionnaire: {name: 'Test questionnaire',
-                                    type: 'QuizQuestionnaire',
-                                    min_question_score: -2,
-                                    max_question_score: -1
-                    }}
-          # create_questionnaire
-          participant = double('Participant')
-          allow(Participant).to receive(:find).with('1').and_return(participant)
-          allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', rspid: 6))
-          allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', id: 6))
-          #allow(AssignmentTeam).to receive(:id).with(participant).and_return(double('AssignmentTeam', id: 6))
-          allow_any_instance_of(QuizQuestionnairesController).to receive(:save_choices).with(1).and_return(true)
-          # save
-          allow_any_instance_of(QuizQuestionnairesController).to receive(:save_questions).with(1).and_return(true)
-          allow_any_instance_of(QuizQuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
-          request.env['HTTP_REFERER'] = 'www.google.com'
-          post :create, params
-          expect(flash[:error]).to eq('Minumum and/or maximum question score cannot be less than 0.')
-          expect(response).to redirect_to('www.google.com')
-          end
-    end
-
-    context 'when questionnaire type is QuizQuestionnaire and min_question_score value is negative' do
-      it 'creates error: The minimum question score must be a positive integer.' do
-        params = {aid: 1,
-                  pid: 1,
-                  questionnaire: {name: 'Test questionnaire',
-                                  type: 'QuizQuestionnaire',
-                                  min_question_score: 2,
-                                  max_question_score: 1
-                  }}
-        # create_questionnaire
-        participant = double('Participant')
-        allow(Participant).to receive(:find).with('1').and_return(participant)
-        allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', rspid: 6))
-        allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', id: 6))
-        #allow(AssignmentTeam).to receive(:id).with(participant).and_return(double('AssignmentTeam', id: 6))
-        allow_any_instance_of(QuizQuestionnairesController).to receive(:save_choices).with(1).and_return(true)
-        # save
-        allow_any_instance_of(QuizQuestionnairesController).to receive(:save_questions).with(1).and_return(true)
-        allow_any_instance_of(QuizQuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
-        request.env['HTTP_REFERER'] = 'www.google.com'
-        post :create, params
-        expect(flash[:error]).to eq('Maximum question score cannot be less than minumum question score.')
-        expect(response).to redirect_to('www.google.com')    end
-  end
-
-    context 'when questionnaire type is QuizQuestionnaire and max_question_score is less than min_question_score' do
-      it 'creates error: The minimum question score must be less than the maximum.' do
-        questionnaire.min_question_score = 3
-        questionnaire.max_question_score = 1
-        questionnaire.valid?
-        expect(questionnaire.errors[:min_question_score]).to include('The minimum question score must be less than the maximum.')                      
-    end
-  end
-
       context 'when quiz is invalid and questionnaire type is QuizQuestionnaire' do
       it 'redirects to submitted_content#edit page' do
         params = {aid: 1,
@@ -206,7 +212,7 @@ describe QuizQuestionnairesController do
         allow(Assignment).to receive(:find).with('1').and_return(assignment)
         allow(assignment).to receive(:require_quiz?).and_return(false)
         get :new, params
-        expect(flash[:error]).to eq('This assignment is not configured to use quizzes.')
+        expect(flash[:error]).to eq('This assignment does not support the quizzing feature.')
         expect(response).to redirect_to('/submitted_content/view?id=1')
       end
     end
@@ -234,7 +240,7 @@ describe QuizQuestionnairesController do
         allow(@questionnaire).to receive(:taken_by_anyone?).and_return(true)
         params = {id: 1, pid: 1}
         get :edit, params
-        expect(flash[:error]).to eq('Your quiz has been taken by one or more students; you cannot edit it anymore.')
+        expect(flash[:error]).to eq('Your quiz has been taken by some other students, you cannot edit it anymore.')
         expect(response).to redirect_to('/submitted_content/view?id=1')
       end
     end
@@ -265,8 +271,7 @@ describe QuizQuestionnairesController do
                                   instructor_loc: ''},
                   question: {'1' => {txt: 'Q1'},
                              '2' => {txt: 'Q2'},
-                             '3' => {txt: 'Q3'},
-                             '4' => {txt: 'Q4'}},
+                             '3' => {txt: 'Q3'}},
                   quiz_question_choices: {'1' => {MultipleChoiceRadio:
                                                       {:correctindex => 1,
                                                        '1' => {txt: 'a11'},
@@ -275,37 +280,31 @@ describe QuizQuestionnairesController do
                                                        '4' => {txt: 'a14'}}},
                                           '2' => {TrueFalse: {'1' => {iscorrect: 'True'}}},
                                           '3' => {MultipleChoiceCheckbox:
-                                                      {'1' => {iscorrect: '0', txt: 'a31'},
-                                                       '2' => {iscorrect: '1', txt: 'a32'},
-                                                       '3' => {iscorrect: '0', txt: 'a33'},
-                                                       '4' => {iscorrect: '1', txt: 'a34'}}},
-                                          '4' => {TrueFalse: {'1' => {iscorrect: 'False'}}}},
+                                                      {'1' => {iscorrect: '1', txt: 'a31'},
+                                                       '2' => {iscorrect: '0', txt: 'a32'},
+                                                       '3' => {iscorrect: '1', txt: 'a33'},
+                                                       '4' => {iscorrect: '0', txt: 'a34'}}}},
                   question_weights: {'1' => {txt: '1'},
                                     '2' => {txt: '1'},
-                                    '3' => {txt: '1'},
-                                    '4' => {txt: '1'}}}
+                                    '3' => {txt: '1'}}}
         questionnaire = double('Questionnaire')
         allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
         allow(questionnaire).to receive(:update_attributes).with(any_args).and_return(true)
         q1 = build(:question, id: 1, type: 'MultipleChoiceRadio')
         q2 = build(:question, id: 2, type: 'TrueFalse')
         q3 = build(:question, id: 3, type: 'MultipleChoiceCheckbox')
-        q4 = build(:question, id: 4, type: 'TrueFalse')
         allow(Question).to receive(:find).with('1').and_return(q1)
         allow(Question).to receive(:find).with('2').and_return(q2)
         allow(Question).to receive(:find).with('3').and_return(q3)
-        allow(Question).to receive(:find).with('4').and_return(q4)
         qc = double('QuizQuestionChoice')
         # quiz question choice for true/false question
         qc_tf = double('QuizQuestionChoice', txt: 'True')
         allow(QuizQuestionChoice).to receive(:where).with(question_id: '1').and_return([qc, qc, qc, qc])
         allow(QuizQuestionChoice).to receive(:where).with(question_id: '2').and_return([qc_tf])
         allow(QuizQuestionChoice).to receive(:where).with(question_id: '3').and_return([qc, qc, qc, qc])
-        allow(QuizQuestionChoice).to receive(:where).with(question_id: '4').and_return([qc_tf])
         allow(q1).to receive(:save).and_return(true)
         allow(q2).to receive(:save).and_return(true)
         allow(q3).to receive(:save).and_return(true)
-        allow(q4).to receive(:save).and_return(true)
         allow(qc).to receive(:update_attributes).with(any_args).and_return(true)
         allow(qc_tf).to receive(:update_attributes).with(any_args).and_return(true)
         post :update, params
@@ -350,25 +349,22 @@ describe QuizQuestionnairesController do
 
   describe '#save_choices' do
     it 'is able to save different kinds of quiz questions' do
-      controller.params = {new_question: {'1' => 'q1', '2' => 'q2', '3' => 'q3', '4' => 'q4'},
+      controller.params = {new_question: {'1' => 'q1', '2' => 'q2', '3' => 'q3'},
                            new_choices: {'1' => {MultipleChoiceRadio: {'1' => {txt: 'a11', iscorrect: '3'},
                                                                        '2' => {txt: 'a12'}, '3' => {txt: 'a13'}, '4' => {txt: 'a14'}}},
-                                         '2' => {TrueFalse: {'1' => {iscorrect: '0'}}},
-                                         '3' => {MultipleChoiceCheckbox: {'1' => {iscorrect: '0', txt: 'a31'},
-                                                                          '2' => {iscorrect: '1', txt: 'a32'},
+                                         '2' => {TrueFalse: {'1' => {iscorrect: '1'}}},
+                                         '3' => {MultipleChoiceCheckbox: {'1' => {iscorrect: '1', txt: 'a31'},
+                                                                          '2' => {iscorrect: '0', txt: 'a32'},
                                                                           '3' => {iscorrect: '1', txt: 'a33'},
-                                                                          '4' => {iscorrect: '0', txt: 'a34'}}},
-                                          '4' => {TrueFalse: {'1' => {iscorrect: '1'}}}},
+                                                                          '4' => {iscorrect: '0', txt: 'a34'}}}},
                            question_type: {'1' => {type: 'MultipleChoiceRadio'},
                                            '2' => {type: 'TrueFalse'},
-                                           '3' => {type: 'MultipleChoiceCheckbox'},
-                                           '4' => {type: 'TrueFalse'}}}
+                                           '3' => {type: 'MultipleChoiceCheckbox'}}}
       q1 = build(:question, id: 1, type: 'MultipleChoiceRadio')
       q2 = build(:question, id: 2, type: 'TrueFalse')
       q3 = build(:question, id: 3, type: 'MultipleChoiceCheckbox')
-      q4 = build(:question, id: 4, type: 'TrueFalse')
-      allow(Question).to receive(:where).with(questionnaire_id: 1).and_return([q1, q2, q3, q4])
-      expect { controller.send(:save_choices, 1) }.to change { QuizQuestionChoice.count }.from(0).to(12)
+      allow(Question).to receive(:where).with(questionnaire_id: 1).and_return([q1, q2, q3])
+      expect { controller.send(:save_choices, 1) }.to change { QuizQuestionChoice.count }.from(0).to(10)
     end
   end
 end

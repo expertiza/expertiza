@@ -23,7 +23,7 @@ class SignedUpTeam < ActiveRecord::Base
       names = '(missing team)'
 
       participant_names.each do |participant_name|
-        unless team_name_added
+        if !team_name_added
           names = "[" + participant_name.team_name + "] " + User.find_by(name: participant_name.u_name).name(ip_address) + " "
           participant.team_name_placeholder = participant_name.team_name
           participant.user_name_placeholder = User.find_by(name: participant_name.u_name).name(ip_address) + " "

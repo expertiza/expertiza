@@ -74,7 +74,7 @@ class ReviewResponseMap < ResponseMap
   def show_feedback(response)
     return unless self.response.any? and response
     map = FeedbackResponseMap.find_by(reviewed_object_id: response.id)
-    map.response.last.display_as_html if map and map.response.any?
+    return map.response.last.display_as_html if map and map.response.any?
   end
 
   def metareview_response_maps
@@ -104,7 +104,7 @@ class ReviewResponseMap < ResponseMap
 
   #E-1973 - returns the reviewer of the response, either a participant or a team
   def get_reviewer
-    ReviewResponseMap.get_reviewer_with_id(assignment.id, reviewer_id)
+    return ReviewResponseMap.get_reviewer_with_id(assignment.id, reviewer_id)
   end
 
   # E-1973 - gets the reviewer of the response, given the assignment and the reviewer id
@@ -137,7 +137,7 @@ class ReviewResponseMap < ResponseMap
         @reviewers << ReviewResponseMap.get_reviewer_with_id(assignment.id, reviewer_id_from_response_map.reviewer_id)
       end
       # we sort the reviewer by name here, using whichever class it is an instance of
-      unless assignment.reviewer_is_team
+      if not assignment.reviewer_is_team
         @reviewers = Participant.sort_by_name(@reviewers)
       else
         @reviewers = Team.sort_by_name(@reviewers)
@@ -146,13 +146,13 @@ class ReviewResponseMap < ResponseMap
       # This is a search, so find reviewers by user's full name
       user_ids = User.select("DISTINCT id").where('fullname LIKE ?', '%' + review_user[:fullname] + '%')
       #E1973 - we use a separate query depending on if the reviewer is a team or participant
-      unless assignment.reviewer_is_team
+      if not assignment.reviewer_is_team
         @reviewers = AssignmentParticipant.where('user_id IN (?) and parent_id = ?', user_ids, assignment.id)
       else
         reviewer_participants = AssignmentTeam.where('id IN (?) and parent_id = ?', team_ids, assignment.id)
         @reviewers = []
         reviewer_participants.each do |participant|
-          unless @reviewers.include? participant.team
+          if not @reviewers.include? participant.team
             @reviewers << participant.team
           end
         end
@@ -189,7 +189,7 @@ class ReviewResponseMap < ResponseMap
     symbol = if round.nil?
                :review
              else
-               ("review round" + " " + round.to_s).to_sym
+               ("review round" + round.to_s).to_sym
              end
     review_final_versions[symbol] = {}
     # TODO E1936 (future work)

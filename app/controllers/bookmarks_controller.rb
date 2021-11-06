@@ -78,7 +78,7 @@ class BookmarksController < ApplicationController
   # calculate average questionnaire score for 'Your rating' for specific bookmark
   def specific_average_score(bookmark)
     if bookmark.nil?
-      '-'
+      return '-'
     else
       assessment = SignUpTopic.find(bookmark.topic_id).assignment
       questions = assessment.questionnaires.where(type: 'BookmarkRatingQuestionnaire').flat_map(&:questions)
@@ -86,7 +86,7 @@ class BookmarksController < ApplicationController
           reviewed_object_id: assessment.id,
           reviewee_id: bookmark.id,
           reviewer_id: AssignmentParticipant.find_by(user_id: current_user.id).id).flat_map {|r| Response.where(map_id: r.id) }
-      score = Response.assessment_score(response: responses, questions: questions)
+      score = Answer.get_total_score(response: responses, questions: questions)
       if score.nil?
         return '-'
       else
@@ -98,14 +98,14 @@ class BookmarksController < ApplicationController
   # calculate average questionnaire score for 'Avg. rating' for specific bookmark
   def total_average_score(bookmark)
     if bookmark.nil?
-      '-'
+      return '-'
     else
       assessment = SignUpTopic.find(bookmark.topic_id).assignment
       questions = assessment.questionnaires.where(type: 'BookmarkRatingQuestionnaire').flat_map(&:questions)
       responses = BookmarkRatingResponseMap.where(
           reviewed_object_id: assessment.id,
           reviewee_id: bookmark.id).flat_map {|r| Response.where(map_id: r.id) }
-      totalScore = Response.compute_scores(responses, questions)
+      totalScore = Answer.compute_scores(responses, questions)
       if totalScore[:avg].nil?
         return '-'
       else

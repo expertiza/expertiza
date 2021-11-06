@@ -22,7 +22,7 @@ class Lock < ActiveRecord::Base
   # Automatically handles creating/destroying locks and timeout periods
   # However, once a user is done with a lock, it is their responsibility to destroy it by using Lock.unlock
   def self.get_lock(lockable, user, timeout)
-    if lockable.nil? || user.nil?
+    if(lockable.nil? || user.nil?)
       return nil
     end
     lock = find_by(lockable: lockable)
@@ -38,7 +38,7 @@ class Lock < ActiveRecord::Base
         return create_lock(lockable, user, timeout)
       end
       # Your last chance on acquiring the lock is if you already own it
-      if lock.user_id == user.id
+      if(lock.user_id == user.id)
         lock.destroy
         return create_lock(lockable, user, timeout)
       end
@@ -73,7 +73,7 @@ class Lock < ActiveRecord::Base
       return
     end
     lock = find_by(lockable: lockable)
-    unless lock.nil?
+    if !lock.nil?
       Lock.where(lockable: lockable).destroy_all
     end
   end
@@ -91,5 +91,6 @@ class Lock < ActiveRecord::Base
       lock.save!
       return lockable
     end
+    return nil
   end
 end

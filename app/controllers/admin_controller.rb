@@ -5,8 +5,6 @@ class AdminController < ApplicationController
     case params[:action]
     when 'list_instructors'
       current_user_has_admin_privileges?
-    when 'remove_instructor'
-      current_user_has_admin_privileges?
     else
       current_user_has_super_admin_privileges?
     end

@@ -50,7 +50,6 @@ class ParticipantsController < ApplicationController
     # E1721 changes End.
   end
 
-  #when you change the duties, changes the permissions based on the new duty you go to
   def update_authorizations
     permissions = Participant.get_permissions(params[:authorization])
     can_submit = permissions[:can_submit]
@@ -122,7 +121,7 @@ class ParticipantsController < ApplicationController
     if assignment.course
       course = assignment.course
       assignment.participants.each do |participant|
-        new_participant = participant.copy_to_course(course.id)
+        new_participant = participant.copy(course.id)
         @copied_participants.push new_participant if new_participant
       end
       # only display undo link if copies of participants are created
@@ -157,7 +156,7 @@ class ParticipantsController < ApplicationController
   end
 
   # Deletes participants from an assignment
-  def delete
+  def delete_assignment_participant
     contributor = AssignmentParticipant.find(params[:id])
     name = contributor.name
     assignment_id = contributor.assignment
@@ -181,7 +180,7 @@ class ParticipantsController < ApplicationController
     teams = Team.where(parent_id: assignment_id)
     teams.each do |team|
       team_info = {}
-      team_info[:name] = team.name(session[:ip])
+      team_info[:name] = team.name
       users = []
       team.users {|team_user| users.append(get_user_info(team_user, assignment)) }
       team_info[:users] = users
@@ -206,14 +205,15 @@ class ParticipantsController < ApplicationController
     user = {}
     user[:name] = team_user.name
     user[:fullname] = team_user.fullname
-    #set by default
     permission_granted = false
+    has_signature = false
+    signature_valid = false
     assignment.participants.each do |participant|
       permission_granted = participant.permission_granted? if team_user.id == participant.user.id
     end
     # If permission is granted, set the publisting rights string
     user[:pub_rights] = permission_granted ? "Granted" : "Denied"
-    user[:verified] = false
+    user[:verified] = permission_granted && has_signature && signature_valid
     user
   end
 

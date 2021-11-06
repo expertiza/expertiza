@@ -15,7 +15,7 @@ class GradesController < ApplicationController
       are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
       self_review_finished?
     when 'view_team'
-      if current_user_is_a? 'Student' # students can only see the heat map for their own team
+      if current_user_is_a? 'Student' # students can only see the head map for their own team
         participant = AssignmentParticipant.find(params[:id])
         current_user_is_assignment_participant?(participant.assignment.id)
       else
@@ -43,11 +43,11 @@ class GradesController < ApplicationController
       end
     end
 
-    @scores = ResponseMap.scores(@assignment,@questions)
-    averages = vector(@scores)
+    @scores = @assignment.scores(@questions)
+    averages = calculate_average_vector(@assignment.scores(@questions))
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)
-    penalties(@assignment.id)
+    calculate_all_penalties(@assignment.id)
 
     @show_reputation = false
   end
@@ -60,14 +60,14 @@ class GradesController < ApplicationController
     questionnaires = @assignment.questionnaires
     @questions = retrieve_questions questionnaires, @assignment.id
     # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
-    @pscore = ResponseMap.participant_scores(@participant, @questions)
+    @pscore = @participant.scores(@questions)
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
-    @stage = @participant.assignment.current_stage(@topic_id)
-    penalties(@assignment.id)
+    @stage = @participant.assignment.get_current_stage(@topic_id)
+    calculate_all_penalties(@assignment.id)
     # prepare feedback summaries
     summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
-    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewee(@questions, @assignment, @team_id, summary_ws_url, session)
+    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewee(@questions, @assignment, @team_id, summary_ws_url)
     @summary = sum.summary
     @avg_scores_by_round = sum.avg_scores_by_round
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
@@ -81,26 +81,11 @@ class GradesController < ApplicationController
     @team_id = @team.id
     questionnaires = @assignment.questionnaires
     @questions = retrieve_questions questionnaires, @assignment.id
-    @pscore = ResponseMap.participant_scores(@participant, @questions)
+    @pscore = @participant.scores(@questions)
     @vmlist = []
 
-    # loop through each questionnaire, and populate the view model for all data necessary
-    # to render the html tables.
-    counter_for_same_rubric = 0
-    questionnaires.each do |questionnaire|
-      @round = nil
-      if @assignment.vary_by_round && questionnaire.type == "ReviewQuestionnaire"
-        questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
-        if questionnaires.count > 1
-          @round = questionnaires[counter_for_same_rubric].used_in_round
-          counter_for_same_rubric += 1
-        else
-          @round = questionnaires[0].used_in_round
-          counter_for_same_rubric = 0
-        end
-      end
-      @vmlist << populate_view_model(questionnaire)
-    end
+    generate_heatgrid(@participant, @assignment, @team, @team_id, questionnaires, @vmlist)
+
     @current_role_name = current_role_name
   end
 
@@ -108,7 +93,7 @@ class GradesController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     @questions = list_questions(@assignment)
-    @scores = ResponseMap.participant_scores(@participant, @questions)
+    @scores = @participant.scores(@questions)
   end
 
   def instructor_review
@@ -143,7 +128,7 @@ class GradesController < ApplicationController
   def update
     participant = AssignmentParticipant.find(params[:id])
     total_score = params[:total_score]
-    unless format("%.2f", total_score) == params[:participant][:grade]
+    if format("%.2f", total_score) != params[:participant][:grade]
       participant.update_attribute(:grade, params[:participant][:grade])
       message = if participant.grade.nil?
                   "The computed score will be used for " + participant.user.name + "."
@@ -169,32 +154,7 @@ class GradesController < ApplicationController
     redirect_to controller: 'grades', action: 'view_team', id: participant.id
   end
 
-  def bar_chart(scores, width = 100, height = 100, spacing = 1)
-    link = nil
-    GoogleChart::BarChart.new("#{width}x#{height}", " ", :vertical, false) do |bc|
-      data = scores
-      bc.data "Line green", data, '990000'
-      bc.axis :y, range: [0, data.max], positions: data.minmax
-      bc.show_legend = false
-      bc.stacked = false
-      bc.width_spacing_options(bar_width: (width - 30) / (data.size + 1), bar_spacing: 1, group_spacing: spacing)
-      bc.data_encoding = :extended
-      link = bc.to_url
-    end
-    link
-  end
-
   private
-
-  def populate_view_model(questionnaire)
-    vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
-    vmquestions = questionnaire.questions
-    vm.add_questions(vmquestions)
-    vm.add_team_members(@team)
-    vm.add_reviews(@participant, @team, @assignment.vary_by_round)
-    vm.number_of_comments_greater_than_10_words
-    vm
-  end
 
   def redirect_when_disallowed
     # For author feedback, participants need to be able to read feedback submitted by other teammates.
@@ -204,16 +164,46 @@ class GradesController < ApplicationController
     # ACS Check if team count is more than 1 instead of checking if it is a team assignment
     if @participant.assignment.max_team_size > 1
       team = @participant.team
-      unless team.nil? || (team.user? session[:user])
+      unless team.nil?
+        unless team.user? session[:user]
           flash[:error] = 'You are not on the team that wrote this feedback'
           redirect_to '/'
           return true
+        end
       end
     else
       reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: @participant.assignment.id).first
       return true unless current_user_id?(reviewer.try(:user_id))
     end
     false
+  end
+
+  def calculate_all_penalties(assignment_id)
+    @all_penalties = {}
+    @assignment = Assignment.find(assignment_id)
+    calculate_for_participants = true unless @assignment.is_penalty_calculated
+    Participant.where(parent_id: assignment_id).each do |participant|
+      penalties = calculate_penalty(participant.id)
+      @total_penalty = 0
+
+      unless penalties[:submission].zero? || penalties[:review].zero? || penalties[:meta_review].zero?
+
+        @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
+        l_policy = LatePolicy.find(@assignment.late_policy_id)
+        @total_penalty = l_policy.max_penalty if @total_penalty > l_policy.max_penalty
+        calculate_penalty_attributes(@participant) if calculate_for_participants
+      end
+      assign_all_penalties(participant, penalties)
+    end
+    @assignment.update_attribute(:is_penalty_calculated, true) unless @assignment.is_penalty_calculated
+  end
+
+  def calculate_penalty_attributes(_participant)
+    deadline_type_id = [1, 2, 5]
+    penalties_symbols = %i[submission review meta_review]
+    deadline_type_id.zip(penalties_symbols).each do |id, symbol|
+      CalculatedPenalty.create(deadline_type_id: id, participant_id: @participant.id, penalty_points: penalties[symbol])
+    end
   end
 
   def assign_all_penalties(participant, penalties)
@@ -233,26 +223,63 @@ class GradesController < ApplicationController
       if @assignment.vary_by_round
         (1..@assignment.rounds_of_reviews).each do |round|
           responses = @pscore[:review][:assessments].select {|response| response.round == round }
-          scores = scores.concat(score_vector(responses, 'review' + round.to_s))
+          scores = scores.concat(build_score_vector(responses, 'review' + round.to_s))
           scores -= [-1.0]
         end
         @grades_bar_charts[:review] = bar_chart(scores)
       else
-        charts(:review)
+        remove_negative_scores_and_build_charts(:review)
       end
     end
-    participant_score_types.each {|symbol| charts(symbol) }
+    participant_score_types.each {|symbol| remove_negative_scores_and_build_charts(symbol) }
+  end
+
+  def remove_negative_scores_and_build_charts(symbol)
+    if @participant_score and @participant_score[symbol]
+      scores = build_score_vector @participant_score[symbol][:assessments], symbol.to_s
+      scores -= [-1.0]
+      @grades_bar_charts[symbol] = bar_chart(scores)
+    end
+  end
+
+  def build_score_vector(reviews, symbol)
+    scores = []
+    reviews.each do |review|
+      scores << Answer.get_total_score(response: [review], questions: @questions[symbol.to_sym], q_types: [])
+    end
+    scores
+  end
+
+  # Filters all non nil values and converts them to integer
+  # Returns a vector
+  def calculate_average_vector(scores)
+    scores[:teams].reject! {|_k, v| v[:scores][:avg].nil? }
+    scores[:teams].map {|_k, v| v[:scores][:avg].to_i }
+  end
+
+  def bar_chart(scores, width = 100, height = 100, spacing = 1)
+    link = nil
+    GoogleChart::BarChart.new("#{width}x#{height}", " ", :vertical, false) do |bc|
+      data = scores
+      bc.data "Line green", data, '990000'
+      bc.axis :y, range: [0, data.max], positions: data.minmax
+      bc.show_legend = false
+      bc.stacked = false
+      bc.width_spacing_options(bar_width: (width - 30) / (data.size + 1), bar_spacing: 1, group_spacing: spacing)
+      bc.data_encoding = :extended
+      link = bc.to_url
+    end
+    link
   end
 
   def self_review_finished?
     participant = Participant.find(params[:id])
     assignment = participant.try(:assignment)
-    self_review_enabled=assignment.try(:is_selfreview_enabled)
-    not_submitted=unsubmitted_self_review?(participant.try(:id))
-    if self_review_enabled
-      !not_submitted
-    else
-      true
-    end
+    # Below is only false when self review is enabled and not submitted
+    return ! ( assignment.try(:is_selfreview_enabled) and unsubmitted_self_review?(participant.try(:id)) )
+  end
+
+  def mean(array)
+    array.inject(0) {|sum, x| sum += x } / array.size.to_f
   end
 end

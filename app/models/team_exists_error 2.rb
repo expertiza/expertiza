@@ -1,2 +1,0 @@
-class TeamExistsError < StandardError
-end

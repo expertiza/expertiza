@@ -308,9 +308,9 @@
     }
     function handleCheckReviewVaryByDuty(checkvalue) {
         var state = checkvalue.checked;
-        var no_of_duties = <%= @duties.length %>
-        if (state == true && no_of_duties > 0) {
-        // make it display by duty
+        <%unless @duties.nil? or @duties.empty?%>
+        if (state == true) {
+            // make it display by duty
             removeQuestionnaireTableRow('TeammateReviewQuestionnaire')
 
             <% @duties.each do |duty| %>
@@ -329,13 +329,13 @@
 
             <% end %>
             <%@avoidrepeatsign=1%>;
-        } else if (state == false && no_of_duties >0) {
+        } else {
             // loop as many times as number of duties, remove TeammateReviewQuestionnaire
             <% @duties.each do |duty| %>
-              removeQuestionnaireTableRow(
-                  'TeammateReviewQuestionnaire',
-                  <%= duty.id %>
-              )
+            removeQuestionnaireTableRow(
+                'TeammateReviewQuestionnaire',
+                <%= duty.id %>
+            )
             <% end %>
 
             // add the default TeammateReviewQuestionnaire
@@ -350,7 +350,7 @@
             );
 
         }
-
+        <%end%>
     }
 </script>
 
@@ -439,22 +439,23 @@
           if (team_assignment_checkbox.is(':checked')) {
               // if condition whether vary by duty is checked or not. If unchecked, show TeammateReviewQuestionnaire
               // otherwise if checked, show the duty and their corresponding questionnaire that is selected
-              if (team_assignment_checkbox.is(':checked')) {
-                  <% @duties.each do |duty| %>
-                  <% assignment_questionnaire = @assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil, duty.id) %>
-                  <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'TeammateReviewQuestionnaire') %>
+              if (rubric_vary_by_duty_checkbox.is(':checked')) {
+                  <%unless @duties.nil? or @duties.empty?%>
+                    <% @duties.each do |duty| %>
+                    <% assignment_questionnaire = @assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil, duty.id) %>
+                    <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'TeammateReviewQuestionnaire') %>
 
-                  addQuestionnaireTableRow(
-                      'TeammateReviewQuestionnaire',
-                      <%= assignment_questionnaire.to_json.html_safe %>,
-                      <%= questionnaire.to_json.html_safe %>,
-                      <%= questionnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>,
-                      null,
-                      '<%= duty.id %>',
-                      '<%= duty.duty_name %>'
-                  );
+                    addQuestionnaireTableRow(
+                        'TeammateReviewQuestionnaire',
+                        <%= assignment_questionnaire.to_json.html_safe %>,
+                        <%= questionnaire.to_json.html_safe %>,
+                        <%= questionnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>,
+                        null,
+                        '<%= duty.id %>',
+                        '<%= duty.duty_name %>'
+                    );
+                    <%end%>
                   <%end%>
-
               } else {
                   <% assignment_questionnaire = @assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil) %>
                   <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'TeammateReviewQuestionnaire') %>

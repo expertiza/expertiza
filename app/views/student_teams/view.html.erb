@@ -20,11 +20,11 @@
     <tr style="border: 1px outset #000000; padding: 10px 20px" >
       <th class="head">Username</th>
       <th class="head">Full name</th>
-      <th class="head">Team-member role (duty)</th>
-      <th class="head">Email address</th>
       <%if @student.assignment.is_duty_based_assignment %>
-          <th class="head">Team-member role (duty)</th>
+          <th class="head">Role</th>
       <%end%>
+      <th class="head">Email address</th>
+
       <% if @teammate_review_allowed %>
         <th class="head">Review action</th>
       <% end %>

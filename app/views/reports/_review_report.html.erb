@@ -78,6 +78,7 @@
                 <%= ', ' unless round == @assignment.num_review_rounds %>
               <% end %>
               <%= link_to "summary", {:controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => reviewer.id, :assignment_id=>@id}, target: :_blank %>
+              <%= "authors summary"%>
             </td>
           <!--Team reviewed / Author feedback-->
           <td align = 'left'>

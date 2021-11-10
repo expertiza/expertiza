@@ -187,4 +187,7 @@ class AssignmentParticipant < Participant
     end
     stage
   end
+  def get_duty_id()
+    TeamsUser.where(:team_id=> self.team.id,:user_id => self.user_id).first.duty_id
+  end
 end

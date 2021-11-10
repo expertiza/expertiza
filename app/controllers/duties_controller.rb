@@ -1,8 +1,10 @@
+
 class DutiesController < ApplicationController
+  include AuthorizationHelper
+
+  # duties can be created/modified by Teaching Assistants, Instructor, Admin, Super Admin
   def action_allowed?
-    ['Instructor',
-     'Teaching Assistant',
-     'Administrator'].include? current_role_name
+    current_user_has_ta_privileges?
   end
 
   before_action :set_duty, only: [:show, :edit, :update, :destroy]
@@ -38,7 +40,7 @@ class DutiesController < ApplicationController
       # When the duty (role) is created successfully we return back to the assignment edit page
       redirect_to edit_assignment_path(params[:duty][:assignment_id]), notice: 'Role was successfully created.'
     else
-      render :new
+      redirect_to_create_page_and_show_error
     end
   end
 
@@ -53,7 +55,7 @@ class DutiesController < ApplicationController
     if @duty.save
       redirect_to edit_assignment_path(params[:duty][:assignment_id]), notice: 'Role was successfully updated.'
     else
-      render :edit
+      redirect_to_create_page_and_show_error
     end
   end
 
@@ -74,5 +76,13 @@ class DutiesController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_duty
     @duty = Duty.find(params[:id])
+  end
+  def redirect_to_create_page_and_show_error
+    complete_error_log = ""
+    if @duty.errors.any?
+      @duty.errors.full_messages.each do |error_message| complete_error_log <<  "#{error_message}. " end
+    end
+    flash[:error] = complete_error_log
+    redirect_to :action => :new, :id=> params[:duty][:assignment_id]
   end
 end

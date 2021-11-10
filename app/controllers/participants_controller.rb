@@ -69,13 +69,6 @@ class ParticipantsController < ApplicationController
     redirect_to action: 'list', id: parent_id, model: participant.class.to_s.gsub("Participant", "")
   end
 
-  # Example of duties: manager, designer, programmer, tester
-  def update_duties
-    participant = Participant.find(params[:member_id])
-    participant.update_attributes(duty_id: params[:member]["duty_id"])
-    redirect_to controller: 'student_teams', action: 'view', student_id: params[:member_id]
-  end
-
   def destroy
     participant = Participant.find(params[:id])
     parent_id = participant.parent_id

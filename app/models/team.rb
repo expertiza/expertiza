@@ -16,7 +16,9 @@ class Team < ActiveRecord::Base
     users.where(parent_id: parent_id || current_user_id).flat_map(&:participants)
   end
   alias get_participants participants
-
+  def team_users
+    TeamsUser.where(team_id: self.id)
+  end
   # Get the response review map
   def responses
     participants.flat_map(&:responses)

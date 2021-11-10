@@ -367,7 +367,10 @@ class ResponseController < ApplicationController
       "GlobalSurveyResponseMap",
       "BookmarkRatingResponseMap"
       if @assignment.is_duty_based_assignment
-        @questionnaire = @map.questionnaire_by_duty(@map.reviewee.duty_id)
+        print("\n\n\n")
+        print(@map.reviewee.inspect)
+        print("\n\n\n")
+        @questionnaire = @map.questionnaire_by_duty(@map.reviewee.get_duty_id())
       else
         @questionnaire = @map.questionnaire
       end

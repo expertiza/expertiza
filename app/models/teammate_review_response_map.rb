@@ -7,7 +7,12 @@ class TeammateReviewResponseMap < ResponseMap
   end
 
   def questionnaire_by_duty(duty_id)
-    Questionnaire.find(AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, duty_id: duty_id).questionnaire_id)
+    duty_questionnaire = AssignmentQuestionnaire.where(:assignment_id => self.assignment.id, :duty_id=> duty_id).first
+    unless duty_questionnaire.nil?
+      return Questionnaire.find(duty_questionnaire.questionnaire_id)
+    else
+      questionnaire()
+    end
   end
 
   def contributor
@@ -16,6 +21,9 @@ class TeammateReviewResponseMap < ResponseMap
 
   def get_title
     "Teammate Review"
+  end
+  def get_reviewer
+    AssignmentParticipant.find(reviewer_id)
   end
 
   def self.teammate_response_report(id)

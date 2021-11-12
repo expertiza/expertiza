@@ -11,7 +11,7 @@ class Team < ActiveRecord::Base
     joins(:teams_users).where("teams.parent_id = ? AND teams_users.user_id = ?", assignment_id, user_id)
   }
   
-  # E2147 : Get the participants of the given team
+  # Get the participants of the given team
   def participants
     users.where(parent_id: parent_id || current_user_id).flat_map(&:participants)
   end

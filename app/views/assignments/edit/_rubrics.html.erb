@@ -2,6 +2,7 @@
     function addQuestionnaireTableRow(questionnaire_type, assignment_questionnaire, questionnaire, questionnaire_options, round_no, duty_id, duty_name) {
         var questionnaire_table = jQuery('#assignment_questionnaire_table>tbody>tr');
         var row_id = 'questionnaire_table_' + questionnaire_type;
+        // E2147 : If duty_id is not undefined, add duty_id with the row_id to create a unique row id
         if (duty_id != undefined){
             row_id = row_id + duty_id
         }
@@ -9,6 +10,8 @@
         var i;
         var html = '<tr id=' + row_id + '>';
         html += '<input name="assignment_form[assignment_questionnaire][][assignment_id]" type="hidden" value="' + '<%= @assignment_form.assignment.id %>' +'">';
+
+        // E2147 : Add duty_id as hidden input for this particular row so that it can be saved in assignment_questionnaire table
         if (duty_id != undefined) {
             html += '<input name="assignment_form[assignment_questionnaire][][duty_id]" type="hidden" value="' + duty_id +'">';
         }
@@ -16,6 +19,7 @@
         if (round_no == null && duty_id == undefined) {
             html += '<td><label for="questionnaire_id">' + questionnaire.display_type + ':</label></td>';
         } else if (round_no == null && duty_id != undefined) {
+            // E2147 : Add name of duty infront of the questionnaire type to select for which duty the questionnaire is being selected
             html += '<td><label for="questionnaire_id">' + questionnaire.display_type +  ' Role ' + duty_name + ':</label></td>';
         }
         else if (round_no!=null && duty_id == undefined) {

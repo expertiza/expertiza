@@ -36,6 +36,7 @@
         <td><%= member.user.fullname(session[:ip]) %></td>
         <%if @student.assignment.is_duty_based_assignment %>
             <% member_duty_id = member.get_duty_id() %>
+              <!-- Gets duty of member if the assignment is duty based and member has a duty -->
             <%unless member_duty_id.nil?%>
                <td><%= Duty.find(member_duty_id).duty_name %></td>
             <%else%>

@@ -22,7 +22,7 @@ class StudentTeamsController < ApplicationController
     # note, this code replaces the following line that cannot be called before action allowed?
     return false unless current_user_has_student_privileges?
     case action_name
-      when 'view'
+    when 'view'
       if are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter")
         return true if current_user_has_id? student.user_id
       else
@@ -50,7 +50,7 @@ class StudentTeamsController < ApplicationController
     @current_due_date = DueDate.current_due_date(@student.assignment.due_dates)
 
     #this line generates a list of users on the waiting list for the topic of a student's team,  
-    @users_on_waiting_list = (SignUpTopic.find(app/controllers/student_teams_controller.rb.topic).users_on_waiting_list if student_team_requirements_met?)
+    @users_on_waiting_list = (SignUpTopic.find(@student.team.topic).users_on_waiting_list if student_team_requirements_met?)
 
     @teammate_review_allowed = DueDate.teammate_review_allowed(@student)
   end

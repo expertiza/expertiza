@@ -104,7 +104,7 @@ class AssignmentForm
         unless attr[:questionnaire_id].blank?
           questionnaire_type = Questionnaire.find(attr[:questionnaire_id]).type
           topic_id = attr[:topic_id] if attr.key?(:topic_id)
-          duty_id = attr[:duty_id] if attr.key?(:duty_id)
+          duty_id = attr[:duty_id] if attr.key?(:duty_id) # if duty_id is present in the attributes, save it.
           aq = assignment_questionnaire(questionnaire_type, attr[:used_in_round], topic_id, duty_id)
           if aq.id.nil?
             unless aq.save
@@ -226,6 +226,10 @@ class AssignmentForm
   def assignment_questionnaire(questionnaire_type, round_number, topic_id, duty_id=nil)
     round_number = nil if round_number.blank?
     topic_id = nil if topic_id.blank?
+
+    # Default value of duty_id is nil, and when duty_id is not nil, then it means that the function call
+    # is made to access assignment_questionnaire of that particular duty. If questionnaires varies by duty,
+    # then find the relevant questionnaire and return.
     if duty_id !=nil and @assignment.questionnaire_varies_by_duty
       # Get all AQs for the assignment and specified duty_id
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, duty_id: duty_id)

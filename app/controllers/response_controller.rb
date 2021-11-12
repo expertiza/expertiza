@@ -367,9 +367,7 @@ class ResponseController < ApplicationController
       "GlobalSurveyResponseMap",
       "BookmarkRatingResponseMap"
       if @assignment.is_duty_based_assignment
-        print("\n\n\n")
-        print(@map.reviewee.inspect)
-        print("\n\n\n")
+        # E2147 : gets questionnaire of a particular duty in that assignment rather than generic questionnaire
         @questionnaire = @map.questionnaire_by_duty(@map.reviewee.get_duty_id())
       else
         @questionnaire = @map.questionnaire

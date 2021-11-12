@@ -35,14 +35,14 @@
         <td><%= member.user.name(session[:ip]) %></td>
         <td><%= member.user.fullname(session[:ip]) %></td>
         <%if @student.assignment.is_duty_based_assignment %>
-            <% member_duty_id = member.get_duty_id() %>
+            <% team_user = member.get_team_user() %>
               <!-- Gets duty of member if the assignment is duty based and member has a duty -->
-            <%unless member_duty_id.nil?%>
-               <td><%= Duty.find(member_duty_id).duty_name %></td>
+            <%unless team_user.duty_id.nil?%>
+               <td><%= Duty.find(team_user.duty_id).duty_name %></td>
             <%else%>
                 <td>
                   <%if  member.user.id == session[:user].id%>
-                      <%= render :partial=>'select_duty_form', :locals => {:assignment_id => @student.assignment.id, :participant_id => member.id, :teams_user_id => member.user_id}%>
+                      <%= render :partial=>'select_duty_form', :locals => {:assignment_id => @student.assignment.id, :participant_id => member.id, :teams_user_id => team_user.id}%>
                   <%else%>
                       Not Selected
                   <%end%>
@@ -53,7 +53,7 @@
 
         <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
         <% if (@teammate_review_allowed &&
-            ((@student.assignment.is_duty_based_assignment && !member_duty_id.nil?) || (not @student.assignment.is_duty_based_assignment)))%>
+            ((@student.assignment.is_duty_based_assignment && !team_user.duty_id.nil?) || (not @student.assignment.is_duty_based_assignment)))%>
           <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
             <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
             if map.nil?

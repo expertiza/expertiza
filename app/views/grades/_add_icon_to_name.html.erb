@@ -1,6 +1,21 @@
 <!-- Add an icon to identify if this review was done by TA/instructor -->
 <% if review.done_by_staff_participant? %>
-    <th class="sorter-false"> <img data-toggle="tooltip" data-placement="right" title="Icon indicates this review was done by course staff" class="img_icon" src="/assets/staff.png"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s  %></a> </th>
+    <th class="sorter-false">
+        <img
+            data-toggle="tooltip"
+            data-placement="right"
+            title="Icon indicates this review was done by course staff" class="img_icon"
+            src="/assets/staff.png"
+            >
+        <a
+            target="_blank"
+            href="../response/view?id=<%= review.id.to_s %>"
+            data-toggle="tooltip"
+            data-placement="right"
+            title="Click to see details">
+            <%= "Review " + i.to_s  %>
+        </a>
+    </th>
 <% else %>
     <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>  </th>
 <% end %>

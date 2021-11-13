@@ -59,6 +59,38 @@
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% table_count = 0 %>
 <% @vmlist.each do |vm| %>
+
+              <script type="text/javascript">
+                <% if vm.questionnaire_display_type == "Teammate Review" %>
+                  console.log('ss')
+                  console.log(`<%= vm.pretty_inspect.html_safe %>`);
+                  console.log(`@Participant`)
+                  console.log(`<%= @participant.pretty_inspect.html_safe %>`)
+                  //console.log(`<#%= vm.list_of_reviews[0].pretty_inspect.html_safe %>`);
+                  <% vm.list_of_reviews.each_with_index do |r, i|%>
+
+                    console.groupCollapsed(`<%= "Review #{i}"%>`)
+                    console.log('Response')
+                    console.log(`<%= r.pretty_inspect.html_safe %>`)
+                    <% map_id = r.map_id%>
+                    // teammate response
+                    <% rmap = ResponseMap.find_by(id: map_id) %>
+                    console.log(`<%= rmap.pretty_inspect.html_safe %>`);
+                    <% part = Participant.find_by(id: rmap.reviewee_id) %>
+                    console.log(`Reviewee`);
+                    console.log(`<%= part.pretty_inspect.html_safe %>`);
+                    <% reviewee_student = User.find_by(id: part.user_id) %>
+                    console.log(`<%= reviewee_student.pretty_inspect.html_safe %>`)
+                    console.log(`Reviewer`)
+                    <% reviewer = Participant.find_by(id: rmap.reviewer_id) %>
+                    console.log(`<%= reviewer.pretty_inspect.html_safe %>`);
+                    <% reviewer_student = User.find_by(id: part.user_id) %>
+                    console.log(`<%= reviewer_student.pretty_inspect.html_safe %>`)
+                    console.groupEnd()
+                  <% end %>
+                  console.log(`end loggin`)
+                <% end %>
+              </script>
     <% if (vm.questionnaire_display_type == "Metareview" or vm.questionnaire_display_type == "Author Feedback" or vm.questionnaire_display_type == "Teammate Review") and @current_role_name.eql?'Student' %>
     <% else %>
         <% if vm.list_of_reviewers.length > 0 %>
@@ -87,6 +119,8 @@
               <h4 style="display:inline-block;"><%= vm.questionnaire_display_type %>
                 <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
                     (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
+                <% elsif vm.questionnaire_type == "TeammateReviewQuestionnaire" %>
+                    (For: <%= vm.reviewee_name.inspect.html_safe %>)
                 <%end %>
               </h4>
               <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>
@@ -141,15 +175,23 @@
             <!-- additionally, there are hidden rows (expandable) which are also generated via iteration. -->
             <% vm.list_of_rows.each do |row| %>
 
+                <!-- <script type="text/javascript">
+                  console.log("<%= row %>");
+                </script>
+                -->
+
                 <!-- notice the data-target. because we're toggling via looped code, we need to dynamically generate the identifier. -->
                 <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= row.question_id.to_s + vm.round.to_s %>">
                   <td class = 'cf' data-toggle="tooltip" title="<%= row.question_text %>"> <div style='float: left'><%= j.to_s %></div><div style='float: right'> &#<%= type_and_max(row) %>;</div>  </td>
 
                   <!-- actual cells with scores and colored background. -->
                   <% row.score_row.each do |score| %>
-                      <% score_comment = score.comment.nil? ? '' : score.comment %> <!-- changing nil to null string to avoid Null Pointer Exception -->
+                      <% score_comment = score.comment.nil? ? '' : score.comment %>
+                      <!-- changing nil to null string to avoid Null Pointer Exception -->
                       <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%= strip_tags(score.comment).html_safe%>">
-                        <span class="<%=  underlined?(score) %>"><%= score.score_value.to_s %></span>
+                        <span class="<%=  underlined?(score) %>">
+                          <%= score.score_value.to_s %>
+                        </span>
                       </td>
                   <% end %>
 

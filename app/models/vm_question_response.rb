@@ -42,6 +42,11 @@ class VmQuestionResponse
     end
   end
 
+  def reviewee_name
+    part = @participant_who_is_reviewee
+    User.find_by(id: part.user_id).name
+  end
+
   def add_reviews(participant, team, vary)
     if @questionnaire_type == "ReviewQuestionnaire"
       reviews = if vary
@@ -75,6 +80,7 @@ class VmQuestionResponse
       end
     elsif @questionnaire_type == "TeammateReviewQuestionnaire"
       reviews = participant.teammate_reviews
+      @participant_who_is_reviewee = participant
       reviews.each do |review|
         review_mapping = TeammateReviewResponseMap.find_by(id: review.map_id)
         participant = Participant.find(review_mapping.reviewer_id)

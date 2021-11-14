@@ -161,6 +161,6 @@ class CoursesController < ApplicationController
     @course.institutions_id = params[:course][:institutions_id]
     @course.directory_path = params[:course][:directory_path]
     @course.info = params[:course][:info]
-    @course.private = params[:course][:private].nil? ? false : params[:course][:private]
+    @course.private = params[:course][:private].nil? ? 0 : params[:course][:private]
   end
 end

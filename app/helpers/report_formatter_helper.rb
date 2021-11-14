@@ -1,5 +1,5 @@
 module ReportFormatterHelper
-
+  include AssignmentHelper
   # E1936 team recommends this method be REMOVED (it does not seem to be used anywhere in Expertiza as of 4/21/19)
   def summary_by_reviewee_and_criteria(params, _session = nil)
     assign_basics(params)
@@ -27,8 +27,8 @@ module ReportFormatterHelper
     @review_user = params[:user]
     # If review response is required call review_response_report method in review_response_map model
     @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, @type, @review_user)
-    @review_scores = @assignment.compute_reviews_hash
-    @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
+    @review_scores = compute_reviews_hash(@assignment)
+    @avg_and_ranges = compute_avg_and_ranges_hash(@assignment)
   end
 
   def feedback_response_map(params, _session = nil)

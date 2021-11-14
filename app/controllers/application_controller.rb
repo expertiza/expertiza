@@ -22,10 +22,24 @@ class ApplicationController < ActionController::Base
     if logged_in?
       if @current_user.locale != "no_pref"
         I18n.locale = @current_user.locale
+      elsif params[:controller] == "courses" && params[:id]
+          I18n.locale = get_locale_from_course
+      elsif params[:controller] == "assignments" && params[:id]
+          I18n.locale = get_locale_from_assignment
       else
         I18n.locale = I18n.default_locale
       end
     end
+  end
+
+  def get_locale_from_course
+    course = Course.find(params[:id])
+    course.locale
+  end
+
+  def get_locale_from_assignment
+    assignment = Assignment.find(params[:id])
+    assignment.course.locale
   end
 
   def filter_utf8

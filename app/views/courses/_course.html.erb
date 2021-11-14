@@ -12,7 +12,7 @@
 <p><label for="course_info">Course Information</label><br/>
 <%= text_field 'course', 'info'  %></p>
 
-<p><label>Language</label><br/>
+<p><label>Default Language</label><br/>
   <%= select("course", "locale", [["English", "en_US"], ["Hindi", "hi_IN"]], {:selected => @course ? @course.locale : ["English", "en_US"]}) %></p>
 <!--[eoform:user]-->
 <br/>

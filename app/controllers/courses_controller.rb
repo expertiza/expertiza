@@ -162,5 +162,6 @@ class CoursesController < ApplicationController
     @course.directory_path = params[:course][:directory_path]
     @course.info = params[:course][:info]
     @course.private = params[:course][:private].nil? ? 0 : params[:course][:private]
+    @course.locale = params[:course][:locale]
   end
 end

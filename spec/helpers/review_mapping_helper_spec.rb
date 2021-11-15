@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'rails_helper'
 
 describe ReviewMappingHelper, type: :helper do
-  describe 'get_team_color' do
+  describe 'team_color' do
     before(:each) do
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
       @reviewer = create(:participant, review_grade: nil)
@@ -14,7 +14,7 @@ describe ReviewMappingHelper, type: :helper do
     it 'color should be red if response_map does not exist' do
       response_map_dne = create(:review_response_map)
 
-      color = get_team_color(response_map_dne)
+      color = team_color(response_map_dne)
       expect(color).to eq('red')
     end
 
@@ -35,7 +35,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: response_map_with_reviewee)
 
-      color = get_team_color(response_map_with_reviewee)
+      color = team_color(response_map_with_reviewee)
       expect(color).to eq('blue')
     end
 
@@ -50,7 +50,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: @response_map)
 
-      color = get_team_color(@response_map)
+      color = team_color(@response_map)
       expect(color).not_to eq('blue')
     end
 
@@ -60,7 +60,7 @@ describe ReviewMappingHelper, type: :helper do
       response_map_with_grade_reviewer = create(:review_response_map, reviewer: reviewer_with_grade)
       create(:response, response_map: response_map_with_grade_reviewer)
 
-      color = get_team_color(response_map_with_grade_reviewer)
+      color = team_color(response_map_with_grade_reviewer)
       expect(color).to eq('brown')
     end
 
@@ -75,7 +75,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: @response_map)
 
-      color = get_team_color(@response_map)
+      color = team_color(@response_map)
       expect(color).to eq('green')
     end
 
@@ -97,7 +97,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: response_map_with_reviewee)
 
-      color = get_team_color(response_map_with_reviewee)
+      color = team_color(response_map_with_reviewee)
       expect(color).to eq('green')
     end
 
@@ -120,7 +120,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: response_map_with_reviewee)
 
-      color = get_team_color(response_map_with_reviewee)
+      color = team_color(response_map_with_reviewee)
       expect(color).to eq('purple')
     end
 
@@ -139,7 +139,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: response_map_with_reviewee)
 
-      color = get_team_color(response_map_with_reviewee)
+      color = team_color(response_map_with_reviewee)
       expect(color).to eq('purple')
     end
   end
@@ -183,7 +183,7 @@ describe ReviewMappingHelper, type: :helper do
     end
 
     it 'should return the number of responses given in round 1 reviews' do
-      get_each_review_and_feedback_response_map(@reviewer)
+      review_and_feedback_response_map(@reviewer)
 
       # rspan means the all peer reviews one student received, including unfinished one
       # retrieved from method call in review_mapping_helper.rb file
@@ -191,7 +191,7 @@ describe ReviewMappingHelper, type: :helper do
     end
 
     it 'should return the number of responses given in round 2 reviews' do
-      get_each_review_and_feedback_response_map(@reviewer)
+      review_and_feedback_response_map(@reviewer)
 
       # rspan means the all peer reviews one student received, including unfinished one
       # retrieved from method call in review_mapping_helper.rb file
@@ -205,7 +205,7 @@ describe ReviewMappingHelper, type: :helper do
       @feedback_response_map_list << FeedbackResponseMap.create(reviewed_object_id: @response_3.id, reviewer_id: @reviewer.id)
       @all_review_response_ids << @response_3.id
 
-      get_each_review_and_feedback_response_map(@reviewer)
+      review_and_feedback_response_map(@reviewer)
 
       # rspan means the all peer reviews one student received, including unfinished one
       # retrieved from method call in review_mapping_helper.rb file
@@ -214,7 +214,7 @@ describe ReviewMappingHelper, type: :helper do
 
     it 'should return 0 responses for no round 3 reviews' do
       # no feedback responses set before method call
-      get_each_review_and_feedback_response_map(@reviewer)
+      review_and_feedback_response_map(@reviewer)
 
       # rspan means the all peer reviews one student received, including unfinished one
       # retrieved from method call in review_mapping_helper.rb file
@@ -222,7 +222,7 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  # feedback_response_map_record is called within get_each_review_and_feedback_response_map
+  # feedback_response_map_record is called within review_and_feedback_response_map
   describe 'feedback_response_map_record' do
     before(:each) do
       @reviewer = create(:participant)
@@ -349,7 +349,7 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  describe 'get_awarded_review_score' do
+  describe 'awarded_review_score' do
     before(:each) do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -369,7 +369,7 @@ describe ReviewMappingHelper, type: :helper do
 
       @review_scores = {@reviewer.id => {1 => {@reviewee.id => 10}, 2 => {@reviewee.id => 20}, 3 => {@reviewee.id => 30}}}
 
-      get_awarded_review_score(@reviewer.id, @reviewee.id)
+      awarded_review_score(@reviewer.id, @reviewee.id)
     end
 
 

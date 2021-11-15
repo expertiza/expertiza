@@ -23,9 +23,9 @@
     <% @authors.each do |rejoinder| %>
       <% next unless rejoinder %>
       <% if @assignment.vary_by_round %>
-        <% get_each_review_and_feedback_response_map(rejoinder) %> 
+        <% review_and_feedback_response_map(rejoinder) %>
       <% else %>
-        <% get_certain_review_and_feedback_response_map(rejoinder) %>
+        <% certain_review_and_feedback_response_map(rejoinder) %>
       <% end %>
 
       <% @first_col_identifier = true %>
@@ -132,7 +132,7 @@
           <!--Rejoinder-->
           <!-- If assignment rubrics vary by round, set row_span equal to rspan of rounds 1, 2, and 3 (hardcoded) -->
           <!-- Otherwise, set row_span equal to the @rspan -->
-          <!-- @rspan_round_one and @rspan are set in methods get_each_review_and_feedback_response_map and get_certain_review_and_feedback_response_map above -->
+          <!-- @rspan_round_one and @rspan are set in methods review_and_feedback_response_map and certain_review_and_feedback_response_map above -->
            <%row_span= @assignment.varying_rubrics_by_round? ? (@rspan_round_one.to_i + @rspan_round_two.to_i + @rspan_round_three.to_i) : @rspan.to_i %>
            <!-- If row_span is zero, (no reviews completed), then manually set rowspan to 1 to fix formatting -->
            <% if row_span == 0 %>

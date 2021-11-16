@@ -3,14 +3,20 @@ describe GradesHelper, type: :helper do
   let(:review_response) { build(:response, id: 1, map_id: 1) }
   let(:question) { build(:question) }
   let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
+  let(:team) { build(:assignment_team, id: 1) }
+  let(:assignment_participant) { build(:participant, id: 1, assignment: assignment) }
+  let(:assignment) { build(:assignment, id: 1, max_team_size: 1, questionnaires: questionnaires, late_policy_id:1, is_penalty_calculated: true, rounds_of_reviews: 1, vary_by_round: true)}
   let(:single_assignment) { build(:assignment, id: 1, max_team_size: 1, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
   let(:team_assignment) { build(:assignment, id: 2, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
   let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
-  let(:questionnaire1) { build(:questionnaire, id: 1, questions: [question]) }
-  let(:questionnaire2) { build(:questionnaire, id: 2, questions: [question]) }
+  let(:questionnaire1) { build(:questionnaire, id: 1, questions: [question], type: 'ReviewQuestionnaire') }
+  let(:questionnaire2) { build(:questionnaire, id: 2, questions: [question], type: 'ReviewQuestionnaire') }
   let(:questionnaires) { [questionnaire1, questionnaire2] }
   let(:aq1) { build(:assignment_questionnaire, id: 1, used_in_round: 1) }
   let(:aq2) { build(:assignment_questionnaire, id: 2) }
+  let(:latePolicy) {LatePolicy.new( policy_name: 'late_policy_1', instructor_id: 6, max_penalty: 10, penalty_per_unit: 5, penalty_unit: 1)}
+  let(:vmQ1) {VmQuestionResponse.new(questionnaire1, assignment, 1)}
+  let(:vmQ2) {VmQuestionResponse.new(questionnaire2, assignment, 2)}
   let(:helper) { Class.new { extend GradesHelper } }
 
   describe 'accordion_title' do
@@ -188,7 +194,46 @@ describe GradesHelper, type: :helper do
         allow(aq1).to receive(:first).and_return(aq1)
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 2).and_return(aq2)
         allow(aq2).to receive(:first).and_return(aq2)
-        expect(retrieve_questions(questionnaires, 1)).to eq({test11: questionnaire1.questions, 'test2'=> questionnaire2.questions})
+        expect(retrieve_questions(questionnaires, 1)).to eq({test11: questionnaire1.questions, "test2"=> questionnaire2.questions})
+      end
+    end
+  end
+
+  describe 'view_heatgrid' do
+    context 'when all questionnaires do not match the target type' do
+      it 'render the view with empty list of  VmQuestionResponse' do
+        allow(AssignmentParticipant).to receive(:find).with(1).and_return(assignment_participant)
+        allow(assignment_participant).to receive(:team).and_return(team)
+        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(aq1)
+        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 2).and_return(aq2)
+        expect(view_heatgrid(1, 'non-exist')).to include("!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->")
+        expect(self.instance_variable_get(:@vmlist)).to eq([])
+      end
+    end
+    context 'when all questionnaires match the target type' do
+      it 'render the view with nonempty list of  VmQuestionResponse' do
+        allow(AssignmentParticipant).to receive(:find).with(1).and_return(assignment_participant)
+        allow(assignment_participant).to receive(:team).and_return(team)
+        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(aq1)
+        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 2).and_return(aq2)
+        allow(VmQuestionResponse).to receive(:new).with(any_args).and_return(vmQ1)
+        expect(view_heatgrid(1, 'ReviewQuestionnaire')).to include("!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->")
+        expect(self.instance_variable_get(:@vmlist)).to eq([vmQ1, vmQ1])
+      end
+    end
+  end
+
+  describe 'penalties' do
+    context 'when giving an assignment id' do
+      it 'calculates all the penalties' do
+        allow(Assignment).to receive(:find).with(1).and_return(assignment)
+        allow(Participant).to receive(:where).with(parent_id: 1).and_return([participant])
+        allow(self).to receive(:calculate_penalty).with(participant.id).and_return({submission: 1, review: 1, meta_review: 1})
+        allow(LatePolicy).to receive(:find).with(assignment.late_policy_id).and_return(latePolicy)
+        allow(self).to receive(:assign_all_penalties).with(any_args).and_return(nil)
+        allow(CalculatedPenalty).to receive(:create).with(any_args).and_return(nil)
+        penalties(1)
+        expect(self.instance_variable_get(:@assignment)).to eq(assignment)
       end
     end
   end

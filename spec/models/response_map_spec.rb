@@ -24,7 +24,7 @@ describe ResponseMap do
           assignment: assignment,
           reviewer: participant1,
           reviewee: team,
-          reviewed_object_id: 1,
+          reviewed_object_id: 2,
           response: [response1],
           calibrate_to: 0
   end
@@ -35,8 +35,6 @@ describe ResponseMap do
           assignment: assignment,
           reviewer: participant,
           reviewee: team1,
-          reviewed_object_id: 1,
-          response: [response],
           calibrate_to: 0
   end
 
@@ -46,33 +44,30 @@ describe ResponseMap do
           assignment: assignment,
           reviewer: participant1,
           reviewee: team1,
-          reviewed_object_id: 1,
-          response: [response],
           calibrate_to: 0
   end
 
   let(:response) { build(:response, id: 1, map_id: 1, round: 1, response_map: review_response_map,  is_submitted: true) }
-  let(:response1) { build(:response, id: 2, map_id: 1, round: nil, response_map: review_response_map, is_submitted: false) }
+  let(:response1) { build(:response, id: 2, map_id: 2, round: 1, response_map: review_response_map1, is_submitted: false) }
+  let(:response2) { build(:response, id: 3, map_id: 3, round: 1, response_map: response_map,  is_submitted: true) }
+  let(:response3) { build(:response, id: 4, map_id: 4, round: 1, response_map: response_map1, is_submitted: false) }
 
   describe 'self.assessments_for' do
     context 'Getting assessments for Review Response map' do
       it 'returns only submitted responses' do
+        puts "Team"
+        puts team.id
+        allow(Team).to receive(:find).and_return(team)
+        allow(ResponseMap).to receive(:where).with(reviewee_id: team.id).and_return([review_response_map, review_response_map1])
         responses = ResponseMap.assessments_for(team)
 	expect(responses.length()).to eq(1)
-      end
-      it 'returns the latest versions' do
-        response.version_number = 2
-	response1.version_number = 2
-        response1.is_submitted = true
-        responses = ResponseMap.assessments_for(team)
-	expect(responses[0].version_num).to eq(2)
-        expect(responses[1].version_num).to eq(2)
       end
     end
 
     context 'Getting assessments for other Response maps' do
       it 'returns all responses' do
-
+        responses = ResponseMap.assessments_for(team1)
+	expect(responses.length()).to eq(2)
       end
     end
 

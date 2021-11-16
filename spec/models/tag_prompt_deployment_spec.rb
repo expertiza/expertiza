@@ -48,7 +48,14 @@ describe TagPromptDeployment do
 			question_ids = allow(question).to receive(:map).with(1).and_return(1)
       allow(Answer).to receive(:where).with({question_id: question_ids, response_id: responses_ids}).and_return(answers)
       expect(answers.count).to eq(4)
-      expect(answers[:answer1][:comments].length).to be < 5
     end
+    it "comments length less than threshold" do
+			expect(answers[:answer1][:comments].length).to be < tag_dep.answer_length_threshold
+    end
+    # context "unless answer_length_threshold true"  do
+    #   it "filter answers by comments", :unless => true do
+    #     expect(answers[:answer1][:comments].length.error).to be >= tag_dep.answer_length_threshold
+    #   end
+    # end
   end
 end

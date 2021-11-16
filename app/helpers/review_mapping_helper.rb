@@ -59,10 +59,10 @@ module ReviewMappingHelper
       color.push 'purple'
     else
       if link.nil? or (link !~ %r{https*:\/\/wiki(.*)||https*:\/\/github(.*)})
+      link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
         color.push 'green'
       else
-        link_updated_at = link_updated_at(link)
-        color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
+        color.push 'red'
       end
     end
   end

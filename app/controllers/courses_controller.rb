@@ -7,7 +7,8 @@
 # change access permission from public to private or vice versa
 class CoursesController < ApplicationController
   include AuthorizationHelper
-  
+  before_action :set_language_choices
+
   autocomplete :user, :name
   require 'fileutils'
 
@@ -163,5 +164,15 @@ class CoursesController < ApplicationController
     @course.info = params[:course][:info]
     @course.private = params[:course][:private].nil? ? 0 : params[:course][:private]
     @course.locale = params[:course][:locale]
+  end
+
+  private
+
+  def set_language_choices
+    # Set the available languages
+    @languages = [%w[English en_US], %w[Hindi hi_IN]]
+
+    # Set the default language
+    @default_language = %w[English en_US]
   end
 end

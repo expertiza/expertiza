@@ -16,10 +16,10 @@ short_comments_answers = {
 'answer1': {id: 1, question_id: 1, answer: 3, comments: 'comm', response_id: 2313},
 'answer4': {id: 4, question_id: 2, answer: 1, comments: 'com1', response_id: 241} }
 describe '#tag_prompt' do
-	it 'returns the associated tag prompt with the deployment' do
-		allow(TagPrompt).to receive(:find).with(1).and_return(tp)
-		expect(tag_dep.tag_prompt).to be(tp)
-	end
+it 'returns the associated tag prompt with the deployment' do
+allow(TagPrompt).to receive(:find).with(1).and_return(tp)
+expect(tag_dep.tag_prompt).to be(tp)
+end
 end
 #get_number_of_taggable_answers calculates total taggable answers assigned to an user who participated in "tag review assignment".
 describe '#get_number_of_taggable_answers' do

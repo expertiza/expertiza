@@ -193,6 +193,9 @@ hi_IN:
       your_team: "आपकी टीम"
       view_team: "(अपनी टीम देखें और प्रबंधित करें)"
       submit_work: "(सबमिट करें और अपना काम देखें)"
+#     change this
+      view_bookmarks: "View bookmarks"
+      view_bookmarks_lengthy: "(View bookmarks others have submitted for your topic)"
       your_work: "आपका काम"
       others_work: "दूसरों का काम"
       your_readings: "आपकी रीडिंग"

@@ -3,7 +3,7 @@
 
 <div style="">
   <div class="taskbox" style="width:18%; display: inline; float:left; margin-right: 10px;" >
-    <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @tasknotstarted.size.to_s %>&nbsp;</span> Tasks not yet started<br></strong><br>
+    <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @tasknotstarted.size.to_s %>&nbsp;</span> <%=t ".tasks_not_started" %><br></strong><br>
 
     <% @tasknotstarted.each do |student_task|
       participant = student_task.participant
@@ -40,11 +40,11 @@
 
     <span>&nbsp; &raquo;
       <%= link_to student_task.assignment.name + " " + student_task.current_stage, :controller => controller, :action => action, :id => participant.id %>
-      (<%= student_task.relative_deadline %> left)
+      (<%= student_task.relative_deadline %> <%=t ".left" %>)
     </span><br/>
   <% end %>
 
-  <br/> <strong> &nbsp;&nbsp;<span class="revnum">&nbsp;<%= @taskrevisions.size.to_s %>&nbsp;</span> Revisions<br></strong><br>
+  <br/> <strong> &nbsp;&nbsp;<span class="revnum">&nbsp;<%= @taskrevisions.size.to_s %>&nbsp;</span> <%=t ".revisions" %><br></strong><br>
   <% @taskrevisions.each do |student_task|
     participant = student_task.participant
     stage = student_task.current_stage
@@ -67,12 +67,12 @@
 <% end %>
 <br/>
 
-<strong>Students who have teamed with you<br></strong><br>
+<strong><%=t ".student_team" %><br></strong><br>
 
 <% @students_teamed_with.keys.each do |course_id| %>
     <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @students_teamed_with[course_id].size.to_s %>&nbsp;</span>
       <%if course_id.nil?%>
-        assignments not associated with any course
+        <%=t ".not_associated" %>
       <%else%>
         <%=  Course.find(course_id).name %>
       <%end%>
@@ -87,14 +87,14 @@
 <div class="topictable" style="float: left;width: 80%;margin-bottom: 10px; display: inline; ">  
  <table class="table table-striped" cellpadding="2">
     <tr class="taskheader">
-      <th>Assignment</th>
-      <th>Course</th>
-      <th>Topic</th>
-      <th>Current Stage</th>
-      <th>Review Grade</th>
-      <th>Badges</th>
-      <th>Stage Deadline <img src="/assets/info.png" title="You can change 'Preferred Time Zone' in 'Profile' in the banner."/></th>
-      <th>Publishing Rights <img src="/assets/info.png" title="Grant publishing rights"/></th>
+      <th><%=t ".assignment_name" %></th>
+      <th><%=t ".course" %></th>
+      <th><%=t ".topic" %></th>
+      <th><%=t ".current_stage" %></th>
+      <th><%=t ".review_grade" %></th>
+      <th><%=t ".badges" %></th>
+      <th><%=t ".stage_deadline" %><img src="/assets/info.png" title="You can change 'Preferred Time Zone' in 'Profile' in the banner."/></th>
+      <th><%=t ".publishing_rights" %><img src="/assets/info.png" title="Grant publishing rights"/></th>
     </tr>
     <% @student_tasks.each do |student_task| %>
       <% participant = student_task.participant %>

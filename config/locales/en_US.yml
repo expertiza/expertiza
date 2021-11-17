@@ -195,6 +195,8 @@ en_US:
       assignment_description: "Assignment Description"
       signup_sheet: "Signup sheet"
       signup_topic: "(Sign up for a topic)"
+      view_bookmarks: "View bookmarks"
+      view_bookmarks_lengthy: "(View bookmarks others have submitted for your topic)"
       your_team: "Your team"
       view_team: "(View and manage your team)"
       submit_work: "(Submit and view your work)"

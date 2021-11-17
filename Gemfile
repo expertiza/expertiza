@@ -91,7 +91,7 @@ group :test do
   gem "factory_bot_rails"
   gem 'geckodriver-helper', '~> 0.0.3'
   gem 'capybara'
-  gem 'selenium-webdriver'
+  gem 'selenium-webdriver', '~> 3.142', '>= 3.142.3'
   gem 'gherkin'
   gem 'guard-rails'
   gem 'guard-rspec'
@@ -101,10 +101,3 @@ group :test do
   gem 'shoulda'
   gem 'puma'
 end
-
-group :development, :test do
-  gem 'capybara'
-  gem 'selenium-webdriver'
-  gem 'simplecov', require: false
-end
-

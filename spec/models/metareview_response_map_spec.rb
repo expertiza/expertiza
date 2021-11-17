@@ -23,9 +23,9 @@ describe MetareviewResponseMap do
   let(:response1) { build(:response, id: 2, map_id: 1, round: 2, response_map: review_response_map) }
   let(:response2) { build(:response, id: 3, map_id: 1, round: nil, response_map: review_response_map, is_submitted: true) }
   let(:response3) { build(:response) }
-  let(:metareview_response_map) { build(:meta_review_response_map, reviewed_object_id: 1) }
+  let(:metareview_response_map) { build(:meta_review_response_map, review_mapping: review_response_map) }
   let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
-  let(:student1) { build(:student, id: 2, name: "name1", fullname: 'no one', email: 'expertiza@mailinator.com') }
+  let(:student1) { build(:student, id: 2, name: 'name1', fullname: 'no one', email: 'expertiza@mailinator.com') }
   let(:assignment_questionnaire1) { build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 1) }
   let(:assignment_questionnaire2) { build(:assignment_questionnaire, id: 2, assignment_id: 1, questionnaire_id: 2) }
   let(:questionnaire1) { build(:questionnaire, type: 'ReviewQuestionnaire') }
@@ -35,6 +35,10 @@ describe MetareviewResponseMap do
   let(:review_questionnaire) { build(:questionnaire, id: 1) }
   let(:response3) { build(:response) }
   let(:response_map) { build(:review_response_map, reviewer_id: 2, response: [response3]) }
+  let(:qmetareview_response_map) { build(:meta_review_response_map, id: 3, review_mapping: review_response_map3) }
+  let(:review_response_map3) { build(:review_response_map, id: 3, assignment: assignment3, reviewer: participant, reviewee: team) }
+  let(:assignment3) { build(:assignment, id: 4, questionnaires: [questionnaire2]) }
+  let(:assignment_questionnaire3) { build(:assignment_questionnaire, id: 3, assignment_id: 4, questionnaire: questionnaire2) }
   before(:each) do
     allow(review_response_map).to receive(:response).and_return(response)
     allow(response_map).to receive(:response).and_return(response3)
@@ -57,10 +61,11 @@ describe MetareviewResponseMap do
       end
 
       it 'finds the questionaire' do
-        allow(Response).to receive(:find).and_return(response)
-        allow(MetareviewResponseMap).to receive(:where).and_return([metareview_response_map])
-        allow(AssignmentTeam).to receive(:find).with(1).and_return(team)
-        expect(metareview_response_map.questionnaire).to eq(team)
+        # puts qmetareview_response_map.review_mapping.assignment.questionnaires
+        allow(Questionnaire).to receive(:find_by).with(type: 'MetareviewQuestionnaire').and_return(questionnaire2)
+        allow(AssignmentQuestionnaire).to receive(:find_by).and_return(assignment_questionnaire3)
+        allow(MetareviewResponseMap).to receive(:where).and_return(qmetareview_response_map)
+        expect(qmetareview_response_map.questionnaire).to eq([questionnaire2])
       end
 
       it 'finds title' do
@@ -75,15 +80,19 @@ describe MetareviewResponseMap do
         expect(MetareviewResponseMap.export_fields(nil)).to eq(["contributor", "reviewed by", "metareviewed by"])
       end
     end
+
     context 'When using functionality of metareview_response_map' do
       it '#export' do
         csv = []
         parent_id = 1
         options = nil
         allow(Response).to receive(:find).and_return(response)
-        allow(MetareviewResponseMap).to receive(:where).and_return([metareview_response_map])
+        allow(MetareviewResponseMap).to receive(:find_by).and_return(metareview_response_map)
+        allow(Assignment).to receive(:find).and_return(assignment)
+        allow(Assignment).to receive(:metareview_mappings).and_return(metareview_response_map)
         expect(MetareviewResponseMap.export(csv, parent_id, options)).to eq([metareview_response_map])
       end
+
       it '#email' do
         reviewer_id = 1
         allow(Participant).to receive(:find).with(1).and_return(participant)

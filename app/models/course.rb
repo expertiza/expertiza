@@ -1,7 +1,7 @@
 class Course < ActiveRecord::Base
   enum locale: {
-      en_US: 0,
-      hi_IN: 1
+      en_US: 1,
+      hi_IN: 2
   }
   has_many :ta_mappings, dependent: :destroy
   has_many :tas, through: :ta_mappings

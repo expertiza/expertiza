@@ -6,7 +6,6 @@ FactoryBot.define do
   factory :role_of_administrator, class: Role do
     name 'Administrator'
     parent_id nil
-    # team = Team.joins(:teams_users).where(team_users: {parent_id: self.assignment_id}, user_id: user_id)
     description ''
   end
 

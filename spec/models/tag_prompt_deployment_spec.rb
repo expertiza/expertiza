@@ -57,5 +57,5 @@ describe '#get_number_of_taggable_answers' do
 			expect(answers.count).to eq(0)
 		end
 	end
-	end
+end
 end

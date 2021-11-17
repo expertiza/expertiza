@@ -108,6 +108,9 @@ GEM
     bootstrap3-datetimepicker-rails (4.17.47)
       momentjs-rails (>= 2.8.1)
     builder (3.2.4)
+    bullet (6.1.5)
+      activesupport (>= 3.0.0)
+      uniform_notifier (~> 1.11)
     c21e (1.1.9)
     capistrano (3.16.0)
       airbrussh (>= 1.0.0)
@@ -587,6 +590,7 @@ GEM
     unf_ext (0.0.7.7)
     unicode (0.4.4.4)
     unicode-display_width (1.5.0)
+    uniform_notifier (1.14.2)
     unparser (0.5.2)
       abstract_type (~> 0.0.7)
       adamantium (~> 0.2.0)
@@ -616,6 +620,7 @@ DEPENDENCIES
   awesome_nested_set
   bind-it
   bootstrap3-datetimepicker-rails (~> 4.17.47)
+  bullet
   capistrano
   capistrano-bundler
   capistrano-db-tasks
@@ -704,5 +709,4 @@ DEPENDENCIES
   zip-zip
 
 BUNDLED WITH
-   1.16.6
-
+   1.17.3

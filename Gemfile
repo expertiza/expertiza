@@ -84,6 +84,7 @@ group :development do
   gem 'pry-remote'
   gem 'quiet_assets'
   gem 'rubocop'
+  gem 'bullet'
 end
 
 group :test do

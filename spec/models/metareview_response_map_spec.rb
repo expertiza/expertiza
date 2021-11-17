@@ -42,11 +42,59 @@ describe MetareviewResponseMap do
   end
 
   describe '#metareview_response_map' do
-    context 'When creating metareview_response_map' do
+    context 'When getting properties of metareview_response_map' do
       it 'finds version numbers' do
         allow(Response).to receive(:find).and_return(response)
         allow(MetareviewResponseMap).to receive(:where).and_return([metareview_response_map])
         expect(metareview_response_map.get_all_versions).to eq([])
+      end
+
+      it 'finds the contributor of the metareview' do
+        allow(Response).to receive(:find).and_return(response)
+        allow(MetareviewResponseMap).to receive(:where).and_return([metareview_response_map])
+        allow(AssignmentTeam).to receive(:find).with(1).and_return(team)
+        expect(metareview_response_map.contributor).to eq(team)
+      end
+
+      it 'finds the questionaire' do
+        allow(Response).to receive(:find).and_return(response)
+        allow(MetareviewResponseMap).to receive(:where).and_return([metareview_response_map])
+        allow(AssignmentTeam).to receive(:find).with(1).and_return(team)
+        expect(metareview_response_map.questionnaire).to eq(team)
+      end
+
+      it 'finds title' do
+        allow(Response).to receive(:find).and_return(response)
+        allow(MetareviewResponseMap).to receive(:where).and_return([metareview_response_map])
+        expect(metareview_response_map.get_title).to eq("Metareview")
+      end
+
+      it 'finds fields' do
+        allow(Response).to receive(:find).and_return(response)
+        allow(MetareviewResponseMap).to receive(:where).and_return([metareview_response_map])
+        expect(MetareviewResponseMap.export_fields(nil)).to eq(["contributor", "reviewed by", "metareviewed by"])
+      end
+    end
+    context 'When using functionality of metareview_response_map' do
+      it '#export' do
+        csv = []
+        parent_id = 1
+        options = nil
+        allow(Response).to receive(:find).and_return(response)
+        allow(MetareviewResponseMap).to receive(:where).and_return([metareview_response_map])
+        expect(MetareviewResponseMap.export(csv, parent_id, options)).to eq([metareview_response_map])
+      end
+      it '#email' do
+        reviewer_id = 1
+        allow(Participant).to receive(:find).with(1).and_return(participant)
+        allow(Assignment).to receive(:find).with(1).and_return(assignment)
+        allow(AssignmentTeam).to receive(:find).with(1).and_return(team)
+        allow(AssignmentTeam).to receive(:users).and_return(student)
+        allow(User).to receive(:find).with(1).and_return(student)
+        review_response_map.reviewee_id = 1
+        defn = {body: {type: "Metareview", obj_name: "Test Assgt", first_name: "no one", partial_name: "new_submission"}, to: "expertiza@mailinator.com"}
+        expect { metareview_response_map.email(defn, participant, Assignment.find(Participant.find(reviewer_id).parent_id)) }
+            .to change { ActionMailer::Base.deliveries.count }.by 1
       end
     end
   end

@@ -581,7 +581,8 @@ class Assignment < ActiveRecord::Base
   end
 
   # Get locale value
-  def get_locale
+  def get_locale(id)
+    assignment = Assignment.find(id)
     self.course.locale
   end
 

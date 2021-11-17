@@ -23,11 +23,9 @@ class ApplicationController < ActionController::Base
       if @current_user.locale != "no_pref"
         I18n.locale = @current_user.locale
       elsif params[:controller] == "courses" && params[:id]
-        course = Course.find(params[:id])
-        I18n.locale = course.get_locale
+        I18n.locale = Course.get_locale(params[:id])
       elsif params[:controller] == "assignments" && params[:id]
-        assignment = Assignment.find(params[:id])
-        I18n.locale = assignment.get_locale
+        I18n.locale = Assignment.get_locale(id)
       else
         I18n.locale = I18n.default_locale
       end

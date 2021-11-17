@@ -1,4 +1,8 @@
 class Course < ActiveRecord::Base
+  enum locale: {
+      en_US: 1,
+      hi_IN: 2
+  }
   has_many :ta_mappings, dependent: :destroy
   has_many :tas, through: :ta_mappings
   has_many :assignments, dependent: :destroy
@@ -63,6 +67,11 @@ class Course < ActiveRecord::Base
       end
       raise error_msg
     end
+  end
+
+  # Get locale value
+  def get_locale
+    self.locale
   end
 
   require 'analytic/course_analytic'

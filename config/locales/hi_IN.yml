@@ -1,0 +1,10 @@
+hi_IN:
+  student_task:
+    list:
+      assignments: "असाइनमेंट"
+  assignments:
+    edit:
+      editing_assignment: "संपादन असाइनमेंट"
+  courses:
+    edit:
+      edit_course: "पाठ्यक्रम संपादित"

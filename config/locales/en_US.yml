@@ -1,0 +1,10 @@
+en_US:
+  student_task:
+    list:
+      assignments: "Assignments"
+  assignments:
+    edit:
+      editing_assignment: "Editing Assignment"
+  courses:
+    edit:
+      edit_course: "Edit Course"

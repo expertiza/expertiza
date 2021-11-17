@@ -16,6 +16,23 @@ class ApplicationController < ActionController::Base
   before_action :set_time_zone
   before_action :authorize
   before_action :filter_utf8
+  before_action :set_locale
+
+  def set_locale
+    if logged_in?
+      if @current_user.locale != "no_pref"
+        I18n.locale = @current_user.locale
+      elsif params[:controller] == "courses" && params[:id]
+        course = Course.find(params[:id])
+        I18n.locale = course.get_locale
+      elsif params[:controller] == "assignments" && params[:id]
+        assignment = Assignment.find(params[:id])
+        I18n.locale = assignment.get_locale
+      else
+        I18n.locale = I18n.default_locale
+      end
+    end
+  end
 
   def filter_utf8
     remove_non_utf8(params)

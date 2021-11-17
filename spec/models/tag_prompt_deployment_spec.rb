@@ -21,9 +21,9 @@ describe '#tag_prompt' do
 		expect(tag_dep.tag_prompt).to be(tp)
 	end
 end
-#get_number_of_taggable_answers calculates total taggable answers assigned to an user who  participated in "tag review assignment".
+#get_number_of_taggable_answers calculates total taggable answers assigned to an user who participated in "tag review assignment".
 describe '#get_number_of_taggable_answers' do
-	context "when user_id given" do
+  context "when user_id given" do
 		it 'get team and response info of the participant' do
 			allow(Team).to receive(:join).with(:team_users, {:parent_id => tag_dep.assignment_id, :user_id => 1}).and_return(team)
 			allow(Response).to receive(:join).with(:response_maps, {:reviewed_object_id => 1, :reviewee_id => team.id}).and_return(responses)
@@ -37,6 +37,7 @@ describe '#get_number_of_taggable_answers' do
 		allow(Answer).to receive(:where).with({question_id: question_ids, response_id: responses_ids}).and_return(answers)
 		allow(answers).to receive(:where).with(any_args).and_return(short_comments_answers)
 		expect(answers).not_to be(nil)
+		expect(short_comments_answers).not_to be(nil)
 	end
 	context "unless answer_length_threshold true"  do
 		it "apply filter on comments length", :unless => true do

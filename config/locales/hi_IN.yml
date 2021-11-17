@@ -1,7 +1,4 @@
 hi_IN:
-
-  #  hello: "Hello world"
-
   # This section of keys are for the pages related to Courses
   course:
     edit:

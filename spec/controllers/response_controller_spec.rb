@@ -362,4 +362,27 @@ describe ResponseController do
     end
   end
 
+  describe '#fetch_review_metric' do
+  context 'checks whether the fetch_review_metric methods does not return nil' do
+    it 'returns a list of configuration' do
+      expect(controller.fetch_review_metric).not_to be_nil
+    end
+  end
 end
+
+describe '#fetch_review_metric' do
+  context 'checks whether the fetch_review_metric fetches the correct review metrics from review_metric.yml file' do
+    it 'returns a list of configuration of metrics' do
+      metrics = controller.fetch_review_metric
+      metrics.push("")
+      expect(metrics.length).to be <= 4
+      metrics.each do |metric|
+        expect(["sentiment","problem","suggestion",""].include? metric).to eq(true)
+      end
+    end
+  end
+end    
+
+end
+
+

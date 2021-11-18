@@ -432,15 +432,16 @@ en_US:
 
   popup:
     self_review_popup:
-      no_review_done: " No review has been done yet"
-      reviewer_score: " Reviewer's score "
-      self_review_of: " self review "
+      no_review_done: "No review done yet."
+      reviewer_score: "Reviewer's score"
+      self_review_of: "Self Review of"
       question: " Question "
       score: "Score"
       comments: "Comments"
       other_reviewer_score: "Reviewer Score (Σ weighted score/Σ weighted available score)"
       additional_comments: "Additional comments"
       no_comments: "No comments"
+      back: "Back"
 
   student_quizzes:
     index:

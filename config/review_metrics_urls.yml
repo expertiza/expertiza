@@ -1,0 +1,15 @@
+development:
+  metrics: ["sentiment","problem","suggestion"]
+  sentiment: "https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk"
+  problem: "http://152.7.99.200:5000/problem"
+  suggestion: "http://152.7.99.200:5000/suggestions"
+production:
+  metrics: ["sentiment","problem","suggestion"]
+  sentiment: "https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk"
+  problem: "http://152.7.99.200:5000/problem"
+  suggestion: "http://152.7.99.200:5000/suggestions"  
+test:
+  metrics: ["sentiment","problem","suggestion"]
+  sentiment: "https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk"
+  problem: "http://152.7.99.200:5000/problem"
+  suggestion: "http://152.7.99.200:5000/suggestions"

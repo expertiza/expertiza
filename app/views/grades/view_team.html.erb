@@ -231,7 +231,15 @@
                         </thead>
                         <% for index in 0 .. row.score_row.length - 1 %>
                             <tr>
-                              <td>Review <%=index + 1%></td>
+                              <% if @current_role_name.eql?'Student' %>
+                                <td>Review <%=index + 1%></td>
+                              <% else %>
+                                <td>
+                                  <% reviewer_id = row.score_row[index].reviewer_id %>
+                                  <% fullname = Participant.find_by(id: reviewer_id).fullname(session[:ip]) %>
+                                  Review by <%= fullname %>
+                                </td>
+                              <% end%>
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
                               <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
                                 <!-- E2100 : Set id and data of this <td> to be queried by jQuery for the tagging report

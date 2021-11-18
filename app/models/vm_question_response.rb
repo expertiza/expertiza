@@ -166,7 +166,7 @@ class VmQuestionResponse
 
       # Now construct the color code and we're good to go!
       color_code = "c#{color_code_number}"
-      row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts))
+      row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts, answer.response_id))
     end
   end
 

@@ -7,50 +7,20 @@ describe ResponseMap do
   let(:student1) { build(:student, id: 2, name: "name1", fullname: 'no one', email: 'expertiza@mailinator.com') }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt', rounds_of_reviews: 2) }
 
-  let(:review_response_map) do
-    build :review_response_map,
-          id: 1,
-          assignment: assignment,
-          reviewer: participant,
-          reviewee: team,
-          reviewed_object_id: 1,
-          response: [response],
-          calibrate_to: 0
-  end
+  let(:review_response_map) { build(:review_response_map, id: 1, assignment: assignment, reviewer: participant, reviewee: team) }
+  let(:review_response_map1) { build(:review_response_map, id: 2, assignment: assignment, reviewer: participant1, reviewee: team) }
 
-  let(:review_response_map1) do
-    build :review_response_map,
-          id: 2,
-          assignment: assignment,
-          reviewer: participant1,
-          reviewee: team,
-          reviewed_object_id: 2,
-          response: [response1],
-          calibrate_to: 0
-  end
 
-  let(:response_map) do
-    build :response_map,
-          id: 3,
-          assignment: assignment,
-          reviewer: participant,
-          reviewee: team1,
-          calibrate_to: 0
-  end
-
-  let(:response_map1) do
-    build :response_map,
-          id: 4,
-          assignment: assignment,
-          reviewer: participant1,
-          reviewee: team1,
-          calibrate_to: 0
-  end
-
-  let(:response) { build(:response, id: 1, map_id: 1, round: 1, response_map: review_response_map,  is_submitted: true) }
+  #let(:review_response_map1){ build(:review_response_map, id: 2, assignment: assignment,reviewer: participant1, reviewee: team1, reviewed_object_id: 1, response: [response], calibrate_to: 0) }
+  let(:response) { build(:response, id: 1, map_id: 1, round: 1, response_map: review_response_map, is_submitted: true) }
   let(:response1) { build(:response, id: 2, map_id: 2, round: 1, response_map: review_response_map1, is_submitted: false) }
   let(:response2) { build(:response, id: 3, map_id: 3, round: 1, response_map: response_map,  is_submitted: true) }
   let(:response3) { build(:response, id: 4, map_id: 4, round: 1, response_map: response_map1, is_submitted: false) }
+
+  before(:each) do
+    allow(review_response_map).to receive(:response).and_return(response)
+    allow(review_response_map1).to receive(:response).and_return(response1)
+  end
 
   describe 'self.assessments_for' do
     context 'Getting assessments for Review Response map' do

@@ -342,6 +342,7 @@ en_US:
       score_for: "Score for"
       reputation: "Reputation"
       back: "Back"
+      main_view: "Main View"
 
     view_team:
       summary_report: "Summary Report for assignment:"
@@ -359,13 +360,23 @@ en_US:
       metric1: "metric-1"
       review: "Review"
       score: "Score"
-      comment: "Comment"
+      comment: "comment"
+      Comment: "Comment"
       additional_comments: "Additional Comments"
       no_review_of: "NO REVIEW OF"
       type_exists: "TYPE EXISTS"
       grade_and_comment: "Grade and comment for submission"
-      grade: "Grade:"
+      grade: "Grade"
       comment2: "Comment:"
+      show_tags: "show tags"
+      no_reviews_for_assignment: "There are no reviews for this assignment"
+      round: "Round"
+      of: "of"
+      interaction_legend_tooltip: "Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience."
+      metric_tooltip: "A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback."
+      sort_by_total_review_score: "Sort by total review score"
+      sort_by_total_review_score_tooltip: "Sort reviews in ascending/descending order of the total score. Consecutive clicks will alternate between ascending and descending sort order"
+      save: "Save"
 
     participant_charts:
       hide_stats: "hide stats"
@@ -373,6 +384,13 @@ en_US:
 
     participant:
       show_submission: "show submission"
+      show_review: "show reviews"
+      show_review_summary: "show review summary"
+      show_metareviews: "show metareviews"
+      show_author_feedback: "show author feedback"
+      show_teammate_reviews: "show teammate reviews"
+      view_heatgrid: "view heatgrid"
+      edit_score: "edit score"
 
     participant_title:
       submitted_work: "Submitted work"

@@ -46,6 +46,10 @@ class VmQuestionResponse
     part = @participant_who_is_reviewee
     User.find_by(id: part.user_id).name
   end
+  
+  def reviewee_id
+    @participant_who_is_reviewee.user_id
+  end
 
   def add_reviews(participant, team, vary)
     if @questionnaire_type == "ReviewQuestionnaire"
@@ -107,6 +111,7 @@ class VmQuestionResponse
   end
 
   def display_team_members(ip_address = nil)
+    # Add anonymized ka logic idhar
     @output = ""
     if @questionnaire_type == "MetareviewQuestionnaire" || @questionnaire_type == "ReviewQuestionnaire"
       @output = "Team members:"

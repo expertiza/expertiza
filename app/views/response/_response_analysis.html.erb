@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Review Feedback Metrics</title>
+    <style>/*This style tag provides css styling to the table */
+        th, td, p, input, h3 {
+            font:15px 'Segoe UI';
+        }
+        table, th, td {
+            border: solid 1px #ddd;
+            border-collapse: collapse;
+            padding: 2px 3px;
+            text-align: center;
+        }
+        th {
+            font-weight:bold;
+        }
+    </style>
+    <style>/*This style tag provides css styling to the table conditional formatting in color() function*/
+		table {
+		    border-color: black;
+		}
+		.good {
+		    background-color: #BCED91;
+		}
+		.neutral {
+		    background-color: #FFEC8B;
+		}
+		.poor {
+		    background-color: #FF8080;
+		}
+	</style>
+	<style>/*This style tag provides css styling to the table tooltip*/
+	    .parentCell_metric_table {
+	        position: relative;
+            padding-left: 15px;
+            padding-right: 15px;            
+	    }
+	    .tooltip_metric_table {
+	        display: none;
+	        position: absolute;
+	        z-index: 100;
+	        border: 1px;
+	        background-color: white;
+	        border: 1px solid black;
+	        padding: 3px;
+	        color: black;
+	        top: 20px;
+	        left: 20px;
+	    }
+	    .parentCell_metric_table:hover span.tooltip_metric_table {
+	        display:block;
+	    }
+	</style>    
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
+</head>
+<body>
+    <br>
+    <input type='button' onclick='getReviewFeedback()' value='Get Review Feedback' />
+    <br>    
+    <br>
+    <p id='showData'></p>
+    <br>
+    <div id='timeTaken'></div>   
+</body>
+<script  src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+    var response_general = null; //global variable to store the data from promise returned by async await api call.       
+
+    //This function makes POST API call to the given url with final_json data   
+    function makeRequest(final_json,url) 
+    {
+        return new Promise(function (resolve, reject) 
+        {
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', url);
+            xhr.setRequestHeader('content-type', 'application/json');
+            xhr.onload = function () 
+            {
+                if (this.status >= 200 && this.status < 300) 
+                {
+                    resolve(xhr.response);
+                    response_general = xhr.response;
+                } 
+                else 
+                {
+                    reject(
+                    {
+                        status: this.status,
+                        statusText: xhr.statusText
+                    });
+                }
+            };
+            xhr.onerror = function () 
+            {
+                reject(
+                {
+                    status: this.status,
+                    statusText: xhr.statusText
+                });
+            };    
+            xhr.send(final_json);
+        });
+    }
+    //fetches the review form comments one by one - formats them into a single stringified json
+    function fetch_response_comments()
+    {
+        var serialized_form = $("form").serialize();      
+        var form_value_to_json = [Object.fromEntries(new URLSearchParams(serialized_form))]
+
+        //for loop counts the number of comments in review form
+        var j = 0;
+        for(j =0; j <1000; j++)
+        {
+            if (document.getElementById("responses_"+j+"_comments") == null)
+            {break;}
+        }
+
+        //for loop parses comments from review form and pushes all of them into 'reviews' list
+        var id = 0;
+        var reviews = [];
+        for (var i =2; i < j; i++) {              
+            if (document.getElementById("responses_"+i+"_comments") == null)
+                 continue;
+            else
+            {
+                var single_comment_json = {};
+                single_comment_json["id"] = id;
+                var comment_string = (document.getElementById("responses_"+i+"_comments").value);
+                comment_string =  $("<p>").html(comment_string).text();
+                comment_string = comment_string.replace("\n"," ");
+                single_comment_json["text"] = comment_string.replace("\r","");
+                id++;
+                reviews.push(single_comment_json);
+             }
+        }
+
+        //fetches the last comment(just above 'additional comments') in review form
+        var single_comment_json = {};
+        single_comment_json["id"] = id;
+        var comment_string =  (document.getElementById("responses_"+0+"_comments").value);
+        comment_string =  $("<p>").html(comment_string).text();
+        comment_string = comment_string.replace("\n"," ");
+        single_comment_json["text"] = comment_string.replace("\r","");                        
+        id++;
+        reviews.push(single_comment_json);
+
+        //fetches the 'additional comment' text present at the end of review form
+        single_comment_json = {};
+        single_comment_json["id"] = id;
+        comment_string = form_value_to_json[0]['review[comments]'];
+        comment_string =  $("<p>").html(comment_string).text();
+        comment_string = comment_string.replace("\n"," ");
+        single_comment_json["text"] = comment_string.replace("\r","");                       
+        id++;
+        reviews.push(single_comment_json);
+
+        var number_of_comments = reviews.length; 
+
+        //converts the reviews list into a json object, which is later converted into stringified json.
+        var processed_comment_json = {};
+        processed_comment_json["reviews"] = reviews;
+        processed_comment_json_string = JSON.stringify(processed_comment_json);
+        return [processed_comment_json_string, number_of_comments]
+    }
+
+    //combines output from all API calls into a single list object after processing the api output data    
+    function combine_api_output(number_of_comments, config_file_values, response_sentiment = null, response_problem = null, response_suggestion = null)
+    {
+        var pos; var neg; var neu;
+        combined_api_output = [];
+
+        //processes api output comment by comment
+        for(var i =0; i< number_of_comments; i++)        
+        {
+            var single_comment_api_output = {};
+            single_comment_api_output["Comment Number"] = i+1;
+
+            //This convert the sentiment api output from sentiment values to positive, negative, neutral string
+            if(config_file_values.includes('sentiment'))
+            {
+                pos = response_sentiment['sentiments'][i]['pos'];
+                neg = response_sentiment['sentiments'][i]['neg'];
+                neu = response_sentiment['sentiments'][i]['neu'];
+
+                if ( pos > neg && pos > neu )
+                    single_comment_api_output["Sentiment"] = 'Positive'; 
+                if ( neu > pos && neu > neg )
+                    single_comment_api_output["Sentiment"] = 'Neutral'; 
+                if ( neg > neu && neg > pos )
+                    single_comment_api_output["Sentiment"] = 'Negative';  
+            }  
+            if(config_file_values.includes('problem'))
+                { single_comment_api_output["Problem Detected?"] = response_problem['reviews'][i]['problems'] }
+
+            if(config_file_values.includes('suggestion'))
+                { single_comment_api_output["Suggestion?"] = response_suggestion['reviews'][i]['suggestions'] }
+
+            combined_api_output.push(single_comment_api_output);              
+        }
+        return combined_api_output        
+    }    
+
+    //This function takes in the processed api output to display a table(populated with API output) on UI
+    function generateTable(combined_api_output)
+    {
+        //tooltip_json to store the text displayed in tooltip
+        var tooltip_json = {"Comment Number":'The comment number from the top in the form.', "Sentiment": 'This column shows the tone of the comment.', "Problem Detected?": 'This shows whether any problem is mentioned in the comment or not.',"Suggestion?": 'This shows whether any problem is mentioned in the comment or not.'}
+
+        var col = [];
+        for (var i = 0; i < combined_api_output.length; i++) {
+            for (var key in combined_api_output[i]) {
+                if (col.indexOf(key) === -1) {
+                    col.push(key);
+                }
+            }
+        }
+
+        // Create a table header row using the extracted headers above.
+        var table = document.createElement("table");
+        var tr = table.insertRow(-1);                   // table row.
+
+        for (var i = 0; i < col.length; i++) {
+            var th = document.createElement("th");      // table header.
+            th.innerHTML = col[i] + `<img src="/assets/info.png" title='`+tooltip_json[col[i]]+`'>`;
+            th.classList.add("parentCell_metric_table");
+            tr.appendChild(th);
+        }
+
+        // add json data to the table as rows.
+        for (var i = 0; i < combined_api_output.length; i++) {
+
+            tr = table.insertRow(-1);
+
+            for (var j = 0; j < col.length; j++) {
+                var tabCell = tr.insertCell(-1);
+                tabCell.innerHTML = combined_api_output[i][col[j]];
+            }
+        }
+        // Now, add the newly created table with json data, to a container.
+        var divShowData = document.getElementById('showData');
+        divShowData.innerHTML = "";
+        divShowData.appendChild(table);
+
+        //provides conditional formatting to the generated table
+        color();
+    }
+
+    //The driver code to fetch the review comments, get API call output and display them in tabular format
+    async function getReviewFeedback() 
+    {
+        //this variable fetches and stores the review metrics setting stored in config file review_metrics.yml
+        var config_file_values =   $('.fetch_review_metric').data('params');
+
+        //displays text 'Loading...' when 'get review feedback' button is pressed until table is displayed
+        var time_taken_obj = document.getElementById('timeTaken');
+        time_taken_obj.innerHTML = "Loading..."
+
+        //start the timer here - which will be used to calculate total time taken.
+        var time_start = performance.now();        
+        var processed_comment_json_string = fetch_response_comments();
+        var number_of_comments = processed_comment_json_string[1];
+        processed_comment_json_string = processed_comment_json_string[0];
+
+        //Sentiment API Call
+        var response_sentiment = null;
+        if(config_file_values.includes('sentiment'))
+        {
+            await makeRequest(processed_comment_json_string, 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk')
+            response_sentiment = JSON.parse(response_general);
+            response_general = null;
+        }
+
+        //Problem API Call 
+        var response_problem = null; 
+        if(config_file_values.includes('problem'))
+        { 
+            await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/problem')
+            response_problem = JSON.parse(response_general);
+            response_general = null;
+        }
+
+        //Suggestion API Call
+        var response_suggestion = null;
+        if(config_file_values.includes('suggestion'))
+        {
+            await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/suggestions')
+            response_suggestion = JSON.parse(response_general);
+            response_general = null;
+        }
+
+        var combined_api_output = combine_api_output(number_of_comments, config_file_values, response_sentiment, response_problem, response_suggestion);
+        generateTable(combined_api_output);
+
+        time_end = performance.now();
+        var time_taken = time_end - time_start;
+        var time_taken_obj = document.getElementById('timeTaken');
+        time_taken_obj.innerHTML = `<p> Time taken is ${(time_taken/1000).toFixed(2)} seconds. </p>`;
+
+    }
+</script>
+<script>
+//This function does the conditional formatting of the output table on UI
+function color(){ $('td').each(
+function() {
+    var score = $(this).text();
+    if (score == 'Positive' || score == 'Present') {
+        $(this).addClass('good');
+    } 
+    else if (score == 'Neutral') {
+        $(this).addClass('neutral');
+    }
+    else if (score == 'Negative' || score == 'Absent') {
+        $(this).addClass('poor');
+    }
+    });
+}
+</script>
+</html>

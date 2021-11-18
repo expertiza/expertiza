@@ -42,6 +42,10 @@ class VmQuestionResponse
     end
   end
 
+  def reviewee_id
+    @participant_who_is_reviewee.user_id
+  end
+
   def reviewee_name
     part = @participant_who_is_reviewee
     User.find_by(id: part.user_id).name

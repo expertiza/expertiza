@@ -32,7 +32,7 @@ describe TeammateReviewResponseMap do
     allow(response_map).to receive(:id).and_return(1)
   end
 
-  it '#get_title' do
+  it '#contributor' do
     expect(teammate_review_response_map1.contributor).to eq(nil)
   end
 
@@ -52,15 +52,29 @@ describe TeammateReviewResponseMap do
       end
 
       it 'returns correct questionnaire found by used_in_round and topic_id if both used_in_round and topic_id are given' do
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return(
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment1.id, used_in_round: 1, topic_id: 1).and_return(
             [assignment_teammate_questionnaire1])
-        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(teammate_questionnaire1)
+        allow(Questionnaire).to receive(:find_by!).with(type: 'TeammateReviewQuestionnaire').and_return([teammate_questionnaire1])
+        #allow(Questionnaire).to receive(:where!).and_return([teammate_questionnaire1])
+
+
+        assignment1.questionnaires = [teammate_questionnaire1, teammate_questionnaire2]
         puts "--"
+        puts assignment1
+        puts "questionnaire through assignment"
         puts assignment1.questionnaires
         puts "--"
-        puts teammate_questionnaire1.assignments
+        puts teammate_questionnaire1
+        puts teammate_questionnaire1.type
+
         puts "--"
-        puts assignment_teammate_questionnaire1.assign
+        puts assignment_teammate_questionnaire1
+        puts assignment_teammate_questionnaire1.assignment
+        puts assignment_teammate_questionnaire1.questionnaire
+        puts "--"
+        puts teammate_review_response_map1.assignment.questionnaires.class
+        puts teammate_review_response_map1.assignment.questionnaires.where!(type: 'TeammateReviewQuestionnaire')
+
         expect(teammate_review_response_map1.questionnaire()).to eq(teammate_questionnaire1)
       end
 

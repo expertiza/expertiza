@@ -94,7 +94,7 @@ FactoryBot.define do
     is_new_user false
     master_permission_granted 0
     handle 'handle'
-    digital_certificate nil
+    digital_certificate nild
     timezonepref 'Eastern Time (US & Canada)'
     public_key nil
     copy_of_emails false
@@ -199,6 +199,17 @@ FactoryBot.define do
     has_badge false
     allow_selecting_additional_reviews_after_1st_round false
     auto_assign_mentor false
+  end
+
+  factory :late_policy, class: LatePolicy do
+    # Help multiple factory-created assignments get unique names
+    # Let the first created assignment have the name 'final2' to avoid breaking some fragile existing tests
+    policy_name 'Dummy Name'
+    instructor_id 1
+    max_penalty 5
+    penalty_per_unit 1
+    penalty_unit 1
+    assignments {[ Assignment.first || association(:assignment) ]}
   end
 
   factory :assignment_team, class: AssignmentTeam do

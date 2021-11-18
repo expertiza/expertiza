@@ -425,6 +425,10 @@ en_US:
       warning: "Warning:"
       you_must: "You must have a wiki account named after your handle.  If you do not, please e-mail your instructor or the course staff."
       back: "Back"
+      handle_explanation: "For example, if you are writing on a wiki, you might not want to use your Expertiza user-ID to show up on the
+           wiki, because then your reviewers would know who they are reviewing. So, you are allowed to set up a handle instead.
+           If you have a handle, then your wiki account is named after your handle, and your reviewers see your handle,
+           but not your user-ID."
 
   popup:
     self_review_popup:

@@ -377,6 +377,18 @@ FactoryBot.define do
     instruction_loc nil
   end
 
+  factory :teammate_questionnaire, class: TeammateReviewQuestionnaire do
+    name 'Test questionnaire'
+    # Beware: it is fragile to assume that role_id of instructor is 1 (or any other unchanging value)
+    instructor { Instructor.first || association(:instructor) }
+    private 0
+    min_question_score 0
+    max_question_score 5
+    type 'TeammateReviewQuestionnaire'
+    display_type 'Review'
+    instruction_loc nil
+  end
+
   factory :questionnaire_node, class: QuestionnaireNode do
     parent_id 0
     node_object_id 0
@@ -412,6 +424,16 @@ FactoryBot.define do
     dropdown 1
   end
 
+  factory :assignment_teammate_questionnaire, class: AssignmentQuestionnaire do
+    assignment { Assignment.first || association(:assignment) }
+    questionnaire { TeammateReviewQuestionnaire.first || association(:assignment_teammate_questionnaire) }
+    user_id 1
+    questionnaire_weight 100
+    used_in_round nil
+    topic_id nil
+    dropdown 1
+  end
+
   factory :bookmark_questionnaire, class: BookmarkRatingQuestionnaire do
     name "BookmarkRatingQuestionnaire"
     assignments {[ Assignment.first || association(:assignment) ]}
@@ -425,6 +447,14 @@ FactoryBot.define do
     reviewer { AssignmentParticipant.first || association(:participant) }
     reviewee { AssignmentTeam.first || association(:assignment_team) }
     type 'ReviewResponseMap'
+    calibrate_to 0
+  end
+
+  factory :teammate_review_response_map, class: TeammateReviewResponseMap do
+    assignment { Assignment.first || association(:assignment) }
+    reviewer { AssignmentParticipant.first || association(:participant) }
+    reviewee { AssignmentParticipant.first || association(:participant) }
+    type 'TeammateReviewResponseMap'
     calibrate_to 0
   end
 

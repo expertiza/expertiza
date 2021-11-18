@@ -45,7 +45,7 @@ class ViewTranslationSubstitutor
 
     resume_index = 0
     while resume_index < contents.length do
-      match_data = contents[resume_index, contents.length].match(/#{BLACKLIST}(\s+)?(#{val})(\s+)?#{BLACKLIST}/)
+      match_data = contents[resume_index, contents.length].match(/#{BLACKLIST}(\s+)?(#{Regexp.escape(val)})(\s+)?#{BLACKLIST}/)
       break if match_data == nil
 
       match_begin, match_end = resume_index + match_data.begin(0), resume_index + match_data.end(0)

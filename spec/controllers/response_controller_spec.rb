@@ -396,7 +396,7 @@ describe ResponseController do
       it 'returns a list of configuration of metrics' do
         metrics = controller.fetch_review_metric
         api_urls = controller.fetch_review_metric_api_urls
-        expect(api_urls.length).to be == metrics.length
+        expect(api_urls.length).to eq(metrics.length)
         expected_api_urls = {}
         metrics.each do |metric|
           expected_api_urls[metric] = api_urls[metric]

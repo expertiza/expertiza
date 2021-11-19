@@ -143,14 +143,24 @@ class ResponseController < ApplicationController
     render action: 'response'
   end
 
-   # fetches the review metric configuration from config file review_metrics.yml file
-   def fetch_review_metric
+  # fetches the review metric configuration from config file review_metrics.yml file
+  def fetch_review_metric
     @temp = REVIEW_METRIC_CONFIG['metrics']
     @review_options = []
     for i in 0..@temp.length-1
       @review_options.push(@temp[i]) unless REVIEW_METRIC_CONFIG[@temp[i]] == false
     end
     @review_options
+  end
+
+  # fetches the review metric api urls from config file review_metrics_api_urls.yml file
+  def fetch_review_metric_api_urls
+    metrics = REVIEW_METRIC_API_URLS_CONFIG['metrics']
+    api_urls = {}
+    for metric in metrics
+      api_urls[metric] = REVIEW_METRIC_API_URLS_CONFIG[metric]
+    end
+    api_urls
   end  
 
   def new_feedback

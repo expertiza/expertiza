@@ -252,6 +252,9 @@
         //this variable fetches and stores the review metrics setting stored in config file review_metrics.yml
         var config_file_values =   $('.fetch_review_metric').data('params');
 
+        //this variable fetches and stores the review metrics api urls stored in config file review_metrics_api_urls.yml
+        var config_file_api_urls =   $('.fetch_review_metric_api_urls').data('params');
+
         //displays text 'Loading...' when 'get review feedback' button is pressed until table is displayed
         var time_taken_obj = document.getElementById('timeTaken');
         time_taken_obj.innerHTML = "Loading..."
@@ -266,7 +269,7 @@
         var response_sentiment = null;
         if(config_file_values.includes('sentiment'))
         {
-            await makeRequest(processed_comment_json_string, 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk')
+            await makeRequest(processed_comment_json_string, config_file_api_urls['sentiment'])
             response_sentiment = JSON.parse(response_general);
             response_general = null;
         }
@@ -275,7 +278,7 @@
         var response_problem = null; 
         if(config_file_values.includes('problem'))
         { 
-            await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/problem')
+            await makeRequest(processed_comment_json_string, config_file_api_urls['problem'])
             response_problem = JSON.parse(response_general);
             response_general = null;
         }
@@ -284,7 +287,7 @@
         var response_suggestion = null;
         if(config_file_values.includes('suggestion'))
         {
-            await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/suggestions')
+            await makeRequest(processed_comment_json_string, config_file_api_urls['suggestion'])
             response_suggestion = JSON.parse(response_general);
             response_general = null;
         }

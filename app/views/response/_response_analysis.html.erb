@@ -165,7 +165,9 @@
     }
 
     //combines output from all API calls into a single list object after processing the api output data    
-    function combine_api_output(number_of_comments, config_file_values, response_sentiment = null, response_problem = null, response_suggestion = null)
+    // TODO
+    //function combine_api_output(number_of_comments, config_file_values, response_sentiment = null, response_problem = null, response_suggestion = null)
+    function combine_api_output(number_of_comments, config_file_values, responseDict =[])
     {
         var pos; var neg; var neu;
         combined_api_output = [];
@@ -179,6 +181,7 @@
             //This convert the sentiment api output from sentiment values to positive, negative, neutral string
             if(config_file_values.includes('sentiment'))
             {
+                response_sentiment = responseDict['sentiment']
                 pos = response_sentiment['sentiments'][i]['pos'];
                 neg = response_sentiment['sentiments'][i]['neg'];
                 neu = response_sentiment['sentiments'][i]['neu'];
@@ -189,12 +192,13 @@
                     single_comment_api_output["Sentiment"] = 'Neutral'; 
                 if ( neg > neu && neg > pos )
                     single_comment_api_output["Sentiment"] = 'Negative';  
-            }  
-            if(config_file_values.includes('problem'))
-                { single_comment_api_output["Problem Detected?"] = response_problem['reviews'][i]['problems'] }
+            } 
+            // TODO 
+            //if(config_file_values.includes('problem'))
+            //    { single_comment_api_output["Problem Detected?"] = response_problem['reviews'][i]['problems'] }
 
-            if(config_file_values.includes('suggestion'))
-                { single_comment_api_output["Suggestion?"] = response_suggestion['reviews'][i]['suggestions'] }
+            //if(config_file_values.includes('suggestion'))
+            //    { single_comment_api_output["Suggestion?"] = response_suggestion['reviews'][i]['suggestions'] }
 
             combined_api_output.push(single_comment_api_output);              
         }
@@ -205,7 +209,10 @@
     function generateTable(combined_api_output)
     {
         //tooltip_json to store the text displayed in tooltip
-        var tooltip_json = {"Comment Number":'The comment number from the top in the form.', "Sentiment": 'This column shows the tone of the comment.', "Problem Detected?": 'This shows whether any problem is mentioned in the comment or not.',"Suggestion?": 'This shows whether any problem is mentioned in the comment or not.'}
+        
+        // TODO
+        //var tooltip_json = {"Comment Number":'The comment number from the top in the form.', "Sentiment": 'This column shows the tone of the comment.', "Problem Detected?": 'This shows whether any problem is mentioned in the comment or not.',"Suggestion?": 'This shows whether any problem is mentioned in the comment or not.'}
+        var tooltip_json = {"Comment Number":'The comment number from the top in the form.', "Sentiment": 'This column shows the tone of the comment.'}
 
         var col = [];
         for (var i = 0; i < combined_api_output.length; i++) {
@@ -246,6 +253,7 @@
         color();
     }
 
+    
     //The driver code to fetch the review comments, get API call output and display them in tabular format
     async function getReviewFeedback() 
     {
@@ -261,35 +269,49 @@
         var processed_comment_json_string = fetch_response_comments();
         var number_of_comments = processed_comment_json_string[1];
         processed_comment_json_string = processed_comment_json_string[0];
+        
+        //gives a dictionary of analysis with their api endpoints
+        var analysisDict = {sentiment: 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk'}
+        var responseDict = {}
+        for (var analysisVal in analysisDict){
+            if(config_file_values.includes(analysisVal))
+            {
+                await makeRequest(processed_comment_json_string, analysisDict[analysisVal])
+                responseDict[analysisVal] = JSON.parse(response_general);
+                response_general = null;
+            }
 
+        }
         //Sentiment API Call
-        var response_sentiment = null;
-        if(config_file_values.includes('sentiment'))
-        {
-            await makeRequest(processed_comment_json_string, 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk')
-            response_sentiment = JSON.parse(response_general);
-            response_general = null;
-        }
+        //var response_sentiment = null;
+        //if(config_file_values.includes('sentiment'))
+        //{
+        //    await makeRequest(processed_comment_json_string, 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk')
+        //    response_sentiment = JSON.parse(response_general);
+        //    response_general = null;
+        // }
 
+        //TODO
         //Problem API Call 
-        var response_problem = null; 
-        if(config_file_values.includes('problem'))
-        { 
-            await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/problem')
-            response_problem = JSON.parse(response_general);
-            response_general = null;
-        }
+        //var response_problem = null; 
+        //if(config_file_values.includes('problem'))
+        //{ 
+        //    await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/problem')
+        //    response_problem = JSON.parse(response_general);
+        //    response_general = null;
+        //}
 
         //Suggestion API Call
-        var response_suggestion = null;
-        if(config_file_values.includes('suggestion'))
-        {
-            await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/suggestions')
-            response_suggestion = JSON.parse(response_general);
-            response_general = null;
-        }
+        //var response_suggestion = null;
+        //if(config_file_values.includes('suggestion'))
+        //{
+        //    await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/suggestions')
+        //    response_suggestion = JSON.parse(response_general);
+        //    response_general = null;
+        //}
 
-        var combined_api_output = combine_api_output(number_of_comments, config_file_values, response_sentiment, response_problem, response_suggestion);
+        //var combined_api_output = combine_api_output(number_of_comments, config_file_values, response_sentiment, response_problem, response_suggestion);
+        var combined_api_output = combine_api_output(number_of_comments, config_file_values, responseDict);
         generateTable(combined_api_output);
 
         time_end = performance.now();
@@ -298,22 +320,22 @@
         time_taken_obj.innerHTML = `<p> Time taken is ${(time_taken/1000).toFixed(2)} seconds. </p>`;
 
     }
-</script>
-<script>
-//This function does the conditional formatting of the output table on UI
-function color(){ $('td').each(
-function() {
-    var score = $(this).text();
-    if (score == 'Positive' || score == 'Present') {
-        $(this).addClass('good');
-    } 
-    else if (score == 'Neutral') {
-        $(this).addClass('neutral');
+
+    //This function does the conditional formatting of the output table on UI
+    function color(){ $('td').each(
+    function() {
+        var score = $(this).text();
+        if (score == 'Positive' || score == 'Present') {
+            $(this).addClass('good');
+        } 
+        else if (score == 'Neutral') {
+            $(this).addClass('neutral');
+        }
+        else if (score == 'Negative' || score == 'Absent') {
+            $(this).addClass('poor');
+        }
+        });
     }
-    else if (score == 'Negative' || score == 'Absent') {
-        $(this).addClass('poor');
-    }
-    });
-}
 </script>
+
 </html>

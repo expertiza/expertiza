@@ -445,25 +445,28 @@ en_US:
 
   student_quizzes:
     index:
-      quiz_for: "Quiz for"
+      quiz_for: "Quizzes for "
       assignment_not_support: "This assignment does not support quizzes"
+      back: "Back"
 
     responses:
       work_not_submit: "Work has not been submitted yet"
       begin: "Begin"
+      view: "View"
 
     set_dynamic_quiz:
       select_topic: "Select a topic below to take a new quiz"
-      request_new_quiz: "Request for a new quiz"
+      request_new_quiz: "Request a new quiz to take"
 
     finished_quiz:
       answers: "Answers"
       quiz_score: "Quiz score: "
+      back: "Back"
 
     review_questions:
-      quiz_listings: " Listing of all quiz questions for : "
-      quiz_create: " Quiz created by: "
-      topic: " Topic: "
+      quiz_listings: "Listing of all quiz questions for"
+      quiz_create: "Quiz created by"
+      topic: "Topic:"
       quiz_taker: "Quiz taker"
       quiz_score: "Quiz score"
       avg_score: "Average score for quiz takers: "

@@ -78,7 +78,7 @@ en_US:
       use_the_teams: "Use the teams that are currently defined for the course."
       team_name: "Team Name"
 
-  assignment:
+  assignments:
     new:
       create_new: "Create New"
       public: "Public"

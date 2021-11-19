@@ -21,4 +21,4 @@ class CreateReviewBids < ActiveRecord::Migration
 	  add_foreign_key "review_bids", "sign_up_topics", column: "signuptopic_id"
 	  add_foreign_key "review_bids", "users"
   end
-end 
+end

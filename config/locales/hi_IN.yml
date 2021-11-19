@@ -230,6 +230,10 @@ hi_IN:
       bookmarks: "बुकमार्क्स "
       actions: " एक्शन्स"
       advertise: "अद्वेर्तीसे - मेन्ट(स)"
+      topic_id: "Topic ID"
+      select: "Select"
+      questionnaire: "Questionnaire"
+      disabled: "(disabled)"
 
     suggested_topic:
       approved_suggestion: "आपका अनुमोदित से सुझाया गया विषय"

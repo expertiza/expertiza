@@ -65,7 +65,6 @@
 </body>
 <script  src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
-    var response_general = null; //global variable to store the data from promise returned by async await api call.       
 
     //This function makes POST API call to the given url with final_json data   
     function makeRequest(final_json,url) 
@@ -80,7 +79,6 @@
                 if (this.status >= 200 && this.status < 300) 
                 {
                     resolve(xhr.response);
-                    response_general = xhr.response;
                 } 
                 else 
                 {
@@ -266,27 +264,24 @@
         var response_sentiment = null;
         if(config_file_values.includes('sentiment'))
         {
-            await makeRequest(processed_comment_json_string, 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk')
-            response_sentiment = JSON.parse(response_general);
-            response_general = null;
+            response_sentiment = await makeRequest(processed_comment_json_string, 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk')
+            response_sentiment = JSON.parse(response_sentiment);
         }
 
         //Problem API Call 
         var response_problem = null; 
         if(config_file_values.includes('problem'))
         { 
-            await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/problem')
-            response_problem = JSON.parse(response_general);
-            response_general = null;
+            response_problem = await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/problem')
+            response_problem = JSON.parse(response_problem);
         }
 
         //Suggestion API Call
         var response_suggestion = null;
         if(config_file_values.includes('suggestion'))
         {
-            await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/suggestions')
+            response_suggestion = await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/suggestions')
             response_suggestion = JSON.parse(response_general);
-            response_general = null;
         }
 
         var combined_api_output = combine_api_output(number_of_comments, config_file_values, response_sentiment, response_problem, response_suggestion);

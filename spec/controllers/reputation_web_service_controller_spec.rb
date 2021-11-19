@@ -13,10 +13,12 @@ describe ReputationWebServiceController do
       @reviewee = create(:assignment_team, assignment: @assignment)
 
       @response_map = create(:review_response_map, reviewer: @reviewer)
-      @submission_records = create(:submission_records, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink' content: 'weblink')
+      @submission_records = create(:submission_records, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'weblink')
 
     end
 
     it '' do
-      create()
+      # create()
     end
+  end
+end

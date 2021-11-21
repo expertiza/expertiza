@@ -1,0 +1,15 @@
+%p#notice= notice
+
+%p
+  %b Revision plan team map:
+  = @revision_plan_team_map.revision_plan_team_map_id
+%p
+  %b Team:
+  = @revision_plan_team_map.team_id
+%p
+  %b Used in round:
+  = @revision_plan_team_map.used_in_round
+
+= link_to 'Edit', edit_revision_plan_team_map_path(@revision_plan_team_map)
+\|
+= link_to 'Back', revision_plan_team_maps_path

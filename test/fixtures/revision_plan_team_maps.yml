@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  revision_plan_team_map_id: MyString
+  team_id: 1
+  used_in_round: false
+
+two:
+  revision_plan_team_map_id: MyString
+  team_id: 1
+  used_in_round: false

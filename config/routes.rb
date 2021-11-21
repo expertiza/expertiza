@@ -1,5 +1,9 @@
 
 Expertiza::Application.routes.draw do
+  resources :revision_plan_team_maps
+  resources :revision_plan_team_maps
+  resources :revision_plan_team_maps
+  resources :revision_plan_team_maps
   ###
   # Please insert new routes alphabetically!
   ###

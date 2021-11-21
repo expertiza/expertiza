@@ -1,0 +1,25 @@
+%h1 Listing revision_plan_team_maps
+
+%table
+  %thead
+    %tr
+      %th Revision plan team map
+      %th Team
+      %th Used in round
+      %th
+      %th
+      %th
+
+  %tbody
+    - @revision_plan_team_maps.each do |revision_plan_team_map|
+      %tr
+        %td= revision_plan_team_map.revision_plan_team_map_id
+        %td= revision_plan_team_map.team_id
+        %td= revision_plan_team_map.used_in_round
+        %td= link_to 'Show', revision_plan_team_map
+        %td= link_to 'Edit', edit_revision_plan_team_map_path(revision_plan_team_map)
+        %td= link_to 'Destroy', revision_plan_team_map, method: :delete, data: { confirm: 'Are you sure?' }
+
+%br
+
+= link_to 'New Revision plan team map', new_revision_plan_team_map_path

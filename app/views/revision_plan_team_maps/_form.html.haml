@@ -1,0 +1,19 @@
+= form_for @revision_plan_team_map do |f|
+  - if @revision_plan_team_map.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@revision_plan_team_map.errors.count, "error")} prohibited this revision_plan_team_map from being saved:"
+      %ul
+        - @revision_plan_team_map.errors.full_messages.each do |message|
+          %li= message
+
+  .field
+    = f.label :revision_plan_team_map_id
+    = f.text_field :revision_plan_team_map_id
+  .field
+    = f.label :team_id
+    = f.number_field :team_id
+  .field
+    = f.label :used_in_round
+    = f.check_box :used_in_round
+  .actions
+    = f.submit 'Save'

@@ -12,15 +12,12 @@ class ViewTranslationSubstitutor
   private
 
   def process_directory(dir_name, view_hash)
-    puts "=== Processing directory '#{dir_name}' ==="
     dir_stats = {}
     view_hash.each { |view_name, translations| dir_stats[view_name] = process_view(dir_name, view_name, translations) }
     dir_stats
   end
 
   def process_view(directory_name, view_name, translations)
-    puts "--- Processing view '#{view_name}' ---"
-
     path = "./#{directory_name}/#{view_name}.html.erb"
     unless File.exists?(path)
       path = "./#{directory_name}/_#{view_name}.html.erb"
@@ -40,7 +37,6 @@ class ViewTranslationSubstitutor
   end
 
   def process_translation(contents, key, val)
-    puts "Processing #{key}=#{val}"
     replacements, skips = [], []
 
     resume_index = 0
@@ -55,11 +51,9 @@ class ViewTranslationSubstitutor
         t_call = black_start == nil ? "<%=t \".#{key}\"%>" : "t(\".#{key}\")"
         replacement = "#{white_start}#{t_call}#{white_end}"
         replacements += [contents[match_begin, matched_text.length]]
-        puts "\tReplacing: ' #{}'\t->\t'#{replacement}'"
         contents[match_begin, matched_text.length] = replacement
         resume_index = match_begin + replacement.length
       else
-        puts "\tSkipping #{matched_text}"
         resume_index = match_end
         skips += [matched_text]
       end

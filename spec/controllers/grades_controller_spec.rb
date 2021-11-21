@@ -82,7 +82,7 @@ describe GradesController do
         allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
         allow(assignment).to receive(:late_policy_id).and_return(false)
         allow(assignment).to receive(:calculate_penalty).and_return(false)
-        allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
+        allow(ResponseMap).to receive(:compute_total_score).with(assignment, any_args).and_return(100)
         params = {id: 1}
         session = {user: instructor}
         get :view_my_scores, params, session
@@ -109,7 +109,7 @@ describe GradesController do
         allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])
         allow(assignment).to receive(:late_policy_id).and_return(false)
         allow(assignment).to receive(:calculate_penalty).and_return(false)
-        allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
+        allow(ResponseMap).to receive(:compute_total_score).with(assignment, any_args).and_return(100)
         allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([review_response])
         allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
         params = {id: 1}
@@ -128,7 +128,7 @@ describe GradesController do
       allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
       allow(review_questionnaire).to receive(:get_assessments_for).with(participant).and_return([review_response])
       allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
-      allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
+      allow(ResponseMap).to receive(:compute_total_score).with(assignment, any_args).and_return(100)
       params = {id: 1}
       get :edit, params
       expect(response).to render_template(:edit)

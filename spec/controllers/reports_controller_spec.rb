@@ -62,9 +62,9 @@ describe ReportsController do
           allow(ReviewResponseMap).to receive(:review_response_report)
             .with('1', assignment, 'ReviewResponseMap', 'no one')
             .and_return([participant, participant1])
-          allow(assignment).to receive(:compute_reviews_hash)
+          allow(ReviewResponseMap).to receive(:compute_reviews_hash).with(assignment)
             .and_return('1' => 'good')
-          allow(assignment).to receive(:compute_avg_and_ranges_hash)
+          allow(ReviewResponseMap).to receive(:compute_avg_and_ranges_hash).with(assignment)
             .and_return(avg: 94, range: [90, 99])
           params = {
             id: 1,

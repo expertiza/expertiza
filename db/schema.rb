@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20211102232926) do
+ActiveRecord::Schema.define(version: 20211122083330) do
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -30,8 +30,9 @@ ActiveRecord::Schema.define(version: 20211102232926) do
     t.integer  "tag_prompt_deployment_id", limit: 4
     t.integer  "user_id",                  limit: 4
     t.string   "value",                    limit: 255
-    t.datetime "created_at",                           null: false
-    t.datetime "updated_at",                           null: false
+    t.datetime "created_at",                                                    null: false
+    t.datetime "updated_at",                                                    null: false
+    t.decimal  "confidence_level",                     precision: 10, scale: 5
   end
 
   add_index "answer_tags", ["answer_id"], name: "index_answer_tags_on_answer_id", using: :btree
@@ -302,11 +303,11 @@ ActiveRecord::Schema.define(version: 20211102232926) do
   add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed", using: :btree
 
   create_table "duties", force: :cascade do |t|
-    t.string   "duty_name",      limit: 255
-    t.integer  "max_duty_limit", limit: 4
-    t.integer  "assignment_id",  limit: 4
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
+    t.string   "duty_name",            limit: 255
+    t.integer  "max_members_for_role", limit: 4
+    t.integer  "assignment_id",        limit: 4
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
   end
 
   add_index "duties", ["assignment_id"], name: "index_duties_on_assignment_id", using: :btree
@@ -759,10 +760,8 @@ ActiveRecord::Schema.define(version: 20211102232926) do
   create_table "teams_users", force: :cascade do |t|
     t.integer "team_id", limit: 4
     t.integer "user_id", limit: 4
-    t.integer "duty_id", limit: 4
   end
 
-  add_index "teams_users", ["duty_id"], name: "index_teams_users_on_duty_id", using: :btree
   add_index "teams_users", ["team_id"], name: "fk_users_teams", using: :btree
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
@@ -872,7 +871,6 @@ ActiveRecord::Schema.define(version: 20211102232926) do
   add_foreign_key "tag_prompt_deployments", "assignments"
   add_foreign_key "tag_prompt_deployments", "questionnaires"
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
-  add_foreign_key "teams_users", "duties"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
 end

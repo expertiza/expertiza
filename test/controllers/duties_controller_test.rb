@@ -18,7 +18,7 @@ class DutiesControllerTest < ActionController::TestCase
 
   test "should create duty" do
     assert_difference('Duty.count') do
-      post :create, duty: { assignment_id: @duty.assignment_id, duty_name: @duty.duty_name, max_duty_limit: @duty.max_duty_limit }
+      post :create, duty: { assignment_id: @duty.assignment_id, duty_name: @duty.duty_name, max_members_for_role: @duty.max_members_for_role }
     end
 
     assert_redirected_to duty_path(assigns(:duty))
@@ -35,7 +35,7 @@ class DutiesControllerTest < ActionController::TestCase
   end
 
   test "should update duty" do
-    patch :update, id: @duty, duty: { assignment_id: @duty.assignment_id, duty_name: @duty.duty_name, max_duty_limit: @duty.max_duty_limit }
+    patch :update, id: @duty, duty: { assignment_id: @duty.assignment_id, duty_name: @duty.duty_name, max_members_for_role: @duty.max_members_for_role }
     assert_redirected_to duty_path(assigns(:duty))
   end
 

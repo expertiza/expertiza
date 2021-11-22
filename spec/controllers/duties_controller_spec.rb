@@ -1,7 +1,7 @@
 describe DutiesController do
   let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true) }
   let(:instructor) { build(:instructor, id: 6) }
-  let(:duty) { build(:duty, id: 1, duty_name: "Role", max_duty_limit: 2, assignment_id: 1) }
+  let(:duty) { build(:duty, id: 1, duty_name: "Role", max_members_for_role: 2, assignment_id: 1) }
   let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
 
   before(:each) do
@@ -20,7 +20,7 @@ describe DutiesController do
               id: 2,
               duty: {
                   duty_name: 'Scrum Master',
-                  max_duty_limit: 2,
+                  max_members_for_role: 2,
                   assignment_id: 1
               }
           }
@@ -41,7 +41,7 @@ describe DutiesController do
             assignment_id: 1,
             duty: {
                 duty_name: 'Scrum Master',
-                max_duty_limit: 5,
+                max_members_for_role: 5,
                 assignment_id: 1
             }
         }

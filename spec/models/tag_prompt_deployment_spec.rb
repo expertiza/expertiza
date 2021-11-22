@@ -2,7 +2,7 @@ describe TagPromptDeployment do
 	let(:tag_dep) { TagPromptDeployment.new id: 1, tag_prompt: tp, tag_prompt_id: 1, question_type: "Criterion", answer_length_threshold: 15, assignment_id: 1 }
 	let(:tp) { TagPrompt.new(prompt: "test prompt", desc: "test desc", control_type: "Checkbox") }
 	let(:team) {Team.new(id: 1, parent_id: 1)}
-	let(:rp) {Response.new}
+	let(:rp) {Response.new(id: 1, round: 1, additional_comment: "improvement scope")}
 	let(:responses) {Response.new(id: 1, round: 1, additional_comment: "improvement scope")}
 	let(:assignment) {Assignment.new({assignment: 1})}
 	let(:question) {Question.new(questionnaire_id: 1, type: 'tagging')}
@@ -25,10 +25,10 @@ describe TagPromptDeployment do
 	describe '#get_number_of_taggable_answers' do
 		context "when user_id given" do
 			it 'get team and response info of the participant' do
-				allow(Team).to receive(:join).with(:team_users, {:parent_id => tag_dep.assignment_id, :user_id => 1}).and_return(team)
-				allow(Response).to receive(:join).with(:response_maps, {:reviewed_object_id => 1, :reviewee_id => team.id}).and_return(responses)
+				allow(Team).to receive(:joins).with(:team_users, {:parent_id => tag_dep.assignment_id, :user_id => 1}).and_return(team)
+				allow(Response).to receive(:joins).with(:response_maps, {:reviewed_object_id => 1, :reviewee_id => team.id}).and_return([responses])
 				allow(Question).to receive(:where).with({:questionnaire_id => 1, :type => 'tagging'}).and_return(question)
-				expect(responses).to be(responses)
+				expect(responses).to eq(rp)
 			end
 		end
 		it "answers for reviews" do
@@ -57,5 +57,6 @@ describe TagPromptDeployment do
 				expect(answers.count).to eq(0)
 			end
 		end
-	end
+  end
+
 end

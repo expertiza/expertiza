@@ -426,7 +426,7 @@ FactoryBot.define do
 
   factory :assignment_teammate_questionnaire, class: AssignmentQuestionnaire do
     assignment { Assignment.first || association(:assignment) }
-    questionnaire { TeammateReviewQuestionnaire.first || association(:assignment_teammate_questionnaire) }
+    questionnaire { TeammateReviewQuestionnaire.first || association(:teammate_questionnaire) }
     user_id 1
     questionnaire_weight 100
     used_in_round nil

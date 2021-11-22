@@ -30,6 +30,34 @@ class QuestionnaireNode < Node
       name.gsub!(/[^\w]/, '')
       conditions += " and questionnaires.type = \"#{name}\""
     end
+
+    # Creating the variable from _search param
+    name = _search[:name].to_s.strip
+    course_name = _search[:course].to_s.strip
+    assignment_name = _search[:assignment].to_s.strip
+    question_text = _search[:question_text].to_s.strip
+
+    # Checking if the search criteria are present or not. Based on this, modifying the query
+    if course_name.present?
+      course = Course.find_by('name LIKE ?', "%#{course_name}%")
+      instructor_id = course.instructor_id
+      conditions += " and questionnaires.instructor_id = \"#{instructor_id}\""
+    end
+
+    conditions += " and questionnaires.name LIKE \"%#{name}%\"" if name.present?
+
+    if question_text.present?
+      matching_questionnaires = Question.where('txt LIKE ?', "%#{question_text}%")
+      ids = matching_questionnaires.map(&:questionnaire_id)
+      conditions += " and questionnaires.id in (#{ids.join(',')})"
+    end
+
+    # Fetching the matching assignments from Assignment and AssignmentQuestionnaire tables based on name
+    matching_assignments = Assignment.where('name LIKE ?', "%#{assignment_name}%")
+    matching_questionnaires = AssignmentQuestionnaire.where('assignment_id in (?)', matching_assignments.ids)
+    questionnaire_ids = matching_questionnaires.map(&:questionnaire_id)
+    conditions += " and questionnaires.id in (#{questionnaire_ids.join(',')})"
+
     sortvar = 'name' if sortvar.nil? or sortvar == 'directory_path'
     sortorder = 'ASC' if sortorder.nil?
     (self.includes(:questionnaire).where([conditions, values]).order("questionnaires.#{sortvar} #{sortorder}") if Questionnaire.column_names.include? sortvar and

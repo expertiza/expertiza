@@ -80,4 +80,17 @@ describe TeammateReviewResponseMap do
 
     end
   end
+
+  it '#email' do
+    reviewer_id = 1
+    allow(Participant).to receive(:find).with(1).and_return(participant)
+    allow(Assignment).to receive(:find).with(1).and_return(assignment)
+    allow(AssignmentTeam).to receive(:find).with(1).and_return(team)
+    allow(AssignmentTeam).to receive(:users).and_return(student)
+    allow(User).to receive(:find).with(1).and_return(student)
+    review_response_map.reviewee_id = 1
+    defn = {body: {type: "TeammateReview", obj_name: "Test Assgt", first_name: "no one", partial_name: "new_submission"}, to: "expertiza@mailinator.com"}
+    expect { teammate_review_response_map1.email(defn, participant, Assignment.find(Participant.find(reviewer_id).parent_id)) }
+        .to change { ActionMailer::Base.deliveries.count }.by 1
+  end
 end

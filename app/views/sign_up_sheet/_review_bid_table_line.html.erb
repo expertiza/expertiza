@@ -1,4 +1,4 @@
-<%= render :partial => '/sign_up_sheet/base_table_line'%>
+<%= render :partial => '/sign_up_sheet/base_table_line', :locals => {:topic=>topic}%>
 
 <input name="hidden_topic_id" type="hidden" value=<%=topic.id %> >
 

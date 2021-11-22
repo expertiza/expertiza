@@ -3,9 +3,10 @@ describe ReputationWebServiceController do
   describe '' do
     before(:each) do
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day, submitter_count: 0, num_reviews: 3, rounds_of_reviews: 2, reputation_algorithm: 'lauw')
-      @questionnaire = create(:questionnaire, min_question_score: 0, max_question_score: 10, default_num_choices: 1, type: 'ReviewQuestionnaire')
-      @assignment_questionnaire_1 = create(:assignment_questionnaire, assignment_id: @assignment.id, questionnaire_id: @questionnaire.id, used_in_round: 1)
-      @assignment_questionnaire_2 = create(:assignment_questionnaire, assignment_id: @assignment.id, questionnaire_id: @questionnaire.id, used_in_round: 2)
+      @questionnaire_1 = create(:questionnaire, min_question_score: 0, max_question_score: 10, default_num_choices: 1, type: 'ReviewQuestionnaire')
+      @questionnaire_2 = create(:questionnaire, min_question_score: 0, max_question_score: 10, default_num_choices: 1, type: 'ReviewQuestionnaire')
+      @assignment_questionnaire_1 = create(:assignment_questionnaire, assignment_id: @assignment.id, questionnaire_id: @questionnaire_1.id, used_in_round: 1)
+      @assignment_questionnaire_2 = create(:assignment_questionnaire, assignment_id: @assignment.id, questionnaire_id: @questionnaire_2.id, used_in_round: 2)
 
       @reviewer_1 = create(:participant, can_review: 1)
       @reviewer_2 = create(:participant, can_review: 1)

@@ -187,4 +187,13 @@ class AssignmentParticipant < Participant
     end
     stage
   end
+
+  # E2147 : Gets duty id of the assignment participant by mapping teams user with help of
+  # user_id. Will no longer be needed once teams_user is converted into participant_teams
+  def get_duty_id()
+    get_team_user().duty_id
+  end
+  def get_team_user()
+    TeamsUser.where(:team_id=> self.team.id,:user_id => self.user_id).first
+  end
 end

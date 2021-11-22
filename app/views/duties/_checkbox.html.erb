@@ -10,7 +10,7 @@
         <div id="add_duties" <%= "hidden" if not @assignment_form.assignment.is_duty_based_assignment %> >
           <br>
           <%if !@assignment_form.assignment.is_duty_based_assignment%>
-              <p>Please save your preference before creating duties</p>
+              <p>Please save your preference before accessing roles</p>
           <%else%>
               <%= render '/duties/add_duties' %>
           <%end%>

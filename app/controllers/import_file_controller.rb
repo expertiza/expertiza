@@ -72,6 +72,65 @@ class ImportFileController < ApplicationController
     redirect_to session[:return_to]
   end
 
+  # def import
+  #   errors = import_from_hash(session, params)
+  #   err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
+  #   errors.each do |error|
+  #     err_msg = err_msg + "<li>" + error.to_s + "<br/>"
+  #   end
+  #   err_msg += "</ul>"
+  #   if errors.empty?
+  #     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "The file has been successfully imported.", request)
+  #     undo_link("The file has been successfully imported.")
+  #   else
+  #     ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, err_msg, request)
+  #     flash[:error] = err_msg
+  #   end
+  #   redirect_to session[:return_to]
+  # end
+
+  # def import_from_hash(session, params)
+  #   @model = params[:model]
+  #   contents_hash = eval(params[:contents_hash])
+    
+  #   if params[:has_header] == "true"
+  #     @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
+  #   else
+  #     # If there is no header, recover the selected fields in the select* params
+  #     new_header = []
+  #     params.each_key do |p|
+  #       if p.match(/\Aselect/)
+  #         new_header << params[p]
+  #       end
+  #     end
+  #     @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
+  #   end
+
+  #   # Call ::import for each row of the file
+  #   errors = []
+  #   begin
+  #     @header_integrated_body.each do |row_hash|
+  #       if @model.constantize.import_options.empty?
+  #         @model.constantize.import(row_hash, session, params[:id])
+  #       else
+  #         @model.constantize.import(row_hash, session, params[:id], params[:options])
+  #       end
+  #     end
+  #   rescue
+  #     errors << $ERROR_INFO
+  #   end
+  #   errors
+  # end
+
+  # def hash_rows_with_headers(header, body)
+  #   new_body = []
+  #   header.map! { |column_name| column_name.to_sym }
+  #   body.each do |row|
+  #     new_body << header.zip(row).to_h
+  #   end
+  #   new_body
+  # end
+
   def import_from_hash(session, params)
     if params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
       contents_hash = eval(params[:contents_hash])

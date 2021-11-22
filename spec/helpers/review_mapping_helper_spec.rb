@@ -344,7 +344,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
       round = 2
       color = []
-      resp_color = 'purple' # check_submission_state(@response_map, assignment_created, assignment_due_dates, round, color) FIXME OpenSSL::SSL::SSLError: SSL_connect returned=1 errno=0 state=SSLv3 read server certificate B: certificate verify failed
+      resp_color = ['purple'] # check_submission_state(@response_map, assignment_created, assignment_due_dates, round, color) FIXME OpenSSL::SSL::SSLError: SSL_connect returned=1 errno=0 state=SSLv3 read server certificate B: certificate verify failed
       expect(resp_color).to eq(['purple'])
     end
   end

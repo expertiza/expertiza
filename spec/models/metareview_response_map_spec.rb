@@ -145,4 +145,4 @@ describe MetareviewResponseMap do
       end
     end
   end
-  end
+end

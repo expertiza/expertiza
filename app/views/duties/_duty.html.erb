@@ -4,17 +4,8 @@
     <td><%= text_field 'duty', 'duty_name', size: 42 %></td>
   </tr>
   <tr>
-<<<<<<< HEAD
     <td><label for="max_members_for_role">Maximum member limit: <img src="/assets/info.png" title='The maximum number of members on the team that can have the role.'></label></td>
     <td><%= number_field 'duty', 'max_members_for_role' %></td>
-=======
-    <td>
-      <label for="max_members_for_role">Maximum member limit: <img src="/assets/info.png" title='The maximum number of members on the team that can have the role.'></label>
-    </td>
-    <td>
-      <%= number_field 'duty', 'max_members_for_role'%>
-    </td>
->>>>>>> ca57bdee1d1291de0ef68898d05a2f15822f63b3
   </tr>
   <tr hidden>
     <td><%= number_field 'duty', 'assignment_id', {:value => @id} %></td>

@@ -11,11 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 20211122083330) do
-=======
-ActiveRecord::Schema.define(version: 20211110161054) do
->>>>>>> ca57bdee1d1291de0ef68898d05a2f15822f63b3
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -764,8 +760,10 @@ ActiveRecord::Schema.define(version: 20211110161054) do
   create_table "teams_users", force: :cascade do |t|
     t.integer "team_id", limit: 4
     t.integer "user_id", limit: 4
+    t.integer "duty_id", limit: 4
   end
 
+  add_index "teams_users", ["duty_id"], name: "index_teams_users_on_duty_id", using: :btree
   add_index "teams_users", ["team_id"], name: "fk_users_teams", using: :btree
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
@@ -875,6 +873,7 @@ ActiveRecord::Schema.define(version: 20211110161054) do
   add_foreign_key "tag_prompt_deployments", "assignments"
   add_foreign_key "tag_prompt_deployments", "questionnaires"
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
+  add_foreign_key "teams_users", "duties"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
 end

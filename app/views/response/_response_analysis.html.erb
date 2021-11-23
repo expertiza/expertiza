@@ -82,21 +82,25 @@
                 } 
                 else 
                 {
-                    reject(
-                    {
+                    let reason = {
                         status: this.status,
                         statusText: xhr.statusText
-                    });
+                    };
+                    reject(
+                        new Error(JSON.stringify(reason))
+                    );
                 }
             };
             xhr.onerror = function () 
             {
-                reject(
-                {
+                let reason = {
                     status: this.status,
                     statusText: xhr.statusText
-                });
-            };    
+                };
+                reject(
+                    new Error(JSON.stringify(reason))
+                );
+            }; 
             xhr.send(final_json);
         });
     }
@@ -293,24 +297,39 @@
         var response_sentiment = null;
         if(config_file_values.includes('sentiment'))
         {
-            response_sentiment = await makeRequest(processed_comment_json_string, 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk')
-            response_sentiment = JSON.parse(response_sentiment);
+            try {
+                response_sentiment = await makeRequest(processed_comment_json_string, 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk')
+                response_sentiment = JSON.parse(response_sentiment);
+            } catch(error) {
+                time_taken_obj.innerHTML = "Request failed. Please try again.";
+                throw error;
+            }
         }
 
-        //Problem API Call 
+        // Problem API Call 
         var response_problem = null; 
         if(config_file_values.includes('problem'))
         { 
-            response_problem = await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/problem')
-            response_problem = JSON.parse(response_problem);
+            try {
+                response_problem = await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/problem');
+                response_problem = JSON.parse(response_problem);
+            } catch(error) {
+                time_taken_obj.innerHTML = "Request failed. Please try again.";
+                throw error;
+            }
         }
 
         // //Suggestion API Call
         var response_suggestion = null;
         if(config_file_values.includes('suggestion'))
         {
-            response_suggestion = await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/suggestions')
-            response_suggestion = JSON.parse(response_suggestion);
+            try {
+                response_suggestion = await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/suggestions');
+                response_suggestion = JSON.parse(response_suggestion);
+            } catch(error) {
+                time_taken_obj.innerHTML = "Request failed. Please try again.";
+                throw error;
+            }
         }
 
         var combined_api_output = combine_api_output(number_of_comments, config_file_values, response_sentiment, response_problem, response_suggestion);

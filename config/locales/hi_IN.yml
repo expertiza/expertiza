@@ -536,5 +536,10 @@ hi_IN:
         one: "1 सेकंड"
         other: "%{count} सेकंड"
 
+  shared:
+    footer_message:
+      help: "मदद"
+      papers: "Expertiza पर कागजात"
+
   # end of Student Views
 

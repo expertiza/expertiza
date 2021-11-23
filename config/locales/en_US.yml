@@ -524,6 +524,10 @@ en_US:
     email:
       email_add: "E-mail address:"
 
+  shared:
+    footer_message:
+      help: "Help"
+      papers: "Papers on Expertiza"
 
 
 

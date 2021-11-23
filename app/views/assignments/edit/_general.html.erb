@@ -256,6 +256,13 @@ function microtaskChanged() {
       <%= label_tag('assignment_form[assignment][availability_flag]', 'Available to students?') %>
     </td>
   </tr>
+
+  <tr>
+    <td style='padding:5px' id='assignment_metrics_field'>
+    <%= label_tag('assignment_form[assignment][heatgrid_metric]', 'Select a Metric to be displayed in the Report Heatgrid:') %>
+    <%= select('assignment_form[assignment]', 'heatgrid_metric', [['--', ''], %w[Lauw Lauw], %w[Hamer Hamer]], { :selected => @assignment_form.assignment.reputation_algorithm}, { :class => 'form-control', :style => 'width: 100px'}) %>
+    </td>
+  </tr>
 </table>
 
 

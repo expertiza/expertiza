@@ -67,6 +67,7 @@
     </td>
   </tr>
 
+  <%if @metareview_allowed_checkbox == true%>
   <tr id="assignment_review_topic_threshold_row">
     <td>
         <span id="meta_reviews_allowed" <%= 'hidden' if @assignment_form.assignment.num_metareviews_allowed.nil?%> class="form-inline">
@@ -89,6 +90,7 @@
         </span>
     </td>
   </tr>
+    <%end %>
 
   <tr id="instructor_selected_review_mapping_mechanism" hidden='hidden'>
     <td>

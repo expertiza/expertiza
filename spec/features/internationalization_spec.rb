@@ -43,5 +43,19 @@ describe "internationalization", js: true do
       expect(page).to have_select('user_locale', selected: 'Hindi')
       expect(page).to have_content("उपयोगकर्ता के जानकारी")
     end
+
+    it "should be able to persist locale preference across sessions" do
+      login_as(hindi_student.name)
+      visit '/profile/update/edit'
+      expect(page).to have_select('user_locale', selected: 'No preference')
+
+      select "Hindi", :from => "user_locale"
+      click_button "Save", match: :first
+      Capybara.reset_sessions!
+
+      login_as(hindi_student.name)
+      visit '/profile/update/edit'
+      expect(page).to have_select('user_locale', selected: 'Hindi')
+    end
   end
 end

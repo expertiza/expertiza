@@ -10,7 +10,7 @@
   <%= render :partial => 'users/email' %>
   <%= render :partial => 'users/institutions' %>
   <%= render :partial => 'users/prefs' %>
-  <p><strong><%=t ".action_pref"%><strong><p>
+  <p><strong><%=t ".action_pref"%></strong></p>
   <%# Create 2 radio button for user to select if show action button on their assignment home page%>
   <%= radio_button_tag(:no_show_action, 'not_show_actions',checked = @user.preference_home_flag ? false : true) %>
   <%= label_tag(:no_show_action, t(".homepage_cant")) %>

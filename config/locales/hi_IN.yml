@@ -74,7 +74,7 @@ hi_IN:
       use_the_teams: "वर्तमान में पाठ्यक्रम के लिए परिभाषित टीमों का प्रयोग करें."
       team_name: "टीम का नाम"
 
-  assignment:
+  assignments:
     new:
       create_new: "नया बनाओ"
       public: "सार्वजनिक"

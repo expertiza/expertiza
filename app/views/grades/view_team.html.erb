@@ -60,37 +60,6 @@
 <% table_count = 0 %>
 <% @vmlist.each do |vm| %>
 
-              <script type="text/javascript">
-                <% if vm.questionnaire_display_type == "Teammate Review" %>
-                  console.log('ss')
-                  console.log(`<%= vm.pretty_inspect.html_safe %>`);
-                  console.log(`@Participant`)
-                  console.log(`<%= @participant.pretty_inspect.html_safe %>`)
-                  //console.log(`<#%= vm.list_of_reviews[0].pretty_inspect.html_safe %>`);
-                  <% vm.list_of_reviews.each_with_index do |r, i|%>
-
-                    console.groupCollapsed(`<%= "Review #{i}"%>`)
-                    console.log('Response')
-                    console.log(`<%= r.pretty_inspect.html_safe %>`)
-                    <% map_id = r.map_id%>
-                    // teammate response
-                    <% rmap = ResponseMap.find_by(id: map_id) %>
-                    console.log(`<%= rmap.pretty_inspect.html_safe %>`);
-                    <% part = Participant.find_by(id: rmap.reviewee_id) %>
-                    console.log(`Reviewee`);
-                    console.log(`<%= part.pretty_inspect.html_safe %>`);
-                    <% reviewee_student = User.find_by(id: part.user_id) %>
-                    console.log(`<%= reviewee_student.pretty_inspect.html_safe %>`)
-                    console.log(`Reviewer`)
-                    <% reviewer = Participant.find_by(id: rmap.reviewer_id) %>
-                    console.log(`<%= reviewer.pretty_inspect.html_safe %>`);
-                    <% reviewer_student = User.find_by(id: part.user_id) %>
-                    console.log(`<%= reviewer_student.pretty_inspect.html_safe %>`)
-                    console.groupEnd()
-                  <% end %>
-                  console.log(`end loggin`)
-                <% end %>
-              </script>
     <% if (vm.questionnaire_display_type == "Metareview" or vm.questionnaire_display_type == "Author Feedback") and @current_role_name.eql?'Student' %>
     <% elsif (vm.questionnaire_display_type == "Teammate Review" and @current_role_name.eql?'Student' and !@assignment.show_teammate_reviews)%>
     <% elsif (vm.questionnaire_display_type == "Teammate Review" and @current_role_name.eql?'Student' and @assignment.show_teammate_reviews and current_user.id != vm.reviewee_id )%>

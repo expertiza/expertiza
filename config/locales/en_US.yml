@@ -490,17 +490,17 @@ en_US:
   profile:
     edit:
       user_profile_info: "User Profile Information"
-      password_msg: "If password field is blank, the password will not be updated"
-      preferred_time_zone: "Preferred time zone "
+      password_msg: "If password field is blank, the password will not be updated."
+      preferred_time_zone: "Preferred Time Zone"
       save: "Save"
 
     handle:
       handle: "Handle"
-      handle_prof: "A 'handle' can be used to conceal your username from people who view your wiki pages. If you have a handle,
+      handle_prof: "A \"handle\" can be used to conceal your username from people who view your wiki pages. If you have a handle,
                      your wiki account should be named after your handle instead of after your user-ID.  If you do not have a handle,
                      your Expertiza user-ID will be used instead. A blank entry in the field below will cause the handle to be set back to your Expertiza user-ID."
       note: "Note: By using this form, you are changing your default handle, which will be used for all future assignments. To change your handle for a specific assignment, select that assignment and choose the Change Handle action."
-    default_handle: "Default Handle:"
+      default_handle: "Default handle"
   users:
     prefs:
       email: "E-mail Options"

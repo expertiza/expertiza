@@ -1,4 +1,4 @@
-<h1>User Profile Information</h1>
+<h1><%=t ".user_profile_info"%></h1>
 
 <br/>
 
@@ -6,7 +6,7 @@
 <table class="table borderless table-not-full-width">
   <%= render :partial => 'users/name' %>
   <%= render :partial => 'users/password' %>
-  <tr><td><i><font size=-2>If password field is blank, the password will not be updated.</font></i></td><td></td></tr>
+  <tr><td><i><font size=-2><%=t ".password_msg"%></font></i></td><td></td></tr>
   <%= render :partial => 'users/email' %>
   <%= render :partial => 'users/institutions' %>
   <%= render :partial => 'users/prefs' %>
@@ -20,9 +20,9 @@
   <% if @user.role.parent_id != nil %>
     <%= render :partial => 'limit' %>
   <% end %>
-  <p class="form-inline"><label class="width-266">Preferred Time Zone: </label>
+  <p class="form-inline"><label class="width-266"><%=t ".preferred_time_zone"%>: </label>
   <%= time_zone_select("user", "timezonepref", ActiveSupport::TimeZone.all,{}, {:class => 'form-control width-250'})%></p>
 
-  <%= f.submit 'Save', class: "btn btn-default btn-md" %>
+  <%= f.submit t(".save"), class: "btn btn-default btn-md" %>
 </table>
 <% end %>

@@ -47,7 +47,7 @@ describe ReviewBidsController do
       render_views
       it 'renders "others_view" page' do
         expect {get :index, :format => :html }.to_not raise_error
-        expect(response.body) =~ '/reivew_bids/others_view' 
+        expect(response.body) =~ '/sign_up_sheet/others_work'
       end
     end
   end
@@ -57,7 +57,7 @@ describe ReviewBidsController do
       render_views
       it 'redirects to "others_view" page' do
         expect {get :create, :format => :html }.to_not raise_error
-        expect(response.body) =~ '/reivew_bids/others_view' 
+        expect(response.body) =~ '/sign_up_sheet/others_work'
       end
     end
   end
@@ -68,7 +68,7 @@ describe ReviewBidsController do
     it 'renders the bidding page' do
       get :show
       expect {get :show, :format => :html }.to_not raise_error
-      expect(response.body) =~ '/reivew_bids/show'
+      expect(response.body) =~ '/sign_up_sheet/review_bid_show'
     end
   end
 
@@ -77,7 +77,7 @@ describe ReviewBidsController do
     it 'updates bids in bidding page' do
       get :set_priority
       expect {get :set_priority, :format => :html }.to_not raise_error
-      expect(response.body) =~ '/reivew_bids/show'
+      expect(response.body) =~ '/sign_up_sheet/review_bid_show'
     end
   end
 

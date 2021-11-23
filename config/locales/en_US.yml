@@ -78,7 +78,7 @@ en_US:
       use_the_teams: "Use the teams that are currently defined for the course."
       team_name: "Team Name"
 
-  assignment:
+  assignments:
     new:
       create_new: "Create New"
       public: "Public"
@@ -167,10 +167,6 @@ en_US:
   # end of keys for pages related to Courses
 
   # keys for pages Student Views
-
-  assignments:
-    edit:
-      editing_assignment: "Editing Assignment"
 
   student_task:
     list:
@@ -284,6 +280,10 @@ en_US:
       reply: "Reply"
       ad_for_team: "Advertisement for teammates"
       back: "Back"
+      view: "View"
+      edit: "Edit"
+      leave_team: "Leave team"
+      edit_name: "Edit name"
 
   submitted_content:
     edit:
@@ -493,6 +493,10 @@ en_US:
       password_msg: "If password field is blank, the password will not be updated."
       preferred_time_zone: "Preferred Time Zone"
       save: "Save"
+      action_pref: "Action Preference"
+      homepage_cant: "homepage cannot show actions"
+      homepage_can: "homepage can show actions"
+
 
     handle:
       handle: "Handle"
@@ -501,6 +505,7 @@ en_US:
                      your Expertiza user-ID will be used instead. A blank entry in the field below will cause the handle to be set back to your Expertiza user-ID."
       note: "Note: By using this form, you are changing your default handle, which will be used for all future assignments. To change your handle for a specific assignment, select that assignment and choose the Change Handle action."
       default_handle: "Default handle"
+
   users:
     prefs:
       email: "E-mail Options"
@@ -509,6 +514,13 @@ en_US:
       email_other_review: "When someone else submits work I am assigned to review"
       see_review: "When someone else reviews one of my reviews (metareviews my work)"
       send_mail: "Send me copies of emails sent for assignments"
+      when_someone_else: "When someone else"
+      reviews: "reviews"
+      my_work: "my work"
+      submits: "submits"
+      reviews_one: "reviews one of my reviews"
+      work_assigned: "work I am assigned to review"
+      meta_reviews: "meta-reviews"
 
     password:
       password_label: "Password: "
@@ -523,6 +535,10 @@ en_US:
     email:
       email_add: "E-mail address:"
 
+  shared:
+    footer_message:
+      help: "Help"
+      papers: "Papers on Expertiza"
 
 
 

@@ -74,7 +74,7 @@ hi_IN:
       use_the_teams: "वर्तमान में पाठ्यक्रम के लिए परिभाषित टीमों का प्रयोग करें."
       team_name: "टीम का नाम"
 
-  assignment:
+  assignments:
     new:
       create_new: "नया बनाओ"
       public: "सार्वजनिक"
@@ -162,9 +162,6 @@ hi_IN:
   # end of Courses view
 
   # keys for pages Student Views
-  assignments:
-    edit:
-      editing_assignment: "संपादन असाइनमेंट"
   student_task:
     list:
       assignments: "असाइनमेंट"
@@ -277,6 +274,10 @@ hi_IN:
       reply: "जवाब दे"
       ad_for_team: "टीम के साथी के लिए अद्वेर्तिसेमेन्ट"
       back: "वापस पीछे"
+      view: "व्यू"
+      edit: "एडिट "
+      leave_team: "टीम छोड़ो"
+      edit_name: "नाम परिवर्तन"
 
   submitted_content:
     edit:
@@ -461,6 +462,9 @@ hi_IN:
       password_msg: "अगर पासवर्ड खाली है, थो वोह अपडेट नहीं होगा "
       preferred_time_zone: " पसंदीदा समय क्षेत्र "
       save: "संग्रह क्करें"
+      action_pref: "कार्रवाई वरीयता"
+      homepage_cant: "मुखपृष्ठ कार्रवाई नहीं दिखा सकता"
+      homepage_can: "मुखपृष्ठ कार्रवाई दिखा सकता है"
 
     handle:
       handle: "हैंडल"
@@ -476,6 +480,13 @@ hi_IN:
       email_other_review: "जब कोई दूसरा काम करता है तो मुझे समीक्षा करने का काम सौंपा जाता है"
       see_review: "जब कोई और मेरी एक समीक्षा करता है"
       send_mail: "मुझे असाइनमेंट के लिए भेजे गए"
+      when_someone_else: "जब कोई और"
+      reviews: "समीक्षा"
+      my_work: "मेरा काम"
+      submits: "प्रविष्टियों पर"
+      reviews_one: "मेरी समीक्षाओं में से एक की समीक्षा करें"
+      work_assigned: "काम मुझे समीक्षा के लिए सौंपा गया है"
+      meta_reviews: "मेटा-समीक्षा"
 
     password:
       password_label: "पासवर्ड: "
@@ -534,6 +545,11 @@ hi_IN:
       x_seconds:
         one: "1 सेकंड"
         other: "%{count} सेकंड"
+
+  shared:
+    footer_message:
+      help: "मदद"
+      papers: "Expertiza पर कागजात"
 
   # end of Student Views
 

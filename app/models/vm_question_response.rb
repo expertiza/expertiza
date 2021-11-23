@@ -51,10 +51,6 @@ class VmQuestionResponse
     User.find_by(id: part.user_id).name
   end
   
-  def reviewee_id
-    @participant_who_is_reviewee.user_id
-  end
-
   def add_reviews(participant, team, vary)
     if @questionnaire_type == "ReviewQuestionnaire"
       reviews = if vary

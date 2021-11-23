@@ -170,14 +170,12 @@
                     <%= row.average_score_for_row.to_s %>
                   </td>
 
-
                   <% case @assignment.heatgrid_metric %>
                   <% when 'countofcomments' %>                
                     <td  class = 'cf' align="center">
                       <%= row.countofcomments.to_s %>
                     </td>
                   <%end%>
-
 
                 </tr>
                 <!--loop that creates the collapsed-by-default row, which lists all comments. -->

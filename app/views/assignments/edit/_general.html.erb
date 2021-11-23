@@ -260,7 +260,7 @@ function microtaskChanged() {
   <tr>
     <td style='padding:5px' id='assignment_metrics_field'>
     <%= label_tag('assignment_form[assignment][heatgrid_metric]', 'Select a Metric to be displayed in the Report Heatgrid:') %>
-    <%= select('assignment_form[assignment]', 'heatgrid_metric', [%w[Count-Of-Comments-Word-Count>10 countofcomments],  %w[word_count_20 word_count_20]], { :selected => @assignment_form.assignment.heatgrid_metric}, { :class => 'form-control', :style => 'width: 100px'}) %>
+    <%= select('assignment_form[assignment]', 'heatgrid_metric', [%w[Count-Of-Comments-Word-Count>10 countofcomments]], { :selected => @assignment_form.assignment.heatgrid_metric}, { :class => 'form-control', :style => 'width: 100px'}) %>
     </td>
   </tr>
 </table>

@@ -3,7 +3,7 @@ hi_IN:
   #  hello: "Hello world"
 
   # This section of keys are for the pages related to Courses
-  course:
+  courses:
     edit:
       course_title: "एडिट कोर्स"
 
@@ -162,6 +162,9 @@ hi_IN:
   # end of Courses view
 
   # keys for pages Student Views
+  assignments:
+    edit:
+      editing_assignment: "संपादन असाइनमेंट"
   student_task:
     list:
       assignments: "असाइनमेंट"

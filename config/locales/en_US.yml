@@ -5,7 +5,7 @@ en_US:
   # hello: "Hello world"
 
   # This section of keys are for the pages related to Courses
-  course:
+  courses:
 
     edit:
       course_title: "Edit course"
@@ -167,6 +167,11 @@ en_US:
   # end of keys for pages related to Courses
 
   # keys for pages Student Views
+
+  assignments:
+    edit:
+      editing_assignment: "Editing Assignment"
+
   student_task:
     list:
       assignments: "Assignments"

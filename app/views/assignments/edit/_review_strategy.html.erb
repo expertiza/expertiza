@@ -61,7 +61,8 @@
   </tr>
   <tr>
     <td>
-      <%= check_box_tag('meta_review', 'true', true, {:onChange => 'hasMetaReviewChanged()'}) %>
+      <%@metareview_allowed_checkbox=true%>
+      <%= check_box_tag('meta_review', 'true', @metareview_allowed, {:onChange => 'hasMetaReviewChanged()'}) %>
       <%= label_tag('meta_review', 'Has meta-review limit?') %>  
       <img src="/assets/info.png" title='Does this particular assignment have a meta-review limit for each review?'>
     </td>

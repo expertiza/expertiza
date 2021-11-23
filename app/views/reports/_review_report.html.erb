@@ -141,7 +141,7 @@
             <% @response_maps.each_with_index do |reviewer_map, index| %>
               <% if Team.where(id: reviewer_map.reviewee_id).length > 0 %>
                 <% @team = Team.find(reviewer_map.reviewee_id) %>
-                <%= render partial: 'team_score_score_awarded', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: reviewer.id} %>
+                <%= render partial: 'author_scores', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: reviewer.id} %>
               <% end %>
             <% end %>
           </td>
@@ -150,7 +150,7 @@
            <% @response_maps.each_with_index do |reviewer_map, index| %>
               <% if Team.where(id: reviewer_map.reviewee_id).length > 0 %>
                 <% @team = Team.find(reviewer_map.reviewee_id) %>
-                <%= render partial: 'team_score', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: reviewer.id} %>
+                <%= render partial: 'author_scores_avg', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: reviewer.id} %>
               <% end %>
             <% end %>
           </td>

@@ -197,6 +197,8 @@
                         <% for index in 0 .. row.score_row.length - 1 %>
                             <tr>
                               <% if @current_role_name.eql?'Student' or vm.questionnaire_type != "TeammateReviewQuestionnaire" %>
+                                <%# Use Review {{index}} format for student view, and
+                                when questionnaire_type is not teammatereview %>
                                 <td>Review <%=index + 1%></td>
                               <% else %>
                                 <td>

@@ -274,6 +274,10 @@ hi_IN:
       reply: "जवाब दे"
       ad_for_team: "टीम के साथी के लिए अद्वेर्तिसेमेन्ट"
       back: "वापस पीछे"
+      view: "व्यू"
+      edit: "एडिट "
+      leave_team: "टीम छोड़ो"
+      edit_name: "नाम परिवर्तन"
 
   submitted_content:
     edit:

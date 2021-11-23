@@ -493,6 +493,10 @@ en_US:
       password_msg: "If password field is blank, the password will not be updated."
       preferred_time_zone: "Preferred Time Zone"
       save: "Save"
+      action_pref: "Action Preference"
+      homepage_cant: "homepage cannot show actions"
+      homepage_can: "homepage can show actions"
+
 
     handle:
       handle: "Handle"
@@ -510,6 +514,13 @@ en_US:
       email_other_review: "When someone else submits work I am assigned to review"
       see_review: "When someone else reviews one of my reviews (metareviews my work)"
       send_mail: "Send me copies of emails sent for assignments"
+      when_someone_else: "When someone else"
+      reviews: "reviews"
+      my_work: "my work"
+      submits: "submits"
+      reviews_one: "reviews one of my reviews"
+      work_assigned: "work I am assigned to review"
+      meta_reviews: "meta-reviews"
 
     password:
       password_label: "Password: "

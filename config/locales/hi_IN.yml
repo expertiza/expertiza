@@ -462,6 +462,9 @@ hi_IN:
       password_msg: "अगर पासवर्ड खाली है, थो वोह अपडेट नहीं होगा "
       preferred_time_zone: " पसंदीदा समय क्षेत्र "
       save: "संग्रह क्करें"
+      action_pref: "कार्रवाई वरीयता"
+      homepage_cant: "मुखपृष्ठ कार्रवाई नहीं दिखा सकता"
+      homepage_can: "मुखपृष्ठ कार्रवाई दिखा सकता है"
 
     handle:
       handle: "हैंडल"
@@ -477,6 +480,13 @@ hi_IN:
       email_other_review: "जब कोई दूसरा काम करता है तो मुझे समीक्षा करने का काम सौंपा जाता है"
       see_review: "जब कोई और मेरी एक समीक्षा करता है"
       send_mail: "मुझे असाइनमेंट के लिए भेजे गए"
+      when_someone_else: "जब कोई और"
+      reviews: "समीक्षा"
+      my_work: "मेरा काम"
+      submits: "प्रविष्टियों पर"
+      reviews_one: "मेरी समीक्षाओं में से एक की समीक्षा करें"
+      work_assigned: "काम मुझे समीक्षा के लिए सौंपा गया है"
+      meta_reviews: "मेटा-समीक्षा"
 
     password:
       password_label: "पासवर्ड: "

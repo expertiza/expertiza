@@ -91,4 +91,14 @@ describe "internationalization", js: true do
       expect(page).to have_select('course_locale', selected: 'Hindi')
     end
   end
+
+  describe "a user with no language preference" do
+    it "views the profile page (and other pages without a locale affinity) in English"
+    it "views the course page in the course language (and other pages with a locale affinity)"
+  end
+
+  describe "a user with a language preference of 'Hindi'" do
+    it "views the profile page in 'Hindi'"
+    it "should use the user's preferred language over the course's language (similarly for other pages with a locale affinity)"
+  end
 end

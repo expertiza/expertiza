@@ -38,21 +38,28 @@
   <button onclick="exportTableToCSV('review_scores.csv')">Export Review Scores To CSV File</button>
   <br />
   <br />
+  <input type='button' onClick='javascript:showHideColumn(this);' value='show'> 
+  <br />
   <table id="myTable" class="table table-striped" width="100%" cellspacing='0' cellpadding='2' border='0'>
     <thead>
+    
     <tr bgcolor='#CCCCCC'>
       <!-- class value decides whether the column should be sortable or not  -->
-      <th rowspan ="2" width="16%" class="sorter-true">Reviewer <span></span></th>
-      <th rowspan ="2" width="10%" class="sorter-true">Reviews done<span></span></th>
-      <th rowspan ="2" width="24%" class="sorter-true">Team reviewed <span></span></th>
-      <th width="6%" colspan=  "2" class="sorter-false">Scores<span></span></th>
+      <th rowspan ="2" width="8%" class="sorter-true">Reviewer <span></span></th>
+      <th rowspan ="2" width="8%" class="sorter-true">Reviews done<span></span></th>
+      <th rowspan ="2" width="20%" class="sorter-true">Team reviewed <span></span></th>
+      <th width="5%" colspan=  "2" class="sorter-false">Scores<span></span></th>
+      <th width="11%" colspan="2" class="sorter-false">Author Feedback Score<span></span></th>
       <th rowspan ="2" width="14%" class="sorter-true">Metrics <span></span></th>
-      <th rowspan ="2" class="sorter-false">Assign grade and write comments <span></span></th>
+       <th rowspan ="2" width="18%"  class="sorter-false">Assign grade and write comments <span></span></th>
+     
     </tr>
     <tr bgcolor='#CCCCCC'>
 
-		  <th width="6%" class="sorter-true"> Score awarded <span></span></th>
+		  <th width="4%" class="sorter-true" style="white-space:nowrap;"> Score awarded <span></span></th>
 		  <th width="6%" class="sorter-true"> AVG Score <span></span></th>
+		 <th width="16%" class="sorter-true"> Scores awarded <span></span></th>
+   		 <th width="6%" class="sorter-true"> AVG Score<span></span></th>
     </tr>
     </thead>
     <tbody>
@@ -66,13 +73,13 @@
             <!--reviewer-->
 			
 			<!-- added class attribute and span tag to extract full name and unityID of the user for scraping (Used in export to CSV functionality) -->
-            <td>
+            <td style="white-space:nowrap;">
               <%= index + 1 %>.
               <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post, :class => "user_unityID" %>
               (<span class="user_name"><%= user.fullname(session[:ip]) %></span>)
             </td>
             <!--# reviews done-->
-            <td align = 'left'>
+            <td align = 'left' style="white-space:nowrap;">
               <% (1..@assignment.num_review_rounds).each do |round| %>
                 <%= instance_variable_get("@review_in_round_" + round.to_s) %>/<%= @rspan %>
                 <%= ', ' unless round == @assignment.num_review_rounds %>
@@ -80,7 +87,7 @@
               <%= link_to "summary", {:controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => reviewer.id, :assignment_id=>@id}, target: :_blank %>
             </td>
           <!--Team reviewed / Author feedback-->
-          <td align = 'left'>
+          <td align = 'left' style="white-space:nowrap;">
           <% @response_maps.each_with_index do |reviewer_map, index| %>
             <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
             <% team_name_color = get_team_color(reviewer_map) %>
@@ -111,7 +118,7 @@
             <% end %>
           </td>
           <!--Render partial view corresponding to the overall score awarded to a team-->
-          <td align='left'>
+          <td align='left' style="white-space:nowrap;">
             <% @response_maps.each_with_index do |reviewer_map, index| %>
               <% if Team.where(id: reviewer_map.reviewee_id).length > 0 %>
                 <% @team = Team.find(reviewer_map.reviewee_id) %>
@@ -120,8 +127,26 @@
             <% end %>
           </td>         
           <!--Render partial view corresponding to the average score awarded to a team-->
-          <td align='left'>
+          <td align='left' style="white-space:nowrap;">
+           <% @response_maps.each_with_index do |reviewer_map, index| %>
+              <% if Team.where(id: reviewer_map.reviewee_id).length > 0 %>
+                <% @team = Team.find(reviewer_map.reviewee_id) %>
+                <%= render partial: 'team_score', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: reviewer.id} %>
+              <% end %>
+            <% end %>
+          </td>
+	 <!--Render partial view corresponding to each author score in a team-->
+          <td align='left' style="white-space:nowrap;">
             <% @response_maps.each_with_index do |reviewer_map, index| %>
+              <% if Team.where(id: reviewer_map.reviewee_id).length > 0 %>
+                <% @team = Team.find(reviewer_map.reviewee_id) %>
+                <%= render partial: 'team_score_score_awarded', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: reviewer.id} %>
+              <% end %>
+            <% end %>
+          </td>
+          <!--Render partial view corresponding to the average score awarded by a team-->
+          <td align='left' style="white-space:nowrap;">
+           <% @response_maps.each_with_index do |reviewer_map, index| %>
               <% if Team.where(id: reviewer_map.reviewee_id).length > 0 %>
                 <% @team = Team.find(reviewer_map.reviewee_id) %>
                 <%= render partial: 'team_score', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: reviewer.id} %>
@@ -129,11 +154,11 @@
             <% end %>
           </td>
           <!--Metrics-->
-          <td align='left'>
+          <td align='left' style="white-space:nowrap;">
             <%= display_volume_metric_chart(reviewer) %>
           </td>
           <!--Assign grade and write comments-->
-          <td align='left'>
+          <td align='left' style="white-space:nowrap;">
             <%= form_tag save_grade_and_comment_for_reviewer_review_mapping_index_path, remote: true do %>
               <%= hidden_field_tag :participant_id, reviewer.id %>
               <%= hidden_field_tag :assignment_id, @id %>
@@ -262,4 +287,45 @@
 		
 		return row;
 	}
+	var row0_col=4;
+	var row1_col1=2;
+	var row1_col2=3;
+        var colNo1=5;
+	var colNo2=6;	
+	showHideColumn(null);
+
+	var doShow;
+
+	function showHideColumn(e) {
+	    if (e != null) {
+        	if (doShow) {
+            	doShow = false;
+            	e.value = 'show';
+        	} else {
+            		e.value = 'hide';
+            		doShow = true;
+        		}
+    	
+		}	
+    	var rows = document.getElementById('myTable').rows;
+
+    	for (var row = 0; row < rows.length; row++) {
+        	var cols = rows[row].cells;
+		if (row==0){
+		cols[row0_col].style.display = doShow ? '' : 'none';
+		}
+		else if(row==1){
+		cols[row1_col1].style.display = doShow ? '' : 'none';
+		cols[row1_col2].style.display = doShow ? '' : 'none';
+		}
+		else{
+        		if (colNo1 >= 1 && colNo1 < cols.length && colNo2>=1 && colNo2<cols.length) {
+            		cols[colNo1].style.display = doShow ? '' : 'none';
+			cols[colNo2].style.display = doShow ? '' : 'none';	
+        		}
+			}
+		}
+
+	}
+
 </script>

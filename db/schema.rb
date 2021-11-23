@@ -800,13 +800,6 @@ ActiveRecord::Schema.define(version: 20210422185445) do
     t.datetime "created_at"
   end
 
-  create_table "key_mapping", force: :cascade do |t|
-    t.string   "name",   limit: 255
-    t.string   "value",  limit: 255
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   add_index "versions", %w[item_type item_id], name: "index_versions_on_item_type_and_item_id", using: :btree
 
   add_foreign_key "answer_tags", "answers"

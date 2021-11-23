@@ -42,6 +42,10 @@ class VmQuestionResponse
     end
   end
 
+  def reviewee_id
+    @participant_who_is_reviewee.user_id
+  end
+
   def reviewee_name
     part = @participant_who_is_reviewee
     User.find_by(id: part.user_id).name
@@ -167,7 +171,7 @@ class VmQuestionResponse
 
       # Now construct the color code and we're good to go!
       color_code = "c#{color_code_number}"
-      row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts))
+      row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts, answer.response_id))
     end
   end
 

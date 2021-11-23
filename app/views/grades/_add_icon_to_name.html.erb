@@ -1,21 +1,45 @@
+
+
+<%# Determine the content of the reviewed by text %>
+<% review_text = "" %>
+<% if @current_role_name.eql?'Student' or questionnaire_type != "TeammateReviewQuestionnaire" %>
+  <% review_text = "Review #{i + 1}" %>
+<% else %>
+  <% resp = Response.find(review.id) %>
+  <% map = ResponseMap.find(resp.map_id) %>
+  <% reviewer_id = map.reviewer_id %>
+  <% fullname = Participant.find_by(id: reviewer_id).fullname(session[:ip]) %>
+  <% review_text = "Review by #{fullname}" %>
+<% end%>
+
 <!-- Add an icon to identify if this review was done by TA/instructor -->
 <% if review.done_by_staff_participant? %>
+<th class="sorter-false">
+  <img
+    data-toggle="tooltip"
+    data-placement="right"
+    title="Icon indicates this review was done by course staff" class="img_icon"
+    src="/assets/staff.png"
+    >
+  <a
+    target="_blank"
+    href="../response/view?id=<%= review.id.to_s %>"
+    data-toggle="tooltip"
+    data-placement="right"
+    title="Click to see details">
+    <%= review_text %>
+  </a>
+</th>
+<% else %>
     <th class="sorter-false">
-        <img
-            data-toggle="tooltip"
-            data-placement="right"
-            title="Icon indicates this review was done by course staff" class="img_icon"
-            src="/assets/staff.png"
-            >
         <a
-            target="_blank"
-            href="../response/view?id=<%= review.id.to_s %>"
+            target="_blank" 
+            href="../response/view?id=<%= review.id.to_s %>"  
             data-toggle="tooltip"
             data-placement="right"
-            title="Click to see details">
-            <%= "Review " + i.to_s  %>
+            title="Click to see details"
+        >
+        <%= review_text %>
         </a>
     </th>
-<% else %>
-    <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>  </th>
 <% end %>

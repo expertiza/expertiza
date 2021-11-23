@@ -154,19 +154,16 @@
               <% vm.list_of_reviews.each do |review| %>
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
-                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i} %>
+                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i, questionnaire_type: vm.questionnaire_type } %>
                   <% else %>
                       <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
-                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i} %>
+                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i, questionnaire_type: vm.questionnaire_type } %>
                   <% end %>
                   <% i += 1 %>
               <% end %>
 
               <th class="sorter-true" align="right" >
                 Avg<span></span>
-              </th>
-              <th class="sorter-false">
-                <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1</span>
               </th>
             </tr>
             </thead>
@@ -181,9 +178,17 @@
                   console.log("<%= row %>");
                 </script>
                 -->
+                <% target_id = "hid__#{row.question_id}__#{vm.round}" %>
+
+                <% if vm.questionnaire_type == "TeammateReviewQuestionnaire" %>
+                  <%# Since we render different heatgrids with the same questions for each
+                  teammember, we need to distinguish the ID, based on the user for whom,
+                  the reviews have been created. %>
+                  <% target_id += "__#{vm.reviewee_id}" %>
+                <% end%>
 
                 <!-- notice the data-target. because we're toggling via looped code, we need to dynamically generate the identifier. -->
-                <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= row.question_id.to_s + vm.round.to_s %>">
+                <tr data-toggle="collapse" class="accordion-toggle" data-target="<%= "#" + target_id %>">
                   <td class = 'cf' data-toggle="tooltip" title="<%= row.question_text %>"> <div style='float: left'><%= j.to_s %></div><div style='float: right'> &#<%= type_and_max(row) %>;</div>  </td>
 
                   <!-- actual cells with scores and colored background. -->
@@ -208,13 +213,10 @@
                   <td  class = 'cf' align="right">
                     <%= row.average_score_for_row.to_s %>
                   </td>
-                  <td  class = 'cf' align="center">
-                    <%= row.countofcomments.to_s %>
-                  </td>
                 </tr>
                 <!--loop that creates the collapsed-by-default row, which lists all comments. -->
                 <tr class="tablesorter-childRow">
-                  <td colspan="<%= (i+1).to_s %>" class="hiddenRow" ><div id="hid<%= row.question_id.to_s + vm.round.to_s %>" class="accordion-body collapse" style="margin-left:10px;">
+                  <td colspan="<%= (i+1).to_s %>" class="hiddenRow" ><div id="<%= target_id %>" class="accordion-body collapse" style="margin-left:10px;">
                     <div style="padding-top: 10px; padding-bottom: 10px;"><%=  sanitize row.question_text %></div>
                     <div>
                       <table class="table tbl_questlist">
@@ -225,7 +227,15 @@
                         </thead>
                         <% for index in 0 .. row.score_row.length - 1 %>
                             <tr>
-                              <td>Review <%=index + 1%></td>
+                              <% if @current_role_name.eql?'Student' or vm.questionnaire_type != "TeammateReviewQuestionnaire" %>
+                                <td>Review <%=index + 1%></td>
+                              <% else %>
+                                <td>
+                                  <% reviewer_id = row.score_row[index].reviewer_id %>
+                                  <% fullname = Participant.find_by(id: reviewer_id).fullname(session[:ip]) %>
+                                  Review by <%= fullname %>
+                                </td>
+                              <% end%>
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
                               <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
                                 <!-- E2100 : Set id and data of this <td> to be queried by jQuery for the tagging report

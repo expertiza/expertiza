@@ -33,7 +33,7 @@ class DutiesController < ApplicationController
     @duty = Duty.new
 
     @duty.assignment_id = params[:duty][:assignment_id]
-    @duty.max_members_for_role = params[:duty][:max_members_for_role]
+    @duty.max_members_for_duty = params[:duty][:max_members_for_duty]
     @duty.duty_name = params[:duty][:duty_name]
 
     if @duty.save
@@ -49,7 +49,7 @@ class DutiesController < ApplicationController
     @duty = Duty.find(params[:id])
 
     @duty.assignment_id = params[:duty][:assignment_id]
-    @duty.max_members_for_role = params[:duty][:max_members_for_role]
+    @duty.max_members_for_duty = params[:duty][:max_members_for_duty]
     @duty.duty_name = params[:duty][:duty_name]
 
     if @duty.save

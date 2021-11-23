@@ -104,30 +104,48 @@
     function fetch_response_comments()
     {
         var serialized_form = $("form").serialize();      
-        var form_value_to_json = [Object.fromEntries(new URLSearchParams(serialized_form))]
+        var form_value_to_json = [Object.fromEntries(new URLSearchParams(serialized_form))];
 
         //for loop counts the number of comments in review form
-        var j = 0;
-        for(j =0; j <1000; j++)
-        {
-            if (document.getElementById("responses_"+j+"_comments") == null)
-            {break;}
+        let review_count = 0,j;
+        let review_mappings = {};
+        while(true) {
+            let comment_element = document.getElementById("responses_"+ review_count +"_comments");
+            if(comment_element == null) {
+                break;
+            }
+            // let question_class = 'responses_'+review_count;
+            // console.log(question_class);
+            // console.log($("label[for=responses_0]"));
+            // let question = $("label[for="+question_class+"]").text();
+            // console.log("The question is:", question);
+            // console.log("The comment is:", $("#responses_"+ review_count +"_comments").text());
+            review_count++;
         }
+        // for(j =0; j <1000; j++)
+        // {
+        //     if (document.getElementById("responses_"+j+"_comments") == null)
+        //     {break;}
+        // }
 
         //for loop parses comments from review form and pushes all of them into 'reviews' list
         var id = 0;
         var reviews = [];
-        for (var i =2; i < j; i++) {              
+        for (var i =1; i < review_count; i++) {              
             if (document.getElementById("responses_"+i+"_comments") == null)
                  continue;
             else
             {
                 var single_comment_json = {};
+                let question_class = 'responses_'+i;
+                let question = $("label[for="+question_class+"]").text();
                 single_comment_json["id"] = id;
                 var comment_string = (document.getElementById("responses_"+i+"_comments").value);
                 comment_string =  $("<p>").html(comment_string).text();
                 comment_string = comment_string.replace("\n"," ");
                 single_comment_json["text"] = comment_string.replace("\r","");
+                single_comment_json["question"] = question;
+                 console.log(single_comment_json);
                 id++;
                 reviews.push(single_comment_json);
              }
@@ -136,10 +154,14 @@
         //fetches the last comment(just above 'additional comments') in review form
         var single_comment_json = {};
         single_comment_json["id"] = id;
+        let question_class = 'responses_'+0;
+        let question = $("label[for="+question_class+"]").text();
         var comment_string =  (document.getElementById("responses_"+0+"_comments").value);
         comment_string =  $("<p>").html(comment_string).text();
         comment_string = comment_string.replace("\n"," ");
-        single_comment_json["text"] = comment_string.replace("\r","");                        
+        single_comment_json["text"] = comment_string.replace("\r","");
+        single_comment_json["question"] = question; 
+        console.log(single_comment_json);                   
         id++;
         reviews.push(single_comment_json);
 
@@ -149,7 +171,8 @@
         comment_string = form_value_to_json[0]['review[comments]'];
         comment_string =  $("<p>").html(comment_string).text();
         comment_string = comment_string.replace("\n"," ");
-        single_comment_json["text"] = comment_string.replace("\r","");                       
+        single_comment_json["text"] = comment_string.replace("\r","");
+        single_comment_json["question"] = "additional comments"                    
         id++;
         reviews.push(single_comment_json);
 
@@ -200,13 +223,15 @@
     }    
 
     //This function takes in the processed api output to display a table(populated with API output) on UI
-    function generateTable(combined_api_output)
+    function generateTable(combined_api_output,processed_comment_json_string)
     {
         //tooltip_json to store the text displayed in tooltip
         var tooltip_json = {"Comment Number":'The comment number from the top in the form.', "Sentiment": 'This column shows the tone of the comment.', "Problem Detected?": 'This shows whether any problem is mentioned in the comment or not.',"Suggestion?": 'This shows whether any problem is mentioned in the comment or not.'}
-
+        processed_comment_json_string = JSON.parse(processed_comment_json_string)['reviews'];
+        console.log(processed_comment_json_string);
         var col = [];
         for (var i = 0; i < combined_api_output.length; i++) {
+            console.log(processed_comment_json_string[i]);
             for (var key in combined_api_output[i]) {
                 if (col.indexOf(key) === -1) {
                     col.push(key);
@@ -232,7 +257,10 @@
 
             for (var j = 0; j < col.length; j++) {
                 var tabCell = tr.insertCell(-1);
-                tabCell.innerHTML = combined_api_output[i][col[j]];
+                tabCell.innerHTML = combined_api_output[i][col[j]]
+                if(j==0) {
+                    tabCell.innerHTML += `<img src="/assets/info.png" title='<h2>Question</h2>+`+processed_comment_json_string[i]['question']+`'>`;
+                }
             }
         }
         // Now, add the newly created table with json data, to a container.
@@ -257,6 +285,7 @@
         //start the timer here - which will be used to calculate total time taken.
         var time_start = performance.now();        
         var processed_comment_json_string = fetch_response_comments();
+        console.log(JSON.parse(processed_comment_json_string[0]));
         var number_of_comments = processed_comment_json_string[1];
         processed_comment_json_string = processed_comment_json_string[0];
 
@@ -276,16 +305,16 @@
             response_problem = JSON.parse(response_problem);
         }
 
-        //Suggestion API Call
+        // //Suggestion API Call
         var response_suggestion = null;
         if(config_file_values.includes('suggestion'))
         {
             response_suggestion = await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/suggestions')
-            response_suggestion = JSON.parse(response_general);
+            response_suggestion = JSON.parse(response_suggestion);
         }
 
         var combined_api_output = combine_api_output(number_of_comments, config_file_values, response_sentiment, response_problem, response_suggestion);
-        generateTable(combined_api_output);
+        generateTable(combined_api_output, processed_comment_json_string);
 
         time_end = performance.now();
         var time_taken = time_end - time_start;

@@ -67,7 +67,7 @@ class ReviewBidsController < ApplicationController
     # @max_team_size = @assignment.num_reviews_allowed  #dont need this
     @num_participants = AssignmentParticipant.where(parent_id: @assignment.id).count
     @selected_topics = nil #this is used to list the topics assigned to review. (ie select == assigned i believe)
-    @bids = team_id.nil? ? [] : ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).order(:priority)
+    @bids = ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).order(:priority)
     signed_up_topics = []
     @bids.each do |bid|
       sign_up_topic = SignUpTopic.find_by(id: bid.signuptopic_id)
@@ -115,14 +115,16 @@ class ReviewBidsController < ApplicationController
       assignment_id = params[:assignment_id]
       # list of reviewers from a specific assignment
       reviewers = AssignmentParticipant.where(parent_id: assignment_id).ids
-      bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers) 
-      
+      bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers)
+      @bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers)
       #runs algorithm and assigns reviews
+      @matched_topics = run_bidding_algorithm(bidding_data)
       matched_topics = run_bidding_algorithm(bidding_data)
-      @@reviews_to_show = nil
-      ReviewBid.assign_review_topics(assignment_id,reviewers,matched_topics) 
-      Assignment.find(assignment_id).update(can_choose_topic_to_review: false)  #turns off bidding for students
-      redirect_to :back
+      render plain: [@bidding_data.inspect,@matched_topics.inspect]
+      #@@reviews_to_show = nil
+      #ReviewBid.assign_review_topics(assignment_id,reviewers,matched_topics)
+      #Assignment.find(assignment_id).update(can_choose_topic_to_review: false)  #turns off bidding for students
+      #redirect_to :back
 
     end
 
@@ -133,7 +135,7 @@ class ReviewBidsController < ApplicationController
   def run_bidding_algorithm(bidding_data)
     # begin
       url = WEBSERVICE_CONFIG["review_bidding_webservice_url"] #won't work unless ENV variables are configured
-      url = 'https://app-csc517.herokuapp.com/match_topics' #hard coding for the time being
+      url = 'http://152.7.176.78:5000/match_topics' #hard coding for the time being
       response = RestClient.post url, bidding_data.to_json, content_type: 'application/json', accept: :json
       return JSON.parse(response.body)
     rescue StandardError

@@ -53,7 +53,7 @@ class ReviewBidsController < ApplicationController
     end
 
     # render view for completing reviews after review bidding has been completed
-    render 'sign_up_sheet/review_bid_others_work'
+    render 'review_bids/others_work' 
   end
 
   # provides vaiables for review bidding page
@@ -81,11 +81,7 @@ class ReviewBidsController < ApplicationController
     selected_topics = []
     ReviewResponseMap.where({:reviewed_object_id => @assignment.id, :reviewer_id => @participant.id}).each do |review_map|
       @assigned_review_maps << review_map
-    end
-
-    # explicitly render the show_review_bid view in sign_up_sheet
-    render 'sign_up_sheet/review_bid_show'
-
+	  end
   end
   
   # function that assigns and updates priorities for review bids
@@ -137,7 +133,7 @@ class ReviewBidsController < ApplicationController
   def run_bidding_algorithm(bidding_data)
     # begin
       url = WEBSERVICE_CONFIG["review_bidding_webservice_url"] #won't work unless ENV variables are configured
-      url = 'http://152.7.176.78:5000/match_topics' #hard coding for the time being
+      url = 'https://app-csc517.herokuapp.com/match_topics' #hard coding for the time being
       response = RestClient.post url, bidding_data.to_json, content_type: 'application/json', accept: :json
       return JSON.parse(response.body)
     rescue StandardError

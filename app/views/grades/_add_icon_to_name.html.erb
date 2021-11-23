@@ -2,7 +2,7 @@
 
 <%# Determine the content of the reviewed by text %>
 <% review_text = "" %>
-<% if @current_role_name.eql?'Student' %>
+<% if @current_role_name.eql?'Student' or questionnaire_type != "TeammateReviewQuestionnaire" %>
   <% review_text = "Review #{i + 1}" %>
 <% else %>
   <% resp = Response.find(review.id) %>

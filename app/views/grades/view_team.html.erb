@@ -152,19 +152,16 @@
               <% vm.list_of_reviews.each do |review| %>
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
-                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i} %>
+                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i, questionnaire_type: vm.questionnaire_type } %>
                   <% else %>
                       <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
-                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i} %>
+                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i, questionnaire_type: vm.questionnaire_type } %>
                   <% end %>
                   <% i += 1 %>
               <% end %>
 
               <th class="sorter-true" align="right" >
                 Avg<span></span>
-              </th>
-              <th class="sorter-false">
-                <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1</span>
               </th>
             </tr>
             </thead>
@@ -214,9 +211,6 @@
                   <td  class = 'cf' align="right">
                     <%= row.average_score_for_row.to_s %>
                   </td>
-                  <td  class = 'cf' align="center">
-                    <%= row.countofcomments.to_s %>
-                  </td>
                 </tr>
                 <!--loop that creates the collapsed-by-default row, which lists all comments. -->
                 <tr class="tablesorter-childRow">
@@ -231,7 +225,7 @@
                         </thead>
                         <% for index in 0 .. row.score_row.length - 1 %>
                             <tr>
-                              <% if @current_role_name.eql?'Student' %>
+                              <% if @current_role_name.eql?'Student' or vm.questionnaire_type != "TeammateReviewQuestionnaire" %>
                                 <td>Review <%=index + 1%></td>
                               <% else %>
                                 <td>

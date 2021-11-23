@@ -168,10 +168,6 @@ en_US:
 
   # keys for pages Student Views
 
-  assignments:
-    edit:
-      editing_assignment: "Editing Assignment"
-
   student_task:
     list:
       assignments: "Assignments"

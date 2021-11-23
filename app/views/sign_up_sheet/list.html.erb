@@ -1,13 +1,13 @@
-<h1>Signup sheet for <%= @assignment.name %> assignment</h1>
+<h1><%=t ".signup_sheet"%> <%= @assignment.name %> <%=t ".assignment_lower"%></h1>
 
 <table class="general">
   <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
   <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
-      <b>Your topic(s):</b>
+      <b><%=t ".your_topics"%></b>
       <% for selected_topic in @selected_topics %>
         <br/><%= selected_topic.topic_name %>
         <% if selected_topic.is_waitlisted == true %>
-          <font color='red'>(waitlisted)</font>
+          <font color='red'><%=t ".waitlisted"%></font>
         <% end %>
       <% end %>
   <% end %>
@@ -44,5 +44,5 @@
 
 <% session[:return_to] = request.url %>
 <br/><br/>
-<a href="javascript:history.back()">Back</a>
+<a href="javascript:history.back()"><%=t ".back"%></a>
 <br/>

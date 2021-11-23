@@ -58,7 +58,7 @@
         <h4>Number of Meta-Reviews Allowed: <%= @assignment.num_metareviews_allowed %></h4>
     <% end %>
     <h4>You are required to do <%= @assignment.num_metareviews_required %> meta-reviews</h4>
-    <h4> Number of Meta-Reviews left: <%= @assignment.num_metareviews_allowed - @num_metareviews_completed %></h4>
+    <h4> Number of Meta-Reviews left: <%= @assignment.num_metareviews_allowed - @num_metareviews_total %></h4>
 
 
   <%= render :partial => 'responses', :locals => {:mappings => @metareview_mappings, :title => 'Metareview'} %>

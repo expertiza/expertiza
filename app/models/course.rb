@@ -70,8 +70,8 @@ class Course < ActiveRecord::Base
   end
 
   # Get course's locale value
-  def get_locale(id)
-    course = Course.find(:id)
+  def self.get_locale(id)
+    course = Course.find(id)
     course.locale
   end
 

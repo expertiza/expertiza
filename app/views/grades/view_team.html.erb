@@ -129,9 +129,14 @@
               <th class="sorter-true" align="right" >
                 Avg<span></span>
               </th>
-              <th class="sorter-false">
-                <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1</span>
-              </th>
+              
+              <% case @assignment.heatgrid_metric %>
+              <% when 'countofcomments' %>
+                <th class="sorter-false">
+                  <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">Word Count > 10</span>
+                </th>
+              <%end%>
+
             </tr>
             </thead>
 
@@ -164,9 +169,14 @@
                   <td  class = 'cf' align="right">
                     <%= row.average_score_for_row.to_s %>
                   </td>
-                  <td  class = 'cf' align="center">
-                    <%= row.countofcomments.to_s %>
-                  </td>
+
+                  <% case @assignment.heatgrid_metric %>
+                  <% when 'countofcomments' %>                
+                    <td  class = 'cf' align="center">
+                      <%= row.countofcomments.to_s %>
+                    </td>
+                  <%end%>
+
                 </tr>
                 <!--loop that creates the collapsed-by-default row, which lists all comments. -->
                 <tr class="tablesorter-childRow">

@@ -68,6 +68,7 @@ class ReviewBidsController < ApplicationController
     @num_participants = AssignmentParticipant.where(parent_id: @assignment.id).count
     @selected_topics = nil #this is used to list the topics assigned to review. (ie select == assigned i believe)
     #@bids = team_id.nil? ? [] : ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).order(:priority)
+    @bids = ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).order(:priority)
     signed_up_topics = []
     @bids.each do |bid|
       sign_up_topic = SignUpTopic.find_by(id: bid.signuptopic_id)

@@ -9,8 +9,7 @@ class RevisionPlanQuestionnairesController < QuestionnairesController
       TeamsUser.where(["team_id = ?", params[:team_id]]).each do |teamuser|
 	@team_members.push( teamuser.user_id)
       end
-      (user_logged_in? && 
-        @team_members.collect { |u|  }.include?(session[:user].id)) || super
+      (user_logged_in? && @team_members.collect { |u|  }.include?(session[:user].id)) || 1
     else
       super
     end

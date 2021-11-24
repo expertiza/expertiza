@@ -23,11 +23,11 @@ describe "internationalization", js: true do
   let(:course) { Course.find_by(name: 'Default Course') }
   let(:hindi_course) { Course.find_by(name: 'Hindi Course Intl') }
   let(:hindi_assignment) { Assignment.find_by(name: 'Hindi Assignment') }
-  let(:hindi_student) { hindi_course.participants.first }
+  let(:hindi_course_student) { hindi_course.participants.first }
 
   describe "changing the user's locale preference" do
     it "should display the profile page in the user's configured language" do
-      login_as(hindi_student.name)
+      login_as(hindi_course_student.name)
       visit '/profile/update/edit'
 
       # Default locale preference is 'No preference'
@@ -46,7 +46,7 @@ describe "internationalization", js: true do
     end
 
     it "should be able to persist user locale preference across sessions" do
-      login_as(hindi_student.name)
+      login_as(hindi_course_student.name)
       visit '/profile/update/edit'
       expect(page).to have_select('user_locale', selected: 'No preference')
 
@@ -54,7 +54,7 @@ describe "internationalization", js: true do
       click_button "Save", match: :first
       Capybara.reset_sessions!
 
-      login_as(hindi_student.name)
+      login_as(hindi_course_student.name)
       visit '/profile/update/edit'
       expect(page).to have_select('user_locale', selected: 'Hindi')
     end
@@ -93,8 +93,23 @@ describe "internationalization", js: true do
   end
 
   describe "a user with no language preference" do
-    it "views the profile page (and other pages without a locale affinity) in English"
-    it "views the course page in the course language (and other pages with a locale affinity)"
+    it "views the profile page (and other pages without a locale affinity) in English" do
+      login_as(hindi_course_student.name)
+      visit '/profile/update/edit'
+      expect(page).to have_select('user_locale', selected: 'No preference')
+
+      visit '/menu/student_task'
+      expect(page).to have_content("Assignments")
+    end
+    it "views the course page in the course language (and also for other pages with a locale affinity)" do
+      login_as(hindi_course_student.name)
+      visit '/profile/update/edit'
+      expect(page).to have_select('user_locale', selected: 'No preference')
+
+      visit '/menu/student_task'
+      click_link 'Hindi Assignment'
+      expect(page).to have_content("सबमिट करें या काम की समीक्षा करें")
+    end
   end
 
   describe "a user with a language preference of 'Hindi'" do

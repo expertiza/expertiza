@@ -58,7 +58,7 @@ module Expertiza
 
       # Languages for the application
       config.i18n.available_locales = [:en_US, :hi_IN]
-      config.i18n.default_locale = :hi_IN # english
+      config.i18n.default_locale = :en_US # english
 
       # Do not swallow errors in after_commit/after_rollback callbacks.
       config.active_record.raise_in_transactional_callbacks = true

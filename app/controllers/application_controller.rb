@@ -24,6 +24,8 @@ class ApplicationController < ActionController::Base
         I18n.locale = @current_user.locale
       elsif params[:controller] == "courses" && params[:id]
         I18n.locale = Course.get_locale(params[:id])
+      elsif params[:controller] == "student_task" && params[:id]
+        I18n.locale = Participant.find(params[:id]).course.locale
       elsif params[:controller] == "assignments" && params[:id]
         I18n.locale = Assignment.get_locale(id)
       else

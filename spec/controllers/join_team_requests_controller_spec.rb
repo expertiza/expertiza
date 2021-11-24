@@ -2,8 +2,6 @@ require './spec/support/teams_shared.rb'
 
 describe JoinTeamRequestsController do
   let(:student) {build_stubbed(:student)}
-  #let(:team) {build_stubbed(:team)}
-  #let(:Object) {build_stubbed(:Object)}
 
   include_context 'authorization check'
   context 'not provides access to people with' do

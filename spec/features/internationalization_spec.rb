@@ -1,26 +1,35 @@
 describe "internationalization", js: true do
   before(:each) do
-    instructor = create(:instructor, name: 'instructor7')
+    instructor = create(:instructor, name: 'hindi_instructor')
+    student = create(:student)
 
     course = create(:course, name: 'Hindi Course Intl', instructor: instructor, locale: Course.locales["hi_IN"])
-    course_participant = create(:course_participant)
+    create(:course_participant, course: course, user: student)
+    assignment = create(:assignment, course: course, name: 'Hindi Assignment')
+    # create(:assignment_node, assignment: assignment)
+    create(:participant, user: student, assignment: assignment)
 
-    create(:assignment, course: course, name: 'Hindi Assignment')
-    create(:assignment_node)
-    create(:participant, user: course_participant.user)
+    eng_course = create(:course, name: 'English Course')
+    create(:course_participant, course: eng_course, user: student)
+    eng_assignment = create(:assignment, course: course, name: 'English Assignment')
+    # create(:assignment_node, assignment: eng_assignment)
+    create(:participant, user: student, assignment: eng_assignment)
 
     course = Course.find_by(name: 'Hindi Course Intl')
     assignment = Assignment.find_by(name: 'Hindi Assignment')
 
-    create(:course, name: 'Default Course', instructor: instructor)
-
     expect(course.participants.size).to eq(1)
     expect(assignment.participants.size).to eq(1)
     expect(course.participants.first.user).to eq(assignment.participants.first.user)
+
+    eng_course = Course.find_by(name: 'English Course')
+    eng_assignment = Assignment.find_by(name: 'English Assignment')
+
+    expect(eng_course.participants.size).to eq(1)
+    expect(eng_assignment.participants.size).to eq(1)
+    expect(eng_course.participants.first.user).to eq(eng_assignment.participants.first.user)
   end
 
-  let(:instructor) { Instructor.find_by(name: 'instructor7') }
-  let(:course) { Course.find_by(name: 'Default Course') }
   let(:hindi_course) { Course.find_by(name: 'Hindi Course Intl') }
   let(:hindi_assignment) { Assignment.find_by(name: 'Hindi Assignment') }
   let(:hindi_course_student) { hindi_course.participants.first }
@@ -61,11 +70,14 @@ describe "internationalization", js: true do
   end
 
   describe "changing the course's locale preference" do
+    let(:instructor) { Instructor.find_by(name: 'hindi_instructor') }
+    let(:course) { Course.find_by(name: 'English Course') }
+
     it "should display the course page in the course's configured language" do
       login_as(instructor.name)
       visit "/course/#{course.id}/edit"
 
-      # Default course locale is 'English'
+      # English Course locale is 'English'
       expect(page).to have_select('course_locale', selected: 'English')
       expect(page).to have_content("Edit course")
 
@@ -113,7 +125,29 @@ describe "internationalization", js: true do
   end
 
   describe "a user with a language preference of 'Hindi'" do
-    it "views the profile page in 'Hindi'"
-    it "should use the user's preferred language over the course's language (similarly for other pages with a locale affinity)"
+    before(:each) do
+      login_as(hindi_course_student.name)
+      visit '/profile/update/edit'
+      select "Hindi", :from => "user_locale"
+      click_button "Save", match: :first
+    end
+
+    it "views the profile page in 'Hindi'" do
+      visit '/profile/update/edit'
+      expect(page).to have_content("उपयोगकर्ता के जानकारी")
+
+      visit '/menu/student_task'
+      expect(page).to have_content("असाइनमेंट")
+    end
+
+    it "should use the user's preferred language over the course's language (similarly for other pages with a locale affinity)" do
+      visit '/menu/student_task'
+      click_link 'Hindi Assignment'
+      expect(page).to have_content("सबमिट करें या काम की समीक्षा करें")
+
+      visit '/menu/student_task'
+      click_link 'English Assignment'
+      expect(page).to have_content("सबमिट करें या काम की समीक्षा करें")
+    end
   end
 end

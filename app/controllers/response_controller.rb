@@ -352,7 +352,7 @@ class ResponseController < ApplicationController
   end
 
   # assigning the instance variables for Edit and New actions
-  def assign_instance_vars
+  def assign_action_parameters
     case params[:action]
     when 'edit'
       @header = 'Edit'

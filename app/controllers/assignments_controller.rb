@@ -345,6 +345,7 @@ class AssignmentsController < ApplicationController
   # populates values and settings of the assignment for editing
   def edit_params_setting
     @assignment = Assignment.find(params[:id])
+    # store the assignment in session, it will be used to go back to assignment being created/edited, while creating new late policy.
     session[:assignment] = @assignment
     @num_submissions_round = @assignment.find_due_dates('submission').nil? ? 0 : @assignment.find_due_dates('submission').count
     @num_reviews_round = @assignment.find_due_dates('review').nil? ? 0 : @assignment.find_due_dates('review').count

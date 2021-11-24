@@ -5,7 +5,7 @@ gem 'rails', '~> 4.2.11.1'
 ## Gems in Alphabetical Order
 gem 'activerecord-session_store'
 gem 'activesupport', '~> 4.2.11.1'
-gem 'airbrake'
+gem 'airbrake', '~>10.0.6'
 gem 'awesome_nested_set'
 gem 'bind-it'
 gem 'bootstrap3-datetimepicker-rails', '~> 4.17.47'
@@ -77,6 +77,7 @@ gem 'tinymce-rails'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
+gem 'bigdecimal', '1.3.5'
 
 group :development do
   gem 'daemons'

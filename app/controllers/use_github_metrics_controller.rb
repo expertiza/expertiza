@@ -1,26 +1,29 @@
 class UseGithubMetricsController < ApplicationController
   before_action :set_use_github_metric, only: [:show, :edit, :update, :destroy]
+  helper_method :exist, :save, :delete
 
   # GET /use_github_metrics
   def index
     @use_github_metrics = UseGithubMetric.all
   end
 
-  def exist(assignment_id)
-    u = UseGithubMetric.find_by(id: assignment_id)
-    !u.nil?
+  def self.exist(assignment_id)
+    @u = UseGithubMetric.find_by(assignment_id: assignment_id)
+    !@u.nil?
   end
 
-  def save(assignment_id)
+  def self.save(assignment_id)
     unless exist(assignment_id)
-      u = UseGithubMetric.new(assignment_id)
-      u.save
+      @u = UseGithubMetric.new(assignment_id)
+      @u.assignment_id = assignment_id
+      @u.save
     end
   end
 
-  def delete(assignment_id)
+  def self.delete(assignment_id)
     if exist(assignment_id)
-      UseGithubMetric.delete(id: assignment_id)
+      @u = UseGithubMetric.find_by(assignment_id: assignment_id)
+      @u.destroy
     end
   end
 
@@ -63,14 +66,29 @@ class UseGithubMetricsController < ApplicationController
     redirect_to use_github_metrics_url, notice: 'Use github metric was successfully destroyed.'
   end
 
-  private
+  def exist
+    @assignment_id = params[:assignment_id]
+    UseGithubMetricsController.exist(@assignment_id)
+  end
+
+  def save
+    @assignment_id = params[:assignment_id]
+    UseGithubMetricsController.exist(@assignment_id)
+  end
+
+  def delete
+    @assignment_id = params[:assignment_id]
+    UseGithubMetricsController.delete(@assignment_id)
+  end
+
+  # private
     # Use callbacks to share common setup or constraints between actions.
     def set_use_github_metric
-      @use_github_metric = UseGithubMetric.find(params[:id])
+      @use_github_metric = UseGithubMetric.find(params[:assignment_id])
     end
 
     # Only allow a trusted parameter "white list" through.
     def use_github_metric_params
-      params.require(:use_github_metric).permit(:id)
+      params.require(:use_github_metric).permit(:assignment_id)
     end
 end

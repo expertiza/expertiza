@@ -146,6 +146,14 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :use_github_metrics, only: [] do
+    collection do
+      get ':assignment_id', action: :exist
+      post ':assignment_id', action: :save
+      delete ':assignment_id', action: :delete
+    end
+  end
+
   resources :import_file, only: [] do
     collection do
       get :start

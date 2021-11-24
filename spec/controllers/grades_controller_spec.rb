@@ -91,17 +91,22 @@ describe GradesController do
     end
   end
 
-  xdescribe '#view_team' do
+  describe '#view_team' do
+    render_views
     it 'renders grades#view_team page' do
       allow(participant).to receive(:team).and_return(team)
+      allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
+      allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])
+      allow(assignment).to receive(:late_policy_id).and_return(false)
+      allow(assignment).to receive(:calculate_penalty).and_return(false)
+      allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
+      allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([review_response])
+      allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
       params = {id: 1}
       get :view_team, params
       expect(response).to render_template(:view_team)
     end
-  end
 
-  describe '#view_team' do
-    render_views
     context 'when view_team page is viewed by a student who is also a TA for another course' do
       it 'renders grades#view_team page' do
         allow(participant).to receive(:team).and_return(team)

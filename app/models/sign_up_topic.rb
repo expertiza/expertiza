@@ -84,7 +84,7 @@ class SignUpTopic < ActiveRecord::Base
       unless assignment.is_intelligent?
         unless signup_record.try(:is_waitlisted)
           # find the first wait listed user if exists
-          first_waitlisted_user = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
+          first_waitlisted_user = Waitlist.first_waitlisted_user(topic_id)
 
           unless first_waitlisted_user.nil?
             # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged

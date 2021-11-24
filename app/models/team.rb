@@ -206,6 +206,8 @@ class Team < ActiveRecord::Base
     team.import_team_members(row_hash) unless team_exists && options[:handle_dups] == "ignore"
   end
 
+
+
   # Handle existence of the duplicate team
   def self.handle_duplicate(team, name, id, handle_dups, teamtype)
     return name if team.nil? # no duplicate
@@ -290,5 +292,30 @@ class Team < ActiveRecord::Base
   def self.remove_user_from_previous_team(parent_id, user_id)
     team_user = TeamsUser.where(user_id: user_id).find { |team_user| team_user.team.parent_id == parent_id }
     team_user.destroy rescue nil
+  end
+
+
+  def self.import_helper(row_hash, id, options, teamtype)
+    raise ArgumentError, "Include duplicate handling option." if not options.has_key? :handle_dups
+    if row_hash.has_key? :teamname
+      name = row_hash[:teamname].to_s
+      team = where(["name =? && parent_id =?", name, id]).first
+      team_exists = !team.nil?
+      name = handle_duplicate(team, name, id, options[:handle_dups], teamtype)
+    else
+      if teamtype.is_a?(CourseTeam)
+        name = self.generate_team_name(Course.find(id).name)
+      elsif teamtype.is_a?(AssignmentTeam)
+        name = self.generate_team_name(Assignment.find(id).name)
+      end
+    end
+    if name
+      team = Object.const_get(teamtype.type).create_team_and_node(id)
+      team.name = name
+      team.save
+    end
+
+    # insert team members into team unless team was pre-existing & we ignore duplicate teams
+    team.import_team_members(row_hash) unless team_exists && options[:handle_dups] == "ignore"
   end
 end

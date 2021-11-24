@@ -389,30 +389,57 @@
       <% end %>
       <tr>
         <td>
-          <img width="100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Reviewer")}" %> title="GoodReviewer">
-          Would you like to award a Good Reviewer badge?
-          <input type="checkbox" id="good_reviewer_checkbox" name="review[good_reviewer_checkbox]">
+          <label for="review_comments">Additional Comments</label><BR/>
+          <textarea cols="70" rows="1" id="review_comments" name="review[comments]" style="overflow:hidden;" class="tinymce">
+            <% if controller.action_name != 'new' and @response.additional_comment != nil %>
+                <%= @response.additional_comment.strip if !@response.nil?%>
+            <% end %>
+          </textarea>
+        </td>
+        <td width="25%">
+          <div id="review_comments_analysis"></div>
         </td>
       </tr>
+
+      <!-- Add a Good Teammate badge to the Teammate Review Questionnaire if the assignment has badges -->
+      <% if @assignment.badge? and (@questionnaire.type == 'TeammateReviewQuestionnaire' or @questionnaire.type == 'Teammate ReviewQuestionnaire') and AssignmentBadge.where(assignment_id: @assignment.id, badge_id: Badge.get_id_from_name('Good Teammate')).any?%>
+        <tr>
+          <td>
+            <img width = "100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Teammate")}" %> title="GoodTeammate">
+             Would you like to award a Good Teammate badge?
+            <input type="checkbox" id="good_teammate_checkbox" name="review[good_teammate_checkbox]">
+          </td>
+        </tr>
+      <% end%>
+
+      <!-- Add a Good Reviewer badge to the Feedback Review Questionnaire if the assignment has badges -->
+      <% if @assignment.badge? and (@questionnaire.type == 'AuthorFeedbackQuestionnaire' or @questionnaire.type == 'Author FeedbackQuestionnaire') and AssignmentBadge.where(assignment_id: @assignment.id, badge_id: Badge.get_id_from_name('Good Reviewer')).any?%>
+        <tr>
+          <td>
+            <img width="100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Reviewer")}" %> title="GoodReviewer">
+            Would you like to award a Good Reviewer badge?
+            <input type="checkbox" id="good_reviewer_checkbox" name="review[good_reviewer_checkbox]">
+          </td>
+        </tr>
+      <% end %>
+
+    </table>
+    <%if @current_round%>
+      <%= hidden_field_tag "review[round]", @current_round %>
+    <%end%>
+    <%= hidden_field_tag "review[questionnaire_id]", @questionnaire.id %>
+
+    <br/>
+    <br>
+    <div id="save_confirm"></div>
+    <%= submit_tag "Save "+@title, :name => "save", :id => "save_review" %>
+    <!--#E1600 check title for selfreview to show submit button-->
+    <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>
+        <%= submit_tag "Submit "+@title, :name => "Submit", :id => "Submit" %>
+        <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
     <% end %>
-
-  </table>
-  <% if @current_round %>
-    <%= hidden_field_tag "review[round]", @current_round %>
-  <% end %>
-  <%= hidden_field_tag "review[questionnaire_id]", @questionnaire.id %>
-
-  <br/>
-  <br>
-  <div id="save_confirm"></div>
-  <%= submit_tag "Save " + @title, :name => "save", :id => "save_review" %>
-  <!--#E1600 check title for selfreview to show submit button-->
-  <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>
-    <%= submit_tag "Submit " + @title, :name => "Submit", :id => "Submit" %>
-    <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
-  <% end %>
-  <%= hidden_field_tag('return', @return) %>
-  <%= hidden_field_tag "isSubmit", :id => "isSubmit" %>
+    <%= hidden_field_tag('return', @return) %>
+    <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %>
 <% end %>
 
 <!--Check whether there is a UploadFile question.-->

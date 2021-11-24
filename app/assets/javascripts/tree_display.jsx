@@ -1194,36 +1194,7 @@ jQuery(document).ready(function() {
             if (((entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1) &&
                     (entry.private == true || entry.type == 'FolderNode'))) {
               if ((date >= var_start_date) && (var_end_date >= date)) {
-                if(_this.props.has_quiz_var && entry.require_quiz) {
-                  _rows.push(<ContentTableRow
-                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
-                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
-                      name={entry.name}
-                      institution={entry.institution}
-                      creation_date={entry.creation_date}
-                      updated_date={entry.updated_date}
-                      actions={entry.actions}
-                      is_available={entry.is_available}
-                      course_id={entry.course_id}
-                      max_team_size={entry.max_team_size}
-                      is_intelligent={entry.is_intelligent}
-                      require_quiz={entry.require_quiz}
-                      dataType={_this.props.dataType}
-                      //this is just a hack. All current users courses are marked as private during fetch for display purpose.
-                      private={entry.private}
-                      allow_suggestions={entry.allow_suggestions}
-                      has_topic={entry.has_topic}
-                      rowClicked={_this.handleExpandClick}
-                      newParams={entry.newParams}
-                  />)
-                  _rows.push(<ContentTableDetailsRow
-                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
-                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
-                      showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
-                      dataType={_this.props.dataType}
-                      children={entry.children}
-                  />)
-                } else if(!_this.props.has_quiz_var){
+                if((_this.props.has_quiz_var && entry.require_quiz) || !_this.props.has_quiz_var) {
                   _rows.push(<ContentTableRow
                       key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
                       id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
@@ -1745,7 +1716,7 @@ jQuery(document).ready(function() {
             </div>
 
 
-            <span id="advancedToggle" style={{ display: 'block' }}>
+            <div id="advancedToggle" style={{ display: 'block' }}>
               <AdditionalSearchDropDown
                   selectValue = {this.state.selectValue}
                   onChange={this.changeAdditionalDrop}
@@ -1769,7 +1740,7 @@ jQuery(document).ready(function() {
                     onChange={this.changeAvailableToggle}
                     dataType={this.props.dataType}/>
               </div>
-            </span>
+            </div>
 
             <NewItemButton
                 dataType={this.props.dataType}

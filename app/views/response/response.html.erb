@@ -351,64 +351,6 @@
 <input type="checkbox" id="autosave_cbx" checked>
 <label id="autosave_cbx_lbl" for="autosave_cbx"></label>
 <div id="save_progress"></div>
-<<<<<<< HEAD
-<%= form_tag({ :action => @next_action }, :id => @modified_object, :class => "review_form") do %>
-  <%= hidden_field_tag "map_id", @modified_object %>
-  <%= hidden_field_tag "saved", (@header == "New") ? 1 : 0 %>
-  <% if @next_action.eql? 'update' %>
-    <input name="_method" type="hidden" value="put"/>
-  <% end %>
-  <table width="100%">
-    <tr>
-      <td>
-        <% i = 0 %>
-        <% @questions.each do |question| %>
-          <% answer = Answer.where(question_id: question.id, response_id: @response.id).first unless @response.nil? %>
-          <% if question.instance_of? Criterion %>
-            <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
-          <% elsif question.instance_of? Scale %>
-            <%= question.complete(i, @questionnaire.min_question_score, @questionnaire.max_question_score, answer) %>
-          <% elsif question.instance_of? Cake %>
-            <%= question.complete(i, answer, @total_score[question.id].to_s) %>
-          <% else %>
-            <%= question.complete(i, answer) %>
-          <% end %>
-
-          <% if [Criterion, TextArea].include? question.class %>
-            <div id="analysis_<%= i.to_s %>_comments"></div>
-          <% end %>
-          <% i += 1 %>
-        <% end %>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <label for="review_comments">Additional Comments</label><BR/>
-        <textarea cols="70" rows="1" id="review_comments" name="review[comments]" style="overflow:hidden;" class="tinymce">
-            <% unless controller.action_name == 'new' || @response.additional_comment.nil? %>
-                <%= @response.additional_comment.strip unless @response.nil? %>
-            <% end %>
-          </textarea>
-      </td>
-      <td width="25%">
-        <div id="review_comments_analysis"></div>
-      </td>
-    </tr>
-
-    <!-- Add a Good Teammate badge to the Teammate Review Questionnaire if the assignment has badges -->
-    <% if @assignment.badge? and (@questionnaire.type == 'TeammateReviewQuestionnaire' or @questionnaire.type == 'Teammate ReviewQuestionnaire') and AssignmentBadge.where(assignment_id: @assignment.id, badge_id: Badge.get_id_from_name('Good Teammate')).any? %>
-      <tr>
-        <td>
-          <img width="100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Teammate")}" %> title="GoodTeammate">
-          Would you like to award a Good Teammate badge?
-          <input type="checkbox" id="good_teammate_checkbox" name="review[good_teammate_checkbox]">
-        </td>
-      </tr>
-    <% end %>
-
-    <!-- Add a Good Reviewer badge to the Feedback Review Questionnaire if the assignment has badges -->
-    <% if @assignment.badge? and (@questionnaire.type == 'AuthorFeedbackQuestionnaire' or @questionnaire.type == 'Author FeedbackQuestionnaire') and AssignmentBadge.where(assignment_id: @assignment.id, badge_id: Badge.get_id_from_name('Good Reviewer')).any? %>
-=======
 <%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form") do %>
     <%= hidden_field_tag "map_id", @modified_object %>
     <%= hidden_field_tag "saved", (@header == "New") ? 1 : 0 %>
@@ -445,7 +387,6 @@
         </tr>
       <% end %>
       <% end %>
->>>>>>> expertiza-sid/beta
       <tr>
         <td>
           <img width="100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Reviewer")}" %> title="GoodReviewer">

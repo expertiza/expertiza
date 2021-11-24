@@ -91,6 +91,22 @@ class User < ActiveRecord::Base
     user_list.uniq
   end
 
+  def self.get_new_user(row_hash, session)
+    attributes = {"role_id" => Role.student.id,
+        "name" => row_hash[:name],
+        "fullname" => row_hash[:fullname],
+        "email" => row_hash[:email],
+        "email_on_submission" => 1,
+        "email_on_review" => 1,
+        "email_on_review_of_review" => 1}
+          
+    user = User.new(attributes)
+    user.parent_id = (session[:user]).id
+    user.timezonepref = User.find(user.parent_id).timezonepref
+    user.save!
+    user
+  end
+
   # Zhewei: anonymized view for demo purposes - 1/3/2018
   def self.anonymized_view?(ip_address = nil)
     anonymized_view_starter_ips = $redis.get('anonymized_view_starter_ips') || ''

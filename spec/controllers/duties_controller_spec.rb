@@ -1,6 +1,8 @@
 describe DutiesController do
-  let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true) }
+  let(:assignment) { build(:assignment, id: 1,course_id: 1,instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true)}
+  let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
+  let(:ta) { build(:teaching_assistant, id: 8) }
   let(:duty) { build(:duty, id: 1, duty_name: "Role", max_members_for_duty: 2, assignment_id: 1) }
   let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
 
@@ -9,6 +11,47 @@ describe DutiesController do
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(Duty).to receive(:find).with('1').and_return(duty)
+  end
+
+  describe '#action_allowed?' do
+    context 'when params action is edit or update' do
+      before(:each) do
+        controller.params = {id: '1', action: 'edit'}
+      end
+
+      context 'when the role name of current user is super admin or admin' do
+        it 'allows certain action' do
+          stub_current_user(admin, admin.role.name, admin.role)
+          expect(controller.send(:action_allowed?)).to be true
+        end
+      end
+
+      context 'when current user is the instructor of current assignment' do
+        it 'allows certain action' do
+          expect(controller.send(:action_allowed?)).to be true
+        end
+      end
+
+      context 'when current user is the ta of the course which current assignment belongs to' do
+        it 'allows certain action' do
+          stub_current_user(ta, ta.role.name, ta.role)
+          allow(TaMapping).to receive(:exists?).with(ta_id: 8, course_id: 1).and_return(true)
+          expect(controller.send(:action_allowed?)).to be true
+        end
+      end
+    end
+
+    context 'when params action is not edit and update' do
+      before(:each) do
+        controller.params = {id: '1', action: 'new'}
+      end
+
+      context 'when the role current user is super admin/admin/instructor/ta' do
+        it 'allows certain action except edit and update' do
+          expect(controller.send(:action_allowed?)).to be true
+        end
+      end
+    end
   end
 
   describe '#create' do

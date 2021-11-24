@@ -24,7 +24,7 @@ class ReviewBidsController < ApplicationController
   
   #needed in order to run index from "Request another submission" button correctly
   def create
-    @@reviews_to_show = params[:reviews_to_show]
+    #@@reviews_to_show = params[:reviews_to_show]
     redirect_to action: 'index', params: params
   end
 
@@ -45,7 +45,7 @@ class ReviewBidsController < ApplicationController
       end
     end
     @review_phase = next_due_date.deadline_type_id
-    @reviews_to_show = @@reviews_to_show.nil? ? (@assignment.num_reviews_required).to_i : @@reviews_to_show.to_i
+    #@reviews_to_show = @@reviews_to_show.nil? ? (@assignment.num_reviews_required).to_i : @@reviews_to_show.to_i
     # Finding how many reviews have been completed
 	  @num_reviews_completed = 0
     @review_mappings.each do |map|

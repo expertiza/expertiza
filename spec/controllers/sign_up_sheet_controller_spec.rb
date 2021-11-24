@@ -191,7 +191,7 @@ describe SignUpSheetController do
   describe '#list' do
     before(:each) do
       allow(SignUpTopic).to receive(:find_slots_filled).with(1).and_return([topic])
-      allow(SignUpTopic).to receive(:find_slots_waitlisted).with(1).and_return([])
+      allow(Waitlist).to receive(:find_slots_waitlisted).with(1).and_return([])
       allow(SignUpTopic).to receive(:where).with(assignment_id: 1, private_to: nil).and_return([topic])
       allow(participant).to receive(:team).and_return(team)
     end

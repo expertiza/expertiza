@@ -146,7 +146,7 @@ class SignUpSheetController < ApplicationController
     @id = assignment_id
     @sign_up_topics = SignUpTopic.where('assignment_id = ?', assignment_id)
     @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
-    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment_id)
+    @slots_waitlisted = Waitlist.find_slots_waitlisted(assignment_id)
 
     @assignment = Assignment.find(assignment_id)
     # ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
@@ -184,7 +184,7 @@ class SignUpSheetController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
     @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
-    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
+    @slots_waitlisted = Waitlist.find_slots_waitlisted(@assignment.id)
     @show_actions = true
     @priority = 0
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)

@@ -1,6 +1,6 @@
 require './spec/support/teams_shared.rb'
 
-describe TeamsController do
+describe JoinTeamRequestsController do
   let(:student) {build_stubbed(:student)}
   #let(:team) {build_stubbed(:team)}
   #let(:Object) {build_stubbed(:Object)}
@@ -9,8 +9,9 @@ describe TeamsController do
   context 'not provides access to people with' do
     it 'student credentials' do
       stub_current_user(student, student.role.name, student.role)
-      expect(controller.send(:action_allowed?)).to be false
+      expect(controller.send(:action_allowed?)).to be true
     end
   end
 
 end
+

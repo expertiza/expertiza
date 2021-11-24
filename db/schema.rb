@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20211122083330) do
+ActiveRecord::Schema.define(version: 20211123205149) do
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -304,7 +304,7 @@ ActiveRecord::Schema.define(version: 20211122083330) do
 
   create_table "duties", force: :cascade do |t|
     t.string   "duty_name",            limit: 255
-    t.integer  "max_members_for_role", limit: 4
+    t.integer  "max_members_for_duty", limit: 4
     t.integer  "assignment_id",        limit: 4
     t.datetime "created_at",                       null: false
     t.datetime "updated_at",                       null: false

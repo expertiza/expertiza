@@ -2,10 +2,10 @@
 
 one:
   duty_name: MyString
-  max_members_for_role: 1
+  max_members_for_duty: 1
   assignment_id: 
 
 two:
   duty_name: MyString
-  max_members_for_role: 1
+  max_members_for_duty: 1
   assignment_id: 

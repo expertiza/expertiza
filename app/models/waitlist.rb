@@ -25,7 +25,7 @@ class Waitlist < ActiveRecord::Base
       next unless non_waitlisted_users.length < max_choosers
       first_waitlisted_team = SignedUpTeam.find_by topic_id: signup_topic_id, is_waitlisted: true
       # moving the waitlisted team into the confirmed signed up teams list and delete all waitlists for this team
-      SignUpTopic.assign_to_first_waiting_team(first_waitlisted_team) if first_waitlisted_team
+      Waitlist.assign_to_first_waiting_team(first_waitlisted_team) if first_waitlisted_team
     end
   end
 
@@ -42,4 +42,14 @@ class Waitlist < ActiveRecord::Base
   def self.first_waitlisted_user(topic_id)
     SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
   end
+
+  def self.assign_to_first_waiting_team(next_wait_listed_team)
+    team_id = next_wait_listed_team.team_id
+    team = Team.find(team_id)
+    assignment_id = team.parent_id
+    next_wait_listed_team.is_waitlisted = false
+    next_wait_listed_team.save
+    Waitlist.cancel_all_waitlists(team_id, assignment_id)
+  end
+
 end

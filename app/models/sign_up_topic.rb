@@ -103,21 +103,12 @@ class SignUpTopic < ActiveRecord::Base
     end # end condition for 'drop deadline' check
   end
 
-  def self.assign_to_first_waiting_team(next_wait_listed_team)
-    team_id = next_wait_listed_team.team_id
-    team = Team.find(team_id)
-    assignment_id = team.parent_id
-    next_wait_listed_team.is_waitlisted = false
-    next_wait_listed_team.save
-    Waitlist.cancel_all_waitlists(team_id, assignment_id)
-  end
-
   def update_waitlisted_users(max_choosers)
     num_of_users_promotable = max_choosers.to_i - self.max_choosers.to_i
     num_of_users_promotable.times do
       next_wait_listed_team = SignedUpTeam.where(topic_id: self.id, is_waitlisted: true).first
       # if slot exist, then confirm the topic for this team and delete all waitlists for this team
-      SignUpTopic.assign_to_first_waiting_team(next_wait_listed_team) if next_wait_listed_team
+      Waitlist.assign_to_first_waiting_team(next_wait_listed_team) if next_wait_listed_team
     end
   end
 

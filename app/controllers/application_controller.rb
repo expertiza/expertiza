@@ -19,18 +19,58 @@ class ApplicationController < ActionController::Base
   before_action :set_locale
 
   def set_locale
-    if logged_in?
+    # Only students with course having language set should have session[:locale] set
+    if logged_in? && current_user_role? && current_user_role.student?
+      # If params is set, means that language was requested. Reset it.
       if @current_user.locale != "no_pref"
         I18n.locale = @current_user.locale
-      elsif params[:controller] == "courses" && params[:id]
-        I18n.locale = Course.get_locale(params[:id])
-      elsif params[:controller] == "student_task" && params[:id]
-        I18n.locale = Participant.find(params[:id]).course.locale
-      elsif params[:controller] == "assignments" && params[:id]
-        I18n.locale = Assignment.get_locale(id)
+      else
+        set_new_locale_for_student
+        #I18n.locale = I18n.default_locale
+      end
+    end
+  end
+
+  def set_new_locale_for_student
+    # Check student task view and set locale accordingly.
+    if !params[:id].nil? || !params[:student_id].nil?
+      participant_id = params[:id] || params[:student_id]
+      participant = AssignmentParticipant.find_by(id: participant_id)
+      # If id or student_id not correct, revert to default locale based on courses.
+      if participant.nil?
+        find_locale_from_courses
+        return
+      end
+      assignment = participant.assignment
+      if !assignment.course.nil?
+        new_locale = assignment.course.locale
+        if !new_locale.nil?
+          I18n.locale = new_locale
+        else
+          I18n.locale = I18n.default_locale
+        end
       else
         I18n.locale = I18n.default_locale
       end
+    else
+      # Set locale to best default possible to all other student pages
+      find_locale_from_courses
+    end
+  end
+
+  def find_locale_from_courses
+    courseParticipants = CourseParticipant.where(user_id: current_user.id)
+    courseParticipantsLocales = courseParticipants.map { |cp| cp.course.locale }
+    # If no tasks, then possible to have no courses assigned.
+    if courseParticipantsLocales.uniq.length == 1 #&& !@tasks.empty?
+      course = courseParticipants.first.course
+      if course.locale?
+        I18n.locale = course.locale
+      else
+        I18n.locale = I18n.default_locale
+      end
+    else
+      I18n.locale = I18n.default_locale
     end
   end
 
@@ -38,7 +78,9 @@ class ApplicationController < ActionController::Base
     remove_non_utf8(params)
   end
 
-  def self.verify(_args); end
+  def self.verify(_args)
+    ;
+  end
 
   def current_user_role?
     current_user.role.name
@@ -114,8 +156,8 @@ class ApplicationController < ActionController::Base
 
   def is_available(user, owner_id)
     user.id == owner_id ||
-        user.admin? ||
-        user.super_admin?
+      user.admin? ||
+      user.super_admin?
   end
 
   def record_not_found
@@ -139,7 +181,7 @@ class ApplicationController < ActionController::Base
   end
 
   protected
-  
+
   # Use this method to validate the current user in order to avoid allowing users
   # to see unauthorized data.
   # Ex: return unless current_user_id?(params[:user_id])

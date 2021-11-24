@@ -20,6 +20,26 @@
         target.style.display = 'none';
     }
   }
+
+  function teammateSelectOnChange(selectNode) {
+    const revieweeIdToShow= selectNode.value;
+    const tableSelector = ".teammate_table";
+    if(revieweeIdToShow == "all") {
+      document.querySelectorAll(tableSelector).forEach((tableNode) => {
+        tableNode.classList.remove("hidden");
+      });
+      return;
+    }
+
+    document.querySelectorAll(tableSelector).forEach((tableNode) => {
+      const tableRevieweeId = tableNode.getAttribute('data-reviewee_id');
+      if(tableRevieweeId == revieweeIdToShow) {
+        tableNode.classList.remove("hidden");
+      } else {
+        tableNode.classList.add("hidden");
+      }
+    });
+  }
 </script>
 <h2>Summary Report for assignment: <%= @assignment.name %></h2>
 <!-- Anchor for Tag Heatgrid. Heatgrid generation code located in /assets/javascripts/view_team_in_grades.js -->
@@ -58,12 +78,31 @@
 </div><br><br>
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% table_count = 0 %>
+<%# This boolean is used to render a dropdown just before the first teammate review heat grid %>
+<% first_teammate_review_appeared = false %>
 <% @vmlist.each do |vm| %>
+
+    <% if not @current_role_name.eql?'Student' and not first_teammate_review_appeared and vm.questionnaire_type == "TeammateReviewQuestionnaire" %>
+      <div>
+        <select onchange="teammateSelectOnChange(this)">
+          <option value="all">All</option>
+          <% @vmlist.select { |tm_vm| tm_vm.questionnaire_type == "TeammateReviewQuestionnaire" }.each do |tm_vm| %>
+            <option value="<%= tm_vm.reviewee_id %>">
+              <%= tm_vm.reviewee_name(session[:ip]) %>
+            </option>
+          <% end %>
+        </select>
+      </div>
+      <% first_teammate_review_appeared = true %>
+    <% end %>
 
     <% if (vm.questionnaire_display_type == "Metareview" or vm.questionnaire_display_type == "Author Feedback") and @current_role_name.eql?'Student' %>
     <% elsif (vm.questionnaire_display_type == "Teammate Review" and @current_role_name.eql?'Student' and !@assignment.show_teammate_reviews)%>
     <% elsif (vm.questionnaire_display_type == "Teammate Review" and @current_role_name.eql?'Student' and @assignment.show_teammate_reviews and current_user.id != vm.reviewee_id )%>
     <% else %>
+        <% if vm.questionnaire_type == "TeammateReviewQuestionnaire" %>
+          <div class="teammate_table" data-reviewee_id="<%= vm.reviewee_id %>">
+        <% end %>
         <% if vm.list_of_reviewers.length > 0 %>
 
           <!-- display the list of questions for this questionnaire -->
@@ -91,7 +130,7 @@
                 <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
                     (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
                 <% elsif vm.questionnaire_type == "TeammateReviewQuestionnaire" %>
-                    (For: <%= vm.reviewee_name.inspect.html_safe %>)
+                    (For: <%= vm.reviewee_name(session[:ip]) %>)
                 <%end %>
               </h4>
               <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>
@@ -125,7 +164,7 @@
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
                     <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i, questionnaire_type: vm.questionnaire_type } %>
                   <% else %>
-                      <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
+                    <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
                     <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i, questionnaire_type: vm.questionnaire_type } %>
                   <% end %>
                   <% i += 1 %>
@@ -272,6 +311,9 @@
           <input class="btn btn-default" type="button" href="#" onclick="col_sort(<%=table_count%>)" data-toggle="tooltip" title="Sort reviews in ascending/descending order of the total score. Consecutive clicks will alternate between ascending and descending sort order" value="Sort by total review score"/>
           <% table_count += 1%>
           <span> <%= vm.display_team_members(session[:ip]) %></span>
+        <% if vm.questionnaire_type == "TeammateReviewQuestionnaire" %>
+          </div>
+        <% end %>
           <!-- this elsif terminates the heatgrid code.  -->
         <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
             <br><div class="alert alert-warning">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>

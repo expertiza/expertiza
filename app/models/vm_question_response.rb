@@ -46,9 +46,9 @@ class VmQuestionResponse
     @participant_who_is_reviewee.user_id
   end
 
-  def reviewee_name
+  def reviewee_name(ip_address = nil)
     part = @participant_who_is_reviewee
-    User.find_by(id: part.user_id).name
+    User.find_by(id: part.user_id).fullname(ip_address)
   end
   
   def add_reviews(participant, team, vary)

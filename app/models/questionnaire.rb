@@ -29,7 +29,8 @@ class Questionnaire < ActiveRecord::Base
                          'CourseSurveyQuestionnaire',
                          'Bookmark RatingQuestionnaire',
                          'BookmarkRatingQuestionnaire',
-                         'QuizQuestionnaire'].freeze
+                         'QuizQuestionnaire',
+                         'RevisionPlanQuestionnaire'].freeze
   has_paper_trail
 
   def get_weighted_score(assignment, scores)
@@ -112,5 +113,15 @@ class Questionnaire < ActiveRecord::Base
 
     results = Questionnaire.where("id <> ? and name = ? and instructor_id = ?", id, name, instructor_id)
     errors.add(:name, "Questionnaire names must be unique.") if results.present?
+  end
+
+  # Display questionnaire heading in response view
+  def display_heading?
+    return false
+  end
+
+  # Return true if user owns questionnaire
+  def owner?(user_id)
+    instructor_id == user_id
   end
 end

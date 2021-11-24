@@ -2,6 +2,7 @@ describe DutiesController do
   let(:assignment) { build(:assignment, id: 1,course_id: 1,instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true)}
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
+  let(:instructor2) { build(:instructor, id: 66) }
   let(:ta) { build(:teaching_assistant, id: 8) }
   let(:duty) { build(:duty, id: 1, duty_name: "Role", max_members_for_duty: 2, assignment_id: 1) }
   let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
@@ -36,6 +37,14 @@ describe DutiesController do
         it 'allows certain action' do
           stub_current_user(ta, ta.role.name, ta.role)
           allow(TaMapping).to receive(:exists?).with(ta_id: 8, course_id: 1).and_return(true)
+          expect(controller.send(:action_allowed?)).to be true
+        end
+      end
+
+      context 'when current user is the instructor of the course which current assignment belongs to' do
+        it 'allows certain action' do
+          stub_current_user(instructor2, instructor2.role.name, instructor2.role)
+          allow(Course).to receive(:find).with(1).and_return(double('Course', instructor_id: 66))
           expect(controller.send(:action_allowed?)).to be true
         end
       end

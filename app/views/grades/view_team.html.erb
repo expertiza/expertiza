@@ -102,6 +102,8 @@
     <% else %>
         <% if vm.questionnaire_type == "TeammateReviewQuestionnaire" %>
           <div class="teammate_table" data-reviewee_id="<%= vm.reviewee_id %>">
+        <% elsif %>
+          <div>
         <% end %>
         <% if vm.list_of_reviewers.length > 0 %>
 
@@ -311,14 +313,11 @@
           <input class="btn btn-default" type="button" href="#" onclick="col_sort(<%=table_count%>)" data-toggle="tooltip" title="Sort reviews in ascending/descending order of the total score. Consecutive clicks will alternate between ascending and descending sort order" value="Sort by total review score"/>
           <% table_count += 1%>
           <span> <%= vm.display_team_members(session[:ip]) %></span>
-        <% if vm.questionnaire_type == "TeammateReviewQuestionnaire" %>
           </div>
-        <% end %>
           <!-- this elsif terminates the heatgrid code.  -->
         <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
             <br><div class="alert alert-warning">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>
         <% end %>
-        <br/>  
     <% end %>
 <% end %>
 <!-- termination of the main outer loop.-->

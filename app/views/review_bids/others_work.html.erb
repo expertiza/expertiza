@@ -24,7 +24,7 @@
   <% title = 'Review' %>
   <!-- loop through each review map -->
   <% @review_mappings.each do |map| %>
-    <% if review_no <= @reviews_to_show %>
+    <% #if review_no <= @reviews_to_show %>
       <%@sorted_responses=[]%>
       <% team = AssignmentTeam.find(map.reviewee_id) %>
       <% participant = team.participants.first %>
@@ -109,11 +109,11 @@
           </tr>
       <% end %>
     <% end%>
-  <% end %>
+  <% #end %>
 </table>
 <br>
-<% if @reviews_to_show < @assignment.num_reviews_allowed %>
-  <%= button_to 'Request Another Review', {:controller=>'review_bids',:action=>'index', :id => @participant.id, :reviews_to_show => (@reviews_to_show.to_i+1)} %>
-<% end %>
+<% #if @reviews_to_show < @assignment.num_reviews_allowed %>
+  <%#= button_to 'Request Another Review', {:controller=>'review_bids',:action=>'index', :id => @participant.id, :reviews_to_show => (@reviews_to_show.to_i+1)} %>
+<% #end %>
 <BR/>
 <%= link_to "Back", :controller=>'student_task', :action => 'view', :id => @participant.id %>

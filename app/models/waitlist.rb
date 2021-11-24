@@ -29,21 +29,21 @@ class Waitlist < ActiveRecord::Base
     end
   end
 
-  def self.find_waitlisted_topics(assignment_id, team_id)
+  def find_waitlisted_topics(assignment_id, team_id)
     # SignedUpTeam.find_by_sql("SELECT u.id FROM sign_up_topics t, signed_up_teams u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = " + assignment_id.to_s + " and u.team_id = " + team_id.to_s)
     SignedUpTeam.find_by_sql(["SELECT u.id FROM sign_up_topics t, signed_up_teams u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = ? and u.team_id = ?", assignment_id.to_s, team_id.to_s])
   end
 
-  def self.find_slots_waitlisted(assignment_id)
+  def find_slots_waitlisted(assignment_id)
     # SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id +  " and u.is_waitlisted = true GROUP BY t.id")
     SignUpTopic.find_by_sql(["SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id = ? and u.is_waitlisted = true GROUP BY t.id", assignment_id])
   end
 
-  def self.first_waitlisted_user(topic_id)
+  def first_waitlisted_user(topic_id)
     SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
   end
 
-  def self.assign_to_first_waiting_team(next_wait_listed_team)
+  def assign_to_first_waiting_team(next_wait_listed_team)
     team_id = next_wait_listed_team.team_id
     team = Team.find(team_id)
     assignment_id = team.parent_id
@@ -52,4 +52,20 @@ class Waitlist < ActiveRecord::Base
     Waitlist.cancel_all_waitlists(team_id, assignment_id)
   end
 
+  def next_wait_listed_team
+    SignedUpTeam.where(topic_id: self.id, is_waitlisted: true).first
+  end
+
+  def update_waitlisted_users(max_choosers)
+    num_of_users_promotable = max_choosers.to_i - self.max_choosers.to_i
+    num_of_users_promotable.times do
+      next_wait_listed_team = Waitlist.next_wait_listed_team
+      # if slot exist, then confirm the topic for this team and delete all waitlists for this team
+      Waitlist.assign_to_first_waiting_team(next_wait_listed_team) if next_wait_listed_team
+    end
+  end
+
+  def waitlisted_signed_up_team(topic_id)
+    SignedUpTeam.where(topic_id: topic_id, is_waitlisted: 1)
+  end
 end

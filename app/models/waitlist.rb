@@ -43,7 +43,7 @@ class Waitlist < ActiveRecord::Base
     SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
   end
 
-  def assign_to_first_waiting_team(next_wait_listed_team)
+  def self.assign_to_first_waiting_team(next_wait_listed_team)
     team_id = next_wait_listed_team.team_id
     team = Team.find(team_id)
     assignment_id = team.parent_id
@@ -52,11 +52,11 @@ class Waitlist < ActiveRecord::Base
     Waitlist.cancel_all_waitlists(team_id, assignment_id)
   end
 
-  def next_wait_listed_team
+  def self.next_wait_listed_team
     SignedUpTeam.where(topic_id: self.id, is_waitlisted: true).first
   end
 
-  def update_waitlisted_users(max_choosers)
+  def self.update_waitlisted_users(max_choosers)
     num_of_users_promotable = max_choosers.to_i - self.max_choosers.to_i
     num_of_users_promotable.times do
       next_wait_listed_team = Waitlist.next_wait_listed_team
@@ -65,7 +65,7 @@ class Waitlist < ActiveRecord::Base
     end
   end
 
-  def waitlisted_signed_up_team(topic_id)
+  def self.waitlisted_signed_up_team(topic_id)
     SignedUpTeam.where(topic_id: topic_id, is_waitlisted: 1)
   end
 end

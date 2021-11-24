@@ -85,7 +85,7 @@
           <!-- display the table title and tooltips -->
           <span style="width:100%;">
               <h4 style="display:inline-block;"><%= vm.questionnaire_display_type %>
-                <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
+                <% if vm.questionnaire_type == "ReviewQuestionnaire" or vm.questionnaire_type == "RevisionPlanQuestionnaire"%>
                     (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
                 <%end %>
               </h4>
@@ -248,7 +248,7 @@
           <% table_count += 1%>
           <span> <%= vm.display_team_members(session[:ip]) %></span>
           <!-- this elsif terminates the heatgrid code.  -->
-        <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
+        <% elsif vm.questionnaire_type != "ReviewQuestionnaire" && vm.questionnaire_type != "RevisionPlanQuestionnaire"%>
             <br><div class="alert alert-warning">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>
         <% end %>
         <br/>  

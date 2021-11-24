@@ -1,7 +1,6 @@
-
 class RevisionPlanQuestionnaire < Questionnaire
   has_one :revision_plan_team_map, foreign_key: 'questionnaire_id', dependent: :destroy
-
+  
   after_initialize :post_initialization
   @print_name = "Revision Plan Rubric"
 
@@ -17,12 +16,12 @@ class RevisionPlanQuestionnaire < Questionnaire
     "revisionplan".to_sym
   end
 
-
+  # get questionnaire for a current round based on team.
   def self.get_questionnaire_for_current_round(team_id)
     assignment_team = Team.find(team_id)
     assignment = assignment_team.assignment
     current_round = assignment.number_of_current_round(assignment_team.topic)
-
+    
     questionnaire = RevisionPlanTeamMap.find_by(team: assignment_team, used_in_round: current_round).try(:questionnaire)
     unless questionnaire
       questionnaire = RevisionPlanQuestionnaire.new
@@ -51,5 +50,4 @@ class RevisionPlanQuestionnaire < Questionnaire
   def owner?(user_id)
     team.users.map{ |u| u.id }.include?(user_id) || super
   end
-
 end

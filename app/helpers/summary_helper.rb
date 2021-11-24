@@ -202,8 +202,7 @@ module SummaryHelper
     end
 
     def summarize_sentences(comments, summary_ws_url)
-      logger = Logger.new(STDOUT)
-      logger.level = Logger::WARN
+      summary = ""
       param = {sentences: comments}
       # call web service
       begin
@@ -213,15 +212,16 @@ module SummaryHelper
         ps = PragmaticSegmenter::Segmenter.new(text: summary)
         return ps.segment
       rescue StandardError => err
-        logger.warn "Standard Error: #{err.inspect}"
+        summary = [err.message]
       end
     end
 
-    # convert answers to each question to sentences
     def get_sentences(ans)
-      sentences = ans.comments.gsub!(/[.?!]/, '\1|').try(:split, '|') || nil unless ans.nil? or ans.comments.nil?
-      sentences.map!(&:strip) unless sentences.nil?
-      sentences
+      unless ans.comments.nil?
+        ans.comments.gsub!(/[.?!]/, '\1|')
+        sentences = ans.comments.split('|')
+        sentences.map!(&:strip)
+      end
     end
 
     def break_up_comments_to_sentences(question_answers)

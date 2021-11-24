@@ -16,7 +16,7 @@ describe DutiesController do
         it 'sets up a new duty and redirects to assignment#edit page' do
           allow(duty).to receive(:save).and_return('OK')
           params = {
-              id: 2,
+              id: 1,
               duty: {
                   duty_name: 'Scrum Master',
                   max_members_for_duty: 2,
@@ -25,12 +25,29 @@ describe DutiesController do
           }
           post :create, params
           expect(response).to redirect_to('/assignments/1/edit')
+          expect(flash[:notice]).to match(/Role was successfully created.*/)
+        end
+      end
+
+      context 'when new duty cannot be saved successfully' do
+        it 'shows error message and redirects to duty#new page' do
+          allow(duty).to receive(:errors)
+          params = {
+              id: 1,
+              duty: {
+                  duty_name: 'Scrum Master',
+                  max_members_for_duty: -1,
+                  assignment_id: 1
+              }
+          }
+          post :create, params
+          expect(flash[:error]).to eq('Max members for duty must be greater than or equal to 1. ')
+          expect(response).to redirect_to('/duties/new?id=1')
         end
       end
     end
 
   describe '#update' do
-
     context 'when duty can be found' do
       it 'updates current duty and redirects to assignment#edit page' do
         allow(Duty).to receive(:find).with('1').and_return(build(:duty, id: 1))
@@ -45,9 +62,26 @@ describe DutiesController do
         }
         post :update, params
         expect(response).to redirect_to('/assignments/1/edit')
+        expect(flash[:notice]).to match(/Role was successfully updated.*/)
       end
     end
 
+    context 'when new duty cannot be updated successfully' do
+      it 'shows error message and redirects to duty#new page' do
+        allow(duty).to receive(:errors)
+        params = {
+            id: 1,
+            duty: {
+                duty_name: 'SM',
+                max_members_for_duty: 1,
+                assignment_id: 1
+            }
+        }
+        post :create, params
+        expect(flash[:error]).to eq('Duty name is too short (minimum is 3 characters). ')
+        expect(response).to redirect_to('/duties/new?id=1')
+      end
+    end
   end
 
   describe '#destroy' do
@@ -56,6 +90,7 @@ describe DutiesController do
         params = {id: 1, assignment_id: 1}
         post :destroy, params
         expect(response).to redirect_to('/assignments/1/edit')
+        expect(flash[:notice]).to match(/Role was successfully destroyed.*/)
       end
       end
   end

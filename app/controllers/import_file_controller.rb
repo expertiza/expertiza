@@ -55,23 +55,6 @@ class ImportFileController < ApplicationController
     @title = params[:title]
   end
 
-  def import
-    errors = import_from_hash(session, params)
-    err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
-    errors.each do |error|
-      err_msg = err_msg + "<li>" + error.to_s + "<br/>"
-    end
-    err_msg += "</ul>"
-    if errors.empty?
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "The file has been successfully imported.", request)
-      undo_link("The file has been successfully imported.")
-    else
-      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, err_msg, request)
-      flash[:error] = err_msg
-    end
-    redirect_to session[:return_to]
-  end
-
   # def import
   #   errors = import_from_hash(session, params)
   #   err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
@@ -89,158 +72,175 @@ class ImportFileController < ApplicationController
   #   redirect_to session[:return_to]
   # end
 
-  # def import_from_hash(session, params)
-  #   @model = params[:model]
-  #   contents_hash = eval(params[:contents_hash])
-    
-  #   if params[:has_header] == "true"
-  #     @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
-  #   else
-  #     # If there is no header, recover the selected fields in the select* params
-  #     new_header = []
-  #     params.each_key do |p|
-  #       if p.match(/\Aselect/)
-  #         new_header << params[p]
-  #       end
-  #     end
-  #     @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
-  #   end
-
-  #   # Call ::import for each row of the file
-  #   errors = []
-  #   begin
-  #     @header_integrated_body.each do |row_hash|
-  #       if @model.constantize.import_options.empty?
-  #         @model.constantize.import(row_hash, session, params[:id])
-  #       else
-  #         @model.constantize.import(row_hash, session, params[:id], params[:options])
-  #       end
-  #     end
-  #   rescue
-  #     errors << $ERROR_INFO
-  #   end
-  #   errors
-  # end
-
-  # def hash_rows_with_headers(header, body)
-  #   new_body = []
-  #   header.map! { |column_name| column_name.to_sym }
-  #   body.each do |row|
-  #     new_body << header.zip(row).to_h
-  #   end
-  #   new_body
-  # end
+  def import
+    errors = import_from_hash(session, params)
+    err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
+    errors.each do |error|
+      err_msg = err_msg + "<li>" + error.to_s + "<br/>"
+    end
+    err_msg += "</ul>"
+    if errors.empty?
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "The file has been successfully imported.", request)
+      undo_link("The file has been successfully imported.")
+    else
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, err_msg, request)
+      flash[:error] = err_msg
+    end
+    redirect_to session[:return_to]
+  end
 
   def import_from_hash(session, params)
-    if params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
-      contents_hash = eval(params[:contents_hash])
-      @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
-      errors = []
-      begin
-        @header_integrated_body.each do |row_hash|
-          if params[:model] == "AssignmentTeam"
-            teamtype = AssignmentTeam
-          else
-            teamtype = CourseTeam
-          end
-          options = eval(params[:options])
-          options[:has_teamname] = params[:has_teamname]
-          Team.import(row_hash, params[:id], options, teamtype)
-        end
-      rescue
-        errors << $ERROR_INFO
-      end
-      elsif params[:model] == "ReviewResponseMap"
-        contents_hash = eval(params[:contents_hash])
-        @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
-        errors = []
-        begin
-          @header_integrated_body.each do |row_hash|
-            ReviewResponseMap.import(row_hash,session,params[:id])
-          end
-        rescue
-          errors << $ERROR_INFO
-        end
-    elsif params[:model] == "MetareviewResponseMap"
-      contents_hash = eval(params[:contents_hash])
-      @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
-      errors = []
-      begin
-        @header_integrated_body.each do |row_hash|
-          MetareviewResponseMap.import(row_hash,session,params[:id])
-        end
-      rescue
-        errors << $ERROR_INFO
-      end
-    elsif params[:model] == 'SignUpTopic' || params[:model] == 'SignUpSheet'
-      contents_hash = eval(params[:contents_hash])
-      if params[:has_header] == 'true'
-        @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
-      else
-        if params[:optional_count] == '0'
-          new_header = [params[:select1], params[:select2], params[:select3]]
-          @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
-        elsif params[:optional_count] == '1'
-          new_header = [params[:select1], params[:select2], params[:select3], params[:select4]]
-          @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
-        elsif params[:optional_count] == '2'
-          new_header = [params[:select1], params[:select2], params[:select3], params[:select4], params[:select5]]
-          @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
-        elsif params[:optional_count] == '3'
-          new_header = [params[:select1], params[:select2], params[:select3], params[:select4], params[:select5], params[:select6]]
-          @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
+    @model = params[:model]
+    contents_hash = eval(params[:contents_hash])
+    
+    if params[:has_header] == "true"
+      @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
+    else
+      # If there is no header, recover the selected fields in the select* params
+      new_header = []
+      params.each_key do |p|
+        if p.match(/\Aselect/)
+          new_header << params[p]
         end
       end
-      errors = []
-      begin
-        @header_integrated_body.each do |row_hash|
-          session[:assignment_id] = params[:id]
-          Object.const_get(params[:model]).import(row_hash, session, params[:id])
+      @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
+    end
+
+    # Call ::import for each row of the file
+    errors = []
+    begin
+      @header_integrated_body.each do |row_hash|
+        if @model.constantize.import_options.empty?
+          @model.constantize.import(row_hash, session, params[:id])
+        else
+          @model.constantize.import(row_hash, session, params[:id], params[:options])
         end
-      rescue
-        errors << $ERROR_INFO
       end
-    elsif params[:model] == 'AssignmentParticipant' || params[:model] == 'CourseParticipant'
-      contents_hash = eval(params[:contents_hash])
-      if params[:has_header] == 'true'
-        @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
-      else
-        new_header = [params[:select1], params[:select2], params[:select3], params[:select4]]
-        @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
-      end
-      errors = []
-      begin
-        if params[:model] == 'AssignmentParticipant'
-          @header_integrated_body.each do |row_hash|
-            AssignmentParticipant.import(row_hash, session, params[:id])
-          end
-        elsif params[:model] == 'CourseParticipant'
-          @header_integrated_body.each do |row_hash|
-            CourseParticipant.import(row_hash, session, params[:id])
-          end
-        end
-      rescue
-        errors << $ERROR_INFO
-      end
-    else # params[:model] = "User"
-      contents_hash = eval(params[:contents_hash])
-      if params[:has_header] == 'true'
-        @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
-      else
-        new_header = [params[:select1], params[:select2], params[:select3]]
-        @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
-      end
-      errors = []
-      begin
-        @header_integrated_body.each do |row_hash|
-          User.import(row_hash, nil, session)
-        end
-      rescue StandardError
-        errors << $ERROR_INFO
-      end
+    rescue
+      errors << $ERROR_INFO
     end
     errors
   end
+
+  def hash_rows_with_headers(header, body)
+    new_body = []
+    header.map! { |column_name| column_name.to_sym }
+    body.each do |row|
+      new_body << header.zip(row).to_h
+    end
+    new_body
+  end
+
+  # def import_from_hash(session, params)
+  #   if params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
+  #     contents_hash = eval(params[:contents_hash])
+  #     @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
+  #     errors = []
+  #     begin
+  #       @header_integrated_body.each do |row_hash|
+  #         if params[:model] == "AssignmentTeam"
+  #           teamtype = AssignmentTeam
+  #         else
+  #           teamtype = CourseTeam
+  #         end
+  #         options = eval(params[:options])
+  #         options[:has_teamname] = params[:has_teamname]
+  #         Team.import(row_hash, params[:id], options, teamtype)
+  #       end
+  #     rescue
+  #       errors << $ERROR_INFO
+  #     end
+  #     elsif params[:model] == "ReviewResponseMap"
+  #       contents_hash = eval(params[:contents_hash])
+  #       @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
+  #       errors = []
+  #       begin
+  #         @header_integrated_body.each do |row_hash|
+  #           ReviewResponseMap.import(row_hash,session,params[:id])
+  #         end
+  #       rescue
+  #         errors << $ERROR_INFO
+  #       end
+  #   elsif params[:model] == "MetareviewResponseMap"
+  #     contents_hash = eval(params[:contents_hash])
+  #     @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
+  #     errors = []
+  #     begin
+  #       @header_integrated_body.each do |row_hash|
+  #         MetareviewResponseMap.import(row_hash,session,params[:id])
+  #       end
+  #     rescue
+  #       errors << $ERROR_INFO
+  #     end
+  #   elsif params[:model] == 'SignUpTopic' || params[:model] == 'SignUpSheet'
+  #     contents_hash = eval(params[:contents_hash])
+  #     if params[:has_header] == 'true'
+  #       @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
+  #     else
+  #       if params[:optional_count] == '0'
+  #         new_header = [params[:select1], params[:select2], params[:select3]]
+  #         @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
+  #       elsif params[:optional_count] == '1'
+  #         new_header = [params[:select1], params[:select2], params[:select3], params[:select4]]
+  #         @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
+  #       elsif params[:optional_count] == '2'
+  #         new_header = [params[:select1], params[:select2], params[:select3], params[:select4], params[:select5]]
+  #         @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
+  #       elsif params[:optional_count] == '3'
+  #         new_header = [params[:select1], params[:select2], params[:select3], params[:select4], params[:select5], params[:select6]]
+  #         @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
+  #       end
+  #     end
+  #     errors = []
+  #     begin
+  #       @header_integrated_body.each do |row_hash|
+  #         session[:assignment_id] = params[:id]
+  #         Object.const_get(params[:model]).import(row_hash, session, params[:id])
+  #       end
+  #     rescue
+  #       errors << $ERROR_INFO
+  #     end
+  #   elsif params[:model] == 'AssignmentParticipant' || params[:model] == 'CourseParticipant'
+  #     contents_hash = eval(params[:contents_hash])
+  #     if params[:has_header] == 'true'
+  #       @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
+  #     else
+  #       new_header = [params[:select1], params[:select2], params[:select3], params[:select4]]
+  #       @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
+  #     end
+  #     errors = []
+  #     begin
+  #       if params[:model] == 'AssignmentParticipant'
+  #         @header_integrated_body.each do |row_hash|
+  #           AssignmentParticipant.import(row_hash, session, params[:id])
+  #         end
+  #       elsif params[:model] == 'CourseParticipant'
+  #         @header_integrated_body.each do |row_hash|
+  #           CourseParticipant.import(row_hash, session, params[:id])
+  #         end
+  #       end
+  #     rescue
+  #       errors << $ERROR_INFO
+  #     end
+  #   else # params[:model] = "User"
+  #     contents_hash = eval(params[:contents_hash])
+  #     if params[:has_header] == 'true'
+  #       @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
+  #     else
+  #       new_header = [params[:select1], params[:select2], params[:select3]]
+  #       @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
+  #     end
+  #     errors = []
+  #     begin
+  #       @header_integrated_body.each do |row_hash|
+  #         User.import(row_hash, nil, session)
+  #       end
+  #     rescue StandardError
+  #       errors << $ERROR_INFO
+  #     end
+  #   end
+  #   errors
+  # end
 
   protected
 
@@ -250,63 +250,63 @@ class ImportFileController < ApplicationController
   # E.G. [ { :name => 'jsmith', :fullname => 'John Smith' , :email => 'jsmith@gmail.com' },
   #        { :name => 'jdoe', :fullname => 'Jane Doe', :email => 'jdoe@gmail.com' } ]
   #
-  def hash_rows_with_headers(header, body)
-    new_body = []
-    if params[:model] == "User" or params[:model] == "AssignmentParticipant" or params[:model] == "CourseParticipant" or params[:model] == "SignUpTopic"
-      header.map! { |column_name| column_name.to_sym }
-      body.each do |row|
-        new_body << header.zip(row).to_h
-      end
-    elsif params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
-      header.map! { |column_name| column_name.to_sym }
-      body.each do |row|
-        h = { }
-        if params[:has_teamname] == "true_first"
-          h[header[0]] = row.shift
-          h[header[1]] = row
-        elsif params[:has_teamname] == "true_last"
-          h[header[1]] = row.pop
-          h[header[0]] = row
-        else
-          h[header[0]] = row
-        end
-        new_body << h
-      end
-    elsif params[:model] == "ReviewResponseMap"
-      header.map! { |column_name| column_name.to_sym }
-      body.each do |row|
-        h = {}
-        if params[:has_reviewee] == "true_first"
-          h[header[0]] = row.shift
-          h[header[1]] = row
-        elsif params[:has_reviewee] == "true_last"
-          h[header[1]] = row.pop
-          h[header[0]] = row
-        else
-          h[header[0]] = row
-        end
-        new_body << h
-      end
-    elsif params[:model] == "MetareviewResponseMap"
-      header.map! { |column_name| column_name.to_sym }
-      body.each do |row|
-        h = {}
-        if params[:has_reviewee] == "true_first"
-          h[header[0]] = row.shift
-          h[header[1]] = row.shift
-          h[header[2]] = row
-        elsif params[:has_reviewee] == "true_last"
-          h[header[2]] = row.pop
-          h[header[1]] = row.pop
-          h[header[0]] = row
-        else
-          h[header[0]] = row
-        end
-        new_body << h
-      end
-    end
-    new_body
-  end
+  # def hash_rows_with_headers(header, body)
+  #   new_body = []
+  #   if params[:model] == "User" or params[:model] == "AssignmentParticipant" or params[:model] == "CourseParticipant" or params[:model] == "SignUpTopic"
+  #     header.map! { |column_name| column_name.to_sym }
+  #     body.each do |row|
+  #       new_body << header.zip(row).to_h
+  #     end
+  #   elsif params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
+  #     header.map! { |column_name| column_name.to_sym }
+  #     body.each do |row|
+  #       h = { }
+  #       if params[:has_teamname] == "true_first"
+  #         h[header[0]] = row.shift
+  #         h[header[1]] = row
+  #       elsif params[:has_teamname] == "true_last"
+  #         h[header[1]] = row.pop
+  #         h[header[0]] = row
+  #       else
+  #         h[header[0]] = row
+  #       end
+  #       new_body << h
+  #     end
+  #   elsif params[:model] == "ReviewResponseMap"
+  #     header.map! { |column_name| column_name.to_sym }
+  #     body.each do |row|
+  #       h = {}
+  #       if params[:has_reviewee] == "true_first"
+  #         h[header[0]] = row.shift
+  #         h[header[1]] = row
+  #       elsif params[:has_reviewee] == "true_last"
+  #         h[header[1]] = row.pop
+  #         h[header[0]] = row
+  #       else
+  #         h[header[0]] = row
+  #       end
+  #       new_body << h
+  #     end
+  #   elsif params[:model] == "MetareviewResponseMap"
+  #     header.map! { |column_name| column_name.to_sym }
+  #     body.each do |row|
+  #       h = {}
+  #       if params[:has_reviewee] == "true_first"
+  #         h[header[0]] = row.shift
+  #         h[header[1]] = row.shift
+  #         h[header[2]] = row
+  #       elsif params[:has_reviewee] == "true_last"
+  #         h[header[2]] = row.pop
+  #         h[header[1]] = row.pop
+  #         h[header[0]] = row
+  #       else
+  #         h[header[0]] = row
+  #       end
+  #       new_body << h
+  #     end
+  #   end
+  #   new_body
+  # end
 
   # Produces a hash where :header refers to the header (may be nil)
   # and :body refers to the contents of the file except the header.

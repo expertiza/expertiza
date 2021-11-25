@@ -1,5 +1,5 @@
 <h2> Author reviews on <%= Participant.find(@reviewer_id).fullname(@ip) %> </h2>
-<% keys = @review_final_versions.keys %>
+<% keys = @feedback_final_versions.keys %>
 <% keys.each do |key| %>
   <% roundtitle = key.to_s %>
   <h4><b><%= roundtitle.titlecase %></b></h4>

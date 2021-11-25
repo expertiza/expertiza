@@ -222,14 +222,15 @@ class ReviewResponseMap < ResponseMap
         prepare_final_feedback_versions(response, team, round, feedback_final_versions, feedback_response_ids)
       end
     end
+    feedback_final_versions
   end
 
   def self.prepare_final_feedback_versions(response, team, round, feedback_final_versions, feedback_response_ids)
+    symbol = ("review round" + " " + round.to_s).to_sym
     author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response.first.id, 'FeedbackResponseMap')
     author_feedback_response_maps.each do |author_feedback_response_map|
       corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)
       next if corresponding_response.empty?
-      symbol = ("review round" + " " + round.to_s).to_sym
       feedback_final_versions[symbol] = {}
       unless corresponding_response.empty?
         if feedback_final_versions[symbol][:questionnaire_id].nil?
@@ -239,8 +240,8 @@ class ReviewResponseMap < ResponseMap
       end
     end
     unless team.nil?
-      feedback_final_versions[team.name] = {}
-      feedback_final_versions[team.name][:feedback_response_ids] = feedback_response_ids
+      feedback_final_versions[symbol][team.name] = {}
+      feedback_final_versions[symbol][team.name][:feedback_response_ids] = feedback_response_ids
     end
   end
 

@@ -212,7 +212,7 @@ class ReviewResponseMap < ResponseMap
 
   def self.final_feedbacks_for_reviewer(assignment_id, reviewer_id, review_rounds)
     feedback_final_versions = {}
-    @response_maps = ResponseMap.where('reviewed_object_id = ? && type = ? && reviewer_id', assignment_id, 'ReviewResponseMap', reviewer_id)
+    @response_maps = ResponseMap.where('reviewed_object_id = ? && type = ? && reviewer_id = ?', assignment_id, 'ReviewResponseMap', reviewer_id)
     (1..review_rounds).each do |round|
       @response_maps.each do |response_map|
         feedback_response_ids = []

@@ -75,11 +75,24 @@ class GradesController < ApplicationController
 
   # method for alternative view
   def view_team
+    puts params[:id]
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
+    puts @participant
+    puts @participant.team
+    puts "@part.assignment"
+    puts @participant.assignment.inspect
     @team = @participant.team
     @team_id = @team.id
     questionnaires = @assignment.questionnaires
+    puts "assignment"
+    puts @assignment.inspect
+    puts "assignment.questinnaires"
+    puts @assignment.questionnaires.inspect
+    puts "questionnaires"
+    puts questionnaires.inspect
+    puts "questionnaires.first"
+    puts questionnaires.first.inspect
     @questions = retrieve_questions questionnaires, @assignment.id
     @pscore = ResponseMap.participant_scores(@participant, @questions)
     @vmlist = []

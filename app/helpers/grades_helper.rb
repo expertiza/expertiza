@@ -168,6 +168,13 @@ module GradesHelper
     questions = {}
     questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.where(assignment_id: assignment_id, questionnaire_id: questionnaire.id).first.used_in_round
+      # dx = AssignmentQuestionnaire.where(assignment_id: assignment_id, questionnaire_id: questionnaire.id)
+      # d1 = dx.first
+      # puts "-----"
+      # puts questionnaire.type
+      # puts questionnaire.id
+      # puts dx.inspect
+      # puts d1.inspect
       questionnaire_symbol = unless round.nil?
                                (questionnaire.symbol.to_s + round.to_s).to_sym
                              else

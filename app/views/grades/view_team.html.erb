@@ -342,3 +342,15 @@
       <%= submit_tag 'Save' ,class: "btn btn-default" %>
     <% end %>
   <% end %>
+
+<h1>@assignment</h1>
+<%= @assignment.inspect %>
+
+<h1>@assignment.questionnaires</h1>
+<% @assignment.questionnaires.each do |q| %>
+  <%= q.inspect %>
+<% end %>
+<h1>Vmlist</h1>
+<% @vmlist.each do |v| %>
+  <%= v.questionnaire_type.inspect %>
+<% end %>

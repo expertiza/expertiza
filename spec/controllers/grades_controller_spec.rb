@@ -15,7 +15,7 @@ describe GradesController do
   let(:ta) { build(:teaching_assistant, id: 8) }
 
   before(:each) do
-    allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
+    # allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
     allow(participant).to receive(:team).and_return(team)
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -94,27 +94,70 @@ describe GradesController do
   describe '#view_team' do
     render_views
 
+    # the names of the factories created for testing view_team
+    # have `_vt` suffix ```where necessary``` to differentiate them from 
+    # the above declared factories
+
+    let(:student1_vt) { create(:student, name: "barry", id: 12) }
+    let(:student2_vt) { create(:student, name: "iris", id: 13) }
+
+    let(:tm_questionnaire) {
+      build(
+        :teammate_review_questionnaire,
+        id: 12,
+        questions: [question],
+        max_question_score: 5
+      )
+    }
+    let(:assignment_vt) {
+      create(:assignment, id: 6, max_team_size: 2,
+      questionnaires: [tm_questionnaire])
+    }
+    let(:assignment_questionnaire_vt) {
+      create(:assignment_questionnaire, id: 12, used_in_round: nil,
+      assignment: assignment_vt) }
+    let(:team_vt) { create(:assignment_team, id: 12,
+    assignment: assignment_vt, users: [student1_vt, student2_vt]) }
+    let(:participant_vt) { create(:participant, id: 12,
+      assignment: assignment_vt, user_id: student1_vt.id) }
+    let(:participant2_vt) { create(:participant, id: 13,
+      assignment: assignment_vt, user_id: student2_vt.id) }
+
+
     before(:each) do
-      allow(participant).to receive(:team).and_return(team)
-      allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
-      allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])
-      allow(assignment).to receive(:late_policy_id).and_return(false)
-      allow(assignment).to receive(:calculate_penalty).and_return(false)
-      allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
+      allow(participant_vt).to receive(:team).and_return(team_vt)
+      allow(AssignmentQuestionnaire)
+        .to receive(:find_by)
+        .with(assignment_id: assignment_vt.id, questionnaire_id: tm_questionnaire.id)
+        .and_return(assignment_questionnaire_vt)
+      allow(AssignmentQuestionnaire)
+        .to receive(:where)
+        .with(any_args)
+        .and_return([assignment_questionnaire_vt])
+      allow(assignment_vt)
+        .to receive(:late_policy_id)
+        .and_return(false)
+      allow(assignment_vt)
+        .to receive(:calculate_penalty)
+        .and_return(false)
+      allow(assignment_vt)
+        .to receive(:compute_total_score)
+        .with(any_args)
+        .and_return(100)
       allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([review_response])
       allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
     end
 
     it 'renders grades#view_team page' do
-      params = {id: 1}
+      params = {id: participant_vt.id}
       get :view_team, params
       expect(response).to render_template(:view_team)
     end
 
     context 'when view_team page is opened by student' do
       it 'dropdown is not rendered' do
-        session = { user: student }
-        params = {id: 1}
+        session = { user: student1_vt }
+        params = {id: participant_vt.id}
         get :view_team, params
         expect(response.body).to_not have_selector('select')
       end
@@ -125,6 +168,7 @@ describe GradesController do
         session = { user: instructor }
         params = {id: 1}
         get :view_team, params
+        puts response.body
         expect(response.body).to have_selector('select')
       end
     end

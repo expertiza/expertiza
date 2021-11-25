@@ -25,7 +25,7 @@ describe TagPromptDeployment do
   #
 #get_number_of_taggable_answers calculates total taggable answers assigned to an user who participated in "tag review assignment".
 	describe '#get_number_of_taggable_answers' do
-    before(:each) do
+		before(:each) do
 			questions_ids = double(1)
 			responses_ids = double(241)
 			allow(Team).to receive(:joins).with(:teams_users).and_return(team)
@@ -40,24 +40,24 @@ describe TagPromptDeployment do
 			allow(Answer).to receive(:where).with({question_id: questions_ids, response_id: responses_ids}).and_return(answers)
 			# allow(answers).to receive(:where).with(conditions: "length(comments) < #{tag_dep1.answer_length_threshold}").and_return(answers_one)
 			# allow(answers_one).to receive(:count)
-    end
-    context "when answer_length_threshold not null" do
-			it 'count of answers', :unless => false do
+		end
+		context "when answer_length_threshold null" do
+			it 'count of answers' do
 				questions_ids = double(1)
 				responses_ids = double(241)
 				allow(Answer).to receive(:where).with({question_id: questions_ids, response_id: responses_ids}).and_return(answers)
 				allow(answers).to receive(:count)
-
 				expect((tag_dep1.get_number_of_taggable_answers(1))).to eq(answers.count)
 			end
-    end
-		context "when answer_length_threshold null" do
-			it 'count of answers', :unless => true do
+		end
+		context "when answer_length_threshold NOT null" do
+			it 'count of answers' do
+				questions_ids = double(1)
+				responses_ids = double(241)
 				tag_dep1.answer_length_threshold = 15
-        allow(Answer).to receive(:where).with({question_id: questions_ids, response_id: responses_ids}).and_return(answers)
+				allow(Answer).to receive(:where).with({question_id: questions_ids, response_id: responses_ids}).and_return(answers)
 				allow(answers).to receive(:where).with(conditions: "length(comments) < #{tag_dep1.answer_length_threshold}").and_return(answers_one)
 				allow(answers_one).to receive(:count)
-
 				expect((tag_dep1.get_number_of_taggable_answers(1))).to eq(answers_one.count)
 			end
 		end

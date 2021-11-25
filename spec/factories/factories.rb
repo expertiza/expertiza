@@ -94,7 +94,7 @@ FactoryBot.define do
     is_new_user false
     master_permission_granted 0
     handle 'handle'
-    digital_certificate nild
+    digital_certificate nil
     timezonepref 'Eastern Time (US & Canada)'
     public_key nil
     copy_of_emails false
@@ -210,6 +210,12 @@ FactoryBot.define do
     penalty_per_unit 1
     penalty_unit 1
     assignments {[ Assignment.first || association(:assignment) ]}
+  end
+
+  factory :calculated_penalty, class: CalculatedPenalty do
+    participant_id 1
+
+
   end
 
   factory :assignment_team, class: AssignmentTeam do

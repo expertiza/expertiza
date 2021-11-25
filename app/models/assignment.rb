@@ -607,10 +607,4 @@ class Assignment < ActiveRecord::Base
     end
     reviewers = reviewers.sort_by {|a| a[1]}
   end
-
-  def feedback_questionnaire_id(feedback_response)
-    feedback_answer = Answer.where(response_id: feedback_response.first.id)
-    question = Question.find(feedback_answer.first.question_id)
-    question.questionnaire_id
-  end
 end

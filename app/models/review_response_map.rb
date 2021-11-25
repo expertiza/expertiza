@@ -213,7 +213,7 @@ class ReviewResponseMap < ResponseMap
   def self.final_feedbacks_for_reviewer(assignment_id, reviewer_id, review_rounds)
     feedback_final_versions = {}
     @response_maps = ResponseMap.where('reviewed_object_id = ? && type = ? && reviewer_id = ?', assignment_id, 'ReviewResponseMap', reviewer_id)
-    (1..review_rounds).each do |round|
+    (1..review_rounds.to_i).each do |round|
       @response_maps.each do |response_map|
         feedback_response_ids = []
         response = Response.where('map_id = ?', response_map.id)
@@ -229,11 +229,11 @@ class ReviewResponseMap < ResponseMap
     author_feedback_response_maps.each do |author_feedback_response_map|
       corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)
       next if corresponding_response.empty?
-      symbol = get_symbol(round)
+      symbol = ("review round" + " " + round.to_s).to_sym
       feedback_final_versions[symbol] = {}
       unless corresponding_response.empty?
-        if feedback_final_versions[symbol][:questionnaire_id].empty?
-          feedback_final_versions[symbol][:questionnaire_id] = Assignment.feedback_questionnaire_id(corresponding_response)
+        if feedback_final_versions[symbol][:questionnaire_id].nil?
+          feedback_final_versions[symbol][:questionnaire_id] = feedback_questionnaire_id(corresponding_response)
         end
         feedback_response_ids << corresponding_response.first.id
       end
@@ -244,11 +244,10 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  def get_symbol(round)
-    if round.nil? :review
-    else
-      ("review round" + " " + round.to_s).to_sym
-    end
+  def self.feedback_questionnaire_id(feedback_response)
+    feedback_answer = Answer.where(response_id: feedback_response.first.id)
+    question = Question.find(feedback_answer.first.question_id)
+    question.questionnaire_id
   end
 
 end

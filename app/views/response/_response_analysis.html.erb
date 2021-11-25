@@ -104,81 +104,53 @@
             xhr.send(final_json);
         });
     }
+
     //fetches the review form comments one by one - formats them into a single stringified json
     function fetch_response_comments()
     {
+
+        function create_comment_object(comment_id, question, class_name){
+            let comment_json = {};
+            comment_json["id"] = comment_id+1;
+            let comment_string = (document.getElementById(class_name).value);
+            comment_string =  $("<p>").html(comment_string).text();
+            comment_string = comment_string.replace("\n"," ");
+            comment_json["text"] = comment_string.replace("\r","");
+            comment_json["question"] = question;
+            return comment_json;
+        }
+
         var serialized_form = $("form").serialize();      
         var form_value_to_json = [Object.fromEntries(new URLSearchParams(serialized_form))];
 
-        //for loop counts the number of comments in review form
-        let review_count = 0,j;
+        //The while loop counts the number of comments in review form and breaks when 
+        //all the comments are found
+        let review_count = 0;
         let review_mappings = {};
         while(true) {
             let comment_element = document.getElementById("responses_"+ review_count +"_comments");
             if(comment_element == null) {
                 break;
             }
-            // let question_class = 'responses_'+review_count;
-            // console.log(question_class);
-            // console.log($("label[for=responses_0]"));
-            // let question = $("label[for="+question_class+"]").text();
-            // console.log("The question is:", question);
-            // console.log("The comment is:", $("#responses_"+ review_count +"_comments").text());
             review_count++;
         }
-        // for(j =0; j <1000; j++)
-        // {
-        //     if (document.getElementById("responses_"+j+"_comments") == null)
-        //     {break;}
-        // }
 
         //for loop parses comments from review form and pushes all of them into 'reviews' list
-        var id = 0;
         var reviews = [];
-        for (var i =1; i < review_count; i++) {              
+        for (var i =0; i < review_count; i++) {              
             if (document.getElementById("responses_"+i+"_comments") == null)
                  continue;
             else
             {
-                var single_comment_json = {};
                 let question_class = 'responses_'+i;
                 let question = $("label[for="+question_class+"]").text();
-                single_comment_json["id"] = id;
-                var comment_string = (document.getElementById("responses_"+i+"_comments").value);
-                comment_string =  $("<p>").html(comment_string).text();
-                comment_string = comment_string.replace("\n"," ");
-                single_comment_json["text"] = comment_string.replace("\r","");
-                single_comment_json["question"] = question;
-                 console.log(single_comment_json);
-                id++;
-                reviews.push(single_comment_json);
+                let class_name = "responses_"+i+"_comments"
+                reviews.push(create_comment_object(i, question, class_name))
              }
         }
 
-        //fetches the last comment(just above 'additional comments') in review form
-        var single_comment_json = {};
-        single_comment_json["id"] = id;
-        let question_class = 'responses_'+0;
-        let question = $("label[for="+question_class+"]").text();
-        var comment_string =  (document.getElementById("responses_"+0+"_comments").value);
-        comment_string =  $("<p>").html(comment_string).text();
-        comment_string = comment_string.replace("\n"," ");
-        single_comment_json["text"] = comment_string.replace("\r","");
-        single_comment_json["question"] = question; 
-        console.log(single_comment_json);                   
-        id++;
-        reviews.push(single_comment_json);
-
         //fetches the 'additional comment' text present at the end of review form
-        single_comment_json = {};
-        single_comment_json["id"] = id;
-        comment_string = form_value_to_json[0]['review[comments]'];
-        comment_string =  $("<p>").html(comment_string).text();
-        comment_string = comment_string.replace("\n"," ");
-        single_comment_json["text"] = comment_string.replace("\r","");
-        single_comment_json["question"] = "additional comments"                    
-        id++;
-        reviews.push(single_comment_json);
+        reviews.push(create_comment_object(review_count, "additional comments", 'review_comments'))
 
         var number_of_comments = reviews.length; 
 

@@ -115,7 +115,7 @@ describe GradesController do
     }
     let(:assignment_questionnaire_vt) {
       create(:assignment_questionnaire, id: 12, used_in_round: nil,
-      assignment: assignment_vt) }
+      assignment: assignment_vt, questionnaire: tm_questionnaire) }
     let(:team_vt) { create(:assignment_team, id: 12,
     assignment: assignment_vt, users: [student1_vt, student2_vt]) }
     let(:participant_vt) { create(:participant, id: 12,
@@ -129,6 +129,10 @@ describe GradesController do
       allow(AssignmentQuestionnaire)
         .to receive(:find_by)
         .with(assignment_id: assignment_vt.id, questionnaire_id: tm_questionnaire.id)
+        .and_return(assignment_questionnaire_vt)
+      allow(AssignmentQuestionnaire)
+        .to receive(:find_by)
+        .with(assignment_id: assignment.id, questionnaire_id: review_questionnaire.id)
         .and_return(assignment_questionnaire_vt)
       allow(AssignmentQuestionnaire)
         .to receive(:where)
@@ -175,6 +179,7 @@ describe GradesController do
 
     context 'when view_team page is viewed by a student who is also a TA for another course' do
       it 'renders grades#view_team page' do
+        allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
         # allow(participant).to receive(:team).and_return(team)
         # allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
         # allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])

@@ -92,6 +92,7 @@ class PopupController < ApplicationController
   end
 
   def view_feedback_scores_popup
+    @ip = session[:ip]
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
     @review_rounds = params[:rounds_of_reviews]

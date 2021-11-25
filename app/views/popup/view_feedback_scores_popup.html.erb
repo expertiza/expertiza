@@ -3,4 +3,6 @@
 <% keys.each do |key| %>
   <% roundtitle = key.to_s %>
   <h4><b><%= roundtitle.titlecase %></b></h4>
+  <h4><b>questionnaire_id = <%= @feedback_final_versions[key][:questionnaire_id] %></b></h4>
+  <%= @feedback_final_versions[key] %>
 <% end #loop for keys %>

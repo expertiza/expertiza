@@ -231,7 +231,7 @@ class ReviewResponseMap < ResponseMap
     author_feedback_response_maps.each do |author_feedback_response_map|
       corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)
       next if corresponding_response.empty?
-      feedback_final_versions[symbol] = {}
+      feedback_final_versions[symbol] = {} if feedback_final_versions[symbol].nil?
       unless corresponding_response.empty?
         if feedback_final_versions[symbol][:questionnaire_id].nil?
           feedback_final_versions[symbol][:questionnaire_id] = feedback_questionnaire_id(corresponding_response)

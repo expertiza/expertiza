@@ -8,11 +8,13 @@ module ReviewScoreCalc
     @response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', self.id, 'ReviewResponseMap')
     rounds = self.num_review_rounds
     (1..rounds).each do |round|
+      # Loop over every review that this user completed
       @response_maps.each do |response_map|
         response = Response.where('map_id = ?', response_map.id)
         response = response.select {|response| response.round == round }
         @round = round
         @response_map = response_map
+        # Calculate the average score given by the team to the review and add it to author_feedback_scores
         calc_avg_feedback_score(response) unless response.empty?
       end
     end
@@ -46,6 +48,7 @@ module ReviewScoreCalc
     if !@author_feedback_scores[@response_map.reviewer_id].nil? && !@author_feedback_scores[@response_map.reviewer_id][@response_map.id].nil?
       @respective_scores = @author_feedback_scores[@response_map.reviewer_id][@response_map.id]
     end
+    # Get the questionnaire id from the answer corresponding to the response
     corresponding_answers = Answer.where('response_id = ?', @corresponding_response.first.id)
     corresponding_questions = Question.where('id = ?', corresponding_answers.first.id)
     author_feedback_questionnaire = Questionnaire.where('id = ?', corresponding_questions.first.questionnaire_id)

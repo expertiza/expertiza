@@ -170,7 +170,7 @@ describe GradesController do
     context 'when view_team page is opened by instructor' do
       it 'dropdown is rendered' do
         session = { user: instructor }
-        params = {id: 1}
+        params = {id: participant_vt.id}
         get :view_team, params
         puts response.body
         expect(response.body).to have_selector('select')

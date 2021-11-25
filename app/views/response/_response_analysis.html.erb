@@ -109,13 +109,15 @@
     function fetch_response_comments()
     {
 
-        function create_comment_object(comment_id, question, class_name){
+        function create_comment_object(comment_id, question, class_name) {
             let comment_json = {};
             comment_json["id"] = comment_id+1;
-            let comment_string = (document.getElementById(class_name).value);
-            comment_string =  $("<p>").html(comment_string).text();
-            comment_string = comment_string.replace("\n"," ");
-            comment_json["text"] = comment_string.replace("\r","");
+            let iframe_id = comment_id >= 0 ? '#responses_'+comment_id+'_comments_ifr' : '#review_comments_ifr';
+            let comment_string = $(iframe_id).contents().find('body[data-id='+ class_name +']').children().first().text();
+            if(comment_string.length == 0) {
+                return {};
+            }
+            comment_json["text"] = comment_string;
             comment_json["question"] = question;
             return comment_json;
         }
@@ -144,14 +146,19 @@
             {
                 let question_class = 'responses_'+i;
                 let question = $("label[for="+question_class+"]").text();
-                let class_name = "responses_"+i+"_comments"
-                reviews.push(create_comment_object(i, question, class_name))
-             }
+                let class_name = "responses_"+i+"_comments";
+                let comment_object = create_comment_object(i, question, class_name);
+                if(Object.keys(comment_object).length > 0) {
+                    reviews.push(comment_object);
+                }
+            }
         }
 
         //fetches the 'additional comment' text present at the end of review form
-        reviews.push(create_comment_object(review_count, "additional comments", 'review_comments'))
-
+        let comment_object = create_comment_object(-1, "additional comments", 'review_comments');
+        if(Object.keys(comment_object).length > 0) {
+            reviews.push(comment_object);
+        }
         var number_of_comments = reviews.length; 
 
         //converts the reviews list into a json object, which is later converted into stringified json.
@@ -261,7 +268,6 @@
         //start the timer here - which will be used to calculate total time taken.
         var time_start = performance.now();        
         var processed_comment_json_string = fetch_response_comments();
-        console.log(JSON.parse(processed_comment_json_string[0]));
         var number_of_comments = processed_comment_json_string[1];
         processed_comment_json_string = processed_comment_json_string[0];
 

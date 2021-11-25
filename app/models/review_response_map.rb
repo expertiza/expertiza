@@ -228,7 +228,7 @@ class ReviewResponseMap < ResponseMap
 
   def self.prepare_final_feedback_versions(response, team, round, feedback_final_versions, feedback_response_ids)
     symbol = ("review round" + " " + round.to_s).to_sym
-    unless response.nil?
+    unless response.empty?
       author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response.first.id, 'FeedbackResponseMap')
       author_feedback_response_maps.each do |author_feedback_response_map|
         corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)

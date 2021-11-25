@@ -3,15 +3,11 @@ describe TagPromptDeployment do
 	let(:tag_dep1) { TagPromptDeployment.new id: 1, tag_prompt: tp, tag_prompt_id: 1, question_type: "Criterion", answer_length_threshold: nil, assignment_id: 1, assignment: assignment , questionnaire: questionaire}
 	let(:tp) { TagPrompt.new(prompt: "test prompt", desc: "test desc", control_type: "Checkbox") }
 	let(:team) {Team.new(id: 1)}
-  let(:assignment) {Assignment.new(id: 1)}
-  let(:questionaire) {Questionnaire.new(id: 1,name: 'question1') }
+	let(:assignment) {Assignment.new(id: 1)}
+	let(:questionaire) {Questionnaire.new(id: 1,name: 'question1') }
 	let(:rp) {Response.new(map_id: 1, round: 1, additional_comment: "improvement scope") }
 	let(:responses) {Response.new(map_id: 1, round: 1, additional_comment: "improvement scope") }
-	# let(:asgn) {Assignment.new({id: 1})}
 	let(:question) {Question.new(questionnaire_id: 1, type: 'tagging')}
-	# let(:answers) {Answer.new(id:1, question_id:1, answer: 3, comments: 'comment', response_id: 241)}
-	# let(:answer1) {Answer.new(id:1, question_id:1, answer: 3, comments: 'comment', response_id: 241)}
-	# let(:answer2) {Answer.new(id:1, question_id:1, answer: 3, comments: 'comment is lengthy ', response_id: 241)}
 	let(:answers) {Answer.new(id:[1,2,3], question_id:[1,1,1], answer: [3,3,3], comments: ['comment', 'comment is lengthy', 'comment is too lengthy'], response_id: [241, 241, 241])}
 	let(:answers_one) {Answer.new(id:[1], question_id:[1], answer: [3], comments: ['comment'], response_id: [241])}
 
@@ -36,8 +32,6 @@ describe TagPromptDeployment do
 			allow(question).to receive(:empty?).and_return(false)
 			allow(question).to receive(:map).with(any_args).and_return(questions_ids)
 			allow(Answer).to receive(:where).with({question_id: questions_ids, response_id: responses_ids}).and_return(answers)
-			# allow(answers).to receive(:where).with(conditions: "length(comments) < #{tag_dep1.answer_length_threshold}").and_return(answers_one)
-			# allow(answers_one).to receive(:count)
 		end
 		context "when answer_length_threshold null" do
 			it 'count of taggable answers' do
@@ -59,17 +53,17 @@ describe TagPromptDeployment do
 				expect((tag_dep1.get_number_of_taggable_answers(1))).to eq(answers_one.count)
 			end
     end
-    context "when responses empty" do
-      it "count of taggable answers zero" do
+		context "when responses empty" do
+			it "count of taggable answers zero" do
 				allow(rp).to receive(:empty?).and_return(true)
 				expect((tag_dep1.get_number_of_taggable_answers(1))).to eq(0)
-      end
-    end
-    context "when questions empty" do
-      it "count of taggable answers zero" do
+			end
+		end
+		context "when questions empty" do
+			it "count of taggable answers zero" do
 				allow(question).to receive(:empty?).and_return(true)
 				expect((tag_dep1.get_number_of_taggable_answers(1))).to eq(0)
-      end
-    end
+			end
+		end
   end
 end

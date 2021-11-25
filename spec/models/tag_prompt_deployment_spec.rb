@@ -6,7 +6,7 @@ describe TagPromptDeployment do
 	let(:assignment) {Assignment.new(id: 1)}
 	let(:questionaire) {Questionnaire.new(id: 1,name: 'question1') }
 	let(:rp) {Response.new(map_id: 1, round: 1, additional_comment: "improvement scope") }
-	let(:responses) {Response.new(map_id: 1, round: 1, additional_comment: "improvement scope") }
+	let(:responses) {Response.new(map_id:[1,2], round: [1, 1], additional_comment: ["improvement scope",'through comments']) }
 	let(:question) {Question.new(questionnaire_id: 1, type: 'tagging')}
 	let(:answers) {Answer.new(id:[1,2,3], question_id:[1,1,1], answer: [3,3,3], comments: ['comment', 'comment is lengthy', 'comment is too lengthy'], response_id: [241, 241, 241])}
 	let(:answers_one) {Answer.new(id:[1], question_id:[1], answer: [3], comments: ['comment'], response_id: [241])}
@@ -25,10 +25,10 @@ describe TagPromptDeployment do
 			allow(Team).to receive(:joins).with(:teams_users).and_return(team)
 			allow(team).to receive(:where).with(team_users: {parent_id: tag_dep1.assignment_id}, user_id: 1).and_return(team)
 			allow(Response).to receive(:joins).with(:response_maps).and_return(responses)
-			allow(responses).to receive(:where).with(response_maps: {reviewed_object_id: 1, reviewee_id: team.id}).and_return(rp)
+			allow(responses).to receive(:where).with(response_maps: {reviewed_object_id: tag_dep1.assignment.id, reviewee_id: team.id}).and_return(rp)
 			allow(rp).to receive(:empty?).and_return(false)
 			allow(rp).to receive(:map).with(any_args).and_return(responses_ids)
-			allow(Question).to receive(:where).with({questionnaire_id: 1, type: 'Criterion'}).and_return(question)
+			allow(Question).to receive(:where).with({questionnaire_id: tag_dep1.questionnaire.id, type: tag_dep1.question_type}).and_return(question)
 			allow(question).to receive(:empty?).and_return(false)
 			allow(question).to receive(:map).with(any_args).and_return(questions_ids)
 			allow(Answer).to receive(:where).with({question_id: questions_ids, response_id: responses_ids}).and_return(answers)

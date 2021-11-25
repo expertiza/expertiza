@@ -95,8 +95,7 @@ class PopupController < ApplicationController
     @ip = session[:ip]
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
-    @review_rounds = params[:rounds_of_reviews]
-    @feedback_final_versions = ReviewResponseMap.final_feedbacks_for_reviewer(@assignment_id, @reviewer_id, @review_rounds)
+    @feedback_final_versions = ReviewResponseMap.final_feedbacks_for_reviewer(@assignment_id, @reviewer_id)
   end
 
   # this can be called from "response_report" by clicking reviewer names from instructor end.

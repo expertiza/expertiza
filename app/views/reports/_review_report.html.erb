@@ -78,7 +78,7 @@
                 <%= ', ' unless round == @assignment.num_review_rounds %>
               <% end %>
               <%= link_to "summary", {:controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => reviewer.id, :assignment_id=>@id}, target: :_blank %>
-              <%= link_to "authors summary", {:controller => 'popup', :action => 'view_feedback_scores_popup', :reviewer_id => reviewer.id, :assignment_id => @id, :rounds_of_reviews => @assignment.num_review_rounds}, target: :_blank %>
+              <%= link_to "authors summary", {:controller => 'popup', :action => 'view_feedback_scores_popup', :reviewer_id => reviewer.id, :assignment_id => @id}, target: :_blank %>
             </td>
           <!--Team reviewed / Author feedback-->
           <td align = 'left'>

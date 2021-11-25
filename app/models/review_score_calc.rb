@@ -53,7 +53,7 @@ module ReviewScoreCalc
     corresponding_question = Question.find(corresponding_answers.first.question_id)
     @questions = Question.where('questionnaire_id = ?', corresponding_question.questionnaire_id)
     # Calculate the score of the author feedback review.
-    @this_review_score = calc_review_score(@corresponding_response, @questions)
+    calc_feedback_review_score
     # Compute the sum of the author feedback scores for this review.
     @respective_scores[@response_map.reviewee_id] = 0 if @respective_scores[@response_map.reviewee_id].nil?
     @respective_scores[@response_map.reviewee_id] += @this_review_score
@@ -62,4 +62,16 @@ module ReviewScoreCalc
     @author_feedback_scores[@response_map.reviewer_id][@response_map.id] = {} if @author_feedback_scores[@response_map.reviewer_id][@response_map.id].nil?
     @author_feedback_scores[@response_map.reviewer_id][@response_map.id] = @respective_scores
   end
+
+  def calc_feedback_review_score
+    if !@corresponding_response.empty?
+      @this_review_score_raw = Answer.get_total_score(response: @corresponding_response, questions: @questions)
+      if @this_review_score_raw
+        @this_review_score = ((@this_review_score_raw * 100) / 100.0).round if @this_review_score_raw >= 0.0
+      end
+    else
+      @this_review_score = -1.0
+    end
+  end
+
 end

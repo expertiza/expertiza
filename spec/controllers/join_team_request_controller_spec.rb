@@ -33,11 +33,6 @@ describe JoinTeamRequestsController do
         expect(get: "join_team_requests/").to route_to("join_team_requests#index")
       end
 
-      # it "renders the new page" do
-      #   get :index, :format => "html"
-      #   expect(response).to render_template(:index)
-      # end
-
     end
   end
 
@@ -58,6 +53,21 @@ describe JoinTeamRequestsController do
         get :show,params
         expect(get: "join_team_requests/1").to route_to("join_team_requests#show",id:"1")
       end
+    end
+  end
+
+  describe "GET #new" do
+    context "when new is called" do
+      it "routes to new page" do
+        get :new
+        expect(get: "join_team_requests/new").to route_to("join_team_requests#new")
+      end
+
+      # it "will render a new page" do
+      #   get :new
+      #   expect(response).to render_template(:new)
+      # end
+
     end
   end
 end

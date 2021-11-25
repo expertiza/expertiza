@@ -32,10 +32,10 @@ module ReviewScoreCalc
     # average.
 
     if !@author_feedback_scores[@response_map.reviewer_id].nil? &&
-      !@author_feedback_scores[@response_map.reviewer_id][@round].nil? &&
-      !@author_feedback_scores[@response_map.reviewer_id][@round][@response_map.reviewee_id].nil? &&
+      !@author_feedback_scores[@response_map.reviewer_id][@response_map.id].nil? &&
+      !@author_feedback_scores[@response_map.reviewer_id][@response_map.id][@response_map.reviewee_id].nil? &&
       !author_feedback_response_maps.empty?
-      @author_feedback_scores[@response_map.reviewer_id][@round][@response_map.reviewee_id] /= author_feedback_response_maps.count
+      @author_feedback_scores[@response_map.reviewer_id][@response_map.id][@response_map.reviewee_id] /= author_feedback_response_maps.count
     end
   end
 
@@ -43,11 +43,13 @@ module ReviewScoreCalc
   # for the response (review) reviewed by one of the authors.
   def calc_feedback_scores_sum
     @respective_scores = {}
-    if !@author_feedback_scores[@response_map.reviewer_id].nil? && !@author_feedback_scores[@response_map.reviewer_id][@round].nil?
-      @respective_scores = @author_feedback_scores[@response_map.reviewer_id][@round]
+    if !@author_feedback_scores[@response_map.reviewer_id].nil? && !@author_feedback_scores[@response_map.reviewer_id][@response_map.id].nil?
+      @respective_scores = @author_feedback_scores[@response_map.reviewer_id][@response_map.id]
     end
-    author_feedback_questionnaire_id = feedback_questionnaire_id(@corresponding_response)
-    @questions = Question.where('questionnaire_id = ?', author_feedback_questionnaire_id)
+    corresponding_answers = Answer.where('response_id = ?', @corresponding_response.first.id)
+    corresponding_questions = Question.where('id = ?', corresponding_answers.first.id)
+    author_feedback_questionnaire = Questionnaire.where('id = ?', corresponding_questions.first.questionnaire_id)
+    @questions = Question.where('questionnaire_id = ?', author_feedback_questionnaire.first.id)
     # Calculate the score of the author feedback review.
     calc_review_score
     # Compute the sum of the author feedback scores for this review.
@@ -55,8 +57,8 @@ module ReviewScoreCalc
     @respective_scores[@response_map.reviewee_id] += @this_review_score
     # The reviewer is the metareviewee whose review the authors or teammates are reviewing.
     @author_feedback_scores[@response_map.reviewer_id] = {} if @author_feedback_scores[@response_map.reviewer_id].nil?
-    @author_feedback_scores[@response_map.reviewer_id][@round] = {} if @author_feedback_scores[@response_map.reviewer_id][@round].nil?
-    @author_feedback_scores[@response_map.reviewer_id][@round] = @respective_scores
+    @author_feedback_scores[@response_map.reviewer_id][@response_map.id] = {} if @author_feedback_scores[@response_map.reviewer_id][@response_map.id].nil?
+    @author_feedback_scores[@response_map.reviewer_id][@response_map.id] = @respective_scores
   end
 
   def calc_review_score

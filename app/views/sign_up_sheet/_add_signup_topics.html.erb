@@ -4,7 +4,7 @@
 <% end %>
 
 <% @sign_up_topics = SignUpTopic.where(['assignment_id = ?', @assignment.id]) %>
-<% @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)  %>
+<% @slots_filled = Waitlist.find_slots_filled(@assignment.id)  %>
 <% @slots_waitlisted = Waitlist.find_slots_waitlisted(@assignment.id) %>
 <% @participants = SignedUpTeam.find_team_participants(@assignment.id, session[:ip])  %>
 

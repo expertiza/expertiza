@@ -114,7 +114,7 @@ describe GradesController do
       questionnaires: [tm_questionnaire])
     }
     let(:assignment_questionnaire_vt) {
-      create(:assignment_questionnaire, id: 12, used_in_round: nil,
+      create(:tm_assignment_questionnaire, id: 12, used_in_round: nil,
       assignment: assignment_vt, questionnaire: tm_questionnaire) }
     let(:team_vt) { create(:assignment_team, id: 12,
     assignment: assignment_vt) }

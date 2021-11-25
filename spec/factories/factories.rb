@@ -418,6 +418,16 @@ FactoryBot.define do
     dropdown 1
   end
 
+
+  factory :tm_assignment_questionnaire, class: AssignmentQuestionnaire do
+    user_id 1
+    questionnaire { association(:teammate_review_questionnaire) }
+    questionnaire_weight 100
+    used_in_round nil
+    topic_id nil
+    dropdown 1
+  end
+
   factory :bookmark_questionnaire, class: BookmarkRatingQuestionnaire do
     name "BookmarkRatingQuestionnaire"
     assignments {[ Assignment.first || association(:assignment) ]}

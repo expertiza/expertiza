@@ -209,4 +209,46 @@ class ReviewResponseMap < ResponseMap
     end
     review_final_versions[symbol][:response_ids] = response_ids
   end
+
+  def self.final_feedbacks_for_reviewer(assignment_id, reviewer_id, review_rounds)
+    feedback_final_versions = {}
+    @response_maps = ResponseMap.where('reviewed_object_id = ? && type = ? && reviewer_id', assignment_id, 'ReviewResponseMap', reviewer_id)
+    (1..review_rounds).each do |round|
+      @response_maps.each do |response_map|
+        feedback_response_ids = []
+        response = Response.where('map_id = ?', response_map.id)
+        response = response.select {|response| response.round == round }
+        team = Team.find(response_map.reviewee_id) unless response_map.reviewee_id.nil?
+        prepare_final_feedback_versions(response, team, round, feedback_final_versions, feedback_response_ids)
+      end
+    end
+  end
+
+  def self.prepare_final_feedback_versions(response, team, round, feedback_final_versions, feedback_response_ids)
+    author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response.first.id, 'FeedbackResponseMap')
+    author_feedback_response_maps.each do |author_feedback_response_map|
+      corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)
+      next if corresponding_response.empty?
+      symbol = get_symbol(round)
+      feedback_final_versions[symbol] = {}
+      unless corresponding_response.empty?
+        if feedback_final_versions[symbol][:questionnaire_id].empty?
+          feedback_final_versions[symbol][:questionnaire_id] = Assignment.feedback_questionnaire_id(corresponding_response)
+        end
+        feedback_response_ids << corresponding_response.first.id
+      end
+    end
+    unless team.nil?
+      feedback_final_versions[team.name] = {}
+      feedback_final_versions[team.name][:feedback_response_ids] = feedback_response_ids
+    end
+  end
+
+  def get_symbol(round)
+    if round.nil? :review
+    else
+      ("review round" + " " + round.to_s).to_sym
+    end
+  end
+
 end

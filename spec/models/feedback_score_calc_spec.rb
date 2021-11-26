@@ -5,7 +5,7 @@ describe FeedbackScoreCalc do
   describe '#compute_author_feedback_scores' do
     let(:response_map) { create(:review_response_map, id: 1, reviewer_id: 1, reviewee_id: 2) }
     let(:response) { create(:response, id: 1)}
-    let(:answer) {create(:answer)}
+    let(:answer) {create(:answer, question_id: 1)}
     let(:question) {create(:question, id: 1, questionnaire_id: 5)}
     before(:each) do
       allow(assignment).to receive(:num_review_rounds).and_return(1)

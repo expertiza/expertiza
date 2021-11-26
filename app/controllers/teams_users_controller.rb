@@ -13,7 +13,9 @@ class TeamsUsersController < ApplicationController
 
   def list
     @team = Team.find(params[:id])
-    @assignment = Assignment.find(@team.assignment_id)
+    puts "Hi inspect:"
+    puts @team.inspect
+    @assignment = Assignment.find(@team.parent_id)
     @teams_users = TeamsUser.page(params[:page]).per_page(10).where(["team_id = ?", params[:id]])
   end
 
@@ -23,6 +25,7 @@ class TeamsUsersController < ApplicationController
 
   def create
     user = User.find_by(name: params[:user][:name].strip)
+    puts user.inspect
     unless user
       urlCreate = url_for controller: 'users', action: 'new'
       flash[:error] = "\"#{params[:user][:name].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."

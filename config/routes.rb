@@ -146,13 +146,6 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :use_github_metrics, only: [] do
-    collection do
-      get ':assignment_id', action: :exist
-      post ':assignment_id', action: :save
-      delete ':assignment_id', action: :delete
-    end
-  end
 
   resources :import_file, only: [] do
     collection do
@@ -544,5 +537,8 @@ resources :institution, except: [:destroy] do
   post '/response_toggle_permission/:id' => 'response#toggle_permission'
   post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
   post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
+
+  post '/use_github_metrics/:assignment_id', controller: :use_github_metrics, action: :save
+  delete '/use_github_metrics/:assignment_id', controller: :use_github_metrics, action: :delete
 end
 

@@ -132,6 +132,13 @@ function microtaskChanged() {
     </td>
   </tr>
 
+  <!--Github-->
+  <tr>
+    <td style='padding:5px' id='assignment_use_github' colspan="2">
+      <input type="checkbox" name = "use_github" id="use_github" <%= "checked" if UseGithubMetricsController.exist(@assignment_form.assignment.id) %>></input>
+      <%= label_tag('use_github', 'Use github metrics?') %>
+    </td>
+  </tr>
   <!--Conference-->
   <tr>
     <td style='padding:5px' id='assignment_is_conference_assignment_field' colspan="2">
@@ -258,6 +265,28 @@ function microtaskChanged() {
             // Otherwise, hide topics tab
             jQuery("#topics_tab_header").hide();
         }
+
+        $('#use_github').change(function () {
+            if (jQuery('#use_github').is(':checked')) {
+                jQuery.ajax({
+                    url: '/use_github_metrics/' + <%= @assignment.id %>,
+                    method: 'POST',
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    dataType: 'json'
+                })
+            } else{
+                jQuery.ajax({
+                    url: '/use_github_metrics/' + <%= @assignment.id %>,
+                    method: 'DELETE',
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    dataType: 'json'
+                })
+            }
+        })
     });
 
     function topicsChanged() {

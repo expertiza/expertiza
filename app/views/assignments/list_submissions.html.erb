@@ -15,7 +15,8 @@
 
 </script>
 <h4><%=@assignment.name%> </h4><h6><%="  Created on:  " + @assignment.created_at.to_s[0..10]%></h6>
-<%if @assignment.uses_github? %>
+<%#check if use github? %>
+<%if UseGithubMetricsController.exist(@assignment.id) %>
 <% if session["github_access_token"].nil? %>
   <% topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(@teams.first) %>
   <%= link_to 'Login to Query Github data', { controller: 'metrics', action: 'show', id: participants.first.id } %>
@@ -75,9 +76,12 @@
               <%= render :partial => 'responses', :locals => {:team => team ,:topic_id => topic_identifier, :title => 'Review'} %>
             <% end %>
             <br>
-              <% unless Metric.find_by_team_id(team.id).nil? %>
-              <%= link_to 'GitHub metrics', { controller: 'metrics', action: 'show', id: participants.first.id }, target: '_blank' %></td>
-                <% end %>
+              <%#check if use github? %>
+              <%if UseGithubMetricsController.exist(@assignment.id) %>
+                <% unless Metric.find_by_team_id(team.id).nil? %>
+                <%= link_to 'GitHub metrics', { controller: 'metrics', action: 'show', id: participants.first.id }, target: '_blank' %></td>
+                  <% end %>
+              <% end %>
           <% end %>
         <% end %>
 

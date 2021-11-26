@@ -1,11 +1,7 @@
 class UseGithubMetricsController < ApplicationController
-  before_action :set_use_github_metric, only: [:show, :edit, :update, :destroy]
-  helper_method :exist, :save, :delete
 
-  # GET /use_github_metrics
-  def index
-    @use_github_metrics = UseGithubMetric.all
-  end
+  skip_before_action :authorize
+  helper_method :exist
 
   def self.exist(assignment_id)
     @u = UseGithubMetric.find_by(assignment_id: assignment_id)
@@ -27,45 +23,6 @@ class UseGithubMetricsController < ApplicationController
     end
   end
 
-  # GET /use_github_metrics/1
-  def show
-  end
-
-  # GET /use_github_metrics/new
-  def new
-    @use_github_metric = UseGithubMetric.new
-  end
-
-  # GET /use_github_metrics/1/edit
-  def edit
-  end
-
-  # POST /use_github_metrics
-  def create
-    @use_github_metric = UseGithubMetric.new(use_github_metric_params)
-
-    if @use_github_metric.save
-      redirect_to @use_github_metric, notice: 'Use github metric was successfully created.'
-    else
-      render :new
-    end
-  end
-
-  # PATCH/PUT /use_github_metrics/1
-  def update
-    if @use_github_metric.update(use_github_metric_params)
-      redirect_to @use_github_metric, notice: 'Use github metric was successfully updated.'
-    else
-      render :edit
-    end
-  end
-
-  # DELETE /use_github_metrics/1
-  def destroy
-    @use_github_metric.destroy
-    redirect_to use_github_metrics_url, notice: 'Use github metric was successfully destroyed.'
-  end
-
   def exist
     @assignment_id = params[:assignment_id]
     UseGithubMetricsController.exist(@assignment_id)
@@ -73,22 +30,18 @@ class UseGithubMetricsController < ApplicationController
 
   def save
     @assignment_id = params[:assignment_id]
-    UseGithubMetricsController.exist(@assignment_id)
+    UseGithubMetricsController.save(@assignment_id)
+    respond_to do |format|
+      format.json { render json: @assignment_id }
+    end
   end
 
   def delete
     @assignment_id = params[:assignment_id]
     UseGithubMetricsController.delete(@assignment_id)
+    respond_to do |format|
+      format.json { render json: @assignment_id }
+    end
   end
 
-  # private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_use_github_metric
-      @use_github_metric = UseGithubMetric.find(params[:assignment_id])
-    end
-
-    # Only allow a trusted parameter "white list" through.
-    def use_github_metric_params
-      params.require(:use_github_metric).permit(:assignment_id)
-    end
 end

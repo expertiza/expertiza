@@ -1,0 +1,3 @@
+describe FeedbackScoreCalc do
+
+end

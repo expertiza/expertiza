@@ -65,7 +65,7 @@ module FeedbackScoreCalc
 
   def calc_feedback_review_score
     if !@corresponding_response.empty?
-      @this_review_score_raw = Answer.get_total_score(response: @corresponding_response, questions: @questions)
+      @this_review_score_raw = Response.assessment_score(response: @corresponding_response, questions: @questions)
       if @this_review_score_raw
         @this_review_score = ((@this_review_score_raw * 100) / 100.0).round if @this_review_score_raw >= 0.0
       end

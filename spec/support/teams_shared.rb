@@ -3,21 +3,21 @@ RSpec.configure do |rspec|
 end
 
 shared_context 'object initializations' do
-  let(:superadmin) {build_stubbed(:superadmin)}
-  let(:admin) {build_stubbed(:admin)}
-  let(:instructor) {build_stubbed(:instructor)}
-  let(:ta) {build_stubbed(:teaching_assistant)}
-  let(:student1) {build_stubbed(:student, id:1)}
-  let(:student2) {build_stubbed(:student, id:2)}
+  let(:superadmin) { build_stubbed(:superadmin) }
+  let(:admin) { build_stubbed(:admin) }
+  let(:instructor) { build_stubbed(:instructor) }
+  let(:ta) { build_stubbed(:teaching_assistant) }
+  let(:student1) { build_stubbed(:student, id:1) }
+  let(:student2) { build_stubbed(:student, id:2) }
   let(:team1) { build_stubbed(:team, id: 1, type: 'Assignment') }
   let(:team2) { build_stubbed(:team, id: 2, type: 'Assignment') }
   let(:team3) { build_stubbed(:team, id: 3, type: 'Assignment') }
   let(:team4) { build_stubbed(:team, id: 4, type: 'Assignment') }
-  let(:join_team_request1) { build_stubbed(:join_team_request, team_id: team1.id, status: 'P')}
-  let(:join_team_request2) { build_stubbed(:join_team_request, team_id: team2.id, status: 'D')}
+  let(:join_team_request1) { build_stubbed(:join_team_request, id: 1, team_id: team1.id, status: 'P') }
+  let(:join_team_request2) { build_stubbed(:join_team_request, id: 2, team_id: team2.id, status: 'D') }
   let(:invalidrequest) { build_stubbed(:join_team_request) }
-  let(:participant) { build_stubbed(:participant, id:1)}
-
+  let(:participant) { build_stubbed(:participant, id: 1) }
+  let(:assignment1) { build_stubbed(:assignment, id: 1) }
 end
 
 shared_context 'authorization check', :shared_context => :metadata do

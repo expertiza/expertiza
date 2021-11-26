@@ -13,8 +13,6 @@ class TeamsUsersController < ApplicationController
 
   def list
     @team = Team.find(params[:id])
-    puts "inspect result:"
-    puts @team.inspect
     @assignment = Assignment.find(@team.parent_id)
     @teams_users = TeamsUser.page(params[:page]).per_page(10).where(["team_id = ?", params[:id]])
   end
@@ -71,7 +69,6 @@ class TeamsUsersController < ApplicationController
   end
 
   def delete
-    puts "I am into delete"
     @teams_user = TeamsUser.find(params[:id])
     parent_id = Team.find(@teams_user.team_id).parent_id
     @user = User.find(@teams_user.user_id)

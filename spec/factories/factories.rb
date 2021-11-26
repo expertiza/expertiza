@@ -214,8 +214,7 @@ FactoryBot.define do
 
   factory :calculated_penalty, class: CalculatedPenalty do
     participant_id 1
-
-
+    deadline_type_id 1
   end
 
   factory :assignment_team, class: AssignmentTeam do

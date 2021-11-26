@@ -15,8 +15,11 @@ describe FeedbackScoreCalc do
       allow(Question).to receive(:find).with(1).and_return(question)
       allow(Question).to receive(:where).and_return([question])
       allow(Response).to receive(:assessment_score).and_return(80)
-
-      expect(assignment.compute_author_feedback_scores).to eq({1 => {1 => {'2': 80}}})
+    end
+    context 'creates a hash map of author feedback scores for each reviewer and each round' do
+      it 'computes feedback scores for all reviewers' do
+        expect(assignment.compute_author_feedback_scores).to eq({1 => {1 => {'2': 80}}})
+      end
     end
   end
 end

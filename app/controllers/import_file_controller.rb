@@ -33,48 +33,70 @@ class ImportFileController < ApplicationController
     @contents_hash = parse_to_hash(@contents_grid, params[:has_header])
   end
 
-  # def show
-  #   @id = params[:id]
-  #   @model = params[:model]
-  #   @options = params[:options]
-  #   @delimiter = get_delimiter(params)
-  #   @has_header = params[:has_header]
-  #   if @model == 'AssignmentTeam' || @model == 'CourseTeam'
-  #     @has_teamname = params[:has_teamname]
-  #   else
-  #     @has_teamname = "nil"
-  #   end
-  #   if @model == 'ReviewResponseMap'
-  #     @has_reviewee = params[:has_reviewee]
-  #   else
-  #     @has_reviewee = nil
-  #   end
-  #   if @model == 'MetareviewResponseMap'
-  #     @has_reviewee = params[:has_reviewee]
-  #     @has_reviewer = params[:has_reviewer]
-  #   else
-  #     @has_reviewee = "nil"
-  #     @has_reviewer = "nil"
-  #   end
-  #   if @model == 'SignUpTopic'
-  #     @optional_count = 0
-  #     if params[:category] == 'true'
-  #       @optional_count += 1
-  #     end
-  #     if params[:description] == 'true'
-  #       @optional_count += 1
-  #     end
-  #     if params[:link] == 'true'
-  #       @optional_count += 1
-  #     end
-  #   else
-  #     @optional_count = 0
-  #   end
-  #   @current_file = params[:file]
-  #   @current_file_contents = @current_file.read
-  #   @contents_grid = parse_to_grid(@current_file_contents, @delimiter)
-  #   @contents_hash = parse_to_hash(@contents_grid, params[:has_header])
-  # end
+  def show
+    if params[:model] == 'AssignmentParticipant' || params[:model] == 'CourseParticipant'
+      @id = params[:id]
+      @model = params[:model]
+
+      # All required fields are selected by default
+      @selected_fields = @model.constantize.required_import_fields
+
+      # Add the chosen optional fields from start
+      @optional_fields = @model.constantize.optional_import_fields(@id)
+      @optional_fields.each do |field, display|
+        if params[field] == "true"
+          @selected_fields.store(field, display)
+        end
+      end
+
+      @field_count = @selected_fields.length
+
+      @options = params[:options]
+      @delimiter = get_delimiter(params)
+      @has_header = params[:has_header]  
+    else
+      @id = params[:id]
+      @model = params[:model]
+      @options = params[:options]
+      @delimiter = get_delimiter(params)
+      @has_header = params[:has_header]
+      if @model == 'AssignmentTeam' || @model == 'CourseTeam'
+        @has_teamname = params[:has_teamname]
+      else
+        @has_teamname = "nil"
+      end
+      if @model == 'ReviewResponseMap'
+        @has_reviewee = params[:has_reviewee]
+      else
+        @has_reviewee = nil
+      end
+      if @model == 'MetareviewResponseMap'
+        @has_reviewee = params[:has_reviewee]
+        @has_reviewer = params[:has_reviewer]
+      else
+        @has_reviewee = "nil"
+        @has_reviewer = "nil"
+      end
+      if @model == 'SignUpTopic'
+        @optional_count = 0
+        if params[:category] == 'true'
+          @optional_count += 1
+        end
+        if params[:description] == 'true'
+          @optional_count += 1
+        end
+        if params[:link] == 'true'
+          @optional_count += 1
+        end
+      else
+        @optional_count = 0
+      end
+    end
+    @current_file = params[:file]
+    @current_file_contents = @current_file.read
+    @contents_grid = parse_to_grid(@current_file_contents, @delimiter)
+    @contents_hash = parse_to_hash(@contents_grid, params[:has_header])
+  end
 
   def start
     @id = params[:id]

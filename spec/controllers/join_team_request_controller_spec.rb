@@ -11,8 +11,6 @@ describe JoinTeamRequestsController do
   end
 
   describe "GET index" do
-    #let(:join_team_requests) {create_list :id,1}
-    #let(:join_team_request) {JoinTeamRequest.new}
     before do
       get :index
     end
@@ -36,8 +34,8 @@ describe JoinTeamRequestsController do
       allow(JoinTeamRequest).to receive(:find).with("1").and_return(join_team_request3)
     end
 
-    context "when show is called" do
-      it "routes to show page" do
+    context "#show" do
+      it "when it is valid" do
         params = { id: 1}
         get :show,params
         expect(get: "join_team_requests/1").to route_to("join_team_requests#show",id:"1")
@@ -54,12 +52,11 @@ describe JoinTeamRequestsController do
     end
   end
 
-  describe "POST #update" do
+  describe "POST #create" do
     before(:each) do
       allow(Participant).to receive(:find).with("1").and_return(participant)
     end
-    context "when the join_team_request is not saved!" do
-      #let(:invalidrequest) {build_stubbed(:join_team_request)}
+    context "when resource is not saved!" do
       it "renders new page" do
         allow(JoinTeamRequest).to receive(:new).and_return(invalidrequest)
         params = {participant_id: participant.id, team_id: -2}
@@ -68,7 +65,31 @@ describe JoinTeamRequestsController do
         expect(response).to render_template("new")
       end
     end
+    context "when resource is saved" do
+      it "valid response" do
+        allow(JoinTeamRequest).to receive(:new).and_return(join_team_request2)
+        allow(Team).to receive(:find).with("1").and_return(team1)
+        allow(Assignment).to receive(:find).with(1).and_return(assignment1)
+        allow(Participant).to receive(:where).with(user_id: 1,parent_id: '1').and_return([participant])
+        allow(join_team_request2).to receive(:save).and_return(true)
+
+        params = {
+          id: 2,
+          join_team_request2: {
+            status: 'P'
+          },
+          team_id: 1,
+          assignment_id: 1
+        }
+        session = {user: student1}
+        post :create, params, session
+        expect(response.status).to eq 302
+        expect(join_team_request2.status).to eq('P')
+        #expect(join_team_request1[:notice]).to match("JoinTeamRequest was successfully created.")
+      end
+    end
   end
+
   describe "PUT #update" do
     before(:each) do
       join_team_request = JoinTeamRequest.new
@@ -78,24 +99,42 @@ describe JoinTeamRequestsController do
       join_team_request.status="P"
     end
     context "when the join_team_request is not updated" do
-      #let(:invalidrequest) {build_stubbed(:join_team_request)}
-
       it "renders edit page" do
         #allow(JoinTeamRequest).to receive(:update_attribute).with(any_args).and_return(false)
         allow(JoinTeamRequest).to receive(:find).with("1").and_return(join_team_request1)
-        allow(JoinTeamRequest).to receive(:edit).and_return(:invalidrequest)
+        #allow(JoinTeamRequest).to receive(:edit).and_return(:invalidrequest)
         params = {
                   id: 1,
                   join_team_request1: {
                   comments: nil
                   }
         }
-
         session = {user: student1}
         put :edit, params, session
         expect(response).to render_template("edit")
       end
+
     end
+  end
+
+  describe "#decline" do
+    before(:each) do
+      allow(Participant).to receive(:find).with("1").and_return(participant)
+    end
+    it "when request declined" do
+      allow(JoinTeamRequest).to receive(:edit).with("D").and_return(join_team_request2)
+      allow(JoinTeamRequest).to receive(:save).and_return(true)
+      params = {
+        id: 2,
+        join_team_request1: {
+          status: 'D'
+        }
+      }
+      session = {user: student1}
+      post :new, params, session
+      expect(response.status).to eq 200
+    end
+
   end
 
 end

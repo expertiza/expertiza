@@ -72,4 +72,97 @@ describe ReputationWebServiceController do
     end
   end
 
+
+  # TODO added by Dong Li
+  describe 'custom test' do
+    let(:assignment1) { double('Assignment', id: 1) }
+    let(:reviewer1) {double('Participant', id: 1, name: 'reviewer', user: double('User', id: 10))}
+    let(:reviewer2) {double('Participant', id: 2, name: 'reviewer', user: double('User', id: 20))}
+
+    # let(:metareview_response_map1) do
+    #   double('MetareviewResponseMap', id: 1, map_id: 1, assignment: assignment1,
+    #          reviewer: reviewer1, reviewee: double('Participant', id: 2, name: 'reviewee'))
+    # end
+    let(:participant1) { double('AssignmentParticipant', id: 1, can_review: false, user: double('User', id: 1)) }
+    let(:participant2) { double('AssignmentParticipant', id: 2, can_review: true, user: double('User', id: 2)) }
+    let(:user1) { double('User', id: 3) }
+    let(:participant3) { double('AssignmentParticipant', id: 3, can_review: true, user: user) }
+    let(:team1) { double('AssignmentTeam', name: 'no one', id: 1) }
+    let(:team2) { double('AssignmentTeam', name: 'no one1', id: 2) }
+
+    let(:questionnaire1) { double('Questionnaire', name: 'q1', instructor_id: 1, min_question_score: 1, max_question_score: 100) }
+    let(:assignment_questionnaire1) { double('AssignmentQuestionnaire', assignment_id: 1, questionnaire_id: 1, user_id: 1,
+                                             questionnaire_weight: 100, used_in_round: 1) }
+
+    let(:question1) {double('Question', id:1, txt: 'question1', questionnaire_id: 1, seq: 1.00, questionnaire: questionnaire1, type: "Criterion", weight: 1)}
+    let(:question2) {double('Question', id:2, txt: 'question2', questionnaire_id: 1, seq: 2.00, questionnaire: questionnaire1, type: "Criterion", weight: 1)}
+    let(:question3) {double('Question',id:3, txt: 'question3', questionnaire_id: 1, seq: 3.00, questionnaire: questionnaire1, type: "Criterion", weight: 1)}
+    let(:question4) {double('Question',id:4, txt: 'question4', questionnaire_id: 1, seq: 4.00, questionnaire: questionnaire1, type: "Criterion", weight: 1)}
+
+    let(:answer1) {double('Answer',id:1, question_id: 1, answer: 5, comment: "None", response_id: 1, question: question1)}
+    let(:answer2) {double('Answer',id:2, question_id: 2, answer: 5, comment: "None", response_id: 1, question: question2)}
+    let(:answer3) {double('Answer',id:3, question_id: 3, answer: 5, comment: "None", response_id: 1, question: question3)}
+    let(:answer4) {double('Answer',id:4, question_id: 4, answer: 5, comment: "None", response_id: 1, question: question4)}
+
+    let(:answer5) {double('Answer',id:5, question_id: 1, answer: 1, comment: "None", response_id: 2, question: question1)}
+    let(:answer6) {double('Answer',id:6, question_id: 2, answer: 1, comment: "None", response_id: 2, question: question2)}
+    let(:answer7) {double('Answer',id:7, question_id: 3, answer: 1, comment: "None", response_id: 2, question: question3)}
+    let(:answer8) {double('Answer',id:8, question_id: 4, answer: 1, comment: "None", response_id: 2, question: question4)}
+
+
+    let(:response1) {double('Response',id:1, map_id: 1, round: 1)}
+    let(:response2) {double('Response',id:2, map_id: 2, round: 1)}
+
+    # review response map of reviewer 1
+    let(:review_response_map1) do
+      double('ReviewResponseMap', id: 1, map_id: 1, assignment: assignment1,
+             reviewer: reviewer1, reviewer_id: 1, reviewee_id: 2, reviewee: double('Participant', id: 2, name: 'reviewee'),
+             response: [response1])
+    end
+
+    let(:review_response_map2) do
+      double('ReviewResponseMap', id: 2, map_id: 2, assignment: assignment1,
+             reviewer: reviewer2, reviewer_id: 2, reviewee_id: 2, reviewee: double('Participant', id: 2, name: 'reviewee'),
+             response: [response2])
+    end
+
+    before(:each) do
+      allow(Assignment).to receive(:find_by).with(id: '1').and_return(assignment1)
+      instructor = build(:instructor)
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      # allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: 1, calibrate_to: false).and_return(review_response_map1)
+      allow(ReviewResponseMap).to receive(:where).with('reviewed_object_id in (?) and calibrate_to = ?', [1], false).and_return([review_response_map1, review_response_map2])
+
+      allow(AssignmentTeam).to receive(:find).with(2).and_return(team1)
+
+      allow(participant1).to receive(:get_reviewer).and_return(participant1)
+      allow(participant2).to receive(:get_reviewer).and_return(participant2)
+      allow(reviewer1).to receive(:get_reviewer).and_return(reviewer1)
+
+      allow(Answer).to receive(:where).with(response_id: 1).and_return([answer1, answer2, answer3, answer4])
+      allow(Answer).to receive(:where).with(response_id: 2).and_return([answer5, answer6, answer7, answer8])
+
+
+    end
+
+    context 'test db_query' do
+      it 'query Peer-Review grade of two reviewers' do
+        result = ReputationWebServiceController.new.db_query(1, 1, false)
+        expect(result).to eq([[10, 1, 5.0], [20, 1, 1.0]])
+      end
+    end
+
+    # context 'test send post request' do
+    #   it 'test 1' do
+    #     params = {assignment_id: 1, round_num: 1, algorithm: 'hammer', checkbox: {expert_grade: "empty"}}
+    #     session = {user: build(:instructor, id: 1)}
+    #
+    #     get :send_post_request, params, session
+    #     expect(response).to redirect_to '/reputation_web_service/client'
+    #   end
+    # end
+
+
+  end
 end
+

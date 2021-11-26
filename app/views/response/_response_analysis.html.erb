@@ -167,7 +167,7 @@
     //combines output from all API calls into a single list object after processing the api output data    
     // TODO
     //function combine_api_output(number_of_comments, config_file_values, response_sentiment = null, response_problem = null, response_suggestion = null)
-    function combine_api_output(number_of_comments, config_file_values, responseDict =[])
+    function combine_api_output(number_of_comments, config_file_values, responseDict ={})
     {
         var pos; var neg; var neu;
         combined_api_output = [];
@@ -178,41 +178,54 @@
             var single_comment_api_output = {};
             single_comment_api_output["Comment Number"] = i+1;
 
-            //This convert the sentiment api output from sentiment values to positive, negative, neutral string
-            if(config_file_values.includes('sentiment'))
-            {
-                response_sentiment = responseDict['sentiment']
-                pos = response_sentiment['sentiments'][i]['pos'];
-                neg = response_sentiment['sentiments'][i]['neg'];
-                neu = response_sentiment['sentiments'][i]['neu'];
+            for (analysis in responseDict){
+                //This convert the sentiment api output from sentiment values to positive, negative, neutral string
+                if(config_file_values.includes(analysis)){ 
+                    if(analysis == 'sentiment')
+                    {
+                        response_sentiment = responseDict['sentiment']
+                        pos = response_sentiment['sentiments'][i]['pos'];
+                        neg = response_sentiment['sentiments'][i]['neg'];
+                        neu = response_sentiment['sentiments'][i]['neu'];
 
-                if ( pos > neg && pos > neu )
-                    single_comment_api_output["Sentiment"] = 'Positive'; 
-                if ( neu > pos && neu > neg )
-                    single_comment_api_output["Sentiment"] = 'Neutral'; 
-                if ( neg > neu && neg > pos )
-                    single_comment_api_output["Sentiment"] = 'Negative';  
-            } 
-            // TODO 
-            //if(config_file_values.includes('problem'))
-            //    { single_comment_api_output["Problem Detected?"] = response_problem['reviews'][i]['problems'] }
+                        if ( pos > neg && pos > neu )
+                            single_comment_api_output["sentiment"] = 'Positive'; 
+                        if ( neu > pos && neu > neg )
+                            single_comment_api_output["sentiment"] = 'Neutral'; 
+                        if ( neg > neu && neg > pos )
+                            single_comment_api_output["sentiment"] = 'Negative';  
+                    }else {
+                        temp = responseDict[analysis]
+                        single_comment_api_output[analysis] = responseDict[analysis]['reviews'][i][String(analysis) + 's']
+                    } 
+                }
+                // TODO 
+                //if(config_file_values.includes('problem'))
+                //    { single_comment_api_output["Problem Detected?"] = response_problem['reviews'][i]['problems'] }
 
-            //if(config_file_values.includes('suggestion'))
-            //    { single_comment_api_output["Suggestion?"] = response_suggestion['reviews'][i]['suggestions'] }
+                //if(config_file_values.includes('suggestion'))
+                //    { single_comment_api_output["Suggestion?"] = response_suggestion['reviews'][i]['suggestions'] }
 
-            combined_api_output.push(single_comment_api_output);              
+                        
+            }
+            combined_api_output.push(single_comment_api_output);      
         }
         return combined_api_output        
     }    
 
     //This function takes in the processed api output to display a table(populated with API output) on UI
-    function generateTable(combined_api_output)
+    function generateTable(combined_api_output, analysisVals)
     {
         //tooltip_json to store the text displayed in tooltip
         
         // TODO
         //var tooltip_json = {"Comment Number":'The comment number from the top in the form.', "Sentiment": 'This column shows the tone of the comment.', "Problem Detected?": 'This shows whether any problem is mentioned in the comment or not.',"Suggestion?": 'This shows whether any problem is mentioned in the comment or not.'}
-        var tooltip_json = {"Comment Number":'The comment number from the top in the form.', "Sentiment": 'This column shows the tone of the comment.'}
+        var tooltip_json = {"Comment Number":'The comment number from the top in the form.'}
+        
+        for (analysis in analysisVals){
+            tooltip_json[analysis] = analysisVals[analysis]["toolTipText"]             
+        }
+
 
         var col = [];
         for (var i = 0; i < combined_api_output.length; i++) {
@@ -260,6 +273,8 @@
         //this variable fetches and stores the review metrics setting stored in config file review_metrics.yml
         var config_file_values =   $('.fetch_review_metric').data('params');
 
+        var analysisVals = $('.fetch_api_analysis').data('params');
+
         //displays text 'Loading...' when 'get review feedback' button is pressed until table is displayed
         var time_taken_obj = document.getElementById('timeTaken');
         time_taken_obj.innerHTML = "Loading..."
@@ -271,12 +286,13 @@
         processed_comment_json_string = processed_comment_json_string[0];
         
         //gives a dictionary of analysis with their api endpoints
-        var analysisDict = {sentiment: 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk'}
+        
         var responseDict = {}
-        for (var analysisVal in analysisDict){
+        for (var analysisVal in analysisVals){
             if(config_file_values.includes(analysisVal))
             {
-                await makeRequest(processed_comment_json_string, analysisDict[analysisVal])
+                apiCall = analysisVals[analysisVal]['apiCall']
+                await makeRequest(processed_comment_json_string, apiCall)
                 responseDict[analysisVal] = JSON.parse(response_general);
                 response_general = null;
             }
@@ -312,7 +328,7 @@
 
         //var combined_api_output = combine_api_output(number_of_comments, config_file_values, response_sentiment, response_problem, response_suggestion);
         var combined_api_output = combine_api_output(number_of_comments, config_file_values, responseDict);
-        generateTable(combined_api_output);
+        generateTable(combined_api_output, analysisVals);
 
         time_end = performance.now();
         var time_taken = time_end - time_start;

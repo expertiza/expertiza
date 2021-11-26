@@ -13,7 +13,7 @@ class TeamsUsersController < ApplicationController
 
   def list
     @team = Team.find(params[:id])
-    @assignment = Assignment.find(@team.assignment_id)
+    @assignment = Assignment.find(@team.parent_id)
     @teams_users = TeamsUser.page(params[:page]).per_page(10).where(["team_id = ?", params[:id]])
   end
 

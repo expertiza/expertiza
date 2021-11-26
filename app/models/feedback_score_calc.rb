@@ -1,4 +1,4 @@
-module ReviewScoreCalc
+module FeedbackScoreCalc
   # Build a hash for the author feedback scores
   #
   # author_feedback_scores[reviewer.id][round][reviewee.id] returns the average author feedback

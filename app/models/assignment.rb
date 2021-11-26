@@ -8,7 +8,7 @@ class Assignment < ActiveRecord::Base
   require 'analytic/assignment_analytic'
   include AssignmentAnalytic
   include ReviewAssignment
-  include ReviewScoreCalc
+  include FeedbackScoreCalc
   include QuizAssignment
   include AssignmentHelper
   has_paper_trail

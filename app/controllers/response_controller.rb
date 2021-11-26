@@ -63,7 +63,7 @@ class ResponseController < ApplicationController
   # Prepare the parameters when student clicks "Edit"
   def edit
     @review_metric_config = fetch_review_metric
-    @api_analysis_values = API_ANALYSIS_VALUES
+    @review_metric_init_config = REVIEW_METIRIC_INITIALIZE_CONFIG
 
     assign_action_parameters
     @prev = Response.where(map_id: @map.id)
@@ -130,7 +130,7 @@ class ResponseController < ApplicationController
 
   def new
     @review_metric_config = fetch_review_metric
-    @api_analysis_values = API_ANALYSIS_VALUES
+    @review_metric_init_config = REVIEW_METIRIC_INITIALIZE_CONFIG
     
     assign_action_parameters
     set_content(true)

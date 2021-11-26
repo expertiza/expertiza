@@ -186,20 +186,22 @@ describe GradesController do
       end
     end
 
-    xcontext 'when view_team page is viewed by a student who is also a TA for another course' do
+    context 'when view_team page is viewed by a student who is also a TA for another course' do
       it 'renders grades#view_team page' do
-        allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
-        allow(assignment).to receive(:course_id).and_return('1')
-        allow(participant).to receive(:team).and_return(team)
-        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
-        allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])
-        allow(assignment).to receive(:late_policy_id).and_return(false)
-        allow(assignment).to receive(:calculate_penalty).and_return(false)
-        allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
-        allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([review_response])
-        allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
-        params = {id: 1}
-        allow(TaMapping).to receive(:exists?).with(ta_id: 1, course_id: 1).and_return(true)
+        # allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
+        # allow(assignment).to receive(:course_id).and_return('1')
+        # allow(participant).to receive(:team).and_return(team)
+        # allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
+        # allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])
+        # allow(assignment).to receive(:late_policy_id).and_return(false)
+        # allow(assignment).to receive(:calculate_penalty).and_return(false)
+        # allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
+        # allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([review_response])
+        # allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
+        # params = {id: 1}
+        params = { id: participant_vt.id }
+        # allow(TaMapping).to receive(:exists?).with(ta_id: 1, course_id: 1).and_return(true)
+        allow(TaMapping).to receive(:exists?).with(ta_id: participant_vt.user_id, course_id: 1).and_return(true)
         stub_current_user(ta, ta.role.name, ta.role)
         get :view_team, params
         expect(response.body).not_to have_content "TA"

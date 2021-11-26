@@ -608,4 +608,11 @@ FactoryBot.define do
     type 'TextArea'
     size '70,1'
   end
+
+  factory :answer, class: Answer do
+    answer 1
+    comments 'Reviewer comments'
+    question_id 1
+  end
+
 end

@@ -38,7 +38,38 @@ describe TeamsUsersController do
       expect(response).to redirect_to('http://test.host/teams/list?id=1')
     end
 
-    it 'flash error when assignmentParticipant is not defined' do
+    it 'flash error when user added to assignment Team is not defined' do
+      allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
+      allow(Team).to receive(:find).with('1').and_return(team1)
+      allow(AssignmentTeam).to receive(:find).with('1').and_return(team1)
+      allow(Assignment).to receive(:find).with(1).and_return(assignment1)
+      allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(nil)
+      session = {user: admin}
+      params = {
+          user: {name: 'student2065'}, id: 1
+      }
+      post :create, params, session
+      expect(flash[:error]).to eq "\"student2065\" is not a participant of the current assignment. Please <a href=\"http://test.host/participants/list?authorization=participant&id=1&model=Assignment\">add</a> this user before continuing."
+      expect(response).to redirect_to('http://test.host/teams/list?id=1')
+    end
+
+    it 'flash error when assignmentTeam has maximum number of participants' do
+      allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
+      allow(Team).to receive(:find).with('1').and_return(team1)
+      allow(AssignmentTeam).to receive(:find).with('1').and_return(team1)
+      allow(Assignment).to receive(:find).with(1).and_return(assignment1)
+      allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
+      allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(false)
+      session = {user: admin}
+      params = {
+          user: {name: 'student2065'}, id: 1
+      }
+      post :create, params, session
+      expect(flash[:error]).to eq "This team already has the maximum number of members."
+      expect(response).to redirect_to('http://test.host/teams/list?id=1')
+    end
+
+    it 'flash error when user added to course Team is not defined' do
       allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
       allow(Team).to receive(:find).with('1').and_return(team1)
       allow(AssignmentTeam).to receive(:find).with('1').and_return(team1)

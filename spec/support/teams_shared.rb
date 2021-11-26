@@ -9,7 +9,7 @@ shared_context 'object initializations' do
   let(:ta) { build_stubbed(:teaching_assistant) }
   let(:student1) { build_stubbed(:student, id:1, name: 'student2065') }
   let(:student2) { build_stubbed(:student, id:2) }
-  let(:team1) { build_stubbed(:assignment_team, id: 1, type: 'Assignment', assignment: assignment1) }
+  let(:team1) { build_stubbed(:assignment_team, id: 1, type: 'Assignment', name: 'wolfers', assignment: assignment1) }
   let(:team2) { build_stubbed(:assignment_team, id: 2, type: 'Assignment') }
   let(:team3) { build_stubbed(:assignment_team, id: 3, type: 'Assignment') }
   let(:team4) { build_stubbed(:assignment_team, id: 4, type: 'Assignment') }

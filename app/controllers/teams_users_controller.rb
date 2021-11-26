@@ -38,6 +38,7 @@ class TeamsUsersController < ApplicationController
           flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
         else
           add_member_return = team.add_member(user, team.parent_id)
+          puts add_member_return.to_s
           flash[:error] = "This team already has the maximum number of members." if add_member_return == false
   
           user = TeamsUser.last

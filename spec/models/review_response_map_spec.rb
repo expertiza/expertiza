@@ -34,7 +34,9 @@ describe ReviewResponseMap do
   let(:question) { double('Question') }
   let(:review_questionnaire) { build(:questionnaire, id: 1) }
   let(:response3) { build(:response) }
-  let(:response_map) { build(:review_response_map, reviewer_id: 2, response: [response3]) }
+  let(:response_map) { build(:review_response_map, reviewer_id: 2, response: [response3], reviewee_id: 3) }
+  let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
+  let(:question1) {Question.new(id: 1, questionnaire_id: 5)}
   before(:each) do
     allow(review_response_map).to receive(:response).and_return(response)
     allow(response_map).to receive(:response).and_return(response3)
@@ -469,5 +471,20 @@ describe ReviewResponseMap do
 
     end
 
+    end
+
+  describe '#final_feedbacks_for_reviewer' do
+    it 'collects all response ids of each team authors into a hash map' do
+      allow(Assignment).to receive(:find).and_return(assignment)
+      allow(ResponseMap).to receive(:where).and_return([response_map])
+      allow(Response).to receive(:where).and_return([response])
+      allow(Team).to receive(:find).and_return(team)
+      allow(Answer).to receive(:where).and_return([answer])
+      allow(Question).to receive(:find).with(1).and_return(question1)
+
+      expect(ReviewResponseMap.final_feedbacks_for_reviewer(1, 1))
+        .to eq("review round 1": {questionnaire_id: 5, "team no name" => [1]},
+               "review round 2": {questionnaire_id: 5, "team no name" => [1]})
+    end
   end
 end

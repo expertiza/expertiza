@@ -5,22 +5,23 @@ end
 shared_context 'object initializations' do
   let(:superadmin) { build_stubbed(:superadmin) }
   let(:admin) { build_stubbed(:admin) }
-  let(:instructor) { build_stubbed(:instructor) }
+  let(:instructor) { build_stubbed(:instructor, id: 1) }
   let(:ta) { build_stubbed(:teaching_assistant) }
   let(:student1) { build_stubbed(:student, id:1, name: 'student2065') }
   let(:student2) { build_stubbed(:student, id:2) }
-  let(:team1) { build_stubbed(:assignment_team, id: 1, type: 'Assignment', assignment: assignment1) }
-  let(:team2) { build_stubbed(:assignment_team, id: 2, type: 'Assignment') }
-  let(:team3) { build_stubbed(:assignment_team, id: 3, type: 'Assignment') }
-  let(:team4) { build_stubbed(:assignment_team, id: 4, type: 'Assignment') }
-  let(:team5) { build_stubbed(:course_team, id: 5, type: 'Course') }
-  let(:team6) { build_stubbed(:course_team, id: 6, type: 'Course') }
+  let(:course1) { build_stubbed(:course, name: 'TestCourse', instructor_id: instructor.id) }
+  let(:assignment1) { build_stubbed(:assignment, name: 'TestAssignment', id: 1, instructor: instructor, course: course1) }
+  let(:team1) { build_stubbed(:assignment_team, id: 1, assignment: assignment1) }
+  let(:team2) { build_stubbed(:assignment_team, id: 2, assignment: assignment1) }
+  let(:team3) { build_stubbed(:assignment_team, id: 3, assignment: assignment1) }
+  let(:team4) { build_stubbed(:assignment_team, id: 4, assignment: assignment1) }
+  let(:team5) { build_stubbed(:course_team, id: 5, course: course1) }
+  let(:team6) { build_stubbed(:course_team, id: 6, course: course1) }
   let(:join_team_request1) { build_stubbed(:join_team_request, id: 1, team_id: team1.id, status: 'P') }
   let(:join_team_request2) { build_stubbed(:join_team_request, id: 2, team_id: team2.id, status: 'D') }
   let(:invalidrequest) { build_stubbed(:join_team_request) }
   let(:participant) { build_stubbed(:participant, id: 1) }
-  let(:course1) { build_stubbed(:course, name: 'TestCourse', id: 1, course_id: course1.id, instructor_id: instructor.id) }
-  let(:assignment1) { build_stubbed(:assignment, name: 'TestAssignment',  id: 1, instructor_id: instructor.id) }
+
 end
 
 shared_context 'authorization check', :shared_context => :metadata do

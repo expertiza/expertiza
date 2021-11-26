@@ -171,26 +171,26 @@ class User < ActiveRecord::Base
     password
   end
 
-  def self.import(row_hash, session, id = nil)
-    raise ArgumentError, "Record does not contain required items." if row_hash.length < self.required_import_fields.length
-    user = User.find_by_name(row_hash[:name])
-    byebug
-    puts "here 1"
-    if user.nil?
-      user = get_new_user(row_hash, session)
-      puts "Here 2"
-      password = user.reset_password
-      MailerHelper.send_mail_to_user(user, "Your Expertiza account has been created.", "user_welcome", password).deliver
-    else
-      puts "here 3"
-      user.email = row_hash[:email]
-      user.fullname = row_hash[:fullname]
-      user.parent_id = (session[:user]).id
-      user.save
-    end
+  # def self.import(row_hash, session, id = nil)
+  #   raise ArgumentError, "Record does not contain required items." if row_hash.length < self.required_import_fields.length
+  #   user = User.find_by_name(row_hash[:name])
+  #   byebug
+  #   puts "here 1"
+  #   if user.nil?
+  #     user = get_new_user(row_hash, session)
+  #     puts "Here 2"
+  #     password = user.reset_password
+  #     MailerHelper.send_mail_to_user(user, "Your Expertiza account has been created.", "user_welcome", password).deliver
+  #   else
+  #     puts "here 3"
+  #     user.email = row_hash[:email]
+  #     user.fullname = row_hash[:fullname]
+  #     user.parent_id = (session[:user]).id
+  #     user.save
+  #   end
 
-    user
-  end
+  #   user
+  # end
 
   def self.required_import_fields
     {"name" => "Name",
@@ -206,20 +206,20 @@ class User < ActiveRecord::Base
     {}
   end
 
-  # def self.import(row_hash, _row_header, session, id = nil)
-  #   raise ArgumentError, "Only #{row_hash.length} column(s) is(are) found. It must contain at least username, full name, email." if row_hash.length < 3
-  #   user = User.find_by_name(row_hash[:name])
-  #   if user.nil?
-  #     attributes = ImportFileHelper.define_attributes(row_hash)
-  #     user = ImportFileHelper.create_new_user(attributes, session)
-  #   else
-  #     user.email = row_hash[:email]
-  #     user.fullname = row_hash[:fullname]
-  #     user.parent_id = (session[:user]).id
-  #     user.save
-  #   end
+  def self.import(row_hash, _row_header, session, id = nil)
+    raise ArgumentError, "Only #{row_hash.length} column(s) is(are) found. It must contain at least username, full name, email." if row_hash.length < 3
+    user = User.find_by_name(row_hash[:name])
+    if user.nil?
+      attributes = ImportFileHelper.define_attributes(row_hash)
+      user = ImportFileHelper.create_new_user(attributes, session)
+    else
+      user.email = row_hash[:email]
+      user.fullname = row_hash[:fullname]
+      user.parent_id = (session[:user]).id
+      user.save
+    end
 
-  # end
+  end
 
   def self.yesorno(elt)
     if elt == true

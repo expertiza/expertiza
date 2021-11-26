@@ -1,3 +1,4 @@
+require 'byebug'
 class ImportFileController < ApplicationController
   include AuthorizationHelper
 
@@ -5,7 +6,7 @@ class ImportFileController < ApplicationController
     current_user_has_ta_privileges?
   end
 
-  def show
+  def sshow
     @id = params[:id]
     @model = params[:model]
 
@@ -100,7 +101,13 @@ class ImportFileController < ApplicationController
   # end
 
   def import
-    errors = import_from_hash(session, params)
+    byebug
+    errors = nil
+    if params[:model] == 'AssignmentParticipant' || params[:model] == 'CourseParticipant'
+      errors = simport_from_hash(session, params)  
+    else
+      errors = import_from_hash(session, params)
+    end
     err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
     errors.each do |error|
       err_msg = err_msg + "<li>" + error.to_s + "<br/>"
@@ -116,7 +123,7 @@ class ImportFileController < ApplicationController
     redirect_to session[:return_to]
   end
 
-  def import_from_hash(session, params)
+  def simport_from_hash(session, params)
     @model = params[:model]
     contents_hash = eval(params[:contents_hash])
     
@@ -158,116 +165,116 @@ class ImportFileController < ApplicationController
     new_body
   end
 
-  # def import_from_hash(session, params)
-  #   if params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
-  #     contents_hash = eval(params[:contents_hash])
-  #     @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
-  #     errors = []
-  #     begin
-  #       @header_integrated_body.each do |row_hash|
-  #         if params[:model] == "AssignmentTeam"
-  #           teamtype = AssignmentTeam
-  #         else
-  #           teamtype = CourseTeam
-  #         end
-  #         options = eval(params[:options])
-  #         options[:has_teamname] = params[:has_teamname]
-  #         Team.import(row_hash, params[:id], options, teamtype)
-  #       end
-  #     rescue
-  #       errors << $ERROR_INFO
-  #     end
-  #     elsif params[:model] == "ReviewResponseMap"
-  #       contents_hash = eval(params[:contents_hash])
-  #       @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
-  #       errors = []
-  #       begin
-  #         @header_integrated_body.each do |row_hash|
-  #           ReviewResponseMap.import(row_hash,session,params[:id])
-  #         end
-  #       rescue
-  #         errors << $ERROR_INFO
-  #       end
-  #   elsif params[:model] == "MetareviewResponseMap"
-  #     contents_hash = eval(params[:contents_hash])
-  #     @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
-  #     errors = []
-  #     begin
-  #       @header_integrated_body.each do |row_hash|
-  #         MetareviewResponseMap.import(row_hash,session,params[:id])
-  #       end
-  #     rescue
-  #       errors << $ERROR_INFO
-  #     end
-  #   elsif params[:model] == 'SignUpTopic' || params[:model] == 'SignUpSheet'
-  #     contents_hash = eval(params[:contents_hash])
-  #     if params[:has_header] == 'true'
-  #       @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
-  #     else
-  #       if params[:optional_count] == '0'
-  #         new_header = [params[:select1], params[:select2], params[:select3]]
-  #         @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
-  #       elsif params[:optional_count] == '1'
-  #         new_header = [params[:select1], params[:select2], params[:select3], params[:select4]]
-  #         @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
-  #       elsif params[:optional_count] == '2'
-  #         new_header = [params[:select1], params[:select2], params[:select3], params[:select4], params[:select5]]
-  #         @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
-  #       elsif params[:optional_count] == '3'
-  #         new_header = [params[:select1], params[:select2], params[:select3], params[:select4], params[:select5], params[:select6]]
-  #         @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
-  #       end
-  #     end
-  #     errors = []
-  #     begin
-  #       @header_integrated_body.each do |row_hash|
-  #         session[:assignment_id] = params[:id]
-  #         Object.const_get(params[:model]).import(row_hash, session, params[:id])
-  #       end
-  #     rescue
-  #       errors << $ERROR_INFO
-  #     end
-  #   elsif params[:model] == 'AssignmentParticipant' || params[:model] == 'CourseParticipant'
-  #     contents_hash = eval(params[:contents_hash])
-  #     if params[:has_header] == 'true'
-  #       @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
-  #     else
-  #       new_header = [params[:select1], params[:select2], params[:select3], params[:select4]]
-  #       @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
-  #     end
-  #     errors = []
-  #     begin
-  #       if params[:model] == 'AssignmentParticipant'
-  #         @header_integrated_body.each do |row_hash|
-  #           AssignmentParticipant.import(row_hash, session, params[:id])
-  #         end
-  #       elsif params[:model] == 'CourseParticipant'
-  #         @header_integrated_body.each do |row_hash|
-  #           CourseParticipant.import(row_hash, session, params[:id])
-  #         end
-  #       end
-  #     rescue
-  #       errors << $ERROR_INFO
-  #     end
-  #   else # params[:model] = "User"
-  #     contents_hash = eval(params[:contents_hash])
-  #     if params[:has_header] == 'true'
-  #       @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
-  #     else
-  #       new_header = [params[:select1], params[:select2], params[:select3]]
-  #       @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
-  #     end
-  #     errors = []
-  #     begin
-  #       @header_integrated_body.each do |row_hash|
-  #         User.import(row_hash, nil, session)
-  #       end
-  #     rescue StandardError
-  #       errors << $ERROR_INFO
-  #     end
-  #   end
-  #   errors
-  # end
+  def import_from_hash(session, params)
+    if params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
+      contents_hash = eval(params[:contents_hash])
+      @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
+      errors = []
+      begin
+        @header_integrated_body.each do |row_hash|
+          if params[:model] == "AssignmentTeam"
+            teamtype = AssignmentTeam
+          else
+            teamtype = CourseTeam
+          end
+          options = eval(params[:options])
+          options[:has_teamname] = params[:has_teamname]
+          Team.import(row_hash, params[:id], options, teamtype)
+        end
+      rescue
+        errors << $ERROR_INFO
+      end
+      elsif params[:model] == "ReviewResponseMap"
+        contents_hash = eval(params[:contents_hash])
+        @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
+        errors = []
+        begin
+          @header_integrated_body.each do |row_hash|
+            ReviewResponseMap.import(row_hash,session,params[:id])
+          end
+        rescue
+          errors << $ERROR_INFO
+        end
+    elsif params[:model] == "MetareviewResponseMap"
+      contents_hash = eval(params[:contents_hash])
+      @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
+      errors = []
+      begin
+        @header_integrated_body.each do |row_hash|
+          MetareviewResponseMap.import(row_hash,session,params[:id])
+        end
+      rescue
+        errors << $ERROR_INFO
+      end
+    elsif params[:model] == 'SignUpTopic' || params[:model] == 'SignUpSheet'
+      contents_hash = eval(params[:contents_hash])
+      if params[:has_header] == 'true'
+        @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
+      else
+        if params[:optional_count] == '0'
+          new_header = [params[:select1], params[:select2], params[:select3]]
+          @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
+        elsif params[:optional_count] == '1'
+          new_header = [params[:select1], params[:select2], params[:select3], params[:select4]]
+          @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
+        elsif params[:optional_count] == '2'
+          new_header = [params[:select1], params[:select2], params[:select3], params[:select4], params[:select5]]
+          @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
+        elsif params[:optional_count] == '3'
+          new_header = [params[:select1], params[:select2], params[:select3], params[:select4], params[:select5], params[:select6]]
+          @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
+        end
+      end
+      errors = []
+      begin
+        @header_integrated_body.each do |row_hash|
+          session[:assignment_id] = params[:id]
+          Object.const_get(params[:model]).import(row_hash, session, params[:id])
+        end
+      rescue
+        errors << $ERROR_INFO
+      end
+    elsif params[:model] == 'AssignmentParticipant' || params[:model] == 'CourseParticipant'
+      contents_hash = eval(params[:contents_hash])
+      if params[:has_header] == 'true'
+        @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
+      else
+        new_header = [params[:select1], params[:select2], params[:select3], params[:select4]]
+        @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
+      end
+      errors = []
+      begin
+        if params[:model] == 'AssignmentParticipant'
+          @header_integrated_body.each do |row_hash|
+            AssignmentParticipant.import(row_hash, session, params[:id])
+          end
+        elsif params[:model] == 'CourseParticipant'
+          @header_integrated_body.each do |row_hash|
+            CourseParticipant.import(row_hash, session, params[:id])
+          end
+        end
+      rescue
+        errors << $ERROR_INFO
+      end
+    else # params[:model] = "User"
+      contents_hash = eval(params[:contents_hash])
+      if params[:has_header] == 'true'
+        @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
+      else
+        new_header = [params[:select1], params[:select2], params[:select3]]
+        @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
+      end
+      errors = []
+      begin
+        @header_integrated_body.each do |row_hash|
+          User.import(row_hash, nil, session)
+        end
+      rescue StandardError
+        errors << $ERROR_INFO
+      end
+    end
+    errors
+  end
 
   protected
 

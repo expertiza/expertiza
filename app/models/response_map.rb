@@ -152,9 +152,6 @@ class ResponseMap < ActiveRecord::Base
 
   def self.compute_assignment_score(participant, questions, scores)
     participant.assignment.questionnaires.each do |questionnaire|
-      puts "compute_assignment_score"
-      puts "questionnaire"
-      puts questionnaire.inspect
       round = AssignmentQuestionnaire.find_by(assignment_id: participant.assignment.id, questionnaire_id: questionnaire.id).used_in_round
       # create symbol for "varying rubrics" feature -Yang
       questionnaire_symbol = if round.nil?

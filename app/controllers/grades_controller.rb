@@ -75,24 +75,11 @@ class GradesController < ApplicationController
 
   # method for alternative view
   def view_team
-    puts params[:id]
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
-    puts @participant
-    puts @participant.team
-    puts "@part.assignment"
-    puts @participant.assignment.inspect
     @team = @participant.team
     @team_id = @team.id
     questionnaires = @assignment.questionnaires
-    puts "assignment"
-    puts @assignment.inspect
-    puts "assignment.questinnaires"
-    puts @assignment.questionnaires.inspect
-    puts "questionnaires"
-    puts questionnaires.inspect
-    puts "questionnaires.first"
-    puts questionnaires.first.inspect
     @questions = retrieve_questions questionnaires, @assignment.id
     @pscore = ResponseMap.participant_scores(@participant, @questions)
     @vmlist = []
@@ -115,8 +102,8 @@ class GradesController < ApplicationController
       if questionnaire.display_type == "Teammate Review"
         # as teammate review will be different for each participant
         # we need to create a separate table for each teammate
-        @participant.team.participants.each do |p|
-          @vmlist << populate_view_model(p, questionnaire, @team)
+        @participant.team.participants.each do |team_participant|
+          @vmlist << populate_view_model(team_participant, questionnaire, @team)
         end
       else
         # only one participant needs iterating, as apart from teammatereview
@@ -211,14 +198,12 @@ class GradesController < ApplicationController
 
   def populate_view_model(participant, questionnaire, team)
     vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
+    puts "sjjdfsdfsdfdfssjfklsdfklsjklfjlsjflkjskldfjslkjfklsjdlfjklsjlfsadfjlsfjlasjflasjldfjsdlf"
+    puts "populate_view_model"
+    puts "sjjdfsdfsdfdfssjfklsdfklsjklfjlsjflkjskldfjslkjfklsjdlfjklsjlfsadfjlsfjlasjflasjldfjsdlf"
     vmquestions = questionnaire.questions
     vm.add_questions(vmquestions)
     vm.add_team_members(team)
-    # Need to iterate over the whole team to get everyone's reviews
-    # @participant.team == AssignmentTeam
-    # participant.team.participants.each do |p|
-    # vm.add_reviews(p, @team, @assignment.vary_by_round)
-    # end
     vm.add_reviews(participant, team, @assignment.vary_by_round)
     vm.number_of_comments_greater_than_10_words
     vm

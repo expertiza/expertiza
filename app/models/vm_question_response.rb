@@ -111,7 +111,6 @@ class VmQuestionResponse
   end
 
   def display_team_members(ip_address = nil)
-    # Add anonymized ka logic idhar
     @output = ""
     if @questionnaire_type == "MetareviewQuestionnaire" || @questionnaire_type == "ReviewQuestionnaire"
       @output = "Team members:"

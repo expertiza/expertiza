@@ -34,10 +34,10 @@ module ReviewScoreCalc
     # average.
 
     if !@author_feedback_scores[@response_map.reviewer_id].nil? &&
-      !@author_feedback_scores[@response_map.reviewer_id][@response_map.id].nil? &&
-      !@author_feedback_scores[@response_map.reviewer_id][@response_map.id][@response_map.reviewee_id].nil? &&
+      !@author_feedback_scores[@response_map.reviewer_id][@round].nil? &&
+      !@author_feedback_scores[@response_map.reviewer_id][@round][@response_map.reviewee_id].nil? &&
       !author_feedback_response_maps.empty?
-      @author_feedback_scores[@response_map.reviewer_id][@response_map.id][@response_map.reviewee_id] /= author_feedback_response_maps.count
+      @author_feedback_scores[@response_map.reviewer_id][@round][@response_map.reviewee_id] /= author_feedback_response_maps.count
     end
   end
 
@@ -45,8 +45,8 @@ module ReviewScoreCalc
   # for the response (review) reviewed by one of the authors.
   def calc_feedback_scores_sum
     @respective_scores = {}
-    if !@author_feedback_scores[@response_map.reviewer_id].nil? && !@author_feedback_scores[@response_map.reviewer_id][@response_map.id].nil?
-      @respective_scores = @author_feedback_scores[@response_map.reviewer_id][@response_map.id]
+    if !@author_feedback_scores[@response_map.reviewer_id].nil? && !@author_feedback_scores[@response_map.reviewer_id][@round].nil?
+      @respective_scores = @author_feedback_scores[@response_map.reviewer_id][@round]
     end
     # Get the questionnaire id from the answer corresponding to the response
     corresponding_answers = Answer.where('response_id = ?', @corresponding_response.first.id)
@@ -59,8 +59,8 @@ module ReviewScoreCalc
     @respective_scores[@response_map.reviewee_id] += @this_review_score
     # The reviewer is the metareviewee whose review the authors or teammates are reviewing.
     @author_feedback_scores[@response_map.reviewer_id] = {} if @author_feedback_scores[@response_map.reviewer_id].nil?
-    @author_feedback_scores[@response_map.reviewer_id][@response_map.id] = {} if @author_feedback_scores[@response_map.reviewer_id][@response_map.id].nil?
-    @author_feedback_scores[@response_map.reviewer_id][@response_map.id] = @respective_scores
+    @author_feedback_scores[@response_map.reviewer_id][@round] = {} if @author_feedback_scores[@response_map.reviewer_id][@round].nil?
+    @author_feedback_scores[@response_map.reviewer_id][@round] = @respective_scores
   end
 
   def calc_feedback_review_score

@@ -61,7 +61,6 @@ include ReviewChartHelper
       color.push 'purple'
     else
       if link.nil? or (link !~ %r{https*:\/\/wiki(.*)||https*:\/\/github(.*)})
-      link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
         color.push 'green'
       else
         color.push 'red'

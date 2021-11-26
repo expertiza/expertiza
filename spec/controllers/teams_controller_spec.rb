@@ -3,7 +3,7 @@ require './spec/support/teams_shared.rb'
 describe TeamsController do
   include_context 'object initializations'
   #let(:logmsg) { build_stubbed(:loggermessage) }
-
+=begin
   describe 'action allowed method' do
     context 'provides access after' do
       include_context 'authorization check'
@@ -67,19 +67,29 @@ describe TeamsController do
 
   describe 'new method' do
     it 'creates a new team successfully' do
-      #allow(Object).to receive_message_chain(:const_get, :find).with(any_args).and_return(assignment1)
-      #para = {response_id: 1, team_id: team1.id}
+      allow(Object).to receive_message_chain(:const_get, :find).with(any_args).and_return(assignment1)
+      para = {id: assignment1.id}
       session = {user: ta, team_type: 'Assignment'}
-      result = get :new, session
+      result = get :new, para, session
       expect(result.status).to eq 200
       expect(controller.instance_variable_get(:@parent)).to eq assignment1
     end
   end
-
+=end
   describe 'create method' do
-
+    context 'called with right conditions' do
+      it 'executes successfully' do
+        allow(Object).to receive_message_chain(:const_get, :find).with(any_args).and_return(assignment1)
+        #allow(Object).to receive_message_chain(:const_get, :create).with(any_args).and_return(team1)
+        allow(Object).to receive_message_chain(:const_get, :where).and_return(team2)
+        #allow(Team).to receive(:check_for_existing)#.with(name: 'SomeName', team_type: 'Assignment')
+        para = {response_id: 1, id: team1.parent_id, team: team1, name: 'SomeName'}
+        session = {user: ta, team_type: 'AssignmentTeam'}
+        result = get :create, para, session
+      end
+    end
   end
-
+=begin
   describe 'update method' do
     it 'updates the team name' do
       allow(Team).to receive(:find).and_return(team1)
@@ -105,6 +115,15 @@ describe TeamsController do
     end
   end
 
+  describe 'delete method' do
+    it 'passes the test' do
+      allow(Team).to receive(:find).and_return(team1)
+      para = {}
+      session = {user: admin}
+    end
+  end
+=end
+=begin
   describe 'inherit method' do
 
   end
@@ -112,6 +131,6 @@ describe TeamsController do
   describe 'bequeath method' do
 
   end
-
+=end
 
 end

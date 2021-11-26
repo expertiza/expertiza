@@ -1,11 +1,11 @@
 describe FeedbackScoreCalc do
   let(:feedback_score_calc) { Class.new { extend FeedbackScoreCalc } }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assignment', rounds_of_reviews: 1) }
+  let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
 
   describe '#compute_author_feedback_scores' do
     let(:response_map) { create(:review_response_map, id: 1, reviewer_id: 1, reviewee_id: 2) }
     let(:response) { create(:response, id: 1)}
-    let(:answer) {create(:answer, question_id: 1)}
     let(:question) {create(:question, id: 1, questionnaire_id: 5)}
     before(:each) do
       allow(assignment).to receive(:num_review_rounds).and_return(1)
@@ -18,7 +18,7 @@ describe FeedbackScoreCalc do
     end
     context 'creates a hash map of author feedback scores for each reviewer and each round' do
       it 'computes feedback scores for all reviewers' do
-        expect(assignment.compute_author_feedback_scores).to eq({1 => {1 => {'2': 80}}})
+        expect(assignment.compute_author_feedback_scores).to eq({1=>{1=>{2=>80}}})
       end
     end
   end

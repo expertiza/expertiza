@@ -2,7 +2,7 @@ version: '3'
 
 services:
   expertiza:
-    image: winbobob/expertiza:ruby-2.2.7
+    build: .
     ports:
       - '3000:3000'
     volumes:
@@ -17,14 +17,18 @@ services:
     command: bundle exec thin start -p 3000
     environment:
       REDIS_HOST: redis
+      RAILS_ENV: development
 
   scrubbed_db:
     image: mysql:5.7
     volumes:
       # https://stackoverflow.com/questions/25920029/setting-up-mysql-and-importing-dump-within-dockerfile
       - './devops/docker/scrubbed_db:/docker-entrypoint-initdb.d'
+      - 'data:/var/lib/mysql'
     environment:
       MYSQL_ROOT_PASSWORD: [YOUR PASSWORD]
 
   redis:
     image: redis:alpine
+volumes:
+    data:

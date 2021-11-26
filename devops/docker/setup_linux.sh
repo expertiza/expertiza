@@ -14,6 +14,11 @@ cd $DIR/devops/docker/scrubbed_db
 
 if [ -f expertiza_scrubbed_db.sql.tar.gz ]; then
    echo "The file expertiza_scrubbed_db.sql.tar.gz exists."
+   tar -xzf expertiza_scrubbed_db.sql.tar.gz
+elif [ -f expertiza_scrubbed_db_2019.09.17.rar ]; then
+   echo "The file expertiza_scrubbed_db.sql.rar exists."
+   unrar e -o+ expertiza_scrubbed_db_2019.09.17.rar .
+   sed -i '1i CREATE DATABASE IF NOT EXISTS expertiza_development; USE expertiza_development;' expertiza_scrubbed_db_2019.09.17.sql
 else
    echo
    echo "The file expertiza_scrubbed_db.sql.tar.gz not found."
@@ -23,13 +28,11 @@ else
    exit 0
 fi
 
-# Untar it
-tar -xzf expertiza_scrubbed_db.sql.tar.gz 
-
 cd $DIR
 
 # Get the docker-compose file
 cp ./devops/docker/docker-compose.yml.example docker-compose.yml
+cp ./devops/docker/Dockerfile Dockerfile
 
 # Get the MYSQL_ROOT_PASSWORD
 read -p "Please enter your MYSQL ROOT PASSWORD: " MYSQL_ROOT_PASSWORD

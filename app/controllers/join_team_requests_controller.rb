@@ -14,6 +14,8 @@ class JoinTeamRequestsController < ApplicationController
   end
 
   def show
+    #added new
+    @join_team_request = JoinTeamRequest.find(params[:id])
     respond_after @join_team_request
   end
 

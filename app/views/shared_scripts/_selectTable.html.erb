@@ -86,6 +86,7 @@ function submitAction(container_id, action_url){
     <% end %>
   </TABLE>
 </DIV>
+
 <% if delete_options[:enabled] %>
   <a href="" onClick="return markAllRows('tableForm');">Check All</a> | <a href="" onClick="return unMarkAllRows('tableForm');">Uncheck All</a>
   <br/>With selected: <a href="" onClick="submitAction('tableForm','<%= url_for(:controller => delete_options[:controller], :action => 'delete_selected', :edit => nil, :list => nil) %>')">Delete</a>

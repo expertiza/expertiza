@@ -13,7 +13,7 @@ class TeamsController < ApplicationController
     parent = Object.const_get(session[:team_type]).find(params[:id])
     Team.randomize_all_by_parent(parent, session[:team_type], params[:team_size].to_i)
     undo_link("Random teams have been successfully created.")
-    ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Random teams have been successfully created', request)
+    #ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Random teams have been successfully created', request)
     redirect_to action: 'list', id: parent.id
   end
 

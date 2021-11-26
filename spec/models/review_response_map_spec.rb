@@ -483,8 +483,8 @@ describe ReviewResponseMap do
       allow(Question).to receive(:find).with(1).and_return(question1)
 
       expect(ReviewResponseMap.final_feedbacks_for_reviewer(1, 1))
-        .to eq("review round 1": {questionnaire_id: 5, "team no name" => [1]},
-               "review round 2": {questionnaire_id: 5, "team no name" => [1]})
+        .to eq("review round 1": {questionnaire_id: 5, "team no name" => {:feedback_response_ids=>[1]}},
+               "review round 2": {questionnaire_id: 5, "team no name" => {:feedback_response_ids=>[1]}})
     end
   end
 end

@@ -4,7 +4,6 @@ describe TeamsController do
   include_context 'object initializations'
   #let(:logmsg) { build_stubbed(:loggermessage) }
 
-=begin
   describe 'action allowed method' do
     context 'provides access after' do
       include_context 'authorization check'
@@ -23,11 +22,8 @@ describe TeamsController do
         allow(Object).to receive_message_chain(:const_get, :find).with(any_args).and_return(assignment1)
         allow(Team).to receive(:randomize_all_by_parent).with(any_args)
         allow(Version).to receive_message_chain(:where, :last).with(any_args).and_return(0.1)
-        #ExpertizaLogger.info.should eq(1)
-        #allow(ExpertizaLogger).to receive(:info).and_return(1)
-        #expect(ExpertizaLogger.info).to be_nil
 
-        para = {response_id: 1, id: 1, team_size: 2}
+        para = {id: 1, team_size: 2}
         session = {user: instructor, team_type: "Assignment"}
         result = get :create_teams, para, session
         expect(result.status).to eq 302
@@ -35,40 +31,46 @@ describe TeamsController do
       end
     end
   end
-=end
+
   describe 'list method' do
-    context 'when everything is right' do
+    before(:each) {
+      allow(Assignment).to receive(:find_by).and_return(assignment1)
+    }
+    context 'when type is Assignment' do
       it 'lists the teams' do
-        params = {response_id: 1, id: 1, type: 'Assignment'}
+        params = {id: assignment1.id, type: 'Assignment'}
         session = {user: instructor}
         result = get :list, params, session
         expect(result.status).to eq 200
+        expect(controller.instance_variable_get(:@assignment)).to eq assignment1
+      end
+    end
+    context 'when type is Course' do
+      it 'lists the teams' do
+        params = {id: assignment1.id, type: 'Course'}
+        session = {user: instructor}
+        result = get :list, params, session
+        expect(result.status).to eq 200
+        expect(controller.instance_variable_get(:@assignment)).to eq nil
       end
     end
     context 'when type is wrong' do
-      it 'lists the teams' do
-        params = {response_id: 1, id: 1, type: 'Course'}
+      it 'throws error' do
+        params = {id: assignment1.id, type: 'Subject'}
         session = {user: instructor}
         result = get :list, params, session
         expect(result.status).to eq 200
-      end
-    end
-    context 'when type is wrong' do
-      it 'lists the teams' do
-        params = {response_id: 1, id: 1, type: 'Subject'}
-        session = {user: instructor}
-        result = get :list, params, session
-        expect(result.status).to eq 200
+        expect(controller.instance_variable_get(:@assignment)).to eq nil
       end
     end
   end
-=begin
+
   describe 'new method' do
     it 'creates a new team successfully' do
-      allow(Object).to receive_message_chain(:const_get, :find).with(any_args).and_return(assignment1)
-      para = {response_id: 1, team_id: team1.id}
-      session = {user: ta}
-      result = get :new, para, session
+      #allow(Object).to receive_message_chain(:const_get, :find).with(any_args).and_return(assignment1)
+      #para = {response_id: 1, team_id: team1.id}
+      session = {user: ta, team_type: 'Assignment'}
+      result = get :new, session
       expect(result.status).to eq 200
       expect(controller.instance_variable_get(:@parent)).to eq assignment1
     end
@@ -85,7 +87,7 @@ describe TeamsController do
       #allow(Team).to receive(:check_for_existing).and_do_nothing#not_raise(TeamExistsError)
 
       para = {response_id: 1, team_id: 1}
-      session = {user: ta2}
+      session = {user: ta}
       result = get :update, para, session
       expect(Rails.logger).to receive(:error)
       expect(result.status).to eq 404
@@ -110,6 +112,6 @@ describe TeamsController do
   describe 'bequeath method' do
 
   end
-=end
+
 
 end

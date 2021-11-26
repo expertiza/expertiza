@@ -26,7 +26,7 @@ describe JoinTeamRequestsController do
     end
   end
 
-  describe "Get #show" do
+  describe "GET #show" do
     before(:each) do
       join_team_request3 = JoinTeamRequest.new
       join_team_request3.participant_id = 1
@@ -54,7 +54,7 @@ describe JoinTeamRequestsController do
     end
   end
 
-  describe "when a join_team_request is created" do
+  describe "POST #update" do
     before(:each) do
       allow(Participant).to receive(:find).with("1").and_return(participant)
     end
@@ -69,5 +69,34 @@ describe JoinTeamRequestsController do
       end
     end
   end
+  describe "PUT #update" do
+    before(:each) do
+      join_team_request = JoinTeamRequest.new
+      join_team_request.id = 1
+      join_team_request.participant_id = 1
+      join_team_request.team_id = 2
+      join_team_request.status="P"
+    end
+    context "when the join_team_request is not updated" do
+      #let(:invalidrequest) {build_stubbed(:join_team_request)}
+
+      it "renders edit page" do
+        #allow(JoinTeamRequest).to receive(:update_attribute).with(any_args).and_return(false)
+        allow(JoinTeamRequest).to receive(:find).with("1").and_return(join_team_request1)
+        allow(JoinTeamRequest).to receive(:edit).and_return(:invalidrequest)
+        params = {
+                  id: 1,
+                  join_team_request1: {
+                  comments: nil
+                  }
+        }
+
+        session = {user: student1}
+        put :edit, params, session
+        expect(response).to render_template("edit")
+      end
+    end
+  end
+
 end
 

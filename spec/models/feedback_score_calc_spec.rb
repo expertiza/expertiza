@@ -2,11 +2,11 @@ describe FeedbackScoreCalc do
   let(:feedback_score_calc) { Class.new { extend FeedbackScoreCalc } }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assignment', rounds_of_reviews: 1) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
+  let(:question) {Question.new(id: 1, questionnaire_id: 5)}
 
   describe '#compute_author_feedback_scores' do
     let(:response_map) { create(:review_response_map, id: 1, reviewer_id: 1, reviewee_id: 2) }
     let(:response) { create(:response, id: 1)}
-    let(:question) {create(:question, id: 1, questionnaire_id: 5)}
     before(:each) do
       allow(assignment).to receive(:num_review_rounds).and_return(1)
       allow(ResponseMap).to receive(:where).and_return([response_map])

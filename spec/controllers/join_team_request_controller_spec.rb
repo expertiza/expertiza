@@ -2,7 +2,7 @@ require './spec/support/teams_shared.rb'
 
 describe JoinTeamRequestsController do
   let(:student) {build_stubbed(:student)}
-
+  let(:participant){build_stubbed(:participant,id: 1)}
   include_context 'authorization check'
   context 'not provides access to people with' do
     it 'student credentials' do
@@ -27,7 +27,6 @@ describe JoinTeamRequestsController do
     let(:join_team_request2) {build(:join_team_request,team_id: team2.id, status: 'D')}
 
     context "when index is called" do
-
       it "routes to index page" do
         get :index
         expect(get: "join_team_requests/").to route_to("join_team_requests#index")
@@ -38,7 +37,6 @@ describe JoinTeamRequestsController do
 
   describe "Get #show" do
     before(:each) do
-
       join_team_request3 = JoinTeamRequest.new
       join_team_request3.participant_id = 1
       join_team_request3.team_id = 2
@@ -62,12 +60,21 @@ describe JoinTeamRequestsController do
         get :new
         expect(get: "join_team_requests/new").to route_to("join_team_requests#new")
       end
-
-      # it "will render a new page" do
-      #   get :new
-      #   expect(response).to render_template(:new)
-      # end
-
+    end
+  end
+  describe "when a join_team_request is created" do
+    before(:each) do
+      allow(Participant).to receive(:find).with("1").and_return(participant)
+    end
+    context "when the join_team_request is not saved!" do
+      let(:invalidrequest) {build_stubbed(:join_team_request)}
+      it "renders new page" do
+        allow(JoinTeamRequest).to receive(:new).and_return(invalidrequest)
+        params = {participant_id: participant.id, team_id: -2}
+        session = {user: student}
+        get :new, params, session
+        expect(response).to render_template("new")
+      end
     end
   end
 end

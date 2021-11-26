@@ -26,7 +26,7 @@ describe JoinTeamRequestsController do
     end
   end
 
-  describe "Get #show" do
+  describe "GET #show" do
     before(:each) do
       join_team_request3 = JoinTeamRequest.new
       join_team_request3.participant_id = 1
@@ -54,7 +54,7 @@ describe JoinTeamRequestsController do
     end
   end
 
-  describe "when a join_team_request is created" do
+  describe "POST #update" do
     before(:each) do
       allow(Participant).to receive(:find).with("1").and_return(participant)
     end
@@ -69,7 +69,7 @@ describe JoinTeamRequestsController do
       end
     end
   end
-  describe "when a join_team_request is updated" do
+  describe "PUT #update" do
     before(:each) do
       join_team_request = JoinTeamRequest.new
       join_team_request.id = 1
@@ -87,12 +87,12 @@ describe JoinTeamRequestsController do
         params = {
                   id: 1,
                   join_team_request1: {
-                  comments: 123
+                  comments: nil
                   }
         }
 
         session = {user: student1}
-        post :edit, params, session
+        put :edit, params, session
         expect(response).to render_template("edit")
       end
     end

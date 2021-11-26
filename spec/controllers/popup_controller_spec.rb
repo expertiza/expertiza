@@ -44,4 +44,14 @@ describe PopupController do
   describe '#self_review_popup' do
     ## INSERT CONTEXT/DESCRIPTION/CODE HERE
   end
+
+  describe '#view_feedback_scores_popup' do
+    it "renders the feedback scores popup page successfully" do
+      allow(ReviewResponseMap).to receive(final_feedbacks_for_reviewer).and_return({})
+      params = {assignment_id: 1, reviewer_id: 2}
+      session = {user: instructor}
+      result = get :view_feedback_scores_popup, params, session
+      expect(result.status).to eq 200
+    end
+  end
 end

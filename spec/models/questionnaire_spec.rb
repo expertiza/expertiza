@@ -133,6 +133,4 @@ describe Questionnaire do
       expect(questionnaire2.max_possible_score).to eq(100)
     end
   end
-
-  DESCRIBE '#'
 end

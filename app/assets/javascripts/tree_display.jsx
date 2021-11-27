@@ -1741,9 +1741,7 @@ jQuery(document).ready(function() {
               </div>
             </div>
 
-            <div
-                style={{ margin: '8px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'center' }}
-            >
+            <div>
               <FilterButton
                   filterOption="public"
                   onUserFilter={this.handleUserFilter}

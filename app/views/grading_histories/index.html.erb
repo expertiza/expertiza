@@ -3,22 +3,41 @@
      receiver = ""
      assignment = ""
    else
+     assignment = Assignment.where(id: record.assignment_id).pluck(:name).first
+     receiver = record.grade_receiver_id
+     
      if record.grading_type == "Submission"
-       receiver = "of " + Team.where(id: record.grade_receiver_id).pluck(:name).first
-       assignment = "for the submission " + Assignment.where(id: record.assignment_id).pluck(:name).first
+       team_name = Team.where(id: record.grade_receiver_id).pluck(:name).first
+     elsif record.grading_type == "Review"
+       student_name = User.where(id: record.grade_receiver_id).pluck(:fullname).first 
      else
-       receiver = "of " + User.where(id: record.grade_receiver_id).pluck(:fullname).first
-       assignment = "for review in " + Assignment.where(id: record.assignment_id).pluck(:name).first
+       assignment = "Unkown"
      end
 
    end
 %>
-<h1 class="center">Grade History <%= receiver %> <%= assignment %></h1>
+<h1 class="center">Grade History of <%= record.grading_type %><%= " On " %><%= assignment %></h1>
+
+  <% if record.grading_type == "Submission" %>
+    <h3 class="left">Team ID: <%= team_name %></h3>
+  <% elsif record.grading_type == "Review" %>
+    <h3 class="left">Student ID: <%= student_name %></h3>
+  <% else %>
+    <h3 class="center">Unkown Grading Type</h3>
+  <% end %>
 
 <table style="border-collapse:collapse; table-layout:fixed; width:1500px;">
   <thead>
   <tr>
-    <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Instructor</th>
+  <% if record.grading_type == "Submission" %>
+    <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Team ID</th>
+  <% elsif record.grading_type == "Review" %>
+    <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Student ID</th>
+  <% else %>
+    <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Receiver ID</th>
+  <% end %>
+    <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Grader ID</th>
+    <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Assignment ID</th>
     <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Grade</th>
     <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Comment</th>
     <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Graded At</th>
@@ -28,7 +47,9 @@
   <tbody>
   <% @grading_histories.each do |record| %>
     <tr>
-      <td style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;"><%= User.where(id: record.instructor_id).pluck(:fullname).first %></td>
+      <td style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;"><%= record.grade_receiver_id %></td>
+      <td style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;"><%= record.instructor_id %></td>
+      <td style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;"><%= record.record.assignment_id %></td>
       <td style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;"><%= record.grade %></td>
       <td style="padding:10px; border:solid 1.5px black; width:60px; word-wrap:break-word;"><%= record.comment %></td>
       <td style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;"><%= record.created_at %></td>

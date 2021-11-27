@@ -812,6 +812,7 @@ jQuery(document).ready(function() {
             placeholder="Search..."
             value={this.props.filterText}
             ref="filterTextInput"
+            className="form-control"
             onChange={this.handleChange}
           />
         </span>
@@ -835,7 +836,7 @@ jQuery(document).ready(function() {
             ref="filterCheckbox"
             onChange={this.handleChange}
           >
-            {" Include others' items"}
+            {" Include others' " + this.props.dataType + "s"}
           </input>
         </span>
       )
@@ -1021,7 +1022,7 @@ jQuery(document).ready(function() {
         this.setState({
           expandedRow: this.state.expandedRow.concat([ id ])
         })
-        // if(this.props.dataType!='assignment') {
+        if(this.props.dataType!='assignment') {
         _this = this
         jQuery.post(
           '/tree_display/get_sub_folder_contents',
@@ -1034,7 +1035,7 @@ jQuery(document).ready(function() {
           },
           'json'
         )
-        // }
+         }
       } else {
         var index = this.state.expandedRow.indexOf(id)
         if (index > -1) {
@@ -1695,15 +1696,13 @@ jQuery(document).ready(function() {
                   dataType={this.props.dataType}
               />
 
-              <FilterButton
-                  filterOption="public"
-                  onUserFilter={this.handleUserFilter}
-                  inputCheckboxValue={this.state.publicCheckbox}
-                  dataType={this.props.dataType}
-              />
+              <button type="button"
+                      className="btn btn-primary"
+                      onClick={this.handleSearch}>
+                Search
+              </button>
 
-              <button
-                  className="btn btn-link"
+              <a
                   onClick={() => {
                     var x = document.getElementById("advancedToggle");
                     if (x.style.display === "none") {
@@ -1712,11 +1711,11 @@ jQuery(document).ready(function() {
                       x.style.display = "none";
                     }}}>
                 Advanced Search
-              </button>
+              </a>
             </div>
 
 
-            <div id="advancedToggle" style={{ display: 'block' }}>
+            <div id="advancedToggle" style={{ display: 'none' }}>
               <AdditionalSearchDropDown
                   selectValue = {this.state.selectValue}
                   onChange={this.changeAdditionalDrop}
@@ -1742,10 +1741,23 @@ jQuery(document).ready(function() {
               </div>
             </div>
 
-            <NewItemButton
-                dataType={this.props.dataType}
-                private={true}
-            />
+            <div
+                style={{ margin: '8px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'center' }}
+            >
+              <FilterButton
+                  filterOption="public"
+                  onUserFilter={this.handleUserFilter}
+                  inputCheckboxValue={this.state.publicCheckbox}
+                  dataType={this.props.dataType}
+              />
+
+              <NewItemButton
+                  dataType={this.props.dataType}
+                  private={true}
+              />
+
+            </div>
+
             <ContentTable
                 data={this.state.tableData}
                 filterText={this.state.filterText}

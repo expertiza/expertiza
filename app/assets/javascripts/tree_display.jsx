@@ -1021,7 +1021,6 @@ jQuery(document).ready(function() {
         this.setState({
           expandedRow: this.state.expandedRow.concat([ id ])
         })
-        // if(this.props.dataType!='assignment') {
         _this = this
         jQuery.post(
           '/tree_display/get_sub_folder_contents',
@@ -1076,7 +1075,7 @@ jQuery(document).ready(function() {
               (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
               (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
               (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
-            (entry.private == true || entry.type == 'FolderNode')
+            (entry.private || entry.type == 'FolderNode')
           ) {
             _rows.push(
               <ContentTableRow
@@ -1146,7 +1145,7 @@ jQuery(document).ready(function() {
           jQuery.each(this.props.data, function (i, entry) {
             var date = entry.creation_date;
             if (((entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1) &&
-                    (entry.private == true || entry.type == 'FolderNode'))) {
+                    (entry.private || entry.type == 'FolderNode'))) {
 
               if ((date >= var_start_date) && (var_end_date >= date)) {
                 if((_this.props.has_quiz_var && entry.require_quiz) || !_this.props.has_quiz_var) {
@@ -1606,9 +1605,6 @@ jQuery(document).ready(function() {
           return a_val.localeCompare(b_val)
         }
       })
-      // this.setState({
-      //   tableData: tmpData
-      // })
     },
     componentWillReceiveProps: function(nextProps) {
       this.setState({
@@ -1616,16 +1612,14 @@ jQuery(document).ready(function() {
       })
     },
     handleUserFilter: function(name, checked) {
-      var publicCheckboxStatus = this.state.publicCheckbox
-      publicCheckboxStatus = checked
       var tmpData = this.props.data.filter(function(element) {
-        if (publicCheckboxStatus) {
+        if (checked) {
           return true
         } else return element.private === true
       })
       this.setState({
         tableData: tmpData,
-        publicCheckbox: publicCheckboxStatus
+        publicCheckbox: checked
       })
     },
     changeAdditionalDrop: function(event) {
@@ -1716,7 +1710,7 @@ jQuery(document).ready(function() {
             </div>
 
 
-            <div id="advancedToggle" style={{ display: 'block' }}>
+            <div id="advancedToggle" style={{ display: 'none' }}>
               <AdditionalSearchDropDown
                   selectValue = {this.state.selectValue}
                   onChange={this.changeAdditionalDrop}

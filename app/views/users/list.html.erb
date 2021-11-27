@@ -14,7 +14,6 @@
 
 <div class="exp">
   <table>
-    <tr><th colspan=5></th><th colspan=3 class="head">E-mail on ...</th></tr>
     <tr><th class="head">UserID</th><th class="head">Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Meta-review</th></tr>
     <% for user in @paginated_users %>
       <% if (params[:show] != 'true' && !user.name(session[:ip]).include?("_hidden")) || params[:show] == 'true'%>

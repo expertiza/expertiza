@@ -24,7 +24,7 @@
 <!-- Username TextBox with Search button and a Advanced Search with text based on its' state: toggled on or off -->
 
 <div style="margin: 8px auto; display: grid; grid-template-columns: repeat(3, auto) 1fr; grid-gap: 8px; align-items: center">
-  <%= label_tag :search_name, 'UserID:' %><%= text_field_tag(:search_name,params[:search_name]) %>
+  <%= label_tag :search_usrid, 'UserID:' %><%= text_field_tag(:search_usrid,params[:search_usrid]) %>
   <%= submit_tag("Search") %>
   <a id="search_toggle_button"></a>
 </div>
@@ -32,6 +32,6 @@
 <!-- Name and Email TextBoxes to be displayed on tap of Advanced Search button -->
 
 <div id="advance_search_form" style="margin-bottom: 8px; display: grid; grid-template-columns: repeat(4, auto) 1fr; grid-gap: 8px; align-items: center">
-  <%= label_tag :search_full_name, 'Name: ' %><%= text_field_tag(:search_fname,params[:search_fname]) %>
+  <%= label_tag :search_full_name, 'Name: ' %><%= text_field_tag(:search_fname,params[:search_fname]) %><br/>
   <%= label_tag :search_email, 'Email: ' %><%= text_field_tag(:search_email,params[:search_email]) %>
 </div> 

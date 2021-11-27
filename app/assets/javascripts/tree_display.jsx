@@ -1545,7 +1545,7 @@ jQuery(document).ready(function() {
                 Search
               </button>
               <a onClick={this.toggleAdvancedSearch}>
-                {this.state.advancedSearchVisible ? 'Hide Advanced Search' : 'Advanced Search'}
+                {'Advanced Search'}
               </a>
             </div>
             {this.state.advancedSearchVisible ? <QuestionnairesAdvancedSearchBar ref={instance => { this.child = instance; }} /> : null}

@@ -16,8 +16,8 @@ describe Response do
   let(:questionnaire2) { ReviewQuestionnaire.new(id: 2, questions: [question2], max_question_score: 5) }
   let(:tag_prompt) {TagPrompt.new(id: 1, prompt: "prompt")}
   let(:tag_prompt_deployment) {TagPromptDeployment.new(id: 1, tag_prompt_id: 1, assignment_id: 1, questionnaire_id: 1, question_type: 'Criterion')}
-  let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1) }
-  let!(:response_record) { create(:response, id: 1, map_id: 1, response_map: response_map) }
+  let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1, reviewee_id:1) }
+  let!(:response_record) { create(:response, id: 1, map_id: 1, response_map: response_map, updated_at: '2020-03-24 12:10:20') }
   before(:each) do
     allow(response).to receive(:map).and_return(review_response_map)
   end
@@ -98,7 +98,7 @@ describe Response do
       expect(response.maximum_score).to eq(10)
     end
 
-    it 'returns the maximum possible score for current responsesssss' do
+    it 'returns the maximum possible score for current response without score' do
       response.scores = []
       question2 = double('ScoredQuestion', weight: 2)
       allow(Question).to receive(:find).with(1).and_return(question2)
@@ -132,6 +132,35 @@ describe Response do
                                                                      subject: "A new submission is available for Test Assgt"},
                                                                     participant, assignment).and_return(true)
       expect(response.email).to eq(true)
+    end
+  end
+
+  describe '#populate_new_response' do
+    it 'when response exists and after recent submission date' do
+      submission_record = double(SubmissionRecord, updated_at: '2020-03-23 12:10:20')
+      team = double('AssignmentTeam', id: response_map.reviewee_id, most_recent_submission: submission_record)
+      allow(AssignmentTeam).to receive(:find_by).with({:id => response_map.reviewee_id}).and_return(team)
+      expect(response.populate_new_response(response_map, "1")).to eq(response_record)
+    end
+
+    it 'when response exists and after recent submission date' do
+      submission_record = double(SubmissionRecord, updated_at: '2020-03-25 12:10:20')
+      team = double('AssignmentTeam', id: response_map.reviewee_id, most_recent_submission: submission_record)
+      new_response = double('Response')
+
+      allow(AssignmentTeam).to receive(:find_by).with({:id => response_map.reviewee_id}).and_return(team)
+      allow(Response).to receive(:create).with(map_id: response_map.id, additional_comment: '', round: "1", is_submitted: 0).and_return(new_response)
+      expect(response.populate_new_response(response_map, "1")).to eq(new_response)
+    end
+
+    it 'when response does not exist' do
+      submission_record = double(SubmissionRecord, updated_at: '2020-03-23 12:10:20')
+      team = double('AssignmentTeam', id: response_map.reviewee_id, most_recent_submission: submission_record)
+      new_response = double('Response', order:{})
+      allow(Response).to receive(:where).with(map_id: response_map.id, round: 1).and_return(new_response)
+      allow(AssignmentTeam).to receive(:find_by).with({:id => response_map.reviewee_id}).and_return(team)
+      allow(Response).to receive(:create).with(map_id: response_map.id, additional_comment: '', round: "1", is_submitted: 0).and_return(new_response)
+      expect(response.populate_new_response(response_map, "1")).to eq(new_response)
     end
   end
 

@@ -72,9 +72,9 @@
               <% if Team.where(id: ri.reviewee_id).length > 0 %>
                 <!--Team reviewed-->
                 <% if index == 0 %>
-                  <div id= <%= team_name_color %>>
+                  <div id= <%= team_name_color %>/>
                 <% else %>
-                  <div id = <%= team_name_color %> style="border-top:solid;border-width:1px;">
+                  <div style="border-top: solid; border-width: 1px;" id = <%= team_name_color %> >
                 <% end %>
                     <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
                     <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
@@ -119,18 +119,26 @@
             <%= form_tag save_grade_and_comment_for_reviewer_review_mapping_index_path, remote: true do %>
               <%= hidden_field_tag :participant_id, r.id %>
               <%= hidden_field_tag :assignment_id, @id %>
-              <%= number_field_tag 'grade_for_reviewer', r.review_grade.try(:grade_for_reviewer), min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %>
-              <br/>
-              <%= text_area_tag 'comment_for_reviewer', r.review_grade.try(:comment_for_reviewer), placeholder: 'Comment', class: "awesome_input", 'data-multiple' => '', 'data-minchars' => "1" %>
               <table class="inline-transparent">
+              <tr style="margin-bottom: 4px">
+                <td colspan="3"><%= number_field_tag 'grade_for_reviewer', r.review_grade.try(:grade_for_reviewer), min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %>
+                </td>
+              </tr>
+                <tr>
+                  <td colspan="3">
+              <%= text_area_tag 'comment_for_reviewer', r.review_grade.try(:comment_for_reviewer), placeholder: 'Comment', class: "awesome_input", 'data-multiple' => '', 'data-minchars' => "1" %>
+                  </td>
+                </tr>
+
                 <tr>
                   <td>
                     <%= image_tag 'text_macro.png', :border => 2, :title => 'Text Macro/Pastebin', :style => 'width: 24px; height:30px', :onclick => 'show_text_macros()' %>
                   </td>
-                </tr>
-                <tr>
                   <td>
                     <%= submit_tag 'Save' %>
+                  </td>
+                  <td>
+                    <%= link_to "Grading History", grading_histories_path(grade_receiver_id: Participant.where(id: r.id).pluck(:user_id).first, participant_id: r.id, grade_type: "Review") %>
                   </td>
                 </tr>
               </table>

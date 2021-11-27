@@ -84,9 +84,7 @@ describe ReputationWebServiceController do
         create(:answer, question_id: @question_1_3.id, response_id: @response_1_3.id, answer: 1)
         create(:answer, question_id: @question_1_4.id, response_id: @response_1_3.id, answer: 1)
         create(:answer, question_id: @question_1_5.id, response_id: @response_1_3.id, answer: 1)
-
-        #result = ReputationWebServiceController.new.db_query(1, 1, false)
-        #expect(result).to eq([[2, 1, 100.0], [3, 1, 60.0], [4, 1, 20.0]])
+        
         result = ReputationWebServiceController.new.json_generator(1, 0, 1)
         expect(result).to eq({"submission1"=>{"stu2"=>100.0, "stu3"=>60.0, "stu4"=>20.0}})
         #repeat for different answers

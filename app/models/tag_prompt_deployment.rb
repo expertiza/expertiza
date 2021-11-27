@@ -43,19 +43,13 @@ class TagPromptDeployment < ActiveRecord::Base
         end
         responses_ids = responses.map(&:id)
         answers = Answer.where(question_id: questions_ids, response_id: responses_ids)
-        puts "Bulbasaur"
-        p answers
-        p team
+
         answers = answers.select { |answer| answer.comments.length > self.answer_length_threshold } unless self.answer_length_threshold.nil?
         answers_ids = answers.map(&:id)
         teams_users = TeamsUser.where(team_id: team.id)
         users = teams_users.map{ |teams_user| User.find(teams_user.user_id) }
-        puts '---'
-        p teams_users
-        p users
+
         users.each do |user|
-          puts 'Charmander'
-          p user
           tags = AnswerTag.where(tag_prompt_deployment_id: self.id, user_id: user.id, answer_id: answers_ids)
           tagged_answers_ids = tags.map(&:answer_id)
 

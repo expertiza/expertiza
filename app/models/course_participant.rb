@@ -46,24 +46,6 @@ class CourseParticipant < Participant
     {}
   end
 
-
-  # provide import functionality for Course Participants
-  # if user does not exist, it will be created and added to this assignment
-  # def self.import(row_hash, _row_header = nil, session, id)
-  #   raise ArgumentError, "No user id has been specified." if row_hash.empty?
-  #   user = User.find_by(name: row_hash[:name])
-  #   if user.nil?
-  #     raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
-  #     attributes = ImportFileHelper.define_attributes(row_hash)
-  #     user = ImportFileHelper.create_new_user(attributes, session)
-  #   end
-  #   course = Course.find_by(id)
-  #   raise ImportError, "The course with the id \"" + id.to_s + "\" was not found." if course.nil?
-  #   unless CourseParticipant.exists?(user_id: user.id, parent_id: id)
-  #     CourseParticipant.create(user_id: user.id, parent_id: id)
-  #   end
-  # end
-
   def path
     Course.find(self.parent_id).path + self.directory_num.to_s + "/"
   end

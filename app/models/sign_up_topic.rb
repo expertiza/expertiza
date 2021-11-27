@@ -12,39 +12,6 @@ class SignUpTopic < ActiveRecord::Base
   validates :topic_name, :assignment_id, :max_choosers, presence: true
   validates :topic_identifier, length: {maximum: 10}
 
-  # This method is not used anywhere
-  # def get_team_id_from_topic_id(user_id)
-  #  return find_by_sql("select t.id from teams t,teams_users u where t.id=u.team_id and u.user_id = 5");
-  # end
-
-  # def self.import(row_hash, session = nil, id)
-  #   raise ArgumentError, "Record does not contain required items." if row_hash.length < self.required_import_fields.length
-  #   topic = SignUpTopic.where(topic_name: row_hash[:topic_name], assignment_id: id).first
-  #   if topic.nil?
-  #     get_new_sign_up_topic(get_topic_attributes(row_hash), id)
-  #   else
-  #     topic.max_choosers = row_hash[:max_choosers]
-  #     topic.topic_identifier = row_hash[:topic_identifier]
-  #     topic.save
-  #   end
-  # end
-
-  # def self.required_import_fields
-  #   {"topic_identifier" => "Topic Identifier",
-  #    "topic_name" => "Topic Name",
-  #    "max_choosers" => "Max Choosers"}
-  # end
-
-  # def self.optional_import_fields(id=nil)
-  #   {"category" => "Category",
-  #    "description" => "Description",
-  #    "link" => "Link"}
-  # end
-
-  # def self.import_options
-  #   {}
-  # end
-
   def self.import(row_hash, session, _id = nil)
     if row_hash.length < 3
       raise ArgumentError, "The CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category (optional), Topic Description (Optional), Topic Link (optional)."

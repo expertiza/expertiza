@@ -1,36 +1,8 @@
-require 'byebug'
 class ImportFileController < ApplicationController
   include AuthorizationHelper
 
   def action_allowed?
     current_user_has_ta_privileges?
-  end
-
-  def sshow
-    @id = params[:id]
-    @model = params[:model]
-
-    # All required fields are selected by default
-    @selected_fields = @model.constantize.required_import_fields
-
-    # Add the chosen optional fields from start
-    @optional_fields = @model.constantize.optional_import_fields(@id)
-    @optional_fields.each do |field, display|
-      if params[field] == "true"
-        @selected_fields.store(field, display)
-      end
-    end
-
-    @field_count = @selected_fields.length
-
-    @options = params[:options]
-    @delimiter = get_delimiter(params)
-    @has_header = params[:has_header]
-
-    @current_file = params[:file]
-    @current_file_contents = @current_file.read
-    @contents_grid = parse_to_grid(@current_file_contents, @delimiter)
-    @contents_hash = parse_to_hash(@contents_grid, params[:has_header])
   end
 
   def show
@@ -105,25 +77,7 @@ class ImportFileController < ApplicationController
     @title = params[:title]
   end
 
-  # def import
-  #   errors = import_from_hash(session, params)
-  #   err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
-  #   errors.each do |error|
-  #     err_msg = err_msg + "<li>" + error.to_s + "<br/>"
-  #   end
-  #   err_msg += "</ul>"
-  #   if errors.empty?
-  #     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "The file has been successfully imported.", request)
-  #     undo_link("The file has been successfully imported.")
-  #   else
-  #     ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, err_msg, request)
-  #     flash[:error] = err_msg
-  #   end
-  #   redirect_to session[:return_to]
-  # end
-
   def import
-    byebug
     errors = nil
     if params[:model] == 'AssignmentParticipant' || params[:model] == 'CourseParticipant'
       errors = simport_from_hash(session, params)  

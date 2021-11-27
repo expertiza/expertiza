@@ -74,7 +74,7 @@
                 <% if index == 0 %>
                   <div id= <%= team_name_color %>>
                 <% else %>
-                  <div id = <%= team_name_color %> style="border-top:solid;border-width:1px;">
+                  <div style="border-top: solid; border-width: 1px;" id = <%= team_name_color %> >
                 <% end %>
                     <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
                     <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
@@ -120,6 +120,7 @@
               <%= hidden_field_tag :participant_id, r.id %>
               <%= hidden_field_tag :assignment_id, @id %>
               <%= number_field_tag 'grade_for_reviewer', r.review_grade.try(:grade_for_reviewer), min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %>
+              <%= link_to "Grading History", grading_histories_path(grade_receiver_id: Participant.where(id: r.id).pluck(:user_id).first, participant_id: r.id, grade_type: "Review") %>
               <br/>
               <%= text_area_tag 'comment_for_reviewer', r.review_grade.try(:comment_for_reviewer), placeholder: 'Comment', class: "awesome_input", 'data-multiple' => '', 'data-minchars' => "1" %>
               <table class="inline-transparent">

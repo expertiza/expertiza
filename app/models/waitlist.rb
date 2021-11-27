@@ -29,6 +29,18 @@ class Waitlist < ActiveRecord::Base
     end
   end
 
+  def self.remove_waitlists_for_team(topic_id, _assignment_id)
+    # first_waitlisted_signup = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
+    first_waitlisted_signup = Waitlist.first_waitlisted_signup(topic_id)
+
+    # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
+    first_waitlisted_signup.is_waitlisted = false
+    first_waitlisted_signup.save
+
+    # Cancel all topics the user is waitlisted for
+    Waitlist.cancel_all_waitlists(first_waitlisted_signup.team_id, SignUpTopic.find(topic_id).assignment_id)
+  end
+
   def self.find_slots_filled(assignment_id)
     # SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id+  " and u.is_waitlisted = false GROUP BY t.id")
     SignUpTopic.find_by_sql(["SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id = ? and u.is_waitlisted = false GROUP BY t.id", assignment_id])
@@ -74,15 +86,15 @@ class Waitlist < ActiveRecord::Base
     SignedUpTeam.where(topic_id: topic_id, is_waitlisted: 1)
   end
 
-<<<<<<< Updated upstream
+  def self.first_waitlisted_signup(topic_id)
+    SignedUpTeam.find_by(topic_id: topic_id, is_waitlisted:  true)
+  end
+
   def self.waitlisted_user_id_from_team_id(team_id)
     TeamsUser.where(team_id: team_id).first.user_id
   end
-=======
+
   def self.teams_not_signed_up(topic_id)
     SignedUpTeam.where(team_id: topic_id, is_waitlisted: 0)
   end
-
-  
->>>>>>> Stashed changes
 end

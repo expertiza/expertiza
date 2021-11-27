@@ -1,0 +1,37 @@
+<!-- Javascript code to toggle on and off the Advanced Search button text -->
+<script>
+    $(document).ready(() => {
+        const $toggleButton = $('#search_toggle_button');
+        const $advancedSearchForm = $('#advance_search_form');
+        var isAdvancedSearchVisible = false;
+        toggleAdvancedSearch(isAdvancedSearchVisible);
+        $toggleButton.click(() => {
+            isAdvancedSearchVisible = !isAdvancedSearchVisible;
+            toggleAdvancedSearch(isAdvancedSearchVisible);
+        });
+        function toggleAdvancedSearch(isAdvancedSearchVisible) {
+            if (isAdvancedSearchVisible) {
+                $advancedSearchForm.show();
+                $toggleButton.text('Hide Advanced Search');
+            } else {
+                $advancedSearchForm.hide();
+                $toggleButton.text('Advanced Search');
+            }
+        }
+    });
+</script>
+
+<!-- Username TextBox with Search button and a Advanced Search with text based on its' state: toggled on or off -->
+
+<div style="margin: 8px auto; display: grid; grid-template-columns: repeat(3, auto) 1fr; grid-gap: 8px; align-items: center">
+  <%= label_tag :search_name, 'UserID:' %><%= text_field_tag(:search_name,params[:search_name]) %>
+  <%= submit_tag("Search") %>
+  <a id="search_toggle_button"></a>
+</div>
+
+<!-- Name and Email TextBoxes to be displayed on tap of Advanced Search button -->
+
+<div id="advance_search_form" style="margin-bottom: 8px; display: grid; grid-template-columns: repeat(4, auto) 1fr; grid-gap: 8px; align-items: center">
+  <%= label_tag :search_full_name, 'Full Name: ' %><%= text_field_tag(:search_fname,params[:search_fname]) %>
+  <%= label_tag :search_email, 'Email: ' %><%= text_field_tag(:search_email,params[:search_email]) %>
+</div> 

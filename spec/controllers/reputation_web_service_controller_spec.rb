@@ -1,34 +1,27 @@
 describe ReputationWebServiceController do
-=begin
-  let(:instructor){build(:instructor, id:1)}
 
-  describe '' do
+  let(:instructor){build(:instructor, id:1)}
+  describe 'custom test' do
     before(:each) do
       @assignment_1 = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day, submitter_count: 0, num_reviews: 3, rounds_of_reviews: 2, reputation_algorithm: 'lauw', id: 1)
       @assignment_2 = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day, submitter_count: 0, num_reviews: 3, rounds_of_reviews: 2, reputation_algorithm: 'hamer', id: 2)
       @questionnaire_1 = create(:questionnaire, min_question_score: 0, max_question_score: 5, type: 'ReviewQuestionnaire', id: 1)
-      @questionnaire_2 = create(:questionnaire, min_question_score: 0, max_question_score: 5, type: 'ReviewQuestionnaire', id: 2)
-      @assignment_questionnaire_1_1 = create(:assignment_questionnaire, assignment_id: @assignment_1.id, questionnaire_id: @questionnaire_1.id, used_in_round: 1, id: 1)
-      @assignment_questionnaire_1_2 = create(:assignment_questionnaire, assignment_id: @assignment_1.id, questionnaire_id: @questionnaire_2.id, used_in_round: 2, id: 2)
-      @assignment_questionnaire_2_1 = create(:assignment_questionnaire, assignment_id: @assignment_2.id, questionnaire_id: @questionnaire_1.id, used_in_round: 1, id: 3)
-      @assignment_questionnaire_2_2 = create(:assignment_questionnaire, assignment_id: @assignment_2.id, questionnaire_id: @questionnaire_2.id, used_in_round: 2, id: 4)
+      @assignment_questionnaire_1_1 = create(:assignment_questionnaire, assignment_id: @assignment_1.id, questionnaire_id: @questionnaire_1.id, used_in_round: 1)
+      @assignment_questionnaire_1_2 = create(:assignment_questionnaire, assignment_id: @assignment_1.id, questionnaire_id: @questionnaire_1.id, used_in_round: 2)
+      @assignment_questionnaire_2_1 = create(:assignment_questionnaire, assignment_id: @assignment_2.id, questionnaire_id: @questionnaire_1.id, used_in_round: 1)
+      @assignment_questionnaire_2_2 = create(:assignment_questionnaire, assignment_id: @assignment_2.id, questionnaire_id: @questionnaire_1.id, used_in_round: 2, id: 4)
 
       @question_1_1 = create(:question, questionnaire_id: @questionnaire_1.id, id: 1)
       @question_1_2 = create(:question, questionnaire_id: @questionnaire_1.id, id: 2)
       @question_1_3 = create(:question, questionnaire_id: @questionnaire_1.id, id: 3)
       @question_1_4 = create(:question, questionnaire_id: @questionnaire_1.id, id: 4)
       @question_1_5 = create(:question, questionnaire_id: @questionnaire_1.id, id: 5)
-      @question_2_1 = create(:question, questionnaire_id: @questionnaire_2.id, id: 6)
-      @question_2_2 = create(:question, questionnaire_id: @questionnaire_2.id, id: 7)
-      @question_2_3 = create(:question, questionnaire_id: @questionnaire_2.id, id: 8)
-      @question_2_4 = create(:question, questionnaire_id: @questionnaire_2.id, id: 9)
-      @question_2_5 = create(:question, questionnaire_id: @questionnaire_2.id, id: 10)
 
       @reviewer_1 = create(:participant, can_review: 1)
       @reviewer_2 = create(:participant, can_review: 1)
       @reviewer_3 = create(:participant, can_review: 1)
-      @reviewer_4 = create(:participant, can_review: 1)
-      @reviewer_5 = create(:participant, can_review: 1)
+      #@reviewer_4 = create(:participant, can_review: 1)
+      #@reviewer_5 = create(:participant, can_review: 1)
 
       @reviewee_1 = create(:assignment_team, assignment: @assignment)
       @reviewee_2 = create(:assignment_team, assignment: @assignment)
@@ -37,44 +30,68 @@ describe ReputationWebServiceController do
       @response_map_1_1 = create(:review_response_map, reviewer_id: @reviewer_1.id, reviewee_id: @reviewee_1.id)
       @response_map_1_2 = create(:review_response_map, reviewer_id: @reviewer_2.id, reviewee_id: @reviewee_1.id)
       @response_map_1_3 = create(:review_response_map, reviewer_id: @reviewer_3.id, reviewee_id: @reviewee_1.id)
-      @response_map_1_4 = create(:review_response_map, reviewer_id: @reviewer_4.id, reviewee_id: @reviewee_1.id)
-      @response_map_1_5 = create(:review_response_map, reviewer_id: @reviewer_5.id, reviewee_id: @reviewee_1.id)
+      #@response_map_1_4 = create(:review_response_map, reviewer_id: @reviewer_4.id, reviewee_id: @reviewee_1.id)
+      #@response_map_1_5 = create(:review_response_map, reviewer_id: @reviewer_5.id, reviewee_id: @reviewee_1.id)
       @response_map_2_1 = create(:review_response_map, reviewer_id: @reviewer_1.id, reviewee_id: @reviewee_2.id)
       @response_map_2_2 = create(:review_response_map, reviewer_id: @reviewer_2.id, reviewee_id: @reviewee_2.id)
       @response_map_2_3 = create(:review_response_map, reviewer_id: @reviewer_3.id, reviewee_id: @reviewee_2.id)
-      @response_map_2_4 = create(:review_response_map, reviewer_id: @reviewer_4.id, reviewee_id: @reviewee_2.id)
-      @response_map_2_5 = create(:review_response_map, reviewer_id: @reviewer_5.id, reviewee_id: @reviewee_2.id)
+      #@response_map_2_4 = create(:review_response_map, reviewer_id: @reviewer_4.id, reviewee_id: @reviewee_2.id)
+      #@response_map_2_5 = create(:review_response_map, reviewer_id: @reviewer_5.id, reviewee_id: @reviewee_2.id)
       @response_map_3_1 = create(:review_response_map, reviewer_id: @reviewer_1.id, reviewee_id: @reviewee_3.id)
       @response_map_3_2 = create(:review_response_map, reviewer_id: @reviewer_2.id, reviewee_id: @reviewee_3.id)
       @response_map_3_3 = create(:review_response_map, reviewer_id: @reviewer_3.id, reviewee_id: @reviewee_3.id)
-      @response_map_3_4 = create(:review_response_map, reviewer_id: @reviewer_4.id, reviewee_id: @reviewee_3.id)
-      @response_map_3_5 = create(:review_response_map, reviewer_id: @reviewer_5.id, reviewee_id: @reviewee_3.id)
+      #@response_map_3_4 = create(:review_response_map, reviewer_id: @reviewer_4.id, reviewee_id: @reviewee_3.id)
+      #@response_map_3_5 = create(:review_response_map, reviewer_id: @reviewer_5.id, reviewee_id: @reviewee_3.id)
 
       @response_1_1 = create(:response, is_submitted: true, map_id: @response_map_1_1.id)
       @response_1_2 = create(:response, is_submitted: true, map_id: @response_map_1_2.id)
       @response_1_3 = create(:response, is_submitted: true, map_id: @response_map_1_3.id)
-      @response_1_4 = create(:response, is_submitted: true, map_id: @response_map_1_4.id)
-      @response_1_5 = create(:response, is_submitted: true, map_id: @response_map_1_5.id)
+      #@response_1_4 = create(:response, is_submitted: true, map_id: @response_map_1_4.id)
+      #@response_1_5 = create(:response, is_submitted: true, map_id: @response_map_1_5.id)
       @response_2_1 = create(:response, is_submitted: true, map_id: @response_map_2_1.id)
       @response_2_2 = create(:response, is_submitted: true, map_id: @response_map_2_2.id)
       @response_2_3 = create(:response, is_submitted: true, map_id: @response_map_2_3.id)
-      @response_2_4 = create(:response, is_submitted: true, map_id: @response_map_2_4.id)
-      @response_2_5 = create(:response, is_submitted: true, map_id: @response_map_2_5.id)
+      #@response_2_4 = create(:response, is_submitted: true, map_id: @response_map_2_4.id)
+      #@response_2_5 = create(:response, is_submitted: true, map_id: @response_map_2_5.id)
       @response_3_1 = create(:response, is_submitted: true, map_id: @response_map_3_1.id)
       @response_3_2 = create(:response, is_submitted: true, map_id: @response_map_3_2.id)
       @response_3_3 = create(:response, is_submitted: true, map_id: @response_map_3_3.id)
-      @response_3_4 = create(:response, is_submitted: true, map_id: @response_map_3_4.id)
-      @response_3_5 = create(:response, is_submitted: true, map_id: @response_map_3_5.id)
+      #@response_3_4 = create(:response, is_submitted: true, map_id: @response_map_3_4.id)
+      #@response_3_5 = create(:response, is_submitted: true, map_id: @response_map_3_5.id)
     end
 
-    it '' do
-       create(:answer, question_id: @question_1_1, response_id: @response_1_1, answer: 5)
-       #repeat for different answers
+    it 'scenario 1' do
+      # reivewer_1's review for reviewee_1: [5, 5, 5, 5, 5]
+      create(:answer, question_id: @question_1_1.id, response_id: @response_1_1.id, answer: 5)
+      create(:answer, question_id: @question_1_2.id, response_id: @response_1_1.id, answer: 5)
+      create(:answer, question_id: @question_1_3.id, response_id: @response_1_1.id, answer: 5)
+      create(:answer, question_id: @question_1_4.id, response_id: @response_1_1.id, answer: 5)
+      create(:answer, question_id: @question_1_5.id, response_id: @response_1_1.id, answer: 5)
+
+      # reivewer_2's review for reviewee_1: [3, 3, 3, 3, 3]
+      create(:answer, question_id: @question_1_1.id, response_id: @response_1_2.id, answer: 3)
+      create(:answer, question_id: @question_1_2.id, response_id: @response_1_2.id, answer: 3)
+      create(:answer, question_id: @question_1_3.id, response_id: @response_1_2.id, answer: 3)
+      create(:answer, question_id: @question_1_4.id, response_id: @response_1_2.id, answer: 3)
+      create(:answer, question_id: @question_1_5.id, response_id: @response_1_2.id, answer: 3)
+
+      # reivewer_3's review for reviewee_1: [1, 1, 1, 1, 1]
+      create(:answer, question_id: @question_1_1.id, response_id: @response_1_3.id, answer: 1)
+      create(:answer, question_id: @question_1_2.id, response_id: @response_1_3.id, answer: 1)
+      create(:answer, question_id: @question_1_3.id, response_id: @response_1_3.id, answer: 1)
+      create(:answer, question_id: @question_1_4.id, response_id: @response_1_3.id, answer: 1)
+      create(:answer, question_id: @question_1_5.id, response_id: @response_1_3.id, answer: 1)
+
+      #result = ReputationWebServiceController.new.db_query(1, 1, false)
+      #expect(result).to eq([[2, 1, 100.0], [3, 1, 60.0], [4, 1, 20.0]])
+      result = ReputationWebServiceController.new.json_generator(1, 0, 1)
+      expect(result).to eq({"submission1"=>{"stu2"=>100.0, "stu3"=>60.0, "stu4"=>20.0}})
+      #repeat for different answers
     end
   end
-=end
 
 
+=begin
   # TODO added by Dong Li
   describe 'custom test' do
     let(:assignment_1) { double('Assignment', id: 1, rounds_of_reviews:2, reputation_algorithm: 'lauw') }
@@ -140,16 +157,6 @@ describe ReputationWebServiceController do
              reviewer: reviewer_2, reviewer_id: 2, reviewee: reviewee_1, reviewee_id: 1, response: [response_1_2])
     end
 
-# move inside test ideally
-    let(:answer_1_1) {double('Answer',id:1, question_id: 1, answer: 5, comment: "None", response_id: 1, question: question_1_1)}
-    let(:answer_1_2) {double('Answer',id:2, question_id: 2, answer: 5, comment: "None", response_id: 1, question: question_1_2)}
-    let(:answer_1_3) {double('Answer',id:3, question_id: 3, answer: 5, comment: "None", response_id: 1, question: question_1_3)}
-    let(:answer_1_4) {double('Answer',id:4, question_id: 4, answer: 5, comment: "None", response_id: 1, question: question_1_4)}
-    let(:answer_2_1) {double('Answer',id:5, question_id: 1, answer: 1, comment: "None", response_id: 2, question: question_2_1)}
-    let(:answer_2_2) {double('Answer',id:6, question_id: 2, answer: 1, comment: "None", response_id: 2, question: question_2_2)}
-    let(:answer_2_3) {double('Answer',id:7, question_id: 3, answer: 1, comment: "None", response_id: 2, question: question_2_3)}
-    let(:answer_2_4) {double('Answer',id:8, question_id: 4, answer: 1, comment: "None", response_id: 2, question: question_2_4)}
-
     before(:each) do
       allow(Assignment).to receive(:find_by).with(id: '1').and_return(assignment_1)
       instructor = build(:instructor)
@@ -167,13 +174,31 @@ describe ReputationWebServiceController do
       allow(reviewer_4).to receive(:get_reviewer).and_return(reviewer_4)
       allow(reviewer_5).to receive(:get_reviewer).and_return(reviewer_5)
 
-      allow(Answer).to receive(:where).with(response_id: 1).and_return([answer_1_1, answer_1_2, answer_1_3, answer_1_4])
-      allow(Answer).to receive(:where).with(response_id: 2).and_return([answer_2_1, answer_2_2, answer_2_3, answer_2_4])
+#      allow(Answer).to receive(:where).with(response_id: 1).and_return([answer_1_1, answer_1_2, answer_1_3, answer_1_4])
+#      allow(Answer).to receive(:where).with(response_id: 2).and_return([answer_2_1, answer_2_2, answer_2_3, answer_2_4])
 
     end
 
     context 'test db_query' do
       it 'query Peer-Review grade of two reviewers' do
+
+#        let(:answer_1_1) {double('Answer',id:1, question_id: 1, answer: 5, comment: "None", response_id: 1, question: question_1_1)}
+#    let(:answer_1_2) {double('Answer',id:2, question_id: 2, answer: 5, comment: "None", response_id: 1, question: question_1_2)}
+#    let(:answer_1_3) {double('Answer',id:3, question_id: 3, answer: 5, comment: "None", response_id: 1, question: question_1_3)}
+#    let(:answer_1_4) {double('Answer',id:4, question_id: 4, answer: 5, comment: "None", response_id: 1, question: question_1_4)}
+#    let(:answer_2_1) {double('Answer',id:5, question_id: 1, answer: 1, comment: "None", response_id: 2, question: question_2_1)}
+#    let(:answer_2_2) {double('Answer',id:6, question_id: 2, answer: 1, comment: "None", response_id: 2, question: question_2_2)}
+#    let(:answer_2_3) {double('Answer',id:7, question_id: 3, answer: 1, comment: "None", response_id: 2, question: question_2_3)}
+#    let(:answer_2_4) {double('Answer',id:8, question_id: 4, answer: 1, comment: "None", response_id: 2, question: question_2_4)}
+
+        create(:answer, id: 1, question_id: 1, answer: 5, response_id: 1 )
+        create(:answer, id: 2, question_id: 2, answer: 5, response_id: 1, question: question_1_2 )
+        create(:answer, id: 3, question_id: 3, answer: 5, response_id: 1, question: question_1_3 )
+        create(:answer, id: 4, question_id: 4, answer: 5, response_id: 1, question: question_1_4 )
+        create(:answer, id: 5, question_id: 1, answer: 1, response_id: 2, question: question_2_1 )
+        create(:answer, id: 6, question_id: 2, answer: 1, response_id: 2, question: question_2_2 )
+        create(:answer, id: 7, question_id: 3, answer: 1, response_id: 2, question: question_2_3 )
+        create(:answer, id: 8, question_id: 4, answer: 1, response_id: 2, question: question_2_4 )
         result = ReputationWebServiceController.new.db_query(1, 1, false)
         expect(result).to eq([[1, 2, 100.0], [2, 2, 20.0]])
       end
@@ -190,5 +215,5 @@ describe ReputationWebServiceController do
     # end
 
   end
+=end
 end
-

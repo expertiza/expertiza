@@ -198,9 +198,6 @@ class GradesController < ApplicationController
 
   def populate_view_model(participant, questionnaire, team)
     vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
-    puts "sjjdfsdfsdfdfssjfklsdfklsjklfjlsjflkjskldfjslkjfklsjdlfjklsjlfsadfjlsfjlasjflasjldfjsdlf"
-    puts "populate_view_model"
-    puts "sjjdfsdfsdfdfssjfklsdfklsjklfjlsjflkjskldfjslkjfklsjdlfjklsjlfsadfjlsfjlasjflasjldfjsdlf"
     vmquestions = questionnaire.questions
     vm.add_questions(vmquestions)
     vm.add_team_members(team)

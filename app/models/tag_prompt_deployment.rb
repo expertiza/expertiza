@@ -11,7 +11,7 @@ class TagPromptDeployment < ActiveRecord::Base
 
   def get_number_of_taggable_answers(user_id)
     team = Team.joins(:teams_users).where(team_users: {parent_id: self.assignment_id}, user_id: user_id)
-    responses = Response.joins(:response_maps).where(response_maps: {reviewed_object_id: self.assignment.id, reviewee_id: team.id}) 
+    responses = Response.joins(:response_maps).where(response_maps: {reviewed_object_id: self.assignment.id, reviewee_id: team.id})
     questions = Question.where(questionnaire_id: self.questionnaire.id, type: self.question_type)
 
     unless responses.empty? || questions.empty?

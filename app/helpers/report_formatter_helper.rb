@@ -29,6 +29,8 @@ module ReportFormatterHelper
     @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, @type, @review_user)
     @review_scores = @assignment.compute_reviews_hash
     @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
+    # Calculate the average score given to the user by each team reviewed
+    @author_feedback_scores = @assignment.compute_author_feedback_scores
   end
 
   def feedback_response_map(params, _session = nil)

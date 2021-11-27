@@ -209,4 +209,50 @@ class ReviewResponseMap < ResponseMap
     end
     review_final_versions[symbol][:response_ids] = response_ids
   end
+
+  def self.final_feedbacks_for_reviewer(assignment_id, reviewer_id)
+    feedback_final_versions = {}
+    review_rounds = Assignment.find(assignment_id).rounds_of_reviews
+    @response_maps = ResponseMap.where('reviewed_object_id = ? && type = ? && reviewer_id = ?', assignment_id, 'ReviewResponseMap', reviewer_id)
+    (1..review_rounds).each do |round|
+      @response_maps.each do |response_map|
+        feedback_response_ids = []
+        response = Response.where('map_id = ?', response_map.id)
+        response = response.select {|response| response.round == round }
+        team = Team.find(response_map.reviewee_id) unless response_map.reviewee_id.nil?
+        prepare_final_feedback_versions(response, team, round, feedback_final_versions, feedback_response_ids)
+      end
+    end
+    feedback_final_versions
+  end
+
+  def self.prepare_final_feedback_versions(response, team, round, feedback_final_versions, feedback_response_ids)
+    symbol = ("review round" + " " + round.to_s).to_sym
+    unless response.empty?
+      author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response.first.id, 'FeedbackResponseMap')
+      author_feedback_response_maps.each do |author_feedback_response_map|
+        corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)
+        next if corresponding_response.empty?
+        feedback_final_versions[symbol] = {} if feedback_final_versions[symbol].nil?
+        unless corresponding_response.empty?
+          if feedback_final_versions[symbol][:questionnaire_id].nil?
+            feedback_final_versions[symbol][:questionnaire_id] = feedback_questionnaire_id(corresponding_response)
+          end
+          feedback_response_ids << corresponding_response.first.id
+        end
+      end
+    end
+    unless team.nil?
+      feedback_final_versions[symbol] = {} if feedback_final_versions[symbol].nil?
+      feedback_final_versions[symbol][team.name] = {}
+      feedback_final_versions[symbol][team.name][:feedback_response_ids] = feedback_response_ids
+    end
+  end
+
+  def self.feedback_questionnaire_id(feedback_response)
+    feedback_answer = Answer.where(response_id: feedback_response.first.id)
+    question = Question.find(feedback_answer.first.question_id)
+    question.questionnaire_id
+  end
+
 end

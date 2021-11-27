@@ -91,6 +91,13 @@ class PopupController < ApplicationController
     flash.now[:error] = "This report is not implemented for assignments where the rubric varies by topic." if assignment.vary_by_topic
   end
 
+  def view_feedback_scores_popup
+    @ip = session[:ip]
+    @reviewer_id = params[:reviewer_id]
+    @assignment_id = params[:assignment_id]
+    @feedback_final_versions = ReviewResponseMap.final_feedbacks_for_reviewer(@assignment_id, @reviewer_id)
+  end
+
   # this can be called from "response_report" by clicking reviewer names from instructor end.
   def reviewer_details_popup
     @userid = Participant.find(params[:id]).user_id

@@ -46,7 +46,7 @@ class LatePoliciesController < ApplicationController
     set_assignment_id
     @late_policy = LatePolicy.new
     respond_to do |format|
-      format.html # new.html.haml
+      format.html # new.html.erb
       format.xml  { render xml: @late_policy }
     end
   end

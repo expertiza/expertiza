@@ -1,12 +1,5 @@
-<!--E1877 script added to sort the table-->
-<script>
-  $(function () {
-    /*E1877: Function for sorting the table */
-    $("#submissionsTable").tablesorter({
-      sortList: [[0,0]] //E1877: sort First Column by default when page loads
-    });
-  });
-</script>
+<!-- Changes base on - E1934 -->
+
 <% headers = {} %>
 <% headers["Topic_name"] = "16%" if @assignment.topics? %>
 <% if @assignment.max_team_size > 1 %>
@@ -16,80 +9,73 @@
   <% headers["Participant name"] = "18%" %>
 <% end %>                              
 <% headers["Submitted item(s)"] = nil %>
-<!--E1877: table id changed -->
-<table id ="submissionsTable" class="table table-striped" style="margin-top: 50px">
-    <thead>
-    <!--E1877: class="sorter-true" added to sort all attributes-->
-      <tr>
-        <% if @assignment.topics? %>
-          <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Topic name</th>
-        <% end %>
-        <% if @assignment.max_team_size > 1 %>
-          <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Team name</th>
-          <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Team member(s)</th>
-        <% else %>
-          <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Participant name</th>
-        <% end %>  
-        <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Links</th> 
-        <th class="sorter-false" style="font-weight: bold; font-size: 15px;"></th>
-      </tr>                    
-    </thead>
-    <% @l = -1 %>
-    <% @teams.each do |team| %>
-      <% @l = @l+1 %>
-      <tr>
-        <% topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team) %>
 
-        <!--Topic name-->
-        <% if @assignment.topics? %>
-          <td><%= topic_identifier + '. ' + topic_name %></td>
-        <% end %>
+<table class="table table-striped" style="margin-top: 50px">
+  <thead>
+  <% if @assignment.topics? %>
+    <td style="font-weight: bold; font-size: 15px;">Topic name</td>
+  <% end %>
+  <% if @assignment.max_team_size > 1 %>
+    <td style="font-weight: bold; font-size: 15px;">Team name</td>
+    <td style="font-weight: bold; font-size: 15px;">Team member(s)</td>
+  <% else %>
+    <td style="font-weight: bold; font-size: 15px;">Participant name</td>
+  <% end %>
+  <td style="font-weight: bold; font-size: 15px;">Links</td>
+  <td style="font-weight: bold; font-size: 15px;">History</td>
+  </thead>
+  <% @l = -1 %>
+  <% @teams.each do |team| %>
+    <% @l = @l+1 %>
+    <tr>
+      <% topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team) %>
+      <!--Topic name-->
+      <% if @assignment.topics? %>
+        <td><%= topic_identifier + '. ' + topic_name %></td>
+      <% end %>
 
-        <!--Team name-->
+      <!--Team name-->
+      <% if @assignment.max_team_size > 1 %>
         <% team_name_color = get_team_name_color_in_list_submission(team) %>
-        <% if @assignment.max_team_size > 1 %>
-          <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
-          <% unless participants.empty? or participants[0].nil?%>
+        <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
+          <% unless participants.empty? %>
             <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
           <% end %>
+      <% end %>
+
+      <!--Team member(s) / Participant name-->
+      <td>
+        <% users_for_curr_team.each do |user| %>
+          <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post , id:"name"+@l.to_s%>
+          (<%= user.fullname(session[:ip])%>)<br>
         <% end %>
+      </td>
 
-        <!--Team member(s) / Participant name-->
-          <td>
-              <% users_for_curr_team.each do |user| %>
-                  <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post , id:"name"+@l.to_s%>
-                  (<%= user.fullname(session[:ip])%>)<br>
-              <% end %>
-            <% if @assignment.max_team_size < 2 and ( !participants.empty? or !participants[0].nil?)%>
-              <script>document.getElementById("name<%=@l.to_s %>").style.color = "<%=team_name_color%>"</script>
-              <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %>
-            <%end %>
-          </td>
-
-        <!--Submitted item(s)-->
-        <td>
+      <!--Submitted item(s)-->
+      <td>
         <!--Display submitted hyperlinks-->
-          <% participant = participants.compact.first %>
-          <% if participant and !team.hyperlinks.empty? %>
-            <% team.hyperlinks.each do |link| %>
-              <a href="<%= link %>" target="_blank">- <%= link %></a><br/>
-            <% end %>
+        <% participant = participants.compact.first %>
+        <% if participant and !team.submitted_files.empty? %>
+          <% team.hyperlinks.each do |link| %>
+            <a href="<%= link %>" target="_blank">- <%= link %></a><br/>
           <% end %>
-          <br>
-          <!--Display submitted files-->
-          <% p team.submitted_files %>
-          <% if participant and !team.submitted_files.empty? %>
-            <% files = team.submitted_files %>
-            <%= display_directory_tree(participant, files, true).html_safe if files and files.length > 0 %>
-          <% end %>
-        </td>
-        <td width="10%">
+        <% end %>
+        <br>
+        <!--Display submitted files-->
+        <% p team.submitted_files %>
+        <% if participant and !team.submitted_files.empty? %>
+          <% files = team.submitted_files %>
+          <%= display_directory_tree(participant, files, true).html_safe if files and files.length > 0 %>
+        <% end %>
+      </td>
+      <td width="10%">
 
-          <%= link_to "History", submission_records_path(team_id: team.id) %>
+          <%= link_to "Submission History", submission_records_path(team_id: team.id) %> </br>
+          <%= link_to "Grading History", grading_histories_path(grade_reciever_id: team.id, grade_type: "Submission") %>
 
-        </td>
-      </tr>
-    <% end %>
-  </table>
-  <p> **In "Team name" column, text in <i style = "color:#0984e3">blue</i> indicates that the submission grade is not assigned; text in <i style = "color: #cd6133">brown</i> indicates that the submission grade has been assigned.</p>
+      </td>
+    </tr>
+  <% end %>
+</table>
+<p> **In "Team name" column, text in <i style = "color:#0984e3">blue</i> indicates that the submission grade is not assigned; text in <i style = "color: #cd6133">brown</i> indicates that the submission grade has been assigned.</p>
 </div>

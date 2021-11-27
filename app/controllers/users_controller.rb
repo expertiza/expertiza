@@ -91,7 +91,7 @@ class UsersController < ApplicationController
     # Appends the email to the search criteria, if found in the email text box
     search_email = ".*" + params[:search_email].strip + ".*" if params[:search_email].present?
 
-    [search_uid, search_fname, search_email]
+    [search_usrid, search_fname, search_email]
   end
 
   # for displaying users which are being searched for editing purposes after checking whether current user is authorized to do so

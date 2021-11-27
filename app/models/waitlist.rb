@@ -74,7 +74,15 @@ class Waitlist < ActiveRecord::Base
     SignedUpTeam.where(topic_id: topic_id, is_waitlisted: 1)
   end
 
+<<<<<<< Updated upstream
   def self.waitlisted_user_id_from_team_id(team_id)
     TeamsUser.where(team_id: team_id).first.user_id
   end
+=======
+  def self.teams_not_signed_up(topic_id)
+    SignedUpTeam.where(team_id: topic_id, is_waitlisted: 0)
+  end
+
+  
+>>>>>>> Stashed changes
 end

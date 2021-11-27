@@ -4,6 +4,7 @@ describe GradesController do
   let(:assignment_questionnaire) { build(:assignment_questionnaire, used_in_round: 1, assignment: assignment) }
   let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
   let(:participant2) { build(:participant, id: 2, assignment: assignment, user_id: 1) }
+  let(:participant3) { build(:participant, id: 3, assignment: assignment, user_id: 1, grade: 98) }
   let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
@@ -16,6 +17,7 @@ describe GradesController do
 
   before(:each) do
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
+    allow(AssignmentParticipant).to receive(:find).with('3').and_return(participant3)
     allow(participant).to receive(:team).and_return(team)
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -166,9 +168,23 @@ describe GradesController do
   end
 
   describe '#update' do
-    before(:each) do
-      allow(participant).to receive(:update_attribute).with(any_args).and_return(participant)
+
+    context 'when participant\'s grade is update' do
+      it 'updates grades and redirects to grades#edit page' do
+        params = {
+            id: 3,
+            total_score: 98,
+            participant: {
+                grade: 98
+            }
+        }
+        allow(participant3).to receive(:update_attribute).with(any_args).and_return(participant3)
+        post :update, params
+        expect(flash[:note]).to eq("A score of 98% has been saved for instructor6.")
+        expect(response).to redirect_to('/grades/3/edit')
+      end
     end
+
     context 'when total is not equal to participant\'s grade' do
       it 'updates grades and redirects to grades#edit page' do
         params = {
@@ -178,6 +194,7 @@ describe GradesController do
             grade: 96
           }
         }
+        allow(participant).to receive(:update_attribute).with(any_args).and_return(participant)
         post :update, params
         expect(flash[:note]).to eq("The computed score will be used for #{participant.user.name}.")
         expect(response).to redirect_to('/grades/1/edit')
@@ -193,6 +210,7 @@ describe GradesController do
             grade: 98
           }
         }
+        allow(participant).to receive(:update_attribute).with(any_args).and_return(participant)
         post :update, params
         expect(flash[:note]).to eq("The computed score will be used for #{participant.user.name}.")
         expect(response).to redirect_to('/grades/1/edit')

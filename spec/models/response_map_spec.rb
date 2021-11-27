@@ -126,10 +126,16 @@ describe ResponseMap do
   describe 'find_team_member' do
     context 'Finds the team of a reviewee' do
       it 'finds the team for a metareview response map' do
-        
+        #Ask Nick about map line
+        #Ask Nick if find_by returns array
+        allow(ResponseMap).to receive(:find_by).with(id: metareview_response_map.reviewed_object_id).and_return(metareview_response_map)
+        allow(AssignmentTeam).to receive(:find_by).with(id: review_response_map.reviewee_id).and_return(team)
+        expect(metareview_response_map.find_team_member).to eq(team)
       end
-      it 'finds the team for a metareview response map' do
-        
+      it 'finds the team for a regular response map' do
+        #Ask Nick if there should be an id: before reviewee_id in the with
+        allow(AssignmentTeam).to receive(:find).with(review_response_map.reviewee_id).and_return(team)
+        expect(review_response_map.find_team_member).to eq(team)
       end
     end
 

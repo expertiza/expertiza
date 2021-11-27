@@ -88,6 +88,14 @@ describe Response do
     end
   end
 
+  describe '#delete' do
+    it 'computes the total score of a review' do
+      score_d = create(:answer, id:1)
+      response_d = create(:response, id: 2, map_id: 1, response_map: response_map, scores:[score_d])
+      expect { response_d.delete }.to change { Response.count}.by(-1).and change {Answer.count}.by(-1)
+    end
+  end
+
   describe '#average_score' do
     context 'when maximum_score returns 0' do
       it 'returns N/A' do

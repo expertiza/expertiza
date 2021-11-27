@@ -97,8 +97,8 @@
     <% end %>
 
     <% if (vm.questionnaire_display_type == "Metareview" or vm.questionnaire_display_type == "Author Feedback") and @current_role_name.eql?'Student' %>
-    <% elsif (vm.questionnaire_display_type == "Teammate Review" and @current_role_name.eql?'Student' and !@assignment.show_teammate_reviews)%>
-    <% elsif (vm.questionnaire_display_type == "Teammate Review" and @current_role_name.eql?'Student' and @assignment.show_teammate_reviews and current_user.id != vm.reviewee_id )%>
+    <% elsif (vm.questionnaire_type == "TeammateReviewQuestionnaire" and @current_role_name.eql?'Student' and !@assignment.show_teammate_reviews)%>
+    <% elsif (vm.questionnaire_type == "TeammateReviewQuestionnaire" and @current_role_name.eql?'Student' and @assignment.show_teammate_reviews and current_user.id != vm.reviewee_id )%>
     <% else %>
         <% if vm.questionnaire_type == "TeammateReviewQuestionnaire" %>
           <div class="teammate_table" data-reviewee_id="<%= vm.reviewee_id %>">

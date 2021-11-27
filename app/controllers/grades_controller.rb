@@ -99,7 +99,7 @@ class GradesController < ApplicationController
           counter_for_same_rubric = 0
         end
       end
-      if questionnaire.display_type == "Teammate Review"
+      if questionnaire.type == "TeammateReviewQuestionnaire"
         # as teammate review will be different for each participant
         # we need to create a separate table for each teammate
         @participant.team.participants.each do |team_participant|

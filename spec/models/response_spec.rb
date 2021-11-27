@@ -1,5 +1,6 @@
 describe Response do
-  let(:participant) { build(:participant, id: 1, parent_id:1, user: build(:student, name: 'no name', fullname: 'no one')) }
+  let(:user) {build(:student, id: 1, role_id: 1, name: 'no name', fullname: 'no one')}
+  let(:participant) { build(:participant, id: 1, parent_id:1, user: user) }
   let(:participant2) { build(:participant, id: 2) }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
   let(:team) { build(:assignment_team) }
@@ -272,6 +273,35 @@ describe Response do
           .with(["assignment_id = ? and questionnaire_id IN (?)",1, ReviewQuestionnaire.select("id")], )
           .and_return(assignment_questionnaire)
       expect(Response.calibration_results_info(1, 2, 1)).to eq([calibration_response, response_record, [question]])
+    end
+  end
+
+  describe 'done_by_staff_participant?' do
+    it 'true if review is done by Instructor' do
+      allow(Response).to receive(:find).with(1).and_return(response)
+      allow(ResponseMap).to receive(:find).with(1).and_return(review_response_map)
+      allow(Participant).to receive(:find).with(1).and_return(participant)
+      allow(User).to receive(:find).with(1).and_return(user)
+      allow(Role).to receive(:find).with(1).and_return(build(:role_of_instructor))
+      expect(response.done_by_staff_participant?).to eq(true)
+    end
+
+    it 'true if review is done by teaching assistant' do
+      allow(Response).to receive(:find).with(1).and_return(response)
+      allow(ResponseMap).to receive(:find).with(1).and_return(review_response_map)
+      allow(Participant).to receive(:find).with(1).and_return(participant)
+      allow(User).to receive(:find).with(1).and_return(user)
+      allow(Role).to receive(:find).with(1).and_return(build(:role_of_teaching_assistant))
+      expect(response.done_by_staff_participant?).to eq(true)
+    end
+
+    it 'false if review is done by student' do
+      allow(Response).to receive(:find).with(1).and_return(response)
+      allow(ResponseMap).to receive(:find).with(1).and_return(review_response_map)
+      allow(Participant).to receive(:find).with(1).and_return(participant)
+      allow(User).to receive(:find).with(1).and_return(user)
+      allow(Role).to receive(:find).with(1).and_return(build(:role_of_student))
+      expect(response.done_by_staff_participant?).to eq(false)
     end
   end
 

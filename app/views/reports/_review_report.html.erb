@@ -38,8 +38,8 @@
   <button onclick="exportTableToCSV('review_scores.csv')">Export Review Scores To CSV File</button>
   <br />
   <br />
-  <input type='button' onClick='javascript:showHideColumn(this);' value='show'> 
-  <br />
+  <input type='button' onClick='javascript:showHideColumn(this);' value='Show'> Author Scores Column 
+  <br /><br>
   <table id="myTable" class="table table-striped" width="100%" cellspacing='0' cellpadding='2' border='0'>
     <thead>
     
@@ -49,17 +49,15 @@
       <th rowspan ="2" width="8%" class="sorter-true">Reviews done<span></span></th>
       <th rowspan ="2" width="20%" class="sorter-true">Team reviewed <span></span></th>
       <th width="5%" colspan=  "2" class="sorter-false">Scores<span></span></th>
-      <th width="11%" colspan="2" class="sorter-false">Author Feedback Score<span></span></th>
+      <th rowspan ="2"  width="8%" class="sorter-false" >AVG Feedback Score<span></span></th>
       <th rowspan ="2" width="14%" class="sorter-true">Metrics <span></span></th>
-       <th rowspan ="2" width="18%"  class="sorter-false">Assign grade and write comments <span></span></th>
+       <th rowspan ="2"  class="sorter-false">Assign grade and write comments <span></span></th>
      
     </tr>
     <tr bgcolor='#CCCCCC'>
 
 		  <th width="4%" class="sorter-true" style="white-space:nowrap;"> Score awarded <span></span></th>
 		  <th width="6%" class="sorter-true"> AVG Score <span></span></th>
-		 <th width="16%" class="sorter-true"> Scores awarded <span></span></th>
-   		 <th width="6%" class="sorter-true"> AVG Score<span></span></th>
     </tr>
     </thead>
     <tbody>
@@ -136,18 +134,9 @@
               <% end %>
             <% end %>
           </td>
-	 <!--Render partial view corresponding to each author score in a team-->
+	 <!--Render partial view corresponding to each author avg score in each round-->
           <td align='left' style="white-space:nowrap;">
             <% @response_maps.each_with_index do |reviewer_map, index| %>
-              <% if Team.where(id: reviewer_map.reviewee_id).length > 0 %>
-                <% @team = Team.find(reviewer_map.reviewee_id) %>
-                <%= render partial: 'author_scores', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: reviewer.id} %>
-              <% end %>
-            <% end %>
-          </td>
-          <!--Render partial view corresponding to the average score awarded by a team-->
-          <td align='left' style="white-space:nowrap;">
-           <% @response_maps.each_with_index do |reviewer_map, index| %>
               <% if Team.where(id: reviewer_map.reviewee_id).length > 0 %>
                 <% @team = Team.find(reviewer_map.reviewee_id) %>
                 <%= render partial: 'author_scores_avg', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: reviewer.id} %>
@@ -289,10 +278,7 @@
 		return row;
 	}
 	var row0_col=4;
-	var row1_col1=2;
-	var row1_col2=3;
         var colNo1=5;
-	var colNo2=6;	
 	showHideColumn(null);
 
 	var doShow;
@@ -301,9 +287,9 @@
 	    if (e != null) {
         	if (doShow) {
             	doShow = false;
-            	e.value = 'show';
+            	e.value = 'Show';
         	} else {
-            		e.value = 'hide';
+            		e.value = 'Hide';
             		doShow = true;
         		}
     	
@@ -315,14 +301,9 @@
 		if (row==0){
 		cols[row0_col].style.display = doShow ? '' : 'none';
 		}
-		else if(row==1){
-		cols[row1_col1].style.display = doShow ? '' : 'none';
-		cols[row1_col2].style.display = doShow ? '' : 'none';
-		}
 		else{
-        		if (colNo1 >= 1 && colNo1 < cols.length && colNo2>=1 && colNo2<cols.length) {
+        		if (colNo1 >= 1 && colNo1 < cols.length) {
             		cols[colNo1].style.display = doShow ? '' : 'none';
-			cols[colNo2].style.display = doShow ? '' : 'none';	
         		}
 			}
 		}

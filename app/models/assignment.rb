@@ -11,7 +11,6 @@ class Assignment < ActiveRecord::Base
   include FeedbackScoreCalc
   include QuizAssignment
   include AssignmentHelper
-  include FeedbackScoreCalc
   has_paper_trail
   # When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;

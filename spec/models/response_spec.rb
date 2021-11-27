@@ -1,7 +1,8 @@
 describe Response do
   let(:user) {build(:student, id: 1, role_id: 1, name: 'no name', fullname: 'no one')}
+  let(:user2) {build(:student, id: 2, role_id: 2, name: 'no name2', fullname: 'no one2')}
   let(:participant) { build(:participant, id: 1, parent_id:1, user: user) }
-  let(:participant2) { build(:participant, id: 2) }
+  let(:participant2) { build(:participant, id: 2, parent_id:2, user: user2) }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
   let(:team) { build(:assignment_team) }
   let(:signed_up_team) { build(:signed_up_team, team_id: team.id) }
@@ -294,6 +295,36 @@ describe Response do
           .with(["assignment_id = ? and questionnaire_id IN (?)",1, ReviewQuestionnaire.select("id")], )
           .and_return(assignment_questionnaire)
       expect(Response.calibration_results_info(1, 2, 1)).to eq([calibration_response, response_record, [question]])
+    end
+  end
+
+  describe 'notify_instructor_on_difference' do
+    it 'should send correct data format' do
+      allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+      allow(User).to receive(:find).with(1).and_return(user)
+      team = double('AssignmentTeam', participants:[participant2] )
+      allow(response).to receive(:map).and_return(response.response_map)
+      allow(AssignmentTeam).to receive(:find).with(1).and_return(team)
+      allow(User).to receive(:find).with(2).and_return(user2)
+      allow(Assignment).to receive(:find).with(1).and_return(assignment)
+      allow(response).to receive(:aggregate_questionnaire_score).and_return(1)
+      allow(response).to receive(:maximum_score).and_return(2)
+      mail = double()
+      allow(mail).to receive(:deliver_now)
+      expect(Mailer).to receive(:notify_grade_conflict_message)
+                                       .with(to: assignment.instructor.email,
+                                             subject: 'Expertiza Notification: A review score is outside the acceptable range',
+                                             body: {
+                                                 reviewer_name: 'no one',
+                                                 type: 'review',
+                                                 reviewee_name: 'no one2',
+                                                 new_score: 0.5,
+                                                 assignment: assignment,
+                                                 conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=1',
+                                                 summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=2',
+                                                 assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/1/edit'
+                                             }).and_return(mail)
+      response.notify_instructor_on_difference
     end
   end
 

@@ -38,7 +38,7 @@
   <button onclick="exportTableToCSV('review_scores.csv')">Export Review Scores To CSV File</button>
   <br />
   <br />
-  <input type='button' onClick='javascript:showHideColumn(this);' value='Show'> Author Scores Column 
+  <input type='button' onClick='javascript:showHideColumn(this);' value='Show'> AVG Feedback Scores Column
   <br /><br>
   <table id="myTable" class="table table-striped" width="100%" cellspacing='0' cellpadding='2' border='0'>
     <thead>
@@ -83,6 +83,7 @@
                 <%= ', ' unless round == @assignment.num_review_rounds %>
               <% end %>
               <%= link_to "summary", {:controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => reviewer.id, :assignment_id=>@id}, target: :_blank %>
+              <br/>
               <%= link_to "authors summary", {:controller => 'popup', :action => 'view_feedback_scores_popup', :reviewer_id => reviewer.id, :assignment_id => @id}, target: :_blank %>
             </td>
           <!--Team reviewed / Author feedback-->

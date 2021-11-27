@@ -73,4 +73,8 @@ class Waitlist < ActiveRecord::Base
   def self.waitlisted_signed_up_team(topic_id)
     SignedUpTeam.where(topic_id: topic_id, is_waitlisted: 1)
   end
+
+  def self.waitlisted_user_id_from_team_id(team_id)
+    TeamsUser.where(team_id: team_id).first.user_id
+  end
 end

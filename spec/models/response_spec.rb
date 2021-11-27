@@ -12,8 +12,11 @@ describe Response do
   let(:questionnaire1) { create(:questionnaire, id: 1) }
   let(:question1) { create(:question, questionnaire: questionnaire1, weight: 1, id: 1) }
   let(:question2) { TextArea.new(id: 1, weight: 2, break_before: true) }
+  let(:question3) { build(:questionnaire_header) }
   let(:questionnaire) { ReviewQuestionnaire.new(id: 1, questions: [question], max_question_score: 5) }
   let(:questionnaire2) { ReviewQuestionnaire.new(id: 2, questions: [question2], max_question_score: 5) }
+  let(:questionnaire3) { ReviewQuestionnaire.new(id: 3, questions: [question, question3], max_question_score: 5) }
+  let(:assignment_questionnaire) { build(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire3) }
   let(:tag_prompt) {TagPrompt.new(id: 1, prompt: "prompt")}
   let(:tag_prompt_deployment) {TagPromptDeployment.new(id: 1, tag_prompt_id: 1, assignment_id: 1, questionnaire_id: 1, question_type: 'Criterion')}
   let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1, reviewee_id:1) }
@@ -254,6 +257,21 @@ describe Response do
         allow(response).to receive(:maximum_score).and_return(100)
         expect(Response.avg_scores_and_count_for_prev_reviews([response], double('Response', id: 6))).to eq([0.96, 1])
       end
+    end
+  end
+
+  describe '.calibration_results_info' do
+    it 'returns references to a calibration response, review response, and questions' do
+      calibration_response_map = double("review_response_map")
+      calibration_response = double("response", review_response_map: calibration_response_map)
+      allow(ReviewResponseMap).to receive(:find).with(1).and_return(calibration_response_map)
+      allow(ReviewResponseMap).to receive(:find).with(2).and_return(response_map)
+      allow(calibration_response_map).to receive(:response).and_return([calibration_response])
+      allow(Assignment).to receive(:find).with(1).and_return(assignment)
+      allow(AssignmentQuestionnaire).to receive(:find_by)
+          .with(["assignment_id = ? and questionnaire_id IN (?)",1, ReviewQuestionnaire.select("id")], )
+          .and_return(assignment_questionnaire)
+      expect(Response.calibration_results_info(1, 2, 1)).to eq([calibration_response, response_record, [question]])
     end
   end
 

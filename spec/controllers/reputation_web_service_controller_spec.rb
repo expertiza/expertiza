@@ -32,11 +32,13 @@ describe ReputationWebServiceController do
       @response_map_1_3 = create(:review_response_map, reviewer_id: @reviewer_3.id, reviewee_id: @reviewee_1.id)
       @response_map_1_4 = create(:review_response_map, reviewer_id: @reviewer_4.id, reviewee_id: @reviewee_1.id)
       @response_map_1_5 = create(:review_response_map, reviewer_id: @reviewer_5.id, reviewee_id: @reviewee_1.id)
+
       @response_map_2_1 = create(:review_response_map, reviewer_id: @reviewer_1.id, reviewee_id: @reviewee_2.id)
       @response_map_2_2 = create(:review_response_map, reviewer_id: @reviewer_2.id, reviewee_id: @reviewee_2.id)
       @response_map_2_3 = create(:review_response_map, reviewer_id: @reviewer_3.id, reviewee_id: @reviewee_2.id)
       @response_map_2_4 = create(:review_response_map, reviewer_id: @reviewer_4.id, reviewee_id: @reviewee_2.id)
       @response_map_2_5 = create(:review_response_map, reviewer_id: @reviewer_5.id, reviewee_id: @reviewee_2.id)
+
       @response_map_3_1 = create(:review_response_map, reviewer_id: @reviewer_1.id, reviewee_id: @reviewee_3.id)
       @response_map_3_2 = create(:review_response_map, reviewer_id: @reviewer_2.id, reviewee_id: @reviewee_3.id)
       @response_map_3_3 = create(:review_response_map, reviewer_id: @reviewer_3.id, reviewee_id: @reviewee_3.id)
@@ -48,11 +50,13 @@ describe ReputationWebServiceController do
       @response_1_3 = create(:response, is_submitted: true, map_id: @response_map_1_3.id)
       @response_1_4 = create(:response, is_submitted: true, map_id: @response_map_1_4.id)
       @response_1_5 = create(:response, is_submitted: true, map_id: @response_map_1_5.id)
+
       @response_2_1 = create(:response, is_submitted: true, map_id: @response_map_2_1.id)
       @response_2_2 = create(:response, is_submitted: true, map_id: @response_map_2_2.id)
       @response_2_3 = create(:response, is_submitted: true, map_id: @response_map_2_3.id)
       @response_2_4 = create(:response, is_submitted: true, map_id: @response_map_2_4.id)
       @response_2_5 = create(:response, is_submitted: true, map_id: @response_map_2_5.id)
+
       @response_3_1 = create(:response, is_submitted: true, map_id: @response_map_3_1.id)
       @response_3_2 = create(:response, is_submitted: true, map_id: @response_map_3_2.id)
       @response_3_3 = create(:response, is_submitted: true, map_id: @response_map_3_3.id)
@@ -60,36 +64,88 @@ describe ReputationWebServiceController do
       @response_3_5 = create(:response, is_submitted: true, map_id: @response_map_3_5.id)
     end
 
-    it 'scenario 1' do
-      # reivewer_1's review for reviewee_1: [5, 5, 5, 5, 5]
-      create(:answer, question_id: @question_1_1.id, response_id: @response_1_1.id, answer: 5)
-      create(:answer, question_id: @question_1_2.id, response_id: @response_1_1.id, answer: 5)
-      create(:answer, question_id: @question_1_3.id, response_id: @response_1_1.id, answer: 5)
-      create(:answer, question_id: @question_1_4.id, response_id: @response_1_1.id, answer: 5)
-      create(:answer, question_id: @question_1_5.id, response_id: @response_1_1.id, answer: 5)
-
-      # reivewer_2's review for reviewee_1: [3, 3, 3, 3, 3]
-      create(:answer, question_id: @question_1_1.id, response_id: @response_1_2.id, answer: 3)
-      create(:answer, question_id: @question_1_2.id, response_id: @response_1_2.id, answer: 3)
-      create(:answer, question_id: @question_1_3.id, response_id: @response_1_2.id, answer: 3)
-      create(:answer, question_id: @question_1_4.id, response_id: @response_1_2.id, answer: 3)
-      create(:answer, question_id: @question_1_5.id, response_id: @response_1_2.id, answer: 3)
-
-      # reivewer_3's review for reviewee_1: [1, 1, 1, 1, 1]
-      create(:answer, question_id: @question_1_1.id, response_id: @response_1_3.id, answer: 1)
-      create(:answer, question_id: @question_1_2.id, response_id: @response_1_3.id, answer: 1)
-      create(:answer, question_id: @question_1_3.id, response_id: @response_1_3.id, answer: 1)
-      create(:answer, question_id: @question_1_4.id, response_id: @response_1_3.id, answer: 1)
-      create(:answer, question_id: @question_1_5.id, response_id: @response_1_3.id, answer: 1)
-
-      #result = ReputationWebServiceController.new.db_query(1, 1, false)
-      #expect(result).to eq([[2, 1, 100.0], [3, 1, 60.0], [4, 1, 20.0]])
-      result = ReputationWebServiceController.new.json_generator(1, 0, 1)
-      expect(result).to eq({"submission1"=>{"stu2"=>100.0, "stu3"=>60.0, "stu4"=>20.0}})
-      #repeat for different answers
+    context 'test db_query' do
+      it 'return average score' do
+        create(:answer, question_id: @question_1_1.id, response_id: @response_1_1.id, answer: 1)
+        create(:answer, question_id: @question_1_2.id, response_id: @response_1_1.id, answer: 2)
+        create(:answer, question_id: @question_1_3.id, response_id: @response_1_1.id, answer: 3)
+        create(:answer, question_id: @question_1_4.id, response_id: @response_1_1.id, answer: 4)
+        create(:answer, question_id: @question_1_5.id, response_id: @response_1_1.id, answer: 5)
+        result = ReputationWebServiceController.new.db_query(1, 1, false)
+        expect(result).to eq([[2, 1, 60.0]])
+      end
     end
-  end
 
+    context 'test json_generator' do
+      it 'test 3 reviewer for one reviewee' do
+        # reivewer_1's review for reviewee_1: [5, 5, 5, 5, 5]
+        create(:answer, question_id: @question_1_1.id, response_id: @response_1_1.id, answer: 5)
+        create(:answer, question_id: @question_1_2.id, response_id: @response_1_1.id, answer: 5)
+        create(:answer, question_id: @question_1_3.id, response_id: @response_1_1.id, answer: 5)
+        create(:answer, question_id: @question_1_4.id, response_id: @response_1_1.id, answer: 5)
+        create(:answer, question_id: @question_1_5.id, response_id: @response_1_1.id, answer: 5)
+
+        # reivewer_2's review for reviewee_1: [3, 3, 3, 3, 3]
+        create(:answer, question_id: @question_1_1.id, response_id: @response_1_2.id, answer: 3)
+        create(:answer, question_id: @question_1_2.id, response_id: @response_1_2.id, answer: 3)
+        create(:answer, question_id: @question_1_3.id, response_id: @response_1_2.id, answer: 3)
+        create(:answer, question_id: @question_1_4.id, response_id: @response_1_2.id, answer: 3)
+        create(:answer, question_id: @question_1_5.id, response_id: @response_1_2.id, answer: 3)
+
+        # reivewer_3's review for reviewee_1: [1, 1, 1, 1, 1]
+        create(:answer, question_id: @question_1_1.id, response_id: @response_1_3.id, answer: 1)
+        create(:answer, question_id: @question_1_2.id, response_id: @response_1_3.id, answer: 1)
+        create(:answer, question_id: @question_1_3.id, response_id: @response_1_3.id, answer: 1)
+        create(:answer, question_id: @question_1_4.id, response_id: @response_1_3.id, answer: 1)
+        create(:answer, question_id: @question_1_5.id, response_id: @response_1_3.id, answer: 1)
+
+        #result = ReputationWebServiceController.new.db_query(1, 1, false)
+        #expect(result).to eq([[2, 1, 100.0], [3, 1, 60.0], [4, 1, 20.0]])
+        result = ReputationWebServiceController.new.json_generator(1, 0, 1)
+        expect(result).to eq({"submission1"=>{"stu2"=>100.0, "stu3"=>60.0, "stu4"=>20.0}})
+        #repeat for different answers
+      end
+
+      it 'test same reviewer for different reviewee' do
+        # reivewer_1's review for reviewee_1: [5, 5, 5, 5, 5]
+        create(:answer, question_id: @question_1_1.id, response_id: @response_1_1.id, answer: 5)
+        create(:answer, question_id: @question_1_2.id, response_id: @response_1_1.id, answer: 5)
+        create(:answer, question_id: @question_1_3.id, response_id: @response_1_1.id, answer: 5)
+        create(:answer, question_id: @question_1_4.id, response_id: @response_1_1.id, answer: 5)
+        create(:answer, question_id: @question_1_5.id, response_id: @response_1_1.id, answer: 5)
+
+        # reivewer_1's review for reviewee_2: [3, 3, 3, 3, 3]
+        create(:answer, question_id: @question_1_1.id, response_id: @response_2_1.id, answer: 3)
+        create(:answer, question_id: @question_1_2.id, response_id: @response_2_1.id, answer: 3)
+        create(:answer, question_id: @question_1_3.id, response_id: @response_2_1.id, answer: 3)
+        create(:answer, question_id: @question_1_4.id, response_id: @response_2_1.id, answer: 3)
+        create(:answer, question_id: @question_1_5.id, response_id: @response_2_1.id, answer: 3)
+
+        result = ReputationWebServiceController.new.json_generator(1, 0, 1)
+        expect(result).to eq("submission1"=>{"stu2"=>100.0}, "submission2"=>{"stu2"=>60.0})
+        #repeat for different answers
+      end
+
+    end
+
+    context 'test send_post_request' do
+      it 'failed because of no public key file' do
+        # reivewer_1's review for reviewee_1: [5, 5, 5, 5, 5]
+        create(:answer, question_id: @question_1_1.id, response_id: @response_1_1.id, answer: 5)
+        create(:answer, question_id: @question_1_2.id, response_id: @response_1_1.id, answer: 5)
+        create(:answer, question_id: @question_1_3.id, response_id: @response_1_1.id, answer: 5)
+        create(:answer, question_id: @question_1_4.id, response_id: @response_1_1.id, answer: 5)
+        create(:answer, question_id: @question_1_5.id, response_id: @response_1_1.id, answer: 5)
+
+        params = {assignment_id: 1, round_num: 1, algorithm: 'hammer', checkbox: {expert_grade: "empty"}}
+        session = {user: build(:instructor, id: 1)}
+
+        get :send_post_request, params, session
+        expect(response).to redirect_to '/reputation_web_service/client'
+      end
+    end
+
+  end
 
 =begin
   # TODO added by Dong Li

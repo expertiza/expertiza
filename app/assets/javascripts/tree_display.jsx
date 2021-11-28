@@ -842,6 +842,106 @@ jQuery(document).ready(function() {
     }
   })
 
+  var DatePickerStart = React.createClass({
+    render: function() {
+      var formStyle = {
+        margin: 0,
+        padding: 0,
+        display: 'inline'
+      }
+      if (this.props.dataType === 'questionnaire') {
+        formStyle = {
+          margin: 0,
+          padding: 0,
+          display: 'none'
+        }
+      }
+      return (
+          <span style = {formStyle}
+                start_date={this.props.start_date}
+                onChange={this.props.onChange} >
+                Start Date <input className="form-control" type="date" id="start_date"></input>
+            </span>
+      );
+    }
+  });
+
+  //========================================================================
+  var DatePickerEnd = React.createClass({
+    render: function() {
+      var formStyle = {
+        margin: 0,
+        padding: 0,
+        display: 'inline'
+      }
+      if (this.props.dataType === 'questionnaire') {
+        formStyle = {
+          margin: 0,
+          padding: 0,
+          display: 'none'
+        }
+      }
+      return (
+          <span style = {formStyle}
+                end_date={this.props.end_date}
+                onChange={this.props.onChange} >
+                End Date <input className="form-control" type="date" id="end_date"></input>
+            </span>
+      );
+    }
+  });
+
+  var AdditionalSearchDropDown = React.createClass({
+    render: function() {
+      var formStyle = {
+        margin: 0,
+        padding: 0,
+        display: 'inline'
+      }
+      if (this.props.dataType === 'questionnaire') {
+        formStyle = {
+          margin: 0,
+          padding: 0,
+          display: 'none'
+        }
+      }
+      return (
+
+          <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'center' }}>
+            <select
+                value={this.props.selectValue}
+                onChange={this.props.onChange}
+                className="form-control"
+            >
+              <option value="empty">----------</option>
+              <option value="created_date">Created Date Filter</option>
+              <option value="updated_date">Updated Date Filter</option>
+            </select>
+          </div>
+
+      );
+    }
+  });
+
+  var HASQUIZ_TOGGLE = React.createClass({
+    render: function() {
+      return (
+          <span
+              style={{"display": (this.props.dataType === 'questionnaire' ? "none" : "")}}
+              has_quiz_var={this.props.has_quiz_var}
+              onChange={this.props.onChange}>
+
+                    <div class="checkbox">
+               <input
+                   type="checkbox" id="has_quiz_var" value="">Require a Quiz</input>
+
+                    </div>
+          </span>
+      );
+    }
+  })
+//========================================================================
+
   var NewItemButton = React.createClass({
     render: function() {
       var renderContent = []
@@ -921,7 +1021,6 @@ jQuery(document).ready(function() {
         this.setState({
           expandedRow: this.state.expandedRow.concat([ id ])
         })
-        // if(this.props.dataType!='assignment') {
         _this = this
         jQuery.post(
           '/tree_display/get_sub_folder_contents',
@@ -969,13 +1068,14 @@ jQuery(document).ready(function() {
         } else if (this.props.dataType == 'assignment') {
           _rows.push(<TitleRow title="My Assignments" />)
         }
+        if(_this.props.selectValue == 'empty'){
         jQuery.each(this.props.data, function(i, entry) {
           if (
             ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
               (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
               (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
               (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
-            (entry.private == true || entry.type == 'FolderNode')
+            (entry.private || entry.type == 'FolderNode')
           ) {
             _rows.push(
               <ContentTableRow
@@ -1037,7 +1137,101 @@ jQuery(document).ready(function() {
           } else {
             return
           }
-        })
+        })}
+
+        if(_this.props.selectValue == 'created_date'){
+          var var_start_date = _this.props.start_date+1;
+          var var_end_date = _this.props.end_date+1;
+          jQuery.each(this.props.data, function (i, entry) {
+            var date = entry.creation_date;
+            if (((entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1) &&
+                    (entry.private || entry.type == 'FolderNode'))) {
+
+              if ((date >= var_start_date) && (var_end_date >= date)) {
+                if((_this.props.has_quiz_var && entry.require_quiz) || !_this.props.has_quiz_var) {
+                  _rows.push(<ContentTableRow
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
+                      name={entry.name}
+                      institution={entry.institution}
+                      creation_date={entry.creation_date}
+                      updated_date={entry.updated_date}
+                      actions={entry.actions}
+                      is_available={entry.is_available}
+                      course_id={entry.course_id}
+                      max_team_size={entry.max_team_size}
+                      is_intelligent={entry.is_intelligent}
+                      require_quiz={entry.require_quiz}
+                      dataType={_this.props.dataType}
+                      //this is just a hack. All current users courses are marked as private during fetch for display purpose.
+                      private={entry.private}
+                      allow_suggestions={entry.allow_suggestions}
+                      has_topic={entry.has_topic}
+                      rowClicked={_this.handleExpandClick}
+                      newParams={entry.newParams}
+                  />)
+                  _rows.push(<ContentTableDetailsRow
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
+                      showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                      dataType={_this.props.dataType}
+                      children={entry.children}
+                  />)
+                }
+              }
+            } else {
+              return;
+            }
+          })
+        }
+
+        if(_this.props.selectValue == 'updated_date'){
+          var var_start_date = _this.props.start_date+1;
+          var var_end_date = _this.props.end_date+1;
+          jQuery.each(this.props.data, function (i, entry) {
+            var date = entry.updated_date;
+            if (((entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1) &&
+                    (entry.private == true || entry.type == 'FolderNode'))) {
+              if ((date >= var_start_date) && (var_end_date >= date)) {
+                if((_this.props.has_quiz_var && entry.require_quiz) || !_this.props.has_quiz_var) {
+                  _rows.push(<ContentTableRow
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
+                      name={entry.name}
+                      institution={entry.institution}
+                      creation_date={entry.creation_date}
+                      updated_date={entry.updated_date}
+                      actions={entry.actions}
+                      is_available={entry.is_available}
+                      course_id={entry.course_id}
+                      max_team_size={entry.max_team_size}
+                      is_intelligent={entry.is_intelligent}
+                      require_quiz={entry.require_quiz}
+                      dataType={_this.props.dataType}
+                      //this is just a hack. All current users courses are marked as private during fetch for display purpose.
+                      private={entry.private}
+                      allow_suggestions={entry.allow_suggestions}
+                      has_topic={entry.has_topic}
+                      rowClicked={_this.handleExpandClick}
+                      newParams={entry.newParams}
+                  />)
+                  _rows.push(<ContentTableDetailsRow
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
+                      showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                      dataType={_this.props.dataType}
+                      children={entry.children}
+                  />)
+                }
+              }
+
+            } else {
+              return;
+            }
+          })
+        }
+
+
         /** this was protecting an always null field, weird TODO */
         if (this.props.showPublic) {
           if (this.props.dataType == 'course') {
@@ -1277,6 +1471,92 @@ jQuery(document).ready(function() {
     }
   })
 
+  //======================================
+  var QuestionnairesAdvancedSearchBar = React.createClass({
+    getInputValues: function () {
+      return {
+        question_text: this.refs.question_text.getDOMNode().value,
+        course: this.refs.course.getDOMNode().value,
+        assignment: this.refs.assignment.getDOMNode().value,
+      };
+    },
+
+    render: function () {
+      return (
+          <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(6, auto) 1fr', gridGap: '8px' }}>
+            <label for="question_text">Question Text:</label>
+            <input
+                data-toggle="tooltip" title="Search by words used in questions that belong to the questionnaires"
+                ref="question_text"
+                type="text"
+                className="form-control" />
+            <label for="course">Course:</label>
+            <input
+                data-toggle="tooltip" title="Search for questionnaires that are used in the given course"
+                ref="course"
+                type="text"
+                className="form-control" />
+            <label for="assignment">Assignment:</label>
+            <input
+                data-toggle="tooltip" title="Search for questionnaires that are used in the given assignment"
+                ref="assignment"
+                type="text"
+                className="form-control" />
+          </div>
+      );
+    }
+  })
+
+  /* Added by E2079
+  *  React component containing the UI elements
+  *  for the Questionnaire Search Bar, along with Advanced Search.
+  * */
+  var QuestionnairesSearchBar = React.createClass({
+    getInitialState: () => {
+      return {
+        advancedSearchVisible: false,
+      }
+    },
+    toggleAdvancedSearch() {
+      this.setState({
+        advancedSearchVisible: !this.state.advancedSearchVisible
+      });
+    },
+    handleSearch: function () {
+      this.props.onSearchClick({
+        name: this.refs.nameInput.getDOMNode().value,
+        ...this.state.advancedSearchVisible ? this.child.getInputValues() : null,
+      });
+    },
+    render: function () {
+      return (
+          <div>
+            <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'center' }}>
+              <input
+                  data-toggle="tooltip" title="The name of the questionnaire"
+                  ref="nameInput"
+                  type="text"
+                  className="form-control"
+                  placeholder="Name" />
+              <button type="button"
+                      className="btn btn-primary"
+                      onClick={this.handleSearch}>
+                Search
+              </button>
+              <a onClick={this.toggleAdvancedSearch}>
+                {this.state.advancedSearchVisible ? 'Hide Advanced Search' : 'Advanced Search'}
+              </a>
+            </div>
+            {this.state.advancedSearchVisible ? <QuestionnairesAdvancedSearchBar ref={instance => { this.child = instance; }} /> : null}
+          </div>
+      );
+    }
+  })
+
+  //======================================
+
+
+
   /** beta branch isnt getting a prop related to the data to be displayed in the dropdown */
   var FilterableTable = React.createClass({
     getInitialState: function() {
@@ -1284,7 +1564,11 @@ jQuery(document).ready(function() {
         filterText: '',
         privateCheckbox: false,
         publicCheckbox: false,
-        tableData: this.props.data
+        tableData: this.props.data,
+        selectValue: 'empty',
+        start_date: '',
+        end_date:'',
+        has_quiz_var: false
       }
     },
     handleUserInput: function(filterText) {
@@ -1321,9 +1605,6 @@ jQuery(document).ready(function() {
           return a_val.localeCompare(b_val)
         }
       })
-      // this.setState({
-      //   tableData: tmpData
-      // })
     },
     componentWillReceiveProps: function(nextProps) {
       this.setState({
@@ -1331,43 +1612,149 @@ jQuery(document).ready(function() {
       })
     },
     handleUserFilter: function(name, checked) {
-      var publicCheckboxStatus = this.state.publicCheckbox
-      publicCheckboxStatus = checked
       var tmpData = this.props.data.filter(function(element) {
-        if (publicCheckboxStatus) {
+        if (checked) {
           return true
         } else return element.private === true
       })
       this.setState({
         tableData: tmpData,
-        publicCheckbox: publicCheckboxStatus
+        publicCheckbox: checked
       })
     },
+    changeAdditionalDrop: function(event) {
+      this.setState({ selectValue: event.target.value });
+    },
+
+    changeDateStart: function(event) {
+      this.setState({
+        start_date: event.target.value,
+      });
+    },
+
+    changeDateEnd: function(event) {
+      this.setState({
+        end_date: event.target.value,
+      });
+    },
+
+    changeAvailableToggle: function(event) {
+      this.setState({
+        has_quiz_var: event.target.checked,
+      });
+    },
+
     render: function() {
+      if (this.props.dataType === 'questionnaire') {
+        return (
+            <div className="filterable_table">
+              <QuestionnairesSearchBar
+                  onSearchClick={this.handleSearchClick}
+                  dataType={this.props.dataType} />
+              <FilterButton
+                  filterOption="public"
+                  onUserFilter={this.handleUserFilter}
+                  inputCheckboxValue={this.state.publicCheckbox}
+                  dataType={this.props.dataType}
+              />
+              <NewItemButton
+                  dataType={this.props.dataType}
+                  private={true}
+              />
+              <ContentTable
+                  data={this.state.tableData}
+                  filterText={this.state.filterText}
+                  onUserClick={this.handleUserClick}
+                  dataType={this.props.dataType}
+                  showPublic={this.state.publicCheckbox}
+              />
+            </div>
+        )
+      }
+
+      /* Added by E2079
+      * Returns advanced search functionality by
+      * created and updated date
+      * in courses and assignments
+      * */
       return (
-        <div className="filterable_table">
-          <SearchBar
-            filterText={this.state.filterText}
-            onUserInput={this.handleUserInput}
-            dataType={this.props.dataType}
-          />
-          <FilterButton
-            filterOption="public"
-            onUserFilter={this.handleUserFilter}
-            inputCheckboxValue={this.state.publicCheckbox}
-            dataType={this.props.dataType}
-          />
-          <NewItemButton dataType={this.props.dataType} private={true} />
-          <ContentTable
-            data={this.state.tableData}
-            filterText={this.state.filterText}
-            onUserClick={this.handleUserClick}
-            dataType={this.props.dataType}
-            showPublic={this.state.publicCheckbox}
-          />
-        </div>
+          <div className="">
+
+            <div
+                style={{ margin: '8px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'center' }}
+            >
+              <SearchBar
+                  filterText={this.state.filterText}
+                  onUserInput={this.handleUserInput}
+                  dataType={this.props.dataType}
+              />
+
+              <FilterButton
+                  filterOption="public"
+                  onUserFilter={this.handleUserFilter}
+                  inputCheckboxValue={this.state.publicCheckbox}
+                  dataType={this.props.dataType}
+              />
+
+              <button
+                  className="btn btn-link"
+                  onClick={() => {
+                    var x = document.getElementById("advancedToggle");
+                    if (x.style.display === "none") {
+                      x.style.display = "block";
+                    } else {
+                      x.style.display = "none";
+                    }}}>
+                Advanced Search
+              </button>
+            </div>
+
+
+            <div id="advancedToggle" style={{ display: 'none' }}>
+              <AdditionalSearchDropDown
+                  selectValue = {this.state.selectValue}
+                  onChange={this.changeAdditionalDrop}
+                  dataType={this.props.dataType}/>
+              <div style={{
+                margin: '10px auto',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, auto) 1fr',
+                gridGap: '8px',
+                alignItems: 'center' }}>
+                <DatePickerStart
+                    start_date = {this.state.start_date}
+                    onChange={this.changeDateStart}
+                    dataType={this.props.dataType}/>
+                <DatePickerEnd
+                    start_date = {this.state.end_date}
+                    onChange={this.changeDateEnd}
+                    dataType={this.props.dataType}/>
+                <HASQUIZ_TOGGLE
+                    has_quiz_var = {this.state.has_quiz_var}
+                    onChange={this.changeAvailableToggle}
+                    dataType={this.props.dataType}/>
+              </div>
+            </div>
+
+            <NewItemButton
+                dataType={this.props.dataType}
+                private={true}
+            />
+            <ContentTable
+                data={this.state.tableData}
+                filterText={this.state.filterText}
+                onUserClick={this.handleUserClick}
+                dataType={this.props.dataType}
+                showPublic={this.state.publicCheckbox}
+                selectValue={this.state.selectValue}
+                start_date = {this.state.start_date}
+                end_date = {this.state.end_date}
+                has_quiz_var = {this.state.has_quiz_var}
+            />
+          </div>
       )
     }
+
   })
 
   var TabSystem = React.createClass({

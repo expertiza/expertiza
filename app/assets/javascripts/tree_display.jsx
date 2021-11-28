@@ -600,7 +600,7 @@ jQuery(document).ready(function() {
     },
     componentDidMount: function() {
       // this buffer holds the title for all of the rubric types under the Questionnaire tab
-      rubricBuffer = [
+      let rubricBuffer = [
         'Review',
         'Metareview',
         'Author Feedback',
@@ -612,8 +612,8 @@ jQuery(document).ready(function() {
 
       //selectedMenuItem then takes the clicked rubric from the panel under questionnaire
       //selectedMenuItemIndex finds the corresponding index of the click rubric from the above buffer
-      selectedMenuItem = document.getElementById('tree_display').getAttribute('data-menu-item')
-      selectedMenuItemIndex = rubricBuffer.indexOf(selectedMenuItem)
+      let selectedMenuItem = document.getElementById('tree_display').getAttribute('data-menu-item')
+      let selectedMenuItemIndex = rubricBuffer.indexOf(selectedMenuItem)
 
       if (selectedMenuItemIndex !== -1) {
         if (rubricBuffer[selectedMenuItemIndex] === this.props.name) {
@@ -630,7 +630,6 @@ jQuery(document).ready(function() {
       }
     },
     handleClick: function(event) {
-      //alert('click');
 
       if (event.target.type != 'button') {
         this.setState(
@@ -662,8 +661,8 @@ jQuery(document).ready(function() {
         colWidthArray = [ '20%', '0%', '0%', '20%', '20%', '20%', '20%' ]
       }
       if (this.props.creation_date && this.props.updated_date) {
-        creation = this.props.creation_date
-        updated = this.props.updated_date
+        let creation = this.props.creation_date
+        let updated = this.props.updated_date
 
         creation_date = formatDate(new Date(creation))
         updated_date = formatDate(new Date(updated))
@@ -894,20 +893,7 @@ jQuery(document).ready(function() {
 
   var AdditionalSearchDropDown = React.createClass({
     render: function() {
-      var formStyle = {
-        margin: 0,
-        padding: 0,
-        display: 'inline'
-      }
-      if (this.props.dataType === 'questionnaire') {
-        formStyle = {
-          margin: 0,
-          padding: 0,
-          display: 'none'
-        }
-      }
       return (
-
           <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'center' }}>
             <select
                 value={this.props.selectValue}
@@ -919,7 +905,6 @@ jQuery(document).ready(function() {
               <option value="updated_date">Updated Date Filter</option>
             </select>
           </div>
-
       );
     }
   });
@@ -1024,7 +1009,7 @@ jQuery(document).ready(function() {
         })
 
         if(this.props.dataType!='assignment') {
-        _this = this
+        let _this = this
         jQuery.post(
           '/tree_display/get_sub_folder_contents',
           {
@@ -1036,7 +1021,7 @@ jQuery(document).ready(function() {
           },
           'json'
         )
-         }
+        }
       } else {
         var index = this.state.expandedRow.indexOf(id)
         if (index > -1) {
@@ -1058,8 +1043,14 @@ jQuery(document).ready(function() {
       var colDisplayStyle = {
         display: ''
       }
+        const isEntryValid = entry => ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
+            (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
+            (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
+            (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
+            (entry.private || entry.type == 'FolderNode')
+        const isQuestionnaire = this.props.dataType === 'questionnaire'
       if (this.props) {
-        if (this.props.dataType === 'questionnaire') {
+        if (isQuestionnaire) {
           colWidthArray = [ '70%', '0%', '0%', '0%', '0%', '0%', '30%' ]
           colDisplayStyle = {
             display: 'none'
@@ -1068,18 +1059,13 @@ jQuery(document).ready(function() {
         if (this.props.dataType == 'course') {
           colWidthArray = [ '20%', '0%', '0%', '20%', '20%', '20%', '20%' ]
           _rows.push(<TitleRow title="My Courses" />)
-        } else if (this.props.dataType == 'assignment') {
+        }
+        if (this.props.dataType == 'assignment') {
           _rows.push(<TitleRow title="My Assignments" />)
         }
         if(_this.props.selectValue == 'empty'){
         jQuery.each(this.props.data, function(i, entry) {
-          if (
-            ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
-              (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-              (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
-              (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
-            (entry.private || entry.type == 'FolderNode')
-          ) {
+          if (isEntryValid(entry) || isQuestionnaire) {
             _rows.push(
               <ContentTableRow
                 key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
@@ -1670,6 +1656,7 @@ jQuery(document).ready(function() {
                   onUserClick={this.handleUserClick}
                   dataType={this.props.dataType}
                   showPublic={this.state.publicCheckbox}
+                  selectValue={this.state.selectValue}
               />
             </div>
         )
@@ -1710,12 +1697,11 @@ jQuery(document).ready(function() {
               </a>
             </div>
 
-
-            <div id="advancedToggle" style={{ display: 'none' }}>
+              <div id="advancedToggle" style={{ display: 'none' }}>
               <AdditionalSearchDropDown
                   selectValue = {this.state.selectValue}
                   onChange={this.changeAdditionalDrop}
-                  dataType={this.props.dataType}/>
+              />
               <div style={{
                 margin: '10px auto',
                 display: 'grid',

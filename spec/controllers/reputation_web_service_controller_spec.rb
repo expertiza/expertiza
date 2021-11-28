@@ -3,8 +3,8 @@ describe ReputationWebServiceController do
   let(:instructor){build(:instructor, id:1)}
   describe 'custom test' do
     before(:each) do
-      @assignment_1 = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day, submitter_count: 0, num_reviews: 3, rounds_of_reviews: 2, reputation_algorithm: 'lauw', id: 1)
-      @assignment_2 = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day, submitter_count: 0, num_reviews: 3, rounds_of_reviews: 2, reputation_algorithm: 'hamer', id: 2)
+      @assignment_1 = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day, submitter_count: 0, num_reviews: 5, num_reviewers: 5, num_reviews_allowed: 5, rounds_of_reviews: 2, reputation_algorithm: 'lauw', id: 1)
+      @assignment_2 = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day, submitter_count: 0, num_reviews: 5, num_reviewers: 5, num_reviews_allowed: 5, rounds_of_reviews: 2, reputation_algorithm: 'hamer', id: 2)
       @questionnaire_1 = create(:questionnaire, min_question_score: 0, max_question_score: 5, type: 'ReviewQuestionnaire', id: 1)
       @assignment_questionnaire_1_1 = create(:assignment_questionnaire, assignment_id: @assignment_1.id, questionnaire_id: @questionnaire_1.id, used_in_round: 1)
       @assignment_questionnaire_1_2 = create(:assignment_questionnaire, assignment_id: @assignment_1.id, questionnaire_id: @questionnaire_1.id, used_in_round: 2)
@@ -20,8 +20,8 @@ describe ReputationWebServiceController do
       @reviewer_1 = create(:participant, can_review: 1)
       @reviewer_2 = create(:participant, can_review: 1)
       @reviewer_3 = create(:participant, can_review: 1)
-      #@reviewer_4 = create(:participant, can_review: 1)
-      #@reviewer_5 = create(:participant, can_review: 1)
+      @reviewer_4 = double(:participant, can_review: 1)
+      @reviewer_5 = double(:participant, can_review: 1)
 
       @reviewee_1 = create(:assignment_team, assignment: @assignment)
       @reviewee_2 = create(:assignment_team, assignment: @assignment)

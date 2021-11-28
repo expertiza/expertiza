@@ -12,12 +12,12 @@
 
 <%= render :partial => 'links' %>
 
-<div class="exp">
+<div class="exp" style="background-color: #FFF">
   <table>
     <tr><th class="head">UserID</th><th class="head">Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Meta-review</th></tr>
     <% for user in @paginated_users %>
       <% if (params[:show] != 'true' && !user.name(session[:ip]).include?("_hidden")) || params[:show] == 'true'%>
-        <tr class="exp">
+        <tr class="exp" style="background-color: #FFF">
           <td><%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %></td>
           <td><%= link_to user.fullname(session[:ip]), :controller=> 'users', :action => 'show', :id => user.id %></td>
           <td><%= user.email(session[:ip]) %></td>

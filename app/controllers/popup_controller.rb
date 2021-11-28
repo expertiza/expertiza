@@ -91,10 +91,12 @@ class PopupController < ApplicationController
     flash.now[:error] = "This report is not implemented for assignments where the rubric varies by topic." if assignment.vary_by_topic
   end
 
+  # Views author feedback report and heatmap
   def view_feedback_scores_popup
     @ip = session[:ip]
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
+    # Collect the response ids of all authors in each team for which the reviewer has reviewed the assignment.
     @feedback_final_versions = ReviewResponseMap.final_feedbacks_for_reviewer(@assignment_id, @reviewer_id)
   end
 

@@ -1,7 +1,7 @@
 module FeedbackScoreCalc
   # Build a hash for the author feedback scores
   #
-  # author_feedback_scores[reviewer.id][round][reviewee.id] returns the average author feedback
+  # author_feedback_scores[reviewer.id][round][reviewee.id] returns the average author feedback by each team for each round
   # score for AssignmentParticipant reviewer's review of the AssignmentTeam reviewee.
   def compute_author_feedback_scores
     @author_feedback_scores = {}
@@ -11,10 +11,11 @@ module FeedbackScoreCalc
       # Loop over every review that this user completed
       @response_maps.each do |response_map|
         response = Response.where('map_id = ?', response_map.id)
+        # Filter the responses of each round
         response = response.select {|response| response.round == round }
         @round = round
         @response_map = response_map
-        # Calculate the average score given by the team to the review and add it to author_feedback_scores
+        # Calculate the average score given by the team to the reviewer and add it to author_feedback_scores
         calc_avg_feedback_score(response) unless response.empty?
       end
     end
@@ -24,12 +25,15 @@ module FeedbackScoreCalc
   # Fill the author_feedback_scores hash for this response (review).
   def calc_avg_feedback_score(response)
     @count = 0
-    # Retrieve the author feedback response maps for the teammates reviewing the review of their work.
+    # Retrieve the author feedback response maps by all the teammates reviewing the review of their work.
     author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response.first.id, 'FeedbackResponseMap')
+    #Loop over each author responses to find the average of all the teammates.
     author_feedback_response_maps.each do |author_feedback_response_map|
       @corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)
       next if @corresponding_response.empty?
+      # count just the valid author responses inorder to take the average
       @count += 1
+      # calculates the sum of all valid author scores
       calc_feedback_scores_sum
     end
     # Divide the sum of the author feedback scores for this review by their number to get the
@@ -67,8 +71,10 @@ module FeedbackScoreCalc
 
   def calc_feedback_review_score
     if !@corresponding_response.empty?
+      # Calculate the percentage score given by the author to the reviewer.
       @this_review_score_raw = Response.assessment_score(response: @corresponding_response, questions: @questions)
       if @this_review_score_raw
+        # Round of the author score to the nearest integer for better UI experience.
         @this_review_score = ((@this_review_score_raw * 100) / 100.0).round if @this_review_score_raw >= 0.0
       end
     else

@@ -210,16 +210,23 @@ class ReviewResponseMap < ResponseMap
     review_final_versions[symbol][:response_ids] = response_ids
   end
 
+  #Build a hash for storing response ids of authors in each team
+  #
+  # feedback_final_versions[symbol][team.name][:feedback_response_ids] will have the list of author response_ids for each team
   def self.final_feedbacks_for_reviewer(assignment_id, reviewer_id)
     feedback_final_versions = {}
     review_rounds = Assignment.find(assignment_id).rounds_of_reviews
     @response_maps = ResponseMap.where('reviewed_object_id = ? && type = ? && reviewer_id = ?', assignment_id, 'ReviewResponseMap', reviewer_id)
     (1..review_rounds).each do |round|
+      # Loop over every review that this reviewer completed
       @response_maps.each do |response_map|
         feedback_response_ids = []
         response = Response.where('map_id = ?', response_map.id)
+        # filter the response corresponding to each round.
         response = response.select {|response| response.round == round }
+        # each reviewee id in response map corresponds to the team which the reviewer has reviewed.
         team = Team.find(response_map.reviewee_id) unless response_map.reviewee_id.nil?
+        # populate the hash map with corresponding author response_ids of each team.
         prepare_final_feedback_versions(response, team, round, feedback_final_versions, feedback_response_ids)
       end
     end
@@ -227,28 +234,37 @@ class ReviewResponseMap < ResponseMap
   end
 
   def self.prepare_final_feedback_versions(response, team, round, feedback_final_versions, feedback_response_ids)
+    # symbol: key in the hash determining the round number
     symbol = ("review round" + " " + round.to_s).to_sym
     unless response.empty?
+      # Retrieve the author feedback response maps by all the teammates reviewing the review of their work.
       author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response.first.id, 'FeedbackResponseMap')
+      #Loop over each author responses save the corresponding response id in the feedback_response_ids list.
       author_feedback_response_maps.each do |author_feedback_response_map|
         corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)
         next if corresponding_response.empty?
         feedback_final_versions[symbol] = {} if feedback_final_versions[symbol].nil?
+        # save the response_ids in hash map only if the author response is valid.
         unless corresponding_response.empty?
+          # save the questionnaire_id only once per round.
           if feedback_final_versions[symbol][:questionnaire_id].nil?
             feedback_final_versions[symbol][:questionnaire_id] = feedback_questionnaire_id(corresponding_response)
           end
+          # store the response id of authors in the list
           feedback_response_ids << corresponding_response.first.id
         end
       end
     end
+    # save the response_ids list only if the team exists.
     unless team.nil?
       feedback_final_versions[symbol] = {} if feedback_final_versions[symbol].nil?
       feedback_final_versions[symbol][team.name] = {}
+      # save the response_ids list under the team_name key within hash.
       feedback_final_versions[symbol][team.name][:feedback_response_ids] = feedback_response_ids
     end
   end
 
+  # Collect the feedback questionnaire id for each round.
   def self.feedback_questionnaire_id(feedback_response)
     feedback_answer = Answer.where(response_id: feedback_response.first.id)
     question = Question.find(feedback_answer.first.question_id)

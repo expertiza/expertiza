@@ -1,15 +1,21 @@
 <h2> Author reviews on <%= Participant.find(@reviewer_id).fullname(@ip) %> </h2>
 <% keys = @feedback_final_versions.keys %>
+<!--Loop over each round to display author feedback comments for each round-->
 <% keys.each do |key| %>
+  <!--      displays the course name and assignment name at the page top-->
   <h4><b> Course    :</b> <%= Assignment.find(@assignment_id).course.name %></h4>
   <h4><b> Assignment:</b> <%= Assignment.find(@assignment_id).name %></h4>
   <% roundtitle = key.to_s %>
+  <!--      displays the round number for each round-->
   <h4><b><%= roundtitle.titlecase %></b></h4>
 
   <% team_name_keys = @feedback_final_versions[key].keys %>
+  <!--Loop over each team to display author feedback comments for each team-->
   <% team_name_keys.each do |team_name_key| %>
+    <!--skip the questionnaire_id key and the team which has no responses-->
     <% if team_name_key.to_s != "questionnaire_id" and
       @feedback_final_versions[key][team_name_key][:feedback_response_ids].length > 0%>
+      <!-- Display the team name-->
       <h4><b>Team name :</b><%= team_name_key.to_s %></h4>
 
       <table class="general" border="1">
@@ -33,7 +39,7 @@
           <% end %>
         </tr>
 
-        <!-- Questions and Responses Row -->
+        <!-- Author feedback Questions and Responses Row -->
         <% questions.each do |question| %>
           <% unless question.is_a?(QuestionnaireHeader) %>
             <tr>

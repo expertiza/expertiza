@@ -1,4 +1,5 @@
 <% (1..@assignment.num_review_rounds).each do |round| %>
+<!--      Display the valid average author score percentage of the team for each round. Skip if there is no valid score.-->
       <% if @author_feedback_scores[reviewer_id] && @author_feedback_scores[reviewer_id][round] && @author_feedback_scores[reviewer_id][round][team_id]%>
         <%= @author_feedback_scores[reviewer_id][round][team_id]%>
         %

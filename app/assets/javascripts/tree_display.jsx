@@ -842,51 +842,26 @@ jQuery(document).ready(function() {
     }
   })
 
-  var DatePickerStart = React.createClass({
+  var DatePicker = React.createClass({
     render: function() {
       var formStyle = {
         margin: 0,
         padding: 0,
-        display: 'inline'
-      }
-      if (this.props.dataType === 'questionnaire') {
-        formStyle = {
-          margin: 0,
-          padding: 0,
-          display: 'none'
-        }
+        display: this.props.dataType === 'questionnaire' ? 'none' : 'inline'
       }
       return (
-          <span style = {formStyle}
-                start_date={this.props.start_date}
-                onChange={this.props.onChange} >
-                Start Date <input className="form-control" type="date" id="start_date"></input>
-            </span>
-      );
-    }
-  });
-
-  //========================================================================
-  var DatePickerEnd = React.createClass({
-    render: function() {
-      var formStyle = {
-        margin: 0,
-        padding: 0,
-        display: 'inline'
-      }
-      if (this.props.dataType === 'questionnaire') {
-        formStyle = {
-          margin: 0,
-          padding: 0,
-          display: 'none'
-        }
-      }
-      return (
-          <span style = {formStyle}
-                end_date={this.props.end_date}
-                onChange={this.props.onChange} >
-                End Date <input className="form-control" type="date" id="end_date"></input>
-            </span>
+          <span
+              style={formStyle}
+              date={this.props.date}
+              onChange={this.props.onChange}
+          >
+              {this.props.title}
+              <input
+                  className="form-control"
+                  type="date"
+                  id={this.props.inputId}
+              />
+          </span>
       );
     }
   });
@@ -1043,14 +1018,14 @@ jQuery(document).ready(function() {
       var colDisplayStyle = {
         display: ''
       }
-        const isEntryValid = entry => ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
-            (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-            (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
-            (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
-            (entry.private || entry.type == 'FolderNode')
-        const isQuestionnaire = this.props.dataType === 'questionnaire'
+      const isEntryValid = entry => ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
+          (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
+          (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
+          (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
+          (entry.private || entry.type == 'FolderNode')
+
       if (this.props) {
-        if (isQuestionnaire) {
+        if (this.props.dataType === 'questionnaire') {
           colWidthArray = [ '70%', '0%', '0%', '0%', '0%', '0%', '30%' ]
           colDisplayStyle = {
             display: 'none'
@@ -1059,16 +1034,14 @@ jQuery(document).ready(function() {
         if (this.props.dataType == 'course') {
           colWidthArray = [ '20%', '0%', '0%', '20%', '20%', '20%', '20%' ]
           _rows.push(<TitleRow title="My Courses" />)
-        } else if (this.props.dataType == 'assignment') {
+        }
+        if (this.props.dataType == 'assignment') {
           _rows.push(<TitleRow title="My Assignments" />)
         }
 
+        if(this.props.selectValue === 'empty') {
         jQuery.each(this.props.data, function(i, entry) {
-          if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
-              (entry.private == true || entry.type == 'FolderNode')) {
+          if (isEntryValid(entry)) {
             _rows.push(
               <ContentTableRow
                 key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
@@ -1129,7 +1102,7 @@ jQuery(document).ready(function() {
           } else {
             return
           }
-        })
+        })}
 
         if(_this.props.selectValue == 'created_date'){
           var var_start_date = _this.props.start_date+1;
@@ -1710,15 +1683,22 @@ jQuery(document).ready(function() {
                 display: 'grid',
                 gridTemplateColumns: 'repeat(3, auto) 1fr',
                 gridGap: '8px',
-                alignItems: 'center' }}>
-                <DatePickerStart
-                    start_date = {this.state.start_date}
+                alignItems: 'center' }}
+              >
+                <DatePicker
+                    date={this.state.start_date}
                     onChange={this.changeDateStart}
-                    dataType={this.props.dataType}/>
-                <DatePickerEnd
-                    start_date = {this.state.end_date}
+                    dataType={this.props.dataType}
+                    inputId="start_date"
+                    title="Start Date"
+                />
+                <DatePicker
+                    date={this.state.end_date}
                     onChange={this.changeDateEnd}
-                    dataType={this.props.dataType}/>
+                    dataType={this.props.dataType}
+                    inputId="end_date"
+                    title="End Date"
+                />
                 <HASQUIZ_TOGGLE
                     has_quiz_var = {this.state.has_quiz_var}
                     onChange={this.changeAvailableToggle}

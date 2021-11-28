@@ -1,5 +1,6 @@
 
 require 'active_support/time_with_zone'
+require  'fileutils'
 
 class AssignmentForm
   attr_accessor :assignment,
@@ -55,7 +56,7 @@ class AssignmentForm
     error
   end
 
-  def update(attributes, user, vary_by_topic_desired = false)
+  def update(attributes, user)
     @has_errors = false
     has_late_policy = false
     if attributes[:assignment][:late_policy_id].to_i > 0
@@ -65,7 +66,6 @@ class AssignmentForm
     end
     update_assignment(attributes[:assignment])
     update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
-    update_assignment_questionnaires(attributes[:topic_questionnaire]) unless @has_errors || attributes[:assignment][:vary_by_topic] == 'false'
     update_due_dates(attributes[:due_date], user) unless @has_errors
     update_assigned_badges(attributes[:badge], attributes[:assignment]) unless @has_errors
     add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck])
@@ -90,29 +90,24 @@ class AssignmentForm
     @assignment.num_reviews = @assignment.num_reviews_allowed
   end
 
-  # code to save assignment questionnaires updated in the Rubrics and Topics tabs
+  # code to save assignment questionnaires
   def update_assignment_questionnaires(attributes)
-    return if attributes.nil? || attributes.empty?
-    if attributes[0].key?(:questionnaire_weight)
-      validate_assignment_questionnaires_weights(attributes)
-      @errors = @assignment.errors.to_s
-      topic_id = nil
-    end
+    return false unless attributes
+    validate_assignment_questionnaires_weights(attributes)
+    @errors = @assignment.errors
     unless @has_errors
-      # Update AQ if found, otherwise create new entry
-      attributes.each do |attr|
-        unless attr[:questionnaire_id].blank?
-          questionnaire_type = Questionnaire.find(attr[:questionnaire_id]).type
-          topic_id = attr[:topic_id] if attr.key?(:topic_id)
-          aq = assignment_questionnaire(questionnaire_type, attr[:used_in_round], topic_id)
-          if aq.id.nil?
-            unless aq.save
-              @errors = @assignment.errors.to_s
-              @has_errors = true
-              next
-            end
+      existing_aqs = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
+      existing_aqs.each(&:delete)
+      attributes.each do |assignment_questionnaire|
+        if assignment_questionnaire[:id].nil? or assignment_questionnaire[:id].blank?
+          aq = AssignmentQuestionnaire.new(assignment_questionnaire)
+          unless aq.save
+            @errors = @assignment.errors.to_s
+            @has_errors = true
           end
-          unless aq.update_attributes(attr)
+        else
+          aq = AssignmentQuestionnaire.find(assignment_questionnaire[:id])
+          unless aq.update_attributes(assignment_questionnaire)
             @errors = @assignment.errors.to_s
             @has_errors = true
           end
@@ -221,69 +216,6 @@ class AssignmentForm
     end
   end
 
-  # Find an AQ based on the given values
-  def assignment_questionnaire(questionnaire_type, round_number, topic_id)
-    round_number = nil if round_number.blank?
-    topic_id = nil if topic_id.blank?
-    if @assignment.vary_by_round && @assignment.vary_by_topic
-        # Get all AQs for the assignment and specified round number and topic
-        assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number, topic_id: topic_id)
-        assignment_questionnaires.each do |aq|
-          # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-          return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
-        end
-    elsif @assignment.vary_by_round
-        # Get all AQs for the assignment and specified round number by round #
-        assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number)
-        assignment_questionnaires.each do |aq|
-          # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-          return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
-        end
-    elsif @assignment.vary_by_topic
-        # Get all AQs for the assignment and specified round number by topic
-        assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, topic_id: topic_id)
-        assignment_questionnaires.each do |aq|
-          # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-          return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
-        end
-    else
-        # Get all AQs for the assignment
-        assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
-        assignment_questionnaires.each do |aq|
-          # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-          return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
-        end
-    end
-
-    # Create a new AQ if it was not found based on the attributes
-    default_weight = {}
-    default_weight['ReviewQuestionnaire'] = 100
-    default_weight['MetareviewQuestionnaire'] = 0
-    default_weight['AuthorFeedbackQuestionnaire'] = 0
-    default_weight['TeammateReviewQuestionnaire'] = 0
-    default_weight['BookmarkRatingQuestionnaire'] = 0
-    default_aq = AssignmentQuestionnaire.where(user_id: @assignment.instructor_id, assignment_id: nil, questionnaire_id: nil).first
-    default_limit = if default_aq.blank?
-                      15
-                    else
-                      default_aq.notification_limit
-                    end
-
-    aq = AssignmentQuestionnaire.new
-    aq.questionnaire_weight = default_weight[questionnaire_type]
-    aq.notification_limit = default_limit
-    aq.assignment = @assignment
-    aq
-  end
-
-  # Find a questionnaire for the given AQ and questionnaire type
-  def questionnaire(assignment_questionnaire, questionnaire_type)
-    return Object.const_get(questionnaire_type).new if assignment_questionnaire.nil?
-    questionnaire = Questionnaire.find_by(id: assignment_questionnaire.questionnaire_id)
-    return questionnaire unless questionnaire.nil?
-    Object.const_get(questionnaire_type).new
-  end
-
   def get_time_diff_btw_due_date_and_now(due_date)
     due_at = due_date.due_at.to_s(:db)
     Time.parse(due_at)
@@ -291,6 +223,46 @@ class AssignmentForm
     time_left_in_min = find_min_from_now(due_at)
     diff_btw_time_left_and_threshold = time_left_in_min - due_date.threshold * 60
     [diff_btw_time_left_and_threshold, time_left_in_min]
+  end
+
+  def self.copy_calibration(old_assign,new_assign_id)
+    if old_assign.is_calibrated
+      SubmissionRecord.copycalibratedsubmissions(old_assign, new_assign_id)
+      old_team_ids = Team.createnewteam(old_assign, new_assign_id)
+      @new_teams = Team.where(parent_id: new_assign_id)
+      new_team_ids = []
+      @new_teams.each do |catt|
+        new_team_ids.append(catt.id)
+      end
+      dict = Hash[old_team_ids.zip new_team_ids]
+      count = 0
+      old_team_ids.each do |catt|
+        @old_team_user = TeamsUser.where(team_id: catt)
+        @old_team_user.each do |matt|
+          @new_team_user = TeamsUser.new
+          @new_team_user.team_id = new_team_ids[count]
+          @new_team_user.user_id = matt.user_id
+          @new_team_user.save
+          Participant.createparticipant(matt, old_assign, new_assign_id)
+        end
+        Participant.mapreviewresponseparticipant(old_assign, new_assign_id, dict)
+        ReviewResponseMap.newreviewresp(old_assign, catt, dict, new_assign_id)
+        count += 1
+      end
+      old_directory_path = ""
+      new_directory_path = ""
+      old_team_ids.each do |catt|
+        @team_needed = Team.where(id:catt).first
+        @team_inserted = Team.where(id:dict[catt]).first
+        old_directory_path = @team_needed.directory_path
+        new_directory_path = @team_inserted.directory_path
+        break
+      end
+    end
+    if File.exist?(old_directory_path)
+      Dir.mkdir(new_directory_path) unless File.exist?(new_directory_path)
+      FileUtils.cp_r old_directory_path+'/.', new_directory_path
+    end
   end
 
   # add DelayedJob into queue and return it
@@ -406,7 +378,16 @@ class AssignmentForm
     old_assign = Assignment.find(assignment_id)
     new_assign = old_assign.dup
     user.set_instructor(new_assign)
-    new_assign.update_attribute('name', 'Copy of ' + new_assign.name)
+    # Set name of new assignment as 'Copy of <old assignment name>'. If it already exists, set it as 'Copy of <old assignment name> (1)'.
+    # Repeated till unique name is found.
+    name_counter = 0
+    new_name = 'Copy of ' + new_assign.name
+    until Assignment.find_by(name: new_name).nil?
+      new_name = 'Copy of ' + new_assign.name
+      name_counter += 1
+      new_name += ' (' + name_counter.to_s + ')'
+    end
+    new_assign.update_attribute('name', new_name)
     new_assign.update_attribute('created_at', Time.now)
     new_assign.update_attribute('updated_at', Time.now)
     new_assign.update_attribute('directory_path', new_assign.directory_path + '_copy') if new_assign.directory_path.present?
@@ -425,6 +406,7 @@ class AssignmentForm
     else
       new_assign_id = nil
     end
+    copy_calibration(old_assign, new_assign_id)
     new_assign_id
   end
 
@@ -437,8 +419,7 @@ class AssignmentForm
         notification_limit: aq.notification_limit,
         questionnaire_weight: aq.questionnaire_weight,
         used_in_round: aq.used_in_round,
-        dropdown: aq.dropdown,
-        topic_id: aq.topic_id
+        dropdown: aq.dropdown
       )
     end
   end

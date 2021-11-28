@@ -291,4 +291,40 @@ class Team < ActiveRecord::Base
     team_user = TeamsUser.where(user_id: user_id).find { |team_user| team_user.team.parent_id == parent_id }
     team_user.destroy rescue nil
   end
+
+  #Create new teams for calibrated assignments with respect to the old team already present
+  def self.createnewteam(old_assign, new_assign_id)
+    puts "Alpha"
+    @original_team_values = Team.where(parent_id: old_assign.id)
+    old_team_ids = []
+    @original_team_values.each do |catt|
+      @prev_assignment = Assignment.find(old_assign.id)
+      @prev_instructor = Participant.find_by(parent_id: old_assign.id, user_id: @prev_assignment.instructor_id)
+      @map = ReviewResponseMap.find_by(reviewed_object_id: old_assign.id, reviewer_id: @prev_instructor.id, reviewee_id: catt.id)
+      if @map
+        @resp = Response.find_by(map_id: @map.id, is_submitted: false)
+        if @resp
+          old_team_ids.append(catt.id)
+          @new_team = Team.new
+          @new_team.name = catt.name
+          @new_team.parent_id = new_assign_id
+          @new_team.type = catt.type
+          @new_team.comments_for_advertisement = catt.comments_for_advertisement
+          @new_team.advertise_for_partner = catt.advertise_for_partner
+          @new_team.submitted_hyperlinks = catt.submitted_hyperlinks
+          @new_team.directory_num = catt.directory_num
+          @new_team.grade_for_submission = catt.grade_for_submission
+          @new_team.comment_for_submission = catt.comment_for_submission
+          @new_team.make_public = catt.make_public
+          @new_team.save
+        else
+          next
+        end
+      else
+        next
+      end
+    end
+    old_team_ids
+  end
+
 end

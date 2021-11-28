@@ -311,13 +311,13 @@ class AssignmentForm
         Participant.mapreviewresponseparticipant(old_assign, new_assign_id, dict)
         ReviewResponseMap.newreviewresp(old_assign, catt, dict, new_assign_id)
         count += 1
-        
+
         @team_needed = Team.where(id:catt).first
-        @team_inserted = AssignmentTeam.where(id:dict[catt]).first
-        @team_inserted.set_student_directory_num
         old_directory_path = @team_needed.directory_path
-        new_directory_path = @team_inserted.directory_path
         if File.exist?(old_directory_path)
+          @team_inserted = AssignmentTeam.where(id:dict[catt]).first
+          @team_inserted.set_student_directory_num
+          new_directory_path = @team_inserted.directory_path
           Dir.mkdir(new_directory_path) unless File.exist?(new_directory_path)
           FileUtils.cp_r old_directory_path+'/.', new_directory_path
         end

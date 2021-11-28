@@ -292,7 +292,7 @@ class AssignmentForm
     if old_assign.is_calibrated
       SubmissionRecord.copycalibratedsubmissions(old_assign, new_assign_id)
       old_team_ids = Team.createnewteam(old_assign, new_assign_id)
-      @new_teams = Team.where(parent_id: new_assign_id)
+      @new_teams = AssignmentTeam.where(parent_id: new_assign_id)
       new_team_ids = []
       @new_teams.each do |catt|
         new_team_ids.append(catt.id)
@@ -311,20 +311,17 @@ class AssignmentForm
         Participant.mapreviewresponseparticipant(old_assign, new_assign_id, dict)
         ReviewResponseMap.newreviewresp(old_assign, catt, dict, new_assign_id)
         count += 1
-      end
-      old_directory_path = ""
-      new_directory_path = ""
-      old_team_ids.each do |catt|
+        
         @team_needed = Team.where(id:catt).first
-        @team_inserted = Team.where(id:dict[catt]).first
+        @team_inserted = AssignmentTeam.where(id:dict[catt]).first
+        @team_inserted.set_student_directory_num
         old_directory_path = @team_needed.directory_path
         new_directory_path = @team_inserted.directory_path
-        break
+        if File.exist?(old_directory_path)
+          Dir.mkdir(new_directory_path) unless File.exist?(new_directory_path)
+          FileUtils.cp_r old_directory_path+'/.', new_directory_path
+        end
       end
-    end
-    if File.exist?(old_directory_path)
-      Dir.mkdir(new_directory_path) unless File.exist?(new_directory_path)
-      FileUtils.cp_r old_directory_path+'/.', new_directory_path
     end
   end
 

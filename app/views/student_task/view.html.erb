@@ -57,7 +57,8 @@ to display the label "Your team" in the student assignment tasks-->
           <font color="gray">Your work</font> (You have to choose a topic first)
         <% end %>
       <% else %>
-        <% if @assignment.submission_allowed(@topic_id) %>
+        <% if (!@can_submit_revision_plan && @assignment.submission_allowed(@topic_id)) || 
+              (@can_submit_revision_plan && @revision_plan_questionnaire_id && @assignment.submission_allowed(@topic_id)) %>
           <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> (Submit and view your work)
         <% else %>
           <font color="gray">Your work</font> (You are not allowed to submit your work right now)

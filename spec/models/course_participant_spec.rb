@@ -2,29 +2,29 @@ require 'byebug'
 describe "CourseParticipant" do
   let(:course) { build(:course, id: 1, name: 'ECE517')  }
   let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team])  } 
-
-  describe "#copy" do
-    before(:each) do
-      byebug
-      @assignment = build(:assignment)
-      @course_participant = build(:course_participant)
-      @assignment_participant = build(:participant)
-    end
+  let(:assignment_participant) {build(:participant, id: 1)}
+  '''describe "#copy" do
+    #before(:each) do
+    #  byebug
+    #  assignment = build(:assignment)
+    #  course_participant = build(:course_participant)
+    #  @assignment_participant = build(:participant)
+    #end
 
     it "create a copy of participant" do
-      allow(AssignmentParticipant).to receive(:create).and_return(@assignment_participant)
-      allow(@assignment_participant).to receive(:set_handle).and_return(true)
-      expect(@course_participant.copy(@assignment.id)).to be_an_instance_of(AssignmentParticipant)
+      allow(AssignmentParticipant).to receive(:create).and_return(participant)
+      allow(assignment_participant).to receive(:set_handle).and_return(true)
+      expect(course_participant.copy(@assignment.id)).to be_an_instance_of(AssignmentParticipant)
     end
 
     it "returns nil if copy exist" do
       allow(AssignmentParticipant).to receive(:where).and_return(AssignmentParticipant)
-      allow(AssignmentParticipant).to receive(:first).and_return(@assignment_participant)
-      allow(@assignment_participant).to receive(:set_handle).and_return(true)
+      allow(AssignmentParticipant).to receive(:first).and_return(participant)
+      allow(assignment_participant).to receive(:set_handle).and_return(true)
 
-      expect(@course_participant.copy(@assignment.id)).to be_nil
+      expect(course_participant.copy(assignment.id)).to be_nil
     end
-  end
+  end'''
 
   describe ".import" do
     context 'when record is empty' do

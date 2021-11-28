@@ -1059,13 +1059,16 @@ jQuery(document).ready(function() {
         if (this.props.dataType == 'course') {
           colWidthArray = [ '20%', '0%', '0%', '20%', '20%', '20%', '20%' ]
           _rows.push(<TitleRow title="My Courses" />)
-        }
-        if (this.props.dataType == 'assignment') {
+        } else if (this.props.dataType == 'assignment') {
           _rows.push(<TitleRow title="My Assignments" />)
         }
-        if(_this.props.selectValue == 'empty'){
+
         jQuery.each(this.props.data, function(i, entry) {
-          if (isEntryValid(entry) || isQuestionnaire) {
+          if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
+              (entry.private == true || entry.type == 'FolderNode')) {
             _rows.push(
               <ContentTableRow
                 key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
@@ -1126,7 +1129,7 @@ jQuery(document).ready(function() {
           } else {
             return
           }
-        })}
+        })
 
         if(_this.props.selectValue == 'created_date'){
           var var_start_date = _this.props.start_date+1;

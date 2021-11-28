@@ -1,6 +1,22 @@
 <h2> Author reviews on <%= Participant.find(@reviewer_id).fullname(@ip) %> </h2>
 <% keys = @feedback_final_versions.keys %>
 <% keys.each do |key| %>
+  <% keys2 = @feedback_final_versions[key].keys %>
+  <% questionnaire_id = Questionnaire.find(@feedback_final_versions[key][:questionnaire_id]) %>
+  <% questions = Question.where(questionnaire_id: questionnaire_id) %>
+  <% keys2.each do |key2| %>
+    <% team = Team.where(name: @feedback_final_versions[key][key2]) %>
+    <% author_id = TeamsUsers.where(team_id: team.id) %>
+    <% author_id.each do |author_id| %>
+      <% author_name = User.find(author_id.user_id) %>
+      <% answers = Answer.where(response_id: @feedback_final_versions[key][key2][1]) %>
+    <% end %>
+  <% end %>
+  <div>
+    <div class="c<%= answer.answer %> grade-circle" ><p><%= answer.answer %></p></div>
+  </div>
+
+
   <% roundtitle = key.to_s %>
   <h4><b><%= roundtitle.titlecase %></b></h4>
   <h4><b>questionnaire_id = <%= @feedback_final_versions[key][:questionnaire_id] %></b></h4>

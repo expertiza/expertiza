@@ -10,6 +10,16 @@ describe AnswerTagsController do
   let!(:tag_prompt_deployment2) { create(:tag_prompt_deployment, id: 2, assignment_id: 2, questionnaire_id: 1) }
   let!(:answer_tag) { create(:answer_tag, id: 1, tag_prompt_deployment_id: 1, user_id: student.id) }
 
+
+  #factory objects required for "create_edit" test cases - since creating answer tags and updating answer tags requires pre mapping of answer and tag deployment key constraints
+  let(:questionnaire1) { create(:questionnaire, id: 2) }
+  let(:question1) { create(:question, questionnaire: questionnaire, weight: 2, id: 2, type: "Criterion") }
+  let(:response_map) { create(:review_response_map, id: 2, reviewed_object_id: 2) }
+  let!(:response_record) { create(:response, id: 2, response_map: response_map) }
+  let!(:answer) { create(:answer, question: question1, comments: "test comment", response_id: response_record.id) }
+  let(:tag_prompt) { TagPrompt.create id: 3, prompt: "??", desc: "desc", control_type: "slider" }
+  let(:tag_deploy) { TagPromptDeployment.create id: 3, tag_prompt: tag_prompt, question_type: "Criterion" }
+
   #To allow the functionality only if the accessing user is having student privileges
   #params: action
   describe '#action_allowed?' do
@@ -94,7 +104,7 @@ describe AnswerTagsController do
         output = JSON.parse(response.body)
         expect(output.length).to eql(1)
       end
-      
+
       it 'when there are no answer tags for given random user_id' do
         params = {user_id: 42}
         get :index, params
@@ -115,6 +125,48 @@ describe AnswerTagsController do
         output = JSON.parse(response.body)
         expect(output.length).to eql(0)
       end
+    end
+  end
+
+
+  #To allow creation if not existing and simultaneously updating the new answer tag.
+  #params: answer_id (answer id mapping to which tag is being created)
+  #params: tag_prompt_deployment_id (tag_prompt id mapping to which tag is being created)
+  #params: value (new value to be updated)
+
+  describe '#create_edit' do
+    context 'when student tries to create or update the answer tags' do
+      before(:each) do
+        controller.request.session[:user] = student
+      end
+
+      it 'add entry if not existing and update the old value by new value provided as param' do
+        params = {answer_id: answer.id,tag_prompt_deployment_id: tag_deploy.id,value: 0}
+        post :create_edit, params, session
+        expect(response).to have_http_status(200)
+      end
+
+      it 'restricts updating answer tag by student if no mapping is found related to any answer for that tag (foreign key constraint)' do
+        params = {answer_id: nil,tag_prompt_deployment_id: tag_deploy.id,value: 0}
+        expect {
+          post :create_edit, params, session
+        }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+
+      it 'restricts updating answer tag by student if no mapping is found related to any tag_prompt_deployment for that tag (foreign key constraint)' do
+        params = {answer_id: answer.id,tag_prompt_deployment_id: nil,value: 0}
+        expect {
+          post :create_edit, params, session
+        }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+
+      it 'restricts updating answer tag by student if no updated value is provided for the answer tag' do
+        params = {answer_id: answer.id,tag_prompt_deployment_id: tag_deploy.id,value: nil}
+        expect {
+          post :create_edit, params, session
+        }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+
     end
   end
 end

@@ -242,7 +242,8 @@
                 var tabCell = tr.insertCell(-1);
                 tabCell.innerHTML = combined_api_output[i][col[j]]
                 if(j==0) {
-                    tabCell.innerHTML += `<img src="/assets/info.png" title='`+processed_comment_json_string[i]['question']+`'>`;
+                    let title = 'Q) '+ processed_comment_json_string[i]['question'] + '   A) ' + processed_comment_json_string[i]['text'];
+                    tabCell.innerHTML += `<img src="/assets/info.png" title='`+title+`'>`;
                 }
             }
         }

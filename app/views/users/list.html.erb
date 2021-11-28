@@ -2,7 +2,7 @@
 
 <br/>
 <%= form_tag :action => 'show_if_authorized' do %>
-  View specific user: <%= text_field_with_auto_complete :user, :name, {:size => 41}, class:'form-control', placeholder: 'Search UserID...' %>
+  View specific user: <%= text_field_with_auto_complete :user, :name, {:size => 41, :class =>'form-control', :placeholder => 'Search UserID...'} %>
   <button type="submit" class="btn btn-primary">Edit</button>
 <% end %>
 

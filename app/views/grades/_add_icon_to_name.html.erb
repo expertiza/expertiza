@@ -4,7 +4,7 @@
 <% review_text = "" %>
 <% if @current_role_name.eql?'Student' or questionnaire_type != "TeammateReviewQuestionnaire" %>
   <%# Use Review {{index}} format for student view, and when questionnaire_type is not teammatereview %>
-  <% review_text = "Review #{i + 1}" %>
+  <% review_text = "Review #{i}" %>
 <% else %>
   <% resp = Response.find(review.id) %>
   <% map = ResponseMap.find(resp.map_id) %>

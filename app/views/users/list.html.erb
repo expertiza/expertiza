@@ -2,8 +2,10 @@
 
 <br/>
 <%= form_tag :action => 'show_if_authorized' do %>
-  View specific user: <%= text_field_with_auto_complete :user, :name, {:size => 41, :class =>'form-control', :placeholder => 'Search UserID...'} %>
-  <button type="submit" class="btn btn-primary">Edit</button>
+  <div style="margin: 8px auto; display: grid; grid-template-columns: repeat(3, auto) 1fr; grid-gap: 8px; align-items: center">
+    View specific user: <%= text_field_with_auto_complete :user, :name, {:size => 41, :class =>'form-control'} %>
+    <button type="submit" class="btn btn-primary">Edit</button>
+  </div>
 <% end %>
 
 <%= form_tag :action => 'list', :paginate_show => '1', :num_users => @per_page do %>

@@ -377,6 +377,12 @@ FactoryBot.define do
     instruction_loc nil
   end
 
+  factory :teammate_review_questionnaire, class: TeammateReviewQuestionnaire do
+    name 'Test teammate review questionnaire'
+    type 'TeammateReviewQuestionnaire'
+    display_type 'Teammate Review'
+  end
+
   factory :questionnaire_node, class: QuestionnaireNode do
     parent_id 0
     node_object_id 0
@@ -406,6 +412,16 @@ FactoryBot.define do
     assignment { Assignment.first || association(:assignment) }
     questionnaire { ReviewQuestionnaire.first || association(:questionnaire) }
     user_id 1
+    questionnaire_weight 100
+    used_in_round nil
+    topic_id nil
+    dropdown 1
+  end
+
+
+  factory :tm_assignment_questionnaire, class: AssignmentQuestionnaire do
+    user_id 1
+    questionnaire { association(:teammate_review_questionnaire) }
     questionnaire_weight 100
     used_in_round nil
     topic_id nil

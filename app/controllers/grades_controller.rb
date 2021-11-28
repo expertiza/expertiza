@@ -99,11 +99,11 @@ class GradesController < ApplicationController
           counter_for_same_rubric = 0
         end
       end
-      if questionnaire.display_type == "Teammate Review"
+      if questionnaire.type == "TeammateReviewQuestionnaire"
         # as teammate review will be different for each participant
         # we need to create a separate table for each teammate
-        @participant.team.participants.each do |p|
-          @vmlist << populate_view_model(p, questionnaire, @team)
+        @participant.team.participants.each do |team_participant|
+          @vmlist << populate_view_model(team_participant, questionnaire, @team)
         end
       else
         # only one participant needs iterating, as apart from teammatereview
@@ -201,11 +201,6 @@ class GradesController < ApplicationController
     vmquestions = questionnaire.questions
     vm.add_questions(vmquestions)
     vm.add_team_members(team)
-    # Need to iterate over the whole team to get everyone's reviews
-    # @participant.team == AssignmentTeam
-    # participant.team.participants.each do |p|
-    # vm.add_reviews(p, @team, @assignment.vary_by_round)
-    # end
     vm.add_reviews(participant, team, @assignment.vary_by_round)
     vm.number_of_comments_greater_than_10_words
     vm

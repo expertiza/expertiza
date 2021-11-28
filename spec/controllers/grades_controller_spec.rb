@@ -15,7 +15,6 @@ describe GradesController do
   let(:ta) { build(:teaching_assistant, id: 8) }
 
   before(:each) do
-    allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
     allow(participant).to receive(:team).and_return(team)
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -91,29 +90,106 @@ describe GradesController do
     end
   end
 
-  xdescribe '#view_team' do
+  describe '#view_team' do
+    render_views
+
+    # All stubs and factories are instantiated within this scope so as to not 
+    # clash with other broken test.
+    # The names of the factories created for testing view_team
+    # have `_vt` suffix ```where necessary``` to differentiate them from 
+    # the above declared factories
+
+    let(:student1_vt) { create(:student, name: "barry", id: 12) }
+    let(:student2_vt) { create(:student, name: "iris", id: 13) }
+
+    let(:tm_questionnaire) {
+      build(
+        :teammate_review_questionnaire,
+        id: 12,
+        questions: [question],
+        max_question_score: 5
+      )
+    }
+    let(:assignment_vt) {
+      create(:assignment, id: 6, max_team_size: 2,
+      questionnaires: [tm_questionnaire])
+    }
+    let(:assignment_questionnaire_vt) {
+      create(:tm_assignment_questionnaire, id: 12, used_in_round: nil,
+      assignment: assignment_vt, questionnaire: tm_questionnaire) }
+    let(:team_vt) { create(:assignment_team, id: 12,
+    assignment: assignment_vt) }
+    let(:participant_vt) { create(:participant, id: 12,
+      assignment: assignment_vt, user_id: student1_vt.id) }
+    let(:participant2_vt) { create(:participant, id: 13,
+      assignment: assignment_vt, user_id: student2_vt.id) }
+
+
+    before(:each) do
+      # Need to stub this method so the factory instance with
+      # the stubbed :team method is returned by :find
+      # instead of a separate instance with the same data
+      allow(AssignmentParticipant)
+        .to receive(:find)
+        .with(participant_vt.id.to_s)
+        .and_return(participant_vt)
+      allow(participant_vt).to receive(:team).and_return(team_vt)
+      allow(team_vt).to receive(:participants).and_return([participant_vt, participant2_vt])
+      allow(AssignmentQuestionnaire)
+        .to receive(:find_by)
+        .with(assignment_id: assignment_vt.id, questionnaire_id: tm_questionnaire.id)
+        .and_return(assignment_questionnaire_vt)
+      allow(AssignmentQuestionnaire)
+        .to receive(:find_by)
+        .with(assignment_id: assignment.id, questionnaire_id: review_questionnaire.id)
+        .and_return(assignment_questionnaire_vt)
+      allow(AssignmentQuestionnaire)
+        .to receive(:where)
+        .with(any_args)
+        .and_return([assignment_questionnaire_vt])
+      allow(assignment_vt)
+        .to receive(:late_policy_id)
+        .and_return(false)
+      allow(assignment_vt)
+        .to receive(:calculate_penalty)
+        .and_return(false)
+      allow(assignment_vt)
+        .to receive(:compute_total_score)
+        .with(any_args)
+        .and_return(100)
+      allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([review_response])
+      allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
+    end
+
     it 'renders grades#view_team page' do
-      allow(participant).to receive(:team).and_return(team)
-      params = {id: 1}
+      params = {id: participant_vt.id}
       get :view_team, params
       expect(response).to render_template(:view_team)
     end
-  end
 
-  describe '#view_team' do
-    render_views
+    context 'when view_team page is opened by student' do
+      it 'dropdown is not rendered' do
+        session = { user: student1_vt }
+        params = {id: participant_vt.id}
+        stub_current_user(student1_vt, student1_vt.role.name, student1_vt.role)
+        get :view_team, params
+        expect(response.body).to_not have_selector('select')
+      end
+    end
+
+    context 'when view_team page is opened by instructor' do
+      it 'dropdown is rendered' do
+        session = { user: instructor }
+        params = {id: participant_vt.id}
+        get :view_team, params
+        expect(response.body).to have_selector('select')
+      end
+    end
+
     context 'when view_team page is viewed by a student who is also a TA for another course' do
       it 'renders grades#view_team page' do
-        allow(participant).to receive(:team).and_return(team)
-        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
-        allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])
-        allow(assignment).to receive(:late_policy_id).and_return(false)
-        allow(assignment).to receive(:calculate_penalty).and_return(false)
-        allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
-        allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([review_response])
-        allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
-        params = {id: 1}
-        allow(TaMapping).to receive(:exists?).with(ta_id: 1, course_id: 1).and_return(true)
+        params = { id: participant_vt.id }
+        allow(TaMapping).to receive(:exists?).with(ta_id: participant_vt.user_id, course_id: 1).and_return(true)
         stub_current_user(ta, ta.role.name, ta.role)
         get :view_team, params
         expect(response.body).not_to have_content "TA"

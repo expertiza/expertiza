@@ -64,8 +64,6 @@
   
 </TR>
 
-<h4> pscore: <%= sprintf("%.2f", @pscore[:total_score]) %></h4>
-
 <script type="text/javascript">
   <% %w[review metareview feedback teammate].each do |type| %>
   <% if @pscore[type.to_sym] && @pscore[type.to_sym][:scores][:avg]%>

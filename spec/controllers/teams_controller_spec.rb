@@ -22,9 +22,7 @@ describe TeamsController do
     context 'when everything is right' do
       it 'creates teams with random names' do
         allow(Object).to receive_message_chain(:const_get, :find).with(any_args).and_return(assignment1)
-        allow(Team).to receive(:randomize_all_by_parent).with(any_args)
         allow(Version).to receive_message_chain(:where, :last).with(any_args).and_return(0.1)
-
         para = {id: assignment1.id, team_size: 2}
         session = {user: instructor, team_type: "Assignment"}
         result = get :create_teams, para, session
@@ -35,9 +33,7 @@ describe TeamsController do
   end
 
   describe 'list method' do
-    before(:each) {
-      allow(Assignment).to receive(:find_by).and_return(assignment1)
-    }
+    before(:each) { allow(Assignment).to receive(:find_by).and_return(assignment1) }
     context 'when type is Assignment' do
       it 'lists the teams' do
         params = {id: assignment1.id, type: 'Assignment'}
@@ -81,23 +77,23 @@ describe TeamsController do
   describe 'create method' do
     context 'called with right conditions' do
       it 'executes successfully' do
-        bypass_rescue
-        allow(Object).to receive_message_chain(:const_get, :find).and_return(assignment1)
-        allow(Team).to receive(:check_for_existing).and_return(nil)#.with(name: 'SomeName', team_type: 'Assignment')
-        allow(Object).to receive_message_chain(:const_get, :create).and_return(team1)
-        allow(TeamNode).to receive(:create).and_return(nil)
+        #bypass_rescue
+        allow(Object).to receive_message_chain(:const_get, :find).and_return(course1)
+        #allow(Team).to receive(:check_for_existing).and_return(nil)#.with(name: 'SomeName', team_type: 'Assignment')
+        #allow(Object).to receive_message_chain(:const_get, :create).and_return(team1)
+        #allow(TeamNode).to receive(:create).and_return(nil)
         #allow(Object).to receive_message_chain(:const_get, :where).and_return(nil)
-        para = {id: 1}
-        session = {user: ta, team_type: 'Assignment'}
-        #result = get :create, para, session
+        para = {id: 1, team: team5}
+        session = {user: ta, team_type: 'Course'}
+        result = get :create, para, session
         #expect(result.status).to eq 302
         #expect(result).to redirect_to(:action => 'list', :id => assignment1.id)
       end
     end
     context 'called with existing team name' do
       it 'fails' do
-        bypass_rescue
-        allow(Object).to receive_message_chain(:const_get, :find).and_raise(StandardError.new("error"))
+        #bypass_rescue
+        #allow(Object).to receive_message_chain(:const_get, :find).and_raise(StandardError.new("error"))
         #allow(Object).to receive_message_chain(:const_get, :find).and_return(assignment1)
         #allow(Team).to receive(:check_for_existing).and_raise(StandardError.new("error"))
         para = {id: 1}
@@ -111,10 +107,9 @@ describe TeamsController do
 
   describe 'update method' do
     it 'updates the team name' do
-      allow(Team).to receive(:find).and_return(team1)
-      allow(Object).to receive_message_chain(:const_get, :find).with(any_args).and_return(team1.parent_id)
+      #allow(Team).to receive(:find).and_return(team1)
+      #allow(Object).to receive_message_chain(:const_get, :find).with(any_args).and_return(team1.parent_id)
       #allow(Team).to receive(:check_for_existing).and_do_nothing#not_raise(TeamExistsError)
-
       para = {response_id: 1, team_id: 1}
       session = {user: ta}
       #result = get :update, para, session
@@ -135,25 +130,51 @@ describe TeamsController do
   end
 
   describe 'delete method' do
-    it 'passes the test' do
-      request.env['HTTP_REFERER'] = root_url
-      allow(Team).to receive(:find_by).with(any_args).and_return(team5)
-      #allow(Object).to receive(:const_get).and_return(course1)
-      allow(Object).to receive_message_chain(:const_get, :find).and_return(course1)
-      allow(SignedUpTeam).to receive(:where).and_return(signedupteam)#.with(any_args).and_return(signedupteam)
-      #allow(TeamsUser).to receive(:where).and_return(nil)#.with(any_args).and_return(teamusers)
-      #allow(@signUps).to receive_message_chain(:first, :is_waitlisted).with(any_args).and_return(0)
-      allow(team5).to receive(:destroy).and_return(nil)
-
-      para = {id: 5}
-      session = {user: instructor, team_type: 'CourseTeam'}
-      #result = get :delete, para, session
-      #expect(controller.instance_variable_get(:@signedupteam)).to eq nil
-      #expect(controller.instance_variable_get(:@team)).to eq nil
-      #expect(result.status).to eq 302
-      #expect(result).to redirect_to :back
+    before(:each) { request.env['HTTP_REFERER'] = root_url }
+    context 'gets called and team is nil' do
+      it 'it simply redirects' do
+        allow(Team).to receive(:find_by).and_return(nil)
+        para = {id: 5}
+        session = {user: instructor}
+        result = get :delete, para, session
+        expect(result.status).to eq 302
+        expect(result).to redirect_to :back
+        expect(controller.instance_variable_get(:@team)).to eq nil
+      end
     end
+    context 'gets called and team is not nil and it does not hold a topic' do
+      it 'it deletes the team' do
+        allow(Team).to receive(:find_by).and_return(team5)
+        allow(Object).to receive_message_chain(:const_get, :find).and_return(course1)
+        allow(team5).to receive(:destroy).and_return(nil)
+        para = {id: 5}
+        session = {user: instructor, team_type: 'CourseTeam'}
+        result = get :delete, para, session
+        expect(result.status).to eq 302
+        expect(controller.instance_variable_get(:@team)).to eq team5
+      end
+    end
+=begin
+    context 'gets called and team is not nil and it holds a topic' do
+      it 'it reassigns topic and then deletes the team' do
+        allow(Team).to receive(:find_by).and_return(team5)
+        allow(Object).to receive_message_chain(:const_get, :find).and_return(course1)
+        allow('if').to receive('true'.to_s)
+        #controller.instance_variable_set(:@signed_up_team, team5)
+        #allow(@signed_up_team).to receive(:==).and_return(1)
+        #controller.instance_variable_set(:@signUps, team5)
+        #allow(team5).to receive_message_chain(:first, :is_waitlisted).and_return(false)
+        #allow(@signed_up_team).to receive_message_chain(:first, :topic_id).and_return(5)
+        allow(team5).to receive(:destroy).and_return(nil)
+        para = {id: 5}
+        session = {user: instructor, team_type: 'CourseTeam'}
+        result = get :delete, para, session
+        expect(result.status).to eq 302
+      end
+    end
+=end
   end
+
 
   describe 'inherit method' do
     context 'when assignment belongs to course and team is not empty' do
@@ -219,5 +240,4 @@ describe TeamsController do
       end
     end
   end
-
 end

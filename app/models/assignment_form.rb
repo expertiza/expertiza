@@ -216,6 +216,69 @@ class AssignmentForm
     end
   end
 
+  # Find an AQ based on the given values
+  def assignment_questionnaire(questionnaire_type, round_number, topic_id)
+    round_number = nil if round_number.blank?
+    topic_id = nil if topic_id.blank?
+    if @assignment.vary_by_round && @assignment.vary_by_topic
+        # Get all AQs for the assignment and specified round number and topic
+        assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number, topic_id: topic_id)
+        assignment_questionnaires.each do |aq|
+          # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
+          return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+        end
+    elsif @assignment.vary_by_round
+        # Get all AQs for the assignment and specified round number by round #
+        assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number)
+        assignment_questionnaires.each do |aq|
+          # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
+          return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+        end
+    elsif @assignment.vary_by_topic
+        # Get all AQs for the assignment and specified round number by topic
+        assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, topic_id: topic_id)
+        assignment_questionnaires.each do |aq|
+          # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
+          return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+        end
+    else
+        # Get all AQs for the assignment
+        assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
+        assignment_questionnaires.each do |aq|
+          # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
+          return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+        end
+    end
+
+    # Create a new AQ if it was not found based on the attributes
+    default_weight = {}
+    default_weight['ReviewQuestionnaire'] = 100
+    default_weight['MetareviewQuestionnaire'] = 0
+    default_weight['AuthorFeedbackQuestionnaire'] = 0
+    default_weight['TeammateReviewQuestionnaire'] = 0
+    default_weight['BookmarkRatingQuestionnaire'] = 0
+    default_aq = AssignmentQuestionnaire.where(user_id: @assignment.instructor_id, assignment_id: nil, questionnaire_id: nil).first
+    default_limit = if default_aq.blank?
+                      15
+                    else
+                      default_aq.notification_limit
+                    end
+
+    aq = AssignmentQuestionnaire.new
+    aq.questionnaire_weight = default_weight[questionnaire_type]
+    aq.notification_limit = default_limit
+    aq.assignment = @assignment
+    aq
+  end
+
+  # Find a questionnaire for the given AQ and questionnaire type
+  def questionnaire(assignment_questionnaire, questionnaire_type)
+    return Object.const_get(questionnaire_type).new if assignment_questionnaire.nil?
+    questionnaire = Questionnaire.find_by(id: assignment_questionnaire.questionnaire_id)
+    return questionnaire unless questionnaire.nil?
+    Object.const_get(questionnaire_type).new
+  end
+
   def get_time_diff_btw_due_date_and_now(due_date)
     due_at = due_date.due_at.to_s(:db)
     Time.parse(due_at)

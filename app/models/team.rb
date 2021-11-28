@@ -315,7 +315,9 @@ class Team < ActiveRecord::Base
           @new_team.directory_num = catt.directory_num
           @new_team.grade_for_submission = catt.grade_for_submission
           @new_team.comment_for_submission = catt.comment_for_submission
-          @new_team.make_public = catt.make_public
+          # Removed a line from the previous team where this set new_team.make_public equal to catt.make_public
+          # As that field seems to no longer exist. However, I can't find where it was removed. It was added here however
+          # https://expertiza.csc.ncsu.edu/index.php/CSC/ECE_517_Spring_2018-_Project_E1810:_Show_sample_submissions_and_reviews
           @new_team.save
         else
           next

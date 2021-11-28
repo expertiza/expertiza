@@ -63,7 +63,7 @@ class ResponseController < ApplicationController
   # Prepare the parameters when student clicks "Edit"
   def edit
     @review_metric_config = fetch_review_metric
-    @review_metric_init_config = REVIEW_METIRIC_INITIALIZE_CONFIG
+    @review_metric_api_call_values = fetch_review_metric_api_call_values
 
     assign_action_parameters
     @prev = Response.where(map_id: @map.id)
@@ -130,7 +130,7 @@ class ResponseController < ApplicationController
 
   def new
     @review_metric_config = fetch_review_metric
-    @review_metric_init_config = REVIEW_METIRIC_INITIALIZE_CONFIG
+    @review_metric_init_config = fetch_review_metric_api_call_values
     
     assign_action_parameters
     set_content(true)
@@ -150,7 +150,7 @@ class ResponseController < ApplicationController
 
 
 
-#psengo
+
   # fetches the review metric configuration from config file review_metrics.yml file
   def fetch_review_metric
     @temp = REVIEW_METRIC_CONFIG['metrics']
@@ -160,19 +160,19 @@ class ResponseController < ApplicationController
     end
     @review_options
   end
-#End Psengo  
-# Grffin
+  
+
 
   # fetches the review metric api urls from config file review_metrics_api_urls.yml file
-  def fetch_review_metric_api_urls
+  def fetch_review_metric_api_call_values
     metrics = REVIEW_METRIC_API_URLS_CONFIG['metrics']
-    api_urls = {}
+    api_call_values = {}
     for metric in metrics
-      api_urls[metric] = REVIEW_METRIC_API_URLS_CONFIG[metric]
+      api_call_values[metric] = REVIEW_METRIC_API_URLS_CONFIG[metric]
     end
-    api_urls
+    api_call_values
   end  
-# End Griffin
+
 
 
   def new_feedback

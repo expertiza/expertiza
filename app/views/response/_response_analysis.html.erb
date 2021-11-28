@@ -210,15 +210,15 @@
     }    
 
     //This function takes in the processed api output to display a table(populated with API output) on UI
-    function generateTable(combined_api_output, analysisVals)
+    function generateTable(combined_api_output, config_file_api_call_values)
     {
         //tooltip_json to store the text displayed in tooltip
         var tooltip_json = {"Comment Number":'The comment number from the top in the form.'}
 
         //This goes through each analysis and adds their tool tip and tool tip text to tooltip_json
-        for (analysis in analysisVals){
+        for (analysis in config_file_api_call_values){
             analysisColumnName = String(analysis).charAt(0).toUpperCase() + String(analysis).slice(1)
-            tooltip_json[analysisColumnName] = analysisVals[analysis]["toolTipText"]             
+            tooltip_json[analysisColumnName] = config_file_api_call_values[analysis]["toolTipText"]             
         }
 
         var col = [];
@@ -267,15 +267,8 @@
         //this variable fetches and stores the review metrics setting stored in config file review_metrics.yml
         var config_file_values =   $('.fetch_review_metric').data('params');
 
-//griffin
         //this variable fetches and stores the review metrics api urls stored in config file review_metrics_api_urls.yml
-        var config_file_api_urls =   $('.fetch_review_metric_api_urls').data('params');
-// End Grffin
-//psengo
-        //this variable fetches and stores the analysis api setting stored in config file review_metrics_initialize.yml. 
-        //The value in the settings give any hardcoded value for each analysis(for example: api url, tooltips, etc.)
-        var analysisVals = $('.fetch_review_metric_init').data('params');
-//end psengo
+        var config_file_api_call_values =  $('.fetch_review_metric_api_call_values').data('params');
 
         //displays text 'Loading...' when 'get review feedback' button is pressed until table is displayed
         var time_taken_obj = document.getElementById('timeTaken');
@@ -290,51 +283,22 @@
         //This holds the response value of each analysis as a dictionar/hash(key = analysis name, value = response of analysis)
         var analysisResponseDict = {}
 
-//griffon
-        //Sentiment API Call
-        var response_sentiment = null;
-        if(config_file_values.includes('sentiment'))
-        {
-            await makeRequest(processed_comment_json_string, config_file_api_urls['sentiment'])
-            response_sentiment = JSON.parse(response_general);
-            response_general = null;
-        }
-
-        //Problem API Call 
-        var response_problem = null; 
-        if(config_file_values.includes('problem'))
-        { 
-            await makeRequest(processed_comment_json_string, config_file_api_urls['problem'])
-            response_problem = JSON.parse(response_general);
-            response_general = null;
-        }
-
-        //Suggestion API Call
-        var response_suggestion = null;
-        if(config_file_values.includes('suggestion'))
-        {
-            await makeRequest(processed_comment_json_string, config_file_api_urls['suggestion'])
-            response_suggestion = JSON.parse(response_general);
-            response_general = null;
-//end griffon
-//psengo
         //This loops through each analysis(key) in analysisVals hash/dictionary and gets its respective apiurl(value) and puts the response of the
         //api url into responseDict
-        for (var analysisVal in analysisVals){
+        for (var analysisVal in config_file_api_call_values){
             if(config_file_values.includes(analysisVal))
             {
-                apiCall = analysisVals[analysisVal]['apiCall']
+                apiCall = config_file_api_call_values[analysisVal]['apiCall']
                 await makeRequest(processed_comment_json_string, apiCall)
                 analysisResponseDict[analysisVal] = JSON.parse(response_general);
                 response_general = null;
             }
 
-//end psengo
         }
 
         //This line places the response of the analysis into a better format for generating a table.
         var combined_api_output = combine_api_output(number_of_comments, config_file_values, analysisResponseDict);
-        generateTable(combined_api_output, analysisVals);
+        generateTable(combined_api_output, config_file_api_call_values);
 
         time_end = performance.now();
         var time_taken = time_end - time_start;

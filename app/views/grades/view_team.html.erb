@@ -82,7 +82,10 @@
 <% first_teammate_review_appeared = false %>
 <% @vmlist.each do |vm| %>
 
-    <% if not @current_role_name.eql?'Student' and not first_teammate_review_appeared and vm.questionnaire_type == "TeammateReviewQuestionnaire" %>
+    <% if (not @current_role_name.eql?'Student' and
+        not first_teammate_review_appeared and
+        vm.questionnaire_type == "TeammateReviewQuestionnaire" 
+      ) %>
       <div>
         <select onchange="teammateSelectOnChange(this)">
           <option value="all">All</option>
@@ -97,8 +100,16 @@
     <% end %>
 
     <% if (vm.questionnaire_display_type == "Metareview" or vm.questionnaire_display_type == "Author Feedback") and @current_role_name.eql?'Student' %>
-    <% elsif (vm.questionnaire_type == "TeammateReviewQuestionnaire" and @current_role_name.eql?'Student' and !@assignment.show_teammate_reviews)%>
-    <% elsif (vm.questionnaire_type == "TeammateReviewQuestionnaire" and @current_role_name.eql?'Student' and @assignment.show_teammate_reviews and current_user.id != vm.reviewee_id )%>
+    <% elsif (
+      vm.questionnaire_type == "TeammateReviewQuestionnaire" and
+      @current_role_name.eql?'Student' and
+      !@assignment.show_teammate_reviews
+      ) %>
+    <% elsif (
+      vm.questionnaire_type == "TeammateReviewQuestionnaire" and 
+      @current_role_name.eql?'Student' and
+      @assignment.show_teammate_reviews and current_user.id != vm.reviewee_id
+      )%>
     <% else %>
         <% if vm.questionnaire_type == "TeammateReviewQuestionnaire" %>
           <div class="teammate_table" data-reviewee_id="<%= vm.reviewee_id %>">
@@ -201,7 +212,12 @@
                   <% row.score_row.each do |score| %>
                       <% score_comment = score.comment.nil? ? '' : score.comment %>
                       <!-- changing nil to null string to avoid Null Pointer Exception -->
-                      <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%= strip_tags(score.comment).html_safe%>">
+                      <td
+                        class="<%= score.color_code %>"
+                        align="center"
+                        data-toggle="tooltip"
+                        title="<%= strip_tags(score.comment).html_safe%>"
+                      >
                         <span class="<%=  underlined?(score) %>">
                           <%= score.score_value.to_s %>
                         </span>

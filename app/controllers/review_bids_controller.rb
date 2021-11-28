@@ -37,17 +37,16 @@ class ReviewBidsController < ApplicationController
 
     # Finding the current phase that we are in
     # Commented out as reviewed and came to a conclusion that results of the review phase logic is not used
-    #due_dates = AssignmentDueDate.where(parent_id: @assignment.id)
-    #@very_last_due_date = AssignmentDueDate.where(parent_id: @assignment.id).order("due_at DESC").limit(1)
-    #next_due_date = @very_last_due_date[0]
-    #for due_date in due_dates
-    #  if due_date.due_at > Time.now
-    #    next_due_date = due_date if due_date.due_at < next_due_date.due_at
-    #  end
-    #end
-    #@topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
-    #@review_phase = @assignment.current_stage(@topic_id)
-    #@reviews_to_show = @@reviews_to_show.nil? ? (@assignment.num_reviews_required).to_i : @@reviews_to_show.to_i
+    due_dates = AssignmentDueDate.where(parent_id: @assignment.id)
+    @very_last_due_date = AssignmentDueDate.where(parent_id: @assignment.id).order("due_at DESC").limit(1)
+    next_due_date = @very_last_due_date[0]
+    for due_date in due_dates
+     if due_date.due_at > Time.now
+       next_due_date = due_date if due_date.due_at < next_due_date.due_at
+     end
+    end
+    @review_phase = next_due_date.deadline_type_id
+    @reviews_to_show = @@reviews_to_show.nil? ? (@assignment.num_reviews_required).to_i : @@reviews_to_show.to_i
     # Finding how many reviews have been completed
     @num_reviews_completed = 0
     @review_mappings.each do |map|

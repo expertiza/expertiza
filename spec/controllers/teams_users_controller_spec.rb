@@ -15,31 +15,31 @@ describe TeamsUsersController do
     stub_current_user(student, student.role.name, student.role)
   end
 
-describe '#action_allowed?' do
-  context 'when params action is update duties' do
-    before(:each) do
-      controller.params = {id: '1', action: 'update_duties'}
+  describe '#action_allowed?' do
+    context 'when params action is update duties' do
+      before(:each) do
+        controller.params = {id: '1', action: 'update_duties'}
+      end
+
+      context 'when the role current user is student' do
+        it 'allows certain action' do
+          stub_current_user(student, student.role.name, student.role)
+          expect(controller.send(:action_allowed?)).to be true
+        end
+      end
+    end
     end
 
-    context 'when the role current user is student' do
-      it 'allows certain action' do
-        stub_current_user(student, student.role.name, student.role)
-        expect(controller.send(:action_allowed?)).to be true
+
+  describe '#update_duties' do
+    context 'testing the function to update duty_id' do
+      it 'when duties are updated correctly' do
+        allow(TeamsUser).to receive(:find).with('1').and_return(team_user)
+        params = {teams_user_id: 1, teams_user: { duty_id: 2 }, participant_id: 1 }
+        session = {user: instructor}
+        post :update_duties, params, session
+        expect(response).to redirect_to
       end
     end
   end
-  end
-
-
-describe '#update_duties' do
-  context 'testing the function to update duty_id' do
-    it 'when duties are updated correctly' do
-      allow(TeamsUser).to receive(:find).with('1').and_return(team_user)
-      params = {teams_user_id: 1, teams_user: { duty_id: 2 }, participant_id: 1 }
-      session = {user: instructor}
-      post :update_duties, params, session
-      expect(response).to redirect_to
-    end
-  end
-end
 end

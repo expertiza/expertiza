@@ -363,26 +363,47 @@ describe ResponseController do
   end
 
   describe '#fetch_review_metric' do
-  context 'checks whether the fetch_review_metric methods does not return nil' do
-    it 'returns a list of configuration' do
-      expect(controller.fetch_review_metric).not_to be_nil
-    end
-  end
-end
-
-describe '#fetch_review_metric' do
-  context 'checks whether the fetch_review_metric fetches the correct review metrics from review_metric.yml file' do
-    it 'returns a list of configuration of metrics' do
-      metrics = controller.fetch_review_metric
-      metrics.push("")
-      expect(metrics.length).to be <= 4
-      metrics.each do |metric|
-        expect(["sentiment","problem","suggestion",""].include? metric).to eq(true)
+    context 'checks whether the fetch_review_metric methods does not return nil' do
+      it 'returns a list of configuration' do
+        expect(controller.fetch_review_metric).not_to be_nil
       end
     end
   end
-end    
+
+  describe '#fetch_review_metric' do
+    context 'checks whether the fetch_review_metric fetches the correct review metrics from review_metric.yml file' do
+      it 'returns a list of configuration of metrics' do
+        metrics = controller.fetch_review_metric
+        metrics.push("")
+        expect(metrics.length).to be <= 4
+        metrics.each do |metric|
+          expect(["sentiment","problem","suggestion",""].include? metric).to eq(true)
+        end
+      end
+    end
+  end
+
+  describe '#fetch_review_metric_api_urls' do
+    context 'checks whether the fetch_review_metric_api_urls methods does not return nil' do
+      it 'returns a list of configuration' do
+        expect(controller.fetch_review_metric_api_urls).not_to be_nil
+      end
+    end
+  end
+
+  describe '#fetch_review_metric_api_urls' do
+    context 'checks whether the fetch_review_metric_api_urls fetches the correct review metrics api urls from review_metric_api_urls.yml file' do
+      it 'returns a list of configuration of metrics' do
+        metrics = controller.fetch_review_metric
+        api_urls = controller.fetch_review_metric_api_urls
+        expect(api_urls.length).to eq(metrics.length)
+        expected_api_urls = {}
+        metrics.each do |metric|
+          expected_api_urls[metric] = api_urls[metric]
+        end
+        expect(api_urls).to eq(expected_api_urls)
+      end
+    end
+  end
 
 end
-
-

@@ -2,15 +2,19 @@ require 'rails_helper'
 describe GradesHelper, type: :helper do
   let(:review_response) { build(:response, id: 1, map_id: 1) }
   let(:question) { build(:question) }
-  let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
+  let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1, parent_id: 1) }
   let(:team) { build(:assignment_team, id: 1) }
   let(:assignment_participant) { build(:participant, id: 1, assignment: assignment) }
+  let(:assignment_viewgrid) { build(:participant, id: 2, assignment: assignment_for_viewgrid) }
   let(:assignment) { build(:assignment, id: 1, max_team_size: 1, questionnaires: questionnaires, late_policy_id:1, is_penalty_calculated: true, rounds_of_reviews: 1, vary_by_round: true)}
+  let(:assignment_for_penalty) { build(:assignment, id: 4, max_team_size: 1, questionnaires: questionnaires, late_policy_id:1, is_penalty_calculated: false, rounds_of_reviews: 1, vary_by_round: true)}
+  let(:assignment_for_viewgrid) { build(:assignment, id: 5, max_team_size: 1, questionnaires: [questionnaire3], late_policy_id:1, is_penalty_calculated: false, rounds_of_reviews: 1, vary_by_round: false)}
   let(:single_assignment) { build(:assignment, id: 1, max_team_size: 1, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
   let(:team_assignment) { build(:assignment, id: 2, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
   let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
   let(:questionnaire1) { build(:questionnaire, id: 1, questions: [question], type: 'ReviewQuestionnaire') }
   let(:questionnaire2) { build(:questionnaire, id: 2, questions: [question], type: 'ReviewQuestionnaire') }
+  let(:questionnaire3) { build(:questionnaire, id: 3, questions: [question], type: 'TeammateReviewQuestionnaire') }
   let(:questionnaires) { [questionnaire1, questionnaire2] }
   let(:aq1) { build(:assignment_questionnaire, id: 1, used_in_round: 1) }
   let(:aq2) { build(:assignment_questionnaire, id: 2) }
@@ -183,6 +187,16 @@ describe GradesHelper, type: :helper do
         expect(helper.has_team_and_metareview?).to eq({has_team: true, has_metareview: true, true_num: 2})
       end
     end
+
+    context 'when query assignment is team work and has metareview' do
+      it 'return true_num with 0' do
+        params = {action: 'view_my_scores', id: 1}
+        allow(helper).to receive(:params).and_return(params)
+        allow(Participant).to receive(:find).with(1).and_return(participant)
+        allow(AssignmentDueDate).to receive(:exists?).with(any_args).and_return(true)
+        expect(helper.has_team_and_metareview?).to eq({has_team: true, has_metareview: true, true_num: 2})
+      end
+    end
   end
 
   describe 'retrieve_questions' do
@@ -221,6 +235,16 @@ describe GradesHelper, type: :helper do
         expect(self.instance_variable_get(:@vmlist)).to eq([vmQ1, vmQ1])
       end
     end
+
+    context 'when all questionnaires match the target type, but the assignment does not vary by round' do
+      it 'the round variable in the new VmQuestionResponse should be nil' do
+        allow(AssignmentParticipant).to receive(:find).with(2).and_return(assignment_viewgrid)
+        allow(assignment_viewgrid).to receive(:team).and_return(team)
+        view_heatgrid(2, 'TeammateReviewQuestionnaire')
+        list =  self.instance_variable_get(:@vmlist)
+        expect(list[0].round).to eq(nil)
+      end
+    end
   end
 
   describe 'penalties' do
@@ -233,6 +257,18 @@ describe GradesHelper, type: :helper do
         allow(self).to receive(:assign_all_penalties).with(any_args).and_return(nil)
         allow(CalculatedPenalty).to receive(:create).with(any_args).and_return(nil)
         penalties(1)
+        expect(self.instance_variable_get(:@assignment)).to eq(assignment)
+      end
+
+      # This test should be skipped because there are some bugs in the original code.
+      it 'calculates all the penalties' do
+        allow(Assignment).to receive(:find).with(4).and_return(assignment_for_penalty)
+        allow(Participant).to receive(:where).with(parent_id: 4).and_return([participant])
+        allow(self).to receive(:calculate_penalty).with(participant.id).and_return({submission: 1, review: 1, meta_review: 1})
+        allow(LatePolicy).to receive(:find).with(assignment.late_policy_id).and_return(latePolicy)
+        allow(self).to receive(:assign_all_penalties).with(any_args).and_return(nil)
+        allow(CalculatedPenalty).to receive(:create).with(any_args).and_return(nil)
+        penalties(4)
         expect(self.instance_variable_get(:@assignment)).to eq(assignment)
       end
     end

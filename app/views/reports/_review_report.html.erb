@@ -74,6 +74,7 @@
             <td style="white-space:nowrap;">
               <%= index + 1 %>.
               <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post, :class => "user_unityID" %>
+              <br/>
               (<span class="user_name"><%= user.fullname(session[:ip]) %></span>)
             </td>
             <!--# reviews done-->

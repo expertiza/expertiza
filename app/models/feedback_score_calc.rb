@@ -23,11 +23,13 @@ module FeedbackScoreCalc
 
   # Fill the author_feedback_scores hash for this response (review).
   def calc_avg_feedback_score(response)
+    @count = 0
     # Retrieve the author feedback response maps for the teammates reviewing the review of their work.
     author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response.first.id, 'FeedbackResponseMap')
     author_feedback_response_maps.each do |author_feedback_response_map|
       @corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)
       next if @corresponding_response.empty?
+      @count += 1
       calc_feedback_scores_sum
     end
     # Divide the sum of the author feedback scores for this review by their number to get the
@@ -36,8 +38,8 @@ module FeedbackScoreCalc
     if !@author_feedback_scores[@response_map.reviewer_id].nil? &&
       !@author_feedback_scores[@response_map.reviewer_id][@round].nil? &&
       !@author_feedback_scores[@response_map.reviewer_id][@round][@response_map.reviewee_id].nil? &&
-      !author_feedback_response_maps.empty?
-      @author_feedback_scores[@response_map.reviewer_id][@round][@response_map.reviewee_id] /= author_feedback_response_maps.count
+      !author_feedback_response_maps.empty? && @count!=0
+      @author_feedback_scores[@response_map.reviewer_id][@round][@response_map.reviewee_id] /= @count
     end
   end
 

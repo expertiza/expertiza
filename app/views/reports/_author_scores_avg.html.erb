@@ -1,6 +1,7 @@
 <% (1..@assignment.num_review_rounds).each do |round| %>
       <% if @author_feedback_scores[reviewer_id] && @author_feedback_scores[reviewer_id][round] && @author_feedback_scores[reviewer_id][round][team_id]%>
         <%= @author_feedback_scores[reviewer_id][round][team_id]%>
+        %
         <%= ', ' unless round == @assignment.num_review_rounds %>
 
       <% else %>

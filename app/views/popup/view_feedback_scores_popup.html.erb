@@ -1,24 +1,91 @@
 <h2> Author reviews on <%= Participant.find(@reviewer_id).fullname(@ip) %> </h2>
 <% keys = @feedback_final_versions.keys %>
 <% keys.each do |key| %>
-  <% keys2 = @feedback_final_versions[key].keys %>
-  <% questionnaire_id = Questionnaire.find(@feedback_final_versions[key][:questionnaire_id]) %>
-  <% questions = Question.where(questionnaire_id: questionnaire_id) %>
-  <% keys2.each do |key2| %>
-    <% team = Team.where(name: @feedback_final_versions[key][key2]) %>
-    <% author_id = TeamsUsers.where(team_id: team.id) %>
-    <% author_id.each do |author_id| %>
-      <% author_name = User.find(author_id.user_id) %>
-      <% answers = Answer.where(response_id: @feedback_final_versions[key][key2][1]) %>
-    <% end %>
-  <% end %>
-  <div>
-    <div class="c<%= answer.answer %> grade-circle" ><p><%= answer.answer %></p></div>
-  </div>
-
-
+  <h4><b> Course    :</b> <%= Assignment.find(@assignment_id).course.name %></h4>
+  <h4><b> Assignment:</b> <%= Assignment.find(@assignment_id).name %></h4>
   <% roundtitle = key.to_s %>
   <h4><b><%= roundtitle.titlecase %></b></h4>
-  <h4><b>questionnaire_id = <%= @feedback_final_versions[key][:questionnaire_id] %></b></h4>
-  <%= @feedback_final_versions[key] %>
+
+  <% team_name_keys = @feedback_final_versions[key].keys %>
+  <% team_name_keys.each do |team_name_key| %>
+    <% if team_name_key.to_s != "questionnaire_id" and
+      @feedback_final_versions[key][team_name_key][:feedback_response_ids].length > 0%>
+      <h4><b>Team name :</b><%= team_name_key.to_s %></h4>
+
+      <table class="general" border="1">
+        <% questionnaire_id = Questionnaire.find(@feedback_final_versions[key][:questionnaire_id]) %>
+        <% questions = Question.where(questionnaire_id: questionnaire_id) %>
+        <% num_responses = @feedback_final_versions[key][team_name_key][:feedback_response_ids].length %>
+        <% responses = @feedback_final_versions[key][team_name_key][:feedback_response_ids] %>
+
+        <!--      set column length equal for all responses-->
+        <% item_width  = 100/(num_responses+1) %>
+
+        <!-- show the author who did the review -->
+        <!-- First Row -->
+        <tr>
+          <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <b>ITEM</b></th>
+          <% responses.each do |response_id| %>
+            <td width="<%= item_width %>%">
+              <% author_name = Participant.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id).fullname(@ip) %>
+              <b><%= author_name %></b> <div style ="font-size:11px"> done at -- <%= Response.find(response_id).updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p") %> &nbsp&nbsp</div>
+            </td>
+          <% end %>
+        </tr>
+
+        <!-- Questions and Responses Row -->
+        <% questions.each do |question| %>
+          <% unless question.is_a?(QuestionnaireHeader) %>
+            <tr>
+              <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <%= question.txt %></th>
+              <!-- Show review summary of checkbox question -->
+              <% if question.instance_of? Checkbox %>
+
+                <% responses.each do |response_id| %>
+                  <td align="center" width="<%= item_width %>%">
+                    <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
+                    <% unless answer.nil? %>
+                      <%= answer.answer == 0 ? image_tag("delete_icon.png") : image_tag("Check-icon.png") %>
+                    <% end %>
+                  </td>
+                <% end %>
+
+                <!-- Show feedback summary of a non checkbox question -->
+              <% else %>
+
+                <% responses.each do |response_id| %>
+                  <td width="<%= item_width %>%">
+                    <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
+                    <% unless answer.nil? %>
+                      <div>
+                        <div class="c<%= answer.answer %> grade-circle" ><p><%= answer.answer %></p></div>
+                        <div><p><%= answer.comments.html_safe unless answer.comments.nil? %></p></div>
+                      </div>
+                    <% end %>
+                  </td>
+                <% end %>
+
+              <% end %>
+            </tr>
+
+          <% else %>
+            <% next %>
+
+          <% end %>
+        <% end %>
+
+        <!-- Last Row additional Comments -->
+        <tr>
+          <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <b>Additional Comments</b></th>
+          <% responses.each do |response_id| %>
+            <td width="<%= item_width %>%">
+              <%=sanitize Response.find(response_id).additional_comment %>
+            </td>
+          <% end %>
+        </tr>
+
+      </table>
+    <% end %>
+  <% end %>
+
 <% end #loop for keys %>

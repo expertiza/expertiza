@@ -41,20 +41,38 @@ describe 'CourseTeam' do
       expect(course_team1.add_participant(1, user2)).to eq(participant)
     end
   end
-  describe '#import' do
-    context 'when the course does not exist' do
-      it 'raises an import error' do
-        allow(Course).to receive(:find).with(1).and_return(nil)
-        expect{CourseTeam.import({}, 1, nil)}.to raise_error(ImportError)
-      end
+  describe ".import" do
+    let(:row) do
+        {teammembers: 'none'}
     end
-    context 'when the course does exist' do
-      it 'raises an error with empty row hash' do
-        allow(Course).to receive(:find).with(1).and_return(course)
-        expect{CourseTeam.import({}, 1, nil)}.to raise_error(ArgumentError)
-      end
+    context "when a course team does not exist with id" do
+        it "raises ImportError" do
+            course_id = 1
+            allow(Course).to receive(:find).with(course_id).and_return(nil)
+            error_message = "The course with the id \"" + course_id.to_s + "\" was not found. <a href='/course/new'>Create</a> this course?"
+            expect { CourseTeam.import(row, nil, course_id, nil) }.
+                to raise_error(ImportError, error_message)
+        end
+    end
+
+    context "when the course team does not have the required fields" do
+        it "raises ArgumentError" do
+            expect { CourseTeam.import([], nil, 1, nil) }.
+                to raise_error(ArgumentError)
+        end
+    end
+
+    context "when a course team with the same id already exists" do
+        it "gets imported through Team.import" do
+            course_id = 1
+            options = []
+            allow(Course).to receive(:find).with(course_id).and_return(course)
+            expect(Team).to receive(:import_helper).with(row, course_id, options, instance_of(CourseTeam))
+            CourseTeam.import(row, nil, course_id, options)
+        end
     end
   end
+
   describe '#export' do
     it 'writes to a csv' do
       allow(CourseTeam).to receive(:where).with(parent_id: 1).and_return([course_team1])

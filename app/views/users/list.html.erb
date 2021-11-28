@@ -2,8 +2,8 @@
 
 <br/>
 <%= form_tag :action => 'show_if_authorized' do %>
-  View user - enter exact login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
-<input type='submit' value='Edit'/>
+  View specific user: <%= text_field_with_auto_complete :user, :name, {:size => 41}, class:'form-control', placeholder: 'Search UserID...' %>
+  <button type="submit" class="btn btn-primary">Edit</button>
 <% end %>
 
 <%= form_tag :action => 'list', :paginate_show => '1', :num_users => @per_page do %>
@@ -12,12 +12,12 @@
 
 <%= render :partial => 'links' %>
 
-<div class="exp" style="background-color: #FFF">
-  <table>
+<div>
+  <table class="table table-hover" style="width: 100%">
     <tr><th class="head">UserID</th><th class="head">Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Meta-review</th></tr>
     <% for user in @paginated_users %>
       <% if (params[:show] != 'true' && !user.name(session[:ip]).include?("_hidden")) || params[:show] == 'true'%>
-        <tr class="exp" style="background-color: #FFF">
+        <tr>
           <td><%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %></td>
           <td><%= link_to user.fullname(session[:ip]), :controller=> 'users', :action => 'show', :id => user.id %></td>
           <td><%= user.email(session[:ip]) %></td>
@@ -46,8 +46,5 @@
       session[:return_to] = "#{request.protocol}#{request.host_with_port}#{request.fullpath}"
     %>
 
-  <%= link_to 'New user',:role => "Student", :action => 'new' %> |
-  <%= link_to 'Import users', :controller=>'import_file', :action=>'start', :model => 'User', :expected_fields => 'username&nbsp;&nbsp;|&nbsp;&nbsp;full name (first [middle] last)&nbsp;&nbsp;|&nbsp;&nbsp;e-mail address' %> |
-  <%= link_to 'Export users', :controller=>'export_file',:action=>'start',:model=> 'User',:id=> 1 %>
-
+  <%= render :partial => 'links' %>
 </p>

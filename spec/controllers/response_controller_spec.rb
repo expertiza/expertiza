@@ -383,19 +383,19 @@ describe ResponseController do
     end
   end
 
-  describe '#fetch_review_metric_api_urls' do
-    context 'checks whether the fetch_review_metric_api_urls methods does not return nil' do
+  describe '#fetch_review_metric_api_call_values' do
+    context 'checks whether the fetch_review_metric_api_call_values methods does not return nil' do
       it 'returns a list of configuration' do
-        expect(controller.fetch_review_metric_api_urls).not_to be_nil
+        expect(controller.fetch_review_metric_api_call_values).not_to be_nil
       end
     end
   end
 
-  describe '#fetch_review_metric_api_urls' do
-    context 'checks whether the fetch_review_metric_api_urls fetches the correct review metrics api urls from review_metric_api_urls.yml file' do
+  describe '#fetch_review_metric_api_call_values' do
+    context 'checks whether the fetch_review_metric_api_call_values fetches the correct review metrics api urls from review_metric_api_call_values.yml file' do
       it 'returns a list of configuration of metrics' do
         metrics = controller.fetch_review_metric
-        api_urls = controller.fetch_review_metric_api_urls
+        api_urls = controller.fetch_review_metric_api_call_values
         expect(api_urls.length).to eq(metrics.length)
         expected_api_urls = {}
         metrics.each do |metric|

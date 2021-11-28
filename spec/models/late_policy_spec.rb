@@ -11,7 +11,7 @@ describe LatePolicy do
 
   # testing positive scenario where same policy name is found for an instructor.
   describe '#check_policy_same_name' do
-    it 'finds the policy from the list of late policies' do
+    it 'returns true when policy with same name already exists' do
       allow(LatePolicy).to receive(:where).with(any_args).and_return(Array(late_policy))
       expect(LatePolicy.check_policy_with_same_name("Dummy Name",1)).to eq(true)
     end
@@ -19,15 +19,15 @@ describe LatePolicy do
 
   # testing negative scenario where same policy name is not found for an instructor.
   describe '#check_policy_same_name' do
-    it 'finds the policy from the list of late policies' do
+    it 'returns false when policy with same name does not exist' do
       allow(LatePolicy).to receive(:where).with(any_args).and_return(Array(late_policy))
       expect(LatePolicy.check_policy_with_same_name("Dummy Name 2",2)).to eq(false)
     end
   end
 
   # assignment has calculate_penalty set as false and thus there is no change in Array(calculated_penalty)
-  describe '#check_update_calculated_penalty_points deadline_type_id as nil' do
-    it 'gets all calculated penalties' do
+  describe '#check_update_calculated_penalty_points' do
+    it 'does not update calculated penalty when deadline type id is nil' do
       calculated_penalty.deadline_type_id = nil
       allow(CalculatedPenalty).to receive(:all).and_return(Array(calculated_penalty))
       allow_any_instance_of( PenaltyHelper ).to receive(:calculate_penalty).and_return({submission: 1, review: 2, meta_review: 3})
@@ -38,8 +38,8 @@ describe LatePolicy do
   end
 
   #when the deadline_type_id is set as 1, the final penalty points in calculated penalty are same as submission penalty (set here as 1)
-  describe '#check_update_calculated_penalty_points deadline_type_id as 5' do
-    it 'gets all calculated penalties' do
+  describe '#check_update_calculated_penalty_points' do
+    it 'updates calculated penalty by submission penalty when deadline type id is 1' do
       calculated_penalty.deadline_type_id = 1
       allow(CalculatedPenalty).to receive(:all).and_return(Array(calculated_penalty))
       allow_any_instance_of( PenaltyHelper ).to receive(:calculate_penalty).and_return({submission: 1, review: 2, meta_review: 3})
@@ -50,8 +50,8 @@ describe LatePolicy do
   end
 
   #when the deadline_type_id is set as 2, the final penalty points in calculated penalty are same as review penalty (set here as 2)
-  describe '#check_update_calculated_penalty_points deadline_type_id as 2' do
-    it 'gets all calculated penalties' do
+  describe '#check_update_calculated_penalty_points' do
+    it 'updates calculated penalty by review penalty when deadline type id is 2' do
       calculated_penalty.deadline_type_id = 2
       allow(CalculatedPenalty).to receive(:all).and_return(Array(calculated_penalty))
       allow_any_instance_of( PenaltyHelper ).to receive(:calculate_penalty).and_return({submission: 1, review: 2, meta_review: 3})
@@ -62,8 +62,8 @@ describe LatePolicy do
   end
 
   #when the eadline_type_id 5 is set as 5, the final penalty points in calculated penalty are same as meta_review penalty (set here as 3)
-  describe '#check_update_calculated_penalty_points for deadline_type_id as 5' do
-    it 'gets all calculated penalties' do
+  describe '#check_update_calculated_penalty_points' do
+    it 'updates calculated penalty by meta review penalty when deadline type id is 5' do
       calculated_penalty.deadline_type_id = 5
       allow(CalculatedPenalty).to receive(:all).and_return(Array(calculated_penalty))
       allow_any_instance_of( PenaltyHelper ).to receive(:calculate_penalty).and_return({submission: 1, review: 2, meta_review: 3})

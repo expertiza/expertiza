@@ -167,18 +167,16 @@ describe GradesController do
       expect(response).to render_template(:view_team)
     end
 
-    context 'when view_team page is opened by student' do
-      it 'dropdown is not rendered' do
+    context 'dropdown for selecting a teammate review' do
+      it 'is not rendered is not rendered when page is opened by student' do
         session = { user: student1_vt }
         params = {id: participant_vt.id}
         stub_current_user(student1_vt, student1_vt.role.name, student1_vt.role)
         get :view_team, params
         expect(response.body).to_not have_selector('select')
       end
-    end
 
-    context 'when view_team page is opened by instructor' do
-      it 'dropdown is rendered' do
+      it 'is rendered when page is opened by instructor' do
         session = { user: instructor }
         params = {id: participant_vt.id}
         get :view_team, params

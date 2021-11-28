@@ -231,9 +231,10 @@ class AssignmentTeam < Team
   end
 
   # Set the directory num for this team
+  # TODO: This should be ended with a ! since it has side effects on the object
   def set_student_directory_num
     return if self.directory_num and self.directory_num >= 0
-    max_num = AssignmentTeam.where(parent_id: self.parent_id).order('directory_num desc').first.directory_num
+    max_num = AssignmentTeam.where(parent_id: self.parent_id).maximum(:directory_num)
     dir_num = max_num ? max_num + 1 : 0
     self.update_attributes(directory_num: dir_num)
   end

@@ -121,6 +121,23 @@ describe LatePoliciesController do
       end
     end
 
+    context 'when penalty per unit is negative while creating late policy' do
+      before(:each) do
+        allow(LatePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
+      end
+      it "throws a flash error " do
+        params = {
+          late_policy: {
+            max_penalty: 30,
+            penalty_per_unit: -10,
+            policy_name: "Invalid_Policy"
+          },
+        }
+        post :create,params
+        expect(flash[:error]).to eq("The following error occurred while saving the late policy: ")
+      end
+    end
+
     context 'when policy with same name exists' do
       before(:each) do
         latePolicy = LatePolicy.new
@@ -207,6 +224,24 @@ describe LatePoliciesController do
         }
         post :update,params
         expect(flash[:error]).to eq("Cannot edit the policy. A policy with the same name Policy1 already exists.")
+      end
+    end
+
+    context 'when penalty per unit is negative while updating of late policy' do
+      before(:each) do
+        allow(LatePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
+      end
+      it "throws a flash error " do
+        params = {
+          late_policy: {
+            max_penalty: 30,
+            penalty_per_unit: 10,
+            policy_name: "Invalid_Policy"
+          },
+          id:1
+        }
+        post :update,params
+        expect(flash[:error]).to eq("The following error occurred while updating the late policy: ")
       end
     end
 

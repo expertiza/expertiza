@@ -1,9 +1,11 @@
 require 'byebug'
 describe "CourseParticipant" do
-  let(:course) {build (:course)}
-  
+  let(:course) { build(:course, id: 1, name: 'ECE517')  }
+  let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team])  } 
+
   describe "#copy" do
     before(:each) do
+      byebug
       @assignment = build(:assignment)
       @course_participant = build(:course_participant)
       @assignment_participant = build(:participant)

@@ -195,6 +195,49 @@ describe GradesController do
         expect(response.body).not_to have_content "TA"
       end
     end
+
+    context 'when assignment(show reviews) value is checked' do
+      it 'Student can view his score' do
+        session = { user: student1_vt }
+        params = {id: participant_vt.id}
+        stub_current_user(student1_vt, student1_vt.role.name, student1_vt.role)
+        get :view_team, params
+        expect(response.body).to have_selector(".teammate_table[data-reviewee_id=\"#{participant_vt.id}\"]")
+        expect(response.body).to_not have_selector(".teammate_table[data-reviewee_id=\"#{participant2_vt.id}\"]")
+      end
+
+      it 'Instructor can view the student score' do
+        #session = { user: student1_vt }
+        params = {id: participant_vt.id}
+        #stub_current_user(student1_vt, student1_vt.role.name, student1_vt.role)
+        get :view_team, params
+        expect(response.body).to have_selector(".teammate_table[data-reviewee_id=\"#{participant_vt.id}\"]")
+        expect(response.body).to have_selector(".teammate_table[data-reviewee_id=\"#{participant2_vt.id}\"]")
+      end
+    end
+    
+    context 'when assignment(show reviews) value is unchecked' do
+      before(:each) do
+        allow(assignment_vt).to receive(:show_teammate_reviews).and_return(false) 
+      end
+      it 'Student cannot view his score' do
+        session = { user: student1_vt }
+        params = {id: participant_vt.id}
+        stub_current_user(student1_vt, student1_vt.role.name, student1_vt.role)
+        get :view_team, params
+        expect(response.body).to_not have_selector(".teammate_table[data-reviewee_id=\"#{participant_vt.id}\"]")
+        expect(response.body).to_not have_selector(".teammate_table[data-reviewee_id=\"#{participant2_vt.id}\"]")
+      end
+
+      it 'Instructor can view the student score' do
+        #session = { user: student1_vt }
+        params = {id: participant_vt.id}
+        #stub_current_user(student1_vt, student1_vt.role.name, student1_vt.role)
+        get :view_team, params
+        expect(response.body).to have_selector(".teammate_table[data-reviewee_id=\"#{participant_vt.id}\"]")
+        expect(response.body).to have_selector(".teammate_table[data-reviewee_id=\"#{participant2_vt.id}\"]")
+      end
+    end
   end
 
   describe '#edit' do

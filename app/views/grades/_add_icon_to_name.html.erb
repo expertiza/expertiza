@@ -4,7 +4,7 @@
 <% review_text = "" %>
 <% if @current_role_name.eql?'Student' or questionnaire_type != "TeammateReviewQuestionnaire" %>
   <%# Use Review {{index}} format for student view, and when questionnaire_type is not teammatereview %>
-  <% review_text = "Review #{i + 1}" %>
+  <% review_text = "Review #{i}" %>
 <% else %>
   <% resp = Response.find(review.id) %>
   <% map = ResponseMap.find(resp.map_id) %>
@@ -13,15 +13,16 @@
   <% review_text = "Review by #{fullname}" %>
 <% end%>
 
+<th class="sorter-false">
 <!-- Add an icon to identify if this review was done by TA/instructor -->
 <% if review.done_by_staff_participant? %>
-<th class="sorter-false">
   <img
     data-toggle="tooltip"
     data-placement="right"
     title="Icon indicates this review was done by course staff" class="img_icon"
     src="/assets/staff.png"
     >
+<% end %>
   <a
     target="_blank"
     href="../response/view?id=<%= review.id.to_s %>"
@@ -31,16 +32,3 @@
     <%= review_text %>
   </a>
 </th>
-<% else %>
-    <th class="sorter-false">
-        <a
-            target="_blank" 
-            href="../response/view?id=<%= review.id.to_s %>"  
-            data-toggle="tooltip"
-            data-placement="right"
-            title="Click to see details"
-        >
-        <%= review_text %>
-        </a>
-    </th>
-<% end %>

@@ -54,7 +54,7 @@ class ReviewBidsController < ApplicationController
     end
 
     # render view for completing reviews after review bidding has been completed
-    render 'others_work'
+    render 'sign_up_sheet/review_bids_others_work'
   end
 
   # provides vaiables for review bidding page
@@ -84,6 +84,9 @@ class ReviewBidsController < ApplicationController
     ReviewResponseMap.where({:reviewed_object_id => @assignment.id, :reviewer_id => @participant.id}).each do |review_map|
       @assigned_review_maps << review_map
     end
+
+    # explicitly render view since it's in the sign up sheet views
+    render 'sign_up_sheet/review_bids_show'
   end
 
   # function that assigns and updates priorities for review bids

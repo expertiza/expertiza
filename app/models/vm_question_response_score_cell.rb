@@ -10,10 +10,12 @@ class VmQuestionResponseScoreCell
 
   attr_reader :score_value
   def reviewer_id
-    resp = Response.find(@response_id)
-    map = ResponseMap.find(resp.map_id)
-    map.reviewer_id
+    response = Response.find(@response_id)
+    response_map = ResponseMap.find(response.map_id)
+    response_map.reviewer_id
   end
+
+  attr_reader :response_id
 
   attr_reader :comment
 

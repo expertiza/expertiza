@@ -63,6 +63,8 @@ class ResponseController < ApplicationController
   # Prepare the parameters when student clicks "Edit"
   def edit
     @review_metric_config = fetch_review_metric
+    @review_metric_init_config = REVIEW_METIRIC_INITIALIZE_CONFIG
+
     assign_action_parameters
     @prev = Response.where(map_id: @map.id)
     @review_scores = @prev.to_a
@@ -128,6 +130,8 @@ class ResponseController < ApplicationController
 
   def new
     @review_metric_config = fetch_review_metric
+    @review_metric_init_config = REVIEW_METIRIC_INITIALIZE_CONFIG
+    
     assign_action_parameters
     set_content(true)
     @stage = @assignment.current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
@@ -143,6 +147,10 @@ class ResponseController < ApplicationController
     render action: 'response'
   end
 
+
+
+
+#psengo
   # fetches the review metric configuration from config file review_metrics.yml file
   def fetch_review_metric
     @temp = REVIEW_METRIC_CONFIG['metrics']
@@ -152,6 +160,8 @@ class ResponseController < ApplicationController
     end
     @review_options
   end
+#End Psengo  
+# Grffin
 
   # fetches the review metric api urls from config file review_metrics_api_urls.yml file
   def fetch_review_metric_api_urls
@@ -162,6 +172,8 @@ class ResponseController < ApplicationController
     end
     api_urls
   end  
+# End Griffin
+
 
   def new_feedback
     review = Response.find(params[:id]) unless params[:id].nil?

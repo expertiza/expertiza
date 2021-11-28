@@ -130,7 +130,7 @@ class ResponseController < ApplicationController
 
   def new
     @review_metric_config = fetch_review_metric
-    @review_metric_init_config = fetch_review_metric_api_call_values
+    @review_metric_api_call_values = fetch_review_metric_api_call_values
     
     assign_action_parameters
     set_content(true)

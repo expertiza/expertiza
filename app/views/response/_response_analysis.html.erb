@@ -297,9 +297,9 @@
         for (var analysisVal in config_file_api_call_values){
             if(config_file_values.includes(analysisVal))
             {
-                apiCall = config_file_api_call_values[analysisVal]['apiCall']
+                apiCall = config_file_api_call_values[analysisVal]['apiCall'];
                 try {
-                    let response = await makeRequest(processed_comment_json_string, apiCall)
+                    let response = await makeRequest(processed_comment_json_string, apiCall);
                     analysisResponseDict[analysisVal] = JSON.parse(response);
                 } catch(error) {
                          time_taken_obj.innerHTML = "Request failed. Please try again.";

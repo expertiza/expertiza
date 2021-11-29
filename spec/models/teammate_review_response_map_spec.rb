@@ -82,6 +82,12 @@ describe TeammateReviewResponseMap do
   #   end
   # end
 
+  it '#teammate_response_report' do
+
+    allow(TeammateReviewResponseMap).to receive_message_chain(:select, :where).and_return(assignment1);
+    expect(TeammateReviewResponseMap.teammate_response_report(2)).to eq(assignment1);
+  end
+
   it '#email' do
     reviewer_id = 1
     allow(AssignmentParticipant).to receive(:find).with(2).and_return(participant)

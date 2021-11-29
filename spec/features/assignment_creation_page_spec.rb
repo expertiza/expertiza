@@ -50,7 +50,7 @@ describe "Assignment creation page", js: true do
 		check("assignment_form_assignment_is_calibrated")
 		uncheck("assignment_form_assignment_availability_flag")
 		expect(page).to have_select("assignment_form[assignment][reputation_algorithm]", options: %w[-- Hamer Lauw])
-		expect(page).to have_select("assignment_form[assignment][heatgrid_metric]", options: %w[-- 'Verbose Comment Count'])
+		select "Verbose Comment Count", from: 'countsofcomment'
 
 		click_button 'Create'
 		assignment = Assignment.where(name: 'public assignment for test').first

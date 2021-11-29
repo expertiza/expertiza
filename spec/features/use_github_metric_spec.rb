@@ -9,9 +9,9 @@ describe "assignment creation due dates", js: true do
     login_as("instructor6")
   end
     it "should edit assignment available to students" do
-         visit "/assignments/834/edit"
+         visit "/assignments/#{@assignment.id}/edit"
     	 find(:css, "#use_github[value='use_github']").set(true)
-         visit "/assignments/list_submissions?id=834"
+         visit "/assignments/list_submissions?id=#{@assignment.id}"
          expect(page).to have_content("Github data")
     end
 

@@ -24,7 +24,6 @@ class ReviewBidsController < ApplicationController
 
   #needed in order to run index from "Request another submission" button correctly
   def create
-    #@@reviews_to_show = params[:reviews_to_show]
     redirect_to action: 'index', params: params
   end
 
@@ -35,7 +34,6 @@ class ReviewBidsController < ApplicationController
     @assignment = @participant.assignment
     @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
 
-    #@reviews_to_show = @@reviews_to_show.nil? ? (@assignment.num_reviews_required).to_i : @@reviews_to_show.to_i
     # Finding how many reviews have been completed
     @num_reviews_completed = 0
     @review_mappings.each do |map|
@@ -53,11 +51,9 @@ class ReviewBidsController < ApplicationController
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     my_topic = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     @sign_up_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: my_topic)
-    # @max_team_size = @assignment.num_reviews_allowed  #dont need this
     @num_participants = AssignmentParticipant.where(parent_id: @assignment.id).count
     @selected_topics = nil #this is used to list the topics assigned to review. (ie select == assigned i believe)
-    #@bids = team_id.nil? ? [] : ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).order(:priority)
-    @bids = ReviewBid.where(participant_id: @participant, assignment_id: @assignment.id).order(:priority)
+    @bids = team_id.nil? ? [] : ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).order(:priority)
     signed_up_topics = []
     @bids.each do |bid|
       sign_up_topic = SignUpTopic.find_by(id: bid.signuptopic_id)
@@ -109,11 +105,7 @@ class ReviewBidsController < ApplicationController
     # list of reviewers from a specific assignment
     reviewers = AssignmentParticipant.where(parent_id: assignment_id).ids
     bidding_data = ReviewBid.get_bidding_data(assignment_id, reviewers)
-    # @bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers)
-    #runs algorithm and assigns reviews
-    # @matched_topics = run_bidding_algorithm(bidding_data)
     matched_topics = run_bidding_algorithm(bidding_data)
-    #@@reviews_to_show = nil
     ReviewBid.assign_review_topics(assignment_id, reviewers, matched_topics)
     Assignment.find(assignment_id).update(can_choose_topic_to_review: false) #turns off bidding for students
     redirect_to :back

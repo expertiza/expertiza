@@ -24,7 +24,7 @@
 <!-- Username TextBox with Search button and a Advanced Search with text based on its' state: toggled on or off -->
 
 <div style="margin: 8px auto; display: grid; grid-template-columns: repeat(3, auto) 1fr; grid-gap: 8px; align-items: center">
-  <%= label_tag :search_name, 'UserID: ' %><%= text_field_tag(:search_name,params[:search_name], class:'form-control', placeholder: 'Search UserID...') %>
+  <%= label_tag :search_usrid, 'UserID: ' %><%= text_field_tag(:search_usrid,params[:search_usrid], class:'form-control', placeholder: 'Search UserID...') %>
   <button type="submit" class="btn btn-primary">Search</button>
   <a id="search_toggle_button"></a>
 </div>

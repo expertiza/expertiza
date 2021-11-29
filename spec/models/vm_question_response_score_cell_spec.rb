@@ -1,21 +1,26 @@
 describe VmQuestionResponseScoreCell do
 	let(:questionnaire) { create(:questionnaire, id: 1) }
-  let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
+  	let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
 	let!(:answer) { create(:answer, answer: 5, comments: "This is a comment. I hope it is a good one") }
 	let(:tp) { TagPrompt.new(prompt: "test prompt", desc: "test desc", control_type: "Checkbox") }
-  let(:tp2) { TagPrompt.new(prompt: "test prompt2", desc: "test desc2", control_type: "Slider") }
-  let(:id) {create(:id1, id1 : 1)}
-  let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1) }
-  let!(:response_record) { create(:response, id: 1, map_id: 1, response_map: response_map) }
-  before(:each) do
-    allow(response).to receive(:map).and_return(review_response_map)
-  end
+  	let(:tp2) { TagPrompt.new(prompt: "test prompt2", desc: "test desc2", control_type: "Slider") }
+  	let(:team) { build(:assignment_team) }
+  	let(:participant) { build(:participant, id: 1, user: build(:student, name: 'no name', fullname: 'no one')) }
+  	let(:participant2) { build(:participant, id: 2) }
+  	let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
+  	let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer]) }
+  	let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
+  	let(:response_map) { create(:review_response_map, id: 3, reviewed_object_id: 3) }
+  	let!(:response_record) { create(:response, id: 3, map_id: 3, response_map: response_map) }
+  	before(:each) do
+    	allow(response).to receive(:map).and_return(review_response_map)
+  	end
   	describe '#initialize' do
   		it 'creates a score cell and its getter functiors work' do
   			color_code_number = ((5.to_f / 5.to_f) * 5.0).ceil
   			color_code = "c#{color_code_number}"
   			vm_tag_prompts = [tp, tp2]
-			response_id = id
+			response_id = 120
   			vmqrsc = VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts, response_id)
   			expect(vmqrsc.score_value).to eq(answer.answer)
   			expect(vmqrsc.color_code).to eq(color_code)

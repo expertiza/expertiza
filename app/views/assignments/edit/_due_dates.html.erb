@@ -558,7 +558,7 @@
           addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
           <%end %>
           <% if @assignment_form.assignment.is_calibrated?  %>
-          addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'calibration review', 0, <%= due_date(@assignment_form.assignment, 'review').to_json.html_safe %>);
+          addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'calibration', 0, <%= due_date(@assignment_form.assignment, 'calibration').to_json.html_safe %>);
           <% end %>
 
           //after webpage refreshes, hide or display name and url according to whether names and urls are empty in DB

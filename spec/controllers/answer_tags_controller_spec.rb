@@ -141,7 +141,7 @@ describe AnswerTagsController do
       end
 
       it 'add entry if not existing and update the old value by new value provided as param' do
-        params = {answer_id: answer.id,tag_prompt_deployment_id: tag_deploy.id,value: 0}
+        params = {answer_id: answer.id,tag_prompt_deployment_id: tag_deploy.id,value: "0"}
         post :create_edit, params, session
         expect(response).to have_http_status(200)
         expect(AnswerTag.find_by(answer_id: answer.id).value).to eql("0")

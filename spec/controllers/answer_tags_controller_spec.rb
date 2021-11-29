@@ -18,7 +18,7 @@ describe AnswerTagsController do
   let!(:response_record) { create(:response, id: 2, response_map: response_map) }
   let!(:answer) { create(:answer, question: question1, comments: "test comment", response_id: response_record.id) }
   let(:tag_prompt) { create(:tag_prompt, id: 3, prompt: "??", desc: "desc", control_type: "slider") }
-  let(:tag_deploy) { TagPromptDeployment.create id: 3, tag_prompt: tag_prompt, question_type: "Criterion" }
+  let(:tag_deploy) { create(:tag_prompt_deployment, id: 3, tag_prompt: tag_prompt, question_type: "Criterion") }
 
   #To allow the functionality only if the accessing user is having student privileges
   #params: action

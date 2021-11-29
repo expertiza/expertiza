@@ -805,7 +805,7 @@ jQuery(document).ready(function() {
       );
     }
   });
-  /* The function for controling the searching date in advance search
+  /* The function for controlling the searching date in advance search
    * Have create date and updated date two choice
    */
   var AdditionalSearchDropDown = React.createClass({
@@ -825,7 +825,7 @@ jQuery(document).ready(function() {
       );
     }
   });
-  /* The function will reponse for the checkbox "require a quiz"
+  /* The function will response for the checkbox "require a quiz"
    * in advanced search in course and assignment*/
   var HASQUIZ_TOGGLE = React.createClass({
     render: function() {
@@ -1123,7 +1123,7 @@ jQuery(document).ready(function() {
     }
   })
 
-  /* The funtion control the advanced search for questionnaires
+  /* The function control the advanced search for questionnaires
    * It can be search by Question Text, Course, and Assignment
    */
   var QuestionnairesAdvancedSearchBar = React.createClass({

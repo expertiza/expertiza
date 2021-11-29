@@ -50,7 +50,7 @@ class ReviewBidsController < ApplicationController
   def show
     @assignment = @participant.assignment
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
-    my_topic = self.reviewer_self_topic(params[:id].to_i)
+    my_topic = self.topic_id(@assignment, params[:id].to_i)
 #     @participant = AssignmentParticipant.find(params[:id].to_i)
 #     team_id = @participant.team.try(:id)
 #     my_topic = SignedUpTeam.where(team_id: team_id).pluck(:topic_id).first

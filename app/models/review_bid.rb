@@ -43,17 +43,6 @@ class ReviewBid < ActiveRecord::Base
       team_to_review.nil? ? [] : ReviewResponseMap.create({:reviewed_object_id => assignment_id, :reviewer_id => reviewer, :reviewee_id => team_to_review, :type => "ReviewResponseMap"})
     end
 
-
-    # method to get reviewers own project topic
-    # return self_topic
-    def self.reviewer_self_topic(reviewer_id)
-      participant = AssignmentParticipant.find_by(id: reviewer_id)
-      team_id = participant.team.try(:id)
-      self_topic = SignedUpTeam.where(team_id: team_id).pluck(:topic_id).first
-
-      return self_topic
-    end
-
     # method for getting individual reviewers bidding data
     # returns user's bidding data hash
     def self.reviewer_bidding_data(reviewer,assignment_id)

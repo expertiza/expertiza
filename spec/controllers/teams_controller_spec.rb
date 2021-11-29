@@ -75,29 +75,21 @@ describe TeamsController do
   end
 
   describe 'create method' do
-    context 'called with right conditions' do
-      it 'executes successfully' do
-        #bypass_rescue
-        allow(Object).to receive_message_chain(:const_get, :find).and_return(course1)
-        #allow(Team).to receive(:check_for_existing).and_return(nil)#.with(name: 'SomeName', team_type: 'Assignment')
-        #allow(Object).to receive_message_chain(:const_get, :create).and_return(team1)
-        #allow(TeamNode).to receive(:create).and_return(nil)
-        #allow(Object).to receive_message_chain(:const_get, :where).and_return(nil)
-        para = {id: 1, team: team5}
-        session = {user: ta, team_type: 'Course'}
+    context 'when invoked with a team which does not exist' do
+      it 'creates it' do
+        allow(Assignment).to receive(:find).and_return(assignment1)
+        para = { id: assignment1.id, team: {name: 'rando team'}}
+        session = {user: ta, team_type: 'Assignment'}
         result = get :create, para, session
-        #expect(result.status).to eq 302
-        #expect(result).to redirect_to(:action => 'list', :id => assignment1.id)
+        expect(result.status).to eq 302
+        expect(result).to redirect_to(:action => 'list', :id => assignment1.id)
       end
     end
-    context 'called with existing team name' do
-      it 'fails' do
-        #bypass_rescue
-        #allow(Object).to receive_message_chain(:const_get, :find).and_raise(StandardError.new("error"))
-        #allow(Object).to receive_message_chain(:const_get, :find).and_return(assignment1)
-        #allow(Team).to receive(:check_for_existing).and_raise(StandardError.new("error"))
-        para = {id: 1}
-        session = {user: ta}
+    context 'when invoked with a team which does exist' do
+      it 'throws an error' do
+        allow(Assignment).to receive(:find).and_return(assignment1)
+        para = { id: assignment1.id, team: {name: 'rando team'}}
+        session = {user: ta, team_type: 'Assignment'}
         #result = get :create, para, session
         #expect(result.status).to eq 302
         #expect(result).to redirect_to(:action => 'new', :id => assignment1.id)
@@ -107,14 +99,13 @@ describe TeamsController do
 
   describe 'update method' do
     it 'updates the team name' do
-      #allow(Team).to receive(:find).and_return(team1)
-      #allow(Object).to receive_message_chain(:const_get, :find).with(any_args).and_return(team1.parent_id)
-      #allow(Team).to receive(:check_for_existing).and_do_nothing#not_raise(TeamExistsError)
-      para = {response_id: 1, team_id: 1}
-      session = {user: ta}
-      #result = get :update, para, session
-      #expect(Rails.logger).to receive(:error)
-      #expect(result.status).to eq 404
+      allow(Team).to receive(:find).and_return(team1)
+      allow(Assignment).to receive(:find).and_return(assignment1)
+      para = { id: team1.id, team: {name: 'rando team'}}
+      session = {user: ta, team_type: 'Assignment'}
+      result = get :update, para, session
+      expect(result.status).to eq 302
+      expect(result).to redirect_to(:action => 'list', :id => assignment1.id)
     end
   end
 
@@ -174,7 +165,6 @@ describe TeamsController do
     end
 =end
   end
-
 
   describe 'inherit method' do
     context 'when assignment belongs to course and team is not empty' do

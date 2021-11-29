@@ -39,15 +39,14 @@ class TeamsUsersController < ApplicationController
         else
           add_member_return = team.add_member(user, team.parent_id)
           flash[:error] = "This team already has the maximum number of members." if add_member_return == false
-  
-          user = TeamsUser.last
-          undo_link("The team @teams_user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
-
           # E2115 Mentor Management
           # Kick off the Mentor Management workflow
           # Note: this is _not_ supported for CourseTeams which is why the other
           # half of this if block does not include the same code
           if add_member_return
+            user = TeamsUser.last
+            puts user.inspect
+            undo_link("The team @teams_user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
             MentorManagement.assign_mentor(assignment.id, team.id)
           end
         end

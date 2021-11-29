@@ -59,4 +59,25 @@ describe AdvertiseForPartnerController do
     end
   end
 
+  describe "POST #create" do
+
+    context "when it is valid" do
+      it "will create an advertisement" do
+        allow(AssignmentTeam).to receive(:find_by).and_return(team1)
+        allow(AssignmentParticipant).to receive(:exists?).and_return(true)
+        allow(team1).to receive(:assignment).and_return(assignment1)
+        allow(team1).to receive(:update_attributes).and_return(true)
+        allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
+
+        params  = {
+          id: team1.id,
+          team_id: team1.id,
+        }
+        session = {user: ta}
+        result = get :create, params, session
+        expect(result.status).to eq 302
+        expect(result).to redirect_to(view_student_teams_path(:student_id => 1))
+      end
+    end
+  end
 end

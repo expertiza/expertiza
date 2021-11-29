@@ -48,6 +48,8 @@ class JoinTeamRequestsController < ApplicationController
 
   # update join team request entry for join_team_request table and add it to the table
   def update
+    #Adding new
+    #@join_team_request = JoinTeamRequest.find(params[:id])
     respond_to do |format|
       if @join_team_request.update_attribute(:comments, params[:join_team_request][:comments])
         format.html { redirect_to(@join_team_request, notice: 'JoinTeamRequest was successfully updated.') }

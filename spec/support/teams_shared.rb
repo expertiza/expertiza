@@ -1,7 +1,7 @@
 RSpec.configure do |rspec|
   rspec.shared_context_metadata_behavior = :apply_to_host_groups
 end
-
+# Declaring common stubbed objects
 shared_context 'object initializations' do
   let(:superadmin) { build_stubbed(:superadmin) }
   let(:admin) { build_stubbed(:admin) }
@@ -24,20 +24,24 @@ shared_context 'object initializations' do
   let(:participant) { build_stubbed(:participant, id: 1) }
 
 end
-
+# Creating a shared context for authorization check to be shared with teams related files
 shared_context 'authorization check', :shared_context => :metadata do
+  # Testing to check Instructor access
   it 'superadmin credentials' do
     stub_current_user(superadmin, superadmin.role.name, superadmin.role)
     expect(controller.send(:action_allowed?)).to be true
   end
+  # Testing to check Admin access
   it 'admin credentials' do
     stub_current_user(admin, admin.role.name, admin.role)
     expect(controller.send(:action_allowed?)).to be true
   end
+  # Testing to check TA access
   it 'ta credentials' do
     stub_current_user(ta, ta.role.name, ta.role)
     expect(controller.send(:action_allowed?)).to be true
   end
+  # Testing to check Instructor access
   it 'instructor credentials' do
     stub_current_user(instructor, instructor.role.name, instructor.role)
     expect(controller.send(:action_allowed?)).to be true

@@ -477,6 +477,11 @@ describe Assignment do
       assignment = create(:assignment)
       expect(assignment.heatgrid_metric).to eq('countofcomments')
     end
+
+    it 'none value can be selected' do
+      assignment = build(:assignment, heatgrid_metric: '')
+      expect(assignment.heatgrid_metric).to eq('')
+    end
   end
 
   describe '#num_review_rounds' do

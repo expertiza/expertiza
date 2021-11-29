@@ -33,9 +33,10 @@ describe "assignment creation due dates", js: true do
   end
     it "should edit assignment available to students" do
          visit "/assignments/1/edit"
-         sleep(inspection_time=10)
+         sleep(inspection_time=60)
     	 check('Use github metrics?', allow_label_click: true)
          visit "/assignments/list_submissions?id=1"
+         sleep(inspection_time=60)
          expect(page).to have_content("Github data")
     end
 

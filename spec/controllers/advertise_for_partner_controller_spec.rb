@@ -80,4 +80,77 @@ describe AdvertiseForPartnerController do
       end
     end
   end
+
+  describe "POST #update" do
+
+    context "when advertisement is updated" do
+      it "the advertisement is updated" do
+        allow(AssignmentTeam).to receive(:find_by).and_return(team1)
+        allow(AssignmentParticipant).to receive(:exists?).and_return(true)
+        allow(team1).to receive(:assignment).and_return(assignment1)
+        allow(team1).to receive(:update_attributes).and_return(true)
+        allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
+
+        params  = {
+            id: team1.id,
+            team_id: team1.id,
+        }
+        session = {user: ta}
+        result = get :update, params, session
+        expect(result.status).to eq 302
+        expect(result).to redirect_to(view_student_teams_path(:student_id => 1))
+      end
+      it "the advertisement is not updated due to error" do
+        allow(AssignmentTeam).to receive(:find_by).and_return(team1)
+        allow(AssignmentParticipant).to receive(:exists?).and_return(true)
+        allow(team1).to receive(:assignment).and_return(assignment1)
+        allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
+        allow(team1).to receive(:update_attributes).and_raise(StandardError)
+        params  = {
+            id: team1.id,
+            team_id: team1.id,
+        }
+        session = {user: ta}
+        result = get :update, params, session
+        expect(flash[:error]).to eq "An error occurred and your advertisement was not updated!"
+        expect(result.status).to eq 200
+      end
+    end
+  end
+  describe "POST #remove" do
+
+    context "when advertisement is removed" do
+      it "the advertisement is removed" do
+        allow(AssignmentTeam).to receive(:find_by).and_return(team1)
+        allow(AssignmentParticipant).to receive(:exists?).and_return(true)
+        allow(team1).to receive(:assignment).and_return(assignment1)
+        allow(team1).to receive(:update_attributes).and_return(true)
+        allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
+
+        params  = {
+            id: team1.id,
+            team_id: team1.id,
+        }
+        session = {user: ta}
+        result = get :remove, params, session
+        expect(result.status).to eq 302
+        expect(result).to redirect_to(view_student_teams_path(:student_id => 1))
+      end
+      it "the advertisement is not removed due to error" do
+        allow(AssignmentTeam).to receive(:find_by).and_return(team1)
+        allow(AssignmentParticipant).to receive(:exists?).and_return(true)
+        allow(team1).to receive(:assignment).and_return(assignment1)
+        allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
+        allow(team1).to receive(:update_attributes).and_raise(StandardError)
+        params  = {
+            id: team1.id,
+            team_id: team1.id,
+        }
+        session = {user: ta}
+        result = get :remove, params, session
+        expect(flash[:error]).to eq "An error occurred and your advertisement was not removed!"
+        expect(result).to redirect_to(request.env['HTTP_REFERER'] ? :back : (:root))
+      end
+    end
+  end
 end

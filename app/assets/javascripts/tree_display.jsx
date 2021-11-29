@@ -841,7 +841,7 @@ jQuery(document).ready(function() {
       )
     }
   })
-
+  /* Add datepicker for advanced search in course and assignment*/
   var DatePicker = React.createClass({
     render: function() {
       var formStyle = {
@@ -865,7 +865,9 @@ jQuery(document).ready(function() {
       );
     }
   });
-
+  /* The function for controling the searching date in advance search
+   * Have create date and updated date two choice
+   */
   var AdditionalSearchDropDown = React.createClass({
     render: function() {
       return (
@@ -883,25 +885,22 @@ jQuery(document).ready(function() {
       );
     }
   });
-
+  /* The function will reponse for the checkbox "require a quiz"
+   * in advanced search in course and assignment*/
   var HASQUIZ_TOGGLE = React.createClass({
     render: function() {
       return (
-          <span
-              style={{"display": (this.props.dataType === 'questionnaire' ? "none" : "")}}
-              has_quiz_var={this.props.has_quiz_var}
-              onChange={this.props.onChange}>
-
-                    <div class="checkbox">
-               <input
-                   type="checkbox" id="has_quiz_var" value="">Require a Quiz</input>
-
-                    </div>
-          </span>
+        <span
+            style={{"display": (this.props.dataType === 'questionnaire' ? "none" : "")}}
+            has_quiz_var={this.props.has_quiz_var}
+            onChange={this.props.onChange}>
+          <div class="checkbox">
+            <input type="checkbox" id="has_quiz_var" value="">Require a Quiz</input>
+          </div>
+        </span>
       );
     }
   })
-//========================================================================
 
   var NewItemButton = React.createClass({
     render: function() {
@@ -983,6 +982,7 @@ jQuery(document).ready(function() {
           expandedRow: this.state.expandedRow.concat([ id ])
         })
 
+        //avoid the error in assignment searching page
         if(this.props.dataType!='assignment') {
         let _this = this
         jQuery.post(
@@ -1103,7 +1103,7 @@ jQuery(document).ready(function() {
             return
           }
         })}
-
+        /* Include the functionality of searching by created_date */
         if(_this.props.selectValue == 'created_date'){
           var var_start_date = _this.props.start_date+1;
           var var_end_date = _this.props.end_date+1;
@@ -1149,7 +1149,7 @@ jQuery(document).ready(function() {
             }
           })
         }
-
+        /* Include the functionality of searching by updated_date */
         if(_this.props.selectValue == 'updated_date'){
           var var_start_date = _this.props.start_date+1;
           var var_end_date = _this.props.end_date+1;
@@ -1195,8 +1195,6 @@ jQuery(document).ready(function() {
             }
           })
         }
-
-
         /** this was protecting an always null field, weird TODO */
         if (this.props.showPublic) {
           if (this.props.dataType == 'course') {
@@ -1436,7 +1434,9 @@ jQuery(document).ready(function() {
     }
   })
 
-  //======================================
+  /* The funtion control the advanced search for questionnaires
+   * It can be search by Question Text, Course, and Assignment
+   */
   var QuestionnairesAdvancedSearchBar = React.createClass({
     getInputValues: function () {
       return {
@@ -1472,8 +1472,7 @@ jQuery(document).ready(function() {
     }
   })
 
-  /* Added by E2079
-  *  React component containing the UI elements
+  /* React component containing the UI elements
   *  for the Questionnaire Search Bar, along with Advanced Search.
   * */
   var QuestionnairesSearchBar = React.createClass({
@@ -1518,7 +1517,6 @@ jQuery(document).ready(function() {
     }
   })
 
-  //======================================
 
 
 
@@ -1638,8 +1636,7 @@ jQuery(document).ready(function() {
         )
       }
 
-      /* Added by E2079
-      * Returns advanced search functionality by
+      /* Returns advanced search functionality by
       * created and updated date
       * in courses and assignments
       * */

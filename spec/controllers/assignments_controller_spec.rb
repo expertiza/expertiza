@@ -1,4 +1,4 @@
-describe AssignmentsController do
+0describe AssignmentsController do
 
   let(:assignment) do
     build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true, directory_path: 'same path',

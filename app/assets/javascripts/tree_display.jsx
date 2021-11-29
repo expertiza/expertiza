@@ -1018,419 +1018,168 @@ jQuery(document).ready(function() {
       var colDisplayStyle = {
         display: ''
       }
-      const isEntryValid = entry => ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
-          (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-          (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
-          (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
-          (entry.private || entry.type == 'FolderNode')
+      var isDataTypeCourse = this.props.dataType === 'course'
+      var isDataTypeAssignment = this.props.dataType === 'assignment'
+      var isDataTypeQuestionnaire = this.props.dataType === 'questionnaire'
+      var isSelectValueCreatedDate = this.props.selectValue === 'created_date'
+      var isSelectValueUpdatedDate = this.props.selectValue === 'updated_date'
+
+      function isEntryValid(entry) {
+        if (_this.props.selectValue === 'empty' || (_this.props.showPublic && isDataTypeCourse)) {
+          return ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
+            (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
+            (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
+            (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
+            (entry.private || entry.type == 'FolderNode')
+        } else {
+          return (entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1) &&
+            (entry.private || entry.type == 'FolderNode')
+        }
+      }
+
+      function pushRows(i, entry) {
+        _rows.push(
+          <ContentTableRow
+            key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
+            id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i}
+            name={entry.name}
+            institution={entry.institution}
+            creation_date={entry.creation_date}
+            updated_date={entry.updated_date}
+            actions={entry.actions}
+            is_available={entry.is_available}
+            course_id={entry.course_id}
+            max_team_size={entry.max_team_size}
+            is_intelligent={entry.is_intelligent}
+            require_quiz={entry.require_quiz}
+            dataType={_this.props.dataType}
+            //this is just a hack. All current users courses are marked as private during fetch for display purpose.
+            private={entry.private}
+            allow_suggestions={entry.allow_suggestions}
+            has_topic={entry.has_topic}
+            rowClicked={_this.handleExpandClick}
+            newParams={entry.newParams}
+          />
+        )
+        _rows.push(
+          <ContentTableDetailsRow
+            key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2 + 1).toString() + '_' + i}
+            id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2 + 1).toString() + '_' + i}
+            showElement={
+              _this.state.expandedRow.indexOf(
+                entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i
+              ) > -1 ? '' : 'none'
+            }
+            dataType={_this.props.dataType}
+            children={entry.children}
+          />
+        )
+      }
 
       if (this.props) {
-        if (this.props.dataType === 'questionnaire') {
+        if (isDataTypeQuestionnaire) {
           colWidthArray = [ '70%', '0%', '0%', '0%', '0%', '0%', '30%' ]
           colDisplayStyle = {
             display: 'none'
           }
         }
-        if (this.props.dataType == 'course') {
+        if (isDataTypeCourse) {
           colWidthArray = [ '20%', '0%', '0%', '20%', '20%', '20%', '20%' ]
-          _rows.push(<TitleRow title="My Courses" />)
+          _rows.push(<TitleRow title='My Courses' />)
         }
-        if (this.props.dataType == 'assignment') {
-          _rows.push(<TitleRow title="My Assignments" />)
+        if (isDataTypeAssignment) {
+          _rows.push(<TitleRow title='My Assignments' />)
         }
 
         if(this.props.selectValue === 'empty') {
-        jQuery.each(this.props.data, function(i, entry) {
-          if (isEntryValid(entry)) {
-            _rows.push(
-              <ContentTableRow
-                key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
-                id={
-                  entry.type +
-                  '_' +
-                  (parseInt(entry.nodeinfo.node_object_id) * 2).toString() +
-                  '_' +
-                  i
-                }
-                name={entry.name}
-                institution={entry.institution}
-                creation_date={entry.creation_date}
-                updated_date={entry.updated_date}
-                actions={entry.actions}
-                is_available={entry.is_available}
-                course_id={entry.course_id}
-                max_team_size={entry.max_team_size}
-                is_intelligent={entry.is_intelligent}
-                require_quiz={entry.require_quiz}
-                dataType={_this.props.dataType}
-                //this is just a hack. All current users courses are marked as private during fetch for display purpose.
-                private={entry.private}
-                allow_suggestions={entry.allow_suggestions}
-                has_topic={entry.has_topic}
-                rowClicked={_this.handleExpandClick}
-                newParams={entry.newParams}
-              />
-            )
-            _rows.push(
-              <ContentTableDetailsRow
-                key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2 + 1).toString() + '_' + i}
-                id={
-                  entry.type +
-                  '_' +
-                  (parseInt(entry.nodeinfo.node_object_id) * 2 + 1).toString() +
-                  '_' +
-                  i
-                }
-                // showElement={true}
-                showElement={
-                  _this.state.expandedRow.indexOf(
-                    entry.type +
-                      '_' +
-                      (parseInt(entry.nodeinfo.node_object_id) * 2).toString() +
-                      '_' +
-                      i
-                  ) > -1 ? (
-                    ''
-                  ) : (
-                    'none'
-                  )
-                }
-                dataType={_this.props.dataType}
-                children={entry.children}
-              />
-            )
-          } else {
-            return
-          }
+          jQuery.each(this.props.data, function(i, entry) {
+            isEntryValid(entry) && pushRows(i, entry)
         })}
+        
         /* Include the functionality of searching by created_date */
-        if(_this.props.selectValue == 'created_date'){
-          var var_start_date = _this.props.start_date+1;
-          var var_end_date = _this.props.end_date+1;
+        if (isSelectValueCreatedDate || isSelectValueUpdatedDate) {
+          var startDate = this.props.start_date + 1
+          var endDate = this.props.end_date + 1
           jQuery.each(this.props.data, function (i, entry) {
-            var date = entry.creation_date;
-            if (((entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1) &&
-                    (entry.private || entry.type == 'FolderNode'))) {
-
-              if ((date >= var_start_date) && (var_end_date >= date)) {
+            var date = isSelectValueCreatedDate ? entry.creation_date : entry.updated_date
+            if (isEntryValid(entry)) {
+              if ((date >= startDate) && (endDate >= date)) {
                 if((_this.props.has_quiz_var && entry.require_quiz) || !_this.props.has_quiz_var) {
-                  _rows.push(<ContentTableRow
-                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
-                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
-                      name={entry.name}
-                      institution={entry.institution}
-                      creation_date={entry.creation_date}
-                      updated_date={entry.updated_date}
-                      actions={entry.actions}
-                      is_available={entry.is_available}
-                      course_id={entry.course_id}
-                      max_team_size={entry.max_team_size}
-                      is_intelligent={entry.is_intelligent}
-                      require_quiz={entry.require_quiz}
-                      dataType={_this.props.dataType}
-                      //this is just a hack. All current users courses are marked as private during fetch for display purpose.
-                      private={entry.private}
-                      allow_suggestions={entry.allow_suggestions}
-                      has_topic={entry.has_topic}
-                      rowClicked={_this.handleExpandClick}
-                      newParams={entry.newParams}
-                  />)
-                  _rows.push(<ContentTableDetailsRow
-                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
-                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
-                      showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
-                      dataType={_this.props.dataType}
-                      children={entry.children}
-                  />)
+                  pushRows(i, entry)
                 }
               }
-            } else {
-              return;
             }
           })
         }
-        /* Include the functionality of searching by updated_date */
-        if(_this.props.selectValue == 'updated_date'){
-          var var_start_date = _this.props.start_date+1;
-          var var_end_date = _this.props.end_date+1;
-          jQuery.each(this.props.data, function (i, entry) {
-            var date = entry.updated_date;
-            if (((entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1) &&
-                    (entry.private == true || entry.type == 'FolderNode'))) {
-              if ((date >= var_start_date) && (var_end_date >= date)) {
-                if((_this.props.has_quiz_var && entry.require_quiz) || !_this.props.has_quiz_var) {
-                  _rows.push(<ContentTableRow
-                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
-                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
-                      name={entry.name}
-                      institution={entry.institution}
-                      creation_date={entry.creation_date}
-                      updated_date={entry.updated_date}
-                      actions={entry.actions}
-                      is_available={entry.is_available}
-                      course_id={entry.course_id}
-                      max_team_size={entry.max_team_size}
-                      is_intelligent={entry.is_intelligent}
-                      require_quiz={entry.require_quiz}
-                      dataType={_this.props.dataType}
-                      //this is just a hack. All current users courses are marked as private during fetch for display purpose.
-                      private={entry.private}
-                      allow_suggestions={entry.allow_suggestions}
-                      has_topic={entry.has_topic}
-                      rowClicked={_this.handleExpandClick}
-                      newParams={entry.newParams}
-                  />)
-                  _rows.push(<ContentTableDetailsRow
-                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
-                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
-                      showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
-                      dataType={_this.props.dataType}
-                      children={entry.children}
-                  />)
-                }
-              }
 
-            } else {
-              return;
-            }
-          })
-        }
         /** this was protecting an always null field, weird TODO */
         if (this.props.showPublic) {
-          if (this.props.dataType == 'course') {
+          if (isDataTypeCourse) {
             _rows.push(<TitleRow title="Others' Public Courses" />)
             jQuery.each(this.props.data, function(i, entry) {
-              if (
-                ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.creation_date &&
-                    entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.updated_date &&
-                    entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
-                entry.private == false
-              ) {
-                _rows.push(
-                  <ContentTableRow
-                    key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
-                    id={
-                      entry.type +
-                      '_' +
-                      (parseInt(entry.nodeinfo.node_object_id) * 2).toString() +
-                      '_' +
-                      i
-                    }
-                    name={entry.name}
-                    institution={entry.institution}
-                    creation_date={entry.creation_date}
-                    updated_date={entry.updated_date}
-                    actions={entry.actions}
-                    is_available={entry.is_available}
-                    course_id={entry.course_id}
-                    max_team_size={entry.max_team_size}
-                    is_intelligent={entry.is_intelligent}
-                    require_quiz={entry.require_quiz}
-                    dataType={_this.props.dataType}
-                    private={entry.private}
-                    allow_suggestions={entry.allow_suggestions}
-                    has_topic={entry.has_topic}
-                    rowClicked={_this.handleExpandClick}
-                    newParams={entry.newParams}
-                  />
-                )
-                _rows.push(
-                  <ContentTableDetailsRow
-                    key={
-                      entry.type +
-                      '_' +
-                      (parseInt(entry.nodeinfo.id) * 2 + 1).toString() +
-                      '_' +
-                      i
-                    }
-                    id={
-                      entry.type +
-                      '_' +
-                      (parseInt(entry.nodeinfo.node_object_id) * 2 + 1).toString() +
-                      '_' +
-                      i
-                    }
-                    showElement={
-                      _this.state.expandedRow.indexOf(
-                        entry.type +
-                          '_' +
-                          (parseInt(entry.nodeinfo.node_object_id) * 2).toString() +
-                          '_' +
-                          i
-                      ) > -1 ? (
-                        ''
-                      ) : (
-                        'none'
-                      )
-                    }
-                    dataType={_this.props.dataType}
-                    children={entry.children}
-                  />
-                )
-              } else {
-                return
-              }
+              isEntryValid(entry) && pushRows(i, entry)
             })
-          } else if (this.props.dataType == 'assignment') {
+          } else if (isDataTypeAssignment) {
             _rows.push(<TitleRow title="Others' Public Assignments" />)
             jQuery.each(this.props.data, function(i, entry) {
               if (
                 ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.creation_date &&
-                    entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.updated_date &&
-                    entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
+                  (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
                 entry.private == false
               ) {
-                _rows.push(
-                  <ContentTableRow
-                    key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
-                    id={
-                      entry.type +
-                      '_' +
-                      (parseInt(entry.nodeinfo.node_object_id) * 2).toString() +
-                      '_' +
-                      i
-                    }
-                    name={entry.name}
-                    creation_date={entry.creation_date}
-                    updated_date={entry.updated_date}
-                    actions={entry.actions}
-                    is_available={entry.is_available}
-                    course_id={entry.course_id}
-                    max_team_size={entry.max_team_size}
-                    is_intelligent={entry.is_intelligent}
-                    require_quiz={entry.require_quiz}
-                    dataType={_this.props.dataType}
-                    private={entry.private}
-                    allow_suggestions={entry.allow_suggestions}
-                    has_topic={entry.has_topic}
-                    rowClicked={_this.handleExpandClick}
-                    newParams={entry.newParams}
-                  />
-                )
-                _rows.push(
-                  <ContentTableDetailsRow
-                    key={
-                      entry.type +
-                      '_' +
-                      (parseInt(entry.nodeinfo.id) * 2 + 1).toString() +
-                      '_' +
-                      i
-                    }
-                    id={
-                      entry.type +
-                      '_' +
-                      (parseInt(entry.nodeinfo.node_object_id) * 2 + 1).toString() +
-                      '_' +
-                      i
-                    }
-                    showElement={
-                      _this.state.expandedRow.indexOf(
-                        entry.type +
-                          '_' +
-                          (parseInt(entry.nodeinfo.node_object_id) * 2).toString() +
-                          '_' +
-                          i
-                      ) > -1 ? (
-                        ''
-                      ) : (
-                        'none'
-                      )
-                    }
-                    dataType={_this.props.dataType}
-                    children={entry.children}
-                  />
-                )
-              } else {
-                return
+               pushRows(i, entry) 
               }
             })
           }
         }
       }
-      if (this.props.dataType == 'course') {
-        return (
-          <table className="table table-hover" style={{ 'table-layout': 'fixed' }}>
-            <thead>
-              <tr>
-                <th width={colWidthArray[0]}>
-                  Name
-                  <SortToggle
-                    colName="name"
-                    order="normal"
-                    handleUserClick={this.handleSortingClick}
-                  />
-                </th>
+
+      return (
+        <table className='table table-hover' style={{ 'table-layout': 'fixed' }}>
+          <thead>
+            <tr>
+              <th width={colWidthArray[0]}>
+                Name
+                <SortToggle
+                  colName='name'
+                  order='normal'
+                  handleUserClick={this.handleSortingClick}
+                />
+              </th>
+              {isDataTypeCourse && (
                 <th style={colDisplayStyle} width={colWidthArray[3]}>
                   Institution
                   <SortToggle
-                    colName="institution"
-                    order="normal"
+                    colName='institution'
+                    order='normal'
                     handleUserClick={this.handleSortingClick}
                   />
                 </th>
-                <th style={colDisplayStyle} width={colWidthArray[4]}>
-                  Creation Date
-                  <SortToggle
-                    colName="creation_date"
-                    order="normal"
-                    handleUserClick={this.handleSortingClick}
-                  />
-                </th>
-                <th style={colDisplayStyle} width={colWidthArray[5]}>
-                  Updated Date
-                  <SortToggle
-                    colName="updated_date"
-                    order="normal"
-                    handleUserClick={this.handleSortingClick}
-                  />
-                </th>
-                <th width={colWidthArray[6]}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>{_rows}</tbody>
-          </table>
-        )
-      } else {
-        return (
-          <table className="table table-hover" style={{ 'table-layout': 'fixed' }}>
-            <thead>
-              <tr>
-                <th width={colWidthArray[0]}>
-                  Name
-                  <SortToggle
-                    colName="name"
-                    order="normal"
-                    handleUserClick={this.handleSortingClick}
-                  />
-                </th>
-                <th style={colDisplayStyle} width={colWidthArray[4]}>
-                  Creation Date
-                  <SortToggle
-                    colName="creation_date"
-                    order="normal"
-                    handleUserClick={this.handleSortingClick}
-                  />
-                </th>
-                <th style={colDisplayStyle} width={colWidthArray[5]}>
-                  Updated Date
-                  <SortToggle
-                    colName="updated_date"
-                    order="normal"
-                    handleUserClick={this.handleSortingClick}
-                  />
-                </th>
-                <th width={colWidthArray[6]}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>{_rows}</tbody>
-          </table>
-        )
-      }
+              )}
+              <th style={colDisplayStyle} width={colWidthArray[4]}>
+                Creation Date
+                <SortToggle
+                  colName='creation_date'
+                  order='normal'
+                  handleUserClick={this.handleSortingClick}
+                />
+              </th>
+              <th style={colDisplayStyle} width={colWidthArray[5]}>
+                Updated Date
+                <SortToggle
+                  colName='updated_date'
+                  order='normal'
+                  handleUserClick={this.handleSortingClick}
+                />
+              </th>
+              <th width={colWidthArray[6]}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>{_rows}</tbody>
+        </table>
+      )
+
     }
   })
 

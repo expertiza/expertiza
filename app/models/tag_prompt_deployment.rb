@@ -20,7 +20,8 @@ class TagPromptDeployment < ActiveRecord::Base
 
       answers = Answer.where(question_id: questions_ids, response_id: responses_ids)
 
-      answers = answers.where(conditions: "length(comments) < " + self.answer_length_threshold) unless self.answer_length_threshold.nil?
+      # E2169. Testing - Answer Tagging
+      answers = answers.where(conditions: "length(comments) < #{self.answer_length_threshold}" ) unless self.answer_length_threshold.nil?
       return answers.count
     end
     0

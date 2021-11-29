@@ -1,11 +1,11 @@
 require_relative 'helpers/assignment_creation_helper'
-require_relative '../helpers/grades_helper_spec.rb'
 include AssignmentCreationHelper
-include GradesHelper
+
 describe "assignment creation due dates", js: true do
 
   before(:each) do
     create_deadline_types()
+    @assignment = create(:assignment, name: 'public assignment for test')
     login_as("instructor6")
   end
     it "should edit assignment available to students" do

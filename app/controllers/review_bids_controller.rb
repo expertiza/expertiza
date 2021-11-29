@@ -97,11 +97,11 @@ class ReviewBidsController < ApplicationController
   def assign_bidding
     # sets parameters used for running bidding algorithm
     assignment_id = params[:assignment_id]
-    # list of reviewers from a specific assignment
-    reviewers = AssignmentParticipant.where(parent_id: assignment_id).ids
-    bidding_data = ReviewBid.get_bidding_data(assignment_id, reviewers)
+    # list of reviewer id's from a specific assignment
+    reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
+    bidding_data = ReviewBid.get_bidding_data(assignment_id, reviewer_ids)
     matched_topics = run_bidding_algorithm(bidding_data)
-    ReviewBid.assign_review_topics(assignment_id, reviewers, matched_topics)
+    ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
     Assignment.find(assignment_id).update(can_choose_topic_to_review: false) #turns off bidding for students
     redirect_to :back
 

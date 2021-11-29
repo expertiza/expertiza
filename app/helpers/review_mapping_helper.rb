@@ -6,24 +6,6 @@ include ReviewChartHelper
   end
 
   #
-  # gets the response map data such as reviewer id, reviewd object id and type for the review report
-  #
-  def data_for_review_report(reviewed_object_id, reviewer_id, type)
-    rspan = 0
-    (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@review_in_round_" + round.to_s, 0) }
-
-    response_maps = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", reviewed_object_id, reviewer_id, type])
-    response_maps.each do |ri|
-      rspan += 1 if Team.exists?(id: ri.reviewee_id)
-      responses = ri.response
-      (1..@assignment.num_review_rounds).each do |round|
-        instance_variable_set("@review_in_round_" + round.to_s, instance_variable_get("@review_in_round_" + round.to_s) + 1) if responses.exists?(round: round)
-      end
-    end
-    [response_maps, rspan]
-  end
-
-  #
   # gets the team name's color according to review and assignment submission status
   #
   def team_color(response_map)
@@ -261,6 +243,7 @@ include ReviewChartHelper
                 end
     css_class
   end
+
 
   class ReviewStrategy
     attr_accessor :participants, :teams

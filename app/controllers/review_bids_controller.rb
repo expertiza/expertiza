@@ -35,17 +35,6 @@ class ReviewBidsController < ApplicationController
     @assignment = @participant.assignment
     @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
 
-    # Finding the current phase that we are in
-    # Commented out as reviewed and came to a conclusion that results of the review phase logic is not used
-    due_dates = AssignmentDueDate.where(parent_id: @assignment.id)
-    @very_last_due_date = AssignmentDueDate.where(parent_id: @assignment.id).order("due_at DESC").limit(1)
-    next_due_date = @very_last_due_date[0]
-    for due_date in due_dates
-     if due_date.due_at > Time.now
-       next_due_date = due_date if due_date.due_at < next_due_date.due_at
-     end
-    end
-    @review_phase = next_due_date.deadline_type_id
     #@reviews_to_show = @@reviews_to_show.nil? ? (@assignment.num_reviews_required).to_i : @@reviews_to_show.to_i
     # Finding how many reviews have been completed
     @num_reviews_completed = 0
@@ -122,9 +111,9 @@ class ReviewBidsController < ApplicationController
     # list of reviewers from a specific assignment
     reviewers = AssignmentParticipant.where(parent_id: assignment_id).ids
     bidding_data = ReviewBid.get_bidding_data(assignment_id, reviewers)
-    @bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers)
+    # @bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers)
     #runs algorithm and assigns reviews
-    @matched_topics = run_bidding_algorithm(bidding_data)
+    # @matched_topics = run_bidding_algorithm(bidding_data)
     matched_topics = run_bidding_algorithm(bidding_data)
     #@@reviews_to_show = nil
     ReviewBid.assign_review_topics(assignment_id, reviewers, matched_topics)
@@ -140,7 +129,7 @@ class ReviewBidsController < ApplicationController
   def run_bidding_algorithm(bidding_data)
     # begin
     url = WEBSERVICE_CONFIG["review_bidding_webservice_url"] #won't work unless ENV variables are configured
-    url = '152.7.176.78:5000/match_topics' #hard coding for the time being
+    url = 'http://app-csc517.herokuapp.com/match_topics' #hard coding for the time being
     response = RestClient.post url, bidding_data.to_json, content_type: 'application/json', accept: :json
     return JSON.parse(response.body)
   rescue StandardError

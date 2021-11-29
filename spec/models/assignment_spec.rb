@@ -472,6 +472,13 @@ describe Assignment do
     end
   end
 
+  describe '#heatgrid_metric' do
+    it 'returns countofcomments by default' do      
+      assignment = create(:assignment)
+      expect(assignment.heatgrid_metric).to eq('countofcomments')
+    end
+  end
+
   describe '#num_review_rounds' do
     it 'returns max round number in all due dates of current assignment' do
       allow(AssignmentDueDate).to receive(:where).with(parent_id: 1).and_return([assignment_due_date])

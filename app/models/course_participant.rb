@@ -13,7 +13,6 @@ class CourseParticipant < Participant
   end
 
   def self.import(row_hash, session, id)
-    byebug
     raise ArgumentError, "The record does not have enough items." if row_hash.length < self.required_import_fields.length
     user = User.find_by(name: row_hash[:name])
     user = User.import(row_hash, session, nil) if user.nil?

@@ -1,4 +1,3 @@
-require 'byebug'
 require 'uri'
 require 'yaml'
 # Code Review: Notice that Participant overloads two different concepts:
@@ -111,7 +110,6 @@ class AssignmentParticipant < Participant
   ######
 
   def self.import(row_hash, session, id)
-    byebug
     raise ArgumentError, "Record does not contain required items." if row_hash.length < self.required_import_fields.length
     user = User.find_by(name: row_hash[:name])
     user = User.import(row_hash, session, nil) if user.nil?

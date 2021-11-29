@@ -1,4 +1,3 @@
-require 'byebug'
 class User < ActiveRecord::Base
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = {if: -> { false }} # Don't validate email uniqueness
@@ -93,7 +92,6 @@ class User < ActiveRecord::Base
   end
 
   def self.get_new_user(row_hash, session)
-    byebug
     attributes = {"role_id" => Role.student.id,
         "name" => row_hash[:name],
         "fullname" => row_hash[:fullname],

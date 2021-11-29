@@ -144,6 +144,7 @@ describe AnswerTagsController do
         params = {answer_id: answer.id,tag_prompt_deployment_id: tag_deploy.id,value: 0}
         post :create_edit, params, session
         expect(response).to have_http_status(200)
+        expect(AnswerTag.find_by(answer_id: answer.id).value).to eql("0")
       end
 
       it 'restricts updating answer tag by student if no mapping is found related to any answer for that tag (foreign key constraint)' do

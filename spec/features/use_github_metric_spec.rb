@@ -1,4 +1,5 @@
 require_relative 'helpers/assignment_creation_helper'
+require_relative'../rails_helper.rb'
 include AssignmentCreationHelper
 
 describe "assignment creation due dates", js: true do

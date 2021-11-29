@@ -207,7 +207,7 @@ FactoryBot.define do
     comments_for_advertisement nil
     advertise_for_partner nil
     submitted_hyperlinks '---
-- https://www.expertiza.ncsu.edu'  '---
+- https://www.expertiza.ncsu.edu
 - https://github.com/expertiza/expertiza/pull/1261'
     directory_num 0
   end

@@ -34,10 +34,12 @@ describe "assignment creation due dates", js: true do
     it "should edit assignment available to students" do
          visit "/assignments/1/edit"
          sleep(inspection_time=60)
-    	 check('Use github metrics?', allow_label_click: true)
-         visit "/assignments/list_submissions?id=1"
-         sleep(inspection_time=60)
-         expect(page).to have_content("Github data")
+          expect{
+                check('Use github metrics?', allow_label_click: true)
+             }.to change(use_github_metrics, :count).by(1)
+#          visit "/assignments/list_submissions?id=1"
+#          sleep(inspection_time=60)
+#          expect(page).to have_content("Github data")
     end
 
   # able to set deadlines for a single round of reviews

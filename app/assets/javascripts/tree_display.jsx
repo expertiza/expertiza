@@ -600,7 +600,7 @@ jQuery(document).ready(function() {
     },
     componentDidMount: function() {
       // this buffer holds the title for all of the rubric types under the Questionnaire tab
-      rubricBuffer = [
+      let rubricBuffer = [
         'Review',
         'Metareview',
         'Author Feedback',
@@ -612,8 +612,8 @@ jQuery(document).ready(function() {
 
       //selectedMenuItem then takes the clicked rubric from the panel under questionnaire
       //selectedMenuItemIndex finds the corresponding index of the click rubric from the above buffer
-      selectedMenuItem = document.getElementById('tree_display').getAttribute('data-menu-item')
-      selectedMenuItemIndex = rubricBuffer.indexOf(selectedMenuItem)
+      let selectedMenuItem = document.getElementById('tree_display').getAttribute('data-menu-item')
+      let selectedMenuItemIndex = rubricBuffer.indexOf(selectedMenuItem)
 
       if (selectedMenuItemIndex !== -1) {
         if (rubricBuffer[selectedMenuItemIndex] === this.props.name) {
@@ -630,7 +630,6 @@ jQuery(document).ready(function() {
       }
     },
     handleClick: function(event) {
-      //alert('click');
 
       if (event.target.type != 'button') {
         this.setState(
@@ -662,8 +661,8 @@ jQuery(document).ready(function() {
         colWidthArray = [ '20%', '0%', '0%', '20%', '20%', '20%', '20%' ]
       }
       if (this.props.creation_date && this.props.updated_date) {
-        creation = this.props.creation_date
-        updated = this.props.updated_date
+        let creation = this.props.creation_date
+        let updated = this.props.updated_date
 
         creation_date = formatDate(new Date(creation))
         updated_date = formatDate(new Date(updated))
@@ -812,6 +811,7 @@ jQuery(document).ready(function() {
             placeholder="Search..."
             value={this.props.filterText}
             ref="filterTextInput"
+            className="form-control"
             onChange={this.handleChange}
           />
         </span>
@@ -835,78 +835,40 @@ jQuery(document).ready(function() {
             ref="filterCheckbox"
             onChange={this.handleChange}
           >
-            {" Include others' items"}
+            {" Include others' " + this.props.dataType + "s"}
           </input>
         </span>
       )
     }
   })
 
-  var DatePickerStart = React.createClass({
+  var DatePicker = React.createClass({
     render: function() {
       var formStyle = {
         margin: 0,
         padding: 0,
-        display: 'inline'
-      }
-      if (this.props.dataType === 'questionnaire') {
-        formStyle = {
-          margin: 0,
-          padding: 0,
-          display: 'none'
-        }
+        display: this.props.dataType === 'questionnaire' ? 'none' : 'inline'
       }
       return (
-          <span style = {formStyle}
-                start_date={this.props.start_date}
-                onChange={this.props.onChange} >
-                Start Date <input className="form-control" type="date" id="start_date"></input>
-            </span>
-      );
-    }
-  });
-
-  //========================================================================
-  var DatePickerEnd = React.createClass({
-    render: function() {
-      var formStyle = {
-        margin: 0,
-        padding: 0,
-        display: 'inline'
-      }
-      if (this.props.dataType === 'questionnaire') {
-        formStyle = {
-          margin: 0,
-          padding: 0,
-          display: 'none'
-        }
-      }
-      return (
-          <span style = {formStyle}
-                end_date={this.props.end_date}
-                onChange={this.props.onChange} >
-                End Date <input className="form-control" type="date" id="end_date"></input>
-            </span>
+          <span
+              style={formStyle}
+              date={this.props.date}
+              onChange={this.props.onChange}
+          >
+              {this.props.title}
+              <input
+                  className="form-control"
+                  type="date"
+                  id={this.props.inputId}
+              />
+          </span>
       );
     }
   });
 
   var AdditionalSearchDropDown = React.createClass({
     render: function() {
-      var formStyle = {
-        margin: 0,
-        padding: 0,
-        display: 'inline'
-      }
-      if (this.props.dataType === 'questionnaire') {
-        formStyle = {
-          margin: 0,
-          padding: 0,
-          display: 'none'
-        }
-      }
       return (
-
           <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'center' }}>
             <select
                 value={this.props.selectValue}
@@ -918,7 +880,6 @@ jQuery(document).ready(function() {
               <option value="updated_date">Updated Date Filter</option>
             </select>
           </div>
-
       );
     }
   });
@@ -1021,7 +982,9 @@ jQuery(document).ready(function() {
         this.setState({
           expandedRow: this.state.expandedRow.concat([ id ])
         })
-        _this = this
+
+        if(this.props.dataType!='assignment') {
+        let _this = this
         jQuery.post(
           '/tree_display/get_sub_folder_contents',
           {
@@ -1033,7 +996,7 @@ jQuery(document).ready(function() {
           },
           'json'
         )
-        // }
+        }
       } else {
         var index = this.state.expandedRow.indexOf(id)
         if (index > -1) {
@@ -1055,6 +1018,12 @@ jQuery(document).ready(function() {
       var colDisplayStyle = {
         display: ''
       }
+      const isEntryValid = entry => ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
+          (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
+          (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
+          (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
+          (entry.private || entry.type == 'FolderNode')
+
       if (this.props) {
         if (this.props.dataType === 'questionnaire') {
           colWidthArray = [ '70%', '0%', '0%', '0%', '0%', '0%', '30%' ]
@@ -1065,18 +1034,14 @@ jQuery(document).ready(function() {
         if (this.props.dataType == 'course') {
           colWidthArray = [ '20%', '0%', '0%', '20%', '20%', '20%', '20%' ]
           _rows.push(<TitleRow title="My Courses" />)
-        } else if (this.props.dataType == 'assignment') {
+        }
+        if (this.props.dataType == 'assignment') {
           _rows.push(<TitleRow title="My Assignments" />)
         }
-        if(_this.props.selectValue == 'empty'){
+
+        if(this.props.selectValue === 'empty') {
         jQuery.each(this.props.data, function(i, entry) {
-          if (
-            ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
-              (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-              (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
-              (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
-            (entry.private || entry.type == 'FolderNode')
-          ) {
+          if (isEntryValid(entry)) {
             _rows.push(
               <ContentTableRow
                 key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
@@ -1544,7 +1509,7 @@ jQuery(document).ready(function() {
                 Search
               </button>
               <a onClick={this.toggleAdvancedSearch}>
-                {this.state.advancedSearchVisible ? 'Hide Advanced Search' : 'Advanced Search'}
+                {'Advanced Search'}
               </a>
             </div>
             {this.state.advancedSearchVisible ? <QuestionnairesAdvancedSearchBar ref={instance => { this.child = instance; }} /> : null}
@@ -1667,6 +1632,7 @@ jQuery(document).ready(function() {
                   onUserClick={this.handleUserClick}
                   dataType={this.props.dataType}
                   showPublic={this.state.publicCheckbox}
+                  selectValue={this.state.selectValue}
               />
             </div>
         )
@@ -1689,15 +1655,13 @@ jQuery(document).ready(function() {
                   dataType={this.props.dataType}
               />
 
-              <FilterButton
-                  filterOption="public"
-                  onUserFilter={this.handleUserFilter}
-                  inputCheckboxValue={this.state.publicCheckbox}
-                  dataType={this.props.dataType}
-              />
+              <button type="button"
+                      className="btn btn-primary"
+                      onClick={this.handleSearch}>
+                Search
+              </button>
 
-              <button
-                  className="btn btn-link"
+              <a
                   onClick={() => {
                     var x = document.getElementById("advancedToggle");
                     if (x.style.display === "none") {
@@ -1706,29 +1670,35 @@ jQuery(document).ready(function() {
                       x.style.display = "none";
                     }}}>
                 Advanced Search
-              </button>
+              </a>
             </div>
 
-
-            <div id="advancedToggle" style={{ display: 'none' }}>
+              <div id="advancedToggle" style={{ display: 'none' }}>
               <AdditionalSearchDropDown
                   selectValue = {this.state.selectValue}
                   onChange={this.changeAdditionalDrop}
-                  dataType={this.props.dataType}/>
+              />
               <div style={{
                 margin: '10px auto',
                 display: 'grid',
                 gridTemplateColumns: 'repeat(3, auto) 1fr',
                 gridGap: '8px',
-                alignItems: 'center' }}>
-                <DatePickerStart
-                    start_date = {this.state.start_date}
+                alignItems: 'center' }}
+              >
+                <DatePicker
+                    date={this.state.start_date}
                     onChange={this.changeDateStart}
-                    dataType={this.props.dataType}/>
-                <DatePickerEnd
-                    start_date = {this.state.end_date}
+                    dataType={this.props.dataType}
+                    inputId="start_date"
+                    title="Start Date"
+                />
+                <DatePicker
+                    date={this.state.end_date}
                     onChange={this.changeDateEnd}
-                    dataType={this.props.dataType}/>
+                    dataType={this.props.dataType}
+                    inputId="end_date"
+                    title="End Date"
+                />
                 <HASQUIZ_TOGGLE
                     has_quiz_var = {this.state.has_quiz_var}
                     onChange={this.changeAvailableToggle}
@@ -1736,10 +1706,21 @@ jQuery(document).ready(function() {
               </div>
             </div>
 
-            <NewItemButton
-                dataType={this.props.dataType}
-                private={true}
-            />
+            <div>
+              <FilterButton
+                  filterOption="public"
+                  onUserFilter={this.handleUserFilter}
+                  inputCheckboxValue={this.state.publicCheckbox}
+                  dataType={this.props.dataType}
+              />
+
+              <NewItemButton
+                  dataType={this.props.dataType}
+                  private={true}
+              />
+
+            </div>
+
             <ContentTable
                 data={this.state.tableData}
                 filterText={this.state.filterText}

@@ -3,6 +3,18 @@ require './spec/support/teams_shared.rb'
 describe JoinTeamRequestsController do
   include_context "object initializations"
   include_context 'authorization check'
+  before (:each) {
+    join_team_request4 = JoinTeamRequest.new()
+    join_team_request4.id = 3
+    join_team_request4.team_id = 4
+    join_team_request4.status = 'P'
+    join_team_request4.participant_id = 1
+    join_team_request4.comments = "I want to join the team"
+    join_team_request4.save
+    allow(  join_team_request4).to receive(:save).and_return(true)
+    allow(JoinTeamRequest).to receive(:find).with("2").and_return(join_team_request2)
+    allow(join_team_request2).to receive(:update_attribute).with(any_args).and_return('OK!')
+  }
   context 'not provides access to people with' do
     it 'student credentials' do
       stub_current_user(student1, student1.role.name, student1.role)
@@ -11,34 +23,23 @@ describe JoinTeamRequestsController do
   end
 
   describe "GET index" do
-    before do
-      get :index
-    end
-
-    context "when index is called" do
-      it "routes to index page" do
-        get :index
-        expect(get: "join_team_requests/").to route_to("join_team_requests#index")
-      end
-
+    it "routes to index page" do
+      allow(JoinTeamRequest).to receive(:all).and_return(join_team_request1)#([join_team_request1, join_team_request2])
+      params = {action: 'index'}
+      session = {user: ta}
+      result = get :index, params, session
+      expect(result.status).to eq 302
     end
   end
 
   describe "GET #show" do
-    before(:each) do
-      join_team_request3 = JoinTeamRequest.new
-      join_team_request3.participant_id = 1
-      join_team_request3.team_id = 2
-      join_team_request3.comments="Accepted"
-      join_team_request3.status="P"
-      allow(JoinTeamRequest).to receive(:find).with("1").and_return(join_team_request3)
-    end
-
     context "#show" do
       it "when it is valid" do
-        params = { id: 1}
-        get :show,params
-        expect(get: "join_team_requests/1").to route_to("join_team_requests#show",id:"1")
+        allow(JoinTeamRequest).to receive(:find).and_return(join_team_request2)
+        params = {action: 'show'}
+        session = {user: ta}
+        result = get :show, params, session
+        expect(result.status).to eq 200
       end
     end
   end
@@ -85,57 +86,61 @@ describe JoinTeamRequestsController do
         post :create, params, session
         expect(response.status).to eq 302
         expect(join_team_request2.status).to eq('P')
-        #expect(join_team_request1[:notice]).to match("JoinTeamRequest was successfully created.")
       end
     end
   end
 
   describe "PUT #update" do
     before(:each) do
-      join_team_request = JoinTeamRequest.new
-      join_team_request.id = 1
-      join_team_request.participant_id = 1
-      join_team_request.team_id = 2
-      join_team_request.status="P"
+      join_team_request2 = JoinTeamRequest.new
+      allow(join_team_request2).to receive(:update_attributes).with(:comments).and_return(true)
+      allow(Participant).to receive(:find).with("1").and_return(participant)
     end
-    context "when the join_team_request is not updated" do
-      it "renders edit page" do
-        #allow(JoinTeamRequest).to receive(:update_attribute).with(any_args).and_return(false)
-        allow(JoinTeamRequest).to receive(:find).with("1").and_return(join_team_request1)
-        #allow(JoinTeamRequest).to receive(:edit).and_return(:invalidrequest)
+    context "when the join_team_request is updated" do
+
+      it "gives update message" do
+        allow(Participant).to receive(:find).with("1").and_return(participant)
+        allow(Team).to receive(:find).with("2").and_return(team2)
         params = {
-                  id: 1,
-                  join_team_request1: {
-                  comments: nil
+          action: 'update',
+          id: 2,
+          join_team_request2: {
+                      comments: "Changed"
                   }
         }
-        session = {user: student1}
-        put :edit, params, session
-        expect(response).to render_template("edit")
+        put :update, params
+        expect(response.status).to eq 302
       end
 
     end
   end
 
   describe "#decline" do
-    before(:each) do
-      allow(Participant).to receive(:find).with("1").and_return(participant)
+    context "when join team request is declined" do
+      it "will change status to 'D'" do
+        allow(JoinTeamRequest).to receive(:find).and_return(join_team_request2)
+        allow(join_team_request2).to receive(:save).and_return(true)
+        params = {action: 'decline'}
+        session = {user: ta}
+        result = get :decline, params, session
+        expect(result.status).to eq 302
+        expect(result).to redirect_to(view_student_teams_path)
+      end
     end
-    it "when request declined" do
-      allow(JoinTeamRequest).to receive(:edit).with("D").and_return(join_team_request2)
-      allow(JoinTeamRequest).to receive(:save).and_return(true)
-      params = {
-        id: 2,
-        join_team_request1: {
-          status: 'D'
-        }
-      }
-      session = {user: student1}
-      post :new, params, session
-      expect(response.status).to eq 200
-    end
+  end
 
+  describe 'destroy method' do
+    it 'gets coverage' do
+      allow(JoinTeamRequest).to receive(:find).and_return(join_team_request2)
+      allow(join_team_request2).to receive(:destroy).and_return(true)
+      params = {action: 'destroy'}
+      session = {user: ta}
+      result = get :destroy, params, session
+      expect(result.status).to eq 302
+      expect(result).to redirect_to(join_team_requests_url)
+    end
   end
 
 end
+
 

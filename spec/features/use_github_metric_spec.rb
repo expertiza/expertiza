@@ -1,5 +1,5 @@
 require_relative 'helpers/assignment_creation_helper'
-require_relative 'helpers\grades_helper_spec.rb'
+require_relative '..\helpers\grades_helper_spec.rb'
 include AssignmentCreationHelper
 include GradesHelper
 describe "assignment creation due dates", js: true do

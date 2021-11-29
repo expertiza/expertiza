@@ -61,7 +61,8 @@ describe "Assignment creation page", js: true do
 			spec_location: 'testLocation',
 			microtask: true,
 			is_calibrated: true,
-			availability_flag: false
+			availability_flag: false,
+			heatgrid_metric: 'countofcomments'
 		)
 	end
 

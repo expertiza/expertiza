@@ -608,4 +608,25 @@ FactoryBot.define do
     type 'TextArea'
     size '70,1'
   end
+
+  factory :answer_tag, class: AnswerTag do
+    answer { Answer.first || association(:answer) }
+    tag_prompt_deployment { TagPromptDeployment.first || association(:tag_prompt_deployment) }
+    user { User.first || association(:user) }
+    value "0"
+  end
+
+  factory :tag_prompt, class: TagPrompt do
+    prompt "Prompt"
+    desc "Description"
+    control_type "Slider"
+  end
+
+  factory :tag_prompt_deployment, class: TagPromptDeployment do
+    tag_prompt { TagPrompt.first || association(:tag_prompt) }
+    assignment { Assignment.first || association(:assignment) }
+    questionnaire { Questionnaire.first || association(:questionnaire) }
+    question_type "Criterion"
+    answer_length_threshold 6
+  end
 end

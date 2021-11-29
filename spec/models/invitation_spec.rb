@@ -129,3 +129,4 @@ describe Invitation do
     end
   end
 end
+

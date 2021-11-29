@@ -46,7 +46,8 @@ class ReviewBid < ActiveRecord::Base
     # method for getting individual reviewer_ids bidding data
     # returns user's bidding data hash
     def self.reviewer_bidding_data(reviewer_id,assignment_id)
-      self_topic = SignedUpTeam.topic_id(assignment_id, reviewer_id)
+      reviewer_user_id = AssignmentParticipant.find(reviewer_id).user_id
+      self_topic = SignedUpTeam.topic_id(assignment_id, reviewer_user_id)
       bidding_data = {'tid'=> [], 'otid' => self_topic, 'priority' => [], 'time'=>[]}
       bids = ReviewBid.where(participant_id: reviewer_id)
 

@@ -415,17 +415,18 @@ jQuery(document).ready(function() {
       var nodeTypeRaw = this.props.id.split('_')[0]
       var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length - 4).toLowerCase()
       var id = this.props.id.split('_')[1]
-      if (this.props.dataType == 'course') {
-        var institution_name = '-'
+      var institution_name = '-'
         if (typeof this.props.institution !== 'undefined' && this.props.institution.length != 0) {
           institution_name = this.props.institution[0].name
         }
         return (
           <tr id={this.props.id}>
             <td width={colWidthArray[0]}>{this.props.name}</td>
-            <td style={colDisplayStyle} width={colWidthArray[3]}>
-              {institution_name}
-            </td>
+            {this.props.dataType == 'course' && (
+              <td style={colDisplayStyle} width={colWidthArray[3]}>
+                {institution_name}
+              </td>
+            )}
             <td width={colWidthArray[4]} dangerouslySetInnerHTML={{ __html: creation_date }} />
             <td width={colWidthArray[5]} dangerouslySetInnerHTML={{ __html: updated_date }} />
             <td width={colWidthArray[6]}>
@@ -448,33 +449,6 @@ jQuery(document).ready(function() {
             </td>
           </tr>
         )
-      } else {
-        return (
-          <tr id={this.props.id}>
-            <td width={colWidthArray[0]}>{this.props.name}</td>
-            <td width={colWidthArray[4]} dangerouslySetInnerHTML={{ __html: creation_date }} />
-            <td width={colWidthArray[5]} dangerouslySetInnerHTML={{ __html: updated_date }} />
-            <td width={colWidthArray[6]}>
-              <RowAction
-                actions={this.props.actions}
-                key={'simpleTable_' + this.props.id}
-                nodeType={nodeType}
-                parent_name={this.props.name}
-                private={this.props.private}
-                is_available={this.props.is_available}
-                course_id={this.props.course_id}
-                max_team_size={this.props.max_team_size}
-                is_intelligent={this.props.is_intelligent}
-                require_quiz={this.props.require_quiz}
-                allow_suggestions={this.props.allow_suggestions}
-                has_topic={this.props.has_topic}
-                id={id}
-                instructor_id={this.props.instructor_id}
-              />
-            </td>
-          </tr>
-        )
-      }
     }
   })
 

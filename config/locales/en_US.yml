@@ -535,6 +535,51 @@ en_US:
     email:
       email_add: "E-mail address:"
 
+  datetime:
+    distance_in_words:
+      about_x_hours:
+        one: "about 1 hour"
+        other: "about %{count} hours"
+      about_x_months:
+        one: "about 1 month"
+        other: "about %{count} months"
+      about_x_years:
+        one: "about 1 year"
+        other: "about %{count} years"
+      almost_x_years:
+        one: "about 1 year"
+        other: "about %{count} years"
+      half_a_minute: "half minute"
+      less_than_x_minutes:
+        zero: "less than 0 minute"
+        one: "less than 1 minute"
+        other: "less than %{count} minute"
+      less_than_x_seconds:
+        zero: "less than 0 second"
+        one: "less than 1 second"
+        other: "less than %{count} seconds"
+      over_x_years:
+        one: "less than 1 year"
+        other: "more than %{count} years"
+      x_days:
+        one: "1 day"
+        other: "%{count} days"
+      x_hours:
+        one: "1 hour"
+        other: "%{count} hours"
+      x_minutes:
+        one: "1 minute"
+        other: "%{count} minute"
+      x_months:
+        one: "1 month"
+        other: "%{count} months"
+      x_years:
+        one: "1 year"
+        other: "%{count} years"
+      x_seconds:
+        one: "1 second"
+        other: "%{count} second"
+
   shared:
     footer_message:
       help: "Help"

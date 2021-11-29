@@ -155,6 +155,66 @@ describe AssignmentsController do
     end
   end
 
+  describe '#create with countofcomments' do
+    before(:each) do
+      allow(AssignmentForm).to receive(:new).with(any_args).and_return(assignment_form)
+      @params = {
+        button: '',
+        assignment_form: {
+          assignment_questionnaire: [{"assignment_id" => "1", "questionnaire_id" => "666", "dropdown" => "true",
+                                      "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
+          due_date: [{"id" => "", "parent_id" => "", "round" => "1", "deadline_type_id" => "1", "due_at" => "2017/12/05 00:00", "submission_allowed_id" => "3", "review_allowed_id" => "1", "teammate_review_allowed_id" => "3", "review_of_review_allowed_id" => "1", "threshold" => "1"},
+                     {"id" => "", "parent_id" => "", "round" => "1", "deadline_type_id" => "2", "due_at" => "2017/12/02 00:00", "submission_allowed_id" => "1", "review_allowed_id" => "3", "teammate_review_allowed_id" => "3", "review_of_review_allowed_id" => "1", "threshold" => "1"}],
+          assignment: {
+            instructor_id: 2,
+            course_id: 1,
+            max_team_size: 1,
+            id: 1,
+            name: 'test assignment',
+            directory_path: '/test',
+            spec_location: '',
+            private: false,
+            show_teammate_reviews: false,
+            require_quiz: false,
+            num_quiz_questions: 0,
+            staggered_deadline: false,
+            microtask: false,
+            reviews_visible_to_all: false,
+            is_calibrated: false,
+            availability_flag: true,
+            reputation_algorithm: 'Lauw',
+            heatgrid_metric: 'countofcomments',
+            simicheck: -1,
+            simicheck_threshold: 100
+          }
+        }
+      }
+    end
+    context 'when assignment_form is saved successfully' do
+      it 'redirects to assignment#edit page' do
+        allow(assignment_form).to receive(:assignment).and_return(assignment)
+        allow(assignment_form).to receive(:save).and_return(true)
+        allow(assignment_form).to receive(:update).with(any_args).and_return(true)
+        allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))
+        allow(assignment).to receive(:id).and_return(1)
+        allow(Assignment).to receive(:find_by).with(id: 1).and_return(assignment)
+        allow_any_instance_of(AssignmentsController).to receive(:undo_link)
+          .with('Assignment "test assignment" has been created successfully. ').and_return(true)
+        post :create, @params
+        expect(response).to redirect_to('/assignments/1/edit')
+      end
+    end
+
+    context 'when assignment_form is not saved successfully' do
+      it 'renders assignment#new page' do
+        allow(assignment_form).to receive(:save).and_return(false)
+        post :create, @params
+        expect(response).to render_template(:new)
+      end
+    end
+  end
+
+
   describe '#edit' do
     context 'when assignment has staggered deadlines' do
       it 'shows an error flash message and renders edit page' do
@@ -246,6 +306,7 @@ describe AssignmentsController do
               is_calibrated: false,
               availability_flag: true,
               reputation_algorithm: 'Lauw',
+              heatgrid_metric: 'countofcomments',
               simicheck: -1,
               simicheck_threshold: 100
             }

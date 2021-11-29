@@ -15,26 +15,30 @@ describe JoinTeamRequestsController do
     allow(JoinTeamRequest).to receive(:find).with("2").and_return(join_team_request2)
     allow(join_team_request2).to receive(:update_attribute).with(any_args).and_return('OK!')
   }
-  context 'not provides access to people with' do
-    it 'student credentials' do
+  # Testing action_allowed? controller
+  context 'provides access to people with' do
+    it 'will give students above access' do
       stub_current_user(student1, student1.role.name, student1.role)
+      # Expecting students to allowed access.
       expect(controller.send(:action_allowed?)).to be true
     end
   end
 
+
   describe "GET index" do
     it "routes to index page" do
-      allow(JoinTeamRequest).to receive(:all).and_return(join_team_request1)#([join_team_request1, join_team_request2])
+      # Stubbing an object to receive .all method to give list of index
+      allow(JoinTeamRequest).to receive(:all).and_return(join_team_request1)
       params = {action: 'index'}
       session = {user: ta}
       result = get :index, params, session
       expect(result.status).to eq 302
     end
   end
-
+  # Testing show method
   describe "GET #show" do
-    context "#show" do
-      it "when it is valid" do
+    context "when show is valid" do
+      it "will show particular student team given index" do
         allow(JoinTeamRequest).to receive(:find).and_return(join_team_request2)
         params = {action: 'show'}
         session = {user: ta}
@@ -44,6 +48,7 @@ describe JoinTeamRequestsController do
     end
   end
 
+  # Testing new method
   describe "GET #new" do
     context "when new is called" do
       it "routes to new page" do
@@ -53,8 +58,10 @@ describe JoinTeamRequestsController do
     end
   end
 
+  # Testing create method
   describe "POST #create" do
     before(:each) do
+      # Stubbing participant to receive an object with id = 1
       allow(Participant).to receive(:find).with("1").and_return(participant)
     end
     context "when resource is not saved!" do
@@ -66,6 +73,7 @@ describe JoinTeamRequestsController do
         expect(response).to render_template("new")
       end
     end
+    # Testing when the object is being saved to the database
     context "when resource is saved" do
       it "valid response" do
         allow(JoinTeamRequest).to receive(:new).and_return(join_team_request2)
@@ -89,15 +97,16 @@ describe JoinTeamRequestsController do
       end
     end
   end
-
+  # Testing the Update method
   describe "PUT #update" do
     before(:each) do
+      # Stubbing an object and allowing it to receive update_attributes method
       join_team_request2 = JoinTeamRequest.new
       allow(join_team_request2).to receive(:update_attributes).with(:comments).and_return(true)
       allow(Participant).to receive(:find).with("1").and_return(participant)
     end
-    context "when the join_team_request is updated" do
 
+    context "when the join_team_request is updated" do
       it "gives update message" do
         allow(Participant).to receive(:find).with("1").and_return(participant)
         allow(Team).to receive(:find).with("2").and_return(team2)
@@ -108,39 +117,48 @@ describe JoinTeamRequestsController do
                       comments: "Changed"
                   }
         }
+        # Updating "Comments" in the join team request object
         put :update, params
         expect(response.status).to eq 302
       end
-
     end
   end
 
+  # Testing Decline method
   describe "#decline" do
     context "when join team request is declined" do
-      it "will change status to 'D'" do
+      before(:each) do
         allow(JoinTeamRequest).to receive(:find).and_return(join_team_request2)
         allow(join_team_request2).to receive(:save).and_return(true)
+      end
+      it "will change status to 'D'" do
         params = {action: 'decline'}
         session = {user: ta}
         result = get :decline, params, session
         expect(result.status).to eq 302
+      end
+      it "will redirect to view student teams path" do
+        params = {action: 'decline'}
+        session = {user: ta}
+        result = get :decline, params, session
         expect(result).to redirect_to(view_student_teams_path)
       end
     end
   end
-
+  # Testing destroy method
   describe 'destroy method' do
-    it 'gets coverage' do
-      allow(JoinTeamRequest).to receive(:find).and_return(join_team_request2)
-      allow(join_team_request2).to receive(:destroy).and_return(true)
-      params = {action: 'destroy'}
-      session = {user: ta}
-      result = get :destroy, params, session
-      expect(result.status).to eq 302
-      expect(result).to redirect_to(join_team_requests_url)
+    context "when valid" do
+      it 'will redirect to join team request page' do
+        allow(JoinTeamRequest).to receive(:find).and_return(join_team_request2)
+        allow(join_team_request2).to receive(:destroy).and_return(true)
+        params = {action: 'destroy'}
+        session = {user: ta}
+        result = get :destroy, params, session
+        expect(result.status).to eq 302
+        expect(result).to redirect_to(join_team_requests_url)
+      end
     end
   end
-
 end
 
 

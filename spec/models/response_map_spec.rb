@@ -27,7 +27,6 @@ describe ResponseMap do
   let(:response4) { build(:response, id: 5, map_id: 5, round: 1, response_map: review_response_map2,  is_submitted: true) }
   let(:response5) { build(:response, id: 6, map_id: 5, round: 1, response_map: review_response_map2, is_submitted: false) }
 
-  #Ask Nick if response should be an array
   before(:each) do
     allow(review_response_map).to receive(:response).and_return([response])
     allow(review_response_map1).to receive(:response).and_return([response1])
@@ -41,7 +40,6 @@ describe ResponseMap do
       it 'returns only submitted responses' do
         allow(Team).to receive(:find).and_return(team)
         allow(ResponseMap).to receive(:where).with(reviewee_id: team.id).and_return([review_response_map, review_response_map1])
-        # Ask Nick if where always returns an array
         allow(Response).to receive(:where).with(map_id: 1).and_return([response])
         allow(Response).to receive(:where).with(map_id: 2).and_return([response1])
         responses = ResponseMap.assessments_for(team)
@@ -53,8 +51,6 @@ describe ResponseMap do
       it 'returns all responses' do
         allow(Team).to receive(:find).and_return(team1)
         allow(ResponseMap).to receive(:where).with(reviewee_id: participant2.id).and_return([teammate_review_response_map, teammate_review_response_map1])
-        # Ask Nick if where always returns an array
-        # Also ask Nick about ResponseMap factory
         allow(Response).to receive(:where).with(map_id: 3).and_return([response2])
         allow(Response).to receive(:where).with(map_id: 4).and_return([response3])
         responses = ResponseMap.assessments_for(participant2)
@@ -68,20 +64,14 @@ describe ResponseMap do
     context 'Returning latest version of responses by reviewer' do
       it 'returns the second response' do
         allow(ResponseMap).to receive(:where).with(reviewee_id: team2.id, reviewer_id: participant2.id ).and_return([review_response_map2])
-        #Ask Nick if map is supposed to be map.id
         allow(Response).to receive(:where).with(map_id: review_response_map2.id).and_return([response4, response5])
-        #Ask Nick about reviewer_is_team function, no method reviewer_is_team or self.team
-        #Ask Nick about self.comparator
         responses = ResponseMap.reviewer_assessments_for(team2, participant2)
 	expect(responses).to eq(response5)
       end
       it 'returns the response with the version number' do
         response4.version_num = 2
         allow(ResponseMap).to receive(:where).with(reviewee_id: team2.id, reviewer_id: participant2.id ).and_return([review_response_map2])
-        #Ask Nick if map is supposed to be map.id
         allow(Response).to receive(:where).with(map_id: review_response_map2.id).and_return([response4, response5])
-        #Ask Nick about reviewer_is_team function, no method reviewer_is_team or self.team
-        #Ask Nick about self.comparator
         responses = ResponseMap.reviewer_assessments_for(team2, participant2)
 	expect(responses).to eq(response4)
       end
@@ -89,10 +79,7 @@ describe ResponseMap do
         response4.version_num = 3
         response5.version_num = 2
         allow(ResponseMap).to receive(:where).with(reviewee_id: team2.id, reviewer_id: participant2.id ).and_return([review_response_map2])
-        #Ask Nick if map is supposed to be map.id
         allow(Response).to receive(:where).with(map_id: review_response_map2.id).and_return([response4, response5])
-        #Ask Nick about reviewer_is_team function, no method reviewer_is_team or self.team
-        #Ask Nick about self.comparator
         responses = ResponseMap.reviewer_assessments_for(team2, participant2)
 	expect(responses).to eq(response4)
       end
@@ -113,10 +100,9 @@ describe ResponseMap do
   describe 'assign_metareviewer' do
     context 'Assigns a metareviewer to a review' do
       it 'creates a metareview response map' do
-        #Ask Nick how to test a create, it says there is no difference between the doubles
-        metareview_response_map_temp = double('meta_review_response_map', reviewed_object_id: review_response_map1.id, reviewer_id: participant2.id, reviewee_id: participant1.id)
+        metareview_response_map_temp = create(:meta_review_response_map, reviewed_object_id: review_response_map1.id, reviewer_id: participant2.id, reviewee_id: participant1.id)
         allow(MetareviewResponseMap).to receive(:create).with(reviewed_object_id: review_response_map1.id, reviewer_id: participant2.id, reviewee_id: participant1.id).and_return(\
-          double('meta_review_response_map', reviewed_object_id: review_response_map1.id, reviewer_id: participant2.id, reviewee_id: participant1.id))
+          metareview_response_map_temp)
         expect(review_response_map1.assign_metareviewer(participant2)).to eq(metareview_response_map_temp)
       end
     end
@@ -126,14 +112,11 @@ describe ResponseMap do
   describe 'find_team_member' do
     context 'Finds the team of a reviewee' do
       it 'finds the team for a metareview response map' do
-        #Ask Nick about map line
-        #Ask Nick if find_by returns array
         allow(ResponseMap).to receive(:find_by).with(id: metareview_response_map.reviewed_object_id).and_return(metareview_response_map)
         allow(AssignmentTeam).to receive(:find_by).with(id: review_response_map.reviewee_id).and_return(team)
         expect(metareview_response_map.find_team_member).to eq(team)
       end
       it 'finds the team for a regular response map' do
-        #Ask Nick if there should be an id: before reviewee_id in the with
         allow(AssignmentTeam).to receive(:find).with(review_response_map.reviewee_id).and_return(team)
         expect(review_response_map.find_team_member).to eq(team)
       end

@@ -50,7 +50,7 @@ class ResponseMap < ActiveRecord::Base
     # get_reviewer may return an AssignmentParticipant or an AssignmentTeam
     #map = where(reviewee_id: team.id, reviewer_id: reviewer.get_reviewer.id)
     map = where(reviewee_id: team.id, reviewer_id: reviewer.id)
-    Response.where(map_id: map.first .id).sort {|m1, m2| self.comparator(m1, m2) }[0]
+    Response.where(map_id: map.first.id).sort {|m1, m2| self.comparator(m1, m2) }[0]
   end
 
   # Placeholder method, override in derived classes if required.

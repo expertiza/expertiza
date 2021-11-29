@@ -2,10 +2,9 @@ require_relative 'helpers/assignment_creation_helper'
 include AssignmentCreationHelper
 
 describe "assignment creation due dates", js: true do
-
+let(:assignment) { build(:assignment, id: 1, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
   before(:each) do
     create_deadline_types()
-    let(:assignment) { build(:assignment, id: 1, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
     login_as("instructor6")
   end
     it "should edit assignment available to students" do

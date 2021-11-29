@@ -10,9 +10,8 @@ describe "assignment creation due dates", js: true do
     let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
     let(:team) { build(:assignment_team, id: 1, name: 'no team') }
     let(:metric) { build(:metric, id: 1, metric_source_id: 1, participant_id: participant.id, github_id:"student@ncsu.edu") }
+    let(:assignment_team) {build(:assignment_team, id: 1, name: 'team1', submitted_hyperlinks: ["https://www.github.com/anonymous/expertiza", "https://github.com/expertiza/expertiza/pull/1234"])}
   before(:each) do
-    create_deadline_types()
-    #@assignment_team = create(:assignment_team, id: 1, name: 'team1', submitted_hyperlinks: ["https://www.github.com/anonymous/expertiza", "https://github.com/expertiza/expertiza/pull/1234"])
     login_as("instructor6")
   end
     it "should edit assignment available to students" do

@@ -1197,31 +1197,25 @@ jQuery(document).ready(function() {
 
     render: function () {
       return (
-          <div>
-            <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(6, auto) 1fr', gridGap: '8px' }}>
-              <label for="course">Course:</label>
-              <input
-                  data-toggle="tooltip" title="Search for questionnaires that are used in the given course"
-                  ref="course"
-                  type="text"
-                  className="form-control" />
-            </div>
-            <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(6, auto) 1fr', gridGap: '8px' }}>
-              <label for="assignment">Assignment:</label>
-              <input
-                  data-toggle="tooltip" title="Search for questionnaires that are used in the given assignment"
-                  ref="assignment"
-                  type="text"
-                  className="form-control" />
-            </div>
-            <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(6, auto) 1fr', gridGap: '8px' }}>
-              <label for="question_text">Question Text:</label>
-              <input
-                  data-toggle="tooltip" title="Search by words used in questions that belong to the questionnaires"
-                  ref="question_text"
-                  type="text"
-                  className="form-control" />
-            </div>
+          <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(6, auto) 1fr', gridGap: '8px' }}>
+            <label for="question_text">Question Text:</label>
+            <input
+                data-toggle="tooltip" title="Search by words used in questions that belong to the questionnaires"
+                ref="question_text"
+                type="text"
+                className="form-control" />
+            <label for="course">Course:</label>
+            <input
+                data-toggle="tooltip" title="Search for questionnaires that are used in the given course"
+                ref="course"
+                type="text"
+                className="form-control" />
+            <label for="assignment">Assignment:</label>
+            <input
+                data-toggle="tooltip" title="Search for questionnaires that are used in the given assignment"
+                ref="assignment"
+                type="text"
+                className="form-control" />
           </div>
       );
     }

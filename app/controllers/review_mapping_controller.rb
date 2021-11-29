@@ -426,6 +426,12 @@ class ReviewMappingController < ApplicationController
     review_grade.reviewer_id = session[:user].id
     begin
       review_grade.save!
+      GradingHistory.create(instructor_id: session[:user].id,
+        assignment_id: params[:assignment_id],
+        grading_type: "Review",
+        grade_receiver_id: Participant.find(params[:participant_id]).user_id,
+        grade: params[:grade_for_reviewer],
+        comment: params[:comment_for_reviewer])
       flash[:success] = 'Grade and comment for reviewer successfully saved.'
     rescue StandardError
       flash[:error] = $ERROR_INFO

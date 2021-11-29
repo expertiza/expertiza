@@ -91,7 +91,7 @@ class User < ActiveRecord::Base
     end
 
     # Generates a regular expression for the searched username to compare it in the user list
-    regex_uid = Regexp.new(search_usrid)
+    regex_usrid = Regexp.new(search_usrid)
 
     # Generates a regular expression for the searched full name to compare it in the user list
     regex_fname = Regexp.new(search_fname)
@@ -103,7 +103,7 @@ class User < ActiveRecord::Base
     # Combines all the search criteria with an and operator and returns the results satisfying all the
     # specified conditions.
     selected_users = user_list.select do |item|
-      regex_uid.match(item.name) \
+      regex_usrid.match(item.name) \
       and regex_fname.match(item.fullname) \
       and regex_email.match(item.email)
     end

@@ -83,7 +83,7 @@ class UsersController < ApplicationController
     search_email = ".*"
 
     # Appends the user name to the search criteria, if found in the username text box
-    search_uid = ".*" + params[:search_usrid].strip + ".*" if params[:search_usrid].present?
+    search_usrid = ".*" + params[:search_usrid].strip + ".*" if params[:search_usrid].present?
 
     # Appends the full name to the search criteria, if found in the name text box
     search_fname = ".*" + params[:search_fname].strip + ".*" if params[:search_fname].present?

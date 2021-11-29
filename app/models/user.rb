@@ -70,7 +70,7 @@ class User < ActiveRecord::Base
 
   # This method populates the model with the data corresponding to the search criteria. If the search criteria is empty
   # all users based on their role are fetched and sent to the View to render.
-  def get_user_list(search_usrid = '', search_fname = '', search_email = '')
+  def get_user_list(search_uname = '', search_fname = '', search_email = '')
     user_list = []
     # If the user is a super admin, fetch all users
     user_list = SuperAdministrator.get_user_list if self.role.super_admin?
@@ -91,7 +91,7 @@ class User < ActiveRecord::Base
     end
 
     # Generates a regular expression for the searched username to compare it in the user list
-    regex_uid = Regexp.new(search_usrid)
+    regex_uname = Regexp.new(search_uname)
 
     # Generates a regular expression for the searched full name to compare it in the user list
     regex_fname = Regexp.new(search_fname)
@@ -103,7 +103,7 @@ class User < ActiveRecord::Base
     # Combines all the search criteria with an and operator and returns the results satisfying all the
     # specified conditions.
     selected_users = user_list.select do |item|
-      regex_uid.match(item.name) \
+      regex_uname.match(item.name) \
       and regex_fname.match(item.fullname) \
       and regex_email.match(item.email)
     end

@@ -40,15 +40,15 @@ class TeamsUsersController < ApplicationController
           add_member_return = team.add_member(user, team.parent_id)
           puts add_member_return.to_s
           flash[:error] = "This team already has the maximum number of members." if add_member_return == false
-  
-          user = TeamsUser.last
-          undo_link("The team @teams_user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
+
 
           # E2115 Mentor Management
           # Kick off the Mentor Management workflow
           # Note: this is _not_ supported for CourseTeams which is why the other
           # half of this if block does not include the same code
           if add_member_return
+            user = TeamsUser.last
+            undo_link("The team @teams_user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
             MentorManagement.assign_mentor(assignment.id, team.id)
           end
         end
@@ -60,8 +60,10 @@ class TeamsUsersController < ApplicationController
         else
           add_member_return = team.add_member(user)
           flash[:error] = "This team already has the maximum number of members." if add_member_return == false
+          if add_member_return
           @teams_user = TeamsUser.last
           undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
+          end
         end
       end
     end
@@ -70,6 +72,7 @@ class TeamsUsersController < ApplicationController
   end
 
   def delete
+    puts 'delete'
     @teams_user = TeamsUser.find(params[:id])
     parent_id = Team.find(@teams_user.team_id).parent_id
     @user = User.find(@teams_user.user_id)

@@ -59,9 +59,11 @@ class Team < ActiveRecord::Base
 
   # Add member to the team, changed to hash by E1776
   def add_member(user, _assignment_id = nil)
+    puts 'add_member entry'
     raise "The user #{user.name} is already a member of the team #{self.name}" if user?(user)
     can_add_member = false
     unless full?
+      puts 'add_member not full'
       can_add_member = true
       t_user = TeamsUser.create(user_id: user.id, team_id: self.id)
       parent = TeamNode.find_by(node_object_id: self.id)

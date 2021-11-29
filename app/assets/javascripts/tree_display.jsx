@@ -1025,7 +1025,7 @@ jQuery(document).ready(function() {
       var isSelectValueUpdatedDate = this.props.selectValue === 'updated_date'
 
       function isEntryValid(entry) {
-        if (this.props.selectValue === 'empty' || (this.props.showPublic && isDataTypeCourse)) {
+        if (_this.props.selectValue === 'empty' || (_this.props.showPublic && isDataTypeCourse)) {
           return ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
             (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
             (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
@@ -1052,12 +1052,12 @@ jQuery(document).ready(function() {
             max_team_size={entry.max_team_size}
             is_intelligent={entry.is_intelligent}
             require_quiz={entry.require_quiz}
-            dataType={this.props.dataType}
+            dataType={_this.props.dataType}
             //this is just a hack. All current users courses are marked as private during fetch for display purpose.
             private={entry.private}
             allow_suggestions={entry.allow_suggestions}
             has_topic={entry.has_topic}
-            rowClicked={this.handleExpandClick}
+            rowClicked={_this.handleExpandClick}
             newParams={entry.newParams}
           />
         )
@@ -1066,11 +1066,11 @@ jQuery(document).ready(function() {
             key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2 + 1).toString() + '_' + i}
             id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2 + 1).toString() + '_' + i}
             showElement={
-              this.state.expandedRow.indexOf(
+              _this.state.expandedRow.indexOf(
                 entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i
               ) > -1 ? '' : 'none'
             }
-            dataType={this.props.dataType}
+            dataType={_this.props.dataType}
             children={entry.children}
           />
         )

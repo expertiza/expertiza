@@ -42,8 +42,8 @@
   <% average /= 2 %>
   <h4>Average peer review score: <span class = "c5"><%= average.is_a?(Float)? sprintf("%.2f",average): average %></span></h4>
 <% elsif @pscore[:review]  %>
-<% rscore_review = Rscore.new(@pscore,:review)%>
-<h4>Average peer review score: <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h4>
+  <% rscore_review = Rscore.new(@pscore,:review)%>
+  <h4>Average peer review score: <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h4>
 <%else %>
   <h4> There are no reviews for this assignment</h4>
 <%end %>

@@ -36,72 +36,72 @@ class AssignmentParticipant < Participant
     reviewers
   end
 
-  def review_score
-    review_questionnaire = self.assignment.questionnaires.select {|q| q.type == "ReviewQuestionnaire" }[0]
-    assessment = review_questionnaire.get_assessments_for(self)
-    (Answer.compute_scores(assessment, review_questionnaire.questions)[:avg] / 100.00) * review_questionnaire.max_possible_score.to_f
-  end
+  # def review_score
+  #   review_questionnaire = self.assignment.questionnaires.select {|q| q.type == "ReviewQuestionnaire" }[0]
+  #   assessment = review_questionnaire.get_assessments_for(self)
+  #   (Answer.compute_scores(assessment, review_questionnaire.questions)[:avg] / 100.00) * review_questionnaire.max_possible_score.to_f
+  # end
 
-  # Return scores that this participant has been given
-  # methods extracted from scores method: merge_scores, topic_total_scores, calculate_scores
-  def scores(questions)
-    scores = {}
-    scores[:participant] = self
-    compute_assignment_score(questions, scores)
-    scores[:total_score] = self.assignment.compute_total_score(scores)
-    # merge scores[review#] (for each round) to score[review]  -Yang
-    merge_scores(scores) if self.assignment.vary_by_round
-    # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
-    # PS: I don't like the fact that we are doing this here but it is difficult to make it work anywhere else
-    topic_total_scores(scores) if self.assignment.microtask?
+  # # Return scores that this participant has been given
+  # # methods extracted from scores method: merge_scores, topic_total_scores, calculate_scores
+  # def scores(questions)
+  #   scores = {}
+  #   scores[:participant] = self
+  #   compute_assignment_score(questions, scores)
+  #   scores[:total_score] = self.assignment.compute_total_score(scores)
+  #   # merge scores[review#] (for each round) to score[review]  -Yang
+  #   merge_scores(scores) if self.assignment.vary_by_round
+  #   # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
+  #   # PS: I don't like the fact that we are doing this here but it is difficult to make it work anywhere else
+  #   topic_total_scores(scores) if self.assignment.microtask?
 
-    # for all quiz questionnaires (quizzes) taken by the participant
-    # quiz_responses = []
-    # quiz_response_mappings = QuizResponseMap.where(reviewer_id: self.id)
-    # quiz_response_mappings.each do |qmapping|
-    #   quiz_responses << qmapping.response if qmapping.response
-    # end
-    # scores[:quiz] = Hash.new
-    # scores[:quiz][:assessments] = quiz_responses
-    # scores[:quiz][:scores] = Answer.compute_quiz_scores(scores[:quiz][:assessments])
-    scores[:total_score] = assignment.compute_total_score(scores) if !self.assignment.vary_by_round
-    # scores[:total_score] += compute_quiz_scores(scores)
-    # move lots of calculation from view(_participant.html.erb) to model
-    calculate_scores(scores)
-  end
+  #   # for all quiz questionnaires (quizzes) taken by the participant
+  #   # quiz_responses = []
+  #   # quiz_response_mappings = QuizResponseMap.where(reviewer_id: self.id)
+  #   # quiz_response_mappings.each do |qmapping|
+  #   #   quiz_responses << qmapping.response if qmapping.response
+  #   # end
+  #   # scores[:quiz] = Hash.new
+  #   # scores[:quiz][:assessments] = quiz_responses
+  #   # scores[:quiz][:scores] = Answer.compute_quiz_scores(scores[:quiz][:assessments])
+  #   scores[:total_score] = assignment.compute_total_score(scores) if !self.assignment.vary_by_round
+  #   # scores[:total_score] += compute_quiz_scores(scores)
+  #   # move lots of calculation from view(_participant.html.erb) to model
+  #   calculate_scores(scores)
+  # end
 
-  def compute_assignment_score(questions, scores)
-    counter_for_same_rubric = 0
-    self.assignment.questionnaires.each do |questionnaire|
-      if self.assignment.vary_by_round? && questionnaire.type == "ReviewQuestionnaire"
-        questionnaires = AssignmentQuestionnaire.where(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id)
-        if questionnaires.count > 1
-          round = questionnaires[counter_for_same_rubric].used_in_round
-          counter_for_same_rubric += 1
-        else
-          round = questionnaires[0].used_in_round
-          counter_for_same_rubric = 0
-        end
-      else
-        round = AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id).used_in_round
-      end
-      # create symbol for "varying rubrics" feature -Yang
-      questionnaire_symbol = if round.nil?
-                               questionnaire.symbol
-                             else
-                               (questionnaire.symbol.to_s + round.to_s).to_sym
-                             end
+  # def compute_assignment_score(questions, scores)
+  #   counter_for_same_rubric = 0
+  #   self.assignment.questionnaires.each do |questionnaire|
+  #     if self.assignment.vary_by_round? && questionnaire.type == "ReviewQuestionnaire"
+  #       questionnaires = AssignmentQuestionnaire.where(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id)
+  #       if questionnaires.count > 1
+  #         round = questionnaires[counter_for_same_rubric].used_in_round
+  #         counter_for_same_rubric += 1
+  #       else
+  #         round = questionnaires[0].used_in_round
+  #         counter_for_same_rubric = 0
+  #       end
+  #     else
+  #       round = AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id).used_in_round
+  #     end
+  #     # create symbol for "varying rubrics" feature -Yang
+  #     questionnaire_symbol = if round.nil?
+  #                              questionnaire.symbol
+  #                            else
+  #                              (questionnaire.symbol.to_s + round.to_s).to_sym
+  #                            end
 
-      scores[questionnaire_symbol] = {}
+  #     scores[questionnaire_symbol] = {}
 
-      scores[questionnaire_symbol][:assessments] = if round.nil?
-                                                     questionnaire.get_assessments_for(self)
-                                                   else
-                                                     questionnaire.get_assessments_round_for(self, round)
-                                                   end
-      scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
-    end
-  end
+  #     scores[questionnaire_symbol][:assessments] = if round.nil?
+  #                                                    questionnaire.get_assessments_for(self)
+  #                                                  else
+  #                                                    questionnaire.get_assessments_round_for(self, round)
+  #                                                  end
+  #     scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
+  #   end
+  # end
 
   # E1973, dummy method to match the functionality of AssignmentTeam
   def set_current_user(current_user)

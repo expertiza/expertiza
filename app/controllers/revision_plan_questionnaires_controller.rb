@@ -4,12 +4,10 @@ class RevisionPlanQuestionnairesController < QuestionnairesController
   def action_allowed?
     case params[:action]
     when 'edit'
-      @team_members = Array.new
+      
       questionnaire = Questionnaire.find(params[:id])
-      TeamsUser.where(["team_id = ?", params[:team_id]]).each do |teamuser|
-	@team_members.push( teamuser.user_id)
-      end
-      (user_logged_in? && @team_members.collect { |u|  }.include?(session[:user].id)) || 1
+      
+      (user_logged_in? && Team.is_team_members?(params[:team_id],session[:user].id) ) || 1
     else
       super
     end

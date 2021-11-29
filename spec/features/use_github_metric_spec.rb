@@ -33,7 +33,7 @@ describe "assignment creation due dates", js: true do
   end
     it "should edit assignment available to students" do
          visit "/assignments/1/edit"
-    	 find(:css, "#use_github[value='use_github']").set(true)
+    	 check('Use github metrics?', allow_label_click: true)
          visit "/assignments/list_submissions?id=1"
          expect(page).to have_content("Github data")
     end

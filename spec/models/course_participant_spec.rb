@@ -1,11 +1,10 @@
-require 'byebug'
+
 describe "CourseParticipant" do
   let(:course) { build(:course, id: 1, name: 'ECE517')  }
   let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team])  } 
   let(:assignment_participant) {build(:participant, id: 1)}
   '''describe "#copy" do
     #before(:each) do
-    #  byebug
     #  assignment = build(:assignment)
     #  course_participant = build(:course_participant)
     #  @assignment_participant = build(:participant)
@@ -29,7 +28,6 @@ describe "CourseParticipant" do
   describe ".import" do
     context 'when record is empty' do
       it 'raises an ArgumentError' do
-        byebug
         expect { CourseParticipant.import({}, nil, nil) }.to raise_error(ArgumentError)
       end
     end

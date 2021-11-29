@@ -17,11 +17,14 @@ shared_context 'object initializations' do
   let(:team4) { build_stubbed(:assignment_team, id: 4, parent_id: assignment1.id) }
   let(:team5) { build_stubbed(:course_team, id: 5, parent_id: course1.id) }
   let(:team6) { build_stubbed(:course_team, id: 6, parent_id: course1.id) }
+  let(:team7) { build_stubbed(:assignment_team, name: 'test',  parent_id: course1.id) }
   let(:join_team_request1) { build_stubbed(:join_team_request, id: 1, team_id: team1.id, status: 'P') }
   let(:join_team_request2) { build_stubbed(:join_team_request, id: 2, team_id: team2.id, status: 'P',comments: "Any comment") }
   let(:join_team_request3) { build_stubbed(:join_team_request, id: 3, team_id: team2.id, status: 'D',comments: "Updated") }
   let(:invalidrequest) { build_stubbed(:join_team_request) }
   let(:participant) { build_stubbed(:participant, id: 1) }
+  let(:node1) { build_stubbed(:assignment_node,  node_object_id: 1) }
+  let(:team_user1) { build_stubbed(:team_user, team_id:1, user_id:1)}
 
 end
 # Creating a shared context for authorization check to be shared with teams related files

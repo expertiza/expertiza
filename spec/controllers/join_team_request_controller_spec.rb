@@ -75,13 +75,15 @@ describe JoinTeamRequestsController do
     end
     # Testing when the object is being saved to the database
     context "when resource is saved" do
-      it "valid response" do
+      before(:each) do
         allow(JoinTeamRequest).to receive(:new).and_return(join_team_request2)
         allow(Team).to receive(:find).with("1").and_return(team1)
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
         allow(Participant).to receive(:where).with(user_id: 1,parent_id: '1').and_return([participant])
         allow(join_team_request2).to receive(:save).and_return(true)
-
+      end
+      it "valid response" do
+        allow(join_team_request2).to receive(:save).and_return(true)
         params = {
           id: 2,
           join_team_request2: {
@@ -94,6 +96,15 @@ describe JoinTeamRequestsController do
         post :create, params, session
         expect(response.status).to eq 302
         expect(join_team_request2.status).to eq('P')
+      end
+    end
+    context "when it is not created" do
+      it "will page for new " do
+        allow(join_team_request2).to receive(:save).and_return(false)
+        params = {action: 'new'}
+        session = {user: student1}
+        get :new, params, session
+        expect(response.status).to eq 200
       end
     end
   end

@@ -148,7 +148,7 @@ describe AnswerTagsController do
       end
 
       it 'restricts updating answer tag by student if no mapping is found related to any answer for that tag (foreign key constraint)' do
-        params = {answer_id: nil,tag_prompt_deployment_id: tag_deploy.id,value: 0}
+        params = {answer_id: nil,tag_prompt_deployment_id: tag_deploy.id,value: "0"}
         expect {
           post :create_edit, params, session
         }.to raise_error(ActiveRecord::RecordInvalid)

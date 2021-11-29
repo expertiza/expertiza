@@ -33,7 +33,7 @@ describe "assignment creation due dates", js: true do
   end
     it "should edit assignment available to students" do
          visit "/assignments/1/edit"
-         sleep(inspection_time=60)
+         sleep(inspection_time=5)
           expect{
                 check('Use github metrics?', allow_label_click: true)
              }.to change(use_github_metrics, :count).by(1)

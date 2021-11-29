@@ -22,11 +22,6 @@ class ReviewBidsController < ApplicationController
     end
   end
 
-  #needed in order to run index from "Request another submission" button correctly
-  def create
-    redirect_to action: 'index', params: params
-  end
-
   # provides variables for reviewing page located at views/review_bids/others_work.html.erb
   def index
     @participant = AssignmentParticipant.find(params[:id])

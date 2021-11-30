@@ -916,11 +916,6 @@ jQuery(document).ready(function() {
       }
     },
     handleExpandClick: function (id, expanded, newParams) {
-        console.log('')
-        console.log('## id', id)
-        console.log('## expanded', expanded)
-        console.log('## newParams', newParams)
-        console.log('')
       if (expanded) {
         var newExpandedRow = this.state.expandedRow
         newExpandedRow.push(id)
@@ -970,9 +965,6 @@ jQuery(document).ready(function() {
                   newParams={entry.newParams}
               />
           )
-          console.log('===> show element', this.state.expandedRow.indexOf(
-              entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i
-          ) > -1 ? '' : 'none')
           rows.push(
               <ContentTableDetailsRow
                   key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2 + 1).toString() + '_' + i}
@@ -1311,7 +1303,6 @@ jQuery(document).ready(function() {
                 }
                 return data
             })
-              console.log('>>> tempData', searchFilteredData)
             this.setState({ searchFilteredData, searchPressed: true })
           }
       },
@@ -1459,7 +1450,7 @@ jQuery(document).ready(function() {
                 start_date = {this.state.start_date}
                 end_date = {this.state.end_date}
                 has_quiz_var = {this.state.has_quiz_var}
-                getSubFolderData={getSubFolderData}
+                getSubFolderData={this.getSubFolderData}
             />
           </div>
       )

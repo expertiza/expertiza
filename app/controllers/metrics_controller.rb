@@ -313,6 +313,7 @@ class MetricsController < ApplicationController
     http.verify_mode = OpenSSL::SSL::VERIFY_PEER
     # request = Net::HTTP::Post.new(uri.path, 'Authorization' => 'Bearer' + ' ' + session["github_access_token"]) # set up authorization
     request = Net::HTTP::Post.new(uri.path) # set up authorization
+    # send the token in the header
     request['Authorization'] = 'Bearer' + ' ' + session["github_access_token"]
     request.body = data.to_json # convert query message to json and pass as request body
     response = http.request(request) # make the actual request

@@ -46,7 +46,7 @@ class ReviewBidsController < ApplicationController
      end
     end
     @review_phase = next_due_date.deadline_type_id
-    @reviews_to_show = @@reviews_to_show.nil? ? (@assignment.num_reviews_required).to_i : @@reviews_to_show.to_i
+    #@reviews_to_show = @@reviews_to_show.nil? ? (@assignment.num_reviews_required).to_i : @@reviews_to_show.to_i
     # Finding how many reviews have been completed
     @num_reviews_completed = 0
     @review_mappings.each do |map|
@@ -139,7 +139,7 @@ class ReviewBidsController < ApplicationController
   def run_bidding_algorithm(bidding_data)
     # begin
     url = WEBSERVICE_CONFIG["review_bidding_webservice_url"] #won't work unless ENV variables are configured
-    url = 'http://app-csc517.herokuapp.com/match_topics' #hard coding for the time being
+    url = '152.7.176.78:5000/match_topics' #hard coding for the time being
     response = RestClient.post url, bidding_data.to_json, content_type: 'application/json', accept: :json
     return JSON.parse(response.body)
   rescue StandardError

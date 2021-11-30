@@ -86,7 +86,8 @@ describe "internationalization", js: true do
 
       visit "/course/#{course.id}/edit"
       expect(page).to have_select('course_locale', selected: 'Hindi')
-      expect(page).to have_content("एडिट कोर्स")
+      # Renders in english since translation is currently only enabled for students
+      expect(page).to have_content("Edit course")
     end
 
     it "should be able to persist course locale preference across sessions" do

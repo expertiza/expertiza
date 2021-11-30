@@ -173,5 +173,34 @@ describe TagPromptDeployment do
       expect(user_answer_tagging[1].percentage).to eq("100.0")
     end
 
+    it 'varies by round, there are no tags' do
+      allow(Team).to receive(:where).with(parent_id: self.assignment.id).and_return([team])
+      allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])
+      allow(assignment).to receive(:vary_by_round).and_return(true)
+      allow(ReviewResponseMap).to receive(:get_responses_for_team_round).and_return([response])
+      allow(Answer).to receive(:where).and_return(answersObjectArray)
+      allow(TeamsUser).to receive(:where).with(team_id: team.id).and_return([team_user1, team_user2])
+      allow(User).to receive(:find).with(user1.id).and_return(user1)
+      allow(User).to receive(:find).with(user2.id).and_return(user2)
+      allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: tag_dep.id, user_id: user1.id, answer_id: [2, 3]).and_return([])
+      allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: tag_dep.id, user_id: user2.id, answer_id: [2, 3]).and_return([])
+
+      user_answer_tagging = tag_dep.assignment_tagging_progress
+
+      expect(ResponseMap).not_to receive(:assessments_for)
+      expect(user_answer_tagging).not_to be_empty
+      expect(user_answer_tagging.length).to eq(2)
+
+      expect(user_answer_tagging[0].user).to eq(user1)
+      expect(user_answer_tagging[0].no_tagged).to eq(0)
+      expect(user_answer_tagging[0].no_not_tagged).to eq(2)
+      expect(user_answer_tagging[0].percentage).to eq("0.0")
+
+      expect(user_answer_tagging[1].user).to eq(user2)
+      expect(user_answer_tagging[1].no_tagged).to eq(0)
+      expect(user_answer_tagging[1].no_not_tagged).to eq(2)
+      expect(user_answer_tagging[1].percentage).to eq("0.0")
+    end
+
   end
 end

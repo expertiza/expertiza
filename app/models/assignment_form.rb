@@ -298,7 +298,6 @@ class AssignmentForm
         new_team_ids.append(catt.id)
       end
       dict = Hash[old_team_ids.zip new_team_ids]
-      count = 0
       old_team_ids.each do |catt|
         @old_team_user = TeamsUser.where(team_id: catt)
         @old_team_user.each do |matt|
@@ -310,12 +309,11 @@ class AssignmentForm
         end
         Participant.mapreviewresponseparticipant(old_assign, new_assign_id, dict)
         ReviewResponseMap.newreviewresp(old_assign, catt, dict, new_assign_id)
-        count += 1
 
-        @team_needed = Team.where(id:catt).first
+        @team_needed = Team.find(catt)
         old_directory_path = @team_needed.directory_path
         if File.exist?(old_directory_path)
-          @team_inserted = AssignmentTeam.where(id:dict[catt]).first
+          @team_inserted = AssignmentTeam.find(dict[catt])
           @team_inserted.set_student_directory_num
           new_directory_path = @team_inserted.directory_path
           Dir.mkdir(new_directory_path) unless File.exist?(new_directory_path)

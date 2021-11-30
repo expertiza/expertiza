@@ -10,6 +10,10 @@ class ParticipantsController < ApplicationController
     end
   end
 
+  def controller_locale
+    locale_for_student
+  end
+
   def list
     if Participant::PARTICIPANT_TYPES.include? params[:model]
       @root_node = Object.const_get(params[:model] + "Node").find_by(node_object_id: params[:id])

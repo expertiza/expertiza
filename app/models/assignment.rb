@@ -580,11 +580,6 @@ class Assignment < ActiveRecord::Base
     questionnaire_ids
   end
 
-  # Get locale value
-  def get_locale(id)
-    assignment = Assignment.find(id)
-    self.course.locale
-  end
 
   private
 

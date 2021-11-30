@@ -69,12 +69,6 @@ class Course < ActiveRecord::Base
     end
   end
 
-  # Get course's locale value
-  def self.get_locale(id)
-    course = Course.find(id)
-    course.locale
-  end
-
   require 'analytic/course_analytic'
   include CourseAnalytic
 end

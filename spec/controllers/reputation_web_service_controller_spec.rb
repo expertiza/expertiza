@@ -64,27 +64,31 @@ describe ReputationWebServiceController do
 
     context 'test json_generator' do
       it 'test 3 reviewer for one reviewee' do
-        # reivewer_1's review for reviewee_1: [5, 5, 5, 5, 5]
+        # reivewer_1's review for reviewee_1; Numeric value of the answer array
+        # for response_1_1: [5, 5, 5, 5, 5]
         create(:answer, question_id: @question_1_1.id, response_id: @response_1_1.id, answer: 5)
         create(:answer, question_id: @question_1_2.id, response_id: @response_1_1.id, answer: 5)
         create(:answer, question_id: @question_1_3.id, response_id: @response_1_1.id, answer: 5)
         create(:answer, question_id: @question_1_4.id, response_id: @response_1_1.id, answer: 5)
         create(:answer, question_id: @question_1_5.id, response_id: @response_1_1.id, answer: 5)
 
-        # reivewer_2's review for reviewee_1: [3, 3, 3, 3, 3]
+        # reivewer_2's review for reviewee_1; Numeric value of the answer array
+        # for response_1_2: [3, 3, 3, 3, 3]
         create(:answer, question_id: @question_1_1.id, response_id: @response_1_2.id, answer: 3)
         create(:answer, question_id: @question_1_2.id, response_id: @response_1_2.id, answer: 3)
         create(:answer, question_id: @question_1_3.id, response_id: @response_1_2.id, answer: 3)
         create(:answer, question_id: @question_1_4.id, response_id: @response_1_2.id, answer: 3)
         create(:answer, question_id: @question_1_5.id, response_id: @response_1_2.id, answer: 3)
 
-        # reivewer_3's review for reviewee_1: [1, 1, 1, 1, 1]
+        # reivewer_3's review for reviewee_1; Numeric value of the answer array
+        # for response_1_3: [1, 1, 1, 1, 1]
         create(:answer, question_id: @question_1_1.id, response_id: @response_1_3.id, answer: 1)
         create(:answer, question_id: @question_1_2.id, response_id: @response_1_3.id, answer: 1)
         create(:answer, question_id: @question_1_3.id, response_id: @response_1_3.id, answer: 1)
         create(:answer, question_id: @question_1_4.id, response_id: @response_1_3.id, answer: 1)
         create(:answer, question_id: @question_1_5.id, response_id: @response_1_3.id, answer: 1)
-        
+
+        # Expect to get JSON formart as 2D Hash with given answer array above per reviewer
         result = ReputationWebServiceController.new.json_generator(1, 0, 1)
         expect(result).to eq({"submission1"=>{"stu2"=>100.0, "stu3"=>60.0, "stu4"=>20.0}})
         #repeat for different answers

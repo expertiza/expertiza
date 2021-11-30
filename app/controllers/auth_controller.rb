@@ -48,7 +48,7 @@ class AuthController < ApplicationController
       github_login
     when "google_oauth2"
       google_login
-    when "github2021" # due to github https://developer.github.com/changes/2020-02-10-deprecating-auth-through-query-param/
+    when "github2021" # due to github 0
       custom_github_login
     else
       ExpertizaLogger.error LoggerMessage.new(controller_name, user.name, "Invalid OAuth Provider", "")

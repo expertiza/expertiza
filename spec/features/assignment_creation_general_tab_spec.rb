@@ -88,4 +88,11 @@ describe "Assignment creation general tab", js: true do
 
 		expect(page).to have_selector('#Calibration')
 	end
+
+	it "check if checking calibration shows the calibration in due dates tab" do
+		check 'assignment_form_assignment_is_calibrated'
+		click_button 'Save'
+		click_button 'DueDates'
+		expect(page).to have_selector(:xpath,'//*[@id="calibration"]')
+	end
 end

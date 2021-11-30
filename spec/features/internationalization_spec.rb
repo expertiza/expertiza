@@ -39,8 +39,8 @@ describe "internationalization", js: true do
       login_as(hindi_course_student.name)
       visit '/profile/update/edit'
 
-      # Default locale preference is 'No preference'
-      expect(page).to have_select('user_locale', selected: 'No preference')
+      # Default locale preference is 'No Preference'
+      expect(page).to have_select('user_locale', selected: 'No Preference')
       expect(page).to have_content("User Profile Information")
 
       select "English", :from => "user_locale"
@@ -57,7 +57,7 @@ describe "internationalization", js: true do
     it "should be able to persist user locale preference across sessions" do
       login_as(hindi_course_student.name)
       visit '/profile/update/edit'
-      expect(page).to have_select('user_locale', selected: 'No preference')
+      expect(page).to have_select('user_locale', selected: 'No Preference')
 
       select "Hindi", :from => "user_locale"
       click_button "Save", match: :first
@@ -109,7 +109,7 @@ describe "internationalization", js: true do
     it "views the profile page (and other pages without a locale affinity) in English" do
       login_as(hindi_course_student.name)
       visit '/profile/update/edit'
-      expect(page).to have_select('user_locale', selected: 'No preference')
+      expect(page).to have_select('user_locale', selected: 'No Preference')
 
       visit '/menu/student_task'
       expect(page).to have_content("Assignments")
@@ -117,7 +117,7 @@ describe "internationalization", js: true do
     it "views the course page in the course language (and also for other pages with a locale affinity)" do
       login_as(hindi_course_student.name)
       visit '/profile/update/edit'
-      expect(page).to have_select('user_locale', selected: 'No preference')
+      expect(page).to have_select('user_locale', selected: 'No Preference')
 
       visit '/menu/student_task'
       click_link 'Hindi Assignment'

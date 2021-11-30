@@ -1,6 +1,6 @@
 hi_IN:
-
-  #  hello: "Hello world"
+  display_name: "Hindi"
+  database_encoding: 2
 
   # This section of keys are for the pages related to Courses
   courses:

@@ -1,8 +1,5 @@
 class Course < ActiveRecord::Base
-  enum locale: {
-      en_US: 1,
-      hi_IN: 2
-  }
+  enum locale: Locale.code_name_to_db_encoding
   has_many :ta_mappings, dependent: :destroy
   has_many :tas, through: :ta_mappings
   has_many :assignments, dependent: :destroy

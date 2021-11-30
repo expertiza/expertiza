@@ -64,9 +64,9 @@ describe AssignmentForm do
 
   describe '#update_assignment_questionnaires' do
     context 'when attributes are nil or empty' do
-      it 'returns nil' do
-        expect(assignment_form.update_assignment_questionnaires(nil)).to eq(nil)
-        expect(assignment_form.update_assignment_questionnaires([])).to eq(nil)
+      it 'returns false' do
+        expect(assignment_form.update_assignment_questionnaires(nil)).to eq(false)
+        expect(assignment_form.update_assignment_questionnaires([])).to eq(false)
       end
     end
 
@@ -414,6 +414,19 @@ describe AssignmentForm do
               [assignment_questionnaire2])
           allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
           allow(AssignmentQuestionnaire).to receive(:new).and_return(assignment_questionnaire1)
+          allow(aq_attributes1).to receive(:key?).with(:questionnaire_weight).and_return(false)
+          allow(aq_attributes1).to receive(:[]).with(:questionnaire_weight).and_return(nil)
+          allow(aq_attributes1).to receive(:[]).with(:questionnaire_id).and_return(nil)
+          allow(aq_attributes1).to receive(:[]).with(:used_in_round).and_return(nil)
+          allow(aq_attributes1).to receive(:key?).with(:topic_id).and_return(false)
+          allow(aq_attributes1).to receive(:[]).with(:id).and_return(nil)
+          allow(aq_attributes2).to receive(:key?).with(:questionnaire_weight).and_return(true)
+          allow(aq_attributes2).to receive(:[]).with(:questionnaire_weight).and_return(0)
+          allow(aq_attributes2).to receive(:[]).with(:questionnaire_id).and_return(2)
+          allow(aq_attributes2).to receive(:[]).with(:used_in_round).and_return("")
+          allow(aq_attributes2).to receive(:key?).with(:topic_id).and_return(false)
+          allow(aq_attributes2).to receive(:[]).with(:id).and_return(2)
+
         end
 
         it 'returns attributes (args) and does not change @has_errors value since save and update_attributes methods work correctly' do
@@ -771,7 +784,7 @@ describe AssignmentForm do
   end
 
   describe '.copy' do
-    context 'copies the original assignment to a new one' do
+    context 'copies the original assignment to a new one and returs the new assignment_id' do
       it 'returns the new assignment_id' do
         allow(Assignment).to receive(:find).with(1).and_return(assignment)
         allow_any_instance_of(AssignmentForm).to receive(:copy_assignment_questionnaire).with(any_args).and_return('OK!')
@@ -783,7 +796,7 @@ describe AssignmentForm do
     end
 
     context 'when Copy of <old assignment name> does not exists' do
-      it 'copies the original assignment to a new one and returns the new assignment_id' do
+      it 'copies the original assignment to a new one with Copy of <old assignment name> filename' do
         allow(Assignment).to receive(:find).with(1).and_return(assignment)
         allow_any_instance_of(AssignmentForm).to receive(:copy_assignment_questionnaire).with(any_args).and_return('OK!')
         allow(AssignmentDueDate).to receive(:copy).with(1, any_args).and_return('OK!')
@@ -797,7 +810,7 @@ describe AssignmentForm do
     end
 
     context 'when Copy of <old assignment name> exists' do
-      it 'copies the original assignment to a new one and returns the new assignment_id' do
+      it 'copies the original assignment to a new one with Copy of <old assignment name> (1) filename ' do
         allow(Assignment).to receive(:find).with(1).and_return(assignment)
         old_assignmet_name = assignment.name
         allow_any_instance_of(AssignmentForm).to receive(:copy_assignment_questionnaire).with(any_args).and_return('OK!')
@@ -812,6 +825,4 @@ describe AssignmentForm do
     end
   end
 
-  describe '.copy_calibration' do
-    
 end

@@ -33,7 +33,7 @@
           <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <b>ITEM</b></th>
           <% responses.each do |response_id| %>
             <td width="<%= item_width %>%">
-              <% author_name = Participant.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id).fullname(@ip) %>
+              <% author_name = Participant.find(ResponseMap.find(Response.find(response_id).map_id).reviewer_id).fullname(@ip) %>
               <b><%= author_name %></b> <div style ="font-size:11px"> done at -- <%= Response.find(response_id).updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p") %> &nbsp&nbsp</div>
             </td>
           <% end %>

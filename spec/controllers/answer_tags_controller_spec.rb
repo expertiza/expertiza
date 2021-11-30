@@ -125,6 +125,27 @@ describe AnswerTagsController do
         output = JSON.parse(response.body)
         expect(output.length).to eql(0)
       end
+
+      it 'when the user_id is nil' do
+        params = {user_id: nil}
+        get :index, params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
+
+      it 'when the questionnaire_id is nil' do
+        params = {questionnaire_id: nil}
+        get :index, params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
+
+      it 'when the assignment_id is nil' do
+        params = {assignment_id: nil}
+        get :index, params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
     end
   end
 

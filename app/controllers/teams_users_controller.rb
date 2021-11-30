@@ -13,6 +13,8 @@ class TeamsUsersController < ApplicationController
 
   def list
     @team = Team.find(params[:id])
+    #@team do not have assignment_id attribute. 
+    #Changed it to @team.parent_id to render list.
     @assignment = Assignment.find(@team.parent_id)
     @teams_users = TeamsUser.page(params[:page]).per_page(10).where(["team_id = ?", params[:id]])
   end

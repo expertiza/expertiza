@@ -1,192 +1,180 @@
-require './spec/support/teams_shared.rb'
+class StudentTeamsController < ApplicationController
+  include AuthorizationHelper
 
-describe StudentTeamsController do
-  include_context 'object initializations'
-  include_context 'authorization check'
+  autocomplete :user, :name
 
+  def team
+    @team ||= AssignmentTeam.find params[:team_id]
+  end
 
-  let(:student_teams_controller) { StudentTeamsController.new }
-  let(:student) { double "student" }
+  attr_writer :team
 
-  #renders the student view
-  describe '#view' do
-    it 'sets the student' do
-      allow(AssignmentParticipant).to receive(:find).with('12345').and_return student
-      allow(student_teams_controller).to receive(:current_user_id?)
-      allow(student_teams_controller).to receive(:params).and_return(student_id: '12345')
-      allow(student).to receive(:user_id)
-      student_teams_controller.view
+  def student
+    @student ||= AssignmentParticipant.find(params[:student_id])
+    #puts @student.inspect
+    #@student
+  end
+
+  attr_writer :student
+
+  before_action :team, only: %i[edit update]
+  before_action :student, only: %i[view update edit create remove_participant]
+
+  def action_allowed?
+    # note, this code replaces the following line that cannot be called before action allowed?
+    return false unless current_user_has_student_privileges?
+    case action_name
+    when 'view'
+      if are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter")
+        return true if current_user_has_id? student.user_id
+      else
+        return false
+      end
+    when 'create'
+      current_user_has_id? student.user_id
+    when 'edit', 'update'
+      current_user_has_id? team.user_id
+    else
+      true
     end
   end
 
-  describe 'POST #create' do
-    #before(:each) do
-    # @student = AssignmentParticipant.new
-    #end
-    # When assignment team is empty it flashes a notice
-    context 'when create Assignment team' do
-      it 'flash notice when team is empty' do
-        allow(AssignmentTeam).to receive(:where).with(name: '', parent_id: 1).and_return([])
-        allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
-        allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
-        allow(student1).to receive(:user_id).with(any_args).and_return(1)
-        session = {user:student1}
-        params = {
-          student_id:1,
-          team:{
-            name:''
-          },
-          action: 'create'
-        }
-        result= post :create, params, session
-        expect(result.status).to eq 302
-      end
-    end
-    #happy flow to create team
-    context "create team" do
-      it "saves the team" do
-        allow(AssignmentNode).to receive(:find_by).with(node_object_id: 1).and_return(node1)
-        allow(AssignmentTeam).to receive(:new).with(name: 'test', parent_id: 1).and_return(team7)
-        allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
-        allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
-        allow(User).to receive(:find).with(1).and_return(team_user1)
-        allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(true)
-        allow(student1).to receive(:user_id).with(any_args).and_return(1)
-        allow(team7).to receive(:save).and_return(true)
-        session = {user:student1}
-        params = {
-          student_id:1,
-          team:{
-            name:'test'
-          },
-          action: 'create'
-        }
-        result= post :create, params, session
+  def view
+    # View will check if send_invs and recieved_invs are set before showing
+    # only the owner should be able to see those.
 
-        expect(result.status).to eq(302)
+    return unless current_user_id? student.user_id
 
+    @send_invs = Invitation.where from_id: student.user.id, assignment_id: student.assignment.id
+    @received_invs = Invitation.where to_id: student.user.id, assignment_id: student.assignment.id, reply_status: 'W'
+
+
+    @current_due_date = DueDate.current_due_date(@student.assignment.due_dates)
+
+    #this line generates a list of users on the waiting list for the topic of a student's team,  
+    @users_on_waiting_list = (SignUpTopic.find(@student.team.topic).users_on_waiting_list if student_team_requirements_met?)
+
+    @teammate_review_allowed = DueDate.teammate_review_allowed(@student)
+  end
+
+  def create
+    existing_teams = AssignmentTeam.where name: params[:team][:name], parent_id: student.parent_id
+    # check if the team name is in use
+    if existing_teams.empty?
+      if params[:team][:name].blank?
+        flash[:notice] = 'The team name is empty.'
+        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Team name missing while creating team', request)
+        redirect_to view_student_teams_path student_id: student.id
+        return
       end
-    end
-    #when the team name os already in use, it flashes message
-    context "name already in use" do
-      it "flash notice" do
-        allow(AssignmentTeam).to receive(:where).with(name: 'test', parent_id: 1).and_return(team7)
-        allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
-        allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
-        allow(student1).to receive(:user_id).with(any_args).and_return(1)
-        allow(team7).to receive(:empty?).and_return(false)
-        session = {user:student1}
-        params = {
-          student_id:1,
-          team:{
-            name:'test'
-          },
-          action: 'create'
-        }
-        result= post :create, params, session
-        expect(result.status).to eq 302
-      end
+      team = AssignmentTeam.new(name: params[:team][:name], parent_id: student.parent_id)
+      team.save
+      parent = AssignmentNode.find_by node_object_id: student.parent_id
+      TeamNode.create parent_id: parent.id, node_object_id: team.id
+      user = User.find student.user_id
+      team.add_member user, team.parent_id
+      team_created_successfully(team)
+      redirect_to view_student_teams_path student_id: student.id
+
+    else
+      flash[:notice] = 'That team name is already in use.'
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, 'Team name being created was already in use', request)
+      redirect_to view_student_teams_path student_id: student.id
     end
   end
 
-  describe '#update' do
-    #When the name is not already present it updates the name
-    context 'update team name when matching name not found' do
-      it 'update name' do
-        allow(AssignmentTeam).to receive(:where).with(name: 'test', parent_id: 1).and_return([])
-        allow(Team).to receive(:find).with("1").and_return(team7)
-        allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
-        allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
-        allow(student1).to receive(:user_id).with(any_args).and_return(1)
-        allow(team7).to receive(:user_id).with(any_args).and_return(1)
-        allow(team7).to receive(:update_attribute).and_return(true)
-        session = {user:student1}
-        params = {
-          student_id:1,
-          team_id:1,
-          team:{
-            name:'test'
-          },
-          action: 'update'
-        }
-        result= post :update, params, session
-        expect(result.status).to eq(302)
-      end
-    end
-    #When no team has name and only one matching team is found,update the name
-    context 'update name when name is found' do
-      it 'update name' do
-        allow(AssignmentTeam).to receive(:where).with(name: 'test', parent_id: 1).and_return(team1)
-        allow(Team).to receive(:find).with("1").and_return(team8)
-        allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
-        allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
-        allow(student1).to receive(:user_id).with(any_args).and_return(1)
-        allow(team8).to receive(:user_id).with(any_args).and_return(1)
-        allow(team8).to receive(:update_attribute).and_return(true)
-        allow(team1).to receive(:length).and_return(1)
-        allow(team1).to receive(:name).and_return("test")
-        allow(team8).to receive(:name).and_return("test")
-        session = {user:student1}
-        params = {
-          student_id:1,
-          team_id:1,
-          team:{
-            name:'test'
-          },
-          action: 'update'
-        }
-        result= post :update, params, session
-        expect(result.status).to eq(302)
-      end
-    end
-    #when the team name is already in use, then flash the error message
-    context 'name is already in use' do
-      it 'flash notice' do
-        allow(AssignmentTeam).to receive(:where).with(name: 'test', parent_id: 1).and_return(team1)
-        allow(Team).to receive(:find).with("1").and_return(team8)
-        allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
-        allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
-        allow(student1).to receive(:user_id).with(any_args).and_return(1)
-        allow(team8).to receive(:user_id).with(any_args).and_return(1)
-        allow(team1).to receive(:length).and_return(2)
+  def edit; end
 
-        session = {user:student1}
-        params = {
-          student_id:1,
-          team_id:1,
-          team:{
-            name:'test'
-          },
-          action: 'update'
-        }
-        result= post :update, params, session
-        expect(result.status).to eq(302)
+  def update
+    # Update the team name only if the given team name is not used already
+    matching_teams = AssignmentTeam.where name: params[:team][:name], parent_id: team.parent_id
+    if matching_teams.length.zero?
+      if team.update_attribute('name', params[:team][:name])
+        team_created_successfully
+
+        redirect_to view_student_teams_path student_id: params[:student_id]
+
       end
+    elsif matching_teams.length == 1 && (matching_teams.name == team.name)
+
+      team_created_successfully
+      redirect_to view_student_teams_path student_id: params[:student_id]
+
+    else
+      flash[:notice] = 'That team name is already in use.'
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Team name being updated to was already in use', request)
+      redirect_to view_student_teams_path student_id: params[:student_id]
+
     end
   end
+  #The following two methods are necessary to improve readability
+  #update the advertise_for_partner of team table
+  def advertise_for_partners
+    Team.update_all advertise_for_partner: true, id: params[:team_id]
+  end
+  
+  def remove_advertisement
+    Team.update_all advertise_for_partner: false, id: params[:team_id]
+    redirect_to view_student_teams_path student_id: params[:team_id]
+  end
 
-  describe '#remove_participant' do
-    #remove participant from team and remove team if he was the only particilant
-    context 'remove team user' do
-      it 'remove user' do
-        allow(AssignmentParticipant).to receive(:find).and_return(participant)
-        allow(TeamsUser).to receive(:where).and_return(team_user1)
-        allow(team_user1).to receive(:destroy_all)
-        allow(team_user1).to receive_message_chain(:where,:empty?).and_return(false)
-        allow_any_instance_of(AssignmentParticipant).to receive(:save).and_return(false)
-        session = {user:student1}
-        params = {
-          team_id:1,
-          user_id:1,
-          student_id:1,
-          team:{
-            name:'test'
-          }
-        }
-        result = post :remove_participant, params, session
-        expect(result.status).to eq 302
-        # expect(result).to redirect_to(view_student_teams_path(:student_id => 1))
+  def remove_participant
+    # remove the record from teams_users table
+    team_user = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id)
+    remove_team_user(team_user)
+    # if your old team does not have any members, delete the entry for the team
+    if TeamsUser.where(team_id: params[:team_id]).empty?
+      old_team = AssignmentTeam.find params[:team_id]
+      if old_team && !old_team.received_any_peer_review?
+        old_team.destroy
+        # if assignment has signup sheet then the topic selected by the team has to go back to the pool
+        # or to the first team in the waitlist
+        Waitlist.remove_from_waitlists(params[:team_id])
       end
     end
+    # remove all the sent invitations
+    old_invites = Invitation.where from_id: student.user_id, assignment_id: student.parent_id
+    old_invites.each(&:destroy)
+    student.save
+    redirect_to view_student_teams_path student_id: student.id
   end
+
+  def remove_team_user(team_user)
+    return false unless team_user
+    team_user.destroy_all
+    undo_link "The user \"#{team_user.name}\" has been successfully removed from the team."
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'User removed a participant from the team', request)
+  end
+
+  def team_created_successfully(current_team = nil)
+    if current_team
+      undo_link "The team \"#{current_team.name}\" has been successfully updated."
+    else
+      undo_link "The team \"#{team.name}\" has been successfully updated."
+    end
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'The team has been successfully created.', request)
+  end
+
+  # This method is used to show the Author Feedback Questionnaire of current assignment
+  def review
+    @assignment = Assignment.find params[:assignment_id]
+    redirect_to view_questionnaires_path id: @assignment.questionnaires.find_by(type: 'AuthorFeedbackQuestionnaire').id
+  end
+
+
+  #used to check student team requirements
+  def student_team_requirements_met?
+    #checks if the student has a team
+    if @student.team.nil?
+      return false
+    end
+    #checks that the student's team has a topic
+    if @student.team.topic.nil? 
+      return false
+    end
+    #checks that the student has selected some topics
+    @student.assignment.topics?
+
+  end
+
 end

@@ -48,8 +48,6 @@ class AuthController < ApplicationController
       github_login
     when "google_oauth2"
       google_login
-    when "github2021" # due to github 0
-      custom_github_login
     else
       ExpertizaLogger.error LoggerMessage.new(controller_name, user.name, "Invalid OAuth Provider", "")
     end
@@ -77,19 +75,6 @@ class AuthController < ApplicationController
     else
       after_login(user)
     end
-  end
-
-  #E2111 Catch return of 3-way handshake when 2021 Github API custom authentication is being used.
-  def custom_github_login
-    session_code = request.env['rack.request.query_hash']['code']
-    result = RestClient.post('https://github.com/login/oauth/access_token',
-                               {:client_id => GITHUB_CONFIG['client_key'],
-                                :client_secret => GITHUB_CONFIG['client_secret'],
-                                :code => session_code},
-                               :accept => :json)
-    access_token = JSON.parse(result)['access_token']
-    session["github_access_token"] = access_token
-    redirect_to controller: 'assignments', action: 'list_submissions', id: session["assignment_id"]
   end
 
   def login_failed

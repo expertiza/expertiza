@@ -46,6 +46,12 @@ describe TagPromptDeployment do
       allow(question).to receive(:map).with(any_args).and_return(questions_ids)
       allow(Answer).to receive(:where).with({question_id: questions_ids, response_id: response_ids}).and_return(answer)
     end
+    context "when user_id is null" do
+      it "given out an error message" do
+        allow(Team).to receive(:joins).with(:teams_users).and_return(team)
+        allow(team).to receive(:where).with(team_users: {parent_id: tag_dep1.assignment_id}, user_id: nil).and_raise(ActiveRecord::StaleObjectError)
+      end
+    end
     context "when answer_length_threshold null" do
       it 'count of taggable answers' do
         questions_ids = double(1)

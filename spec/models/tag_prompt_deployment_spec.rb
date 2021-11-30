@@ -49,7 +49,8 @@ describe TagPromptDeployment do
     context "when user_id is null" do
       it "given out an error message" do
         allow(Team).to receive(:joins).with(:teams_users).and_return(team)
-        allow(team).to receive(:where).with(team_users: {parent_id: tag_dep1.assignment_id}, user_id: nil).and_raise(ActiveRecord::StaleObjectError)
+        allow(team).to receive(:where).with(team_users: {parent_id: tag_dep1.assignment_id}, user_id: nil).and_raise(ActiveRecord::ActiveRecordError)
+        expect{tag_dep1.get_number_of_taggable_answers(nil)}.to raise_error ActiveRecord::ActiveRecordError
       end
     end
     context "when answer_length_threshold null" do

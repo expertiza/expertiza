@@ -915,27 +915,17 @@ jQuery(document).ready(function() {
         expandedRow: []
       }
     },
-    handleExpandClick: function(id, expanded, newParams) {
-      this.state.expandedRow.concat([ id ])
+    handleExpandClick: function (id, expanded, newParams) {
       if (expanded) {
+        var newExpandedRow = this.state.expandedRow
+        newExpandedRow.push(id)
         this.setState({
-          expandedRow: this.state.expandedRow.concat([ id ])
+          expandedRow: newExpandedRow
         })
 
         //avoid the error in assignment searching page
         if(this.props.dataType!='assignment') {
-        let _this = this
-        jQuery.post(
-          '/tree_display/get_sub_folder_contents',
-          {
-            reactParams2: newParams
-          },
-          function(data) {
-            _this.props.data[id.split('_')[2]]['children'] = data
-            _this.forceUpdate()
-          },
-          'json'
-        )
+          this.props.getSubFolderData(id, newParams)
         }
       } else {
         var index = this.state.expandedRow.indexOf(id)
@@ -948,12 +938,61 @@ jQuery(document).ready(function() {
         }
       }
     },
-    handleSortingClick: function(colName, order) {
+    handleSortingClick: (colName, order) => {
       this.props.onUserClick(colName, order)
+    },
+      pushRows: function(rows, i, entry) {
+          rows.push(
+              <ContentTableRow
+                  key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
+                  id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i}
+                  name={entry.name}
+                  institution={entry.institution}
+                  creation_date={entry.creation_date}
+                  updated_date={entry.updated_date}
+                  actions={entry.actions}
+                  is_available={entry.is_available}
+                  course_id={entry.course_id}
+                  max_team_size={entry.max_team_size}
+                  is_intelligent={entry.is_intelligent}
+                  require_quiz={entry.require_quiz}
+                  dataType={this.props.dataType}
+                  //this is just a hack. All current users courses are marked as private during fetch for display purpose.
+                  private={entry.private}
+                  allow_suggestions={entry.allow_suggestions}
+                  has_topic={entry.has_topic}
+                  rowClicked={this.handleExpandClick}
+                  newParams={entry.newParams}
+              />
+          )
+          rows.push(
+              <ContentTableDetailsRow
+                  key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2 + 1).toString() + '_' + i}
+                  id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2 + 1).toString() + '_' + i}
+                  showElement={
+                      this.state.expandedRow.indexOf(
+                          entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i
+                      ) > -1 ? '' : 'none'
+                  }
+                  dataType={this.props.dataType}
+                  children={entry.children}
+              />
+          )
+      },
+      isEntryValid: function(entry) {
+        if (this.props.selectValue === 'empty' || (this.props.showPublic && isDataTypeCourse)) {
+            return ((entry.name && entry.name.indexOf(this.props.filterText) !== -1) ||
+                (entry.creation_date && entry.creation_date.indexOf(this.props.filterText) !== -1) ||
+                (entry.institution && entry.institution.indexOf(this.props.filterText) !== -1) ||
+                (entry.updated_date && entry.updated_date.indexOf(this.props.filterText) !== -1)) &&
+                (entry.private || entry.type == 'FolderNode')
+        } else {
+            return (entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(this.props.filterText.toLowerCase()) !== -1) &&
+                (entry.private || entry.type == 'FolderNode')
+        }
     },
     render: function() {
       var _rows = []
-      var _this = this
       var colWidthArray = [ '30%', '0%', '0%', '0%', '25%', '25%', '20%' ]
       var colDisplayStyle = {
         display: ''
@@ -963,58 +1002,6 @@ jQuery(document).ready(function() {
       var isDataTypeQuestionnaire = this.props.dataType === 'questionnaire'
       var isSelectValueCreatedDate = this.props.selectValue === 'created_date'
       var isSelectValueUpdatedDate = this.props.selectValue === 'updated_date'
-
-      function isEntryValid(entry) {
-        if (_this.props.selectValue === 'empty' || (_this.props.showPublic && isDataTypeCourse)) {
-          return ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
-            (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-            (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
-            (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
-            (entry.private || entry.type == 'FolderNode')
-        } else {
-          return (entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1) &&
-            (entry.private || entry.type == 'FolderNode')
-        }
-      }
-
-      function pushRows(i, entry) {
-        _rows.push(
-          <ContentTableRow
-            key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
-            id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i}
-            name={entry.name}
-            institution={entry.institution}
-            creation_date={entry.creation_date}
-            updated_date={entry.updated_date}
-            actions={entry.actions}
-            is_available={entry.is_available}
-            course_id={entry.course_id}
-            max_team_size={entry.max_team_size}
-            is_intelligent={entry.is_intelligent}
-            require_quiz={entry.require_quiz}
-            dataType={_this.props.dataType}
-            //this is just a hack. All current users courses are marked as private during fetch for display purpose.
-            private={entry.private}
-            allow_suggestions={entry.allow_suggestions}
-            has_topic={entry.has_topic}
-            rowClicked={_this.handleExpandClick}
-            newParams={entry.newParams}
-          />
-        )
-        _rows.push(
-          <ContentTableDetailsRow
-            key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2 + 1).toString() + '_' + i}
-            id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2 + 1).toString() + '_' + i}
-            showElement={
-              _this.state.expandedRow.indexOf(
-                entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i
-              ) > -1 ? '' : 'none'
-            }
-            dataType={_this.props.dataType}
-            children={entry.children}
-          />
-        )
-      }
 
       if (this.props) {
         if (isDataTypeQuestionnaire) {
@@ -1028,24 +1015,24 @@ jQuery(document).ready(function() {
           _rows.push(<TitleRow title='My Courses' />)
         }
         if (isDataTypeAssignment) {
-          _rows.push(<TitleRow title='My Assignments' />)
+            _rows.push(<TitleRow title='My Assignments'/>)
         }
 
         if(this.props.selectValue === 'empty') {
-          jQuery.each(this.props.data, function(i, entry) {
-            isEntryValid(entry) && pushRows(i, entry)
+          jQuery.each(this.props.data, (i, entry) => {
+              this.isEntryValid(entry) && this.pushRows(_rows, i, entry)
         })}
-        
+
         /* Include the functionality of searching by created_date */
         if (isSelectValueCreatedDate || isSelectValueUpdatedDate) {
           var startDate = this.props.start_date + 1
           var endDate = this.props.end_date + 1
-          jQuery.each(this.props.data, function (i, entry) {
+          jQuery.each(this.props.data, (i, entry) => {
             var date = isSelectValueCreatedDate ? entry.creation_date : entry.updated_date
-            if (isEntryValid(entry)) {
+            if (this.isEntryValid(entry)) {
               if ((date >= startDate) && (endDate >= date)) {
-                if((_this.props.has_quiz_var && entry.require_quiz) || !_this.props.has_quiz_var) {
-                  pushRows(i, entry)
+                if((this.props.has_quiz_var && entry.require_quiz) || !this.props.has_quiz_var) {
+                  this.pushRows(_rows, i, entry)
                 }
               }
             }
@@ -1056,19 +1043,19 @@ jQuery(document).ready(function() {
         if (this.props.showPublic) {
           if (isDataTypeCourse) {
             _rows.push(<TitleRow title="Others' Public Courses" />)
-            jQuery.each(this.props.data, function(i, entry) {
-              isEntryValid(entry) && pushRows(i, entry)
+            jQuery.each(this.props.data,(i, entry) => {
+                this.isEntryValid(entry) && this.pushRows(_rows, i, entry)
             })
           } else if (isDataTypeAssignment) {
             _rows.push(<TitleRow title="Others' Public Assignments" />)
-            jQuery.each(this.props.data, function(i, entry) {
+            jQuery.each(this.props.data, (i, entry) => {
               if (
-                ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
+                ((entry.name && entry.name.indexOf(this.props.filterText) !== -1) ||
+                  (entry.creation_date && entry.creation_date.indexOf(this.props.filterText) !== -1) ||
+                  (entry.updated_date && entry.updated_date.indexOf(this.props.filterText) !== -1)) &&
                 entry.private == false
               ) {
-               pushRows(i, entry) 
+               this.pushRows(_rows, i, entry)
               }
             })
           }
@@ -1181,6 +1168,9 @@ jQuery(document).ready(function() {
         ...this.state.advancedSearchVisible ? this.child.getInputValues() : null,
       });
     },
+    onInputChange: function() {
+        this.props.onQuestionnaireSearchChange(this.refs.nameInput.getDOMNode().value)
+    },
     render: function () {
       return (
           <div>
@@ -1190,7 +1180,9 @@ jQuery(document).ready(function() {
                   ref="nameInput"
                   type="text"
                   className="form-control"
-                  placeholder="Name" />
+                  placeholder="Name"
+                  onChange={this.onInputChange}
+              />
               <button type="button"
                       className="btn btn-primary"
                       onClick={this.handleSearch}>
@@ -1220,7 +1212,9 @@ jQuery(document).ready(function() {
         selectValue: 'empty',
         start_date: '',
         end_date:'',
-        has_quiz_var: false
+        has_quiz_var: false,
+        searchPressed: false,
+        searchFilteredData: []
       }
     },
     handleUserInput: function(filterText) {
@@ -1296,13 +1290,51 @@ jQuery(document).ready(function() {
       });
     },
 
+      handleSearchClick: function(param) {
+          if (this.state.tableData.length !== 0) {
+            var searchFilteredData = this.state.tableData.map(function(data) {
+                if (data.children) {
+                    var questionnaireSearchIncluded = data.children.filter(function(child) {
+                        if (child.name.indexOf(param.name) !== -1) {
+                            return child
+                        }
+                    })
+                    return { ...data, children: questionnaireSearchIncluded }
+                }
+                return data
+            })
+            this.setState({ searchFilteredData, searchPressed: true })
+          }
+      },
+
+      handleQuestionnaireSearchChange: function(text) {
+        if (text === '' && this.state.searchPressed) {
+            this.setState({ searchPressed: false })
+        }
+      },
+
+      getSubFolderData: function(id,newParams) {
+        jQuery.post(
+          '/tree_display/get_sub_folder_contents',
+          { reactParams2: newParams},
+          (data) => {
+            var prevTableData = this.state.tableData
+            prevTableData[id.split('_')[2]]['children'] = data
+            this.setState({ tableData: prevTableData })
+          },
+          'json'
+        )
+      },
+
     render: function() {
       if (this.props.dataType === 'questionnaire') {
         return (
             <div className="filterable_table">
               <QuestionnairesSearchBar
                   onSearchClick={this.handleSearchClick}
-                  dataType={this.props.dataType} />
+                  dataType={this.props.dataType}
+                  onQuestionnaireSearchChange={this.handleQuestionnaireSearchChange}
+              />
               <FilterButton
                   filterOption="public"
                   onUserFilter={this.handleUserFilter}
@@ -1314,12 +1346,13 @@ jQuery(document).ready(function() {
                   private={true}
               />
               <ContentTable
-                  data={this.state.tableData}
+                  data={this.state.searchPressed ? this.state.searchFilteredData : this.state.tableData}
                   filterText={this.state.filterText}
                   onUserClick={this.handleUserClick}
                   dataType={this.props.dataType}
                   showPublic={this.state.publicCheckbox}
                   selectValue={this.state.selectValue}
+                  getSubFolderData={this.getSubFolderData}
               />
             </div>
         )
@@ -1417,6 +1450,7 @@ jQuery(document).ready(function() {
                 start_date = {this.state.start_date}
                 end_date = {this.state.end_date}
                 has_quiz_var = {this.state.has_quiz_var}
+                getSubFolderData={this.getSubFolderData}
             />
           </div>
       )

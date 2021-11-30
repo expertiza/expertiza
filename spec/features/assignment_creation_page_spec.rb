@@ -37,7 +37,7 @@ describe "Assignment creation page", js: true do
 		)
 	end
 
-	it "is able to create a public assignment with countofcomments expected" do
+	it "is able to create a public assignment with countofcomments metric" do
 		login_as("instructor6")
 		visit "/assignments/new?private=0"
 
@@ -63,6 +63,35 @@ describe "Assignment creation page", js: true do
 			is_calibrated: true,
 			availability_flag: false,
 			heatgrid_metric: 'countofcomments'
+		)
+	end
+
+	it "is able to create a public assignment with no metrics expected" do
+		login_as("instructor6")
+		visit "/assignments/new?private=0"
+
+		fill_in 'assignment_form_assignment_name', with: 'public assignment for test'
+		select('Course 2', from: 'assignment_form_assignment_course_id')
+		fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+		fill_in 'assignment_form_assignment_spec_location', with: 'testLocation'
+		check("assignment_form_assignment_microtask")
+		check("assignment_form_assignment_reviews_visible_to_all")
+		check("assignment_form_assignment_is_calibrated")
+		uncheck("assignment_form_assignment_availability_flag")
+		expect(page).to have_select("assignment_form[assignment][reputation_algorithm]", options: %w[-- Hamer Lauw])
+		select "--", from: 'countsofcomment'
+
+		click_button 'Create'
+		assignment = Assignment.where(name: 'public assignment for test').first
+		expect(assignment).to have_attributes(
+			name: 'public assignment for test',
+			course_id: Course.find_by(name: 'Course 2').id,
+			directory_path: 'testDirectory',
+			spec_location: 'testLocation',
+			microtask: true,
+			is_calibrated: true,
+			availability_flag: false,
+			heatgrid_metric: ''
 		)
 	end
 

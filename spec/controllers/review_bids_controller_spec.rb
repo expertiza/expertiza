@@ -1,6 +1,3 @@
-require "rails_helper"
-require "spec_helper"
-
 describe ReviewBidsController do
    #let(:assignment) { double('Assignment', id: 1) }
    #let(:participant) { double('AssignmentParticipant', id: 1, can_review: false, user: double('User', id: 1)) }

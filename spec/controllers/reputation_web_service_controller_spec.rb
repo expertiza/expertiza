@@ -143,14 +143,32 @@ describe ReputationWebServiceController do
         params = {assignment_id: 1, round_num: 1, algorithm: 'hammer', checkbox: {expert_grade: "empty"}}
         session = {user: build(:instructor, id: 1)}
 
-        expect(true).to eq(true)
+        client = ReputationWebServiceController.new.client
 
         # comment out because send_post_request method request public key file while this file is missing
         # so at this time send_post_request is not functioning normally
         # if it functions correctly, it will update the reviewer's reputation score according to the selected reputation algorithm.
         # get :send_post_request, params, session
         # expect(response).to redirect_to '/reputation_web_service/client'
+
+        # req = ReputationWebServiceController.new.send_post_request
+        # expect(req).to redirect_to(client)
+        expect(true).to eq(true)
       end
     end
+
+    context 'test aes_decrypt' do
+      it 'return the correct plain text' do
+        data = (0...8).map { (65 + rand(26)).chr }.join
+        cipher, key, iv = ReputationWebServiceController.new.aes_encrypt(data)
+        plain = ReputationWebServiceController.new.aes_decrypt(cipher, key, iv)
+        expect(plain).to eq(data)
+      end
+    end
+
+    # TODO test for round 2
+    # The web service is not available yet because of missing of public1.gem and private1.gem
+    # Once the controller can get response from the reputation_web_service, the test should proceed to round 2 submission
+    # More detailed explanation on https://expertiza.csc.ncsu.edu/index.php/CSC/ECE_517_Fall_2021_-_E2168._Testing_-_Reputations
   end
 end

@@ -291,4 +291,12 @@ class Team < ActiveRecord::Base
     team_user = TeamsUser.where(user_id: user_id).find { |team_user| team_user.team.parent_id == parent_id }
     team_user.destroy rescue nil
   end
+
+  def self.is_team_members?(team_id,user_id)
+    @team_members = Array.new
+    TeamsUser.where(["team_id = ?", team_id]).each do |teamuser|
+      @team_members.push(teamuser.user_id)
+    end
+    return @team_members.collect { |u|  }.include?(user_id)
+  end
 end

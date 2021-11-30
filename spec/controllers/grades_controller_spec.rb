@@ -15,7 +15,7 @@ describe GradesController do
   let(:question) { build(:question) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment, users: [instructor]) }
   let(:team2) { build(:assignment_team, id: 2, parent_id: 8) }
-  let(:student) { build(:student) }
+  let(:student) { build(:student, id: 2) }
   let(:review_response_map) { build(:review_response_map, id: 1) }
   let(:assignment_due_date) { build(:assignment_due_date) }
   let(:ta) { build(:teaching_assistant, id: 8) }
@@ -272,15 +272,16 @@ describe GradesController do
       end
     end
     context 'when the user is an student' do
+      before(:each) do
+        controller.params = {id: 4, action: 'view_team'}
+      end
       it 'only see the heat map for their own team' do
-        params = {action: 'view_team'}
-        session[:user].role.name = 'Student'
-        session[:user].id = 2
+        stub_current_user(student, student.role.name, student.role)
         allow(AssignmentParticipant).to receive(:find).with(4).and_return(participant4)
+        allow(AssignmentParticipant).to receive(:exist?).with(parent_id: 2, user_id: 2).and_return(false)
         expect(controller.action_allowed?).to eq(false)
       end
     end
-
   end
 
   describe '#redirect_when_disallowed' do

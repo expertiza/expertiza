@@ -31,6 +31,7 @@ class ApplicationController < ActionController::Base
         # If the user doesn't have any preference, the locale is taken from the course locale, if the current page is a course specific page or else default locale is used
       elsif current_user_role? && current_user_role.student? && %w[student_task sign_up_sheet student_teams student_review grades submitted_content participants].include?(params[:controller])
         return locale_for_student
+      end
     end
     I18n.default_locale
   end

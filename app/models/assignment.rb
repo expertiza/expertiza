@@ -580,7 +580,6 @@ class Assignment < ActiveRecord::Base
     questionnaire_ids
   end
 
-
   private
 
   #returns true if assignment has staggered deadline and topic_id is nil

@@ -298,10 +298,10 @@ class AssignmentForm
         new_team_ids.append(catt.id)
       end
       dict = Hash[old_team_ids.zip new_team_ids]
+      count = 0
       old_team_ids.each do |catt|
         @old_team_user = TeamsUser.where(team_id: catt)
         @old_team_user.each do |matt|
-          @new_team_user = TeamsUser.new
           @new_team_user = TeamsUser.new
           @new_team_user.team_id = new_team_ids[count]
           @new_team_user.user_id = matt.user_id
@@ -310,6 +310,7 @@ class AssignmentForm
         end
         Participant.mapreviewresponseparticipant(old_assign, new_assign_id, dict)
         ReviewResponseMap.newreviewresp(old_assign, catt, dict, new_assign_id)
+        count += 1
 
         @team_needed = Team.where(id:catt).first
         old_directory_path = @team_needed.directory_path

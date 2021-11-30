@@ -18,20 +18,22 @@ describe StudentTeamsController do
   end
 
   describe 'POST #create' do
-    before(:each) do
-      @student = AssignmentParticipant.new
-    end
+    #before(:each) do
+     # @student = AssignmentParticipant.new
+    #end
     context 'when create Assignment team' do
       it 'flash notice when team is empty' do
-        allow(AssignmentTeam).to receive(:where).with(name: '', parent_id: 1).and_return(nil)
-        allow(AssignmentParticipant).to receive(:find).and_return(participant)
-        allow(student1).to receive(:user_id)
+        allow(AssignmentTeam).to receive(:where).with(name: '', parent_id: 1).and_return([])
+        allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
+        allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
+        allow(student1).to receive(:user_id).with(any_args).and_return(1)
         session = {user:student1}
         params = {
           student_id:1,
           team:{
-            name:'test'
-          }
+            name:''
+          },
+          action: 'create'
         }
         result= post :create, params, session
         expect(result.status).to eq 302
@@ -41,15 +43,19 @@ describe StudentTeamsController do
       it "saves the team" do
         allow(AssignmentNode).to receive(:find_by).with(node_object_id: 1).and_return(node1)
         allow(AssignmentTeam).to receive(:new).with(name: 'test', parent_id: 1).and_return(team7)
-        allow(AssignmentParticipant).to receive(:find).and_return(participant)
-        allow(student1).to receive(:user_id)
+        allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
+        allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
+        allow(User).to receive(:find).with(1).and_return(team_user1)
+        allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(true)
+        allow(student1).to receive(:user_id).with(any_args).and_return(1)
         allow(team7).to receive(:save).and_return(true)
         session = {user:student1}
         params = {
           student_id:1,
           team:{
             name:'test'
-          }
+          },
+        action: 'create'
         }
         result= post :create, params, session
 
@@ -60,14 +66,17 @@ describe StudentTeamsController do
     context "name already in use" do
       it "flash notice" do
         allow(AssignmentTeam).to receive(:where).with(name: 'test', parent_id: 1).and_return(team7)
-        allow(AssignmentParticipant).to receive(:find).and_return(participant)
-        allow(student1).to receive(:user_id)
+        allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
+        allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
+        allow(student1).to receive(:user_id).with(any_args).and_return(1)
+        allow(team7).to receive(:empty?).and_return(false)
         session = {user:student1}
         params = {
           student_id:1,
           team:{
             name:'test'
-          }
+          },
+          action: 'create'
         }
         result= post :create, params, session
         expect(result.status).to eq 302
@@ -76,19 +85,71 @@ describe StudentTeamsController do
   end
 
   describe '#update' do
-    context 'update team name' do
+    context 'update team name when matching name not found' do
       it 'update name' do
-        allow(AssignmentParticipant).to receive(:find).and_return(participant)
-        allow(AssignmentTeam).to receive(:find).and_return(team7)
-        allow(AssignmentTeam).to receive(:where).with(name: 'test', parent_id: 1).and_return(team7)
-        allow(team7).to receive(:destroy_all)
-        allow(student1).to receive(save).and_return(true)
+        allow(AssignmentTeam).to receive(:where).with(name: 'test', parent_id: 1).and_return([])
+        allow(Team).to receive(:find).with("1").and_return(team7)
+        allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
+        allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
+        allow(student1).to receive(:user_id).with(any_args).and_return(1)
+        allow(team7).to receive(:user_id).with(any_args).and_return(1)
+        allow(team7).to receive(:update_attribute).and_return(true)
         session = {user:student1}
         params = {
           student_id:1,
+          team_id:1,
           team:{
             name:'test'
-          }
+          },
+          action: 'update'
+        }
+        result= post :update, params, session
+        expect(result.status).to eq(302)
+      end
+    end
+    context 'update name when name is found' do
+      it 'update name' do
+        allow(AssignmentTeam).to receive(:where).with(name: 'test', parent_id: 1).and_return(team1)
+        allow(Team).to receive(:find).with("1").and_return(team8)
+        allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
+        allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
+        allow(student1).to receive(:user_id).with(any_args).and_return(1)
+        allow(team8).to receive(:user_id).with(any_args).and_return(1)
+        allow(team8).to receive(:update_attribute).and_return(true)
+        allow(team1).to receive(:length).and_return(1)
+        allow(team1).to receive(:name).and_return("test")
+        allow(team8).to receive(:name).and_return("test")
+        session = {user:student1}
+        params = {
+          student_id:1,
+          team_id:1,
+          team:{
+            name:'test'
+          },
+          action: 'update'
+        }
+        result= post :update, params, session
+        expect(result.status).to eq(302)
+      end
+    end
+    context 'name is already in use' do
+      it 'flash notice' do
+        allow(AssignmentTeam).to receive(:where).with(name: 'test', parent_id: 1).and_return(team1)
+        allow(Team).to receive(:find).with("1").and_return(team8)
+        allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
+        allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
+        allow(student1).to receive(:user_id).with(any_args).and_return(1)
+        allow(team8).to receive(:user_id).with(any_args).and_return(1)
+        allow(team1).to receive(:length).and_return(2)
+
+        session = {user:student1}
+        params = {
+          student_id:1,
+          team_id:1,
+          team:{
+            name:'test'
+          },
+          action: 'update'
         }
         result= post :update, params, session
         expect(result.status).to eq(302)
@@ -118,6 +179,5 @@ describe StudentTeamsController do
     # expect(result).to redirect_to(view_student_teams_path(:student_id => 1))
      end
    end
-
   end
 end

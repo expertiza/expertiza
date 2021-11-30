@@ -19,65 +19,50 @@ class ApplicationController < ActionController::Base
   before_action :set_locale
 
   def set_locale
+    I18n.locale = user_locale
+  end
+
+  def user_locale
     # Checks whether the user is logged in, else the default locale is used
     if logged_in?
       # If the current user has set his preferred language, the locale is set according to their preference
       if @current_user.locale != "no_pref"
-        I18n.locale = @current_user.locale
+        return @current_user.locale
         # If the user doesn't have any preference, the locale is taken from the course locale, if the current page is a course specific page or else default locale is used
       elsif current_user_role? && current_user_role.student? && %w[student_task sign_up_sheet student_teams student_review grades submitted_content participants].include?(params[:controller])
-        set_new_locale_for_student
-      else
-        I18n.locale = I18n.default_locale
-      end
-    else
-      I18n.locale = I18n.default_locale
+        return locale_for_student
     end
+    I18n.default_locale
   end
 
-  def set_new_locale_for_student
+  def locale_for_student
     # Gets participant using student from params
-    if !params[:id].nil? || !params[:student_id].nil?
-      participant_id = params[:id] || params[:student_id]
+    participant_id = params[:id] || params[:student_id]
+    if participant_id != nil
       participant = AssignmentParticipant.find_by(id: participant_id)
       # If id or student_id not correct, revert to locale based on courses.
-      if participant.nil?
-        find_locale_from_courses
-        return
-      end
+      return locale_from_user_courses if participant.nil?
+
       # Find assignment from participant and find locale from the assigment
       assignment = participant.assignment
-      if !assignment.course.nil?
-        new_locale = assignment.course.locale
-        if !new_locale.nil?
-          I18n.locale = new_locale
-        else
-          I18n.locale = I18n.default_locale
-        end
-      else
-        I18n.locale = I18n.default_locale
-      end
+      return assignment.course.locale unless assignment.course.nil? || assignment.course.locale.nil?
     else
-      find_locale_from_courses
+      return locale_from_user_courses
     end
+    I18n.default_locale
   end
 
-  def find_locale_from_courses
+  def locale_from_user_courses
     # If the page is a course or assignment page with no specific student id, every course of that student is checked and if
     # the language for all these course are same, the page is displayed in that language
-  courseParticipants = CourseParticipant.where(user_id: current_user.id)
-    courseParticipantsLocales = courseParticipants.map { |cp| cp.course.locale }
+    course_participants = CourseParticipant.where(user_id: current_user.id)
+    course_participants_locales = course_participants.map { |cp| cp.course.locale }
     # If no tasks, then possible to have no courses assigned.
-    if courseParticipantsLocales.uniq.length == 1 #&& !@tasks.empty?
-      course = courseParticipants.first.course
-      if course.locale?
-        I18n.locale = course.locale
-      else
-        I18n.locale = I18n.default_locale
-      end
-    else
-      I18n.locale = I18n.default_locale
+    if course_participants_locales.uniq.length == 1 #&& !@tasks.empty?
+      course = course_participants.first.course
+      return course.locale if course.locale?
     end
+    I18n.default_locale
   end
 
   def filter_utf8

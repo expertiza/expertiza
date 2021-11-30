@@ -1,6 +1,6 @@
 class ProfileController < ApplicationController
   include AuthorizationHelper
-  helper_method :get_language_choices
+  helper_method :language_choices
 
   def action_allowed?
     user_logged_in?
@@ -36,7 +36,7 @@ class ProfileController < ApplicationController
     redirect_to controller: :profile, action: :edit
   end
 
-  def get_language_choices
+  def language_choices
     # Set the available languages
     [["No preference", "no_pref"], %w[English en_US], %w[Hindi hi_IN]]
   end

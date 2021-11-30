@@ -23,7 +23,7 @@
   <p class="form-inline"><label class="width-266"><%=t ".preferred_time_zone"%>: </label>
     <%= time_zone_select("user", "timezonepref", ActiveSupport::TimeZone.all,{}, {:class => 'form-control width-250'})%></p>
   <p class="form-inline"><label class="width-266">Preferred Language: </label>
-    <%= f.select :locale, get_language_choices ,{:selected => @user.locale}, {:class => 'form-control width-250'}%></p>
+    <%= f.select :locale, language_choices ,{:selected => @user.locale}, {:class => 'form-control width-250'}%></p>
 
   <%= f.submit t(".save"), class: "btn btn-default btn-md" %>
 </table>

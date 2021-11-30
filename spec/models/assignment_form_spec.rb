@@ -771,13 +771,47 @@ describe AssignmentForm do
   end
 
   describe '.copy' do
-    it 'copies the original assignment to a new one and returns the new assignment_id' do
-      allow(Assignment).to receive(:find).with(1).and_return(assignment)
-      allow_any_instance_of(AssignmentForm).to receive(:copy_assignment_questionnaire).with(any_args).and_return('OK!')
-      allow(AssignmentDueDate).to receive(:copy).with(1, any_args).and_return('OK!')
-      allow_any_instance_of(Assignment).to receive(:create_node).and_return('OK!')
-      allow(SignUpTopic).to receive(:where).with(assignment_id: 1).and_return([build(:topic)])
-      expect(AssignmentForm.copy(1, build(:instructor))).to eq(2)
+    context 'copies the original assignment to a new one' do
+      it 'returns the new assignment_id' do
+        allow(Assignment).to receive(:find).with(1).and_return(assignment)
+        allow_any_instance_of(AssignmentForm).to receive(:copy_assignment_questionnaire).with(any_args).and_return('OK!')
+        allow(AssignmentDueDate).to receive(:copy).with(1, any_args).and_return('OK!')
+        allow_any_instance_of(Assignment).to receive(:create_node).and_return('OK!')
+        allow(SignUpTopic).to receive(:where).with(assignment_id: 1).and_return([build(:topic)])
+        expect(AssignmentForm.copy(1, build(:instructor))).to eq(2)
+      end
+    end
+
+    context 'when Copy of <old assignment name> does not exists' do
+      it 'copies the original assignment to a new one and returns the new assignment_id' do
+        allow(Assignment).to receive(:find).with(1).and_return(assignment)
+        allow_any_instance_of(AssignmentForm).to receive(:copy_assignment_questionnaire).with(any_args).and_return('OK!')
+        allow(AssignmentDueDate).to receive(:copy).with(1, any_args).and_return('OK!')
+        allow_any_instance_of(Assignment).to receive(:create_node).and_return('OK!')
+        allow(SignUpTopic).to receive(:where).with(assignment_id: 1).and_return([build(:topic)])
+        old_assignmet_name = assignment.name
+        AssignmentForm.copy(1, build(:instructor))
+        new_assign = Assignment.find_by(id: 2)
+        expect(new_assign.name).to eq("Copy of " + old_assignmet_name)
+      end
+    end
+
+    context 'when Copy of <old assignment name> exists' do
+      it 'copies the original assignment to a new one and returns the new assignment_id' do
+        allow(Assignment).to receive(:find).with(1).and_return(assignment)
+        old_assignmet_name = assignment.name
+        allow_any_instance_of(AssignmentForm).to receive(:copy_assignment_questionnaire).with(any_args).and_return('OK!')
+        allow(AssignmentDueDate).to receive(:copy).with(1, any_args).and_return('OK!')
+        allow_any_instance_of(Assignment).to receive(:create_node).and_return('OK!')
+        allow(SignUpTopic).to receive(:where).with(assignment_id: 1).and_return([build(:topic)])
+        AssignmentForm.copy(1, build(:instructor))
+        AssignmentForm.copy(1, build(:instructor))
+        new_assign = Assignment.find_by(id: 3)
+        expect(new_assign.name).to eq("Copy of " + old_assignmet_name + ' (1)')
+      end
     end
   end
+
+  describe '.copy_calibration' do
+    
 end

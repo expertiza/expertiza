@@ -126,14 +126,14 @@ describe TagPromptDeployment do
       expect(user_answer_tagging.length).to eq(2)
 
       expect(user_answer_tagging[0].user).to eq(user1)
-      expect(user_answer_tagging[0].no_tagged).to eq(1)
+      expect(user_answer_tagging[0].no_tagged).to eq(2)
       expect(user_answer_tagging[0].no_not_tagged).to eq(2)
-      expect(user_answer_tagging[0].percentage).to eq("50.0")
+      expect(user_answer_tagging[0].percentage).to eq("100.0")
 
       expect(user_answer_tagging[1].user).to eq(user2)
-      expect(user_answer_tagging[1].no_tagged).to eq(1)
+      expect(user_answer_tagging[1].no_tagged).to eq(2)
       expect(user_answer_tagging[1].no_not_tagged).to eq(2)
-      expect(user_answer_tagging[1].percentage).to eq("50.0")
+      expect(user_answer_tagging[1].percentage).to eq("100.0")
 
     end
 
@@ -156,14 +156,14 @@ describe TagPromptDeployment do
       expect(user_answer_tagging.length).to eq(2)
 
       expect(user_answer_tagging[0].user).to eq(user1)
-      expect(user_answer_tagging[0].no_tagged).to eq(1)
+      expect(user_answer_tagging[0].no_tagged).to eq(2)
       expect(user_answer_tagging[0].no_not_tagged).to eq(2)
-      expect(user_answer_tagging[0].percentage).to eq("50.0")
+      expect(user_answer_tagging[0].percentage).to eq("100.0")
 
       expect(user_answer_tagging[1].user).to eq(user2)
-      expect(user_answer_tagging[1].no_tagged).to eq(1)
+      expect(user_answer_tagging[1].no_tagged).to eq(2)
       expect(user_answer_tagging[1].no_not_tagged).to eq(2)
-      expect(user_answer_tagging[1].percentage).to eq("50.0")
+      expect(user_answer_tagging[1].percentage).to eq("100.0")
     end
 
   end

@@ -69,7 +69,6 @@ class TeamsUsersController < ApplicationController
   end
 
   def delete
-    puts 'delete'
     @teams_user = TeamsUser.find(params[:id])
     parent_id = Team.find(@teams_user.team_id).parent_id
     @user = User.find(@teams_user.user_id)

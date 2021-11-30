@@ -154,7 +154,7 @@ describe TeamsUsersController do
         allow(TeamUserNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('TeamUserNode', id: 1))
         allow(Course).to receive(:find).with(1).and_return(course1)
         allow(CourseParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
-        allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(true)
+        allow_any_instance_of(CourseTeam).to receive(:add_member).with(any_args).and_return(true)
         session = {user: admin}
         params = {
             user: {name: 'student2065'}, id: 5

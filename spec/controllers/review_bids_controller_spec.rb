@@ -51,17 +51,6 @@ describe ReviewBidsController do
       end
     end
   end
-  
-  describe '#create' do
-    context "with render views" do
-      render_views
-      it 'redirects to "others_view" page' do
-        expect {get :create, :format => :html }.to_not raise_error
-        expect(response.body) =~ '/sign_up_sheet/others_work'
-      end
-    end
-  end
-
 
   describe '#show' do
     render_views

@@ -48,12 +48,10 @@ class ReviewBidsController < ApplicationController
 
   # provides vaiables for review bidding page
   def show
+    @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
-    my_topic = self.topic_id(@assignment, params[:id].to_i)
-#     @participant = AssignmentParticipant.find(params[:id].to_i)
-#     team_id = @participant.team.try(:id)
-#     my_topic = SignedUpTeam.where(team_id: team_id).pluck(:topic_id).first
+    my_topic = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     @sign_up_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: my_topic)
     # @max_team_size = @assignment.num_reviews_allowed  #dont need this
     @num_participants = AssignmentParticipant.where(parent_id: @assignment.id).count

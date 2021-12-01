@@ -74,7 +74,7 @@
                         <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
                     </td>
 
-                    <% if @assignment.get_current_stage(topic_id) != "Finished" %>
+                    <% if @assignment.current_stage(topic_id) != "Finished" %>
                       <%- # show the link as 'Edit' when latest review is done in current round -%>
                       <%- # show link as 'Update' when latest review is done in different round or there has been a new submission in current round -%>
                       <% if last_response_round == current_round%>

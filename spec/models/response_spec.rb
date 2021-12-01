@@ -90,7 +90,7 @@ describe Response do
   end
 
   describe '#delete' do
-    it 'computes the total score of a review' do
+    it 'delete the corresponding scores when delete the response' do
       score_d = create(:answer, id:1)
       response_d = create(:response, id: 2, map_id: 1, response_map: response_map, scores:[score_d])
       expect { response_d.delete }.to change { Response.count}.by(-1).and change {Answer.count}.by(-1)
@@ -128,7 +128,7 @@ describe Response do
       response.scores = []
       question2 = double('ScoredQuestion', weight: 2)
       allow(Question).to receive(:find).with(1).and_return(question2)
-      allow(question2).to receive(:is_a?).with(ScoredQuestion).and_return(true)
+      allow(question2).to receive(:is_a?).with(ScoredQuestion).and_return(false)
       allow(response).to receive(:questionnaire_by_answer).with(nil).and_return(questionnaire)
       allow(questionnaire).to receive(:max_question_score).and_return(5)
       expect(response.maximum_score).to eq(0)
@@ -446,13 +446,6 @@ describe Response do
       allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: nil, sum_of_weights: 5, q1_max_question_score: 5))
       allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
       expect(Response.assessment_score(response: [response_record], questions: [question1])).to eq -1.0
-    end
-
-    xit "checks if submission_valid? is called" do
-      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: nil, sum_of_weights: 5, q1_max_question_score: 5))
-      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
-      expect(Answer).to receive(:submission_valid?)
-      Response.assessment_score(response: [response_record], questions: [question1])
     end
   end
 end

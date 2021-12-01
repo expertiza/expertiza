@@ -48,10 +48,28 @@ class AuthController < ApplicationController
       github_login
     when "google_oauth2"
       google_login
+    when "github2021" # due to  github https://developer.github.com/changes/2020-02-10-deprecating-auth-through-query-param/
+      custom_github_login
     else
       ExpertizaLogger.error LoggerMessage.new(controller_name, user.name, "Invalid OAuth Provider", "")
     end
   end
+
+
+  # new method to satisfy the change of the auth
+  def custom_github_login
+    session_code = request.env['rack.request.query_hash']['code']
+    result = RestClient.post('https://github.com/login/oauth/access_token',
+                               {:client_id => GITHUB_CONFIG['client_key'],
+                                :client_secret => GITHUB_CONFIG['client_secret'],
+                                :code => session_code},
+                               :accept => :json)
+    access_token = JSON.parse(result)['access_token']
+    session["github_access_token"] = access_token
+    redirect_to controller: 'assignments', action: 'list_submissions', id: session["assignment_id"]
+  end
+
+
 
   # Fall 2018, E1858
   # Login functionality for Github login feature using omniAuth2

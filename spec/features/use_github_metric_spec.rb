@@ -32,13 +32,24 @@ describe "assignment creation due dates", js: true do
     @assignment = Assignment.first
     login_as("instructor6")
   end
-    it "should edit assignment available to students" do
+    it "check the box of the use github metrics? and the list_submissions page will have the content 'Github data'  " do
          visit "/assignments/#{@assignment.id}/edit"
          sleep(inspection_time=0)
     	 check('Use github metrics?', allow_label_click: true)
+    	 sleep(inspection_time=2)
          visit "/assignments/list_submissions?id=#{@assignment.id}"
-          sleep(inspection_time=30)
+          sleep(inspection_time=10)
          expect(page).to have_content("Github data")
+    end
+
+    it "uncheck the checkbox of the use github metrics? and the list_submissions page will not have the content 'Github data'  do
+             visit "/assignments/#{@assignment.id}/edit"
+             sleep(inspection_time=0)
+        	 check('Use github metrics?', allow_label_click: false)
+        	 sleep(inspection_time=2)
+             visit "/assignments/list_submissions?id=#{@assignment.id}"
+              sleep(inspection_time=10)
+             expect(page).to have_no_content("Github data")
     end
 
   # able to set deadlines for a single round of reviews

@@ -42,7 +42,7 @@ describe "assignment creation due dates", js: true do
          expect(page).to have_content("Github data")
     end
 
-    it "uncheck the checkbox of the use github metrics? and the list_submissions page will not have the content 'Github data'  do
+    it "uncheck the checkbox of the use github metrics? and the list_submissions page will not have the content 'Github data' " do
              visit "/assignments/#{@assignment.id}/edit"
              sleep(inspection_time=0)
         	 check('Use github metrics?', allow_label_click: false)
@@ -53,5 +53,4 @@ describe "assignment creation due dates", js: true do
     end
 
   # able to set deadlines for a single round of reviews
-    end
 end

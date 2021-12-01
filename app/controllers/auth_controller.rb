@@ -77,6 +77,8 @@ class AuthController < ApplicationController
     end
   end
 
+
+
   def login_failed
     flash.now[:error] = "Your username or password is incorrect."
     render action: 'forgotten'

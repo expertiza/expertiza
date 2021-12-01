@@ -35,17 +35,6 @@ class ReviewBidsController < ApplicationController
     @assignment = @participant.assignment
     @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
 
-    # Finding the current phase that we are in
-    # Commented out as reviewed and came to a conclusion that results of the review phase logic is not used
-    due_dates = AssignmentDueDate.where(parent_id: @assignment.id)
-    @very_last_due_date = AssignmentDueDate.where(parent_id: @assignment.id).order("due_at DESC").limit(1)
-    next_due_date = @very_last_due_date[0]
-    for due_date in due_dates
-     if due_date.due_at > Time.now
-       next_due_date = due_date if due_date.due_at < next_due_date.due_at
-     end
-    end
-    @review_phase = next_due_date.deadline_type_id
     #@reviews_to_show = @@reviews_to_show.nil? ? (@assignment.num_reviews_required).to_i : @@reviews_to_show.to_i
     # Finding how many reviews have been completed
     @num_reviews_completed = 0
@@ -59,11 +48,12 @@ class ReviewBidsController < ApplicationController
 
   # provides vaiables for review bidding page
   def show
-    @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
-    team_id = @participant.team.try(:id)
-    my_topic = SignedUpTeam.where(team_id: team_id).pluck(:topic_id).first
+    my_topic = self.reviewer_self_topic(params[:id].to_i)
+#     @participant = AssignmentParticipant.find(params[:id].to_i)
+#     team_id = @participant.team.try(:id)
+#     my_topic = SignedUpTeam.where(team_id: team_id).pluck(:topic_id).first
     @sign_up_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: my_topic)
     # @max_team_size = @assignment.num_reviews_allowed  #dont need this
     @num_participants = AssignmentParticipant.where(parent_id: @assignment.id).count
@@ -121,9 +111,9 @@ class ReviewBidsController < ApplicationController
     # list of reviewers from a specific assignment
     reviewers = AssignmentParticipant.where(parent_id: assignment_id).ids
     bidding_data = ReviewBid.get_bidding_data(assignment_id, reviewers)
-    @bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers)
+    # @bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers)
     #runs algorithm and assigns reviews
-    @matched_topics = run_bidding_algorithm(bidding_data)
+    # @matched_topics = run_bidding_algorithm(bidding_data)
     matched_topics = run_bidding_algorithm(bidding_data)
     #@@reviews_to_show = nil
     ReviewBid.assign_review_topics(assignment_id, reviewers, matched_topics)

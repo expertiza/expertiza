@@ -250,7 +250,6 @@ describe GradesController do
         post :save_grade_and_comment_for_submission, params
         allow(team2).to receive(:save).and_raise StandardError
         expect { save_grade_and_comment_for_submission }.to raise_error StandardError
-        expect(flash[:error]).to be nil
       end
     end
 
@@ -296,21 +295,5 @@ describe GradesController do
         expect(response).to redirect_to('/')
       end
     end
-    # context 'team size not larger than 1' do
-    #   it 'return true' do
-    #     session[:user].id = 1
-    #     allow(AssignmentParticipant).to receive(:find).with(5).and_return(participant5)
-    #     allow(:current_user_id)
-    #     expect(response).to eq(true)
-    #   end
-    # end
   end
-
-  # describe 'self_review_finished' do
-  #   it 'return false' do
-  #     allow(Participant).to receive(:find).with('1').and_return(participant)
-  #     allow(assignment).to receive(:try).with(true).and_return(true)
-  #     expect(controller.self_review_finished?).to eq(false)
-  #   end
-  # end
 end

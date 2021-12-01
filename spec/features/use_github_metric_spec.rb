@@ -48,7 +48,7 @@ describe "assignment creation due dates", js: true do
         	 check('Use github metrics?', allow_label_click: false)
         	 sleep(inspection_time=2)
              visit "/assignments/list_submissions?id=#{@assignment.id}"
-              sleep(inspection_time=10)
+              sleep(inspection_time=9)
              expect(page).to have_no_content("Github data")
     end
 

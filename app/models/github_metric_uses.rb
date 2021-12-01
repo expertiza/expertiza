@@ -1,4 +1,4 @@
-class UseGithubMetric < ActiveRecord::Base
+class GithubMetricUses < ActiveRecord::Base
 
   def initialize(assignment_id)
     super()

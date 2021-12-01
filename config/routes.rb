@@ -538,7 +538,7 @@ resources :institution, except: [:destroy] do
   post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
   post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
 
-  post '/use_github_metrics/:assignment_id', controller: :use_github_metrics, action: :save
-  delete '/use_github_metrics/:assignment_id', controller: :use_github_metrics, action: :delete
+  post '/github_metric_uses/:assignment_id', controller: :github_metric_uses, action: :save
+  delete '/github_metric_uses/:assignment_id', controller: :github_metric_uses, action: :delete
 end
 

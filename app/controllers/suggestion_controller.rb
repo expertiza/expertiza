@@ -142,7 +142,8 @@ class SuggestionController < ApplicationController
       else # this user has a team in this assignment, check whether this team has topic or not
         if @topic_id.nil?
           # clean waitlists
-          SignedUpTeam.where(team_id: @team_id, is_waitlisted: 1).destroy_all
+          # SignedUpTeam.where(team_id: @team_id, is_waitlisted: 1).destroy_all
+          Waitlist.clean_waitlist(@team_id)
           SignedUpTeam.create(topic_id: @signuptopic.id, team_id: @team_id, is_waitlisted: 0)
         else
           @signuptopic.private_to = @user_id

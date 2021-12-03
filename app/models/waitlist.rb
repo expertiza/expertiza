@@ -94,6 +94,10 @@ class Waitlist < ActiveRecord::Base
     TeamsUser.where(team_id: team_id).first.user_id
   end
 
+  def self.clean_waitlist(team_id)
+    SignedUpTeam.where(team_id: team_id, is_waitlisted: 1).destroy_all
+  end
+
   def self.teams_not_signed_up(topic_id)
     SignedUpTeam.where(team_id: topic_id, is_waitlisted: 0)
   end

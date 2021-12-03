@@ -79,6 +79,7 @@ class Assignment < ActiveRecord::Base
 
   def valid_num_review
     self.num_reviews = self.num_reviews_allowed
+    self.num_review_of_reviews = self.num_metareviews_allowed
     if self.num_reviews_allowed && self.num_reviews_allowed != -1 && self.num_reviews_allowed < self.num_reviews_required
       self.errors.add(:message, "Num of reviews required cannot be greater than number of reviews allowed")
     elsif self.num_metareviews_allowed && self.num_metareviews_allowed != -1 && self.num_metareviews_allowed < self.num_metareviews_required

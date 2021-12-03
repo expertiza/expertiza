@@ -389,14 +389,9 @@
                 jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
                 addQuestionnaireTableRow(
                         'MetareviewQuestionnaire',
-                        null,
-                        <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-                        <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-                        <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
+                        null, <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>, <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>, <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
                 );
             }
-
-            <%@metareview_allowed_checkbox=true%>
 
         }
         function removeOrAddSignup(){
@@ -434,14 +429,9 @@ function removeOrAddMetareview() {
         addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
         jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
         addQuestionnaireTableRow(
-            'MetareviewQuestionnaire',
-            null,
-            <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-            <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-            <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
+            'MetareviewQuestionnaire', null, <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>, <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>, <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
         );
     }
-    <%@metareview_allowed_checkbox=true%>
 }
 //E1654. Improve date-picker and deadlines Code change starts
 //This is a generic funtion to add and substract days and months
@@ -511,8 +501,7 @@ function addDaysOrMonth(mul, type) {
 </span>
 
 <input name="metareviewAllowed" type="hidden" value="false" />
-<%= check_box_tag('metareviewAllowed', 'true', @metareview_allowed,:onclick=>"removeOrAddMetareview()" ) %>
-<%= label_tag('metareviewAllowed', 'Use meta-review deadline') %><br/>
+<br/>
 <div id="date_updater_div">
                                                     <button type="button" id="show_date_updater" class="btn btn-default" style="margin-bottom: 20px;">Show/Hide Date Updater</button>
                                                     <div id="date_updater_inner">
@@ -560,8 +549,8 @@ function addDaysOrMonth(mul, type) {
         addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'submission', <%=i%>, <%= due_date(@assignment_form.assignment, 'submission', i-1).to_json.html_safe %>); // or use questionnaire_options(@assignment, nil).to_json
         addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'review', <%=i%>, <%= due_date(@assignment_form.assignment, 'review', i-1).to_json.html_safe %>) ;
         <% end %>
-        <% if @metareview_allowed %>
-        addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
+        <% if @metareview_true %>
+          addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
         <%end %>
 
         //after webpage refreshes, hide or display name and url according to whether names and urls are empty in DB

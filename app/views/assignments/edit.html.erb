@@ -1,5 +1,10 @@
 <h1>Editing Assignment: <%=@assignment_form.assignment.name%></h1>
 
+  <% if @assignment.num_metareviews_allowed == 0 %>
+    <% @metareview_true = false %>
+  <% else %>
+    <% @metareview_true = true %>
+  <%end%>
 
   <%= form_for @assignment_form.assignment, html: { id: 'assignment_form' } do %>
     <div class= "table" id="tabs">
@@ -87,10 +92,7 @@
           if (bookmark_checkbox.is(':checked')) {
             addQuestionnaireTableRow(
                     'BookmarkRatingQuestionnaire',
-                    null,
-                    <%= questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>,
-                    <%= assignment_questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>,
-                    <%= questionnaire_options(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>
+                    null, <%= questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>, <%= assignment_questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>, <%= questionnaire_options(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>
             );
           }
       }

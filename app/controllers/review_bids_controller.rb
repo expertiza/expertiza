@@ -117,11 +117,9 @@ class ReviewBidsController < ApplicationController
       # list of reviewers from a specific assignment
       reviewers = AssignmentParticipant.where(parent_id: assignment_id).ids
       bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers)
-      @bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers)
+
       #runs algorithm and assigns reviews
-      @matched_topics = run_bidding_algorithm(bidding_data)
       matched_topics = run_bidding_algorithm(bidding_data)
-      #render plain: [@bidding_data.inspect,@matched_topics.inspect]
       #@@reviews_to_show = nil
       ReviewBid.assign_review_topics(assignment_id,reviewers,matched_topics)
       Assignment.find(assignment_id).update(can_choose_topic_to_review: false)  #turns off bidding for students

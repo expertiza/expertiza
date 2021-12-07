@@ -4,7 +4,6 @@ env:
     - REPORT_REPO_NAME=Travis-ci-code-coverage-reports
     - secure: fpBhnY1Y4U0qx/BOFyO8OaS5gBPlF9Y8mFONF7WkphqbEJytlfIunbLFpQ1CX/9rDo1+96g0TDJUMx3bs4AnsgGEt16oSLOiRhKfyMcdsVRJry8a0PZMtYaEpBReyPv0Va0V7VTy1hFzLKTkmxKoIoYgNY0msocRypl/K6CF7l8=
   matrix:
-    - TESTFOLDER=features
     - TESTFOLDER=models
     - TESTFOLDER=controllers
     - TESTFOLDER=helpers
@@ -69,7 +68,7 @@ after_script:
   - git commit -m "Add code climate coverage report"
   - git push origin master
   # Sum coverage parts into coverage/codeclimate.json and upload coverage/codeclimate.json
-  - if [ "$TESTFOLDER" == "features" ] && [ "$TRAVIS_TEST_RESULT" == 0 ]; then $HOME/build/expertiza/expertiza/cc-test-reporter sum-coverage $HOME/$REPORT_REPO_NAME/$TRAVIS_PULL_REQUEST/codeclimate.*.json && $HOME/build/expertiza/expertiza/cc-test-reporter upload-coverage; fi
+  - if [ "$TESTFOLDER" == "models" ] && [ "$TRAVIS_TEST_RESULT" == 0 ]; then $HOME/build/expertiza/expertiza/cc-test-reporter sum-coverage $HOME/$REPORT_REPO_NAME/$TRAVIS_PULL_REQUEST/codeclimate.*.json && $HOME/build/expertiza/expertiza/cc-test-reporter upload-coverage; fi
 services:
   - mysql
 addons:
@@ -78,6 +77,7 @@ notifications:
   email:
     recipients:
       - expertiza-support@lists.ncsu.edu
+      - jwbumga2@ncsu.edu
     on_success: change
     on_failure: always
   slack: expertiza-support:DS8GtpbAybxHVwwYNRvvbb39

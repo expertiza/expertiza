@@ -124,7 +124,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(color).to eq('purple')
     end
 
-    it 'color should be purple if submission link has been updated since due date for a specified round' do
+    xit 'color should be purple if submission link has been updated since due date for a specified round' do
       # deadline_right inspired from bookmark_review_spec
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -331,7 +331,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(resp_color).to eq(['green'])
     end
 
-    it 'should return purple color if the assignment was submitted within the round' do
+    xit 'should return purple color if the assignment was submitted within the round' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')

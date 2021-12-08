@@ -48,7 +48,7 @@ class LotteryController < ApplicationController
   def construct_users_bidding_info(sign_up_topics, teams)
     users_bidding_info = []
     # Exclude any teams already signed up
-    teams_not_signed_up = teams.reject {|team| SignedUpTeam.where(team_id: team.id, is_waitlisted: 0).any? }
+    teams_not_signed_up = teams.reject {|team| Waitlist.teams_not_signed_up(team.id).any? }
     teams_not_signed_up.each do |team|
       # Grab student id and list of bids
       bids = []
@@ -117,7 +117,8 @@ class LotteryController < ApplicationController
     # Getting sign-up topics with max_choosers > 0
     sign_up_topics = SignUpTopic.where('assignment_id = ? AND max_choosers > 0', assignment.id)
     unassigned_teams = assignment.teams.reload.select do |t|
-      SignedUpTeam.where(team_id: t.id, is_waitlisted: 0).blank? and Bid.where(team_id: t.id).any?
+      #SignedUpTeam.where(team_id: t.id, is_waitlisted: 0).blank? and Bid.where(team_id: t.id).any?
+      Waitlist.teams_not_signed_up(t.id).blank? and Bid.where(team_id: t.id).any?
     end
 
     # Sorting unassigned_teams by team size desc, number of bids in current team asc

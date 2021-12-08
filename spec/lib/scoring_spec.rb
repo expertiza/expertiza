@@ -1,4 +1,6 @@
 describe Scoring do
+    include Scoring
+
     let(:assignment_helper) { Class.new { extend AssignmentHelper } }
     let(:questionnaire) { create(:questionnaire, id: 1) }
     let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
@@ -13,14 +15,13 @@ describe Scoring do
     describe '#compute_total_score' do
         context 'when avg score is nil' do
             it 'computes total score for this assignment by summing the score given on all questionnaires' do
-            assignment_helper = Assignment.new(id: 1, name: 'Test Assgt')
             scores = {review1: {scores: {max: 80, min: 0, avg: nil}, assessments: [response]}}
-            allow(assignment_helper).to receive(:questionnaires).and_return([questionnaire1])
+            allow(assignment).to receive(:questionnaires).and_return([questionnaire1])
             allow(ReviewQuestionnaire).to receive_message_chain(:assignment_questionnaires, :find_by)
                 .with(no_args).with(assignment_id: 1).and_return(double('AssignmentQuestionnaire', id: 1))
             allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: nil)
                                                                 .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
-            expect(compute_total_score(assignment_helper, scores)).to eq(0)
+            expect(compute_total_score(assignment, scores)).to eq(0)
             end
         end
     end
@@ -78,7 +79,7 @@ describe Scoring do
     describe '#peer_review_questions_for_team' do
         context 'when there is no signed up team' do
             it 'peer review questions should return nil' do
-            val = assignment_helper.send(:peer_review_questions_for_team, nil)
+            val = Scoring.send(:peer_review_questions_for_team, nil, nil)
             expect(val).to be_nil
             end
         end

@@ -1,7 +1,9 @@
 require './spec/support/teams_shared.rb'
 
 describe StudentTeamsController do
+  # Including the stubbed objects from the teams_shared.rb file
   include_context 'object initializations'
+  # Including the shared method from the teams_shared.rb file
   include_context 'authorization check'
 
 
@@ -20,9 +22,6 @@ describe StudentTeamsController do
   end
 
   describe 'POST #create' do
-    #before(:each) do
-    # @student = AssignmentParticipant.new
-    #end
     # When assignment team is empty it flashes a notice
     context 'when create Assignment team' do
       it 'flash notice when team is empty' do
@@ -39,6 +38,7 @@ describe StudentTeamsController do
           action: 'create'
         }
         result= post :create, params, session
+        #status code 302: Redirect url
         expect(result.status).to eq 302
       end
     end
@@ -62,7 +62,7 @@ describe StudentTeamsController do
           action: 'create'
         }
         result= post :create, params, session
-
+        #status code 302: Redirect url
         expect(result.status).to eq(302)
 
       end
@@ -84,6 +84,7 @@ describe StudentTeamsController do
           action: 'create'
         }
         result= post :create, params, session
+        #status code 302: Redirect url
         expect(result.status).to eq 302
       end
     end
@@ -110,6 +111,7 @@ describe StudentTeamsController do
           action: 'update'
         }
         result= post :update, params, session
+        #status code 302: Redirect url
         expect(result.status).to eq(302)
       end
     end
@@ -136,6 +138,7 @@ describe StudentTeamsController do
           action: 'update'
         }
         result= post :update, params, session
+        #status code 302: Redirect url
         expect(result.status).to eq(302)
       end
     end
@@ -160,6 +163,7 @@ describe StudentTeamsController do
           action: 'update'
         }
         result= post :update, params, session
+        #status code 302: Redirect url
         expect(result.status).to eq(302)
       end
     end

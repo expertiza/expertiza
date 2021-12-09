@@ -1,12 +1,13 @@
 require './spec/support/teams_shared.rb'
 
 describe TeamsUsersController do
+  # Including the stubbed objects from the teams_shared.rb file
   include_context 'object initializations'
   #Objects initialization for team users
   let(:teamUser) { build(:team_user, id:1, team_id:1, user_id:1) }
   let(:teamUser2) { build(:team_user, id:2, team_id:1, user_id:2) }
 
-
+  # Including the shared method from the teams_shared.rb file
   include_context 'authorization check'
   context 'not provides access to people with' do
     it 'student credentials' do
@@ -51,7 +52,9 @@ describe TeamsUsersController do
           user: {name: 'instructor6'}, id: 1
       }
       post :create, params, session
+      #Expect to throw error
       expect(flash[:error]).to eq "\"instructor6\" is not defined. Please <a href=\"http://test.host/users/new\">create</a> this user before continuing."
+      #Expect the response to redirect to 'http://test.host/teams/list?id=1'
       expect(response).to redirect_to('http://test.host/teams/list?id=1')
     end
     end
@@ -68,7 +71,9 @@ describe TeamsUsersController do
           user: {name: 'student2065'}, id: 1
       }
       post :create, params, session
+      #Expect to throw error
       expect(flash[:error]).to eq "\"student2065\" is not a participant of the current assignment. Please <a href=\"http://test.host/participants/list?authorization=participant&id=1&model=Assignment\">add</a> this user before continuing."
+      #Expect the response to redirect to 'http://test.host/teams/list?id=1'
       expect(response).to redirect_to('http://test.host/teams/list?id=1')
     end
     end
@@ -86,7 +91,9 @@ describe TeamsUsersController do
           user: {name: 'student2065'}, id: 1
       }
       post :create, params, session
+      #Expect to throw error
       expect(flash[:error]).to eq "This team already has the maximum number of members."
+      #Expect the response to redirect to 'http://test.host/teams/list?id=1'
       expect(response).to redirect_to('http://test.host/teams/list?id=1')
     end
     end
@@ -105,6 +112,7 @@ describe TeamsUsersController do
             user: {name: 'student2065'}, id: 1
         }
         post :create, params, session
+        #Expect the response to redirect to 'http://test.host/teams/list?id=1'
         expect(response).to redirect_to('http://test.host/teams/list?id=1')
       end
     end
@@ -121,7 +129,9 @@ describe TeamsUsersController do
           user: {name: 'student2065'}, id: 5
       }
       post :create, params, session
+      #Expect to throw error
       expect(flash[:error]).to eq "\"student2065\" is not a participant of the current course. Please <a href=\"http://test.host/participants/list?authorization=participant&id=1&model=Course\">add</a> this user before continuing."
+      #Expect the response to redirect to 'http://test.host/teams/list?id=1'
       expect(response).to redirect_to('http://test.host/teams/list?id=1')
     end
     end
@@ -139,7 +149,9 @@ describe TeamsUsersController do
           user: {name: 'student2065'}, id: 5
       }
       post :create, params, session
+      #Expect to throw error
       expect(flash[:error]).to eq "This team already has the maximum number of members."
+      #Expect the response to redirect to 'http://test.host/teams/list?id=1'
       expect(response).to redirect_to('http://test.host/teams/list?id=1')
     end
     end
@@ -160,6 +172,7 @@ describe TeamsUsersController do
             user: {name: 'student2065'}, id: 5
         }
         post :create, params, session
+        #Expect the response to redirect to 'http://test.host/teams/list?id=1'
         expect(response).to redirect_to('http://test.host/teams/list?id=1')
       end
     end
@@ -175,6 +188,7 @@ describe TeamsUsersController do
       @params = {id:1}
       session = {user: instructor}
       post :delete, @params, session
+      #Expect the response to redirect to 'http://test.host/teams/list?id=1'
       expect(response).to redirect_to('http://test.host/teams/list?id=1')
     end
     end
@@ -189,6 +203,7 @@ describe TeamsUsersController do
         @params = {item:[1,2]}
         session = {user: instructor}
         post :delete_selected, @params, session
+        #Expect the response to redirect to 'http://test.host/teams_users/list'
         expect(response).to redirect_to('http://test.host/teams_users/list')
       end
     end

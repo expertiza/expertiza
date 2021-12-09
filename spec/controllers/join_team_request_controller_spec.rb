@@ -1,9 +1,9 @@
 require './spec/support/teams_shared.rb'
 
 describe JoinTeamRequestsController do
-  # Including the stubbed objects from the shared_teams.rb file
+  # Including the stubbed objects from the teams_shared.rb file
   include_context "object initializations"
-  # Including the shared method from the shared_teams.rb file
+  # Including the shared method from the teams_shared.rb file
   include_context 'authorization check'
   # Testing action_allowed? controller
   context 'provides access to people with' do
@@ -35,6 +35,7 @@ describe JoinTeamRequestsController do
         params = {action: 'show'}
         session = {user: ta}
         result = get :show, params, session
+        #status code 200: Request succeeded
         expect(result.status).to eq 200
       end
     end
@@ -86,6 +87,7 @@ describe JoinTeamRequestsController do
         }
         session = {user: student1}
         post :create, params, session
+        #status code 302: Redirect url
         expect(response.status).to eq 302
         expect(join_team_request2.status).to eq('P')
       end
@@ -96,6 +98,7 @@ describe JoinTeamRequestsController do
         params = {action: 'new'}
         session = {user: student1}
         get :new, params, session
+        #status code 200: Request succeeded
         expect(response.status).to eq 200
       end
     end
@@ -122,6 +125,7 @@ describe JoinTeamRequestsController do
         }
         # Updating "Comments" in the join team request object
         put :update, params
+        #status code 302: Redirect url
         expect(response.status).to eq 302
       end
     end
@@ -138,6 +142,7 @@ describe JoinTeamRequestsController do
         params = {action: 'decline'}
         session = {user: ta}
         result = get :decline, params, session
+        #status code 302: Redirect url
         expect(result.status).to eq 302
       end
       it "will redirect to view student teams path" do
@@ -157,6 +162,7 @@ describe JoinTeamRequestsController do
         params = {action: 'destroy'}
         session = {user: ta}
         result = get :destroy, params, session
+        #status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(join_team_requests_url)
       end

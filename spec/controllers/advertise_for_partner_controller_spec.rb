@@ -1,14 +1,17 @@
 require './spec/support/teams_shared.rb'
 
 describe AdvertiseForPartnerController do
+  # Including the stubbed objects from the teams_shared.rb file
   include_context 'object initializations'
   let(:team1user1) { build_stubbed(:team_user, id: 1, team: team1, user: student1)}
   let(:team1user2) { build_stubbed(:team_user, id: 2, team: team1, user: student2)}
 
+  # Performs authorization check for user
   describe 'action allowed method' do
-    context 'provides access when called directly' do
+    context 'when called directly' do
+      # Including the shared method from the teams_shared.rb file
       include_context 'authorization check'
-      it 'for student' do
+      it 'provides access for student' do
         stub_current_user(student1, student1.role.name, student1.role)
         expect(controller.send(:action_allowed?)).to be true
       end
@@ -20,6 +23,7 @@ describe AdvertiseForPartnerController do
         allow(AssignmentParticipant).to receive(:exists?).and_return(true)
         session = {user: student1}
         result = get :create, session
+        #status code 302: Redirect url
         expect(result.status).to eq 302
       end
       it 'check if update method can be called by the user' do
@@ -27,6 +31,7 @@ describe AdvertiseForPartnerController do
         allow(AssignmentParticipant).to receive(:exists?).and_return(true)
         session = {user: student1}
         result = get :update, session
+        #status code 302: Redirect url
         expect(result.status).to eq 302
       end
       it 'check if edit method can be called by the user' do
@@ -34,6 +39,7 @@ describe AdvertiseForPartnerController do
         allow(AssignmentParticipant).to receive(:exists?).and_return(true)
         session = {user: student1}
         result = get :edit, session
+        #status code 302: Redirect url
         expect(result.status).to eq 302
       end
       it 'check if remove method can be called by the user' do
@@ -41,6 +47,7 @@ describe AdvertiseForPartnerController do
         allow(AssignmentParticipant).to receive(:exists?).and_return(true)
         session = {user: student1}
         result = get :remove, session
+        #status code 302: Redirect url
         expect(result.status).to eq 302
       end
     end
@@ -55,6 +62,7 @@ describe AdvertiseForPartnerController do
       para = {id: team1.id, team_id: team1.id}
       session = {user: student1}
       result = get :edit, para, session
+      #status code 200: Request succeeded
       expect(result.status).to eq 200
       expect(controller.instance_variable_get(:@team)).to eq team1
     end
@@ -77,6 +85,7 @@ describe AdvertiseForPartnerController do
         }
         session = {user: ta}
         result = get :create, params, session
+        #status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(view_student_teams_path(:student_id => 1))
       end
@@ -99,6 +108,7 @@ describe AdvertiseForPartnerController do
         }
         session = {user: ta}
         result = get :update, params, session
+        #status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(view_student_teams_path(:student_id => 1))
       end
@@ -115,6 +125,7 @@ describe AdvertiseForPartnerController do
         session = {user: ta}
         result = get :update, params, session
         expect(flash[:error]).to eq "An error occurred and your advertisement was not updated!"
+        #status code 200: Request succeeded
         expect(result.status).to eq 200
       end
     end
@@ -137,6 +148,7 @@ describe AdvertiseForPartnerController do
         }
         session = {user: ta}
         result = get :remove, params, session
+        #status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(view_student_teams_path(:student_id => 1))
       end

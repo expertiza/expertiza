@@ -1,10 +1,12 @@
 require './spec/support/teams_shared.rb'
 
 describe TeamsController do
+  # Performs authorization check for user
   include_context 'object initializations'
 
   describe 'action allowed method' do
     context 'provides access after' do
+      # Including the shared method from the teams_shared.rb file
       include_context 'authorization check'
     end
     context 'not provides access to people with' do
@@ -23,6 +25,7 @@ describe TeamsController do
         para = {id: assignment1.id, team_size: 2}
         session = {user: instructor, team_type: "Assignment"}
         result = get :create_teams, para, session
+        #status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(:action => 'list', :id => assignment1.id)
       end
@@ -36,6 +39,7 @@ describe TeamsController do
         params = {id: assignment1.id, type: 'Assignment'}
         session = {user: instructor}
         result = get :list, params, session
+        #status code 200: Request succeeded
         expect(result.status).to eq 200
         expect(controller.instance_variable_get(:@assignment)).to eq assignment1
       end
@@ -45,6 +49,7 @@ describe TeamsController do
         params = {id: course1.id, type: 'Course'}
         session = {user: instructor}
         result = get :list, params, session
+        #status code 200: Request succeeded
         expect(result.status).to eq 200
         expect(controller.instance_variable_get(:@assignment)).to eq nil
       end
@@ -54,6 +59,7 @@ describe TeamsController do
         params = {id: 52, type: 'Subject'}
         session = {user: instructor}
         result = get :list, params, session
+        #status code 200: Request succeeded
         expect(result.status).to eq 200
         expect(controller.instance_variable_get(:@assignment)).to eq nil
       end
@@ -66,6 +72,7 @@ describe TeamsController do
       para = {id: assignment1.id}
       session = {user: ta, team_type: 'Assignment'}
       result = get :new, para, session
+      #status code 200: Request succeeded
       expect(result.status).to eq 200
       expect(controller.instance_variable_get(:@parent)).to eq assignment1
     end
@@ -78,6 +85,7 @@ describe TeamsController do
         para = { id: assignment1.id, team: {name: 'rando team'}}
         session = {user: ta, team_type: 'Assignment'}
         result = get :create, para, session
+        #status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(:action => 'list', :id => assignment1.id)
       end
@@ -128,6 +136,7 @@ describe TeamsController do
         para = {id: 5}
         session = {user: instructor}
         result = get :delete, para, session
+        #status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to :back
         expect(controller.instance_variable_get(:@team)).to eq nil
@@ -141,6 +150,7 @@ describe TeamsController do
         para = {id: 5}
         session = {user: instructor, team_type: 'CourseTeam'}
         result = get :delete, para, session
+        #status code 302: Redirect url
         expect(result.status).to eq 302
         expect(controller.instance_variable_get(:@team)).to eq team5
       end
@@ -176,6 +186,7 @@ describe TeamsController do
         para = {id: team5.id}
         session = {user: ta}
         result = get :inherit, para, session
+        #status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(:controller => 'teams', :action => 'list', :id => assignment1.id)
       end
@@ -187,6 +198,7 @@ describe TeamsController do
         para = {id: team5.id}
         session = {user: ta}
         result = get :inherit, para, session
+        #status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(:controller => 'teams', :action => 'list', :id => assignment1.id)
       end
@@ -200,6 +212,7 @@ describe TeamsController do
         para = {id: team5.id}
         session = {user: ta}
         result = get :inherit, para, session
+        #status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(:controller => 'teams', :action => 'list', :id => fasg.id)
       end
@@ -215,6 +228,7 @@ describe TeamsController do
         para = {id: team2.id}
         session = {user: ta}
         result = get :bequeath, para, session
+        #status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(:controller => 'teams', :action => 'list', :id => assignment1.id)
       end
@@ -228,6 +242,7 @@ describe TeamsController do
         para = {id: team2.id}
         session = {user: ta}
         result = get :bequeath, para, session
+        #status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(:controller => 'teams', :action => 'list', :id => fasg.id)
       end

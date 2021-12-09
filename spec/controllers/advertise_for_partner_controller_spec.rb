@@ -16,8 +16,11 @@ describe AdvertiseForPartnerController do
         expect(controller.send(:action_allowed?)).to be true
       end
     end
+    # we expect 302 status in response because these tests are only to check the authorization that happens before
+    # controller enters the method itself, since there are no stubbings for methods themselves, the process will
+    # encounter some problem once inside the method and redirect in all cases
+    # since we only care about authorization checks, we are not concerned with where we get redirected to for now
     context 'performs access check when called before' do
-      #we expect it to redirect us because we are only calling the create method to check the authorization that happens before controller enters the method itself
       it 'checks if create method can be called by the user' do
         allow(AssignmentTeam).to receive_message_chain(:find_by, :assignment).and_return(assignment1)
         allow(AssignmentParticipant).to receive(:exists?).and_return(true)

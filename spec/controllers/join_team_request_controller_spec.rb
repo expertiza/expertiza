@@ -1,20 +1,10 @@
 require './spec/support/teams_shared.rb'
 
 describe JoinTeamRequestsController do
+  # Including the stubbed objects from the shared_teams.rb file
   include_context "object initializations"
+  # Including the shared method from the shared_teams.rb file
   include_context 'authorization check'
-  before (:each) {
-    join_team_request4 = JoinTeamRequest.new()
-    join_team_request4.id = 3
-    join_team_request4.team_id = 4
-    join_team_request4.status = 'P'
-    join_team_request4.participant_id = 1
-    join_team_request4.comments = "I want to join the team"
-    join_team_request4.save
-    allow(  join_team_request4).to receive(:save).and_return(true)
-    allow(JoinTeamRequest).to receive(:find).with("2").and_return(join_team_request2)
-    allow(join_team_request2).to receive(:update_attribute).with(any_args).and_return('OK!')
-  }
   # Testing action_allowed? controller
   context 'provides access to people with' do
     it 'will give students above access' do

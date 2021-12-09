@@ -53,7 +53,7 @@ describe JoinTeamRequestsController do
   # Testing new method
   describe "GET #new" do
     context "when new is called" do
-      it "routes to new page" do
+      it "routes to #new page" do
         get :new
         expect(get: "join_team_requests/new").to route_to("join_team_requests#new")
       end
@@ -66,8 +66,8 @@ describe JoinTeamRequestsController do
       # Stubbing participant to receive an object with id = 1
       allow(Participant).to receive(:find).with("1").and_return(participant)
     end
-    context "when resource is not saved!" do
-      it "renders new page" do
+    context "when creating new join team request is not saved!" do
+      it "will render #new page" do
         allow(JoinTeamRequest).to receive(:new).and_return(invalidrequest)
         params = {participant_id: participant.id, team_id: -2}
         session = {user: student1}
@@ -84,7 +84,7 @@ describe JoinTeamRequestsController do
         allow(Participant).to receive(:where).with(user_id: 1,parent_id: '1').and_return([participant])
         allow(join_team_request2).to receive(:save).and_return(true)
       end
-      it "valid response" do
+      it "will change the status to 'P' " do
         allow(join_team_request2).to receive(:save).and_return(true)
         params = {
           id: 2,
@@ -120,7 +120,7 @@ describe JoinTeamRequestsController do
     end
 
     context "when the join_team_request is updated" do
-      it "gives update message" do
+      it "will update the :comments parameter only" do
         allow(Participant).to receive(:find).with("1").and_return(participant)
         allow(Team).to receive(:find).with("2").and_return(team2)
         params = {
@@ -138,7 +138,7 @@ describe JoinTeamRequestsController do
   end
 
   # Testing Decline method
-  describe "#decline" do
+  describe "Get #decline" do
     context "when join team request is declined" do
       before(:each) do
         allow(JoinTeamRequest).to receive(:find).and_return(join_team_request2)

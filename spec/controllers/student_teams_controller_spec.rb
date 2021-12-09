@@ -42,9 +42,9 @@ describe StudentTeamsController do
         expect(result.status).to eq 302
       end
     end
-    #happy flow to create team
+    #when all the team name is set correctly, create team
     context "create team" do
-      it "saves the team" do
+      it "saves the team when all the team name is set correctly" do
         allow(AssignmentNode).to receive(:find_by).with(node_object_id: 1).and_return(node1)
         allow(AssignmentTeam).to receive(:new).with(name: 'test', parent_id: 1).and_return(team7)
         allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
@@ -67,9 +67,9 @@ describe StudentTeamsController do
 
       end
     end
-    #when the team name os already in use, it flashes message
+    #when the team name is already in use, it flashes message
     context "name already in use" do
-      it "flash notice" do
+      it "flash notice when the team name is already in use" do
         allow(AssignmentTeam).to receive(:where).with(name: 'test', parent_id: 1).and_return(team7)
         allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
         allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
@@ -90,9 +90,9 @@ describe StudentTeamsController do
   end
 
   describe '#update' do
-    #When the name is not already present it updates the name
+    #When the name is not already present in the database, it updates the name
     context 'update team name when matching name not found' do
-      it 'update name' do
+      it 'update name when the name is not already present in the database' do
         allow(AssignmentTeam).to receive(:where).with(name: 'test', parent_id: 1).and_return([])
         allow(Team).to receive(:find).with("1").and_return(team7)
         allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
@@ -115,7 +115,7 @@ describe StudentTeamsController do
     end
     #When no team has name and only one matching team is found,update the name
     context 'update name when name is found' do
-      it 'update name' do
+      it 'update name when no team has name and only one matching team is found' do
         allow(AssignmentTeam).to receive(:where).with(name: 'test', parent_id: 1).and_return(team1)
         allow(Team).to receive(:find).with("1").and_return(team8)
         allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
@@ -141,7 +141,7 @@ describe StudentTeamsController do
     end
     #when the team name is already in use, then flash the error message
     context 'name is already in use' do
-      it 'flash notice' do
+      it 'when the team name is already in use flash notice' do
         allow(AssignmentTeam).to receive(:where).with(name: 'test', parent_id: 1).and_return(team1)
         allow(Team).to receive(:find).with("1").and_return(team8)
         allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
@@ -166,9 +166,9 @@ describe StudentTeamsController do
   end
 
   describe '#remove_participant' do
-    #remove participant from team and remove team if he was the only particilant
+    #remove participant from team and remove team if he was the only participant
     context 'remove team user' do
-      it 'remove user' do
+      it 'remove user from team and remove team if he was the only participant' do
         allow(AssignmentParticipant).to receive(:find).and_return(participant)
         allow(TeamsUser).to receive(:where).and_return(team_user1)
         allow(team_user1).to receive(:destroy_all)

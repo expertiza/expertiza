@@ -57,8 +57,8 @@ describe AdvertiseForPartnerController do
   end
 
   #When the Assignment team exists and the assignment participant exists, then allow user to edit
-  describe 'edit method' do
-    it 'then allow user to edit when the Assignment team exists and the assignment participant exists' do
+  describe 'edit method called' do
+    it 'by a valid team allows user to edit the advertisement' do
       allow(AssignmentTeam).to receive(:find_by).and_return(team1)
       allow(AssignmentTeam).to receive_message_chain(:find_by, :assignment).and_return(assignment1)
       allow(AssignmentParticipant).to receive(:exists?).and_return(true)
@@ -72,20 +72,15 @@ describe AdvertiseForPartnerController do
   end
 
   #create advertisement by passing team and paticipant details
-  describe "POST #create" do
-
-    context "when advertisement request is valid" do
-      it "will create an advertisement" do
+  describe "create method called" do
+    context "by a an existing team with advertisement comment" do
+      it "will create an advertisement for the team in current session" do
         allow(AssignmentTeam).to receive(:find_by).and_return(team1)
         allow(AssignmentParticipant).to receive(:exists?).and_return(true)
         allow(team1).to receive(:assignment).and_return(assignment1)
         allow(team1).to receive(:update_attributes).and_return(true)
         allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
-
-        params  = {
-          id: team1.id,
-          team_id: team1.id,
-        }
+        params = {id: team1.id, team_id: team1.id}
         session = {user: ta}
         result = get :create, params, session
         #status code 302: Redirect url
@@ -95,19 +90,18 @@ describe AdvertiseForPartnerController do
     end
   end
 
-  # Update advertisement by passing team and paticipant details
-  describe "POST #update" do
-    context "when advertisement is updated" do
-      it "the advertisement is updated" do
+  # Update advertisement by passing team and participant details
+  describe "update method called" do
+    context "to update the comment in advertisement by a valid member of the current team in session" do
+      it "updates the advertisement successfully" do
         allow(AssignmentTeam).to receive(:find_by).and_return(team1)
         allow(AssignmentParticipant).to receive(:exists?).and_return(true)
         allow(team1).to receive(:assignment).and_return(assignment1)
         allow(team1).to receive(:update_attributes).and_return(true)
         allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
-
         params  = {
             id: team1.id,
-            team_id: team1.id,
+            team_id: team1.id
         }
         session = {user: ta}
         result = get :update, params, session
@@ -115,7 +109,10 @@ describe AdvertiseForPartnerController do
         expect(result.status).to eq 302
         expect(result).to redirect_to(view_student_teams_path(:student_id => 1))
       end
-      it "the advertisement is not updated due to error" do
+    end
+
+    context "to update the comment in advertisement by a non-valid member of the current team in session" do
+      it "throws an error and the advertisement is not updated" do
         allow(AssignmentTeam).to receive(:find_by).and_return(team1)
         allow(AssignmentParticipant).to receive(:exists?).and_return(true)
         allow(team1).to receive(:assignment).and_return(assignment1)
@@ -123,7 +120,7 @@ describe AdvertiseForPartnerController do
         allow(team1).to receive(:update_attributes).and_raise(StandardError)
         params  = {
             id: team1.id,
-            team_id: team1.id,
+            team_id: team1.id
         }
         session = {user: ta}
         result = get :update, params, session
@@ -134,20 +131,18 @@ describe AdvertiseForPartnerController do
     end
   end
   
-  # Remove advertisement by passing team and paticipant details
-  describe "POST #remove" do
-#When al details are passed, remove the advertisement
-    context "when advertisement is removed" do
-      it "the advertisement is removed" do
+  # Remove advertisement by passing team and participant details
+  describe "remove method" do
+    context "when called by a valid member of the current team in session" do
+      it "allows to successfully remove the advertisement" do
         allow(AssignmentTeam).to receive(:find_by).and_return(team1)
         allow(AssignmentParticipant).to receive(:exists?).and_return(true)
         allow(team1).to receive(:assignment).and_return(assignment1)
         allow(team1).to receive(:update_attributes).and_return(true)
         allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
-
         params  = {
             id: team1.id,
-            team_id: team1.id,
+            team_id: team1.id
         }
         session = {user: ta}
         result = get :remove, params, session
@@ -155,7 +150,10 @@ describe AdvertiseForPartnerController do
         expect(result.status).to eq 302
         expect(result).to redirect_to(view_student_teams_path(:student_id => 1))
       end
-      it "the advertisement is not removed due to error" do
+    end
+
+    context "when called by a non-valid member of the current team in session" do
+      it "throws an error and advertisement is not removed" do
         allow(AssignmentTeam).to receive(:find_by).and_return(team1)
         allow(AssignmentParticipant).to receive(:exists?).and_return(true)
         allow(team1).to receive(:assignment).and_return(assignment1)
@@ -163,7 +161,7 @@ describe AdvertiseForPartnerController do
         allow(team1).to receive(:update_attributes).and_raise(StandardError)
         params  = {
             id: team1.id,
-            team_id: team1.id,
+            team_id: team1.id
         }
         session = {user: ta}
         result = get :remove, params, session

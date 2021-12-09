@@ -15,28 +15,28 @@ describe AdvertiseForPartnerController do
     end
     context 'performs access check when called before' do
       #we expect it to redirect us because we are only calling the create method to check the authorization that happens before controller enters the method itself
-      it 'create method' do
+      it 'checks if create method can be called by the user' do
         allow(AssignmentTeam).to receive_message_chain(:find_by, :assignment).and_return(assignment1)
         allow(AssignmentParticipant).to receive(:exists?).and_return(true)
         session = {user: student1}
         result = get :create, session
         expect(result.status).to eq 302
       end
-      it 'update method' do
+      it 'check if update method can be called by the user' do
         allow(AssignmentTeam).to receive_message_chain(:find_by, :assignment).and_return(assignment1)
         allow(AssignmentParticipant).to receive(:exists?).and_return(true)
         session = {user: student1}
         result = get :update, session
         expect(result.status).to eq 302
       end
-      it 'edit method' do
+      it 'check if edit method can be called by the user' do
         allow(AssignmentTeam).to receive_message_chain(:find_by, :assignment).and_return(assignment1)
         allow(AssignmentParticipant).to receive(:exists?).and_return(true)
         session = {user: student1}
         result = get :edit, session
         expect(result.status).to eq 302
       end
-      it 'remove method' do
+      it 'check if remove method can be called by the user' do
         allow(AssignmentTeam).to receive_message_chain(:find_by, :assignment).and_return(assignment1)
         allow(AssignmentParticipant).to receive(:exists?).and_return(true)
         session = {user: student1}
@@ -46,8 +46,9 @@ describe AdvertiseForPartnerController do
     end
   end
 
+  #When the Assignment team exists and the assignment participant exists, then allow user to edit
   describe 'edit method' do
-    it 'passes the test' do
+    it 'then allow user to edit when the Assignment team exists and the assignment participant exists' do
       allow(AssignmentTeam).to receive(:find_by).and_return(team1)
       allow(AssignmentTeam).to receive_message_chain(:find_by, :assignment).and_return(assignment1)
       allow(AssignmentParticipant).to receive(:exists?).and_return(true)
@@ -59,9 +60,10 @@ describe AdvertiseForPartnerController do
     end
   end
 
+  #create advertisement by passing team and paticipant details
   describe "POST #create" do
 
-    context "when it is valid" do
+    context "when advertisement request is valid" do
       it "will create an advertisement" do
         allow(AssignmentTeam).to receive(:find_by).and_return(team1)
         allow(AssignmentParticipant).to receive(:exists?).and_return(true)
@@ -81,8 +83,8 @@ describe AdvertiseForPartnerController do
     end
   end
 
+  # Update advertisement by passing team and paticipant details
   describe "POST #update" do
-
     context "when advertisement is updated" do
       it "the advertisement is updated" do
         allow(AssignmentTeam).to receive(:find_by).and_return(team1)
@@ -117,8 +119,10 @@ describe AdvertiseForPartnerController do
       end
     end
   end
+  
+  # Remove advertisement by passing team and paticipant details
   describe "POST #remove" do
-
+#When al details are passed, remove the advertisement
     context "when advertisement is removed" do
       it "the advertisement is removed" do
         allow(AssignmentTeam).to receive(:find_by).and_return(team1)

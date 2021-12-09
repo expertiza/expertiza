@@ -37,7 +37,7 @@ describe JoinTeamRequestsController do
   #     expect(result.status).to eq 302
   #   end
   # end
-  # Testing show method
+  # Testing show method to get the particular join team request
   describe "GET #show" do
     context "when show is valid" do
       it "will show particular student team given index" do
@@ -50,7 +50,7 @@ describe JoinTeamRequestsController do
     end
   end
 
-  # Testing new method
+  # Testing new method to redirect to create a new join team request
   describe "GET #new" do
     context "when new is called" do
       it "routes to #new page" do
@@ -60,7 +60,7 @@ describe JoinTeamRequestsController do
     end
   end
 
-  # Testing create method
+  # Testing create method to create a new join team request
   describe "POST #create" do
     before(:each) do
       # Stubbing participant to receive an object with id = 1

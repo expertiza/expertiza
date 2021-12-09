@@ -1,7 +1,8 @@
 RSpec.configure do |rspec|
   rspec.shared_context_metadata_behavior = :apply_to_host_groups
 end
-# Declaring common stubbed objects
+# Declaring common stubbed objects: This creates single instances of superadmin, admin, instructor, teaching assistant, course and assignment. 
+# There are 2 instances of students, 5 instances of assignment teams, 2 instances of course teams, 4 instances of team join requests, and single instances of participant, node and team user.
 shared_context 'object initializations' do
   let(:superadmin) { build_stubbed(:superadmin) }
   let(:admin) { build_stubbed(:admin) }

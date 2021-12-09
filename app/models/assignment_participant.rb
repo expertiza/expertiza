@@ -109,6 +109,8 @@ class AssignmentParticipant < Participant
 
   ######
 
+  # provide import functionality for Assignment Participants
+  # if user does not exist, it will be created and added to this assignment
   def self.import(row_hash, session, id)
     raise ArgumentError, "Record does not contain required items." if row_hash.length < self.required_import_fields.length
     user = User.find_by(name: row_hash[:name])
@@ -133,34 +135,6 @@ class AssignmentParticipant < Participant
   def self.import_options
     {}
   end
-
-  # provide import functionality for Assignment Participants
-  # if user does not exist, it will be created and added to this assignment
-
-  # def self.import(row_hash, _row_header = nil, session, id)
-  #   raise ArgumentError, "No user id has been specified." if row_hash.empty?
-  #   user = User.find_by(name: row_hash[:name])
-
-  #   #if user with provided name in csv file is not present then new user will be created.
-  #   if user.nil?
-  #     raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
-
-  #     #define_attributes method will return an element that stores values from the row_hash.
-  #     attributes = ImportFileHelper.define_attributes(row_hash)
-
-  #     #create_new_user method will create new user with values present in attribute.
-  #     user = ImportFileHelper.create_new_user(attributes, session)
-
-  #   end
-  #   raise ImportError, "The assignment with id \"#{id}\" was not found." if Assignment.find(id).nil?
-
-  #   #if user is already added to the assignment then return.
-  #   return if AssignmentParticipant.exists?(user_id: user.id, parent_id: id)
-
-  #   #if user is not already a participant then, user will be added to the assignment.
-  #   new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id)
-  #   new_part.set_handle
-  # end
 
   # grant publishing rights to one or more assignments. Using the supplied private key,
   # digital signatures are generated.

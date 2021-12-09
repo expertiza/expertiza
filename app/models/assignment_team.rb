@@ -127,16 +127,6 @@ class AssignmentTeam < Team
     files
   end
 
-  # REFACTOR BEGIN:: functionality of import,export, handle_duplicate shifted to team.rb
-  # Import csv file to form teams directly
-  # def self.import(row, assignment_id, options)
-  #   unless Assignment.find_by(id: assignment_id)
-  #     raise ImportError, "The assignment with the id \"" + assignment_id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
-  #   end
-  #   @assignment_team = prototype
-  #   Team.import(row, assignment_id, options, @assignment_team)
-  # end
-
   # Export the existing teams in a csv file
   def self.export(csv, parent_id, options)
     @assignment_team = prototype
@@ -284,6 +274,7 @@ class AssignmentTeam < Team
     get_logged_in_reviewer_id(current_user_id) != nil
   end
 
+  # Import csv file to form teams directly
   def self.import(row_hash, session = nil, id, options)
         raise ArgumentError, "Record does not contain required items." if row_hash.length < self.required_import_fields.length
         raise ImportError, "The assignment with the id \"" + id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?" if Assignment.find_by(id: id).nil?

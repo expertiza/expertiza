@@ -84,24 +84,6 @@ class GradesController < ApplicationController
     @pscore = ResponseMap.participant_scores(@participant, @questions)
     @vmlist = []
 
-    # # loop through each questionnaire, and populate the view model for all data necessary
-    # # to render the html tables.
-    # counter_for_same_rubric = 0
-    # questionnaires.each do |questionnaire|
-    #   @round = nil
-    #   if @assignment.vary_by_round && questionnaire.type == "ReviewQuestionnaire"
-    #     questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
-    #     if questionnaires.count > 1
-    #       @round = questionnaires[counter_for_same_rubric].used_in_round
-    #       counter_for_same_rubric += 1
-    #     else
-    #       @round = questionnaires[0].used_in_round
-    #       counter_for_same_rubric = 0
-    #     end
-    #   end
-    #   @vmlist << populate_view_model(questionnaire)
-    # end
-
     generate_heatgrid(@participant, @assignment, @team, @team_id, questionnaires, @vmlist)
 
     @current_role_name = current_role_name

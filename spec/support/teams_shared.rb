@@ -30,7 +30,7 @@ shared_context 'object initializations' do
 end
 # Creating a shared context for authorization check to be shared with teams related files
 shared_context 'authorization check', :shared_context => :metadata do
-  # Testing to check Instructor access
+  # Testing to check SuperAdmin access
   it 'superadmin credentials' do
     stub_current_user(superadmin, superadmin.role.name, superadmin.role)
     expect(controller.send(:action_allowed?)).to be true

@@ -35,7 +35,7 @@ class ResponseMap < ActiveRecord::Base
     responses
   end
 
-  def comparator(m1, m2)
+  def self.comparator(m1, m2)
     if m1.version_num and m2.version_num
       m2.version_num <=> m1.version_num
     elsif m1.version_num
@@ -48,8 +48,9 @@ class ResponseMap < ActiveRecord::Base
   # return latest versions of the response given by reviewer
   def self.reviewer_assessments_for(team, reviewer)
     # get_reviewer may return an AssignmentParticipant or an AssignmentTeam
-    map = where(reviewee_id: team.id, reviewer_id: reviewer.get_reviewer.id)
-    Response.where(map_id: map).sort {|m1, m2| self.comparator(m1, m2) }[0]
+    #map = where(reviewee_id: team.id, reviewer_id: reviewer.get_reviewer.id)
+    map = where(reviewee_id: team.id, reviewer_id: reviewer.id)
+    Response.where(map_id: map.first.id).sort {|m1, m2| self.comparator(m1, m2) }[0]
   end
 
   # Placeholder method, override in derived classes if required.
@@ -89,7 +90,8 @@ class ResponseMap < ActiveRecord::Base
   def find_team_member
     # ACS Have metareviews done for all teams
     if self.type.to_s == "MetareviewResponseMap"
-        review_mapping = ResponseMap.find_by(id: map.reviewed_object_id)
+        #review_mapping = ResponseMap.find_by(id: map.reviewed_object_id)
+        review_mapping = ResponseMap.find_by(id: self.reviewed_object_id)
         team = AssignmentTeam.find_by(id: review_mapping.reviewee_id)
     else
         team = AssignmentTeam.find(self.reviewee_id)

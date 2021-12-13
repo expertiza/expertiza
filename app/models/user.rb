@@ -61,6 +61,7 @@ class User < ActiveRecord::Base
   end
 
   def recursively_parent_of(user)
+    
     p = user.parent
     return false if p.nil?
     return true if p == self
@@ -81,7 +82,7 @@ class User < ActiveRecord::Base
 
     # Add the children to the list
     unless self.role.super_admin?
-      User.all.find_each do |u|
+      User.includes(:parent, :role, parent: [:parent, :role]).find_each do |u|
         if recursively_parent_of(u)
           user_list << u unless user_list.include?(u)
         end

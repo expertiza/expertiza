@@ -61,7 +61,6 @@ class User < ActiveRecord::Base
   end
 
   def recursively_parent_of(user)
-    
     p = user.parent
     return false if p.nil?
     return true if p == self

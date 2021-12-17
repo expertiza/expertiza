@@ -604,7 +604,7 @@ GEM
       rubyzip (>= 1.0.0)
 
 PLATFORMS
-  ruby
+  ruby (>=2.3.0)
 
 DEPENDENCIES
   RedCloth

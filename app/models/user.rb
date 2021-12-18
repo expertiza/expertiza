@@ -81,6 +81,7 @@ class User < ActiveRecord::Base
 
     # Add the children to the list
     unless self.role.super_admin?
+      #Line 85 implements eager loading using 'includes' method. For detail, visit: http://tiny.cc/9aomuz
       User.includes(:parent, :role, parent: [:parent, :role]).find_each do |u|
         if recursively_parent_of(u)
           user_list << u unless user_list.include?(u)

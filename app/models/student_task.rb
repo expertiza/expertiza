@@ -25,6 +25,7 @@ class StudentTask
   end
 
   def self.from_user(user)
+    #Line 29 implements eager loading using 'includes' method. For detail, visit: http://tiny.cc/9aomuz
     user.assignment_participants.includes([:assignment, :topic]).map do |participant|
       StudentTask.from_participant participant
     end.sort_by(&:stage_deadline)

@@ -44,11 +44,13 @@ class Instructor < User
       participants << course.get_participants
     end
     assignments = Assignment.where(instructor_id: user.id)
+    #Line 48 implements eager loading using 'includes' method. For detail, visit: http://tiny.cc/9aomuz
     assignments.includes([:participants]).each do |assignment|
       participants << assignment.participants
     end
     participants.each do |p_s|
       next if p_s.empty?
+      #Line 54 implements eager loading using 'includes' method. For detail, visit: http://tiny.cc/9aomuz
       p_s.includes(:user, user: [:role]).each do |p|
         user_list << p.user if user.role.hasAllPrivilegesOf(p.user.role)
       end

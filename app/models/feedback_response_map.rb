@@ -33,6 +33,7 @@ class FeedbackResponseMap < ResponseMap
     # reviewed_object_id in (select id from responses where
     # map_id in (select id from response_maps where reviewed_object_id = 722 and type = 'ReviewResponseMap'))
     @review_response_map_ids = ReviewResponseMap.where(["reviewed_object_id = ?", id]).pluck("id")
+    #Line 37 implements eager loading using 'includes' method. For detail, visit: http://tiny.cc/9aomuz
     teams = AssignmentTeam.includes([:users]).where(parent_id: id)
     @authors = []
     teams.each do |team|

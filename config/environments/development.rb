@@ -59,7 +59,7 @@ Expertiza::Application.configure do
   config.assets.debug = true
   config.react.variant = :development
   config.active_record.logger = nil
-
+  #Line 63-69 are for 'bullet' gem initialization.
   config.after_initialize do
     Bullet.enable = true
     Bullet.alert = true

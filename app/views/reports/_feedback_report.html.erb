@@ -157,6 +157,7 @@
               <%= @count %>/<%= @rspan %>
             </td>
           <% end %>
+          #Line 161 implements eager loading using 'includes' method. For detail, visit: http://tiny.cc/9aomuz
           <% @review_responses.includes([:response_map]).each do |review_response| %>
             <!-- Get 'FeedbackReponseMap' for each review response, 'FeedbackResponseMap' alias as 'frm' -->
             <% @frm = FeedbackResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and reviewee_id = ?", review_response.id, rejoinder.id, review_response.response_map.reviewer_id]).first %>

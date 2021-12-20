@@ -43,9 +43,9 @@ class Instructor < User
     courses.each do |course|
       participants << course.get_participants
     end
-    assignments = Assignment.where(instructor_id: user.id)
-    #Line 48 implements eager loading using 'includes' method. For detail, visit: http://tiny.cc/9aomuz
-    assignments.includes([:participants]).each do |assignment|
+    assignments = Assignment.includes([:participants]).where(instructor_id: user.id)
+    #Line 46 implements eager loading using 'includes' method. For detail, visit: http://tiny.cc/9aomuz
+    assignments.each do |assignment|
       participants << assignment.participants
     end
     participants.each do |p_s|

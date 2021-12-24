@@ -85,6 +85,7 @@ group :development do
   gem 'quiet_assets'
   gem 'rubocop'
   gem 'bullet', '~> 5.7.6'
+  #Latest version of bullet gem is 6.1.5, which requires Ruby version of >=2.3 but as 'beta' branch uses Ruby version 2.2.7, this gem has been downgraded in this pull request. Please upgrade the bullet gem to latest version, as soon as Ruby version of 'beta' branch is upgraded to some higher versions. 
 end
 
 group :test do

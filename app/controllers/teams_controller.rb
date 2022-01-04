@@ -68,6 +68,15 @@ class TeamsController < ApplicationController
     @team = Team.find(params[:id])
   end
 
+  def delete_all
+    # Deletes all the teams assigned to a course, by finding them via node_object_id
+    root_node = Object.const_get(session[:team_type] + "Node").find_by(node_object_id: params[:id])
+    child_nodes = root_node.get_teams.map { |e| e.node_object_id}
+    course_teams = Team.where(id: child_nodes)
+    course_teams.destroy_all if course_teams
+    redirect_to action: 'list', id: params[:id]
+  end
+
   def delete
     # delete records in team, teams_users, signed_up_teams table
     @team = Team.find_by(id: params[:id])

@@ -42,29 +42,15 @@ describe ReportsController do
       stub_const('WEBSERVICE_CONFIG', 'summary_webservice_url' => 'expertiza.ncsu.edu')
     end
 
-    # E1936 team recommends this method be REMOVED (it does not seem to be used anywhere in Expertiza as of 4/21/19)
-    describe 'summary_by_reviewee_and_criteria' do
-      context 'when type is SummaryByRevieweeAndCriteria' do
-        it_should_behave_like "summary_report"
-      end
-    end
-
-    # E1936 team recommends this method be REMOVED (it does not seem to be used anywhere in Expertiza as of 4/21/19)
-    describe 'summary_by_criteria' do
-      context 'when type is SummaryByCriteria' do
-        it_should_behave_like "summary_report"
-      end
-    end
-
     describe 'review_response_map' do
       context 'when type is ReviewResponseMap' do
         it 'renders response_report page with corresponding data' do
           allow(ReviewResponseMap).to receive(:review_response_report)
             .with('1', assignment, 'ReviewResponseMap', 'no one')
             .and_return([participant, participant1])
-          allow(assignment).to receive(:compute_reviews_hash)
+          allow_any_instance_of(Scoring).to receive(:compute_reviews_hash).with(assignment)
             .and_return('1' => 'good')
-          allow(assignment).to receive(:compute_avg_and_ranges_hash)
+          allow_any_instance_of(Scoring).to receive(:compute_avg_and_ranges_hash).with(assignment)
             .and_return(avg: 94, range: [90, 99])
           params = {
             id: 1,

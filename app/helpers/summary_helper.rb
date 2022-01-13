@@ -303,11 +303,13 @@ module SummaryHelper
       criteria.each do |q|
         # include this score in the average round score if the weight is valid & q is criterion
         if !q.weight.nil? and q.weight > 0 and q.type.eql?("Criterion")
-          puts avg_scores_by_criterion
-          puts avg_scores_by_criterion[q.txt]
-          puts q
-          puts q.weight
-          round_score += avg_scores_by_criterion[q.txt] * q.weight
+          # Check if the criteria text value is a boolean - if it is, convert to 1 or 0 for multiplication
+          if avg_scores_by_criterion[q.txt].in? [true, false]
+            avg_scores_by_criterion_weight = avg_scores_by_criterion[q.txt] ? 1 : 0
+            round_score += avg_scores_by_criterion_weight * q.weight
+          else
+            round_score += avg_scores_by_criterion[q.txt] * q.weight
+          end
           sum_weight += q.weight
         end
       end

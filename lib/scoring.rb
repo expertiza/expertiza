@@ -51,7 +51,7 @@ private
 
 # Get all of the questions asked during peer review for the given team's work
 def peer_review_questions_for_team(assignment, team, round_number = nil)
-  
+  return nil if team.nil?
   signed_up_team = SignedUpTeam.find_by(team_id: team.id)
   topic_id = signed_up_team.topic_id unless signed_up_team.nil?
   review_questionnaire_id = assignment.review_questionnaire_id(round_number, topic_id) unless team.nil?

@@ -391,7 +391,7 @@ describe 'AssignmentTeam' do
         allow(questionnaire1).to receive(:symbol).with(no_args).and_return(:questionnaire1)
         allow(questionnaire2).to receive(:symbol).with(no_args).and_return(:questionnaire2)
         allow(team.assignment).to receive(:compute_total_score).with(scores.except(:total_score)).and_return(10)
-        expect(team.scores(questions)).to eq(scores)
+        expect(team.aggregate_review_grade(questions)).to eq(scores)
       end
     end
   end

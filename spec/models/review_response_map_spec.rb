@@ -40,7 +40,8 @@ describe ReviewResponseMap do
     allow(response_map).to receive(:response).and_return(response3)
     allow(response_map).to receive(:id).and_return(1)
   end
-
+  
+  # comment
   describe '#scores' do
     context 'when assignment is varying rubric by round assignment' do
       it 'calculates scores in each round of each team in current assignment' do

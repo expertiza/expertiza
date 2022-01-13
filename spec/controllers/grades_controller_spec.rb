@@ -1,21 +1,31 @@
 describe GradesController do
   let(:review_response) { build(:response) }
   let(:assignment) { build(:assignment, id: 1, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
+  let(:assignment2) { build(:assignment, id: 2, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
+  let(:assignment3) { build(:assignment, id: 3, max_team_size: 0, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
   let(:assignment_questionnaire) { build(:assignment_questionnaire, used_in_round: 1, assignment: assignment) }
   let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
   let(:participant2) { build(:participant, id: 2, assignment: assignment, user_id: 1) }
+  let(:participant3) { build(:participant, id: 3, assignment: assignment, user_id: 1, grade: 98) }
+  let(:participant4) { build(:participant, id: 4, assignment: assignment2, user_id: 1) }
+  let(:participant5) { build(:participant, id: 5, assignment: assignment3, user_id: 1) }
   let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:question) { build(:question) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment, users: [instructor]) }
-  let(:student) { build(:student) }
+  let(:team2) { build(:assignment_team, id: 2, parent_id: 8) }
+  let(:student) { build(:student, id: 2) }
   let(:review_response_map) { build(:review_response_map, id: 1) }
   let(:assignment_due_date) { build(:assignment_due_date) }
   let(:ta) { build(:teaching_assistant, id: 8) }
 
   before(:each) do
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
+    allow(AssignmentParticipant).to receive(:find).with('3').and_return(participant3)
+    allow(AssignmentParticipant).to receive(:find).with('4').and_return(participant4)
+    allow(AssignmentParticipant).to receive(:find).with('5').and_return(participant5)
+
     allow(participant).to receive(:team).and_return(team)
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -93,7 +103,7 @@ describe GradesController do
 
   xdescribe '#view_team' do
     it 'renders grades#view_team page' do
-      allow(participant).to receive(:team).and_return(team)
+      allow(participant).to receive(:team).and_return(team2)
       params = {id: 1}
       get :view_team, params
       expect(response).to render_template(:view_team)
@@ -166,8 +176,20 @@ describe GradesController do
   end
 
   describe '#update' do
-    before(:each) do
-      allow(participant).to receive(:update_attribute).with(any_args).and_return(participant)
+    context 'when participant\'s grade is update' do
+      it 'updates grades and redirects to grades#edit page' do
+        params = {
+            id: 3,
+            total_score: 98,
+            participant: {
+                grade: 98
+            }
+        }
+        allow(participant3).to receive(:update_attribute).with(any_args).and_return(participant3)
+        post :update, params
+        expect(flash[:note]).to eq("A score of 98% has been saved for instructor6.")
+        expect(response).to redirect_to('/grades/3/edit')
+      end
     end
     context 'when total is not equal to participant\'s grade' do
       it 'updates grades and redirects to grades#edit page' do
@@ -178,6 +200,7 @@ describe GradesController do
             grade: 96
           }
         }
+        allow(participant).to receive(:update_attribute).with(any_args).and_return(participant)
         post :update, params
         expect(flash[:note]).to eq("The computed score will be used for #{participant.user.name}.")
         expect(response).to redirect_to('/grades/1/edit')
@@ -193,6 +216,7 @@ describe GradesController do
             grade: 98
           }
         }
+        allow(participant).to receive(:update_attribute).with(any_args).and_return(participant)
         post :update, params
         expect(flash[:note]).to eq("The computed score will be used for #{participant.user.name}.")
         expect(response).to redirect_to('/grades/1/edit')
@@ -213,21 +237,48 @@ describe GradesController do
       expect(flash[:error]).to be nil
       expect(response).to redirect_to('/grades/view_team?id=1')
     end
+
+    context 'save grade and comment for submission failed' do
+      it 'catch error' do
+        allow(AssignmentParticipant).to receive(:find_by).with(id: '4').and_return(participant4)
+        allow(participant4).to receive(:team).and_return(team2)
+        params = {
+            participant_id: 4,
+            grade_for_submission: 100,
+            comment_for_submission: 'comment'
+        }
+        post :save_grade_and_comment_for_submission, params
+        allow(team2).to receive(:save).and_raise StandardError
+        expect { save_grade_and_comment_for_submission }.to raise_error StandardError
+      end
+    end
+
   end
 
   describe '#action_allowed' do
     context 'when the student does not belong to a team' do
-      it 'returns false' do 
+      it 'returns false' do
         params = {action: 'view_team'}
         session[:user].role.name = 'Student'
         expect(controller.action_allowed?).to eq(false)
       end
     end
     context 'when the user is an instructor' do
-      it 'returns true' do 
-        params = {action: 'view_team'} 
+      it 'returns true' do
+        params = {action: 'view_team'}
         session[:user].role.name = 'Instructor'
         expect(controller.action_allowed?).to eq(true)
+      end
+    end
+    context 'when the user is an student' do
+      before(:each) do
+        controller.params = {id: 4, action: 'view_team'}
+      end
+      it 'only see the heat map for their own team' do
+        stub_current_user(student, student.role.name, student.role)
+        allow(AssignmentParticipant).to receive(:find).with(4).and_return(participant4)
+        allow(AssignmentParticipant).to receive(:exist?).with(parent_id: 2, user_id: 2).and_return(false)
+        expect(controller.action_allowed?).to eq(false)
       end
     end
   end
@@ -243,6 +294,6 @@ describe GradesController do
         get :view_my_scores, params
         expect(response).to redirect_to('/')
       end
-    end 
+    end
   end
 end

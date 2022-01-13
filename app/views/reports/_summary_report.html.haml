@@ -11,8 +11,8 @@
         %td.data_column
           .collapse{:id => "round_#{(i+1).to_s}"}
             %table.table.table-striped
-              - p @summary
               - p @summary[i]
+              - p @summary[i].keys
               - @summary[i].keys.each do |question|
                 %tr{:bgcolor => "#f9f9f9"}
                   %td

@@ -50,7 +50,9 @@ module SummaryHelper
     #   aside from in methods which are themselves not used anywhere in Expertiza as of 4/21/19
     # produce summaries for instructor. it merges all feedback given to all reviewees, and summarize them by criterion
     def summarize_reviews_by_criterion(assignment, summary_ws_url)
-      self.summary = self.avg_scores_by_criterion = self.avg_scores_by_round = Array.new(assignment.rounds_of_reviews)
+      self.summary = Hash.new
+      self.avg_scores_by_criterion = Array.new(assignment.rounds_of_reviews)
+      self.avg_scores_by_round = Array.new(assignment.rounds_of_reviews)
       rubric = get_questions_by_assignment(assignment)
 
       (0..assignment.num_review_rounds - 1).each do |round|

@@ -97,9 +97,9 @@ class Participant < ActiveRecord::Base
   def scores(questions) 
     scores = {}
     scores[:participant] = self 
-    ResponseMap.compute_assignment_score(self, questions, scores)
+    compute_assignment_score(self, questions, scores)
     scores[:total_score] = compute_total_score(self.assignment, scores)
-    ResponseMap.merge_scores(self, scores) if self.assignment.varying_rubrics_by_round?
+    merge_scores(self, scores) if self.assignment.varying_rubrics_by_round?
     scores
   end
 

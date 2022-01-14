@@ -96,7 +96,6 @@ group :test do
   gem 'guard-rails'
   gem 'guard-rspec'
   gem 'launchy'
-  gem 'mutant-rspec'
   gem 'rspec-rails'
   gem 'shoulda'
   gem 'puma'

@@ -137,6 +137,7 @@ class AssignmentForm
   def update_tag_prompt_deployments(attributes)
     unless attributes.nil?
       attributes.each do |key, value|
+        # We need to use destroy_all to delete all the dependents also. 
         TagPromptDeployment.where(id: value['deleted']).destroy_all if value.key?('deleted')
         # assume if tag_prompt is there, then id, question_type, answer_length_threshold must also be there since the inputs are coupled
         next unless value.key?('tag_prompt')

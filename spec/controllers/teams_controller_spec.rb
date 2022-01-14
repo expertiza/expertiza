@@ -29,6 +29,15 @@ describe TeamsController do
         expect { @c_team.delete }.to change(Team, :count).by(-1)
       end
     end
+
+    context "with two course teams" do
+      it "deletes all the course teams" do
+        @course = create(:course)
+        @team1 = create(:course_team)
+        @team2 = create(:course_team)
+        expect { CourseTeam.delete_all}.to change(Team, :count).by(-2)
+      end
+    end
   end
 
   describe "Testing copy functionality - " do

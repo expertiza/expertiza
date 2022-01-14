@@ -1,6 +1,5 @@
 module ReportFormatterHelper
-
-  # E1936 team recommends this method be REMOVED (it does not seem to be used anywhere in Expertiza as of 4/21/19)
+  include Scoring
   def summary_by_reviewee_and_criteria(params, _session = nil)
     assign_basics(params)
     # E1991 : pass extra session variable to address anonymized view
@@ -13,7 +12,6 @@ module ReportFormatterHelper
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
   end
 
-  # E1936 team recommends this method be REMOVED (it does not seem to be used anywhere in Expertiza as of 4/21/19)
   def summary_by_criteria(params, _session = nil)
     assign_basics(params)
     sum = SummaryHelper::Summary.new.summarize_reviews_by_criterion(@assignment, @summary_ws_url)
@@ -27,8 +25,8 @@ module ReportFormatterHelper
     @review_user = params[:user]
     # If review response is required call review_response_report method in review_response_map model
     @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, @type, @review_user)
-    @review_scores = @assignment.compute_reviews_hash
-    @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
+    @review_scores = compute_reviews_hash(@assignment)
+    @avg_and_ranges = compute_avg_and_ranges_hash(@assignment)
   end
 
   def feedback_response_map(params, _session = nil)

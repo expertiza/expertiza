@@ -2,14 +2,19 @@
     <!--E2147 Duty Based Reviewing-->
     <tr>
       <td id='is_duty_based_assignment'>
-        <input name="assignment_form[assignment][is_duty_based_assignment]" type="hidden" value="false"/>
-        <%= check_box_tag('assignment_form[assignment][is_duty_based_assignment]', 'true', @assignment_form.assignment.is_duty_based_assignment, {:id => "is_duty_checkbox", :onChange => 'hasDutiesChanged()'}) %>
+        <input name="assignment_form[assignment][duty_based_assignment?]" type="hidden" value="false"/>
+        <%= check_box_tag(
+                'assignment_form[assignment][duty_based_assignment?]',
+                'true',
+                @assignment_form.assignment.duty_based_assignment?,
+                {:id => "is_duty_checkbox", :onChange => 'hasDutiesChanged()'})
+        %>
         <%= label_tag('duty_assignment', 'Is Role-Based Reviewing?') %>
-        <img src="/assets/info.png" title='Check the box if this assignment allows role assignments within the team'>
+        <img src="/assets/info.png" title='Check the box if this assignment allows role assignment within the team'>
 
-        <div id="add_duties" <%= "hidden" if not @assignment_form.assignment.is_duty_based_assignment %> >
+        <div id="add_duties" <%= "hidden" unless @assignment_form.assignment.duty_based_assignment? %> >
           <br>
-          <%if !@assignment_form.assignment.is_duty_based_assignment%>
+          <%unless @assignment_form.assignment.duty_based_assignment?%>
               <p>Please save your preference before accessing roles</p>
           <%else%>
               <%= render '/duties/add_duties' %>

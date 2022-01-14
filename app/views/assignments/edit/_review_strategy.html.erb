@@ -148,8 +148,11 @@
       <img src="/assets/info.png" title='Select if you want a person to allow review their own submission'>
     </td>
   </tr>
+
   <!-- #E2147 -->
-  <%= render '/duties/checkbox' %>
+  <div id="duty_assignment_chkbx" hidden>
+    <%= render '/duties/checkbox' %>
+  </div>
   <!--#E1870-->
   <% if @assignment_form.assignment.rounds_of_reviews > 1 %>
     <tr>
@@ -197,4 +200,14 @@
             add_duties_div.attr('hidden', true);
         }
     }
+    jQuery(document).ready(function () {
+        var has_teams_checkbox = jQuery('#team_assignment');
+        var duty_assignment_chkbx =  jQuery('#duty_assignment_chkbx')
+        if (has_teams_checkbox.is(':checked')) {
+            duty_assignment_chkbx.removeAttr('hidden');
+        } else {
+            duty_assignment_chkbx.attr('hidden', true);
+        }
+    })
+
 </script>

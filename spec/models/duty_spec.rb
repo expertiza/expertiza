@@ -8,7 +8,8 @@ describe Duty do
   let(:user3) { build(:student, id: 3, name: 'no name3', fullname: 'no one3', participants: [participant3]) }
 
   let(:team1) { build(:assignment_team, id: 1, name: 'no team', users: [user, user2, user3]) }
-  let(:sample_duty_taken) { build(:duty, id: 1, max_members_for_duty:1, assignment_id:1) }
+  let(:sample_duty_taken) { build(:duty, id: 1, name: 'Developer', max_members_for_duty:1, assignment_id:1) }
+  let(:sample_duplicate_duty) { build(:duty, id: 2, name: 'Developer', max_members_for_duty:1, assignment_id:1) }
   let(:sample_duty_not_taken) { build(:duty, id: 1, max_members_for_duty:2, assignment_id:1) }
 
   let(:team_user1) { build(:team_user, id: 1, user: user) }
@@ -22,6 +23,14 @@ describe Duty do
     allow(participant3).to receive(:get_team_user).and_return(team_user3)
   end
 
+  context 'name of the duty should be valid'
+    it 'returns true' do
+      expect(Duty.create(name: 'Scrum Master', max_members_for_duty: 1).valid?).to be true
+      expect(Duty.create(name: 'Software Development Engineer 1', max_members_for_duty: 1).valid?).to be true
+    end
+    it 'returns false' do
+      expect(Duty.create(name: '!@#$%^&*()', max_members_for_duty: 1).valid?).to be false
+    end
   describe '#can_be_assigned?' do
     context 'when users in current team want to assign roles that are available'
       it 'returns true' do

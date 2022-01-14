@@ -48,6 +48,7 @@ class Assignment < ActiveRecord::Base
     DEFAULT_MAX_OUTSTANDING_REVIEWS
   end
 
+  # TODO I'm scared of this. Do we need to look at it ?
   def team_assignment?
     true
   end

@@ -20,9 +20,9 @@
     <tr style="border: 1px outset #000000; padding: 10px 20px" >
       <th class="head">Username</th>
       <th class="head">Full name</th>
-      <%if @student.assignment.is_duty_based_assignment %>
+      <% if @student.assignment.duty_based_assignment? %>
           <th class="head">Role</th>
-      <%end%>
+      <% end %>
       <th class="head">Email address</th>
 
       <% if @teammate_review_allowed %>
@@ -30,15 +30,15 @@
       <% end %>
     </tr>
 
-    <% for member in @student.team.participants %> <!--start team member content-->
+    <% @student.team.participants.each do |member| %> <!--start team member content-->
         <tr>
         <td><%= member.user.name(session[:ip]) %></td>
         <td><%= member.user.fullname(session[:ip]) %></td>
-        <%if @student.assignment.is_duty_based_assignment %>
+        <%if @student.assignment.duty_based_assignment? %>
             <% team_user = member.get_team_user() %>
               <!-- Gets duty of member if the assignment is duty based and member has a duty -->
             <%unless team_user.duty_id.nil?%>
-               <td><%= Duty.find(team_user.duty_id).duty_name %></td>
+               <td><%= Duty.find(team_user.duty_id).name %></td>
             <%else%>
                 <td>
                   <%if  member.user.id == session[:user].id%>
@@ -53,7 +53,7 @@
 
         <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
         <% if (@teammate_review_allowed &&
-            ((@student.assignment.is_duty_based_assignment && !team_user.duty_id.nil?) || (not @student.assignment.is_duty_based_assignment)))%>
+            ((@student.assignment.duty_based_assignment? && !team_user.duty_id.nil?) || (! @student.assignment.duty_based_assignment?)))%>
           <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
             <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
             if map.nil?

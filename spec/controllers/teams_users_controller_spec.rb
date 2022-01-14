@@ -5,7 +5,7 @@ describe TeamsUsersController do
   end
   let(:assignment_form) { double('AssignmentForm', assignment: assignment) }
   let(:student) { build(:student) }
-  let(:duty) { build(:duty, id: 1, duty_name: "Role", max_members_for_duty: 2, assignment_id: 1) }
+  let(:duty) { build(:duty, id: 1, name: "Role", max_members_for_duty: 2, assignment_id: 1) }
   let(:teams_user1) {TeamsUser.new id:1, duty_id:1}
  
   before(:each) do

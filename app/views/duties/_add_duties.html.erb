@@ -6,16 +6,14 @@
 <% @duties = Duty.where(['assignment_id = ?', @assignment.id]) %>
 
 
-<% if @duties.size != 0 %>
+<% unless @duties.size.zero? %>
     <table class="table table-striped">
       <tr><%= render :partial => '/duties/table_header' %></tr>
 
-      <% i=1 %>
-      <% for duty in @duties %>
+      <% @duties.each do |duty| %>
           <tr>
-            <%= render :partial => '/duties/table_line', :locals => {:i=>i, :duty=>duty} %>
+            <%= render :partial => '/duties/table_line', :locals => {:duty=>duty} %>
           </tr>
-          <% i=i+1 %>
       <% end %>
 
     </table>

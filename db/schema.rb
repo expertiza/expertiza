@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20211123205149) do
+ActiveRecord::Schema.define(version: 20220114003928) do
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -134,7 +134,7 @@ ActiveRecord::Schema.define(version: 20211123205149) do
     t.boolean  "reviewer_is_team"
     t.boolean  "is_conference_assignment",                                         default: false
     t.boolean  "auto_assign_mentor",                                               default: false
-    t.boolean  "is_duty_based_assignment"
+    t.boolean  "duty_based_assignment?"
     t.boolean  "questionnaire_varies_by_duty"
   end
 
@@ -303,7 +303,7 @@ ActiveRecord::Schema.define(version: 20211123205149) do
   add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed", using: :btree
 
   create_table "duties", force: :cascade do |t|
-    t.string   "duty_name",            limit: 255
+    t.string   "name",                 limit: 255
     t.integer  "max_members_for_duty", limit: 4
     t.integer  "assignment_id",        limit: 4
     t.datetime "created_at",                       null: false

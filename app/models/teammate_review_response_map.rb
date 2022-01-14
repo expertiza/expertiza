@@ -13,7 +13,7 @@ class TeammateReviewResponseMap < ResponseMap
     unless duty_questionnaire.nil?
       return Questionnaire.find(duty_questionnaire.questionnaire_id)
     else
-      questionnaire()
+      questionnaire
     end
   end
 

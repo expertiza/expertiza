@@ -313,7 +313,7 @@
     function handleCheckReviewVaryByDuty(checkvalue) {
         var state = checkvalue.checked;
         <%unless @duties.nil? or @duties.empty?%>
-        if (state == true) {
+          if (state) {
             // make it display by duty
             removeQuestionnaireTableRow('TeammateReviewQuestionnaire')
 
@@ -328,12 +328,12 @@
                 <%= questionnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>,
                 null,
                 '<%= duty.id %>',
-                '<%= duty.duty_name %>'
+                '<%= duty.name %>'
             );
 
             <% end %>
             <%@avoidrepeatsign=1%>;
-        } else {
+          } else {
             // loop as many times as number of duties, remove TeammateReviewQuestionnaire
             <% @duties.each do |duty| %>
             removeQuestionnaireTableRow(
@@ -353,7 +353,7 @@
                 null
             );
 
-        }
+         }
         <%end%>
     }
 </script>
@@ -370,12 +370,13 @@
 <%= check_box_tag('assignment_form[assignment][vary_by_topic]', 'true', @assignment_form.assignment.vary_by_topic) %>
 <%= label_tag('assignment_form[assignment][vary_by_topic]', 'Review rubric varies by topic?') %>
 <br>
-<!--Add a review varies by duties (role in the UI) checkbox. -->
+<!--Add a review varies by duties (role in the UI) checkbox if teams is allowed -->
 <!-- This is questionnaire_varies_by_duty attribute of assignment created by migration -->
-<input name="assignment_form[assignment][questionnaire_varies_by_duty]" type="hidden" value="false" />
-<%= check_box_tag('assignment_form[assignment][questionnaire_varies_by_duty]', 'true', @assignment_form.assignment.questionnaire_varies_by_duty, {:id => "rubric_vary_by_duty_chkbx", onclick: "handleCheckReviewVaryByDuty(this)"}) %>
-<%= label_tag('assignment_form[assignment][questionnaire_varies_by_duty]', 'Review rubric varies by role?') %>
-
+<div id="vary_by_duty" hidden >
+    <input name="assignment_form[assignment][questionnaire_varies_by_duty]" type="hidden" value="false" />
+    <%= check_box_tag('assignment_form[assignment][questionnaire_varies_by_duty]', 'true', @assignment_form.assignment.questionnaire_varies_by_duty, {:id => "rubric_vary_by_duty_chkbx", onclick: "handleCheckReviewVaryByDuty(this)"}) %>
+    <%= label_tag('assignment_form[assignment][questionnaire_varies_by_duty]', 'Review rubric varies by role?') %>
+</div>
 <div>
 <table class='exp table table-striped' id='assignment_questionnaire_table' style='padding:20px; font-size: 15px; width: 100%'>
   <tr class='heading'>
@@ -394,6 +395,7 @@
   </tr>
   <script>
       jQuery(document).ready(function () {
+
           <% if @assignment_form.assignment.vary_by_round %>
           <% 1.upto(@assignment_form.assignment.rounds_of_reviews) do |i| %>
           <% assignment_questionnaire = @assignment_form.assignment_questionnaire('ReviewQuestionnaire', i, nil) %>
@@ -440,7 +442,9 @@
           );
           var team_assignment_checkbox = jQuery('#team_assignment');
           var rubric_vary_by_duty_checkbox = jQuery('#rubric_vary_by_duty_chkbx')
+          var vary_by_duty_div = jQuery('#vary_by_duty')
           if (team_assignment_checkbox.is(':checked')) {
+              vary_by_duty_div.removeAttr('hidden')
               // if condition whether vary by duty is checked or not. If unchecked, show TeammateReviewQuestionnaire
               // otherwise if checked, show the duty and their corresponding questionnaire that is selected
               if (rubric_vary_by_duty_checkbox.is(':checked')) {
@@ -456,7 +460,7 @@
                         <%= questionnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>,
                         null,
                         '<%= duty.id %>',
-                        '<%= duty.duty_name %>'
+                        '<%= duty.name %>'
                     );
                     <%end%>
                   <%end%>

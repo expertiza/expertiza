@@ -4,7 +4,7 @@ describe DutiesController do
   let(:instructor) { build(:instructor, id: 6) }
   let(:instructor2) { build(:instructor, id: 66) }
   let(:ta) { build(:teaching_assistant, id: 8) }
-  let(:duty) { build(:duty, id: 1, duty_name: "Role", max_members_for_duty: 2, assignment_id: 1) }
+  let(:duty) { build(:duty, id: 1, name: "Role", max_members_for_duty: 2, assignment_id: 1) }
   let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
 
   before(:each) do
@@ -70,7 +70,7 @@ describe DutiesController do
           params = {
               id: 1,
               duty: {
-                  duty_name: 'Scrum Master',
+                  name: 'Scrum Master',
                   max_members_for_duty: 2,
                   assignment_id: 1
               }
@@ -87,7 +87,7 @@ describe DutiesController do
           params = {
               id: 1,
               duty: {
-                  duty_name: 'Scrum Master',
+                  name: 'Scrum Master',
                   max_members_for_duty: -1,
                   assignment_id: 1
               }
@@ -107,7 +107,7 @@ describe DutiesController do
             id: 1,
             assignment_id: 1,
             duty: {
-                duty_name: 'Scrum Master',
+                name: 'Scrum Master',
                 max_members_for_duty: 5,
                 assignment_id: 1
             }
@@ -124,7 +124,7 @@ describe DutiesController do
         params = {
             id: 1,
             duty: {
-                duty_name: 'SM',
+                name: 'SM',
                 max_members_for_duty: 1,
                 assignment_id: 1
             }

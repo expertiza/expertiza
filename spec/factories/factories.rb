@@ -529,7 +529,7 @@ FactoryBot.define do
 
   factory :duty, class: Duty do
     id 1
-    duty_name 'Scrum Master'
+    name 'Scrum Master'
     max_members_for_duty 1
     assignment_id 1
   end

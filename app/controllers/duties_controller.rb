@@ -34,7 +34,7 @@ class DutiesController < ApplicationController
 
     @duty.assignment_id = params[:duty][:assignment_id]
     @duty.max_members_for_duty = params[:duty][:max_members_for_duty]
-    @duty.duty_name = params[:duty][:duty_name]
+    @duty.name = params[:duty][:name]
 
     if @duty.save
       # When the duty (role) is created successfully we return back to the assignment edit page
@@ -50,7 +50,7 @@ class DutiesController < ApplicationController
 
     @duty.assignment_id = params[:duty][:assignment_id]
     @duty.max_members_for_duty = params[:duty][:max_members_for_duty]
-    @duty.duty_name = params[:duty][:duty_name]
+    @duty.name = params[:duty][:name]
 
     if @duty.save
       redirect_to edit_assignment_path(params[:duty][:assignment_id]), notice: 'Role was successfully updated.'
@@ -77,12 +77,13 @@ class DutiesController < ApplicationController
   def set_duty
     @duty = Duty.find(params[:id])
   end
+
   def redirect_to_create_page_and_show_error
-    complete_error_log = ""
-    if @duty.errors.any?
-      @duty.errors.full_messages.each do |error_message| complete_error_log <<  "#{error_message}. " end
-    end
-    flash[:error] = complete_error_log
+    # TODO @john @nicholas is there any better way to handle error messages ?
+  error_message = ""
+    @duty.errors.each do |field, error| error_message << error end
+
+    flash[:error] = error_message
     redirect_to :action => :new, :id=> params[:duty][:assignment_id]
   end
 end

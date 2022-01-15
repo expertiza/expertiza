@@ -66,11 +66,11 @@ class Assignment < ActiveRecord::Base
   end
 
   #removes an assignment from course
-  def self.remove_assignment_from_course(assignment)
-    oldpath = assignment.path rescue nil
-    assignment.course_id = nil
-    assignment.save
-    newpath = assignment.path rescue nil
+  def remove_assignment_from_course
+    oldpath = self.path rescue nil
+    self.course_id = nil
+    self.save
+    newpath = self.path rescue nil
     FileHelper.update_file_location(oldpath, newpath)
   end
 

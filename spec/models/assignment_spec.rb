@@ -666,4 +666,29 @@ describe Assignment do
       end
     end
   end
+  describe '#calibrated?' do
+    context 'when the assignment is not a calibrated assignment' do
+      it 'returns false' do
+        assignment = create(:assignment)
+        allow(assignment).to receive(:is_calibrated).and_return(false)
+        expect(assignment.calibrated?).to be_falsey
+      end
+    end
+    context 'when the assignment is a calibrated assignment' do
+      it 'returns true' do
+        assignment = create(:assignment)
+        allow(assignment).to receive(:is_calibrated).and_return(true)
+        expect(assignment.calibrated?).to be_truthy
+      end
+    end
+  end
+  describe '#remove_assignment_from_course' do
+    it 'sets the course_id to nil' do
+      assignment = create(:assignment)
+      assignment.course_id = 2
+      expect(assignment.course_id).to eq(2)
+      assignment.remove_assignment_from_course
+      expect(assignment.course_id).to be_nil
+    end
+  end
 end

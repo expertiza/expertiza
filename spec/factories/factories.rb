@@ -638,4 +638,9 @@ FactoryBot.define do
     type 'TextArea'
     size '70,1'
   end
+
+  factory :content_page, class: ContentPage do
+    title 'Expertiza Home'
+    name 'home'
+  end
 end

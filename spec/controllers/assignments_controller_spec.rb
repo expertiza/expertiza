@@ -382,7 +382,7 @@ describe AssignmentsController do
         assignment_form = AssignmentForm.new
         allow(AssignmentForm).to receive(:new).and_return(assignment_form)
         allow(assignment_form).to receive(:remove_assignment_from_course)
-        allow(Assignment).to receive(:remove_assignment_from_course).with(assignment)
+        allow(Assignment).to receive(:find).and_return(assignment)
 
         session = {user: instructor}
         get :remove_assignment_from_course , {id: 1}

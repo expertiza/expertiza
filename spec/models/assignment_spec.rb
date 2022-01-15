@@ -418,6 +418,13 @@ describe Assignment do
           expect(assignment.current_stage_name(123)).to eq('Review')
         end
       end
+      context "when due date is equal to 'Finished'" do
+        it 'returns Submission' do
+          allow(assignment).to receive(:find_current_stage).with(123).and_return('Finished')
+          allow(assignment).to receive(:current_stage).with(123).and_return('Submission')
+          expect(assignment.current_stage_name(123)).to eq('Submission')
+        end
+      end
     end
   end
 

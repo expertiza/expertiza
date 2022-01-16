@@ -11,13 +11,11 @@
         %td.data_column
           .collapse{:id => "round_#{(i+1).to_s}"}
             %table.table.table-striped
-              - p @summary[i]
-              - p @summary[i].keys
               - @summary[i].keys.each do |question|
                 %tr{:bgcolor => "#f9f9f9"}
                   %td
                     %h5
-                      - safe_concat question
+                      - safe_concat question.txt
                       %div{:style => "text-decoration: underline overline;"} Average score: #{@avg_scores_by_criterion[i][question].to_s}%
                 %tr
                   %td

@@ -7,7 +7,26 @@ module Scoring
     total
   end
 
-  #Computes and returns the scores of assignment for participants and teams
+  # Computes and returns the scores of assignment for participants and teams
+  # Returns data in the format of 
+  # {
+  # :particpant => {
+  #   :<participant_id> => participant.scores(quesitons), 
+  #   :<participant_id> => participant.scores(quesitons)
+  #   },
+  # :teams => {
+  #    :0 => {:team => team, 
+  #           :scores => assignment.vary_by_round ? 
+  #             merge_grades_by_rounds(assignment, grades_by_rounds, total_num_of_assessments, total_score)
+  #             Response.compute_scores(assessments, questions[:review])
+  #          } ,
+  #    :1 => {:team => team, 
+  #           :scores => assignment.vary_by_round ? 
+  #             merge_grades_by_rounds(assignment, grades_by_rounds, total_num_of_assessments, total_score)
+  #             Response.compute_scores(assessments, questions[:review])
+  #          } ,
+  #   }
+  # }
   def review_grades(assignment, questions)
     scores = {:participants => {}, :teams => {}}
     assignment.participants.each do |participant|

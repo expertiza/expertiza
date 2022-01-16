@@ -1,4 +1,80 @@
 module Scoring
+
+  # Computes the total score for a *list of assessments*
+  # parameters
+  #  assessments - a list of assessments of some type (e.g., author feedback, teammate review)
+  #  questions - the list of questions that was filled out in the process of doing those assessments
+  def aggregate_assessment_scores(assessments, questions)
+    scores = {}
+    if assessments.present?
+      scores[:max] = -999_999_999
+      scores[:min] = 999_999_999
+      total_score = 0
+      length_of_assessments = assessments.length.to_f
+      assessments.each do |assessment|
+        curr_score = assessment_score(response: [assessment], questions: questions)
+
+        scores[:max] = curr_score if curr_score > scores[:max]
+        scores[:min] = curr_score unless curr_score >= scores[:min] || curr_score == -1
+
+        # Check if the review is invalid. If is not valid do not include in score calculation
+        if curr_score == -1
+          length_of_assessments -= 1
+          curr_score = 0
+        end
+        total_score += curr_score
+      end
+      scores[:avg] = unless length_of_assessments.zero?
+                       total_score.to_f / length_of_assessments
+                     else
+                       0
+                     end
+    else
+      scores[:max] = nil
+      scores[:min] = nil
+      scores[:avg] = nil
+    end
+    scores
+  end
+
+  
+  # Computes the total score for an assessment
+  # params
+  #  assessment - specifies the assessment for which the total score is being calculated
+  #  questions  - specifies the list of questions being evaluated in the assessment
+
+  def assessment_score(params)
+    @response = params[:response].last
+    return -1.0 if @response.nil? 
+    if @response
+      @questions = params[:questions]
+      return -1.0 if @questions.nil? 
+      weighted_score = 0
+      sum_of_weights = 0
+      max_question_score = 0
+
+      @questionnaire = Questionnaire.find(@questions.first.questionnaire_id) 
+
+      # Retrieve data for questionnaire (max score, sum of scores, weighted scores, etc.)
+      questionnaire_data = ScoreView.questionnaire_data(@questions[0].questionnaire_id, @response.id)
+      weighted_score = questionnaire_data.weighted_score.to_f unless questionnaire_data.weighted_score.nil?
+      sum_of_weights = questionnaire_data.sum_of_weights.to_f
+      answers = Answer.where(response_id: @response.id)
+      answers.each do |answer|
+        question = Question.find(answer.question_id)
+        if answer.answer.nil? && question.is_a?(ScoredQuestion)
+          sum_of_weights -= Question.find(answer.question_id).weight
+        end
+      end
+      max_question_score = questionnaire_data.q1_max_question_score.to_f
+      if sum_of_weights > 0 && max_question_score && weighted_score > 0
+        return (weighted_score / (sum_of_weights * max_question_score)) * 100
+      else
+        return -1.0 # indicating no score
+      end
+    end
+  end
+
   # Compute total score for this assignment by summing the scores given on all questionnaires.
   # Only scores passed in are included in this sum.
   def compute_total_score(assignment, scores)
@@ -18,12 +94,12 @@ module Scoring
   #    :0 => {:team => team, 
   #           :scores => assignment.vary_by_round ? 
   #             merge_grades_by_rounds(assignment, grades_by_rounds, total_num_of_assessments, total_score)
-  #             Response.compute_scores(assessments, questions[:review])
+  #             : aggregate_assessment_scores(assessments, questions[:review])
   #          } ,
   #    :1 => {:team => team, 
   #           :scores => assignment.vary_by_round ? 
   #             merge_grades_by_rounds(assignment, grades_by_rounds, total_num_of_assessments, total_score)
-  #             Response.compute_scores(assessments, questions[:review])
+  #             : aggregate_assessment_scores(assessments, questions[:review])
   #          } ,
   #   }
   # }
@@ -41,7 +117,7 @@ module Scoring
         scores[:teams][index.to_s.to_sym][:scores] = merge_grades_by_rounds(assignment, grades_by_rounds, total_num_of_assessments, total_score)
       else
         assessments = ReviewResponseMap.assessments_for(team)
-        scores[:teams][index.to_s.to_sym][:scores] = Response.compute_scores(assessments, questions[:review])
+        scores[:teams][index.to_s.to_sym][:scores] = aggregate_assessment_scores(assessments, questions[:review])
       end
       index += 1
     end
@@ -51,8 +127,21 @@ module Scoring
   # Return scores that this participant has been given
   # Returns data in the format of
   # {
-  #    :participant => participant
-  #    :
+  #    :total_score => participant.grade ? particpant.grade : compute_total_score(assignment, scores)
+  #    :max_pts_available => topic.micropayment if assignment.topics?
+  #    :participant => participant,
+  #    :questionnaire_symbol1 => {
+  #       :assessments => {review1, review2},
+  #       :scores => aggregate_assessment_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
+  #     }, 
+  #    :questionnaire_symbol2 => {
+  #      :assessments => {review3, review4},
+  #      :scores => aggregate_assessment_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
+  #     },
+  #     :review => {
+  #       :assessments => [review1, review2, review3, review4],
+  #       :scores => {:max => max_score, :min => min_score, :avg => average_score}
+  #   }
   # }
   def participant_scores(participant, questions)
     assignment = participant.assignment
@@ -84,6 +173,11 @@ module Scoring
     scores
   end
 
+  # this function modifies the scores object passed to it from participant_grades
+  # this function should not be called in other contexts, since it is highly dependent on a specific scores structure, described above
+  # retrieves the symbol of eeach questionnaire associated with a participant on a given assignment
+  # returns all the associated reviews with a participant, indexed under :assessments
+  # returns the score assigned for the TOTAL body of responses associated with the user
   def compute_assignment_score(participant, questions, scores)
     participant.assignment.questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.find_by(assignment_id: participant.assignment.id, questionnaire_id: questionnaire.id).used_in_round
@@ -101,12 +195,14 @@ module Scoring
                                                    else
                                                      questionnaire.get_assessments_round_for(participant, round)
                                                    end
-      # Response.compute_scores computes the total score for a list of responses to a questionnaire                                                    
-      scores[questionnaire_symbol][:scores] = Response.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
+      # aggregate_assessment_scores computes the total score for a list of responses to a questionnaire                                                    
+      scores[questionnaire_symbol][:scores] = aggregate_assessment_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
     end
   end
 
   # for each assignment review all scores and determine a max, min and average value
+  # this will be called when the assignment has various rounds, so we need to aggregate the scores across rounds
+  # achieves this by returning all the reviews, no longer delineated by round, and by returning the max, min and averafe
   def merge_scores(participant, scores)
     review_sym = "review".to_sym
     scores[review_sym] = {}
@@ -136,7 +232,7 @@ module Scoring
     scores[review_sym][:scores][:avg] = total_score / scores[review_sym][:assessments].length.to_f
   end
 
-def update_max_or_min(scores, round_sym, review_sym, symbol)
+  def update_max_or_min(scores, round_sym, review_sym, symbol)
     op = :< if symbol == :max
     op = :> if symbol == :min
       # check if there is a max/min score for this particular round
@@ -147,7 +243,8 @@ def update_max_or_min(scores, round_sym, review_sym, symbol)
       end
     end
   end
-
+ 
+  #  
   def compute_reviews_hash(assignment)
     review_scores = {}
     response_type = 'ReviewResponseMap'
@@ -173,7 +270,7 @@ def update_max_or_min(scores, round_sym, review_sym, symbol)
           assessments.select! {|assessment| assessment.round == round }
           scores[contributor.id] = {} if round == 1
           scores[contributor.id][round] = {}
-          scores[contributor.id][round] = Response.compute_scores(assessments, questions)
+          scores[contributor.id][round] = aggregate_assessment_scores(assessments, questions)
         end
       end
     else
@@ -181,7 +278,7 @@ def update_max_or_min(scores, round_sym, review_sym, symbol)
         questions = peer_review_questions_for_team(assignment, contributor)
         assessments = ReviewResponseMap.assessments_for(contributor)
         scores[contributor.id] = {}
-        scores[contributor.id] = Response.compute_scores(assessments, questions)
+        scores[contributor.id] = aggregate_assessment_scores(assessments, questions)
       end
     end
     scores
@@ -201,7 +298,7 @@ end
 
 def calc_review_score(corresponding_response, questions)
   unless corresponding_response.empty?
-    this_review_score_raw = Response.assessment_score(response: corresponding_response, questions: questions)
+    this_review_score_raw = assessment_score(response: corresponding_response, questions: questions)
     if this_review_score_raw
       this_review_score = ((this_review_score_raw * 100) / 100.0).round if this_review_score_raw >= 0.0
     end
@@ -254,7 +351,7 @@ end
     (1..assignment.num_review_rounds).each do |i|
       assessments = ReviewResponseMap.get_responses_for_team_round(team, i)
       round_sym = ("review" + i.to_s).to_sym
-      grades_by_rounds[round_sym] = Response.compute_scores(assessments, questions[round_sym])
+      grades_by_rounds[round_sym] = aggregate_assessment_scores(assessments, questions[round_sym])
       total_num_of_assessments += assessments.size
       total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f unless grades_by_rounds[round_sym][:avg].nil?
     end

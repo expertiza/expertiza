@@ -11,6 +11,8 @@ describe Scoring do
     let(:questionnaire1) { build(:questionnaire, name: "abc", private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234) }
     let(:contributor) { build(:assignment_team, id: 1) }
     let(:signed_up_team) { build(:signed_up_team, team_id: contributor.id) }
+    let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
+    let(:participant) { build(:participant, id: 1, parent_id: 1, user: student) }
 
     describe '#compute_total_score' do
         context 'when avg score is nil' do
@@ -89,11 +91,11 @@ describe Scoring do
     before(:each) do
       allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
                                                          .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
-      allow(review_questionnaire).to receive(:symbol).and_return(:review)
-      allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([response3])
+      allow(questionnaire).to receive(:symbol).and_return(:review)
+      allow(questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([response3])
       allow(Response).to receive(:compute_scores).with([response3], [question]).and_return(max: 95, min: 88, avg: 90)
       allow(ResponseMap).to receive(:compute_total_score).with(assignment, any_args).and_return(100)
-      allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
+      allow(assignment).to receive(:questionnaires).and_return([questionnaire])
       allow(participant).to receive(:assignment).and_return(assignment)
       allow(response3).to receive(:id).and_return(nil)
     end
@@ -139,9 +141,9 @@ describe Scoring do
 
   describe '#compute_assignment_score' do
     before(:each) do
-      allow(review_questionnaire).to receive(:symbol).and_return(:review)
+      allow(questionnaire).to receive(:symbol).and_return(:review)
       allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
-      allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
+      allow(assignment).to receive(:questionnaires).and_return([questionnaire])
       allow(participant).to receive(:assignment).and_return(assignment)
     end
 
@@ -152,7 +154,7 @@ describe Scoring do
         score_map = {max: 100, min: 100, avg: 100}
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
                                                            .and_return(double('AssignmentQuestionnaire', used_in_round: nil))
-        allow(review_questionnaire).to receive(:get_assessments_for).with(participant).and_return([response3])
+        allow(questionnaire).to receive(:get_assessments_for).with(participant).and_return([response3])
         allow(Response).to receive(:compute_scores).with(any_args).and_return(score_map)
         ResponseMap.compute_assignment_score(participant, question_hash, scores)
         expect(scores[:review][:assessments]).to eq([response3])
@@ -167,7 +169,7 @@ describe Scoring do
         score_map = {max: 100, min: 100, avg: 100}
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
                                                            .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
-        allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([response3])
+        allow(questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([response3])
         allow(Response).to receive(:compute_scores).with(any_args).and_return(score_map)
         ResponseMap.compute_assignment_score(participant, question_hash, scores)
         expect(scores[:review1][:assessments]).to eq([response3])

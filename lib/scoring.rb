@@ -11,8 +11,8 @@ module Scoring
   # Returns data in the format of 
   # {
   # :particpant => {
-  #   :<participant_id> => participant.scores(quesitons), 
-  #   :<participant_id> => participant.scores(quesitons)
+  #   :<participant_id> => participant_scores(participant, quesitons), 
+  #   :<participant_id> => participant_scores(participant, quesitons)
   #   },
   # :teams => {
   #    :0 => {:team => team, 
@@ -30,7 +30,7 @@ module Scoring
   def review_grades(assignment, questions)
     scores = {:participants => {}, :teams => {}}
     assignment.participants.each do |participant|
-      scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
+      scores[:participants][participant.id.to_s.to_sym] = participant_scores(participant, questions)
     end
     index = 0
     assignment.teams.each do |team|
@@ -49,17 +49,21 @@ module Scoring
   end
 
   # Return scores that this participant has been given
+  # Returns data in the format of
+  # {
+  #    :participant => participant
+  #    :
+  # }
   def participant_scores(participant, questions)
     assignment = participant.assignment
     scores = {}
     scores[:participant] = participant
-    # Retrieve assignment score
-    compute_assignment_score(participant, questions, scores)
+    scores = compute_assignment_score(participant, questions, scores)
     # Compute the Total Score (with question weights factored in)
     scores[:total_score] = compute_total_score(assignment, scores) 
 
     # merge scores[review#] (for each round) to score[review]
-    merge_scores(participant, scores) if assignment.vary_by_round
+    scores = merge_scores(participant, scores) if assignment.vary_by_round
     # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
     if assignment.microtask?
       topic = SignUpTopic.find_by(assignment_id: assignment.id)
@@ -99,6 +103,7 @@ module Scoring
                                                    end
       # Response.compute_scores computes the total score for a list of responses to a questionnaire                                                    
       scores[questionnaire_symbol][:scores] = Response.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
+      scores
     end
   end
 
@@ -130,6 +135,7 @@ module Scoring
     end
     # Compute the average score for a particular review (all rounds)
     scores[review_sym][:scores][:avg] = total_score / scores[review_sym][:assessments].length.to_f
+    scores
   end
 
 def update_max_or_min(scores, round_sym, review_sym, symbol)

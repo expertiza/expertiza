@@ -127,7 +127,7 @@ class AssignmentForm
     attributes.each do |assignment_questionnaire|
       total_weight += assignment_questionnaire[:questionnaire_weight].to_i
     end
-    if total_weight != 0 and total_weight != 100
+    unless total_weight.zero? || total_weight == 100
       @assignment.errors.add(:message, 'Total weight of rubrics should add up to either 0 or 100%')
       @has_errors = true
     end
@@ -195,7 +195,7 @@ class AssignmentForm
 
   # Adds badges to assignment badges table as part of E1822
   def update_assigned_badges(badge, assignment)
-    if assignment and badge
+    if assignment && badge
       AssignmentBadge.where(assignment_id: assignment[:id]).map(&:id).each do |assigned_badge_id|
         AssignmentBadge.delete(assigned_badge_id) unless badge[:id].include?(assigned_badge_id)
       end

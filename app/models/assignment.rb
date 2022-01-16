@@ -463,7 +463,7 @@ class Assignment < ActiveRecord::Base
       end
       @questions[questionnaire_symbol] = questionnaire.questions
     end
-    @scores = review_grades(assignment, @questions)
+    @scores = review_grades(self, @questions)
     return csv if @scores[:teams].nil?
     export_data(csv, @scores, options)
   end

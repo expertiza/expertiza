@@ -38,7 +38,7 @@ describe Scoring do
         let!(:response_record) { create(:response, id: 1, response_map: response_map) }
         let!(:response_record2) { create(:response, id: 2, response_map: response_map2) }
         before(:each) do
-            allow(Response).to receive(:assessment_score).and_return(50, 30)
+            allow_any_instance_of(Scoring).to receive(:assessment_score).and_return(50, 30)
             allow(ResponseMap).to receive(:where).and_return([response_map, response_map2])
             allow(SignedUpTeam).to receive(:find_by).with(team_id: contributor.id).and_return(signed_up_team)
         end
@@ -62,7 +62,7 @@ describe Scoring do
         before(:each) do
             score = {min: 50.0, max: 50.0, avg: 50.0}
             allow(assignment_helper).to receive(:contributors).and_return([contributor])
-            allow(Response).to receive(:compute_scores).with([], [question1]).and_return(score)
+            allow_any_instance_of(Scoring).to receive(:aggregate_assessment_scores).with([], [question1]).and_return(score)
             allow(ReviewResponseMap).to receive(:assessments_for).with(contributor).and_return([])
             allow(SignedUpTeam).to receive(:find_by).with(team_id: contributor.id).and_return(signed_up_team)
             allow(assignment_helper).to receive(:review_questionnaire_id).and_return(1)
@@ -97,7 +97,7 @@ describe Scoring do
                                                          .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
       allow(questionnaire).to receive(:symbol).and_return(:review)
       allow(questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([response3])
-      allow(Response).to receive(:compute_scores).with([response3], [question]).and_return(max: 95, min: 88, avg: 90)
+      allow_any_instance_of(Scoring).to receive(:aggregate_assessment_scores).with([response3], [question]).and_return(max: 95, min: 88, avg: 90)
       allow(ResponseMap).to receive(:compute_total_score).with(assignment, any_args).and_return(100)
       allow(assignment).to receive(:questionnaires).and_return([questionnaire])
       allow(participant).to receive(:assignment).and_return(assignment)
@@ -159,7 +159,7 @@ describe Scoring do
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
                                                            .and_return(double('AssignmentQuestionnaire', used_in_round: nil))
         allow(questionnaire).to receive(:get_assessments_for).with(participant).and_return([response3])
-        allow(Response).to receive(:compute_scores).with(any_args).and_return(score_map)
+        allow_any_instance_of(Scoring).to receive(:aggregate_assessment_scores).with(any_args).and_return(score_map)
         ResponseMap.compute_assignment_score(participant, question_hash, scores)
         expect(scores[:review][:assessments]).to eq([response3])
         expect(scores[:review][:scores]).to eq(score_map)
@@ -174,7 +174,7 @@ describe Scoring do
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
                                                            .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
         allow(questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([response3])
-        allow(Response).to receive(:compute_scores).with(any_args).and_return(score_map)
+        allow_any_instance_of(Scoring).to receive(:aggregate_assessment_scores).with(any_args).and_return(score_map)
         ResponseMap.compute_assignment_score(participant, question_hash, scores)
         expect(scores[:review1][:assessments]).to eq([response3])
         expect(scores[:review1][:scores]).to eq(score_map)
@@ -188,7 +188,7 @@ describe Scoring do
         allow(participant).to receive(:assignment).and_return(assignment)
         scores = {}
         allow(assignment).to receive(:num_review_rounds).and_return(1)
-        ResponseMap.merge_scores(participant, scores)
+        merge_scores(participant, scores)
         expect(scores[:review][:scores][:max]).to eq(0)
         expect(scores[:review][:scores][:min]).to eq(0)
         expect(scores[:review][:scores][:min]).to eq(0)
@@ -201,7 +201,7 @@ describe Scoring do
         score_map = {max: 100, min: 100, avg: 100}
         scores = {review1: {scores: score_map, assessments: [response]}}
         allow(assignment).to receive(:num_review_rounds).and_return(1)
-        ResponseMap.merge_scores(participant, scores)
+        merge_scores(participant, scores)
         expect(scores[:review][:scores][:max]).to eq(100)
         expect(scores[:review][:scores][:min]).to eq(100)
         expect(scores[:review][:scores][:min]).to eq(100)
@@ -251,6 +251,70 @@ describe Scoring do
       end
 
     end
-
   end
+  describe "#aggregate_assessment_scores" do
+    let(:response1) { double("respons1") }
+    let(:response2) { double("respons2") }
+
+    before(:each) do
+      @total_score = 100.0
+      allow_any_instance_of(Scoring).to receive(:assessment_score).and_return(@total_score)
+    end
+
+    it "returns nil if list of assessments is empty" do
+      assessments = []
+      scores = aggregate_assessment_scores(assessments, [question1])
+      expect(scores[:max]).to eq nil
+      expect(scores[:min]).to eq nil
+      expect(scores[:avg]).to eq nil
+    end
+
+    it "returns scores when a single valid assessment of total score 100 is give" do
+      assessments = [response1]
+      scores = aggregate_assessment_scores(assessments, [question1])
+      expect(scores[:max]).to eq @total_score
+      expect(scores[:min]).to eq @total_score
+      expect(scores[:avg]).to eq @total_score
+    end
+
+    it "returns scores when two valid assessments of total scores 80 and 100 are given" do
+      assessments = [response1, response2]
+      total_score1 = 100.0
+      total_score2 = 80.0
+      allow_any_instance_of(Scoring).to receive(:assessment_score).and_return(total_score1, total_score2)
+      scores = aggregate_assessment_scores(assessments, [question1])
+      expect(scores[:max]).to eq total_score1
+      expect(scores[:min]).to eq total_score2
+      expect(scores[:avg]).to eq (total_score1 + total_score2) / 2
+    end
+  end
+  describe "#test get total score" do
+    it "returns total score when required conditions are met" do
+      # stub for ScoreView.find_by_sql to revent prevent unit testing sql db queries
+      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: 20, sum_of_weights: 5, q1_max_question_score: 4))
+      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: "1")])
+      expect(assessment_score(response: [response], questions: [question1])).to eq 100.0
+      # output calculation is (weighted_score / (sum_of_weights * max_question_score)) * 100
+      # 4.0
+    end
+
+    it "returns total score when one answer is nil for scored question and its weight gets removed from sum_of_weights" do
+      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: 20, sum_of_weights: 5, q1_max_question_score: 4))
+      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
+      expect(assessment_score(response: [response], questions: [question1])).to be_within(0.01).of(125.0)
+    end
+
+    it "returns -1 when answer is nil for scored question which makes sum of weights = 0" do
+      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: 20, sum_of_weights: 1, q1_max_question_score: 5))
+      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
+      expect(assessment_score(response: [response], questions: [question1])).to eq -1.0
+    end
+
+    it "returns -1 when weighted_score of questionnaireData is nil" do
+      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: nil, sum_of_weights: 5, q1_max_question_score: 5))
+      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
+      expect(assessment_score(response: [response], questions: [question1])).to eq -1.0
+    end
+  end
+
 end

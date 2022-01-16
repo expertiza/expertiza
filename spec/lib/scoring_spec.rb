@@ -11,8 +11,12 @@ describe Scoring do
     let(:questionnaire1) { build(:questionnaire, name: "abc", private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234) }
     let(:contributor) { build(:assignment_team, id: 1) }
     let(:signed_up_team) { build(:signed_up_team, team_id: contributor.id) }
+    
+    # ReviewResponseMap Spec Additions
     let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
     let(:participant) { build(:participant, id: 1, parent_id: 1, user: student) }
+    let(:response3) { build(:response) }
+    let(:question) { double('Question') }
 
     describe '#compute_total_score' do
         context 'when avg score is nil' do

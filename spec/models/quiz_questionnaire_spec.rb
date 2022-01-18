@@ -29,5 +29,32 @@ describe QuizQuestionnaire do
        end
      end
    end
-
+  describe '#taken_by_anyone?' do 
+    context 'when the quiz hasnt been taken' do
+      it 'returns false' do
+        allow(ResponseMap).to receive(:where).and_return([])
+        expect(quiz_questionnaire.taken_by_anyone?).to be_falsey
+      end
+    end
+    context 'when the quiz has been taken' do
+      it 'returns false' do
+        allow(ResponseMap).to receive(:where).and_return([QuizResponseMap.new])
+        expect(quiz_questionnaire.taken_by_anyone?).to be_truthy
+      end
+    end
+  end
+  describe '#taken_by?' do 
+    context 'when the quiz hasnt been taken' do
+      it 'returns false' do
+        allow(ResponseMap).to receive(:where).and_return([])
+        expect(quiz_questionnaire.taken_by?(participant)).to be_falsey
+      end
+    end
+    context 'when the quiz has been taken' do
+      it 'returns false' do
+        allow(ResponseMap).to receive(:where).and_return([QuizResponseMap.new])
+        expect(quiz_questionnaire.taken_by?(participant)).to be_truthy
+      end
+    end
+  end
 end

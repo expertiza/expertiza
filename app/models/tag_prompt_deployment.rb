@@ -2,6 +2,7 @@ class TagPromptDeployment < ActiveRecord::Base
   belongs_to :tag_prompt
   belongs_to :assignment
   belongs_to :questionnaire
+  has_many :answer_tags, dependent: :destroy
 
   require "time"
 

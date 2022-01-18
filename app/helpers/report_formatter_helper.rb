@@ -1,24 +1,5 @@
 module ReportFormatterHelper
   include Scoring
-  def summary_by_reviewee_and_criteria(params, _session = nil)
-    assign_basics(params)
-    # E1991 : pass extra session variable to address anonymized view
-    # note that this is already passed from parent method in _session
-    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, @summary_ws_url, _session)
-    @summary = sum.summary
-    @reviewers = sum.reviewers
-    @avg_scores_by_reviewee = sum.avg_scores_by_reviewee
-    @avg_scores_by_round = sum.avg_scores_by_round
-    @avg_scores_by_criterion = sum.avg_scores_by_criterion
-  end
-
-  def summary_by_criteria(params, _session = nil)
-    assign_basics(params)
-    sum = SummaryHelper::Summary.new.summarize_reviews_by_criterion(@assignment, @summary_ws_url)
-    @summary = sum.summary
-    @avg_scores_by_round = sum.avg_scores_by_round
-    @avg_scores_by_criterion = sum.avg_scores_by_criterion
-  end
 
   def review_response_map(params, _session = nil)
     assign_basics(params)

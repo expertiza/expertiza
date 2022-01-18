@@ -129,7 +129,9 @@ class SuggestionController < ApplicationController
       # if this user do not have team in this assignment, create one for him/her and assign this topic to this team.
       if @team_id.nil?
         #E2121 UPDATE - move creation of team to appropriate class
-        AssignmentTeam.create_new_team(@user_id, @signuptopic)
+        new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s,
+                                     parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
+        new_team.create_new_team(@user_id, @signuptopic)
       else # this user has a team in this assignment, check whether this team has topic or not
         if @topic_id.nil?
           # clean waitlists

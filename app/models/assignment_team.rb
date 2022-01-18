@@ -273,12 +273,10 @@ class AssignmentTeam < Team
   end
 
   #E2121 Refractor create_new_team
-  def create_new_team
-    new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s,
-                                     parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
-    t_user = TeamsUser.create(team_id: new_team.id, user_id: @user_id)
-    SignedUpTeam.create(topic_id: @signuptopic.id, team_id: new_team.id, is_waitlisted: 0)
-    parent = TeamNode.create(parent_id: @signuptopic.assignment_id, node_object_id: new_team.id)
+  def create_new_team(user_id, signuptopic)
+    t_user = TeamsUser.create(team_id: self.id, user_id: user_id)
+    SignedUpTeam.create(topic_id: signuptopic.id, team_id: self.id, is_waitlisted: 0)
+    parent = TeamNode.create(parent_id: signuptopic.assignment_id, node_object_id: self.id)
     TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
   end
   

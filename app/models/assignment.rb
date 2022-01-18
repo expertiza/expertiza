@@ -55,7 +55,7 @@ class Assignment < ActiveRecord::Base
   alias team_assignment team_assignment?
 
   def topics?
-    @has_topics ||= !sign_up_topics.empty?
+    @has_topics ||= sign_up_topics.any?
   end
 
   def calibrated?
@@ -67,16 +67,16 @@ class Assignment < ActiveRecord::Base
   end
 
   #removes an assignment from course
-  def self.remove_assignment_from_course(assignment)
-    oldpath = assignment.path rescue nil
-    assignment.course_id = nil
-    assignment.save
-    newpath = assignment.path rescue nil
+  def remove_assignment_from_course
+    oldpath = self.path rescue nil
+    self.course_id = nil
+    self.save
+    newpath = self.path rescue nil
     FileHelper.update_file_location(oldpath, newpath)
   end
 
   def teams?
-    @has_teams ||= !self.teams.empty?
+    @has_teams ||= self.teams.any?
   end
 
   # remove empty teams (teams with no users) from assignment
@@ -435,7 +435,7 @@ class Assignment < ActiveRecord::Base
 
   # Checks if there are rounds with no reviews
   def self.check_empty_rounds(answers, round_num, res_type)
-    unless answers[round_num][res_type].empty?
+    if answers[round_num][res_type].any?
       return round_num.nil? ? "Round Nil - " + res_type : "Round " + round_num.to_s + " - " + res_type.to_s
     end
   end
@@ -585,7 +585,7 @@ class Assignment < ActiveRecord::Base
 
   #returns true if assignment has staggered deadline and topic_id is nil
   def staggered_and_no_topic?(topic_id)
-    self.staggered_deadline? and topic_id.nil?
+    self.staggered_deadline? && topic_id.nil?
   end
 
   #returns true if reviews required is greater than reviews allowed

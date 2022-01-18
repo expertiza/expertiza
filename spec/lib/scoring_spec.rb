@@ -1,6 +1,5 @@
 describe Scoring do
     include Scoring
-
     let(:assignment_helper) { Class.new { extend AssignmentHelper } }
     let(:questionnaire) { create(:questionnaire, id: 1) }
     let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }

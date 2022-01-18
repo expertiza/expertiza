@@ -15,7 +15,8 @@ module AssignmentHelper
       courses = Course.where(instructor_id: instructor.id)
       # instructor can see courses his/her TAs created
       ta_ids = []
-      ta_ids << Instructor.get_my_tas(session[:user].id)
+      instructor = Instructor.find(session[:user].id)
+      ta_ids << instructor.my_tas
       ta_ids.flatten!
       ta_ids.each do |ta_id|
         ta = Ta.find(ta_id)

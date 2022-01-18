@@ -6,6 +6,7 @@
 
 class Assignment < ActiveRecord::Base
   require 'analytic/assignment_analytic'
+  include Scoring
   include AssignmentAnalytic
   include ReviewAssignment
   include QuizAssignment
@@ -462,7 +463,7 @@ class Assignment < ActiveRecord::Base
       end
       @questions[questionnaire_symbol] = questionnaire.questions
     end
-    @scores = ResponseMap.scores(self, @questions)
+    @scores = review_grades(self, @questions)
     return csv if @scores[:teams].nil?
     export_data(csv, @scores, options)
   end

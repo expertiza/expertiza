@@ -308,7 +308,6 @@ module SummaryHelper
         if !criteria.weight.nil? and criteria.weight > 0 and criteria.type.eql?("Criterion")
           round_score += avg_scores_by_criterion.values.first * criteria.weight
           sum_weight += criteria.weight
-
         end
       end 
       round_score /= sum_weight if sum_weight > 0 and round_score > 0

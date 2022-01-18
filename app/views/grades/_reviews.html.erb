@@ -68,7 +68,6 @@
                 <% else %>
                     <% review_symbol = 'review' %>
                 <% end %>
-                <% puts @questions %>
                 <% @questions.each do |question| %>
                     <% if question.instance_of? UploadFile %>
                         <!-- Display FileUpload question type -->

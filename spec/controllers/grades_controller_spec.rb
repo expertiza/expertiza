@@ -59,7 +59,7 @@ describe GradesController do
         allow(ReviewResponseMap).to receive(:assessments_for).with(team).and_return([review_response])
         params = {id: 1}
         get :view, params
-        expect(controller.instance_variable_get(:@questions)[:review].size).to eq(1)
+        expect(controller.instance_variable_get(:@questions).size).to eq(1)
         expect(response).to render_template(:view)
       end
     end

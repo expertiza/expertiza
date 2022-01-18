@@ -5,6 +5,7 @@ class Response < ActiveRecord::Base
   # Added for E1973. A team review will have a lock on it so only one user at a time may edit it.
   include Lockable
   include ResponseAnalytic
+  include Scoring
   belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'map_id', inverse_of: false
   
   has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy, inverse_of: false
@@ -253,6 +254,10 @@ class Response < ActiveRecord::Base
   def done_by_staff_participant?
     role = Role.find(User.find(Participant.find(ResponseMap.find(Response.find(self.id).map_id).reviewer_id).user_id).role_id).name
     (role == "Instructor") || (role == "Teaching Assistant")
+  end
+
+  def self.score(params)
+    Class.new.extend(Scoring).assessment_score(params)
   end
 
   private

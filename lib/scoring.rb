@@ -42,7 +42,6 @@ module Scoring
   # params
   #  assessment - specifies the assessment for which the total score is being calculated
   #  questions  - specifies the list of questions being evaluated in the assessment
-
   def assessment_score(params)
     @response = params[:response].last
     return -1.0 if @response.nil? 

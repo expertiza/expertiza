@@ -139,12 +139,4 @@ describe Participant do
       expect(Participant.sort_by_name(unsorted)).to eq(sorted)
     end
   end
-
-  describe '#scores' do
-    context 'when no questions are provided' do
-      it 'returns a hash with the participant and a total score of zero' do
-        expect(participant.scores(nil)).to eq({:participant => participant, :total_score => 0})
-      end
-    end
-  end
 end

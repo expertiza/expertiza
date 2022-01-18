@@ -15,14 +15,13 @@ module SummaryHelper
       self.summary_ws_url = summary_ws_url
 
       # get all answers for each question and send them to summarization WS
-      questions.each_key do |round|
+      questions.each_with_index do |question, index|
+        round = index + 1
         self.summary[round.to_s] = {}
         self.avg_scores_by_criterion[round.to_s] = {}
         self.avg_scores_by_round[round.to_s] = 0.0
-        questions[round].each do |question|
-          next if question.type.eql?("SectionHeader")
-          summarize_reviews_by_reviewee_question(assignment, reviewee_id, question, round)
-        end
+        next if question.type.eql?("SectionHeader")
+        summarize_reviews_by_reviewee_question(assignment, reviewee_id, question, round) 
         self.avg_scores_by_round[round.to_s] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round.to_s], questions[round])
       end
       self
@@ -41,7 +40,7 @@ module SummaryHelper
     def end_threads(threads)
       threads.each do |t|
         # Wait for the thread to finish if it isn't this thread (i.e. the main thread).
-        t.join if t != Thread.current
+        t.join unless t == Thread.current
       end
     end
 
@@ -304,20 +303,13 @@ module SummaryHelper
 
     def calculate_round_score(avg_scores_by_criterion, criteria)
       round_score = sum_weight = 0.0
-      criteria.each do |q|
-        # include this score in the average round score if the weight is valid & q is criterion
-        if !q.weight.nil? and q.weight > 0 and q.type.eql?("Criterion")
-          # Check if the criteria text value is a boolean - if it is, convert to 1 or 0 for multiplication
-          if avg_scores_by_criterion[q.txt].in? [true, false]
-            avg_scores_by_criterion_weight = avg_scores_by_criterion[q.txt] ? 1 : 0
-            round_score += avg_scores_by_criterion_weight * q.weight
-          else
-            round_score += avg_scores_by_criterion[q.txt] * q.weight
-          end
-          sum_weight += q.weight
+      # include this score in the average round score if the weight is valid & q is criterion
+      unless criteria.nil?
+        if !criteria.weight.nil? and criteria.weight > 0 and criteria.type.eql?("Criterion")
+          round_score += avg_scores_by_criterion.values.first * criteria.weight
+          sum_weight += criteria.weight
         end
-      end
-
+      end 
       round_score /= sum_weight if sum_weight > 0 and round_score > 0
       round_score
     end

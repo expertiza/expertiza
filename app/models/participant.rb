@@ -92,17 +92,6 @@ class Participant < ActiveRecord::Base
     ).deliver
   end
 
-  # Return scores that this participant for the given questions
-  # Implemented in assignment_participant.rb
-  def scores(questions) 
-    scores = {}
-    scores[:participant] = self 
-    ResponseMap.compute_assignment_score(self, questions, scores)
-    scores[:total_score] = compute_total_score(self.assignment, scores)
-    ResponseMap.merge_scores(self, scores) if self.assignment.varying_rubrics_by_round?
-    scores
-  end
-
   # Authorizations are paricipant, reader, reviewer, submitter (They are not store in Participant table.)
   # Permissions are can_submit, can_review, can_take_quiz.
   # Get permissions form authorizations.

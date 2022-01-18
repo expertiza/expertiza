@@ -34,7 +34,6 @@ class GradesController < ApplicationController
   def view
     @assignment = Assignment.find(params[:id])
     questionnaires = @assignment.questionnaires
-
     if @assignment.vary_by_round
       @questions = retrieve_questions questionnaires, @assignment.id
     else
@@ -43,7 +42,6 @@ class GradesController < ApplicationController
         @questions[questionnaire.symbol] = questionnaire.questions
       end
     end
-
     @scores = review_grades(@assignment,@questions)
     averages = vector(@scores)
     @average_chart = bar_chart(averages, 300, 100, 5)

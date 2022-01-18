@@ -19,6 +19,24 @@ describe ReportsController do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
 
+  shared_examples_for "summary_report" do
+    it 'renders response_report page with corresponding data' do
+      allow(SummaryHelper::Summary).to receive_message_chain(:new, :summarize_reviews_by_reviewees)
+        .with(no_args).with(assignment, 'expertiza.ncsu.edu', session)
+        .and_return(double('Summary', summary: 'awesome!',
+                                      reviewers: [participant, participant1],
+                                      avg_scores_by_reviewee: 95,
+                                      avg_scores_by_round: 92,
+                                      avg_scores_by_criterion: 94))
+      params = {
+        id: 1,
+        report: {type: 'SummaryByRevieweeAndCriteria'}
+      }
+      get :response_report, params
+      expect(response).to render_template(:response_report)
+    end
+  end
+
   describe 'response_report' do
     before(:each) do
       stub_const('WEBSERVICE_CONFIG', 'summary_webservice_url' => 'expertiza.ncsu.edu')

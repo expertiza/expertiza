@@ -143,7 +143,6 @@ class SuggestionController < ApplicationController
 
   def reject_suggestion
     @suggestion = Suggestion.find(params[:id])
-
     if @suggestion.update_attribute('status', 'Rejected')
       flash[:notice] = 'The suggestion has been successfully rejected.'
     else

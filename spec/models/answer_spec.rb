@@ -56,13 +56,4 @@ describe Answer do
       expect { Answer.submission_valid?(response_record) }.to raise_error
     end
   end
-
-  describe '#get_reviewee_from_answer' do
-    it 'finds the reviewee from the answer' do
-      allow(Response).to receive(:find).with(1).and_return(response_record)
-      allow(ResponseMap).to receive(:find).with(1).and_return(response_map)
-      allow(response_map).to receive(:reviewee_id).and_return(team1)
-      expect(answer.get_reviewee_from_answer(answer)).to eq(team1)
-    end
-  end
 end

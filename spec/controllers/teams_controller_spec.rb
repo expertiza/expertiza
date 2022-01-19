@@ -29,6 +29,15 @@ describe TeamsController do
         expect { @c_team.delete }.to change(Team, :count).by(-1)
       end
     end
+
+    context "with two course teams" do
+      it "deletes all the course teams" do
+        @course = create(:course)
+        @team1 = create(:course_team)
+        @team2 = create(:course_team)
+        expect { CourseTeam.delete_all}.to change(Team, :count).by(-2)
+      end
+    end
   end
 
   describe "Testing copy functionality - " do
@@ -55,7 +64,7 @@ describe TeamsController do
       course_team.parent_id = course.id
       course_team.save!
 
-      # puts "assignment #{assignment.id}"
+
       post :inherit, id: assignment.id
       expect(response).to have_http_status(302)
       # expect(response).to redirect_to list_teams_url(id: course.id, type: :Course)
@@ -84,12 +93,11 @@ describe TeamsController do
       assignment_team.parent_id = assignment.id
       assignment_team.save!
 
-      # puts "assignment #{assignment.id}"
+
       post :bequeath, id: assignment_team.id
       expect(response).to have_http_status(302)
       # expect(response).to redirect_to list_teams_url(id: assignment.id)
       # assignment_teams = AssignmentTeam.all
-      # puts assignment_teams.count
     end
   end
 end

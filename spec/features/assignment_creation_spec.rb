@@ -65,7 +65,7 @@ describe "assignment function" do
       check("assignment_form_assignment_reviews_visible_to_all")
       check("assignment_form_assignment_is_calibrated")
       uncheck("assignment_form_assignment_availability_flag")
-      expect(page).to have_select("assignment_form[assignment][reputation_algorithm]", options: ['--', 'Hamer', 'Lauw'])
+      expect(page).to have_select("assignment_form[assignment][reputation_algorithm]", options: %w[-- Hamer Lauw])
 
       click_button 'Create'
       assignment = Assignment.where(name: 'public assignment for test').first
@@ -92,7 +92,7 @@ describe "assignment function" do
       check("assignment_form_assignment_reviews_visible_to_all")
       check("assignment_form_assignment_is_calibrated")
       uncheck("assignment_form_assignment_availability_flag")
-      expect(page).to have_select("assignment_form[assignment][reputation_algorithm]", options: ['--', 'Hamer', 'Lauw'])
+      expect(page).to have_select("assignment_form[assignment][reputation_algorithm]", options: %w[-- Hamer Lauw])
 
       click_button 'Create'
       assignment = Assignment.where(name: 'private assignment for test').first
@@ -178,7 +178,7 @@ describe "assignment function" do
       fill_in 'assignment_form_assignment_spec_location', with: 'testLocation'
       check('assignment_form_assignment_reviews_visible_to_all')
       click_button 'Create'
-      expect(page).to have_select("assignment_form[assignment][reputation_algorithm]", options: ['--', 'Hamer', 'Lauw'])
+      expect(page).to have_select("assignment_form[assignment][reputation_algorithm]", options: %w[-- Hamer Lauw])
       # click_button 'Create'
       assignment = Assignment.where(name: 'private assignment for test').first
       expect(assignment).to have_attributes(

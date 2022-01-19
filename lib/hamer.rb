@@ -7,18 +7,18 @@ module Hamer
     iterations = 0
     begin
       # Store previous weights to determine convergence
-      previous_weights = submissions.map{|s|s.reviews.map(&:weight)}
+      previous_weights = submissions.map { |s| s.reviews.map(&:weight) }
 
       # Reset reviewer inaccuracy
-      reviewers.each {|reviewer| reviewer.inaccuracy = 0 }
+      reviewers.each { |reviewer| reviewer.inaccuracy = 0 }
 
       # Pass 1: Calculate reviewer distance from average (inaccuracy)
       submissions.each do |submission|
         # Find current weighted average
         reviews = submission.reviews
-        weighted_scores = reviews.map{|r|r.score * r.weight}
+        weighted_scores = reviews.map { |r| r.score * r.weight }
         total_weight = reviews.map(&:weight).sum.to_f
-        weighted_average = weighted_scores.sum.to_f/total_weight
+        weighted_average = weighted_scores.sum.to_f / total_weight
 
         # Add to the reviewers' inaccuracy average
         reviews.each do |review|
@@ -27,7 +27,7 @@ module Hamer
           reviewer.inaccuracy += review_inaccuracy / reviewer.reviews.count
         end
       end
-     
+
       # Pass 2: Use reviewer inaccuracy to calculate new review score weights
       average_inaccuracy = reviewers.map(&:inaccuracy).sum / reviewers.size
       submissions.each do |submission|
@@ -40,8 +40,8 @@ module Hamer
         end
       end
       iterations += 1
-    end while !converged?(previous_weights, 
-                          submissions.map{|s|s.reviews.map(&:weight)})
+    end until converged?(previous_weights,
+                         submissions.map { |s| s.reviews.map(&:weight) })
 
     return :iterations => iterations
   end
@@ -120,7 +120,7 @@ module Hamer
         @reviewers << Reviewer.new(letter)
       end
 
-      return @reviwers
+      @reviwers
     end
 
     def submissions(rogue_score=5)
@@ -147,7 +147,7 @@ module Hamer
         end
       end
 
-      return @submissions
+      @submissions
     end
   end
 end

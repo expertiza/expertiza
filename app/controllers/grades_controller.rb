@@ -7,6 +7,7 @@ class GradesController < ApplicationController
   include AssignmentHelper
   include GradesHelper
   include AuthorizationHelper
+  include Scoring
 
   def action_allowed?
     case params[:action]
@@ -33,7 +34,6 @@ class GradesController < ApplicationController
   def view
     @assignment = Assignment.find(params[:id])
     questionnaires = @assignment.questionnaires
-
     if @assignment.vary_by_round
       @questions = retrieve_questions questionnaires, @assignment.id
     else
@@ -42,9 +42,8 @@ class GradesController < ApplicationController
         @questions[questionnaire.symbol] = questionnaire.questions
       end
     end
-
-    @scores = @assignment.scores(@questions)
-    averages = vector(@assignment.scores(@questions))
+    @scores = review_grades(@assignment,@questions)
+    averages = vector(@scores)
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)
     penalties(@assignment.id)
@@ -60,10 +59,10 @@ class GradesController < ApplicationController
     questionnaires = @assignment.questionnaires
     @questions = retrieve_questions questionnaires, @assignment.id
     # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
-    @pscore = @participant.scores(@questions)
+    @pscore = participant_scores(@participant, @questions)
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
-    @stage = @participant.assignment.get_current_stage(@topic_id)
+    @stage = @participant.assignment.current_stage(@topic_id)
     penalties(@assignment.id)
     # prepare feedback summaries
     summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
@@ -81,7 +80,7 @@ class GradesController < ApplicationController
     @team_id = @team.id
     questionnaires = @assignment.questionnaires
     @questions = retrieve_questions questionnaires, @assignment.id
-    @pscore = @participant.scores(@questions)
+    @pscore = participant_scores(@participant, @questions)
     @vmlist = []
 
     # loop through each questionnaire, and populate the view model for all data necessary
@@ -108,7 +107,7 @@ class GradesController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     @questions = list_questions(@assignment)
-    @scores = @participant.scores(@questions)
+    @scores = participant_scores(@participant, @questions)
   end
 
   def instructor_review
@@ -143,7 +142,7 @@ class GradesController < ApplicationController
   def update
     participant = AssignmentParticipant.find(params[:id])
     total_score = params[:total_score]
-    if format("%.2f", total_score) != params[:participant][:grade]
+    unless format("%.2f", total_score) == params[:participant][:grade]
       participant.update_attribute(:grade, params[:participant][:grade])
       message = if participant.grade.nil?
                   "The computed score will be used for " + participant.user.name + "."

@@ -5,6 +5,7 @@ class Response < ActiveRecord::Base
   # Added for E1973. A team review will have a lock on it so only one user at a time may edit it.
   include Lockable
   include ResponseAnalytic
+  include Scoring
   belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'map_id', inverse_of: false
   
   has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy, inverse_of: false
@@ -71,7 +72,7 @@ class Response < ActiveRecord::Base
     total_weight = 0
     scores.each do |s|
       question = Question.find(s.question_id)
-      total_weight += question.weight if !s.answer.nil? && question.is_a?(ScoredQuestion)
+      total_weight += question.weight unless s.answer.nil? || !question.is_a?(ScoredQuestion)
     end
     questionnaire = if scores.empty?
                       questionnaire_by_answer(nil)
@@ -108,7 +109,7 @@ class Response < ActiveRecord::Base
 
     most_recent_submission_by_reviewee = reviewee_team.most_recent_submission if reviewee_team
 
-    if response.nil? || (most_recent_submission_by_reviewee and most_recent_submission_by_reviewee.updated_at > response.updated_at)
+    if response.nil? || (most_recent_submission_by_reviewee && most_recent_submission_by_reviewee.updated_at > response.updated_at)
       response = Response.create(map_id: response_map.id, additional_comment: '', round: current_round, is_submitted: 0)
     end
     response
@@ -127,7 +128,6 @@ class Response < ActiveRecord::Base
       else
         assignment = Participant.find(map.reviewer_id).assignment
       end
-      topic_id = SignedUpTeam.find_by(team_id: map.reviewee_id).topic_id
       questionnaire = Questionnaire.find(assignment.review_questionnaire_id)
     end
     questionnaire
@@ -161,7 +161,7 @@ class Response < ActiveRecord::Base
     [comments, counter, @comments_in_round, @counter_in_round]
   end
 
-  def self.get_volume_of_review_comments(assignment_id, reviewer_id)
+  def self.volume_of_review_comments(assignment_id, reviewer_id)
     comments, counter,
       @comments_in_round, @counter_in_round = Response.concatenate_all_review_comments(assignment_id, reviewer_id)
     num_rounds = @comments_in_round.count - 1 #ignore nil element (index 0)
@@ -181,10 +181,10 @@ class Response < ActiveRecord::Base
   # compare the current response score with other scores on the same artifact, and test if the difference
   # is significant enough to notify instructor.
   # Precondition: the response object is associated with a ReviewResponseMap
-  ### "map_class.get_assessments_for" method need to be refactored
+  ### "map_class.assessments_for" method need to be refactored
   def significant_difference?
     map_class = self.map.class
-    existing_responses = map_class.get_assessments_for(self.map.reviewee)
+    existing_responses = map_class.assessments_for(self.map.reviewee)
     average_score_on_same_artifact_from_others, count = Response.avg_scores_and_count_for_prev_reviews(existing_responses, self)
     # if this response is the first on this artifact, there's no grade conflict
     return false if count.zero?
@@ -204,7 +204,7 @@ class Response < ActiveRecord::Base
     scores_assigned = []
     count = 0
     existing_responses.each do |existing_response|
-      if existing_response.id != current_response.id # the current_response is also in existing_responses array
+      unless existing_response.id == current_response.id # the current_response is also in existing_responses array
         count += 1
         scores_assigned << existing_response.aggregate_questionnaire_score.to_f / existing_response.maximum_score
       end
@@ -253,30 +253,34 @@ class Response < ActiveRecord::Base
   # Check if this review was done by TA/instructor return True or False
   def done_by_staff_participant?
     role = Role.find(User.find(Participant.find(ResponseMap.find(Response.find(self.id).map_id).reviewer_id).user_id).role_id).name
-    return (role == "Instructor") || (role == "Teaching Assistant")
+    (role == "Instructor") || (role == "Teaching Assistant")
+  end
+
+  def self.score(params)
+    Class.new.extend(Scoring).assessment_score(params)
   end
 
   private
 
-  def construct_instructor_html identifier, self_id, count
+  def construct_instructor_html(identifier, self_id, count)
     identifier += '<h4><B>Review ' + count.to_s + '</B></h4>'
     identifier += '<B>Reviewer: </B>' + self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
     identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' \
            "'review_" + self_id + "','review'" + ');return false;">hide review</a><BR/>'
   end
 
-  def construct_student_html identifier, self_id, count
-    identifier += '<table width="100%">'\
-						 '<tr>'\
-						 '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;'\
-						 '<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' + "'review_" + self_id + "','review'" + ');return false;">hide review</a>'\
-						 '</td>'\
-						 '<td align="left"><b>Last Reviewed:</b>'\
-						 "<span>#{(self.updated_at.nil? ? 'Not available' : self.updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>"\
+  def construct_student_html(identifier, self_id, count)
+    identifier += '<table width="100%">' \
+						 '<tr>' \
+						 '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;' \
+						 '<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' + "'review_" + self_id + "','review'" + ');return false;">hide review</a>' \
+						 '</td>' \
+						 '<td align="left"><b>Last Reviewed:</b>' \
+						 "<span>#{(self.updated_at.nil? ? 'Not available' : self.updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>" \
 						 '</tr></table>'
   end
 
-  def construct_review_response code, self_id, show_tags = nil, current_user = nil
+  def construct_review_response(code, self_id, show_tags = nil, current_user = nil)
     code += '<table id="review_' + self_id + '" class="table table-bordered">'
     answers = Answer.where(response_id: self.response_id)
     unless answers.empty?
@@ -287,7 +291,7 @@ class Response < ActiveRecord::Base
       tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id) : nil
       code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, current_user
     end
-    comment = if !self.additional_comment.nil?
+    comment = unless self.additional_comment.nil?
                 self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
               else
                 ''
@@ -296,12 +300,12 @@ class Response < ActiveRecord::Base
     code += '</table>'
   end
 
-  def add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, current_user = nil
+  def add_table_rows(questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, current_user = nil)
     count = 0
     # loop through questions so the the questions are displayed in order based on seq (sequence number)
     questions.each do |question|
       count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
-      answer = answers.find {|a| a.question_id == question.id }
+      answer = answers.find { |a| a.question_id == question.id }
       row_class = count.even? ? "info" : "warning"
       row_class = "" if question.is_a? QuestionnaireHeader
       code += '<tr class="' + row_class + '"><td>'

@@ -9,8 +9,8 @@ module QuizAssignment
 
     # Reject contributions of topics whose deadline has passed
     contributor_set.reject! do |contributor|
-      contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "Complete" or
-          contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "submission"
+      contributor.assignment.current_stage(signed_up_topic(contributor).id) == "Complete" or
+          contributor.assignment.current_stage(signed_up_topic(contributor).id) == "submission"
     end
 
     candidate_topics = Set.new
@@ -21,7 +21,7 @@ module QuizAssignment
   # Returns a contributor whose quiz is to be taken if available, otherwise will raise an error
   def contributor_for_quiz(reviewer, topic)
     raise "Please select a topic." if topics? and topic.nil?
-    raise "This assignment does not have topics." if !topics? and topic
+    raise "This assignment does not have topics." unless topics? || !topic
 
     # This condition might happen if the reviewer/quiz taker waited too much time in the
     # select topic page and other students have already selected this topic.

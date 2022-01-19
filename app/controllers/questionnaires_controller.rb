@@ -127,7 +127,7 @@ class QuestionnairesController < ApplicationController
             # example of 'v' value
             # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
             v.each_pair do |key, value|
-              @question.send(key + '=', value) if @question.send(key) != value
+              @question.send(key + '=', value) unless @question.send(key) == value
             end
             @question.save
           end
@@ -225,7 +225,7 @@ class QuestionnairesController < ApplicationController
           # example of 'v' value
           # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
           v.each_pair do |key, value|
-            @question.send(key + '=', value) if @question.send(key) != value
+            @question.send(key + '=', value) unless @question.send(key) == value
           end
 
           @question.save
@@ -238,7 +238,7 @@ class QuestionnairesController < ApplicationController
 
     if params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
-    elsif !questionnaire_id.nil?
+    elsif questionnaire_id
       redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
     end
   end
@@ -249,9 +249,9 @@ class QuestionnairesController < ApplicationController
   def save
     @questionnaire.save!
 
-    save_questions @questionnaire.id if !@questionnaire.id.nil? and @questionnaire.id > 0
+    save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
     # We do not create node for quiz questionnaires
-    if @questionnaire.type != "QuizQuestionnaire"
+    unless @questionnaire.type == "QuizQuestionnaire"
       p_folder = TreeFolder.find_by(name: @questionnaire.display_type)
       parent = FolderNode.find_by(node_object_id: p_folder.id)
       # create_new_node_if_necessary(parent)

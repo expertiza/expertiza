@@ -6,9 +6,9 @@ class CourseParticipant < Participant
     if part.nil?
       part = AssignmentParticipant.create(user_id: self.user_id, parent_id: assignment_id)
       part.set_handle
-      return part
+      part
     else
-      return nil # return nil so we can tell a copy is not made
+      nil # return nil so we can tell a copy is not made
     end
   end
 

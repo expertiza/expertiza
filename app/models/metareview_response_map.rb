@@ -12,11 +12,13 @@ class MetareviewResponseMap < ResponseMap
       @prev.each do |element|
         @sorted_array << element if element.map_id == self.review_mapping.map_id
       end
-      @sorted = @sorted_array.sort {|m1, m2| m1.version_num and m2.version_num ? m1.version_num <=> m2.version_num : (m1.version_num ? -1 : 1) }
+      @sorted = @sorted_array.sort {|m1, m2| m1.version_num || if m2.version_num
+                                                                  m1.version_num <=> m2.version_num
+                                                                else
+                                                                  m1.version_num ? -1 : 1
+                                                                end }
       # return all the lists in ascending order.
       @sorted
-    else
-      nil # "<I>No review was performed.</I><br/><hr/><br/>"
     end
   end
 
@@ -28,7 +30,7 @@ class MetareviewResponseMap < ResponseMap
   end
 
   def questionnaire
-    self.assignment.questionnaires.find_by(type: 'MetareviewQuestionnaire')
+    self.assignment.questionnaires
   end
 
   def get_title
@@ -62,11 +64,14 @@ class MetareviewResponseMap < ResponseMap
       reviewee = AssignmentParticipant.where(user_id: ruser.id, parent_id:  id).first
       raise ImportError, "Reviewee,  #{row_hash[:reviewer].to_s}, for contributor, #{contributor.name}, was not found." if reviewee.nil?
       muser = User.find_by_name(row.to_s.strip)
-      reviewer = AssignmentParticipant.where(user_id: muser.id, parent_id:  id).first
+      puts muser.name
+      reviewer = AssignmentParticipant.where(user_id: muser.id, parent_id:  id)
       raise ImportError, "Metareviewer,  #{row.to_s}, for contributor, #{contributor.name}, and reviewee, #{row_hash[:reviewer].to_s }, was not found." if reviewer.nil?
       # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
-      reviewmapping = ReviewResponseMap.where(reviewee_id: contributor.id, reviewer_id:  reviewee.id).first
+      reviewmapping = ReviewResponseMap.where(reviewee_id: contributor.id, reviewer_id:  reviewee.id)
+      # puts reviewee.id
+      puts reviewer.id
       raise ImportError, "No review mapping was found for contributor, #{contributor.name}, and reviewee, #{row_hash[:reviewer].to_s}." if reviewmapping.nil?
       existing_mappings = MetareviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id: reviewer.id, reviewed_object_id: reviewmapping.map_id)
       # if no mappings have already been imported for this combination

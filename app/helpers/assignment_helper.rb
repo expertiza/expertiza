@@ -9,13 +9,14 @@ module AssignmentHelper
       courses << Course.where(instructor_id: ta.id)
       courses.flatten!
     # Administrator and Super-Administrator can see all courses
-    elsif session[:user].role.name == 'Administrator' or session[:user].role.name == 'Super-Administrator'
+    elsif session[:user].role.name == 'Administrator' || session[:user].role.name == 'Super-Administrator'
       courses = Course.all
     elsif session[:user].role.name == 'Instructor'
       courses = Course.where(instructor_id: instructor.id)
       # instructor can see courses his/her TAs created
       ta_ids = []
-      ta_ids << Instructor.get_my_tas(session[:user].id)
+      instructor = Instructor.find(session[:user].id)
+      ta_ids << instructor.my_tas
       ta_ids.flatten!
       ta_ids.each do |ta_id|
         ta = Ta.find(ta_id)
@@ -24,7 +25,7 @@ module AssignmentHelper
     end
     options = []
     # Only instructors, but not TAs, would then be allowed to change an assignment to be part of no course
-    if session[:user].role.name == 'Administrator' or session[:user].role.name == 'Super-Administrator' or session[:user].role.name == 'Instructor'
+    if session[:user].role.name == 'Administrator' || session[:user].role.name == 'Super-Administrator' || session[:user].role.name == 'Instructor'
       options << ['-----------', nil]
     end
     courses.each do |course|
@@ -62,7 +63,7 @@ module AssignmentHelper
     due_dates.delete_if {|due_date| due_date.due_at.nil? }
     due_dates.sort! {|x, y| x.due_at <=> y.due_at }
 
-    if due_dates[round].nil? or round < 0
+    if due_dates[round].nil? || round < 0
       due_date = AssignmentDueDate.new
       due_date.deadline_type_id = DeadlineType.find_by(name: type).id
       # creating new round
@@ -100,3 +101,4 @@ module AssignmentHelper
   end
 
 end
+

@@ -1,7 +1,7 @@
 class Assessment360Controller < ApplicationController
   include GradesHelper
   include AuthorizationHelper
-
+  include Scoring
   # Added the @instructor to display the instructor name in the home page of the 360 degree assessment
   def action_allowed?
     current_user_has_ta_privileges?
@@ -174,7 +174,7 @@ class Assessment360Controller < ApplicationController
     participant = AssignmentParticipant.find_by(user_id: user_id, parent_id: assignment_id)
     assignment = participant.assignment
     questions = retrieve_questions assignment.questionnaires, assignment_id
-    participant.scores(questions)
+    participant_scores(participant, questions)
   end
 
   def format_topic(topic)

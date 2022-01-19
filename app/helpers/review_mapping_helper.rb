@@ -120,7 +120,8 @@ module ReviewMappingHelper
                                 # E1991 : check anonymized view here
                                 Team.find(reviewee_id).name
                               end
-    team_reviewed_link_name = "(" + team_reviewed_link_name + ")" if !response.empty? and !response.last.is_submitted?
+    team_reviewed_link_name = "(" + team_reviewed_link_name + ")"
+    #if !response.empty? and !response.last.is_submitted?
     team_reviewed_link_name
   end
 
@@ -143,7 +144,7 @@ module ReviewMappingHelper
     # Iterating through list
     (1..num_rounds).each do |round|
       # Changing values of instance variable based on below condition
-      if team_id != nil && team_id != -1.0
+      unless team_id.nil? || team_id == -1.0
         instance_variable_set("@score_awarded_round_" + round.to_s, @review_scores[reviewer_id][round][team_id].to_s + '%')
       end
     end
@@ -164,7 +165,7 @@ module ReviewMappingHelper
   def sort_reviewer_by_review_volume_desc
     @reviewers.each do |r|
       # get the volume of review comments
-      review_volumes = Response.get_volume_of_review_comments(@assignment.id, r.id)
+      review_volumes = Response.volume_of_review_comments(@assignment.id, r.id)
       r.avg_vol_per_round = []
       review_volumes.each_index do |i|
         if i.zero?
@@ -274,7 +275,7 @@ module ReviewMappingHelper
     # if someone did not do any tagging in 30 seconds, then ignore this interval
     threshold = 30
     intervals = intervals.select{|v| v < threshold}
-    if not intervals.empty?
+    unless  intervals.empty?
       interval_mean = intervals.reduce(:+) / intervals.size.to_f
     end
     #build the parameters for the chart
@@ -286,7 +287,7 @@ module ReviewMappingHelper
           data: intervals,
           label: "time intervals"
         },
-        if not intervals.empty?
+        unless  intervals.empty?
           {
             data: Array.new(intervals.length, interval_mean),
             label: "Mean time spent"
@@ -320,7 +321,7 @@ module ReviewMappingHelper
     intervals = intervals.select{|v| v < threshold}
 
     #Get Metrics once tagging intervals are available
-    if not intervals.empty?
+    unless intervals.empty?
       metrics = Hash.new
       metrics[:mean] = (intervals.reduce(:+) / intervals.size.to_f).round(interval_precision)
       metrics[:min] = intervals.min
@@ -328,7 +329,7 @@ module ReviewMappingHelper
       sum = intervals.inject(0){|accum, i| accum +(i- metrics[:mean])**2}
       metrics[:variance] = (sum/(intervals.size).to_f).round(interval_precision)
       metrics[:stand_dev] = Math.sqrt(metrics[:variance]).round(interval_precision)
-      return metrics
+      metrics
     end
     #if no Hash object is returned, the UI handles it accordingly
   end

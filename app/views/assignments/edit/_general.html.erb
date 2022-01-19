@@ -82,7 +82,7 @@ function microtaskChanged() {
     <td style='padding:5px' id='assignment_team_assignment_field'>
 
       <div class="form-inline">
-      <% if(@assignment_form.assignment.max_team_size == 1)%>
+      <% if @assignment_form.assignment.max_team_size == 1%>
         <%= check_box_tag('team_assignment', 'true', false, {:onChange => 'hasTeamsChanged()'}) %>
       <% else %>
         <%= check_box_tag('team_assignment', 'true', @assignment_form.assignment.team_assignment?, {:onChange => 'hasTeamsChanged()'}) %>
@@ -217,7 +217,7 @@ function microtaskChanged() {
       <div class="form-inline">
       <!--<input name="assignment_form[assignment][reputation_algorithm]" type="hidden" value="false"/>-->
       <%= label_tag('assignment_form[assignment][reputation_algorithm]', 'Reputation Algorithm?') %>
-      <%= select('assignment_form[assignment]','reputation_algorithm', [['--', ''],['Lauw', 'Lauw'],['Hamer','Hamer']], {:selected => @assignment_form.assignment.reputation_algorithm}, {:class => 'form-control', :style => 'width: 100px'}) %>
+      <%= select('assignment_form[assignment]', 'reputation_algorithm', [['--', ''], %w[Lauw Lauw], %w[Hamer Hamer]], { :selected => @assignment_form.assignment.reputation_algorithm}, { :class => 'form-control', :style => 'width: 100px'}) %>
       </div>
     </td>
   </tr>

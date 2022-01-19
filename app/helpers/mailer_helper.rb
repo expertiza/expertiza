@@ -1,6 +1,6 @@
 module MailerHelper
   def self.send_mail_to_user(user, subject, partial_name, password)
-    Mailer.generic_message ({
+    Mailer.generic_message({
       to: user.email,
       subject: subject,
       body: {
@@ -13,7 +13,7 @@ module MailerHelper
   end
 
   def self.send_mail_to_all_super_users(super_user, user, subject)
-    Mailer.request_user_message ({
+    Mailer.request_user_message({
       to: super_user.email,
       subject: subject,
       body: {
@@ -25,7 +25,7 @@ module MailerHelper
   end
 
   def self.send_mail_for_conference_user(user, subject, partial_name, password, conference_variable)
-    Mailer.generic_message ({
+    Mailer.generic_message({
         to: user.email,
         subject: subject,
         body: {

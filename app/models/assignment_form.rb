@@ -36,6 +36,25 @@ class AssignmentForm
     assignment_form
   end
 
+  def rubric_weight_error(attributes)
+    error = false
+    attributes[:assignment_questionnaire].each do |assignment_questionnaire|
+      # Check rubrics to make sure weight is 0 if there are no Scored Questions
+      scored_questionnaire = false
+      questionnaire = Questionnaire.find(assignment_questionnaire[:questionnaire_id])
+      questions = Question.where(questionnaire_id: questionnaire.id)
+      questions.each do |question|
+        if question.is_a? ScoredQuestion
+          scored_questionnaire = true
+        end
+      end
+      unless scored_questionnaire || assignment_questionnaire[:questionnaire_weight].to_i.zero?
+        error = true
+      end
+    end
+    error
+  end
+
   def update(attributes, user, vary_by_topic_desired = false)
     @has_errors = false
     has_late_policy = false
@@ -108,7 +127,7 @@ class AssignmentForm
     attributes.each do |assignment_questionnaire|
       total_weight += assignment_questionnaire[:questionnaire_weight].to_i
     end
-    if total_weight != 0 and total_weight != 100
+    unless total_weight.zero? || total_weight == 100
       @assignment.errors.add(:message, 'Total weight of rubrics should add up to either 0 or 100%')
       @has_errors = true
     end
@@ -118,7 +137,8 @@ class AssignmentForm
   def update_tag_prompt_deployments(attributes)
     unless attributes.nil?
       attributes.each do |key, value|
-        TagPromptDeployment.where(id: value['deleted']).delete_all if value.key?('deleted')
+        # We need to use destroy_all to delete all the dependents also. 
+        TagPromptDeployment.where(id: value['deleted']).destroy_all if value.key?('deleted')
         # assume if tag_prompt is there, then id, question_type, answer_length_threshold must also be there since the inputs are coupled
         next unless value.key?('tag_prompt')
         for i in 0..value['tag_prompt'].count - 1
@@ -175,7 +195,7 @@ class AssignmentForm
 
   # Adds badges to assignment badges table as part of E1822
   def update_assigned_badges(badge, assignment)
-    if assignment and badge
+    if assignment && badge
       AssignmentBadge.where(assignment_id: assignment[:id]).map(&:id).each do |assigned_badge_id|
         AssignmentBadge.delete(assigned_badge_id) unless badge[:id].include?(assigned_badge_id)
       end
@@ -276,8 +296,7 @@ class AssignmentForm
 
   # add DelayedJob into queue and return it
   def add_delayed_job(_assignment, deadline_type, due_date, min_left)
-    delayed_job_id = MailWorker.perform_in(min_left * 60, due_date.parent_id, deadline_type, due_date.due_at)
-    delayed_job_id
+    MailWorker.perform_in(min_left * 60, due_date.parent_id, deadline_type, due_date.due_at)
   end
 
   # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue
@@ -306,9 +325,7 @@ class AssignmentForm
   def find_min_from_now(due_at)
     curr_time = DateTime.now.in_time_zone(zone = 'UTC').to_s(:db)
     curr_time = Time.parse(curr_time)
-    time_in_min = ((due_at - curr_time).to_i / 60)
-    # time_in_min = 1
-    time_in_min
+    ((due_at - curr_time).to_i / 60)
   end
 
   # Save the assignment

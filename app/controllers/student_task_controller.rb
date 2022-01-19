@@ -9,7 +9,7 @@ class StudentTaskController < ApplicationController
 
   def impersonating_as_admin?
     original_user = session[:original_user]
-    admin_role_ids = Role.where(name:['Administrator','Super-Administrator']).pluck(:id)
+    admin_role_ids = Role.where(name:%w[Administrator Super-Administrator]).pluck(:id)
     admin_role_ids.include? original_user.role_id
   end
 

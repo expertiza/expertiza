@@ -10,105 +10,6 @@ describe Answer do
   describe "# test dependancy between question.rb and answer.rb"
   it { should belong_to(:question) }
 
-  describe "#test get total score" do
-    it "returns total score when required conditions are met" do
-      # stub for ScoreView.find_by_sql to revent prevent unit testing sql db queries
-      allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview", weighted_score: 20, sum_of_weights: 5, q1_max_question_score: 4)])
-      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: "1")])
-      expect(Answer.assessment_score(response: [response_record], questions: [question1])).to eq 100.0
-      # output calculation is (weighted_score / (sum_of_weights * max_question_score)) * 100
-      # 4.0
-    end
-
-    it "returns total score when one answer is nil for scored question and its weight gets removed from sum_of_weights" do
-      allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview", weighted_score: 20, sum_of_weights: 5, q1_max_question_score: 4)])
-      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
-      expect(Answer.assessment_score(response: [response_record], questions: [question1])).to be_within(0.01).of(125.0)
-    end
-
-    it "returns -1 when answer is nil for scored question which makes sum of weights = 0" do
-      allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview", weighted_score: 20, sum_of_weights: 1, q1_max_question_score: 5)])
-      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
-      expect(Answer.assessment_score(response: [response_record], questions: [question1])).to eq -1.0
-    end
-
-    it "returns -1 when weighted_score of questionnaireData is nil" do
-      allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview", weighted_score: nil, sum_of_weights: 5, q1_max_question_score: 5)])
-      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
-      expect(Answer.assessment_score(response: [response_record], questions: [question1])).to eq -1.0
-    end
-
-    xit "checks if submission_valid? is called" do
-      allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview", weighted_score: nil, sum_of_weights: 5, q1_max_question_score: 5)])
-      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
-      expect(Answer).to receive(:submission_valid?)
-      Answer.assessment_score(response: [response_record], questions: [question1])
-    end
-  end
-
-  describe "#test compute scores" do
-    let(:response1) { double("respons1") }
-    let(:response2) { double("respons2") }
-
-    before(:each) do
-      @total_score = 100.0
-      allow(Answer).to receive(:assessment_score).and_return(@total_score)
-    end
-
-    it "returns nil if list of assessments is empty" do
-      assessments = []
-      scores = Answer.compute_scores(assessments, [question1])
-      expect(scores[:max]).to eq nil
-      expect(scores[:min]).to eq nil
-      expect(scores[:avg]).to eq nil
-    end
-
-    it "returns scores when a single valid assessment of total score 100 is give" do
-      assessments = [response1]
-      Answer.instance_variable_set(:@invalid, 0)
-      scores = Answer.compute_scores(assessments, [question1])
-      expect(scores[:max]).to eq @total_score
-      expect(scores[:min]).to eq @total_score
-      expect(scores[:avg]).to eq @total_score
-    end
-
-    it "returns scores when two valid assessments of total scores 80 and 100 are given" do
-      assessments = [response1, response2]
-      Answer.instance_variable_set(:@invalid, 0)
-      total_score1 = 100.0
-      total_score2 = 80.0
-      allow(Answer).to receive(:assessment_score).and_return(total_score1, total_score2)
-      scores = Answer.compute_scores(assessments, [question1])
-      expect(scores[:max]).to eq total_score1
-      expect(scores[:min]).to eq total_score2
-      expect(scores[:avg]).to eq (total_score1 + total_score2) / 2
-    end
-
-    it "returns scores when an invalid assessments is given" do
-      assessments = [response1]
-      Answer.instance_variable_set(:@invalid, 1)
-      scores = Answer.compute_scores(assessments, [question1])
-      expect(scores[:max]).to eq @total_score
-      expect(scores[:min]).to eq @total_score
-      expect(scores[:avg]).to eq 0
-    end
-
-    it "returns scores when invalid flag is nil" do
-      assessments = [response1]
-      Answer.instance_variable_set(:@invalid, nil)
-      scores = Answer.compute_scores(assessments, [question1])
-      expect(scores[:max]).to eq @total_score
-      expect(scores[:min]).to eq @total_score
-      expect(scores[:avg]).to eq @total_score
-    end
-
-    it "checks if assessment_score function is called" do
-      assessments = [response1]
-      expect(Answer).to receive(:assessment_score).with(response: assessments, questions: [question1]).and_return(@total_score)
-      scores = Answer.compute_scores(assessments, [question1])
-    end
-  end
-
   describe "#test sql queries in answer.rb" do
     before(:each) do
       @assignment_id = 1
@@ -153,15 +54,6 @@ describe Answer do
       allow(AssignmentDueDate).to receive(:where).and_return(nil)
       allow(AssignmentDueDate).to receive(:order).and_return(nil)
       expect { Answer.submission_valid?(response_record) }.to raise_error
-    end
-  end
-
-  describe '#get_reviewee_from_answer' do
-    it 'finds the reviewee from the answer' do
-      allow(Response).to receive(:find).with(1).and_return(response_record)
-      allow(ResponseMap).to receive(:find).with(1).and_return(response_map)
-      allow(response_map).to receive(:reviewee_id).and_return(team1)
-      expect(answer.get_reviewee_from_answer(answer)).to eq(team1)
     end
   end
 end

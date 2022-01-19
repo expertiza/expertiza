@@ -179,17 +179,17 @@ describe Assignment do
     end
   end
   
-  describe '#get_questionnaire_ids' do
+  describe '#questionnaire_ids' do
     context 'when the assignment does not have rounds' do
       it 'it returns the ids of the associated questionnaires' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire1])
-        expect(assignment.get_questionnaire_ids(nil)).to eq([assignment_questionnaire1])
+        expect(assignment.questionnaire_ids(nil)).to eq([assignment_questionnaire1])
       end
     end
     context 'when the assignment has rounds' do
       it 'it returns the id of the associated questionnaires from the round' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 1).and_return([assignment_questionnaire1])
-        expect(assignment.get_questionnaire_ids(1)).to eq([assignment_questionnaire1])
+        expect(assignment.questionnaire_ids(1)).to eq([assignment_questionnaire1])
       end
     end
     context 'when the assignment has no associated questionnaires' do
@@ -200,36 +200,7 @@ describe Assignment do
         allow(arr).to receive(:find_each).and_yield(assignment_questionnaire1).and_yield(assignment_questionnaire2)
         allow(assignment_questionnaire1).to receive(:questionnaire).and_return(questionnaire1)
         allow(assignment_questionnaire2).to receive(:questionnaire).and_return(questionnaire2)
-        expect(assignment.get_questionnaire_ids(1)).to eq([assignment_questionnaire1])
-      end
-    end
-  end
-
-  describe '#scores' do
-    context 'when assignment is varying rubric by round assignment' do
-      it 'calculates scores in each round of each team in current assignment' do
-        allow(participant).to receive(:scores).with(review1: [question]).and_return(98)
-        assignment.vary_by_round = true 
-        allow(assignment).to receive(:num_review_rounds).and_return(1)
-        allow(ReviewResponseMap).to receive(:get_responses_for_team_round).with(team, 1).and_return([response])
-        allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
-        scores = assignment.scores(review1: [question])
-        expect(scores[:teams][:"0"][:scores][:avg]).to eq(90)
-        expect(scores[:teams][:"0"][:scores][:min]).to eq(88)
-        expect(scores[:teams][:"0"][:scores][:max]).to eq(95)
-      end
-    end
-
-    context 'when assignment is not varying rubric by round assignment' do
-      it 'calculates scores of each team in current assignment' do
-        allow(participant).to receive(:scores).with(review: [question]).and_return(98)
-        allow(assignment).to receive(:vary_by_round).and_return(false)
-        allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([response])
-        allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
-        scores = assignment.scores(review: [question])
-        expect(scores[:teams][:"0"][:scores][:avg]).to eq(90)
-        expect(scores[:teams][:"0"][:scores][:min]).to eq(88)
-        expect(scores[:teams][:"0"][:scores][:max]).to eq(95)
+        expect(assignment.questionnaire_ids(1)).to eq([assignment_questionnaire1])
       end
     end
   end
@@ -433,7 +404,7 @@ describe Assignment do
 
       context 'topic_id is not nil' do
         it 'returns Submission' do
-          allow(assignment).to receive(:get_current_stage).with(123).and_return('Submission')
+          allow(assignment).to receive(:current_stage).with(123).and_return('Submission')
           expect(assignment.current_stage_name(123)).to eq('Submission')
         end
       end
@@ -445,6 +416,13 @@ describe Assignment do
         it 'returns the deadline name of current due date' do
           allow(assignment).to receive(:find_current_stage).with(123).and_return(assignment_due_date)
           expect(assignment.current_stage_name(123)).to eq('Review')
+        end
+      end
+      context "when due date is equal to 'Finished'" do
+        it 'returns Submission' do
+          allow(assignment).to receive(:find_current_stage).with(123).and_return('Finished')
+          allow(assignment).to receive(:current_stage).with(123).and_return('Submission')
+          expect(assignment.current_stage_name(123)).to eq('Submission')
         end
       end
     end
@@ -693,6 +671,31 @@ describe Assignment do
         @assignment_due_date_rev2 = create(:assignment_due_date, round: 2, parent_id: assignment.id, review_allowed_id: dead_right.id, review_of_review_allowed_id: dead_right.id, submission_allowed_id: dead_right.id, deadline_type: @deadline_type_rev)
         expect(assignment.find_review_period(nil)).to eql([[@assignment_due_date_sub1, @assignment_due_date_sub2], [@assignment_due_date_rev1, @assignment_due_date_rev2]])
       end
+    end
+  end
+  describe '#calibrated?' do
+    context 'when the assignment is not a calibrated assignment' do
+      it 'returns false' do
+        assignment = create(:assignment)
+        allow(assignment).to receive(:is_calibrated).and_return(false)
+        expect(assignment.calibrated?).to be_falsey
+      end
+    end
+    context 'when the assignment is a calibrated assignment' do
+      it 'returns true' do
+        assignment = create(:assignment)
+        allow(assignment).to receive(:is_calibrated).and_return(true)
+        expect(assignment.calibrated?).to be_truthy
+      end
+    end
+  end
+  describe '#remove_assignment_from_course' do
+    it 'sets the course_id to nil' do
+      assignment = create(:assignment)
+      assignment.course_id = 2
+      expect(assignment.course_id).to eq(2)
+      assignment.remove_assignment_from_course
+      expect(assignment.course_id).to be_nil
     end
   end
 end

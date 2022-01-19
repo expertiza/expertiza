@@ -72,7 +72,7 @@ class PopupController < ApplicationController
     all_assignments = Assignment.where(:instructor_id=>session[:user].id)
     @similar_assignments = []
     all_assignments.each do |assignment|
-      if (string_similarity(@assignment.name, assignment.name) > ASSIGNMENT_NAME_SIMILARITY_THRESHOLD)
+      if string_similarity(@assignment.name, assignment.name) > ASSIGNMENT_NAME_SIMILARITY_THRESHOLD
         @similar_assignments << assignment
       end
     end

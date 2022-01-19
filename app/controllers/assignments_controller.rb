@@ -189,7 +189,7 @@ class AssignmentsController < ApplicationController
   # remove an assignment from a course. Doesn't delete assignment
   def remove_assignment_from_course
     assignment = Assignment.find(params[:id])
-    Assignment.remove_assignment_from_course(assignment)
+    assignment.remove_assignment_from_course
     redirect_to list_tree_display_index_path
   end
 
@@ -502,8 +502,11 @@ class AssignmentsController < ApplicationController
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
     elsif @assignment_form.update_attributes(assignment_form_params, current_user)
       flash[:note] = 'The assignment was successfully saved....'
+      if @assignment_form.rubric_weight_error(assignment_form_params)
+        flash[:error] = "A rubric has no ScoredQuestions, but still has a weight. Please change the weight to 0."
+      end
     else
-      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
+      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.to_s}"
     end
     ExpertizaLogger.info LoggerMessage.new("", session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)
   end

@@ -15,7 +15,7 @@ describe CourseNode do
   describe '#create_course_node' do
     it 'saves a course node with course data' do
       allow(CourseNode).to receive(:get_parent_id).and_return(1)
-      expect(course_node.create_course_node(course)).to be_truthy
+      expect(CourseNode.create_course_node(course)).to be_truthy
     end
   end
   describe '#table' do

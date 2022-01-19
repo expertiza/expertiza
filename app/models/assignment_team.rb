@@ -1,6 +1,7 @@
 class AssignmentTeam < Team
   require File.dirname(__FILE__) + '/analytic/assignment_team_analytic'
   include AssignmentTeamAnalytic
+  include Scoring
 
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'parent_id'
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewee_id'
@@ -17,7 +18,7 @@ class AssignmentTeam < Team
   # EDIT: A situation was found which differs slightly. If the current user is on the team, we want to
   # return that instead for instances where the code uses the current user.
   def user_id
-    if @current_user != nil and users.include? @current_user
+    if !@current_user.nil? && users.include?(@current_user)
       @current_user.id
     end
     users.first.id
@@ -67,7 +68,7 @@ class AssignmentTeam < Team
 
   # E-1973 If a team is being treated as a reviewer of an assignment, then they are the reviewer
   def get_reviewer
-    return self
+    self
   end
 
   # Evaluates whether any contribution by this team was reviewed by reviewer
@@ -84,7 +85,7 @@ class AssignmentTeam < Team
 
   # Whether the team has submitted work or not
   def has_submissions?
-    self.submitted_files.any? or self.submitted_hyperlinks.present?
+    self.submitted_files.any? || self.submitted_hyperlinks.present?
   end
 
   # Get Participants of the team
@@ -115,7 +116,7 @@ class AssignmentTeam < Team
   end
 
   # Get the first member of the team
-  def self.get_first_member(team_id)
+  def self.first_member(team_id)
     find_by(id: team_id).try(:participants).try(:first)
   end
 
@@ -157,19 +158,6 @@ class AssignmentTeam < Team
   def add_participant(assignment_id, user)
     return if AssignmentParticipant.find_by(parent_id: assignment_id, user_id: user.id)
     AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted)
-  end
-
-  # return a hash of scores that the team has received for the questions
-  def scores(questions)
-    scores = {}
-    scores[:team] = self # This doesn't appear to be used anywhere
-    assignment.questionnaires.each do |questionnaire|
-      scores[questionnaire.symbol] = {}
-      scores[questionnaire.symbol][:assessments] = ReviewResponseMap.where(reviewee_id: self.id)
-      scores[questionnaire.symbol][:scores] = Answer.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
-    end
-    scores[:total_score] = assignment.compute_total_score(scores)
-    scores
   end
 
   def hyperlinks
@@ -276,12 +264,12 @@ class AssignmentTeam < Team
         return participant.id
       end
     end
-    return nil
+    nil
   end
 
   # determines if the team contains a participant who is currently logged in
   def current_user_is_reviewer?(current_user_id)
-    return get_logged_in_reviewer_id(current_user_id) != nil
+    get_logged_in_reviewer_id(current_user_id) != nil
   end
 
 end

@@ -15,6 +15,7 @@ nohup.out
 pg_data/*
 .github/*
 
+
 #################
 ## scrubbed_db ##
 #################

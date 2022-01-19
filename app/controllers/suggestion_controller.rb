@@ -112,27 +112,12 @@ class SuggestionController < ApplicationController
   end
 
   def notification
-    #--zhewei-----06/22/2015--------------------------------------------------------------------------------------
-    # If you want to create a new team with topic and team members on view, you have to
-    # 1. create new Team
-    # 2. create new TeamsUser
-    # 3. create new SignedUpTeam
-    # 4. create new TeamNode (node_object_id of TeamNode is team_id)
-    # 5. create new TeamUserNode (node_object_id of TeamUserNode is teams_user_id)
-    #----------------------------------------------------------------------------------------------------------
-    # if proposer's signup_pref is yes and does not have a team yet --> create team and assign topic
-    # if proposer's signup_pref is yes, has a team, does not hold a topic yet --> assign topic
-    # if proposer's signup_pref is yes, has a team and topic --> send email says that 'approved'
-    # if proposer's signup_pref is no --> send email says that 'approved'
-    #-------------how to simplify?------------------------------------------------------------------------------
     if @suggestion.signup_preference == 'Y'
-      # if this user do not have team in this assignment, create one for him/her and assign this topic to this team.
       if @team_id.nil?
-        #E2121 UPDATE - move creation of team to appropriate class
         new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s,
                                      parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
         new_team.create_new_team(@user_id, @signuptopic)
-      else # this user has a team in this assignment, check whether this team has topic or not
+      else
         if @topic_id.nil?
           # clean waitlists
           SignedUpTeam.where(team_id: @team_id, is_waitlisted: 1).destroy_all

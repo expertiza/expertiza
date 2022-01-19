@@ -10,9 +10,10 @@ describe SuggestionController do
   let(:ta) { build(:teaching_assistant, id: 8) }
   let(:student) { build(:student, id: 1)}
   let(:questionnaire) { build(:questionnaire, id: 666) }
-  let(:suggestion){build(:suggestion)}
+  let(:suggestion){build(:suggestion, id: 1)}
   let(:comment){build(:comment)}
   let(:assignment_questionnaire) { build(:assignment_questionnaire, id: 1, questionnaire: questionnaire) }
+  let(:suggestion_comment) {build(:suggestion_comment)}
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -38,6 +39,7 @@ describe SuggestionController do
 
   describe '#update_suggestion' do
     it "checks updated is saved" do
+      allow(Suggestion).to receive(:find).and_return(suggestion)
       params = {id: 1,suggestion:{title:'new title', description: 'new description', signup_preference:'N'} }
       post :update_suggestion, params
       expect(response).to render_template('suggestion/new?id=1')
@@ -50,8 +52,8 @@ describe SuggestionController do
     it 'adds a participant' do
       allow(Assignment).to receive(:find).with('1').and_return(assignment)
       allow(User).to receive(:find_by).with(name: student.name).and_return(student)
-      @comment = SuggestionComment.new
-      @comment.suggestion_id = 1;
+      allow(SuggestionComment).to receive(:new).and_return(suggestion_comment)
+      allow_any_instance_of(SuggestionComment).to receive(:save).and_return(true)
       params = { id:1, comment:{vote:"Y", comments:"comments"}}
       session = {user: instructor}
       xhr :get, :add_comment, params, session
@@ -61,10 +63,10 @@ describe SuggestionController do
 
   describe '#reject_suggestion' do
     it 'reject a suggestion' do
+      allow(Suggestion).to receive(:find).and_return(suggestion)
+      allow_any_instance_of(Suggestion).to receive(:update_attributes).and_return(true)
       get :reject_suggestion, id: 1
       expect(flash[:notice]).to eq 'The suggestion has been successfully rejected.'
     end
   end
-
-
 end

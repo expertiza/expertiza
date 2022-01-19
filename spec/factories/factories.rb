@@ -648,5 +648,12 @@ FactoryBot.define do
     unityID 'student2065'
     signup_preference 'Y'
   end
-
+  factory :suggestion_comment, class: SuggestionComment do
+    id 1
+    comment 'this is a suggestion_comment'
+    commenter 'oss topic'
+    vote 'Y'
+    suggestion_id 1
+    visible_to_student 0
+  end
 end

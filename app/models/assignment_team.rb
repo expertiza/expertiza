@@ -272,4 +272,12 @@ class AssignmentTeam < Team
     get_logged_in_reviewer_id(current_user_id) != nil
   end
 
+  #E2121 Refractor create_new_team
+  def create_new_team(user_id, signuptopic)
+    t_user = TeamsUser.create(team_id: self.id, user_id: user_id)
+    SignedUpTeam.create(topic_id: signuptopic.id, team_id: self.id, is_waitlisted: 0)
+    parent = TeamNode.create(parent_id: signuptopic.assignment_id, node_object_id: self.id)
+    TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+  end
+  
 end

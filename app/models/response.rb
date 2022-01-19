@@ -5,6 +5,7 @@ class Response < ActiveRecord::Base
   # Added for E1973. A team review will have a lock on it so only one user at a time may edit it.
   include Lockable
   include ResponseAnalytic
+  include Scoring
   belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'map_id', inverse_of: false
   
   has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy, inverse_of: false
@@ -127,7 +128,6 @@ class Response < ActiveRecord::Base
       else
         assignment = Participant.find(map.reviewer_id).assignment
       end
-      topic_id = SignedUpTeam.find_by(team_id: map.reviewee_id).topic_id
       questionnaire = Questionnaire.find(assignment.review_questionnaire_id)
     end
     questionnaire
@@ -256,6 +256,10 @@ class Response < ActiveRecord::Base
     (role == "Instructor") || (role == "Teaching Assistant")
   end
 
+  def self.score(params)
+    Class.new.extend(Scoring).assessment_score(params)
+  end
+
   private
 
   def construct_instructor_html(identifier, self_id, count)
@@ -318,80 +322,5 @@ class Response < ActiveRecord::Base
       code += '</td></tr>'
     end
     code
-  end
-
-  # Computes the total score for a *list of assessments*
-  # parameters
-  #  assessments - a list of assessments of some type (e.g., author feedback, teammate review)
-  #  questions - the list of questions that was filled out in the process of doing those assessments
-  def self.compute_scores(assessments, questions)
-    scores = {}
-    if assessments.present?
-      scores[:max] = -999_999_999
-      scores[:min] = 999_999_999
-      total_score = 0
-      length_of_assessments = assessments.length.to_f
-      assessments.each do |assessment|
-        curr_score = assessment_score(response: [assessment], questions: questions)
-
-        scores[:max] = curr_score if curr_score > scores[:max]
-        scores[:min] = curr_score unless curr_score >= scores[:min] || curr_score == -1
-
-        # Check if the review is invalid. If is not valid do not include in score calculation
-        if @invalid == 1 || curr_score == -1
-          length_of_assessments -= 1
-          curr_score = 0
-        end
-        total_score += curr_score
-      end
-      scores[:avg] = unless length_of_assessments.zero?
-                       total_score.to_f / length_of_assessments
-                     else
-                       0
-                     end
-    else
-      scores[:max] = nil
-      scores[:min] = nil
-      scores[:avg] = nil
-    end
-
-    scores
-  end
-
-  # Computes the total score for an assessment
-  # params
-  #  assessment - specifies the assessment for which the total score is being calculated
-  #  questions  - specifies the list of questions being evaluated in the assessment
-
-  def self.assessment_score(params)
-    @response = params[:response].last
-    return -1.0 if @response.nil? 
-    if @response
-      @questions = params[:questions]
-      return -1.0 if @questions.nil? 
-      weighted_score = 0
-      sum_of_weights = 0
-      max_question_score = 0
-
-      @questionnaire = Questionnaire.find(@questions.first.questionnaire_id) 
-
-      # Retrieve data for questionnaire (max score, sum of scores, weighted scores, etc.)
-      questionnaire_data = ScoreView.questionnaire_data(@questions[0].questionnaire_id, @response.id)
-      weighted_score = questionnaire_data.weighted_score.to_f unless questionnaire_data.weighted_score.nil?
-      sum_of_weights = questionnaire_data.sum_of_weights.to_f
-      answers = Answer.where(response_id: @response.id)
-      answers.each do |answer|
-        question = Question.find(answer.question_id)
-        if answer.answer.nil? && question.is_a?(ScoredQuestion)
-          sum_of_weights -= Question.find(answer.question_id).weight
-        end
-      end
-      max_question_score = questionnaire_data.q1_max_question_score.to_f
-      if sum_of_weights > 0 && max_question_score && weighted_score > 0
-        return (weighted_score / (sum_of_weights * max_question_score)) * 100
-      else
-        return -1.0 # indicating no score
-      end
-    end
   end
 end

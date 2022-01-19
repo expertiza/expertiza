@@ -2,6 +2,7 @@ CURRENT_MAINTAINERS = %w[
   efg
   Winbobob
   TheAkbar
+  johnbumgardner
 ].freeze
 
 ADDED_FILES    = git.added_files

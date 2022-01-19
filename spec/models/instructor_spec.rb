@@ -7,6 +7,12 @@ describe Instructor do
   let(:course) { build(:course) }
   let(:user1) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
   let(:user2) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbe@gmail.com', password: '123456789', password_confirmation: '123456789' }
+  let(:ta_mapping1) { TaMapping.new }
+  let(:ta_mapping2) { TaMapping.new }
+  before(:each) do 
+    allow(ta_mapping1).to receive(:ta_id).and_return(1)
+    allow(ta_mapping2).to receive(:ta_id).and_return(2)
+  end
   describe '#list all' do
     it 'lists all of some object type associated with the instructor' do
       allow(Assignment).to receive(:where).with("instructor_id = ? OR private = 0", 6).and_return([assignment])
@@ -23,6 +29,14 @@ describe Instructor do
     it 'gets all objects of a given type' do
       allow(Assignment).to receive(:where).with("id = ? AND (instructor_id = ? OR private = 0)", 1, 6).and_return([assignment])
       expect(instructor.get(Assignment, participant1.id, instructor.id)).to eq(assignment)
+    end
+  end
+  describe '#my_tas' do
+    it 'gets all TAs from the Courses associated with the instructor' do
+      allow(Course).to receive(:where).and_return([course])
+      allow(TaMapping).to receive(:where).and_return([ta_mapping1, ta_mapping2])
+      expect(instructor.my_tas).to eq([1,2])
+
     end
   end
   describe '#get_user_list' do

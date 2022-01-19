@@ -47,7 +47,6 @@ describe InstitutionController do
           stub_current_user(ta, ta.role.name, ta.role)
           (controller.send(:action_allowed?)).should be false
         end
-
         it 'deny certain action if current user is the student' do
           stub_current_user(student, student.role.name, student.role)
           (controller.send(:action_allowed?)).should be false
@@ -112,6 +111,20 @@ describe InstitutionController do
         }
         put :update, @params
         expect(response).to redirect_to("/institution/list")
+      end
+    end
+    context 'when institution is not updated successfully' do
+      it 'renders institution#edit' do
+        stub_current_user(instructor, instructor.role.name, instructor.role)
+        @params = {
+            id:1,
+            institution: {
+                name: "test institution"
+            }
+        }
+        allow(institution).to receive(:update_attribute).with(any_args).and_return(false)
+        put :update, @params
+        expect(response).to render_template(:edit)
       end
     end
   end

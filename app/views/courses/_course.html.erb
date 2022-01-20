@@ -5,8 +5,8 @@
 <p><label for="course_name">Course Name</label><br/>
 <%= text_field 'course', 'name'  %></p>
 
-<p><label for="course_directory_path">Course Directory</label> (Mandatory field. No space or special chars.)
-  <img src="/assets/info.png" title='- DO NOT change this field for an ongoing course. It may cause loss of student submitted files.'>
+<p><label for="course_directory_path">Course Directory</label> (Mandatory field. No spaces, special characters, or quotes.)
+  <img src="/assets/info.png" title='- Do not change this field for an ongoing course! It may cause the loss of student submitted files.'>
 <br/>
 <%= text_field 'course', 'directory_path', placeholder: "Ex: 'csc517/s21'"  %></p>
 <p><label for="course_info">Course Information</label><br/>

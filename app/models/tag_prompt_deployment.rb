@@ -21,7 +21,8 @@ class TagPromptDeployment < ActiveRecord::Base
 
       answers = Answer.where(question_id: questions_ids, response_id: responses_ids)
 
-      answers = answers.where(conditions: "length(comments) < " + self.answer_length_threshold) unless self.answer_length_threshold.nil?
+      # E2169. Testing - Answer Tagging
+      answers = answers.where(conditions: "length(comments) < #{self.answer_length_threshold}" ) unless self.answer_length_threshold.nil?
       return answers.count
     end
     0
@@ -44,9 +45,12 @@ class TagPromptDeployment < ActiveRecord::Base
         end
         responses_ids = responses.map(&:id)
         answers = Answer.where(question_id: questions_ids, response_id: responses_ids)
-        answers = answers.where("length(comments) > ?", self.answer_length_threshold.to_s) unless self.answer_length_threshold.nil?
+
+        answers = answers.select { |answer| answer.comments.length > self.answer_length_threshold } unless self.answer_length_threshold.nil?
         answers_ids = answers.map(&:id)
-        users = TeamsUser.where(team_id: team.id).map(&:user)
+        teams_users = TeamsUser.where(team_id: team.id)
+        users = teams_users.map{ |teams_user| User.find(teams_user.user_id) }
+
         users.each do |user|
           tags = AnswerTag.where(tag_prompt_deployment_id: self.id, user_id: user.id, answer_id: answers_ids)
           tagged_answers_ids = tags.map(&:answer_id)
@@ -63,7 +67,7 @@ class TagPromptDeployment < ActiveRecord::Base
           end
 
           percentage = answers.count == 0 ? "-" : format("%.1f", tags.count.to_f / answers.count * 100)
-          not_tagged_answers = answers.where.not(id: tagged_answers_ids)
+          not_tagged_answers = answers.select { |answer| !tagged_answers_ids.include?(answer.id) }
 
           # E2082 Adding tag_update_intervals as information that should be passed
           answer_tagging = VmUserAnswerTagging.new(user, percentage, tags.count, not_tagged_answers.count, answers.count, tag_update_intervals)

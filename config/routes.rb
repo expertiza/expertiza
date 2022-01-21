@@ -174,6 +174,7 @@ resources :institution, except: [:destroy] do
   resources :join_team_requests do
     collection do
       post :decline
+      get :index
     end
   end
 

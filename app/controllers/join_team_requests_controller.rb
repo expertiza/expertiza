@@ -9,6 +9,10 @@ class JoinTeamRequestsController < ApplicationController
   end
 
   def index
+    unless current_user_has_admin_privileges?
+      redirect_to "/"
+      return
+    end
     @join_team_requests = JoinTeamRequest.all
     respond_after @join_team_requests
   end

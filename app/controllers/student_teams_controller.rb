@@ -11,8 +11,6 @@ class StudentTeamsController < ApplicationController
 
   def student
     @student ||= AssignmentParticipant.find(params[:student_id])
-    #puts @student.inspect
-    #@student
   end
 
   attr_writer :student

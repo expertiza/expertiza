@@ -4,7 +4,7 @@
 <H3>Team Name: <%= @team.name(session[:ip]) %></H3>
 
 <%
-    column_definitions = Array.new
+    column_definitions = []
 column_definitions << {:name => 'Team Member', :type => 'fetch', :model => 'User', :field => 'name', :column => 'user_id'}
 column_definitions << {:name => 'Remove from Team',      :action => 'delete_team_user', :controller => 'teams_users'}
 

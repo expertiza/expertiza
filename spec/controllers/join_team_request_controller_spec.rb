@@ -19,7 +19,7 @@ describe JoinTeamRequestsController do
 
   describe "GET index" do
     context 'when the user does not have admin permissions' do
-      it "routes to index page" do
+      it "redirects to" do
         # Stubbing an object to receive .all method to give list of index
         allow(JoinTeamRequest).to receive(:all).and_return(join_team_request1)
         params = {action: 'index'}

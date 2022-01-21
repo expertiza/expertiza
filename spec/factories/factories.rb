@@ -648,6 +648,7 @@ FactoryBot.define do
     unityID 'student2065'
     signup_preference 'Y'
   end
+  
   factory :suggestion_comment, class: SuggestionComment do
     id 1
     comments 'this is a suggestion_comment'
@@ -655,5 +656,26 @@ FactoryBot.define do
     vote 'Y'
     suggestion_id 1
     visible_to_student 0
+  end 
+
+  factory :answer_tag, class: AnswerTag do
+    answer { Answer.first || association(:answer) }
+    tag_prompt_deployment { TagPromptDeployment.first || association(:tag_prompt_deployment) }
+    user { User.first || association(:user) }
+    value "0"
+  end
+
+  factory :tag_prompt, class: TagPrompt do
+    prompt "Prompt"
+    desc "Description"
+    control_type "Slider"
+  end
+
+  factory :tag_prompt_deployment, class: TagPromptDeployment do
+    tag_prompt { TagPrompt.first || association(:tag_prompt) }
+    assignment { Assignment.first || association(:assignment) }
+    questionnaire { Questionnaire.first || association(:questionnaire) }
+    question_type "Criterion"
+    answer_length_threshold 6
   end
 end

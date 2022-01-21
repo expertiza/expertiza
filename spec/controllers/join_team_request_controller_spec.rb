@@ -18,13 +18,25 @@ describe JoinTeamRequestsController do
   # An issue in github is created for this problem.
 
   describe "GET index" do
-    it "routes to index page" do
-      # Stubbing an object to receive .all method to give list of index
-      allow(JoinTeamRequest).to receive(:all).and_return(join_team_request1)
-      params = {action: 'index'}
-      session = {user: ta}
-      result = get :index, params, session
-      expect(result.status).to eq 302
+    context 'when the user does not have admin permissions' do
+      it "routes to index page" do
+        # Stubbing an object to receive .all method to give list of index
+        allow(JoinTeamRequest).to receive(:all).and_return(join_team_request1)
+        params = {action: 'index'}
+        session = {user: ta}
+        result = get :index, params, session
+        expect(result.status).to eq 302
+      end
+    end
+    context 'when the user does have admin permissions' do
+      it "routes to index page" do
+        # Stubbing an object to receive .all method to give list of index
+        allow(JoinTeamRequest).to receive(:all).and_return(join_team_request1)
+        params = {action: 'index'}
+        session = {user: admin}
+        result = get :index, params, session
+        expect(result.status).to eq 200
+      end
     end
   end
   # Testing show method to get the particular join team request

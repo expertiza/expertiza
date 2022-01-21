@@ -64,6 +64,15 @@ describe TeamsController do
         expect(controller.instance_variable_get(:@assignment)).to eq nil
       end
     end
+
+    context "with two course teams" do
+      it "deletes all the course teams" do
+        @course = create(:course)
+        @team1 = create(:course_team)
+        @team2 = create(:course_team)
+        expect { CourseTeam.delete_all}.to change(Team, :count).by(-2)
+      end
+    end
   end
 
   describe 'new method' do

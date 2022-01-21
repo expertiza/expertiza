@@ -1,4 +1,5 @@
 class Participant < ActiveRecord::Base
+  include Scoring
   has_paper_trail
   belongs_to :user
   belongs_to :topic, class_name: 'SignUpTopic', inverse_of: false
@@ -90,10 +91,6 @@ class Participant < ActiveRecord::Base
       }
     ).deliver
   end
-
-  # Return scores that this participant for the given questions
-  # Implemented in assignment_participant.rb
-  def scores(questions); end
 
   # Authorizations are paricipant, reader, reviewer, submitter (They are not store in Participant table.)
   # Permissions are can_submit, can_review, can_take_quiz.

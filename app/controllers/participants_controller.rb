@@ -18,6 +18,7 @@ class ParticipantsController < ApplicationController
     begin
       @participants = @parent.participants
       @model = params[:model]
+      puts @model
       # E726 Fall2012 Changes Begin
       @authorization = params[:authorization]
       # E726 Fall2012 Changes End

@@ -74,7 +74,7 @@ class Participant < ActiveRecord::Base
   def able_to_review
     can_review
   end
-
+  
   def email(pw, home_page)
     user = User.find_by(id: self.user_id)
     assignment = Assignment.find_by(id: self.assignment.id)

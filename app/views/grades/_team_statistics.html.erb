@@ -6,7 +6,6 @@
       </td>
     </tr>
   <% participant = tscore[:team].participants.first %>
-  <% participant %>
   <% if participant %>
     <%= render :partial => 'grades/team_review_statistics',
                :locals => {:prefix => prefix+"_1",

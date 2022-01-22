@@ -1,9 +1,6 @@
 <% rscore = pscore[:review] %> 
 <tr>
     <td colspan="10">
-<% @questions.each do |question|%>
-  <% puts question.to_s %>
-<% end %>
 <% if rscore and rscore[:assessments].length > 0 %>
     <%flag_varying_rubrics=false%>
     <%if @questions.include?("review1".to_sym)%>

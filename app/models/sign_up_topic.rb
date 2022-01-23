@@ -111,4 +111,20 @@ class SignUpTopic < ActiveRecord::Base
     topic_display += self.topic_identifier.to_s + ' - '
     topic_display + self.topic_name
   end
+
+  #E2121 Line 160: Refactor approve_suggestion to indicate that notification is being sent
+  def self.new_topic_from_suggestion(suggestion)
+    signuptopic = SignUpTopic.new
+    signuptopic.topic_identifier = 'S' + Suggestion.where("assignment_id = ? and id <= ?", suggestion.assignment_id, suggestion.id).size.to_s
+    signuptopic.topic_name = suggestion.title
+    signuptopic.assignment_id = suggestion.assignment_id
+    signuptopic.max_choosers = 1
+    #return this model based on these checks
+    if signuptopic.save && suggestion.update_attribute('status', 'Approved')
+      return signuptopic
+    else
+      return 'failed'
+    end
+  end
+
 end

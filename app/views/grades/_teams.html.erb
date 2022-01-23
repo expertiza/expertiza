@@ -8,7 +8,7 @@
 	<% col_range_th_span_value = 2 %>
 <% when 1 %>
 	<% col_outer_th_span_value = 6 %>
-	<% if has_team_and_metareview?[:has_team] and !has_team_and_metareview?[:has_metareview] %>
+	<% if has_team_and_metareview?[:has_team] && !has_team_and_metareview?[:has_metareview] %>
 		<% col_avg_th_span_value = 2 %>
 		<% col_range_th_span_value = 4 %>
 	<% else %>
@@ -23,7 +23,6 @@
 
 <!-- TEAMS -->
 
-<% index = 0 %>
 <!--E1877: thead added to the row-->
 <thead>
 <%= render :partial => 'team_title', :locals => {:prefix => nil, 
@@ -33,7 +32,7 @@
 </thead>
 <!--E1877: tbody tag added to the table structure-->
 <tbody>
-<% for index in 0 .. @scores[:teams].length - 1 %>   
+<% 0.upto(@scores[:teams].length - 1).each do |index| %>   
      <%= render :partial => 'grades/team',
                 :locals => {:prefix => 'team'+index.to_s,
                             :tscore => @scores[:teams][index.to_s.to_sym],

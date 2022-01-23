@@ -73,8 +73,8 @@ class SuggestionController < ApplicationController
     end
 
     if @suggestion.save
-      flash[:success] = 'Thank you for your suggestion!' if @suggestion.unityID != ''
-      flash[:success] = 'You have submitted an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID == ''
+      flash[:success] = 'Thank you for your suggestion!' unless @suggestion.unityID.empty? 
+      flash[:success] = 'You have submitted an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID.empty?
     end
     redirect_to action: 'new', id: @suggestion.assignment_id
   end
@@ -87,17 +87,6 @@ class SuggestionController < ApplicationController
     elsif !params[:reject_suggestion].nil?
       reject_suggestion
     end
-  end
-
-  # this is a method for lazy team creation. Here may not be the right place for this method.
-  # should be refactored into a static method in AssignmentTeam class. --Yang
-  def create_new_team
-    new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s,
-                                     parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
-    t_user = TeamsUser.create(team_id: new_team.id, user_id: @user_id)
-    SignedUpTeam.create(topic_id: @signuptopic.id, team_id: new_team.id, is_waitlisted: 0)
-    parent = TeamNode.create(parent_id: @signuptopic.assignment_id, node_object_id: new_team.id)
-    TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
   end
 
   # If the user submits a suggestion and gets it approved -> Send email
@@ -123,23 +112,12 @@ class SuggestionController < ApplicationController
   end
 
   def notification
-    #--zhewei-----06/22/2015--------------------------------------------------------------------------------------
-    # If you want to create a new team with topic and team members on view, you have to
-    # 1. create new Team
-    # 2. create new TeamsUser
-    # 3. create new SignedUpTeam
-    # 4. create new TeamNode (node_object_id of TeamNode is team_id)
-    # 5. create new TeamUserNode (node_object_id of TeamUserNode is teams_user_id)
-    #----------------------------------------------------------------------------------------------------------
-    # if proposer's signup_pref is yes and does not have a team yet --> create team and assign topic
-    # if proposer's signup_pref is yes, has a team, does not hold a topic yet --> assign topic
-    # if proposer's signup_pref is yes, has a team and topic --> send email says that 'approved'
-    # if proposer's signup_pref is no --> send email says that 'approved'
     if @suggestion.signup_preference == 'Y'
-      # if this user do not have team in this assignment, create one for him/her and assign this topic to this team.
       if @team_id.nil?
-        create_new_team
-      else # this user has a team in this assignment, check whether this team has topic or not
+        new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s,
+                                     parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
+        new_team.create_new_team(@user_id, @signuptopic)
+      else
         if @topic_id.nil?
           # clean waitlists
           # SignedUpTeam.where(team_id: @team_id, is_waitlisted: 1).destroy_all
@@ -166,7 +144,6 @@ class SuggestionController < ApplicationController
 
   def reject_suggestion
     @suggestion = Suggestion.find(params[:id])
-
     if @suggestion.update_attribute('status', 'Rejected')
       flash[:notice] = 'The suggestion has been successfully rejected.'
     else
@@ -189,12 +166,10 @@ class SuggestionController < ApplicationController
       @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
       @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)
     end
-    @signuptopic = SignUpTopic.new
-    @signuptopic.topic_identifier = 'S' + Suggestion.where("assignment_id = ? and id <= ?", @suggestion.assignment_id, @suggestion.id).size.to_s
-    @signuptopic.topic_name = @suggestion.title
-    @signuptopic.assignment_id = @suggestion.assignment_id
-    @signuptopic.max_choosers = 1
-    if @signuptopic.save && @suggestion.update_attribute('status', 'Approved')
+    #After getting topic from user/team, get the suggestion
+    @signuptopic = SignUpTopic.new_topic_from_suggestion(@suggestion)
+    #Get success only if the signuptopic object was returned from its class
+    if @signuptopic != 'failed'
       flash[:success] = 'The suggestion was successfully approved.'
     else
       flash[:error] = 'An error occurred when approving the suggestion.'

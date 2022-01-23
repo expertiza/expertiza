@@ -8,6 +8,19 @@ describe CourseTeam do
   let(:participant) { build(:participant, user: build(:student, name: "Jane", fullname: "Doe, Jane", id: 1)) }
   let(:participant2) { build(:participant, user: build(:student, name: "John", fullname: "Doe, John", id: 2)) }
   let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
+
+  describe 'validations' do
+    it 'validates presence of name' do
+      course.name = ""
+      expect(course).not_to be_valid
+    end
+    it 'validates presence of directory_path' do
+      # course is built with the default directory_path 'csc517/test' in factories.rb
+      course.directory_path = ""
+      expect(course).not_to be_valid
+    end
+  end
+
   describe '#get_teams' do
     it 'returns the associated teams with the course' do
       allow(CourseTeam).to receive(:where).with(parent_id: 1).and_return([course_team1, course_team2])

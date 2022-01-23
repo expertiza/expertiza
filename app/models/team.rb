@@ -293,31 +293,27 @@ class Team < ActiveRecord::Base
   end
 
   #Create new teams for calibrated assignments with respect to the old team already present
-  def self.createnewteam(old_assign, new_assign_id)
-    puts "Alpha"
+  def self.create_new_team(old_assign, new_assign_id)
     @original_team_values = Team.where(parent_id: old_assign.id)
     old_team_ids = []
-    @original_team_values.each do |catt|
+    @original_team_values.each do |team|
       @prev_assignment = Assignment.find(old_assign.id)
       @prev_instructor = Participant.find_by(parent_id: old_assign.id, user_id: @prev_assignment.instructor_id)
       @map = ReviewResponseMap.find_by(reviewed_object_id: old_assign.id, reviewer_id: @prev_instructor.id, reviewee_id: catt.id)
       if @map
         @resp = Response.find_by(map_id: @map.id, is_submitted: false)
         if @resp
-          old_team_ids.append(catt.id)
+          old_team_ids << team.id
           @new_team = Team.new
-          @new_team.name = catt.name
+          @new_team.name = team.name
           @new_team.parent_id = new_assign_id
-          @new_team.type = catt.type
-          @new_team.comments_for_advertisement = catt.comments_for_advertisement
-          @new_team.advertise_for_partner = catt.advertise_for_partner
-          @new_team.submitted_hyperlinks = catt.submitted_hyperlinks
-          @new_team.directory_num = catt.directory_num
-          @new_team.grade_for_submission = catt.grade_for_submission
-          @new_team.comment_for_submission = catt.comment_for_submission
-          # Removed a line from the previous team where this set new_team.make_public equal to catt.make_public
-          # As that field seems to no longer exist. However, I can't find where it was removed. It was added here however
-          # https://expertiza.csc.ncsu.edu/index.php/CSC/ECE_517_Spring_2018-_Project_E1810:_Show_sample_submissions_and_reviews
+          @new_team.type = team.type
+          @new_team.comments_for_advertisement = team.comments_for_advertisement
+          @new_team.advertise_for_partner = team.advertise_for_partner
+          @new_team.submitted_hyperlinks = team.submitted_hyperlinks
+          @new_team.directory_num = team.directory_num
+          @new_team.grade_for_submission = team.grade_for_submission
+          @new_team.comment_for_submission = team.comment_for_submission
           @new_team.save
         else
           next

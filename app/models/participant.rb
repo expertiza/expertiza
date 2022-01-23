@@ -156,36 +156,36 @@ class Participant < ActiveRecord::Base
   end
 
 
-  def self.createparticipant(matt,old_assign, new_assign_id)
-    @old_participant = Participant.where(user_id: matt.user_id, parent_id: old_assign.id)
-    @old_participant.each do |natt|
+  def self.create_participant(team_user,old_assign, new_assign_id)
+    @old_participant = Participant.where(user_id: team_user.user_id, parent_id: old_assign.id)
+    @old_participant.each do |participant|
       @new_participant = Participant.new
-      @new_participant.can_submit = natt.can_submit
-      @new_participant.can_review = natt.can_review
-      @new_participant.user_id = matt.user_id
+      @new_participant.can_submit = participant.can_submit
+      @new_participant.can_review = participant.can_review
+      @new_participant.user_id = team_user.user_id
       @new_participant.parent_id = new_assign_id
-      @new_participant.submitted_at = natt.submitted_at
-      @new_participant.permission_granted = natt.permission_granted
-      @new_participant.penalty_accumulated = natt.penalty_accumulated
-      @new_participant.grade = natt.grade
-      @new_participant.type = natt.type
-      @new_participant.handle = natt.handle
-      @new_participant.time_stamp = natt.time_stamp
-      @new_participant.digital_signature = natt.digital_signature
-      @new_participant.duty = natt.duty
-      @new_participant.can_take_quiz = natt.can_take_quiz
+      @new_participant.submitted_at = participant.submitted_at
+      @new_participant.permission_granted = participant.permission_granted
+      @new_participant.penalty_accumulated = participant.penalty_accumulated
+      @new_participant.grade = participant.grade
+      @new_participant.type = participant.type
+      @new_participant.handle = participant.handle
+      @new_participant.time_stamp = participant.time_stamp
+      @new_participant.digital_signature = participant.digital_signature
+      @new_participant.duty = participant.duty
+      @new_participant.can_take_quiz = participant.can_take_quiz
       @new_participant.save
     end
   end
 
-  def self.mapreviewresponseparticipant(old_assign, new_assign_id, dict)
-    @old_assignmentnumber = Assignment.find_by(id: old_assign.id)
-    @new_assignmentnumber = Assignment.find_by(id: new_assign_id)
-    @find_participant = Participant.find_by(parent_id: old_assign.id, user_id: @old_assignmentnumber.instructor_id)
+  def self.map_review_response_participant(old_assign, new_assign_id, dict)
+    @old_assignment_number = Assignment.find_by(id: old_assign.id)
+    @new_assignment_number = Assignment.find_by(id: new_assign_id)
+    @find_participant = Participant.find_by(parent_id: old_assign.id, user_id: @old_assignment_number.instructor_id)
     @new_participant = Participant.new
     @new_participant.can_submit = @find_participant.can_submit
     @new_participant.can_review = @find_participant.can_review
-    @new_participant.user_id = @new_assignmentnumber.instructor_id
+    @new_participant.user_id = @new_assignment_number.instructor_id
     @new_participant.parent_id = new_assign_id
     @new_participant.submitted_at = @find_participant.submitted_at
     @new_participant.permission_granted = @find_participant.permission_granted
@@ -198,18 +198,18 @@ class Participant < ActiveRecord::Base
     @new_participant.duty = @find_participant.duty
     @new_participant.can_take_quiz = @find_participant.can_take_quiz
     @new_participant.save
-    @getnewparticipant = Participant.find_by(parent_id: new_assign_id, user_id: @old_assignmentnumber.instructor_id)
-    @old_reviewrespmap = ReviewResponseMap.where(reviewed_object_id: old_assign.id)
-    @old_reviewrespmap.each do |satt|
-      if dict.key?(satt.reviewee_id)
-        @new_reviewrespmap = ReviewResponseMap.new
-        @new_reviewrespmap.reviewed_object_id = new_assign_id
-        @new_reviewrespmap.reviewer_id = @getnewparticipant.id
-        @new_reviewrespmap.reviewee_id = dict[satt.reviewee_id]
-        @new_reviewrespmap.type = satt.type
-        @new_reviewrespmap.created_at = satt.created_at
-        @new_reviewrespmap.calibrate_to = satt.calibrate_to
-        @new_reviewrespmap.save
+    @get_new_articipant = Participant.find_by(parent_id: new_assign_id, user_id: @old_assignment_number.instructor_id)
+    @old_review_response_maps = ReviewResponseMap.where(reviewed_object_id: old_assign.id)
+    @old_review_response_maps.each do |map|
+      if dict.key?(map.reviewee_id)
+        @new_review_response_map = ReviewResponseMap.new
+        @new_review_response_map.reviewed_object_id = new_assign_id
+        @new_review_response_map.reviewer_id = @get_new_participant.id
+        @new_review_response_map.reviewee_id = dict[map.reviewee_id]
+        @new_review_response_map.type = map.type
+        @new_review_response_map.created_at = map.created_at
+        @new_review_response_map.calibrate_to = map.calibrate_to
+        @new_review_response_map.save
       else
         next
       end

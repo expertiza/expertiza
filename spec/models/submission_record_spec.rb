@@ -13,17 +13,17 @@ describe SubmissionRecord do
   it 'is invalid without a user' do
     expect(build(:submission_record, user: nil)).to_not be_valid
   end
-  it 'is invalid without an assingment id' do
+  it 'is invalid without an assignment id' do
     expect(build(:submission_record, assignment_id: nil)).to_not be_valid
   end
 
-  describe '.copycalibratedsubmissions' do
+  describe '.copy_calibrated_submissions' do
     it 'copy a calibrated submissions' do
       allow(SubmissionRecord).to receive(:find).with(1).and_return(submission_record)
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow(SubmissionRecord).to receive(:where).with(assignment_id: 1).and_return([submission_record])
       old_submission_record = SubmissionRecord.find(1)
-      SubmissionRecord.copycalibratedsubmissions(assignment, 2)
+      SubmissionRecord.copy_calibrated_submissions(assignment, 2)
       allow(SubmissionRecord).to receive(:where).and_call_original
       new_submission_record = SubmissionRecord.find_by(assignment_id: 2)
       expect(new_submission_record.assignment_id).to eq(2)

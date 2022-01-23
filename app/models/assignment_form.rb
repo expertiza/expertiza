@@ -99,7 +99,7 @@ class AssignmentForm
       existing_aqs = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
       existing_aqs.each(&:delete)
       attributes.each do |assignment_questionnaire|
-        if assignment_questionnaire[:id].nil? or assignment_questionnaire[:id].blank?
+        if assignment_questionnaire[:id].nil? || assignment_questionnaire[:id].blank?
           aq = AssignmentQuestionnaire.new(assignment_questionnaire)
           unless aq.save
             @errors = @assignment.errors.to_s
@@ -212,7 +212,7 @@ class AssignmentForm
       # If the deadline type is review, add a delayed job to drop outstanding review
       add_delayed_job(@assignment, "drop_outstanding_reviews", due_date, min_left) if deadline_type == "review"
       # If the deadline type is team_formation, add a delayed job to drop one member team
-      next unless deadline_type == "team_formation" and @assignment.team_assignment?
+      next unless deadline_type == "team_formation" && @assignment.team_assignment?
       add_delayed_job(@assignment, "drop_one_member_topics", due_date, min_left)
     end
   end
@@ -291,27 +291,25 @@ class AssignmentForm
 
   def self.copy_calibration(old_assign,new_assign_id)
     if old_assign.is_calibrated
-      SubmissionRecord.copycalibratedsubmissions(old_assign, new_assign_id)
-      old_team_ids = Team.createnewteam(old_assign, new_assign_id)
+      SubmissionRecord.copy_calibrated_submissions(old_assign, new_assign_id)
+      old_team_ids = Team.create_new_team(old_assign, new_assign_id)
       @new_teams = AssignmentTeam.where(parent_id: new_assign_id)
       new_team_ids = []
-      @new_teams.each do |catt|
-        new_team_ids.append(catt.id)
+      @new_teams.each do |new_team|
+        new_team_ids.append(new_team.id)
       end
       dict = Hash[old_team_ids.zip new_team_ids]
-      count = 0
-      old_team_ids.each do |catt|
-        @old_team_user = TeamsUser.where(team_id: catt)
-        @old_team_user.each do |matt|
+      old_team_ids.each_with_index do |old_team_id, count|
+        @old_team_user = TeamsUser.where(team_id: old_team_id)
+        @old_team_user.each do |team_user|
           @new_team_user = TeamsUser.new
           @new_team_user.team_id = new_team_ids[count]
-          @new_team_user.user_id = matt.user_id
+          @new_team_user.user_id = team_user.user_id
           @new_team_user.save
-          Participant.createparticipant(matt, old_assign, new_assign_id)
+          Participant.create_participant(team_user, old_assign, new_assign_id)
         end
-        Participant.mapreviewresponseparticipant(old_assign, new_assign_id, dict)
-        ReviewResponseMap.newreviewresp(old_assign, catt, dict, new_assign_id)
-        count += 1
+        Participant.map_review_response_participant(old_assign, new_assign_id, dict)
+        ReviewResponseMap.new_review_response(old_assign, catt, dict, new_assign_id)
 
         @team_needed = Team.where(id:catt).first
         old_directory_path = @team_needed.directory_path
@@ -423,7 +421,7 @@ class AssignmentForm
     if simicheck_delay.to_i >= 0
       duedates = AssignmentDueDate.where(parent_id: @assignment.id)
       duedates.each do |due_date|
-        next if DeadlineType.find(due_date.deadline_type_id).name != "submission"
+        next unless DeadlineType.find(due_date.deadline_type_id).name == "submission"
         enqueue_simicheck_task(due_date, simicheck_delay)
       end
     end

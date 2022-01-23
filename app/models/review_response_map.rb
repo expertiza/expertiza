@@ -163,36 +163,36 @@ class ReviewResponseMap < ResponseMap
   end
 
 
-  def self.newreviewresp(old_assign, catt, dict, new_assign_id)
-    @old_reviewrespmap = ReviewResponseMap.where(reviewed_object_id: old_assign.id, reviewee_id: catt)
-    @find_newrespmap =  ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[catt])
-    oldreviewrespids = []
-    newreviewrespids = []
-    @old_reviewrespmap.each do |zatt|
-      oldreviewrespids.append(zatt.id)
+  def self.new_review_response(old_assign, new_team, dict, new_assign_id)
+    @old_review_response_maps = ReviewResponseMap.where(reviewed_object_id: old_assign.id, reviewee_id: new_team)
+    @find_new_response_maps =  ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[new_team])
+    old_review_response_ids = []
+    new_review_response_ids = []
+    @old_review_response_maps.each do |map|
+      old_review_response_ids << map.id 
     end
-    @find_newrespmap.each do |zatt|
-      newreviewrespids.append(zatt.id)
+    @find_new_response_maps.each do |map|
+      new_review_response_ids << map.id
     end
-    dict1 = Hash[oldreviewrespids.zip newreviewrespids]
+    dict1 = Hash[old_review_response_ids.zip new_review_response_ids]
     dict1.each do |item, value|
-      @oldresp = Response.where(map_id: item)
-      @oldresp.each do |zatt|
-        @newresp = Response.new
-        @newresp.map_id = value
-        @newresp.additional_comment = zatt.additional_comment
-        @newresp.version_num = zatt.version_num
-        @newresp.round = zatt.round
-        @newresp.is_submitted = zatt.is_submitted
-        @newresp.save
-        @oldanswers = Answer.where(response_id:zatt.id)
-        @oldanswers.each do |latt|
-          @newanswer = Answer.new
-          @newanswer.question_id = latt.question_id
-          @newanswer.answer = latt.answer
-          @newanswer.comments = latt.comments
-          @newanswer.response_id = @newresp.id
-          @newanswer.save
+      @old_responses = Response.where(map_id: item)
+      @old_responses.each do |response|
+        @new_response = Response.new
+        @new_response.map_id = value
+        @new_response.additional_comment = response.additional_comment
+        @new_response.version_num = response.version_num
+        @new_response.round = response.round
+        @new_response.is_submitted = response.is_submitted
+        @new_response.save
+        @old_answers = Answer.where(response_id: response.id)
+        @old_answers.each do |old_answer|
+          @new_answer = Answer.new
+          @new_answer.question_id = old_answer.question_id
+          @new_answer.answer = old_answer.answer
+          @new_answer.comments = old_answer.comments
+          @new_answer.response_id = @new_response.id
+          @new_answer.save
         end
       end
     end

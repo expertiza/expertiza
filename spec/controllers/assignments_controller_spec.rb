@@ -1,7 +1,7 @@
 describe AssignmentsController do
 
   let(:assignment) do
-    build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true, directory_path: 'same path',
+    build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true, directory_path: 'test_assignment',
                        participants: [build(:participant)], teams: [build(:assignment_team)], course_id: 1)
   end
   let(:assignment_form) { double('AssignmentForm', assignment: assignment) }
@@ -134,7 +134,6 @@ describe AssignmentsController do
     context 'when assignment_form is saved successfully' do
       it 'redirects to assignment#edit page' do
         allow(assignment_form).to receive(:assignment).and_return(assignment)
-        allow(Assignment).to receive(:find_by).with(any_args).and_return(false)
         allow(Assignment).to receive(:find_by).with(any_args).and_return(false)
         allow(assignment_form).to receive(:save).and_return(true)
         allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))

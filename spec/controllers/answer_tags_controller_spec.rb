@@ -3,8 +3,8 @@ describe AnswerTagsController do
   #factory objects required for "action_allowed" test cases
   let(:instructor) { build(:instructor, id: 1) }
   let(:student) { build(:student, id: 1) }
-  let!(:assignment) { create(:assignment, id: 1) }
-  let!(:assignment2) { create(:assignment, id: 2) }
+  let!(:assignment) { create(:assignment, name:"assignment", directory_path:"assignment", id: 1) }
+  let!(:assignment2) { create(:assignment, name:"assignment2", directory_path:"assignment2", id: 2) }
   let!(:questionnaire) { create(:questionnaire, id: 1) }
   let!(:tag_prompt_deployment) { create(:tag_prompt_deployment, id: 1, assignment_id: 1, questionnaire_id: 1) }
   let!(:tag_prompt_deployment2) { create(:tag_prompt_deployment, id: 2, assignment_id: 2, questionnaire_id: 1) }

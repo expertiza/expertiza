@@ -50,11 +50,11 @@ class ParticipantsController < ApplicationController
 
   #when you change the duties, changes the permissions based on the new duty you go to
   def update_authorizations
+    participant = Participant.find(params[:id])
     permissions = participant.permissions(params[:authorization])
     can_submit = permissions[:can_submit]
     can_review = permissions[:can_review]
     can_take_quiz = permissions[:can_take_quiz]
-    participant = Participant.find(params[:id])
     parent_id = participant.parent_id
     # Upon successfully updating the attributes based on user role, a flash message is displayed to the user after the
     # change in the database. This also gives the user the error message if the update fails.

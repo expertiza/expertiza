@@ -1,14 +1,27 @@
 class AssignmentTeam < Team
   require File.dirname(__FILE__) + '/analytic/assignment_team_analytic'
   include AssignmentTeamAnalytic
+  include Scoring
 
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'parent_id'
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewee_id'
   has_many :review_response_maps, foreign_key: 'reviewee_id'
   has_many :responses, through: :review_response_maps, foreign_key: 'map_id'
   # START of contributor methods, shared with AssignmentParticipant
-  
-
+  # Added for E1973, Team reviews.
+  # Some methods prompt a reviewer for a user id. This method just returns the user id of the first user in the team
+  # This is a very hacky way to deal with very complex functionality but the reasoning is this:
+  # The reason this is being added is to give ReviewAssignment#reject_own_submission a way to reject the submission
+  # Of the reviewer. If there are team reviews, there must be team submissions, so any team member's user id will do.
+  # Hopefully, this logic applies if there are other situations where reviewer.user_id was called
+  # EDIT: A situation was found which differs slightly. If the current user is on the team, we want to
+  # return that instead for instances where the code uses the current user.
+  def user_id
+    if !@current_user.nil? && users.include?(@current_user)
+      @current_user.id
+    end
+    users.first.id
+  end
 
   # Whether this team includes a given participant or not
   def includes?(participant)
@@ -60,7 +73,7 @@ class AssignmentTeam < Team
 
   # Whether the team has submitted work or not
   def has_submissions?
-    self.submitted_files.any? or self.submitted_hyperlinks.present?
+    self.submitted_files.any? || self.submitted_hyperlinks.present?
   end
 
   # Get Participants of the team
@@ -91,7 +104,7 @@ class AssignmentTeam < Team
   end
 
   # Get the first member of the team
-  def self.get_first_member(team_id)
+  def self.first_member(team_id)
     find_by(id: team_id).try(:participants).try(:first)
   end
 
@@ -133,19 +146,6 @@ class AssignmentTeam < Team
   def add_participant(assignment_id, user)
     return if AssignmentParticipant.find_by(parent_id: assignment_id, user_id: user.id)
     AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted)
-  end
-
-  # return a hash of scores that the team has received for the questions
-  def scores(questions)
-    scores = {}
-    scores[:team] = self # This doesn't appear to be used anywhere
-    assignment.questionnaires.each do |questionnaire|
-      scores[questionnaire.symbol] = {}
-      scores[questionnaire.symbol][:assessments] = ReviewResponseMap.where(reviewee_id: self.id)
-      scores[questionnaire.symbol][:scores] = Response.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
-    end
-    scores[:total_score] = assignment.compute_total_score(scores)
-    scores
   end
 
   def hyperlinks
@@ -250,4 +250,12 @@ class AssignmentTeam < Team
   end
 
 
+  #E2121 Refractor create_new_team
+  def create_new_team(user_id, signuptopic)
+    t_user = TeamsUser.create(team_id: self.id, user_id: user_id)
+    SignedUpTeam.create(topic_id: signuptopic.id, team_id: self.id, is_waitlisted: 0)
+    parent = TeamNode.create(parent_id: signuptopic.assignment_id, node_object_id: self.id)
+    TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+  end
+  
 end

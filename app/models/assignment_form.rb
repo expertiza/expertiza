@@ -122,7 +122,7 @@ class AssignmentForm
     attributes.each do |assignment_questionnaire|
       total_weight += assignment_questionnaire[:questionnaire_weight].to_i
     end
-    if total_weight != 0 and total_weight != 100
+    unless total_weight.zero? || total_weight == 100
       @assignment.errors.add(:message, 'Total weight of rubrics should add up to either 0 or 100%')
       @has_errors = true
     end
@@ -132,7 +132,8 @@ class AssignmentForm
   def update_tag_prompt_deployments(attributes)
     unless attributes.nil?
       attributes.each do |key, value|
-        TagPromptDeployment.where(id: value['deleted']).delete_all if value.key?('deleted')
+        # We need to use destroy_all to delete all the dependents also. 
+        TagPromptDeployment.where(id: value['deleted']).destroy_all if value.key?('deleted')
         # assume if tag_prompt is there, then id, question_type, answer_length_threshold must also be there since the inputs are coupled
         next unless value.key?('tag_prompt')
         for i in 0..value['tag_prompt'].count - 1
@@ -189,7 +190,7 @@ class AssignmentForm
 
   # Adds badges to assignment badges table as part of E1822
   def update_assigned_badges(badge, assignment)
-    if assignment and badge
+    if assignment && badge
       AssignmentBadge.where(assignment_id: assignment[:id]).map(&:id).each do |assigned_badge_id|
         AssignmentBadge.delete(assigned_badge_id) unless badge[:id].include?(assigned_badge_id)
       end

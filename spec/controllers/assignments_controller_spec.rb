@@ -143,6 +143,7 @@ describe AssignmentsController do
         allow_any_instance_of(AssignmentsController).to receive(:undo_link)
            .with('Assignment "test assignment" has been created successfully. ').and_return(true)
         post :create, @params
+        expect(flash[:error]).to eq("")
         expect(response).to redirect_to('/assignments/1/edit')
       end
     end
@@ -313,8 +314,8 @@ describe AssignmentsController do
   end
 
   describe '#copy' do
-    let(:new_assignment) { build(:assignment, id: 2, name: 'new assignment', directory_path: 'different path') }
-    let(:new_assignment2) { build(:assignment, id: 2, name: 'new assignment', directory_path: 'same path') }
+    let(:new_assignment) { build(:assignment, id: 2, name: 'new_assignment', directory_path: 'new_assignment') }
+    let(:new_assignment2) { build(:assignment, id: 2, name: 'new_assignment2', directory_path: 'new_assignment2') }
 
     context 'when new assignment id fetches successfully' do
       it 'redirects to assignments#edit page' do
@@ -324,21 +325,6 @@ describe AssignmentsController do
         params = {id: 1}
         get :copy, params
         expect(flash[:note]).to be_nil
-        expect(flash[:error]).to be_nil
-        expect(response).to redirect_to('/assignments/2/edit')
-      end
-    end
-
-    context 'when new assignment directory is same as old' do
-      it 'should show an error and redirect to assignments#edit page' do
-        allow(AssignmentForm).to receive(:copy).with('1', instructor).and_return(2)
-        allow(Assignment).to receive(:find).with(2).and_return(new_assignment2)
-        params = {id: 1}
-        session = {user: instructor}
-        get :copy, params, session
-        expect(flash[:note]).to eq("Warning: The submission directory for the copy of this assignment will be the same as the submission directory "\
-          "for the existing assignment. This will allow student submissions to one assignment to overwrite submissions to the other assignment. "\
-          "If you do not want this to happen, change the submission directory in the new copy of the assignment.")
         expect(flash[:error]).to be_nil
         expect(response).to redirect_to('/assignments/2/edit')
       end

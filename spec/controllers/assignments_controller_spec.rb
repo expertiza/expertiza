@@ -164,8 +164,7 @@ describe AssignmentsController do
     context 'when assignment_form is saved successfully' do
       it 'redirects to assignment#edit page' do
         allow(assignment_form).to receive(:assignment).and_return(assignment)
-        allow(Assignment).to receive(:find_by).with(name: "test assignment", course_id: 1).and_return(false)
-        allow(Assignment).to receive(:find_by).with(directory_path: "/test", course_id: 1).and_return(false)
+        allow(Assignment).to receive(:find_by).and_call_original
         allow(assignment_form).to receive(:save).and_return(true)
         allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))
         allow(assignment_form).to receive(:update).with(any_args).and_return(true)

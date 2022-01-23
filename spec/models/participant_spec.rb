@@ -117,18 +117,30 @@ describe Participant do
     end
   end
 
-  describe '#get_authorization' do
+  describe '#authorization' do
     it 'returns participant when no arguments are passed' do
-      expect(Participant.get_authorization(nil, nil, nil)).to eq('participant')
+      allow(participant).to receive(:can_submit).and_return(nil)
+      allow(participant).to receive(:can_review).and_return(nil)
+      allow(participant).to receive(:can_take_quiz).and_return(nil)
+      expect(participant.authorization).to eq('participant')
     end
     it 'returns reader when no arguments are passed' do
-      expect(Participant.get_authorization(false, true, true)).to eq('reader')
+      allow(participant).to receive(:can_submit).and_return(false)
+      allow(participant).to receive(:can_review).and_return(true)
+      allow(participant).to receive(:can_take_quiz).and_return(true)
+      expect(participant.authorization).to eq('reader')
     end
     it 'returns submitter when no arguments are passed' do
-      expect(Participant.get_authorization(true, false, false)).to eq('submitter')
+      allow(participant).to receive(:can_submit).and_return(true)
+      allow(participant).to receive(:can_review).and_return(false)
+      allow(participant).to receive(:can_take_quiz).and_return(false)
+      expect(participant.authorization).to eq('submitter')
     end
     it 'returns reviewer when no arguments are passed' do
-      expect(Participant.get_authorization(false, true, false)).to eq('reviewer')
+      allow(participant).to receive(:can_submit).and_return(false)
+      allow(participant).to receive(:can_review).and_return(true)
+      allow(participant).to receive(:can_take_quiz).and_return(false)
+      expect(participant.authorization).to eq('reviewer')
     end
   end
 

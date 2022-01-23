@@ -113,11 +113,11 @@ class Participant < ActiveRecord::Base
   end
 
   # Get authorization from permissions.
-  def self.get_authorization(can_submit, can_review, can_take_quiz)
+  def authorization
     authorization = 'participant'
-    authorization = 'reader' if can_submit == false and can_review == true and can_take_quiz == true
-    authorization = 'submitter' if can_submit == true and can_review == false and can_take_quiz == false
-    authorization = 'reviewer' if can_submit == false and can_review == true and can_take_quiz == false
+    authorization = 'reader' if !self.can_submit && self.can_review && self.can_take_quiz
+    authorization = 'submitter' if self.can_submit && !self.can_review && !self.can_take_quiz
+    authorization = 'reviewer' if !self.can_submit && self.can_review && !self.can_take_quiz
     authorization
   end
 

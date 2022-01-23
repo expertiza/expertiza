@@ -102,18 +102,18 @@ describe Participant do
     end
   end
 
-  describe '#get_permissions' do
+  describe '#permissions' do
     it 'returns the permissions of participant' do
-      expect(Participant.get_permissions('participant')).to contain_exactly([:can_submit, true], [:can_review, true], [:can_take_quiz, true])
+      expect(participant.permissions('participant')).to contain_exactly([:can_submit, true], [:can_review, true], [:can_take_quiz, true])
     end
     it 'returns the permissions of reader' do
-      expect(Participant.get_permissions('reader')).to contain_exactly([:can_submit, false], [:can_review, true], [:can_take_quiz, true])
+      expect(participant.permissions('reader')).to contain_exactly([:can_submit, false], [:can_review, true], [:can_take_quiz, true])
     end
     it 'returns the permissions of reviewer' do
-      expect(Participant.get_permissions('reviewer')).to contain_exactly([:can_submit, false], [:can_review, true], [:can_take_quiz, false])
+      expect(partcipant.permissions('reviewer')).to contain_exactly([:can_submit, false], [:can_review, true], [:can_take_quiz, false])
     end
     it 'returns the permissions of submitter' do
-      expect(Participant.get_permissions('submitter')).to contain_exactly([:can_submit, true], [:can_review, false], [:can_take_quiz, false])
+      expect(participant.permissions('submitter')).to contain_exactly([:can_submit, true], [:can_review, false], [:can_take_quiz, false])
     end
   end
 

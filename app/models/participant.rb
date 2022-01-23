@@ -95,7 +95,7 @@ class Participant < ActiveRecord::Base
   # Authorizations are paricipant, reader, reviewer, submitter (They are not store in Participant table.)
   # Permissions are can_submit, can_review, can_take_quiz.
   # Get permissions form authorizations.
-  def self.get_permissions(authorization)
+  def permissions(authorization)
     can_submit = true
     can_review = true
     can_take_quiz = true

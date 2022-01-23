@@ -27,7 +27,7 @@ class ParticipantsController < ApplicationController
   def add
     curr_object = Object.const_get(params[:model]).find(params[:id]) if Participant::PARTICIPANT_TYPES.include? params[:model]
     begin
-      permissions = Participant.get_permissions(params[:authorization])
+      permissions = participants.permissions(params[:authorization])
       can_submit = permissions[:can_submit]
       can_review = permissions[:can_review]
       can_take_quiz = permissions[:can_take_quiz]
@@ -50,7 +50,7 @@ class ParticipantsController < ApplicationController
 
   #when you change the duties, changes the permissions based on the new duty you go to
   def update_authorizations
-    permissions = Participant.get_permissions(params[:authorization])
+    permissions = participant.permissions(params[:authorization])
     can_submit = permissions[:can_submit]
     can_review = permissions[:can_review]
     can_take_quiz = permissions[:can_take_quiz]

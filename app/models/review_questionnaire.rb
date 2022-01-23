@@ -22,7 +22,6 @@ class ReviewQuestionnaire < Questionnaire
   def get_assessments_round_for(participant, round)
     team = AssignmentTeam.team(participant)
     return nil unless team
-
     team_id = team.id
     responses = []
     if participant

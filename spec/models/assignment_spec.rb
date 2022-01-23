@@ -418,6 +418,13 @@ describe Assignment do
           expect(assignment.current_stage_name(123)).to eq('Review')
         end
       end
+      context "when due date is equal to 'Finished'" do
+        it 'returns Submission' do
+          allow(assignment).to receive(:find_current_stage).with(123).and_return('Finished')
+          allow(assignment).to receive(:current_stage).with(123).and_return('Submission')
+          expect(assignment.current_stage_name(123)).to eq('Submission')
+        end
+      end
     end
   end
 
@@ -664,6 +671,31 @@ describe Assignment do
         @assignment_due_date_rev2 = create(:assignment_due_date, round: 2, parent_id: assignment.id, review_allowed_id: dead_right.id, review_of_review_allowed_id: dead_right.id, submission_allowed_id: dead_right.id, deadline_type: @deadline_type_rev)
         expect(assignment.find_review_period(nil)).to eql([[@assignment_due_date_sub1, @assignment_due_date_sub2], [@assignment_due_date_rev1, @assignment_due_date_rev2]])
       end
+    end
+  end
+  describe '#calibrated?' do
+    context 'when the assignment is not a calibrated assignment' do
+      it 'returns false' do
+        assignment = create(:assignment)
+        allow(assignment).to receive(:is_calibrated).and_return(false)
+        expect(assignment.calibrated?).to be_falsey
+      end
+    end
+    context 'when the assignment is a calibrated assignment' do
+      it 'returns true' do
+        assignment = create(:assignment)
+        allow(assignment).to receive(:is_calibrated).and_return(true)
+        expect(assignment.calibrated?).to be_truthy
+      end
+    end
+  end
+  describe '#remove_assignment_from_course' do
+    it 'sets the course_id to nil' do
+      assignment = create(:assignment)
+      assignment.course_id = 2
+      expect(assignment.course_id).to eq(2)
+      assignment.remove_assignment_from_course
+      expect(assignment.course_id).to be_nil
     end
   end
 end

@@ -2,12 +2,12 @@ describe StudentTask do
   # Write your mocked object here!
   let(:participant) { build(:participant, id: 1, user_id: user.id, parent_id: assignment.id) }
   let(:participant2) { build(:participant, id: 2, user_id: user2.id, parent_id: assignment.id) }
-  let(:participant3) { build(:participant, id: 3, user_id: user3.id, parent_id: assignment2.id) }
   let(:user) { create(:student) }
   let(:user2) { create(:student, name: "qwertyui", id: 5) }
   let(:user3) { create(:student, name: "qwertyui1234", id: 6) }
   let(:course) { build(:course) }
   let(:assignment) { build(:assignment, name: 'assignment') }
+  let(:assignment2) { build(:assignment, name: 'assignment2')}
   let(:assignment) { create(:assignment, name: 'test_assignment', directory_path: "test_assignment", is_calibrated: true) }
   let(:team) { create(:assignment_team, id: 1, name: 'team 1', parent_id: assignment.id, users: [user, user2]) }
   let(:team2) { create(:assignment_team, id: 2, name: 'team 2', parent_id: assignment2.id, users: [user3]) }

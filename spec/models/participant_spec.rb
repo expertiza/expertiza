@@ -110,7 +110,7 @@ describe Participant do
       expect(participant.permissions('reader')).to contain_exactly([:can_submit, false], [:can_review, true], [:can_take_quiz, true])
     end
     it 'returns the permissions of reviewer' do
-      expect(partcipant.permissions('reviewer')).to contain_exactly([:can_submit, false], [:can_review, true], [:can_take_quiz, false])
+      expect(participant.permissions('reviewer')).to contain_exactly([:can_submit, false], [:can_review, true], [:can_take_quiz, false])
     end
     it 'returns the permissions of submitter' do
       expect(participant.permissions('submitter')).to contain_exactly([:can_submit, true], [:can_review, false], [:can_take_quiz, false])

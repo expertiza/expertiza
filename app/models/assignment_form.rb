@@ -92,7 +92,7 @@ class AssignmentForm
 
   # code to save assignment questionnaires
   def update_assignment_questionnaires(attributes)
-    return false unless attributes
+    return false unless attributes && attributes.any?
     validate_assignment_questionnaires_weights(attributes)
     @errors = @assignment.errors
     unless @has_errors

@@ -134,7 +134,7 @@ describe 'AssignmentTeam' do
   describe ".export_fields" do
     context "when team has name" do
       it "exports the fields" do
-        expect(AssignmentTeam.export_fields(team)).to eq(["Team Name", "Assignment Name"])
+        expect(AssignmentTeam.export_fields(team)).to eq(["Team Name"])
       end
     end
   end
@@ -232,8 +232,8 @@ describe 'AssignmentTeam' do
     it "sets the directory for the team" do
       team = build(:assignment_team, id: 1, parent_id: 1, directory_num: -1)
       max_num = 0
-      allow(AssignmentTeam).to receive_message_chain(:where, :order, :first, :directory_num).
-        with(parent_id: team.parent_id).with(:directory_num, :desc).with(no_args).with(no_args).and_return(max_num)
+      allow(AssignmentTeam).to receive_message_chain(:where, :maximum).
+        with(parent_id: team.parent_id).with(:directory_num).and_return(max_num)
       expect(team.set_student_directory_num).to be true
     end
   end
@@ -333,7 +333,7 @@ describe 'AssignmentTeam' do
       it "assign the reviewer to the team" do
         allow(Assignment).to receive(:find).with(team.parent_id).and_return(assignment)
         allow(ReviewResponseMap).to receive(:create).
-          with(reviewee_id: team.id, reviewer_id: participant1.id, reviewed_object_id: assignment.id, reviewer_is_team: nil).and_return(review_response_map)
+          with(reviewee_id: team.id, reviewer_id: participant1.id, reviewed_object_id: assignment.id).and_return(review_response_map)
         expect(team.assign_reviewer(participant1)).to eq(review_response_map)
       end
     end

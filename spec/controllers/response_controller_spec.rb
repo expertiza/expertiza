@@ -189,7 +189,7 @@ describe ResponseController do
   describe '#new' do
     it 'renders response#response page' do
       allow(AssignmentForm).to receive(:create_form_object).with(1).and_return(assignment_form)
-      allow(assignment_form).to receive(:assignment_questionnaire).with('ReviewQuestionnaire', 1, 1).and_return(assignment_questionnaire)
+      allow(assignment_form).to receive(:assignment_questionnaire).with('ReviewQuestionnaire', 1, nil).and_return(assignment_questionnaire)
       allow(SignedUpTeam).to receive(:where).with(team_id: 1, is_waitlisted: 0).and_return([double('SignedUpTeam', topic_id: 1)])
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow(AssignmentDueDate).to receive(:find_by).with(any_args).and_return(assignment_due_date)

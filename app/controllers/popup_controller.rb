@@ -84,7 +84,7 @@ class PopupController < ApplicationController
     @ip = session[:ip]
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
-    @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@assignment_id, @reviewer_id)
+    @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewer_id)
     @reviews = []
 
     assignment = Assignment.find(@assignment_id)

@@ -56,14 +56,14 @@ describe ReviewResponseMap do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return(
             [assignment_questionnaire1])
         allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
-        expect(review_response_map.questionnaire(1, 1)).to eq(questionnaire1)
+        expect(review_response_map.questionnaire(1)).to eq(questionnaire1)
       end
 
       it 'returns correct questionnaire found by used_in_round if only used_in_round is given' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: nil).and_return(
             [assignment_questionnaire1])
         allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
-        expect(review_response_map.questionnaire(1, nil)).to eq(questionnaire1)
+        expect(review_response_map.questionnaire(1)).to eq(questionnaire1)
       end
 
       it 'returns correct questionnaire found by topic_id if only topic_id is given and there is no current round used in the due date' do
@@ -71,7 +71,7 @@ describe ReviewResponseMap do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: nil, topic_id: 1).and_return(
             [assignment_questionnaire1])
         allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
-        expect(review_response_map.questionnaire(nil, 1)).to eq(questionnaire1)
+        expect(review_response_map.questionnaire(nil)).to eq(questionnaire1)
       end
 
       it 'returns correct questionnaire found by used_in_round and topic_id if only topic_id is given, but current round is found by the due date' do
@@ -79,7 +79,7 @@ describe ReviewResponseMap do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return(
             [assignment_questionnaire1])
         allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
-        expect(review_response_map.questionnaire(nil, 1)).to eq(questionnaire1)
+        expect(review_response_map.questionnaire(nil)).to eq(questionnaire1)
       end
     end
 
@@ -87,12 +87,13 @@ describe ReviewResponseMap do
       it 'returns correct questionnaire found by type' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
             [assignment_questionnaire1, assignment_questionnaire2])
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return([])
-        allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
-        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(nil)
+        allow_any_instance_of(AssignmentForm).to receive(:assignment_questionnaire).and_return(assignment_questionnaire1)
+        allow_any_instance_of(AssignmentForm).to receive(:questionnaire).and_return(questionnaire2)
+        allow(questionnaire2).to receive(:id).and_return(nil)
         allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire1)
         allow(Questionnaire).to receive(:find).with(2).and_return(questionnaire2)
-        expect(review_response_map.questionnaire(1, 1)).to eq(questionnaire1)
+        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
+        expect(review_response_map.questionnaire(1)).to eq(questionnaire1)
       end
     end
   end
@@ -119,48 +120,43 @@ describe ReviewResponseMap do
     allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: 1).and_return([review_response_map, review_response_map1])
     expect(ReviewResponseMap.export(csv, parent_id, options)).to eq([review_response_map1, review_response_map])
   end
-
-  it '#import' do
-    row_hash = {reviewee: "name", reviewers: ["name1"]}
-    session = nil
-    assignment_id = 1
-    # when reviewee user = nil
-    allow(User).to receive(:find_by).and_return(nil)
-    expect { ReviewResponseMap.import(row_hash, session, 1) }.to raise_error(ArgumentError, "Cannot find reviewee user.")
-    # when reviewee user exists but reviewee user is not a participant in this assignment
-    allow(User).to receive(:find_by).with(name: "name").and_return(student)
-    allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(nil)
-    expect { ReviewResponseMap.import(row_hash, session, 1) }.to raise_error(ArgumentError, "Reviewee user is not a participant in this assignment.")
-    # when reviewee user exists and reviewee user is a participant in this assignment
-    allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
-    allow(AssignmentTeam).to receive(:team).with(participant).and_return(team)
-    ## when reviewer user doesn't exist
-    allow(User).to receive(:find_by).with(name: "name1").and_return(nil)
-    expect { ReviewResponseMap.import(row_hash, session, 1) }.to raise_error(ArgumentError, "Cannot find reviewer user.")
-    ## when reviewer user exist
-    allow(User).to receive(:find_by).with(name: "name1").and_return(student1)
-    ### when reviewer user is not a participant in this assignment.
-    allow(AssignmentParticipant).to receive(:find_by).with(user_id: 2, parent_id: 1).and_return(nil)
-    expect { ReviewResponseMap.import(row_hash, session, 1) }.to raise_error(ArgumentError, "Reviewer user is not a participant in this assignment.")
-    ### when reviewer user is a participant in this assignment.
-    allow(AssignmentParticipant).to receive(:find_by).with(user_id: 2, parent_id: 1).and_return(participant1)
-    allow(ReviewResponseMap).to receive(:find_or_create_by)
-      .with(reviewed_object_id: 1, reviewer_id: 2, reviewee_id: 1, calibrate_to: false)
-      .and_return(review_response_map)
-    allow(participant1).to receive(:get_reviewer).and_return(participant1)
-    expect(ReviewResponseMap.import(row_hash, session, 1)).to eq(["name1"])
-    # when reviewee_team = nil
-    allow(AssignmentTeam).to receive(:team).with(participant).and_return(nil)
-    allow(AssignmentTeam).to receive(:create).and_return(double('team', id: 1))
-    allow(TeamsUser).to receive(:create).with(team_id: 1, user_id: 1).and_return(double('teams_users', id: 1, team_id: 1, user_id: 1))
-    allow(TeamNode).to receive(:create).with(parent_id: assignment_id, node_object_id: 1).and_return(double('team_node', id: 1, parent_id: 1, node_object_id: 1))
-    allow(TeamUserNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('team_user_node', id: 1, parent_id: 1, node_object_id: 1))
-    allow(User).to receive(:find_by).with(name: "name1").and_return(student1)
-    allow(AssignmentParticipant).to receive(:find_by).with(user_id: 2, parent_id: 1).and_return(participant1)
-    allow(ReviewResponseMap).to receive(:find_or_create_by)
-      .with(reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1, calibrate_to: false).and_return(review_response_map)
-    expect(ReviewResponseMap.import(row_hash, session, 1)).to eq(["name1"])
-  end
+  describe '#import' do
+    before(:each) do
+      @row_hash = {reviewee: "name", reviewers: ["name1"]}
+      @session = nil
+    end
+    context 'when team is not found' do
+      it 'raises an exception' do
+        allow(Team).to receive(:find_by).and_return(nil)
+        expect{ReviewResponseMap.import(@row_hash, @session, 1)}.to raise_error(ArgumentError, "Could not find a team with name name, please import teams first")
+      end
+    end
+    context 'when user is not found' do
+      it 'raises an exception' do
+        allow(Team).to receive(:find_by).and_return(team)
+        allow(User).to receive(:find_by).and_return(nil)
+        expect{ReviewResponseMap.import(@row_hash, @session, 1)}.to raise_error(ArgumentError, "Cannot find reviewer user.")
+      end
+    end
+    context 'when the user is found, but not a participant in this assignment' do
+      it 'raises an exception' do
+        allow(Team).to receive(:find_by).and_return(team)
+        allow(User).to receive(:find_by).and_return(student)
+        allow(AssignmentParticipant).to receive(:find_by).and_return(nil)
+        expect{ReviewResponseMap.import(@row_hash, @session, 1)}.to raise_error(ArgumentError, "Reviewer user is not a participant in this assignment.")
+      end
+    end
+    context 'when the specified user is a participant' do
+      it 'creates a ReviewResponseMap' do
+        allow(Team).to receive(:find_by).and_return(team)
+        allow(User).to receive(:find_by).and_return(student)
+        allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
+        allow(ReviewResponseMap).to receive(:find_or_create_by).and_return(review_response_map)
+        expect(ReviewResponseMap).to receive(:find_or_create_by)
+        ReviewResponseMap.import(@row_hash, @session, 1)
+      end
+    end
+   end
 
   it '#show_feedback' do
     allow(review_response_map).to receive(:response).and_return([response])
@@ -197,7 +193,7 @@ describe ReviewResponseMap do
     allow(assignment).to receive(:review_questionnaire_id).with(1).and_return(1)
     allow(Response).to receive(:where).with(map_id: 1, round: 2).and_return([response1])
     allow(assignment).to receive(:review_questionnaire_id).with(2).and_return(1)
-    expect(ReviewResponseMap.final_versions_from_reviewer(1, 1))
+    expect(ReviewResponseMap.final_versions_from_reviewer(1))
       .to eq("review round 1": {questionnaire_id: 1, response_ids: [1]}, "review round 2": {questionnaire_id: 1, response_ids: [2]})
   end
 

@@ -44,7 +44,6 @@ class ReviewResponseMap < ResponseMap
     reviewee_team = Team.find_by(name: row_hash[:reviewee].to_s, parent_id: assignment_id)
     raise ArgumentError, "Could not find a team with name #{row_hash[:reviewee].to_s}, please import teams first" unless reviewee_team
     return unless reviewee_team
-
     row_hash[:reviewers].each do |reviewer|
       reviewer_user_name = reviewer.to_s
       reviewer_user = User.find_by(name: reviewer_user_name)
@@ -94,7 +93,7 @@ class ReviewResponseMap < ResponseMap
   # will be used to display the reviewer summary
   def self.final_versions_from_reviewer(reviewer_id)
     maps = ReviewResponseMap.where(reviewer_id: reviewer_id)
-    assignment = Assignment.find(Participants.find(reviewer_id).parent_id)
+    assignment = Assignment.find(Participant.find(reviewer_id).parent_id)
     prepare_final_review_versions(assignment, maps)
   end
 
@@ -154,7 +153,7 @@ class ReviewResponseMap < ResponseMap
       where_map = {map_id: map.id}
       where_map[:round] = round unless round.nil?
       responses = Response.where(where_map)
-      next if response.empty?
+      next if responses.empty?
       responses.each do |response|
         response_ids << response.id
       end

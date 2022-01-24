@@ -345,9 +345,11 @@ class Assignment < ActiveRecord::Base
     questionnaire = assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire')
     return questionnaire.id unless questionnaire.id.nil?
     # If correct questionnaire is not found, find it by type
-    AssignmentQuestionnaire.where(assignment_id: self.id).select do |aq|
-      !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == 'ReviewQuestionnaire'
-      return aq.questionnaire_id
+    assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: self.id)
+    assignment_questionnaires.each do |aq|
+      if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == 'ReviewQuestionnaire'
+        return aq.questionnaire_id
+      end
     end
     nil
   end

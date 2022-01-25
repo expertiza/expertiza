@@ -224,10 +224,6 @@ class ResponseController < ApplicationController
     redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
-  def pending_surveys
-    redirect_to controller: 'survey_deployment', action: 'pending_surveys'
-  end
-
   def redirect
     error_id = params[:error_msg]
     message_id = params[:msg]
@@ -245,8 +241,6 @@ class ResponseController < ApplicationController
       redirect_to controller: 'assignments', action: 'edit', id: @map.response_map.assignment.id
     when "selfreview"
       redirect_to controller: 'submitted_content', action: 'edit', id: @map.response_map.reviewer_id
-    when "survey"
-      redirect_to controller: 'survey_deployment', action: 'pending_surveys'
     when "bookmark"
       bookmark = Bookmark.find(@map.response_map.reviewee_id)
       redirect_to controller: 'bookmarks', action: 'list', id: bookmark.topic_id
@@ -310,11 +304,7 @@ class ResponseController < ApplicationController
   # e.g. student click "Edit" or "View"
   def set_content(new_response = false)
     @title = @map.get_title
-    if @map.survey?
-      @survey_parent = @map.survey_parent
-    else
-      @assignment = @map.assignment
-    end
+    @assignment = @map.assignment
     @participant = @map.reviewer
     @contributor = @map.contributor
     new_response ? questionnaire_from_response_map : questionnaire_from_response
@@ -362,9 +352,6 @@ class ResponseController < ApplicationController
       "MetareviewResponseMap",
       "TeammateReviewResponseMap",
       "FeedbackResponseMap",
-      "CourseSurveyResponseMap",
-      "AssignmentSurveyResponseMap",
-      "GlobalSurveyResponseMap",
       "BookmarkRatingResponseMap"
       @questionnaire = @map.questionnaire
     end

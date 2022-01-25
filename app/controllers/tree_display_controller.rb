@@ -30,9 +30,6 @@ class TreeDisplayController < ApplicationController
   def goto_metareview_rubrics; goto_controller('Metareview','3') end
   def goto_teammatereview_rubrics; goto_controller('Teammate Review','3') end
   def goto_author_feedbacks; goto_controller('Author Feedback','3') end
-  def goto_global_survey; goto_controller('Global Survey','3') end
-  def goto_surveys; goto_controller('Assignment Survey','3') end
-  def goto_course_surveys; goto_controller('Course Survey','3') end
   def goto_courses; goto_controller('Courses','1') end
   def goto_bookmarkrating_rubrics; goto_controller('Bookmarkrating','3') end
   def goto_assignments; goto_controller('Assignments','2') end

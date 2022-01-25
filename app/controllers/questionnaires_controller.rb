@@ -52,7 +52,7 @@ class QuestionnairesController < ApplicationController
 
   def create
     if params[:questionnaire][:name].blank?
-      flash[:error] = 'A rubric or survey must have a title.'
+      flash[:error] = 'A rubric must have a title.'
       redirect_to controller: 'questionnaires', action: 'new', model: params[:questionnaire][:type], private: params[:questionnaire][:private]
     else
       questionnaire_private = params[:questionnaire][:private] == 'true'
@@ -72,7 +72,7 @@ class QuestionnairesController < ApplicationController
         # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
         # In the future, we need to write migration files to make them consistency.
         # E1903 : We are not sure of other type of cases, so have added a if statement. If there are only 5 cases, remove the if statement
-        if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey BookmarkRating].include?(display_type)
+        if %w[AuthorFeedback TeammateReview BookmarkRating].include?(display_type)
           display_type = (display_type.split /(?=[A-Z])/).join("%")
         end
         @questionnaire.display_type = display_type

@@ -49,11 +49,6 @@ const node_attributes = {
         href: '/review_mapping/list_mappings?id=' + `${parseInt(props.id) / 2}`,
         src: '/assets/tree_view/assign-reviewers-24.png'
       }),
-      (props) => ({
-        title: 'Assign survey',
-        href: '/survey_deployment/new?id=' + `${parseInt(props.id) / 2}` + '&type=AssignmentSurveyDeployment',
-        src: '/assets/tree_view/assign-survey-24.png'
-      }),
       (props) =>
         props.require_quiz
           ? {
@@ -79,11 +74,6 @@ const node_attributes = {
         title: 'View reports',
         href: '/reports/response_report?id=' + `${parseInt(props.id) / 2}`,
         src: '/assets/tree_view/view-review-report-24.png'
-      }),
-      (props) => ({
-        title: 'View survey responses',
-        href: '/survey_deployment/view_responses?id=' + `${parseInt(props.id) / 2}`,
-        src: '/assets/tree_view/view-survey-24.png'
       }),
       (props) =>
         props.is_intelligent
@@ -165,11 +155,6 @@ const node_attributes = {
         title: 'View grade summary by student',
         href: '/assessment360/course_student_grade_summary?course_id=',
         src: '/assets/tree_view/360-dashboard-24.png'
-      },
-      {
-        title: 'Assign survey',
-        href: '/survey_deployment/new?type=CourseSurveyDeployment&id=',
-        src: '/assets/tree_view/assign-survey-24.png'
       },
       {
         title: 'View aggregated teammate & meta reviews',
@@ -604,10 +589,7 @@ jQuery(document).ready(function() {
         'Review',
         'Metareview',
         'Author Feedback',
-        'Teammate Review',
-        'Assignment Survey',
-        'Global Survey',
-        'Course Survey'
+        'Teammate Review'
       ]
 
       //selectedMenuItem then takes the clicked rubric from the panel under questionnaire
@@ -1400,8 +1382,6 @@ jQuery(document).ready(function() {
         '/assets/tree_view/assign-course-blue-24.png',
         '/assets/tree_view/run-lottery.png',
         '/assets/tree_view/assign-reviewers-24.png',
-        '/assets/tree_view/assign-survey-24.png',
-        '/assets/tree_view/view-survey-24.png',
         '/assets/tree_view/view-scores-24.png',
         '/assets/tree_view/view-review-report-24.png',
         '/assets/tree_view/view-suggestion-24.png',

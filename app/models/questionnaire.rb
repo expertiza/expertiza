@@ -20,13 +20,6 @@ class Questionnaire < ActiveRecord::Base
                          'AuthorFeedbackQuestionnaire',
                          'Teammate ReviewQuestionnaire',
                          'TeammateReviewQuestionnaire',
-                         'SurveyQuestionnaire',
-                         'AssignmentSurveyQuestionnaire',
-                         'Assignment SurveyQuestionnaire',
-                         'Global SurveyQuestionnaire',
-                         'GlobalSurveyQuestionnaire',
-                         'Course SurveyQuestionnaire',
-                         'CourseSurveyQuestionnaire',
                          'Bookmark RatingQuestionnaire',
                          'BookmarkRatingQuestionnaire',
                          'QuizQuestionnaire'].freeze

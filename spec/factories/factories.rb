@@ -77,6 +77,14 @@ FactoryBot.define do
     copy_of_emails  false
   end
 
+  factory :loggermessage, class: LoggerMessage do
+    generator nil
+    unity_id nil
+    message "Success"
+    oip nil
+    req_id nil
+  end
+
   factory :student, class: User do
     # Zhewei: In order to keep students the same names (2065, 2066, 2064) before each example.
     sequence(:name) {|n| n = n % 3; "student206#{n + 4}" }
@@ -238,7 +246,15 @@ FactoryBot.define do
   factory :invitation, class: Invitation do
     reply_status 'W'
   end
-
+  factory :join_team_request, class: JoinTeamRequest do
+    id 1
+    participant_id 5
+    comments "some comments"
+    team_id 1
+    status 'P'
+    created_at '2020-03-24 12:10:20'
+    updated_at '2020-03-24 12:10:20'
+  end
   factory :topic, class: SignUpTopic do
     topic_name 'Hello world!'
     assignment { Assignment.first || association(:assignment) }

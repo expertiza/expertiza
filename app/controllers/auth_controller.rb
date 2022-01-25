@@ -40,7 +40,6 @@ class AuthController < ApplicationController
                 action: AuthHelper.get_home_action(session[:user])
   end
 
-  # Login functionality for google login feature using omniAuth2
   def google_login
     g_email = env['omniauth.auth'].info.email
     user = User.find_by(email: g_email)

@@ -15,19 +15,19 @@
     <BR/>
     <%flag_varying_rubrics=false%>
 
-    <%if @questions.has_key?("review1".to_sym)%>
+    <%if @questions.include?("review1".to_sym)%>
         <b> Round 1:</b>
         <%flag_varying_rubrics=true%>
         <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review1".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer", :round=>1 }%>
     <%end%>
 
-    <%if @questions.has_key?("review2".to_sym)%>
+    <%if @questions.include?("review2".to_sym)%>
         <b> Round 2:</b>
         <%flag_varying_rubrics=true%>
         <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review2".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" , :round=>2 }%>
     <%end%>
 
-    <%if @questions.has_key?("review3".to_sym)%>
+    <%if @questions.include?("review3".to_sym)%>
         <b> Round 3:</b>
         <%flag_varying_rubrics=true%>
         <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review3".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" , :round=>3 }%>
@@ -68,7 +68,7 @@
                 <% else %>
                     <% review_symbol = 'review' %>
                 <% end %>
-                <% @questions[review_symbol.to_sym].each do |question| %>
+                <% @questions.each do |question| %>
                     <% if question.instance_of? UploadFile %>
                         <!-- Display FileUpload question type -->
                         <% current_folder = DisplayOption.new %>

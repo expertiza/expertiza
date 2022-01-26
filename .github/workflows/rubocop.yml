@@ -2,7 +2,39 @@ name: RuboCop
 
 on: [push, pull_request]
 
+### full
+name: changes
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    steps:
+      - id: file_changes
+        uses: trilom/file-changes-action@v1.2.3
+        with:
+          # optional target repo
+          githubRepo: trilom/file-changes-action
+          # optional token
+          githubToken: ${{ secrets.BOT_TOKEN }}
+          # optional output format
+          output: 'json'
+          # optional fileoutput format
+          fileOutput: 'csv'
+          # optional push before SHA (need both before and after)
+          pushBefore: 79eeec74aebc3deb0a2f6234c5ac13142e9224e5
+          # optional push after SHA (need both before and after)
+          pushAfter: 1c5a2bfde79e2c9cffb75b9a455391350fe69a40
+          # optional PR number to compare
+          prNumber: 36
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    steps:
+      - id: file_changes
+        uses: trilom/file-changes-action@v1.2.3
+        with:
+          # optional output format
+          output: 'changed_files.json'
   build:
     runs-on: ubuntu-latest
 

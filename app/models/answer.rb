@@ -37,10 +37,4 @@ class Answer < ActiveRecord::Base
                                                  answers.question_id = ? ", assignment_id, reviewee_id, q_id)
     question_answers
   end
-
-  def get_reviewee_from_answer(answer)
-    resp = Response.find(answer.response_id)
-    map = ResponseMap.find(resp.map_id)
-    map.reviewee_id
-  end
 end

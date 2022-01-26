@@ -1,0 +1,15 @@
+<table>
+  <tr>
+    <th>Team Name</th>
+    <th>Comments</th>
+    <th>Status</th>
+  </tr>
+  <% @join_team_requests.each do |join_team_request| %> 
+    <tr>
+      <td><%=h Team.find_by(id: join_team_request.team_id).try(:name) %></td>
+      <td><%=h join_team_request.comments[2..-3] unless join_team_request.comments.nil?  %></td>
+      <td><%= display_request_status(join_team_request) %></td>
+    </tr>
+  <% end %>
+</table>
+

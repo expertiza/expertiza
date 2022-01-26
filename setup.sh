@@ -73,7 +73,7 @@ then
     echo 'Install Third-party Javascript Libraries for Linux Platform'
     sudo apt-get update  
     sudo apt-get install build-essential libssl-dev
-
+    sudo apt-get update ca-certificates
     curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 
     sudo apt-get install -y nodejs && sudo apt-get install -y npm && sudo ln -s /usr/bin/nodejs /usr/bin/node

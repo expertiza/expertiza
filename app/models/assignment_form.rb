@@ -137,7 +137,7 @@ class AssignmentForm
         TagPromptDeployment.where(id: value['deleted']).destroy_all if value.key?('deleted')
         # assume if tag_prompt is there, then id, question_type, answer_length_threshold must also be there since the inputs are coupled
         next unless value.key?('tag_prompt')
-        for i in 0..value['tag_prompt'].count - 1
+        0.upto(value['tag_prompt'].count - 1).each do |i|
           tag_dep = nil
           if !(value['id'][i] == "undefined" or value['id'][i] == "null" or value['id'][i].nil?)
             tag_dep = TagPromptDeployment.find(value['id'][i])
@@ -310,12 +310,12 @@ class AssignmentForm
           Participant.create_participant(team_user, old_assign, new_assign_id)
         end
         Participant.map_review_response_participant(old_assign, new_assign_id, dict)
-        ReviewResponseMap.new_review_response(old_assign, catt, dict, new_assign_id)
+        ReviewResponseMap.new_review_response(old_assign, old_team_id, dict, new_assign_id)
 
-        @team_needed = Team.where(id:catt).first
+        @team_needed = Team.where(id: old_team_id).first
         old_directory_path = @team_needed.directory_path
         if File.exist?(old_directory_path)
-          @team_inserted = AssignmentTeam.where(id:dict[catt]).first
+          @team_inserted = AssignmentTeam.where(id:dict[old_team_id]).first
           @team_inserted.set_student_directory_num
           new_directory_path = @team_inserted.directory_path
           Dir.mkdir(new_directory_path) unless File.exist?(new_directory_path)

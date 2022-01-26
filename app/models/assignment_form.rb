@@ -103,13 +103,13 @@ class AssignmentForm
           aq = AssignmentQuestionnaire.new(assignment_questionnaire)
           unless aq.save
             @errors = @assignment.errors.to_s
-            @has_errors = true
+            @has_errors ||= true
           end
         else
           aq = AssignmentQuestionnaire.find(assignment_questionnaire[:id])
           unless aq.update_attributes(assignment_questionnaire)
             @errors = @assignment.errors.to_s
-            @has_errors = true
+            @has_errors ||= true
           end
         end
       end
@@ -125,6 +125,7 @@ class AssignmentForm
     unless total_weight.zero? || total_weight == 100
       @assignment.errors.add(:message, 'Total weight of rubrics should add up to either 0 or 100%')
       @has_errors = true
+      return
     end
   end
 

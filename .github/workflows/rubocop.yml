@@ -40,10 +40,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Ruby 2.2.7
+    - name: Set up Ruby 2.3.7
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.2.7
+        ruby-version: 2.3.7
     - name: Cache gems
       uses: actions/cache@v1
       with:

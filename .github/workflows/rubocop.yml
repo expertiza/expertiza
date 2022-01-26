@@ -11,7 +11,7 @@ jobs:
     - name: Setup
       uses: actions/setup-ruby@v1
       with:
-        ruby-version: '2.3'
+        ruby-version: '2.3.7'
     - name: Cache gems
       uses: actions/cache@v1
       with:

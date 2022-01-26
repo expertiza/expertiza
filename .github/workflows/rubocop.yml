@@ -1,48 +1,47 @@
-name: RuboCop
-
-on: [push, pull_request]
-
-### full
-name: changes
-jobs:
-  changes:
-    runs-on: ubuntu-latest
-    steps:
-      - id: file_changes
-        uses: trilom/file-changes-action@v1.2.3
-        with:
-          # optional target repo
-          githubRepo: trilom/file-changes-action
+name: Lint
+on: [pull_request]
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    steps:
-      - id: file_changes
-        uses: trilom/file-changes-action@v1.2.3
-        with:
-          # optional output format
-          output: 'changed_files.json'
   build:
+    name: Lint
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Ruby 2.3.7
-      uses: ruby/setup-ruby@v1
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup
+      uses: actions/setup-ruby@v1
       with:
-        ruby-version: 2.3.7
+        ruby-version: '2.3'
     - name: Cache gems
       uses: actions/cache@v1
       with:
         path: vendor/bundle
-        key: ${{ runner.os }}-rubocop-${{ hashFiles('**/Gemfile.lock') }}
+        key: ${{ runner.os }}-gems-${{ env.cache-name }}-${{ hashFiles('**/Gemfile.lock') }}
         restore-keys: |
-          ${{ runner.os }}-rubocop-
-    - name: Install gems
+          ${{ runner.os }}-gems-
+
+    - name: Bundle install
       run: |
+        bundle config our_gem_repo.com our_username:${{ secrets.GEM_REPO_PASSWORD }}
+        bundle config set without 'production staging'
         bundle config path vendor/bundle
-        bundle config set without 'default doc job cable storage ujs test db'
-        bundle install --jobs 4 --retry 3
-    - name: Run RuboCop
-      run: bundle exec rubocop --parallel
+        bundle install
+        git checkout Gemfile.lock
+
+    - name: Get file changes
+      id: get_file_changes
+      uses: dorner/file-changes-action@v1.2.0
+      with:
+        githubToken: ${{ secrets.GITHUB_TOKEN }}
+        plaintext: true
+    - name: Echo file changes
+      run: |
+        echo Changed files: ${{ steps.get_file_changes.outputs.files }}
+    - name: Run lint
+      uses: dorner/lint-action@v1.3.3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        rubocop_bundler: true
+        auto_fix: true
+        rubocop_bundler_args: -R --fail-level C ${{ steps.get_file_changes.outputs.files}}
+

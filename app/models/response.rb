@@ -324,6 +324,7 @@ class Response < ActiveRecord::Base
     code
   end
 
+  # copy the review responses for a calibrated assignment
   def self.copy_review_response(old_assign, old_team_id, dict, new_assign_id)
     @old_review_response_maps = ReviewResponseMap.where(reviewed_object_id: old_assign.id, reviewee_id: old_team_id)
     @find_new_response_maps =  ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[old_team_id])

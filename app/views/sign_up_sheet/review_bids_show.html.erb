@@ -1,0 +1,55 @@
+<h1>Bidding sheet for <%= @assignment.name %> reviews</h1>
+<div style="display:block">
+  <h3 style="width: 40%; float: left">Topics</h3>
+  <h3 style="width: 40%; float:right">Review Bid Selections</h3>
+</div>
+
+<div style="display:block">
+  <div style="display:inline-block" >
+    <!--Topics table-->
+    <table style="width: 48%; float: left" class="general">
+      <tr><%= render :partial => 'sign_up_sheet/review_bids_table_header' %></tr>
+      <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
+          <b>Your topic(s) to review:</b>
+          <% for selected_topic in @selected_topics %>
+              <br/><%= selected_topic.topic_name %>
+          <% end %>
+      <% end %>
+      <br/><br/>
+      <% i=1 %>
+      <tbody id="topics"  class="connectedSortable">
+      <tr class="sort-disabled"><td></td><td></td></tr>
+      <% for topic in @sign_up_topics %>
+          <%= get_intelligent_topic_row_review_bids(topic, @selected_topics, @num_participants) %>
+          <% is_suggested_topic = false %>
+          <%= render :partial => 'sign_up_sheet/review_bids_table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
+          </tr>
+          <% i=i+1 %>
+      <% end %>
+      </tbody>
+    </table>
+
+    <!--Selections table-->
+    <table style="width: 48%; display:block" class="general" align="right">
+      <% i=1 %>
+      <tr><%= render :partial => 'sign_up_sheet/review_bids_table_header' %></tr>
+      <tbody id="selections" data-update-url=<%= "set_priority?id=#{@participant.id}" %> class="connectedSortable">
+        <tr class="sort-disabled"><td></td><td></td></tr>
+        <% for topic in @bids %>
+          <tr style= "background-color:<%= get_topic_bg_color_review_bids(topic, @num_participants) %>" id="topic_<%= topic.id %>">
+             <%= render :partial => 'sign_up_sheet/review_bids_table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
+          </tr>
+          <% i=i+1 %>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div>
+    <% session[:return_to] = request.url %>
+    <br/>
+    <br/>
+    <a href="javascript:history.back()">Back</a>
+    <br/>
+  </div>
+</div>

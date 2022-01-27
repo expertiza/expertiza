@@ -82,17 +82,17 @@ ActiveRecord::Schema.define(version: 20220114003928) do
     t.datetime "updated_at"
     t.string   "name",                                               limit: 255
     t.string   "directory_path",                                     limit: 255
-    t.integer  "submitter_count",                                    limit: 4,     default: 0,      null: false
+    t.integer  "submitter_count",                                    limit: 4,     default: 0,               null: false
     t.integer  "course_id",                                          limit: 4,     default: 0
     t.integer  "instructor_id",                                      limit: 4,     default: 0
-    t.boolean  "private",                                                          default: false,  null: false
-    t.integer  "num_reviews",                                        limit: 4,     default: 3,      null: false
-    t.integer  "num_review_of_reviews",                              limit: 4,     default: 0,      null: false
-    t.integer  "num_review_of_reviewers",                            limit: 4,     default: 0,      null: false
+    t.boolean  "private",                                                          default: false,           null: false
+    t.integer  "num_reviews",                                        limit: 4,     default: 3,               null: false
+    t.integer  "num_review_of_reviews",                              limit: 4,     default: 0,               null: false
+    t.integer  "num_review_of_reviewers",                            limit: 4,     default: 0,               null: false
     t.boolean  "reviews_visible_to_all"
-    t.integer  "num_reviewers",                                      limit: 4,     default: 0,      null: false
+    t.integer  "num_reviewers",                                      limit: 4,     default: 0,               null: false
     t.text     "spec_location",                                      limit: 65535
-    t.integer  "max_team_size",                                      limit: 4,     default: 0,      null: false
+    t.integer  "max_team_size",                                      limit: 4,     default: 0,               null: false
     t.boolean  "staggered_deadline"
     t.boolean  "allow_suggestions"
     t.integer  "days_between_submissions",                           limit: 4
@@ -103,12 +103,12 @@ ActiveRecord::Schema.define(version: 20220114003928) do
     t.integer  "rounds_of_reviews",                                  limit: 4,     default: 1
     t.boolean  "microtask",                                                        default: false
     t.boolean  "require_quiz"
-    t.integer  "num_quiz_questions",                                 limit: 4,     default: 0,      null: false
+    t.integer  "num_quiz_questions",                                 limit: 4,     default: 0,               null: false
     t.boolean  "is_coding_assignment"
     t.boolean  "is_intelligent"
-    t.boolean  "calculate_penalty",                                                default: false,  null: false
+    t.boolean  "calculate_penalty",                                                default: false,           null: false
     t.integer  "late_policy_id",                                     limit: 4
-    t.boolean  "is_penalty_calculated",                                            default: false,  null: false
+    t.boolean  "is_penalty_calculated",                                            default: false,           null: false
     t.integer  "max_bids",                                           limit: 4
     t.boolean  "show_teammate_reviews"
     t.boolean  "availability_flag",                                                default: true
@@ -136,6 +136,7 @@ ActiveRecord::Schema.define(version: 20220114003928) do
     t.boolean  "auto_assign_mentor",                                               default: false
     t.boolean  "duty_based_assignment?"
     t.boolean  "questionnaire_varies_by_duty"
+    t.string   "review_choosing_algorithm",                          limit: 255,   default: "Simple Choose"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -535,6 +536,21 @@ ActiveRecord::Schema.define(version: 20220114003928) do
 
   add_index "resubmission_times", ["participant_id"], name: "fk_resubmission_times_participants", using: :btree
 
+  create_table "review_bids", force: :cascade do |t|
+    t.integer  "priority",       limit: 4
+    t.integer  "signuptopic_id", limit: 4
+    t.integer  "participant_id", limit: 4
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.integer  "user_id",        limit: 4
+    t.integer  "assignment_id",  limit: 4
+  end
+
+  add_index "review_bids", ["assignment_id"], name: "fk_rails_549e23ae08", using: :btree
+  add_index "review_bids", ["participant_id"], name: "fk_rails_ab93feeb35", using: :btree
+  add_index "review_bids", ["signuptopic_id"], name: "fk_rails_e88fa4058f", using: :btree
+  add_index "review_bids", ["user_id"], name: "fk_rails_6041e1cdb9", using: :btree
+
   create_table "review_comment_paste_bins", force: :cascade do |t|
     t.integer  "review_grade_id", limit: 4
     t.string   "title",           limit: 255
@@ -863,6 +879,10 @@ ActiveRecord::Schema.define(version: 20220114003928) do
   add_foreign_key "question_advices", "questions", name: "fk_question_question_advices"
   add_foreign_key "questions", "questionnaires", name: "fk_question_questionnaires"
   add_foreign_key "resubmission_times", "participants", name: "fk_resubmission_times_participants"
+  add_foreign_key "review_bids", "assignments"
+  add_foreign_key "review_bids", "participants"
+  add_foreign_key "review_bids", "sign_up_topics", column: "signuptopic_id"
+  add_foreign_key "review_bids", "users"
   add_foreign_key "review_comment_paste_bins", "review_grades"
   add_foreign_key "review_grades", "participants"
   add_foreign_key "sign_up_topics", "assignments", name: "fk_sign_up_topics_assignments"

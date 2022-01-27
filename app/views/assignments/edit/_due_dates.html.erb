@@ -541,7 +541,6 @@
             addDueDateTableElement(<%= @due_date_nameurl_not_empty.nil ? false:@due_date_nameurl_not_empty %>, 'team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
           <% end %>
       }
-      function team_formation_due_date_checkbox() {}
       jQuery(document).ready(function () {
           addTeamInformation()
           <% if @assignment_form.assignment.topics? %>

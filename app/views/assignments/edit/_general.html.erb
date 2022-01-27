@@ -302,7 +302,7 @@ function microtaskChanged() {
     }
     <% end %>
 
-    <!-- Violation of DRY principle, not adds input field and handles checkboxes hidden states -->
+    <!-- Violation of DRY principle, adds input field and handles checkboxes hidden states in other views -->
     function hasTeamsChanged() {
         var msg = 'Warning! Unchecking this box will hide teams that already exist.';
         var checkbox = jQuery('#team_assignment');

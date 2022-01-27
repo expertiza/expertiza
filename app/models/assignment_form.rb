@@ -230,7 +230,7 @@ class AssignmentForm
     # Default value of duty_id is nil, and when duty_id is not nil, then it means that the function call
     # is made to access assignment_questionnaire of that particular duty. If questionnaires varies by duty,
     # then find the relevant questionnaire and return.
-    if duty_id !=nil and @assignment.questionnaire_varies_by_duty
+    if duty_id and @assignment.questionnaire_varies_by_duty
       # Get all AQs for the assignment and specified duty_id
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, duty_id: duty_id)
       assignment_questionnaires.each do |aq|

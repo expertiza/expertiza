@@ -309,6 +309,14 @@ resources :institution, except: [:destroy] do
     end
   end
 
+  resources :review_bids do
+    collection do
+      post :assign_bidding
+      post :set_priority
+      post :index
+    end
+  end
+
   resources :review_mapping, only: [] do
     collection do
       post :add_metareviewer

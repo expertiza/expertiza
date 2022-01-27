@@ -290,6 +290,7 @@ class AssignmentForm
     [diff_btw_time_left_and_threshold, time_left_in_min]
   end
 
+  # If an assignment is calibrated, this method will copy the calibrated response to a targeted new assignment
   def self.copy_calibration(old_assign,new_assign_id)
     if old_assign.is_calibrated
       SubmissionRecord.copy_calibrated_submissions(old_assign, new_assign_id)
@@ -307,10 +308,10 @@ class AssignmentForm
           @new_team_user.team_id = new_team_ids[count]
           @new_team_user.user_id = team_user.user_id
           @new_team_user.save
-          Participant.create_participant(team_user, old_assign, new_assign_id)
+          Participant.copy_calibrated_participant(team_user, old_assign, new_assign_id)
         end
-        Participant.map_review_response_participant(old_assign, new_assign_id, dict)
-        ReviewResponseMap.new_review_response(old_assign, old_team_id, dict, new_assign_id)
+        ReviewResponseMap.copy_calibrated_response_map(old_assign, new_assign_id, dict)
+        Response.copy_review_response(old_assign, old_team_id, dict, new_assign_id)
 
         @team_needed = Team.where(id: old_team_id).first
         old_directory_path = @team_needed.directory_path
@@ -466,7 +467,7 @@ class AssignmentForm
     else
       new_assign_id = nil
     end
-    copy_calibration(old_assign, new_assign_id)
+    copy_calibration(old_assign, new_assign_id) if old_assign.is_calibrated
     new_assign_id
   end
 

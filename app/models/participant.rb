@@ -155,8 +155,8 @@ class Participant < ActiveRecord::Base
     fields
   end
 
-
-  def self.create_participant(team_user,old_assign, new_assign_id)
+  # Copies a specified participant from one assignment to another
+  def self.copy_calibrated_participant(team_user,old_assign, new_assign_id)
     @old_participant = Participant.where(user_id: team_user.user_id, parent_id: old_assign.id)
     @old_participant.each do |participant|
       @new_participant = Participant.new
@@ -177,43 +177,4 @@ class Participant < ActiveRecord::Base
       @new_participant.save
     end
   end
-
-  def self.map_review_response_participant(old_assign, new_assign_id, dict)
-    @old_assignment_number = Assignment.find_by(id: old_assign.id)
-    @new_assignment_number = Assignment.find_by(id: new_assign_id)
-    @find_participant = Participant.find_by(parent_id: old_assign.id, user_id: @old_assignment_number.instructor_id)
-    @new_participant = Participant.new
-    @new_participant.can_submit = @find_participant.can_submit
-    @new_participant.can_review = @find_participant.can_review
-    @new_participant.user_id = @new_assignment_number.instructor_id
-    @new_participant.parent_id = new_assign_id
-    @new_participant.submitted_at = @find_participant.submitted_at
-    @new_participant.permission_granted = @find_participant.permission_granted
-    @new_participant.penalty_accumulated = @find_participant.penalty_accumulated
-    @new_participant.grade = @find_participant.grade
-    @new_participant.type = @find_participant.type
-    @new_participant.handle = @find_participant.handle
-    @new_participant.time_stamp = @find_participant.time_stamp
-    @new_participant.digital_signature = @find_participant.digital_signature
-    @new_participant.duty = @find_participant.duty
-    @new_participant.can_take_quiz = @find_participant.can_take_quiz
-    @new_participant.save
-    @get_new_articipant = Participant.find_by(parent_id: new_assign_id, user_id: @old_assignment_number.instructor_id)
-    @old_review_response_maps = ReviewResponseMap.where(reviewed_object_id: old_assign.id)
-    @old_review_response_maps.each do |map|
-      if dict.key?(map.reviewee_id)
-        @new_review_response_map = ReviewResponseMap.new
-        @new_review_response_map.reviewed_object_id = new_assign_id
-        @new_review_response_map.reviewer_id = @get_new_participant.id
-        @new_review_response_map.reviewee_id = dict[map.reviewee_id]
-        @new_review_response_map.type = map.type
-        @new_review_response_map.created_at = map.created_at
-        @new_review_response_map.calibrate_to = map.calibrate_to
-        @new_review_response_map.save
-      else
-        next
-      end
-    end
-  end
-
 end

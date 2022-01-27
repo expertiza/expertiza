@@ -299,7 +299,7 @@ class Team < ActiveRecord::Base
     @original_team_values.each do |team|
       @prev_assignment = Assignment.find(old_assign.id)
       @prev_instructor = Participant.find_by(parent_id: old_assign.id, user_id: @prev_assignment.instructor_id)
-      @map = ReviewResponseMap.find_by(reviewed_object_id: old_assign.id, reviewer_id: @prev_instructor.id, reviewee_id: catt.id)
+      @map = ReviewResponseMap.find_by(reviewed_object_id: old_assign.id, reviewer_id: @prev_instructor.id, reviewee_id: team.id)
       if @map
         @resp = Response.find_by(map_id: @map.id, is_submitted: false)
         if @resp

@@ -323,4 +323,39 @@ class Response < ActiveRecord::Base
     end
     code
   end
+
+  def self.copy_review_response(old_assign, old_team_id, dict, new_assign_id)
+    @old_review_response_maps = ReviewResponseMap.where(reviewed_object_id: old_assign.id, reviewee_id: old_team_id)
+    @find_new_response_maps =  ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[old_team_id])
+    old_review_response_ids = []
+    new_review_response_ids = []
+    @old_review_response_maps.each do |map|
+      old_review_response_ids << map.id 
+    end
+    @find_new_response_maps.each do |map|
+      new_review_response_ids << map.id
+    end
+    dict1 = Hash[old_review_response_ids.zip new_review_response_ids]
+    dict1.each do |item, value|
+      @old_responses = Response.where(map_id: item)
+      @old_responses.each do |response|
+        @new_response = Response.new
+        @new_response.map_id = value
+        @new_response.additional_comment = response.additional_comment
+        @new_response.version_num = response.version_num
+        @new_response.round = response.round
+        @new_response.is_submitted = response.is_submitted
+        @new_response.save
+        @old_answers = Answer.where(response_id: response.id)
+        @old_answers.each do |old_answer|
+          @new_answer = Answer.new
+          @new_answer.question_id = old_answer.question_id
+          @new_answer.answer = old_answer.answer
+          @new_answer.comments = old_answer.comments
+          @new_answer.response_id = @new_response.id
+          @new_answer.save
+        end
+      end
+    end
+  end
 end

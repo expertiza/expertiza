@@ -13,6 +13,8 @@ coverage
 app/controllers/auth_controller.rb
 nohup.out
 pg_data/*
+.github/*
+
 
 #################
 ## scrubbed_db ##

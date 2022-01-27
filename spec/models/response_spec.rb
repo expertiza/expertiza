@@ -1,6 +1,8 @@
 describe Response do
-  let(:participant) { build(:participant, id: 1, user: build(:student, name: 'no name', fullname: 'no one')) }
-  let(:participant2) { build(:participant, id: 2) }
+  let(:user) {build(:student, id: 1, role_id: 1, name: 'no name', fullname: 'no one')}
+  let(:user2) {build(:student, id: 2, role_id: 2, name: 'no name2', fullname: 'no one2')}
+  let(:participant) { build(:participant, id: 1, parent_id:1, user: user) }
+  let(:participant2) { build(:participant, id: 2, parent_id:2, user: user2) }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
   let(:team) { build(:assignment_team) }
   let(:signed_up_team) { build(:signed_up_team, team_id: team.id) }
@@ -12,12 +14,15 @@ describe Response do
   let(:questionnaire1) { create(:questionnaire, id: 1) }
   let(:question1) { create(:question, questionnaire: questionnaire1, weight: 1, id: 1) }
   let(:question2) { TextArea.new(id: 1, weight: 2, break_before: true) }
+  let(:question3) { build(:questionnaire_header) }
   let(:questionnaire) { ReviewQuestionnaire.new(id: 1, questions: [question], max_question_score: 5) }
   let(:questionnaire2) { ReviewQuestionnaire.new(id: 2, questions: [question2], max_question_score: 5) }
+  let(:questionnaire3) { ReviewQuestionnaire.new(id: 3, questions: [question, question3], max_question_score: 5) }
+  let(:assignment_questionnaire) { build(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire3) }
   let(:tag_prompt) {TagPrompt.new(id: 1, prompt: "prompt")}
   let(:tag_prompt_deployment) {TagPromptDeployment.new(id: 1, tag_prompt_id: 1, assignment_id: 1, questionnaire_id: 1, question_type: 'Criterion')}
-  let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1) }
-  let!(:response_record) { create(:response, id: 1, map_id: 1, response_map: response_map) }
+  let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1, reviewee_id:1) }
+  let!(:response_record) { create(:response, id: 1, map_id: 1, response_map: response_map, updated_at: '2020-03-24 12:10:20') }
   before(:each) do
     allow(response).to receive(:map).and_return(review_response_map)
   end
@@ -59,6 +64,19 @@ describe Response do
           "Additional Comment: </b></td></tr></table>")
       end
     end
+
+    it 'if additional comment is not empty' do
+      response.additional_comment = "Test:\nadditional comment"
+      allow(response).to receive(:questionnaire_by_answer).with(answer).and_return(questionnaire)
+      allow(questionnaire).to receive(:max_question_score).and_return(5)
+      allow(questionnaire).to receive(:id).and_return(1)
+      allow(assignment).to receive(:id).and_return(1)
+      allow(question).to receive(:view_completed_question).with(1, answer, 5, nil, nil).and_return('Question HTML code')
+      expect(response.display_as_html('Instructor end', 0)).to eq("<h4><B>Review 0</B></h4><B>Reviewer: </B>no one (no name)&nbsp;&nbsp;&nbsp;"\
+          "<a href=\"#\" name= \"review_Instructor end_1Link\" onClick=\"toggleElement('review_Instructor end_1','review');return false;\">"\
+          "hide review</a><BR/><table id=\"review_Instructor end_1\" class=\"table table-bordered\">"\
+          "<tr class=\"warning\"><td>Question HTML code</td></tr><tr><td><b>Additional Comment: </b>Test:<BR/>additional comment</td></tr></table>")
+    end
   end
 
   describe '#aggregate_questionnaire_score' do
@@ -68,6 +86,14 @@ describe Response do
       allow(question2).to receive(:is_a?).with(ScoredQuestion).and_return(true)
       allow(question2).to receive(:answer).and_return(answer)
       expect(response.aggregate_questionnaire_score).to eq(2)
+    end
+  end
+
+  describe '#delete' do
+    it 'delete the corresponding scores when delete the response' do
+      score_d = create(:answer, id:1)
+      response_d = create(:response, id: 2, map_id: 1, response_map: response_map, scores:[score_d])
+      expect { response_d.delete }.to change { Response.count}.by(-1).and change {Answer.count}.by(-1)
     end
   end
 
@@ -97,10 +123,20 @@ describe Response do
       allow(questionnaire).to receive(:max_question_score).and_return(5)
       expect(response.maximum_score).to eq(10)
     end
+
+    it 'returns the maximum possible score for current response without score' do
+      response.scores = []
+      question2 = double('ScoredQuestion', weight: 2)
+      allow(Question).to receive(:find).with(1).and_return(question2)
+      allow(question2).to receive(:is_a?).with(ScoredQuestion).and_return(false)
+      allow(response).to receive(:questionnaire_by_answer).with(nil).and_return(questionnaire)
+      allow(questionnaire).to receive(:max_question_score).and_return(5)
+      expect(response.maximum_score).to eq(0)
+    end
   end
 
   describe '#email' do
-    it 'calls email method in corresponding respons maps' do
+    it 'calls email method in assignment survey respond map' do
       assignment_survey_response_map = double('AssignmentSurveyResponseMap', reviewer_id: 1)
       allow(ResponseMap).to receive(:find).with(1).and_return(assignment_survey_response_map)
       allow(Participant).to receive(:find).with(1).and_return(participant)
@@ -110,6 +146,47 @@ describe Response do
                                                                      subject: "A new submission is available for Test Assgt"},
                                                                     participant, assignment).and_return(true)
       expect(response.email).to eq(true)
+    end
+
+    it 'calls email method in course survey respond map' do
+      course_survey_response_map = double('CourseSurveyResponseMap', reviewer_id: 1)
+      allow(ResponseMap).to receive(:find).with(1).and_return(course_survey_response_map)
+      allow(Participant).to receive(:find).with(1).and_return(participant)
+      allow(Assignment).to receive(:find).with(1).and_return(assignment)
+      allow(course_survey_response_map).to receive(:survey?).and_return(false)
+      allow(course_survey_response_map).to receive(:email).with({body: {partial_name: "new_submission"},
+                                                                     subject: "A new submission is available for Test Assgt"},
+                                                                    participant, assignment).and_return(true)
+      expect(response.email).to eq(true)
+    end
+  end
+
+  describe '#populate_new_response' do
+    it 'when response exists and after recent submission date' do
+      submission_record = double(SubmissionRecord, updated_at: '2020-03-23 12:10:20')
+      team = double('AssignmentTeam', id: response_map.reviewee_id, most_recent_submission: submission_record)
+      allow(AssignmentTeam).to receive(:find_by).with({:id => response_map.reviewee_id}).and_return(team)
+      expect(response.populate_new_response(response_map, "1")).to eq(response_record)
+    end
+
+    it 'when response exists and after recent submission date' do
+      submission_record = double(SubmissionRecord, updated_at: '2020-03-25 12:10:20')
+      team = double('AssignmentTeam', id: response_map.reviewee_id, most_recent_submission: submission_record)
+      new_response = double('Response')
+
+      allow(AssignmentTeam).to receive(:find_by).with({:id => response_map.reviewee_id}).and_return(team)
+      allow(Response).to receive(:create).with(map_id: response_map.id, additional_comment: '', round: "1", is_submitted: 0).and_return(new_response)
+      expect(response.populate_new_response(response_map, "1")).to eq(new_response)
+    end
+
+    it 'when response does not exist' do
+      submission_record = double(SubmissionRecord, updated_at: '2020-03-23 12:10:20')
+      team = double('AssignmentTeam', id: response_map.reviewee_id, most_recent_submission: submission_record)
+      new_response = double('Response', order:{})
+      allow(Response).to receive(:where).with(map_id: response_map.id, round: 1).and_return(new_response)
+      allow(AssignmentTeam).to receive(:find_by).with({:id => response_map.reviewee_id}).and_return(team)
+      allow(Response).to receive(:create).with(map_id: response_map.id, additional_comment: '', round: "1", is_submitted: 0).and_return(new_response)
+      expect(response.populate_new_response(response_map, "1")).to eq(new_response)
     end
   end
 
@@ -125,7 +202,7 @@ describe Response do
       end
     end
     context 'when answer is nil' do
-      it 'returns review questionnaire of current assignment' do
+      it 'returns review questionnaire of current assignment from map itself' do
         allow(ResponseMap).to receive(:find).with(1).and_return(review_response_map)
         allow(Participant).to receive(:find).with(1).and_return(participant)
         allow(participant).to receive(:assignment).and_return(assignment)
@@ -133,19 +210,14 @@ describe Response do
         allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire2)
         expect(response.questionnaire_by_answer(nil)).to eq(questionnaire2)
       end
-    end
-  end
-
-  describe '#populate_new_response' do
-    context 'when current round response is found' do
-      it 'returns the current round response' do
-        allow(response).to receive(:populate_new_response).with(:review_response_map, "0").and_return(response)
-        expect(response.id).to eq(1)
-      end
-    end
-    context 'when current round response is found' do
-      it 'returns a new response object' do
-        allow(response).to receive(:populate_new_response).with(:review_response_map, nil).and_return(:new_response)
+      it 'returns review questionnaire of current assignment from participant' do
+        assignment_survey_response_map = double('AssignmentSurveyResponseMap', reviewer_id: 1, reviewee_id:team.id)
+        allow(ResponseMap).to receive(:find).with(1).and_return(assignment_survey_response_map)
+        allow(Participant).to receive(:find).with(1).and_return(participant)
+        allow(participant).to receive(:assignment).and_return(assignment)
+        allow(assignment).to receive(:review_questionnaire_id).and_return(1)
+        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire2)
+        expect(response.questionnaire_by_answer(nil)).to eq(questionnaire2)
       end
     end
   end
@@ -211,102 +283,77 @@ describe Response do
     end
   end
 
-  describe "#test compute scores" do
-    let(:response1) { double("respons1") }
-    let(:response2) { double("respons2") }
-
-    before(:each) do
-      @total_score = 100.0
-      allow(Response).to receive(:assessment_score).and_return(@total_score)
-    end
-
-    it "returns nil if list of assessments is empty" do
-      assessments = []
-      scores = Response.compute_scores(assessments, [question1])
-      expect(scores[:max]).to eq nil
-      expect(scores[:min]).to eq nil
-      expect(scores[:avg]).to eq nil
-    end
-
-    it "returns scores when a single valid assessment of total score 100 is give" do
-      assessments = [response1]
-      Response.instance_variable_set(:@invalid, 0)
-      scores = Response.compute_scores(assessments, [question1])
-      expect(scores[:max]).to eq @total_score
-      expect(scores[:min]).to eq @total_score
-      expect(scores[:avg]).to eq @total_score
-    end
-
-    it "returns scores when two valid assessments of total scores 80 and 100 are given" do
-      assessments = [response1, response2]
-      Response.instance_variable_set(:@invalid, 0)
-      total_score1 = 100.0
-      total_score2 = 80.0
-      allow(Response).to receive(:assessment_score).and_return(total_score1, total_score2)
-      scores = Response.compute_scores(assessments, [question1])
-      expect(scores[:max]).to eq total_score1
-      expect(scores[:min]).to eq total_score2
-      expect(scores[:avg]).to eq (total_score1 + total_score2) / 2
-    end
-
-    it "returns scores when an invalid assessments is given" do
-      assessments = [response1]
-      Response.instance_variable_set(:@invalid, 1)
-      scores = Response.compute_scores(assessments, [question1])
-      expect(scores[:max]).to eq @total_score
-      expect(scores[:min]).to eq @total_score
-      expect(scores[:avg]).to eq 0
-    end
-
-    it "returns scores when invalid flag is nil" do
-      assessments = [response1]
-      Response.instance_variable_set(:@invalid, nil)
-      scores = Response.compute_scores(assessments, [question1])
-      expect(scores[:max]).to eq @total_score
-      expect(scores[:min]).to eq @total_score
-      expect(scores[:avg]).to eq @total_score
-    end
-
-    it "checks if assessment_score function is called" do
-      assessments = [response1]
-      expect(Response).to receive(:assessment_score).with(response: assessments, questions: [question1]).and_return(@total_score)
-      scores = Response.compute_scores(assessments, [question1])
+  describe '.calibration_results_info' do
+    it 'returns references to a calibration response, review response, and questions' do
+      calibration_response_map = double("review_response_map")
+      calibration_response = double("response", review_response_map: calibration_response_map)
+      allow(ReviewResponseMap).to receive(:find).with(1).and_return(calibration_response_map)
+      allow(ReviewResponseMap).to receive(:find).with(2).and_return(response_map)
+      allow(calibration_response_map).to receive(:response).and_return([calibration_response])
+      allow(Assignment).to receive(:find).with(1).and_return(assignment)
+      allow(AssignmentQuestionnaire).to receive(:find_by)
+          .with(["assignment_id = ? and questionnaire_id IN (?)",1, ReviewQuestionnaire.select("id")], )
+          .and_return(assignment_questionnaire)
+      expect(Response.calibration_results_info(1, 2, 1)).to eq([calibration_response, response_record, [question]])
     end
   end
 
-  describe "#test get total score" do
-    it "returns total score when required conditions are met" do
-      # stub for ScoreView.find_by_sql to revent prevent unit testing sql db queries
-      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: 20, sum_of_weights: 5, q1_max_question_score: 4))
-      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: "1")])
-      expect(Response.assessment_score(response: [response_record], questions: [question1])).to eq 100.0
-      # output calculation is (weighted_score / (sum_of_weights * max_question_score)) * 100
-      # 4.0
+  describe 'notify_instructor_on_difference' do
+    it 'should send correct data format' do
+      allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+      allow(User).to receive(:find).with(1).and_return(user)
+      team = double('AssignmentTeam', participants:[participant2] )
+      allow(response).to receive(:map).and_return(response.response_map)
+      allow(AssignmentTeam).to receive(:find).with(1).and_return(team)
+      allow(User).to receive(:find).with(2).and_return(user2)
+      allow(Assignment).to receive(:find).with(1).and_return(assignment)
+      allow(response).to receive(:aggregate_questionnaire_score).and_return(1)
+      allow(response).to receive(:maximum_score).and_return(2)
+      mail = double()
+      allow(mail).to receive(:deliver_now)
+      expect(Mailer).to receive(:notify_grade_conflict_message)
+                                       .with(to: assignment.instructor.email,
+                                             subject: 'Expertiza Notification: A review score is outside the acceptable range',
+                                             body: {
+                                                 reviewer_name: 'no one',
+                                                 type: 'review',
+                                                 reviewee_name: 'no one2',
+                                                 new_score: 0.5,
+                                                 assignment: assignment,
+                                                 conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=1',
+                                                 summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=2',
+                                                 assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/1/edit'
+                                             }).and_return(mail)
+      response.notify_instructor_on_difference
+    end
+  end
+
+  describe 'done_by_staff_participant?' do
+    it 'true if review is done by Instructor' do
+      allow(Response).to receive(:find).with(1).and_return(response)
+      allow(ResponseMap).to receive(:find).with(1).and_return(review_response_map)
+      allow(Participant).to receive(:find).with(1).and_return(participant)
+      allow(User).to receive(:find).with(1).and_return(user)
+      allow(Role).to receive(:find).with(1).and_return(build(:role_of_instructor))
+      expect(response.done_by_staff_participant?).to eq(true)
     end
 
-    it "returns total score when one answer is nil for scored question and its weight gets removed from sum_of_weights" do
-      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: 20, sum_of_weights: 5, q1_max_question_score: 4))
-      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
-      expect(Response.assessment_score(response: [response_record], questions: [question1])).to be_within(0.01).of(125.0)
+    it 'true if review is done by teaching assistant' do
+      allow(Response).to receive(:find).with(1).and_return(response)
+      allow(ResponseMap).to receive(:find).with(1).and_return(review_response_map)
+      allow(Participant).to receive(:find).with(1).and_return(participant)
+      allow(User).to receive(:find).with(1).and_return(user)
+      allow(Role).to receive(:find).with(1).and_return(build(:role_of_teaching_assistant))
+      expect(response.done_by_staff_participant?).to eq(true)
     end
 
-    it "returns -1 when answer is nil for scored question which makes sum of weights = 0" do
-      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: 20, sum_of_weights: 1, q1_max_question_score: 5))
-      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
-      expect(Response.assessment_score(response: [response_record], questions: [question1])).to eq -1.0
-    end
-
-    it "returns -1 when weighted_score of questionnaireData is nil" do
-      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: nil, sum_of_weights: 5, q1_max_question_score: 5))
-      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
-      expect(Response.assessment_score(response: [response_record], questions: [question1])).to eq -1.0
-    end
-
-    xit "checks if submission_valid? is called" do
-      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: nil, sum_of_weights: 5, q1_max_question_score: 5))
-      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
-      expect(Answer).to receive(:submission_valid?)
-      Response.assessment_score(response: [response_record], questions: [question1])
+    it 'false if review is done by student' do
+      allow(Response).to receive(:find).with(1).and_return(response)
+      allow(ResponseMap).to receive(:find).with(1).and_return(review_response_map)
+      allow(Participant).to receive(:find).with(1).and_return(participant)
+      allow(User).to receive(:find).with(1).and_return(user)
+      allow(Role).to receive(:find).with(1).and_return(build(:role_of_student))
+      expect(response.done_by_staff_participant?).to eq(false)
     end
   end
 end

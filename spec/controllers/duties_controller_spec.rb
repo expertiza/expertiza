@@ -93,7 +93,7 @@ describe DutiesController do
               }
           }
           post :create, params
-          expect(flash[:error]).to eq('Max members for duty must be greater than or equal to 1. ')
+          expect(flash[:error]).to eq('Value for max members for role is invalid. ')
           expect(response).to redirect_to('/duties/new?id=1')
         end
       end
@@ -130,7 +130,7 @@ describe DutiesController do
             }
         }
         post :create, params
-        expect(flash[:error]).to eq('Duty name is too short (minimum is 3 characters). ')
+        expect(flash[:error]).to eq('Role name is too short (minimum is 3 characters). ')
         expect(response).to redirect_to('/duties/new?id=1')
       end
     end

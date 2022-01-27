@@ -10,10 +10,10 @@ class TeammateReviewResponseMap < ResponseMap
   # default questionnaire set for TeammateReviewQuestionnaire type.
   def questionnaire_by_duty(duty_id)
     duty_questionnaire = AssignmentQuestionnaire.where(:assignment_id => self.assignment.id, :duty_id=> duty_id).first
-    unless duty_questionnaire.nil?
-      return Questionnaire.find(duty_questionnaire.questionnaire_id)
-    else
+    if duty_questionnaire.nil?
       questionnaire
+    else
+      Questionnaire.find(duty_questionnaire.questionnaire_id)
     end
   end
 

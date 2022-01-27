@@ -83,28 +83,21 @@ function microtaskChanged() {
     <td style='padding:5px' id='assignment_team_assignment_field'>
 
       <div class="form-inline">
-      <% if @assignment_form.assignment.max_team_size == 1%>
-        <%= check_box_tag('team_assignment', 'true', false, {:onChange => 'hasTeamsChanged()'}) %>
-      <% else %>
         <%= check_box_tag('team_assignment', 'true', @assignment_form.assignment.team_assignment?, {:onChange => 'hasTeamsChanged()'}) %>
-      <% end %>
-      <% @assignment_form.assignment.max_team_size %>
-      <%= label_tag('team_assignment', 'Has teams?') %>
+        <% @assignment_form.assignment.max_team_size %>
+        <%= label_tag('team_assignment', 'Has teams?') %>
 
-    <span style='padding:5px' class="form-inline" id='assignment_team_count_field' <%= 'hidden' if @assignment_form.assignment.max_team_size == 1%>>
-
-      <!--Teammate reviews fields-->
-      <input name="assignment_form[assignment][show_teammate_reviews]" type="hidden" value="false"/>
-      <%= label_tag('assignment_form[assignment][max_team_size]', 'Maximum number of members per team:') %>
-      <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:50px;', class: 'form-control'}) %>
-    
-      </span>
+        <span style='padding:5px' class="form-inline" id='assignment_team_count_field' <%= 'hidden' unless @assignment_form.assignment.team_assignment?%>>
+          <!--Teammate reviews fields-->
+          <input name="assignment_form[assignment][show_teammate_reviews]" type="hidden" value="false"/>
+          <%= label_tag('assignment_form[assignment][max_team_size]', 'Maximum number of members per team:') %>
+          <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:50px;', class: 'form-control'}) %>
+        </span>
       </div>
-      <span id='assignment_show_teammate_reviews' class="form-inline"  <%= 'hidden' if @assignment_form.assignment.max_team_size < 2%>>
-
-      <%= check_box_tag('assignment_form[assignment][show_teammate_reviews]', 'true', @assignment_form.assignment.show_teammate_reviews) %>
-      <%= label_tag('assignment_form[assignment][show_teammate_reviews]', 'Show teammate reviews?') %>
-    </span>
+      <span id='assignment_show_teammate_reviews' class="form-inline"  <%= 'hidden' unless @assignment_form.assignment.team_assignment?%>>
+        <%= check_box_tag('assignment_form[assignment][show_teammate_reviews]', 'true', @assignment_form.assignment.show_teammate_reviews) %>
+        <%= label_tag('assignment_form[assignment][show_teammate_reviews]', 'Show teammate reviews?') %>
+      </span>
       &nbsp;&nbsp;&nbsp;&nbsp;
       <!--Maximum number of members per team-->
     </td>
@@ -309,8 +302,9 @@ function microtaskChanged() {
     }
     <% end %>
 
+    <!-- Violation of DRY principle, not adds input field and handles checkboxes hidden states -->
     function hasTeamsChanged() {
-      var msg = 'Warning! Unchecking this box will hide teams that already exist.';
+        var msg = 'Warning! Unchecking this box will hide teams that already exist.';
         var checkbox = jQuery('#team_assignment');
         var team_count_field = jQuery('#assignment_team_count_field');
         var teammate_reviews_field = jQuery('#assignment_show_teammate_reviews');
@@ -328,16 +322,6 @@ function microtaskChanged() {
             // what would the mentor be assigned to if there are no teams?
             autoAssignMentorCheckbox.hide();
             addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
-            <% assignment_questionnaire = @assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil) %>
-            <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'TeammateReviewQuestionnaire') %>
-            addQuestionnaireTableRow(
-                'TeammateReviewQuestionnaire',
-                <%= assignment_questionnaire.to_json.html_safe %>,
-                <%= questionnaire.to_json.html_safe %>,
-                <%= questionnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>,
-                null
-          );
-
         } else {
             if (confirm(msg)) {
               team_count_field.attr('hidden', true);
@@ -348,11 +332,10 @@ function microtaskChanged() {
               autoAssignMentorCheckbox.show();
               document.getElementById('assignment_form_assignment_max_team_size').value = '1';
               removeDueDateTableElement('team_formation', 0);
-
             } else {
               checkbox.prop('checked', true);
             }
-            if (<%= @assignment_form.assignment.max_team_size == 1%>){
+            if (<%= !@assignment_form.assignment.team_assignment?%>){
               team_count_field.attr('hidden', true);
             }
           } 

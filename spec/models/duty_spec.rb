@@ -18,9 +18,9 @@ describe Duty do
 
   before(:each) do
     allow(team1).to receive(:participants).and_return([participant, participant2, participant3])
-    allow(participant).to receive(:get_team_user).and_return(team_user1)
-    allow(participant2).to receive(:get_team_user).and_return(team_user2)
-    allow(participant3).to receive(:get_team_user).and_return(team_user3)
+    allow(participant).to receive(:team_user).and_return(team_user1)
+    allow(participant2).to receive(:team_user).and_return(team_user2)
+    allow(participant3).to receive(:team_user).and_return(team_user3)
   end
 
   context 'name of the duty should be valid'

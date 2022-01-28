@@ -27,9 +27,9 @@ class StudentTaskController < ApplicationController
 
       if impersonating_as_ta?
         ta_course_ids = TaMapping.where(:ta_id => session[:original_user].id).pluck(:course_id)
-        @student_tasks = @student_tasks.select {|t| ta_course_ids.include?t.assignment.course_id }
+        @student_tasks.select! {|t| ta_course_ids.include?t.assignment.course_id }
       else
-        @student_tasks = @student_tasks.select {|t| t.assignment.course and session[:original_user].id == t.assignment.course.instructor_id or !t.assignment.course and session[:original_user].id == t.assignment.instructor_id }
+        @student_tasks.select! {|t| t.assignment.course and session[:original_user].id == t.assignment.course.instructor_id or !t.assignment.course and session[:original_user].id == t.assignment.instructor_id }
       end
     end
     @student_tasks.select! {|t| t.assignment.availability_flag }
@@ -48,7 +48,7 @@ class StudentTaskController < ApplicationController
     @can_submit = @participant.can_submit
     @can_review = @participant.can_review
     @can_take_quiz = @participant.can_take_quiz
-    @authorization = Participant.get_authorization(@can_submit, @can_review, @can_take_quiz)
+    @authorization = @participant.authorization
     @team = @participant.team
     denied unless current_user_id?(@participant.user_id)
     @assignment = @participant.assignment
@@ -68,8 +68,8 @@ class StudentTaskController < ApplicationController
     # Finding the current phase that we are in
     due_dates = AssignmentDueDate.where(parent_id: @assignment.id)
     @very_last_due_date = AssignmentDueDate.where(parent_id: @assignment.id).order("due_at DESC").limit(1)
-    next_due_date = @very_last_due_date[0]
-    for due_date in due_dates
+    next_due_date = @very_last_due_date.first
+    due_dates.each do |due_date|
       if due_date.due_at > Time.now
         next_due_date = due_date if due_date.due_at < next_due_date.due_at
       end

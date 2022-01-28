@@ -24,11 +24,11 @@
             <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
             <td><%= @teamed_count[cp.id] %></td>
             <% @assignments.each do |assignment|%>
-                <td><%= @meta_review[cp.id][assignment.id] %></td>
-                <td><%= @teammate_review[cp.id][assignment.id] %></td>
+                <td><%= @meta_review[cp.id][assignment.id] unless @meta_review.nil? %></td>
+                <td><%= @teammate_review[cp.id][assignment.id] unless @teammate_review.nil? %></td>
             <% end%>
-            <td><%= @meta_review[cp.id][:avg_grade_for_assgt] %></td>
-            <td><%= @teammate_review[cp.id][:avg_grade_for_assgt] %></td>
+            <td><%= @meta_review[cp.id][:avg_grade_for_assgt] unless @meta_review.nil? || @meta_review[cp.id].nil? %></td>
+            <td><%= @teammate_review[cp.id][:avg_grade_for_assgt] unless @teammate_review.nil? || @teammate_review[cp.id].nil?%></td>
         </tr>
     <%end%>
         <tr>
@@ -40,10 +40,16 @@
             <% end%>
             <% total_meta_review_grade = @overall_meta_review_grades.inject(0) {|sum, (k, v)| sum + v } %>
             <% total_meta_review_count = @overall_meta_review_count.inject(0) {|sum, (k, v)| sum + v } %>
-            <td><%= "#{total_meta_review_grade / total_meta_review_count}%" %></td>
+            <td>
+              <%= total_meta_review_count.zero? ? "N/A" : 
+              "#{total_meta_review_grade / total_meta_review_count}%" %>
+            </td>
             <% total_teammate_review_grade = @overall_teammate_review_grades.inject(0) {|sum, (k, v)| sum + v } %>
             <% total_teammate_review_count = @overall_teammate_review_count.inject(0) {|sum, (k, v)| sum + v } %>
-            <td><%= "#{total_teammate_review_grade / total_teammate_review_count}%" %></td>
+            <td>
+              <%= total_meta_review_count.zero? ? "N/A" : 
+              "#{total_teammate_review_grade / total_teammate_review_count}%" %>    
+            </td>
         </tr>
     </table>
 </div>

@@ -1,24 +1,5 @@
 module ReportFormatterHelper
   include Scoring
-  def summary_by_reviewee_and_criteria(params, _session = nil)
-    assign_basics(params)
-    # E1991 : pass extra session variable to address anonymized view
-    # note that this is already passed from parent method in _session
-    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, @summary_ws_url, _session)
-    @summary = sum.summary
-    @reviewers = sum.reviewers
-    @avg_scores_by_reviewee = sum.avg_scores_by_reviewee
-    @avg_scores_by_round = sum.avg_scores_by_round
-    @avg_scores_by_criterion = sum.avg_scores_by_criterion
-  end
-
-  def summary_by_criteria(params, _session = nil)
-    assign_basics(params)
-    sum = SummaryHelper::Summary.new.summarize_reviews_by_criterion(@assignment, @summary_ws_url)
-    @summary = sum.summary
-    @avg_scores_by_round = sum.avg_scores_by_round
-    @avg_scores_by_criterion = sum.avg_scores_by_criterion
-  end
 
   def review_response_map(params, _session = nil)
     assign_basics(params)
@@ -59,7 +40,7 @@ module ReportFormatterHelper
     create_participant(@id, user.id) if participant.nil?
     @review_questionnaire_ids = ReviewQuestionnaire.select("id")
     @assignment_questionnaire = AssignmentQuestionnaire.retrieve_questionnaire_for_assignment(@id).first
-    @questions = @assignment_questionnaire.questionnaire.questions.select {|q| q.type == 'Criterion' or q.type == 'Scale' }
+    @questions = @assignment_questionnaire.questionnaire.questions.select {|q| q.type == 'Criterion' || q.type == 'Scale' }
     @calibration_response_maps = ReviewResponseMap.where(reviewed_object_id: @id, calibrate_to: 1)
     @review_response_map_ids = ReviewResponseMap.select('id').where(reviewed_object_id: @id, calibrate_to: 0)
     @responses = Response.where(map_id: @review_response_map_ids)

@@ -1,4 +1,4 @@
-class Participant < ActiveRecord::Base
+class Participant < ApplicationRecord
   include Scoring
   has_paper_trail
   belongs_to :user

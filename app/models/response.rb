@@ -1,7 +1,7 @@
 require 'analytic/response_analytic'
 require 'lingua/en/readability'
 
-class Response < ActiveRecord::Base
+class Response < ApplicationRecord
   # Added for E1973. A team review will have a lock on it so only one user at a time may edit it.
   include Lockable
   include ResponseAnalytic

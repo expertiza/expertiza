@@ -1,4 +1,4 @@
-class LatePolicy < ActiveRecord::Base
+class LatePolicy < ApplicationRecord
   belongs_to :user
 
   # has_many :assignments

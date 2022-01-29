@@ -4,7 +4,7 @@
 ###
 ###
 
-class Assignment < ActiveRecord::Base
+class Assignment < ApplicationRecord
   require 'analytic/assignment_analytic'
   include Scoring
   include AssignmentAnalytic

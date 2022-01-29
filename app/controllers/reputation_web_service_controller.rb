@@ -45,7 +45,7 @@ class ReputationWebServiceController < ApplicationController
   #   query+="group by RM.id "+
   #   "order by RM.reviewee_id"
   #
-  #  result = ActiveRecord::Base.connection.select_all(query)
+  #  result = ApplicationRecord.connection.select_all(query)
   def db_query(assignment_id, round_num, has_topic, another_assignment_id = 0)
     raw_data_array = []
     assignment_ids = []

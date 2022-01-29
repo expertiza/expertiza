@@ -1,4 +1,4 @@
-class PasswordReset < ActiveRecord::Base
+class PasswordReset < ApplicationRecord
   validates :user_email, presence: true
   attr_accessible :user_email, :token
   def self.save_token(user, token)

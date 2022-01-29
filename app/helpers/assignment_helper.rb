@@ -20,7 +20,7 @@ module AssignmentHelper
       ta_ids.flatten!
       ta_ids.each do |ta_id|
         ta = Ta.find(ta_id)
-        ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id) }
+        ta.ta_mappings.each { |mapping| courses.or(Course.where(id: mapping.course_id)) }
       end
     end
     options = []

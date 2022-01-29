@@ -1,4 +1,4 @@
-class SystemSettings < ActiveRecord::Base
+class SystemSettings < ApplicationRecord
   self.table_name = 'system_settings'
 
   attr_accessor :public_role, :default_markup_style

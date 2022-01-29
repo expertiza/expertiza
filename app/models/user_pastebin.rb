@@ -1,4 +1,4 @@
-class UserPastebin < ActiveRecord::Base
+class UserPastebin < ApplicationRecord
   validates :user_id, uniqueness: {scope: :short_form}
   attr_accessible :short_form, :long_form
 

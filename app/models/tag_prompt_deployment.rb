@@ -1,4 +1,4 @@
-class TagPromptDeployment < ActiveRecord::Base
+class TagPromptDeployment < ApplicationRecord
   belongs_to :tag_prompt
   belongs_to :assignment
   belongs_to :questionnaire

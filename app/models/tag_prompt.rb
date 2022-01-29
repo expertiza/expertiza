@@ -1,4 +1,4 @@
-class TagPrompt < ActiveRecord::Base
+class TagPrompt < ApplicationRecord
   validates :prompt, presence: true
   validates :desc, presence: true
   validates :control_type, presence: true

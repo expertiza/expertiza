@@ -1,4 +1,4 @@
-class AwardedBadge < ActiveRecord::Base
+class AwardedBadge < ApplicationRecord
   belongs_to :badge
   belongs_to :participant
 

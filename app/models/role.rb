@@ -1,7 +1,7 @@
 require "credentials"
 require "menu"
 
-class Role < ActiveRecord::Base
+class Role < ApplicationRecord
   belongs_to :parent, class_name: 'Role', inverse_of: false
   has_many :users, inverse_of: false, dependent: :nullify
 

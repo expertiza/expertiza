@@ -41,7 +41,7 @@ class MergeQuestionnaireAndType < ActiveRecord::Migration
     add_column :questionnaires, :display_type, :string
     Questionnaire.find_each{
       | questionnaire |
-      records = ActiveRecord::Base.connection.select_all("select * from questionnaire_types where id = #{questionnaire.type_id}")
+      records = ApplicationRecord.connection.select_all("select * from questionnaire_types where id = #{questionnaire.type_id}")
       type = records[0]['name']
       questionnaire.update_attribute('display_type',type)
       type.gsub!(/[^\w]/,'')

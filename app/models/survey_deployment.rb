@@ -1,4 +1,4 @@
-class SurveyDeployment < ActiveRecord::Base
+class SurveyDeployment < ApplicationRecord
   validates :start_date, presence: true
   validates :end_date, presence: true
   validate :valid_start_end_time?

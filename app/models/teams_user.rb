@@ -1,4 +1,4 @@
-class TeamsUser < ActiveRecord::Base
+class TeamsUser < ApplicationRecord
   belongs_to :user
   belongs_to :team
   has_one :team_user_node, foreign_key: 'node_object_id', dependent: :destroy

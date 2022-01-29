@@ -1,4 +1,4 @@
-class Course < ActiveRecord::Base
+class Course < ApplicationRecord
   has_many :ta_mappings, dependent: :destroy
   has_many :tas, through: :ta_mappings
   has_many :assignments, dependent: :destroy

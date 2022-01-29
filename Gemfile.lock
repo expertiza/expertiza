@@ -72,10 +72,9 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
-    airbrake (11.0.3)
-      airbrake-ruby (~> 5.1)
-    airbrake-ruby (5.2.1)
-      rbtree3 (~> 0.5)
+    airbrake (5.2.0)
+      airbrake-ruby (~> 1.2)
+    airbrake-ruby (1.8.0)
     airbrussh (1.4.0)
       sshkit (>= 1.6.1, != 1.7.0)
     archive-zip (0.12.0)
@@ -290,7 +289,7 @@ GEM
     multi_json (1.15.0)
     multi_xml (0.6.0)
     multipart-post (2.1.1)
-    mysql2 (0.5.3)
+    mysql2 (0.4.10)
     nap (1.1.0)
     nenv (0.3.0)
     net-scp (3.0.0)
@@ -381,7 +380,6 @@ GEM
     rb-inotify (0.10.1)
       ffi (~> 1.0)
     rb-readline (0.5.5)
-    rbtree3 (0.7.0)
     rchardet (1.8.0)
     react-rails (2.6.1)
       babel-transpiler (>= 0.7.0)
@@ -558,7 +556,7 @@ DEPENDENCIES
   activerecord (= 5.0.1.rc2)
   activerecord-session_store (= 1.1.3)
   activesupport (= 5.0.1.rc2)
-  airbrake
+  airbrake (= 5.2.0)
   authlogic (= 4.5.0)
   awesome_nested_set (= 3.3.1)
   bootstrap3-datetimepicker-rails (~> 4.17.47)
@@ -601,7 +599,7 @@ DEPENDENCIES
   lingua
   mimemagic!
   momentjs-rails (>= 2.9.0)
-  mysql2
+  mysql2 (= 0.4.10)
   nokogiri (~> 1.8)
   omniauth-google-oauth2
   open-uri-cached

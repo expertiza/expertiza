@@ -27,7 +27,7 @@ module Expertiza
     config.active_record.raise_in_transactional_callbacks = true
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password, :password_confirmation, :password, :password_confirmation]
-    config.active_record.whitelist_attributes = false
+    # config.active_record.whitelist_attributes = false # need protected_attributes gem
     config.autoload_paths << Rails.root.join('lib', '{**}')
     config.eager_load_paths << Rails.root.join('lib')
     config.react.addons = true

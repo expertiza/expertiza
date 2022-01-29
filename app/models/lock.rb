@@ -6,7 +6,7 @@
 # Because this was made for that purpose, ActiveRecord.lock! is not used on the resource. However, it may be useful
 # for you if you wish to use this to implement a lock just on a database entry.
 # There is information here: https://api.rubyonrails.org/v5.2.3/classes/ActiveRecord/Locking/Pessimistic.html
-class Lock < ActiveRecord::Base
+class Lock < ApplicationRecord
   #The resource being locked can be any class
   belongs_to :lockable, polymorphic: true
   belongs_to :user, class_name: 'User', foreign_key: 'user_id', inverse_of: false

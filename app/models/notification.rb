@@ -1,5 +1,4 @@
-class Notification < ActiveRecord::Base
-  attr_accessible :course_id, :subject, :description, :expiration_date, :active_flag
+class Notification < ApplicationRecord
   validates :subject, presence: true
   validates :description, presence: true
   validates :expiration_date, presence: true

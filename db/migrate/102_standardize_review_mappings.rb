@@ -56,7 +56,7 @@ class StandardizeReviewMappings < ActiveRecord::Migration
     add_column :review_mappings, :type, :string, :null => false
     
     
-    records = ApplicationRecord.connection.select_all("select * from `review_mappings`")
+    records = ActiveRecord::Migration.connection.select_all("select * from `review_mappings`")
 
     records.each{
        | mapping |
@@ -90,7 +90,7 @@ class StandardizeReviewMappings < ActiveRecord::Migration
        today = Time.now             
        oldest_allowed_time = Time.local(today.year - 1,today.month,today.day,0,0,0) 
        assignment = Assignment.find(mapping["reviewed_object_id"])
-       review = ApplicationRecord.connection.select_one("select * from `reviews` where id = #{mapping["id"]}")       
+       review = ActiveRecord::Migration.connection.select_one("select * from `reviews` where id = #{mapping["id"]}")       
        
        if assignment.nil?
          raise "DELETE ReviewMapping #{mapping["id"]}: No assignment found with ID = #{mapping["reviewed_object_id"]}"    

@@ -40,7 +40,7 @@ environment ENV.fetch("RAILS_ENV") { "development" }
 # cannot share connections between processes.
 #
 # on_worker_boot do
-#   ApplicationRecord.establish_connection if defined?(ActiveRecord)
+#   ActiveRecord::Migration.establish_connection if defined?(ActiveRecord)
 # end
 
 # Allow puma to be restarted by `rails restart` command.

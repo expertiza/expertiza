@@ -660,6 +660,11 @@ FactoryBot.define do
     size '70,1'
   end
 
+  factory :content_page, class: ContentPage do
+    title 'Expertiza Home'
+    name 'home'
+  end
+  
   factory :suggestion, class: Suggestion do
     id 1
     assignment_id 1

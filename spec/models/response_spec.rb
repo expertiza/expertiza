@@ -135,32 +135,6 @@ describe Response do
     end
   end
 
-  describe '#email' do
-    it 'calls email method in assignment survey respond map' do
-      assignment_survey_response_map = double('AssignmentSurveyResponseMap', reviewer_id: 1)
-      allow(ResponseMap).to receive(:find).with(1).and_return(assignment_survey_response_map)
-      allow(Participant).to receive(:find).with(1).and_return(participant)
-      allow(assignment_survey_response_map).to receive(:survey?).and_return(true)
-      allow(assignment_survey_response_map).to receive(:survey_parent).and_return(assignment)
-      allow(assignment_survey_response_map).to receive(:email).with({body: {partial_name: "new_submission"},
-                                                                     subject: "A new submission is available for Test Assgt"},
-                                                                    participant, assignment).and_return(true)
-      expect(response.email).to eq(true)
-    end
-
-    it 'calls email method in course survey respond map' do
-      course_survey_response_map = double('CourseSurveyResponseMap', reviewer_id: 1)
-      allow(ResponseMap).to receive(:find).with(1).and_return(course_survey_response_map)
-      allow(Participant).to receive(:find).with(1).and_return(participant)
-      allow(Assignment).to receive(:find).with(1).and_return(assignment)
-      allow(course_survey_response_map).to receive(:survey?).and_return(false)
-      allow(course_survey_response_map).to receive(:email).with({body: {partial_name: "new_submission"},
-                                                                     subject: "A new submission is available for Test Assgt"},
-                                                                    participant, assignment).and_return(true)
-      expect(response.email).to eq(true)
-    end
-  end
-
   describe '#populate_new_response' do
     it 'when response exists and after recent submission date' do
       submission_record = double(SubmissionRecord, updated_at: '2020-03-23 12:10:20')
@@ -204,15 +178,6 @@ describe Response do
     context 'when answer is nil' do
       it 'returns review questionnaire of current assignment from map itself' do
         allow(ResponseMap).to receive(:find).with(1).and_return(review_response_map)
-        allow(Participant).to receive(:find).with(1).and_return(participant)
-        allow(participant).to receive(:assignment).and_return(assignment)
-        allow(assignment).to receive(:review_questionnaire_id).and_return(1)
-        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire2)
-        expect(response.questionnaire_by_answer(nil)).to eq(questionnaire2)
-      end
-      it 'returns review questionnaire of current assignment from participant' do
-        assignment_survey_response_map = double('AssignmentSurveyResponseMap', reviewer_id: 1, reviewee_id:team.id)
-        allow(ResponseMap).to receive(:find).with(1).and_return(assignment_survey_response_map)
         allow(Participant).to receive(:find).with(1).and_return(participant)
         allow(participant).to receive(:assignment).and_return(assignment)
         allow(assignment).to receive(:review_questionnaire_id).and_return(1)

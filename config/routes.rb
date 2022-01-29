@@ -270,10 +270,6 @@ resources :institution, except: [:destroy] do
   resources :review_questionnaires, controller: :questionnaires
   resources :metareview_questionnaires, controller: :questionnaires
   resources :teammate_review_questionnaires, controller: :questionnaires
-  resources :survey_questionnaires, controller: :questionnaires
-  resources :assignment_survey_questionnaires, controller: :questionnaires
-  resources :global_survey_questionnaires, controller: :questionnaires
-  resources :course_survey_questionnaires, controller: :questionnaires
   resources :bookmark_rating_questionnaires, controller: :questionnaires
 
   resources :questions do

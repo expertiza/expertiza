@@ -6,7 +6,6 @@ describe CourseNode do
   before(:each) do
   	course_node.node_object_id = 1
   	course.private = true
-    allow(course).to receive(:survey_distribution_id).and_return(1)
     allow(Course).to receive(:find_by).with(id: 1).and_return(course)
     allow(User).to receive(:find_by).with(id: 1).and_return(user1)
     allow(User).to receive(:find).with(1).and_return(user1)
@@ -79,11 +78,6 @@ describe CourseNode do
   describe '#get_private' do
     it 'returns whether the course is private' do
       expect(course_node.get_private).to be_truthy
-    end
-  end
-  describe '#get_survey_distribution_id' do
-    it 'returns whether the course is private' do
-      expect(course_node.get_survey_distribution_id).to eq(1)
     end
   end
 end

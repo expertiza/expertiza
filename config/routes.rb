@@ -446,14 +446,6 @@ resources :institution, except: [:destroy] do
     end
   end
 
-  resources :survey_deployment, only: %i[new create] do
-    collection do
-      get :list
-      get :reminder_thread
-      get :pending_surveys
-    end
-  end
-
   resources :system_settings do
     collection do
       get :list

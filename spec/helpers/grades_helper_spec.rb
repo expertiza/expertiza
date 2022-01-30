@@ -114,7 +114,7 @@ describe GradesHelper, type: :helper do
   describe 'underlined?' do
     context 'when the comment is present' do
       it 'returns underlined' do
-        score = VmQuestionResponseScoreCell.new(95, 0, 'This is a comment.')
+        score = VmQuestionResponseScoreCell.new(95, 0, 'This is a comment.', response_id: 120)
         expect(underlined?(score)).to eq('underlined')
       end
     end

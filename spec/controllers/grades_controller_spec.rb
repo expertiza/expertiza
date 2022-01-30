@@ -115,7 +115,7 @@ describe GradesController do
 
     let(:tm_questionnaire) {
       build(
-        :teammate_review_questionnaire,
+        :teammate_questionnaire,
         id: 12,
         questions: [question],
         max_question_score: 5

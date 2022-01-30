@@ -398,6 +398,11 @@ FactoryBot.define do
     instruction_loc nil
   end
 
+  factory :teammate_review_questionnaire, class: TeammateReviewQuestionnaire do
+    name 'Test teammate review questionnaire'
+    type 'TeammateReviewQuestionnaire'
+    display_type 'Teammate Review'
+  end
 
   factory :teammate_questionnaire, class: TeammateReviewQuestionnaire do
     name 'Test questionnaire'

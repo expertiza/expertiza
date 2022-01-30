@@ -77,10 +77,9 @@
 <% end %>
 </div><br><br>
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
-<% table_count = 0 %>
 <%# This boolean is used to render a dropdown just before the first teammate review heat grid %>
 <% first_teammate_review_appeared = false %>
-<% @vmlist.each do |vm| %>
+<% @vmlist.each_with_index do |vm, table_count| %>
 
     <% if (not @current_role_name.eql?'Student' and
         not first_teammate_review_appeared and

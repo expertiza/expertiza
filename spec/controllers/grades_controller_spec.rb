@@ -115,7 +115,7 @@ describe GradesController do
 
     let(:tm_questionnaire) {
       build(
-        :teammate_questionnaire,
+        :teammate_review_questionnaire,
         id: 12,
         questions: [question],
         max_question_score: 5
@@ -126,7 +126,7 @@ describe GradesController do
       questionnaires: [tm_questionnaire])
     }
     let(:assignment_questionnaire_vt) {
-      create(:tm_assignment_questionnaire, id: 12, used_in_round: nil,
+      create(:assignment_questionnaire, id: 12, used_in_round: nil,
       assignment: assignment_vt, questionnaire: tm_questionnaire) }
     let(:team_vt) { create(:assignment_team, id: 12,
     assignment: assignment_vt) }

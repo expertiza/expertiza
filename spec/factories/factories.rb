@@ -593,10 +593,6 @@ FactoryBot.define do
     email 'abc@mailinator.com'
   end
 
-  factory :survey_deployment, class: SurveyDeployment do
-    type 'AssignmentSurveyDeployment'
-  end
-
   factory :multiple_choice_checkbox, class: MultipleChoiceCheckbox do
     txt 'Test question:'
     weight 1

@@ -12,6 +12,10 @@ describe VmQuestionResponse  do
   let(:response) { VmQuestionResponse.new(review_questionnaire, assignment, 1) }
   let(:answer) { double('Answer') }
   let(:reviews) { [double('Response', map_id: 1, response_id: 1)] }
+  let!(:answer1) { create(:answer, id: 2) }
+  let(:row){ VmQuestionResponseRow.new(2, 1, 1, 5, 1)}
+  let(:tag_dep) { TagPromptDeployment.new id: 1, tag_prompt: tp, tag_prompt_id: 1, question_type: "Criterion", answer_length_threshold: 5, questionnaire: review_questionnaire, assignment: assignment }
+  let(:tp) { TagPrompt.new(prompt: "test prompt", desc: "test desc", control_type: "Checkbox") }
 
   describe '#initialize' do
     context 'when intitialized with a review questionnaire' do
@@ -77,7 +81,7 @@ describe VmQuestionResponse  do
         response = VmQuestionResponse.new(author_feedback_questionnaire, assignment, 1)
         allow(FeedbackResponseMap).to receive(:where).with(reviewer_id: 3).and_return([double(id: 1, reviewer_id: 3, reviewee_id: 4, response_id: 1)])
 	      response.add_reviews(participant, team, false)
-        expect(response.list_of_reviews.size).to eq(0)
+        expect(response.list_of_reviews.size).to eq(1)
         expect(response.list_of_reviewers.size).to eq(1)
       end
     end
@@ -115,6 +119,24 @@ describe VmQuestionResponse  do
       response.add_team_members(team)
       allow(participant).to receive(:fullname).and_return('2065, student')
       expect(response.display_team_members).to eq('Team members: (2065, student) ')
+    end
+  end
+
+  describe '#max_score_for_questionnaire' do
+    context 'when there are no rows' do
+      it 'return 0' do
+        expect(response.max_score_for_questionnaire).to eq(0)
+      end
+    end
+  end
+
+  describe '#add_answer' do
+    it 'returns a VmQuestionResponseScoreCell' do
+      allow(response).to receive(:list_of_rows).and_return([row])
+      allow(TagPromptDeployment).to receive(:where).and_return([tag_dep])
+      allow(Question).to receive(:find).and_return(question)
+      allow(TagPrompt).to receive(:find).and_return(tp)
+      expect(response.add_answer(answer1)).to eq([])
     end
   end
 end

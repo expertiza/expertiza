@@ -40,7 +40,6 @@ class AuthController < ApplicationController
                 action: AuthHelper.get_home_action(session[:user])
   end
 
-  # Login functionality for google login feature using omniAuth2
   def google_login
     g_email = env['omniauth.auth'].info.email
     user = User.find_by(email: g_email)
@@ -63,21 +62,21 @@ class AuthController < ApplicationController
     AuthController.logout(session)
     redirect_to '/'
   end
-
-  def self.authorised?(session, params)
-    authorised = false # default
+# changing spelling of the authorised to authorized 
+  def self.authorized?(session, params)
+    authorized = false # default
     check_controller = false
 
     if params[:controller] == 'content_pages' and
       params[:action] == 'view'
       if session[:credentials].pages.key?(params[:page_name].to_s)
-        authorised = true if session[:credentials].pages[params[:page_name].to_s] == true
+        authorized = true if session[:credentials].pages[params[:page_name].to_s] == true
       end
     else
       # Check if there's a specific permission for an action
       if session[:credentials].actions.key?(params[:controller])
         if session[:credentials].actions[params[:controller]].key?(params[:action]) and session[:credentials].actions[params[:controller]][params[:action]]
-          authorised = true
+          authorized = true
         else
           check_controller = true
         end
@@ -87,12 +86,12 @@ class AuthController < ApplicationController
 
       # Check if there's a general permission for a controller
       if check_controller
-        authorised = true if session[:credentials].controllers.key?(params[:controller]) and session[:credentials].controllers[params[:controller]]
+        authorized = true if session[:credentials].controllers.key?(params[:controller]) and session[:credentials].controllers[params[:controller]]
       end
     end # Check permissions
 
-    ExpertizaLogger.info "Authorised? #{authorised}, check_controller? #{check_controller}"
-    authorised
+    ExpertizaLogger.info "Authorized? #{authorized}, check_controller? #{check_controller}"
+    authorized
   end
 
   protected

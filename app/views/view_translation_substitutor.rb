@@ -38,17 +38,17 @@ class ViewTranslationSubstitutor
 
   def process_translation(contents, key, val)
     replacements, skips = [], []
-
+    puts contents.to_s 
     resume_index = 0
     while resume_index < contents.length do
       match_data = contents[resume_index, contents.length].match(/#{BLACKLIST}(\s+)?(#{Regexp.escape(val)})(\s+)?#{BLACKLIST}/)
-      break if match_data == nil
+      break if match_data.nil?
 
       match_begin, match_end = resume_index + match_data.begin(0), resume_index + match_data.end(0)
       matched_text, black_start, white_start, white_end, black_end = match_data[0], match_data[1], match_data[2], match_data[4], match_data[5]
 
-      if black_start == black_end && (black_start == nil || %W[\" '].include?(black_start))
-        t_call = black_start == nil ? "<%=t \".#{key}\"%>" : "t(\".#{key}\")"
+      if black_start == black_end && (black_start.nil? || %W[\" '].include?(black_start))
+        t_call = black_start.nil? ? "<%=t \".#{key}\"%>" : "t(\".#{key}\")"
         replacement = "#{white_start}#{t_call}#{white_end}"
         replacements += [contents[match_begin, matched_text.length]]
         contents[match_begin, matched_text.length] = replacement

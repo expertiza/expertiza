@@ -34,7 +34,7 @@ class ApplicationController < ActionController::Base
           return controller_locale
         end
       else
-        return controller_locale
+        return I18n.default_locale
       end
     end
     I18n.default_locale
@@ -43,7 +43,7 @@ class ApplicationController < ActionController::Base
   def locale_for_student
     # Gets participant using student from params
     participant_id = params[:id] || params[:student_id]
-    if participant_id != nil
+    if !participant_id.nil?
       participant = AssignmentParticipant.find_by(id: participant_id)
       # If id or student_id not correct, revert to locale based on courses.
       return locale_from_user_courses if participant.nil?
@@ -150,7 +150,7 @@ class ApplicationController < ActionController::Base
     redirect_back
   end
 
-  def is_available(user, owner_id)
+  def available?(user, owner_id)
     user.id == owner_id ||
       user.admin? ||
       user.super_admin?

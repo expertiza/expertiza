@@ -57,9 +57,8 @@
 <% end %>
 </div><br><br>
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
-<% table_count = 0 %>
-<% @vmlist.each do |vm| %>
-    <% if (vm.questionnaire_display_type == "Metareview" or vm.questionnaire_display_type == "Author Feedback" or vm.questionnaire_display_type == "Teammate Review") and @current_role_name.eql?'Student' %>
+<% @vmlist.each_with_index do |vm, table_count| %>
+    <% if (vm.questionnaire_display_type == "Metareview" || vm.questionnaire_display_type == "Author Feedback" || vm.questionnaire_display_type == "Teammate Review") and @current_role_name.eql?'Student' %>
     <% else %>
         <% if vm.list_of_reviewers.length > 0 %>
 
@@ -70,11 +69,10 @@
               <th>#</th>
               <th><%=t ".question"%></th>
               </thead>
-              <% count = 0 %>
-              <% vm.list_of_rows.each do |row| %>
+              <% vm.list_of_rows.each_with_index do |row, count| %>
                   <% if row.score_row.count > 0  %>
                       <tr style="background-color: #ffffff;">
-                        <td><%= count += 1 %></td>
+                        <td><%= count %></td>
                         <td><%= row.question_text %></td>
                       </tr>
                   <% end %>
@@ -112,10 +110,9 @@
             <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
             <thead>
             <tr class="hide-scrollbar">
-              <th class="sorter-true"><%=t ".question"%><span></span></th>
-            
-              <% i = 1 %>
-              <% vm.list_of_reviews.each do |review| %>
+              <th class="sorter-true">Question<span></span></th>
+              <% i_final = 0 %>
+              <% vm.list_of_reviews.each_with_index do |review, i| %>
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
                     <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i} %>
@@ -123,7 +120,7 @@
                       <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
                     <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i} %>
                   <% end %>
-                  <% i += 1 %>
+                  <% i_final = 0%>
               <% end %>
 
               <th class="sorter-true" align="right" >
@@ -136,25 +133,23 @@
             </thead>
 
             <% score_row_count = vm.list_of_rows.first.score_row.count %>
-            <% j = 1 %>
             <!-- here, starts a series of nested loops. loops for the rows, and for the cells of the rows.-->
             <!-- additionally, there are hidden rows (expandable) which are also generated via iteration. -->
-            <% vm.list_of_rows.each do |row| %>
-
+            <% vm.list_of_rows.each_with_index do |row, j| %>
                 <!-- notice the data-target. because we're toggling via looped code, we need to dynamically generate the identifier. -->
                 <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= row.question_id.to_s + vm.round.to_s %>">
-                  <td class = 'cf' data-toggle="tooltip" title="<%= row.question_text %>"> <div style='float: left'><%= j.to_s %></div><div style='float: right'> &#<%= type_and_max(row) %>;</div>  </td>
+                  <td class = 'cf' data-toggle="tooltip" title="<%= row.question_text %>"> <div style='float: left'><%= (j+1).to_s %></div><div style='float: right'> &#<%= type_and_max(row) %>;</div>  </td>
 
                   <!-- actual cells with scores and colored background. -->
                   <% row.score_row.each do |score| %>
-                      <% score_comment = score.comment.nil? ? '' : score.comment %> <!-- changing nil to null string to avoid Null Pointer Exception -->
+                      <% score_comment = score.comment.nil? ? '' : score.comment %> 
                       <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%= strip_tags(score.comment).html_safe%>">
                         <span class="<%=  underlined?(score) %>"><%= score.score_value.to_s %></span>
                       </td>
                   <% end %>
 
-                  <% if row.score_row.count == 0 %>
-                      <% for index in 0 .. score_row_count - 1 %>
+                  <% if row.score_row.count.zero? %>
+                      <% (0.upto(score_row_count - 1)).each do |index| %>
                           <td align="center">
                             <%= "" %>
                           </td>
@@ -170,7 +165,7 @@
                 </tr>
                 <!--loop that creates the collapsed-by-default row, which lists all comments. -->
                 <tr class="tablesorter-childRow">
-                  <td colspan="<%= (i+1).to_s %>" class="hiddenRow" ><div id="hid<%= row.question_id.to_s + vm.round.to_s %>" class="accordion-body collapse" style="margin-left:10px;">
+                  <td colspan="<%= (i_final+1).to_s %>" class="hiddenRow" ><div id="hid<%= row.question_id.to_s + vm.round.to_s %>" class="accordion-body collapse" style="margin-left:10px;">
                     <div style="padding-top: 10px; padding-bottom: 10px;"><%=  sanitize row.question_text %></div>
                     <div>
                       <table class="table tbl_questlist">
@@ -179,7 +174,7 @@
                         <th><%=t ".score"%></th>
                         <th><%=t ".Comment"%></th>
                         </thead>
-                        <% for index in 0 .. row.score_row.length - 1 %>
+                        <% (0.upto(row.score_row.length - 1)).each do |index| %>
                             <tr>
                               <td><%=t ".review"%> <%=index + 1%></td>
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
@@ -192,8 +187,8 @@
                                      "j"     represents number of this question
                                      "index" represents number of this review
                                 -->
-                                <td id="<%= 'rr'+ j.to_s + '_' + index.to_s %>" data-round="<%= vm.round.to_s %>="
-                                    data-question_num="<%= j.to_s %>" data-review_num="<%= index.to_s %>"
+                                <td id="<%= 'rr'+ (j+1).to_s + '_' + index.to_s %>" data-round="<%= vm.round.to_s %>="
+                                    data-question_num="<%= (j+1).to_s %>" data-review_num="<%= index.to_s %>"
                                     data-has_tag="<%= row.score_row[index].vm_prompts.count > 0 ? "true":"false"%>">
                               <% else %>
                                 <td>
@@ -214,13 +209,12 @@
                   </div>
                   </td>
                 </tr>
-                <% j += 1 %>
             <% end %>
 
             <!--displays the row for the addl comments, by default: collapsed. -->
             <tr>
-              <td colspan="<%= (i+1).to_s %>" class="hiddenRow" >
-                <div id="hid<%= vm.questionnaire_type + vm.round.to_s + t(".comment") %>" class="accordion-body collapse" style="margin-left:10px;">
+              <td colspan="<%= (i_final+1).to_s %>" class="hiddenRow" >
+                <div id="hid<%= vm.questionnaire_type + vm.round.to_s + "comment" %>" class="accordion-body collapse" style="margin-left:10px;">
                   <div style="background-color:#A9A9F5;padding:4px;">
                     <table class="table tbl_addlcmt">
                       <thead>
@@ -228,11 +222,9 @@
                       <th ><%=t ".additional_comments"%></th>
                       </thead>
                       <tbody>
-                      <%k = 1%>
-                      <% vm.list_of_reviews.each do |review| %>
-                          <tr><td ><%= k %></td>
+                      <% vm.list_of_reviews.each_with_index do |review, k| %>
+                          <tr><td ><%= k+1 %></td>
                             <td ><%= Response.find(review.id)["additional_comment"] %></td></tr>
-                          <%k += 1%>
                       <% end %>
                       </tbody>
                     </table>
@@ -244,8 +236,7 @@
         </div>
           <!-- Display the list of team members, for Peer Reviews. -->
           <div style="margin-top:5px"></div>
-          <input class="btn btn-default" type="button" href="#" onclick="col_sort(<%=table_count%>)" data-toggle="tooltip" title=<%=t ".sort_by_total_review_score_tooltip"%> value=<%=t ".sort_by_total_review_score"%>/>
-          <% table_count += 1%>
+          <input class="btn btn-default" type="button" href="#" onclick="col_sort(<%=table_count%>)" data-toggle="tooltip" title="Sort reviews in ascending/descending order of the total score. Consecutive clicks will alternate between ascending and descending sort order" value="Sort by total review score"/>
           <span> <%= vm.display_team_members(session[:ip]) %></span>
           <!-- this elsif terminates the heatgrid code.  -->
         <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
@@ -267,8 +258,8 @@
     <%=t ".grade"%>: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
     <%=t ".Comment"%>: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %><br>
   <% end %>
-  <% if TaMapping.where(ta_id: @ta_id, course_id: @course_id).exists? %>
-  <h4 style="font-weight:bold;display:inline-block;">TA Grade-<%=t ".Comment"%>:</h4><br/>
+  <% if TaMapping.where(ta_id: @ta_id, course_id: @course_id).exists? || current_user == @assignment.instructor%>
+  <h4 style="font-weight:bold;display:inline-block;">TA Grade-Comment:</h4><br/>
     <%= form_tag 'save_grade_and_comment_for_submission' do %>
       <%= hidden_field_tag :participant_id, params[:id] %>
       <%= number_field_tag 'grade_for_submission', @team.try(:grade_for_submission) ,min: 0, max: 100, maxlength: 3, size: 3, class: "form-control width-150", placeholder: t(".grade") %><br/>

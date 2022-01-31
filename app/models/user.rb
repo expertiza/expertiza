@@ -186,9 +186,9 @@ class User < ActiveRecord::Base
     user = User.find_by(email: login)
     if user.nil?
       items = login.split("@")
-      shortName = items[0]
-      userList = User.where("name = ?", shortName)
-      user = userList.first if !userList.nil? && userList.length == 1
+      short_name = items[0]
+      user_list = User.where("name = ?", short_name)
+      user = user_list.first if !user_list.nil? && user_list.length == 1
     end
     user
   end
@@ -288,7 +288,7 @@ class User < ActiveRecord::Base
 
   def teaching_assistant_for?(student)
     return false unless teaching_assistant?
-    return false if student.role.name != 'Student'
+    return false unless student.role.name == 'Student'
     # We have to use the Ta object instead of User object
     # because single table inheritance is not currently functioning
     ta = Ta.find(id)

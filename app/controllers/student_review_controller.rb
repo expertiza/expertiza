@@ -58,5 +58,10 @@ class StudentReviewController < ApplicationController
     @all_assignments.each do |assignment|
         @response_ids << assignment.response_id
     end
+
+    # Redirect review bidding to the review bid controller if bidding enabled
+    if @assignment.review_choosing_algorithm == "Bidding"
+      redirect_to controller: 'review_bids', action: 'index', assignment_id: params[:assignment_id], id: params[:id]
+    end
   end
 end

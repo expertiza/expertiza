@@ -116,7 +116,7 @@ class UsersController < ApplicationController
     # if the user name already exists, register the user by email address
     check = User.find_by(name: params[:user][:name])
     params[:user][:name] = params[:user][:email] unless check.nil?
-    is_user=true
+    is_user = true
     # Assign all user params for creating user using assign_user_params function
     @user=assign_user_params(is_user)
     if @user.save

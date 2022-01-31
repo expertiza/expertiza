@@ -1,4 +1,4 @@
--<h2>Reviews for "<%= @assignment.name %>"</h2>
+<h2>Reviews for "<%= @assignment.name %>"</h2>
 
 <!-- Added the feature to find the reviews and meta-reviews left for students by E1839 @Rayan Dasoriya -->
 <% if @assignment.num_reviews_allowed.nil? || @assignment.num_reviews_allowed == -1%>
@@ -54,7 +54,7 @@
   <%= render :partial => 'responses', :locals => {:mappings => @metareview_mappings, :title => 'Metareview'} %>
     <br/>
     <% if @assignment.review_assignment_strategy == Assignment::RS_AUTO_SELECTED %>
-        <% if @num_metareviews_in_progress == 0 %>
+        <% if @num_metareviews_in_progress.zero? %>
             <%= render :partial => 'set_dynamic_metareview', :locals => {:assignment => @assignment} %>
         <% end %>
     <% end %>

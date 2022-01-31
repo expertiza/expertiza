@@ -8,7 +8,7 @@ class TeamsController < ApplicationController
   end
 
   # This function is used to create teams with random names.
-  # Instructors can call by clicking "Create temas" icon anc then click "Create teams" at the bottom.
+  # Instructors can call by clicking "Create teams" icon and then click "Create teams" at the bottom.
   def create_teams
     parent = Object.const_get(session[:team_type]).find(params[:id])
     Team.randomize_all_by_parent(parent, session[:team_type], params[:team_size].to_i)
@@ -33,7 +33,7 @@ class TeamsController < ApplicationController
     @parent = Object.const_get(session[:team_type] ||= 'Assignment').find(params[:id])
   end
 
-  # called when a instructor tries to create an empty namually.
+  # called when a instructor tries to create an empty team manually.
   def create
     parent = Object.const_get(session[:team_type]).find(params[:id])
     begin
@@ -67,6 +67,13 @@ class TeamsController < ApplicationController
   def edit
     @team = Team.find(params[:id])
   end
+
+  def delete_all
+    root_node = Object.const_get(session[:team_type] + "Node").find_by(node_object_id: params[:id])
+    child_nodes = root_node.get_teams.map{|e| e.node_object_id}
+    Team.destroy_all(id: child_nodes) if child_nodes
+    redirect_to action: 'list', id: params[:id]
+  end  
 
   def delete
     # delete records in team, teams_users, signed_up_teams table

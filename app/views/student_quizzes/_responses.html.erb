@@ -2,7 +2,7 @@
   <% review_no = 1%>
   <% mappings.each do | map | %>
     <% if @assignment.team_assignment?%>
-      <% reviewee = AssignmentTeam.get_first_member(map.reviewee_id) %>
+      <% reviewee = AssignmentTeam.first_member(map.reviewee_id) %>
     <% else %>
       <% reviewee = map.reviewee %>
     <% end %>

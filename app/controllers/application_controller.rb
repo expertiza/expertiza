@@ -102,7 +102,7 @@ class ApplicationController < ActionController::Base
   def are_needed_authorizations_present?(id, *authorizations)
     participant = Participant.find_by(id: id)
     return false if participant.nil?
-    authorization = Participant.get_authorization(participant.can_submit, participant.can_review, participant.can_take_quiz)
+    authorization = participant.authorization
     !authorizations.include?(authorization)
   end
 

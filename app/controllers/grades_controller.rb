@@ -7,6 +7,7 @@ class GradesController < ApplicationController
   include AssignmentHelper
   include GradesHelper
   include AuthorizationHelper
+  include Scoring
 
   def action_allowed?
     case params[:action]
@@ -37,7 +38,6 @@ class GradesController < ApplicationController
   def view
     @assignment = Assignment.find(params[:id])
     questionnaires = @assignment.questionnaires
-
     if @assignment.vary_by_round
       @questions = retrieve_questions questionnaires, @assignment.id
     else
@@ -46,8 +46,7 @@ class GradesController < ApplicationController
         @questions[questionnaire.symbol] = questionnaire.questions
       end
     end
-
-    @scores = ResponseMap.scores(@assignment,@questions)
+    @scores = review_grades(@assignment,@questions)
     averages = vector(@scores)
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)
@@ -64,7 +63,7 @@ class GradesController < ApplicationController
     questionnaires = @assignment.questionnaires
     @questions = retrieve_questions questionnaires, @assignment.id
     # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
-    @pscore = ResponseMap.participant_scores(@participant, @questions)
+    @pscore = participant_scores(@participant, @questions)
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
     @stage = @participant.assignment.current_stage(@topic_id)
@@ -85,7 +84,7 @@ class GradesController < ApplicationController
     @team_id = @team.id
     questionnaires = @assignment.questionnaires
     @questions = retrieve_questions questionnaires, @assignment.id
-    @pscore = ResponseMap.participant_scores(@participant, @questions)
+    @pscore = participant_scores(@participant, @questions)
     @vmlist = []
 
     # loop through each questionnaire, and populate the view model for all data necessary
@@ -112,7 +111,7 @@ class GradesController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     @questions = list_questions(@assignment)
-    @scores = ResponseMap.participant_scores(@participant, @questions)
+    @scores = participant_scores(@participant, @questions)
   end
 
   def instructor_review

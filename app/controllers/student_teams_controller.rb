@@ -37,6 +37,10 @@ class StudentTeamsController < ApplicationController
     end
   end
 
+  def controller_locale
+    locale_for_student
+  end
+
   def view
     # View will check if send_invs and recieved_invs are set before showing
     # only the owner should be able to see those.

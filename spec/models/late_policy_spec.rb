@@ -9,6 +9,57 @@ describe LatePolicy do
   let(:review_response_map) {build(:review_response_map)}
   let (:response) {build(:response)}
 
+  describe 'validations' do
+    it 'validates presence of policy_name' do
+      late_policy.policy_name = ""
+      expect(late_policy).not_to be_valid
+    end
+    it 'validates presence of instructor_id' do
+      late_policy.instructor_id = ""
+      expect(late_policy).not_to be_valid
+    end
+    it 'validates presence of max_penalty' do
+      late_policy.max_penalty = ""
+      expect(late_policy).not_to be_valid
+    end
+    it 'validates presence of penalty_per_unit' do
+      late_policy.penalty_per_unit = ""
+      expect(late_policy).not_to be_valid
+    end
+    it 'validates presence of penalty_unit' do
+      late_policy.penalty_unit = ""
+      expect(late_policy).not_to be_valid
+    end
+    it 'validates max_penalty is > 0 and < 100' do
+      late_policy.max_penalty = -10
+      expect(late_policy).not_to be_valid
+      late_policy.max_penalty = 10
+      expect(late_policy).to be_valid
+      late_policy.max_penalty = 110
+      expect(late_policy).not_to be_valid
+    end
+    it 'validates max_penalty is numerical' do
+      late_policy.max_penalty = "word"
+      expect(late_policy).not_to be_valid
+    end
+    it 'validates penalty_per_unit is greater_than 0' do
+      late_policy.penalty_per_unit = -10
+      expect(late_policy).not_to be_valid
+      late_policy.penalty_per_unit = 10
+      expect(late_policy).to be_valid
+    end
+    it 'validates penalty_per_unit is numerical' do
+      late_policy.penalty_per_unit = "word"
+      expect(late_policy).not_to be_valid
+    end
+    it 'validates policy_name has 2+ characters and is alphanumeric' do
+      late_policy.policy_name = "a"
+      expect(late_policy).not_to be_valid
+      late_policy.policy_name = "a name"
+      expect(late_policy).to be_valid
+    end
+  end
+
   # testing positive scenario where same policy name is found for an instructor.
   describe '#check_policy_same_name' do
     it 'returns true when policy with same name already exists' do

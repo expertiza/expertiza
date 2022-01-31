@@ -484,7 +484,7 @@ class AssignmentsController < ApplicationController
 
     @due_date_info = DueDate.find_each(parent_id: params[:id])
 
-    DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all if params[:metareviewAllowed] == "false"
+    DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all if params[:metareview_allowed] == "false"
   end
 
   # sets assignment time zone if not specified and flashes a warning

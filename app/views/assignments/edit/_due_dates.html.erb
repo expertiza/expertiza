@@ -502,9 +502,9 @@
 <%= label_tag('teamFormationAllowed', 'Use team formation deadline') %><br/>
 </span>
 
-<input name="metareviewAllowed" type="hidden" value="false"/>
-<%= check_box_tag('metareviewAllowed', 'true', @metareview_allowed, :onclick => "removeOrAddMetareview()") %>
-<%= label_tag('metareviewAllowed', 'Use meta-review deadline') %><br/><br/>
+<input name="metareview_allowed" type="hidden" value="false"/>
+<%= check_box_tag('metareview_allowed', 'true', @metareview_allowed, :onclick => "removeOrAddMetareview()") %>
+<%= label_tag('metareview_allowed', 'Use meta-review deadline') %><br/><br/>
 <div id="date_updater_div">
   <button type="button" id="show_date_updater" class="btn btn-default" style="margin-bottom: 20px; margin-right: 10px; float: left">Show/Hide Date Updater</button>
 </div>

@@ -1,0 +1,7 @@
+# .github/config/rubocop_linter_action.yml
+
+# Description: The scope of code that Rubocop should lint. Use this if you only want to lint changed files. If this is not set
+# or not equal to 'modified', Rubocop is run against the entire codebase. Note that this will not work on the master branch.
+# Valid options: 'modified'
+# Default: nil
+check_scope: 'modified'

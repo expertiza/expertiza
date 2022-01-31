@@ -1,5 +1,5 @@
 <% if SignUpTopic.has_suggested_topic?(@assignment.id) %>
-    <h2>Your approved suggested topic</h2>
+    <h2><%=t ".approved_suggestion"%></h2>
     <table class="general">
       <tr><%= render :partial => 'table_header' %></tr>
       <br/>

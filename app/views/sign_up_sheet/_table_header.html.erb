@@ -1,25 +1,25 @@
-<th width="5%">Topic ID</th>
-<th width="5%">Select</th>
+<th width="5%"><%=t ".topic_id"%></th>
+<th width="5%"><%=t ".select"%></th>
 <% if @assignment.vary_by_topic %>
-  <th width="25%">Topic name(s)</th>
-  <th width="25%">Questionnaire</th>
+  <th width="25%"><%=t ".topic_name"%></th>
+  <th width="25%"><%=t ".questionnaire"%></th>
 <% else %>
-    <th width="50%">Topic name(s)</th>
+    <th width="50%"><%=t ".topic_name"%></th>
 <% end %>
 <% if @assignment.microtask? %>
-  <th width="5%">Micro- payment</th>
+  <th width="5%"><%=t ".micro_payment"%></th>
 <% end %>
 <% if not @assignment.is_intelligent or  ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? current_user_role?.name %>
-  <th width="5%">Num. of slots</th>
-  <th width="5%">Available slots</th>
-  <th width="5%">Num. on waitlist</th>
-  <th width="10%"> Bookmarks
+  <th width="5%"><%=t ".num_slots"%></th>
+  <th width="5%"><%=t ".available_slots"%></th>
+  <th width="5%"><%=t ".num_waitlist"%></th>
+  <th width="10%"> <%=t ".bookmarks"%>
     <!--Bookmarks may be disabled for this assignment-->
-    <% unless @use_bookmark %> (disabled) <% end %>
+    <% unless @use_bookmark %> <%=t ".disabled"%> <% end %>
   </th>
   <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>
-      <th width="10%">Actions</th>
-      <th width="5%">Advertise- ment(s)</th>
+      <th width="10%"><%=t ".actions"%></th>
+      <th width="5%"><%=t ".advertise"%></th>
   <% end %>
 
 <% end %>

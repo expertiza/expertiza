@@ -174,6 +174,7 @@ resources :institution, except: [:destroy] do
   resources :join_team_requests do
     collection do
       post :decline
+      get :index
     end
   end
 
@@ -305,6 +306,14 @@ resources :institution, except: [:destroy] do
       get :show_calibration_results_for_student
       post :custom_create
       get :json
+    end
+  end
+
+  resources :review_bids do
+    collection do
+      post :assign_bidding
+      post :set_priority
+      post :index
     end
   end
 
@@ -458,7 +467,7 @@ resources :institution, except: [:destroy] do
   resources :teams, only: %i[new create edit update] do
     collection do
       get :list
-      # post ':id', action: :create_teams
+      post ':id', action: :update
       post :create_teams
       post :inherit
     end

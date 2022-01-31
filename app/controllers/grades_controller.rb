@@ -27,6 +27,10 @@ class GradesController < ApplicationController
     end
   end
 
+  def controller_locale
+    locale_for_student
+  end
+
   # the view grading report provides the instructor with an overall view of all the grades for
   # an assignment. It lists all participants of an assignment and all the reviews they received.
   # It also gives a final score, which is an average of all the reviews and greatest difference

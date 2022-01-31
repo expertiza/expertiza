@@ -1,0 +1,21 @@
+name: RuboCop
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      BUNDLE_WITHOUT: default doc job cable storage ujs test db
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Ruby 2.7
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.7
+        bundler-cache: true
+
+    - name: Run RuboCop
+      run: bundle exec rubocop --parallel

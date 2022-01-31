@@ -31,10 +31,14 @@ class StudentTeamsController < ApplicationController
     when 'create'
       current_user_has_id? student.user_id
     when 'edit', 'update'
-      team.get_participants.map(&:user_id).include? current_user.id
+      current_user_has_id? team.user_id
     else
       true
     end
+  end
+
+  def controller_locale
+    locale_for_student
   end
 
   def view
@@ -93,7 +97,7 @@ class StudentTeamsController < ApplicationController
         redirect_to view_student_teams_path student_id: params[:student_id]
 
       end
-    elsif matching_teams.length == 1 && (matching_teams[0].name == team.name)
+    elsif matching_teams.length == 1 && (matching_teams.name == team.name)
 
       team_created_successfully
       redirect_to view_student_teams_path student_id: params[:student_id]
@@ -101,7 +105,7 @@ class StudentTeamsController < ApplicationController
     else
       flash[:notice] = 'That team name is already in use.'
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Team name being updated to was already in use', request)
-      redirect_to edit_student_teams_path team_id: params[:team_id], student_id: params[:student_id]
+      redirect_to view_student_teams_path student_id: params[:student_id]
 
     end
   end

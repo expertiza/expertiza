@@ -1,4 +1,4 @@
-<h2>Questions</h2>
+<h2><%=t ".questions"%></h2>
 <% @map = ResponseMap.find(params[:map_id]) %>
 <% @questionnaire = Questionnaire.find(@map.reviewed_object_id) %>
 <% @reviewee_participant=AssignmentTeam.find(@map.reviewee_id).participants.first%>
@@ -19,5 +19,5 @@
       <%= question.complete.html_safe %>
       <br>
     <% end %>
-  <%= submit_tag "Submit Quiz", :name=>"save" %>
+  <%= submit_tag t(".submit_quiz"), :name=>"save" %>
 <% end %>

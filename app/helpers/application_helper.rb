@@ -1,6 +1,6 @@
 # Methods added to this helper will be available to all templates in the application.
 module ApplicationHelper
-  def is_available(user, owner_id)
+  def available?(user, owner_id)
     user.id == owner_id ||
       user.admin? ||
       user.super_admin?

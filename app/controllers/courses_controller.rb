@@ -7,7 +7,7 @@
 # change access permission from public to private or vice versa
 class CoursesController < ApplicationController
   include AuthorizationHelper
-  
+
   autocomplete :user, :name
   require 'fileutils'
 
@@ -162,5 +162,7 @@ class CoursesController < ApplicationController
     @course.directory_path = params[:course][:directory_path]
     @course.info = params[:course][:info]
     @course.private = params[:course][:private].nil? ? 0 : params[:course][:private]
+    @course.locale = params[:course][:locale]
   end
+
 end

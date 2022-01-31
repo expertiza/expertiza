@@ -36,6 +36,10 @@ class SignUpSheetController < ApplicationController
   verify method: :post, only: %i[destroy create update],
          redirect_to: {action: :list}
 
+  def controller_locale
+    locale_for_student
+  end
+
   # Prepares the form for adding a new topic. Used in conjunction with create
   def new
     @id = params[:id]

@@ -19,6 +19,10 @@ class StudentTaskController < ApplicationController
     ta_role.include? original_user.role_id
   end
 
+  def controller_locale
+    locale_for_student
+  end
+
   def list
     redirect_to(controller: 'eula', action: 'display') if current_user.is_new_user
     session[:user] = User.find_by(id: current_user.id)
@@ -93,7 +97,7 @@ class StudentTaskController < ApplicationController
 	end
    end  
 
-  
+
 
   
   

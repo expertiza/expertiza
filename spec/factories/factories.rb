@@ -3,6 +3,11 @@ FactoryBot.define do
     name 'North Carolina State University'
   end
 
+  factory :review_bid, class: ReviewBid do
+    priority 2
+    signuptopic_id 123
+  end
+
   factory :role_of_administrator, class: Role do
     name 'Administrator'
     parent_id nil
@@ -655,6 +660,11 @@ FactoryBot.define do
     size '70,1'
   end
 
+  factory :content_page, class: ContentPage do
+    title 'Expertiza Home'
+    name 'home'
+  end
+  
   factory :suggestion, class: Suggestion do
     id 1
     assignment_id 1

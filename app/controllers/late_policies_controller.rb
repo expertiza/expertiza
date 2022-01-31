@@ -1,7 +1,6 @@
 class LatePoliciesController < ApplicationController
   include AuthorizationHelper
 
-  # determines if an action is allowed for a user
   def action_allowed?
     case params[:action]
     when 'new', 'create', 'index'
@@ -11,9 +10,7 @@ class LatePoliciesController < ApplicationController
       current_user.instructor_id == instructor_id
     end
   end
-  # display all late policies
-  # GET /late_policies
-  # GET /late_policies.xml
+
   def index
     @penalty_policies = LatePolicy.all
     respond_to do |format|
@@ -22,8 +19,6 @@ class LatePoliciesController < ApplicationController
     end
   end
 
-  # GET /late_policies/1
-  # GET /late_policies/1.xml
   def show
     @penalty_policy = LatePolicy.find(params[:id])
     respond_to do |format|
@@ -32,9 +27,6 @@ class LatePoliciesController < ApplicationController
     end
   end
 
-  # GET /late_policies/new
-  # GET /late_policies/new.xml
-  # creates and renders a new assignment form
   def new
     @late_policy = LatePolicy.new
     respond_to do |format|
@@ -43,15 +35,10 @@ class LatePoliciesController < ApplicationController
     end
   end
 
-  # GET /late_policies/1/edit
-  # edits a late policy's rubrics
   def edit
     @penalty_policy = LatePolicy.find(params[:id])
   end
 
-  # POST /late_policies
-  # POST /late_policies.xml
-  # creates a new late policy via the late policy form
   def create
     # penalty per unit cannot be greater than maximum penalty
     invalid_penalty_per_unit = params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
@@ -84,9 +71,6 @@ class LatePoliciesController < ApplicationController
     end
   end
 
-  # PUT /late_policies/1
-  # PUT /late_policies/1.xml
-  # update a late policy via the late policy form
   def update
     @penalty_policy = LatePolicy.find(params[:id])
     # if name has changed then only check for this
@@ -116,9 +100,6 @@ class LatePoliciesController < ApplicationController
     end
   end
 
-  # DELETE /late_policies/1
-  # DELETE /late_policies/1.xml
-  # deletes the late policy
   def destroy
     @penalty_policy = LatePolicy.find(params[:id])
     begin

@@ -1,28 +1,33 @@
-# .github/workflows/rubocop.yml
+name: Rubocop
 
-name: RuboCop
-
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
-  build:
+  codespell:
+    name: Check spelling all files with codespell
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        python-version: [3.8]
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up Ruby 2.7 
-      uses: actions/setup-ruby@v1
-      with:
-        ruby-version: 2.7 # Replace with your ruby version
-    - name: Gems Cache
-      id: gem-cache
-      uses: actions/cache@v1
-      with:
-        path: vendor/bundle
-        key: ${{ runner.os }}-gem-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gem-
-    - name: Rubocop Linter Action
-      uses: andrewmcodes/rubocop-linter-action@v3.0.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install codespell
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Check spelling with codespell
+        run: codespell --ignore-words=codespell.txt || exit 1
+  misspell:
+    name: Check spelling all files in commit with misspell
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install
+        run: wget -O - -q https://git.io/misspell | sh -s -- -b .
+      - name: Misspell
+        run: git ls-files --empty-directory | xargs ./misspell -i 'aircrafts,devels,invertions' -error

@@ -37,8 +37,7 @@ class ViewTranslationSubstitutor
   end
 
   def process_translation(contents, key, val)
-    replacements, skips = [], []
-    puts contents.to_s 
+    replacements, skips = [], [] 
     resume_index = 0
     while resume_index < contents.length do
       match_data = contents[resume_index, contents.length].match(/#{BLACKLIST}(\s+)?(#{Regexp.escape(val)})(\s+)?#{BLACKLIST}/)

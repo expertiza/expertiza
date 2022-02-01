@@ -4,7 +4,7 @@
     <% display_to_author = Team.exists?(team_id) && Team.find(team_id).user?(@current_user)%>
 
     <% if display_to_author %>
-      <h5>Hyperlink Actions:</h5>
+      <h5><%=t ".hyperlink_action"%></h5>
       <%= f.submit 'Delete selected hyperlink' %>
     <% end  %>
     </br>
@@ -13,7 +13,7 @@
     </br>
   <% end %>
 
-  <a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">hide links</a><br/>
+  <a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;"><%=t ".hide_link"%></a><br/>
   <div id="url" style="">
     <ul>
       <% participant.team.hyperlinks.each_with_index {

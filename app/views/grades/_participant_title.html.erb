@@ -14,30 +14,30 @@
 
 <tr <% if prefix %>id='<%= prefix %>_1' style="background-color: #f9f9f9;"<% end %>>
 <th style="text-align:center;" WIDTH="<%= namecolwidth %>%">&nbsp;</th>
-<th style="text-align:center;" COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Submitted work</th>
+<th style="text-align:center;" COLSPAN="2" WIDTH="<%= colwidth*2 %>%"><%=t ".submitted_work"%></th>
 <% if has_team_and_metareview?[:has_metareview] %>
-	<th style="text-align:center;" COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Reviewing</th>
+	<th style="text-align:center;" COLSPAN="2" WIDTH="<%= colwidth*2 %>%"><%=t ".reviewing"%></th>
 <% end %>
-<th style="text-align:center;" COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Author Feedback</th>
+<th style="text-align:center;" COLSPAN="2" WIDTH="<%= colwidth*2 %>%"><%=t ".author_feedback"%></th>
 <% if has_team_and_metareview?[:has_team] %>
-  <th style="text-align:center;" COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Teammate Review</th>
+  <th style="text-align:center;" COLSPAN="2" WIDTH="<%= colwidth*2 %>%"><%=t ".teammate_review"%></th>
 <% end %>
 <th style="text-align:center;" WIDTH="<%= colwidth %>%">&nbsp;</th></tr>           
 
 <tr <% if prefix %>id='<%= prefix %>_2' style="display:none; background-color: #f9f9f9;"<% end %>>
-<th style="text-align:left;" WIDTH="<%= namecolwidth %>%" ALIGN="LEFT">Contributor</th>
-<th style="text-align:center;" WIDTH="<%= colwidth %>%">Average</th>
-<th style="text-align:center;" WIDTH="<%= colwidth %>%">Range</th>
+<th style="text-align:left;" WIDTH="<%= namecolwidth %>%" ALIGN="LEFT"><%=t ".contributor"%></th>
+<th style="text-align:center;" WIDTH="<%= colwidth %>%"><%=t ".average"%></th>
+<th style="text-align:center;" WIDTH="<%= colwidth %>%"><%=t ".range"%></th>
 <% if has_team_and_metareview?[:has_metareview] %>
-	<th style="text-align:center;" WIDTH="<%= colwidth %>%">Average</th>
-	<th style="text-align:center;" WIDTH="<%= colwidth %>%">Range </th>
+	<th style="text-align:center;" WIDTH="<%= colwidth %>%"><%=t ".average"%></th>
+	<th style="text-align:center;" WIDTH="<%= colwidth %>%"><%=t ".range"%> </th>
 <% end %> 
-<th style="text-align:center;" WIDTH="<%= colwidth %>%">Average</th>
-<th style="text-align:center;" WIDTH="<%= colwidth %>%">Range </th>
+<th style="text-align:center;" WIDTH="<%= colwidth %>%"><%=t ".average"%></th>
+<th style="text-align:center;" WIDTH="<%= colwidth %>%"><%=t ".range"%> </th>
   <!--ACS Display teammate review ratings only for teams with size greater than 1-->
 <% if has_team_and_metareview?[:has_team] %>
-	<th style="text-align:center;" WIDTH="<%= colwidth %>%">Average</th>
-	<th style="text-align:center;" WIDTH="<%= colwidth %>%">Range </th>
+	<th style="text-align:center;" WIDTH="<%= colwidth %>%"><%=t ".average"%></th>
+	<th style="text-align:center;" WIDTH="<%= colwidth %>%"><%=t ".range"%> </th>
 <% end %>   
-<th style="text-align:center;" WIDTH="<%= colwidth %>%">Final Score</th></tr>    
+<th style="text-align:center;" WIDTH="<%= colwidth %>%"><%=t ".final_score"%></th></tr>    
     

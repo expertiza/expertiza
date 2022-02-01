@@ -1,0 +1,114 @@
+<% session[:return_to] = request.url %>
+<% if flash[:notice] != nil and flash[:notice].strip != "" %>
+       <div class="flash_error">
+       <%= flash[:notice] %>
+       </div>
+<% end %>
+
+<h2>Reviews for "<%= @assignment.name %>"</h2>
+
+<!-- add headers that provide information regarding review numbers -->
+<% if @assignment.num_reviews_allowed.nil? || @assignment.num_reviews_allowed == -1%>
+    <h4>Your instructor expects you to do <%= @assignment.num_reviews_required %> reviews. You are not allowed to do any extra reviews. </h4>
+<% elsif @assignment.num_reviews_allowed == @assignment.num_reviews_required %>
+    <h4>You should perform exactly <%= @assignment.num_reviews_allowed %> reviews </h4>
+<% else %>
+    <h4>You may perform between <%= @assignment.num_reviews_required %> and <%= @assignment.num_reviews_allowed %> reviews</h4>
+<% end %>
+<h4>You are required to do <%= @assignment.num_reviews_required %> reviews</h4>
+<h4> Number of reviews left: <%= @assignment.num_reviews_allowed - @num_reviews_completed %></h4>
+
+<!-- table with reviews available to complete -->
+<table>
+  <% review_no = 1 %>
+  <% title = 'Review' %>
+  <!-- loop through each review map -->
+  <% @review_mappings.each do |map| %>
+      <%@sorted_responses=[]%>
+      <% team = AssignmentTeam.find(map.reviewee_id) %>
+      <% participant = team.participants.first %>
+
+      <% if participant %>
+          <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
+          <tr>
+            <td>
+              <b><%= "#{title} #{review_no}." %></b>
+              <!--In ‘review_bids/index’ page, if the topic_identifier is empty, ‘:’ sign should not be displayed.-->
+              <% if !topic_id.nil? %>
+                  <% if SignUpTopic.find(topic_id).topic_identifier != '' %>
+                      <%= " #{SignUpTopic.find(topic_id).topic_identifier}: #{SignUpTopic.find(topic_id).topic_name}" %>
+                  <% else %>
+                      <%= " #{SignUpTopic.find(topic_id).topic_name}" %>
+                  <% end %>
+              <% end %>
+
+              <%if !@assignment.is_anonymous%>
+                &nbsp; (author: <%= participant.fullname%>)
+              <%end%>
+            </td>
+            <% latest_submission = team.most_recent_submission %>
+            <td>&nbsp;</td>
+            <% if !map.response.empty? && latest_submission %>
+                <% array_not_empty = 0 %>
+                <% @sorted_responses = Array.new %>
+                <% @prev = Response.where(:map_id => map.id) %>
+                <% for element in @prev %>
+                    <% array_not_empty = 1 %>
+                    <% @sorted_responses << element %>
+                <% end %>
+
+                <% if array_not_empty == 1 %>
+                    <% @sorted_responses = @sorted_responses.sort_by {|obj| obj.updated_at} # the latest should be at the last%>
+                    <% @latest_response = @sorted_responses.last %>
+
+                    <%if @latest_response.round.nil?%>
+                      <% last_response_round = AssignmentDueDate.done_in_assignment_round(@assignment.id,@latest_response) %>
+                    <%else%>
+                      <% last_response_round = @latest_response.round %>
+                    <%end%>
+
+                    <% current_round = @assignment.number_of_current_round(topic_id) %>
+
+                    <td>
+                        <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
+                    </td>
+
+                    <% if @assignment.current_stage(topic_id) != "Finished" %>
+                      <%- # show the link as 'Edit' when latest review is done in current round -%>
+                      <%- # show link as 'Update' when latest review is done in different round or there has been a new submission in current round -%>
+                      <% if last_response_round == current_round%>
+
+                        <td>
+                          <%- # If review is not submitted (is still being edited), show an 'Edit' link. -%>
+                          <% if !@latest_response.is_submitted %>
+                              <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
+
+                          <%- # If the submission has been updated since it was last reviewed, show an 'Update' link-%>
+                          <% elsif @latest_response.updated_at < latest_submission.updated_at %>
+                              <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
+                          <%end%>
+                        </td>
+                      <% else %>
+                        <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
+                      <% end %>
+                    <% end %>
+                    <td><%= "  -- latest update at #{@latest_response.updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p")}" %></td>
+          <%end%>
+            <% elsif @assignment.current_stage(topic_id) != "Complete" && @assignment.can_review(topic_id) && latest_submission%>
+                <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
+                <td>&nbsp;&nbsp;</td>
+
+            <%- # If the team being reviewed has not submitted yet -%>
+            <% else %>
+                <td> Work has not yet been submitted for Review
+                <%= review_no  %></td>
+            <% end %>
+            <% review_no+=1 %>
+
+          </tr>
+      <% end %>
+    <% end%>
+</table>
+<br>
+<BR/>
+<%= link_to "Back", :controller=>'student_task', :action => 'view', :id => @participant.id %>

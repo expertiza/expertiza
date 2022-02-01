@@ -18,7 +18,7 @@ class StandardizeReviewOfReviewMappings < ActiveRecord::Migration
     rename_column :review_of_review_mappings, :review_mapping_id, :reviewed_object_id
 
     
-    records = ActiveRecord::Migration.connection.select_all("select * from `review_of_review_mappings`")
+    records = ActiveRecord::Base.connection.select_all("select * from `review_of_review_mappings`")
 
     records.each{
       | mapping |
@@ -50,8 +50,8 @@ class StandardizeReviewOfReviewMappings < ActiveRecord::Migration
       today = Time.now             
       oldest_allowed_time = Time.local(today.year - 1,today.month,today.day,0,0,0)     
 
-      review = ActiveRecord::Migration.connection.select_one("select * from `review_of_reviews` where mapping_id = #{mapping["id"]}")
-      review_mapping = ActiveRecord::Migration.connection.select_one("select * from `review_mappings` where id = #{mapping["reviewed_object_id"]}")
+      review = ActiveRecord::Base.connection.select_one("select * from `review_of_reviews` where mapping_id = #{mapping["id"]}")
+      review_mapping = ActiveRecord::Base.connection.select_one("select * from `review_mappings` where id = #{mapping["reviewed_object_id"]}")
 
       assignment = Assignment.find(review_mapping.assignment_id)
       if assignment.nil?

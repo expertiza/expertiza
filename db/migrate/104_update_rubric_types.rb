@@ -1,6 +1,6 @@
 class UpdateRubricTypes < ActiveRecord::Migration
   def self.up
-    metareview_type = ActiveRecord::Migration.connection.select_one("select * from `questionnaire_types` where name = 'Metareview'")
+    metareview_type = ActiveRecord::Base.connection.select_one("select * from `questionnaire_types` where name = 'Metareview'")
     pnode = QuestionnaireTypeNode.find_by_node_object_id(metareview_type["id"])
     questionnaires = Questionnaire.where(['id in (6,16,43,91)'])
     questionnaires.each{
@@ -15,7 +15,7 @@ class UpdateRubricTypes < ActiveRecord::Migration
          scores = Score.where(['question_id = ?',question.id])
          scores.each{
             | score | 
-            metareview = ActiveRecord::Migration.connection.select_one("select * from `review_of_reviews where id = #{score.instance_id}")
+            metareview = ActiveRecord::Base.connection.select_one("select * from `review_of_reviews where id = #{score.instance_id}")
             if metareview != nil
               score.update_attribute('questionnaire_type_id',metareview_type["id"])              
             end

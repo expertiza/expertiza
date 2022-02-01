@@ -7,7 +7,7 @@ class CreateTeammateReviewMappings < ActiveRecord::Migration
     end
     
     add_column :teammate_reviews, :mapping_id, :integer, :null => false
-    records = ActiveRecord::Migration.connection.select_all("select * from `teammate_reviews`")
+    records = ActiveRecord::Base.connection.select_all("select * from `teammate_reviews`")
       
     records.each{
        | review |

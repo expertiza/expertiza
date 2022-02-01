@@ -32,34 +32,34 @@ class CreateResponseMaps < ActiveRecord::Migration
              ADD CONSTRAINT fk_score_response
              FOREIGN KEY (response_id) REFERENCES responses(id)'              
     
-    ActiveRecord::Migration.connection.select_all("select * from review_of_review_mappings").each{
+    ActiveRecord::Base.connection.select_all("select * from review_of_review_mappings").each{
        | map | 
-       rmap = ActiveRecord::Migration.connection.select_all("select * from review_mappings where id = #{map['reviewed_object_id']}")       
+       rmap = ActiveRecord::Base.connection.select_all("select * from review_mappings where id = #{map['reviewed_object_id']}")       
        assignment = Assignment.find(rmap[0]['reviewed_object_id'].to_i) 
        create_response_map(map,"review_of_reviews","MetareviewResponseMap", "MetareviewQuestionnaire",assignment)       
     }
     
-    ActiveRecord::Migration.connection.select_all("select * from feedback_mappings").each{
+    ActiveRecord::Base.connection.select_all("select * from feedback_mappings").each{
        | map | 
-       review = ActiveRecord::Migration.connection.select_all("select * from reviews where id = #{map['reviewed_object_id']}")
-       rmap = ActiveRecord::Migration.connection.select_all("select * from review_mappings where id = #{review[0]['mapping_id']}")
+       review = ActiveRecord::Base.connection.select_all("select * from reviews where id = #{map['reviewed_object_id']}")
+       rmap = ActiveRecord::Base.connection.select_all("select * from review_mappings where id = #{review[0]['mapping_id']}")
        assignment = Assignment.find(rmap[0]['reviewed_object_id'].to_i)              
        create_response_map(map,"review_feedbacks","FeedbackResponseMap", "AuthorFeedbackQuestionnaire",assignment)
     }  
     
-    ActiveRecord::Migration.connection.select_all("select * from teammate_review_mappings").each{
+    ActiveRecord::Base.connection.select_all("select * from teammate_review_mappings").each{
        | map | 
        assignment = Assignment.find(map['reviewed_object_id'].to_i)               
        create_response_map(map,"teammate_reviews","TeammateReviewResponseMap", "TeammateReviewQuestionnaire",assignment)        
     }     
    
     # create response mappings as associate to a given review object
-    ActiveRecord::Migration.connection.select_all("select * from review_mappings").each{
+    ActiveRecord::Base.connection.select_all("select * from review_mappings").each{
        | map | 
        
        assignment = Assignment.find(map['reviewed_object_id'].to_i) 
        
-       review = ActiveRecord::Migration.connection.select_all("select * from reviews where mapping_id = #{map['id']}")
+       review = ActiveRecord::Base.connection.select_all("select * from reviews where mapping_id = #{map['id']}")
        if map['type'] = 'ParticipantReviewMapping'
           map_type = "ParticipantReviewResponseMap"
        else
@@ -118,7 +118,7 @@ class CreateResponseMaps < ActiveRecord::Migration
    
     today = Time.now             
     oldest_allowed_time = Time.local(today.year - 1,today.month,today.day,0,0,0)    
-       review = ActiveRecord::Migration.connection.select_all("select * from #{review_type} where mapping_id = #{map['id']}")
+       review = ActiveRecord::Base.connection.select_all("select * from #{review_type} where mapping_id = #{map['id']}")
         rmap = Object.const_get(map_type).create(
                   :reviewed_object_id => map['reviewed_object_id'].to_i,
                   :reviewer_id => map['reviewer_id'].to_i,

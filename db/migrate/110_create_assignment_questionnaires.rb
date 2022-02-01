@@ -35,7 +35,7 @@ class CreateAssignmentQuestionnaires < ActiveRecord::Migration
       make_association('TeammateReviewQuestionnaire', assignment, assignment.teammate_review_questionnaire_id)        
     }
     
-    l_records = ActiveRecord::Migration.connection.select_all("select * from notification_limits")
+    l_records = ActiveRecord::Base.connection.select_all("select * from notification_limits")
         
     l_records.each{
       |l|
@@ -53,8 +53,8 @@ class CreateAssignmentQuestionnaires < ActiveRecord::Migration
       begin
         q = Object.const_get(model).find(questionnaire_id)
         association = AssignmentQuestionnaire.create(:assignment_id => assignment.id, :questionnaire_id => q.id)
-        l_records = ActiveRecord::Migration.connection.select_all("select * from notification_limits where assignment_id = #{assignment.id} and questionnaire_id = #{q.id}")
-        w_records = ActiveRecord::Migration.connection.select_all("select * from questionnaire_weights where assignment_id = #{assignment.id} and questionnaire_id = #{q.id}")         
+        l_records = ActiveRecord::Base.connection.select_all("select * from notification_limits where assignment_id = #{assignment.id} and questionnaire_id = #{q.id}")
+        w_records = ActiveRecord::Base.connection.select_all("select * from questionnaire_weights where assignment_id = #{assignment.id} and questionnaire_id = #{q.id}")         
         
         if l_records.length > 0
           association.update_attribute("user_id",l_records[0]['user_id'])

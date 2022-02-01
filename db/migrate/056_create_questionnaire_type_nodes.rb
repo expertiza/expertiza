@@ -1,5 +1,5 @@
 class CreateQuestionnaireTypeNodes < ActiveRecord::Migration  
-  def self.up
+  def self.up      
     #Retrieve all questionnaire types
     types = ActiveRecord::Base.connection.select_all("select * from questionnaire_types")          
     folder = TreeFolder.find_by_name('Questionnaires')

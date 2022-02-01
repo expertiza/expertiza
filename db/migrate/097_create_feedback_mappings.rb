@@ -20,12 +20,12 @@ class CreateFeedbackMappings < ActiveRecord::Migration
              FOREIGN KEY (reviewee_id) references participants(id)"    
     
     add_column :review_feedbacks, :mapping_id, :integer, :null => false     
-    records = ActiveRecord::Migration.connection.select_all("select * from `review_feedbacks`")
+    records = ActiveRecord::Base.connection.select_all("select * from `review_feedbacks`")
     
     records.each{
        | feedback | 
-       review = ActiveRecord::Migration.connection.select_one("select * from `reviews` where id = #{feedback["review_id"]}")
-       reviewmap = ActiveRecord::Migration.connection.select_one("select * from `review_mappings` where id = #{review["review_mapping_id"]}")
+       review = ActiveRecord::Base.connection.select_one("select * from `reviews` where id = #{feedback["review_id"]}")
+       reviewmap = ActiveRecord::Base.connection.select_one("select * from `review_mappings` where id = #{review["review_mapping_id"]}")
        
        unless reviewmap.nil?
          reviewer = get_reviewer(reviewmap, feedback)
@@ -34,7 +34,7 @@ class CreateFeedbackMappings < ActiveRecord::Migration
        unless reviewer.nil? || reviewee.nil?
          execute "INSERT INTO `feedback_mappings (`reviewer_id`, `reviewee_id`, `reviewed_object_id`) VALUES
             (#{reviewer.id}, #{reviewee.id}, #{review["id"]});" 
-         map = ActiveRecord::Migration.connection.select_one("select * from `feedback_mappings` where id = (select max(id) from `feedback_mappings`)")
+         map = ActiveRecord::Base.connection.select_one("select * from `feedback_mappings` where id = (select max(id) from `feedback_mappings`)")
          execute "update `review_feedbacks` set mapping_id = #{map.id} where id = #{feedback["id"]}"         
        else
          execute "delete from `review_feedbacks where id = #{feedback["id"]}"         

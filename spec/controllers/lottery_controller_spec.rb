@@ -1,6 +1,6 @@
 describe LotteryController do
-  let(:assignment) { create(:assignment, is_intelligent: true, name: "assignment") }
-  let(:assignment_2) { create(:assignment, is_intelligent: false, name: "assignment_2") }
+  let(:assignment) { create(:assignment, is_intelligent: true, name: "assignment", directory_path:"assignment") }
+  let(:assignment_2) { create(:assignment, is_intelligent: false, name: "assignment_2", directory_path:"assignment_2") }
 
   let(:student1) { create(:student, name: "student1") }
   let(:student2) { create(:student, name: "student2") }

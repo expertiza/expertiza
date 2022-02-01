@@ -1,4 +1,4 @@
-class RedesignScoreView < ActiveRecord::Migration
+class RedesignScoreView < ActiveRecord::Migration[4.2]
   def self.up
     execute <<-SQL
       CREATE VIEW score_views AS SELECT ques.weight question_weight,ques.type AS type,

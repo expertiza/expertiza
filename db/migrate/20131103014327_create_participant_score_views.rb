@@ -1,4 +1,4 @@
-class CreateParticipantScoreViews < ActiveRecord::Migration
+class CreateParticipantScoreViews < ActiveRecord::Migration[4.2]
   def self.up
     execute <<-SQL
       CREATE VIEW participant_score_views AS SELECT r.id response_id,s.answer,q.weight,qs.name questionaire_type,qs.max_question_score,t.id as team_id,user_id as participant_id , t.parent_id as assignment_id

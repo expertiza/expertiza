@@ -1,4 +1,4 @@
-class CreateScoreViews < ActiveRecord::Migration
+class CreateScoreViews < ActiveRecord::Migration[4.2]
 
     def self.up
       execute <<-SQL

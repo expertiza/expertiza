@@ -1,4 +1,4 @@
-class AlterUserIdInBidsTableToTeamId < ActiveRecord::Migration
+class AlterUserIdInBidsTableToTeamId < ActiveRecord::Migration[4.2]
   def change
     Bid.all.each do |bid|
       begin

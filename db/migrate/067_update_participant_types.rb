@@ -1,4 +1,4 @@
-class UpdateParticipantTypes < ActiveRecord::Migration
+class UpdateParticipantTypes < ActiveRecord::Migration[4.2]
   def self.up    
     add_column :participants, :type, :string
     

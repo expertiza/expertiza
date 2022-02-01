@@ -1,4 +1,4 @@
-class AddIsLotteryToAssignments < ActiveRecord::Migration
+class AddIsLotteryToAssignments < ActiveRecord::Migration[4.2]
   def self.up
     add_column :assignments, :is_lottery, :boolean
   end

@@ -1,4 +1,4 @@
-class CreateQuestionAdvices < ActiveRecord::Migration
+class CreateQuestionAdvices < ActiveRecord::Migration[4.2]
   def self.up
     create_table :question_advices do |t|
       t.column :question_id, :integer

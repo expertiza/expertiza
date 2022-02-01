@@ -1,4 +1,4 @@
-class AddUnknownControllers < ActiveRecord::Migration
+class AddUnknownControllers < ActiveRecord::Migration[4.2]
   def self.up
     permission = Permission.find_by_name('do assignments')
     controller = SiteController.find_or_create_by(name: 'student_team')

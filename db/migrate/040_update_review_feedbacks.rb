@@ -1,4 +1,4 @@
-class UpdateReviewFeedbacks < ActiveRecord::Migration
+class UpdateReviewFeedbacks < ActiveRecord::Migration[4.2]
   def self.up    
     rename_column :review_feedbacks, :user_id, :author_id
     rename_column :review_feedbacks, :txt, :additional_comment

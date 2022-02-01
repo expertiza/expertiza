@@ -1,4 +1,4 @@
-class AddPriorityToBids < ActiveRecord::Migration
+class AddPriorityToBids < ActiveRecord::Migration[4.2]
   def self.up
     add_column :bids, :priority, :integer
   end

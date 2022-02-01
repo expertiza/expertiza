@@ -1,4 +1,4 @@
-class CreateReviewFiles < ActiveRecord::Migration
+class CreateReviewFiles < ActiveRecord::Migration[4.2]
   def self.up
     create_table :review_files do |t|
       t.string :filepath

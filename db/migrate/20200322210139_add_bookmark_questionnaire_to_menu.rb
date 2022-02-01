@@ -1,4 +1,4 @@
-class AddBookmarkQuestionnaireToMenu < ActiveRecord::Migration
+class AddBookmarkQuestionnaireToMenu < ActiveRecord::Migration[4.2]
     def self.up
     site_controller = SiteController.find_by_name('tree_display')
 

@@ -1,4 +1,4 @@
-class CreatePeerReviewScores < ActiveRecord::Migration
+class CreatePeerReviewScores < ActiveRecord::Migration[4.2]
   def self.up
     create_table :peer_review_scores do |t|
       # Note: Table name pluralized by convention.

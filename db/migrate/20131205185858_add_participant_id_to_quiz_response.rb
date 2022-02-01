@@ -1,4 +1,4 @@
-class AddParticipantIdToQuizResponse < ActiveRecord::Migration
+class AddParticipantIdToQuizResponse < ActiveRecord::Migration[4.2]
   def self.up
     add_column :quiz_responses, :participant_id, :integer
   end

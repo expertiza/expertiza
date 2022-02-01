@@ -70,9 +70,9 @@ describe "SignUpSheetHelper" do
 
   describe "#render_participant_info" do
     before(:each) do
-      @assignment1 = create(:assignment, name: "final 1")
+      @assignment1 = create(:assignment, name: "final 1", directory_path: "final_1")
       @topic1 = create(:topic, assignment: @assignment1)
-      @assignment2 = create(:assignment, name: "final 2")
+      @assignment2 = create(:assignment, name: "final 2", directory_path: "final_2")
       @topic2 = create(:topic, assignment: @assignment2)
       @participant1 = create(:participant, assignment: @assignment1)
     end

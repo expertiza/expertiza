@@ -22,6 +22,10 @@ class AssignmentsController < ApplicationController
     @num_reviews_round = 0
   end
 
+  def assignment_by_name_and_course(name, course_id)
+    Assignment.find_by(name: name, course_id: course_id)
+  end
+
   # creates a new assignment via the assignment form
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
@@ -32,7 +36,7 @@ class AssignmentsController < ApplicationController
       find_existing_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
       if !find_existing_assignment && !find_existing_directory && @assignment_form.save #No existing names/directories 
         @assignment_form.create_assignment_node
-        current_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
+        current_assignment = assignment_by_name_and_course(@assignment_form.assignment.name, @assignment_form.assignment.course_id)
         assignment_form_params[:assignment][:id] = current_assignment.id.to_s
         ques_array = assignment_form_params[:assignment_questionnaire]
         due_array = assignment_form_params[:due_date]
@@ -45,7 +49,7 @@ class AssignmentsController < ApplicationController
         assignment_form_params[:assignment_questionnaire] = ques_array
         assignment_form_params[:due_date] = due_array
         @assignment_form.update(assignment_form_params, current_user)
-        aid = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id).id
+        aid = assignment_by_name_and_course(@assignment_form.assignment.name, @assignment_form.assignment.course_id).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
         redirect_to edit_assignment_path aid
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")

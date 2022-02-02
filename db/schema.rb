@@ -565,15 +565,6 @@ ActiveRecord::Schema.define(version: 20211114021523) do
 
   add_index "review_grades", ["participant_id"], name: "fk_rails_29587cf6a9", using: :btree
 
-  create_table "review_status_maps", force: :cascade do |t|
-    t.integer  "reviewee_id",      limit: 4
-    t.integer  "reviewer_id",      limit: 4
-    t.string   "status",           limit: 255
-    t.integer  "review_object_id", limit: 4
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
-  end
-
   create_table "roles", force: :cascade do |t|
     t.string   "name",            limit: 255, default: "", null: false
     t.integer  "parent_id",       limit: 4

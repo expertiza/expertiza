@@ -1,4 +1,5 @@
 class Course < ActiveRecord::Base
+  enum locale: Locale.code_name_to_db_encoding
   has_many :ta_mappings, dependent: :destroy
   has_many :tas, through: :ta_mappings
   has_many :assignments, dependent: :destroy
@@ -10,6 +11,7 @@ class Course < ActiveRecord::Base
   has_many :notifications, dependent: :destroy
   has_paper_trail
   validates :name, presence: true
+  validates :directory_path, presence: true
   # Return any predefined teams associated with this course
   # Author: ajbudlon
   # Date: 7/21/2008

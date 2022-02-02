@@ -1,5 +1,6 @@
 class BookmarksController < ApplicationController
   include AuthorizationHelper
+  include Scoring
   helper_method :specific_average_score
   helper_method :total_average_score
 
@@ -86,7 +87,7 @@ class BookmarksController < ApplicationController
           reviewed_object_id: assessment.id,
           reviewee_id: bookmark.id,
           reviewer_id: AssignmentParticipant.find_by(user_id: current_user.id).id).flat_map {|r| Response.where(map_id: r.id) }
-      score = Response.assessment_score(response: responses, questions: questions)
+      score = assessment_score(response: responses, questions: questions)
       if score.nil?
         return '-'
       else
@@ -105,7 +106,7 @@ class BookmarksController < ApplicationController
       responses = BookmarkRatingResponseMap.where(
           reviewed_object_id: assessment.id,
           reviewee_id: bookmark.id).flat_map {|r| Response.where(map_id: r.id) }
-      totalScore = Response.compute_scores(responses, questions)
+      totalScore = aggregate_assessment_scores(responses, questions)
       if totalScore[:avg].nil?
         return '-'
       else

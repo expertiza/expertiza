@@ -1,4 +1,6 @@
 class Participant < ActiveRecord::Base
+  include Scoring
+  include ParticipantsHelper
   has_paper_trail
   belongs_to :user
   belongs_to :topic, class_name: 'SignUpTopic', inverse_of: false
@@ -73,7 +75,7 @@ class Participant < ActiveRecord::Base
   def able_to_review
     can_review
   end
-
+  
   def email(pw, home_page)
     user = User.find_by(id: self.user_id)
     assignment = Assignment.find_by(id: self.assignment.id)
@@ -91,36 +93,12 @@ class Participant < ActiveRecord::Base
     ).deliver
   end
 
-  # Return scores that this participant for the given questions
-  # Implemented in assignment_participant.rb
-  def scores(questions); end
-
-  # Authorizations are paricipant, reader, reviewer, submitter (They are not store in Participant table.)
-  # Permissions are can_submit, can_review, can_take_quiz.
-  # Get permissions form authorizations.
-  def self.get_permissions(authorization)
-    can_submit = true
-    can_review = true
-    can_take_quiz = true
-    case authorization
-    when 'reader'
-      can_submit = false
-    when 'reviewer'
-      can_submit = false
-      can_take_quiz = false
-    when 'submitter'
-      can_review = false
-      can_take_quiz = false
-    end
-    {can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz}
-  end
-
   # Get authorization from permissions.
-  def self.get_authorization(can_submit, can_review, can_take_quiz)
+  def authorization
     authorization = 'participant'
-    authorization = 'reader' if can_submit == false and can_review == true and can_take_quiz == true
-    authorization = 'submitter' if can_submit == true and can_review == false and can_take_quiz == false
-    authorization = 'reviewer' if can_submit == false and can_review == true and can_take_quiz == false
+    authorization = 'reader' if !self.can_submit && self.can_review && self.can_take_quiz
+    authorization = 'submitter' if self.can_submit && !self.can_review && !self.can_take_quiz
+    authorization = 'reviewer' if !self.can_submit && self.can_review && !self.can_take_quiz
     authorization
   end
 

@@ -3,6 +3,11 @@ FactoryBot.define do
     name 'North Carolina State University'
   end
 
+  factory :review_bid, class: ReviewBid do
+    priority 2
+    signuptopic_id 123
+  end
+
   factory :role_of_administrator, class: Role do
     name 'Administrator'
     parent_id nil
@@ -75,6 +80,14 @@ FactoryBot.define do
     timezonepref nil
     public_key nil
     copy_of_emails  false
+  end
+
+  factory :loggermessage, class: LoggerMessage do
+    generator nil
+    unity_id nil
+    message "Success"
+    oip nil
+    req_id nil
   end
 
   factory :student, class: User do
@@ -201,6 +214,22 @@ FactoryBot.define do
     auto_assign_mentor false
   end
 
+  factory :late_policy, class: LatePolicy do
+    # Help multiple factory-created assignments get unique names
+    # Let the first created assignment have the name 'final2' to avoid breaking some fragile existing tests
+    policy_name 'Dummy Name'
+    instructor_id 1
+    max_penalty 5
+    penalty_per_unit 1
+    penalty_unit 1
+    assignments {[ Assignment.first || association(:assignment) ]}
+  end
+
+  factory :calculated_penalty, class: CalculatedPenalty do
+    participant_id 1
+    deadline_type_id 1
+  end
+
   factory :assignment_team, class: AssignmentTeam do
     sequence(:name) {|n| "team#{n}" }
     assignment { Assignment.first || association(:assignment) }
@@ -238,7 +267,15 @@ FactoryBot.define do
   factory :invitation, class: Invitation do
     reply_status 'W'
   end
-
+  factory :join_team_request, class: JoinTeamRequest do
+    id 1
+    participant_id 5
+    comments "some comments"
+    team_id 1
+    status 'P'
+    created_at '2020-03-24 12:10:20'
+    updated_at '2020-03-24 12:10:20'
+  end
   factory :topic, class: SignUpTopic do
     topic_name 'Hello world!'
     assignment { Assignment.first || association(:assignment) }
@@ -637,5 +674,50 @@ FactoryBot.define do
     seq 1.00
     type 'TextArea'
     size '70,1'
+  end
+
+  factory :content_page, class: ContentPage do
+    title 'Expertiza Home'
+    name 'home'
+  end
+  
+  factory :suggestion, class: Suggestion do
+    id 1
+    assignment_id 1
+    title 'oss topic'
+    description 'add oss topic'
+    status 'Initiated'
+    unityID 'student2065'
+    signup_preference 'Y'
+  end
+  
+  factory :suggestion_comment, class: SuggestionComment do
+    id 1
+    comments 'this is a suggestion_comment'
+    commenter 'oss topic'
+    vote 'Y'
+    suggestion_id 1
+    visible_to_student 0
+  end 
+
+  factory :answer_tag, class: AnswerTag do
+    answer { Answer.first || association(:answer) }
+    tag_prompt_deployment { TagPromptDeployment.first || association(:tag_prompt_deployment) }
+    user { User.first || association(:user) }
+    value "0"
+  end
+
+  factory :tag_prompt, class: TagPrompt do
+    prompt "Prompt"
+    desc "Description"
+    control_type "Slider"
+  end
+
+  factory :tag_prompt_deployment, class: TagPromptDeployment do
+    tag_prompt { TagPrompt.first || association(:tag_prompt) }
+    assignment { Assignment.first || association(:assignment) }
+    questionnaire { Questionnaire.first || association(:questionnaire) }
+    question_type "Criterion"
+    answer_length_threshold 6
   end
 end

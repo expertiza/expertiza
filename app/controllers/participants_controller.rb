@@ -1,5 +1,6 @@
 class ParticipantsController < ApplicationController
   include AuthorizationHelper
+  include ParticipantsHelper
   autocomplete :user, :name
 
   def action_allowed?
@@ -10,6 +11,10 @@ class ParticipantsController < ApplicationController
     end
   end
 
+  def controller_locale
+    locale_for_student
+  end
+
   def list
     if Participant::PARTICIPANT_TYPES.include? params[:model]
       @root_node = Object.const_get(params[:model] + "Node").find_by(node_object_id: params[:id])
@@ -18,9 +23,7 @@ class ParticipantsController < ApplicationController
     begin
       @participants = @parent.participants
       @model = params[:model]
-      # E726 Fall2012 Changes Begin
       @authorization = params[:authorization]
-      # E726 Fall2012 Changes End
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
@@ -29,7 +32,7 @@ class ParticipantsController < ApplicationController
   def add
     curr_object = Object.const_get(params[:model]).find(params[:id]) if Participant::PARTICIPANT_TYPES.include? params[:model]
     begin
-      permissions = Participant.get_permissions(params[:authorization])
+      permissions = participant_permissions(params[:authorization])
       can_submit = permissions[:can_submit]
       can_review = permissions[:can_review]
       can_take_quiz = permissions[:can_take_quiz]
@@ -45,18 +48,16 @@ class ParticipantsController < ApplicationController
       url_for controller: 'users', action: 'new'
       flash.now[:error] = "The user <b>#{params[:user][:name]}</b> does not exist or has already been added."
     end
-    # E1721 : AJAX for adding participants to assignment changes begin
     render action: 'add.js.erb', layout: false
-    # E1721 changes End.
   end
 
   #when you change the duties, changes the permissions based on the new duty you go to
   def update_authorizations
-    permissions = Participant.get_permissions(params[:authorization])
+    participant = Participant.find(params[:id])
+    permissions = participant_permissions(params[:authorization])
     can_submit = permissions[:can_submit]
     can_review = permissions[:can_review]
     can_take_quiz = permissions[:can_take_quiz]
-    participant = Participant.find(params[:id])
     parent_id = participant.parent_id
     # Upon successfully updating the attributes based on user role, a flash message is displayed to the user after the
     # change in the database. This also gives the user the error message if the update fails.

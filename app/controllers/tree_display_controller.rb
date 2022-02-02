@@ -188,7 +188,7 @@ class TreeDisplayController < ApplicationController
 
   def update_is_available_2(res2, instructor_id, child)
     # current user is the instructor (role can be admin/instructor/ta) of this course. is_available_condition1
-    res2["is_available"] = is_available(session[:user], instructor_id) ||
+    res2["is_available"] = available?(session[:user], instructor_id) ||
         is_user_ta?(instructor_id, child) ||
         is_user_instructor?(instructor_id)
   end
@@ -329,7 +329,7 @@ class TreeDisplayController < ApplicationController
   # Checks if the user is the instructor for the course or assignment node provided.
   # Note: Admin and super admin users are considered instructors for all courses.
   def instructor_for_course?(node)
-    is_available(session[:user], node.get_instructor_id)
+    available?(session[:user], node.get_instructor_id)
   end
 
   # Checks if the user is a TA for the course or assignment node provided.

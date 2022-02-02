@@ -24,9 +24,8 @@ class Instructor < User
     object_type.find_by("id = ? AND (instructor_id = ? OR private = 0)", id, user_id)
   end
 
-  def self.get_my_tas(instructor_id)
-    # instructor = Instructor.find(instructor_id)
-    courses = Course.where(instructor_id: instructor_id)
+  def my_tas
+    courses = Course.where(instructor_id: self.id)
     ta_ids = []
     courses.each do |course|
       ta_mappings = TaMapping.where(course_id: course.id)

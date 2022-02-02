@@ -24,8 +24,8 @@ Expertiza::Application.configure do
       address:              'smtp.gmail.com',
       port:                 25,
       domain:               'gmail.com',
-      user_name:            'expertiza.development@gmail.com',
-      password:             'Expertiza@123',
+      user_name:            'expertiza.debugging@gmail.com',
+      password:             'dt2DR0Hhf',
       authentication:       'plain',
       enable_starttls_auto: true  }
 

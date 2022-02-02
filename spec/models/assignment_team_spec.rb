@@ -72,11 +72,11 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe ".get_first_member" do
+  describe ".first_member" do
     context "when team id is present" do
       it "get first member of the  team" do
         allow(AssignmentTeam).to receive_message_chain(:find_by, :try, :try).with(id: team.id).with(:participant).with(:first).and_return(participant1)
-        expect(AssignmentTeam.get_first_member(team.id)).to eq(participant1)
+        expect(AssignmentTeam.first_member(team.id)).to eq(participant1)
       end
     end
   end
@@ -363,39 +363,7 @@ describe 'AssignmentTeam' do
       team.destroy
     end
   end
-
-  describe "#scores" do
-    context "when a hash of question is given" do
-      it "returns the score received by the team" do
-        questionnaire1 = build(:questionnaire, id: 1)
-        questionnaire2 = build(:questionnaire, id: 2)
-
-        question1 = build(:question, id: 1, questionnaire: questionnaire1)
-        question2 = build(:question, id: 2, questionnaire: questionnaire2)
-        questions = {questionnaire1.symbol => [question1], questionnaire2.symbol => [question2]}
-
-        scores = {}
-        scores[:team] = team
-        scores[:questionnaire1] = {}
-        scores[:questionnaire1][:assessments] = review_response_map
-        scores[:questionnaire1][:scores] = 5
-        scores[:questionnaire2] = {}
-        scores[:questionnaire2][:assessments] = review_response_map
-        scores[:questionnaire2][:scores] = 5
-        scores[:total_score] = 10
-
-        allow(team.assignment).to receive(:questionnaires).with(no_args).and_return([questionnaire1, questionnaire2])
-        allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team.id).and_return(review_response_map)
-        allow(Response).to receive(:compute_scores).with(scores[:questionnaire1][:assessments], questions[:questionnaire1]).and_return(5)
-        allow(Response).to receive(:compute_scores).with(scores[:questionnaire2][:assessments], questions[:questionnaire2]).and_return(5)
-        allow(questionnaire1).to receive(:symbol).with(no_args).and_return(:questionnaire1)
-        allow(questionnaire2).to receive(:symbol).with(no_args).and_return(:questionnaire2)
-        allow(team.assignment).to receive(:compute_total_score).with(scores.except(:total_score)).and_return(10)
-        expect(team.scores(questions)).to eq(scores)
-      end
-    end
-  end
-
+  
   describe "create team with users" do
     before(:each) do
       @assignment = create(:assignment)

@@ -19,6 +19,10 @@ class SubmittedContentController < ApplicationController
 
   end
 
+  def controller_locale
+    locale_for_student
+  end
+
   # The view have already tested that @assignment.submission_allowed(topic_id) is true,
   # so @can_submit should be true
   def edit

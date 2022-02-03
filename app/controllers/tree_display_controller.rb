@@ -50,7 +50,7 @@ class TreeDisplayController < ApplicationController
     # Get all child nodes associated with a top level folder that the logged in user is authorized
     # to view. Top level folders include Questionaires, Courses, and Assignments.
     folders = {}
-    FolderNode.get.each do |folder_node|
+    FolderNode.includes(:folder).get.each do |folder_node|
     
       child_nodes = folder_node.get_children(nil, nil, session[:user].id, nil, nil)
       # Serialize the contents of each node so it can be displayed on the UI
@@ -73,7 +73,7 @@ class TreeDisplayController < ApplicationController
     # Get all child nodes associated with a top level folder that the logged in user is authorized
     # to view. Top level folders include Questionaires, Courses, and Assignments.
     folders = {}
-    FolderNode.get.each do |folder_node|
+    FolderNode.includes(:folder).get.each do |folder_node|
       child_nodes = folder_node.get_children(nil, nil, session[:user].id, nil, nil)
       # Serialize the contents of each node so it can be displayed on the UI
       contents = []

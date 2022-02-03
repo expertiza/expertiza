@@ -63,7 +63,7 @@ describe FeedbackResponseMap do
         maps = [review_response_map]
         allow(ReviewResponseMap).to receive(:where).with(["reviewed_object_id = ?", 1]).and_return(maps)
         allow(maps).to receive(:pluck).with("id").and_return(review_response_map.id)
-        allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team])
+        allow(AssignmentTeam).to receive_message_chain(:includes, :where).and_return([team])
         allow(team).to receive(:users).and_return([user1])
         allow(user1).to receive(:id).and_return(1)
         allow(AssignmentParticipant).to receive(:where).with(parent_id: 1, user_id: 1).and_return([participant])
@@ -94,7 +94,7 @@ describe FeedbackResponseMap do
         maps = [review_response_map]
         allow(ReviewResponseMap).to receive(:where).with(["reviewed_object_id = ?", 1]).and_return(maps)
         allow(maps).to receive(:pluck).with("id").and_return(review_response_map.id)
-        allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team])
+        allow(AssignmentTeam).to receive_message_chain(:includes, :where).and_return([team])
         allow(team).to receive(:users).and_return([user1])
         allow(user1).to receive(:id).and_return(1)
         allow(AssignmentParticipant).to receive(:where).with(parent_id: 1, user_id: 1).and_return([participant])

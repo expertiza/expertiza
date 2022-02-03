@@ -33,7 +33,7 @@ class FeedbackResponseMap < ResponseMap
     # reviewed_object_id in (select id from responses where
     # map_id in (select id from response_maps where reviewed_object_id = 722 and type = 'ReviewResponseMap'))
     @review_response_map_ids = ReviewResponseMap.where(["reviewed_object_id = ?", id]).pluck("id")
-    teams = AssignmentTeam.where(parent_id: id)
+    teams = AssignmentTeam.includes([:users]).where(parent_id: id)
     @authors = []
     teams.each do |team|
       team.users.each do |user|

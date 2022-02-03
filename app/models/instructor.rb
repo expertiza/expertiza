@@ -42,13 +42,13 @@ class Instructor < User
     courses.each do |course|
       participants << course.get_participants
     end
-    assignments = Assignment.includes([:participants]).where(instructor_id: user.id)
-    assignments.each do |assignment|
+    assignments = Assignment.where(instructor_id: user.id)
+    assignments.includes([:participants]).each do |assignment|
       participants << assignment.participants
     end
     participants.each do |assignment_participants|
       next if assignment_participants.empty?
-      assignment_participants.each do |participant|
+      assignment_participants.includes(:user, user: [:role]).each do |participant|
         user_list << participant.user if user.role.hasAllPrivilegesOf(participant.user.role)
       end
     end

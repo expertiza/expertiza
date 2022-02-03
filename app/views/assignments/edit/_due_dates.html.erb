@@ -322,7 +322,7 @@
             return;
         }
         if (state == false && round_count > 1) {
-            //hide name and url colomns
+            //hide name and url columns
             removeDueDateTableElement('team_formation', 0);
             for (i = 1; i <= round_count; i++) {
                 removeDueDateTableElement('submission', i);
@@ -340,7 +340,7 @@
             due_date_url_column.style.display = "none";
         }
         if (state == true && round_count > 1) {
-            //display name and url colomns
+            //display name and url columns
             removeDueDateTableElement('team_formation', 0);
             for (i = 1; i <= round_count; i++) {
                 removeDueDateTableElement('submission', i);
@@ -434,7 +434,7 @@
     }
 
     //E1654. Improve date-picker and deadlines Code change starts
-    //This is a generic funtion to add and substract days and months
+    //This is a generic function to add and subtract days and months
     function addDaysOrMonth(mul, type) {
         var days = parseInt($('#days').val(), 10); // days variable stores the number of days to change the deadline
         var months = parseInt($('#months').val(), 10);  // days variable stores the number of days to change the deadline

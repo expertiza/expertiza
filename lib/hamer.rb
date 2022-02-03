@@ -120,7 +120,7 @@ module Hamer
         @reviewers << Reviewer.new(letter)
       end
 
-      @reviwers
+      @reviewers
     end
 
     def submissions(rogue_score=5)

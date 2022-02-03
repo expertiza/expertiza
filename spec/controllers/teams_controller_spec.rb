@@ -214,7 +214,7 @@ describe TeamsController do
     end
     context 'called when assignment belongs to no course' do
       let(:fasg) { build_stubbed(:assignment, id: 1074, course_id: -2) }
-      # a temporary assigment object is created with an abnormal course_id so that we can check the fail condition of the method
+      # a temporary assignment object is created with an abnormal course_id so that we can check the fail condition of the method
       it 'flashes error' do
         allow(Assignment).to receive(:find).and_return(fasg)
         allow(Course).to receive(:find).and_return(course1)
@@ -244,7 +244,7 @@ describe TeamsController do
     end
     context 'called when assignment does not have a course' do
       let(:fasg) { build_stubbed(:assignment, id: 1074, course_id: -2) }
-      # a temporary assigment object is created with an abnormal course_id so that we can check the fail condition of the method
+      # a temporary assignment object is created with an abnormal course_id so that we can check the fail condition of the method
       it 'throws an error and fails to copy the teams' do
         allow(AssignmentTeam).to receive(:find).and_return(team2)
         allow(Assignment).to receive(:find).and_return(fasg)

@@ -66,7 +66,7 @@ class ReviewMappingController < ApplicationController
 
         # Get the assignment's participant corresponding to the user
         reviewer = get_reviewer(user, assignment, regurl)
-        # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+        # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
         # to treat all assignments as team assignments
         if ReviewResponseMap.where(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id).first.nil?
           ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
@@ -135,7 +135,7 @@ class ReviewMappingController < ApplicationController
   end
   # This method checks if the user that is requesting a review has any outstanding reviews, if a user has more than 2
   # outstanding reviews, he is not allowed to ask for more reviews.
-  # First we find the reviews done by that student, if he hasn't done any review till now, true is retured
+  # First we find the reviews done by that student, if he hasn't done any review till now, true is returned
   # else we compute total reviews completed by adding each response
   # we then check of the reviews in progress are less than assignment's policy
   def check_outstanding_reviews?(assignment, reviewer)
@@ -306,7 +306,7 @@ class ReviewMappingController < ApplicationController
   def list_mappings
     flash[:error] = params[:msg] if params[:msg]
     @assignment = Assignment.find(params[:id])
-    # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+    # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @items = AssignmentTeam.where(parent_id: @assignment.id)
     @items.sort_by(&:name)

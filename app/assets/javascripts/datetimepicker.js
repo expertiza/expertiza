@@ -37,7 +37,7 @@ var SaturdayColor="#7f8c8d";//Background color of Saturday.
 var WeekDayColor="white";//Background color of weekdays.
 var FontColor="#333333";//color of font in Calendar day cell.
 var TodayColor="#f39c12";//Background color of today.
-var SelDateColor="#d35400";//Backgrond color of selected date in textbox.
+var SelDateColor="#d35400";//Background color of selected date in textbox.
 var YrSelColor="#cc0033";//color of font of Year selector.
 var ThemeBg="";//Background image of Calendar window.
 //end Configurable parameters

@@ -39,7 +39,7 @@ class ReviewBidsController < ApplicationController
     render 'sign_up_sheet/review_bids_others_work'
   end
 
-  # provides vaiables for review bidding page
+  # provides variables for review bidding page
   def show
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
@@ -107,7 +107,7 @@ class ReviewBidsController < ApplicationController
 
   end
 
-  # call webserver for running assigning algorthim
+  # call webserver for running assigning algorithm
   # passing webserver: student_ids, topic_ids, student_preferences, time_stamps
   # webserver returns: 
   # returns matched assignments as json body

@@ -1,7 +1,7 @@
 class ContentPagesController < ApplicationController
   include AuthorizationHelper
 
-  # Currenly, this controller is onlt used for managing pull-down menus.
+  # Currently, this controller is only used for managing pull-down menus.
   # Further development is currently paused on this controller, please consult before changing/using the code. 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],

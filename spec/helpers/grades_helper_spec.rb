@@ -93,7 +93,7 @@ describe GradesHelper, type: :helper do
       end
     end
     context 'when the question is a ScoredQuestion' do
-      it 'returns the correct code adn the max score' do
+      it 'returns the correct code and the max score' do
         row = VmQuestionResponseRow.new('Some question text', 1, 5, 95, 2)
         allow(Question).to receive(:find).with(1).and_return(question)
         allow(question).to receive(:is_a?).and_return(ScoredQuestion)

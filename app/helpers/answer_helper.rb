@@ -90,7 +90,7 @@ module AnswerHelper
     false
   end
 
-  # Given a questionnaire id, delete all resposes to that questionnaire if the current period accepts reviews and return true/false of success
+  # Given a questionnaire id, delete all responses to that questionnaire if the current period accepts reviews and return true/false of success
   def self.check_and_delete_responses(questionnaire_id)
     question_ids = Questionnaire.find(questionnaire_id).questions.ids
     if AnswerHelper.in_active_period(questionnaire_id) # confirm current period accepts reviews

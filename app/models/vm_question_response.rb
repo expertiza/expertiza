@@ -139,13 +139,13 @@ class VmQuestionResponse
         color_code_number = 1 if color_code_number.zero?
       end
 
-      # Find out the tag prompts assosiated with the question
+      # Find out the tag prompts associated with the question
       tag_deps = TagPromptDeployment.where(questionnaire_id: @questionnaire.id, assignment_id: @assignment.id)
       vm_tag_prompts = []
 
       question = Question.find(answer.question_id)
 
-      # check if the tag prompt applies for thsi question type and if the comment length is above the threshold
+      # check if the tag prompt applies for this question type and if the comment length is above the threshold
       # if it does, then associate this answer with the tag_prompt and tag deployment (the setting)
       tag_deps.each do |tag_dep|
         if tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold

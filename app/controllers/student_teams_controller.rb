@@ -42,7 +42,7 @@ class StudentTeamsController < ApplicationController
   end
 
   def view
-    # View will check if send_invs and recieved_invs are set before showing
+    # View will check if send_invs and received_invs are set before showing
     # only the owner should be able to see those.
 
     return unless current_user_id? student.user_id

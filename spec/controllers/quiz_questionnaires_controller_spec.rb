@@ -92,7 +92,7 @@ describe QuizQuestionnairesController do
           allow_any_instance_of(QuizQuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
           request.env['HTTP_REFERER'] = 'www.google.com'
           post :create, params
-          expect(flash[:error]).to eq('Minumum and/or maximum question score cannot be less than 0.')
+          expect(flash[:error]).to eq('Minimum and/or maximum question score cannot be less than 0.')
           expect(response).to redirect_to('www.google.com')
           end
     end
@@ -118,7 +118,7 @@ describe QuizQuestionnairesController do
         allow_any_instance_of(QuizQuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
         request.env['HTTP_REFERER'] = 'www.google.com'
         post :create, params
-        expect(flash[:error]).to eq('Maximum question score cannot be less than minumum question score.')
+        expect(flash[:error]).to eq('Maximum question score cannot be less than minimum question score.')
         expect(response).to redirect_to('www.google.com')    end
   end
 
@@ -323,7 +323,7 @@ describe QuizQuestionnairesController do
     end
 
     context 'when user does not specify choice info for one question' do
-      it 'returns mesage (Please select a correct answer for all questions)' do
+      it 'returns message (Please select a correct answer for all questions)' do
         controller.params = {aid: 1,
                              questionnaire: {name: 'test questionnaire'},
                              question_type: {'1' => {type: 'TrueFalse'}},
@@ -334,7 +334,7 @@ describe QuizQuestionnairesController do
     end
 
     context 'when user specifies all necessary information' do
-      it 'returns mesage (valid)' do
+      it 'returns message (valid)' do
         controller.params = {aid: 1,
                              questionnaire: {name: 'test questionnaire'},
                              question_type: {'1' => {type: 'TrueFalse'}},

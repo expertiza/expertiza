@@ -213,7 +213,7 @@ describe TreeDisplayController do
       @assignment1.course_id = @course2.id
       @assignment1.save
 
-      # make ta participant of that assigment
+      # make ta participant of that assignment
       @participant1 = create(:participant)
       @participant1.parent_id = @assignment1.id
       @participant1.user_id = @ta.id
@@ -246,7 +246,7 @@ describe TreeDisplayController do
       @assignment1.course_id = @course1.id
       @assignment1.save
 
-      # make ta participant of that assigment
+      # make ta participant of that assignment
       @participant1 = create(:participant)
       @participant1.parent_id = @assignment1.id
       @participant1.user_id = @ta.id

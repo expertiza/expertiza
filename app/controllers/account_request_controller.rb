@@ -25,7 +25,7 @@ class AccountRequestController < ApplicationController
   # Decides whether a new user should be created or not
   def create_approved_user
     # If a user isn't selected before approving or denying, they are given an error message
-    if params[:selection] == nil
+    if params[:selection].nil?
       flash[:error] = "Please select at least one user before approving or rejecting"
       redirect_to action: 'list_pending_requested'
       return 

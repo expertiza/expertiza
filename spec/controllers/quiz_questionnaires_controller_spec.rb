@@ -92,7 +92,7 @@ describe QuizQuestionnairesController do
           allow_any_instance_of(QuizQuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
           request.env['HTTP_REFERER'] = 'www.google.com'
           post :create, params
-          expect(flash[:error]).to eq('Minumum and/or maximum question score cannot be less than 0.')
+          expect(flash[:error]).to eq('Minimum and/or maximum question score cannot be less than 0.')
           expect(response).to redirect_to('www.google.com')
           end
     end

@@ -44,7 +44,7 @@ describe Instructor do
     	instructor_role = build(:role_of_instructor, id: 2, name: "Instructor_role_test", description: '', parent_id: nil, default_page_id: nil)
       allow(Course).to receive(:where).with(instructor_id: 6).and_return([course])
       allow(course).to receive(:get_participants).and_return([participant1])
-      allow(Assignment).to receive(:where).with(instructor_id: 6).and_return([assignment])
+      allow(Assignment).to receive_message_chain(:includes, :where).and_return([assignment])
       allow(assignment).to receive(:participants).and_return([participant2])
       allow(participant1).to receive(:user).and_return(user1)
       allow(participant2).to receive(:user).and_return(user2)

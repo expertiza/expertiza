@@ -3,8 +3,8 @@ describe ReputationWebServiceController do
   let(:instructor){build(:instructor, id:1)}
   describe 'custom test' do
     before(:each) do
-      @assignment_1 = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day, submitter_count: 0, num_reviews: 3, num_reviewers: 3, num_reviews_allowed: 3, rounds_of_reviews: 2, reputation_algorithm: 'lauw', id: 1)
-      @assignment_2 = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day, submitter_count: 0, num_reviews: 3, num_reviewers: 3, num_reviews_allowed: 3, rounds_of_reviews: 2, reputation_algorithm: 'hamer', id: 2)
+      @assignment_1 = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day, submitter_count: 0, num_reviews: 3, num_reviewers: 3, num_reviews_allowed: 3, rounds_of_reviews: 2, reputation_algorithm: 'lauw', id: 1, directory_path: "assignment_1")
+      @assignment_2 = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day, submitter_count: 0, num_reviews: 3, num_reviewers: 3, num_reviews_allowed: 3, rounds_of_reviews: 2, reputation_algorithm: 'hamer', id: 2, directory_path: "assignment_2")
       @questionnaire_1 = create(:questionnaire, min_question_score: 0, max_question_score: 5, type: 'ReviewQuestionnaire', id: 1)
       #assignment_questionnaire_<i>_<j> means assignment #i's #j th round of review.
       @assignment_questionnaire_1_1 = create(:assignment_questionnaire, assignment_id: @assignment_1.id, questionnaire_id: @questionnaire_1.id, used_in_round: 1)

@@ -214,6 +214,22 @@ FactoryBot.define do
     auto_assign_mentor false
   end
 
+  factory :late_policy, class: LatePolicy do
+    # Help multiple factory-created assignments get unique names
+    # Let the first created assignment have the name 'final2' to avoid breaking some fragile existing tests
+    policy_name 'Dummy Name'
+    instructor_id 1
+    max_penalty 5
+    penalty_per_unit 1
+    penalty_unit 1
+    assignments {[ Assignment.first || association(:assignment) ]}
+  end
+
+  factory :calculated_penalty, class: CalculatedPenalty do
+    participant_id 1
+    deadline_type_id 1
+  end
+
   factory :assignment_team, class: AssignmentTeam do
     sequence(:name) {|n| "team#{n}" }
     assignment { Assignment.first || association(:assignment) }

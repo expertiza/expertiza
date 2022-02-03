@@ -353,7 +353,7 @@
               null
           );
           <% end %>
-          var metareview_allowed_checkbox = jQuery('#metareviewAllowed');
+          var metareview_allowed_checkbox = jQuery('#metareview_allowed');
           if (metareview_allowed_checkbox.is(':checked')) {
               <% assignment_questionnaire = @assignment_form.assignment_questionnaire('MetareviewQuestionnaire', nil, nil) %>
               <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'MetareviewQuestionnaire') %>

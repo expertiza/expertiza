@@ -11,8 +11,6 @@ class LatePoliciesController < ApplicationController
     end
   end
 
-  # GET /late_policies
-  # GET /late_policies.xml
   def index
     @penalty_policies = LatePolicy.all
     respond_to do |format|
@@ -21,8 +19,6 @@ class LatePoliciesController < ApplicationController
     end
   end
 
-  # GET /late_policies/1
-  # GET /late_policies/1.xml
   def show
     @penalty_policy = LatePolicy.find(params[:id])
     respond_to do |format|
@@ -31,8 +27,6 @@ class LatePoliciesController < ApplicationController
     end
   end
 
-  # GET /late_policies/new
-  # GET /late_policies/new.xml
   def new
     @late_policy = LatePolicy.new
     respond_to do |format|
@@ -41,30 +35,35 @@ class LatePoliciesController < ApplicationController
     end
   end
 
-  # GET /late_policies/1/edit
   def edit
     @penalty_policy = LatePolicy.find(params[:id])
   end
 
-  # POST /late_policies
-  # POST /late_policies.xml
   def create
+    # penalty per unit cannot be greater than maximum penalty
     invalid_penalty_per_unit = params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
     flash[:error] = "The maximum penalty cannot be less than penalty per unit." if invalid_penalty_per_unit
     same_policy_name = false
+    # penalty name should be unique
     if same_policy_name != LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
       flash[:error] = "A policy with the same name already exists."
       same_policy_name = true
     end
-    if !invalid_penalty_per_unit && !same_policy_name
+    # maximum penalty cannot be greater than equal to 100
+    if params[:late_policy][:max_penalty].to_i >= 100
+      flash[:error] = "Maximum penalty cannot be greater than or equal to 100"
+      invalid_max_penalty = true
+    end
+
+    if !invalid_penalty_per_unit && !same_policy_name && !invalid_max_penalty
       @late_policy = LatePolicy.new(late_policy_params)
       @late_policy.instructor_id = instructor_id
       begin
         @late_policy.save!
-        flash[:notice] = "The penalty policy was successfully created."
+        flash[:notice] = "The late policy was successfully created."
         redirect_to action: 'index'
       rescue StandardError
-        flash[:error] = "The following error occurred while saving the penalty policy: "
+        flash[:error] = "The following error occurred while saving the late policy: "
         redirect_to action: 'new'
       end
     else
@@ -72,20 +71,22 @@ class LatePoliciesController < ApplicationController
     end
   end
 
-  # PUT /late_policies/1
-  # PUT /late_policies/1.xml
   def update
     @penalty_policy = LatePolicy.find(params[:id])
-    invalid_penalty_per_unit = params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
-    flash[:error] = "The maximum penalty cannot be less than penalty per unit." if invalid_penalty_per_unit
-    same_policy_name = false
     # if name has changed then only check for this
-    if params[:late_policy][:policy_name] != @penalty_policy.policy_name
-      if same_policy_name == LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
-        flash[:error] = "The policy could not be updated because a policy with the same name already exists."
-      end
-    end
-    if !same_policy_name && !invalid_penalty_per_unit
+    if params[:late_policy][:policy_name] != @penalty_policy.policy_name &&
+       LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
+        flash[:error] = "Cannot edit the policy. A policy with the same name " + params[:late_policy][:policy_name] + " already exists."
+        redirect_to action: 'edit', id: params[:id]
+    elsif params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
+      # penalty per unit cannot be greater than maximum penalty
+      flash[:error] = "Cannot edit the policy. The maximum penalty cannot be less than penalty per unit."
+      redirect_to action: 'edit', id: params[:id]
+    elsif params[:late_policy][:max_penalty].to_i >= 100
+      # maximum penalty cannot be greater than equal to 100
+      flash[:error] = "Maximum penalty cannot be greater than or equal to 100"
+      redirect_to action: 'edit', id: params[:id]
+    else
       begin
         @penalty_policy.update_attributes(late_policy_params)
         @penalty_policy.save!
@@ -93,20 +94,12 @@ class LatePoliciesController < ApplicationController
         flash[:notice] = "The late policy was successfully updated."
         redirect_to action: 'index'
       rescue StandardError
-        flash[:error] = "The following error occurred while updating the penalty policy: "
+        flash[:error] = "The following error occurred while updating the late policy: "
         redirect_to action: 'edit', id: params[:id]
       end
-    elsif invalid_penalty_per_unit
-      flash[:error] = "Cannot edit the policy. The maximum penalty cannot be less than penalty per unit."
-      redirect_to action: 'edit', id: params[:id]
-    elsif same_policy_name
-      flash[:error] = "Cannot edit the policy. A policy with the same name " + params[:late_policy][:policy_name] + " already exists."
-      redirect_to action: 'edit', id: params[:id]
     end
   end
 
-  # DELETE /late_policies/1
-  # DELETE /late_policies/1.xml
   def destroy
     @penalty_policy = LatePolicy.find(params[:id])
     begin

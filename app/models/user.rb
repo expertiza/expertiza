@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+  enum locale: Locale.code_name_to_db_encoding(Locale.available_locale_preferences)
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = {if: -> { false }} # Don't validate email uniqueness
     config.crypto_provider = Authlogic::CryptoProviders::Sha1
@@ -81,9 +82,9 @@ class User < ActiveRecord::Base
 
     # Add the children to the list
     unless self.role.super_admin?
-      User.all.find_each do |u|
-        if recursively_parent_of(u)
-          user_list << u unless user_list.include?(u)
+      User.includes(:parent, :role, parent: [:parent, :role]).find_each do |user|
+        if recursively_parent_of(user)
+          user_list << user unless user_list.include?(user)
         end
       end
     end

@@ -8,6 +8,10 @@ class StudentReviewController < ApplicationController
         current_user_has_student_privileges?
   end
 
+  def controller_locale
+    locale_for_student
+  end
+
   def list
     # we can assume the id is of the current user and for the participant
     # if the assignment has team reviewers, other controllers take care of getting the team from this object

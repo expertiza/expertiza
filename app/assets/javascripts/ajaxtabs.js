@@ -85,7 +85,7 @@ ddajaxtabs.prototype={
 			this.expandtab(tabref) //expand this tab
 	},
 
-	cycleit:function(dir, autorun){ //PUBLIC function to move foward or backwards through each hot tab (tabinstance.cycleit('foward/back') )
+	cycleit:function(dir, autorun){ //PUBLIC function to move forward or backwards through each hot tab (tabinstance.cycleit('foward/back') )
 		if (dir=="next"){
 			var currentTabIndex=(this.currentTabIndex<this.hottabspositions.length-1)? this.currentTabIndex+1 : 0
 		}

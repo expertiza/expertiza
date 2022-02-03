@@ -86,8 +86,8 @@ module Scoring
   # Returns data in the format of 
   # {
   # :particpant => {
-  #   :<participant_id> => participant_scores(participant, quesitons), 
-  #   :<participant_id> => participant_scores(participant, quesitons)
+  #   :<participant_id> => participant_scores(participant, questions), 
+  #   :<participant_id> => participant_scores(participant, questions)
   #   },
   # :teams => {
   #    :0 => {:team => team, 

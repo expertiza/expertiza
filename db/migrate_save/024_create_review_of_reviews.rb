@@ -9,7 +9,7 @@ class CreateReviewOfReviews < ActiveRecord::Migration
 	# Understand that, in dynamically mapped reviews, reviewer A may review reviewees B and C, and may be the first
 	# entity to review both B and C.  So (s)he will be B's reviewer number 1 and C's reviewer number 1.  However, B
 	# and C can't both be his review #1.
-	# This logic caters for the situation where the entity doing the reivews of reviews is different than the entity
+	# This logic caters for the situation where the entity doing the reviews of reviews is different than the entity
 	# doing reviews (e.g., teams are doing the reviews (of other teams), whereas individuals are doing the reviews
 	# of the reviews (that were done by teams)).
     end

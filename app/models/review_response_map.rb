@@ -118,7 +118,7 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  # wrap lastest version of responses in each response map, together withe the questionnaire_id
+  # wrap latest version of responses in each response map, together with the questionnaire_id
   # will be used to display the reviewer summary
   def self.final_versions_from_reviewer(assignment_id, reviewer_id)
     reviewer = ReviewResponseMap.get_reviewer_with_id(assignment_id, reviewer_id)
@@ -158,7 +158,7 @@ class ReviewResponseMap < ResponseMap
         end
       end
     end
-    # @review_scores[reveiwer_id][reviewee_id] = score for assignments not using vary_rubric_by_rounds feature
+    # @review_scores[reviewer_id][reviewee_id] = score for assignments not using vary_rubric_by_rounds feature
     # @review_scores[reviewer_id][round][reviewee_id] = score for assignments using vary_rubric_by_rounds feature
   end
 

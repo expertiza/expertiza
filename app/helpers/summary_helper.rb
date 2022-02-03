@@ -144,7 +144,7 @@ module SummaryHelper
 
             # summarize the comments by calling the summarization Web Service
 
-            # since it'll do a lot of request, do this in seperate threads
+            # since it'll do a lot of request, do this in separate threads
             threads << Thread.new do
               summary[reviewee_name][round][q.txt] = summarize_sentences(comments, summary_ws_url) unless comments.empty?
             end

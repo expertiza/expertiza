@@ -53,10 +53,10 @@ class QuizQuestionnairesController < QuestionnairesController
       @questionnaire.instructor_id = author_team.id # for a team assignment, set the instructor id to the team_id
 
       if @questionnaire.min_question_score < 0 || @questionnaire.max_question_score < 0
-        flash[:error] = "Minumum and/or maximum question score cannot be less than 0."
+        flash[:error] = "Minimum and/or maximum question score cannot be less than 0."
         redirect_to :back
       elsif @questionnaire.max_question_score < @questionnaire.min_question_score
-        flash[:error] = "Maximum question score cannot be less than minumum question score."
+        flash[:error] = "Maximum question score cannot be less than minimum question score."
         redirect_to :back
       else
         @successful_create = true

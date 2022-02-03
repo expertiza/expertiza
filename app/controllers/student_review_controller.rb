@@ -25,7 +25,7 @@ class StudentReviewController < ApplicationController
     # or there team, depending on if reviewers are teams. If the reviewer is not yet on a team, just set review_mappings
     # to an empty list to prevent errors
     if @participant.get_reviewer != nil
-      # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+      # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
       @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.get_reviewer.id, reviewer_is_team: @assignment.reviewer_is_team)
     else

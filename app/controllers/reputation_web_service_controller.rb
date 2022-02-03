@@ -110,7 +110,7 @@ class ReputationWebServiceController < ApplicationController
       request_body['submission' + record[1].to_s] = {} unless request_body.key?('submission' + record[1].to_s)
       request_body['submission' + record[1].to_s]['stu' + record[0].to_s] = record[2]
     end
-    # sort the 2-dimention hash
+    # sort the 2-dimension hash
     request_body.each {|k, v| request_body[k] = v.sort.to_h }
     request_body.sort.to_h
   end
@@ -227,10 +227,10 @@ class ReputationWebServiceController < ApplicationController
     encrypted_string
   end
 
-  def rsa_private_key2(cipertext)
+  def rsa_private_key2(ciphertext)
     private_key_file = 'private2.pem'
     password = "ZXhwZXJ0aXph\n"
-    encrypted_string = cipertext
+    encrypted_string = ciphertext
     private_key = OpenSSL::PKey::RSA.new(File.read(private_key_file), Base64.decode64(password))
     string = private_key.private_decrypt(Base64.decode64(encrypted_string))
 
@@ -242,16 +242,16 @@ class ReputationWebServiceController < ApplicationController
     cipher.encrypt
     key = cipher.random_key
     iv = cipher.random_iv
-    cipertext = Base64.encode64(cipher.update(data) + cipher.final)
-    [cipertext, key, iv]
+    ciphertext = Base64.encode64(cipher.update(data) + cipher.final)
+    [ciphertext, key, iv]
   end
 
-  def aes_decrypt(cipertext, key, iv)
+  def aes_decrypt(ciphertext, key, iv)
     decipher = OpenSSL::Cipher::AES.new(256, :CBC)
     decipher.decrypt
     decipher.key = key
     decipher.iv = iv
-    plain = decipher.update(Base64.decode64(cipertext)) + decipher.final
+    plain = decipher.update(Base64.decode64(ciphertext)) + decipher.final
     plain
   end
 end

@@ -109,7 +109,7 @@ class TreeDisplayController < ApplicationController
     end
   end
 
-  # Returns the contents of the Courses and Questionaire subfolders
+  # Returns the contents of the Courses and Questionnaire subfolders
   def get_sub_folder_contents
     # Convert the object received in parameters to a FolderNode object.
     folder_node = (params[:reactParams2][:nodeType]).constantize.new
@@ -143,7 +143,7 @@ class TreeDisplayController < ApplicationController
   # ^^^ original method for "handleExpandClick"
   # For the questionnaire's handleExpandClick function, it appears that the get_sub_folder_contents method is not capable of returning the data.
   # We fixed the courses by rendering the json properly on the return to the jquery post request from the front-end
-  # The assignments tab did not have any data when we used the react debuging extension (i.e. the childNodes attribute was null)
+  # The assignments tab did not have any data when we used the react debugging extension (i.e. the childNodes attribute was null)
   # From this, we assumed there was no data to display underneath each assignment
   # After debugging, we found that the "nodeType" attribute in the :reactParams field of the post request identifies the type of childNodes to be retrieved (i.e. "courses" or "Questionnaires")
   # We found that a "FolderNode" value for this attribute equates to a questionnaire
@@ -337,7 +337,7 @@ class TreeDisplayController < ApplicationController
       ta_mappings.any? { |ta_mapping| ta_mapping.course_id == course_id }
   end
 
-  # Check if the provided course or assignment node is avaiable to the logged in user.
+  # Check if the provided course or assignment node is available to the logged in user.
   # Instructors and TA's have access to courses, not individual assignments. It doesn't matter
   # which node is passed in, we only about course access. 
   def course_is_available?(node)

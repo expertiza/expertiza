@@ -48,7 +48,7 @@ class ApplicationController < ActionController::Base
       # If id or student_id not correct, revert to locale based on courses.
       return locale_from_user_courses if participant.nil?
 
-      # Find assignment from participant and find locale from the assigment
+      # Find assignment from participant and find locale from the assignment
       assignment = participant.assignment
       return assignment.course.locale unless assignment.course.nil? || assignment.course.locale.nil?
     else

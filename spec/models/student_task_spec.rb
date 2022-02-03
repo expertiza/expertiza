@@ -231,7 +231,7 @@ describe StudentTask do
     end
   end
 
-  # Gets the due dates of an assigment
+  # Gets the due dates of an assignment
   describe "#get_due_date_data" do
     context 'when called with assignment having empty due dates' do
       it "return empty time_list array" do

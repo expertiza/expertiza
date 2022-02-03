@@ -50,7 +50,7 @@ describe SystemSettings do
     allow(@system_settings).to receive(:session_expired_page_id).and_return(4)
     expect(@system_settings.session_expired_page).to eq(@session_expired_page)
   end
-  it 'returns nil when the pageid doesnt match the denied pages' do
+  it 'returns nil when the pageid does not match the denied pages' do
     allow(@system_settings).to receive(:site_default_page_id).and_return(1)
     allow(@system_settings).to receive(:not_found_page_id).and_return(2)
     allow(@system_settings).to receive(:permission_denied_page_id).and_return(3)

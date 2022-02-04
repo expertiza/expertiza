@@ -2,13 +2,25 @@ class TeamsUsersController < ApplicationController
   include AuthorizationHelper
 
   def action_allowed?
-    current_user_has_ta_privileges?
+    # Allow duty updation for a team if current user is student, else require TA or above Privileges.
+    if %w[update_duties].include? params[:action]
+      current_user_has_student_privileges?
+    else
+      current_user_has_ta_privileges?
+    end
   end
 
   def auto_complete_for_user_name
     team = Team.find(session[:team_id])
     @users = team.get_possible_team_members(params[:user][:name])
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
+  end
+
+  # Example of duties: manager, designer, programmer, tester. Finds TeamsUser and save preferred Duty
+  def update_duties
+    team_user = TeamsUser.find(params[:teams_user_id])
+    team_user.update_attribute(:duty_id, params[:teams_user]["duty_id"])
+    redirect_to controller: 'student_teams', action: 'view', student_id: params[:participant_id]
   end
 
   def list

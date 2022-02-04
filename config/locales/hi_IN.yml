@@ -108,7 +108,7 @@ hi_IN:
 
       rubrics:
         review_varies: "क्या समीक्षा दौर से भिन्न होती है?"
-        questionaire: "प्रश्नावली"
+        questionnaire: "प्रश्नावली"
         use_dropdown: "ड्रॉप डाउन का उपयोग करें"
         instead: " इसके बजाय क्या ?"
         scored_question: "रन बनाए-सवाल"

@@ -58,16 +58,6 @@ describe ParticipantsController do
     end
   end
 
-  describe '#update_duties' do
-    it 'updates the duties for the participant' do
-      allow(Participant).to receive(:find).with('1').and_return(participant)
-      params = {student_id: 1}
-      session = {user: instructor}
-      get :update_duties, params, session
-      expect(response).to redirect_to('/student_teams/view?student_id=1')
-    end
-  end
-
   describe '#update_authorizations' do
     it 'updates the authorizations for the participant' do
       allow(Participant).to receive(:find).with('1').and_return(participant)

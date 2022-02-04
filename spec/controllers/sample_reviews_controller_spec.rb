@@ -62,7 +62,7 @@ RSpec.describe SampleReviewsController, type: :controller do
     end
   end
   describe '#unmap_from_assignment' do
-    context 'when Instructor selects to umark sample review from all assignments' do
+    context 'when Instructor selects to unmark sample review from all assignments' do
       it 'deletes mapping and marks response visibility to public' do
         params = {id: 1,format: :json}
         session = {user: build(:instructor, id: 1)}

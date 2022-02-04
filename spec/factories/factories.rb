@@ -594,6 +594,13 @@ FactoryBot.define do
     name 'fake_site'
   end
 
+  factory :duty, class: Duty do
+    id 1
+    name 'Scrum Master'
+    max_members_for_duty 1
+    assignment_id 1
+  end
+
   factory :version, class: Version do
     item_type 'Node'
     item_id 1

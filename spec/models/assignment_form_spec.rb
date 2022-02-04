@@ -5,10 +5,12 @@ describe AssignmentForm do
   let(:user) { double('Instructor', timezonepref: 'Eastern Time (US & Canada)') }
   let(:assignment_questionnaire1) { build(:assignment_questionnaire) }
   let(:assignment_questionnaire2) { build(:assignment_questionnaire) }
+  let(:assignment_questionnaire2) { build(:assignment_questionnaire, id:1, duty_id:1, questionnaire_id:1) }
   let(:aq_attributes1) { double('AssignmentQuestionnaire') }
   let(:aq_attributes2) { double('AssignmentQuestionnaire') }
   let(:questionnaire1) { double('Questionnaire', type: 'ReviewQuestionnaire') }
   let(:questionnaire2) { double('Questionnaire', type: 'MetareviewQuestionnaire') }
+  let(:questionnaire3) { double('Questionnaire', type: 'TeammateReviewQuestionnaire') }
   before(:each) do
     assignment_form.instance_variable_set(:@assignment, assignment)
   end
@@ -83,11 +85,16 @@ describe AssignmentForm do
         allow(aq_attributes1).to receive(:[]).with(:questionnaire_id).and_return(1)
         allow(aq_attributes1).to receive(:[]).with(:used_in_round).and_return("")
         allow(aq_attributes1).to receive(:key?).with(:topic_id).and_return(false)
+        allow(aq_attributes1).to receive(:[]).with(:duty_id).and_return("")
+        allow(aq_attributes1).to receive(:key?).with(:duty_id).and_return(false)
         allow(aq_attributes2).to receive(:key?).with(:questionnaire_weight).and_return(true)
         allow(aq_attributes2).to receive(:[]).with(:questionnaire_weight).and_return(0)
         allow(aq_attributes2).to receive(:[]).with(:questionnaire_id).and_return(2)
         allow(aq_attributes2).to receive(:[]).with(:used_in_round).and_return("")
         allow(aq_attributes2).to receive(:key?).with(:topic_id).and_return(false)
+        allow(aq_attributes2).to receive(:[]).with(:duty_id).and_return("")
+        allow(aq_attributes2).to receive(:key?).with(:duty_id).and_return(false)
+
       end
 
       context 'when both active records exist and can be found' do
@@ -316,11 +323,15 @@ describe AssignmentForm do
         allow(aq_attributes1).to receive(:[]).with(:used_in_round).and_return("")
         allow(aq_attributes1).to receive(:key?).with(:topic_id).and_return(true)
         allow(aq_attributes1).to receive(:[]).with(:topic_id).and_return("")
+        allow(aq_attributes1).to receive(:[]).with(:duty_id).and_return("")
+        allow(aq_attributes1).to receive(:key?).with(:duty_id).and_return(false)
         allow(aq_attributes2).to receive(:key?).with(:questionnaire_weight).and_return(false)
         allow(aq_attributes2).to receive(:[]).with(:questionnaire_id).and_return(2)
         allow(aq_attributes2).to receive(:[]).with(:used_in_round).and_return("")
         allow(aq_attributes2).to receive(:key?).with(:topic_id).and_return(true)
         allow(aq_attributes2).to receive(:[]).with(:topic_id).and_return("")
+        allow(aq_attributes2).to receive(:[]).with(:duty_id).and_return("")
+        allow(aq_attributes2).to receive(:key?).with(:duty_id).and_return(false)
       end
 
       context 'when both active records exist and can be found' do
@@ -607,6 +618,17 @@ describe AssignmentForm do
       end
     end
 
+    context 'when active record for assignment_questionnaire is not found for a given assignment_id amd duty_id' do
+      let(:new_assignment_questionnaire) { build(:assignment_questionnaire) }
+      it 'returns new instance of assignment_questionnaire with default values' do
+        allow(assignment).to receive(:questionnaire_varies_by_duty).and_return(true)
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, duty_id: anything).and_return([])
+        allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
+        allow(AssignmentQuestionnaire).to receive(:new).and_return(new_assignment_questionnaire)
+        expect(assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil, 1)).to eq(new_assignment_questionnaire)
+      end
+    end
+
     context 'when active record for assignment_questionnaire is found for a given assignment_id, used_in_round, and topic_id, but associated questionnaire_id is nil' do
       # Based on the E1936 design this is not possible, but there could different models that create AQ with questionnaire_id
       let(:new_assignment_questionnaire) { build(:assignment_questionnaire) }
@@ -617,6 +639,18 @@ describe AssignmentForm do
         allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
         allow(AssignmentQuestionnaire).to receive(:new).and_return(new_assignment_questionnaire)
         expect(assignment_form.assignment_questionnaire('ReviewQuestionnaire', 1, 1)).to eq(new_assignment_questionnaire)
+      end
+    end
+
+    context 'when active record for assignment_questionnaire is found for a given assignment_id amd duty_id' do
+      let(:new_assignment_questionnaire) { build(:assignment_questionnaire) }
+      it 'returns new instance of assignment_questionnaire with default values' do
+        allow(assignment).to receive(:questionnaire_varies_by_duty).and_return(true)
+        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire3)
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, duty_id: 1).and_return([assignment_questionnaire2])
+        allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
+        allow(AssignmentQuestionnaire).to receive(:new).and_return(new_assignment_questionnaire)
+        expect(assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil, 1)).to eq(assignment_questionnaire2)
       end
     end
   end

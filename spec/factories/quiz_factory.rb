@@ -18,7 +18,7 @@ FactoryBot.define do
   # in the Expertiza model. It shares a one-to-many relationship
   # with QuizQuestion and QuizResponseMap, and foreign keys
   # to an AssignmentTeam. It is important to note that
-  # the instructor_id field, a holdover from the Questionaire
+  # the instructor_id field, a holdover from the Questionnaire
   # superclass, is the field used to store the team id.
   factory :quiz_questionnaire, class: QuizQuestionnaire do
     name 'Quiz Questionnaire'

@@ -6,12 +6,26 @@ class TeammateReviewResponseMap < ResponseMap
     self.assignment.questionnaires.find_by(type: 'TeammateReviewQuestionnaire')
   end
 
+  # E2147 : gets questionnaire for a particular duty. If no questionnaire is found for the given duty, returns the
+  # default questionnaire set for TeammateReviewQuestionnaire type.
+  def questionnaire_by_duty(duty_id)
+    duty_questionnaire = AssignmentQuestionnaire.where(:assignment_id => self.assignment.id, :duty_id=> duty_id).first
+    if duty_questionnaire.nil?
+      questionnaire
+    else
+      Questionnaire.find(duty_questionnaire.questionnaire_id)
+    end
+  end
+
   def contributor
     nil
   end
 
   def get_title
     "Teammate Review"
+  end
+  def get_reviewer
+    AssignmentParticipant.find(reviewer_id)
   end
 
   def self.teammate_response_report(id)

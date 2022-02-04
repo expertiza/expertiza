@@ -114,7 +114,7 @@ en_US:
 
       rubrics:
         review_varies: "Review varies by round?"
-        questionaire: "Questionaire"
+        questionnaire: "Questionnaire"
         use_dropdown: "Use dropdown"
         instead: "instead?"
         scored_question: "Scored-question"

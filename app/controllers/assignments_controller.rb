@@ -91,6 +91,9 @@ class AssignmentsController < ApplicationController
     @badges = Badge.all
     @use_bookmark = @assignment.use_bookmark
 
+    # E2147 : gets duties of a particular assignment. Returns empty if no duties are found
+    @duties = Duty.where(assignment_id:@assignment_form.assignment.id)
+
   end
 
   # updates an assignment via an assignment form

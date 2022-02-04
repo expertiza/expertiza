@@ -4,7 +4,7 @@
 
 # A point to be taken into consideration is that :id (except when explicitly stated) here means topic id and not assignment id
 # (this is referenced as :assignment id in the params has)
-# The way it works is that assignments have their own id's, so do topics. A topic has a foreign key dependecy on the assignment_id
+# The way it works is that assignments have their own id's, so do topics. A topic has a foreign key dependency on the assignment_id
 # Hence each topic has a field called assignment_id which points which can be used to identify the assignment that this topic belongs
 # to
 
@@ -86,7 +86,7 @@ class SignUpSheetController < ApplicationController
     @topic = SignUpTopic.find(params[:id])
   end
 
-  # updates the database tables to reflect the new values for the assignment. Used in conjuntion with edit
+  # updates the database tables to reflect the new values for the assignment. Used in conjunction with edit
   def update
     @topic = SignUpTopic.find(params[:id])
     if @topic
@@ -156,7 +156,7 @@ class SignUpSheetController < ApplicationController
     # ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     # Though called participants, @participants are actually records in signed_up_teams table, which
-    # is a mapping table between teams and topics (waitlisted recored are also counted)
+    # is a mapping table between teams and topics (waitlisted recorded are also counted)
     @participants = SignedUpTeam.find_team_participants(assignment_id, session[:ip])
   end
 
@@ -223,7 +223,7 @@ class SignUpSheetController < ApplicationController
       @selected_topics = if users_team.empty?
                            nil
                          else
-                           # TODO: fix this; cant use 0
+                           # TODO: fix this; can't use 0
                            SignedUpTeam.find_user_signup_topics(@assignment.id, users_team[0].t_id)
                          end
     end

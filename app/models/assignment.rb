@@ -52,7 +52,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def team_assignment?
-    true
+    self.max_team_size > 1
   end
   alias team_assignment team_assignment?
 
@@ -215,7 +215,7 @@ class Assignment < ActiveRecord::Base
       raise "There is at least one teammate review response that exists for #{self.name}."
     end
 
-    # destroy instances of invitations, teams, particiapnts, etc, refactored by Rajan, Jasmine, Sreenidhi 3/30/2020
+    # destroy instances of invitations, teams, participants, etc, refactored by Rajan, Jasmine, Sreenidhi 3/30/2020
     #You can now add the instances to be deleted into the list.
     delete_instances = %w[invitations teams participants due_dates assignment_questionnaires]
     delete_instances.each do |instance|

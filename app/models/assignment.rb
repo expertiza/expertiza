@@ -6,6 +6,7 @@
 
 class Assignment < ActiveRecord::Base
   require 'analytic/assignment_analytic'
+  include Scoring
   include AssignmentAnalytic
   include ReviewAssignment
   include QuizAssignment
@@ -34,6 +35,8 @@ class Assignment < ActiveRecord::Base
   validates :name, presence: true
   validates :name, uniqueness: {scope: :course_id}
   validate :valid_num_review
+  validates :directory_path, presence: true # E2138 Validation for unique submission directory
+  validates :directory_path, uniqueness: {scope: :course_id}
 
   REVIEW_QUESTIONNAIRES = {author_feedback: 0, metareview: 1, review: 2, teammate_review: 3}.freeze
 
@@ -49,12 +52,12 @@ class Assignment < ActiveRecord::Base
   end
 
   def team_assignment?
-    true
+    self.max_team_size > 1
   end
   alias team_assignment team_assignment?
 
   def topics?
-    @has_topics ||= !sign_up_topics.empty?
+    @has_topics ||= sign_up_topics.any?
   end
 
   def calibrated?
@@ -66,16 +69,16 @@ class Assignment < ActiveRecord::Base
   end
 
   #removes an assignment from course
-  def self.remove_assignment_from_course(assignment)
-    oldpath = assignment.path rescue nil
-    assignment.course_id = nil
-    assignment.save
-    newpath = assignment.path rescue nil
+  def remove_assignment_from_course
+    oldpath = self.path rescue nil
+    self.course_id = nil
+    self.save
+    newpath = self.path rescue nil
     FileHelper.update_file_location(oldpath, newpath)
   end
 
   def teams?
-    @has_teams ||= !self.teams.empty?
+    @has_teams ||= self.teams.any?
   end
 
   # remove empty teams (teams with no users) from assignment
@@ -212,7 +215,7 @@ class Assignment < ActiveRecord::Base
       raise "There is at least one teammate review response that exists for #{self.name}."
     end
 
-    # destroy instances of invitations, teams, particiapnts, etc, refactored by Rajan, Jasmine, Sreenidhi 3/30/2020
+    # destroy instances of invitations, teams, participants, etc, refactored by Rajan, Jasmine, Sreenidhi 3/30/2020
     #You can now add the instances to be deleted into the list.
     delete_instances = %w[invitations teams participants due_dates assignment_questionnaires]
     delete_instances.each do |instance|
@@ -434,7 +437,7 @@ class Assignment < ActiveRecord::Base
 
   # Checks if there are rounds with no reviews
   def self.check_empty_rounds(answers, round_num, res_type)
-    unless answers[round_num][res_type].empty?
+    if answers[round_num][res_type].any?
       return round_num.nil? ? "Round Nil - " + res_type : "Round " + round_num.to_s + " - " + res_type.to_s
     end
   end
@@ -462,7 +465,7 @@ class Assignment < ActiveRecord::Base
       end
       @questions[questionnaire_symbol] = questionnaire.questions
     end
-    @scores = ResponseMap.scores(self, @questions)
+    @scores = review_grades(self, @questions)
     return csv if @scores[:teams].nil?
     export_data(csv, @scores, options)
   end
@@ -584,7 +587,7 @@ class Assignment < ActiveRecord::Base
 
   #returns true if assignment has staggered deadline and topic_id is nil
   def staggered_and_no_topic?(topic_id)
-    self.staggered_deadline? and topic_id.nil?
+    self.staggered_deadline? && topic_id.nil?
   end
 
   #returns true if reviews required is greater than reviews allowed

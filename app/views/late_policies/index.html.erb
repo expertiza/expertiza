@@ -29,7 +29,7 @@ end
         <% if is_admin %>
           <td><%= User.find(penalty_policy.instructor_id).name %></td>
         <% end %>
-        <td><%= link_to 'Edit', :action => 'edit', :id => penalty_policy %></td>
+        <td style="padding-right: 10px"><%= link_to 'Edit', :action => 'edit', :id => penalty_policy %></td>
         <td><%= link_to 'Delete', penalty_policy, :method => 'delete', confirm: 'Are you sure?' %></td>
       </tr>
     <% end %>
@@ -38,4 +38,5 @@ end
 
 <br />
 
-<%= link_to 'New late policy', :action => 'new'%>
+<%= link_to 'New late policy', :action => 'new'%><br />
+<%= link_to 'Back', :controller=> 'assignments', :action => 'edit', :id=>session[:assignment]%>

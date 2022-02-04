@@ -59,7 +59,7 @@
           </td>
 
           <% @teammate_review_response_maps.each do |rm| %>
-            <!--for each teammate_review_response_maps, we have to check whether the corresponsding teammate_review_response exists or not-->
+            <!--for each teammate_review_response_maps, we have to check whether the corresponding teammate_review_response exists or not-->
             <% map_id = rm.id %>
             <% @teammate_review_response = Response.where(map_id: map_id).first %>
             <% if !@teammate_review_response.blank? %>

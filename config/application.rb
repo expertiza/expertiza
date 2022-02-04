@@ -28,7 +28,8 @@ module Expertiza
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password, :password_confirmation, :password, :password_confirmation]
     config.active_record.whitelist_attributes = false
-    config.autoload_paths += Dir[Rails.root.join('lib', '{**}')]
+    config.autoload_paths << Rails.root.join('lib', '{**}')
+    config.eager_load_paths << Rails.root.join('lib')
     config.react.addons = true
     config.assets.paths << Rails.root.join('vendor', 'assets', 'components')
     config.cache_store = :redis_store, "redis://#{ENV.fetch('REDIS_HOST', 'localhost')}:6379/0/cache", { raise_errors: false }
@@ -55,7 +56,10 @@ module Expertiza
 
       # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
       # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
-      # config.i18n.default_locale = :de
+
+      # Languages for the application
+      config.i18n.available_locales = [:en_US, :hi_IN]
+      config.i18n.default_locale = :en_US # english
 
       # Do not swallow errors in after_commit/after_rollback callbacks.
       config.active_record.raise_in_transactional_callbacks = true

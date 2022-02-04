@@ -25,7 +25,7 @@ class StudentTask
   end
 
   def self.from_user(user)
-    user.assignment_participants.map do |participant|
+    user.assignment_participants.includes([:assignment, :topic]).map do |participant|
       StudentTask.from_participant participant
     end.sort_by(&:stage_deadline)
   end

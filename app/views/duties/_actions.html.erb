@@ -1,0 +1,3 @@
+
+  <%= link_to image_tag('edit_icon.png', :border => 0, :title => 'Edit Role', :align => 'middle'), :controller=>'duties', :action=> 'edit', :id => duty.id, :duty => duty %>
+  <%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Delete Role', :align => 'middle'), :controller=>'duties', :action=> 'delete_duty', :id => duty.id, :assignment_id => duty.assignment_id %>

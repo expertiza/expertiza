@@ -7,7 +7,7 @@
   <% @sorted_responses = [] %>
   <tr>
     <!--Heading-->
-    <td><b>Self Review:</b><BR/></td>
+    <td><b><%=t ".self_review"%></b><BR/></td>
     <% @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
     <% @review_phase = @assignment.current_stage(@topic_id) %>
     <% @review_mappings = SelfReviewResponseMap.where(reviewer_id: @participant.id) %>
@@ -23,7 +23,7 @@
                 <% array_not_empty = 1 %>
                 <% @sorted_responses << element %>
             <% end %>
-            <!--The code above helps in retrieving any exsiting responses for self-review-->
+            <!--The code above helps in retrieving any existing responses for self-review-->
             <!--The if condition below ensures that responses are retrieved and can be viewed by user when 'View' option is selected-->
             <% if array_not_empty == 1 %>
                 <% @sorted_responses = @sorted_responses.sort_by { |obj| obj.updated_at } %>
@@ -81,7 +81,7 @@
         <% end %>
     <% else %>
         <td>&nbsp;&nbsp;</td>
-        <td> (Work has not yet been submitted)</td>
+        <td> <%=t ".work_not_submitted"%></td>
     <% end %>
 
   </tr>

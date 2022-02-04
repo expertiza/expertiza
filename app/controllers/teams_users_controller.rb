@@ -2,7 +2,12 @@ class TeamsUsersController < ApplicationController
   include AuthorizationHelper
 
   def action_allowed?
-    current_user_has_ta_privileges?
+    # Allow duty updation for a team if current user is student, else require TA or above Privileges.
+    if %w[update_duties].include? params[:action]
+      current_user_has_student_privileges?
+    else
+      current_user_has_ta_privileges?
+    end
   end
 
   def auto_complete_for_user_name
@@ -11,9 +16,16 @@ class TeamsUsersController < ApplicationController
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 
+  # Example of duties: manager, designer, programmer, tester. Finds TeamsUser and save preferred Duty
+  def update_duties
+    team_user = TeamsUser.find(params[:teams_user_id])
+    team_user.update_attribute(:duty_id, params[:teams_user]["duty_id"])
+    redirect_to controller: 'student_teams', action: 'view', student_id: params[:participant_id]
+  end
+
   def list
     @team = Team.find(params[:id])
-    @assignment = Assignment.find(@team.assignment_id)
+    @assignment = Assignment.find(@team.parent_id)
     @teams_users = TeamsUser.page(params[:page]).per_page(10).where(["team_id = ?", params[:id]])
   end
 
@@ -39,15 +51,13 @@ class TeamsUsersController < ApplicationController
         else
           add_member_return = team.add_member(user, team.parent_id)
           flash[:error] = "This team already has the maximum number of members." if add_member_return == false
-  
-          user = TeamsUser.last
-          undo_link("The team @teams_user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
-
           # E2115 Mentor Management
           # Kick off the Mentor Management workflow
           # Note: this is _not_ supported for CourseTeams which is why the other
           # half of this if block does not include the same code
           if add_member_return
+            user = TeamsUser.last
+            undo_link("The team @teams_user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
             MentorManagement.assign_mentor(assignment.id, team.id)
           end
         end
@@ -59,8 +69,10 @@ class TeamsUsersController < ApplicationController
         else
           add_member_return = team.add_member(user)
           flash[:error] = "This team already has the maximum number of members." if add_member_return == false
+          if add_member_return
           @teams_user = TeamsUser.last
           undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
+          end
         end
       end
     end

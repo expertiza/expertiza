@@ -1,7 +1,7 @@
 describe MentorManagement do
   # using let! so that state is automatically set up before each example group
   # this could also be accomplished with before(:each) and instance methods
-  # but the rest of the code base makes use of let alot, so this is consistent
+  # but the rest of the code base makes use of let a lot, so this is consistent
   # with that, while achieving the same goal as before(:each)
   let!(:assignment) { create(:assignment, id: 999, auto_assign_mentor: true) }
   let!(:ta) { create(:teaching_assistant, id: 999) }

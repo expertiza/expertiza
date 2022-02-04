@@ -1,5 +1,6 @@
 
 Expertiza::Application.routes.draw do
+  resources :duties
   ###
   # Please insert new routes alphabetically!
   ###
@@ -174,6 +175,7 @@ resources :institution, except: [:destroy] do
   resources :join_team_requests do
     collection do
       post :decline
+      get :index
     end
   end
 
@@ -211,7 +213,6 @@ resources :institution, except: [:destroy] do
       get :inherit
       get :bequeath_all
       post :update_authorizations
-      post :update_duties
       post :change_handle
       get :view_copyright_grants
     end
@@ -305,6 +306,14 @@ resources :institution, except: [:destroy] do
       get :show_calibration_results_for_student
       post :custom_create
       get :json
+    end
+  end
+
+  resources :review_bids do
+    collection do
+      post :assign_bidding
+      post :set_priority
+      post :index
     end
   end
 
@@ -458,15 +467,16 @@ resources :institution, except: [:destroy] do
   resources :teams, only: %i[new create edit update] do
     collection do
       get :list
-      # post ':id', action: :create_teams
+      post ':id', action: :update
       post :create_teams
       post :inherit
     end
   end
 
-  resources :teams_users, only: %i[new create] do
+  resources :teams_users, only: %i[new create update] do
     collection do
       post :list
+      post :update_duties
     end
   end
 
@@ -539,6 +549,7 @@ resources :institution, except: [:destroy] do
   post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
   post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
   post 'student_task/publishing_rights_update', controller: :student_task, action: :publishing_rights_update,method: :put
+  get 'student_view/flip_view', controller: :student_view, action: :flip_view
   #updated route and added specific controller action upon accessing this route
 end
 

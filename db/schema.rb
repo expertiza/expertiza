@@ -30,9 +30,8 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.integer  "tag_prompt_deployment_id", limit: 4
     t.integer  "user_id",                  limit: 4
     t.string   "value",                    limit: 255
-    t.datetime "created_at",                                                    null: false
-    t.datetime "updated_at",                                                    null: false
-    t.decimal  "confidence_level",                     precision: 10, scale: 5
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
   end
 
   add_index "answer_tags", ["answer_id"], name: "index_answer_tags_on_answer_id", using: :btree
@@ -132,11 +131,11 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.boolean  "vary_by_topic",                                                    default: false
     t.boolean  "vary_by_round",                                                    default: false
     t.boolean  "reviewer_is_team"
+    t.string   "review_choosing_algorithm",                          limit: 255,   default: "Simple Choose"
     t.boolean  "is_conference_assignment",                                         default: false
     t.boolean  "auto_assign_mentor",                                               default: false
     t.boolean  "duty_based_assignment?"
     t.boolean  "questionnaire_varies_by_duty"
-    t.string "review_choosing_algorithm", limit: 255, default: "Simple Choose"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree

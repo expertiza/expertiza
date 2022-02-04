@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20211114021523) do
+ActiveRecord::Schema.define(version: 20220114003928) do
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -30,8 +30,9 @@ ActiveRecord::Schema.define(version: 20211114021523) do
     t.integer  "tag_prompt_deployment_id", limit: 4
     t.integer  "user_id",                  limit: 4
     t.string   "value",                    limit: 255
-    t.datetime "created_at",                           null: false
-    t.datetime "updated_at",                           null: false
+    t.datetime "created_at",                                                    null: false
+    t.datetime "updated_at",                                                    null: false
+    t.decimal  "confidence_level",                     precision: 10, scale: 5
   end
 
   add_index "answer_tags", ["answer_id"], name: "index_answer_tags_on_answer_id", using: :btree
@@ -68,9 +69,11 @@ ActiveRecord::Schema.define(version: 20211114021523) do
     t.integer "used_in_round",        limit: 4
     t.boolean "dropdown",                       default: true
     t.integer "topic_id",             limit: 4
+    t.integer "duty_id",              limit: 4
   end
 
   add_index "assignment_questionnaires", ["assignment_id"], name: "fk_aq_assignments_id", using: :btree
+  add_index "assignment_questionnaires", ["duty_id"], name: "index_assignment_questionnaires_on_duty_id", using: :btree
   add_index "assignment_questionnaires", ["questionnaire_id"], name: "fk_aq_questionnaire_id", using: :btree
   add_index "assignment_questionnaires", ["user_id"], name: "fk_aq_user_id", using: :btree
 
@@ -129,9 +132,11 @@ ActiveRecord::Schema.define(version: 20211114021523) do
     t.boolean  "vary_by_topic",                                                    default: false
     t.boolean  "vary_by_round",                                                    default: false
     t.boolean  "reviewer_is_team"
-    t.string   "review_choosing_algorithm",                          limit: 255,   default: "Simple Choose"
     t.boolean  "is_conference_assignment",                                         default: false
     t.boolean  "auto_assign_mentor",                                               default: false
+    t.boolean  "duty_based_assignment?"
+    t.boolean  "questionnaire_varies_by_duty"
+    t.string   "review_choosing_algorithm",                          limit: 255,   default: "Simple Choose"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -411,8 +416,10 @@ ActiveRecord::Schema.define(version: 20211114021523) do
     t.boolean  "can_take_quiz",                     default: true
     t.float    "Hamer",               limit: 24,    default: 1.0
     t.float    "Lauw",                limit: 24,    default: 0.0
+    t.integer  "duty_id",             limit: 4
   end
 
+  add_index "participants", ["duty_id"], name: "index_participants_on_duty_id", using: :btree
   add_index "participants", ["user_id"], name: "fk_participant_users", using: :btree
 
   create_table "password_resets", force: :cascade do |t|
@@ -770,8 +777,10 @@ ActiveRecord::Schema.define(version: 20211114021523) do
   create_table "teams_users", force: :cascade do |t|
     t.integer "team_id", limit: 4
     t.integer "user_id", limit: 4
+    t.integer "duty_id", limit: 4
   end
 
+  add_index "teams_users", ["duty_id"], name: "index_teams_users_on_duty_id", using: :btree
   add_index "teams_users", ["team_id"], name: "fk_users_teams", using: :btree
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
@@ -846,6 +855,7 @@ ActiveRecord::Schema.define(version: 20211114021523) do
   add_foreign_key "assignment_badges", "assignments"
   add_foreign_key "assignment_badges", "badges"
   add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
+  add_foreign_key "assignment_questionnaires", "duties"
   add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
   add_foreign_key "assignments", "assignments", column: "sample_assignment_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
@@ -864,6 +874,7 @@ ActiveRecord::Schema.define(version: 20211114021523) do
   add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"
   add_foreign_key "late_policies", "users", column: "instructor_id", name: "fk_instructor_id"
   add_foreign_key "locks", "users"
+  add_foreign_key "participants", "duties"
   add_foreign_key "participants", "users", name: "fk_participant_users"
   add_foreign_key "plagiarism_checker_assignment_submissions", "assignments"
   add_foreign_key "plagiarism_checker_comparisons", "plagiarism_checker_assignment_submissions"
@@ -884,6 +895,7 @@ ActiveRecord::Schema.define(version: 20211114021523) do
   add_foreign_key "tag_prompt_deployments", "assignments"
   add_foreign_key "tag_prompt_deployments", "questionnaires"
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
+  add_foreign_key "teams_users", "duties"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
 end

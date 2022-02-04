@@ -52,7 +52,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def team_assignment?
-    true
+    self.max_team_size > 1
   end
   alias team_assignment team_assignment?
 

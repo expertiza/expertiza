@@ -149,6 +149,10 @@
     </td>
   </tr>
 
+  <!-- #E2147 -->
+  <div id="duty_assignment_chkbx" hidden>
+    <%= render '/duties/checkbox' %>
+  </div>
   <!--#E1870-->
   <% if @assignment_form.assignment.rounds_of_reviews > 1 %>
     <tr>
@@ -185,4 +189,25 @@
             jQuery('#assignment_form_assignment_num_metareviews_allowed').val('-1');
         }
     }
+    function hasDutiesChanged() {
+        var checkbox = jQuery('#is_duty_checkbox');
+        var add_duties_div = jQuery('#add_duties');
+
+        if (checkbox.is(':checked')) {
+            add_duties_div.removeAttr('hidden');
+        }
+        else {
+            add_duties_div.attr('hidden', true);
+        }
+    }
+    jQuery(document).ready(function () {
+        var has_teams_checkbox = jQuery('#team_assignment');
+        var duty_assignment_chkbx =  jQuery('#duty_assignment_chkbx')
+        if (has_teams_checkbox.is(':checked')) {
+            duty_assignment_chkbx.removeAttr('hidden');
+        } else {
+            duty_assignment_chkbx.attr('hidden', true);
+        }
+    })
+
 </script>

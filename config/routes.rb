@@ -1,5 +1,6 @@
 
 Expertiza::Application.routes.draw do
+  resources :duties
   ###
   # Please insert new routes alphabetically!
   ###
@@ -212,7 +213,6 @@ resources :institution, except: [:destroy] do
       get :inherit
       get :bequeath_all
       post :update_authorizations
-      post :update_duties
       post :change_handle
       get :view_copyright_grants
     end
@@ -473,9 +473,10 @@ resources :institution, except: [:destroy] do
     end
   end
 
-  resources :teams_users, only: %i[new create] do
+  resources :teams_users, only: %i[new create update] do
     collection do
       post :list
+      post :update_duties
     end
   end
 

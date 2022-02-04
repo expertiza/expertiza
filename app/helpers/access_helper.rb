@@ -32,5 +32,9 @@ module AccessHelper
 
   def action_allowed?
     # default action_allowed is nil. So to allow any action, we need to override this in the controller.
+    if current_user && current_role.instructor?
+      # allow action when the user is an instructor
+      true
+    end
   end
 end

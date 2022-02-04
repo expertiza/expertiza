@@ -1,11 +1,11 @@
 describe SignUpSheetController do
-  let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true) }
-  let(:assignment2) { create(:assignment, id: 2, microtask: false, staggered_deadline: false, private: true) }
-  let(:assignment3) { create(:assignment, id: 3, microtask: true, staggered_deadline: true, private: false) }
-  let(:assignment30) { create(:assignment, id: 30, microtask: true, staggered_deadline: false, private: true) }
-  let(:assignment40) { create(:assignment, id: 40, microtask: false, staggered_deadline: true, private: false) }
-  let(:assignment6) { create(:assignment, id: 6000, microtask: true, staggered_deadline: false, private: false) }
-  let(:assignment7) { create(:assignment, id: 7000, microtask: false, staggered_deadline: true, private: true) }
+  let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true, directory_path: "assignment") }
+  let(:assignment2) { create(:assignment, id: 2, microtask: false, staggered_deadline: false, private: true, directory_path: "assignment2") }
+  let(:assignment3) { create(:assignment, id: 3, microtask: true, staggered_deadline: true, private: false, directory_path: "assignment3") }
+  let(:assignment30) { create(:assignment, id: 30, microtask: true, staggered_deadline: false, private: true, directory_path: "assignment30") }
+  let(:assignment40) { create(:assignment, id: 40, microtask: false, staggered_deadline: true, private: false, directory_path: "assignment40") }
+  let(:assignment6) { create(:assignment, id: 6000, microtask: true, staggered_deadline: false, private: false, directory_path: "assignment6") }
+  let(:assignment7) { create(:assignment, id: 7000, microtask: false, staggered_deadline: true, private: true, directory_path: "assignment7") }
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 8) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }

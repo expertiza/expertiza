@@ -52,7 +52,7 @@ describe "Assignment creation topics tab", js: true do
 		)
 	end
 
-	it "procedes without topics properties" do
+	it "proceeds without topics properties" do
 		uncheck("assignment_form_assignment_allow_suggestions")
 		uncheck("assignment_form_assignment_is_intelligent")
 		uncheck("assignment_form_assignment_can_review_same_topic")

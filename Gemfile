@@ -10,6 +10,7 @@ gem 'authlogic', '4.1'
 gem 'awesome_nested_set'
 gem 'bind-it'
 gem 'bootstrap3-datetimepicker-rails', '~> 4.17.47'
+gem 'bullet', '~> 5.7.6'
 gem 'capistrano'
 gem 'capistrano-bundler'
 gem "capistrano-db-tasks", require: false

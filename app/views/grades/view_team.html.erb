@@ -2,10 +2,10 @@
 <script type="text/javascript">
   $( document ).ready(function() {
     $('#tag_prompt_toggler').click(function () {
-      if ($('#tag_prompt_toggler').text() == "hide tags")
-        $('#tag_prompt_toggler').text("show tags")
+      if ($('#tag_prompt_toggler').text() == t(".hide_tags"))
+        $('#tag_prompt_toggler').text(t(".show_tags"))
       else
-        $('#tag_prompt_toggler').text("hide tags")
+        $('#tag_prompt_toggler').text(t(".hide_tags"))
       $('.tag_prompt_container').toggle();
       $('.tag_heat_grid').toggle();
     });
@@ -21,14 +21,14 @@
     }
   }
 </script>
-<h2>Summary Report for assignment: <%= @assignment.name %></h2>
+<h2><%=t ".summary_report"%> <%= @assignment.name %></h2>
 <!-- Anchor for Tag Heatgrid. Heatgrid generation code located in /assets/javascripts/view_team_in_grades.js -->
 <table id="tag_heat_grid" class="tag_heat_grid"></table>
-<h4>Team: <%= @team.name(session[:ip]) %></h4>
+<h4><%=t ".team"%> <%= @team.name(session[:ip]) %></h4>
 <!--Obtain topic name from assignment helper-->
 <% topic_id, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(@team) %>
 <% if @assignment.topics? %>
-  <h4>Topic: <%= topic_id + '. ' + topic_name %></h4>
+  <h4><%=t ".topic"%> <%= topic_id + '. ' + topic_name %></h4>
 <% end %>
 <!--Obtain only review scores
     Bugfix E2100 -- Single-round reviews use the :review symbol, multi-round reviews use :review1 and :review2. Average
@@ -40,20 +40,20 @@
   <% rscore_review2 = Rscore.new(@pscore,:review2) %>
   <% average = rscore_review1.my_avg + rscore_review2.my_avg %>
   <% average /= 2 %>
-  <h4>Average peer review score: <span class = "c5"><%= average.is_a?(Float)? sprintf("%.2f",average): average %></span></h4>
+  <h4><%=t ".average_peer_review"%> <span class = "c5"><%= average.is_a?(Float)? sprintf("%.2f",average): average %></span></h4>
 <% elsif @pscore[:review]  %>
 <% rscore_review = Rscore.new(@pscore,:review)%>
-<h4>Average peer review score: <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h4>
+<h4><%=t ".average_peer_review"%> <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h4>
 <%else %>
-  <h4> There are no reviews for this assignment</h4>
+  <h4> <%=t ".no_reviews_for_assignment"%></h4>
 <%end %>
 <!--Toggle submission-->
-<button onclick="toggleFunction('<%= @participant.id.to_s%>')" class="btn btn-default">Show Submission</button>
+<button onclick="toggleFunction('<%= @participant.id.to_s%>')" class="btn btn-default"><%=t ".show_submission"%></button>
 <div id="<%= @participant.id.to_s%>" style="display:none;">
 <% if @participant.team.hyperlinks.try(:length) %>
   <%= render :partial => 'submitted_content/hyperlink', :locals => {participant: @participant, stage: @stage} %>
   <% else %>
- <b>No Submission</b>
+ <b><%=t ".no_submission"%></b>
 <% end %>
 </div><br><br>
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
@@ -67,7 +67,7 @@
             <table class="table table-striped">
               <thead>
               <th>#</th>
-              <th>Question</th>
+              <th><%=t ".question"%></th>
               </thead>
               <% vm.list_of_rows.each_with_index do |row, count| %>
                   <% if row.score_row.count > 0  %>
@@ -84,15 +84,15 @@
           <span style="width:100%;">
               <h4 style="display:inline-block;"><%= vm.questionnaire_display_type %>
                 <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
-                    (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
+                    (<%=t ".round"%>: <%= vm.round.to_s  %> <%=t ".of"%> <%= vm.rounds.to_s  %>)
                 <%end %>
               </h4>
-              <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>
+              <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions"><%=t ".toggle_question_list"%></span>
             <% if @assignment.is_answer_tagging_allowed %>
-            <span class="spn_qsttog" id="tag_prompt_toggler" title="">hide tags</span>
+            <span class="spn_qsttog" id="tag_prompt_toggler" title=""><%=t ".hide_tags"%></span>
             <% end %>
-            <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Colors are scaled from poor to excellent in the following order: red, orange, yellow, light-green, dark-green">color legend</span>
-            <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience.">interaction legend</span>
+            <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Colors are scaled from poor to excellent in the following order: red, orange, yellow, light-green, dark-green"><%=t ".color_legend"%></span>
+            <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title=t(".interaction_legend_tooltip")><%=t ".interaction_legend"%></span>
           </span>
             <!--
                 Changes to this was done as part of E1788_OSS_project_Maroon_Heatmap_fixes
@@ -127,7 +127,7 @@
                 Avg<span></span>
               </th>
               <th class="sorter-false">
-                <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1</span>
+                <span  data-toggle="tooltip" data-placement="right" title="<%=t(".metric_tooltip")%>"><%=t ".metric1"%></span>
               </th>
             </tr>
             </thead>
@@ -170,13 +170,13 @@
                     <div>
                       <table class="table tbl_questlist">
                         <thead>
-                        <th>Review </th>
-                        <th>Score</th>
-                        <th>Comment</th>
+                        <th><%=t ".review"%> </th>
+                        <th><%=t ".score"%></th>
+                        <th><%=t ".Comment"%></th>
                         </thead>
                         <% (0.upto(row.score_row.length - 1)).each do |index| %>
                             <tr>
-                              <td>Review <%=index + 1%></td>
+                              <td><%=t ".review"%> <%=index + 1%></td>
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
                               <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
                                 <!-- E2100 : Set id and data of this <td> to be queried by jQuery for the tagging report
@@ -218,8 +218,8 @@
                   <div style="background-color:#A9A9F5;padding:4px;">
                     <table class="table tbl_addlcmt">
                       <thead>
-                      <th>Review</th>
-                      <th >Additional Comments</th>
+                      <th><%=t ".review"%></th>
+                      <th ><%=t ".additional_comments"%></th>
                       </thead>
                       <tbody>
                       <% vm.list_of_reviews.each_with_index do |review, k| %>
@@ -240,7 +240,7 @@
           <span> <%= vm.display_team_members(session[:ip]) %></span>
           <!-- this elsif terminates the heatgrid code.  -->
         <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
-            <br><div class="alert alert-warning">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>
+            <br><div class="alert alert-warning"><%=t ".no_review_of"%> <%= vm.questionnaire_type %> TYPE EXISTS. </div>
         <% end %>
         <br/>  
     <% end %>
@@ -253,17 +253,17 @@
    @ta_id = @participant.user_id
 %>
 
-  <h4 style="font-weight:bold;display:inline-block;">Grade and comment for submission</h4><br/>
+  <h4 style="font-weight:bold;display:inline-block;"><%=t ".grade_and_comment"%></h4><br/>
   <% if ['Student', 'Teaching Assistant'].include? current_user.role.name %>
-    Grade: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
-    Comment: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %><br>
+    <%=t ".grade"%>: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
+    <%=t ".Comment"%>: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %><br>
   <% end %>
   <% if TaMapping.where(ta_id: @ta_id, course_id: @course_id).exists? || current_user == @assignment.instructor%>
   <h4 style="font-weight:bold;display:inline-block;">TA Grade-Comment:</h4><br/>
     <%= form_tag 'save_grade_and_comment_for_submission' do %>
       <%= hidden_field_tag :participant_id, params[:id] %>
-      <%= number_field_tag 'grade_for_submission', @team.try(:grade_for_submission) ,min: 0, max: 100, maxlength: 3, size: 3, class: "form-control width-150", placeholder: 'Grade' %><br/>
-      <%= text_area_tag 'comment_for_submission', @team.try(:comment_for_submission), size: '75x10', placeholder: 'Comment', class: "form-control width-500" %><br>
-      <%= submit_tag 'Save' ,class: "btn btn-default" %>
+      <%= number_field_tag 'grade_for_submission', @team.try(:grade_for_submission) ,min: 0, max: 100, maxlength: 3, size: 3, class: "form-control width-150", placeholder: t(".grade") %><br/>
+      <%= text_area_tag 'comment_for_submission', @team.try(:comment_for_submission), size: '75x10', placeholder: t(".Comment"), class: "form-control width-500" %><br>
+      <%= submit_tag t(".save") ,class: "btn btn-default" %>
     <% end %>
   <% end %>

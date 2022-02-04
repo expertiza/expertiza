@@ -81,7 +81,7 @@ describe PopupController do
 
   # this can be called from "response_report" by clicking team names from instructor end.
   describe '#team_users_popup' do
-    it "renders the page successfuly as Instructor" do 
+    it "renders the page successfully as Instructor" do 
       allow(Team).to receive(:find).and_return(team)
       allow(Assignment).to receive(:find).and_return(assignment)
 

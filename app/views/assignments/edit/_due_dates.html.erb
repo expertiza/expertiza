@@ -87,6 +87,7 @@
         if (previous_element.length == 0) {
             return
         }
+        var style_center = 'align="center" style="text-align-last: center"'
 
         var html = '<tr id=' + element_id + '>';
 
@@ -125,14 +126,15 @@
         if (due_name == null) {
             due_name = '';
         }
-        html += '<td align="center" class="due_date_due_at">' +
+
+        html += '<td ' + style_center +' class="due_date_due_at">' +
             '<input id="datetimepicker_' + element_id +
             '" name="assignment_form[due_date][][due_at]"  type="text" style="width: 140px;text-align:center;" value="' +
             due_at.substr(0, 16) + '" class="form-control">' + '</td>';
         html += '<td align="center" class="due_date_due_at" width="5%">' + '<input id="use_updator_' + element_id +
             '" type="checkbox" name="updatorCheck" style="width: 20px">' + '</td>';
 
-        html += '<td align="center" class="due_date_due_at" width="10%">';
+        html += '<td ' + style_center + ' class="due_date_due_at" width="10%">';
         // if(deadline_type == 'team_formation'){
         //     html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]" disabled>'
         // }
@@ -145,7 +147,7 @@
             '<option value="3">Yes</option>' +
             '</select></td>';
 
-        html += '<td align="center" class="due_date_review_allowed_id" width="10%">';
+        html += '<td '  + style_center + ' class="due_date_review_allowed_id" width="10%">';
         // if(deadline_type == 'team_formation'){
         //     html += '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]" disabled>'
         // }
@@ -158,7 +160,7 @@
             '<option value="3">Yes</option>' +
             '</select></td>';
 
-        html += '<td align="center" class="due_date_teammate_review_allowed_id" width="10%">';
+        html += '<td '  + style_center +  ' class="due_date_teammate_review_allowed_id" width="10%">';
         html += '<select id="due_date_teammate_review_allowed_id" name="assignment_form[due_date][][teammate_review_allowed_id]" class="form-control" style="width: 75px">'
         html +=
             '<option value="1">No</option>' +
@@ -166,7 +168,7 @@
             '<option value="3">Yes</option>' +
             '</select></td>';
 
-        html += '<td align="center" class="due_date_review_of_review_allowed_id" width="10%">';
+        html += '<td '  + style_center +  ' class="due_date_review_of_review_allowed_id" width="10%">';
         // if(deadline_type == 'team_formation'){
         //     html += '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]" disabled>'
         // }
@@ -180,7 +182,7 @@
             '</select></td>';
 
         if (<%= @assignment_form.assignment.require_quiz == nil ? false : @assignment_form.assignment.require_quiz %>) {
-            html += '<td align="center" class="due_date_quiz_allowed_id" width="10%">' +
+            html += '<td ' + style_center + ' class="due_date_quiz_allowed_id" width="10%">' +
                 '<select id="due_date_quiz_allowed_id" name="assignment_form[due_date][][quiz_allowed_id]" class="form-control" style="width: 75px">' +
                 '<option value="1">No</option>' +
                 '<option value="2">Late</option>' +
@@ -189,7 +191,7 @@
         } else {
         }
 
-        html += '<td align="center" class="due_date_threshold" width="10%">' +
+        html += '<td '  + style_center + ' class="due_date_threshold" width="10%">' +
             '<select id="due_date_threshold" name="assignment_form[due_date][][threshold]" class="form-control" style="width: 75px">' +
             '<option value="">No</option>' +
             '<option value="1">1</option>' +
@@ -208,9 +210,9 @@
             '</select></td>';
         var html2 = html;
 
-        html += '<td  align="center" id="specialname" class="due_date_name" width="10%">';
+        html += '<td ' + style_center + ' id="specialname" class="due_date_name" width="10%">';
         html += '<input id="due_date_name" type="text" name="assignment_form[due_date][][deadline_name]" value="' + due_date.deadline_name + '" class="form-control">' + '</td>';
-        html += '<td align="center" id="due_date_url_col" class="due_date_description_url" width="10%">';
+        html += '<td ' + style_center + ' id="due_date_url_col" class="due_date_description_url" width="10%">';
         html += '<input id="due_date_description_url" type="text" name="assignment_form[due_date][][description_url]" value="' + due_date.description_url + '" class="form-control">' + '</td>';
         if (addnameurl == false) {
             previous_element.after(html2);
@@ -320,7 +322,7 @@
             return;
         }
         if (state == false && round_count > 1) {
-            //hide name and url colomns
+            //hide name and url columns
             removeDueDateTableElement('team_formation', 0);
             for (i = 1; i <= round_count; i++) {
                 removeDueDateTableElement('submission', i);
@@ -338,7 +340,7 @@
             due_date_url_column.style.display = "none";
         }
         if (state == true && round_count > 1) {
-            //display name and url colomns
+            //display name and url columns
             removeDueDateTableElement('team_formation', 0);
             for (i = 1; i <= round_count; i++) {
                 removeDueDateTableElement('submission', i);
@@ -432,7 +434,7 @@
     }
 
     //E1654. Improve date-picker and deadlines Code change starts
-    //This is a generic funtion to add and substract days and months
+    //This is a generic function to add and subtract days and months
     function addDaysOrMonth(mul, type) {
         var days = parseInt($('#days').val(), 10); // days variable stores the number of days to change the deadline
         var months = parseInt($('#months').val(), 10);  // days variable stores the number of days to change the deadline
@@ -500,21 +502,22 @@
 <%= label_tag('teamFormationAllowed', 'Use team formation deadline') %><br/>
 </span>
 
-<input name="metareviewAllowed" type="hidden" value="false"/>
-<%= check_box_tag('metareviewAllowed', 'true', @metareview_allowed, :onclick => "removeOrAddMetareview()") %>
-<%= label_tag('metareviewAllowed', 'Use meta-review deadline') %><br/>
+<input name="metareview_allowed" type="hidden" value="false"/>
+<%= check_box_tag('metareview_allowed', 'true', @metareview_allowed, :onclick => "removeOrAddMetareview()") %>
+<%= label_tag('metareview_allowed', 'Use meta-review deadline') %><br/><br/>
 <div id="date_updater_div">
-  <button type="button" id="show_date_updater" class="btn btn-default" style="margin-bottom: 20px;">Show/Hide Date
-    Updater
-  </button>
-  <div id="date_updater_inner">
+  <button type="button" id="show_date_updater" class="btn btn-default" style="margin-bottom: 20px; margin-right: 10px; float: left">Show/Hide Date Updater</button>
+</div>
+<img style="margin-left: 30px" src="/assets/info.png" title='Enter the number of days by which you want to prepone/postpone the deadline. Then select rows using the checkbox provided under Use Date Updater column. Then use +/- to change the Date and Time.   '>
+<div id="date_updater_inner" style="float: left; margin-left: 40px">
+
 
     <%= label_tag('Days') %>
     <button type="button" id="addDays_btn" class="btn btn-default">+</button>
-    <input id="days" type="number" name="quantity" min="0" value="0" style="width:50px">
+    <input id="days" type="number" name="quantity" min="0" value="1" style="width:50px">
     <button type="button" id="subDays_btn" class="btn btn-default">-</button>
 
-  </div>
+
 </div>
 <table class='exp table table-striped' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden; font-size: 15px'>
 

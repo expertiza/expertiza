@@ -4,7 +4,7 @@ module ReviewMappingHelper
   end
 
   #
-  # gets the response map data such as reviewer id, reviewd object id and type for the review report
+  # gets the response map data such as reviewer id, reviewed object id and type for the review report
   #
   def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
     rspan = 0

@@ -35,6 +35,8 @@ class Assignment < ActiveRecord::Base
   validates :name, presence: true
   validates :name, uniqueness: {scope: :course_id}
   validate :valid_num_review
+  validates :directory_path, presence: true # E2138 Validation for unique submission directory
+  validates :directory_path, uniqueness: {scope: :course_id}
 
   REVIEW_QUESTIONNAIRES = {author_feedback: 0, metareview: 1, review: 2, teammate_review: 3}.freeze
 
@@ -213,7 +215,7 @@ class Assignment < ActiveRecord::Base
       raise "There is at least one teammate review response that exists for #{self.name}."
     end
 
-    # destroy instances of invitations, teams, particiapnts, etc, refactored by Rajan, Jasmine, Sreenidhi 3/30/2020
+    # destroy instances of invitations, teams, participants, etc, refactored by Rajan, Jasmine, Sreenidhi 3/30/2020
     #You can now add the instances to be deleted into the list.
     delete_instances = %w[invitations teams participants due_dates assignment_questionnaires]
     delete_instances.each do |instance|

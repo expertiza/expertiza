@@ -75,7 +75,7 @@ describe TeamsUsersController do
 
   #Test team users controller new method
   describe '#new' do
-    it 'sets the Team object to instatance variable' do
+    it 'sets the Team object to instance variable' do
       allow(Team).to receive(:find).with('1').and_return(team1)
       params = {id:  1}
       session = {user: instructor}

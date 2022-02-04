@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220114003928) do
+ActiveRecord::Schema.define(version: 20211114021523) do
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -30,9 +30,8 @@ ActiveRecord::Schema.define(version: 20220114003928) do
     t.integer  "tag_prompt_deployment_id", limit: 4
     t.integer  "user_id",                  limit: 4
     t.string   "value",                    limit: 255
-    t.datetime "created_at",                                                    null: false
-    t.datetime "updated_at",                                                    null: false
-    t.decimal  "confidence_level",                     precision: 10, scale: 5
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
   end
 
   add_index "answer_tags", ["answer_id"], name: "index_answer_tags_on_answer_id", using: :btree
@@ -132,11 +131,15 @@ ActiveRecord::Schema.define(version: 20220114003928) do
     t.boolean  "vary_by_topic",                                                    default: false
     t.boolean  "vary_by_round",                                                    default: false
     t.boolean  "reviewer_is_team"
+    t.string   "review_choosing_algorithm",                          limit: 255,   default: "Simple Choose"
     t.boolean  "is_conference_assignment",                                         default: false
     t.boolean  "auto_assign_mentor",                                               default: false
+<<<<<<< HEAD
     t.boolean  "duty_based_assignment?"
     t.boolean  "questionnaire_varies_by_duty"
     t.string   "review_choosing_algorithm",                          limit: 255,   default: "Simple Choose"
+=======
+>>>>>>> dfdb304bad24e5ff76176b83ebd083408bf406dc
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -251,6 +254,7 @@ ActiveRecord::Schema.define(version: 20220114003928) do
     t.datetime "updated_at"
     t.boolean  "private",                       default: false, null: false
     t.integer  "institutions_id", limit: 4
+    t.integer  "locale",          limit: 4,     default: 1
   end
 
   add_index "courses", ["instructor_id"], name: "fk_course_users", using: :btree
@@ -830,6 +834,7 @@ ActiveRecord::Schema.define(version: 20220114003928) do
     t.boolean "copy_of_emails",                             default: false
     t.integer "institution_id",            limit: 4
     t.boolean "preference_home_flag",                       default: true
+    t.integer "locale",                    limit: 4,        default: 0
   end
 
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree

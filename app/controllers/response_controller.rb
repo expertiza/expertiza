@@ -276,7 +276,7 @@ class ResponseController < ApplicationController
     # the response to be updated
     @response = Response.find(params[:id])
 
-    # Error message placehoder
+    # Error message placeholder
     msg = ""
 
     begin

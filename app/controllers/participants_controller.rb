@@ -1,5 +1,6 @@
 class ParticipantsController < ApplicationController
   include AuthorizationHelper
+  include ParticipantsHelper
   autocomplete :user, :name
 
   def action_allowed?
@@ -8,6 +9,10 @@ class ParticipantsController < ApplicationController
     else
       current_user_has_ta_privileges?
     end
+  end
+
+  def controller_locale
+    locale_for_student
   end
 
   def list
@@ -27,7 +32,7 @@ class ParticipantsController < ApplicationController
   def add
     curr_object = Object.const_get(params[:model]).find(params[:id]) if Participant::PARTICIPANT_TYPES.include? params[:model]
     begin
-      permissions = participants.permissions(params[:authorization])
+      permissions = participant_permissions(params[:authorization])
       can_submit = permissions[:can_submit]
       can_review = permissions[:can_review]
       can_take_quiz = permissions[:can_take_quiz]
@@ -43,15 +48,13 @@ class ParticipantsController < ApplicationController
       url_for controller: 'users', action: 'new'
       flash.now[:error] = "The user <b>#{params[:user][:name]}</b> does not exist or has already been added."
     end
-    # E1721 : AJAX for adding participants to assignment changes begin
     render action: 'add.js.erb', layout: false
-    # E1721 changes End.
   end
 
   #when you change the duties, changes the permissions based on the new duty you go to
   def update_authorizations
     participant = Participant.find(params[:id])
-    permissions = participant.permissions(params[:authorization])
+    permissions = participant_permissions(params[:authorization])
     can_submit = permissions[:can_submit]
     can_review = permissions[:can_review]
     can_take_quiz = permissions[:can_take_quiz]

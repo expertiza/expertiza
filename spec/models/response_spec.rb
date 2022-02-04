@@ -259,7 +259,7 @@ describe Response do
     end
 
     context 'when count is not 0' do
-      context 'when the difference between average score on same artifact from others and current score is bigger thatn allowed percentage' do
+      context 'when the difference between average score on same artifact from others and current score is bigger than allowed percentage' do
         it 'returns true' do
           allow(Response).to receive(:avg_scores_and_count_for_prev_reviews).with([response], response).and_return([0.8, 2])
           allow(response).to receive(:aggregate_questionnaire_score).and_return(93)

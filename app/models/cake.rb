@@ -97,10 +97,10 @@ class Cake < ScoredQuestion
     # Sums up the scores given by all teammates that should be less than or equal to 100
     def calculate_total_score(question_answers)
       question_score = 0.0
-      question_answers.each do |ans|
+      question_answers.each do |question_answer|
         # calculate score per question
-        unless ans.answer.nil?
-          question_score += ans.answer
+        unless question_answer.answer.nil?
+          question_score += question_answer.answer
         end
       end
       question_score

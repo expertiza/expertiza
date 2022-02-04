@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(version: 20220114003928) do
     t.datetime "updated_at",                      null: false
     t.text     "self_introduction", limit: 65535
   end
-  
+
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
     t.integer  "tag_prompt_deployment_id", limit: 4
@@ -136,7 +136,7 @@ ActiveRecord::Schema.define(version: 20220114003928) do
     t.boolean  "auto_assign_mentor",                                               default: false
     t.boolean  "duty_based_assignment?"
     t.boolean  "questionnaire_varies_by_duty"
-    t.string   "review_choosing_algorithm", limit: 255, default: "Simple Choose"
+    t.string "review_choosing_algorithm", limit: 255, default: "Simple Choose"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -363,7 +363,7 @@ ActiveRecord::Schema.define(version: 20220114003928) do
   end
 
   add_index "locks", ["user_id"], name: "fk_rails_426f571216", using: :btree
-  
+
   create_table "markup_styles", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
   end
@@ -551,7 +551,7 @@ ActiveRecord::Schema.define(version: 20220114003928) do
   add_index "review_bids", ["participant_id"], name: "fk_rails_ab93feeb35", using: :btree
   add_index "review_bids", ["signuptopic_id"], name: "fk_rails_e88fa4058f", using: :btree
   add_index "review_bids", ["user_id"], name: "fk_rails_6041e1cdb9", using: :btree
-  
+
   create_table "review_comment_paste_bins", force: :cascade do |t|
     t.integer  "review_grade_id", limit: 4
     t.string   "title",           limit: 255
@@ -598,7 +598,7 @@ ActiveRecord::Schema.define(version: 20220114003928) do
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
   end
-  
+
   create_table "score_views", id: false, force: :cascade do |t|
     t.integer  "question_weight",       limit: 4
     t.string   "type",                  limit: 255

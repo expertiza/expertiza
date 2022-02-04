@@ -5,5 +5,3 @@ nd
 ot
 DNE
 devels
-nIn
-DNE

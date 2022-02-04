@@ -14,9 +14,7 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
-          exclude_file: app/assets/*
-          exclude_file: Dangerfile
-          exclude_file: app/assets
+          exclude_file: app/assets/*, Dangerfile
           ignore_words_list: upto,xdescribe,DNE
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies

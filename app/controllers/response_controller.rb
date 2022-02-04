@@ -28,7 +28,7 @@ class ResponseController < ApplicationController
   # E-1973 - helper method to check if the current user is the reviewer
   # if the reviewer is an assignment team, we have to check if the current user is on the team
   def current_user_is_reviewer?(map, reviewer_id)
-    map.get_reviewer.current_user_is_reviewer? current_user.try(:id)
+    map.reviewer.current_user_is_reviewer? current_user.try(:id)
   end
 
   # GET /response/json?response_id=xx
@@ -255,7 +255,7 @@ class ResponseController < ApplicationController
     else
       # if reviewer is team, then we have to get the id of the participant from the team
       # the id in reviewer_id is of an AssignmentTeam
-      reviewer_id = @map.response_map.get_reviewer.get_logged_in_reviewer_id(current_user.try(:id))
+      reviewer_id = @map.response_map.reviewer.get_logged_in_reviewer_id(current_user.try(:id))
       redirect_to controller: 'student_review', action: 'list', id: reviewer_id
     end
   end
@@ -276,7 +276,7 @@ class ResponseController < ApplicationController
     # the response to be updated
     @response = Response.find(params[:id])
 
-    # Error message placehoder
+    # Error message placeholder
     msg = ""
 
     begin
@@ -366,7 +366,12 @@ class ResponseController < ApplicationController
       "AssignmentSurveyResponseMap",
       "GlobalSurveyResponseMap",
       "BookmarkRatingResponseMap"
-      @questionnaire = @map.questionnaire
+      if @assignment.duty_based_assignment?
+        # E2147 : gets questionnaire of a particular duty in that assignment rather than generic questionnaire
+        @questionnaire = @map.questionnaire_by_duty(@map.reviewee.duty_id)
+      else
+        @questionnaire = @map.questionnaire
+      end
     end
   end
 

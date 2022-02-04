@@ -24,8 +24,8 @@ Expertiza::Application.configure do
       address:              'smtp.gmail.com',
       port:                 25,
       domain:               'gmail.com',
-      user_name:            'expertiza.development@gmail.com',
-      password:             'Expertiza@123',
+      user_name:            'expertiza.debugging@gmail.com',
+      password:             'dt2DR0Hhf',
       authentication:       'plain',
       enable_starttls_auto: true  }
 
@@ -59,5 +59,13 @@ Expertiza::Application.configure do
   config.assets.debug = true
   config.react.variant = :development
   config.active_record.logger = nil
+  #Line 63-69 are for 'bullet' gem initialization.
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.alert = false
+    Bullet.bullet_logger = false
+    Bullet.console = false
+    Bullet.rails_logger = false
+  end  
 end
 

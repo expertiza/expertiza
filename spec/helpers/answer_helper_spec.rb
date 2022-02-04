@@ -1,7 +1,7 @@
 describe AnswerHelper do
   before(:each) do
-    @assignment1 = create(:assignment, name: "name1")
-    @assignment2 = create(:assignment, name: "name2")
+    @assignment1 = create(:assignment, name: "name1", directory_path: "name1")
+    @assignment2 = create(:assignment, name: "name2", directory_path: "name2")
     @questionnaire1 = create(:questionnaire)
     @questionnaire2 = create(:questionnaire)
     @questionnaire3 = create(:questionnaire)

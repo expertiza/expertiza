@@ -2,7 +2,7 @@
   <% review_no = 1%>
   <% mappings.each do | map | %>
     <% if @assignment.team_assignment?%>
-      <% reviewee = AssignmentTeam.get_first_member(map.reviewee_id) %>
+      <% reviewee = AssignmentTeam.first_member(map.reviewee_id) %>
     <% else %>
       <% reviewee = map.reviewee %>
     <% end %>
@@ -13,20 +13,20 @@
         <td><%= unless topic.nil? then " #{topic.topic_identifier}: #{topic.topic_name} --- " end %> <b><%= "#{questionnaire.name}" %></b></td>
           <td>&nbsp;</td>
           <% if !map.response.empty? %>
-            <td><%= link_to "View", {:controller => 'student_quizzes', :action => 'finished_quiz', :map_id => map.id} %></td>
+            <td><%= link_to t(".view"), {:controller => 'student_quizzes', :action => 'finished_quiz', :map_id => map.id} %></td>
           <% elsif @assignment.current_stage(topic) != "Complete" %>
             <% if @assignment.staggered_deadline?%>
               <% if @assignment.current_stage(topic) != 'submission'%>
-                <td><%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %></td>
+                <td><%= link_to t(".begin"),{:controller => 'response', :action => 'new', :id => map.id} %></td>
               <%else%>
-                <td>Begin</td><td> (Work has not yet been submitted)</td>
+                <td><%=t ".begin"%></td><td> (Work has not yet been submitted)</td>
               <% end %>
             <% else %>
-              <td><%= link_to "Begin", {:controller => 'student_quizzes', :action => 'take_quiz', :map_id => map.id, :assignment_id => @assignment.id} %></td>
+              <td><%= link_to t(".begin"), {:controller => 'student_quizzes', :action => 'take_quiz', :map_id => map.id, :assignment_id => @assignment.id} %></td>
             <% end %>
           <% else %>
             <% # Deadline has passed, and the work was not submitted %>
-            <td>Begin</td><td> (Work has not yet been submitted)</td>
+            <td><%=t ".begin"%></td><td> (Work has not yet been submitted)</td>
           <% end %>
         </tr>
         <% review_no += 1 %>

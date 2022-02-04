@@ -4,7 +4,7 @@ module ReviewMappingHelper
   end
 
   #
-  # gets the response map data such as reviewer id, reviewd object id and type for the review report
+  # gets the response map data such as reviewer id, reviewed object id and type for the review report
   #
   def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
     rspan = 0
@@ -120,7 +120,8 @@ module ReviewMappingHelper
                                 # E1991 : check anonymized view here
                                 Team.find(reviewee_id).name
                               end
-    team_reviewed_link_name = "(" + team_reviewed_link_name + ")" if !response.empty? and !response.last.is_submitted?
+    team_reviewed_link_name = "(" + team_reviewed_link_name + ")"
+    #if !response.empty? and !response.last.is_submitted?
     team_reviewed_link_name
   end
 

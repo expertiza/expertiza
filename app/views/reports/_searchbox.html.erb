@@ -23,12 +23,6 @@
         Self review report
       </option>
     <% end %>
-    <option value='SummaryByCriteria' >
-      Aggregated comments by rubric question
-    </option>
-    <option value='SummaryByRevieweeAndCriteria' >
-      Comment summary by reviewee (team)
-    </option>
     <option value='BookmarkRatingResponseMap' >
       Bookmark Review Report
     </option>
@@ -89,12 +83,6 @@
   <h1> Bookmark review report for <%= @assignment.name%> </h1>
 <% elsif @type == "Calibration" %>
   <h1> Calibration report for <%= @assignment.name%> </h1>
-<!--Show summary reports-->
-<% elsif @type == "SummaryByCriteria" %>
-    <h1> Review summary report for <%= @assignment.name%> </h1>
-<% elsif @type == "SummaryByRevieweeAndCriteria" %>
-    <h1> Reviewees summary report for <%= @assignment.name%> </h1>
-<!--End show summary reports-->
 <% elsif @type == "Collusion" %>
     <h1> Potential collusion report for <%= @assignment.name%> </h1>
 <% elsif @type == "PlagiarismCheckerReport" %>

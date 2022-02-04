@@ -1,6 +1,6 @@
 describe Assignment do
 
-  let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
+  let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team], max_team_size: 2) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 3, name: 'no one') }
   let(:review_response_map) { build(:review_response_map, response: [response], reviewer: build(:participant), reviewee: build(:assignment_team)) }
@@ -286,7 +286,7 @@ describe Assignment do
       allow(TeammateReviewResponseMap).to receive(:where).with(reviewed_object_id: 1).and_return([teammate_review_response_map])
     end
     context 'when there is at least one review response in current assignment' do
-      it 'raises an error messge and current assignment cannot be deleted' do
+      it 'raises an error message and current assignment cannot be deleted' do
         allow(review_response_map).to receive(:delete).with(nil)
                                                       .and_raise('Mysql2::Error: Cannot delete or update a parent row: a foreign key constraint fails')
         expect { assignment.delete }.to raise_error('There is at least one review response that exists for no assignment.')
@@ -294,7 +294,7 @@ describe Assignment do
     end
 
     context 'when there is no review response in current assignment and at least one teammate review response in current assignment' do
-      it 'raises an error messge and current assignment cannot be deleted' do
+      it 'raises an error message and current assignment cannot be deleted' do
         allow(review_response_map).to receive(:delete).with(nil).and_return(true)
         allow(teammate_review_response_map).to receive(:delete).with(nil).and_raise('Something wrong during deletion')
         expect { assignment.delete }.to raise_error('There is at least one teammate review response that exists for no assignment.')
@@ -416,6 +416,13 @@ describe Assignment do
         it 'returns the deadline name of current due date' do
           allow(assignment).to receive(:find_current_stage).with(123).and_return(assignment_due_date)
           expect(assignment.current_stage_name(123)).to eq('Review')
+        end
+      end
+      context "when due date is equal to 'Finished'" do
+        it 'returns Submission' do
+          allow(assignment).to receive(:find_current_stage).with(123).and_return('Finished')
+          allow(assignment).to receive(:current_stage).with(123).and_return('Submission')
+          expect(assignment.current_stage_name(123)).to eq('Submission')
         end
       end
     end
@@ -664,6 +671,31 @@ describe Assignment do
         @assignment_due_date_rev2 = create(:assignment_due_date, round: 2, parent_id: assignment.id, review_allowed_id: dead_right.id, review_of_review_allowed_id: dead_right.id, submission_allowed_id: dead_right.id, deadline_type: @deadline_type_rev)
         expect(assignment.find_review_period(nil)).to eql([[@assignment_due_date_sub1, @assignment_due_date_sub2], [@assignment_due_date_rev1, @assignment_due_date_rev2]])
       end
+    end
+  end
+  describe '#calibrated?' do
+    context 'when the assignment is not a calibrated assignment' do
+      it 'returns false' do
+        assignment = create(:assignment)
+        allow(assignment).to receive(:is_calibrated).and_return(false)
+        expect(assignment.calibrated?).to be_falsey
+      end
+    end
+    context 'when the assignment is a calibrated assignment' do
+      it 'returns true' do
+        assignment = create(:assignment)
+        allow(assignment).to receive(:is_calibrated).and_return(true)
+        expect(assignment.calibrated?).to be_truthy
+      end
+    end
+  end
+  describe '#remove_assignment_from_course' do
+    it 'sets the course_id to nil' do
+      assignment = create(:assignment)
+      assignment.course_id = 2
+      expect(assignment.course_id).to eq(2)
+      assignment.remove_assignment_from_course
+      expect(assignment.course_id).to be_nil
     end
   end
 end

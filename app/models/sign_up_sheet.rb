@@ -35,7 +35,7 @@ class SignUpSheet < ActiveRecord::Base
         result = true if sign_up.save
       end
     else
-      # If all the topics choosen by the user are waitlisted,
+      # If all the topics chosen by the user are waitlisted,
       user_signup.each do | user_signup_topic |
         return false unless user_signup_topic.is_waitlisted
       end

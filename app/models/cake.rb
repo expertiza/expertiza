@@ -103,4 +103,5 @@ class Cake < ScoredQuestion
     end
     question_score
   end
-  end
+end
+

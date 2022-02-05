@@ -1,4 +1,4 @@
-class RemoveQuizQuestionTypeFromQuestionnaires < ActiveRecord::Migration
+class RemoveQuizQuestionTypeFromQuestionnaires < ActiveRecord::Migration[4.2]
   def self.up
     remove_column :questionnaires, :quiz_question_type
   end

@@ -1,4 +1,4 @@
-class RenameFieldsInAssignments < ActiveRecord::Migration
+class RenameFieldsInAssignments < ActiveRecord::Migration[4.2]
   def self.up
     begin
       remove_column :assignments, :start_date

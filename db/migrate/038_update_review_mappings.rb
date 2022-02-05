@@ -1,4 +1,4 @@
-class UpdateReviewMappings < ActiveRecord::Migration
+class UpdateReviewMappings < ActiveRecord::Migration[4.2]
     def self.up
     add_column "review_mappings","round",:integer
     

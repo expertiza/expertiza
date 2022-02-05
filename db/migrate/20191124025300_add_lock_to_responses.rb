@@ -1,4 +1,4 @@
-class AddLockToResponses < ActiveRecord::Migration
+class AddLockToResponses < ActiveRecord::Migration[4.2]
   def change
     create_table :locks do |t|
       t.integer :timeout_period

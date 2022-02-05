@@ -1,4 +1,4 @@
-class CreateResponseMaps < ActiveRecord::Migration
+class CreateResponseMaps < ActiveRecord::Migration[4.2]
   def self.up
     create_table :response_maps do |t|
       t.column :reviewed_object_id, :integer, :null => false

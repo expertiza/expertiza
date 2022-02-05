@@ -1,4 +1,4 @@
-class ChangeTeamsUsersToTeamsParticipants < ActiveRecord::Migration
+class ChangeTeamsUsersToTeamsParticipants < ActiveRecord::Migration[4.2]
   def self.up
     begin
       rename_table :teams_participants, :teams_participants

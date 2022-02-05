@@ -1,4 +1,4 @@
-class CreateSurveyDeployments < ActiveRecord::Migration
+class CreateSurveyDeployments < ActiveRecord::Migration[4.2]
   def self.up
     create_table :survey_deployments do |t|
       # Note: Table name pluralized by convention.

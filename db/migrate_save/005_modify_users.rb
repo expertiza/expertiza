@@ -1,4 +1,4 @@
-class ModifyUsers < ActiveRecord::Migration
+class ModifyUsers < ActiveRecord::Migration[4.2]
   def self.up
     # t.column :username, :string, :limit=>32  --  called "name" in Goldberg
     # t.column :password, :string -- already included in Goldberg table

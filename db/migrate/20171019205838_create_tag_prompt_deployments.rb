@@ -1,4 +1,4 @@
-class CreateTagPromptDeployments < ActiveRecord::Migration
+class CreateTagPromptDeployments < ActiveRecord::Migration[4.2]
   def change
     create_table :tag_prompt_deployments do |t|
       t.references :tag_prompt, index: true, foreign_key: true

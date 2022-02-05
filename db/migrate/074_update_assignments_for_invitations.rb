@@ -1,4 +1,4 @@
-class UpdateAssignmentsForInvitations < ActiveRecord::Migration
+class UpdateAssignmentsForInvitations < ActiveRecord::Migration[4.2]
   def self.up   
     begin
       add_column :assignments, :team_count, :integer, :null => false, :default => 0

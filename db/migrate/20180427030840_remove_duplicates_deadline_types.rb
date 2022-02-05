@@ -1,4 +1,4 @@
-class RemoveDuplicatesDeadlineTypes < ActiveRecord::Migration
+class RemoveDuplicatesDeadlineTypes < ActiveRecord::Migration[4.2]
   def up
 
      execute <<-SQL

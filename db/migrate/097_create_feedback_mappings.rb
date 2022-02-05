@@ -1,4 +1,4 @@
-class CreateFeedbackMappings < ActiveRecord::Migration
+class CreateFeedbackMappings < ActiveRecord::Migration[4.2]
   def self.up    
     create_table :feedback_mappings do |t|
         t.column :reviewer_id, :integer, :null => false

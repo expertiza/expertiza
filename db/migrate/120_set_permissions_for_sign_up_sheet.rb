@@ -1,4 +1,4 @@
-class SetPermissionsForSignUpSheet < ActiveRecord::Migration
+class SetPermissionsForSignUpSheet < ActiveRecord::Migration[4.2]
   def self.up
     permission = Permission.find_by_name('administer assignments')
     controller = SiteController.find_or_create_by(name: 'sign_up_sheet')

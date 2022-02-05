@@ -1,4 +1,4 @@
-class UpdateControllerActionsForVersionsRevert < ActiveRecord::Migration
+class UpdateControllerActionsForVersionsRevert < ActiveRecord::Migration[4.2]
   def self.up
     @permission = Permission.find_by_name('public actions - execute')
     @controller = SiteController.find_by_name('versions')

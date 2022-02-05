@@ -1,4 +1,4 @@
-class CreateBids < ActiveRecord::Migration
+class CreateBids < ActiveRecord::Migration[4.2]
   def self.up
     create_table :bids do |t|
       t.belongs_to :topic

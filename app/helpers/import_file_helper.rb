@@ -17,11 +17,15 @@ module ImportFileHelper
   end
 
   def self.create_new_user(attributes, session)
-    user = User.new(attributes)
-    user.parent_id = (session[:user]).id
-    user.timezonepref = User.find(user.parent_id).timezonepref
-    user.save!
-    user
+    @user = User.new(attributes)
+    @user.parent_id = (session[:user]).id
+    @user.timezonepref = User.find(@user.parent_id).timezonepref
+    if @user.save!
+      password = @user.reset_password # the password is reset
+      prepared_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)
+      prepared_mail.deliver
+    end
+    @user
   end
 
 end

@@ -162,7 +162,7 @@ if ADDED_FILES.grep(/.*temp.*/).any? ||
 You committed `temp`, `tmp` or `cache` files. Please remove them.
     MARKDOWN
 
-  raise(TEMP_FILE_MESSAGE, sticky: true)
+  fail(TEMP_FILE_MESSAGE, sticky: true)
 end
 
 # ------------------------------------------------------------------------------
@@ -196,7 +196,7 @@ if PR_ADDED.include?('puts ') ||
    PR_ADDED.include?('binding.pry') ||
    PR_ADDED.include?('debugger;') ||
    PR_ADDED.include?('console.log')
-  raise('You are including debug code in your pull request, please remove it.', sticky: true)
+  fail('You are including debug code in your pull request, please remove it.', sticky: true)
 end
 
 # ------------------------------------------------------------------------------

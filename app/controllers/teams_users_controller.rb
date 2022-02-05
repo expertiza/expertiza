@@ -14,7 +14,7 @@ class TeamsUsersController < ApplicationController
   def list
     @team = Team.find(params[:id])
     @assignment = Assignment.find(@team.parent_id)
-    @teams_users = TeamsUser.page(params[:page]).per_page(10).where(["team_id = ?", params[:id]])
+    @teams_users = TeamsUser.page(params[:page]).per_page(10).where(['team_id = ?', params[:id]])
   end
 
   def new
@@ -38,7 +38,9 @@ class TeamsUsersController < ApplicationController
           flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
         else
           add_member_return = team.add_member(user, team.parent_id)
-          flash[:error] = "This team already has the maximum number of members." if add_member_return == false
+          if add_member_return == false
+            flash[:error] = 'This team already has the maximum number of members.'
+          end
           # E2115 Mentor Management
           # Kick off the Mentor Management workflow
           # Note: this is _not_ supported for CourseTeams which is why the other
@@ -56,15 +58,17 @@ class TeamsUsersController < ApplicationController
           flash[:error] = "\"#{user.name}\" is not a participant of the current course. Please <a href=\"#{urlCourseParticipantList}\">add</a> this user before continuing."
         else
           add_member_return = team.add_member(user)
-          flash[:error] = "This team already has the maximum number of members." if add_member_return == false
+          if add_member_return == false
+            flash[:error] = 'This team already has the maximum number of members.'
+          end
           if add_member_return
-          @teams_user = TeamsUser.last
-          undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
+            @teams_user = TeamsUser.last
+            undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
           end
         end
       end
     end
-    
+
     redirect_to controller: 'teams', action: 'list', id: team.parent_id
   end
 

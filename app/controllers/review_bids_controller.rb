@@ -39,7 +39,7 @@ class ReviewBidsController < ApplicationController
     render 'sign_up_sheet/review_bids_others_work'
   end
 
-  # provides vaiables for review bidding page
+  # provides variables for review bidding page
   def show
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
@@ -99,7 +99,7 @@ class ReviewBidsController < ApplicationController
     assignment_id = params[:assignment_id].to_i
     # list of reviewer id's from a specific assignment
     reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
-    bidding_data = ReviewBid.get_bidding_data(assignment_id, reviewer_ids)
+    bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
     matched_topics = run_bidding_algorithm(bidding_data)
     ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
     Assignment.find(assignment_id).update(can_choose_topic_to_review: false) #turns off bidding for students
@@ -107,7 +107,7 @@ class ReviewBidsController < ApplicationController
 
   end
 
-  # call webserver for running assigning algorthim
+  # call webserver for running assigning algorithm
   # passing webserver: student_ids, topic_ids, student_preferences, time_stamps
   # webserver returns: 
   # returns matched assignments as json body

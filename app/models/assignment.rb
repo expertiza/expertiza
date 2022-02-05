@@ -35,6 +35,8 @@ class Assignment < ApplicationRecord
   validates :name, presence: true
   validates :name, uniqueness: {scope: :course_id}
   validate :valid_num_review
+  validates :directory_path, presence: true # E2138 Validation for unique submission directory
+  validates :directory_path, uniqueness: {scope: :course_id}
 
   REVIEW_QUESTIONNAIRES = {author_feedback: 0, metareview: 1, review: 2, teammate_review: 3}.freeze
 
@@ -50,7 +52,7 @@ class Assignment < ApplicationRecord
   end
 
   def team_assignment?
-    true
+    self.max_team_size > 1
   end
   alias team_assignment team_assignment?
 
@@ -213,7 +215,7 @@ class Assignment < ApplicationRecord
       raise "There is at least one teammate review response that exists for #{self.name}."
     end
 
-    # destroy instances of invitations, teams, particiapnts, etc, refactored by Rajan, Jasmine, Sreenidhi 3/30/2020
+    # destroy instances of invitations, teams, participants, etc, refactored by Rajan, Jasmine, Sreenidhi 3/30/2020
     #You can now add the instances to be deleted into the list.
     delete_instances = %w[invitations teams participants due_dates assignment_questionnaires]
     delete_instances.each do |instance|
@@ -424,9 +426,9 @@ class Assignment < ApplicationRecord
       @response_for_this_map = Response.find_by_sql(["SELECT * FROM responses WHERE map_id = #{map.id}"])
       # for this response, get the answer associated with it
       @response_for_this_map.each do |resp|
-        @answer = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{resp.id}"])
-        @answer.each do |ans|
-          answers[resp.round][map.type].push(ans)
+        @associated_answers = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{resp.id}"])
+        @associated_answers.each do |answer|
+          answers[resp.round][map.type].push(answer)
         end
       end
     end

@@ -33,7 +33,7 @@ class Node < ApplicationRecord
   # node's object type
   def self.table; end
 
-  # Retreives the node's object name
+  # Retrieves the node's object name
   def get_name; end
 
   # Retrieves the node's object directory

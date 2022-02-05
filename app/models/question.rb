@@ -91,7 +91,7 @@ class Question < ApplicationRecord
   def self.import(row, _row_header, _session, q_id = nil)
     if row.length != 5
       raise ArgumentError,  "Not enough items: expect 3 columns: your login name, your full name" \
-                            "(first and last name, not seperated with the delimiter), and your email."
+                            "(first and last name, not separated with the delimiter), and your email."
     end
     # questionnaire = Questionnaire.find_by_id(_id)
     questionnaire = Questionnaire.find_by(id: q_id)

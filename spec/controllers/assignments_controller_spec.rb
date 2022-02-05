@@ -1,7 +1,11 @@
 describe AssignmentsController do
 
   let(:assignment) do
-    build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true, directory_path: 'same path',
+    build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true, directory_path: 'test_assignment',
+                       participants: [build(:participant)], teams: [build(:assignment_team)], course_id: 1)
+  end
+  let(:assignment2) do
+    build(:assignment, id: 2, name: 'new test assignment', instructor_id: 6, staggered_deadline: true, directory_path: 'new_test_assignment',
                        participants: [build(:participant)], teams: [build(:assignment_team)], course_id: 1)
   end
   let(:assignment_form) { double('AssignmentForm', assignment: assignment) }
@@ -100,8 +104,8 @@ describe AssignmentsController do
   describe '#create' do
     before(:each) do
       allow(AssignmentForm).to receive(:new).with(any_args).and_return(assignment_form)
-      @params = {
-        button: '',
+      @used_params = {
+        button: true,
         assignment_form: {
           assignment_questionnaire: [{"assignment_id" => "1", "questionnaire_id" => "666", "dropdown" => "true",
                                       "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
@@ -130,27 +134,75 @@ describe AssignmentsController do
           }
         }
       }
+      @new_params = {
+        button: true,
+        assignment_form: {
+          assignment_questionnaire: [{"assignment_id" => "1", "questionnaire_id" => "666", "dropdown" => "true",
+                                      "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
+          due_date: [{"id" => "", "parent_id" => "", "round" => "1", "deadline_type_id" => "1", "due_at" => "2017/12/05 00:00", "submission_allowed_id" => "3", "review_allowed_id" => "1", "teammate_review_allowed_id" => "3", "review_of_review_allowed_id" => "1", "threshold" => "1"},
+                     {"id" => "", "parent_id" => "", "round" => "1", "deadline_type_id" => "2", "due_at" => "2017/12/02 00:00", "submission_allowed_id" => "1", "review_allowed_id" => "3", "teammate_review_allowed_id" => "3", "review_of_review_allowed_id" => "1", "threshold" => "1"}],
+          assignment: {
+            instructor_id: 2,
+            course_id: 1,
+            max_team_size: 1,
+            id: 2,
+            name: 'new test assignment',
+            directory_path: 'new_test_assignment',
+            spec_location: '',
+            private: false,
+            show_teammate_reviews: false,
+            require_quiz: false,
+            num_quiz_questions: 0,
+            staggered_deadline: false,
+            microtask: false,
+            reviews_visible_to_all: false,
+            is_calibrated: false,
+            availability_flag: true,
+            reputation_algorithm: 'Lauw',
+            simicheck: -1,
+            simicheck_threshold: 100
+          }
+        }
+      }
     end
     context 'when assignment_form is saved successfully' do
       it 'redirects to assignment#edit page' do
-        allow(assignment_form).to receive(:assignment).and_return(assignment)
+        allow(assignment_form).to receive(:assignment).and_return(assignment2)
+        allow(Assignment).to receive(:find_by).with(name: "new test assignment", course_id: 1).and_return(nil)
+        allow(Assignment).to receive(:find_by).with(directory_path: 'new_test_assignment', course_id: 1).and_return(nil)
         allow(assignment_form).to receive(:save).and_return(true)
-        allow(assignment_form).to receive(:update).with(any_args).and_return(true)
+        allow_any_instance_of(AssignmentsController).to receive(:assignment_by_name_and_course).and_return(assignment2)
         allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))
-        allow(assignment).to receive(:id).and_return(1)
-        allow(Assignment).to receive(:find_by).with(id: 1).and_return(assignment)
+        allow(assignment_form).to receive(:update).with(any_args).and_return(true)
+        allow(assignment2).to receive(:id).and_return(2)
         allow_any_instance_of(AssignmentsController).to receive(:undo_link)
-          .with('Assignment "test assignment" has been created successfully. ').and_return(true)
-        post :create, @params
-        expect(response).to redirect_to('/assignments/1/edit')
+           .with('Assignment "new test assignment" has been created successfully. ').and_return(true)
+        post :create, @new_params
+        expect(response).to redirect_to('/assignments/2/edit')
       end
     end
 
     context 'when assignment_form is not saved successfully' do
-      it 'renders assignment#new page' do
+      it 'redirect to assignments#new page' do
         allow(assignment_form).to receive(:save).and_return(false)
-        post :create, @params
-        expect(response).to render_template(:new)
+        post :create, @used_params
+        expect(response).to redirect_to('/assignments/new?private=1')
+      end
+    end
+
+    #Create an assignment with name that already exists and expect the create method in assignments_controller_spec.rb to throw error
+    context 'when assignment_form name already exists and is not saved properly' do
+      it 'redirects to assignment#new page' do
+        allow(assignment_form).to receive(:assignment).and_return(assignment)
+        allow(Assignment).to receive(:find_by).with(any_args).and_return(false)
+        allow(assignment_form).to receive(:save).and_return(true)
+        allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))
+        allow(assignment_form).to receive(:update).with(any_args).and_return(true)
+        allow(assignment).to receive(:id).and_return(1)
+        allow(Assignment).to receive(:find_by).with(course_id:1, name:'test assignment').and_return(assignment)
+        post :create, @used_params
+        expect(flash[:error]).to eq('Failed to create assignment.<br>  test assignment already exists as an assignment name')
+        expect(response).to redirect_to('/assignments/new?private=1')
       end
     end
   end
@@ -296,8 +348,8 @@ describe AssignmentsController do
   end
 
   describe '#copy' do
-    let(:new_assignment) { build(:assignment, id: 2, name: 'new assignment', directory_path: 'different path') }
-    let(:new_assignment2) { build(:assignment, id: 2, name: 'new assignment', directory_path: 'same path') }
+    let(:new_assignment) { build(:assignment, id: 2, name: 'new_assignment', directory_path: 'new_assignment') }
+    let(:new_assignment2) { build(:assignment, id: 2, name: 'new_assignment2', directory_path: 'new_assignment2') }
 
     context 'when new assignment id fetches successfully' do
       it 'redirects to assignments#edit page' do
@@ -307,21 +359,6 @@ describe AssignmentsController do
         params = {id: 1}
         get :copy, params
         expect(flash[:note]).to be_nil
-        expect(flash[:error]).to be_nil
-        expect(response).to redirect_to('/assignments/2/edit')
-      end
-    end
-
-    context 'when new assignment directory is same as old' do
-      it 'should show an error and redirect to assignments#edit page' do
-        allow(AssignmentForm).to receive(:copy).with('1', instructor).and_return(2)
-        allow(Assignment).to receive(:find).with(2).and_return(new_assignment2)
-        params = {id: 1}
-        session = {user: instructor}
-        get :copy, params, session
-        expect(flash[:note]).to eq("Warning: The submission directory for the copy of this assignment will be the same as the submission directory "\
-          "for the existing assignment. This will allow student submissions to one assignment to overwrite submissions to the other assignment. "\
-          "If you do not want this to happen, change the submission directory in the new copy of the assignment.")
         expect(flash[:error]).to be_nil
         expect(response).to redirect_to('/assignments/2/edit')
       end

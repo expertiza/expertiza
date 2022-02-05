@@ -37,8 +37,12 @@ class StudentTeamsController < ApplicationController
     end
   end
 
+  def controller_locale
+    locale_for_student
+  end
+
   def view
-    # View will check if send_invs and recieved_invs are set before showing
+    # View will check if send_invs and received_invs are set before showing
     # only the owner should be able to see those.
 
     return unless current_user_id? student.user_id
@@ -51,7 +55,6 @@ class StudentTeamsController < ApplicationController
 
     #this line generates a list of users on the waiting list for the topic of a student's team,  
     @users_on_waiting_list = (SignUpTopic.find(@student.team.topic).users_on_waiting_list if student_team_requirements_met?)
-
     @teammate_review_allowed = DueDate.teammate_review_allowed(@student)
   end
 

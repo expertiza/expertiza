@@ -84,7 +84,7 @@ class Lock < ApplicationRecord
   # lock on the object
   def self.create_lock(lockable, user, timeout)
     # This method is still a potential location for a race condition.
-    # Unfortunately, database locks can't be created for nonexistant entries.
+    # Unfortunately, database locks can't be created for nonexistent entries.
     # This was the way I found online avoid the race condition but I'm not sure exactly how it works
     transaction do
       lock = Lock.new(lockable: lockable, user: user, timeout_period: timeout)

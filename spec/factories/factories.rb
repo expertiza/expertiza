@@ -214,6 +214,22 @@ FactoryBot.define do
     auto_assign_mentor false
   end
 
+  factory :late_policy, class: LatePolicy do
+    # Help multiple factory-created assignments get unique names
+    # Let the first created assignment have the name 'final2' to avoid breaking some fragile existing tests
+    policy_name 'Dummy Name'
+    instructor_id 1
+    max_penalty 5
+    penalty_per_unit 1
+    penalty_unit 1
+    assignments {[ Assignment.first || association(:assignment) ]}
+  end
+
+  factory :calculated_penalty, class: CalculatedPenalty do
+    participant_id 1
+    deadline_type_id 1
+  end
+
   factory :assignment_team, class: AssignmentTeam do
     sequence(:name) {|n| "team#{n}" }
     assignment { Assignment.first || association(:assignment) }
@@ -578,6 +594,13 @@ FactoryBot.define do
     name 'fake_site'
   end
 
+  factory :duty, class: Duty do
+    id 1
+    name 'Scrum Master'
+    max_members_for_duty 1
+    assignment_id 1
+  end
+
   factory :version, class: Version do
     item_type 'Node'
     item_id 1
@@ -660,6 +683,11 @@ FactoryBot.define do
     size '70,1'
   end
 
+  factory :content_page, class: ContentPage do
+    title 'Expertiza Home'
+    name 'home'
+  end
+  
   factory :suggestion, class: Suggestion do
     id 1
     assignment_id 1

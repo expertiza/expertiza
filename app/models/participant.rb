@@ -1,5 +1,6 @@
 class Participant < ApplicationRecord
   include Scoring
+  include ParticipantsHelper
   has_paper_trail
   belongs_to :user
   belongs_to :topic, class_name: 'SignUpTopic', inverse_of: false
@@ -90,26 +91,6 @@ class Participant < ApplicationRecord
         partial_name: "register"
       }
     ).deliver
-  end
-
-  # Authorizations are paricipant, reader, reviewer, submitter (They are not store in Participant table.)
-  # Permissions are can_submit, can_review, can_take_quiz.
-  # Get permissions form authorizations.
-  def permissions(authorization)
-    can_submit = true
-    can_review = true
-    can_take_quiz = true
-    case authorization
-    when 'reader'
-      can_submit = false
-    when 'reviewer'
-      can_submit = false
-      can_take_quiz = false
-    when 'submitter'
-      can_review = false
-      can_take_quiz = false
-    end
-    {can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz}
   end
 
   # Get authorization from permissions.

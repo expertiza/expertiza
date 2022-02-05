@@ -8,18 +8,17 @@ class ReviewBid < ApplicationRecord
   # returns the bidding data needed for the assigning algorithm
   # student_ids, topic_ids, student_preferences, topic_preferences, max reviews allowed
   public 
-    def self.get_bidding_data(assignment_id,reviewer_ids)
+    def self.bidding_data(assignment_id,reviewer_ids)
       # create basic hash and set basic hash data
-      bidding_data = {'tid'=> [], 'users' => Hash.new, 'max_accepted_proposals' => []}
+      bidding_data = {'tid'=> [], 'users' => {}, 'max_accepted_proposals' => []}
       bidding_data['tid'] = SignUpTopic.where(assignment_id: assignment_id).ids
       bidding_data['max_accepted_proposals'] = Assignment.where(id:assignment_id).pluck(:num_reviews_allowed).first
 
       # loop through reviewer_ids to get reviewer specific bidding data
-      for reviewer_id in reviewer_ids do
+      reviewer_ids.each do |reviewer_id|
         bidding_data['users'][reviewer_id] = self.reviewer_bidding_data(reviewer_id,assignment_id)
       end
-
-      return bidding_data
+      bidding_data
     end
 
     # assigns topics to reviews as matched by the webservice algorithm
@@ -52,14 +51,12 @@ class ReviewBid < ApplicationRecord
       bids = ReviewBid.where(participant_id: reviewer_id)
 
       # loop through each bid for a topic to get specific data
-      for bid in bids do
+      bids.each do |bid|
         bidding_data['tid'] << bid.signuptopic_id
         bidding_data['priority'] << bid.priority
         bidding_data['time'] << bid.updated_at
       end
-
-      return bidding_data
+      bidding_data
     end
-
 end
 

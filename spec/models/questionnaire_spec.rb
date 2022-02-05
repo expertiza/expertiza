@@ -98,7 +98,7 @@ describe Questionnaire do
         expect(questionnaire2.true_false_questions?).to eq(true)
       end
     end
-    context 'when there are no assocaited questions' do
+    context 'when there are no associated questions' do
       it 'returns false' do
         allow(questionnaire2).to receive(:questions).and_return([])
         expect(questionnaire2.true_false_questions?).to eq(false)

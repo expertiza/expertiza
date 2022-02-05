@@ -157,7 +157,7 @@ describe ReviewMappingHelper, type: :helper do
     end
 
     #one round, no response
-    it 'should return false if response wasnt submitted in every round' do
+    it 'should return false if response was not submitted in every round' do
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
 

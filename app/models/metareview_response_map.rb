@@ -66,7 +66,7 @@ class MetareviewResponseMap < ResponseMap
       muser = User.find_by_name(row.to_s.strip)
       reviewer = AssignmentParticipant.where(user_id: muser.id, parent_id:  id)
       raise ImportError, "Metareviewer,  #{row.to_s}, for contributor, #{contributor.name}, and reviewee, #{row_hash[:reviewer].to_s }, was not found." if reviewer.nil?
-      # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+      # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
       reviewmapping = ReviewResponseMap.where(reviewee_id: contributor.id, reviewer_id:  reviewee.id)
       raise ImportError, "No review mapping was found for contributor, #{contributor.name}, and reviewee, #{row_hash[:reviewer].to_s}." if reviewmapping.nil?

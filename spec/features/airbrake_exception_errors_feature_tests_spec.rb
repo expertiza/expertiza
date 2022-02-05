@@ -1,4 +1,4 @@
-describe "Airbrake expection errors" do
+describe "Airbrake exception errors" do
   before(:each) do
     create(:assignment, name: "TestAssignment", directory_path: 'test_assignment')
     create_list(:participant, 3)
@@ -78,7 +78,7 @@ describe "Airbrake expection errors" do
   end
 
   # Airbrake-1608029321738848168
-  it "will not show error when instructor did not login and try to access assignment editting page" do
+  it "will not show error when instructor did not login and try to access assignment editing page" do
     assignment = Assignment.first
     visit "/assignments/#{assignment.id}/edit"
     expect(page).to have_current_path('/')

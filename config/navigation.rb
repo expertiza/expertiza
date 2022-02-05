@@ -57,7 +57,7 @@ SimpleNavigation::Configuration.run do |navigation|
       sub_nav.item :tab3, 'tab3', grades/krunal
     end
 
-    # You can also specify a condition-proc that needs to be fullfilled to display an item.
+    # You can also specify a condition-proc that needs to be fulfilled to display an item.
     # Conditions are part of the options. They are evaluated in the context of the views,
     # thus you can use all the methods and vars you have available in the views.
     primary.item :tab4, 'Admin', grades/krunal

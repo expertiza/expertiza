@@ -1,0 +1,555 @@
+hi_IN:
+  display_name: "Hindi"
+  database_encoding: 2
+
+  # This section of keys are for the pages related to Courses
+  courses:
+    edit:
+      course_title: "एडिट कोर्स"
+
+    course:
+      institute_name: "इन्स्टिट्यूशन का नाम"
+      course_name: "कोर्स का नाम"
+      course_directory: "कोर्स डाइरेक्टरी"
+      directory_warning: "(आवश्यक स्थान। कोई जगह या विशेष वर्ण नहीं।)"
+      course_info: "कोर्स संबंधी जानकारी"
+      language: "भाषा चुनिए"
+
+    view_teaching_assistants:
+      teaching_assistants: "शिक्षण सहायक"
+      course: "कोर्स"
+      teaching_assistant_name: "शिक्षण सहायक का नाम"
+
+    add_individual:
+      enter_user_login: "उपयोगकर्ता का लॉगिन दर्ज करें:"
+      add_ta: "शिक्षण सहायक को शामिल करना"
+
+  participant:
+    list:
+      participants: "हिस्सा लेनेवाला"
+
+  shared_scripts:
+    user_list:
+      email: "ईमेल ..."
+      permissions: "इजाज़त ..."
+      name: "नाम"
+      full_name: "पूरा नाम"
+      email_address: " ईमेल  एड्रेस"
+      role: "भूमिका "
+      parent: "पेअरॅन्ट"
+      badges: "पदक"
+      review: "समीक्षा"
+      submissions: "सबमिशन"
+      metareview: "मेटारिव्यु"
+      submit: "सबमिट"
+      take_quiz: "प्रश्नोत्तरी लेना"
+      handle: "संभालना "
+      action: "एक्शन"
+
+    add_individual:
+      enter_login: "उपयोगकर्ता का लॉगिन दर्ज करें:"
+      add: "शामिल करना"
+      participant: "हिस्सा लेनेवाला"
+      reader: "पाठक"
+      reviewer: "समीक्षक"
+      submitter: "जमाकर्ता का नाम"
+
+  teams:
+    list:
+      teams_for: "टीम्स फॉर"
+      teams: "टीम्स"
+      students_without_team: "टीमों के बिना छात्र"
+      name: "नाम"
+      show_members: "सभी टीम नंबर दिखाएं"
+
+    new:
+      create_teams_for: "टीम्स बनाना फॉर"
+      automatically: "खुद ब खुद"
+      uses_insofar: "जब असाइनमेंट बनाया गया था, निर्दिष्ट किए गए सदस्यों की संख्या का उपयोग करता है."
+      team_size: "टीम का परिमाण:"
+      create_teams: "टीम्स बनाना"
+      manually: "मैन्युअल रूप से"
+      specify_team_them: "टीम का नाम निर्दिष्ट करें और टीम में सदस्यों को एक एक करके चुने."
+      inherit_teams: "पाठ्यक्रम से निहित टीमों "
+      use_the_teams: "वर्तमान में पाठ्यक्रम के लिए परिभाषित टीमों का प्रयोग करें."
+      team_name: "टीम का नाम"
+
+  assignments:
+    new:
+      create_new: "नया बनाओ"
+      public: "सार्वजनिक"
+      private: "प्राइवेट"
+      assignment: "असाइनमेंट"
+      general: "सामान्य"
+      rubrics: "रुब्रिकों"
+      review_strategy: "समीक्षा रणनीति"
+      due_date: "अंतिम तारीख"
+      create_button: "बनाना"
+
+    edit:
+      general:
+        assignment_name: "असाइनमेंट का नाम:"
+        course: "कोर्स"
+        submission_directory: "सबमिशन निर्देशिका "
+        mandatory_field: "(आवश्यक स्थान. कोई स्थान या विशेष पात्रों की अनुमति नहीं है.)"
+        description_url: "यूआरएल विवरण"
+        calibration: "अंशांकन "
+        has_team: "क्या आपके पास एक टीम है?"
+        has_quiz: "क्या आपके पास प्रश्नोत्तरी है?"
+        has_badge: "क्या आपके पास बैज है?"
+        staggered_deadline: "क्या यह एक चौंकाने वाली समयसीमा असाइनमेंट है?"
+        mico_task: "क्या यह एक माइक्रो टास्क असाइनमेंट है?"
+        review_reviewers: "समीक्षा अन्य समीक्षकों के लिए उपलब्ध हैं?"
+        calibrate_training: "प्रशिक्षण के लिए यह अंशांकन है?"
+        reputation_algorithm: "क्या यह एक प्रतिष्ठा एल्गोरिदम है?"
+        use_simicheck: "क्या आप सिमिचेक उपयोग करना चाहते हैं?"
+        allow_feedback: "क्या उपयोगकर्ता द्वारा टैग की गई प्रतिक्रिया टिप्पणियों की अनुमति होनी चाहिए ?"
+        available: "क्या यह छात्रों के लिए उपलब्ध है?"
+
+      rubrics:
+        review_varies: "क्या समीक्षा दौर से भिन्न होती है?"
+        questionnaire: "प्रश्नावली"
+        use_dropdown: "ड्रॉप डाउन का उपयोग करें"
+        instead: " इसके बजाय क्या ?"
+        scored_question: "रन बनाए-सवाल"
+        display_style: "प्रदर्शन शैली"
+        weight: "वजन"
+        notification_limit: "विज्ञापन का हद"
+        author_feedback: "लेखक से प्रतिक्रिया"
+        review: "समीक्षा"
+
+      review_strategy:
+        review_strategy: "समीक्षा रणनीति: "
+        review_topic: " समीक्षा विषय सीमा (के):"
+        max_num_reviews: "प्रति समीक्षाकर्ता की समीक्षा की अधिकतम संख्या :"
+        max_review_limit: "क्या समीक्षा की अधिकतम सीमा है?"
+        set_num_reviews: "प्रति समीक्षाकर्ता समीक्षा की संख्या निर्धारित करें"
+        set req_reviews: "प्रति समीक्षाकर्ता समीक्षा की आवश्यक संख्या निर्धारित करें"
+        meta_review: "क्या मेटा समीक्षा की सीमा है?"
+        set_num_meta: "प्रति समीक्षाकर्ता मेटारिव्यु की संख्या निर्धारित करें"
+        set_req_meta: "प्रति समीक्षाकर्ता मेटारिव्यु की आवश्यक संख्या निर्धारित करें"
+        anon_review: "क्या यह एक अनाम समीक्षा है?"
+        self_review: "क्या आत्म समीक्षा की अनुमति है?"
+
+      due_dates:
+        num_review_rounds: "समीक्षा दौर की संख्या :"
+        timezone: "समय क्षेत्र: "
+        meta_deadline: "मेटारिव्यु की अंतिम तिथि का उपयोग करें "
+        show_hide: "दिनांक अद्यतनकर्ता को दिखाएं / छुपाएं "
+        deadline_type: "अंतिम तिथि प्रकार"
+        date_time: "दिनांक और समय"
+        use_updater: "तारीख अद्यतनकर्ता का उपयोग करें "
+        submission_allowed: "सबमिशन की अनुमति है"
+        review_allowed: "समीक्षा की अनुमति है"
+        teammate_review: "टीममाइट समीक्षा की अनुमति है"
+        meta_allowed: "मेटारिव्यु की अनुमति है"
+        has_quiz: "आपके पास प्रश्नोत्तरी है"
+        reminder: "शेष-भाग (घंटे)"
+        due_date_names: "अंतिम तारीख का नाम"
+        description_url: "यूआरएल विवरण"
+        round: "संख्या"
+
+      late_policy:
+        apply_penalty: "पेनल्टी पालिसी लागू करें:"
+        late_policty: "नई देरी पालिसी"
+
+      calibration:
+        particpant_name: "हिस्सा लेनेवाला का नाम"
+        action: "एक्शन"
+        submitted_item: "सबमिट की गई वस्तुएं "
+        submit_calibration: "अंशांकन के लिए समीक्षा सबमिट करें"
+
+  # end of Courses view
+
+  # keys for pages Student Views
+  student_task:
+    list:
+      assignments: "असाइनमेंट"
+      tasks_not_started: "असाइनमेंट अभी  शुरू नहीं हुआ है"
+      revisions: "संशोधन"
+      student_team: "छात्र जिन्होंने आपके साथ मिलकर काम किया है"
+      not_associated: "असाइनमेंट किसी भी कोर्स से जुड़े नहीं हैं"
+      assignment_name: "असाइनमेंट"
+      course: "कोर्स"
+      topic: "विषय"
+      current_stage: "वर्तमान स्थिति"
+      review_grade: "ग्रेड की समीक्षा करें"
+      badges: "बैज"
+      stage_deadline: "चरण की अंतिम तिथि"
+      publishing_rights: "प्रकाशन अधिकार"
+      left: "बाकी"
+
+    publishing_rights:
+      select_assignment: "सूची से असाइनमेंट चुनें या अपने काम के लिए"
+      publishing_rights: "प्रकाशन अधिकार"
+      for_work: "सेट करें।"
+
+    view:
+      submit_review: "सबमिट करें या काम की समीक्षा करें"
+      next_click: "अगला: शीर्षक पर असाइनमेंट पर जिस गतिविधि को आप करना चाहते हैं उसे क्लिक करें:"
+      assignment_description: "असाइनमेंट विवरण"
+      signup_sheet: "साइनअप शीट"
+      signup_topic: "(एक विषय के लिए साइन अप करें)"
+      your_team: "आपकी टीम"
+      view_team: "(अपनी टीम देखें और प्रबंधित करें)"
+      submit_work: "(सबमिट करें और अपना काम देखें)"
+#     change this
+      view_bookmarks: "View bookmarks"
+      view_bookmarks_lengthy: "(View bookmarks others have submitted for your topic)"
+      your_work: "आपका काम"
+      others_work: "दूसरों का काम"
+      your_readings: "आपकी रीडिंग"
+      choose_topic: "(आपको पहले एक विषय चुनना होगा)"
+      not_allowed: "(आपको अभी आपको काम सबमिट करने की अनुमति नहीं है)"
+      give_feedback: "(दूसरों को उनके काम पर प्रतिक्रिया दें)"
+      take_quizzes: "प्रश्नोत्तरी लें"
+      quizzes_read: "(आपके द्वारा पढ़े गए काम पर प्रश्नोत्तरी लें)"
+      your_scores: "आपके स्कोर"
+      alternate_view: "वैकल्पिक देखें"
+      view_feedback: "(अपने काम पर प्रतिक्रिया देखें)"
+      suggest_topic: "नया विषय सुझाएं"
+      take_survey: "एक सर्वेक्षण ले"
+      change_handle: "अपना हैंडल बदलें"
+      self_review: "(आपको 'अपने स्कोर' की जांच करने से पहले 'अपने काम' के तहत स्वयं समीक्षा सबमिट करनी होगी।)"
+      log_you_out: "(यह आपको लॉग आउट कर देगा)"
+      different_handle: "(इस असाइनमेंट के लिए एक अलग हैंडल प्रदान करें)"
+      back: "वापस पीछे"
+
+  sign_up_sheet:
+    list:
+      signup_sheet: "साइनअप शीट फॉर"
+      assignment_lower: "असाइनमेंट"
+      your_topics: "आपका विषय:"
+      waitlisted: "(वेटलिस्टेड)"
+      back: "वापस पीछे"
+
+    table_header:
+      topic_num: "विषय #"
+      topic_name: "विषय का नाम"
+      micro_payment: "माइक्रो - पेमेंट "
+      num_slots: "स्लॉट की संख्या"
+      available_slots: "उपलब्ध स्लॉट"
+      num_waitlist: "वैटलिस्ट में नंबर"
+      bookmarks: "बुकमार्क्स "
+      actions: " एक्शन्स"
+      advertise: "अद्वेर्तीसे - मेन्ट(स)"
+      topic_id: "Topic ID"
+      select: "Select"
+      questionnaire: "Questionnaire"
+      disabled: "(disabled)"
+
+    suggested_topic:
+      approved_suggestion: "आपका अनुमोदित से सुझाया गया विषय"
+
+  student_teams:
+    edit:
+      edit_team: "टीम संपादित करें"
+      team_name: "टीम का नाम:"
+      back: "वापस पीछे"
+
+    view:
+      team_info: "टीम की जानकारी"
+      no_team: "अब आपके पास कोई टीम नहीं है!"
+      name_team: "टीम को नाम दे "
+      team_name: "टीम का नाम:"
+      team_name_up: "टीम का नाम:"
+      team_members: "टीम के सदस्या"
+      username: "यूजरनाम "
+      fullname: "पूरा नाम"
+      email_address: "ईमेल  एड्रेस"
+      review_action: "रिव्यु एक्शन"
+      send_invite: "निमंत्रण भेजें"
+      status: "स्थिति"
+      accepted: "मंजूर किया"
+      declined: "रद्द हुआ"
+      wait_reply: "रीप्ले की प्रतीक्षा "
+      invite_people: "लोगो को निमंत्रण भेजे "
+      enter_user: "उपयोगकर्ता का लॉगिन दर्ज करें: "
+      users_waiting: "उपयोगकर्ता जो इस विषय की प्रतीक्षा कर रहे हैं:"
+      user_id: "यूजर ईद"
+      email: "ईमेल "
+      received_invitation: "आमंत्रण आया"
+      from: "फ्रॉम "
+      team_name_no_colon: "टीम का नाम"
+      reply: "जवाब दे"
+      ad_for_team: "टीम के साथी के लिए अद्वेर्तिसेमेन्ट"
+      back: "वापस पीछे"
+      view: "व्यू"
+      edit: "एडिट "
+      leave_team: "टीम छोड़ो"
+      edit_name: "नाम परिवर्तन"
+
+  submitted_content:
+    edit:
+      back: "वापस पीछे"
+
+    title:
+      submit_work: " काम जमा करने का कारन "
+
+    self_review:
+      self_review: "स्वयं की समीक्षा:"
+      work_not_submitted: "(कार्य अभी तक सबमिट नहीं किया गया है)"
+
+    hyperlink:
+      hyperlink_action: "हाइपरलिंक एक्शन्स:"
+      hide_link: "लिंक छुपाएं"
+
+    main:
+      submit_hyperlink: "हाइपरलिंक सबमिट करें:"
+      quiz: "प्रश्नोत्तरी:"
+      view_quiz: "प्रश्नोत्तरी देखें"
+      edit_quiz: "प्रश्नोत्तरी बदलें"
+
+    submitted_files:
+      submit_file: "फाइल जमा करें:"
+      or: "या"
+
+  student_review:
+    list:
+      reviews_for: "इसके लिए समीक्षाएँ: "
+      your_instructor_expects: "आपके प्रशिक्षक आपसे अपेक्षा करते है कि आप करेंगे"
+      you_are_not_allowed: "आपको कोई अतिरिक्त समीक्षा करने की अनुमति नहीं है।"
+      perform_exactly: "आपको करनी चाहिए ठीक"
+      may_perform_between_1: "आप इन कई समीक्षाओं के बीच प्रदर्शन कर सकते हैं:"
+      may_perform_between_2: "और"
+      required_to_do: "आपको करना होगा"
+      reviews: "समीक्षा"
+      num_reviews_left: "शेष समीक्षाओं की संख्या:"
+      note1: "नोट: आपके पास 2 से अधिक उत्कृष्ट समीक्षा नहीं हो सकती है। किसी अन्य को चुनने से पहले आपको अपनी उत्कृष्ट समीक्षाओं में से एक पूरा करना होगा।"
+      note2_1: "नोट: आप से अधिक नहीं कर सकते हैं"
+      note2_2: "असाइनमेंट पॉलिसी के अनुसार समीक्षा।"
+      reviews_cannot: "समीक्षा इस समय नहीं की जा सकती है"
+      metareviews_for: "मेटारिव्यु फॉर"
+      metareviews_allowed: "मेटा - रिव्युस की अनुमत संख्या:"
+      metareviews: "मेटा - रिव्युस"
+      metareviews_left: "शेष मेटा - रिव्युस की संख्या:"
+      back: "वापस पीछे"
+
+    responses:
+      view: "व्यू "
+      edit: "एडिट "
+      update: "अपडेट"
+      latest_update_at: " -- नवीनतम अपडेट पर"
+      begin: "शुरू"
+      show_calibration_results: "अंशांकन परिणाम दिखाएं"
+      review_done_at: "इस पर समीक्षा की गई --"
+      no_previous_available: "कोई पिछले संस्करण उपलब्ध नहीं है"
+
+    set_dynamic_review:
+      i_don't_care: "मुझे परवाह नहीं है कि मैं किस विषय की समीक्षा करता हूं।"
+      select_topic: "एक नई समीक्षा शुरू करने के लिए नीचे एक विषय का चयन करें:"
+      request_new_submission: "समीक्षा करने के लिए एक नए सबमिशन का अनुरोध करें"
+
+    set_dynamic_metareview:
+      request_new_metareview: "परफॉर्म करने के लिए एक नए मेटायरव्यू का अनुरोध करें"
+
+  grades:
+    view_my_scores:
+      score_for: "स्कोर फॉर "
+      reputation: "रेपुटेशन"
+      back: "वापस पीछे"
+
+    view_team:
+      summary_report: "असाइनमेंट के लिए सारांश रिपोर्ट:"
+      team: "टीम:"
+      topic: "विषय:"
+      average_peer_review: "औसत सहकर्मी समीक्षा स्कोर:"
+      show_submission: "सबमिशन दिखाएं"
+      no_submission: "कोई सबमिशन नहीं"
+      question: "सवाल"
+      toggle_question_list: "प्रश्न सूची टॉगल करें"
+      hide_tags: "टैग छुपाएं"
+      color_legend: "कलर लीजेंड"
+      interaction_legend: "इंटरेक्शन लीजेंड"
+      criterion: "क्रिटेरिआ "
+      metric1: "मीट्रिक -१ "
+      review: "रिव्यु"
+      score: "स्कोर"
+      comment: "टिप्पणी"
+      additional_comments: "अतिरिक्त टिप्पणियां"
+      no_review_of: "इसका कोई रिव्यु नहीं "
+      type_exists: "यह प्रकार पहले से है"
+      grade_and_comment: "जमा करने के लिए ग्रेड और टिप्पणी"
+      grade: "ग्रेड:"
+      comment2: "टिप्पणी:"
+
+    participant_charts:
+      hide_stats: "आँकड़े छिपाएँ"
+      stats: "आँकड़े"
+
+    participant:
+      show_submission: "प्रस्तुत काम देखे"
+
+    participant_title:
+      submitted_work: "प्रस्तुत काम"
+      reviewing: "समीक्षा के लिए"
+      author_feedback: "लेखक की प्रतिक्रिया"
+      teammate_review: "टीममेट रिव्यू"
+      contributor: "योगदानकर्ता"
+      average: "औसत"
+      range: "सीमा"
+      final_score: "फाइनल स्कोर"
+
+  participants:
+    change_handle:
+      create_or_change: "वर्तमान असाइनमेंट के लिए हैंडल बनाएं या बदलें"
+      your: "आपका"
+      handle: "हैंडल"
+      is_the_way: "आपके समीक्षक आपको इस तरह से जानेगे ।"
+      for_example: "उदाहरण के लिए, यदि आप विकी पर लिख रहे हैं, तो हो सकता है कि आप विकी पर दिखाने के लिए अपने विशेषज्ञिता उपयोगकर्ता-आईडी का उपयोग नहीं करना चाहें, क्योंकि तब आपके समीक्षकों को पता चलेगा कि वे किसकी समीक्षा कर रहे हैं। तो, आपको इसके बजाय एक हैंडल सेट करने की अनुमति है। यदि आपके पास हैंडल है, तो आपके विकी खाते का नाम आपके हैंडल के नाम पर रखा गया है, और आपके समीक्षक आपके हैंडल को देखते हैं, लेकिन आपका उपयोगकर्ता-आईडी नहीं।"
+      if_you_do_not: "यदि आपके पास कोई हैंडल नहीं है, तो इसके बजाय आपके उपयोगकर्ता-आईडी का उपयोग किया जाएगा।"
+      two_ways: "आप दो तरीकों से एक हैंडल सेट अप कर सकते हैं:"
+      handle_for: "आप इसके लिए हैंडल सेट उप कर सकते है "
+      only_this_assignment: "केवल यह असाइनमेंट"
+      by_entering: "नीचे एक हैंडल दर्ज करके।"
+      you_can_set_up_default: "आप अपना \ डिफ़ॉल्ट \ हैंडल सेट उप कर सकते है अपना एडिट करके "
+      note_that: "ध्यान दें कि यदि आप अपना संपादन करके अपना हैंडल बदलते हैं"
+      your_new_handle: "आपके नए हैंडल का इस्तेमाल सभी के लिए किया जाएगा"
+      future: "भविष्य"
+      assignments_if: "असाइनमेंट्स ; यदि आप इस असाइनमेंट पर भी परिवर्तन लागू करना चाहते हैं, तो आपको इसे नीचे भी बदलना होगा।"
+      change_handle: "हैंडल बदलें"
+      for_current: "वर्तमान असाइनमेंट के लिए"
+      warning: "चेतावनी:"
+      you_must: "आपके विकी अकाउंट का नाम आपके हैंडल का नाम होना चाहिए। यदि नहीं हैं, तो कृपया अपने प्रशिक्षक या पाठ्यक्रम के कर्मचारियों को ई-मेल करें।"
+      back: "वापस पीछे"
+
+  popup:
+    self_review_popup:
+      no_review_done: "अभी तक कोई समीक्षा नहीं की गई है"
+      reviewer_score: "समीक्षक दिया हुआ अंक"
+      self_review_of: "की समीक्षा"
+      question: "प्रश्न"
+      score: "अंक"
+      comments: "प्रतिक्रिया"
+      other_reviewer_score: "समीक्षक के अंक (Σ भारित अंक / Σ भारित उपलब्ध अंक)"
+      additional_comments: "अतिरिक्त प्रतिक्रिया यदि कोई हो"
+      no_comments: "कोई प्रतिक्रिया नहीं "
+
+  student_quizzes:
+    index:
+      quiz_for: "इसके लिए प्रश्नोत्तरी है: "
+      assignment_not_support: "इस असाइनमेंट में अभी प्रश्नोत्तरी नहीं हैं"
+      back: "वापस पीछे"
+
+    responses:
+      work_not_submit: " आपका काम अभी तक प्रस्तुत नहीं किया गया है"
+      begin: "शुरू करो"
+
+    set_dynamic_quiz:
+      select_topic: "एक नई प्रश्नोत्तरी लेने के लिए नीचे दिए गए विषय का चयन करें"
+      request_new_quiz: "एक नई प्रश्नोत्तरी के लिए अनुरोध करें"
+
+    finished_quiz:
+      answers: "जवाब"
+      quiz_score: "प्रश्नोत्तरी के लिए अंक"
+      back: "वापस पीछे"
+
+    review_questions:
+      quiz_listings: "सभी प्रश्नोत्तरी इसके लिए :"
+      quiz_create: "यह प्रश्नोत्तरी उनके द्वारा बनाई गई थी: "
+      topic: "विषय :"
+      quiz_taker: "प्रश्नोत्तरी लेने वाला व्यक्ति"
+      quiz_score: "प्रश्नोत्तरी के लिए अंक"
+      avg_score: "प्रश्नोत्तरी लेने वाले के लिए औसत अंक"
+
+    take_quiz:
+      questions: "प्रशन"
+      submit_quiz: "कृपया प्रश्नोत्तरी जमा करें"
+
+  profile:
+    edit:
+      user_profile_info: "उपयोगकर्ता के जानकारी"
+      password_msg: "अगर पासवर्ड खाली है, थो वोह अपडेट नहीं होगा "
+      preferred_time_zone: " पसंदीदा समय क्षेत्र "
+      save: "संग्रह क्करें"
+      action_pref: "कार्रवाई वरीयता"
+      homepage_cant: "मुखपृष्ठ कार्रवाई नहीं दिखा सकता"
+      homepage_can: "मुखपृष्ठ कार्रवाई दिखा सकता है"
+
+    handle:
+      handle: "हैंडल"
+      default_handle: "डिफ़ॉल्ट हैंडल:"
+      handle_prof: " हैंडल आपका चुना हुआ नाम अन्य लोगों से छिपाता है. यदि आपके पास हैंडल है, आपका विकी अकाउंट वोह हैंडल के नॉम होणा चाहीये. अगर हैंडल नही हैं, आपके एक्सपेर्टीज़ा के यूजर ईद  (चुना हुआ नाम) उपयोग होगा. नीचे के खाली स्तान हैंडल को आपके एक्सपेर्टीज़ा में चुना हुआ नाम में बदल देगा.  "
+      note: "ध्यान दें: इस फ़ॉर्म के माध्यम से आप अपना 'डिफ़ॉल्ट हैंडल' बदल रहे हैं. अब ये आपके भविष्य के असाइनमेंट में इस्तेमाल किया जाएगा. यदि आप अपना हैंडल बदलना चाहते हैं एक विशिष्ट असाइनमेंट के लिय, आप वोह असाइनमेंट का चुनाव करके 'डिफ़ॉल्ट हैंडल' में  परिवर्तन लाये "
+
+  users:
+    prefs:
+      email: "ईमेल के विकल्प"
+      email_option: " चुनाव कीजिये जब आप ईमेल प्राप्त करना चाहते हैं "
+      email_review: "जब कोई और मेरे काम की समीक्षा करता है"
+      email_other_review: "जब कोई दूसरा काम करता है तो मुझे समीक्षा करने का काम सौंपा जाता है"
+      see_review: "जब कोई और मेरी एक समीक्षा करता है"
+      send_mail: "मुझे असाइनमेंट के लिए भेजे गए"
+      when_someone_else: "जब कोई और"
+      reviews: "समीक्षा"
+      my_work: "मेरा काम"
+      submits: "प्रविष्टियों पर"
+      reviews_one: "मेरी समीक्षाओं में से एक की समीक्षा करें"
+      work_assigned: "काम मुझे समीक्षा के लिए सौंपा गया है"
+      meta_reviews: "मेटा-समीक्षा"
+
+    password:
+      password_label: "पासवर्ड: "
+      confirm_password: "अपने पासवर्ड की पुष्टि करें: "
+
+    name:
+      name_convention: "पूरा नाम (अंतिम , पहला[ मध्य]):"
+
+    institutions:
+      inst_name: "संस्था"
+
+    email:
+      email_add: "ईमेल पता:"
+
+  datetime:
+    distance_in_words:
+      about_x_hours:
+        one: "करीब 1 घंटा"
+        other: "करीब %{count} घंटे"
+      about_x_months:
+        one: "करीब 1 महीना"
+        other: "करीब %{count} महीने"
+      about_x_years:
+        one: "करीब 1 साल"
+        other: "करीब %{count} साल"
+      almost_x_years:
+        one: "करीब 1 साल"
+        other: "करीब %{count} साल"
+      half_a_minute: "आधा मिनट"
+      less_than_x_minutes:
+        zero: "0 मिनट से कम"
+        one: "1 मिनट से कम"
+        other: "%{count} मिनट से कम"
+      less_than_x_seconds:
+        zero: "0 सेकंड से कम"
+        one: "1 सेकंड से कम"
+        other: "%{count} सेकंड से कम"
+      over_x_years:
+        one: "1 साल से अधिक"
+        other: "%{count} साल से अधिक"
+      x_days:
+        one: "1 दिन"
+        other: "%{count} दिन"
+      x_hours:
+        one: "1 घंटा"
+        other: "%{count} घंटे"
+      x_minutes:
+        one: "1 मिनट"
+        other: "%{count} मिनट"
+      x_months:
+        one: "1 महीना"
+        other: "%{count} महीने"
+      x_years:
+        one: "1 साल"
+        other: "%{count} साल"
+      x_seconds:
+        one: "1 सेकंड"
+        other: "%{count} सेकंड"
+
+  shared:
+    footer_message:
+      help: "मदद"
+      papers: "Expertiza पर कागजात"
+
+  # end of Student Views
+

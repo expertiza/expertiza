@@ -4,9 +4,9 @@
   <%= form_for @assignment_form.assignment, html: { id: 'assignment_form' } do %>
     <div class= "chart-table" id="tabs">
       <ul>
-        <li><a href="#tabs-1" id="General">General</a></li>
-        <li><a href="#tabs-2" id="Rubrics">Rubrics</a></li>
-        <li><a href="#tabs-3" id="ReviewStrategy">Review strategy</a></li>
+        <li><a href="#tabs-1" id=t(".general")><%=t ".general"%></a></li>
+        <li><a href="#tabs-2" id=t(".rubrics")><%=t ".rubrics"%></a></li>
+        <li><a href="#tabs-3" id="ReviewStrategy"><%=t ".review_strategy"%></a></li>
         <li><a href="#tabs-4" id="DueDates">Due dates</a></li>
         <%if @assignment_form.assignment.is_calibrated%>
             <li><a href="#tabs-5" id="Calibration">Calibration</a></li>
@@ -29,7 +29,7 @@
           <%= render 'assignments/edit/calibration' %>
         </div>
       <%end%>
-      <%= button_tag "Create", :id => 'submit_btn' %> | <%= render :partial => '/shared_scripts/back' %>
+      <%= button_tag t(".create_button"), :id => 'submit_btn' %> | <%= render :partial => '/shared_scripts/back' %>
     </div>
     <script>
       var useBookmarkChanged = function () {

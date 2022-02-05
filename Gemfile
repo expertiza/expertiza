@@ -12,6 +12,7 @@ gem 'authlogic', '4.5.0'
 gem 'awesome_nested_set', '3.3.1'
 # gem 'bind-it'
 gem 'bootstrap3-datetimepicker-rails', '~> 4.17.47'
+gem 'bullet', '~> 5.7.6'
 gem 'capistrano'
 gem 'capistrano-bundler'
 gem 'capistrano-db-tasks', require: false
@@ -24,6 +25,7 @@ gem 'coffee-rails'
 gem 'coveralls', require: false
 gem 'danger', git: 'https://github.com/Winbobob/danger.git', ref: '1ccfed23f809a1e5c46e2533cfd7a3138f6cd821', require: false
 gem 'delayed_job_active_record', '4.1.4'
+gem 'dotenv-rails', :require => 'dotenv/rails-now'
 gem 'dynamic_form'
 gem 'edavis10-ruby-web-search'
 gem 'engtagger'

@@ -1,5 +1,6 @@
 
 Expertiza::Application.routes.draw do
+  resources :duties
   ###
   # Please insert new routes alphabetically!
   ###
@@ -88,7 +89,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :course, controller: 'courses', only: %i[new create edit update] do
+  resources :course, controller: 'courses', only: %i[new create edit update delete] do
     collection do
       get :toggle_access
       get :copy
@@ -212,7 +213,6 @@ resources :institution, except: [:destroy] do
       get :inherit
       get :bequeath_all
       post :update_authorizations
-      post :update_duties
       post :change_handle
       get :view_copyright_grants
     end
@@ -473,9 +473,10 @@ resources :institution, except: [:destroy] do
     end
   end
 
-  resources :teams_users, only: %i[new create] do
+  resources :teams_users, only: %i[new create update] do
     collection do
       post :list
+      post :update_duties
     end
   end
 
@@ -548,6 +549,7 @@ resources :institution, except: [:destroy] do
   post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
   post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
   post 'student_task/publishing_rights_update', controller: :student_task, action: :publishing_rights_update,method: :put
+  get 'student_view/flip_view', controller: :student_view, action: :flip_view
   #updated route and added specific controller action upon accessing this route
 end
 

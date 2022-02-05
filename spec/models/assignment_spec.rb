@@ -1,6 +1,6 @@
 describe Assignment do
 
-  let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
+  let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team], max_team_size: 2) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 3, name: 'no one') }
   let(:review_response_map) { build(:review_response_map, response: [response], reviewer: build(:participant), reviewee: build(:assignment_team)) }
@@ -286,7 +286,7 @@ describe Assignment do
       allow(TeammateReviewResponseMap).to receive(:where).with(reviewed_object_id: 1).and_return([teammate_review_response_map])
     end
     context 'when there is at least one review response in current assignment' do
-      it 'raises an error messge and current assignment cannot be deleted' do
+      it 'raises an error message and current assignment cannot be deleted' do
         allow(review_response_map).to receive(:delete).with(nil)
                                                       .and_raise('Mysql2::Error: Cannot delete or update a parent row: a foreign key constraint fails')
         expect { assignment.delete }.to raise_error('There is at least one review response that exists for no assignment.')
@@ -294,7 +294,7 @@ describe Assignment do
     end
 
     context 'when there is no review response in current assignment and at least one teammate review response in current assignment' do
-      it 'raises an error messge and current assignment cannot be deleted' do
+      it 'raises an error message and current assignment cannot be deleted' do
         allow(review_response_map).to receive(:delete).with(nil).and_return(true)
         allow(teammate_review_response_map).to receive(:delete).with(nil).and_raise('Something wrong during deletion')
         expect { assignment.delete }.to raise_error('There is at least one teammate review response that exists for no assignment.')

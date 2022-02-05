@@ -101,6 +101,7 @@ group :test do
   gem 'guard-rspec'
   gem 'launchy'
   gem 'rspec-rails', '4.1.2'
+  gem 'rails-controller-testing'
   gem 'shoulda'
   gem 'puma'
 end

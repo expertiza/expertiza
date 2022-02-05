@@ -16,6 +16,6 @@ jobs:
       with:
         ruby-version: 2.7
         bundler-cache: true
-
+        action_config_path: ".github/config/rubocop_linter_action.yml"
     - name: Run RuboCop
       run: bundle exec rubocop --parallel

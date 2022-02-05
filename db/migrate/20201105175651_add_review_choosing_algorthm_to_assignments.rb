@@ -4,6 +4,6 @@ class AddReviewChoosingAlgorthmToAssignments < ActiveRecord::Migration
   end
 
   def self.down
-  	remove_column :assignments, :review_choosing_algorithm
+    remove_column :assignments, :review_choosing_algorithm
   end
 end

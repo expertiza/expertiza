@@ -1,10 +1,10 @@
 describe QuestionnaireNode do
-	let(:questionnaire) {build(:questionnaire)}
-	let(:questionnaire2) {build(:questionnaire)}
-	let(:questionnaire3) {build(:questionnaire)}
-  let(:questionnaire_node) {build(:questionnaire_node)}
-  let(:teaching_assistant) {build(:teaching_assistant)}
-  let(:student) {build(:student)}
+  let(:questionnaire) { build(:questionnaire) }
+  let(:questionnaire2) { build(:questionnaire) }
+  let(:questionnaire3) { build(:questionnaire) }
+  let(:questionnaire_node) { build(:questionnaire_node) }
+  let(:teaching_assistant) { build(:teaching_assistant) }
+  let(:student) { build(:student) }
   let(:assignment) { build(:assignment, id: 1, name: 'Assignment') }
   it { should belong_to(:questionnaire) }
   it { should belong_to(:node_object) }
@@ -56,11 +56,11 @@ describe QuestionnaireNode do
   describe '#get' do
     context 'when the user is a teaching assistant' do
       it 'returns the questionnaires associated with the TA' do
-      	condition = '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
-      	values = [1]
-      	sortvar = 'name'
-      	sortorder = 'ASC'
-      	arr = [questionnaire, questionnaire2, questionnaire3]
+        condition = '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
+        values = [1]
+        sortvar = 'name'
+        sortorder = 'ASC'
+        arr = [questionnaire, questionnaire2, questionnaire3]
         allow(User).to receive(:find).with(1).and_return(teaching_assistant)
         allow(Questionnaire).to receive(:where).with([condition, values]).and_return(arr)
         allow(QuestionnaireNode).to receive(:includes).with(:questionnaire).and_return(Questionnaire)
@@ -71,11 +71,11 @@ describe QuestionnaireNode do
     end
     context 'when the user is not a teaching assistant' do
       it 'returns the questionnaires associated with the student' do
-      	condition = '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
-      	values = 1
-      	sortvar = 'name'
-      	sortorder = 'ASC'
-      	arr = [questionnaire, questionnaire2, questionnaire3]
+        condition = '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
+        values = 1
+        sortvar = 'name'
+        sortorder = 'ASC'
+        arr = [questionnaire, questionnaire2, questionnaire3]
         allow(User).to receive(:find).with(1).and_return(student)
         allow(Questionnaire).to receive(:where).with([condition, values]).and_return(arr)
         allow(QuestionnaireNode).to receive(:includes).with(:questionnaire).and_return(Questionnaire)
@@ -86,11 +86,11 @@ describe QuestionnaireNode do
     end
     context 'when the user is not a teaching assistant and show is enabled' do
       it 'returns the questionnaires associated with the student' do
-      	condition = 'questionnaires.instructor_id = ?'
-      	values = 1
-      	sortvar = 'name'
-      	sortorder = 'ASC'
-      	arr = [questionnaire, questionnaire2, questionnaire3]
+        condition = 'questionnaires.instructor_id = ?'
+        values = 1
+        sortvar = 'name'
+        sortorder = 'ASC'
+        arr = [questionnaire, questionnaire2, questionnaire3]
         allow(User).to receive(:find).with(1).and_return(student)
         allow(Questionnaire).to receive(:where).with([condition, values]).and_return(arr)
         allow(QuestionnaireNode).to receive(:includes).with(:questionnaire).and_return(Questionnaire)
@@ -101,13 +101,13 @@ describe QuestionnaireNode do
     end
     context 'when the user is a teaching assistant and show is enabled and parent_id is enabled' do
       it 'returns the questionnaires associated with the student' do
-      	conditions = 'questionnaires.instructor_id = ?'
-      	name = "AssignmentQuestionnaire"
+        conditions = 'questionnaires.instructor_id = ?'
+        name = 'AssignmentQuestionnaire'
         conditions += " and questionnaires.type = \"#{name}\""
-      	values = 1
-      	sortvar = 'name'
-      	sortorder = 'ASC'
-      	arr = [questionnaire, questionnaire2, questionnaire3]
+        values = 1
+        sortvar = 'name'
+        sortorder = 'ASC'
+        arr = [questionnaire, questionnaire2, questionnaire3]
         allow(TreeFolder).to receive(:find).with(2).and_return(assignment)
         allow(User).to receive(:find).with(1).and_return(student)
         allow(Questionnaire).to receive(:where).with([conditions, values]).and_return(arr)
@@ -117,5 +117,5 @@ describe QuestionnaireNode do
         expect(QuestionnaireNode.get(sortvar = nil, sortorder = nil, user_id = 1, show = true, parent_id = 2, _search = nil)).to eq(arr)
       end
     end
-  end 
+  end
 end

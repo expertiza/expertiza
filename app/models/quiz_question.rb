@@ -3,15 +3,15 @@ class QuizQuestion < Question
   def edit; end
 
   def view_question_text
-    html = "<b>" + self.txt + '</b><br />'
-    html += "Question Type: " + self.type + '<br />'
-    html += 'Question Weight: ' + self.weight.to_s + '<br />'
-    if self.quiz_question_choices
-      self.quiz_question_choices.each do |choices|
+    html = '<b>' + txt + '</b><br />'
+    html += 'Question Type: ' + type + '<br />'
+    html += 'Question Weight: ' + weight.to_s + '<br />'
+    if quiz_question_choices
+      quiz_question_choices.each do |choices|
         html += if choices.iscorrect?
-                  "  - <b>" + choices.txt + "</b><br /> "
+                  '  - <b>' + choices.txt + '</b><br /> '
                 else
-                  "  - " + choices.txt + "<br /> "
+                  '  - ' + choices.txt + '<br /> '
                 end
       end
       html += '<br />'

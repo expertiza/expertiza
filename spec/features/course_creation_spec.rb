@@ -1,11 +1,11 @@
 describe 'add TA', js: true do
   before(:each) do
     @course = create(:course, name: 'TA course')
-    ta_role = Role.create(name: "Teaching Assistant")
+    ta_role = Role.create(name: 'Teaching Assistant')
     ta_role.save
   end
 
-  it "check to see if TA can be added and removed" do
+  it 'check to see if TA can be added and removed' do
     student = create(:student)
     login_as('instructor6')
     visit "/course/view_teaching_assistants?id=#{@course.id}&model=Course"
@@ -24,10 +24,10 @@ describe 'add TA', js: true do
     end.to change { TaMapping.count }.by(-1)
   end
 
-  it "should display newly created course" do
+  it 'should display newly created course' do
     login_as('instructor6')
     visit "/course/view_teaching_assistants?id=#{@course.id}&model=Course"
 
-    expect(page).to have_content("TA course")
+    expect(page).to have_content('TA course')
   end
 end

@@ -4,6 +4,6 @@ class AddPriorityToBids < ActiveRecord::Migration
   end
 
   def self.down
-  	remove_column :bids, :priority, :integer
+    remove_column :bids, :priority, :integer
   end
 end

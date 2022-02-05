@@ -6,8 +6,8 @@ class AnswerController < ApplicationController
 
   def action_allowed?
     case params[:action]
-      when 'index'
-        current_user_has_student_privileges?
+    when 'index'
+      current_user_has_student_privileges?
     end
   end
 
@@ -22,9 +22,9 @@ class AnswerController < ApplicationController
     end
     # get all answers given the questionnaire and response id
     question_answers = Question.joins(join_query)
-                           .select('answers.*, questions.txt as qtxt, questions.type as qtype, questions.seq as qseq')
-                           .where(where_query)
-                           .order("seq asc")
+                               .select('answers.*, questions.txt as qtxt, questions.type as qtype, questions.seq as qseq')
+                               .where(where_query)
+                               .order('seq asc')
     render json: question_answers
   end
 end

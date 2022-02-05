@@ -9,7 +9,6 @@ class CreateJoinTeamRequests < ActiveRecord::Migration
     end
   end
 
-
   def self.down
     drop_table :join_team_requests
   end

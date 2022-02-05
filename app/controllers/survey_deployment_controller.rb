@@ -17,27 +17,27 @@ class SurveyDeploymentController < ApplicationController
 
   def new
     case params[:type]
-    when "AssignmentSurveyDeployment"
+    when 'AssignmentSurveyDeployment'
       new_assignment_deployment
-    when "CourseSurveyDeployment"
+    when 'CourseSurveyDeployment'
       new_course_deployment
     else
-      flash[:error] = "Unexpected type. Check your dates! Dates should be in the future. "
+      flash[:error] = 'Unexpected type. Check your dates! Dates should be in the future. '
     end
 
     if params[:type]
       @survey_deployment_type = params[:type]
-      @survey_type = params[:type].sub("Deployment", "Questionnaire")
+      @survey_type = params[:type].sub('Deployment', 'Questionnaire')
     end
 
     # Get the list of surveys that match the deployment type
     case @survey_type
-    when "AssignmentSurveyQuestionnaire"
-      @surveys = Questionnaire.where(type: "AssignmentSurveyQuestionnaire").map {|u| [u.name, u.id] }
-    when "CourseSurveyQuestionnaire"
-      @surveys = Questionnaire.where(type: "CourseSurveyQuestionnaire").map {|u| [u.name, u.id] }
+    when 'AssignmentSurveyQuestionnaire'
+      @surveys = Questionnaire.where(type: 'AssignmentSurveyQuestionnaire').map { |u| [u.name, u.id] }
+    when 'CourseSurveyQuestionnaire'
+      @surveys = Questionnaire.where(type: 'CourseSurveyQuestionnaire').map { |u| [u.name, u.id] }
     else
-      flash[:error] = "Unexpected type. Check your dates! Dates should be in the future."
+      flash[:error] = 'Unexpected type. Check your dates! Dates should be in the future.'
       redirect_to '/tree_display/list'
     end
   end
@@ -60,7 +60,7 @@ class SurveyDeploymentController < ApplicationController
     if params[:add_global_survey]
       global = GlobalSurveyQuestionnaire.find_by(private: false)
       if global.nil?
-        flash[:error] = "No global survey available"
+        flash[:error] = 'No global survey available'
         return redirect_to action: 'new'
       else
         global_id = global.id
@@ -144,20 +144,23 @@ class SurveyDeploymentController < ApplicationController
     [CourseParticipant, AssignmentParticipant].each do |participant_type| # Get all the participant(course or assignment) entries for this user
       participants = participant_type.where(user_id: session[:user].id)
       next unless participants
+
       participants.each do |p|
         survey_deployment_type = (participant_type == CourseParticipant ? CourseSurveyDeployment : AssignmentSurveyDeployment)
         survey_deployments = survey_deployment_type.where(parent_id: p.parent_id)
         next unless survey_deployments
+
         survey_deployments.each do |survey_deployment|
           next unless survey_deployment && Time.zone.now > survey_deployment.start_date && Time.zone.now < survey_deployment.end_date
+
           @surveys <<
-              ['survey' => Questionnaire.find(survey_deployment.questionnaire_id),
-               'survey_deployment_id' => survey_deployment.id,
-               'start_date' => survey_deployment.start_date,
-               'end_date' => survey_deployment.end_date,
-               'parent_id' => p.parent_id,
-               'participant_id' => p.id,
-               'global_survey_id' => survey_deployment.global_survey_id]
+            ['survey' => Questionnaire.find(survey_deployment.questionnaire_id),
+             'survey_deployment_id' => survey_deployment.id,
+             'start_date' => survey_deployment.start_date,
+             'end_date' => survey_deployment.end_date,
+             'parent_id' => p.parent_id,
+             'participant_id' => p.id,
+             'global_survey_id' => survey_deployment.global_survey_id]
         end
       end
     end

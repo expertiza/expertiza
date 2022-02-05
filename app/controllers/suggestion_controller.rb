@@ -15,20 +15,20 @@ class SuggestionController < ApplicationController
     @suggestioncomment.suggestion_id = params[:id]
     @suggestioncomment.commenter = session[:user].name
     if @suggestioncomment.save
-      flash[:notice] = "Your comment has been successfully added."
+      flash[:notice] = 'Your comment has been successfully added.'
     else
-      flash[:error] = "There was an error in adding your comment."
+      flash[:error] = 'There was an error in adding your comment.'
     end
     if current_user_has_student_privileges?
-      redirect_to action: "student_view", id: params[:id]
+      redirect_to action: 'student_view', id: params[:id]
     else
-      redirect_to action: "show", id: params[:id]
+      redirect_to action: 'show', id: params[:id]
     end
   end
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],
-         redirect_to: {action: :list}
+         redirect_to: { action: :list }
 
   def list
     @suggestions = Suggestion.where(assignment_id: params[:id])
@@ -69,11 +69,11 @@ class SuggestionController < ApplicationController
     @suggestion.unityID = if params[:suggestion_anonymous].nil?
                             session[:user].name
                           else
-                            ""
+                            ''
     end
 
     if @suggestion.save
-      flash[:success] = 'Thank you for your suggestion!' unless @suggestion.unityID.empty? 
+      flash[:success] = 'Thank you for your suggestion!' unless @suggestion.unityID.empty?
       flash[:success] = 'You have submitted an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID.empty?
     end
     redirect_to action: 'new', id: @suggestion.assignment_id
@@ -115,7 +115,7 @@ class SuggestionController < ApplicationController
     if @suggestion.signup_preference == 'Y'
       if @team_id.nil?
         new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s,
-                                     parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
+                                         parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
         new_team.create_new_team(@user_id, @signuptopic)
       else
         if @topic_id.nil?
@@ -165,9 +165,9 @@ class SuggestionController < ApplicationController
       @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
       @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)
     end
-    #After getting topic from user/team, get the suggestion
+    # After getting topic from user/team, get the suggestion
     @signuptopic = SignUpTopic.new_topic_from_suggestion(@suggestion)
-    #Get success only if the signuptopic object was returned from its class
+    # Get success only if the signuptopic object was returned from its class
     if @signuptopic != 'failed'
       flash[:success] = 'The suggestion was successfully approved.'
     else

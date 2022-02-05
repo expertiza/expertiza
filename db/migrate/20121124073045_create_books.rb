@@ -1,9 +1,6 @@
 class CreateBooks < ActiveRecord::Migration
   def self.up
-    create_table :books do |t|
-
-      t.timestamps
-    end
+    create_table :books, &:timestamps
   end
 
   def self.down

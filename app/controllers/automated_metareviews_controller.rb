@@ -12,8 +12,8 @@ class AutomatedMetareviewsController < ApplicationController
     if assignment
       instructor = find_assignment_instructor(assignment)
       current_user_teaching_staff_of_assignment?(assignment.id) ||
-          current_user_ancestor_of?(instructor) ||
-          current_user_is_assignment_participant?(assignment.id)
+        current_user_ancestor_of?(instructor) ||
+        current_user_is_assignment_participant?(assignment.id)
     else
       false
     end
@@ -44,13 +44,13 @@ class AutomatedMetareviewsController < ApplicationController
                                                                 avg(tone_neutral) as neutral, avg(quantity) as quantity from automated_metareviews where response_id <> ?", @automated_metareview.response_id])[0]
     unless avg_existing_metareviews.nil?
       # if any of the values are -ve, set them as 0 (for graph display)
-      avg_existing_metareviews.relevance = 0 if avg_existing_metareviews.relevance.nil? or avg_existing_metareviews.relevance < 0
-      avg_existing_metareviews.summative = 0 if avg_existing_metareviews.summative.nil? or avg_existing_metareviews.summative.to_f < 0
-      avg_existing_metareviews.problem = 0 if avg_existing_metareviews.problem.nil? or avg_existing_metareviews.problem.to_f < 0
-      avg_existing_metareviews.advisory = 0 if avg_existing_metareviews.advisory.nil? or avg_existing_metareviews.advisory.to_f < 0
-      avg_existing_metareviews.positive = 0 if avg_existing_metareviews.positive.nil? or avg_existing_metareviews.positive.to_f < 0
-      avg_existing_metareviews.negative = 0 if avg_existing_metareviews.negative.nil? or avg_existing_metareviews.negative.to_f < 0
-      avg_existing_metareviews.neutral = 0 if avg_existing_metareviews.neutral.nil? or avg_existing_metareviews.neutral.to_f < 0
+      avg_existing_metareviews.relevance = 0 if avg_existing_metareviews.relevance.nil? || (avg_existing_metareviews.relevance < 0)
+      avg_existing_metareviews.summative = 0 if avg_existing_metareviews.summative.nil? || (avg_existing_metareviews.summative.to_f < 0)
+      avg_existing_metareviews.problem = 0 if avg_existing_metareviews.problem.nil? || (avg_existing_metareviews.problem.to_f < 0)
+      avg_existing_metareviews.advisory = 0 if avg_existing_metareviews.advisory.nil? || (avg_existing_metareviews.advisory.to_f < 0)
+      avg_existing_metareviews.positive = 0 if avg_existing_metareviews.positive.nil? || (avg_existing_metareviews.positive.to_f < 0)
+      avg_existing_metareviews.negative = 0 if avg_existing_metareviews.negative.nil? || (avg_existing_metareviews.negative.to_f < 0)
+      avg_existing_metareviews.neutral = 0 if avg_existing_metareviews.neutral.nil? || (avg_existing_metareviews.neutral.to_f < 0)
     end
 
     # for current metareview values
@@ -73,10 +73,10 @@ class AutomatedMetareviewsController < ApplicationController
     color_1 = 'c53711'
     color_2 = '0000ff'
     # labels in reverse order of content being displayed
-    names_array = ["Neutral Tone", "Negative Tone", "Positive Tone", "Advisory Content", "Problem Content", "Summative Content", "Relevance"]
-    GoogleChart::BarChart.new("500x450", "Your work Vs Average performance on reviews", :horizontal, false) do |bc|
-      bc.data "Your work", current_metareview_data, color_1
-      bc.data "Avg. performance on reviews", existing_metareview_data, color_2
+    names_array = ['Neutral Tone', 'Negative Tone', 'Positive Tone', 'Advisory Content', 'Problem Content', 'Summative Content', 'Relevance']
+    GoogleChart::BarChart.new('500x450', 'Your work Vs Average performance on reviews', :horizontal, false) do |bc|
+      bc.data 'Your work', current_metareview_data, color_1
+      bc.data 'Avg. performance on reviews', existing_metareview_data, color_2
       bc.axis :y, labels: names_array, font_size: 10
       bc.axis :x, range: [0, 1]
       bc.show_legend = true

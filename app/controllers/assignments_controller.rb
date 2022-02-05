@@ -1,5 +1,4 @@
 class AssignmentsController < ApplicationController
-  
   include AssignmentHelper
   include AuthorizationHelper
   autocomplete :user, :name
@@ -34,7 +33,7 @@ class AssignmentsController < ApplicationController
       find_existing_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
       dir_path = assignment_form_params[:assignment][:directory_path]
       find_existing_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
-      if !find_existing_assignment && !find_existing_directory && @assignment_form.save #No existing names/directories 
+      if !find_existing_assignment && !find_existing_directory && @assignment_form.save # No existing names/directories
         @assignment_form.create_assignment_node
         current_assignment = assignment_by_name_and_course(@assignment_form.assignment.name, @assignment_form.assignment.course_id)
         assignment_form_params[:assignment][:id] = current_assignment.id.to_s
@@ -55,14 +54,14 @@ class AssignmentsController < ApplicationController
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
         return
       else
-        flash[:error] = "Failed to create assignment."
-        if find_existing_assignment #Throw error if assignment name already found.
-          flash[:error] << "<br>  " + @assignment_form.assignment.name + " already exists as an assignment name"
+        flash[:error] = 'Failed to create assignment.'
+        if find_existing_assignment # Throw error if assignment name already found.
+          flash[:error] << '<br>  ' + @assignment_form.assignment.name + ' already exists as an assignment name'
         end
-        if find_existing_directory #Throw error if directory path already found.
-          flash[:error] << "<br>  " + dir_path + " already exists as a submission directory name"
+        if find_existing_directory # Throw error if directory path already found.
+          flash[:error] << '<br>  ' + dir_path + ' already exists as a submission directory name'
         end
-        redirect_to "/assignments/new?private=1"
+        redirect_to '/assignments/new?private=1'
       end
     else
       render 'new'
@@ -92,8 +91,7 @@ class AssignmentsController < ApplicationController
     @use_bookmark = @assignment.use_bookmark
 
     # E2147 : gets duties of a particular assignment. Returns empty if no duties are found
-    @duties = Duty.where(assignment_id:@assignment_form.assignment.id)
-
+    @duties = Duty.where(assignment_id: @assignment_form.assignment.id)
   end
 
   # updates an assignment via an assignment form
@@ -114,9 +112,9 @@ class AssignmentsController < ApplicationController
       # Specifically useful when switching between vary-do-not-vary by topic on the Rubrics tab
       # This changes how the Topics tab should appear
       # Followed instructions at:
-      #https://atlwendy.ghost.io/render-a-partial-view-tutorial-for-beginners/
-      render :partial => "assignments/edit/topics"
-      # TODO E1936 (future work)
+      # https://atlwendy.ghost.io/render-a-partial-view-tutorial-for-beginners/
+      render partial: 'assignments/edit/topics'
+      # TODO: E1936 (future work)
       # There is a noticeable delay bewtween changing the state of the
       # "Review rubric varies by topic?" checkbox on the Rubrics tab,
       # and the show / hide of rubric drop-downs on the Topics tab
@@ -148,9 +146,9 @@ class AssignmentsController < ApplicationController
     new_assign_id = AssignmentForm.copy(params[:id], @user)
     if new_assign_id
       if check_same_directory?(params[:id], new_assign_id)
-        flash[:note] = "Warning: The submission directory for the copy of this assignment will be the same as the submission directory "\
-          "for the existing assignment. This will allow student submissions to one assignment to overwrite submissions to the other assignment. "\
-          "If you do not want this to happen, change the submission directory in the new copy of the assignment."
+        flash[:note] = 'Warning: The submission directory for the copy of this assignment will be the same as the submission directory '\
+          'for the existing assignment. This will allow student submissions to one assignment to overwrite submissions to the other assignment. '\
+          'If you do not want this to happen, change the submission directory in the new copy of the assignment.'
       end
       redirect_to edit_assignment_path new_assign_id
     else
@@ -167,7 +165,7 @@ class AssignmentsController < ApplicationController
       # Issue 1017 - allow instructor to delete assignment created by TA.
       # FixA : TA can only delete assignment created by itself.
       # FixB : Instrucor will be able to delete any assignment belonging to his/her courses.
-      if user.role.name == 'Instructor' or (user.role.name == 'Teaching Assistant' and user.id == assignment_form.assignment.instructor_id)
+      if (user.role.name == 'Instructor') || ((user.role.name == 'Teaching Assistant') && (user.id == assignment_form.assignment.instructor_id))
         assignment_form.delete(params[:force])
         ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Assignment #{assignment_form.assignment.id} was deleted.", request)
         flash[:success] = 'The assignment was successfully deleted.'
@@ -208,7 +206,7 @@ class AssignmentsController < ApplicationController
   end
 
   def delete_delayed_mailer
-    queue = Sidekiq::Queue.new("mailers")
+    queue = Sidekiq::Queue.new('mailers')
     queue.each do |job|
       job.delete if job.jid == params[:delayed_job_id]
     end
@@ -225,10 +223,11 @@ class AssignmentsController < ApplicationController
   #   doesn't matter what tab we are on (anybody can request this render)
   #   doesn't matter where the flash item originated, anything can get seen this way
   def instant_flash
-    render :partial => "shared/flash_messages"
+    render partial: 'shared/flash_messages'
   end
 
   private
+
   # check whether rubrics are set before save assignment
   def list_unassigned_rubrics
     rubrics_list = %w[ReviewQuestionnaire
@@ -334,10 +333,10 @@ class AssignmentsController < ApplicationController
   # update assignment_form with assignment_questionnaire and due_date
   def update_assignment_form(exist_assignment)
     questionnaire_array = assignment_form_params[:assignment_questionnaire]
-    questionnaire_array.each {|cur_questionnaire| cur_questionnaire[:assignment_id] = exist_assignment.id.to_s }
+    questionnaire_array.each { |cur_questionnaire| cur_questionnaire[:assignment_id] = exist_assignment.id.to_s }
     assignment_form_params[:assignment_questionnaire]
     due_array = assignment_form_params[:due_date]
-    due_array.each {|cur_due| cur_due[:parent_id] = exist_assignment.id.to_s }
+    due_array.each { |cur_due| cur_due[:parent_id] = exist_assignment.id.to_s }
     assignment_form_params[:due_date]
     @assignment_form.update(assignment_form_params, current_user)
   end
@@ -389,8 +388,8 @@ class AssignmentsController < ApplicationController
     if @assignment_form.assignment.staggered_deadline == true
       @review_rounds = @assignment_form.assignment.num_review_rounds
       @due_date_all ||= AssignmentDueDate.where(parent_id: @assignment_form.assignment.id)
-      @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_SUBMISSION }
-      @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_REVIEW }
+      @assignment_submission_due_dates = @due_date_all.select { |due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_SUBMISSION }
+      @assignment_review_due_dates = @due_date_all.select { |due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_REVIEW }
     end
     @assignment_form.assignment.staggered_deadline == true
   end
@@ -431,10 +430,10 @@ class AssignmentsController < ApplicationController
     if !list_unassigned_rubrics.empty? && request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
       rubrics_needed = needed_rubrics(list_unassigned_rubrics)
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Rubrics missing for #{@assignment_form.assignment.name}.", request)
-      if flash.now[:error] != "Failed to save the assignment: [\"Total weight of rubrics should add up to either 0 or 100%\"]"
-        flash.now[:error] = "You did not specify all the necessary rubrics. You need " + rubrics_needed +
-            " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics" \
-            " <a id='go_to_tabs2' style='color: blue;'>here</a>."
+      if flash.now[:error] != 'Failed to save the assignment: ["Total weight of rubrics should add up to either 0 or 100%"]'
+        flash.now[:error] = 'You did not specify all the necessary rubrics. You need ' + rubrics_needed +
+                            " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics" \
+                            " <a id='go_to_tabs2' style='color: blue;'>here</a>."
       end
     end
   end
@@ -442,8 +441,8 @@ class AssignmentsController < ApplicationController
   # flashes an error if an assignment has no directory and sets tag prompting
   def path_warning_and_answer_tag
     if @assignment_form.assignment.directory_path.blank?
-      flash.now[:error] = "You did not specify your submission directory."
-      ExpertizaLogger.error LoggerMessage.new(controller_name, "", "Submission directory not specified", request)
+      flash.now[:error] = 'You did not specify your submission directory.'
+      ExpertizaLogger.error LoggerMessage.new(controller_name, '', 'Submission directory not specified', request)
     end
     @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id]) if @assignment_form.assignment.is_answer_tagging_allowed
   end
@@ -465,8 +464,8 @@ class AssignmentsController < ApplicationController
 
   # flash notice if the time zone is not specified for an assignment's due date
   def user_timezone_specified
-    ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Timezone not specified", request) if current_user.timezonepref.nil?
-    flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines." if current_user.timezonepref.nil?
+    ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, 'Timezone not specified', request) if current_user.timezonepref.nil?
+    flash.now[:error] = 'You have not specified your preferred timezone yet. Please do this before you set up the deadlines.' if current_user.timezonepref.nil?
   end
 
   # helper methods for update
@@ -498,7 +497,7 @@ class AssignmentsController < ApplicationController
 
     @due_date_info = DueDate.find_each(parent_id: params[:id])
 
-    DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all if params[:metareview_allowed] == "false"
+    DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all if params[:metareview_allowed] == 'false'
   end
 
   # sets assignment time zone if not specified and flashes a warning
@@ -506,8 +505,8 @@ class AssignmentsController < ApplicationController
     if current_user.timezonepref.nil?
       parent_id = current_user.parent_id
       parent_timezone = User.find(parent_id).timezonepref
-      flash[:error] = "We strongly suggest that instructors specify their preferred timezone to"\
-          " guarantee the correct display time. For now we assume you are in " + parent_timezone
+      flash[:error] = 'We strongly suggest that instructors specify their preferred timezone to'\
+          ' guarantee the correct display time. For now we assume you are in ' + parent_timezone
       current_user.timezonepref = parent_timezone
     end
   end
@@ -519,18 +518,18 @@ class AssignmentsController < ApplicationController
     elsif @assignment_form.update_attributes(assignment_form_params, current_user)
       flash[:note] = 'The assignment was successfully saved....'
       if @assignment_form.rubric_weight_error(assignment_form_params)
-        flash[:error] = "A rubric has no ScoredQuestions, but still has a weight. Please change the weight to 0."
+        flash[:error] = 'A rubric has no ScoredQuestions, but still has a weight. Please change the weight to 0.'
       end
     else
-      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.to_s}"
+      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors}"
     end
-    ExpertizaLogger.info LoggerMessage.new("", session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)
+    ExpertizaLogger.info LoggerMessage.new('', session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)
   end
 
   def query_participants_and_alert
     assignment = Assignment.find(params[:id])
-    if assignment.participants.size == 0
-      flash[:error] = %Q[Saved assignment is missing participants. Add them <a href="/participants/list?id=#{assignment.id}&model=Assignment">here</a>]
+    if assignment.participants.empty?
+      flash[:error] = %(Saved assignment is missing participants. Add them <a href="/participants/list?id=#{assignment.id}&model=Assignment">here</a>)
     end
   end
 

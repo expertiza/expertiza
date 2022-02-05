@@ -4,7 +4,7 @@ describe SignUpTopic do
   let(:signed_up_team) { build(:signed_up_team) }
   let(:team) { create(:assignment_team, id: 1, name: 'team 1', users: [user, user2]) }
   let(:user) { create(:student) }
-  let(:user2) { create(:student, name: "qwertyui", id: 5) }
+  let(:user2) { create(:student, name: 'qwertyui', id: 5) }
   describe '.import' do
     context 'when record is empty' do
       it 'raises an ArgumentError' do
@@ -13,13 +13,13 @@ describe SignUpTopic do
     end
     context 'when record is not empty' do
       let(:row) do
-        {topic_identifier: 'identifier', topic_name: 'name', max_choosers: 'chooser', category: 'category', description: 'description', link: 'link'}
+        { topic_identifier: 'identifier', topic_name: 'name', max_choosers: 'chooser', category: 'category', description: 'description', link: 'link' }
       end
       let(:session) do
-        {assignment_id: 1}
+        { assignment_id: 1 }
       end
       let(:attributes) do
-        {topic_identifier: 'identifier', topic_name: 'name', max_choosers: 'chooser', category: 'category', description: 'description', link: 'link'}
+        { topic_identifier: 'identifier', topic_name: 'name', max_choosers: 'chooser', category: 'category', description: 'description', link: 'link' }
       end
       context 'when the topic is not found' do
         it 'creates a new sign up topic' do
@@ -43,7 +43,7 @@ describe SignUpTopic do
 
   describe '#new_topic_from_suggestion' do
     before(:each) do
-      allow(Suggestion).to receive_message_chain(:where, :size, :to_s).and_return("3")
+      allow(Suggestion).to receive_message_chain(:where, :size, :to_s).and_return('3')
     end
     context 'when the signup topic saves successfully and the suggestion updates attribute successfully' do
       it 'returns a signuptopic' do
@@ -63,7 +63,7 @@ describe SignUpTopic do
 
   describe '#format_for_display' do
     it 'returns a formatted string' do
-      expect(topic.format_for_display).to eq("1 - Hello world!")
+      expect(topic.format_for_display).to eq('1 - Hello world!')
     end
   end
 

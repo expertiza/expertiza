@@ -3,9 +3,9 @@ describe Participant do
   let(:user) { build(:student, id: 4, name: 'no name', fullname: 'no two') }
   let(:team_user) { build(:team_user, id: 1, user: user, team: team) }
   let(:topic) { build(:topic) }
-  let(:participant) { build(:participant, user: build(:student, name: "Jane", fullname: "Doe, Jane", id: 1)) }
-  let(:participant2) { build(:participant, user: build(:student, name: "John", fullname: "Doe, John", id: 2)) }
-  let(:participant3) { build(:participant, can_review: false, user: build(:student, name: "King", fullname: "Titan, King", id: 3)) }
+  let(:participant) { build(:participant, user: build(:student, name: 'Jane', fullname: 'Doe, Jane', id: 1)) }
+  let(:participant2) { build(:participant, user: build(:student, name: 'John', fullname: 'Doe, John', id: 2)) }
+  let(:participant3) { build(:participant, can_review: false, user: build(:student, name: 'King', fullname: 'Titan, King', id: 3)) }
   let(:participant4) { Participant.new }
   let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
@@ -35,21 +35,21 @@ describe Participant do
     end
   end
 
-  describe "#name" do
-    it "returns the name of the user" do
-      expect(participant.name).to eq("Jane")
+  describe '#name' do
+    it 'returns the name of the user' do
+      expect(participant.name).to eq('Jane')
     end
   end
 
-  describe "#fullname" do
-    it "returns the full name of the user" do
-      expect(participant.fullname).to eq("Doe, Jane")
+  describe '#fullname' do
+    it 'returns the full name of the user' do
+      expect(participant.fullname).to eq('Doe, Jane')
     end
   end
 
   describe '#handle' do
     it 'returns the handle of the participant' do
-      expect(participant.handle(nil)).to eq("handle")
+      expect(participant.handle(nil)).to eq('handle')
     end
   end
 
@@ -71,7 +71,7 @@ describe Participant do
     end
     it 'raises error, delete participant with associations and force is nil' do
       allow(participant).to receive(:team).and_return(team)
-      expect { participant.delete(nil) }.to raise_error.with_message("Associations exist for this participant.")
+      expect { participant.delete(nil) }.to raise_error.with_message('Associations exist for this participant.')
     end
   end
 
@@ -83,7 +83,7 @@ describe Participant do
     end
     it 'returns the participant topic name when not nil' do
       allow(participant).to receive(:topic).and_return(topic)
-      expect(participant.topic_name).to eq("Hello world!")
+      expect(participant.topic_name).to eq('Hello world!')
     end
   end
 

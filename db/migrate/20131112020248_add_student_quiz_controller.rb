@@ -6,6 +6,5 @@ class AddStudentQuizController < ActiveRecord::Migration
     controller.save
   end
 
-  def self.down
-  end
+  def self.down; end
 end

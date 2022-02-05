@@ -4,6 +4,6 @@ class AddAlgorithmToAssignments < ActiveRecord::Migration
   end
 
   def self.down
-  	remove_column :assignments, :reputation_algorithm
+    remove_column :assignments, :reputation_algorithm
   end
 end

@@ -5,9 +5,9 @@ class CreateReviewMappings < ActiveRecord::Migration
       t.column :author_id, :integer # if an individual is being reviewed, this field is non-null, otherwise is null
       t.column :team_id, :integer   # if a team is being reviewed, this field is non-null, otherwise is null
       t.column :reviewer_id, :integer
-      t.column :assignment_id, :integer  # assignment that is being reviewed
+      t.column :assignment_id, :integer # assignment that is being reviewed
     end
-    execute "alter table review_mappings 
+    execute "alter table review_mappings
           add constraint fk_review_mapping_assignments
           foreign key (assignment_id) references assignments(id)"
   end

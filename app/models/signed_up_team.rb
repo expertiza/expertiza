@@ -69,7 +69,6 @@ class SignedUpTeam < ActiveRecord::Base
     end
   end
 
-  # This method is used to returns topic_id from [signed_up_teams] table and the inputs are assignment_id and user_id.
   def self.topic_id(assignment_id, user_id)
     # team_id variable represents the team_id for this user in this assignment
     team_id = TeamsUser.team_id(assignment_id, user_id)

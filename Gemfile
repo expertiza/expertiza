@@ -92,7 +92,7 @@ end
 
 group :test do
   gem 'database_cleaner'
-  gem "factory_bot_rails"
+  gem "factory_bot_rails", '4.8.2'
   gem 'geckodriver-helper', '~> 0.0.3'
   gem 'capybara'
   gem 'selenium-webdriver'

@@ -143,7 +143,10 @@ class User < ActiveRecord::Base
 
   def valid_password?(password)
     Authlogic::CryptoProviders::Sha1.stretches = 1
-    Authlogic::CryptoProviders::Sha1.matches?(crypted_password, password, self.password_salt)
+    #authlogic internally changed the matches function, so old passwords work with the first line
+    old_validation = Authlogic::CryptoProviders::Sha1.matches?(crypted_password, self.password_salt.to_s + password)
+    new_validation = Authlogic::CryptoProviders::Sha1.matches?(crypted_password, password, self.password_salt)
+    old_validation || new_validation
   end
 
   # Resets the password to be mailed to the user

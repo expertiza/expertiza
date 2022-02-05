@@ -191,11 +191,11 @@ end
 # ------------------------------------------------------------------------------
 # 9. Your pull request should avoid keeping debugging code.
 # ------------------------------------------------------------------------------
-if PR_ADDED.include?('puts ') ||
-   PR_ADDED.include?('print ') ||
-   PR_ADDED.include?('binding.pry') ||
-   PR_ADDED.include?('debugger;') ||
-   PR_ADDED.include?('console.log')
+if PR_ADDED.include?("puts ") ||
+   PR_ADDED.include?("print ") ||
+   PR_ADDED.include?("binding.pry") ||
+   PR_ADDED.include?("debugger;") ||
+   PR_ADDED.include?("console.log")
   fail('You are including debug code in your pull request, please remove it.', sticky: true)
 end
 

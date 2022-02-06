@@ -27,11 +27,9 @@ describe Waitlist do
       allow(SignedUpTeam).to receive(:find_by).with(topic_id: 1, is_waitlisted: true).and_return(signedupteam4)
       allow(SignUpTopic).to receive(:find).and_return(topic1)
       allow_any_instance_of(SignedUpTeam).to receive(:destroy).and_return(true)
-      allow(SignUpTopic).to receive(:assign_to_first_waiting_team).and_return(true)
-      expect(SignUpTopic).to receive(:assign_to_first_waiting_team)
+      allow(Waitlist).to receive(:assign_to_first_waiting_team).and_return(true)
+      expect(Waitlist).to receive(:assign_to_first_waiting_team)
       Waitlist.remove_from_waitlists(1)
-      
-      
     end
   end
 end

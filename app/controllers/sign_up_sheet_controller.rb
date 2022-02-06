@@ -468,7 +468,7 @@ class SignUpSheetController < ApplicationController
       topic.max_choosers = params[:topic][:max_choosers]
     else
       if topic.max_choosers.to_i < params[:topic][:max_choosers].to_i
-        topic.update_waitlisted_users params[:topic][:max_choosers]
+        Waitlist.update_waitlisted_users params[:topic][:max_choosers]
         topic.max_choosers = params[:topic][:max_choosers]
       else
         flash[:error] = 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'

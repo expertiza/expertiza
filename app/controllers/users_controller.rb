@@ -69,7 +69,7 @@ class UsersController < ApplicationController
     # Retrieves the search by user names, full names and or email; all criteria that are available
     search_usrid, search_fname, search_email = search_parameters
 
-    # Passes the above received search criterias to the User model to populate the list accordingly.
+    # Passes the above received search criteria to the User model to populate the list accordingly.
     @users = user.get_user_list search_usrid, search_fname, search_email
 
     @paginated_users = paginate_list(@users)

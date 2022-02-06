@@ -107,7 +107,6 @@ class TreeDisplayController < ApplicationController
       # Serialize the contents of each node so it can be displayed on the UI
       contents = []
       child_nodes.each do |node|
-        # TODO: INCLUDE THE CHILDREN NODES HERE, ITS FILTERING TOO MUCH AND NOT RETRIEVING ANYTHING USEFUL INT EH CHILDREN SECTION OF THE REACT REFERENCE HERE
         contents.push(serialize_folder_to_json(folder_node.get_name, node))
       end
 

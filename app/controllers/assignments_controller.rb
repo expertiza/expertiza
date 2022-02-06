@@ -108,16 +108,7 @@ class AssignmentsController < ApplicationController
 
     # What to do next depends on how we got here
     if params['button'].nil?
-      # REFRESH the topics tab after changing tabs
-      # Specifically useful when switching between vary-do-not-vary by topic on the Rubrics tab
-      # This changes how the Topics tab should appear
-      # Followed instructions at:
-      # https://atlwendy.ghost.io/render-a-partial-view-tutorial-for-beginners/
       render partial: 'assignments/edit/topics'
-      # TODO: E1936 (future work)
-      # There is a noticeable delay bewtween changing the state of the
-      # "Review rubric varies by topic?" checkbox on the Rubrics tab,
-      # and the show / hide of rubric drop-downs on the Topics tab
     else
       # SAVE button was used (do a redirect)
       redirect_to edit_assignment_path @assignment_form.assignment.id

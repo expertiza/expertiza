@@ -62,7 +62,6 @@ module AnalyticHelper
   end
 
   #======= helper data formatting =====#
-  # TODO: implementing normalize for bar chart
   def normalize(array)
     normalized_array = []
     max = array.max

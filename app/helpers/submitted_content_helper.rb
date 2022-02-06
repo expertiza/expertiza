@@ -1,7 +1,7 @@
 module SubmittedContentHelper
   def display_directory_tree(participant, files, display_to_reviewer_flag)
     index = 0
-    participant = @participant if @participant # TODO: Verify why this is needed
+    participant = @participant if @participant
     assignment = participant.assignment # participant is @map.contributor
     topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) # participant is @map.reviewer
     check_stage = assignment.current_stage(topic_id)
@@ -48,7 +48,7 @@ module SubmittedContentHelper
   # Zhewei: this method is used to display reviewer uploaded files during peer review.
   def display_review_files_directory_tree(participant, files)
     index = 0
-    participant = @participant if @participant # TODO: Verify why this is needed
+    participant = @participant if @participant
     assignment = participant.assignment # participant is @map.contributor
     html = ''
 

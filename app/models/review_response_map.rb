@@ -197,13 +197,6 @@ class ReviewResponseMap < ResponseMap
                ('review round' + ' ' + round.to_s).to_sym
              end
     review_final_versions[symbol] = {}
-    # TODO: E1936 (future work)
-    # review_questionnaire_id method signature has changed
-    # need to change call to review_questionnaire_id here
-    # cannot do this as part of this project's scope
-    # the structure of the output (assumes only 1 questionnaire per round) has to change
-    # and this change has to bubble all the way up to tone analysis, heatmaps, and review scores pop-up
-    # this is a vary-by-topic redesign project all on its own
     review_final_versions[symbol][:questionnaire_id] = assignment.review_questionnaire_id(round)
     response_ids = []
     maps.each do |map|

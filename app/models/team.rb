@@ -167,21 +167,14 @@ class Team < ActiveRecord::Base
   end
 
   # Extract team members from the csv and push to DB,  changed to hash by E1776
-  # todo check if the starting_index is necessary
-  def import_team_members(starting_index = 0, row_hash)
-    starting_index
-    index = 0
-    row_hash[:teammembers].each do |teammember|
-      next if index < starting_index # not sure this will work, hash is not ordered like array
-
-      user = User.find_by(name: teammember.to_s)
+  def import_team_members(row_hash)
+    row_hash[:teammembers].each_with_index do |teammate, index|
+      user = User.find_by(name: teammate.to_s)
       if user.nil?
-        raise ImportError, "The user '#{teammember}' was not found. <a href='/users/new'>Create</a> this user?"
+        raise ImportError, "The user '#{teammate}' was not found. <a href='/users/new'>Create</a> this user?"
       else
         add_member(user) if TeamsUser.find_by(team_id: id, user_id: user.id).nil?
       end
-
-      index += 1
     end
   end
 

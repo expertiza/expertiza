@@ -1038,7 +1038,6 @@ jQuery(document).ready(function() {
             return
           }
         })
-        /** this was protecting an always null field, weird TODO */
         if (this.props.showPublic) {
           if (this.props.dataType == 'course') {
             _rows.push(<TitleRow title="Others' Public Courses" />)

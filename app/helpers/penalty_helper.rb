@@ -13,9 +13,8 @@ module PenaltyHelper
     end
     penalties = { submission: 0, review: 0, meta_review: 0 }
     calculate_penalty = @assignment.calculate_penalty
-    # TODO: add calculate_penalty column to the assignment table and
     # use its value to check if the penalty is to be calculated for the assignment or not
-    if calculate_penalty == true
+    if calculate_penalty
       topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
       stage = @assignment.current_stage(topic_id)
       if stage == 'Finished'

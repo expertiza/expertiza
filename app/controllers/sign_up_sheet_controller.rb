@@ -223,8 +223,7 @@ class SignUpSheetController < ApplicationController
       @selected_topics = if users_team.empty?
                            nil
                          else
-                           # TODO: fix this; can't use 0
-                           SignedUpTeam.find_user_signup_topics(@assignment.id, users_team[0].t_id)
+                           SignedUpTeam.find_user_signup_topics(@assignment.id, users_team.first.t_id)
                          end
     end
     render('sign_up_sheet/intelligent_topic_selection') && return if @assignment.is_intelligent

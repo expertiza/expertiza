@@ -77,7 +77,6 @@ class DutiesController < ApplicationController
   end
 
   def redirect_to_create_page_and_show_error
-    # TODO: @john @nicholas is there any better way to handle error messages ?
     error_message = ''
     @duty.errors.each { |_field, error| error_message << error }
 

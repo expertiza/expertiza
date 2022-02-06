@@ -329,6 +329,4 @@ class QuestionnairesController < ApplicationController
     params.require(:question).permit(:txt, :weight, :questionnaire_id, :seq, :type, :size,
                                      :alternatives, :break_before, :max_label, :min_label)
   end
-
-  # FIXME: These private methods belong in the Questionnaire model
 end

@@ -196,7 +196,7 @@ if PR_ADDED.include?("puts ") ||
    PR_ADDED.include?("binding.pry") ||
    PR_ADDED.include?("debugger;") ||
    PR_ADDED.include?("console.log")
-  fail('You are including debug code in your pull request, please remove it.', sticky: true)
+  warn('You are including debug code in your pull request, please remove it.', sticky: true)
 end
 
 # ------------------------------------------------------------------------------

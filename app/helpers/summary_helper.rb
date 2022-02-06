@@ -144,7 +144,7 @@ module SummaryHelper
 
             # summarize the comments by calling the summarization Web Service
 
-            # since it'll do a lot of request, do this in seperate threads
+            # since it'll do a lot of request, do this in separate threads
             threads << Thread.new do
               summary[reviewee_name][round][q.txt] = summarize_sentences(comments, summary_ws_url) unless comments.empty?
             end
@@ -221,8 +221,8 @@ module SummaryHelper
     end
 
     # convert answers to each question to sentences
-    def get_sentences(ans)
-      sentences = ans.comments.gsub!(/[.?!]/, '\1|').try(:split, '|') || nil unless ans.nil? or ans.comments.nil?
+    def get_sentences(answer)
+      sentences = answer.comments.gsub!(/[.?!]/, '\1|').try(:split, '|') || nil unless answer.nil? or answer.comments.nil?
       sentences.map!(&:strip) unless sentences.nil?
       sentences
     end
@@ -230,8 +230,8 @@ module SummaryHelper
     def break_up_comments_to_sentences(question_answers)
       # store answers of each question in an array to be converted into json
       comments = []
-      question_answers.each do |ans|
-        sentences = get_sentences(ans)
+      question_answers.each do |answer|
+        sentences = get_sentences(answer)
         # add the comment to an array to be converted as a json request
         comments.concat(sentences) unless sentences.nil?
       end
@@ -284,10 +284,10 @@ module SummaryHelper
 
       valid_answer_counter = 0
       question_score = 0.0
-      question_answers.each do |ans|
+      question_answers.each do |question_answer|
         # calculate score per question
-        unless ans.answer.nil?
-          question_score += ans.answer
+        unless question_answer.answer.nil?
+          question_score += question_answer.answer
           valid_answer_counter += 1
         end
       end

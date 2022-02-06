@@ -240,7 +240,7 @@ window.addEventListener('load', (e) => {
 })
 
 jQuery(document).ready(function() {
-  // This preloadedImages function is refered from http://jsfiddle.net/slashingweapon/8jAeu/
+  // This preloadedImages function is referred from http://jsfiddle.net/slashingweapon/8jAeu/
   // Actually I am not using the values in preloadedImages, but image loading speed is indeed getting faster
   let treeDisplayDiv = document.querySelector('#tree_display');
 
@@ -1198,10 +1198,7 @@ jQuery(document).ready(function() {
     }
   })
 
-
-
-
-  /** beta branch isnt getting a prop related to the data to be displayed in the dropdown */
+  /** beta branch isn't getting a prop related to the data to be displayed in the dropdown */
   var FilterableTable = React.createClass({
     getInitialState: function() {
       return {

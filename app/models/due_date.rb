@@ -93,7 +93,7 @@ class DueDate < ActiveRecord::Base
       # TopicDueDate      08/03/2016
       # AssignmentDueDate 09/04/2016
       # In this case, we cannot find due_at later than Time.now in TopicDueDate.
-      # So we should find next corrsponding AssignmentDueDate, starting with the 4th one, not the 1st one!
+      # So we should find next corresponding AssignmentDueDate, starting with the 4th one, not the 1st one!
       if next_due_date.nil?
         topic_due_date_size = TopicDueDate.where(parent_id: topic_id).size
         following_assignment_due_dates = AssignmentDueDate.where(parent_id: assignment_id)[topic_due_date_size..-1]

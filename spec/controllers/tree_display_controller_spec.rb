@@ -209,11 +209,11 @@ describe TreeDisplayController do
 
       # make ta student of that course
       # create assignment against course_2
-      @assignment1 = create(:assignment, name: 'test1')
+      @assignment1 = create(:assignment, name: 'test1', directory_path: "test1")
       @assignment1.course_id = @course2.id
       @assignment1.save
 
-      # make ta participant of that assigment
+      # make ta participant of that assignment
       @participant1 = create(:participant)
       @participant1.parent_id = @assignment1.id
       @participant1.user_id = @ta.id
@@ -242,11 +242,11 @@ describe TreeDisplayController do
 
       # make ta student of the existing course he is ta of
       # create assignment against course_1
-      @assignment1 = create(:assignment, name: 'test2')
+      @assignment1 = create(:assignment, name: 'test2', directory_path: "test2")
       @assignment1.course_id = @course1.id
       @assignment1.save
 
-      # make ta participant of that assigment
+      # make ta participant of that assignment
       @participant1 = create(:participant)
       @participant1.parent_id = @assignment1.id
       @participant1.user_id = @ta.id
@@ -274,7 +274,7 @@ describe TreeDisplayController do
 
       # create assignment against course_1
       # this is 2nd assignment added to course_1, other being in "before" method
-      @assignment2 = create(:assignment, name: 'test3')
+      @assignment2 = create(:assignment, name: 'test3', directory_path: "test3")
       @assignment2.course_id = @course1.id
       @assignment2.save!
 

@@ -6,7 +6,8 @@
   </p>
 
   <%= render :partial => 'users/user', :locals => { :new_user => true, :request_user => true } %>
-  <%= submit_tag "Request" %>
+
+    <%= submit_tag "Request" %>
 <% end %>
 
 <%= link_to 'Back', root_path%>

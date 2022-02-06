@@ -1,0 +1,3 @@
+<td> <a href="/duties/<%= duty.id %>/edit"><%= duty.name %></a></td>
+<td><%= duty.max_members_for_duty %></td>
+<td align="center"><%= render :partial => '/duties/actions', :locals => {:duty=>duty} %></td>

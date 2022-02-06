@@ -44,7 +44,7 @@ describe CourseNode do
     end
   end
   describe '#get_courses_managed_by_users' do
-    context 'when you arent a TA' do
+    context 'when you are not a TA' do
       it 'returns the user id' do
         allow(user1).to receive(:teaching_assistant?).and_return(false)
         expect(CourseNode.get_courses_managed_by_user(1)).to eq(1)

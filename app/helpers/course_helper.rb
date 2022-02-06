@@ -1,5 +1,5 @@
 module CourseHelper
-  # determin the courses that a user associate with
+  # determine the courses that a user associate with
   def associated_courses(user)
     # NOTE: testing for roles in general is a bad practice but since the data base does not provide clear
     # way to get this association we have no other choice

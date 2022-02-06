@@ -7,7 +7,7 @@ describe Answer do
   let!(:answer) { create(:answer, question: question1, response_id: 1) }
   let(:team1) { build(:assignment_team, id: 2, name: 'team has name') }
 
-  describe "# test dependancy between question.rb and answer.rb"
+  describe "# test dependency between question.rb and answer.rb"
   it { should belong_to(:question) }
 
   describe "#test sql queries in answer.rb" do

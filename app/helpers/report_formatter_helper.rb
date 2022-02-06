@@ -40,7 +40,7 @@ module ReportFormatterHelper
     create_participant(@id, user.id) if participant.nil?
     @review_questionnaire_ids = ReviewQuestionnaire.select("id")
     @assignment_questionnaire = AssignmentQuestionnaire.retrieve_questionnaire_for_assignment(@id).first
-    @questions = @assignment_questionnaire.questionnaire.questions.select {|q| q.type == 'Criterion' or q.type == 'Scale' }
+    @questions = @assignment_questionnaire.questionnaire.questions.select {|q| q.type == 'Criterion' || q.type == 'Scale' }
     @calibration_response_maps = ReviewResponseMap.where(reviewed_object_id: @id, calibrate_to: 1)
     @review_response_map_ids = ReviewResponseMap.select('id').where(reviewed_object_id: @id, calibrate_to: 0)
     @responses = Response.where(map_id: @review_response_map_ids)

@@ -52,7 +52,7 @@ class AssignmentQuestionnaireController < ApplicationController
 
     questionnaire = Questionnaire.find(params[:questionnaire_id])
     if questionnaire.nil?
-      flash[:error] = "Questionaire #" + questionnaire.id + " does not currently exist."
+      flash[:error] = "Questionnaire #" + questionnaire.id + " does not currently exist."
       return
     end
 

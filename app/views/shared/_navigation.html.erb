@@ -15,9 +15,9 @@
       <% if session[:menu] %>
             <!-- if student_view is inactive (session[:flip_user] is not set to true),
                  show the standard navigation menu -->
-          <% if !session[:flip_user] || session[:flip_user] == nil  %>
+          <% if !session[:flip_user] || session[:flip_user].nil?  %>
               <%= render :partial => 'menu_items/suckerfish',
-                           :locals => { items: session[:menu].get_menu(0) - [26, 59], level: 0 } %>
+                           :locals => { items: session[:menu].get_menu(0) - [59], level: 0 } %>
           <!-- if student_view is active for instructor, render student view navigation menu,
                including the Instructor View button -->
           <% elsif session[:user].role.name == 'Instructor' %>

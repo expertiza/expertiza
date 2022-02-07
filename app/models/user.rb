@@ -27,7 +27,6 @@ class User < ActiveRecord::Base
   validates :email, format: {with: /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, allow_blank: true}
 
   before_validation :randomize_password, if: ->(user) { user.new_record? && user.password.blank? } # AuthLogic
-  after_create :email_welcome
 
   scope :superadministrators, -> { where role_id: Role.superadministrator }
   scope :superadmins, -> { superadministrators }
@@ -165,7 +164,10 @@ class User < ActiveRecord::Base
 
   def valid_password?(password)
     Authlogic::CryptoProviders::Sha1.stretches = 1
-    Authlogic::CryptoProviders::Sha1.matches?(crypted_password, self.password_salt.to_s + password)
+    #authlogic internally changed the matches function, so old passwords work with the first line
+    old_validation = Authlogic::CryptoProviders::Sha1.matches?(crypted_password, self.password_salt.to_s + password)
+    new_validation = Authlogic::CryptoProviders::Sha1.matches?(crypted_password, password, self.password_salt)
+    old_validation || new_validation
   end
 
   # Resets the password to be mailed to the user

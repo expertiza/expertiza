@@ -13,8 +13,8 @@ describe 'Tests mailer' do
       }
     ).deliver_now
 
-    expect(email.from[0]).to eq("expertiza.development@gmail.com")
-    expect(email.to[0]).to eq('expertiza.development@gmail.com')
+    expect(email.from[0]).to eq("expertiza.debugging@gmail.com")
+    expect(email.to[0]).to eq('expertiza.debugging@gmail.com')
     expect(email.subject).to eq('Test')
   end
 end

@@ -159,6 +159,9 @@ describe AssignmentParticipant do
             test_user = User.new(name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com')
             test_user.id = 123
             test_user.save!
+            password = test_user.reset_password # the password is reset
+            prepared_mail = MailerHelper.send_mail_to_user(test_user, "Your Expertiza account and password have been created.", "user_welcome", password)
+            prepared_mail.deliver
             test_user
           end
           # allow(ImportFileHelper).to receive(:create_new_user).with(attributes, {}).and_return()

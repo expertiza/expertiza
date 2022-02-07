@@ -4,7 +4,7 @@ describe AssignmentSurveyResponseMap, type: :model do
   let(:previous_day) { (Time.now.getlocal - 1 * 86_400).strftime('%Y-%m-%d %H:%M:%S') }
   let(:next_day) { (Time.now.getlocal + 1 * 86_400).strftime('%Y-%m-%d %H:%M:%S') }
   let(:assignment) { build(:assignment, id: 1, name: 'Assignment1') }
-  let(:user) { build(:student, email: 'expertiza.development@gmail.com', name: 'Jane', fullname: 'Doe, Jane', id: 1) }
+  let(:user) { build(:student, email: 'expertiza.debugging@gmail.com', name: 'Jane', fullname: 'Doe, Jane', id: 1) }
   before(:each) do
     survey_deployment = AssignmentSurveyDeployment.new questionnaire_id: 1, start_date: previous_day, end_date: next_day, parent_id: '12345678', type: 'AssignmentSurveyDeployment'
     @assignment_survey_response_map = AssignmentSurveyResponseMap.new
@@ -55,16 +55,15 @@ describe AssignmentSurveyResponseMap, type: :model do
       allow(User).to receive(:find).with(1).and_return(user)
       defn = {
         body: {
-          type: 'Peer Review',
-          obj_name: 'Test Assgt',
-          first_name: 'no one',
-          partial_name: 'new_submission'
-        },
-        to: 'expertiza.development@gmail.com'
-      }
+          type: "Peer Review", 
+          obj_name: "Test Assgt", 
+          first_name: "no one", 
+          partial_name: "new_submission"
+        }, 
+        to: 'expertiza.debugging@gmail.com'}
       email = @assignment_survey_response_map.email(defn, participant, assignment)
-      expect(email.from[0]).to eq('expertiza.development@gmail.com')
-      expect(email.to[0]).to eq('expertiza.development@gmail.com')
+      expect(email.from[0]).to eq('expertiza.debugging@gmail.com')
+      expect(email.to[0]).to eq('expertiza.debugging@gmail.com')
     end
   end
 end

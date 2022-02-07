@@ -14,9 +14,9 @@ describe MailWorker do
       Sidekiq::Testing.inline!
       MailWorker.perform_async('1', 'metareview', '2018-12-31 00:00:01')
       email = ActionMailer::Base.deliveries.first
-      expect(email.from[0]).to eq('expertiza.development@gmail.com')
+      expect(email.from[0]).to eq('expertiza.debugging@gmail.com')
       # expect(email.bcc[0]).to eq(user.email)
-      expect(email.to[0]).to eq('expertiza.development@gmail.com')
+      expect(email.to[0]).to eq('expertiza.debugging@gmail.com')
       # expect(email.subject).to eq('Message regarding teammate review for assignment ' + assignment.name)
       expect(email.subject).to eq('Your Expertiza account and password has been created')
     end

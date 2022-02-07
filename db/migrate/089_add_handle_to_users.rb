@@ -1,12 +1,16 @@
 class AddHandleToUsers < ActiveRecord::Migration
   def self.up
-    add_column :users, :handle, :string, null: true
-  rescue StandardError
-    put $ERROR_INFO
+    begin
+      add_column :users, :handle, :string, :null => true
+    rescue
+      put $!
+    end    
   end
 
   def self.down
-    remove_column :users, :handle
-  rescue StandardError
+    begin
+      remove_column :users, :handle
+    rescue
+    end
   end
 end

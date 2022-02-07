@@ -2,22 +2,26 @@ class CreateTeamUserNodes < ActiveRecord::Migration
   def self.up
     begin
       remove_column :teams_users, :assignment_id
-    rescue StandardError
+    rescue
     end
-
+    
     teamsusers = TeamsUser.all
-    teamsusers.each  do |user|
+    teamsusers.each{
+      | user |
       parent = TeamNode.find_by_node_object_id(user.team_id)
       if parent
-        TeamUserNode.create(node_object_id: user.id, parent_id: parent.id)
+        TeamUserNode.create(:node_object_id => user.id, :parent_id => parent.id )
       end
-    end
+    }    
   end
 
   def self.down
     teamsusers = TeamsUser.all
-    teamsusers.each(&:destroy)
-
+    teamsusers.each{
+       |user|
+       user.destroy
+    }
+    
     add_column :teams_users, :assignment_id, :integer
   end
 end

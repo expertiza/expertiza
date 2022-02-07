@@ -4,6 +4,6 @@ class RemoveDynamicReviewerAssignmentsEnabledFromAssignments < ActiveRecord::Mig
   end
 
   def self.down
-    add_column :assignments, :dynamic_reviewer_assignments_enabled, :boolean, default: 0
+    add_column :assignments, :dynamic_reviewer_assignments_enabled, :boolean, :default => 0
   end
 end

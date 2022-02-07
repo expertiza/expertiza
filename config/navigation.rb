@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Configures your navigation
 SimpleNavigation::Configuration.run do |navigation|
   # Specify a custom renderer if needed.
@@ -46,21 +47,21 @@ SimpleNavigation::Configuration.run do |navigation|
     #           :method - Specifies the http-method for the generated link - default is :get.
     #           :highlights_on - if autohighlighting is turned off and/or you want to explicitly specify
     #                            when the item should be highlighted, you can set a regexp which is matched
-    #                            against the current URI.  You may also use a proc, or the symbol <tt>:subpath</tt>.
+    #                            against the current URI.  You may also use a proc, or the symbol <tt>:subpath</tt>. 
     #
-    primary.item :tab1, 'tab1', grades / krunal
+    primary.item :tab1, 'tab1', grades/krunal
 
     # Add an item which has a sub navigation (same params, but with block)
-    primary.item :tab2, 'tab2', grades / krunal do |sub_nav|
+    primary.item :tab2, 'tab2', grades/krunal do |sub_nav|
       # Add an item to the sub navigation (same params again)
-      sub_nav.item :tab3, 'tab3', grades / krunal
+      sub_nav.item :tab3, 'tab3', grades/krunal
     end
 
     # You can also specify a condition-proc that needs to be fulfilled to display an item.
     # Conditions are part of the options. They are evaluated in the context of the views,
     # thus you can use all the methods and vars you have available in the views.
-    primary.item :tab4, 'Admin', grades / krunal
-    primary.item :tab5, 'Account', grades / krunal
+    primary.item :tab4, 'Admin', grades/krunal
+    primary.item :tab5, 'Account', grades/krunal
 
     # you can also specify a css id or class to attach to this particular level
     # works for all levels of the menu
@@ -69,5 +70,7 @@ SimpleNavigation::Configuration.run do |navigation|
 
     # You can turn off auto highlighting for a specific level
     # primary.auto_highlight = false
+
   end
+
 end

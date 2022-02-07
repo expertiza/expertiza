@@ -13,8 +13,8 @@ describe ResponseController do
   let(:bookmark) { build(:bookmark) }
   let(:team_response) { build(:response, id: 2, map_id: 2) }
   let(:team_response_map) { build(:review_response_map, id: 2, reviewer: participant, reviewer_is_team: true) }
-  let(:team_questionnaire) { build(:questionnaire, id: 2) }
-  let(:team_assignment) { build(:assignment, id: 2) }
+  let(:team_questionnaire) {build(:questionnaire, id: 2)}
+  let(:team_assignment) {build(:assignment, id: 2)}
   let(:assignment_team) { build(:assignment_team, id: 1) }
   let(:signed_up_team) { build(:signed_up_team, team_id: assignment_team.id) }
   let(:assignment_form) { AssignmentForm.new }
@@ -22,17 +22,17 @@ describe ResponseController do
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
-
+    
     allow(Assignment).to receive(:find).with('2').and_return(team_assignment)
     allow(Assignment).to receive(:find).with(2).and_return(team_assignment)
-
+    
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(Response).to receive(:find).with('1').and_return(review_response)
     allow(Response).to receive(:find).with(1).and_return(review_response)
-
+    
     allow(Response).to receive(:find).with('2').and_return(team_response)
     allow(Response).to receive(:find).with(2).and_return(team_response)
-
+    
     allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
     allow(review_response).to receive(:map).and_return(review_response_map)
 
@@ -43,7 +43,7 @@ describe ResponseController do
   describe '#action_allowed?' do
     context 'when params action is edit' do
       before(:each) do
-        controller.params = { id: '1', action: 'edit' }
+        controller.params = {id: '1', action: 'edit'}
       end
 
       context 'when response is not submitted and current_user is the reviewer of the response' do
@@ -63,7 +63,7 @@ describe ResponseController do
     context 'when params action is delete or update' do
       context 'when current_user is the reviewer of the response' do
         it 'allows certain action' do
-          controller.params = { id: '1', action: 'update' }
+          controller.params = {id: '1', action: 'update'}
           expect(controller.send(:action_allowed?)).to be true
         end
       end
@@ -72,7 +72,7 @@ describe ResponseController do
     context 'when params action is view' do
       context 'when response_map is a ReviewResponseMap and current user is the instructor of current assignment' do
         it 'allows certain action' do
-          controller.params = { id: '1', action: 'view' }
+          controller.params = {id: '1', action: 'view'}
           expect(controller.send(:action_allowed?)).to be true
         end
       end
@@ -82,15 +82,15 @@ describe ResponseController do
   describe '#delete' do
     it 'deletes current response and redirects to response#redirect page' do
       allow(review_response).to receive(:delete).and_return(review_response)
-      params = { id: 1 }
+      params = {id: 1}
       post :delete, params
       expect(response).to redirect_to('/response/redirect?id=1&msg=The+response+was+deleted.')
     end
-
+    
     it 'Redirects away if another user has a lock on the resource' do
       allow(team_response).to receive(:delete).and_return(team_response)
       allow(Lock).to receive(:get_lock).and_return(nil)
-      params = { id: 2 }
+      params = {id: 2}
       post :delete, params
       expect(response).not_to redirect_to('/response/redirect?id=2&msg=The+response+was+deleted.')
     end
@@ -107,7 +107,7 @@ describe ResponseController do
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire])
       allow(Answer).to receive(:where).with(response_id: 1, question_id: 1).and_return([answer])
-      params = { id: 1, return: 'assignment_edit' }
+      params = {id: 1, return: 'assignment_edit'}
       get :edit, params
       expect(controller.instance_variable_get(:@review_scores)).to eq([answer])
       expect(controller.instance_variable_get(:@dropdown_or_scale)).to eq('dropdown')
@@ -115,10 +115,10 @@ describe ResponseController do
       expect(controller.instance_variable_get(:@max)).to eq(5)
       expect(response).to render_template(:response)
     end
-
+    
     it 'does not render the page if the user does not have a lock on the response' do
       allow(Lock).to receive(:get_lock).and_return(nil)
-      params = { id: 2, return: 'assignment_edit' }
+      params = {id: 2, return: 'assignment_edit'}
       get :edit, params
       expect(response).not_to render_template(:response)
     end
@@ -134,11 +134,11 @@ describe ResponseController do
             comments: 'some comments'
           }
         }
-        session = { user: instructor }
+        session = {user: instructor}
         post :update, params, session
         expect(response).to redirect_to('/response/save?id=1&msg=Your+response+was+not+saved.+Cause%3A189+ERROR%21&review%5Bcomments%5D=some+comments')
       end
-
+      
       it 'Does not allow a user to update a response if a lock exists on the response' do
         allow(ResponseMap).to receive(:find).with(2).and_return(team_response_map)
         allow(Lock).to receive(:get_lock).and_return(nil)
@@ -148,11 +148,11 @@ describe ResponseController do
             comments: 'some comments'
           },
           responses: {
-            '0' => { score: 98, comment: 'LGTM' }
+            '0' => {score: 98, comment: 'LGTM'}
           },
           isSubmit: 'No'
         }
-        session = { user: instructor }
+        session = {user: instructor}
         post :update, params, session
         expect(response).not_to redirect_to('/response/save?id=1&msg=&review%5Bcomments%5D=some+comments')
       end
@@ -175,11 +175,11 @@ describe ResponseController do
             comments: 'some comments'
           },
           responses: {
-            '0' => { score: 98, comment: 'LGTM' }
+            '0' => {score: 98, comment: 'LGTM'}
           },
           isSubmit: 'No'
         }
-        session = { user: instructor }
+        session = {user: instructor}
         post :update, params, session
         expect(response).to redirect_to('/response/save?id=1&msg=&review%5Bcomments%5D=some+comments')
       end
@@ -212,8 +212,8 @@ describe ResponseController do
       it 'redirects to response#new page' do
         allow(AssignmentParticipant).to receive(:where).with(user_id: 6, parent_id: 1).and_return([participant])
         allow(FeedbackResponseMap).to receive(:where).with(reviewed_object_id: 1, reviewer_id: 1).and_return([])
-        params = { id: 1 }
-        session = { user: instructor }
+        params = {id: 1}
+        session = {user: instructor}
         get :new_feedback, params, session
         expect(response).to redirect_to('/response/new?id=2&return=feedback')
       end
@@ -222,8 +222,8 @@ describe ResponseController do
     context 'when current response is not nil' do
       it 'redirects to previous page' do
         allow(Response).to receive(:find).with('2').and_return(nil)
-        params = { id: 2 }
-        session = { user: instructor }
+        params = {id: 2}
+        session = {user: instructor}
         request.env['HTTP_REFERER'] = 'www.google.com'
         get :new_feedback, params, session
         expect(response).to redirect_to('www.google.com')
@@ -242,7 +242,7 @@ describe ResponseController do
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire])
       allow(Answer).to receive(:where).with(response_id: 1, question_id: 1).and_return([answer])
-      params = { id: 1, return: 'assignment_edit' }
+      params = {id: 1, return: 'assignment_edit'}
       get :view, params
       expect(controller.instance_variable_get(:@dropdown_or_scale)).to eq('dropdown')
       expect(controller.instance_variable_get(:@min)).to eq(0)
@@ -267,7 +267,7 @@ describe ResponseController do
           comments: 'no comment'
         },
         responses: {
-          '0' => { score: 98, comment: 'LGTM' }
+          '0' => {score: 98, comment: 'LGTM'}
         },
         isSubmit: 'No'
       }
@@ -284,7 +284,7 @@ describe ResponseController do
         id: 1,
         return: ''
       }
-      session = { user: instructor }
+      session = {user: instructor}
       post :save, params, session
       expect(response).to redirect_to('/response/redirect?id=1&return=')
     end
@@ -293,7 +293,7 @@ describe ResponseController do
   describe '#redirect' do
     before(:each) do
       allow(Response).to receive(:find_by).with(map_id: '1').and_return(review_response)
-      @params = { id: 1 }
+      @params = {id: 1}
     end
 
     context 'when params[:return] is bookmark' do
@@ -361,4 +361,5 @@ describe ResponseController do
       end
     end
   end
+
 end

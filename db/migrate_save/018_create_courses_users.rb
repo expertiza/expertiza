@@ -7,7 +7,7 @@ class CreateCoursesUsers < ActiveRecord::Migration
     create_table :courses_users do |t|
       t.column :user_id, :integer
       t.column :course_id, :integer
-      t.column :active, :boolean # whether user is still actively enrolled in course
+      t.column :active, :boolean  # whether user is still actively enrolled in course
     end
     execute "alter table courses_users
              add constraint fk_courses_users

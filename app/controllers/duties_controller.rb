@@ -1,3 +1,4 @@
+
 class DutiesController < ApplicationController
   include AuthorizationHelper
 
@@ -6,7 +7,7 @@ class DutiesController < ApplicationController
     current_user_has_ta_privileges?
   end
 
-  before_action :set_duty, only: %i[show edit update destroy]
+  before_action :set_duty, only: [:show, :edit, :update, :destroy]
 
   # GET /duties
   def index
@@ -14,7 +15,8 @@ class DutiesController < ApplicationController
   end
 
   # GET /duties/1
-  def show; end
+  def show
+  end
 
   # GET /duties/new
   def new
@@ -23,7 +25,8 @@ class DutiesController < ApplicationController
   end
 
   # GET /duties/1/edit
-  def edit; end
+  def edit
+  end
 
   # POST /duties
   def create
@@ -70,17 +73,17 @@ class DutiesController < ApplicationController
   end
 
   private
-
   # Use callbacks to share common setup or constraints between actions.
   def set_duty
     @duty = Duty.find(params[:id])
   end
 
   def redirect_to_create_page_and_show_error
-    error_message = ''
-    @duty.errors.each { |_field, error| error_message << error }
+    # TODO @john @nicholas is there any better way to handle error messages ?
+  error_message = ""
+    @duty.errors.each do |field, error| error_message << error end
 
     flash[:error] = error_message
-    redirect_to action: :new, id: params[:duty][:assignment_id]
+    redirect_to :action => :new, :id=> params[:duty][:assignment_id]
   end
 end

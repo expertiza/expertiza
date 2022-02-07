@@ -1,7 +1,7 @@
 module Hamer
   def self.calculate_weighted_scores_and_reputation(submissions, reviewers)
     # Initialize weights
-    submissions.each { |s| s.reviews.each { |review| review.weight = 1 } }
+    submissions.each {|s| s.reviews.each {|review| review.weight = 1}}
 
     # Iterate until convergence
     iterations = 0
@@ -23,7 +23,7 @@ module Hamer
         # Add to the reviewers' inaccuracy average
         reviews.each do |review|
           reviewer = review.reviewer
-          review_inaccuracy = (review.score - weighted_average)**2
+          review_inaccuracy = (review.score - weighted_average) ** 2
           reviewer.inaccuracy += review_inaccuracy / reviewer.reviews.count
         end
       end
@@ -33,7 +33,9 @@ module Hamer
       submissions.each do |submission|
         submission.reviews.each do |review|
           weight = average_inaccuracy / review.reviewer.inaccuracy
-          weight = 2 + Math.log10(weight - 1) if weight > 2
+          if weight > 2
+            weight = 2 + Math.log10(weight - 1)
+          end
           review.weight = weight
         end
       end
@@ -41,14 +43,13 @@ module Hamer
     end until converged?(previous_weights,
                          submissions.map { |s| s.reviews.map(&:weight) })
 
-    { iterations: iterations }
+    return :iterations => iterations
   end
 
   # Ensure all numbers in lists a and b are equal
   # Options: :precision => Number of digits to round to
-  def self.converged?(a, b, options = { precision: 2 })
-    raise 'a and b must be the same size' unless a.size == b.size
-
+  def self.converged?(a, b, options={:precision => 2})
+    raise "a and b must be the same size" unless a.size == b.size
     a.flatten!
     b.flatten!
 
@@ -57,7 +58,7 @@ module Hamer
       return false unless num.to_f.round(p) == b[i].to_f.round(p)
     end
 
-    true
+    return true
   end
 end
 
@@ -105,7 +106,7 @@ module Hamer
       def initialize(name)
         self.name = name
       end
-
+      
       def weight
         reviews.first.weight
       end
@@ -122,15 +123,15 @@ module Hamer
       @reviewers
     end
 
-    def submissions(rogue_score = 5)
+    def submissions(rogue_score=5)
       return @submissions if @submissions
 
       @submissions = []
 
-      scores = [[10, 10, 9, rogue_score],
-                [3, 2, 4, rogue_score],
-                [7, 4, 5, rogue_score],
-                [6, 4, 5, rogue_score]]
+      scores = [[10,10,9,rogue_score],
+                [3,2,4,rogue_score],
+                [7,4,5,rogue_score],
+                [6,4,5,rogue_score]]
       scores.each do |submission_scores|
         @submissions << Submission.new do |s|
           i = -1

@@ -5,8 +5,8 @@ class CreateQuestionAdvices < ActiveRecord::Migration
       t.column :score, :integer # either an integer or true/false.  false should be assigned a score of 0, and true should be assigned a score of 1
       t.column :advice, :text # the meaning of giving this score for this question
     end
-
-    execute "alter table question_advices
+  
+    execute "alter table question_advices 
              add constraint fk_question_question_advices
              foreign key (question_id) references questions(id)"
   end

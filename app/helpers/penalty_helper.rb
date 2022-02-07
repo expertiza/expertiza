@@ -11,13 +11,14 @@ module PenaltyHelper
       @max_penalty_for_no_submission = LatePolicy.find(@assignment.late_policy_id).max_penalty
       @penalty_unit = LatePolicy.find(@assignment.late_policy_id).penalty_unit
     end
-    penalties = { submission: 0, review: 0, meta_review: 0 }
+    penalties = {submission: 0, review: 0, meta_review: 0}
     calculate_penalty = @assignment.calculate_penalty
+    # TODO: add calculate_penalty column to the assignment table and
     # use its value to check if the penalty is to be calculated for the assignment or not
-    if calculate_penalty
+    if calculate_penalty == true
       topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
       stage = @assignment.current_stage(topic_id)
-      if stage == 'Finished'
+      if stage == "Finished"
         penalties[:submission] = calculate_submission_penalty
         penalties[:review] = calculate_review_penalty
         penalties[:meta_review] = calculate_meta_review_penalty
@@ -28,7 +29,7 @@ module PenaltyHelper
 
   def calculate_submission_penalty
     submission_due_date = AssignmentDueDate.where(deadline_type_id: @submission_deadline_type_id,
-                                                  parent_id: @assignment.id).first.due_at
+                                                  parent_id:  @assignment.id).first.due_at
     resubmission_times = @participant.resubmission_times
     if resubmission_times.any?
       last_submission_time = resubmission_times.at(resubmission_times.size - 1).resubmitted_at
@@ -53,7 +54,7 @@ module PenaltyHelper
     if num_of_reviews_required > 0
       review_mappings = ReviewResponseMap.where(reviewer_id: @participant.get_reviewer.id)
       review_due_date = AssignmentDueDate.where(deadline_type_id: @review_deadline_type_id,
-                                                parent_id: @assignment.id).first
+                                                parent_id:  @assignment.id).first
       penalty = compute_penalty_on_reviews(review_mappings, review_due_date.due_at, num_of_reviews_required) unless review_due_date.nil?
     end
     penalty
@@ -65,7 +66,7 @@ module PenaltyHelper
     if num_of_meta_reviews_required > 0
       meta_review_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
       meta_review_due_date = AssignmentDueDate.where(deadline_type_id: @meta_review_deadline_type_id,
-                                                     parent_id: @assignment.id).first
+                                                     parent_id:  @assignment.id).first
       penalty = compute_penalty_on_reviews(meta_review_mappings, meta_review_due_date.due_at, num_of_meta_reviews_required) unless meta_review_due_date.nil?
     end
     penalty

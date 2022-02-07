@@ -6,7 +6,6 @@ class CreateParticipantScoreViews < ActiveRecord::Migration
  WHERE  rm.id = r.map_id AND r.id=s.response_id AND q.id = s.question_id AND qs.id = q.questionnaire_id    AND tu.team_id = rm.reviewee_id   AND tu.team_id = t.id
     SQL
   end
-
   def self.down
     execute <<-SQL
       DROP VIEW participant_score_views

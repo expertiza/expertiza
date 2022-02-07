@@ -3,18 +3,18 @@ class TeamUserNode < Node
   attr_accessible :parent_id, :node_object_id
 
   def self.table
-    'teams_users'
+    "teams_users"
   end
 
   def get_name(ip_address = nil)
-    TeamsUser.find(node_object_id).name(ip_address)
+    TeamsUser.find(self.node_object_id).name(ip_address)
   end
 
   def self.get(parent_id)
-    nodes = Node.joins('INNER JOIN teams_users ON nodes.node_object_id = teams_users.id')
+    nodes = Node.joins("INNER JOIN teams_users ON nodes.node_object_id = teams_users.id")
                 .select('nodes.*')
                 .where("nodes.type = 'TeamUserNode'")
-    nodes.where('teams_users.team_id = ?', parent_id) if parent_id
+    nodes.where("teams_users.team_id = ?", parent_id) if parent_id
   end
 
   def is_leaf

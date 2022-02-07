@@ -1,5 +1,6 @@
 class AddingAttributesSubmissionCode < ActiveRecord::Migration
   def change
+
     add_column :submission_records, :type, :text
     add_column :submission_records, :content, :string
     add_column :submission_records, :createdat, :datetime

@@ -1,14 +1,14 @@
 class UpdateAssignmentsForInvitations < ActiveRecord::Migration
-  def self.up
+  def self.up   
     begin
-      add_column :assignments, :team_count, :integer, null: false, default: 0
-    rescue StandardError
+      add_column :assignments, :team_count, :integer, :null => false, :default => 0
+    rescue
     end
-
+  
     begin
       remove_column :assignments, :max_team_count
-    rescue StandardError
-    end
+    rescue
+    end  
   end
 
   def self.down

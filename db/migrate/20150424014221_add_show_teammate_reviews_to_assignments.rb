@@ -4,6 +4,6 @@ class AddShowTeammateReviewsToAssignments < ActiveRecord::Migration
   end
 
   def self.down
-    remove_column :assignments, :show_teammate_reviews, :boolean
+  	remove_column :assignments, :show_teammate_reviews, :boolean
   end
 end

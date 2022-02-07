@@ -8,19 +8,19 @@ class Ta < User
                 ['All public assignments', 'list_all']].freeze
 
   def courses_assisted_with
-    courses = TaMapping.where(ta_id: id)
-    courses.map { |c| Course.find(c.course_id) }
+    courses = TaMapping.where(ta_id: self.id)
+    courses.map {|c| Course.find(c.course_id) }
   end
 
   def list_all(object_type, user_id)
-    object_type.where(['instructor_id = ? OR private = 0', user_id])
+    object_type.where(["instructor_id = ? OR private = 0", user_id])
   end
 
   def list_mine(object_type, user_id)
     #### if we are loading "My Assignments" for a user who is a TA we need to find all assignments
     #### which are assigned to a course for which the user is a TA (in addition to his own assignments
     #### which he created
-    if object_type.to_s.eql? 'Assignment'
+    if object_type.to_s.eql? "Assignment"
       #### once the course_id on the assignments table is being assigned properly we can use
       #### this find method, until then use the one below.
       # Assignment.find_by_sql(["select assignments.id, assignments.name, assignments.directory_path " +
@@ -29,15 +29,15 @@ class Ta < User
 
       #### this find method compares the directories of an assignment and a course to find out if the
       #### the assignment is in a subdirectory of a course that the user is a TA for.
-      Assignment.find_by_sql(['select assignments.id, assignments.name, assignments.directory_path ' \
-      'from assignments, ta_mappings where assignments.course_id = ta_mappings.course_id and ta_mappings.ta_id=?', user_id])
+      Assignment.find_by_sql(["select assignments.id, assignments.name, assignments.directory_path " \
+      "from assignments, ta_mappings where assignments.course_id = ta_mappings.course_id and ta_mappings.ta_id=?", user_id])
     else
-      object_type.where(['instructor_id = ?', user_id])
+      object_type.where(["instructor_id = ?", user_id])
     end
   end
 
   def get(object_type, id, user_id)
-    object_type.where(['id = ? AND (instructor_id = ? OR private = 0)', id, user_id]).first
+    object_type.where(["id = ? AND (instructor_id = ? OR private = 0)", id, user_id]).first
   end
 
   # This method is potentially problematic: it assumes one TA only help teach one course.
@@ -81,16 +81,16 @@ class Ta < User
   end
 
   def get_instructor
-    Ta.get_my_instructor(id)
+    Ta.get_my_instructor(self.id)
   end
 
   def set_instructor(new_assign)
-    new_assign.instructor_id = Ta.get_my_instructor(id)
-    new_assign.course_id = TaMapping.get_course_id(id)
+    new_assign.instructor_id = Ta.get_my_instructor(self.id)
+    new_assign.course_id = TaMapping.get_course_id(self.id)
   end
 
   def assign_courses_to_assignment
-    @courses = TaMapping.get_courses(id)
+    @courses = TaMapping.get_courses(self.id)
   end
 
   def teaching_assistant?
@@ -107,7 +107,6 @@ class Ta < User
     end
     participants.each do |p_s|
       next if p_s.empty?
-
       p_s.each do |p|
         user_list << p.user if user.role.hasAllPrivilegesOf(p.user.role)
       end

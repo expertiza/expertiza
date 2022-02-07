@@ -6,7 +6,9 @@ class UpdateSiteControllersForVersions < ActiveRecord::Migration
     @controller.save
 
     Role.rebuild_cache
+
   end
 
-  def self.down; end
+  def self.down
+  end
 end

@@ -1,3 +1,4 @@
+
 Expertiza::Application.routes.draw do
   resources :duties
   ###
@@ -156,7 +157,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :institution, except: [:destroy] do
+resources :institution, except: [:destroy] do
     collection do
       get :list
       post ':id', action: :update
@@ -190,7 +191,7 @@ Expertiza::Application.routes.draw do
       get :list
     end
   end
-
+  
   resources :lock do
     collection do
       post :release_lock
@@ -239,28 +240,30 @@ Expertiza::Application.routes.draw do
       get :set_publish_permission
     end
   end
-  # Nitin - removed quiz related routes from questionnaires controller
+#Nitin - removed quiz related routes from questionnaires controller
   resources :questionnaires, only: %i[new create edit update] do
     collection do
       get :copy
       get :select_questionnaire_type
       post :select_questionnaire_type
       get :toggle_access
-      get :view
+      get :view  
       post :add_new_questions
       post :save_all_questions
     end
   end
-  # #Nitin - Created new routes for quiz_questionnaire
-  #   resources :quiz_questionnaire, only: %i[new create edit update] do
-  #     collection do
-  #       get :new_quiz
-  #       post :create_quiz_questionnaire
-  #       get :edit_quiz
-  #       post :update_quiz
-  #
-  #     end
-  #   end
+=begin
+#Nitin - Created new routes for quiz_questionnaire
+  resources :quiz_questionnaire, only: %i[new create edit update] do
+    collection do
+      get :new_quiz
+      post :create_quiz_questionnaire
+      get :edit_quiz
+      post :update_quiz
+      
+    end
+  end
+=end
   resources :quiz_questionnaires
 
   resources :author_feedback_questionnaires, controller: :questionnaires
@@ -408,7 +411,7 @@ Expertiza::Application.routes.draw do
       get :list
       get :view
       put :publishing_rights_update
-      # added a new route for updating publishing rights
+      #added a new route for updating publishing rights
       get '/*other', to: redirect('/student_task/list')
     end
   end
@@ -490,7 +493,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :users, constraints: { id: /\d+/ } do
+  resources :users, constraints: {id: /\d+/} do
     collection do
       get :list
       post :list
@@ -502,7 +505,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :account_request, constraints: { id: /\d+/ } do
+  resources :account_request, constraints: {id: /\d+/} do
     collection do
       get :list
       post :list
@@ -545,7 +548,8 @@ Expertiza::Application.routes.draw do
   post '/response_toggle_permission/:id' => 'response#toggle_permission'
   post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
   post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
-  post 'student_task/publishing_rights_update', controller: :student_task, action: :publishing_rights_update, method: :put
+  post 'student_task/publishing_rights_update', controller: :student_task, action: :publishing_rights_update,method: :put
   get 'student_view/flip_view', controller: :student_view, action: :flip_view
-  # updated route and added specific controller action upon accessing this route
+  #updated route and added specific controller action upon accessing this route
 end
+

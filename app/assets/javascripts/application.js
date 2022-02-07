@@ -83,16 +83,16 @@ function checkDeadlines()
 {
 
   var dates = new Array();
-  var array = document.getElementsByTagName('input');
+  var inputs = document.getElementsByTagName('input');
   var index = 0;
-  for(i = 0; i < array.length; i++){
-    if(array[i].id.match("due_date")){
-      if (array[i].value == "") {
+  for(i = 0; i < inputs.length; i++){
+    if(inputs[i].id.match("due_date")){
+      if (inputs[i].value == "") {
         alert("Please specify a date for each deadline before continuing.")
           return false
       }
       else
-        dates[index++] = array[i]	  	   	     	    
+        dates[index++] = inputs[i]	  	   	     	    
     }
   }
 

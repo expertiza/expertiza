@@ -18,7 +18,7 @@ class InvitationsController < ApplicationController
     if Invitation.is_invited?(@student.user_id, @user.id, @student.parent_id)
       create_utility
     else
-      ExpertizaLogger.error LoggerMessage.new('', @student.name, 'Student was already invited')
+      ExpertizaLogger.error LoggerMessage.new("", @student.name, "Student was already invited")
       flash[:note] = "You have already sent an invitation to \"#{@user.name}\"."
     end
 
@@ -30,19 +30,17 @@ class InvitationsController < ApplicationController
   def update_join_team_request(user, student)
     # update the status in the join_team_request to A
     return unless user && student
-
     # participant information of invitee and assignment
     participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', user.id, student.parent_id).first
     return unless participant
-
     old_entry = JoinTeamRequest.where('participant_id = ? and team_id = ?', participant.id, params[:team_id]).first
     # Status code A for accepted
-    old_entry.update_attribute('status', 'A') if old_entry
+    old_entry.update_attribute("status", 'A') if old_entry
   end
 
   def auto_complete_for_user_name
     search = params[:user][:name].to_s
-    @users = User.where('LOWER(name) LIKE ?', "%#{search}%") if search.present?
+    @users = User.where("LOWER(name) LIKE ?", "%#{search}%") if search.present?
   end
 
   def accept
@@ -86,7 +84,9 @@ class InvitationsController < ApplicationController
     # User/Author has information about the participant
     @student = AssignmentParticipant.find(params[:student_id])
     @assignment = Assignment.find(@student.parent_id)
-    @user ||= create_coauthor if @assignment.is_conference_assignment
+    if @assignment.is_conference_assignment
+      @user =  create_coauthor unless @user
+    end
 
     return unless current_user_id?(@student.user_id)
 
@@ -129,7 +129,6 @@ class InvitationsController < ApplicationController
     # check if invited user is already in the team
 
     return if team_member.empty?
-
     flash[:error] = "The user \"#{@user.name}\" is already a member of the team."
     redirect_to view_student_teams_path student_id: @student.id
   end

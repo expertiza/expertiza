@@ -8,6 +8,10 @@ class StudentReviewController < ApplicationController
         current_user_has_student_privileges?
   end
 
+  def controller_locale
+    locale_for_student
+  end
+
   def list
     # we can assume the id is of the current user and for the participant
     # if the assignment has team reviewers, other controllers take care of getting the team from this object
@@ -21,7 +25,7 @@ class StudentReviewController < ApplicationController
     # or there team, depending on if reviewers are teams. If the reviewer is not yet on a team, just set review_mappings
     # to an empty list to prevent errors
     if @participant.get_reviewer != nil
-      # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+      # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
       @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.get_reviewer.id, reviewer_is_team: @assignment.reviewer_is_team)
     else
@@ -53,6 +57,11 @@ class StudentReviewController < ApplicationController
     @response_ids = []
     @all_assignments.each do |assignment|
         @response_ids << assignment.response_id
+    end
+
+    # Redirect review bidding to the review bid controller if bidding enabled
+    if @assignment.review_choosing_algorithm == "Bidding"
+      redirect_to controller: 'review_bids', action: 'index', assignment_id: params[:assignment_id], id: params[:id]
     end
   end
 end

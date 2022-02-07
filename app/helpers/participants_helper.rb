@@ -79,4 +79,32 @@ module ParticipantsHelper
       config[ident] = newstr.strip unless newstr.nil?
     end
   end
+
+  # Authorizations are paricipant, reader, reviewer, submitter (They are not store in Participant table.)
+  # Permissions are can_submit, can_review, can_take_quiz.
+  # Get permissions form authorizations.
+  def participant_permissions(authorization)
+    can_submit = true
+    can_review = true
+    can_take_quiz = true
+    case authorization
+    when 'reader'
+      can_submit = false
+      can_review = true
+      can_take_quiz = true
+    when 'reviewer'
+      can_submit = false
+      can_review = true
+      can_take_quiz = false
+    when 'submitter'
+      can_submit = true
+      can_review = false
+      can_take_quiz = false
+    else 
+      can_submit = true
+      can_review = true
+      can_take_quiz = true
+    end
+    {can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz}
+  end
 end

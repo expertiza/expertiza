@@ -20,7 +20,7 @@ class AnswerController < ApplicationController
     if params.key?(:questionnaire_id)
       where_query = "questions.questionnaire_id = #{params[:questionnaire_id]}"
     end
-    # get all answers given the questionaire and response id
+    # get all answers given the questionnaire and response id
     question_answers = Question.joins(join_query)
                            .select('answers.*, questions.txt as qtxt, questions.type as qtype, questions.seq as qseq')
                            .where(where_query)

@@ -15,14 +15,13 @@ module SummaryHelper
       self.summary_ws_url = summary_ws_url
 
       # get all answers for each question and send them to summarization WS
-      questions.each_key do |round|
+      questions.each_with_index do |question, index|
+        round = index + 1
         self.summary[round.to_s] = {}
         self.avg_scores_by_criterion[round.to_s] = {}
         self.avg_scores_by_round[round.to_s] = 0.0
-        questions[round].each do |question|
-          next if question.type.eql?("SectionHeader")
-          summarize_reviews_by_reviewee_question(assignment, reviewee_id, question, round)
-        end
+        next if question.type.eql?("SectionHeader")
+        summarize_reviews_by_reviewee_question(assignment, reviewee_id, question, round) 
         self.avg_scores_by_round[round.to_s] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round.to_s], questions[round])
       end
       self
@@ -41,7 +40,7 @@ module SummaryHelper
     def end_threads(threads)
       threads.each do |t|
         # Wait for the thread to finish if it isn't this thread (i.e. the main thread).
-        t.join if t != Thread.current
+        t.join unless t == Thread.current
       end
     end
 
@@ -50,7 +49,9 @@ module SummaryHelper
     #   aside from in methods which are themselves not used anywhere in Expertiza as of 4/21/19
     # produce summaries for instructor. it merges all feedback given to all reviewees, and summarize them by criterion
     def summarize_reviews_by_criterion(assignment, summary_ws_url)
-      self.summary = self.avg_scores_by_criterion = self.avg_scores_by_round = Array.new(assignment.rounds_of_reviews)
+      self.summary = {}
+      self.avg_scores_by_criterion = Array.new(assignment.rounds_of_reviews)
+      self.avg_scores_by_round = Array.new(assignment.rounds_of_reviews)
       rubric = get_questions_by_assignment(assignment)
 
       (0..assignment.num_review_rounds - 1).each do |round|
@@ -76,7 +77,8 @@ module SummaryHelper
 
       threads << Thread.new do
         self.avg_scores_by_criterion[round][question.txt] = calculate_avg_score_by_criterion(answers_questions, get_max_score_for_question(question))
-        self.summary[round][question.txt] = summarize_sentences(break_up_comments_to_sentences(answers_questions), summary_ws_url)
+        comments = break_up_comments_to_sentences(answers_questions)
+        self.summary[round][question] = summarize_sentences(comments, summary_ws_url)
       end
       # Wait for all threads to end
       end_threads(threads)
@@ -142,7 +144,7 @@ module SummaryHelper
 
             # summarize the comments by calling the summarization Web Service
 
-            # since it'll do a lot of request, do this in seperate threads
+            # since it'll do a lot of request, do this in separate threads
             threads << Thread.new do
               summary[reviewee_name][round][q.txt] = summarize_sentences(comments, summary_ws_url) unless comments.empty?
             end
@@ -214,12 +216,13 @@ module SummaryHelper
         return ps.segment
       rescue StandardError => err
         logger.warn "Standard Error: #{err.inspect}"
+        return ["Problem with WebServices", "Please contact the Expertiza Development team"]
       end
     end
 
     # convert answers to each question to sentences
-    def get_sentences(ans)
-      sentences = ans.comments.gsub!(/[.?!]/, '\1|').try(:split, '|') || nil unless ans.nil? or ans.comments.nil?
+    def get_sentences(answer)
+      sentences = answer.comments.gsub!(/[.?!]/, '\1|').try(:split, '|') || nil unless answer.nil? or answer.comments.nil?
       sentences.map!(&:strip) unless sentences.nil?
       sentences
     end
@@ -227,8 +230,8 @@ module SummaryHelper
     def break_up_comments_to_sentences(question_answers)
       # store answers of each question in an array to be converted into json
       comments = []
-      question_answers.each do |ans|
-        sentences = get_sentences(ans)
+      question_answers.each do |answer|
+        sentences = get_sentences(answer)
         # add the comment to an array to be converted as a json request
         comments.concat(sentences) unless sentences.nil?
       end
@@ -281,10 +284,10 @@ module SummaryHelper
 
       valid_answer_counter = 0
       question_score = 0.0
-      question_answers.each do |ans|
+      question_answers.each do |question_answer|
         # calculate score per question
-        unless ans.answer.nil?
-          question_score += ans.answer
+        unless question_answer.answer.nil?
+          question_score += question_answer.answer
           valid_answer_counter += 1
         end
       end
@@ -300,14 +303,13 @@ module SummaryHelper
 
     def calculate_round_score(avg_scores_by_criterion, criteria)
       round_score = sum_weight = 0.0
-      criteria.each do |q|
-        # include this score in the average round score if the weight is valid & q is criterion
-        if !q.weight.nil? and q.weight > 0 and q.type.eql?("Criterion")
-          round_score += avg_scores_by_criterion[q.txt] * q.weight
-          sum_weight += q.weight
+      # include this score in the average round score if the weight is valid & q is criterion
+      unless criteria.nil?
+        if !criteria.weight.nil? and criteria.weight > 0 and criteria.type.eql?("Criterion")
+          round_score += avg_scores_by_criterion.values.first * criteria.weight
+          sum_weight += criteria.weight
         end
-      end
-
+      end 
       round_score /= sum_weight if sum_weight > 0 and round_score > 0
       round_score
     end

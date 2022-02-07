@@ -73,7 +73,7 @@ describe InvitationsController do
       expect{post :create, params, session}.to change(Invitation, :count).by(1).and change(User, :count).by(1)
     end
 
-    it 'invitation not added for new user if enetered email has incorrect format' do
+    it 'invitation not added for new user if entered email has incorrect format' do
       params = {
           user: {name: 'testuser',
                 parent_id: 1,

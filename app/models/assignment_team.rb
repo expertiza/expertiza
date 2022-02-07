@@ -1,6 +1,7 @@
 class AssignmentTeam < Team
   require File.dirname(__FILE__) + '/analytic/assignment_team_analytic'
   include AssignmentTeamAnalytic
+  include Scoring
 
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'parent_id'
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewee_id'
@@ -17,7 +18,7 @@ class AssignmentTeam < Team
   # EDIT: A situation was found which differs slightly. If the current user is on the team, we want to
   # return that instead for instances where the code uses the current user.
   def user_id
-    if @current_user != nil and users.include? @current_user
+    if !@current_user.nil? && users.include?(@current_user)
       @current_user.id
     end
     users.first.id
@@ -84,7 +85,7 @@ class AssignmentTeam < Team
 
   # Whether the team has submitted work or not
   def has_submissions?
-    self.submitted_files.any? or self.submitted_hyperlinks.present?
+    self.submitted_files.any? || self.submitted_hyperlinks.present?
   end
 
   # Get Participants of the team
@@ -115,7 +116,7 @@ class AssignmentTeam < Team
   end
 
   # Get the first member of the team
-  def self.get_first_member(team_id)
+  def self.first_member(team_id)
     find_by(id: team_id).try(:participants).try(:first)
   end
 
@@ -147,19 +148,6 @@ class AssignmentTeam < Team
   def add_participant(assignment_id, user)
     return if AssignmentParticipant.find_by(parent_id: assignment_id, user_id: user.id)
     AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted)
-  end
-
-  # return a hash of scores that the team has received for the questions
-  def scores(questions)
-    scores = {}
-    scores[:team] = self # This doesn't appear to be used anywhere
-    assignment.questionnaires.each do |questionnaire|
-      scores[questionnaire.symbol] = {}
-      scores[questionnaire.symbol][:assessments] = ReviewResponseMap.where(reviewee_id: self.id)
-      scores[questionnaire.symbol][:scores] = Response.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
-    end
-    scores[:total_score] = assignment.compute_total_score(scores)
-    scores
   end
 
   def hyperlinks
@@ -274,27 +262,34 @@ class AssignmentTeam < Team
     get_logged_in_reviewer_id(current_user_id) != nil
   end
 
+
   # Import csv file to form teams directly
   def self.import(row_hash, session = nil, id, options)
-        raise ArgumentError, "Record does not contain required items." if row_hash.length < self.required_import_fields.length
-        raise ImportError, "The assignment with the id \"" + id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?" if Assignment.find_by(id: id).nil?
-        Team.import_helper(row_hash, id, options, prototype)
+    raise ArgumentError, "Record does not contain required items." if row_hash.length < self.required_import_fields.length
+    raise ImportError, "The assignment with the id \"" + id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?" if Assignment.find_by(id: id).nil?
+    Team.import_helper(row_hash, id, options, prototype)
   end
 
   def self.required_import_fields
-        {"teammembers" => "Team Members"}
+    {"teammembers" => "Team Members"}
   end
 
   def self.optional_import_fields(id=nil)
-        {"teamname" => "Team Name"}
+    {"teamname" => "Team Name"}
   end
 
   def self.import_options
-         {"handle_dups" => {"display" => "Handle Duplicates",
-                          "options" => {"ignore" => "Ignore new team name",
-                                          "replace" => "Replace the existing team with the new team",
-                                          "insert" => "Insert any new team members into the existing team",
-                                          "rename" => "Rename the new team and import"}}}
+    {"handle_dups" => {"display" => "Handle Duplicates",
+      "options" => {"ignore" => "Ignore new team name",
+      "replace" => "Replace the existing team with the new team",
+      "insert" => "Insert any new team members into the existing team",
+      "rename" => "Rename the new team and import"}}}
   end
-
+  #E2121 Refractor create_new_team
+  def create_new_team(user_id, signuptopic)
+    t_user = TeamsUser.create(team_id: self.id, user_id: user_id)
+    SignedUpTeam.create(topic_id: signuptopic.id, team_id: self.id, is_waitlisted: 0)
+    parent = TeamNode.create(parent_id: signuptopic.assignment_id, node_object_id: self.id)
+    TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+  end
 end

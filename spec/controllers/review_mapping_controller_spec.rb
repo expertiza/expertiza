@@ -556,7 +556,7 @@ describe ReviewMappingController do
       end
 
       context 'when student review num is greater than or equal to team size' do
-        it 'throws error stating that student review number cannot be greather than or equal to team size' do
+        it 'throws error stating that student review number cannot be greater than or equal to team size' do
           allow(ReviewResponseMap).to receive(:where)
             .with(reviewed_object_id: 1, calibrate_to: 1)
             .and_return([double('ReviewResponseMap', reviewee_id: 2)])

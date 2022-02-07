@@ -35,7 +35,7 @@ class ProfileController < ApplicationController
     redirect_to controller: :profile, action: :edit
   end
 
-  
+
   private
 
   def user_params

@@ -1,17 +1,17 @@
--<h2>Reviews for "<%= @assignment.name %>"</h2>
+<h2>Reviews for "<%= @assignment.name %>"</h2>
 
 <!-- Added the feature to find the reviews and meta-reviews left for students by E1839 @Rayan Dasoriya -->
 <% if @assignment.num_reviews_allowed.nil? || @assignment.num_reviews_allowed == -1%>
-    <h4>Your instructor expects you to do <%= @assignment.num_reviews_required %> reviews. You are not allowed to do any extra reviews. </h4>
+    <h4><%=t ".your_instructor_expects"%> <%= @assignment.num_reviews_required %> reviews. You are not allowed to do any extra reviews. </h4>
 
 <% elsif @assignment.num_reviews_allowed == @assignment.num_reviews_required %>
-    <h4>You should perform exactly <%= @assignment.num_reviews_allowed %> reviews </h4>
+    <h4><%=t ".perform_exactly"%> <%= @assignment.num_reviews_allowed %> reviews </h4>
 <% else %>
 
-    <h4>You may perform between <%= @assignment.num_reviews_required %> and <%= @assignment.num_reviews_allowed %> reviews</h4>
+    <h4><%=t ".may_perform_between_1"%> <%= @assignment.num_reviews_required %> <%=t ".may_perform_between_2"%> <%= @assignment.num_reviews_allowed %> reviews</h4>
 <% end %>
-<h4>You are required to do <%= @assignment.num_reviews_required %> reviews</h4>
-<h4> Number of reviews left: <%= @assignment.num_reviews_allowed - @num_reviews_completed %></h4>
+<h4><%=t ".required_to_do"%> <%= @assignment.num_reviews_required %> reviews</h4>
+<h4> <%=t ".num_reviews_left"%> <%= @assignment.num_reviews_allowed - @num_reviews_completed %></h4>
 
 <% unless @response_ids.empty? %>
 <%=  link_to "Sample Reviews" , sample_reviews_path(:id => @assignment.id) %>
@@ -25,10 +25,10 @@
       <% if @assignment.dynamic_reviewer_assignment? %>
           <% if @num_reviews_in_progress >= Assignment.max_outstanding_reviews %>
               <br><br>
-              <span>Note: You can't have more than 2 outstanding reviews. You must complete one of your outstanding reviews before selecting another.</span>
+              <span><%=t ".note1"%></span>
           <% elsif @assignment.num_reviews && @assignment.num_reviews >= 0 && @num_reviews_total >= @assignment.num_reviews%>
               <br><br>
-              <span>Note: You can't do more than <%=@assignment.num_reviews%> reviews according to assignment policy.</span>
+              <span><%=t ".note2_1"%> <%=@assignment.num_reviews%> <%=t ".note2_2"%></span>
           <%else %>
             <%= render :partial => 'set_dynamic_review', :locals => {:assignment => @assignment, :participant => @participant} %>
           <% end %>
@@ -36,7 +36,7 @@
       <% end %>
     <% end %>
 <% else %>
-    <p><em>Reviews cannot be performed at this time</em></p >
+    <p><em><%=t ".reviews_cannot"%></em></p >
 <% end %>
 
 <% if @assignment.metareview_allowed(@topic_id) || @assignment.current_stage == "Complete" %>
@@ -47,18 +47,18 @@
     <% else %>
         <h4>Number of Meta-Reviews Allowed: "<%= @assignment.num_metareviews_allowed %>"</h4>
     <% end %>
-    <h4>You are required to do <%= @assignment.num_metareviews_required %> meta-reviews</h4>
-    <h4> Number of Meta-Reviews left: <%= @assignment.num_metareviews_allowed - @num_metareviews_completed %></h4>
+    <h4><%=t ".required_to_do"%> <%= @assignment.num_metareviews_required %> <%=t ".metareviews"%></h4>
+    <h4> <%=t ".metareviews_left"%> <%= @assignment.num_metareviews_allowed - @num_metareviews_completed %></h4>
 
 
   <%= render :partial => 'responses', :locals => {:mappings => @metareview_mappings, :title => 'Metareview'} %>
     <br/>
     <% if @assignment.review_assignment_strategy == Assignment::RS_AUTO_SELECTED %>
-        <% if @num_metareviews_in_progress == 0 %>
+        <% if @num_metareviews_in_progress.zero? %>
             <%= render :partial => 'set_dynamic_metareview', :locals => {:assignment => @assignment} %>
         <% end %>
     <% end %>
 <% end %>
 
 <br><br>
-<a href="javascript:window.history.back()">Back</a>
+<a href="javascript:window.history.back()"><%=t ".back"%></a>

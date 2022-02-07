@@ -104,7 +104,8 @@ class AssignmentForm
         unless attr[:questionnaire_id].blank?
           questionnaire_type = Questionnaire.find(attr[:questionnaire_id]).type
           topic_id = attr[:topic_id] if attr.key?(:topic_id)
-          aq = assignment_questionnaire(questionnaire_type, attr[:used_in_round], topic_id)
+          duty_id = attr[:duty_id] if attr.key?(:duty_id) # if duty_id is present in the attributes, save it.
+          aq = assignment_questionnaire(questionnaire_type, attr[:used_in_round], topic_id, duty_id)
           if aq.id.nil?
             unless aq.save
               @errors = @assignment.errors.to_s
@@ -127,7 +128,7 @@ class AssignmentForm
     attributes.each do |assignment_questionnaire|
       total_weight += assignment_questionnaire[:questionnaire_weight].to_i
     end
-    if total_weight != 0 and total_weight != 100
+    unless total_weight.zero? || total_weight == 100
       @assignment.errors.add(:message, 'Total weight of rubrics should add up to either 0 or 100%')
       @has_errors = true
     end
@@ -137,7 +138,8 @@ class AssignmentForm
   def update_tag_prompt_deployments(attributes)
     unless attributes.nil?
       attributes.each do |key, value|
-        TagPromptDeployment.where(id: value['deleted']).delete_all if value.key?('deleted')
+        # We need to use destroy_all to delete all the dependents also. 
+        TagPromptDeployment.where(id: value['deleted']).destroy_all if value.key?('deleted')
         # assume if tag_prompt is there, then id, question_type, answer_length_threshold must also be there since the inputs are coupled
         next unless value.key?('tag_prompt')
         for i in 0..value['tag_prompt'].count - 1
@@ -194,7 +196,7 @@ class AssignmentForm
 
   # Adds badges to assignment badges table as part of E1822
   def update_assigned_badges(badge, assignment)
-    if assignment and badge
+    if assignment && badge
       AssignmentBadge.where(assignment_id: assignment[:id]).map(&:id).each do |assigned_badge_id|
         AssignmentBadge.delete(assigned_badge_id) unless badge[:id].include?(assigned_badge_id)
       end
@@ -222,36 +224,47 @@ class AssignmentForm
   end
 
   # Find an AQ based on the given values
-  def assignment_questionnaire(questionnaire_type, round_number, topic_id)
+  def assignment_questionnaire(questionnaire_type, round_number, topic_id, duty_id=nil)
     round_number = nil if round_number.blank?
     topic_id = nil if topic_id.blank?
-    if @assignment.vary_by_round && @assignment.vary_by_topic
+
+    # Default value of duty_id is nil, and when duty_id is not nil, then it means that the function call
+    # is made to access assignment_questionnaire of that particular duty. If questionnaires varies by duty,
+    # then find the relevant questionnaire and return.
+    if duty_id and @assignment.questionnaire_varies_by_duty
+      # Get all AQs for the assignment and specified duty_id
+      assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, duty_id: duty_id)
+      assignment_questionnaires.each do |aq|
+        # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
+        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+      end
+    elsif @assignment.vary_by_round && @assignment.vary_by_topic
         # Get all AQs for the assignment and specified round number and topic
         assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number, topic_id: topic_id)
         assignment_questionnaires.each do |aq|
           # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-          return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+          return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
         end
     elsif @assignment.vary_by_round
         # Get all AQs for the assignment and specified round number by round #
         assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number)
         assignment_questionnaires.each do |aq|
           # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-          return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+          return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
         end
     elsif @assignment.vary_by_topic
         # Get all AQs for the assignment and specified round number by topic
         assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, topic_id: topic_id)
         assignment_questionnaires.each do |aq|
           # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-          return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+          return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
         end
     else
         # Get all AQs for the assignment
         assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
         assignment_questionnaires.each do |aq|
           # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-          return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+          return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
         end
     end
 

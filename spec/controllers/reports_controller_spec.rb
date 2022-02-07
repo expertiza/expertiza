@@ -19,41 +19,9 @@ describe ReportsController do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
 
-  shared_examples_for "summary_report" do
-    it 'renders response_report page with corresponding data' do
-      allow(SummaryHelper::Summary).to receive_message_chain(:new, :summarize_reviews_by_reviewees)
-        .with(no_args).with(assignment, 'expertiza.ncsu.edu', session)
-        .and_return(double('Summary', summary: 'awesome!',
-                                      reviewers: [participant, participant1],
-                                      avg_scores_by_reviewee: 95,
-                                      avg_scores_by_round: 92,
-                                      avg_scores_by_criterion: 94))
-      params = {
-        id: 1,
-        report: {type: 'SummaryByRevieweeAndCriteria'}
-      }
-      get :response_report, params
-      expect(response).to render_template(:response_report)
-    end
-  end
-
   describe 'response_report' do
     before(:each) do
       stub_const('WEBSERVICE_CONFIG', 'summary_webservice_url' => 'expertiza.ncsu.edu')
-    end
-
-    # E1936 team recommends this method be REMOVED (it does not seem to be used anywhere in Expertiza as of 4/21/19)
-    describe 'summary_by_reviewee_and_criteria' do
-      context 'when type is SummaryByRevieweeAndCriteria' do
-        it_should_behave_like "summary_report"
-      end
-    end
-
-    # E1936 team recommends this method be REMOVED (it does not seem to be used anywhere in Expertiza as of 4/21/19)
-    describe 'summary_by_criteria' do
-      context 'when type is SummaryByCriteria' do
-        it_should_behave_like "summary_report"
-      end
     end
 
     describe 'review_response_map' do
@@ -62,9 +30,9 @@ describe ReportsController do
           allow(ReviewResponseMap).to receive(:review_response_report)
             .with('1', assignment, 'ReviewResponseMap', 'no one')
             .and_return([participant, participant1])
-          allow(assignment).to receive(:compute_reviews_hash)
+          allow_any_instance_of(Scoring).to receive(:compute_reviews_hash).with(assignment)
             .and_return('1' => 'good')
-          allow(assignment).to receive(:compute_avg_and_ranges_hash)
+          allow_any_instance_of(Scoring).to receive(:compute_avg_and_ranges_hash).with(assignment)
             .and_return(avg: 94, range: [90, 99])
           params = {
             id: 1,

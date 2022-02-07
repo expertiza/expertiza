@@ -1,5 +1,5 @@
 describe "SummaryHelper" do
-	let(:answer) { Answer.new(answer: 1, comments: 'This is a sentence. This is anohter sentence.', question_id: 1) }
+	let(:answer) { Answer.new(answer: 1, comments: 'This is a sentence. This is another sentence.', question_id: 1) }
 	before(:each) do
 		@sum = SummaryHelper::Summary.new
 	end

@@ -31,7 +31,7 @@ describe AccountRequestController do
           commit: 'Reject'
       }
       post :create_approved_user, params
-      expect(flash[:error]).to eq 'Please Approve or Reject before submitting'
+      expect(flash[:error]).to eq 'Please select at least one user before approving or rejecting'
       expect(response).to redirect_to('http://test.host/account_request/list_pending_requested')
     end
 
@@ -133,7 +133,7 @@ describe AccountRequestController do
           requested_user: {self_introduction: 'I am good'}
       }
       post :create_requested_user_record, params
-      expect(flash[:error]).to eq 'The account you are requesting has already existed in Expertiza.'
+      expect(flash[:error]).to eq 'The account you are requesting already exists in Expertiza.'
       expect(response).to redirect_to('http://test.host/account_request/new?role=Student')
     end
 

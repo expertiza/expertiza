@@ -62,10 +62,36 @@ class UsersController < ApplicationController
   # for displaying the list of users
   def list
     user = session[:user]
-    @users = user.get_user_list
+    # @users = user.get_user_list
     # paginate_list is called with the entire list of users
     # @paginated_users can be used to display set number of users per page
+
+    # Retrieves the search by user names, full names and or email; all criteria that are available
+    search_usrid, search_fname, search_email = search_parameters
+
+    # Passes the above received search criteria to the User model to populate the list accordingly.
+    @users = user.get_user_list search_usrid, search_fname, search_email
+
     @paginated_users = paginate_list(@users)
+  end
+
+  # Modularized the code to pass the search parameters, if found in the search textboxes, to the list method that
+  # generates the list of users to be displayed on the UI
+  def search_parameters
+    search_usrid = ".*"
+    search_fname = ".*"
+    search_email = ".*"
+
+    # Appends the user name to the search criteria, if found in the username text box
+    search_usrid = ".*" + params[:search_usrid].strip + ".*" if params[:search_usrid].present?
+
+    # Appends the full name to the search criteria, if found in the name text box
+    search_fname = ".*" + params[:search_fname].strip + ".*" if params[:search_fname].present?
+
+    # Appends the email to the search criteria, if found in the email text box
+    search_email = ".*" + params[:search_email].strip + ".*" if params[:search_email].present?
+
+    [search_usrid, search_fname, search_email]
   end
 
   # for displaying users which are being searched for editing purposes after checking whether current user is authorized to do so

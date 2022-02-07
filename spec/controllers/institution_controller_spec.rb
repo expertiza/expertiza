@@ -26,7 +26,6 @@ describe InstitutionController do
       before(:each) do
         controller.params = { id: '1', action: 'edit' }
       end
-
       context 'when the role name of current user is super admin or admin' do
         it 'allows certain action' do
           stub_current_user(admin, admin.role.name, admin.role)
@@ -37,7 +36,7 @@ describe InstitutionController do
       context 'when current user is the instructor' do
         it 'allows certain action' do
           stub_current_user(instructor, instructor.role.name, instructor.role)
-          controller.send(:action_allowed?).should be true
+          controller.send(:action_allowed?).to be_truthy
         end
       end
 
@@ -114,7 +113,6 @@ describe InstitutionController do
     end
     context 'when institution is not updated successfully' do
       it 'renders institution#edit' do
-        stub_current_user(instructor, instructor.role.name, instructor.role)
         @params = {
           id: 1,
           institution: {

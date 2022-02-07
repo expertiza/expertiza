@@ -234,7 +234,6 @@ ActiveRecord::Schema.define(version: 20_220_111_023_859) do
     t.string  'name',               limit: 255, default: '', null: false
     t.integer 'permission_id',      limit: 4
     t.string  'url_to_use',         limit: 255
-
   end
 
   add_index 'controller_actions', ['permission_id'], name: 'fk_controller_action_permission_id', using: :btree

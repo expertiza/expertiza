@@ -162,7 +162,7 @@ if ADDED_FILES.grep(/.*temp.*/).any? ||
 You committed `temp`, `tmp` or `cache` files. Please remove them.
     MARKDOWN
 
-  fail(TEMP_FILE_MESSAGE, sticky: true)
+  raise(TEMP_FILE_MESSAGE, sticky: true)
 end
 
 # ------------------------------------------------------------------------------
@@ -191,11 +191,11 @@ end
 # ------------------------------------------------------------------------------
 # 9. Your pull request should avoid keeping debugging code.
 # ------------------------------------------------------------------------------
-if PR_ADDED.include?("puts ") ||
-   PR_ADDED.include?("print ") ||
-   PR_ADDED.include?("binding.pry") ||
-   PR_ADDED.include?("debugger;") ||
-   PR_ADDED.include?("console.log")
+if PR_ADDED.include?('puts ') ||
+   PR_ADDED.include?('print ') ||
+   PR_ADDED.include?('binding.pry') ||
+   PR_ADDED.include?('debugger;') ||
+   PR_ADDED.include?('console.log')
   warn('You are including debug code in your pull request, please remove it.', sticky: true)
 end
 

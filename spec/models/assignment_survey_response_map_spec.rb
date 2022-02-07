@@ -55,12 +55,13 @@ describe AssignmentSurveyResponseMap, type: :model do
       allow(User).to receive(:find).with(1).and_return(user)
       defn = {
         body: {
-          type: "Peer Review", 
-          obj_name: "Test Assgt", 
-          first_name: "no one", 
-          partial_name: "new_submission"
-        }, 
-        to: 'expertiza.debugging@gmail.com'}
+          type: 'Peer Review',
+          obj_name: 'Test Assgt',
+          first_name: 'no one',
+          partial_name: 'new_submission'
+        },
+        to: 'expertiza.debugging@gmail.com'
+      }
       email = @assignment_survey_response_map.email(defn, participant, assignment)
       expect(email.from[0]).to eq('expertiza.debugging@gmail.com')
       expect(email.to[0]).to eq('expertiza.debugging@gmail.com')

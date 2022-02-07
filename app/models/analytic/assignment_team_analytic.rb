@@ -2,16 +2,16 @@
 module AssignmentTeamAnalytic
   #======= general ==========#
   def num_participants
-    self.participants.count
+    participants.count
   end
 
   def num_reviews
-    self.responses.count
+    responses.count
   end
 
   #========== score ========#
   def average_review_score
-    if self.num_reviews == 0
+    if num_reviews == 0
       0
     else
       review_scores.inject(:+).to_f / num_reviews
@@ -32,7 +32,7 @@ module AssignmentTeamAnalytic
   end
 
   def average_review_word_count
-    if self.num_reviews == 0
+    if num_reviews == 0
       0
     else
       total_review_word_count.to_f / num_reviews
@@ -70,7 +70,7 @@ module AssignmentTeamAnalytic
 
   def review_character_counts
     list = []
-    self.responses.each do |response|
+    responses.each do |response|
       list << response.total_character_count
     end
     if list.empty?
@@ -83,7 +83,7 @@ module AssignmentTeamAnalytic
   # return an array containing the score of all the reviews
   def review_scores
     list = []
-    self.responses.each do |response|
+    responses.each do |response|
       list << response.average_score
     end
     if list.empty?
@@ -95,7 +95,7 @@ module AssignmentTeamAnalytic
 
   def review_word_counts
     list = []
-    self.responses.each do |response|
+    responses.each do |response|
       list << response.total_word_count
     end
     if list.empty?

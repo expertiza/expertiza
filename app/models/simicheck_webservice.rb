@@ -13,7 +13,7 @@ class SimiCheckWebService
     full_url = @@base_uri + '/comparisons'
     RestClient::Request.execute(method: :get,
                                 url: full_url,
-                                headers: {simicheck_api_key: @@api_key},
+                                headers: { simicheck_api_key: @@api_key },
                                 verify_ssl: false)
   end
 
@@ -25,7 +25,7 @@ class SimiCheckWebService
   #   response = RestClient::Response
   def self.new_comparison(comparison_name = '')
     full_url = @@base_uri + '/comparison'
-    json_body = {comparison_name: comparison_name}.to_json
+    json_body = { comparison_name: comparison_name }.to_json
     RestClient::Request.execute(method: :put,
                                 url: full_url,
                                 payload: json_body,
@@ -47,7 +47,7 @@ class SimiCheckWebService
     full_url = @@base_uri + '/comparison/' + comparison_id
     RestClient::Request.execute(method: :delete,
                                 url: full_url,
-                                headers: {simicheck_api_key: @@api_key},
+                                headers: { simicheck_api_key: @@api_key },
                                 verify_ssl: false)
   end
 
@@ -60,7 +60,7 @@ class SimiCheckWebService
     full_url = @@base_uri + '/comparison/' + comparison_id
     RestClient::Request.execute(method: :get,
                                 url: full_url,
-                                headers: {simicheck_api_key: @@api_key},
+                                headers: { simicheck_api_key: @@api_key },
                                 verify_ssl: false)
   end
 
@@ -72,7 +72,7 @@ class SimiCheckWebService
   #   response = RestClient::Response (NO BODY)
   def self.update_comparison(comparison_id, new_comparison_name)
     full_url = @@base_uri + '/comparison/' + comparison_id
-    json_body = {comparison_name: new_comparison_name}.to_json
+    json_body = { comparison_name: new_comparison_name }.to_json
     RestClient::Request.execute(method: :post,
                                 url: full_url,
                                 payload: json_body,
@@ -98,7 +98,7 @@ class SimiCheckWebService
   def self.upload_file(comparison_id, path_to_file)
     full_url = @@base_uri + '/upload_file/' + comparison_id
     file_to_upload = File.new(path_to_file, 'rb')
-    json_body = {"file" => file_to_upload} # don't use .to_json!
+    json_body = { 'file' => file_to_upload } # don't use .to_json!
     RestClient::Request.execute(method: :put,
                                 url: full_url,
                                 payload: json_body,
@@ -119,7 +119,7 @@ class SimiCheckWebService
   #   response = RestClient::Response (NO BODY)
   def self.delete_files(comparison_id, filenames_to_delete)
     full_url = @@base_uri + '/delete_files/' + comparison_id
-    json_body = {"filenames" => filenames_to_delete}.to_json
+    json_body = { 'filenames' => filenames_to_delete }.to_json
     RestClient::Request.execute(method: :post,
                                 url: full_url,
                                 payload: json_body,
@@ -145,7 +145,7 @@ class SimiCheckWebService
     full_url = @@base_uri + '/similarity_nxn/' + comparison_id
     RestClient::Request.execute(method: :get,
                                 url: full_url,
-                                headers: {simicheck_api_key: @@api_key},
+                                headers: { simicheck_api_key: @@api_key },
                                 verify_ssl: false)
   end
 
@@ -156,7 +156,7 @@ class SimiCheckWebService
   #   response = RestClient::Response
   def self.post_similarity_nxn(comparison_id, callback_url = '')
     full_url = @@base_uri + '/similarity_nxn/' + comparison_id
-    json_body = callback_url.empty? ? {}.to_json : {"callback_url" => callback_url}.to_json
+    json_body = callback_url.empty? ? {}.to_json : { 'callback_url' => callback_url }.to_json
     RestClient::Request.execute(method: :post,
                                 url: full_url,
                                 payload: json_body,
@@ -185,7 +185,7 @@ class SimiCheckWebService
   # Gets the latest results for the similarity of one file wrt. all other files in a comparison
   def self.get_similarity_1xn(comparison_id, filename)
     full_url = @@base_uri + '/similarity_1xn/' + comparison_id
-    json_body = {"filename" => filename}.to_json
+    json_body = { 'filename' => filename }.to_json
     RestClient::Request.execute(method: :get,
                                 url: full_url,
                                 payload: json_body,
@@ -201,7 +201,7 @@ class SimiCheckWebService
   # Finds the files in a comparison that are most similar to a given file
   def self.post_similarity_1xn(comparison_id, filename, callback_url = '')
     full_url = @@base_uri + '/similarity_1xn/' + comparison_id
-    json_body = callback_url.empty? ? {"filename" => filename}.to_json : {"filename" => filename, "callback_url" => callback_url}.to_json
+    json_body = callback_url.empty? ? { 'filename' => filename }.to_json : { 'filename' => filename, 'callback_url' => callback_url }.to_json
     RestClient::Request.execute(method: :post,
                                 url: full_url,
                                 payload: json_body,
@@ -223,7 +223,7 @@ class SimiCheckWebService
     full_url = @@base_uri + '/visualize_similarity/' + comparison_id
     RestClient::Request.execute(method: :get,
                                 url: full_url,
-                                headers: {simicheck_api_key: @@api_key},
+                                headers: { simicheck_api_key: @@api_key },
                                 verify_ssl: false)
   end
 
@@ -232,7 +232,7 @@ class SimiCheckWebService
     full_url = @@base_uri + '/visualize_comparison/' + comparison_id + '/' + file_id1 + '/' + file_id2
     RestClient::Request.execute(method: :get,
                                 url: full_url,
-                                headers: {simicheck_api_key: @@api_key},
+                                headers: { simicheck_api_key: @@api_key },
                                 verify_ssl: false)
   end
 end

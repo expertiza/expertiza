@@ -15,7 +15,7 @@ module ChartHelper
     end
 
     def get_id_str
-      "chart_container_" + @chart_id.to_s
+      'chart_container_' + @chart_id.to_s
     end
 
     def self.include_header?
@@ -37,7 +37,7 @@ module ChartHelper
         template = set_template_optional_params(template)
       else
         template[:title][:text] = if optionalConf[:title].nil?
-                                    ""
+                                    ''
                                   else
                                     optionalConf[:title]
                                   end
@@ -49,7 +49,7 @@ module ChartHelper
     # Separate function to initializee optional parameters field. Supports Separation of responsibility.
 
     def self.set_template_optional_params(template)
-      template[:title][:text] = ""
+      template[:title][:text] = ''
       template.delete(:subtitle)
       template.delete(:yAxis)
       template.delete(:xAxis)
@@ -113,9 +113,9 @@ module ChartHelper
 
     def self.test_data
       {
-        course_list: [["course 1", 1], ["course 2", 2], ["course 3", 3]],
-        assignment_list: [["assignment 1", 1], ["assignment 2", 2], ["assignment", 3]],
-        team_list: [["team 1", 1], ["team 2", 2], ["team 3", 3]],
+        course_list: [['course 1', 1], ['course 2', 2], ['course 3', 3]],
+        assignment_list: [['assignment 1', 1], ['assignment 2', 2], ['assignment', 3]],
+        team_list: [['team 1', 1], ['team 2', 2], ['team 3', 3]],
         chart_obj: ChartHelper.data_template[:bar]
       }
     end

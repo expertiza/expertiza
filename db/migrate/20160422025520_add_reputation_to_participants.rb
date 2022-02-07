@@ -5,7 +5,7 @@ class AddReputationToParticipants < ActiveRecord::Migration
   end
 
   def self.down
-  	remove_column :participants, :Lauw
-  	remove_column :participants, :Hamer
+    remove_column :participants, :Lauw
+    remove_column :participants, :Hamer
   end
 end

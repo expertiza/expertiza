@@ -4,10 +4,10 @@ describe 'CourseTeam' do
   let(:participant) { build(:participant, user: user2) }
   let(:course) { build(:course, id: 1, name: 'ECE517') }
   let(:team_user) { build(:team_user, id: 1, user: user2) }
-  describe "copy course team to assignment team" do
-    it "should allow course team to be copied to assignment team" do
+  describe 'copy course team to assignment team' do
+    it 'should allow course team to be copied to assignment team' do
       assignment = build(Assignment)
-      assignment.name = "test"
+      assignment.name = 'test'
       assignment.save!
       assignment_team = AssignmentTeam.new
       assignment_team.save
@@ -31,7 +31,7 @@ describe 'CourseTeam' do
   end
   describe '#prototype' do
     it 'creates a course team' do
-      expect(CourseTeam.prototype.class).to eq(CourseTeam) 
+      expect(CourseTeam.prototype.class).to eq(CourseTeam)
     end
   end
   describe '#add_participant' do
@@ -45,13 +45,13 @@ describe 'CourseTeam' do
     context 'when the course does not exist' do
       it 'raises an import error' do
         allow(Course).to receive(:find).with(1).and_return(nil)
-        expect{CourseTeam.import({}, 1, nil)}.to raise_error(ImportError)
+        expect { CourseTeam.import({}, 1, nil) }.to raise_error(ImportError)
       end
     end
     context 'when the course does exist' do
       it 'raises an error with empty row hash' do
         allow(Course).to receive(:find).with(1).and_return(course)
-        expect{CourseTeam.import({}, 1, nil)}.to raise_error(ArgumentError)
+        expect { CourseTeam.import({}, 1, nil) }.to raise_error(ArgumentError)
       end
     end
   end
@@ -59,19 +59,19 @@ describe 'CourseTeam' do
     it 'writes to a csv' do
       allow(CourseTeam).to receive(:where).with(parent_id: 1).and_return([course_team1])
       allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
-      expect(CourseTeam.export([], 1, {team_name: 'false'})).to eq([["no team", "no name"]])
+      expect(CourseTeam.export([], 1, team_name: 'false')).to eq([['no team', 'no name']])
     end
   end
   describe '#export_fields' do
     it 'returns a list of headers' do
-      expect(CourseTeam.export_fields({team_name: 'false'})).to eq(['Team Name', 'Team members', 'Course Name'])
+      expect(CourseTeam.export_fields(team_name: 'false')).to eq(['Team Name', 'Team members', 'Course Name'])
     end
   end
   describe '#add_member' do
     context 'when the user is already on the team' do
       it 'raises an error' do
         allow(course_team1).to receive(:user?).with(user2).and_return(true)
-        expect{course_team1.add_member(user2)}.to raise_error("The user \"no name\" is already a member of the team, \"no team\"")
+        expect { course_team1.add_member(user2) }.to raise_error('The user "no name" is already a member of the team, "no team"')
       end
     end
     context 'when the user is not on the team' do

@@ -1,15 +1,15 @@
 describe Waitlist do
   let(:topic1) { build(:topic, id: 1) }
   let(:topic2) { build(:topic, id: 2) }
-  let(:signedupteam1) { build(:signed_up_team)}
-  let(:signedupteam2) { build(:signed_up_team)}
-  let(:signedupteam3) { build(:signed_up_team, is_waitlisted: false)}
-  let(:signedupteam4) { build(:signed_up_team, is_waitlisted: true)}
+  let(:signedupteam1) { build(:signed_up_team) }
+  let(:signedupteam2) { build(:signed_up_team) }
+  let(:signedupteam3) { build(:signed_up_team, is_waitlisted: false) }
+  let(:signedupteam4) { build(:signed_up_team, is_waitlisted: true) }
   before(:each) do
-  	allow(signedupteam1).to receive(:topic_id).and_return(1)
-  	allow(signedupteam2).to receive(:topic_id).and_return(2)
-  	allow(signedupteam3).to receive(:topic_id).and_return(1)
-  	allow(signedupteam4).to receive(:topic_id).and_return(1)
+    allow(signedupteam1).to receive(:topic_id).and_return(1)
+    allow(signedupteam2).to receive(:topic_id).and_return(2)
+    allow(signedupteam3).to receive(:topic_id).and_return(1)
+    allow(signedupteam4).to receive(:topic_id).and_return(1)
   end
   describe '#cancel_all_waitlists' do
     it 'destroys signed up teams' do
@@ -30,8 +30,6 @@ describe Waitlist do
       allow(SignUpTopic).to receive(:assign_to_first_waiting_team).and_return(true)
       expect(SignUpTopic).to receive(:assign_to_first_waiting_team)
       Waitlist.remove_from_waitlists(1)
-      
-      
     end
   end
 end

@@ -1,10 +1,9 @@
 class UpdateCache < ActiveRecord::Migration
   def self.up
-     remove_column :score_caches, :assignment_id
-     rename_column :score_caches, :object_id, :reviewee_id
-     remove_column :score_caches, :course_id
+    remove_column :score_caches, :assignment_id
+    rename_column :score_caches, :object_id, :reviewee_id
+    remove_column :score_caches, :course_id
     end
-
 
   def self.down
     add_column :score_caches, :assignment_id, :integer

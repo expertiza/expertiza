@@ -4,30 +4,30 @@ class Checkbox < UnscoredQuestion
   def edit(count)
     html = edit_remove_button(count) + edit_seq(count) + edit_question(count)
     html += edit_type(count) + edit_weight(count)
-    safe_join(["<tr>".html_safe, "</tr>".html_safe], html.html_safe)
+    safe_join(['<tr>'.html_safe, '</tr>'.html_safe], html.html_safe)
   end
 
   def edit_remove_button(_count)
     html = '<td align="center"><a rel="nofollow" data-method="delete" href="/questions/'
-    html += self.id.to_s + '">Remove</a></td>'
+    html += id.to_s + '">Remove</a></td>'
     html
   end
 
   def edit_seq(_count)
-    html = '<td><input size="6" value="' + self.seq.to_s + '" name="question['
-    html += self.id.to_s + '][seq]" id="question_' + self.id.to_s + '_seq" type="text"></td>'
+    html = '<td><input size="6" value="' + seq.to_s + '" name="question['
+    html += id.to_s + '][seq]" id="question_' + id.to_s + '_seq" type="text"></td>'
     html
   end
 
   def edit_question(_count)
-    html = '<td><textarea cols="50" rows="1" name="question[' + self.id.to_s + '][txt]" id="question_'
-    html += self.id.to_s + '_txt" placeholder="Edit question content here">' + self.txt + '</textarea></td>'
+    html = '<td><textarea cols="50" rows="1" name="question[' + id.to_s + '][txt]" id="question_'
+    html += id.to_s + '_txt" placeholder="Edit question content here">' + txt + '</textarea></td>'
     html
   end
 
   def edit_type(_count)
-    html = '<td><input size="10" disabled="disabled" value="' + self.type + '" name="question['
-    html += self.id.to_s + '][type]" id="question_' + self.id.to_s + '_type" type="text"></td>'
+    html = '<td><input size="10" disabled="disabled" value="' + type + '" name="question['
+    html += id.to_s + '][type]" id="question_' + id.to_s + '_type" type="text"></td>'
     html
   end
 
@@ -38,26 +38,26 @@ class Checkbox < UnscoredQuestion
 
   # This method returns what to display if an instructor (etc.) is viewing a questionnaire
   def view_question_text
-    html = '<TR><TD align="left"> ' + self.txt + ' </TD>'
-    html += '<TD align="left">' + self.type + '</TD>'
-    html += '<td align="center">' + self.weight.to_s + '</TD>'
+    html = '<TR><TD align="left"> ' + txt + ' </TD>'
+    html += '<TD align="left">' + type + '</TD>'
+    html += '<td align="center">' + weight.to_s + '</TD>'
     html += '<TD align="center">Checked/Unchecked</TD>'
     html += '</TR>'
-    safe_join(["".html_safe, "".html_safe], html.html_safe)
+    safe_join([''.html_safe, ''.html_safe], html.html_safe)
   end
 
   def complete(count, answer = nil)
     html = check_previous_question + complete_first_second_input(count, answer)
     html += complete_third_input(count, answer)
-    html += '<label for="responses_' + count.to_s + '">&nbsp;&nbsp;' + self.txt + '</label>'
+    html += '<label for="responses_' + count.to_s + '">&nbsp;&nbsp;' + txt + '</label>'
     html += complete_script(count)
     html += complete_if_column_header
-    safe_join(["".html_safe, "".html_safe], html.html_safe)
+    safe_join([''.html_safe, ''.html_safe], html.html_safe)
   end
 
   def check_previous_question
-    curr_question = Question.find(self.id)
-    prev_question = Question.where("seq < ?", curr_question.seq).order(:seq).last
+    curr_question = Question.find(id)
+    prev_question = Question.where('seq < ?', curr_question.seq).order(:seq).last
     html = if prev_question.type == 'ColumnHeader'
              '<td style="padding: 15px;">'
            else
@@ -69,7 +69,7 @@ class Checkbox < UnscoredQuestion
   def complete_first_second_input(count, answer = nil)
     html = '<input id="responses_' + count.to_s + '_comments" name="responses[' + count.to_s + '][comment]" type="hidden" value="">'
     html += '<input id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" type="hidden"'
-    html += if !answer.nil? and answer.answer == 1
+    html += if !answer.nil? && (answer.answer == 1)
               'value="1"'
             else
               'value="0"'
@@ -80,7 +80,7 @@ class Checkbox < UnscoredQuestion
 
   def complete_third_input(count, answer = nil)
     html = '<input id="responses_' + count.to_s + '_checkbox" type="checkbox" onchange="checkbox' + count.to_s + 'Changed()"'
-    html += 'checked="checked"' if !answer.nil? and answer.answer == 1
+    html += 'checked="checked"' if !answer.nil? && (answer.answer == 1)
     html += '>'
 
     html
@@ -98,11 +98,11 @@ class Checkbox < UnscoredQuestion
   end
 
   def complete_if_column_header
-    curr_question = Question.find(self.id)
-    next_question = Question.where("seq > ?", curr_question.seq).order(:seq).first
+    curr_question = Question.find(id)
+    next_question = Question.where('seq > ?', curr_question.seq).order(:seq).first
     html = if next_question.type == 'ColumnHeader'
              '</td></tr>'
-           elsif next_question.type == 'SectionHeader' or next_question.type == 'TableHeader'
+           elsif (next_question.type == 'SectionHeader') || (next_question.type == 'TableHeader')
              '</td></tr></table><br/>'
            else
              '<BR/>'
@@ -115,21 +115,21 @@ class Checkbox < UnscoredQuestion
     html = check_previous_question
     html += view_completed_question_answer(count, answer)
     html += view_completed_question_if_column_header
-    safe_join(["".html_safe, "".html_safe], html.html_safe)
+    safe_join([''.html_safe, ''.html_safe], html.html_safe)
   end
 
   def view_completed_question_answer(count, answer)
     html = if answer.answer == 1
-             '<b>' + count.to_s + '. &nbsp;&nbsp;<img src="/assets/Check-icon.png">' + self.txt + '</b>'
+             '<b>' + count.to_s + '. &nbsp;&nbsp;<img src="/assets/Check-icon.png">' + txt + '</b>'
            else
-             '<b>' + count.to_s + '. &nbsp;&nbsp;<img src="/assets/delete_icon.png">' + self.txt + '</b>'
+             '<b>' + count.to_s + '. &nbsp;&nbsp;<img src="/assets/delete_icon.png">' + txt + '</b>'
            end
     html
   end
 
   def view_completed_question_if_column_header
-    curr_question = Question.find(self.id)
-    next_question = Question.where("seq > ?", curr_question.seq).order(:seq).first
+    curr_question = Question.find(id)
+    next_question = Question.where('seq > ?', curr_question.seq).order(:seq).first
     html = if next_question.type == 'ColumnHeader'
              '</td></tr>'
            elsif next_question.type == 'TableHeader'

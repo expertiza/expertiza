@@ -6,6 +6,7 @@ class CreateResetPassword < ActiveRecord::Migration
       t.datetime :updated_at
     end
   end
+
   def self.down
     drop_table :password_resets
   end

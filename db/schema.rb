@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -10,6 +9,7 @@
 # you'll amass, the slower it'll run and the greater likelihood for issues).
 #
 # It's strongly recommended that you check this file into your version control system.
+
 
 ActiveRecord::Schema.define(version: 20220111023859) do
 
@@ -238,663 +238,663 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.string  "url_to_use",         limit: 255
   end
 
-  add_index "controller_actions", ["permission_id"], name: "fk_controller_action_permission_id", using: :btree
-  add_index "controller_actions", ["site_controller_id"], name: "fk_controller_action_site_controller_id", using: :btree
+  add_index 'controller_actions', ['permission_id'], name: 'fk_controller_action_permission_id', using: :btree
+  add_index 'controller_actions', ['site_controller_id'], name: 'fk_controller_action_site_controller_id', using: :btree
 
-  create_table "courses", force: :cascade do |t|
-    t.string   "name",            limit: 255
-    t.integer  "instructor_id",   limit: 4
-    t.string   "directory_path",  limit: 255
-    t.text     "info",            limit: 65535
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.boolean  "private",                       default: false, null: false
-    t.integer  "institutions_id", limit: 4
-    t.integer  "locale",          limit: 4,     default: 1
+  create_table 'courses', force: :cascade do |t|
+    t.string   'name',            limit: 255
+    t.integer  'instructor_id',   limit: 4
+    t.string   'directory_path',  limit: 255
+    t.text     'info',            limit: 65_535
+    t.datetime 'created_at'
+    t.datetime 'updated_at'
+    t.boolean  'private', default: false, null: false
+    t.integer  'institutions_id', limit: 4
+    t.integer  'locale',          limit: 4, default: 1
   end
 
-  add_index "courses", ["instructor_id"], name: "fk_course_users", using: :btree
+  add_index 'courses', ['instructor_id'], name: 'fk_course_users', using: :btree
 
-  create_table "deadline_rights", force: :cascade do |t|
-    t.string "name", limit: 32
+  create_table 'deadline_rights', force: :cascade do |t|
+    t.string 'name', limit: 32
   end
 
-  create_table "deadline_types", force: :cascade do |t|
-    t.string "name", limit: 32
+  create_table 'deadline_types', force: :cascade do |t|
+    t.string 'name', limit: 32
   end
 
-  create_table "delayed_jobs", force: :cascade do |t|
-    t.integer  "priority",   limit: 4,     default: 0
-    t.integer  "attempts",   limit: 4,     default: 0
-    t.text     "handler",    limit: 65535
-    t.text     "last_error", limit: 65535
-    t.datetime "run_at"
-    t.datetime "locked_at"
-    t.datetime "failed_at"
-    t.string   "locked_by",  limit: 255
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "queue",      limit: 255
+  create_table 'delayed_jobs', force: :cascade do |t|
+    t.integer  'priority',   limit: 4,     default: 0
+    t.integer  'attempts',   limit: 4,     default: 0
+    t.text     'handler',    limit: 65_535
+    t.text     'last_error', limit: 65_535
+    t.datetime 'run_at'
+    t.datetime 'locked_at'
+    t.datetime 'failed_at'
+    t.string   'locked_by', limit: 255
+    t.datetime 'created_at'
+    t.datetime 'updated_at'
+    t.string   'queue', limit: 255
   end
 
-  add_index "delayed_jobs", ["priority", "run_at"], name: "delayed_jobs_priority", using: :btree
+  add_index 'delayed_jobs', %w[priority run_at], name: 'delayed_jobs_priority', using: :btree
 
-  create_table "due_dates", force: :cascade do |t|
-    t.datetime "due_at"
-    t.integer  "deadline_type_id",            limit: 4
-    t.integer  "parent_id",                   limit: 4
-    t.integer  "submission_allowed_id",       limit: 4
-    t.integer  "review_allowed_id",           limit: 4
-    t.integer  "review_of_review_allowed_id", limit: 4
-    t.integer  "round",                       limit: 4
-    t.boolean  "flag",                                    default: false
-    t.integer  "threshold",                   limit: 4,   default: 1
-    t.string   "delayed_job_id",              limit: 255
-    t.string   "deadline_name",               limit: 255
-    t.string   "description_url",             limit: 255
-    t.integer  "quiz_allowed_id",             limit: 4,   default: 1
-    t.integer  "teammate_review_allowed_id",  limit: 4,   default: 3
-    t.string   "type",                        limit: 255, default: "AssignmentDueDate"
+  create_table 'due_dates', force: :cascade do |t|
+    t.datetime 'due_at'
+    t.integer  'deadline_type_id',            limit: 4
+    t.integer  'parent_id',                   limit: 4
+    t.integer  'submission_allowed_id',       limit: 4
+    t.integer  'review_allowed_id',           limit: 4
+    t.integer  'review_of_review_allowed_id', limit: 4
+    t.integer  'round',                       limit: 4
+    t.boolean  'flag',                                    default: false
+    t.integer  'threshold',                   limit: 4,   default: 1
+    t.string   'delayed_job_id',              limit: 255
+    t.string   'deadline_name',               limit: 255
+    t.string   'description_url',             limit: 255
+    t.integer  'quiz_allowed_id',             limit: 4,   default: 1
+    t.integer  'teammate_review_allowed_id',  limit: 4,   default: 3
+    t.string   'type',                        limit: 255, default: 'AssignmentDueDate'
   end
 
-  add_index "due_dates", ["deadline_type_id"], name: "fk_deadline_type_due_date", using: :btree
-  add_index "due_dates", ["parent_id"], name: "fk_due_dates_assignments", using: :btree
-  add_index "due_dates", ["review_allowed_id"], name: "fk_due_date_review_allowed", using: :btree
-  add_index "due_dates", ["review_of_review_allowed_id"], name: "fk_due_date_review_of_review_allowed", using: :btree
-  add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed", using: :btree
+  add_index 'due_dates', ['deadline_type_id'], name: 'fk_deadline_type_due_date', using: :btree
+  add_index 'due_dates', ['parent_id'], name: 'fk_due_dates_assignments', using: :btree
+  add_index 'due_dates', ['review_allowed_id'], name: 'fk_due_date_review_allowed', using: :btree
+  add_index 'due_dates', ['review_of_review_allowed_id'], name: 'fk_due_date_review_of_review_allowed', using: :btree
+  add_index 'due_dates', ['submission_allowed_id'], name: 'fk_due_date_submission_allowed', using: :btree
 
-  create_table "duties", force: :cascade do |t|
-    t.string   "name",                 limit: 255
-    t.integer  "max_members_for_duty", limit: 4
-    t.integer  "assignment_id",        limit: 4
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
+  create_table 'duties', force: :cascade do |t|
+    t.string   'name',                 limit: 255
+    t.integer  'max_members_for_duty', limit: 4
+    t.integer  'assignment_id',        limit: 4
+    t.datetime 'created_at',                       null: false
+    t.datetime 'updated_at',                       null: false
   end
 
-  add_index "duties", ["assignment_id"], name: "index_duties_on_assignment_id", using: :btree
+  add_index 'duties', ['assignment_id'], name: 'index_duties_on_assignment_id', using: :btree
 
-  create_table "institutions", force: :cascade do |t|
-    t.string "name", limit: 255, default: "", null: false
+  create_table 'institutions', force: :cascade do |t|
+    t.string 'name', limit: 255, default: '', null: false
   end
 
-  create_table "invitations", force: :cascade do |t|
-    t.integer "assignment_id", limit: 4
-    t.integer "from_id",       limit: 4
-    t.integer "to_id",         limit: 4
-    t.string  "reply_status",  limit: 1
+  create_table 'invitations', force: :cascade do |t|
+    t.integer 'assignment_id', limit: 4
+    t.integer 'from_id',       limit: 4
+    t.integer 'to_id',         limit: 4
+    t.string  'reply_status',  limit: 1
   end
 
-  add_index "invitations", ["assignment_id"], name: "fk_invitation_assignments", using: :btree
-  add_index "invitations", ["from_id"], name: "fk_invitationfrom_users", using: :btree
-  add_index "invitations", ["to_id"], name: "fk_invitationto_users", using: :btree
+  add_index 'invitations', ['assignment_id'], name: 'fk_invitation_assignments', using: :btree
+  add_index 'invitations', ['from_id'], name: 'fk_invitationfrom_users', using: :btree
+  add_index 'invitations', ['to_id'], name: 'fk_invitationto_users', using: :btree
 
-  create_table "join_team_requests", force: :cascade do |t|
-    t.integer  "participant_id", limit: 4
-    t.integer  "team_id",        limit: 4
-    t.text     "comments",       limit: 65535
-    t.string   "status",         limit: 1
-    t.datetime "created_at"
-    t.datetime "updated_at"
+  create_table 'join_team_requests', force: :cascade do |t|
+    t.integer  'participant_id', limit: 4
+    t.integer  'team_id',        limit: 4
+    t.text     'comments',       limit: 65_535
+    t.string   'status',         limit: 1
+    t.datetime 'created_at'
+    t.datetime 'updated_at'
   end
 
-  create_table "languages", force: :cascade do |t|
-    t.string "name", limit: 32
+  create_table 'languages', force: :cascade do |t|
+    t.string 'name', limit: 32
   end
 
-  create_table "late_policies", force: :cascade do |t|
-    t.float   "penalty_per_unit", limit: 24
-    t.integer "max_penalty",      limit: 4,   default: 0, null: false
-    t.string  "penalty_unit",     limit: 255,             null: false
-    t.integer "times_used",       limit: 4,   default: 0, null: false
-    t.integer "instructor_id",    limit: 4,               null: false
-    t.string  "policy_name",      limit: 255,             null: false
+  create_table 'late_policies', force: :cascade do |t|
+    t.float   'penalty_per_unit', limit: 24
+    t.integer 'max_penalty',      limit: 4, default: 0, null: false
+    t.string  'penalty_unit',     limit: 255, null: false
+    t.integer 'times_used',       limit: 4, default: 0, null: false
+    t.integer 'instructor_id',    limit: 4,               null: false
+    t.string  'policy_name',      limit: 255,             null: false
   end
 
-  add_index "late_policies", ["instructor_id"], name: "fk_instructor_id", using: :btree
+  add_index 'late_policies', ['instructor_id'], name: 'fk_instructor_id', using: :btree
 
-  create_table "locks", force: :cascade do |t|
-    t.integer  "timeout_period", limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "user_id",        limit: 4
-    t.integer  "lockable_id",    limit: 4
-    t.string   "lockable_type",  limit: 255
+  create_table 'locks', force: :cascade do |t|
+    t.integer  'timeout_period', limit: 4
+    t.datetime 'created_at'
+    t.datetime 'updated_at'
+    t.integer  'user_id',        limit: 4
+    t.integer  'lockable_id',    limit: 4
+    t.string   'lockable_type',  limit: 255
   end
 
-  add_index "locks", ["user_id"], name: "fk_rails_426f571216", using: :btree
+  add_index 'locks', ['user_id'], name: 'fk_rails_426f571216', using: :btree
 
-  create_table "markup_styles", force: :cascade do |t|
-    t.string "name", limit: 255, default: "", null: false
+  create_table 'markup_styles', force: :cascade do |t|
+    t.string 'name', limit: 255, default: '', null: false
   end
 
-  create_table "menu_items", force: :cascade do |t|
-    t.integer "parent_id",            limit: 4
-    t.string  "name",                 limit: 255, default: "", null: false
-    t.string  "label",                limit: 255, default: "", null: false
-    t.integer "seq",                  limit: 4
-    t.integer "controller_action_id", limit: 4
-    t.integer "content_page_id",      limit: 4
+  create_table 'menu_items', force: :cascade do |t|
+    t.integer 'parent_id',            limit: 4
+    t.string  'name',                 limit: 255, default: '', null: false
+    t.string  'label',                limit: 255, default: '', null: false
+    t.integer 'seq',                  limit: 4
+    t.integer 'controller_action_id', limit: 4
+    t.integer 'content_page_id',      limit: 4
   end
 
-  add_index "menu_items", ["content_page_id"], name: "fk_menu_item_content_page_id", using: :btree
-  add_index "menu_items", ["controller_action_id"], name: "fk_menu_item_controller_action_id", using: :btree
-  add_index "menu_items", ["parent_id"], name: "fk_menu_item_parent_id", using: :btree
+  add_index 'menu_items', ['content_page_id'], name: 'fk_menu_item_content_page_id', using: :btree
+  add_index 'menu_items', ['controller_action_id'], name: 'fk_menu_item_controller_action_id', using: :btree
+  add_index 'menu_items', ['parent_id'], name: 'fk_menu_item_parent_id', using: :btree
 
-  create_table "nodes", force: :cascade do |t|
-    t.integer "parent_id",      limit: 4
-    t.integer "node_object_id", limit: 4
-    t.string  "type",           limit: 255
+  create_table 'nodes', force: :cascade do |t|
+    t.integer 'parent_id',      limit: 4
+    t.integer 'node_object_id', limit: 4
+    t.string  'type',           limit: 255
   end
 
-  create_table "notifications", force: :cascade do |t|
-    t.string   "subject",         limit: 255
-    t.text     "description",     limit: 65535
-    t.date     "expiration_date"
-    t.boolean  "active_flag"
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
-    t.integer  "course_id",       limit: 4
+  create_table 'notifications', force: :cascade do |t|
+    t.string   'subject',         limit: 255
+    t.text     'description',     limit: 65_535
+    t.date     'expiration_date'
+    t.boolean  'active_flag'
+    t.datetime 'created_at',                    null: false
+    t.datetime 'updated_at',                    null: false
+    t.integer  'course_id', limit: 4
   end
 
-  add_index "notifications", ["course_id"], name: "index_notifications_on_course_id", using: :btree
+  add_index 'notifications', ['course_id'], name: 'index_notifications_on_course_id', using: :btree
 
-  create_table "participants", force: :cascade do |t|
-    t.boolean  "can_submit",                        default: true
-    t.boolean  "can_review",                        default: true
-    t.integer  "user_id",             limit: 4
-    t.integer  "parent_id",           limit: 4
-    t.datetime "submitted_at"
-    t.boolean  "permission_granted"
-    t.integer  "penalty_accumulated", limit: 4,     default: 0,    null: false
-    t.float    "grade",               limit: 24
-    t.string   "type",                limit: 255
-    t.string   "handle",              limit: 255
-    t.datetime "time_stamp"
-    t.text     "digital_signature",   limit: 65535
-    t.string   "duty",                limit: 255
-    t.boolean  "can_take_quiz",                     default: true
-    t.float    "Hamer",               limit: 24,    default: 1.0
-    t.float    "Lauw",                limit: 24,    default: 0.0
-    t.integer  "duty_id",             limit: 4
+  create_table 'participants', force: :cascade do |t|
+    t.boolean  'can_submit',                        default: true
+    t.boolean  'can_review',                        default: true
+    t.integer  'user_id',             limit: 4
+    t.integer  'parent_id',           limit: 4
+    t.datetime 'submitted_at'
+    t.boolean  'permission_granted'
+    t.integer  'penalty_accumulated', limit: 4, default: 0, null: false
+    t.float    'grade',               limit: 24
+    t.string   'type',                limit: 255
+    t.string   'handle',              limit: 255
+    t.datetime 'time_stamp'
+    t.text     'digital_signature',   limit: 65_535
+    t.string   'duty',                limit: 255
+    t.boolean  'can_take_quiz',                     default: true
+    t.float    'Hamer',               limit: 24,    default: 1.0
+    t.float    'Lauw',                limit: 24,    default: 0.0
+    t.integer  'duty_id',             limit: 4
   end
 
-  add_index "participants", ["duty_id"], name: "index_participants_on_duty_id", using: :btree
-  add_index "participants", ["user_id"], name: "fk_participant_users", using: :btree
+  add_index 'participants', ['duty_id'], name: 'index_participants_on_duty_id', using: :btree
+  add_index 'participants', ['user_id'], name: 'fk_participant_users', using: :btree
 
-  create_table "password_resets", force: :cascade do |t|
-    t.string   "user_email", limit: 255
-    t.string   "token",      limit: 255
-    t.datetime "updated_at"
+  create_table 'password_resets', force: :cascade do |t|
+    t.string   'user_email', limit: 255
+    t.string   'token',      limit: 255
+    t.datetime 'updated_at'
   end
 
-  create_table "permissions", force: :cascade do |t|
-    t.string "name", limit: 255, default: "", null: false
+  create_table 'permissions', force: :cascade do |t|
+    t.string 'name', limit: 255, default: '', null: false
   end
 
-  create_table "plagiarism_checker_assignment_submissions", force: :cascade do |t|
-    t.string   "name",          limit: 255
-    t.string   "simicheck_id",  limit: 255
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-    t.integer  "assignment_id", limit: 4
+  create_table 'plagiarism_checker_assignment_submissions', force: :cascade do |t|
+    t.string   'name',          limit: 255
+    t.string   'simicheck_id',  limit: 255
+    t.datetime 'created_at',                null: false
+    t.datetime 'updated_at',                null: false
+    t.integer  'assignment_id', limit: 4
   end
 
-  add_index "plagiarism_checker_assignment_submissions", ["assignment_id"], name: "index_plagiarism_checker_assgt_subm_on_assignment_id", using: :btree
+  add_index 'plagiarism_checker_assignment_submissions', ['assignment_id'], name: 'index_plagiarism_checker_assgt_subm_on_assignment_id', using: :btree
 
-  create_table "plagiarism_checker_comparisons", force: :cascade do |t|
-    t.integer  "plagiarism_checker_assignment_submission_id", limit: 4
-    t.string   "similarity_link",                             limit: 255
-    t.decimal  "similarity_percentage",                                   precision: 10
-    t.string   "file1_name",                                  limit: 255
-    t.string   "file1_id",                                    limit: 255
-    t.string   "file1_team",                                  limit: 255
-    t.string   "file2_name",                                  limit: 255
-    t.string   "file2_id",                                    limit: 255
-    t.string   "file2_team",                                  limit: 255
-    t.datetime "created_at",                                                             null: false
-    t.datetime "updated_at",                                                             null: false
+  create_table 'plagiarism_checker_comparisons', force: :cascade do |t|
+    t.integer  'plagiarism_checker_assignment_submission_id', limit: 4
+    t.string   'similarity_link',                             limit: 255
+    t.decimal  'similarity_percentage', precision: 10
+    t.string   'file1_name',                                  limit: 255
+    t.string   'file1_id',                                    limit: 255
+    t.string   'file1_team',                                  limit: 255
+    t.string   'file2_name',                                  limit: 255
+    t.string   'file2_id',                                    limit: 255
+    t.string   'file2_team',                                  limit: 255
+    t.datetime 'created_at',                                                             null: false
+    t.datetime 'updated_at',                                                             null: false
   end
 
-  add_index "plagiarism_checker_comparisons", ["plagiarism_checker_assignment_submission_id"], name: "assignment_submission_index", using: :btree
+  add_index 'plagiarism_checker_comparisons', ['plagiarism_checker_assignment_submission_id'], name: 'assignment_submission_index', using: :btree
 
-  create_table "question_advices", force: :cascade do |t|
-    t.integer "question_id", limit: 4
-    t.integer "score",       limit: 4
-    t.text    "advice",      limit: 65535
+  create_table 'question_advices', force: :cascade do |t|
+    t.integer 'question_id', limit: 4
+    t.integer 'score',       limit: 4
+    t.text    'advice',      limit: 65_535
   end
 
-  add_index "question_advices", ["question_id"], name: "fk_question_question_advices", using: :btree
+  add_index 'question_advices', ['question_id'], name: 'fk_question_question_advices', using: :btree
 
-  create_table "question_types", force: :cascade do |t|
-    t.string "type", limit: 255
+  create_table 'question_types', force: :cascade do |t|
+    t.string 'type', limit: 255
   end
 
-  create_table "questionnaires", force: :cascade do |t|
-    t.string   "name",               limit: 64
-    t.integer  "instructor_id",      limit: 4,     default: 0,     null: false
-    t.boolean  "private",                          default: false, null: false
-    t.integer  "min_question_score", limit: 4,     default: 0,     null: false
-    t.integer  "max_question_score", limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at",                                       null: false
-    t.string   "type",               limit: 255
-    t.string   "display_type",       limit: 255
-    t.text     "instruction_loc",    limit: 65535
+  create_table 'questionnaires', force: :cascade do |t|
+    t.string   'name',               limit: 64
+    t.integer  'instructor_id',      limit: 4,     default: 0,     null: false
+    t.boolean  'private',                          default: false, null: false
+    t.integer  'min_question_score', limit: 4,     default: 0,     null: false
+    t.integer  'max_question_score', limit: 4
+    t.datetime 'created_at'
+    t.datetime 'updated_at', null: false
+    t.string   'type',               limit: 255
+    t.string   'display_type',       limit: 255
+    t.text     'instruction_loc',    limit: 65_535
   end
 
-  create_table "questions", force: :cascade do |t|
-    t.text    "txt",              limit: 65535
-    t.integer "weight",           limit: 4
-    t.integer "questionnaire_id", limit: 4
-    t.decimal "seq",                            precision: 6, scale: 2
-    t.string  "type",             limit: 255
-    t.string  "size",             limit: 255,                           default: ""
-    t.string  "alternatives",     limit: 255
-    t.boolean "break_before",                                           default: true
-    t.string  "max_label",        limit: 255,                           default: ""
-    t.string  "min_label",        limit: 255,                           default: ""
+  create_table 'questions', force: :cascade do |t|
+    t.text    'txt',              limit: 65_535
+    t.integer 'weight',           limit: 4
+    t.integer 'questionnaire_id', limit: 4
+    t.decimal 'seq', precision: 6, scale: 2
+    t.string  'type',             limit: 255
+    t.string  'size',             limit: 255, default: ''
+    t.string  'alternatives',     limit: 255
+    t.boolean 'break_before',                                           default: true
+    t.string  'max_label',        limit: 255,                           default: ''
+    t.string  'min_label',        limit: 255,                           default: ''
   end
 
-  add_index "questions", ["questionnaire_id"], name: "fk_question_questionnaires", using: :btree
+  add_index 'questions', ['questionnaire_id'], name: 'fk_question_questionnaires', using: :btree
 
-  create_table "quiz_question_choices", force: :cascade do |t|
-    t.integer "question_id", limit: 4
-    t.text    "txt",         limit: 65535
-    t.boolean "iscorrect",                 default: false
+  create_table 'quiz_question_choices', force: :cascade do |t|
+    t.integer 'question_id', limit: 4
+    t.text    'txt',         limit: 65_535
+    t.boolean 'iscorrect', default: false
   end
 
-  create_table "response_maps", force: :cascade do |t|
-    t.integer  "reviewed_object_id", limit: 4,   default: 0,     null: false
-    t.integer  "reviewer_id",        limit: 4,   default: 0,     null: false
-    t.integer  "reviewee_id",        limit: 4,   default: 0,     null: false
-    t.string   "type",               limit: 255, default: "",    null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.boolean  "calibrate_to",                   default: false
-    t.boolean  "reviewer_is_team"
+  create_table 'response_maps', force: :cascade do |t|
+    t.integer  'reviewed_object_id', limit: 4,   default: 0,     null: false
+    t.integer  'reviewer_id',        limit: 4,   default: 0,     null: false
+    t.integer  'reviewee_id',        limit: 4,   default: 0,     null: false
+    t.string   'type',               limit: 255, default: '',    null: false
+    t.datetime 'created_at'
+    t.datetime 'updated_at'
+    t.boolean  'calibrate_to', default: false
+    t.boolean  'reviewer_is_team'
   end
 
-  add_index "response_maps", ["reviewer_id"], name: "fk_response_map_reviewer", using: :btree
+  add_index 'response_maps', ['reviewer_id'], name: 'fk_response_map_reviewer', using: :btree
 
-  create_table "responses", force: :cascade do |t|
-    t.integer  "map_id",             limit: 4,     default: 0,         null: false
-    t.text     "additional_comment", limit: 65535
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "version_num",        limit: 4
-    t.integer  "round",              limit: 4
-    t.boolean  "is_submitted",                     default: false
-    t.string   "visibility",         limit: 255,   default: "private"
+  create_table 'responses', force: :cascade do |t|
+    t.integer  'map_id',             limit: 4, default: 0, null: false
+    t.text     'additional_comment', limit: 65_535
+    t.datetime 'created_at'
+    t.datetime 'updated_at'
+    t.integer  'version_num',        limit: 4
+    t.integer  'round',              limit: 4
+    t.boolean  'is_submitted', default: false
+    t.string   'visibility', limit: 255, default: 'private'
   end
 
-  add_index "responses", ["map_id"], name: "fk_response_response_map", using: :btree
+  add_index 'responses', ['map_id'], name: 'fk_response_response_map', using: :btree
 
-  create_table "resubmission_times", force: :cascade do |t|
-    t.integer  "participant_id", limit: 4
-    t.datetime "resubmitted_at"
+  create_table 'resubmission_times', force: :cascade do |t|
+    t.integer  'participant_id', limit: 4
+    t.datetime 'resubmitted_at'
   end
 
-  add_index "resubmission_times", ["participant_id"], name: "fk_resubmission_times_participants", using: :btree
+  add_index 'resubmission_times', ['participant_id'], name: 'fk_resubmission_times_participants', using: :btree
 
-  create_table "review_bids", force: :cascade do |t|
-    t.integer  "priority",       limit: 4
-    t.integer  "signuptopic_id", limit: 4
-    t.integer  "participant_id", limit: 4
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
-    t.integer  "user_id",        limit: 4
-    t.integer  "assignment_id",  limit: 4
+  create_table 'review_bids', force: :cascade do |t|
+    t.integer  'priority',       limit: 4
+    t.integer  'signuptopic_id', limit: 4
+    t.integer  'participant_id', limit: 4
+    t.datetime 'created_at',               null: false
+    t.datetime 'updated_at',               null: false
+    t.integer  'user_id',        limit: 4
+    t.integer  'assignment_id',  limit: 4
   end
 
-  add_index "review_bids", ["assignment_id"], name: "fk_rails_549e23ae08", using: :btree
-  add_index "review_bids", ["participant_id"], name: "fk_rails_ab93feeb35", using: :btree
-  add_index "review_bids", ["signuptopic_id"], name: "fk_rails_e88fa4058f", using: :btree
-  add_index "review_bids", ["user_id"], name: "fk_rails_6041e1cdb9", using: :btree
+  add_index 'review_bids', ['assignment_id'], name: 'fk_rails_549e23ae08', using: :btree
+  add_index 'review_bids', ['participant_id'], name: 'fk_rails_ab93feeb35', using: :btree
+  add_index 'review_bids', ['signuptopic_id'], name: 'fk_rails_e88fa4058f', using: :btree
+  add_index 'review_bids', ['user_id'], name: 'fk_rails_6041e1cdb9', using: :btree
 
-  create_table "review_comment_paste_bins", force: :cascade do |t|
-    t.integer  "review_grade_id", limit: 4
-    t.string   "title",           limit: 255
-    t.text     "review_comment",  limit: 65535
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+  create_table 'review_comment_paste_bins', force: :cascade do |t|
+    t.integer  'review_grade_id', limit: 4
+    t.string   'title',           limit: 255
+    t.text     'review_comment',  limit: 65_535
+    t.datetime 'created_at',                    null: false
+    t.datetime 'updated_at',                    null: false
   end
 
-  add_index "review_comment_paste_bins", ["review_grade_id"], name: "fk_rails_0a539bcc81", using: :btree
+  add_index 'review_comment_paste_bins', ['review_grade_id'], name: 'fk_rails_0a539bcc81', using: :btree
 
-  create_table "review_grades", force: :cascade do |t|
-    t.integer  "participant_id",       limit: 4
-    t.integer  "grade_for_reviewer",   limit: 4
-    t.text     "comment_for_reviewer", limit: 65535
-    t.datetime "review_graded_at"
-    t.integer  "reviewer_id",          limit: 4
+  create_table 'review_grades', force: :cascade do |t|
+    t.integer  'participant_id',       limit: 4
+    t.integer  'grade_for_reviewer',   limit: 4
+    t.text     'comment_for_reviewer', limit: 65_535
+    t.datetime 'review_graded_at'
+    t.integer  'reviewer_id', limit: 4
   end
 
-  add_index "review_grades", ["participant_id"], name: "fk_rails_29587cf6a9", using: :btree
+  add_index 'review_grades', ['participant_id'], name: 'fk_rails_29587cf6a9', using: :btree
 
-  create_table "roles", force: :cascade do |t|
-    t.string   "name",            limit: 255, default: "", null: false
-    t.integer  "parent_id",       limit: 4
-    t.string   "description",     limit: 255, default: "", null: false
-    t.integer  "default_page_id", limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
+  create_table 'roles', force: :cascade do |t|
+    t.string   'name',            limit: 255, default: '', null: false
+    t.integer  'parent_id',       limit: 4
+    t.string   'description',     limit: 255, default: '', null: false
+    t.integer  'default_page_id', limit: 4
+    t.datetime 'created_at'
+    t.datetime 'updated_at'
   end
 
-  add_index "roles", ["default_page_id"], name: "fk_role_default_page_id", using: :btree
-  add_index "roles", ["parent_id"], name: "fk_role_parent_id", using: :btree
+  add_index 'roles', ['default_page_id'], name: 'fk_role_default_page_id', using: :btree
+  add_index 'roles', ['parent_id'], name: 'fk_role_parent_id', using: :btree
 
-  create_table "roles_permissions", force: :cascade do |t|
-    t.integer "role_id",       limit: 4, default: 0, null: false
-    t.integer "permission_id", limit: 4, default: 0, null: false
+  create_table 'roles_permissions', force: :cascade do |t|
+    t.integer 'role_id',       limit: 4, default: 0, null: false
+    t.integer 'permission_id', limit: 4, default: 0, null: false
   end
 
-  add_index "roles_permissions", ["permission_id"], name: "fk_roles_permission_permission_id", using: :btree
-  add_index "roles_permissions", ["role_id"], name: "fk_roles_permission_role_id", using: :btree
+  add_index 'roles_permissions', ['permission_id'], name: 'fk_roles_permission_permission_id', using: :btree
+  add_index 'roles_permissions', ['role_id'], name: 'fk_roles_permission_role_id', using: :btree
 
-  create_table "sample_reviews", force: :cascade do |t|
-    t.integer  "assignment_id", limit: 4
-    t.integer  "response_id",   limit: 4
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+  create_table 'sample_reviews', force: :cascade do |t|
+    t.integer  'assignment_id', limit: 4
+    t.integer  'response_id',   limit: 4
+    t.datetime 'created_at',              null: false
+    t.datetime 'updated_at',              null: false
   end
 
-  create_table "score_views", id: false, force: :cascade do |t|
-    t.integer  "question_weight",       limit: 4
-    t.string   "type",                  limit: 255
-    t.integer  "q1_id",                 limit: 4,     default: 0
-    t.string   "q1_name",               limit: 64
-    t.integer  "q1_instructor_id",      limit: 4,     default: 0
-    t.boolean  "q1_private",                          default: false
-    t.integer  "q1_min_question_score", limit: 4,     default: 0
-    t.integer  "q1_max_question_score", limit: 4
-    t.datetime "q1_created_at"
-    t.datetime "q1_updated_at"
-    t.string   "q1_type",               limit: 255
-    t.string   "q1_display_type",       limit: 255
-    t.integer  "ques_id",               limit: 4,     default: 0,     null: false
-    t.integer  "ques_questionnaire_id", limit: 4
-    t.integer  "s_id",                  limit: 4,     default: 0
-    t.integer  "s_question_id",         limit: 4,     default: 0
-    t.integer  "s_score",               limit: 4
-    t.text     "s_comments",            limit: 65535
-    t.integer  "s_response_id",         limit: 4
+  create_table 'score_views', id: false, force: :cascade do |t|
+    t.integer  'question_weight',       limit: 4
+    t.string   'type',                  limit: 255
+    t.integer  'q1_id',                 limit: 4, default: 0
+    t.string   'q1_name',               limit: 64
+    t.integer  'q1_instructor_id',      limit: 4,     default: 0
+    t.boolean  'q1_private',                          default: false
+    t.integer  'q1_min_question_score', limit: 4,     default: 0
+    t.integer  'q1_max_question_score', limit: 4
+    t.datetime 'q1_created_at'
+    t.datetime 'q1_updated_at'
+    t.string   'q1_type',               limit: 255
+    t.string   'q1_display_type',       limit: 255
+    t.integer  'ques_id',               limit: 4, default: 0, null: false
+    t.integer  'ques_questionnaire_id', limit: 4
+    t.integer  's_id',                  limit: 4,     default: 0
+    t.integer  's_question_id',         limit: 4,     default: 0
+    t.integer  's_score',               limit: 4
+    t.text     's_comments',            limit: 65_535
+    t.integer  's_response_id',         limit: 4
   end
 
-  create_table "sections", force: :cascade do |t|
-    t.string   "name",       limit: 255,   null: false
-    t.text     "desc_text",  limit: 65535
-    t.datetime "created_at"
-    t.datetime "updated_at"
+  create_table 'sections', force: :cascade do |t|
+    t.string   'name',       limit: 255,   null: false
+    t.text     'desc_text',  limit: 65_535
+    t.datetime 'created_at'
+    t.datetime 'updated_at'
   end
 
-  create_table "sessions", force: :cascade do |t|
-    t.string   "session_id", limit: 255,      default: "", null: false
-    t.text     "data",       limit: 16777215
-    t.datetime "created_at"
-    t.datetime "updated_at"
+  create_table 'sessions', force: :cascade do |t|
+    t.string   'session_id', limit: 255,      default: '', null: false
+    t.text     'data',       limit: 16_777_215
+    t.datetime 'created_at'
+    t.datetime 'updated_at'
   end
 
-  add_index "sessions", ["session_id"], name: "index_sessions_on_session_id", using: :btree
-  add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
+  add_index 'sessions', ['session_id'], name: 'index_sessions_on_session_id', using: :btree
+  add_index 'sessions', ['updated_at'], name: 'index_sessions_on_updated_at', using: :btree
 
-  create_table "sign_up_topics", force: :cascade do |t|
-    t.text    "topic_name",       limit: 65535,             null: false
-    t.integer "assignment_id",    limit: 4,     default: 0, null: false
-    t.integer "max_choosers",     limit: 4,     default: 0, null: false
-    t.text    "category",         limit: 65535
-    t.string  "topic_identifier", limit: 10
-    t.integer "micropayment",     limit: 4,     default: 0
-    t.integer "private_to",       limit: 4
-    t.text    "description",      limit: 65535
-    t.string  "link",             limit: 255
+  create_table 'sign_up_topics', force: :cascade do |t|
+    t.text    'topic_name',       limit: 65_535, null: false
+    t.integer 'assignment_id',    limit: 4,     default: 0, null: false
+    t.integer 'max_choosers',     limit: 4,     default: 0, null: false
+    t.text    'category',         limit: 65_535
+    t.string  'topic_identifier', limit: 10
+    t.integer 'micropayment',     limit: 4, default: 0
+    t.integer 'private_to',       limit: 4
+    t.text    'description',      limit: 65_535
+    t.string  'link',             limit: 255
   end
 
-  add_index "sign_up_topics", ["assignment_id"], name: "fk_sign_up_categories_sign_up_topics", using: :btree
-  add_index "sign_up_topics", ["assignment_id"], name: "index_sign_up_topics_on_assignment_id", using: :btree
+  add_index 'sign_up_topics', ['assignment_id'], name: 'fk_sign_up_categories_sign_up_topics', using: :btree
+  add_index 'sign_up_topics', ['assignment_id'], name: 'index_sign_up_topics_on_assignment_id', using: :btree
 
-  create_table "signed_up_teams", force: :cascade do |t|
-    t.integer "topic_id",                   limit: 4, default: 0,     null: false
-    t.integer "team_id",                    limit: 4, default: 0,     null: false
-    t.boolean "is_waitlisted",                        default: false, null: false
-    t.integer "preference_priority_number", limit: 4
+  create_table 'signed_up_teams', force: :cascade do |t|
+    t.integer 'topic_id',                   limit: 4, default: 0,     null: false
+    t.integer 'team_id',                    limit: 4, default: 0,     null: false
+    t.boolean 'is_waitlisted',                        default: false, null: false
+    t.integer 'preference_priority_number', limit: 4
   end
 
-  add_index "signed_up_teams", ["topic_id"], name: "fk_signed_up_users_sign_up_topics", using: :btree
+  add_index 'signed_up_teams', ['topic_id'], name: 'fk_signed_up_users_sign_up_topics', using: :btree
 
-  create_table "site_controllers", force: :cascade do |t|
-    t.string  "name",          limit: 255, default: "", null: false
-    t.integer "permission_id", limit: 4,   default: 0,  null: false
-    t.integer "builtin",       limit: 4,   default: 0
+  create_table 'site_controllers', force: :cascade do |t|
+    t.string  'name',          limit: 255, default: '', null: false
+    t.integer 'permission_id', limit: 4,   default: 0,  null: false
+    t.integer 'builtin',       limit: 4,   default: 0
   end
 
-  add_index "site_controllers", ["permission_id"], name: "fk_site_controller_permission_id", using: :btree
+  add_index 'site_controllers', ['permission_id'], name: 'fk_site_controller_permission_id', using: :btree
 
-  create_table "submission_records", force: :cascade do |t|
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
-    t.text     "type",          limit: 65535
-    t.string   "content",       limit: 255
-    t.string   "operation",     limit: 255
-    t.integer  "team_id",       limit: 4
-    t.string   "user",          limit: 255
-    t.integer  "assignment_id", limit: 4
+  create_table 'submission_records', force: :cascade do |t|
+    t.datetime 'created_at',                  null: false
+    t.datetime 'updated_at',                  null: false
+    t.text     'type',          limit: 65_535
+    t.string   'content',       limit: 255
+    t.string   'operation',     limit: 255
+    t.integer  'team_id',       limit: 4
+    t.string   'user',          limit: 255
+    t.integer  'assignment_id', limit: 4
   end
 
-  create_table "suggestion_comments", force: :cascade do |t|
-    t.text     "comments",           limit: 65535
-    t.string   "commenter",          limit: 255
-    t.string   "vote",               limit: 255
-    t.integer  "suggestion_id",      limit: 4
-    t.datetime "created_at"
-    t.boolean  "visible_to_student",               default: false
+  create_table 'suggestion_comments', force: :cascade do |t|
+    t.text     'comments',           limit: 65_535
+    t.string   'commenter',          limit: 255
+    t.string   'vote',               limit: 255
+    t.integer  'suggestion_id',      limit: 4
+    t.datetime 'created_at'
+    t.boolean  'visible_to_student', default: false
   end
 
-  create_table "suggestions", force: :cascade do |t|
-    t.integer "assignment_id",     limit: 4
-    t.string  "title",             limit: 255
-    t.text    "description",       limit: 65535
-    t.string  "status",            limit: 255
-    t.string  "unityID",           limit: 255
-    t.string  "signup_preference", limit: 255
+  create_table 'suggestions', force: :cascade do |t|
+    t.integer 'assignment_id',     limit: 4
+    t.string  'title',             limit: 255
+    t.text    'description',       limit: 65_535
+    t.string  'status',            limit: 255
+    t.string  'unityID',           limit: 255
+    t.string  'signup_preference', limit: 255
   end
 
-  create_table "survey_deployments", force: :cascade do |t|
-    t.integer  "questionnaire_id", limit: 4
-    t.datetime "start_date"
-    t.datetime "end_date"
-    t.datetime "last_reminder"
-    t.integer  "parent_id",        limit: 4,   default: 0, null: false
-    t.integer  "global_survey_id", limit: 4
-    t.string   "type",             limit: 255
+  create_table 'survey_deployments', force: :cascade do |t|
+    t.integer  'questionnaire_id', limit: 4
+    t.datetime 'start_date'
+    t.datetime 'end_date'
+    t.datetime 'last_reminder'
+    t.integer  'parent_id',        limit: 4, default: 0, null: false
+    t.integer  'global_survey_id', limit: 4
+    t.string   'type',             limit: 255
   end
 
-  add_index "survey_deployments", ["questionnaire_id"], name: "fk_rails_7c62b6ef2b", using: :btree
+  add_index 'survey_deployments', ['questionnaire_id'], name: 'fk_rails_7c62b6ef2b', using: :btree
 
-  create_table "system_settings", force: :cascade do |t|
-    t.string  "site_name",                 limit: 255, default: "", null: false
-    t.string  "site_subtitle",             limit: 255
-    t.string  "footer_message",            limit: 255, default: ""
-    t.integer "public_role_id",            limit: 4,   default: 0,  null: false
-    t.integer "session_timeout",           limit: 4,   default: 0,  null: false
-    t.integer "default_markup_style_id",   limit: 4,   default: 0
-    t.integer "site_default_page_id",      limit: 4,   default: 0,  null: false
-    t.integer "not_found_page_id",         limit: 4,   default: 0,  null: false
-    t.integer "permission_denied_page_id", limit: 4,   default: 0,  null: false
-    t.integer "session_expired_page_id",   limit: 4,   default: 0,  null: false
-    t.integer "menu_depth",                limit: 4,   default: 0,  null: false
+  create_table 'system_settings', force: :cascade do |t|
+    t.string  'site_name',                 limit: 255, default: '', null: false
+    t.string  'site_subtitle',             limit: 255
+    t.string  'footer_message',            limit: 255, default: ''
+    t.integer 'public_role_id',            limit: 4,   default: 0,  null: false
+    t.integer 'session_timeout',           limit: 4,   default: 0,  null: false
+    t.integer 'default_markup_style_id',   limit: 4,   default: 0
+    t.integer 'site_default_page_id',      limit: 4,   default: 0,  null: false
+    t.integer 'not_found_page_id',         limit: 4,   default: 0,  null: false
+    t.integer 'permission_denied_page_id', limit: 4,   default: 0,  null: false
+    t.integer 'session_expired_page_id',   limit: 4,   default: 0,  null: false
+    t.integer 'menu_depth',                limit: 4,   default: 0,  null: false
   end
 
-  add_index "system_settings", ["not_found_page_id"], name: "fk_system_settings_not_found_page_id", using: :btree
-  add_index "system_settings", ["permission_denied_page_id"], name: "fk_system_settings_permission_denied_page_id", using: :btree
-  add_index "system_settings", ["public_role_id"], name: "fk_system_settings_public_role_id", using: :btree
-  add_index "system_settings", ["session_expired_page_id"], name: "fk_system_settings_session_expired_page_id", using: :btree
-  add_index "system_settings", ["site_default_page_id"], name: "fk_system_settings_site_default_page_id", using: :btree
+  add_index 'system_settings', ['not_found_page_id'], name: 'fk_system_settings_not_found_page_id', using: :btree
+  add_index 'system_settings', ['permission_denied_page_id'], name: 'fk_system_settings_permission_denied_page_id', using: :btree
+  add_index 'system_settings', ['public_role_id'], name: 'fk_system_settings_public_role_id', using: :btree
+  add_index 'system_settings', ['session_expired_page_id'], name: 'fk_system_settings_session_expired_page_id', using: :btree
+  add_index 'system_settings', ['site_default_page_id'], name: 'fk_system_settings_site_default_page_id', using: :btree
 
-  create_table "ta_mappings", force: :cascade do |t|
-    t.integer "ta_id",     limit: 4
-    t.integer "course_id", limit: 4
+  create_table 'ta_mappings', force: :cascade do |t|
+    t.integer 'ta_id',     limit: 4
+    t.integer 'course_id', limit: 4
   end
 
-  add_index "ta_mappings", ["course_id"], name: "fk_ta_mappings_course_id", using: :btree
-  add_index "ta_mappings", ["ta_id"], name: "fk_ta_mappings_ta_id", using: :btree
+  add_index 'ta_mappings', ['course_id'], name: 'fk_ta_mappings_course_id', using: :btree
+  add_index 'ta_mappings', ['ta_id'], name: 'fk_ta_mappings_ta_id', using: :btree
 
-  create_table "tag_prompt_deployments", force: :cascade do |t|
-    t.integer  "tag_prompt_id",           limit: 4
-    t.integer  "assignment_id",           limit: 4
-    t.integer  "questionnaire_id",        limit: 4
-    t.string   "question_type",           limit: 255
-    t.integer  "answer_length_threshold", limit: 4
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
+  create_table 'tag_prompt_deployments', force: :cascade do |t|
+    t.integer  'tag_prompt_id',           limit: 4
+    t.integer  'assignment_id',           limit: 4
+    t.integer  'questionnaire_id',        limit: 4
+    t.string   'question_type',           limit: 255
+    t.integer  'answer_length_threshold', limit: 4
+    t.datetime 'created_at',                          null: false
+    t.datetime 'updated_at',                          null: false
   end
 
-  add_index "tag_prompt_deployments", ["assignment_id"], name: "index_tag_prompt_deployments_on_assignment_id", using: :btree
-  add_index "tag_prompt_deployments", ["questionnaire_id"], name: "index_tag_prompt_deployments_on_questionnaire_id", using: :btree
-  add_index "tag_prompt_deployments", ["tag_prompt_id"], name: "index_tag_prompt_deployments_on_tag_prompt_id", using: :btree
+  add_index 'tag_prompt_deployments', ['assignment_id'], name: 'index_tag_prompt_deployments_on_assignment_id', using: :btree
+  add_index 'tag_prompt_deployments', ['questionnaire_id'], name: 'index_tag_prompt_deployments_on_questionnaire_id', using: :btree
+  add_index 'tag_prompt_deployments', ['tag_prompt_id'], name: 'index_tag_prompt_deployments_on_tag_prompt_id', using: :btree
 
-  create_table "tag_prompts", force: :cascade do |t|
-    t.string   "prompt",       limit: 255
-    t.string   "desc",         limit: 255
-    t.string   "control_type", limit: 255
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+  create_table 'tag_prompts', force: :cascade do |t|
+    t.string   'prompt',       limit: 255
+    t.string   'desc',         limit: 255
+    t.string   'control_type', limit: 255
+    t.datetime 'created_at',               null: false
+    t.datetime 'updated_at',               null: false
   end
 
-  create_table "teams", force: :cascade do |t|
-    t.string  "name",                       limit: 255
-    t.integer "parent_id",                  limit: 4
-    t.string  "type",                       limit: 255
-    t.text    "comments_for_advertisement", limit: 65535
-    t.boolean "advertise_for_partner"
-    t.text    "submitted_hyperlinks",       limit: 65535
-    t.integer "directory_num",              limit: 4
-    t.integer "grade_for_submission",       limit: 4
-    t.text    "comment_for_submission",     limit: 65535
-    t.boolean "make_public",                              default: false
+  create_table 'teams', force: :cascade do |t|
+    t.string  'name',                       limit: 255
+    t.integer 'parent_id',                  limit: 4
+    t.string  'type',                       limit: 255
+    t.text    'comments_for_advertisement', limit: 65_535
+    t.boolean 'advertise_for_partner'
+    t.text    'submitted_hyperlinks',       limit: 65_535
+    t.integer 'directory_num',              limit: 4
+    t.integer 'grade_for_submission',       limit: 4
+    t.text    'comment_for_submission',     limit: 65_535
+    t.boolean 'make_public', default: false
   end
 
-  create_table "teams_users", force: :cascade do |t|
-    t.integer "team_id", limit: 4
-    t.integer "user_id", limit: 4
-    t.integer "duty_id", limit: 4
+  create_table 'teams_users', force: :cascade do |t|
+    t.integer 'team_id', limit: 4
+    t.integer 'user_id', limit: 4
+    t.integer 'duty_id', limit: 4
   end
 
-  add_index "teams_users", ["duty_id"], name: "index_teams_users_on_duty_id", using: :btree
-  add_index "teams_users", ["team_id"], name: "fk_users_teams", using: :btree
-  add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
+  add_index 'teams_users', ['duty_id'], name: 'index_teams_users_on_duty_id', using: :btree
+  add_index 'teams_users', ['team_id'], name: 'fk_users_teams', using: :btree
+  add_index 'teams_users', ['user_id'], name: 'fk_teams_users', using: :btree
 
-  create_table "track_notifications", force: :cascade do |t|
-    t.integer  "user_id",         limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "notification_id", limit: 4, null: false
+  create_table 'track_notifications', force: :cascade do |t|
+    t.integer  'user_id', limit: 4
+    t.datetime 'created_at'
+    t.datetime 'updated_at'
+    t.integer  'notification_id', limit: 4, null: false
   end
 
-  add_index "track_notifications", ["notification_id"], name: "notification_id", using: :btree
-  add_index "track_notifications", ["user_id"], name: "user_id", using: :btree
+  add_index 'track_notifications', ['notification_id'], name: 'notification_id', using: :btree
+  add_index 'track_notifications', ['user_id'], name: 'user_id', using: :btree
 
-  create_table "tree_folders", force: :cascade do |t|
-    t.string  "name",       limit: 255
-    t.string  "child_type", limit: 255
-    t.integer "parent_id",  limit: 4
+  create_table 'tree_folders', force: :cascade do |t|
+    t.string  'name',       limit: 255
+    t.string  'child_type', limit: 255
+    t.integer 'parent_id',  limit: 4
   end
 
-  create_table "user_pastebins", force: :cascade do |t|
-    t.integer  "user_id",    limit: 4
-    t.string   "short_form", limit: 255
-    t.text     "long_form",  limit: 65535
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+  create_table 'user_pastebins', force: :cascade do |t|
+    t.integer  'user_id',    limit: 4
+    t.string   'short_form', limit: 255
+    t.text     'long_form',  limit: 65_535
+    t.datetime 'created_at',               null: false
+    t.datetime 'updated_at',               null: false
   end
 
-  create_table "users", force: :cascade do |t|
-    t.string  "name",                      limit: 255,      default: "",    null: false
-    t.string  "crypted_password",          limit: 40,       default: "",    null: false
-    t.integer "role_id",                   limit: 4,        default: 0,     null: false
-    t.string  "password_salt",             limit: 255
-    t.string  "fullname",                  limit: 255
-    t.string  "email",                     limit: 255
-    t.integer "parent_id",                 limit: 4
-    t.boolean "private_by_default",                         default: false
-    t.string  "mru_directory_path",        limit: 128
-    t.boolean "email_on_review"
-    t.boolean "email_on_submission"
-    t.boolean "email_on_review_of_review"
-    t.boolean "is_new_user",                                default: true,  null: false
-    t.integer "master_permission_granted", limit: 1,        default: 0
-    t.string  "handle",                    limit: 255
-    t.text    "digital_certificate",       limit: 16777215
-    t.string  "persistence_token",         limit: 255
-    t.string  "timezonepref",              limit: 255
-    t.text    "public_key",                limit: 16777215
-    t.boolean "copy_of_emails",                             default: false
-    t.integer "institution_id",            limit: 4
-    t.boolean "preference_home_flag",                       default: true
-    t.integer "locale",                    limit: 4,        default: 0
+  create_table 'users', force: :cascade do |t|
+    t.string  'name',                      limit: 255,      default: '',    null: false
+    t.string  'crypted_password',          limit: 40,       default: '',    null: false
+    t.integer 'role_id',                   limit: 4,        default: 0,     null: false
+    t.string  'password_salt',             limit: 255
+    t.string  'fullname',                  limit: 255
+    t.string  'email',                     limit: 255
+    t.integer 'parent_id',                 limit: 4
+    t.boolean 'private_by_default', default: false
+    t.string  'mru_directory_path', limit: 128
+    t.boolean 'email_on_review'
+    t.boolean 'email_on_submission'
+    t.boolean 'email_on_review_of_review'
+    t.boolean 'is_new_user',                                default: true, null: false
+    t.integer 'master_permission_granted', limit: 1,        default: 0
+    t.string  'handle',                    limit: 255
+    t.text    'digital_certificate',       limit: 16_777_215
+    t.string  'persistence_token',         limit: 255
+    t.string  'timezonepref',              limit: 255
+    t.text    'public_key',                limit: 16_777_215
+    t.boolean 'copy_of_emails', default: false
+    t.integer 'institution_id', limit: 4
+    t.boolean 'preference_home_flag', default: true
+    t.integer 'locale', limit: 4, default: 0
   end
 
-  add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree
+  add_index 'users', ['role_id'], name: 'fk_user_role_id', using: :btree
 
-  create_table "versions", force: :cascade do |t|
-    t.string   "item_type",  limit: 255,      null: false
-    t.integer  "item_id",    limit: 4,        null: false
-    t.string   "event",      limit: 255,      null: false
-    t.string   "whodunnit",  limit: 255
-    t.text     "object",     limit: 16777215
-    t.datetime "created_at"
+  create_table 'versions', force: :cascade do |t|
+    t.string   'item_type',  limit: 255,      null: false
+    t.integer  'item_id',    limit: 4,        null: false
+    t.string   'event',      limit: 255,      null: false
+    t.string   'whodunnit',  limit: 255
+    t.text     'object',     limit: 16_777_215
+    t.datetime 'created_at'
   end
 
-  add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
+  add_index 'versions', %w[item_type item_id], name: 'index_versions_on_item_type_and_item_id', using: :btree
 
-  add_foreign_key "answer_tags", "answers"
-  add_foreign_key "answer_tags", "tag_prompt_deployments"
-  add_foreign_key "answer_tags", "users"
-  add_foreign_key "answers", "questions", name: "fk_score_questions"
-  add_foreign_key "answers", "responses", name: "fk_score_response"
-  add_foreign_key "assignment_badges", "assignments"
-  add_foreign_key "assignment_badges", "badges"
-  add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
-  add_foreign_key "assignment_questionnaires", "duties"
-  add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
-  add_foreign_key "assignments", "assignments", column: "sample_assignment_id"
-  add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
-  add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
-  add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
-  add_foreign_key "awarded_badges", "badges"
-  add_foreign_key "awarded_badges", "participants"
-  add_foreign_key "courses", "users", column: "instructor_id", name: "fk_course_users"
-  add_foreign_key "due_dates", "deadline_rights", column: "review_allowed_id", name: "fk_due_date_review_allowed"
-  add_foreign_key "due_dates", "deadline_rights", column: "review_of_review_allowed_id", name: "fk_due_date_review_of_review_allowed"
-  add_foreign_key "due_dates", "deadline_rights", column: "submission_allowed_id", name: "fk_due_date_submission_allowed"
-  add_foreign_key "due_dates", "deadline_types", name: "fk_deadline_type_due_date"
-  add_foreign_key "duties", "assignments"
-  add_foreign_key "invitations", "assignments", name: "fk_invitation_assignments"
-  add_foreign_key "invitations", "users", column: "from_id", name: "fk_invitationfrom_users"
-  add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"
-  add_foreign_key "late_policies", "users", column: "instructor_id", name: "fk_instructor_id"
-  add_foreign_key "locks", "users"
-  add_foreign_key "participants", "duties"
-  add_foreign_key "participants", "users", name: "fk_participant_users"
-  add_foreign_key "plagiarism_checker_assignment_submissions", "assignments"
-  add_foreign_key "plagiarism_checker_comparisons", "plagiarism_checker_assignment_submissions"
-  add_foreign_key "question_advices", "questions", name: "fk_question_question_advices"
-  add_foreign_key "questions", "questionnaires", name: "fk_question_questionnaires"
-  add_foreign_key "resubmission_times", "participants", name: "fk_resubmission_times_participants"
-  add_foreign_key "review_bids", "assignments"
-  add_foreign_key "review_bids", "participants"
-  add_foreign_key "review_bids", "sign_up_topics", column: "signuptopic_id"
-  add_foreign_key "review_bids", "users"
-  add_foreign_key "review_comment_paste_bins", "review_grades"
-  add_foreign_key "review_grades", "participants"
-  add_foreign_key "sign_up_topics", "assignments", name: "fk_sign_up_topics_assignments"
-  add_foreign_key "signed_up_teams", "sign_up_topics", column: "topic_id", name: "fk_signed_up_users_sign_up_topics"
-  add_foreign_key "survey_deployments", "questionnaires"
-  add_foreign_key "ta_mappings", "courses", name: "fk_ta_mappings_course_id"
-  add_foreign_key "ta_mappings", "users", column: "ta_id", name: "fk_ta_mappings_ta_id"
-  add_foreign_key "tag_prompt_deployments", "assignments"
-  add_foreign_key "tag_prompt_deployments", "questionnaires"
-  add_foreign_key "tag_prompt_deployments", "tag_prompts"
-  add_foreign_key "teams_users", "duties"
-  add_foreign_key "teams_users", "teams", name: "fk_users_teams"
-  add_foreign_key "teams_users", "users", name: "fk_teams_users"
+  add_foreign_key 'answer_tags', 'answers'
+  add_foreign_key 'answer_tags', 'tag_prompt_deployments'
+  add_foreign_key 'answer_tags', 'users'
+  add_foreign_key 'answers', 'questions', name: 'fk_score_questions'
+  add_foreign_key 'answers', 'responses', name: 'fk_score_response'
+  add_foreign_key 'assignment_badges', 'assignments'
+  add_foreign_key 'assignment_badges', 'badges'
+  add_foreign_key 'assignment_questionnaires', 'assignments', name: 'fk_aq_assignments_id'
+  add_foreign_key 'assignment_questionnaires', 'duties'
+  add_foreign_key 'assignment_questionnaires', 'questionnaires', name: 'fk_aq_questionnaire_id'
+  add_foreign_key 'assignments', 'assignments', column: 'sample_assignment_id'
+  add_foreign_key 'assignments', 'late_policies', name: 'fk_late_policy_id'
+  add_foreign_key 'assignments', 'users', column: 'instructor_id', name: 'fk_assignments_instructors'
+  add_foreign_key 'automated_metareviews', 'responses', name: 'fk_automated_metareviews_responses_id'
+  add_foreign_key 'awarded_badges', 'badges'
+  add_foreign_key 'awarded_badges', 'participants'
+  add_foreign_key 'courses', 'users', column: 'instructor_id', name: 'fk_course_users'
+  add_foreign_key 'due_dates', 'deadline_rights', column: 'review_allowed_id', name: 'fk_due_date_review_allowed'
+  add_foreign_key 'due_dates', 'deadline_rights', column: 'review_of_review_allowed_id', name: 'fk_due_date_review_of_review_allowed'
+  add_foreign_key 'due_dates', 'deadline_rights', column: 'submission_allowed_id', name: 'fk_due_date_submission_allowed'
+  add_foreign_key 'due_dates', 'deadline_types', name: 'fk_deadline_type_due_date'
+  add_foreign_key 'duties', 'assignments'
+  add_foreign_key 'invitations', 'assignments', name: 'fk_invitation_assignments'
+  add_foreign_key 'invitations', 'users', column: 'from_id', name: 'fk_invitationfrom_users'
+  add_foreign_key 'invitations', 'users', column: 'to_id', name: 'fk_invitationto_users'
+  add_foreign_key 'late_policies', 'users', column: 'instructor_id', name: 'fk_instructor_id'
+  add_foreign_key 'locks', 'users'
+  add_foreign_key 'participants', 'duties'
+  add_foreign_key 'participants', 'users', name: 'fk_participant_users'
+  add_foreign_key 'plagiarism_checker_assignment_submissions', 'assignments'
+  add_foreign_key 'plagiarism_checker_comparisons', 'plagiarism_checker_assignment_submissions'
+  add_foreign_key 'question_advices', 'questions', name: 'fk_question_question_advices'
+  add_foreign_key 'questions', 'questionnaires', name: 'fk_question_questionnaires'
+  add_foreign_key 'resubmission_times', 'participants', name: 'fk_resubmission_times_participants'
+  add_foreign_key 'review_bids', 'assignments'
+  add_foreign_key 'review_bids', 'participants'
+  add_foreign_key 'review_bids', 'sign_up_topics', column: 'signuptopic_id'
+  add_foreign_key 'review_bids', 'users'
+  add_foreign_key 'review_comment_paste_bins', 'review_grades'
+  add_foreign_key 'review_grades', 'participants'
+  add_foreign_key 'sign_up_topics', 'assignments', name: 'fk_sign_up_topics_assignments'
+  add_foreign_key 'signed_up_teams', 'sign_up_topics', column: 'topic_id', name: 'fk_signed_up_users_sign_up_topics'
+  add_foreign_key 'survey_deployments', 'questionnaires'
+  add_foreign_key 'ta_mappings', 'courses', name: 'fk_ta_mappings_course_id'
+  add_foreign_key 'ta_mappings', 'users', column: 'ta_id', name: 'fk_ta_mappings_ta_id'
+  add_foreign_key 'tag_prompt_deployments', 'assignments'
+  add_foreign_key 'tag_prompt_deployments', 'questionnaires'
+  add_foreign_key 'tag_prompt_deployments', 'tag_prompts'
+  add_foreign_key 'teams_users', 'duties'
+  add_foreign_key 'teams_users', 'teams', name: 'fk_users_teams'
+  add_foreign_key 'teams_users', 'users', name: 'fk_teams_users'
 end

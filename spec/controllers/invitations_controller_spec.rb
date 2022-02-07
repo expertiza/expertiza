@@ -6,9 +6,9 @@ describe InvitationsController do
   let(:ta) { build(:teaching_assistant, id: 8) }
   let(:invitation) { build(:invitation) }
   let(:participant) { build(:participant, id: 1) }
-  let(:assignment) { build(:assignment, id: 2, is_conference_assignment: 1, max_team_size:100) }
-  let(:assignment2) { build(:assignment, id: 2, is_conference_assignment: 0, max_team_size:100) }
-  let(:teamUser) { build(:team_user, id:3) }
+  let(:assignment) { build(:assignment, id: 2, is_conference_assignment: 1, max_team_size: 100) }
+  let(:assignment2) { build(:assignment, id: 2, is_conference_assignment: 0, max_team_size: 100) }
+  let(:teamUser) { build(:team_user, id: 3) }
   let(:team) { build(:team, id: 3) }
   describe '#action_allowed?' do
     context 'when current user is student' do
@@ -47,65 +47,61 @@ describe InvitationsController do
       allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       params = {
-          user: {name: 'student@gmail.com', email: 'student@gmail.com'},
-          student_id: 1
+        user: { name: 'student@gmail.com', email: 'student@gmail.com' },
+        student_id: 1
       }
-      session = {user: student}
+      session = { user: student }
 
-      expect{post :create, params, session}.to change(Invitation, :count).by(1).and change(User, :count).by(0)
-
+      expect { post :create, params, session }.to change(Invitation, :count).by(1).and change(User, :count).by(0)
     end
 
-  
-    it 'invitation added for new user who does not have an expertiza account yet and sends an invitation' do 
+    it 'invitation added for new user who does not have an expertiza account yet and sends an invitation' do
       params = {
-          user: {name: 'testuser@gmail.com',
+        user: { name: 'testuser@gmail.com',
                 parent_id: 1,
-                institution_id: 1},
-          student_id: 1,
-          team_id: 1
+                institution_id: 1 },
+        student_id: 1,
+        team_id: 1
       }
       allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
-      allow(TeamsUser).to receive(:find).with("1").and_return(teamUser)
-      allow(Team).to receive(:find).with("1").and_return(team)
-      session = {user: student1}
-      expect{post :create, params, session}.to change(Invitation, :count).by(1).and change(User, :count).by(1)
+      allow(TeamsUser).to receive(:find).with('1').and_return(teamUser)
+      allow(Team).to receive(:find).with('1').and_return(team)
+      session = { user: student1 }
+      expect { post :create, params, session }.to change(Invitation, :count).by(1).and change(User, :count).by(1)
     end
 
     it 'invitation not added for new user if entered email has incorrect format' do
       params = {
-          user: {name: 'testuser',
+        user: { name: 'testuser',
                 parent_id: 1,
-                institution_id: 1},
-          student_id: 1,
-          team_id: 1
+                institution_id: 1 },
+        student_id: 1,
+        team_id: 1
       }
       allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
-      allow(TeamsUser).to receive(:find).with("1").and_return(teamUser)
-      allow(Team).to receive(:find).with("1").and_return(team)
-      session = {user: student1}
-      expect{post :create, params, session}.to change(Invitation, :count).by(0).and change(User, :count).by(0)
+      allow(TeamsUser).to receive(:find).with('1').and_return(teamUser)
+      allow(Team).to receive(:find).with('1').and_return(team)
+      session = { user: student1 }
+      expect { post :create, params, session }.to change(Invitation, :count).by(0).and change(User, :count).by(0)
     end
 
     it 'invitation and user not added for new user with normal assignment' do
       params = {
-          user: {name: 'testuser@gmail.com',
-                email: 'testuser@gmail.com',
-                },
-          student_id: 1,
-          team_id: 1
+        user: { name: 'testuser@gmail.com',
+                email: 'testuser@gmail.com' },
+        student_id: 1,
+        team_id: 1
       }
       allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
       allow(Assignment).to receive(:find).with(1).and_return(assignment2)
-      allow(TeamsUser).to receive(:find).with("1").and_return(teamUser)
-      allow(Team).to receive(:find).with("1").and_return(team)
-      session = {user: student1}
-      expect{post :create, params, session}.to change(Invitation, :count).by(0).and change(User, :count).by(0)
+      allow(TeamsUser).to receive(:find).with('1').and_return(teamUser)
+      allow(Team).to receive(:find).with('1').and_return(team)
+      session = { user: student1 }
+      expect { post :create, params, session }.to change(Invitation, :count).by(0).and change(User, :count).by(0)
       expect(flash[:error]).to eq 'The user "testuser@gmail.com" does not exist. Please make sure the name entered is correct.'
     end
-
   end
   describe '#create' do
     it 'creates a new Invitation object' do
@@ -116,8 +112,8 @@ describe InvitationsController do
   describe '#accept' do
     it 'accepts the invite' do
       allow(Invitation).to receive(:find).with('1').and_return(invitation)
-      params = {team_id: 1, inv_id: 1}
-      session = {user: instructor}
+      params = { team_id: 1, inv_id: 1 }
+      session = { user: instructor }
       get :accept, params, session
       expect(flash[:error]).to eq 'The team that invited you does not exist anymore.'
       expect(response).to redirect_to('/student_teams/view')
@@ -128,8 +124,8 @@ describe InvitationsController do
     it ' declines the invite' do
       allow(Invitation).to receive(:find).with('1').and_return(invitation)
       allow(Participant).to receive(:find).with(student.id).and_return(student)
-      params = {student_id: student.id, inv_id: 1}
-      session = {user: instructor}
+      params = { student_id: student.id, inv_id: 1 }
+      session = { user: instructor }
       get :decline, params, session
       expect(response).to redirect_to('/student_teams/view')
     end
@@ -139,8 +135,8 @@ describe InvitationsController do
     it 'cancels the invite' do
       allow(Invitation).to receive(:find).with('1').and_return(invitation)
       allow(invitation).to receive(:destroy).and_return(true)
-      params = {inv_id: 1, student_id: student.id}
-      session = {user: instructor}
+      params = { inv_id: 1, student_id: student.id }
+      session = { user: instructor }
       get :cancel, params, session
       expect(response).to redirect_to('/student_teams/view')
     end

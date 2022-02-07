@@ -415,18 +415,17 @@ jQuery(document).ready(function() {
       var nodeTypeRaw = this.props.id.split('_')[0]
       var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length - 4).toLowerCase()
       var id = this.props.id.split('_')[1]
-      var institution_name = '-'
+      if (this.props.dataType == 'course') {
+        var institution_name = '-'
         if (typeof this.props.institution !== 'undefined' && this.props.institution.length != 0) {
           institution_name = this.props.institution[0].name
         }
         return (
           <tr id={this.props.id}>
             <td width={colWidthArray[0]}>{this.props.name}</td>
-            {this.props.dataType == 'course' && (
-              <td style={colDisplayStyle} width={colWidthArray[3]}>
-                {institution_name}
-              </td>
-            )}
+            <td style={colDisplayStyle} width={colWidthArray[3]}>
+              {institution_name}
+            </td>
             <td width={colWidthArray[4]} dangerouslySetInnerHTML={{ __html: creation_date }} />
             <td width={colWidthArray[5]} dangerouslySetInnerHTML={{ __html: updated_date }} />
             <td width={colWidthArray[6]}>
@@ -449,6 +448,33 @@ jQuery(document).ready(function() {
             </td>
           </tr>
         )
+      } else {
+        return (
+          <tr id={this.props.id}>
+            <td width={colWidthArray[0]}>{this.props.name}</td>
+            <td width={colWidthArray[4]} dangerouslySetInnerHTML={{ __html: creation_date }} />
+            <td width={colWidthArray[5]} dangerouslySetInnerHTML={{ __html: updated_date }} />
+            <td width={colWidthArray[6]}>
+              <RowAction
+                actions={this.props.actions}
+                key={'simpleTable_' + this.props.id}
+                nodeType={nodeType}
+                parent_name={this.props.name}
+                private={this.props.private}
+                is_available={this.props.is_available}
+                course_id={this.props.course_id}
+                max_team_size={this.props.max_team_size}
+                is_intelligent={this.props.is_intelligent}
+                require_quiz={this.props.require_quiz}
+                allow_suggestions={this.props.allow_suggestions}
+                has_topic={this.props.has_topic}
+                id={id}
+                instructor_id={this.props.instructor_id}
+              />
+            </td>
+          </tr>
+        )
+      }
     }
   })
 
@@ -574,7 +600,7 @@ jQuery(document).ready(function() {
     },
     componentDidMount: function() {
       // this buffer holds the title for all of the rubric types under the Questionnaire tab
-      let rubricBuffer = [
+      rubricBuffer = [
         'Review',
         'Metareview',
         'Author Feedback',
@@ -586,8 +612,8 @@ jQuery(document).ready(function() {
 
       //selectedMenuItem then takes the clicked rubric from the panel under questionnaire
       //selectedMenuItemIndex finds the corresponding index of the click rubric from the above buffer
-      let selectedMenuItem = document.getElementById('tree_display').getAttribute('data-menu-item')
-      let selectedMenuItemIndex = rubricBuffer.indexOf(selectedMenuItem)
+      selectedMenuItem = document.getElementById('tree_display').getAttribute('data-menu-item')
+      selectedMenuItemIndex = rubricBuffer.indexOf(selectedMenuItem)
 
       if (selectedMenuItemIndex !== -1) {
         if (rubricBuffer[selectedMenuItemIndex] === this.props.name) {
@@ -604,6 +630,7 @@ jQuery(document).ready(function() {
       }
     },
     handleClick: function(event) {
+      //alert('click');
 
       if (event.target.type != 'button') {
         this.setState(
@@ -635,8 +662,8 @@ jQuery(document).ready(function() {
         colWidthArray = [ '20%', '0%', '0%', '20%', '20%', '20%', '20%' ]
       }
       if (this.props.creation_date && this.props.updated_date) {
-        let creation = this.props.creation_date
-        let updated = this.props.updated_date
+        creation = this.props.creation_date
+        updated = this.props.updated_date
 
         creation_date = formatDate(new Date(creation))
         updated_date = formatDate(new Date(updated))
@@ -644,48 +671,82 @@ jQuery(document).ready(function() {
       var nodeTypeRaw = this.props.id.split('_')[0]
       var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length - 4).toLowerCase()
       var id = this.props.id.split('_')[1]
-      var institution_name = '-'
-      if (typeof this.props.institution !== 'undefined' && this.props.institution.length != 0) {
-        institution_name = this.props.institution[0].name
-      }
-      return (
-        <tr onClick={this.handleClick} id={this.props.id}>
-          <td width={colWidthArray[0]}>{this.props.name}</td>
-          {this.props.dataType === 'course' && (
+      if (this.props.dataType == 'course') {
+        var institution_name = '-'
+        if (typeof this.props.institution !== 'undefined' && this.props.institution.length != 0) {
+          institution_name = this.props.institution[0].name
+        }
+        return (
+          <tr onClick={this.handleClick} id={this.props.id}>
+            <td width={colWidthArray[0]}>{this.props.name}</td>
             <td style={colDisplayStyle} width={colWidthArray[3]}>
               {institution_name}
             </td>
-          )}
-          <td
-            style={colDisplayStyle}
-            width={colWidthArray[4]}
-            dangerouslySetInnerHTML={{ __html: creation_date }}
-          />
-          <td
-            style={colDisplayStyle}
-            width={colWidthArray[5]}
-            dangerouslySetInnerHTML={{ __html: updated_date }}
-          />
-          <td width={colWidthArray[6]}>
-            <RowAction
-              actions={this.props.actions}
-              key={this.props.id}
-              nodeType={nodeType}
-              parent_name={this.props.name}
-              private={this.props.private}
-              is_available={this.props.is_available}
-              course_id={this.props.course_id}
-              max_team_size={this.props.max_team_size}
-              is_intelligent={this.props.is_intelligent}
-              require_quiz={this.props.require_quiz}
-              allow_suggestions={this.props.allow_suggestions}
-              has_topic={this.props.has_topic}
-              dataType={this.props.dataType}
-              id={id}
+            <td
+              style={colDisplayStyle}
+              width={colWidthArray[4]}
+              dangerouslySetInnerHTML={{ __html: creation_date }}
             />
-          </td>
-        </tr>
-      )
+            <td
+              style={colDisplayStyle}
+              width={colWidthArray[5]}
+              dangerouslySetInnerHTML={{ __html: updated_date }}
+            />
+            <td width={colWidthArray[6]}>
+              <RowAction
+                actions={this.props.actions}
+                key={this.props.id}
+                nodeType={nodeType}
+                parent_name={this.props.name}
+                private={this.props.private}
+                is_available={this.props.is_available}
+                course_id={this.props.course_id}
+                max_team_size={this.props.max_team_size}
+                is_intelligent={this.props.is_intelligent}
+                require_quiz={this.props.require_quiz}
+                allow_suggestions={this.props.allow_suggestions}
+                has_topic={this.props.has_topic}
+                dataType={this.props.dataType}
+                id={id}
+              />
+            </td>
+          </tr>
+        )
+      } else {
+        return (
+          <tr onClick={this.handleClick} id={this.props.id}>
+            <td width={colWidthArray[0]}>{this.props.name}</td>
+            <td
+              style={colDisplayStyle}
+              width={colWidthArray[4]}
+              dangerouslySetInnerHTML={{ __html: creation_date }}
+            />
+            <td
+              style={colDisplayStyle}
+              width={colWidthArray[5]}
+              dangerouslySetInnerHTML={{ __html: updated_date }}
+            />
+            <td width={colWidthArray[6]}>
+              <RowAction
+                actions={this.props.actions}
+                key={this.props.id}
+                nodeType={nodeType}
+                parent_name={this.props.name}
+                private={this.props.private}
+                is_available={this.props.is_available}
+                course_id={this.props.course_id}
+                max_team_size={this.props.max_team_size}
+                is_intelligent={this.props.is_intelligent}
+                require_quiz={this.props.require_quiz}
+                allow_suggestions={this.props.allow_suggestions}
+                has_topic={this.props.has_topic}
+                dataType={this.props.dataType}
+                id={id}
+              />
+            </td>
+          </tr>
+        )
+      }
     }
   })
 
@@ -751,7 +812,6 @@ jQuery(document).ready(function() {
             placeholder="Search..."
             value={this.props.filterText}
             ref="filterTextInput"
-            className="form-control"
             onChange={this.handleChange}
           />
         </span>
@@ -775,70 +835,10 @@ jQuery(document).ready(function() {
             ref="filterCheckbox"
             onChange={this.handleChange}
           >
-            {" Include others' " + this.props.dataType + "s"}
+            {" Include others' items"}
           </input>
         </span>
       )
-    }
-  })
-  /* Add datepicker for advanced search in course and assignment*/
-  var DatePicker = React.createClass({
-    render: function() {
-      var formStyle = {
-        margin: 0,
-        padding: 0,
-        display: this.props.dataType === 'questionnaire' ? 'none' : 'inline'
-      }
-      return (
-          <span
-              style={formStyle}
-              date={this.props.date}
-              onChange={this.props.onChange}
-          >
-              {this.props.title}
-              <input
-                  className="form-control"
-                  type="date"
-                  id={this.props.inputId}
-              />
-          </span>
-      );
-    }
-  });
-  /* The function for controlling the searching date in advance search
-   * Have create date and updated date two choice
-   */
-  var AdditionalSearchDropDown = React.createClass({
-    render: function() {
-      return (
-          <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'center' }}>
-            <select
-                value={this.props.selectValue}
-                onChange={this.props.onChange}
-                className="form-control"
-            >
-              <option value="empty">----------</option>
-              <option value="created_date">Created Date Filter</option>
-              <option value="updated_date">Updated Date Filter</option>
-            </select>
-          </div>
-      );
-    }
-  });
-  /* The function will response for the checkbox "require a quiz"
-   * in advanced search in course and assignment*/
-  var HASQUIZ_TOGGLE = React.createClass({
-    render: function() {
-      return (
-        <span
-            style={{"display": (this.props.dataType === 'questionnaire' ? "none" : "")}}
-            has_quiz_var={this.props.has_quiz_var}
-            onChange={this.props.onChange}>
-          <div class="checkbox">
-            <input type="checkbox" id="has_quiz_var" value="">Require a Quiz</input>
-          </div>
-        </span>
-      );
     }
   })
 
@@ -915,18 +915,26 @@ jQuery(document).ready(function() {
         expandedRow: []
       }
     },
-    handleExpandClick: function (id, expanded, newParams) {
+    handleExpandClick: function(id, expanded, newParams) {
+      this.state.expandedRow.concat([ id ])
       if (expanded) {
-        var newExpandedRow = this.state.expandedRow
-        newExpandedRow.push(id)
         this.setState({
-          expandedRow: newExpandedRow
+          expandedRow: this.state.expandedRow.concat([ id ])
         })
-
-        //avoid the error in assignment searching page
-        if(this.props.dataType!='assignment') {
-          this.props.getSubFolderData(id, newParams)
-        }
+        // if(this.props.dataType!='assignment') {
+        _this = this
+        jQuery.post(
+          '/tree_display/get_sub_folder_contents',
+          {
+            reactParams2: newParams
+          },
+          function(data) {
+            _this.props.data[id.split('_')[2]]['children'] = data
+            _this.forceUpdate()
+          },
+          'json'
+        )
+        // }
       } else {
         var index = this.state.expandedRow.indexOf(id)
         if (index > -1) {
@@ -938,263 +946,333 @@ jQuery(document).ready(function() {
         }
       }
     },
-    handleSortingClick: (colName, order) => {
+    handleSortingClick: function(colName, order) {
       this.props.onUserClick(colName, order)
-    },
-      pushRows: function(rows, i, entry) {
-          rows.push(
-              <ContentTableRow
-                  key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
-                  id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i}
-                  name={entry.name}
-                  institution={entry.institution}
-                  creation_date={entry.creation_date}
-                  updated_date={entry.updated_date}
-                  actions={entry.actions}
-                  is_available={entry.is_available}
-                  course_id={entry.course_id}
-                  max_team_size={entry.max_team_size}
-                  is_intelligent={entry.is_intelligent}
-                  require_quiz={entry.require_quiz}
-                  dataType={this.props.dataType}
-                  //this is just a hack. All current users courses are marked as private during fetch for display purpose.
-                  private={entry.private}
-                  allow_suggestions={entry.allow_suggestions}
-                  has_topic={entry.has_topic}
-                  rowClicked={this.handleExpandClick}
-                  newParams={entry.newParams}
-              />
-          )
-          rows.push(
-              <ContentTableDetailsRow
-                  key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2 + 1).toString() + '_' + i}
-                  id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2 + 1).toString() + '_' + i}
-                  showElement={
-                      this.state.expandedRow.indexOf(
-                          entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i
-                      ) > -1 ? '' : 'none'
-                  }
-                  dataType={this.props.dataType}
-                  children={entry.children}
-              />
-          )
-      },
-      isEntryValid: function(entry) {
-        if (this.props.selectValue === 'empty' || (this.props.showPublic && isDataTypeCourse)) {
-            return ((entry.name && entry.name.indexOf(this.props.filterText) !== -1) ||
-                (entry.creation_date && entry.creation_date.indexOf(this.props.filterText) !== -1) ||
-                (entry.institution && entry.institution.indexOf(this.props.filterText) !== -1) ||
-                (entry.updated_date && entry.updated_date.indexOf(this.props.filterText) !== -1)) &&
-                (entry.private || entry.type == 'FolderNode')
-        } else {
-            return (entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(this.props.filterText.toLowerCase()) !== -1) &&
-                (entry.private || entry.type == 'FolderNode')
-        }
     },
     render: function() {
       var _rows = []
+      var _this = this
       var colWidthArray = [ '30%', '0%', '0%', '0%', '25%', '25%', '20%' ]
       var colDisplayStyle = {
         display: ''
       }
-      var isDataTypeCourse = this.props.dataType === 'course'
-      var isDataTypeAssignment = this.props.dataType === 'assignment'
-      var isDataTypeQuestionnaire = this.props.dataType === 'questionnaire'
-      var isSelectValueCreatedDate = this.props.selectValue === 'created_date'
-      var isSelectValueUpdatedDate = this.props.selectValue === 'updated_date'
-
       if (this.props) {
-        if (isDataTypeQuestionnaire) {
+        if (this.props.dataType === 'questionnaire') {
           colWidthArray = [ '70%', '0%', '0%', '0%', '0%', '0%', '30%' ]
           colDisplayStyle = {
             display: 'none'
           }
         }
-        if (isDataTypeCourse) {
+        if (this.props.dataType == 'course') {
           colWidthArray = [ '20%', '0%', '0%', '20%', '20%', '20%', '20%' ]
-          _rows.push(<TitleRow title='My Courses' />)
+          _rows.push(<TitleRow title="My Courses" />)
+        } else if (this.props.dataType == 'assignment') {
+          _rows.push(<TitleRow title="My Assignments" />)
         }
-        if (isDataTypeAssignment) {
-            _rows.push(<TitleRow title='My Assignments'/>)
-        }
-
-        if(this.props.selectValue === 'empty') {
-          jQuery.each(this.props.data, (i, entry) => {
-              this.isEntryValid(entry) && this.pushRows(_rows, i, entry)
-        })}
-
-        /* Include the functionality of searching by created_date */
-        if (isSelectValueCreatedDate || isSelectValueUpdatedDate) {
-          var startDate = this.props.start_date + 1
-          var endDate = this.props.end_date + 1
-          jQuery.each(this.props.data, (i, entry) => {
-            var date = isSelectValueCreatedDate ? entry.creation_date : entry.updated_date
-            if (this.isEntryValid(entry)) {
-              if ((date >= startDate) && (endDate >= date)) {
-                if((this.props.has_quiz_var && entry.require_quiz) || !this.props.has_quiz_var) {
-                  this.pushRows(_rows, i, entry)
+        jQuery.each(this.props.data, function(i, entry) {
+          if (
+            ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
+              (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
+              (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
+              (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
+            (entry.private == true || entry.type == 'FolderNode')
+          ) {
+            _rows.push(
+              <ContentTableRow
+                key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
+                id={
+                  entry.type +
+                  '_' +
+                  (parseInt(entry.nodeinfo.node_object_id) * 2).toString() +
+                  '_' +
+                  i
                 }
-              }
-            }
-          })
-        }
-
-        /** this was protecting an always null field, weird TODO */
+                name={entry.name}
+                institution={entry.institution}
+                creation_date={entry.creation_date}
+                updated_date={entry.updated_date}
+                actions={entry.actions}
+                is_available={entry.is_available}
+                course_id={entry.course_id}
+                max_team_size={entry.max_team_size}
+                is_intelligent={entry.is_intelligent}
+                require_quiz={entry.require_quiz}
+                dataType={_this.props.dataType}
+                //this is just a hack. All current users courses are marked as private during fetch for display purpose.
+                private={entry.private}
+                allow_suggestions={entry.allow_suggestions}
+                has_topic={entry.has_topic}
+                rowClicked={_this.handleExpandClick}
+                newParams={entry.newParams}
+              />
+            )
+            _rows.push(
+              <ContentTableDetailsRow
+                key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2 + 1).toString() + '_' + i}
+                id={
+                  entry.type +
+                  '_' +
+                  (parseInt(entry.nodeinfo.node_object_id) * 2 + 1).toString() +
+                  '_' +
+                  i
+                }
+                // showElement={true}
+                showElement={
+                  _this.state.expandedRow.indexOf(
+                    entry.type +
+                      '_' +
+                      (parseInt(entry.nodeinfo.node_object_id) * 2).toString() +
+                      '_' +
+                      i
+                  ) > -1 ? (
+                    ''
+                  ) : (
+                    'none'
+                  )
+                }
+                dataType={_this.props.dataType}
+                children={entry.children}
+              />
+            )
+          } else {
+            return
+          }
+        })
         if (this.props.showPublic) {
-          if (isDataTypeCourse) {
+          if (this.props.dataType == 'course') {
             _rows.push(<TitleRow title="Others' Public Courses" />)
-            jQuery.each(this.props.data,(i, entry) => {
-                this.isEntryValid(entry) && this.pushRows(_rows, i, entry)
-            })
-          } else if (isDataTypeAssignment) {
-            _rows.push(<TitleRow title="Others' Public Assignments" />)
-            jQuery.each(this.props.data, (i, entry) => {
+            jQuery.each(this.props.data, function(i, entry) {
               if (
-                ((entry.name && entry.name.indexOf(this.props.filterText) !== -1) ||
-                  (entry.creation_date && entry.creation_date.indexOf(this.props.filterText) !== -1) ||
-                  (entry.updated_date && entry.updated_date.indexOf(this.props.filterText) !== -1)) &&
+                ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.creation_date &&
+                    entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.updated_date &&
+                    entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
                 entry.private == false
               ) {
-               this.pushRows(_rows, i, entry)
+                _rows.push(
+                  <ContentTableRow
+                    key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
+                    id={
+                      entry.type +
+                      '_' +
+                      (parseInt(entry.nodeinfo.node_object_id) * 2).toString() +
+                      '_' +
+                      i
+                    }
+                    name={entry.name}
+                    institution={entry.institution}
+                    creation_date={entry.creation_date}
+                    updated_date={entry.updated_date}
+                    actions={entry.actions}
+                    is_available={entry.is_available}
+                    course_id={entry.course_id}
+                    max_team_size={entry.max_team_size}
+                    is_intelligent={entry.is_intelligent}
+                    require_quiz={entry.require_quiz}
+                    dataType={_this.props.dataType}
+                    private={entry.private}
+                    allow_suggestions={entry.allow_suggestions}
+                    has_topic={entry.has_topic}
+                    rowClicked={_this.handleExpandClick}
+                    newParams={entry.newParams}
+                  />
+                )
+                _rows.push(
+                  <ContentTableDetailsRow
+                    key={
+                      entry.type +
+                      '_' +
+                      (parseInt(entry.nodeinfo.id) * 2 + 1).toString() +
+                      '_' +
+                      i
+                    }
+                    id={
+                      entry.type +
+                      '_' +
+                      (parseInt(entry.nodeinfo.node_object_id) * 2 + 1).toString() +
+                      '_' +
+                      i
+                    }
+                    showElement={
+                      _this.state.expandedRow.indexOf(
+                        entry.type +
+                          '_' +
+                          (parseInt(entry.nodeinfo.node_object_id) * 2).toString() +
+                          '_' +
+                          i
+                      ) > -1 ? (
+                        ''
+                      ) : (
+                        'none'
+                      )
+                    }
+                    dataType={_this.props.dataType}
+                    children={entry.children}
+                  />
+                )
+              } else {
+                return
+              }
+            })
+          } else if (this.props.dataType == 'assignment') {
+            _rows.push(<TitleRow title="Others' Public Assignments" />)
+            jQuery.each(this.props.data, function(i, entry) {
+              if (
+                ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.creation_date &&
+                    entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.updated_date &&
+                    entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
+                entry.private == false
+              ) {
+                _rows.push(
+                  <ContentTableRow
+                    key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
+                    id={
+                      entry.type +
+                      '_' +
+                      (parseInt(entry.nodeinfo.node_object_id) * 2).toString() +
+                      '_' +
+                      i
+                    }
+                    name={entry.name}
+                    creation_date={entry.creation_date}
+                    updated_date={entry.updated_date}
+                    actions={entry.actions}
+                    is_available={entry.is_available}
+                    course_id={entry.course_id}
+                    max_team_size={entry.max_team_size}
+                    is_intelligent={entry.is_intelligent}
+                    require_quiz={entry.require_quiz}
+                    dataType={_this.props.dataType}
+                    private={entry.private}
+                    allow_suggestions={entry.allow_suggestions}
+                    has_topic={entry.has_topic}
+                    rowClicked={_this.handleExpandClick}
+                    newParams={entry.newParams}
+                  />
+                )
+                _rows.push(
+                  <ContentTableDetailsRow
+                    key={
+                      entry.type +
+                      '_' +
+                      (parseInt(entry.nodeinfo.id) * 2 + 1).toString() +
+                      '_' +
+                      i
+                    }
+                    id={
+                      entry.type +
+                      '_' +
+                      (parseInt(entry.nodeinfo.node_object_id) * 2 + 1).toString() +
+                      '_' +
+                      i
+                    }
+                    showElement={
+                      _this.state.expandedRow.indexOf(
+                        entry.type +
+                          '_' +
+                          (parseInt(entry.nodeinfo.node_object_id) * 2).toString() +
+                          '_' +
+                          i
+                      ) > -1 ? (
+                        ''
+                      ) : (
+                        'none'
+                      )
+                    }
+                    dataType={_this.props.dataType}
+                    children={entry.children}
+                  />
+                )
+              } else {
+                return
               }
             })
           }
         }
       }
-
-      return (
-        <table className='table table-hover' style={{ 'table-layout': 'fixed' }}>
-          <thead>
-            <tr>
-              <th width={colWidthArray[0]}>
-                Name
-                <SortToggle
-                  colName='name'
-                  order='normal'
-                  handleUserClick={this.handleSortingClick}
-                />
-              </th>
-              {isDataTypeCourse && (
-                <th style={colDisplayStyle} width={colWidthArray[3]}>
-                  Institution
+      if (this.props.dataType == 'course') {
+        return (
+          <table className="table table-hover" style={{ 'table-layout': 'fixed' }}>
+            <thead>
+              <tr>
+                <th width={colWidthArray[0]}>
+                  Name
                   <SortToggle
-                    colName='institution'
-                    order='normal'
+                    colName="name"
+                    order="normal"
                     handleUserClick={this.handleSortingClick}
                   />
                 </th>
-              )}
-              <th style={colDisplayStyle} width={colWidthArray[4]}>
-                Creation Date
-                <SortToggle
-                  colName='creation_date'
-                  order='normal'
-                  handleUserClick={this.handleSortingClick}
-                />
-              </th>
-              <th style={colDisplayStyle} width={colWidthArray[5]}>
-                Updated Date
-                <SortToggle
-                  colName='updated_date'
-                  order='normal'
-                  handleUserClick={this.handleSortingClick}
-                />
-              </th>
-              <th width={colWidthArray[6]}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>{_rows}</tbody>
-        </table>
-      )
-
-    }
-  })
-
-  /* The function control the advanced search for questionnaires
-   * It can be search by Question Text, Course, and Assignment
-   */
-  var QuestionnairesAdvancedSearchBar = React.createClass({
-    getInputValues: function () {
-      return {
-        question_text: this.refs.question_text.getDOMNode().value,
-        course: this.refs.course.getDOMNode().value,
-        assignment: this.refs.assignment.getDOMNode().value,
-      };
-    },
-
-    render: function () {
-      return (
-          <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(6, auto) 1fr', gridGap: '8px' }}>
-            <label for="question_text">Question Text:</label>
-            <input
-                data-toggle="tooltip" title="Search by words used in questions that belong to the questionnaires"
-                ref="question_text"
-                type="text"
-                className="form-control" />
-            <label for="course">Course:</label>
-            <input
-                data-toggle="tooltip" title="Search for questionnaires that are used in the given course"
-                ref="course"
-                type="text"
-                className="form-control" />
-            <label for="assignment">Assignment:</label>
-            <input
-                data-toggle="tooltip" title="Search for questionnaires that are used in the given assignment"
-                ref="assignment"
-                type="text"
-                className="form-control" />
-          </div>
-      );
-    }
-  })
-
-  /* React component containing the UI elements
-  *  for the Questionnaire Search Bar, along with Advanced Search.
-  * */
-  var QuestionnairesSearchBar = React.createClass({
-    getInitialState: () => {
-      return {
-        advancedSearchVisible: false,
+                <th style={colDisplayStyle} width={colWidthArray[3]}>
+                  Institution
+                  <SortToggle
+                    colName="institution"
+                    order="normal"
+                    handleUserClick={this.handleSortingClick}
+                  />
+                </th>
+                <th style={colDisplayStyle} width={colWidthArray[4]}>
+                  Creation Date
+                  <SortToggle
+                    colName="creation_date"
+                    order="normal"
+                    handleUserClick={this.handleSortingClick}
+                  />
+                </th>
+                <th style={colDisplayStyle} width={colWidthArray[5]}>
+                  Updated Date
+                  <SortToggle
+                    colName="updated_date"
+                    order="normal"
+                    handleUserClick={this.handleSortingClick}
+                  />
+                </th>
+                <th width={colWidthArray[6]}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>{_rows}</tbody>
+          </table>
+        )
+      } else {
+        return (
+          <table className="table table-hover" style={{ 'table-layout': 'fixed' }}>
+            <thead>
+              <tr>
+                <th width={colWidthArray[0]}>
+                  Name
+                  <SortToggle
+                    colName="name"
+                    order="normal"
+                    handleUserClick={this.handleSortingClick}
+                  />
+                </th>
+                <th style={colDisplayStyle} width={colWidthArray[4]}>
+                  Creation Date
+                  <SortToggle
+                    colName="creation_date"
+                    order="normal"
+                    handleUserClick={this.handleSortingClick}
+                  />
+                </th>
+                <th style={colDisplayStyle} width={colWidthArray[5]}>
+                  Updated Date
+                  <SortToggle
+                    colName="updated_date"
+                    order="normal"
+                    handleUserClick={this.handleSortingClick}
+                  />
+                </th>
+                <th width={colWidthArray[6]}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>{_rows}</tbody>
+          </table>
+        )
       }
-    },
-    toggleAdvancedSearch() {
-      this.setState({
-        advancedSearchVisible: !this.state.advancedSearchVisible
-      });
-    },
-    handleSearch: function () {
-      this.props.onSearchClick({
-        name: this.refs.nameInput.getDOMNode().value,
-        ...this.state.advancedSearchVisible ? this.child.getInputValues() : null,
-      });
-    },
-    onInputChange: function() {
-        this.props.onQuestionnaireSearchChange(this.refs.nameInput.getDOMNode().value)
-    },
-    render: function () {
-      return (
-          <div>
-            <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'center' }}>
-              <input
-                  data-toggle="tooltip" title="The name of the questionnaire"
-                  ref="nameInput"
-                  type="text"
-                  className="form-control"
-                  placeholder="Name"
-                  onChange={this.onInputChange}
-              />
-              <button type="button"
-                      className="btn btn-primary"
-                      onClick={this.handleSearch}>
-                Search
-              </button>
-              <a onClick={this.toggleAdvancedSearch}>
-                {'Advanced Search'}
-              </a>
-            </div>
-            {this.state.advancedSearchVisible ? <QuestionnairesAdvancedSearchBar ref={instance => { this.child = instance; }} /> : null}
-          </div>
-      );
     }
   })
 
@@ -1205,13 +1283,7 @@ jQuery(document).ready(function() {
         filterText: '',
         privateCheckbox: false,
         publicCheckbox: false,
-        tableData: this.props.data,
-        selectValue: 'empty',
-        start_date: '',
-        end_date:'',
-        has_quiz_var: false,
-        searchPressed: false,
-        searchFilteredData: []
+        tableData: this.props.data
       }
     },
     handleUserInput: function(filterText) {
@@ -1248,6 +1320,9 @@ jQuery(document).ready(function() {
           return a_val.localeCompare(b_val)
         }
       })
+      // this.setState({
+      //   tableData: tmpData
+      // })
     },
     componentWillReceiveProps: function(nextProps) {
       this.setState({
@@ -1255,204 +1330,43 @@ jQuery(document).ready(function() {
       })
     },
     handleUserFilter: function(name, checked) {
+      var publicCheckboxStatus = this.state.publicCheckbox
+      publicCheckboxStatus = checked
       var tmpData = this.props.data.filter(function(element) {
-        if (checked) {
+        if (publicCheckboxStatus) {
           return true
         } else return element.private === true
       })
       this.setState({
         tableData: tmpData,
-        publicCheckbox: checked
+        publicCheckbox: publicCheckboxStatus
       })
     },
-    changeAdditionalDrop: function(event) {
-      this.setState({ selectValue: event.target.value });
-    },
-
-    changeDateStart: function(event) {
-      this.setState({
-        start_date: event.target.value,
-      });
-    },
-
-    changeDateEnd: function(event) {
-      this.setState({
-        end_date: event.target.value,
-      });
-    },
-
-    changeAvailableToggle: function(event) {
-      this.setState({
-        has_quiz_var: event.target.checked,
-      });
-    },
-
-      handleSearchClick: function(param) {
-          if (this.state.tableData.length !== 0) {
-            var searchFilteredData = this.state.tableData.map(function(data) {
-                if (data.children) {
-                    var questionnaireSearchIncluded = data.children.filter(function(child) {
-                        if (child.name.indexOf(param.name) !== -1) {
-                            return child
-                        }
-                    })
-                    return { ...data, children: questionnaireSearchIncluded }
-                }
-                return data
-            })
-            this.setState({ searchFilteredData, searchPressed: true })
-          }
-      },
-
-      handleQuestionnaireSearchChange: function(text) {
-        if (text === '' && this.state.searchPressed) {
-            this.setState({ searchPressed: false })
-        }
-      },
-
-      getSubFolderData: function(id,newParams) {
-        jQuery.post(
-          '/tree_display/get_sub_folder_contents',
-          { reactParams2: newParams},
-          (data) => {
-            var prevTableData = this.state.tableData
-            prevTableData[id.split('_')[2]]['children'] = data
-            this.setState({ tableData: prevTableData })
-          },
-          'json'
-        )
-      },
-
     render: function() {
-      if (this.props.dataType === 'questionnaire') {
-        return (
-            <div className="filterable_table">
-              <QuestionnairesSearchBar
-                  onSearchClick={this.handleSearchClick}
-                  dataType={this.props.dataType}
-                  onQuestionnaireSearchChange={this.handleQuestionnaireSearchChange}
-              />
-              <FilterButton
-                  filterOption="public"
-                  onUserFilter={this.handleUserFilter}
-                  inputCheckboxValue={this.state.publicCheckbox}
-                  dataType={this.props.dataType}
-              />
-              <NewItemButton
-                  dataType={this.props.dataType}
-                  private={true}
-              />
-              <ContentTable
-                  data={this.state.searchPressed ? this.state.searchFilteredData : this.state.tableData}
-                  filterText={this.state.filterText}
-                  onUserClick={this.handleUserClick}
-                  dataType={this.props.dataType}
-                  showPublic={this.state.publicCheckbox}
-                  selectValue={this.state.selectValue}
-                  getSubFolderData={this.getSubFolderData}
-              />
-            </div>
-        )
-      }
-
-      /* Returns advanced search functionality by
-      * created and updated date
-      * in courses and assignments
-      * */
       return (
-          <div className="">
-
-            <div
-                style={{ margin: '8px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'center' }}
-            >
-              <SearchBar
-                  filterText={this.state.filterText}
-                  onUserInput={this.handleUserInput}
-                  dataType={this.props.dataType}
-              />
-
-              <button type="button"
-                      className="btn btn-primary"
-                      onClick={this.handleSearch}>
-                Search
-              </button>
-
-              <a
-                  onClick={() => {
-                    var x = document.getElementById("advancedToggle");
-                    if (x.style.display === "none") {
-                      x.style.display = "block";
-                    } else {
-                      x.style.display = "none";
-                    }}}>
-                Advanced Search
-              </a>
-            </div>
-
-              <div id="advancedToggle" style={{ display: 'none' }}>
-              <AdditionalSearchDropDown
-                  selectValue = {this.state.selectValue}
-                  onChange={this.changeAdditionalDrop}
-              />
-              <div style={{
-                margin: '10px auto',
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, auto) 1fr',
-                gridGap: '8px',
-                alignItems: 'center' }}
-              >
-                <DatePicker
-                    date={this.state.start_date}
-                    onChange={this.changeDateStart}
-                    dataType={this.props.dataType}
-                    inputId="start_date"
-                    title="Start Date"
-                />
-                <DatePicker
-                    date={this.state.end_date}
-                    onChange={this.changeDateEnd}
-                    dataType={this.props.dataType}
-                    inputId="end_date"
-                    title="End Date"
-                />
-                <HASQUIZ_TOGGLE
-                    has_quiz_var = {this.state.has_quiz_var}
-                    onChange={this.changeAvailableToggle}
-                    dataType={this.props.dataType}/>
-              </div>
-            </div>
-
-            <div>
-              <FilterButton
-                  filterOption="public"
-                  onUserFilter={this.handleUserFilter}
-                  inputCheckboxValue={this.state.publicCheckbox}
-                  dataType={this.props.dataType}
-              />
-
-              <NewItemButton
-                  dataType={this.props.dataType}
-                  private={true}
-              />
-
-            </div>
-
-            <ContentTable
-                data={this.state.tableData}
-                filterText={this.state.filterText}
-                onUserClick={this.handleUserClick}
-                dataType={this.props.dataType}
-                showPublic={this.state.publicCheckbox}
-                selectValue={this.state.selectValue}
-                start_date = {this.state.start_date}
-                end_date = {this.state.end_date}
-                has_quiz_var = {this.state.has_quiz_var}
-                getSubFolderData={this.getSubFolderData}
-            />
-          </div>
+        <div className="filterable_table">
+          <SearchBar
+            filterText={this.state.filterText}
+            onUserInput={this.handleUserInput}
+            dataType={this.props.dataType}
+          />
+          <FilterButton
+            filterOption="public"
+            onUserFilter={this.handleUserFilter}
+            inputCheckboxValue={this.state.publicCheckbox}
+            dataType={this.props.dataType}
+          />
+          <NewItemButton dataType={this.props.dataType} private={true} />
+          <ContentTable
+            data={this.state.tableData}
+            filterText={this.state.filterText}
+            onUserClick={this.handleUserClick}
+            dataType={this.props.dataType}
+            showPublic={this.state.publicCheckbox}
+          />
+        </div>
       )
     }
-
   })
 
   var TabSystem = React.createClass({

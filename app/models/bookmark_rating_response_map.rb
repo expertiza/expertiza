@@ -3,7 +3,7 @@ class BookmarkRatingResponseMap < ReviewResponseMap
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
 
   def questionnaire
-    self.assignment.questionnaires.find_by(type: 'BookmarkRatingQuestionnaire')
+    assignment.questionnaires.find_by(type: 'BookmarkRatingQuestionnaire')
   end
 
   def contributor
@@ -11,10 +11,10 @@ class BookmarkRatingResponseMap < ReviewResponseMap
   end
 
   def self.bookmark_response_report(id)
-    BookmarkRatingResponseMap.select("DISTINCT reviewer_id").where("reviewed_object_id = ?", id)
+    BookmarkRatingResponseMap.select('DISTINCT reviewer_id').where('reviewed_object_id = ?', id)
   end
 
   def get_title
-    "Bookmark Review"
+    'Bookmark Review'
   end
 end

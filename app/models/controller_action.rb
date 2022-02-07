@@ -3,43 +3,43 @@ class ControllerAction < ActiveRecord::Base
   belongs_to :permission
 
   validates :name, presence: true
-  validates :name, uniqueness: { scope: 'site_controller_id' }
+  validates :name, uniqueness: {scope: 'site_controller_id'}
 
   attr_accessor :controller, :permission, :url, :allowed, :specific_name
 
-  scope :order_by_controller_and_action, lambda {
-    joins('left outer join site_controllers on site_controller_id = site_controllers.id')
-      .order('site_controllers.name, name')
+  scope :order_by_controller_and_action, -> {
+    joins('left outer join site_controllers on site_controller_id = site_controllers.id').
+      order('site_controllers.name, name')
   }
 
   def controller
-    @controller ||= SiteController.find(site_controller_id)
+    @controller ||= SiteController.find(self.site_controller_id)
   end
 
   def permission
-    @permission ||= if permission_id
-                      Permission.find(permission_id)
+    @permission ||= if self.permission_id
+                      Permission.find(self.permission_id)
                     else
                       Permission.new(id: nil,
-                                     name: "(default -- #{controller.permission.name})")
+                                     name: "(default -- #{self.controller.permission.name})")
                     end
     @permission
   end
 
   def effective_permission_id
-    permission_id || controller.permission_id
+    self.permission_id || self.controller.permission_id
   end
 
   def fullname
-    if site_controller_id && (site_controller_id > 0)
-      "#{controller.name}: #{name}"
+    if self.site_controller_id and self.site_controller_id > 0
+      "#{self.controller.name}: #{self.name}"
     else
-      name.to_s
+      self.name.to_s
       end
   end
 
   def url
-    @url ||= "/#{controller.name}/#{name}"
+    @url ||= "/#{self.controller.name}/#{self.name}"
     @url
   end
 
@@ -47,13 +47,13 @@ class ControllerAction < ActiveRecord::Base
     # Hash for faster & easier lookups
     if permission_ids
       perms = {}
-      permission_ids.each do |id|
+      for id in permission_ids do
         perms[id] = true
       end
     end
 
     actions = ControllerAction.all
-    actions.each do |action|
+    for action in actions do
       action.allowed = if action.permission_id
                          if perms.key?(action.permission_id)
                            1

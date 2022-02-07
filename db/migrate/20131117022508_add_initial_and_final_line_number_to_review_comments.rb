@@ -9,3 +9,4 @@ class AddInitialAndFinalLineNumberToReviewComments < ActiveRecord::Migration
     remove_column :review_comments, :last_line_number
   end
 end
+

@@ -18,13 +18,13 @@ class MailWorker
     participant_mails = find_participant_emails
 
     if %w[drop_one_member_topics drop_outstanding_reviews compare_files_with_simicheck].include?(self.deadline_type)
-      drop_one_member_topics if self.deadline_type == 'drop_outstanding_reviews' && assignment.team_assignment
-      drop_outstanding_reviews if self.deadline_type == 'drop_outstanding_reviews'
-      perform_simicheck_comparisons(self.assignment_id) if self.deadline_type == 'compare_files_with_simicheck'
+      drop_one_member_topics if self.deadline_type == "drop_outstanding_reviews" && assignment.team_assignment
+      drop_outstanding_reviews if self.deadline_type == "drop_outstanding_reviews"
+      perform_simicheck_comparisons(self.assignment_id) if self.deadline_type == "compare_files_with_simicheck"
     else
       # Can we rename deadline_type(metareview) to "teammate review". If, yes then we donot need this if clause below!
-      deadlineText = if self.deadline_type == 'metareview'
-                       'teammate review'
+      deadlineText = if self.deadline_type == "metareview"
+                       "teammate review"
                      else
                        self.deadline_type
       end
@@ -34,10 +34,10 @@ class MailWorker
   end
 
   def email_reminder(emails, deadline_type)
-    assignment = Assignment.find(assignment_id)
+    assignment = Assignment.find(self.assignment_id)
     subject = "Message regarding #{deadline_type} for assignment #{assignment.name}"
     body = "This is a reminder to complete #{deadline_type} for assignment #{assignment.name}. \
-    Deadline is #{due_at}.If you have already done the  #{deadline_type}, Please ignore this mail."
+    Deadline is #{self.due_at}.If you have already done the  #{deadline_type}, Please ignore this mail."
 
     emails.each do |mail|
       Rails.logger.info mail
@@ -49,7 +49,7 @@ class MailWorker
 
   def find_participant_emails
     emails = []
-    participants = Participant.where(parent_id: assignment_id)
+    participants = Participant.where(parent_id: self.assignment_id)
     participants.each do |participant|
       emails << participant.user.email unless participant.user.nil?
     end
@@ -67,7 +67,7 @@ class MailWorker
   end
 
   def drop_outstanding_reviews
-    reviews = ResponseMap.where(reviewed_object_id: assignment_id)
+    reviews = ResponseMap.where(reviewed_object_id: self.assignment_id)
     reviews.each do |review|
       review_has_began = Response.where(map_id: review.id)
       if review_has_began.size.zero?

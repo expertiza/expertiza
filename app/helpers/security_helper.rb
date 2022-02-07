@@ -1,11 +1,11 @@
 module SecurityHelper
   def special_chars
-    special = '/\\?<>|&$#'
+    special = "/\\?<>|&$#"
   end
 
   def contains_special_chars?(str)
     special = special_chars
-    regex = /[#{special.gsub(/./) { |char| "\\#{char}" }}]/
+    regex = /[#{special.gsub(/./) {|char| "\\#{char}" }}]/
 
     !(str =~ regex).nil?
   end
@@ -19,16 +19,20 @@ module SecurityHelper
   end
 
   def json_valid?(str)
-    JSON.parse(str)
-    true
-  rescue JSON::ParserError, TypeError => e
-    false
+    begin
+      JSON.parse(str)
+      return true
+    rescue JSON::ParserError, TypeError => e
+      return false
+    end
   end
 
   def date_valid?(date)
-    Date.parse(date)
-    true
-  rescue ArgumentError
-    false
+    begin
+      Date.parse(date)
+      return true
+    rescue ArgumentError
+      return false
+    end
   end
 end

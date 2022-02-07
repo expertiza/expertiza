@@ -1,3 +1,4 @@
+
 describe Node do
   let(:node) { Menu::Node.new }
   let(:content_page) { double('ContentPage', id: 1, name: 'name') }
@@ -160,7 +161,7 @@ describe Menu do
 
   describe '#select' do
     it 'returns when name is not in by_name{}' do
-      expect(menu.select('not_in_menu')).to be_nil
+      expect(menu.select("not_in_menu")).to be_nil
     end
 
     it 'returns when name is in by_name{}' do
@@ -221,11 +222,11 @@ describe Menu do
   describe '#selected' do
     it 'returns root if nothing is selected previously' do
       # menu_item has seq: 1, so it is the root.
-      expect(menu.selected).to eq('menu_item1')
+      expect(menu.selected).to eq("menu_item1")
     end
     it 'returns the name of the selected menu_item' do
       menu.select(menu_item2.name)
-      expect(menu.selected).to eq('menu_item2')
+      expect(menu.selected).to eq("menu_item2")
     end
   end
 

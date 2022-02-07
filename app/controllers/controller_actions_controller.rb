@@ -1,9 +1,9 @@
 class ControllerActionsController < ApplicationController
   include AuthorizationHelper
-
+  
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],
-         redirect_to: { action: :index }
+         redirect_to: {action: :index}
 
   def action_allowed?
     current_user_has_super_admin_privileges?
@@ -101,17 +101,17 @@ class ControllerActionsController < ApplicationController
     if classes.key? classname
       controller = classes[classname]
 
-      controller.public_instance_methods(false).each do |method|
+      for method in controller.public_instance_methods(false) do
         actions[method] = true
       end
 
-      controller.hidden_actions.each do |hidden|
+      for hidden in controller.hidden_actions do
         actions.delete hidden
       end
     end
 
     action_collection = []
-    actions.keys.sort.each do |action|
+    for action in actions.keys.sort do
       action_collection << ControllerAction.new(name: action)
     end
 

@@ -2,10 +2,10 @@ class ContentPagesController < ApplicationController
   include AuthorizationHelper
 
   # Currently, this controller is only used for managing pull-down menus.
-  # Further development is currently paused on this controller, please consult before changing/using the code.
+  # Further development is currently paused on this controller, please consult before changing/using the code. 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],
-         redirect_to: { action: :list }
+         redirect_to: {action: :list}
 
   def action_allowed?
     case params[:action]
@@ -89,12 +89,12 @@ class ContentPagesController < ApplicationController
     @content_page = ContentPage.find(params[:id])
     foreign
 
-    if @menu_items.empty? && !@system_pages
+    if @menu_items.empty? and !@system_pages
       @content_page.destroy
       Role.rebuild_cache
       redirect_to action: 'list'
     else
-      flash.now[:error] = 'You cannot delete this content page as it has dependants. (See below)'
+      flash.now[:error] = "You cannot delete this content page as it has dependants. (See below)"
       render action: 'show'
     end
   end

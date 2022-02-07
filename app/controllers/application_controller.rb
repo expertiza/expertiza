@@ -27,7 +27,7 @@ class ApplicationController < ActionController::Base
     if logged_in?
       # If the current user has set his preferred language, the locale is set according to their preference
       if !current_user.locale.nil?
-        if current_user.locale != 'no_pref'
+        if current_user.locale != "no_pref" 
           return current_user.locale
           # If the user doesn't have any preference, the locale is taken from the course locale, if the current page is a course specific page or else default locale is used
         elsif current_user_role? && current_user_role.student? && respond_to?(:controller_locale)
@@ -63,7 +63,7 @@ class ApplicationController < ActionController::Base
     course_participants = CourseParticipant.where(user_id: current_user.id)
     course_participants_locales = course_participants.map { |cp| cp.course.locale }
     # If no tasks, then possible to have no courses assigned.
-    if course_participants_locales.uniq.length == 1 # && !@tasks.empty?
+    if course_participants_locales.uniq.length == 1 #&& !@tasks.empty?
       course = course_participants.first.course
       return course.locale if course.locale?
     end
@@ -74,7 +74,9 @@ class ApplicationController < ActionController::Base
     remove_non_utf8(params)
   end
 
-  def self.verify(_args); end
+  def self.verify(_args)
+    ;
+  end
 
   def current_user_role?
     current_user.role.name
@@ -97,7 +99,6 @@ class ApplicationController < ActionController::Base
   def undo_link(message)
     version = Version.where('whodunnit = ?', session[:user].id).last
     return unless version.try(:created_at) && Time.now.in_time_zone - version.created_at < 5.0
-
     link_name = params[:redo] == 'true' ? 'redo' : 'undo'
     message + "<a href = #{url_for(controller: :versions, action: :revert, id: version.id, redo: !params[:redo])}>#{link_name}</a>"
   end
@@ -105,7 +106,6 @@ class ApplicationController < ActionController::Base
   def are_needed_authorizations_present?(id, *authorizations)
     participant = Participant.find_by(id: id)
     return false if participant.nil?
-
     authorization = participant.authorization
     !authorizations.include?(authorization)
   end

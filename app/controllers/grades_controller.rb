@@ -12,9 +12,9 @@ class GradesController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'view_my_scores'
-      current_user_has_student_privileges? &&
-        are_needed_authorizations_present?(params[:id], 'reader', 'reviewer') &&
-        self_review_finished?
+      current_user_has_student_privileges? and
+      are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
+      self_review_finished?
     when 'view_team'
       if current_user_is_a? 'Student' # students can only see the heat map for their own team
         participant = AssignmentParticipant.find(params[:id])
@@ -46,7 +46,7 @@ class GradesController < ApplicationController
         @questions[questionnaire.symbol] = questionnaire.questions
       end
     end
-    @scores = review_grades(@assignment, @questions)
+    @scores = review_grades(@assignment,@questions)
     averages = vector(@scores)
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)
@@ -59,7 +59,6 @@ class GradesController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id])
     @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
     return if redirect_when_disallowed
-
     @assignment = @participant.assignment
     questionnaires = @assignment.questionnaires
     @questions = retrieve_questions questionnaires, @assignment.id
@@ -70,7 +69,7 @@ class GradesController < ApplicationController
     @stage = @participant.assignment.current_stage(@topic_id)
     penalties(@assignment.id)
     # prepare feedback summaries
-    summary_ws_url = WEBSERVICE_CONFIG['summary_webservice_url']
+    summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
     sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewee(@questions, @assignment, @team_id, summary_ws_url, session)
     @summary = sum.summary
     @avg_scores_by_round = sum.avg_scores_by_round
@@ -93,7 +92,7 @@ class GradesController < ApplicationController
     counter_for_same_rubric = 0
     questionnaires.each do |questionnaire|
       @round = nil
-      if @assignment.vary_by_round && questionnaire.type == 'ReviewQuestionnaire'
+      if @assignment.vary_by_round && questionnaire.type == "ReviewQuestionnaire"
         questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
         if questionnaires.count > 1
           @round = questionnaires[counter_for_same_rubric].used_in_round
@@ -128,9 +127,9 @@ class GradesController < ApplicationController
       review = Response.find_by(map_id: review_mapping.map_id)
     end
     if review_exists
-      redirect_to controller: 'response', action: 'edit', id: review.id, return: 'instructor'
+      redirect_to controller: 'response', action: 'edit', id: review.id, return: "instructor"
     else
-      redirect_to controller: 'response', action: 'new', id: review_mapping.map_id, return: 'instructor'
+      redirect_to controller: 'response', action: 'new', id: review_mapping.map_id, return: "instructor"
     end
   end
 
@@ -147,12 +146,12 @@ class GradesController < ApplicationController
   def update
     participant = AssignmentParticipant.find(params[:id])
     total_score = params[:total_score]
-    unless format('%.2f', total_score) == params[:participant][:grade]
+    unless format("%.2f", total_score) == params[:participant][:grade]
       participant.update_attribute(:grade, params[:participant][:grade])
       message = if participant.grade.nil?
-                  'The computed score will be used for ' + participant.user.name + '.'
+                  "The computed score will be used for " + participant.user.name + "."
                 else
-                  'A score of ' + params[:participant][:grade] + '% has been saved for ' + participant.user.name + '.'
+                  "A score of " + params[:participant][:grade] + "% has been saved for " + participant.user.name + "."
                 end
     end
     flash[:note] = message
@@ -175,9 +174,9 @@ class GradesController < ApplicationController
 
   def bar_chart(scores, width = 100, height = 100, spacing = 1)
     link = nil
-    GoogleChart::BarChart.new("#{width}x#{height}", ' ', :vertical, false) do |bc|
+    GoogleChart::BarChart.new("#{width}x#{height}", " ", :vertical, false) do |bc|
       data = scores
-      bc.data 'Line green', data, '990000'
+      bc.data "Line green", data, '990000'
       bc.axis :y, range: [0, data.max], positions: data.minmax
       bc.show_legend = false
       bc.stacked = false
@@ -209,9 +208,9 @@ class GradesController < ApplicationController
     if @participant.assignment.max_team_size > 1
       team = @participant.team
       unless team.nil? || (team.user? session[:user])
-        flash[:error] = 'You are not on the team that wrote this feedback'
-        redirect_to '/'
-        return true
+          flash[:error] = 'You are not on the team that wrote this feedback'
+          redirect_to '/'
+          return true
       end
     else
       reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: @participant.assignment.id).first
@@ -236,7 +235,7 @@ class GradesController < ApplicationController
       scores = []
       if @assignment.vary_by_round
         (1..@assignment.rounds_of_reviews).each do |round|
-          responses = @pscore[:review][:assessments].select { |response| response.round == round }
+          responses = @pscore[:review][:assessments].select {|response| response.round == round }
           scores = scores.concat(score_vector(responses, 'review' + round.to_s))
           scores -= [-1.0]
         end
@@ -245,14 +244,14 @@ class GradesController < ApplicationController
         charts(:review)
       end
     end
-    participant_score_types.each { |symbol| charts(symbol) }
+    participant_score_types.each {|symbol| charts(symbol) }
   end
 
   def self_review_finished?
     participant = Participant.find(params[:id])
     assignment = participant.try(:assignment)
-    self_review_enabled = assignment.try(:is_selfreview_enabled)
-    not_submitted = unsubmitted_self_review?(participant.try(:id))
+    self_review_enabled=assignment.try(:is_selfreview_enabled)
+    not_submitted=unsubmitted_self_review?(participant.try(:id))
     if self_review_enabled
       !not_submitted
     else

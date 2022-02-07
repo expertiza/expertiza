@@ -64,14 +64,14 @@ describe MenuItemsController do
   # Airbrake-1766139777878852159
   describe '#link' do
     it "can handle the situation (redirect_to '/') when the session[:menu] is nil" do
-      controller.params[:name] = 'manage/courses'
+      controller.params[:name] = "manage/courses"
       controller.session[:menu] = nil
       get :link
       expect(response).to redirect_to('/')
     end
 
     it 'redirect to node.url when the session[:menu] is not nil' do
-      controller.params[:name] = 'manage/courses'
+      controller.params[:name] = "manage/courses"
       allow(controller.session[:menu]).to receive(:try).with(any_args).and_return(double('node', url: '/tree_display/goto_courses'))
       get :link
       expect(response).to redirect_to('/tree_display/goto_courses')
@@ -131,7 +131,7 @@ describe ReviewMappingController do
       allow(Response).to receive(:exists?).with(any_args).and_return(false)
       allow(review_response_map).to receive(:destroy).and_return(true)
       post :delete_reviewer, id: 1
-      expect(flash[:success]).to eq('The review mapping for "stu1" and "stu2" has been deleted.')
+      expect(flash[:success]).to eq("The review mapping for \"stu1\" and \"stu2\" has been deleted.")
       expect(response).to redirect_to 'www.google.com'
     end
   end

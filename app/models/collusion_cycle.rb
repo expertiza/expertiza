@@ -49,7 +49,6 @@ class CollusionCycle
         else
           s20 = ap2.reviews_by_reviewer(assignment_participant).aggregate_questionnaire_score
         end
-
         collusion_cycles.push([[assignment_participant, s01], [ap1, s12], [ap2, s20]])
       end
     end
@@ -99,9 +98,9 @@ class CollusionCycle
   def cycle_similarity_score(cycle)
     similarity_score = 0.0
     count = 0.0
-    (0...cycle.size - 1).each do |pivot|
+    for pivot in 0...cycle.size - 1 do
       pivot_score = cycle[pivot][1]
-      (pivot + 1...cycle.size).each do |other|
+      for other in pivot + 1...cycle.size do
         similarity_score += (pivot_score - cycle[other][1]).abs
         count += 1.0
       end
@@ -114,7 +113,7 @@ class CollusionCycle
   def cycle_deviation_score(cycle)
     deviation_score = 0.0
     count = 0.0
-    (0...cycle.size).each do |member|
+    for member in 0...cycle.size do
       participant = AssignmentParticipant.find(cycle[member][0].id)
       total_score = participant.review_score
       deviation_score += (total_score - cycle[member][1]).abs

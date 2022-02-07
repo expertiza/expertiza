@@ -36,15 +36,11 @@ module ReportFormatterHelper
   def calibration(params, session)
     assign_basics(params)
     user = session[:user]
-    participant = begin
-                    AssignmentParticipant.where(parent_id: @id, user_id: user.id).first
-                  rescue StandardError
-                    nil
-                  end
+    participant = AssignmentParticipant.where(parent_id: @id, user_id: user.id).first rescue nil
     create_participant(@id, user.id) if participant.nil?
-    @review_questionnaire_ids = ReviewQuestionnaire.select('id')
+    @review_questionnaire_ids = ReviewQuestionnaire.select("id")
     @assignment_questionnaire = AssignmentQuestionnaire.retrieve_questionnaire_for_assignment(@id).first
-    @questions = @assignment_questionnaire.questionnaire.questions.select { |q| q.type == 'Criterion' || q.type == 'Scale' }
+    @questions = @assignment_questionnaire.questionnaire.questions.select {|q| q.type == 'Criterion' || q.type == 'Scale' }
     @calibration_response_maps = ReviewResponseMap.where(reviewed_object_id: @id, calibrate_to: 1)
     @review_response_map_ids = ReviewResponseMap.select('id').where(reviewed_object_id: @id, calibrate_to: 0)
     @responses = Response.where(map_id: @review_response_map_ids)
@@ -105,7 +101,7 @@ module ReportFormatterHelper
   def calculate_formatted_percentage(line)
     number_tagged = @user_tagging_report[line.user.name].no_tagged.to_f
     number_taggable = @user_tagging_report[line.user.name].no_tagable
-    formatted_percentage = format('%.1f', (number_tagged / number_taggable) * 100)
+    formatted_percentage = format("%.1f", (number_tagged / number_taggable) * 100)
     @user_tagging_report[line.user.name].no_tagable.zero? ? '-' : formatted_percentage
   end
 end

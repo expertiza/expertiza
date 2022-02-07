@@ -6,4 +6,5 @@ class AddQuizAllowedIdToDueDates < ActiveRecord::Migration
   def self.down
     delete_column :due_dates, :quiz_allowed_id
   end
+
 end

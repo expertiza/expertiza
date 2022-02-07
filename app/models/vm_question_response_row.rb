@@ -16,13 +16,13 @@ class VmQuestionResponseRow
   # the question max score is the max score of the questionnaire, except if the question is a true/false, in which case
   # the max score is one.
   def question_max_score
-    question = Question.find(question_id)
-    if question.type == 'Checkbox'
+    question = Question.find(self.question_id)
+    if question.type == "Checkbox"
       1
     elsif question.is_a? ScoredQuestion
       @question_max_score
     else
-      'N/A'
+      "N/A"
     end
   end
 

@@ -1,31 +1,33 @@
 class UpdateParticipantTypes < ActiveRecord::Migration
-  def self.up
+  def self.up    
     add_column :participants, :type, :string
-
+    
     begin
-      execute "ALTER TABLE `participants`
-             DROP FOREIGN KEY `fk_participant_assignments`"
-    rescue StandardError
+      execute "ALTER TABLE `participants` 
+             DROP FOREIGN KEY `fk_participant_assignments`" 
+    rescue  
     end
-
+  
     begin
-      execute "ALTER TABLE `participants`
+      execute "ALTER TABLE `participants` 
              DROP INDEX `fk_participant_assignments`"
-    rescue StandardError
-    end
-
+    rescue
+    end    
+    
     rename_column :participants, :assignment_id, :parent_id
-
+    
     participants = Participant.all
-    participants.each  do |participant|
+    participants.each{
+      |participant|
       participant.type = 'AssignmentParticipant'
       participant.save
-    end
-
+    }
+    
     course_users = CoursesUsers.all
-    course_users.each do |user|
-      CourseParticipant.create(user_id: user.user_id, parent_id: user.course_id)
-    end
+    course_users.each{
+      |user|
+      CourseParticipant.create(:user_id => user.user_id, :parent_id => user.course_id)
+    }
     drop_table :courses_users
   end
 
@@ -35,13 +37,14 @@ class UpdateParticipantTypes < ActiveRecord::Migration
       t.column :course_id, :integer
       t.column :active, :boolean
     end
-
+    
     course_users = CourseParticipant.all
-    course_users.each do |user|
-      CoursesUser.create(user_id: user.user_id, course_id: user.parent_id)
+    course_users.each{
+      |user|
+      CoursesUser.create(:user_id => user.user_id, :course_id => user.parent_id)
       user.destroy
-    end
-
+    }
+    
     rename_column :participants, :parent_id, :assignment_id
     remove_column :participants, :type
   end

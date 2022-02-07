@@ -122,9 +122,9 @@ class CoursesController < ApplicationController
     @course = Course.find(params[:course_id])
     @user = User.find_by(name: params[:user][:name])
     if @user.nil?
-      flash.now[:error] = 'The user inputted "' + params[:user][:name] + '" does not exist.'
+      flash.now[:error] = "The user inputted \"" + params[:user][:name] + "\" does not exist."
     elsif !TaMapping.where(ta_id: @user.id, course_id: @course.id).empty?
-      flash.now[:error] = 'The user inputted "' + params[:user][:name] + '" is already a TA for this course.'
+      flash.now[:error] = "The user inputted \"" + params[:user][:name] + "\" is already a TA for this course."
     else
       @ta_mapping = TaMapping.create(ta_id: @user.id, course_id: @course.id)
       @user.role = Role.find_by name: 'Teaching Assistant'
@@ -155,8 +155,8 @@ class CoursesController < ApplicationController
     render action: 'remove_ta.js.erb', layout: false
   end
 
-  # This method is called in the update and create methods to set the fields of a course
-  def set_course_fields(_course)
+  #This method is called in the update and create methods to set the fields of a course
+  def set_course_fields(course)
     @course.name = params[:course][:name]
     @course.institutions_id = params[:course][:institutions_id]
     @course.directory_path = params[:course][:directory_path]
@@ -164,4 +164,5 @@ class CoursesController < ApplicationController
     @course.private = params[:course][:private].nil? ? 0 : params[:course][:private]
     @course.locale = params[:course][:locale]
   end
+
 end

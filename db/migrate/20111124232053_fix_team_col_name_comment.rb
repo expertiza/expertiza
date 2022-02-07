@@ -3,5 +3,6 @@ class FixTeamColNameComment < ActiveRecord::Migration
     rename_column :teams, :comment, :comments_for_advertisement
   end
 
-  def self.down; end
+  def self.down
+  end
 end

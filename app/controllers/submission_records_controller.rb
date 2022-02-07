@@ -10,7 +10,6 @@ class SubmissionRecordsController < ApplicationController
     return true if current_user_has_admin_privileges?
     return true if current_user_instructs_assignment?(assignment)
     return true if current_user_has_ta_mapping_for_assignment?(assignment)
-
     false
   end
 

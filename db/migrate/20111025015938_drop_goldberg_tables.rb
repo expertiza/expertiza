@@ -12,5 +12,6 @@ class DropGoldbergTables < ActiveRecord::Migration
     drop_table :goldberg_users
   end
 
-  def self.down; end
+  def self.down
+  end
 end

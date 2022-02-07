@@ -4,6 +4,6 @@ class AddMaxBidsToAssigments < ActiveRecord::Migration
   end
 
   def self.down
-    remove_column :assignments, :max_bids, :integer
+  	remove_column :assignments, :max_bids, :integer
   end
 end

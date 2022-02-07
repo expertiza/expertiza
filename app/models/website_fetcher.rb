@@ -1,3 +1,4 @@
+
 class WebsiteFetcher
   require 'http_request'
 
@@ -8,7 +9,7 @@ class WebsiteFetcher
   end
 
   def initialize(params)
-    @url = params['url']
+    @url = params["url"]
   end
 
   def fetch_content
@@ -16,7 +17,7 @@ class WebsiteFetcher
     if res.is_a? Net::HTTPSuccess
       sanitize(res.body)
     else
-      ''
+      ""
     end
   end
 

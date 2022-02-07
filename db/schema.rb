@@ -30,8 +30,9 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.integer  "tag_prompt_deployment_id", limit: 4
     t.integer  "user_id",                  limit: 4
     t.string   "value",                    limit: 255
-    t.datetime "created_at",                           null: false
-    t.datetime "updated_at",                           null: false
+    t.datetime "created_at",                                                    null: false
+    t.datetime "updated_at",                                                    null: false
+    t.decimal  "confidence_level",                     precision: 10, scale: 5
   end
 
   add_index "answer_tags", ["answer_id"], name: "index_answer_tags_on_answer_id", using: :btree

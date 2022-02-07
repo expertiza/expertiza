@@ -90,6 +90,6 @@ FactoryBot.define do
     question_weight 1
     s_score 1
     s_response_id 1
-    s_comments "test comment"
+    s_comments 'test comment'
   end
 end

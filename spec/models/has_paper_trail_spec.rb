@@ -1,9 +1,7 @@
 describe 'has_paper_trail' do
-  it "will create Version record when create delayed jobs record" do
+  it 'will create Version record when create delayed jobs record' do
     PaperTrail.enabled = true
-    for version in Version.all
-      version.delete
-    end
+    Version.all.each(&:delete)
     expect(Version.all.count).to eq(0)
 
     @delayed_job = DelayedJob.new

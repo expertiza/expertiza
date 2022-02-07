@@ -1,6 +1,6 @@
 class MetareviewQuestionnaire < Questionnaire
   after_initialize :post_initialization
-  @print_name = "Metareview Rubric"
+  @print_name = 'Metareview Rubric'
 
   class << self
     attr_reader :print_name
@@ -11,7 +11,7 @@ class MetareviewQuestionnaire < Questionnaire
   end
 
   def symbol
-    "metareview".to_sym
+    'metareview'.to_sym
   end
 
   def get_assessments_for(participant)

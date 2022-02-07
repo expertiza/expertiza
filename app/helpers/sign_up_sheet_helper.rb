@@ -3,13 +3,17 @@ module SignUpSheetHelper
   # otherwise, it should display the topic due date.
   def check_topic_due_date_value(assignment_due_dates, topic_id, deadline_type_id = 1, review_round = 1)
     due_date = get_topic_deadline(assignment_due_dates, topic_id, deadline_type_id, review_round)
-    due_date ? DateTime.parse(due_date.to_s).strftime("%Y-%m-%d %H:%M:%S") : nil
+    due_date ? DateTime.parse(due_date.to_s).strftime('%Y-%m-%d %H:%M:%S') : nil
   end
 
   def get_topic_deadline(_assignment_due_dates, topic_id, deadline_type_id = 1, review_round = 1)
-    topic_due_date = TopicDueDate.where(parent_id: topic_id,
-                                        deadline_type_id: deadline_type_id,
-                                        round: review_round).first rescue nil
+    topic_due_date = begin
+                       TopicDueDate.where(parent_id: topic_id,
+                                          deadline_type_id: deadline_type_id,
+                                          round: review_round).first
+                     rescue StandardError
+                       nil
+                     end
     topic_due_date.nil? ? topic_due_date : topic_due_date.due_at
   end
 
@@ -30,9 +34,9 @@ module SignUpSheetHelper
     row_html = ''
     if selected_topics.present?
       selected_topics.each do |selected_topic|
-        row_html = if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted
+        row_html = if (selected_topic.topic_id == topic.id) && !selected_topic.is_waitlisted
                      '<tr bgcolor="yellow">'
-                   elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted
+                   elsif (selected_topic.topic_id == topic.id) && selected_topic.is_waitlisted
                      '<tr bgcolor="lightgray">'
                    else
                      '<tr id="topic_' + topic.id.to_s + '">'
@@ -58,6 +62,7 @@ module SignUpSheetHelper
       chooser_present = false
       participants.each do |participant|
         next unless topic.id == participant.topic_id
+
         chooser_present = true
         html += participant.user_name_placeholder
         if assignment.max_team_size > 1

@@ -1,16 +1,15 @@
 describe AuthorizationHelper do
-
   # Set up some dummy users
   # Inspired by spec/controllers/users_controller_spec.rb
   # Makes use of spec/factories/factories.rb
   # Use create instead of build so that these users get IDs
   # https://stackoverflow.com/questions/41149787/how-do-i-create-an-user-id-for-a-factorygirl-build
-  let(:student) {create(:student)}
-  let(:teaching_assistant) {create(:teaching_assistant)}
-  let(:instructor) {create(:instructor)}
-  let(:admin) {create(:admin)}
-  let(:superadmin) {create(:superadmin)}
-  let(:assignment_team) {create(:assignment_team)}
+  let(:student) { create(:student) }
+  let(:teaching_assistant) { create(:teaching_assistant) }
+  let(:instructor) { create(:instructor) }
+  let(:admin) { create(:admin) }
+  let(:superadmin) { create(:superadmin) }
+  let(:assignment_team) { create(:assignment_team) }
 
   # The global before(:each) in spec/spec_helper.rb establishes roles before each test runs
 
@@ -18,8 +17,7 @@ describe AuthorizationHelper do
 
   # HAS PRIVILEGES (Super Admin --> Admin --> Instructor --> TA --> Student)
 
-  describe ".current_user_has_super_admin_privileges?" do
-
+  describe '.current_user_has_super_admin_privileges?' do
     it 'returns false if there is no current user' do
       session[:user] = nil
       expect(current_user_has_super_admin_privileges?).to be false
@@ -49,11 +47,9 @@ describe AuthorizationHelper do
       stub_current_user(superadmin, superadmin.role.name, superadmin.role)
       expect(current_user_has_super_admin_privileges?).to be true
     end
-
   end
 
-  describe ".current_user_has_admin_privileges?" do
-
+  describe '.current_user_has_admin_privileges?' do
     it 'returns false if there is no current user' do
       session[:user] = nil
       expect(current_user_has_admin_privileges?).to be false
@@ -83,11 +79,9 @@ describe AuthorizationHelper do
       stub_current_user(superadmin, superadmin.role.name, superadmin.role)
       expect(current_user_has_admin_privileges?).to be true
     end
-
   end
 
-  describe ".current_user_has_instructor_privileges?" do
-
+  describe '.current_user_has_instructor_privileges?' do
     it 'returns false if there is no current user' do
       session[:user] = nil
       expect(current_user_has_instructor_privileges?).to be false
@@ -117,11 +111,9 @@ describe AuthorizationHelper do
       stub_current_user(superadmin, superadmin.role.name, superadmin.role)
       expect(current_user_has_instructor_privileges?).to be true
     end
-
   end
 
-  describe ".current_user_has_ta_privileges?" do
-
+  describe '.current_user_has_ta_privileges?' do
     it 'returns false if there is no current user' do
       session[:user] = nil
       expect(current_user_has_ta_privileges?).to be false
@@ -151,11 +143,9 @@ describe AuthorizationHelper do
       stub_current_user(superadmin, superadmin.role.name, superadmin.role)
       expect(current_user_has_ta_privileges?).to be true
     end
-
   end
 
-  describe ".current_user_has_student_privileges?" do
-
+  describe '.current_user_has_student_privileges?' do
     it 'returns false if there is no current user' do
       session[:user] = nil
       expect(current_user_has_student_privileges?).to be false
@@ -185,11 +175,9 @@ describe AuthorizationHelper do
       stub_current_user(superadmin, superadmin.role.name, superadmin.role)
       expect(current_user_has_student_privileges?).to be true
     end
-
   end
 
-  describe ".current_user_teaching_staff_of_assignment?" do
-
+  describe '.current_user_teaching_staff_of_assignment?' do
     # # Rather than specifying IDs explicitly for instructor, TA, course, etc.
     # # Use factory create method to auto generate IDs.
     # # In this way we have less risk of making a mistake (e.g. duplication) in the ID numbers.
@@ -273,19 +261,17 @@ describe AuthorizationHelper do
     end
 
     it 'returns false if the teaching assistant is not associated with the course of the assignment' do
-
       instructor1 = create(:instructor)
       teaching_assistant1 = create(:teaching_assistant)
       assignment = create(:assignment, instructor_id: instructor1.id)
       stub_current_user(teaching_assistant1, teaching_assistant1.role.name, teaching_assistant1.role)
       expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be false
     end
-
   end
 
   # OTHER HELPER METHODS
 
-  describe ".current_user_is_assignment_participant?" do
+  describe '.current_user_is_assignment_participant?' do
     # Makes use of existing :assignment_team, :participant, and :assignment factories
 
     it 'returns false if there is no current user' do
@@ -335,11 +321,9 @@ describe AuthorizationHelper do
       participant = create(:participant, user: session[:user])
       expect(current_user_is_assignment_participant?(participant.assignment.id)).to be true
     end
-
   end
 
-  describe ".current_user_created_bookmark_id?" do
-
+  describe '.current_user_created_bookmark_id?' do
     it 'returns false if there is no current user' do
       session[:user] = nil
       create(:bookmark, user: student)
@@ -348,7 +332,7 @@ describe AuthorizationHelper do
 
     it 'returns false if there is no bookmark' do
       stub_current_user(student, student.role.name, student.role)
-      expect(current_user_created_bookmark_id?(12345678)).to be false
+      expect(current_user_created_bookmark_id?(12_345_678)).to be false
     end
 
     it 'returns false if the current user did not create the bookmark' do
@@ -362,84 +346,78 @@ describe AuthorizationHelper do
       create(:bookmark, user: student)
       expect(current_user_created_bookmark_id?(Bookmark.first.id)).to be true
     end
-
   end
 
-  describe ".current_user_is_a?" do
-
+  describe '.current_user_is_a?' do
     it 'returns false if there is no current user' do
       session[:user] = nil
-      expect(current_user_is_a? 'Student').to be false
+      expect(current_user_is_a?('Student')).to be false
     end
 
     it 'returns false if there is a current user no role' do
       random_user = build(:teaching_assistant, role_id: nil)
       session[:user] = random_user
-      expect(current_user_is_a? 'Teaching Assistant').to be false
+      expect(current_user_is_a?('Teaching Assistant')).to be false
     end
 
     it 'returns false if an erroneous role is passed in' do
-      expect(current_user_is_a? 'Random Role').to be false
+      expect(current_user_is_a?('Random Role')).to be false
     end
 
     it 'returns true if current user and parameter are both Student' do
       stub_current_user(student, student.role.name, student.role)
-      expect(current_user_is_a? 'Student').to be true
+      expect(current_user_is_a?('Student')).to be true
     end
 
     it 'returns true if current user and parameter are both Teaching Assistant' do
       stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
-      expect(current_user_is_a? 'Teaching Assistant').to be true
+      expect(current_user_is_a?('Teaching Assistant')).to be true
     end
 
     it 'returns true if current user and parameter are both Instructor' do
       stub_current_user(instructor, instructor.role.name, instructor.role)
-      expect(current_user_is_a? 'Instructor').to be true
+      expect(current_user_is_a?('Instructor')).to be true
     end
 
     it 'returns true if current user and parameter are both Administrator' do
       stub_current_user(admin, admin.role.name, admin.role)
-      expect(current_user_is_a? 'Administrator').to be true
+      expect(current_user_is_a?('Administrator')).to be true
     end
 
     it 'returns true if current user and parameter are both Super-Administrator' do
       stub_current_user(superadmin, superadmin.role.name, superadmin.role)
-      expect(current_user_is_a? 'Super-Administrator').to be true
+      expect(current_user_is_a?('Super-Administrator')).to be true
     end
-
   end
 
-  describe ".current_user_has_id?" do
-
+  describe '.current_user_has_id?' do
     it 'returns false if there is no current user' do
       session[:user] = nil
-      expect(current_user_has_id? -1).to be false
+      expect(current_user_has_id?(-1)).to be false
     end
 
     it 'returns false if current user exists but an erroneous id is passed in' do
       stub_current_user(admin, admin.role.name, admin.role)
-      expect(current_user_has_id? -1).to be false
+      expect(current_user_has_id?(-1)).to be false
     end
 
     it 'returns false if passed in id does not match current user id' do
       stub_current_user(student, student.role.name, student.role)
-      expect(current_user_has_id? student.id + 1).to be false
+      expect(current_user_has_id?(student.id + 1)).to be false
     end
 
     it 'returns true if passed in id matches the current user id' do
       stub_current_user(instructor, instructor.role.name, instructor.role)
-      expect(current_user_has_id? instructor.id).to be true
+      expect(current_user_has_id?(instructor.id)).to be true
     end
 
     it 'returns true if passed in id is the string version of current user id' do
       stub_current_user(instructor, instructor.role.name, instructor.role)
-      expect(current_user_has_id? instructor.id.to_s).to be true
+      expect(current_user_has_id?(instructor.id.to_s)).to be true
     end
-
   end
 
-  describe ".given_user_can_submit?" do
-
+  describe '.given_user_can_submit?' do
     it 'returns false if there is no given user' do
       expect(given_user_can_submit?(nil)).to be false
     end
@@ -457,11 +435,9 @@ describe AuthorizationHelper do
       participant = create(:participant, can_submit: 1)
       expect(given_user_can_submit?(participant.id)).to be true
     end
-
   end
 
-  describe ".given_user_can_review?" do
-
+  describe '.given_user_can_review?' do
     it 'returns false if there is no given user' do
       expect(given_user_can_review?(nil)).to be false
     end
@@ -479,11 +455,9 @@ describe AuthorizationHelper do
       participant = create(:participant, can_review: 1)
       expect(given_user_can_review?(participant.id)).to be true
     end
-
   end
 
-  describe ".given_user_can_take_quiz?" do
-
+  describe '.given_user_can_take_quiz?' do
     it 'returns false if there is no given user' do
       expect(given_user_can_take_quiz?(nil)).to be false
     end
@@ -501,11 +475,9 @@ describe AuthorizationHelper do
       participant = create(:participant, can_take_quiz: 1)
       expect(given_user_can_take_quiz?(participant.id)).to be true
     end
-
   end
 
-  describe ".given_user_can_read?" do
-
+  describe '.given_user_can_read?' do
     it 'returns false if there is no given user' do
       expect(given_user_can_read?(nil)).to be false
     end
@@ -523,11 +495,9 @@ describe AuthorizationHelper do
       participant = create(:participant, can_take_quiz: 1)
       expect(given_user_can_read?(participant.id)).to be true
     end
-
   end
 
   describe '.response_edit_allowed?' do
-
     it 'returns false if current user is not logged in' do
       map = create(:review_response_map)
       session[:user] = nil
@@ -555,13 +525,13 @@ describe AuthorizationHelper do
     end
 
     it 'returns true if map is of type ReviewResponseMap and current user is on the reviewee team' do
-    stub_current_user(student, student.role.name, student.role)
-    reviewer = create(:participant)
-    team = create(:assignment_team)
-    TeamNode.create(node_object_id: team.id)
-    team.add_member(session[:user])
-    map = create(:review_response_map, reviewer: reviewer, reviewee_id: team.id)
-    expect(response_edit_allowed?(map, map.reviewer.user_id)).to be true
+      stub_current_user(student, student.role.name, student.role)
+      reviewer = create(:participant)
+      team = create(:assignment_team)
+      TeamNode.create(node_object_id: team.id)
+      team.add_member(session[:user])
+      map = create(:review_response_map, reviewer: reviewer, reviewee_id: team.id)
+      expect(response_edit_allowed?(map, map.reviewer.user_id)).to be true
     end
 
     it 'returns true if map is of type ReviewResponseMap and user is an admin' do
@@ -586,46 +556,44 @@ describe AuthorizationHelper do
       map = create(:review_response_map, reviewer: reviewer)
       expect(response_edit_allowed?(map, map.reviewer.user_id)).to be true
     end
-
   end
 
-  describe ".current_user_ancestor_of?" do
-
+  describe '.current_user_ancestor_of?' do
     it 'returns false if there is no logged in user' do
       session[:user] = nil
-      expect(current_user_ancestor_of? instructor).to be false
+      expect(current_user_ancestor_of?(instructor)).to be false
     end
 
     it 'returns false if the user argument is null' do
-      expect(current_user_ancestor_of? nil) .to be false
+      expect(current_user_ancestor_of?(nil)) .to be false
     end
 
     it 'returns false if there is a currently logged in user, but the target user has no parent' do
       stub_current_user(instructor, instructor.role.name, instructor.role)
       allow(student).to receive(:parent).and_return(nil)
-      expect(current_user_ancestor_of? student).to be false
+      expect(current_user_ancestor_of?(student)).to be false
     end
 
     it 'returns false if the current user is not an ancestor of the target user' do
       stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
-      parent = create(:instructor, parent_id: nil )
+      parent = create(:instructor, parent_id: nil)
       allow(student).to receive(:parent).and_return(parent)
-      expect(current_user_ancestor_of? student).to be false
+      expect(current_user_ancestor_of?(student)).to be false
     end
 
     it 'returns true if the current user is a parent of the target user' do
       ta = create(:teaching_assistant, parent_id: nil)
       stub_current_user(ta, ta.role.name, ta.role)
       allow(student).to receive(:parent).and_return(ta)
-      expect(current_user_ancestor_of? student).to be true
+      expect(current_user_ancestor_of?(student)).to be true
     end
 
     it 'returns true if the current user is a grandparent of the target user' do
-      instructor1 = create(:instructor, parent_id: nil )
+      instructor1 = create(:instructor, parent_id: nil)
       stub_current_user(instructor1, instructor1.role.name, instructor1.role)
       allow(teaching_assistant).to receive(:parent).and_return(instructor1)
       allow(student).to receive(:parent).and_return(teaching_assistant)
-      expect(current_user_ancestor_of? student).to be true
+      expect(current_user_ancestor_of?(student)).to be true
     end
 
     it 'returns true if the current user is a great grandparent of the target user' do
@@ -634,13 +602,11 @@ describe AuthorizationHelper do
       allow(instructor).to receive(:parent).and_return(admin1)
       allow(teaching_assistant).to receive(:parent).and_return(instructor)
       allow(student).to receive(:parent).and_return(teaching_assistant)
-      expect(current_user_ancestor_of? student).to be true
+      expect(current_user_ancestor_of?(student)).to be true
     end
-
   end
 
-  describe ".current_user_instructs_assignment?" do
-
+  describe '.current_user_instructs_assignment?' do
     it 'returns false if there is no logged in user' do
       assignment = create(:assignment)
       session[:user] = nil
@@ -653,8 +619,8 @@ describe AuthorizationHelper do
     end
 
     it 'returns false if the assignment has some other instructor' do
-      instructor1 = create(:instructor, name: "test_instructor_1")
-      instructor2 = create(:instructor, name: "test_instructor_2")
+      instructor1 = create(:instructor, name: 'test_instructor_1')
+      instructor2 = create(:instructor, name: 'test_instructor_2')
       assignment = create(:assignment, instructor_id: instructor1.id)
       stub_current_user(instructor2, instructor2.role.name, instructor2.role)
       expect(current_user_instructs_assignment?(assignment)).to be false
@@ -667,18 +633,16 @@ describe AuthorizationHelper do
     end
 
     it 'returns true if the course associated with the assignment is instructed by the current user' do
-      instructor1 = create(:instructor, name: "test_instructor_1")
-      instructor2 = create(:instructor, name: "test_instructor_2")
+      instructor1 = create(:instructor, name: 'test_instructor_1')
+      instructor2 = create(:instructor, name: 'test_instructor_2')
       course = create(:course, instructor_id: instructor1.id)
       assignment = create(:assignment, instructor_id: instructor2.id, course_id: course.id)
       stub_current_user(instructor1, instructor1.role.name, instructor1.role)
       expect(current_user_instructs_assignment?(assignment)).to be true
     end
-
   end
 
-  describe ".current_user_has_ta_mapping_for_assignment?" do
-
+  describe '.current_user_has_ta_mapping_for_assignment?' do
     it 'returns false if there is no logged in user' do
       assignment = create(:assignment)
       session[:user] = nil
@@ -691,8 +655,8 @@ describe AuthorizationHelper do
     end
 
     it 'returns false if the current user and the given assignment are NOT associated by a TA mapping' do
-      ta1 = create(:teaching_assistant, name: "test_ta_1")
-      ta2 = create(:teaching_assistant, name: "test_ta_2")
+      ta1 = create(:teaching_assistant, name: 'test_ta_1')
+      ta2 = create(:teaching_assistant, name: 'test_ta_2')
       course = create(:course)
       assignment = create(:assignment, course_id: course.id)
       TaMapping.create(ta_id: ta1.id, course_id: course.id)
@@ -707,10 +671,9 @@ describe AuthorizationHelper do
       stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
       expect(current_user_has_ta_mapping_for_assignment?(assignment)).to be true
     end
-
   end
 
-  describe ".find_assignment_from_response_id" do
+  describe '.find_assignment_from_response_id' do
     # Makes use of existing :response, :review_response_map, and :meta_review_response_map factories
 
     it 'returns the assignment if one is found without recursion' do
@@ -732,7 +695,7 @@ describe AuthorizationHelper do
       expect(find_assignment_from_response_id(response.id)).to eq(response.response_map.review_mapping.review_mapping.assignment)
     end
 
-    describe ".find_assignment_instructor" do
+    describe '.find_assignment_instructor' do
       # Makes use of existing :assignment and :course factories. Both point to Instructor.first
 
       it 'returns the instructor if the assignment belongs to a course' do
@@ -747,9 +710,6 @@ describe AuthorizationHelper do
         assignment = create(:assignment, course: nil, instructor: instructor)
         expect(find_assignment_instructor(assignment)).to eq(assignment.instructor)
       end
-
     end
-
   end
-
 end

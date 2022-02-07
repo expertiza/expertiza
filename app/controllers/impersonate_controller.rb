@@ -1,6 +1,6 @@
 class ImpersonateController < ApplicationController
   include SecurityHelper
- 
+
   def action_allowed?
     # Check for TA privileges first since TA's also have student privileges.
     if ['Student'].include? current_role_name
@@ -40,7 +40,7 @@ class ImpersonateController < ApplicationController
         user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:impersonate][:name]) : user = user = User.find_by(name: params[:impersonate][:name])
         AuthController.clear_user_info(session, nil)
         session[:user] = user
-        session[:impersonate] =  true
+        session[:impersonate] = true
         session[:original_user] = @original_user
       else
         # E1991 : check whether instructor is currently in anonymized view
@@ -56,14 +56,14 @@ class ImpersonateController < ApplicationController
   # Checking if special characters are present in the username provided, only alphanumeric should be used
   def check_if_special_char
     if params[:user]
-      if warn_for_special_chars(params[:user][:name], "Username")
+      if warn_for_special_chars(params[:user][:name], 'Username')
         redirect_back
         return
       end
     end
 
     if params[:impersonate]
-      if warn_for_special_chars(params[:impersonate][:name], "Username")
+      if warn_for_special_chars(params[:impersonate][:name], 'Username')
         redirect_back
         return
       end
@@ -104,7 +104,7 @@ class ImpersonateController < ApplicationController
         if !params[:impersonate][:name].empty?
           @message = "You cannot impersonate '#{params[:impersonate][:name]}'."
         else
-          @message = "No original account was found. Please close your browser and start a new session."
+          @message = 'No original account was found. Please close your browser and start a new session.'
         end
       end
     end
@@ -139,7 +139,7 @@ class ImpersonateController < ApplicationController
       else
         # Impersonate a new account
         if !params[:impersonate][:name].empty?
-          #check if special chars /\?<>|&$# are used to avoid html tags or system command
+          # check if special chars /\?<>|&$# are used to avoid html tags or system command
           check_if_special_char
           # E1991 : check whether instructor is currently in anonymized view
           user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:impersonate][:name]) : user = user = User.find_by(name: params[:impersonate][:name])

@@ -18,7 +18,7 @@ class QuestionsController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],
-         redirect_to: {action: :list}
+         redirect_to: { action: :list }
 
   # List all questions in paginated view
   def list
@@ -72,9 +72,9 @@ class QuestionsController < ApplicationController
     questionnaire_id = question.questionnaire_id
 
     if AnswerHelper.check_and_delete_responses(questionnaire_id)
-      flash[:success] = "You have successfully deleted the question. Any existing reviews for the questionnaire have been deleted!"
+      flash[:success] = 'You have successfully deleted the question. Any existing reviews for the questionnaire have been deleted!'
     else
-      flash[:success] = "You have successfully deleted the question!"
+      flash[:success] = 'You have successfully deleted the question!'
     end
 
     begin

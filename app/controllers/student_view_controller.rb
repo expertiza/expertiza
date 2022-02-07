@@ -5,20 +5,20 @@ class StudentViewController < ApplicationController
     current_user_has_instructor_privileges?
   end
 
-	def flip_view
+  def flip_view
     # flips the value of session[:flip_user], allowing an instructor
     # to see the student view, or allows them to switch back, due to
-    # check on session[:flip_user] in _navigation.html.erb. 
+    # check on session[:flip_user] in _navigation.html.erb.
 
     # if flag is false or uninitialized, set it to true
-    if(session[:flip_user] == nil || session[:flip_user] == false) then
-			session[:flip_user] = true
-			redirect_to '/'
+    if session[:flip_user].nil? || session[:flip_user] == false
+      session[:flip_user] = true
+      redirect_to '/'
 
-    # if flag is true, set to false.
-		elsif(session[:flip_user] == true) then
-			session[:flip_user] = false
-			redirect_to '/'
+      # if flag is true, set to false.
+    elsif session[:flip_user] == true
+      session[:flip_user] = false
+      redirect_to '/'
     end
   end
 end

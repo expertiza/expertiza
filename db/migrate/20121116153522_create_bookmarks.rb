@@ -1,14 +1,13 @@
 class CreateBookmarks < ActiveRecord::Migration
   def self.up
-    if(table_exists?(:bookmarks)==false)
-    create_table :bookmarks do |t|
+    if table_exists?(:bookmarks) == false
+      create_table :bookmarks do |t|
+        t.column 'url', :string, null: false
+        t.column 'discoverer_user_id', :integer, null: false
+        t.column 'user_count', :integer, null: false
 
-        t.column "url", :string, :null => false
-        t.column "discoverer_user_id", :integer, :null=> false
-        t.column "user_count", :integer, :null => false
-
-      t.timestamps
-    end
+        t.timestamps
+      end
     end
   end
 

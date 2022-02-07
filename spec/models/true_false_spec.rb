@@ -1,5 +1,5 @@
 describe TrueFalse do
-	let(:true_false) { build(:true_false, id: 1)}
+  let(:true_false) { build(:true_false, id: 1) }
   describe '#edit' do
     it 'returns html' do
       qc1 = double('QuizQuestionChoice')
@@ -14,21 +14,21 @@ describe TrueFalse do
     context 'when the question does not have text' do
       it 'returns "Please make sure all questions have text"' do
         allow(true_false).to receive(:txt).and_return('')
-        questions = {"1" => {txt: 'question text', iscorrect: '1'}, "2" => {txt: 'question text', iscorrect: '0'}}
+        questions = { '1' => { txt: 'question text', iscorrect: '1' }, '2' => { txt: 'question text', iscorrect: '0' } }
         expect(true_false.isvalid(questions)).to eq('Please make sure all questions have text')
       end
     end
     context 'when the choice does not have text' do
       it 'returns "Please make sure every question has text for all options"' do
         allow(true_false).to receive(:txt).and_return('Text')
-        questions = {"1" => {txt: '', iscorrect: '1'}, "2" => {txt: 'question text', iscorrect: '0'}}
+        questions = { '1' => { txt: '', iscorrect: '1' }, '2' => { txt: 'question text', iscorrect: '0' } }
         expect(true_false.isvalid(questions)).to eq('Please make sure every question has text for all options')
       end
     end
     context 'when no right answer was selected' do
       it 'returns "Please select a correct answer for all questions"' do
         allow(true_false).to receive(:txt).and_return('Text')
-        questions = {"1" => {txt: 'question text', iscorrect: '0'}, "2" => {txt: 'question text', iscorrect: '0'}}
+        questions = { '1' => { txt: 'question text', iscorrect: '0' }, '2' => { txt: 'question text', iscorrect: '0' } }
         expect(true_false.isvalid(questions)).to eq('Please select a correct answer for all questions')
       end
     end
@@ -38,5 +38,4 @@ describe TrueFalse do
       expect(true_false.get_formatted_question_type).to eq('True/False')
     end
   end
-
 end

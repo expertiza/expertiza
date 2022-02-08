@@ -28,7 +28,7 @@
 <% end %>
 
 <BR/>
-<% if not @parent.instance_of?(Course) and not @parent.course.nil? %>
+<% if !@parent.instance_of?(Course) && !@parent.course.nil? && !@parent.teams?%>
   <H2> Inherit Teams From Course </H2>
   <p> Use the teams that are currently defined for the course.</p>
   <%= form_tag :action => 'inherit' do %>

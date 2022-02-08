@@ -168,6 +168,10 @@ class SurveyDeploymentController < ApplicationController
 
   def view_responses
     sd = SurveyDeployment.find_by(parent_id: params[:id])
+    if sd.nil?
+      flash[:warn] = "This assignment does not have a survey deployment."
+      return redirect_to controller: 'assignments', action:'edit', id: params[:id]
+    end
     @questionnaire = Questionnaire.find(sd.questionnaire_id)
     @questions = Question.where(questionnaire_id: @questionnaire.id)
     response_map_list = ResponseMap.where(reviewee_id: sd.id)

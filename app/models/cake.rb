@@ -104,4 +104,3 @@ class Cake < ScoredQuestion
     question_score
   end
 end
-

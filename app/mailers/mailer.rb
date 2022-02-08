@@ -106,7 +106,7 @@ class Mailer < ActionMailer::Base
     @name = defn[:body][:name]
     @assignment_name = defn[:body][:assignment_name]
     defn[:to] = 'expertiza.debugging@gmail.com' if Rails.env.development? || Rails.env.test?
-    mail(:subject => defn[:subject],
-         :to => defn[:to])
+    mail(subject: defn[:subject],
+         to: defn[:to])
   end
 end

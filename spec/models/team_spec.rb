@@ -168,7 +168,7 @@ describe Team do
       it 'raises an ImportError' do
         allow(User).to receive(:find_by).with(name: 'no name').and_return(nil)
         expect { team.import_team_members(teammembers: ['no name']) }.to raise_error(ImportError,
-                                                                                        "The user 'no name' was not found. <a href='/users/new'>Create</a> this user?")
+                                                                                     "The user 'no name' was not found. <a href='/users/new'>Create</a> this user?")
       end
     end
 

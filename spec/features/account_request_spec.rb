@@ -13,7 +13,7 @@ describe 'new user request' do
       # click 'REQUEST ACCOUNT' button on root path, redirect to users# new page
       visit '/'
       click_button 'Request account'
-      expect(page).to have_current_path('/account_request/new?role=Instructor')
+      expect(page).to have_current_path("/account_request/new?utf8=%E2%9C%93&commit=Request+account")
       fill_in 'user_name', with: 'requester'
       fill_in 'user_fullname', with: 'requester, requester'
       # a new user is able to add a new institution

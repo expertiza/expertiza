@@ -8,6 +8,7 @@ env:
     - TESTFOLDER=controllers
     - TESTFOLDER=helpers
     - TESTFOLDER=lib
+    - TESTFOLDER=features
 language: ruby
 dist: trusty
 cache:

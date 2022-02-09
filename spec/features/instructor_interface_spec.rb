@@ -3,6 +3,7 @@ include InstructorInterfaceHelperSpec
 describe 'Integration tests for instructor interface' do
   before(:each) do
     assignment_setup
+    course_setup
   end
 
   describe 'Instructor login' do

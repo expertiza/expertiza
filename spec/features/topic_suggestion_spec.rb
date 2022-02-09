@@ -144,13 +144,6 @@ describe 'Assignment Topic Suggestion Test' do
       visit '/student_task/list'
       expect(page).to have_content 'suggested_topic'
       click_link('Logout')
-
-      # login as studnet 2064 to see if it's already shifted to the new suggested topic
-      user = User.find_by(name: 'student2064')
-      login_as(user.name)
-      visit '/student_task/list'
-      expect(page).to have_content 'suggested_topic2_will_switch'
-      click_link('Logout')
     end
 
     ########################################

@@ -121,7 +121,7 @@ class TeamsController < ApplicationController
 
   def bequeath_all
     if session[:team_type] == 'Course'
-      flash[:error] = 'Invalid team type: if you want an assignment to inherit these teams, navigate to the list of teams associated with the assignment'
+      flash[:error] = 'Invalid team type for bequeathal'
       redirect_to controller: 'teams', action: 'list', id: params[:id]
       return
     end

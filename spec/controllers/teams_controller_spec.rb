@@ -225,33 +225,49 @@ describe TeamsController do
       end
     end
   end
-
-  describe 'bequeath method' do
-    context 'called when assignment has a course' do
-      it 'copies the teams from assignment to the course' do
-        allow(AssignmentTeam).to receive(:find).and_return(team2)
-        allow(Assignment).to receive(:find).and_return(assignment1)
-        allow(Course).to receive(:find).and_return(course1)
-        para = { id: team2.id }
-        session = { user: ta }
-        result = get :bequeath, para, session
-        # status code 302: Redirect url
-        expect(result.status).to eq 302
-        expect(result).to redirect_to(controller: 'teams', action: 'list', id: assignment1.id)
+  
+  describe '#bequeath_all' do
+    context 'when the team type is session' do
+      it 'flashes an error' do
+        session = {team_type: 'Course', user: ta}
+        para = { id: team5.id }
+        post :bequeath_all, para, session 
+        expect(flash[:error]).to eq('Invalid team type for bequeathal')
       end
     end
-    context 'called when assignment does not have a course' do
-      let(:fasg) { build_stubbed(:assignment, id: 1074, course_id: -2) }
-      # a temporary assignment object is created with an abnormal course_id so that we can check the fail condition of the method
-      it 'throws an error and fails to copy the teams' do
-        allow(AssignmentTeam).to receive(:find).and_return(team2)
-        allow(Assignment).to receive(:find).and_return(fasg)
-        para = { id: team2.id }
-        session = { user: ta }
-        result = get :bequeath, para, session
-        # status code 302: Redirect url
-        expect(result.status).to eq 302
-        expect(result).to redirect_to(controller: 'teams', action: 'list', id: fasg.id)
+    context 'when there is no course associated with this assignment' do
+      it 'flashes an error' do
+        para = { id: 1 }
+        session = {team_type: 'Assignment', user: ta}
+        allow(Assignment).to receive(:find).and_return(assignment1)
+        allow_any_instance_of(Assignment).to receive(:course_id).and_return(nil)
+        post :bequeath_all, para, session
+        expect(flash[:error]).to eq('No course was found for this assignment.')
+      end
+    end
+    context 'when the course already has teams associated with it' do
+      it 'flashes an error' do
+        para = { id: 1 }
+        session = {team_type: 'Assignment', user: ta}
+        allow(Assignment).to receive(:find).and_return(assignment1)
+        allow_any_instance_of(Assignment).to receive(:course_id).and_return(1)
+        allow(Course).to receive(:find).and_return(course1)
+        allow_any_instance_of(Course).to receive(:course_teams).and_return([team5, team6])
+        post :bequeath_all, para, session
+        expect(flash[:error]).to eq('The course already has associated teams')
+      end
+    end
+    context 'when bequeathal is successful in copying 2 teams' do
+      it 'flashes a note stating 2 teams were copied' do
+        para = { id: 1 }
+        session = {team_type: 'Assignment', user: ta}
+        allow(Assignment).to receive(:find).and_return(assignment1)
+        allow_any_instance_of(Assignment).to receive(:course_id).and_return(1)
+        allow(Course).to receive(:find).and_return(course1)
+        allow_any_instance_of(Course).to receive(:course_teams).and_return([])
+        allow_any_instance_of(Assignment).to receive(:teams).and_return([team1, team2])
+        post :bequeath_all, para, session
+        expect(flash[:note]).to eq('2 teams were successfully copied to \'TestCourse\'')
       end
     end
   end

@@ -48,7 +48,7 @@ describe 'peer review testing' do
     click_link 'TestAssignment'
     click_link "Others' work"
     find(:css, '#i_dont_care').set(true)
-    click_button 'Request a new submission to review'
+    click_button 'Request'
     expect(page).to have_content 'No topics are available to review at this time. Please try later.'
   end
 
@@ -58,7 +58,7 @@ describe 'peer review testing' do
     click_link 'TestAssignment'
     click_link "Others' work"
     find(:css, '#i_dont_care').set(true)
-    click_button 'Request a new submission to review'
+    click_button 'Request'
     expect(page).to have_content 'No topics are available to review at this time. Please try later.'
   end
 
@@ -82,7 +82,7 @@ describe 'peer review testing' do
     click_link 'TestAssignment'
     click_link "Others' work"
     choose "topic_id_#{SignUpTopic.find_by(topic_name: 'TestTopic').id}"
-    click_button 'Request a new submission to review'
+    click_button 'Request'
     expect(page).to have_content 'No previous versions available'
   end
 
@@ -97,7 +97,7 @@ describe 'peer review testing' do
     click_link 'TestAssignment'
     click_link "Others' work"
     find(:css, '#i_dont_care').set(true)
-    click_button 'Request a new submission to review'
+    click_button 'Request'
     expect(page).to have_content 'No previous versions available'
   end
 end

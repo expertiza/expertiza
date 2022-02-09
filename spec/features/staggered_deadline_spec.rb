@@ -116,7 +116,7 @@ describe 'Staggered deadline test' do
     expect(page).to have_content "Others' work"
     click_link "Others' work"
     expect(page).to have_content 'Reviews for "Assignment1665"'
-    click_button 'Request a new submission to review'
+    click_button 'Request'
     expect(page).to have_content 'No topic is selected. Please go back and select a topic.'
     click_link('Logout')
 
@@ -130,7 +130,7 @@ describe 'Staggered deadline test' do
     click_link "Others' work"
     expect(page).to have_content 'Reviews for "Assignment1665"'
     choose 'topic_id_1'
-    click_button 'Request a new submission to review'
+    click_button 'Request'
     expect(page).to have_content 'Review 1.'
     click_link 'Begin'
     expect(page).to have_content 'You are reviewing Topic_1'
@@ -169,7 +169,7 @@ describe 'Staggered deadline test' do
     click_link "Others' work"
     expect(page).to have_content 'Reviews for "Assignment1665"'
     choose 'topic_id_2'
-    click_button 'Request a new submission to review'
+    click_button 'Request'
     expect(page).to have_content 'Review 1.'
     click_link 'Begin'
     expect(page).to have_content 'You are reviewing Topic_2'
@@ -196,7 +196,7 @@ describe 'Staggered deadline test' do
     click_link "Others' work"
     expect(page).to have_content 'Reviews for "Assignment1665"'
     choose 'topic_id_1'
-    click_button 'Request a new submission to review'
+    click_button 'Request'
     expect(page).to have_content 'Review 1.'
     click_link 'Begin'
     expect(page).to have_content 'You are reviewing Topic_1'

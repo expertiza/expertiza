@@ -12,7 +12,7 @@ describe 'new user request' do
     it 'works correctly', js: true do
       # click 'REQUEST ACCOUNT' button on root path, redirect to users# new page
       visit '/'
-      click_link 'Request account'
+      click_button 'Request account'
       expect(page).to have_current_path('/account_request/new?role=Instructor')
       fill_in 'user_name', with: 'requester'
       fill_in 'user_fullname', with: 'requester, requester'

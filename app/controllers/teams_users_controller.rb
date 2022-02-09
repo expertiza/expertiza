@@ -34,6 +34,7 @@ class TeamsUsersController < ApplicationController
   end
 
   def create
+    puts 'Got here'
     user = User.find_by(name: params[:user][:name].strip)
     unless user
       urlCreate = url_for controller: 'users', action: 'new'
@@ -49,7 +50,13 @@ class TeamsUsersController < ApplicationController
           urlAssignmentParticipantList = url_for controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment', authorization: 'participant'
           flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
         else
-          add_member_return = team.add_member(user, team.parent_id)
+          begin 
+            add_member_return = team.add_member(user, team.parent_id)
+          rescue
+            flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
+            redirect_back
+            return
+          end
           flash[:error] = 'This team already has the maximum number of members.' if add_member_return == false
           # E2115 Mentor Management
           # Kick off the Mentor Management workflow

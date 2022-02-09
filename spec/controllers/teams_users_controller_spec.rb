@@ -219,6 +219,92 @@ describe TeamsUsersController do
         expect(response).to redirect_to('http://test.host/teams/list?id=1')
       end
     end
+
+    context 'when user is already on an assignment team' do
+      it 'returns redirect_back' do
+        allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
+        allow(Team).to receive(:find).with(any_args).and_return(team1)
+        allow(AssignmentTeam).to receive(:find).with('1').and_return(team1)
+        allow(Assignment).to receive(:find).with(1).and_return(assignment1)
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
+        allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(true)
+        allow(TeamsUser).to receive(:last).with(any_args).and_return(student1)
+        allow(assignment1).to receive(:user_on_team?).with(student1).and_return(true)
+        session = { user: admin }
+        params = {
+          user: { name: 'student2065' }, id: 1
+        }
+        post :create, params, session
+        # Expect to throw error
+        expect(flash[:error]).to eq 'This user is already assigned to a team for this assignment'
+        # Expect the response to redirect back to 'test.host'
+        expect(response).to redirect_to('http://test.host/')
+      end
+    end
+
+    context 'when user is added to assignment team while on a team already' do
+      it 'it throws error that they are already on a team' do
+        allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
+        allow(Team).to receive(:find).with('1').and_return(team1)
+        allow(AssignmentTeam).to receive(:find).with('1').and_return(team1)
+        allow(Assignment).to receive(:find).with(1).and_return(assignment1)
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
+        allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_raise("Member on existing team error")
+        session = { user: admin }
+        params = {
+          user: { name: 'student2065' }, id: 1
+        }
+        post :create, params, session
+        # Expect to throw error
+        expect(flash[:error]).to eq 'The user student2065 is already a member of the team wolfers'
+        # Expect the response to redirect back to 'test.host'
+        expect(response).to redirect_to('http://test.host/')
+      end
+    end
+
+    context 'when user is already on a course team' do
+      it 'returns redirect_back' do
+        allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
+        allow(Team).to receive(:find).with('5').and_return(team5)
+        allow(CourseTeam).to receive(:find).with('5').and_return(team5)
+        allow(TeamsUser).to receive(:create).with(user_id: 1, team_id: 5).and_return(double('TeamsUser', id: 1))
+        allow(TeamNode).to receive(:find_by).with(node_object_id: 5).and_return(double('TeamNode', id: 1))
+        allow(TeamUserNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('TeamUserNode', id: 1))
+        allow(Course).to receive(:find).with(1).and_return(course1)
+        allow(CourseParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
+        allow_any_instance_of(CourseTeam).to receive(:add_member).with(any_args).and_return(true)
+        allow(course1).to receive(:user_on_team?).with(student1).and_return(true)
+        session = { user: admin }
+        params = {
+          user: { name: 'student2065' }, id: 5
+        }
+        post :create, params, session
+        # Expect to throw error
+        expect(flash[:error]).to eq 'This user is already assigned to a team for this course'
+        # Expect the response to redirect back to 'test.host'
+        expect(response).to redirect_to('http://test.host/')
+      end
+    end
+
+    context 'when user is added to course team while on a team already' do
+      it 'it throws error that they are already on a team' do
+        allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
+        allow(Team).to receive(:find).with('5').and_return(team5)
+        allow(CourseTeam).to receive(:find).with('5').and_return(team5)
+        allow(Course).to receive(:find).with(1).and_return(course1)
+        allow(CourseParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
+        allow_any_instance_of(CourseTeam).to receive(:add_member).with(any_args).and_raise("Member on existing team error")
+        session = { user: admin }
+        params = {
+          user: { name: 'student2065' }, id: 5
+        }
+        post :create, params, session
+        # Expect to throw error
+        expect(flash[:error]).to eq 'The user student2065 is already a member of the team team1'
+        # Expect the response to redirect back to 'test.host'
+        expect(response).to redirect_to('http://test.host/')
+      end
+    end
   end
 
   # Test delete user from team

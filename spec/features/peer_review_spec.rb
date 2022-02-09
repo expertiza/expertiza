@@ -42,7 +42,7 @@ describe 'peer review testing' do
     expect(page).to have_content 'Reviews for "TestAssignment"'
 
     choose 'topic_id'
-    click_button 'Request a new submission to review'
+    click_button 'Request'
 
     click_link 'Begin'
   end

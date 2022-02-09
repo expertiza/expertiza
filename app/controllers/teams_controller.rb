@@ -21,7 +21,6 @@ class TeamsController < ApplicationController
     allowed_types = %w[Assignment Course]
     session[:team_type] = params[:type] if params[:type] && allowed_types.include?(params[:type])
     @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == 'Assignment'
-    # @course = Course.find(params[:id]) if session[:team_type] == 'Course'
     begin
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
@@ -71,10 +70,6 @@ class TeamsController < ApplicationController
 
   def delete_all
     root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
-    if root_node.nil?
-      flash[:warning] = "Error detected" 
-      return
-    end
     child_nodes = root_node.get_teams.map(&:node_object_id)
     Team.destroy_all(id: child_nodes) if child_nodes
     redirect_to action: 'list', id: params[:id]

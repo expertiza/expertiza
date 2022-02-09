@@ -267,7 +267,7 @@ describe TeamsController do
         allow_any_instance_of(Course).to receive(:course_teams).and_return([])
         allow_any_instance_of(Assignment).to receive(:teams).and_return([team1, team2])
         post :bequeath_all, para, session
-        expect(flash[:note]).to eq('2 teams were successfully copied to \'TestCourse\'')
+        expect(flash[:note]).to eq("2 teams were successfully copied to \"TestCourse\"")
       end
     end
   end

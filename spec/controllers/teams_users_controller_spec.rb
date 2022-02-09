@@ -300,7 +300,7 @@ describe TeamsUsersController do
         }
         post :create, params, session
         # Expect to throw error
-        expect(flash[:error]).to eq 'The user student2065 is already a member of the team team1'
+        expect(flash[:error]).to eq 'The user student2065 is already a member of the team team5'
         # Expect the response to redirect back to 'test.host'
         expect(response).to redirect_to('http://test.host/')
       end

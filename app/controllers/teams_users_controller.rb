@@ -34,7 +34,6 @@ class TeamsUsersController < ApplicationController
   end
 
   def create
-    puts 'Got here'
     user = User.find_by(name: params[:user][:name].strip)
     unless user
       urlCreate = url_for controller: 'users', action: 'new'
@@ -42,10 +41,14 @@ class TeamsUsersController < ApplicationController
     end
 
     team = Team.find(params[:id])
-
     unless user.nil?
       if team.is_a?(AssignmentTeam)
         assignment = Assignment.find(team.parent_id)
+        if assignment.user_on_team?(user)
+          flash[:error] = "This user is already assigned to a team for this assignment" 
+          redirect_back
+          return
+        end
         if AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id).nil?
           urlAssignmentParticipantList = url_for controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment', authorization: 'participant'
           flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
@@ -70,11 +73,22 @@ class TeamsUsersController < ApplicationController
         end
       else # CourseTeam
         course = Course.find(team.parent_id)
+        if course.user_on_team?(user)
+          flash[:error] = "This user is already assigned to a team for this course" 
+          redirect_back
+          return
+        end
         if CourseParticipant.find_by(user_id: user.id, parent_id: course.id).nil?
           urlCourseParticipantList = url_for controller: 'participants', action: 'list', id: course.id, model: 'Course', authorization: 'participant'
           flash[:error] = "\"#{user.name}\" is not a participant of the current course. Please <a href=\"#{urlCourseParticipantList}\">add</a> this user before continuing."
         else
-          add_member_return = team.add_member(user)
+          begin 
+            add_member_return = team.add_member(user, team.parent_id)
+          rescue
+            flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
+            redirect_back
+            return
+          end
           flash[:error] = 'This team already has the maximum number of members.' if add_member_return == false
           if add_member_return
             @teams_user = TeamsUser.last

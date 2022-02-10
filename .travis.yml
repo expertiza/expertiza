@@ -4,12 +4,13 @@ env:
     - REPORT_REPO_NAME=Travis-ci-code-coverage-reports
     - secure: fpBhnY1Y4U0qx/BOFyO8OaS5gBPlF9Y8mFONF7WkphqbEJytlfIunbLFpQ1CX/9rDo1+96g0TDJUMx3bs4AnsgGEt16oSLOiRhKfyMcdsVRJry8a0PZMtYaEpBReyPv0Va0V7VTy1hFzLKTkmxKoIoYgNY0msocRypl/K6CF7l8=
   jobs:
-    fast_finish: true
-    - TESTFOLDER=features
+    - fast_finish: true
     - TESTFOLDER=models
     - TESTFOLDER=controllers
     - TESTFOLDER=helpers
     - TESTFOLDER=lib
+    - allow_failures:
+      - TESTFOLDER=features
 language: ruby
 dist: trusty
 cache:

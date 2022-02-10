@@ -96,11 +96,7 @@ class UsersController < ApplicationController
       @user = User.find(params[:id])
       @assignment_participant_num = AssignmentParticipant.where(user_id: @user.id).count
       @maps = ResponseMap.where('reviewee_id = ? or reviewer_id = ?', params[:id], params[:id])
-<<<<<<< HEAD
       @total_user_num = User.count
-=======
-      # count the number of users in DB
->>>>>>> ad4176bf9 (fix issue #2234)
     end
   end
 

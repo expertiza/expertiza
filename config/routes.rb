@@ -464,7 +464,6 @@ Expertiza::Application.routes.draw do
   resources :teams, only: %i[new create edit update] do
     collection do
       get :list
-      post ':id', action: :update
       post :create_teams
       post :inherit
     end

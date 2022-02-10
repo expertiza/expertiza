@@ -16,7 +16,7 @@ shared_context 'object initializations' do
   let(:team2) { build_stubbed(:assignment_team, id: 2, parent_id: assignment1.id) }
   let(:team3) { build_stubbed(:assignment_team, id: 3, parent_id: assignment1.id) }
   let(:team4) { build_stubbed(:assignment_team, id: 4, parent_id: assignment1.id) }
-  let(:team5) { build_stubbed(:course_team, id: 5, parent_id: course1.id) }
+  let(:team5) { build_stubbed(:course_team, id: 5, name: 'team5', parent_id: course1.id) }
   let(:team6) { build_stubbed(:course_team, id: 6, parent_id: course1.id) }
   let(:team7) { build_stubbed(:assignment_team, name: 'test', parent_id: course1.id) }
   let(:team8) { build_stubbed(:assignment_team, id: 1, name: 'wolfers', parent_id: assignment1.id) }

@@ -61,7 +61,7 @@ class Team < ActiveRecord::Base
   # Add member to the team, changed to hash by E1776
   def add_member(user, _assignment_id = nil)
     raise "The user #{user.name} is already a member of the team #{name}" if user?(user)
-
+    
     can_add_member = false
     unless full?
       can_add_member = true

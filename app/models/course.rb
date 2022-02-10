@@ -69,6 +69,15 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def user_on_team?(user)
+    teams = get_teams
+    users = []
+    teams.each do |team|
+      users << team.users
+    end
+    users.flatten.include? user
+  end
+
   require 'analytic/course_analytic'
   include CourseAnalytic
 end

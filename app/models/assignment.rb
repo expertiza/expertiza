@@ -47,6 +47,15 @@ class Assignment < ActiveRecord::Base
   DEFAULT_MAX_REVIEWERS = 3
   DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
 
+  def user_on_team? (user)
+    teams = self.teams
+    users = []
+    teams.each do | team |
+      users << team.users
+    end
+    users.flatten.include? user
+  end
+
   def self.max_outstanding_reviews
     DEFAULT_MAX_OUTSTANDING_REVIEWS
   end

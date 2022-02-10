@@ -24,15 +24,4 @@ describe 'Assignment creation review strategy tab', js: true do
       max_reviews_per_submission: 10
     )
   end
-
-  # instructor assign reviews will happen only one time, so the data will not be store in DB.
-  it 'sets number of reviews by each student' do
-    pending('review section not yet completed')
-    login_as('instructor6')
-    visit '/assignments/1/edit'
-    find_link('ReviewStrategy').click
-    select 'Instructor-Selected', from: 'assignment_form_assignment_review_assignment_strategy'
-    check 'num_reviews_student'
-    fill_in 'num_reviews_per_student', with: 5
-  end
 end

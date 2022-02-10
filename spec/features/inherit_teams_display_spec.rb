@@ -1,9 +1,10 @@
 describe 'displaying inherit teams section' do
   it 'should display inherit teams option while creating an assignment team' do
+    create(:course)
+    create(:course_team)
     create(:assignment)
     create(:assignment_node)
     create(:assignment_team)
-
     login_as('instructor6')
     visit '/teams/list?id=1&type=Assignment'
     click_link 'Create Team'

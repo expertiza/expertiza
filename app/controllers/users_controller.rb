@@ -76,6 +76,8 @@ class UsersController < ApplicationController
       # check whether current user is authorized to edit the user being searched, call show if true
 
       if @role.parent_id.nil? || @role.parent_id < session[:user].role_id || @user.id == session[:user].id
+        @total_user_num = User.count
+        @assignment_participant_num = AssignmentParticipant.where(user_id: @user.id).count
         render action: 'show'
       else
         flash[:note] = 'The specified user is not available for editing.'
@@ -92,13 +94,8 @@ class UsersController < ApplicationController
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
       @user = User.find(params[:id])
-      role
-      # obtain number of assignments participated
-      @assignment_participant_num = 0
-      AssignmentParticipant.where(user_id: @user.id).each { |_participant| @assignment_participant_num += 1 }
-      # judge whether this user become reviewer or reviewee
+      @assignment_participant_num = AssignmentParticipant.where(user_id: @user.id).count
       @maps = ResponseMap.where('reviewee_id = ? or reviewer_id = ?', params[:id], params[:id])
-      # count the number of users in DB
       @total_user_num = User.count
     end
   end

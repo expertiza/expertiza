@@ -193,7 +193,7 @@ class User < ActiveRecord::Base
       items = login.split('@')
       short_name = items[0]
       user_list = User.where('name = ?', short_name)
-      user = user_list.first if !user_list.nil? && user_list.length == 1
+      user = user_list.first if user_list.any? && user_list.length == 1
     end
     user
   end

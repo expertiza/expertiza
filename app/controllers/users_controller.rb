@@ -62,10 +62,10 @@ class UsersController < ApplicationController
   # for displaying the list of users
   def list
     user = session[:user]
-    @users = user.get_user_list
+    # @users = user.get_user_list
     # paginate_list is called with the entire list of users
     # @paginated_users can be used to display set number of users per page
-    @paginated_users = paginate_list(@users)
+    @paginated_users = paginate_list
   end
 
   # for displaying users which are being searched for editing purposes after checking whether current user is authorized to do so
@@ -94,6 +94,7 @@ class UsersController < ApplicationController
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
       @user = User.find(params[:id])
+      @role = @user.role
       @assignment_participant_num = AssignmentParticipant.where(user_id: @user.id).count
       @maps = ResponseMap.where('reviewee_id = ? or reviewer_id = ?', params[:id], params[:id])
       @total_user_num = User.count
@@ -296,7 +297,7 @@ class UsersController < ApplicationController
   end
 
   # For filtering the users list with proper search and pagination.
-  def paginate_list(users)
+  def paginate_list
     paginate_options = { '1' => 25, '2' => 50, '3' => 100 }
 
     # If the above hash does not have a value for the key,
@@ -313,7 +314,7 @@ class UsersController < ApplicationController
 
     # paginate
     users = if paginate_options[@per_page.to_s].nil? # displaying all - no pagination
-              User.paginate(page: params[:page], per_page: users.count)
+              User.paginate(page: params[:page], per_page: User.count)
             else # some pagination is active - use the per_page
               User.paginate(page: params[:page], per_page: paginate_options[@per_page.to_s])
             end

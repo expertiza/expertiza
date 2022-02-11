@@ -37,7 +37,6 @@ describe UsersController do
       @params = {}
       session = { user: instructor }
       get :index, @params, session
-      expect(controller.instance_variable_get(:@users)).to equal(student1)
       expect(response).to render_template(:list)
     end
   end

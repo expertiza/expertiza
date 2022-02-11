@@ -44,6 +44,10 @@ class ExportFileController < ApplicationController
         csv << Object.const_get(params[:model]).export_headers(params[:id])
         csv << Object.const_get(params[:model]).export_details_fields(params[:details])
         Object.const_get(params[:model]).export_details(csv, params[:id], params[:details])
+      else
+        flash[:error] = "This operation is not supported for #{params[:model]}"
+        redirect_to :back
+        return
       end
     end
 

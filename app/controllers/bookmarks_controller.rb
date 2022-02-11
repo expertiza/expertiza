@@ -28,8 +28,8 @@ class BookmarksController < ApplicationController
   end
 
   def create
-    create_bookmark_params[:url] = create_bookmark_params[:url].gsub!(/http:\/\//, "") if create_bookmark_params[:url].start_with?('http://')
-    create_bookmark_params[:url] = create_bookmark_params[:url].gsub!(/https:\/\//, "") if create_bookmark_params[:url].start_with?('https://')
+    params[:url] = params[:url].gsub!(/http:\/\//, "") if params[:url].start_with?('http://')
+    params[:url] = params[:url].gsub!(/https:\/\//, "") if params[:url].start_with?('https://')
     begin
       Bookmark.create(url: create_bookmark_params[:url], title: create_bookmark_params[:title], description: create_bookmark_params[:description], user_id: session[:user].id, topic_id: create_bookmark_params[:topic_id])
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Your bookmark has been successfully created!', request)
@@ -38,7 +38,7 @@ class BookmarksController < ApplicationController
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, $ERROR_INFO, request)
       flash[:error] = $ERROR_INFO
     end
-    redirect_to action: 'list', id: create_bookmark_params[:topic_id]
+    redirect_to action: 'list', id: params[:topic_id]
   end
 
   def edit
@@ -66,7 +66,7 @@ class BookmarksController < ApplicationController
   end
 
   def save_bookmark_rating_score
-    @bookmark = Bookmark.find(create_bookmark_params[:id])
+    @bookmark = Bookmark.find(params[:id])
     @bookmark_rating = BookmarkRating.where(bookmark_id: @bookmark.id, user_id: session[:user].id).first
     if @bookmark_rating.blank?
       BookmarkRating.create(bookmark_id: @bookmark.id, user_id: session[:user].id, rating: create_bookmark_params[:rating])

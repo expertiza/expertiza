@@ -498,6 +498,7 @@ Expertiza::Application.routes.draw do
       get :auto_complete_for_user_name
       get :set_anonymized_view
       get :keys
+      delete :destroy
     end
   end
 

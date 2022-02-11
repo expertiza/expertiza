@@ -175,9 +175,9 @@ class User < ActiveRecord::Base
   end
 
   def self.yesorno(elt)
-    if elt == true
+    if elt
       'yes'
-    elsif elt == false
+    elsif !elt
       'no'
     else
       ''
@@ -193,7 +193,7 @@ class User < ActiveRecord::Base
       items = login.split('@')
       short_name = items[0]
       user_list = User.where('name = ?', short_name)
-      user = user_list.first if !user_list.nil? && user_list.length == 1
+      user = user_list.first if user_list.any? && user_list.length == 1
     end
     user
   end
@@ -304,7 +304,7 @@ class User < ActiveRecord::Base
   end
 
   def teaching_assistant?
-    true if role.ta?
+    role.ta?
   end
 
   def self.search_users(role, user_id, letter, search_by)

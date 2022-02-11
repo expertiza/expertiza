@@ -321,7 +321,7 @@ describe User do
   describe '.export_fields' do
     it 'exports all information setting in options' do
       expect(User.export_fields('personal_details' => 'true', 'role' => 'true', 'parent' => 'true', 'email_options' => 'true', 'handle' => 'true'))
-        .to eq(['name', 'full name', 'email', 'role', 'parent', 'email on submission', 'email on review', 'email on metareview', 'handle'])
+        .to eq(['name', 'full name', 'email', 'role', 'parent', 'email on submission', 'email on review', 'email on metareview', 'copy of emails', 'handle'])
     end
 
     it 'exports only personal_details' do
@@ -336,7 +336,7 @@ describe User do
 
     it 'exports only email_options' do
       expect(User.export_fields('email_options' => 'true'))
-        .to eq(['email on submission', 'email on review', 'email on metareview'])
+        .to eq(['email on submission', 'email on review', 'email on metareview', 'copy of emails'])
     end
 
     it 'exports only handle' do

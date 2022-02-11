@@ -1,4 +1,4 @@
-class AddNewMappingStrategy < ActiveRecord::Migration[4.2]
+class AddNewMappingStrategy < ActiveRecord::Migration[4.2][4.2]
   def self.up
     
     execute "INSERT INTO mapping_strategies (`id`, `name`) VALUES 

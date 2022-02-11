@@ -1,4 +1,4 @@
-class StandardizeReviewOfReviewMappings < ActiveRecord::Migration[4.2]  
+class StandardizeReviewOfReviewMappings < ActiveRecord::Migration[4.2][4.2]  
   def self.up
 
     begin

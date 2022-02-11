@@ -1,4 +1,4 @@
-class CleanUpQuestionnaires < ActiveRecord::Migration[4.2]
+class CleanUpQuestionnaires < ActiveRecord::Migration[4.2][4.2]
   def self.up    
     Questionnaire.find_by_sql("select q.* 
       from questionnaires q

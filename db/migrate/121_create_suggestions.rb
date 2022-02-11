@@ -1,4 +1,4 @@
-class CreateSuggestions < ActiveRecord::Migration[4.2]
+class CreateSuggestions < ActiveRecord::Migration[4.2][4.2]
   def self.up
     create_table :suggestions do |t|
      t.column  :assignment_id,      :int

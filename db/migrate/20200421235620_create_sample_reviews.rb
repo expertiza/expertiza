@@ -1,4 +1,4 @@
-class CreateSampleReviews < ActiveRecord::Migration[4.2]
+class CreateSampleReviews < ActiveRecord::Migration[4.2][4.2]
   def change
     create_table :sample_reviews do |t|
 

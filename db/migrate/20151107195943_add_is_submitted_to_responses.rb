@@ -1,4 +1,4 @@
-class AddIsSubmittedToResponses < ActiveRecord::Migration[4.2]
+class AddIsSubmittedToResponses < ActiveRecord::Migration[4.2][4.2]
   def self.up
     begin
       add_column :responses, :isSubmitted, :string, :null => true

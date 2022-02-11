@@ -1,4 +1,4 @@
-class Addiscodingassignmenttoassignments < ActiveRecord::Migration[4.2]
+class Addiscodingassignmenttoassignments < ActiveRecord::Migration[4.2][4.2]
     def self.up
       add_column :assignments, :is_coding_assignment, :boolean
     end

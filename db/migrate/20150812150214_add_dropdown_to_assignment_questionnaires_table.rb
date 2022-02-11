@@ -1,4 +1,4 @@
-class AddDropdownToAssignmentQuestionnairesTable < ActiveRecord::Migration[4.2]
+class AddDropdownToAssignmentQuestionnairesTable < ActiveRecord::Migration[4.2][4.2]
   def self.up
   	add_column :assignment_questionnaires, :dropdown, :boolean, default: true
   end

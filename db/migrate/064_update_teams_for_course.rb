@@ -1,4 +1,4 @@
-class UpdateTeamsForCourse < ActiveRecord::Migration[4.2]
+class UpdateTeamsForCourse < ActiveRecord::Migration[4.2][4.2]
   def self.up
     begin
       execute "ALTER TABLE `teams` DROP FOREIGN KEY `fk_teams_assignments`"

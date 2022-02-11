@@ -1,4 +1,4 @@
-class RemoveDynamicReviewerAssignmentsEnabledFromAssignments < ActiveRecord::Migration[4.2]
+class RemoveDynamicReviewerAssignmentsEnabledFromAssignments < ActiveRecord::Migration[4.2][4.2]
   def self.up
     remove_column :assignments, :dynamic_reviewer_assignments_enabled
   end

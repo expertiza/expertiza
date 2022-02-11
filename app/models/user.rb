@@ -175,9 +175,9 @@ class User < ActiveRecord::Base
   end
 
   def self.yesorno(elt)
-    if elt
+    if elt == true
       'yes'
-    elsif !elt
+    elsif elt == false
       'no'
     else
       ''
@@ -304,7 +304,7 @@ class User < ActiveRecord::Base
   end
 
   def teaching_assistant?
-    role.ta?
+    true if role.ta?
   end
 
   def self.search_users(role, user_id, letter, search_by)

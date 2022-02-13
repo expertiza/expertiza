@@ -107,8 +107,7 @@ module Scoring
     assignment.participants.each do |participant|
       scores[:participants][participant.id.to_s.to_sym] = participant_scores(participant, questions)
     end
-    index = 0
-    assignment.teams.each do |team|
+    assignment.teams.each_with_index do |team, index|
       scores[:teams][index.to_s.to_sym] = { team: team, scores: {} }
       if assignment.vary_by_round
         grades_by_rounds, total_num_of_assessments, total_score = compute_grades_by_rounds(assignment, questions, team)
@@ -118,7 +117,6 @@ module Scoring
         assessments = ReviewResponseMap.assessments_for(team)
         scores[:teams][index.to_s.to_sym][:scores] = aggregate_assessment_scores(assessments, questions[:review])
       end
-      index += 1
     end
     scores
   end
@@ -187,7 +185,6 @@ module Scoring
                              else
                                (questionnaire.symbol.to_s + round.to_s).to_sym
                              end
-
       scores[questionnaire_symbol] = {}
 
       scores[questionnaire_symbol][:assessments] = if round.nil?
@@ -195,6 +192,9 @@ module Scoring
                                                    else
                                                      questionnaire.get_assessments_round_for(participant, round)
                                                    end
+      if questionnaire_symbol == 'feedback'
+        puts "Feedback: #{scores[questionnaire_symbol][:assessments]}"
+      end
       # aggregate_assessment_scores computes the total score for a list of responses to a questionnaire
       scores[questionnaire_symbol][:scores] = aggregate_assessment_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
     end

@@ -45,7 +45,7 @@ class AssignmentParticipant < Participant
   end
 
   def feedback
-    FeedbackResponseMap.assessments_for(self)
+    FeedbackResponseMap.assessments_for(team)
   end
 
   def reviews

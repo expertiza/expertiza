@@ -51,7 +51,6 @@ class GradesController < ApplicationController
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)
     penalties(@assignment.id)
-
     @show_reputation = false
   end
 

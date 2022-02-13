@@ -35,6 +35,7 @@ class ResponseMap < ActiveRecord::Base
       end
       responses = responses.sort { |a, b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
     end
+    puts responses.each {|response| response.type}
     responses
   end
 

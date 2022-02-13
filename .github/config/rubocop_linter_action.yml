@@ -7,3 +7,9 @@
 check_scope: 'modified'
 with:
   action_config_path: ".github/actions/config/rubocop.yml"
+
+# The base branch against which changes will be compared, if check_scope config is set to 'modified'.
+# This setting is not used if check_scope != 'modified'.
+# Valid options: 'origin/another_branch'
+# Default: 'origin/master'
+base_branch: "origin/beta"

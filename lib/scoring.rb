@@ -191,10 +191,7 @@ module Scoring
                                                      questionnaire.get_assessments_for(participant)
                                                    else
                                                      questionnaire.get_assessments_round_for(participant, round)
-                                                   end
-      if questionnaire_symbol == 'feedback'
-        puts "Feedback: #{scores[questionnaire_symbol][:assessments]}"
-      end
+                                                   end 
       # aggregate_assessment_scores computes the total score for a list of responses to a questionnaire
       scores[questionnaire_symbol][:scores] = aggregate_assessment_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
     end

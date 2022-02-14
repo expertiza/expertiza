@@ -129,7 +129,6 @@ development:
         save_advice: false
       response:
         delete: false
-        pending_surveys: true
       analytic:
         assignment_list: false
         course_list: false
@@ -240,16 +239,6 @@ development:
         parent_id:
         site_controller_id: 23
         url: "/student_task/list"
-      30: &3 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id: 42
-        id: 30
-        label: Pending Surveys
-        name: pending_surveys
-        parent:
-        parent_id:
-        site_controller_id: 31
-        url: "/response/pending_surveys"
       27: &4 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 36
@@ -295,7 +284,6 @@ development:
     by_name:
       home: *1
       student_task: *2
-      pending_surveys: *3
       profile: *4
       contact_us: *5
       credits: *7
@@ -307,7 +295,6 @@ development:
       children:
       - 1
       - 26
-      - 30
       - 27
       - 2
       - 50
@@ -716,7 +703,6 @@ production:
         save_advice: false
       response:
         delete: false
-        pending_surveys: true
       analytic:
         assignment_list: false
         course_list: false
@@ -827,16 +813,6 @@ production:
         parent_id:
         site_controller_id: 23
         url: "/student_task/list"
-      30: &3 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id: 42
-        id: 30
-        label: Pending Surveys
-        name: pending_surveys
-        parent:
-        parent_id:
-        site_controller_id: 31
-        url: "/response/pending_surveys"
       27: &4 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 36
@@ -882,7 +858,6 @@ production:
     by_name:
       home: *1
       student_task: *2
-      pending_surveys: *3
       profile: *4
       contact_us: *5
       credits: *7
@@ -894,7 +869,6 @@ production:
       children:
       - 1
       - 26
-      - 30
       - 27
       - 2
       - 50

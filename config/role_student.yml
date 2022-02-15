@@ -70,20 +70,11 @@ development:
         list: true
       profile:
         edit: true
-      survey_response:
-        create: true
-        submit: true
       team:
         list: false
         list_assignments: false
       teams_users:
         list: false
-      course_evaluation:
-        list: true
-      survey_deployment:
-        list: false
-      statistics:
-        list_surveys: false
       impersonate:
         start: false
         impersonate: true
@@ -101,9 +92,6 @@ development:
         goto_questionnaires: false
         goto_author_feedbacks: false
         goto_review_rubrics: false
-        goto_global_survey: false
-        goto_surveys: false
-        goto_course_evaluations: false
         goto_courses: false
         goto_assignments: false
         goto_teammate_reviews: false
@@ -163,21 +151,16 @@ development:
       institution: false
       student_task: true
       profile: true
-      survey_response: true
       team: false
       teams_users: false
       import_file: false
-      course_evaluation: true
       participant_choices: false
-      survey_deployment: false
-      statistics: false
       impersonate: false
       review_mapping: false
       grades: false
       tree_display: false
       student_team: true
       invitation: true
-      survey: false
       password_retrieval: true
       submitted_content: true
       eula: true
@@ -365,9 +348,6 @@ test:
         list: true
       profile:
         edit: true
-      survey_response:
-        create: true
-        submit: true
       team:
         list: false
         list_assignments: false
@@ -385,19 +365,12 @@ test:
         assign_metareviewer_dynamically: true
       grades:
         view_my_scores: true
-      survey_deployment:
-        list: false
-      statistics:
-        list_surveys: false
       tree_display:
         list: false
         drill: false
         goto_questionnaires: false
         goto_author_feedbacks: false
         goto_review_rubrics: false
-        goto_global_survey: false
-        goto_surveys: false
-        goto_course_evaluations: false
         goto_courses: false
         goto_assignments: false
         goto_teammate_reviews: false
@@ -450,21 +423,16 @@ test:
       institution: false
       student_task: true
       profile: true
-      survey_response: true
       team: false
       teams_users: false
       impersonate: false
       import_file: false
       review_mapping: false
       grades: false
-      course_evaluation: true
       participant_choices: false
-      survey_deployment: false
-      statistics: false
       tree_display: false
       student_team: true
       invitation: true
-      survey: false
       password_retrieval: true
       submitted_content: true
       eula: true
@@ -644,20 +612,11 @@ production:
         list: true
       profile:
         edit: true
-      survey_response:
-        create: true
-        submit: true
       team:
         list: false
         list_assignments: false
       teams_users:
         list: false
-      course_evaluation:
-        list: true
-      survey_deployment:
-        list: false
-      statistics:
-        list_surveys: false
       impersonate:
         start: false
         impersonate: true
@@ -675,9 +634,6 @@ production:
         goto_questionnaires: false
         goto_author_feedbacks: false
         goto_review_rubrics: false
-        goto_global_survey: false
-        goto_surveys: false
-        goto_course_evaluations: false
         goto_courses: false
         goto_assignments: false
         goto_teammate_reviews: false
@@ -737,21 +693,16 @@ production:
       institution: false
       student_task: true
       profile: true
-      survey_response: true
       team: false
       teams_users: false
       import_file: false
-      course_evaluation: true
       participant_choices: false
-      survey_deployment: false
-      statistics: false
       impersonate: false
       review_mapping: false
       grades: false
       tree_display: false
       student_team: true
       invitation: true
-      survey: false
       password_retrieval: true
       submitted_content: true
       eula: true

@@ -70,20 +70,11 @@ development:
         list: true
       profile:
         edit: true
-      survey_response:
-        create: true
-        submit: true
       team:
         list: true
         list_assignments: true
       teams_users:
         list: true
-      course_evaluation:
-        list: true
-      survey_deployment:
-        list: true
-      statistics:
-        list_surveys: true
       impersonate:
         start: true
         impersonate: true
@@ -101,9 +92,6 @@ development:
         goto_questionnaires: true
         goto_author_feedbacks: true
         goto_review_rubrics: true
-        goto_global_survey: true
-        goto_surveys: true
-        goto_course_evaluations: true
         goto_courses: true
         goto_assignments: true
         goto_teammate_reviews: true
@@ -164,21 +152,16 @@ development:
       institution: false
       student_task: true
       profile: true
-      survey_response: true
       team: true
       teams_users: true
       import_file: true
-      course_evaluation: true
       participant_choices: true
-      survey_deployment: true
-      statistics: true
       impersonate: true
       review_mapping: true
       grades: true
       tree_display: true
       student_team: true
       invitation: true
-      survey: true
       password_retrieval: true
       submitted_content: true
       eula: true
@@ -261,16 +244,6 @@ development:
         parent_id:
         site_controller_id: 23
         url: "/student_task/list"
-      30: &5 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id: 42
-        id: 30
-        label: Course Evaluation
-        name: Course Evaluation
-        parent:
-        parent_id:
-        site_controller_id: 31
-        url: "/tree_display/goto_surveys"
       27: &6 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 36
@@ -338,9 +311,6 @@ development:
         - 48
         - 49
         - 40
-        - 41
-        - 42
-        - 43
         - 52
       44: &14 !ruby/object:Menu::Node
         content_page_id:
@@ -412,36 +382,6 @@ development:
         parent_id: 38
         site_controller_id: 38
         url: "/tree_display/goto_author_feedbacks"
-      41: &21 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id: 63
-        id: 41
-        label: Global survey
-        name: manage/questionnaires/global survey
-        parent:
-        parent_id: 38
-        site_controller_id: 38
-        url: "/tree_display/goto_global_survey"
-      42: &22 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id: 64
-        id: 42
-        label: Assignment surveys
-        name: manage/questionnaires/assignment surveys
-        parent:
-        parent_id: 38
-        site_controller_id: 38
-        url: "/tree_display/goto_surveys"
-      43: &23 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id: 64
-        id: 43
-        label: Course surveys
-        name: manage/questionnaires/course surveys
-        parent:
-        parent_id: 38
-        site_controller_id: 38
-        url: "/tree_display/goto_surveys"
       50: &24 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 15
@@ -499,9 +439,6 @@ development:
       manage/questionnaires/metareview rubrics: *18
       manage/questionnaires/teammate review rubrics: *19
       manage/questionnaires/author feedbacks: *20
-      manage/questionnaires/global survey: *21
-      manage/questionnaires/assignment surveys: *22
-      manage/questionnaires/course surveys: *23
       manage/questionnaires/bookmark rating rubrics: *38
       anonymized_view: *24
       student_view: *58
@@ -589,9 +526,6 @@ test:
         list: true
       profile:
         edit: true
-      survey_response:
-        create: true
-        submit: true
       team:
         list: true
         list_assignments: true
@@ -609,10 +543,6 @@ test:
         assign_metareviewer_dynamically: true
       grades:
         view_my_scores: true
-      survey_deployment:
-        list: true
-      statistics:
-        list_surveys: true
       tree_display:
         list: true
         drill: true
@@ -675,7 +605,6 @@ test:
       institution: false
       student_task: true
       profile: true
-      survey_response: true
       team: true
       teams_users: true
       impersonate: true
@@ -684,12 +613,9 @@ test:
       grades: true
       course_evaluation: true
       participant_choices: true
-      survey_deployment: true
-      statistics: true
       tree_display: true
       student_team: true
       invitation: true
-      survey: true
       password_retrieval: true
       submitted_content: true
       eula: true
@@ -813,9 +739,6 @@ test:
         - 24
         - 25
         - 26
-        - 27
-        - 28
-        - 29
         - 30
         - 52
       21: &11 !ruby/object:Menu::Node
@@ -898,36 +821,6 @@ test:
         controller_action_id: 54
         content_page_id:
         url: "/tree_display/goto_author_feedbacks"
-      28: &20 !ruby/object:Menu::Node
-        parent:
-        parent_id: 20
-        name: manage/questionnaires/global survey
-        id: 28
-        label: Global survey
-        site_controller_id: 33
-        controller_action_id: 56
-        content_page_id:
-        url: "/tree_display/goto_global_survey"
-      29: &21 !ruby/object:Menu::Node
-        parent:
-        parent_id: 20
-        name: manage/questionnaires/assignment surveys
-        id: 29
-        label: Assignment surveys
-        site_controller_id: 33
-        controller_action_id: 57
-        content_page_id:
-        url: "/tree_display/goto_surveys"
-      30: &22 !ruby/object:Menu::Node
-        parent:
-        parent_id: 20
-        name: manage/questionnaires/course surveys
-        id: 30
-        label: Course surveys
-        site_controller_id: 33
-        controller_action_id: 57
-        content_page_id:
-        url: "/tree_display/goto_surveys"
       52: &38 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 64
@@ -975,9 +868,6 @@ test:
       manage/questionnaires/metareview rubrics: *17
       manage/questionnaires/teammate review rubrics: *18
       manage/questionnaires/author feedbacks: *19
-      manage/questionnaires/global survey: *20
-      manage/questionnaires/assignment surveys: *21
-      manage/questionnaires/course course: *22
       manage/questionnaires/bookmark rating rubrics: *38
       student_view: *58
       instructor_view: *59
@@ -1084,9 +974,6 @@ production:
         goto_questionnaires: true
         goto_author_feedbacks: true
         goto_review_rubrics: true
-        goto_global_survey: true
-        goto_surveys: true
-        goto_course_evaluations: true
         goto_courses: true
         goto_assignments: true
         goto_teammate_reviews: true
@@ -1151,10 +1038,7 @@ production:
       team: true
       teams_users: true
       import_file: true
-      course_evaluation: true
       participant_choices: true
-      survey_deployment: true
-      statistics: true
       impersonate: true
       review_mapping: true
       grades: true
@@ -1385,36 +1269,6 @@ production:
         parent_id: 38
         site_controller_id: 38
         url: "/tree_display/goto_author_feedbacks"
-      41: &21 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id: 63
-        id: 41
-        label: Global survey
-        name: manage/questionnaires/global survey
-        parent:
-        parent_id: 38
-        site_controller_id: 38
-        url: "/tree_display/goto_global_survey"
-      42: &22 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id: 64
-        id: 42
-        label: Assignment surveys
-        name: manage/questionnaires/assignment surveys
-        parent:
-        parent_id: 38
-        site_controller_id: 38
-        url: "/tree_display/goto_surveys"
-      43: &23 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id: 64
-        id: 43
-        label: Course surveys
-        name: manage/questionnaires/course surveys
-        parent:
-        parent_id: 38
-        site_controller_id: 38
-        url: "/tree_display/goto_surveys"
       50: &24 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 15
@@ -1472,9 +1326,6 @@ production:
       manage/questionnaires/metareview rubrics: *18
       manage/questionnaires/teammate review rubrics: *19
       manage/questionnaires/author feedbacks: *20
-      manage/questionnaires/global survey: *21
-      manage/questionnaires/assignment surveys: *22
-      manage/questionnaires/course surveys: *23
       manage/questionnaires/bookmark rating rubrics: *38
       anonymized_view: *24
       student_view: *58

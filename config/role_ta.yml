@@ -94,9 +94,6 @@ development:
         goto_questionnaires: true
         goto_author_feedbacks: true
         goto_review_rubrics: true
-        goto_global_survey: true
-        goto_surveys: true
-        goto_course_evaluations: true
         goto_courses: true
         goto_assignments: true
         goto_teammate_reviews: true
@@ -160,17 +157,13 @@ development:
       team: true
       teams_users: true
       import_file: true
-      course_evaluation: true
       participant_choices: true
-      survey_deployment: true
-      statistics: true
       impersonate: true
       review_mapping: true
       grades: true
       tree_display: true
       student_team: true
       invitation: true
-      survey: true
       password_retrieval: true
       submitted_content: true
       eula: true
@@ -318,9 +311,6 @@ development:
         - 48
         - 49
         - 40
-        - 41
-        - 42
-        - 43
       44: &14 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 66
@@ -391,36 +381,6 @@ development:
         parent_id: 38
         site_controller_id: 38
         url: "/tree_display/goto_author_feedbacks"
-      41: &21 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id: 63
-        id: 41
-        label: Global survey
-        name: manage/questionnaires/global survey
-        parent:
-        parent_id: 38
-        site_controller_id: 38
-        url: "/tree_display/goto_global_survey"
-      42: &22 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id: 64
-        id: 42
-        label: Assignment surveys
-        name: manage/questionnaires/assignment surveys
-        parent:
-        parent_id: 38
-        site_controller_id: 38
-        url: "/tree_display/goto_surveys"
-      43: &23 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id: 64
-        id: 43
-        label: Course surveys
-        name: manage/questionnaires/course surveys
-        parent:
-        parent_id: 38
-        site_controller_id: 38
-        url: "/tree_display/goto_surveys"
       50: &24 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 15
@@ -448,9 +408,6 @@ development:
       manage/questionnaires/metareview rubrics: *18
       manage/questionnaires/teammate review rubrics: *19
       manage/questionnaires/author feedbacks: *20
-      manage/questionnaires/global survey: *21
-      manage/questionnaires/assignment surveys: *22
-      manage/questionnaires/course surveys: *23
       anonymized_view: *24
     crumbs:
     - 1
@@ -557,9 +514,6 @@ test:
         goto_questionnaires: false
         goto_author_feedbacks: false
         goto_review_rubrics: false
-        goto_global_survey: false
-        goto_surveys: false
-        goto_course_evaluations: false
         goto_courses: false
         goto_assignments: false
         goto_teammate_reviews: false
@@ -612,14 +566,12 @@ test:
       institution: false
       student_task: true
       profile: true
-      survey_response: true
       team: false
       teams_users: false
       impersonate: false
       import_file: false
       review_mapping: false
       grades: false
-      course_evaluation: true
       participant_choices: false
       tree_display: false
       student_team: true
@@ -791,20 +743,11 @@ production:
         list: true
       profile:
         edit: true
-      survey_response:
-        create: true
-        submit: true
       team:
         list: true
         list_assignments: true
       teams_users:
         list: true
-      course_evaluation:
-        list: true
-      survey_deployment:
-        list: true
-      statistics:
-        list_surveys: true
       impersonate:
         start: true
         impersonate: true
@@ -822,9 +765,6 @@ production:
         goto_questionnaires: true
         goto_author_feedbacks: true
         goto_review_rubrics: true
-        goto_global_survey: true
-        goto_surveys: true
-        goto_course_evaluations: true
         goto_courses: true
         goto_assignments: true
         goto_teammate_reviews: true

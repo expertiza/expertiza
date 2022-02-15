@@ -92,9 +92,6 @@ development:
         goto_questionnaires: true
         goto_author_feedbacks: true
         goto_review_rubrics: true
-        goto_global_survey: true
-        goto_surveys: true
-        goto_course_evaluations: true
         goto_courses: true
         goto_assignments: true
         goto_teammate_reviews: true
@@ -417,9 +414,6 @@ development:
         - 48
         - 49
         - 40
-        - 41
-        - 42
-        - 43
       44: &22 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 66
@@ -490,36 +484,6 @@ development:
         parent_id: 38
         site_controller_id: 38
         url: "/tree_display/goto_author_feedbacks"
-      41: &29 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id: 63
-        id: 41
-        label: Global survey
-        name: manage/questionnaires/global survey
-        parent:
-        parent_id: 38
-        site_controller_id: 38
-        url: "/tree_display/goto_global_survey"
-      42: &30 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id: 64
-        id: 42
-        label: Assignment surveys
-        name: manage/questionnaires/assignment surveys
-        parent:
-        parent_id: 38
-        site_controller_id: 38
-        url: "/tree_display/goto_surveys"
-      43: &31 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id: 64
-        id: 43
-        label: Course surveys
-        name: manage/questionnaires/course surveys
-        parent:
-        parent_id: 38
-        site_controller_id: 38
-        url: "/tree_display/goto_surveys"
       22: &32 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 32
@@ -605,9 +569,6 @@ development:
       manage/questionnaires/metareview rubrics: *26
       manage/questionnaires/teammate review rubrics: *27
       manage/questionnaires/author feedbacks: *28
-      manage/questionnaires/global survey: *29
-      manage/questionnaires/assignment surveys: *30
-      manage/questionnaires/course surveys: *31
       show/institutions: *32
       show/super-administrators: *33
       show/administrators: *34

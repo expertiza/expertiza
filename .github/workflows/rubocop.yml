@@ -18,4 +18,4 @@ jobs:
         bundler-cache: true
         action_config_path: ".github/config/rubocop_linter_action.yml"
     - name: Run RuboCop
-      run: git diff --name-only --diff-filter=AM origin/beta | bundle exec xargs rubocop --parallel
+      run: git diff --name-only --diff-filter=AM $TRAVIS_COMMIT_RANGE | bundle exec xargs rubocop --parallel

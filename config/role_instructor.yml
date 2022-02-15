@@ -311,7 +311,6 @@ development:
         - 48
         - 49
         - 40
-        - 52
       44: &14 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 66
@@ -392,16 +391,6 @@ development:
         parent_id: 37
         site_controller_id: 35
         url: "/users/set_anonymized_view"
-      52: &38 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id: 64
-        id: 52
-        label: Bookmark Rating rubrics
-        name: manage/questionnaires/bookmark rating rubrics
-        parent:
-        parent_id: 38
-        site_controller_id: 38
-        url: "/tree_display/goto_bookmark_reviews"
       58: &58 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 58
@@ -439,7 +428,6 @@ development:
       manage/questionnaires/metareview rubrics: *18
       manage/questionnaires/teammate review rubrics: *19
       manage/questionnaires/author feedbacks: *20
-      manage/questionnaires/bookmark rating rubrics: *38
       anonymized_view: *24
       student_view: *58
       instructor_view : *59

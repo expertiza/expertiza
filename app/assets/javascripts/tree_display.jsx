@@ -590,9 +590,6 @@ jQuery(document).ready(function() {
         'Metareview',
         'Author Feedback',
         'Teammate Review',
-        'Assignment Survey',
-        'Global Survey',
-        'Course Survey'
       ]
 
       //selectedMenuItem then takes the clicked rubric from the panel under questionnaire

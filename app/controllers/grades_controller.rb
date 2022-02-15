@@ -83,12 +83,13 @@ class GradesController < ApplicationController
     @team = @participant.team
     @team_id = @team.id
     questionnaires = @assignment.questionnaires
-    @questions = retrieve_questions questionnaires, @assignment.id
+    @questions = retrieve_questions(questionnaires, @assignment.id)
     @pscore = participant_scores(@participant, @questions)
+    @responses = @pscore[:review][:assessments]
+    puts questionnaires
+
     @vmlist = []
 
-    # loop through each questionnaire, and populate the view model for all data necessary
-    # to render the html tables.
     counter_for_same_rubric = 0
     questionnaires.each do |questionnaire|
       @round = nil

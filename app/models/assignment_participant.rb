@@ -94,7 +94,6 @@ class AssignmentParticipant < Participant
     files = []
 
     files_list.each do |file|
-      puts file
       if File.directory?(file)
         dir_files = files(file)
         dir_files.each { |f| files << f }

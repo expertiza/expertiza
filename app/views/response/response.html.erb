@@ -301,12 +301,13 @@
 <% else %>
   <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
 
-  <% if !@map.contributor.nil? && !@map.instance_of?(FeedbackResponseMap) %>
+  <% unless @map.contributor.nil? or @map.instance_of?(FeedbackResponseMap) %>
     <% if @map.assignment.team_assignment? %>
-      <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id %>
+
+      <% team_member = TeamsUser.find_by_team_id(@map.contributor.id).user_id %>
       <% topic_id = SignedUpTeam.topic_id(@map.assignment.id, team_member) %>
     <% else %>
-      <% participant = Participant.find(TeamsUser.find_by_team_id(@map.contributor).user_id) %>
+      <% participant = Participant.find(TeamsUser.find_by_team_id(@map.contributor.id).user_id) %>
       <% topic_id = SignedUpTeam.where(participant.parent_id, participant.user_id) %>
     <% end %>
     <% unless topic_id.nil? %>

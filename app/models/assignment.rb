@@ -51,6 +51,7 @@ class Assignment < ApplicationRecord
     DEFAULT_MAX_OUTSTANDING_REVIEWS
   end
 
+  # TODO app breakes when max team size is set as > 1 and team has only one member
   def team_assignment?
     self.max_team_size > 1
   end

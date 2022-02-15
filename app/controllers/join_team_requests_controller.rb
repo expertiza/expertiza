@@ -53,7 +53,7 @@ class JoinTeamRequestsController < ApplicationController
   # update join team request entry for join_team_request table and add it to the table
   def update
     respond_to do |format|
-      if @join_team_request.update_attribute(join_team_request_params)
+      if @join_team_request.update(join_team_request_params)
         format.html { redirect_to(@join_team_request, notice: 'JoinTeamRequest was successfully updated.') }
         format.xml  { head :ok }
       else

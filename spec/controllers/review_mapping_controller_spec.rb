@@ -145,7 +145,7 @@ describe ReviewMappingController do
         allow(assignment).to receive(:assign_reviewer_dynamically_no_topic).with(participant, team2).and_return(true)
         allow(ReviewResponseMap).to receive(:reviewer_id).with(1).and_return(0)
         allow(assignment).to receive(:num_reviews_allowed).and_return(1)
-	params = {
+	      params = {
           assignment_id: 1,
           reviewer_id: 1,
           topic_id: 1

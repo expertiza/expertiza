@@ -2,6 +2,9 @@ name: RuboCop
 
 on: [push, pull_request]
 
+Metrics/LineLength:
+  Enabled: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,7 +21,4 @@ jobs:
         bundler-cache: true
         action_config_path: ".github/config/rubocop_linter_action.yml"
     - name: Run RuboCop
-      with:
-        Metrics/LineLength:
-          Enabled: false
       run: bundle exec rubocop --parallel

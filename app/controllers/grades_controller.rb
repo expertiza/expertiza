@@ -85,8 +85,6 @@ class GradesController < ApplicationController
     questionnaires = @assignment.questionnaires
     @questions = retrieve_questions(questionnaires, @assignment.id)
     @pscore = participant_scores(@participant, @questions)
-    @responses = @pscore[:review][:assessments]
-    puts questionnaires
 
     @vmlist = []
 

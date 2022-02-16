@@ -115,7 +115,5 @@ module SubmittedContentHelper
       # The zip file is no longer needed, so delete it
       File.delete(file_name)
     end
-  # rescue
-  # end
   end
 end

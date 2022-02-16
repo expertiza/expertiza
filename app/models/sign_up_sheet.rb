@@ -6,7 +6,6 @@ class SignUpSheet < ActiveRecord::Base
       # if team is not yet created, create new team.
       # create Team and TeamNode
       team = AssignmentTeam.create_team_and_node(assignment_id)
-      user = User.find(user_id)
       # create SignedUpTeam
       confirmationStatus = SignUpSheet.confirmTopic(user_id, team.id, topic_id, assignment_id) if topic_id
     else

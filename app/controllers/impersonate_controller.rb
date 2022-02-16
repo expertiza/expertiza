@@ -44,7 +44,6 @@ class ImpersonateController < ApplicationController
         session[:original_user] = @original_user
       else
         # E1991 : check whether instructor is currently in anonymized view
-        user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:user][:name]) : User.find_by(name: params[:user][:name])
         AuthController.clear_user_info(session, nil)
         session[:user] = session[:super_user]
         session[:super_user] = nil
@@ -84,7 +83,6 @@ class ImpersonateController < ApplicationController
     else
       unless params[:impersonate][:name].empty?
         # E1991 : check whether instructor is currently in anonymized view
-        user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:impersonate][:name]) : User.find_by(name: params[:impersonate][:name])
         overwrite_session
       end
     end

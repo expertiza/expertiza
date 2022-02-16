@@ -161,7 +161,7 @@ class AssignmentForm
         end
       end
     end
-    tag_dep
+    return tag_dep
   end
   # end required by answer tagging
 

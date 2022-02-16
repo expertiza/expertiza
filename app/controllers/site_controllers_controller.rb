@@ -68,7 +68,7 @@ class SiteControllersController < ApplicationController
     redirect_to action: 'index'
   end
 
-    protected
+  protected
 
   def foreign
     @permissions = Permission.order(:name)
@@ -132,5 +132,5 @@ class SiteControllersController < ApplicationController
     end
 
     actions.keys
-  end  # def controller_actions
-end  # class
+  end
+end

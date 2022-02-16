@@ -35,7 +35,9 @@
     score not being computed and shown for multi-round reviews. Check for :review1 and :review2 symbols, generate arithmetic
     means of each, and take arithmetic mean of both to display. If :review symbol present, use original logic.
 -->
-<% if @pscore[:review1] && @pscore[:review2] %>
+<% puts @pscore%>
+<% if @pscore[:review1] && @pscore[:review2] && @pscore[:review1]
+  [:assessments].any? && @pscore[:review2][:assessments].any? %>
   <% rscore_review1 = Rscore.new(@pscore,:review1) %>
   <% rscore_review2 = Rscore.new(@pscore,:review2) %>
   <% average = rscore_review1.my_avg + rscore_review2.my_avg %>

@@ -123,7 +123,7 @@ class ApplicationController < ActionController::Base
   end
 
   alias current_user_role? current_user_role
-  
+
   def logged_in?
     # Recommendation: rename to ever_logged_in? because that's how this actually works
     current_user

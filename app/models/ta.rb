@@ -109,7 +109,7 @@ class Ta < User
       next if p_s.empty?
 
       p_s.each do |p|
-        user_list << p.user if user.role.hasAllPrivilegesOf(p.user.role)
+        user_list << p.user if user.role.has_all_privileges_of?(p.user.role)
       end
     end
     user_list

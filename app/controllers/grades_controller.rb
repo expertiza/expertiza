@@ -51,7 +51,6 @@ class GradesController < ApplicationController
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)
     penalties(@assignment.id)
-
     @show_reputation = false
   end
 
@@ -84,12 +83,11 @@ class GradesController < ApplicationController
     @team = @participant.team
     @team_id = @team.id
     questionnaires = @assignment.questionnaires
-    @questions = retrieve_questions questionnaires, @assignment.id
+    @questions = retrieve_questions(questionnaires, @assignment.id)
     @pscore = participant_scores(@participant, @questions)
+
     @vmlist = []
 
-    # loop through each questionnaire, and populate the view model for all data necessary
-    # to render the html tables.
     counter_for_same_rubric = 0
     questionnaires.each do |questionnaire|
       @round = nil

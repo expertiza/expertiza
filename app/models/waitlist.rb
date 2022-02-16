@@ -4,6 +4,8 @@ class Waitlist < ActiveRecord::Base
     unless waitlisted_topics.nil?
       waitlisted_topics.each do |waitlisted_topic|
         entry = SignedUpTeam.find_by(topic_id: waitlisted_topic.id)
+        next if entry.nil?
+        
         entry.destroy
       end
     end

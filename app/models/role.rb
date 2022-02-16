@@ -139,7 +139,7 @@ class Role < ActiveRecord::Base
   # If the current role is the same as the parameter role, return true
   # That is, use greater-than-or-equal-to logic
 
-  def hasAllPrivilegesOf(target_role)
+  def has_all_privileges_of?(target_role)
     privileges = {}
     privileges['Student'] = 1
     privileges['Teaching Assistant'] = 2

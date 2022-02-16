@@ -9,6 +9,7 @@ class Role < ActiveRecord::Base
   validates :name, presence: true
   validates :name, uniqueness: true
 
+  attr_accessor :cache
   attr_reader :student, :ta, :instructor, :administrator, :superadministrator
 
   def cache

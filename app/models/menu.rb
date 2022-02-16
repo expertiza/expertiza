@@ -41,7 +41,7 @@ class Menu
     end
   end
 
-  attr_accessor :root
+  attr_accessor :root, :selected
 
   def initialize(role = nil)
     @root = Node.new

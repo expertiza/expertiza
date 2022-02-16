@@ -55,18 +55,18 @@ class ControllerAction < ActiveRecord::Base
     actions = ControllerAction.all
     actions.each do |action|
       action.allowed = if action.permission_id
-        if perms.key?(action.permission_id)
-          1
-        else
-          0
-        end
-      else # Controller's permission
-        if perms.key?(action.controller.permission_id)
-          1
-        else
-          0
-        end
-      end
+                         if perms.key?(action.permission_id)
+                           1
+                         else
+                           0
+                         end
+                       else # Controller's permission
+                         if perms.key?(action.controller.permission_id)
+                           1
+                         else
+                           0
+                         end
+                       end
     end
 
     actions

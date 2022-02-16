@@ -152,16 +152,15 @@ class AssignmentForm
                              answer_length_threshold: value['answer_length_threshold'][i])
             end
           else
-            tag_dep = TagPromptDeployment.new(assignment_id: @assignment.id,
-                                              questionnaire_id: key,
-                                              tag_prompt_id: value['tag_prompt'][i],
-                                              question_type: value['question_type'][i],
-                                              answer_length_threshold: value['answer_length_threshold'][i]).save
+            TagPromptDeployment.new(assignment_id: @assignment.id,
+                                    questionnaire_id: key,
+                                    tag_prompt_id: value['tag_prompt'][i],
+                                    question_type: value['question_type'][i],
+                                    answer_length_threshold: value['answer_length_threshold'][i]).save
           end
         end
       end
     end
-    return tag_dep
   end
   # end required by answer tagging
 

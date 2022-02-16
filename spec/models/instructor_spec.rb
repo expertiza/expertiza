@@ -50,7 +50,7 @@ describe Instructor do
       allow(instructor).to receive(:role).and_return(instructor_role)
       allow(user1).to receive(:role).and_return(instructor_role)
       allow(user2).to receive(:role).and_return(instructor_role)
-      allow(instructor_role).to receive(:hasAllPrivilegesOf).and_return(true)
+      allow(instructor_role).to receive(:has_all_privileges_of?).and_return(true)
       expect(Instructor.get_user_list(instructor)).to eq([user1, user2])
     end
   end

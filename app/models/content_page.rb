@@ -6,8 +6,6 @@ class ContentPage < ActiveRecord::Base
 
   belongs_to :permission
 
-  attr_accessor :content_html
-
   def url
     "/#{name}"
   end
@@ -40,9 +38,9 @@ class ContentPage < ActiveRecord::Base
         RedCloth.new(content).to_html(:markdown)
       else
         content
-                     end
+      end
     else
       content
-        end
+    end
   end
 end

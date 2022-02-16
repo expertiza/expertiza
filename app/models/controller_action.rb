@@ -5,7 +5,7 @@ class ControllerAction < ActiveRecord::Base
   validates :name, presence: true
   validates :name, uniqueness: { scope: 'site_controller_id' }
 
-  attr_accessor :controller, :permission, :url, :allowed, :specific_name
+  attr_accessor :allowed, :specific_name
 
   scope :order_by_controller_and_action, lambda {
     joins('left outer join site_controllers on site_controller_id = site_controllers.id')
@@ -35,7 +35,7 @@ class ControllerAction < ActiveRecord::Base
       "#{controller.name}: #{name}"
     else
       name.to_s
-      end
+    end
   end
 
   def url
@@ -55,18 +55,18 @@ class ControllerAction < ActiveRecord::Base
     actions = ControllerAction.all
     actions.each do |action|
       action.allowed = if action.permission_id
-                         if perms.key?(action.permission_id)
-                           1
-                         else
-                           0
-                                          end
-                       else # Controller's permission
-                         if perms.key?(action.controller.permission_id)
-                           1
-                         else
-                           0
-                                          end
-                       end
+                        if perms.key?(action.permission_id)
+                          1
+                        else
+                          0
+                        end
+                      else # Controller's permission
+                        if perms.key?(action.controller.permission_id)
+                          1
+                        else
+                          0
+                        end
+                      end
     end
 
     actions

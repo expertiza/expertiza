@@ -47,9 +47,7 @@ module SubmittedContentHelper
 
   # Zhewei: this method is used to display reviewer uploaded files during peer review.
   def display_review_files_directory_tree(participant, files)
-    index = 0
     participant = @participant if @participant
-    assignment = participant.assignment # participant is @map.contributor
     html = ''
 
     files.each do |file|
@@ -72,6 +70,7 @@ module SubmittedContentHelper
   def display_hyperlink_in_peer_review_question(comments)
     html = ''
     html += link_to image_tag('/assets/tree_view/List-hyperlinks-24.png'), comments, target: '_blank'
+    html
   end
 
   def list_sub_directories(file, participant)
@@ -82,7 +81,6 @@ module SubmittedContentHelper
 
       index += 1
       disp = file + '/' + path
-      display = File.basename(file) + '/' + path
       ret += '<li>'
       ret += "<input type=radio id='chk_files' name='chk_files' value='#{index}'>" if @check_stage != 'Complete' && @flag == false
       ret += "<input type=hidden id='filenames_#{index}' name='filenames[#{index}]' value='" + File.dirname(disp) + '/' + File.basename(path) + "'>"
@@ -119,5 +117,5 @@ module SubmittedContentHelper
     end
   # rescue
   # end
-end
+  end
 end

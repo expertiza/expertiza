@@ -280,6 +280,7 @@ class Response < ActiveRecord::Base
 						 '<td align="left"><b>Last Reviewed:</b>' \
 						 "<span>#{(updated_at.nil? ? 'Not available' : updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>" \
 						 '</tr></table>'
+    identifier
   end
 
   def construct_review_response(code, self_id, show_tags = nil, current_user = nil)
@@ -300,6 +301,7 @@ class Response < ActiveRecord::Base
               end
     code += '<tr><td><b>Additional Comment: </b>' + comment + '</td></tr>'
     code += '</table>'
+    code
   end
 
   def add_table_rows(questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, current_user = nil)

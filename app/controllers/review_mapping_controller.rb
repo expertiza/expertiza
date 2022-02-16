@@ -369,7 +369,6 @@ class ReviewMappingController < ApplicationController
       end
     else
       teams_with_calibrated_artifacts = []
-      teams_with_uncalibrated_artifacts = []
       ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 1).each do |response_map|
         teams_with_calibrated_artifacts << AssignmentTeam.find(response_map.reviewee_id)
       end

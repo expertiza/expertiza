@@ -94,7 +94,7 @@ module PenaltyHelper
             penalty += penalty_for_this_review
           end
         end
-      elsif
+      else
         penalty = @max_penalty_for_no_submission
       end
     end

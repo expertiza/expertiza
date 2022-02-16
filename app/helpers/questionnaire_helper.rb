@@ -40,7 +40,7 @@ module QuestionnaireHelper
     end
 
     csv_data
-end
+  end
 
   def self.get_questions_from_csv(questionnaire, file)
     questions = []
@@ -73,7 +73,6 @@ end
             q.weight = cell.strip.to_i if cell
           else
             if (score >= questionnaire.min_question_score) && !cell.nil?
-              a = QuestionAdvice.new(score: score, advice: cell.strip) if custom_rubric
               a = QuestionAdvice.new(score: questionnaire.min_question_score + i - 4, advice: cell.strip)
               score -= 1
               q.question_advices << a

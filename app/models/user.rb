@@ -172,6 +172,7 @@ class User < ActiveRecord::Base
       user.parent_id = (session[:user]).id
       user.save
     end
+    user
   end
 
   def self.yesorno(elt)
@@ -238,7 +239,7 @@ class User < ActiveRecord::Base
 
     # return the new private key
     new_key.to_pem
-    end
+  end
 
   def initialize(attributes = nil)
     super(attributes)

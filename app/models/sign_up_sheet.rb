@@ -7,8 +7,6 @@ class SignUpSheet < ActiveRecord::Base
       # create Team and TeamNode
       team = AssignmentTeam.create_team_and_node(assignment_id)
       user = User.find(user_id)
-      # create TeamsUser and TeamUserNode
-      teamuser = ApplicationController.helpers.create_team_users(user, team.id)
       # create SignedUpTeam
       confirmationStatus = SignUpSheet.confirmTopic(user_id, team.id, topic_id, assignment_id) if topic_id
     else
@@ -67,10 +65,9 @@ class SignUpSheet < ActiveRecord::Base
     sign_up.is_waitlisted = false
     sign_up.save
     # Update topic_id in signed_up_teams table with the topic_id
-    team_id = SignedUpTeam.find_team_users(assignment_id, user_id)
     signUp = SignedUpTeam.where(topic_id: topic_id).first
     signUp.update_attribute('topic_id', topic_id)
-    result = true
+    return true
   end
 
   def self.create_SignUpTeam(assignment_id, sign_up, topic_id, user_id)

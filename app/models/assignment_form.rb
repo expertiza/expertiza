@@ -161,6 +161,7 @@ class AssignmentForm
         end
       end
     end
+    tag_dep
   end
   # end required by answer tagging
 
@@ -339,7 +340,7 @@ class AssignmentForm
   # This functions finds the epoch time in seconds of the due_at parameter and finds the difference of it
   # from the current time and returns this difference in minutes
   def find_min_from_now(due_at)
-    curr_time = DateTime.now.in_time_zone(zone = 'UTC').to_s(:db)
+    curr_time = DateTime.now.in_time_zone('UTC').to_s(:db)
     curr_time = Time.parse(curr_time)
     ((due_at - curr_time).to_i / 60)
   end
@@ -358,10 +359,6 @@ class AssignmentForm
   #====setup methods for new and edit method=====#
   def set_up_assignment_review
     set_up_defaults
-
-    submissions = @assignment.find_due_dates('submission')
-    reviews = @assignment.find_due_dates('review')
-
     @assignment.directory_path = nil if @assignment.directory_path.empty?
   end
 

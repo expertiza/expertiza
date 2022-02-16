@@ -70,7 +70,7 @@ class SuggestionController < ApplicationController
                             session[:user].name
                           else
                             ''
-    end
+                          end
 
     if @suggestion.save
       flash[:success] = 'Thank you for your suggestion!' unless @suggestion.unityID.empty?

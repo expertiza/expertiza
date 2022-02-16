@@ -174,7 +174,6 @@ class ResponseController < ApplicationController
       @round = nil
     end
     is_submitted = (params[:isSubmit] == 'Yes')
-    was_submitted = false
     # There could be multiple responses per round, when re-submission is enabled for that round.
     # Hence we need to pick the latest response.
     @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first
@@ -277,7 +276,7 @@ class ResponseController < ApplicationController
     @response = Response.find(params[:id])
 
     # Error message placeholder
-    msg = ''
+    error_msg = ''
 
     begin
       @map = @response.map
@@ -288,9 +287,9 @@ class ResponseController < ApplicationController
         @response.update_attribute('visibility', visibility)
       end
     rescue StandardError
-      msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
+      error_msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
-    redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+    redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: error_msg
   end
 
   private

@@ -44,6 +44,7 @@ class TeamsUser < ActiveRecord::Base
 
   # Add member to the team they were invited to and accepted the invite for
   def self.add_member_to_invited_team(invitee_user_id, invited_user_id, assignment_id)
+    can_add_member = false
     users_teams = TeamsUser.where(['user_id = ?', invitee_user_id])
     users_teams.each do |team|
       new_team = AssignmentTeam.where(['id = ? and parent_id = ?', team.team_id, assignment_id]).first

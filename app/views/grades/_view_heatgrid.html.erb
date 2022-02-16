@@ -90,7 +90,7 @@ function toggleFunction(elementId) {
           <!-- display the table title and tooltips -->
           <span style="width:100%;">
               <h4 style="font-weight:bold;display:inline-block;"><%= vm.questionnaire_display_type %>
-                <% if vm.questionnaire_type == "ReviewQuestionnaire" && @assignment.vary_by_round?%>
+                <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
                     (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
                 <%end %>
               </h4>

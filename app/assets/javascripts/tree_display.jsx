@@ -19,7 +19,7 @@ const node_attributes = {
   },
   assignment: {
     plural: 'assignments',
-    colWidthArray: [ '30%', '0%', '0%', '0%', '25%', '25%', '20%' ],
+    colWidthArray: ['30%', '0%', '0%', '0%', '25%', '25%', '20%'],
 
     actions: [
       (props) => ({
@@ -39,10 +39,10 @@ const node_attributes = {
       (props) =>
         parseInt(props.max_team_size) > 1
           ? {
-              title: 'Create teams',
-              href: '/teams/list?id=' + `${parseInt(props.id) / 2}` + '&type=Assignment',
-              src: '/assets/tree_view/create-teams-24.png'
-            }
+            title: 'Create teams',
+            href: '/teams/list?id=' + `${parseInt(props.id) / 2}` + '&type=Assignment',
+            src: '/assets/tree_view/create-teams-24.png'
+          }
           : null,
       (props) => ({
         title: 'Assign reviewers',
@@ -57,13 +57,13 @@ const node_attributes = {
       (props) =>
         props.require_quiz
           ? {
-              title: 'View quiz questions',
-              href:
-                '/student_quizzes/review_questions?id=' +
-                `${parseInt(props.id) / 2}` +
-                '&type=Assignment',
-              src: '/assets/tree_view/view-survey-24.png'
-            }
+            title: 'View quiz questions',
+            href:
+              '/student_quizzes/review_questions?id=' +
+              `${parseInt(props.id) / 2}` +
+              '&type=Assignment',
+            src: '/assets/tree_view/view-survey-24.png'
+          }
           : null,
       (props) => ({
         title: 'View submissions',
@@ -88,21 +88,21 @@ const node_attributes = {
       (props) =>
         props.is_intelligent
           ? {
-              title: 'Intelligent Assignment',
-              href: '/lottery/run_intelligent_assignment/' + `${parseInt(props.id) / 2}`,
-              src: '/assets/tree_view/run-lottery.png'
-            }
+            title: 'Intelligent Assignment',
+            href: '/lottery/run_intelligent_assignment/' + `${parseInt(props.id) / 2}`,
+            src: '/assets/tree_view/run-lottery.png'
+          }
           : null,
       (props) =>
         props.allow_suggestions
           ? {
-              title: 'View suggestions',
-              href: '/suggestion/list?id=' + `${parseInt(props.id) / 2}` + '&type=Assignment',
-              src: '/assets/tree_view/view-suggestion-24.png'
-            }
+            title: 'View suggestions',
+            href: '/suggestion/list?id=' + `${parseInt(props.id) / 2}` + '&type=Assignment',
+            src: '/assets/tree_view/view-suggestion-24.png'
+          }
           : null
     ],
-    getActions: function(props) {
+    getActions: function (props) {
       if (props.is_available) {
         return node_attributes.assignment.actions.filter((i) => i(props)).map((val, i, arr) => {
           let ret = val(props)
@@ -178,7 +178,7 @@ const node_attributes = {
         extra: <span style={{ fontSize: '22px', top: '8px' }} className="glyphicon glyphicon-list-alt" />
       }
     ],
-    getActions: function(id) {
+    getActions: function (id) {
       return node_attributes.course.actions.map(
         (action) =>
           action.src ? (
@@ -197,8 +197,8 @@ const node_attributes = {
   },
   questionnaire: {
     plural: 'questionnaires',
-    colWidthArray: [ '30%', '0%', '0%', '0%', '20%', '20%', '30%' ],
-    getActions: function(handleButtonClick, parent_name) {
+    colWidthArray: ['30%', '0%', '0%', '0%', '20%', '20%', '30%'],
+    getActions: function (handleButtonClick, parent_name) {
       return (
         <span onClick={handleButtonClick}>
           <form
@@ -239,7 +239,7 @@ window.addEventListener('load', (e) => {
   }
 })
 
-jQuery(document).ready(function() {
+jQuery(document).ready(function () {
   // This preloadedImages function is refered from http://jsfiddle.net/slashingweapon/8jAeu/
   // Actually I am not using the values in preloadedImages, but image loading speed is indeed getting faster
   let treeDisplayDiv = document.querySelector('#tree_display');
@@ -247,7 +247,7 @@ jQuery(document).ready(function() {
   if (treeDisplayDiv) {
     // set the user preference to homeActionshowflag 
     app_variables.homeActionShowFlag = treeDisplayDiv.dataset.userShow;
-    
+
   }
   var preloadedImages = []
   function preloadImages() {
@@ -283,130 +283,22 @@ jQuery(document).ready(function() {
     return month[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear() + ' - ' + strTime
   }
 
-  var RowAction = React.createClass({
-    getInitialState: function() {
-      return {
-        showDetails: true
-      }
-    },
-    handleButtonClick: function(e) {
-      e.stopPropagation()
-      if (e.target.type === 'button') {
-        if (e.target.name === 'more') {
-          this.setState({
-            showDetails: true
-          })
-        }
-      }
-    },
-    render: function() {
-      var moreContent = []
-      var moreButtonStyle = {
-        display: '',
-        padding: '0 2px'
-      }
-      if (node_attributes.isQuestionnaire(this.props.dataType)) {
-        return node_attributes.questionnaire.getActions(this.handleButtonClick, this.props.parent_name)
-      }
-      if (this.state.showDetails) {
-        /** only running this check after the state changes to show the details (which currently is on any click on the row) */
-        /** this will update after the user clicks anywhere on the row */
-
-        moreButtonStyle.display = 'none'
-        if (this.props.is_available || node_attributes.isQuestionnaire(this.props.nodeType)) {
-          // check if the user id exists
-          // check if the current user id matches the user/instructor id associated with a questionnaire/survey
-          // show edit button only for the items which are associated to that user
-          // if (app_variables.currentUserId == null || this.props.instructor_id == app_variables.currentUserId) {
-            moreContent.push(
-                <span>
-                  <a
-                    title="Edit"
-                    href={`/${node_attributes[this.props.nodeType].plural}/${parseInt(this.props.id) /
-                      2}/edit`}
-                  >
-                    <img src="/assets/tree_view/edit-icon-24.png" />
-                  </a>
-                </span>
-                )
-          // }
-          moreContent.push(
-            <span>
-              <a
-                title="Delete"
-                href={`/tree_display/confirm?id=${parseInt(this.props.id) /
-                  2}&nodeType=${node_attributes[this.props.nodeType].plural}`}
-              >
-                <img src="/assets/tree_view/delete-icon-24.png" />
-              </a>
-            </span>
-          )
-        }
-        moreContent.push(
-          <span>
-            <a
-              title="Copy"
-              href={`/${node_attributes[this.props.nodeType].plural}/copy?assets=course&id=${parseInt(
-                this.props.id
-              ) / 2}`}
-            >
-              <img src="/assets/tree_view/Copy-icon-24.png" />
-            </a>
-          </span>
-        )
-
-        if (node_attributes.isCourse(this.props.dataType)) {
-          moreContent.push(<br />)
-          moreContent.push(...node_attributes.course.getActions(parseInt(this.props.id) / 2))
-
-        }
-      }
-      if (node_attributes.isAssignment(this.props.dataType) && app_variables.homeActionShowFlag == 'true') {
-        // Assignment tab starts here
-        // Now is_intelligent and Add Manager related buttons have not been added into the new UI
-        moreContent.push(...node_attributes.assignment.getActions(this.props))
-      } else if (node_attributes.isQuestionnaire(this.props.dataType)) {
-        moreContent.push(
-          <span>
-            <a
-              title="View questionnaire"
-              href={'/questionnaires/view?id=' + (parseInt(this.props.id) / 2).toString()}
-            >
-              <img src="/assets/tree_view/view-survey-24.png" />
-            </a>
-          </span>
-        )
-      }
-      // if ends
-      return (
-        <span onClick={this.handleButtonClick}>
-          <button
-            style={moreButtonStyle}
-            name="more"
-            type="button"
-            className="glyphicon glyphicon-option-horizontal"
-          />
-          {moreContent}
-        </span>
-      )
-    }
-  })
 
   var SimpleTableRow = React.createClass({
-    render: function() {
+    render: function () {
       var creation_date
       var updated_date
-      var colWidthArray = [ '30%', '0%', '0%', '0%', '25%', '25%', '20%' ]
+      var colWidthArray = ['30%', '0%', '0%', '0%', '25%', '25%', '20%']
       var colDisplayStyle = {
         display: ''
       }
       if (this.props.dataType === 'questionnaire') {
-        colWidthArray = [ '30%', '0%', '0%', '0%', '20%', '20%', '30%' ]
+        colWidthArray = ['30%', '0%', '0%', '0%', '20%', '20%', '30%']
         colDisplayStyle = {
           display: 'none'
         }
       } else if (this.props.dataType === 'course') {
-        colWidthArray = [ '20%', '0%', '0%', '20%', '20%', '20%', '20%' ]
+        colWidthArray = ['20%', '0%', '0%', '20%', '20%', '20%', '20%']
       }
       if (this.props.creation_date && this.props.updated_date) {
         creation_date = this.props.creation_date.replace('T', '<br/>')
@@ -479,25 +371,25 @@ jQuery(document).ready(function() {
   })
 
   var SimpleTable = React.createClass({
-    render: function() {
+    render: function () {
       var _rows = []
       var _this = this
-      var colWidthArray = [ '30%', '0%', '0%', '0%', '25%', '25%', '20%' ]
+      var colWidthArray = ['30%', '0%', '0%', '0%', '25%', '25%', '20%']
       var colDisplayStyle = {
         display: ''
       }
       var firstColText = (this.props.dataType === 'questionnaire' ? 'Item' : 'Assignment') + ' name'
       if (this.props.dataType === 'questionnaire') {
-        colWidthArray = [ '30%', '0%', '0%', '0%', '20%', '20%', '30%' ]
+        colWidthArray = ['30%', '0%', '0%', '0%', '20%', '20%', '30%']
         colDisplayStyle = {
           display: 'none'
         }
       } else if (this.props.dataType === 'course') {
-        colWidthArray = [ '20%', '0%', '0%', '20%', '20%', '20%', '20%' ]
+        colWidthArray = ['20%', '0%', '0%', '20%', '20%', '20%', '20%']
       }
       if (this.props.data) {
         if (this.props.dataType == 'course') {
-          this.props.data.forEach(function(entry, i) {
+          this.props.data.forEach(function (entry, i) {
             _rows.push(
               <SimpleTableRow
                 key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
@@ -527,7 +419,7 @@ jQuery(document).ready(function() {
             )
           })
         } else {
-          this.props.data.forEach(function(entry, i) {
+          this.props.data.forEach(function (entry, i) {
             _rows.push(
               <SimpleTableRow
                 key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
@@ -593,12 +485,12 @@ jQuery(document).ready(function() {
   })
 
   var ContentTableRow = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
       return {
         expanded: false
       }
     },
-    componentDidMount: function() {
+    componentDidMount: function () {
       // this buffer holds the title for all of the rubric types under the Questionnaire tab
       rubricBuffer = [
         'Review',
@@ -622,14 +514,14 @@ jQuery(document).ready(function() {
             {
               expanded: true
             },
-            function() {
+            function () {
               this.props.rowClicked(this.props.id, true, this.props.newParams)
             }
           )
         }
       }
     },
-    handleClick: function(event) {
+    handleClick: function (event) {
       //alert('click');
 
       if (event.target.type != 'button') {
@@ -637,7 +529,7 @@ jQuery(document).ready(function() {
           {
             expanded: !this.state.expanded
           },
-          function() {
+          function () {
             this.props.rowClicked(this.props.id, this.state.expanded, this.props.newParams)
           }
         )
@@ -645,21 +537,21 @@ jQuery(document).ready(function() {
         event.stopPropagation()
       }
     },
-    render: function() {
+    render: function () {
       var creation_date
       var updated_date
-      var colWidthArray = [ '30%', '0%', '0%', '0%', '25%', '25%', '20%' ]
+      var colWidthArray = ['30%', '0%', '0%', '0%', '25%', '25%', '20%']
       var colDisplayStyle = {
         display: '',
         'word-wrap': 'break-word'
       }
       if (this.props.dataType === 'questionnaire') {
-        colWidthArray = [ '70%', '0%', '0%', '0%', '0%', '0%', '30%' ]
+        colWidthArray = ['70%', '0%', '0%', '0%', '0%', '0%', '30%']
         colDisplayStyle = {
           display: 'none'
         }
       } else if (this.props.dataType === 'course') {
-        colWidthArray = [ '20%', '0%', '0%', '20%', '20%', '20%', '20%' ]
+        colWidthArray = ['20%', '0%', '0%', '20%', '20%', '20%', '20%']
       }
       if (this.props.creation_date && this.props.updated_date) {
         creation = this.props.creation_date
@@ -751,7 +643,7 @@ jQuery(document).ready(function() {
   })
 
   var ContentTableDetailsRow = React.createClass({
-    render: function() {
+    render: function () {
       var colSpan = '5'
       var colDisplayStyle = {
         display: ''
@@ -789,7 +681,7 @@ jQuery(document).ready(function() {
   })
 
   var TitleRow = React.createClass({
-    render: function() {
+    render: function () {
       return (
         <tr className="active">
           <td colSpan="6">
@@ -801,10 +693,10 @@ jQuery(document).ready(function() {
   })
 
   var SearchBar = React.createClass({
-    handleChange: function() {
+    handleChange: function () {
       this.props.onUserInput(this.refs.filterTextInput.getDOMNode().value)
     },
-    render: function() {
+    render: function () {
       return (
         <span style={{ display: this.props.dataType === 'questionnaire' ? 'none' : '' }}>
           <input
@@ -820,10 +712,10 @@ jQuery(document).ready(function() {
   })
 
   var FilterButton = React.createClass({
-    handleChange: function() {
+    handleChange: function () {
       this.props.onUserFilter(this.props.filterOption, this.refs.filterCheckbox.getDOMNode().checked)
     },
-    render: function() {
+    render: function () {
       return (
         <span
           className="show-checkbox"
@@ -843,7 +735,7 @@ jQuery(document).ready(function() {
   })
 
   var NewItemButton = React.createClass({
-    render: function() {
+    render: function () {
       var renderContent = []
       var formStyle = {
         margin: 0,
@@ -878,18 +770,18 @@ jQuery(document).ready(function() {
   })
 
   var SortToggle = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
       return {
         order: this.props.order
       }
     },
-    handleClick: function() {
+    handleClick: function () {
       if (this.state.order === 'normal') {
         this.setState(
           {
             order: 'reverse'
           },
-          function() {
+          function () {
             this.props.handleUserClick(this.props.colName, this.state.order)
           }
         )
@@ -898,28 +790,28 @@ jQuery(document).ready(function() {
           {
             order: 'normal'
           },
-          function() {
+          function () {
             this.props.handleUserClick(this.props.colName, this.state.order)
           }
         )
       }
     },
-    render: function() {
+    render: function () {
       return <span className="glyphicon glyphicon-sort" onClick={this.handleClick} />
     }
   })
 
   var ContentTable = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
       return {
         expandedRow: []
       }
     },
-    handleExpandClick: function(id, expanded, newParams) {
-      this.state.expandedRow.concat([ id ])
+    handleExpandClick: function (id, expanded, newParams) {
+      this.state.expandedRow.concat([id])
       if (expanded) {
         this.setState({
-          expandedRow: this.state.expandedRow.concat([ id ])
+          expandedRow: this.state.expandedRow.concat([id])
         })
         // if(this.props.dataType!='assignment') {
         _this = this
@@ -928,7 +820,7 @@ jQuery(document).ready(function() {
           {
             reactParams2: newParams
           },
-          function(data) {
+          function (data) {
             _this.props.data[id.split('_')[2]]['children'] = data
             _this.forceUpdate()
           },
@@ -946,30 +838,30 @@ jQuery(document).ready(function() {
         }
       }
     },
-    handleSortingClick: function(colName, order) {
+    handleSortingClick: function (colName, order) {
       this.props.onUserClick(colName, order)
     },
-    render: function() {
+    render: function () {
       var _rows = []
       var _this = this
-      var colWidthArray = [ '30%', '0%', '0%', '0%', '25%', '25%', '20%' ]
+      var colWidthArray = ['30%', '0%', '0%', '0%', '25%', '25%', '20%']
       var colDisplayStyle = {
         display: ''
       }
       if (this.props) {
         if (this.props.dataType === 'questionnaire') {
-          colWidthArray = [ '70%', '0%', '0%', '0%', '0%', '0%', '30%' ]
+          colWidthArray = ['70%', '0%', '0%', '0%', '0%', '0%', '30%']
           colDisplayStyle = {
             display: 'none'
           }
         }
         if (this.props.dataType == 'course') {
-          colWidthArray = [ '20%', '0%', '0%', '20%', '20%', '20%', '20%' ]
+          colWidthArray = ['20%', '0%', '0%', '20%', '20%', '20%', '20%']
           _rows.push(<TitleRow title="My Courses" />)
         } else if (this.props.dataType == 'assignment') {
           _rows.push(<TitleRow title="My Assignments" />)
         }
-        jQuery.each(this.props.data, function(i, entry) {
+        jQuery.each(this.props.data, function (i, entry) {
           if (
             ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
               (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
@@ -1020,10 +912,10 @@ jQuery(document).ready(function() {
                 showElement={
                   _this.state.expandedRow.indexOf(
                     entry.type +
-                      '_' +
-                      (parseInt(entry.nodeinfo.node_object_id) * 2).toString() +
-                      '_' +
-                      i
+                    '_' +
+                    (parseInt(entry.nodeinfo.node_object_id) * 2).toString() +
+                    '_' +
+                    i
                   ) > -1 ? (
                     ''
                   ) : (
@@ -1042,7 +934,7 @@ jQuery(document).ready(function() {
         if (this.props.showPublic) {
           if (this.props.dataType == 'course') {
             _rows.push(<TitleRow title="Others' Public Courses" />)
-            jQuery.each(this.props.data, function(i, entry) {
+            jQuery.each(this.props.data, function (i, entry) {
               if (
                 ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
                   (entry.creation_date &&
@@ -1099,10 +991,10 @@ jQuery(document).ready(function() {
                     showElement={
                       _this.state.expandedRow.indexOf(
                         entry.type +
-                          '_' +
-                          (parseInt(entry.nodeinfo.node_object_id) * 2).toString() +
-                          '_' +
-                          i
+                        '_' +
+                        (parseInt(entry.nodeinfo.node_object_id) * 2).toString() +
+                        '_' +
+                        i
                       ) > -1 ? (
                         ''
                       ) : (
@@ -1119,7 +1011,7 @@ jQuery(document).ready(function() {
             })
           } else if (this.props.dataType == 'assignment') {
             _rows.push(<TitleRow title="Others' Public Assignments" />)
-            jQuery.each(this.props.data, function(i, entry) {
+            jQuery.each(this.props.data, function (i, entry) {
               if (
                 ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
                   (entry.creation_date &&
@@ -1174,10 +1066,10 @@ jQuery(document).ready(function() {
                     showElement={
                       _this.state.expandedRow.indexOf(
                         entry.type +
-                          '_' +
-                          (parseInt(entry.nodeinfo.node_object_id) * 2).toString() +
-                          '_' +
-                          i
+                        '_' +
+                        (parseInt(entry.nodeinfo.node_object_id) * 2).toString() +
+                        '_' +
+                        i
                       ) > -1 ? (
                         ''
                       ) : (
@@ -1279,7 +1171,7 @@ jQuery(document).ready(function() {
 
   /** beta branch isnt getting a prop related to the data to be displayed in the dropdown */
   var FilterableTable = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
       return {
         filterText: '',
         privateCheckbox: false,
@@ -1287,14 +1179,14 @@ jQuery(document).ready(function() {
         tableData: this.props.data
       }
     },
-    handleUserInput: function(filterText) {
+    handleUserInput: function (filterText) {
       this.setState({
         filterText: filterText
       })
     },
-    handleUserClick: function(colName, order) {
+    handleUserClick: function (colName, order) {
       var tmpData = this.state.tableData
-      tmpData.sort(function(a, b) {
+      tmpData.sort(function (a, b) {
         var a_val = eval('a.' + colName)
         var b_val = eval('b.' + colName)
         if (order === 'normal') {
@@ -1325,15 +1217,15 @@ jQuery(document).ready(function() {
       //   tableData: tmpData
       // })
     },
-    componentWillReceiveProps: function(nextProps) {
+    componentWillReceiveProps: function (nextProps) {
       this.setState({
         tableData: nextProps.data
       })
     },
-    handleUserFilter: function(name, checked) {
+    handleUserFilter: function (name, checked) {
       var publicCheckboxStatus = this.state.publicCheckbox
       publicCheckboxStatus = checked
-      var tmpData = this.props.data.filter(function(element) {
+      var tmpData = this.props.data.filter(function (element) {
         if (publicCheckboxStatus) {
           return true
         } else return element.private === true
@@ -1343,7 +1235,7 @@ jQuery(document).ready(function() {
         publicCheckbox: publicCheckboxStatus
       })
     },
-    render: function() {
+    render: function () {
       return (
         <div className="filterable_table">
           <SearchBar
@@ -1371,7 +1263,7 @@ jQuery(document).ready(function() {
   })
 
   var TabSystem = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
       return {
         tableContent: {
           Courses: {},
@@ -1381,7 +1273,7 @@ jQuery(document).ready(function() {
         activeTab: '1'
       }
     },
-    componentWillMount: function() {
+    componentWillMount: function () {
       var _this = this
       preloadImages(
         '/assets/tree_view/edit-icon-24.png',
@@ -1408,16 +1300,16 @@ jQuery(document).ready(function() {
         '/assets/tree_view/view-delayed-mailer.png',
         '/assets/tree_view/view-publish-rights-24.png'
       )
-      jQuery.get('/tree_display/session_last_open_tab', function(data) {
+      jQuery.get('/tree_display/session_last_open_tab', function (data) {
         _this.setState({
           activeTab: data
         })
       })
       jQuery.get(
         '/tree_display/get_folder_contents',
-        function(data2, status) {
-          jQuery.each(data2, function(nodeType, outerNode) {
-            jQuery.each(outerNode, function(i, node) {
+        function (data2, status) {
+          jQuery.each(data2, function (nodeType, outerNode) {
+            jQuery.each(outerNode, function (i, node) {
               var newParams = {
                 key: node.name + '|' + node.directory,
                 nodeType: nodeType,
@@ -1444,10 +1336,10 @@ jQuery(document).ready(function() {
         'json'
       )
     },
-    handleTabChange: function(tabIndex) {
+    handleTabChange: function (tabIndex) {
       jQuery.get('/tree_display/set_session_last_open_tab?tab=' + tabIndex.toString())
     },
-    render: function() {
+    render: function () {
       return (
         <ReactSimpleTabs
           className="tab-system"

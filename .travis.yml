@@ -15,7 +15,7 @@ cache:
   directories:
     - vendor/assets/components
 rvm:
-  - 2.7
+  - 2.7.1
 branches:
   only:
     - master
@@ -39,6 +39,7 @@ before_script:
   - cp config/database.yml.example config/database.yml
   - cp config/secrets.yml.example config/secrets.yml
   - export JAVA_HOME=/usr/lib/jvm/java-6-openjdk-amd64
+  - gem install bundler:1.16.6
   - bundle install
   - bundle exec danger --verbose
   - bundle exec rake db:setup

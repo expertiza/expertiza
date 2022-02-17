@@ -73,7 +73,6 @@ class ControllerActionsController < ApplicationController
 
   def destroy
     @controller_action = ControllerAction.find(params[:id])
-    site_controller_id = @controller_action.site_controller_id
     @controller_action.destroy
     Role.rebuild_cache
     redirect_to @controller_action.site_controller

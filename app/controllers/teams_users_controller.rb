@@ -45,7 +45,7 @@ class TeamsUsersController < ApplicationController
       if team.is_a?(AssignmentTeam)
         assignment = Assignment.find(team.parent_id)
         if assignment.user_on_team?(user)
-          flash[:error] = "This user is already assigned to a team for this assignment" 
+          flash[:error] = "This user is already assigned to a team for this assignment"
           redirect_back
           return
         end
@@ -53,7 +53,7 @@ class TeamsUsersController < ApplicationController
           urlAssignmentParticipantList = url_for controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment', authorization: 'participant'
           flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
         else
-          begin 
+          begin
             add_member_return = team.add_member(user, team.parent_id)
           rescue
             flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
@@ -74,7 +74,7 @@ class TeamsUsersController < ApplicationController
       else # CourseTeam
         course = Course.find(team.parent_id)
         if course.user_on_team?(user)
-          flash[:error] = "This user is already assigned to a team for this course" 
+          flash[:error] = "This user is already assigned to a team for this course"
           redirect_back
           return
         end
@@ -82,7 +82,7 @@ class TeamsUsersController < ApplicationController
           urlCourseParticipantList = url_for controller: 'participants', action: 'list', id: course.id, model: 'Course', authorization: 'participant'
           flash[:error] = "\"#{user.name}\" is not a participant of the current course. Please <a href=\"#{urlCourseParticipantList}\">add</a> this user before continuing."
         else
-          begin 
+          begin
             add_member_return = team.add_member(user, team.parent_id)
           rescue
             flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"

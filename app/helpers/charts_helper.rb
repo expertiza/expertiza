@@ -32,6 +32,7 @@ module ChartsHelper
     color_string = color_string[0..-2]   # remove last comma
 
     address += value_string + label_string + color_string
+    address
   end
 
   # labels: array of labels
@@ -65,6 +66,7 @@ module ChartsHelper
     color_string = color_string[0..-2]   # remove last comma
 
     address += value_string + label_string + color_string
+    address
   end
 
   def self.get_rg_color(value, max)

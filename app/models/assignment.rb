@@ -47,10 +47,10 @@ class Assignment < ActiveRecord::Base
   DEFAULT_MAX_REVIEWERS = 3
   DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
 
-  def user_on_team? (user)
+  def user_on_team?(user)
     teams = self.teams
     users = []
-    teams.each do | team |
+    teams.each do |team|
       users << team.users
     end
     users.flatten.include? user
@@ -183,6 +183,7 @@ class Assignment < ActiveRecord::Base
                   Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(instructor[:name]) + '/'
                 end
     path_text += FileHelper.clean_path(directory_path)
+    path_text
   end
 
   # Check whether review, metareview, etc.. is allowed
@@ -508,7 +509,6 @@ class Assignment < ActiveRecord::Base
     @scores = scores
     (0..@scores[:teams].length - 1).each do |index|
       team = @scores[:teams][index.to_s.to_sym]
-      first_participant = team[:team].participants[0] unless team[:team].participants[0].nil?
       teams_csv = []
       teams_csv << team[:team].name
       names_of_participants = ''
@@ -633,6 +633,7 @@ class Assignment < ActiveRecord::Base
   def min_metareview(response_map_set)
     response_map_set.sort! { |a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
     min_metareviews = response_map_set.first.metareview_response_maps.count
+    min_metareviews
   end
 
   # returns a map of reviewer to meta_reviews

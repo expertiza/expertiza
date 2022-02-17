@@ -180,7 +180,6 @@ class SignUpSheetController < ApplicationController
   # simple function that redirects to assignment->edit->topic panel to display /add_signup_topics or the /add_signup_topics_staggered page
   # staggered means that different topics can have different deadlines.
   def redirect_to_assignment_edit(assignment_id)
-    assignment = Assignment.find(assignment_id)
     redirect_to controller: 'assignments', action: 'edit', id: assignment_id
   end
 
@@ -445,10 +444,6 @@ class SignUpSheetController < ApplicationController
   def setup_new_topic
     set_values_for_new_topic
     @sign_up_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
-    if @assignment.staggered_deadline?
-      topic_set = []
-      topic = @sign_up_topic.id
-    end
     if @sign_up_topic.save
       undo_link "The topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
       # Akshay - correctly changing the redirection url to topics tab in edit assignment view.

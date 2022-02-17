@@ -47,7 +47,7 @@ class ConferenceController < ApplicationController
       url = polymorphic_url :conference, action: 'new', role: 'Student', assignment_id: params[:user][:assignment]
       return redirect_to url
     end
-end
+  end
 
   def add_conference_user
     # check if user is already present with given username in system

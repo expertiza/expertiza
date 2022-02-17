@@ -1,6 +1,7 @@
 module SecurityHelper
   def special_chars
     special = '/\\?<>|&$#'
+    special
   end
 
   def contains_special_chars?(str)
@@ -21,7 +22,7 @@ module SecurityHelper
   def json_valid?(str)
     JSON.parse(str)
     true
-  rescue JSON::ParserError, TypeError => e
+  rescue JSON::ParserError, TypeError
     false
   end
 

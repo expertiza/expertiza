@@ -8,7 +8,7 @@ class ReviewResponseMap < ResponseMap
   # ReviewResponseMap was created in so many places, I thought it best to add this here as a catch-all
   def after_initialize
     # If an assignment supports team reviews, it is marked in each mapping
-    reviewer_is_team = assignment.reviewer_is_team
+    assignment.reviewer_is_team
   end
 
   # Find a review questionnaire associated with this review response map's assignment

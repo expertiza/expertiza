@@ -245,14 +245,7 @@ class QuestionnairesController < ApplicationController
   # save questionnaire object after create or edit
   def save
     @questionnaire.save!
-
     save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
-    # We do not create node for quiz questionnaires
-    unless @questionnaire.type == 'QuizQuestionnaire'
-      p_folder = TreeFolder.find_by(name: @questionnaire.display_type)
-      parent = FolderNode.find_by(node_object_id: p_folder.id)
-      # create_new_node_if_necessary(parent)
-    end
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
   end
 

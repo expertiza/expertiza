@@ -79,7 +79,6 @@ class TeamsController < ApplicationController
     # delete records in team, teams_users, signed_up_teams table
     @team = Team.find_by(id: params[:id])
     unless @team.nil?
-      course = Object.const_get(session[:team_type]).find(@team.parent_id)
       @signed_up_team = SignedUpTeam.where(team_id: @team.id)
       @teams_users = TeamsUser.where(team_id: @team.id)
 

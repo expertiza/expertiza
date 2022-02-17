@@ -61,7 +61,6 @@ class UsersController < ApplicationController
 
   # for displaying the list of users
   def list
-    user = session[:user]
     # @users = user.get_user_list
     # paginate_list is called with the entire list of users
     # @paginated_users can be used to display set number of users per page

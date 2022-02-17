@@ -56,7 +56,7 @@ module QuestionnaireAnalytic
       [0]
     else
       character_count_list
-   end
+    end
   end
 
   def total_character_count

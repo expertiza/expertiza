@@ -17,7 +17,7 @@ class MetareviewResponseMap < ResponseMap
                             m1.version_num <=> m2.version_num
                           else
                             m1.version_num ? -1 : 1
-                                                      end
+                          end
       end
       # return all the lists in ascending order.
       @sorted

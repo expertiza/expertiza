@@ -8,7 +8,6 @@ module QuestionnaireHelper
   CSV_TYPE = 1
   CSV_PARAM = 2
   CSV_WEIGHT = 3
-
   def self.adjust_advice_size(questionnaire, question)
     # now we only support question advices for scored questions
     if question.is_a?(ScoredQuestion)

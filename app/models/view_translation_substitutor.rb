@@ -73,10 +73,10 @@ class ViewTranslationSubstitutor
   end
 end
 
-locale = YAML.load_file('../../config/locales/en_US.yml')['en_US']
-locale = {
-  'student_task' => {
-    'publishing_rights' => locale['student_task']['publishing_rights']
-  }
-}
-ViewTranslationSubstitutor.new.substitute(locale)
+# locale = YAML.load_file('../../config/locales/en_US.yml')['en_US']
+# locale = {
+#   'student_task' => {
+#     'publishing_rights' => locale['student_task']['publishing_rights']
+#   }
+# }
+# ViewTranslationSubstitutor.new.substitute(locale)

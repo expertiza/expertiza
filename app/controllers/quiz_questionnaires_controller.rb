@@ -167,7 +167,7 @@ class QuizQuestionnairesController < QuestionnairesController
                         QuizQuestionChoice.new(txt: q_answer_choices[choice_key][:txt], iscorrect: 'true', question_id: question.id)
                       else
                         QuizQuestionChoice.new(txt: q_answer_choices[choice_key][:txt], iscorrect: 'false', question_id: question.id)
-        end
+                      end
     question_choice.save
   end
 

@@ -35,7 +35,6 @@ class TrueFalse < QuizQuestion
     quiz_question_choices = QuizQuestionChoice.where(question_id: id)
     html = '<label for="' + id.to_s + '">' + txt + '</label><br>'
     (0..1).each do |i|
-      txt = quiz_question_choices[i].txt
       html += '<input name = ' + "\"#{id}\" "
       html += 'id = ' + "\"#{id}" + '_' + "#{i + 1}\" "
       html += 'value = ' + "\"#{quiz_question_choices[i].txt}\" "

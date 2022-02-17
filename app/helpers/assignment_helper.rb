@@ -88,7 +88,9 @@ module AssignmentHelper
       users_for_curr_team << user
       participants << Participant.where(['parent_id = ? AND user_id = ?', @assignment.id, user.id]).first
     end
-    [topic_identifier ||= '', topic_name ||= '', users_for_curr_team, participants]
+    topic_identifier ||= ''
+    topic_name ||= ''
+    [topic_identifier, topic_name, users_for_curr_team, participants]
   end
 
   def get_team_name_color_in_list_submission(team)

@@ -3,6 +3,7 @@ CURRENT_MAINTAINERS = %w[
   Winbobob
   TheAkbar
   johnbumgardner
+  nnhimes
 ].freeze
 
 ADDED_FILES    = git.added_files
@@ -36,6 +37,8 @@ unless CURRENT_MAINTAINERS.include? PR_AUTHOR
       markdown <<-MARKDOWN
 Thanks for the pull request, and welcome! :tada: The Expertiza team is excited to review your changes, and you should hear from us soon.
 
+Please make sure the PR passes all checks and you have run `rubocop -a` to autocorrect issues before requesting a review.
+
 This repository is being automatically checked for code-quality issues using `Code Climate`.
 You can see results for this analysis in the PR status below. Newly introduced issues should be fixed before a pull request is considered ready to review.
 
@@ -48,6 +51,8 @@ If you have any questions, please send email to <a href="mailto:expertiza-suppor
     WELCOME_MESSAGE =
       markdown <<-MARKDOWN
 Thanks for the pull request, and welcome! :tada: The Expertiza team is excited to review your changes, and you should hear from us soon.
+
+Please make sure the PR passes all checks and you have run `rubocop -a` to autocorrect issues before requesting a review.
 
 This repository is being automatically checked for code quality issues using `Code Climate`.
 You can see results for this analysis in the PR status below. Newly introduced issues should be fixed before a pull request is considered ready to review.

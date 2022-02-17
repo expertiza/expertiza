@@ -16,7 +16,7 @@ class SampleReviewsController < ApplicationController
       @assignment = Assignment.find(assignment.assignment_id)
     end
     @links = generate_links(@response_ids)
-    end
+  end
 
   def show
     @response_id = params[:id]
@@ -48,7 +48,6 @@ class SampleReviewsController < ApplicationController
       visibility = 'published'
       @response.update_attribute('visibility', visibility)
     rescue StandardError
-      msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
 
     respond_to do |format|
@@ -68,7 +67,6 @@ class SampleReviewsController < ApplicationController
       visibility = 'public'
       @response.update_attribute('visibility', visibility)
     rescue StandardError
-      msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
 
     respond_to do |format|
@@ -76,4 +74,4 @@ class SampleReviewsController < ApplicationController
       format.json { head :no_content }
     end
   end
-  end
+end

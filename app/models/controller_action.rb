@@ -35,7 +35,7 @@ class ControllerAction < ActiveRecord::Base
       "#{controller.name}: #{name}"
     else
       name.to_s
-      end
+    end
   end
 
   def url
@@ -59,13 +59,13 @@ class ControllerAction < ActiveRecord::Base
                            1
                          else
                            0
-                                          end
+                         end
                        else # Controller's permission
                          if perms.key?(action.controller.permission_id)
                            1
                          else
                            0
-                                          end
+                         end
                        end
     end
 

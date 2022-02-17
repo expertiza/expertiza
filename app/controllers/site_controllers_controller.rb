@@ -68,7 +68,7 @@ class SiteControllersController < ApplicationController
     redirect_to action: 'index'
   end
 
-    protected
+  protected
 
   def foreign
     @permissions = Permission.order(:name)
@@ -117,7 +117,6 @@ class SiteControllersController < ApplicationController
   # which that controller will respond.
 
   def controller_actions(controller_name)
-    controllers = controller_classes
     actions = {}
 
     if @controller_classes.key? controller_name
@@ -133,5 +132,5 @@ class SiteControllersController < ApplicationController
     end
 
     actions.keys
-  end  # def controller_actions
-  end  # class
+  end
+end

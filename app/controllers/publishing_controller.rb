@@ -44,7 +44,7 @@ class PublishingController < ApplicationController
 
     @participant = AssignmentParticipant.find(params[:id]) unless params[:id].nil?
     @user = User.find(session[:user].id) # Find again, because the user's certificate may have changed since login
-    end
+  end
 
   # Grant publishing rights using the private key supplied by the student
   def grant_with_private_key

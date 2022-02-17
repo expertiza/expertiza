@@ -253,7 +253,6 @@ module SummaryHelper
           # E1936 team did not update this usage of review_questionnaire_id() to include topic,
           #   because this method does not seem to be used anywhere in Expertiza
           #   as noted in method block comment above
-          questionnaire_id = assignment.review_questionnaire_id(round + 1)
           # get criteria in the corresponding rubric (each round may use different rubric)
           rubric[round] = Question.where(questionnaire_id: assignment.review_questionnaire_id(round + 1)).order(:seq)
         else

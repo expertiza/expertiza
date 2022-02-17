@@ -178,9 +178,9 @@ module ReviewMappingHelper
     # get the number of review rounds for the assignment
     @num_rounds = @assignment.num_review_rounds.to_f.to_i
     @all_reviewers_avg_vol_per_round = []
-    @all_reviewers_overall_avg_vol = @reviewers.inject(0) { |sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @all_reviewers_overall_avg_vol = @reviewers.inject(0) { |sum, r| sum + r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
     @num_rounds.times do |round|
-      @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) { |sum, r| sum += r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
+      @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) { |sum, r| sum + r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
     end
     @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
@@ -405,7 +405,7 @@ module ReviewMappingHelper
     css_class = if dict.key?(diff.abs)
                   dict[diff.abs]
                 else
-                  css_class = 'c1'
+                  'c1'
                 end
     css_class
   end

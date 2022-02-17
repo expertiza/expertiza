@@ -102,7 +102,6 @@ class Assessment360Controller < ApplicationController
       @assignments.each do |assignment|
         user_id = cp.user_id
         assignment_id = assignment.id
-        assignment_participant = assignment.participants.find_by(user_id: user_id)
         next if assignment.participants.find_by(user_id: user_id).nil? # break out of the loop if there are no participants in the assignment
         next if TeamsUser.team_id(assignment_id, user_id).nil? # break out of the loop if the participant has no team
 

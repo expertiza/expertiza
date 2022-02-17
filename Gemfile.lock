@@ -90,6 +90,7 @@ GEM
     babel-transpiler (0.7.0)
       babel-source (>= 4.0, < 6)
       execjs (~> 2.0)
+    bigdecimal (1.3.5)
     bind-it (0.2.6)
       rjb
     bootstrap3-datetimepicker-rails (4.17.47)
@@ -477,6 +478,7 @@ GEM
     sawyer (0.8.2)
       addressable (>= 2.3.5)
       faraday (> 0.8, < 2.0)
+    scanf (1.0.0)
     scrypt (3.0.6)
       ffi-compiler (>= 1.0, < 2.0)
     seer (0.10.0)
@@ -564,6 +566,7 @@ DEPENDENCIES
   airbrake
   authlogic (= 4.1)
   awesome_nested_set
+  bigdecimal (= 1.3.5)
   bind-it
   bootstrap3-datetimepicker-rails (~> 4.17.47)
   bullet (~> 5.7.6)
@@ -635,6 +638,7 @@ DEPENDENCIES
   rubyzip
   rwordnet
   sass-rails (= 5.0.3)
+  scanf
   scrypt (= 3.0.6)
   seer
   selenium-webdriver

@@ -171,7 +171,7 @@ class ApplicationController < ActionController::Base
           undef: :replace,
           replace: ''
         }
-        value.encode!(Encoding.find('UTF-8'), encode_opts)
+        value.encode!(Encoding.find('UTF-8'))
       end
     end
   end

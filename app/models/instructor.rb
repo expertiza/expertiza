@@ -50,7 +50,7 @@ class Instructor < User
       next if assignment_participants.empty?
 
       assignment_participants.each do |participant|
-        user_list << participant.user if user.role.hasAllPrivilegesOf(participant.user.role)
+        user_list << participant.user if user.role.has_all_privileges_of?(participant.user.role)
       end
     end
     user_list

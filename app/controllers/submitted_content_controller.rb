@@ -100,7 +100,11 @@ class SubmittedContentController < ApplicationController
 
   def submit_file
     participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(participant.user_id)
+    unless current_user_id?(participant.user_id)
+      flash[:error] = "Authentication Error"
+      redirect_to action: 'edit', id: participant.id
+      return
+    end
 
     file = params[:uploaded_file]
     file_size_limit = 5

@@ -143,7 +143,7 @@ class CoursesController < ApplicationController
 
     # if the user does not have any other TA mappings, then the role should be changed to student
     other_ta_mappings_num = TaMapping.where(ta_id: @ta_mapping.ta_id).size - 1
-    if other_ta_mappings_num == 0
+    if other_ta_mappings_num.zero?
       @ta.role = Role.find_by name: 'Student'
       @ta.save
     end

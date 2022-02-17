@@ -1,8 +1,4 @@
 Expertiza::Application.routes.draw do
-  resources :duties
-  ###
-  # Please insert new routes alphabetically!
-  ###
 
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
@@ -99,6 +95,8 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :duties
+  
   resources :eula, only: [] do
     collection do
       get :accept

@@ -259,8 +259,8 @@ class User < ActiveRecord::Base
       tcsv.push(user.role.name) if options['role'] == 'true'
       tcsv.push(user.parent.name) if options['parent'] == 'true'
       tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails) if options['email_options'] == 'true'
-      tcsv.push(user.handle) if options['handle'] == 'true'
       tcsv.push(user.preference_home_flag) if options['preference_home_flag'] == 'true'
+      tcsv.push(user.handle) if options['handle'] == 'true'
       csv << tcsv
     end
   end
@@ -274,7 +274,8 @@ class User < ActiveRecord::Base
     fields.push('name', 'full name', 'email') if options['personal_details'] == 'true'
     fields.push('role') if options['role'] == 'true'
     fields.push('parent') if options['parent'] == 'true'
-    fields.push('email on submission', 'email on review', 'email on metareview') if options['email_options'] == 'true'
+    fields.push('email on submission', 'email on review', 'email on metareview', 'copy of emails') if options['email_options'] == 'true'
+    fields.push('preference home flag') if options['preference_home_flag'] == 'true'
     fields.push('handle') if options['handle'] == 'true'
     fields
   end

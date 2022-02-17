@@ -223,10 +223,6 @@ class ResponseController < ApplicationController
     redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
-  def pending_surveys
-    redirect_to controller: 'survey_deployment', action: 'pending_surveys'
-  end
-
   def redirect
     error_id = params[:error_msg]
     message_id = params[:msg]

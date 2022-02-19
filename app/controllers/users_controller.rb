@@ -131,7 +131,7 @@ class UsersController < ApplicationController
       error_message = ''
       @user.errors.each { |_field, error| error_message << error }
       flash[:error] = error_message
-      redirect_to action: 'list'   
+      redirect_to action: 'list'
     end
   end
 

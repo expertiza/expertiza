@@ -8,7 +8,7 @@ class AuthController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'login', 'logout', 'login_failed', 'google_login'
+    when 'login', 'logout', 'login_failed'
       true
     else
       current_user_has_super_admin_privileges?
@@ -40,18 +40,6 @@ class AuthController < ApplicationController
                 action: AuthHelper.get_home_action(session[:user])
   end
 
-  def google_login
-    g_email = env['omniauth.auth'].info.email
-    user = User.find_by(email: g_email)
-    if user.nil?
-      ExpertizaLogger.error LoggerMessage.new(controller_name, g_email, 'This email is not authorized to use Expertiza!', request)
-      flash[:error] = 'This email is not authorized to use Expertiza!'
-      redirect_to root_path
-    else
-      after_login(user)
-    end
-  end
-
   def login_failed
     flash.now[:error] = 'Your username or password is incorrect.'
     render action: 'forgotten'
@@ -63,38 +51,6 @@ class AuthController < ApplicationController
     redirect_to '/'
   end
 
-  # changing spelling of the authorised to authorized
-  def self.authorized?(session, params)
-    authorized = false # default
-    check_controller = false
-
-    if (params[:controller] == 'content_pages') &&
-       (params[:action] == 'view')
-      if session[:credentials].pages.key?(params[:page_name].to_s)
-        authorized = true if session[:credentials].pages[params[:page_name].to_s] == true
-      end
-    else
-      # Check if there's a specific permission for an action
-      if session[:credentials].actions.key?(params[:controller])
-        if session[:credentials].actions[params[:controller]].key?(params[:action]) && session[:credentials].actions[params[:controller]][params[:action]]
-          authorized = true
-        else
-          check_controller = true
-        end
-      else
-        check_controller = true
-      end
-
-      # Check if there's a general permission for a controller
-      if check_controller
-        authorized = true if session[:credentials].controllers.key?(params[:controller]) && session[:credentials].controllers[params[:controller]]
-      end
-    end # Check permissions
-
-    ExpertizaLogger.info "Authorized? #{authorized}, check_controller? #{check_controller}"
-    authorized
-  end
-
   protected
 
   def self.logout(session)
@@ -103,7 +59,7 @@ class AuthController < ApplicationController
 
   def self.set_current_role(role_id, session)
     if role_id
-      role = Role.find role_id
+      role = Role.find(role_id)
       if role
         Role.rebuild_cache if !role.cache || !role.cache.try(:has_key?, :credentials)
         session[:credentials] = role.cache[:credentials]

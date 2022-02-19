@@ -8,20 +8,20 @@
         <td><%=t ".email_option"%>
           <tr>
             <td><label for="user_email_on_review"><%=t ".when_someone_else"%> <strong><%=t ".reviews"%></strong> <%=t ".my_work"%></label></td>
-            <td><%= check_box 'user', 'email_on_review', {},  true, false  %></td>
+            <td><%= check_box 'user', 'email_on_review', {checked: true},  true, false  %></td>
           </tr>
           <tr>
             <td><label for="user_email_on_submission"><%=t ".when_someone_else"%> <strong><%=t ".submits"%></strong> <%=t ".work_assigned"%></label></td>
-            <td><%= check_box 'user', 'email_on_submission', {}, true, false  %></td>
+            <td><%= check_box 'user', 'email_on_submission', {checked: true}, true, false  %></td>
           </tr>
           <tr>
             <td><label for="user_email_on_review_of_review"><%=t ".when_someone_else"%> <%=t ".reviews_one"%> (<strong>meta-<%=t ".reviews"%></strong> <%=t ".my_work"%>)</label></td>
-            <td><%= check_box 'user', 'email_on_review_of_review', {}, true, false %></td>
+            <td><%= check_box 'user', 'email_on_review_of_review', {checked: true}, true, false %></td>
           </tr>
           <% if @user.role_id == 2 %>
             <tr>
               <td><label for="copy_of_emails"> <%=t ".send_mail"%></label></td>
-              <td><%= check_box 'user', 'copy_of_emails', {}, true, false %></td>
+              <td><%= check_box 'user', 'copy_of_emails', {checked: true}, true, false %></td>
             </tr>
           <% end %>
   </table>

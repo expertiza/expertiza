@@ -29,16 +29,6 @@ describe User do
     it 'returns the full name of the user' do
       expect(user.fullname).to eq('abc xyz')
     end
-
-    it 'Validate presence of fullname which cannot be blank' do
-      user.fullname = '  '
-      expect(user).not_to be_valid
-    end
-
-    it 'Validate the email format correctness' do
-      user.fullname = 'John Bumgardner'
-      expect(user).to be_valid
-    end
   end
 
   describe '#email' do

@@ -61,6 +61,9 @@ class UsersController < ApplicationController
 
   # for displaying the list of users
   def list
+    # @users = user.get_user_list
+    # paginate_list is called with the entire list of users
+    # @paginated_users can be used to display set number of users per page
     @paginated_users = paginate_list
   end
 
@@ -128,10 +131,7 @@ class UsersController < ApplicationController
       redirect_to action: 'list'
     else
       foreign
-      error_message = ''
-      @user.errors.each { |_field, error| error_message << error }
-      flash[:error] = error_message
-      redirect_to action: 'list'
+      render action: 'new'
     end
   end
 

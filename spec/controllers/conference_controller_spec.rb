@@ -49,7 +49,6 @@ describe ConferenceController do
         user: { name: 'lily',
                 role_id: 2,
                 email: 'chenzy@gmail.com',
-                fullname: 'John Bumgardner',
                 assignment: '2' }
       }
       allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
@@ -77,7 +76,6 @@ describe ConferenceController do
         user: { name: 'lily',
                 role_id: 2,
                 email: 'chenzy@gmail.com',
-                fullname: 'John Bumgardner',
                 assignment: '2' }
       }
       allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
@@ -89,7 +87,6 @@ describe ConferenceController do
         user: { name: 'lily23',
                 role_id: 2,
                 email: 'chenzy@gmail.com',
-                fullname: 'John Bumgardner',
                 assignment: '2' }
       }
       allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)

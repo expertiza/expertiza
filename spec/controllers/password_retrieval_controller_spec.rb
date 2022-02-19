@@ -4,7 +4,6 @@ describe PasswordRetrievalController do
       @user = User.new
       @user.email = 'example@example.edu'
       @user.name = 'ex'
-      @user.fullname = 'John Bumgardner'
       @user.save!
       post :send_password, user: { email: 'example@example.edu' }
       expect(PasswordReset.where(user_email: 'example@example.edu')).to exist
@@ -13,7 +12,6 @@ describe PasswordRetrievalController do
       @user = User.new
       @user.email = 'example@example.edu'
       @user.name = 'Shubham'
-      @user.fullname = 'John Bumgardner'
       @user.save!
       @password_retrival = PasswordReset.new
       @local_token = 'some random string'
@@ -27,7 +25,6 @@ describe PasswordRetrievalController do
       @user = User.new
       @user.email = 'aexample@example.edu'
       @user.name = 'Shubham'
-      @user.fullname = 'John Bumgardner'
       @user.save!
       post :send_password, user: { email: 'example@example.edu' }
       expect(PasswordReset.where(user_email: 'example@example.edu')).not_to exist

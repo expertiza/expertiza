@@ -3,8 +3,8 @@ describe PasswordRetrievalController do
     it 'create new entry in password_resets table' do
       @user = User.new
       @user.email = 'example@example.edu'
-      @user.name = 'ex'
       @user.fullname = 'John Bumgardner'
+      @user.name = 'ex'
       @user.save!
       post :send_password, user: { email: 'example@example.edu' }
       expect(PasswordReset.where(user_email: 'example@example.edu')).to exist
@@ -12,8 +12,8 @@ describe PasswordRetrievalController do
     it 'modifies the token in password_resets_table' do
       @user = User.new
       @user.email = 'example@example.edu'
-      @user.name = 'Shubham'
       @user.fullname = 'John Bumgardner'
+      @user.name = 'Shubham'
       @user.save!
       @password_retrival = PasswordReset.new
       @local_token = 'some random string'

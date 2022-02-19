@@ -239,7 +239,7 @@ describe UsersController do
                 institution_id: 1 }
       }
       post :create, params, session
-      expect(response).to render_template(:new)
+      expect(response).to redirect_to('/users/list')
     end
   end
 

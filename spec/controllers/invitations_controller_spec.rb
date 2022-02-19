@@ -58,6 +58,7 @@ describe InvitationsController do
     it 'invitation added for new user who does not have an expertiza account yet and sends an invitation' do
       params = {
         user: { name: 'testuser@gmail.com',
+                fullname: 'John Bumgardner',
                 parent_id: 1,
                 institution_id: 1 },
         student_id: 1,

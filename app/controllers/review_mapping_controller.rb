@@ -555,8 +555,10 @@ class ReviewMappingController < ApplicationController
       iterator += 1
     end
   end
-  
+
   def review_mapping_params
-    params.require(:review_grade).permit(:grade_for_reviewer, :comment_for_reviewer, :review_graded_at)
+    params
+      .require(:review_grade)
+      .permit(:grade_for_reviewer, :comment_for_reviewer, :review_graded_at)
   end
 end

@@ -4,6 +4,8 @@ class Waitlist < ApplicationRecord
     unless waitlisted_topics.nil?
       waitlisted_topics.each do |waitlisted_topic|
         entry = SignedUpTeam.find_by(topic_id: waitlisted_topic.id)
+        next if entry.nil?
+
         entry.destroy
       end
     end
@@ -17,6 +19,7 @@ class Waitlist < ApplicationRecord
       non_waitlisted_users = SignedUpTeam.where(topic_id: signup_topic_id, is_waitlisted: false)
       max_choosers = SignUpTopic.find(signup_topic_id).max_choosers
       next unless non_waitlisted_users.length < max_choosers
+
       first_waitlisted_team = SignedUpTeam.find_by(topic_id: signup_topic_id, is_waitlisted: true)
       SignUpTopic.assign_to_first_waiting_team(first_waitlisted_team) if first_waitlisted_team
     end

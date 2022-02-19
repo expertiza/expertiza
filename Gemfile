@@ -93,19 +93,19 @@ group :development do
 end
 
 group :test do
+  gem 'capybara'
   gem 'database_cleaner'
   gem "factory_bot_rails", '4.8.2'
   gem 'geckodriver-helper', '~> 0.0.3'
-  gem 'capybara'
-  gem 'selenium-webdriver'
   gem 'gherkin'
   gem 'guard-rails'
   gem 'guard-rspec'
   gem 'launchy'
   gem 'rspec-rails', '4.1.2'
   gem 'rails-controller-testing'
-  gem 'shoulda'
   gem 'puma'
+  gem 'selenium-webdriver'
+  gem 'shoulda'
 end
 
 group :development, :test do
@@ -113,4 +113,3 @@ group :development, :test do
   gem 'selenium-webdriver'
   gem 'simplecov', require: false
 end
-

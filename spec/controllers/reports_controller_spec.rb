@@ -31,12 +31,12 @@ describe ReportsController do
             .with('1', assignment, 'ReviewResponseMap', 'no one')
             .and_return([participant, participant1])
           allow_any_instance_of(Scoring).to receive(:compute_reviews_hash).with(assignment)
-            .and_return('1' => 'good')
+                                                                          .and_return('1' => 'good')
           allow_any_instance_of(Scoring).to receive(:compute_avg_and_ranges_hash).with(assignment)
-            .and_return(avg: 94, range: [90, 99])
+                                                                                 .and_return(avg: 94, range: [90, 99])
           params = {
             id: 1,
-            report: {type: 'ReviewResponseMap'},
+            report: { type: 'ReviewResponseMap' },
             user: 'no one'
           }
           get :response_report, params
@@ -54,7 +54,7 @@ describe ReportsController do
               .with('1', 'FeedbackResponseMap').and_return([participant, participant1], [1, 2], [3, 4], [])
             params = {
               id: 1,
-              report: {type: 'FeedbackResponseMap'}
+              report: { type: 'FeedbackResponseMap' }
             }
             get :response_report, params
             expect(response).to render_template(:response_report)
@@ -68,7 +68,7 @@ describe ReportsController do
               .with('1', 'FeedbackResponseMap').and_return([participant, participant1], [1, 2, 3, 4])
             params = {
               id: 1,
-              report: {type: 'FeedbackResponseMap'}
+              report: { type: 'FeedbackResponseMap' }
             }
             get :response_report, params
             expect(response).to render_template(:response_report)
@@ -84,7 +84,7 @@ describe ReportsController do
             .with('1').and_return([participant, participant2])
           params = {
             id: 1,
-            report: {type: 'TeammateReviewResponseMap'}
+            report: { type: 'TeammateReviewResponseMap' }
           }
           get :response_report, params
           expect(response).to render_template(:response_report)
@@ -108,12 +108,12 @@ describe ReportsController do
           allow(ReviewResponseMap).to receive_message_chain(:select, :where)
             .with('id').with(reviewed_object_id: '1', calibrate_to: 0).and_return([1, 2])
           allow(Response).to receive(:where).with(map_id: [1, 2]).and_return([double('response')])
-          allow(role).to receive(:hasAllPrivilegesOf).with(any_args).and_return(true)
+          allow(role).to receive(:has_all_privileges_of?).with(any_args).and_return(true)
           params = {
             id: 1,
-            report: {type: 'Calibration'}
+            report: { type: 'Calibration' }
           }
-          session = {user: user}
+          session = { user: user }
           get :response_report, params, session
           expect(response).to render_template(:response_report)
         end
@@ -131,7 +131,7 @@ describe ReportsController do
             .and_return([double('PlagiarismCheckerAssignmentSubmission')])
           params = {
             id: 1,
-            report: {type: 'PlagiarismCheckerReport'}
+            report: { type: 'PlagiarismCheckerReport' }
           }
           get :response_report, params
           expect(response).to render_template(:response_report)

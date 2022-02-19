@@ -53,11 +53,8 @@
       <%= submit_tag "Sign in", :class => 'btn btn-danger', :style => 'width:100%; margin-left:auto; margin-right:auto;' %>
     </p>
   <% end %>
+  <br><br><br>
   <p>
-
-  </p>
-  <br/>
-</div>
     <%= form_tag({:controller => 'account_request', :role => "Instructor", :action => 'new'}, :method => "get") do %>
         <div>
           <%= recaptcha_tags %>
@@ -65,7 +62,7 @@
         <%= submit_tag "Request account", :class => 'btn btn-danger', :style => 'width:100%; margin-left:auto; margin-right:auto;' %>
 
     <% end %>
-
-
+  </p>
+</div>
 
 <% end %>

@@ -3,6 +3,7 @@ CURRENT_MAINTAINERS = %w[
   Winbobob
   TheAkbar
   johnbumgardner
+  nnhimes
 ].freeze
 
 ADDED_FILES    = git.added_files
@@ -18,12 +19,12 @@ PR_TITLE       = github.pr_title
 PR_DIFF        = github.pr_diff
 PR_ADDED       = PR_DIFF
                  .split("\n")
-                 .select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}
+                 .select { |loc| loc.start_with?('+') && !loc.include?('+++ b') }
                  .join('')
 
 def warning_message_of_config_file_change(filename, regex)
-  if !CURRENT_MAINTAINERS.include? PR_AUTHOR and MODIFIED_FILES.grep(regex).any?
-    fail("You changed #{filename}; please double-check whether this is necessary.", sticky: true)
+  if !CURRENT_MAINTAINERS.include?(PR_AUTHOR) && MODIFIED_FILES.grep(regex).any?
+    raise("You changed #{filename}; please double-check whether this is necessary.", sticky: true)
   end
 end
 
@@ -35,6 +36,8 @@ unless CURRENT_MAINTAINERS.include? PR_AUTHOR
     WELCOME_MESSAGE_COURSE_PROJECT =
       markdown <<-MARKDOWN
 Thanks for the pull request, and welcome! :tada: The Expertiza team is excited to review your changes, and you should hear from us soon.
+
+Please make sure the PR passes all checks and you have run `rubocop -a` to autocorrect issues before requesting a review.
 
 This repository is being automatically checked for code-quality issues using `Code Climate`.
 You can see results for this analysis in the PR status below. Newly introduced issues should be fixed before a pull request is considered ready to review.
@@ -48,6 +51,8 @@ If you have any questions, please send email to <a href="mailto:expertiza-suppor
     WELCOME_MESSAGE =
       markdown <<-MARKDOWN
 Thanks for the pull request, and welcome! :tada: The Expertiza team is excited to review your changes, and you should hear from us soon.
+
+Please make sure the PR passes all checks and you have run `rubocop -a` to autocorrect issues before requesting a review.
 
 This repository is being automatically checked for code quality issues using `Code Climate`.
 You can see results for this analysis in the PR status below. Newly introduced issues should be fixed before a pull request is considered ready to review.
@@ -75,7 +80,7 @@ end
 # ------------------------------------------------------------------------------
 # 2. Your pull request should not be too small (less than 50 LoC).
 # ------------------------------------------------------------------------------
-if PR_TITLE =~ /E[0-9]{4}/ and LoC < 50
+if PR_TITLE =~ /E[0-9]{4}/ && (LoC < 50)
   SMALL_PR_MESSAGE =
     markdown <<-MARKDOWN
 Your pull request is less than 50 LoC.
@@ -123,7 +128,7 @@ end
 # ------------------------------------------------------------------------------
 # 5. Your pull request is "work in progress" and it will not be merged.
 # ------------------------------------------------------------------------------
-if PR_TITLE.include? "WIP" or PR_TITLE.include? "wip"
+if PR_TITLE.include?('WIP') || PR_TITLE.include?('wip')
   WIP_MESSAGE =
     markdown <<-MARKDOWN
 This pull request is classed as `Work in Progress`. It cannot be merged right now.
@@ -135,14 +140,14 @@ end
 # ------------------------------------------------------------------------------
 # 6. Your pull request should not contain "Todo" or "Fixme" keyword.
 # ------------------------------------------------------------------------------
-if PR_ADDED.include? "TODO" or
-   PR_ADDED.include? "Todo" or
-   PR_ADDED.include? "todo" or
-   PR_ADDED.include? "toDo" or
-   PR_ADDED.include? "FIXME" or
-   PR_ADDED.include? "FixMe" or
-   PR_ADDED.include? "Fixme" or
-   PR_ADDED.include? "fixme"
+if PR_ADDED.include?('TODO') ||
+   PR_ADDED.include?('Todo') ||
+   PR_ADDED.include?('todo') ||
+   PR_ADDED.include?('toDo') ||
+   PR_ADDED.include?('FIXME') ||
+   PR_ADDED.include?('FixMe') ||
+   PR_ADDED.include?('Fixme') ||
+   PR_ADDED.include?('fixme')
   TODO_MESSAGE =
     markdown <<-MARKDOWN
 This pull request contains `TODO` or `FIXME` task(s); please fix them.
@@ -154,15 +159,15 @@ end
 # ------------------------------------------------------------------------------
 # 7. Your pull request should not include temp, tmp, cache file.
 # ------------------------------------------------------------------------------
-if ADDED_FILES.grep(/.*temp.*/).any? or
-   ADDED_FILES.grep(/.*tmp.*/).any? or
+if ADDED_FILES.grep(/.*temp.*/).any? ||
+   ADDED_FILES.grep(/.*tmp.*/).any? ||
    ADDED_FILES.grep(/.*cache.*/).any?
   TEMP_FILE_MESSAGE =
     markdown <<-MARKDOWN
 You committed `temp`, `tmp` or `cache` files. Please remove them.
     MARKDOWN
 
-  fail(TEMP_FILE_MESSAGE, sticky: true)
+  raise(TEMP_FILE_MESSAGE, sticky: true)
 end
 
 # ------------------------------------------------------------------------------
@@ -170,38 +175,39 @@ end
 # ------------------------------------------------------------------------------
 (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).each do |file|
   next unless file =~ /.*\.rb$/
+
   added_lines = git
                 .diff_for_file(file)
                 .patch
                 .split("\n")
-                .select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}
+                .select { |loc| loc.start_with?('+') && !loc.include?('+++ b') }
                 .join('')
-  if added_lines =~ /\$[A-Za-z0-9_]+/ or added_lines =~ /@@[A-Za-z0-9_]+/
-    GLOBAL_CLASS_VARIABLE_MESSAGE =
-      markdown <<-MARKDOWN
-You are using global variables (`$`) or class variables (`@@`); please double-check whether this is necessary.
+  next unless added_lines =~ /\$[A-Za-z0-9_]+/ || added_lines =~ /@@[A-Za-z0-9_]+/
+
+  GLOBAL_CLASS_VARIABLE_MESSAGE =
+    markdown <<-MARKDOWN
+  You are using global variables (`$`) or class variables (`@@`); please double-check whether this is necessary.
     MARKDOWN
 
-    warn(GLOBAL_CLASS_VARIABLE_MESSAGE, sticky: true)
-    break
-  end
+  warn(GLOBAL_CLASS_VARIABLE_MESSAGE, sticky: true)
+  break
 end
 
 # ------------------------------------------------------------------------------
 # 9. Your pull request should avoid keeping debugging code.
 # ------------------------------------------------------------------------------
-if PR_ADDED.include? "puts " or
-   PR_ADDED.include? "print " or
-   PR_ADDED.include? "binding.pry" or
-   PR_ADDED.include? "debugger;" or
-   PR_ADDED.include? "console.log"
-  fail("You are including debug code in your pull request, please remove it.", sticky: true)
+if PR_ADDED.include?('puts ') ||
+   PR_ADDED.include?('print ') ||
+   PR_ADDED.include?('binding.pry') ||
+   PR_ADDED.include?('debugger;') ||
+   PR_ADDED.include?('console.log')
+  warn('You are including debug code in your pull request, please remove it.', sticky: true)
 end
 
 # ------------------------------------------------------------------------------
 # 10. You should write tests after making changes to the application.
 # ------------------------------------------------------------------------------
-if TOUCHED_FILES.grep(/app/).any? and TOUCHED_FILES.grep(/spec/).empty?
+if TOUCHED_FILES.grep(/app/).any? && TOUCHED_FILES.grep(/spec/).empty?
   NO_TEST_MESSAGE =
     markdown <<-MARKDOWN
 There are code changes, but no corresponding tests.
@@ -216,21 +222,22 @@ end
 # ------------------------------------------------------------------------------
 (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).each do |file|
   next unless file =~ /.*_spec\.rb$/
+
   added_lines = git
                 .diff_for_file(file)
                 .patch
                 .split("\n")
-                .select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}
+                .select { |loc| loc.start_with?('+') && !loc.include?('+++ b') }
                 .join('')
-  if added_lines.include? "xdescribe" or
-     added_lines.include? "xspecify"  or
-     added_lines.include? "xexample"  or
-     added_lines.include? "xit"       or
-     added_lines.include? "skip("     or
-     added_lines.include? "skip "     or
-     added_lines.include? "pending("  or
-     added_lines.include? "fdescribe" or
-     added_lines.include? "fit"
+  if added_lines.include?('xdescribe') ||
+     added_lines.include?('xspecify')  ||
+     added_lines.include?('xexample')  ||
+     added_lines.include?('xit')       ||
+     added_lines.include?('skip(')     ||
+     added_lines.include?('skip ')     ||
+     added_lines.include?('pending(')  ||
+     added_lines.include?('fdescribe') ||
+     added_lines.include?('fit')
     TEST_SKIPPED_MESSAGE =
       markdown <<-MARKDOWN
 There are one or more skipped/pending/focused test cases in your pull request. Please fix them.
@@ -245,14 +252,16 @@ end
 # 12. Unit tests and integration tests should avoid using "create" keyword.
 # ------------------------------------------------------------------------------
 (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).each do |file|
-  next unless file =~ /spec\/models/ or file =~ /spec\/controllers/
+  next unless file =~ %r{spec/models} || file =~ %r{spec/controllers}
+
   added_lines = git
                 .diff_for_file(file)
                 .patch
                 .split("\n")
-                .select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}
+                .select { |loc| loc.start_with?('+') && !loc.include?('+++ b') }
                 .join('')
   next unless added_lines =~ /create\(/
+
   CREATE_MOCK_UP_OBJ_MESSAGE =
     markdown <<-MARKDOWN
   Using `create` in unit tests or integration tests may be overkill. Try to use `build` or `double` instead.
@@ -267,13 +276,15 @@ end
 # ------------------------------------------------------------------------------
 (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).each do |file|
   next unless file =~ /.*_spec\.rb$/
+
   added_lines = git
                 .diff_for_file(file)
                 .patch
                 .split("\n")
-                .select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}
+                .select { |loc| loc.start_with?('+') && !loc.include?('+++ b') }
                 .join('')
-  next unless added_lines.include? ".should"
+  next unless added_lines.include? '.should'
+
   NO_SHOULD_SYNTAX_MESSAGE =
     markdown <<-MARKDOWN
 The `should` syntax is deprecated in RSpec 3. Please use `expect` syntax instead.
@@ -287,23 +298,23 @@ end
 # ------------------------------------------------------------------------------
 # 14. Your RSpec testing files do not need to require helper files (e.g., rails_helper.rb, spec_helper.rb).
 # ------------------------------------------------------------------------------
-if PR_ADDED.include? "require 'rspec'"                or
-   PR_ADDED.include? "require \"rspec\""              or
-   PR_ADDED.include? "require 'spec_helper'"          or
-   PR_ADDED.include? "require \"spec_helper\""        or
-   PR_ADDED.include? "require 'rails_helper'"         or
-   PR_ADDED.include? "require \"rails_helper\""       or
-   PR_ADDED.include? "require 'test_helper'"          or
-   PR_ADDED.include? "require \"test_helper\""        or
-   PR_ADDED.include? "require 'factory_girl_rails'"   or
-   PR_ADDED.include? "require \"factory_girl_rails\"" or
-   PR_ADDED.include? "require 'factory_bot_rails'"    or
-   PR_ADDED.include? "require \"factory_bot_rails\""
+if PR_ADDED.include?("require 'rspec'") ||
+   PR_ADDED.include?('require "rspec"') ||
+   PR_ADDED.include?("require 'spec_helper'") ||
+   PR_ADDED.include?('require "spec_helper"') ||
+   PR_ADDED.include?("require 'rails_helper'") ||
+   PR_ADDED.include?('require "rails_helper"') ||
+   PR_ADDED.include?("require 'test_helper'") ||
+   PR_ADDED.include?('require "test_helper"') ||
+   PR_ADDED.include?("require 'factory_girl_rails'") ||
+   PR_ADDED.include?('require "factory_girl_rails"') ||
+   PR_ADDED.include?("require 'factory_bot_rails'") ||
+   PR_ADDED.include?('require "factory_bot_rails"')
   RSPEC_REQUIRE_MESSAGE =
-  markdown <<-MARKDOWN
+    markdown <<-MARKDOWN
 You are requiring `rspec` gem, fixture-related gem(s) or different helper methods in RSpec tests.
 There have already been included, you do not need to require them again. Please remove them.
-   MARKDOWN
+    MARKDOWN
 
   warn(RSPEC_REQUIRE_MESSAGE, sticky: true)
 end
@@ -311,15 +322,15 @@ end
 # ------------------------------------------------------------------------------
 # 15. You should avoid committing text files for RSpec tests.
 # ------------------------------------------------------------------------------
-if (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/.*spec.*\.txt/).any? or
+if (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/.*spec.*\.txt/).any? ||
    (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/.*spec.*\.csv/).any?
-  warn("You committed text files (`*.txt` or `*.csv`) for RSpec tests; please double-check whether this is necessary.", sticky: true)
+  warn('You committed text files (`*.txt` or `*.csv`) for RSpec tests; please double-check whether this is necessary.', sticky: true)
 end
 
 # ------------------------------------------------------------------------------
 # 16. Your pull request should not change or add *.md files unless you have a good reason.
 # ------------------------------------------------------------------------------
-if !CURRENT_MAINTAINERS.include? PR_AUTHOR and (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/\.md/).any?
+if !CURRENT_MAINTAINERS.include?(PR_AUTHOR) && (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/\.md/).any?
   MARKDOWN_CHANGE_MESSAGE =
     markdown <<-MARKDOWN
 You changed MARKDOWN (`*.md`) documents; please double-check whether it is necessary to do so.
@@ -332,9 +343,9 @@ end
 # ------------------------------------------------------------------------------
 # 17. Your pull request should not change DB schema unless there is new DB migrations.
 # ------------------------------------------------------------------------------
-if !CURRENT_MAINTAINERS.include? PR_AUTHOR and
-  (TOUCHED_FILES.grep(/db\/migrate/).empty? and
-  (MODIFIED_FILES.grep(/schema\.rb/).any? or (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/schema\.json/).any?))
+if !CURRENT_MAINTAINERS.include?(PR_AUTHOR) &&
+   (TOUCHED_FILES.grep(%r{db/migrate}).empty? &&
+   (MODIFIED_FILES.grep(/schema\.rb/).any? || (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/schema\.json/).any?))
   DB_SCHEMA_CHANGE_MESSAGE =
     markdown <<-MARKDOWN
 You should commit changes to the DB schema (`db/schema.rb`) only if you have created new DB migrations.
@@ -347,7 +358,7 @@ end
 # ------------------------------------------------------------------------------
 # 18. Your pull request should not modify *.yml or *.yml.example file.
 # ------------------------------------------------------------------------------
-if !CURRENT_MAINTAINERS.include? PR_AUTHOR and (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/\.yml/).any?
+if !CURRENT_MAINTAINERS.include?(PR_AUTHOR) && (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/\.yml/).any?
   YAML_FILE_MESSAGE =
     markdown <<-MARKDOWN
 You changed YAML (`*.yml`) or example (`*.yml.example`) files; please double-check whether this is necessary.
@@ -359,8 +370,8 @@ end
 # ------------------------------------------------------------------------------
 # 19. Your pull request should not modify test-related helper files.
 # ------------------------------------------------------------------------------
-if !CURRENT_MAINTAINERS.include? PR_AUTHOR and
-  (MODIFIED_FILES.grep(/rails_helper\.rb/).any? or MODIFIED_FILES.grep(/spec_helper\.rb/).any?)
+if !CURRENT_MAINTAINERS.include?(PR_AUTHOR) &&
+   (MODIFIED_FILES.grep(/rails_helper\.rb/).any? || MODIFIED_FILES.grep(/spec_helper\.rb/).any?)
   TEST_HELPER_FILE_MESSAGE =
     markdown <<-MARKDOWN
 You should not change `rails_helper.rb` or `spec_helper.rb` file; please revert these changes.
@@ -372,8 +383,8 @@ end
 # ------------------------------------------------------------------------------
 # 20. Your pull request should not modify Gemfile, Gemfile.lock.
 # ------------------------------------------------------------------------------
-if !CURRENT_MAINTAINERS.include? PR_AUTHOR and
-  (MODIFIED_FILES.include? "Gemfile" or MODIFIED_FILES.include? "Gemfile.lock")
+if !CURRENT_MAINTAINERS.include?(PR_AUTHOR) &&
+   (MODIFIED_FILES.include?('Gemfile') || MODIFIED_FILES.include?('Gemfile.lock'))
   GEMFILE_CHANGE_MESSAGE =
     markdown <<-MARKDOWN
 You are modifying `Gemfile` or `Gemfile.lock`, please double check whether it is necessary.
@@ -452,7 +463,7 @@ warning_message_of_config_file_change('setup.sh', /setup\.sh/)
 # ------------------------------------------------------------------------------
 # 34. The PR should not modify vendor folder.
 # ------------------------------------------------------------------------------
-if !CURRENT_MAINTAINERS.include? PR_AUTHOR and (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/vendor/).any?
+if !CURRENT_MAINTAINERS.include?(PR_AUTHOR) && (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/vendor/).any?
   VENDOR_MESSAGE =
     markdown <<-MARKDOWN
 You modified `vendor` folder, please double-check whether it is necessary.
@@ -464,7 +475,7 @@ end
 # ------------------------------------------------------------------------------
 # 35. You should not modify /spec/factories/ folder.
 # ------------------------------------------------------------------------------
-if !CURRENT_MAINTAINERS.include? PR_AUTHOR and (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/spec\/factories/).any?
+if !CURRENT_MAINTAINERS.include?(PR_AUTHOR) && (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(%r{spec/factories}).any?
   FIXTURE_FILE_MESSAGE =
     markdown <<-MARKDOWN
 You modified `spec/factories/` folder; please double-check whether it is necessary.
@@ -497,20 +508,21 @@ end
 # ------------------------------------------------------------------------------
 (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).each do |file|
   next unless file =~ /.*_spec\.rb$/
+
   added_lines_arr = git
                     .diff_for_file(file)
                     .patch
                     .split("\n")
-                    .select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}
+                    .select { |loc| loc.start_with?('+') && !loc.include?('+++ b') }
   added_lines = added_lines_arr.join('')
   num_of_tests = added_lines.scan(/\+\s*it\s*['"]/).count
   num_of_expect_key_words = added_lines.scan(/\+\s*expect\s*(\(|\{|do)/).count
   num_of_commented_out_expect_key_words = added_lines.scan(/\+\s*#\s*expect\s*(\(|\{|do)/).count
-  num_of_expectation_without_machers = added_lines_arr.count{ |loc| loc.scan(/^\+\s*expect\s*[\(\{]/).count > 0 and loc.scan(/\.(to|not_to|to_not)/).count == 0}
-  num_of_expectation_not_focus_on_real_value = added_lines_arr.count{ |loc| loc.scan(/^\+\s*expect\s*[\(\{]/).count > 0 and loc.scan(/\.(not_to|to_not)\s*(be_nil|be_empty|eq 0|eql 0|equal 0)/).count > 0 }
+  num_of_expectation_without_machers = added_lines_arr.count { |loc| (loc.scan(/^\+\s*expect\s*[\(\{]/).count > 0) && (loc.scan(/\.(to|not_to|to_not)/).count == 0) }
+  num_of_expectation_not_focus_on_real_value = added_lines_arr.count { |loc| (loc.scan(/^\+\s*expect\s*[\(\{]/).count > 0) && (loc.scan(/\.(not_to|to_not)\s*(be_nil|be_empty|eq 0|eql 0|equal 0)/).count > 0) }
   num_of_wildcard_argument_matchers = added_lines.scan(/\((anything|any_args)\)/).count
   num_of_expectations_on_page = added_lines.scan(/\+\s*expect\s*\(page\)/).count
-  
+
   if num_of_wildcard_argument_matchers >= 5
     WILDCARD_ARGUMENT_MATCHERS_MESSAGE =
       markdown <<-MARKDOWN
@@ -520,7 +532,7 @@ To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail 
 
     warn(WILDCARD_ARGUMENT_MATCHERS_MESSAGE, sticky: true)
     break
-  elsif num_of_expect_key_words < num_of_tests or num_of_commented_out_expect_key_words > 0
+  elsif (num_of_expect_key_words < num_of_tests) || (num_of_commented_out_expect_key_words > 0)
     NOT_WRITING_EXPECTATIONS_FOR_TESTS_MESSAGE =
       markdown <<-MARKDOWN
 One or more of your tests do not have expectations or you commented out some expectations.
@@ -539,14 +551,14 @@ To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail 
     warn(EXPECTATION_WITHOUT_MATCHERS_MESSAGE, sticky: true)
     break
   elsif num_of_expectation_not_focus_on_real_value > 0
-    EXPECTATION_NOT_FOCUS_ON_REAL_VALUE = 
+    EXPECTATION_NOT_FOCUS_ON_REAL_VALUE =
       markdown <<-MARKDOWN
 One or more of your test expectations only focus on the return value not being `nil`, `empty` or not equal to `0` without testing the `real` value.
 To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail conditions -- please write expectations to test the `real` value.
       MARKDOWN
 
-      warn(EXPECTATION_NOT_FOCUS_ON_REAL_VALUE, sticky: true)
-      break
+    warn(EXPECTATION_NOT_FOCUS_ON_REAL_VALUE, sticky: true)
+    break
   elsif num_of_expect_key_words - num_of_expectations_on_page < num_of_tests
     EXPECT_ON_OBJ_ON_PAGE_MESSAGE =
       markdown <<-MARKDOWN

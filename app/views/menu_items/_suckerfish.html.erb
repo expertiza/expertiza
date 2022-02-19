@@ -1,6 +1,7 @@
 <% level += 1 %>
 <% items.each do |item_id|
   item = session[:menu].get_item(item_id)
+  next if item.nil?
   selected = session[:menu].selected?(item.id)
   long_name = item.name.split(/\W/).collect{|word| word.capitalize}.join(' ')
 %>

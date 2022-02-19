@@ -1,6 +1,6 @@
 class TeammateReviewQuestionnaire < Questionnaire
   after_initialize :post_initialization
-  @print_name = "Team Review Rubric"
+  @print_name = 'Team Review Rubric'
 
   class << self
     attr_reader :print_name
@@ -11,7 +11,7 @@ class TeammateReviewQuestionnaire < Questionnaire
   end
 
   def symbol
-    "teammate".to_sym
+    'teammate'.to_sym
   end
 
   def get_assessments_for(participant)

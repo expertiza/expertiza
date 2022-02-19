@@ -6,17 +6,17 @@ class SelfReviewResponseMap < ResponseMap
 
   # Find a review questionnaire associated with this self-review response map's assignment
   def questionnaire(round_number = nil, topic_id = nil)
-    Questionnaire.find(self.assignment.review_questionnaire_id(round_number, topic_id))
+    Questionnaire.find(assignment.review_questionnaire_id(round_number, topic_id))
   end
 
   # This method helps to find contributor - here Team ID
   def contributor
-    Team.find_by(id: self.reviewee_id)
+    Team.find_by(id: reviewee_id)
   end
 
   # This method returns 'Title' of type of review (used to manipulate headings accordingly)
   def get_title
-    "Self Review"
+    'Self Review'
   end
 
   # do not send any reminder for self review received.

@@ -1,5 +1,5 @@
-require "credentials"
-require "menu"
+require 'credentials'
+require 'menu'
 
 class Role < ApplicationRecord
   belongs_to :parent, class_name: 'Role', inverse_of: false
@@ -14,9 +14,9 @@ class Role < ApplicationRecord
 
   def cache
     @cache = {}
-    unless self.nil?
-      @cache[:credentials] = CACHED_ROLES[self.id][:credentials]
-      @cache[:menu] = CACHED_ROLES[self.id][:menu]
+    unless nil?
+      @cache[:credentials] = CACHED_ROLES[id][:credentials]
+      @cache[:menu] = CACHED_ROLES[id][:menu]
     end
     @cache
   end
@@ -86,21 +86,22 @@ class Role < ApplicationRecord
   end
 
   def rebuild_credentials
-    self.cache[:credentials] = CACHED_ROLES[self.id][:credentials]
+    cache[:credentials] = CACHED_ROLES[id][:credentials]
   end
 
   def rebuild_menu
-    self.cache[:menu] = CACHED_ROLES[self.id][:menu]
+    cache[:menu] = CACHED_ROLES[id][:menu]
   end
 
   # return ids of roles that are below this role
   def get_available_roles
     ids = []
 
-    current = self.parent_id
+    current = parent_id
     while current
       role = Role.find(current)
       next unless role
+
       unless ids.index(role.id)
         ids << role.id
         current = role.parent_id
@@ -114,17 +115,17 @@ class Role < ApplicationRecord
     parents = []
     seen = {}
 
-    current = self.id
+    current = id
 
     while current
       role = Role.find(current)
       if role
-        unless seen.key?(role.id)
+        if seen.key?(role.id)
+          current = nil
+        else
           parents << role
           seen[role.id] = true
           current = role.parent_id
-        else
-          current = nil
         end
       else
         current = nil
@@ -138,25 +139,23 @@ class Role < ApplicationRecord
   # If the current role is the same as the parameter role, return true
   # That is, use greater-than-or-equal-to logic
 
-  def hasAllPrivilegesOf(target_role)
+  def has_all_privileges_of?(target_role)
     privileges = {}
-    privileges["Student"] = 1
-    privileges["Teaching Assistant"] = 2
-    privileges["Instructor"] = 3
-    privileges["Administrator"] = 4
-    privileges["Super-Administrator"] = 5
+    privileges['Student'] = 1
+    privileges['Teaching Assistant'] = 2
+    privileges['Instructor'] = 3
+    privileges['Administrator'] = 4
+    privileges['Super-Administrator'] = 5
 
-    privileges[self.name] >= privileges[target_role.name]
+    privileges[name] >= privileges[target_role.name]
   end
 
   def update_with_params(role_params)
-    begin
-      self.name = role_params[:name]
-      self.parent_id = role_params[:parent_id]
-      self.description = role_params[:description]
-      self.save
-    rescue StandardError
-      false
-    end
+    self.name = role_params[:name]
+    self.parent_id = role_params[:parent_id]
+    self.description = role_params[:description]
+    save
+  rescue StandardError
+    false
   end
 end

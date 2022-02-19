@@ -7,7 +7,7 @@ class SiteControllersController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],
-         redirect_to: {action: :index}
+         redirect_to: { action: :index }
 
   def index
     @builtin_site_controllers = SiteController.builtin
@@ -117,21 +117,20 @@ class SiteControllersController < ApplicationController
   # which that controller will respond.
 
   def controller_actions(controller_name)
-    controllers = controller_classes
     actions = {}
 
     if @controller_classes.key? controller_name
       controller = @controller_classes[controller_name]
 
-      for method in controller.public_instance_methods do
+      controller.public_instance_methods.each do |method|
         actions[method] = true
       end
 
-      for hidden in controller.hidden_actions do
+      controller.hidden_actions.each do |hidden|
         actions.delete hidden
       end
     end
 
     actions.keys
-  end  # def controller_actions
-  end  # class
+  end
+end

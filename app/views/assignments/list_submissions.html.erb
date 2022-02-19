@@ -34,9 +34,7 @@
         <th class="sorter-false" style="font-weight: bold; font-size: 15px;"></th>
       </tr>                    
     </thead>
-    <% @l = -1 %>
     <% @teams.each do |team| %>
-      <% @l = @l+1 %>
       <tr>
         <% topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team) %>
 
@@ -72,7 +70,7 @@
         <td>
         <!--Display submitted hyperlinks-->
           <% participant = participants.compact.first %>
-          <% if participant and !team.hyperlinks.empty? %>
+          <% if participant && !team.hyperlinks.empty? %>
             <% team.hyperlinks.each do |link| %>
               <a href="<%= link %>" target="_blank">- <%= link %></a><br/>
             <% end %>
@@ -80,9 +78,9 @@
           <br>
           <!--Display submitted files-->
           <% team.submitted_files %>
-          <% if participant and !team.submitted_files.empty? %>
+          <% if participant && !team.submitted_files.empty? %>
             <% files = team.submitted_files %>
-            <%= display_directory_tree(participant, files, true).html_safe if files and files.length > 0 %>
+            <%= display_directory_tree(participant, files, true).html_safe if files && files.length > 0 %>
           <% end %>
         </td>
         <td width="10%">

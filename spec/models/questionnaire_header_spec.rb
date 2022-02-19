@@ -7,7 +7,7 @@ describe QuestionnaireHeader do
   end
   describe '#complete' do
     it 'returns the text' do
-    	expect(questionnaire_header.complete).to eq('Test question:')
+      expect(questionnaire_header.complete).to eq('Test question:')
     end
   end
 end

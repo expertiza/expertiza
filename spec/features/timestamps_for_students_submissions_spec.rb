@@ -31,8 +31,8 @@ describe 'timestamps for student\'s submissions' do
       # it also displays due dates
       # it also displays submitted files or hyperlinks
     end
-  
-  context 'after current participant finishes an author feedback' do
+
+    context 'after current participant finishes an author feedback' do
       it 'displays a link named \'feedback\' with its timestamps (you could redirect to that feedback by clicking the link)'
       # it also displays due dates
       # it also displays submitted files or hyperlinks

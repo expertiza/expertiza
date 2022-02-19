@@ -10,221 +10,230 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220111023859) do
-
-  create_table "account_requests", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.string   "name"
-    t.integer  "role_id"
-    t.string   "fullname"
-    t.string   "institution_id"
-    t.string   "email"
-    t.string   "status"
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
-    t.text     "self_introduction", limit: 65535
+ActiveRecord::Schema.define(version: 20_220_111_023_859) do
+  create_table 'account_requests', force: :cascade do |t|
+    t.string   'name',              limit: 255
+    t.integer  'role_id',           limit: 4
+    t.string   'fullname',          limit: 255
+    t.string   'institution_id',    limit: 255
+    t.string   'email',             limit: 255
+    t.string   'status',            limit: 255
+    t.datetime 'created_at',                      null: false
+    t.datetime 'updated_at',                      null: false
+    t.text     'self_introduction', limit: 65_535
   end
 
-  create_table "answer_tags", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.integer  "answer_id"
-    t.integer  "tag_prompt_deployment_id"
-    t.integer  "user_id"
-    t.string   "value"
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
-    t.index ["answer_id"], name: "index_answer_tags_on_answer_id", using: :btree
-    t.index ["tag_prompt_deployment_id"], name: "index_answer_tags_on_tag_prompt_deployment_id", using: :btree
-    t.index ["user_id"], name: "index_answer_tags_on_user_id", using: :btree
+  create_table 'answer_tags', force: :cascade do |t|
+    t.integer  'answer_id',                limit: 4
+    t.integer  'tag_prompt_deployment_id', limit: 4
+    t.integer  'user_id',                  limit: 4
+    t.string   'value',                    limit: 255
+    t.datetime 'created_at',                           null: false
+    t.datetime 'updated_at',                           null: false
   end
 
-  create_table "answers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.integer "question_id",               default: 0, null: false
-    t.integer "answer"
-    t.text    "comments",    limit: 65535
-    t.integer "response_id"
-    t.index ["question_id"], name: "fk_score_questions", using: :btree
-    t.index ["response_id"], name: "fk_score_response", using: :btree
+  add_index 'answer_tags', ['answer_id'], name: 'index_answer_tags_on_answer_id', using: :btree
+  add_index 'answer_tags', ['tag_prompt_deployment_id'], name: 'index_answer_tags_on_tag_prompt_deployment_id', using: :btree
+  add_index 'answer_tags', ['user_id'], name: 'index_answer_tags_on_user_id', using: :btree
+
+  create_table 'answers', force: :cascade do |t|
+    t.integer 'question_id', limit: 4, default: 0, null: false
+    t.integer 'answer',      limit: 4
+    t.text    'comments',    limit: 65_535
+    t.integer 'response_id', limit: 4
   end
 
-  create_table "assignment_badges", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.integer  "badge_id"
-    t.integer  "assignment_id"
-    t.integer  "threshold"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
-    t.index ["assignment_id"], name: "index_assignment_badges_on_assignment_id", using: :btree
-    t.index ["badge_id"], name: "index_assignment_badges_on_badge_id", using: :btree
+  add_index 'answers', ['question_id'], name: 'fk_score_questions', using: :btree
+  add_index 'answers', ['response_id'], name: 'fk_score_response', using: :btree
+
+  create_table 'assignment_badges', force: :cascade do |t|
+    t.integer  'badge_id',      limit: 4
+    t.integer  'assignment_id', limit: 4
+    t.integer  'threshold',     limit: 4
+    t.datetime 'created_at',              null: false
+    t.datetime 'updated_at',              null: false
   end
 
-  create_table "assignment_questionnaires", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.integer "assignment_id"
-    t.integer "questionnaire_id"
-    t.integer "user_id"
-    t.integer "notification_limit",   default: 15,   null: false
-    t.integer "questionnaire_weight", default: 0,    null: false
-    t.integer "used_in_round"
-    t.boolean "dropdown",             default: true
-    t.integer "topic_id"
-    t.integer "duty_id"
-    t.index ["assignment_id"], name: "fk_aq_assignments_id", using: :btree
-    t.index ["duty_id"], name: "index_assignment_questionnaires_on_duty_id", using: :btree
-    t.index ["questionnaire_id"], name: "fk_aq_questionnaire_id", using: :btree
-    t.index ["user_id"], name: "fk_aq_user_id", using: :btree
+  add_index 'assignment_badges', ['assignment_id'], name: 'index_assignment_badges_on_assignment_id', using: :btree
+  add_index 'assignment_badges', ['badge_id'], name: 'index_assignment_badges_on_badge_id', using: :btree
+
+  create_table 'assignment_questionnaires', force: :cascade do |t|
+    t.integer 'assignment_id',        limit: 4
+    t.integer 'questionnaire_id',     limit: 4
+    t.integer 'user_id',              limit: 4
+    t.integer 'notification_limit',   limit: 4, default: 15,   null: false
+    t.integer 'questionnaire_weight', limit: 4, default: 0,    null: false
+    t.integer 'used_in_round',        limit: 4
+    t.boolean 'dropdown', default: true
+    t.integer 'topic_id',             limit: 4
+    t.integer 'duty_id',              limit: 4
   end
 
-  create_table "assignments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "name"
-    t.string   "directory_path"
-    t.integer  "submitter_count",                                                  default: 0,               null: false, unsigned: true
-    t.integer  "course_id",                                                        default: 0
-    t.integer  "instructor_id",                                                    default: 0
-    t.boolean  "private",                                                          default: false,           null: false
-    t.integer  "num_reviews",                                                      default: 3,               null: false
-    t.integer  "num_review_of_reviews",                                            default: 0,               null: false, unsigned: true
-    t.integer  "num_review_of_reviewers",                                          default: 0,               null: false
-    t.boolean  "reviews_visible_to_all"
-    t.integer  "num_reviewers",                                                    default: 0,               null: false, unsigned: true
-    t.text     "spec_location",                                      limit: 65535
-    t.integer  "max_team_size",                                                    default: 0,               null: false
-    t.boolean  "staggered_deadline"
-    t.boolean  "allow_suggestions"
-    t.integer  "days_between_submissions"
-    t.string   "review_assignment_strategy"
-    t.integer  "max_reviews_per_submission"
-    t.integer  "review_topic_threshold",                                           default: 0
-    t.boolean  "copy_flag",                                                        default: false
-    t.integer  "rounds_of_reviews",                                                default: 1
-    t.boolean  "microtask",                                                        default: false
-    t.boolean  "require_quiz"
-    t.integer  "num_quiz_questions",                                               default: 0,               null: false
-    t.boolean  "is_coding_assignment"
-    t.boolean  "is_intelligent"
-    t.boolean  "calculate_penalty",                                                default: false,           null: false
-    t.integer  "late_policy_id"
-    t.boolean  "is_penalty_calculated",                                            default: false,           null: false
-    t.integer  "max_bids"
-    t.boolean  "show_teammate_reviews"
-    t.boolean  "availability_flag",                                                default: true
-    t.boolean  "use_bookmark"
-    t.boolean  "can_review_same_topic",                                            default: true
-    t.boolean  "can_choose_topic_to_review",                                       default: true
-    t.boolean  "is_calibrated",                                                    default: false
-    t.boolean  "is_selfreview_enabled"
-    t.string   "reputation_algorithm",                                             default: "Lauw"
-    t.boolean  "is_anonymous",                                                     default: true
-    t.integer  "num_reviews_required",                                             default: 3
-    t.integer  "num_metareviews_required",                                         default: 3
-    t.integer  "num_metareviews_allowed",                                          default: 3
-    t.integer  "num_reviews_allowed",                                              default: 3
-    t.integer  "simicheck",                                                        default: -1
-    t.integer  "simicheck_threshold",                                              default: 100
-    t.boolean  "is_answer_tagging_allowed"
-    t.boolean  "has_badge"
-    t.boolean  "allow_selecting_additional_reviews_after_1st_round"
-    t.boolean  "vary_by_topic",                                                    default: false
-    t.boolean  "vary_by_round",                                                    default: false
-    t.boolean  "reviewer_is_team"
-    t.string   "review_choosing_algorithm",                                        default: "Simple Choose"
-    t.boolean  "is_conference_assignment",                                         default: false
-    t.boolean  "auto_assign_mentor",                                               default: false
-    t.boolean  "duty_based_assignment?"
-    t.boolean  "questionnaire_varies_by_duty"
-    t.index ["course_id"], name: "fk_assignments_courses", using: :btree
-    t.index ["instructor_id"], name: "fk_assignments_instructors", using: :btree
-    t.index ["late_policy_id"], name: "fk_late_policy_id", using: :btree
+  add_index 'assignment_questionnaires', ['assignment_id'], name: 'fk_aq_assignments_id', using: :btree
+  add_index 'assignment_questionnaires', ['duty_id'], name: 'index_assignment_questionnaires_on_duty_id', using: :btree
+  add_index 'assignment_questionnaires', ['questionnaire_id'], name: 'fk_aq_questionnaire_id', using: :btree
+  add_index 'assignment_questionnaires', ['user_id'], name: 'fk_aq_user_id', using: :btree
+
+  create_table 'assignments', force: :cascade do |t|
+    t.datetime 'created_at'
+    t.datetime 'updated_at'
+    t.string   'name',                                               limit: 255
+    t.string   'directory_path',                                     limit: 255
+    t.integer  'submitter_count',                                    limit: 4,     default: 0, null: false
+    t.integer  'course_id',                                          limit: 4,     default: 0
+    t.integer  'instructor_id',                                      limit: 4,     default: 0
+    t.boolean  'private',                                                          default: false,           null: false
+    t.integer  'num_reviews',                                        limit: 4,     default: 3,               null: false
+    t.integer  'num_review_of_reviews',                              limit: 4,     default: 0,               null: false
+    t.integer  'num_review_of_reviewers',                            limit: 4,     default: 0,               null: false
+    t.boolean  'reviews_visible_to_all'
+    t.integer  'num_reviewers',                                      limit: 4, default: 0, null: false
+    t.text     'spec_location',                                      limit: 65_535
+    t.integer  'max_team_size',                                      limit: 4, default: 0, null: false
+    t.boolean  'staggered_deadline'
+    t.boolean  'allow_suggestions'
+    t.integer  'days_between_submissions',                           limit: 4
+    t.string   'review_assignment_strategy',                         limit: 255
+    t.integer  'max_reviews_per_submission',                         limit: 4
+    t.integer  'review_topic_threshold',                             limit: 4,     default: 0
+    t.boolean  'copy_flag',                                                        default: false
+    t.integer  'rounds_of_reviews', limit: 4, default: 1
+    t.boolean  'microtask', default: false
+    t.boolean  'require_quiz'
+    t.integer  'num_quiz_questions', limit: 4, default: 0, null: false
+    t.boolean  'is_coding_assignment'
+    t.boolean  'is_intelligent'
+    t.boolean  'calculate_penalty', default: false, null: false
+    t.integer  'late_policy_id', limit: 4
+    t.boolean  'is_penalty_calculated', default: false, null: false
+    t.integer  'max_bids', limit: 4
+    t.boolean  'show_teammate_reviews'
+    t.boolean  'availability_flag', default: true
+    t.boolean  'use_bookmark'
+    t.boolean  'can_review_same_topic',                                            default: true
+    t.boolean  'can_choose_topic_to_review',                                       default: true
+    t.boolean  'is_calibrated',                                                    default: false
+    t.boolean  'is_selfreview_enabled'
+    t.string   'reputation_algorithm', limit: 255, default: 'Lauw'
+    t.boolean  'is_anonymous',                                                     default: true
+    t.integer  'num_reviews_required',                               limit: 4,     default: 3
+    t.integer  'num_metareviews_required',                           limit: 4,     default: 3
+    t.integer  'num_metareviews_allowed',                            limit: 4,     default: 3
+    t.integer  'num_reviews_allowed',                                limit: 4,     default: 3
+    t.integer  'simicheck',                                          limit: 4,     default: -1
+    t.integer  'simicheck_threshold',                                limit: 4,     default: 100
+    t.boolean  'is_answer_tagging_allowed'
+    t.boolean  'has_badge'
+    t.boolean  'allow_selecting_additional_reviews_after_1st_round'
+    t.integer  'sample_assignment_id', limit: 4
+    t.boolean  'vary_by_topic',                                                    default: false
+    t.boolean  'vary_by_round',                                                    default: false
+    t.boolean  'reviewer_is_team'
+    t.string   'review_choosing_algorithm', limit: 255, default: 'Simple Choose'
+    t.boolean  'is_conference_assignment',                                         default: false
+    t.boolean  'auto_assign_mentor',                                               default: false
+    t.boolean  'duty_based_assignment?'
+    t.boolean  'questionnaire_varies_by_duty'
   end
 
-  create_table "automated_metareviews", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.float    "relevance",         limit: 24
-    t.float    "content_summative", limit: 24
-    t.float    "content_problem",   limit: 24
-    t.float    "content_advisory",  limit: 24
-    t.float    "tone_positive",     limit: 24
-    t.float    "tone_negative",     limit: 24
-    t.float    "tone_neutral",      limit: 24
-    t.integer  "quantity"
-    t.integer  "plagiarism"
-    t.integer  "version_num"
-    t.integer  "response_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.index ["response_id"], name: "fk_automated_metareviews_responses_id", using: :btree
+  add_index 'assignments', ['course_id'], name: 'fk_assignments_courses', using: :btree
+  add_index 'assignments', ['instructor_id'], name: 'fk_assignments_instructors', using: :btree
+  add_index 'assignments', ['late_policy_id'], name: 'fk_late_policy_id', using: :btree
+  add_index 'assignments', ['sample_assignment_id'], name: 'fk_rails_b01b82a1a2', using: :btree
+
+  create_table 'automated_metareviews', force: :cascade do |t|
+    t.float    'relevance',         limit: 24
+    t.float    'content_summative', limit: 24
+    t.float    'content_problem',   limit: 24
+    t.float    'content_advisory',  limit: 24
+    t.float    'tone_positive',     limit: 24
+    t.float    'tone_negative',     limit: 24
+    t.float    'tone_neutral',      limit: 24
+    t.integer  'quantity',          limit: 4
+    t.integer  'plagiarism',        limit: 4
+    t.integer  'version_num',       limit: 4
+    t.integer  'response_id',       limit: 4
+    t.datetime 'created_at'
+    t.datetime 'updated_at'
   end
 
-  create_table "awarded_badges", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.integer  "badge_id"
-    t.integer  "participant_id"
-    t.datetime "created_at",      null: false
-    t.datetime "updated_at",      null: false
-    t.integer  "approval_status"
-    t.index ["badge_id"], name: "index_awarded_badges_on_badge_id", using: :btree
-    t.index ["participant_id"], name: "index_awarded_badges_on_participant_id", using: :btree
+  add_index 'automated_metareviews', ['response_id'], name: 'fk_automated_metareviews_responses_id', using: :btree
+
+  create_table 'awarded_badges', force: :cascade do |t|
+    t.integer  'badge_id',        limit: 4
+    t.integer  'participant_id',  limit: 4
+    t.datetime 'created_at',                null: false
+    t.datetime 'updated_at',                null: false
+    t.integer  'approval_status', limit: 4
   end
 
-  create_table "badges", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.string   "name"
-    t.string   "description"
-    t.string   "image_name"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+  add_index 'awarded_badges', ['badge_id'], name: 'index_awarded_badges_on_badge_id', using: :btree
+  add_index 'awarded_badges', ['participant_id'], name: 'index_awarded_badges_on_participant_id', using: :btree
+
+  create_table 'badges', force: :cascade do |t|
+    t.string   'name',        limit: 255
+    t.string   'description', limit: 255
+    t.string   'image_name',  limit: 255
+    t.datetime 'created_at',              null: false
+    t.datetime 'updated_at',              null: false
   end
 
-  create_table "bids", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.integer  "topic_id"
-    t.integer  "team_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "priority"
-    t.index ["team_id"], name: "index_bids_on_team_id", using: :btree
-    t.index ["topic_id"], name: "index_bids_on_topic_id", using: :btree
+  create_table 'bids', force: :cascade do |t|
+    t.integer  'topic_id',   limit: 4
+    t.integer  'team_id',    limit: 4
+    t.datetime 'created_at'
+    t.datetime 'updated_at'
+    t.integer  'priority', limit: 4
   end
 
-  create_table "bookmark_ratings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.integer  "bookmark_id"
-    t.integer  "user_id"
-    t.integer  "rating"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+  add_index 'bids', ['team_id'], name: 'index_bids_on_team_id', using: :btree
+  add_index 'bids', ['topic_id'], name: 'index_bids_on_topic_id', using: :btree
+
+  create_table 'bookmark_ratings', force: :cascade do |t|
+    t.integer  'bookmark_id', limit: 4
+    t.integer  'user_id',     limit: 4
+    t.integer  'rating',      limit: 4
+    t.datetime 'created_at'
+    t.datetime 'updated_at'
   end
 
-  create_table "bookmarks", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.text     "url",         limit: 65535
-    t.text     "title",       limit: 65535
-    t.text     "description", limit: 65535
-    t.integer  "user_id"
-    t.integer  "topic_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.index ["topic_id"], name: "index_bookmarks_on_topic_id", using: :btree
+  create_table 'bookmarks', force: :cascade do |t|
+    t.text     'url',         limit: 65_535
+    t.text     'title',       limit: 65_535
+    t.text     'description', limit: 65_535
+    t.integer  'user_id',     limit: 4
+    t.integer  'topic_id',    limit: 4
+    t.datetime 'created_at'
+    t.datetime 'updated_at'
   end
 
-  create_table "calculated_penalties", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.integer "participant_id"
-    t.integer "deadline_type_id"
-    t.integer "penalty_points"
+  add_index 'bookmarks', ['topic_id'], name: 'index_bookmarks_on_topic_id', using: :btree
+
+  create_table 'calculated_penalties', force: :cascade do |t|
+    t.integer 'participant_id',   limit: 4
+    t.integer 'deadline_type_id', limit: 4
+    t.integer 'penalty_points',   limit: 4
   end
 
-  create_table "content_pages", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.string   "title"
-    t.string   "name",                          default: "", null: false
-    t.integer  "markup_style_id"
-    t.text     "content",         limit: 65535
-    t.integer  "permission_id",                 default: 0,  null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.text     "content_cache",   limit: 65535
-    t.index ["markup_style_id"], name: "fk_content_page_markup_style_id", using: :btree
-    t.index ["permission_id"], name: "fk_content_page_permission_id", using: :btree
+  create_table 'content_pages', force: :cascade do |t|
+    t.string   'title',           limit: 255
+    t.string   'name',            limit: 255, default: '', null: false
+    t.integer  'markup_style_id', limit: 4
+    t.text     'content',         limit: 65_535
+    t.integer  'permission_id',   limit: 4, default: 0, null: false
+    t.datetime 'created_at'
+    t.datetime 'updated_at'
+    t.text     'content_cache', limit: 65_535
   end
 
-  create_table "controller_actions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.integer "site_controller_id", default: 0,  null: false
-    t.string  "name",               default: "", null: false
-    t.integer "permission_id"
-    t.string  "url_to_use"
-    t.index ["permission_id"], name: "fk_controller_action_permission_id", using: :btree
-    t.index ["site_controller_id"], name: "fk_controller_action_site_controller_id", using: :btree
+  add_index 'content_pages', ['markup_style_id'], name: 'fk_content_page_markup_style_id', using: :btree
+  add_index 'content_pages', ['permission_id'], name: 'fk_content_page_permission_id', using: :btree
+
+  create_table 'controller_actions', force: :cascade do |t|
+    t.integer 'site_controller_id', limit: 4,   default: 0,  null: false
+    t.string  'name',               limit: 255, default: '', null: false
+    t.integer 'permission_id',      limit: 4
+    t.string  'url_to_use',         limit: 255
   end
 
   create_table "courses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|

@@ -6,8 +6,7 @@
 # server "example.com", user: "deploy", roles: %w{app db web}, my_property: :my_value
 # server "example.com", user: "deploy", roles: %w{app web}, other_property: :other_value
 # server "db.example.com", user: "deploy", roles: %w{db}
-server 'expertiza.ncsu.edu', user: 'rails', roles: %w{web app}
-
+server 'expertiza.ncsu.edu', user: 'rails', roles: %w[web app]
 
 # role-based syntax
 # ==================
@@ -20,10 +19,9 @@ server 'expertiza.ncsu.edu', user: 'rails', roles: %w{web app}
 # role :app, %w{deploy@example.com}, my_property: :my_value
 # role :web, %w{user1@primary.com user2@additional.com}, other_property: :other_value
 # role :db,  %w{deploy@example.com}
-role :app, %w{rails@expertiza.ncsu.edu}
-role :web, %w{rails@expertiza.ncsu.edu}
-role :db,  %w{rails@expertiza.ncsu.edu}
-
+role :app, %w[rails@expertiza.ncsu.edu]
+role :web, %w[rails@expertiza.ncsu.edu]
+role :db,  %w[rails@expertiza.ncsu.edu]
 
 # Configuration
 # =============
@@ -32,8 +30,6 @@ role :db,  %w{rails@expertiza.ncsu.edu}
 # For available Capistrano configuration variables see the documentation page.
 # http://capistranorb.com/documentation/getting-started/configuration/
 # Feel free to add new variables to customise your setup.
-
-
 
 # Custom SSH Options
 # ==================

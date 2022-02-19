@@ -18,7 +18,7 @@ describe 'new user request' do
       fill_in 'user_fullname', with: 'requester, requester'
       # a new user is able to add a new institution
       select 'Other', from: 'user_institution_id'
-      expect(page).to have_field("institution_name")
+      expect(page).to have_field('institution_name')
       fill_in 'institution_name', with: 'Xavier Institute for Mutant Education and Outreach'
       # a new user is able to write a brief introduction
       expect(page).to have_field('requested_user_self_introduction')
@@ -57,12 +57,12 @@ describe 'new user request' do
     context 'when super-admin or admin accepts a requester' do
       context 'using name as username and password in the email' do
         it 'allows the new user to login Expertiza' do
-          create(:student, name: 'approved_requster1', password: "password")
+          create(:student, name: 'approved_requster1', password: 'password')
           visit '/'
           fill_in 'login_name', with: 'approved_requster1'
           fill_in 'login_password', with: 'password'
           click_button 'Sign in'
-          expect(page).to have_current_path("/student_task/list")
+          expect(page).to have_current_path('/student_task/list')
         end
       end
     end

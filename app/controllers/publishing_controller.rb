@@ -41,10 +41,10 @@ class PublishingController < ApplicationController
   def grant
     # Lookup the specific assignment (if any) that the user is granting publishing rights to.
     # This will be nil when the user is granting to all past assignments.
-    
+
     @participant = AssignmentParticipant.find(params[:id]) unless params[:id].nil?
     @user = User.find(session[:user].id) # Find again, because the user's certificate may have changed since login
-    end
+  end
 
   # Grant publishing rights using the private key supplied by the student
   def grant_with_private_key

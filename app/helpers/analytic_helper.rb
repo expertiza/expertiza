@@ -39,7 +39,7 @@ module AnalyticHelper
       data_point << object_data
     end
     # Formatting the optional parameters field ( pie charts do not support optional parameters )
-    if chart_type != "pie"
+    if chart_type != 'pie'
       option = {}
       option[:x_axis_categories] = data_type_list
     else
@@ -58,11 +58,10 @@ module AnalyticHelper
 
   #======== sorting ============#
   def sort_by_name(array_of_arrays)
-    array_of_arrays.sort_by {|a| a[0] }
+    array_of_arrays.sort_by { |a| a[0] }
   end
 
   #======= helper data formatting =====#
-  # TODO: implementing normalize for bar chart
   def normalize(array)
     normalized_array = []
     max = array.max
@@ -75,10 +74,10 @@ module AnalyticHelper
   def distribution(array, num_intervals, x_min = array.min)
     distribution = []
     interval_size = ((array.max - x_min).to_f / num_intervals).ceil
-    intervals = (1..num_intervals).to_a.collect {|val| val * interval_size }
+    intervals = (1..num_intervals).to_a.collect { |val| val * interval_size }
     intervals.each do |interval_max|
-      distribution << array.select {|a| a < interval_max }.count
-      array.reject! {|a| a < interval_max }
+      distribution << array.select { |a| a < interval_max }.count
+      array.reject! { |a| a < interval_max }
     end
     distribution
   end
@@ -86,7 +85,7 @@ module AnalyticHelper
   def distribution_categories(array, num_intervals, x_min = array.min)
     categories = []
     interval_size = ((array.max - x_min).to_f / num_intervals).ceil
-    intervals = (1..num_intervals).to_a.collect {|val| val * interval_size }
+    intervals = (1..num_intervals).to_a.collect { |val| val * interval_size }
     interval_min = 0
     intervals.each do |interval_max|
       categories << (interval_min..interval_max).to_s

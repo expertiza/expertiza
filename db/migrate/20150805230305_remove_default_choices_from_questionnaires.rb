@@ -1,5 +1,5 @@
-class RemoveDefaultChoicesFromQuestionnaires < ActiveRecord::Migration[4.2][4.2]
+class RemoveDefaultChoicesFromQuestionnaires < ActiveRecord::Migration[4.2]
   def change
-    remove_column "questionnaires","default_num_choices"
+    remove_column 'questionnaires', 'default_num_choices'
   end
 end

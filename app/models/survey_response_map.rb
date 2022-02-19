@@ -10,7 +10,7 @@ class SurveyResponseMap < ResponseMap
 
   def email(defn, participant, survey_parent)
     user = User.find(participant.user_id)
-    defn[:body][:type] = "Survey Submission"
+    defn[:body][:type] = 'Survey Submission'
     defn[:body][:obj_name] = survey_parent.name
     defn[:body][:first_name] = user.fullname
     defn[:to] = user.email

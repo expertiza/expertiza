@@ -1,5 +1,5 @@
-class RemoveNotificationAcceptedFromResponseMap < ActiveRecord::Migration[4.2][4.2]
+class RemoveNotificationAcceptedFromResponseMap < ActiveRecord::Migration[4.2]
   def change
-    remove_column "response_maps","notification_accepted"
+    remove_column 'response_maps', 'notification_accepted'
   end
 end

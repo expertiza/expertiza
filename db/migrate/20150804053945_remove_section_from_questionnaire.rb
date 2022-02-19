@@ -1,5 +1,5 @@
-class RemoveSectionFromQuestionnaire < ActiveRecord::Migration[4.2][4.2]
+class RemoveSectionFromQuestionnaire < ActiveRecord::Migration[4.2]
   def change
-    remove_column "questionnaires","section"
+    remove_column 'questionnaires', 'section'
   end
 end

@@ -53,7 +53,7 @@ class AssignmentQuestionnaireController < ApplicationController
       flash[:error] = 'Questionnaire #' + questionnaire.id + ' does not currently exist.'
       return
     end
-
+    puts "This one yeaahhhh"
     @assignment_questionnaire = AssignmentQuestionnaire.new(assignment_questionnaire_params)
     @assignment_questionnaire.save
 
@@ -64,6 +64,8 @@ class AssignmentQuestionnaireController < ApplicationController
 
   private
   def assignment_questionnaire_params
-    params.permit!
+    params.permit(:assignment_id, :questionnaire_id,
+     :user_id , :notification_limit, :questionnaire_weight,
+    :used_in_round, :dropdown, :topic_id, :duty_id)
   end
 end

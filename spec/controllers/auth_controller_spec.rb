@@ -1,6 +1,7 @@
 describe AuthController do
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
+  let(:instructor_role) { build(:role_of_instructor, id: 2, name: 'Instructor_role_test', description: '', parent_id: nil, default_page_id: nil) }
   describe '#action_allowed?' do
   	before(:each) do
   	  stub_current_user(admin, admin.role.name, admin.role)
@@ -21,12 +22,6 @@ describe AuthController do
   	  it 'returns true' do
   	  	controller.params = { action: 'login_failed' }
 				expect(controller.send(:action_allowed?)).to be_truthy
-  	  end
-  	end
-  	context 'when the action desired is google login' do
-  	  it 'returns true' do
-  	  	controller.params = { action: 'google_login' }
-  	  	expect(controller.send(:action_allowed?)).to be_truthy
   	  end
   	end
   	context 'when the action desired is other' do
@@ -66,6 +61,50 @@ describe AuthController do
   		allow(controller).to receive(:redirect_to)
   		expect(AuthController).to receive(:set_current_role)
   		controller.after_login(instructor)
+  	end
+  end
+  describe '#logout' do
+  	it 'calls logout and redirects to root' do
+  		expect(controller).to receive(:logout)
+  		get :logout
+  	end
+  end
+  describe '#self.logout' do
+  	it 'calls clear_session' do
+  		session = {user: instructor}
+  		expect(AuthController).to receive(:clear_session).with(session)
+  		AuthController.logout(session)
+  	end
+  end
+  describe '#self.set_current_role' do
+  	context 'when the role is found' do
+  		it 'sets the session for the role' do
+  			allow(Role).to receive(:find).and_return(instructor_role)
+  			expect(ExpertizaLogger).to receive(:info)
+  			AuthController.set_current_role(2, {})
+  		end
+  	end
+  	context 'when the role is not found' do
+  		it 'throws an error' do
+  			allow(Role).to receive(:find).and_return(nil)
+  			expect(ExpertizaLogger).to receive(:error)
+  			AuthController.set_current_role(2, {})
+  		end
+  	end
+  end
+  describe '#self.clear_session' do
+  	it 'returns nil and clears session hash' do
+  		session = {user: instructor}		
+  		expect(AuthController.clear_session(session)).to be_nil
+  		expect(session[:clear]).to be_truthy
+  	end
+  end
+  describe '#self.clear_user_info' do
+  	it 'returns nil and clears session hash' do
+  		session = {user: instructor}		
+  		allow(Role).to receive(:student).and_return(instructor_role)
+  		expect(AuthController.clear_user_info(session, 1)).to be_nil
+  		expect(session[:clear]).to be_truthy
   	end
   end
 end

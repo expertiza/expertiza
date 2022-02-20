@@ -24,7 +24,6 @@ module AssignmentHelper
     end
     courses.flatten!
     options = []
-    # Only instructors, but not TAs, would then be allowed to change an assignment to be part of no course
     if session[:user].role.name == 'Administrator' || session[:user].role.name == 'Super-Administrator' || session[:user].role.name == 'Instructor'
       options << ['-----------', nil]
     end

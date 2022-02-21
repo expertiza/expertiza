@@ -1,5 +1,5 @@
 module AssignmentHelper
-  def course_options(instructor)
+  def course_options(instructor = nil)
     courses = []
     if session[:user].role.name == 'Teaching Assistant'
       ta = Ta.find(session[:user].id)
@@ -9,9 +9,9 @@ module AssignmentHelper
       courses << Course.where(instructor_id: ta.id)
     # Administrator and Super-Administrator can see all courses
     elsif session[:user].role.name == 'Administrator' || session[:user].role.name == 'Super-Administrator'
-      courses = Course.all
+      courses << Course.all
     elsif session[:user].role.name == 'Instructor'
-      courses << Course.where(instructor_id: instructor.id)
+      courses << Course.where(instructor_id: session[:user].id)
       # instructor can see courses his/her TAs created
       ta_ids = []
       instructor = Instructor.find(session[:user].id)
@@ -24,7 +24,6 @@ module AssignmentHelper
     end
     courses.flatten!
     options = []
-    # Only instructors, but not TAs, would then be allowed to change an assignment to be part of no course
     if session[:user].role.name == 'Administrator' || session[:user].role.name == 'Super-Administrator' || session[:user].role.name == 'Instructor'
       options << ['-----------', nil]
     end

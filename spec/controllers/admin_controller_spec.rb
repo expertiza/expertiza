@@ -145,8 +145,8 @@ describe AdminController do
   context '#show_super_administrator' do
     it 'find selected Super-Administrator and render #show' do
       stub_current_user(super_admin, super_admin.role.name, super_admin.role)
-      params = { id: '1' }
-      get :show_super_administrator, params
+      request_params = { id: '1' }
+      get :show_super_administrator, params: request_params
       expect(assigns(:user)).to eq(super_admin)
       expect(assigns(:role)).to eq(super_admin.role)
       expect(response).to render_template(:show_super_administrator)
@@ -156,8 +156,8 @@ describe AdminController do
   context '#list_administrators' do
     it 'lists all the admins' do
       stub_current_user(super_admin, super_admin.role.name, super_admin.role)
-      params = { page: '1' }
-      get :list_administrators, params
+      request_params = { page: '1' }
+      get :list_administrators, params: request_params
       expect(assigns(:users)).to eq(admin_list)
     end
   end
@@ -165,8 +165,8 @@ describe AdminController do
   context '#show_administrator' do
     it 'find selected admin and render #show' do
       stub_current_user(super_admin, super_admin.role.name, super_admin.role)
-      params = { id: '3' }
-      get :show_administrator, params
+      request_params = { id: '3' }
+      get :show_administrator, params: request_params
       expect(assigns(:user)).to eq(admin1)
       expect(assigns(:role)).to eq(admin1.role)
       expect(response).to render_template(:show_administrator)
@@ -176,8 +176,8 @@ describe AdminController do
   context '#list_instructors' do
     it 'lists all the instructors' do
       stub_current_user(admin1, admin1.role.name, admin1.role)
-      params = { page: '1' }
-      get :list_instructors, params
+      request_params = { page: '1' }
+      get :list_instructors, params: request_params
       expect(assigns(:users)).to eq(instructor_list_pid3)
     end
   end
@@ -185,8 +185,8 @@ describe AdminController do
   context '#show_instructor' do
     it 'find selected instructor and render #show' do
       stub_current_user(super_admin, super_admin.role.name, super_admin.role)
-      params = { id: '10' }
-      get :show_instructor, params
+      request_params = { id: '10' }
+      get :show_instructor, params: request_params
       expect(assigns(:user)).to eq(instructor1)
       expect(assigns(:role)).to eq(instructor1.role)
       expect(response).to render_template(:show_instructor)

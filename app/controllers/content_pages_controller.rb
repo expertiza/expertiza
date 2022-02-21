@@ -116,4 +116,5 @@ class ContentPagesController < ApplicationController
 
   def content_pages_params
     params.permit(:id, :content_page)
+  end
 end

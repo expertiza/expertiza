@@ -1,9 +1,9 @@
 <script type="text/javascript">
-  function UpdateButton(){
-    if (document.getElementById("impersonate_name").value.length > 0)
-      document.getElementById("revert_button").value = "Impersonate";
-    else
-      document.getElementById("revert_button").value = "Revert";
+  function UpdateButton() {
+      if (document.getElementById("impersonate_name").value.length > 0)
+          document.getElementById("revert_button").value = "Impersonate";
+      else
+          document.getElementById("revert_button").value = "Revert";
   }
 </script>
 
@@ -47,15 +47,22 @@
     </p>
     <p>
       <% if defined?(@attempts) and @attempts[@username] %>
-          <div class="g-recaptcha" data-sitekey="6LcFcRUUAAAAAP0aQmJmT0299FLzCPyVExZYlOUv"></div>
+          <!--<div class="g-recaptcha" data-sitekey="6LcFcRUUAAAAAP0aQmJmT0299FLzCPyVExZYlOUv"></div>-->
           <br><br><br><br>
       <% end %>
       <%= submit_tag "Sign in", :class => 'btn btn-danger', :style => 'width:100%; margin-left:auto; margin-right:auto;' %>
     </p>
   <% end %>
+  <br><br><br>
   <p>
-  <%= link_to "Request account",{:controller => 'account_request',:role => "Instructor", :action => 'new'}, :class => 'btn btn-danger', :style => 'color:white;width:100%;margin-left:auto;margin-right:auto;' %>
+    <%= form_tag({:controller => 'account_request', :role => "Instructor", :action => 'new'}, :method => "get") do %>
+        <div>
+          <%= recaptcha_tags %>
+        </div>
+        <%= submit_tag "Request account", :class => 'btn btn-danger', :style => 'width:100%; margin-left:auto; margin-right:auto;' %>
+
+    <% end %>
   </p>
-  <br/>
 </div>
+
 <% end %>

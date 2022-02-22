@@ -3,7 +3,7 @@ describe 'Tests mailer' do
     # Send the email, then test that it got queued
     email = Mailer.sync_message(
       to: 'tluo@ncsu.edu',
-      subject: "Test",
+      subject: 'Test',
       body: {
         obj_name: 'assignment',
         type: 'submission',
@@ -13,8 +13,8 @@ describe 'Tests mailer' do
       }
     ).deliver_now
 
-    expect(email.from[0]).to eq("expertiza.development@gmail.com")
-    expect(email.to[0]).to eq('expertiza.development@gmail.com')
+    expect(email.from[0]).to eq('expertiza.debugging@gmail.com')
+    expect(email.to[0]).to eq('expertiza.debugging@gmail.com')
     expect(email.subject).to eq('Test')
   end
 end

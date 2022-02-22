@@ -1,5 +1,6 @@
 class BookmarksController < ApplicationController
   include AuthorizationHelper
+  include Scoring
   helper_method :specific_average_score
   helper_method :total_average_score
 
@@ -11,7 +12,7 @@ class BookmarksController < ApplicationController
       current_role_name.eql? 'Student'
     when 'edit', 'update', 'destroy'
       # edit, update, delete bookmarks can only be done by owner
-      current_user_has_student_privileges? and current_user_created_bookmark_id?(params[:id])
+      current_user_has_student_privileges? && current_user_created_bookmark_id?(params[:id])
     end
     @current_role_name = current_role_name
   end
@@ -27,8 +28,8 @@ class BookmarksController < ApplicationController
   end
 
   def create
-    params[:url] = params[:url].gsub!(/http:\/\//, "") if params[:url].start_with?('http://')
-    params[:url] = params[:url].gsub!(/https:\/\//, "") if params[:url].start_with?('https://')
+    params[:url] = params[:url].gsub!(%r{http://}, '') if params[:url].start_with?('http://')
+    params[:url] = params[:url].gsub!(%r{https://}, '') if params[:url].start_with?('https://')
     begin
       Bookmark.create(url: params[:url], title: params[:title], description: params[:description], user_id: session[:user].id, topic_id: params[:topic_id])
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Your bookmark has been successfully created!', request)
@@ -83,10 +84,11 @@ class BookmarksController < ApplicationController
       assessment = SignUpTopic.find(bookmark.topic_id).assignment
       questions = assessment.questionnaires.where(type: 'BookmarkRatingQuestionnaire').flat_map(&:questions)
       responses = BookmarkRatingResponseMap.where(
-          reviewed_object_id: assessment.id,
-          reviewee_id: bookmark.id,
-          reviewer_id: AssignmentParticipant.find_by(user_id: current_user.id).id).flat_map {|r| Response.where(map_id: r.id) }
-      score = Response.assessment_score(response: responses, questions: questions)
+        reviewed_object_id: assessment.id,
+        reviewee_id: bookmark.id,
+        reviewer_id: AssignmentParticipant.find_by(user_id: current_user.id).id
+      ).flat_map { |r| Response.where(map_id: r.id) }
+      score = assessment_score(response: responses, questions: questions)
       if score.nil?
         return '-'
       else
@@ -103,9 +105,10 @@ class BookmarksController < ApplicationController
       assessment = SignUpTopic.find(bookmark.topic_id).assignment
       questions = assessment.questionnaires.where(type: 'BookmarkRatingQuestionnaire').flat_map(&:questions)
       responses = BookmarkRatingResponseMap.where(
-          reviewed_object_id: assessment.id,
-          reviewee_id: bookmark.id).flat_map {|r| Response.where(map_id: r.id) }
-      totalScore = Response.compute_scores(responses, questions)
+        reviewed_object_id: assessment.id,
+        reviewee_id: bookmark.id
+      ).flat_map { |r| Response.where(map_id: r.id) }
+      totalScore = aggregate_assessment_scores(responses, questions)
       if totalScore[:avg].nil?
         return '-'
       else

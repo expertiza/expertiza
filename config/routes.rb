@@ -1,8 +1,4 @@
-
 Expertiza::Application.routes.draw do
-  ###
-  # Please insert new routes alphabetically!
-  ###
 
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
@@ -88,7 +84,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :course, controller: 'courses', only: %i[new create edit update] do
+  resources :course, controller: 'courses', only: %i[new create edit update delete] do
     collection do
       get :toggle_access
       get :copy
@@ -99,6 +95,8 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :duties
+  
   resources :eula, only: [] do
     collection do
       get :accept
@@ -156,7 +154,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-resources :institution, except: [:destroy] do
+  resources :institution, except: [:destroy] do
     collection do
       get :list
       post ':id', action: :update
@@ -174,6 +172,7 @@ resources :institution, except: [:destroy] do
   resources :join_team_requests do
     collection do
       post :decline
+      get :index
     end
   end
 
@@ -189,7 +188,7 @@ resources :institution, except: [:destroy] do
       get :list
     end
   end
-  
+
   resources :lock do
     collection do
       post :release_lock
@@ -211,7 +210,6 @@ resources :institution, except: [:destroy] do
       get :inherit
       get :bequeath_all
       post :update_authorizations
-      post :update_duties
       post :change_handle
       get :view_copyright_grants
     end
@@ -239,30 +237,28 @@ resources :institution, except: [:destroy] do
       get :set_publish_permission
     end
   end
-#Nitin - removed quiz related routes from questionnaires controller
+  # Nitin - removed quiz related routes from questionnaires controller
   resources :questionnaires, only: %i[new create edit update] do
     collection do
       get :copy
       get :select_questionnaire_type
       post :select_questionnaire_type
       get :toggle_access
-      get :view  
+      get :view
       post :add_new_questions
       post :save_all_questions
     end
   end
-=begin
-#Nitin - Created new routes for quiz_questionnaire
-  resources :quiz_questionnaire, only: %i[new create edit update] do
-    collection do
-      get :new_quiz
-      post :create_quiz_questionnaire
-      get :edit_quiz
-      post :update_quiz
-      
-    end
-  end
-=end
+  # #Nitin - Created new routes for quiz_questionnaire
+  #   resources :quiz_questionnaire, only: %i[new create edit update] do
+  #     collection do
+  #       get :new_quiz
+  #       post :create_quiz_questionnaire
+  #       get :edit_quiz
+  #       post :update_quiz
+  #
+  #     end
+  #   end
   resources :quiz_questionnaires
 
   resources :author_feedback_questionnaires, controller: :questionnaires
@@ -305,6 +301,14 @@ resources :institution, except: [:destroy] do
       get :show_calibration_results_for_student
       post :custom_create
       get :json
+    end
+  end
+
+  resources :review_bids do
+    collection do
+      post :assign_bidding
+      post :set_priority
+      post :index
     end
   end
 
@@ -402,7 +406,7 @@ resources :institution, except: [:destroy] do
       get :list
       get :view
       put :publishing_rights_update
-      #added a new route for updating publishing rights
+      # added a new route for updating publishing rights
       get '/*other', to: redirect('/student_task/list')
     end
   end
@@ -458,15 +462,15 @@ resources :institution, except: [:destroy] do
   resources :teams, only: %i[new create edit update] do
     collection do
       get :list
-      # post ':id', action: :create_teams
       post :create_teams
       post :inherit
     end
   end
 
-  resources :teams_users, only: %i[new create] do
+  resources :teams_users, only: %i[new create update] do
     collection do
       post :list
+      post :update_duties
     end
   end
 
@@ -483,7 +487,7 @@ resources :institution, except: [:destroy] do
     end
   end
 
-  resources :users, constraints: {id: /\d+/} do
+  resources :users, constraints: { id: /\d+/ } do
     collection do
       get :list
       post :list
@@ -492,10 +496,11 @@ resources :institution, except: [:destroy] do
       get :auto_complete_for_user_name
       get :set_anonymized_view
       get :keys
+      delete :destroy
     end
   end
 
-  resources :account_request, constraints: {id: /\d+/} do
+  resources :account_request, constraints: { id: /\d+/ } do
     collection do
       get :list
       post :list
@@ -522,7 +527,6 @@ resources :institution, except: [:destroy] do
   root to: 'content_pages#view', page_name: 'home'
   post :login, to: 'auth#login'
   post :logout, to: 'auth#logout'
-  get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
   get '/auth/*path', to: redirect('/')
   get '/menu/*name', controller: :menu_items, action: :link
@@ -538,7 +542,7 @@ resources :institution, except: [:destroy] do
   post '/response_toggle_permission/:id' => 'response#toggle_permission'
   post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
   post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
-  post 'student_task/publishing_rights_update', controller: :student_task, action: :publishing_rights_update,method: :put
-  #updated route and added specific controller action upon accessing this route
+  post 'student_task/publishing_rights_update', controller: :student_task, action: :publishing_rights_update, method: :put
+  get 'student_view/flip_view', controller: :student_view, action: :flip_view
+  # updated route and added specific controller action upon accessing this route
 end
-

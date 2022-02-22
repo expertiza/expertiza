@@ -6,12 +6,14 @@ gem 'rails', '~> 4.2.11.1'
 gem 'activerecord-session_store'
 gem 'activesupport', '~> 4.2.11.1'
 gem 'airbrake'
+gem 'authlogic', '4.1'
 gem 'awesome_nested_set'
 gem 'bind-it'
 gem 'bootstrap3-datetimepicker-rails', '~> 4.17.47'
+gem 'bullet', '~> 5.7.6'
 gem 'capistrano'
 gem 'capistrano-bundler'
-gem "capistrano-db-tasks", require: false
+gem 'capistrano-db-tasks', require: false
 # https://www.phusionpassenger.com/library/deploy/apache/automating_app_updates/ruby/
 gem 'capistrano-passenger'
 gem 'capistrano-rails'
@@ -21,16 +23,16 @@ gem 'coffee-rails'
 gem 'coveralls', require: false
 gem 'danger', git: 'https://github.com/Winbobob/danger.git', ref: '1ccfed23f809a1e5c46e2533cfd7a3138f6cd821', require: false
 gem 'delayed_job_active_record'
+gem 'dotenv-rails', require: 'dotenv/rails-now'
 gem 'dynamic_form'
 gem 'edavis10-ruby-web-search'
 gem 'engtagger'
-gem 'expertiza-authlogic', git: 'https://github.com/expertiza/authlogic.git', require: 'authlogic'
 gem 'fastercsv'
 gem 'font-awesome-rails'
 gem 'foreman'
 gem 'gchartrb', require: 'google_chart'
 gem 'gdata', require: false
-gem "googlecharts", require: "gchart"
+gem 'googlecharts', require: 'gchart'
 gem 'haml-rails'
 gem 'jquery-colorbox-rails'
 gem 'jquery-datetimepicker-rails'
@@ -52,7 +54,7 @@ gem 'rails4-autocomplete'
 gem 'rake'
 gem 'rb-readline'
 gem 'react-rails'
-gem "recaptcha", require: "recaptcha/rails"
+gem 'recaptcha', require: 'recaptcha/rails'
 gem 'RedCloth'
 gem 'redis-namespace'
 gem 'redis-rails'
@@ -62,7 +64,7 @@ gem 'rjb'
 gem 'rubyzip'
 gem 'rwordnet'
 gem 'sass-rails', '5.0.3'
-gem 'scrypt'
+gem 'scrypt', '3.0.6'
 gem 'seer'
 gem 'shoulda-matchers'
 gem 'sidekiq'
@@ -87,19 +89,18 @@ group :development do
 end
 
 group :test do
-  gem 'database_cleaner'
-  gem "factory_bot_rails"
-  gem 'geckodriver-helper', '~> 0.0.3'
   gem 'capybara'
-  gem 'selenium-webdriver'
+  gem 'database_cleaner'
+  gem 'factory_bot_rails'
+  gem 'geckodriver-helper', '~> 0.0.3'
   gem 'gherkin'
   gem 'guard-rails'
   gem 'guard-rspec'
   gem 'launchy'
-  gem 'mutant-rspec'
-  gem 'rspec-rails'
-  gem 'shoulda'
   gem 'puma'
+  gem 'rspec-rails'
+  gem 'selenium-webdriver'
+  gem 'shoulda'
 end
 
 group :development, :test do
@@ -107,4 +108,3 @@ group :development, :test do
   gem 'selenium-webdriver'
   gem 'simplecov', require: false
 end
-

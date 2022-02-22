@@ -5,10 +5,12 @@ describe AssignmentForm do
   let(:user) { double('Instructor', timezonepref: 'Eastern Time (US & Canada)') }
   let(:assignment_questionnaire1) { build(:assignment_questionnaire) }
   let(:assignment_questionnaire2) { build(:assignment_questionnaire) }
+  let(:assignment_questionnaire2) { build(:assignment_questionnaire, id: 1, duty_id: 1, questionnaire_id: 1) }
   let(:aq_attributes1) { double('AssignmentQuestionnaire') }
   let(:aq_attributes2) { double('AssignmentQuestionnaire') }
   let(:questionnaire1) { double('Questionnaire', type: 'ReviewQuestionnaire') }
   let(:questionnaire2) { double('Questionnaire', type: 'MetareviewQuestionnaire') }
+  let(:questionnaire3) { double('Questionnaire', type: 'TeammateReviewQuestionnaire') }
   before(:each) do
     assignment_form.instance_variable_set(:@assignment, assignment)
   end
@@ -81,13 +83,17 @@ describe AssignmentForm do
         allow(aq_attributes1).to receive(:key?).with(:questionnaire_weight).and_return(true)
         allow(aq_attributes1).to receive(:[]).with(:questionnaire_weight).and_return(100)
         allow(aq_attributes1).to receive(:[]).with(:questionnaire_id).and_return(1)
-        allow(aq_attributes1).to receive(:[]).with(:used_in_round).and_return("")
+        allow(aq_attributes1).to receive(:[]).with(:used_in_round).and_return('')
         allow(aq_attributes1).to receive(:key?).with(:topic_id).and_return(false)
+        allow(aq_attributes1).to receive(:[]).with(:duty_id).and_return('')
+        allow(aq_attributes1).to receive(:key?).with(:duty_id).and_return(false)
         allow(aq_attributes2).to receive(:key?).with(:questionnaire_weight).and_return(true)
         allow(aq_attributes2).to receive(:[]).with(:questionnaire_weight).and_return(0)
         allow(aq_attributes2).to receive(:[]).with(:questionnaire_id).and_return(2)
-        allow(aq_attributes2).to receive(:[]).with(:used_in_round).and_return("")
+        allow(aq_attributes2).to receive(:[]).with(:used_in_round).and_return('')
         allow(aq_attributes2).to receive(:key?).with(:topic_id).and_return(false)
+        allow(aq_attributes2).to receive(:[]).with(:duty_id).and_return('')
+        allow(aq_attributes2).to receive(:key?).with(:duty_id).and_return(false)
       end
 
       context 'when both active records exist and can be found' do
@@ -95,7 +101,8 @@ describe AssignmentForm do
           allow(assignment_questionnaire1).to receive(:id).and_return(1)
           allow(assignment_questionnaire2).to receive(:id).and_return(2)
           allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
-              [assignment_questionnaire1, assignment_questionnaire2])
+            [assignment_questionnaire1, assignment_questionnaire2]
+          )
         end
 
         it 'returns attributes (args) and does not change @has_errors value since update_attributes method works correctly' do
@@ -138,7 +145,8 @@ describe AssignmentForm do
         before(:each) do
           allow(assignment_questionnaire1).to receive(:id).and_return(1)
           allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
-              [assignment_questionnaire1])
+            [assignment_questionnaire1]
+          )
           allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
           allow(AssignmentQuestionnaire).to receive(:new).and_return(assignment_questionnaire2)
         end
@@ -192,7 +200,8 @@ describe AssignmentForm do
         before(:each) do
           allow(assignment_questionnaire2).to receive(:id).and_return(2)
           allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
-              [assignment_questionnaire2])
+            [assignment_questionnaire2]
+          )
           allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
           allow(AssignmentQuestionnaire).to receive(:new).and_return(assignment_questionnaire1)
         end
@@ -275,27 +284,29 @@ describe AssignmentForm do
 
       context 'when questionnaire_id is not given within attributes' do
         it 'returns attributes (args) and does not change @has_errors value when both attributes do not have questionnaire_id specified' do
-          allow(aq_attributes1).to receive(:[]).with(:questionnaire_id).and_return("")
-          allow(aq_attributes2).to receive(:[]).with(:questionnaire_id).and_return("")
+          allow(aq_attributes1).to receive(:[]).with(:questionnaire_id).and_return('')
+          allow(aq_attributes2).to receive(:[]).with(:questionnaire_id).and_return('')
           expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
           expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
         end
 
         it 'returns attributes (args) and does not change @has_errors value when attributes1 does not have questionnaire_id specified' do
-          allow(aq_attributes1).to receive(:[]).with(:questionnaire_id).and_return("")
+          allow(aq_attributes1).to receive(:[]).with(:questionnaire_id).and_return('')
           allow(assignment_questionnaire2).to receive(:id).and_return(2)
           allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
-              [assignment_questionnaire2])
+            [assignment_questionnaire2]
+          )
           allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(true)
           expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
           expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
         end
 
         it 'returns attributes (args) and does not change @has_errors value when attributes2 does not have questionnaire_id specified' do
-          allow(aq_attributes2).to receive(:[]).with(:questionnaire_id).and_return("")
+          allow(aq_attributes2).to receive(:[]).with(:questionnaire_id).and_return('')
           allow(assignment_questionnaire1).to receive(:id).and_return(1)
           allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
-              [assignment_questionnaire1])
+            [assignment_questionnaire1]
+          )
           allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(true)
           expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
           expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
@@ -313,14 +324,18 @@ describe AssignmentForm do
         allow(Questionnaire).to receive(:find).with(2).and_return(questionnaire2)
         allow(aq_attributes1).to receive(:key?).with(:questionnaire_weight).and_return(false)
         allow(aq_attributes1).to receive(:[]).with(:questionnaire_id).and_return(1)
-        allow(aq_attributes1).to receive(:[]).with(:used_in_round).and_return("")
+        allow(aq_attributes1).to receive(:[]).with(:used_in_round).and_return('')
         allow(aq_attributes1).to receive(:key?).with(:topic_id).and_return(true)
-        allow(aq_attributes1).to receive(:[]).with(:topic_id).and_return("")
+        allow(aq_attributes1).to receive(:[]).with(:topic_id).and_return('')
+        allow(aq_attributes1).to receive(:[]).with(:duty_id).and_return('')
+        allow(aq_attributes1).to receive(:key?).with(:duty_id).and_return(false)
         allow(aq_attributes2).to receive(:key?).with(:questionnaire_weight).and_return(false)
         allow(aq_attributes2).to receive(:[]).with(:questionnaire_id).and_return(2)
-        allow(aq_attributes2).to receive(:[]).with(:used_in_round).and_return("")
+        allow(aq_attributes2).to receive(:[]).with(:used_in_round).and_return('')
         allow(aq_attributes2).to receive(:key?).with(:topic_id).and_return(true)
-        allow(aq_attributes2).to receive(:[]).with(:topic_id).and_return("")
+        allow(aq_attributes2).to receive(:[]).with(:topic_id).and_return('')
+        allow(aq_attributes2).to receive(:[]).with(:duty_id).and_return('')
+        allow(aq_attributes2).to receive(:key?).with(:duty_id).and_return(false)
       end
 
       context 'when both active records exist and can be found' do
@@ -328,7 +343,8 @@ describe AssignmentForm do
           allow(assignment_questionnaire1).to receive(:id).and_return(1)
           allow(assignment_questionnaire2).to receive(:id).and_return(2)
           allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
-              [assignment_questionnaire1, assignment_questionnaire2])
+            [assignment_questionnaire1, assignment_questionnaire2]
+          )
         end
 
         it 'returns attributes (args) and does not change @has_errors value since update_attributes method works correctly' do
@@ -364,7 +380,8 @@ describe AssignmentForm do
         before(:each) do
           allow(assignment_questionnaire1).to receive(:id).and_return(1)
           allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
-              [assignment_questionnaire1])
+            [assignment_questionnaire1]
+          )
           allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
           allow(AssignmentQuestionnaire).to receive(:new).and_return(assignment_questionnaire2)
         end
@@ -411,7 +428,8 @@ describe AssignmentForm do
         before(:each) do
           allow(assignment_questionnaire2).to receive(:id).and_return(2)
           allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
-              [assignment_questionnaire2])
+            [assignment_questionnaire2]
+          )
           allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
           allow(AssignmentQuestionnaire).to receive(:new).and_return(assignment_questionnaire1)
         end
@@ -480,27 +498,29 @@ describe AssignmentForm do
 
       context 'when questionnaire_id is not given within attributes' do
         it 'returns attributes (args) and does not change @has_errors value when both attributes do not have questionnaire_id specified' do
-          allow(aq_attributes1).to receive(:[]).with(:questionnaire_id).and_return("")
-          allow(aq_attributes2).to receive(:[]).with(:questionnaire_id).and_return("")
+          allow(aq_attributes1).to receive(:[]).with(:questionnaire_id).and_return('')
+          allow(aq_attributes2).to receive(:[]).with(:questionnaire_id).and_return('')
           expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
           expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
         end
 
         it 'returns attributes (args) and does not change @has_errors value when attributes1 does not have questionnaire_id specified' do
-          allow(aq_attributes1).to receive(:[]).with(:questionnaire_id).and_return("")
+          allow(aq_attributes1).to receive(:[]).with(:questionnaire_id).and_return('')
           allow(assignment_questionnaire2).to receive(:id).and_return(2)
           allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
-              [assignment_questionnaire2])
+            [assignment_questionnaire2]
+          )
           allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(true)
           expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
           expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
         end
 
         it 'returns attributes (args) and does not change @has_errors value when attributes2 does not have questionnaire_id specified' do
-          allow(aq_attributes2).to receive(:[]).with(:questionnaire_id).and_return("")
+          allow(aq_attributes2).to receive(:[]).with(:questionnaire_id).and_return('')
           allow(assignment_questionnaire1).to receive(:id).and_return(1)
           allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
-              [assignment_questionnaire1])
+            [assignment_questionnaire1]
+          )
           allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(true)
           expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
           expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
@@ -517,8 +537,8 @@ describe AssignmentForm do
     end
 
     context 'when attributes are not nil and at least one due_date\'s id is nil or blank' do
-      let(:due_date2) { {due_at: '2015-06-22 12:05:00 -0400'} }
-      let(:due_date3) { {id: 1, due_at: '2015-06-22 12:05:00 -0400'} }
+      let(:due_date2) { { due_at: '2015-06-22 12:05:00 -0400' } }
+      let(:due_date3) { { id: 1, due_at: '2015-06-22 12:05:00 -0400' } }
       let(:attributes) { [due_date2, due_date3] }
       before(:each) do
         allow(AssignmentDueDate).to receive(:new).with(due_date2).and_return(due_date2)
@@ -564,7 +584,7 @@ describe AssignmentForm do
         Sidekiq::ScheduledSet.new.clear
         Sidekiq::Stats.new.reset
         Sidekiq::DeadSet.new.clear
-        queue = Sidekiq::Queues["mailers"]
+        queue = Sidekiq::Queues['mailers']
         expect { assignment_form.add_to_delayed_queue }.to change { queue.size }.by(2)
       end
     end
@@ -577,7 +597,7 @@ describe AssignmentForm do
         Sidekiq::ScheduledSet.new.clear
         Sidekiq::Stats.new.reset
         Sidekiq::DeadSet.new.clear
-        queue = Sidekiq::Queues["mailers"]
+        queue = Sidekiq::Queues['mailers']
         expect { assignment_form.add_to_delayed_queue }.to change { queue.size }.by(2)
       end
     end
@@ -587,7 +607,8 @@ describe AssignmentForm do
     context 'when multiple active records of assignment_questionnaire are found for a given assignment_id, used_in_round, and topic_id' do
       it 'returns correct assignment questionnaire found by questionnaire type' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return(
-            [assignment_questionnaire1, assignment_questionnaire2])
+          [assignment_questionnaire1, assignment_questionnaire2]
+        )
         allow(assignment_questionnaire1).to receive(:questionnaire_id).and_return(1)
         allow(assignment_questionnaire2).to receive(:questionnaire_id).and_return(2)
         allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire1)
@@ -607,16 +628,40 @@ describe AssignmentForm do
       end
     end
 
+    context 'when active record for assignment_questionnaire is not found for a given assignment_id amd duty_id' do
+      let(:new_assignment_questionnaire) { build(:assignment_questionnaire) }
+      it 'returns new instance of assignment_questionnaire with default values' do
+        allow(assignment).to receive(:questionnaire_varies_by_duty).and_return(true)
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, duty_id: anything).and_return([])
+        allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
+        allow(AssignmentQuestionnaire).to receive(:new).and_return(new_assignment_questionnaire)
+        expect(assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil, 1)).to eq(new_assignment_questionnaire)
+      end
+    end
+
     context 'when active record for assignment_questionnaire is found for a given assignment_id, used_in_round, and topic_id, but associated questionnaire_id is nil' do
       # Based on the E1936 design this is not possible, but there could different models that create AQ with questionnaire_id
       let(:new_assignment_questionnaire) { build(:assignment_questionnaire) }
       it 'returns new instance of assignment_questionnaire with default values' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return(
-            [assignment_questionnaire1])
+          [assignment_questionnaire1]
+        )
         allow(assignment_questionnaire1).to receive(:questionnaire_id).and_return(nil)
         allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
         allow(AssignmentQuestionnaire).to receive(:new).and_return(new_assignment_questionnaire)
         expect(assignment_form.assignment_questionnaire('ReviewQuestionnaire', 1, 1)).to eq(new_assignment_questionnaire)
+      end
+    end
+
+    context 'when active record for assignment_questionnaire is found for a given assignment_id amd duty_id' do
+      let(:new_assignment_questionnaire) { build(:assignment_questionnaire) }
+      it 'returns new instance of assignment_questionnaire with default values' do
+        allow(assignment).to receive(:questionnaire_varies_by_duty).and_return(true)
+        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire3)
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, duty_id: 1).and_return([assignment_questionnaire2])
+        allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
+        allow(AssignmentQuestionnaire).to receive(:new).and_return(new_assignment_questionnaire)
+        expect(assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil, 1)).to eq(assignment_questionnaire2)
       end
     end
   end
@@ -640,7 +685,6 @@ describe AssignmentForm do
       it 'returns new instance of questionnaire object if assignment_questionnaire is nil' do
         expect(assignment_form.questionnaire(nil, 'ReviewQuestionnaire').id).to eq nil
       end
-
     end
   end
 

@@ -29,10 +29,19 @@ describe User do
     it 'returns the full name of the user' do
       expect(user.fullname).to eq('abc xyz')
     end
+
+    it 'Validate presence of fullname which cannot be blank' do
+      user.fullname = '  '
+      expect(user).not_to be_valid
+    end
+
+    it 'Validate the email format correctness' do
+      user.fullname = 'John Bumgardner'
+      expect(user).to be_valid
+    end
   end
 
   describe '#email' do
-
     it 'returns the email of the user' do
       expect(user.email).to eq('abcxyz@gmail.com')
     end
@@ -83,7 +92,7 @@ describe User do
       allow(user1).to receive(:role).and_return('Student')
       allow(user2).to receive(:role).and_return('Student')
       expect(user.role.get_parents).to eq(['Student'])
-      allow(User).to receive(:all).with(conditions: ['name LIKE ?', "abc%"], limit: 20).and_return([user1, user2])
+      allow(User).to receive(:all).with(conditions: ['name LIKE ?', 'abc%'], limit: 20).and_return([user1, user2])
       expect(user.get_available_users(user.name)).to eq([user1, user2])
     end
   end
@@ -141,9 +150,9 @@ describe User do
 
   describe '#get_user_list' do
     before(:each) do
-      allow(user).to receive_message_chain("role.super_admin?") { false }
-      allow(user).to receive_message_chain("role.instructor?") { false }
-      allow(user).to receive_message_chain("role.ta?") { false }
+      allow(user).to receive_message_chain('role.super_admin?') { false }
+      allow(user).to receive_message_chain('role.instructor?') { false }
+      allow(user).to receive_message_chain('role.ta?') { false }
       allow(SuperAdministrator).to receive(:get_user_list).and_return([user1, user2])
       allow(Instructor).to receive(:get_user_list).and_return([user1, user2])
       allow(Ta).to receive(:get_user_list).and_return([user1, user2])
@@ -151,21 +160,21 @@ describe User do
 
     context 'when current user is super admin' do
       it 'fetches all users' do
-        allow(user).to receive_message_chain("role.super_admin?") { true }
+        allow(user).to receive_message_chain('role.super_admin?') { true }
         expect(user.get_user_list).to eq([user1, user2])
       end
     end
 
     context 'when current user is an instructor' do
       it 'fetches all users in his/her course/assignment' do
-        allow(user).to receive_message_chain("role.instructor?") { true }
+        allow(user).to receive_message_chain('role.instructor?') { true }
         expect(user.get_user_list).to eq([user1, user2])
       end
     end
 
     context 'when current user is a TA' do
       it 'fetches all users in his/her courses' do
-        allow(user).to receive_message_chain("role.ta?") { true }
+        allow(user).to receive_message_chain('role.ta?') { true }
         expect(user.get_user_list).to eq([user1, user2])
       end
     end
@@ -198,15 +207,15 @@ describe User do
 
   describe '.import' do
     it 'raises error if import column does not equal to 3' do
-      row = {"name" => 'abc', "fullname" => 'abc xyz'}
+      row = { 'name' => 'abc', 'fullname' => 'abc xyz' }
       expect { User.import(row, nil, nil, nil) }.to raise_error(ArgumentError)
     end
 
     it 'updates an existing user with info from impor file' do
       create(:student, name: 'abc')
-      row = {name: 'abc', fullname: 'test, test', email: 'test@gmail.com'}
+      row = { name: 'abc', fullname: 'test, test', email: 'test@gmail.com' }
       allow(user).to receive(:id).and_return(6)
-      User.import(row, nil, {user: user}, nil)
+      User.import(row, nil, { user: user }, nil)
       updated_user = User.find_by(name: 'abc')
       expect(updated_user.email).to eq 'test@gmail.com'
       expect(updated_user.fullname).to eq 'test, test'
@@ -322,7 +331,7 @@ describe User do
   describe '.export_fields' do
     it 'exports all information setting in options' do
       expect(User.export_fields('personal_details' => 'true', 'role' => 'true', 'parent' => 'true', 'email_options' => 'true', 'handle' => 'true'))
-        .to eq(['name', 'full name', 'email', 'role', 'parent', 'email on submission', 'email on review', 'email on metareview', 'handle'])
+        .to eq(['name', 'full name', 'email', 'role', 'parent', 'email on submission', 'email on review', 'email on metareview', 'copy of emails', 'handle'])
     end
 
     it 'exports only personal_details' do
@@ -337,7 +346,7 @@ describe User do
 
     it 'exports only email_options' do
       expect(User.export_fields('email_options' => 'true'))
-        .to eq(['email on submission', 'email on review', 'email on metareview'])
+        .to eq(['email on submission', 'email on review', 'email on metareview', 'copy of emails'])
     end
 
     it 'exports only handle' do
@@ -354,12 +363,12 @@ describe User do
 
     it 'returns user by user name fetching from params' do
       allow(User).to receive(:find_by).with(name: 'abc').and_return(user)
-      expect(User.from_params(user: {name: 'abc'})).to eq(user)
+      expect(User.from_params(user: { name: 'abc' })).to eq(user)
     end
 
     it 'raises an error when Expertiza cannot find user' do
       allow_any_instance_of(Object).to receive(:url_for).with(controller: 'users', action: 'new').and_return('users/new/1')
-      expect { User.from_params(user: {}) }.to raise_error(RuntimeError, /a href='users\/new\/1'>create an account<\/a> for this user to continue/)
+      expect { User.from_params(user: {}) }.to raise_error(RuntimeError, %r{a href='users/new/1'>create an account</a> for this user to continue})
     end
   end
 
@@ -422,19 +431,19 @@ describe User do
     it 'returns anonymized name when anonymized view is set' do
       student = create(:student)
       allow(User).to receive(:anonymized_view?).and_return(true)
-      expect(student.name).to eq "Student " + student.id.to_s
+      expect(student.name).to eq 'Student ' + student.id.to_s
     end
 
     it 'returns real name when anonymized view is not set' do
       student = create(:student)
       allow(User).to receive(:anonymized_view?).and_return(false)
-      expect(student.name).not_to eq "Student " + student.id.to_s
+      expect(student.name).not_to eq 'Student ' + student.id.to_s
     end
 
     # this test case is applicable to impersonate mode
     it 'returns correct real name from anonymized name' do
       student = create(:student)
-      expect(student.name).not_to eq "Student" + student.id.to_s
+      expect(student.name).not_to eq 'Student' + student.id.to_s
       real_student = User.real_user_from_anonymized_name(student.name)
       expect(student.name).to eq real_student.name
       expect(student).to eq real_student
@@ -445,26 +454,26 @@ describe User do
     let(:role) { Role.new }
 
     before(:each) do
-      allow(User).to receive_message_chain(:order, :where).with("(role_id in (?) or id = ?) and name like ?", role.get_available_roles, @user_id, '%name%')
-      allow(User).to receive_message_chain(:order, :where).with("(role_id in (?) or id = ?) and fullname like ?", role.get_available_roles, @user_id, '%fullname%')
-      allow(User).to receive_message_chain(:order, :where).with("(role_id in (?) or id = ?) and email like ?", role.get_available_roles, @user_id, '%email%')
+      allow(User).to receive_message_chain(:order, :where).with('(role_id in (?) or id = ?) and name like ?', role.get_available_roles, @user_id, '%name%')
+      allow(User).to receive_message_chain(:order, :where).with('(role_id in (?) or id = ?) and fullname like ?', role.get_available_roles, @user_id, '%fullname%')
+      allow(User).to receive_message_chain(:order, :where).with('(role_id in (?) or id = ?) and email like ?', role.get_available_roles, @user_id, '%email%')
       user_id = double
     end
 
     it 'when the search_by is 1' do
-      search_by = "1"
+      search_by = '1'
       allow(User).to receive_message_chain(:order, :where).and_return(user)
       expect(User.search_users(role, @user_id, 'name', search_by)).to eq user
     end
 
     it 'when the search_by is 2' do
-      search_by = "2"
+      search_by = '2'
       allow(User).to receive_message_chain(:order, :where).and_return(user)
       expect(User.search_users(role, @user_id, 'fullname', search_by)).to eq user
     end
 
     it 'when the search_by is 3' do
-      search_by = "3"
+      search_by = '3'
       allow(User).to receive_message_chain(:order, :where).and_return(user)
       expect(User.search_users(role, @user_id, 'email', search_by)).to eq user
     end

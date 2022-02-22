@@ -1,5 +1,5 @@
 describe MailWorker do
-  let(:assignment) { build(:assignment, id: 1, name: "no assignment", participants: [participant], teams: [team]) }
+  let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
   let(:participant) { build(:participant, id: 1, parent_id: 1, user: user) }
   let(:team) { build(:assignment_team, id: 1, name: 'no team', users: [user], parent_id: 1) }
   let(:user) { build(:student, id: 1, email: 'psingh22@ncsu.edu') }
@@ -34,8 +34,8 @@ describe MailWorker do
 
     it "should expect the queue size of one" do
       Sidekiq::Testing.fake!
-      MailWorker.perform_in(3.hours, "1", "metareview", "2018-12-31 00:00:01")
-      queue = Sidekiq::Queues["mailers"]
+      MailWorker.perform_in(3.hours, '1', 'metareview', '2018-12-31 00:00:01')
+      queue = Sidekiq::Queues['mailers']
       expect(queue.size).to eq(1)
     end
   end

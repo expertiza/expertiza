@@ -1,34 +1,13 @@
 module ReportFormatterHelper
-
-  # E1936 team recommends this method be REMOVED (it does not seem to be used anywhere in Expertiza as of 4/21/19)
-  def summary_by_reviewee_and_criteria(params, _session = nil)
-    assign_basics(params)
-    # E1991 : pass extra session variable to address anonymized view
-    # note that this is already passed from parent method in _session
-    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, @summary_ws_url, _session)
-    @summary = sum.summary
-    @reviewers = sum.reviewers
-    @avg_scores_by_reviewee = sum.avg_scores_by_reviewee
-    @avg_scores_by_round = sum.avg_scores_by_round
-    @avg_scores_by_criterion = sum.avg_scores_by_criterion
-  end
-
-  # E1936 team recommends this method be REMOVED (it does not seem to be used anywhere in Expertiza as of 4/21/19)
-  def summary_by_criteria(params, _session = nil)
-    assign_basics(params)
-    sum = SummaryHelper::Summary.new.summarize_reviews_by_criterion(@assignment, @summary_ws_url)
-    @summary = sum.summary
-    @avg_scores_by_round = sum.avg_scores_by_round
-    @avg_scores_by_criterion = sum.avg_scores_by_criterion
-  end
+  include Scoring
 
   def review_response_map(params, _session = nil)
     assign_basics(params)
     @review_user = params[:user]
     # If review response is required call review_response_report method in review_response_map model
     @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, @type, @review_user)
-    @review_scores = @assignment.compute_reviews_hash
-    @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
+    @review_scores = compute_reviews_hash(@assignment)
+    @avg_and_ranges = compute_avg_and_ranges_hash(@assignment)
   end
 
   def feedback_response_map(params, _session = nil)
@@ -52,16 +31,20 @@ module ReportFormatterHelper
     assign_basics(params)
     @reviewers = BookmarkRatingResponseMap.bookmark_response_report(@id)
     @topics = @assignment.sign_up_topics
-   end
+  end
 
   def calibration(params, session)
     assign_basics(params)
     user = session[:user]
-    participant = AssignmentParticipant.where(parent_id: @id, user_id: user.id).first rescue nil
+    participant = begin
+                    AssignmentParticipant.where(parent_id: @id, user_id: user.id).first
+                  rescue StandardError
+                    nil
+                  end
     create_participant(@id, user.id) if participant.nil?
-    @review_questionnaire_ids = ReviewQuestionnaire.select("id")
+    @review_questionnaire_ids = ReviewQuestionnaire.select('id')
     @assignment_questionnaire = AssignmentQuestionnaire.retrieve_questionnaire_for_assignment(@id).first
-    @questions = @assignment_questionnaire.questionnaire.questions.select {|q| q.type == 'Criterion' or q.type == 'Scale' }
+    @questions = @assignment_questionnaire.questionnaire.questions.select { |q| q.type == 'Criterion' || q.type == 'Scale' }
     @calibration_response_maps = ReviewResponseMap.where(reviewed_object_id: @id, calibrate_to: 1)
     @review_response_map_ids = ReviewResponseMap.select('id').where(reviewed_object_id: @id, calibrate_to: 0)
     @responses = Response.where(map_id: @review_response_map_ids)
@@ -122,7 +105,7 @@ module ReportFormatterHelper
   def calculate_formatted_percentage(line)
     number_tagged = @user_tagging_report[line.user.name].no_tagged.to_f
     number_taggable = @user_tagging_report[line.user.name].no_tagable
-    formatted_percentage = format("%.1f", (number_tagged / number_taggable) * 100)
+    formatted_percentage = format('%.1f', (number_tagged / number_taggable) * 100)
     @user_tagging_report[line.user.name].no_tagable.zero? ? '-' : formatted_percentage
   end
 end

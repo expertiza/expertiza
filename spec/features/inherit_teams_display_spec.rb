@@ -4,7 +4,7 @@ describe 'displaying inherit teams section' do
     create(:assignment_node)
     create(:assignment_team)
 
-    login_as("instructor6")
+    login_as('instructor6')
     visit '/teams/list?id=1&type=Assignment'
     click_link 'Create Team'
     expect(page).to have_content('Inherit Teams From Course')
@@ -15,7 +15,7 @@ describe 'displaying inherit teams section' do
     create(:course_node)
     create(:course_team)
 
-    login_as("instructor6")
+    login_as('instructor6')
     visit '/teams/list?id=1&type=Course'
     click_link 'Create Team'
     expect(page).to have_no_content('Inherit Teams From Course')
@@ -26,7 +26,7 @@ describe 'displaying inherit teams section' do
     create(:assignment_node)
     assignment.update_attributes(course_id: nil)
 
-    login_as("instructor6")
+    login_as('instructor6')
     visit '/teams/list?id=1&type=Assignment'
     click_link 'Create Team'
     expect(page).to have_no_content('Inherit Teams From Course')

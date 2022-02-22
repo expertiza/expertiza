@@ -3,25 +3,25 @@
 <div>
   <table class="table borderless">
     <tr>
-      <th align='left'>E-mail options</th>
+      <th align='left'><%=t ".email"%></th>
       <tr>
-        <td>Check the boxes representing the times when you want to receive e-mail.
+        <td><%=t ".email_option"%>
           <tr>
-            <td><label for="user_email_on_review">When someone else <strong>reviews</strong> my work</label></td>
-            <td><%= check_box 'user', 'email_on_review', {},  true, false  %></td>
+            <td><label for="user_email_on_review"><%=t ".when_someone_else"%> <strong><%=t ".reviews"%></strong> <%=t ".my_work"%></label></td>
+            <td><%= check_box 'user', 'email_on_review', {checked: true},  true, false  %></td>
           </tr>
           <tr>
-            <td><label for="user_email_on_submission">When someone else <strong>submits</strong> work I am assigned to review</label></td>
-            <td><%= check_box 'user', 'email_on_submission', {}, true, false  %></td>
+            <td><label for="user_email_on_submission"><%=t ".when_someone_else"%> <strong><%=t ".submits"%></strong> <%=t ".work_assigned"%></label></td>
+            <td><%= check_box 'user', 'email_on_submission', {checked: true}, true, false  %></td>
           </tr>
           <tr>
-            <td><label for="user_email_on_review_of_review">When someone else reviews one of my reviews (<strong>meta-reviews</strong> my work)</label></td>
-            <td><%= check_box 'user', 'email_on_review_of_review', {}, true, false %></td>
+            <td><label for="user_email_on_review_of_review"><%=t ".when_someone_else"%> <%=t ".reviews_one"%> (<strong>meta-<%=t ".reviews"%></strong> <%=t ".my_work"%>)</label></td>
+            <td><%= check_box 'user', 'email_on_review_of_review', {checked: true}, true, false %></td>
           </tr>
           <% if @user.role_id == 2 %>
             <tr>
-              <td><label for="copy_of_emails">Send me copies of emails sent for assigments</label></td>
-              <td><%= check_box 'user', 'copy_of_emails', {}, true, false %></td>
+              <td><label for="copy_of_emails"> <%=t ".send_mail"%></label></td>
+              <td><%= check_box 'user', 'copy_of_emails', {checked: true}, true, false %></td>
             </tr>
           <% end %>
   </table>

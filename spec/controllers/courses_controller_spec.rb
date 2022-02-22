@@ -29,8 +29,8 @@ describe CoursesController do
     context 'when @course is not nil' do
       it 'renders the course#edit page' do
         allow(Course).to receive(:find).with('1').and_return(double('Course', instructor_id: 6))
-        session = {user: instructor}
-        params = {id: 1}
+        session = { user: instructor }
+        params = { id: 1 }
         get :edit, params, session
         expect(response).to render_template(:edit)
       end
@@ -41,8 +41,8 @@ describe CoursesController do
     it 'deletes the course and redirects to tree_display#list page' do
       allow(Course).to receive(:find).with('1').and_return(course)
       allow(course).to receive(:destroy).and_return(true)
-      params = {id: 1}
-      session = {user: instructor}
+      params = { id: 1 }
+      session = { user: instructor }
       post :delete, params, session
       expect(response).to redirect_to('/tree_display/list')
     end
@@ -50,8 +50,8 @@ describe CoursesController do
 
   describe '#new' do
     it 'sets the private instance variable' do
-      params = {private:  1}
-      session = {user: instructor}
+      params = { private: 1 }
+      session = { user: instructor }
       get :new, params, session
       expect(controller.instance_variable_get(:@private)).to eq('1')
     end
@@ -63,20 +63,19 @@ describe CoursesController do
       allow(Course).to receive(:new).and_return(course_double)
       allow(course_double).to receive(:save).and_return(true)
     end
-    
-    it "redirects to the correct url" do
+
+    it 'redirects to the correct url' do
       post :create
       expect(response).to redirect_to root_url
     end
   end
 
   describe '#update' do
-    
-    it "checks updated is saved" do
+    it 'checks updated is saved' do
       allow(Course).to receive(:find).with('1').and_return(course)
       allow(course).to receive(:destroy).and_return(true)
-      params = {id: 1}
-      session = {instructor_id: 1}
+      params = { id: 1 }
+      session = { instructor_id: 1 }
       post :update, params, session
       expect(response).to be_redirect
     end

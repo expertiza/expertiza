@@ -3,7 +3,7 @@ describe 'timestamps for student\'s submissions' do
   # Please follow the TDD process as much as you can.
   # Use factories to create necessary DB records.
   # Please avoid duplicated code as much as you can by moving the code to before(:each) block or separated methods.
-  # RSpec feature tests examples: spec/features/airbrake_expection_errors_feature_tests_spec.rb
+  # RSpec feature tests examples: spec/features/airbrake_exception_errors_feature_tests_spec.rb
   # For single user login, please use login_as method.
   # If your tests need to switch to different users frequently,
   # please use stub_current_user(user, user.role.name, user.role) each time to stub login behavior.
@@ -31,8 +31,8 @@ describe 'timestamps for student\'s submissions' do
       # it also displays due dates
       # it also displays submitted files or hyperlinks
     end
-  
-  context 'after current participant finishes an author feedback' do
+
+    context 'after current participant finishes an author feedback' do
       it 'displays a link named \'feedback\' with its timestamps (you could redirect to that feedback by clicking the link)'
       # it also displays due dates
       # it also displays submitted files or hyperlinks

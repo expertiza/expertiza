@@ -19,7 +19,7 @@ class Node < ActiveRecord::Base
 
   # Retrieves the action partial for this node
   def get_partial_name
-    self.class.table + "_actions"
+    self.class.table + '_actions'
   end
 
   # Most objects are not leaves
@@ -33,7 +33,7 @@ class Node < ActiveRecord::Base
   # node's object type
   def self.table; end
 
-  # Retreives the node's object name
+  # Retrieves the node's object name
   def get_name; end
 
   # Retrieves the node's object directory

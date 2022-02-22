@@ -19,6 +19,5 @@ class SetPermissionForSuggestion < ActiveRecord::Migration
     Role.rebuild_cache
   end
 
-  def self.down
-  end
+  def self.down; end
 end

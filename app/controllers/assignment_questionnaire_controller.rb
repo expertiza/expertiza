@@ -2,7 +2,6 @@
 # Email: hliu11@ncsu.edu
 
 class AssignmentQuestionnaireController < ApplicationController
-
   include AuthorizationHelper
 
   # According to Dr. Gehringer, only the instructor, an ancestor of the instructor,
@@ -12,18 +11,17 @@ class AssignmentQuestionnaireController < ApplicationController
 
     if assignment
       current_user_teaching_staff_of_assignment?(assignment.id) ||
-          current_user_ancestor_of?(assignment.instructor)
+        current_user_ancestor_of?(assignment.instructor)
     else
       false
     end
   end
 
-
   # delete all AssignmentQuestionnaire entry that's associated with an assignment
   def delete_all
     assignment = Assignment.find(params[:assignment_id])
     if assignment.nil?
-      flash[:error] = "Assignment #" + assignment.id + " does not currently exist."
+      flash[:error] = 'Assignment #' + assignment.id + ' does not currently exist.'
       return
     end
 
@@ -37,22 +35,22 @@ class AssignmentQuestionnaireController < ApplicationController
 
   def create
     if params[:assignment_id].nil?
-      flash[:error] = "Missing assignment:" + params[:assignment_id]
+      flash[:error] = 'Missing assignment:' + params[:assignment_id]
       return
     elsif params[:questionnaire_id].nil?
-      flash[:error] = "Missing questionnaire:" + params[:questionnaire_id]
+      flash[:error] = 'Missing questionnaire:' + params[:questionnaire_id]
       return
     end
 
     assignment = Assignment.find(params[:assignment_id])
     if assignment.nil?
-      flash[:error] = "Assignment #" + assignment.id + " does not currently exist."
+      flash[:error] = 'Assignment #' + assignment.id + ' does not currently exist.'
       return
     end
 
     questionnaire = Questionnaire.find(params[:questionnaire_id])
     if questionnaire.nil?
-      flash[:error] = "Questionaire #" + questionnaire.id + " does not currently exist."
+      flash[:error] = 'Questionnaire #' + questionnaire.id + ' does not currently exist.'
       return
     end
 

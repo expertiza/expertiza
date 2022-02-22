@@ -9,6 +9,10 @@ class JoinTeamRequestsController < ApplicationController
   end
 
   def index
+    unless current_user_has_admin_privileges?
+      redirect_to '/'
+      return
+    end
     @join_team_requests = JoinTeamRequest.all
     respond_after @join_team_requests
   end
@@ -38,7 +42,7 @@ class JoinTeamRequestsController < ApplicationController
         format.html { redirect_to(@join_team_request, notice: 'JoinTeamRequest was successfully created.') }
         format.xml  { render xml: @join_team_request, status: :created, location: @join_team_request }
       else
-        format.html { render action: "new" }
+        format.html { render action: 'new' }
         format.xml  { render xml: @join_team_request.errors, status: :unprocessable_entity }
       end
     end
@@ -51,7 +55,7 @@ class JoinTeamRequestsController < ApplicationController
         format.html { redirect_to(@join_team_request, notice: 'JoinTeamRequest was successfully updated.') }
         format.xml  { head :ok }
       else
-        format.html { render action: "edit" }
+        format.html { render action: 'edit' }
         format.xml  { render xml: @join_team_request.errors, status: :unprocessable_entity }
       end
     end
@@ -79,8 +83,8 @@ class JoinTeamRequestsController < ApplicationController
     # check if the advertisement is from a team member and if so disallow requesting invitations
     team_member = TeamsUser.where(['team_id =? and user_id =?', params[:team_id], session[:user][:id]])
     team = Team.find(params[:team_id])
-    return flash[:error] = "This team is full." if team.full?
-    return flash[:error] = "You are already a member of this team." unless team_member.empty?
+    return flash[:error] = 'This team is full.' if team.full?
+    return flash[:error] = 'You are already a member of this team.' unless team_member.empty?
   end
 
   def find_request

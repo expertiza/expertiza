@@ -1,4 +1,4 @@
-# Removed failing test cases regarding the reviews_by_reviewer method in assignment_participant, which was removed because it was unused elsewhere in the application. 
+# Removed failing test cases regarding the reviews_by_reviewer method in assignment_participant, which was removed because it was unused elsewhere in the application.
 # Committed by lburgess07 on 10/14/2020 hash: 76d145836
 describe CollusionCycle do
   #
@@ -255,85 +255,85 @@ describe CollusionCycle do
           end
         end
 
-      context 'when current assignment participant was not reviewed by the reviewee of current reviewee (ap1)' do
-        it 'skips current reviewer (ap3) and returns corresponding collusion cycles' do
-          allow(participant1).to receive(:reviews_by_reviewer).with(participant2).and_return(nil)
-          allow(participant2).to receive(:reviews_by_reviewer).with(participant3).and_return(response_2_3)
-          allow(participant3).to receive(:reviews_by_reviewer).with(participant4).and_return(response_3_4)
-          allow(participant4).to receive(:reviews_by_reviewer).with(participant1).and_return(response_4_1)
+        context 'when current assignment participant was not reviewed by the reviewee of current reviewee (ap1)' do
+          it 'skips current reviewer (ap3) and returns corresponding collusion cycles' do
+            allow(participant1).to receive(:reviews_by_reviewer).with(participant2).and_return(nil)
+            allow(participant2).to receive(:reviews_by_reviewer).with(participant3).and_return(response_2_3)
+            allow(participant3).to receive(:reviews_by_reviewer).with(participant4).and_return(response_3_4)
+            allow(participant4).to receive(:reviews_by_reviewer).with(participant1).and_return(response_4_1)
 
-          # Tests if current assignment participant was not reviewed by current reviewer
-          expect(cycle.four_node_cycles(participant1)).to eq([])
+            # Tests if current assignment participant was not reviewed by current reviewer
+            expect(cycle.four_node_cycles(participant1)).to eq([])
+          end
+        end
+
+        context 'when the reviewee of current reviewee (ap1) was not reviewed by current reviewee (ap2)' do
+          it 'skips current reviewer (ap3) and returns corresponding collusion cycles' do
+            allow(participant1).to receive(:reviews_by_reviewer).with(participant2).and_return(response_1_2)
+            allow(participant2).to receive(:reviews_by_reviewer).with(participant3).and_return(nil)
+            allow(participant3).to receive(:reviews_by_reviewer).with(participant4).and_return(response_3_4)
+            allow(participant4).to receive(:reviews_by_reviewer).with(participant1).and_return(response_4_1)
+            expect(cycle.four_node_cycles(participant1)).to eq([])
+          end
+        end
+
+        context 'when current reviewee (ap2) was not reviewed by current reviewer (ap3)' do
+          it 'skips current reviewer (ap3) and returns corresponding collusion cycles' do
+            allow(participant1).to receive(:reviews_by_reviewer).with(participant2).and_return(response_1_2)
+            allow(participant2).to receive(:reviews_by_reviewer).with(participant3).and_return(response_2_3)
+            allow(participant3).to receive(:reviews_by_reviewer).with(participant4).and_return(nil)
+            allow(participant4).to receive(:reviews_by_reviewer).with(participant1).and_return(response_4_1)
+
+            # Tests if current assignment participant was not reviewed by current reviewer
+            expect(cycle.four_node_cycles(participant1)).to eq([])
+          end
+        end
+
+        context 'when current reviewer (ap3) was not reviewed by current assignment participant' do
+          it 'skips current reviewer (ap3) and returns corresponding collusion cycles' do
+            allow(participant1).to receive(:reviews_by_reviewer).with(participant2).and_return(response_1_2)
+            allow(participant2).to receive(:reviews_by_reviewer).with(participant3).and_return(response_2_3)
+            allow(participant3).to receive(:reviews_by_reviewer).with(participant4).and_return(response_3_4)
+            allow(participant4).to receive(:reviews_by_reviewer).with(participant1).and_return(nil)
+            # Tests if reviewer was not reviewed by assignment participant
+            expect(cycle.four_node_cycles(participant1)).to eq([])
+          end
         end
       end
+    end
 
-      context 'when the reviewee of current reviewee (ap1) was not reviewed by current reviewee (ap2)' do
-        it 'skips current reviewer (ap3) and returns corresponding collusion cycles' do
-          allow(participant1).to receive(:reviews_by_reviewer).with(participant2).and_return(response_1_2)
-          allow(participant2).to receive(:reviews_by_reviewer).with(participant3).and_return(nil)
-          allow(participant3).to receive(:reviews_by_reviewer).with(participant4).and_return(response_3_4)
-          allow(participant4).to receive(:reviews_by_reviewer).with(participant1).and_return(response_4_1)
-          expect(cycle.four_node_cycles(participant1)).to eq([])
+    describe '#cycle_similarity_score' do
+      context 'when collusion cycle has been calculated, verify the similarity score' do
+        it 'returns similarity score based on inputted 2 node cycle' do
+          c = [[participant1, 90], [participant2, 70]]
+          expect(cycle.cycle_similarity_score(c)).to eql(20.0)
+        end
+        it 'returns similarity score based on inputted 3 node cycle' do
+          c = [[participant1, 90], [participant2, 60], [participant2, 30]]
+          expect(cycle.cycle_similarity_score(c)).to eql(40.0)
+        end
+        it 'returns similarity score based on inputted 4 node cycle' do
+          c = [[participant1, 80], [participant1, 40], [participant1, 40], [participant1, 0]]
+          expect(cycle.cycle_similarity_score(c)).to eql(40.0)
         end
       end
+    end
 
-      context 'when current reviewee (ap2) was not reviewed by current reviewer (ap3)' do
-        it 'skips current reviewer (ap3) and returns corresponding collusion cycles' do
-          allow(participant1).to receive(:reviews_by_reviewer).with(participant2).and_return(response_1_2)
-          allow(participant2).to receive(:reviews_by_reviewer).with(participant3).and_return(response_2_3)
-          allow(participant3).to receive(:reviews_by_reviewer).with(participant4).and_return(nil)
-          allow(participant4).to receive(:reviews_by_reviewer).with(participant1).and_return(response_4_1)
-
-          # Tests if current assignment participant was not reviewed by current reviewer
-          expect(cycle.four_node_cycles(participant1)).to eq([])
+    describe '#cycle_deviation_score' do
+      context 'when collusion cycle has been calculated, verify the deviation score' do
+        it 'returns cycle deviation score based on inputted 2 node cycle' do
+          c = [[participant1, 91], [participant2, 71]]
+          expect(cycle.cycle_deviation_score(c)).to eql(1.0)
         end
-      end
-
-      context 'when current reviewer (ap3) was not reviewed by current assignment participant' do
-        it 'skips current reviewer (ap3) and returns corresponding collusion cycles' do
-          allow(participant1).to receive(:reviews_by_reviewer).with(participant2).and_return(response_1_2)
-          allow(participant2).to receive(:reviews_by_reviewer).with(participant3).and_return(response_2_3)
-          allow(participant3).to receive(:reviews_by_reviewer).with(participant4).and_return(response_3_4)
-          allow(participant4).to receive(:reviews_by_reviewer).with(participant1).and_return(nil)
-          # Tests if reviewer was not reviewed by assignment participant
-          expect(cycle.four_node_cycles(participant1)).to eq([])
+        it 'returns cycle deviation score based on inputted 3 node cycle' do
+          c = [[participant1, 92], [participant2, 72], [participant3, 97]]
+          expect(cycle.cycle_deviation_score(c)).to eql(2.0)
+        end
+        it 'returns cycle deviation score based on inputted 4 node cycle' do
+          c = [[participant1, 91], [participant2, 71], [participant3, 100], [participant4, 99]]
+          expect(cycle.cycle_deviation_score(c)).to eql(1.0)
         end
       end
     end
   end
-
-  describe '#cycle_similarity_score' do
-    context 'when collusion cycle has been calculated, verify the similarity score' do
-      it 'returns similarity score based on inputted 2 node cycle' do
-        c = [[participant1, 90], [participant2, 70]]
-        expect(cycle.cycle_similarity_score(c)).to eql(20.0)
-      end
-      it 'returns similarity score based on inputted 3 node cycle' do
-        c = [[participant1, 90], [participant2, 60], [participant2, 30]]
-        expect(cycle.cycle_similarity_score(c)).to eql(40.0)
-      end
-      it 'returns similarity score based on inputted 4 node cycle' do
-        c = [[participant1, 80], [participant1, 40], [participant1, 40], [participant1, 0]]
-        expect(cycle.cycle_similarity_score(c)).to eql(40.0)
-      end
-    end
-  end
-
-  describe '#cycle_deviation_score' do
-    context 'when collusion cycle has been calculated, verify the deviation score' do
-      it 'returns cycle deviation score based on inputted 2 node cycle' do
-        c = [[participant1, 91], [participant2, 71]]
-        expect(cycle.cycle_deviation_score(c)).to eql(1.0)
-      end
-      it 'returns cycle deviation score based on inputted 3 node cycle' do
-        c = [[participant1, 92], [participant2, 72], [participant3, 97]]
-        expect(cycle.cycle_deviation_score(c)).to eql(2.0)
-      end
-      it 'returns cycle deviation score based on inputted 4 node cycle' do
-        c = [[participant1, 91], [participant2, 71], [participant3, 100], [participant4, 99]]
-        expect(cycle.cycle_deviation_score(c)).to eql(1.0)
-      end
-    end
-  end
-end
 end

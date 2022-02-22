@@ -3,9 +3,9 @@ describe Participant do
   let(:user) { build(:student, id: 4, name: 'no name', fullname: 'no two') }
   let(:team_user) { build(:team_user, id: 1, user: user, team: team) }
   let(:topic) { build(:topic) }
-  let(:participant) { build(:participant, user: build(:student, name: "Jane", fullname: "Doe, Jane", id: 1)) }
-  let(:participant2) { build(:participant, user: build(:student, name: "John", fullname: "Doe, John", id: 2)) }
-  let(:participant3) { build(:participant, can_review: false, user: build(:student, name: "King", fullname: "Titan, King", id: 3)) }
+  let(:participant) { build(:participant, user: build(:student, name: 'Jane', fullname: 'Doe, Jane', id: 1)) }
+  let(:participant2) { build(:participant, user: build(:student, name: 'John', fullname: 'Doe, John', id: 2)) }
+  let(:participant3) { build(:participant, can_review: false, user: build(:student, name: 'King', fullname: 'Titan, King', id: 3)) }
   let(:participant4) { Participant.new }
   let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
   let(:participant5) { build(:participant, user: user, assignment: assignment) }
@@ -36,21 +36,21 @@ describe Participant do
     end
   end
 
-  describe "#name" do
-    it "returns the name of the user" do
-      expect(participant.name).to eq("Jane")
+  describe '#name' do
+    it 'returns the name of the user' do
+      expect(participant.name).to eq('Jane')
     end
   end
 
-  describe "#fullname" do
-    it "returns the full name of the user" do
-      expect(participant.fullname).to eq("Doe, Jane")
+  describe '#fullname' do
+    it 'returns the full name of the user' do
+      expect(participant.fullname).to eq('Doe, Jane')
     end
   end
 
   describe '#handle' do
     it 'returns the handle of the participant' do
-      expect(participant.handle(nil)).to eq("handle")
+      expect(participant.handle(nil)).to eq('handle')
     end
   end
 
@@ -72,7 +72,7 @@ describe Participant do
     end
     it 'raises error, delete participant with associations and force is nil' do
       allow(participant).to receive(:team).and_return(team)
-      expect { participant.delete(nil) }.to raise_error.with_message("Associations exist for this participant.")
+      expect { participant.delete(nil) }.to raise_error.with_message('Associations exist for this participant.')
     end
   end
 
@@ -84,7 +84,7 @@ describe Participant do
     end
     it 'returns the participant topic name when not nil' do
       allow(participant).to receive(:topic).and_return(topic)
-      expect(participant.topic_name).to eq("Hello world!")
+      expect(participant.topic_name).to eq('Hello world!')
     end
   end
 
@@ -99,37 +99,49 @@ describe Participant do
 
   describe '#email' do
     it 'sends an email to the participant' do
-      expect { participant.email("Missing 'pw'", "Missing 'home_page'") }.to change { ActionMailer::Base.deliveries.count }.by(2)
+      expect { participant.email("Missing 'pw'", "Missing 'home_page'") }.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
   end
 
-  describe '#get_permissions' do
+  describe '#participant_permissions' do
     it 'returns the permissions of participant' do
-      expect(Participant.get_permissions('participant')).to contain_exactly([:can_submit, true], [:can_review, true], [:can_take_quiz, true])
+      expect(participant.participant_permissions('participant')).to contain_exactly([:can_submit, true], [:can_review, true], [:can_take_quiz, true])
     end
     it 'returns the permissions of reader' do
-      expect(Participant.get_permissions('reader')).to contain_exactly([:can_submit, false], [:can_review, true], [:can_take_quiz, true])
+      expect(participant.participant_permissions('reader')).to contain_exactly([:can_submit, false], [:can_review, true], [:can_take_quiz, true])
     end
     it 'returns the permissions of reviewer' do
-      expect(Participant.get_permissions('reviewer')).to contain_exactly([:can_submit, false], [:can_review, true], [:can_take_quiz, false])
+      expect(participant.participant_permissions('reviewer')).to contain_exactly([:can_submit, false], [:can_review, true], [:can_take_quiz, false])
     end
     it 'returns the permissions of submitter' do
-      expect(Participant.get_permissions('submitter')).to contain_exactly([:can_submit, true], [:can_review, false], [:can_take_quiz, false])
+      expect(participant.participant_permissions('submitter')).to contain_exactly([:can_submit, true], [:can_review, false], [:can_take_quiz, false])
     end
   end
 
-  describe '#get_authorization' do
+  describe '#authorization' do
     it 'returns participant when no arguments are passed' do
-      expect(Participant.get_authorization(nil, nil, nil)).to eq('participant')
+      allow(participant).to receive(:can_submit).and_return(nil)
+      allow(participant).to receive(:can_review).and_return(nil)
+      allow(participant).to receive(:can_take_quiz).and_return(nil)
+      expect(participant.authorization).to eq('participant')
     end
     it 'returns reader when no arguments are passed' do
-      expect(Participant.get_authorization(false, true, true)).to eq('reader')
+      allow(participant).to receive(:can_submit).and_return(false)
+      allow(participant).to receive(:can_review).and_return(true)
+      allow(participant).to receive(:can_take_quiz).and_return(true)
+      expect(participant.authorization).to eq('reader')
     end
     it 'returns submitter when no arguments are passed' do
-      expect(Participant.get_authorization(true, false, false)).to eq('submitter')
+      allow(participant).to receive(:can_submit).and_return(true)
+      allow(participant).to receive(:can_review).and_return(false)
+      allow(participant).to receive(:can_take_quiz).and_return(false)
+      expect(participant.authorization).to eq('submitter')
     end
     it 'returns reviewer when no arguments are passed' do
-      expect(Participant.get_authorization(false, true, false)).to eq('reviewer')
+      allow(participant).to receive(:can_submit).and_return(false)
+      allow(participant).to receive(:can_review).and_return(true)
+      allow(participant).to receive(:can_take_quiz).and_return(false)
+      expect(participant.authorization).to eq('reviewer')
     end
   end
 

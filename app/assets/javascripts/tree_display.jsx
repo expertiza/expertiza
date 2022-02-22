@@ -49,11 +49,6 @@ const node_attributes = {
         href: '/review_mapping/list_mappings?id=' + `${parseInt(props.id) / 2}`,
         src: '/assets/tree_view/assign-reviewers-24.png'
       }),
-      (props) => ({
-        title: 'Assign survey',
-        href: '/survey_deployment/new?id=' + `${parseInt(props.id) / 2}` + '&type=AssignmentSurveyDeployment',
-        src: '/assets/tree_view/assign-survey-24.png'
-      }),
       (props) =>
         props.require_quiz
           ? {
@@ -79,11 +74,6 @@ const node_attributes = {
         title: 'View reports',
         href: '/reports/response_report?id=' + `${parseInt(props.id) / 2}`,
         src: '/assets/tree_view/view-review-report-24.png'
-      }),
-      (props) => ({
-        title: 'View survey responses',
-        href: '/survey_deployment/view_responses?id=' + `${parseInt(props.id) / 2}`,
-        src: '/assets/tree_view/view-survey-24.png'
       }),
       (props) =>
         props.is_intelligent
@@ -167,11 +157,6 @@ const node_attributes = {
         src: '/assets/tree_view/360-dashboard-24.png'
       },
       {
-        title: 'Assign survey',
-        href: '/survey_deployment/new?type=CourseSurveyDeployment&id=',
-        src: '/assets/tree_view/assign-survey-24.png'
-      },
-      {
         title: 'View aggregated teammate & meta reviews',
         href: '/assessment360/all_students_all_reviews?course_id=',
         src: null,
@@ -240,7 +225,7 @@ window.addEventListener('load', (e) => {
 })
 
 jQuery(document).ready(function() {
-  // This preloadedImages function is refered from http://jsfiddle.net/slashingweapon/8jAeu/
+  // This preloadedImages function is referred from http://jsfiddle.net/slashingweapon/8jAeu/
   // Actually I am not using the values in preloadedImages, but image loading speed is indeed getting faster
   let treeDisplayDiv = document.querySelector('#tree_display');
 
@@ -605,9 +590,6 @@ jQuery(document).ready(function() {
         'Metareview',
         'Author Feedback',
         'Teammate Review',
-        'Assignment Survey',
-        'Global Survey',
-        'Course Survey'
       ]
 
       //selectedMenuItem then takes the clicked rubric from the panel under questionnaire
@@ -1038,7 +1020,6 @@ jQuery(document).ready(function() {
             return
           }
         })
-        /** this was protecting an always null field, weird TODO */
         if (this.props.showPublic) {
           if (this.props.dataType == 'course') {
             _rows.push(<TitleRow title="Others' Public Courses" />)
@@ -1277,7 +1258,7 @@ jQuery(document).ready(function() {
     }
   })
 
-  /** beta branch isnt getting a prop related to the data to be displayed in the dropdown */
+  /** beta branch isn't getting a prop related to the data to be displayed in the dropdown */
   var FilterableTable = React.createClass({
     getInitialState: function() {
       return {

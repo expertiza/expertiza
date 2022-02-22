@@ -16,8 +16,8 @@
                  :reviewer_id => session[:user].id do %>
 
         <input id="i_dont_care" name="i_dont_care" type="checkbox" onchange="toggleVis(this.checked, 'topic_list');" />
-        I don't care which topic I review.
-        <p><b>Select a topic below to begin a new review:</b></p>
+        <%=t ".i_don't_care"%>
+        <p><b><%=t ".select_topic"%></b></p>
 
     <table cellpadding="0" id="topic_list">
       <% #candidate_topics_to_review = assignment.candidate_topics_to_review(session[:user]).to_a %>
@@ -41,7 +41,7 @@
       <% end %>
     </table>
 
-  <p><input type='submit' value='Request a new submission to review'/></p>
+  <p><input type='submit' value= <%= t(".request_new_submission").to_s %> /></p>
     <% end %>
   <%end%>
 <% else %>
@@ -51,7 +51,7 @@
                  :action => 'assign_reviewer_dynamically',
                  :assignment_id => assignment.id,
                  :reviewer_id => session[:user].id do %>
-    <p><input type='submit' value='Request a new submission to review'/></p>
+    <p><input type='submit' value=t(".request_new_submission")/></p>
   <% end %>
   <%end%>
 <% end %>

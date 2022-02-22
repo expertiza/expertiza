@@ -1,6 +1,6 @@
 class Mailer < ActionMailer::Base
   if Rails.env.development? || Rails.env.test?
-    default from: 'expertiza.development@gmail.com'
+    default from: 'expertiza.debugging@gmail.com'
   else
     default from: 'expertiza-support@lists.ncsu.edu'
   end
@@ -13,29 +13,14 @@ class Mailer < ActionMailer::Base
     @new_pct = defn[:body][:new_pct]
     @avg_pct = defn[:body][:avg_pct]
     @assignment = defn[:body][:assignment]
-
-    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
-    mail(subject: defn[:subject],
-         to: defn[:to],
-         bcc: defn[:bcc])
-  end
-
-  def generic_message(defn)
-    @partial_name = defn[:body][:partial_name]
-    @user = defn[:body][:user]
-    @first_name = defn[:body][:first_name]
-    @password = defn[:body][:password]
-    @new_pct = defn[:body][:new_pct]
-    @avg_pct = defn[:body][:avg_pct]
-    @assignment = defn[:body][:assignment]
     @conference_variable = defn[:body][:conference_variable]
 
-    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
+    defn[:to] = 'expertiza.debugging@gmail.com' if Rails.env.development? || Rails.env.test?
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:bcc])
   end
-  
+
   def request_user_message(defn)
     @user = defn[:body][:user]
     @super_user = defn[:body][:super_user]
@@ -44,7 +29,7 @@ class Mailer < ActionMailer::Base
     @avg_pct = defn[:body][:avg_pct]
     @assignment = defn[:body][:assignment]
 
-    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
+    defn[:to] = 'expertiza.debugging@gmail.com' if Rails.env.development? || Rails.env.test?
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:bcc])
@@ -58,7 +43,7 @@ class Mailer < ActionMailer::Base
     @first_name = defn[:body][:first_name]
     @partial_name = defn[:body][:partial_name]
 
-    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
+    defn[:to] = 'expertiza.debugging@gmail.com' if Rails.env.development? || Rails.env.test?
     mail(subject: defn[:subject],
          to: defn[:to])
   end
@@ -66,7 +51,7 @@ class Mailer < ActionMailer::Base
   def delayed_message(defn)
     ret = mail(subject: defn[:subject],
                body: defn[:body],
-               content_type: "text/html",
+               content_type: 'text/html',
                bcc: defn[:bcc])
     ExpertizaLogger.info(ret.encoded.to_s)
   end
@@ -76,7 +61,7 @@ class Mailer < ActionMailer::Base
     @topic_name = defn[:body][:approved_topic_name]
     @proposer = defn[:body][:proposer]
 
-    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
+    defn[:to] = 'expertiza.debugging@gmail.com' if Rails.env.development? || Rails.env.test?
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:cc])
@@ -94,19 +79,19 @@ class Mailer < ActionMailer::Base
     @summary_url = @body[:summary_url]
     @assignment_edit_url = @body[:assignment_edit_url]
 
-    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
+    defn[:to] = 'expertiza.debugging@gmail.com' if Rails.env.development? || Rails.env.test?
     mail(subject: defn[:subject],
          to: defn[:to])
   end
 
-  #Email about a review rubric being changed. If this is successful, then the answers are deleted for a user's response
+  # Email about a review rubric being changed. If this is successful, then the answers are deleted for a user's response
   def notify_review_rubric_change(defn)
     @body = defn[:body]
     @answers = defn[:body][:answers]
     @name = defn[:body][:name]
     @assignment_name = defn[:body][:assignment_name]
-    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
-    mail(:subject => defn[:subject],
-         :to => defn[:to])
+    defn[:to] = 'expertiza.debugging@gmail.com' if Rails.env.development? || Rails.env.test?
+    mail(subject: defn[:subject],
+         to: defn[:to])
   end
 end

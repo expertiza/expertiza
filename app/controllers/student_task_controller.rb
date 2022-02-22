@@ -9,14 +9,18 @@ class StudentTaskController < ApplicationController
 
   def impersonating_as_admin?
     original_user = session[:original_user]
-    admin_role_ids = Role.where(name:%w[Administrator Super-Administrator]).pluck(:id)
+    admin_role_ids = Role.where(name: %w[Administrator Super-Administrator]).pluck(:id)
     admin_role_ids.include? original_user.role_id
   end
 
   def impersonating_as_ta?
     original_user = session[:original_user]
-    ta_role = Role.where(name:['Teaching Assistant']).pluck(:id)
+    ta_role = Role.where(name: ['Teaching Assistant']).pluck(:id)
     ta_role.include? original_user.role_id
+  end
+
+  def controller_locale
+    locale_for_student
   end
 
   def list
@@ -26,13 +30,13 @@ class StudentTaskController < ApplicationController
     if session[:impersonate] && !impersonating_as_admin?
 
       if impersonating_as_ta?
-        ta_course_ids = TaMapping.where(:ta_id => session[:original_user].id).pluck(:course_id)
-        @student_tasks = @student_tasks.select {|t| ta_course_ids.include?t.assignment.course_id }
+        ta_course_ids = TaMapping.where(ta_id: session[:original_user].id).pluck(:course_id)
+        @student_tasks.select! { |t| ta_course_ids.include? t.assignment.course_id }
       else
-        @student_tasks = @student_tasks.select {|t| t.assignment.course and session[:original_user].id == t.assignment.course.instructor_id or !t.assignment.course and session[:original_user].id == t.assignment.instructor_id }
+        @student_tasks.select! { |t| t.assignment.course && (session[:original_user].id == t.assignment.course.instructor_id) || !t.assignment.course && (session[:original_user].id == t.assignment.instructor_id) }
       end
     end
-    @student_tasks.select! {|t| t.assignment.availability_flag }
+    @student_tasks.select! { |t| t.assignment.availability_flag }
 
     # #######Tasks and Notifications##################
     @tasknotstarted = @student_tasks.select(&:not_started?)
@@ -48,7 +52,7 @@ class StudentTaskController < ApplicationController
     @can_submit = @participant.can_submit
     @can_review = @participant.can_review
     @can_take_quiz = @participant.can_take_quiz
-    @authorization = Participant.get_authorization(@can_submit, @can_review, @can_take_quiz)
+    @authorization = @participant.authorization
     @team = @participant.team
     denied unless current_user_id?(@participant.user_id)
     @assignment = @participant.assignment
@@ -67,17 +71,17 @@ class StudentTaskController < ApplicationController
     @assignment = @participant.assignment
     # Finding the current phase that we are in
     due_dates = AssignmentDueDate.where(parent_id: @assignment.id)
-    @very_last_due_date = AssignmentDueDate.where(parent_id: @assignment.id).order("due_at DESC").limit(1)
-    next_due_date = @very_last_due_date[0]
-    for due_date in due_dates
+    @very_last_due_date = AssignmentDueDate.where(parent_id: @assignment.id).order('due_at DESC').limit(1)
+    next_due_date = @very_last_due_date.first
+    due_dates.each do |due_date|
       if due_date.due_at > Time.now
         next_due_date = due_date if due_date.due_at < next_due_date.due_at
       end
     end
 
     @review_phase = next_due_date.deadline_type_id
-    if next_due_date.review_of_review_allowed_id == DeadlineRight::LATE or next_due_date.review_of_review_allowed_id == DeadlineRight::OK
-      @can_view_metareview = true if @review_phase == DeadlineType.find_by(name: "metareview").id
+    if (next_due_date.review_of_review_allowed_id == DeadlineRight::LATE) || (next_due_date.review_of_review_allowed_id == DeadlineRight::OK)
+      @can_view_metareview = true if @review_phase == DeadlineType.find_by(name: 'metareview').id
     end
 
     @review_mappings = ResponseMap.where(reviewer_id: @participant.id)
@@ -85,17 +89,13 @@ class StudentTaskController < ApplicationController
   end
 
   def publishing_rights_update
-	@participant = AssignmentParticipant.find(params[:id])
-        @participant.permission_granted = params[:status]
-	@participant.save
-	respond_to do |format|
-		format.html {head :no_content}
-	end
-   end  
+    @participant = AssignmentParticipant.find(params[:id])
+    @participant.permission_granted = params[:status]
+    @participant.save
+    respond_to do |format|
+      format.html { head :no_content }
+    end
+  end
 
-  
-
-  
-  
   def your_work; end
 end

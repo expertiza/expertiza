@@ -22,7 +22,7 @@ class MentorManagement
   #   they are assigned to. Returns `nil` if there are
   #   no participants with mentor duty for [assignment_id].
   def self.select_mentor(assignment_id)
-    mentor_user_id, _ = self.zip_mentors_with_team_count(assignment_id).first
+    mentor_user_id, = zip_mentors_with_team_count(assignment_id).first
     User.where(id: mentor_user_id).first
   end
 
@@ -76,12 +76,12 @@ class MentorManagement
   def self.notify_team_of_mentor_assignment(mentor, team)
     members = team.users
     emails = members.map(&:email)
-    members_info = members.map{|mem| "#{mem.fullname} - #{mem.email}"}
+    members_info = members.map { |mem| "#{mem.fullname} - #{mem.email}" }
     mentor_info = "#{mentor.fullname} (#{mentor.email})"
     message = "#{mentor_info} has been assigned as your mentor for assignment #{Assignment.find(team.parent_id).name} <br>Current members:<br> #{members_info.join('<br>')}"
 
     Mailer.delayed_message(bcc: emails,
-                           subject: "[Expertiza]: New Mentor Assignment",
+                           subject: '[Expertiza]: New Mentor Assignment',
                            body: message).deliver_now
   end
 
@@ -108,7 +108,7 @@ class MentorManagement
   # number of teams they're part of, which acts as a proxy for
   # the number of teams they're mentoring.
   def self.zip_mentors_with_team_count(assignment_id)
-    mentor_ids = self.mentors_for_assignment(assignment_id).pluck(:user_id)
+    mentor_ids = mentors_for_assignment(assignment_id).pluck(:user_id)
 
     return [] if mentor_ids.empty?
 
@@ -118,5 +118,4 @@ class MentorManagement
 
     team_counts.sort_by { |_, v| v }
   end
-
 end

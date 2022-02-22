@@ -4,7 +4,7 @@
   <p><label for="role_id">Role</label><br/>
     <%= collection_select 'user', 'role_id', @all_roles, :id, :name %></p>
 
-  <%= render :partial => 'user', :locals => { :request_user =>false} %>
+  <%= render :partial => 'user', :locals => { :request_user =>false, :edit => true} %>
   <%= submit_tag 'Edit' %>
 <% end %>
 

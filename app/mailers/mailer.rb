@@ -13,21 +13,6 @@ class Mailer < ActionMailer::Base
     @new_pct = defn[:body][:new_pct]
     @avg_pct = defn[:body][:avg_pct]
     @assignment = defn[:body][:assignment]
-
-    defn[:to] = 'expertiza.debugging@gmail.com' if Rails.env.development? || Rails.env.test?
-    mail(subject: defn[:subject],
-         to: defn[:to],
-         bcc: defn[:bcc])
-  end
-
-  def generic_message(defn)
-    @partial_name = defn[:body][:partial_name]
-    @user = defn[:body][:user]
-    @first_name = defn[:body][:first_name]
-    @password = defn[:body][:password]
-    @new_pct = defn[:body][:new_pct]
-    @avg_pct = defn[:body][:avg_pct]
-    @assignment = defn[:body][:assignment]
     @conference_variable = defn[:body][:conference_variable]
 
     defn[:to] = 'expertiza.debugging@gmail.com' if Rails.env.development? || Rails.env.test?

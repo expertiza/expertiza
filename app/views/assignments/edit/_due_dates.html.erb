@@ -541,7 +541,7 @@
   <script>
       function addTeamInformation() {
           <% if @assignment_form.assignment.team_assignment? && due_date(@assignment_form.assignment, 'team_formation').due_at %>
-            addDueDateTableElement(<%= @due_date_nameurl_not_empty.nil ? false:@due_date_nameurl_not_empty %>, 'team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
+            addDueDateTableElement(<%= @due_date_nameurl_not_empty.nil? ? false:@due_date_nameurl_not_empty %>, 'team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
           <% end %>
       }
       jQuery(document).ready(function () {

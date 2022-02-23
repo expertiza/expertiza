@@ -31,7 +31,7 @@ module ReportFormatterHelper
     assign_basics(params)
     @reviewers = BookmarkRatingResponseMap.bookmark_response_report(@id)
     @topics = @assignment.sign_up_topics
-   end
+  end
 
   def calibration(params, session)
     assign_basics(params)

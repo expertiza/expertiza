@@ -95,7 +95,7 @@ class StudentTaskController < ApplicationController
     respond_to do |format|
       format.html { head :no_content }
     end
-   end
+  end
 
   def your_work; end
 end

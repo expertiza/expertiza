@@ -1,8 +1,4 @@
 Expertiza::Application.routes.draw do
-  resources :duties
-  ###
-  # Please insert new routes alphabetically!
-  ###
 
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
@@ -99,6 +95,8 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :duties
+  
   resources :eula, only: [] do
     collection do
       get :accept
@@ -464,7 +462,6 @@ Expertiza::Application.routes.draw do
   resources :teams, only: %i[new create edit update] do
     collection do
       get :list
-      post ':id', action: :update
       post :create_teams
       post :inherit
     end
@@ -499,6 +496,7 @@ Expertiza::Application.routes.draw do
       get :auto_complete_for_user_name
       get :set_anonymized_view
       get :keys
+      delete :destroy
     end
   end
 
@@ -529,7 +527,6 @@ Expertiza::Application.routes.draw do
   root to: 'content_pages#view', page_name: 'home'
   post :login, to: 'auth#login'
   post :logout, to: 'auth#logout'
-  get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
   get '/auth/*path', to: redirect('/')
   get '/menu/*name', controller: :menu_items, action: :link

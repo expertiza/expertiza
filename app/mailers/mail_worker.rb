@@ -27,7 +27,7 @@ class MailWorker
                        'teammate review'
                      else
                        self.deadline_type
-      end
+                     end
 
       email_reminder(participant_mails, deadlineText) unless participant_mails.empty?
     end

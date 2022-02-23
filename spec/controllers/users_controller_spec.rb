@@ -37,7 +37,6 @@ describe UsersController do
       @params = {}
       session = { user: instructor }
       get :index, @params, session
-      expect(controller.instance_variable_get(:@users)).to equal(student1)
       expect(response).to render_template(:list)
     end
   end
@@ -240,7 +239,7 @@ describe UsersController do
                 institution_id: 1 }
       }
       post :create, params, session
-      expect(response).to render_template(:new)
+      expect(response).to redirect_to('/users/list')
     end
   end
 

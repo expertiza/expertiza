@@ -41,13 +41,13 @@ class ConferenceController < ApplicationController
   def create
     # Check if user needs to be created as author for conference type assignment and add author to assignment
     @recaptcha_succeeded = verify_recaptcha secret_key: '6Lfb_uEZAAAAAPcSk-9fcNh3syzfvfagPeNc8Y_B'
-    if @recaptcha_succeeded == true && add_conference_user
+    if @recaptcha_succeeded && add_conference_user
       add_conference_user_as_participant
     else
       url = polymorphic_url :conference, action: 'new', role: 'Student', assignment_id: params[:user][:assignment]
       return redirect_to url
     end
-end
+  end
 
   def add_conference_user
     # check if user is already present with given username in system

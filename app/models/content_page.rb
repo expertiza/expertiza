@@ -40,9 +40,9 @@ class ContentPage < ActiveRecord::Base
         RedCloth.new(content).to_html(:markdown)
       else
         content
-                     end
+      end
     else
       content
-        end
+    end
   end
 end

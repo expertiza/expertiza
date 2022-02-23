@@ -29,6 +29,16 @@ describe User do
     it 'returns the full name of the user' do
       expect(user.fullname).to eq('abc xyz')
     end
+
+    it 'Validate presence of fullname which cannot be blank' do
+      user.fullname = '  '
+      expect(user).not_to be_valid
+    end
+
+    it 'Validate the email format correctness' do
+      user.fullname = 'John Bumgardner'
+      expect(user).to be_valid
+    end
   end
 
   describe '#email' do
@@ -321,7 +331,7 @@ describe User do
   describe '.export_fields' do
     it 'exports all information setting in options' do
       expect(User.export_fields('personal_details' => 'true', 'role' => 'true', 'parent' => 'true', 'email_options' => 'true', 'handle' => 'true'))
-        .to eq(['name', 'full name', 'email', 'role', 'parent', 'email on submission', 'email on review', 'email on metareview', 'handle'])
+        .to eq(['name', 'full name', 'email', 'role', 'parent', 'email on submission', 'email on review', 'email on metareview', 'copy of emails', 'handle'])
     end
 
     it 'exports only personal_details' do
@@ -336,7 +346,7 @@ describe User do
 
     it 'exports only email_options' do
       expect(User.export_fields('email_options' => 'true'))
-        .to eq(['email on submission', 'email on review', 'email on metareview'])
+        .to eq(['email on submission', 'email on review', 'email on metareview', 'copy of emails'])
     end
 
     it 'exports only handle' do

@@ -324,16 +324,42 @@
       <% end %>
     <% end %>
 
-    <% if @assignment.teams? %>
-      <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-      <%= render :partial => 'submitted_content/main', :locals => { :reviewee_participant => @contributor.participants.first, :participant => @contributor.participants.first, :stage => @assignment.current_stage(topic_id) } %>
-    <% else %>
-      <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-      <%= render :partial => 'submitted_content/main', :locals => { :participant => @contributor, :stage => @assignment.current_stage(topic_id) } %>
-    <% end %>
-    <hr/>
+
+<h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
+<% if !@map.contributor.nil? && !@map.instance_of?(FeedbackResponseMap) %>
+  <% if @map.assignment.team_assignment? %>
+    <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id %>
+    <% topic_id = SignedUpTeam.topic_id(@map.assignment.id, team_member) %>
+  <% else %>
+    <% participant = Participant.find(TeamsUser.find_by_team_id(@map.contributor).user_id) %>
+    <% topic_id = SignedUpTeam.where(participant.parent_id, participant.user_id) %>
   <% end %>
+  <% unless topic_id.nil? %>
+    <% topic = SignUpTopic.find(topic_id) %>
+    <h2>You are reviewing <%= topic.topic_name %></h2>
+    <% unless topic.description.nil? %>
+      <b>Description &nbsp;&nbsp;&nbsp;</b>
+      <% if topic.description.to_s.length > 90 %>
+        <%= topic.description.to_s[0..90] + '...' %>
+        <a style="cursor: pointer" onclick="show_alert('<%= topic.description%>')">more...</a>
+      <% else %>
+        <%= topic.description.to_s %>
+      <% end %>
+      <% unless topic.link.nil? %>
+        <%= link_to image_tag('external-link-16.png', :border => 0, :align => 'middle'), topic.link, :target => '_blank' %>
+      <% end %>
+    <% end %>
+  <% end %>
+  <% if @assignment.teams? %>
+    <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
+    <%= render :partial => 'submitted_content/main', :locals => { :reviewee_participant => @contributor.participants.first, :participant => @contributor.participants.first, :stage => @assignment.current_stage(topic_id) } %>
+  <% else %>
+    <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
+    <%= render :partial => 'submitted_content/main', :locals => { :participant => @contributor, :stage => @assignment.current_stage(topic_id) } %>
+  <% end %>
+  <hr/>
 <% end %>
+
 
 <!-- display all versions available -->
 <% @responses_versions = [] %>
@@ -356,28 +382,26 @@
     <input name="_method" type="hidden" value="put"/>
   <% end %>
   <table width="100%">
-    <tr>
-      <td>
-        <% i = 0 %>
-        <% @questions.each do |question| %>
-          <% answer = Answer.where(question_id: question.id, response_id: @response.id).first unless @response.nil? %>
-          <% if question.instance_of? Criterion %>
-            <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
-          <% elsif question.instance_of? Scale %>
-            <%= question.complete(i, @questionnaire.min_question_score, @questionnaire.max_question_score, answer) %>
-          <% elsif question.instance_of? Cake %>
-            <%= question.complete(i, answer, @total_score[question.id].to_s) %>
-          <% else %>
-            <%= question.complete(i, answer) %>
-          <% end %>
+    <% @questions.each_with_index do |question, i| %>
+      <tr>
+        <td>
+            <% answer = Answer.where(question_id: question.id, response_id: @response.id).first unless @response.nil? %>
+            <% if question.instance_of? Criterion %>
+              <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
+            <% elsif question.instance_of? Scale %>
+              <%= question.complete(i, @questionnaire.min_question_score, @questionnaire.max_question_score, answer) %>
+            <% elsif question.instance_of? Cake %>
+              <%= question.complete(i, answer, @total_score[question.id].to_s) %>
+            <% else %>
+              <%= question.complete(i, answer) %>
+            <% end %>
 
-          <% if [Criterion, TextArea].include? question.class %>
-            <div id="analysis_<%= i.to_s %>_comments"></div>
-          <% end %>
-          <% i += 1 %>
-        <% end %>
-      </td>
-    </tr>
+            <% if [Criterion, TextArea].include? question.class %>
+              <div id="analysis_<%= i.to_s %>_comments"></div>
+            <% end %>
+        </td>
+      </tr>
+    <% end %>
     <tr>
       <td>
         <label for="review_comments">Additional Comments</label><BR/>
@@ -459,3 +483,5 @@
 </script>
 <div id="BackLink"><a href="javascript:window.history.back()">Back</a></div>
 <div id="dialog-message" style="word-wrap: normal"></div>
+
+

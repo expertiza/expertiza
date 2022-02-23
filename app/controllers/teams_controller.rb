@@ -79,7 +79,6 @@ class TeamsController < ApplicationController
     # delete records in team, teams_users, signed_up_teams table
     @team = Team.find_by(id: params[:id])
     unless @team.nil?
-      course = Object.const_get(session[:team_type]).find(@team.parent_id)
       @signed_up_team = SignedUpTeam.where(team_id: @team.id)
       @teams_users = TeamsUser.where(team_id: @team.id)
 
@@ -103,7 +102,7 @@ class TeamsController < ApplicationController
   # The team and team members are all copied.
   def inherit
     assignment = Assignment.find(params[:id])
-    if assignment.course_id >= 0
+    if assignment.course_id
       course = Course.find(assignment.course_id)
       teams = course.get_teams
       if teams.empty?
@@ -119,17 +118,27 @@ class TeamsController < ApplicationController
     redirect_to controller: 'teams', action: 'list', id: assignment.id
   end
 
-  # Copies existing teams from an assignment up to a course
-  # The team and team members are all copied.
-  def bequeath
-    team = AssignmentTeam.find(params[:id])
-    assignment = Assignment.find(team.parent_id)
-    if assignment.course_id >= 0
+  def bequeath_all
+    if session[:team_type] == 'Course'
+      flash[:error] = 'Invalid team type for bequeathal'
+      redirect_to controller: 'teams', action: 'list', id: params[:id]
+      return
+    end
+    assignment = Assignment.find(params[:id])
+    if assignment.course_id
       course = Course.find(assignment.course_id)
-      team.copy(course.id)
-      flash[:note] = 'The team "' + team.name + '" was successfully copied to "' + course.name + '"'
+      if course.course_teams.any?
+        flash[:error] = 'The course already has associated teams'
+        redirect_to controller: 'teams', action: 'list', id: assignment.id
+        return
+      end
+      teams = assignment.teams
+      teams.each do |team|
+        team.copy(course.id)
+      end
+      flash[:note] = teams.length.to_s + ' teams were successfully copied to "' + course.name + '"'
     else
-      flash[:error] = "This assignment is not #{url_for(controller: 'assignment', action: 'assign', id: assignment.id)} with a course."
+      flash[:error] = 'No course was found for this assignment.'
     end
     redirect_to controller: 'teams', action: 'list', id: assignment.id
   end

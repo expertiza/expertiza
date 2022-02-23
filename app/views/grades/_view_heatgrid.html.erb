@@ -154,7 +154,7 @@ function toggleFunction(elementId) {
                   <% end %>
 
 
-                  <% if row.score_row.count == 0 %>
+                  <% if row.score_row.count.zero? %>
                       <% for index in 0 .. score_row_count - 1 %>
                           <td align="center">
                             <%= "" %>

@@ -121,6 +121,7 @@ module ConferenceHelper
 
   def user_params
     params.require(:user).permit(:name,
+                                 :fullname,
                                  :role_id,
                                  :email,
                                  :parent_id,

@@ -3,7 +3,7 @@ class TextArea < TextResponse
     if size.nil?
       cols = '70'
       rows = '1'
-    elsif
+    else
       cols = size.split(',')[0]
       rows = size.split(',')[1]
     end

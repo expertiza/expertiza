@@ -8,7 +8,7 @@
                      :authorization => @authorization}
 %>
 <br/>
-<% if params[:model] == 'Assignment' and @parent.course_id and  @parent.course_id > 0 %>
+<% if params[:model] == 'Assignment' && @parent.course_id %>
   <%= link_to 'Copy participants from course', :action => 'inherit', :id => @root_node.node_object_id %>  |
   <%= link_to 'Copy participants to course', :action => 'bequeath_all', :id => @root_node.node_object_id %><BR/>
 <% end %>

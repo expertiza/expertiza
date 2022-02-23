@@ -26,6 +26,8 @@ class User < ActiveRecord::Base
   validates :email, presence: { message: "can't be blank" }
   validates :email, format: { with: /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, allow_blank: true }
 
+  validates :fullname, presence: true
+
   before_validation :randomize_password, if: ->(user) { user.new_record? && user.password.blank? } # AuthLogic
 
   scope :superadministrators, -> { where role_id: Role.superadministrator }
@@ -172,6 +174,7 @@ class User < ActiveRecord::Base
       user.parent_id = (session[:user]).id
       user.save
     end
+    user
   end
 
   def self.yesorno(elt)
@@ -193,7 +196,7 @@ class User < ActiveRecord::Base
       items = login.split('@')
       short_name = items[0]
       user_list = User.where('name = ?', short_name)
-      user = user_list.first if !user_list.nil? && user_list.length == 1
+      user = user_list.first if user_list.any? && user_list.length == 1
     end
     user
   end
@@ -238,7 +241,7 @@ class User < ActiveRecord::Base
 
     # return the new private key
     new_key.to_pem
-    end
+  end
 
   def initialize(attributes = nil)
     super(attributes)
@@ -258,8 +261,8 @@ class User < ActiveRecord::Base
       tcsv.push(user.role.name) if options['role'] == 'true'
       tcsv.push(user.parent.name) if options['parent'] == 'true'
       tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails) if options['email_options'] == 'true'
-      tcsv.push(user.handle) if options['handle'] == 'true'
       tcsv.push(user.preference_home_flag) if options['preference_home_flag'] == 'true'
+      tcsv.push(user.handle) if options['handle'] == 'true'
       csv << tcsv
     end
   end
@@ -273,7 +276,8 @@ class User < ActiveRecord::Base
     fields.push('name', 'full name', 'email') if options['personal_details'] == 'true'
     fields.push('role') if options['role'] == 'true'
     fields.push('parent') if options['parent'] == 'true'
-    fields.push('email on submission', 'email on review', 'email on metareview') if options['email_options'] == 'true'
+    fields.push('email on submission', 'email on review', 'email on metareview', 'copy of emails') if options['email_options'] == 'true'
+    fields.push('preference home flag') if options['preference_home_flag'] == 'true'
     fields.push('handle') if options['handle'] == 'true'
     fields
   end

@@ -60,7 +60,6 @@ class ReviewBidsController < ApplicationController
     @bids = signed_up_topics
     @num_of_topics = @sign_up_topics.size
     @assigned_review_maps = []
-    selected_topics = []
     ReviewResponseMap.where(reviewed_object_id: @assignment.id, reviewer_id: @participant.id).each do |review_map|
       @assigned_review_maps << review_map
     end
@@ -74,7 +73,6 @@ class ReviewBidsController < ApplicationController
     if params[:topic].nil?
       ReviewBid.where(participant_id: params[:id]).destroy_all
     else
-      participant = AssignmentParticipant.find_by(id: params[:id])
       assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
       @bids = ReviewBid.where(participant_id: params[:id])
       signed_up_topics = ReviewBid.where(participant_id: params[:id]).map(&:signuptopic_id)
@@ -113,7 +111,6 @@ class ReviewBidsController < ApplicationController
   # returns matched assignments as json body
   def run_bidding_algorithm(bidding_data)
     # begin
-    url = WEBSERVICE_CONFIG['review_bidding_webservice_url'] # won't work unless ENV variables are configured
     url = 'http://app-csc517.herokuapp.com/match_topics' # hard coding for the time being
     response = RestClient.post url, bidding_data.to_json, content_type: 'application/json', accept: :json
     JSON.parse(response.body)

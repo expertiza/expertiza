@@ -99,5 +99,6 @@ class ResponseMap < ActiveRecord::Base
     else
       team = AssignmentTeam.find(reviewee_id)
     end
+    team
   end
 end

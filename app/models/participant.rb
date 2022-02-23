@@ -88,11 +88,11 @@ class Participant < ActiveRecord::Base
             subject: "Assignment '#{self.assignment.name}': A submission has been updated since you last reviewed it",
             cc: self.assignment.instructor.email,
             :body => {
-                :obj_name => self.assignment.name,
-                :link => "https://expertiza.ncsu.edu/response/new?id=#{mapping.id}",
-                :type => 'submission',
-                :first_name => ApplicationHelper::get_user_first_name(reviewer),
-                :partial_name => 'updated_submission_since_review'
+              :obj_name => self.assignment.name,
+              :link => "https://expertiza.ncsu.edu/response/new?id=#{mapping.id}",
+              :type => 'submission',
+              :first_name => ApplicationHelper::get_user_first_name(reviewer),
+              :partial_name => 'updated_submission_since_review'
             }
           }
         ).deliver_now

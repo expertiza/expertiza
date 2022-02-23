@@ -83,18 +83,18 @@ class Participant < ActiveRecord::Base
       mappings.each do |mapping|
         reviewer = mapping.reviewer.user
         Mailer.sync_message(
-            {
-                :to => reviewer.email,
-                subject:  "Assignment '#{self.assignment.name}': A submission has been updated since you last reviewed it",
-                cc: self.assignment.instructor.email,
-                :body => {
-                    :obj_name => self.assignment.name,
-                    :link => "https://expertiza.ncsu.edu/response/new?id=#{mapping.id}",
-                    :type => 'submission',
-                    :first_name => ApplicationHelper::get_user_first_name(reviewer),
-                    :partial_name => 'updated_submission_since_review'
-                }
+          {
+            :to => reviewer.email,
+            subject: "Assignment '#{self.assignment.name}': A submission has been updated since you last reviewed it",
+            cc: self.assignment.instructor.email,
+            :body => {
+                :obj_name => self.assignment.name,
+                :link => "https://expertiza.ncsu.edu/response/new?id=#{mapping.id}",
+                :type => 'submission',
+                :first_name => ApplicationHelper::get_user_first_name(reviewer),
+                :partial_name => 'updated_submission_since_review'
             }
+          }
         ).deliver_now
       end
     end

@@ -295,5 +295,5 @@ class Team < ActiveRecord::Base
       nil
     end
   end
-  
+
 end

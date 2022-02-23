@@ -14,8 +14,13 @@ coverage
 app/controllers/auth_controller.rb
 nohup.out
 pg_data/*
+.initialized
 
-
+#################
+## scrubbed_db ##
+#################
+expertiza.sql
+docker-start.sh
 
 #################
 ## scrubbed_db ##

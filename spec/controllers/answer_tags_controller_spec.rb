@@ -17,7 +17,6 @@ describe AnswerTagsController do
   let!(:answer) { create(:answer, question: question1, comments: 'test comment', response_id: response_record.id) }
   let(:tag_prompt) { create(:tag_prompt, id: 3, prompt: '??', desc: 'desc', control_type: 'slider') }
   let(:tag_deploy) { create(:tag_prompt_deployment, id: 3, tag_prompt: tag_prompt, question_type: 'Criterion') }
-
   # To allow the functionality only if the accessing user is having student privileges
   # params: action
   describe '#action_allowed?' do
@@ -75,71 +74,71 @@ describe AnswerTagsController do
       end
 
       it 'when there is one tag prompt deployment but has no answer tag' do
-        params = { assignment_id: 2 }
-        get :index, params
+        request_params = { assignment_id: 2 }
+        get :index, params: request_params
         output = JSON.parse(response.body)
         expect(output.length).to eql(0)
       end
 
       it 'when there is one answer tag for given user_id' do
-        params = { user_id: student.id }
-        get :index, params
+        request_params = { user_id: student.id }
+        get :index, params: request_params
         output = JSON.parse(response.body)
         expect(output.length).to eql(1)
       end
 
       it 'when there is one answer tag for given assignment_id' do
-        params = { assignment_id: assignment.id }
-        get :index, params
+        request_params = { assignment_id: assignment.id }
+        get :index, params: request_params
         output = JSON.parse(response.body)
         expect(output.length).to eql(1)
       end
 
       it 'when there is one answer tag for given questionnaire_id' do
-        params = { questionnaire_id: questionnaire.id }
-        get :index, params
+        request_params = { questionnaire_id: questionnaire.id }
+        get :index, params: request_params
         output = JSON.parse(response.body)
         expect(output.length).to eql(1)
       end
 
       it 'when there are no answer tags for given random user_id' do
-        params = { user_id: 42 }
-        get :index, params
+        request_params = { user_id: 42 }
+        get :index, params: request_params
         output = JSON.parse(response.body)
         expect(output.length).to eql(0)
       end
 
       it 'when there are no answer tags for given random assignment_id' do
-        params = { assignment_id: 42 }
-        get :index, params
+        request_params = { assignment_id: 42 }
+        get :index, params: request_params
         output = JSON.parse(response.body)
         expect(output.length).to eql(0)
       end
 
       it 'when there are no answer tags for given random questionnaire_id' do
-        params = { questionnaire_id: 42 }
-        get :index, params
+        request_params = { questionnaire_id: 42 }
+        get :index, params: request_params
         output = JSON.parse(response.body)
         expect(output.length).to eql(0)
       end
 
       it 'when the user_id is nil' do
-        params = { user_id: nil }
-        get :index, params
+        request_params = { user_id: nil }
+        get :index, params: request_params
         output = JSON.parse(response.body)
         expect(output.length).to eql(0)
       end
 
       it 'when the questionnaire_id is nil' do
-        params = { questionnaire_id: nil }
-        get :index, params
+        request_params = { questionnaire_id: nil }
+        get :index, params: request_params
         output = JSON.parse(response.body)
         expect(output.length).to eql(0)
       end
 
       it 'when the assignment_id is nil' do
-        params = { assignment_id: nil }
-        get :index, params
+        request_params = { assignment_id: nil }
+        get :index, params: request_params
         output = JSON.parse(response.body)
         expect(output.length).to eql(0)
       end
@@ -158,30 +157,30 @@ describe AnswerTagsController do
       end
 
       it 'add entry if not existing and update the old value by new value provided as param' do
-        params = { answer_id: answer.id, tag_prompt_deployment_id: tag_deploy.id, value: '0' }
-        post :create_edit, params, session
+        request_params = { answer_id: answer.id, tag_prompt_deployment_id: tag_deploy.id, value: '0' }
+        post :create_edit, params: request_params
         expect(response).to have_http_status(200)
         expect(AnswerTag.find_by(answer_id: answer.id).value).to eql('0')
       end
 
       it 'restricts updating answer tag by student if no mapping is found related to any answer for that tag (foreign key constraint)' do
-        params = { answer_id: nil, tag_prompt_deployment_id: tag_deploy.id, value: '0' }
+        request_params = { answer_id: nil, tag_prompt_deployment_id: tag_deploy.id, value: '0' }
         expect do
-          post :create_edit, params, session
+          post :create_edit, params: request_params
         end.to raise_error(ActiveRecord::RecordInvalid)
       end
 
       it 'restricts updating answer tag by student if no mapping is found related to any tag_prompt_deployment for that tag (foreign key constraint)' do
-        params = { answer_id: answer.id, tag_prompt_deployment_id: nil, value: '0' }
+        request_params = { answer_id: answer.id, tag_prompt_deployment_id: nil, value: '0' }
         expect do
-          post :create_edit, params, session
+          post :create_edit, params: request_params
         end.to raise_error(ActiveRecord::RecordInvalid)
       end
 
       it 'restricts updating answer tag by student if no updated value is provided for the answer tag' do
-        params = { answer_id: answer.id, tag_prompt_deployment_id: tag_deploy.id, value: nil }
+        request_params = { answer_id: answer.id, tag_prompt_deployment_id: tag_deploy.id, value: nil }
         expect do
-          post :create_edit, params, session
+          post :create_edit, params: request_params
         end.to raise_error(ActiveRecord::RecordInvalid)
       end
     end

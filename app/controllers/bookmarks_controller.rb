@@ -120,10 +120,11 @@ class BookmarksController < ApplicationController
   private
   # TODO: Create a common definition for both create and update to reduce it to single params method
   # Change create method to take bookmark param as required.
-  def create_bookmark_params:
+  def create_bookmark_params
     params.permit(:url, :title, :description, :topic_id, :rating, :id)
   end
 
-  def update_bookmark_params:
+  def update_bookmark_params
     params.require(:bookmark).permit(:url, :title, :description)
+  end
 end

@@ -11,7 +11,7 @@ describe TeamsController do
     it 'will redirect to previous page if the team cannot be found by id' do
       allow(Team).to receive(:find).with(any_args).and_return(nil)
       allow(Team).to receive(:find_by).with(any_args).and_return(nil)
-      post :delete, id: 1
+      post :delete, params: { id: 1 }
       expect(response).to redirect_to 'www.google.com'
     end
 
@@ -29,7 +29,7 @@ describe TeamsController do
       allow(signed_up_teams).to receive(:destroy_all).and_return(true)
       allow(team).to receive(:destroy).and_return(true)
 
-      post :delete, id: 1
+      post :delete, params: { id: 1 }
       expect(response).to redirect_to 'www.google.com'
     end
   end
@@ -116,7 +116,7 @@ describe ReviewMappingController do
     it 'will stay in current page if review_response_map_id is nil' do
       allow(ReviewResponseMap).to receive(:find).with(any_args).and_return(nil)
       allow(ReviewResponseMap).to receive(:find_by).with(any_args).and_return(nil)
-      post :delete_reviewer, id: 1
+      post :delete_reviewer, params: { id: 1 }
       expect(flash[:error]).to eq('This review has already been done. It cannot been deleted.')
       expect(response).to redirect_to 'www.google.com'
     end
@@ -130,7 +130,7 @@ describe ReviewMappingController do
       allow(ReviewResponseMap).to receive(:find_by).with(any_args).and_return(review_response_map)
       allow(Response).to receive(:exists?).with(any_args).and_return(false)
       allow(review_response_map).to receive(:destroy).and_return(true)
-      post :delete_reviewer, id: 1
+      post :delete_reviewer, params: { id: 1 }
       expect(flash[:success]).to eq('The review mapping for "stu1" and "stu2" has been deleted.')
       expect(response).to redirect_to 'www.google.com'
     end

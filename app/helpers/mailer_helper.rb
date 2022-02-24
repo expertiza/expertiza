@@ -53,4 +53,5 @@ module MailerHelper
         }
       }
     )
+  end
 end

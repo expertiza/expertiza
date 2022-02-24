@@ -8,7 +8,7 @@ describe MailWorker do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Participant).to receive(:where).with(parent_id: '1').and_return([participant])
     allow(User).to receive(:where).with(email: "psingh22@ncsu.edu").and_return([user])
-    allow(Participant).to receive(:find).with(user_id: '1', parent_id: '1').and_return([participant])
+    allow(Participant).to receive(:where).with(user_id: '1', parent_id: '1').and_return([participant])
   end
 
   describe 'Tests mailer with sidekiq' do
@@ -19,7 +19,7 @@ describe MailWorker do
       expect(email.subject).to eq("Your Expertiza account and password has been created")
     end
 
-    it "should send reminder email to required email address with proper content" do
+    it 'should send reminder email to required email address with proper content' do
       Sidekiq::Testing.inline!
       ActionMailer::Base.deliveries.clear
       worker = MailWorker.new
@@ -32,7 +32,7 @@ describe MailWorker do
       expect(email.body).to eq("This is a reminder to complete teammate review for assignment no assignment.\nPlease follow the link: http://expertiza.ncsu.edu/student_task/view?id=1\nDeadline is 2018-12-31 00:00:01. If you have already done the teammate review, then please ignore this mail.")
     end
 
-    it "should expect the queue size of one" do
+    it 'should expect the queue size of one' do
       Sidekiq::Testing.fake!
       MailWorker.perform_in(3.hours, '1', 'metareview', '2018-12-31 00:00:01')
       queue = Sidekiq::Queues['mailers']

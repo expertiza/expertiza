@@ -154,16 +154,12 @@ describe Participant do
   end
 
   describe 'check if email is being sent or not' do
-
     it 'participants assignment reviewers are sent email for a new submission' do
-
       allow(AssignmentTeam).to receive(:team).and_return(team)
       allow(TeamsUser).to receive(:find_by).and_return(team_user)
       allow(ResponseMap).to receive(:where).and_return([review_response_map])
       expect { participant5.mail_assigned_reviewers }.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
   end
-
-
 end
 

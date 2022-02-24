@@ -45,7 +45,7 @@ class MailWorker
       user = User.where(email: mail).first
 
       # Finding the mapping between participant and assignment so that it can be sent as a query param
-      participant_assignment_id = Participant.find(user_id: user.id.to_s, parent_id: self.assignment_id.to_s).first.id
+      participant_assignment_id = Participant.where(user_id: user.id.to_s, parent_id: self.assignment_id.to_s).first.id
 
       # This is the link which User can use to navigate
       link_to_destination = "Please follow the link: http://expertiza.ncsu.edu/student_task/view?id=#{participant_assignment_id}\n"

@@ -82,7 +82,7 @@ class Participant < ActiveRecord::Base
     unless mappings.nil?
       mappings.each do |mapping|
         reviewer = mapping.reviewer.user
-        prepared_mail = MailerHelper.send_mail_to_assigned_reviewers(reviewer: reviewer, participant: self, mapping: mapping)
+        prepared_mail = MailerHelper.send_mail_to_assigned_reviewers(reviewer, self, mapping)
         prepared_mail.deliver_now
       end
     end

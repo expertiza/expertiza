@@ -5,7 +5,7 @@
     <div>Instructor</div>
   </p>
 
-  <%= render :partial => 'users/user', :locals => { :new_user => true, :request_user => true } %>
+  <%= render :partial => 'users/user', :locals => { :new_user => true, :request_user => true, :edit => false } %>
 
     <%= submit_tag "Request" %>
 <% end %>

@@ -43,7 +43,7 @@ class InstitutionController < ApplicationController
 
   def update
     @institution = Institution.find(params[:id])
-    if @institution.update_attribute(institution_params)
+    if @institution.update_attribute(:name, params[:institution][:name])
 
       flash[:success] = 'The institution was successfully updated.'
       redirect_to action: 'list'

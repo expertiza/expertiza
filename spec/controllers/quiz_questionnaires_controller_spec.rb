@@ -41,7 +41,7 @@ describe QuizQuestionnairesController do
         end
         context 'when questionnaire type is QuizQuestionnaire' do
           it 'redirects to submitted_content#edit page' do
-            params = { aid: 1,
+            request_params = { aid: 1,
                        pid: 1,
                        questionnaire: { name: 'Test questionnaire',
                                         type: 'QuizQuestionnaire',
@@ -57,7 +57,7 @@ describe QuizQuestionnairesController do
             # save
             allow_any_instance_of(QuizQuestionnairesController).to receive(:save_questions).with(1).and_return(true)
             allow_any_instance_of(QuizQuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
-            post :create, params
+            post :create, params: request_params
             expect(flash[:note]).to eq('The quiz was successfully created.')
             expect(response).to redirect_to('/submitted_content/1/edit')
             expect(controller.instance_variable_get(:@questionnaire).private).to eq false
@@ -71,7 +71,7 @@ describe QuizQuestionnairesController do
 
         context 'when questionnaire type is QuizQuestionnaire and max_question_score value is negative' do
           it 'creates error: The maximum question score must be a positive integer.' do
-            params = { aid: 1,
+            request_params = { aid: 1,
                        pid: 1,
                        questionnaire: { name: 'Test questionnaire',
                                         type: 'QuizQuestionnaire',
@@ -88,7 +88,7 @@ describe QuizQuestionnairesController do
             allow_any_instance_of(QuizQuestionnairesController).to receive(:save_questions).with(1).and_return(true)
             allow_any_instance_of(QuizQuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
             request.env['HTTP_REFERER'] = 'www.google.com'
-            post :create, params
+            post :create, params: request_params
             expect(flash[:error]).to eq('Minimum and/or maximum question score cannot be less than 0.')
             expect(response).to redirect_to('www.google.com')
           end
@@ -96,7 +96,7 @@ describe QuizQuestionnairesController do
 
         context 'when questionnaire type is QuizQuestionnaire and min_question_score value is negative' do
           it 'creates error: The minimum question score must be a positive integer.' do
-            params = { aid: 1,
+            request_params = { aid: 1,
                        pid: 1,
                        questionnaire: { name: 'Test questionnaire',
                                         type: 'QuizQuestionnaire',
@@ -113,7 +113,7 @@ describe QuizQuestionnairesController do
             allow_any_instance_of(QuizQuestionnairesController).to receive(:save_questions).with(1).and_return(true)
             allow_any_instance_of(QuizQuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
             request.env['HTTP_REFERER'] = 'www.google.com'
-            post :create, params
+            post :create, params: request_params
             expect(flash[:error]).to eq('Maximum question score cannot be less than minimum question score.')
             expect(response).to redirect_to('www.google.com')
           end
@@ -130,14 +130,14 @@ describe QuizQuestionnairesController do
 
         context 'when quiz is invalid and questionnaire type is QuizQuestionnaire' do
           it 'redirects to submitted_content#edit page' do
-            params = { aid: 1,
+            request_params = { aid: 1,
                        pid: 1,
                        questionnaire: { name: 'test questionnaire',
                                         type: 'QuizQuestionnaire' } }
             # create_quiz_questionnaire
             allow_any_instance_of(QuizQuestionnairesController).to receive(:validate_quiz).and_return('Please select a correct answer for all questions')
             request.env['HTTP_REFERER'] = 'www.google.com'
-            post :create, params
+            post :create, params: request_params
             expect(flash[:error]).to eq('Please select a correct answer for all questions')
             expect(response).to redirect_to('www.google.com')
           end
@@ -148,8 +148,8 @@ describe QuizQuestionnairesController do
         it 'renders questionnaires#view_quiz' do
           allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire'))
           allow(Participant).to receive(:find).with('1').and_return(double('Participant'))
-          params = { id: 1, pid: 1 }
-          get :view, params
+          request_params = { id: 1, pid: 1 }
+          get :view, params: request_params
           expect(response).to render_template(:view)
         end
       end
@@ -157,7 +157,7 @@ describe QuizQuestionnairesController do
       describe '#new' do
         context 'when an assignment requires quiz' do
           before(:each) do
-            @params = { aid: 1,
+            @request_params = { aid: 1,
                         model: 'QuizQuestionnaire',
                         pid: 1,
                         private: 0 }
@@ -171,13 +171,13 @@ describe QuizQuestionnairesController do
             allow(AssignmentParticipant).to receive_message_chain(:find, :team).with('1').with(no_args).and_return(team)
             allow(@assignment).to receive(:topics?).and_return(true)
             allow(team).to receive(:topic).and_return(double(:SignUpTopic))
-            get :new, @params
+            get :new, params: @request_params
             expect(response).to render_template(:new_quiz)
           end
 
           it 'shows error message and redirects to submitted_content#view if current participant does not have a team' do
             allow(AssignmentParticipant).to receive_message_chain(:find, :team).with('1').with(no_args).and_return(nil)
-            get :new, @params
+            get :new, params: @request_params
             expect(flash[:error]).to eq('You should create or join a team first.')
             expect(response).to redirect_to('/submitted_content/view?id=1')
           end
@@ -187,7 +187,7 @@ describe QuizQuestionnairesController do
             allow(AssignmentParticipant).to receive_message_chain(:find, :team).with('1').with(no_args).and_return(team)
             allow(@assignment).to receive(:topics?).and_return(true)
             allow(team).to receive(:topic).and_return(nil)
-            get :new, @params
+            get :new, params: @request_params
             expect(flash[:error]).to eq('Your team should have a topic.')
             expect(response).to redirect_to('/submitted_content/view?id=1')
           end
@@ -195,14 +195,14 @@ describe QuizQuestionnairesController do
 
         context 'when an assignment does not require quiz' do
           it 'shows error message and redirects to submitted_content#view' do
-            params = { aid: 1,
+            request_params = { aid: 1,
                        model: 'QuizQuestionnaire',
                        pid: 1,
                        private: 0 }
             assignment = double('Assignment')
             allow(Assignment).to receive(:find).with('1').and_return(assignment)
             allow(assignment).to receive(:require_quiz?).and_return(false)
-            get :new, params
+            get :new, params: request_params
             expect(flash[:error]).to eq('This assignment is not configured to use quizzes.')
             expect(response).to redirect_to('/submitted_content/view?id=1')
           end
@@ -219,8 +219,8 @@ describe QuizQuestionnairesController do
           it 'renders questionnaires#edit page' do
             stub_current_user(student, student.role.name, student.role) # action only permitted for Student role
             allow(@questionnaire).to receive(:taken_by_anyone?).and_return(false)
-            params = { id: 1 }
-            get :edit, params
+            request_params = { id: 1 }
+            get :edit, params: request_params
             expect(response).to render_template(:edit)
           end
         end
@@ -229,8 +229,8 @@ describe QuizQuestionnairesController do
           it 'shows flash[:error] message and redirects to submitted_content#view page' do
             stub_current_user(student, student.role.name, student.role) # action only permitted for Student role
             allow(@questionnaire).to receive(:taken_by_anyone?).and_return(true)
-            params = { id: 1, pid: 1 }
-            get :edit, params
+            request_params = { id: 1, pid: 1 }
+            get :edit, params: request_params
             expect(flash[:error]).to eq('Your quiz has been taken by one or more students; you cannot edit it anymore.')
             expect(response).to redirect_to('/submitted_content/view?id=1')
           end
@@ -241,15 +241,15 @@ describe QuizQuestionnairesController do
         context 'when @questionnaire is nil' do
           it 'redirects to submitted_content#view page' do
             allow(Questionnaire).to receive(:find).with('1').and_return(nil)
-            params = { id: 1, pid: 1 }
-            post :update, params
+            request_params = { id: 1, pid: 1 }
+            post :update, params: request_params
             expect(response).to redirect_to('/submitted_content/view?id=1')
           end
         end
 
         context 'when @questionnaire is not nil' do
           it 'updates all quiz questions and redirects to submitted_content#view page' do
-            params = { id: 1,
+            request_params = { id: 1,
                        pid: 1,
                        save: true,
                        questionnaire: { name: 'test questionnaire',
@@ -305,7 +305,7 @@ describe QuizQuestionnairesController do
             allow(q4).to receive(:save).and_return(true)
             allow(qc).to receive(:update_attributes).with(any_args).and_return(true)
             allow(qc_tf).to receive(:update_attributes).with(any_args).and_return(true)
-            post :update, params
+            post :update, params: request_params
             expect(response).to redirect_to('/submitted_content/view?id=1')
           end
         end

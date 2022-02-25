@@ -24,7 +24,7 @@ describe ImpersonateController do
       allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: student1.name } }
-      get :impersonate, @params
+      get :impersonate, params: @params
       expect(response).to redirect_to('http://www.example.com')
     end
 
@@ -34,7 +34,7 @@ describe ImpersonateController do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: student1.name } }
       @session = { user: instructor }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       expect(session[:super_user]).to eq instructor
       expect(session[:user]).to eq student1
       expect(session[:original_user]).to eq instructor
@@ -47,7 +47,7 @@ describe ImpersonateController do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: student1.name } }
       @session = { user: instructor }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       expect(response).to redirect_to('/tree_display/drill')
     end
 
@@ -59,7 +59,7 @@ describe ImpersonateController do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: 'Student30' } }
       @session = { user: instructor }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       expect(session[:super_user]).to eq instructor
       expect(session[:user]).to eq student1
       expect(session[:original_user]).to eq instructor
@@ -74,9 +74,9 @@ describe ImpersonateController do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: student1.name } }
       @session = { user: instructor }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       @params = { user: { name: student2.name } }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       expect(session[:super_user]).to eq instructor
       expect(session[:user]).to eq student2
       expect(session[:original_user]).to eq instructor
@@ -91,10 +91,10 @@ describe ImpersonateController do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: student1.name } }
       @session = { user: instructor }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       # nav bar uses the :impersonate as the param name, so let make sure it always works from there too.
       @params = { impersonate: { name: student2.name } }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       expect(session[:super_user]).to eq instructor
       expect(session[:user]).to eq student2
       expect(session[:original_user]).to eq instructor

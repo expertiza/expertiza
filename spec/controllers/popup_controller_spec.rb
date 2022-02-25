@@ -68,9 +68,9 @@ describe PopupController do
         allow(Participant).to receive(:find).with('1').and_return(participant)
         allow(User).to receive(:find).with(participant.user_id).and_return(participant)
 
-        params = { response_id: 1, reviewee_id: 1 }
-        session = { user: ta }
-        result = get :author_feedback_popup, params, session
+        request_params = { response_id: 1, reviewee_id: 1 }
+        user_session = { user: ta }
+        result = get :author_feedback_popup, params: request_params, session: user_session
         expect(result.status).to eq 200
         expect(controller.instance_variable_get(:@sum)).to eq 20
         expect(controller.instance_variable_get(:@total_possible)).to eq 19
@@ -98,9 +98,9 @@ describe PopupController do
       allow(Response).to receive_message_chain(:aggregate_questionnaire_score).with(no_args).and_return(response)
       allow(Response).to receive_message_chain(:maximum_score).with(no_args).and_return(response)
 
-      params = { id: team.id }
-      session = { user: instructor }
-      result = get :team_users_popup, params, session
+      request_params = { id: team.id }
+      user_session = { user: instructor }
+      result = get :team_users_popup, params: request_params, session: user_session
       expect(result.status).to eq 200
     end
   end
@@ -111,9 +111,9 @@ describe PopupController do
       it 'Prepares scores and review analysis report for rendering purpose' do
         allow(Assignment).to receive(:find).and_return(assignment)
         allow(Participant).to receive(:find).and_return(participant)
-        params = { reviewer_id: participant.id, assignment_id: assignment.id }
-        session = { user: instructor }
-        result = get :view_review_scores_popup, params, session
+        request_params = { reviewer_id: participant.id, assignment_id: assignment.id }
+        user_session = { user: instructor }
+        result = get :view_review_scores_popup, params: request_params, session: user_session
         expect(controller.instance_variable_get(:@review_final_versions)).to eq final_versions
       end
     end
@@ -126,9 +126,9 @@ describe PopupController do
       user = double(:user, fullname: 'Test User', name: 'Test', email: 'test@gmail.com', handle: 1)
       allow(Participant).to receive(:find).with('1').and_return(participant)
       allow(User).to receive(:find).with(participant.user_id).and_return(user)
-      params = { id: 1, assignment_id: 1 }
-      session = { user: instructor }
-      get :reviewer_details_popup, params, session
+      request_params = { id: 1, assignment_id: 1 }
+      user_session = { user: instructor }
+      get :reviewer_details_popup, params: request_params, session: user_session
       expect(@response).to have_http_status(200)
       expect(user.fullname).to eq('Test User')
       expect(user.name).to eq('Test')
@@ -152,9 +152,9 @@ describe PopupController do
         allow(Response).to receive_message_chain(:find, :average_score).with('1').with(no_args).and_return(response1)
         allow(Response).to receive_message_chain(:find, :aggregate_questionnaire_score).with('1').with(no_args).and_return(response1)
         allow(Response).to receive_message_chain(:find, :maximum_score).with('1').with(no_args).and_return(response1)
-        params = { response_id: 1, user_fullname: questionnaire1.name }
-        session = { user: instructor }
-        get :self_review_popup, params, session
+        request_params = { response_id: 1, user_fullname: questionnaire1.name }
+        user_session = { user: instructor }
+        get :self_review_popup, params: request_params, session: user_session
         expect(@response).to have_http_status(200)
       end
     end

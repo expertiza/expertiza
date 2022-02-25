@@ -21,7 +21,7 @@ describe TeamsUsersController do
   end
 
   describe '#action_allowed?' do
-    context 'when params action is update duties' do
+    context 'when request_params action is update duties' do
       before(:each) do
         controller.params = { id: '1', action: 'update_duties' }
       end
@@ -39,13 +39,13 @@ describe TeamsUsersController do
     it 'updates the duties for the participant' do
       allow(TeamsUser).to receive(:find).with('1').and_return(teams_user1)
       allow(teams_user1).to receive(:update_attribute).with(any_args).and_return('OK')
-      params = {
+      request_params = {
         teams_user_id: '1',
         teams_user: { duty_id: '1' },
         participant_id: '1'
       }
-      session = { user: stub_current_user(student, student.role.name, student.role) }
-      get :update_duties, params, session
+      user_session = { user: stub_current_user(student, student.role.name, student.role) }
+      get :update_duties, params: request_params, session: user_session
       expect(response).to redirect_to('/student_teams/view?student_id=1')
     end
   end
@@ -65,9 +65,9 @@ describe TeamsUsersController do
       it 'renders list of users under Assignment team teams#users' do
         allow(Team).to receive(:find).with('1').and_return(team1)
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
-        @params = { id: 1 }
-        session = { user: instructor }
-        get :list, @params, session
+        request_params = { id: 1 }
+        user_session = { user: instructor }
+        get :list, params: request_params, session: user_session
         expect(response).to render_template(:list)
       end
     end
@@ -77,9 +77,9 @@ describe TeamsUsersController do
   describe '#new' do
     it 'sets the Team object to instance variable' do
       allow(Team).to receive(:find).with('1').and_return(team1)
-      params = { id: 1 }
-      session = { user: instructor }
-      get :new, params, session
+      request_params = { id: 1 }
+      user_session = { user: instructor }
+      get :new, params: request_params, session: user_session
       expect(controller.instance_variable_get(:@team)).to eq(team1)
     end
   end
@@ -90,11 +90,11 @@ describe TeamsUsersController do
       it 'it throws error when user is not defined' do
         allow(User).to receive(:find_by).with(name: 'instructor6').and_return(nil)
         allow(Team).to receive(:find).with('1').and_return(team1)
-        session = { user: admin }
-        params = {
+        user_session = { user: admin }
+        request_params = {
           user: { name: 'instructor6' }, id: 1
         }
-        post :create, params, session
+        post :create, params: request_params, session: user_session
         # Expect to throw error
         expect(flash[:error]).to eq '"instructor6" is not defined. Please <a href="http://test.host/users/new">create</a> this user before continuing.'
         # Expect the response to redirect to 'http://test.host/teams/list?id=1'
@@ -109,11 +109,11 @@ describe TeamsUsersController do
         allow(AssignmentTeam).to receive(:find).with('1').and_return(team1)
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(nil)
-        session = { user: admin }
-        params = {
+        user_session = { user: admin }
+        request_params = {
           user: { name: 'student2065' }, id: 1
         }
-        post :create, params, session
+        post :create, params: request_params, session: user_session
         # Expect to throw error
         expect(flash[:error]).to eq '"student2065" is not a participant of the current assignment. Please <a href="http://test.host/participants/list?authorization=participant&id=1&model=Assignment">add</a> this user before continuing.'
         # Expect the response to redirect to 'http://test.host/teams/list?id=1'
@@ -129,11 +129,11 @@ describe TeamsUsersController do
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
         allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(false)
-        session = { user: admin }
-        params = {
+        user_session = { user: admin }
+        request_params = {
           user: { name: 'student2065' }, id: 1
         }
-        post :create, params, session
+        post :create, params: request_params, session: user_session
         # Expect to throw error
         expect(flash[:error]).to eq 'This team already has the maximum number of members.'
         # Expect the response to redirect to 'http://test.host/teams/list?id=1'
@@ -150,11 +150,11 @@ describe TeamsUsersController do
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
         allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(true)
         allow(TeamsUser).to receive(:last).with(any_args).and_return(student1)
-        session = { user: admin }
-        params = {
+        user_session = { user: admin }
+        request_params = {
           user: { name: 'student2065' }, id: 1
         }
-        post :create, params, session
+        post :create, params: request_params, session: user_session
         # Expect the response to redirect to 'http://test.host/teams/list?id=1'
         expect(response).to redirect_to('http://test.host/teams/list?id=1')
       end
@@ -167,11 +167,11 @@ describe TeamsUsersController do
         allow(CourseTeam).to receive(:find).with('5').and_return(team5)
         allow(Course).to receive(:find).with(1).and_return(course1)
         allow(CourseParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(nil)
-        session = { user: admin }
-        params = {
+        user_session = { user: admin }
+        request_params = {
           user: { name: 'student2065' }, id: 5
         }
-        post :create, params, session
+        post :create, params: request_params, session: user_session
         # Expect to throw error
         expect(flash[:error]).to eq '"student2065" is not a participant of the current course. Please <a href="http://test.host/participants/list?authorization=participant&id=1&model=Course">add</a> this user before continuing.'
         # Expect the response to redirect to 'http://test.host/teams/list?id=1'
@@ -187,11 +187,11 @@ describe TeamsUsersController do
         allow(Course).to receive(:find).with(1).and_return(course1)
         allow(CourseParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
         allow_any_instance_of(CourseTeam).to receive(:add_member).with(any_args).and_return(false)
-        session = { user: admin }
-        params = {
+        user_session = { user: admin }
+        request_params = {
           user: { name: 'student2065' }, id: 5
         }
-        post :create, params, session
+        post :create, params: request_params, session: user_session
         # Expect to throw error
         expect(flash[:error]).to eq 'This team already has the maximum number of members.'
         # Expect the response to redirect to 'http://test.host/teams/list?id=1'
@@ -210,11 +210,11 @@ describe TeamsUsersController do
         allow(Course).to receive(:find).with(1).and_return(course1)
         allow(CourseParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
         allow_any_instance_of(CourseTeam).to receive(:add_member).with(any_args).and_return(true)
-        session = { user: admin }
-        params = {
+        user_session = { user: admin }
+        request_params = {
           user: { name: 'student2065' }, id: 5
         }
-        post :create, params, session
+        post :create, params: request_params, session: user_session
         # Expect the response to redirect to 'http://test.host/teams/list?id=1'
         expect(response).to redirect_to('http://test.host/teams/list?id=1')
       end
@@ -230,11 +230,11 @@ describe TeamsUsersController do
         allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(true)
         allow(TeamsUser).to receive(:last).with(any_args).and_return(student1)
         allow(assignment1).to receive(:user_on_team?).with(student1).and_return(true)
-        session = { user: admin }
-        params = {
+        user_session = { user: admin }
+        request_params = {
           user: { name: 'student2065' }, id: 1
         }
-        post :create, params, session
+        post :create, params: request_params, session: user_session
         # Expect to throw error
         expect(flash[:error]).to eq 'This user is already assigned to a team for this assignment'
         # Expect the response to redirect back to 'test.host'
@@ -250,11 +250,11 @@ describe TeamsUsersController do
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
         allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_raise("Member on existing team error")
-        session = { user: admin }
-        params = {
+        user_session = { user: admin }
+        request_params = {
           user: { name: 'student2065' }, id: 1
         }
-        post :create, params, session
+        post :create, params: request_params, session: user_session
         # Expect to throw error
         expect(flash[:error]).to eq 'The user student2065 is already a member of the team wolfers'
         # Expect the response to redirect back to 'test.host'
@@ -274,11 +274,11 @@ describe TeamsUsersController do
         allow(CourseParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
         allow_any_instance_of(CourseTeam).to receive(:add_member).with(any_args).and_return(true)
         allow(course1).to receive(:user_on_team?).with(student1).and_return(true)
-        session = { user: admin }
-        params = {
+        user_session = { user: admin }
+        request_params = {
           user: { name: 'student2065' }, id: 5
         }
-        post :create, params, session
+        post :create, params: request_params, session: user_session
         # Expect to throw error
         expect(flash[:error]).to eq 'This user is already assigned to a team for this course'
         # Expect the response to redirect back to 'test.host'
@@ -294,11 +294,11 @@ describe TeamsUsersController do
         allow(Course).to receive(:find).with(1).and_return(course1)
         allow(CourseParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
         allow_any_instance_of(CourseTeam).to receive(:add_member).with(any_args).and_raise("Member on existing team error")
-        session = { user: admin }
-        params = {
+        user_session = { user: admin }
+        request_params = {
           user: { name: 'student2065' }, id: 5
         }
-        post :create, params, session
+        post :create, params: request_params, session: user_session
         # Expect to throw error
         expect(flash[:error]).to eq 'The user student2065 is already a member of the team team5'
         # Expect the response to redirect back to 'test.host'
@@ -314,9 +314,9 @@ describe TeamsUsersController do
         allow(TeamsUser).to receive(:find).with('1').and_return(teamUser)
         allow(Team).to receive(:find).with(teamUser.team_id).and_return(team1)
         allow(User).to receive(:find).with(teamUser.user_id).and_return(student1)
-        @params = { id: 1 }
-        session = { user: instructor }
-        post :delete, @params, session
+        request_params = { id: 1 }
+        user_session = { user: instructor }
+        post :delete, params: request_params, session: user_session
         # Expect the response to redirect to 'http://test.host/teams/list?id=1'
         expect(response).to redirect_to('http://test.host/teams/list?id=1')
       end
@@ -329,9 +329,9 @@ describe TeamsUsersController do
       it 'it deletes the selected users and redirects to Teams#list page' do
         allow(TeamsUser).to receive(:find).with('1').and_return([teamUser])
         allow(TeamsUser).to receive(:find).with('2').and_return([teamUser2])
-        @params = { item: [1, 2] }
-        session = { user: instructor }
-        post :delete_selected, @params, session
+        request_params = { item: [1, 2] }
+        user_session = { user: instructor }
+        post :delete_selected, params: request_params, session: user_session
         # Expect the response to redirect to 'http://test.host/teams_users/list'
         expect(response).to redirect_to('http://test.host/teams_users/list')
       end

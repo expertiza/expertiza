@@ -16,9 +16,11 @@ class CourseParticipant < Participant
   # if user does not exist, it will be created and added to this assignment
   def self.import(row_hash, _row_header = nil, session, id)
     raise ArgumentError, 'No user id has been specified.' if row_hash.empty?
+    
     user = User.find_by(name: row_hash[:name])
     if user.nil?
       raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
+      
       attributes = ImportFileHelper.define_attributes(row_hash)
       user = ImportFileHelper.create_new_user(attributes, session)
     end

@@ -22,14 +22,14 @@ class MailWorker
       drop_outstanding_reviews if self.deadline_type == 'drop_outstanding_reviews'
       perform_simicheck_comparisons(self.assignment_id) if self.deadline_type == 'compare_files_with_simicheck'
     else
-      # Can we rename deadline_type(metareview) to "teammate review". If, yes then we donot need this if clause below!
-      deadlineText = if self.deadline_type == 'metareview'
-                       'teammate review'
-                     else
-                       self.deadline_type
-                     end
+      # Can we rename deadline_type(metareview) to "teammate review". If, yes then we do not need this if clause below!
+      deadline_text = if self.deadline_type == 'metareview'
+                        'teammate review'
+                      else
+                        self.deadline_type
+                      end
 
-      email_reminder(participant_mails, deadlineText) unless participant_mails.empty?
+      email_reminder(participant_mails, deadline_text) unless participant_mails.empty?
     end
   end
 

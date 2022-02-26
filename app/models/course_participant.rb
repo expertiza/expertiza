@@ -18,7 +18,7 @@ class CourseParticipant < Participant
     raise ArgumentError, 'No user id has been specified.' if row_hash.empty?
     user = User.find_by(name: row_hash[:name])
     if user.nil?
-      raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 3
+      raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
       attributes = ImportFileHelper.define_attributes(row_hash)
       user = ImportFileHelper.create_new_user(attributes, session)
     end

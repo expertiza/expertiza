@@ -70,6 +70,7 @@ class SubmittedContentController < ApplicationController
         ExpertizaLogger.error LoggerMessage.new(controller_name, @participant.name, "The URL or URI is invalid. Reason: #{$ERROR_INFO}", request)
         flash[:error] = "The URL or URI is invalid. Reason: #{$ERROR_INFO}"
       end
+      @participant.mail_assigned_reviewers
       ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully submitted.', request)
       undo_link('The link has been successfully submitted.')
     end
@@ -148,15 +149,12 @@ class SubmittedContentController < ApplicationController
                             content: full_filename,
                             user: participant.name,
                             assignment_id: assignment.id,
-                            operation: 'Submit File')
-    ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The file has been submitted.', request)
-    # send message to reviewers when submission has been updated
-    # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
-    begin
-      participant.assignment.email(participant.id)
-    rescue StandardError
-      nil
-    end
+                            operation: "Submit File")
+    ExpertizaLogger.info LoggerMessage.new(controller_name, participant.name, 'The file has been submitted.', request)
+
+    # Notify all reviewers assigned to this reviewee
+    participant.mail_assigned_reviewers
+
     if params[:origin] == 'review'
       redirect_to :back
     else

@@ -141,7 +141,7 @@ class SubmittedContentController < ApplicationController
     full_filename = curr_directory + File.split(safe_filename).last.tr(' ', '_') # safe_filename #curr_directory +
     File.open(full_filename, 'wb') { |f| f.write(file_content) }
     if params['unzip']
-      SubmittedContentHelper.unzip_file(full_filename, curr_directory, true) if get_file_type(safe_filename) == 'zip'
+      SubmittedContentHelper.unzip_file(full_filename, curr_directory, true) if file_type(safe_filename) == 'zip'
     end
     assignment = Assignment.find(participant.parent_id)
     team = participant.team
@@ -215,7 +215,7 @@ class SubmittedContentController < ApplicationController
     file.size <= size * 1024 * 1024
   end
 
-  def get_file_type(file_name)
+  def file_type(file_name)
     base = File.basename(file_name)
     base.split('.')[base.split('.').size - 1] if base.split('.').size > 1
   end

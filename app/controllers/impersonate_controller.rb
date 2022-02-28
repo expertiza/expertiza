@@ -33,7 +33,7 @@ class ImpersonateController < ApplicationController
       session[:original_user] = @original_user
       session[:impersonate] = true
       session[:user] = user
-    elsif params[:impersonate][:name]
+    elsif !params[:impersonate][:name].empty?
       # E1991 : check whether instructor is currently in anonymized view
       user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:impersonate][:name]) : User.find_by(name: params[:impersonate][:name])
       AuthController.clear_user_info(session, nil)

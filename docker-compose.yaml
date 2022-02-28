@@ -34,7 +34,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./expertiza-db:/var/lib/mysql
+      - ./expertiza-db:/var/lib/mysql:rw
     environment:
       MYSQL_ROOT_PASSWORD: expertiza
       MYSQL_DATABASE: expertiza_development
@@ -42,6 +42,8 @@ services:
       test: out=$$(mysqladmin ping -h localhost -P 3306 -u root --password=$$MYSQL_ROOT_PASSWORD 2>&1); echo $$out | grep 'mysqld is alive' || { echo $$out; exit 1; }
       timeout: 20s
       retries: 25
-
+    restart: on-failure:3
+    user: mysql
+    command: [--ignore-db-dir=lost+found]
 volumes:
   logvolume01: {}

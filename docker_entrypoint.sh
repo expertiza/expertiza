@@ -2,12 +2,25 @@
 if [ ! -f .initialized ]; then                                                                                                                                                                                    
     echo "Initializing container"
 
+    cp /app/config/secrets.yml.example /app/config/secrets.yml
+
+    # Remove default development configuration
+    sed '7,9d' ./config/database.yml.example  > ./config/database.yml
+
+    echo "development:
+  adapter: mysql2
+  host: mysql
+  username: root
+  password: expertiza
+  database: expertiza_development" >> ./config/database.yml
+
     # Begin to mount
     echo "Inserting scrubbed db into database... this may take awhile!"
     mysql --user=root --password=expertiza --host=mysql expertiza_development < /app/expertiza.sql
 
     if [ $? -ne 0 ]; then
         echo "Failed to import db"
+        rm -rf /app/expertiza-db
         exit 1
     fi
 
@@ -18,6 +31,7 @@ if [ ! -f .initialized ]; then
         echo "Migrations success!"
     else
         echo "Failed migrations"
+        rm -rf /app/expertiza-db
         exit 1
     fi                                                                                                                                                                           
                                                                                                                                                                                            

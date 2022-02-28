@@ -11,7 +11,15 @@
 docker -v 
 docker-compose -v
 ```
-5) Run expertiza in **attached** mode or **detached** mode
+
+
+5) Download the [scrubbed database](https://drive.google.com/u/0/uc?id=1CwM7H0GMeU5rEfCIZyoXeUvzrS1M2i64&export=download)
+Add it to the project root directory and rename it to **expertiza.sql**
+
+
+6) Run expertiza in **attached** mode or **detached** mode in macs **terminal** or **windows PowerShell**
+
+**NOTE!  Do not run with WSL on the first run! (causes volume generation issues)**
 
 **Reccommended for windows** Attached (closing terminal closes expertiza):
 `docker-compose up`
@@ -19,7 +27,7 @@ docker-compose -v
 Detached (closing terminal does not close expertiza):
 `docker-compose up -d`
 
-6) You can verify that everything is running by using `docker ps`
+7) You can verify that everything is running by using `docker ps`
 
 **NOTE This may take 5-10 minutes to set up the database and migrate on the first run!!**
 
@@ -27,7 +35,7 @@ You should see mysql (healthy)
 and redis (healthy)
 and expertiza_web
 
-7) Getting terminal access to your instance of expertiza (running in a container!)
+8) Getting terminal access to your instance of expertiza (running in a container!)
 In VSCode click the green icon in the bottom left.
 
 Select 
@@ -35,12 +43,12 @@ Select
 or 
 `Remote Containers: Reopen Locally`
 
-8) VSCode will install ruby extensions and you can click the plus button on the right to get a new
+9) VSCode will install ruby extensions and you can click the plus button on the right to get a new
 terminal.
 
-9) Run `bundle exec rails s -b 0.0.0.0`
+10) Run `bundle exec rails s -b 0.0.0.0`
 
-10) Setup is complete! Please read below to understand how to connect to expertiza, MYSQL and Redis
+11) Setup is complete! Please read below to understand how to connect to expertiza, MYSQL and Redis
 
 #### Connecting to expertiza
 
@@ -111,3 +119,9 @@ This means migrations were not ran
 Do a Ctrl +C or `docker-compose down` depending on if you are using -d or not
 delete the .initialized file
 `docker-compose up`
+
+### Error response from daemon: error while creating mount source path
+Try `docker-compose down`
+Then `docker-compose up` once it completes
+If that fails, try 
+Restarting docker desktop or the docker daemon (linux). Find docker in the tray, hit quit docker desktop then relaunch

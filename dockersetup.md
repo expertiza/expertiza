@@ -21,7 +21,7 @@ Add it to the project root directory and rename it to **expertiza.sql**
 
 **NOTE!  Do not run with WSL on the first run! (causes volume generation issues)**
 
-**Reccommended for windows** Attached (closing terminal closes expertiza):
+**Recommended for windows** Attached (closing terminal closes expertiza):
 `docker-compose up`
 
 Detached (closing terminal does not close expertiza):
@@ -81,7 +81,7 @@ Docker containers allow you to run a much more efficient "virtual machine" or "c
 
 **Why use docker?** You can abstract your development, stage, and production environments to a set of repeatable commands. It effectively guarantees that an environment is the same on one host to the next.
 
-**docker-compose vs docker** docker-compose allows you to run mutliple docker containers (called services) in an orderly fashion. By default, docker containers are **not** exposed to your local machine, a port needs to be forwarded. docker-compose can handle this as well as setting up the connections between your containers and configuring them.
+**docker-compose vs docker** docker-compose allows you to run multiple docker containers (called services) in an orderly fashion. By default, docker containers are **not** exposed to your local machine, a port needs to be forwarded. docker-compose can handle this as well as setting up the connections between your containers and configuring them.
 
 ### Helpful docker commands
 

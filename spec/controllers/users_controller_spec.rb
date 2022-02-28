@@ -104,7 +104,7 @@ describe UsersController do
       request_params = {
         user: { name: instructor.name }
       }
-      user_session = { user: student4 }
+      user_session = { user: teaching_assistant }
       post :show_if_authorized, params: request_params, session: user_session
 
       expect(response).to redirect_to('http://test.host/users/list')
@@ -112,7 +112,7 @@ describe UsersController do
   end
 
   context '#show' do
-    it 'when request_params[:id] is not nil' do
+    it 'when params[:id] is not nil' do
       allow(controller).to receive(:current_user).and_return(student1)
       allow(User).to receive(:find).with('1').and_return(student1)
       request_params = { id: 1 }
@@ -121,7 +121,7 @@ describe UsersController do
       expect(response).to render_template(:show)
     end
 
-    it 'when request_params[:id] is not nil but role_id is nil' do
+    it 'when params[:id] is not nil but role_id is nil' do
       student_no_role_id = create(:student)
       stub_current_user(student_no_role_id, student_no_role_id.role.name, student_no_role_id.role)
       user_session = { user: student_no_role_id }
@@ -131,7 +131,7 @@ describe UsersController do
       expect(response).to render_template(:show)
     end
 
-    it 'when request_params[:id] is nil' do
+    it 'when params[:id] is nil' do
       request_params = { id: nil }
       get :show, params: request_params
       expect(response).to redirect_to('/tree_display/drill')
@@ -274,7 +274,7 @@ describe UsersController do
     before(:each) do
       stub_current_user(student1, student1.role.name, student1.role)
     end
-    it 'when request_params[:id] is not nil' do
+    it 'when params[:id] is not nil' do
       the_key = 'the key'
       allow(User).to receive(:find).with('1').and_return(student1)
       allow(student1).to receive(:generate_keys).and_return(the_key)
@@ -282,7 +282,7 @@ describe UsersController do
       get :keys, params: request_params
       expect(controller.instance_variable_get(:@private_key)).to be(the_key)
     end
-    it 'when request_params[:id] is nil' do
+    it 'when params[:id] is nil' do
       get :keys
       expect(response).to redirect_to('/tree_display/drill')
     end

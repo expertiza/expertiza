@@ -296,7 +296,7 @@ class ReviewMappingController < ApplicationController
     else
       flash[:error] = 'This review has already been done. It cannot been deleted.'
     end
-    redirect_to :back
+    redirect_back fallback_location: root_path
   end
 
   def delete_metareviewer

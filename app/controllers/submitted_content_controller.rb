@@ -158,7 +158,7 @@ class SubmittedContentController < ApplicationController
       nil
     end
     if params[:origin] == 'review'
-      redirect_to :back
+      redirect_back fallback_location: root_path
     else
       redirect_to action: 'edit', id: participant.id
     end

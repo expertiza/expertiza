@@ -39,6 +39,7 @@ describe Assessment360Controller do
   let(:participant) { build(:participant) }
   let(:scores) {}
   let(:topic) { build(:topic) }
+  REDIRECT_PATH = 'http://example.com'.freeze
 
   describe 'checking controller permissions' do
     context 'when different roles call the controller' do
@@ -74,12 +75,12 @@ describe Assessment360Controller do
   describe '#all_students_all_reviews' do
     context 'when course does not have participants' do
       before(:each) do
-        request.env['HTTP_REFERER'] = 'http://example.com'
+        request.env['HTTP_REFERER'] = REDIRECT_PATH
         get 'all_students_all_reviews'
       end
 
       it 'redirects to back' do
-        expect(response).to redirect_to(:back)
+        expect(response).to redirect_to(REDIRECT_PATH)
       end
 
       it 'flashes an error' do
@@ -90,7 +91,7 @@ describe Assessment360Controller do
     context 'method is called' do
       before(:each) do
         allow(Course).to receive(:find).with('1').and_return(course)
-        request.env['HTTP_REFERER'] = 'http://example.com'
+        request.env['HTTP_REFERER'] = REDIRECT_PATH
       end
 
       it 'redirects to back and flashes error as there are no participants' do
@@ -101,7 +102,7 @@ describe Assessment360Controller do
         user_session = { user: instructor }
         get :all_students_all_reviews, params: request_params, session: user_session
         expect(controller.send(:action_allowed?)).to be true
-        expect(response).to redirect_to(:back)
+        expect(response).to redirect_to(REDIRECT_PATH)
         expect(flash[:error]).to be_present
       end
 
@@ -167,12 +168,12 @@ describe Assessment360Controller do
   describe '#course_student_grade_summary' do
     context 'when course does not have participants' do
       before(:each) do
-        request.env['HTTP_REFERER'] = 'http://example.com'
+        request.env['HTTP_REFERER'] = REDIRECT_PATH
         get 'course_student_grade_summary'
       end
 
       it 'redirects to back' do
-        expect(response).to redirect_to(:back)
+        expect(response).to redirect_to(REDIRECT_PATH)
       end
 
       it 'flashes an error' do
@@ -183,7 +184,7 @@ describe Assessment360Controller do
     context 'method is called' do
       before(:each) do
         allow(Course).to receive(:find).with('1').and_return(course)
-        request.env['HTTP_REFERER'] = 'http://example.com'
+        request.env['HTTP_REFERER'] = REDIRECT_PATH
       end
 
       it 'redirects to back and flashes error as there are no participants' do
@@ -194,7 +195,7 @@ describe Assessment360Controller do
         user_session = { user: instructor }
         get :course_student_grade_summary, params: request_params, session: user_session
         expect(controller.send(:action_allowed?)).to be true
-        expect(response).to redirect_to(:back)
+        expect(response).to redirect_to(REDIRECT_PATH)
         expect(flash[:error]).to be_present
       end
 
@@ -279,7 +280,6 @@ describe Assessment360Controller do
         expect(response.status).to eq(200)
         expect(response).to render_template(:course_student_grade_summary)
         returned_topics = controller.instance_variable_get(:@topics)
-        # TODO below assertion is failing
         expect(returned_topics[nil][1]).to eq(topic)
         returned_assignment_grades = controller.instance_variable_get(:@assignment_grades)
         expect(returned_assignment_grades[nil][1]).to eq(95)
@@ -294,12 +294,12 @@ describe Assessment360Controller do
   describe '#insure_existence_of' do
     context 'checking if the course participants are empty' do
       before(:each) do
-        request.env['HTTP_REFERER'] = 'http://example.com'
+        request.env['HTTP_REFERER'] = REDIRECT_PATH
         get 'insure_existence_of'
       end
 
       it 'redirects to back' do
-        expect(response).to redirect_to(:back)
+        expect(response).to redirect_to(REDIRECT_PATH)
       end
 
       it 'flashes an error' do
@@ -309,7 +309,7 @@ describe Assessment360Controller do
     context 'method is called' do
       before(:each) do
         allow(Course).to receive(:find).with('1').and_return(course)
-        request.env['HTTP_REFERER'] = 'http://example.com'
+        request.env['HTTP_REFERER'] = REDIRECT_PATH
       end
 
       it 'redirects to back and flashes error as there are no participants' do
@@ -320,7 +320,7 @@ describe Assessment360Controller do
         user_session = { user: instructor }
         get :course_student_grade_summary, params: request_params, session: user_session
         expect(controller.send(:action_allowed?)).to be true
-        expect(response).to redirect_to(:back)
+        expect(response).to redirect_to(REDIRECT_PATH)
         expect(flash[:error]).to be_present
       end
     end
@@ -329,12 +329,12 @@ describe Assessment360Controller do
   describe '#assignment_grade_summary' do
     context 'when course does not have participants' do
       before(:each) do
-        request.env['HTTP_REFERER'] = 'http://example.com'
+        request.env['HTTP_REFERER'] = REDIRECT_PATH
         get 'assignment_grade_summary'
       end
 
       it 'redirects to back' do
-        expect(response).to redirect_to(:back)
+        expect(response).to redirect_to(REDIRECT_PATH)
       end
 
       it 'flashes an error' do
@@ -345,7 +345,7 @@ describe Assessment360Controller do
     context 'method is called' do
       before(:each) do
         allow(Course).to receive(:find).with('1').and_return(course)
-        request.env['HTTP_REFERER'] = 'http://example.com'
+        request.env['HTTP_REFERER'] = REDIRECT_PATH
       end
 
       it 'has participants, has team id' do

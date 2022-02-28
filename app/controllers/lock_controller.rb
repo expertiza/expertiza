@@ -18,6 +18,6 @@ class LockController < ApplicationController
     lockable = Object.const_get(params[:type]).find(params[:id])
     Lock.release_lock(lockable)
     # Avoid a big error because of no redirect
-    redirect_to :back
+    redirect_back fallback_location: root_path
   end
 end

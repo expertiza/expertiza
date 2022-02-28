@@ -416,7 +416,7 @@ describe ReviewMappingController do
   describe '#delete_reviewer' do
     before(:each) do
       allow(ReviewResponseMap).to receive(:find_by).with(id: '1').and_return(review_response_map)
-      request.session['HTTP_REFERER'] = 'www.google.com'
+      request.env['HTTP_REFERER'] = 'www.google.com'
     end
 
     context 'when corresponding response does not exist to current review response map' do

@@ -40,7 +40,7 @@ class NotificationsController < ApplicationController
   # POST /notifications
   def create
     if params[:notification]
-      redirect_back
+      redirect_back fallback_location: root_path
       return
     end
     @notification = Notification.new(notification_params)

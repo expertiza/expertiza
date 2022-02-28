@@ -152,7 +152,7 @@ class ResponseController < ApplicationController
       end
       redirect_to action: 'new', id: map.id, return: 'feedback'
     else
-      redirect_to :back
+      redirect_back fallback_location: root_path
     end
   end
 

@@ -46,7 +46,7 @@ class TeamsUsersController < ApplicationController
         assignment = Assignment.find(team.parent_id)
         if assignment.user_on_team?(user)
           flash[:error] = "This user is already assigned to a team for this assignment"
-          redirect_back
+          redirect_back fallback_location: root_path
           return
         end
         if AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id).nil?
@@ -57,7 +57,7 @@ class TeamsUsersController < ApplicationController
             add_member_return = team.add_member(user, team.parent_id)
           rescue
             flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
-            redirect_back
+            redirect_back fallback_location: root_path
             return
           end
           flash[:error] = 'This team already has the maximum number of members.' if add_member_return == false
@@ -75,7 +75,7 @@ class TeamsUsersController < ApplicationController
         course = Course.find(team.parent_id)
         if course.user_on_team?(user)
           flash[:error] = "This user is already assigned to a team for this course"
-          redirect_back
+          redirect_back fallback_location: root_path
           return
         end
         if CourseParticipant.find_by(user_id: user.id, parent_id: course.id).nil?
@@ -86,7 +86,7 @@ class TeamsUsersController < ApplicationController
             add_member_return = team.add_member(user, team.parent_id)
           rescue
             flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
-            redirect_back
+            redirect_back fallback_location: root_path
             return
           end
           flash[:error] = 'This team already has the maximum number of members.' if add_member_return == false

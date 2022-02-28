@@ -4,7 +4,7 @@ describe TeamsController do
     before(:each) do
       user = build(:instructor)
       stub_current_user(user, user.role.name, user.role)
-      # to deal with redirect_to :back
+      # to deal with redirect fallback_location: root_path
       request.env['HTTP_REFERER'] = 'www.google.com'
     end
 
@@ -108,7 +108,7 @@ describe ReviewMappingController do
   before(:each) do
     user = build(:instructor)
     stub_current_user(user, user.role.name, user.role)
-    # to deal with redirect_to :back
+    # to deal with redirect_back fallback_location: root_path
     request.env['HTTP_REFERER'] = 'www.google.com'
   end
   # Airbrake-1800902813969550245

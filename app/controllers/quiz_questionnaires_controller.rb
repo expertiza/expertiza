@@ -53,10 +53,10 @@ class QuizQuestionnairesController < QuestionnairesController
 
       if @questionnaire.min_question_score < 0 || @questionnaire.max_question_score < 0
         flash[:error] = 'Minimum and/or maximum question score cannot be less than 0.'
-        redirect_to :back
+        redirect_back fallback_location: root_path
       elsif @questionnaire.max_question_score < @questionnaire.min_question_score
         flash[:error] = 'Maximum question score cannot be less than minimum question score.'
-        redirect_to :back
+        redirect_back fallback_location: root_path
       else
         @successful_create = true
         save
@@ -66,7 +66,7 @@ class QuizQuestionnairesController < QuestionnairesController
       end
     else
       flash[:error] = valid.to_s
-      redirect_to :back
+      redirect_back fallback_location: root_path
     end
   end
 

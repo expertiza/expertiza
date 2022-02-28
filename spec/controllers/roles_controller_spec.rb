@@ -81,7 +81,7 @@ describe RolesController do
     context 'when the role is updated successfully' do
       it 'redirects to show' do
         allow(Role).to receive(:find).and_return(student_role)
-        allow(student_role).to receive(:update_with_request_params).and_return(true)
+        allow(student_role).to receive(:update_with_params).and_return(true)
         post :update
         expect(response).to redirect_to('/roles/1')
       end

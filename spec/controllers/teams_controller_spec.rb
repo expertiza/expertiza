@@ -147,7 +147,7 @@ describe TeamsController do
         result = get :delete, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq 302
-        expect(result).to redirect_to :back
+        expect(result).to redirect_to root_url
         expect(controller.instance_variable_get(:@team)).to eq nil
       end
     end

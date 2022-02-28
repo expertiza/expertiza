@@ -41,7 +41,7 @@ class PublishingController < ApplicationController
   def grant
     id = params[:id]
     @participant = AssignmentParticipant.find(id) unless id.nil?
-    @user = User.find(session[:user].id) 
+    @user = User.find(session[:user].id)
   end
 
   # Grant publishing rights using the private key supplied by the student

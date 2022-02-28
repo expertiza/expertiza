@@ -108,7 +108,7 @@ class Assessment360Controller < ApplicationController
         next if TeamsUser.team_id(assignment_id, user_id).nil?
 
         # pull information about the student's grades for particular assignment
-        assignment_grade_summary(cp, assignment_id) 
+        assignment_grade_summary(cp, assignment_id)
         peer_review_score = find_peer_review_score(user_id, assignment_id)
 
         next if peer_review_score.nil? # Skip if there are no peers

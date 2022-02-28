@@ -1,9 +1,11 @@
 class SystemSettings < ActiveRecord::Base
   self.table_name = 'system_settings'
 
+  # rubocop:disable Lint/DuplicateMethods
   attr_accessor :public_role, :default_markup_style
   attr_accessor :site_default_page, :not_found_page, :permission_denied_page,
                 :session_expired_page
+  # rubocop:enable Lint/DuplicateMethods
 
   def public_role
     @public_role ||= Role.find(public_role_id)

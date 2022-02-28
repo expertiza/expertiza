@@ -41,7 +41,9 @@ class Menu
     end
   end
 
+  # rubocop:disable Lint/DuplicateMethods
   attr_accessor :root, :selected
+  # rubocop:enable Lint/DuplicateMethods
 
   def initialize(role = nil)
     @root = Node.new

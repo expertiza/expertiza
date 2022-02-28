@@ -40,14 +40,14 @@ class SignUpSheet < ActiveRecord::Base
       # Using a DB transaction to ensure atomic inserts
       ActiveRecord::Base.transaction do
         # check whether user is clicking on a topic which is not going to place him in the waitlist
-        result = sign_up_wailisted(assignment_id, sign_up, team_id, topic_id, user_id)
+        result = sign_up_wailisted(assignment_id, sign_up, team_id, topic_id)
       end
     end
 
     result
   end
 
-  def self.sign_up_wailisted(assignment_id, sign_up, team_id, topic_id, user_id)
+  def self.sign_up_wailisted(assignment_id, sign_up, team_id, topic_id)
     if slotAvailable?(topic_id)
       # if slot exist, then confirm the topic for the user and delete all the waitlist for this user
       result = cancel_all_wailists(assignment_id, sign_up, team_id, topic_id)

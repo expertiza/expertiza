@@ -9,8 +9,10 @@ class Role < ActiveRecord::Base
   validates :name, presence: true
   validates :name, uniqueness: true
 
+  # rubocop:disable Lint/DuplicateMethods
   attr_accessor :cache
   attr_reader :student, :ta, :instructor, :administrator, :superadministrator
+  # rubocop:enable Lint/DuplicateMethods
 
   def cache
     @cache = {}

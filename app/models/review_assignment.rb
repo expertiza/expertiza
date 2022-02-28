@@ -108,13 +108,13 @@ module ReviewAssignment
   private
 
   def reject_by_least_reviewed(contributor_set)
-    contributor = contributor_set.min_by { |contributor| contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count }
+    contributor = contributor_set.min_by { |contributor_item| contributor_item.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count }
     min_reviews = begin
                     contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count
                   rescue StandardError
                     0
                   end
-    contributor_set.reject! { |contributor| contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count > min_reviews + review_topic_threshold }
+    contributor_set.reject! { |contributor_item| contributor_item.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count > min_reviews + review_topic_threshold }
     contributor_set
   end
 

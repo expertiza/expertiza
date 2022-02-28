@@ -6,7 +6,9 @@ class ContentPage < ActiveRecord::Base
 
   belongs_to :permission
 
+  # rubocop:disable Lint/DuplicateMethods
   attr_accessor :content_html
+  # rubocop:enable Lint/DuplicateMethods
 
   def url
     "/#{name}"

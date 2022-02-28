@@ -286,7 +286,7 @@ class Team < ActiveRecord::Base
 
   # Removes the specified user from any team of the specified assignment
   def self.remove_user_from_previous_team(parent_id, user_id)
-    team_user = TeamsUser.where(user_id: user_id).find { |team_user| team_user.team.parent_id == parent_id }
+    team_user = TeamsUser.where(user_id: user_id).find { |team_user_obj| team_user_obj.team.parent_id == parent_id }
     begin
       team_user.destroy
     rescue StandardError

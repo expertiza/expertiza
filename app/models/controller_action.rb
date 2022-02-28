@@ -5,7 +5,9 @@ class ControllerAction < ActiveRecord::Base
   validates :name, presence: true
   validates :name, uniqueness: { scope: 'site_controller_id' }
 
+  # rubocop:disable Lint/DuplicateMethods
   attr_accessor :controller, :permission, :url, :allowed, :specific_name
+  # rubocop:enable Lint/DuplicateMethods
 
   scope :order_by_controller_and_action, lambda {
     joins('left outer join site_controllers on site_controller_id = site_controllers.id')

@@ -727,4 +727,10 @@ FactoryBot.define do
     question_type 'Criterion'
     answer_length_threshold 6
   end
+
+  factory :ta_mapping, class: TaMapping do
+    id 1
+    ta_id 1
+    course_id 1
+  end
 end

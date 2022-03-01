@@ -39,12 +39,12 @@ class Mailer < ActionMailer::Base
     @body = defn[:body]
     @type = defn[:body][:type]
     @obj_name = defn[:body][:obj_name]
+    @link = defn[:body][:link]
     @first_name = defn[:body][:first_name]
     @partial_name = defn[:body][:partial_name]
 
     defn[:to] = 'expertiza.debugging@gmail.com' if Rails.env.development? || Rails.env.test?
     mail(subject: defn[:subject],
-         # content_type: "text/html",
          to: defn[:to])
   end
 

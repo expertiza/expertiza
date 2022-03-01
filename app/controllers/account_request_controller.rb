@@ -147,7 +147,7 @@ class AccountRequestController < ApplicationController
   def notify_supers_new_request(requested_user)
     super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')
     super_users.each do |super_user|
-      prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, requested_user, 'New account Request')
+      prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, requested_user, 'New Account Request: ' + requested_user.fullname)
       prepared_mail.deliver
     end
     # Notifying an email to the administrator regarding the new user request!

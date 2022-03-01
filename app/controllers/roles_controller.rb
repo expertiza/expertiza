@@ -46,7 +46,6 @@ class RolesController < ApplicationController
 
   def update
     @role = Role.find(params[:id])
-
     if @role.update_with_params(params[:role])
       Role.rebuild_cache
       @role = Role.find(params[:id])
@@ -62,8 +61,6 @@ class RolesController < ApplicationController
     Role.find(params[:id]).destroy
     redirect_to Role
   end
-
-  protected
 
   def foreign
     @other_roles = @role.other_roles

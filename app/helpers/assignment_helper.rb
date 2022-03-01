@@ -1,18 +1,17 @@
 module AssignmentHelper
-  def course_options(instructor)
+  def course_options(instructor = nil)
+    courses = []
     if session[:user].role.name == 'Teaching Assistant'
-      courses = []
       ta = Ta.find(session[:user].id)
       ta.ta_mappings.each { |mapping| courses << Course.find(mapping.course_id) }
       # If a TA created some courses before, s/he can still add new assignments to these courses.
       # Only those courses should be shown in the dropdown list of courses, the assignment is part of and the instructor or TA has access to.
       courses << Course.where(instructor_id: ta.id)
-      courses.flatten!
     # Administrator and Super-Administrator can see all courses
     elsif session[:user].role.name == 'Administrator' || session[:user].role.name == 'Super-Administrator'
-      courses = Course.all
+      courses << Course.all
     elsif session[:user].role.name == 'Instructor'
-      courses = Course.where(instructor_id: instructor.id)
+      courses << Course.where(instructor_id: session[:user].id)
       # instructor can see courses his/her TAs created
       ta_ids = []
       instructor = Instructor.find(session[:user].id)
@@ -23,8 +22,8 @@ module AssignmentHelper
         ta.ta_mappings.each { |mapping| courses << Course.find(mapping.course_id) }
       end
     end
+    courses.flatten!
     options = []
-    # Only instructors, but not TAs, would then be allowed to change an assignment to be part of no course
     if session[:user].role.name == 'Administrator' || session[:user].role.name == 'Super-Administrator' || session[:user].role.name == 'Instructor'
       options << ['-----------', nil]
     end

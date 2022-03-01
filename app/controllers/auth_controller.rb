@@ -8,7 +8,7 @@ class AuthController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'login', 'logout', 'login_failed', 'google_login'
+    when 'login', 'logout', 'login_failed'
       true
     else
       current_user_has_super_admin_privileges?
@@ -38,18 +38,6 @@ class AuthController < ApplicationController
     AuthController.set_current_role(user.role_id, session)
     redirect_to controller: AuthHelper.get_home_controller(session[:user]),
                 action: AuthHelper.get_home_action(session[:user])
-  end
-
-  def google_login
-    g_email = env['omniauth.auth'].info.email
-    user = User.find_by(email: g_email)
-    if user.nil?
-      ExpertizaLogger.error LoggerMessage.new(controller_name, g_email, 'This email is not authorized to use Expertiza!', request)
-      flash[:error] = 'This email is not authorized to use Expertiza!'
-      redirect_to root_path
-    else
-      after_login(user)
-    end
   end
 
   def login_failed

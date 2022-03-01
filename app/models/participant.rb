@@ -73,6 +73,21 @@ class Participant < ActiveRecord::Base
     end
   end
 
+  # send email to team's reviewers in case a new submission is made
+  def mail_assigned_reviewers
+    # Find review mappings for the work done by this participant's team
+    mappings = ResponseMap.where(reviewed_object_id: self.assignment.id,
+                                 reviewee_id: self.team.id,
+                                 type: 'ReviewResponseMap')
+    unless mappings.nil?
+      mappings.each do |mapping|
+        reviewer = mapping.reviewer.user
+        prepared_mail = MailerHelper.send_mail_to_assigned_reviewers(reviewer, self, mapping)
+        prepared_mail.deliver_now
+      end
+    end
+  end
+
   def able_to_review
     can_review
   end

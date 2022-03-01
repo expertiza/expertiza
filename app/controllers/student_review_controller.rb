@@ -25,7 +25,7 @@ class StudentReviewController < ApplicationController
     # E-1973 calling get_reviewer on a participant will return either that participant
     # or there team, depending on if reviewers are teams. If the reviewer is not yet on a team, just set review_mappings
     # to an empty list to prevent errors
-    if !@participant.get_reviewer.nil?
+    if @participant.get_reviewer
       # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
       @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.get_reviewer.id, reviewer_is_team: @assignment.reviewer_is_team)
@@ -33,7 +33,7 @@ class StudentReviewController < ApplicationController
       @review_mappings = []
     end
     # if it is an calibrated assignment, change the response_map order in a certain way
-    @review_mappings = @review_mappings.sort_by { |mapping| mapping.id % 5 } if @assignment.is_calibrated == true
+    @review_mappings = @review_mappings.sort_by { |mapping| mapping.id % 5 } if @assignment.is_calibrated
     @metareview_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
     # Calculate the number of reviews that the user has completed so far.
 
@@ -46,8 +46,8 @@ class StudentReviewController < ApplicationController
 
     @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
     # Calculate the number of metareviews that the user has completed so far.
-    @num_metareviews_total       = @metareview_mappings.size
-    @num_metareviews_completed   = 0
+    @num_metareviews_total = @metareview_mappings.size
+    @num_metareviews_completed = 0
     @metareview_mappings.each do |map|
       @num_metareviews_completed += 1 unless map.response.empty?
     end

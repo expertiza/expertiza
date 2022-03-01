@@ -7,7 +7,6 @@ class ControllerAction < ActiveRecord::Base
 
   # rubocop:disable Lint/DuplicateMethods
   attr_accessor :controller, :permission, :url, :allowed, :specific_name
-  # rubocop:enable Lint/DuplicateMethods
 
   scope :order_by_controller_and_action, lambda {
     joins('left outer join site_controllers on site_controller_id = site_controllers.id')
@@ -44,6 +43,7 @@ class ControllerAction < ActiveRecord::Base
     @url ||= "/#{controller.name}/#{name}"
     @url
   end
+  # rubocop:enable Lint/DuplicateMethods
 
   def self.actions_allowed(permission_ids)
     # Hash for faster & easier lookups

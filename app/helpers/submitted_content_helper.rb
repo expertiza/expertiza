@@ -39,6 +39,7 @@ module SubmittedContentHelper
         ret += "\n   </td>\n   </tr>"
         index += 1
       rescue StandardError
+        # Do nothing
       end
     end
     ret += "\n</table><br/>"

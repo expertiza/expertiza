@@ -12,7 +12,6 @@ class Role < ActiveRecord::Base
   # rubocop:disable Lint/DuplicateMethods
   attr_accessor :cache
   attr_reader :student, :ta, :instructor, :administrator, :superadministrator
-  # rubocop:enable Lint/DuplicateMethods
 
   def cache
     @cache = {}
@@ -22,6 +21,7 @@ class Role < ActiveRecord::Base
     end
     @cache
   end
+  # rubocop:enable Lint/DuplicateMethods
 
   def self.find_or_create_by_name(params)
     Role.find_or_create_by(name: params)

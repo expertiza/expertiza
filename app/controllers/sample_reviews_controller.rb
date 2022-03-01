@@ -48,6 +48,7 @@ class SampleReviewsController < ApplicationController
       visibility = 'published'
       @response.update_attribute('visibility', visibility)
     rescue StandardError
+      # Do nothing
     end
 
     respond_to do |format|
@@ -67,6 +68,7 @@ class SampleReviewsController < ApplicationController
       visibility = 'public'
       @response.update_attribute('visibility', visibility)
     rescue StandardError
+      # Do nothing
     end
 
     respond_to do |format|

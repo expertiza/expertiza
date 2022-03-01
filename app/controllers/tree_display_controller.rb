@@ -130,6 +130,7 @@ class TreeDisplayController < ApplicationController
       end
       flash[:error] = 'Invalid child nodes in the TreeList'
     rescue StandardError
+      # Do nothing
     end
 
     respond_to do |format|

@@ -47,7 +47,7 @@ class ExportFileController < ApplicationController
       else
         flash[:error] = "This operation is not supported for #{params[:model]}"
         redirect_to :back
-        return
+        return nil
       end
     end
 

@@ -28,6 +28,7 @@ module FileHelper
       create_directory_from_path(newpath)
     end
   rescue StandardError
+    # Do nothing
   end
 
   # replace invalid characters with underscore

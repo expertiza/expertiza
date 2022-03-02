@@ -292,7 +292,7 @@ class ResponseController < ApplicationController
 
   # Added for E1973, team-based reviewing:
   # http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_Project_E1973._Team_Based_Reviewing
-  # This action gets taken if the response is locked and cannot be edit right now
+  # Taken if the response is locked and cannot be edited right now
   def response_lock_action
     redirect_to action: 'redirect', id: @map.map_id, return: 'locked', error_msg: 'Another user is modifying this response or has modified this response. Try again later.'
   end

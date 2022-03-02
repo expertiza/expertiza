@@ -51,84 +51,48 @@ class AuthController < ApplicationController
     redirect_to '/'
   end
 
-  # changing spelling of the authorised to authorized
-  def self.authorized?(session, params)
-    authorized = false # default
-    check_controller = false
-
-    if (params[:controller] == 'content_pages') &&
-       (params[:action] == 'view')
-      if session[:credentials].pages.key?(params[:page_name].to_s)
-        authorized = true if session[:credentials].pages[params[:page_name].to_s] == true
-      end
-    else
-      # Check if there's a specific permission for an action
-      if session[:credentials].actions.key?(params[:controller])
-        if session[:credentials].actions[params[:controller]].key?(params[:action]) && session[:credentials].actions[params[:controller]][params[:action]]
-          authorized = true
-        else
-          check_controller = true
-        end
-      else
-        check_controller = true
-      end
-
-      # Check if there's a general permission for a controller
-      if check_controller
-        authorized = true if session[:credentials].controllers.key?(params[:controller]) && session[:credentials].controllers[params[:controller]]
-      end
-    end # Check permissions
-
-    ExpertizaLogger.info "Authorized? #{authorized}, check_controller? #{check_controller}"
-    authorized
+  def self.logout(session)
+    clear_session(session)
   end
 
-  class << self
-    protected
-
-    def logout(session)
-      clear_session(session)
-    end
-
-    def set_current_role(role_id, session)
-      if role_id
-        role = Role.find role_id
-        if role
-          Role.rebuild_cache if !role.cache || !role.cache.try(:has_key?, :credentials)
-          session[:credentials] = role.cache[:credentials]
-          session[:menu] = role.cache[:menu]
-          ExpertizaLogger.info "Logging in user as role #{session[:credentials].class}"
-        else
-          ExpertizaLogger.error 'Something went seriously wrong with the role.'
-        end
-      end
-    end
-
-    def clear_session(session)
-      session[:user_id] = nil
-      session[:user] = nil
-      session[:credentials] = nil
-      session[:menu] = nil
-      session[:clear] = true
-      session[:assignment_id] = nil
-      session[:original_user] = nil
-      session[:impersonate] = nil
-    end
-
-    # clears any identifying info from session
-    def clear_user_info(session, assignment_id)
-      session[:user_id] = nil
-      session[:user] = '' # sets user to an empty string instead of nil, to show that the user was logged in
-      role = Role.student
+  def self.set_current_role(role_id, session)
+    if role_id
+      role = Role.find role_id
       if role
-        Role.rebuild_cache if !role.cache || !role.cache.key?(:credentials)
+        Role.rebuild_cache if !role.cache || !role.cache.try(:has_key?, :credentials)
         session[:credentials] = role.cache[:credentials]
         session[:menu] = role.cache[:menu]
+        ExpertizaLogger.info "Logging in user as role #{session[:credentials].class}"
+      else
+        ExpertizaLogger.error 'Something went seriously wrong with the role.'
       end
-      session[:clear] = true
-      session[:assignment_id] = assignment_id
-      session[:original_user] = nil
-      session[:impersonate] = nil
     end
+  end
+
+  def self.clear_session(session)
+    session[:user_id] = nil
+    session[:user] = nil
+    session[:credentials] = nil
+    session[:menu] = nil
+    session[:clear] = true
+    session[:assignment_id] = nil
+    session[:original_user] = nil
+    session[:impersonate] = nil
+  end
+
+  # clears any identifying info from session
+  def self.clear_user_info(session, assignment_id)
+    session[:user_id] = nil
+    session[:user] = '' # sets user to an empty string instead of nil, to show that the user was logged in
+    role = Role.student
+    if role
+      Role.rebuild_cache if !role.cache || !role.cache.key?(:credentials)
+      session[:credentials] = role.cache[:credentials]
+      session[:menu] = role.cache[:menu]
+    end
+    session[:clear] = true
+    session[:assignment_id] = assignment_id
+    session[:original_user] = nil
+    session[:impersonate] = nil
   end
 end

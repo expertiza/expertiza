@@ -14,6 +14,7 @@
   <%# @results is the ad_info for an assignment's topic %>
   <% @results.each {|result| %>
     <% ad_request = JoinTeamRequest.where(team_id: result[:team_id], participant_id: session[:user].id).first %>
+    <% puts ad_request %>
     <%
       team_members = []
       TeamsUser.where(team_id: result[:team_id]).each{|teamuser|
@@ -33,19 +34,19 @@
           %>
           <img src="/assets/info.png" title="Send request to join this team">
           </td>
+        <% else %>
+          <% if team_members.include?(session[:user].name) %>
+            <td align="center"><img src="/assets/info.png" title="You're a member of this team and cannot request to join!"></td>
+          <% else %>
+            <td align="center"><%= link_to "Edit invitation", :controller => 'join_team_requests', :action => 'edit',
+                  :id=>ad_request.id
+                %>
+              <img src="/assets/info.png" title="Edit your request to join this team">
+            </td>
+          <% end %>
+        <% end %>
       </tr>
-    <% else %>
-      <% if team_members.include?(session[:user].name) %>
-        <td align="center"><img src="/assets/info.png" title="You're a member of this team and cannot request to join!"></td>
-      <% else %>
-        <td align="center"><%= link_to "Edit invitation", :controller => 'join_team_requests', :action => 'edit',
-              :id=>ad_request.id
-            %>
-          <img src="/assets/info.png" title="Edit your request to join this team">
-        </td>
-      <% end %>
     <% end %>
-  <% end %>
   <% } %>
 
 </table>

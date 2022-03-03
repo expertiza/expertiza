@@ -4,7 +4,6 @@ CURRENT_MAINTAINERS = %w[
   TheAkbar
   johnbumgardner
   nnhimes
-  divyang02
 ].freeze
 
 ADDED_FILES    = git.added_files

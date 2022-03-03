@@ -13,7 +13,7 @@
   <% count=0 %>
   <%# @results is the ad_info for an assignment's topic %>
   <% @results.each {|result| %>
-    <% ad_request = JoinTeamRequest.where(team_id: result[:team_id], participant_id: session[:user].id) %>
+    <% ad_request = JoinTeamRequest.where(team_id: result[:team_id], participant_id: session[:user].id).first %>
     <%
       team_members = []
       TeamsUser.where(team_id: result[:team_id]).each{|teamuser|

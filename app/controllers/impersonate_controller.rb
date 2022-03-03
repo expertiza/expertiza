@@ -102,7 +102,7 @@ class ImpersonateController < ApplicationController
         end
       end
     end
-  rescue Exception
+  rescue StandardError
     flash[:error] = @message
     redirect_to :back
   end
@@ -154,7 +154,7 @@ class ImpersonateController < ApplicationController
       AuthController.set_current_role(user.role_id, session)
       redirect_to action: AuthHelper.get_home_action(session[:user]),
                   controller: AuthHelper.get_home_controller(session[:user])
-    rescue Exception
+    rescue StandardError
       flash[:error] = @message
       redirect_to :back
     end

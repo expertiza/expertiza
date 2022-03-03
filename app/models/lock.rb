@@ -73,8 +73,6 @@ class Lock < ActiveRecord::Base
     Lock.where(lockable: lockable).destroy_all unless lock.nil?
   end
 
-  private
-
   # Just a little helper method to help keep this code DRY
   # If for some reason, the lock had trouble being created, returns nil because there is no
   # lock on the object

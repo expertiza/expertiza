@@ -20,13 +20,13 @@
 TeamsUser.where(team_id: result[:team_id]).each{|teamuser|
   team_members+=User.find(teamuser.user_id).name+" "
 }
-      if result[:advertise_for_partner] == true || result[:advertise_for_partner] == 1
+      if result[:advertise_for_partner]|| result[:advertise_for_partner] == 1
       %>
     <tr>
       <td align="center" width="500"><%= result[:name] %></td>
       <td align="center" width="500"><%= team_members  %></td>
       <td align="center" width="500"><%= result[:comments_for_advertisement] %></td>
-      <% if  Participant.where(parent_id: result[:assignment_id], user_id: session[:user].id).first!=nil %>
+      <% if  Participant.where(parent_id: result[:assignment_id], user_id: session[:user].id).first && result[:request].nil? %>
         <td align="center"><%= link_to "Request invitation", :controller => 'join_team_requests', :action => 'new',
           :assignment_id=>result[:assignment_id],
           :topic_id=>result[:topic_id],
@@ -36,7 +36,11 @@ TeamsUser.where(team_id: result[:team_id]).each{|teamuser|
       <img src="/assets/info.png" title="Send request to join this team">
     </td>
   <%else%>
-    <td></td>
+     <td align="center"><%= link_to "Edit invitation", :controller => 'join_team_requests', :action => 'edit',
+          :id=>result[:request].id
+        %>
+      <img src="/assets/info.png" title="Send request to join this team">
+    </td>
   <% end
   end %>
 

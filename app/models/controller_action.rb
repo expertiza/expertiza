@@ -5,6 +5,7 @@ class ControllerAction < ApplicationRecord
   validates :name, presence: true
   validates :name, uniqueness: { scope: 'site_controller_id' }
 
+  # rubocop:disable Lint/DuplicateMethods
   attr_accessor :controller, :permission, :url, :allowed, :specific_name
 
   scope :order_by_controller_and_action, lambda {
@@ -42,6 +43,7 @@ class ControllerAction < ApplicationRecord
     @url ||= "/#{controller.name}/#{name}"
     @url
   end
+  # rubocop:enable Lint/DuplicateMethods
 
   def self.actions_allowed(permission_ids)
     # Hash for faster & easier lookups

@@ -493,6 +493,7 @@ class SignUpSheetController < ApplicationController
       ad_map[:name] = team.name
       ad_map[:assignment_id] = topic.assignment_id
       ad_map[:advertise_for_partner] = team.advertise_for_partner
+      ad_map[:request] = JoinTeamRequest.where(team_id: team.id).first
 
       # Append to the list
       @ad_information.append(ad_map)

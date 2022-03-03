@@ -46,6 +46,7 @@
           %>
           <img src="/assets/info.png" title="Send request to join this team">
           </td>
+<<<<<<< HEAD
         <% else %>
           <% if team_members.include?(session[:user].name) %>
             <td align="center"><img src="/assets/info.png" title="You're a member of this team and cannot request to join!"></td>
@@ -66,6 +67,19 @@
           <% end %>
         <% end %>
       </tr>
+=======
+      </tr>
+    <% else %>
+      <% if team_members.include?(session[:user].name) %>
+        <td align="center"><img src="/assets/info.png" title="You're a member of this team and cannot request to join!"></td>
+      <% else %>
+        <td align="center"><%= link_to "Edit invitation", :controller => 'join_team_requests', :action => 'edit',
+              :id=>ad_request.id
+            %>
+          <img src="/assets/info.png" title="Edit your request to join this team">
+        </td>
+      <% end %>
+>>>>>>> 19886fbdd (Format fix in show_team)
     <% end %>
   <% end %>
   <% } %>

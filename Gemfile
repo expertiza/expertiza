@@ -1,7 +1,5 @@
 source 'https://rubygems.org'
 
-ruby '2.6.3'
-
 gem 'rails', '~> 5.1'
 
 ## Gems in Alphabetical Order
@@ -48,7 +46,7 @@ gem 'lingua'
 gem 'mimemagic', github: 'mimemagicrb/mimemagic', ref: '01f92d86d15d85cfd0f20dabd025dcbd36a8a60f'
 gem 'momentjs-rails', '>= 2.9.0'
 gem 'mysql2', '0.4.10'
-gem 'nokogiri', '~> 1.8'
+gem 'nokogiri', '1.10.10'
 gem 'omniauth-google-oauth2'
 gem 'open-uri-cached'
 gem 'paper_trail'

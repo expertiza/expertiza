@@ -4,7 +4,7 @@ describe BadgesController do
   let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, name: 'Instructor1') }
   let(:student1) { build(:student, id: 21, role_id: 1) }
   let(:ta) { build(:teaching_assistant, id: 6) }
-  let(:badge)
+  #let(:badge)
   #let(:student2) {build(:student, id: )}
   describe '#action_allowed?' do
     context 'when the role of current user is Super-Admin' do
@@ -42,7 +42,7 @@ describe BadgesController do
   describe '#new' do
     it 'creates a new badges form and renders badges#new page' do
       get :new
-      expect(response).to render_template(:new)
+      expect(get: 'badges/new').to route_to('badges#new')
     end
   end
 

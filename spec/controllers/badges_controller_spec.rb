@@ -4,7 +4,7 @@ describe BadgesController do
   let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, name: 'Instructor1') }
   let(:student1) { build(:student, id: 21, role_id: 1) }
   let(:ta) { build(:teaching_assistant, id: 6) }
-  #let(:badge)
+  let(:badge) {build(:badge, id:1, name: 'test', description: 'test desc', image_name: 'good-reviewer.png')}
   #let(:student2) {build(:student, id: )}
   describe '#action_allowed?' do
     context 'when the role of current user is Super-Admin' do
@@ -40,10 +40,22 @@ describe BadgesController do
   end
   
   describe '#new' do
-    it 'creates a new badges form and renders badges#new page' do
-      get :new
-      expect(get: 'badges/new').to route_to('badges#new')
+    context 'when user wants to create a new form' do
+      it 'renders badges#new page' do
+        get :new
+        expect(get: 'badges/new').to route_to('badges#new')
+      end
     end
-  end
+    context 'when user tries to create a new badge' do
+      it 'renders the create new form' do
+        allow(Badge).to receive(:new).and_return(badge)
+        #params = { participant_id: participant.id, team_id: -2 }
+        params = {}
+        session = { user: instructor1 }
+        get :new, params, session
+        expect(response).to render_template('new')
+      end
+    end
 
+  end
 end

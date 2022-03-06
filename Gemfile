@@ -78,7 +78,6 @@ gem 'tinymce-rails'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
-gem 'bigdecimal', '1.3.5'
 
 group :development do
   gem 'daemons'

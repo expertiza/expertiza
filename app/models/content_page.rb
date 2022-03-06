@@ -6,7 +6,9 @@ class ContentPage < ActiveRecord::Base
 
   belongs_to :permission
 
+  # rubocop:disable Lint/DuplicateMethods
   attr_accessor :content_html
+  # rubocop:enable Lint/DuplicateMethods
 
   def url
     "/#{name}"
@@ -21,6 +23,7 @@ class ContentPage < ActiveRecord::Base
     self.content_cache = markup_content
   end
 
+  # rubocop:disable Lint/DuplicateMethods
   def content_html
     if content_cache.present?
       content_cache.html_safe
@@ -28,6 +31,7 @@ class ContentPage < ActiveRecord::Base
       markup_content.html_safe
     end
   end
+  # rubocop:enable Lint/DuplicateMethods
 
   protected
 

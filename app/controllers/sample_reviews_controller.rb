@@ -48,6 +48,7 @@ class SampleReviewsController < ApplicationController
       visibility = 'published'
       @response.update_attribute('visibility', visibility)
     rescue StandardError
+      flash[:warn] = 'StandardError updating response attribute in map_to_assignment'
     end
 
     respond_to do |format|
@@ -67,6 +68,7 @@ class SampleReviewsController < ApplicationController
       visibility = 'public'
       @response.update_attribute('visibility', visibility)
     rescue StandardError
+      flash[:warn] = 'StandardError updating response attribute in unmap_from_assignment'
     end
 
     respond_to do |format|

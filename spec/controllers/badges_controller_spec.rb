@@ -46,16 +46,17 @@ describe BadgesController do
         expect(get: 'badges/new').to route_to('badges#new')
       end
     end
-    # context 'when user tries to create a new badge' do
-    #   it 'renders the create new form' do
-    #     allow(Badge).to receive(:new).and_return(badge)
-    #     #params = { participant_id: participant.id, team_id: -2 }
-    #     params = {}
-    #     session = { user: instructor1 }
-    #     get :new, params, session
-    #     expect(response).to render_template('new')
-    #   end
-    # end
+
+context 'when user tries to create a new badge' do
+      it 'renders the create new form' do
+        allow(Badge).to receive(:new).and_return(badge)
+        #params = { participant_id: participant.id, team_id: -2 }
+        params = {}
+        session = { user: instructor1 }
+        get :new, params, session
+        expect(response).to render_template('new')
+      end
+    end
 
   end
 end

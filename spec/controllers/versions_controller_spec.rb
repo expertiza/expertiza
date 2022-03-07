@@ -31,12 +31,25 @@ describe VersionsController do
     end
   end
 
-  describe "GET /index" do
-    it "returns http success" do
+  describe 'GET /index' do
+    it 'returns http success' do
       stub_current_user(admin, admin.role.name, admin.role)
-      expect(controller.send(:action_allowed?)).to be_truthy
-      get "index"
-      expect(response).to redirect_to("/versions/search")
+      get 'index'
+      expect(response).to redirect_to('/versions/search')
+    end
+  end
+
+  describe 'GET /search' do
+    it 'returns http success' do
+      stub_current_user(admin, admin.role.name, admin.role)
+      params = { id: 3 }
+      get 'search', params
+      expect(response).to be_success
+    end
+    it 'should render search template' do
+      stub_current_user(admin, admin.role.name, admin.role)
+      get 'search'
+      expect(response).to render_template('search')
     end
   end
 end

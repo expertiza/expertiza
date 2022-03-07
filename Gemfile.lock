@@ -458,6 +458,8 @@ GEM
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 1.6)
+    rubocop-rspec (1.38.1)
+      rubocop (>= 0.68.1)
     ruby-progressbar (1.11.0)
     ruby_parser (3.15.1)
       sexp_processor (~> 4.9)
@@ -630,8 +632,10 @@ DEPENDENCIES
   rest-client
   rgl
   rjb
+  rspec (~> 3.0)
   rspec-rails
   rubocop
+  rubocop-rspec
   rubyzip
   rwordnet
   sass-rails (= 5.0.3)

@@ -6,7 +6,8 @@ describe ParticipantsController do
   let(:assignment_node) { build(:assignment_node) }
   let(:assignment) { build(:assignment) }
   let(:team) { build(:team) }
-  let(:participant) { build(:participant) }
+  let(:topic) { build(:topic) }
+  let(:signed_up_team) { build(:signed_up_team) }
   describe '#action_allowed?' do
     context 'when current user is student' do
       it 'allows update_duties action' do
@@ -155,4 +156,20 @@ describe ParticipantsController do
       expect(pc.send(:get_user_info, student, assignment)).to eq(name: 'name', fullname: 'fullname', pub_rights: 'Granted', verified: false)
     end
   end
+
+  describe '#get_signup_topics_for_assignment' do
+    it 'gives the signup topics for assignment' do
+
+
+      # allow(signed_up_team).to receive(:topic).and_return(topic)
+      # allow(signed_up_team).to receive(:team_id).and_return('team_id')
+
+      # allow(topic).to receive(:topic_name).and_return('topic_name')
+      # allow(topic).to receive(:assignment).and_return(assignment)    
+
+      pc = ParticipantsController.new
+      expect(pc.send(:get_signup_topics_for_assignment, topic.assignment.id, topic, signed_up_team.team_id)).to eq(true)
+    end
+  end
+
 end

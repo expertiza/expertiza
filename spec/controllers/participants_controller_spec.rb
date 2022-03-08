@@ -1,6 +1,7 @@
 describe ParticipantsController do
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student) }
+  let(:student1) { build_stubbed(:student, id: 1, name: 'student') }
   let(:course_participant) { build(:course_participant) }
   let(:participant) { build(:participant) }
   let(:assignment_node) { build(:assignment_node) }
@@ -37,59 +38,11 @@ describe ParticipantsController do
     end
   end
 
-  describe '#destroy' do
-    it 'deletes the participant and redirects to #list page' do
-      allow(Participant).to receive(:find).with('1').and_return(course_participant)
-      allow(course_participant).to receive(:destroy).and_return(true)
-      params = { id: 1 }
-      session = { user: instructor }
-      post :destroy, params, session
-      expect(response).to redirect_to('/participants/list?id=1&model=Course')
-    end
-  end
-
-  describe '#delete' do
-    it 'deletes the assignment_participant and redirects to #review_mapping/list_mappings page' do
-      allow(Participant).to receive(:find).with('1').and_return(participant)
-      allow(participant).to receive(:destroy).and_return(true)
-      params = { id: 1 }
-      session = { user: instructor }
-      get :delete, params, session
-      expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
-    end
-  end
-
-  describe '#update_authorizations' do
-    it 'updates the authorizations for the participant' do
-      allow(Participant).to receive(:find).with('1').and_return(participant)
-      params = { authorization: 'participant', id: 1 }
-      session = { user: instructor }
-      get :update_authorizations, params, session
-      expect(response).to redirect_to('/participants/list?id=1&model=Assignment')
-    end
-  end
-
-  describe '#validate_authorizations' do
-    # Test case for successful update of participant to reviewer, expects the success flash message after role is updated.
-    it 'updates the authorizations for the participant to make them reviewer' do
-      allow(Participant).to receive(:find).with('1').and_return(participant)
-      params = { authorization: 'reviewer', id: 1 }
-      session = { user: instructor }
-      get :update_authorizations, params, session
-      expect(flash[:success]).to eq 'The role of the selected participants has been successfully updated.'
-      expect(participant.can_review).to eq(true)
-      expect(participant.can_submit).to eq(false)
-      expect(participant.can_take_quiz).to eq(false)
-    end
-
-    # Test for case where we expect to encounter an error in update_attributes method
-    it ' throws an exception while validating authorizations' do
-      allow(Participant).to receive(:find).with('1').and_return(participant)
-      allow(participant).to receive(:update_attributes).and_raise(StandardError)
-      params = { authorization: 'reviewer', id: 1 }
-      session = { user: instructor }
-      get :update_authorizations, params, session
-      expect(flash[:error]).to eq 'The update action failed.'
+  describe '#controller_locale' do
+    it 'should return I18n.default_locale' do
+      user = student
+      stub_current_user(user, user.role.name, user.role)
+      expect(controller.send(:controller_locale)).to eq(I18n.default_locale)
     end
   end
 
@@ -123,6 +76,27 @@ describe ParticipantsController do
     end
   end
 
+  describe '#update_authorizations' do
+    it 'updates the authorizations for the participant' do
+      allow(Participant).to receive(:find).with('1').and_return(participant)
+      params = { authorization: 'participant', id: 1 }
+      session = { user: instructor }
+      get :update_authorizations, params, session
+      expect(response).to redirect_to('/participants/list?id=1&model=Assignment')
+    end
+  end
+
+  describe '#destroy' do
+    it 'deletes the participant and redirects to #list page' do
+      allow(Participant).to receive(:find).with('1').and_return(course_participant)
+      allow(course_participant).to receive(:destroy).and_return(true)
+      params = { id: 1 }
+      session = { user: instructor }
+      post :destroy, params, session
+      expect(response).to redirect_to('/participants/list?id=1&model=Course')
+    end
+  end
+
   describe '#inherit' do
     it 'inherits the participant list' do
       allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -142,6 +116,61 @@ describe ParticipantsController do
       get :bequeath_all, params, session
       expect(flash[:note]).to eq 'All assignment participants are already part of the course'
       expect(response).to redirect_to('/participants/list?model=Assignment')
+    end
+  end
+
+  describe '#change_handle' do
+    it 'changes the handle of the participant' do
+      allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
+      params = { id: 1, participant: { handle: 'new_handle' } }
+      session = { user: student1 }
+      xhr :get, :change_handle, params, session
+      expect(response).to have_http_status(200)
+    end
+  end
+
+  describe '#delete' do
+    it 'deletes the assignment_participant and redirects to #review_mapping/list_mappings page' do
+      allow(Participant).to receive(:find).with('1').and_return(participant)
+      allow(participant).to receive(:destroy).and_return(true)
+      params = { id: 1 }
+      session = { user: instructor }
+      get :delete, params, session
+      expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+    end
+  end
+
+  describe '#view_copyright_grants' do
+    it 'renders the copyright_grants template' do
+      allow(Assignment).to receive(:find).with('1').and_return(assignment)
+      params = { id: 1 }
+      session = { user: instructor }
+      get :view_copyright_grants, params, session
+      expect(response).to render_template('view_copyright_grants')
+    end
+  end
+
+  describe '#validate_authorizations' do
+    # Test case for successful update of participant to reviewer, expects the success flash message after role is updated.
+    it 'updates the authorizations for the participant to make them reviewer' do
+      allow(Participant).to receive(:find).with('1').and_return(participant)
+      params = { authorization: 'reviewer', id: 1 }
+      session = { user: instructor }
+      get :update_authorizations, params, session
+      expect(flash[:success]).to eq 'The role of the selected participants has been successfully updated.'
+      expect(participant.can_review).to eq(true)
+      expect(participant.can_submit).to eq(false)
+      expect(participant.can_take_quiz).to eq(false)
+    end
+
+    # Test for case where we expect to encounter an error in update_attributes method
+    it ' throws an exception while validating authorizations' do
+      allow(Participant).to receive(:find).with('1').and_return(participant)
+      allow(participant).to receive(:update_attributes).and_raise(StandardError)
+      params = { authorization: 'reviewer', id: 1 }
+      session = { user: instructor }
+      get :update_authorizations, params, session
+      expect(flash[:error]).to eq 'The update action failed.'
     end
   end
 

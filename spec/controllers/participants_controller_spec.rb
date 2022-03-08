@@ -188,14 +188,6 @@ describe ParticipantsController do
 
   describe '#get_signup_topics_for_assignment' do
     it 'gives the signup topics for assignment' do
-
-
-      # allow(signed_up_team).to receive(:topic).and_return(topic)
-      # allow(signed_up_team).to receive(:team_id).and_return('team_id')
-
-      # allow(topic).to receive(:topic_name).and_return('topic_name')
-      # allow(topic).to receive(:assignment).and_return(assignment)    
-
       pc = ParticipantsController.new
       expect(pc.send(:get_signup_topics_for_assignment, topic.assignment.id, topic, signed_up_team.team_id)).to eq(true)
     end

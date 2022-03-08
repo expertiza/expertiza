@@ -400,7 +400,9 @@ class SignUpSheetController < ApplicationController
 
   # This method is called when a student click on the trumpet icon. So this is a bad method name. --Yang
   def show_team
-    if !(assignment = Assignment.find(params[:assignment_id])).nil? && !(topic = SignUpTopic.find(params[:id])).nil?
+    assignment = Assignment.find(params[:assignment_id])
+    topic = SignUpTopic.find(params[:id])
+    if assignment && topic
       @results = ad_info(assignment.id, topic.id)
       @results.each do |result|
         result.keys.each do |key|
@@ -480,7 +482,7 @@ class SignUpSheetController < ApplicationController
   # clicks to see ads related to a topic
   def ad_info(_assignment_id, topic_id)
     @ad_information = []
-    @signed_up_teams = SignedUpTeam.where('topic_id = ?', topic_id.to_s)
+    @signed_up_teams = SignedUpTeam.where(topic_id: topic_id)
     # Iterate through the results of the query and get the required attributes
     @signed_up_teams.each do |signed_up_team|
       team = signed_up_team.team

@@ -40,7 +40,6 @@ before_script:
   - cp config/secrets.yml.example config/secrets.yml
   - export JAVA_HOME=/usr/lib/jvm/java-6-openjdk-amd64
   - bundle install
-  - bundle exec danger --verbose
   - bundle exec rake db:setup
   # Test coverage offered by Code Climate
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-0.7.0-linux-amd64 > ./cc-test-reporter

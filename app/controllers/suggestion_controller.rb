@@ -11,10 +11,10 @@ class SuggestionController < ApplicationController
   end
 
   def add_comment
-    @suggestioncomment = SuggestionComment.new(vote: params[:suggestion_comment][:vote], comments: params[:suggestion_comment][:comments])
-    @suggestioncomment.suggestion_id = params[:id]
-    @suggestioncomment.commenter = session[:user].name
-    if @suggestioncomment.save
+    @suggestion_comment = SuggestionComment.new(vote: params[:suggestion_comment][:vote], comments: params[:suggestion_comment][:comments])
+    @suggestion_comment.suggestion_id = params[:id]
+    @suggestion_comment.commenter = session[:user].name
+    if @suggestion_comment.save
       flash[:notice] = 'Your comment has been successfully added.'
     else
       flash[:error] = 'There was an error in adding your comment.'

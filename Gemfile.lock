@@ -616,7 +616,7 @@ DEPENDENCIES
   mimemagic!
   momentjs-rails (>= 2.9.0)
   mysql2 (= 0.4.10)
-  nokogiri (~> 1.8)
+  nokogiri (= 1.10.10)
   omniauth-google-oauth2
   open-uri-cached
   paper_trail

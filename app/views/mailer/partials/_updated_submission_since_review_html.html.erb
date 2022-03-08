@@ -1,0 +1,6 @@
+Hi <%= @first_name %>,</br>
+<p>
+  A <%=@type%> you were reviewing for Assignment '<%= @obj_name %>' has been updated since you last review.<br>
+  Hence, to update your review please click on the following link.<br>
+  <% if @link %><a href="<%= @link %>"><%= @link %></a><% end %>
+</p>

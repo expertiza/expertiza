@@ -72,8 +72,8 @@ class StudentTeamsController < ApplicationController
       team.save
       parent = AssignmentNode.find_by node_object_id: student.parent_id
       TeamNode.create parent_id: parent.id, node_object_id: team.id
-      user = User.find student.user_id
-      team.add_member user, team.parent_id
+      user = User.find(student.user_id)
+      team.add_member(user, team.parent_id)
       team_created_successfully(team)
       redirect_to view_student_teams_path student_id: student.id
 
@@ -92,15 +92,11 @@ class StudentTeamsController < ApplicationController
     if matching_teams.length.zero?
       if team.update_attribute('name', params[:team][:name])
         team_created_successfully
-
         redirect_to view_student_teams_path student_id: params[:student_id]
-
       end
-    elsif matching_teams.length == 1 && (matching_teams.name == team.name)
-
+    elsif matching_teams.length == 1 && matching_teams.name == team.name
       team_created_successfully
       redirect_to view_student_teams_path student_id: params[:student_id]
-
     else
       flash[:notice] = 'That team name is already in use.'
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Team name being updated to was already in use', request)

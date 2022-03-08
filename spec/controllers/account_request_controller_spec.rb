@@ -31,7 +31,6 @@ describe AccountRequestController do
 
     it 'the input status is nil and original status is nil' do
       request_params = {
-        selection: nil,
         commit: 'Reject'
       }
       post :create_approved_user, params: request_params

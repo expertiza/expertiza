@@ -57,7 +57,7 @@ class AdvertiseForPartnerController < ApplicationController
   rescue StandardError
     ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, 'An error occurred and your advertisement was not removed', request)
     flash[:error] = 'An error occurred and your advertisement was not removed!'
-    redirect_to request.env['HTTP_REFERER'] ? :back : :root
+    redirect_back fallback_location: root_path
   else
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Your advertisement has been successfully removed.', request)
     flash[:success] = 'Your advertisement was successfully removed!'

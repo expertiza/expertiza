@@ -84,6 +84,14 @@ describe ParticipantsController do
       get :update_authorizations, params, session
       expect(response).to redirect_to('/participants/list?id=1&model=Assignment')
     end
+    it 'updates the authorizations fails' do
+      allow(Participant).to receive(:find).with('1').and_return(participant)
+      params = { authorization: 'participant', id: 1 }
+      session = { user: student }
+      get :update_authorizations, params, session
+      expect(flash[:error]).to eq 'A student is not allowed to update_authorizations this/these participants'
+      expect(response).to redirect_to('/')
+    end
   end
 
   describe '#destroy' do

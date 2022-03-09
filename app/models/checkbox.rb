@@ -141,4 +141,6 @@ class Checkbox < UnscoredQuestion
            end
     html
   end
+
+  # test code
 end

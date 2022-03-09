@@ -95,7 +95,7 @@ describe ReputationWebServiceController do
         create(:answer, question_id: @question_1_5.id, response_id: @response_1_3.id, answer: 1)
 
         # Expect to get JSON formart as 2D Hash with given answer array above per reviewer
-        result = ReputationWebServiceController.new.json_generator(1, 0, 1)
+        result = ReputationWebServiceController.new.generate_json_for_peer_reviews([1, 0], 1)
         expect(result).to eq('submission1' => { 'stu2' => 100.0, 'stu3' => 60.0, 'stu4' => 20.0 })
         # This test serves as the sample methodology to test on only 1 possible combination of answer array distribution
         # More combination of reviewer's answer need to be created for future reputation correctness test
@@ -119,7 +119,7 @@ describe ReputationWebServiceController do
         create(:answer, question_id: @question_1_5.id, response_id: @response_2_1.id, answer: 3)
 
         # Expect to get JSON formart as 2D Hash with given answer array above for reviewer_1
-        result = ReputationWebServiceController.new.json_generator(1, 0, 1)
+        result = ReputationWebServiceController.new.generate_json_for_peer_reviews([1, 0], 1)
         expect(result).to eq('submission1' => { 'stu2' => 100.0 }, 'submission2' => { 'stu2' => 60.0 })
         # This test serves as the sample methodology to test on only 1 possible combination of answer array distribution
         # More combination of reviewer's answer need to be created for future reputation correctness test

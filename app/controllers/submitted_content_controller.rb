@@ -29,7 +29,6 @@ class SubmittedContentController < ApplicationController
 
     @assignment = @participant.assignment
     # ACS We have to check if this participant has team or not
-    # hence use team count for the check
     SignUpSheet.signup_team(@assignment.id, @participant.user_id, nil) if @participant.team.nil?
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = !params.key?(:view)

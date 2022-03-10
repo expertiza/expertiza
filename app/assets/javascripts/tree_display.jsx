@@ -7,7 +7,7 @@ let app_variables = {
 };
 
 /** this object helps consolidate some of the logic used on this page */
-const node_attributes = {
+const nodeAttributes = {
   isAssignment(name) {
     return name === 'assignment' || name === 'assignments'
   },
@@ -23,11 +23,11 @@ const node_attributes = {
 
     actions: [
       (props) => ({
-        title: props.course_id ? 'Remove from course' : 'Assign to course',
-        href: props.course_id
+        title: props.courseId ? 'Remove from course' : 'Assign to course',
+        href: props.courseId
           ? '/assignments/remove_assignment_from_course?id=' + (parseInt(props.id) / 2).toString()
           : '/assignments/place_assignment_in_course?id=' + (parseInt(props.id) / 2).toString(),
-        src: props.course_id
+        src: props.courseId
           ? '/assets/tree_view/remove-from-course-24.png'
           : '/assets/tree_view/view-review-report-24.png'
       }),
@@ -37,7 +37,7 @@ const node_attributes = {
         src: '/assets/tree_view/add-participant-24.png'
       }),
       (props) =>
-        parseInt(props.max_team_size) > 1
+        parseInt(props.maxTeamSize) > 1
           ? {
             title: 'Create teams',
             href: '/teams/list?id=' + `${parseInt(props.id) / 2}` + '&type=Assignment',
@@ -55,7 +55,7 @@ const node_attributes = {
         src: '/assets/tree_view/assign-survey-24.png'
       }),
       (props) =>
-        props.require_quiz
+        props.requireQuiz
           ? {
             title: 'View quiz questions',
             href:
@@ -86,7 +86,7 @@ const node_attributes = {
         src: '/assets/tree_view/view-survey-24.png'
       }),
       (props) =>
-        props.is_intelligent
+        props.isIntelligent
           ? {
             title: 'Intelligent Assignment',
             href: '/lottery/run_intelligent_assignment/' + `${parseInt(props.id) / 2}`,
@@ -94,7 +94,7 @@ const node_attributes = {
           }
           : null,
       (props) =>
-        props.allow_suggestions
+        props.allowSuggestions
           ? {
             title: 'View suggestions',
             href: '/suggestion/list?id=' + `${parseInt(props.id) / 2}` + '&type=Assignment',
@@ -103,8 +103,8 @@ const node_attributes = {
           : null
     ],
     getActions: function (props) {
-      if (props.is_available) {
-        return node_attributes.assignment.actions.filter((i) => i(props)).map((val, i, arr) => {
+      if (props.isAvailable) {
+        return nodeAttributes.assignment.actions.filter((i) => i(props)).map((val, i, arr) => {
           let ret = val(props)
           /** every five provide a break */
           if (i % 5 == 0) {
@@ -127,7 +127,7 @@ const node_attributes = {
           }
         })
       } else {
-        let ret = node_attributes.assignment.actions[0](props)
+        let ret = nodeAttributes.assignment.actions[0](props)
         return (
           <span>
             <a title={ret.title} href={ret.href}>
@@ -179,7 +179,7 @@ const node_attributes = {
       }
     ],
     getActions: function (id) {
-      return node_attributes.course.actions.map(
+      return nodeAttributes.course.actions.map(
         (action) =>
           action.src ? (
             <a title={action.title} href={action.href + id}>
@@ -282,93 +282,6 @@ jQuery(document).ready(function () {
     var strTime = hours + ':' + minutes + ' ' + ampm
     return month[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear() + ' - ' + strTime
   }
-
-
-  var SimpleTableRow = React.createClass({
-    render: function () {
-      var creation_date
-      var updated_date
-      var colWidthArray = ['30%', '0%', '0%', '0%', '25%', '25%', '20%']
-      var colDisplayStyle = {
-        display: ''
-      }
-      if (this.props.dataType === 'questionnaire') {
-        colWidthArray = ['30%', '0%', '0%', '0%', '20%', '20%', '30%']
-        colDisplayStyle = {
-          display: 'none'
-        }
-      } else if (this.props.dataType === 'course') {
-        colWidthArray = ['20%', '0%', '0%', '20%', '20%', '20%', '20%']
-      }
-      if (this.props.creation_date && this.props.updated_date) {
-        creation_date = this.props.creation_date.replace('T', '<br/>')
-        updated_date = this.props.updated_date.replace('T', '<br/>')
-      }
-      var nodeTypeRaw = this.props.id.split('_')[0]
-      var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length - 4).toLowerCase()
-      var id = this.props.id.split('_')[1]
-      if (this.props.dataType == 'course') {
-        var institution_name = '-'
-        if (typeof this.props.institution !== 'undefined' && this.props.institution.length != 0) {
-          institution_name = this.props.institution[0].name
-        }
-        return (
-          <tr id={this.props.id}>
-            <td width={colWidthArray[0]}>{this.props.name}</td>
-            <td style={colDisplayStyle} width={colWidthArray[3]}>
-              {institution_name}
-            </td>
-            <td width={colWidthArray[4]} dangerouslySetInnerHTML={{ __html: creation_date }} />
-            <td width={colWidthArray[5]} dangerouslySetInnerHTML={{ __html: updated_date }} />
-            <td width={colWidthArray[6]}>
-              <RowAction
-                actions={this.props.actions}
-                key={'simpleTable_' + this.props.id}
-                nodeType={nodeType}
-                parent_name={this.props.name}
-                private={this.props.private}
-                is_available={this.props.is_available}
-                course_id={this.props.course_id}
-                max_team_size={this.props.max_team_size}
-                is_intelligent={this.props.is_intelligent}
-                require_quiz={this.props.require_quiz}
-                allow_suggestions={this.props.allow_suggestions}
-                has_topic={this.props.has_topic}
-                id={id}
-                instructor_id={this.props.instructor_id}
-              />
-            </td>
-          </tr>
-        )
-      } else {
-        return (
-          <tr id={this.props.id}>
-            <td width={colWidthArray[0]}>{this.props.name}</td>
-            <td width={colWidthArray[4]} dangerouslySetInnerHTML={{ __html: creation_date }} />
-            <td width={colWidthArray[5]} dangerouslySetInnerHTML={{ __html: updated_date }} />
-            <td width={colWidthArray[6]}>
-              <RowAction
-                actions={this.props.actions}
-                key={'simpleTable_' + this.props.id}
-                nodeType={nodeType}
-                parent_name={this.props.name}
-                private={this.props.private}
-                is_available={this.props.is_available}
-                course_id={this.props.course_id}
-                max_team_size={this.props.max_team_size}
-                is_intelligent={this.props.is_intelligent}
-                require_quiz={this.props.require_quiz}
-                allow_suggestions={this.props.allow_suggestions}
-                has_topic={this.props.has_topic}
-                id={id}
-                instructor_id={this.props.instructor_id}
-              />
-            </td>
-          </tr>
-        )
-      }
-    }
-  })
 
   var SimpleTable = React.createClass({
     render: function () {
@@ -563,8 +476,8 @@ jQuery(document).ready(function () {
       var nodeTypeRaw = this.props.id.split('_')[0]
       var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length - 4).toLowerCase()
       var id = this.props.id.split('_')[1]
-      if (this.props.dataType == 'course') {
-        var institution_name = '-'
+      if (this.props.dataType == 'course') { //refactor
+        var institution_name = '&ndash;'
         if (typeof this.props.institution !== 'undefined' && this.props.institution.length != 0) {
           institution_name = this.props.institution[0].name
         }
@@ -589,15 +502,14 @@ jQuery(document).ready(function () {
                 actions={this.props.actions}
                 key={this.props.id}
                 nodeType={nodeType}
-                parent_name={this.props.name}
+                parentName={this.props.name}
                 private={this.props.private}
-                is_available={this.props.is_available}
-                course_id={this.props.course_id}
-                max_team_size={this.props.max_team_size}
-                is_intelligent={this.props.is_intelligent}
-                require_quiz={this.props.require_quiz}
-                allow_suggestions={this.props.allow_suggestions}
-                has_topic={this.props.has_topic}
+                isAvailable={this.props.is_available}
+                courseId={this.props.course_id}
+                maxTeamSize={this.props.max_team_size}
+                isIntelligent={this.props.is_intelligent}
+                requireQuiz={this.props.require_quiz}
+                allowSuggestions={this.props.allow_suggestions}
                 dataType={this.props.dataType}
                 id={id}
               />
@@ -623,15 +535,14 @@ jQuery(document).ready(function () {
                 actions={this.props.actions}
                 key={this.props.id}
                 nodeType={nodeType}
-                parent_name={this.props.name}
+                parentName={this.props.name}
                 private={this.props.private}
-                is_available={this.props.is_available}
-                course_id={this.props.course_id}
-                max_team_size={this.props.max_team_size}
-                is_intelligent={this.props.is_intelligent}
-                require_quiz={this.props.require_quiz}
-                allow_suggestions={this.props.allow_suggestions}
-                has_topic={this.props.has_topic}
+                isAvailable={this.props.is_available}
+                courseId={this.props.course_id}
+                maxTeamSize={this.props.max_team_size}
+                isIntelligent={this.props.is_intelligent}
+                requireQuiz={this.props.require_quiz}
+                allowSuggestions={this.props.allow_suggestions}
                 dataType={this.props.dataType}
                 id={id}
               />

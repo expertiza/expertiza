@@ -104,8 +104,8 @@ class ReputationWebServiceController < ApplicationController
   def generate_json_for_peer_reviews(assignment_id_list, round_num = 2)
     has_topic = !SignUpTopic.where(assignment_id: assignment_id_list[0]).empty?
 
-    results = get_peer_reviews(assignment_id_list, round_num, has_topic)
-    request_body = generate_json_body(results)
+    peer_reviews_list = get_peer_reviews(assignment_id_list, round_num, has_topic)
+    request_body = generate_json_body(peer_reviews_list)
     request_body
   end
 

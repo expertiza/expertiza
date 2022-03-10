@@ -19,7 +19,7 @@ class BadgesController < ApplicationController
   def create
     @badge = Badge.new(badge_params)
     image_file = params[:badge][:image_file]
-    if !image_file.nil?
+    if image_file
       File.open(Rails.root.join('app', 'assets', 'images', 'badges', image_file.original_filename), 'wb') do |file|
         file.write(image_file.read)
       end

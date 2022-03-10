@@ -130,6 +130,7 @@ class TreeDisplayController < ApplicationController
       end
       flash[:error] = 'Invalid child nodes in the TreeList'
     rescue StandardError
+      flash[:warn] = 'StandardError running initialize_fnode_update_children on child_nodes in children_node_ng'
     end
 
     respond_to do |format|

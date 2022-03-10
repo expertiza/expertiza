@@ -2,9 +2,9 @@ class CreateQuizResponses < ActiveRecord::Migration[4.2]
   def self.up
     create_table :quiz_responses do |t|
       t.text :response
-      t.references :assignment
-      t.references :questionnaire
-      t.references :question
+      t.references :assignment, :integer
+      t.references :questionnaire, :integer
+      t.references :question, :integer
 
       t.timestamps
     end

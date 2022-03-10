@@ -52,9 +52,9 @@ class CreateQuestionnaireFolderNodes < ActiveRecord::Migration[4.2]
     fnode = TreeFolder.create(name: 'Course Evaluation', child_type: 'QuestionnaireNode')
     pfNode = FolderNode.create(parent_id: pNode.id, node_object_id: fnode.id)
 
-    CourseEvaluationQuestionnaire.find_each  do |questionnaire|
-      QuestionnaireNode.create(parent_id: pfNode.id, node_object_id: questionnaire.id)
-    end
+    # CourseEvaluationQuestionnaire.find_each  do |questionnaire|
+    #   QuestionnaireNode.create(parent_id: pfNode.id, node_object_id: questionnaire.id)
+    # end
 
     folders = TreeFolder.where(child_type: 'QuestionnaireNode')
     folders.each do |folder|

@@ -37,7 +37,7 @@ class SubmittedContentController < ApplicationController
 
   # view is called when @assignment.submission_allowed(topic_id) is false
   # so @can_submit should be false
-  def Prevent_submission
+  def prevent_submission
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
 

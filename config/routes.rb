@@ -430,7 +430,7 @@ Expertiza::Application.routes.draw do
       post :folder_action
       post :submit_hyperlink
       get :submit_hyperlink
-      get :view
+      get :prevent_submission
     end
   end
 

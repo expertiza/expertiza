@@ -20,26 +20,33 @@ class ReputationWebServiceController < ApplicationController
     current_user_has_ta_privileges?
   end
 
-  def calculate_peer_review_grade(valid_response)
-    valid_response.each do |response|
-      answers = Answer.where(response_id: response.id)
-      max_question_score = begin
-                             answers.first.question.questionnaire.max_question_score
-                           rescue StandardError
-                             1
-                           end
-      temp_sum = 0
-      weight_sum = 0
-      valid_answer = answers.select { |a| (a.question.type == 'Criterion') && !a.answer.nil? }
-      next if valid_answer.empty?
+  def calculate_peer_review_grade(response)
+    answers = Answer.where(response_id: response.id)
+    max_question_score = begin
+                            answers.first.question.questionnaire.max_question_score
+                          rescue StandardError
+                            1
+                          end
+    temp_sum = 0
+    weight_sum = 0
+    valid_answer = answers.select { |a| (a.question.type == 'Criterion') && !a.answer.nil? }
+    return nil if valid_answer.empty?
 
-      valid_answer.each do |answer|
-        temp_sum += answer.answer * answer.question.weight
-        weight_sum += answer.question.weight
-      end
-      peer_review_grade = 100.0 * temp_sum / (weight_sum * max_question_score)
-      return peer_review_grade.round(4)
+    valid_answer.each do |answer|
+      temp_sum += answer.answer * answer.question.weight
+      weight_sum += answer.question.weight
     end
+    peer_review_grade = 100.0 * temp_sum / (weight_sum * max_question_score)
+    peer_review_grade.round(4)
+  end
+
+  def get_peer_reviews_for_responses(reviewer_id, team_id, valid_response)
+    peer_review_grades_list = []
+    valid_response.each do |response|
+      review_grade = calculate_peer_review_grade(response)
+      peer_review_grades_list << [reviewer_id, team_id, review_grade] unless review_grade.nil?
+    end
+    peer_review_grades_list
   end
 
   # db query, return peer reviews
@@ -51,28 +58,35 @@ class ReputationWebServiceController < ApplicationController
       topic_condition = ((has_topic && (SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false)) || !has_topic)
       last_valid_response = response_map.response.select { |r| r.round == round_num }.max
       valid_response = [last_valid_response] unless last_valid_response.nil?
-      next unless (topic_condition == true) && !valid_response.nil? && !valid_response.empty?
-
-      raw_data_array << [reviewer.id, team.id, calculate_peer_review_grade(valid_response)]
+      if (topic_condition == true) && !valid_response.nil? && !valid_response.empty?
+        raw_data_array += get_peer_reviews_for_responses(reviewer.id, team.id, valid_response)
+      end
     end
     raw_data_array
   end
 
-  # special db query, return quiz scores
-  def db_query_with_quiz_score(assignment_id_list)
-    raw_data_array = []
-    teams = AssignmentTeam.where('parent_id in (?)', assignment_id_list)
-    team_ids = []
-    teams.each { |team| team_ids << team.id }
+  def get_ids_list(tables)
+    id_list = []
+    tables.each { |table| id_list << table.id }
+    id_list
+  end
+
+  def get_scores(team_ids)
     quiz_questionnnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
-    quiz_questionnnaire_ids = []
-    quiz_questionnnaires.each { |questionnaire| quiz_questionnnaire_ids << questionnaire.id }
+    quiz_questionnnaire_ids = get_ids_list(quiz_questionnnaires)
     QuizResponseMap.where('reviewed_object_id in (?)', quiz_questionnnaire_ids).each do |response_map|
       quiz_score = response_map.quiz_score
       participant = Participant.find(response_map.reviewer_id)
       raw_data_array << [participant.user_id, response_map.reviewee_id, quiz_score]
     end
     raw_data_array
+  end
+
+  # special db query, return quiz scores
+  def get_quiz_score(assignment_id_list)
+    teams = AssignmentTeam.where('parent_id in (?)', assignment_id_list)
+    team_ids = get_ids_list(teams)
+    get_scores(team_ids)
   end
 
   def generate_json_body(results)
@@ -84,18 +98,20 @@ class ReputationWebServiceController < ApplicationController
     # sort the 2-dimension hash
     request_body.each { |k, v| request_body[k] = v.sort.to_h }
     request_body.sort.to_h
+    request_body
   end
 
   def generate_json_for_peer_reviews(assignment_id_list, round_num = 2)
     has_topic = !SignUpTopic.where(assignment_id: assignment_id_list[0]).empty?
-    @results = get_peer_reviews(assignment_id_list, round_num, has_topic)
-    request_body = generate_json_body(@results)
+
+    results = get_peer_reviews(assignment_id_list, round_num, has_topic)
+    request_body = generate_json_body(results)
     request_body
   end
 
   def generate_json_for_quiz_scores(assignment_id_list)
-    @results = db_query_with_quiz_score(assignment_id_list)
-    request_body = generate_json_body(@results)
+    participant_reviewee_map = get_quiz_score(assignment_id_list)
+    request_body = generate_json_body(participant_reviewee_map)
     request_body
   end
 
@@ -119,11 +135,11 @@ class ReputationWebServiceController < ApplicationController
     @response = @@response
   end
 
-  def get_assignment_id_list(assignment_id_1, assignment_id_2)
+  def get_assignment_id_list(assignment_id_one, assignment_id_two)
     assignment_id_list = []
-    assignment_id_list << assignment_id_1
-    assignment_id_list << assignment_id_2 unless assignment_id_2.zero?
-    return assignment_id_list
+    assignment_id_list << assignment_id_one
+    assignment_id_list << assignment_id_two unless assignment_id_two.zero?
+    assignment_id_list
   end
 
   def send_post_request

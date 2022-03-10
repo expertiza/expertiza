@@ -225,8 +225,6 @@ class SubmittedContentController < ApplicationController
     base.split('.')[base.split('.').size - 1] if base.split('.').size > 1
   end
 
-  
-
   # if one team do not hold a topic (still in waitlist), they cannot submit their work.
   def one_team_can_submit_work?
     @participant = if params[:id].nil?

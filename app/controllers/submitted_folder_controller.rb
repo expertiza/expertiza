@@ -45,10 +45,10 @@ class SubmittedFolderController < ApplicationController
     newloc += "/"
     newloc += params[:faction][:move]
     begin
-        FileHelper.move_file(old_filename, newloc)
-        flash[:note] = "The file was successfully moved from \"/#{params[:filenames][params[:chk_files]]}\" to \"/#{params[:faction][:move]}\""
+      FileHelper.move_file(old_filename, newloc)
+      flash[:note] = "The file was successfully moved from \"/#{params[:filenames][params[:chk_files]]}\" to \"/#{params[:faction][:move]}\""
     rescue StandardError => e
-    flash[:error] = "There was a problem moving the file: " + e.message
+      flash[:error] = "There was a problem moving the file: " + e.message
     end
   end
 
@@ -84,7 +84,7 @@ class SubmittedFolderController < ApplicationController
     begin
       raise "A file with this name already exists. Please delete the existing file before copying." if File.exist?(new_filename)
       raise "The referenced file does not exist." unless File.exist?(old_filename)
-      
+
       FileUtils.cp_r(old_filename, new_filename)
     rescue StandardError => e
       flash[:error] = "There was a problem copying the file: " + e.message

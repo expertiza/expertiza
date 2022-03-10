@@ -134,7 +134,7 @@ class SubmittedContentController < ApplicationController
     ExpertizaLogger.info LoggerMessage.new(controller_name, participant.name, 'The file has been submitted.', request)
     notify_reviewers(participant)
   end
-  
+
   def get_file_upload(participant, file, file_content)
     participant.team.set_student_directory_num
     @current_folder = DisplayOption.new

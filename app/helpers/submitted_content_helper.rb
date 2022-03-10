@@ -24,7 +24,7 @@ module SubmittedContentHelper
           ret += link_to File.basename(file), :controller => 'submitted_content', :action => 'edit', :id => participant.id, 'current_folder[name]' => file
         else
           ret += "\n      "
-          ret += link_to File.basename(file), :controller => 'submitted_content',
+          ret += link_to File.basename(file), :controller => 'submitted_folder',
                                               :action => 'download',
                                               :id => participant.id,
                                               :download => File.basename(file),
@@ -55,7 +55,7 @@ module SubmittedContentHelper
       begin
         if File.exist?(file)
           html += link_to image_tag('/assets/tree_view/List-submisstions-24.png'),
-                          :controller => 'submitted_content',
+                          :controller => 'submitted_folder',
                           :action => 'download',
                           :id => participant.id,
                           :download => File.basename(file),
@@ -87,11 +87,11 @@ module SubmittedContentHelper
       ret += "<input type=hidden id='filenames_#{index}' name='filenames[#{index}]' value='" + File.dirname(disp) + '/' + File.basename(path) + "'>"
       if File.ftype(disp) == 'directory'
         ret += "<a title='Expand/Collapse' href='#' onclick='javascript:collapseSubDirectory(#{index}); return false;'><img id='expand.#{index}' alt='Expand/Collapse' title='Expand/Collapse' src='/assets/up.png'></a>&nbsp;"
-        ret += link_to path, :controller => 'submitted_content', :action => 'edit', :id => participant.id, :download => File.basename(path), 'current_folder[name]' => File.dirname(disp)
+        ret += link_to path, :controller => 'submitted_folder', :action => 'edit', :id => participant.id, :download => File.basename(path), 'current_folder[name]' => File.dirname(disp)
         ret += '</li>'
         ret += list_sub_directories(disp, participant)
       else
-        ret += link_to path, :controller => 'submitted_content', :action => 'edit', :id => participant.id, :download => File.basename(path), 'current_folder[name]' => File.dirname(disp)
+        ret += link_to path, :controller => 'submitted_folder', :action => 'edit', :id => participant.id, :download => File.basename(path), 'current_folder[name]' => File.dirname(disp)
         ret += '</li>'
       end
     end

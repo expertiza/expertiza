@@ -20,55 +20,60 @@ class ReputationWebServiceController < ApplicationController
     current_user_has_ta_privileges?
   end
 
+  def calculate_peer_review_grade(response)
+    answers = Answer.where(response_id: response.id)
+    max_question_score = begin
+                            answers.first.question.questionnaire.max_question_score
+                          rescue StandardError
+                            1
+                          end
+    temp_sum = 0
+    weight_sum = 0
+    valid_answer = answers.select { |a| (a.question.type == 'Criterion') && !a.answer.nil? }
+    return nil if valid_answer.empty?
+
+    valid_answer.each do |answer|
+      temp_sum += answer.answer * answer.question.weight
+      weight_sum += answer.question.weight
+    end
+    peer_review_grade = 100.0 * temp_sum / (weight_sum * max_question_score)
+    peer_review_grade.round(4)
+  end
+
+  def get_peer_reviews_for_responses(reviewer_id, team_id, valid_response)
+    peer_review_grades_list = []
+    valid_response.each do |response|
+      review_grade = calculate_peer_review_grade(response)
+      peer_review_grades_list << [reviewer_id, team_id, review_grade] unless review_grade.nil?
+    end
+    peer_review_grades_list
+  end
+
   # db query, return peer reviews
-  def db_query(assignment_id, round_num, has_topic, another_assignment_id = 0)
+  def get_peer_reviews(assignment_id_list, round_num, has_topic)
     raw_data_array = []
-    assignment_ids = []
-    assignment_ids << assignment_id
-    assignment_ids << another_assignment_id unless another_assignment_id.zero?
-    ReviewResponseMap.where('reviewed_object_id in (?) and calibrate_to = ?', assignment_ids, false).each do |response_map|
+    ReviewResponseMap.where('reviewed_object_id in (?) and calibrate_to = ?', assignment_id_list, false).each do |response_map|
       reviewer = response_map.reviewer.user
       team = AssignmentTeam.find(response_map.reviewee_id)
       topic_condition = ((has_topic && (SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false)) || !has_topic)
       last_valid_response = response_map.response.select { |r| r.round == round_num }.max
       valid_response = [last_valid_response] unless last_valid_response.nil?
-      next unless (topic_condition == true) && !valid_response.nil? && !valid_response.empty?
-
-      valid_response.each do |response|
-        answers = Answer.where(response_id: response.id)
-        max_question_score = begin
-                               answers.first.question.questionnaire.max_question_score
-                             rescue StandardError
-                               1
-                             end
-        temp_sum = 0
-        weight_sum = 0
-        valid_answer = answers.select { |a| (a.question.type == 'Criterion') && !a.answer.nil? }
-        next if valid_answer.empty?
-
-        valid_answer.each do |answer|
-          temp_sum += answer.answer * answer.question.weight
-          weight_sum += answer.question.weight
-        end
-        peer_review_grade = 100.0 * temp_sum / (weight_sum * max_question_score)
-        raw_data_array << [reviewer.id, team.id, peer_review_grade.round(4)]
+      if (topic_condition == true) && !valid_response.nil? && !valid_response.empty?
+        raw_data_array += get_peer_reviews_for_responses(reviewer.id, team.id, valid_response)
       end
     end
     raw_data_array
   end
 
-  # special db query, return quiz scores
-  def db_query_with_quiz_score(assignment_id, another_assignment_id = 0)
-    raw_data_array = []
-    assignment_ids = []
-    assignment_ids << assignment_id
-    assignment_ids << another_assignment_id unless another_assignment_id.zero?
-    teams = AssignmentTeam.where('parent_id in (?)', assignment_ids)
-    team_ids = []
-    teams.each { |team| team_ids << team.id }
+  def get_ids_list(tables)
+    id_list = []
+    tables.each { |table| id_list << table.id }
+    id_list
+  end
+
+  def get_scores(team_ids)
     quiz_questionnnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
-    quiz_questionnnaire_ids = []
-    quiz_questionnnaires.each { |questionnaire| quiz_questionnnaire_ids << questionnaire.id }
+    quiz_questionnnaire_ids = get_ids_list(quiz_questionnnaires)
     QuizResponseMap.where('reviewed_object_id in (?)', quiz_questionnnaire_ids).each do |response_map|
       quiz_score = response_map.quiz_score
       participant = Participant.find(response_map.reviewer_id)
@@ -77,23 +82,37 @@ class ReputationWebServiceController < ApplicationController
     raw_data_array
   end
 
-  def json_generator(assignment_id, another_assignment_id = 0, round_num = 2, type = 'peer review grades')
-    assignment = Assignment.find_by(id: assignment_id)
-    has_topic = !SignUpTopic.where(assignment_id: assignment_id).empty?
+  # special db query, return quiz scores
+  def get_quiz_score(assignment_id_list)
+    teams = AssignmentTeam.where('parent_id in (?)', assignment_id_list)
+    team_ids = get_ids_list(teams)
+    get_scores(team_ids)
+  end
 
-    if type == 'peer review grades'
-      @results = db_query(assignment.id, round_num, has_topic, another_assignment_id)
-    elsif type == 'quiz scores'
-      @results = db_query_with_quiz_score(assignment.id, another_assignment_id)
-    end
+  def generate_json_body(results)
     request_body = {}
-    @results.each_with_index do |record, _index|
+    results.each_with_index do |record, _index|
       request_body['submission' + record[1].to_s] = {} unless request_body.key?('submission' + record[1].to_s)
       request_body['submission' + record[1].to_s]['stu' + record[0].to_s] = record[2]
     end
     # sort the 2-dimension hash
     request_body.each { |k, v| request_body[k] = v.sort.to_h }
     request_body.sort.to_h
+    request_body
+  end
+
+  def generate_json_for_peer_reviews(assignment_id_list, round_num = 2)
+    has_topic = !SignUpTopic.where(assignment_id: assignment_id_list[0]).empty?
+
+    peer_reviews_list = get_peer_reviews(assignment_id_list, round_num, has_topic)
+    request_body = generate_json_body(peer_reviews_list)
+    request_body
+  end
+
+  def generate_json_for_quiz_scores(assignment_id_list)
+    participant_reviewee_map = get_quiz_score(assignment_id_list)
+    request_body = generate_json_body(participant_reviewee_map)
+    request_body
   end
 
   def client
@@ -116,11 +135,20 @@ class ReputationWebServiceController < ApplicationController
     @response = @@response
   end
 
+  def get_assignment_id_list(assignment_id_one, assignment_id_two)
+    assignment_id_list = []
+    assignment_id_list << assignment_id_one
+    assignment_id_list << assignment_id_two unless assignment_id_two.zero?
+    assignment_id_list
+  end
+
   def send_post_request
     # https://www.socialtext.net/open/very_simple_rest_in_ruby_part_3_post_to_create_a_new_workspace
     req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader: { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
     curr_assignment_id = (params[:assignment_id].empty? ? '724' : params[:assignment_id])
-    req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
+    assignment_id_list_peers = get_assignment_id_list(curr_assignment_id, params[:another_assignment_id].to_i)
+    req.body = generate_json_for_peer_reviews(assignment_id_list_peers, params[:round_num].to_i).to_json
+    # req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
     req.body[0] = '' # remove the first '{'
     @@assignment_id = params[:assignment_id]
     @@round_num = params[:round_num]
@@ -152,7 +180,9 @@ class ReputationWebServiceController < ApplicationController
       @@additional_info = 'add initial lauw reputation values'
     elsif params[:checkbox][:quiz] == 'Add quiz scores'
       @@additional_info = 'add quiz scores'
-      quiz_str = json_generator(params[:assignment_id].to_i, params[:another_assignment_id].to_i, params[:round_num].to_i, 'quiz scores').to_json
+      assignment_id_list_quiz = get_assignment_id_list(params[:assignment_id].to_i, params[:another_assignment_id].to_i)
+      quiz_str =  generate_json_for_quiz_scores(assignment_id_list_quiz).to_json
+      # quiz_str = json_generator(params[:assignment_id].to_i, params[:another_assignment_id].to_i, params[:round_num].to_i, 'quiz scores').to_json
       quiz_str[0] = ''
       quiz_str.prepend('"quiz_scores":{')
       quiz_str += ','

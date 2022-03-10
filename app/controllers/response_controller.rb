@@ -1,5 +1,6 @@
 class ResponseController < ApplicationController
   include AuthorizationHelper
+  include ResponseHelper
 
   helper :submitted_content
   helper :file
@@ -13,23 +14,16 @@ class ResponseController < ApplicationController
     end
     case action
     when 'edit' # If response has been submitted, no further editing allowed
-      return false if response.is_submitted
-
-      return current_user_is_reviewer?(response.map, user_id)
+      is_action_allowed = response.is_submitted ? false : current_user_is_reviewer?(response.map, user_id)
       # Deny access to anyone except reviewer & author's team
     when 'delete', 'update'
-      return current_user_is_reviewer?(response.map, user_id)
+      is_action_allowed = current_user_is_reviewer?(response.map, user_id)
     when 'view'
-      return response_edit_allowed?(response.map, user_id)
+      is_action_allowed = response_edit_allowed?(response.map, user_id)
     else
-      user_logged_in?
+      is_action_allowed = user_logged_in?
     end
-  end
-
-  # E-1973 - helper method to check if the current user is the reviewer
-  # if the reviewer is an assignment team, we have to check if the current user is on the team
-  def current_user_is_reviewer?(map, _reviewer_id)
-    map.reviewer.current_user_is_reviewer? current_user.try(:id)
+    is_action_allowed
   end
 
   # GET /response/json?response_id=xx
@@ -111,11 +105,12 @@ class ResponseController < ApplicationController
         response_lock_action
         return
       end
-      @response.update_attribute('additional_comment', params[:review][:comments])
+      @response.update_attributes('additional_comment', params[:review][:comments])
       @questionnaire = questionnaire_from_response
       questions = sort_questions(@questionnaire.questions)
-      create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
-      @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
+      # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+      create_answers(params, questions) unless params[:responses].nil?
+      @response.update_attributes('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
@@ -386,11 +381,6 @@ class ResponseController < ApplicationController
     @dropdown_or_scale = (use_dropdown ? 'dropdown' : 'scale')
   end
 
-  # sorts by sequence number
-  def sort_questions(questions)
-    questions.sort_by(&:seq)
-  end
-
   # For each question in the list, starting with the first one, you update the comment and score
   def create_answers(params, questions)
     params[:responses].each_pair do |k, v|
@@ -406,19 +396,6 @@ class ResponseController < ApplicationController
       # it's unlikely that these answers exist, but in case the user refresh the browser some might have been inserted.
       answer = Answer.where(response_id: @response.id, question_id: q.id).first
       Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if answer.nil?
-    end
-  end
-
-  # Creates a table to store total contribution for Cake question across all reviewers
-  def store_total_cake_score
-    @total_score = {}
-    @questions.each do |question|
-      next unless question.instance_of? Cake
-
-      reviewee_id = ResponseMap.select(:reviewee_id, :type).where(id: @response.map_id.to_s).first
-      total_score = question.get_total_score_for_question(reviewee_id.type, question.id, @participant.id, @assignment.id, reviewee_id.reviewee_id).to_s
-      total_score = 0 if total_score.nil?
-      @total_score[question.id] = total_score
     end
   end
 end

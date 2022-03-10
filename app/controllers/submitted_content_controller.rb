@@ -123,7 +123,7 @@ class SubmittedContentController < ApplicationController
       redirect_to action: 'edit', id: participant.id
       return
     end
-    full_filename = get_file_upload(participant, file_content)
+    full_filename = get_file_upload(participant, file, file_content)
     
     assignment = Assignment.find(participant.parent_id)
     team = participant.team
@@ -133,10 +133,10 @@ class SubmittedContentController < ApplicationController
                             assignment_id: assignment.id,
                             operation: "Submit File")
     ExpertizaLogger.info LoggerMessage.new(controller_name, participant.name, 'The file has been submitted.', request)
-    notify_reviewers
+    notify_reviewers(participant)
   end
   
-  def get_file_upload(participant, file_content)
+  def get_file_upload(participant, file, file_content)
     participant.team.set_student_directory_num
     @current_folder = DisplayOption.new
     @current_folder.name = '/'
@@ -157,7 +157,7 @@ class SubmittedContentController < ApplicationController
     return full_filename
   end
 
-  def notify_reviewers
+  def notify_reviewers(participant)
     participant.mail_assigned_reviewers
 
     if params[:origin] == 'review'

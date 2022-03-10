@@ -1,8 +1,8 @@
 class SubmittedFolderController < ApplicationController
-
   def folder_action
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
+
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name]) if params[:current_folder]
@@ -28,6 +28,7 @@ class SubmittedFolderController < ApplicationController
       raise "File_name is nil." if file_name.nil?
       raise "Cannot send a whole folder." if File.directory?(folder_name + "/" + file_name)
       raise "File does not exist." unless File.exist?(folder_name + "/" + file_name)
+
       send_file(folder_name + "/" + file_name, disposition: 'inline')
     rescue StandardError => e
       flash[:error] = e.message
@@ -46,9 +47,9 @@ class SubmittedFolderController < ApplicationController
     begin
         FileHelper.move_file(old_filename, newloc)
         flash[:note] = "The file was successfully moved from \"/#{params[:filenames][params[:chk_files]]}\" to \"/#{params[:faction][:move]}\""
-      rescue StandardError => e
-        flash[:error] = "There was a problem moving the file: " + e.message
-      end
+    rescue StandardError => e
+    flash[:error] = "There was a problem moving the file: " + e.message
+    end
   end
 
   def rename_selected_file
@@ -56,6 +57,7 @@ class SubmittedFolderController < ApplicationController
     new_filename = params[:directories][params[:chk_files]] + "/" + FileHelper.sanitize_filename(params[:faction][:rename])
     begin
       raise "A file already exists in this directory with the name \"#{params[:faction][:rename]}\"" if File.exist?(new_filename)
+
       File.send("rename", old_filename, new_filename)
     rescue StandardError => e
       flash[:error] = "There was a problem renaming the file: " + e.message
@@ -82,6 +84,7 @@ class SubmittedFolderController < ApplicationController
     begin
       raise "A file with this name already exists. Please delete the existing file before copying." if File.exist?(new_filename)
       raise "The referenced file does not exist." unless File.exist?(old_filename)
+      
       FileUtils.cp_r(old_filename, new_filename)
     rescue StandardError => e
       flash[:error] = "There was a problem copying the file: " + e.message

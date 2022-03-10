@@ -124,7 +124,6 @@ class SubmittedContentController < ApplicationController
       return
     end
     full_filename = get_file_upload(participant, file, file_content)
-    
     assignment = Assignment.find(participant.parent_id)
     team = participant.team
     SubmissionRecord.create(team_id: team.id,

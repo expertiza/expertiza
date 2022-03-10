@@ -100,7 +100,6 @@ class ResponseController < ApplicationController
   # Update the response and answers when student "edit" existing response
   def update
     render nothing: true unless action_allowed?
-
     msg = ''
     begin
       # the response to be updated
@@ -111,11 +110,14 @@ class ResponseController < ApplicationController
         response_lock_action
         return
       end
-      @response.update_attribute('additional_comment', params[:review][:comments])
+      @response.update_attributes('additional_comment': params[:review][:comments])
       @questionnaire = questionnaire_from_response
       questions = sort_questions(@questionnaire.questions)
-      create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
-      @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
+
+      # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+      create_answers(params, questions) unless params[:responses].nil?
+
+      @response.update_attributes('is_submitted': true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
@@ -178,15 +180,13 @@ class ResponseController < ApplicationController
     # Hence we need to pick the latest response.
     @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first
     if @response.nil?
-      @response = Response.create(
-        map_id: @map.id,
-        additional_comment: params[:review][:comments],
-        round: @round.to_i,
-        is_submitted: is_submitted
-      )
+      @response = Response.create( map_id: @map.id, additional_comment: params[:review][:comments],
+        round: @round.to_i, is_submitted: is_submitted)
     end
     was_submitted = @response.is_submitted
-    @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
+
+    # ignore if autoupdate try to save when the response object is not yet created.s
+    @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted)
 
     # :version_num=>@version)
     # Change the order for displaying questions for editing response views.
@@ -194,6 +194,7 @@ class ResponseController < ApplicationController
     create_answers(params, questions) if params[:responses]
     msg = 'Your response was successfully saved.'
     error_msg = ''
+
     # only notify if is_submitted changes from false to true
     if (@map.is_a? ReviewResponseMap) && (!was_submitted && @response.is_submitted) && @response.significant_difference?
       @response.notify_instructor_on_difference

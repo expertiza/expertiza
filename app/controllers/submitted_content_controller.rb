@@ -123,7 +123,20 @@ class SubmittedContentController < ApplicationController
       redirect_to action: 'edit', id: participant.id
       return
     end
-
+    full_filename = get_file_upload(participant, file_content)
+    
+    assignment = Assignment.find(participant.parent_id)
+    team = participant.team
+    SubmissionRecord.create(team_id: team.id,
+                            content: full_filename,
+                            user: participant.name,
+                            assignment_id: assignment.id,
+                            operation: "Submit File")
+    ExpertizaLogger.info LoggerMessage.new(controller_name, participant.name, 'The file has been submitted.', request)
+    notify_reviewers
+  end
+  
+  def get_file_upload(participant, file_content)
     participant.team.set_student_directory_num
     @current_folder = DisplayOption.new
     @current_folder.name = '/'
@@ -141,16 +154,10 @@ class SubmittedContentController < ApplicationController
     if params['unzip']
       SubmittedContentHelper.unzip_file(full_filename, curr_directory, true) if file_type(safe_filename) == 'zip'
     end
-    assignment = Assignment.find(participant.parent_id)
-    team = participant.team
-    SubmissionRecord.create(team_id: team.id,
-                            content: full_filename,
-                            user: participant.name,
-                            assignment_id: assignment.id,
-                            operation: "Submit File")
-    ExpertizaLogger.info LoggerMessage.new(controller_name, participant.name, 'The file has been submitted.', request)
+    return full_filename
+  end
 
-    # Notify all reviewers assigned to this reviewee
+  def notify_reviewers
     participant.mail_assigned_reviewers
 
     if params[:origin] == 'review'

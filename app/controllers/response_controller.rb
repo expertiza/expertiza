@@ -114,7 +114,8 @@ class ResponseController < ApplicationController
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = questionnaire_from_response
       questions = sort_questions(@questionnaire.questions)
-      create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+      # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+      create_answers(params, questions) unless params[:responses].nil?
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     rescue StandardError
@@ -186,7 +187,9 @@ class ResponseController < ApplicationController
       )
     end
     was_submitted = @response.is_submitted
-    @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
+    review_comments = params[:review][:comments]
+    # ignore if autoupdate try to save when the response object is not yet created.
+    @response.update(additional_comment: review_comments, is_submitted: is_submitted)
 
     # :version_num=>@version)
     # Change the order for displaying questions for editing response views.
@@ -203,6 +206,11 @@ class ResponseController < ApplicationController
                 return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
   end
 
+  def insert_into_awarded_badges(participant_id, badge_name)
+    badge_id = Badge.get_id_from_name(badge_name: badge_name)
+    AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
+  end
+
   def save
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
@@ -211,12 +219,10 @@ class ResponseController < ApplicationController
     # E1822: Added logic to insert a student suggested 'Good Teammate' or 'Good Reviewer' badge in the awarded_badges table.
     if @map.assignment.badge?
       if @map.is_a?(TeammateReviewResponseMap) && (params[:review][:good_teammate_checkbox] == 'on')
-        badge_id = Badge.get_id_from_name('Good Teammate')
-        AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
+        insert_into_awarded_badges(participant.id, 'Good Teammate')
       end
       if @map.is_a?(FeedbackResponseMap) && (params[:review][:good_reviewer_checkbox] == 'on')
-        badge_id = Badge.get_id_from_name('Good Reviewer')
-        AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
+        insert_into_awarded_badges(participant.id, 'Good Reviewer')
       end
     end
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Response was successfully saved')
@@ -396,8 +402,8 @@ class ResponseController < ApplicationController
     params[:responses].each_pair do |k, v|
       score = Answer.where(response_id: @response.id, question_id: questions[k.to_i].id).first
       score ||= Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])
-      score.update_attribute('answer', v[:score])
-      score.update_attribute('comments', v[:comment])
+      score.update_attributes('answer': v[:score])
+      score.update_attributes('comments': v[:comment])
     end
   end
 

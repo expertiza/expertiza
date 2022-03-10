@@ -20,13 +20,32 @@ class ReputationWebServiceController < ApplicationController
     current_user_has_ta_privileges?
   end
 
+  def calculate_peer_review_grade(valid_response)
+    valid_response.each do |response|
+      answers = Answer.where(response_id: response.id)
+      max_question_score = begin
+                             answers.first.question.questionnaire.max_question_score
+                           rescue StandardError
+                             1
+                           end
+      temp_sum = 0
+      weight_sum = 0
+      valid_answer = answers.select { |a| (a.question.type == 'Criterion') && !a.answer.nil? }
+      next if valid_answer.empty?
+
+      valid_answer.each do |answer|
+        temp_sum += answer.answer * answer.question.weight
+        weight_sum += answer.question.weight
+      end
+      peer_review_grade = 100.0 * temp_sum / (weight_sum * max_question_score)
+      return peer_review_grade.round(4)
+    end
+  end
+
   # db query, return peer reviews
-  def db_query(assignment_id, round_num, has_topic, another_assignment_id = 0)
+  def get_peer_reviews(assignment_id_list, round_num, has_topic)
     raw_data_array = []
-    assignment_ids = []
-    assignment_ids << assignment_id
-    assignment_ids << another_assignment_id unless another_assignment_id.zero?
-    ReviewResponseMap.where('reviewed_object_id in (?) and calibrate_to = ?', assignment_ids, false).each do |response_map|
+    ReviewResponseMap.where('reviewed_object_id in (?) and calibrate_to = ?', assignment_id_list, false).each do |response_map|
       reviewer = response_map.reviewer.user
       team = AssignmentTeam.find(response_map.reviewee_id)
       topic_condition = ((has_topic && (SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false)) || !has_topic)
@@ -34,25 +53,7 @@ class ReputationWebServiceController < ApplicationController
       valid_response = [last_valid_response] unless last_valid_response.nil?
       next unless (topic_condition == true) && !valid_response.nil? && !valid_response.empty?
 
-      valid_response.each do |response|
-        answers = Answer.where(response_id: response.id)
-        max_question_score = begin
-                               answers.first.question.questionnaire.max_question_score
-                             rescue StandardError
-                               1
-                             end
-        temp_sum = 0
-        weight_sum = 0
-        valid_answer = answers.select { |a| (a.question.type == 'Criterion') && !a.answer.nil? }
-        next if valid_answer.empty?
-
-        valid_answer.each do |answer|
-          temp_sum += answer.answer * answer.question.weight
-          weight_sum += answer.question.weight
-        end
-        peer_review_grade = 100.0 * temp_sum / (weight_sum * max_question_score)
-        raw_data_array << [reviewer.id, team.id, peer_review_grade.round(4)]
-      end
+      raw_data_array << [reviewer.id, team.id, calculate_peer_review_grade(valid_response)]
     end
     raw_data_array
   end
@@ -86,10 +87,8 @@ class ReputationWebServiceController < ApplicationController
   end
 
   def generate_json_for_peer_reviews(assignment_id_list, round_num = 2)
-    assignment = Assignment.find_by(id: assignment_id_list[0])
     has_topic = !SignUpTopic.where(assignment_id: assignment_id_list[0]).empty?
-
-    @results = db_query(assignment.id, round_num, has_topic, assignment_id_list[1])
+    @results = get_peer_reviews(assignment_id_list, round_num, has_topic)
     request_body = generate_json_body(@results)
     request_body
   end

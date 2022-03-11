@@ -186,11 +186,11 @@ class QuestionnairesController < ApplicationController
         question.min_label = 'Strongly disagree'
       end
 
-      question.size = '50, 3' if question.is_a? Criterion
-      question.size = '50, 3' if question.is_a? Cake
-      question.alternatives = '0|1|2|3|4|5' if question.is_a? Dropdown
-      question.size = '60, 5' if question.is_a? TextArea
-      question.size = '30' if question.is_a? TextField
+      question.size = ScoredQuestion::DEFAULT_CRITERION_SIZE if question.is_a? Criterion
+      question.size = ScoredQuestion::DEFAULT_CRITERION_SIZE if question.is_a? Cake
+      question.alternatives = ScoredQuestion::DEFAULT_ALTERNATIVES if question.is_a? Dropdown
+      question.size = ScoredQuestion::DEFAULT_TEXT_AREA_SIZE if question.is_a? TextArea
+      question.size = ScoredQuestion::DEFAULT_TEXT_FIELD_SIZE if question.is_a? TextField
 
       begin
         question.save

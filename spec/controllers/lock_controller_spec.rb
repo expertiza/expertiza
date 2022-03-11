@@ -8,7 +8,7 @@ describe LockController do
         stub_current_user(instructor1, instructor1.role.name, instructor1.role)
         expect(controller.send(:action_allowed?)).to be_truthy
       end
-    end
+    end 
     context 'when the role of current user is Student' do
       it 'refuses certain action' do
         stub_current_user(student1, student1.role.name, student1.role)

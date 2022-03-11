@@ -90,21 +90,23 @@ describe CoursesController do
     end
   end
 
+  #todo
   describe '#copy' do
-    let(:course) { double('Course', id: 1, name: 'new_course', directory_path: 'test', instructor_id: 6) }
-    let(:new_course) { double('Course', id: 1, name: 'new_course2', directory_path: 'test2', instructor_id: 6)}
+    let(:new_course) { double('Course', id: 1, name: 'new_course', directory_path: 'test') }
+    # let(:new_course2) { double('Course', id: 1, name: 'new_course2', directory_path: 'test2', instructor_id: 6)}
 
     context 'when new course id fetches successfully' do
       it 'redirects to the new course' do
+        allow(instructor).to receive(:id).and_return(6)
         allow(course).to receive(:dup).and_return(new_course)
         allow(new_course).to receive(:save).and_return(true)
-        allow(Course).to receive(:find).with("1").and_return(new_course)
-        # params = { id: 1 }
-        params = {instructor_id: 6, id: 1}
+        # allow(new_course).to receive(:instructor_id).and_return(6)
+        allow(Course).to receive(:find).with('1').and_return(new_course)
+
+        params = { id: 1 }
         session = { user: instructor }
+
         get :copy, params, session
-        # expect(flash[:note]).to be_nil
-        # expect(flash[:error]).to be_nil
         expect(response).to be_redirect
         # expect(response).to redirect_to(edit_course_path(new_course))
       end
@@ -112,12 +114,13 @@ describe CoursesController do
 
     context 'when course is not found' do
       it 'redirects to tree_display#list page' do
+        allow(instructor).to receive(:id).and_return(6)
         allow(course).to receive(:copy_course_index_path).and_return(new_course)
         allow(new_course).to receive(:save).and_return(true)
         allow(Course).to receive(:find).with('1').and_return(new_course)
         params = { id: 1 }
         session = { user: instructor }
-        post :copy, params, session
+        get :copy, params, session
         expect(response).to redirect_to('/tree_display/list')
       end
     end
@@ -137,8 +140,7 @@ describe CoursesController do
       params = { id: 1 }
       session = { instructor_id: 1 }
       get :view_teaching_assistants, params, session
-      # expect(response).to be_redirect
-      expect(controller.instance_variable_get(:@ta_mappings)).to eq(response)
+      expect(controller.instance_variable_get(:@ta_mappings)).to eq(nil)
     end
   end
 
@@ -149,7 +151,7 @@ describe CoursesController do
       params = { id: 1 }
       session = { instructor_id: 1 }
       post :add_ta, params, session
-      expect(response).to render_template(:add_ta)
+      expect(response).to be_redirct
     end
   end
 
@@ -160,7 +162,7 @@ describe CoursesController do
       params = { id: 1 }
       session = { instructor_id: 1 }
       post :remove_ta, params, session
-      expect(response).to render_template(:remove_ta)
+      expect(response).to be_redirct
     end
   end
 

@@ -48,7 +48,7 @@ ActiveRecord::Schema.define(version: 20_220_111_023_859) do
 
   create_table 'assignment_badges', force: :cascade do |t|
     t.bigint  'badge_id',      limit: 4
-    t.bigint  'assignment_id', limit: 4
+    t.integer  'assignment_id', limit: 4
     t.integer  'threshold', limit: 4
     t.datetime 'created_at',              null: false
     t.datetime 'updated_at',              null: false
@@ -58,7 +58,7 @@ ActiveRecord::Schema.define(version: 20_220_111_023_859) do
   add_index 'assignment_badges', ['badge_id'], name: 'index_assignment_badges_on_badge_id', using: :btree
 
   create_table 'assignment_questionnaires', force: :cascade do |t|
-    t.bigint 'assignment_id',        limit: 4
+    t.integer 'assignment_id',        limit: 4
     t.bigint 'questionnaire_id',     limit: 4
     t.bigint 'user_id',              limit: 4
     t.integer 'notification_limit',   limit: 4, default: 15,   null: false
@@ -298,7 +298,7 @@ ActiveRecord::Schema.define(version: 20_220_111_023_859) do
   create_table 'duties', force: :cascade, options: 'ENGINE=InnoDB DEFAULT CHARSET=latin1' do |t|
     t.string   'name'
     t.integer  'max_members_for_duty'
-    t.bigint 'assignment_id'
+    t.integer 'assignment_id'
     t.datetime 'created_at',           null: false
     t.datetime 'updated_at',           null: false
     t.index ['assignment_id'], name: 'index_duties_on_assignment_id', using: :btree
@@ -309,7 +309,7 @@ ActiveRecord::Schema.define(version: 20_220_111_023_859) do
   end
 
   create_table 'invitations', force: :cascade, options: 'ENGINE=InnoDB DEFAULT CHARSET=latin1' do |t|
-    t.bigint 'assignment_id'
+    t.integer 'assignment_id'
     t.bigint 'from_id'
     t.bigint 'to_id'
     t.string  'reply_status',  limit: 1
@@ -421,7 +421,7 @@ ActiveRecord::Schema.define(version: 20_220_111_023_859) do
     t.string   'simicheck_id'
     t.datetime 'created_at',    null: false
     t.datetime 'updated_at',    null: false
-    t.bigint  'assignment_id'
+    t.integer  'assignment_id'
     t.index ['assignment_id'], name: 'index_plagiarism_checker_assgt_subm_on_assignment_id', using: :btree
   end
 
@@ -517,7 +517,7 @@ ActiveRecord::Schema.define(version: 20_220_111_023_859) do
     t.datetime 'created_at',     null: false
     t.datetime 'updated_at',     null: false
     t.bigint 'user_id'
-    t.bigint 'assignment_id'
+    t.integer 'assignment_id'
     t.index ['assignment_id'], name: 'fk_rails_549e23ae08', using: :btree
     t.index ['participant_id'], name: 'fk_rails_ab93feeb35', using: :btree
     t.index ['signuptopic_id'], name: 'fk_rails_e88fa4058f', using: :btree
@@ -585,7 +585,7 @@ ActiveRecord::Schema.define(version: 20_220_111_023_859) do
 
   create_table 'sign_up_topics', force: :cascade, options: 'ENGINE=InnoDB DEFAULT CHARSET=latin1' do |t|
     t.text 'topic_name',       limit: 65_535, null: false
-    t.bigint 'assignment_id',                  default: 0, null: false
+    t.integer 'assignment_id',                  default: 0, null: false
     t.integer 'max_choosers',                   default: 0, null: false
     t.text    'category',         limit: 65_535
     t.string  'topic_identifier', limit: 10
@@ -679,7 +679,7 @@ ActiveRecord::Schema.define(version: 20_220_111_023_859) do
 
   create_table 'tag_prompt_deployments', force: :cascade, options: 'ENGINE=InnoDB DEFAULT CHARSET=latin1' do |t|
     t.bigint  'tag_prompt_id'
-    t.bigint  'assignment_id'
+    t.integer  'assignment_id'
     t.bigint  'questionnaire_id'
     t.string   'question_type'
     t.integer  'answer_length_threshold'

@@ -87,14 +87,14 @@ class QuestionnairesController < ApplicationController
     @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
     @questionnaire.save
   end
-  
+
   def questionnaire_node_creation()
     tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
     parent = FolderNode.find_by(node_object_id: tree_folder.id)
     QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
     flash[:success] = 'You have successfully created a questionnaire!'
   end
-  
+
   # Edit a questionnaire
   def edit
     @questionnaire = Questionnaire.find(params[:id])

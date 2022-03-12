@@ -51,11 +51,11 @@ class LatePoliciesController < ApplicationController
     # penalty per unit cannot be greater than maximum penalty
     invalid_penalty_per_unit = params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
     flash[:error] = 'The maximum penalty cannot be less than penalty per unit.' if invalid_penalty_per_unit
-    same_policy_name = false
+    policy_name_exists = false
     # penalty name should be unique
-    if same_policy_name != LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
+    if policy_name_exists != LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
       flash[:error] = 'A policy with the same name already exists.'
-      same_policy_name = true
+      policy_name_exists = true
     end
     # maximum penalty cannot be greater than equal to 100
     if params[:late_policy][:max_penalty].to_i >= 100
@@ -66,7 +66,7 @@ class LatePoliciesController < ApplicationController
 # If penalty  is valid and the penalty name does not already exists then tries to update and save.
 # If something unexpected happens while saving the record in to database then displays a flash notice and redirect to create a new late policy again.
 # If any of above checks fails, then redirect to create a new late policy again.
-if !invalid_penalty_per_unit && !same_policy_name && !invalid_max_penalty
+if !invalid_penalty_per_unit && !policy_name_exists && !invalid_max_penalty
       @late_policy = LatePolicy.new(late_policy_params)
       @late_policy.instructor_id = instructor_id
       begin

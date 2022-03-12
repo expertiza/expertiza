@@ -40,13 +40,16 @@ describe MarkupStylesController do
     end
 
     describe '#list' do
-        #Include tests here
+#      it 'redirects to list' do
+#        get :list
+#        expect(response).to redirect_to('/roles')
+#      end
     end
 
     describe '#show' do
         context 'when try to show a markupstyle' do
           
-            it 'renders markupstyles#show when find the target markupstyle' do
+            it 'renders markup_style#show when find the target markupstyle' do
               @params = {
                 id: 1
               }
@@ -58,23 +61,89 @@ describe MarkupStylesController do
     end
 
     describe '#new' do
-        #Include tests here
+      it 'creates a new markup style object and renders MarkupStyle#new page' do
+        get :new
+        expect(response).to render_template(:new)
+      end  
     end
 
     describe '#create' do
-        #Include tests here
+      context 'when markup style is saved successfully' do
+        it 'redirects to markup_style#list page' do
+          allow(institution).to receive(:name).and_return('test markup_style')
+          @params = {
+            markup_style: {
+              name: 'test markup_style'
+            }
+          }
+          post :create, @params
+          expect(response).to redirect_to('/markup_styles/list')
+        end
+      end
+      context 'when markup_style is not saved successfully' do
+        it 'renders markup_style#new page' do
+          allow(markup_style).to receive(:save).and_return(false)
+          @params = {
+            markup_style: {
+              name: 'test'
+            }
+          }
+          post :create, @params
+          expect(flash.now[:error]).to eq('The creation of the markup_style failed.')
+          expect(response).to render_template(:new)
+        end
+      end      
     end
 
     describe '#edit' do
-        #Include tests here
+      it 'renders markup_style#edit' do
+        @params = {
+          id: 1
+        }
+        get :edit, @params
+        expect(response).to render_template(:edit)
+      end
     end
 
     describe '#update' do
-        #Include tests here
+      context 'when markupstyle is updated successfully' do
+        it 'renders markupstyle#list' do
+          @params = {
+            id: 1,
+            markup_style: {
+              name: 'test markup style'
+            }
+          }
+          put :update, @params
+          expect(response).to redirect_to('/markup_styles/list')
+        end
+      end
+      context 'when markup_style is not updated successfully' do
+        it 'renders markup_style#edit' do
+          #stub_current_user(instructor, instructor.role.name, instructor.role)
+          @params = {
+            id: 1,
+            markup_style: {
+              name: 'test markup style'
+            }
+          }
+          allow(MarkupStyle).to receive(:update_attribute).with(any_args).and_return(false)
+          put :update, @params
+          expect(response).to render_template(:edit)
+        end
+      end
     end
 
     describe '#destroy' do
-        #Include tests here
+      context 'when try to delete a markup style' do
+        it 'renders markup_style#list when delete successfully' do
+          @params = {
+            id: 1
+          }
+          post :delete, @params, session
+          expect(response).to redirect_to('/markup_styles/list')
+        end
+      end
     end
 
 end

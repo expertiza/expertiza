@@ -198,6 +198,7 @@ class QuestionnairesController < ApplicationController
     end
     redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
   end  
+  
   def add_new_ScoredQuestion
     questionnaire_id = params[:id] unless params[:id].nil?
     # If the questionnaire is being used in the active period of an assignment, delete existing responses before adding new questions

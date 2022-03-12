@@ -3,6 +3,7 @@ describe 'SummaryHelper' do
   before(:each) do
     @sum = SummaryHelper::Summary.new
   end
+
   describe '#get_sentences' do
     context 'when the answer is nil' do
       it 'returns a nil object' do

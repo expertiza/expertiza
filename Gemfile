@@ -5,7 +5,7 @@ gem 'rails', '~> 4.2.11.1'
 ## Gems in Alphabetical Order
 gem 'activerecord-session_store'
 gem 'activesupport', '~> 4.2.11.1'
-gem 'airbrake'
+gem 'airbrake','~>9.5'
 gem 'authlogic', '4.1'
 gem 'awesome_nested_set'
 gem 'bind-it'
@@ -101,6 +101,7 @@ group :test do
   gem 'rspec-rails'
   gem 'selenium-webdriver'
   gem 'shoulda'
+
 end
 
 group :development, :test do

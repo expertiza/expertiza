@@ -5,13 +5,9 @@ describe MarkupStylesController do
     let(:student_role) { build(:role_of_student, id: 1, name: 'Student_role_test', description: '', parent_id: nil, default_page_id: nil) }
     let(:instructor_role) {  build(:role_of_instructor, id: 2, name: 'Instructor_role_test', description: '', parent_id: nil, default_page_id: nil) }
     let(:admin_role) { build(:role_of_administrator, id: 3, name: 'Administrator_role_test', description: '', parent_id: nil, default_page_id: nil) }
-    let(:markupstyles) { build(:markupstyles, id: 1, name: 'test markupstyles')}
+    let(:markup_style) { build(:markup_style, id: 1, name: 'test markupstyles') }
         
-    # define default behaviors for each method call
-    before(:each) do
-        stub_current_user(super_admin, super_admin.role.name, super_admin.role)
-        allow(MarkupStyles).to receive(:find).with('1').and_return(markupstyles)
-    end
+
     describe '#action_allowed?' do
         context 'when the current user is student' do
             it 'returns false' do
@@ -26,6 +22,13 @@ describe MarkupStylesController do
             end
           end
     end
+
+    # define default behaviors for each method call
+    before(:each) do
+      allow(MarkupStyle).to receive(:find).with('1').and_return(markupstyles)
+      stub_current_user(super_admin, super_admin.role.name, super_admin.role)
+        
+    end    
 
     describe '#index' do
         context 'when markup styles query a page of markup styles' do
@@ -42,6 +45,7 @@ describe MarkupStylesController do
 
     describe '#show' do
         context 'when try to show a markupstyle' do
+          
             it 'renders markupstyles#show when find the target markupstyle' do
               @params = {
                 id: 1

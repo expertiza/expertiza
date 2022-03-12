@@ -24,7 +24,7 @@ class CourseNode < Node
 
   # returns: list of CourseNodes based on query
   # the get method will return all courses meeting the criteria, but the method name is necessary due to polymorphism
-  def self.get(sortvar = 'name', _sortorder = 'desc', user_id = nil, show = nil, _parent_id = nil, _search = nil)
+  def self.get(_sortvar = 'name', _sortorder = 'desc', user_id = nil, show = nil, _parent_id = nil, _search = nil)
     sortvar = 'created_at'
     if Course.column_names.include? sortvar
       includes(:course).where([get_course_query_conditions(show, user_id), get_courses_managed_by_user(user_id)])

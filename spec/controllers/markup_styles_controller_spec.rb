@@ -115,12 +115,12 @@ describe MarkupStylesController do
             }
           }
           put :update, @params
-          expect(response).to redirect_to('/markup_styles/list')
+          expect(response).to redirect_to('/markup_styles/1')
         end
       end
       context 'when markup_style is not updated successfully' do
         it 'renders markup_style#edit' do
-          #stub_current_user(instructor, instructor.role.name, instructor.role)
+          stub_current_user(super_admin, super_admin.role.name, super_admin.role)
           @params = {
             id: 1,
             markup_style: {

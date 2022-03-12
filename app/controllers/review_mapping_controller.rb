@@ -525,37 +525,35 @@ class ReviewMappingController < ApplicationController
     teams = review_strategy.teams
     participants = review_strategy.participants
     num_participants = participants.size
+    maximum_reviews_per_student = review_strategy.reviews_per_student
+    maximum_reviews_per_team = review_strategy.reviews_per_team
 
     iterator = 0
     teams.each do |team|
       selected_participants = []
       if !team.equal? teams.last
         # need to even out the # of reviews for teams
-        while selected_participants.size < review_strategy.reviews_per_team
+        while selected_participants.size < maximum_reviews_per_team
           num_participants_this_team = number_of_participants_in_team(assignment_id)
           
           # if all outstanding participants are already in selected_participants, just break the loop.
           break if selected_participants.size == participants.size - num_participants_this_team
 
-          # generate random number
-          if iterator.zero?
-            rand_num = rand(0..num_participants - 1)
-          else
-            rand_num = condition_for_else(participants_hash)
-          end
+          # generate random number used as hash key in participants_hash
+          rand_num = get_random_number(iterator, participants_hash)
+          
           # prohibit one student to review his/her own artifact
           next if TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
-
-          if_condition_1 = (participants_hash[participants[rand_num].id] < review_strategy.reviews_per_student)
-          if_condition_2 = (!selected_participants.include? participants[rand_num].id)
-          if if_condition_1 and if_condition_2
-            # selected_participants cannot include duplicate num
-            selected_participants << participants[rand_num].id
-            participants_hash[participants[rand_num].id] += 1
+          
+          participant_hash_key = participants_hash[participants[rand_num].id]
+          participant_not_present_in_selected_participants = (!selected_participants.include? participants[rand_num].id)
+          
+          if (participant_hash_key < maximum_reviews_per_student) and (participant_not_present_in_selected_participants)
+            modify_selected_participants_to_review(participants[rand_num].id, selected_participants, participants_hash)
           end
           # remove students who have already been assigned enough num of reviews out of participants array
           participants.each do |participant|
-            if participants_hash[participant.id] == review_strategy.reviews_per_student
+            if participants_hash[participant.id] == maximum_reviews_per_student
               participants.delete_at(rand_num)
               num_participants -= 1
             end
@@ -567,9 +565,8 @@ class ReviewMappingController < ApplicationController
         participants.each do |participant|
           # avoid last team receives too many peer reviews
           ## why this selected_participants condition since it's empty
-          if !TeamsUser.exists?(team_id: team.id, user_id: participant.user_id) and selected_participants.size < review_strategy.reviews_per_team
-            selected_participants << participant.id
-            participants_hash[participant.id] += 1
+          if !TeamsUser.exists?(team_id: team.id, user_id: participant.user_id) and selected_participants.size < maximum_reviews_per_team
+            modify_selected_participants_to_review(participant.id, selected_participants, participants_hash)
           end
         end
       end
@@ -582,6 +579,22 @@ class ReviewMappingController < ApplicationController
       iterator += 1
     end
   end
+
+  def modify_selected_participants_to_review(participant_id, selected_participants, participants_hash)
+    # selected_participants cannot include duplicate num
+    selected_participants << participant_id
+    participants_hash[participant_id] += 1
+  end
+
+  def get_random_number(iterator, participants_hash)
+    if iterator.zero?
+      rand_num = rand(0..num_participants - 1)
+    else
+      rand_num = condition_for_else(participants_hash)
+    end
+    return rand_num
+  end
+
 
   def number_of_participants_in_team(assignment_id)
     num_participants_this_team = TeamsUser.where(team_id: team.id).size

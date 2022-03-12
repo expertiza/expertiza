@@ -51,7 +51,7 @@ describe MarkupStylesController do
         it 'renders markupstyles#list' do
           params = { page: '1' }           
           get :list, params
-          expect(assigns(:markup_styles)).to eq(nil)  
+          expect(assigns(:markup_styles)).not_to eq(nil)  
           expect(response).to render_template(:list)
         end
       end

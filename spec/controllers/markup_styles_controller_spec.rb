@@ -31,6 +31,7 @@ describe MarkupStylesController do
     # define default behaviors for each method call
     before(:each) do
       allow(MarkupStyle).to receive(:find).with('1').and_return(markup_style)
+      allow(markup_style_list).to receive(:paginate).with(page: '1', per_page: 10).and_return(markup_style_list)
       #allow(MarkupStyle).to receive(:paginate).with(1,10).and_return(markup_style_list)
       stub_current_user(super_admin, super_admin.role.name, super_admin.role)
         
@@ -50,7 +51,7 @@ describe MarkupStylesController do
         it 'renders markupstyles#list' do
           params = { page: '1' }           
           get :list, params
-          expect(assigns(:markup_styles)).to eq(markup_style_list)  
+          expect(assigns(:markup_style_list)).to eq(markup_style_list)  
           expect(response).to render_template(:list)
         end
       end

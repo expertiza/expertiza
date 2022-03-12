@@ -140,7 +140,7 @@ describe MarkupStylesController do
           @params = {
             id: 1
           }
-          post :delete, @params, session
+          post :destroy, @params, session
           expect(response).to redirect_to('/markup_styles/list')
         end
       end

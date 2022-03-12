@@ -59,7 +59,6 @@ class QuestionnairesController < ApplicationController
         flash[:error] = $ERROR_INFO
       end
       begin
-        
         # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
         # In the future, we need to write migration files to make them consistency.
         # E1903 : We are not sure of other type of cases, so have added a if statement. If there are only 5 cases, remove the if statement
@@ -68,11 +67,8 @@ class QuestionnairesController < ApplicationController
         end
         # moved all questionnaire assignments to a new method
         assign_questionnaire_values(questionnaire_private, display_type)
-        
-        
         # Create node moved to a new method
         questionnaire_node_creation()
-
       rescue StandardError
         flash[:error] = $ERROR_INFO
       end
@@ -98,7 +94,7 @@ class QuestionnairesController < ApplicationController
     QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
     flash[:success] = 'You have successfully created a questionnaire!'
   end
-
+  
   # Edit a questionnaire
   def edit
     @questionnaire = Questionnaire.find(params[:id])

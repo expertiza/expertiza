@@ -20,18 +20,23 @@ class ReputationWebServiceController < ApplicationController
     current_user_has_ta_privileges?
   end
 
-  def calculate_peer_review_grade(response)
+  def get_max_question_score(answers)
+    begin
+      answers.first.question.questionnaire.max_question_score
+    rescue StandardError
+      1
+    end
+  end
+
+  def get_valid_answers_for_response(response)
     answers = Answer.where(response_id: response.id)
-    max_question_score = begin
-                            answers.first.question.questionnaire.max_question_score
-                          rescue StandardError
-                            1
-                          end
+    valid_answer = answers.select { |a| (a.question.type == 'Criterion') && !a.answer.nil? }
+    valid_answer.empty? ? nil : valid_answer 
+  end
+
+  def calculate_peer_review_grade(valid_answer, max_question_score)
     temp_sum = 0
     weight_sum = 0
-    valid_answer = answers.select { |a| (a.question.type == 'Criterion') && !a.answer.nil? }
-    return nil if valid_answer.empty?
-
     valid_answer.each do |answer|
       temp_sum += answer.answer * answer.question.weight
       weight_sum += answer.question.weight
@@ -43,8 +48,10 @@ class ReputationWebServiceController < ApplicationController
   def get_peer_reviews_for_responses(reviewer_id, team_id, valid_response)
     peer_review_grades_list = []
     valid_response.each do |response|
-      review_grade = calculate_peer_review_grade(response)
-      peer_review_grades_list << [reviewer_id, team_id, review_grade] unless review_grade.nil?
+      valid_answer = get_valid_answers_for_response(response)
+      next if valid_answer.nil? 
+      review_grade = calculate_peer_review_grade(valid_answer, get_max_question_score(valid_answer))
+      peer_review_grades_list << [reviewer_id, team_id, review_grade]
     end
     peer_review_grades_list
   end

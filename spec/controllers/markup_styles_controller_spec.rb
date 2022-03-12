@@ -70,7 +70,7 @@ describe MarkupStylesController do
     describe '#create' do
       context 'when markup style is saved successfully' do
         it 'redirects to markup_style#list page' do
-          allow(institution).to receive(:name).and_return('test markup_style')
+          allow(MarkupStyle).to receive(:name).and_return('test markup_style')
           @params = {
             markup_style: {
               name: 'test markup_style'

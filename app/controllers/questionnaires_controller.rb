@@ -197,7 +197,7 @@ class QuestionnairesController < ApplicationController
       end
     end
     redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
-  end 
+  end
   
   # Zhewei: This method is used to save all questions in current questionnaire.
   def save_all_questions

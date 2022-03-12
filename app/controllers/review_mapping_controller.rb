@@ -533,14 +533,13 @@ class ReviewMappingController < ApplicationController
       selected_participants = []
       if !team.equal? teams.last
         # need to even out the # of reviews for teams
+        num_participants_this_team = number_of_participants_in_team(assignment_id, team)
         while selected_participants.size < maximum_reviews_per_team
-          num_participants_this_team = number_of_participants_in_team(assignment_id)
-          
           # if all outstanding participants are already in selected_participants, just break the loop.
           break if selected_participants.size == participants.size - num_participants_this_team
 
           # generate random number used as hash key in participants_hash
-          rand_num = get_random_number(iterator, participants_hash)
+          rand_num = get_random_number(iterator, participants_hash, num_participants)
           
           # prohibit one student to review his/her own artifact
           next if TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
@@ -586,7 +585,7 @@ class ReviewMappingController < ApplicationController
     participants_hash[participant_id] += 1
   end
 
-  def get_random_number(iterator, participants_hash)
+  def get_random_number(iterator, participants_hash, num_participants)
     if iterator.zero?
       rand_num = rand(0..num_participants - 1)
     else
@@ -596,7 +595,7 @@ class ReviewMappingController < ApplicationController
   end
 
 
-  def number_of_participants_in_team(assignment_id)
+  def number_of_participants_in_team(assignment_id, team)
     num_participants_this_team = TeamsUser.where(team_id: team.id).size
     # If there are some submitters or reviewers in this team, they are not treated as normal participants.
     # They should be removed from 'num_participants_this_team'

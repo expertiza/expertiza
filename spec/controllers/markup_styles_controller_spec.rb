@@ -99,7 +99,7 @@ describe MarkupStylesController do
           post :create, @params          
           expect(flash.now[:error]).to eq(nil) #
           #expect(response).to render_template(:new) # this one is failing  
-          expect(response).to render_template([]) 
+          expect(response).to render_template(nil) 
         end
       end      
     end
@@ -139,7 +139,7 @@ describe MarkupStylesController do
           allow(MarkupStyle).to receive(:update_attribute).with(any_args).and_return(false)
           put :update, @params
           #expect(response).to render_template(:edit) # this one is failing
-          expect(response).to render_template([])
+          expect(response).to render_template(nil)
         end
       end
     end

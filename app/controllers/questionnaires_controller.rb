@@ -204,9 +204,9 @@ class QuestionnairesController < ApplicationController
     questionnaire_id = params[:id] unless params[:id].nil?
     # If the questionnaire is being used in the active period of an assignment, delete existing responses before adding new questions
     if AnswerHelper.check_and_delete_responses(questionnaire_id)
-      flash[:success] = 'You have successfully added a new question. Any existing reviews for the questionnaire have been deleted!'
+      flash[:success] = 'You have successfully added a new scored question. Any existing reviews for the questionnaire have been deleted!'
     else
-      flash[:success] = 'You have successfully added a new question.'
+      flash[:success] = 'You have successfully added a new scored question.'
     end
     num_of_questions = Questionnaire.find(questionnaire_id).questions.size
     ((num_of_questions + 1)..(num_of_questions + params[:question][:total_num].to_i)).each do |i|
@@ -219,6 +219,7 @@ class QuestionnairesController < ApplicationController
       question.alternatives = ScoredQuestion::DEFAULT_ALTERNATIVES if question.is_a? Dropdown
       @question.size = ScoredQuestion::DEFAULT_TEXT_AREA_SIZE if question.is_a? TextArea
       @question.size = ScoredQuestion::DEFAULT_TEXT_FIELD_SIZE if question.is_a? TextField
+
       begin
         question.save
       rescue StandardError
@@ -240,7 +241,6 @@ class QuestionnairesController < ApplicationController
           v.each_pair do |key, value|
             @question.send(key + '=', value) unless @question.send(key) == value
           end
-
           @question.save
           flash[:success] = 'All questions have been successfully saved!'
         end
@@ -248,7 +248,6 @@ class QuestionnairesController < ApplicationController
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
-
     if params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     elsif questionnaire_id

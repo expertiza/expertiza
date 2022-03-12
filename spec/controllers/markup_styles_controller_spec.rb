@@ -21,7 +21,7 @@ describe MarkupStylesController do
             end
           end
           context 'when the current user is Super-Admin' do
-            it 'returns false' do
+            it 'returns true' do
               stub_current_user(super_admin, super_admin.role.name, super_admin.role)
               expect(controller.send(:action_allowed?)).to be_truthy
             end
@@ -48,7 +48,9 @@ describe MarkupStylesController do
     describe '#list' do
       context 'when markup styles query a page of markup styles' do
         it 'renders markupstyles#list' do
-          get :list 
+          params = { page: '1' }           
+          get :list, params
+          expect(assigns(:markup_styles)).to eq(markup_style_list)  
           expect(response).to render_template(:list)
         end
       end

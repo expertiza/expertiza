@@ -31,7 +31,7 @@ describe MarkupStylesController do
     # define default behaviors for each method call
     before(:each) do
       allow(MarkupStyle).to receive(:find).with('1').and_return(markup_style)
-      allow(MarkupStyle).to receive(:paginate).with('1','10').and_return(markup_style_list)
+      #allow(MarkupStyle).to receive(:paginate).with(1,10).and_return(markup_style_list)
       stub_current_user(super_admin, super_admin.role.name, super_admin.role)
         
     end    

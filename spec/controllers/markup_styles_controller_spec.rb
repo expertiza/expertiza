@@ -5,10 +5,12 @@ describe MarkupStylesController do
     let(:student_role) { build(:role_of_student, id: 1, name: 'Student_role_test', description: '', parent_id: nil, default_page_id: nil) }
     let(:instructor_role) {  build(:role_of_instructor, id: 2, name: 'Instructor_role_test', description: '', parent_id: nil, default_page_id: nil) }
     let(:admin_role) { build(:role_of_administrator, id: 3, name: 'Administrator_role_test', description: '', parent_id: nil, default_page_id: nil) }
-    
+    let(:markupstyles) { build(:markupstyles, id: 1, name: 'test markupstyles')}
+        
     # define default behaviors for each method call
     before(:each) do
         stub_current_user(super_admin, super_admin.role.name, super_admin.role)
+        allow(MarkupStyles).to receive(:find).with('1').and_return(markupstyles)
     end
     describe '#action_allowed?' do
         context 'when the current user is student' do

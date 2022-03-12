@@ -199,7 +199,7 @@ class QuestionnairesController < ApplicationController
     redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
   end
   
-  #This method is used to add new scored questions when editing questionnaire.
+  # This method is used to add new scored questions when editing questionnaire.
   
   def add_new_ScoredQuestion
     questionnaire_id = params[:id] unless params[:id].nil?

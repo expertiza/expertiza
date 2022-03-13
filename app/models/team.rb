@@ -95,6 +95,18 @@ class Team < ActiveRecord::Base
     raise TeamExistsError, "The team name #{name} is already in use." unless list.empty?
   end
 
+  # copies content of one object to the another
+  def self.copy_content(source, destination)
+    source.each do |each_element|
+      each_element.copy(destination.id)
+    end
+  end
+
+  # enum method for team clone operations
+  def self.team_operation
+    { inherit: 'inherit', bequeath: 'bequeath' }.freeze
+  end
+
   # Algorithm
   # Start by adding single members to teams that are one member too small.
   # Add two-member teams to teams that two members too small. etc.

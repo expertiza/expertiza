@@ -184,7 +184,7 @@ class ReputationWebServiceController < ApplicationController
 
   def process_response_body(response)
     # Decryption
-    response.body = decrypt_response(response.body)
+    decrypt_response(response.body)
    
     @@response = response
     @@response_body = response.body
@@ -250,13 +250,13 @@ class ReputationWebServiceController < ApplicationController
     @@another_assignment_id = params[:another_assignment_id]
 
     if params[:checkbox][:expert_grade] == 'Add expert grades'
-      req.body = add_expert_grades(req.body)
+      add_expert_grades(req.body)
     elsif params[:checkbox][:hamer] == 'Add initial Hamer reputation values'
       add_hamer_reputation_values
     elsif params[:checkbox][:lauw] == 'Add initial Lauw reputation values'
       add_lauw_reputation_values
     elsif params[:checkbox][:quiz] == 'Add quiz scores'
-      req.body = add_quiz_scores(req.body)
+      add_quiz_scores(req.body)
     else
       @@additional_info = ''
     end

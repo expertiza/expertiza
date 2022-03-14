@@ -1,5 +1,6 @@
 class ResponseController < ApplicationController
   include AuthorizationHelper
+  before_action :set_response , only: %i[update]
 
   helper :submitted_content
   helper :file
@@ -104,8 +105,6 @@ class ResponseController < ApplicationController
     begin
       # the response to be updated
       # Locking functionality added for E1973, team-based reviewing
-      @response = Response.find(params[:id])
-      @map = @response.map
       if @map.reviewer_is_team && !Lock.lock_between?(@response, current_user)
         response_lock_action
         return
@@ -290,6 +289,11 @@ class ResponseController < ApplicationController
   end
 
   private
+
+  def set_response
+    @response = Response.find(params[:id])
+    @map = @response.map
+  end
 
   # Added for E1973, team-based reviewing:
   # http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_Project_E1973._Team_Based_Reviewing

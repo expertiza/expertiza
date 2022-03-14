@@ -115,7 +115,7 @@ class SubmittedContentController < ApplicationController
   def submit_file
     participant = AssignmentParticipant.find(params[:id])
     # check if the current user id is same as participant user id
-    # Validate the user and on failure redirect to edit function for Submitting a file. 
+    # Validate the user and on failure redirect to edit function for Submitting a file.
     unless current_user_id?(participant.user_id)
       flash[:error] = "Authentication Error"
       redirect_to action: 'edit', id: participant.id
@@ -240,7 +240,6 @@ class SubmittedContentController < ApplicationController
     file.size <= size * 1024 * 1024
   end
 
-  
   def file_type(file_name)
     base = File.basename(file_name)
     base.split('.')[base.split('.').size - 1] if base.split('.').size > 1

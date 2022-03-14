@@ -125,7 +125,7 @@ class SubmittedContentController < ApplicationController
     file = params[:uploaded_file]
     file_size_limit = 5
 
-    # check if file size is greater than the specified limit then redirect to edit function
+    # Check if file size is greater than the specified limit then redirect to edit function
     unless check_content_size(file, file_size_limit)
       flash[:error] = "File size must smaller than #{file_size_limit}MB"
       redirect_to action: 'edit', id: participant.id

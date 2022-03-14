@@ -1,5 +1,5 @@
 class SubmittedFolderController < ApplicationController
-  
+
   # Function to redirect user to appropriate file editing,creation options and new folder options.
   def perform_folder_action
     @participant = AssignmentParticipant.find(params[:id])

@@ -1,6 +1,6 @@
 class SubmittedFolderController < ApplicationController
   
-  #function to redirect user to appropriate file editing,creation options and new folder options.
+  # Function to redirect user to appropriate file editing,creation options and new folder options.
   def perform_folder_action
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
@@ -22,7 +22,7 @@ class SubmittedFolderController < ApplicationController
     redirect_to action: 'edit', id: @participant.id
   end
 
-  #raises error if there are issues with downloading of current selected folder and file in it
+  # Raises error if there are issues with downloading of current selected folder and file in it
   def download
     begin
       folder_name = params['current_folder']['name']
@@ -42,7 +42,7 @@ class SubmittedFolderController < ApplicationController
     locale_for_student
   end
 
-  #moves file from current location/directory to specified directory/location and raises error if any problem occurs
+  # Moves file from current location/directory to specified directory/location and raises error if any problem occurs
   def move_selected_file
     old_filename = params[:directories][params[:chk_files]] + "/" + params[:filenames][params[:chk_files]]
     newloc = @participant.dir_path
@@ -56,8 +56,8 @@ class SubmittedFolderController < ApplicationController
     end
   end
 
-  #to rename a selected file, checks any discrepancies in new file name, if new filename is same as some existing filename in current directory
-  #error is flashed. 
+  # To rename a selected file, checks any discrepancies in new file name, if new filename is same as some existing filename in current directory
+  # error is flashed.
   def rename_selected_file
     old_filename = params[:directories][params[:chk_files]] + "/" + params[:filenames][params[:chk_files]]
     new_filename = params[:directories][params[:chk_files]] + "/" + FileHelper.sanitize_filename(params[:faction][:rename])
@@ -84,6 +84,7 @@ class SubmittedFolderController < ApplicationController
                             operation: "Remove File")
     ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The selected file has been deleted.', request)
   end
+
   # Function to copy selected file
   def copy_selected_file
     old_filename = params[:directories][params[:chk_files]] + "/" + params[:filenames][params[:chk_files]]

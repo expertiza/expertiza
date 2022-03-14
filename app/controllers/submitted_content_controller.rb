@@ -4,7 +4,7 @@ class SubmittedContentController < ApplicationController
 
   include AuthorizationHelper
 
- #Function to check if the called action is allowed by the current user
+  # Function to check if the called action is allowed by the current user
   def action_allowed?
     case params[:action]
     when 'edit'
@@ -44,6 +44,7 @@ class SubmittedContentController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id])
     # check if the current user id is same as participant user id
     return unless current_user_id?(@participant.user_id)
+
     # @assignment is used to store the assignment of the participant
     @assignment = @participant.assignment
     # @can_submit is the flag indicating if the user can submit or not in current stage
@@ -52,16 +53,17 @@ class SubmittedContentController < ApplicationController
     redirect_to action: 'edit', id: params[:id], view: true
   end
 
-  #Function to submit the hyperlink uploaded by the current team
+  # Function to submit the hyperlink uploaded by the current team
   def submit_hyperlink
     @participant = AssignmentParticipant.find(params[:id])
     # check if the current user id is same as participant user id
     return unless current_user_id?(@participant.user_id)
-    #Store the participant team
+
+    # Store the participant team
     team = @participant.team
     team_hyperlinks = team.hyperlinks
 
-    #Check if the same hyperlink has been submitted by the team.
+    # Check if the same hyperlink has been submitted by the team.
     if team_hyperlinks.include?(params['submission'])
       ExpertizaLogger.error LoggerMessage.new(controller_name, @participant.name, 'You or your teammate(s) have already submitted the same hyperlink.', request)
       flash[:error] = 'You or your teammate(s) have already submitted the same hyperlink.'
@@ -85,14 +87,14 @@ class SubmittedContentController < ApplicationController
     redirect_to action: 'edit', id: @participant.id
   end
 
-  #Function to delete the hyperlink uploaded by the current team
+  # Function to delete the hyperlink uploaded by the current team
   def remove_hyperlink
     @participant = AssignmentParticipant.find(params[:hyperlinks][:participant_id])
     # check if the current user id is same as participant user id
     return unless current_user_id?(@participant.user_id)
 
     team = @participant.team
-    #Store the hyperlink to be deleted
+    # Store the hyperlink to be deleted
     hyperlink_to_delete = team.hyperlinks[params['chk_links'].to_i]
     team.remove_hyperlink(hyperlink_to_delete)
     ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully removed.', request)
@@ -109,7 +111,7 @@ class SubmittedContentController < ApplicationController
     redirect_to action: action, id: @participant.id
   end
 
-  #Function to submit file
+  # Function to submit file
   def submit_file
     participant = AssignmentParticipant.find(params[:id])
     # check if the current user id is same as participant user id
@@ -139,7 +141,7 @@ class SubmittedContentController < ApplicationController
       return
     end
 
-    #Submit the file successfully
+    # Submit the file successfully
     full_filename = get_file_upload(participant, file, file_content)
     assignment = Assignment.find(participant.parent_id)
     team = participant.team
@@ -174,8 +176,7 @@ class SubmittedContentController < ApplicationController
     return full_filename
   end
 
-
-  #notifies reviewers 
+  # notifies reviewers
   def notify_reviewers(participant)
     participant.mail_assigned_reviewers
 

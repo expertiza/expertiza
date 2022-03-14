@@ -7,15 +7,7 @@ require 'base64'
 class ReputationWebServiceController < ApplicationController
   include AuthorizationHelper
 
-  @@request_body = ''
-  @@response_body = ''
-  @@assignment_id = ''
-  @@another_assignment_id = ''
-  @@round_num = ''
-  @@algorithm = ''
-  @@additional_info = ''
-  @@response = ''
-
+  # checks for the user privileges before performing the action requested
   def action_allowed?
     current_user_has_ta_privileges?
   end
@@ -73,9 +65,7 @@ class ReputationWebServiceController < ApplicationController
   end
 
   def get_ids_list(tables)
-    id_list = []
-    tables.each { |table| id_list << table.id }
-    id_list
+    tables.map { |table| table.id }
   end
 
   def get_scores(team_ids)
@@ -123,23 +113,7 @@ class ReputationWebServiceController < ApplicationController
   end
 
   def client
-    @request_body = @@request_body
-    @response_body = @@response_body
     @max_assignment_id = Assignment.last.id
-    @assignment = begin
-                    Assignment.find(@@assignment_id)
-                  rescue StandardError
-                    nil
-                  end
-    @another_assignment = begin
-                            Assignment.find(@@another_assignment_id)
-                          rescue StandardError
-                            nil
-                          end
-    @round_num = @@round_num
-    @algorithm = @@algorithm
-    @additional_info = @@additional_info
-    @response = @@response
   end
 
   def encrypt_request_body(plain_data)
@@ -186,33 +160,23 @@ class ReputationWebServiceController < ApplicationController
     # Decryption
     decrypt_response(response.body)
    
-    @@response = response
-    @@response_body = response.body
+    @response = response
+    @response_body = response.body
 
     update_participants(response)
     redirect_to action: 'client'
   end
 
   def add_expert_grades(body)
-    @@additional_info = 'add expert grades'
+    @additional_info = 'add expert grades'
     case params[:assignment_id]
-    when '724' # expert grades of Wiki 1a (724)
-      if params[:another_assignment_id].to_i.zero?
-        body.prepend('"expert_grades": {"submission23967":93,"submission23969":89,"submission23971":95,"submission23972":86,"submission23973":91,"submission23975":94,"submission23979":90,"submission23980":94,"submission23981":87,"submission23982":79,"submission23983":91,"submission23986":92,"submission23987":91,"submission23988":93,"submission23991":98,"submission23992":91,"submission23994":87,"submission23995":93,"submission23998":92,"submission23999":87,"submission24000":93,"submission24001":93,"submission24006":96,"submission24007":87,"submission24008":92,"submission24009":92,"submission24010":93,"submission24012":94,"submission24013":96,"submission24016":91,"submission24018":93,"submission24024":96,"submission24028":88,"submission24031":94,"submission24040":93,"submission24043":95,"submission24044":91,"submission24046":95,"submission24051":92},')
-      else # expert grades of Wiki 1a and 1b (724, 733)
-        body.prepend('"expert_grades": {"submission23967":93, "submission23969":89, "submission23971":95, "submission23972":86, "submission23973":91, "submission23975":94, "submission23979":90, "submission23980":94, "submission23981":87, "submission23982":79, "submission23983":91, "submission23986":92, "submission23987":91, "submission23988":93, "submission23991":98, "submission23992":91, "submission23994":87, "submission23995":93, "submission23998":92, "submission23999":87, "submission24000":93, "submission24001":93, "submission24006":96, "submission24007":87, "submission24008":92, "submission24009":92, "submission24010":93, "submission24012":94, "submission24013":96, "submission24016":91, "submission24018":93, "submission24024":96, "submission24028":88, "submission24031":94, "submission24040":93, "submission24043":95, "submission24044":91, "submission24046":95, "submission24051":92, "submission24100":90, "submission24079":92, "submission24298":86, "submission24545":92, "submission24082":96, "submission24080":86, "submission24284":92, "submission24534":93, "submission24285":94, "submission24297":91},')
-      end
-    when '735' # expert grades of program 1 (735)
-      body.prepend('"expert_grades": {"submission24083":96.084,"submission24085":88.811,"submission24086":100,"submission24087":100,"submission24088":92.657,"submission24091":96.783,"submission24092":90.21,"submission24093":100,"submission24097":90.909,"submission24098":98.601,"submission24101":99.301,"submission24278":98.601,"submission24279":72.727,"submission24281":54.476,"submission24289":94.406,"submission24291":99.301,"submission24293":93.706,"submission24296":98.601,"submission24302":83.217,"submission24303":91.329,"submission24305":100,"submission24307":100,"submission24308":100,"submission24311":95.804,"submission24313":91.049,"submission24314":100,"submission24315":97.483,"submission24316":91.608,"submission24317":98.182,"submission24320":90.21,"submission24321":90.21,"submission24322":98.601},')
     when '754' # expert grades of Wiki contribution (754)
       body.prepend('"expert_grades": {"submission25030":95,"submission25031":92,"submission25033":88,"submission25034":98,"submission25035":100,"submission25037":95,"submission25038":95,"submission25039":93,"submission25040":96,"submission25041":90,"submission25042":100,"submission25046":95,"submission25049":90,"submission25050":88,"submission25053":91,"submission25054":96,"submission25055":94,"submission25059":96,"submission25071":85,"submission25082":100,"submission25086":95,"submission25097":90,"submission25098":85,"submission25102":97,"submission25103":94,"submission25105":98,"submission25114":95,"submission25115":94},')
-    when '756' # expert grades of Wikipedia contribution (756)
-      body.prepend('"expert_grades": {"submission25107":76.6667,"submission25109":83.3333},')
     end
   end
 
   def add_quiz_scores(body)
-    @@additional_info = 'add quiz scores'
+    @additional_info = 'add quiz scores'
     assignment_id_list_quiz = get_assignment_id_list(params[:assignment_id].to_i, params[:another_assignment_id].to_i)
     quiz_str =  generate_json_for_quiz_scores(assignment_id_list_quiz).to_json
     quiz_str[0] = ''
@@ -223,11 +187,11 @@ class ReputationWebServiceController < ApplicationController
   end
 
   def add_hamer_reputation_values
-    @@additional_info = 'add initial hamer reputation values'
+    @additional_info = 'add initial hamer reputation values'
   end
 
   def add_lauw_reputation_values
-    @@additional_info = 'add initial lauw reputation values'
+    @additional_info = 'add initial lauw reputation values'
   end
   
   def get_assignment_id_list(assignment_id_one, assignment_id_two)
@@ -239,7 +203,7 @@ class ReputationWebServiceController < ApplicationController
   
   def prepare_request_body
     req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader: { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
-    curr_assignment_id = (params[:assignment_id].empty? ? '724' : params[:assignment_id])
+    curr_assignment_id = (params[:assignment_id].empty? ? '754' : params[:assignment_id])
     assignment_id_list_peers = get_assignment_id_list(curr_assignment_id, params[:another_assignment_id].to_i)
     req.body = generate_json_for_peer_reviews(assignment_id_list_peers, params[:round_num].to_i).to_json
     # req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
@@ -258,12 +222,12 @@ class ReputationWebServiceController < ApplicationController
     elsif params[:checkbox][:quiz] == 'Add quiz scores'
       add_quiz_scores(req.body)
     else
-      @@additional_info = ''
+      @additional_info = ''
     end
 
    
     req.body.prepend('{')
-    @@request_body = req.body
+    @request_body = req.body
     # Encrypting the request body data
     req.body = encrypt_request_body(req.body)
    

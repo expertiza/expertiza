@@ -1,6 +1,6 @@
 class CreateQuizQuestionChoices < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'quiz_question_choices', force: true do |t|
+    create_table 'quiz_question_choices', id: :integer, auto_increment: true, force: true do |t|
       t.column 'question_id', :integer # the question to which this advice belongs
       t.column 'txt', :text # the choice to be given to the user
       t.column 'iscorrect', :boolean, default: false # the correctness of this choice to be given to the user

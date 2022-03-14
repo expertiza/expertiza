@@ -1,6 +1,6 @@
 class CreateAssignmentBadges < ActiveRecord::Migration[4.2]
   def change
-    create_table :assignment_badges do |t|
+    create_table :assignment_badges, id: :integer, auto_increment: true do |t|
       t.references :badge, index: true, foreign_key: true
       t.references :assignment, index: true, foreign_key: true
       t.integer :threshold

@@ -1,6 +1,6 @@
 class CreateDeadlineRights < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :deadline_rights do |t|
+    create_table :deadline_rights, id: :integer, auto_increment: true do |t|
       t.column :name, :string, limit: 32
     end
     deadline_right = DeadlineRight.create(name: 'No')

@@ -1,6 +1,6 @@
 class CreateParticipants < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :participants do |t|
+    create_table :participants, id: :integer, auto_increment: true do |t|
       t.column :submit_allowed, :boolean # true if user is allowed to submit to this assignment
       t.column :review_allowed, :boolean
       t.column :user_id, :integer

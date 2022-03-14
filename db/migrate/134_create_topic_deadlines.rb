@@ -1,6 +1,6 @@
 class CreateTopicDeadlines < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :topic_deadlines do |t|
+    create_table :topic_deadlines, id: :integer, auto_increment: true do |t|
       t.column 'due_at', :datetime
       t.column 'deadline_type_id', :integer
       t.column 'topic_id', :integer

@@ -1,7 +1,7 @@
 class CreateBookmarkRatingRubrics < ActiveRecord::Migration[4.2]
   def self.up
     if table_exists?(:bookmark_rating_rubrics) == false
-      create_table :bookmark_rating_rubrics do |t|
+      create_table :bookmark_rating_rubrics, id: :integer, auto_increment: true do |t|
         t.column 'display_text', :string, null: false
         t.column 'minimum_rating', :integer, null: false
         t.column 'maximum_rating', :integer, null: false

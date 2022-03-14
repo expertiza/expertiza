@@ -1,6 +1,6 @@
 class CreateReviewScores < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'review_scores', force: true do |t|
+    create_table 'review_scores', id: :integer, auto_increment: true, force: true do |t|
       t.column 'review_id', :integer
       t.column 'question_id', :integer
       t.column 'score', :integer

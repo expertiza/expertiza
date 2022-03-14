@@ -1,6 +1,6 @@
 class CreateScores < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :scores, id: :integer do |t|
+    create_table :scores, id: :integer, auto_increment: true do |t|
       t.column :instance_id, :integer, null: false
       t.column :question_id, :integer, null: false
       t.column :questionnaire_type_id, :integer, null: false

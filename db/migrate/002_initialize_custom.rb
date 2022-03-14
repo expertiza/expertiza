@@ -1,6 +1,6 @@
 class InitializeCustom < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'permissions', force: true do |t|
+    create_table 'permissions', id: :integer, auto_increment: true, force: true do |t|
       t.column 'name', :string, default: '', null: false
     end
     execute "INSERT INTO `permissions` VALUES (1,'Administer Goldberg')"

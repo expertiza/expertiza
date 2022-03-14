@@ -1,6 +1,6 @@
 class CreateReviewGradesTable < ActiveRecord::Migration[4.2]
   def change
-    create_table :review_grades do |t|
+    create_table :review_grades, id: :integer, auto_increment: true do |t|
       t.integer :participant_id
       t.integer :grade_for_reviewer
       t.text :comment_for_reviewer

@@ -1,6 +1,6 @@
 class CreateQuizResponses < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :quiz_responses do |t|
+    create_table :quiz_responses, id: :integer, auto_increment: true do |t|
       t.text :response
       t.references :assignment
       t.references :questionnaire

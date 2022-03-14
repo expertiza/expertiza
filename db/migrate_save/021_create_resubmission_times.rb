@@ -1,6 +1,6 @@
 class CreateResubmissionTimes < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :resubmission_times do |t|
+    create_table :resubmission_times, id: :integer, auto_increment: true do |t|
       t.column :participant_id, :integer
       t.column :resubmitted_at, :datetime
     end

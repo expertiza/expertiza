@@ -1,6 +1,6 @@
 class CreateDueDates < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'due_dates', force: true do |t|
+    create_table 'due_dates', id: :integer, auto_increment: true, force: true do |t|
       t.column 'due_at', :datetime
       t.column 'deadline_type_id', :integer
       t.column 'assignment_id', :integer

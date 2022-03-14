@@ -1,6 +1,6 @@
 class CreateNotifications < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :notification_limits do |t|
+    create_table :notification_limits, id: :integer, auto_increment: true do |t|
       t.column :user_id, :integer, null: false
       t.column :assignment_id, :integer, null: true
       t.column :questionnaire_id, :integer, null: true

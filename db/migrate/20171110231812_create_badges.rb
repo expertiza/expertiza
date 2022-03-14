@@ -1,6 +1,6 @@
 class CreateBadges < ActiveRecord::Migration[4.2]
   def change
-    create_table :badges do |t|
+    create_table :badges, id: :integer, auto_increment: true do |t|
       t.string :name
       t.string :description
       t.string :image_name

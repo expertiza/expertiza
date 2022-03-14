@@ -1,6 +1,6 @@
 class CreateRequestedUsers < ActiveRecord::Migration[4.2]
   def change
-    create_table :requested_users do |t|
+    create_table :requested_users, id: :integer, auto_increment: true do |t|
       t.string :name
       t.integer :role_id
       t.string :fullname

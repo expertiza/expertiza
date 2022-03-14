@@ -1,6 +1,6 @@
 class CreateLatePolicies < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'late_policies', force: true do |t|
+    create_table 'late_policies', id: :integer, auto_increment: true, force: true do |t|
       t.column 'penalty_period_in_minutes', :integer
       t.column 'penalty_per_unit', :integer
       t.column 'expressed_as_percentage', :boolean

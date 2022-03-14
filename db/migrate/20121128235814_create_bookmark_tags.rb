@@ -1,6 +1,6 @@
 class CreateBookmarkTags < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :bookmark_tags do |t|
+    create_table :bookmark_tags, id: :integer, auto_increment: true do |t|
       t.string :tag_name
 
       t.timestamps

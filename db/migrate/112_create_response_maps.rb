@@ -1,6 +1,6 @@
 class CreateResponseMaps < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :response_maps do |t|
+    create_table :response_maps, id: :integer, auto_increment: true do |t|
       t.column :reviewed_object_id, :integer, :null => false
       t.column :reviewer_id,        :integer, :null => false
       t.column :reviewee_id,        :integer, :null => false
@@ -14,7 +14,7 @@ class CreateResponseMaps < ActiveRecord::Migration[4.2]
              ADD CONSTRAINT fk_response_map_reviewer
              FOREIGN KEY (reviewer_id) REFERENCES participants(id)'      
     
-    create_table :responses do |t|
+    create_table :responses, id: :integer, auto_increment: true do |t|
       t.column :map_id, :integer, :null => false
       t.column :additional_comment, :string, :null => true
       t.column :created_at, :datetime, :null => true

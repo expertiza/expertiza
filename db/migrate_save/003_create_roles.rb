@@ -1,7 +1,7 @@
 class CreateRoles < ActiveRecord::Migration[4.2]
   # This table need not be created in migration, as it is already created by Goldberg
   def self.up
-    create_table :roles do |t|
+    create_table :roles, id: :integer, auto_increment: true do |t|
       # t.column :name, :string
       t.column :name, :string, limit: 32
     end

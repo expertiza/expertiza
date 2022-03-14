@@ -1,6 +1,6 @@
 class CreateLatePolicies < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :late_policies do |t|
+    create_table :late_policies, id: :integer, auto_increment: true do |t|
       # t.column :name, :string
       t.column :penalty_period_in_minutes, :integer # length of penalty period, expressed in minutes; e.g., if penalty is per hour, value here is 60
       t.column :penalty_per_unit, :integer # how many points or how many percent deducted for each unit (above) late

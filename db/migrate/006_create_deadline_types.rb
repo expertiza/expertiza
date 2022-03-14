@@ -1,6 +1,6 @@
 class CreateDeadlineTypes < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'deadline_types', force: true do |t|
+    create_table 'deadline_types', id: :integer, auto_increment: true, force: true do |t|
       t.column 'name', :string, limit: 32
     end
 

@@ -1,6 +1,6 @@
 class CreateReviewOfReviewMappings < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'review_of_review_mappings', force: true do |t|
+    create_table 'review_of_review_mappings', id: :integer, auto_increment: true, force: true do |t|
       t.column 'review_mapping_id', :integer
       t.column 'review_reviewer_id', :integer
       t.column 'review_id', :integer

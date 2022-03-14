@@ -1,6 +1,6 @@
 class CreateQuestionnaires < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'questionnaires', force: true do |t|
+    create_table 'questionnaires', id: :integer, auto_increment: true, force: true do |t|
       t.column 'name', :string, limit: 64 # the name of the questionnaire
       t.column 'instructor_id', :integer, default: 0, null: false # the id of the instructor (as user) who created the questionnaire
       t.column 'private', :boolean, default: false, null: false # is the questionnaire private?

@@ -1,6 +1,6 @@
 class CreateSignedUpUsers < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :signed_up_users do |t|
+    create_table :signed_up_users, id: :integer, auto_increment: true do |t|
       t.column :topic_id, :integer, null: false
       t.column :creator_id, :integer, null: false
       t.column :is_waitlisted, :boolean, null: false

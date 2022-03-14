@@ -1,6 +1,6 @@
 class CreateAssignments < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'assignments', force: true do |t|
+    create_table 'assignments', id: :integer, auto_increment: true, force: true do |t|
       t.column 'created_at', :datetime
       t.column 'updated_at', :datetime
       t.column 'name', :string

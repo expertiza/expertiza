@@ -434,8 +434,8 @@ Expertiza::Application.routes.draw do
   resources :submitted_folder, only: [:edit] do
     collection do
       get :download
-      get :folder_action
-      post :folder_action
+      get :perform_folder_action
+      post :perform_folder_action
       get :view
     end
   end

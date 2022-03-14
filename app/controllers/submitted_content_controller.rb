@@ -166,39 +166,39 @@ class SubmittedContentController < ApplicationController
     end
   end
 
-  def perform_folder_action
-    @participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(@participant.user_id)
+  # def perform_folder_action
+  #   @participant = AssignmentParticipant.find(params[:id])
+  #   return unless current_user_id?(@participant.user_id)
 
-    @current_folder = DisplayOption.new
-    @current_folder.name = '/'
-    @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name]) if params[:current_folder]
-    if params[:faction][:delete]
-      delete_selected_files
-    elsif params[:faction][:rename]
-      rename_selected_file
-    elsif params[:faction][:move]
-      move_selected_file
-    elsif params[:faction][:copy]
-      copy_selected_file
-    elsif params[:faction][:create]
-      create_new_folder
-    end
-    redirect_to action: 'edit', id: @participant.id
-  end
+  #   @current_folder = DisplayOption.new
+  #   @current_folder.name = '/'
+  #   @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name]) if params[:current_folder]
+  #   if params[:faction][:delete]
+  #     delete_selected_files
+  #   elsif params[:faction][:rename]
+  #     rename_selected_file
+  #   elsif params[:faction][:move]
+  #     move_selected_file
+  #   elsif params[:faction][:copy]
+  #     copy_selected_file
+  #   elsif params[:faction][:create]
+  #     create_new_folder
+  #   end
+  #   redirect_to action: 'edit', id: @participant.id
+  # end
 
-  def download
-    folder_name = params['current_folder']['name']
-    file_name = params['download']
-    raise 'Folder_name is nil.' if folder_name.nil?
-    raise 'File_name is nil.' if file_name.nil?
-    raise 'Cannot send a whole folder.' if File.directory?(folder_name + '/' + file_name)
-    raise 'File does not exist.' unless File.exist?(folder_name + '/' + file_name)
+  # def download
+  #   folder_name = params['current_folder']['name']
+  #   file_name = params['download']
+  #   raise 'Folder_name is nil.' if folder_name.nil?
+  #   raise 'File_name is nil.' if file_name.nil?
+  #   raise 'Cannot send a whole folder.' if File.directory?(folder_name + '/' + file_name)
+  #   raise 'File does not exist.' unless File.exist?(folder_name + '/' + file_name)
 
-    send_file(folder_name + '/' + file_name, disposition: 'inline')
-  rescue StandardError => e
-    flash[:error] = e.message
-  end
+  #   send_file(folder_name + '/' + file_name, disposition: 'inline')
+  # rescue StandardError => e
+  #   flash[:error] = e.message
+  # end
 
   private
 

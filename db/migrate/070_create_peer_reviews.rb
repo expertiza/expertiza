@@ -1,6 +1,6 @@
 class CreatePeerReviews < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :peer_reviews, id: :integer do |t|
+    create_table :peer_reviews, id: :integer, auto_increment: true do |t|
       # Note: Table name pluralized by convention.
       t.column 'reviewer_id', :integer
       t.column 'reviewee_id', :integer

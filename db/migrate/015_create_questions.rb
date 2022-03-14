@@ -1,6 +1,6 @@
 class CreateQuestions < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'questions', id: :integer, force: true do |t|
+    create_table 'questions', id: :integer, auto_increment: true, force: true do |t|
       t.column 'txt', :text # the question content
       t.column 'true_false', :boolean # is this a true/false question?
       t.column 'weight', :integer # the scoring weight

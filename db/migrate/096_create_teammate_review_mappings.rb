@@ -1,6 +1,6 @@
 class CreateTeammateReviewMappings < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :teammate_review_mappings, id: :integer do |t|
+    create_table :teammate_review_mappings, id: :integer, auto_increment: true do |t|
       t.column :reviewer_id, :integer, null: false
       t.column :reviewee_id, :integer, null: false
       t.column :reviewed_object_id, :integer, null: false

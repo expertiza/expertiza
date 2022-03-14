@@ -1,6 +1,6 @@
 class CreateTaMappings < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :ta_mappings, id: :integer do |t|
+    create_table :ta_mappings, id: :integer, auto_increment: true do |t|
       t.column :ta_id, :integer
       t.column :course_id, :integer
     end

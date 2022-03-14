@@ -1,6 +1,6 @@
 class CreateSuggestions < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :suggestions, id: :integer do |t|
+    create_table :suggestions, id: :integer, auto_increment: true do |t|
       t.column :assignment_id, :int
       t.column  :title,              :string
       t.column  :description,        :string, limit: 750

@@ -1,6 +1,6 @@
 class CreateTeams < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'teams', id: :integer, force: true do |t|
+    create_table 'teams', id: :integer, auto_increment: true, force: true do |t|
       t.column 'name', :string
       t.column 'assignment_id', :integer, default: 0, null: false
     end

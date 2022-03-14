@@ -1,6 +1,6 @@
 class CreateVersions < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :versions, id: :integer do |t|
+    create_table :versions, id: :integer, auto_increment: true do |t|
       t.string   :item_type, null: false
       t.integer  :item_id,   null: false
       t.string   :event,     null: false

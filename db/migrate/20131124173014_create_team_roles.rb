@@ -1,6 +1,6 @@
 class CreateTeamRoles < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'team_roles', id: :integer, force: true do |t|
+    create_table 'team_roles', id: :integer, auto_increment: true, force: true do |t|
       t.string 'role_names'
       t.integer 'questionnaire_id'
     end

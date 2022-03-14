@@ -1,6 +1,6 @@
 class CreateTagPrompts < ActiveRecord::Migration[4.2]
   def change
-    create_table :tag_prompts, id: :integer do |t|
+    create_table :tag_prompts, id: :integer, auto_increment: true do |t|
       t.string :prompt
       t.string :desc
       t.string :control_type

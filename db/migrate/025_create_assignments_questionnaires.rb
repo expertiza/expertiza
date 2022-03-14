@@ -1,6 +1,6 @@
 class CreateAssignmentsQuestionnaires < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'assignments_questionnaires', id: :integer, force: true do |t|
+    create_table 'assignments_questionnaires', id: :integer, auto_increment: true, force: true do |t|
       t.column 'questionnaire_id', :integer, default: 0, null: false
       t.column 'assignment_id', :integer, default: 0, null: false
     end

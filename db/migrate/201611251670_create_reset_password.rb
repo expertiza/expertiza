@@ -1,6 +1,6 @@
 class CreateResetPassword < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :password_resets, id: :integer do |t|
+    create_table :password_resets, id: :integer, auto_increment: true do |t|
       t.string :user_email
       t.string :token
       t.datetime :updated_at

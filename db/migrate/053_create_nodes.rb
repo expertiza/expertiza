@@ -1,6 +1,6 @@
 class CreateNodes < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :nodes, id: :integer do |t|
+    create_table :nodes, id: :integer, auto_increment: true do |t|
       t.column :parent_id, :integer
       t.column :node_object_id, :integer
       t.column :type, :string

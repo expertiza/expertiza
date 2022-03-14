@@ -1,6 +1,6 @@
 class CreateAutomatedMetareviews < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :automated_metareviews, id: :integer do |t|
+    create_table :automated_metareviews, id: :integer, auto_increment: true do |t|
       t.float :relevance
       t.float :content_summative
       t.float :content_problem

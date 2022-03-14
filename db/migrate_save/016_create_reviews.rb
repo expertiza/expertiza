@@ -1,7 +1,7 @@
 class CreateReviews < ActiveRecord::Migration[4.2]
   # This table should have essentially the same format as review_of_reviews
   def self.up
-    create_table :reviews, id: :integer do |t|
+    create_table :reviews, id: :integer, auto_increment: true do |t|
       t.column :reviewed_at, :datetime # time that the review was saved
       t.column :review_mapping_id, :integer # the entry in the review_mappings table identifies reviewer and reviewee
       t.column :review_num_for_author, :integer # on author's review page, the review is listed as having this number

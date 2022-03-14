@@ -1,6 +1,6 @@
 class TeamsUsers < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :teams_users, id: :integer do |t| # maps users to teams; in rare cases, a single individual is on > 1 team for an assgt.
+    create_table :teams_users, id: :integer, auto_increment: true do |t| # maps users to teams; in rare cases, a single individual is on > 1 team for an assgt.
       t.column :team_id, :integer
       t.column :user_id, :integer
     end

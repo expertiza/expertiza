@@ -1,6 +1,6 @@
 class CreateQuestionAdvices < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'question_advices', id: :integer, force: true do |t|
+    create_table 'question_advices', id: :integer, auto_increment: true, force: true do |t|
       t.column 'question_id', :integer # the question to which this advice belongs
       t.column 'score', :integer # the score associated with this advice
       t.column 'advice', :text # the advice to be given to the user

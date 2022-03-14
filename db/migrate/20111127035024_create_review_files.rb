@@ -1,6 +1,6 @@
 class CreateReviewFiles < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :review_files, id: :integer do |t|
+    create_table :review_files, id: :integer, auto_increment: true do |t|
       t.string :filepath
       t.integer :author_participant_id
       t.integer :version_number

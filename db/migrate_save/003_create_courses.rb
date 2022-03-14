@@ -1,6 +1,6 @@
 class CreateCourses < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :courses, id: :integer do |t|
+    create_table :courses, id: :integer, auto_increment: true do |t|
       t.column :title, :string
       t.column :instructor_id, :int
       t.column :directory_path, :string # the directory for this course; all assgts. will be in subdirectories of this

@@ -1,6 +1,6 @@
 class CreateReviewComments < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :review_comments, id: :integer do |t|
+    create_table :review_comments, id: :integer, auto_increment: true do |t|
       t.integer :review_file_id
       t.text :comment_content
       t.integer :reviewer_participant_id

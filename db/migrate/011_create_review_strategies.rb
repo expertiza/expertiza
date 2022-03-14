@@ -1,6 +1,6 @@
 class CreateReviewStrategies < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'review_strategies', id: :integer, force: true do |t|
+    create_table 'review_strategies', id: :integer, auto_increment: true, force: true do |t|
       t.column 'name', :string
     end
 

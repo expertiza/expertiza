@@ -1,6 +1,6 @@
 class CreatePeerReviewScores < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :peer_review_scores do |t|
+    create_table :peer_review_scores, id: :integer do |t|
       # Note: Table name pluralized by convention.
       t.column 'peer_review_id', :integer
       t.column 'question_id', :integer

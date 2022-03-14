@@ -1,7 +1,7 @@
 class CreateBmappings < ActiveRecord::Migration[4.2]
   def self.up
     if table_exists?(:bmappings) == false
-      create_table :bmappings do |t|
+      create_table :bmappings, id: :integer do |t|
         t.column 'bookmark_id', :integer, null: false
         t.column 'title', :string
         t.column 'user_id', :integer, null: false

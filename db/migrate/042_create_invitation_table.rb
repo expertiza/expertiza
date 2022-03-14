@@ -1,6 +1,6 @@
 class CreateInvitationTable < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :invitations do |t|
+    create_table :invitations, id: :integer do |t|
       # Note: Table name pluralized by convention.
       t.column :assignment_id, :integer
       t.column :from_id, :integer

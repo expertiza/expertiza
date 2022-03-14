@@ -1,6 +1,6 @@
 class CreateCourses < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'courses', force: true do |t|
+    create_table 'courses', id: :integer, force: true do |t|
       t.column 'title', :string
       t.column 'instructor_id', :integer
       t.column 'directory_path', :string

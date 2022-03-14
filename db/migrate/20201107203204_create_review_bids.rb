@@ -1,6 +1,6 @@
 class CreateReviewBids < ActiveRecord::Migration[4.2]
   def change
-    create_table :review_bids do |t|
+    create_table :review_bids, id: :integer do |t|
       t.integer  'priority',       limit: 4
       t.integer  'signuptopic_id', limit: 4
       t.integer  'participant_id', limit: 4

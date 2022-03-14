@@ -1,6 +1,6 @@
 class CreateDuties < ActiveRecord::Migration[4.2]
   def change
-    create_table :duties do |t|
+    create_table :duties, id: :integer do |t|
       t.string :name
       t.integer :max_duty_limit
       t.references :assignment, index: true, foreign_key: true

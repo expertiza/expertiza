@@ -1,6 +1,6 @@
 class CreateQuestionAdvices < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :question_advices do |t|
+    create_table :question_advices, id: :integer do |t|
       t.column :question_id, :integer
       t.column :score, :integer # either an integer or true/false.  false should be assigned a score of 0, and true should be assigned a score of 1
       t.column :advice, :text # the meaning of giving this score for this question

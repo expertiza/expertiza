@@ -1,6 +1,6 @@
 class CreateParticipants < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'participants', force: true do |t|
+    create_table 'participants', id: :integer, force: true do |t|
       t.column 'submit_allowed', :boolean, default: true
       t.column 'review_allowed', :boolean, default: true
       t.column 'user_id', :integer

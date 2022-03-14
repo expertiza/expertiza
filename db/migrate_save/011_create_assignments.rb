@@ -1,6 +1,6 @@
 class CreateAssignments < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :assignments do |t|
+    create_table :assignments, id: :integer do |t|
       t.column :name, :string
       t.column :directory_path, :string
       t.column :submitter_count, :integer, default: 0 # number of people who have submitted to this assgt. so far; initialized to 0

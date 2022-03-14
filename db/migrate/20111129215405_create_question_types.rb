@@ -1,6 +1,6 @@
 class CreateQuestionTypes < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'question_types', force: true do |t|
+    create_table 'question_types', id: :integer, force: true do |t|
       t.column 'q_type', :string, null: false # the type of custom question
       t.column 'parameters', :string # parameters for a given question
       t.column 'question_id', :integer, default: 1, null: false # Questionnaire Type join

@@ -1,6 +1,6 @@
 class CreateScoreCaches < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :score_caches do |t|
+    create_table :score_caches, id: :integer do |t|
       t.column 'object_id', :integer, default: 0, null: false
       t.column 'assignment_id', :integer, default: 0, null: true
       t.column 'course_id', :integer, default: 0, null: true

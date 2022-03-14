@@ -1,6 +1,6 @@
 class CreateReviewFeedbacks < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :review_feedbacks do |t|
+    create_table :review_feedbacks, id: :integer do |t|
       # Note: Table name pluralized by convention.  Do *NOT* refer to "feedbacks" in any documentation!
       t.column :assignment_id, :integer # the assignment to which this feedback pertains.
       t.column :review_id, :integer # the review to which this feedback pertains; if it is null, the feedback is general, for all reviewers.

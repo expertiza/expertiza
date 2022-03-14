@@ -1,6 +1,6 @@
 class CreateQuestionnaires < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :questionnaires do |t|
+    create_table :questionnaires, id: :integer do |t|
       t.column :name, :string, limit: 64
       t.column :instructor_id, :integer # id of instructor who created the questionnaire
       t.column :private, :boolean # whether questionnaire is visible to other instructors

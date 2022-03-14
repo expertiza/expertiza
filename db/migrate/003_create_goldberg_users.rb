@@ -1,6 +1,6 @@
 class CreateGoldbergUsers < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'goldberg_users', force: true do |t|
+    create_table 'goldberg_users', id: :integer, force: true do |t|
       t.column 'name', :string, default: '', null: false
       t.column 'password', :string, limit: 40, default: '', null: false
       t.column 'role_id', :integer, default: 0, null: false

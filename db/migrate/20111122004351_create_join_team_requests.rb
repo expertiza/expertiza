@@ -1,6 +1,6 @@
 class CreateJoinTeamRequests < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :join_team_requests do |t|
+    create_table :join_team_requests, id: :integer do |t|
       t.column :participant_id, :integer
       t.column :team_id, :integer
       t.column :comments, :text

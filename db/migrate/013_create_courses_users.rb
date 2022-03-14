@@ -1,6 +1,6 @@
 class CreateCoursesUsers < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'courses_users', force: true do |t|
+    create_table 'courses_users', id: :integer, force: true do |t|
       t.column 'user_id', :integer
       t.column 'course_id', :integer
       t.column 'active', :boolean

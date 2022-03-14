@@ -1,7 +1,7 @@
 class CreateReviewMappings < ActiveRecord::Migration[4.2]
   # This table should have essentially the same format as review_of_review_mappings
   def self.up
-    create_table :review_mappings do |t|
+    create_table :review_mappings, id: :integer do |t|
       t.column :author_id, :integer # if an individual is being reviewed, this field is non-null, otherwise is null
       t.column :team_id, :integer   # if a team is being reviewed, this field is non-null, otherwise is null
       t.column :reviewer_id, :integer

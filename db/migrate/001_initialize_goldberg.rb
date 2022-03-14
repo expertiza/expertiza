@@ -1,6 +1,6 @@
 class InitializeGoldberg < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'goldberg_permissions', force: true do |t|
+    create_table 'goldberg_permissions', id: :integer, force: true do |t|
       t.column 'name', :string, default: '', null: false
     end
     execute "INSERT INTO `goldberg_permissions` VALUES (1,'Administer site'),(2,'Public pages - edit'),(3,'Public pages - view'),(4,'Public actions - execute'),(5,'Members only page -- view');"

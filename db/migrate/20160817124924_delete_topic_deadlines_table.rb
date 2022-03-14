@@ -4,7 +4,7 @@ class DeleteTopicDeadlinesTable < ActiveRecord::Migration[4.2]
   end
 
   def self.down
-    create_table :topic_deadlines do |t|
+    create_table :topic_deadlines, id: :integer do |t|
       t.datetime :due_at
       t.integer :deadline_type_id
       t.integer :topic_id

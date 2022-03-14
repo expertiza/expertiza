@@ -1,6 +1,6 @@
 class CreateComments < ActiveRecord::Migration[4.2]
   def self.up
-    create_table :comments do |t|
+    create_table :comments, id: :integer do |t|
       t.column :participant_id, :integer, null: false
       t.column :private, :boolean, null: false
       t.column :comment, :text, null: false

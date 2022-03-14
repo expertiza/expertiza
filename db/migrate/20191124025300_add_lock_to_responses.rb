@@ -1,6 +1,6 @@
 class AddLockToResponses < ActiveRecord::Migration[4.2]
   def change
-    create_table :locks do |t|
+    create_table :locks, id: :integer do |t|
       t.integer :timeout_period
       t.timestamps
     end

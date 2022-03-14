@@ -1,6 +1,6 @@
 class CreateTeamsUsers < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'teams_users', force: true do |t|
+    create_table 'teams_users', id: :integer, force: true do |t|
       t.column 'team_id', :integer
       t.column 'user_id', :integer
     end

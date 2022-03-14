@@ -1,6 +1,6 @@
 class CreateMappingStrategies < ActiveRecord::Migration[4.2]
   def self.up
-    create_table 'mapping_strategies', force: true do |t|
+    create_table 'mapping_strategies', id: :integer, force: true do |t|
       t.column 'name', :string
     end
 

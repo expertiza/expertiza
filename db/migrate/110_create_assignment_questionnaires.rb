@@ -4,7 +4,7 @@ class CreateAssignmentQuestionnaires < ActiveRecord::Migration[4.2]
       drop_table :assignments_questionnaires
     rescue StandardError
     end
-    create_table :assignment_questionnaires do |t|
+    create_table :assignment_questionnaires, id: :integer do |t|
       t.column :assignment_id,        :integer, null: true
       t.column :questionnaire_id,     :integer, null: true
       t.column :user_id,              :integer, null: true

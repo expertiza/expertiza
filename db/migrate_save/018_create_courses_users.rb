@@ -4,7 +4,7 @@ class CreateCoursesUsers < ActiveRecord::Migration[4.2]
     # but it also contains info as to whether a user has dropped a course.
     # If it didn't, when a user dropped a course, all his submitted work
     # would become inaccessible to PG.
-    create_table :courses_users do |t|
+    create_table :courses_users, id: :integer do |t|
       t.column :user_id, :integer
       t.column :course_id, :integer
       t.column :active, :boolean # whether user is still actively enrolled in course

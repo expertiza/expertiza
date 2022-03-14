@@ -1,6 +1,6 @@
 class CreateReviewCommentPasteBins < ActiveRecord::Migration[4.2]
   def change
-    create_table :review_comment_paste_bins do |t|
+    create_table :review_comment_paste_bins, id: :integer do |t|
       t.integer :review_grade_id
       t.string :title
       t.text :review_comment

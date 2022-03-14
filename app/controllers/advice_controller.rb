@@ -5,6 +5,13 @@ class AdviceController < ApplicationController
     current_user_has_ta_privileges?
   end
 
+# checks whether given coonditions are ture or not and return true or false
+  def check_advice(sorted_advice, num_advices, question)
+    return ((question.question_advices.length != num_advices) ||
+    sorted_advice.empty? ||
+    (sorted_advice[0].score != @questionnaire.max_question_score) ||
+    (sorted_advice[sorted_advice.length - 1] != @questionnaire.min_question_score))
+  end
   # Modify the advice associated with a questionnaire
   def edit_advice
     #Stores the questionnaire with given id in URL
@@ -15,23 +22,20 @@ class AdviceController < ApplicationController
     @questionnaire.questions.each do |question|
 
       #if the question is a scored question, store the number of advices corresponsing to that question (max_score - min_score), else 0
-      num_questions = if question.is_a?(ScoredQuestion)  #bug -> num_questions should be num_advices
-                        @questionnaire.max_question_score - @questionnaire.min_question_score   #bug -> should add +1
-                      else
+      num_advices = if question.is_a?(ScoredQuestion) 
+                        @questionnaire.max_question_score - @questionnaire.min_question_score + 1  
+                    else
                         0
-                      end
+                    end
 
       #sorting question advices in descending order by score
-      sorted_advice = question.question_advices.sort_by { |x| -x.score }
+      sorted_advice = question.question_advices.sort_by { |x| x.score }.reverse
 
       #Checks the condition for adjusting the advice size
-      next unless (question.question_advices.length != num_questions) ||
-                  sorted_advice.empty? ||
-                  (sorted_advice[0].score != @questionnaire.min_question_score) || #bug -> should match with max_question_score 
-                  (sorted_advice[sorted_advice.length - 1] != @questionnaire.max_question_score) #bug -> should match with min_question_score 
-
-      #  The number of advices for this question has changed.
-      QuestionnaireHelper.adjust_advice_size(@questionnaire, question)
+      if check_advice(sorted_advice, num_advices, question)
+        #  The number of advices for this question has changed.
+        QuestionnaireHelper.adjust_advice_size(@questionnaire, question)
+      end
     end
   end
 

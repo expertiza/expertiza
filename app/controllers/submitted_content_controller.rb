@@ -63,7 +63,7 @@ class SubmittedContentController < ApplicationController
     team = @participant.team
     team_hyperlinks = team.hyperlinks
 
-    # Check if the same hyperlink has been submitted by the team.
+    # check if the same hyperlink has been submitted by the team.
     if team_hyperlinks.include?(params['submission'])
       ExpertizaLogger.error LoggerMessage.new(controller_name, @participant.name, 'You or your teammate(s) have already submitted the same hyperlink.', request)
       flash[:error] = 'You or your teammate(s) have already submitted the same hyperlink.'

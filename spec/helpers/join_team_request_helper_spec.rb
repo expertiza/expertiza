@@ -19,7 +19,7 @@ describe JoinTeamRequestsHelper do
       end
 
       it 'returns the associated status' do
-        expect(helper.display_request_status(join_team_request1)).to eq('Pending: A request has been made to join this team.')
+        expect(helper.display_request_status(join_team_request1)).to eq('Denied: The team has denied your request.')
       end
     end
 
@@ -30,7 +30,7 @@ describe JoinTeamRequestsHelper do
       end
 
       it 'returns the associated status' do
-        expect(helper.display_request_status(join_team_request1)).to eq('Pending: A request has been made to join this team.')
+        expect(helper.display_request_status(join_team_request1)).to eq('Accepted: The team has accepted your request.\nYou should receive an invitation in \"Your Team\" page.')
       end
     end
 

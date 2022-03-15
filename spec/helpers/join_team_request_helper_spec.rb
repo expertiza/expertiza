@@ -30,7 +30,7 @@ describe JoinTeamRequestsHelper do
       end
 
       it 'returns the associated status' do
-        expect(helper.display_request_status(join_team_request1)).to eq('Accepted: The team has accepted your request.\nYou should receive an invitation in "Your Team" page.')
+        expect(helper.display_request_status(join_team_request1)).to eq("Accepted: The team has accepted your request.\nYou should receive an invitation in \"Your Team\" page.")
       end
     end
 

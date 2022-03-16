@@ -79,16 +79,12 @@ class QuestionnairesController < ApplicationController
     @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
     @questionnaire.save
   end
-  
-
   def questionnaire_node_creation()
     tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
     parent = FolderNode.find_by(node_object_id: tree_folder.id)
     QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
     flash[:success] = 'You have successfully created a questionnaire!'
   end
-  
-
   # Edit a questionnaire
   def edit
     @questionnaire = Questionnaire.find(params[:id])
@@ -99,6 +95,8 @@ class QuestionnairesController < ApplicationController
     # If 'Add' or 'Edit/View advice' is clicked, redirect appropriately
     if params[:add_new_questions]
       redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
+    elsif params[:add_new_ScoredQuestion]
+      redirect_to action: 'add_new_ScoredQuestion', id: params[:id], question: params[:add_new_ScoredQuestion]
     elsif params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     else
@@ -173,19 +171,9 @@ class QuestionnairesController < ApplicationController
     else
       flash[:success] = 'You have successfully added a new question.'
     end
-    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
-    ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
+    num_of_questions = Questionnaire.find(questionnaire_id).questions.size
+    ((num_of_questions + 1)..(num_of_questions + params[:question][:total_num].to_i)).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
-      if question.is_a? ScoredQuestion
-        question.weight = params[:question][:weight]
-        question.max_label = 'Strongly agree'
-        question.min_label = 'Strongly disagree'
-      end
-      question.size = ScoredQuestion::DEFAULT_CRITERION_SIZE if question.is_a? Criterion
-      question.size = ScoredQuestion::DEFAULT_CRITERION_SIZE if question.is_a? Cake
-      question.alternatives = ScoredQuestion::DEFAULT_ALTERNATIVES if question.is_a? Dropdown
-      question.size = ScoredQuestion::DEFAULT_TEXT_AREA_SIZE if question.is_a? TextArea
-      question.size = ScoredQuestion::DEFAULT_TEXT_FIELD_SIZE if question.is_a? TextField
       begin
         question.save
       rescue StandardError
@@ -194,6 +182,7 @@ class QuestionnairesController < ApplicationController
     end
     redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
   end
+
   # Zhewei: This method is used to save all questions in current questionnaire.
   def save_all_questions
     questionnaire_id = params[:id]
@@ -226,6 +215,7 @@ class QuestionnairesController < ApplicationController
     save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
   end
+  # save questions that have been added to a questionnaire
   # save questions that have been added to a questionnaire
   def save_new_questions(questionnaire_id)
     if params[:new_question]

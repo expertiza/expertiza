@@ -1,6 +1,6 @@
 class ResponseController < ApplicationController
   include AuthorizationHelper
-  before_action :set_response , only: %i[update]
+  before_action :set_response, only: %i[update delete view]
 
   helper :submitted_content
   helper :file
@@ -42,8 +42,6 @@ class ResponseController < ApplicationController
 
   def delete
     # The locking was added for E1973, team-based reviewing. See lock.rb for details
-    @response = Response.find(params[:id])
-    @map = @response.map
     if @map.reviewer_is_team
       @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
       if @response.nil?
@@ -159,8 +157,6 @@ class ResponseController < ApplicationController
 
   # view response
   def view
-    @response = Response.find(params[:id])
-    @map = @response.map
     set_content
   end
 

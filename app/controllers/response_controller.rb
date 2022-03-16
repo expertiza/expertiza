@@ -4,6 +4,16 @@ class ResponseController < ApplicationController
 
   helper :submitted_content
   helper :file
+  before_action :access_calibration, only: [:show_calibration_results_for_student]
+
+  def access_calibration
+    response = Response.find(params[:id])
+    user_id = response.map.reviewer.user_id if response.map.reviewer
+    unless current_user_is_reviewer?(response.map, user_id)
+      flash[:error] = 'You are not allowed to view this calibration result'
+      redirect_to controller: 'student_review', action: 'list', id: user_id
+    end
+  end
 
   def action_allowed?
     response = user_id = nil
@@ -14,16 +24,17 @@ class ResponseController < ApplicationController
     end
     case action
     when 'edit' # If response has been submitted, no further editing allowed
-      is_action_allowed = response.is_submitted ? false : current_user_is_reviewer?(response.map, user_id)
+      return false if response.is_submitted
+
+      return current_user_is_reviewer?(response.map, user_id)
       # Deny access to anyone except reviewer & author's team
     when 'delete', 'update'
-      is_action_allowed = current_user_is_reviewer?(response.map, user_id)
+      return current_user_is_reviewer?(response.map, user_id)
     when 'view'
-      is_action_allowed = response_edit_allowed?(response.map, user_id)
+      return response_edit_allowed?(response.map, user_id)
     else
-      is_action_allowed = user_logged_in?
+      user_logged_in?
     end
-    is_action_allowed
   end
 
   # GET /response/json?response_id=xx
@@ -129,7 +140,7 @@ class ResponseController < ApplicationController
     # So do the answers, otherwise the response object can't find the questionnaire when the user hasn't saved his new review and closed the window.
     # A new response has to be created when there hasn't been any reviews done for the current round,
     # or when there has been a submission after the most recent review in this round.
-    @response = @response.populate_new_response(@map, @current_round)
+    @response = @response.create_or_get_response(@map, @current_round)
     questions = sort_questions(@questionnaire.questions)
     store_total_cake_score
     init_answers(questions)
@@ -250,14 +261,14 @@ class ResponseController < ApplicationController
     end
   end
 
-  # This method controls what is shown students when they view results from a calibration.
-  # Most of the business logic lives in the model, where the :calibration_response_map_id and :review_response_map_id are used
-  # to find the appropriate references to calibration responses, review responses as well as the response questions
+  # This method set the appropriate values to the instance variables used in the 'show_calibration_results_for_student' page
+  # Responses are fetched using calibration_response_map_id and review_response_map_id params passed in the URL
+  # Questions are fetched by querying AssignmentQuestionnaire table to get the valid questions
   def show_calibration_results_for_student
     @assignment = Assignment.find(params[:assignment_id])
-    @calibration_response,
-    @review_response,
-    @questions = Response.calibration_results_info(params[:calibration_response_map_id], params[:review_response_map_id], params[:assignment_id])
+    @calibration_response = ReviewResponseMap.find(params[:calibration_response_map_id]).response[0]
+    @review_response = ReviewResponseMap.find(params[:review_response_map_id]).response[0]
+    @questions = AssignmentQuestionnaire.get_questions_by_assignment_id(params[:assignment_id])
   end
 
   def toggle_permission
@@ -290,32 +301,6 @@ class ResponseController < ApplicationController
   # Taken if the response is locked and cannot be edited right now
   def response_lock_action
     redirect_to action: 'redirect', id: @map.map_id, return: 'locked', error_msg: 'Another user is modifying this response or has modified this response. Try again later.'
-  end
-
-  # new_response if a flag parameter indicating that if user is requesting a new rubric to fill
-  # if true: we figure out which questionnaire to use based on current time and records in assignment_questionnaires table
-  # e.g. student click "Begin" or "Update" to start filling out a rubric for others' work
-  # if false: we figure out which questionnaire to display base on @response object
-  # e.g. student click "Edit" or "View"
-  def set_content(new_response = false)
-    @title = @map.get_title
-    if @map.survey?
-      @survey_parent = @map.survey_parent
-    else
-      @assignment = @map.assignment
-    end
-    @participant = @map.reviewer
-    @contributor = @map.contributor
-    new_response ? questionnaire_from_response_map : questionnaire_from_response
-    set_dropdown_or_scale
-    @questions = sort_questions(@questionnaire.questions)
-    @min = @questionnaire.min_question_score
-    @max = @questionnaire.max_question_score
-    # The new response is created here so that the controller has access to it in the new method
-    # This response object is populated later in the new method
-    if new_response
-      @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
-    end
   end
 
   # This method is called within the Edit or New actions

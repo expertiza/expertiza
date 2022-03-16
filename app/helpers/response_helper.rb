@@ -10,16 +10,40 @@ module ResponseHelper
     questions.sort_by(&:seq)
   end
 
-  # Creates a table to store total contribution for Cake question across all reviewers
+  # Assigns total contribution for cake question across all reviewers to a hash map
+  # Key : question_id, Value : total score for cake question
   def store_total_cake_score
-    @total_score = {}
-    @questions.each do |question|
-      next unless question.instance_of? Cake
+    reviewee = ResponseMap.select(:reviewee_id, :type).where(id: @response.map_id.to_s).first
+    @total_score = Cake.get_total_score_for_questions(reviewee.type,
+                                                      @questions,
+                                                      @participant.id,
+                                                      @assignment.id,
+                                                      reviewee.reviewee_id)
+  end
 
-      reviewee_id = ResponseMap.select(:reviewee_id, :type).where(id: @response.map_id.to_s).first
-      total_score = question.get_total_score_for_question(reviewee_id.type, question.id, @participant.id, @assignment.id, reviewee_id.reviewee_id).to_s
-      total_score = 0 if total_score.nil?
-      @total_score[question.id] = total_score
+  # new_response if a flag parameter indicating that if user is requesting a new rubric to fill
+  # if true: we figure out which questionnaire to use based on current time and records in assignment_questionnaires table
+  # e.g. student click "Begin" or "Update" to start filling out a rubric for others' work
+  # if false: we figure out which questionnaire to display base on @response object
+  # e.g. student click "Edit" or "View"
+  def set_content(new_response = false)
+    @title = @map.get_title
+    if @map.survey?
+      @survey_parent = @map.survey_parent
+    else
+      @assignment = @map.assignment
+    end
+    @participant = @map.reviewer
+    @contributor = @map.contributor
+    new_response ? questionnaire_from_response_map : questionnaire_from_response
+    set_dropdown_or_scale
+    @questions = sort_questions(@questionnaire.questions)
+    @min = @questionnaire.min_question_score
+    @max = @questionnaire.max_question_score
+    # The new response is created here so that the controller has access to it in the new method
+    # This response object is populated later in the new method
+    if new_response
+      @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
     end
   end
 end

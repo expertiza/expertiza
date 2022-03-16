@@ -206,11 +206,6 @@ class ResponseController < ApplicationController
                 return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
   end
 
-  def insert_into_awarded_badges(participant_id, badge_name)
-    badge_id = Badge.get_id_from_name(badge_name: badge_name)
-    AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
-  end
-
   def save
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
@@ -219,10 +214,10 @@ class ResponseController < ApplicationController
     # E1822: Added logic to insert a student suggested 'Good Teammate' or 'Good Reviewer' badge in the awarded_badges table.
     if @map.assignment.badge?
       if @map.is_a?(TeammateReviewResponseMap) && (params[:review][:good_teammate_checkbox] == 'on')
-        insert_into_awarded_badges(participant.id, 'Good Teammate')
+        AwardedBadge.award_badge(participant.id, 'Good Teammate')
       end
       if @map.is_a?(FeedbackResponseMap) && (params[:review][:good_reviewer_checkbox] == 'on')
-        insert_into_awarded_badges(participant.id, 'Good Reviewer')
+        AwardedBadge.award_badge(participant.id, 'Good Reviewer')
       end
     end
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Response was successfully saved')

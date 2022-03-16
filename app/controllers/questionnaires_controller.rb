@@ -106,6 +106,8 @@ class QuestionnairesController < ApplicationController
     # If 'Add' or 'Edit/View advice' is clicked, redirect appropriately
     if params[:add_new_questions]
       redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
+    elsif params[:add_new_ScoredQuestion]
+      redirect_to action: 'add_new_ScoredQuestion', id: params[:id], question: params[:new_question]
     elsif params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     else
@@ -189,18 +191,6 @@ class QuestionnairesController < ApplicationController
     num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
-      if question.is_a? ScoredQuestion
-        question.weight = params[:question][:weight]
-        question.max_label = 'Strongly agree'
-        question.min_label = 'Strongly disagree'
-      end
-
-      question.size = ScoredQuestion::DEFAULT_CRITERION_SIZE if question.is_a? Criterion
-      question.size = ScoredQuestion::DEFAULT_CRITERION_SIZE if question.is_a? Cake
-      question.alternatives = ScoredQuestion::DEFAULT_ALTERNATIVES if question.is_a? Dropdown
-      question.size = ScoredQuestion::DEFAULT_TEXT_AREA_SIZE if question.is_a? TextArea
-      question.size = ScoredQuestion::DEFAULT_TEXT_FIELD_SIZE if question.is_a? TextField
-
       begin
         question.save
       rescue StandardError
@@ -210,6 +200,35 @@ class QuestionnairesController < ApplicationController
     redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
   end
 
+  # Zhewei: This method is used to add new scored questions when editing questionnaire.
+  def add_new_ScoredQuestion
+    questionnaire_id = params[:id] unless params[:id].nil?
+    # If the questionnaire is being used in the active period of an assignment, delete existing responses before adding new questions
+    if AnswerHelper.check_and_delete_responses(questionnaire_id)
+      flash[:success] = 'You have successfully added a new scored question. Any existing reviews for the questionnaire have been deleted!'
+    else
+      flash[:success] = 'You have successfully added a new scored question.'
+    end
+    num_of_questions = Questionnaire.find(questionnaire_id).questions.size
+    ((num_of_questions + 1)..(num_of_questions + params[:question][:total_num].to_i)).each do |i|
+      question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
+      question.weight = params[:question][:weight]
+      question.max_label = 'Strongly agree'
+      question.min_label = 'Strongly disagree'
+      question.size = ScoredQuestion::DEFAULT_CRITERION_SIZE if question.is_a? Criterion
+      question.size = ScoredQuestion::DEFAULT_CRITERION_SIZE if question.is_a? Cake
+      question.alternatives = ScoredQuestion::DEFAULT_ALTERNATIVES if question.is_a? Dropdown
+      @question.size = ScoredQuestion::DEFAULT_TEXT_AREA_SIZE if question.is_a? TextArea
+      @question.size = ScoredQuestion::DEFAULT_TEXT_FIELD_SIZE if question.is_a? TextField
+      begin
+        question.save
+      rescue StandardError
+        flash[:error] = $ERROR_INFO
+      end
+    end
+    redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+  end
+  
   # Zhewei: This method is used to save all questions in current questionnaire.
   def save_all_questions
     questionnaire_id = params[:id]

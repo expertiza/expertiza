@@ -188,8 +188,8 @@ class QuestionnairesController < ApplicationController
       flash[:success] = 'You have successfully added a new question.'
     end
 
-    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
-    ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
+    num_of_questions = Questionnaire.find(questionnaire_id).questions.size
+    ((num_of_questions + 1)..(num_of_questions + params[:question][:total_num].to_i)).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
       begin
         question.save

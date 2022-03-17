@@ -7,6 +7,13 @@ class TeamsController < ApplicationController
     current_user_has_ta_privileges?
   end
 
+  # attempt to initialize team type in session
+  def init_team_type(type)
+    if type and Team.allowed_types.include?(type)
+      session[:team_type] = type
+    end
+  end
+
   # This function is used to create teams with random names.
   # Instructors can call by clicking "Create teams" icon and then click "Create teams" at the bottom.
   def create_teams
@@ -18,7 +25,7 @@ class TeamsController < ApplicationController
   end
 
   def list
-    session[:team_type] = params[:type] if params[:type] && Team.allowed_types.include?(params[:type])
+    init_team_type(params[:type])
     @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == 'Assignment'
     begin
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])

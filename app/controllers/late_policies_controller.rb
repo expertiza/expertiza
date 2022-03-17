@@ -78,7 +78,7 @@ class LatePoliciesController < ApplicationController
   end
 
   def update
-    @penalty_policy = LatePolicy.find(params[:id])
+    penalty_policy = LatePolicy.find(params[:id])
     # if name has changed then only check for this
     if params[:late_policy][:policy_name] != @penalty_policy.policy_name &&
        LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
@@ -94,9 +94,9 @@ class LatePoliciesController < ApplicationController
       redirect_to action: 'edit', id: params[:id]
     else
       begin
-        @penalty_policy.update_attributes(late_policy_params)
-        @penalty_policy.save!
-        LatePolicy.update_calculated_penalty_objects(@penalty_policy)
+        penalty_policy.update_attributes(late_policy_params)
+        penalty_policy.save!
+        LatePolicy.update_calculated_penalty_objects(penalty_policy)
         flash[:notice] = 'The late policy was successfully updated.'
         redirect_to action: 'index'
       rescue StandardError

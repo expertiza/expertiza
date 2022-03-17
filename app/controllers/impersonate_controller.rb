@@ -48,7 +48,11 @@ class ImpersonateController < ApplicationController
     end
   end
 
-  # Checking if special characters are present in the username provided, only alphanumeric should be used
+  # Checks if special characters are present in the username provided, only alphanumeric should be used
+  # warn_for_special_chars is a method in SecurityHelper class.SecurityHelper class has methods to handle this.
+  # special_chars method-Initialises string with special characters /\?<>|&$# .
+  # contains_special_chars method-converts it to regex and compares with the string
+  # warn_for_special_chars takes the output from above method and flashes an error if there are any special characters(/\?<>|&$#) in the string
   def check_if_special_char
     if params[:user]
       if warn_for_special_chars(params[:user][:name], 'Username')
@@ -66,6 +70,10 @@ class ImpersonateController < ApplicationController
   end
 
   # Checking if the username provided can be impersonated or not
+  # If the user is in anonymized view,then fetch the real user else fetch the user using params
+  # can_impersonate method in user.rb checks whether the original user can impersonate the other user in params
+  # This method checks whether the user is a superadmin or teaching staff or recursively adds the child users till it reached highest hierarchy which is SuperAdmin
+  # If original user can impersonate the user ,then session will be overwrite to get the view of the user who is getting impersonated
   def check_if_user_impersonateable
     if params[:impersonate].nil?
       # E1991 : check whether instructor is currently in anonymized view
@@ -86,6 +94,7 @@ class ImpersonateController < ApplicationController
   end
 
   # Function to display appropriate error messages based on different username provided, the message explains each error
+  # This function checks params values and displays error_message based on the user name .This is initial check to see if username is valid
   def display_error_msg
     if params[:user]
       @message = "No user exists with the name '#{params[:user][:name]}'."

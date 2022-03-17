@@ -201,7 +201,8 @@ class QuestionnairesController < ApplicationController
   end
 
   # Zhewei: This method is used to add new scored questions when editing questionnaire.
-  def add_new_ScoredQuestion
+
+  def add_new_questions
     questionnaire_id = params[:id] unless params[:id].nil?
     # If the questionnaire is being used in the active period of an assignment, delete existing responses before adding new questions
     if AnswerHelper.check_and_delete_responses(questionnaire_id)
@@ -211,10 +212,11 @@ class QuestionnairesController < ApplicationController
     end
     num_of_questions = Questionnaire.find(questionnaire_id).questions.size
     ((num_of_questions + 1)..(num_of_questions + params[:question][:total_num].to_i)).each do |i|
+      # Webrown2: explore moving ScoredQuestion initialization into the scored_question model
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
       question.weight = params[:question][:weight]
-      question.max_label = 'Strongly agree'
-      question.min_label = 'Strongly disagree'
+      question.max_label = ScoredQuestion::DEFAULT_MAX_AGREEMENT
+      question.min_label = ScoredQuestion::DEFAULT_MIN_AGREEMENT
       question.size = ScoredQuestion::DEFAULT_CRITERION_SIZE if question.is_a? Criterion
       question.size = ScoredQuestion::DEFAULT_CRITERION_SIZE if question.is_a? Cake
       question.alternatives = ScoredQuestion::DEFAULT_ALTERNATIVES if question.is_a? Dropdown
@@ -229,9 +231,8 @@ class QuestionnairesController < ApplicationController
     redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
   end
 
-  # Zhewei: This method is used to save all questions in current questionnaire.
-  def save_all_questions
-    questionnaire_id = params[:id]
+ # Zhewei: This method is used to save all questions in current questionnaire.
+ def save_all_questions
     begin
       if params[:save]
         params[:question].each_pair do |k, v|
@@ -252,8 +253,8 @@ class QuestionnairesController < ApplicationController
 
     if params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
-    elsif questionnaire_id
-      redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+    elsif params[:id]
+      redirect_to edit_questionnaire_path(params[:id].to_sym)
     end
   end
 

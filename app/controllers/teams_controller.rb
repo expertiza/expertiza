@@ -14,11 +14,16 @@ class TeamsController < ApplicationController
     end
   end
 
+  # getter for retrieving team_type from session
+  def team_type
+    session[:team_type]
+  end
+
   # This function is used to create teams with random names.
   # Instructors can call by clicking "Create teams" icon and then click "Create teams" at the bottom.
   def create_teams
-    parent = Object.const_get(session[:team_type]).find(params[:id])
-    Team.randomize_all_by_parent(parent, session[:team_type], params[:team_size].to_i)
+    parent = Object.const_get(team_type).find(params[:id])
+    Team.randomize_all_by_parent(parent, team_type, params[:team_size].to_i)
     undo_link('Random teams have been successfully created.')
     ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Random teams have been successfully created', request)
     redirect_to action: 'list', id: parent.id
@@ -26,9 +31,9 @@ class TeamsController < ApplicationController
 
   def list
     init_team_type(params[:type])
-    @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == 'Assignment'
+    @assignment = Assignment.find_by(id: params[:id]) if team_type == 'Assignment'
     begin
-      @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
+      @root_node = Object.const_get(team_type + 'Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
     rescue StandardError
       flash[:error] = $ERROR_INFO
@@ -36,15 +41,15 @@ class TeamsController < ApplicationController
   end
 
   def new
-    @parent = Object.const_get(session[:team_type] ||= 'Assignment').find(params[:id])
+    @parent = Object.const_get(team_type ||= 'Assignment').find(params[:id])
   end
 
   # called when a instructor tries to create an empty team manually.
   def create
-    parent = Object.const_get(session[:team_type]).find(params[:id])
+    parent = Object.const_get(team_type).find(params[:id])
     begin
-      Team.check_for_existing(parent, params[:team][:name], session[:team_type])
-      @team = Object.const_get(session[:team_type] + 'Team').create(name: params[:team][:name], parent_id: parent.id)
+      Team.check_for_existing(parent, params[:team][:name], team_type)
+      @team = Object.const_get(team_type + 'Team').create(name: params[:team][:name], parent_id: parent.id)
       TeamNode.create(parent_id: parent.id, node_object_id: @team.id)
       undo_link("The team \"#{@team.name}\" has been successfully created.")
       redirect_to action: 'list', id: parent.id
@@ -56,9 +61,9 @@ class TeamsController < ApplicationController
 
   def update
     @team = Team.find(params[:id])
-    parent = Object.const_get(session[:team_type]).find(@team.parent_id)
+    parent = Object.const_get(team_type).find(@team.parent_id)
     begin
-      Team.check_for_existing(parent, params[:team][:name], session[:team_type])
+      Team.check_for_existing(parent, params[:team][:name], team_type)
       @team.name = params[:team][:name]
       @team.save
       flash[:success] = "The team \"#{@team.name}\" has been successfully updated."
@@ -75,7 +80,7 @@ class TeamsController < ApplicationController
   end
 
   def delete_all
-    root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
+    root_node = Object.const_get(team_type + 'Node').find_by(node_object_id: params[:id])
     child_nodes = root_node.get_teams.map(&:node_object_id)
     Team.destroy_all(id: child_nodes) if child_nodes
     redirect_to action: 'list', id: params[:id]
@@ -113,7 +118,7 @@ class TeamsController < ApplicationController
   # Handovers all teams to the course that contains the corresponding assignment
   # The team and team members are all copied.
   def bequeath_all
-    if session[:team_type] == 'Course'
+    if team_type == 'Course'
       flash[:error] = 'Invalid team type for bequeath all'
       redirect_to controller: 'teams', action: 'list', id: params[:id]
     else

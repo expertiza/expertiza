@@ -60,6 +60,22 @@ describe UsersController do
       expect(controller.action_allowed?).to be true
     end
 
+    # checks if user has admin privileges when admin and when not admin
+    it 'admin list_pending_requested' do
+      params = { action: 'list_pending_requested' }
+      allow(controller).to receive(:params).and_return(params)
+      expect(controller.action_allowed?).to be false
+      stub_current_user(student7, student7.role.name, student7.role)
+      allow(controller).to receive(:params).and_return(params)
+      expect(controller.action_allowed?).to be false
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      allow(controller).to receive(:params).and_return(params)
+      expect(controller.action_allowed?).to be true
+      stub_current_user(admin, admin.role.name, admin.role)
+      allow(controller).to receive(:params).and_return(params)
+      expect(controller.action_allowed?).to be true
+    end
+
     # check there are no errors while setting anonymized view as a student
     it 'redirects to back' do
       stub_current_user(student7, student7.role.name, student7.role)

@@ -76,14 +76,14 @@ class LatePoliciesController < ApplicationController
     # penalty per unit cannot be greater than maximum penalty
     invalid_penalty_per_unit = params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
     flash[:error] = "The maximum penalty cannot be less than penalty per unit." if invalid_penalty_per_unit
-    same_policy_name = false
+    policy_name_exists = false
     # penalty name should be unique
-    if same_policy_name != LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
+    if policy_name_exists != LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
       flash[:error] = "A policy with the same name already exists."
-      same_policy_name = true
+      policy_name_exists = true
     end
     # If penalty  is valid and the penalty name does not already exists then tries to update and save.
-    if !invalid_penalty_per_unit && !same_policy_name
+    if !invalid_penalty_per_unit && !policy_name_exists
       @late_policy = LatePolicy.new(late_policy_params)
       @late_policy.instructor_id = instructor_id
       begin
@@ -108,15 +108,15 @@ class LatePoliciesController < ApplicationController
     @penalty_policy = LatePolicy.find(params[:id])
     invalid_penalty_per_unit = params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
     flash[:error] = "The maximum penalty cannot be less than penalty per unit." if invalid_penalty_per_unit
-    same_policy_name = false
+    policy_name_exists = false
     # if name has changed then need to check if the name already exists or not.
     if params[:late_policy][:policy_name] != @penalty_policy.policy_name
-      if same_policy_name == LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
+      if policy_name_exists == LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
         flash[:error] = "The policy could not be updated because a policy with the same name already exists."
       end
     end
     # If the the policy passes all the above checks then controller tries to update.
-    if !same_policy_name && !invalid_penalty_per_unit
+    if !policy_name_exists && !invalid_penalty_per_unit
       begin
         @penalty_policy.update_attributes(late_policy_params)
         @penalty_policy.save!
@@ -133,7 +133,7 @@ class LatePoliciesController < ApplicationController
       flash[:error] = "Cannot edit the policy. The maximum penalty cannot be less than penalty per unit."
       redirect_to action: 'edit', id: params[:id]
     # If same policy name already exists then display a flash notice.
-    elsif same_policy_name
+    elsif policy_name_exists
       flash[:error] = "Cannot edit the policy. A policy with the same name " + params[:late_policy][:policy_name] + " already exists."
       redirect_to action: 'edit', id: params[:id]
     end

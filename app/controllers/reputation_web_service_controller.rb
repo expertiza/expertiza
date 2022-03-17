@@ -208,10 +208,10 @@ class ReputationWebServiceController < ApplicationController
     req.body = generate_json_for_peer_reviews(assignment_id_list_peers, params[:round_num].to_i).to_json
     # req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
     req.body[0] = '' # remove the first '{'
-    @@assignment_id = params[:assignment_id]
-    @@round_num = params[:round_num]
-    @@algorithm = params[:algorithm]
-    @@another_assignment_id = params[:another_assignment_id]
+    @assignment_id = params[:assignment_id]
+    @round_num = params[:round_num]
+    @algorithm = params[:algorithm]
+    @another_assignment_id = params[:another_assignment_id]
 
     if params[:checkbox][:expert_grade] == 'Add expert grades'
       add_expert_grades(req.body)

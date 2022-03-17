@@ -4,7 +4,15 @@ describe PublishingController do
   let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, name: 'Instructor1') }
   let(:student1) { build(:student, id: 21, role_id: 1) }
   let(:ta) { build(:teaching_assistant, id: 6) }
+  let(:assignment) { build(:assignment, id: 1)}
+  let(:participant) {build(:participant, id: 1)}
+  let(:allow1) {{id: 1, allow: 0 } }
+  let(:assignment_participant1) { build(:participant, id: 2, user_id: 21)}
+  let(:assignment_participant2) { build(:participant, id: 3, user_id: 21)}
 	
+ before(:each) do
+    allow(User).to receive(:find).with(21).and_return(student1)
+  end
 	describe '#action_allowed?' do
     context 'when the role of current user is Super-Admin' do
       it 'allows certain action' do
@@ -37,4 +45,96 @@ describe PublishingController do
       end
     end
   end
+
+describe 'view' do
+    context 'user visits the publishing rights page' do
+      it 'displays all the assignment participants' do
+          stub_current_user(student1, student1.role.name, student1.role)
+          params = { id: 21 }
+          get :view, params
+          expect(assigns(:user)).to eq(student1)
+      end
+    end
+  end
+describe 'set_publish_permission' do
+=begin
+    context 'user does not match with participant' do
+      it 'returns nil' do
+        allow(AssignmentParticipant).to receive(:find).with(nil).and_return(assignment_participant1)
+allow(AssignmentParticipant).to receive(:update_attribute).with(allow1).and_return(assignment_participant1)
+        stub_current_user(student1, student1.role.name, student1.role)
+        params ={allow: 0}
+        post :set_publish_permission, params
+        expect(response).to be(nil)  
+      end
+    end
+=end
+
+    context 'user matches with participant and user clicks on the grant button next to the assignment' do
+      it 'redirectsto the grant page' do
+        allow(AssignmentParticipant).to receive(:find).with('3').and_return(assignment_participant2)
+        stub_current_user(student1, student1.role.name, student1.role)
+        params ={id: 3, allow: 1}
+        post :set_publish_permission, params
+        expect(response).to redirect_to(action: :grant)
+      end
+    end
+=begin
+context 'user matches with participant and the assignment is already granted permission' do
+      it 'redirects to the view page' do
+	#assignment_participant = mock_model(AssignmentParticipant)
+	stub_current_user(student1, student1.role.name, student1.role)
+	#assignment_participant2.stub!(:update_attribute).with('permission_granted','0').and_return(true)
+	allow(AssignmentParticipant).to receive(:find).with('3').and_return(assignment_participant2)
+        #allow(AssignmentParticipant).to receive(:update_attribute).with(:permission_granted, '0').and_return(true)
+        params ={id: 3, allow: '0'}
+        post :set_publish_permission, params
+        expect(response).to redirect_to(action: :view)
+      end
+    end
+=end
+
+  end
+describe 'grant' do
+      context 'user clicks on grant option' do
+        it 'redirects to the grant page' do
+          allow(AssignmentParticipant).to receive(:find).with('3').and_return(assignment_participant2)
+          stub_current_user(student1, student1.role.name, student1.role)
+          params ={id: 3}
+          get :grant, params
+          expect(assigns(:user)).to eq(student1)
+        end
+      end
+    end
+describe 'grant_with_private_key' do
+      context 'user visits the grant page without id and enters correct RSA private key' do
+        it 'verifies to be successful for all past assignments and redirect to view' do
+          #participant_list = double('participant_list', participant: assignment_participant1, participant: assignment_participant2)
+          #participant_list=[:assignment_participant1, :assignment_participant2]
+          allow(AssignmentParticipant).to receive(:where).with(user_id: 21).and_return([assignment_participant1])
+          stub_current_user(student1, student1.role.name, student1.role)
+         
+          params = {}
+
+          [assignment_participant1].each do |participant|
+	allow(participant).to receive(:verify_digital_signature).with(any_args).and_return(true)
+            allow(participant).to receive(:assign_copyright).with(any_args).and_raise('The private key you inputted was invalid.', StandardError)
+          end
+          post :grant_with_private_key, params
+          expect(flash[:notice]).to eq('The private key you inputted was invalid.')
+          expect(response).to redirect_to(action: :grant)
+       end
+      end
+    end
+describe 'update_publish_permissions' do
+      context 'user clicks on the grant publishing rights to all past assignments button and the assignments are already granted permission' do
+        it 'redirects to grant page' do
+          allow(AssignmentParticipant).to receive(:find).with('3').and_return(assignment_participant2)
+          stub_current_user(student1, student1.role.name, student1.role)
+          params ={id: 3, allow: 1}
+          post :update_publish_permissions, params
+          expect(response).to redirect_to(action: :grant)
+        end
+      end
+    end
 end

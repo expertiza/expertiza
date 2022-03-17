@@ -51,8 +51,6 @@ class QuestionnairesController < ApplicationController
       flash[:error] = 'A rubric or survey must have a title.'
       redirect_to controller: 'questionnaires', action: 'new', model: params[:questionnaire][:type], private: params[:questionnaire][:private]
     else
-      questionnaire_private = params[:questionnaire][:private] == 'true'
-      display_type = params[:questionnaire][:type].split('Questionnaire')[0]
       begin
         @questionnaire = Object.const_get(params[:questionnaire][:type]).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
       rescue StandardError
@@ -62,11 +60,8 @@ class QuestionnairesController < ApplicationController
         # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
         # In the future, we need to write migration files to make them consistency.
         # E1903 : We are not sure of other type of cases, so have added a if statement. If there are only 5 cases, remove the if statement
-        if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey BookmarkRating].include?(display_type)
-          display_type = (display_type.split /(?=[A-Z])/).join('%')
-        end
         # moved all questionnaire assignments to a new method
-        assign_questionnaire_values(questionnaire_private, display_type)
+        initialize_values()
         # Create node moved to a new method
         questionnaire_node_creation()
       rescue StandardError
@@ -76,19 +71,24 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-  def assign_questionnaire_values(prv, display)
-    @questionnaire.private = prv
+  def initialize_values()
+    display_type = params[:questionnaire][:type].split('Questionnaire')[0]
+    if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey BookmarkRating].include?(display_type)
+      display_type = (display_type.split /(?=[A-Z])/).join('%')
+    end
+    @questionnaire.private = params[:questionnaire][:private] == 'true'
     @questionnaire.name = params[:questionnaire][:name]
     @questionnaire.instructor_id = session[:user].id
     @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
     @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
     @questionnaire.type = params[:questionnaire][:type]
-    @questionnaire.display_type = display
+    @questionnaire.display_type = display_type
     @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
     @questionnaire.save
   end
 
-  def questionnaire_node_creation()
+  def create_questionnaire_node()
+    # Investigate moving this to node class
     tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
     parent = FolderNode.find_by(node_object_id: tree_folder.id)
     QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')

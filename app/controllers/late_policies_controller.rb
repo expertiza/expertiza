@@ -80,7 +80,7 @@ class LatePoliciesController < ApplicationController
   def update
     penalty_policy = LatePolicy.find(params[:id])
     # if name has changed then only check for this
-    if params[:late_policy][:policy_name] != @penalty_policy.policy_name &&
+    if params[:late_policy][:policy_name] != penalty_policy.policy_name &&
        LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
       flash[:error] = 'Cannot edit the policy. A policy with the same name ' + params[:late_policy][:policy_name] + ' already exists.'
       redirect_to action: 'edit', id: params[:id]

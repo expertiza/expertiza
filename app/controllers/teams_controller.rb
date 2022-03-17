@@ -18,8 +18,7 @@ class TeamsController < ApplicationController
   end
 
   def list
-    allowed_types = %w[Assignment Course]
-    session[:team_type] = params[:type] if params[:type] && allowed_types.include?(params[:type])
+    session[:team_type] = params[:type] if params[:type] && Team.allowed_types.include?(params[:type])
     @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == 'Assignment'
     begin
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])

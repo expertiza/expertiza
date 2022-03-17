@@ -14,16 +14,16 @@ class SimpleTableRow extends React.Component {
         } else if (this.props.dataType === 'course') {
             colWidthArray = ['20%', '0%', '0%', '20%', '20%', '20%', '20%']
         }
-        if (this.props.creationDate && this.props.updatedDate) {
-            creationDate = this.props.creationDate.replace('T', '<br/>')
-            updatedDate = this.props.updatedDate.replace('T', '<br/>')
+        if (this.props.creation_date && this.props.updated_date) {
+            creationDate = this.props.creation_date.replace('T', '<br/>')
+            updatedDate = this.props.updated_date.replace('T', '<br/>')
         }
         var nodeTypeRaw = this.props.id.split('_')[0]
         var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length - 4).toLowerCase()
         var id = this.props.id.split('_')[1]
-        var institution_name = '-'
-        if (typeof this.props.institution !== 'undefined' && this.props.institution.length != 0) {
-            institution_name = this.props.institution[0].name
+        var institutionName = '-'
+        if (this.props.institution && this.props.institution.length != 0) {
+            institutionName = this.props.institution[0].name
         }
         return (
             <tr id={this.props.id}>
@@ -31,7 +31,7 @@ class SimpleTableRow extends React.Component {
                 {
                     this.props.dataType == 'course' &&
                     <td style={colDisplayStyle} width={colWidthArray[3]}>
-                        {institution_name}
+                        {institutionName}
                     </td>
                 }
                 <td width={colWidthArray[4]} dangerouslySetInnerHTML={{ __html: creationDate }} />

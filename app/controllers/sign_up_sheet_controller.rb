@@ -435,7 +435,7 @@ class SignUpSheetController < ApplicationController
   end
 
   def publish_approved_suggested_topic
-    SignUpTopic.find(topic_id: params[:topic_id]).update_attribute(:private_to, nil) if SignUpTopic.exists?(topic_id:params[:topic_id])
+    SignUpTopic.find(topic_id: params[:topic_id]).update_attribute(:private_to, nil) if SignUpTopic.exists?(topic_id: params[:topic_id])
     redirect_to action: 'list', id: params[:id]
   end
 

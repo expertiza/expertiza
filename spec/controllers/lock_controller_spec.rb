@@ -33,7 +33,7 @@ describe LockController do
           type: 'test lockable'
         }
         get :release_lock, @params
-        expect(result).to redirect_to(request.env['HTTP_REFERER'] ? :back : :root)
+        expect(response).to redirect_to(request.env['HTTP_REFERER'] ? :back : :root)
       end
     end
   end

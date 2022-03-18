@@ -422,7 +422,7 @@ class SignUpSheetController < ApplicationController
     team_id = TeamsUser.team_id(assignment.id, session[:user].id)
     original_topic_id = SignedUpTeam.topic_id(assignment.id.to_i, session[:user].id)
     #sql injection here
-    SignUpTopic.find_by(topic_id:params[:topic_id]).update_attribute(:private_to, nil) if SignUpTopic.exists?(params[:topic_id])
+    SignUpTopic.find_by(topic_id:params[:topic_id]).update_attribute(:private_to, nil) if SignUpTopic.exists?(topic_id: params[:topic_id])
     if SignedUpTeam.exists?(team_id: team_id, is_waitlisted: 0)
       SignedUpTeam.where(team_id: team_id, is_waitlisted: 0).first.update_attribute('topic_id', params[:topic_id].to_i)
     end

@@ -27,12 +27,10 @@ describe LockController do
   describe '#release_lock' do
     context 'when release lock ' do
       it 'renders the response correctly' do
-        allow(Lock).to receive(:find).with('1').and_return(lock1)
+        allow(Lock).to receive(:find).with('123').and_return(lock1)
         @params = {
-          id: 1,
-          lock: {
-            name: 'test lockable'
-          }
+          id: 123,
+          type: 'test lockable'
         }
         get :release_lock, @params
         expect(response).to redirect_to(:back)

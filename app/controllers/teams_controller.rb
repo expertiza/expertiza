@@ -19,7 +19,8 @@ class TeamsController < ApplicationController
 
   def list
     session[:team_type] = params[:type] if params[:type] && Team.allowed_types.include?(params[:type])
-    @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == 'Assignment'
+    @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == Team.allowed_types[0]
+    @is_valid_assignment = session[:team_type] == Team.allowed_types[0] && @assignment.max_team_size > 1
     begin
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
@@ -29,7 +30,7 @@ class TeamsController < ApplicationController
   end
 
   def new
-    @parent = Object.const_get(session[:team_type] ||= 'Assignment').find(params[:id])
+    @parent = Object.const_get(session[:team_type] ||= Team.allowed_types[0]).find(params[:id])
   end
 
   # called when a instructor tries to create an empty team manually.
@@ -106,7 +107,7 @@ class TeamsController < ApplicationController
   # Handovers all teams to the course that contains the corresponding assignment
   # The team and team members are all copied.
   def bequeath_all
-    if session[:team_type] == 'Course'
+    if session[:team_type] == Team.allowed_types[1]
       flash[:error] = 'Invalid team type for bequeath all'
       redirect_to controller: 'teams', action: 'list', id: params[:id]
     else

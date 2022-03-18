@@ -111,10 +111,12 @@ class ResponseController < ApplicationController
       @questionnaire = questionnaire_from_response
       questions = sort_questions(@questionnaire.questions)
 
+
       # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       create_answers(params, questions) unless params[:responses].nil?
 
       @response.update_attributes('is_submitted': true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
+
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
@@ -207,12 +209,10 @@ class ResponseController < ApplicationController
     # E1822: Added logic to insert a student suggested 'Good Teammate' or 'Good Reviewer' badge in the awarded_badges table.
     if @map.assignment.badge?
       if @map.is_a?(TeammateReviewResponseMap) && (params[:review][:good_teammate_checkbox] == 'on')
-        badge_id = Badge.get_id_from_name('Good Teammate')
-        AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
+        AwardedBadge.award_badge(participant.id, 'Good Teammate')
       end
       if @map.is_a?(FeedbackResponseMap) && (params[:review][:good_reviewer_checkbox] == 'on')
-        badge_id = Badge.get_id_from_name('Good Reviewer')
-        AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
+        AwardedBadge.award_badge(participant.id, 'Good Reviewer')
       end
     end
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Response was successfully saved')
@@ -397,8 +397,8 @@ class ResponseController < ApplicationController
     params[:responses].each_pair do |k, v|
       score = Answer.where(response_id: @response.id, question_id: questions[k.to_i].id).first
       score ||= Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])
-      score.update_attribute('answer', v[:score])
-      score.update_attribute('comments', v[:comment])
+      score.update_attributes('answer': v[:score])
+      score.update_attributes('comments': v[:comment])
     end
   end
 

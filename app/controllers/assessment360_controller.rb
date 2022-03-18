@@ -9,105 +9,6 @@ class Assessment360Controller < ApplicationController
 
   # Find the list of all students and assignments pertaining to the course.
   # This data is used to compute the metareview and teammate review scores.
-  def all_students_all_reviews_old
-    course = Course.find(params[:course_id])
-    @assignments = course.assignments.reject(&:is_calibrated).reject { |a| a.participants.empty? }
-    @course_participants = course.get_participants
-    insure_existence_of(@course_participants, course)
-    # hashes for view
-    @meta_review = {}
-    @teammate_review = {}
-    @teamed_count = {}
-    # for course
-    # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
-    # @overall_teammate_review_count = {assgt_id1: 1, assgt_id2: 2, ...}
-    %w[teammate meta].each do |type|
-      instance_variable_set("@overall_#{type}_review_grades", {})
-      instance_variable_set("@overall_#{type}_review_count", {})
-    end
-    @course_participants.each do |cp|
-      # for each assignment
-      # [aggregrate_review_grades_per_stu, review_count_per_stu] --> [0, 0]
-      %w[teammate meta].each { |type| instance_variable_set("@#{type}_review_info_per_stu", [0, 0]) }
-      students_teamed = StudentTask.teamed_students(cp.user)
-      @teamed_count[cp.id] = students_teamed[course.id].try(:size).to_i
-      @assignments.each do |assignment|
-        @meta_review[cp.id] = {} unless @meta_review.key?(cp.id)
-        @teammate_review[cp.id] = {} unless @teammate_review.key?(cp.id)
-        assignment_participant = assignment.participants.find_by(user_id: cp.user_id)
-        next if assignment_participant.nil?
-
-        teammate_reviews = assignment_participant.teammate_reviews
-        meta_reviews = assignment_participant.metareviews
-        calc_overall_review_info(assignment,
-                                 cp,
-                                 teammate_reviews,
-                                 @teammate_review,
-                                 @overall_teammate_review_grades,
-                                 @overall_teammate_review_count,
-                                 @teammate_review_info_per_stu)
-        calc_overall_review_info(assignment,
-                                 cp,
-                                 meta_reviews,
-                                 @meta_review,
-                                 @overall_meta_review_grades,
-                                 @overall_meta_review_count,
-                                 @meta_review_info_per_stu)
-      end
-      # calculate average grade for each student on all assignments in this course
-      avg_review_calc_per_student(cp, @teammate_review_info_per_stu, @teammate_review)
-      avg_review_calc_per_student(cp, @meta_review_info_per_stu, @meta_review)
-    end
-    # avoid divide by zero error
-    overall_review_count(@assignments, @overall_meta_review_count)
-    overall_review_count(@assignments, @overall_teammate_review_count)
-  end
-
-  # def all_students_meta_review
-  #   course = Course.find(params[:course_id])
-  #   @assignments = course.assignments.reject(&:is_calibrated).reject { |a| a.participants.empty? }
-  #   @course_participants = course.get_participants
-  #   insure_existence_of(@course_participants, course)
-  #   # hashes for view
-  #   @meta_review = {}
-  #   @teamed_count = {} # TODO: https://github.com/sak007/expertiza/issues/2
-  #   # for course
-  #   # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
-  #   # @overall_teammate_review_count = {assgt_id1: 1, assgt_id2: 2, ...}
-  #   %w[teammate meta].each do |type|
-  #     instance_variable_set("@overall_#{type}_review_grades", {})
-  #     instance_variable_set("@overall_#{type}_review_count", {})
-  #   end
-  #   @course_participants.each do |cp|
-  #     # for each assignment
-  #     # [aggregrate_review_grades_per_stu, review_count_per_stu] --> [0, 0]
-  #     %w[teammate meta].each { |type| instance_variable_set("@#{type}_review_info_per_stu", [0, 0]) }
-  #     students_teamed = StudentTask.teamed_students(cp.user)
-  #     @teamed_count[cp.id] = students_teamed[course.id].try(:size).to_i # TODO: https://github.com/sak007/expertiza/issues/2
-  #     @assignments.each do |assignment|
-  #       @meta_review[cp.id] = {} unless @meta_review.key?(cp.id)
-  #       assignment_participant = assignment.participants.find_by(user_id: cp.user_id)
-  #       next if assignment_participant.nil?
-  #
-  #       # meta_reviews = assignment_participant.public_send('metareviews') if assignment_participant.respond_to? 'metareviews'
-  #       meta_reviews = assignment_participant.metareviews
-  #       calc_overall_review_info(assignment,
-  #                                cp,
-  #                                meta_reviews,
-  #                                @meta_review,
-  #                                @overall_meta_review_grades,
-  #                                @overall_meta_review_count,
-  #                                @meta_review_info_per_stu)
-  #     end
-  #     # calculate average grade for each student on all assignments in this course
-  #     avg_review_calc_per_student(cp, @meta_review_info_per_stu, @meta_review)
-  #   end
-  #   # avoid divide by zero error
-  #   overall_review_count(@assignments, @overall_meta_review_count)
-  # end
-
-  # Find the list of all students and assignments pertaining to the course.
-  # This data is used to compute the metareview and teammate review scores.
   def all_students_all_reviews
     course = Course.find(params[:course_id])
     @assignments = course.assignments.reject(&:is_calibrated).reject { |a| a.participants.empty? }
@@ -130,17 +31,25 @@ class Assessment360Controller < ApplicationController
     # @overall_teammate_review_count = {assgt_id1: 1, assgt_id2: 2, ...}
     instance_variable_set("@overall_#{type}_review_grades", {})
     instance_variable_set("@overall_#{type}_review_count", {})
+    review_by_user_id_and_assignment = {}
+    @assignments.each do |assignment|
+      assignment.participants.all.each do |assignment_participant|
+        review_by_user_id_and_assignment[assignment_participant.user_id] = {} unless review_by_user_id_and_assignment.key?(assignment_participant.user_id)
+        assignment_reviews = assignment_participant.public_send(reviews_variable) if assignment_participant.respond_to? reviews_variable
+        review_by_user_id_and_assignment[assignment_participant.user_id][assignment.id] = assignment_reviews
+      end
+    end
+
     @course_participants.each do |cp|
       # for each assignment
       # [aggregrate_review_grades_per_stu, review_count_per_stu] --> [0, 0]
       instance_variable_set("@#{type}_review_info_per_stu", [0, 0])
+      review[cp.id] = {}
       students_teamed = StudentTask.teamed_students(cp.user)
       @teamed_count[cp.id] = students_teamed[course.id].try(:size).to_i # TODO: https://github.com/sak007/expertiza/issues/2
       @assignments.each do |assignment|
-        review[cp.id] = {} unless review.key?(cp.id)
-        assignment_participant = assignment.participants.find_by(user_id: cp.user_id)
-        next if assignment_participant.nil?
-        reviews = assignment_participant.public_send(reviews_variable) if assignment_participant.respond_to? reviews_variable
+        next if review_by_user_id_and_assignment[cp.user_id].nil?
+        reviews = review_by_user_id_and_assignment[cp.user_id][assignment.id]
         calc_overall_review_info(assignment,
                                  cp,
                                  reviews,
@@ -155,6 +64,7 @@ class Assessment360Controller < ApplicationController
     # avoid divide by zero error
     overall_review_count(@assignments, instance_variable_get("@overall_#{type}_review_count"))
   end
+
   # to avoid divide by zero error
   def overall_review_count(assignments, overall_review_count)
     assignments.each do |assignment|

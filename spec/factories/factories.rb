@@ -7,7 +7,7 @@ FactoryBot.define do
     name 'Duy Test'
   end 
 
-  factory :markup_style, class: MarkupStyle do
+  factory :lock, class: Lock do
     lockable_id 123
     lockable_type 'Duy lockable test'
     user_id 1234

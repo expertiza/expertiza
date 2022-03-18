@@ -437,7 +437,7 @@ class SignUpSheetController < ApplicationController
 
   def publish_approved_suggested_topic
     #sql injection here
-    SignUpTopic.find(topic_id: params[:topic_id]).update_attribute(:private_to, nil) if SignUpTopic.exists?(params[:topic_id])
+    SignUpTopic.find(topic_id: params[:topic_id]).update_attribute(:private_to, nil) if SignUpTopic.exists?(topic_id:params[:topic_id])
     redirect_to action: 'list', id: params[:id]
   end
 

@@ -2,7 +2,7 @@ describe LockController do
   let(:super_admin) { build(:superadmin, id: 1, role_id: 5) }
   let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, name: 'Instructor1') }
   let(:student1) { build(:student, id: 21, role_id: 1) }
-  let(:lock1) { build(:lock, id: 1, lockable_type: 'test lockable') }
+  let(:lock1) { build(:lock, id: 1, user: instructor1, lockable_type: 'test lockable') }
 
   describe '#action_allowed?' do
     context 'when the role of current user is Instructor' do
@@ -27,7 +27,7 @@ describe LockController do
   describe '#release_lock' do
     context 'when release lock ' do
       it 'renders the response correctly' do
-        allow(Lock).to receive(:find).with('123').and_return(lock1)
+        allow(Lock).to receive(:find_by).with('123').and_return(lock1)
         @params = {
           id: 123,
           type: 'test lockable'

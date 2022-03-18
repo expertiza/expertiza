@@ -10,22 +10,19 @@ class Assessment360Controller < ApplicationController
   # Find the list of all students and assignments pertaining to the course.
   # This data is used to compute the metareview and teammate review scores.
   def all_students_all_reviews
-    course = Course.find(params[:course_id])
-    @assignments = course.assignments.includes([:participants]).reject(&:is_calibrated).reject { |a| a.participants.empty? }
-    @course_participants = course.get_participants
-    insure_existence_of(@course_participants, course)
+    load_course_assignments_and_course_participants
 
     # hashes for view
-    @meta_review = {}
-    @teammate_review = {}
-    all_students_review(course, 'meta', 'metareviews', @meta_review)
-    all_students_review(course, 'teammate','teammate_reviews', @teammate_review)
+    @meta_review = get_reviews_by_type('meta', 'metareviews')
+    @teammate_review = get_reviews_by_type('teammate','teammate_reviews')
   end
 
-  # TODO: Give a better name for reviews_variable
-  def all_students_review(course, type, reviews_variable, review)
+  # Change metareviews to meta_reviews in assignment_participants and its references
+  # so that reviews_variable can be removed
+  def get_reviews_by_type(type, reviews_variable)
     # hashes for view
     @teamed_count = {} # TODO: https://github.com/sak007/expertiza/issues/2
+    review = {}
     # for course
     # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
     # @overall_teammate_review_count = {assgt_id1: 1, assgt_id2: 2, ...}
@@ -46,7 +43,7 @@ class Assessment360Controller < ApplicationController
       instance_variable_set("@#{type}_review_info_per_stu", [0, 0])
       review[cp.id] = {}
       students_teamed = StudentTask.teamed_students(cp.user)
-      @teamed_count[cp.id] = students_teamed[course.id].try(:size).to_i # TODO: https://github.com/sak007/expertiza/issues/2
+      @teamed_count[cp.id] = students_teamed[@course.id].try(:size).to_i # TODO: https://github.com/sak007/expertiza/issues/2
       @assignments.each do |assignment|
         # skip if the student is not participated in any assignment
         next if review_by_user_id_and_assignment[cp.user_id].nil?
@@ -66,6 +63,7 @@ class Assessment360Controller < ApplicationController
     end
     # avoid divide by zero error
     overall_review_count(@assignments, instance_variable_get("@overall_#{type}_review_count"))
+    return review
   end
 
   # to avoid divide by zero error
@@ -94,10 +92,7 @@ class Assessment360Controller < ApplicationController
     @assignment_grades = {}
     @peer_review_scores = {}
     @final_grades = {}
-    course = Course.find(params[:course_id])
-    @assignments = course.assignments.reject(&:is_calibrated).reject { |a| a.participants.empty? }
-    @course_participants = course.get_participants
-    insure_existence_of(@course_participants, course)
+    load_course_assignments_and_course_participants
     @course_participants.each do |cp|
       @topics[cp.id] = {}
       @assignment_grades[cp.id] = {}
@@ -181,6 +176,13 @@ class Assessment360Controller < ApplicationController
     assignment = participant.assignment
     questions = retrieve_questions assignment.questionnaires, assignment_id
     participant_scores(participant, questions)
+  end
+
+  def load_course_assignments_and_course_participants
+    @course = Course.find(params[:course_id])
+    @assignments = @course.assignments.includes([:participants]).reject(&:is_calibrated).reject { |a| a.participants.empty? }
+    @course_participants = @course.get_participants
+    insure_existence_of(@course_participants, @course)
   end
 
   def format_topic(topic)

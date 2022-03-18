@@ -27,7 +27,7 @@ describe LockController do
   describe '#release_lock' do
     context 'when release lock ' do
       it 'renders the response correctly' do
-        allow(Lock).to receive(:find_by).with('123').and_return(lock1)
+        allow(Lock).to receive(:find_by).with(any_args).and_return(lock1)
         @params = {
           id: 123,
           type: 'test lockable'

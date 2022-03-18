@@ -7,7 +7,7 @@ describe MarkupStylesController do
     let(:admin_role) { build(:role_of_administrator, id: 3, name: 'Administrator_role_test', description: '', parent_id: nil, default_page_id: nil) }
     let(:markup_style) { build(:markup_style, id: 1, name: 'test markupstyle') }
     let(:markup_style1) { build(:markup_style, id: 2, name: 'test markupstyle1') }
-
+    let(:instructor) { build(:instructor, id: 2,role_id: 3) }
     # create fake lists
     let(:markup_style_list) { [markup_style, markup_style1] }
 
@@ -19,13 +19,19 @@ describe MarkupStylesController do
               stub_current_user(student, student.role.name, student.role)
               expect(controller.send(:action_allowed?)).to be_falsey
             end
+        end
+        context 'when the current user is instructure' do
+          it 'returns false' do
+            stub_current_user(instructor, instructor.role.name, instructor.role)
+            expect(controller.send(:action_allowed?)).to be_falsey
           end
-          context 'when the current user is Super-Admin' do
-            it 'returns true' do
-              stub_current_user(super_admin, super_admin.role.name, super_admin.role)
-              expect(controller.send(:action_allowed?)).to be_truthy
-            end
+        end        
+        context 'when the current user is Super-Admin' do
+          it 'returns true' do
+            stub_current_user(super_admin, super_admin.role.name, super_admin.role)
+            expect(controller.send(:action_allowed?)).to be_truthy
           end
+        end
     end
 
     # define default behaviors for each method call

@@ -11,7 +11,7 @@ class Assessment360Controller < ApplicationController
   # This data is used to compute the metareview and teammate review scores.
   def all_students_all_reviews
     course = Course.find(params[:course_id])
-    @assignments = course.assignments.reject(&:is_calibrated).reject { |a| a.participants.empty? }
+    @assignments = course.assignments.includes([:participants]).reject(&:is_calibrated).reject { |a| a.participants.empty? }
     @course_participants = course.get_participants
     insure_existence_of(@course_participants, course)
 
@@ -48,7 +48,10 @@ class Assessment360Controller < ApplicationController
       students_teamed = StudentTask.teamed_students(cp.user)
       @teamed_count[cp.id] = students_teamed[course.id].try(:size).to_i # TODO: https://github.com/sak007/expertiza/issues/2
       @assignments.each do |assignment|
+        # skip if the student is not participated in any assignment
         next if review_by_user_id_and_assignment[cp.user_id].nil?
+        # skip if the student is not participated in the current assignment
+        next if review_by_user_id_and_assignment[cp.user_id][assignment.id].nil?
         reviews = review_by_user_id_and_assignment[cp.user_id][assignment.id]
         calc_overall_review_info(assignment,
                                  cp,

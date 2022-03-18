@@ -8,8 +8,8 @@ class SubmissionRecordsController < ApplicationController
     assignment_team = AssignmentTeam.find(params[:team_id])
     assignment = Assignment.find(assignment_team.parent_id)
     return true if current_user_has_admin_privileges?
-    return true if current_user_instructs_assignment?(assignment)
-    return true if current_user_has_ta_mapping_for_assignment?(assignment)
+    return true if current_user_has_instructor_privileges? && current_user_instructs_assignment?(assignment)
+    return true if current_user_has_ta_privileges? && current_user_has_ta_mapping_for_assignment?(assignment)
 
     false
   end

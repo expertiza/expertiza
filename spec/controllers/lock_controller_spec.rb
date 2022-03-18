@@ -12,15 +12,15 @@ describe LockController do
       end
     end 
     context 'when the role of current user is Student' do
-      it 'refuses certain action' do
+      it 'refuses the action' do
         stub_current_user(student1, student1.role.name, student1.role)
         expect(controller.send(:action_allowed?)).to be_falsey
       end
     end
     context 'when the role of current user is Super Admin' do
-      it 'allows certain action' do
+      it 'refuses the action' do
         stub_current_user(super_admin, super_admin.role.name, super_admin.role)
-        expect(controller.send(:action_allowed?)).to be_truthy
+        expect(controller.send(:action_allowed?)).to be_falsey
       end
     end
   end

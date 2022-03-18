@@ -33,73 +33,83 @@ class TeamsUsersController < ApplicationController
     @team = Team.find(params[:id])
   end
 
-  def create
-    user = User.find_by(name: params[:user][:name].strip)
-    unless user
-      urlCreate = url_for controller: 'users', action: 'new'
-      flash[:error] = "\"#{params[:user][:name].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."
+  def flash_error(message, values = nil)
+    flash[:error] = values ? message % values : message
+  end
+  def addTeamMember(team,user,msg)
+    begin
+      add_member_return = team.add_member(user, team.parent_id)
+    rescue
+      flash_error("The user #{user.name} is already a member of the team #{team.name}")
+      redirect_back
+      return
     end
+    flash_error('This team already has the maximum number of members.') if add_member_return == false
+    if add_member_return
+      user = TeamsUser.last
+      undo_link("The team @teams_user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
+      if msg=="assignment"
+        MentorManagement.assign_mentor(assignment.id, team.id)
+      end
+    end
+  end
 
+
+  def isUserAssigned(model,user)
+    if model.user_on_team?(user)
+      flash_error(msg)
+      redirect_back
+      return
+    end
+  end
+
+  def isParticipant(modelParticipant,user,primaryAssignment,team,msg,msg1)
+    if modelParticipant.find_by(user_id: user.id, parent_id: primaryAssignment.id).nil?
+      urlAssignmentParticipantList = msg
+      flash_error("\"#{user.name}\" is not a participant of the current#{msg1} . Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing.")
+    else
+      addMemberReturn(team,user,msg1)
+    end
+  end
+
+  
+
+
+  def usrUrl(user,stripped_name)
+    unless user
+      flash_error(%[“%s” is not defined. Please <a href=”%s”>create this user</a>
+        before continuing.], [stripped_name, new_user_path])
+    end
+  end
+
+
+def modelAssignment(model,team,user,msg,modelParticipant)
+    assignment = model.find(team.parent_id)
+    isUserAssigned(assignment,user,"This user is already assigned to a team for this " + msg)
+    urlAssignmentParticipantList=""
+    if msg=="course"
+      urlCourseParticipantList = url_for controller: 'participants', action: 'list', id: course.id, model: 'Course', authorization: 'participant'
+    else
+      urlAssignmentParticipantList=url_for controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment', authorization: 'participant'
+    end
+    isParticipant(modelParticipant,user,assignment,team,urlAssignmentParticipantList, msg)
+  end
+    
+  def create
+    stripped_name = params[:user][:name].strip
+    user = User.find_by(name: stripped_name)
+    usrUrl(user,stripped_name)
     team = Team.find(params[:id])
     unless user.nil?
       if team.is_a?(AssignmentTeam)
-        assignment = Assignment.find(team.parent_id)
-        if assignment.user_on_team?(user)
-          flash[:error] = "This user is already assigned to a team for this assignment"
-          redirect_back
-          return
-        end
-        if AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id).nil?
-          urlAssignmentParticipantList = url_for controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment', authorization: 'participant'
-          flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
-        else
-          begin
-            add_member_return = team.add_member(user, team.parent_id)
-          rescue
-            flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
-            redirect_back
-            return
-          end
-          flash[:error] = 'This team already has the maximum number of members.' if add_member_return == false
-          # E2115 Mentor Management
-          # Kick off the Mentor Management workflow
-          # Note: this is _not_ supported for CourseTeams which is why the other
-          # half of this if block does not include the same code
-          if add_member_return
-            user = TeamsUser.last
-            undo_link("The team @teams_user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
-            MentorManagement.assign_mentor(assignment.id, team.id)
-          end
-        end
-      else # CourseTeam
-        course = Course.find(team.parent_id)
-        if course.user_on_team?(user)
-          flash[:error] = "This user is already assigned to a team for this course"
-          redirect_back
-          return
-        end
-        if CourseParticipant.find_by(user_id: user.id, parent_id: course.id).nil?
-          urlCourseParticipantList = url_for controller: 'participants', action: 'list', id: course.id, model: 'Course', authorization: 'participant'
-          flash[:error] = "\"#{user.name}\" is not a participant of the current course. Please <a href=\"#{urlCourseParticipantList}\">add</a> this user before continuing."
-        else
-          begin
-            add_member_return = team.add_member(user, team.parent_id)
-          rescue
-            flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
-            redirect_back
-            return
-          end
-          flash[:error] = 'This team already has the maximum number of members.' if add_member_return == false
-          if add_member_return
-            @teams_user = TeamsUser.last
-            undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
-          end
-        end
+        modelAssignment(Assignment,team,user,"assignment",AssignmentParticipant)
+      else 
+        modelAssignment(Course,team,user,"course",CourseParticipant)
       end
     end
-
     redirect_to controller: 'teams', action: 'list', id: team.parent_id
   end
+
 
   def delete
     @teams_user = TeamsUser.find(params[:id])

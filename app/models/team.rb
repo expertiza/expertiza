@@ -138,13 +138,11 @@ class Team < ActiveRecord::Base
     (1..num_of_teams).to_a.each do |i|
       team = Object.const_get(team_type + 'Team').create(name: 'Team_' + i.to_s, parent_id: parent.id)
       TeamNode.create(parent_id: parent.id, node_object_id: team.id)
-      min_team_size.times do
-        break if next_team_member_index >= users.length
-
-        user = users[next_team_member_index]
+      (0..[min_team_size, users.length].min).each do |index|
+        user = users[index]
         team.add_member(user, parent.id)
-        next_team_member_index += 1
-      end
+    end
+
     end
   end
 

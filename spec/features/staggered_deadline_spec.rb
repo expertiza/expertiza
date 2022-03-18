@@ -93,9 +93,9 @@ describe 'Staggered deadline test' do
 
   it 'test1: in round 1, student2064 in review stage could do review' do
     # impersonate each participant submit their topics
-    submit_topic('student2064', '/sign_up_sheet/sign_up?id=1&topic_id=1', 'https://google.com')
+    submit_topic('student2064', '/signup_sheet/sign_up?id=1&topic_id=1', 'https://google.com')
     click_link('Logout')
-    submit_topic('student2065', '/sign_up_sheet/sign_up?id=1&topic_id=2', 'https://ncsu.edu')
+    submit_topic('student2065', '/signup_sheet/sign_up?id=1&topic_id=2', 'https://ncsu.edu')
     click_link('Logout')
     # change deadline to make student2064 in review stage in round 1
     change_due(1, 1, 1, DateTime.now.in_time_zone - 10)
@@ -143,9 +143,9 @@ describe 'Staggered deadline test' do
 
   it 'test2: in round 2, both students should be in review stage to review each other' do
     # impersonate each participant submit their topics
-    submit_topic('student2064', '/sign_up_sheet/sign_up?id=1&topic_id=1', 'https://google.com')
+    submit_topic('student2064', '/signup_sheet/sign_up?id=1&topic_id=1', 'https://google.com')
     click_link('Logout')
-    submit_topic('student2065', '/sign_up_sheet/sign_up?id=1&topic_id=2', 'https://ncsu.edu')
+    submit_topic('student2065', '/signup_sheet/sign_up?id=1&topic_id=2', 'https://ncsu.edu')
     click_link('Logout')
     # change deadline to make both in review stage in round 2
     change_due(1, 1, 1, DateTime.now.in_time_zone - 30)
@@ -214,9 +214,9 @@ describe 'Staggered deadline test' do
 
   it 'test3: in round 2, both students after review deadline should not do review' do
     # impersonate each participant submit their topics
-    submit_topic('student2064', '/sign_up_sheet/sign_up?id=1&topic_id=1', 'https://google.com')
+    submit_topic('student2064', '/signup_sheet/sign_up?id=1&topic_id=1', 'https://google.com')
     click_link('Logout')
-    submit_topic('student2065', '/sign_up_sheet/sign_up?id=1&topic_id=2', 'https://ncsu.edu')
+    submit_topic('student2065', '/signup_sheet/sign_up?id=1&topic_id=2', 'https://ncsu.edu')
     click_link('Logout')
 
     # change deadline to make both after review deadline in round 2

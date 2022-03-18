@@ -18,7 +18,7 @@ describe 'team invitation' do
       before(:each) do
         # team owner creates an advertisement from student_teams#view page
 
-        # sign_up_sheet#list page has a horn icon appearing at the last column of the table
+        # signup_sheet#list page has a horn icon appearing at the last column of the table
 
         # other students could click the horn icon to send a invitation request to team owner
 

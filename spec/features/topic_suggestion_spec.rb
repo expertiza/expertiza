@@ -234,7 +234,7 @@ describe 'Assignment Topic Suggestion Test' do
       click_link('Signup sheet')
       expect(page).to have_content 'suggested_topic2_without_switch'
       # click_link('publish_approved_suggested_topic')
-      visit '/sign_up_sheet/publish_approved_suggested_topic/2?assignment_id=1'
+      visit '/signup_sheet/publish_approved_suggested_topic/2?assignment_id=1'
       # find(:xpath, "//tr[contains(.,'suggested_topic2_without_switch')]/td/a", :figure=>"Publish Topic").click
       visit '/student_task/list'
       expect(page).to have_content 'suggested_topic'

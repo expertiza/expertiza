@@ -1,7 +1,7 @@
 <h1><%=t ".signup_sheet"%> <%= @assignment.name %> <%=t ".assignment_lower"%></h1>
 
 <table class="general">
-  <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
+  <tr><%= render :partial => '/signup_sheet/table_header' %></tr>
   <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
       <b><%=t ".your_topics"%></b>
       <% for selected_topic in @selected_topics %>
@@ -30,7 +30,7 @@
         <tr id="topic_<%= topic.id %>">
       <% end %>
       <% is_suggested_topic = false %>
-      <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
+      <%= render :partial => '/signup_sheet/table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
       </tr>
       <% i=i+1 %>
     <% end %>
@@ -39,7 +39,7 @@
 <br/><br/>
 
 <% if SignUpTopic.has_suggested_topic?(@assignment.id) %>
-    <%= render :partial => '/sign_up_sheet/suggested_topic' %>
+    <%= render :partial => '/signup_sheet/suggested_topic' %>
 <% end %>
 
 <% session[:return_to] = request.url %>

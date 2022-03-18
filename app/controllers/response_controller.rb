@@ -1,6 +1,8 @@
 class ResponseController < ApplicationController
   include AuthorizationHelper
+
   include ResponseHelper
+  before_action :set_response, only: %i[update delete view]
 
   helper :submitted_content
   helper :file
@@ -46,8 +48,6 @@ class ResponseController < ApplicationController
 
   def delete
     # The locking was added for E1973, team-based reviewing. See lock.rb for details
-    @response = Response.find(params[:id])
-    @map = @response.map
     if @map.reviewer_is_team
       @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
       if @response.nil?
@@ -105,23 +105,24 @@ class ResponseController < ApplicationController
   # Update the response and answers when student "edit" existing response
   def update
     render nothing: true unless action_allowed?
-
     msg = ''
     begin
       # the response to be updated
       # Locking functionality added for E1973, team-based reviewing
-      @response = Response.find(params[:id])
-      @map = @response.map
       if @map.reviewer_is_team && !Lock.lock_between?(@response, current_user)
         response_lock_action
         return
       end
-      @response.update_attributes('additional_comment', params[:review][:comments])
+
+      @response.update_attributes('additional_comment': params[:review][:comments])
       @questionnaire = questionnaire_from_response
       questions = sort_questions(@questionnaire.questions)
+
       # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       create_answers(params, questions) unless params[:responses].nil?
-      @response.update_attributes('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
+
+      @response.update_attributes('is_submitted': true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
+
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
@@ -164,8 +165,6 @@ class ResponseController < ApplicationController
 
   # view response
   def view
-    @response = Response.find(params[:id])
-    @map = @response.map
     set_content
   end
 
@@ -184,15 +183,13 @@ class ResponseController < ApplicationController
     # Hence we need to pick the latest response.
     @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first
     if @response.nil?
-      @response = Response.create(
-        map_id: @map.id,
-        additional_comment: params[:review][:comments],
-        round: @round.to_i,
-        is_submitted: is_submitted
-      )
+      @response = Response.create( map_id: @map.id, additional_comment: params[:review][:comments],
+        round: @round.to_i, is_submitted: is_submitted)
     end
     was_submitted = @response.is_submitted
-    @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
+
+    # ignore if autoupdate try to save when the response object is not yet created.s
+    @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted)
 
     # :version_num=>@version)
     # Change the order for displaying questions for editing response views.
@@ -200,6 +197,7 @@ class ResponseController < ApplicationController
     create_answers(params, questions) if params[:responses]
     msg = 'Your response was successfully saved.'
     error_msg = ''
+
     # only notify if is_submitted changes from false to true
     if (@map.is_a? ReviewResponseMap) && (!was_submitted && @response.is_submitted) && @response.significant_difference?
       @response.notify_instructor_on_difference
@@ -295,6 +293,11 @@ class ResponseController < ApplicationController
   end
 
   private
+
+  def set_response
+    @response = Response.find(params[:id])
+    @map = @response.map
+  end
 
   # Added for E1973, team-based reviewing:
   # http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_Project_E1973._Team_Based_Reviewing

@@ -144,7 +144,7 @@ class Team < ActiveRecord::Base
     end
 
     end
-  end
+
 
   def self.assign_single_users_to_teams(min_team_size, parent, teams, users)
     teams.each do |team|

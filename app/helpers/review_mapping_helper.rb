@@ -52,17 +52,13 @@ module ReviewMappingHelper
 
   # checks the submission state within each round and assigns team colour
   def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
-    if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
-      color.push 'purple'
-    else
-      link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
-      if link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
-        color.push 'green'
-      else
-        link_updated_at = get_link_updated_at(link)
-        color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
-      end
-    end
+    return color.push 'purple' if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
+
+    link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
+    return color.push 'green' if link.nil? || (link !~ %r{https*:\/\/wiki(.*)})
+
+    link_updated_at = get_link_updated_at(link)
+    color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
   end
 
   # checks if a review was submitted in every round and gives the total responses count

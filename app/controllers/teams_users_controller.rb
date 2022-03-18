@@ -36,7 +36,8 @@ class TeamsUsersController < ApplicationController
   def flash_error(message, values = nil)
     flash[:error] = values ? message % values : message
   end
-  def addTeamMember(team,user,msg)
+
+  def addTeamMember(team, user, msg)
     begin
       add_member_return = team.add_member(user, team.parent_id)
     rescue
@@ -48,14 +49,14 @@ class TeamsUsersController < ApplicationController
     if add_member_return
       user = TeamsUser.last
       undo_link("The team @teams_user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
-      if msg=="assignment"
+      if msg == "assignment"
         MentorManagement.assign_mentor(assignment.id, team.id)
       end
     end
   end
 
 
-  def isUserAssigned(model,user)
+  def isUserAssigned(model, user)
     if model.user_on_team?(user)
       flash_error(msg)
       redirect_back
@@ -63,7 +64,7 @@ class TeamsUsersController < ApplicationController
     end
   end
 
-  def isParticipant(modelParticipant,user,primaryAssignment,team,msg,msg1)
+  def isParticipant(modelParticipant, user, primaryAssignment, team, msg, msg1)
     if modelParticipant.find_by(user_id: user.id, parent_id: primaryAssignment.id).nil?
       urlAssignmentParticipantList = msg
       flash_error("\"#{user.name}\" is not a participant of the current#{msg1} . Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing.")
@@ -75,7 +76,7 @@ class TeamsUsersController < ApplicationController
   
 
 
-  def usrUrl(user,stripped_name)
+  def usrUrl(user, stripped_name)
     unless user
       flash_error(%[“%s” is not defined. Please <a href=”%s”>create this user</a>
         before continuing.], [stripped_name, new_user_path])
@@ -83,11 +84,11 @@ class TeamsUsersController < ApplicationController
   end
 
 
-def modelAssignment(model,team,user,msg,modelParticipant)
+def modelAssignment(model, team, user, msg, modelParticipant)
     assignment = model.find(team.parent_id)
     isUserAssigned(assignment,user,"This user is already assigned to a team for this " + msg)
     urlAssignmentParticipantList=""
-    if msg=="course"
+    if msg == "course"
       urlCourseParticipantList = url_for controller: 'participants', action: 'list', id: course.id, model: 'Course', authorization: 'participant'
     else
       urlAssignmentParticipantList=url_for controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment', authorization: 'participant'

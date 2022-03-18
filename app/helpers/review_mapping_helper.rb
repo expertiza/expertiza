@@ -133,13 +133,13 @@ module ReviewMappingHelper
   def get_awarded_review_score(reviewer_id, team_id)
     # Storing redundantly computed value in num_rounds variable
     num_rounds = @assignment.num_review_rounds
-    # Setting values of instance variables
-    (1..num_rounds).each { |round| instance_variable_set('@score_awarded_round_' + round.to_s, '-----') }
     # Iterating through list
     (1..num_rounds).each do |round|
+      # Setting values of instance variables
+      instance_variable_set("@score_awarded_round_#{round}", '-----')
       # Changing values of instance variable based on below condition
-      unless team_id.nil? || team_id == -1.0
-        instance_variable_set('@score_awarded_round_' + round.to_s, @review_scores[reviewer_id][round][team_id].to_s + '%')
+      unless team_id.nil? || team_id.to_d == -1.0.to_d
+        instance_variable_set("@score_awarded_round_#{round}", "#{@review_scores[reviewer_id][round][team_id]}%")
       end
     end
   end

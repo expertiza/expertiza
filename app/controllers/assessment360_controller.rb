@@ -117,49 +117,43 @@ class Assessment360Controller < ApplicationController
     # hashes for view
     @meta_review = {}
     @teammate_review = {}
-    all_students_review('metareviews', @meta_review, @overall_meta_review_grades,
-                        @overall_meta_review_count, @meta_review_info_per_stu)
-    all_students_review('teammate_reviews', @teammate_review, @overall_teammate_review_grades,
-                        @overall_teammate_review_count, @teammate_review_info_per_stu)
+    all_students_review(course, 'meta', 'metareviews', @meta_review)
+    all_students_review(course, 'teammate','teammate_reviews', @teammate_review)
   end
 
   # TODO: Give a better name for reviews_variable
-  def all_students_review(reviews_variable, review, overall_review_grades,
-                          overall_review_count, review_info_per_stu)
+  def all_students_review(course, type, reviews_variable, review)
     # hashes for view
     @teamed_count = {} # TODO: https://github.com/sak007/expertiza/issues/2
     # for course
     # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
     # @overall_teammate_review_count = {assgt_id1: 1, assgt_id2: 2, ...}
-    %w[teammate meta].each do |type|
-      instance_variable_set("@overall_#{type}_review_grades", {})
-      instance_variable_set("@overall_#{type}_review_count", {})
-    end
+    instance_variable_set("@overall_#{type}_review_grades", {})
+    instance_variable_set("@overall_#{type}_review_count", {})
     @course_participants.each do |cp|
       # for each assignment
       # [aggregrate_review_grades_per_stu, review_count_per_stu] --> [0, 0]
-      %w[teammate meta].each { |type| instance_variable_set("@#{type}_review_info_per_stu", [0, 0]) }
+      instance_variable_set("@#{type}_review_info_per_stu", [0, 0])
       students_teamed = StudentTask.teamed_students(cp.user)
       @teamed_count[cp.id] = students_teamed[course.id].try(:size).to_i # TODO: https://github.com/sak007/expertiza/issues/2
       @assignments.each do |assignment|
         review[cp.id] = {} unless review.key?(cp.id)
         assignment_participant = assignment.participants.find_by(user_id: cp.user_id)
         next if assignment_participant.nil?
-
         reviews = assignment_participant.public_send(reviews_variable) if assignment_participant.respond_to? reviews_variable
         calc_overall_review_info(assignment,
                                  cp,
                                  reviews,
                                  review,
-                                 overall_review_grades,
-                                 overall_review_count,
-                                 review_info_per_stu)
+                                 instance_variable_get("@overall_#{type}_review_grades"),
+                                 instance_variable_get("@overall_#{type}_review_count"),
+                                 instance_variable_get("@#{type}_review_info_per_stu"))
       end
       # calculate average grade for each student on all assignments in this course
-      avg_review_calc_per_student(cp, review_info_per_stu, review)
+      avg_review_calc_per_student(cp, instance_variable_get("@#{type}_review_info_per_stu"), review)
     end
     # avoid divide by zero error
-    overall_review_count(@assignments, overall_review_count)
+    overall_review_count(@assignments, instance_variable_get("@overall_#{type}_review_count"))
   end
   # to avoid divide by zero error
   def overall_review_count(assignments, overall_review_count)

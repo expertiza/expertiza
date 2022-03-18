@@ -79,16 +79,17 @@ class LatePoliciesController < ApplicationController
 
   def update
     penalty_policy = LatePolicy.find(params[:id])
+    max_penalty = params[:late_policy][:max_penalty].to_i
     # if name has changed then only check for this
     if params[:late_policy][:policy_name] != penalty_policy.policy_name &&
        LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
       flash[:error] = 'Cannot edit the policy. A policy with the same name ' + params[:late_policy][:policy_name] + ' already exists.'
       redirect_to action: 'edit', id: params[:id]
-    elsif params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
+    elsif max_penalty < params[:late_policy][:penalty_per_unit].to_i
       # penalty per unit cannot be greater than maximum penalty
       flash[:error] = 'Cannot edit the policy. The maximum penalty cannot be less than penalty per unit.'
       redirect_to action: 'edit', id: params[:id]
-    elsif params[:late_policy][:max_penalty].to_i >= 100
+    elsif max_penalty >= 100
       # maximum penalty cannot be greater than equal to 100
       flash[:error] = 'Maximum penalty cannot be greater than or equal to 100'
       redirect_to action: 'edit', id: params[:id]

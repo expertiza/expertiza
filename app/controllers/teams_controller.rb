@@ -12,8 +12,15 @@ class TeamsController < ApplicationController
   def create_teams
     parent = Object.const_get(session[:team_type]).find(params[:id])
     Team.randomize_all_by_parent(parent, session[:team_type], params[:team_size].to_i)
-    undo_link('Random teams have been successfully created.')
-    ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Random teams have been successfully created', request)
+    message = 'Random teams have been successfully created'
+    undo_link(message)
+    # To do: Move this check to a application level commons file.
+    # For now this is the only usage of this check.
+    # If a similar use case pops up "To do" action needs to be performed.
+    # Fix link: https://tinyurl.com/y64bupbk
+    if Rails.env.development?
+      ExpertizaLogger.info LoggerMessage.new(controller_name, '', message, request)
+    end
     redirect_to action: 'list', id: parent.id
   end
 

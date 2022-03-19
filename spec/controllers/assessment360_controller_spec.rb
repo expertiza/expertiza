@@ -129,7 +129,7 @@ describe Assessment360Controller do
         allow(StudentTask).to receive(:teamed_students).with(course_participant.user).and_return(student1)
         allow(assignment_with_participants.participants).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(course_participant).to receive(:teammate_reviews).and_return(empty_teammate_review)
-        allow(course_participant).to receive(:metareviews).and_return(empty_meta_review)
+        allow(course_participant).to receive(:meta_reviews).and_return(empty_meta_review)
         params = { course_id: 1 }
         session = { user: instructor }
         get :all_students_all_reviews, params, session
@@ -149,7 +149,7 @@ describe Assessment360Controller do
         allow(StudentTask).to receive(:teamed_students).with(course_participant.user).and_return(student1)
         allow(assignment_with_participants.participants).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(course_participant).to receive(:teammate_reviews).and_return(teammate_review)
-        allow(course_participant).to receive(:metareviews).and_return(meta_review)
+        allow(course_participant).to receive(:meta_reviews).and_return(meta_review)
         params = { course_id: 1 }
         session = { user: instructor }
         get :all_students_all_reviews, params, session

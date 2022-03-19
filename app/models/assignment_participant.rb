@@ -77,7 +77,7 @@ class AssignmentParticipant < Participant
     QuizResponseMap.assessments_for(self)
   end
 
-  def metareviews
+  def meta_reviews
     MetareviewResponseMap.assessments_for(self)
   end
 

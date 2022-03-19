@@ -13,7 +13,7 @@ class Assessment360Controller < ApplicationController
     load_course_assignments_and_course_participants
 
     # hashes for view
-    @meta_review = get_reviews_by_type('meta', 'metareviews')
+    @meta_review = get_reviews_by_type('meta', 'meta_reviews')
     @teammate_review = get_reviews_by_type('teammate','teammate_reviews')
   end
 

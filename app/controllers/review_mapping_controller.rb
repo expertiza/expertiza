@@ -264,7 +264,7 @@ class ReviewMappingController < ApplicationController
     if num_unsuccessful_deletes > 0
       url_yes = url_for action: 'delete_all_metareviewers', id: mapping.map_id, force: 1
       url_no = url_for action: 'delete_all_metareviewers', id: mapping.map_id
-      flash[:error] = "A delete action failed:<br/>#{num_unsuccessful_deletes} metareviews exist for these mappings. " \
+      flash[:error] = "A delete action failed:<br/>#{num_unsuccessful_deletes} meta_reviews exist for these mappings. " \
                       'Delete these mappings anyway?' \
                       "&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><br/>"
     else

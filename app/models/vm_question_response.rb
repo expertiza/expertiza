@@ -84,7 +84,7 @@ class VmQuestionResponse
         @list_of_reviews << review
       end
     elsif @questionnaire_type == 'MetareviewQuestionnaire'
-      reviews = participant.metareviews
+      reviews = participant.meta_reviews
       reviews.each do |review|
         review_mapping = MetareviewResponseMap.find_by(id: review.map_id)
         participant = Participant.find(review_mapping.reviewer_id)

@@ -8,15 +8,22 @@
       <th rowspan=2 width="320">Students</th>
       <th rowspan=2 width="30">Teammate Count</th>
       <% @assignments.each do |assignment| %>
-        <th colspan=2 width="300"> <%= assignment.name %> </th>
+        <th colspan=5 width="300"> <%= assignment.name %> </th>
       <% end %>
       <th colspan="2" width="300">Aggregate Score</th>
+      <th colspan=2>Final Grades</th>
     </tr>
     <tr>
-      <% (0..@assignments.size).each do %>
+      <% (1..@assignments.size).each do %>
         <td><b>Metareviews</b></td>
         <td><b>Teammate Reviews</b></td>
+        <th><b>Topic</b></th>
+        <th><b>Peer Score</b></th>
+        <th><b>Instructor Grade</b></th>
       <% end %>
+      <th><b>Metareviews</b></th>
+      <th><b>Teammate Reviews</b></th>
+      <th class="sorter-true"><b>Total Instructor Grade</b></th>
     </tr>
 
     <% @course_participants.each do |cp|%>
@@ -26,9 +33,16 @@
             <% @assignments.each do |assignment|%>
                 <td><%= format_percentage(@meta_review[cp.id][assignment.id]) unless @meta_review.nil? %></td>
                 <td><%= format_percentage(@teammate_review[cp.id][assignment.id]) unless @teammate_review.nil? %></td>
+                <% topic = format_topic(@topics[cp.id][assignment.id]) %>
+                <td title="<%= topic %>" class="topic topic-tooltip">
+                  <%= topic %>
+                </td>
+                <td><%= format_score(@peer_review_scores[cp.id][assignment.id]) %></td>
+                <td><%= format_score(@assignment_grades[cp.id][assignment.id]) %> </td>
             <% end%>
             <td><%= format_percentage(@meta_review[:aggregate_score][cp.id]) unless @meta_review.nil? %></td>
             <td><%= format_percentage(@teammate_review[:aggregate_score][cp.id]) unless @teammate_review.nil? %></td>
+            <td><%= @final_grades[cp.id] %></td>
         </tr>
     <%end%>
         <tr>
@@ -37,9 +51,13 @@
             <% @assignments.each do |assignment|%>
                 <td><%= format_percentage(@meta_review[:class_avg][assignment.id]) unless @meta_review.nil? %></td>
                 <td><%= format_percentage(@teammate_review[:class_avg][assignment.id]) unless @teammate_review.nil? %></td>
+                <td></td>
+                <td></td>
+                <td></td>
             <% end%>
           <td><%= format_percentage(@meta_review[:aggregate_score_class_avg]) unless @meta_review.nil? %></td>
           <td><%= format_percentage(@teammate_review[:aggregate_score_class_avg]) unless @teammate_review.nil? %></td>
+          <td></td>
         </tr>
     </table>
 </div>

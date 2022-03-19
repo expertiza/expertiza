@@ -43,7 +43,7 @@ describe SubmissionRecordsController do
     end
 
     context 'when current user is instructor but NOT the instructor who instructs the current assignment' do
-      it 'allows certain action' do
+      it 'refuses certain action' do
         stub_current_user(instructor2, instructor2.role.name, instructor2.role)
         expect(controller.send(:action_allowed?)).to be_falsey
       end
@@ -58,7 +58,7 @@ describe SubmissionRecordsController do
     end
 
     context 'when current user is a TA but NOT the TA of course which current assignment belongs to' do
-      it 'allows certain action' do
+      it 'refuses certain action' do
         stub_current_user(ta, ta.role.name, ta.role)
         allow(TaMapping).to receive(:exists?).with(ta_id: 8, course_id: 1).and_return(false )
         expect(controller.send(:action_allowed?)).to be false
@@ -66,7 +66,7 @@ describe SubmissionRecordsController do
     end
 
     context 'when current user is a student' do
-      it 'allows certain action' do
+      it 'refuses certain action' do
         stub_current_user(student, student.role.name, student.role)
         expect(controller.send(:action_allowed?)).to be false
       end

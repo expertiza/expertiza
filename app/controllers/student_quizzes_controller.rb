@@ -1,6 +1,7 @@
 class StudentQuizzesController < ApplicationController
   include AuthorizationHelper
 
+  # Based on the logged in user, verifies user's authourizations and privileges
   def action_allowed?
     if current_user_is_a? 'Student'
       if action_name.eql? 'index'
@@ -13,6 +14,7 @@ class StudentQuizzesController < ApplicationController
     end
   end
 
+  # Initializes instance variables needed to fetch the necessary details of the quizzes.
   def index
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
@@ -21,24 +23,27 @@ class StudentQuizzesController < ApplicationController
     @quiz_mappings = QuizResponseMap.mappings_for_reviewer(@participant.id)
   end
 
+  # For the response provided, this methods displays the questions, right/wrong answers and the final score.
   def finished_quiz
     @response = Response.where(map_id: params[:map_id]).first
     @response_map = QuizResponseMap.find(params[:map_id])
-    @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id) # for quiz response map, the reivewed_object_id is questionnaire id
+    # for quiz response map, the reivewed_object_id is questionnaire id
+    @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id) 
     @map = ResponseMap.find(params[:map_id])
     @participant = AssignmentTeam.find(@map.reviewee_id).participants.first
 
     @quiz_score = @response_map.quiz_score
   end
 
-  # Create an array of candidate quizzes for current reviewer
+  # Lists all the available quizzes created by the other teams in the current project which can be attempted.
   def self.take_quiz(assignment_id, reviewer_id)
     quizzes = []
     reviewer = Participant.where(user_id: reviewer_id, parent_id: assignment_id).first
     reviewed_team_response_maps = ReviewResponseMap.where(reviewer_id: reviewer.id)
     reviewed_team_response_maps.each do |team_response_map_record|
       reviewee_id = team_response_map_record.reviewee_id
-      reviewee_team = Team.find(reviewee_id) # reviewees should always be teams
+      # reviewees should always be teams
+      reviewee_team = Team.find(reviewee_id) 
       next unless reviewee_team.parent_id == assignment_id
 
       quiz_questionnaire = QuizQuestionnaire.where(instructor_id: reviewee_team.id).first
@@ -51,7 +56,7 @@ class StudentQuizzesController < ApplicationController
     quizzes
   end
 
-  # the way 'answers' table store the results of quiz
+  # calulates the score and stores the answers entered.  
   def calculate_score(map, response)
     questionnaire = Questionnaire.find(map.reviewed_object_id)
     scores = []

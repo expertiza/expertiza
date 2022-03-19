@@ -10,17 +10,16 @@ describe SubmissionRecordsController do
 
   let(:submission_record) { build(:submission_record, id: 1, team_id: 27158, assignment_id: 1) }
 
-  # describe '#index' do
-  #   it 'renders assignments#index page' do
-  #     controller.params = { team_id: 27158 }
-  #     allow(AssignmentTeam).to receive(:find).with(any_args).and_return(team)
-  #     allow(Assignment).to receive(:find).with(any_args).and_return(assignment)
-  #     allow(SubmissionRecord).to receive(:where).with(any_args).and_return([submission_record])
-  #     #get :index, params
-  #     #expect(response).to render_template(:index)
-  #     expect(controller.send(:index)).to render_template(:index)
-  #   end
-  # end
+  describe '#index' do
+    it 'call index method' do
+      params = { team_id: 27158 }
+      allow(AssignmentTeam).to receive(:find).with(any_args).and_return(team)
+      allow(Assignment).to receive(:find).with(any_args).and_return(assignment)
+      allow(SubmissionRecord).to receive(:where).with(any_args).and_return([submission_record])
+      result = get :index, params
+      expect(result.status).to eq 302
+      end
+  end
 
   describe '#action_allowed?' do
     before(:each) do

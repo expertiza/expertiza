@@ -38,12 +38,6 @@ describe SubmissionRecordsController do
     context 'when current user is instructor who instructs the current assignment' do
       it 'allows certain action' do
         stub_current_user(instructor1, instructor1.role.name, instructor1.role)
-
-        # print("Debug\n")
-        # puts "instructor1 details --> #{instructor1.inspect} \n\n"
-        # puts "assignment details --> #{assignment.inspect} \n\n"
-        # puts "user details --> #{session[:user].inspect}  \n\n"
-
         expect(controller.send(:action_allowed?)).to be_truthy
       end
     end

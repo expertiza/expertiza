@@ -1,8 +1,8 @@
 <h2><%=t ".answers"%></h2>
 <b><%=t ".quiz_score"%><%= @quiz_score %>%</b>
 
-<%  @assignment = Assignment.find(@participant.parent_id)%>
-<%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage => ""} %>
+<%  @assignment = Assignment.find(@quiz_taker.parent_id)%>
+<%= render :partial => 'submitted_content/main', :locals => {:participant => @quiz_taker, :stage => ""} %>
 
 <br>
 <% i = 1 %>

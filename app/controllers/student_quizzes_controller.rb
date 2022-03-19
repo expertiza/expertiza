@@ -25,12 +25,12 @@ class StudentQuizzesController < ApplicationController
 
   # For the response provided, this methods displays the questions, right/wrong answers and the final score.
   def finished_quiz
-    @response = Response.where(map_id: params[:map_id]).first
+    @response = Response.where(map_id: params[:map_id]).last
     @response_map = QuizResponseMap.find(params[:map_id])
     # for quiz response map, the reivewed_object_id is questionnaire id
     @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id) 
-    @map = ResponseMap.find(params[:map_id])
-    @participant = AssignmentTeam.find(@map.reviewee_id).participants.first
+    @quiz_response_map = ResponseMap.find(params[:map_id])
+    @quiz_taker = AssignmentTeam.find(@quiz_response_map.reviewee_id).participants.first
 
     @quiz_score = @response_map.quiz_score
   end

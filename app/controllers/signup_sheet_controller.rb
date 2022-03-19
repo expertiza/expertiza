@@ -261,7 +261,7 @@ class SignupSheetController < ApplicationController
   end
 
 
-  def delete_signup_helper(isInstructor, participant, assignment, drop_topic_deadline)
+  def flash_delete_signup_message(isInstructor, participant, assignment, drop_topic_deadline)
     messages = ["You have already submitted your work, so you are not allowed to drop your topic.",
                 "You cannot drop your topic after the drop topic deadline!",
                 "You have successfully dropped your topic!",
@@ -303,7 +303,7 @@ class SignupSheetController < ApplicationController
     # (A student/team has submitted if participant directory_num is non-null or submitted_hyperlinks is non-null.)
     # If there is no drop topic deadline, student can drop topic at any time (if all the submissions are deleted)
     # If there is a drop topic deadline, student cannot drop topic after this deadline.
-    delete_signup_helper(false, participant, assignment, drop_topic_deadline)
+    flash_delete_signup_message(false, participant, assignment, drop_topic_deadline)
 
     #if !participant.team.submitted_files.empty? || !participant.team.hyperlinks.empty?
     #  flash[:error] = 'You have already submitted your work, so you are not allowed to drop your topic.'
@@ -327,7 +327,7 @@ class SignupSheetController < ApplicationController
     user = TeamsUser.find_by(team_id: team.id).user
     participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
     drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
-    delete_signup_helper(true, participant, assignment, drop_topic_deadline)
+    flash_delete_signup_message(true, participant, assignment, drop_topic_deadline)
 
     #if !participant.team.submitted_files.empty? || !participant.team.hyperlinks.empty?
     #  flash[:error] = 'The student has already submitted their work, so you are not allowed to remove them.'

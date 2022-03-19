@@ -270,26 +270,26 @@ class SignupSheetController < ApplicationController
                 "You have successfully dropped the student from the topic!"
     ]
     if isInstructor == false
-      flash1 = messages[0]
-      flash2 = messages[1]
-      flash3 = messages[2]
+      work_submitted_message = messages[0]
+      deadline_passed_message = messages[1]
+      success_message = messages[2]
       id_param = session[:user]
     else
-      flash1 = messages[3]
-      flash2 = messages[4]
-      flash3 = messages[5]
+      work_submitted_message = messages[3]
+      deadline_passed_message = messages[4]
+      success_message = messages[5]
       id_param = participant
     end
 
     if !participant.team.submitted_files.empty? || !participant.team.hyperlinks.empty?
-      flash[:error] = flash1
+      flash[:error] = work_submitted_message
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for already submitted work: ' + params[:topic_id].to_s)
     elsif !drop_topic_deadline.nil? && (Time.now > drop_topic_deadline.due_at)
-      flash[:error] = flash2
+      flash[:error] = deadline_passed_message
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for ended work: ' + params[:topic_id].to_s)
     else
       delete_signup_for_topic(assignment.id, params[:topic_id], session[:user].id)
-      flash[:success] = flash3
+      flash[:success] = success_message
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student has been dropped from the topic: ' + params[:topic_id].to_s)
     end
   end

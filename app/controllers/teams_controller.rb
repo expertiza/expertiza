@@ -48,6 +48,12 @@ class TeamsController < ApplicationController
 
   def list
     init_team_type(params[:type])
+    puts "Team type in session after hitting list"
+    puts team_type
+    puts "Team.allowed_types[0]"
+    puts  Team.allowed_types[0]
+    puts  "is team_type == Team.allowed_types[0]"
+    puts team_type == Team.allowed_types[0]
     @assignment = Assignment.find_by(id: params[:id]) if team_type == Team.allowed_types[0]
     @is_valid_assignment = team_type == Team.allowed_types[0] && @assignment.max_team_size > 1
 
@@ -60,6 +66,10 @@ class TeamsController < ApplicationController
   end
 
   def new
+    puts "team_type"
+    puts team_type
+    puts "Or?"
+    puts team_type ||= Team.allowed_types[0]
     @parent = Object.const_get(team_type ||= Team.allowed_types[0]).find(params[:id])
   end
 

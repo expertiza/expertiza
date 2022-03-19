@@ -19,10 +19,15 @@ class TeamsController < ApplicationController
     session[:team_type]
   end
 
+  # retrieve an object's parent by its ID
+  def get_parent_by_id(id)
+    Object.const_get(team_type).find(id)
+  end
+
   # This function is used to create teams with random names.
   # Instructors can call by clicking "Create teams" icon and then click "Create teams" at the bottom.
   def create_teams
-    parent = Object.const_get(team_type).find(params[:id])
+    parent = get_parent_by_id(params[:id])
     Team.randomize_all_by_parent(parent, team_type, params[:team_size].to_i)
     message = 'Random teams have been successfully created'
     undo_link(message)
@@ -55,7 +60,7 @@ class TeamsController < ApplicationController
 
   # called when a instructor tries to create an empty team manually.
   def create
-    parent = Object.const_get(team_type).find(params[:id])
+    parent = get_parent_by_id(params[:id])
     begin
       Team.check_for_existing(parent, params[:team][:name], team_type)
       @team = Object.const_get(team_type + 'Team').create(name: params[:team][:name], parent_id: parent.id)

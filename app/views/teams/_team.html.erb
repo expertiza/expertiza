@@ -2,11 +2,9 @@
 <%= render :partial => '/tree_display/page_footer' %><br/>
 <% session[:return_to] = request.url %>
 <%= link_to 'Create Team', :action => 'new', :id=> @root_node.node_object_id, :model => @model %>
-<% if @root_node.class == AssignmentNode %>
-  <% modelType = 'AssignmentTeam' %>
-<% else %>
-  <% modelType = 'CourseTeam' %>
-<% end %>
+
+<% modelType = (@root_node.class == AssignmentNode) ? 'AssignmentTeam' : 'CourseTeam' %>
+
 | <%= link_to 'Import Teams',
               :controller=>'import_file',
               :action=>'start',

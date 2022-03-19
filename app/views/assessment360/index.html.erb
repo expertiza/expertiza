@@ -1,0 +1,45 @@
+<style>
+  th, td {
+    text-align: center;
+}
+</style>
+  <table class="table table-striped">
+    <tr>
+      <th rowspan=2 width="320">Students</th>
+      <th rowspan=2 width="30">Teammate Count</th>
+      <% @assignments.each do |assignment| %>
+        <th colspan=2 width="300"> <%= assignment.name %> </th>
+      <% end %>
+      <th colspan="2" width="300">Aggregate Score</th>
+    </tr>
+    <tr>
+      <% (0..@assignments.size).each do %>
+        <td><b>Metareviews</b></td>
+        <td><b>Teammate Reviews</b></td>
+      <% end %>
+    </tr>
+
+    <% @course_participants.each do |cp|%>
+        <tr>
+            <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
+            <td><%= @teamed_count[cp.id] %></td>
+            <% @assignments.each do |assignment|%>
+                <td><%= format_percentage(@meta_review[cp.id][assignment.id]) unless @meta_review.nil? %></td>
+                <td><%= format_percentage(@teammate_review[cp.id][assignment.id]) unless @teammate_review.nil? %></td>
+            <% end%>
+            <td><%= format_percentage(@meta_review[:aggregate_score][cp.id]) unless @meta_review.nil? %></td>
+            <td><%= format_percentage(@teammate_review[:aggregate_score][cp.id]) unless @teammate_review.nil? %></td>
+        </tr>
+    <%end%>
+        <tr>
+            <td><b>Class Average</b></td>
+            <td></td>
+            <% @assignments.each do |assignment|%>
+                <td><%= format_percentage(@meta_review[:class_avg][assignment.id]) unless @meta_review.nil? %></td>
+                <td><%= format_percentage(@teammate_review[:class_avg][assignment.id]) unless @teammate_review.nil? %></td>
+            <% end%>
+          <td><%= format_percentage(@meta_review[:aggregate_score_class_avg]) unless @meta_review.nil? %></td>
+          <td><%= format_percentage(@teammate_review[:aggregate_score_class_avg]) unless @teammate_review.nil? %></td>
+        </tr>
+    </table>
+</div>

@@ -45,7 +45,7 @@ describe Assessment360Controller do
       it 'does not allow student' do
         params = { course_id: 1 }
         session = { user: student }
-        get :all_students_all_reviews, params, session
+        get :index, params, session
         expect(controller.send(:action_allowed?)).to be false
       end
 
@@ -99,7 +99,7 @@ describe Assessment360Controller do
         allow(course).to receive(:get_participants).and_return([]) # no participants
         params = { course_id: 1 }
         session = { user: instructor }
-        get :all_students_all_reviews, params, session
+        get :index, params, session
         expect(controller.send(:action_allowed?)).to be true
         expect(response).to redirect_to(:back)
         expect(flash[:error]).to be_present
@@ -112,10 +112,10 @@ describe Assessment360Controller do
         allow(StudentTask).to receive(:teamed_students).with(course_participant.user).and_return(student1)
         params = { course_id: 1 }
         session = { user: instructor }
-        get :all_students_all_reviews, params, session
+        get :index, params, session
         expect(controller.send(:action_allowed?)).to be true
         expect(response.status).to eq(200)
-        expect(response).to render_template(:all_students_all_reviews)
+        expect(response).to render_template(:index)
         returned_teammate_review = controller.instance_variable_get(:@teammate_review)
         expect(returned_teammate_review[nil]).to eq({})
         returned_meta_review = controller.instance_variable_get(:@meta_review)
@@ -132,10 +132,10 @@ describe Assessment360Controller do
         allow(course_participant).to receive(:meta_reviews).and_return(empty_meta_review)
         params = { course_id: 1 }
         session = { user: instructor }
-        get :all_students_all_reviews, params, session
+        get :index, params, session
         expect(controller.send(:action_allowed?)).to be true
         expect(response.status).to eq(200)
-        expect(response).to render_template(:all_students_all_reviews)
+        expect(response).to render_template(:index)
         returned_teammate_review = controller.instance_variable_get(:@teammate_review)
         expect(returned_teammate_review[nil]).to eq({})
         returned_meta_review = controller.instance_variable_get(:@meta_review)
@@ -152,10 +152,10 @@ describe Assessment360Controller do
         allow(course_participant).to receive(:meta_reviews).and_return(meta_review)
         params = { course_id: 1 }
         session = { user: instructor }
-        get :all_students_all_reviews, params, session
+        get :index, params, session
         expect(controller.send(:action_allowed?)).to be true
         expect(response.status).to eq(200)
-        expect(response).to render_template(:all_students_all_reviews)
+        expect(response).to render_template(:index)
         returned_teammate_review = controller.instance_variable_get(:@teammate_review)
         expect(returned_teammate_review[nil][1]).to eq('95%')
         returned_meta_review = controller.instance_variable_get(:@meta_review)

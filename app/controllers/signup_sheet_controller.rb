@@ -140,10 +140,10 @@ class SignupSheetController < ApplicationController
     load_add_signup_topics(params[:id])
     SignUpSheet.add_signup_topic(params[:id])
   end
-
-  def add_signup_topics_staggered
-    add_signup_topics
-  end
+  # Commented add_signup_topics_staggered because it was doing same thing as add_signup_topics.
+  #def add_signup_topics_staggered
+  #   add_signup_topics
+  #end
 
   # retrieves all the data associated with the given assignment. Includes all topics,
   def load_add_signup_topics(assignment_id)
@@ -174,7 +174,7 @@ class SignupSheetController < ApplicationController
   # staggered means that different topics can have different deadlines.
   def redirect_to_sign_up(assignment_id)
     assignment = Assignment.find(assignment_id)
-    assignment.staggered_deadline == true ? (redirect_to action: 'add_signup_topics_staggered', id: assignment_id) : (redirect_to action: 'add_signup_topics', id: assignment_id)
+    assignment.staggered_deadline == true ? (redirect_to action: 'add_signup_topics', id: assignment_id) : (redirect_to action: 'add_signup_topics', id: assignment_id)
   end
 
   # simple function that redirects to assignment->edit->topic panel to display /add_signup_topics or the /add_signup_topics_staggered page

@@ -94,7 +94,7 @@ describe SignupSheetController do
     end
 
     context 'when topic can be found' do
-      it 'updates the existing topic and redirects to signup_sheet#add_signup_topics_staggered page' do
+      it 'updates the existing topic and redirects to signup_sheet#add_signup_topics page' do
         allow(SignedUpTeam).to receive(:find_by).with(topic_id: 1).and_return(signed_up_team)
         allow(SignedUpTeam).to receive(:where).with(topic_id: 1, is_waitlisted: true).and_return([signed_up_team2])
         allow(Team).to receive(:find).with(2).and_return(team)
@@ -111,7 +111,7 @@ describe SignupSheetController do
         }
         post :create, params
         expect(SignedUpTeam.first.is_waitlisted).to be false
-        expect(response).to redirect_to('/signup_sheet/add_signup_topics_staggered?id=1')
+        expect(response).to redirect_to('/signup_sheet/add_signup_topics?id=1')
       end
     end
   end

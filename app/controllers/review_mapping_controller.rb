@@ -480,6 +480,7 @@ class ReviewMappingController < ApplicationController
     if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0)
       .where("created_at > :time",
              time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
+    end
   end
 
   # This method calculates the time when the last review mapping record was created

@@ -273,12 +273,12 @@ class SignupSheetController < ApplicationController
       work_submitted_message = messages[0]
       deadline_passed_message = messages[1]
       success_message = messages[2]
-      id_param = session[:user]
+
     else
       work_submitted_message = messages[3]
       deadline_passed_message = messages[4]
       success_message = messages[5]
-      id_param = participant
+
     end
 
     if !participant.team.submitted_files.empty? || !participant.team.hyperlinks.empty?

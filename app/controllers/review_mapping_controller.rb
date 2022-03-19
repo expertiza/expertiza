@@ -43,6 +43,32 @@ class ReviewMappingController < ApplicationController
     @mapping = ResponseMap.find(params[:id])
   end
 
+  # This method is used to assign a user as a reviewer to a team except his own team
+  # The reviewer can't be assigned to review his own team's work
+  def add_reviewer_to_another_team(assignment,user_id,topic_id)
+    # Team lazy initialization
+    SignUpSheet.signup_team(assignment.id, user_id, topic_id)
+
+    begin
+      user = User.from_params(params)
+      # contributor_id is team_id
+      regurl = url_for id: assignment.id,
+                       user_id: user.id,
+                       contributor_id: params[:contributor_id]
+
+      # Get the assignment's participant corresponding to the user
+      reviewer = get_reviewer(user, assignment, regurl)
+      # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+      # to treat all assignments as team assignments
+      if ReviewResponseMap.where(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id).first.nil?
+        ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+      else
+        raise 'The reviewer, \"" + reviewer.name + "\", is already assigned to this contributor.'
+      end
+    rescue StandardError => e
+      msg = e.message
+    end
+  end
   # This method is used to assign reviewers to student's work
   # The student cannot review their own work
 
@@ -58,44 +84,55 @@ class ReviewMappingController < ApplicationController
     # If instructor want to assign one student to review his/her own artifact,
     # it should be counted as “self-review” and we need to make /app/views/submitted_content/_selfreview.html.erb work.
 
-    participant_temp = Participant.where(user_id: user_id, parent_id: params[:id]).first rescue nil
+    temporary_participant = Participant.where(user_id: user_id, parent_id: params[:id]).first rescue nil
     # msg = 'User field cannot be empty'
 
     # Check for user field is empty or not
     if user_id
       if TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
-        flash[:error] = "You cannot assign this student to review his/her own artifact."
+        flash[:error] = 'You cannot assign this student to review his/her own artifact.'
 
         # If the user is not allowed to review this assignment
-      elsif !participant_temp or !participant_temp.can_review
-        flash[:error] = "This user is not authorized to review the assignment."
+      elsif !temporary_participant or !temporary_participant.can_review
+        flash[:error] = 'This user is not authorized to review the assignment.'
         msg = 'This user is not authorized to review the assignment.'
       else
-        # Team lazy initialization
-        SignUpSheet.signup_team(assignment.id, user_id, topic_id)
-
-        begin
-          user = User.from_params(params)
-          # contributor_id is team_id
-          regurl = url_for id: assignment.id,
-                           user_id: user.id,
-                           contributor_id: params[:contributor_id]
-
-          # Get the assignment's participant corresponding to the user
-          reviewer = get_reviewer(user, assignment, regurl)
-          # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-          # to treat all assignments as team assignments
-          if ReviewResponseMap.where(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id).first.nil?
-            ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
-          else
-            raise "The reviewer, \"" + reviewer.name + "\", is already assigned to this contributor."
-          end
-        rescue StandardError => e
-          msg = e.message
-        end
+        add_reviewer_to_another_team(assignment,user_id,topic_id)
       end
     end
     redirect_to action: 'list_mappings', id: assignment.id, msg: msg
+  end
+
+  # assign the reviewer to review the assignment_team's submission. Only used in the assignments that do not have any topic
+  # Parameter assignment_team is the candidate assignment team, it cannot be a team w/o submission, or have reviewed by reviewer, or reviewer's own team.
+  # (guaranteed by candidate_assignment_teams_to_review method)
+  def assign_reviewer_without_topic(assignment,reviewer)
+    assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
+    assignment_team = assignment_teams.to_a.sample rescue nil
+    if assignment_team.nil?
+      flash[:error] = 'No artifacts are available to review at this time. Please try later.'
+    else
+      assignment.assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
+    end
+  end
+
+  def assign_on_topic_availability(assignment,reviewer)
+    # begin
+    if assignment.topics? # assignment with topics
+      topic = if params[:topic_id]
+                SignUpTopic.find(params[:topic_id])
+              else
+                assignment.candidate_topics_to_review(reviewer).to_a.sample rescue nil
+              end
+      if topic.nil?
+        flash[:error] = 'No topics are available to review at this time. Please try later.'
+      else
+        assignment.assign_reviewer_dynamically(reviewer, topic)
+      end
+
+    else # assignment without topic -Yang
+      assign_reviewer_without_topic(assignment,reviewer)
+    end
   end
 
   # 7/12/2015 -zhewei
@@ -107,32 +144,9 @@ class ReviewMappingController < ApplicationController
     reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
 
     if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
-      flash[:error] = "No topic is selected.  Please go back and select a topic."
+      flash[:error] = 'No topic is selected.  Please go back and select a topic.'
     else
-
-      # begin
-      if assignment.topics? # assignment with topics
-        topic = if params[:topic_id]
-                  SignUpTopic.find(params[:topic_id])
-                else
-                  assignment.candidate_topics_to_review(reviewer).to_a.sample rescue nil
-                end
-        if topic.nil?
-          flash[:error] = "No topics are available to review at this time. Please try later."
-        else
-          assignment.assign_reviewer_dynamically(reviewer, topic)
-        end
-
-      else # assignment without topic -Yang
-        assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
-        assignment_team = assignment_teams.to_a.sample rescue nil
-        if assignment_team.nil?
-          flash[:error] = "No artifacts are available to review at this time. Please try later."
-        else
-          assignment.assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
-        end
-
-      end
+      assign_on_topic_availability(assignment,reviewer)
     end
     redirect_to controller: 'student_review', action: 'list', id: reviewer.id
   end
@@ -143,7 +157,7 @@ class ReviewMappingController < ApplicationController
       assignment = Assignment.find(params[:assignment_id])
       reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
       if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id: params[:participant_id]).first
-        flash[:error] = "You have already taken that quiz."
+        flash[:error] = 'You have already taken that quiz.'
       else
         @map = QuizResponseMap.new
         @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
@@ -167,7 +181,7 @@ class ReviewMappingController < ApplicationController
       regurl = url_for action: 'add_user_to_assignment', id: mapping.map_id, user_id: user.id
       reviewer = get_reviewer(user, mapping.assignment, regurl)
       unless MetareviewResponseMap.where(reviewed_object_id: mapping.map_id, reviewer_id: reviewer.id).first.nil?
-        raise "The metareviewer \"" + reviewer.user.name + "\" is already assigned to this reviewer."
+        raise 'The metareviewer \"" + reviewer.user.name + "\" is already assigned to this reviewer.'
       end
       MetareviewResponseMap.create(reviewed_object_id: mapping.map_id,
                                    reviewer_id: reviewer.id,
@@ -480,6 +494,7 @@ class ReviewMappingController < ApplicationController
     if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0)
       .where("created_at > :time",
              time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
+    end
   end
 
   # This method calculates the time when the last review mapping record was created

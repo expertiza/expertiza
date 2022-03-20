@@ -24,7 +24,7 @@ class ImpersonateController < ApplicationController
     @users = session[:user].get_available_users(params[:user][:name])
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
- 
+
   # Called whenever we want to enter the impersonate mode in the application.
   def start
     flash[:error] = "This page doesn't take any query string." unless request.GET.empty?
@@ -71,11 +71,9 @@ class ImpersonateController < ApplicationController
   # If original user can impersonate the user ,then session will be overwrite to get the view of the user who is getting impersonated
   def check_if_user_impersonateable
     if params[:impersonate].nil?
-      # E1991 : check whether instructor is currently in anonymized view
       user = get_real_user(params[:user][:name]) 
       if !@original_user.can_impersonate? user
         @message = "You cannot impersonate '#{params[:user][:name]}'."
-        temp
         AuthController.clear_user_info(session, nil)
       else
         overwrite_session
@@ -90,10 +88,12 @@ class ImpersonateController < ApplicationController
   # Function to display appropriate error messages based on different username provided, the message explains each error
   # This function checks params values and displays error_message based on the user name .This is initial check to see if username is valid
   def display_error_msg
+    # This is called when we try to impersonate a wrong user from the original logged in account.
     if params[:user]
       @message = "No user exists with the name '#{params[:user][:name]}'."
+    # This is called when we try to impersonate a wrong user from the impersonated account.
     elsif params[:impersonate]
-      @message = "No user exists with the name '#{params[:impersonate][:name]}'."
+      @message = "No impersonate user exists with the name '#{params[:impersonate][:name]}'."
     else
       if params[:impersonate].nil?
         @message = "You cannot impersonate '#{params[:user][:name]}'."
@@ -111,7 +111,7 @@ class ImpersonateController < ApplicationController
   end
 
   # Main operation
-  def do_main_operation(user)
+  def do_impersonate_operation(user)
     check_if_user_impersonateable if user
     display_error_msg
   end
@@ -119,24 +119,23 @@ class ImpersonateController < ApplicationController
   # Main operation, method used to break the functions in impersonate controller and bring out 2 functionalities at same level,
   # checking if user impersonateable, if not throw corresponding error message
   def impersonate
-    puts params.inspect
     # Initial check to see if the username exists
     display_error_msg
     begin
       @original_user = session[:super_user] || session[:user]
-      # Impersonate using form on /impersonate/start, based on the username provided, this method looks to see if that's possible by calling the do_main_operation method
+      # Impersonate using form on /impersonate/start, based on the username provided, this method looks to see if that's possible by calling the do_impersonate_operation method
       if params[:impersonate].nil?
         # Check if special chars /\?<>|&$# are used to avoid html tags or system command
         check_if_special_char
         user = get_real_user(params[:user][:name]) 
-        do_main_operation(user)
+        do_impersonate_operation(user)
       else
         # Impersonate a new account
         if !params[:impersonate][:name].empty?
           # check if special chars /\?<>|&$# are used to avoid html tags or system command
           check_if_special_char
           user = get_real_user(params[:impersonate][:name])
-          do_main_operation(user)
+          do_impersonate_operation(user)
           # Revert to original account when currently in the impersonated session
         else
           if !session[:super_user].nil?

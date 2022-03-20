@@ -19,13 +19,13 @@ class ReputationWebServiceController < ApplicationController
       1
     end
   end
-  
+
   def get_valid_answers_for_response(response)
     answers = Answer.where(response_id: response.id)
     valid_answer = answers.select { |a| (a.question.type == 'Criterion') && !a.answer.nil? }
-    valid_answer.empty? ? nil : valid_answer 
+    valid_answer.empty? ? nil : valid_answer
   end
-  
+
   def calculate_peer_review_grade(valid_answer, max_question_score)
     temp_sum = 0
     weight_sum = 0
@@ -41,12 +41,13 @@ class ReputationWebServiceController < ApplicationController
     peer_review_grades_list = []
     valid_response.each do |response|
       valid_answer = get_valid_answers_for_response(response)
-      next if valid_answer.nil? 
+      next if valid_answer.nil?
+
       review_grade = calculate_peer_review_grade(valid_answer, get_max_question_score(valid_answer))
       peer_review_grades_list << [reviewer_id, team_id, review_grade]
     end
     peer_review_grades_list
-   end
+  end
 
   # db query, return peer reviews
   def get_peer_reviews(assignment_id_list, round_num, has_topic)
@@ -117,7 +118,6 @@ class ReputationWebServiceController < ApplicationController
   end
 
   def encrypt_request_body(plain_data)
-
     # AES symmetric algorithm encrypts raw data
     aes_encrypted_request_data = aes_encrypt(plain_data)
     plain_data = aes_encrypted_request_data[0]
@@ -126,7 +126,7 @@ class ReputationWebServiceController < ApplicationController
     encrypted_key = rsa_public_key1(aes_encrypted_request_data[1])
     encrypted_vi = rsa_public_key1(aes_encrypted_request_data[2])
     # fixed length 350
-    
+
     plain_data.prepend('", "data":"')
     plain_data.prepend(encrypted_vi)
     plain_data.prepend(encrypted_key)
@@ -145,11 +145,13 @@ class ReputationWebServiceController < ApplicationController
     # AES symmetric algorithm decrypts data
     aes_encrypted_response_data = encrypted_data['data']
     decrypted_data = aes_decrypt(aes_encrypted_response_data, key, vi)
+    decrypted_data
   end
 
   def update_participants(response)
     JSON.parse(response.body.to_s).each do |alg, list|
       next unless alg == 'Hamer' || alg == 'Lauw'
+
       list.each do |id, rep|
         Participant.find_by(user_id: id).update(alg.to_sym => rep) unless /leniency/ =~ id.to_s
       end
@@ -159,7 +161,7 @@ class ReputationWebServiceController < ApplicationController
   def process_response_body(response)
     # Decryption
     decrypt_response(response.body)
-   
+
     @response = response
     @response_body = response.body
 
@@ -193,14 +195,14 @@ class ReputationWebServiceController < ApplicationController
   def add_lauw_reputation_values
     @additional_info = 'add initial lauw reputation values'
   end
-  
+
   def get_assignment_id_list(assignment_id_one, assignment_id_two)
     assignment_id_list = []
     assignment_id_list << assignment_id_one
     assignment_id_list << assignment_id_two unless assignment_id_two.zero?
     assignment_id_list
   end
-  
+
   def prepare_request_body
     req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader: { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
     curr_assignment_id = (params[:assignment_id].empty? ? '754' : params[:assignment_id])
@@ -225,12 +227,12 @@ class ReputationWebServiceController < ApplicationController
       @additional_info = ''
     end
 
-   
+
     req.body.prepend('{')
     @request_body = req.body
     # Encrypting the request body data
     req.body = encrypt_request_body(req.body)
-   
+
     # request body should be in JSON format.
     req.body = format_into_JSON(req.body)
     req

@@ -51,8 +51,8 @@ class Assessment360Controller < ApplicationController
     # instructor grade is stored in the team model, which is found by finding the user's team for the assignment
     team_id = TeamsUser.team_id(assignment_id, user_id)
     team = Team.find(team_id)
+    return if team[:grade_for_submission].nil?
     @assignment_grades[cp.id][assignment_id] = team[:grade_for_submission]
-    return if @assignment_grades[cp.id][assignment_id].nil?
 
     @final_grades[cp.id] += @assignment_grades[cp.id][assignment_id]
   end
@@ -95,6 +95,8 @@ class Assessment360Controller < ApplicationController
     @teammate_review[:class_avg] = calc_class_avg_score(@teammate_review)
     @teammate_review[:aggregate_score_class_avg] = calc_aggregate_score_class_avg(@teammate_review)
     course_student_grade_summary
+    @peer_review_scores[:class_avg] = calc_class_avg_score(@peer_review_scores)
+    @assignment_grades[:class_avg] = calc_class_avg_score(@assignment_grades)
   end
 
   private
@@ -217,7 +219,6 @@ class Assessment360Controller < ApplicationController
       assignment_review_scores = {}
       total_review_scores = {}
       review_counts = {}
-
       review.each do |cp_id, assignment_review_scores_map|
         assignment_review_scores_map.each do |assignment_id, score|
           total_review_scores[assignment_id] = 0 unless total_review_scores.key?(assignment_id)
@@ -228,7 +229,7 @@ class Assessment360Controller < ApplicationController
       end
 
       @assignments.each do |assignment|
-        assignment_review_scores[assignment.id] = (total_review_scores[assignment.id] * 1.0 / review_counts[assignment.id]).round if review_counts.key?(assignment.id)
+        assignment_review_scores[assignment.id] = (total_review_scores[assignment.id] * 1.0 / review_counts[assignment.id]).round(2) if review_counts.key?(assignment.id)
       end
 
       return assignment_review_scores

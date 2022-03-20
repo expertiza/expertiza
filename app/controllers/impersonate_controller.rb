@@ -59,8 +59,9 @@ class ImpersonateController < ApplicationController
   # special_chars method-Initialises string with special characters /\?<>|&$# .
   # contains_special_chars method-converts it to regex and compares with the string
   # warn_for_special_chars takes the output from above method and flashes an error if there are any special characters(/\?<>|&$#) in the string
-  def check_if_special_char(parameter)
-    redirect_back if params[parameter] && warn_for_special_chars(params[parameter][:name], 'Username')
+  def check_if_special_char
+    redirect_back if params[:user] && warn_for_special_chars(params[:user][:name], 'Username')
+    redirect_back if params[:impersonate] && warn_for_special_chars(params[:impersonate][:name], 'Username')
   end
 
   # Checking if the username provided can be impersonated or not
@@ -118,6 +119,7 @@ class ImpersonateController < ApplicationController
   # Main operation, method used to break the functions in impersonate controller and bring out 2 functionalities at same level,
   # checking if user impersonateable, if not throw corresponding error message
   def impersonate
+    puts params.inspect
     # Initial check to see if the username exists
     display_error_msg
     begin
@@ -125,14 +127,14 @@ class ImpersonateController < ApplicationController
       # Impersonate using form on /impersonate/start, based on the username provided, this method looks to see if that's possible by calling the do_main_operation method
       if params[:impersonate].nil?
         # Check if special chars /\?<>|&$# are used to avoid html tags or system command
-        check_if_special_char(:impersonate)
+        check_if_special_char
         user = get_real_user(params[:user][:name]) 
         do_main_operation(user)
       else
         # Impersonate a new account
         if !params[:impersonate][:name].empty?
           # check if special chars /\?<>|&$# are used to avoid html tags or system command
-          check_if_special_char(:impersonate)
+          check_if_special_char
           user = get_real_user(params[:impersonate][:name])
           do_main_operation(user)
           # Revert to original account when currently in the impersonated session

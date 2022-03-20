@@ -1,5 +1,8 @@
 class ImpersonateController < ApplicationController
   include SecurityHelper
+  
+  # This function checks if the logged in user is a student or not. If it is a student, do not allow the impersonate mode.
+  # If the logged in user has the role or anything other than the student, we allow that user to use the impersonate mode.
 
   def action_allowed?
     # Check for TA privileges first since TA's also have student privileges.
@@ -13,43 +16,44 @@ class ImpersonateController < ApplicationController
     end
   end
 
+  # This function gives the dropdown where we have all the usernames based on the name we enter.
+  # We should ideally be able to search for whichever username we want to impersonate.
+  # This function does not seem to work
+
   def auto_complete_for_user_name
     @users = session[:user].get_available_users(params[:user][:name])
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
-
+ 
+  # Called whenever we want to enter the impersonate mode in the application.
   def start
     flash[:error] = "This page doesn't take any query string." unless request.GET.empty?
   end
 
   # Method to overwrite the session details that are corresponding to the user or one being impersonated
+  # The first 'if' statement is executed if the logged in user tried to access the impersonate feature from his account.
+  # The 'elsif' statement is executed if the user is impersonating someone and then tried to impersonate another person.
+  # The 'else' statement is executed if...
+
+  def generate_session(user)
+    AuthController.clear_user_info(session, nil)
+    session[:original_user] = @original_user
+    session[:impersonate] = true
+    session[:user] = user
+  end
+
   def overwrite_session
-    # If not impersonatable, then original user's session remains
     if params[:impersonate].nil?
-      # E1991 : check whether instructor is currently in anonymized view
       user = get_real_user(params[:user][:name]) 
-      #user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:user][:name]) : User.find_by(name: params[:user][:name])
       session[:super_user] = session[:user] if session[:super_user].nil?
-      AuthController.clear_user_info(session, nil)
-      session[:original_user] = @original_user
-      session[:impersonate] = true
-      session[:user] = user
     elsif !params[:impersonate][:name].empty?
-      # E1991 : check whether instructor is currently in anonymized view
       user = get_real_user(params[:impersonate][:name]) 
-      #user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:impersonate][:name]) : User.find_by(name: params[:impersonate][:name])
-      AuthController.clear_user_info(session, nil)
-      session[:user] = user
-      session[:impersonate] = true
-      session[:original_user] = @original_user
     else
-      # E1991 : check whether instructor is currently in anonymized view
-      AuthController.clear_user_info(session, nil)
       session[:user] = session[:super_user]
       session[:super_user] = nil
     end
+    generate_session(user)
   end
-
   # Checks if special characters are present in the username provided, only alphanumeric should be used
   # warn_for_special_chars is a method in SecurityHelper class.SecurityHelper class has methods to handle this.
   # special_chars method-Initialises string with special characters /\?<>|&$# .
@@ -80,7 +84,6 @@ class ImpersonateController < ApplicationController
     if params[:impersonate].nil?
       # E1991 : check whether instructor is currently in anonymized view
       user = get_real_user(params[:user][:name]) 
-      #user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:user][:name]) : User.find_by(name: params[:user][:name])
       if !@original_user.can_impersonate? user
         @message = "You cannot impersonate '#{params[:user][:name]}'."
         temp
@@ -141,7 +144,6 @@ class ImpersonateController < ApplicationController
         check_if_special_char
         # E1991 : check whether instructor is currently in anonymized view
         user = get_real_user(params[:user][:name]) 
-        #user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:user][:name]) : user = User.find_by(name: params[:user][:name])
         do_main_operation(user)
       else
         # Impersonate a new account
@@ -149,8 +151,7 @@ class ImpersonateController < ApplicationController
           # check if special chars /\?<>|&$# are used to avoid html tags or system command
           check_if_special_char
           # E1991 : check whether instructor is currently in anonymized view
-          user = get_real_user(params[:impersonate][:name]) 
-          #user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:impersonate][:name]) : User.find_by(name: params[:impersonate][:name])
+          user = get_real_user(params[:impersonate][:name])
           do_main_operation(user)
           # Revert to original account when currently in the impersonated session
         else
@@ -176,11 +177,10 @@ class ImpersonateController < ApplicationController
 end
 
 def get_real_user(name)
- #user= User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:user][:name]) : user = User.find_by(name: params[:user][:name])
- if User.anonymized_view?(session[:ip])
-  user=User.real_user_from_anonymized_name(name)
- else
-  user = User.find_by(name: name)
- end
- return user
+  if User.anonymized_view?(session[:ip])
+    user = User.real_user_from_anonymized_name(name)
+  else
+    user = User.find_by(name: name)
+  end
+  return user
 end

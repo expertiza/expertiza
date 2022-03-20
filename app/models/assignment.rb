@@ -393,9 +393,9 @@ class Assignment < ApplicationRecord
     @assignment = Assignment.find(parent_id)
     @answers = {} # Contains all answer objects for this assignment
     # Find all unique response types
-    @uniq_response_type = ResponseMap.uniq.pluck(:type)
+    @uniq_response_type = ResponseMap.all.uniq.pluck(:type)
     # Find all unique round numbers
-    @uniq_rounds = Response.uniq.pluck(:round)
+    @uniq_rounds = Response.all.uniq.pluck(:round)
     # create the nested hash that holds all the answers organized by round # and response type
     @uniq_rounds.each do |round_num|
       @answers[round_num] = {}

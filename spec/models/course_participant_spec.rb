@@ -46,7 +46,7 @@ describe 'CourseParticipant' do
       course = build(:course)
       session = {}
       row = []
-      allow(Course).to receive(:find_by).and_return(course)
+      allow(Course).to receive(:find).and_return(course)
       allow(session[:user]).to receive(:id).and_return(1)
       row = { name: 'user_name', fullname: 'user_fullname', email: 'name@email.com', role: 'user_role_name', parent: 'user_parent_name' }
       course_part = CourseParticipant.import(row, nil, session, 2)

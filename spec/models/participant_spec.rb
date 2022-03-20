@@ -31,7 +31,8 @@ describe Participant do
 
   describe '#response' do
     it 'Returns the participant responses' do
-      allow(participant.response_maps).to receive(:map).and_return(response)
+      allow(participant).to receive(:response_maps).and_return(review_response_map)
+      allow(review_response_map).to receive(:map).and_return(response)
       expect(participant.responses).to eq(response)
     end
   end

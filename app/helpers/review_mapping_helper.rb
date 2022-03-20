@@ -405,6 +405,7 @@ module ReviewMappingHelper
     end
   end
 
+  # Review strategy for teams and participants
   class ReviewStrategy
     attr_accessor :participants, :teams
 
@@ -415,6 +416,7 @@ module ReviewMappingHelper
     end
   end
 
+ # Student Review Strategy for participants
   class StudentReviewStrategy < ReviewStrategy
     def reviews_per_team
       (@participants.size * @review_num * 1.0 / @teams.size).round
@@ -429,6 +431,7 @@ module ReviewMappingHelper
     end
   end
 
+ # Team Review Strategy for teams according to team size
   class TeamReviewStrategy < ReviewStrategy
     def reviews_per_team
       @review_num

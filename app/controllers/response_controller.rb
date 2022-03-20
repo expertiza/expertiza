@@ -5,7 +5,7 @@ class ResponseController < ApplicationController
   helper :submitted_content
   helper :file
 
-  before_action :authorize_show_calibration_results, only: [show_calibration_results_for_student]
+  before_action :authorize_show_calibration_results, only: %i[show_calibration_results_for_student]
   before_action :set_response, only: %i[update delete view]
 
   def action_allowed?

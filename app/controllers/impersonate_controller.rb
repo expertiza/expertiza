@@ -81,7 +81,6 @@ class ImpersonateController < ApplicationController
       end
     else
       unless params[:impersonate][:name].empty?
-        # E1991 : check whether instructor is currently in anonymized view
         overwrite_session
       end
     end
@@ -127,7 +126,6 @@ class ImpersonateController < ApplicationController
       if params[:impersonate].nil?
         # Check if special chars /\?<>|&$# are used to avoid html tags or system command
         check_if_special_char(:impersonate)
-        # E1991 : check whether instructor is currently in anonymized view
         user = get_real_user(params[:user][:name]) 
         do_main_operation(user)
       else
@@ -135,7 +133,6 @@ class ImpersonateController < ApplicationController
         if !params[:impersonate][:name].empty?
           # check if special chars /\?<>|&$# are used to avoid html tags or system command
           check_if_special_char(:impersonate)
-          # E1991 : check whether instructor is currently in anonymized view
           user = get_real_user(params[:impersonate][:name])
           do_main_operation(user)
           # Revert to original account when currently in the impersonated session

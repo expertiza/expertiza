@@ -257,22 +257,8 @@ class ReviewMappingController < ApplicationController
     team = AssignmentTeam.find(params[:contributor_id])
     review_response_maps = team.review_mappings
     num_remain_review_response_maps = review_response_maps.size
-    # Iterate through every response and related answers and check whether they are empty or not
     review_response_maps.each do |review_response_map|
-      flag = nil
-      if review_response_map and Response.exists?(map_id: review_response_map.id)
-        Response.where(map_id: review_response_map.id).each do |response|
-          break unless flag.nil?
-          flag = 1 unless response.additional_comment.empty?
-          Answer.where(response_id: response.id).each do |answer|
-            if !answer.comments.empty? or (answer.answer != 0 and !answer.answer.nil?)
-              flag = 1
-            end
-            break unless flag.nil?
-          end
-        end
-      end
-      if flag.nil?
+      unless Response.exists?(map_id: review_response_map.id)
         ReviewResponseMap.find(review_response_map.id).destroy
         num_remain_review_response_maps -= 1
       end

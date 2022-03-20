@@ -337,6 +337,15 @@ class ReviewMappingController < ApplicationController
     @items.sort_by(&:name)
   end
 
+  def create_team(participants,assignment_id, teams)
+    participants.each do |participant|
+      user = participant.user
+      next if TeamsUser.team_id(assignment_id, user.id)
+      team = AssignmentTeam.create_team_and_node(assignment_id)
+      ApplicationController.helpers.create_team_users(user, team.id)
+      teams << team
+    end
+  end
   def automatic_review_mapping
     assignment_id = params[:id].to_i
     participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.select(&:can_review).shuffle!
@@ -344,13 +353,7 @@ class ReviewMappingController < ApplicationController
     max_team_size = Integer(params[:max_team_size]) # Assignment.find(assignment_id).max_team_size
     # Create teams if its an individual assignment.
     if teams.empty? and max_team_size == 1
-      participants.each do |participant|
-        user = participant.user
-        next if TeamsUser.team_id(assignment_id, user.id)
-        team = AssignmentTeam.create_team_and_node(assignment_id)
-        ApplicationController.helpers.create_team_users(user, team.id)
-        teams << team
-      end
+      create_team(participants,assignment_id, teams)
     end
     num_reviews_per_student = params[:num_reviews_per_student].to_i
     submission_review_num = params[:num_reviews_per_submission].to_i

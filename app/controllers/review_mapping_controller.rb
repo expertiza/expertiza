@@ -3,7 +3,7 @@ class ReviewMappingController < ApplicationController
 
   autocomplete :user, :name
   # use_google_charts
-  require 'gchart'
+  # require 'gchart'
   # helper :dynamic_review_assignment
   helper :submitted_content
   # including the following helper to refactor the code in response_report function

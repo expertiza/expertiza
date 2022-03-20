@@ -530,6 +530,37 @@ class ReviewMappingController < ApplicationController
     return teams_hash
   end
 
+  def update_participants_after_assigning_reviews(num_participants, maximum_reviews_per_student)
+    # remove students who have already been assigned enough num of reviews out of participants array
+    participants.each do |participant|
+      if participants_hash[participant.id] == maximum_reviews_per_student
+        participants.delete_at(rand_num)
+        num_participants -= 1
+      end
+    end
+  end
+
+  def even_out_reviews_among_teams(num_participants, maximum_reviews_per_student)
+    # need to even out the # of reviews for teams
+    num_participants_this_team = number_of_participants_in_team(assignment_id, team)
+    while selected_participants.size < maximum_reviews_per_team
+      # if all outstanding participants are already in selected_participants, just break the loop.
+      break if selected_participants.size == participants.size - num_participants_this_team
+
+      # generate random number used as hash key in participants_hash
+      rand_num = get_random_number(iterator, participants_hash, num_participants)
+      # prohibit one student to review his/her own artifact
+      next if TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
+
+      participant_hash_key = participants_hash[participants[rand_num].id]
+      participant_not_present_in_selected_participants = (!selected_participants.include? participants[rand_num].id)
+      if (participant_hash_key < maximum_reviews_per_student) && participant_not_present_in_selected_participants
+        modify_selected_participants_to_review(participants[rand_num].id, selected_participants, participants_hash)
+      end
+      update_participants_after_assigning_reviews(num_participants, maximum_reviews_per_student)
+    end
+  end
+
   def peer_review_strategy(assignment_id, review_strategy, participants_hash)
     teams = review_strategy.teams
     participants = review_strategy.participants
@@ -540,49 +571,23 @@ class ReviewMappingController < ApplicationController
     iterator = 0
     teams.each do |team|
       selected_participants = []
+      # REVIEW: num for last team can be different from other teams.
       if !team.equal? teams.last
-        # need to even out the # of reviews for teams
-        num_participants_this_team = number_of_participants_in_team(assignment_id, team)
-        while selected_participants.size < maximum_reviews_per_team
-          # if all outstanding participants are already in selected_participants, just break the loop.
-          break if selected_participants.size == participants.size - num_participants_this_team
-
-          # generate random number used as hash key in participants_hash
-          rand_num = get_random_number(iterator, participants_hash, num_participants)
-          
-          # prohibit one student to review his/her own artifact
-          next if TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
-          
-          participant_hash_key = participants_hash[participants[rand_num].id]
-          participant_not_present_in_selected_participants = (!selected_participants.include? participants[rand_num].id)
-          
-          if (participant_hash_key < maximum_reviews_per_student) and (participant_not_present_in_selected_participants)
-            modify_selected_participants_to_review(participants[rand_num].id, selected_participants, participants_hash)
-          end
-          # remove students who have already been assigned enough num of reviews out of participants array
-          participants.each do |participant|
-            if participants_hash[participant.id] == maximum_reviews_per_student
-              participants.delete_at(rand_num)
-              num_participants -= 1
-            end
-          end
-        end
+        even_out_reviews_among_teams(num_participants, maximum_reviews_per_student)
       else
-        # REVIEW: num for last team can be different from other teams.
         # prohibit one student to review his/her own artifact and selected_participants cannot include duplicate num
         participants.each do |participant|
           # avoid last team receives too many peer reviews
           ## why this selected_participants condition since it's empty
-          if !TeamsUser.exists?(team_id: team.id, user_id: participant.user_id) and selected_participants.size < maximum_reviews_per_team
+          if !TeamsUser.exists?(team_id: team.id, user_id: participant.user_id) && selected_participants.size < maximum_reviews_per_team
             modify_selected_participants_to_review(participant.id, selected_participants, participants_hash)
           end
         end
       end
-
       begin
-        selected_participants.each {|index| ReviewResponseMap.where(reviewee_id: team.id, reviewer_id: index, reviewed_object_id: assignment_id).first_or_create }
+        selected_participants.each { |index| ReviewResponseMap.where(reviewee_id: team.id, reviewer_id: index, reviewed_object_id: assignment_id).first_or_create }
       rescue StandardError
-        flash[:error] = "Automatic assignment of reviewer failed."
+        flash[:error] = 'Automatic assignment of reviewer failed.'
       end
       iterator += 1
     end

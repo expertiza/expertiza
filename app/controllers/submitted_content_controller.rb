@@ -38,7 +38,7 @@ class SubmittedContentController < ApplicationController
     @stage = @assignment.current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
   end
 
-  # view is called when @assignment.submission_allowed(topic_id) is false
+  # prevent_submission is called when @assignment.submission_allowed(topic_id) is false
   # so @can_submit should be false
   def prevent_submission
     @participant = AssignmentParticipant.find(params[:id])

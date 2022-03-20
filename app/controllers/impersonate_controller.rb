@@ -59,20 +59,8 @@ class ImpersonateController < ApplicationController
   # special_chars method-Initialises string with special characters /\?<>|&$# .
   # contains_special_chars method-converts it to regex and compares with the string
   # warn_for_special_chars takes the output from above method and flashes an error if there are any special characters(/\?<>|&$#) in the string
-  def check_if_special_char
-    if params[:user]
-      if warn_for_special_chars(params[:user][:name], 'Username')
-        redirect_back
-        return
-      end
-    end
-
-    if params[:impersonate]
-      if warn_for_special_chars(params[:impersonate][:name], 'Username')
-        redirect_back
-        return
-      end
-    end
+  def check_if_special_char(parameter)
+    redirect_back if params[parameter] && warn_for_special_chars(params[parameter][:name], 'Username')
   end
 
   # Checking if the username provided can be impersonated or not
@@ -141,7 +129,7 @@ class ImpersonateController < ApplicationController
       # Impersonate using form on /impersonate/start, based on the username provided, this method looks to see if that's possible by calling the do_main_operation method
       if params[:impersonate].nil?
         # Check if special chars /\?<>|&$# are used to avoid html tags or system command
-        check_if_special_char
+        check_if_special_char(:impersonate)
         # E1991 : check whether instructor is currently in anonymized view
         user = get_real_user(params[:user][:name]) 
         do_main_operation(user)
@@ -149,7 +137,7 @@ class ImpersonateController < ApplicationController
         # Impersonate a new account
         if !params[:impersonate][:name].empty?
           # check if special chars /\?<>|&$# are used to avoid html tags or system command
-          check_if_special_char
+          check_if_special_char(:impersonate)
           # E1991 : check whether instructor is currently in anonymized view
           user = get_real_user(params[:impersonate][:name])
           do_main_operation(user)

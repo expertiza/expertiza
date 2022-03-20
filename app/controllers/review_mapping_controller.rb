@@ -312,28 +312,11 @@ class ReviewMappingController < ApplicationController
 
   def delete_reviewer
     review_response_map = ReviewResponseMap.find_by(id: params[:id])
-    if review_response_map and Response.exists?(map_id: review_response_map.id)
-      # Iterate through every response and related answers and check whether they are empty or not
-      Response.where(map_id: review_response_map.id).each do |response|
-        unless response.additional_comment.empty?
-          flash[:error] = "This reviewer has already started the review. Hence, it cannot been deleted."
-          redirect_to :back
-          return
-        end
-        Answer.where(response_id: response.id).each do |answer|
-          if !answer.comments.empty? or (answer.answer != 0 and !answer.answer.nil?)
-            flash[:error] = "This reviewer has already started the review. Hence, it cannot been deleted."
-            redirect_to :back
-            return
-          end
-        end
-      end
-    end
-    if review_response_map
+    if review_response_map && !Response.exists?(map_id: review_response_map.id)
       review_response_map.destroy
-      flash[:success] = "The review mapping for \"" + review_response_map.reviewee.name + "\" and \"" + review_response_map.reviewer.name + "\" has been deleted."
+      flash[:success] = 'The review mapping for "' + review_response_map.reviewee.name + '" and "' + review_response_map.reviewer.name + '" has been deleted.'
     else
-      flash[:error] = "No review found."
+      flash[:error] = 'This review has already been done. It cannot been deleted.'
     end
     redirect_to :back
   end

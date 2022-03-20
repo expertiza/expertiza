@@ -72,7 +72,7 @@ class Cake < ScoredQuestion
     safe_join([''.html_safe, ''.html_safe], html.html_safe)
   end
 
-  # This Method returns the total cake score for each question.
+  # E2218: This Method returns the total cake score for each question.
   # Its called from the model new method in response controller.
   # @param review_type  [String]
   # @param questions [Array]

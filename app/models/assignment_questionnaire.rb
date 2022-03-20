@@ -14,6 +14,7 @@ class AssignmentQuestionnaire < ActiveRecord::Base
     return record.assignment, record.used_in_round unless record.nil?
   end
 
+  # E2218
   # @param assignment_id [Integer]
   # @return questions corresponding to the assignment_id and review questionnaire questions that are not headers
   def self.get_questions_by_assignment_id(assignment_id)

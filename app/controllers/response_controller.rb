@@ -1,21 +1,12 @@
 class ResponseController < ApplicationController
   include AuthorizationHelper
-
   include ResponseHelper
-  before_action :set_response, only: %i[update delete view]
 
   helper :submitted_content
   helper :file
-  before_action :access_calibration, only: [:show_calibration_results_for_student]
 
-  def access_calibration
-    response = Response.find(params[:id])
-    user_id = response.map.reviewer.user_id if response.map.reviewer
-    unless current_user_is_reviewer?(response.map, user_id)
-      flash[:error] = 'You are not allowed to view this calibration result'
-      redirect_to controller: 'student_review', action: 'list', id: user_id
-    end
-  end
+  before_action :authorize_show_calibration_results, only: %i[show_calibration_results_for_student]
+  before_action :set_response, only: %i[update delete view]
 
   def action_allowed?
     response = user_id = nil
@@ -38,6 +29,17 @@ class ResponseController < ApplicationController
       user_logged_in?
     end
   end
+
+  # E2218: Method to authorize if the reviewer can view the calibration results
+  def authorize_show_calibration_results
+    response = Response.find(params[:id])
+    user_id = response.map.reviewer.user_id if response.map.reviewer
+    unless current_user_is_reviewer?(response.map, user_id)
+      flash[:error] = 'You are not allowed to view this calibration result'
+      redirect_to controller: 'student_review', action: 'list', id: user_id
+    end
+  end
+
 
   # GET /response/json?response_id=xx
   def json

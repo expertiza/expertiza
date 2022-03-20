@@ -57,6 +57,7 @@ class StudentQuizzesController < ApplicationController
     quizzes
   end
 
+  # Stores the answers entered by the quiz taker and calculates the score based on the answers entered.
   def record_response
     map = ResponseMap.find(params[:map_id])
     # check if there is any response for this map_id. This is to prevent student take same quiz twice

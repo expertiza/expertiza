@@ -103,6 +103,36 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id, msg: msg
   end
 
+
+  # This method checks if the user is allowed to do any more reviews.
+  # First we find the number of reviews done by that reviewer for that assignment and we compare it with assignment policy
+  # if number of reviews are less than allowed than a user is allowed to request.
+  def review_allowed?(assignment, reviewer)
+    @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+    assignment.num_reviews_allowed > @review_mappings.size
+  end
+  
+  # This method checks if the user that is requesting a review has any outstanding reviews, if a user has more than 2
+  # outstanding reviews, he is not allowed to ask for more reviews.
+  # First we find the reviews done by that student, if he hasn't done any review till now, true is returned
+  # else we compute total reviews completed by adding each response
+  # we then check of the reviews in progress are less than assignment's policy
+  def check_outstanding_reviews?(assignment, reviewer)
+    @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+    @num_reviews_total = @review_mappings.size
+    if @num_reviews_total.zero?
+      true
+    else
+      @num_reviews_completed = 0
+      @review_mappings.each do |map|
+        @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
+      end
+      @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
+      @num_reviews_in_progress < Assignment.max_outstanding_reviews
+    end
+  end
+
+
   # assign the reviewer to review the assignment_team's submission. Only used in the assignments that do not have any topic
   # Parameter assignment_team is the candidate assignment team, it cannot be a team w/o submission, or have reviewed by reviewer, or reviewer's own team.
   # (guaranteed by candidate_assignment_teams_to_review method)
@@ -141,14 +171,22 @@ class ReviewMappingController < ApplicationController
   # and is used for instructor assigning reviewers in instructor-selected assignment.
   def assign_reviewer_dynamically
     assignment = Assignment.find(params[:assignment_id])
-    reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
-
+    participant = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
+    reviewer = participant.get_reviewer
     if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
       flash[:error] = 'No topic is selected.  Please go back and select a topic.'
     else
-      assign_on_topic_availability(assignment,reviewer)
+      if review_allowed?(assignment, reviewer)
+        if check_outstanding_reviews?(assignment, reviewer)
+          assign_on_topic_availability(assignment, reviewer)
+        else
+          flash[:error] = 'You cannot do more reviews when you have ' + Assignment.max_outstanding_reviews + 'reviews to do'
+        end
+      else
+        flash[:error] = 'You cannot do more than ' + assignment.num_reviews_allowed.to_s + ' reviews based on assignment policy'
+      end
     end
-    redirect_to controller: 'student_review', action: 'list', id: reviewer.id
+    redirect_to controller: 'student_review', action: 'list', id: participant.id
   end
 
   # assigns the quiz dynamically to the participant

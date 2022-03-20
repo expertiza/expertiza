@@ -196,15 +196,7 @@ class SignupSheetController < ApplicationController
     @use_bookmark = @assignment.use_bookmark
 
     if @assignment.is_intelligent
-      @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
-      signed_up_topics = []
-      @bids.each do |bid|
-        sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
-        signed_up_topics << sign_up_topic if sign_up_topic
-      end
-      signed_up_topics &= @sign_up_topics
-      @sign_up_topics -= signed_up_topics
-      @bids = signed_up_topics
+      compute_signup_topics team_id
     end
 
     @num_of_topics = @sign_up_topics.size
@@ -497,6 +489,26 @@ class SignupSheetController < ApplicationController
     # topic.assignment_id = params[:id]
     topic.save
     redirect_to_sign_up params[:id]
+  end
+
+  def compute_signup_topics(team_id)
+    @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
+    signed_up_topics = []
+    @bids.each do |bid|
+      sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
+
+      # Compute all signed up topics which were bid by this particular team
+      signed_up_topics << sign_up_topic if sign_up_topic
+    end
+
+    # signed_up_topics will have topics which are bid by this team and part of this assignment.
+    signed_up_topics &= @sign_up_topics
+
+    # @sign_up_topics will have all the topics of current assignment which are not bid by current team.
+    @sign_up_topics -= signed_up_topics 
+    
+    # @bids has all the topics from current @assignment.id and also bid by current team.
+    @bids = signed_up_topics
   end
 
   def update_max_choosers(topic)

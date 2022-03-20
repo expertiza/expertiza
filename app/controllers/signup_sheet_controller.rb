@@ -184,6 +184,8 @@ class SignupSheetController < ApplicationController
   end
 
   def list
+
+    # Find participant, assignment participant is associated with, team which participant belongs to etc.
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
     @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
@@ -195,6 +197,7 @@ class SignupSheetController < ApplicationController
     team_id = @participant.team.try(:id)
     @use_bookmark = @assignment.use_bookmark
 
+    # is_intelligent indicates whether topics are to be bid on, and then the "intelligent assignment" algorithm will assign teams to topics
     if @assignment.is_intelligent
       compute_signup_topics team_id
     end
@@ -205,6 +208,7 @@ class SignupSheetController < ApplicationController
     @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
 
     unless @assignment.due_dates.find_by(deadline_type_id: 1).nil?
+      # show_action sis false, if no staggered deadline and due date has been already passed.
       @show_actions = false if !@assignment.staggered_deadline? && (@assignment.due_dates.find_by(deadline_type_id: 1).due_at < Time.now)
 
       # Find whether the user has signed up for any topics; if so the user won't be able to

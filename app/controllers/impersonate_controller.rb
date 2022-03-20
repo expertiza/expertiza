@@ -107,16 +107,13 @@ class ImpersonateController < ApplicationController
     end
   rescue StandardError
     flash[:error] = @message
-    redirect_to :back
+    redirect_back
   end
 
   # Main operation
   def do_main_operation(user)
-    if user
-      check_if_user_impersonateable
-    else
-      display_error_msg
-    end
+    check_if_user_impersonateable if user
+    display_error_msg
   end
 
   # Main operation, method used to break the functions in impersonate controller and bring out 2 functionalities at same level,
@@ -159,7 +156,7 @@ class ImpersonateController < ApplicationController
                   controller: AuthHelper.get_home_controller(session[:user])
     rescue StandardError
       flash[:error] = @message
-      redirect_to :back
+      redirect_back
     end
   end
 end

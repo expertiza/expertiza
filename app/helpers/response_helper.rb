@@ -1,4 +1,6 @@
 module ResponseHelper
+  # E2218: this module contains methods that are used in response_controller class
+
   # E-1973 - helper method to check if the current user is the reviewer
   # if the reviewer is an assignment team, we have to check if the current user is on the team
   def current_user_is_reviewer?(map, _reviewer_id)

@@ -51,8 +51,8 @@ class Assessment360Controller < ApplicationController
     # instructor grade is stored in the team model, which is found by finding the user's team for the assignment
     team_id = TeamsUser.team_id(assignment_id, user_id)
     team = Team.find(team_id)
+    return if team[:grade_for_submission].nil?
     @assignment_grades[cp.id][assignment_id] = team[:grade_for_submission]
-    return if @assignment_grades[cp.id][assignment_id].nil?
 
     @final_grades[cp.id] += @assignment_grades[cp.id][assignment_id]
   end
@@ -84,6 +84,7 @@ class Assessment360Controller < ApplicationController
   def index
     calc_teammate_count
 
+    # Calculate avg review score
     @meta_review = reviews_for_type('meta')
     @meta_review[:aggregate_score] = calc_aggregate_score(@meta_review)
     @meta_review[:class_avg] = calc_class_avg_score(@meta_review)
@@ -94,6 +95,8 @@ class Assessment360Controller < ApplicationController
     @teammate_review[:class_avg] = calc_class_avg_score(@teammate_review)
     @teammate_review[:aggregate_score_class_avg] = calc_aggregate_score_class_avg(@teammate_review)
     course_student_grade_summary
+    @peer_review_scores[:class_avg] = calc_class_avg_score(@peer_review_scores)
+    @assignment_grades[:class_avg] = calc_class_avg_score(@assignment_grades)
   end
 
   private
@@ -109,47 +112,47 @@ class Assessment360Controller < ApplicationController
       insure_existence_of(@course_participants, @course)
     end
 
+    # compute review score based on the type of all assignments for all students and
+    # return a map with the review score with cp_id and assignment_id
+    # as key. example return object structure
+    # review = {
+    #   STUDENT_1_ID: {
+    #     ASSIGNMENT_1_ID: 95,
+    #     ASSIGNMENT_2_ID: 70,
+    #     ASSIGNMENT_3_ID: 90
+    #   },
+    #   STUDENT_2_ID: {
+    #     ASSIGNMENT_2_ID: 80,
+    #     ASSIGNMENT_4_ID: 70
+    #   }
+    # }
+    # accessing the score from the output object,
+    # review[STUDENT_1_ID][ASSIGNMENT_1_ID] = 95
     def reviews_for_type(type)
       reviews_variable = type + '_reviews'
       review = {}
 
-      review_by_user_id_and_assignment = reviews_by_user_id_and_assignment(reviews_variable)
+      # Create a map with user_id and assignment_id as key and reviews as value
+      reviews_by_user_id_and_assignment = reviews_by_user_id_and_assignment(reviews_variable)
 
       @course_participants.each do |cp|
         review[cp.id] = {}
-        # cp_assignment_count = 0
-        # total_cp_review_score = 0
-        # for each assignment
-        # [aggregrate_review_grades_per_stu, review_count_per_stu] --> [0, 0]
-        # instance_variable_set("@#{type}_review_info_per_stu", [0, 0])
-        # review[cp.id] = {}
         @assignments.each do |assignment|
           # skip if the student is not participated in any assignment
-          next if review_by_user_id_and_assignment[cp.user_id].nil?
+          next if reviews_by_user_id_and_assignment[cp.user_id].nil?
 
           # skip if the student is not participated in the current assignment
-          next if review_by_user_id_and_assignment[cp.user_id][assignment.id].nil?
+          next if reviews_by_user_id_and_assignment[cp.user_id][assignment.id].nil?
 
-          reviews = review_by_user_id_and_assignment[cp.user_id][assignment.id]
-          # score = calc_avg_score(reviews)
-
-          # skip if the student does not have any review for the assignment
-          # next if score.nil?
-
-          # cp_assignment_count += 1
-          # total_cp_review_score += score
+          reviews = reviews_by_user_id_and_assignment[cp.user_id][assignment.id]
           score = calc_avg_score(reviews)
+
+          # Don't set score as nil because, this will create a entry in the review map with cp.id and assignment.id as
+          # key and nil as value. This will make it easy to count the number of assignments attempted while calculating
+          # class average and aggregate score
           review[cp.id][assignment.id] = score unless score.nil?
         end
-        # calculate average grade for each student on all assignments in this course
-        # avg_review_calc_per_student(cp, instance_variable_get("@#{type}_review_info_per_stu"), review)
-        # if cp_assignment_count > 0
-        #   review[cp.id][:aggregate_score] =(total_cp_review_score * 1.0 / cp_assignment_count).round
-        # end
-
       end
-      # avoid divide by zero error
-      # overall_review_count(@assignments, instance_variable_get("@overall_#{type}_review_count"))
       return review
     end
 
@@ -163,7 +166,7 @@ class Assessment360Controller < ApplicationController
     def reviews_by_user_id_and_assignment(reviews_variable)
       reviews = {}
       @assignments.each do |assignment|
-        assignment.participants.all.each do |assignment_participant|
+        assignment.participants.each do |assignment_participant|
           reviews[assignment_participant.user_id] = {} unless reviews.key?(assignment_participant.user_id)
           assignment_reviews = assignment_participant.public_send(reviews_variable) if assignment_participant.respond_to? reviews_variable
           reviews[assignment_participant.user_id][assignment.id] = assignment_reviews
@@ -174,7 +177,7 @@ class Assessment360Controller < ApplicationController
 
     def calc_avg_score(reviews)
       # If a student has not taken an assignment or if they have not received any grade for the same,
-      # assign it as 0 instead of leaving it blank. This helps in easier calculation of overall grade
+      # assign it as nil(not returning anything). This helps in easier calculation of overall grade
       grades = 0
       # Check if they person has gotten any review for the assignment
       if reviews.count > 0
@@ -192,6 +195,12 @@ class Assessment360Controller < ApplicationController
       end
     end
 
+    # Calculate average review score of all the assignment completed by the student.
+    # Return object structure,
+    # aggregate_scores = {
+    #   STUDENT_ID_1: 100,
+    #   STUDENT_ID_2: 98
+    # }
     def calc_aggregate_score(review)
       aggregate_scores = {}
       review.each do |cp_id, assignment_review_scores_map|
@@ -200,11 +209,16 @@ class Assessment360Controller < ApplicationController
       return aggregate_scores
     end
 
+    # Calculate average review score of all students for each assignment
+    # Return object structure,
+    # assignment_review_scores = {
+    #   ASSIGNMENT_1_ID: 98,
+    #   ASSIGNMENT_2_ID: 97
+    # }
     def calc_class_avg_score(review)
       assignment_review_scores = {}
       total_review_scores = {}
       review_counts = {}
-
       review.each do |cp_id, assignment_review_scores_map|
         assignment_review_scores_map.each do |assignment_id, score|
           total_review_scores[assignment_id] = 0 unless total_review_scores.key?(assignment_id)
@@ -215,12 +229,13 @@ class Assessment360Controller < ApplicationController
       end
 
       @assignments.each do |assignment|
-        assignment_review_scores[assignment.id] = (total_review_scores[assignment.id] * 1.0 / review_counts[assignment.id]).round if review_counts.key?(assignment.id)
+        assignment_review_scores[assignment.id] = (total_review_scores[assignment.id] * 1.0 / review_counts[assignment.id]).round(2) if review_counts.key?(assignment.id)
       end
 
       return assignment_review_scores
     end
 
+    # Calculate average aggregate review score of all students
     def calc_aggregate_score_class_avg(review)
       return (review[:aggregate_score].values.sum * 1.0 / review[:aggregate_score].size).round unless review[:aggregate_score].empty?
     end

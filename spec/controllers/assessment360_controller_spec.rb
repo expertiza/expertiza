@@ -23,8 +23,10 @@ describe Assessment360Controller do
           id: 1,
           name: 'test_assignment',
           instructor_id: 2,
-          participants: [build(:participant, id: 1, user_id: 1, assignment: assignment)], course_id: 1)
+          participants: [build(:participant, id: 1, user_id: 1, assignment: assignment)],
+          course_id: 1)
   end
+  let(:participants_list) { [build(:participant, id: 1, user_id: 1, assignment: assignment)] }
   let(:assignment_with_participants_list) { [assignment_with_participants] }
   let(:empty_teammate_review) { [] }
   let(:empty_meta_review) { [] }
@@ -118,7 +120,7 @@ describe Assessment360Controller do
         expect(response.status).to eq(200)
         expect(response).to render_template(:all_students_all_reviews)
         returned_teammate_review = controller.instance_variable_get(:@teammate_review)
-        expect(returned_teammate_review[nil]).to eq({})
+        expect(returned_teammate_review[course_participant.id]).to eq({})
         returned_meta_review = controller.instance_variable_get(:@meta_review)
         expect(returned_meta_review[nil]).to eq({})
       end
@@ -128,7 +130,8 @@ describe Assessment360Controller do
         allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
         allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
         allow(StudentTask).to receive(:teamed_students).with(course_participant.user).and_return(student1)
-        allow(assignment_with_participants.participants).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
+        allow(assignment_with_participants).to receive(:participants).and_return(participants_list)
+        allow(participants_list).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(course_participant).to receive(:teammate_reviews).and_return(empty_teammate_review)
         allow(course_participant).to receive(:metareviews).and_return(empty_meta_review)
         request_params = { course_id: 1 }
@@ -148,7 +151,8 @@ describe Assessment360Controller do
         allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
         allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
         allow(StudentTask).to receive(:teamed_students).with(course_participant.user).and_return(student1)
-        allow(assignment_with_participants.participants).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
+        allow(assignment_with_participants).to receive(:participants).and_return(participants_list)
+        allow(participants_list).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(course_participant).to receive(:teammate_reviews).and_return(teammate_review)
         allow(course_participant).to receive(:metareviews).and_return(meta_review)
         request_params = { course_id: 1 }
@@ -158,7 +162,7 @@ describe Assessment360Controller do
         expect(response.status).to eq(200)
         expect(response).to render_template(:all_students_all_reviews)
         returned_teammate_review = controller.instance_variable_get(:@teammate_review)
-        expect(returned_teammate_review[nil][1]).to eq('95%')
+        expect(returned_teammate_review[course_participant.id][1]).to eq('95%')
         returned_meta_review = controller.instance_variable_get(:@meta_review)
         expect(returned_meta_review[nil][1]).to eq('100%')
       end
@@ -217,7 +221,8 @@ describe Assessment360Controller do
         allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
         allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
         allow(assignment_list).to receive(:reject).and_return(assignment_list)
-        allow(assignment_with_participants.participants).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
+        allow(assignment_with_participants).to receive(:participants).and_return(participants_list)
+        allow(participants_list).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(signed_up_team).to receive(:topic_id).with(assignment.id, course_participant.user_id).and_return(1)
         allow(SignUpTopic).to receive(:find_by).with(id: nil).and_return(topic)
         request_params = { course_id: 1 }
@@ -227,7 +232,7 @@ describe Assessment360Controller do
         expect(response.status).to eq(200)
         expect(response).to render_template(:course_student_grade_summary)
         returned_assignment_grades = controller.instance_variable_get(:@assignment_grades)
-        expect(returned_assignment_grades[nil]).to eq({})
+        expect(returned_assignment_grades[course_participant.id]).to eq({})
         returned_peer_review_scores = controller.instance_variable_get(:@peer_review_scores)
         expect(returned_peer_review_scores[nil]).to eq({})
         returned_final_grades = controller.instance_variable_get(:@final_grades)
@@ -239,7 +244,8 @@ describe Assessment360Controller do
         allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
         allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
         allow(assignment_list).to receive(:reject).and_return(assignment_list)
-        allow(assignment_with_participants.participants).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
+        allow(assignment_with_participants).to receive(:participants).and_return(participants_list)
+        allow(participants_list).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(SignedUpTeam).to receive(:topic_id).with(assignment.id, course_participant.user_id).and_return(1)
         allow(SignUpTopic).to receive(:find_by).with(id: 1).and_return(topic)
         allow(TeamsUser).to receive(:team_id).with(assignment.id, course_participant.user_id).and_return(1)
@@ -252,7 +258,7 @@ describe Assessment360Controller do
         expect(response.status).to eq(200)
         expect(response).to render_template(:course_student_grade_summary)
         returned_topics = controller.instance_variable_get(:@topics)
-        expect(returned_topics[nil][1]).to eq(topic)
+        expect(returned_topics[course_participant.id][1]).to eq(topic)
         returned_assignment_grades = controller.instance_variable_get(:@assignment_grades)
         expect(returned_assignment_grades[nil][1]).to eq(nil)
         returned_peer_review_scores = controller.instance_variable_get(:@peer_review_scores)
@@ -266,7 +272,8 @@ describe Assessment360Controller do
         allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
         allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
         allow(assignment_list).to receive(:reject).and_return(assignment_list)
-        allow(assignment_with_participants.participants).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
+        allow(assignment_with_participants).to receive(:participants).and_return(participants_list)
+        allow(participants_list).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(SignedUpTeam).to receive(:topic_id).with(assignment.id, course_participant.user_id).and_return(1)
         allow(SignUpTopic).to receive(:find_by).with(id: 1).and_return(topic)
         allow(TeamsUser).to receive(:team_id).with(assignment.id, course_participant.user_id).and_return(1)
@@ -280,7 +287,7 @@ describe Assessment360Controller do
         expect(response.status).to eq(200)
         expect(response).to render_template(:course_student_grade_summary)
         returned_topics = controller.instance_variable_get(:@topics)
-        expect(returned_topics[nil][1]).to eq(topic)
+        expect(returned_topics[course_participant.id][1]).to eq(topic)
         returned_assignment_grades = controller.instance_variable_get(:@assignment_grades)
         expect(returned_assignment_grades[nil][1]).to eq(95)
         returned_peer_review_scores = controller.instance_variable_get(:@peer_review_scores)
@@ -353,7 +360,8 @@ describe Assessment360Controller do
         allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
         allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
         allow(assignment_list).to receive(:reject).and_return(assignment_list)
-        allow(assignment_with_participants.participants).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
+        allow(assignment_with_participants).to receive(:participants).and_return(participants_list)
+        allow(participants_list).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(SignedUpTeam).to receive(:topic_id).with(assignment.id, course_participant.user_id).and_return(1)
         allow(SignUpTopic).to receive(:find_by).with(id: 1).and_return(topic)
         allow(TeamsUser).to receive(:team_id).with(assignment.id, course_participant.user_id).and_return(1)
@@ -367,10 +375,10 @@ describe Assessment360Controller do
         expect(response.status).to eq(200)
         expect(response).to render_template(:course_student_grade_summary)
         returned_topics = controller.instance_variable_get(:@topics)
-        expect(returned_topics[nil][1]).to eq(topic)
+        expect(returned_topics[course_participant.id][1]).to eq(topic)
         returned_assignment_grades = controller.instance_variable_get(:@assignment_grades)
         returned_peer_review_scores = controller.instance_variable_get(:@peer_review_scores)
-        expect(returned_peer_review_scores[nil][1]).to eq(90)
+        expect(returned_peer_review_scores[course_participant.id][1]).to eq(90)
         returned_final_grades = controller.instance_variable_get(:@final_grades)
       end
     end

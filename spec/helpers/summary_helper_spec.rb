@@ -54,6 +54,21 @@ describe 'SummaryHelper' do
     end
   end
 
+  describe '#break_up_comments_to_sentences' do
+    context 'when the question_answers is not nil' do
+      it 'add the comment to an array to be converted as a json request' do
+        comments = @summary.break_up_comments_to_sentences([answer])
+        expect(comments.length).to be(2)
+      end
+    end
+    context 'when the question_answers is nil' do
+      it 'returns an empty array' do
+        comments = @summary.break_up_comments_to_sentences([])
+        expect(comments.length).to be(0)
+      end
+    end
+  end
+
   describe '#calculate_round_score' do
    context 'when criteria not available' do
      it 'returns 0' do

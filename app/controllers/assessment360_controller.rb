@@ -166,7 +166,7 @@ class Assessment360Controller < ApplicationController
     def reviews_by_user_id_and_assignment(reviews_variable)
       reviews = {}
       @assignments.each do |assignment|
-        assignment.participants.all.each do |assignment_participant|
+        assignment.participants.each do |assignment_participant|
           reviews[assignment_participant.user_id] = {} unless reviews.key?(assignment_participant.user_id)
           assignment_reviews = assignment_participant.public_send(reviews_variable) if assignment_participant.respond_to? reviews_variable
           reviews[assignment_participant.user_id][assignment.id] = assignment_reviews

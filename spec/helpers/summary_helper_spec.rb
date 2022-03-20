@@ -4,6 +4,7 @@ require 'rest_client'
 
 describe 'SummaryHelper' do
   let(:answer) { Answer.new(answer: 1, comments: 'This is a sentence. This is another sentence.', question_id: 1) }
+  let(:answer1){ Answer.new(answer: 2, comments: 'This is a sentence1. This is another sentence1.', question_id: 2)}
   let(:question) {build(:question, weight:1, type:"Criterion")}
   let(:avg_scores_by_criterion) { {a:2.345} }
 
@@ -65,6 +66,25 @@ describe 'SummaryHelper' do
       it 'returns an empty array' do
         comments = @summary.break_up_comments_to_sentences([])
         expect(comments.length).to be(0)
+      end
+    end
+  end
+
+  describe '#calculate_avg_score_by_criterion' do
+    context 'when question_answers are available' do
+      it 'calculate percentage question_score  & no float' do
+        expect(@summary.calculate_avg_score_by_criterion([answer,answer1], 3)).to be_within(0).of(50)
+        end
+    end
+    context 'when question_answers are not available' do
+      it 'gives question scores 0.0' do
+        expect(@summary.calculate_avg_score_by_criterion([], 3)).to eq(0.0)
+      end
+    end
+
+    context 'when q_max_score = 0' do
+      it 'gives pure question_score' do
+        expect(@summary.calculate_avg_score_by_criterion([answer,answer1], 0)).to eq(3.0)
       end
     end
   end

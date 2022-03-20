@@ -83,7 +83,8 @@ describe TeammateReviewResponseMap do
     end
     it 'returns default questionnaire when no questionnaire is found for duty' do
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, duty_id: 1).and_return([])
-      allow(assignment.questionnaires).to receive(:find_by).with(type: 'TeammateReviewQuestionnaire').and_return(questionnaire)
+      allow(assignment).to receive(:questionnaires).and_return(questionnaire)
+      allow(questionnaire).to receive(:find_by).with(type: 'TeammateReviewQuestionnaire').and_return(questionnaire)
       expect(teammate_review_response_map.questionnaire_by_duty(1)).to eq questionnaire
     end
   end

@@ -121,16 +121,17 @@
     <%end%>
         <tr>
             <td><b>Class Average</b></td>
-            <td></td>
+            <td class="teammate_count"></td>
             <% @assignments.each do |assignment|%>
                 <td class="meta_review"><%= format_percentage(@meta_review[:class_avg][assignment.id]) unless @meta_review.nil? %></td>
                 <td class="teammate_review"><%= format_percentage(@teammate_review[:class_avg][assignment.id]) unless @teammate_review.nil? %></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td class="topic"></td>
+                <td class="peer_score"><%= format_score(@peer_review_scores[:class_avg][assignment.id]) %></td>
+                <td class="instructor_grade"><%= format_score(@assignment_grades[:class_avg][assignment.id]) %> </td>
             <% end%>
           <td class="meta_review"><%= format_percentage(@meta_review[:aggregate_score_class_avg]) unless @meta_review.nil? %></td>
           <td class="teammate_review"><%= format_percentage(@teammate_review[:aggregate_score_class_avg]) unless @teammate_review.nil? %></td>
+          <td class="tot_instructor_grade"><%= format_score(@final_grades.inject(0) {|sum, (k, v)| sum += v}) %> </td>
           <td></td>
         </tr>
     </table>

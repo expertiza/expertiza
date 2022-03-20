@@ -211,7 +211,7 @@ pg_data
 
 .projectile
 .ruby-gemset
-.ruby-version
+# .ruby-version
 mysql2psql.yml
 *.pem
 t.csv

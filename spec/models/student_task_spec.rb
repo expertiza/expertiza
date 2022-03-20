@@ -143,7 +143,7 @@ describe StudentTask do
       expect(student_task.revision?).to eq(true)
     end
 
-    it 'returns true if metareviews given is true' do
+    it 'returns true if meta_reviews given is true' do
       allow(student_task).to receive(:content_submitted_in_current_stage?).and_return(false)
       allow(student_task).to receive(:reviews_given_in_current_stage?).and_return(false)
       allow(student_task).to receive(:metareviews_given_in_current_stage?).and_return(true)

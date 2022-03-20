@@ -75,10 +75,10 @@ describe AssignmentParticipant do
     end
   end
 
-  describe '#metareviews' do
+  describe '#meta_reviews' do
     it 'returns corresponding metareview responses given by current participant' do
       allow(MetareviewResponseMap).to receive(:assessments_for).with(participant).and_return([response])
-      expect(participant.metareviews).to eq([response])
+      expect(participant.meta_reviews).to eq([response])
     end
   end
 

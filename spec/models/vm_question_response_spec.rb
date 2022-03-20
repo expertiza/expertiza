@@ -102,7 +102,7 @@ describe VmQuestionResponse  do
     context 'when initialized with a meta review type' do
       it 'adds reviews' do
         response = VmQuestionResponse.new(metareview_questionnaire, assignment, 1)
-        allow(participant).to receive(:metareviews).and_return(reviews)
+        allow(participant).to receive(:meta_reviews).and_return(reviews)
         allow(MetareviewResponseMap).to receive(:find_by).with(id: 1).and_return(double('MetareviewResponseMap', reviewer_id: 1))
         response.add_reviews(participant, team, false)
         expect(response.list_of_reviews.size).to eq(1)

@@ -1,4 +1,6 @@
 class Assessment360Controller < ApplicationController
+  before_action :init_data
+
   include GradesHelper
   include AuthorizationHelper
   include Scoring
@@ -7,79 +9,6 @@ class Assessment360Controller < ApplicationController
     current_user_has_ta_privileges?
   end
 
-  # Find the list of all students and assignments pertaining to the course.
-  # This data is used to compute the metareview and teammate review scores.
-  def all_students_all_reviews
-    course = Course.find(params[:course_id])
-    @assignments = course.assignments.reject(&:is_calibrated).reject { |a| a.participants.empty? }
-    @course_participants = course.get_participants
-    insure_existence_of(@course_participants, course)
-    # hashes for view
-    @meta_review = {}
-    @teammate_review = {}
-    @teamed_count = {}
-    # for course
-    # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
-    # @overall_teammate_review_count = {assgt_id1: 1, assgt_id2: 2, ...}
-    %w[teammate meta].each do |type|
-      instance_variable_set("@overall_#{type}_review_grades", {})
-      instance_variable_set("@overall_#{type}_review_count", {})
-    end
-    @course_participants.each do |cp|
-      # for each assignment
-      # [aggregrate_review_grades_per_stu, review_count_per_stu] --> [0, 0]
-      %w[teammate meta].each { |type| instance_variable_set("@#{type}_review_info_per_stu", [0, 0]) }
-      students_teamed = StudentTask.teamed_students(cp.user)
-      @teamed_count[cp.id] = students_teamed[course.id].try(:size).to_i
-      @assignments.each do |assignment|
-        @meta_review[cp.id] = {} unless @meta_review.key?(cp.id)
-        @teammate_review[cp.id] = {} unless @teammate_review.key?(cp.id)
-        assignment_participant = assignment.participants.find_by(user_id: cp.user_id)
-        next if assignment_participant.nil?
-
-        teammate_reviews = assignment_participant.teammate_reviews
-        meta_reviews = assignment_participant.metareviews
-        calc_overall_review_info(assignment,
-                                 cp,
-                                 teammate_reviews,
-                                 @teammate_review,
-                                 @overall_teammate_review_grades,
-                                 @overall_teammate_review_count,
-                                 @teammate_review_info_per_stu)
-        calc_overall_review_info(assignment,
-                                 cp,
-                                 meta_reviews,
-                                 @meta_review,
-                                 @overall_meta_review_grades,
-                                 @overall_meta_review_count,
-                                 @meta_review_info_per_stu)
-      end
-      # calculate average grade for each student on all assignments in this course
-      avg_review_calc_per_student(cp, @teammate_review_info_per_stu, @teammate_review)
-      avg_review_calc_per_student(cp, @meta_review_info_per_stu, @meta_review)
-    end
-    # avoid divide by zero error
-    overall_review_count(@assignments, @overall_teammate_review_count, @overall_meta_review_count)
-  end
-
-  # to avoid divide by zero error
-  def overall_review_count(assignments, overall_teammate_review_count, overall_meta_review_count)
-    assignments.each do |assignment|
-      temp_count = overall_teammate_review_count[assignment.id]
-      overall_teammate_review_count[assignment.id] = 1 if temp_count.nil? || temp_count.zero?
-      temp_count = overall_meta_review_count[assignment.id]
-      overall_meta_review_count[assignment.id] = 1 if temp_count.nil? || temp_count.zero?
-    end
-  end
-
-  # Calculate the overall average review grade that a student has gotten from their teammate(s) and instructor(s)
-  def avg_review_calc_per_student(cp, review_info_per_stu, review)
-    # check to see if the student has been given a review
-    if review_info_per_stu[1] > 0
-      temp_avg_grade = review_info_per_stu[0] * 1.0 / review_info_per_stu[1]
-      review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'
-    end
-  end
 
   # Find the list of all students and assignments pertaining to the course.
   # This data is used to compute the instructor assigned grade and peer review scores.
@@ -90,10 +19,6 @@ class Assessment360Controller < ApplicationController
     @assignment_grades = {}
     @peer_review_scores = {}
     @final_grades = {}
-    course = Course.find(params[:course_id])
-    @assignments = course.assignments.reject(&:is_calibrated).reject { |a| a.participants.empty? }
-    @course_participants = course.get_participants
-    insure_existence_of(@course_participants, course)
     @course_participants.each do |cp|
       @topics[cp.id] = {}
       @assignment_grades[cp.id] = {}
@@ -126,49 +51,10 @@ class Assessment360Controller < ApplicationController
     # instructor grade is stored in the team model, which is found by finding the user's team for the assignment
     team_id = TeamsUser.team_id(assignment_id, user_id)
     team = Team.find(team_id)
+    return if team[:grade_for_submission].nil?
     @assignment_grades[cp.id][assignment_id] = team[:grade_for_submission]
-    return if @assignment_grades[cp.id][assignment_id].nil?
 
     @final_grades[cp.id] += @assignment_grades[cp.id][assignment_id]
-  end
-
-  def insure_existence_of(course_participants, course)
-    if course_participants.empty?
-      flash[:error] = "There is no course participant in course #{course.name}"
-      redirect_to(:back)
-    end
-  end
-
-  # The function populates the hash value for all students for all the reviews that they have gotten.
-  # I.e., Teammate and Meta for each of the assignments that they have taken
-  # This value is then used to display the overall teammate_review and meta_review grade in the view
-  def calc_overall_review_info(assignment,
-                               course_participant,
-                               reviews,
-                               hash_per_stu,
-                               overall_review_grade_hash,
-                               overall_review_count_hash,
-                               review_info_per_stu)
-    # If a student has not taken an assignment or if they have not received any grade for the same,
-    # assign it as 0 instead of leaving it blank. This helps in easier calculation of overall grade
-    overall_review_grade_hash[assignment.id] = 0 unless overall_review_grade_hash.key?(assignment.id)
-    overall_review_count_hash[assignment.id] = 0 unless overall_review_count_hash.key?(assignment.id)
-    grades = 0
-    # Check if they person has gotten any review for the assignment
-    if reviews.count > 0
-      reviews.each { |review| grades += review.average_score.to_i }
-      avg_grades = (grades * 1.0 / reviews.count).round
-      hash_per_stu[course_participant.id][assignment.id] = avg_grades.to_s + '%'
-    end
-    # Calculate sum of averages to get student's overall grade
-    if avg_grades && (grades >= 0)
-      # for each assignment
-      review_info_per_stu[0] += avg_grades
-      review_info_per_stu[1] += 1
-      # for course
-      overall_review_grade_hash[assignment.id] += avg_grades
-      overall_review_count_hash[assignment.id] += 1
-    end
   end
 
   # The peer review score is taken from the questions for the assignment
@@ -180,13 +66,177 @@ class Assessment360Controller < ApplicationController
   end
 
   def format_topic(topic)
-    topic.nil? ? '-' : topic.format_for_display
+    topic.nil? ? '–' : topic.format_for_display
   end
 
   def format_score(score)
-    score.nil? ? '-' : score
+    score.nil? ? '–' : score
+  end
+
+  def format_percentage(score)
+    score.nil? ? '–' : score.to_s + '%'
   end
 
   helper_method :format_score
   helper_method :format_topic
+  helper_method :format_percentage
+
+  def index
+    calc_teammate_count
+
+    # Calculate avg review score
+    @meta_review = reviews_for_type('meta')
+    @meta_review[:aggregate_score] = calc_aggregate_score(@meta_review)
+    @meta_review[:class_avg] = calc_class_avg_score(@meta_review)
+    @meta_review[:aggregate_score_class_avg] = calc_aggregate_score_class_avg(@meta_review)
+
+    @teammate_review = reviews_for_type('teammate')
+    @teammate_review[:aggregate_score] = calc_aggregate_score(@teammate_review)
+    @teammate_review[:class_avg] = calc_class_avg_score(@teammate_review)
+    @teammate_review[:aggregate_score_class_avg] = calc_aggregate_score_class_avg(@teammate_review)
+    course_student_grade_summary
+    @peer_review_scores[:class_avg] = calc_class_avg_score(@peer_review_scores)
+    @assignment_grades[:class_avg] = calc_class_avg_score(@assignment_grades)
+  end
+
+  private
+    def init_data
+      @course = Course.find(params[:course_id])
+
+      # Load participants along with the assignments(eager loading)
+      # TODO: What does calibrate does?
+      # Reject assignments with empty participants
+      @assignments = @course.assignments.includes([:participants]).reject(&:is_calibrated).reject { |a| a.participants.empty? }
+
+      @course_participants = @course.get_participants
+      insure_existence_of(@course_participants, @course)
+    end
+
+    # compute review score based on the type of all assignments for all students and
+    # return a map with the review score with cp_id and assignment_id
+    # as key. example return object structure
+    # review = {
+    #   STUDENT_1_ID: {
+    #     ASSIGNMENT_1_ID: 95,
+    #     ASSIGNMENT_2_ID: 70,
+    #     ASSIGNMENT_3_ID: 90
+    #   },
+    #   STUDENT_2_ID: {
+    #     ASSIGNMENT_2_ID: 80,
+    #     ASSIGNMENT_4_ID: 70
+    #   }
+    # }
+    # accessing the score from the output object,
+    # review[STUDENT_1_ID][ASSIGNMENT_1_ID] = 95
+    def reviews_for_type(type)
+      reviews_variable = type + '_reviews'
+      review = {}
+
+      # Create a map with user_id and assignment_id as key and reviews as value
+      reviews_by_user_id_and_assignment = reviews_by_user_id_and_assignment(reviews_variable)
+
+      @course_participants.each do |cp|
+        review[cp.id] = {}
+        @assignments.each do |assignment|
+          # skip if the student is not participated in any assignment
+          next if reviews_by_user_id_and_assignment[cp.user_id].nil?
+
+          # skip if the student is not participated in the current assignment
+          next if reviews_by_user_id_and_assignment[cp.user_id][assignment.id].nil?
+
+          reviews = reviews_by_user_id_and_assignment[cp.user_id][assignment.id]
+          score = calc_avg_score(reviews)
+
+          # Don't set score as nil because, this will create a entry in the review map with cp.id and assignment.id as
+          # key and nil as value. This will make it easy to count the number of assignments attempted while calculating
+          # class average and aggregate score
+          review[cp.id][assignment.id] = score unless score.nil?
+        end
+      end
+      return review
+    end
+
+    def insure_existence_of(course_participants, course)
+      if course_participants.empty?
+        flash[:error] = "There is no course participant in course #{course.name}"
+        redirect_to(:back)
+      end
+    end
+
+    def reviews_by_user_id_and_assignment(reviews_variable)
+      reviews = {}
+      @assignments.each do |assignment|
+        assignment.participants.each do |assignment_participant|
+          reviews[assignment_participant.user_id] = {} unless reviews.key?(assignment_participant.user_id)
+          assignment_reviews = assignment_participant.public_send(reviews_variable) if assignment_participant.respond_to? reviews_variable
+          reviews[assignment_participant.user_id][assignment.id] = assignment_reviews
+        end
+      end
+      return reviews
+    end
+
+    def calc_avg_score(reviews)
+      # If a student has not taken an assignment or if they have not received any grade for the same,
+      # assign it as nil(not returning anything). This helps in easier calculation of overall grade
+      grades = 0
+      # Check if they person has gotten any review for the assignment
+      if reviews.count > 0
+        reviews.each { |review| grades += review.average_score.to_i }
+        return (grades * 1.0 / reviews.count).round
+      end
+    end
+
+    # TODO: https://github.com/sak007/expertiza/issues/2
+    def calc_teammate_count
+      @teamed_count = {}
+      @course_participants.each do |cp|
+        students_teamed = StudentTask.teamed_students(cp.user)
+        @teamed_count[cp.id] = students_teamed[@course.id].try(:size).to_i
+      end
+    end
+
+    # Calculate average review score of all the assignment completed by the student.
+    # Return object structure,
+    # aggregate_scores = {
+    #   STUDENT_ID_1: 100,
+    #   STUDENT_ID_2: 98
+    # }
+    def calc_aggregate_score(review)
+      aggregate_scores = {}
+      review.each do |cp_id, assignment_review_scores_map|
+        aggregate_scores[cp_id] = (assignment_review_scores_map.inject(0) {|sum , (k,v)| sum += v } * 1.0 / assignment_review_scores_map.size).round unless assignment_review_scores_map.empty?
+      end
+      return aggregate_scores
+    end
+
+    # Calculate average review score of all students for each assignment
+    # Return object structure,
+    # assignment_review_scores = {
+    #   ASSIGNMENT_1_ID: 98,
+    #   ASSIGNMENT_2_ID: 97
+    # }
+    def calc_class_avg_score(review)
+      assignment_review_scores = {}
+      total_review_scores = {}
+      review_counts = {}
+      review.each do |cp_id, assignment_review_scores_map|
+        assignment_review_scores_map.each do |assignment_id, score|
+          total_review_scores[assignment_id] = 0 unless total_review_scores.key?(assignment_id)
+          review_counts[assignment_id] = 0 unless review_counts.key?(assignment_id)
+          total_review_scores[assignment_id] += score
+          review_counts[assignment_id] += 1
+        end
+      end
+
+      @assignments.each do |assignment|
+        assignment_review_scores[assignment.id] = (total_review_scores[assignment.id] * 1.0 / review_counts[assignment.id]).round(2) if review_counts.key?(assignment.id)
+      end
+
+      return assignment_review_scores
+    end
+
+    # Calculate average aggregate review score of all students
+    def calc_aggregate_score_class_avg(review)
+      return (review[:aggregate_score].values.sum * 1.0 / review[:aggregate_score].size).round unless review[:aggregate_score].empty?
+    end
 end

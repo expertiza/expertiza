@@ -1,0 +1,92 @@
+<style>
+  th, td {
+    text-align: center;
+}
+</style>
+
+<input type="checkbox" name="meta_review"> meta_review
+<input type="checkbox" name="teammate_review"> teammate_review
+<input type="checkbox" name="topic"> topic
+<input type="checkbox" name="peer_score"> peer_score
+<input type="checkbox" name="instructor_grade"> instructor_grade
+
+<script>
+    $("input:checkbox").attr("checked", false).click(function() {
+        var shcolumn = "." + $(this).attr("name");
+        $(shcolumn).toggle();
+        if($(this).attr("name") == "meta_review" || $(this).attr("name") == "teammate_review") {
+            validate();
+        }
+    });
+
+    function validate() {
+        var meta_presence = document.getElementByClass("meta_review");
+        var teammate_presence = document.getElementByClass("teammate_review");
+        if(meta_presence.checked && teammate.presence.checked) {
+            var shcolumn = ".aggregate_score";
+            $(shcolumn).toggle();
+        }
+    }
+
+</script>
+
+<div id="wrap-table" style="position:relative; overflow:auto; width:100%">
+  <table class="table table-striped">
+    <tr>
+      <th rowspan=2 >Students</th>
+      <th rowspan=2 >Teammate Count</th>
+      <% @assignments.each do |assignment| %>
+        <th colspan=5 > <%= assignment.name %> </th>
+      <% end %>
+      <th class="aggregate_score" colspan="2">Aggregate Score</th>
+      <th colspan=2>Final Grades</th>
+    </tr>
+
+    <tr>
+      <% (1..@assignments.size).each do %>
+        <th class="meta_review"><b>Metareviews</b></th>
+        <th class="teammate_review"><b>Teammate Reviews</b></th>
+        <th class="topic topic-tooltip"><b>Topic</b></th>
+        <th class="peer_score"><b>Peer Score</b></th>
+        <th class="instructor_grade"><b>Instructor Grade</b></th>
+      <% end %>
+      <th class="meta_review"><b>Metareviews</b></th>
+      <th class="teammate_review"><b>Teammate Reviews</b></th>
+      <th class="sorter-true"><b>Total Instructor Grade</b></th>
+    </tr>
+
+    <% @course_participants.each do |cp|%>
+        <tr>
+            <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
+            <td><%= @teamed_count[cp.id] %></td>
+            <% @assignments.each do |assignment|%>
+                <td class="meta_review"><%= format_percentage(@meta_review[cp.id][assignment.id]) unless @meta_review.nil? %></td>
+                <td class="teammate_review"><%= format_percentage(@teammate_review[cp.id][assignment.id]) unless @teammate_review.nil? %></td>
+                <% topic = format_topic(@topics[cp.id][assignment.id]) %>
+                <td title="<%= topic %>" class="topic topic-tooltip">
+                  <%= topic %>
+                </td>
+                <td class="peer_score"><%= format_score(@peer_review_scores[cp.id][assignment.id]) %></td>
+                <td class="instructor_grade"><%= format_score(@assignment_grades[cp.id][assignment.id]) %> </td>
+            <% end%>
+            <td class="meta_review"><%= format_percentage(@meta_review[:aggregate_score][cp.id]) unless @meta_review.nil? %></td>
+            <td class="teammate_review"><%= format_percentage(@teammate_review[:aggregate_score][cp.id]) unless @teammate_review.nil? %></td>
+            <td><%= @final_grades[cp.id] %></td>
+        </tr>
+    <%end%>
+        <tr>
+            <td><b>Class Average</b></td>
+            <td></td>
+            <% @assignments.each do |assignment|%>
+                <td class="meta_review"><%= format_percentage(@meta_review[:class_avg][assignment.id]) unless @meta_review.nil? %></td>
+                <td class="teammate_review"><%= format_percentage(@teammate_review[:class_avg][assignment.id]) unless @teammate_review.nil? %></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            <% end%>
+          <td class="meta_review"><%= format_percentage(@meta_review[:aggregate_score_class_avg]) unless @meta_review.nil? %></td>
+          <td class="teammate_review"><%= format_percentage(@teammate_review[:aggregate_score_class_avg]) unless @teammate_review.nil? %></td>
+          <td></td>
+        </tr>
+    </table>
+</div>

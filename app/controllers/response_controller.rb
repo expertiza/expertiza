@@ -295,6 +295,7 @@ class ResponseController < ApplicationController
 
   private
 
+  # E2218: Method to initialize response and response map for update, delete and view methods
   def set_response
     @response = Response.find(params[:id])
     @map = @response.map

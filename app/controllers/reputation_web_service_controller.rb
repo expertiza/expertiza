@@ -7,11 +7,15 @@ require 'base64'
 class ReputationWebServiceController < ApplicationController
   include AuthorizationHelper
 
-  # checks for the user privileges before performing the action requested
+  # action_allowed? function checks if the currently authenticated user has the authorization to perform certain actions. 
+  # This function returns true if the user has privileges to perform the action. Otherwise, it returns false.
   def action_allowed?
     current_user_has_ta_privileges?
   end
 
+  # get_max_question_score receives a set of answers as an argument and gets the question associated with the answers.
+  # It then returns the maximum score of the question from the relevant questionnaire record.
+  # In case of standard error, this method returns 1 
   def get_max_question_score(answers)
     begin
       answers.first.question.questionnaire.max_question_score
@@ -20,12 +24,18 @@ class ReputationWebServiceController < ApplicationController
     end
   end
   
+  # get_valid_answers_for_response method retrieves the answer list using the id of the received response.
+  # It filters out the answers list to select non-empty answers of criterion question type as valid_answer.
+  # return valid_answers if it is not an empty list.
   def get_valid_answers_for_response(response)
     answers = Answer.where(response_id: response.id)
     valid_answer = answers.select { |a| (a.question.type == 'Criterion') && !a.answer.nil? }
     valid_answer.empty? ? nil : valid_answer 
   end
   
+  # calculate_peer_review_grade calculates a cumulative review grade with respect to the set of valid answers.
+  # This function takes in arguments of valid_answer and the maximum score of the question.
+  # peer_review_grade is calculated as a percentage of valid answers' cumulative weight in the answer's cumulative weight of the maximum score.
   def calculate_peer_review_grade(valid_answer, max_question_score)
     temp_sum = 0
     weight_sum = 0
@@ -37,6 +47,9 @@ class ReputationWebServiceController < ApplicationController
     peer_review_grade.round(4)
   end
 
+  # get_peer_reviews_for_responses calculates the peer review grade for each valid response.
+  # It gets a peer review grade for each valid answer associated with each valid response.
+  # Calculated grades along with reviewer ID and team ID are appended to a list and returned.
   def get_peer_reviews_for_responses(reviewer_id, team_id, valid_response)
     peer_review_grades_list = []
     valid_response.each do |response|
@@ -48,7 +61,11 @@ class ReputationWebServiceController < ApplicationController
     peer_review_grades_list
    end
 
-  # db query, return peer reviews
+  
+  # get_peer_reviews, for a given assignment list ids, retrieves all the reviews for the submitted works.
+  # For each review, the reviewer, the team being reviewed, and the validly submitted works are queried for.
+  # These results are sent to get_peer_reviews_for_responses for getting the review grade for that particular review.
+  # reviewer_id, team_id, review_grade are appended to the raw_data_array list and returned.
   def get_peer_reviews(assignment_id_list, round_num, has_topic)
     raw_data_array = []
     ReviewResponseMap.where('reviewed_object_id in (?) and calibrate_to = ?', assignment_id_list, false).each do |response_map|
@@ -64,10 +81,16 @@ class ReputationWebServiceController < ApplicationController
     raw_data_array
   end
 
+  # get_ids_list accepts a list of objects and maps each object to the corresponding object id attribute.
+  # This method returns the altered list to the caller function.
   def get_ids_list(tables)
     tables.map { |table| table.id }
   end
 
+  # get_scores method accepts team IDs as an argument.
+  # It then finds all the quiz questionnaires associated with all the teams in the list.
+  # For each questionnaire, it retrieves the reviewer id, reviewee id, and score.
+  # This data is appended to the raw data list and returned.
   def get_scores(team_ids)
     quiz_questionnnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
     quiz_questionnnaire_ids = get_ids_list(quiz_questionnnaires)
@@ -79,13 +102,19 @@ class ReputationWebServiceController < ApplicationController
     raw_data_array
   end
 
-  # special db query, return quiz scores
+  # get_quiz_score takes a list of assignment IDs as arguments.
+  # Queries the AssignmentTeam to find the teams participating in the assignment.
+  # Stores the IDs of the teams in team_ids.
+  # It calls get_scores on team_ids to get the scores of all the participating teams.
   def get_quiz_score(assignment_id_list)
     teams = AssignmentTeam.where('parent_id in (?)', assignment_id_list)
     team_ids = get_ids_list(teams)
     get_scores(team_ids)
   end
 
+  # generate_json_body is a helper method.
+  # It accepts unformatted string data and formats it into JSON.
+  # It returns the formatted body after sorting the hash.
   def generate_json_body(results)
     request_body = {}
     results.each_with_index do |record, _index|
@@ -97,7 +126,10 @@ class ReputationWebServiceController < ApplicationController
     request_body.sort.to_h
     request_body
   end
-
+  # generate_json_for_peer_reviews takes assignment_id_list and round number as arguments.
+  # This method retrieves all the peer reviews associated with the assignment id list by calling the get_peer_reviews method.
+  # It then formats the peer-review list in JSON by calling generate_json_body method.
+  # it returns the formatted peer review data.
   def generate_json_for_peer_reviews(assignment_id_list, round_num = 2)
     has_topic = !SignUpTopic.where(assignment_id: assignment_id_list[0]).empty?
 
@@ -106,38 +138,58 @@ class ReputationWebServiceController < ApplicationController
     request_body
   end
 
+  # generate_json_for_quiz_scores accepts a list of assignment ids as an argument.
+  # It then calls the get_quiz_score method on the list to get maps of teams and scores for the given assignments.
+  # The map is then formatted into JSON by calling generate_json_body and returns it.
   def generate_json_for_quiz_scores(assignment_id_list)
     participant_reviewee_map = get_quiz_score(assignment_id_list)
     request_body = generate_json_body(participant_reviewee_map)
     request_body
   end
 
+  # This method returns the id of the last assignment.
   def client
     @max_assignment_id = Assignment.last.id
   end
 
+  # encrypt_request_body is used by the method prepare_request_body.
+  # This method takes in the plain request body data, encrypts the data using AES symmetric algorithm.
+  # It then uses RSA asymetric encryption to encrypt the AES keys.
+  # Then the encrypted data is prepended with the encrypted keys and sent back to the prepare_request_body method.
   def encrypt_request_body(plain_data)
 
     # AES symmetric algorithm encrypts raw data
     aes_encrypted_request_data = aes_encrypt(plain_data)
-    plain_data = aes_encrypted_request_data[0]
+    encrypted_data = aes_encrypted_request_data[0]
 
     # RSA asymmetric algorithm encrypts keys of AES
     encrypted_key = rsa_public_key1(aes_encrypted_request_data[1])
     encrypted_vi = rsa_public_key1(aes_encrypted_request_data[2])
-    # fixed length 350
     
-    plain_data.prepend('", "data":"')
-    plain_data.prepend(encrypted_vi)
-    plain_data.prepend(encrypted_key)
+    encrypted_data.prepend('", "data":"')
+    encrypted_data.prepend(encrypted_vi)
+    encrypted_data.prepend(encrypted_key)
+
+    encrypted_data
   end
 
-  def format_into_JSON(data)
-    data.prepend('{"keys":"')
-    data << '"}'
-    data.gsub!(/\n/, '\\n')
+  # format_into_JSON accepts the unformatted string data pertaining to the request body.
+  # Unoformatted string data is converted into JSON format in this method.
+  # JSON formatted request body is returned to the prepare_request_body method.
+  def format_into_JSON(unformatted_data)
+
+    unformatted_data.prepend('{"keys":"')
+    unformatted_data << '"}'
+    formatted_data = unformatted_data.gsub!(/\n/, '\\n')
+
+    formatted_data
   end
 
+  # decrypt_response decrypts the encrypted response body.
+  # It accepts the encrypted body in JSON format.
+  # RSA decryption is first done on the keys.
+  # Decrypted keys are then used to perform AES decryption on the data.
+  # Decrypted data is sent back to the process_response_body method.
   def decrypt_response(encrypted_data)
     encrypted_data = JSON.parse(encrypted_data)
     key = rsa_private_key2(encrypted_data['keys'][0, 350])
@@ -147,7 +199,10 @@ class ReputationWebServiceController < ApplicationController
     decrypted_data = aes_decrypt(aes_encrypted_response_data, key, vi)
   end
 
-  def update_participants(response)
+  # update_participants_reputation accepts the decrypted response body in the JSON format.
+  # It then parses the JSON and updates the reputation scores of the participants in the list.
+  # If the alg variable is not  Hamer/ Lauv, the updation step is skipped.
+  def update_participants_reputation(response)
     JSON.parse(response.body.to_s).each do |alg, list|
       next unless alg == 'Hamer' || alg == 'Lauw'
       list.each do |id, rep|
@@ -156,17 +211,27 @@ class ReputationWebServiceController < ApplicationController
     end
   end
 
+  # process_response_body gets the control after receiving a response from the server.
+  # It receives the response body as an argument
+  # It calls the decrypt_response to decrypt the data back into plain request body data.
+  # It updates the instance variables related to the response.
+  # It then calls the update_participants_reputation to update the reputation scores received in the response body.
+  # Finally the control redirects to the client.
+
   def process_response_body(response)
     # Decryption
-    decrypt_response(response.body)
+    response.body = decrypt_response(response.body)
    
     @response = response
     @response_body = response.body
 
-    update_participants(response)
+    update_participants_reputation(response)
     redirect_to action: 'client'
   end
 
+  # add_expert_grades sets the @additional_info to 'add expert grades'
+  # It prepends the request body with the expert grades pertaining to the default wiki contribution case of 754
+  # It receives the request body as an argument, prepends it, and returns the body to the caller function (prepare_request_body)
   def add_expert_grades(body)
     @additional_info = 'add expert grades'
     case params[:assignment_id]
@@ -175,6 +240,10 @@ class ReputationWebServiceController < ApplicationController
     end
   end
 
+  # add_quiz_scores is a helper function of prepare_request_body.
+  # It sets the instance variable @additional_info.
+  # It gets the assignment id list and generates the json on quiz scores of those assignments.
+  # Finally processes quiz string is prepended to the request body, received as an argument, and returns the body to prepare_request_body. 
   def add_quiz_scores(body)
     @additional_info = 'add quiz scores'
     assignment_id_list_quiz = get_assignment_id_list(params[:assignment_id].to_i, params[:another_assignment_id].to_i)
@@ -186,14 +255,21 @@ class ReputationWebServiceController < ApplicationController
     body.prepend(quiz_str)
   end
 
+  # add_hamer_reputation_values sets the instance variable @additional_info.
+  # This method is called by the prepare_request_body method when params receive instruction through the corresponding view's checkbox.
   def add_hamer_reputation_values
     @additional_info = 'add initial hamer reputation values'
   end
 
+  # add_lauw_reputation_values sets the instance variable @additional_info.
+  # This method is called by the prepare_request_body method when params receive instruction through the corresponding view's checkbox.
   def add_lauw_reputation_values
     @additional_info = 'add initial lauw reputation values'
   end
   
+  # get_assignment_id_list on receipt of individual assignment IDs returns a list with all the assignment IDs appended into a data structure
+  # This function accepts 2 arguments, with the second argument being optional, and returns the list assignment_id_list
+  # If the second argument is 0, it is not appended to the list.
   def get_assignment_id_list(assignment_id_one, assignment_id_two)
     assignment_id_list = []
     assignment_id_list << assignment_id_one
@@ -201,12 +277,16 @@ class ReputationWebServiceController < ApplicationController
     assignment_id_list
   end
   
+  # prepare_request_body method is responsible for preparing the request body in a proper format to send to the server.
+  # It gets the raw request body and populates the class variables based on the received parameters.
+  # It further calls the methods: encrypt_request_body and format_into_JSON to get the request body into the correct format.
+  # It finally sends the prepared request body back to the send_post_request method.
   def prepare_request_body
     req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader: { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
     curr_assignment_id = (params[:assignment_id].empty? ? '754' : params[:assignment_id])
     assignment_id_list_peers = get_assignment_id_list(curr_assignment_id, params[:another_assignment_id].to_i)
     req.body = generate_json_for_peer_reviews(assignment_id_list_peers, params[:round_num].to_i).to_json
-    # req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
+  
     req.body[0] = '' # remove the first '{'
     @assignment_id = params[:assignment_id]
     @round_num = params[:round_num]
@@ -236,6 +316,10 @@ class ReputationWebServiceController < ApplicationController
     req
   end
 
+  # send_post_request function calls the prepare_request_body function to get a prepared request body in proper format.
+  # It then sends the prepared request to the server. 
+  # Finally, it forwards the received response to the process_response_body function.
+  # The core of this function deals with sending a request to calculate the review scores, receiving and forwarding the response to the processing function.
   def send_post_request
     req = prepare_request_body
     response = Net::HTTP.new('peerlogic.csc.ncsu.edu').start { |http| http.request(req) }

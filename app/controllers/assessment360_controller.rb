@@ -66,15 +66,15 @@ class Assessment360Controller < ApplicationController
   end
 
   def format_topic(topic)
-    topic.nil? ? '-' : topic.format_for_display
+    topic.nil? ? '–' : topic.format_for_display
   end
 
   def format_score(score)
-    score.nil? ? '-' : score
+    score.nil? ? '–' : score
   end
 
   def format_percentage(score)
-    score.nil? ? '-' : score.to_s + '%'
+    score.nil? ? '–' : score.to_s + '%'
   end
 
   helper_method :format_score

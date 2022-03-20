@@ -1,11 +1,4 @@
 GIT
-  remote: git://github.com/mimemagicrb/mimemagic.git
-  revision: 01f92d86d15d85cfd0f20dabd025dcbd36a8a60f
-  ref: 01f92d86d15d85cfd0f20dabd025dcbd36a8a60f
-  specs:
-    mimemagic (0.3.5)
-
-GIT
   remote: https://github.com/Winbobob/danger.git
   revision: 1ccfed23f809a1e5c46e2533cfd7a3138f6cd821
   ref: 1ccfed23f809a1e5c46e2533cfd7a3138f6cd821
@@ -69,8 +62,8 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
-    airbrake (10.0.6)
-      airbrake-ruby (~> 4.13)
+    airbrake (9.5.5)
+      airbrake-ruby (~> 4.8)
     airbrake-ruby (4.15.0)
       rbtree3 (~> 0.5)
     airbrussh (1.4.0)
@@ -84,6 +77,8 @@ GEM
       activesupport (>= 4.2, < 5.3)
       request_store (~> 1.0)
       scrypt (>= 1.2, < 4.0)
+    autoprefixer-rails (9.8.6)
+      execjs
     awesome_nested_set (3.4.0)
       activerecord (>= 4.0.0, < 7.0)
     babel-source (5.8.35)
@@ -92,12 +87,16 @@ GEM
       execjs (~> 2.0)
     bind-it (0.2.6)
       rjb
+    bootstrap-sass (3.4.1)
+      autoprefixer-rails (>= 5.2.1)
+      sassc (>= 2.0.0)
     bootstrap3-datetimepicker-rails (4.17.47)
       momentjs-rails (>= 2.8.1)
     builder (3.2.4)
     bullet (5.7.6)
       activesupport (>= 3.0.0)
       uniform_notifier (~> 1.11.0)
+    byebug (11.0.1)
     c21e (1.1.9)
     capistrano (3.16.0)
       airbrussh (>= 1.0.0)
@@ -284,6 +283,9 @@ GEM
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2021.0225)
+    mimemagic (0.4.3)
+      nokogiri (~> 1)
+      rake
     mini_mime (1.1.0)
     mini_portile2 (2.4.0)
     minitest (5.14.4)
@@ -389,7 +391,7 @@ GEM
     rb-inotify (0.10.1)
       ffi (~> 1.0)
     rb-readline (0.5.5)
-    rbtree3 (0.6.0)
+    rbtree3 (0.7.0)
     rchardet (1.8.0)
     react-rails (2.6.1)
       babel-transpiler (>= 0.7.0)
@@ -474,6 +476,14 @@ GEM
       sprockets (>= 2.8, < 4.0)
       sprockets-rails (>= 2.0, < 4.0)
       tilt (~> 1.1)
+    sassc (2.4.0)
+      ffi (~> 1.9)
+    sassc-rails (2.1.2)
+      railties (>= 4.0.0)
+      sassc (>= 2.0)
+      sprockets (> 3.0)
+      sprockets-rails
+      tilt
     sawyer (0.8.2)
       addressable (>= 2.3.5)
       faraday (> 0.8, < 2.0)
@@ -561,12 +571,14 @@ DEPENDENCIES
   RedCloth
   activerecord-session_store
   activesupport (~> 4.2.11.1)
-  airbrake
+  airbrake (~> 9.5)
   authlogic (= 4.1)
   awesome_nested_set
   bind-it
+  bootstrap-sass (~> 3.4.1)
   bootstrap3-datetimepicker-rails (~> 4.17.47)
   bullet (~> 5.7.6)
+  byebug
   capistrano
   capistrano-bundler
   capistrano-db-tasks
@@ -605,7 +617,7 @@ DEPENDENCIES
   json
   launchy
   lingua
-  mimemagic!
+  mimemagic
   momentjs-rails (>= 2.9.0)
   mysql2
   nokogiri
@@ -635,6 +647,7 @@ DEPENDENCIES
   rubyzip
   rwordnet
   sass-rails (= 5.0.3)
+  sassc-rails (>= 2.1.0)
   scrypt (= 3.0.6)
   seer
   selenium-webdriver

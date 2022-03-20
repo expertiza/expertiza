@@ -506,11 +506,11 @@ describe ReviewMappingController do
         it 'shows an error flash message and redirects to review_mapping#list_mappings page' do
           params = {
             id: 1,
-            max_team_size: 1,
-            num_reviews_per_student: 0,
+            maximum_team_size: 1,
+            number_of_reviews_per_student: 0,
             num_reviews_per_submission: 0,
-            num_calibrated_artifacts: 0,
-            num_uncalibrated_artifacts: 0
+            number_of_calibrated_artifacts: 0,
+            number_of_uncalibrated_artifacts: 0
           }
           post :automatic_review_mapping, params
           expect(flash[:error]).to eq('Please choose either the number of reviews per student or the number of reviewers per team (student).')
@@ -523,11 +523,11 @@ describe ReviewMappingController do
           allow_any_instance_of(ReviewMappingController).to receive(:automatic_review_mapping_strategy).with(any_args).and_return(true)
           params = {
             id: 1,
-            max_team_size: 1,
-            num_reviews_per_student: 1,
-            num_reviews_per_submission: 0,
-            num_calibrated_artifacts: 0,
-            num_uncalibrated_artifacts: 0
+            maximum_team_size: 1,
+            number_of_reviews_per_student: 1,
+            number_of_reviews_per_submission: 0,
+            number_of_calibrated_artifacts: 0,
+            number_of_uncalibrated_artifacts: 0
           }
           post :automatic_review_mapping, params
           expect(flash[:error]).to be nil
@@ -543,11 +543,11 @@ describe ReviewMappingController do
           allow_any_instance_of(ReviewMappingController).to receive(:automatic_review_mapping_strategy).with(any_args).and_return(true)
           params = {
             id: 1,
-            max_team_size: 1,
-            num_reviews_per_student: 1,
-            num_reviews_per_submission: 0,
-            num_calibrated_artifacts: 1,
-            num_uncalibrated_artifacts: 1
+            maximum_team_size: 1,
+            number_of_reviews_per_student: 1,
+            number_of_reviews_per_submission: 0,
+            number_of_calibrated_artifacts: 1,
+            number_of_uncalibrated_artifacts: 1
           }
           post :automatic_review_mapping, params
           expect(flash[:error]).to be nil
@@ -563,11 +563,11 @@ describe ReviewMappingController do
           allow(AssignmentTeam).to receive(:find).with(2).and_return(team)
           params = {
             id: 1,
-            max_team_size: 1,
-            num_reviews_per_student: 45,
-            num_reviews_per_submission: 0,
-            num_calibrated_artifacts: 0,
-            num_uncalibrated_artifacts: 0
+            maximum_team_size: 1,
+            number_of_reviews_per_student: 45,
+            number_of_reviews_per_submission: 0,
+            number_of_calibrated_artifacts: 0,
+            number_of_uncalibrated_artifacts: 0
           }
           post :automatic_review_mapping, params
           expect(flash[:error]).to eq('You cannot set the number of reviews done ' \
@@ -586,11 +586,11 @@ describe ReviewMappingController do
         allow(ApplicationController).to receive_message_chain(:helpers, :create_team_users).with(no_args).with(user, 1).and_return(true)
         params = {
           id: 1,
-          max_team_size: 1,
-          num_reviews_per_student: 1,
-          num_reviews_per_submission: 4,
-          num_calibrated_artifacts: 0,
-          num_uncalibrated_artifacts: 0
+          maximum_team_size: 1,
+          number_of_reviews_per_student: 1,
+          number_of_reviews_per_submission: 4,
+          number_of_calibrated_artifacts: 0,
+          number_of_uncalibrated_artifacts: 0
         }
         post :automatic_review_mapping, params
         expect(flash[:error]).to eq('Please choose either the number of reviews per student or the number of reviewers per team (student), not both.')

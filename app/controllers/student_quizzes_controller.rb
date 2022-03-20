@@ -56,7 +56,8 @@ class StudentQuizzesController < ApplicationController
     quizzes
   end
 
-  # calulates the score and stores the answers entered.
+  # This method as whole fetches the answers provided and calculates the final scores for the quiz.
+  # Also calls seperate methods for handling single answer/ true or false evaluations and mulitple answer evaluations for calculating score.
   def calculate_score(map, response)
     questionnaire = Questionnaire.find(map.reviewed_object_id)
     answers = []
@@ -67,7 +68,8 @@ class StudentQuizzesController < ApplicationController
       ques_type = question.type
       if ques_type.eql? 'MultipleChoiceCheckbox'
         has_response = multiple_answer_evaluation(answers, params, question, correct_answers, has_response, response)
-      else # TrueFalse and MultipleChoiceRadio
+      # TrueFalse and MultipleChoiceRadio
+      else 
         has_response = single_answer_evaluation(answers, params, question, correct_answers, has_response, response)
       end
     end
@@ -81,7 +83,7 @@ class StudentQuizzesController < ApplicationController
     end
   end
 
-  # Validates answers for questions that contains multiple answers
+  # Evaluates scores for questions that contains multiple answers
   def multiple_answer_evaluation(answers, params, question, correct_answers, has_response, response)
     score = 0
     if params[question.id.to_s].nil?
@@ -105,7 +107,7 @@ class StudentQuizzesController < ApplicationController
     return has_response
   end
 
-  # Validates answers for questions that contains only one answers
+  # Evaluates scores for questions that contains only single/ true or false answers
   def single_answer_evaluation(answers, params, question, correct_answers, has_response, response)
     correct_answer = correct_answers.first
     score = correct_answer.txt == params[question.id.to_s] ? 1 : 0

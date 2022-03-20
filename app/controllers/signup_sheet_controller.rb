@@ -490,7 +490,10 @@ class SignupSheetController < ApplicationController
     topic.save
     redirect_to_sign_up params[:id]
   end
-
+  
+  # compute signup topics will compute 2 variables:
+  # @sign_up_topics: Contains list of all topics belonging to current assignment, but not bid by current team
+  # @bids: List of topics bid by current team and are part of current assignment, which participant/team belongs to
   def compute_signup_topics(team_id)
     @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
     signed_up_topics = []

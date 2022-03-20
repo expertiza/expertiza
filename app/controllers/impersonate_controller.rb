@@ -47,13 +47,14 @@ class ImpersonateController < ApplicationController
       user = get_real_user(params[:user][:name]) 
       session[:super_user] = session[:user] if session[:super_user].nil?
     elsif !params[:impersonate][:name].empty?
-      user = get_real_user(params[:impersonate][:name]) 
+      user = get_real_user(params[:impersonate][:name])
     else
       session[:user] = session[:super_user]
       session[:super_user] = nil
     end
     generate_session(user)
   end
+
   # Checks if special characters are present in the username provided, only alphanumeric should be used
   # warn_for_special_chars is a method in SecurityHelper class.SecurityHelper class has methods to handle this.
   # special_chars method-Initialises string with special characters /\?<>|&$# .
@@ -69,6 +70,7 @@ class ImpersonateController < ApplicationController
   # can_impersonate method in user.rb checks whether the original user can impersonate the other user in params
   # This method checks whether the user is a superadmin or teaching staff or recursively adds the child users till it reached highest hierarchy which is SuperAdmin
   # If original user can impersonate the user ,then session will be overwrite to get the view of the user who is getting impersonated
+
   def check_if_user_impersonateable
     if params[:impersonate].nil?
       user = get_real_user(params[:user][:name]) 
@@ -87,6 +89,7 @@ class ImpersonateController < ApplicationController
 
   # Function to display appropriate error messages based on different username provided, the message explains each error
   # This function checks params values and displays error_message based on the user name .This is initial check to see if username is valid
+  
   def display_error_msg
     # This is called when we try to impersonate a wrong user from the original logged in account.
     if params[:user]
@@ -118,6 +121,7 @@ class ImpersonateController < ApplicationController
 
   # Main operation, method used to break the functions in impersonate controller and bring out 2 functionalities at same level,
   # checking if user impersonateable, if not throw corresponding error message
+
   def impersonate
     # Initial check to see if the username exists
     display_error_msg
@@ -161,9 +165,9 @@ end
 
 def get_real_user(name)
   if User.anonymized_view?(session[:ip])
-    user = User.real_user_from_anonymized_name(name)
+    User.real_user_from_anonymized_name(name)
   else
-    user = User.find_by(name: name)
+    User.find_by(name: name)
   end
-  return user
+  # return user
 end

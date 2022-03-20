@@ -232,7 +232,7 @@ class QuestionnairesController < ApplicationController
   end
 
  # Zhewei: This method is used to save all questions in current questionnaire.
- def save_all_questions
+  def save_all_questions
     begin
       if params[:save]
         params[:question].each_pair do |k, v|

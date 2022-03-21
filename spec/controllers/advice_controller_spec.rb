@@ -2,6 +2,7 @@ describe AdviceController do
   let(:super_admin) { build(:superadmin, id: 1, role_id: 5) }
   let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, name: 'Instructor1') }
   let(:student1) { build(:student, id: 21, role_id: 1) }
+
   describe '#action_allowed?' do
     context 'when the role of current user is Super-Admin' do
       it 'allows certain action' do
@@ -19,6 +20,147 @@ describe AdviceController do
       it 'refuses certain action' do
         stub_current_user(student1, student1.role.name, student1.role)
         expect(controller.send(:action_allowed?)).to be_falsey
+      end
+    end
+  end
+
+  describe '#edit_advice' do
+    context "when edit_advice is called with question advice score > max score of questionnaire" do
+      #max score of advice = 3 (!=2)
+      let(:questionnaire) do
+        build(:questionnaire, id: 1, min_question_score: 1,
+          questions: [build(:question, id: 1, weight: 2, question_advices: [build(:question_advice, id:1, score: 1, question_id: 1, advice: "Advice1"), build(:question_advice, id:2, score: 3, question_id: 1, advice: "Advice2")])], max_question_score: 2)
+      end
+      let(:qa1) { build(:question_advice, id: 1, score: 1, question_id: 1, advice: "Advice1") }
+      let(:qa2) { build(:question_advice, id: 2, score: 3, question_id: 1, advice: "Advice2") }
+
+      it "edit advice redirects correctly when called with incorrect maximum score for a question advice" do
+        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
+        allow(QuestionAdvice).to receive(:delete_all).with(any_args)
+        allow(QuestionAdvice).to receive(:where).with(any_args).and_return([qa1,qa2])
+        allow(QuestionAdvice).to receive(:delete).with(any_args)
+        allow(QuestionAdvice).to receive(:new).with(any_args)
+        params = {id: 1}
+        session = {user: instructor1}
+        get :edit_advice, params, session
+        expect(response).to render_template(:edit_advice)
+      end
+    end
+
+    context "when edit_advice is called with question advice score < min score of questionnaire" do
+      #min score of advice = 0 (!=1)
+      let(:questionnaire) do
+        build(:questionnaire, id: 1, min_question_score: 1,
+          questions: [build(:question, id: 1, weight: 2, question_advices: [build(:question_advice, id:1, score: 0, question_id: 1, advice: "Advice1"), build(:question_advice, id:2, score: 2, question_id: 1, advice: "Advice2")])], max_question_score: 2)
+      end
+      let(:qa1) { build(:question_advice, id: 1, score: 1, question_id: 1, advice: "Advice1") }
+      let(:qa2) { build(:question_advice, id: 2, score: 3, question_id: 1, advice: "Advice2") }
+
+      it "edit advice redirects correctly when called with incorrect minimum score for a question advice " do
+        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
+        allow(QuestionAdvice).to receive(:delete_all).with(any_args)
+        allow(QuestionAdvice).to receive(:where).with(any_args).and_return([qa1,qa2])
+        allow(QuestionAdvice).to receive(:delete).with(any_args)
+        allow(QuestionAdvice).to receive(:new).with(any_args)
+        params = {id: 1}
+        session = {user: instructor1}
+        get :edit_advice, params, session
+        expect(response).to render_template(:edit_advice)
+      end
+    end
+
+    context "when edit_advice is called with number of advices > (max-min) score of questionnaire" do
+      #number of advices > 2
+      let(:questionnaire) do
+        build(:questionnaire, id: 1, min_question_score: 1,
+          questions: [build(:question, id: 1, weight: 2, question_advices: [build(:question_advice, id:1, score: 1, question_id: 1, advice: "Advice1"), build(:question_advice, id:2, score: 2, question_id: 1, advice: "Advice2"), build(:question_advice, id:3, score: 2, question_id: 1, advice: "Advice3")])], max_question_score: 2)
+      end
+      let(:qa1) { build(:question_advice, id: 1, score: 1, question_id: 1, advice: "Advice1") }
+      let(:qa2) { build(:question_advice, id: 2, score: 3, question_id: 1, advice: "Advice2") }
+
+      it "edit advice redirects correctly when called with incorrect number of advices for a question " do
+        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
+        allow(QuestionAdvice).to receive(:delete_all).with(any_args)
+        allow(QuestionAdvice).to receive(:where).with(any_args).and_return([qa1,qa2])
+        allow(QuestionAdvice).to receive(:delete).with(any_args)
+        allow(QuestionAdvice).to receive(:new).with(any_args)
+        params = {id: 1}
+        session = {user: instructor1}
+        get :edit_advice, params, session
+        expect(response).to render_template(:edit_advice)
+      end
+    end
+
+    context "when edit_advice is called with no advices for a question in questionnaire" do
+      # 0 advices - empty list scenario
+      let(:questionnaire) do
+        build(:questionnaire, id: 1, min_question_score: 1,
+          questions: [build(:question, id: 1, weight: 2, question_advices: [])], max_question_score: 2)
+      end
+      let(:qa1) { build(:question_advice, id: 1, score: 1, question_id: 1, advice: "Advice1") }
+      let(:qa2) { build(:question_advice, id: 2, score: 3, question_id: 1, advice: "Advice2") }
+
+      it "edit advice redirects correctly when called with an empty advice list " do
+        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
+        allow(QuestionAdvice).to receive(:delete_all).with(any_args)
+        allow(QuestionAdvice).to receive(:where).with(any_args).and_return([qa1,qa2])
+        allow(QuestionAdvice).to receive(:delete).with(any_args)
+        allow(QuestionAdvice).to receive(:new).with(any_args)
+        params = {id: 1}
+        session = {user: instructor1}
+        get :edit_advice, params, session
+        expect(response).to render_template(:edit_advice)
+      end
+    end
+
+    context "when edit_advice is called with all conditions satisfied" do
+      # all perfect
+      let(:questionnaire) do
+        build(:questionnaire, id: 1, min_question_score: 1,
+          questions: [build(:question, id: 1, weight: 2, question_advices: [build(:question_advice, id:1, score: 1, question_id: 1, advice: "Advice1"), build(:question_advice, id:2, score: 2, question_id: 1, advice: "Advice2")])], max_question_score: 2)
+      end
+      let(:qa1) { build(:question_advice, id: 1, score: 1, question_id: 1, advice: "Advice1") }
+      let(:qa2) { build(:question_advice, id: 2, score: 3, question_id: 1, advice: "Advice2") }
+
+      it "edit advice redirects correctly when called with all correct pre-conditions " do
+        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
+        allow(QuestionAdvice).to receive(:delete_all).with(any_args)
+        allow(QuestionAdvice).to receive(:where).with(any_args).and_return([qa1,qa2])
+        allow(QuestionAdvice).to receive(:delete).with(any_args)
+        allow(QuestionAdvice).to receive(:new).with(any_args)
+        params = {id: 1}
+        session = {user: instructor1}
+        get :edit_advice, params, session
+        expect(response).to render_template(:edit_advice)
+      end
+    end
+  end
+
+  describe '#save_advice' do
+    context "when save_advice is called" do
+      let(:questionnaire) do
+        build(:questionnaire, id: 1, min_question_score: 1,
+          questions: [build(:question, id: 1, weight: 2, question_advices: [build(:question_advice, id:1, score: 1, question_id: 1, advice: "Advice1"), build(:question_advice, id:2, score: 3, question_id: 1, advice: "Advice2")])], max_question_score: 2)
+      end
+      
+      it "saves advice" do
+        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
+        allow(QuestionAdvice).to receive(:update).with(any_args).and_return("Ok")
+        params = {advice: {"1" => {:advice => "Hello"}}, id: 1}
+        session = {user: instructor1}
+        get :save_advice, params, session
+        expect(flash[:notice]).to eq('The advice was successfully saved!')
+        expect(response).to redirect_to('/advice/edit_advice/1')
+      end
+
+      it "does not save the advice" do
+        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
+        allow(QuestionAdvice).to receive(:update).with(any_args).and_return("Ok")
+        params = {id: 1}
+        session = {user: instructor1}
+        get :save_advice, params, session
+        expect(flash[:notice]).not_to eq('The advice was successfully saved!')
+        expect(response).to redirect_to('/advice/edit_advice/1')
       end
     end
   end

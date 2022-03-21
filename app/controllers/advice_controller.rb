@@ -5,13 +5,15 @@ class AdviceController < ApplicationController
     current_user_has_ta_privileges?
   end
 
-# checks whether given coonditions are ture or not and return true or false
-  def check_advice(sorted_advice, num_advices, question)
+  # checks whether the advices for a question in questionnaire have valid attributes
+  # return true if the number of advices and their scores are invalid, else returns false
+  def invalid_advice_status(sorted_advice, num_advices, question)
     return ((question.question_advices.length != num_advices) ||
     sorted_advice.empty? ||
     (sorted_advice[0].score != @questionnaire.max_question_score) ||
-    (sorted_advice[sorted_advice.length - 1] != @questionnaire.min_question_score))
+    (sorted_advice[sorted_advice.length - 1].score != @questionnaire.min_question_score))
   end
+  
   # Modify the advice associated with a questionnaire
   def edit_advice
     #Stores the questionnaire with given id in URL
@@ -32,7 +34,7 @@ class AdviceController < ApplicationController
       sorted_advice = question.question_advices.sort_by { |x| x.score }.reverse
 
       #Checks the condition for adjusting the advice size
-      if check_advice(sorted_advice, num_advices, question)
+      if invalid_advice_status(sorted_advice, num_advices, question)
         #  The number of advices for this question has changed.
         QuestionnaireHelper.adjust_advice_size(@questionnaire, question)
       end

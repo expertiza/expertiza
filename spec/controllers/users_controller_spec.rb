@@ -70,7 +70,7 @@ describe UsersController do
       expect(controller.action_allowed?).to be false
       stub_current_user(instructor, instructor.role.name, instructor.role)
       allow(controller).to receive(:params).and_return(params)
-      expect(controller.action_allowed?).to be true
+      expect(controller.action_allowed?).to be false
       stub_current_user(admin, admin.role.name, admin.role)
       allow(controller).to receive(:params).and_return(params)
       expect(controller.action_allowed?).to be true

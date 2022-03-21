@@ -41,6 +41,9 @@ class Assessment360Controller < ApplicationController
         @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
       end
     end
+    @peer_review_scores[:class_avg] = calc_class_avg_score(@peer_review_scores)
+    @assignment_grades[:class_avg] = calc_class_avg_score(@assignment_grades)
+
   end
 
   def assignment_grade_summary(cp, assignment_id)
@@ -82,29 +85,27 @@ class Assessment360Controller < ApplicationController
   helper_method :format_percentage
 
   def index
-    calc_teammate_count
+    # Set teammate count for all participants
+    @teammate_count = teammate_count
 
-    # Calculate avg review score
+    # Set meta review scores
     @meta_review = reviews_for_type('meta')
-    @meta_review[:aggregate_score] = calc_aggregate_score(@meta_review)
-    @meta_review[:class_avg] = calc_class_avg_score(@meta_review)
-    @meta_review[:aggregate_score_class_avg] = calc_aggregate_score_class_avg(@meta_review)
 
+    # Set teammate review scores
     @teammate_review = reviews_for_type('teammate')
-    @teammate_review[:aggregate_score] = calc_aggregate_score(@teammate_review)
-    @teammate_review[:class_avg] = calc_class_avg_score(@teammate_review)
-    @teammate_review[:aggregate_score_class_avg] = calc_aggregate_score_class_avg(@teammate_review)
+
+    # This function sets @peer_review_scores, @assignment_grades and @final_grades to be rendered in the view
+    # The calculations occur in the same iteration so, it is logical to have a single function call to set these values
     course_student_grade_summary
-    @peer_review_scores[:class_avg] = calc_class_avg_score(@peer_review_scores)
-    @assignment_grades[:class_avg] = calc_class_avg_score(@assignment_grades)
   end
 
   private
+    # This function loads the raw data required for rendering information in the page.
+    # It makes most of the db calls required for the computation.
     def init_data
       @course = Course.find(params[:course_id])
 
       # Load participants along with the assignments(eager loading)
-      # TODO: What does calibrate does?
       # Reject assignments with empty participants
       @assignments = @course.assignments.includes([:participants]).reject(&:is_calibrated).reject { |a| a.participants.empty? }
 
@@ -112,9 +113,9 @@ class Assessment360Controller < ApplicationController
       insure_existence_of(@course_participants, @course)
     end
 
-    # compute review score based on the type of all assignments for all students and
-    # return a map with the review score with cp_id and assignment_id
-    # as key. example return object structure
+    # compute review score based on the type(meta/teammate) of all assignments for all students and
+    # return a map with cp_id and assignment_id as key and respective review score as value
+    # example return object structure
     # review = {
     #   STUDENT_1_ID: {
     #     ASSIGNMENT_1_ID: 95,
@@ -129,33 +130,26 @@ class Assessment360Controller < ApplicationController
     # accessing the score from the output object,
     # review[STUDENT_1_ID][ASSIGNMENT_1_ID] = 95
     def reviews_for_type(type)
-      reviews_variable = type + '_reviews'
-      review = {}
+      reviews_type = type + '_reviews'
+      reviews = {}
 
-      # Create a map with user_id and assignment_id as key and reviews as value
-      reviews_by_user_id_and_assignment = reviews_by_user_id_and_assignment(reviews_variable)
-
-      @course_participants.each do |cp|
-        review[cp.id] = {}
-        @assignments.each do |assignment|
-          # skip if the student is not participated in any assignment
-          next if reviews_by_user_id_and_assignment[cp.user_id].nil?
-
-          # skip if the student is not participated in the current assignment
-          next if reviews_by_user_id_and_assignment[cp.user_id][assignment.id].nil?
-
-          reviews = reviews_by_user_id_and_assignment[cp.user_id][assignment.id]
-          score = calc_avg_score(reviews)
-
-          # Don't set score as nil because, this will create a entry in the review map with cp.id and assignment.id as
-          # key and nil as value. This will make it easy to count the number of assignments attempted while calculating
-          # class average and aggregate score
-          review[cp.id][assignment.id] = score unless score.nil?
+      @assignments.each do |assignment|
+        assignment.participants.each do |assignment_participant|
+          reviews[assignment_participant.user_id] = {} unless reviews.key?(assignment_participant.user_id)
+          assignment_reviews = assignment_participant.public_send(reviews_type) if assignment_participant.respond_to? reviews_type
+          score = calc_avg_score(assignment_reviews)
+          reviews[assignment_participant.user_id][assignment.id] = score unless score.nil?
         end
       end
-      return review
+
+      reviews[:aggregate_score] = calc_aggregate_score(reviews)
+      reviews[:class_avg] = calc_class_avg_score(reviews)
+      reviews[:aggregate_score_class_avg] = calc_aggregate_score_class_avg(reviews)
+
+      return reviews
     end
 
+    # This function throws an error if this page is loaded when there are no participants for the selected course
     def insure_existence_of(course_participants, course)
       if course_participants.empty?
         flash[:error] = "There is no course participant in course #{course.name}"
@@ -163,18 +157,7 @@ class Assessment360Controller < ApplicationController
       end
     end
 
-    def reviews_by_user_id_and_assignment(reviews_variable)
-      reviews = {}
-      @assignments.each do |assignment|
-        assignment.participants.each do |assignment_participant|
-          reviews[assignment_participant.user_id] = {} unless reviews.key?(assignment_participant.user_id)
-          assignment_reviews = assignment_participant.public_send(reviews_variable) if assignment_participant.respond_to? reviews_variable
-          reviews[assignment_participant.user_id][assignment.id] = assignment_reviews
-        end
-      end
-      return reviews
-    end
-
+    # TODO: Move to mixin
     def calc_avg_score(reviews)
       # If a student has not taken an assignment or if they have not received any grade for the same,
       # assign it as nil(not returning anything). This helps in easier calculation of overall grade
@@ -186,13 +169,15 @@ class Assessment360Controller < ApplicationController
       end
     end
 
-    # TODO: https://github.com/sak007/expertiza/issues/2
-    def calc_teammate_count
-      @teamed_count = {}
+    # Calculate teammate count for all course participants
+    # Returns a map with course participant id as key and their respective teammate count as value
+    def teammate_count
+      teammate_count = {}
       @course_participants.each do |cp|
         students_teamed = StudentTask.teamed_students(cp.user)
-        @teamed_count[cp.id] = students_teamed[@course.id].try(:size).to_i
+        teammate_count[cp.id] = students_teamed[@course.id].try(:size).to_i
       end
+      return teammate_count
     end
 
     # Calculate average review score of all the assignment completed by the student.

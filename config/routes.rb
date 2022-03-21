@@ -38,7 +38,6 @@ Expertiza::Application.routes.draw do
 
   resources :assessment360, only: [] do
     collection do
-      get :course_student_grade_summary
       get :index
     end
   end

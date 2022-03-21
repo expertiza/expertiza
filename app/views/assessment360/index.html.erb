@@ -1,92 +1,170 @@
 <style>
-  th, td {
-    text-align: center;
-}
+    th, td {
+        text-align: center;
+    }
 </style>
 
-<input type="checkbox" name="meta_review"> meta_review
-<input type="checkbox" name="teammate_review"> teammate_review
-<input type="checkbox" name="topic"> topic
-<input type="checkbox" name="peer_score"> peer_score
-<input type="checkbox" name="instructor_grade"> instructor_grade
+<%# Initializing the checkboxes on the top of the page. By default, they'll be checked.%>
+<input class = "toggleColumns" type="checkbox" data-target="teammate_count" checked>Teammate Count
+<input class = "toggleColumns meta_review_checkbox assignment_columns aggregate_columns" type="checkbox" data-target="meta_review" checked>Metareview
+<input class = "toggleColumns teammate_review_checkbox assignment_columns aggregate_columns" type="checkbox" data-target="teammate_review" checked>Teammate review
+<input class = "toggleColumns topic_checkbox assignment_columns" type="checkbox" data-target="topic" checked>Topic
+<input class = "toggleColumns peer_score_checkbox assignment_columns" type="checkbox" data-target="peer_score" checked>Peer score
+<input class = "toggleColumns instructor_grade_checkbox assignment_columns" type="checkbox" data-target="instructor_grade" checked>Instructor grade
+<input class = "toggleColumns total_instructor_grade_checkbox" type="checkbox" data-target="tot_instructor_grade" checked>Total instructor grade
 
 <script>
-    $("input:checkbox").attr("checked", false).click(function() {
-        var shcolumn = "." + $(this).attr("name");
-        $(shcolumn).toggle();
-        if($(this).attr("name") == "meta_review" || $(this).attr("name") == "teammate_review") {
-            validate();
+    // Function checks if Teammate review and Metareview boxes are enabled/disabled.
+    // If both checkboxes are disabled, then the Aggregate score column also needs to be hidden.
+    function validate_aggscore()
+    {
+        var meta_presence = document.getElementsByClassName("meta_review_checkbox")[0];
+        var teammate_presence = document.getElementsByClassName("teammate_review_checkbox")[0];
+        var affected_parent_column = '.aggregate_score'; // Aggregate Score has two child columns - Metareviews and Teammate Reviews
+        if(!meta_presence.checked && !teammate_presence.checked)
+        {
+            $(affected_parent_column).hide();
         }
-    });
-
-    function validate() {
-        var meta_presence = document.getElementByClass("meta_review");
-        var teammate_presence = document.getElementByClass("teammate_review");
-        if(meta_presence.checked && teammate.presence.checked) {
-            var shcolumn = ".aggregate_score";
-            $(shcolumn).toggle();
+        else {
+            $(affected_parent_column).show();
         }
     }
 
+    // Function checks if all assignment columns checkboxes are enabled/disabled.
+    // If all checkboxes are disabled, then the corresponding Assignment columns also needs to be hidden.
+    function validate_assignments()
+    {
+        var assignment_checkboxes = $('input.assignment_columns:not(":checked")').length;
+        var affected_column = '.assgn_colspan'; // Assignment has five child columns - Metareviews, Teammate Reviews, Topic, Peer score and Instructor grade
+        if(assignment_checkboxes == 5)
+        {
+            $(affected_column).hide();
+        }
+        else {
+            $(affected_column).show();
+        }
+    }
+
+    // Function checks if Total instructor grade box is enabled/disabled.
+    // If the checkbox is disabled, then the Final Grades column also needs to be hidden.
+    function validate_finalgrades()
+    {
+        var total_instructor_grade_presence = document.getElementsByClassName("total_instructor_grade_checkbox")[0];
+        var parent_column = '.final_grades'; // Final Grade has a child column - Total Instructor Grade
+        $(parent_column).toggle();
+    }
+
+    // Function checks the number of checkboxes that are unchecked.
+    // Based on the number of columns hidden, the colspan of parent column changes to align with rendering.
+    function check_colspan()
+    {
+        var assignment_colspan_value = 5; //Default size of colspan for assignments
+        var aggregate_colspan_value = 2; //Default size of colspan for aggregate scores
+
+        var assignment_dynamic_colspan = $('input.assignment_columns:not(":checked")').length;
+        assignment_colspan_value = assignment_colspan_value - assignment_dynamic_colspan; //Calculated based on number of boxes unchecked
+
+        assignment_colspan = document.getElementsByClassName("assgn_colspan");
+        $(assignment_colspan).attr('colspan', assignment_colspan_value); //colspan is assigned dynamically here
+
+        var aggregate_dynamic_colspan = $('input.aggregate_columns:not(":checked")').length;
+        aggregate_colspan_value = aggregate_colspan_value - aggregate_dynamic_colspan; //Calculated based on number of boxes unchecked
+
+        aggregate_colspan = document.getElementsByClassName("aggregate_score");
+        $(aggregate_colspan).attr('colspan', aggregate_colspan_value); //colspan is assigned dynamically here
+
+    }
+
+    //This function runs everytime there is a change in the state of checkboxes
+    //Based on the boxes that are checked, their corresponding columns are shown.
+    //If the columns have a parent column (Assignment/Aggregate/Final Grade), then extra checks are done.
+
+    $(function() {
+        $('.toggleColumns').on('change', function (e)
+        {
+            var tableColumn = $(e.currentTarget).data('target');
+            $('.' + tableColumn).toggle();
+            check_colspan(); //Dynamically colspan is verified and assigned
+
+            if(tableColumn == "meta_review" || tableColumn == "teammate_review")
+            {
+                validate_aggscore();
+                validate_assignments();
+            }
+            else if(tableColumn == "tot_instructor_grade")
+            {
+                validate_finalgrades();
+            }
+            else if (tableColumn == "topic" || tableColumn == "peer_score" || tableColumn == "instructor_grade")
+            {
+                validate_assignments(); //Check and hide assignment columns based on checkboxes
+            }
+            else{}
+        });
+    });
+
 </script>
+
+<%# The entire data is stored inside a div class to allow uniform styling %>
 
 <div id="wrap-table" style="position:relative; overflow:auto; width:100%">
   <table class="table table-striped">
     <tr>
       <th rowspan=2 >Students</th>
-      <th rowspan=2 >Teammate Count</th>
+      <th class="teammate_count" rowspan=2 >Teammate Count</th>
       <% @assignments.each do |assignment| %>
-        <th colspan=5 > <%= assignment.name %> </th>
+        <th class="assgn_colspan" colspan = "5"> <%= assignment.name %> </th>
       <% end %>
       <th class="aggregate_score" colspan="2">Aggregate Score</th>
-      <th colspan=2>Final Grades</th>
+      <th class="final_grades" colspan="2">Final Grades</th>
     </tr>
 
     <tr>
       <% (1..@assignments.size).each do %>
         <th class="meta_review"><b>Metareviews</b></th>
-        <th class="teammate_review"><b>Teammate Reviews</b></th>
+        <th class="teammate_review"><b>Teammate reviews</b></th>
         <th class="topic topic-tooltip"><b>Topic</b></th>
-        <th class="peer_score"><b>Peer Score</b></th>
-        <th class="instructor_grade"><b>Instructor Grade</b></th>
+        <th class="peer_score"><b>Peer score</b></th>
+        <th class="instructor_grade"><b>Instructor grade</b></th>
       <% end %>
       <th class="meta_review"><b>Metareviews</b></th>
-      <th class="teammate_review"><b>Teammate Reviews</b></th>
-      <th class="sorter-true"><b>Total Instructor Grade</b></th>
+      <th class="teammate_review"><b>Teammate reviews</b></th>
+      <th class="sorter-true tot_instructor_grade"><b>Total instructor grade</b></th>
     </tr>
 
     <% @course_participants.each do |cp|%>
-        <tr>
-            <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
-            <td><%= @teamed_count[cp.id] %></td>
-            <% @assignments.each do |assignment|%>
-                <td class="meta_review"><%= format_percentage(@meta_review[cp.id][assignment.id]) unless @meta_review.nil? %></td>
-                <td class="teammate_review"><%= format_percentage(@teammate_review[cp.id][assignment.id]) unless @teammate_review.nil? %></td>
-                <% topic = format_topic(@topics[cp.id][assignment.id]) %>
-                <td title="<%= topic %>" class="topic topic-tooltip">
-                  <%= topic %>
-                </td>
-                <td class="peer_score"><%= format_score(@peer_review_scores[cp.id][assignment.id]) %></td>
-                <td class="instructor_grade"><%= format_score(@assignment_grades[cp.id][assignment.id]) %> </td>
-            <% end%>
-            <td class="meta_review"><%= format_percentage(@meta_review[:aggregate_score][cp.id]) unless @meta_review.nil? %></td>
-            <td class="teammate_review"><%= format_percentage(@teammate_review[:aggregate_score][cp.id]) unless @teammate_review.nil? %></td>
-            <td><%= @final_grades[cp.id] %></td>
-        </tr>
+      <tr>
+        <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
+        <td class="teammate_count"><%= @teammate_count[cp.id] %></td>
+        <% @assignments.each do |assignment|%>
+          <td class="meta_review"><%= format_percentage(@meta_review[cp.user_id][assignment.id]) unless @meta_review.nil? %></td>
+          <td class="teammate_review"><%= format_percentage(@teammate_review[cp.user_id][assignment.id]) unless @teammate_review.nil? %></td>
+          <% topic = format_topic(@topics[cp.id][assignment.id]) %>
+          <td title="<%= topic %>" class="topic topic-tooltip">
+            <%= topic %>
+          </td>
+          <td class="peer_score"><%= format_score(@peer_review_scores[cp.id][assignment.id]) %></td>
+          <td class="instructor_grade"><%= format_score(@assignment_grades[cp.id][assignment.id]) %> </td>
+        <% end%>
+        <td class="meta_review"><%= format_percentage(@meta_review[:aggregate_score][cp.user_id]) unless @meta_review.nil? %></td>
+        <td class="teammate_review"><%= format_percentage(@teammate_review[:aggregate_score][cp.user_id]) unless @teammate_review.nil? %></td>
+        <td class="tot_instructor_grade"><%= @final_grades[cp.id] %></td>
+      </tr>
     <%end%>
-        <tr>
-            <td><b>Class Average</b></td>
-            <td></td>
-            <% @assignments.each do |assignment|%>
-                <td class="meta_review"><%= format_percentage(@meta_review[:class_avg][assignment.id]) unless @meta_review.nil? %></td>
-                <td class="teammate_review"><%= format_percentage(@teammate_review[:class_avg][assignment.id]) unless @teammate_review.nil? %></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            <% end%>
-          <td class="meta_review"><%= format_percentage(@meta_review[:aggregate_score_class_avg]) unless @meta_review.nil? %></td>
-          <td class="teammate_review"><%= format_percentage(@teammate_review[:aggregate_score_class_avg]) unless @teammate_review.nil? %></td>
-          <td></td>
-        </tr>
-    </table>
+    <tr>
+      <td><b>Class average</b></td>
+      <td class="teammate_count"></td>
+      <% @assignments.each do |assignment|%>
+        <td class="meta_review"><%= format_percentage(@meta_review[:class_avg][assignment.id]) unless @meta_review.nil? %></td>
+        <td class="teammate_review"><%= format_percentage(@teammate_review[:class_avg][assignment.id]) unless @teammate_review.nil? %></td>
+        <td class="topic"></td>
+        <td class="peer_score"><%= format_score(@peer_review_scores[:class_avg][assignment.id]) %></td>
+        <td class="instructor_grade"><%= format_score(@assignment_grades[:class_avg][assignment.id]) %> </td>
+      <% end%>
+      <td class="meta_review"><%= format_percentage(@meta_review[:aggregate_score_class_avg]) unless @meta_review.nil? %></td>
+      <td class="teammate_review"><%= format_percentage(@teammate_review[:aggregate_score_class_avg]) unless @teammate_review.nil? %></td>
+      <td class="tot_instructor_grade"><%= format_score(@final_grades.inject(0) {|sum, (k, v)| sum += v}) %> </td>
+      <td></td>
+    </tr>
+  </table>
 </div>

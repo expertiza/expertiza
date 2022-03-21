@@ -35,12 +35,12 @@ describe BadgesController do
   
   describe '#new' do
     context 'when user wants to create a new badge' do
-      it 'should call the new#badge page url' do
+      it 'calls the new#badge page url' do
         get :new
         expect(get: 'badges/new').to route_to('badges#new')
       end
 
-      it 'should render the create new form and allow the user to enter details' do
+      it 'renders the create new form and allow the user to enter details' do
         allow(Badge).to receive(:new).and_return(badge)
         params = {}
         session = { user: instructor1 }
@@ -62,14 +62,14 @@ describe BadgesController do
         stub_current_user(ta, ta.role.name, ta.role)
         session[:return_to] ||= 'http://test.host/assignments/844/edit'
         get :redirect_to_assignment
-        response.should redirect_to("http://test.host/assignments/844/edit")
+        expect(response).to redirect_to "http://test.host/assignments/844/edit"
       end
 	  end
   end
 
   describe '#create' do
     context 'when user enters all the required badge details correctly' do
-        it 'should save the badge successfully' do
+        it 'saves the badge successfully' do
         @file = fixture_file_upload('app/assets/images/badges/test.png', 'image/png')
         allow(@file).to receive(:original_filename).and_return("test.png")
         session = { user: instructor1 }
@@ -90,7 +90,7 @@ describe BadgesController do
     end
 
     context 'when user forgets to enter few of the required badge details' do
-      it 'should throw an error for missing image file' do
+      it 'throws an error for missing image file' do
         @file = nil
         session = { user: instructor1 }
         params = {
@@ -109,7 +109,7 @@ describe BadgesController do
       end
     
     
-      it 'should throw an error for missing badge name' do
+      it 'throws an error for missing badge name' do
         @file = fixture_file_upload('app/assets/images/badges/test.png', 'image/png')
         allow(@file).to receive(:original_filename).and_return("test.png")
         session = { user: instructor1 }
@@ -128,7 +128,7 @@ describe BadgesController do
         expect(response).to render_template('new')
       end
     
-      it 'should throw an error for missing badge description' do
+      it 'throws an error for missing badge description' do
         @file = fixture_file_upload('app/assets/images/badges/test.png', 'image/png')
         allow(@file).to receive(:original_filename).and_return("test.png")
         session = { user: instructor1 }

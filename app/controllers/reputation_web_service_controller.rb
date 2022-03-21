@@ -231,7 +231,7 @@ class ReputationWebServiceController < ApplicationController
   def process_response_body(response)
     # Decryption
 
-    response.body = decrypt_response(response.body)
+    # response.body = decrypt_response(response.body)
 
     @response = response
     @response_body = response.body
@@ -319,10 +319,10 @@ class ReputationWebServiceController < ApplicationController
     req.body.prepend('{')
     @request_body = req.body
     # Encrypting the request body data
-    req.body = encrypt_request_body(req.body)
+    # req.body = encrypt_request_body(req.body)
 
     # request body should be in JSON format.
-    req.body = format_into_json(req.body)
+    # req.body = format_into_json(req.body)
     req
   end
 

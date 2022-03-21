@@ -115,6 +115,7 @@ class LatePoliciesController < ApplicationController
   def duplicate_name_check(is_update=false)
     should_check = true
     prefix = is_update ? "Cannot edit the policy. " : ""
+    valid_penalty, error_message = true, nil
 
     if is_update
         existing_late_policy = LatePolicy.find(params[:id])

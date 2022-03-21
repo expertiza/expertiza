@@ -52,7 +52,7 @@ describe LotteryController do
     Bid.create(topic_id: topic4.id, team_id: assignment_team1.id, priority: 3)
 
     @teams = assignment.teams
-    @sign_up_topics = assignment.sign_up_topics
+    @signup_topics = assignment.sign_up_topics
   end
 
   describe '#action_allowed?' do
@@ -79,7 +79,7 @@ describe LotteryController do
                                       { pid: student2.id, ranks: [1, 0, 0, 3] },
                                       { pid: student3.id, ranks: [1, 0, 0, 3] },
                                       { pid: student4.id, ranks: [0, 2, 5, 1] }]
-      users_bidding_info = controller.send(:construct_users_bidding_info, @sign_up_topics, @teams)
+      users_bidding_info = controller.send(:construct_users_bidding_info, @signup_topics, @teams)
       expect(users_bidding_info).to eq(@expected_users_bidding_info)
     end
   end

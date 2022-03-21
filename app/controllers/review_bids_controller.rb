@@ -44,9 +44,9 @@ class ReviewBidsController < ApplicationController
   def show
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
-    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
+    @signup_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     my_topic = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
-    @sign_up_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: my_topic)
+    @signup_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: my_topic)
     @num_participants = AssignmentParticipant.where(parent_id: @assignment.id).count
     @selected_topics = nil # this is used to list the topics assigned to review. (ie select == assigned i believe)
     @bids = ReviewBid.where(participant_id: @participant, assignment_id: @assignment.id)
@@ -55,10 +55,10 @@ class ReviewBidsController < ApplicationController
       sign_up_topic = SignUpTopic.find_by(id: bid.signuptopic_id)
       signed_up_topics << sign_up_topic if sign_up_topic
     end
-    signed_up_topics &= @sign_up_topics
-    @sign_up_topics -= signed_up_topics
+    signed_up_topics &= @signup_topics
+    @signup_topics -= signed_up_topics
     @bids = signed_up_topics
-    @num_of_topics = @sign_up_topics.size
+    @num_of_topics = @signup_topics.size
     @assigned_review_maps = []
     ReviewResponseMap.where(reviewed_object_id: @assignment.id, reviewer_id: @participant.id).each do |review_map|
       @assigned_review_maps << review_map

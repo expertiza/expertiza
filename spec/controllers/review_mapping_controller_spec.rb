@@ -474,7 +474,7 @@ describe ReviewMappingController do
       allow(MetareviewResponseMap).to receive(:find).with('1').and_return(metareview_response_map)
       allow(metareview_response_map).to receive(:delete).and_return(true)
       params = { id: 1 }
-      post :delete_metareview, params
+      post :delete_metareviewer, params
       expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
     end
   end

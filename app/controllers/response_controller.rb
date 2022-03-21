@@ -116,7 +116,7 @@ class ResponseController < ApplicationController
         return
       end
 
-      @response.update_attributes('additional_comment': params[:review][:comments])
+      @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = questionnaire_from_response
       questions = sort_questions(@questionnaire.questions)
 
@@ -124,7 +124,7 @@ class ResponseController < ApplicationController
       # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       create_answers(params, questions) unless params[:responses].nil?
 
-      @response.update_attributes('is_submitted': true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
+      @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
 
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     rescue StandardError
@@ -376,8 +376,8 @@ class ResponseController < ApplicationController
     params[:responses].each_pair do |k, v|
       score = Answer.where(response_id: @response.id, question_id: questions[k.to_i].id).first
       score ||= Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])
-      score.update_attributes('answer': v[:score])
-      score.update_attributes('comments': v[:comment])
+      score.update_attribute('answer', v[:score])
+      score.update_attribute('comments', v[:comment])
     end
   end
 

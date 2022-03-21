@@ -59,8 +59,6 @@ gem 'RedCloth'
 gem 'redis-namespace'
 gem 'redis-rails'
 gem 'rest-client'
-gem 'rspec', '~> 3.0'
-gem 'rubocop-rspec', require: false
 gem 'rgl', require: 'rgl/adjacency'
 gem 'rjb'
 gem 'rubyzip'

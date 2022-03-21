@@ -103,6 +103,7 @@ class ReputationWebServiceController < ApplicationController
   def get_scores(team_ids)
     quiz_questionnnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
     quiz_questionnnaire_ids = get_ids_list(quiz_questionnnaires)
+    raw_data_array = []
     QuizResponseMap.where('reviewed_object_id in (?)', quiz_questionnnaire_ids).each do |response_map|
       quiz_score = response_map.quiz_score
       participant = Participant.find(response_map.reviewer_id)
@@ -237,7 +238,6 @@ class ReputationWebServiceController < ApplicationController
     @response_body = response.body
 
     update_participants_reputation(response)
-    redirect_to action: 'client'
   end
 
   # add_expert_grades sets the @additional_info to 'add expert grades'
@@ -333,7 +333,12 @@ class ReputationWebServiceController < ApplicationController
   def send_post_request
     req = prepare_request_body
     response = Net::HTTP.new('peerlogic.csc.ncsu.edu').start { |http| http.request(req) }
-    process_response_body(response)
+    if  %w[400 500].include?(response.code)
+      flash[:error] = 'Post Request Failed'
+    else
+      process_response_body(response)
+    end
+    redirect_to action: 'client'
   end
 
   def rsa_public_key1(data)

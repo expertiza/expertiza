@@ -49,9 +49,9 @@
 <!--Request information-->
 <%= "Request info: #{flash[:assignment].name} (#{flash[:assignment].id})" unless flash[:assignment].nil? %>
 <%= " + #{flash[:another_assignment].name} (#{flash[:another_assignment].id})" unless flash[:another_assignment].nil? %>
-<%= "<br/>round #{flash[:round_num]}" unless flash[:assignment].nil? %>
-<%= "<br/>#{flash[:algorithm]} algorithm" unless flash[:assignment].nil? %>
-<%= "<br/>#{flash[:additional_info]}" unless flash[:additional_info].try(:empty?) %>
+<%= " + round #{flash[:round_num]}" unless flash[:assignment].nil? %>
+<%= " + #{flash[:algorithm]} algorithm" unless flash[:assignment].nil? %>
+<%= " + #{flash[:additional_info]}" unless flash[:additional_info].try(:empty?) %>
 <br/><br/>
 
 <!--Beautified request and response message-->

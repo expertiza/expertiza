@@ -75,7 +75,7 @@ describe Assessment360Controller do
     context 'when course does not have participants' do
       before(:each) do
         request.env['HTTP_REFERER'] = 'http://example.com'
-        get 'all_students_all_reviews'
+        get 'index'
       end
 
       it 'redirects to back' do
@@ -168,7 +168,7 @@ describe Assessment360Controller do
     context 'when course does not have participants' do
       before(:each) do
         request.env['HTTP_REFERER'] = 'http://example.com'
-        get 'course_student_grade_summary'
+        get 'index'
       end
 
       it 'redirects to back' do
@@ -192,7 +192,7 @@ describe Assessment360Controller do
         allow(course).to receive(:get_participants).and_return([]) # no participants
         params = { course_id: 1 }
         session = { user: instructor }
-        get :course_student_grade_summary, params, session
+        get :index, params, session
         expect(controller.send(:action_allowed?)).to be true
         expect(response).to redirect_to(:back)
         expect(flash[:error]).to be_present
@@ -205,10 +205,10 @@ describe Assessment360Controller do
         allow(assignment_list).to receive(:reject).and_return(assignment_list)
         params = { course_id: 1 }
         session = { user: instructor }
-        get :course_student_grade_summary, params, session
+        get :index, params, session
         expect(controller.send(:action_allowed?)).to be true
         expect(response.status).to eq(200)
-        expect(response).to render_template(:course_student_grade_summary)
+        expect(response).to render_template(:index)
       end
 
       it 'has participants, next assignment participant exists, but no team id exists' do
@@ -221,10 +221,10 @@ describe Assessment360Controller do
         allow(SignUpTopic).to receive(:find_by).with(id: nil).and_return(topic)
         params = { course_id: 1 }
         session = { user: instructor }
-        get :course_student_grade_summary, params, session
+        get :index, params, session
         expect(controller.send(:action_allowed?)).to be true
         expect(response.status).to eq(200)
-        expect(response).to render_template(:course_student_grade_summary)
+        expect(response).to render_template(:index)
         returned_assignment_grades = controller.instance_variable_get(:@assignment_grades)
         expect(returned_assignment_grades[nil]).to eq({})
         returned_peer_review_scores = controller.instance_variable_get(:@peer_review_scores)
@@ -246,10 +246,10 @@ describe Assessment360Controller do
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: course_participant.user_id, parent_id: assignment.id).and_return(course_participant)
         params = { course_id: 1 }
         session = { user: instructor }
-        get :course_student_grade_summary, params, session
+        get :index, params, session
         expect(controller.send(:action_allowed?)).to be true
         expect(response.status).to eq(200)
-        expect(response).to render_template(:course_student_grade_summary)
+        expect(response).to render_template(:index)
         returned_topics = controller.instance_variable_get(:@topics)
         expect(returned_topics[nil][1]).to eq(topic)
         returned_assignment_grades = controller.instance_variable_get(:@assignment_grades)
@@ -274,10 +274,10 @@ describe Assessment360Controller do
         allow_any_instance_of(Assessment360Controller).to receive(:participant_scores).with(course_participant, {}).and_return(review: { scores: { avg: 90 } })
         params = { course_id: 1 }
         session = { user: instructor }
-        get :course_student_grade_summary, params, session
+        get :index, params, session
         expect(controller.send(:action_allowed?)).to be true
         expect(response.status).to eq(200)
-        expect(response).to render_template(:course_student_grade_summary)
+        expect(response).to render_template(:index)
         returned_topics = controller.instance_variable_get(:@topics)
         expect(returned_topics[nil][1]).to eq(topic)
         returned_assignment_grades = controller.instance_variable_get(:@assignment_grades)
@@ -317,7 +317,7 @@ describe Assessment360Controller do
         allow(course).to receive(:get_participants).and_return([]) # no participants
         params = { course_id: 1 }
         session = { user: instructor }
-        get :course_student_grade_summary, params, session
+        get :index, params, session
         expect(controller.send(:action_allowed?)).to be true
         expect(response).to redirect_to(:back)
         expect(flash[:error]).to be_present
@@ -361,10 +361,10 @@ describe Assessment360Controller do
         allow_any_instance_of(Assessment360Controller).to receive(:participant_scores).with(course_participant, {}).and_return(review: { scores: { avg: 90 } })
         params = { course_id: 1 }
         session = { user: instructor }
-        get :course_student_grade_summary, params, session
+        get :index, params, session
         expect(controller.send(:action_allowed?)).to be true
         expect(response.status).to eq(200)
-        expect(response).to render_template(:course_student_grade_summary)
+        expect(response).to render_template(:index)
         returned_topics = controller.instance_variable_get(:@topics)
         expect(returned_topics[nil][1]).to eq(topic)
         returned_assignment_grades = controller.instance_variable_get(:@assignment_grades)

@@ -4,63 +4,72 @@
 }
 </style>
 
-<input class = "toggleColumns" type="checkbox" data-target="teammate_count" checked> teammate_count
-<input class = "toggleColumns meta_review_checkbox assignment_columns aggregate_columns" type="checkbox" data-target="meta_review" checked> meta_review
-<input class = "toggleColumns teammate_review_checkbox assignment_columns aggregate_columns" type="checkbox" data-target="teammate_review" checked> teammate_review
-<input class = "toggleColumns topic_checkbox assignment_columns" type="checkbox" data-target="topic" checked> topic
-<input class = "toggleColumns peer_score_checkbox assignment_columns" type="checkbox" data-target="peer_score" checked> peer_score
-<input class = "toggleColumns instructor_grade_checkbox assignment_columns" type="checkbox" data-target="instructor_grade" checked> instructor_grade
-<input class = "toggleColumns total_instructor_grade_checkbox" type="checkbox" data-target="tot_instructor_grade" checked> total_instructor_grade
+<%# Initializing the checkboxes on the top of the page. By default, they'll be checked.%>
+<input class = "toggleColumns" type="checkbox" data-target="teammate_count" checked>Teammate Count
+<input class = "toggleColumns meta_review_checkbox assignment_columns aggregate_columns" type="checkbox" data-target="meta_review" checked>Metareview
+<input class = "toggleColumns teammate_review_checkbox assignment_columns aggregate_columns" type="checkbox" data-target="teammate_review" checked>Teammate review
+<input class = "toggleColumns topic_checkbox assignment_columns" type="checkbox" data-target="topic" checked>Topic
+<input class = "toggleColumns peer_score_checkbox assignment_columns" type="checkbox" data-target="peer_score" checked>Peer score
+<input class = "toggleColumns instructor_grade_checkbox assignment_columns" type="checkbox" data-target="instructor_grade" checked>Instructor grade
+<input class = "toggleColumns total_instructor_grade_checkbox" type="checkbox" data-target="tot_instructor_grade" checked>Total instructor grade
 
 <script>
+    // Function checks if Teammate review and Metareview boxes are enabled/disabled.
+    // If both checkboxes are disabled, then the Aggregate score column also needs to be hidden.
     function validate_aggscore()
     {
         var meta_presence = document.getElementsByClassName("meta_review_checkbox")[0];
         var teammate_presence = document.getElementsByClassName("teammate_review_checkbox")[0];
-        var shcolumn1 = '.aggregate_score';
+        var affected_parent_column = '.aggregate_score'; // Aggregate Score has two child columns - Metareviews and Teammate Reviews
         if(!meta_presence.checked && !teammate_presence.checked)
         {
-            $(shcolumn1).hide();
+            $(affected_parent_column).hide();
         }
         else {
-            $(shcolumn1).show();
+            $(affected_parent_column).show();
         }
     }
+    // Function checks if Total instructor grade box is enabled/disabled.
+    // If the checkbox is disabled, then the Final Grades column also needs to be hidden.
     function validate_finalgrades()
     {
         var total_instructor_grade_presence = document.getElementsByClassName("total_instructor_grade_checkbox")[0];
-        var shcolumn2 = '.final_grades';
-        $(shcolumn2).toggle();
+        var parent_column = '.final_grades'; // Final Grade has a child column - Total Instructor Grade
+        $(parent_column).toggle();
     }
 
+    // Function checks the number of checkboxes that are unchecked.
+    // Based on the number of columns hidden, the colspan of parent column changes to align with rendering.
     function check_colspan()
     {
-        var assignment_colspan_value = 5;
-        var aggregate_colspan_value = 2;
+        var assignment_colspan_value = 5; //Default size of colspan for assignments
+        var aggregate_colspan_value = 2; //Default size of colspan for aggregate scores
 
-        var tabcol1 = $('input.assignment_columns:not(":checked")').length;
-        assignment_colspan_value = assignment_colspan_value - tabcol1;
-        // console.log(assignment_colspan_value);
+        var assignment_dynamic_colspan = $('input.assignment_columns:not(":checked")').length;
+        assignment_colspan_value = assignment_colspan_value - assignment_dynamic_colspan; //Calculated based on number of boxes unchecked
 
         assignment_colspan = document.getElementsByClassName("assgn_colspan");
-        $(assignment_colspan).attr('colspan', assignment_colspan_value);
-        // console.log($(assignment_colspan).attr('colspan', assignment_colspan_value));
+        $(assignment_colspan).attr('colspan', assignment_colspan_value); //colspan is assigned dynamically here
 
-        var tabcol2 = $('input.aggregate_columns:not(":checked")').length;
-        aggregate_colspan_value = aggregate_colspan_value - tabcol2;
+        var aggregate_dynamic_colspan = $('input.aggregate_columns:not(":checked")').length;
+        aggregate_colspan_value = aggregate_colspan_value - aggregate_dynamic_colspan; //Calculated based on number of boxes unchecked
 
         aggregate_colspan = document.getElementsByClassName("aggregate_score");
-        $(aggregate_colspan).attr('colspan', aggregate_colspan_value);
-        // console.log($(assignment_colspan).attr('colspan', assignment_colspan_value));
+        $(aggregate_colspan).attr('colspan', aggregate_colspan_value); //colspan is assigned dynamically here
 
     }
+
+    //This function runs everytime there is a change in the state of checkboxes
+    //Based on the boxes that are checked, their corresponding columns are shown.
+    //If the columns have a parent column (Assignment/Aggregate/Final Grade), then extra checks are done.
 
     $(function() {
         $('.toggleColumns').on('change', function (e)
         {
             var tableColumn = $(e.currentTarget).data('target');
             $('.' + tableColumn).toggle();
-            check_colspan();
+            check_colspan(); //Dynamically colspan is verified and assigned
+
             if(tableColumn == "meta_review" || tableColumn == "teammate_review")
             {
                 validate_aggscore();
@@ -74,6 +83,8 @@
     });
 
 </script>
+
+<%# The entire data is stored inside a div class to allow uniform styling %>
 
 <div id="wrap-table" style="position:relative; overflow:auto; width:100%">
   <table class="table table-striped">
@@ -90,14 +101,14 @@
     <tr>
       <% (1..@assignments.size).each do %>
         <th class="meta_review"><b>Metareviews</b></th>
-        <th class="teammate_review"><b>Teammate Reviews</b></th>
+        <th class="teammate_review"><b>Teammate reviews</b></th>
         <th class="topic topic-tooltip"><b>Topic</b></th>
-        <th class="peer_score"><b>Peer Score</b></th>
-        <th class="instructor_grade"><b>Instructor Grade</b></th>
+        <th class="peer_score"><b>Peer score</b></th>
+        <th class="instructor_grade"><b>Instructor grade</b></th>
       <% end %>
       <th class="meta_review"><b>Metareviews</b></th>
-      <th class="teammate_review"><b>Teammate Reviews</b></th>
-      <th class="sorter-true tot_instructor_grade"><b>Total Instructor Grade</b></th>
+      <th class="teammate_review"><b>Teammate reviews</b></th>
+      <th class="sorter-true tot_instructor_grade"><b>Total instructor grade</b></th>
     </tr>
 
     <% @course_participants.each do |cp|%>
@@ -120,7 +131,7 @@
         </tr>
     <%end%>
         <tr>
-            <td><b>Class Average</b></td>
+            <td><b>Class average</b></td>
             <td class="teammate_count"></td>
             <% @assignments.each do |assignment|%>
                 <td class="meta_review"><%= format_percentage(@meta_review[:class_avg][assignment.id]) unless @meta_review.nil? %></td>

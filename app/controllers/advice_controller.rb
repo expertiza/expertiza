@@ -7,7 +7,7 @@ class AdviceController < ApplicationController
 
   # checks whether the advices for a question in questionnaire have valid attributes
   # return true if the number of advices and their scores are invalid, else returns false
-  def invalid_advice_status(sorted_advice, num_advices, question)
+  def is_invalid_advice?(sorted_advice, num_advices, question)
     return ((question.question_advices.length != num_advices) ||
     sorted_advice.empty? ||
     (sorted_advice[0].score != @questionnaire.max_question_score) ||
@@ -34,7 +34,7 @@ class AdviceController < ApplicationController
       sorted_advice = question.question_advices.sort_by { |x| x.score }.reverse
 
       #Checks the condition for adjusting the advice size
-      if invalid_advice_status(sorted_advice, num_advices, question)
+      if is_invalid_advice?(sorted_advice, num_advices, question)
         #  The number of advices for this question has changed.
         QuestionnaireHelper.adjust_advice_size(@questionnaire, question)
       end

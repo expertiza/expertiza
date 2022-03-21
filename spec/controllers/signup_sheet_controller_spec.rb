@@ -735,7 +735,7 @@ describe SignupSheetController do
 
   describe '#show_team' do
     it 'renders show_team page' do
-      allow(SignedUpTeam).to receive(:where).with('topic_id = ?', '1').and_return([signed_up_team])
+      allow(SignedUpTeam).to receive(:where).with(topic_id: 1).and_return([signed_up_team])
       allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([double('TeamsUser', user_id: 1)])
       allow(User).to receive(:find).with(1).and_return(student)
       params = { assignment_id: 1, id: 1 }

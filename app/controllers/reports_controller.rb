@@ -2,6 +2,7 @@ class ReportsController < ApplicationController
   include AuthorizationHelper
 
   autocomplete :user, :name
+  require 'gchart'
   helper :submitted_content
   include ReportFormatterHelper
 

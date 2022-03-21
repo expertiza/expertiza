@@ -358,7 +358,7 @@ module ReviewMappingHelper
   end
 
   # gets review and feedback responses for all rounds for the feedback report
-  def get_each_review_and_feedback_response_map(author)
+  def get_each_review_and_feedback(author)
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     # Calculate how many responses one team received from each round
     # It is the feedback number each team member should make
@@ -383,7 +383,7 @@ module ReviewMappingHelper
   end
 
   # gets review and feedback responses for a certain round for the feedback report
-  def get_certain_review_and_feedback_response_map(author)
+  def get_certain_review_feedback(author)
     # Setting values of instance variables
     @feedback_response_maps = FeedbackResponseMap.where(['reviewed_object_id IN (?) and reviewer_id = ?', @all_review_response_ids, author.id])
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)

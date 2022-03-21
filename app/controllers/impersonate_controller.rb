@@ -46,13 +46,14 @@ class ImpersonateController < ApplicationController
     if params[:impersonate].nil?
       user = get_real_user(params[:user][:name])
       session[:super_user] = session[:user] if session[:super_user].nil?
+      generate_session(user)
     elsif !params[:impersonate][:name].empty?
       user = get_real_user(params[:impersonate][:name])
+      generate_session(user)
     else
       session[:user] = session[:super_user]
       session[:super_user] = nil
     end
-    generate_session(user)
   end
 
   # Checks if special characters are present in the username provided, only alphanumeric should be used

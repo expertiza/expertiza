@@ -63,7 +63,7 @@ class QuestionnairesController < ApplicationController
         # moved all questionnaire assignments to a new method
         initialize_values()
         # Create node moved to a new method
-        questionnaire_node_creation()
+        create_questionnaire_node()
       rescue StandardError
         flash[:error] = $ERROR_INFO
       end

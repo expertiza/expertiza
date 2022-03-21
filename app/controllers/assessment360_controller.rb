@@ -130,31 +130,23 @@ class Assessment360Controller < ApplicationController
     # accessing the score from the output object,
     # review[STUDENT_1_ID][ASSIGNMENT_1_ID] = 95
     def reviews_for_type(type)
-      reviews_variable = type + '_reviews'
-      review = {}
+      reviews_type = type + '_reviews'
+      reviews = {}
 
-      # Create a map with user_id and assignment_id as key and reviews as value
-      reviews_by_user_id_and_assignment = reviews_by_user_id_and_assignment(reviews_variable)
-
-      @course_participants.each do |cp|
-        review[cp.id] = {}
-        @assignments.each do |assignment|
-          # skip if the student is not participated in any assignment
-          next if reviews_by_user_id_and_assignment[cp.user_id].nil?
-
-          # skip if the student is not participated in the current assignment
-          next if reviews_by_user_id_and_assignment[cp.user_id][assignment.id].nil?
-
-          reviews = reviews_by_user_id_and_assignment[cp.user_id][assignment.id]
-          score = calc_avg_score(reviews)
-
-          # Don't set score as nil because, this will create a entry in the review map with cp.id and assignment.id as
-          # key and nil as value. This will make it easy to count the number of assignments attempted while calculating
-          # class average and aggregate score
-          review[cp.id][assignment.id] = score unless score.nil?
+      @assignments.each do |assignment|
+        assignment.participants.each do |assignment_participant|
+          reviews[assignment_participant.user_id] = {} unless reviews.key?(assignment_participant.user_id)
+          assignment_reviews = assignment_participant.public_send(reviews_type) if assignment_participant.respond_to? reviews_type
+          score = calc_avg_score(assignment_reviews)
+          reviews[assignment_participant.user_id][assignment.id] = score unless score.nil?
         end
       end
-      return review
+
+      reviews[:aggregate_score] = calc_aggregate_score(reviews)
+      reviews[:class_avg] = calc_class_avg_score(reviews)
+      reviews[:aggregate_score_class_avg] = calc_aggregate_score_class_avg(reviews)
+
+      return reviews
     end
 
     # This function throws an error if this page is loaded when there are no participants for the selected course
@@ -163,19 +155,6 @@ class Assessment360Controller < ApplicationController
         flash[:error] = "There is no course participant in course #{course.name}"
         redirect_to(:back)
       end
-    end
-
-    # TODO: move to reviews_by_type
-    def reviews_by_user_id_and_assignment(reviews_variable)
-      reviews = {}
-      @assignments.each do |assignment|
-        assignment.participants.each do |assignment_participant|
-          reviews[assignment_participant.user_id] = {} unless reviews.key?(assignment_participant.user_id)
-          assignment_reviews = assignment_participant.public_send(reviews_variable) if assignment_participant.respond_to? reviews_variable
-          reviews[assignment_participant.user_id][assignment.id] = assignment_reviews
-        end
-      end
-      return reviews
     end
 
     # TODO: Move to mixin

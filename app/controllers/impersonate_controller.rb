@@ -1,6 +1,9 @@
 class ImpersonateController < ApplicationController
   include SecurityHelper
 
+  # This function checks if the logged in user is a student or not. If it is a student, do not allow the impersonate mode.
+  # If the logged in user has the role or anything other than the student, we allow that user to use the impersonate mode.
+
   def action_allowed?
     # Check for TA privileges first since TA's also have student privileges.
     if ['Student'].include? current_role_name
@@ -13,16 +16,24 @@ class ImpersonateController < ApplicationController
     end
   end
 
+  # This function gives the dropdown where we have all the usernames based on the name we enter.
+  # We should ideally be able to search for whichever username we want to impersonate.
+  # This function does not seem to work
+
   def auto_complete_for_user_name
     @users = session[:user].get_available_users(params[:user][:name])
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 
+  # Called whenever we want to enter the impersonate mode in the application.
   def start
     flash[:error] = "This page doesn't take any query string." unless request.GET.empty?
   end
 
   # Method to overwrite the session details that are corresponding to the user or one being impersonated
+  # The first 'if' statement is executed if the logged in user tried to access the impersonate feature from his account.
+  # The 'elsif' statement is executed if the user is impersonating someone and then tried to impersonate another person.
+  # The 'else' statement is executed if...
   def overwrite_session
     # If not impersonatable, then original user's session remains
     if params[:impersonate].nil?
@@ -48,7 +59,11 @@ class ImpersonateController < ApplicationController
     end
   end
 
-  # Checking if special characters are present in the username provided, only alphanumeric should be used
+  # Checks if special characters are present in the username provided, only alphanumeric should be used
+  # warn_for_special_chars is a method in SecurityHelper class.SecurityHelper class has methods to handle this.
+  # special_chars method-Initialises string with special characters /\?<>|&$# .
+  # contains_special_chars method-converts it to regex and compares with the string
+  # warn_for_special_chars takes the output from above method and flashes an error if there are any special characters(/\?<>|&$#) in the string
   def check_if_special_char
     if params[:user]
       if warn_for_special_chars(params[:user][:name], 'Username')
@@ -66,6 +81,10 @@ class ImpersonateController < ApplicationController
   end
 
   # Checking if the username provided can be impersonated or not
+  # If the user is in anonymized view,then fetch the real user else fetch the user using params
+  # can_impersonate method in user.rb checks whether the original user can impersonate the other user in params
+  # This method checks whether the user is a superadmin or teaching staff or recursively adds the child users till it reached highest hierarchy which is SuperAdmin
+  # If original user can impersonate the user ,then session will be overwrite to get the view of the user who is getting impersonated
   def check_if_user_impersonateable
     if params[:impersonate].nil?
       # E1991 : check whether instructor is currently in anonymized view
@@ -86,9 +105,13 @@ class ImpersonateController < ApplicationController
   end
 
   # Function to display appropriate error messages based on different username provided, the message explains each error
+  # This function checks params values and displays error_message based on the user name .This is initial check to see if username is valid
+
   def display_error_msg
+    # This is called when we try to impersonate a wrong user from the original logged in account.
     if params[:user]
       @message = "No user exists with the name '#{params[:user][:name]}'."
+      # This is called when we try to impersonate a wrong user from the impersonated account.
     elsif params[:impersonate]
       @message = "No user exists with the name '#{params[:impersonate][:name]}'."
     else

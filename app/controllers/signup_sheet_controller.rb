@@ -148,7 +148,7 @@ class SignupSheetController < ApplicationController
   # retrieves all the data associated with the given assignment. Includes all topics,
   def load_add_signup_topics(assignment_id)
     @id = assignment_id
-    @sign_up_topics = SignUpTopic.where('assignment_id = ?', assignment_id)
+    @signup_topics = SignUpTopic.where('assignment_id = ?', assignment_id)
     @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment_id)
 
@@ -192,7 +192,7 @@ class SignupSheetController < ApplicationController
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
     @show_actions = true
     @priority = 0
-    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
+    @signup_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     @max_team_size = @assignment.max_team_size
     team_id = @participant.team.try(:id)
     @use_bookmark = @assignment.use_bookmark
@@ -203,7 +203,7 @@ class SignupSheetController < ApplicationController
       compute_signup_topics team_id
     end
 
-    @num_of_topics = @sign_up_topics.size
+    @num_of_topics = @signup_topics.size
     @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
     @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
     @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
@@ -497,7 +497,7 @@ class SignupSheetController < ApplicationController
   end
   
   # compute signup topics will compute 2 variables:
-  # @sign_up_topics: Contains list of all topics belonging to current assignment, but not bid by current team
+  # @signup_topics: Contains list of all topics belonging to current assignment, but not bid by current team
   # @bids: List of topics bid by current team and are part of current assignment, which participant/team belongs to
   def compute_signup_topics(team_id)
     @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
@@ -510,10 +510,10 @@ class SignupSheetController < ApplicationController
     end
 
     # signed_up_topics will have topics which are bid by this team and part of this assignment.
-    signed_up_topics &= @sign_up_topics
+    signed_up_topics &= @signup_topics
 
-    # @sign_up_topics will have all the topics of current assignment which are not bid by current team.
-    @sign_up_topics -= signed_up_topics 
+    # @signup_topics will have all the topics of current assignment which are not bid by current team.
+    @signup_topics -= signed_up_topics 
     
     # @bids has all the topics from current @assignment.id and also bid by current team.
     @bids = signed_up_topics

@@ -484,7 +484,7 @@ describe SignupSheetController do
         session = { user: instructor }
         get :list, params, session
         expect(controller.instance_variable_get(:@bids).size).to eq(1)
-        expect(controller.instance_variable_get(:@sign_up_topics)).to be_empty
+        expect(controller.instance_variable_get(:@signup_topics)).to be_empty
         expect(response).to render_template('signup_sheet/intelligent_topic_selection')
       end
     end

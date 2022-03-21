@@ -362,6 +362,10 @@ class ReviewMappingController < ApplicationController
   end
   # E1721 changes End
 
+  # This method is used to delete the review mapping from the ReviewResponseMap. If the review mapping exists
+  # the method delets it. 
+  # If the review mapping is deleted successfully, a success alert is shown. However, 
+  # if the review is already done, the method shows an error, saying that the review cannot be deleted. . 
   def delete_reviewer
     review_response_map = ReviewResponseMap.find_by(id: params[:id])
     if review_response_map && !Response.exists?(map_id: review_response_map.id)
@@ -373,6 +377,10 @@ class ReviewMappingController < ApplicationController
     redirect_to :back
   end
 
+  # This method is used to remove the metareview mapping from the MetareviewResponseMap. 
+  # It first finds the mapping using the id, in the MetareviewResponseMap. 
+  # It then goes ahead and deletes this mapping from the map. 
+  # If the deletion fails, the method allows the user to delete it forcefully.  
   def delete_metareviewer
     mapping = MetareviewResponseMap.find(params[:id])
     assignment_id = mapping.assignment.id
@@ -383,19 +391,10 @@ class ReviewMappingController < ApplicationController
     rescue StandardError
       flash[:error] = "A delete action failed:<br/>" + $ERROR_INFO.to_s + "<a href='/review_mapping/delete_metareview/" + mapping.map_id.to_s + "'>Delete this mapping anyway>?"
     end
-
     redirect_to action: 'list_mappings', id: assignment_id
   end
 
-  def delete_metareview
-    mapping = MetareviewResponseMap.find(params[:id])
-    assignment_id = mapping.assignment.id
-    # metareview = mapping.response
-    # metareview.delete
-    mapping.delete
-    redirect_to action: 'list_mappings', id: assignment_id
-  end
-
+  # This method is used to sort records in AssignmentTeam
   def list_mappings
     flash[:error] = params[:msg] if params[:msg]
     @assignment = Assignment.find(params[:id])
@@ -405,7 +404,9 @@ class ReviewMappingController < ApplicationController
     @items.sort_by(&:name)
   end
 
-  #
+  # This method is used to create a team and assign participants to the team.
+  # @params participants is list of {Participant} type
+  # @params teams is {AssignmentTeam} type
   def create_team(participants,assignment_id, teams)
     participants.each do |participant|
       user = participant.user
@@ -415,6 +416,7 @@ class ReviewMappingController < ApplicationController
       teams << team
     end
   end
+
 
   def mapping_strategy_without_artifacts(number_of_reviews_per_student, number_of_reviews_per_submission,
                                          teams,assignment_id,participants)
@@ -450,6 +452,7 @@ class ReviewMappingController < ApplicationController
     automatic_review_mapping_strategy(assignment_id, participants, teams_with_uncalibrated_artifacts.shuffle!, number_of_uncalibrated_artifacts, 0)
   end
 
+  # This method is used to perform automatic review mapping. 
   def automatic_review_mapping
     assignment_id = params[:id].to_i
     participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.select(&:can_review).shuffle!
@@ -507,6 +510,10 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id
   end
 
+  # This method is used to save grade and comments for the reviewer. If a review grade 
+  # does not exist for a participant, we create a review_grade record and assign
+  # grade and other values for the reviewer. 
+  # If the review grade is not updated successfully, an error message is thrown. 
   def save_grade_and_comment_for_reviewer
     review_grade = ReviewGrade.find_by(participant_id: params[:participant_id])
     review_grade = ReviewGrade.create(participant_id: params[:participant_id]) if review_grade.nil?
@@ -528,6 +535,7 @@ class ReviewMappingController < ApplicationController
 
   # E1600
   # Start self review if not started yet - Creates a self-review mapping when user requests a self-review
+  # This method has th functionality for performing self review. 
   def start_self_review
     user_id = params[:reviewer_userid]
     assignment = Assignment.find(params[:assignment_id])

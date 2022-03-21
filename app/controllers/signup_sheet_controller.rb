@@ -235,9 +235,6 @@ class SignupSheetController < ApplicationController
     redirect_to action: 'list', id: params[:id]
   end
 
-  # routes to new page to specficy student
-  def signup_as_instructor; end
-
   def signup_as_instructor_action
     user = User.find_by(name: params[:username])
     if user.nil? # validate invalid user

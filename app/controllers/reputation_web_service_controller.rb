@@ -187,10 +187,10 @@ class ReputationWebServiceController < ApplicationController
   # Unoformatted string data is converted into JSON format in this method.
   # JSON formatted request body is returned to the prepare_request_body method.
   def format_into_json(unformatted_data)
-    unformatted_data.prepend('{"keys":"')
-    unformatted_data << '"}'
+    unformatted_data.prepend('{"keys":')
+    unformatted_data << '}'
     formatted_data = unformatted_data.gsub!(/\n/, '\\n')
-
+    formatted_data = formatted_data.nil? ? unformatted_data : formatted_data
     formatted_data
   end
 
@@ -293,7 +293,7 @@ class ReputationWebServiceController < ApplicationController
   # It further calls the methods: encrypt_request_body and format_into_json to get the request body into the correct format.
   # It finally sends the prepared request body back to the send_post_request method.
   def prepare_request_body
-    req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader: { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
+    req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
     curr_assignment_id = (params[:assignment_id].empty? ? '754' : params[:assignment_id])
     assignment_id_list_peers = get_assignment_id_list(curr_assignment_id, params[:another_assignment_id].to_i)
     req.body = generate_json_for_peer_reviews(assignment_id_list_peers, params[:round_num].to_i).to_json

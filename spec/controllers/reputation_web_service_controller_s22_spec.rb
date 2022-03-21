@@ -55,22 +55,22 @@ describe ReputationWebServiceController do
   
       # TODO: Further test for reputation web service required
       context 'test send_post_request' do
-        it 'one low reputation reviewer' do
+        it 'one rouge reviewer' do
             # reivewer_1's review for reviewee_1; Numeric value of the answer array
             # for response_1_1: [5, 5, 5, 5, 5]
-            create(:answer, question_id: @question_1_1.id, response_id: @response_1_1.id, answer: 5)
+            create(:answer, question_id: @question_1_1.id, response_id: @response_1_1.id, answer: 2)
             create(:answer, question_id: @question_1_2.id, response_id: @response_1_1.id, answer: 5)
-            create(:answer, question_id: @question_1_3.id, response_id: @response_1_1.id, answer: 5)
-            create(:answer, question_id: @question_1_4.id, response_id: @response_1_1.id, answer: 5)
-            create(:answer, question_id: @question_1_5.id, response_id: @response_1_1.id, answer: 5)
+            create(:answer, question_id: @question_1_3.id, response_id: @response_1_1.id, answer: 4)
+            create(:answer, question_id: @question_1_4.id, response_id: @response_1_1.id, answer: 3)
+            create(:answer, question_id: @question_1_5.id, response_id: @response_1_1.id, answer: 1)
 
             # reivewer_2's review for reviewee_1; Numeric value of the answer array
             # for response_1_2: [3, 3, 3, 3, 3]
-            create(:answer, question_id: @question_1_1.id, response_id: @response_1_2.id, answer: 5)
+            create(:answer, question_id: @question_1_1.id, response_id: @response_1_2.id, answer: 2)
             create(:answer, question_id: @question_1_2.id, response_id: @response_1_2.id, answer: 5)
-            create(:answer, question_id: @question_1_3.id, response_id: @response_1_2.id, answer: 5)
-            create(:answer, question_id: @question_1_4.id, response_id: @response_1_2.id, answer: 5)
-            create(:answer, question_id: @question_1_5.id, response_id: @response_1_2.id, answer: 5)
+            create(:answer, question_id: @question_1_3.id, response_id: @response_1_2.id, answer: 4)
+            create(:answer, question_id: @question_1_4.id, response_id: @response_1_2.id, answer: 3)
+            create(:answer, question_id: @question_1_5.id, response_id: @response_1_2.id, answer: 1)
 
             # reivewer_3's review for reviewee_1; Numeric value of the answer array
             # for response_1_3: [1, 1, 1, 1, 1]
@@ -95,32 +95,34 @@ describe ReputationWebServiceController do
           # req = ReputationWebServiceController.new.send_post_request
           # expect(req).to redirect_to(client)
           expect(true).to eq(true)
+
+          # Should return reivewer_1: 2.0, reivewer_2: 2.0, reivewer_3: 0.5
         end
 
         it 'all equal reputation' do
             # reivewer_1's review for reviewee_1; Numeric value of the answer array
             # for response_1_1: [5, 5, 5, 5, 5]
             create(:answer, question_id: @question_1_1.id, response_id: @response_1_1.id, answer: 5)
-            create(:answer, question_id: @question_1_2.id, response_id: @response_1_1.id, answer: 5)
-            create(:answer, question_id: @question_1_3.id, response_id: @response_1_1.id, answer: 5)
-            create(:answer, question_id: @question_1_4.id, response_id: @response_1_1.id, answer: 5)
-            create(:answer, question_id: @question_1_5.id, response_id: @response_1_1.id, answer: 5)
+            create(:answer, question_id: @question_1_2.id, response_id: @response_1_1.id, answer: 4)
+            create(:answer, question_id: @question_1_3.id, response_id: @response_1_1.id, answer: 4)
+            create(:answer, question_id: @question_1_4.id, response_id: @response_1_1.id, answer: 3)
+            create(:answer, question_id: @question_1_5.id, response_id: @response_1_1.id, answer: 2)
 
             # reivewer_2's review for reviewee_1; Numeric value of the answer array
             # for response_1_2: [3, 3, 3, 3, 3]
             create(:answer, question_id: @question_1_1.id, response_id: @response_1_2.id, answer: 5)
-            create(:answer, question_id: @question_1_2.id, response_id: @response_1_2.id, answer: 5)
-            create(:answer, question_id: @question_1_3.id, response_id: @response_1_2.id, answer: 5)
-            create(:answer, question_id: @question_1_4.id, response_id: @response_1_2.id, answer: 5)
-            create(:answer, question_id: @question_1_5.id, response_id: @response_1_2.id, answer: 5)
+            create(:answer, question_id: @question_1_2.id, response_id: @response_1_2.id, answer: 3)
+            create(:answer, question_id: @question_1_3.id, response_id: @response_1_2.id, answer: 4)
+            create(:answer, question_id: @question_1_4.id, response_id: @response_1_2.id, answer: 4)
+            create(:answer, question_id: @question_1_5.id, response_id: @response_1_2.id, answer: 2)
 
             # reivewer_3's review for reviewee_1; Numeric value of the answer array
             # for response_1_3: [1, 1, 1, 1, 1]
-            create(:answer, question_id: @question_1_1.id, response_id: @response_1_3.id, answer: 5)
-            create(:answer, question_id: @question_1_2.id, response_id: @response_1_3.id, answer: 5)
-            create(:answer, question_id: @question_1_3.id, response_id: @response_1_3.id, answer: 5)
-            create(:answer, question_id: @question_1_4.id, response_id: @response_1_3.id, answer: 5)
-            create(:answer, question_id: @question_1_5.id, response_id: @response_1_3.id, answer: 5)
+            create(:answer, question_id: @question_1_1.id, response_id: @response_1_3.id, answer: 4)
+            create(:answer, question_id: @question_1_2.id, response_id: @response_1_3.id, answer: 3)
+            create(:answer, question_id: @question_1_3.id, response_id: @response_1_3.id, answer: 4)
+            create(:answer, question_id: @question_1_4.id, response_id: @response_1_3.id, answer: 3)
+            create(:answer, question_id: @question_1_5.id, response_id: @response_1_3.id, answer: 2)
   
           # choose hammer algorithm without expert grade (instructor's given grade)
           params = { assignment_id: 1, round_num: 1, algorithm: 'hammer', checkbox: { expert_grade: 'empty' } }
@@ -137,9 +139,11 @@ describe ReputationWebServiceController do
           # req = ReputationWebServiceController.new.send_post_request
           # expect(req).to redirect_to(client)
           expect(true).to eq(true)
+
+          # Should return reivewer_1: 1.0, reivewer_2: 1,0, reivewer_3: 1.0
         end
 
-        it 'testing random scores correctness' do
+        it 'testing random scores reputation' do
             # reivewer_1's review for reviewee_1; Numeric value of the answer array
             # for response_1_1: [5, 5, 5, 5, 5]
             create(:answer, question_id: @question_1_1.id, response_id: @response_1_1.id, answer: 2)
@@ -179,6 +183,8 @@ describe ReputationWebServiceController do
           # req = ReputationWebServiceController.new.send_post_request
           # expect(req).to redirect_to(client)
           expect(true).to eq(true)
+
+          # Should return reivewer_1: 2.4, reivewer_2: 0.5, reivewer_3: 1.5
         end
       end
     end

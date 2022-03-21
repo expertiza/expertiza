@@ -286,6 +286,23 @@ describe UsersController do
       get :edit, @params, session
       expect(response).to render_template(:edit)
     end
+	  
+    it 'checks if role renders through edit' do
+      new_student = User.new
+      new_student = student1
+      new_student.role_id = nil  
+      allow(User).to receive(:find).with(any_args).and_return(new_student)
+      get :edit
+      expect(response).to render_template(:edit)
+    end
+	 
+    it 'checks if role fails through edit' do
+      new_student = User.new
+      new_student = student1
+      new_student.role_id = nil  
+      allow(User).to receive(:find).with(any_args).and_return(new_student)
+      expect{controller.edit}.not_to raise_error
+    end
   end
 
   context '#update' do

@@ -41,6 +41,25 @@ describe UsersController do
     end
   end
 
+  context '#auto_complete_for_user_name' do
+    it 'checks if auto_complete returns actionview error' do
+	    stub_current_user(student1, student1.role.name, student1.role)
+    	session = { user: student1 }
+    	@params = {user: student1}
+    	allow(controller).to receive(:params).and_return(@params)
+    	expect{controller.auto_complete_for_user_name}.to raise_error(ActionView::Template::Error)
+    end
+
+    it 'checks if get auto_complete redirects to test host' do
+    	stub_current_user(student1, student1.role.name, student1.role)
+    	session = { user: student1 }
+    	@params = {user: student1}
+    	allow(controller).to receive(:params).and_return(@params)
+    	get :auto_complete_for_user_name, @params, session
+    	expect(response).to redirect_to("http://test.host/")
+    end  
+  end
+
   context '#set_anonymized_view' do
     it 'redirects to back' do
       request.env['HTTP_REFERER'] = 'http://www.example.com'

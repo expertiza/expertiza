@@ -103,6 +103,7 @@ class ReputationWebServiceController < ApplicationController
   def get_scores(team_ids)
     quiz_questionnnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
     quiz_questionnnaire_ids = get_ids_list(quiz_questionnnaires)
+    raw_data_array = []
     QuizResponseMap.where('reviewed_object_id in (?)', quiz_questionnnaire_ids).each do |response_map|
       quiz_score = response_map.quiz_score
       participant = Participant.find(response_map.reviewer_id)
@@ -159,7 +160,9 @@ class ReputationWebServiceController < ApplicationController
 
   # This method returns the id of the last assignment.
   def client
-    @max_assignment_id = Assignment.last.id
+    flash[:max_assignment_id] = Assignment.last.id
+    flash[:assignment] = Assignment.find(flash[:assignment_id]) rescue nil
+    flash[:another_assignment] = Assignment.find(flash[:another_assignment_id]) rescue nil
   end
 
   # encrypt_request_body is used by the method prepare_request_body.
@@ -186,10 +189,10 @@ class ReputationWebServiceController < ApplicationController
   # Unoformatted string data is converted into JSON format in this method.
   # JSON formatted request body is returned to the prepare_request_body method.
   def format_into_json(unformatted_data)
-    unformatted_data.prepend('{"keys":"')
-    unformatted_data << '"}'
+    unformatted_data.prepend('{"keys":')
+    unformatted_data << '}'
     formatted_data = unformatted_data.gsub!(/\n/, '\\n')
-
+    formatted_data = formatted_data.nil? ? unformatted_data : formatted_data
     formatted_data
   end
 
@@ -230,21 +233,19 @@ class ReputationWebServiceController < ApplicationController
 
   def process_response_body(response)
     # Decryption
+    # response.body = decrypt_response(response.body)
 
-    response.body = decrypt_response(response.body)
-
-    @response = response
-    @response_body = response.body
+    flash[:response] = response
+    flash[:response_body] = response.body
 
     update_participants_reputation(response)
-    redirect_to action: 'client'
   end
 
   # add_expert_grades sets the @additional_info to 'add expert grades'
   # It prepends the request body with the expert grades pertaining to the default wiki contribution case of 754
   # It receives the request body as an argument, prepends it, and returns the body to the caller function (prepare_request_body)
   def add_expert_grades(body)
-    @additional_info = 'add expert grades'
+    flash[:additional_info] = 'add expert grades'
     case params[:assignment_id]
     when '754' # expert grades of Wiki contribution (754)
       body.prepend('"expert_grades": {"submission25030":95,"submission25031":92,"submission25033":88,"submission25034":98,"submission25035":100,"submission25037":95,"submission25038":95,"submission25039":93,"submission25040":96,"submission25041":90,"submission25042":100,"submission25046":95,"submission25049":90,"submission25050":88,"submission25053":91,"submission25054":96,"submission25055":94,"submission25059":96,"submission25071":85,"submission25082":100,"submission25086":95,"submission25097":90,"submission25098":85,"submission25102":97,"submission25103":94,"submission25105":98,"submission25114":95,"submission25115":94},')
@@ -256,7 +257,7 @@ class ReputationWebServiceController < ApplicationController
   # It gets the assignment id list and generates the json on quiz scores of those assignments.
   # Finally processes quiz string is prepended to the request body, received as an argument, and returns the body to prepare_request_body.
   def add_quiz_scores(body)
-    @additional_info = 'add quiz scores'
+    flash[:additional_info] = 'add quiz scores'
     assignment_id_list_quiz = get_assignment_id_list(params[:assignment_id].to_i, params[:another_assignment_id].to_i)
     quiz_str =  generate_json_for_quiz_scores(assignment_id_list_quiz).to_json
     quiz_str[0] = ''
@@ -269,13 +270,13 @@ class ReputationWebServiceController < ApplicationController
   # add_hamer_reputation_values sets the instance variable @additional_info.
   # This method is called by the prepare_request_body method when params receive instruction through the corresponding view's checkbox.
   def add_hamer_reputation_values
-    @additional_info = 'add initial hamer reputation values'
+    flash[:additional_info] = 'add initial hamer reputation values'
   end
 
   # add_lauw_reputation_values sets the instance variable @additional_info.
   # This method is called by the prepare_request_body method when params receive instruction through the corresponding view's checkbox.
   def add_lauw_reputation_values
-    @additional_info = 'add initial lauw reputation values'
+    flash[:additional_info] = 'add initial lauw reputation values'
   end
 
   # get_assignment_id_list on receipt of individual assignment IDs returns a list with all the assignment IDs appended into a data structure
@@ -293,16 +294,17 @@ class ReputationWebServiceController < ApplicationController
   # It further calls the methods: encrypt_request_body and format_into_json to get the request body into the correct format.
   # It finally sends the prepared request body back to the send_post_request method.
   def prepare_request_body
-    req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader: { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
+    req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
     curr_assignment_id = (params[:assignment_id].empty? ? '754' : params[:assignment_id])
     assignment_id_list_peers = get_assignment_id_list(curr_assignment_id, params[:another_assignment_id].to_i)
+
     req.body = generate_json_for_peer_reviews(assignment_id_list_peers, params[:round_num].to_i).to_json
 
     req.body[0] = '' # remove the first '{'
-    @assignment_id = params[:assignment_id]
-    @round_num = params[:round_num]
-    @algorithm = params[:algorithm]
-    @another_assignment_id = params[:another_assignment_id]
+    flash[:assignment_id] = params[:assignment_id]
+    flash[:round_num] = params[:round_num]
+    flash[:algorithm] = params[:algorithm]
+    flash[:another_assignment_id] = params[:another_assignment_id]
 
     if params[:checkbox][:expert_grade] == 'Add expert grades'
       add_expert_grades(req.body)
@@ -313,16 +315,16 @@ class ReputationWebServiceController < ApplicationController
     elsif params[:checkbox][:quiz] == 'Add quiz scores'
       add_quiz_scores(req.body)
     else
-      @additional_info = ''
+      flash[:additional_info] = ''
     end
 
     req.body.prepend('{')
-    @request_body = req.body
+    flash[:request_body] = req.body
     # Encrypting the request body data
-    req.body = encrypt_request_body(req.body)
+    # req.body = encrypt_request_body(req.body)
 
     # request body should be in JSON format.
-    req.body = format_into_json(req.body)
+    # req.body = format_into_json(req.body)
     req
   end
 
@@ -333,7 +335,12 @@ class ReputationWebServiceController < ApplicationController
   def send_post_request
     req = prepare_request_body
     response = Net::HTTP.new('peerlogic.csc.ncsu.edu').start { |http| http.request(req) }
-    process_response_body(response)
+    if %w[400 500].include?(response.code)
+      flash[:error] = 'Post Request Failed'
+    else
+      process_response_body(response)
+    end
+    redirect_to action: 'client'
   end
 
   def rsa_public_key1(data)

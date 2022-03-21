@@ -1,5 +1,8 @@
 <%= form_tag action: "send_post_request" do %>
-	<b style="font-size: 20px;">Step 1: </b>Assignment_id: <%= number_field_tag 'assignment_id', nil, in: 1..@max_assignment_id, value: @assignment.nil? ? 754 : @assignment.id, style: 'width: 3em;' %> + <%= number_field_tag 'another_assignment_id', nil, in: 1..@max_assignment_id, value: @another_assignment.nil? ? '' : @another_assignment.id, style: 'width: 3em;' %> (optional) with round <%= number_field_tag 'round_num', nil, in: 1..3, value: 2, style: 'width: 2em;' %><br>
+	<b style="font-size: 20px;">Step 1: </b>
+	Assignment_id: <%= number_field_tag 'assignment_id', nil, in: 1..flash[:max_assignment_id], value: flash[:assignment].nil? ? 754 : flash[:assignment].id, style: 'width: 3em;' %> + 
+	<%= number_field_tag 'another_assignment_id', nil, in: 1..flash[:max_assignment_id], value: flash[:another_assignment].nil? ? '' : flash[:another_assignment].id, style: 'width: 3em;' %> 
+	(optional) with round <%= number_field_tag 'round_num', nil, in: 1..3, value: 2, style: 'width: 2em;' %><br>
 
 	<b style="font-size: 20px;">Step 2: </b>Choose reputation algorithm:
 	<select id='algorithm' name='algorithm' style="width: 13em">
@@ -32,11 +35,11 @@
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<%= hidden_field_tag 'checkbox[hamer]', '' %>
 	<%= check_box_tag 'checkbox[hamer]', 'Add initial Hamer reputation values' %>Add initial Hamer reputation values 
-	with assignment_id: <%= number_field_tag 'hamer_assignment_id', nil, in: 1..@max_assignment_id, value: '', style: 'width: 3em;' %> + <%= number_field_tag 'another_hamer_assignment_id', nil, in: 1..@max_assignment_id, value: '', style: 'width: 3em;' %> (optional) <br/>
+	with assignment_id: <%= number_field_tag 'hamer_assignment_id', nil, in: 1..flash[:max_assignment_id], value: '', style: 'width: 3em;' %> + <%= number_field_tag 'another_hamer_assignment_id', nil, in: 1..flash[:max_assignment_id], value: '', style: 'width: 3em;' %> (optional) <br/>
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<%= hidden_field_tag 'checkbox[lauw]', '' %> 
 	<%= check_box_tag 'checkbox[lauw]', 'Add initial Lauw reputation values' %>Add initial Lauw reputation values 
-	with assignment_id:&nbsp;&nbsp;&nbsp;<%= number_field_tag 'lauw_assignment_id', nil, in: 1..@max_assignment_id, value: '', style: 'width: 3em;' %> + <%= number_field_tag 'another_lauw_assignment_id', nil, in: 1..@max_assignment_id, value: '', style: 'width: 3em;' %> (optional) <br/>
+	with assignment_id:&nbsp;&nbsp;&nbsp;<%= number_field_tag 'lauw_assignment_id', nil, in: 1..flash[:max_assignment_id], value: '', style: 'width: 3em;' %> + <%= number_field_tag 'another_lauw_assignment_id', nil, in: 1..flash[:max_assignment_id], value: '', style: 'width: 3em;' %> (optional) <br/>
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<%= hidden_field_tag 'checkbox[quiz]', '' %>
 	<%= check_box_tag 'checkbox[quiz]', 'Add quiz scores' %>Add quiz scores <br/>
@@ -44,11 +47,11 @@
 <% end %>
 <hr>
 <!--Request information-->
-<%= "Request info: #{@assignment.name} (#{@assignment.id})" unless @assignment.nil? %>
-<%= " + #{@another_assignment.name} (#{@another_assignment.id})" unless @another_assignment.nil? %>
-<%= " + round #{@round_num}" unless @assignment.nil? %>
-<%= " + #{@algorithm} algorithm" unless @assignment.nil? %>
-<%= " + #{@additional_info}" unless @additional_info.try(:empty?) %>
+<%= "Request info: #{flash[:assignment].name} (#{flash[:assignment].id})" unless flash[:assignment].nil? %>
+<%= " + #{flash[:another_assignment].name} (#{flash[:another_assignment].id})" unless flash[:another_assignment].nil? %>
+<%= " + round #{flash[:round_num]}" unless flash[:assignment].nil? %>
+<%= " + #{flash[:algorithm]} algorithm" unless flash[:assignment].nil? %>
+<%= " + #{flash[:additional_info]}" unless flash[:additional_info].try(:empty?) %>
 <br/><br/>
 
 <!--Beautified request and response message-->
@@ -68,9 +71,9 @@
 <!--Minified request and response message-->
 <b>Minified request and response message</b><br/>
 <p style="background-color: #fdf6e3; color: #657b83; padding: 5px; word-wrap: break-word;">
-	<%=@request_body unless @request_body.try(:empty?) %><br/><br/>
-	<%="Response #{@response.try(:code)} #{@response.try(:message)}:
-          #{@response.try(:body)}" unless @response == '' %>
+	<%=flash[:request_body] unless flash[:request_body].try(:empty?) %><br/><br/>
+	<%="Response #{flash[:response].try(:code)} #{flash[:response].try(:message)}:
+          #{flash[:response].try(:body)}" unless flash[:response] == '' %>
 </p>
 
 
@@ -121,8 +124,8 @@
 		// http://stackoverflow.com/questions/5410682/parsing-a-json-string-in-ruby
 		// http://stackoverflow.com/questions/9244824/how-to-remove-quot-from-my-json-in-javascript
 		// &quot; is not valid in a JSON object, and g in replace means replace globally
-		var request = JSON.parse('<%= @request_body %>'.replace(/&quot;/g,'"'));
-		var response = JSON.parse('<%= @response_body %>'.replace(/&quot;/g,'"'));
+		var request = JSON.parse('<%= flash[:request_body] %>'.replace(/&quot;/g,'"'));
+		var response = JSON.parse('<%= flash[:response_body] %>'.replace(/&quot;/g,'"'));
 		
 		$('#request').html(library.json.prettyPrint(request));
 		$('#response').html(library.json.prettyPrint(response));

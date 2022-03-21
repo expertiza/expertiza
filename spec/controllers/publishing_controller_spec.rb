@@ -75,7 +75,7 @@ describe PublishingController do
 
   describe 'grant' do
     context 'user clicks on grant option' do
-      it 'redirects to the grant page' do
+      it 'displays the page where the user can supply their private key and grant publishing rights' do
         allow(AssignmentParticipant).to receive(:find).with('3').and_return(assignment_participant2)
         stub_current_user(student1, student1.role.name, student1.role)
         params ={id: 3}
@@ -137,7 +137,7 @@ describe PublishingController do
   end
 
   describe 'update_publish_permissions' do
-    context 'user clicks on the grant publishing rights to all past assignments button and the assignments are already granted permission' do
+    context 'user clicks on the grant publishing rights to all past assignments button' do
       it 'redirects to grant page' do
         allow(AssignmentParticipant).to receive(:find).with('3').and_return(assignment_participant2)
         stub_current_user(student1, student1.role.name, student1.role)

@@ -43,7 +43,7 @@ describe UsersController do
 
   context '#auto_complete_for_user_name' do
     it 'checks if auto_complete returns actionview error' do
-	    stub_current_user(student1, student1.role.name, student1.role)
+	stub_current_user(student1, student1.role.name, student1.role)
     	session = { user: student1 }
     	@params = {user: student1}
     	allow(controller).to receive(:params).and_return(@params)

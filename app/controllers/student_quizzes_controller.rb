@@ -76,6 +76,7 @@ class StudentQuizzesController < ApplicationController
   end
 
   # This method is only for quiz questionnaires, it is called when instructors click "view quiz questions" on the pop-up panel.
+  # Using the current assignment id parameter, fetches all the questions for each quiz and finally lists all the answers and scores for each submission.
   def review_questions
     @assignment_id = params[:id]
     @quiz_questionnaires = []

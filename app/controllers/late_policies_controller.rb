@@ -28,10 +28,10 @@ class LatePoliciesController < ApplicationController
   end
 
   def new
-    @late_policy = LatePolicy.new
+    @penalty_policy = LatePolicy.new
     respond_to do |format|
       format.html # new.html.erb
-      format.xml  { render xml: @late_policy }
+      format.xml  { render xml: @penalty_policy }
     end
   end
 
@@ -40,35 +40,19 @@ class LatePoliciesController < ApplicationController
   end
 
   def create
-    validPenalty = true
-
-    # penalty per unit cannot be greater than maximum penalty
-    invalid_penalty_per_unit = params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
-    if invalid_penalty_per_unit
-      flash[:error] = 'The maximum penalty cannot be less than penalty per unit.'
-      validPenalty = false
-    
-    # penalty name should be unique
-    if LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
-      flash[:error] = 'A policy with the same name already exists.'
-      validPenalty = false
+    valid_penalty, error_message = validate_input
+    if error_message
+        flash[:error] = error_message
     end
 
-    # maximum penalty cannot be greater than equal to 100
-    if params[:late_policy][:max_penalty].to_i >= 100
-      flash[:error] = 'Maximum penalty cannot be greater than or equal to 100'
-      validPenalty = false
-    end
-
-    # if the late policy does not violate any of the above conditions, the policy is created
-    if validPenalty
+    if valid_penalty
       @late_policy = LatePolicy.new(late_policy_params)
       @late_policy.instructor_id = instructor_id
       begin
         @late_policy.save!
         flash[:notice] = 'The late policy was successfully created.'
         redirect_to action: 'index'
-      rescue StandardError
+      rescue StandardError 
         flash[:error] = 'The following error occurred while saving the late policy: '
         redirect_to action: 'new'
       end
@@ -78,20 +62,16 @@ class LatePoliciesController < ApplicationController
   end
 
   def update
+      # NOTE: While we consolidated the input validation for create and update,
+      # there were some difference in error messages that was lost.
+      # error message from this function would contain "cannot edit the policy"
+      # and duplicate name error would return the duplicate name in the error
+      # message. TODO: need to check this is not breaking any tests.
     penalty_policy = LatePolicy.find(params[:id])
-    max_penalty = params[:late_policy][:max_penalty].to_i
-    # if name has changed then only check for this
-    if params[:late_policy][:policy_name] != penalty_policy.policy_name &&
-       LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
-      flash[:error] = 'Cannot edit the policy. A policy with the same name ' + params[:late_policy][:policy_name] + ' already exists.'
-      redirect_to action: 'edit', id: params[:id]
-    elsif max_penalty < params[:late_policy][:penalty_per_unit].to_i
-      # penalty per unit cannot be greater than maximum penalty
-      flash[:error] = 'Cannot edit the policy. The maximum penalty cannot be less than penalty per unit.'
-      redirect_to action: 'edit', id: params[:id]
-    elsif max_penalty >= 100
-      # maximum penalty cannot be greater than equal to 100
-      flash[:error] = 'Maximum penalty cannot be greater than or equal to 100'
+
+    valid_penalty, error_message = validate_input(is_update=true)
+    if error_message
+      flash[:error] = error_message
       redirect_to action: 'edit', id: params[:id]
     else
       begin
@@ -131,4 +111,53 @@ class LatePoliciesController < ApplicationController
   def late_policy
     @penalty_policy ||= @late_policy || LatePolicy.find(params[:id]) if params[:id]
   end
+
+  def duplicate_name_check(is_update=false)
+    should_check = true
+    prefix = is_update ? "Cannot edit the policy. " : ""
+
+    if is_update
+        existing_late_policy = LatePolicy.find(params[:id])
+        if existing_late_policy.policy_name == params[:late_policy][:policy_name]
+            should_check = false
+        end
+    end
+
+    if should_check 
+      if LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
+          error_message = prefix + 'A policy with the same name ' + params[:late_policy][:policy_name] + ' already exists.'
+          valid_penalty = false
+      end
+    end
+    return valid_penalty, error_message
+  end
+
+
+  def validate_input(is_update=false)
+    # Validates input for create and update forms
+    max_penalty = params[:late_policy][:max_penalty].to_i
+    penalty_per_unit = params[:late_policy][:penalty_per_unit].to_i
+
+    valid_penalty, error_message = true, nil
+    valid_penalty, error_message = duplicate_name_check(is_update)
+    prefix = is_update ? "Cannot edit the policy. " : ""
+
+    if max_penalty < penalty_per_unit 
+      error_message = prefix + 'The maximum penalty cannot be less than penalty per unit.'
+      valid_penalty = false
+    end
+
+    if penalty_per_unit < 0
+      error_message = 'Penalty per unit cannot be negative.' 
+      valid_penalty = false
+    end
+
+    if max_penalty >= 100
+      error_message = prefix + 'Maximum penalty cannot be greater than or equal to 100'
+      valid_penalty = false
+    end
+
+    return valid_penalty, error_message
+  end
+
 end

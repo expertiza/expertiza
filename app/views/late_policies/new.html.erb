@@ -1,30 +1,9 @@
 <h1>New late policy</h1>
 
-<%= form_for @late_policy, :url => { :action => "create" } do |f| %>
-  <%= error_messages_for @late_policy %>
+<%= form_for @penalty_policy, :url => { :action => "create" } do |f| %>
+  <%= error_messages_for @penalty_policy %>
 
-  <p>
-  <label for="late_policy_name">Late policy name:</label><label style="color: #ff0000;">*</label><br/>
-    <%= f.text_field 'policy_name' %>
-  </p>
-  <p>
-  <label for="late_policy_penalty_points_per_unit">Penalty points per unit:</label><label style="color: #ff0000;">*</label><br/>
-    <%= f.text_field 'penalty_per_unit' %>
-  </p>
-  <p>
-  <label for="penalty_unit">Penalty unit:</label><label style="color: #ff0000;">*</label><br/>
-    <!--select name=<='late_policy[:penalty_unit]'%>>
-    <option value='Minute' selected>Minute</option>
-    <option value='Hour' >Hour</option>
-    <option value='Day' >Day</option>
-    </select-->
-    <% @units= %w[Minute Hour Day]%>
-    <%= f.select "penalty_unit", @units %>
-  </p>
-  <p>
-    <label for="late_policy_penalty_maximum">Maximum penalty:</label><label style="color: #ff0000;">*</label><br/>
-    <%= f.text_field 'max_penalty' %>
-  </p>
+  <%= render partial: 'form', locals: { f: f } %>
 
   <%= f.submit 'Create' %>
 <% end %>

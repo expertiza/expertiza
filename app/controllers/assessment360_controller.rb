@@ -4,6 +4,8 @@ class Assessment360Controller < ApplicationController
   include GradesHelper
   include AuthorizationHelper
   include Scoring
+  include Average
+
   # Added the @instructor to display the instructor name in the home page of the 360 degree assessment
   def action_allowed?
     current_user_has_ta_privileges?
@@ -137,6 +139,8 @@ class Assessment360Controller < ApplicationController
         assignment.participants.each do |assignment_participant|
           reviews[assignment_participant.user_id] = {} unless reviews.key?(assignment_participant.user_id)
           assignment_reviews = assignment_participant.public_send(reviews_type) if assignment_participant.respond_to? reviews_type
+          # If a student has not taken an assignment or if they have not received any grade for the same,
+          # assign it as nil(not returning anything). This helps in easier calculation of overall grade
           score = calc_avg_score(assignment_reviews)
           reviews[assignment_participant.user_id][assignment.id] = score unless score.nil?
         end
@@ -154,18 +158,6 @@ class Assessment360Controller < ApplicationController
       if course_participants.empty?
         flash[:error] = "There is no course participant in course #{course.name}"
         redirect_to(:back)
-      end
-    end
-
-    # TODO: Move to mixin
-    def calc_avg_score(reviews)
-      # If a student has not taken an assignment or if they have not received any grade for the same,
-      # assign it as nil(not returning anything). This helps in easier calculation of overall grade
-      grades = 0
-      # Check if they person has gotten any review for the assignment
-      if reviews.count > 0
-        reviews.each { |review| grades += review.average_score.to_i }
-        return (grades * 1.0 / reviews.count).round
       end
     end
 

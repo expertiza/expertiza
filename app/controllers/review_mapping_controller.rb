@@ -240,15 +240,15 @@ class ReviewMappingController < ApplicationController
     assignment = Assignment.find(params[:id])
     team = AssignmentTeam.find(params[:contributor_id])
     review_response_maps = team.review_mappings
-    num_remain_review_response_maps = review_response_maps.size
+    remaining_review_response_maps = review_response_maps.size
     review_response_maps.each do |review_response_map|
       unless Response.exists?(map_id: review_response_map.id)
         ReviewResponseMap.find(review_response_map.id).destroy
-        num_remain_review_response_maps -= 1
+        remaining_review_response_maps -= 1
       end
     end
-    if num_remain_review_response_maps > 0
-      flash[:error] = "#{num_remain_review_response_maps} reviewer(s) cannot be deleted because they have already started a review."
+    if remaining_review_response_maps > 0
+      flash[:error] = "#{remaining_review_response_maps} reviewer(s) cannot be deleted because they have already started a review."
     else
       flash[:success] = "All review mappings for \"#{team.name}\" have been deleted."
     end
@@ -350,9 +350,9 @@ class ReviewMappingController < ApplicationController
   def mapping_strategy_without_artifacts(number_of_reviews_per_student, number_of_reviews_per_submission,
                                          teams,assignment_id,participants)
     # check for exit paths first
-    if number_of_reviews_per_student == 0 and number_of_reviews_per_submission == 0
+    if number_of_reviews_per_student.zero? and number_of_reviews_per_submission.zero?
       flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
-    elsif number_of_reviews_per_student != 0 and number_of_reviews_per_submission != 0
+    elsif !number_of_reviews_per_student.zero? and !number_of_reviews_per_submission.zero?
       flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
     elsif number_of_reviews_per_student >= teams.size
       # Exception detection: If instructor want to assign too many reviews done
@@ -405,15 +405,15 @@ class ReviewMappingController < ApplicationController
   end
 
   def automatic_review_mapping_strategy(assignment_id,
-                                        participants, teams, num_reviews_per_student = 0,
-                                        submission_review_num = 0)
+                                        participants, teams, number_of_reviews_per_student = 0,
+                                        number_of_reviews_per_submission = 0)
     participants_hash = {}
     participants.each {|participant| participants_hash[participant.id] = 0 }
     # calculate reviewers for each team
-    if num_reviews_per_student != 0 and submission_review_num == 0
-      review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, num_reviews_per_student)
-    elsif num_reviews_per_student == 0 and submission_review_num != 0
-      review_strategy = ReviewMappingHelper::TeamReviewStrategy.new(participants, teams, submission_review_num)
+    if !number_of_reviews_per_student.zero? and number_of_reviews_per_submission.zero?
+      review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, number_of_reviews_per_student)
+    elsif number_of_reviews_per_student.zero? and !number_of_reviews_per_submission.zero?
+      review_strategy = ReviewMappingHelper::TeamReviewStrategy.new(participants, teams, number_of_reviews_per_submission)
     end
 
     # student_review_num was ambiguous. Changed it to num_reviews_per_student.

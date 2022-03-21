@@ -24,6 +24,11 @@ class ReviewMappingController < ApplicationController
     end
   end
 
+ 
+  # The method add_calibration checks if a participant with  certain user_id exists in the
+  # AssignmentParticipant map. If the participant doesn't exist, this method creates a new participant 
+  # in the AssignmentParticipant map. This method also checks the ReviewResponseMap with certain parameters. 
+  # If the record doesn't exist, then a new record is created in the map. 
   def add_calibration
     participant = AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first rescue nil
     if participant.nil?
@@ -43,8 +48,13 @@ class ReviewMappingController < ApplicationController
     @mapping = ResponseMap.find(params[:id])
   end
 
-  # This method is used to assign a user as a reviewer to a team except his own team
-  # The reviewer can't be assigned to review his own team's work
+  # This method is used to assign a user as a reviewer to a team 
+  # The reviewer cannot be assigned to review his own team's work
+  # Only members of other team are allowed to review a certain team's work. 
+  # The method doesn't return anything. It just performs the assignment of the reviewer to the team. 
+  # @param assignment is {Assignment} type.
+  # @param user_id is {string} 
+  # @param topic_id is {string}
   def add_reviewer_to_another_team(assignment,user_id,topic_id)
     # Team lazy initialization
     SignUpSheet.signup_team(assignment.id, user_id, topic_id)
@@ -70,15 +80,16 @@ class ReviewMappingController < ApplicationController
     end
     return msg
   end
-  # This method is used to assign reviewers to student's work
-  # The student cannot review their own work
-
+  
+  # This method is used to assign reviewers to student's work.
+  # The student should not be able to review their own work. 
+  # If instructor want to assign one student to review his/her own artifact,
+  # it should be counted as "self-review" and we need to make /app/views/submitted_content/_selfreview.html.erb work.
+  # This method does not take any parameters and does not return anything.
   def add_reviewer
     assignment = Assignment.find(params[:id])
     topic_id = params[:topic_id]
     user_id = User.where(name: params[:user][:name]).first.id
-    # If instructor want to assign one student to review his/her own artifact,
-    # it should be counted as "self-review" and we need to make /app/views/submitted_content/_selfreview.html.erb work.
     if TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
       flash[:error] = 'You cannot assign this student to review his/her own artifact.'
     else
@@ -88,9 +99,11 @@ class ReviewMappingController < ApplicationController
   end
 
 
-  # This method checks if the user is allowed to do any more reviews.
+  # This method checks if the user is allowed to do any more reviews than the user already has
   # First we find the number of reviews done by that reviewer for that assignment and we compare it with assignment policy
-  # if number of reviews are less than allowed than a user is allowed to request.
+  # if number of reviews are less than allowed than a user is allowed to request for more reviwes. 
+  # @param assignment is {Assignment} type.
+  # @param reviewer is {AssignmentParticipant} 
   def review_allowed?(assignment, reviewer)
     @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
     assignment.num_reviews_allowed > @review_mappings.size
@@ -101,6 +114,8 @@ class ReviewMappingController < ApplicationController
   # First we find the reviews done by that student, if he hasn't done any review till now, true is returned
   # else we compute total reviews completed by adding each response
   # we then check of the reviews in progress are less than assignment's policy
+  # @param assignment is {Assignment} type.
+  # @param reviewer is {AssignmentParticipant} 
   def check_outstanding_reviews?(assignment, reviewer)
     @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
     @num_reviews_total = @review_mappings.size
@@ -120,6 +135,8 @@ class ReviewMappingController < ApplicationController
   # assign the reviewer to review the assignment_team's submission. Only used in the assignments that do not have any topic
   # Parameter assignment_team is the candidate assignment team, it cannot be a team w/o submission, or have reviewed by reviewer, or reviewer's own team.
   # (guaranteed by candidate_assignment_teams_to_review method)
+  # @param assignment is {Assignment} type.
+  # @param reviewer is {AssignmentParticipant} 
   def assign_reviewer_without_topic(assignment,reviewer)
     assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
     assignment_team = assignment_teams.to_a.sample rescue nil
@@ -130,6 +147,12 @@ class ReviewMappingController < ApplicationController
     end
   end
 
+  # This method makes assignments based on the availability of the topic. It does this on the basis
+  # whether a topic_id exists or not.
+  # If a topic_id does not exist, then the method makes an assignment without the topic.
+  # However, if a topic_id does exist, the method assigns the reviewer dynamically.
+  # @param assignment is {Assignment} type.
+  # @param reviewer is {AssignmentParticipant} 
   def assign_on_topic_availability(assignment,reviewer)
     # begin
     if assignment.topics? # assignment with topics
@@ -173,7 +196,11 @@ class ReviewMappingController < ApplicationController
     redirect_to controller: 'student_review', action: 'list', id: participant.id
   end
 
-  # assigns the quiz dynamically to the participant
+  # This method is used to assign a quiz dynamically to the participant. 
+  # The method first finds the assignment and reviewer using the assignment_id and reviewer_id parameters.
+  # If the participant has already taken the quiz, the method shows an error.
+  # Otherwise, a new record is created in the QuizResponseMap. 
+  # This method doesn't return anything. 
   def assign_quiz_dynamically
     begin
       assignment = Assignment.find(params[:assignment_id])
@@ -193,7 +220,11 @@ class ReviewMappingController < ApplicationController
     redirect_to student_quizzes_path(id: reviewer.id)
   end
 
-
+  # This method is used to assign metareviewer to a reviewer. To achieve this, the method first
+  # finds the user from the params. The method then checks if a reviewer is already assigned 
+  # as a meta reviewer. If yes, it throws a flash alert. 
+  # Otherwise, the method just creates new meta reviewer in the MetareviewResponseMap. 
+  # The method doesn't return anything. 
   def add_metareviewer
     mapping = ResponseMap.find(params[:id])
     msg = ''
@@ -214,6 +245,11 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: mapping.assignment.id, msg: msg
   end
 
+  # This method is used to assign a metareviewer dynamically. 
+  # The method first finds the assignment using the assignment_id param. 
+  # It then finds the metareviewer from AssignmentParticipant. The method then
+  # assigns the metareviewer to the asignment dynamically. If the operation fails
+  # an error is thrown. 
   def assign_metareviewer_dynamically
     assignment = Assignment.find(params[:assignment_id])
     metareviewer = AssignmentParticipant.where(user_id: params[:metareviewer_id], parent_id: assignment.id).first
@@ -225,7 +261,12 @@ class ReviewMappingController < ApplicationController
     redirect_to controller: 'student_review', action: 'list', id: metareviewer.id
   end
 
-  #This method gets the reviewer
+  # This method gets the reviewer form the AssignmentParticipant. 
+  # If this operation fails, the code handles it by throwing an error. 
+  # If the reviewer does not exist, an error is thrown, asking the user to
+  # register the user first. 
+  # @param user is {Participant} type.
+  # @param reg_url is {string} 
   def get_reviewer(user, assignment, reg_url)
     begin
       reviewer = AssignmentParticipant.where(user_id: user.id, parent_id: assignment.id).first
@@ -236,6 +277,12 @@ class ReviewMappingController < ApplicationController
     end
   end
 
+
+  # This method is used to remove reviewers that are not working on any reviews. 
+  # The method identifies all such reviewers and deletes them from the ReviewResponseMap. 
+  # If after all the deletions, values still exist in ReviewResponseMap, the method
+  # shows an alert that says that the reviewer(s) cannot be deleted because they have already started a review.
+  # This method doesn't return anything. 
   def delete_outstanding_reviewers
     assignment = Assignment.find(params[:id])
     team = AssignmentTeam.find(params[:contributor_id])
@@ -255,31 +302,52 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id
   end
 
+
+  # This method is used to delete all the meta reviewers. 
+  # The method also keeps a track of the number of unsuccessful deletes. 
+  # If the number of unsiccessfu deletes is greater than 0, the method shows an alert
+  # asking the user if they want to delete the existing meta reviewers. 
   def delete_all_metareviewers
     mapping = ResponseMap.find(params[:id])
-    mmappings = MetareviewResponseMap.where(reviewed_object_id: mapping.map_id)
-    num_unsuccessful_deletes = 0
-    mmappings.each do |mmapping|
+    meta_reviewer_mappings = MetareviewResponseMap.where(reviewed_object_id: mapping.map_id)
+    num_of_unsuccessful_deletes = 0
+    meta_reviewer_mappings.each do |mmapping|
       begin
         mmapping.delete(params[:force])
       rescue StandardError
-        num_unsuccessful_deletes += 1
+        num_of_unsuccessful_deletes += 1
       end
     end
-
-    if num_unsuccessful_deletes > 0
-      url_yes = url_for action: 'delete_all_metareviewers', id: mapping.map_id, force: 1
-      url_no = url_for action: 'delete_all_metareviewers', id: mapping.map_id
-      flash[:error] = "A delete action failed:<br/>#{num_unsuccessful_deletes} metareviews exist for these mappings. " \
-                      'Delete these mappings anyway?' \
-                      "&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><br/>"
+    if num_of_unsuccessful_deletes > 0
+      delete_unsuccessful_deletes(mapping, num_of_unsuccessful_deletes)
     else
       flash[:note] = "All metareview mappings for contributor \"" + mapping.reviewee.name + "\" and reviewer \"" + mapping.reviewer.name + "\" have been deleted."
     end
     redirect_to action: 'list_mappings', id: mapping.assignment.id
   end
 
+  # This method asks the user if they want to go ahead with deleting the metareviewers that 
+  # were not succesfully deleted earlier. 
+  # It prompts for the user to either delete the metareviewer for a mapping 
+  # or keep them. If the user chooses to delete them, the delete_all_metareviewers action is called and 
+  # the metareviewer is deleted. 
+  # @param mapping is {ResponseMap} type.
+  # @param num_of_unsuccessful_deletes is {integer} 
+  def delete_unsuccessful_deletes(mapping, num_of_unsuccessful_deletes)
+    url_yes = url_for action: 'delete_all_metareviewers', id: mapping.map_id, force: 1
+    url_no = url_for action: 'delete_all_metareviewers', id: mapping.map_id
+    flash[:error] = "A delete action failed:<br/>#{num_of_unsuccessful_deletes} metareviews exist for these mappings. " \
+                    'Delete these mappings anyway?' \
+                    "&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><br/>"
+  end
+
+
   # E1721: Unsubmit reviews using AJAX
+  # This method is used to Unsubmit a review that has been reviewed by a reviewer. 
+  # To achieve this, the method finds the review response from the ReviewResponseMap. Using this
+  # the reviewer and the reviewee are identified. The method then displays an alert
+  # telling whether the review has been unsubmitted or not. 
+  # This method does not return anything. 
   def unsubmit_review
     @response = Response.where(map_id: params[:id]).last
     review_response_map = ReviewResponseMap.find_by(id: params[:id])
@@ -337,6 +405,7 @@ class ReviewMappingController < ApplicationController
     @items.sort_by(&:name)
   end
 
+  #
   def create_team(participants,assignment_id, teams)
     participants.each do |participant|
       user = participant.user
@@ -481,22 +550,23 @@ class ReviewMappingController < ApplicationController
 
   private
 
+
+  # This method is used to assign reviewers for a team. 
+  #It assigns reviewers to participants that have insufficient reviews. 
   def assign_reviewers_for_team(assignment_id, review_strategy, reviews_per_participant_map)
     if check_eligibility(assignment_id,review_strategy)
       participants_with_insufficient_review_num = []
       reviews_per_participant_map.each do |participant_id, review_num|
         participants_with_insufficient_review_num << participant_id if review_num < review_strategy.reviews_per_student
       end
-      #can be added in a method
       teams_hash = generate_teams_hash(assignment_id)
-      #can be added in a method
       teams_hash = teams_hash_modified(participants_with_insufficient_review_num, teams_hash, assignment_id)
     end
     @@time_create_last_review_mapping_record = last_created_time_review_mapping_record(assignment_id)
   end
 
-  # This method is used to check eligibility 
-  def check_eligibility(assignment_id,review_strategy)
+  # This method is used to checks if reviews are needed. 
+  def check_reviews_eligibility(assignment_id,review_strategy)
     if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0)
       .where("created_at > :time",
              time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
@@ -509,7 +579,8 @@ class ReviewMappingController < ApplicationController
   end
 
   
-  # This method is used to generate teams_hash 
+  # This method is used to generate teams_hash. It first generates an unsorted teams_hash
+  # and returns a sorted hash of the same. 
   def generate_teams_hash(assignment_id)
     unsorted_teams_hash = {}
       ReviewResponseMap.where(reviewed_object_id: assignment_id,
@@ -524,7 +595,7 @@ class ReviewMappingController < ApplicationController
       return teams_hash
   end
 
-  # This method is used to modify the teams_hash value
+  # This method is used to modify the teams_hash value. 
   def teams_hash_modified(participants_with_insufficient_review_num, teams_hash, assignment_id)
     participants_with_insufficient_review_num.each do |participant_id|
       teams_hash.each_key do |team_id, _num_review_received|
@@ -542,8 +613,8 @@ class ReviewMappingController < ApplicationController
     return teams_hash
   end
 
+  # This method is used to remove students who have already been assigned enough num of reviews out of participants array
   def update_participants_after_assigning_reviews(num_participants, maximum_reviews_per_student, participants, reviews_per_participant_map, rand_num)
-    # remove students who have already been assigned enough num of reviews out of participants array
     participants.each do |participant|
       if reviews_per_participant_map[participant.id] == maximum_reviews_per_student
         participants.delete_at(rand_num)
@@ -552,8 +623,8 @@ class ReviewMappingController < ApplicationController
     end
   end
 
+  # This method is used to even out the # of reviews for teams.
   def even_out_reviews_among_teams(team, assignment_id, review_strategy, selected_participants, reviews_per_participant_map, iterator, num_participants, participants)
-    # need to even out the # of reviews for teams
     maximum_reviews_per_student = review_strategy.reviews_per_student
     maximum_reviews_per_team = review_strategy.reviews_per_team
 

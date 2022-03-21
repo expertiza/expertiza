@@ -614,7 +614,7 @@ class ReviewMappingController < ApplicationController
   end
 
   # This method is used to remove students who have already been assigned enough num of reviews out of participants array
-  def update_participants_after_assigning_reviews(num_participants, maximum_reviews_per_student, participants, reviews_per_participant_map, rand_num)
+  def remove_students_with_enough_reviews(num_participants, maximum_reviews_per_student, participants, reviews_per_participant_map, rand_num)
     participants.each do |participant|
       if reviews_per_participant_map[participant.id] == maximum_reviews_per_student
         participants.delete_at(rand_num)
@@ -623,7 +623,9 @@ class ReviewMappingController < ApplicationController
     end
   end
 
-  # This method is used to even out the # of reviews for teams.
+  # This method is used to even out the # of reviews among teams for the specified assignment ID
+  # reviews_per_participant_map is used to track number of reviews assigned to a particiapnt till now
+  # selected_participants is used to track participant IDs which are selected to review for a particular team
   def even_out_reviews_among_teams(team, assignment_id, review_strategy, selected_participants, reviews_per_participant_map, iterator, num_participants, participants)
     maximum_reviews_per_student = review_strategy.reviews_per_student
     maximum_reviews_per_team = review_strategy.reviews_per_team
@@ -643,10 +645,13 @@ class ReviewMappingController < ApplicationController
       if (current_reviews_per_participant < maximum_reviews_per_student) && participant_not_present_in_selected_participants
         modify_selected_participants_to_review(participants[rand_num].id, selected_participants, reviews_per_participant_map)
       end
-      update_participants_after_assigning_reviews(num_participants, maximum_reviews_per_student, participants, reviews_per_participant_map, rand_num)
+      remove_students_with_enough_reviews(num_participants, maximum_reviews_per_student, participants, reviews_per_participant_map, rand_num)
     end
   end
 
+  # Strategy to allocate reviews to participants following certain principles 
+  # 1) Evenly distributing the reviews to participants
+  # 2) Not assignining the participant to review his or her own work
   def peer_review_strategy(assignment_id, review_strategy, reviews_per_participant_map)
     teams = review_strategy.teams
     participants = review_strategy.participants
@@ -678,6 +683,8 @@ class ReviewMappingController < ApplicationController
     end
   end
 
+  # This function is used to update the selected participants corresponding to a team to review
+  # It also maintains reviews per participant assigned till now
   def modify_selected_participants_to_review(participant_id, selected_participants, reviews_per_participant_map)
     # selected_participants cannot include duplicate num
     selected_participants << participant_id
@@ -693,7 +700,7 @@ class ReviewMappingController < ApplicationController
     return rand_num
   end
 
-
+  # determines number of participants in the team with Assignment assignment_id who can't review or submit
   def number_of_participants_in_team(assignment_id, team)
     num_participants_this_team = TeamsUser.where(team_id: team.id).size
     # If there are some submitters or reviewers in this team, they are not treated as normal participants.

@@ -61,19 +61,8 @@ class ImpersonateController < ApplicationController
   # contains_special_chars method-converts it to regex and compares with the string
   # warn_for_special_chars takes the output from above method and flashes an error if there are any special characters(/\?<>|&$#) in the string
   def check_if_special_char
-    if params[:user]
-      if warn_for_special_chars(params[:user][:name], 'Username')
-        redirect_back
-        return
-      end
-    end
-
-    if params[:impersonate]
-      if warn_for_special_chars(params[:impersonate][:name], 'Username')
-        redirect_back
-        return
-      end
-    end
+    redirect_back if params[:user] && warn_for_special_chars(params[:user][:name], 'Username')
+    redirect_back if params[:impersonate] && warn_for_special_chars(params[:impersonate][:name], 'Username')
   end
 
   # Checking if the username provided can be impersonated or not
@@ -83,8 +72,7 @@ class ImpersonateController < ApplicationController
   # If original user can impersonate the user ,then session will be overwrite to get the view of the user who is getting impersonated
   def check_if_user_impersonateable
     if params[:impersonate].nil?
-      # E1991 : check whether instructor is currently in anonymized view
-      user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:user][:name]) : User.find_by(name: params[:user][:name])
+      user = get_real_user(params[:user][:name])
       if !@original_user.can_impersonate? user
         @message = "You cannot impersonate '#{params[:user][:name]}'."
         temp
@@ -109,7 +97,7 @@ class ImpersonateController < ApplicationController
       @message = "No user exists with the name '#{params[:user][:name]}'."
       # This is called when we try to impersonate a wrong user from the impersonated account.
     elsif params[:impersonate]
-      @message = "No user exists with the name '#{params[:impersonate][:name]}'."
+      @message = "No impersonate user exists with the name '#{params[:impersonate][:name]}'."
     else
       if params[:impersonate].nil?
         @message = "You cannot impersonate '#{params[:user][:name]}'."
@@ -123,16 +111,13 @@ class ImpersonateController < ApplicationController
     end
   rescue StandardError
     flash[:error] = @message
-    redirect_to :back
+    redirect_back
   end
 
   # Main operation
-  def do_main_operation(user)
-    if user
-      check_if_user_impersonateable
-    else
-      display_error_msg
-    end
+  def do_impersonate_operation(user)
+    check_if_user_impersonateable if user
+    display_error_msg
   end
 
   # Main operation, method used to break the functions in impersonate controller and bring out 2 functionalities at same level,

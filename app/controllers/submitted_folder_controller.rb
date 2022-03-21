@@ -3,6 +3,7 @@ class SubmittedFolderController < ApplicationController
   def perform_folder_action
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
+    
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name]) if params[:current_folder]

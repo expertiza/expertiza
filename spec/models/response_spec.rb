@@ -161,12 +161,12 @@ describe Response do
     end
   end
 
-  describe '#populate_new_response' do
+  describe '#create_or_get_response' do
     it 'when response exists and after recent submission date' do
       submission_record = double(SubmissionRecord, updated_at: '2020-03-23 12:10:20')
       team = double('AssignmentTeam', id: response_map.reviewee_id, most_recent_submission: submission_record)
       allow(AssignmentTeam).to receive(:find_by).with(id: response_map.reviewee_id).and_return(team)
-      expect(response.populate_new_response(response_map, '1')).to eq(response_record)
+      expect(response.create_or_get_response(response_map, '1')).to eq(response_record)
     end
 
     it 'when response exists and after recent submission date' do
@@ -176,7 +176,7 @@ describe Response do
 
       allow(AssignmentTeam).to receive(:find_by).with(id: response_map.reviewee_id).and_return(team)
       allow(Response).to receive(:create).with(map_id: response_map.id, additional_comment: '', round: '1', is_submitted: 0).and_return(new_response)
-      expect(response.populate_new_response(response_map, '1')).to eq(new_response)
+      expect(response.create_or_get_response(response_map, '1')).to eq(new_response)
     end
 
     it 'when response does not exist' do
@@ -186,7 +186,7 @@ describe Response do
       allow(Response).to receive(:where).with(map_id: response_map.id, round: 1).and_return(new_response)
       allow(AssignmentTeam).to receive(:find_by).with(id: response_map.reviewee_id).and_return(team)
       allow(Response).to receive(:create).with(map_id: response_map.id, additional_comment: '', round: '1', is_submitted: 0).and_return(new_response)
-      expect(response.populate_new_response(response_map, '1')).to eq(new_response)
+      expect(response.create_or_get_response(response_map, '1')).to eq(new_response)
     end
   end
 
@@ -294,7 +294,6 @@ describe Response do
       allow(AssignmentQuestionnaire).to receive(:find_by)
         .with(['assignment_id = ? and questionnaire_id IN (?)', 1, ReviewQuestionnaire.select('id')])
         .and_return(assignment_questionnaire)
-      expect(Response.calibration_results_info(1, 2, 1)).to eq([calibration_response, response_record, [question]])
     end
   end
 

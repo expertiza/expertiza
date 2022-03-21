@@ -184,7 +184,6 @@ class SignupSheetController < ApplicationController
   end
 
   def list
-
     # Find participant, assignment which participant is associated with, team which participant belongs to etc.
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
@@ -432,7 +431,7 @@ class SignupSheetController < ApplicationController
   # This method is called when a student click on the trumpet icon. So this is a bad method name. --Yang
   def show_team
     if !(assignment = Assignment.find(params[:assignment_id])).nil? && !(topic = SignUpTopic.find(params[:id])).nil?
-      @results = ad_info(assignment.id, topic.id)
+      @results = ads_for_partners_info(assignment.id, topic.id)
       @results.each do |result|
         result.keys.each do |key|
           @current_team_name = result[key] if key.equal? :name
@@ -535,7 +534,7 @@ class SignupSheetController < ApplicationController
 
   # get info related to the ad for partners so that it can be displayed when an assignment_participant
   # clicks to see ads related to a topic
-  def ad_info(_assignment_id, topic_id)
+  def ads_for_partners_info(_assignment_id, topic_id)
     # List that contains individual result object
     @result_list = []
     # Get the results

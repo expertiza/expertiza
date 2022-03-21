@@ -1,7 +1,7 @@
 <style>
-  th, td {
-    text-align: center;
-}
+    th, td {
+        text-align: center;
+    }
 </style>
 
 <%# Initializing the checkboxes on the top of the page. By default, they'll be checked.%>
@@ -29,6 +29,22 @@
             $(affected_parent_column).show();
         }
     }
+
+    // Function checks if all assignment columns checkboxes are enabled/disabled.
+    // If all checkboxes are disabled, then the corresponding Assignment columns also needs to be hidden.
+    function validate_assignments()
+    {
+        var assignment_checkboxes = $('input.assignment_columns:not(":checked")').length;
+        var affected_column = '.assgn_colspan'; // Assignment has five child columns - Metareviews, Teammate Reviews, Topic, Peer score and Instructor grade
+        if(assignment_checkboxes == 5)
+        {
+            $(affected_column).hide();
+        }
+        else {
+            $(affected_column).show();
+        }
+    }
+
     // Function checks if Total instructor grade box is enabled/disabled.
     // If the checkbox is disabled, then the Final Grades column also needs to be hidden.
     function validate_finalgrades()
@@ -73,10 +89,15 @@
             if(tableColumn == "meta_review" || tableColumn == "teammate_review")
             {
                 validate_aggscore();
+                validate_assignments();
             }
             else if(tableColumn == "tot_instructor_grade")
             {
                 validate_finalgrades();
+            }
+            else if (tableColumn == "topic" || tableColumn == "peer_score" || tableColumn == "instructor_grade")
+            {
+                validate_assignments(); //Check and hide assignment columns based on checkboxes
             }
             else{}
         });
@@ -112,38 +133,38 @@
     </tr>
 
     <% @course_participants.each do |cp|%>
-        <tr>
-            <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
-            <td class="teammate_count"><%= @teammate_count[cp.id] %></td>
-            <% @assignments.each do |assignment|%>
-                <td class="meta_review"><%= format_percentage(@meta_review[cp.user_id][assignment.id]) unless @meta_review.nil? %></td>
-                <td class="teammate_review"><%= format_percentage(@teammate_review[cp.user_id][assignment.id]) unless @teammate_review.nil? %></td>
-                <% topic = format_topic(@topics[cp.id][assignment.id]) %>
-                <td title="<%= topic %>" class="topic topic-tooltip">
-                  <%= topic %>
-                </td>
-                <td class="peer_score"><%= format_score(@peer_review_scores[cp.id][assignment.id]) %></td>
-                <td class="instructor_grade"><%= format_score(@assignment_grades[cp.id][assignment.id]) %> </td>
-            <% end%>
-            <td class="meta_review"><%= format_percentage(@meta_review[:aggregate_score][cp.user_id]) unless @meta_review.nil? %></td>
-            <td class="teammate_review"><%= format_percentage(@teammate_review[:aggregate_score][cp.user_id]) unless @teammate_review.nil? %></td>
-            <td class="tot_instructor_grade"><%= @final_grades[cp.id] %></td>
-        </tr>
+      <tr>
+        <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
+        <td class="teammate_count"><%= @teammate_count[cp.id] %></td>
+        <% @assignments.each do |assignment|%>
+          <td class="meta_review"><%= format_percentage(@meta_review[cp.user_id][assignment.id]) unless @meta_review.nil? %></td>
+          <td class="teammate_review"><%= format_percentage(@teammate_review[cp.user_id][assignment.id]) unless @teammate_review.nil? %></td>
+          <% topic = format_topic(@topics[cp.id][assignment.id]) %>
+          <td title="<%= topic %>" class="topic topic-tooltip">
+            <%= topic %>
+          </td>
+          <td class="peer_score"><%= format_score(@peer_review_scores[cp.id][assignment.id]) %></td>
+          <td class="instructor_grade"><%= format_score(@assignment_grades[cp.id][assignment.id]) %> </td>
+        <% end%>
+        <td class="meta_review"><%= format_percentage(@meta_review[:aggregate_score][cp.user_id]) unless @meta_review.nil? %></td>
+        <td class="teammate_review"><%= format_percentage(@teammate_review[:aggregate_score][cp.user_id]) unless @teammate_review.nil? %></td>
+        <td class="tot_instructor_grade"><%= @final_grades[cp.id] %></td>
+      </tr>
     <%end%>
-        <tr>
-            <td><b>Class average</b></td>
-            <td class="teammate_count"></td>
-            <% @assignments.each do |assignment|%>
-                <td class="meta_review"><%= format_percentage(@meta_review[:class_avg][assignment.id]) unless @meta_review.nil? %></td>
-                <td class="teammate_review"><%= format_percentage(@teammate_review[:class_avg][assignment.id]) unless @teammate_review.nil? %></td>
-                <td class="topic"></td>
-                <td class="peer_score"><%= format_score(@peer_review_scores[:class_avg][assignment.id]) %></td>
-                <td class="instructor_grade"><%= format_score(@assignment_grades[:class_avg][assignment.id]) %> </td>
-            <% end%>
-          <td class="meta_review"><%= format_percentage(@meta_review[:aggregate_score_class_avg]) unless @meta_review.nil? %></td>
-          <td class="teammate_review"><%= format_percentage(@teammate_review[:aggregate_score_class_avg]) unless @teammate_review.nil? %></td>
-          <td class="tot_instructor_grade"><%= format_score(@final_grades.inject(0) {|sum, (k, v)| sum += v}) %> </td>
-          <td></td>
-        </tr>
-    </table>
+    <tr>
+      <td><b>Class average</b></td>
+      <td class="teammate_count"></td>
+      <% @assignments.each do |assignment|%>
+        <td class="meta_review"><%= format_percentage(@meta_review[:class_avg][assignment.id]) unless @meta_review.nil? %></td>
+        <td class="teammate_review"><%= format_percentage(@teammate_review[:class_avg][assignment.id]) unless @teammate_review.nil? %></td>
+        <td class="topic"></td>
+        <td class="peer_score"><%= format_score(@peer_review_scores[:class_avg][assignment.id]) %></td>
+        <td class="instructor_grade"><%= format_score(@assignment_grades[:class_avg][assignment.id]) %> </td>
+      <% end%>
+      <td class="meta_review"><%= format_percentage(@meta_review[:aggregate_score_class_avg]) unless @meta_review.nil? %></td>
+      <td class="teammate_review"><%= format_percentage(@teammate_review[:aggregate_score_class_avg]) unless @teammate_review.nil? %></td>
+      <td class="tot_instructor_grade"><%= format_score(@final_grades.inject(0) {|sum, (k, v)| sum += v}) %> </td>
+      <td></td>
+    </tr>
+  </table>
 </div>

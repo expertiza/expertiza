@@ -46,12 +46,8 @@ class ReputationWebServiceController < ApplicationController
   # This function takes in arguments of valid_answer and the maximum score of the question.
   # peer_review_grade is calculated as a percentage of valid answers' cumulative weight in the answer's cumulative weight of the maximum score.
   def calculate_peer_review_grade(valid_answer, max_question_score)
-    temp_sum = 0
-    weight_sum = 0
-    valid_answer.each do |answer|
-      temp_sum += answer.answer * answer.question.weight
-      weight_sum += answer.question.weight
-    end
+    temp_sum = valid_answer.map { |answer| answer.answer * answer.question.weight }.inject(:+)
+    weight_sum = valid_answer.sum { |answer| answer.question.weight }
     peer_review_grade = 100.0 * temp_sum / (weight_sum * max_question_score)
     peer_review_grade.round(4)
   end

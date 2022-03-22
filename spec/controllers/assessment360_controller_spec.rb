@@ -39,6 +39,7 @@ describe Assessment360Controller do
   let(:participant) { build(:participant) }
   let(:scores) {}
   let(:topic) { build(:topic) }
+  let(:topic_with_identifier_and_name) { build(:topic, topic_identifier: 2.1, topic_name: 'Topic 1')}
 
   describe 'checking controller permissions' do
     context 'when different roles call the controller' do
@@ -381,6 +382,59 @@ describe Assessment360Controller do
         returned_peer_review_scores = controller.instance_variable_get(:@peer_review_scores)
         expect(returned_peer_review_scores[nil][1]).to eq(90)
         returned_final_grades = controller.instance_variable_get(:@final_grades)
+      end
+    end
+  end
+
+  describe 'Test format functions' do
+
+    context 'format_topic' do
+
+      it 'topic is nil' do
+        result = controller.format_topic(nil)
+        expect(result).to eq('–')
+      end
+
+      it 'topic is not null' do
+        expected = '2.1 - Topic 1'
+        allow(topic_with_identifier_and_name).to receive(:format_for_display).and_return(expected)
+        result = controller.format_topic(topic_with_identifier_and_name)
+        expect(result).to eq(expected)
+      end
+    end
+
+    context 'format_score' do
+      it 'score is nil' do
+        result = controller.format_score(nil)
+        expect(result).to eq('–')
+      end
+
+      it 'score is int' do
+        result = controller.format_score(97)
+        expect(result).to eq(97)
+      end
+
+      it 'score is float' do
+        result = controller.format_score(97.67)
+        expect(result).to eq(97.67)
+      end
+
+    end
+
+    context 'format_percentage' do
+      it 'percentage is nil' do
+        result = controller.format_percentage(nil)
+        expect(result).to eq('–')
+      end
+
+      it 'percentage is int' do
+        result = controller.format_percentage(97)
+        expect(result).to eq('97%')
+      end
+
+      it 'percentage is float' do
+        result = controller.format_percentage(97.67)
+        expect(result).to eq('97.67%')
       end
     end
   end

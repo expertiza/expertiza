@@ -4,27 +4,40 @@ require 'net/http'
 require 'openssl'
 require 'base64'
 
-# Expertiza allows student work to be peer-reviewed, since peers can provide more feedback than the instructor can.
-# However, if we want to assure that all students receive competent feedback, or even use peer-assigned grades,
-# we need a way to judge which peer reviewers are most credible. The solution is the reputation system.
-# Reputation systems have been deployed as web services, peer-review researchers will be able to use them to calculate scores on assignments,
+# Expertiza allows student work to be peer-reviewed, since peers can provide
+# more feedback than the instructor can.
+# However, if we want to assure that all students receive competent feedback,
+# or even use peer-assigned grades,
+# we need a way to judge which peer reviewers are most credible. The solution
+# is the reputation system.
+# Reputation systems have been deployed as web services, peer-review
+# researchers will be able to use them to calculate scores on assignments,
 # both past and present (past data can be used to tune the algorithms).
 #
 # This file is the controller to calculate the reputation scores.
-# A 'reputation' measures how close a reviewer's scores are to other reviewers' scores.
+# A 'reputation' measures how close a reviewer's scores are to other reviewers'
+# scores.
 # This controller implements the calculation of reputation scores.
 class ReputationWebServiceController < ApplicationController
   include AuthorizationHelper
 
-  # action_allowed? function checks if the currently authenticated user has the authorization to perform certain actions.
-  # This function returns true if the user has privileges to perform the action. Otherwise, it returns false.
+  # Method: action_allowed
+  # This method checks if the currently authenticated user has the authorization
+  # to perform certain actions
+  # Params
+  #
+  # Returns
+  #   true if the user has privileges to perform the action else returns false
   def action_allowed?
     current_user_has_ta_privileges?
   end
 
-  # get_max_question_score receives a set of answers as an argument and gets the question associated with the answers.
-  # It then returns the maximum score of the question from the relevant questionnaire record.
-  # In case of standard error, this method returns 1
+  # Method: get_max_question_score
+  # This method receives a set of answers and gets the maximum question score
+  # Params
+  #   answers: set of answers
+  # Returns
+  #   if no error returns max_question_score of first question else 1
   def get_max_question_score(answers)
     begin
       answers.first.question.questionnaire.max_question_score
@@ -33,18 +46,25 @@ class ReputationWebServiceController < ApplicationController
     end
   end
 
-  # get_valid_answers_for_response method retrieves the answer list using the id of the received response.
-  # It filters out the answers list to select non-empty answers of criterion question type as valid_answer.
-  # return valid_answers if it is not an empty list.
+  # Method: get_valid_answers_for_response
+  # This method receives response and filters the valid answers list of the response ID
+  # Params
+  #   response
+  # Returns
+  #   set of valid answers
   def get_valid_answers_for_response(response)
     answers = Answer.where(response_id: response.id)
     valid_answer = answers.select { |a| (a.question.type == 'Criterion') && !a.answer.nil? }
     valid_answer.empty? ? nil : valid_answer
   end
 
-  # calculate_peer_review_grade calculates a cumulative review grade with respect to the set of valid answers.
-  # This function takes in arguments of valid_answer and the maximum score of the question.
-  # peer_review_grade is calculated as a percentage of valid answers' cumulative weight in the answer's cumulative weight of the maximum score.
+  # Method: calculate_peer_review_grade
+  # This method calculates a cumulative review grade with respect to the set of valid answers
+  # Params
+  #   valid_answer: valid answer to get weight of the answer's question
+  #   max_question_score: used to calculate maximum score for peer review grade
+  # Returns
+  #   peer_review_grade
   def calculate_peer_review_grade(valid_answer, max_question_score)
     temp_sum = valid_answer.map { |answer| answer.answer * answer.question.weight }.inject(:+)
     weight_sum = valid_answer.sum { |answer| answer.question.weight }
@@ -52,9 +72,14 @@ class ReputationWebServiceController < ApplicationController
     peer_review_grade.round(4)
   end
 
-  # get_peer_reviews_for_responses calculates the peer review grade for each valid response.
-  # It gets a peer review grade for each valid answer associated with each valid response.
-  # Calculated grades along with reviewer ID and team ID are appended to a list and returned.
+  # Method: get_peer_reviews_for_responses
+  # This method calculates the peer review grade for each valid response
+  # Params
+  #   reviewer_id: used to create respective element in the peer_review_grades_list
+  #   team_id: used to create respective element in the peer_review_grades_list
+  #   valid_response: to get the valid answer for each valid response
+  # Returns
+  #   peer_review_grades_list
   def get_peer_reviews_for_responses(reviewer_id, team_id, valid_response)
     peer_review_grades_list = []
     valid_response.each do |response|
@@ -67,10 +92,15 @@ class ReputationWebServiceController < ApplicationController
     peer_review_grades_list
   end
 
-  # get_peer_reviews, for a given assignment list ids, retrieves all the reviews for the submitted works.
-  # For each review, the reviewer, the team being reviewed, and the validly submitted works are queried for.
-  # These results are sent to get_peer_reviews_for_responses for getting the review grade for that particular review.
-  # reviewer_id, team_id, review_grade are appended to the raw_data_array list and returned.
+  # Method: get_peer_reviews
+  # This method retrieves all the reviews for the submissions
+  # Params
+  #   assignment_id_list: used to retrieve response map
+  #   round_num: used to retrieve round_num for the valid response
+  #   has_topic: to get the topic condition
+  # Returns
+  #   raw_data_array: which corresponds to the return of 
+  #     get_peer_reviews_for_responses method and appended to the raw_data_array
   def get_peer_reviews(assignment_id_list, round_num, has_topic)
     raw_data_array = []
     ReviewResponseMap.where('reviewed_object_id in (?) and calibrate_to = ?', assignment_id_list, false).each do |response_map|
@@ -86,16 +116,22 @@ class ReputationWebServiceController < ApplicationController
     raw_data_array
   end
 
-  # get_ids_list accepts a list of objects and maps each object to the corresponding object id attribute.
-  # This method returns the altered list to the caller function.
+  # Method: get_ids_list
+  # This method maps each object to the corresponding object's ID
+  # Params
+  #   tables: any table
+  # Returns
+  #   id in the tables
   def get_ids_list(tables)
     tables.map(&:id)
   end
 
-  # get_scores method accepts team IDs as an argument.
-  # It then finds all the quiz questionnaires associated with all the teams in the list.
-  # For each questionnaire, it retrieves the reviewer id, reviewee id, and score.
-  # This data is appended to the raw data list and returned.
+  # Method: get_scores
+  # This method gets the quiz score of each participant for respective reviewee
+  # Params
+  #   team_ids: list of team IDs
+  # Returns
+  #   raw_data_array: which is a list of participant, reviewee and the participant's quiz score
   def get_scores(team_ids)
     quiz_questionnnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
     quiz_questionnnaire_ids = get_ids_list(quiz_questionnnaires)
@@ -108,19 +144,26 @@ class ReputationWebServiceController < ApplicationController
     raw_data_array
   end
 
-  # get_quiz_score takes a list of assignment IDs as arguments.
-  # Queries the AssignmentTeam to find the teams participating in the assignment.
-  # Stores the IDs of the teams in team_ids.
-  # It calls get_scores on team_ids to get the scores of all the participating teams.
+  # Method: get_quiz_score
+  # This method gets the quiz score of assignments
+  # Params
+  #   assignment_id_list: list of assignment IDs
+  # Returns
+  #   raw_data_array: returned by get_scores method, which is a list of participant, 
+  #     reviewee and the participant's quiz score
   def get_quiz_score(assignment_id_list)
     teams = AssignmentTeam.where('parent_id in (?)', assignment_id_list)
     team_ids = get_ids_list(teams)
     get_scores(team_ids)
   end
 
-  # generate_json_body is a helper method.
-  # It accepts unformatted string data and formats it into JSON.
-  # It returns the formatted body after sorting the hash.
+  # Method: generate_json_body
+  # This method generates json body for the peer reviews and quiz scores
+  # Params
+  #   results: list of grades with corresponding team/participant ID, 
+  #     reviewee ID and their score
+  # Returns
+  #   request_body: returns the formatted body after sorting the hash
   def generate_json_body(results)
     request_body = {}
     results.each_with_index do |record, _index|

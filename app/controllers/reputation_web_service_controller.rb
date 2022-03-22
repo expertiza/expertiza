@@ -294,7 +294,8 @@ class ReputationWebServiceController < ApplicationController
   # It further calls the methods: encrypt_request_body and format_into_json to get the request body into the correct format.
   # It finally sends the prepared request body back to the send_post_request method.
   def prepare_request_body
-    req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
+    reputation_web_service_path = URI.parse(WEBSERVICE_CONFIG['reputation_web_service_url']).path
+    req = Net::HTTP::Post.new(reputation_web_service_path, { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
     curr_assignment_id = (params[:assignment_id].empty? ? '754' : params[:assignment_id])
     assignment_id_list_peers = get_assignment_id_list(curr_assignment_id, params[:another_assignment_id].to_i)
 
@@ -334,7 +335,8 @@ class ReputationWebServiceController < ApplicationController
   # The core of this function deals with sending a request to calculate the review scores, receiving and forwarding the response to the processing function.
   def send_post_request
     req = prepare_request_body
-    response = Net::HTTP.new('peerlogic.csc.ncsu.edu').start { |http| http.request(req) }
+    reputation_web_service_hostname = URI.parse(WEBSERVICE_CONFIG['reputation_web_service_url']).host
+    response = Net::HTTP.new(reputation_web_service_hostname).start { |http| http.request(req) }
     if %w[400 500].include?(response.code)
       flash[:error] = 'Post Request Failed'
     else

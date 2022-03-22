@@ -285,12 +285,43 @@ class ReputationWebServiceController < ApplicationController
     assignment_id_list
   end
 
-  def set_flash_messages(req)
+  # Method: add_flash_messages
+  # This method sets the flash messages to pass on to the next request i.e
+  # the reqest redirected to the client
+  # Params 
+  #   req: This contains the entire req that needs to be sent to the reputation 
+  #     webservice
+  # Returns
+  #   nil
+  def add_flash_messages(req)
     flash[:assignment_id] = params[:assignment_id]
     flash[:round_num] = params[:round_num]
     flash[:algorithm] = params[:algorithm]
     flash[:another_assignment_id] = params[:another_assignment_id]
     flash[:request_body] = req.body
+  end
+
+  # Method: add_additional_info_details
+  # This method sets the additional info details based on the options
+  # selected in the additional information section. We populate the request
+  # based on the selections
+  # Params 
+  #   req: This contains the entire req that needs to be sent to the reputation 
+  #     webservice
+  # Returns
+  #   nil
+  def add_additional_info_details(req)
+    if params[:checkbox][:expert_grade] == 'Add expert grades'
+      add_expert_grades(req.body)
+    elsif params[:checkbox][:hamer] == 'Add initial Hamer reputation values'
+      add_hamer_reputation_values
+    elsif params[:checkbox][:lauw] == 'Add initial Lauw reputation values'
+      add_lauw_reputation_values
+    elsif params[:checkbox][:quiz] == 'Add quiz scores'
+      add_quiz_scores(req.body)
+    else
+      flash[:additional_info] = ''
+    end
   end
 
   # prepare_request_body method is responsible for preparing the request body in a proper format to send to the server.
@@ -306,20 +337,9 @@ class ReputationWebServiceController < ApplicationController
     req.body = generate_json_for_peer_reviews(assignment_id_list_peers, params[:round_num].to_i).to_json
 
     req.body[0] = '' # remove the first '{'
-    if params[:checkbox][:expert_grade] == 'Add expert grades'
-      add_expert_grades(req.body)
-    elsif params[:checkbox][:hamer] == 'Add initial Hamer reputation values'
-      add_hamer_reputation_values
-    elsif params[:checkbox][:lauw] == 'Add initial Lauw reputation values'
-      add_lauw_reputation_values
-    elsif params[:checkbox][:quiz] == 'Add quiz scores'
-      add_quiz_scores(req.body)
-    else
-      flash[:additional_info] = ''
-    end
-
+    add_additional_info_details req
     req.body.prepend('{')
-    set_flash_messages req
+    add_flash_messages req
 
     # Encrypting the request body data
     # req.body = encrypt_request_body(req.body)

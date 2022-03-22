@@ -1,5 +1,4 @@
 E2168. Testing - reputations
-testing from zgl
 
 Expertiza
 =========

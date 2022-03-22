@@ -160,9 +160,9 @@ class ReputationWebServiceController < ApplicationController
 
   # This method returns the id of the last assignment.
   def client
-    flash[:max_assignment_id] = Assignment.last.id
-    flash[:assignment] = Assignment.find(flash[:assignment_id]) rescue nil
-    flash[:another_assignment] = Assignment.find(flash[:another_assignment_id]) rescue nil
+    @max_assignment_id = Assignment.last.id
+    @assignment = Assignment.find(flash[:assignment_id]) rescue nil
+    @another_assignment = Assignment.find(flash[:another_assignment_id]) rescue nil
   end
 
   # encrypt_request_body is used by the method prepare_request_body.

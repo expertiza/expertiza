@@ -19,7 +19,16 @@ describe GradesController do
   let(:review_response_map) { build(:review_response_map, id: 1) }
   let(:assignment_due_date) { build(:assignment_due_date) }
   let(:ta) { build(:teaching_assistant, id: 8) }
-
+  score_view_setup_query = '
+  CREATE OR REPLACE VIEW score_views AS SELECT ques.weight question_weight,ques.type AS type,
+      q1.id "q1_id",q1.NAME AS q1_name,q1.instructor_id AS q1_instructor_id,q1.private AS q1_private,
+      q1.min_question_score AS q1_min_question_score,q1.max_question_score AS q1_max_question_score,
+      q1.created_at AS q1_created_at,q1.updated_at AS q1_updated_at,
+      q1.TYPE AS q1_type,q1.display_type AS q1_display_type,
+      ques.id as ques_id,ques.questionnaire_id as ques_questionnaire_id, s.id AS s_id,s.question_id AS s_question_id,
+      s.answer AS s_score,s.comments AS s_comments,s.response_id AS s_response_id
+      FROM questions ques left join questionnaires q1 on ques.questionnaire_id = q1.id left join answers s on ques.id = s.question_id'
+  ActiveRecord::Base.connection.execute(score_view_setup_query)
   before(:each) do
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
     allow(AssignmentParticipant).to receive(:find).with('3').and_return(participant3)

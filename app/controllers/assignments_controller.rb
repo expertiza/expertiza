@@ -31,7 +31,7 @@ class AssignmentsController < ApplicationController
       find_existing_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
       if !find_existing_assignment && !find_existing_directory && @assignment_form.save # No existing names/directories
         @assignment_form.create_assignment_node
-        exist_assignment = Assignment.find_by(id: @assignment_form.assignment.id)
+        exist_assignment = Assignment.find(@assignment_form.assignment.id)
         assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
         if assignment_form_params[:assignment][:directory_path].blank?
           assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
@@ -47,7 +47,7 @@ class AssignmentsController < ApplicationController
         assignment_form_params[:assignment_questionnaire] = ques_array
         assignment_form_params[:due_date] = due_array
         @assignment_form.update(assignment_form_params, current_user)
-        aid = Assignment.find_by(id: @assignment_form.assignment.id).id
+        aid = Assignment.find(@assignment_form.assignment.id).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
         redirect_to edit_assignment_path aid
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")

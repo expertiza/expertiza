@@ -136,7 +136,7 @@ describe ResponseController do
         }
         user_session = { user: instructor }
         post :update, params: request_params, session: user_session
-        expect(response).to redirect_to('/response/save?id=1&msg=Your+response+was+not+saved.+Cause%3A189+ERROR%21&review%5Bcomments%5D=some+comments')
+        expect(response).to redirect_to('/response/save?id=1&msg=Your+response+was+not+saved.+Cause%3A189+ERROR%21')
       end
 
       it 'Does not allow a user to update a response if a lock exists on the response' do
@@ -154,7 +154,7 @@ describe ResponseController do
         }
         user_session = { user: instructor }
         post :update, params: request_params, session: user_session
-        expect(response).not_to redirect_to('/response/save?id=1&msg=&review%5Bcomments%5D=some+comments')
+        expect(response).not_to redirect_to('/response/save?id=1&msg=')
       end
     end
 
@@ -181,7 +181,7 @@ describe ResponseController do
         }
         user_session = { user: instructor }
         post :update, params: request_params, session: user_session
-        expect(response).to redirect_to('/response/save?id=1&msg=&review%5Bcomments%5D=some+comments')
+        expect(response).to redirect_to('/response/save?id=1&msg=')
       end
     end
   end
@@ -272,7 +272,7 @@ describe ResponseController do
         isSubmit: 'No'
       }
       post :create, params: request_params
-      expect(response).to redirect_to('/response/save?error_msg=&id=1&msg=Your+response+was+successfully+saved.&review%5Bcomments%5D=no+comment&review%5Bquestionnaire_id%5D=1&review%5Bround%5D=1')
+      expect(response).to redirect_to('/response/save?error_msg=&id=1&msg=Your+response+was+successfully+saved.')
     end
   end
 

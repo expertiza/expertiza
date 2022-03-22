@@ -131,19 +131,13 @@ class ImpersonateController < ApplicationController
       @original_user = session[:super_user] || session[:user]
       # Impersonate using form on /impersonate/start, based on the username provided, this method looks to see if that's possible by calling the do_main_operation method
       if params[:impersonate].nil?
-        # Check if special chars /\?<>|&$# are used to avoid html tags or system command
         check_if_special_char
-        # E1991 : check whether instructor is currently in anonymized view
-        # user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:user][:name]) : user = User.find_by(name: params[:user][:name])
         user = get_real_user(params[:user][:name])
         do_impersonate_operation(user)
       else
         # Impersonate a new account
         if !params[:impersonate][:name].empty?
-          # check if special chars /\?<>|&$# are used to avoid html tags or system command
           check_if_special_char
-          # E1991 : check whether instructor is currently in anonymized view
-          # user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:impersonate][:name]) : User.find_by(name: params[:impersonate][:name])
           user = get_real_user(params[:impersonate][:name])
           do_impersonate_operation(user)
           # Revert to original account when currently in the impersonated session
@@ -167,6 +161,8 @@ class ImpersonateController < ApplicationController
       redirect_to :back
     end
   end
+
+  # This method checks if the user is in anonymized view and accordingly returns the user object associated with the parameter
 
   def get_real_user(name)
     if User.anonymized_view?(session[:ip])

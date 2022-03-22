@@ -68,7 +68,7 @@ class ReviewMappingController < ApplicationController
 
       # Get the assignment's participant corresponding to the user
       reviewer = get_reviewer(user, assignment, regurl)
-      # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+      # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
       if ReviewResponseMap.where(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id).first.nil?
         ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
@@ -248,7 +248,7 @@ class ReviewMappingController < ApplicationController
   # This method is used to assign a metareviewer dynamically. 
   # The method first finds the assignment using the assignment_id param. 
   # It then finds the metareviewer from AssignmentParticipant. The method then
-  # assigns the metareviewer to the asignment dynamically. If the operation fails
+  # assigns the metareviewer to the assignment dynamically. If the operation fails
   # an error is thrown. 
   def assign_metareviewer_dynamically
     assignment = Assignment.find(params[:assignment_id])
@@ -327,7 +327,7 @@ class ReviewMappingController < ApplicationController
   end
 
   # This method asks the user if they want to go ahead with deleting the metareviewers that 
-  # were not succesfully deleted earlier. 
+  # were not successfully deleted earlier. 
   # It prompts for the user to either delete the metareviewer for a mapping 
   # or keep them. If the user chooses to delete them, the delete_all_metareviewers action is called and 
   # the metareviewer is deleted. 
@@ -363,7 +363,7 @@ class ReviewMappingController < ApplicationController
   # E1721 changes End
 
   # This method is used to delete the review mapping from the ReviewResponseMap. If the review mapping exists
-  # the method delets it. 
+  # the method deletes it. 
   # If the review mapping is deleted successfully, a success alert is shown. However, 
   # if the review is already done, the method shows an error, saying that the review cannot be deleted. . 
   def delete_reviewer
@@ -398,7 +398,7 @@ class ReviewMappingController < ApplicationController
   def list_mappings
     flash[:error] = params[:msg] if params[:msg]
     @assignment = Assignment.find(params[:id])
-    # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+    # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @items = AssignmentTeam.where(parent_id: @assignment.id)
     @items.sort_by(&:name)

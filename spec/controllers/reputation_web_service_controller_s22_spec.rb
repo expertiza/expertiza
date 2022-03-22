@@ -2,14 +2,15 @@ describe ReputationWebServiceController do
     let(:instructor) { build(:instructor, id: 1) }
     describe 'custom test' do
       before(:each) do
-        @assignment_1 = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day, submitter_count: 0, num_reviews: 3, num_reviewers: 3, num_reviews_allowed: 3, rounds_of_reviews: 2, reputation_algorithm: 'lauw', id: 1, directory_path: 'assignment_1')
-        @assignment_2 = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day, submitter_count: 0, num_reviews: 3, num_reviewers: 3, num_reviews_allowed: 3, rounds_of_reviews: 2, reputation_algorithm: 'hamer', id: 2, directory_path: 'assignment_2')
+        # @assignment_1 = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day, submitter_count: 0, num_reviews: 3, num_reviewers: 3, num_reviews_allowed: 3, rounds_of_reviews: 2, reputation_algorithm: 'lauw', id: 1, directory_path: 'assignment_1')
+        @assignment_1 = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day, submitter_count: 0, num_reviews: 3, num_reviewers: 3, num_reviews_allowed: 3, rounds_of_reviews: 2, reputation_algorithm: 'hamer', id: 2, directory_path: 'assignment_1')
         @questionnaire_1 = create(:questionnaire, min_question_score: 0, max_question_score: 5, type: 'ReviewQuestionnaire', id: 1)
+
         # assignment_questionnaire_<i>_<j> means assignment #i's #j th round of review.
         @assignment_questionnaire_1_1 = create(:assignment_questionnaire, assignment_id: @assignment_1.id, questionnaire_id: @questionnaire_1.id, used_in_round: 1)
         @assignment_questionnaire_1_2 = create(:assignment_questionnaire, assignment_id: @assignment_1.id, questionnaire_id: @questionnaire_1.id, used_in_round: 2)
-        @assignment_questionnaire_2_1 = create(:assignment_questionnaire, assignment_id: @assignment_2.id, questionnaire_id: @questionnaire_1.id, used_in_round: 1)
-        @assignment_questionnaire_2_2 = create(:assignment_questionnaire, assignment_id: @assignment_2.id, questionnaire_id: @questionnaire_1.id, used_in_round: 2, id: 4)
+        # @assignment_questionnaire_2_1 = create(:assignment_questionnaire, assignment_id: @assignment_2.id, questionnaire_id: @questionnaire_1.id, used_in_round: 1)
+        # @assignment_questionnaire_2_2 = create(:assignment_questionnaire, assignment_id: @assignment_2.id, questionnaire_id: @questionnaire_1.id, used_in_round: 2, id: 4)
   
         # question_i_j means question #j in questionnaire #i.
         @question_1_1 = create(:question, questionnaire_id: @questionnaire_1.id, id: 1)
@@ -86,14 +87,7 @@ describe ReputationWebServiceController do
   
           client = ReputationWebServiceController.new.client
   
-          # comment out because send_post_request method request public key file while this file is missing
-          # so at this time send_post_request is not functioning normally
-          # if it functions correctly, it will update the reviewer's reputation score according to the selected reputation algorithm.
-          # get :send_post_request, params, session
-          # expect(response).to redirect_to '/reputation_web_service/client'
-  
-          # req = ReputationWebServiceController.new.send_post_request
-          # expect(req).to redirect_to(client)
+          req = ReputationWebServiceController.new.send_post_request
           expect(true).to eq(true)
 
           # Should return reivewer_1: 2.0, reivewer_2: 2.0, reivewer_3: 0.5
@@ -129,15 +123,8 @@ describe ReputationWebServiceController do
           session = { user: build(:instructor, id: 1) }
   
           client = ReputationWebServiceController.new.client
-  
-          # comment out because send_post_request method request public key file while this file is missing
-          # so at this time send_post_request is not functioning normally
-          # if it functions correctly, it will update the reviewer's reputation score according to the selected reputation algorithm.
-          # get :send_post_request, params, session
-          # expect(response).to redirect_to '/reputation_web_service/client'
-  
-          # req = ReputationWebServiceController.new.send_post_request
-          # expect(req).to redirect_to(client)
+
+          req = ReputationWebServiceController.new.send_post_request
           expect(true).to eq(true)
 
           # Should return reivewer_1: 1.0, reivewer_2: 1,0, reivewer_3: 1.0
@@ -173,15 +160,8 @@ describe ReputationWebServiceController do
           session = { user: build(:instructor, id: 1) }
   
           client = ReputationWebServiceController.new.client
-  
-          # comment out because send_post_request method request public key file while this file is missing
-          # so at this time send_post_request is not functioning normally
-          # if it functions correctly, it will update the reviewer's reputation score according to the selected reputation algorithm.
-          # get :send_post_request, params, session
-          # expect(response).to redirect_to '/reputation_web_service/client'
-  
-          # req = ReputationWebServiceController.new.send_post_request
-          # expect(req).to redirect_to(client)
+
+          req = ReputationWebServiceController.new.send_post_request
           expect(true).to eq(true)
 
           # Should return reivewer_1: 2.4, reivewer_2: 0.5, reivewer_3: 1.5

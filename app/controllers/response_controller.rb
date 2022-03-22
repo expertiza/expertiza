@@ -32,9 +32,9 @@ class ResponseController < ApplicationController
 
   # E2218: Method to authorize if the reviewer can view the calibration results
   def authorize_show_calibration_results
-    response = Response.find(params[:id])
-    user_id = response.map.reviewer.user_id if response.map.reviewer
-    unless current_user_is_reviewer?(response.map, user_id)
+    response_map = ResponseMap.find(params[:review_response_map_id])
+    user_id = response_map.reviewer.user_id if response_map.reviewer
+    unless current_user_is_reviewer?(response_map, user_id)
       flash[:error] = 'You are not allowed to view this calibration result'
       redirect_to controller: 'student_review', action: 'list', id: user_id
     end

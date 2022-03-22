@@ -39,7 +39,7 @@ describe Assessment360Controller do
   let(:participant) { build(:participant) }
   let(:scores) {}
   let(:topic) { build(:topic) }
-  let(:topic_with_identifier_and_name) { build(:topic, topic_identifier: 2.1, topic_name: 'Topic 1')}
+  let(:topic_with_identifier_and_name) { build(:topic, topic_identifier: 2.1, topic_name: 'Topic 1') }
 
   describe 'checking controller permissions' do
     context 'when different roles call the controller' do
@@ -387,9 +387,7 @@ describe Assessment360Controller do
   end
 
   describe 'Test format functions' do
-
     context 'format_topic' do
-
       it 'topic is nil' do
         result = controller.format_topic(nil)
         expect(result).to eq('–')
@@ -418,7 +416,6 @@ describe Assessment360Controller do
         result = controller.format_score(97.67)
         expect(result).to eq(97.67)
       end
-
     end
 
     context 'format_percentage' do

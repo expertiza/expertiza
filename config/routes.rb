@@ -1,5 +1,4 @@
 Expertiza::Application.routes.draw do
-
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
 
@@ -95,7 +94,7 @@ Expertiza::Application.routes.draw do
   end
 
   resources :duties
-  
+
   resources :eula, only: [] do
     collection do
       get :accept

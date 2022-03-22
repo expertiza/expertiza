@@ -137,14 +137,14 @@
         <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
         <td class="teammate_count"><%= @teammate_count[cp.id] %></td>
         <% @assignments.each do |assignment|%>
-          <td class="meta_review"><%= format_percentage(@meta_review[cp.user_id][assignment.id]) unless @meta_review.nil? %></td>
-          <td class="teammate_review"><%= format_percentage(@teammate_review[cp.user_id][assignment.id]) unless @teammate_review.nil? %></td>
+          <td class="meta_review"><%= format_percentage(@meta_review[cp.user_id].nil? ? nil : @meta_review[cp.user_id][assignment.id]) unless @meta_review.nil? %></td>
+          <td class="teammate_review"><%= format_percentage(@teammate_review[cp.user_id].nil? ? nil : @teammate_review[cp.user_id][assignment.id]) unless @teammate_review.nil? %></td>
           <% topic = format_topic(@topics[cp.id][assignment.id]) %>
           <td title="<%= topic %>" class="topic topic-tooltip">
             <%= topic %>
           </td>
-          <td class="peer_score"><%= format_score(@peer_review_scores[cp.id][assignment.id]) %></td>
-          <td class="instructor_grade"><%= format_score(@assignment_grades[cp.id][assignment.id]) %> </td>
+          <td class="peer_score"><%= format_score(@peer_review_scores[cp.id].nil? ? nil : @peer_review_scores[cp.id][assignment.id]) %></td>
+          <td class="instructor_grade"><%= format_score(@assignment_grades[cp.id].nil? ? nil : @assignment_grades[cp.id][assignment.id]) %> </td>
         <% end%>
         <td class="meta_review"><%= format_percentage(@meta_review[:aggregate_score][cp.user_id]) unless @meta_review.nil? %></td>
         <td class="teammate_review"><%= format_percentage(@teammate_review[:aggregate_score][cp.user_id]) unless @teammate_review.nil? %></td>

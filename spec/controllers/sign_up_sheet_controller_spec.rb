@@ -778,7 +778,7 @@ describe SignUpSheetController do
       }
       session = { user: instructor }
       get :switch_original_topic_to_approved_suggested_topic, params, session
-      expect(flash[:error]).to eq('Signup topic does not exist.')) # Change response
+      expect(flash[:error]).to eq('Signup topic does not exist.') # Change response
     end
   end
 

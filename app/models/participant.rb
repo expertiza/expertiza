@@ -1,6 +1,7 @@
 class Participant < ApplicationRecord
   include Scoring
   include ParticipantsHelper
+  self.inheritance_column = :type_inheritance
   has_paper_trail
   belongs_to :user
   belongs_to :topic, class_name: 'SignUpTopic', inverse_of: false

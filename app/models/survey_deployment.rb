@@ -2,6 +2,7 @@ class SurveyDeployment < ApplicationRecord
   validates :start_date, presence: true
   validates :end_date, presence: true
   validate :valid_start_end_time?
+  self.inheritance_column = :type_inheritance
 
   def valid_start_end_time?
     if end_date.nil? || start_date.nil?

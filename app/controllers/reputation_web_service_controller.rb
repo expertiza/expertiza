@@ -47,7 +47,8 @@ class ReputationWebServiceController < ApplicationController
   end
 
   # Method: get_valid_answers_for_response
-  # This method receives response and filters the valid answers list of the response ID
+  # This method receives response and filters the valid answers list of the
+  # response ID
   # Params
   #   response
   # Returns
@@ -99,7 +100,7 @@ class ReputationWebServiceController < ApplicationController
   #   round_num: used to retrieve round_num for the valid response
   #   has_topic: to get the topic condition
   # Returns
-  #   raw_data_array: which corresponds to the return of 
+  #   raw_data_array: which corresponds to the return of
   #     get_peer_reviews_for_responses method and appended to the raw_data_array
   def get_peer_reviews(assignment_id_list, round_num, has_topic)
     raw_data_array = []
@@ -149,7 +150,7 @@ class ReputationWebServiceController < ApplicationController
   # Params
   #   assignment_id_list: list of assignment IDs
   # Returns
-  #   raw_data_array: returned by get_scores method, which is a list of participant, 
+  #   raw_data_array: returned by get_scores method, which is a list of participant,
   #     reviewee and the participant's quiz score
   def get_quiz_score(assignment_id_list)
     teams = AssignmentTeam.where('parent_id in (?)', assignment_id_list)
@@ -160,7 +161,7 @@ class ReputationWebServiceController < ApplicationController
   # Method: generate_json_body
   # This method generates json body for the peer reviews and quiz scores
   # Params
-  #   results: list of grades with corresponding team/participant ID, 
+  #   results: list of grades with corresponding team/participant ID,
   #     reviewee ID and their score
   # Returns
   #   request_body: returns the formatted body after sorting the hash
@@ -245,7 +246,7 @@ class ReputationWebServiceController < ApplicationController
 
   # Method: update_participants_reputation
   # This method accepts the response body in the JSON format.
-  # It then parses the JSON and updates the reputation scores of the 
+  # It then parses the JSON and updates the reputation scores of the
   # participants in the list.
   # If the alg variable is not  Hamer/ Lauv, the updation step is skipped.
   # Params
@@ -266,7 +267,7 @@ class ReputationWebServiceController < ApplicationController
   # This method gets the control after receiving a response from the server.
   # It receives the response body as an argument
   # It updates the instance variables related to the response.
-  # It then calls the update_participants_reputation to update the reputation 
+  # It then calls the update_participants_reputation to update the reputation
   # scores received in the response body.
   # Params
   #   response: The response from the reputation web service
@@ -282,7 +283,6 @@ class ReputationWebServiceController < ApplicationController
   end
 
   # Method: add_expert_grades
-  # This method sets the @additional_info to 'add expert grades'
   # It prepends the request body with the expert grades pertaining
   # to the default wiki contribution case of 754.
   # It receives the request body as an argument and prepends it
@@ -298,10 +298,15 @@ class ReputationWebServiceController < ApplicationController
     end
   end
 
-  # add_quiz_scores is a helper function of prepare_request_body.
-  # It sets the instance variable @additional_info.
-  # It gets the assignment id list and generates the json on quiz scores of those assignments.
-  # Finally processes quiz string is prepended to the request body, received as an argument, and returns the body to prepare_request_body.
+  # Method: add_quiz_scores
+  # It gets the assignment id list and generates the json on quiz scores of
+  # those assignments.
+  # Finally processes quiz string is prepended to the request body, received
+  # as an argument, and returns the body to prepare_request_body.
+  # Params
+  #   body: The request body to add the expert grades to
+  # Returns
+  #   body prepended with the expert grades
   def add_quiz_scores(body)
     flash[:additional_info] = 'add quiz scores'
     assignment_id_list_quiz = get_assignment_id_list(params[:assignment_id].to_i, params[:another_assignment_id].to_i)
@@ -315,7 +320,7 @@ class ReputationWebServiceController < ApplicationController
 
   # Method: add_lauw_reputation_values
   # This method sets the instance variable @additional_info.
-  # This method is called by the prepare_request_body method 
+  # This method is called by the prepare_request_body method
   # when params receive instruction through the corresponding view's checkbox.
   # THIS METHOD IS NOT IMPLETEMENTED
   # Params
@@ -328,7 +333,7 @@ class ReputationWebServiceController < ApplicationController
 
   # Method: add_lauw_reputation_values
   # This method sets the instance variable @additional_info.
-  # This method is called by the prepare_request_body method 
+  # This method is called by the prepare_request_body method
   # when params receive instruction through the corresponding view's checkbox.
   # THIS METHOD IS NOT IMPLETEMENTED
   # Params
@@ -361,7 +366,7 @@ class ReputationWebServiceController < ApplicationController
   # This method sets the flash messages to pass on to the next request i.e
   # the reqest redirected to the client
   # Params
-  #   req: This contains the entire req that needs to be sent to the reputation 
+  #   req: This contains the entire req that needs to be sent to the reputation
   #     webservice
   # Returns
   #   nil
@@ -378,7 +383,7 @@ class ReputationWebServiceController < ApplicationController
   # selected in the additional information section. We populate the request
   # based on the selections
   # Params
-  #   req: This contains the entire req that needs to be sent to the reputation 
+  #   req: This contains the entire req that needs to be sent to the reputation
   #     webservice
   # Returns
   #   nil

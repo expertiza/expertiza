@@ -1,7 +1,7 @@
 module StudentQuizzesHelper
 
   # This method as whole fetches the answers provided and calculates the final scores for the quiz.
-  # Also calls seperate methods for handling single answer/ true or false evaluations and mulitple answer evaluations for calculating score.
+  # Also calls separate methods for handling single answer/ true or false evaluations and multiple answer evaluations for calculating score.
   def calculate_score(map, response)
     questionnaire = Questionnaire.find(map.reviewed_object_id)
     answers = []
@@ -31,22 +31,22 @@ module StudentQuizzesHelper
   def multiple_answer_evaluation(answers, params, question, correct_answers, has_response, response)
     score = 0
     if params[question.id.to_s].nil?
-        has_response = false
-      else
-        params[question.id.to_s].each do |choice|
-          # loop the quiz taker's choices and see if 1)all the correct choice are checked and 2) # of quiz taker's choice matches the # of the correct choices
-          correct_answers.each do |correct|
-            score += 1 if choice.eql? correct.txt
-          end
+      has_response = false
+    else
+      params[question.id.to_s].each do |choice|
+        # loop the quiz taker's choices and see if 1)all the correct choice are checked and 2) # of quiz taker's choice matches the # of the correct choices
+        correct_answers.each do |correct|
+          score += 1 if choice.eql? correct.txt
         end
-        score = score == correct_answers.count && score == params[question.id.to_s].count ? 1 : 0
-        # for MultipleChoiceCheckbox, score =1 means the quiz taker have done this question correctly, not just make select this choice correctly.
-        params[question.id.to_s].each do |choice|
-          new_answer = Answer.new comments: choice, question_id: question.id, response_id: response.id, answer: score
+      end
+      score = score == correct_answers.count && score == params[question.id.to_s].count ? 1 : 0
+      # for MultipleChoiceCheckbox, score =1 means the quiz taker have done this question correctly, not just make select this choice correctly.
+      params[question.id.to_s].each do |choice|
+        new_answer = Answer.new comments: choice, question_id: question.id, response_id: response.id, answer: score
 
-          has_response = false unless new_answer.valid?
-          answers.push(new_answer)
-        end
+        has_response = false unless new_answer.valid?
+        answers.push(new_answer)
+      end
     end
     return has_response
   end

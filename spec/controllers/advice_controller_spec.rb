@@ -139,9 +139,11 @@ describe AdviceController do
 
   describe '#save_advice' do
     context "when save_advice is called" do
+      let(:qa1) {build(:question_advice, id:1, score: 1, question_id: 1, advice: "Advice1")}
+      let(:qa2) {build(:question_advice, id:2, score: 2, question_id: 1, advice: "Advice2")}
       let(:questionnaire) do
         build(:questionnaire, id: 1, min_question_score: 1,
-          questions: [build(:question, id: 1, weight: 2, question_advices: [build(:question_advice, id:1, score: 1, question_id: 1, advice: "Advice1"), build(:question_advice, id:2, score: 3, question_id: 1, advice: "Advice2")])], max_question_score: 2)
+          questions: [build(:question, id: 1, weight: 2, question_advices: [qa1,qa2])], max_question_score: 2)
       end
       
       it "saves advice successfully" do

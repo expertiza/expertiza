@@ -60,14 +60,18 @@ describe AssignmentQuestionnaireController do
 
    describe '#delete_all' do
 
-    # context 'when no assignment is associated with the id in the database' do
-    #   it 'refuses certain action' do
-    #     assignment_id = 30
-    #     allow(Assignment).to receive(:find_by).and_return(nil)
-    #     delete :new, params
-    #     expect(flash[:error]).to eq('Assignment #' + assignment.id.to_s + ' does not currently exist.')
-    #   end
-    # end
+    context 'when no assignment is associated with the id in the database' do
+      it 'refuses certain action' do
+        params = {:assignment_id => 20}
+        session = { user: super_admin }
+
+        allow(Assignment).to receive(:find).with('20').and_return(nil)
+        post :delete_all, params, session
+        expect(flash[:error]).to be_present
+        # expect(flash[:error]).to eq('Assignment #' + params[:assignment_id].to_s + ' does not currently exist.')
+      end
+    end
+  end
 
     context 'when questionnaires related to an assignment are deleted' do
       it 'should persist that delete in the database' do
@@ -90,6 +94,16 @@ describe AssignmentQuestionnaireController do
       end
     end
 
+    describe '#create' do
+      context 'when assignment id is not entered' do
+        it 'flashes a response of missing assignment id' do
+          session = { user: super_admin}
+          params = { :assignment_id => nil}
+          get :create, params, session
+          # expect(flash[:error]).to eq('Missing assignment:' + params[:assigment_id])
+          expect(flash[:error]).to be_present
+        end
+      end
   end
 
 end

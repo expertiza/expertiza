@@ -126,8 +126,8 @@ class LatePoliciesController < ApplicationController
       current_user.instructor_id
   end
 
-  # This function checks if the id exists in parameters and assigns it to the instance variable of penalty policy.
   def late_policy
+    # This function checks if the id exists in parameters and assigns it to the instance variable of penalty policy.
     @penalty_policy ||= @late_policy || LatePolicy.find(params[:id]) if params[:id]
   end
 
@@ -153,7 +153,6 @@ class LatePoliciesController < ApplicationController
     return valid_penalty, error_message
   end
 
-  # This function validates the input.
   def validate_input(is_update=false)
     # Validates input for create and update forms
     max_penalty = params[:late_policy][:max_penalty].to_i

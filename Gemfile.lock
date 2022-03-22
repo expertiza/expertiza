@@ -84,8 +84,6 @@ GEM
       activesupport (>= 4.2, < 5.3)
       request_store (~> 1.0)
       scrypt (>= 1.2, < 4.0)
-    autoprefixer-rails (9.8.6)
-      execjs
     awesome_nested_set (3.4.0)
       activerecord (>= 4.0.0, < 7.0)
     babel-source (5.8.35)
@@ -94,9 +92,6 @@ GEM
       execjs (~> 2.0)
     bind-it (0.2.6)
       rjb
-    bootstrap-sass (3.4.1)
-      autoprefixer-rails (>= 5.2.1)
-      sassc (>= 2.0.0)
     bootstrap3-datetimepicker-rails (4.17.47)
       momentjs-rails (>= 2.8.1)
     builder (3.2.4)
@@ -479,14 +474,6 @@ GEM
       sprockets (>= 2.8, < 4.0)
       sprockets-rails (>= 2.0, < 4.0)
       tilt (~> 1.1)
-    sassc (2.4.0)
-      ffi (~> 1.9)
-    sassc-rails (2.1.2)
-      railties (>= 4.0.0)
-      sassc (>= 2.0)
-      sprockets (> 3.0)
-      sprockets-rails
-      tilt
     sawyer (0.8.2)
       addressable (>= 2.3.5)
       faraday (> 0.8, < 2.0)
@@ -578,7 +565,6 @@ DEPENDENCIES
   authlogic (= 4.1)
   awesome_nested_set
   bind-it
-  bootstrap-sass (~> 3.4.1)
   bootstrap3-datetimepicker-rails (~> 4.17.47)
   bullet (~> 5.7.6)
   capistrano
@@ -649,7 +635,6 @@ DEPENDENCIES
   rubyzip
   rwordnet
   sass-rails (= 5.0.3)
-  sassc-rails (>= 2.1.0)
   scrypt (= 3.0.6)
   seer
   selenium-webdriver

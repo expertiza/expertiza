@@ -534,10 +534,8 @@ class SignupSheetController < ApplicationController
   # get info related to the ad for partners so that it can be displayed when an assignment_participant
   # clicks to see ads related to a topic
   def ads_for_partners_info(_assignment_id, topic_id)
-    # List that contains individual result object
-    @result_list = []
-    # Get the results
-    @results = SignedUpTeam.where('topic_id = ?', topic_id.to_s)
+    @ad_information = []
+    @signed_up_teams = SignedUpTeam.where(topic_id: topic_id)
     # Iterate through the results of the query and get the required attributes
     @signed_up_teams.each do |signed_up_team|
       team = signed_up_team.team

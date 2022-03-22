@@ -5,6 +5,7 @@
 # Author: AJBUDLON
 # Date: 7/18/2008
 class Node < ApplicationRecord
+  self.inheritance_column = :type_inheritance
   has_paper_trail
   # acts_as_nested_set
 

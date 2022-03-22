@@ -1,4 +1,5 @@
 class DueDate < ApplicationRecord
+  self.inheritance_column = :type_inheritance
   validate :due_at_is_valid_datetime
   #  has_paper_trail
 

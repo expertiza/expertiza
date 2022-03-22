@@ -2,7 +2,9 @@ describe ImpersonateController do
   let(:instructor) { build(:instructor, id: 2) }
   let(:student1) { build(:student, id: 30, name: :Amanda) }
   let(:student2) { build(:student, id: 40, name: :Brian) }
-
+  let(:admin) { build(:admin, id: 3, name: :Admin) }
+  let(:super_admin) { build(:superadmin, id: 5, name: :Superadmin) }
+ 
   # impersonate is mostly used by instructors
   # run all tests using instructor account
   # except some exceptions where we'll use other accounts
@@ -41,6 +43,16 @@ describe ImpersonateController do
       expect(session[:impersonate]).to be true
     end
 
+    it 'instructor should not be able to impersonate a super admin user with their real name' do
+      allow(User).to receive(:find_by).with(name: super_admin.name).and_return(super_admin)
+      allow(instructor).to receive(:can_impersonate?).with(super_admin).and_return(false)
+      request.env['HTTP_REFERER'] = 'http://www.example.com'
+      @params = { user: { name: super_admin.name } }
+      @session = { user: instructor }
+      post :impersonate, @params, @session
+      expect(session[:impersonate]).to be nil
+    end
+    
     it 'instructor redirects to student home page after impersonating a student' do
       allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
       allow(instructor).to receive(:can_impersonate?).with(student1).and_return(true)

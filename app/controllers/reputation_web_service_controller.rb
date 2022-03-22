@@ -133,10 +133,15 @@ class ReputationWebServiceController < ApplicationController
     request_body
   end
 
-  # generate_json_for_peer_reviews takes assignment_id_list and round number as arguments.
-  # This method retrieves all the peer reviews associated with the assignment id list by calling the get_peer_reviews method.
-  # It then formats the peer-review list in JSON by calling generate_json_body method.
-  # it returns the formatted peer review data.
+  # Method: generate_json_for_peer_reviews
+  # This method retrieves all the peer reviews associated with
+  # the assignment id list by calling the get_peer_reviews method.
+  # It then formats the peer-review list in JSON.
+  # Params
+  #   assignment_id_list: list of assignment ids to get quiz scores for
+  #   round_num: round number of the review
+  # Returns
+  #   request_body: request body populated with the formatted peer review data.
   def generate_json_for_peer_reviews(assignment_id_list, round_num = 2)
     has_topic = !SignUpTopic.where(assignment_id: assignment_id_list[0]).empty?
 
@@ -145,58 +150,46 @@ class ReputationWebServiceController < ApplicationController
     request_body
   end
 
-  # generate_json_for_quiz_scores accepts a list of assignment ids as an argument.
-  # It then calls the get_quiz_score method on the list to get maps of teams and scores for the given assignments.
-  # The map is then formatted into JSON by calling generate_json_body and returns it.
+  # Method: generate_json_for_quiz_scores
+  # This method accepts a list of assignment ids as an argument.
+  # It then calls the get_quiz_score method on the list to get
+  # maps of teams and scores for the given assignments.
+  # The map is then formatted into JSON.
+  # Params
+  #   assignment_id_list: list of assignment ids to get quiz scores for
+  # Returns
+  #   request_body: request body populated with quiz scores
   def generate_json_for_quiz_scores(assignment_id_list)
     participant_reviewee_map = get_quiz_score(assignment_id_list)
     request_body = generate_json_body(participant_reviewee_map)
     request_body
   end
 
-  # This method returns the id of the last assignment.
+  # Method: client
+  # This method is called when the url reputation_web_service/client
+  # is hit using GET method.
+  # This renders the client.html.erb
+  # It also populates the instance variables to be used in the views
+  # Params
+  #
+  # Returns
+  #   nil
   def client
     @max_assignment_id = Assignment.last.id
     @assignment = Assignment.find(flash[:assignment_id]) rescue nil
     @another_assignment = Assignment.find(flash[:another_assignment_id]) rescue nil
   end
 
-  # encrypt_request_body is used by the method prepare_request_body.
-  # This method takes in the plain request body data, encrypts the data using AES symmetric algorithm.
-  # It then uses RSA asymetric encryption to encrypt the AES keys.
-  # Then the encrypted data is prepended with the encrypted keys and sent back to the prepare_request_body method.
-  def encrypt_request_body(plain_data)
-    # AES symmetric algorithm encrypts raw data
-    aes_encrypted_request_data = aes_encrypt(plain_data)
-    encrypted_data = aes_encrypted_request_data[0]
-
-    # RSA asymmetric algorithm encrypts keys of AES
-    encrypted_key = rsa_public_key1(aes_encrypted_request_data[1])
-    encrypted_vi = rsa_public_key1(aes_encrypted_request_data[2])
-
-    encrypted_data.prepend('", "data":"')
-    encrypted_data.prepend(encrypted_vi)
-    encrypted_data.prepend(encrypted_key)
-
-    encrypted_data
-  end
-
-  # format_into_json accepts the unformatted string data pertaining to the request body.
-  # Unoformatted string data is converted into JSON format in this method.
-  # JSON formatted request body is returned to the prepare_request_body method.
-  def format_into_json(unformatted_data)
-    unformatted_data.prepend('{"keys":')
-    unformatted_data << '}'
-    formatted_data = unformatted_data.gsub!(/\n/, '\\n')
-    formatted_data = formatted_data.nil? ? unformatted_data : formatted_data
-    formatted_data
-  end
-
-  # decrypt_response decrypts the encrypted response body.
+  # Method: decrypt_response
+  # This method decrypts the encrypted response body.
   # It accepts the encrypted body in JSON format.
   # RSA decryption is first done on the keys.
   # Decrypted keys are then used to perform AES decryption on the data.
   # Decrypted data is sent back to the process_response_body method.
+  # Params
+  #   encrypted_data: The encrypted response from the reputation web service
+  # Returns
+  #   decrypted_data: The decrypted response from the reputation web service
   def decrypt_response(encrypted_data)
     encrypted_data = JSON.parse(encrypted_data)
     key = rsa_private_key2(encrypted_data['keys'][0, 350])
@@ -207,9 +200,15 @@ class ReputationWebServiceController < ApplicationController
     decrypted_data
   end
 
-  # update_participants_reputation accepts the decrypted response body in the JSON format.
-  # It then parses the JSON and updates the reputation scores of the participants in the list.
+  # Method: update_participants_reputation
+  # This method accepts the response body in the JSON format.
+  # It then parses the JSON and updates the reputation scores of the 
+  # participants in the list.
   # If the alg variable is not  Hamer/ Lauv, the updation step is skipped.
+  # Params
+  #   response: The response from the reputation web service
+  # Returns
+  #   nil
   def update_participants_reputation(response)
     JSON.parse(response.body.to_s).each do |alg, list|
       next unless %w[Hamer Lauw].include?(alg)
@@ -220,26 +219,34 @@ class ReputationWebServiceController < ApplicationController
     end
   end
 
-  # process_response_body gets the control after receiving a response from the server.
+  # Method: process_response_body
+  # This method gets the control after receiving a response from the server.
   # It receives the response body as an argument
-  # It calls the decrypt_response to decrypt the data back into plain request body data.
   # It updates the instance variables related to the response.
-  # It then calls the update_participants_reputation to update the reputation scores received in the response body.
-  # Finally the control redirects to the client.
-
+  # It then calls the update_participants_reputation to update the reputation 
+  # scores received in the response body.
+  # Params
+  #   response: The response from the reputation web service
+  # Returns
+  #   nil
   def process_response_body(response)
     # Decryption
     # response.body = decrypt_response(response.body)
 
     flash[:response] = response
     flash[:response_body] = response.body
-
     update_participants_reputation(response)
   end
 
-  # add_expert_grades sets the @additional_info to 'add expert grades'
-  # It prepends the request body with the expert grades pertaining to the default wiki contribution case of 754
-  # It receives the request body as an argument, prepends it, and returns the body to the caller function (prepare_request_body)
+  # Method: add_expert_grades
+  # This method sets the @additional_info to 'add expert grades'
+  # It prepends the request body with the expert grades pertaining
+  # to the default wiki contribution case of 754.
+  # It receives the request body as an argument and prepends it
+  # Params
+  #   body: The request body to add the expert grades to
+  # Returns
+  #   body prepended with the expert grades
   def add_expert_grades(body)
     flash[:additional_info] = 'add expert grades'
     case params[:assignment_id]
@@ -263,22 +270,44 @@ class ReputationWebServiceController < ApplicationController
     body.prepend(quiz_str)
   end
 
-  # add_hamer_reputation_values sets the instance variable @additional_info.
-  # This method is called by the prepare_request_body method when params receive instruction through the corresponding view's checkbox.
+  # Method: add_lauw_reputation_values
+  # This method sets the instance variable @additional_info.
+  # This method is called by the prepare_request_body method 
+  # when params receive instruction through the corresponding view's checkbox.
+  # THIS METHOD IS NOT IMPLETEMENTED
+  # Params
+  #
+  # Returns
+  #   nil
   def add_hamer_reputation_values
     flash[:additional_info] = 'add initial hamer reputation values'
   end
 
-  # add_lauw_reputation_values sets the instance variable @additional_info.
-  # This method is called by the prepare_request_body method when params receive instruction through the corresponding view's checkbox.
+  # Method: add_lauw_reputation_values
+  # This method sets the instance variable @additional_info.
+  # This method is called by the prepare_request_body method 
+  # when params receive instruction through the corresponding view's checkbox.
+  # THIS METHOD IS NOT IMPLETEMENTED
+  # Params
+  #
+  # Returns
+  #   nil
   def add_lauw_reputation_values
     flash[:additional_info] = 'add initial lauw reputation values'
   end
 
-  # get_assignment_id_list on receipt of individual assignment IDs returns a list with all the assignment IDs appended into a data structure
-  # This function accepts 2 arguments, with the second argument being optional, and returns the list assignment_id_list
+  # Method: get_assignment_id_list
+  # This method on receipt of individual assignment IDs returns a list with all
+  # the assignment IDs appended into a data structure
+  # This function accepts 2 arguments, with the second argument being optional,
+  # and returns the list assignment_id_list
   # If the second argument is 0, it is not appended to the list.
-  def get_assignment_id_list(assignment_id_one, assignment_id_two)
+  # Params
+  #   assignment_id_one: first assignment id (required)
+  #   assignment_id_two: second assignment id (optional)
+  # Returns
+  #   assignment_id_list: list containing two assignment ids
+  def get_assignment_id_list(assignment_id_one, assignment_id_two = 0)
     assignment_id_list = []
     assignment_id_list << assignment_id_one
     assignment_id_list << assignment_id_two unless assignment_id_two.zero?
@@ -288,7 +317,7 @@ class ReputationWebServiceController < ApplicationController
   # Method: add_flash_messages
   # This method sets the flash messages to pass on to the next request i.e
   # the reqest redirected to the client
-  # Params 
+  # Params
   #   req: This contains the entire req that needs to be sent to the reputation 
   #     webservice
   # Returns
@@ -305,7 +334,7 @@ class ReputationWebServiceController < ApplicationController
   # This method sets the additional info details based on the options
   # selected in the additional information section. We populate the request
   # based on the selections
-  # Params 
+  # Params
   #   req: This contains the entire req that needs to be sent to the reputation 
   #     webservice
   # Returns
@@ -324,10 +353,16 @@ class ReputationWebServiceController < ApplicationController
     end
   end
 
-  # prepare_request_body method is responsible for preparing the request body in a proper format to send to the server.
-  # It gets the raw request body and populates the class variables based on the received parameters.
-  # It further calls the methods: encrypt_request_body and format_into_json to get the request body into the correct format.
-  # It finally sends the prepared request body back to the send_post_request method.
+  # Method: prepare_request_body
+  # This method is responsible for preparing the request body in a proper format
+  # to send to the server. It populates the assignment scores and peer review
+  # scores. It also populates the flash messages to send to the next request
+  # It finally sends the prepared request body back to the send_post_request
+  # method.
+  # Params
+  #
+  # Returns
+  #   nil
   def prepare_request_body
     reputation_web_service_path = URI.parse(WEBSERVICE_CONFIG['reputation_web_service_url']).path
     req = Net::HTTP::Post.new(reputation_web_service_path, { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
@@ -349,10 +384,16 @@ class ReputationWebServiceController < ApplicationController
     req
   end
 
-  # send_post_request function calls the prepare_request_body function to get a prepared request body in proper format.
-  # It then sends the prepared request to the server.
-  # Finally, it forwards the received response to the process_response_body function.
-  # The core of this function deals with sending a request to calculate the review scores, receiving and forwarding the response to the processing function.
+  # Method: send_post_request
+  # This method calls the prepare_request_body function to get a prepared
+  # request body in proper format to send to the server.
+  # It populates the assignment scores and peer review
+  # scores. It also populates the flash messages to send to the next request
+  # We redirect to the client url to display the results.
+  # Params
+  #
+  # Returns
+  #   nil
   def send_post_request
     req = prepare_request_body
     reputation_web_service_hostname = URI.parse(WEBSERVICE_CONFIG['reputation_web_service_url']).host
@@ -365,7 +406,49 @@ class ReputationWebServiceController < ApplicationController
     redirect_to action: 'client'
   end
 
-  #The below methods are unused and we waiting on confirmation to delete them permanently
+  # THE BELOW METHODS ARE UNUSED AND WE WAITING ON CONFIRMATION TO DELETE THEM PERMANENTLY
+  # Method: encrypt_request_body
+  # This method is used by the method prepare_request_body.
+  # This method takes in the plain request body data, encrypts
+  # the data using AES symmetric algorithm.
+  # It then uses RSA asymetric encryption to encrypt the AES keys.
+  # Then the encrypted data is prepended with the encrypted keys
+  # Params
+  #   plain_data: The plain json request
+  # Returns
+  #   encrypted_data: The encrypted json request
+  def encrypt_request_body(plain_data)
+    # AES symmetric algorithm encrypts raw data
+    aes_encrypted_request_data = aes_encrypt(plain_data)
+    encrypted_data = aes_encrypted_request_data[0]
+
+    # RSA asymmetric algorithm encrypts keys of AES
+    encrypted_key = rsa_public_key1(aes_encrypted_request_data[1])
+    encrypted_vi = rsa_public_key1(aes_encrypted_request_data[2])
+
+    encrypted_data.prepend('", "data":"')
+    encrypted_data.prepend(encrypted_vi)
+    encrypted_data.prepend(encrypted_key)
+
+    encrypted_data
+  end
+
+  # Method: format_into_json
+  # This method accepts the unformatted string data pertaining to the request body.
+  # Unoformatted string data is converted into JSON format in this method.
+  # JSON formatted request body is returned to the prepare_request_body method.
+  # Params
+  #   unformatted_data: The unformatted json request
+  # Returns
+  #   formatted_data: The formatted json request
+  def format_into_json(unformatted_data)
+    unformatted_data.prepend('{"keys":')
+    unformatted_data << '}'
+    formatted_data = unformatted_data.gsub!(/\n/, '\\n')
+    formatted_data = formatted_data.nil? ? unformatted_data : formatted_data
+    formatted_data
+  end
+
   def rsa_public_key1(data)
     public_key_file = 'public1.pem'
     public_key = OpenSSL::PKey::RSA.new(File.read(public_key_file))

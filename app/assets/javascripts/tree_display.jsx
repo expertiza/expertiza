@@ -155,12 +155,6 @@ const node_attributes = {
         title: 'View grade summary by student',
         href: '/assessment360/index?course_id=',
         src: '/assets/tree_view/360-dashboard-24.png'
-      },
-      {
-        title: 'View aggregated teammate & meta reviews',
-        href: '/assessment360/index?course_id=',
-        src: null,
-        extra: <span style={{ fontSize: '22px', top: '8px' }} className="glyphicon glyphicon-list-alt" />
       }
     ],
     getActions: function(id) {

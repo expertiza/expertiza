@@ -1,6 +1,6 @@
 describe InvitationsController do
   let(:instructor) { build(:instructor, id: 6) }
-  let(:student) { build(:student, parent_id: 2) }
+  let(:student) { build(:student, parent_id: 2, id: 1) }
   let(:student1) { build(:student, id: 2) }
   let(:admin) { build(:admin) }
   let(:ta) { build(:teaching_assistant, id: 8) }
@@ -56,6 +56,7 @@ describe InvitationsController do
     end
 
     it 'invitation added for new user who does not have an expertiza account yet and sends an invitation' do
+      allow(User).to receive(:email_welcome).and_return(true)
       request_params = {
         user: { name: 'testuser@gmail.com',
                 fullname: 'John Bumgardner',
@@ -73,6 +74,7 @@ describe InvitationsController do
     end
 
     it 'invitation not added for new user if entered email has incorrect format' do
+      allow(User).to receive(:email_welcome).and_return(true)
       request_params = {
         user: { name: 'testuser',
                 parent_id: 1,
@@ -124,11 +126,11 @@ describe InvitationsController do
   describe '#decline' do
     it ' declines the invite' do
       allow(Invitation).to receive(:find).with('1').and_return(invitation)
-      allow(Participant).to receive(:find).with(student.id).and_return(student)
+      allow(Participant).to receive(:find).with('1').and_return(student)
       request_params = { student_id: student.id, inv_id: 1 }
       user_session = { user: instructor }
       get :decline, params: request_params, session: user_session
-      expect(response).to redirect_to('/student_teams/view')
+      expect(response).to redirect_to('/student_teams/view?student_id=1')
     end
   end
 
@@ -139,7 +141,7 @@ describe InvitationsController do
       request_params = { inv_id: 1, student_id: student.id }
       user_session = { user: instructor }
       get :cancel, params: request_params, session: user_session
-      expect(response).to redirect_to('/student_teams/view')
+      expect(response).to redirect_to('/student_teams/view?student_id=1')
     end
   end
 end

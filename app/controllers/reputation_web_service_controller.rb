@@ -285,6 +285,14 @@ class ReputationWebServiceController < ApplicationController
     assignment_id_list
   end
 
+  def set_flash_messages(req)
+    flash[:assignment_id] = params[:assignment_id]
+    flash[:round_num] = params[:round_num]
+    flash[:algorithm] = params[:algorithm]
+    flash[:another_assignment_id] = params[:another_assignment_id]
+    flash[:request_body] = req.body
+  end
+
   # prepare_request_body method is responsible for preparing the request body in a proper format to send to the server.
   # It gets the raw request body and populates the class variables based on the received parameters.
   # It further calls the methods: encrypt_request_body and format_into_json to get the request body into the correct format.
@@ -298,11 +306,6 @@ class ReputationWebServiceController < ApplicationController
     req.body = generate_json_for_peer_reviews(assignment_id_list_peers, params[:round_num].to_i).to_json
 
     req.body[0] = '' # remove the first '{'
-    flash[:assignment_id] = params[:assignment_id]
-    flash[:round_num] = params[:round_num]
-    flash[:algorithm] = params[:algorithm]
-    flash[:another_assignment_id] = params[:another_assignment_id]
-
     if params[:checkbox][:expert_grade] == 'Add expert grades'
       add_expert_grades(req.body)
     elsif params[:checkbox][:hamer] == 'Add initial Hamer reputation values'
@@ -316,7 +319,8 @@ class ReputationWebServiceController < ApplicationController
     end
 
     req.body.prepend('{')
-    flash[:request_body] = req.body
+    set_flash_messages req
+
     # Encrypting the request body data
     # req.body = encrypt_request_body(req.body)
 
@@ -341,6 +345,7 @@ class ReputationWebServiceController < ApplicationController
     redirect_to action: 'client'
   end
 
+  #The below methods are unused and we waiting on confirmation to delete them permanently
   def rsa_public_key1(data)
     public_key_file = 'public1.pem'
     public_key = OpenSSL::PKey::RSA.new(File.read(public_key_file))
@@ -355,7 +360,6 @@ class ReputationWebServiceController < ApplicationController
     encrypted_string = ciphertext
     private_key = OpenSSL::PKey::RSA.new(File.read(private_key_file), Base64.decode64(password))
     string = private_key.private_decrypt(Base64.decode64(encrypted_string))
-
     string
   end
 

@@ -416,7 +416,7 @@ jQuery(document).ready(function () {
             dataType={this.props.dataType}
           />
           <NewItemButton dataType={this.props.dataType} private={true} />
-          <ContentTable
+          <OuterTable
             data={this.state.tableData}
             filterText={this.state.filterText}
             onUserClick={this.handleUserClick}

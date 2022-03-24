@@ -1,4 +1,4 @@
-var ContentTable = React.createClass({
+var OuterTable = React.createClass({
     getInitialState: function () {
         return {
             expandedRow: []
@@ -67,7 +67,7 @@ var ContentTable = React.createClass({
                     (entry.private == true || entry.type == 'FolderNode')
                 ) {
                     _rows.push(
-                        <ContentTableRow
+                        <OuterTableRow
                             key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
                             id={
                                 entry.type +
@@ -142,7 +142,7 @@ var ContentTable = React.createClass({
                             entry.private == false
                         ) {
                             _rows.push(
-                                <ContentTableRow
+                                <OuterTableRow
                                     key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
                                     id={
                                         entry.type +
@@ -218,7 +218,7 @@ var ContentTable = React.createClass({
                             entry.private == false
                         ) {
                             _rows.push(
-                                <ContentTableRow
+                                <OuterTableRow
                                     key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
                                     id={
                                         entry.type +

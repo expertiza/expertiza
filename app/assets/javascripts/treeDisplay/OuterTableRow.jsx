@@ -1,4 +1,4 @@
-class ContentTableRow extends React.Component {
+class OuterTableRow extends React.Component {
     constructor(props) {
         super(props)
         this.state = {

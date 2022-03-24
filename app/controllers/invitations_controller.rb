@@ -77,6 +77,8 @@ class InvitationsController < ApplicationController
     @invitation.assignment_id = @student.parent_id
     @invitation.reply_status = 'W'
     @invitation.save
+    prepared_mail = MailerHelper.send_mail_to_user(@user, 'Invitation Received on Expertiza', 'invite_participant_to_team', '')
+    prepared_mail.deliver
     ExpertizaLogger.info LoggerMessage.new(controller_name, @student.name, "Successfully invited student #{@user.id}", request)
   end
 

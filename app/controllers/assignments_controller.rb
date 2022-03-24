@@ -55,10 +55,10 @@ class AssignmentsController < ApplicationController
         return
       else
         flash[:error] = 'Failed to create assignment.'
-        if find_existing_assignment # Throw error if assignment name already found.
+        if find_existing_assignment
           flash[:error] << '<br>  ' + @assignment_form.assignment.name + ' already exists as an assignment name'
         end
-        if find_existing_directory # Throw error if directory path already found.
+        if find_existing_directory
           flash[:error] << '<br>  ' + dir_path + ' already exists as a submission directory name'
         end
         redirect_to '/assignments/new?private=1'
@@ -78,19 +78,12 @@ class AssignmentsController < ApplicationController
     check_questionnaires_usage
     @due_date_all = update_nil_dd_deadline_name(@due_date_all)
     @due_date_all = update_nil_dd_description_url(@due_date_all)
-    # only when instructor does not assign rubrics and in assignment edit page will show this error message.
     unassigned_rubrics_warning
     path_warning_and_answer_tag
-    # assigned badges will hold all the badges that have been assigned to an assignment
-    # added it to display the assigned badges while creating a badge in the assignments page
-
     update_assignment_badges
-
     @assigned_badges = @assignment_form.assignment.badges
     @badges = Badge.all
     @use_bookmark = @assignment.use_bookmark
-
-    # E2147 : gets duties of a particular assignment. Returns empty if no duties are found
     @duties = Duty.where(assignment_id: @assignment_form.assignment.id)
   end
 
@@ -106,7 +99,6 @@ class AssignmentsController < ApplicationController
     update_feedback_attributes
     query_participants_and_alert
 
-    # What to do next depends on how we got here
     if params['button'].nil?
       render partial: 'assignments/edit/topics'
     else
@@ -484,10 +476,7 @@ class AssignmentsController < ApplicationController
       q[:questionnaire_id].empty?
     end
 
-    # Deleting Due date info from table if meta-review is unchecked. - UNITY ID: ralwan and vsreeni
-
     @due_date_info = DueDate.find_each(parent_id: params[:id])
-
     DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all if params[:metareview_allowed] == 'false'
   end
 

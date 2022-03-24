@@ -285,8 +285,8 @@ jQuery(document).ready(function () {
         <tr style={style} className="active">
           <td style={colDisplayStyle} />
           <td colSpan={colSpan}>
-            <SimpleTable
-              key={'simpletable_' + this.props.id}
+            <InnerTable
+              key={'innertable_' + this.props.id}
               data={this.props.children}
               dataType={this.props.dataType}
             />

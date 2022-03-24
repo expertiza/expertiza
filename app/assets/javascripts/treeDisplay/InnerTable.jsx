@@ -1,4 +1,4 @@
-class SimpleTable extends React.Component {
+class InnerTable extends React.Component {
     render() {
         var rows = []
         var _this = this

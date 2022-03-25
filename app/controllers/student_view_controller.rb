@@ -11,12 +11,12 @@ class StudentViewController < ApplicationController
     # check on session[:flip_user] in _navigation.html.erb.
 
     # if flag is false or uninitialized, set it to true
-    if session[:flip_user].nil? || session[:flip_user] == false
+    if session[:flip_user].nil? || !session[:flip_user]
       session[:flip_user] = true
       redirect_to '/'
 
       # if flag is true, set to false.
-    elsif session[:flip_user] == true
+    elsif session[:flip_user]
       session[:flip_user] = false
       redirect_to '/'
     end

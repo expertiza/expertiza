@@ -112,7 +112,6 @@ class ImpersonateController < ApplicationController
     end
   rescue StandardError
     flash[:error] = @message
-    redirect_back
   end
 
   # Main operation

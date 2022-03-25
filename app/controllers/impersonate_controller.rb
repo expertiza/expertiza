@@ -155,7 +155,6 @@ class ImpersonateController < ApplicationController
                   controller: AuthHelper.get_home_controller(session[:user])
     rescue StandardError
       flash[:error] = @message
-      redirect_to :back
     end
   end
 

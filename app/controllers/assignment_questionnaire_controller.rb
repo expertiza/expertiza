@@ -21,18 +21,16 @@ class AssignmentQuestionnaireController < ApplicationController
   def delete_all
     assignment = Assignment.find(params[:assignment_id])
     if assignment.nil?
-      flash[:error] = 'Assignment #' + params[:assignment_id] + ' does not currently exist.'
+      flash[:error] = 'Assignment #' + assignment.id + ' does not currently exist.'
       return
     end
 
     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:assignment_id])
     @assignment_questionnaires.each(&:delete)
 
-    #####COMMENTED THIS, AS IT IS THROWING ERROR IN RSPEC#####################
     respond_to do |format|
       format.json { render json: @assignment_questionnaires }
     end
-    ##########################################################################
   end
 
   def create

@@ -68,10 +68,8 @@ describe AssignmentQuestionnaireController do
         allow(Assignment).to receive(:find).with('20').and_return(nil)
         post :delete_all, params, session
         expect(flash[:error]).to be_present
-        # expect(flash[:error]).to eq('Assignment #' + params[:assignment_id].to_s + ' does not currently exist.')
       end
     end
-  end
 
     context 'when questionnaires related to an assignment are deleted' do
       it 'should persist that delete in the database' do
@@ -93,8 +91,10 @@ describe AssignmentQuestionnaireController do
 
       end
     end
+  end
 
     describe '#create' do
+    
       context 'when assignment id is not entered' do
         it 'flashes a response of missing assignment id' do
           session = { user: super_admin}

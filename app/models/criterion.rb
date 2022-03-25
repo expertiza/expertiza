@@ -1,6 +1,7 @@
 # Initial commit
 class Criterion < ScoredQuestion
   include ActionView::Helpers
+  self.inheritance_column = :inheritance_type
   validates :size, presence: true
 
   # This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)

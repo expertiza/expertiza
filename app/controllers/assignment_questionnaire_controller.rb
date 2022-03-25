@@ -53,7 +53,6 @@ class AssignmentQuestionnaireController < ApplicationController
       flash[:error] = 'Questionnaire #' + questionnaire.id + ' does not currently exist.'
       return
     end
-    puts "This one yeaahhhh"
     @assignment_questionnaire = AssignmentQuestionnaire.new(assignment_questionnaire_params)
     @assignment_questionnaire.save
 

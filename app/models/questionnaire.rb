@@ -1,7 +1,6 @@
 class Questionnaire < ApplicationRecord
   # for doc on why we do it this way,
   # see http://blog.hasmanythrough.com/2007/1/15/basic-rails-association-cardinality
-  self.inheritance_column = :type_inheritance
   has_many :questions, dependent: :destroy # the collection of questions associated with this Questionnaire
   belongs_to :instructor # the creator of this questionnaire
   has_many :assignment_questionnaires, dependent: :destroy

@@ -1,5 +1,4 @@
 class DueDate < ApplicationRecord
-  self.inheritance_column = :type_inheritance
   validate :due_at_is_valid_datetime
   #  has_paper_trail
 
@@ -74,6 +73,7 @@ class DueDate < ApplicationRecord
 
   def self.done_in_assignment_round(assignment_id, response)
     # for author feedback, quiz, teammate review and metareview, Expertiza only support one round, so the round # should be 1
+    puts ResponseMap.find(response.map_id).inspect
     return 0 if ResponseMap.find(response.map_id).type != 'ReviewResponseMap'
 
     due_dates = DueDate.where(parent_id: assignment_id)

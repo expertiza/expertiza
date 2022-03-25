@@ -1,5 +1,4 @@
 class Team < ApplicationRecord
-  self.inheritance_column = :type_inheritance
   has_many :teams_users, dependent: :destroy
   has_many :users, through: :teams_users
   has_many :join_team_requests, dependent: :destroy

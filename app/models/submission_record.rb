@@ -4,5 +4,4 @@ class SubmissionRecord < ApplicationRecord
   validates :team_id, presence: true
   validates :user, presence: true
   validates :assignment_id, presence: true
-  self.inheritance_column = :type_inheritance
 end

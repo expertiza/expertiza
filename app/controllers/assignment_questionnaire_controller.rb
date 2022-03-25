@@ -29,18 +29,18 @@ class AssignmentQuestionnaireController < ApplicationController
     @assignment_questionnaires.each(&:delete)
 
     #####COMMENTED THIS, AS IT IS THROWING ERROR IN RSPEC#####################
-    # respond_to do |format|
-    #   format.json { render json: @assignment_questionnaires }
-    # end
+    respond_to do |format|
+      format.json { render json: @assignment_questionnaires }
+    end
     ##########################################################################
   end
 
   def create
     if params[:assignment_id].nil?
-      flash[:error] = 'Missing assignment:' #+ params[:assignment_id]
+      flash[:error] = 'Missing assignment:' + params[:assignment_id]
       return
     elsif params[:questionnaire_id].nil?
-      flash[:error] = 'Missing questionnaire:' #+ params[:questionnaire_id]
+      flash[:error] = 'Missing questionnaire:' + params[:questionnaire_id]
       return
     end
 

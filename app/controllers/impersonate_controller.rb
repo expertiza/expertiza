@@ -75,7 +75,7 @@ class ImpersonateController < ApplicationController
   def check_if_user_impersonateable
     if params[:impersonate].nil?
       user = get_real_user(params[:user][:name])
-      if !@original_user.can_impersonate? user
+      unless @original_user.can_impersonate? user
         @message = "You cannot impersonate '#{params[:user][:name]}'."
         temp
         AuthController.clear_user_info(session, nil)
@@ -83,9 +83,7 @@ class ImpersonateController < ApplicationController
         overwrite_session
       end
     else
-      unless params[:impersonate][:name].empty?
-        overwrite_session
-      end
+      overwrite_session unless params[:impersonate][:name].empty?
     end
   end
 

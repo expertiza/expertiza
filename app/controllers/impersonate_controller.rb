@@ -83,7 +83,9 @@ class ImpersonateController < ApplicationController
         overwrite_session
       end
     else
-      overwrite_session unless params[:impersonate][:name].empty?
+      unless params[:impersonate][:name].empty?
+        overwrite_session
+      end
     end
   end
 
@@ -131,23 +133,23 @@ class ImpersonateController < ApplicationController
         check_if_special_char
         user = get_real_user(params[:user][:name])
         do_impersonate_operation(user)
-      else
+      elsif !params[:impersonate][:name].empty?
         # Impersonate a new account
-        if !params[:impersonate][:name].empty?
-          check_if_special_char
-          user = get_real_user(params[:impersonate][:name])
-          do_impersonate_operation(user)
+        # if !params[:impersonate][:name].empty?
+        check_if_special_char
+        user = get_real_user(params[:impersonate][:name])
+        do_impersonate_operation(user)
           # Revert to original account when currently in the impersonated session
-        else
-          if !session[:super_user].nil?
-            AuthController.clear_user_info(session, nil)
-            session[:user] = session[:super_user]
-            user = session[:user]
-            session[:super_user] = nil
-          else
-            display_error_msg
-          end
-        end
+      elsif !session[:super_user].nil?
+        # if !session[:super_user].nil?
+        AuthController.clear_user_info(session, nil)
+        session[:user] = session[:super_user]
+        user = session[:user]
+        session[:super_user] = nil
+      else
+        display_error_msg
+        #   end
+        # end
       end
       # Navigate to user's home location as the default landing page after impersonating or reverting
       AuthController.set_current_role(user.role_id, session)
@@ -155,6 +157,7 @@ class ImpersonateController < ApplicationController
                   controller: AuthHelper.get_home_controller(session[:user])
     rescue StandardError
       flash[:error] = @message
+      redirect_to :back
     end
   end
 

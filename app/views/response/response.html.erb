@@ -353,26 +353,26 @@
     <input name="_method" type="hidden" value="put"/>
   <% end %>
   <table width="100%">
-    <tr>
-      <td>
-        <% @questions.each_with_index do |question, i| %>
-          <% answer = Answer.where(question_id: question.id, response_id: @response.id).first unless @response.nil? %>
-          <% if question.instance_of? Criterion %>
-            <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
-          <% elsif question.instance_of? Scale %>
-            <%= question.complete(i, @questionnaire.min_question_score, @questionnaire.max_question_score, answer) %>
-          <% elsif question.instance_of? Cake %>
-            <%= question.complete(i, answer, @total_score[question.id].to_s) %>
-          <% else %>
-            <%= question.complete(i, answer) %>
-          <% end %>
+    <% @questions.each_with_index do |question, i| %>
+      <tr>
+        <td>
+            <% answer = Answer.where(question_id: question.id, response_id: @response.id).first unless @response.nil? %>
+            <% if question.instance_of? Criterion %>
+              <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
+            <% elsif question.instance_of? Scale %>
+              <%= question.complete(i, @questionnaire.min_question_score, @questionnaire.max_question_score, answer) %>
+            <% elsif question.instance_of? Cake %>
+              <%= question.complete(i, answer, @total_score[question.id].to_s) %>
+            <% else %>
+              <%= question.complete(i, answer) %>
+            <% end %>
 
-          <% if [Criterion, TextArea].include? question.class %>
-            <div id="analysis_<%= i.to_s %>_comments"></div>
-          <% end %>
-        <% end %>
-      </td>
-    </tr>
+            <% if [Criterion, TextArea].include? question.class %>
+              <div id="analysis_<%= i.to_s %>_comments"></div>
+            <% end %>
+        </td>
+      </tr>
+    <% end %>
     <tr>
       <td>
         <label for="review_comments">Additional Comments</label><BR/>
@@ -454,3 +454,5 @@
 </script>
 <div id="BackLink"><a href="javascript:window.history.back()">Back</a></div>
 <div id="dialog-message" style="word-wrap: normal"></div>
+
+

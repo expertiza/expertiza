@@ -123,7 +123,7 @@ class Assessment360Controller < ApplicationController
   def calc_aggregate_score(review)
     aggregate_scores = {}
     review.each do |cp_id, assignment_review_scores_map|
-      aggregate_scores[cp_id] = (assignment_review_scores_map.inject(0) { |sum, (_k, v)| sum += v } * 1.0 / assignment_review_scores_map.size).round unless assignment_review_scores_map.empty?
+      aggregate_scores[cp_id] = (assignment_review_scores_map.inject(0) { |sum, (_k, v)| sum + v } * 1.0 / assignment_review_scores_map.size).round unless assignment_review_scores_map.empty?
     end
     aggregate_scores
   end

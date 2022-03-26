@@ -65,6 +65,7 @@ describe Scoring do
       allow(ReviewResponseMap).to receive(:assessments_for).with(contributor).and_return([])
       allow(SignedUpTeam).to receive(:find_by).with(team_id: contributor.id).and_return(signed_up_team)
       allow(assignment_helper).to receive(:review_questionnaire_id).and_return(1)
+      allow_any_instance_of(Scoring).to receive(:peer_review_questions_for_team).and_return([question1])
     end
     context 'when current assignment varies rubrics by round' do
       it 'computes avg score and score range for each team in each round and return scores' do
@@ -308,6 +309,8 @@ describe Scoring do
     it 'returns -1 when answer is nil for scored question which makes sum of weights = 0' do
       allow(ScoreView).to receive(:questionnaire_data).and_return(double('scoreview', weighted_score: 20, sum_of_weights: 1, q1_max_question_score: 5))
       allow(Answer).to receive(:where).and_return([double('row1', question_id: 1, answer: nil)])
+      puts "check ques"
+      puts Question.find(question1.id).is_a?(ScoredQuestion)
       expect(assessment_score(response: [response], questions: [question1])).to eq -1.0
     end
 

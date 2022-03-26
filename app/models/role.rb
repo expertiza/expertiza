@@ -9,7 +9,6 @@ class Role < ActiveRecord::Base
   validates :name, presence: true
   validates :name, uniqueness: true
 
-  # rubocop:disable Lint/DuplicateMethods
   attr_accessor :cache
   attr_reader :student, :ta, :instructor, :administrator, :superadministrator
 
@@ -21,7 +20,6 @@ class Role < ActiveRecord::Base
     end
     @cache
   end
-  # rubocop:enable Lint/DuplicateMethods
 
   def self.find_or_create_by_name(params)
     Role.find_or_create_by(name: params)

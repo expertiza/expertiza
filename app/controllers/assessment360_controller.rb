@@ -176,22 +176,16 @@ class Assessment360Controller < ApplicationController
       @assignments.each do |assignment|
         user_id = cp.user_id
         assignment_id = assignment.id
-        # break out of the loop if there are no participants in the assignment
-        next if assignment.participants.find_by(user_id: user_id).nil?
-        # break out of the loop if the participant has no team
-        next if TeamsUser.team_id(assignment_id, user_id).nil?
+        next if assignment.participants.find_by(user_id: user_id).nil? # break out of the loop if there are no participants in the assignment
+        next if TeamsUser.team_id(assignment_id, user_id).nil? # break out of the loop if the participant has no team
 
-        # pull information about the student's grades for particular assignment
-        assignment_grade_summary(cp, assignment_id)
+        assignment_grade_summary(cp, assignment_id) # pull information about the student's grades for particular assignment
         peer_review_score = find_peer_review_score(user_id, assignment_id)
 
         next if peer_review_score.nil? # Skip if there are no peers
-        # Skip if there are no reviews done by peer
-        next if peer_review_score[:review].nil?
-        # Skip if there are no reviews scores assigned by peer
-        next if peer_review_score[:review][:scores].nil?
-        # Skip if there are is no peer review average score
-        next if peer_review_score[:review][:scores][:avg].nil?
+        next if peer_review_score[:review].nil? # Skip if there are no reviews done by peer
+        next if peer_review_score[:review][:scores].nil? # Skip if there are no reviews scores assigned by peer
+        next if peer_review_score[:review][:scores][:avg].nil? # Skip if there are is no peer review average score
 
         @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
       end

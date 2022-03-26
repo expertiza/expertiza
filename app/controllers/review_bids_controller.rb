@@ -13,7 +13,7 @@ class ReviewBidsController < ApplicationController
        'Administrator',
        'Super-Administrator',
        'Student'].include?(current_role_name) &&
-        ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer') : true)
+        ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], 'participant' 'reader', 'submitter', 'reviewer') : true)
     else
       ['Instructor',
        'Teaching Assistant',

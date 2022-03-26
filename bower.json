@@ -21,7 +21,7 @@
   ],
   "dependencies": {
     "bootstrap": "latest",
-    "bootstrap-sass": "3.4.1",
+    "bootstrap-sass": "latest",
     "jquery": "latest",
     "react": "latest",
     "react-simpletabs": "latest",

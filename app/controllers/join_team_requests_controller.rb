@@ -36,12 +36,6 @@ class JoinTeamRequestsController < ApplicationController
     @join_team_request.team_id = params[:team_id]
 
     participant = Participant.where(user_id: session[:user][:id], parent_id: params[:assignment_id]).first
-    team = Team.find(params[:team_id])
-    if team.participants.include? participant
-      flash[:error] = 'You already belong to the team'
-      redirect_back
-      return
-    end
     @join_team_request.participant_id = participant.id
     respond_to do |format|
       if @join_team_request.save

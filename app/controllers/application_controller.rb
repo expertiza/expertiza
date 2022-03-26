@@ -122,9 +122,7 @@ class ApplicationController < ActionController::Base
     current_user.role
   end
 
-  # rubocop:disable Lint/DuplicateMethods
   alias current_user_role? current_user_role
-  # rubocop:enable Lint/DuplicateMethods
 
   def logged_in?
     # Recommendation: rename to ever_logged_in? because that's how this actually works

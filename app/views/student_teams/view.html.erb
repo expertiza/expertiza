@@ -91,12 +91,14 @@
 <% end %>
 
 <!--render partial for join team request-->
+  <% if @student.team!=nil %>
     <%= render :partial => 'join_team_requests/list_received',
     :locals =>{:team_id=>@student.team.id,
                :teams_user_id=>params[:student_id],
-               :assignment_id => @student.assignment.id} unless @student.team.nil? %>
+               :assignment_id => @student.assignment.id} %>
+  <% end %>
 
-    <% if @send_invs && @send_invs.any? %>
+    <% if @send_invs && @send_invs.length > 0 %>
     <br/><br/>
     <b>Sent invitations</b>
     <br/><br/>
@@ -108,7 +110,7 @@
           <th class="head"><b><%=t ".email_address"%></b></th>
           <th class="head" align="center"><b><%=t ".status"%></b></th>
         </tr>
-          <% @send_invs.each do |inv| %>
+          <% for inv in @send_invs %>
             <tr>
               <td><%= inv.to_user.name(session[:ip]) %></td>
               <td><%= inv.to_user.fullname(session[:ip]) %></td>
@@ -129,8 +131,8 @@
 <br/>
 
 <!--send invitation-->
-<% if !@student.team.nil? && @student.assignment.max_team_size > 1 %>
-     <% if @student.team.nil? %> <!--dead code-->
+<% if @student.team != nil && @student.assignment.max_team_size > 1 %>
+     <% if @student.team == nil %> <!--dead code-->
        <h3><%=t ".name_team"%></h3>
        <%= form_tag :controller => 'student_teams', :action => 'create' do %>
          <%= hidden_field_tag 'student_id', @student.id %>
@@ -184,19 +186,21 @@
         <th class="head"><%=t ".team_name_no_colon"%> </th>
         <th class="head"><%=t ".reply"%> </th>
       </tr>
-      <% @received_invs.each do |inv| %>
+      <% for inv in @received_invs %>
           <% if inv.reply_status == 'W' %>
               <tr>
                 <td><%= inv.from_user.name(session[:ip]) %></td>
                 <td>
-                  <% teams_users = TeamsUser.where(['user_id = ?', inv.from_id]) %>
-                  <% teams_users.each do |teams_user| %>
-                      <% current_team = Team.where(['id = ? and parent_id = ?', teams_user.team_id, @student.assignment.id]).first %>
-                      <%= Team.find(current_team.id).name unless current_team.nil?%>
+                  <% teamsusers = TeamsUser.where(['user_id = ?', inv.from_id]) %>
+                  <% for teamsuser in teamsusers %>
+                      <% current_team = Team.where(['id = ? and parent_id = ?', teamsuser.team_id, @student.assignment.id]).first %>
+                      <% if current_team != nil %>
+                          <%= Team.find(current_team.id).name %>
+                      <% end %>
                   <% end %>
                 </td>
                 <td>
-                  <%if @student.team.nil?
+                  <%if @student.team == nil
                       @team_id = 0
                     else
                       @team_id = @student.team.id

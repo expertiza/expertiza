@@ -39,7 +39,6 @@ module SubmittedContentHelper
         ret += "\n   </td>\n   </tr>"
         index += 1
       rescue StandardError
-        flash[:warn] = 'StandardError in file processing in display_directory_tree'
       end
     end
     ret += "\n</table><br/>"

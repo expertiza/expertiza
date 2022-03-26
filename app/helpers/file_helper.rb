@@ -28,7 +28,6 @@ module FileHelper
       create_directory_from_path(newpath)
     end
   rescue StandardError
-    flash[:warn] = 'StandardError in self.update_file_location'
   end
 
   # replace invalid characters with underscore

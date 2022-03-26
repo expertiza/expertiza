@@ -97,8 +97,7 @@ class LotteryController < ApplicationController
   def assign_available_slots(teams_bidding_info)
     teams_bidding_info.each do |tb|
       tb[:bids].each do |bid|
-        topic_id = bid[:topic_id]
-        num_of_signed_up_teams = SignedUpTeam.where(topic_id: topic_id).count
+        num_of_signed_up_teams = SignedUpTeam.where(topic_id: bid[:topic_id]).count
         max_choosers = SignUpTopic.find(bid[:topic_id]).try(:max_choosers)
         if num_of_signed_up_teams < max_choosers
           SignedUpTeam.create(team_id: tb[:team_id], topic_id: bid[:topic_id])

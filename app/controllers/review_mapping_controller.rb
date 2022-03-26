@@ -58,7 +58,7 @@ class ReviewMappingController < ApplicationController
     topic_id = params[:topic_id]
     user_id = User.where(name: params[:user][:name]).first.id
     # If instructor want to assign one student to review his/her own artifact,
-    # it should be counted as "self-review" and we need to make /app/views/submitted_content/_selfreview.html.erb work.
+    # it should be counted as “self-review” and we need to make /app/views/submitted_content/_selfreview.html.erb work.
     if TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
       flash[:error] = 'You cannot assign this student to review his/her own artifact.'
     else
@@ -99,7 +99,7 @@ class ReviewMappingController < ApplicationController
     if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
       flash[:error] = 'No topic is selected.  Please go back and select a topic.'
     else
-      if review_allowed?(assignment, reviewer)
+      if is_review_allowed?(assignment, reviewer)
         if check_outstanding_reviews?(assignment, reviewer)
           # begin
           if assignment.topics? # assignment with topics
@@ -146,7 +146,7 @@ class ReviewMappingController < ApplicationController
   # This method checks if the user is allowed to do any more reviews.
   # First we find the number of reviews done by that reviewer for that assignment and we compare it with assignment policy
   # if number of reviews are less than allowed than a user is allowed to request.
-  def review_allowed?(assignment, reviewer)
+  def is_review_allowed?(assignment, reviewer)
     @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
     assignment.num_reviews_allowed > @review_mappings.size
   end
@@ -159,7 +159,7 @@ class ReviewMappingController < ApplicationController
   def check_outstanding_reviews?(assignment, reviewer)
     @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
     @num_reviews_total = @review_mappings.size
-    if @num_reviews_total.zero?
+    if @num_reviews_total == 0
       true
     else
       @num_reviews_completed = 0
@@ -337,7 +337,7 @@ class ReviewMappingController < ApplicationController
     teams = AssignmentTeam.where(parent_id: params[:id].to_i).to_a.shuffle!
     max_team_size = Integer(params[:max_team_size]) # Assignment.find(assignment_id).max_team_size
     # Create teams if its an individual assignment.
-    if teams.empty? && max_team_size == 1
+    if teams.empty? && (max_team_size == 1)
       participants.each do |participant|
         user = participant.user
         next if TeamsUser.team_id(assignment_id, user.id)
@@ -353,9 +353,9 @@ class ReviewMappingController < ApplicationController
     uncalibrated_artifacts_num = params[:num_uncalibrated_artifacts].to_i
     if calibrated_artifacts_num.zero? && uncalibrated_artifacts_num.zero?
       # check for exit paths first
-      if student_review_num.zero? && submission_review_num.zero?
+      if (student_review_num == 0) && (submission_review_num == 0)
         flash[:error] = 'Please choose either the number of reviews per student or the number of reviewers per team (student).'
-      elsif !student_review_num.zero? && !submission_review_num.zero?
+      elsif (student_review_num != 0) && (submission_review_num != 0)
         flash[:error] = 'Please choose either the number of reviews per student or the number of reviewers per team (student), not both.'
       elsif student_review_num >= teams.size
         # Exception detection: If instructor want to assign too many reviews done
@@ -389,9 +389,9 @@ class ReviewMappingController < ApplicationController
     participants_hash = {}
     participants.each { |participant| participants_hash[participant.id] = 0 }
     # calculate reviewers for each team
-    if !student_review_num.zero? && submission_review_num.zero?
+    if (student_review_num != 0) && (submission_review_num == 0)
       review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, student_review_num)
-    elsif student_review_num.zero? && !submission_review_num.zero?
+    elsif (student_review_num == 0) && (submission_review_num != 0)
       review_strategy = ReviewMappingHelper::TeamReviewStrategy.new(participants, teams, submission_review_num)
     end
 
@@ -500,7 +500,8 @@ class ReviewMappingController < ApplicationController
     participants = review_strategy.participants
     num_participants = participants.size
 
-    teams.each_with_index do |team, iterator|
+    iterator = 0
+    teams.each do |team|
       selected_participants = []
       if !team.equal? teams.last
         # need to even out the # of reviews for teams
@@ -510,7 +511,7 @@ class ReviewMappingController < ApplicationController
           # They should be removed from 'num_participants_this_team'
           TeamsUser.where(team_id: team.id).each do |team_user|
             temp_participant = Participant.where(user_id: team_user.user_id, parent_id: assignment_id).first
-            num_participants_this_team -= 1 unless temp_participant.can_review && temp_participant.can_submit
+            num_participants_this_team -= 1 if (temp_participant.can_review == false) || (temp_participant.can_submit == false)
           end
           # if all outstanding participants are already in selected_participants, just break the loop.
           break if selected_participants.size == participants.size - num_participants_this_team
@@ -572,6 +573,7 @@ class ReviewMappingController < ApplicationController
       rescue StandardError
         flash[:error] = 'Automatic assignment of reviewer failed.'
       end
+      iterator += 1
     end
   end
 end

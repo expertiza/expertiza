@@ -51,6 +51,8 @@ class AuthController < ApplicationController
     redirect_to '/'
   end
 
+  protected
+
   def self.logout(session)
     clear_session(session)
   end

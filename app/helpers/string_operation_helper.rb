@@ -1,6 +1,9 @@
 module StringOperationHelper
   def string_similarity(str1, str2)
-    # Perform bigram comparison between two strings and return a percentage match in decimal form
+    '''
+    Perform bigram comparison between two strings
+    and return a percentage match in decimal form
+    '''
     pairs1 = get_ngrams(str1, 3)
     pairs2 = get_ngrams(str2, 3)
 
@@ -10,7 +13,9 @@ module StringOperationHelper
   private
 
   def get_ngrams(string, n)
-    # Takes a string and returns a list of ngrams
+    '''
+    Takes a string and returns a list of ngrams
+    '''
     s = string.downcase
     bg = []
     s.split('').each_with_index do |_item, index|

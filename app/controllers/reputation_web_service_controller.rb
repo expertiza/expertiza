@@ -57,7 +57,7 @@ class ReputationWebServiceController < ApplicationController
       topic_condition = ((has_topic && (SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false)) || !has_topic)
       last_valid_response = response_map.response.select { |r| r.round == round_num }.max
       valid_response = [last_valid_response] unless last_valid_response.nil?
-      next unless topic_condition && valid_response && !valid_response.empty?
+      next unless (topic_condition == true) && !valid_response.nil? && !valid_response.empty?
 
       valid_response.each do |response|
         answers = Answer.where(response_id: response.id)
@@ -68,7 +68,7 @@ class ReputationWebServiceController < ApplicationController
                              end
         temp_sum = 0
         weight_sum = 0
-        valid_answer = answers.select { |a| (a.question.type == 'Criterion') && a.answer }
+        valid_answer = answers.select { |a| (a.question.type == 'Criterion') && !a.answer.nil? }
         next if valid_answer.empty?
 
         valid_answer.each do |answer|

@@ -39,6 +39,7 @@ before_script:
   - cp config/database.yml.example config/database.yml
   - cp config/secrets.yml.example config/secrets.yml
   - export JAVA_HOME=/usr/lib/jvm/java-6-openjdk-amd64
+  - git config --global url."https://github.com/".insteadOf git://github.com/
   - bundle install
   - bundle exec danger --verbose
   - bundle exec rake db:setup

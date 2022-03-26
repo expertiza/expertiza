@@ -4,6 +4,9 @@ describe LockController do
   let(:student1) { build(:student, id: 21, role_id: 1) }
   let(:lock1) { build(:lock, id: 1, user: instructor1, lockable_type: 'test lockable') }
 
+  # Testing the action_allowed function with diffent roles
+  # only current role can release the lock
+  #
   describe '#action_allowed?' do
     context 'when the role of current user is Instructor' do
       it 'allows certain action' do
@@ -24,10 +27,12 @@ describe LockController do
       end
     end
   end
+  # This test case is to test the release_lock function. We call HTTP get with a test @params input 
+  # and expect the reponse to redirect to :back view once done
   describe '#release_lock' do
     context 'when release lock ' do
       it 'renders the response correctly' do
-        allow(Lock).to receive(:find_by).with(any_args).and_return(lock1)
+        allow(Lock).to receive(:find_by).with(any_args).and_return(lock1) # Allowing find_by to be call on Lock and return the lock1 instance for the test
         @params = {
           id: 123,
           type: 'test lockable'

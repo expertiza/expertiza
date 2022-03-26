@@ -63,7 +63,6 @@ describe AssignmentQuestionnaireController do
   describe '#delete_all' do
 
     context 'when no assignment is associated with the id in the database' do
-
       it 'throws an error that the assignment does not exist' do
         stub_current_user(super_admin, super_admin.role.name, super_admin.role)
         params = {:assignment_id => 20}
@@ -95,9 +94,4 @@ describe AssignmentQuestionnaireController do
       end
     end
   end
-
-
-  
-
-  #expect(response).to render_template('new')
 end

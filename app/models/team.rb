@@ -7,6 +7,7 @@ class Team < ActiveRecord::Base
   has_many :bids, dependent: :destroy
   has_paper_trail
 
+  # given specific assignment and user, return matching relations
   scope :find_team_for_assignment_and_user, lambda { |assignment_id, user_id|
     joins(:teams_users).where('teams.parent_id = ? AND teams_users.user_id = ?', assignment_id, user_id)
   }
@@ -114,17 +115,20 @@ class Team < ActiveRecord::Base
   end
 
   # Algorithm
+  # Create random teams for a course or assignment
   # Start by adding single members to teams that are one member too small.
   # Add two-member teams to teams that two members too small. etc.
   def self.randomize_all_by_parent(parent, team_type, min_team_size)
     participants = Participant.where(parent_id: parent.id, type: parent.class.to_s + 'Participant')
+    # randomly sort the participants of the assignment/course
     participants = participants.sort { rand(-1..1) }
+    # get the corresponding user information for each participant
     users = participants.map { |p| User.find(p.user_id) }.to_a
     # find teams still need team members and users who are not in any team
     teams = Team.where(parent_id: parent.id, type: parent.class.to_s + 'Team').to_a
     teams.each { |team| TeamsUser.where(team_id: team.id).each { |teams_user| users.delete(User.find(teams_user.user_id)) } }
     teams.reject! { |team| Team.size(team.id) >= min_team_size }
-    # sort teams by decreasing team size
+    # sort teams that still need members by decreasing team size
     teams.sort_by { |team| Team.size(team.id) }.reverse!
     # insert users who are not in any team to teams still need team members
     assign_single_users_to_teams(min_team_size, parent, teams, users) if !users.empty? && !teams.empty?
@@ -132,6 +136,8 @@ class Team < ActiveRecord::Base
     create_team_from_single_users(min_team_size, parent, team_type, users) unless users.empty?
   end
 
+  # create teams from any users leftover 
+  # after first round of random team creation
   def self.create_team_from_single_users(min_team_size, parent, team_type, users)
     num_of_teams = users.length.fdiv(min_team_size).ceil
     next_team_member_index = 0
@@ -145,6 +151,8 @@ class Team < ActiveRecord::Base
     end
   end
 
+  # assign team members one user at a time until all teams are minimum size
+  # or until there are no more users to assign to teams
   def self.assign_single_users_to_teams(min_team_size, parent, teams, users)
     teams.each do |team|
       curr_team_size = Team.size(team.id)

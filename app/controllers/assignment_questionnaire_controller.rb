@@ -39,26 +39,27 @@ class AssignmentQuestionnaireController < ApplicationController
   end
 
   def create
+    # params[:assignment_id] is a nil value and nil cannot be converted to a string
     if params[:assignment_id].nil?
-      flash[:error] = 'Missing assignment:' + params[:assignment_id]
+      flash[:error] = 'Missing assignment ID - Assignment ID entered is Nil'
       return
-    elsif params[:questionnaire_id].nil?
-      flash[:error] = 'Missing questionnaire:' + params[:questionnaire_id]
-      return
-    end
 
-    assignment = Assignment.find(params[:assignment_id])
-    if assignment.nil?
+    elsif params[:questionnaire_id].nil?
+      flash[:error] = 'Missing questionnaire ID - Questionnaire ID entered is Nil'
+      return
+    
+    elsif assignment.nil?
       flash[:error] = 'Assignment #' + assignment.id + ' does not currently exist.'
       return
-    end
 
-    questionnaire = Questionnaire.find(params[:questionnaire_id])
-    if questionnaire.nil?
+    elsif questionnaire.nil?
       flash[:error] = 'Questionnaire #' + questionnaire.id + ' does not currently exist.'
       return
-    end
+    
+    else
 
+    questionnaire = Questionnaire.find(params[:questionnaire_id])
+    assignment = Assignment.find(params[:assignment_id])
     @assignment_questionnaire = AssignmentQuestionnaire.new(params)
     @assignment_questionnaire.save
 

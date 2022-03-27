@@ -34,14 +34,14 @@ class TeamsController < ApplicationController
   def create_teams
     parent = get_parent_by_id(params[:id])
     Team.randomize_all_by_parent(parent, session[:team_type], params[:team_size].to_i)
-    message = 'Random teams have been successfully created'
-    undo_link(message)
+    success_message = 'Random teams have been successfully created'
+    undo_link(success_message)
     # To do: Move this check to a application level commons file.
     # For now this is the only usage of this check.
     # If a similar use case pops up "To do" action needs to be performed.
     # Fix link: https://tinyurl.com/y64bupbk
     if Rails.env.development?
-      ExpertizaLogger.info LoggerMessage.new(controller_name, '', message, request)
+      ExpertizaLogger.info LoggerMessage.new(controller_name, '', success_message, request)
     end
     redirect_to action: 'list', id: parent.id
   end
@@ -120,7 +120,7 @@ class TeamsController < ApplicationController
       @teams_users = TeamsUser.where(team_id: @team.id)
       @sign_up_team.destroy_all if @sign_up_team
       @teams_users.destroy_all if @teams_users
-      @team.destroy 
+      @team.destroy
       undo_link("The team \"#{@team.name}\" has been successfully deleted.")
     end
     redirect_to :back
@@ -187,5 +187,4 @@ class TeamsController < ApplicationController
       flash[:note] = teams.length.to_s + ' teams were successfully copied to "' + assignment.name + '"'
     end
   end
-
 end

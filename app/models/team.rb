@@ -136,11 +136,10 @@ class Team < ActiveRecord::Base
     create_team_from_single_users(min_team_size, parent, team_type, users) unless users.empty?
   end
 
-  # create teams from any users leftover 
+  # create teams from any users leftover
   # after first round of random team creation
   def self.create_team_from_single_users(min_team_size, parent, team_type, users)
     num_of_teams = users.length.fdiv(min_team_size).ceil
-    next_team_member_index = 0
     (1..num_of_teams).to_a.each do |i|
       team = Object.const_get(team_type + 'Team').create(name: 'Team_' + i.to_s, parent_id: parent.id)
       TeamNode.create(parent_id: parent.id, node_object_id: team.id)
@@ -160,6 +159,14 @@ class Team < ActiveRecord::Base
       member_num_difference.times do
         team.add_member(users.first, parent.id)
         users.delete(users.first)
+        # The early return statement below is correct according to logic.
+        # It is acceptable according to ruby coding principles as well.
+        # It is being reported incorrectly by rubocop.
+        # Related bug thread:https://tinyurl.com/mbrt3pjd
+        # TODO
+        # Rubocop needs to be upgraded to 1.26.1 version.
+        # It requires lot many changes in dependency graph.
+        # This task will bring lot many breaking changes and requires good amount of bandwidth to be fixed.
         return if users.empty?
       end
     end

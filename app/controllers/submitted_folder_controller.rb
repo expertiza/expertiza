@@ -43,7 +43,9 @@ class SubmittedFolderController < ApplicationController
 
   # Moves file from current location/directory to specified directory/location and raises error if any problem occurs
   def move_selected_file
+    # Fetch old file name
     old_filename = params[:directories][params[:chk_files]] + "/" + params[:filenames][params[:chk_files]]
+    # New location path
     newloc = @participant.dir_path
     newloc += "/"
     newloc += params[:faction][:move]
@@ -58,8 +60,10 @@ class SubmittedFolderController < ApplicationController
   # To rename a selected file, checks any discrepancies in new file name, if new filename is same as some existing filename in current directory
   # error is flashed.
   def rename_selected_file
+    # Fetch the old file name
     old_filename = params[:directories][params[:chk_files]] + "/" + params[:filenames][params[:chk_files]]
     new_filename = params[:directories][params[:chk_files]] + "/" + FileHelper.sanitize_filename(params[:faction][:rename])
+    # Check if the file with already existing name is present in the directory and if so raise the error else rename the file
     begin
       raise "A file already exists in this directory with the name \"#{params[:faction][:rename]}\"" if File.exist?(new_filename)
 
@@ -71,11 +75,15 @@ class SubmittedFolderController < ApplicationController
 
   # Function to delete selected file
   def delete_selected_files
+    # Fetch the file name
     filename = params[:directories][params[:chk_files]] + "/" + params[:filenames][params[:chk_files]]
+    # Remove the file using FileUtils
     FileUtils.rm_r(filename)
+    # Fetch username, assignment and team to remove the file. 
     participant = Participant.find_by(id: params[:id])
     assignment = participant.try(:assignment)
     team = participant.try(:team)
+    # Create a new submission record of deletion
     SubmissionRecord.create(team_id: team.try(:id),
                             content: filename,
                             user: participant.try(:name),
@@ -86,7 +94,9 @@ class SubmittedFolderController < ApplicationController
 
   # Function to copy selected file
   def copy_selected_file
+    # Fetch old file name
     old_filename = params[:directories][params[:chk_files]] + "/" + params[:filenames][params[:chk_files]]
+    # Create new file name
     new_filename = params[:directories][params[:chk_files]] + "/" + FileHelper.sanitize_filename(params[:faction][:copy])
     begin
       raise "A file with this name already exists. Please delete the existing file before copying." if File.exist?(new_filename)

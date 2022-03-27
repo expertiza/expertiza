@@ -120,7 +120,7 @@ class TeamsController < ApplicationController
       @teams_users = TeamsUser.where(team_id: @team.id)
       @sign_up_team.destroy_all if @sign_up_team
       @teams_users.destroy_all if @teams_users
-      @team.destroy 
+      @team.destroy
       undo_link("The team \"#{@team.name}\" has been successfully deleted.")
     end
     redirect_to :back
@@ -187,5 +187,4 @@ class TeamsController < ApplicationController
       flash[:note] = teams.length.to_s + ' teams were successfully copied to "' + assignment.name + '"'
     end
   end
-
 end

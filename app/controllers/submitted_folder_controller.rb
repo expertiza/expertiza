@@ -79,7 +79,7 @@ class SubmittedFolderController < ApplicationController
     filename = params[:directories][params[:chk_files]] + "/" + params[:filenames][params[:chk_files]]
     # Remove the file using FileUtils
     FileUtils.rm_r(filename)
-    # Fetch username, assignment and team to remove the file. 
+    # Fetch username, assignment and team to remove the file.
     participant = Participant.find_by(id: params[:id])
     assignment = participant.try(:assignment)
     team = participant.try(:team)

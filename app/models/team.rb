@@ -159,6 +159,14 @@ class Team < ActiveRecord::Base
       member_num_difference.times do
         team.add_member(users.first, parent.id)
         users.delete(users.first)
+        # The early return statement below is correct according to logic.
+        # It is acceptable according to ruby coding principles as well.
+        # It is being reported incorrectly by rubocop.
+        # Related bug thread:https://tinyurl.com/mbrt3pjd
+        # TODO
+        # Rubocop needs to be upgraded to 1.26.1 version.
+        # It requires lot many changes in dependancy graph.
+        # This task will bring lot many breaking changes and requires good amount of bandwidth to be fixed.
         return if users.empty?
       end
     end

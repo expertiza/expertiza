@@ -85,7 +85,7 @@ group :development do
   gem 'pry-nav'
   gem 'pry-remote'
   gem 'quiet_assets'
-  gem 'rubocop'
+  gem 'rubocop', '~> 1.26.1'
   gem 'bootstrap-sass', '~> 3.4.1'
   gem 'sassc-rails', '>= 2.1.0'
 end

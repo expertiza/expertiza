@@ -16,8 +16,12 @@ describe SubmissionRecordsController do
       allow(AssignmentTeam).to receive(:find).with(any_args).and_return(team)
       allow(Assignment).to receive(:find).with(any_args).and_return(assignment)
       allow(SubmissionRecord).to receive(:where).with(any_args).and_return([submission_record])
+
       result = get :index, params
       expect(result.status).to eq 302
+
+      controller.send(:index)
+      expect(controller.instance_variable_get(:@submission_records)).to eq [submission_record]
       end
   end
 

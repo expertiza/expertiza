@@ -57,7 +57,7 @@ describe UsersController do
       expect(controller.action_allowed?).to be true
       stub_current_user(student7, student7.role.name, student7.role)
       allow(controller).to receive(:request_params).and_return(request_params)
-      expect(controller.action_allowed?).to be true
+      expect(controller.action_allowed?).to be false
     end
 
     # check there are no errors while setting anonymized view as a student
@@ -132,8 +132,7 @@ describe UsersController do
     end
 
     it 'when params[:id] is nil' do
-      request_params = { id: nil }
-      get :show, params: request_params
+      get :show
       expect(response).to redirect_to('/tree_display/drill')
     end
   end

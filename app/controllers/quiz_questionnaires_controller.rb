@@ -90,7 +90,7 @@ class QuizQuestionnairesController < QuestionnairesController
     end
     if params['save'] && params[:question].try(:keys)
       @questionnaire.update_attributes(questionnaire_params)
-      params[:question].each_key do |qid|
+      params[:question].each_pair do |qid, _|
         @question = Question.find(qid)
         @question.txt = params[:question][qid.to_sym][:txt]
         @question.weight = params[:question_weights][qid.to_sym][:txt]
@@ -263,7 +263,7 @@ class QuizQuestionnairesController < QuestionnairesController
     questions.each do |question|
       q_type = params[:question_type][question_num.to_s][:type]
       q_answer_choices = params[:new_choices][question_num.to_s][q_type]
-      q_answer_choices.each_key do |choice_key|
+      q_answer_choices.each_pair do |choice_key, _|
         question_factory(q_type, question, choice_key, q_answer_choices) # allow factory method to create appropriate question
       end
       question_num += 1

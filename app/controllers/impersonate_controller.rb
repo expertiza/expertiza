@@ -3,7 +3,7 @@ class ImpersonateController < ApplicationController
 
   # This function checks if the logged in user is a student or not. If it is a student, do not allow the impersonate mode.
   # If the logged in user has the role or anything other than the student, we allow that user to use the impersonate mode.
-  before_action :check_if_name_is_valid
+  before_action :check_if_input_is_valid
 
   def action_allowed?
     # Check for TA privileges first since TA's also have student privileges.
@@ -31,17 +31,18 @@ class ImpersonateController < ApplicationController
     flash[:error] = "This page doesn't take any query string." unless request.GET.empty?
   end
 
-  # Method to overwrite the session details that are corresponding to the user or one being impersonated
-  # The first 'if' statement is executed if the logged in user tried to access the impersonate feature from his account.
-  # The 'elsif' statement is executed if the user is impersonating someone and then tried to impersonate another person.
-  # The 'else' statement is executed if...
-
+  # Method to generate the session for the provided user
   def generate_session(user)
     AuthController.clear_user_info(session, nil)
     session[:original_user] = @original_user
     session[:impersonate] = true
     session[:user] = user
   end
+
+  # Method to overwrite the session details that are corresponding to the user or one being impersonated
+  # The first 'if' statement is executed if the logged in user tried to access the impersonate feature from his account.
+  # The 'elsif' statement is executed if the user is impersonating someone and then tried to impersonate another person.
+  # The 'else' statement is executed if...
 
   def overwrite_session
     if params[:impersonate].nil?
@@ -62,16 +63,15 @@ class ImpersonateController < ApplicationController
   # special_chars method-Initialises string with special characters /\?<>|&$# .
   # contains_special_chars method-converts it to regex and compares with the string
   # warn_for_special_chars takes the output from above method and flashes an error if there are any special characters(/\?<>|&$#) in the string
-  def check_if_name_is_valid
-    #redirect_back if params[:user] && warn_for_special_chars(params[:user][:name], 'Username') 
-    #redirect_back if params[:impersonate] && warn_for_special_chars(params[:impersonate][:name], 'Username')
+  def check_if_input_is_valid
     if params[:user] && warn_for_special_chars(params[:user][:name], 'Username') 
-      flash[:error] = "Please enter valid name"
-      redirect_back
-    elsif params[:impersonate] && warn_for_special_chars(params[:impersonate][:name], 'Username')
-      flash[:error] = "Please enter valid name"
-      redirect_back
+      @message = "Please enter valid student name"
+    else params[:impersonate] && warn_for_special_chars(params[:impersonate][:name], 'Username')
+      @message = "Please enter valid student name"
     end
+  rescue StandardError
+    flash[:error] = @message
+    redirect_back
   end
 
   # Checking if the username provided can be impersonated or not
@@ -97,66 +97,32 @@ class ImpersonateController < ApplicationController
     end
   end
 
-  # Function to display appropriate error messages based on different username provided, the message explains each error
-  # This function checks params values and displays error_message based on the user name .This is initial check to see if username is valid
-
-  #def display_error_msg
-    # This is called when we try to impersonate a wrong user from the original logged in account.
-   # if params[:user]
-    #  @message = "No user exists with the name '#{params[:user][:name]}'."
-      # This is called when we try to impersonate a wrong user from the impersonated account.
-    #elsif params[:impersonate]
-     # @message = "No impersonate user exists with the name '#{params[:impersonate][:name]}'."
-    #else
-     # if params[:impersonate].nil?
-       # @message = "You cannot impersonate '#{params[:user][:name]}'."
-      #else
-       # if !params[:impersonate][:name].empty?
-        #  @message = "You cannot impersonate '#{params[:impersonate][:name]}'."
-        #else
-         # @message = 'No original account was found. Please close your browser and start a new session.'
-        #end
-      #end
-    #end
-  #rescue StandardError
-   # flash[:error] = @message
-  #end
-
   # Main operation
   def do_impersonate_operation(user)
     check_if_user_impersonateable if user
-    #display_error_msg
   end
 
   # Main operation, method used to break the functions in impersonate controller and bring out 2 functionalities at same level,
   # checking if user impersonateable, if not throw corresponding error message
 
   def impersonate
-    # Initial check to see if the username exists
-    #display_error_msg
     begin
       @original_user = session[:super_user] || session[:user]
       # Impersonate using form on /impersonate/start, based on the username provided, this method looks to see if that's possible by calling the do_main_operation method
       if params[:impersonate].nil?
-        #check_if_special_char
+        @message = "You cannot impersonate '#{params[:user][:name]}'."
         user = get_real_user(params[:user][:name])
         do_impersonate_operation(user)
       elsif !params[:impersonate][:name].empty?
         # Impersonate a new account
-        # if !params[:impersonate][:name].empty?
-        #check_if_special_char
         user = get_real_user(params[:impersonate][:name])
         do_impersonate_operation(user)
           # Revert to original account when currently in the impersonated session
       elsif !session[:super_user].nil?
-        # if !session[:super_user].nil?
         AuthController.clear_user_info(session, nil)
         session[:user] = session[:super_user]
         user = session[:user]
         session[:super_user] = nil
-        #display_error_msg
-        #   end
-        # end
       end
       # Navigate to user's home location as the default landing page after impersonating or reverting
       AuthController.set_current_role(user.role_id, session)

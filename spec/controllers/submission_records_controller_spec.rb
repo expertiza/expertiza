@@ -1,4 +1,5 @@
 describe SubmissionRecordsController do
+  # initialize objects using factories.rb required for stubbing in test cases
   let(:super_admin) { build(:superadmin, id: 1) }
   let(:instructor1) { build(:instructor, id: 10, name: 'Instructor1') }
   let(:instructor2) { build(:instructor, id: 11, name: 'Instructor2') }
@@ -10,6 +11,7 @@ describe SubmissionRecordsController do
 
   let(:submission_record) { build(:submission_record, id: 1, team_id: 27158, assignment_id: 1) }
 
+  # Redirects to a page when index method called
   describe '#index' do
     it 'call index method' do
       params = { team_id: 27158 }
@@ -25,7 +27,10 @@ describe SubmissionRecordsController do
       end
   end
 
+  # To allow the functionality only if the accessing user is a super admin
+  # or instructor who instructs current assignment or TA of the course which current assignment belongs
   describe '#action_allowed?' do
+    # define default behaviors for each testcase
     before(:each) do
       controller.params = { team_id: '27158' }
       allow(AssignmentTeam).to receive(:find).with('27158').and_return(team)

@@ -32,7 +32,9 @@ class ProfileController < ApplicationController
   end
 
   # :nocov:
+
   private
+
   def user_params
     params.require(:user).permit(:name,
                                  :crypted_password,

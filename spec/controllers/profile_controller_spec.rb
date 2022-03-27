@@ -1,11 +1,13 @@
 require 'rails_helper'
 
 describe ProfileController do
+  # initialize objects using factories.rb required for stubbing in test cases
   let(:super_admin) { build(:superadmin, id: 1) }
   let(:instructor1) { build(:instructor, id: 10, name: 'Instructor1') }
   let(:questionnaire) { build(:questionnaire, id: 666) }
   let(:assignment_questionnaire) { build(:assignment_questionnaire, id: 1, questionnaire: questionnaire) }
 
+  # To allow the functionality only if the accessing user is logged in
   describe '#action_allowed?' do
     context 'when someone is logged in' do
       it 'allows certain action' do
@@ -21,6 +23,7 @@ describe ProfileController do
     end
   end
 
+  # Renders edit page template
   describe '#edit' do
     it 'renders edit page' do
       stub_current_user(instructor1, instructor1.role.name, instructor1.role)
@@ -32,7 +35,9 @@ describe ProfileController do
     end
   end
 
+  # Flash success/error msg on updating profile and redirect to profile edit page
   describe '#update' do
+    # Test for case where the update_attributes method works as expected
     context 'when profile is saved successfully' do
       it 'shows a success flash message and redirects to profile#edit page' do
         stub_current_user(instructor1, instructor1.role.name, instructor1.role)
@@ -48,6 +53,7 @@ describe ProfileController do
       end
     end
 
+    # Test for case where the update_attributes method works as expected but assignment_questionnaire is not nil
     context 'when profile is saved successfully and assignment_questionnaire is not nil' do
       it 'shows a success flash message and redirects to profile#edit page' do
         stub_current_user(instructor1, instructor1.role.name, instructor1.role)
@@ -67,6 +73,7 @@ describe ProfileController do
       end
     end
 
+    # Test for case where we expect to encounter an error in update_attributes method
     context 'when profile is not saved successfully' do
       it 'displays an error flash message and redirects to profile#edit page' do
         stub_current_user(instructor1, instructor1.role.name, instructor1.role)

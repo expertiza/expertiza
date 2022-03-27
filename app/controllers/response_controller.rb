@@ -8,19 +8,23 @@ class ResponseController < ApplicationController
   before_action :authorize_show_calibration_results, only: %i[show_calibration_results_for_student]
   before_action :set_response, only: %i[update delete view]
 
+  # E2218: Method to check if that action is allowed for the user.
   def action_allowed?
     response = user_id = nil
     action = params[:action]
+    #Initialize response and user id if action is edit or delete or update or view.
     if %w[edit delete update view].include?(action)
       response = Response.find(params[:id])
       user_id = response.map.reviewer.user_id if response.map.reviewer
     end
     case action
-    when 'edit' # If response has been submitted, no further editing allowed
+    when 'edit'
+      # If response has been submitted, no further editing allowed.
       return false if response.is_submitted
-
+      # Else, return true if the user is a reviewer for that response.
       return current_user_is_reviewer?(response.map, user_id)
-      # Deny access to anyone except reviewer & author's team
+
+    # Deny access to anyone except reviewer & author's team
     when 'delete', 'update'
       return current_user_is_reviewer?(response.map, user_id)
     when 'view'
@@ -34,6 +38,7 @@ class ResponseController < ApplicationController
   def authorize_show_calibration_results
     response_map = ResponseMap.find(params[:review_response_map_id])
     user_id = response_map.reviewer.user_id if response_map.reviewer
+    # Deny access to the calibration result page if the current user is not a reviewer.
     unless current_user_is_reviewer?(response_map, user_id)
       flash[:error] = 'You are not allowed to view this calibration result'
       redirect_to controller: 'student_review', action: 'list', id: user_id
@@ -48,6 +53,7 @@ class ResponseController < ApplicationController
     render json: response
   end
 
+  #E2218: Method to delete a response.
   def delete
     # The locking was added for E1973, team-based reviewing. See lock.rb for details
     if @map.reviewer_is_team

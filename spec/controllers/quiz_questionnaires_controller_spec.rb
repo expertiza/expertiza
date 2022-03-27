@@ -179,7 +179,7 @@ describe QuizQuestionnairesController do
             allow(AssignmentParticipant).to receive_message_chain(:find, :team).with('1').with(no_args).and_return(nil)
             get :new, @params
             expect(flash[:error]).to eq('You should create or join a team first.')
-            expect(response).to redirect_to('/submitted_content/view?id=1')
+            expect(response).to redirect_to('/submitted_content/view/1')
           end
 
           it 'shows error message and redirects to submitted_content#view if current participant have a team w/o topic' do
@@ -189,7 +189,7 @@ describe QuizQuestionnairesController do
             allow(team).to receive(:topic).and_return(nil)
             get :new, @params
             expect(flash[:error]).to eq('Your team should have a topic.')
-            expect(response).to redirect_to('/submitted_content/view?id=1')
+            expect(response).to redirect_to('/submitted_content/view/1')
           end
         end
 
@@ -204,7 +204,7 @@ describe QuizQuestionnairesController do
             allow(assignment).to receive(:require_quiz?).and_return(false)
             get :new, params
             expect(flash[:error]).to eq('This assignment is not configured to use quizzes.')
-            expect(response).to redirect_to('/submitted_content/view?id=1')
+            expect(response).to redirect_to('/submitted_content/view/1')
           end
         end
       end
@@ -232,7 +232,7 @@ describe QuizQuestionnairesController do
             params = { id: 1, pid: 1 }
             get :edit, params
             expect(flash[:error]).to eq('Your quiz has been taken by one or more students; you cannot edit it anymore.')
-            expect(response).to redirect_to('/submitted_content/view?id=1')
+            expect(response).to redirect_to('/submitted_content/view/1')
           end
         end
       end
@@ -243,7 +243,7 @@ describe QuizQuestionnairesController do
             allow(Questionnaire).to receive(:find).with('1').and_return(nil)
             params = { id: 1, pid: 1 }
             post :update, params
-            expect(response).to redirect_to('/submitted_content/view?id=1')
+            expect(response).to redirect_to('/submitted_content/view/1')
           end
         end
 
@@ -306,7 +306,7 @@ describe QuizQuestionnairesController do
             allow(qc).to receive(:update_attributes).with(any_args).and_return(true)
             allow(qc_tf).to receive(:update_attributes).with(any_args).and_return(true)
             post :update, params
-            expect(response).to redirect_to('/submitted_content/view?id=1')
+            expect(response).to redirect_to('/submitted_content/view/1')
           end
         end
       end

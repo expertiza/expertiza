@@ -35,9 +35,9 @@ class AssignmentQuestionnaireController < ApplicationController
     puts @assignment_questionnaires #0 objetcs
     puts "This should be empty"
 
-    # respond_to do |format|
-    #   format.json { render json: @assignment_questionnaires }
-    # end
+    respond_to do |format|
+      format.json { render json: @assignment_questionnaires }
+    end
   end
 
   def create
@@ -68,9 +68,9 @@ class AssignmentQuestionnaireController < ApplicationController
     @assignment_questionnaire = AssignmentQuestionnaire.new(params)
     @assignment_questionnaire.save
 
-    # respond_to do |format|
-    #   format.json { render json: @assignment_questionnaire }
-    # end
+    respond_to do |format|
+      format.json { render json: @assignment_questionnaire }
+    end
   
   end
 end

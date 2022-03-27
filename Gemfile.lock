@@ -1,11 +1,4 @@
 GIT
-  remote: git://github.com/mimemagicrb/mimemagic.git
-  revision: 01f92d86d15d85cfd0f20dabd025dcbd36a8a60f
-  ref: 01f92d86d15d85cfd0f20dabd025dcbd36a8a60f
-  specs:
-    mimemagic (0.3.5)
-
-GIT
   remote: https://github.com/Winbobob/danger.git
   revision: 1ccfed23f809a1e5c46e2533cfd7a3138f6cd821
   ref: 1ccfed23f809a1e5c46e2533cfd7a3138f6cd821
@@ -69,8 +62,8 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
-    airbrake (10.0.6)
-      airbrake-ruby (~> 4.13)
+    airbrake (9.5.5)
+      airbrake-ruby (~> 4.8)
     airbrake-ruby (4.15.0)
       rbtree3 (~> 0.5)
     airbrussh (1.4.0)
@@ -289,6 +282,9 @@ GEM
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2021.0225)
+    mimemagic (0.4.3)
+      nokogiri (~> 1)
+      rake
     mini_mime (1.1.0)
     mini_portile2 (2.4.0)
     minitest (5.14.4)
@@ -394,7 +390,7 @@ GEM
     rb-inotify (0.10.1)
       ffi (~> 1.0)
     rb-readline (0.5.5)
-    rbtree3 (0.6.0)
+    rbtree3 (0.7.0)
     rchardet (1.8.0)
     react-rails (2.6.1)
       babel-transpiler (>= 0.7.0)
@@ -574,7 +570,7 @@ DEPENDENCIES
   RedCloth
   activerecord-session_store
   activesupport (~> 4.2.11.1)
-  airbrake
+  airbrake (~> 9.5)
   authlogic (= 4.1)
   awesome_nested_set
   bind-it
@@ -619,7 +615,7 @@ DEPENDENCIES
   json
   launchy
   lingua
-  mimemagic!
+  mimemagic
   momentjs-rails (>= 2.9.0)
   mysql2
   nokogiri

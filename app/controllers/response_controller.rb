@@ -31,6 +31,7 @@ class ResponseController < ApplicationController
   end
 
   # E2218: Method to authorize if the reviewer can view the calibration results
+  # When user manipulates the URL, the user should be authorized
   def authorize_show_calibration_results
     response_map = ResponseMap.find(params[:review_response_map_id])
     user_id = response_map.reviewer.user_id if response_map.reviewer
@@ -69,6 +70,7 @@ class ResponseController < ApplicationController
   # If so, edit that version otherwise create a new version.
 
   # Prepare the parameters when student clicks "Edit"
+  # response questions with answers and scores are rendered in the edit page based on the version number
   def edit
     assign_action_parameters
     @prev = Response.where(map_id: @map.id)
@@ -97,7 +99,7 @@ class ResponseController < ApplicationController
     # set more handy variables for the view
     set_content
     @review_scores = []
-    @questions.each do |question|
+    @review_questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
     @questionnaire = questionnaire_from_response
@@ -267,7 +269,7 @@ class ResponseController < ApplicationController
     @assignment = Assignment.find(params[:assignment_id])
     @calibration_response = ReviewResponseMap.find(params[:calibration_response_map_id]).response[0]
     @review_response = ReviewResponseMap.find(params[:review_response_map_id]).response[0]
-    @questions = AssignmentQuestionnaire.get_questions_by_assignment_id(params[:assignment_id])
+    @review_questions = AssignmentQuestionnaire.get_questions_by_assignment_id(params[:assignment_id])
   end
 
   def toggle_permission
@@ -381,6 +383,8 @@ class ResponseController < ApplicationController
     end
   end
 
+  # This method initialize answers for the questions in the response
+  # Iterates over each questions and create corresponding answer for that
   def init_answers(questions)
     questions.each do |q|
       # it's unlikely that these answers exist, but in case the user refresh the browser some might have been inserted.

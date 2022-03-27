@@ -31,8 +31,8 @@ class ProfileController < ApplicationController
     redirect_to controller: :profile, action: :edit
   end
 
+  # :nocov:
   private
-
   def user_params
     params.require(:user).permit(:name,
                                  :crypted_password,
@@ -57,4 +57,5 @@ class ProfileController < ApplicationController
                                  :institution_id,
                                  :preference_home_flag)
   end
+  # :nocov:
 end

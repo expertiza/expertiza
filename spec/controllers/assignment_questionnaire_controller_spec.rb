@@ -67,11 +67,11 @@ describe AssignmentQuestionnaireController do
       ##If there is no assignment associated with the id in the database then controller must throw an error
       it 'throws an error that the assignment does not exist' do
         stub_current_user(super_admin, super_admin.role.name, super_admin.role)
-        params = {:assignment_id => 20}
 
-        allow(Assignment).to receive(:find).with('20').and_return(nil)
-        delete :delete_all, params
-        expect(flash[:error]).to be_present
+        allow(Assignment).to receive(:find).with(20).and_return(nil)
+        allow(controller).to receive(:params).and_return({ assignment_id: 20})
+        controller.send(:delete_all)
+        expect(flash[:error]).to be_eql('Assignment #20 does not currently exist.')
       end
     end
   
@@ -105,9 +105,11 @@ describe AssignmentQuestionnaireController do
         ## If assignment id is nil, then appropriate missing assignment id error should be flashed. 
         it 'flashes a response of missing assignment id' do
           params = {  assignment_id: nil}
-          session = { user: super_admin }
+
+          stub_current_user(super_admin, super_admin.role.name, super_admin.role)
           allow(Assignment).to receive(:find).and_return(nil)      
-          post :create, params, session
+          allow(controller).to receive(:params).and_return(params)
+          controller.send(:create)
           expect(flash[:error]).to be_eql('Missing assignment ID - Assignment ID entered is Nil')
         end
       end
@@ -115,11 +117,13 @@ describe AssignmentQuestionnaireController do
       context 'when questionnaire id is entered as nil' do
         ## If questionnaire id is nil, then appropriate missing questionnaire id error should be flashed. 
         it 'flashes a response of missing questionnaire id' do
-          params = {  assignment_id: '1', questionnaire_id: nil }
-          session = { user: super_admin }
+          params = {  assignment_id: 1, questionnaire_id: nil }
+
+          stub_current_user(super_admin, super_admin.role.name, super_admin.role)
           allow(Assignment).to receive(:find).and_return(assignment)
           allow(Questionnaire).to receive(:find).and_return(nil)
-          post :create, params, session
+          allow(controller).to receive(:params).and_return(params)
+          controller.send(:create)
           expect(flash[:error]).to be_eql('Missing questionnaire ID - Questionnaire ID entered is Nil')
         end
       end
@@ -127,11 +131,14 @@ describe AssignmentQuestionnaireController do
       context 'when no assignment is associated with the id in the database' do
         ## If no assignment is associated with the id in database, then appropriate missing record error should be flashed
         it 'throws an error that the assignment does not exist in the db' do
-          params = {  assignment_id: '7'}
-          session = { user: super_admin }
-          allow(Assignment).to receive(:find).with('7').and_return(nil)
-
-          post :create, params, session
+          questionnaire1 = create(:questionnaire)
+          params = {  assignment_id: 7, questionnaire_id: questionnaire1.id}
+          
+          stub_current_user(super_admin, super_admin.role.name, super_admin.role)
+          allow(Assignment).to receive(:find).with(7).and_return(nil)
+          allow(Questionnaire).to receive(:find).and_return(questionnaire1)
+          allow(controller).to receive(:params).and_return(params)
+          controller.send(:create)
           expect(flash[:error]).to be_eql('Assignment #7 does not currently exist.')
         end
       end
@@ -139,13 +146,14 @@ describe AssignmentQuestionnaireController do
       context 'when no questionnaire is associated with the id in the database' do
          ## If no questionnaire is associated with the id in database, then appropriate missing record error should be flashed
         it 'throws an error that the questionnaire does not exist in the db' do
-          assignment4 = create(:assignment)
-          params = { assignment_id: assignment4.id, questionnaire_id: '7'}
-          session = { user: super_admin }
-          allow(Assignment).to receive(:find).and_return(assignment4)
-          allow(Questionnaire).to receive(:find).with('7').and_return(nil)
-        
-          post :create, params, session
+          params = { assignment_id: assignment.id, questionnaire_id: 7}
+          
+          stub_current_user(super_admin, super_admin.role.name, super_admin.role)
+          allow(Assignment).to receive(:find).and_return(assignment)
+          allow(Questionnaire).to receive(:find).with(7).and_return(nil)
+          allow(controller).to receive(:params).and_return(params)
+          controller.send(:create)
+          
           expect(flash[:error]).to be_eql('Questionnaire #7 does not currently exist.')
         end
       end
@@ -155,16 +163,16 @@ describe AssignmentQuestionnaireController do
         it 'should save and redirect appropriatley' do
           assignment5 = create(:assignment)
           questionnaire1 = create(:questionnaire)
-          # assignment_questionnaire1 = create(:assignment_questionnaire, assignment_id: assignment5.id, questionnaire_id: questionnaire1.id)
+          params = { assignment_id: assignment5.id, questionnaire_id: questionnaire1.id }
 
+          stub_current_user(super_admin, super_admin.role.name, super_admin.role)
           allow(Assignment).to receive(:find).and_return(assignment5)
           allow(Questionnaire).to receive(:find).and_return(questionnaire1)
+          
+          allow(controller).to receive(:params).and_return(params)
+          controller.send(:create)
 
-          params = { assignment_id: assignment5.id, questionnaire_id: questionnaire1.id}
-          session = { user: super_admin }
-          post :create, params, session
-          # expect(assignmentQuestionnaire).to eq(true)
-          expect(response).to render_template(:add_new_questions_questionnaires)
+          expect(AssignmentQuestionnaire.where(assignment_id: assignment5.id).count).to eq(1)
         end
       end
 

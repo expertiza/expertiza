@@ -23,6 +23,7 @@ class AssignmentQuestionnaireController < ApplicationController
     
     if assignment.nil?
       flash[:error] = 'Assignment #' + params[:assignment_id].to_s + ' does not currently exist.'
+      return
     end
 
     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:assignment_id])
@@ -67,10 +68,9 @@ class AssignmentQuestionnaireController < ApplicationController
     @assignment_questionnaire = AssignmentQuestionnaire.new(params)
     @assignment_questionnaire.save
 
-    puts @assignment_questionnaire
-
-    respond_to do |format|
-      format.json { render json: @assignment_questionnaire }
-    end
+    # respond_to do |format|
+    #   format.json { render json: @assignment_questionnaire }
+    # end
+  
   end
 end

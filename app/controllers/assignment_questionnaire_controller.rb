@@ -27,13 +27,7 @@ class AssignmentQuestionnaireController < ApplicationController
     end
 
     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:assignment_id])
-    puts "Print me!!"
-    puts @assignment_questionnaires #3 objects
-    puts "Three objects printed"
     @assignment_questionnaires.each(&:delete)
-    puts "All have been deleted"
-    puts @assignment_questionnaires #0 objetcs
-    puts "This should be empty"
 
     respond_to do |format|
       format.json { render json: @assignment_questionnaires }

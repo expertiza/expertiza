@@ -165,7 +165,7 @@ class Team < ActiveRecord::Base
         # Related bug thread:https://tinyurl.com/mbrt3pjd
         # TODO
         # Rubocop needs to be upgraded to 1.26.1 version.
-        # It requires lot many changes in dependancy graph.
+        # It requires lot many changes in dependency graph.
         # This task will bring lot many breaking changes and requires good amount of bandwidth to be fixed.
         return if users.empty?
       end

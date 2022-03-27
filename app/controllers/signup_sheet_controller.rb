@@ -140,10 +140,7 @@ class SignupSheetController < ApplicationController
     load_add_signup_topics(params[:id])
     SignUpSheet.add_signup_topic(params[:id])
   end
-  # Commented add_signup_topics_staggered because it was doing same thing as add_signup_topics.
-  #def add_signup_topics_staggered
-  #   add_signup_topics
-  #end
+  # Commented add_signup_topics_staggered because it was doing same thing as add_signup_topics. staggered function was just calling add_signup_topics and nothing new.
 
   # retrieves all the data associated with the given assignment. Includes all topics,
   def load_add_signup_topics(assignment_id)
@@ -253,7 +250,7 @@ class SignupSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
   end
 
-
+  #this function was added to implement DRY code as the same task were performed in both delete_signup function as well as delete_signup_instructor
   def flash_delete_signup_message(isInstructor, participant, assignment, drop_topic_deadline)
     messages = ["You have already submitted your work, so you are not allowed to drop your topic.",
                 "You cannot drop your topic after the drop topic deadline!",

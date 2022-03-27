@@ -3,6 +3,7 @@ class ImpersonateController < ApplicationController
 
   # This function checks if the logged in user is a student or not. If it is a student, do not allow the impersonate mode.
   # If the logged in user has the role or anything other than the student, we allow that user to use the impersonate mode.
+  before_action :check_if_special_char
 
   def action_allowed?
     # Check for TA privileges first since TA's also have student privileges.
@@ -62,8 +63,18 @@ class ImpersonateController < ApplicationController
   # contains_special_chars method-converts it to regex and compares with the string
   # warn_for_special_chars takes the output from above method and flashes an error if there are any special characters(/\?<>|&$#) in the string
   def check_if_special_char
-    redirect_back if params[:user] && warn_for_special_chars(params[:user][:name], 'Username')
-    redirect_back if params[:impersonate] && warn_for_special_chars(params[:impersonate][:name], 'Username')
+   
+    #redirect_back if params[:user] && warn_for_special_chars(params[:user][:name], 'Username') 
+    #redirect_back if params[:impersonate] && warn_for_special_chars(params[:impersonate][:name], 'Username')
+    if params[:user] && warn_for_special_chars(params[:user][:name], 'Username') 
+      flash[:error] = "Please enter valid name"
+      redirect_back
+    elsif params[:impersonate] && warn_for_special_chars(params[:impersonate][:name], 'Username')
+      flash[:error] = "Please enter valid name"
+      redirect_back
+    end
+
+    
   end
 
   # Checking if the username provided can be impersonated or not
@@ -130,13 +141,13 @@ class ImpersonateController < ApplicationController
       @original_user = session[:super_user] || session[:user]
       # Impersonate using form on /impersonate/start, based on the username provided, this method looks to see if that's possible by calling the do_main_operation method
       if params[:impersonate].nil?
-        check_if_special_char
+        #check_if_special_char
         user = get_real_user(params[:user][:name])
         do_impersonate_operation(user)
       elsif !params[:impersonate][:name].empty?
         # Impersonate a new account
         # if !params[:impersonate][:name].empty?
-        check_if_special_char
+        #check_if_special_char
         user = get_real_user(params[:impersonate][:name])
         do_impersonate_operation(user)
           # Revert to original account when currently in the impersonated session

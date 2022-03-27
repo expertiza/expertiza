@@ -42,7 +42,7 @@
               <% end %>
             <% else %>
               <% if session[:user].id == assignment.instructor.id %>
-                <%= link_to "Begin", {:controller => 'review_mapping', :action => 'add_calibration', :id => assignment.id, :team_id => team.id} %>
+                <%= link_to "Begin", {:controller => 'review_mapping', :action => 'add_instructor_to_do_standard_peer_review', :id => assignment.id, :team_id => team.id} %>
               <% end %>
             <% end %>
           </td>

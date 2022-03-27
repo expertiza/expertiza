@@ -27,7 +27,7 @@ describe ReviewMappingController do
     allow(reviewer).to receive(:get_reviewer).and_return(reviewer)
   end
 
-  describe '#add_calibration' do
+  describe '#add_instructor_to_do_standard_peer_review' do
     context 'when both participant and review_response_map have already existed' do
       it 'does not need to create new objects and redirects to responses#new maps' do
         allow(AssignmentParticipant).to receive_message_chain(:where, :first)
@@ -36,7 +36,7 @@ describe ReviewMappingController do
           .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).with(no_args).and_return(review_response_map)
         params = { id: 1, team_id: 1 }
         session = { user: build(:instructor, id: 1) }
-        get :add_calibration, params, session
+        get :add_instructor_to_do_standard_peer_review, params, session
         expect(response).to redirect_to '/response/new?assignment_id=1&id=1&return=assignment_edit'
       end
     end
@@ -53,7 +53,7 @@ describe ReviewMappingController do
           .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).and_return(review_response_map)
         params = { id: 1, team_id: 1 }
         session = { user: build(:instructor, id: 1) }
-        get :add_calibration, params, session
+        get :add_instructor_to_do_standard_peer_review, params, session
         expect(response).to redirect_to '/response/new?assignment_id=1&id=1&return=assignment_edit'
       end
     end

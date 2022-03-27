@@ -24,12 +24,12 @@ class ReviewMappingController < ApplicationController
     end
   end
 
- 
-  # The method add_calibration checks if a participant with  certain user_id exists in the
-  # AssignmentParticipant map. If the participant doesn't exist, this method creates a new participant 
-  # in the AssignmentParticipant map. This method also checks the ReviewResponseMap with certain parameters. 
-  # If the record doesn't exist, then a new record is created in the map. 
-  def add_calibration
+  # The method add_instructor_to_do_standard_peer_review gets called when the instructor of this assignment wants to do
+  # the expert peer-review. It checks if a participant is an instructor of this assignment in corresponding views and in
+  # this function it checks with certain user_id exists in the AssignmentParticipant map. If the participant doesn't
+  # exist, this method creates a new participant in the AssignmentParticipant map. This method also checks the
+  # ReviewResponseMap with certain parameters. If the record doesn't exist, then a new record is created in the map to do a review.
+  def add_instructor_to_do_standard_peer_review
     participant = AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first rescue nil
     if participant.nil?
       participant = AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')

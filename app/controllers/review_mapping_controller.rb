@@ -1,3 +1,12 @@
+# This class is used to assign reviewers to projects. 
+# It has several methods that are used to assign 
+# reviewers to a team under different conditions. 
+# This class implements the functionality for assigning 
+# reviewers and performing reviews. Few of the major functionalities  
+# of the class being automatic review mapping, peer review, 
+# assigning reviewer dynamically and self review. 
+
+
 class ReviewMappingController < ApplicationController
   include AuthorizationHelper
 

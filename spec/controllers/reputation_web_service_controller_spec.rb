@@ -155,15 +155,6 @@ describe ReputationWebServiceController do
       end
     end
 
-    context 'test aes_decrypt' do
-      it 'return the correct plain text' do
-        data = (0...8).map { rand(65..90).chr }.join
-        cipher, key, iv = ReputationWebServiceController.new.aes_encrypt(data)
-        plain = ReputationWebServiceController.new.aes_decrypt(cipher, key, iv)
-        expect(plain).to eq(data)
-      end
-    end
-
     # TODO: test for round 2
     # The web service is not available yet because of missing of public1.gem and private1.gem
     # Once the controller can get response from the reputation_web_service, the test should proceed to round 2 submission

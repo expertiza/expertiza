@@ -466,23 +466,19 @@ class SignupSheetController < ApplicationController
   end
   # compute signup topics will compute 2 variables:
   # @signup_topics: Contains list of all topics belonging to current assignment, but not bid by current team
-  # @bids: List of topics bid by current team and are part of current assignment, which participant/team belongs to
+  # @bids: List of topics bid by current team and are part of current assignment, which participant/team belongs to.
   def compute_signup_topics(team_id)
     @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
     signed_up_topics = []
     @bids.each do |bid|
       sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
-
       # Compute all signed up topics which were bid by this particular team
       signed_up_topics << sign_up_topic if sign_up_topic
     end
-
     # signed_up_topics will have topics which are bid by this team and part of this assignment.
     signed_up_topics &= @signup_topics
-
     # @signup_topics will have all the topics of current assignment which are not bid by current team.
     @signup_topics -= signed_up_topics
-
     # @bids has all the topics from current @assignment.id and also bid by current team.
     @bids = signed_up_topics
   end

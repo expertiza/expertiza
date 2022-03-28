@@ -464,7 +464,6 @@ class SignupSheetController < ApplicationController
     topic.save
     redirect_to_sign_up(params[:id])
   end
-  
   # compute signup topics will compute 2 variables:
   # @signup_topics: Contains list of all topics belonging to current assignment, but not bid by current team
   # @bids: List of topics bid by current team and are part of current assignment, which participant/team belongs to
@@ -483,7 +482,7 @@ class SignupSheetController < ApplicationController
 
     # @signup_topics will have all the topics of current assignment which are not bid by current team.
     @signup_topics -= signed_up_topics
-    
+
     # @bids has all the topics from current @assignment.id and also bid by current team.
     @bids = signed_up_topics
   end

@@ -593,7 +593,7 @@ class ReviewMappingController < ApplicationController
 
   # This method is used to checks if reviews are needed.
   def check_reviews_eligibility(assignment_id, review_strategy)
-    if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0).where("created_at > :time",time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
+    if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0).where("created_at > :time", time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
     end
   end
 

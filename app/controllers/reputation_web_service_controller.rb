@@ -52,10 +52,10 @@ class ReputationWebServiceController < ApplicationController
   # Params
   #   response
   # Returns
-  #   set of valid answers
+  #   set of valid answers (returns nil if empty)
   def get_valid_answers_for_response(response)
     answers = Answer.where(response_id: response.id)
-    valid_answer = answers.select { |a| (a.question.type == 'Criterion') && !a.answer.nil? }
+    valid_answer = answers.select { |answer| (answer.question.type == 'Criterion') && !answer.answer.nil? }
     valid_answer.empty? ? nil : valid_answer
   end
 
@@ -67,9 +67,9 @@ class ReputationWebServiceController < ApplicationController
   # Returns
   #   peer_review_grade
   def calculate_peer_review_grade(valid_answer, max_question_score)
-    temp_sum = valid_answer.map { |answer| answer.answer * answer.question.weight }.inject(:+)
-    weight_sum = valid_answer.sum { |answer| answer.question.weight }
-    peer_review_grade = 100.0 * temp_sum / (weight_sum * max_question_score)
+    weighted_score_sum = valid_answer.map { |answer| answer.answer * answer.question.weight }.inject(:+)
+    question_weight_sum = valid_answer.sum { |answer| answer.question.weight }
+    peer_review_grade = 100.0 * weighted_score_sum / (question_weight_sum * max_question_score)
     peer_review_grade.round(4)
   end
 
@@ -224,41 +224,21 @@ class ReputationWebServiceController < ApplicationController
     @another_assignment = Assignment.find(flash[:another_assignment_id]) rescue nil
   end
 
-  # Method: decrypt_response
-  # This method decrypts the encrypted response body.
-  # It accepts the encrypted body in JSON format.
-  # RSA decryption is first done on the keys.
-  # Decrypted keys are then used to perform AES decryption on the data.
-  # Decrypted data is sent back to the process_response_body method.
-  # Params
-  #   encrypted_data: The encrypted response from the reputation web service
-  # Returns
-  #   decrypted_data: The decrypted response from the reputation web service
-  def decrypt_response(encrypted_data)
-    encrypted_data = JSON.parse(encrypted_data)
-    key = rsa_private_key2(encrypted_data['keys'][0, 350])
-    vi = rsa_private_key2(encrypted_data['keys'][350, 350])
-    # AES symmetric algorithm decrypts data
-    aes_encrypted_response_data = encrypted_data['data']
-    decrypted_data = aes_decrypt(aes_encrypted_response_data, key, vi)
-    decrypted_data
-  end
-
   # Method: update_participants_reputation
   # This method accepts the response body in the JSON format.
   # It then parses the JSON and updates the reputation scores of the
   # participants in the list.
   # If the alg variable is not  Hamer/ Lauv, the updation step is skipped.
   # Params
-  #   response: The response from the reputation web service
+  #   reputation_response: The response from the reputation web service
   # Returns
   #   nil
-  def update_participants_reputation(response)
-    JSON.parse(response.body.to_s).each do |alg, list|
-      next unless %w[Hamer Lauw].include?(alg)
+  def update_participants_reputation(reputation_response)
+    JSON.parse(reputation_response.body.to_s).each do |reputation_algorithm, user_resputation_list|
+      next unless %w[Hamer Lauw].include?(reputation_algorithm)
 
-      list.each do |id, rep|
-        Participant.find_by(user_id: id).update(alg.to_sym => rep) unless /leniency/ =~ id.to_s
+      user_resputation_list.each do |user_id, reputation|
+        Participant.find_by(user_id: user_id).update(reputation_algorithm.to_sym => reputation) unless /leniency/ =~ id.to_s
       end
     end
   end
@@ -270,16 +250,13 @@ class ReputationWebServiceController < ApplicationController
   # It then calls the update_participants_reputation to update the reputation
   # scores received in the response body.
   # Params
-  #   response: The response from the reputation web service
+  #   reputation_response: The response from the reputation web service
   # Returns
   #   nil
-  def process_response_body(response)
-    # Decryption
-    # response.body = decrypt_response(response.body)
-
-    flash[:response] = response
-    flash[:response_body] = response.body
-    update_participants_reputation(response)
+  def process_response_body(reputation_response)
+    flash[:response] = reputation_response
+    flash[:response_body] = reputation_response.body
+    update_participants_reputation(reputation_response)
   end
 
   # Method: add_expert_grades
@@ -311,10 +288,10 @@ class ReputationWebServiceController < ApplicationController
     flash[:additional_info] = 'add quiz scores'
     assignment_id_list_quiz = get_assignment_id_list(params[:assignment_id].to_i, params[:another_assignment_id].to_i)
     quiz_str =  generate_json_for_quiz_scores(assignment_id_list_quiz).to_json
-    quiz_str[0] = ''
-    quiz_str.prepend('"quiz_scores":{')
+    quiz_str[0] = '' # remove first {
+    quiz_str.prepend('"quiz_scores":{') # add quiz_scores tag
     quiz_str += ','
-    quiz_str = quiz_str.gsub('"N/A"', '20.0')
+    quiz_str = quiz_str.gsub('"N/A"', '20.0') # replace N/A values with 20
     body.prepend(quiz_str)
   end
 
@@ -366,16 +343,16 @@ class ReputationWebServiceController < ApplicationController
   # This method sets the flash messages to pass on to the next request i.e
   # the reqest redirected to the client
   # Params
-  #   req: This contains the entire req that needs to be sent to the reputation
+  #   post_req: This contains the entire post_req that needs to be sent to the reputation
   #     webservice
   # Returns
   #   nil
-  def add_flash_messages(req)
+  def add_flash_messages(post_req)
     flash[:assignment_id] = params[:assignment_id]
     flash[:round_num] = params[:round_num]
     flash[:algorithm] = params[:algorithm]
     flash[:another_assignment_id] = params[:another_assignment_id]
-    flash[:request_body] = req.body
+    flash[:request_body] = post_req.body
   end
 
   # Method: add_additional_info_details
@@ -383,19 +360,19 @@ class ReputationWebServiceController < ApplicationController
   # selected in the additional information section. We populate the request
   # based on the selections
   # Params
-  #   req: This contains the entire req that needs to be sent to the reputation
+  #   post_req: This contains the entire post_req that needs to be sent to the reputation
   #     webservice
   # Returns
   #   nil
-  def add_additional_info_details(req)
+  def add_additional_info_details(post_req)
     if params[:checkbox][:expert_grade] == 'Add expert grades'
-      add_expert_grades(req.body)
+      add_expert_grades(post_req.body)
     elsif params[:checkbox][:hamer] == 'Add initial Hamer reputation values'
       add_hamer_reputation_values
     elsif params[:checkbox][:lauw] == 'Add initial Lauw reputation values'
       add_lauw_reputation_values
     elsif params[:checkbox][:quiz] == 'Add quiz scores'
-      add_quiz_scores(req.body)
+      add_quiz_scores(post_req.body)
     else
       flash[:additional_info] = ''
     end
@@ -413,23 +390,17 @@ class ReputationWebServiceController < ApplicationController
   #   nil
   def prepare_request_body
     reputation_web_service_path = URI.parse(WEBSERVICE_CONFIG['reputation_web_service_url']).path
-    req = Net::HTTP::Post.new(reputation_web_service_path, { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
+    post_req = Net::HTTP::Post.new(reputation_web_service_path, { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
     curr_assignment_id = (params[:assignment_id].empty? ? '754' : params[:assignment_id])
     assignment_id_list_peers = get_assignment_id_list(curr_assignment_id, params[:another_assignment_id].to_i)
 
-    req.body = generate_json_for_peer_reviews(assignment_id_list_peers, params[:round_num].to_i).to_json
+    post_req.body = generate_json_for_peer_reviews(assignment_id_list_peers, params[:round_num].to_i).to_json
 
-    req.body[0] = '' # remove the first '{'
-    add_additional_info_details req
-    req.body.prepend('{')
-    add_flash_messages req
-
-    # Encrypting the request body data
-    # req.body = encrypt_request_body(req.body)
-
-    # request body should be in JSON format.
-    # req.body = format_into_json(req.body)
-    req
+    post_req.body[0] = '' # remove the first '{'
+    add_additional_info_details post_req
+    post_req.body.prepend('{')
+    add_flash_messages post_req
+    post_req
   end
 
   # Method: send_post_request
@@ -443,92 +414,14 @@ class ReputationWebServiceController < ApplicationController
   # Returns
   #   nil
   def send_post_request
-    req = prepare_request_body
+    post_req = prepare_request_body
     reputation_web_service_hostname = URI.parse(WEBSERVICE_CONFIG['reputation_web_service_url']).host
-    response = Net::HTTP.new(reputation_web_service_hostname).start { |http| http.request(req) }
-    if %w[400 500].include?(response.code)
+    reputation_response = Net::HTTP.new(reputation_web_service_hostname).start { |http| http.request(post_req) }
+    if %w[400 500].include?(reputation_response.code)
       flash[:error] = 'Post Request Failed'
     else
-      process_response_body(response)
+      process_response_body(reputation_response)
     end
     redirect_to action: 'client'
-  end
-
-  # THE BELOW METHODS ARE UNUSED AND WE WAITING ON CONFIRMATION TO DELETE THEM PERMANENTLY
-  # Method: encrypt_request_body
-  # This method is used by the method prepare_request_body.
-  # This method takes in the plain request body data, encrypts
-  # the data using AES symmetric algorithm.
-  # It then uses RSA asymetric encryption to encrypt the AES keys.
-  # Then the encrypted data is prepended with the encrypted keys
-  # Params
-  #   plain_data: The plain json request
-  # Returns
-  #   encrypted_data: The encrypted json request
-  def encrypt_request_body(plain_data)
-    # AES symmetric algorithm encrypts raw data
-    aes_encrypted_request_data = aes_encrypt(plain_data)
-    encrypted_data = aes_encrypted_request_data[0]
-
-    # RSA asymmetric algorithm encrypts keys of AES
-    encrypted_key = rsa_public_key1(aes_encrypted_request_data[1])
-    encrypted_vi = rsa_public_key1(aes_encrypted_request_data[2])
-
-    encrypted_data.prepend('", "data":"')
-    encrypted_data.prepend(encrypted_vi)
-    encrypted_data.prepend(encrypted_key)
-
-    encrypted_data
-  end
-
-  # Method: format_into_json
-  # This method accepts the unformatted string data pertaining to the request body.
-  # Unoformatted string data is converted into JSON format in this method.
-  # JSON formatted request body is returned to the prepare_request_body method.
-  # Params
-  #   unformatted_data: The unformatted json request
-  # Returns
-  #   formatted_data: The formatted json request
-  def format_into_json(unformatted_data)
-    unformatted_data.prepend('{"keys":')
-    unformatted_data << '}'
-    formatted_data = unformatted_data.gsub!(/\n/, '\\n')
-    formatted_data = formatted_data.nil? ? unformatted_data : formatted_data
-    formatted_data
-  end
-
-  def rsa_public_key1(data)
-    public_key_file = 'public1.pem'
-    public_key = OpenSSL::PKey::RSA.new(File.read(public_key_file))
-    encrypted_string = Base64.encode64(public_key.public_encrypt(data))
-
-    encrypted_string
-  end
-
-  def rsa_private_key2(ciphertext)
-    private_key_file = 'private2.pem'
-    password = "ZXhwZXJ0aXph\n"
-    encrypted_string = ciphertext
-    private_key = OpenSSL::PKey::RSA.new(File.read(private_key_file), Base64.decode64(password))
-    string = private_key.private_decrypt(Base64.decode64(encrypted_string))
-    string
-  end
-
-  def aes_encrypt(data)
-    cipher = OpenSSL::Cipher::AES.new(256, :CBC)
-    cipher.encrypt
-    key = cipher.random_key
-    iv = cipher.random_iv
-    ciphertext = Base64.encode64(cipher.update(data) + cipher.final)
-    [ciphertext, key, iv]
-  end
-
-  def aes_decrypt(ciphertext, key, iv)
-    decipher = OpenSSL::Cipher::AES.new(256, :CBC)
-    decipher.decrypt
-    decipher.key = key
-    decipher.iv = iv
-    plain = decipher.update(Base64.decode64(ciphertext)) + decipher.final
-    plain
   end
 end

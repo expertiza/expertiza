@@ -427,7 +427,7 @@ class SignUpSheetController < ApplicationController
     # Check if this sign up topic exists
     if SignUpTopic.exists?(id: params[:topic_id])
       SignUpTopic.find_by(id: params[:topic_id]).update_attribute(:private_to, nil)
-    else 
+    else
       # Else flash an error
       flash[:error] = 'Signup topic does not exist.'
     end

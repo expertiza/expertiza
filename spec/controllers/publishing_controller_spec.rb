@@ -33,7 +33,7 @@ describe PublishingController do
     end
 
     #check if teaching assisstant is able to perform the actions
-    it 'allows teaching assisstant to peform certain action' do
+    it 'allows teaching assisstant to perform certain action' do
       stub_current_user(ta, ta.role.name, ta.role)
       expect(controller.send(:action_allowed?)).to be_truthy
     end
@@ -171,7 +171,7 @@ describe PublishingController do
       
     context 'user clicks on the deny publishing rights to all past assignments button' do
 
-      #verify user clicks on deny publishing rights to all assigments and redirects to view page
+      #verify user clicks on deny publishing rights to all assignments and redirects to view page
       it 'redirects to view page' do
           allow(AssignmentParticipant).to receive(:where).with(user_id: 21).and_return([assignment_participant1])
         stub_current_user(student1, student1.role.name, student1.role)

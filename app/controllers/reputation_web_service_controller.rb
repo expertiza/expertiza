@@ -274,9 +274,6 @@ class ReputationWebServiceController < ApplicationController
   # Returns
   #   nil
   def process_response_body(response)
-    # Decryption
-    # response.body = decrypt_response(response.body)
-
     flash[:response] = response
     flash[:response_body] = response.body
     update_participants_reputation(response)
@@ -423,12 +420,6 @@ class ReputationWebServiceController < ApplicationController
     add_additional_info_details post_req
     post_req.body.prepend('{')
     add_flash_messages post_req
-
-    # Encrypting the request body data
-    # post_req.body = encrypt_request_body(post_req.body)
-
-    # request body should be in JSON format.
-    # post_req.body = format_into_json(post_req.body)
     post_req
   end
 
@@ -452,83 +443,5 @@ class ReputationWebServiceController < ApplicationController
       process_response_body(response)
     end
     redirect_to action: 'client'
-  end
-
-  # THE BELOW METHODS ARE UNUSED AND WE WAITING ON CONFIRMATION TO DELETE THEM PERMANENTLY
-  # Method: encrypt_request_body
-  # This method is used by the method prepare_request_body.
-  # This method takes in the plain request body data, encrypts
-  # the data using AES symmetric algorithm.
-  # It then uses RSA asymetric encryption to encrypt the AES keys.
-  # Then the encrypted data is prepended with the encrypted keys
-  # Params
-  #   plain_data: The plain json request
-  # Returns
-  #   encrypted_data: The encrypted json request
-  def encrypt_request_body(plain_data)
-    # AES symmetric algorithm encrypts raw data
-    aes_encrypted_request_data = aes_encrypt(plain_data)
-    encrypted_data = aes_encrypted_request_data[0]
-
-    # RSA asymmetric algorithm encrypts keys of AES
-    encrypted_key = rsa_public_key1(aes_encrypted_request_data[1])
-    encrypted_vi = rsa_public_key1(aes_encrypted_request_data[2])
-
-    encrypted_data.prepend('", "data":"')
-    encrypted_data.prepend(encrypted_vi)
-    encrypted_data.prepend(encrypted_key)
-
-    encrypted_data
-  end
-
-  # Method: format_into_json
-  # This method accepts the unformatted string data pertaining to the request body.
-  # Unoformatted string data is converted into JSON format in this method.
-  # JSON formatted request body is returned to the prepare_request_body method.
-  # Params
-  #   unformatted_data: The unformatted json request
-  # Returns
-  #   formatted_data: The formatted json request
-  def format_into_json(unformatted_data)
-    unformatted_data.prepend('{"keys":')
-    unformatted_data << '}'
-    formatted_data = unformatted_data.gsub!(/\n/, '\\n')
-    formatted_data = formatted_data.nil? ? unformatted_data : formatted_data
-    formatted_data
-  end
-
-  def rsa_public_key1(data)
-    public_key_file = 'public1.pem'
-    public_key = OpenSSL::PKey::RSA.new(File.read(public_key_file))
-    encrypted_string = Base64.encode64(public_key.public_encrypt(data))
-
-    encrypted_string
-  end
-
-  def rsa_private_key2(ciphertext)
-    private_key_file = 'private2.pem'
-    password = "ZXhwZXJ0aXph\n"
-    encrypted_string = ciphertext
-    private_key = OpenSSL::PKey::RSA.new(File.read(private_key_file), Base64.decode64(password))
-    string = private_key.private_decrypt(Base64.decode64(encrypted_string))
-    string
-  end
-
-  def aes_encrypt(data)
-    cipher = OpenSSL::Cipher::AES.new(256, :CBC)
-    cipher.encrypt
-    key = cipher.random_key
-    iv = cipher.random_iv
-    ciphertext = Base64.encode64(cipher.update(data) + cipher.final)
-    [ciphertext, key, iv]
-  end
-
-  def aes_decrypt(ciphertext, key, iv)
-    decipher = OpenSSL::Cipher::AES.new(256, :CBC)
-    decipher.decrypt
-    decipher.key = key
-    decipher.iv = iv
-    plain = decipher.update(Base64.decode64(ciphertext)) + decipher.final
-    plain
   end
 end

@@ -7,7 +7,7 @@ module ResponseHelper
     map.reviewer.current_user_is_reviewer? current_user.try(:id)
   end
 
-  # sorts by sequence number
+  # sorts the questions passed by sequence number in ascending order
   def sort_questions(questions)
     questions.sort_by(&:seq)
   end

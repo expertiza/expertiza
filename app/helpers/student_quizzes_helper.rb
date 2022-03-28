@@ -1,5 +1,4 @@
 module StudentQuizzesHelper
-
   # This method as whole fetches the answers provided and calculates the final scores for the quiz.
   # Also calls separate methods for handling single answer/ true or false evaluations and multiple answer evaluations for calculating score.
   def calculate_score(map, response)
@@ -60,5 +59,4 @@ module StudentQuizzesHelper
     answers.push(new_score)
     return has_response
   end
-
 end

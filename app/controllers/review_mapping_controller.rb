@@ -419,6 +419,10 @@ class ReviewMappingController < ApplicationController
     end
   end
 
+  # This method ensures that the instructor does not assign too many reviews to a student.
+  # It throws an error when the number of reviews that are to be done by the 
+  # student are greater than the total number of teams. 
+  # Otherwise, it calls the mapping stategy method. 
   def mapping_strategy_without_artifacts(number_of_reviews_per_student, number_of_reviews_per_submission,
                                          teams, assignment_id, participants)
     # check for exit paths first
@@ -438,6 +442,10 @@ class ReviewMappingController < ApplicationController
     end
   end
 
+  # This method performs mappping strategy on both calibrated artifacts 
+  # and uncalibrated artifacts. To achieve this, the method first identifies 
+  # the teams with calibrated artifacts and then identifies 
+  # the teams without calibrated artifacts using the above. 
   def mapping_strategy_on_artifacts(assignment_id, teams, participants,
                                     number_of_calibrated_artifacts, number_of_uncalibrated_artifacts)
     teams_with_calibrated_artifacts = []
@@ -454,6 +462,9 @@ class ReviewMappingController < ApplicationController
   end
 
   # This method is used to perform automatic review mapping.
+  # If it's an individual assignment, the method simply creates a team. 
+  # Depending on the number of calibrated artifacts and the number of 
+  # uncalibrated artifacts, mapping strategy is performed. 
   def automatic_review_mapping
     assignment_id = params[:id].to_i
     participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.select(&:can_review).shuffle!
@@ -477,6 +488,8 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment_id
   end
 
+  # This method is used to perform peer review strategy and assign 
+  # reviewera for a team. 
   def automatic_review_mapping_strategy(assignment_id,
                                         participants, teams, number_of_reviews_per_student = 0,
                                         number_of_reviews_per_submission = 0)
@@ -619,7 +632,7 @@ class ReviewMappingController < ApplicationController
     return teams_hash
   end
 
-  # This method is used to remove students who have already been assigned enough num of reviews out of participants array
+  # This method is used to remove students who have already been assigned enough number of reviews out of participants array.
   def remove_students_with_enough_reviews(num_participants, maximum_reviews_per_student, participants, reviews_per_participant_map, random_participant_index)
     participants.each do |participant|
       if reviews_per_participant_map[participant.id] == maximum_reviews_per_student

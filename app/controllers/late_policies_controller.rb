@@ -52,10 +52,10 @@ class LatePoliciesController < ApplicationController
   # Create method can create a new late policy.
   # There are few check points before creating a late policy which are written in the if/else statements.
   def create
-    #First this function validates the input then save if the input is valid.
+    # First this function validates the input then save if the input is valid.
     valid_penalty, error_message = validate_input
     if error_message
-        flash[:error] = error_message
+      flash[:error] = error_message
     end
 
     # If penalty  is valid then tries to update and save.
@@ -81,8 +81,8 @@ class LatePoliciesController < ApplicationController
   def update
     penalty_policy = LatePolicy.find(params[:id])
 
-    #First this function validates the input then save if the input is valid.
-    valid_penalty, error_message = validate_input(is_update=true)
+    # First this function validates the input then save if the input is valid.
+    _valid_penalty, error_message = validate_input(true)
     if error_message
       flash[:error] = error_message
       redirect_to action: 'edit', id: params[:id]
@@ -131,8 +131,8 @@ class LatePoliciesController < ApplicationController
     @penalty_policy ||= @late_policy || LatePolicy.find(params[:id]) if params[:id]
   end
 
-  #This function checks if the policy name already exists or not and returns boolean value for penalty and the error message.
-  def duplicate_name_check(is_update=false)
+  # This function checks if the policy name already exists or not and returns boolean value for penalty and the error message.
+  def duplicate_name_check(is_update = false)
     should_check = true
     prefix = is_update ? "Cannot edit the policy. " : ""
     valid_penalty, error_message = true, nil
@@ -153,7 +153,8 @@ class LatePoliciesController < ApplicationController
     return valid_penalty, error_message
   end
 
-  def validate_input(is_update=false)
+  # This function validates the input.
+  def validate_input(is_update = false)
     # Validates input for create and update forms
     max_penalty = params[:late_policy][:max_penalty].to_i
     penalty_per_unit = params[:late_policy][:penalty_per_unit].to_i
@@ -162,13 +163,13 @@ class LatePoliciesController < ApplicationController
     valid_penalty, error_message = duplicate_name_check(is_update)
     prefix = is_update ? "Cannot edit the policy. " : ""
 
-    #This check validates the maximum penalty.
+    # This check validates the maximum penalty.
     if max_penalty < penalty_per_unit
       error_message = prefix + 'The maximum penalty cannot be less than penalty per unit.'
       valid_penalty = false
     end
 
-    #This check validates the penalty per unit for a late policy.
+    # This check validates the penalty per unit for a late policy.
     if penalty_per_unit < 0
       error_message = 'Penalty per unit cannot be negative.'
       valid_penalty = false
@@ -182,5 +183,4 @@ class LatePoliciesController < ApplicationController
 
     return valid_penalty, error_message
   end
-
 end

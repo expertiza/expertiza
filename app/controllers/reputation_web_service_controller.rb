@@ -288,8 +288,8 @@ class ReputationWebServiceController < ApplicationController
     flash[:additional_info] = 'add quiz scores'
     assignment_id_list_quiz = get_assignment_id_list(params[:assignment_id].to_i, params[:another_assignment_id].to_i)
     quiz_str =  generate_json_for_quiz_scores(assignment_id_list_quiz).to_json
-    quiz_str[0] = '' #remove first {
-    quiz_str.prepend('"quiz_scores":{') #add quiz_scores tag 
+    quiz_str[0] = '' # remove first {
+    quiz_str.prepend('"quiz_scores":{') # add quiz_scores tag
     quiz_str += ','
     quiz_str = quiz_str.gsub('"N/A"', '20.0') # replace N/A values with 20
     body.prepend(quiz_str)

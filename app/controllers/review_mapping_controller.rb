@@ -1,6 +1,5 @@
 class ReviewMappingController < ApplicationController
   include AuthorizationHelper
-
   autocomplete :user, :name
   # use_google_charts
   require 'gchart'
@@ -95,7 +94,7 @@ class ReviewMappingController < ApplicationController
     if TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
       flash[:error] = 'You cannot assign this student to review his/her own artifact.'
     else
-        msg = add_reviewer_to_another_team(assignment, user_id, topic_id)
+      msg = add_reviewer_to_another_team(assignment, user_id, topic_id)
     end
     redirect_to action: 'list_mappings', id: assignment.id, msg: msg
   end
@@ -132,7 +131,6 @@ class ReviewMappingController < ApplicationController
       @num_reviews_in_progress < Assignment.max_outstanding_reviews
     end
   end
-
 
   # assign the reviewer to review the assignment_team's submission. Only used in the assignments that do not have any topic
   # Parameter assignment_team is the candidate assignment team, it cannot be a team w/o submission, or have reviewed by reviewer, or reviewer's own team.
@@ -307,7 +305,7 @@ class ReviewMappingController < ApplicationController
 
   # This method is used to delete all the meta reviewers.
   # The method also keeps a track of the number of unsuccessful deletes.
-  # If the number of unsiccessfu deletes is greater than 0, the method shows an alert
+  # If the number of unsuccessful deletes is greater than 0, the method shows an alert
   # asking the user if they want to delete the existing meta reviewers.
   def delete_all_metareviewers
     mapping = ResponseMap.find(params[:id])
@@ -420,9 +418,9 @@ class ReviewMappingController < ApplicationController
   end
 
   # This method ensures that the instructor does not assign too many reviews to a student.
-  # It throws an error when the number of reviews that are to be done by the 
-  # student are greater than the total number of teams. 
-  # Otherwise, it calls the mapping stategy method. 
+  # It throws an error when the number of reviews that are to be done by the
+  # student are greater than the total number of teams.
+  # Otherwise, it calls the mapping strategy method.
   def mapping_strategy_without_artifacts(number_of_reviews_per_student, number_of_reviews_per_submission,
                                          teams, assignment_id, participants)
     # check for exit paths first
@@ -442,10 +440,10 @@ class ReviewMappingController < ApplicationController
     end
   end
 
-  # This method performs mappping strategy on both calibrated artifacts 
-  # and uncalibrated artifacts. To achieve this, the method first identifies 
-  # the teams with calibrated artifacts and then identifies 
-  # the teams without calibrated artifacts using the above. 
+  # This method performs mapping strategy on both calibrated artifacts
+  # and uncalibrated artifacts. To achieve this, the method first identifies
+  # the teams with calibrated artifacts and then identifies
+  # the teams without calibrated artifacts using the above.
   def mapping_strategy_on_artifacts(assignment_id, teams, participants,
                                     number_of_calibrated_artifacts, number_of_uncalibrated_artifacts)
     teams_with_calibrated_artifacts = []
@@ -454,7 +452,7 @@ class ReviewMappingController < ApplicationController
     end
     teams_with_uncalibrated_artifacts = teams - teams_with_calibrated_artifacts
     # REVIEW: mapping strategy
-    automatic_review_mapping_strategy(assignment_id, participants, teams_with_calibrated_artifacts.shuffle!,  number_of_calibrated_artifacts, 0)
+    automatic_review_mapping_strategy(assignment_id, participants, teams_with_calibrated_artifacts.shuffle!, number_of_calibrated_artifacts, 0)
     # REVIEW: mapping strategy
     # since after first mapping, participants (delete_at) will be nil
     participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.select(&:can_review).shuffle!
@@ -462,9 +460,9 @@ class ReviewMappingController < ApplicationController
   end
 
   # This method is used to perform automatic review mapping.
-  # If it's an individual assignment, the method simply creates a team. 
-  # Depending on the number of calibrated artifacts and the number of 
-  # uncalibrated artifacts, mapping strategy is performed. 
+  # If it's an individual assignment, the method simply creates a team.
+  # Depending on the number of calibrated artifacts and the number of
+  # uncalibrated artifacts, mapping strategy is performed.
   def automatic_review_mapping
     assignment_id = params[:id].to_i
     participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.select(&:can_review).shuffle!
@@ -472,7 +470,7 @@ class ReviewMappingController < ApplicationController
     maximum_team_size = Integer(params[:maximum_team_size]) # Assignment.find(assignment_id).maximum_team_size
     # Create teams if its an individual assignment.
     if teams.empty? and maximum_team_size == 1
-      create_team(participants,assignment_id, teams)
+      create_team(participants, assignment_id, teams)
     end
     number_of_reviews_per_student = params[:number_of_reviews_per_student].to_i
     number_of_reviews_per_submission = params[:number_of_reviews_per_submission].to_i
@@ -488,8 +486,8 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment_id
   end
 
-  # This method is used to perform peer review strategy and assign 
-  # reviewera for a team. 
+  # This method is used to perform peer review strategy and assign
+  # reviewers for a team.
   def automatic_review_mapping_strategy(assignment_id,
                                         participants, teams, number_of_reviews_per_student = 0,
                                         number_of_reviews_per_submission = 0)
@@ -588,8 +586,7 @@ class ReviewMappingController < ApplicationController
 
   # This method is used to checks if reviews are needed.
   def check_reviews_eligibility(assignment_id, review_strategy)
-    if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0).where("created_at > :time",
-      time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
+    if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0).where("created_at > :time",time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
     end
   end
 
@@ -598,12 +595,11 @@ class ReviewMappingController < ApplicationController
     return ReviewResponseMap.where(reviewed_object_id: assignment_id).last.created_at
   end
 
-
   # This method is used to generate teams_hash. It first generates an unsorted teams_hash
   # and returns a sorted hash of the same.
   def generate_teams_hash(assignment_id)
     unsorted_teams_hash = {}
-    ReviewResponseMap.where(reviewed_object_id: assignment_id,calibrate_to: 0).each do |response_map|
+    ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0).each do |response_map|
       if unsorted_teams_hash.key? response_map.reviewee_id
         unsorted_teams_hash[response_map.reviewee_id] += 1
       else
@@ -625,7 +621,7 @@ class ReviewMappingController < ApplicationController
                                 reviewed_object_id: assignment_id).first_or_create
 
         teams_hash[team_id] += 1
-        teams_hash = teams_hash.sort_by {|_, v| v }.to_h
+        teams_hash = teams_hash.sort_by { |_, v| v }.to_h
         break
       end
     end
@@ -741,12 +737,12 @@ class ReviewMappingController < ApplicationController
     # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
     is_selected_participant_a_reviewer_of_their_own_work = (participants_with_min_assigned_reviews.size == 1 and TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
     random_participant_index = if is_participants_with_min_assigned_reviews_blank or is_selected_participant_a_reviewer_of_their_own_work
-      # use original method to get random number
-      rand(0..num_participants - 1)
-    else
-      # random_participant_index should be the position of this participant in original array
-      participants_with_min_assigned_reviews[rand(0..participants_with_min_assigned_reviews.size - 1)]
-    end
+                                 # use original method to get random number
+                                 rand(0..num_participants - 1)
+                               else
+                                 # random_participant_index should be the position of this participant in original array
+                                 participants_with_min_assigned_reviews[rand(0..participants_with_min_assigned_reviews.size - 1)]
+                               end
     return random_participant_index
   end
 

@@ -158,7 +158,7 @@ module ReviewMappingHelper
   end
 
   # sorts the reviewers by the average volume of reviews in each round, in descending order
-  def sort_reviewer_by_review_volume_desc
+  def sort_reviewer_by_review_volume
     @reviewers.each do |r|
       # get the volume of review comments
       review_volumes = Response.volume_of_review_comments(@assignment.id, r.id)

@@ -147,6 +147,7 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
+
   describe 'response_for_each_round?' do
     before(:each) do
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
@@ -456,7 +457,7 @@ describe ReviewMappingHelper, type: :helper do
   end
 
   # the function will sort reviewer based on the comment length
-  describe 'sort_reviewer_by_review_volume_desc' do
+  describe 'sort_reviewer_by_review_volume' do
     before(:each) do
       @assignment = create(:assignment, name: 'assignment', created_at: DateTime.now.in_time_zone - 13.day)
       @reviewee = create(:assignment_team, assignment: @assignment)
@@ -478,7 +479,7 @@ describe ReviewMappingHelper, type: :helper do
       @reviewers = Array[@reviewer_1, @reviewer_2, @reviewer_3]
       @reviewers_for_test = Array[@reviewer_2, @reviewer_3, @reviewer_1]
 
-      sort_reviewer_by_review_volume_desc
+      sort_reviewer_by_review_volume
       expect(@reviewers).to eq(@reviewers_for_test)
     end
 
@@ -490,7 +491,7 @@ describe ReviewMappingHelper, type: :helper do
       @reviewers = Array[@reviewer_1, @reviewer_2, @reviewer_3]
       @reviewers_for_test = Array[@reviewer_2, @reviewer_1, @reviewer_3]
 
-      sort_reviewer_by_review_volume_desc
+      sort_reviewer_by_review_volume
       expect(@reviewers).to eq(@reviewers_for_test)
     end
 
@@ -502,7 +503,7 @@ describe ReviewMappingHelper, type: :helper do
       @reviewers = Array[@reviewer_1, @reviewer_2, @reviewer_3]
       @reviewers_for_test = Array[@reviewer_1, @reviewer_2, @reviewer_3]
 
-      sort_reviewer_by_review_volume_desc
+      sort_reviewer_by_review_volume
       expect(@reviewers).to eq(@reviewers_for_test)
     end
   end

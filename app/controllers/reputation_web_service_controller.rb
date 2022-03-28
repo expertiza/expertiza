@@ -52,10 +52,10 @@ class ReputationWebServiceController < ApplicationController
   # Params
   #   response
   # Returns
-  #   set of valid answers
+  #   set of valid answers (returns nil if empty)
   def get_valid_answers_for_response(response)
     answers = Answer.where(response_id: response.id)
-    valid_answer = answers.select { |a| (a.question.type == 'Criterion') && !a.answer.nil? }
+    valid_answer = answers.select { |answer| (answer.question.type == 'Criterion') && !answer.answer.nil? }
     valid_answer.empty? ? nil : valid_answer
   end
 
@@ -67,9 +67,9 @@ class ReputationWebServiceController < ApplicationController
   # Returns
   #   peer_review_grade
   def calculate_peer_review_grade(valid_answer, max_question_score)
-    temp_sum = valid_answer.map { |answer| answer.answer * answer.question.weight }.inject(:+)
-    weight_sum = valid_answer.sum { |answer| answer.question.weight }
-    peer_review_grade = 100.0 * temp_sum / (weight_sum * max_question_score)
+    weighted_score_sum = valid_answer.map { |answer| answer.answer * answer.question.weight }.inject(:+)
+    question_weight_sum = valid_answer.sum { |answer| answer.question.weight }
+    peer_review_grade = 100.0 * weighted_score_sum / (question_weight_sum * max_question_score)
     peer_review_grade.round(4)
   end
 
@@ -237,7 +237,7 @@ class ReputationWebServiceController < ApplicationController
     JSON.parse(reputation_response.body.to_s).each do |reputation_algorithm, user_resputation_list|
       next unless %w[Hamer Lauw].include?(reputation_algorithm)
 
-      user_resputation_list.each do |user_id, reputation_algorithm|
+      user_resputation_list.each do |user_id, reputation|
         Participant.find_by(user_id: user_id).update(reputation_algorithm.to_sym => reputation) unless /leniency/ =~ id.to_s
       end
     end
@@ -288,10 +288,10 @@ class ReputationWebServiceController < ApplicationController
     flash[:additional_info] = 'add quiz scores'
     assignment_id_list_quiz = get_assignment_id_list(params[:assignment_id].to_i, params[:another_assignment_id].to_i)
     quiz_str =  generate_json_for_quiz_scores(assignment_id_list_quiz).to_json
-    quiz_str[0] = ''
-    quiz_str.prepend('"quiz_scores":{')
+    quiz_str[0] = '' #remove first {
+    quiz_str.prepend('"quiz_scores":{') #add quiz_scores tag 
     quiz_str += ','
-    quiz_str = quiz_str.gsub('"N/A"', '20.0')
+    quiz_str = quiz_str.gsub('"N/A"', '20.0') # replace N/A values with 20
     body.prepend(quiz_str)
   end
 

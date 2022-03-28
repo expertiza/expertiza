@@ -1,3 +1,12 @@
+# This class is used to assign reviewers to projects. 
+# It has several methods that are used to assign 
+# reviewers to a team under different conditions. 
+# This class implements the functionality for assigning 
+# reviewers and performing reviews. Few of the major functionalities  
+# of the class being automatic review mapping, peer review, 
+# assigning reviewer dynamically and self review. 
+
+
 class ReviewMappingController < ApplicationController
   include AuthorizationHelper
   autocomplete :user, :name
@@ -579,7 +588,7 @@ class ReviewMappingController < ApplicationController
         participants_with_insufficient_review_num << participant_id if review_num < review_strategy.reviews_per_student
       end
       teams_hash = generate_teams_hash(assignment_id)
-      teams_hash = teams_hash_modified(participants_with_insufficient_review_num, teams_hash, assignment_id)
+      teams_hash_modified(participants_with_insufficient_review_num, teams_hash, assignment_id)
     end
     @@time_create_last_review_mapping_record = last_created_time_review_mapping_record(assignment_id)
   end
@@ -625,7 +634,6 @@ class ReviewMappingController < ApplicationController
         break
       end
     end
-    return teams_hash
   end
 
   # This method is used to remove students who have already been assigned enough number of reviews out of participants array.

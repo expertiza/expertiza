@@ -250,11 +250,11 @@ class ReputationWebServiceController < ApplicationController
   # participants in the list.
   # If the alg variable is not  Hamer/ Lauv, the updation step is skipped.
   # Params
-  #   response: The response from the reputation web service
+  #   reputation_response: The response from the reputation web service
   # Returns
   #   nil
-  def update_participants_reputation(response)
-    JSON.parse(response.body.to_s).each do |alg, list|
+  def update_participants_reputation(reputation_response)
+    JSON.parse(reputation_response.body.to_s).each do |alg, list|
       next unless %w[Hamer Lauw].include?(alg)
 
       list.each do |id, rep|
@@ -270,13 +270,13 @@ class ReputationWebServiceController < ApplicationController
   # It then calls the update_participants_reputation to update the reputation
   # scores received in the response body.
   # Params
-  #   response: The response from the reputation web service
+  #   reputation_response: The response from the reputation web service
   # Returns
   #   nil
-  def process_response_body(response)
-    flash[:response] = response
-    flash[:response_body] = response.body
-    update_participants_reputation(response)
+  def process_response_body(reputation_response)
+    flash[:response] = reputation_response
+    flash[:response_body] = reputation_response.body
+    update_participants_reputation(reputation_response)
   end
 
   # Method: add_expert_grades
@@ -436,11 +436,11 @@ class ReputationWebServiceController < ApplicationController
   def send_post_request
     post_req = prepare_request_body
     reputation_web_service_hostname = URI.parse(WEBSERVICE_CONFIG['reputation_web_service_url']).host
-    response = Net::HTTP.new(reputation_web_service_hostname).start { |http| http.request(post_req) }
-    if %w[400 500].include?(response.code)
+    reputation_response = Net::HTTP.new(reputation_web_service_hostname).start { |http| http.request(post_req) }
+    if %w[400 500].include?(reputation_response.code)
       flash[:error] = 'Post Request Failed'
     else
-      process_response_body(response)
+      process_response_body(reputation_response)
     end
     redirect_to action: 'client'
   end

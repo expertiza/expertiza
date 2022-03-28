@@ -341,7 +341,7 @@ class ReputationWebServiceController < ApplicationController
 
   # Method: add_flash_messages
   # This method sets the flash messages to pass on to the next request i.e
-  # the reqest redirected to the client
+  # the request redirected to the client
   # Params
   #   post_req: This contains the entire post_req that needs to be sent to the reputation
   #     webservice

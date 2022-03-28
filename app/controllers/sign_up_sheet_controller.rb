@@ -420,8 +420,19 @@ class SignUpSheetController < ApplicationController
   def switch_original_topic_to_approved_suggested_topic
     assignment = AssignmentParticipant.find(params[:id]).assignment
     team_id = TeamsUser.team_id(assignment.id, session[:user].id)
+
+    # Tmp variable to store topic id before change
     original_topic_id = SignedUpTeam.topic_id(assignment.id.to_i, session[:user].id)
-    SignUpTopic.find_by(id: params[:topic_id]).update_attribute(:private_to, nil) if SignUpTopic.exists?(id: params[:topic_id]) else flash[:error] = 'Signup topic does not exist.'
+
+    # Check if this sign up topic exists
+    if SignUpTopic.exists?(id: params[:topic_id])
+      SignUpTopic.find_by(id: params[:topic_id]).update_attribute(:private_to, nil)
+    else 
+      # Else flash an error
+      flash[:error] = 'Signup topic does not exist.'
+    end
+
+    # Change to dynamic finder method to prevent sql injection
     if SignedUpTeam.exists?(team_id: team_id, is_waitlisted: 0)
       SignedUpTeam.where(team_id: team_id, is_waitlisted: 0).first.update_attribute('topic_id', params[:topic_id].to_i)
     end

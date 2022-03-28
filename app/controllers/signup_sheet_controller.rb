@@ -250,15 +250,14 @@ class SignupSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
   end
 
-  #this function was added to implement DRY code as the same task were performed in both delete_signup function as well as delete_signup_instructor
+  # This function was added to implement DRY code as the same task were performed in both delete_signup function as well as delete_signup_instructor
   def flash_delete_signup_message(isInstructor, participant, assignment, drop_topic_deadline)
     messages = ["You have already submitted your work, so you are not allowed to drop your topic.",
                 "You cannot drop your topic after the drop topic deadline!",
                 "You have successfully dropped your topic!",
                 "The student has already submitted their work, so you are not allowed to remove them.",
                 "You cannot drop a student after the drop topic deadline!",
-                "You have successfully dropped the student from the topic!"
-    ]
+                "You have successfully dropped the student from the topic!"]
     if isInstructor == false
       work_submitted_message = messages[0]
       deadline_passed_message = messages[1]
@@ -483,7 +482,7 @@ class SignupSheetController < ApplicationController
     signed_up_topics &= @signup_topics
 
     # @signup_topics will have all the topics of current assignment which are not bid by current team.
-    @signup_topics -= signed_up_topics 
+    @signup_topics -= signed_up_topics
     
     # @bids has all the topics from current @assignment.id and also bid by current team.
     @bids = signed_up_topics

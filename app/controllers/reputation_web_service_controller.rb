@@ -234,11 +234,11 @@ class ReputationWebServiceController < ApplicationController
   # Returns
   #   nil
   def update_participants_reputation(reputation_response)
-    JSON.parse(reputation_response.body.to_s).each do |alg, list|
-      next unless %w[Hamer Lauw].include?(alg)
+    JSON.parse(reputation_response.body.to_s).each do |reputation_algorithm, user_resputation_list|
+      next unless %w[Hamer Lauw].include?(reputation_algorithm)
 
-      list.each do |id, rep|
-        Participant.find_by(user_id: id).update(alg.to_sym => rep) unless /leniency/ =~ id.to_s
+      user_resputation_list.each do |user_id, reputation_algorithm|
+        Participant.find_by(user_id: user_id).update(reputation_algorithm.to_sym => reputation) unless /leniency/ =~ id.to_s
       end
     end
   end

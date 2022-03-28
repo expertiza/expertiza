@@ -590,7 +590,7 @@ class ReviewMappingController < ApplicationController
         participants_with_insufficient_review_num << participant_id if review_num < review_strategy.reviews_per_student
       end
       teams_hash = generate_teams_hash(assignment_id)
-      teams_hash = teams_hash_modified(participants_with_insufficient_review_num, teams_hash, assignment_id)
+      teams_hash_modified(participants_with_insufficient_review_num, teams_hash, assignment_id)
     end
     @@time_create_last_review_mapping_record = last_created_time_review_mapping_record(assignment_id)
   end
@@ -638,7 +638,6 @@ class ReviewMappingController < ApplicationController
         break
       end
     end
-    return teams_hash
   end
 
   # This method is used to remove students who have already been assigned enough number of reviews out of participants array.

@@ -85,6 +85,7 @@ class ImpersonateController < ApplicationController
       user = get_real_user(params[:user][:name])
       unless @original_user.can_impersonate? user
         @message = "You cannot impersonate '#{params[:user][:name]}'."
+        temp
         AuthController.clear_user_info(session, nil)
       else
         overwrite_session
@@ -145,6 +146,7 @@ class ImpersonateController < ApplicationController
         # Impersonate a new account
         # if !params[:impersonate][:name].empty?
         #check_if_special_char
+        @message = "You cannot impersonate '#{params[:impersonate][:name]}'."
         user = get_real_user(params[:impersonate][:name])
         do_impersonate_operation(user)
           # Revert to original account when currently in the impersonated session

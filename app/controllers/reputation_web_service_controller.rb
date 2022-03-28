@@ -366,16 +366,16 @@ class ReputationWebServiceController < ApplicationController
   # This method sets the flash messages to pass on to the next request i.e
   # the reqest redirected to the client
   # Params
-  #   req: This contains the entire req that needs to be sent to the reputation
+  #   post_req: This contains the entire post_req that needs to be sent to the reputation
   #     webservice
   # Returns
   #   nil
-  def add_flash_messages(req)
+  def add_flash_messages(post_req)
     flash[:assignment_id] = params[:assignment_id]
     flash[:round_num] = params[:round_num]
     flash[:algorithm] = params[:algorithm]
     flash[:another_assignment_id] = params[:another_assignment_id]
-    flash[:request_body] = req.body
+    flash[:request_body] = post_req.body
   end
 
   # Method: add_additional_info_details
@@ -383,19 +383,19 @@ class ReputationWebServiceController < ApplicationController
   # selected in the additional information section. We populate the request
   # based on the selections
   # Params
-  #   req: This contains the entire req that needs to be sent to the reputation
+  #   post_req: This contains the entire post_req that needs to be sent to the reputation
   #     webservice
   # Returns
   #   nil
-  def add_additional_info_details(req)
+  def add_additional_info_details(post_req)
     if params[:checkbox][:expert_grade] == 'Add expert grades'
-      add_expert_grades(req.body)
+      add_expert_grades(post_req.body)
     elsif params[:checkbox][:hamer] == 'Add initial Hamer reputation values'
       add_hamer_reputation_values
     elsif params[:checkbox][:lauw] == 'Add initial Lauw reputation values'
       add_lauw_reputation_values
     elsif params[:checkbox][:quiz] == 'Add quiz scores'
-      add_quiz_scores(req.body)
+      add_quiz_scores(post_req.body)
     else
       flash[:additional_info] = ''
     end
@@ -413,23 +413,23 @@ class ReputationWebServiceController < ApplicationController
   #   nil
   def prepare_request_body
     reputation_web_service_path = URI.parse(WEBSERVICE_CONFIG['reputation_web_service_url']).path
-    req = Net::HTTP::Post.new(reputation_web_service_path, { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
+    post_req = Net::HTTP::Post.new(reputation_web_service_path, { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
     curr_assignment_id = (params[:assignment_id].empty? ? '754' : params[:assignment_id])
     assignment_id_list_peers = get_assignment_id_list(curr_assignment_id, params[:another_assignment_id].to_i)
 
-    req.body = generate_json_for_peer_reviews(assignment_id_list_peers, params[:round_num].to_i).to_json
+    post_req.body = generate_json_for_peer_reviews(assignment_id_list_peers, params[:round_num].to_i).to_json
 
-    req.body[0] = '' # remove the first '{'
-    add_additional_info_details req
-    req.body.prepend('{')
-    add_flash_messages req
+    post_req.body[0] = '' # remove the first '{'
+    add_additional_info_details post_req
+    post_req.body.prepend('{')
+    add_flash_messages post_req
 
     # Encrypting the request body data
-    # req.body = encrypt_request_body(req.body)
+    # post_req.body = encrypt_request_body(post_req.body)
 
     # request body should be in JSON format.
-    # req.body = format_into_json(req.body)
-    req
+    # post_req.body = format_into_json(post_req.body)
+    post_req
   end
 
   # Method: send_post_request
@@ -443,9 +443,9 @@ class ReputationWebServiceController < ApplicationController
   # Returns
   #   nil
   def send_post_request
-    req = prepare_request_body
+    post_req = prepare_request_body
     reputation_web_service_hostname = URI.parse(WEBSERVICE_CONFIG['reputation_web_service_url']).host
-    response = Net::HTTP.new(reputation_web_service_hostname).start { |http| http.request(req) }
+    response = Net::HTTP.new(reputation_web_service_hostname).start { |http| http.request(post_req) }
     if %w[400 500].include?(response.code)
       flash[:error] = 'Post Request Failed'
     else

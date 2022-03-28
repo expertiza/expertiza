@@ -241,13 +241,5 @@ describe LatePoliciesController do
         expect(flash[:error]).to eq('The following error occurred while updating the late policy: ')
       end
     end
-
-    context 'validate_input testing'
-    before(:each) do
-      allow(LatePolicy).to receive(:duplicate_name_check).with(any_args).and_return(false)
-    end
-    it 'validate_input should return false when it recieves an invalid penalty' do
-      expect(validate_input).to eq(false)
-    end
   end
 end

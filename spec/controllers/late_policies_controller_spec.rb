@@ -242,10 +242,11 @@ describe LatePoliciesController do
       end
     end
 
+    context 'validate_input testing'
+    before(:each) do
+      allow(LatePolicy).to receive(:duplicate_name_check).with(any_args).and_return(false)
+    end
     it 'validate_input should return false when it recieves an invalid penalty' do
-      before(:each) do
-        allow(LatePolicy).to receive(:duplicate_name_check).with(any_args).and_return(false)
-      end
       expect(validate_input).to eq(false)
     end
   end

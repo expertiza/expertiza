@@ -224,26 +224,6 @@ class ReputationWebServiceController < ApplicationController
     @another_assignment = Assignment.find(flash[:another_assignment_id]) rescue nil
   end
 
-  # Method: decrypt_response
-  # This method decrypts the encrypted response body.
-  # It accepts the encrypted body in JSON format.
-  # RSA decryption is first done on the keys.
-  # Decrypted keys are then used to perform AES decryption on the data.
-  # Decrypted data is sent back to the process_response_body method.
-  # Params
-  #   encrypted_data: The encrypted response from the reputation web service
-  # Returns
-  #   decrypted_data: The decrypted response from the reputation web service
-  def decrypt_response(encrypted_data)
-    encrypted_data = JSON.parse(encrypted_data)
-    key = rsa_private_key2(encrypted_data['keys'][0, 350])
-    vi = rsa_private_key2(encrypted_data['keys'][350, 350])
-    # AES symmetric algorithm decrypts data
-    aes_encrypted_response_data = encrypted_data['data']
-    decrypted_data = aes_decrypt(aes_encrypted_response_data, key, vi)
-    decrypted_data
-  end
-
   # Method: update_participants_reputation
   # This method accepts the response body in the JSON format.
   # It then parses the JSON and updates the reputation scores of the

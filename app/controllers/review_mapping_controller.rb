@@ -1,11 +1,10 @@
-# This class is used to assign reviewers to projects. 
-# It has several methods that are used to assign 
-# reviewers to a team under different conditions. 
-# This class implements the functionality for assigning 
-# reviewers and performing reviews. Few of the major functionalities  
-# of the class being automatic review mapping, peer review, 
-# assigning reviewer dynamically and self review. 
-
+# This class is used to assign reviewers to projects.
+# It has several methods that are used to assign
+# reviewers to a team under different conditions.
+# This class implements the functionality for assigning
+# reviewers and performing reviews. Few of the major functionalities
+# of the class being automatic review mapping, peer review,
+# assigning reviewer dynamically and self review.
 
 class ReviewMappingController < ApplicationController
   include AuthorizationHelper
@@ -107,7 +106,6 @@ class ReviewMappingController < ApplicationController
     end
     redirect_to action: 'list_mappings', id: assignment.id, msg: msg
   end
-
 
   # This method checks if the user is allowed to do any more reviews than the user already has
   # First we find the number of reviews done by that reviewer for that assignment and we compare it with assignment policy

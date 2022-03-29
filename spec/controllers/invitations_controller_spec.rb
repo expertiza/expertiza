@@ -56,7 +56,7 @@ describe InvitationsController do
     end
 
     it 'invitation added for new user who does not have an expertiza account yet and sends an invitation' do
-      allow(User).to receive(:email_welcome).and_return(true)
+      allow(User).to receive(:skip_callback).with(:create, :after, :email_welcome).and_return(true)
       request_params = {
         user: { name: 'testuser@gmail.com',
                 fullname: 'John Bumgardner',
@@ -74,7 +74,7 @@ describe InvitationsController do
     end
 
     it 'invitation not added for new user if entered email has incorrect format' do
-      allow(User).to receive(:email_welcome).and_return(true)
+      allow(User).to receive(:skip_callback).with(:create, :after, :email_welcome).and_return(true)
       request_params = {
         user: { name: 'testuser',
                 parent_id: 1,

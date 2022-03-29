@@ -39,6 +39,7 @@ describe AccountRequestController do
     end
 
     it 'the input status is Approved' do
+      allow(controller).to receive(:requested_user_params).and_return({ 'id' => '1' })
       user_session = { user: admin }
       request_params = {
         selection: { '4' => true },
@@ -51,6 +52,8 @@ describe AccountRequestController do
     end
 
     it 'the input status is Approved but save fails' do
+      allow(controller).to receive(:requested_user_params).and_return({ 'id' => '1' })
+
       expect_any_instance_of(User).to receive(:save).and_return(false)
       user_session = { user: admin }
       request_params = {
@@ -63,6 +66,7 @@ describe AccountRequestController do
     end
 
     it 'the input status is Rejected' do
+      allow(controller).to receive(:requested_user_params).and_return({ 'id' => '1' })
       request_params = {
         selection: { '4' => true },
         commit: 'Reject'
@@ -73,6 +77,7 @@ describe AccountRequestController do
     end
 
     it 'the input status is Rejected but update_colums fails' do
+      allow(controller).to receive(:requested_user_params).and_return({ 'id' => '1' })
       expect_any_instance_of(AccountRequest).to receive(:update_columns).and_return(false)
       request_params = {
         selection: { '4' => true },

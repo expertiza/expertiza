@@ -606,7 +606,8 @@ describe SignUpSheetController do
     context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is not nil and its due date has already passed' do
       it 'shows a flash error message and redirects to sign_up_sheet#list page' do
         due_date.due_at = DateTime.now.in_time_zone - 1.day
-        allow(assignment.due_dates).to receive(:find_by).with(deadline_type_id: 6).and_return(due_date)
+        allow(assignment).to receive(:due_dates).and_return(due_date)
+        allow(due_date).to receive(:find_by).with(deadline_type_id: 6).and_return(due_date)
         allow(team).to receive(:submitted_files).and_return([])
         allow(team).to receive(:hyperlinks).and_return([])
         request_params = { id: 1 }
@@ -654,10 +655,17 @@ describe SignUpSheetController do
     context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is not nil and its due date has already passed' do
       it 'shows a flash error message and redirects to assignment#edit page' do
         due_date.due_at = DateTime.now.in_time_zone - 1.day
-        allow(assignment.due_dates).to receive(:find_by).with(deadline_type_id: 6).and_return(due_date)
+        allow(assignment).to receive(:due_dates).and_return(due_date)
+        allow(due_date).to receive(:find_by).with(deadline_type_id: 6).and_return(due_date)
         allow(team).to receive(:submitted_files).and_return([])
         allow(team).to receive(:hyperlinks).and_return([])
-        request_params = { id: 1 }
+        request_params = { 
+          id: 1,
+          due_date: {
+            '1_submission_1_due_date' => nil,
+            '1_review_1_due_date' => nil
+          }
+        }
         user_session = { user: instructor }
         get :delete_signup_as_instructor, params: request_params, session: user_session
         expect(flash[:error]).to eq('You cannot drop a student after the drop topic deadline!')
@@ -690,7 +698,11 @@ describe SignUpSheetController do
       request_params = {
         participant_id: 1,
         assignment_id: 1,
-        topic: ['1']
+        topic: ['1'],
+        due_date: {
+            '1_submission_1_due_date' => nil,
+            '1_review_1_due_date' => nil
+          }
       }
       post :set_priority, params: request_params
       expect(response).to redirect_to('/sign_up_sheet/list?assignment_id=1')
@@ -707,8 +719,12 @@ describe SignUpSheetController do
         allow(TopicDueDate).to receive(:create).with(any_args).and_return(double('TopicDueDate'))
         request_params = {
           assignment_id: 1,
-          due_date: {}
+          due_date: {
+            '1_submission_1_due_date' => nil,
+            '1_review_1_due_date' => nil
+          }
         }
+        
         post :save_topic_deadlines, params: request_params
         expect(response).to redirect_to('/assignments/1/edit')
       end
@@ -725,7 +741,10 @@ describe SignUpSheetController do
         allow(topic_due_date).to receive(:update_attributes).with(any_args).and_return(topic_due_date)
         request_params = {
           assignment_id: 1,
-          due_date: {}
+          due_date: {
+            '1_submission_1_due_date' => nil,
+            '1_review_1_due_date' => nil
+          }
         }
         post :save_topic_deadlines, params: request_params
         expect(response).to redirect_to('/assignments/1/edit')

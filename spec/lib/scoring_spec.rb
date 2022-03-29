@@ -309,8 +309,6 @@ describe Scoring do
     it 'returns -1 when answer is nil for scored question which makes sum of weights = 0' do
       allow(ScoreView).to receive(:questionnaire_data).and_return(double('scoreview', weighted_score: 20, sum_of_weights: 1, q1_max_question_score: 5))
       allow(Answer).to receive(:where).and_return([double('row1', question_id: 1, answer: nil)])
-      puts "check ques"
-      puts Question.find(question1.id).is_a?(ScoredQuestion)
       expect(assessment_score(response: [response], questions: [question1])).to eq -1.0
     end
 

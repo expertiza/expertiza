@@ -10,6 +10,6 @@ class AwardedBadge < ActiveRecord::Base
   # This method is called from response controller
   def award_badge(participant_id, badge_name)
     badge_id = Badge.get_id_from_name(badge_name: badge_name)
-    AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
+    AwardedBadge.where(participant_id: participant_id, badge_id: badge_id, approval_status: 0).first_or_create
   end
 end

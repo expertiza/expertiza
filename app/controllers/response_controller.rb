@@ -12,7 +12,7 @@ class ResponseController < ApplicationController
   def action_allowed?
     response = user_id = nil
     action = params[:action]
-    #Initialize response and user id if action is edit or delete or update or view.
+    # Initialize response and user id if action is edit or delete or update or view.
     if %w[edit delete update view].include?(action)
       response = Response.find(params[:id])
       user_id = response.map.reviewer.user_id if response.map.reviewer
@@ -21,6 +21,7 @@ class ResponseController < ApplicationController
     when 'edit'
       # If response has been submitted, no further editing allowed.
       return false if response.is_submitted
+
       # Else, return true if the user is a reviewer for that response.
       return current_user_is_reviewer?(response.map, user_id)
 
@@ -46,7 +47,6 @@ class ResponseController < ApplicationController
     end
   end
 
-
   # GET /response/json?response_id=xx
   def json
     response_id = params[:response_id] if params.key?(:response_id)
@@ -54,7 +54,7 @@ class ResponseController < ApplicationController
     render json: response
   end
 
-  #E2218: Method to delete a response.
+  # E2218: Method to delete a response.
   def delete
     # The locking was added for E1973, team-based reviewing. See lock.rb for details
     if @map.reviewer_is_team
@@ -128,10 +128,8 @@ class ResponseController < ApplicationController
       @questionnaire = questionnaire_from_response
       questions = sort_questions(@questionnaire.questions)
 
-
       # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       create_answers(params, questions) unless params[:responses].nil?
-
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
 
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
@@ -194,8 +192,8 @@ class ResponseController < ApplicationController
     # Hence we need to pick the latest response.
     @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first
     if @response.nil?
-      @response = Response.create( map_id: @map.id, additional_comment: params[:review][:comments],
-        round: @round.to_i, is_submitted: is_submitted)
+      @response = Response.create(map_id: @map.id, additional_comment: params[:review][:comments],
+                                  round: @round.to_i, is_submitted: is_submitted)
     end
     was_submitted = @response.is_submitted
 

@@ -107,8 +107,7 @@ class QuestionnairesController < ApplicationController
   def update
     # If 'Add' or 'Edit/View advice' is clicked, redirect appropriately
     if params[:add_new_questions]
-      params.permit!
-      redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
+      redirect_to action: 'add_new_questions', id: params[:id], question: params.permit(:new_question)[:new_question]
     elsif params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     else

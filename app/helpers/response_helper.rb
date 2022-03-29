@@ -17,7 +17,7 @@ module ResponseHelper
   def store_total_cake_score
     reviewee = ResponseMap.select(:reviewee_id, :type).where(id: @response.map_id.to_s).first
     @total_score = Cake.get_total_score_for_questions(reviewee.type,
-                                                      @questions,
+                                                      @review_questions,
                                                       @participant.id,
                                                       @assignment.id,
                                                       reviewee.reviewee_id)
@@ -39,7 +39,7 @@ module ResponseHelper
     @contributor = @map.contributor
     new_response ? questionnaire_from_response_map : questionnaire_from_response
     set_dropdown_or_scale
-    @questions = sort_questions(@questionnaire.questions)
+    @review_questions = sort_questions(@questionnaire.questions)
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
     # The new response is created here so that the controller has access to it in the new method

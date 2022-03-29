@@ -69,7 +69,7 @@ describe MarkupStylesController do
       end
     end
 
-    # Test case to test the #show function, which is called to show a particualr markup style
+    # Test case to test the #show function, which is called to show a particular markup style
     # expecting to render :show view properly 
     describe '#show' do
         context 'when try to show a markupstyle' do

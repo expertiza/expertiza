@@ -28,7 +28,7 @@ describe LockController do
     end
   end
   # This test case is to test the release_lock function. We call HTTP get with a test @params input 
-  # and expect the reponse to redirect to :back view once done
+  # and expect the response to redirect to :back view once done
   describe '#release_lock' do
     context 'when release lock ' do
       it 'renders the response correctly' do

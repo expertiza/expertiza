@@ -1,8 +1,10 @@
 class ImpersonateController < ApplicationController
   include SecurityHelper
 
-  # This function checks if the logged in user is a student or not. If it is a student, do not allow the impersonate mode.
-  # If the logged in user has the role or anything other than the student, we allow that user to use the impersonate mode.
+  # This function checks if the logged in user is a student or not.
+  # If it is a student, do not allow the impersonate mode.
+  # If the logged in user has the role or anything other than the student,
+  # we allow that user to use the impersonate mode.
   before_action :check_if_input_is_valid
 
   def action_allowed?
@@ -63,9 +65,9 @@ class ImpersonateController < ApplicationController
   # contains_special_chars method-converts it to regex and compares with the string
   # warn_for_special_chars takes the output from above method and flashes an error if there are any special characters(/\?<>|&$#) in the string
   def check_if_input_is_valid
-    # redirect_back if params[:user] && warn_for_special_chars(params[:user][:name], 'Username') 
+    # redirect_back if params[:user] && warn_for_special_chars(params[:user][:name], 'Username')
     # redirect_back if params[:impersonate] && warn_for_special_chars(params[:impersonate][:name], 'Username')
-    if params[:user] && warn_for_special_chars(params[:user][:name], 'Username') 
+    if params[:user] && warn_for_special_chars(params[:user][:name], 'Username')
       flash[:error] = "Please enter valid student name"
       redirect_back
     elsif params[:impersonate] && warn_for_special_chars(params[:impersonate][:name], 'Username')
@@ -149,7 +151,7 @@ class ImpersonateController < ApplicationController
         @message = "You cannot impersonate '#{params[:impersonate][:name]}'."
         user = get_real_user(params[:impersonate][:name])
         do_impersonate_operation(user)
-          # Revert to original account when currently in the impersonated session
+        # Revert to original account when currently in the impersonated session
       elsif !session[:super_user].nil?
         # if !session[:super_user].nil?
         AuthController.clear_user_info(session, nil)

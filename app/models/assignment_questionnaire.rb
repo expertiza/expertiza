@@ -20,6 +20,6 @@ class AssignmentQuestionnaire < ActiveRecord::Base
   def self.get_questions_by_assignment_id(assignment_id)
     AssignmentQuestionnaire.find_by(['assignment_id = ? and questionnaire_id IN (?)',
                                      Assignment.find(assignment_id).id, ReviewQuestionnaire.select('id')])
-                                       .questionnaire.questions.reject { |q| q.is_a?(QuestionnaireHeader) }
+                           .questionnaire.questions.reject { |q| q.is_a?(QuestionnaireHeader) }
   end
 end

@@ -238,7 +238,7 @@ class ReputationWebServiceController < ApplicationController
       next unless %w[Hamer Lauw].include?(reputation_algorithm)
 
       user_resputation_list.each do |user_id, reputation|
-        Participant.find_by(user_id: user_id).update(reputation_algorithm.to_sym => reputation) unless /leniency/ =~ id.to_s
+        Participant.find_by(user_id: user_id).update(reputation_algorithm.to_sym => reputation) unless /leniency/ =~ user_id.to_s
       end
     end
   end

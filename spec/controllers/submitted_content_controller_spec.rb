@@ -28,6 +28,9 @@ describe SubmittedContentController do
       end
     end
   end
+  describe '#remove_hyperlink' do
+    #placeholder
+  end
   describe '#submit_file' do
     context 'current user does not match up with the participant' do
       it 'renders edit template' do
@@ -78,5 +81,8 @@ describe SubmittedContentController do
       it 'copy action copies selected file'
       it 'create folder action creates new directory'
     end
+  end
+  describe '#download' do
+
   end
 end

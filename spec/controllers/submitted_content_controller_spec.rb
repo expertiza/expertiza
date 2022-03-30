@@ -83,6 +83,34 @@ describe SubmittedContentController do
     end
   end
   describe '#download' do
-
+    context 'user downloads file' do
+      it 'flashes error for nil folder name' do
+        params = {folder_name: nil}
+        response = get :download, params
+        expect(flash[:error]).to be_present # not checking message content since it uses exception message
+      end
+      it 'flashes error for nil file name' do
+        params = {name: nil}
+        response = get :download, params
+        expect(flash[:error]).to be_present # not checking message content since it uses exception message
+      end
+      it 'flashes error if attempt is to download entire folder' do
+        params = {folder_name: 'test_directory', name: nil}
+        response = get :download, params
+        expect(flash[:error]).to be_present # not checking message content since it uses exception message
+      end
+      it 'flashes error if file does not exist' do
+        params = {folder_name: 'unlikely_dir_name', name: 'nonexistantfile.no'}
+        response = get :download, params
+        expect(flash[:error]).to be_present #not checking message content since it uses exception message
+      end
+      it 'calls send for a valid file download' do
+        # still figuring this one out...
+        #params = {folder_name: 'test_dir', name: 'test.txt'}
+        #File.stub!(:exists?).and_return(true)
+        #expect(download).to receive(:send_file)
+        #response = get :download, params
+      end
+    end
   end
 end

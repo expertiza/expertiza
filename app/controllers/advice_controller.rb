@@ -13,7 +13,7 @@ class AdviceController < ApplicationController
     (sorted_advice[0].score != @questionnaire.max_question_score) ||
     (sorted_advice[sorted_advice.length - 1].score != @questionnaire.min_question_score))
   end
-  
+
   # Modify the advice associated with a questionnaire
   def edit_advice
     # Stores the questionnaire with given id in URL
@@ -49,14 +49,14 @@ class AdviceController < ApplicationController
       unless params[:advice].nil?
         params[:advice].each_key do |advice_key|
           # Updates the advice corresponding to the key
-          QuestionAdvice.update(advice_key,advice: params[:advice][advice_key.to_sym][:advice])
+          QuestionAdvice.update(advice_key, advice: params[:advice][advice_key.to_sym][:advice])
         end
         flash[:notice] = 'The advice was successfully saved!'
       end
     rescue ActiveRecord::RecordNotFound
       # If record not found, redirects to edit_advice
-      render action: 'edit_advice',id: params[:id]
+      render action: 'edit_advice', id: params[:id]
     end
-    redirect_to action: 'edit_advice',id: params[:id]
+    redirect_to action: 'edit_advice', id: params[:id]
   end
 end

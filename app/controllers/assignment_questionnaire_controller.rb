@@ -20,8 +20,9 @@ class AssignmentQuestionnaireController < ApplicationController
   # delete all AssignmentQuestionnaire entry that's associated with an assignment
   def delete_all
     assignment = Assignment.find(params[:assignment_id])
+    
     if assignment.nil?
-      flash[:error] = 'Assignment #' + assignment.id + ' does not currently exist.'
+      flash[:error] = 'Assignment #' + params[:assignment_id].to_s + ' does not currently exist.'
       return
     end
 
@@ -35,22 +36,22 @@ class AssignmentQuestionnaireController < ApplicationController
 
   def create
     if assignment_questionnaire_params[:assignment_id].nil?
-      flash[:error] = "Missing assignment:" + assignment_questionnaire_params[:assignment_id]
+      flash[:error] = "Missing assignment"
       return
     elsif assignment_questionnaire_params[:questionnaire_id].nil?
-      flash[:error] = "Missing questionnaire:" + assignment_questionnaire_params[:questionnaire_id]
+      flash[:error] = "Missing questionnaire"
       return
     end
 
     assignment = Assignment.find(assignment_questionnaire_params[:assignment_id])
     if assignment.nil?
-      flash[:error] = 'Assignment #' + assignment.id + ' does not currently exist.'
+      flash[:error] = 'Assignment #' + params[:assignment_id].to_s + ' does not currently exist.'
       return
     end
 
     questionnaire = Questionnaire.find(assignment_questionnaire_params[:questionnaire_id])
     if questionnaire.nil?
-      flash[:error] = 'Questionnaire #' + questionnaire.id + ' does not currently exist.'
+      flash[:error] = 'Questionnaire #' + params[:questionnaire_id].to_s + ' does not currently exist.'
       return
     end
     @assignment_questionnaire = AssignmentQuestionnaire.new(assignment_questionnaire_params)
@@ -59,6 +60,7 @@ class AssignmentQuestionnaireController < ApplicationController
     respond_to do |format|
       format.json { render json: @assignment_questionnaire }
     end
+  
   end
 
   private

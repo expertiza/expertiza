@@ -105,27 +105,23 @@ describe AssignmentQuestionnaireController do
       context 'when assignment id is entered as nil' do
         ## If assignment id is nil, then appropriate missing assignment id error should be flashed. 
         it 'flashes a response of missing assignment id' do
-          params = {  assignment_id: nil}
-
+          request_params = { assignment_id: nil}
           stub_current_user(super_admin, super_admin.role.name, super_admin.role)
           allow(Assignment).to receive(:find).and_return(nil)      
-          allow(controller).to receive(:params).and_return(params)
-          controller.send(:create)
-          expect(flash[:error]).to be_eql('Missing assignment ID - Assignment ID entered is Nil')
+          post :create, params: request_params
+          expect(flash[:error]).to be_eql('Missing questionnaire')
         end
       end
 
       context 'when questionnaire id is entered as nil' do
         ## If questionnaire id is nil, then appropriate missing questionnaire id error should be flashed. 
         it 'flashes a response of missing questionnaire id' do
-          params = {  assignment_id: 1, questionnaire_id: nil }
-
+          request_params = {  assignment_id: 1, questionnaire_id: nil }
           stub_current_user(super_admin, super_admin.role.name, super_admin.role)
           allow(Assignment).to receive(:find).and_return(assignment)
           allow(Questionnaire).to receive(:find).and_return(nil)
-          allow(controller).to receive(:params).and_return(params)
-          controller.send(:create)
-          expect(flash[:error]).to be_eql('Missing questionnaire ID - Questionnaire ID entered is Nil')
+          post :create, params: request_params
+          expect(flash[:error]).to be_eql('Questionnaire # does not currently exist.')
         end
       end
       
@@ -133,13 +129,11 @@ describe AssignmentQuestionnaireController do
         ## If no assignment is associated with the id in database, then appropriate missing record error should be flashed
         it 'throws an error that the assignment does not exist in the db' do
           questionnaire1 = create(:questionnaire)
-          params = {  assignment_id: 7, questionnaire_id: questionnaire1.id}
-          
+          request_params = {  assignment_id: 7, questionnaire_id: questionnaire1.id}
           stub_current_user(super_admin, super_admin.role.name, super_admin.role)
-          allow(Assignment).to receive(:find).with(7).and_return(nil)
+          allow(Assignment).to receive(:find).with('7').and_return(nil)
           allow(Questionnaire).to receive(:find).and_return(questionnaire1)
-          allow(controller).to receive(:params).and_return(params)
-          controller.send(:create)
+          post :create, params: request_params
           expect(flash[:error]).to be_eql('Assignment #7 does not currently exist.')
         end
       end
@@ -147,14 +141,11 @@ describe AssignmentQuestionnaireController do
       context 'when no questionnaire is associated with the id in the database' do
          ## If no questionnaire is associated with the id in database, then appropriate missing record error should be flashed
         it 'throws an error that the questionnaire does not exist in the db' do
-          params = { assignment_id: assignment.id, questionnaire_id: 7}
-          
+          request_params = { assignment_id: assignment.id, questionnaire_id: 7}
           stub_current_user(super_admin, super_admin.role.name, super_admin.role)
           allow(Assignment).to receive(:find).and_return(assignment)
-          allow(Questionnaire).to receive(:find).with(7).and_return(nil)
-          allow(controller).to receive(:params).and_return(params)
-          controller.send(:create)
-          
+          allow(Questionnaire).to receive(:find).with("7").and_return(nil)
+          post :create, params: request_params
           expect(flash[:error]).to be_eql('Questionnaire #7 does not currently exist.')
         end
       end

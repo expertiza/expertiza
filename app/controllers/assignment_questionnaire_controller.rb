@@ -36,10 +36,10 @@ class AssignmentQuestionnaireController < ApplicationController
 
   def create
     if assignment_questionnaire_params[:assignment_id].nil?
-      flash[:error] = "Missing assignment:" + assignment_questionnaire_params[:assignment_id]
+      flash[:error] = "Missing assignment"
       return
     elsif assignment_questionnaire_params[:questionnaire_id].nil?
-      flash[:error] = "Missing questionnaire:" + assignment_questionnaire_params[:questionnaire_id]
+      flash[:error] = "Missing questionnaire"
       return
     end
 

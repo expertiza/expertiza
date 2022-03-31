@@ -1,4 +1,4 @@
-class CreateReviewOfReviewScores < ActiveRecord::Migration
+class CreateReviewOfReviewScores < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'review_of_review_scores', force: true do |t|
       t.column 'review_of_review_id', :integer

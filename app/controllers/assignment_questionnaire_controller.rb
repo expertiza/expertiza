@@ -34,31 +34,37 @@ class AssignmentQuestionnaireController < ApplicationController
   end
 
   def create
-    if params[:assignment_id].nil?
-      flash[:error] = 'Missing assignment:' + params[:assignment_id]
+    if assignment_questionnaire_params[:assignment_id].nil?
+      flash[:error] = "Missing assignment:" + assignment_questionnaire_params[:assignment_id]
       return
-    elsif params[:questionnaire_id].nil?
-      flash[:error] = 'Missing questionnaire:' + params[:questionnaire_id]
+    elsif assignment_questionnaire_params[:questionnaire_id].nil?
+      flash[:error] = "Missing questionnaire:" + assignment_questionnaire_params[:questionnaire_id]
       return
     end
 
-    assignment = Assignment.find(params[:assignment_id])
+    assignment = Assignment.find(assignment_questionnaire_params[:assignment_id])
     if assignment.nil?
       flash[:error] = 'Assignment #' + assignment.id + ' does not currently exist.'
       return
     end
 
-    questionnaire = Questionnaire.find(params[:questionnaire_id])
+    questionnaire = Questionnaire.find(assignment_questionnaire_params[:questionnaire_id])
     if questionnaire.nil?
       flash[:error] = 'Questionnaire #' + questionnaire.id + ' does not currently exist.'
       return
     end
-
-    @assignment_questionnaire = AssignmentQuestionnaire.new(params)
+    @assignment_questionnaire = AssignmentQuestionnaire.new(assignment_questionnaire_params)
     @assignment_questionnaire.save
 
     respond_to do |format|
       format.json { render json: @assignment_questionnaire }
     end
+  end
+
+  private
+  def assignment_questionnaire_params
+    params.permit(:assignment_id, :questionnaire_id,
+     :user_id , :notification_limit, :questionnaire_weight,
+    :used_in_round, :dropdown, :topic_id, :duty_id)
   end
 end

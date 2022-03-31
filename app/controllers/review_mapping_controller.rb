@@ -255,7 +255,7 @@ class ReviewMappingController < ApplicationController
     num_unsuccessful_deletes = 0
     mmappings.each do |mmapping|
       begin
-        mmapping.delete(params[:force])
+        mmapping.delete(ActiveModel::Type::Boolean.new.cast(params[:force]))
       rescue StandardError
         num_unsuccessful_deletes += 1
       end
@@ -296,7 +296,7 @@ class ReviewMappingController < ApplicationController
     else
       flash[:error] = 'This review has already been done. It cannot been deleted.'
     end
-    redirect_to :back
+    redirect_back fallback_location: root_path
   end
 
   def delete_metareviewer
@@ -412,10 +412,8 @@ class ReviewMappingController < ApplicationController
   end
 
   def save_grade_and_comment_for_reviewer
-    review_grade = ReviewGrade.find_by(participant_id: params[:participant_id])
-    review_grade = ReviewGrade.create(participant_id: params[:participant_id]) if review_grade.nil?
-    review_grade.grade_for_reviewer = params[:grade_for_reviewer] if params[:grade_for_reviewer]
-    review_grade.comment_for_reviewer = params[:comment_for_reviewer] if params[:comment_for_reviewer]
+    review_grade = ReviewGrade.find_or_create_by(participant_id: params[:review_grade][:participant_id])
+    review_grade.attributes = review_mapping_params
     review_grade.review_graded_at = Time.now
     review_grade.reviewer_id = session[:user].id
     begin
@@ -573,5 +571,11 @@ class ReviewMappingController < ApplicationController
         flash[:error] = 'Automatic assignment of reviewer failed.'
       end
     end
+  end
+
+  def review_mapping_params
+    params
+      .require(:review_grade)
+      .permit(:grade_for_reviewer, :comment_for_reviewer, :review_graded_at)
   end
 end

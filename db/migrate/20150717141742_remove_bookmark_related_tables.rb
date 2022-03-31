@@ -1,4 +1,4 @@
-class RemoveBookmarkRelatedTables < ActiveRecord::Migration
+class RemoveBookmarkRelatedTables < ActiveRecord::Migration[4.2]
   def self.up
     drop_table :books
     drop_table :bmappings

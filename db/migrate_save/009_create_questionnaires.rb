@@ -1,4 +1,4 @@
-class CreateQuestionnaires < ActiveRecord::Migration
+class CreateQuestionnaires < ActiveRecord::Migration[4.2]
   def self.up
     create_table :questionnaires do |t|
       t.column :name, :string, limit: 64

@@ -1,4 +1,4 @@
-class CreateAutomatedMetareviews < ActiveRecord::Migration
+class CreateAutomatedMetareviews < ActiveRecord::Migration[4.2]
   def self.up
     create_table :automated_metareviews do |t|
       t.float :relevance

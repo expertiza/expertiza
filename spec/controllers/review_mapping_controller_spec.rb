@@ -34,9 +34,9 @@ describe ReviewMappingController do
           .with(parent_id: '1', user_id: 1).with(no_args).and_return(participant)
         allow(ReviewResponseMap).to receive_message_chain(:where, :first)
           .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).with(no_args).and_return(review_response_map)
-        params = { id: 1, team_id: 1 }
-        session = { user: build(:instructor, id: 1) }
-        get :add_calibration, params, session
+        request_params = { id: 1, team_id: 1 }
+        user_session = { user: build(:instructor, id: 1) }
+        get :add_calibration, params: request_params, session: user_session
         expect(response).to redirect_to '/response/new?assignment_id=1&id=1&return=assignment_edit'
       end
     end
@@ -51,9 +51,9 @@ describe ReviewMappingController do
           .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).with(no_args).and_return(nil)
         allow(ReviewResponseMap).to receive(:create)
           .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).and_return(review_response_map)
-        params = { id: 1, team_id: 1 }
-        session = { user: build(:instructor, id: 1) }
-        get :add_calibration, params, session
+        request_params = { id: 1, team_id: 1 }
+        user_session = { user: build(:instructor, id: 1) }
+        get :add_calibration, params: request_params, session: user_session
         expect(response).to redirect_to '/response/new?assignment_id=1&id=1&return=assignment_edit'
       end
     end
@@ -73,7 +73,7 @@ describe ReviewMappingController do
     context 'when team_user does not exist' do
       it 'shows an error message and redirects to review_mapping#list_mappings page' do
         allow(TeamsUser).to receive(:exists?).with(team_id: '1', user_id: 1).and_return(true)
-        post :add_reviewer, @params
+        post :add_reviewer, params: @params
         expect(response).to redirect_to '/review_mapping/list_mappings?id=1'
       end
     end
@@ -89,7 +89,7 @@ describe ReviewMappingController do
         allow(ReviewResponseMap).to receive_message_chain(:where, :first)
           .with(reviewee_id: '1', reviewer_id: 1).with(no_args).and_return(nil)
         allow(ReviewResponseMap).to receive(:create).with(reviewee_id: '1', reviewer_id: 1, reviewed_object_id: 1).and_return(nil)
-        post :add_reviewer, @params
+        post :add_reviewer, params: @params
         expect(response).to redirect_to '/review_mapping/list_mappings?id=1&msg='
       end
     end
@@ -105,11 +105,11 @@ describe ReviewMappingController do
       it 'shows an error message and redirects to student_review#list page' do
         allow(assignment).to receive(:topics?).and_return(true)
         allow(assignment).to receive(:can_choose_topic_to_review?).and_return(true)
-        params = {
+        request_params = {
           assignment_id: 1,
           reviewer_id: 1
         }
-        post :assign_reviewer_dynamically, params
+        post :assign_reviewer_dynamically, params: request_params
         expect(flash[:error]).to eq('No topic is selected.  Please go back and select a topic.')
         expect(response).to redirect_to '/student_review/list?id=1'
       end
@@ -123,12 +123,12 @@ describe ReviewMappingController do
         allow(assignment).to receive(:assign_reviewer_dynamically).with(participant, topic).and_return(true)
         allow(ReviewResponseMap).to receive(:reviewer_id).with(1).and_return(0)
         allow(assignment).to receive(:num_reviews_allowed).and_return(1)
-        params = {
+        request_params = {
           assignment_id: 1,
           reviewer_id: 1,
           topic_id: 1
         }
-        post :assign_reviewer_dynamically, params
+        post :assign_reviewer_dynamically, params: request_params
         expect(response).to redirect_to '/student_review/list?id=1'
       end
     end
@@ -145,12 +145,12 @@ describe ReviewMappingController do
         allow(assignment).to receive(:assign_reviewer_dynamically_no_topic).with(participant, team2).and_return(true)
         allow(ReviewResponseMap).to receive(:reviewer_id).with(1).and_return(0)
         allow(assignment).to receive(:num_reviews_allowed).and_return(1)
-        params = {
+        request_params = {
           assignment_id: 1,
           reviewer_id: 1,
           topic_id: 1
         }
-        post :assign_reviewer_dynamically, params
+        post :assign_reviewer_dynamically, params: request_params
         expect(response).to redirect_to '/student_review/list?id=1'
       end
     end
@@ -164,12 +164,12 @@ describe ReviewMappingController do
                                                    .and_return([])
         allow(assignment).to receive(:assign_reviewer_dynamically).with(participant, topic).and_return(true)
         allow(assignment).to receive(:num_reviews_allowed).and_return(1)
-        params = {
+        request_params = {
           assignment_id: 1,
           reviewer_id: 1,
           topic_id: 1
         }
-        post :assign_reviewer_dynamically, params
+        post :assign_reviewer_dynamically, params: request_params
         expect(response).to redirect_to '/student_review/list?id=1'
       end
     end
@@ -183,12 +183,12 @@ describe ReviewMappingController do
                                                    .and_return([1, 2, 3])
         allow(assignment).to receive(:assign_reviewer_dynamically).with(participant, topic).and_return(true)
         allow(assignment).to receive(:num_reviews_allowed).and_return(1)
-        params = {
+        request_params = {
           assignment_id: 1,
           reviewer_id: 1,
           topic_id: 1
         }
-        post :assign_reviewer_dynamically, params
+        post :assign_reviewer_dynamically, params: request_params
         expect(response).to redirect_to '/student_review/list?id=1'
         expect(flash[:error]).to be_present
       end
@@ -205,12 +205,12 @@ describe ReviewMappingController do
         allow(assignment).to receive(:num_reviews_allowed).and_return(1)
         allow(assignment).to receive(:max_outstanding_reviews).and_return(0)
 
-        params = {
+        request_params = {
           assignment_id: 1,
           reviewer_id: 1,
           topic_id: 1
         }
-        post :assign_reviewer_dynamically, params
+        post :assign_reviewer_dynamically, params: request_params
         expect(response).to redirect_to '/student_review/list?id=1'
       end
     end
@@ -226,12 +226,12 @@ describe ReviewMappingController do
         allow(assignment).to receive(:num_reviews_allowed).and_return(1)
         allow(assignment).to receive(:max_outstanding_reviews).and_return(3)
 
-        params = {
+        request_params = {
           assignment_id: 1,
           reviewer_id: 1,
           topic_id: 1
         }
-        post :assign_reviewer_dynamically, params
+        post :assign_reviewer_dynamically, params: request_params
         expect(flash[:error]).to be_present
         expect(response).to redirect_to '/student_review/list?id=1'
       end
@@ -255,7 +255,7 @@ describe ReviewMappingController do
         allow(ResponseMap).to receive_message_chain(:where, :first).with(reviewed_object_id: '1', reviewer_id: '1')
           .with(no_args).and_return(double('ResponseMap'))
 
-        post :assign_quiz_dynamically, @params
+        post :assign_quiz_dynamically, params: @params
         expect(flash[:error]).to eq('You have already taken that quiz.')
         expect(response).to redirect_to('/student_quizzes?id=1')
       end
@@ -267,7 +267,7 @@ describe ReviewMappingController do
         allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
         allow(Questionnaire).to receive(:find_by).with(instructor_id: 1).and_return(questionnaire)
         allow_any_instance_of(QuizResponseMap).to receive(:save).and_return(true)
-        post :assign_quiz_dynamically, @params
+        post :assign_quiz_dynamically, params: @params
         expect(flash[:error]).to be nil
         expect(response).to redirect_to('/student_quizzes?id=1')
       end
@@ -287,8 +287,8 @@ describe ReviewMappingController do
         .with(user, assignment, 'http://test.host/review_mapping/add_user_to_assignment?id=1&user_id=1')
         .and_return(double('AssignmentParticipant', id: 1, name: 'no one'))
       allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: 1, reviewer_id: 1).and_return([nil])
-      params = { id: 1 }
-      post :add_metareviewer, params
+      request_params = { id: 1 }
+      post :add_metareviewer, params: request_params
       expect(response).to redirect_to('/review_mapping/list_mappings?id=1&msg=')
     end
   end
@@ -298,11 +298,11 @@ describe ReviewMappingController do
       metareviewer = double('AssignmentParticipant', id: 1)
       allow(AssignmentParticipant).to receive(:where).with(user_id: '1', parent_id: 1).and_return([metareviewer])
       allow(assignment).to receive(:assign_metareviewer_dynamically).with(metareviewer).and_return(true)
-      params = {
+      request_params = {
         assignment_id: 1,
         metareviewer_id: 1
       }
-      post :assign_metareviewer_dynamically, params
+      post :assign_metareviewer_dynamically, params: request_params
       expect(response).to redirect_to('/student_review/list?id=1')
     end
   end
@@ -316,11 +316,11 @@ describe ReviewMappingController do
     context 'when review response map has corresponding responses' do
       it 'shows a flash error and redirects to review_mapping#list_mappings page' do
         allow(Response).to receive(:exists?).with(map_id: 1).and_return(true)
-        params = {
+        request_params = {
           id: 1,
           contributor_id: 1
         }
-        post :delete_outstanding_reviewers, params
+        post :delete_outstanding_reviewers, params: request_params
         expect(flash[:success]).to be nil
         expect(flash[:error]).to eq('1 reviewer(s) cannot be deleted because they have already started a review.')
         expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
@@ -333,11 +333,11 @@ describe ReviewMappingController do
         review_response_map = double('ReviewResponseMap')
         allow(ReviewResponseMap).to receive(:find).with(1).and_return(review_response_map)
         allow(review_response_map).to receive(:destroy).and_return(true)
-        params = {
+        request_params = {
           id: 1,
           contributor_id: 1
         }
-        post :delete_outstanding_reviewers, params
+        post :delete_outstanding_reviewers, params: request_params
         expect(flash[:error]).to be nil
         expect(flash[:success]).to eq('All review mappings for "no one" have been deleted.')
         expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
@@ -357,8 +357,8 @@ describe ReviewMappingController do
         @metareview_response_maps.each do |metareview_response_map|
           allow(metareview_response_map).to receive(:delete).with(true).and_raise('Boom')
         end
-        params = { id: 1, force: true }
-        post :delete_all_metareviewers, params
+        request_params = { id: 1, force: true }
+        post :delete_all_metareviewers, params: request_params
         expect(flash[:note]).to be nil
         expect(flash[:error]).to eq('A delete action failed:<br/>1 metareviews exist for these mappings. '\
           "Delete these mappings anyway?&nbsp;<a href='http://test.host/review_mapping/delete_all_metareviewers?force=1&id=1'>Yes</a>&nbsp;|&nbsp;"\
@@ -372,8 +372,8 @@ describe ReviewMappingController do
         @metareview_response_maps.each do |metareview_response_map|
           allow(metareview_response_map).to receive(:delete).with(true)
         end
-        params = { id: 1, force: true }
-        post :delete_all_metareviewers, params
+        request_params = { id: 1, force: true }
+        post :delete_all_metareviewers, params: request_params
         expect(flash[:error]).to be nil
         expect(flash[:note]).to eq('All metareview mappings for contributor "reviewee" and reviewer "reviewer" have been deleted.')
         expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
@@ -393,7 +393,7 @@ describe ReviewMappingController do
         allow(review_response).to receive(:update_attribute).with('is_submitted', false).and_return(true)
         params = { id: 1 }
         # xhr - XmlHttpRequest (AJAX)
-        xhr :get, :unsubmit_review, params
+        get :unsubmit_review, params: { id: 1 }, xhr: true
         expect(flash.now[:error]).to be nil
         expect(flash.now[:success]).to eq('The review by "reviewer" for "reviewee" has been unsubmitted.')
         expect(response).to render_template('unsubmit_review.js.erb')
@@ -405,7 +405,7 @@ describe ReviewMappingController do
         allow(review_response).to receive(:update_attribute).with('is_submitted', false).and_return(false)
         params = { id: 1 }
         # xhr - XmlHttpRequest (AJAX)
-        xhr :get, :unsubmit_review, params
+        get :unsubmit_review, params: { id: 1 }, xhr: true
         expect(flash.now[:success]).to be nil
         expect(flash.now[:error]).to eq('The review by "reviewer" for "reviewee" could not be unsubmitted.')
         expect(response).to render_template('unsubmit_review.js.erb')
@@ -423,8 +423,8 @@ describe ReviewMappingController do
       it 'shows a success flash message and redirects to previous page' do
         allow(Response).to receive(:exists?).with(map_id: 1).and_return(false)
         allow(review_response_map).to receive(:destroy).and_return(true)
-        params = { id: 1 }
-        post :delete_reviewer, params
+        request_params = { id: 1 }
+        post :delete_reviewer, params: request_params
         expect(flash[:success]).to eq('The review mapping for "reviewee" and "reviewer" has been deleted.')
         expect(flash[:error]).to be nil
         expect(response).to redirect_to('www.google.com')
@@ -434,8 +434,8 @@ describe ReviewMappingController do
     context 'when corresponding response exists to current review response map' do
       it 'shows an error flash message and redirects to previous page' do
         allow(Response).to receive(:exists?).with(map_id: 1).and_return(true)
-        params = { id: 1 }
-        post :delete_reviewer, params
+        request_params = { id: 1 }
+        post :delete_reviewer, params: request_params
         expect(flash[:error]).to eq('This review has already been done. It cannot been deleted.')
         expect(flash[:success]).to be nil
         expect(response).to redirect_to('www.google.com')
@@ -451,8 +451,8 @@ describe ReviewMappingController do
     context 'when metareview_response_map can be deleted successfully' do
       it 'show a note flash message and redirects to review_mapping#list_mappings page' do
         allow(metareview_response_map).to receive(:delete).and_return(true)
-        params = { id: 1 }
-        post :delete_metareviewer, params
+        request_params = { id: 1 }
+        post :delete_metareviewer, params: request_params
         expect(flash[:note]).to eq('The metareview mapping for reviewee and reviewer has been deleted.')
         expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
       end
@@ -461,8 +461,8 @@ describe ReviewMappingController do
     context 'when metareview_response_map cannot be deleted successfully' do
       it 'show a note flash message and redirects to review_mapping#list_mappings page' do
         allow(metareview_response_map).to receive(:delete).and_raise('Boom')
-        params = { id: 1 }
-        post :delete_metareviewer, params
+        request_params = { id: 1 }
+        post :delete_metareviewer, params: request_params
         expect(flash[:error]).to eq("A delete action failed:<br/>Boom<a href='/review_mapping/delete_metareview/1'>Delete this mapping anyway>?")
         expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
       end
@@ -473,8 +473,8 @@ describe ReviewMappingController do
     it 'redirects to review_mapping#list_mappings page after deletion' do
       allow(MetareviewResponseMap).to receive(:find).with('1').and_return(metareview_response_map)
       allow(metareview_response_map).to receive(:delete).and_return(true)
-      params = { id: 1 }
-      post :delete_metareview, params
+      request_params = { id: 1 }
+      post :delete_metareview, params: request_params
       expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
     end
   end
@@ -482,11 +482,11 @@ describe ReviewMappingController do
   describe '#list_mappings' do
     it 'renders review_mapping#list_mappings page' do
       allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team, team1])
-      params = {
+      request_params = {
         id: 1,
         msg: 'No error!'
       }
-      get :list_mappings, params
+      get :list_mappings, params: request_params
       expect(flash[:error]).to eq('No error!')
       expect(response).to render_template(:list_mappings)
     end
@@ -504,7 +504,7 @@ describe ReviewMappingController do
 
       context 'when all nums in params are 0' do
         it 'shows an error flash message and redirects to review_mapping#list_mappings page' do
-          params = {
+          request_params = {
             id: 1,
             max_team_size: 1,
             num_reviews_per_student: 0,
@@ -512,7 +512,7 @@ describe ReviewMappingController do
             num_calibrated_artifacts: 0,
             num_uncalibrated_artifacts: 0
           }
-          post :automatic_review_mapping, params
+          post :automatic_review_mapping, params: request_params
           expect(flash[:error]).to eq('Please choose either the number of reviews per student or the number of reviewers per team (student).')
           expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
         end
@@ -521,7 +521,7 @@ describe ReviewMappingController do
       context 'when all nums in params are 0 except student_review_num' do
         it 'runs automatic review mapping strategy and redirects to review_mapping#list_mappings page' do
           allow_any_instance_of(ReviewMappingController).to receive(:automatic_review_mapping_strategy).with(any_args).and_return(true)
-          params = {
+          request_params = {
             id: 1,
             max_team_size: 1,
             num_reviews_per_student: 1,
@@ -529,19 +529,19 @@ describe ReviewMappingController do
             num_calibrated_artifacts: 0,
             num_uncalibrated_artifacts: 0
           }
-          post :automatic_review_mapping, params
+          post :automatic_review_mapping, params: request_params
           expect(flash[:error]).to be nil
           expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
         end
       end
 
-      context 'when calibrated params are not 0' do
+      context 'when calibrated request_params are not 0' do
         it 'runs automatic review mapping strategy and redirects to review_mapping#list_mappings page' do
           allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: 1, calibrate_to: 1)
                                                      .and_return([double('ReviewResponseMap', reviewee_id: 2)])
           allow(AssignmentTeam).to receive(:find).with(2).and_return(team)
           allow_any_instance_of(ReviewMappingController).to receive(:automatic_review_mapping_strategy).with(any_args).and_return(true)
-          params = {
+          request_params = {
             id: 1,
             max_team_size: 1,
             num_reviews_per_student: 1,
@@ -549,7 +549,7 @@ describe ReviewMappingController do
             num_calibrated_artifacts: 1,
             num_uncalibrated_artifacts: 1
           }
-          post :automatic_review_mapping, params
+          post :automatic_review_mapping, params: request_params
           expect(flash[:error]).to be nil
           expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
         end
@@ -561,7 +561,7 @@ describe ReviewMappingController do
             .with(reviewed_object_id: 1, calibrate_to: 1)
             .and_return([double('ReviewResponseMap', reviewee_id: 2)])
           allow(AssignmentTeam).to receive(:find).with(2).and_return(team)
-          params = {
+          request_params = {
             id: 1,
             max_team_size: 1,
             num_reviews_per_student: 45,
@@ -569,7 +569,7 @@ describe ReviewMappingController do
             num_calibrated_artifacts: 0,
             num_uncalibrated_artifacts: 0
           }
-          post :automatic_review_mapping, params
+          post :automatic_review_mapping, params: request_params
           expect(flash[:error]).to eq('You cannot set the number of reviews done ' \
                                       'by each student to be greater than or equal to total number of teams ' \
                                       '[or "participants" if it is an individual assignment].')
@@ -584,7 +584,7 @@ describe ReviewMappingController do
         allow(TeamsUser).to receive(:team_id).with(1, 3).and_return(false)
         allow(AssignmentTeam).to receive(:create_team_and_node).with(1).and_return(double('AssignmentTeam', id: 1))
         allow(ApplicationController).to receive_message_chain(:helpers, :create_team_users).with(no_args).with(user, 1).and_return(true)
-        params = {
+        request_params = {
           id: 1,
           max_team_size: 1,
           num_reviews_per_student: 1,
@@ -592,7 +592,7 @@ describe ReviewMappingController do
           num_calibrated_artifacts: 0,
           num_uncalibrated_artifacts: 0
         }
-        post :automatic_review_mapping, params
+        post :automatic_review_mapping, params: request_params
         expect(flash[:error]).to eq('Please choose either the number of reviews per student or the number of reviewers per team (student), not both.')
         expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
       end
@@ -602,14 +602,14 @@ describe ReviewMappingController do
   describe '#automatic_review_mapping_staggered' do
     it 'shows a note flash message and redirects to review_mapping#list_mappings page' do
       allow(assignment).to receive(:assign_reviewers_staggered).with('4', '2').and_return('Awesome!')
-      params = {
+      request_params = {
         id: 1,
         assignment: {
           num_reviews: 4,
           num_metareviews: 2
         }
       }
-      post :automatic_review_mapping_staggered, params
+      post :automatic_review_mapping_staggered, params: request_params
       expect(flash[:note]).to eq('Awesome!')
       expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
     end
@@ -623,14 +623,17 @@ describe ReviewMappingController do
       # Stub out other items
       allow(ReviewGrade).to receive(:find_by).with(participant_id: '1').and_return(review_grade)
       allow(review_grade).to receive(:save).and_return(true)
-      params = {
-        participant_id: 1,
-        grade_for_reviewer: 90,
-        comment_for_reviewer: 'keke'
+      request_params = {
+        review_grade: {
+          participant_id: 1,
+          grade_for_reviewer: 90,
+          comment_for_reviewer: 'keke'
+        }
       }
-      stub_current_user(instructor, instructor.role.name, instructor.role)
+
       # Perform test
-      post :save_grade_and_comment_for_reviewer, params, session
+      session_params = {user: stub_current_user(instructor, instructor.role.name, instructor.role) }
+      post :save_grade_and_comment_for_reviewer, params: request_params, session: session_params
       expect(flash[:note]).to be nil
       expect(response).to redirect_to('/reports/response_report')
     end
@@ -645,12 +648,12 @@ describe ReviewMappingController do
       it 'creates a new record and redirects to submitted_content#edit page' do
         allow(SelfReviewResponseMap).to receive(:where).with(reviewee_id: 1, reviewer_id: '1').and_return([nil])
         allow(SelfReviewResponseMap).to receive(:create).with(reviewee_id: 1, reviewer_id: '1', reviewed_object_id: 1).and_return(true)
-        params = {
+        request_params = {
           assignment_id: 1,
           reviewer_userid: 1,
           reviewer_id: 1
         }
-        post :start_self_review, params
+        post :start_self_review, params: request_params
         expect(response).to redirect_to('/submitted_content/1/edit')
       end
     end
@@ -658,12 +661,12 @@ describe ReviewMappingController do
     context 'when self review response map exists' do
       it 'redirects to submitted_content#edit page' do
         allow(SelfReviewResponseMap).to receive(:where).with(reviewee_id: 1, reviewer_id: '1').and_return([double('SelfReviewResponseMap')])
-        params = {
+        request_params = {
           assignment_id: 1,
           reviewer_userid: 1,
           reviewer_id: 1
         }
-        post :start_self_review, params
+        post :start_self_review, params: request_params
         expect(response).to redirect_to('/submitted_content/1/edit?msg=Self+review+already+assigned%21')
       end
     end

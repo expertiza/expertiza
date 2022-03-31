@@ -1,4 +1,4 @@
-class MenuUpdateLeaderboard < ActiveRecord::Migration
+class MenuUpdateLeaderboard < ActiveRecord::Migration[4.2]
   def self.up
     # get Permission entry
     permission1 = Permission.find_by_name('public actions - execute')

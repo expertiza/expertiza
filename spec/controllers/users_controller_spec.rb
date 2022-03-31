@@ -34,9 +34,9 @@ describe UsersController do
 
     it 'renders list if user is instructor' do
       allow(instructor).to receive(:get_user_list).and_return(student1)
-      @params = {}
-      session = { user: instructor }
-      get :index, @params, session
+      request_params = {}
+      user_session = { user: instructor }
+      get :index, params: request_params, session: user_session
       expect(response).to render_template(:list)
     end
   end
@@ -44,29 +44,29 @@ describe UsersController do
   context '#set_anonymized_view' do
     it 'redirects to back' do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
-      @params = {}
-      session = { user: instructor }
-      get :set_anonymized_view, params: @params, session: session
+      request_params = {}
+      user_session = { user: instructor }
+      get :set_anonymized_view, params: request_params, session: user_session
       expect(response).to redirect_to('http://www.example.com')
     end
 
     # check whether student / instructor is allowed to set anonymized view
     it 'allows student / instructor to set anonymized view' do
-      params = { action: 'set_anonymized_view' }
-      allow(controller).to receive(:params).and_return(params)
+      request_params = { action: 'set_anonymized_view' }
+      allow(controller).to receive(:request_params).and_return(request_params)
       expect(controller.action_allowed?).to be true
       stub_current_user(student7, student7.role.name, student7.role)
-      allow(controller).to receive(:params).and_return(params)
-      expect(controller.action_allowed?).to be true
+      allow(controller).to receive(:request_params).and_return(request_params)
+      expect(controller.action_allowed?).to be false
     end
 
     # check there are no errors while setting anonymized view as a student
     it 'redirects to back' do
       stub_current_user(student7, student7.role.name, student7.role)
       request.env['HTTP_REFERER'] = 'http://www.example.com'
-      @params = {}
-      session = { user: student7 }
-      get :set_anonymized_view, params: @params, session: session
+      request_params = {}
+      user_session = { user: student7 }
+      get :set_anonymized_view, params: request_params, session: user_session
       expect(response).to redirect_to('http://www.example.com')
     end
   end
@@ -77,21 +77,20 @@ describe UsersController do
     end
     it 'user is nil' do
       allow(User).to receive(:find_by).with(name: 'instructor6').and_return(nil)
-      session = { user: admin }
-      params = {
+      user_session = { user: admin }
+      request_params = {
         user: { name: 'instructor6' }
       }
-      post :show_if_authorized, params, session
+      post :show_if_authorized, params: request_params, session: user_session
       expect(response).to redirect_to('http://test.host/users/list')
     end
 
     it 'user is not nil and user is available for editing' do
       allow(User).to receive(:find_by).with(name: 'instructor6').and_return(student3)
-      session = { user: student4 }
-      params = {
+      request_params = {
         user: { name: 'instructor6' }
       }
-      get :show_if_authorized, params
+      get :show_if_authorized, params: request_params
       expect(response).to render_template(:show)
     end
 
@@ -102,11 +101,11 @@ describe UsersController do
       teaching_assistant = create(:teaching_assistant)
       instructor = create(:instructor)
       stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
-      params = {
+      request_params = {
         user: { name: instructor.name }
       }
-
-      post :show_if_authorized, params, session
+      user_session = { user: teaching_assistant }
+      post :show_if_authorized, params: request_params, session: user_session
 
       expect(response).to redirect_to('http://test.host/users/list')
     end
@@ -116,34 +115,33 @@ describe UsersController do
     it 'when params[:id] is not nil' do
       allow(controller).to receive(:current_user).and_return(student1)
       allow(User).to receive(:find).with('1').and_return(student1)
-      @params = { id: 1 }
-      session = { user: student1 }
-      get :show, @params, session
+      request_params = { id: 1 }
+      user_session = { user: student1 }
+      get :show, params: request_params, session: user_session
       expect(response).to render_template(:show)
     end
 
     it 'when params[:id] is not nil but role_id is nil' do
       student_no_role_id = create(:student)
       stub_current_user(student_no_role_id, student_no_role_id.role.name, student_no_role_id.role)
-      session = { user: student_no_role_id }
-      session[:user].role_id = nil
-      @params = { id: student_no_role_id.id }
-      get :show, @params, session
+      user_session = { user: student_no_role_id }
+      user_session[:user].role_id = nil
+      request_params = { id: student_no_role_id.id }
+      get :show, params: request_params, session: user_session
       expect(response).to render_template(:show)
     end
 
     it 'when params[:id] is nil' do
-      @params = { id: nil }
-      get :show, @params
+      get :show
       expect(response).to redirect_to('/tree_display/drill')
     end
   end
 
   context '#new' do
     it '1' do
-      params = { role: 'instructor' }
-      session = { user: instructor }
-      get :new, params, session
+      request_params = { role: 'instructor' }
+      user_session = { user: instructor }
+      get :new, params: request_params, session: user_session
       expect(response).to render_template(:new)
     end
   end
@@ -154,8 +152,8 @@ describe UsersController do
     end
     it 'save successfully with email as name' do
       allow(User).to receive(:find_by).with(name: 'lily').and_return(student1)
-      session = { user: admin }
-      params = {
+      user_session = { user: admin }
+      request_params = {
         user: { name: 'lily',
                 crypted_password: 'password',
                 role_id: 2,
@@ -177,15 +175,15 @@ describe UsersController do
                 copy_of_emails: nil,
                 institution_id: 1 }
       }
-      post :create, params, session
+      post :create, params: request_params, session: user_session
       allow_any_instance_of(User).to receive(:undo_link).with('The user "chenzy@gmail.com" has been successfully created. ').and_return(true)
       expect(flash[:success]).to eq "A new password has been sent to new user's e-mail address."
       expect(response).to redirect_to('http://test.host/users/list')
     end
 
     it 'save successfully without the same name' do
-      session = { user: admin }
-      params = {
+      user_session = { user: admin }
+      request_params = {
         user: { name: 'instructor6',
                 crypted_password: 'password',
                 role_id: 2,
@@ -207,7 +205,7 @@ describe UsersController do
                 copy_of_emails: nil,
                 institution_id: 1 }
       }
-      post :create, params, session
+      post :create, params: request_params, session: user_session
       allow_any_instance_of(User).to receive(:undo_link).with('The user "instructor6" has been successfully created. ').and_return(true)
       expect(flash[:success]).to eq "A new password has been sent to new user's e-mail address."
       expect(response).to redirect_to('http://test.host/users/list')
@@ -215,8 +213,8 @@ describe UsersController do
 
     it 'save unsuccessfully' do
       expect_any_instance_of(User).to receive(:save).and_return(false)
-      session = { user: admin }
-      params = {
+      user_session = { user: admin }
+      request_params = {
         user: { name: 'instructor6',
                 crypted_password: 'password',
                 role_id: 2,
@@ -238,7 +236,7 @@ describe UsersController do
                 copy_of_emails: nil,
                 institution_id: 1 }
       }
-      post :create, params, session
+      post :create, params: request_params, session: user_session
       expect(response).to redirect_to('/users/list')
     end
   end
@@ -246,9 +244,9 @@ describe UsersController do
   context '#edit' do
     it 'renders users#edit page' do
       allow(User).to receive(:find).with('1').and_return(student1)
-      @params = { id: 1 }
-      session = { user: instructor }
-      get :edit, @params, session
+      request_params = { id: 1 }
+      user_session = { user: instructor }
+      get :edit, params: request_params, session: user_session
       expect(response).to render_template(:edit)
     end
   end
@@ -256,17 +254,17 @@ describe UsersController do
   context '#update' do
     it 'when user is updated successfully' do
       allow(User).to receive(:find).with('1').and_return(student1)
-      @params = { id: 1 }
+      request_params = { id: 1 }
       allow(student1).to receive(:update_attributes).with(any_args).and_return(true)
-      post :update, @params
+      post :update, params: request_params
       expect(flash[:success]).to eq 'The user "lily" has been successfully updated.'
       expect(response).to redirect_to('/users')
     end
     it 'when user is not updated successfully' do
       allow(User).to receive(:find).with('2').and_return(student2)
-      @params = { id: 2 }
+      request_params = { id: 2 }
       allow(student2).to receive(:update_attributes).with(any_args).and_return(false)
-      post :update, @params
+      post :update, params: request_params
       expect(response).to render_template(:edit)
     end
   end
@@ -279,8 +277,8 @@ describe UsersController do
       the_key = 'the key'
       allow(User).to receive(:find).with('1').and_return(student1)
       allow(student1).to receive(:generate_keys).and_return(the_key)
-      @params = { id: 1 }
-      get :keys, @params
+      request_params = { id: 1 }
+      get :keys, params: request_params
       expect(controller.instance_variable_get(:@private_key)).to be(the_key)
     end
     it 'when params[:id] is nil' do

@@ -4,6 +4,7 @@ describe SubmittedContentController do
   let(:student1) { build(:student, id: 21, role_id: 1) }
   let(:team) { build(:assignment_team, id: 1) }
   let(:participant) { build(:participant, id: 1, user_id: 21) }
+  let(:assignment) { build(:assignment, id: 1) }
   describe '#submit_hyperlink' do
     context 'current user is participant and submits hyperlink' do
       before(:each) do
@@ -29,7 +30,28 @@ describe SubmittedContentController do
     end
   end
   describe '#remove_hyperlink' do
-    #placeholder
+    #NOTE - this method is not currently used, the below context is a start
+    #       at proposed tests that may be useful in the future
+    context 'current user is participant' do
+      before(:each) do
+        #allow(AssignmentParticipant).to receive(:find).and_return(participant)
+        #stub_current_user(student1, student1.role.name, student1.role)
+        #allow(participant).to receive(:team).and_return(team)
+        #allow(team).to receive(:hyperlinks).and_return(['google.com'])
+      end
+      it 'redirects to edit if submissions are allowed' #do
+        #params = {id: 1}
+        #allow(assignment).to receive(:submission_allowed).and_return(true)
+        #response = get :remove_hyperlink, params
+        #expect(response).to redirect_to(action: :edit, id: 1)
+      #end
+      it 'redirects to view if submissions are not allowed' #do
+        #params = {id: 1}
+        #allow(assignment).to receive(:submission_allowed).and_return(true)
+        #response = get :remove_hyperlink, params
+        #expect(response).to redirect_to(action: :view, id: 1)
+      #end
+    end
   end
   describe '#submit_file' do
     context 'current user does not match up with the participant' do
@@ -107,9 +129,9 @@ describe SubmittedContentController do
       it 'calls send for a valid file download' do
         # still figuring this one out...
         #params = {folder_name: 'test_dir', name: 'test.txt'}
-        #File.stub!(:exists?).and_return(true)
-        #expect(download).to receive(:send_file)
+        #File.stub(:exist?).and_return(true)
         #response = get :download, params
+        #expect(download).to receive(:send_file)
       end
     end
   end

@@ -28,15 +28,15 @@ describe StudentTeamsController do
         allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
         allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
         allow(student1).to receive(:user_id).with(any_args).and_return(1)
-        session = { user: student1 }
-        params = {
+        user_session = { user: student1 }
+        request_params = {
           student_id: 1,
           team: {
             name: ''
           },
           action: 'create'
         }
-        result = post :create, params, session
+        result = post :create, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq 302
       end
@@ -52,15 +52,15 @@ describe StudentTeamsController do
         allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(true)
         allow(student1).to receive(:user_id).with(any_args).and_return(1)
         allow(team7).to receive(:save).and_return(true)
-        session = { user: student1 }
-        params = {
+        user_session = { user: student1 }
+        request_params = {
           student_id: 1,
           team: {
             name: 'test'
           },
           action: 'create'
         }
-        result = post :create, params, session
+        result = post :create, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq(302)
       end
@@ -73,15 +73,15 @@ describe StudentTeamsController do
         allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
         allow(student1).to receive(:user_id).with(any_args).and_return(1)
         allow(team7).to receive(:empty?).and_return(false)
-        session = { user: student1 }
-        params = {
+        user_session = { user: student1 }
+        request_params = {
           student_id: 1,
           team: {
             name: 'test'
           },
           action: 'create'
         }
-        result = post :create, params, session
+        result = post :create, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq 302
       end
@@ -99,8 +99,8 @@ describe StudentTeamsController do
         allow(student1).to receive(:user_id).with(any_args).and_return(1)
         allow(team7).to receive(:user_id).with(any_args).and_return(1)
         allow(team7).to receive(:update_attribute).and_return(true)
-        session = { user: student1 }
-        params = {
+        user_session = { user: student1 }
+        request_params = {
           student_id: 1,
           team_id: 1,
           team: {
@@ -108,7 +108,7 @@ describe StudentTeamsController do
           },
           action: 'update'
         }
-        result = post :update, params, session
+        result = post :update, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq(302)
       end
@@ -126,8 +126,8 @@ describe StudentTeamsController do
         allow(team1).to receive(:length).and_return(1)
         allow(team1).to receive(:name).and_return('test')
         allow(team8).to receive(:name).and_return('test')
-        session = { user: student1 }
-        params = {
+        user_session = { user: student1 }
+        request_params = {
           student_id: 1,
           team_id: 1,
           team: {
@@ -135,7 +135,7 @@ describe StudentTeamsController do
           },
           action: 'update'
         }
-        result = post :update, params, session
+        result = post :update, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq(302)
       end
@@ -151,8 +151,8 @@ describe StudentTeamsController do
         allow(team8).to receive(:user_id).with(any_args).and_return(1)
         allow(team1).to receive(:length).and_return(2)
 
-        session = { user: student1 }
-        params = {
+        user_session = { user: student1 }
+        request_params = {
           student_id: 1,
           team_id: 1,
           team: {
@@ -160,7 +160,7 @@ describe StudentTeamsController do
           },
           action: 'update'
         }
-        result = post :update, params, session
+        result = post :update, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq(302)
       end
@@ -176,8 +176,8 @@ describe StudentTeamsController do
   #   allow(team_user1).to receive(:destroy_all)
   #   allow(team_user1).to receive_message_chain(:where,:empty?).and_return(false)
   #   allow_any_instance_of(AssignmentParticipant).to receive(:save).and_return(false)
-  #   session = {user:student1}
-  #   params = {
+  #   user_session = {user:student1}
+  #   request_params = {
   #     team_id:1,
   #     user_id:1,
   #     student_id:1,
@@ -185,7 +185,7 @@ describe StudentTeamsController do
   #       name:'test'
   #     }
   #   }
-  #   result = post :remove_participant, params, session
+  #   result = post :remove_participant, params: request_params, session: user_session
   #   expect(result.status).to eq 302
   #   # expect(result).to redirect_to(view_student_teams_path(:student_id => 1))
   #    end

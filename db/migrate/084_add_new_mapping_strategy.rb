@@ -1,4 +1,4 @@
-class AddNewMappingStrategy < ActiveRecord::Migration
+class AddNewMappingStrategy < ActiveRecord::Migration[4.2]
   def self.up
     execute "INSERT INTO mapping_strategies (`id`, `name`) VALUES
             (2, 'Dynamic, fewest extant reviews');"

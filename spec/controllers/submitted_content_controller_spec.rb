@@ -95,8 +95,12 @@ describe SubmittedContentController do
       before(:each) do
         allow(AssignmentParticipant).to receive(:find).and_return(participant)
         stub_current_user(student1, student1.role.name, student1.role)
-        # TODO - create a file for test
       end
+      it 'redirects to edit' #do
+        #params = {id: 1, faction: nil}
+        #response = get :folder_action, params
+        #expect(response).to redirect_to(action: :edit, id: 1)
+      #end
       it 'delete action deletes selected files'
       it 'rename action renames selected file'
       it 'move action moves selected file'

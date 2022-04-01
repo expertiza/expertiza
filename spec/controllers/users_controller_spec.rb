@@ -106,17 +106,6 @@ describe UsersController do
     end
   end
 
-  context '#list' do
-    it 'checks that paginate_list does not fail with controller' do
-      expect{controller.list}.not_to raise_error
-    end
-
-    it 'checks that paginate_list does not fail with post' do
-      post :list
-      expect(response.status).to eq(200)
-    end
-  end
-	
   context '#show_if_authorized' do
     before(:each) do
       allow(User).to receive(:find).with(2).and_return(instructor)

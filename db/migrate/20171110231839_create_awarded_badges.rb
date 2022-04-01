@@ -1,4 +1,4 @@
-class CreateAwardedBadges < ActiveRecord::Migration
+class CreateAwardedBadges < ActiveRecord::Migration[4.2]
   def change
     create_table :awarded_badges do |t|
       t.references :badge, index: true, foreign_key: true

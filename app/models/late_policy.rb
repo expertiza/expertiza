@@ -1,4 +1,4 @@
-class LatePolicy < ActiveRecord::Base
+class LatePolicy < ApplicationRecord
   belongs_to :user
 
   # has_many :assignments
@@ -16,7 +16,7 @@ class LatePolicy < ActiveRecord::Base
 
   validates :policy_name, format: { with: /\A[A-Za-z0-9][A-Za-z0-9\s'._-]+\z/i }
 
-  attr_accessible :penalty_per_unit, :max_penalty, :penalty_unit, :times_used, :policy_name
+  # attr_accessible :penalty_per_unit, :max_penalty, :penalty_unit, :times_used, :policy_name
 
   # method to check whether the policy name given as a parameter already exists under the current instructor id
   # it return true if there's another policy with the same name under current instructor else false

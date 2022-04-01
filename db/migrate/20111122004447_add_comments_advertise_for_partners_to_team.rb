@@ -1,4 +1,4 @@
-class AddCommentsAdvertiseForPartnersToTeam < ActiveRecord::Migration
+class AddCommentsAdvertiseForPartnersToTeam < ActiveRecord::Migration[4.2]
   def self.up
     add_column :teams, :comment, :text
     add_column :teams, :advertise_for_partner, :boolean

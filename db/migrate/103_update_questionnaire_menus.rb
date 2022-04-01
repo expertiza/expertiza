@@ -1,4 +1,4 @@
-class UpdateQuestionnaireMenus < ActiveRecord::Migration
+class UpdateQuestionnaireMenus < ActiveRecord::Migration[4.2]
   def self.up
     site_controller = SiteController.find_by_name('tree_display')
 

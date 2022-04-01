@@ -1,4 +1,4 @@
-class MenuUpdateUsers < ActiveRecord::Migration
+class MenuUpdateUsers < ActiveRecord::Migration[4.2]
   def self.up
     permission = Permission.find_by_name('administer assignments')
     unless permission.nil?

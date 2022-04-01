@@ -1,4 +1,4 @@
-class ControllerUpdatePasswords < ActiveRecord::Migration
+class ControllerUpdatePasswords < ActiveRecord::Migration[4.2]
   def self.up
     controller = SiteController.find_by_name('auth')
     if controller

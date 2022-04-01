@@ -1,4 +1,4 @@
-class CreateParticipants < ActiveRecord::Migration
+class CreateParticipants < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'participants', force: true do |t|
       t.column 'submit_allowed', :boolean, default: true

@@ -1,4 +1,4 @@
-class ReviewBid < ActiveRecord::Base
+class ReviewBid < ApplicationRecord
   belongs_to :topic, class_name: 'SignUpTopic'
   belongs_to :participant, class_name: 'Participant'
   belongs_to :assignment, class_name: 'Assignment'

@@ -1,4 +1,4 @@
-class CreateTreeFolders < ActiveRecord::Migration
+class CreateTreeFolders < ActiveRecord::Migration[4.2]
   def self.up
     create_table :tree_folders do |t|
       t.column :name, :string

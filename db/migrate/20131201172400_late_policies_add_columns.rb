@@ -1,4 +1,5 @@
-class LatePoliciesAddColumns < ActiveRecord::Migration
+class LatePoliciesAddColumns < ActiveRecord::Migration[4.2]
+
   def self.up
     change_column :late_policies, :penalty_per_unit, :float
 

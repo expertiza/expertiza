@@ -1,5 +1,5 @@
-class MoveFiles < ActiveRecord::Migration
-  def self.up
+class MoveFiles < ActiveRecord::Migration[4.2]
+  def self.up    
     courses = Course.where(['not instructor_id is null'])
     courses.each do |course|
       if course.directory_path.nil?

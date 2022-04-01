@@ -1,4 +1,4 @@
-class CreateReviews < ActiveRecord::Migration
+class CreateReviews < ActiveRecord::Migration[4.2]
   # This table should have essentially the same format as review_of_reviews
   def self.up
     create_table :reviews do |t|

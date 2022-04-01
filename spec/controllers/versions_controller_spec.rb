@@ -44,7 +44,7 @@ describe VersionsController do
     it 'render show' do
       stub_current_user(admin, admin.role.name, admin.role)
       allow(Version).to receive(:find).with('1').and_return(version)
-      get 'show', id: 1
+      get 'show', params: {id: 1}
       expect(response).to render_template('show')
     end
 
@@ -54,7 +54,7 @@ describe VersionsController do
     it 'returns http success' do
       stub_current_user(admin, admin.role.name, admin.role)
       params = { id: 3 }
-      get 'search', params
+      get 'search', params: params
       expect(response).to be_success
     end
     it 'should render search template' do

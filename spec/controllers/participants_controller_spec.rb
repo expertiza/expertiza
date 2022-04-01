@@ -129,14 +129,14 @@ describe ParticipantsController do
       allow(Participant).to receive(:find).with('1').and_return(participant)
       params = { authorization: 'participant', id: 1 }
       session = { user: instructor }
-      get :update_authorizations, params, session
+      get :update_authorizations, params: params, session: session
       expect(response).to redirect_to('/participants/list?id=1&model=Assignment')
     end
     it 'updates the authorizations fails' do
       allow(Participant).to receive(:find).with('1').and_return(participant)
       params = { authorization: 'participant', id: 1 }
       session = { user: student }
-      get :update_authorizations, params, session
+      get :update_authorizations, params: params, session: session
       expect(flash[:error]).to eq 'A student is not allowed to update_authorizations this/these participants'
       expect(response).to redirect_to('/')
     end
@@ -148,7 +148,7 @@ describe ParticipantsController do
       allow(course_participant).to receive(:destroy).and_return(true)
       params = { id: 1 }
       session = { user: instructor }
-      post :destroy, params, session
+      post :destroy, params: params, session: session
       expect(response).to redirect_to('/participants/list?id=1&model=Course')
     end
   end
@@ -180,7 +180,7 @@ describe ParticipantsController do
       allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
       params = { id: 1, participant: { handle: 'new_handle' } }
       session = { user: student1 }
-      xhr :get, :change_handle, params, session
+      get :change_handle, params: params, session: session
       expect(response).to have_http_status(200)
     end
   end
@@ -191,7 +191,7 @@ describe ParticipantsController do
       allow(participant).to receive(:destroy).and_return(true)
       params = { id: 1 }
       session = { user: instructor }
-      get :delete, params, session
+      get :delete, params: params, session: session
       expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
     end
   end
@@ -201,7 +201,7 @@ describe ParticipantsController do
       allow(Assignment).to receive(:find).with('1').and_return(assignment)
       params = { id: 1 }
       session = { user: instructor }
-      get :view_copyright_grants, params, session
+      get :view_copyright_grants, params: params, session: session
       expect(response).to render_template('view_copyright_grants')
     end
   end
@@ -212,7 +212,7 @@ describe ParticipantsController do
       allow(Participant).to receive(:find).with('1').and_return(participant)
       params = { authorization: 'reviewer', id: 1 }
       session = { user: instructor }
-      get :update_authorizations, params, session
+      get :update_authorizations, params: params, session: session
       expect(flash[:success]).to eq 'The role of the selected participants has been successfully updated.'
       expect(participant.can_review).to eq(true)
       expect(participant.can_submit).to eq(false)
@@ -225,7 +225,7 @@ describe ParticipantsController do
       allow(participant).to receive(:update_attributes).and_raise(StandardError)
       params = { authorization: 'reviewer', id: 1 }
       session = { user: instructor }
-      get :update_authorizations, params, session
+      get :update_authorizations, params: params, session: session
       expect(flash[:error]).to eq 'The update action failed.'
     end
   end

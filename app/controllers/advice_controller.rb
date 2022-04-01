@@ -7,7 +7,6 @@ class AdviceController < ApplicationController
   # If any of the above condition are True, the edit_advice method calls adjust_advice_size of the QuestionnaireHelper class which adjust the advice sizes accordingly.
   # In the end, save_advice method is called which updates and saves the changes in the advices and displays the success/failure message.
 
-
   include AuthorizationHelper
   # If current user is TA then only current user can edit and update the advice
   def action_allowed?

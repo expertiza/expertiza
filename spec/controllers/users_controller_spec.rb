@@ -55,7 +55,7 @@ describe UsersController do
     	session = { user: student1 }
     	@params = {user: student1}
     	allow(controller).to receive(:params).and_return(@params)
-    	get :auto_complete_for_user_name, params: @params, session: session
+    	get :auto_complete_for_user_name, @params, session
     	expect(response).to redirect_to("http://test.host/")
     end  
   end

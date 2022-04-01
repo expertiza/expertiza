@@ -1,4 +1,4 @@
-class UpdateControllersPublishing < ActiveRecord::Migration
+class UpdateControllersPublishing < ActiveRecord::Migration[4.2]
   def self.up
     perm = Permission.find_by_name('do assignments')
 

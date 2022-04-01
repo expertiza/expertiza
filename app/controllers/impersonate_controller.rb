@@ -52,14 +52,14 @@ class ImpersonateController < ApplicationController
   def check_if_special_char
     if params[:user]
       if warn_for_special_chars(params[:user][:name], 'Username')
-        redirect_back
+        redirect_back fallback_location: root_path
         return
       end
     end
 
     if params[:impersonate]
       if warn_for_special_chars(params[:impersonate][:name], 'Username')
-        redirect_back
+        redirect_back fallback_location: root_path
         return
       end
     end
@@ -102,9 +102,9 @@ class ImpersonateController < ApplicationController
         end
       end
     end
-  rescue Exception
+  rescue StandardError
     flash[:error] = @message
-    redirect_to :back
+    redirect_back fallback_location: root_path
   end
 
   # Main operation
@@ -154,9 +154,9 @@ class ImpersonateController < ApplicationController
       AuthController.set_current_role(user.role_id, session)
       redirect_to action: AuthHelper.get_home_action(session[:user]),
                   controller: AuthHelper.get_home_controller(session[:user])
-    rescue Exception
+    rescue StandardError
       flash[:error] = @message
-      redirect_to :back
+      redirect_back fallback_location: root_path
     end
   end
 end

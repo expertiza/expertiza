@@ -1,4 +1,4 @@
-class UpdateParticipants < ActiveRecord::Migration
+class UpdateParticipants < ActiveRecord::Migration[4.2]
   def self.up
     add_column 'participants', 'grade', :float
     add_column 'participants', 'comments_to_student', :text

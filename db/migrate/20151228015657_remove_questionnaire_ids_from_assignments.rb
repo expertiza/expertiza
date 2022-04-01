@@ -1,4 +1,4 @@
-class RemoveQuestionnaireIdsFromAssignments < ActiveRecord::Migration
+class RemoveQuestionnaireIdsFromAssignments < ActiveRecord::Migration[4.2]
   def change
     execute 'alter table assignments drop foreign key `fk_assignments_review_of_review_questionnaires`;'
     execute 'alter table assignments drop foreign key `fk_assignments_review_questionnaires`;'

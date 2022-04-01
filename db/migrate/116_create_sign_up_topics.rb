@@ -1,4 +1,4 @@
-class CreateSignUpTopics < ActiveRecord::Migration
+class CreateSignUpTopics < ActiveRecord::Migration[4.2]
   def self.up
     create_table :sign_up_topics do |t|
       t.column :topic_name, :text, null: false

@@ -1,4 +1,4 @@
-class InitializeGoldberg < ActiveRecord::Migration
+class InitializeGoldberg < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'goldberg_permissions', force: true do |t|
       t.column 'name', :string, default: '', null: false

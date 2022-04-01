@@ -1,12 +1,11 @@
-"""
-Advice_controller first checks whether current user has TA privileges or not by implementing action_allowed? method. Secondly it sets the number of advices based on score and sort it in descending order. Then it checks four conditions for the advices.
-1. If number of advices is not equal to given advices
-2. If the sorted advices is empty
-3. If first advice score of sorted advices is NOT equal to max score
-4. If last advice score of sorted advices is NOT equal to min score
-If any of the above condition are True, the edit_advice method calls adjust_advice_size of the QuestionnaireHelper class which adjust the advice sizes accordingly.
-In the end, save_advice method is called which updates and saves the changes in the advices and displays the success/failure message.
-"""
+# Advice_controller first checks whether current user has TA privileges or not by implementing action_allowed? method. Secondly it sets the number of advices based on score and sort it in descending order. Then it checks four conditions for the advices.
+# 1. If number of advices is not equal to given advices
+# 2. If the sorted advices is empty
+# 3. If first advice score of sorted advices is NOT equal to max score
+# 4. If last advice score of sorted advices is NOT equal to min score
+# If any of the above condition are True, the edit_advice method calls adjust_advice_size of the QuestionnaireHelper class which adjust the advice sizes accordingly.
+# In the end, save_advice method is called which updates and saves the changes in the advices and displays the success/failure message.
+
 class AdviceController < ApplicationController
   include AuthorizationHelper
   # If current user is TA then only current user can edit and update the advice

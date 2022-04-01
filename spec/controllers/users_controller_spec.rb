@@ -55,7 +55,7 @@ describe UsersController do
     	session = { user: student1 }
     	@params = {user: student1}
     	allow(controller).to receive(:params).and_return(@params)
-    	get :auto_complete_for_user_name, @params, session
+    	get :auto_complete_for_user_name, params: @params, session: session
     	expect(response).to redirect_to("http://test.host/")
     end  
   end
@@ -106,6 +106,17 @@ describe UsersController do
     end
   end
 
+  context '#list' do
+    it 'checks that paginate_list does not fail with controller' do
+      expect{controller.list}.not_to raise_error
+    end
+
+    it 'checks that paginate_list does not fail with post' do
+      post :list
+      expect(response.status).to eq(200)
+    end
+  end
+	
   context '#show_if_authorized' do
     before(:each) do
       allow(User).to receive(:find).with(2).and_return(instructor)

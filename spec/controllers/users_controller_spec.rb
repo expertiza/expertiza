@@ -41,6 +41,25 @@ describe UsersController do
     end
   end
 
+  context '#auto_complete_for_user_name' do
+    it 'checks if auto_complete returns actionview error' do
+	stub_current_user(student1, student1.role.name, student1.role)
+    	session = { user: student1 }
+    	@params = {user: student1}
+    	allow(controller).to receive(:params).and_return(@params)
+    	expect{controller.auto_complete_for_user_name}.to raise_error(ActionView::Template::Error)
+    end
+
+    it 'checks if get auto_complete redirects to test host' do
+    	stub_current_user(student1, student1.role.name, student1.role)
+    	session = { user: student1 }
+    	@params = {user: student1}
+    	allow(controller).to receive(:params).and_return(@params)
+    	get :auto_complete_for_user_name, @params, session
+    	expect(response).to redirect_to("http://test.host/")
+    end  
+  end
+
   context '#set_anonymized_view' do
     it 'redirects to back' do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
@@ -60,6 +79,22 @@ describe UsersController do
       expect(controller.action_allowed?).to be false
     end
 
+    # checks if user has admin privileges when admin and when not admin
+    it 'admin list_pending_requested' do
+      params = { action: 'list_pending_requested' }
+      allow(controller).to receive(:params).and_return(params)
+      expect(controller.action_allowed?).to be false
+      stub_current_user(student7, student7.role.name, student7.role)
+      allow(controller).to receive(:params).and_return(params)
+      expect(controller.action_allowed?).to be false
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      allow(controller).to receive(:params).and_return(params)
+      expect(controller.action_allowed?).to be false
+      stub_current_user(admin, admin.role.name, admin.role)
+      allow(controller).to receive(:params).and_return(params)
+      expect(controller.action_allowed?).to be true
+    end
+
     # check there are no errors while setting anonymized view as a student
     it 'redirects to back' do
       stub_current_user(student7, student7.role.name, student7.role)
@@ -71,6 +106,17 @@ describe UsersController do
     end
   end
 
+  context '#list' do
+    it 'checks that paginate_list does not fail with controller' do
+      expect{controller.list}.not_to raise_error
+    end
+
+    it 'checks that paginate_list does not fail with post' do
+      post :list
+      expect(response.status).to eq(200)
+    end
+  end
+	
   context '#show_if_authorized' do
     before(:each) do
       allow(User).to receive(:find).with(2).and_return(instructor)
@@ -249,6 +295,23 @@ describe UsersController do
       get :edit, params: request_params, session: user_session
       expect(response).to render_template(:edit)
     end
+	  
+    it 'checks if role renders through edit' do
+      new_student = User.new
+      new_student = student1
+      new_student.role_id = nil  
+      allow(User).to receive(:find).with(any_args).and_return(new_student)
+      get :edit
+      expect(response).to render_template(:edit)
+    end
+	 
+    it 'checks if role fails through edit' do
+      new_student = User.new
+      new_student = student1
+      new_student.role_id = nil  
+      allow(User).to receive(:find).with(any_args).and_return(new_student)
+      expect{controller.edit}.not_to raise_error
+    end
   end
 
   context '#update' do
@@ -267,6 +330,49 @@ describe UsersController do
       post :update, params: request_params
       expect(response).to render_template(:edit)
     end
+  end
+	
+  context '#destroy' do
+    it 'check if user was successfully destroyed' do
+      allow(User).to receive(:find).with(any_args).and_return(student1)
+      allow(AssignmentParticipant).to receive(:delete).with(any_args).and_return(true)
+      allow(TeamsUser).to receive(:delete).with(any_args).and_return(true)
+      allow(AssignmentQuestionnaire).to receive(:destroy).with(any_args).and_return(true)
+      allow(User).to receive(:destroy).with(any_args).and_return(true)
+      post :destroy
+      expect(flash[:note]).to be_present
+    end
+
+    it 'check if user was not successfully destroyed' do
+      allow(User).to receive(:find).with(any_args).and_return(nil)
+      allow(AssignmentParticipant).to receive(:delete).with(any_args).and_return(true)
+      allow(TeamsUser).to receive(:delete).with(any_args).and_return(true)
+      allow(AssignmentQuestionnaire).to receive(:destroy).with(any_args).and_return(true)
+      allow(User).to receive(:destroy).with(any_args).and_return(true)
+      post :destroy
+      expect(flash[:error]).to be_present
+    end
+
+    it 'check if successful destroy leads to redirect' do
+      allow(User).to receive(:find).with(any_args).and_return(student1)
+      allow(AssignmentParticipant).to receive(:delete).with(any_args).and_return(true)
+      allow(TeamsUser).to receive(:delete).with(any_args).and_return(true)
+      allow(AssignmentQuestionnaire).to receive(:destroy).with(any_args).and_return(true)
+      allow(User).to receive(:destroy).with(any_args).and_return(true)
+      post :destroy
+      expect(response).to redirect_to :action=> :list
+    end
+
+    it 'check if error during destroy leads to redirect' do
+      allow(User).to receive(:find).with(any_args).and_return(nil)
+      allow(AssignmentParticipant).to receive(:delete).with(any_args).and_return(true)
+      allow(TeamsUser).to receive(:delete).with(any_args).and_return(true)
+      allow(AssignmentQuestionnaire).to receive(:destroy).with(any_args).and_return(true)
+      allow(User).to receive(:destroy).with(any_args).and_return(true)
+      post :destroy
+      expect(response).to redirect_to :action=> :list
+    end
+
   end
 
   context '#keys' do

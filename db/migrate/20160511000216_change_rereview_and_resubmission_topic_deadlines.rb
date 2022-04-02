@@ -1,4 +1,4 @@
-class ChangeRereviewAndResubmissionTopicDeadlines < ActiveRecord::Migration
+class ChangeRereviewAndResubmissionTopicDeadlines < ActiveRecord::Migration[4.2]
   def change
     resubmission_deadlines = TopicDeadline.where(deadline_type_id: 3)
     resubmission_deadlines.each do |resubmission_deadline|

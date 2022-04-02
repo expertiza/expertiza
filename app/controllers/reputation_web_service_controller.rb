@@ -45,7 +45,7 @@ class ReputationWebServiceController < ApplicationController
   #   query+="group by RM.id "+
   #   "order by RM.reviewee_id"
   #
-  #  result = ActiveRecord::Base.connection.select_all(query)
+  #  result = ApplicationRecord.connection.select_all(query)
   def db_query(assignment_id, round_num, has_topic, another_assignment_id = 0)
     raw_data_array = []
     assignment_ids = []
@@ -143,7 +143,7 @@ class ReputationWebServiceController < ApplicationController
 
   def send_post_request
     # https://www.socialtext.net/open/very_simple_rest_in_ruby_part_3_post_to_create_a_new_workspace
-    req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader: { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
+    req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', "", initheader: { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
     curr_assignment_id = (params[:assignment_id].empty? ? '724' : params[:assignment_id])
     req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
     req.body[0] = '' # remove the first '{'

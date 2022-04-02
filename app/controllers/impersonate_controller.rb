@@ -137,7 +137,7 @@ class ImpersonateController < ApplicationController
                   controller: AuthHelper.get_home_controller(session[:user])
     rescue StandardError
       flash[:error] = @message
-      redirect_to :back
+      redirect_back fallback_location: root_path
     end
   end
 

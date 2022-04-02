@@ -1,4 +1,4 @@
-class CreateQuestionTypes < ActiveRecord::Migration
+class CreateQuestionTypes < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'question_types', force: true do |t|
       t.column 'q_type', :string, null: false # the type of custom question

@@ -100,9 +100,6 @@ describe 'due_date_functions' do
 
     it 'next due date does not exist for staggered deadline' do
       assignment_id = create(:assignment, staggered_deadline: true, name: 'TestAssignment2', directory_path: 'TestAssignment2').id
-      due_date = create(:topic_due_date, deadline_type: @deadline_type,
-                                         submission_allowed_id: @deadline_right, review_allowed_id: @deadline_right,
-                                         review_of_review_allowed_id: @deadline_right, due_at: Time.zone.now + 5000, parent_id: assignment_id)
       expect(DueDate.get_next_due_date(assignment_id)).to be nil
     end
 

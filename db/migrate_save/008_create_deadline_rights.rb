@@ -1,4 +1,4 @@
-class CreateDeadlineRights < ActiveRecord::Migration
+class CreateDeadlineRights < ActiveRecord::Migration[4.2]
   def self.up
     create_table :deadline_rights do |t|
       t.column :name, :string, limit: 32

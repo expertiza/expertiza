@@ -1,4 +1,4 @@
-class CreateSignedUpUsers < ActiveRecord::Migration
+class CreateSignedUpUsers < ActiveRecord::Migration[4.2]
   def self.up
     create_table :signed_up_users do |t|
       t.column :topic_id, :integer, null: false

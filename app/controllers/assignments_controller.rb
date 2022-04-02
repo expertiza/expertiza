@@ -21,10 +21,6 @@ class AssignmentsController < ApplicationController
     @num_reviews_round = 0
   end
 
-  def assignment_by_name_and_course(name, course_id)
-    Assignment.find_by(name: name, course_id: course_id)
-  end
-
   # creates a new assignment via the assignment form
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
@@ -35,20 +31,23 @@ class AssignmentsController < ApplicationController
       find_existing_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
       if !find_existing_assignment && !find_existing_directory && @assignment_form.save # No existing names/directories
         @assignment_form.create_assignment_node
-        current_assignment = assignment_by_name_and_course(@assignment_form.assignment.name, @assignment_form.assignment.course_id)
-        assignment_form_params[:assignment][:id] = current_assignment.id.to_s
+        exist_assignment = Assignment.find(@assignment_form.assignment.id)
+        assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
+        if assignment_form_params[:assignment][:directory_path].blank?
+          assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
+        end
         ques_array = assignment_form_params[:assignment_questionnaire]
         due_array = assignment_form_params[:due_date]
         ques_array.each do |cur_questionnaire|
-          cur_questionnaire[:assignment_id] = current_assignment.id.to_s
+          cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
         end
         due_array.each do |cur_due|
-          cur_due[:parent_id] = current_assignment.id.to_s
+          cur_due[:parent_id] = exist_assignment.id.to_s
         end
         assignment_form_params[:assignment_questionnaire] = ques_array
         assignment_form_params[:due_date] = due_array
         @assignment_form.update(assignment_form_params, current_user)
-        aid = assignment_by_name_and_course(@assignment_form.assignment.name, @assignment_form.assignment.course_id).id
+        aid = Assignment.find(@assignment_form.assignment.id).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
         redirect_to edit_assignment_path aid
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
@@ -341,8 +340,6 @@ class AssignmentsController < ApplicationController
   # populates values and settings of the assignment for editing
   def edit_params_setting
     @assignment = Assignment.find(params[:id])
-    # store the assignment in session, it will be used to go back to assignment being created/edited, while creating new late policy.
-    session[:assignment] = @assignment
     @num_submissions_round = @assignment.find_due_dates('submission').nil? ? 0 : @assignment.find_due_dates('submission').count
     @num_reviews_round = @assignment.find_due_dates('review').nil? ? 0 : @assignment.find_due_dates('review').count
 
@@ -475,8 +472,8 @@ class AssignmentsController < ApplicationController
     params[:assignment_form][:assignment_questionnaire].reject! do |q|
       q[:questionnaire_id].empty?
     end
-
-    @due_date_info = DueDate.find_each(parent_id: params[:id])
+    # Deleting Due date info from table if meta-review is unchecked. - UNITY ID: ralwan and vsreeni
+    @due_date_info = DueDate.where(parent_id: params[:id])
     DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all if params[:metareview_allowed] == 'false'
   end
 

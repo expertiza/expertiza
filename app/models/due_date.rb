@@ -1,4 +1,4 @@
-class DueDate < ActiveRecord::Base
+class DueDate < ApplicationRecord
   validate :due_at_is_valid_datetime
   #  has_paper_trail
 

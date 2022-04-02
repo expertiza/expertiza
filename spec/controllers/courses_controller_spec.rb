@@ -85,7 +85,7 @@ describe CoursesController do
   describe '#auto_complete_for_user_name' do
     it 'should return a list of users' do
       allow(User).to receive(:find).with(:all, { conditions: [ 'LOWER(login) LIKE ?', '%test%' ], limit: 10 }).and_return([])
-      get :auto_complete_for_user_name, user: { login: 'test' }
+      get :auto_complete_for_user_name, params: {user: { login: 'test' }}
       expect(response).to be_redirect
     end
   end
@@ -103,7 +103,7 @@ describe CoursesController do
 
         params = { id: 1 }
         session = { user: instructor }
-        get :copy, params, session
+        get :copy, params: params, session: session
         expect(response).to redirect_to('/courses/edit')
       end
     end
@@ -139,7 +139,7 @@ describe CoursesController do
       allow(course).to receive(:instructor_id).and_return(1)
       params = { id: 1 }
       session = { instructor_id: 1 }
-      get :view_teaching_assistants, params, session
+      get :view_teaching_assistants, params: params, session: session
       expect(controller.instance_variable_get(:@ta_mappings)).to eq(nil)
     end
   end
@@ -156,7 +156,7 @@ describe CoursesController do
       allow(user).to receive(:save).and_return(true)
 
       params = { course_id: 1, user: { name: 'Teaching Assistant' } }
-      post :add_ta, params
+      post :add_ta, params: params
       expect(response).to be_redirect
     end
   end
@@ -173,7 +173,7 @@ describe CoursesController do
       allow(Course).to receive(:find).with('1').and_return(course)
 
       params = { id: 1 }
-      post :remove_ta, params
+      post :remove_ta, params: params
       expect(response).to be_redirect
     end
   end
@@ -184,7 +184,7 @@ describe CoursesController do
       allow(course).to receive(:set_course_fields).and_return(true)
       params = { id: 1 }
       session = { instructor_id: 1 }
-      post :set_course_fields, params, session
+      post :set_course_fields, params: params, session: session
       expect(response).to redirect_to('/')
     end
   end

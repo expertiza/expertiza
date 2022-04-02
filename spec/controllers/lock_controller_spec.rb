@@ -37,7 +37,7 @@ describe LockController do
           id: 123,
           type: 'test lockable'
         }
-        get :release_lock, @params
+        get :release_lock, params: @params
         expect(response).to redirect_to(request.env['HTTP_REFERER'] ? :back : :root)
       end
     end

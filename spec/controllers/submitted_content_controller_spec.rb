@@ -16,14 +16,14 @@ describe SubmittedContentController do
       it 'flashes error if a duplicate hyperlink is submitted' do
         allow(team).to receive(:hyperlinks).and_return(['google.com'])
         params = {submission: "google.com", id: 21}
-        response = get :submit_hyperlink, params
+        response = get :submit_hyperlink, params: params
         expect(response).to redirect_to(action: :edit, id: 1)
         expect(flash[:error]).to eq 'You or your teammate(s) have already submitted the same hyperlink.'
       end
       it 'flashes error if url is invalid' do
         allow(team).to receive(:hyperlinks).and_return([])
         params = {submission: "abc123", id: 21}
-        response = get :submit_hyperlink, params
+        response = get :submit_hyperlink, params: params
         expect(response).to redirect_to(action: :edit, id: 1)
         expect(flash[:error]).to be_present # not checking message content since it uses #{$ERROR_INFO}
       end
@@ -69,16 +69,22 @@ describe SubmittedContentController do
         stub_current_user(student1, student1.role.name, student1.role)
       end
       it 'flashes error for file exceeding size limit' do
-        params = {uploaded_file: Rack::Test::UploadedFile.new("#{Rails.root}/spec/fixtures/files/the-rspec-book_p2_1.pdf"),
+        allow(controller).to receive(:check_content_size).and_return(false)
+        file = Rack::Test::UploadedFile.new("#{Rails.root}/spec/fixtures/files/the-rspec-book_p2_1.pdf")
+        params = {uploaded_file: file,
                   id: 1}
-        response = get :submit_file, params
+        response = get :submit_file, params: params
         expect(response).to redirect_to(action: :edit, id: 1)
         expect(flash[:error]).to be_present # not checking message content since it uses variable size limit
       end
       it 'flashes error for file of unexpected type' do
-        params = {uploaded_file: Rack::Test::UploadedFile.new("#{Rails.root}/spec/fixtures/files/helloworld.c"),
+        allow(SubmittedContentController).to receive(:check_content_type_integrity).and_return(false)
+        allow(MimeMagic).to receive(:by_magic).and_return("not valid")
+        allow_any_instance_of(Rack::Test::UploadedFile::String).to receive(:read).and_return("")
+        file = Rack::Test::UploadedFile.new("#{Rails.root}/spec/fixtures/files/helloworld.c")
+        params = {uploaded_file: file,
                   id: 1}
-        response = get :submit_file, params
+        response = get :submit_file, params: params
         expect(response).to redirect_to(action: :edit, id: 1)
         expect(flash[:error]).to eq 'File type error'
       end
@@ -112,22 +118,22 @@ describe SubmittedContentController do
     context 'user downloads file' do
       it 'flashes error for nil folder name' do
         params = {folder_name: nil}
-        response = get :download, params
+        response = get :download, params: params
         expect(flash[:error]).to be_present # not checking message content since it uses exception message
       end
       it 'flashes error for nil file name' do
         params = {name: nil}
-        response = get :download, params
+        response = get :download, params: params
         expect(flash[:error]).to be_present # not checking message content since it uses exception message
       end
       it 'flashes error if attempt is to download entire folder' do
         params = {folder_name: 'test_directory', name: nil}
-        response = get :download, params
+        response = get :download, params: params
         expect(flash[:error]).to be_present # not checking message content since it uses exception message
       end
       it 'flashes error if file does not exist' do
         params = {folder_name: 'unlikely_dir_name', name: 'nonexistantfile.no'}
-        response = get :download, params
+        response = get :download, params: params
         expect(flash[:error]).to be_present #not checking message content since it uses exception message
       end
       it 'calls send for a valid file download' do

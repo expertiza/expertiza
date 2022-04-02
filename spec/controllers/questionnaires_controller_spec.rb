@@ -34,7 +34,7 @@ describe QuestionnairesController do
     let(:instructor) { build(:instructor, id: 1) }
     let(:ta) { build(:teaching_assistant, id: 10, parent_id: 66) }
 
-    context 'when params action is edit or update' do
+    context 'when request_params action is edit or update' do
       before(:each) do
         controller.params = { id: '1', action: 'edit' }
         controller.request.session[:user] = instructor
@@ -92,7 +92,7 @@ describe QuestionnairesController do
         end
       end
     end
-    context 'when params action is not edit and update' do
+    context 'when request_params action is not edit and update' do
       before(:each) do
         controller.params = { id: '1', action: 'new' }
       end
@@ -116,9 +116,9 @@ describe QuestionnairesController do
       allow(FolderNode).to receive(:find_by).with(node_object_id: 1).and_return(double('FolderNode', id: 1))
       allow(QuestionnaireNode).to receive(:find_or_create_by).with(parent_id: 1, node_object_id: 2).and_return(double('QuestionnaireNode'))
       allow_any_instance_of(QuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
-      params = { id: 1 }
-      session = { user: instructor }
-      get :copy, params, session
+      request_params = { id: 1 }
+      user_session = { user: instructor }
+      get :copy, params: request_params, session: user_session
       expect(response).to redirect_to('/questionnaires/view?id=2')
       expect(controller.instance_variable_get(:@questionnaire).name).to eq('Copy of ' + questionnaire.name)
       expect(controller.instance_variable_get(:@questionnaire).private).to eq false
@@ -133,41 +133,41 @@ describe QuestionnairesController do
   describe '#view' do
     it 'renders questionnaires#view page' do
       allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
-      params = { id: 1 }
-      get :view, params
+      request_params = { id: 1 }
+      get :view, params: request_params
       expect(response).to render_template(:view)
     end
   end
 
   describe '#new' do
-    context 'when params[:model] has whitespace in it' do
+    context 'when request_params[:model] has whitespace in it' do
       it 'creates new questionnaire object and renders questionnaires#new page' do
-        params = { model: 'Assignment SurveyQuestionnaire' }
-        get :new, params
+        request_params = { model: 'Assignment SurveyQuestionnaire' }
+        get :new, params: request_params
         expect(response).to render_template(:new)
       end
     end
 
-    context 'when params[:model] does not have whitespace in it' do
+    context 'when request_params[:model] does not have whitespace in it' do
       it 'creates new questionnaire object and renders questionnaires#new page' do
-        params = { model: 'ReviewQuestionnaire' }
-        get :new, params
+        request_params = { model: 'ReviewQuestionnaire' }
+        get :new, params: request_params
         expect(response).to render_template(:new)
       end
     end
 
     context 'when the questionnaire is a bookmark rating rubric' do
       it 'creates new questionnaire object and renders questionnaires#new page' do
-        params = { model: 'BookmarkRatingQuestionnaire' }
-        get :new, params
+        request_params = { model: 'BookmarkRatingQuestionnaire' }
+        get :new, params: request_params
         expect(response).to render_template(:new)
       end
     end
 
     context 'when the questionnaire is a bookmark rating rubric and has whitespace' do
       it 'creates new questionnaire object and renders questionnaires#new page' do
-        params = { model: 'Bookmark RatingQuestionnaire' }
-        get :new, params
+        request_params = { model: 'Bookmark RatingQuestionnaire' }
+        get :new, params: request_params
         expect(response).to render_template(:new)
       end
     end
@@ -175,17 +175,17 @@ describe QuestionnairesController do
 
   describe '#create' do
     it 'redirects to questionnaires#edit page after create a new questionnaire' do
-      params = { questionnaire: { name: 'test questionnaire',
+      request_params = { questionnaire: { name: 'test questionnaire',
                                   private: false,
                                   min_question_score: 0,
                                   max_question_score: 5,
                                   type: 'ReviewQuestionnaire' } }
-      session = { user: instructor }
+      user_session = { user: instructor }
       tree_folder = double('TreeFolder', id: 1)
       allow(TreeFolder).to receive_message_chain(:where, :first).with(['name like ?', 'Review']).with(no_args).and_return(tree_folder)
       allow(FolderNode).to receive(:find_by).with(node_object_id: 1).and_return(double('FolderNode', id: 1))
       allow(QuestionnaireNode).to receive(:create).with(parent_id: 1, node_object_id: 1, type: 'QuestionnaireNode').and_return(double('QuestionnaireNode'))
-      post :create, params, session
+      post :create, params: request_params, session: user_session
       expect(flash[:success]).to eq('You have successfully created a questionnaire!')
       expect(response).to redirect_to('/questionnaires/1/edit')
       expect(controller.instance_variable_get(:@questionnaire).private).to eq false
@@ -207,19 +207,19 @@ describe QuestionnairesController do
 
       context 'when questionnaire type is not QuizQuestionnaire' do
         it 'redirects to submitted_content#edit page' do
-          params = { aid: 1,
+          request_params = { aid: 1,
                      pid: 1,
                      questionnaire: { name: review_questionnaire.name,
                                       type: review_questionnaire.type } }
           # create_questionnaire
           allow(ReviewQuestionnaire).to receive(:new).with(any_args).and_return(review_questionnaire)
-          session = { user: build(:teaching_assistant, id: 1) }
+          user_session = { user: build(:teaching_assistant, id: 1) }
           allow(Ta).to receive(:get_my_instructor).with(1).and_return(6)
           # save
           allow(TreeFolder).to receive(:find_by).with(name: 'Review').and_return(double('TreeFolder', id: 1))
           allow(FolderNode).to receive(:find_by).with(node_object_id: 1).and_return(double('FolderNode'))
           allow_any_instance_of(QuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
-          post :create_questionnaire, params, session
+          post :create_questionnaire, params: request_params, session: user_session
           expect(flash[:note]).to be nil
           expect(response).to redirect_to('/tree_display/list')
           expect(controller.instance_variable_get(:@questionnaire).private).to eq false
@@ -237,9 +237,9 @@ describe QuestionnairesController do
     context 'when @questionnaire is not nil' do
       it 'renders the questionnaires#edit page' do
         allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', instructor_id: 6))
-        session = { user: instructor }
-        params = { id: 1 }
-        get :edit, params, session
+        user_session = { user: instructor }
+        request_params = { id: 1 }
+        get :edit, params: request_params, session: user_session
         expect(response).to render_template(:edit)
       end
     end
@@ -247,9 +247,9 @@ describe QuestionnairesController do
     context 'when @questionnaire is nil' do
       it 'redirects to root page' do
         allow(Questionnaire).to receive(:find).with('666').and_return(nil)
-        session = { user: instructor }
-        params = { id: 666 }
-        get :edit, params, session
+        user_session = { user: instructor }
+        request_params = { id: 666 }
+        get :edit, params: request_params, session: user_session
         expect(response).to redirect_to('/')
       end
     end
@@ -259,7 +259,7 @@ describe QuestionnairesController do
     before(:each) do
       @questionnaire1 = double('Questionnaire', id: 1)
       allow(Questionnaire).to receive(:find).with('1').and_return(@questionnaire1)
-      @params = { id: 1,
+      @request_params = { id: 1,
                   questionnaire: { name: 'test questionnaire',
                                    instructor_id: 6,
                                    private: 0,
@@ -268,7 +268,7 @@ describe QuestionnairesController do
                                    type: 'ReviewQuestionnaire',
                                    display_type: 'Review',
                                    instructor_loc: '' } }
-      @params_with_question = { id: 1,
+      @request_params_with_question = { id: 1,
                                 questionnaire: { name: 'test questionnaire',
                                                  instructor_id: 6,
                                                  private: 0,
@@ -287,8 +287,8 @@ describe QuestionnairesController do
     context 'successfully updates the attributes of questionnaire' do
       it 'redirects to questionnaires#edit page after updating' do
         allow(@questionnaire1).to receive(:update_attributes).with(any_args).and_return(true)
-        # need complete params hash to handle strong parameters
-        post :update, @params
+        # need complete request_params hash to handle strong parameters
+        post :update, params: @request_params
         expect(flash[:success]).to eq 'The questionnaire has been successfully updated!'
         expect(response).to redirect_to('/questionnaires/1/edit')
       end
@@ -297,7 +297,7 @@ describe QuestionnairesController do
     context 'have some errors when updating the attributes of questionnaire' do
       it 'redirects to questionnaires#edit page after updating' do
         allow(@questionnaire1).to receive(:update_attributes).with(any_args).and_raise('This is an error!')
-        post :update, @params
+        post :update, params: @request_params
         expect(flash[:error].to_s).to eq 'This is an error!'
         expect(response).to redirect_to('/questionnaires/1/edit')
       end
@@ -308,29 +308,29 @@ describe QuestionnairesController do
         allow(Question).to receive(:find).with('1').and_return(question)
         allow(question).to receive(:save).and_return(true)
         allow(@questionnaire1).to receive(:update_attributes).with(any_args).and_return(true)
-        post :update, @params_with_question
+        post :update, params: @request_params_with_question
         expect(flash[:success]).to eq('The questionnaire has been successfully updated!')
         expect(response).to redirect_to('/questionnaires/1/edit')
       end
     end
 
-    context 'when params[:view_advice] is not nil' do
+    context 'when request_params[:view_advice] is not nil' do
       it 'redirects to advice#edit_advice page' do
-        params = { id: 1,
+        request_params = { id: 1,
                    view_advice: true }
-        post :update, params
+        post :update, params: request_params
         expect(response).to redirect_to('/advice/edit_advice/1')
       end
     end
 
-    context 'when params[:add_new_questions] is not nil' do
+    context 'when request_params[:add_new_questions] is not nil' do
       it 'redirects to questionnaire#add_new_questions' do
-        params = { id: 1,
+        request_params = { id: 1,
                    add_new_questions: true,
                    new_question: { total_num: 2,
                                    type: 'Criterion' } }
-        post :update, params
-        expect(response).to redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
+        post :update, params: request_params
+        expect(response).to redirect_to action: 'add_new_questions', id: request_params[:id], question: request_params[:new_question]
       end
     end
   end
@@ -343,8 +343,8 @@ describe QuestionnairesController do
                                 assignments: [double('Assignment',
                                                      name: 'test assignment')])
         allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
-        params = { id: 1 }
-        get :delete, params
+        request_params = { id: 1 }
+        get :delete, params: request_params
         expect(flash[:error]).to eq('The assignment <b>test assignment</b> uses this questionnaire. Are sure you want to delete the assignment?')
         expect(response).to redirect_to('/tree_display/list')
       end
@@ -358,8 +358,8 @@ describe QuestionnairesController do
                                 questions: [double('Question',
                                                    answers: [double('Answer')])])
         allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
-        params = { id: 1 }
-        get :delete, params
+        request_params = { id: 1 }
+        get :delete, params: request_params
         expect(flash[:error]).to eq('There are responses based on this rubric, we suggest you do not delete it.')
         expect(response).to redirect_to('/tree_display/list')
       end
@@ -381,8 +381,8 @@ describe QuestionnairesController do
         allow(questionnaire_node).to receive(:delete).and_return(true)
         allow(questionnaire1).to receive(:delete).and_return(true)
         allow_any_instance_of(QuestionnairesController).to receive(:undo_link).with(any_args).and_return(true)
-        params = { id: 1 }
-        get :delete, params
+        request_params = { id: 1 }
+        get :delete, params: request_params
         expect(flash[:error]).to eq nil
         expect(response).to redirect_to('/tree_display/list')
       end
@@ -398,10 +398,10 @@ describe QuestionnairesController do
         allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', id: 1, questions: [criterion]))
         allow_any_instance_of(Array).to receive(:ids).and_return([2]) # need to stub since .ids isn't recognized in the context of testing
         allow(question).to receive(:save).and_return(true)
-        params = { id: 1,
+        request_params = { id: 1,
                    question: { total_num: 2,
                                type: 'Criterion' } }
-        post :add_new_questions, params
+        post :add_new_questions, params: request_params
         expect(response).to redirect_to('/questionnaires/1/edit')
       end
     end
@@ -411,10 +411,10 @@ describe QuestionnairesController do
         allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', id: 1, questions: [dropdown]))
         allow_any_instance_of(Array).to receive(:ids).and_return([3]) # need to stub since .ids isn't recognized in the context of testing
         allow(question).to receive(:save).and_return(true)
-        params = { id: 1,
+        request_params = { id: 1,
                    question: { total_num: 2,
                                type: 'Dropdown' } }
-        post :add_new_questions, params
+        post :add_new_questions, params: request_params
         expect(response).to redirect_to('/questionnaires/1/edit')
       end
     end
@@ -423,10 +423,10 @@ describe QuestionnairesController do
       it 'AnswerHelper.in_active_period should be called to check if this change is in the period.' do
         allow(AnswerHelper).to receive(:in_active_period).with('1').and_return(false)
         expect(AnswerHelper).to receive(:in_active_period).with('1')
-        params = { id: 1,
+        request_params = { id: 1,
                    question: { total_num: 2,
                                type: 'Criterion' } }
-        post :add_new_questions, params
+        post :add_new_questions, params: request_params
       end
     end
 
@@ -435,20 +435,20 @@ describe QuestionnairesController do
         allow(AnswerHelper).to receive(:in_active_period).with('1').and_return(true)
         allow(AnswerHelper).to receive(:delete_existing_responses).with([], '1')
         expect(AnswerHelper).to receive(:delete_existing_responses).with([], '1')
-        params = { id: 1,
+        request_params = { id: 1,
                    question: { total_num: 2,
                                type: 'Criterion' } }
-        post :add_new_questions, params
+        post :add_new_questions, params: request_params
       end
     end
   end
 
   describe '#save_all_questions' do
-    context 'when params[:save] is not nil, params[:view_advice] is nil' do
+    context 'when request_params[:save] is not nil, params: request_params[:view_advice] is nil' do
       it 'redirects to questionnaires#edit page after saving all questions' do
         allow(Question).to receive(:find).with('1').and_return(question)
         allow(question).to receive(:save).and_return(true)
-        params = { id: 1,
+        request_params = { id: 1,
                    save: true,
                    question: { '1' => { seq: 66.0,
                                         txt: 'WOW',
@@ -456,18 +456,18 @@ describe QuestionnairesController do
                                         size: '50,3',
                                         max_label: 'Strong agree',
                                         min_label: 'Not agree' } } }
-        post :save_all_questions, params
+        post :save_all_questions, params: request_params
         expect(flash[:success]).to eq('All questions have been successfully saved!')
         expect(response).to redirect_to('/questionnaires/1/edit')
       end
     end
 
-    context 'when params[:save] is nil, params[:view_advice] is not nil' do
+    context 'when request_params[:save] is nil, params: request_params[:view_advice] is not nil' do
       it 'redirects to advice#edit_advice page' do
-        params = { id: 1,
+        request_params = { id: 1,
                    view_advice: true,
                    question: {} }
-        post :save_all_questions, params
+        post :save_all_questions, params: request_params
         expect(response).to redirect_to('/advice/edit_advice/1')
       end
     end

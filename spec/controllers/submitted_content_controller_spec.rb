@@ -58,8 +58,8 @@ describe SubmittedContentController do
       it 'renders edit template' do
         allow(AssignmentParticipant).to receive(:find).and_return(participant)
         stub_current_user(instructor1, instructor1.role.name, instructor1.role)
-        params = {id: 1}
-        response = get :submit_file, params 
+        request_params = { id: 1 }
+        response = get :submit_file, params: request_params
         expect(response).to redirect_to(action: :edit, id: 1)
       end
     end

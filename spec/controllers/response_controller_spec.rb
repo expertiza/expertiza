@@ -41,7 +41,7 @@ describe ResponseController do
   end
 
   describe '#action_allowed?' do
-    context 'when params action is edit' do
+    context 'when request_params action is edit' do
       before(:each) do
         controller.params = { id: '1', action: 'edit' }
       end
@@ -60,7 +60,7 @@ describe ResponseController do
       end
     end
 
-    context 'when params action is delete or update' do
+    context 'when request_params action is delete or update' do
       context 'when current_user is the reviewer of the response' do
         it 'allows certain action' do
           controller.params = { id: '1', action: 'update' }
@@ -69,7 +69,7 @@ describe ResponseController do
       end
     end
 
-    context 'when params action is view' do
+    context 'when request_params action is view' do
       context 'when response_map is a ReviewResponseMap and current user is the instructor of current assignment' do
         it 'allows certain action' do
           controller.params = { id: '1', action: 'view' }
@@ -82,16 +82,16 @@ describe ResponseController do
   describe '#delete' do
     it 'deletes current response and redirects to response#redirect page' do
       allow(review_response).to receive(:delete).and_return(review_response)
-      params = { id: 1 }
-      post :delete, params
+      request_params = { id: 1 }
+      post :delete, params: request_params
       expect(response).to redirect_to('/response/redirect?id=1&msg=The+response+was+deleted.')
     end
 
     it 'Redirects away if another user has a lock on the resource' do
       allow(team_response).to receive(:delete).and_return(team_response)
       allow(Lock).to receive(:get_lock).and_return(nil)
-      params = { id: 2 }
-      post :delete, params
+      request_params = { id: 2 }
+      post :delete, params: request_params
       expect(response).not_to redirect_to('/response/redirect?id=2&msg=The+response+was+deleted.')
     end
   end
@@ -107,8 +107,8 @@ describe ResponseController do
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire])
       allow(Answer).to receive(:where).with(response_id: 1, question_id: 1).and_return([answer])
-      params = { id: 1, return: 'assignment_edit' }
-      get :edit, params
+      request_params = { id: 1, return: 'assignment_edit' }
+      get :edit, params: request_params
       expect(controller.instance_variable_get(:@review_scores)).to eq([answer])
       expect(controller.instance_variable_get(:@dropdown_or_scale)).to eq('dropdown')
       expect(controller.instance_variable_get(:@min)).to eq(0)
@@ -118,8 +118,8 @@ describe ResponseController do
 
     it 'does not render the page if the user does not have a lock on the response' do
       allow(Lock).to receive(:get_lock).and_return(nil)
-      params = { id: 2, return: 'assignment_edit' }
-      get :edit, params
+      request_params = { id: 2, return: 'assignment_edit' }
+      get :edit, params: request_params
       expect(response).not_to render_template(:response)
     end
   end
@@ -128,21 +128,21 @@ describe ResponseController do
     context 'when something is wrong during response updating' do
       it 'raise an error and redirects to response#save page' do
         allow(review_response).to receive(:update_attribute).with('additional_comment', 'some comments').and_raise('ERROR!')
-        params = {
+        request_params = {
           id: 1,
           review: {
             comments: 'some comments'
           }
         }
-        session = { user: instructor }
-        post :update, params, session
-        expect(response).to redirect_to('/response/save?id=1&msg=Your+response+was+not+saved.+Cause%3A189+ERROR%21&review%5Bcomments%5D=some+comments')
+        user_session = { user: instructor }
+        post :update, params: request_params, session: user_session
+        expect(response).to redirect_to('/response/save?id=1&msg=Your+response+was+not+saved.+Cause%3A189+ERROR%21')
       end
 
       it 'Does not allow a user to update a response if a lock exists on the response' do
         allow(ResponseMap).to receive(:find).with(2).and_return(team_response_map)
         allow(Lock).to receive(:get_lock).and_return(nil)
-        params = {
+        request_params = {
           id: 2,
           review: {
             comments: 'some comments'
@@ -152,9 +152,9 @@ describe ResponseController do
           },
           isSubmit: 'No'
         }
-        session = { user: instructor }
-        post :update, params, session
-        expect(response).not_to redirect_to('/response/save?id=1&msg=&review%5Bcomments%5D=some+comments')
+        user_session = { user: instructor }
+        post :update, params: request_params, session: user_session
+        expect(response).not_to redirect_to('/response/save?id=1&msg=')
       end
     end
 
@@ -169,7 +169,7 @@ describe ResponseController do
         allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire)
         allow(Answer).to receive(:create).with(response_id: 1, question_id: 1, answer: '98', comments: 'LGTM').and_return(answer)
         allow(answer).to receive(:update_attribute).with(any_args).and_return('OK!')
-        params = {
+        request_params = {
           id: 1,
           review: {
             comments: 'some comments'
@@ -179,9 +179,9 @@ describe ResponseController do
           },
           isSubmit: 'No'
         }
-        session = { user: instructor }
-        post :update, params, session
-        expect(response).to redirect_to('/response/save?id=1&msg=&review%5Bcomments%5D=some+comments')
+        user_session = { user: instructor }
+        post :update, params: request_params, session: user_session
+        expect(response).to redirect_to('/response/save?id=1&msg=')
       end
     end
   end
@@ -194,12 +194,12 @@ describe ResponseController do
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow(AssignmentDueDate).to receive(:find_by).with(any_args).and_return(assignment_due_date)
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
-      params = {
+      request_params = {
         id: 1,
         feedback: '',
         return: ''
       }
-      get :new, params
+      get :new, params: request_params
       expect(controller.instance_variable_get(:@dropdown_or_scale)).to eq('dropdown')
       expect(controller.instance_variable_get(:@min)).to eq(0)
       expect(controller.instance_variable_get(:@max)).to eq(5)
@@ -212,9 +212,9 @@ describe ResponseController do
       it 'redirects to response#new page' do
         allow(AssignmentParticipant).to receive(:where).with(user_id: 6, parent_id: 1).and_return([participant])
         allow(FeedbackResponseMap).to receive(:where).with(reviewed_object_id: 1, reviewer_id: 1).and_return([])
-        params = { id: 1 }
-        session = { user: instructor }
-        get :new_feedback, params, session
+        request_params = { id: 1 }
+        user_session = { user: instructor }
+        get :new_feedback, params: request_params, session: user_session
         expect(response).to redirect_to('/response/new?id=2&return=feedback')
       end
     end
@@ -222,10 +222,10 @@ describe ResponseController do
     context 'when current response is not nil' do
       it 'redirects to previous page' do
         allow(Response).to receive(:find).with('2').and_return(nil)
-        params = { id: 2 }
-        session = { user: instructor }
+        request_params = { id: 2 }
+        user_session = { user: instructor }
         request.env['HTTP_REFERER'] = 'www.google.com'
-        get :new_feedback, params, session
+        get :new_feedback, params: request_params, session: user_session
         expect(response).to redirect_to('www.google.com')
       end
     end
@@ -242,8 +242,8 @@ describe ResponseController do
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire])
       allow(Answer).to receive(:where).with(response_id: 1, question_id: 1).and_return([answer])
-      params = { id: 1, return: 'assignment_edit' }
-      get :view, params
+      request_params = { id: 1, return: 'assignment_edit' }
+      get :view, params: request_params
       expect(controller.instance_variable_get(:@dropdown_or_scale)).to eq('dropdown')
       expect(controller.instance_variable_get(:@min)).to eq(0)
       expect(controller.instance_variable_get(:@max)).to eq(5)
@@ -259,7 +259,7 @@ describe ResponseController do
       allow(Answer).to receive(:create).with(response_id: 1, question_id: 1, answer: '98', comments: 'LGTM').and_return(answer)
       allow(answer).to receive(:update_attribute).with(any_args).and_return('OK!')
       allow_any_instance_of(Response).to receive(:email).and_return('OK!')
-      params = {
+      request_params = {
         id: 1,
         review: {
           questionnaire_id: '1',
@@ -271,8 +271,8 @@ describe ResponseController do
         },
         isSubmit: 'No'
       }
-      post :create, params
-      expect(response).to redirect_to('/response/save?error_msg=&id=1&msg=Your+response+was+successfully+saved.&review%5Bcomments%5D=no+comment&review%5Bquestionnaire_id%5D=1&review%5Bround%5D=1')
+      post :create, params: request_params
+      expect(response).to redirect_to('/response/save?error_msg=&id=1&msg=Your+response+was+successfully+saved.')
     end
   end
 
@@ -280,12 +280,12 @@ describe ResponseController do
     it 'save current response map and redirects to response#redirect page' do
       allow(ResponseMap).to receive(:find).with('1').and_return(review_response_map)
       allow(review_response_map).to receive(:save).and_return(review_response_map)
-      params = {
+      request_params = {
         id: 1,
         return: ''
       }
-      session = { user: instructor }
-      post :save, params, session
+      user_session = { user: instructor }
+      post :save, params: request_params, session: user_session
       expect(response).to redirect_to('/response/redirect?id=1&return=')
     end
   end
@@ -293,70 +293,70 @@ describe ResponseController do
   describe '#redirect' do
     before(:each) do
       allow(Response).to receive(:find_by).with(map_id: '1').and_return(review_response)
-      @params = { id: 1 }
+      @request_params = { id: 1 }
     end
 
-    context 'when params[:return] is bookmark' do
+    context 'when request_params[:return] is bookmark' do
       it 'redirects to bookmarks#list page' do
         allow(Bookmark).to receive(:find).with(1).and_return(bookmark)
-        @params[:return] = 'bookmark'
-        get :redirect, @params
+        @request_params[:return] = 'bookmark'
+        get :redirect, params: @request_params
         expect(response).to redirect_to('/bookmarks/list?id=1')
       end
     end
 
-    context 'when params[:return] is feedback' do
+    context 'when request_params[:return] is feedback' do
       it 'redirects to grades#view_my_scores page' do
-        @params[:return] = 'feedback'
-        get :redirect, @params
+        @request_params[:return] = 'feedback'
+        get :redirect, params: @request_params
         expect(response).to redirect_to('/grades/view_my_scores?id=1')
       end
     end
 
-    context 'when params[:return] is teammate' do
+    context 'when request_params[:return] is teammate' do
       it 'redirects to student_teams#view page' do
-        @params[:return] = 'teammate'
-        get :redirect, @params
+        @request_params[:return] = 'teammate'
+        get :redirect, params: @request_params
         expect(response).to redirect_to('/student_teams/view?student_id=1')
       end
     end
 
-    context 'when params[:return] is instructor' do
+    context 'when request_params[:return] is instructor' do
       it 'redirects to grades#view page' do
-        @params[:return] = 'instructor'
-        get :redirect, @params
+        @request_params[:return] = 'instructor'
+        get :redirect, params: @request_params
         expect(response).to redirect_to('/grades/view?id=1')
       end
     end
 
-    context 'when params[:return] is assignment_edit' do
+    context 'when request_params[:return] is assignment_edit' do
       it 'redirects to assignment#edit page' do
-        @params[:return] = 'assignment_edit'
-        get :redirect, @params
+        @request_params[:return] = 'assignment_edit'
+        get :redirect, params: @request_params
         expect(response).to redirect_to('/assignments/1/edit')
       end
     end
 
-    context 'when params[:return] is selfreview' do
+    context 'when request_params[:return] is selfreview' do
       it 'redirects to submitted_content#edit page' do
-        @params[:return] = 'selfreview'
-        get :redirect, @params
+        @request_params[:return] = 'selfreview'
+        get :redirect, params: @request_params
         expect(response).to redirect_to('/submitted_content/1/edit')
       end
     end
 
-    context 'when params[:return] is survey' do
+    context 'when request_params[:return] is survey' do
       it 'redirects to response#pending_surveys page' do
-        @params[:return] = 'survey'
-        get :redirect, @params
+        @request_params[:return] = 'survey'
+        get :redirect, params: @request_params
         expect(response).to redirect_to('/survey_deployment/pending_surveys')
       end
     end
 
-    context 'when params[:return] is other content' do
+    context 'when request_params[:return] is other content' do
       it 'redirects to student_review#list page' do
-        @params[:return] = 'other'
-        get :redirect, @params
+        @request_params[:return] = 'other'
+        get :redirect, params: @request_params
         expect(response).to redirect_to('/student_review/list?id=1')
       end
     end

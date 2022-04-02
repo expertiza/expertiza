@@ -1,4 +1,4 @@
-class AddIsSubmittedToResponses < ActiveRecord::Migration
+class AddIsSubmittedToResponses < ActiveRecord::Migration[4.2]
   def self.up
     add_column :responses, :isSubmitted, :string, null: true
   rescue StandardError

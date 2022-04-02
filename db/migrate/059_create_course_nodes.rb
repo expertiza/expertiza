@@ -1,4 +1,4 @@
-class CreateCourseNodes < ActiveRecord::Migration
+class CreateCourseNodes < ActiveRecord::Migration[4.2]
   def self.up
     courses = Course.all
 

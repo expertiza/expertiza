@@ -22,9 +22,9 @@ describe JoinTeamRequestsController do
       it 'redirects to' do
         # Stubbing an object to receive .all method to give list of index
         allow(JoinTeamRequest).to receive(:all).and_return(join_team_request1)
-        params = { action: 'index' }
-        session = { user: ta }
-        result = get :index, params, session
+        request_params = { action: 'index' }
+        user_session = { user: ta }
+        result = get :index, params: request_params, session: user_session
         expect(result.status).to eq 302
       end
     end
@@ -32,9 +32,9 @@ describe JoinTeamRequestsController do
       it 'routes to index page' do
         # Stubbing an object to receive .all method to give list of index
         allow(JoinTeamRequest).to receive(:all).and_return(join_team_request1)
-        params = { action: 'index' }
-        session = { user: admin }
-        result = get :index, params, session
+        request_params = { action: 'index' }
+        user_session = { user: admin }
+        result = get :index, params: request_params, session: user_session
         expect(result.status).to eq 200
       end
     end
@@ -44,9 +44,9 @@ describe JoinTeamRequestsController do
     context 'when show is valid' do
       it 'will show particular student team given index' do
         allow(JoinTeamRequest).to receive(:find).and_return(join_team_request2)
-        params = { action: 'show' }
-        session = { user: ta }
-        result = get :show, params, session
+        request_params = { action: 'show' }
+        user_session = { user: ta }
+        result = get :show, params: request_params, session: user_session
         # status code 200: Request succeeded
         expect(result.status).to eq 200
       end
@@ -72,9 +72,9 @@ describe JoinTeamRequestsController do
     context 'when creating new join team request is not saved!' do
       it 'will render #new page' do
         allow(JoinTeamRequest).to receive(:new).and_return(invalidrequest)
-        params = { participant_id: participant.id, team_id: -2 }
-        session = { user: student1 }
-        get :new, params, session
+        request_params = { participant_id: participant.id, team_id: -2 }
+        user_session = { user: student1 }
+        get :new, params: request_params, session: user_session
         expect(response).to render_template('new')
       end
     end
@@ -89,7 +89,7 @@ describe JoinTeamRequestsController do
       end
       it "will change the status to 'P' " do
         allow(join_team_request2).to receive(:save).and_return(true)
-        params = {
+        request_params = {
           id: 2,
           join_team_request2: {
             status: 'P'
@@ -97,8 +97,8 @@ describe JoinTeamRequestsController do
           team_id: 1,
           assignment_id: 1
         }
-        session = { user: student1 }
-        post :create, params, session
+        user_session = { user: student1 }
+        post :create, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(response.status).to eq 302
         expect(join_team_request2.status).to eq('P')
@@ -107,9 +107,9 @@ describe JoinTeamRequestsController do
     context 'when it is not created' do
       it 'will page for new ' do
         allow(join_team_request2).to receive(:save).and_return(false)
-        params = { action: 'new' }
-        session = { user: student1 }
-        get :new, params, session
+        request_params = { action: 'new' }
+        user_session = { user: student1 }
+        get :new, params: request_params, session: user_session
         # status code 200: Request succeeded
         expect(response.status).to eq 200
       end
@@ -128,7 +128,7 @@ describe JoinTeamRequestsController do
       it 'will update the :comments parameter only' do
         allow(Participant).to receive(:find).with('1').and_return(participant)
         allow(Team).to receive(:find).with('2').and_return(team2)
-        params = {
+        request_params = {
           action: 'update',
           id: 2,
           join_team_request2: {
@@ -136,7 +136,7 @@ describe JoinTeamRequestsController do
           }
         }
         # Updating "Comments" in the join team request object
-        put :update, params
+        put :update, params: request_params
         # status code 302: Redirect url
         expect(response.status).to eq 302
       end
@@ -151,16 +151,16 @@ describe JoinTeamRequestsController do
         allow(join_team_request2).to receive(:save).and_return(true)
       end
       it "will change status to 'D'" do
-        params = { action: 'decline' }
-        session = { user: ta }
-        result = get :decline, params, session
+        request_params = { action: 'decline' }
+        user_session = { user: ta }
+        result = get :decline, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq 302
       end
       it 'will redirect to view student teams path' do
-        params = { action: 'decline' }
-        session = { user: ta }
-        result = get :decline, params, session
+        request_params = { action: 'decline' }
+        user_session = { user: ta }
+        result = get :decline, params: request_params, session: user_session
         expect(result).to redirect_to(view_student_teams_path)
       end
     end
@@ -171,9 +171,9 @@ describe JoinTeamRequestsController do
       it 'will redirect to join team request page' do
         allow(JoinTeamRequest).to receive(:find).and_return(join_team_request2)
         allow(join_team_request2).to receive(:destroy).and_return(true)
-        params = { action: 'destroy' }
-        session = { user: ta }
-        result = get :destroy, params, session
+        request_params = { action: 'destroy' }
+        user_session = { user: ta }
+        result = get :destroy, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(join_team_requests_url)

@@ -135,4 +135,23 @@ describe 'assignment submisstion test' do
     click_on 'Upload file'
     expect(page).to have_content 'File type error'
   end
+
+  describe "notification of reviewers" do
+    it "does not notify the reviewer/s when no reviews have been submitted" do
+      signup_topic
+      attach_file('uploaded_file',
+                  Rails.root + "spec/features/assignment_submission_files/valid_assignment_file.jpg")
+      expect { click_on 'Upload file' }.to change { ActionMailer::Base.deliveries.count }.by(0)
+    end
+
+    it "notifies the reviewer/s who have reviewed the previous submission of the new submission" do
+      signup_topic
+      reviewer = AssignmentParticipant.find_by(user: User.find_by(name: "student2065")) # An arbitrary reviewer on the assignment
+      create(:review_response_map, reviewer: reviewer) # a reviewer submits a review for this team
+      attach_file('uploaded_file',
+                  Rails.root + "spec/features/assignment_submission_files/valid_assignment_file.jpg")
+      expect { click_on 'Upload file' }.to change { ActionMailer::Base.deliveries.count }.by(1)
+    end
+  end
+
 end

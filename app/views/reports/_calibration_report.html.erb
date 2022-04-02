@@ -9,7 +9,7 @@ th, td {
 	<% max_question_score = @assignment_questionnaire.questionnaire.max_question_score %>
 	<% current_responses = @responses.select{|response|response.response_map.reviewee_id == response_map.reviewee_id} %>
 	<% response_ids = [] %>
-	<% current_responses.each { |curr_response|response_ids << curr_response.id } %>
+	<% current_responses.each { |curr_response| response_ids << curr_response.id } %>
 	<% participant_num = current_responses.count %>
 	
 	<h3> <%= "Calibration #{index+1} (team name:  #{team.name(session[:ip])})" %></h3>
@@ -24,7 +24,7 @@ th, td {
 				<% end %>
 			</tr>
 			<tr>
-				<td> % of students </td>
+				<td> Number of students </td>
 				<% max_count = 0 %>
 				<% count_hash = {} %>
 				<% (min_question_score..max_question_score).each do |answer| %>
@@ -37,9 +37,9 @@ th, td {
 					<% css_class = get_css_style_for_calibration_report(answer - instructor_answer) %>
 					<td class=<%= css_class %>>
 						<% if count == max_count %>
-							<b><%= (count * 100.0 / participant_num).round(2).to_s + '%' %></b>
+							<b><%= count.to_s %></b>
 						<% else %>
-							<%= (count * 100.0 / participant_num).round(2).to_s + '%' %>
+							<%= count.to_s %>
 						<% end %>
 					</td>
 				<% end %>

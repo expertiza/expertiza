@@ -45,7 +45,7 @@ class ReputationWebServiceController < ApplicationController
   #   query+="group by RM.id "+
   #   "order by RM.reviewee_id"
   #
-  #  result = ActiveRecord::Base.connection.select_all(query)
+  #  result = ApplicationRecord.connection.select_all(query)
   def db_query(assignment_id, round_num, has_topic, another_assignment_id = 0)
     raw_data_array = []
     assignment_ids = []
@@ -57,7 +57,7 @@ class ReputationWebServiceController < ApplicationController
       topic_condition = ((has_topic && (SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false)) || !has_topic)
       last_valid_response = response_map.response.select { |r| r.round == round_num }.max
       valid_response = [last_valid_response] unless last_valid_response.nil?
-      next unless (topic_condition == true) && !valid_response.nil? && !valid_response.empty?
+      next unless topic_condition && valid_response && !valid_response.empty?
 
       valid_response.each do |response|
         answers = Answer.where(response_id: response.id)
@@ -68,7 +68,7 @@ class ReputationWebServiceController < ApplicationController
                              end
         temp_sum = 0
         weight_sum = 0
-        valid_answer = answers.select { |a| (a.question.type == 'Criterion') && !a.answer.nil? }
+        valid_answer = answers.select { |a| (a.question.type == 'Criterion') && a.answer }
         next if valid_answer.empty?
 
         valid_answer.each do |answer|
@@ -143,7 +143,7 @@ class ReputationWebServiceController < ApplicationController
 
   def send_post_request
     # https://www.socialtext.net/open/very_simple_rest_in_ruby_part_3_post_to_create_a_new_workspace
-    req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader: { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
+    req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', "", initheader: { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
     curr_assignment_id = (params[:assignment_id].empty? ? '724' : params[:assignment_id])
     req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
     req.body[0] = '' # remove the first '{'

@@ -30,9 +30,9 @@ describe CoursesController do
     context 'when @course is not nil' do
       it 'renders the course#edit page' do
         allow(Course).to receive(:find).with('1').and_return(double('Course', instructor_id: 6))
-        session = { user: instructor }
-        params = { id: 1 }
-        get :edit, params, session
+        user_session = { user: instructor }
+        request_params = { id: 1 }
+        get :edit, params: request_params, session: user_session
         expect(response).to render_template(:edit)
       end
     end
@@ -42,18 +42,18 @@ describe CoursesController do
     it 'deletes the course and redirects to tree_display#list page' do
       allow(Course).to receive(:find).with('1').and_return(course)
       allow(course).to receive(:destroy).and_return(true)
-      params = { id: 1 }
-      session = { user: instructor }
-      post :delete, params, session
+      request_params = { id: 1 }
+      user_session = { user: instructor }
+      post :delete, params: request_params, session: user_session
       expect(response).to redirect_to('/tree_display/list')
     end
   end
 
   describe '#new' do
     it 'sets the private instance variable' do
-      params = { private: 1 }
-      session = { user: instructor }
-      get :new, params, session
+      request_params = { private: 1 }
+      user_session = { user: instructor }
+      get :new, params: request_params, session: user_session
       expect(controller.instance_variable_get(:@private)).to eq('1')
     end
   end
@@ -75,9 +75,9 @@ describe CoursesController do
     it 'checks updated is saved' do
       allow(Course).to receive(:find).with('1').and_return(course)
       allow(course).to receive(:destroy).and_return(true)
-      params = { id: 1 }
-      session = { instructor_id: 1 }
-      post :update, params, session
+      request_params = { id: 1 }
+      user_session = { instructor_id: 1 }
+      post :update, params: request_params, session: user_session
       expect(response).to be_redirect
     end
   end

@@ -29,10 +29,10 @@ describe LatePoliciesController do
     end
     context 'when show is called' do
       it 'routes to show page' do
-        params = {
+        request_params = {
           id: 1
         }
-        get :show, params
+        get :show, params: request_params
         expect(get: 'late_policies/1').to route_to('late_policies#show', id: '1')
       end
     end
@@ -49,10 +49,10 @@ describe LatePoliciesController do
     end
     context 'when edit is called' do
       it 'returns Late policy object' do
-        params = {
+        request_params = {
           id: 1
         }
-        get :edit, params
+        get :edit, params: request_params
         expect(assigns(:penalty_policy).policy_name).to eq('Policy2')
       end
     end
@@ -73,10 +73,10 @@ describe LatePoliciesController do
 
   describe 'delete #destroy' do
     it 'when destroy is called' do
-      params = {
+      request_params = {
         id: 1
       }
-      delete :new, params
+      delete :new, params: request_params
       expect(get: 'late_policies/destroy/1').to route_to('late_policies#destroy', id: '1')
     end
   end
@@ -88,14 +88,14 @@ describe LatePoliciesController do
         allow(latePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
       end
       it 'throws a flash error ' do
-        params = {
+        request_params = {
           late_policy: {
             max_penalty: 10,
             penalty_per_unit: 30,
             policy_name: 'Policy1'
           }
         }
-        post :create, params
+        post :create, params: request_params
         expect(flash[:error]).to eq('The maximum penalty cannot be less than penalty per unit.')
         expect(response).to redirect_to('/late_policies/new')
       end
@@ -107,14 +107,14 @@ describe LatePoliciesController do
         allow(latePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
       end
       it 'throws a flash error ' do
-        params = {
+        request_params = {
           late_policy: {
             max_penalty: 101,
             penalty_per_unit: 30,
             policy_name: 'Policy1'
           }
         }
-        post :create, params
+        post :create, params: request_params
         expect(flash[:error]).to eq('Maximum penalty cannot be greater than or equal to 100')
         expect(response).to redirect_to('/late_policies/new')
       end
@@ -125,14 +125,14 @@ describe LatePoliciesController do
         allow(LatePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
       end
       it 'throws a flash error ' do
-        params = {
+        request_params = {
           late_policy: {
             max_penalty: 30,
             penalty_per_unit: -10,
             policy_name: 'Invalid_Policy'
           }
         }
-        post :create, params
+        post :create, params: request_params
         expect(flash[:error]).to eq('The following error occurred while saving the late policy: ')
       end
     end
@@ -143,14 +143,14 @@ describe LatePoliciesController do
         allow(LatePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(true)
       end
       it 'throws a flash error ' do
-        params = {
+        request_params = {
           late_policy: {
             max_penalty: 30,
             penalty_per_unit: 10,
             policy_name: 'Policy1'
           }
         }
-        post :create, params
+        post :create, params: request_params
         expect(flash[:error]).to eq('A policy with the same name already exists.')
       end
     end
@@ -167,14 +167,14 @@ describe LatePoliciesController do
         allow(latePolicy).to receive(:save!).and_return(false)
       end
       it 'throws a flash error ' do
-        params = {
+        request_params = {
           late_policy: {
             max_penalty: 40,
             penalty_per_unit: 30,
             policy_name: 'Policy1'
           }
         }
-        post :create, params
+        post :create, params: request_params
         expect(flash[:error]).to eq('The following error occurred while saving the late policy: ')
       end
     end
@@ -192,7 +192,7 @@ describe LatePoliciesController do
     end
     context 'when maximum penalty is less than penalty per unit' do
       it 'throws a flash error ' do
-        params = {
+        request_params = {
           late_policy: {
             max_penalty: 30,
             penalty_per_unit: 100,
@@ -200,7 +200,7 @@ describe LatePoliciesController do
           },
           id: 1
         }
-        post :update, params
+        post :update, params: request_params
         expect(flash[:error]).to eq('Cannot edit the policy. The maximum penalty cannot be less than penalty per unit.')
         expect(response).to redirect_to('/late_policies/1/edit')
       end
@@ -211,7 +211,7 @@ describe LatePoliciesController do
         allow(LatePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(true)
       end
       it 'throws a flash error ' do
-        params = {
+        request_params = {
           late_policy: {
             max_penalty: 30,
             penalty_per_unit: 10,
@@ -219,7 +219,7 @@ describe LatePoliciesController do
           },
           id: 1
         }
-        post :update, params
+        post :update, params: request_params
         expect(flash[:error]).to eq('Cannot edit the policy. A policy with the same name Policy1 already exists.')
       end
     end
@@ -229,7 +229,7 @@ describe LatePoliciesController do
         allow(LatePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
       end
       it 'throws a flash error ' do
-        params = {
+        request_params = {
           late_policy: {
             max_penalty: 30,
             penalty_per_unit: 10,
@@ -237,7 +237,7 @@ describe LatePoliciesController do
           },
           id: 1
         }
-        post :update, params
+        post :update, params: request_params
         expect(flash[:error]).to eq('The following error occurred while updating the late policy: ')
       end
     end

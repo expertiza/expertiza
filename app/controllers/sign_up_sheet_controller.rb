@@ -400,7 +400,9 @@ class SignUpSheetController < ApplicationController
 
   # This method is called when a student click on the trumpet icon. So this is a bad method name. --Yang
   def show_team
-    if !(assignment = Assignment.find(params[:assignment_id])).nil? && !(topic = SignUpTopic.find(params[:id])).nil?
+    assignment = Assignment.find(params[:assignment_id])
+    topic = SignUpTopic.find(params[:id])
+    if assignment && topic
       @results = ad_info(assignment.id, topic.id)
       @results.each do |result|
         result.keys.each do |key|
@@ -446,7 +448,6 @@ class SignUpSheetController < ApplicationController
     @sign_up_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
     if @sign_up_topic.save
       undo_link "The topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
-      # Akshay - correctly changing the redirection url to topics tab in edit assignment view.
       redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + '#tabs-2'
     else
       render action: 'new', id: params[:id]
@@ -455,11 +456,11 @@ class SignUpSheetController < ApplicationController
 
   def update_existing_topic(topic)
     topic.topic_identifier = params[:topic][:topic_identifier]
-    update_max_choosers topic
+    update_max_choosers(topic)
     topic.category = params[:topic][:category]
     # topic.assignment_id = params[:id]
     topic.save
-    redirect_to_sign_up params[:id]
+    redirect_to_sign_up(params[:id])
   end
 
   def update_max_choosers(topic)
@@ -469,38 +470,34 @@ class SignUpSheetController < ApplicationController
     # it.
     if SignedUpTeam.find_by(topic_id: topic.id).nil? || topic.max_choosers == params[:topic][:max_choosers]
       topic.max_choosers = params[:topic][:max_choosers]
+    elsif topic.max_choosers.to_i < params[:topic][:max_choosers].to_i
+      topic.update_waitlisted_users params[:topic][:max_choosers]
+      topic.max_choosers = params[:topic][:max_choosers]
     else
-      if topic.max_choosers.to_i < params[:topic][:max_choosers].to_i
-        topic.update_waitlisted_users params[:topic][:max_choosers]
-        topic.max_choosers = params[:topic][:max_choosers]
-      else
-        flash[:error] = 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'
-      end
+      flash[:error] = 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'
     end
   end
 
   # get info related to the ad for partners so that it can be displayed when an assignment_participant
   # clicks to see ads related to a topic
   def ad_info(_assignment_id, topic_id)
-    # List that contains individual result object
-    @result_list = []
-    # Get the results
-    @results = SignedUpTeam.where('topic_id = ?', topic_id.to_s)
+    @ad_information = []
+    @signed_up_teams = SignedUpTeam.where(topic_id: topic_id)
     # Iterate through the results of the query and get the required attributes
-    @results.each do |result|
-      team = result.team
-      topic = result.topic
-      resultMap = {}
-      resultMap[:team_id] = team.id
-      resultMap[:comments_for_advertisement] = team.comments_for_advertisement
-      resultMap[:name] = team.name
-      resultMap[:assignment_id] = topic.assignment_id
-      resultMap[:advertise_for_partner] = team.advertise_for_partner
+    @signed_up_teams.each do |signed_up_team|
+      team = signed_up_team.team
+      topic = signed_up_team.topic
+      ad_map = {}
+      ad_map[:team_id] = team.id
+      ad_map[:comments_for_advertisement] = team.comments_for_advertisement
+      ad_map[:name] = team.name
+      ad_map[:assignment_id] = topic.assignment_id
+      ad_map[:advertise_for_partner] = team.advertise_for_partner
 
       # Append to the list
-      @result_list.append(resultMap)
+      @ad_information.append(ad_map)
     end
-    @result_list
+    @ad_information
   end
 
   def delete_signup_for_topic(assignment_id, topic_id, user_id)

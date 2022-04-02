@@ -50,7 +50,7 @@ describe ImpersonateController do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: super_admin.name } }
       @session = { user: instructor }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       expect(session[:impersonate]).to be nil
     end
 
@@ -60,7 +60,7 @@ describe ImpersonateController do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: admin.name } }
       @session = { user: instructor }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       expect(session[:impersonate]).to be nil
     end
 
@@ -70,7 +70,7 @@ describe ImpersonateController do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: teaching_assistant.name } }
       @session = { user: instructor }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       expect(session[:super_user]).to eq instructor
       expect(session[:user]).to eq teaching_assistant
       expect(session[:original_user]).to eq instructor
@@ -84,7 +84,7 @@ describe ImpersonateController do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: student1.name } }
       @session = { user: teaching_assistant }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       expect(session[:super_user]).to eq teaching_assistant
       expect(session[:user]).to eq student1
       expect(session[:original_user]).to eq teaching_assistant
@@ -98,7 +98,7 @@ describe ImpersonateController do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: instructor.name } }
       @session = { user: teaching_assistant }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       expect(session[:impersonate]).to be nil
     end
 
@@ -109,7 +109,7 @@ describe ImpersonateController do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: admin.name } }
       @session = { user: teaching_assistant }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       expect(session[:impersonate]).to be nil
     end
 
@@ -120,7 +120,7 @@ describe ImpersonateController do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: super_admin.name } }
       @session = { user: teaching_assistant }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       expect(session[:impersonate]).to be nil
     end
 
@@ -131,7 +131,7 @@ describe ImpersonateController do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: student1.name } }
       @session = { user: admin }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       expect(session[:super_user]).to eq admin
       expect(session[:user]).to eq student1
       expect(session[:original_user]).to eq admin
@@ -145,7 +145,7 @@ describe ImpersonateController do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: teaching_assistant.name } }
       @session = { user: admin }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       expect(session[:super_user]).to eq admin
       expect(session[:user]).to eq teaching_assistant
       expect(session[:original_user]).to eq admin
@@ -159,7 +159,7 @@ describe ImpersonateController do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: instructor.name } }
       @session = { user: admin }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       expect(session[:super_user]).to eq admin
       expect(session[:user]).to eq instructor
       expect(session[:original_user]).to eq admin
@@ -173,7 +173,7 @@ describe ImpersonateController do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: super_admin.name } }
       @session = { user: admin }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       expect(session[:impersonate]).to be nil
     end
 
@@ -184,7 +184,7 @@ describe ImpersonateController do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: student1.name } }
       @session = { user: super_admin }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       expect(session[:super_user]).to eq super_admin
       expect(session[:user]).to eq student1
       expect(session[:original_user]).to eq super_admin
@@ -198,7 +198,7 @@ describe ImpersonateController do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: teaching_assistant.name } }
       @session = { user: super_admin }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       expect(session[:super_user]).to eq super_admin
       expect(session[:user]).to eq teaching_assistant
       expect(session[:original_user]).to eq super_admin
@@ -212,7 +212,7 @@ describe ImpersonateController do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: instructor.name } }
       @session = { user: super_admin }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       expect(session[:super_user]).to eq super_admin
       expect(session[:user]).to eq instructor
       expect(session[:original_user]).to eq super_admin
@@ -226,7 +226,7 @@ describe ImpersonateController do
       request.env['HTTP_REFERER'] = 'http://www.example.com'
       @params = { user: { name: admin.name } }
       @session = { user: super_admin }
-      post :impersonate, @params, @session
+      post :impersonate, params: @params, session: @session
       expect(session[:super_user]).to eq super_admin
       expect(session[:user]).to eq admin
       expect(session[:original_user]).to eq super_admin

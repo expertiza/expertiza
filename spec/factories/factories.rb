@@ -3,6 +3,16 @@ FactoryBot.define do
     name 'North Carolina State University'
   end
 
+  factory :markup_style, class: MarkupStyle do
+    name 'Duy Test'
+  end 
+
+  factory :lock, class: Lock do
+    lockable_id 123
+    lockable_type 'Duy lockable test'
+    user_id 1234
+  end 
+
   factory :review_bid, class: ReviewBid do
     priority 2
     signuptopic_id 123

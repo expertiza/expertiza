@@ -1,4 +1,4 @@
-class InitialSetup < ActiveRecord::Migration
+class InitialSetup < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'markup_styles', force: false do |t|
       t.column 'name', :string, default: '', null: false

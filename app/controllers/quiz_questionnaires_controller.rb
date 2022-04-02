@@ -53,10 +53,10 @@ class QuizQuestionnairesController < QuestionnairesController
 
       if @questionnaire.min_question_score < 0 || @questionnaire.max_question_score < 0
         flash[:error] = 'Minimum and/or maximum question score cannot be less than 0.'
-        redirect_to :back
+        redirect_back fallback_location: root_path
       elsif @questionnaire.max_question_score < @questionnaire.min_question_score
         flash[:error] = 'Maximum question score cannot be less than minimum question score.'
-        redirect_to :back
+        redirect_back fallback_location: root_path
       else
         @successful_create = true
         save
@@ -66,7 +66,7 @@ class QuizQuestionnairesController < QuestionnairesController
       end
     else
       flash[:error] = valid.to_s
-      redirect_to :back
+      redirect_back fallback_location: root_path
     end
   end
 
@@ -90,7 +90,7 @@ class QuizQuestionnairesController < QuestionnairesController
     end
     if params['save'] && params[:question].try(:keys)
       @questionnaire.update_attributes(questionnaire_params)
-      params[:question].each_key do |qid|
+      params[:question].each_pair do |qid, _|
         @question = Question.find(qid)
         @question.txt = params[:question][qid.to_sym][:txt]
         @question.weight = params[:question_weights][qid.to_sym][:txt]
@@ -263,7 +263,7 @@ class QuizQuestionnairesController < QuestionnairesController
     questions.each do |question|
       q_type = params[:question_type][question_num.to_s][:type]
       q_answer_choices = params[:new_choices][question_num.to_s][q_type]
-      q_answer_choices.each_key do |choice_key|
+      q_answer_choices.each_pair do |choice_key, _|
         question_factory(q_type, question, choice_key, q_answer_choices) # allow factory method to create appropriate question
       end
       question_num += 1

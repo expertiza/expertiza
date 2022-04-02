@@ -1,4 +1,4 @@
-class CreateSuggestionComments < ActiveRecord::Migration
+class CreateSuggestionComments < ActiveRecord::Migration[4.2]
   def self.up
     create_table :suggestion_comments do |t|
       t.column :comments, :text

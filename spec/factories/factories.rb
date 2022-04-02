@@ -714,7 +714,6 @@ FactoryBot.define do
     commenter 'oss topic'
     vote 'Y'
     suggestion_id 1
-    visible_to_student 0
   end
 
   factory :answer_tag, class: AnswerTag do

@@ -7,21 +7,39 @@ describe SubmittedContentController do
   let(:participant) { build(:participant, id: 1, user_id: 21) }
   let(:assignment) { build(:assignment, id: 1) }
   describe '#action_allowed?' do
-    context 'when user does not have right privilege, it denies action' do
-      it 'for no user' do
+    context 'current user is not authorized' do
+      it 'does not allow action for no user' do
         expect(controller.send(:action_allowed?)).to be false
       end
-      it 'for student' do
+      it 'does not allow action for student without authorizations' do
         allow(controller).to receive(:current_user).and_return(build(:student))
         expect(controller.send(:action_allowed?)).to be false
       end
     end
-    context 'when user has right privilege, it allows action' do
-      it 'for admin' do
+    context 'current user has needed privileges' do
+      it 'allows edit action for student with needed authorizations' do
+        stub_current_user(student1, student1.role.name, student1.role)
+        allow(controller).to receive(:are_needed_authorizations_present?).and_return(true)
+        controller.params = {action: 'edit'}
+        expect(controller.send(:action_allowed?)).to be true
+      end
+      it 'allows submit file action for students with team that can submit' do
+        stub_current_user(student1, student1.role.name, student1.role)
+        allow(controller).to receive(:one_team_can_submit_work?).and_return(true)
+        controller.params = {action: 'submit_file'}
+        expect(controller.send(:action_allowed?)).to be true
+      end
+      it 'allows submit hyperlink action for students with team that can submit' do
+        stub_current_user(student1, student1.role.name, student1.role)
+        allow(controller).to receive(:one_team_can_submit_work?).and_return(true)
+        controller.params = {action: 'submit_hyperlink'}
+        expect(controller.send(:action_allowed?)).to be true
+      end
+      it 'allows action for admin' do
         stub_current_user(admin, admin.role.name, admin.role)
         expect(controller.send(:action_allowed?)).to be true
       end
-      it 'for super_admin' do
+      it 'allows action for super admin' do
         stub_current_user(super_admin, super_admin.role.name, super_admin.role)
         expect(controller.send(:action_allowed?)).to be true
       end
@@ -103,8 +121,7 @@ describe SubmittedContentController do
       it 'flashes error for file exceeding size limit' do
         allow(controller).to receive(:check_content_size).and_return(false)
         file = Rack::Test::UploadedFile.new("#{Rails.root}/spec/fixtures/files/the-rspec-book_p2_1.pdf")
-        params = {uploaded_file: file,
-                  id: 1}
+        params = {uploaded_file: file, id: 1}
         response = get :submit_file, params: params
         expect(response).to redirect_to(action: :edit, id: 1)
         expect(flash[:error]).to be_present # not checking message content since it uses variable size limit

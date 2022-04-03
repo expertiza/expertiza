@@ -19,7 +19,7 @@ describe SubmissionRecordsController do
       allow(Assignment).to receive(:find).with(any_args).and_return(assignment)
       allow(SubmissionRecord).to receive(:where).with(any_args).and_return([submission_record])
 
-      result = get :index, params
+      result = get :index, params: params
       expect(result.status).to eq 302
 
       controller.send(:index)

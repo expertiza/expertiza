@@ -44,12 +44,14 @@ describe ProfileController do
         allow(instructor1).to receive(:update_attributes).with(any_args).and_return(true)
         allow(instructor1).to receive(:save!).and_return(true)
         params = {
-          id: 1,
-          no_show_action: 'not_show_actions'
+          user: {
+            id: 1,
+            no_show_action: 'not_show_actions'
+          }
         }
-        post :update, params
+        post :update, params: params
         expect(flash[:success]).to eq('Your profile was successfully updated.')
-        expect(response).to redirect_to('/profile/1/edit')
+        expect(response).to redirect_to('/profile/edit')
       end
     end
 
@@ -60,16 +62,18 @@ describe ProfileController do
         allow(instructor1).to receive(:update_attributes).with(any_args).and_return(true)
         allow(instructor1).to receive(:save!).and_return(true)
         allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])
-
         params = {
-          id: 1,
-          no_show_action: 'not_show_actions',
-          assignment_questionnaire: { 'assignment_id' => '1', 'questionnaire_id' => '666', 'dropdown' => 'true',
-                                      'questionnaire_weight' => '0', 'notification_limit' => '15', 'used_in_round' => '1' }
+          user: {
+            id: 1,
+            no_show_action: 'not_show_actions',
+            assignment_questionnaire: { 'assignment_id' => '1', 'questionnaire_id' => '666', 'dropdown' => 'true',
+                                      'questionnaire_weight' => '0', 'notification_limit' => '15', 'used_in_round' => '1' 
+                                      }
+          }
         }
-        post :update, params
+        post :update, params: params
         expect(flash[:success]).to eq('Your profile was successfully updated.')
-        expect(response).to redirect_to('/profile/1/edit')
+        expect(response).to redirect_to('/profile/edit')
       end
     end
 
@@ -79,11 +83,13 @@ describe ProfileController do
         stub_current_user(instructor1, instructor1.role.name, instructor1.role)
         allow(instructor1).to receive(:update_attributes).with(any_args).and_return(false)
         params = {
-          id: 1
+          user: { 
+            id: 1
+          }
         }
-        post :update, params
+        post :update, params: params
         expect(flash[:error]).to eq('An error occurred and your profile could not updated.')
-        expect(response).to redirect_to('/profile/1/edit')
+        expect(response).to redirect_to('/profile/edit')
       end
     end
 

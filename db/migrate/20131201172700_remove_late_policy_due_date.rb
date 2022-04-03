@@ -1,4 +1,4 @@
-class RemoveLatePolicyDueDate < ActiveRecord::Migration
+class RemoveLatePolicyDueDate < ActiveRecord::Migration[4.2]
   def self.up
     execute 'ALTER TABLE due_dates DROP FOREIGN KEY `fk_due_date_late_policies`;'
     remove_column :due_dates, :late_policy_id

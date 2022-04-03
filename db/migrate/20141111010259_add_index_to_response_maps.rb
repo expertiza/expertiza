@@ -1,4 +1,4 @@
-class AddIndexToResponseMaps < ActiveRecord::Migration
+class AddIndexToResponseMaps < ActiveRecord::Migration[4.2]
   def self.up
     # add_index :response_maps, :reviewee_id
     # add_index :response_maps, :reviewer_id

@@ -1,4 +1,4 @@
-class CreateSurveyResponses < ActiveRecord::Migration
+class CreateSurveyResponses < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'survey_responses', force: true do |t|
       t.column 'score', :integer, limit: 8

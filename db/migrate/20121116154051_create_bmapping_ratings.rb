@@ -1,4 +1,4 @@
-class CreateBmappingRatings < ActiveRecord::Migration
+class CreateBmappingRatings < ActiveRecord::Migration[4.2]
   def self.up
     if table_exists?(:bmapping_ratings) == false
       create_table :bmapping_ratings do |t|

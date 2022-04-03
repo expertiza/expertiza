@@ -1,4 +1,4 @@
-class CreateLatePolicies < ActiveRecord::Migration
+class CreateLatePolicies < ActiveRecord::Migration[4.2]
   def self.up
     create_table :late_policies do |t|
       # t.column :name, :string

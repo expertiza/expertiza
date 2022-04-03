@@ -1,4 +1,4 @@
-class CreateDropDueDate < ActiveRecord::Migration
+class CreateDropDueDate < ActiveRecord::Migration[4.2]
   def self.up
     DeadlineType.create name: 'drop topic'
   end

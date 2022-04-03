@@ -52,7 +52,7 @@ describe BadgesController do
         allow(Badge).to receive(:new).and_return(badge)
         params = {}
         session = { user: instructor1 }
-        get :new, params, session
+        get :new, params: params, session: session
         expect(response).to render_template('new')
       end
     end
@@ -97,7 +97,7 @@ describe BadgesController do
         session[:return_to] ||= 'http://test.host/assignments/844/edit'
         allow(Badge).to receive(:get_id_from_name).with('test').and_return(badge)
         allow(Badge).to receive(:get_image_name_from_name).with('test').and_return(badge)
-        post :create, params, session, "file" => @file
+        post :create, params: params, session: session
         expect(response).to redirect_to 'http://test.host/assignments/844/edit'
       end
     end
@@ -106,20 +106,18 @@ describe BadgesController do
       
       #verify error thrown when image file is missing and redirect to new template
       it 'throws an error for missing image file' do
-        @file = nil
         session = { user: instructor1 }
         params = {
           badge:{
             name: 'test',
             description: 'test badge',
-            image_name: 'test.png',
-          image_file: @file
+            image_name: 'test.png'
           }
         }
         session[:return_to] ||= 'http://test.host/assignments/844/edit'
         allow(Badge).to receive(:get_id_from_name).with('test').and_return(badge)
         allow(Badge).to receive(:get_image_name_from_name).with('test').and_return(badge)
-        post :create, params, session, "file" => @file
+        post :create, params: params, session: session
         expect(response).to render_template('new')
       end
     
@@ -139,7 +137,7 @@ describe BadgesController do
         session[:return_to] ||= 'http://test.host/assignments/844/edit'
         allow(Badge).to receive(:get_id_from_name).with('test').and_return(badge)
         allow(Badge).to receive(:get_image_name_from_name).with('test').and_return(badge)
-        post :create, params, session, "file" => @file
+        post :create, params: params, session: session
         expect(response).to render_template('new')
       end
     
@@ -159,7 +157,7 @@ describe BadgesController do
         session[:return_to] ||= 'http://test.host/assignments/844/edit'
         allow(Badge).to receive(:get_id_from_name).with('test').and_return(badge)
         allow(Badge).to receive(:get_image_name_from_name).with('test').and_return(badge)
-        post :create, params, session, "file" => @file
+        post :create, params: params, session: session
         expect(response).to render_template('new')   
       end
     end

@@ -52,7 +52,7 @@ describe PublishingController do
       it 'displays all the assignment participants' do
           stub_current_user(student1, student1.role.name, student1.role)
           params = { id: 21 }
-          get :view, params
+          get :view, params: params
           expect(assigns(:user)).to eq(student1)
         end
       end
@@ -66,7 +66,7 @@ describe PublishingController do
         allow(AssignmentParticipant).to receive(:find).with('1').and_return(assignment_participant1)
         stub_current_user(student1, student1.role.name, student1.role)
         params ={id: 1, allow: 1}
-        post :set_publish_permission, params
+        post :set_publish_permission, params: params
         expect(response).to redirect_to(action: :grant)
       end
     end
@@ -79,7 +79,7 @@ describe PublishingController do
         allow(AssignmentParticipant).to receive(:find).with('1').and_return(assignment_participant1)
         allow(assignment_participant1).to receive(:update_attribute).and_return(true)
         params ={id: 1, allow: '0'}
-        post :set_publish_permission, params
+        post :set_publish_permission, params: params
         expect(response).to redirect_to(action: :view)
       end
     end
@@ -93,7 +93,7 @@ describe PublishingController do
         allow(AssignmentParticipant).to receive(:find).with('3').and_return(assignment_participant2)
         stub_current_user(student1, student1.role.name, student1.role)
         params ={id: 3}
-        get :grant, params
+        get :grant, params: params
         expect(assigns(:user)).to eq(student1)
       end
     end
@@ -113,7 +113,7 @@ describe PublishingController do
           allow(participant).to receive(:verify_digital_signature).with(any_args).and_return(true)
           allow(participant).to receive(:assign_copyright).with(any_args).and_raise('The private key you inputted was invalid.', StandardError)
         end
-        post :grant_with_private_key, params
+        post :grant_with_private_key, params: params
         expect(flash[:notice]).to eq('The private key you inputted was invalid.')
         expect(response).to redirect_to(action: :grant)
       end
@@ -132,7 +132,7 @@ describe PublishingController do
           allow(participant).to receive(:verify_digital_signature).with(any_args).and_return(true)
           allow(participant).to receive(:assign_copyright).with(any_args).and_return(true)
         end
-        post :grant_with_private_key, params
+        post :grant_with_private_key, params: params
         expect(response).to redirect_to(action: :view)
       end
     end 
@@ -149,7 +149,7 @@ describe PublishingController do
           allow(participant).to receive(:verify_digital_signature).with(any_args).and_return(true)
           allow(participant).to receive(:assign_copyright).with(any_args).and_raise('The private key you inputted was invalid.', StandardError)
         end
-        post :grant_with_private_key, params
+        post :grant_with_private_key, params: params
         expect(flash[:notice]).to eq('The private key you inputted was invalid.')
         expect(response).to redirect_to(action: :grant,params:{id:2})
       end
@@ -164,7 +164,7 @@ describe PublishingController do
         allow(AssignmentParticipant).to receive(:find).with('3').and_return(assignment_participant2)
         stub_current_user(student1, student1.role.name, student1.role)
         params ={id: 3, allow: 1}
-        post :update_publish_permissions, params
+        post :update_publish_permissions, params: params
         expect(response).to redirect_to(action: :grant)
       end
     end
@@ -180,7 +180,7 @@ describe PublishingController do
           allow(participant).to receive(:update_attribute).and_return(true)
           allow(participant).to receive(:save).and_return(true)
         end
-        post :update_publish_permissions, params
+        post :update_publish_permissions, params: params
         expect(response).to redirect_to(action: :view)
       end
     end      

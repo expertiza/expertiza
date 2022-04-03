@@ -1,4 +1,4 @@
-class MenuUpdateParticipantChoices < ActiveRecord::Migration
+class MenuUpdateParticipantChoices < ActiveRecord::Migration[4.2]
   def self.up
     permission1 = Permission.find_by_name('administer assignments')
     site_controller = SiteController.find_or_create_by(name: 'participant_choices')

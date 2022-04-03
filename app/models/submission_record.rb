@@ -1,4 +1,4 @@
-class SubmissionRecord < ActiveRecord::Base
+class SubmissionRecord < ApplicationRecord
   validates :content, presence: true
   validates :operation, presence: true
   validates :team_id, presence: true

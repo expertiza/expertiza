@@ -1,4 +1,4 @@
-class CreateTopicDependencies < ActiveRecord::Migration
+class CreateTopicDependencies < ActiveRecord::Migration[4.2]
   def self.up
     create_table :topic_dependencies do |t|
       t.column :topic_id, :integer, null: false

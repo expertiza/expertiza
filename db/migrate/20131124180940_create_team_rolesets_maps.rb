@@ -1,4 +1,4 @@
-class CreateTeamRolesetsMaps < ActiveRecord::Migration
+class CreateTeamRolesetsMaps < ActiveRecord::Migration[4.2]
   def self.up
     create_table :team_rolesets_maps do |t|
       t.integer :team_rolesets_id

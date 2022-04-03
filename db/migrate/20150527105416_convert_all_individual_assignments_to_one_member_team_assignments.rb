@@ -1,4 +1,4 @@
-class ConvertAllIndividualAssignmentsToOneMemberTeamAssignments < ActiveRecord::Migration
+class ConvertAllIndividualAssignmentsToOneMemberTeamAssignments < ActiveRecord::Migration[4.2]
   def self.up
     # case 1 (team_num == participants_num and has no topic):
     # change ParticipantReviewResponseMap -> TeamReviewResponseMap in response_maps table

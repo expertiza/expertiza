@@ -1,10 +1,39 @@
 describe SubmittedContentController do
+  let(:admin) { build(:admin, id: 3) }
   let(:super_admin) { build(:superadmin, id: 1, role_id: 5) }
   let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, name: 'Instructor1') }
   let(:student1) { build(:student, id: 21, role_id: 1) }
   let(:team) { build(:assignment_team, id: 1) }
   let(:participant) { build(:participant, id: 1, user_id: 21) }
   let(:assignment) { build(:assignment, id: 1) }
+  describe '#action_allowed?' do
+    context 'when user does not have right privilege, it denies action' do
+      it 'for no user' do
+        expect(controller.send(:action_allowed?)).to be false
+      end
+      it 'for student' do
+        allow(controller).to receive(:current_user).and_return(build(:student))
+        expect(controller.send(:action_allowed?)).to be false
+      end
+    end
+    context 'when user has right privilege, it allows action' do
+      it 'for admin' do
+        stub_current_user(admin, admin.role.name, admin.role)
+        expect(controller.send(:action_allowed?)).to be true
+      end
+      it 'for super_admin' do
+        stub_current_user(super_admin, super_admin.role.name, super_admin.role)
+        expect(controller.send(:action_allowed?)).to be true
+      end
+    end
+  end
+  describe '#controller_locale' do
+    it 'should return I18n.default_locale' do
+      user = student1
+      stub_current_user(user, user.role.name, user.role)
+      expect(controller.send(:controller_locale)).to eq(I18n.default_locale)
+    end
+  end
   describe '#submit_hyperlink' do
     context 'current user is participant and submits hyperlink' do
       before(:each) do

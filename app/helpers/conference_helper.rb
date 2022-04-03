@@ -37,7 +37,6 @@ module ConferenceHelper
 
   def create_author
     params[:user][:name] = params[:user][:email] unless !params[:user][:name].nil? && !params[:user][:name].empty?
-    User.skip_callback(:create, :after, :email_welcome)
     is_author = true
     # Assign all user params for creating author using assign_user_params function
     @user = assign_user_params(is_author)

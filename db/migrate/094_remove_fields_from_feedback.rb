@@ -1,4 +1,4 @@
-class RemoveFieldsFromFeedback < ActiveRecord::Migration
+class RemoveFieldsFromFeedback < ActiveRecord::Migration[4.2]
   def self.up
     begin
       remove_column :review_feedbacks, :feedback_at

@@ -1,4 +1,4 @@
-class DueDateRounds < ActiveRecord::Migration
+class DueDateRounds < ActiveRecord::Migration[4.2]
   def self.up
     add_column 'due_dates', 'round', :integer
   end

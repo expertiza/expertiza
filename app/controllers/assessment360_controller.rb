@@ -176,16 +176,22 @@ class Assessment360Controller < ApplicationController
       @assignments.each do |assignment|
         user_id = cp.user_id
         assignment_id = assignment.id
-        next if assignment.participants.find_by(user_id: user_id).nil? # break out of the loop if there are no participants in the assignment
-        next if TeamsUser.team_id(assignment_id, user_id).nil? # break out of the loop if the participant has no team
+        # break out of the loop if there are no participants in the assignment
+        next if assignment.participants.find_by(user_id: user_id).nil?
+        # break out of the loop if the participant has no team
+        next if TeamsUser.team_id(assignment_id, user_id).nil?
 
-        assignment_grade_summary(cp, assignment_id) # pull information about the student's grades for particular assignment
+        # pull information about the student's grades for particular assignment
+        assignment_grade_summary(cp, assignment_id)
         peer_review_score = find_peer_review_score(user_id, assignment_id)
 
         next if peer_review_score.nil? # Skip if there are no peers
-        next if peer_review_score[:review].nil? # Skip if there are no reviews done by peer
-        next if peer_review_score[:review][:scores].nil? # Skip if there are no reviews scores assigned by peer
-        next if peer_review_score[:review][:scores][:avg].nil? # Skip if there are is no peer review average score
+        # Skip if there are no reviews done by peer
+        next if peer_review_score[:review].nil?
+        # Skip if there are no reviews scores assigned by peer
+        next if peer_review_score[:review][:scores].nil?
+        # Skip if there are is no peer review average score
+        next if peer_review_score[:review][:scores][:avg].nil?
 
         @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
       end
@@ -207,6 +213,45 @@ class Assessment360Controller < ApplicationController
     @assignment_grades[cp.id][assignment_id] = team[:grade_for_submission]
 
     @final_grades[cp.id] += @assignment_grades[cp.id][assignment_id]
+  end
+
+  def insure_existence_of(course_participants, course)
+    if course_participants.empty?
+      flash[:error] = "There is no course participant in course #{course.name}"
+      redirect_back fallback_location: root_path
+    end
+  end
+
+  # The function populates the hash value for all students for all the reviews that they have gotten.
+  # I.e., Teammate and Meta for each of the assignments that they have taken
+  # This value is then used to display the overall teammate_review and meta_review grade in the view
+  def calc_overall_review_info(assignment,
+                               course_participant,
+                               reviews,
+                               hash_per_stu,
+                               overall_review_grade_hash,
+                               overall_review_count_hash,
+                               review_info_per_stu)
+    # If a student has not taken an assignment or if they have not received any grade for the same,
+    # assign it as 0 instead of leaving it blank. This helps in easier calculation of overall grade
+    overall_review_grade_hash[assignment.id] = 0 unless overall_review_grade_hash.key?(assignment.id)
+    overall_review_count_hash[assignment.id] = 0 unless overall_review_count_hash.key?(assignment.id)
+    grades = 0
+    # Check if they person has gotten any review for the assignment
+    if reviews.count > 0
+      reviews.each { |review| grades += review.average_score.to_i }
+      avg_grades = (grades * 1.0 / reviews.count).round
+      hash_per_stu[course_participant.id][assignment.id] = avg_grades.to_s + '%'
+    end
+    # Calculate sum of averages to get student's overall grade
+    if avg_grades && (grades >= 0)
+      # for each assignment
+      review_info_per_stu[0] += avg_grades
+      review_info_per_stu[1] += 1
+      # for course
+      overall_review_grade_hash[assignment.id] += avg_grades
+      overall_review_count_hash[assignment.id] += 1
+    end
   end
 
   # The peer review score is taken from the questions for the assignment

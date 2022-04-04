@@ -11,11 +11,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up Ruby 2.7
+    - name: Set up Ruby 2.3.1
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.7
+        ruby-version: 2.3.1
         bundler-cache: true
         action_config_path: ".github/config/rubocop_linter_action.yml"
     - name: Run RuboCop
-      run: bundle exec rubocop --parallel --only Lint/UselessAssignment,Layout app/
+      run: bundle exec rubocop --parallel --only Lint,Layout app/

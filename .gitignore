@@ -1,5 +1,6 @@
 dump.rdb
 .bundle
+.vscode
 db/*.sqlite3
 db/*.sql
 *.sql

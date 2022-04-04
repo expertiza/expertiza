@@ -7,8 +7,6 @@ class CourseParticipant < Participant
       part = AssignmentParticipant.create(user_id: user_id, parent_id: assignment_id)
       part.set_handle
       part
-    else
-      nil # return nil so we can tell a copy is not made
     end
   end
 
@@ -24,7 +22,7 @@ class CourseParticipant < Participant
       attributes = ImportFileHelper.define_attributes(row_hash)
       user = ImportFileHelper.create_new_user(attributes, session)
     end
-    course = Course.find_by(id)
+    course = Course.find(id)
     raise ImportError, 'The course with the id "' + id.to_s + '" was not found.' if course.nil?
 
     unless CourseParticipant.exists?(user_id: user.id, parent_id: id)

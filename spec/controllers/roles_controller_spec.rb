@@ -2,7 +2,7 @@ describe RolesController do
   let(:super_admin) { build(:superadmin, id: 1, role_id: 5) }
   let(:student) { build(:student, id: 1, role_id: 1) }
   let(:student_role) { build(:role_of_student, id: 1, name: 'Student_role_test', description: '', parent_id: nil, default_page_id: nil) }
-  let(:instructor_role) {  build(:role_of_instructor, id: 2, name: 'Instructor_role_test', description: '', parent_id: nil, default_page_id: nil) }
+  let(:instructor_role) { build(:role_of_instructor, id: 2, name: 'Instructor_role_test', description: '', parent_id: nil, default_page_id: nil) }
   let(:admin_role) { build(:role_of_administrator, id: 3, name: 'Administrator_role_test', description: '', parent_id: nil, default_page_id: nil) }
   describe '#action_allowed?' do
     context 'when the current user is student' do
@@ -19,7 +19,7 @@ describe RolesController do
     end
   end
   before(:each) do
-      stub_current_user(super_admin, super_admin.role.name, super_admin.role)
+    stub_current_user(super_admin, super_admin.role.name, super_admin.role)
   end
   describe '#index' do
     it 'returns the Roles ordered by name' do
@@ -38,10 +38,10 @@ describe RolesController do
   end
   describe '#show' do
     it 'renders show' do
-      params = {id: '1'}
+      request_params = { id: '1' }
       allow(Role).to receive(:find).with('1').and_return(student_role)
       allow(student_role).to receive(:get_parents).and_return([])
-      get :show, params
+      get :show, params: request_params
       expect(response).to render_template(:show)
     end
   end
@@ -71,9 +71,9 @@ describe RolesController do
   end
   describe '#edit' do
     it 'renders edit' do
-      params = {id: '1'}
+      request_params = { id: '1' }
       allow(Role).to receive(:find).with('1').and_return(student_role)
-      get :edit, params
+      get :edit, params: request_params
       expect(response).to render_template(:edit)
     end
   end

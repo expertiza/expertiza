@@ -7,7 +7,7 @@ describe TagPromptDeployment do
   let(:questionnaire) { Questionnaire.new(id: 1, name: 'question1') }
   let(:rp) { Response.new(map_id: 1, round: 1, additional_comment: 'improvement scope') }
   let(:response) { Response.new(map_id: [1, 2], round: [1, 1], additional_comment: ['improvement scope', 'through comments']) }
-  let(:question) { Question.new(type: 'tagging', questionnaire: questionnaire) }
+  let(:question) { Question.new(questionnaire: questionnaire) }
   let(:answer) { Answer.new(id: [1, 2, 3], question_id: [1, 1, 1], answer: [3, 3, 3], comments: ['comment', 'comment is lengthy', 'comment is too lengthy'], response_id: [241, 241, 241]) }
   let(:answers_one) { Answer.new(id: [1], question_id: [1], answer: [3], comments: ['comment'], response_id: [241]) }
   let(:user1) { User.new(id: 1) }

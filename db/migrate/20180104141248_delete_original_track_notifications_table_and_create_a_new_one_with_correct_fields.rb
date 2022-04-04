@@ -1,4 +1,4 @@
-class DeleteOriginalTrackNotificationsTableAndCreateANewOneWithCorrectFields < ActiveRecord::Migration
+class DeleteOriginalTrackNotificationsTableAndCreateANewOneWithCorrectFields < ActiveRecord::Migration[4.2]
   def change
     drop_table :track_notifications
     create_table :track_notifications do |t|

@@ -76,10 +76,10 @@ class ImpersonateController < ApplicationController
 
   def check_if_input_is_valid
     if params[:user] && warn_for_special_chars(params[:user][:name], 'Username')
-      flash[:error] = 'Please enter valid student name'
+      flash[:error] = 'Please enter valid user name'
       redirect_back
     elsif params[:impersonate] && warn_for_special_chars(params[:impersonate][:name], 'Username')
-      flash[:error] = 'Please enter valid student name'
+      flash[:error] = 'Please enter valid user name'
       redirect_back
     end
   end
@@ -107,28 +107,23 @@ class ImpersonateController < ApplicationController
     end
   end
 
-  # Main operation
-
-  def do_impersonate_operation(user)
-    check_if_user_impersonateable if user
-  end
-
-  # Main operation, method used to break the functions in impersonate controller and bring out 2 functionalities at same level,
+  # Impersonate using form on /impersonate/start, based on the username provided
+  # This method looks to see if that's possible by calling the check_if_user_impersonateable method
   # checking if user impersonateable, if not throw corresponding error message
 
   def impersonate
     begin
       @original_user = session[:super_user] || session[:user]
-      # Impersonate using form on /impersonate/start, based on the username provided, this method looks to see if that's possible by calling the do_main_operation method
       if params[:impersonate].nil?
         @message = "You cannot impersonate '#{params[:user][:name]}'."
+        @message = 'User name cannot be empty' if params[:user][:name].empty?
         user = get_real_user(params[:user][:name])
-        do_impersonate_operation(user)
+        check_if_user_impersonateable if user
       elsif !params[:impersonate][:name].empty?
         # Impersonate a new account
         @message = "You cannot impersonate '#{params[:impersonate][:name]}'."
         user = get_real_user(params[:impersonate][:name])
-        do_impersonate_operation(user)
+        check_if_user_impersonateable if user
       # Revert to original account when currently in the impersonated session
       elsif !session[:super_user].nil?
         AuthController.clear_user_info(session, nil)
@@ -142,7 +137,7 @@ class ImpersonateController < ApplicationController
                   controller: AuthHelper.get_home_controller(session[:user])
     rescue StandardError
       flash[:error] = @message
-      redirect_to :back
+      redirect_back fallback_location: root_path
     end
   end
 

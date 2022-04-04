@@ -51,7 +51,7 @@
                  :action => 'assign_reviewer_dynamically',
                  :assignment_id => assignment.id,
                  :reviewer_id => session[:user].id do %>
-    <p><input type='submit' value=t(".request_new_submission")/></p>
+    <p><input type='submit' value=<%= t(".request_new_submission") %>/></p>
   <% end %>
   <%end%>
 <% end %>

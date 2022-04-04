@@ -1,4 +1,4 @@
-class CreateAssignmentsQuestionnaires < ActiveRecord::Migration
+class CreateAssignmentsQuestionnaires < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'assignments_questionnaires', force: true do |t|
       t.column 'questionnaire_id', :integer, default: 0, null: false

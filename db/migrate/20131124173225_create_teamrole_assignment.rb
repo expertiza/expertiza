@@ -1,4 +1,4 @@
-class CreateTeamroleAssignment < ActiveRecord::Migration
+class CreateTeamroleAssignment < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'teamrole_assignment', force: true do |t|
       t.integer 'team_roleset_id'

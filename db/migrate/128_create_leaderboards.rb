@@ -1,4 +1,4 @@
-class CreateLeaderboards < ActiveRecord::Migration
+class CreateLeaderboards < ActiveRecord::Migration[4.2]
   def self.up
     create_table :leaderboards do |t|
       t.column :questionnaire_type_id, :integer

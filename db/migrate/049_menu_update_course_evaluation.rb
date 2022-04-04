@@ -1,4 +1,4 @@
-class MenuUpdateCourseEvaluation < ActiveRecord::Migration
+class MenuUpdateCourseEvaluation < ActiveRecord::Migration[4.2]
   def self.up
     permission1 = Permission.find_by_name('do assignments')
     site_controller = SiteController.find_or_create_by(name: 'course_evaluation')

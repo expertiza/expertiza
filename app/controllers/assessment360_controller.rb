@@ -51,7 +51,7 @@ class Assessment360Controller < ApplicationController
 
     # Load participants along with the assignments(eager loading)
     # Reject assignments with empty participants
-    @assignments = @course.assignments.includes([:participants]).reject(&:is_calibrated).reject { |a| a.participants.empty? }
+    @assignments = @course.assignments.include?([:participants]).reject(&:is_calibrated).reject { |a| a.participants.empty? }
 
     @course_participants = @course.get_participants
     insure_existence_of(@course_participants, @course)

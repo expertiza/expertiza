@@ -14,6 +14,13 @@ describe ImpersonateController do
   end
 
   context '#impersonate' do
+    it 'when input is blank' do
+      request.env['HTTP_REFERER'] = 'http://www.example.com'
+      @params = { user: { name: '' } }
+      get :impersonate, @params
+      expect(response).to redirect_to('http://www.example.com')
+    end
+    
     it 'when instructor tries to impersonate another user' do
       expect(controller.action_allowed?).to be true
     end

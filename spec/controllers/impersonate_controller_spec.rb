@@ -21,6 +21,7 @@ describe ImpersonateController do
       expect(response).to redirect_to('http://www.example.com')
     end
 
+    
     it 'when instructor tries to impersonate another user' do
       expect(controller.action_allowed?).to be true
     end

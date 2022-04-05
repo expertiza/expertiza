@@ -14,7 +14,10 @@
     <%= link_to t(".edit_name"), controller: 'StudentTeams', action: 'edit', team_id: @student.team.id, student_id: @student.id %>
   
   <% if @student.assignment.is_pair_programming_enabled?(@student.assignment.id)%>
-    <button type="button">Request to Pair Program</button>
+    <button><%= link_to "Request to Pair Program",
+      {:controller => 'pair_programming', :action => 'send_invitations', :team_id=>@student.team.id, :student_id => @student.id },
+      {:onClick => "javascript: return confirm('Confirm if Pair Programming request should be sent');"}
+    %></button>
   <% end %>
   
   <br/><br/>
@@ -94,6 +97,41 @@
     <%# <% end %> <!--end self contribution for Cake questions-->
   </table>
 <% end %>
+
+<div>
+  <br/><br/>
+  <b><%=t ".Pair Programming Invitations"%></b>
+  <br/><br/>
+
+  <table style="width:80%" align="center" >
+    <tr style="border: 1px outset #000000; padding: 10px 20px" >
+      <th class="head">Username</th>
+      <th class="head">Full name</th>
+      <% if @student.assignment.duty_based_assignment? %>
+          <th class="head">Role</th>
+      <% end %>
+      <th class="head">Email address</th>
+      <th class="head">Status</th>
+    </tr>
+    <% @student.team.participants.each do |member| %> <!--start Pair Programming content-->
+      <tr>
+        <td><%= member.user.name(session[:ip]) %></td>
+        <td><%= member.user.fullname(session[:ip]) %></td>
+        <td><%= member.user.email(session[:ip]) %></td>
+        <% status = TeamsUser.find_by(user_id: member.user.id, team_id: member.team.id).pair_programming_status %>
+        <% if status == "W" and current_user.id != member.user.id %>
+          <td>Request Pending</td>
+        <% elsif  (status == "W" or status==nil ) and current_user.id == member.user.id%>
+          <td>Accept|decline</td>
+        <% elsif status == "A" %>
+          <td>Accepted</td>
+        <% else %>
+          <td>Rejected</td>
+        <% end %>
+      </tr>
+    <% end %>
+  </table>
+</div>
 
 <!--render partial for join team request-->
     <%= render :partial => 'join_team_requests/list_received',

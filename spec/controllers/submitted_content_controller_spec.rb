@@ -193,6 +193,87 @@ describe SubmittedContentController do
         #expect(download).to receive(:send_file)
       end
     end
+    context 'user that is participant uploads a file' do
+      before(:each) do
+        allow(AssignmentParticipant).to receive(:find).and_return(participant)
+        stub_current_user(student1, student1.role.name, student1.role)
+      end
+      it 'flashes error for file exceeding size limit' do
+        allow(controller).to receive(:check_content_size).and_return(false)
+        file = Rack::Test::UploadedFile.new("#{Rails.root}/spec/fixtures/files/the-rspec-book_p2_1.pdf")
+        params = {uploaded_file: file,
+                  id: 1}
+        response = get :submit_file, params: params
+        expect(response).to redirect_to(action: :edit, id: 1)
+        expect(flash[:error]).to be_present # not checking message content since it uses variable size limit
+      end
+      it 'flashes error for file of unexpected type' do
+        allow(SubmittedContentController).to receive(:check_content_type_integrity).and_return(false)
+        allow(MimeMagic).to receive(:by_magic).and_return("not valid")
+        allow_any_instance_of(Rack::Test::UploadedFile::String).to receive(:read).and_return("")
+        file = Rack::Test::UploadedFile.new("#{Rails.root}/spec/fixtures/files/helloworld.c")
+        params = {uploaded_file: file,
+                  id: 1}
+        response = get :submit_file, params: params
+        expect(response).to redirect_to(action: :edit, id: 1)
+        expect(flash[:error]).to eq 'File type error'
+      end
+      # we could test that file is written and submission record is created, but we could have to
+      # make assumptions about how path is formed and user input for path/filename is sanitized.  We don't want
+      # this test coupled to the existing implementation
+    end
+  end
+  describe '#folder_action' do
+    context 'current user does not match up with the participant' do
+      #method just returns in this context, how do we test that?
+    end
+    context 'current user is participant performing folder action' do
+      before(:each) do
+        allow(AssignmentParticipant).to receive(:find).and_return(participant)
+        stub_current_user(student1, student1.role.name, student1.role)
+      end
+      it 'redirects to edit' #do
+        #params = {id: 1, faction: nil}
+        #response = get :folder_action, params
+        #expect(response).to redirect_to(action: :edit, id: 1)
+      #end
+      it 'delete action deletes selected files'
+      it 'rename action renames selected file'
+      it 'move action moves selected file'
+      it 'copy action copies selected file'
+      it 'create folder action creates new directory'
+    end
+  end
+  describe '#download' do
+    context 'user downloads file' do
+      it 'flashes error for nil folder name' do
+        params = {folder_name: nil}
+        response = get :download, params: params
+        expect(flash[:error]).to be_present # not checking message content since it uses exception message
+      end
+      it 'flashes error for nil file name' do
+        params = {name: nil}
+        response = get :download, params: params
+        expect(flash[:error]).to be_present # not checking message content since it uses exception message
+      end
+      it 'flashes error if attempt is to download entire folder' do
+        params = {folder_name: 'test_directory', name: nil}
+        response = get :download, params: params
+        expect(flash[:error]).to be_present # not checking message content since it uses exception message
+      end
+      it 'flashes error if file does not exist' do
+        params = {folder_name: 'unlikely_dir_name', name: 'nonexistantfile.no'}
+        response = get :download, params: params
+        expect(flash[:error]).to be_present #not checking message content since it uses exception message
+      end
+      it 'calls send for a valid file download' do
+        # still figuring this one out...
+        #params = {folder_name: 'test_dir', name: 'test.txt'}
+        #File.stub(:exist?).and_return(true)
+        #response = get :download, params
+        #expect(download).to receive(:send_file)
+      end
+    end
   end
 
   #########################################

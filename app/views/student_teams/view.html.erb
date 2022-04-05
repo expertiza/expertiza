@@ -12,7 +12,11 @@
 <% else %>
   <b style="text-align: center"><%=t ".team_name_up"%> &nbsp;&nbsp;</b><%= @student.team.name(session[:ip]) %> &nbsp;&nbsp;&nbsp;
     <%= link_to t(".edit_name"), controller: 'StudentTeams', action: 'edit', team_id: @student.team.id, student_id: @student.id %>
-  <button type="button">Request to Pair Program</button>
+  
+  <% if @student.assignment.is_pair_programming_enabled?(@student.assignment.id)%>
+    <button type="button">Request to Pair Program</button>
+  <% end %>
+  
   <br/><br/>
   <b><%=t ".team_members"%></b>
   <br/><br/>

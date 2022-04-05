@@ -1,4 +1,4 @@
-class CreateTeamNodes < ActiveRecord::Migration
+class CreateTeamNodes < ActiveRecord::Migration[4.2]
   def self.up
     teams = Team.all
     teams.each do |team|

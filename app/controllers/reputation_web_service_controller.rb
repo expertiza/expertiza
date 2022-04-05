@@ -223,10 +223,20 @@ class ReputationWebServiceController < ApplicationController
     @assignment = Assignment.find(flash[:assignment_id]) rescue nil
     @another_assignment = Assignment.find(flash[:another_assignment_id]) rescue nil
   end
-
+  
+  # Method: update_participants_reputation
+  # This method accepts the response body in the JSON format.
+  # It then parses the JSON and updates the reputation scores of the
+  # participants in the list.
+  # If the alg variable is not  Hamer/ Lauv, the updation step is skipped.
+  # Params
+  #   reputation_response: The response from the reputation web service
+  # Returns
+  #   nil
   def update_participants_reputation(reputation_response)
     JSON.parse(reputation_response.body.to_s).each do |reputation_algorithm, user_resputation_list|
       next unless %w[Hamer Lauw].include?(reputation_algorithm)
+      
       user_resputation_list.each do |user_id, reputation|
         Participant.find_by(user_id: user_id).update(reputation_algorithm.to_sym => reputation) unless /leniency/ =~ user_id.to_s
       end

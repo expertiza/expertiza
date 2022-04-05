@@ -11,7 +11,10 @@ shared_context 'object initializations' do
   let(:student1) { build_stubbed(:student, id: 1, name: 'student2065') }
   let(:student2) { build_stubbed(:student, id: 2) }
   let(:course1) { build_stubbed(:course, name: 'TestCourse', id: 1, instructor_id: instructor.id) }
-  let(:assignment1) { build_stubbed(:assignment, name: 'TestAssignment', id: 1) }
+  let(:assignment1) do
+    build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true, directory_path: 'same path',
+                       participants: [build(:participant)], teams: [build(:assignment_team)], course_id: 1)
+  end
   let(:team1) { build_stubbed(:assignment_team, id: 1, name: 'wolfers', parent_id: assignment1.id) }
   let(:team2) { build_stubbed(:assignment_team, id: 2, parent_id: assignment1.id) }
   let(:team3) { build_stubbed(:assignment_team, id: 3, parent_id: assignment1.id) }

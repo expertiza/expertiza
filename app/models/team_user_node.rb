@@ -1,6 +1,6 @@
 class TeamUserNode < Node
   belongs_to :node_object, class_name: 'TeamsUser'
-  attr_accessible :parent_id, :node_object_id
+  # attr_accessible :parent_id, :node_object_id  # unnecessary protected attributes
 
   def self.table
     'teams_users'

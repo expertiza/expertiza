@@ -1,4 +1,4 @@
-class CreatePlagiarismCheckerAssignmentSubmissions < ActiveRecord::Migration
+class CreatePlagiarismCheckerAssignmentSubmissions < ActiveRecord::Migration[4.2]
   def change
     create_table :plagiarism_checker_assignment_submissions do |t|
       t.string :name

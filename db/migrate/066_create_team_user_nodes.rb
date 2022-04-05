@@ -1,4 +1,4 @@
-class CreateTeamUserNodes < ActiveRecord::Migration
+class CreateTeamUserNodes < ActiveRecord::Migration[4.2]
   def self.up
     begin
       remove_column :teams_users, :assignment_id

@@ -1,4 +1,4 @@
-class UpdateMenus < ActiveRecord::Migration
+class UpdateMenus < ActiveRecord::Migration[4.2]
   def self.up
     site_controller = SiteController.find_by_name('tree_display')
 

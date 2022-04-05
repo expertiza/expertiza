@@ -123,7 +123,7 @@ class TeamsController < ApplicationController
       @team.destroy
       undo_link("The team \"#{@team.name}\" has been successfully deleted.")
     end
-    redirect_to :back
+    redirect_back fallback_location: root_path
   end
 
   # Copies existing teams from a course down to an assignment

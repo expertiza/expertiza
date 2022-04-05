@@ -2,8 +2,8 @@ require 'rails_helper'
 
 describe TagPrompt do
   let(:ct_criterion) { Criterion.new id: 1, type: 'Criterion', seq: 1.0, txt: 'test txt', weight: 1 }
-  let(:ct_cbox) { Criterion.new id: 1, type: 'Checkbox', seq: 1.0, txt: 'test txt', weight: 1 }
-  let(:ct_text) { Criterion.new id: 1, type: 'Text', seq: 1.0, txt: 'test txt', weight: 1 }
+  let(:ct_cbox) { Checkbox.new id: 1, type: 'Checkbox', seq: 1.0, txt: 'test txt', weight: 1 }
+  let(:ct_text) { TextArea.new id: 1, type: 'TextArea', seq: 1.0, txt: 'test txt', weight: 1 }
   let(:an_long) { Answer.new question: ct_criterion, answer: 5, comments: 'test comments' }
   let(:an_long_text) { Answer.new question: ct_text, answer: 5, comments: 'test comments' }
   let(:an_cb) { Answer.new question: ct_cbox, answer: 1 }

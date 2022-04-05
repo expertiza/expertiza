@@ -1,4 +1,4 @@
-class Duty < ActiveRecord::Base
+class Duty < ApplicationRecord
   belongs_to :assignment
   # validates name with format matching regex, length to be at least 3 and
   # same name cannot be assigned to multiple duties in particular assignment.

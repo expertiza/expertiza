@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220405212335) do
+ActiveRecord::Schema.define(version: 20220405222420) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -700,7 +700,7 @@ ActiveRecord::Schema.define(version: 20220405212335) do
     t.integer "directory_num"
     t.integer "grade_for_submission"
     t.text "comment_for_submission"
-    t.boolean "pair_programming_request"
+    t.integer "pair_programming_request", limit: 1
   end
 
   create_table "teams_users", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|

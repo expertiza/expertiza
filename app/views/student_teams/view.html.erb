@@ -14,7 +14,7 @@
     <%= link_to t(".edit_name"), controller: 'StudentTeams', action: 'edit', team_id: @student.team.id, student_id: @student.id %>
   
   <% if @student.assignment.is_pair_programming_enabled?(@student.assignment.id)%>
-    <% if !Team.find(@student.team.id).pair_programming_request %>
+    <% if Team.find(@student.team.id).pair_programming_request==0 %>
       <button><%= link_to "Request to Pair Program",
         {:controller => 'pair_programming', :action => 'send_invitations', :team_id=>@student.team.id, :student_id => @student.id},
         {:onClick => "javascript: return confirm('Confirm if Pair Programming request should be sent');"}
@@ -29,8 +29,10 @@
         <% end %>
       <% end %>
       <% if pair_programming_team_status %>
+        <% Team.find(@student.team.id).update_attributes(pair_programming_request: 2) %>
         Pair Programming: Yes
       <% else %>
+        <% Team.find(@student.team.id).update_attributes(pair_programming_request: 1) %>
         Pair Programming: Pending
       <% end %>
     <% end %>
@@ -114,7 +116,7 @@
   </table>
 <% end %>
 
-<% if @student.team != nil and Team.find(@student.team.id).pair_programming_request %>
+<% if @student.team != nil and Team.find(@student.team.id).pair_programming_request!=0 %>
   <div>
     <% if !@student.team.nil? && @student.assignment.max_team_size > 1 %>  
       <br/><br/>

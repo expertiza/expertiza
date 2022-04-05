@@ -121,6 +121,7 @@ ActiveRecord::Schema.define(version: 20220414172528) do
     t.boolean "auto_assign_mentor", default: false
     t.boolean "duty_based_assignment?"
     t.boolean "questionnaire_varies_by_duty"
+    t.boolean "enable_pair_programming"
     t.index ["course_id"], name: "fk_assignments_courses"
     t.index ["instructor_id"], name: "fk_assignments_instructors"
     t.index ["late_policy_id"], name: "fk_late_policy_id"
@@ -685,6 +686,7 @@ ActiveRecord::Schema.define(version: 20220414172528) do
     t.integer "team_id"
     t.integer "user_id"
     t.integer "duty_id"
+    t.string "pair_programming_status", limit: 1
     t.index ["duty_id"], name: "index_teams_users_on_duty_id"
     t.index ["team_id"], name: "fk_users_teams"
     t.index ["user_id"], name: "fk_teams_users"

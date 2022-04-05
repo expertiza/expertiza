@@ -239,6 +239,15 @@ function autogenerate_submission(){
   </tr>
   <!-- End answer tagging code -->
 
+  <!--E2244: Pair Programming-->
+  <tr>
+    <td style='padding:5px' id='assignment_enable_pair_programming_field'>
+      <input name="assignment_form[assignment][enable_pair_programming]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][enable_pair_programming]', 'true', @assignment_form.assignment.enable_pair_programming) %>
+      <%= label_tag('assignment_form[assignment][enable_pair_programming]', 'Pair Programming?') %>
+    </td>
+  </tr>
+
   <!--"available to student?" should be the last checkbox-->
   <tr>
     <td style='padding:5px' id='assignment_availability_flag_field'>

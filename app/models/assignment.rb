@@ -614,6 +614,10 @@ class Assignment < ApplicationRecord
     questionnaire_ids
   end
 
+  def is_pair_programming_enabled?(assignment_id)
+    return Assignment.find(assignment_id).enable_pair_programming
+  end
+
   private
 
   # returns true if assignment has staggered deadline and topic_id is nil

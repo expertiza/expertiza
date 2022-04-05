@@ -8,6 +8,7 @@ describe Participant do
   let(:participant3) { build(:participant, can_review: false, user: build(:student, name: 'King', fullname: 'Titan, King', id: 3)) }
   let(:participant4) { Participant.new }
   let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
+  let(:participant5) { build(:participant, user: user, assignment: assignment) }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
   let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer]) }
@@ -30,7 +31,8 @@ describe Participant do
 
   describe '#response' do
     it 'Returns the participant responses' do
-      allow(participant.response_maps).to receive(:map).and_return(response)
+      allow(participant).to receive(:response_maps).and_return(review_response_map)
+      allow(review_response_map).to receive(:map).and_return(response)
       expect(participant.responses).to eq(response)
     end
   end
@@ -151,4 +153,14 @@ describe Participant do
       expect(Participant.sort_by_name(unsorted)).to eq(sorted)
     end
   end
+
+  describe 'check if email is being sent or not' do
+    it 'participants assignment reviewers are sent email for a new submission' do
+      allow(AssignmentTeam).to receive(:team).and_return(team)
+      allow(TeamsUser).to receive(:find_by).and_return(team_user)
+      allow(ResponseMap).to receive(:where).and_return([review_response_map])
+      expect { participant5.mail_assigned_reviewers }.to change { ActionMailer::Base.deliveries.count }.by(1)
+    end
+  end
 end
+

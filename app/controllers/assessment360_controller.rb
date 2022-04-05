@@ -102,16 +102,22 @@ class Assessment360Controller < ApplicationController
       @assignments.each do |assignment|
         user_id = cp.user_id
         assignment_id = assignment.id
-        next if assignment.participants.find_by(user_id: user_id).nil? # break out of the loop if there are no participants in the assignment
-        next if TeamsUser.team_id(assignment_id, user_id).nil? # break out of the loop if the participant has no team
+        # break out of the loop if there are no participants in the assignment
+        next if assignment.participants.find_by(user_id: user_id).nil?
+        # break out of the loop if the participant has no team
+        next if TeamsUser.team_id(assignment_id, user_id).nil?
 
-        assignment_grade_summary(cp, assignment_id) # pull information about the student's grades for particular assignment
+        # pull information about the student's grades for particular assignment
+        assignment_grade_summary(cp, assignment_id)
         peer_review_score = find_peer_review_score(user_id, assignment_id)
 
         next if peer_review_score.nil? # Skip if there are no peers
-        next if peer_review_score[:review].nil? # Skip if there are no reviews done by peer
-        next if peer_review_score[:review][:scores].nil? # Skip if there are no reviews scores assigned by peer
-        next if peer_review_score[:review][:scores][:avg].nil? # Skip if there are is no peer review average score
+        # Skip if there are no reviews done by peer
+        next if peer_review_score[:review].nil?
+        # Skip if there are no reviews scores assigned by peer
+        next if peer_review_score[:review][:scores].nil?
+        # Skip if there are is no peer review average score
+        next if peer_review_score[:review][:scores][:avg].nil?
 
         @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
       end
@@ -135,7 +141,7 @@ class Assessment360Controller < ApplicationController
   def insure_existence_of(course_participants, course)
     if course_participants.empty?
       flash[:error] = "There is no course participant in course #{course.name}"
-      redirect_to(:back)
+      redirect_back fallback_location: root_path
     end
   end
 

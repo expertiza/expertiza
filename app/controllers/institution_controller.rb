@@ -27,7 +27,7 @@ class InstitutionController < ApplicationController
   end
 
   def create
-    @institution = Institution.new(name: params[:institution][:name])
+    @institution = Institution.new(institution_params)
     if @institution.save
       flash[:success] = 'The institution was successfully created.'
       redirect_to action: 'list'
@@ -55,5 +55,11 @@ class InstitutionController < ApplicationController
   def delete
     Institution.find(params[:id]).destroy
     redirect_to action: 'list'
+  end
+
+  private
+
+  def institution_params
+    params.require(:institution).permit(:name)
   end
 end

@@ -13,7 +13,7 @@ class UsersController < ApplicationController
     case params[:action]
     when 'list_pending_requested'
       current_user_has_admin_privileges?
-    when 'new', 'create_requested_user_record'
+    when 'new'
       true
     when 'keys', 'index'
       # These action methods are all written with the clear expectation
@@ -56,7 +56,7 @@ class UsersController < ApplicationController
       anonymized_view_starter_ips += " #{session[:ip]}"
     end
     $redis.set('anonymized_view_starter_ips', anonymized_view_starter_ips)
-    redirect_to :back
+    redirect_back fallback_location: root_path
   end
 
   # for displaying the list of users
@@ -67,7 +67,10 @@ class UsersController < ApplicationController
   # for displaying users which are being searched for editing purposes after checking whether current user is authorized to do so
   def show_if_authorized
     @user = User.find_by(name: params[:user][:name])
-    if !@user.nil?
+    if @user.nil?
+      flash[:note] = params[:user][:name] + ' does not exist.'
+      redirect_to action: 'list'
+    else
       role
       # check whether current user is authorized to edit the user being searched, call show if true
 
@@ -79,9 +82,6 @@ class UsersController < ApplicationController
         flash[:note] = 'The specified user is not available for editing.'
         redirect_to action: 'list'
       end
-    else
-      flash[:note] = params[:user][:name] + ' does not exist.'
-      redirect_to action: 'list'
     end
   end
 
@@ -135,72 +135,6 @@ class UsersController < ApplicationController
     end
   end
 
-  def create_requested_user_record
-    requested_user = RequestedUser.new(requested_user_params)
-    if params[:user][:institution_id].empty?
-      institution = Institution.find_or_create_by(name: params[:institution][:name])
-      requested_user.institution_id = institution.id
-    end
-    requested_user.status = 'Under Review'
-    # The super admin receives a mail about a new user request with the user name
-    (user_existed = User.find_by(name: requested_user.name)) || User.find_by(name: requested_user.email)
-    requested_user_saved = requested_user.save
-    if !user_existed && requested_user_saved
-      super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')
-      super_users.each do |super_user|
-        prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, requested_user, 'New account Request')
-        prepared_mail.deliver
-      end
-      ExpertizaLogger.info LoggerMessage.new(controller_name, requested_user.name, 'The account you are requesting has been created successfully.', request)
-      flash[:success] = "User signup for \"#{requested_user.name}\" has been successfully requested."
-      redirect_to '/instructions/home'
-      return
-    elsif user_existed
-      flash[:error] = 'The account you are requesting has already existed in Expertiza.'
-    else
-      flash[:error] = requested_user.errors.full_messages.to_sentence
-    end
-    ExpertizaLogger.error LoggerMessage.new(controller_name, requested_user.name, flash[:error], request)
-    redirect_to controller: 'users', action: 'new', role: 'Student'
-  end
-
-  def create_approved_user
-    requested_user = RequestedUser.find_by(id: params[:id])
-    requested_user.status = params[:status]
-    if requested_user.status.nil?
-      flash[:error] = 'Please Approve or Reject before submitting'
-    elsif requested_user.update_attributes(params[:user])
-      flash[:success] = "The user \"#{requested_user.name}\" has been successfully updated."
-    end
-    if requested_user.status == 'Approved'
-      new_user = User.new
-      new_user.name = requested_user.name
-      new_user.role_id = requested_user.role_id
-      new_user.institution_id = requested_user.institution_id
-      new_user.fullname = requested_user.fullname
-      new_user.email = requested_user.email
-      new_user.parent_id = session[:user].id
-      new_user.timezonepref = User.find_by(id: new_user.parent_id).timezonepref
-      if new_user.save
-        # Mail is sent to the user with a new password
-        flash[:success] = "A new password has been sent to new user's e-mail address."
-        undo_link("The user \"#{requested_user.name}\" has been successfully created. ")
-      else
-        foreign
-      end
-    elsif requested_user.status == 'Rejected'
-      # If the user request has been rejected, a flash message is shown and redirected to review page
-      if requested_user.update_columns(status: params[:status])
-        flash[:success] = "The user \"#{requested_user.name}\" has been Rejected."
-        redirect_to action: 'list_pending_requested'
-        return
-      else
-        flash[:error] = 'Error processing request.'
-      end
-    end
-    redirect_to action: 'list_pending_requested'
-  end
-
   def edit
     @user = User.find(params[:id])
     role
@@ -208,6 +142,8 @@ class UsersController < ApplicationController
   end
 
   def update
+    #TODO: Remove this permit! and replace it with appropriate strong params after testing.
+    #method :- user_params
     params.permit!
     @user = User.find params[:id]
     # update username, when the user cannot be deleted

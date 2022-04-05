@@ -1,4 +1,4 @@
-class CreateReviewBids < ActiveRecord::Migration
+class CreateReviewBids < ActiveRecord::Migration[4.2]
   def change
     create_table :review_bids do |t|
       t.integer  'priority',       limit: 4

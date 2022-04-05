@@ -33,21 +33,18 @@ class ImpersonateController < ApplicationController
       session[:original_user] = @original_user
       session[:impersonate] = true
       session[:user] = user
+    elsif !params[:impersonate][:name].empty?
+      # E1991 : check whether instructor is currently in anonymized view
+      user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:impersonate][:name]) : User.find_by(name: params[:impersonate][:name])
+      AuthController.clear_user_info(session, nil)
+      session[:user] = user
+      session[:impersonate] = true
+      session[:original_user] = @original_user
     else
-      # If some user is to be impersonated, their session details are overwritten onto the current to impersonate
-      if !params[:impersonate][:name].empty?
-        # E1991 : check whether instructor is currently in anonymized view
-        user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:impersonate][:name]) : User.find_by(name: params[:impersonate][:name])
-        AuthController.clear_user_info(session, nil)
-        session[:user] = user
-        session[:impersonate] = true
-        session[:original_user] = @original_user
-      else
-        # E1991 : check whether instructor is currently in anonymized view
-        AuthController.clear_user_info(session, nil)
-        session[:user] = session[:super_user]
-        session[:super_user] = nil
-      end
+      # E1991 : check whether instructor is currently in anonymized view
+      AuthController.clear_user_info(session, nil)
+      session[:user] = session[:super_user]
+      session[:super_user] = nil
     end
   end
 
@@ -55,14 +52,14 @@ class ImpersonateController < ApplicationController
   def check_if_special_char
     if params[:user]
       if warn_for_special_chars(params[:user][:name], 'Username')
-        redirect_back
+        redirect_back fallback_location: root_path
         return
       end
     end
 
     if params[:impersonate]
       if warn_for_special_chars(params[:impersonate][:name], 'Username')
-        redirect_back
+        redirect_back fallback_location: root_path
         return
       end
     end
@@ -105,9 +102,9 @@ class ImpersonateController < ApplicationController
         end
       end
     end
-  rescue Exception
+  rescue StandardError
     flash[:error] = @message
-    redirect_to :back
+    redirect_back fallback_location: root_path
   end
 
   # Main operation
@@ -157,9 +154,9 @@ class ImpersonateController < ApplicationController
       AuthController.set_current_role(user.role_id, session)
       redirect_to action: AuthHelper.get_home_action(session[:user]),
                   controller: AuthHelper.get_home_controller(session[:user])
-    rescue Exception
+    rescue StandardError
       flash[:error] = @message
-      redirect_to :back
+      redirect_back fallback_location: root_path
     end
   end
 end

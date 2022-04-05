@@ -1,4 +1,4 @@
-class AddGradeForReviewerAndCommentForReviewerInParticipantsTable < ActiveRecord::Migration
+class AddGradeForReviewerAndCommentForReviewerInParticipantsTable < ActiveRecord::Migration[4.2]
   def self.up
     add_column :participants, :grade_for_reviewer, :integer, default: nil
     add_column :participants, :comment_for_reviewer, :string, default: ''

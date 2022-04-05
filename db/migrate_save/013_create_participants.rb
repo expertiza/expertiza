@@ -1,4 +1,4 @@
-class CreateParticipants < ActiveRecord::Migration
+class CreateParticipants < ActiveRecord::Migration[4.2]
   def self.up
     create_table :participants do |t|
       t.column :submit_allowed, :boolean # true if user is allowed to submit to this assignment

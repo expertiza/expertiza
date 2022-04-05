@@ -182,6 +182,7 @@ function toggleFunction(elementId) {
                         </thead>
                         <% for index in 0 .. row.score_row.length - 1 %>
                             <tr>
+                            <% next if vm.list_of_reviewers[index].nil? %>
                               <% if vm.questionnaire_display_type == "Author Feedback" %>
                                 <td><%= vm.list_of_reviewers[index].user_id %></td>
                               <% else %>

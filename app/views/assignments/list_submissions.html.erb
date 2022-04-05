@@ -27,6 +27,7 @@
         <% if @assignment.max_team_size > 1 %>
           <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Team name</th>
           <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Team member(s)</th>
+          <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Pair Programming</th>
         <% else %>
           <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Participant name</th>
         <% end %>  
@@ -64,6 +65,15 @@
                   <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
                   (<%= user.fullname(session[:ip])%>)<br>
               <% end %>
+          </td>
+
+        <!-- Pair Programming -->
+          <td>
+            <% if Team.find(team.id).pair_programming_request==2 %>
+              Yes
+            <% else %>
+              No
+            <% end %>
           </td>
 
         <!--Submitted item(s)-->

@@ -55,7 +55,7 @@ class AdviceController < ApplicationController
     begin
       # checks if advice is present or not
       unless params[:advice].nil?
-        params[:advice].each_key do |advice_key|
+        params[:advice].keys do |advice_key|
           # Updates the advice corresponding to the key
           QuestionAdvice.update(advice_key, advice: params[:advice][advice_key.to_sym][:advice])
         end

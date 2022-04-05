@@ -128,7 +128,7 @@ describe AdviceController do
         allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
         params = {id: 1}
         session = {user: instructor1}
-        result = get :edit_advice, params, session
+        result = get :edit_advice, params: params, session: session
         expect(result.status).to eq 200
         expect(result).to render_template(:edit_advice)
       end
@@ -151,7 +151,7 @@ describe AdviceController do
         allow(QuestionAdvice).to receive(:update).with('1',{:advice => "Hello"}).and_return("Ok")
         params = {advice: {"1" => {:advice => "Hello"}}, id: 1}
         session = {user: instructor1}
-        result = get :save_advice, params, session
+        result = get :save_advice, params: params, session: session
         expect(flash[:notice]).to eq('The advice was successfully saved!')
         expect(result.status).to eq 302
         expect(result).to redirect_to('/advice/edit_advice/1')
@@ -163,7 +163,7 @@ describe AdviceController do
         allow(QuestionAdvice).to receive(:update).with(any_args).and_return("Ok")
         params = {id: 1}
         session = {user: instructor1}
-        result = get :save_advice, params, session
+        result = get :save_advice, params: params, session: session
         expect(flash[:notice]).not_to be_present
         expect(result.status).to eq 302
         expect(result).to redirect_to('/advice/edit_advice/1')

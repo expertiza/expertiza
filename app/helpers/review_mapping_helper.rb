@@ -30,16 +30,14 @@ module ReviewMappingHelper
     # Storing redundantly computed value in a variable
     assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
     # Returning colour based on conditions
-    if Response.exists?(map_id: response_map.id)
-      if !response_map.try(:reviewer).try(:review_grade).nil?
-        'brown'
-      elsif response_for_each_round?(response_map)
-        'blue'
-      else
-        obtain_team_color(response_map, assignment_created, assignment_due_dates)
-      end
+    return 'red' unless Response.exists?(map_id: response_map.id)
+
+    if !response_map.try(:reviewer).try(:review_grade).nil?
+      'brown'
+    elsif response_for_each_round?(response_map)
+      'blue'
     else
-      'red'
+      obtain_team_color(response_map, assignment_created, assignment_due_dates)
     end
   end
 
@@ -54,17 +52,13 @@ module ReviewMappingHelper
 
   # checks the submission state within each round and assigns team colour
   def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
-    if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
-      color.push 'purple'
-    else
-      link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
-      if link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
-        color.push 'green'
-      else
-        link_updated_at = get_link_updated_at(link)
-        color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
-      end
-    end
+    return color.push 'purple' if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
+
+    link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
+    return color.push 'green' if link.nil? || (link !~ %r{https*:\/\/wiki(.*)})
+
+    link_updated_at = get_link_updated_at(link)
+    color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
   end
 
   # checks if a review was submitted in every round and gives the total responses count
@@ -139,30 +133,32 @@ module ReviewMappingHelper
   def get_awarded_review_score(reviewer_id, team_id)
     # Storing redundantly computed value in num_rounds variable
     num_rounds = @assignment.num_review_rounds
-    # Setting values of instance variables
-    (1..num_rounds).each { |round| instance_variable_set('@score_awarded_round_' + round.to_s, '-----') }
     # Iterating through list
     (1..num_rounds).each do |round|
+      # Setting values of instance variables
+      instance_variable_set("@score_awarded_round_#{round}", '-----')
       # Changing values of instance variable based on below condition
-      unless team_id.nil? || team_id == -1.0
-        instance_variable_set('@score_awarded_round_' + round.to_s, @review_scores[reviewer_id][round][team_id].to_s + '%')
+      unless team_id.nil? || team_id.to_d == -1.0.to_d
+        instance_variable_set("@score_awarded_round_#{round}", "#{@review_scores[reviewer_id][round][team_id]}%")
       end
     end
   end
 
   # gets minimum, maximum and average grade value for all the reviews present
   def review_metrics(round, team_id)
-    %i[max min avg].each { |metric| instance_variable_set('@' + metric.to_s, '-----') }
-    if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? { |k| @avg_and_ranges[team_id][round].key? k }
-      %i[max min avg].each do |metric|
-        metric_value = @avg_and_ranges[team_id][round][metric].nil? ? '-----' : @avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
-        instance_variable_set('@' + metric.to_s, metric_value)
+    %i[max min avg].each { |metric| instance_variable_set("@#{metric}", '-----') }
+    return unless @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? { |k| @avg_and_ranges[team_id][round].key? k }
+
+    %i[max min avg].each do |metric|
+      unless @avg_and_ranges[team_id][round][metric].nil?
+        metric_value = "#{@avg_and_ranges[team_id][round][metric].round(0)}%"
+        instance_variable_set("@#{metric}", metric_value)
       end
     end
   end
 
   # sorts the reviewers by the average volume of reviews in each round, in descending order
-  def sort_reviewer_by_review_volume_desc
+  def sort_reviewer_by_review_volume
     @reviewers.each do |r|
       # get the volume of review comments
       review_volumes = Response.volume_of_review_comments(@assignment.id, r.id)
@@ -320,16 +316,16 @@ module ReviewMappingHelper
     intervals = intervals.select { |v| v < threshold }
 
     # Get Metrics once tagging intervals are available
-    unless intervals.empty?
-      metrics = {}
-      metrics[:mean] = (intervals.reduce(:+) / intervals.size.to_f).round(interval_precision)
-      metrics[:min] = intervals.min
-      metrics[:max] = intervals.max
-      sum = intervals.inject(0) { |accum, i| accum + (i - metrics[:mean])**2 }
-      metrics[:variance] = (sum / intervals.size.to_f).round(interval_precision)
-      metrics[:stand_dev] = Math.sqrt(metrics[:variance]).round(interval_precision)
-      metrics
-    end
+    return if intervals.empty?
+
+    metrics = {}
+    metrics[:mean] = (intervals.reduce(:+) / intervals.size.to_f).round(interval_precision)
+    metrics[:min] = intervals.min
+    metrics[:max] = intervals.max
+    sum = intervals.inject(0) { |accum, i| accum + (i - metrics[:mean])**2 }
+    metrics[:variance] = (sum / intervals.size.to_f).round(interval_precision)
+    metrics[:stand_dev] = Math.sqrt(metrics[:variance]).round(interval_precision)
+    metrics
     # if no Hash object is returned, the UI handles it accordingly
   end
 
@@ -362,7 +358,7 @@ module ReviewMappingHelper
   end
 
   # gets review and feedback responses for all rounds for the feedback report
-  def get_each_review_and_feedback_response_map(author)
+  def get_each_review_and_feedback(author)
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     # Calculate how many responses one team received from each round
     # It is the feedback number each team member should make
@@ -387,7 +383,7 @@ module ReviewMappingHelper
   end
 
   # gets review and feedback responses for a certain round for the feedback report
-  def get_certain_review_and_feedback_response_map(author)
+  def get_certain_review_feedback(author)
     # Setting values of instance variables
     @feedback_response_maps = FeedbackResponseMap.where(['reviewed_object_id IN (?) and reviewer_id = ?', @all_review_response_ids, author.id])
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
@@ -402,14 +398,14 @@ module ReviewMappingHelper
   def get_css_style_for_calibration_report(diff)
     # diff - difference between stu's answer and instructor's answer
     dict = { 0 => 'c5', 1 => 'c4', 2 => 'c3', 3 => 'c2' }
-    css_class = if dict.key?(diff.abs)
-                  dict[diff.abs]
-                else
-                  'c1'
-                end
-    css_class
+    if dict.key?(diff.abs)
+      dict[diff.abs]
+    else
+      'c1'
+    end
   end
 
+  # Review strategy for teams and participants
   class ReviewStrategy
     attr_accessor :participants, :teams
 
@@ -420,6 +416,7 @@ module ReviewMappingHelper
     end
   end
 
+  # Student Review Strategy for participants
   class StudentReviewStrategy < ReviewStrategy
     def reviews_per_team
       (@participants.size * @review_num * 1.0 / @teams.size).round
@@ -434,6 +431,7 @@ module ReviewMappingHelper
     end
   end
 
+  # Team Review Strategy for teams according to team size
   class TeamReviewStrategy < ReviewStrategy
     def reviews_per_team
       @review_num

@@ -781,24 +781,4 @@ describe SignUpSheetController do
       expect(response).to redirect_to('/sign_up_sheet/list?id=1')
     end
   end
-
-  describe "SQL Injection Tests" do 
-    it "Returns nothing" do 
-      allow(TeamsUser).to receive(:where).with(user_id: 6).and_return([double('TeamsUser', team_id: 1)])
-      allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([double('TeamsUser', team_id: 1, user_id: 8)])
-      allow(Team).to receive(:find).with(1).and_return(team)
-      team.parent_id = 1
-      allow(SignedUpTeam).to receive(:where).with(team_id: 1, is_waitlisted: 0).and_return([signed_up_team])
-      allow(SignedUpTeam).to receive(:where).with(topic_id: 1, is_waitlisted: 1).and_return([signed_up_team])
-      allow(SignUpSheet).to receive(:signup_team).with(1, 8, 1).and_return('OK!')
-      params = {
-        id: 1,
-        topic_id: "' OR 1='1"
-      }
-      session = { user: instructor }
-      get :switch_original_topic_to_approved_suggested_topic, params, session
-      expect(flash[:error]).to eq('Signup topic does not exist.') # Change response
-    end
-  end
-
 end

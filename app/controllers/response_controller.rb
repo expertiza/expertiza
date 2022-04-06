@@ -131,7 +131,6 @@ class ResponseController < ApplicationController
     @stage = @assignment.current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
     # Because of the autosave feature and the javascript that sync if two reviewing windows are opened
     # The response must be created when the review begin.
-    # So do the answers, otherwise the response object can't find the questionnaire when the user hasn't saved his new review and closed the window.
     # A new response has to be created when there hasn't been any reviews done for the current round,
     # or when there has been a submission after the most recent review in this round.
     @response = @response.populate_new_response(@map, @current_round)
@@ -311,7 +310,11 @@ class ResponseController < ApplicationController
     end
     @participant = @map.reviewer
     @contributor = @map.contributor
-    new_response ? questionnaire_from_response_map : questionnaire_from_response
+    @questionnaire = new_response ? questionnaire_from_response_map : questionnaire_from_response
+    puts @questionnaire
+    # @questionnaire = @questionnaire.first
+    puts "Test Test Test "
+    puts @questionnaire
     set_dropdown_or_scale
     @questions = sort_questions(@questionnaire.questions)
     @min = @questionnaire.min_question_score

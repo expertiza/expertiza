@@ -1,4 +1,4 @@
-class RenamePeerReviews < ActiveRecord::Migration
+class RenamePeerReviews < ActiveRecord::Migration[4.2]
   def self.up
     begin
       rename_table :peer_reviews, :teammate_reviews

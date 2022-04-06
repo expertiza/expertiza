@@ -1,6 +1,6 @@
 require 'analytic/score_analytic'
 
-class Answer < ActiveRecord::Base
+class Answer < ApplicationRecord
   include ScoreAnalytic
   belongs_to :question
   belongs_to :response

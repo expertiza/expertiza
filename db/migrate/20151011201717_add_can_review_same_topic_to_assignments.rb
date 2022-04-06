@@ -1,4 +1,4 @@
-class AddCanReviewSameTopicToAssignments < ActiveRecord::Migration
+class AddCanReviewSameTopicToAssignments < ActiveRecord::Migration[4.2]
   def self.up
     add_column :assignments, :can_review_same_topic, :boolean, default: true
   end

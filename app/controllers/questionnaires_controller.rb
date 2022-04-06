@@ -69,7 +69,7 @@ class QuestionnairesController < ApplicationController
         # In the future, we need to write migration files to make them consistency.
         # E1903 : We are not sure of other type of cases, so have added a if statement. If there are only 5 cases, remove the if statement
         if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey BookmarkRating].include?(display_type)
-          display_type = (display_type.split /(?=[A-Z])/).join('%')
+          display_type = (display_type.split(/(?=[A-Z])/)).join('%')
         end
         @questionnaire.display_type = display_type
         @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
@@ -107,7 +107,10 @@ class QuestionnairesController < ApplicationController
   def update
     # If 'Add' or 'Edit/View advice' is clicked, redirect appropriately
     if params[:add_new_questions]
-      redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
+      # redirect_to action: 'add_new_questions', id: params.permit(:id)[:id], question: params.permit(:new_question)[:new_question]
+      nested_keys = params[:new_question].keys
+      permitted_params = params.permit(:id, :new_question => nested_keys)
+      redirect_to action: 'add_new_questions', id: permitted_params[:id], question: permitted_params[:new_question]
     elsif params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     else

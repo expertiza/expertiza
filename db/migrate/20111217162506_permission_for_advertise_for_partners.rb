@@ -1,4 +1,4 @@
-class PermissionForAdvertiseForPartners < ActiveRecord::Migration
+class PermissionForAdvertiseForPartners < ActiveRecord::Migration[4.2]
   def self.up
     do_assignments_id = Permission.find_by_name('do assignments').id
     SiteController.create name: 'advertise_for_partners', permission_id: do_assignments_id

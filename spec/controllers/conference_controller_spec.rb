@@ -28,12 +28,12 @@ describe ConferenceController do
 
   context '#new' do
     it 'saves successfully for logged in user as Author' do
-      params = { assignment_id: 2 }
-      session = { user: student1 }
+      request_params = { assignment_id: 2 }
+      user_session = { user: student1 }
       stub_current_user(student1, student1.role.name, student1.role)
       allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
       allow(AssignmentParticipant).to receive(:create).with(any_args).and_return(participant)
-      post :new, params, session
+      post :new, params: request_params, session: user_session
       expect(flash[:success]).to eq 'You are added as an Author for assignment final2'
       expect(response).to redirect_to('http://test.host/student_task/list')
     end
@@ -45,7 +45,7 @@ describe ConferenceController do
     end
 
     it 'save successfully for new Author' do
-      params = {
+      request_params = {
         user: { name: 'lily',
                 role_id: 2,
                 email: 'chenzy@gmail.com',
@@ -55,12 +55,13 @@ describe ConferenceController do
       allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
       allow(Assignment).to receive(:find).with('2').and_return(assignment1)
       allow(User).to receive(:find).with(1).and_return(instructor1)
-      post :create, params
+      allow(User).to receive(:skip_callback).with(:create, :after, :email_welcome).and_return(true)
+      post :create, params: request_params
       expect(flash[:success]).to eq 'You are added as an Author for assignment final2'
     end
 
     it 'save successfully for existing user as Author' do
-      params = {
+      request_params = {
         user: { name: 'lily',
                 assignment: '2' }
       }
@@ -69,11 +70,11 @@ describe ConferenceController do
       allow(Assignment).to receive(:find).with('2').and_return(assignment1)
       allow(AssignmentParticipant).to receive(:create).with(any_args).and_return(participant)
       allow(User).to receive(:find).with(1).and_return(instructor1)
-      post :create, params
+      post :create, params: request_params
       expect(flash[:success]).to eq 'You are added as an Author for assignment final2'
     end
     it 'return error if user email already exist' do
-      params = {
+      request_params = {
         user: { name: 'lily',
                 role_id: 2,
                 email: 'chenzy@gmail.com',
@@ -83,9 +84,10 @@ describe ConferenceController do
       allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
       allow(Assignment).to receive(:find).with('2').and_return(assignment1)
       allow(User).to receive(:find).with(1).and_return(instructor1)
-      post :create, params
+      allow(User).to receive(:email_welcome).and_return(true)
+      post :create, params: request_params
 
-      params2 = {
+      request_params2 = {
         user: { name: 'lily23',
                 role_id: 2,
                 email: 'chenzy@gmail.com',
@@ -95,15 +97,15 @@ describe ConferenceController do
       allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
       allow(Assignment).to receive(:find).with('2').and_return(assignment1)
       allow(User).to receive(:find).with(2).and_return(instructor1)
-      post :create, params2
+      post :create, params: request_params2
       expect(flash[:error]).to eq 'A user with username of this email already exists, Please provide a unique email to continue.'
     end
   end
 
   context 'Author/Co-Author login with captcha' do
     it 'should redirect to root with correct recaptcha' do
-      session = { user: student1 }
-      params = {
+      user_session = { user: student1 }
+      request_params = {
         user: { name: 'lily',
                 crypted_password: 'password',
                 role_id: 1,
@@ -128,12 +130,12 @@ describe ConferenceController do
       allow(ConferenceController).to receive(:verify_recaptcha).and_return(true)
       #   expect(response).to render_template 'content_pages/view'
 
-      post :create, params, session
+      post :create, params: request_params, session: user_session
       expect(response).to redirect_to(root_path)
     end
     it 'should redirect to join conference page with incorrect recaptcha' do
-      session = { user: student2 }
-      params = {
+      user_session = { user: student2 }
+      request_params = {
         user: { name: 'lily2',
                 crypted_password: 'password',
                 role_id: 1,
@@ -158,8 +160,8 @@ describe ConferenceController do
 
       allow_any_instance_of(ConferenceController).to receive(:verify_recaptcha).and_return(false)
       #   expect(response).to render_template 'content_pages/view'
-      post :create, params, session
-      expect { post :create, params, session }.to change(User, :count).by(0)
+      post :create, params: request_params, session: user_session
+      expect { post :create, params: request_params, session: user_session }.to change(User, :count).by(0)
     end
   end
 end

@@ -21,14 +21,14 @@ FactoryBot.define do
   # the instructor_id field, a holdover from the Questionnaire
   # superclass, is the field used to store the team id.
   factory :quiz_questionnaire, class: QuizQuestionnaire do
-    name { 'Quiz Questionnaire' }
+    name 'Quiz Questionnaire'
     instructor_id { AssignmentTeam.first.id || association(:assignment_team).id }
-    private { 0 }
-    min_question_score { 0 }
-    max_question_score { 1 }
-    type { 'QuizQuestionnaire' }
-    display_type { 'Quiz' }
-    instruction_loc { nil }
+    private 0
+    min_question_score 0
+    max_question_score 1
+    type 'QuizQuestionnaire'
+    display_type 'Quiz'
+    instruction_loc nil
   end
 
   # Quiz Question is the main representation of a single question
@@ -37,12 +37,12 @@ FactoryBot.define do
   # Each quiz question shares a one-to-many relationship with
   # quiz question choices and answers.
   factory :quiz_question, class: QuizQuestion do
-    txt { 'Question' }
-    weight { 1 }
+    txt 'Question'
+    weight 1
     questionnaire { QuizQuestionnaire.first || association(:quiz_questionnaire) }
     quiz_question_choices { [QuizQuestionChoice.first] || association(:quiz_question_choices) }
-    seq { 1.0 }
-    type { 'MultipleChoiceRadio' }
+    seq 1.0
+    type 'MultipleChoiceRadio'
   end
 
   # Quiz Question Choice stores the definition for each individual
@@ -50,8 +50,8 @@ FactoryBot.define do
   # question.
   factory :quiz_question_choice, class: QuizQuestionChoice do
     question { QuizQuestion.first || association(:quiz_question) }
-    txt { 'Answer Choice 1' }
-    iscorrect { 0 }
+    txt 'Answer Choice 1'
+    iscorrect 0
   end
 
   # Quiz Response Map is a relationship between a Quiz Questionnaire,
@@ -68,7 +68,7 @@ FactoryBot.define do
   # questionnaire. It foreign keys to a quiz response map.
   factory :quiz_response, class: QuizResponse do
     response_map { QuizResponseMap.first || association(:response_map) }
-    is_submitted { 1 }
+    is_submitted 1
   end
 
   # Answer records a participants answer to a single quiz
@@ -77,19 +77,19 @@ FactoryBot.define do
   factory :answer, class: Answer do
     question { Question.first || association(:question) }
     response { Response.first || association(:response) }
-    answer { 1 }
-    comments { 'Answer text' }
+    answer 1
+    comments 'Answer text'
   end
 
   # ScoreView contains data from Questions, Questionnaire
   # and Answer tables and has all the information necessary
   # to calculate weighted grades
   factory :score_view, class: ScoreView do
-    q1_id { 1 }
-    s_question_id { 1 }
-    question_weight { 1 }
-    s_score { 1 }
-    s_response_id { 1 }
-    s_comments { 'test comment' }
+    q1_id 1
+    s_question_id 1
+    question_weight 1
+    s_score 1
+    s_response_id 1
+    s_comments 'test comment'
   end
 end

@@ -111,9 +111,9 @@
             <td><%= member.user.fullname(session[:ip]) %></td>
             <td><%= member.user.email(session[:ip]) %></td>
             <% status = TeamsUser.find_by(user_id: member.user.id, team_id: member.team.id).pair_programming_status %>
-            <% if (status == "W" or status == nil) and current_user.id != member.user.id %>
+            <% if (status == "W" or status.nil?) and current_user.id != member.user.id %>
               <td>Request Pending</td>
-            <% elsif  (status == "W" or status==nil ) and current_user.id == member.user.id%>
+            <% elsif  (status == "W" or status.nil? ) and current_user.id == member.user.id%>
               <td><%= link_to "Accept",
                     {:controller => 'pair_programming', :action => 'accept', :student_id => @student.id, :team_id => @student.team.id},
                     {:onClick => "javascript: return confirm('Are you sure you want to accept the Pair Programming Request?');"}

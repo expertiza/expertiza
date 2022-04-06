@@ -614,8 +614,8 @@ class Assignment < ApplicationRecord
     questionnaire_ids
   end
 
-  def is_pair_programming_enabled?(assignment_id)
-    return Assignment.find(assignment_id).enable_pair_programming
+  def pair_programming_enabled?
+    self.enable_pair_programming
   end
 
   private

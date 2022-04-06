@@ -276,12 +276,10 @@ describe SubmittedContentController do
     end
   end
 
-  #########################################
   let(:student1) { build_stubbed(:student, id: 21, role_id: 1) }
   let(:participant) { build(:participant, id: 1, user_id: 21) }
   describe 'student#view' do
     it 'student#view it' do
-      #puts('-----STUDENT#view--------')
       allow(AssignmentParticipant).to receive(:find).and_return(participant)
       stub_current_user(student1, student1.role.name, student1.role)
       allow(participant).to receive(:name).and_return('Name')
@@ -296,14 +294,11 @@ describe SubmittedContentController do
 
   describe 'instructor#view' do
     it 'instructor#view it' do
-      #puts('-----instructor#view--------')
       allow(AssignmentParticipant).to receive(:find).and_return(participant)
       stub_current_user(instructor1, instructor1.role.name, instructor1.role)
       allow(participant).to receive(:name).and_return('Name')
       params = { id: 21 }
-      #puts('-------inst a-----------')
       response = get :view, params: params
-      #puts('-------inst b-----------')
       expect(response).to redirect_to(action: :edit, view: true, id: 21)
     end
   end
@@ -313,7 +308,6 @@ describe SubmittedContentController do
 
   describe 'superadmin#view' do
     it 'superadmin#view it' do
-      #puts('-----superadmin#view--------')
       allow(AssignmentParticipant).to receive(:find).and_return(participant)
       stub_current_user(superadmin1, superadmin1.role.name, superadmin1.role)
       allow(participant).to receive(:name).and_return('Name')
@@ -322,13 +316,6 @@ describe SubmittedContentController do
       expect(response).to redirect_to(action: :edit, view: true, id: 21)
     end
   end
-
-  ################################
-
-  ## these only work when are_needed_authorizations_present? is hardcode return true; missing perms bc have nil participant?
-  ## then need to know how to set perms
-  ## also ask about the coverage report (index.html not opening)
-  ## ask about prog2 grading rubric?
 
   let(:student1) { build_stubbed(:student, id: 21, role_id: 1) }
   let(:participant) { build(:participant, id: 1, user_id: 21) }
@@ -374,17 +361,6 @@ describe SubmittedContentController do
       expect(response).to render_template(:edit)
     end
   end
-
-  ###################################
-  ##  .to be_truthy
-  ##  .to be_falsey
-
-  ### From link from Nick
-  # it "should do a thing" do
-  #   my_object = MyObject.new
-  #   my_object.send(:do_things_with_message, some_message)
-  #   my_object.thing.should == true
-  # end
 
   ### NEED TO DO check_content_type_integrity
 

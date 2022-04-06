@@ -13,17 +13,19 @@
   <b style="text-align: center"><%=t ".team_name_up"%> &nbsp;&nbsp;</b><%= @student.team.name(session[:ip]) %> &nbsp;&nbsp;&nbsp;
     <%= link_to t(".edit_name"), controller: 'StudentTeams', action: 'edit', team_id: @student.team.id, student_id: @student.id %>
   
-  <% if @student.assignment.is_pair_programming_enabled?(@student.assignment.id)%>
-    <% if Team.find(@student.team.id).pair_programming_request==0 %>
+  <% if @student.assignment.pair_programming_enabled? %>
+    <% if Team.find(@student.team.id).pair_programming_request.nil? or Team.find(@student.team.id).pair_programming_request.zero? %>
+      <% button_enabled = true %>
       <button style="float: right;"><%= link_to "Request to Pair Program",
         {:controller => 'pair_programming', :action => 'send_invitations', :team_id=>@student.team.id, :student_id => @student.id},
         {:onClick => "javascript: return confirm('Confirm if Pair Programming request should be sent');"}
       %></button>
     <% else %>
+      <% button_enabled = false %>
       <% users = TeamsUser.where(team_id: @student.team.id) %>
       <% pair_programming_team_status = true %>
       <% for user in users %>
-        <% if user.pair_programming_status == "W" or user.pair_programming_status == nil %>
+        <% if user.pair_programming_status == "W" or user.pair_programming_status.nil? %>
           <% pair_programming_team_status = false %>
           <% break %>
         <% end %>
@@ -136,9 +138,9 @@
             <td><%= member.user.fullname(session[:ip]) %></td>
             <td><%= member.user.email(session[:ip]) %></td>
             <% status = TeamsUser.find_by(user_id: member.user.id, team_id: member.team.id).pair_programming_status %>
-            <% if (status == "W" or status == nil) and current_user.id != member.user.id %>
+            <% if (status == "W" or status.nil?) and current_user.id != member.user.id %>
               <td>Request Pending</td>
-            <% elsif  (status == "W" or status==nil ) and current_user.id == member.user.id%>
+            <% elsif  (status == "W" or status.nil? ) and current_user.id == member.user.id%>
               <td><%= link_to "Accept",
                     {:controller => 'pair_programming', :action => 'accept', :student_id => @student.id, :team_id => @student.team.id},
                     {:onClick => "javascript: return confirm('Are you sure you want to accept the Pair Programming Request?');"}

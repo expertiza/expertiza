@@ -44,13 +44,13 @@ describe EulaController do
     it 'updates is_new_user attribute' do
       params = {id: 1}
       session = {user: student}
-      get :accept, params, session
+      get :accept, params: params, session: session
       expect(session[:user].is_new_user).to eq(false)
     end
     it 'accept redirects to student_task/list' do      
       params = {id: 1}
       session = {user: student}
-      post :accept, params, session
+      post :accept, params: params, session: session
       expect(response).to redirect_to('/student_task/list')
     end
   end
@@ -60,14 +60,14 @@ describe EulaController do
     it 'displays the flash notice' do
       params = {id: 1}
       session = {user: student}
-      get :decline, params, session
+      get :decline, params: params, session: session
       expect(flash[:notice]).to eq 'Please accept the license agreement in order to use the system.'
     end
     # test if it shows the same page again
     it 'redirects to display same page' do
       params = {id: 1}
       session = {user: student}
-      get :decline, params, session
+      get :decline, params: params, session: session
       expect(response).to redirect_to('/eula/display')
     end
   end

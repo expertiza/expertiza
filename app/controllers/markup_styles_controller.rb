@@ -43,7 +43,7 @@ class MarkupStylesController < ApplicationController
 
   def update
     @markup_style = MarkupStyle.find(params[:id])
-    if @markup_style.update_attributes(markup_styles_params[:markup_style])
+    if @markup_style.update_attributes(markup_styles_params)
       redirect_to action: 'show', id: @markup_style
       flash[:notice] = 'The markup style was successfully updated.'
     else
@@ -60,4 +60,5 @@ class MarkupStylesController < ApplicationController
 
   def markup_styles_params
     params.permit(:id, :markup_style)
+  end
 end

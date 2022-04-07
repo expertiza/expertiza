@@ -137,4 +137,5 @@ class SiteControllersController < ApplicationController
   private
   def site_controller_params
     params.require(:site_controller).permit(:name, :permission_id, :builtin)
+  end
 end

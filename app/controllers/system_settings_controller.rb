@@ -70,7 +70,7 @@ class SystemSettingsController < ApplicationController
     @roles = Role.order('name')
     @pages = ContentPage.order('name')
     @markup_styles = MarkupStyle.order('name')
-    @markup_styles.unshift MarkupStyle.new(id: nil, name: '(none)')
+    @markup_styles.unshift MarkupStyle.new(id: nil, name: '(none)') unless @markup_style.nil?
   end
 
   private
@@ -88,4 +88,5 @@ class SystemSettingsController < ApplicationController
       :session_expired_page_id,
       :menu_depth
     )
+  end
 end

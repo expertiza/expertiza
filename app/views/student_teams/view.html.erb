@@ -91,7 +91,7 @@
   </table>
 <% end %>
 
-<% if @student.team != nil and Team.find(@student.team.id).pair_programming_request!=0 %>
+<% if !@student.team.nil? and Team.find(@student.team.id).pair_programming_request!=0 %>
   <div>
     <% if !@student.team.nil? && @student.assignment.max_team_size > 1 %>  
       <br/><br/>

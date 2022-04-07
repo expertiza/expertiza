@@ -80,7 +80,7 @@ class ImpersonateController < ApplicationController
       redirect_back
     elsif params[:impersonate] && warn_for_special_chars(params[:impersonate][:name], 'Username')
       flash[:error] = 'Please enter valid user name'
-      redirect_back
+      redirect_back fallback_location: root_path
     end
   end
 

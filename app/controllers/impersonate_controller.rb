@@ -56,11 +56,11 @@ class ImpersonateController < ApplicationController
 
   def overwrite_session
     if params[:impersonate].nil?
-      user = get_real_user(params[:user][:name])
+      user = real_user(params[:user][:name])
       session[:super_user] = session[:user] if session[:super_user].nil?
       generate_session(user)
     elsif !params[:impersonate][:name].empty?
-      user = get_real_user(params[:impersonate][:name])
+      user = real_user(params[:impersonate][:name])
       generate_session(user)
     else
       session[:user] = session[:super_user]
@@ -92,7 +92,7 @@ class ImpersonateController < ApplicationController
 
   def check_if_user_impersonateable
     if params[:impersonate].nil?
-      user = get_real_user(params[:user][:name])
+      user = real_user(params[:user][:name])
       unless @original_user.can_impersonate? user
         @message = "You cannot impersonate '#{params[:user][:name]}'."
         temp
@@ -117,12 +117,12 @@ class ImpersonateController < ApplicationController
       if params[:impersonate].nil?
         @message = "You cannot impersonate '#{params[:user][:name]}'."
         @message = 'User name cannot be empty' if params[:user][:name].empty?
-        user = get_real_user(params[:user][:name])
+        user = real_user(params[:user][:name])
         check_if_user_impersonateable if user
       elsif !params[:impersonate][:name].empty?
         # Impersonate a new account
         @message = "You cannot impersonate '#{params[:impersonate][:name]}'."
-        user = get_real_user(params[:impersonate][:name])
+        user = real_user(params[:impersonate][:name])
         check_if_user_impersonateable if user
       # Revert to original account when currently in the impersonated session
       elsif !session[:super_user].nil?
@@ -143,7 +143,7 @@ class ImpersonateController < ApplicationController
 
   # This method checks if the user is in anonymized view and accordingly returns the user object associated with the parameter
 
-  def get_real_user(name)
+  def real_user(name)
     if User.anonymized_view?(session[:ip])
       user = User.real_user_from_anonymized_name(name)
     else

@@ -69,11 +69,7 @@
 
         <!-- Pair Programming -->
           <td>
-            <% if Team.find(team.id).pair_programming_request == 2 %>
-              Yes
-            <% else %>
-              No
-            <% end %>
+            <%= Team.find(team.id).pair_programming_request == 2 ? "Yes": "No" %>
           </td>
 
         <!--Submitted item(s)-->

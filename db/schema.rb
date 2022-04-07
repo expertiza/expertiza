@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220111023859) do
+ActiveRecord::Schema.define(version: 20220405222420) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -31,6 +31,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.string "value"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "confidence_level", precision: 10, scale: 5
     t.index ["answer_id"], name: "index_answer_tags_on_answer_id"
     t.index ["tag_prompt_deployment_id"], name: "index_answer_tags_on_tag_prompt_deployment_id"
     t.index ["user_id"], name: "index_answer_tags_on_user_id"
@@ -122,6 +123,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.boolean "is_answer_tagging_allowed"
     t.boolean "has_badge"
     t.boolean "allow_selecting_additional_reviews_after_1st_round"
+    t.integer "sample_assignment_id"
     t.boolean "vary_by_topic", default: false
     t.boolean "vary_by_round", default: false
     t.boolean "reviewer_is_team"
@@ -130,9 +132,11 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.boolean "auto_assign_mentor", default: false
     t.boolean "duty_based_assignment?"
     t.boolean "questionnaire_varies_by_duty"
+    t.boolean "enable_pair_programming"
     t.index ["course_id"], name: "fk_assignments_courses"
     t.index ["instructor_id"], name: "fk_assignments_instructors"
     t.index ["late_policy_id"], name: "fk_late_policy_id"
+    t.index ["sample_assignment_id"], name: "fk_rails_b01b82a1a2"
   end
 
   create_table "automated_metareviews", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -286,7 +290,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["submission_allowed_id"], name: "fk_due_date_submission_allowed"
   end
 
-  create_table "duties", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "duties", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci" do |t|
     t.string "name"
     t.integer "max_members_for_duty"
     t.integer "assignment_id"
@@ -329,10 +333,11 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.integer "times_used", default: 0, null: false
     t.integer "instructor_id", null: false
     t.string "policy_name", null: false
+    t.boolean "private", default: true, null: false
     t.index ["instructor_id"], name: "fk_instructor_id"
   end
 
-  create_table "locks", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "locks", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci" do |t|
     t.integer "timeout_period"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -364,7 +369,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.string "type"
   end
 
-  create_table "notifications", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "notifications", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3" do |t|
     t.string "subject"
     t.text "description"
     t.date "expiration_date"
@@ -397,7 +402,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["user_id"], name: "fk_participant_users"
   end
 
-  create_table "password_resets", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "password_resets", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3" do |t|
     t.string "user_email"
     t.string "token"
     t.datetime "updated_at"
@@ -407,7 +412,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.string "name", default: "", null: false
   end
 
-  create_table "plagiarism_checker_assignment_submissions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "plagiarism_checker_assignment_submissions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3" do |t|
     t.string "name"
     t.string "simicheck_id"
     t.datetime "created_at", null: false
@@ -416,7 +421,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["assignment_id"], name: "index_plagiarism_checker_assgt_subm_on_assignment_id"
   end
 
-  create_table "plagiarism_checker_comparisons", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "plagiarism_checker_comparisons", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3" do |t|
     t.integer "plagiarism_checker_assignment_submission_id"
     t.string "similarity_link"
     t.decimal "similarity_percentage", precision: 10
@@ -436,6 +441,10 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.integer "score"
     t.text "advice"
     t.index ["question_id"], name: "fk_question_question_advices"
+  end
+
+  create_table "question_types", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.string "type"
   end
 
   create_table "questionnaires", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -501,7 +510,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["participant_id"], name: "fk_resubmission_times_participants"
   end
 
-  create_table "review_bids", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "review_bids", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci" do |t|
     t.integer "priority"
     t.integer "signuptopic_id"
     t.integer "participant_id"
@@ -515,7 +524,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["user_id"], name: "fk_rails_6041e1cdb9"
   end
 
-  create_table "review_comment_paste_bins", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "review_comment_paste_bins", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3" do |t|
     t.integer "review_grade_id"
     t.string "title"
     t.text "review_comment"
@@ -524,7 +533,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["review_grade_id"], name: "fk_rails_0a539bcc81"
   end
 
-  create_table "review_grades", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "review_grades", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3" do |t|
     t.integer "participant_id"
     t.integer "grade_for_reviewer"
     t.text "comment_for_reviewer"
@@ -551,14 +560,14 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["role_id"], name: "fk_roles_permission_role_id"
   end
 
-  create_table "sample_reviews", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "sample_reviews", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci" do |t|
     t.integer "assignment_id"
     t.integer "response_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "sections", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "sections", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci" do |t|
     t.string "name", null: false
     t.text "desc_text"
     t.datetime "created_at"
@@ -620,6 +629,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.string "vote"
     t.integer "suggestion_id"
     t.datetime "created_at"
+    t.boolean "visible_to_student", default: false
   end
 
   create_table "suggestions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -699,24 +709,27 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.integer "directory_num"
     t.integer "grade_for_submission"
     t.text "comment_for_submission"
+    t.boolean "make_public", default: false
+    t.integer "pair_programming_request", limit: 1
   end
 
   create_table "teams_users", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "team_id"
     t.integer "user_id"
     t.integer "duty_id"
+    t.string "pair_programming_status", limit: 1
     t.index ["duty_id"], name: "index_teams_users_on_duty_id"
     t.index ["team_id"], name: "fk_users_teams"
     t.index ["user_id"], name: "fk_teams_users"
   end
 
-  create_table "track_notifications", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.integer "notification_id"
+  create_table "track_notifications", id: :integer, force: :cascade, options: "ENGINE=MyISAM DEFAULT CHARSET=latin1" do |t|
     t.integer "user_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["notification_id"], name: "index_track_notifications_on_notification_id"
-    t.index ["user_id"], name: "index_track_notifications_on_user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer "notification_id", null: false
+    t.index ["notification_id"], name: "notification_id"
+    t.index ["user_id"], name: "user_id"
   end
 
   create_table "tree_folders", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -725,7 +738,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.integer "parent_id"
   end
 
-  create_table "user_pastebins", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "user_pastebins", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3" do |t|
     t.integer "user_id"
     t.string "short_form"
     t.text "long_form"
@@ -733,7 +746,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "users", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "users", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3" do |t|
     t.string "name", default: "", null: false
     t.string "crypted_password", limit: 40, default: "", null: false
     t.integer "role_id", default: 0, null: false
@@ -760,7 +773,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["role_id"], name: "fk_user_role_id"
   end
 
-  create_table "versions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "versions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3" do |t|
     t.string "item_type", null: false
     t.integer "item_id", null: false
     t.string "event", null: false
@@ -780,6 +793,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
   add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
   add_foreign_key "assignment_questionnaires", "duties"
   add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
+  add_foreign_key "assignments", "assignments", column: "sample_assignment_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
   add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
@@ -820,6 +834,4 @@ ActiveRecord::Schema.define(version: 20220111023859) do
   add_foreign_key "teams_users", "duties"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
-  add_foreign_key "track_notifications", "notifications"
-  add_foreign_key "track_notifications", "users"
 end

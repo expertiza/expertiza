@@ -24,7 +24,7 @@
       <% button_enabled = false %>
       <% users = TeamsUser.where(team_id: @student.team.id) %>
       <% pair_programming_team_status = true %>
-      <% for user in users %>
+      <% users.each do |user| %>
         <% if user.pair_programming_status == "W" or user.pair_programming_status.nil? %>
           <% pair_programming_team_status = false %>
           <% break %>

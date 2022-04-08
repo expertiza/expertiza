@@ -25,8 +25,8 @@ class PairProgrammingController < ApplicationController
     def decline
         user = TeamsUser.find_by(team_id: params[:team_id], user_id: current_user.id)
         user.update_attributes(pair_programming_status: "D")
-        flash[:success] = "Pair Programming Request Declined!"
         Team.find(params[:team_id]).update_attributes(pair_programming_request: 0)
+        flash[:success] = "Pair Programming Request Declined!"
         redirect_to view_student_teams_path student_id: params[:student_id]
     end
 end

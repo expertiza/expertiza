@@ -23,6 +23,19 @@ with network lag and having to reinstall gems every time you connect. Installing
 Life is full of tradeoffs. :-) The good news is that you can start on one environment, push your work to git,
 and switch to another environment if you don't like the one you started with.
 
+You need to upgrade the ruby version of the VCL by installing rbenv
+- cd ~
+- sudo apt update
+- sudo apt install git curl libssl-dev libreadline-dev zlib1g-dev autoconf bison build-essential libyaml-dev libreadline-dev libncurses5-dev libffi-dev libgdbm-dev
+- curl -fsSL https://github.com/rbenv/rbenv-installer/raw/HEAD/bin/rbenv-installer | bash
+- echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+- echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+- source ~/.bashrc
+- git clone https://github.com/rbenv/ruby-build.git
+- PREFIX=/usr/local sudo ./ruby-build/install.sh
+- rbenv install 2.7.5
+- rbenv global 2.7.5
+
 ### Installing locally
 
 See the Google doc on [setting up the Expertiza development environment](https://docs.google.com/document/d/1tXmwju6R7KQbvycku-bdXxa6rXSUN4BMyvjY3ROmMSw/edit).

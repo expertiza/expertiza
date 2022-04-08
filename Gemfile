@@ -2,13 +2,13 @@ source 'https://rubygems.org'
 
 ruby '2.7.5'
 
-gem 'rails', '~> 5.1'
+gem 'rails', '~> 5.2'
 
 ## Gems in Alphabetical Order
-gem 'actionpack', '5.1'
-gem 'activerecord', '5.1'
+gem 'actionpack', '~> 5.2.1.rc1'
+gem 'activerecord', '~> 5.2.1.rc1'
 gem 'activerecord-session_store', '1.1.3'
-gem 'activesupport', '5.1'
+gem 'activesupport', '~> 5.2.1.rc1'
 gem 'airbrake', '5.2.0'
 gem 'authlogic', '4.5.0'
 gem 'awesome_nested_set', '3.3.1'
@@ -81,8 +81,9 @@ gem 'tinymce-rails'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
-gem 'railties', '5.1'
+gem 'railties', '~> 5.1'
 gem 'redis-actionpack', '5.0.1'
+gem 'scanf'
 
 group :development do
   gem 'daemons'

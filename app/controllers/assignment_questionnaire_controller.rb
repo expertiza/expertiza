@@ -60,7 +60,6 @@ class AssignmentQuestionnaireController < ApplicationController
     respond_to do |format|
       format.json { render json: @assignment_questionnaire }
     end
-
   end
 
   private

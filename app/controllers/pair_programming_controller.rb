@@ -10,8 +10,8 @@ class PairProgrammingController < ApplicationController
         users.each { |user| user.update_attributes(pair_programming_status: "W")}
         TeamsUser.find_by(team_id: params[:team_id], user_id: current_user.id).update_attributes(pair_programming_status: "A")
         #ExpertizaLogger.info "Accepting Invitation #{params[:inv_id]}: #{accepted}"
-        flash[:success] = "Invitations have been sent successfully!"
         Team.find(params[:team_id]).update_attributes(pair_programming_request: 1)
+        flash[:success] = "Invitations have been sent successfully!"
         redirect_to view_student_teams_path student_id: params[:student_id]
     end
 

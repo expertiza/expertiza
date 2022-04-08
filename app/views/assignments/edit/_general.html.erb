@@ -111,7 +111,14 @@ function autogenerate_submission(){
       </span>
       &nbsp;&nbsp;&nbsp;&nbsp;
       <!--Maximum number of members per team-->
-    </td>
+
+      <br>
+      <!--E2244: Pair Programming-->
+      <span id='assignment_pair_programming' class="form-inline"  <%= 'hidden' unless @assignment_form.assignment.team_assignment?%>>
+        <input name="assignment_form[assignment][enable_pair_programming]" type="hidden" value="false"/>
+        <%= check_box_tag('assignment_form[assignment][enable_pair_programming]', 'true', @assignment_form.assignment.enable_pair_programming) %>
+        <%= label_tag('assignment_form[assignment][enable_pair_programming]', 'Pair Programming?') %>
+      </span>
   </tr>
 
   <!-- E2115 Mentor Management -->
@@ -253,15 +260,6 @@ function autogenerate_submission(){
   </tr>
   <!-- End answer tagging code -->
 
-  <!--E2244: Pair Programming-->
-  <tr>
-    <td style='padding:5px' id='assignment_enable_pair_programming_field'>
-      <input name="assignment_form[assignment][enable_pair_programming]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][enable_pair_programming]', 'true', @assignment_form.assignment.enable_pair_programming) %>
-      <%= label_tag('assignment_form[assignment][enable_pair_programming]', 'Pair Programming?') %>
-    </td>
-  </tr>
-
   <!--"available to student?" should be the last checkbox-->
   <tr>
     <td style='padding:5px' id='assignment_availability_flag_field'>
@@ -330,6 +328,7 @@ function autogenerate_submission(){
         var teammate_reviews_field = jQuery('#assignment_show_teammate_reviews');
         var team_formation_due_date_checkbox = jQuery('#team_formation_due_date_checkbox');
         var autoAssignMentorCheckbox = jQuery('#auto_assign_mentor_checkbox');
+        var pair_programming_field = jQuery('#assignment_pair_programming');
 
         jQuery("#questionnaire_table_TeammateReviewQuestionnaire").remove()
         if (checkbox.is(':checked')) {
@@ -337,6 +336,7 @@ function autogenerate_submission(){
             team_formation_due_date_checkbox.removeAttr('hidden')
             jQuery('#assignment_form_assignment_max_team_size').val('2');
             teammate_reviews_field.removeAttr('hidden');
+            pair_programming_field.removeAttr('hidden');
             // E2115 hide auto assign mentor checkbox when an
             // an assignment does not have teams
             // what would the mentor be assigned to if there are no teams?
@@ -347,6 +347,7 @@ function autogenerate_submission(){
               team_count_field.attr('hidden', true);
               team_formation_due_date_checkbox.attr('hidden', true)
               teammate_reviews_field.attr('hidden', true);
+              pair_programming_field.attr('hidden',true);
               // E2115 show auto assign mentor checkbox when an
               // an assignment has teams
               autoAssignMentorCheckbox.show();

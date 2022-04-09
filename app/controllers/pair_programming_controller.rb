@@ -1,6 +1,6 @@
 class PairProgrammingController < ApplicationController
   include AuthorizationHelper
-  
+
   def action_allowed?
     current_user_has_student_privileges?
   end

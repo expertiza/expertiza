@@ -41,6 +41,8 @@ class TagPromptsController < ApplicationController
   end
 
   private
+
   def tag_prompts_params
     params.permit(:prompt, :desc, :control_type)
+  end
 end

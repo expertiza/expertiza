@@ -1,5 +1,5 @@
 class PlagiarismCheckerComparison < ApplicationRecord
-  #attr_accessible :similarity_link, :similarity_percentage, :file1_name, :file1_team, :file2_name, :file2_team
+  # attr_accessible :similarity_link, :similarity_percentage, :file1_name, :file1_team, :file2_name, :file2_team
   belongs_to :plagiarism_checker_assignment_submission
 
   # t.string :similarity_link

@@ -74,6 +74,7 @@ class SystemSettingsController < ApplicationController
   end
 
   private
+
   def system_settings_params
     params.require(:system_settings).permit(
       :site_name,

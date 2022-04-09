@@ -142,8 +142,8 @@ class UsersController < ApplicationController
   end
 
   def update
-    #TODO: Remove this permit! and replace it with appropriate strong params after testing.
-    #method :- user_params
+    # TODO: Remove this permit! and replace it with appropriate strong params after testing.
+    # method :- user_params
     params.permit!
     @user = User.find params[:id]
     # update username, when the user cannot be deleted

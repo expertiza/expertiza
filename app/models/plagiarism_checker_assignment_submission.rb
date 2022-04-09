@@ -1,5 +1,5 @@
 class PlagiarismCheckerAssignmentSubmission < ApplicationRecord
-  #attr_accessible :name
+  # attr_accessible :name
   belongs_to :assignment
   has_many :plagiarism_checker_comparisons, dependent: :destroy
 

@@ -1,4 +1,4 @@
-class CreateReviewFeedbacks < ActiveRecord::Migration
+class CreateReviewFeedbacks < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'review_feedbacks', force: true do |t|
       t.column 'assignment_id', :integer

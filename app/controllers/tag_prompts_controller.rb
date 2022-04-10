@@ -18,12 +18,12 @@ class TagPromptsController < ApplicationController
     @tagprompts = TagPrompt.all.order('prompt asc')
     @tagprompts.where!('prompt LIKE ?', "%#{params[:prompt]}%") if params.key?(:prompt) && (!params[:prompt] == '')
     @tagprompts.where!('desc LIKE ?', "%#{params[:desc]}%") if params.key?(:desc) && (!params[:desc] == '')
-    @tagprompts.where!('control_type LIKE ?', "%#{params[:control_type]}%") if params.key?(:control_type) && (!params[:control_type] == '')
+    @tagprompts.where!('control_type LIKE ?', "%#{parasms[:control_type]}%") if params.key?(:control_type) && (!params[:control_type] == '')
     render json: @tagprompts
   end
 
   def create
-    @tagprompt = TagPrompt.new(prompt: params[:prompt], desc: params[:desc], control_type: params[:control_type])
+    @tagprompt = TagPrompt.new(tag_prompts_params)
     @tagprompt.save
     render json: @tagprompts
   end
@@ -38,5 +38,11 @@ class TagPromptsController < ApplicationController
     @tagprompt = TagPrompt.find(params[:id])
     @tagprompt.destroy
     render nothing: true, status: 200
+  end
+
+  private
+
+  def tag_prompts_params
+    params.permit(:prompt, :desc, :control_type)
   end
 end

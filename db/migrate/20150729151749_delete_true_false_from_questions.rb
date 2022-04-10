@@ -1,4 +1,4 @@
-class DeleteTrueFalseFromQuestions < ActiveRecord::Migration
+class DeleteTrueFalseFromQuestions < ActiveRecord::Migration[4.2]
   def change
     remove_column 'questions', 'true_false'
   end

@@ -1,6 +1,6 @@
 require 'yaml'
 
-class SubmitMultipleHyperlinks < ActiveRecord::Migration
+class SubmitMultipleHyperlinks < ActiveRecord::Migration[4.2]
   def self.up
     rename_column :participants, :submitted_hyperlink, :submitted_hyperlinks
     Participant.find_each do |p|

@@ -1,4 +1,4 @@
-class CreateQuestionnaireWeights < ActiveRecord::Migration
+class CreateQuestionnaireWeights < ActiveRecord::Migration[4.2]
   def self.up
     create_table :questionnaire_weights do |t|
       t.column :assignment_id, :integer, null: false

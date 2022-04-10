@@ -74,7 +74,7 @@ class QuestionnairesController < ApplicationController
   def initialize_values()
     display_type = params[:questionnaire][:type].split('Questionnaire')[0]
     if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey BookmarkRating].include?(display_type)
-      display_type = (display_type.split /(?=[A-Z])/).join('%')
+      display_type = (display_type.split(/(?=[A-Z])/)).join('%')
     end
     @questionnaire.private = params[:questionnaire][:private] == 'true'
     @questionnaire.name = params[:questionnaire][:name]
@@ -205,7 +205,7 @@ class QuestionnairesController < ApplicationController
 
   # Zhewei: This method is used to add new scored questions when editing questionnaire.
 
-  def add_new_questions
+  def add_new_ScoredQuestion
     questionnaire_id = params[:id] unless params[:id].nil?
     # If the questionnaire is being used in the active period of an assignment, delete existing responses before adding new questions
     if AnswerHelper.check_and_delete_responses(questionnaire_id)

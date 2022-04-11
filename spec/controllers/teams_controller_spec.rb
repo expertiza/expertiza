@@ -232,7 +232,7 @@ describe TeamsController do
         user_session = {team_type: 'Course', user: ta}
         request_params = { id: team5.id }
         post :bequeath_all, params: request_params, session: user_session 
-        expect(flash[:error]).to eq('Invalid team type for bequeathal')
+        expect(flash[:error]).to eq('Invalid team type for bequeath all')
       end
     end
     context 'when there is no course associated with this assignment' do

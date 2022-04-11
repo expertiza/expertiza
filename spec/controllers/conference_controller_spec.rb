@@ -84,7 +84,7 @@ describe ConferenceController do
       allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
       allow(Assignment).to receive(:find).with('2').and_return(assignment1)
       allow(User).to receive(:find).with(1).and_return(instructor1)
-      allow(User).to receive(:email_welcome).and_return(true)
+      allow(User).to receive(:skip_callback).with(:create, :after, :email_welcome).and_return(true)
       post :create, params: request_params
 
       request_params2 = {

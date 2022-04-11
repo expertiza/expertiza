@@ -273,13 +273,13 @@ class Response < ApplicationRecord
 
   def construct_student_html(identifier, self_id, count)
     identifier += '<table width="100%">' \
-						 '<tr>' \
-						 '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;' \
-						 '<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' + "'review_" + self_id + "','review'" + ');return false;">hide review</a>' \
-						 '</td>' \
-						 '<td align="left"><b>Last Reviewed:</b>' \
-						 "<span>#{(updated_at.nil? ? 'Not available' : updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>" \
-						 '</tr></table>'
+             '<tr>' \
+             '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;' \
+             '<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' + "'review_" + self_id + "','review'" + ');return false;">hide review</a>' \
+             '</td>' \
+             '<td align="left"><b>Last Reviewed:</b>' \
+             "<span>#{(updated_at.nil? ? 'Not available' : updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>" \
+             '</tr></table>'
     identifier
   end
 

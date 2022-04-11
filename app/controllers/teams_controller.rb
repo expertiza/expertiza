@@ -13,18 +13,18 @@ class TeamsController < ApplicationController
 
   # attempt to initialize team type in session
   def init_team_type(type)
-    if type and Team.allowed_types.include?(type)
+    if type && Team.allowed_types.include?(type)
       session[:team_type] = type
     end
   end
 
   # retrieve an object's parent by its ID
-  def get_parent_by_id(id)
+  def parent_by_id(id)
     Object.const_get(session[:team_type]).find(id)
   end
 
   # retrieve an object's parent from the object's parent ID
-  def get_parent_from_child(child)
+  def parent_from_child(child)
     Object.const_get(session[:team_type]).find(child.parent_id)
   end
 
@@ -32,7 +32,7 @@ class TeamsController < ApplicationController
   # Instructors can call by clicking "Create teams" icon and then click
   # the "Create teams" link at the bottom.
   def create_teams
-    parent = get_parent_by_id(params[:id])
+    parent = parent_by_id(params[:id])
     Team.randomize_all_by_parent(parent, session[:team_type], params[:team_size].to_i)
     success_message = 'Random teams have been successfully created'
     undo_link(success_message)
@@ -68,7 +68,7 @@ class TeamsController < ApplicationController
 
   # called when a instructor tries to create an empty team manually.
   def create
-    parent = get_parent_by_id(params[:id])
+    parent = parent_by_id(params[:id])
     begin
       Team.check_for_existing(parent, params[:team][:name], session[:team_type])
       @team = Object.const_get(session[:team_type] + 'Team').create(name: params[:team][:name], parent_id: parent.id)
@@ -84,7 +84,7 @@ class TeamsController < ApplicationController
   # updates an existing team with user-entered changes
   def update
     @team = Team.find(params[:id])
-    parent = get_parent_from_child(@team.parent_id)
+    parent = parent_from_child(@team.parent_id)
     begin
       Team.check_for_existing(parent, params[:team][:name], session[:team_type])
       @team.name = params[:team][:name]

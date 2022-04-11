@@ -3,19 +3,19 @@
 <% session[:return_to] = request.url %>
 <%= link_to 'Create Team', :action => 'new', :id=> @root_node.node_object_id, :model => @model %>
 
-<% modelType = (@root_node.class == AssignmentNode) ? 'AssignmentTeam' : 'CourseTeam' %>
+<% model_type = (@root_node.class == AssignmentNode) ? 'AssignmentTeam' : 'CourseTeam' %>
 
 | <%= link_to 'Import Teams',
               :controller=>'import_file',
               :action=>'start',
-              :model => modelType,
+              :model => model_type,
               :title => 'Teams',
               :expected_fields =>  "Team Name <em>(optional)</em>&nbsp;&nbsp;|&nbsp;&nbsp;TeamMember1&nbsp;&nbsp;|&nbsp;&nbsp;TeamMember2&nbsp;&nbsp;|&nbsp;&nbsp;...&nbsp;&nbsp;|&nbsp;&nbsp;TeamMemberN",
               :id => @root_node.node_object_id %>
 |<%= link_to 'Export Teams',
   :controller=>'export_file',
   :action=>'start',
-  :model=> modelType,
+  :model=> model_type,
   :id=>@root_node.node_object_id %>
 |<%= link_to 'Delete All Teams', :action => 'delete_all', :id=> @root_node.node_object_id, :model => @model %>
 |<%= link_to 'Bequeath All Teams', :action=>'bequeath_all', :id => @root_node.node_object_id, :model => @model %>

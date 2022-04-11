@@ -122,7 +122,8 @@ class ResponseController < ApplicationController
     end
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
     redirect_to controller: 'response', action: 'save', id: @map.map_id,
-                return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
+                return: params.permit(:return)[:return], msg: msg, review: params.permit(:review)[:review],
+                save_options: params.permit(:save_options)[:save_options]
   end
 
   def new
@@ -152,7 +153,7 @@ class ResponseController < ApplicationController
       end
       redirect_to action: 'new', id: map.id, return: 'feedback'
     else
-      redirect_to :back
+      redirect_back fallback_location: root_path
     end
   end
 
@@ -200,7 +201,7 @@ class ResponseController < ApplicationController
       @response.email
     end
     redirect_to controller: 'response', action: 'save', id: @map.map_id,
-                return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
+                return: params.permit(:return)[:return], msg: msg, error_msg: error_msg, review: params.permit(:review)[:review], save_options: params.permit(:save_options)[:save_options]
   end
 
   def save
@@ -220,7 +221,7 @@ class ResponseController < ApplicationController
       end
     end
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Response was successfully saved')
-    redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+    redirect_to action: 'redirect', id: @map.map_id, return: params.permit(:return)[:return], msg: params.permit(:msg)[:msg], error_msg: params.permit(:error_msg)[:error_msg]
   end
 
   def redirect

@@ -1,3 +1,3 @@
-class Language < ActiveRecord::Base
-  attr_accessible :name
+class Language < ApplicationRecord
+  # #attr_accessible :name
 end

@@ -1,4 +1,4 @@
-class CreateReviewStrategies < ActiveRecord::Migration
+class CreateReviewStrategies < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'review_strategies', force: true do |t|
       t.column 'name', :string

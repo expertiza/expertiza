@@ -1,7 +1,7 @@
 require 'analytic/response_analytic'
 require 'lingua/en/readability'
 
-class Response < ActiveRecord::Base
+class Response < ApplicationRecord
   # Added for E1973. A team review will have a lock on it so only one user at a time may edit it.
   include Lockable
   include ResponseAnalytic
@@ -273,13 +273,13 @@ class Response < ActiveRecord::Base
 
   def construct_student_html(identifier, self_id, count)
     identifier += '<table width="100%">' \
-						 '<tr>' \
-						 '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;' \
-						 '<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' + "'review_" + self_id + "','review'" + ');return false;">hide review</a>' \
-						 '</td>' \
-						 '<td align="left"><b>Last Reviewed:</b>' \
-						 "<span>#{(updated_at.nil? ? 'Not available' : updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>" \
-						 '</tr></table>'
+             '<tr>' \
+             '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;' \
+             '<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' + "'review_" + self_id + "','review'" + ');return false;">hide review</a>' \
+             '</td>' \
+             '<td align="left"><b>Last Reviewed:</b>' \
+             "<span>#{(updated_at.nil? ? 'Not available' : updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>" \
+             '</tr></table>'
     identifier
   end
 

@@ -23,7 +23,7 @@ class TagPromptsController < ApplicationController
   end
 
   def create
-    @tagprompt = TagPrompt.new(prompt: params[:prompt], desc: params[:desc], control_type: params[:control_type])
+    @tagprompt = TagPrompt.new(tag_prompts_params)
     @tagprompt.save
     render json: @tagprompts
   end
@@ -38,5 +38,11 @@ class TagPromptsController < ApplicationController
     @tagprompt = TagPrompt.find(params[:id])
     @tagprompt.destroy
     render nothing: true, status: 200
+  end
+
+  private
+
+  def tag_prompts_params
+    params.permit(:prompt, :desc, :control_type)
   end
 end

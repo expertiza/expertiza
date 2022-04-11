@@ -1,4 +1,4 @@
-class CreateBookmarks < ActiveRecord::Migration
+class CreateBookmarks < ActiveRecord::Migration[4.2]
   def self.up
     if table_exists?(:bookmarks) == false
       create_table :bookmarks do |t|

@@ -1,4 +1,4 @@
-class CreateTeamRoles < ActiveRecord::Migration
+class CreateTeamRoles < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'team_roles', force: true do |t|
       t.string 'role_names'

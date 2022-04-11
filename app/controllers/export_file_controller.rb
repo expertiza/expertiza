@@ -46,7 +46,7 @@ class ExportFileController < ApplicationController
         Object.const_get(params[:model]).export_details(csv, params[:id], params[:details])
       else
         flash[:error] = "This operation is not supported for #{params[:model]}"
-        redirect_to :back
+        redirect_back fallback_location: root_path
         return nil
       end
     end

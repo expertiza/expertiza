@@ -1,4 +1,4 @@
-class ControllerUpdateCoursesUsers < ActiveRecord::Migration
+class ControllerUpdateCoursesUsers < ActiveRecord::Migration[4.2]
   def self.up
     permission1 = Permission.find_or_create_by(name: 'administer courses')
     site_controller = SiteController.find_or_create_by(name: 'courses_users')

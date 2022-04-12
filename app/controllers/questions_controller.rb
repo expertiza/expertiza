@@ -92,6 +92,7 @@ class QuestionsController < ApplicationController
   end
 
   private
+
   def question_params
     params.permit(:id, :question)
   end

@@ -337,8 +337,8 @@ ActiveRecord::Schema.define(version: 2022_01_11_023859) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "user_id"
-    t.string "lockable_type"
     t.integer "lockable_id"
+    t.string "lockable_type"
     t.index ["user_id"], name: "fk_rails_426f571216"
   end
 

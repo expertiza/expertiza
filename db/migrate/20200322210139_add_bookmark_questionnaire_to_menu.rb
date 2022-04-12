@@ -2,7 +2,7 @@ class AddBookmarkQuestionnaireToMenu < ActiveRecord::Migration[4.2]
     def self.up
     site_controller = SiteController.find_by_name('tree_display')
 
-    bookmarkreview_rubrics_action = ControllerAction.find_or_create_by(name: 'goto_bookmark_reviews', site_controller_id: site_controller.id)
+    bookmarkreview_rubrics_action = ControllerAction.find_or_create_by(name: 'goto_bookmark_reviews')
     bookmarkreview_rubrics_action.site_controller_id = site_controller.id
     bookmarkreview_rubrics_action.save
 

@@ -12,7 +12,7 @@
     <% else %>
         <li class="dropdown">
     <% end %>
-    <a href=<%= URI.encode("/menu/#{item.name}") %>
+    <a href=<%= ERB::Util.url_encode("/menu/#{item.name}") %>
                  <%= if item.children
                        ' class="daddy"'
                      end %>title='<%= long_name %>'><%= item.label.html_safe %></a>

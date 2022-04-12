@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220111023859) do
+ActiveRecord::Schema.define(version: 2022_01_11_023859) do
 
-  create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "account_requests", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name"
     t.integer "role_id"
     t.string "fullname"
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.text "self_introduction"
   end
 
-  create_table "answer_tags", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "answer_tags", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "answer_id"
     t.integer "tag_prompt_deployment_id"
     t.integer "user_id"
@@ -36,7 +36,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["user_id"], name: "index_answer_tags_on_user_id"
   end
 
-  create_table "answers", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "answers", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "question_id", default: 0, null: false
     t.integer "answer"
     t.text "comments"
@@ -45,7 +45,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["response_id"], name: "fk_score_response"
   end
 
-  create_table "assignment_badges", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "assignment_badges", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "badge_id"
     t.integer "assignment_id"
     t.integer "threshold"
@@ -55,7 +55,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["badge_id"], name: "index_assignment_badges_on_badge_id"
   end
 
-  create_table "assignment_questionnaires", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "assignment_questionnaires", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "assignment_id"
     t.integer "questionnaire_id"
     t.integer "user_id"
@@ -71,7 +71,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["user_id"], name: "fk_aq_user_id"
   end
 
-  create_table "assignments", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "assignments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "name"
@@ -135,14 +135,14 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["late_policy_id"], name: "fk_late_policy_id"
   end
 
-  create_table "automated_metareviews", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.float "relevance", limit: 24
-    t.float "content_summative", limit: 24
-    t.float "content_problem", limit: 24
-    t.float "content_advisory", limit: 24
-    t.float "tone_positive", limit: 24
-    t.float "tone_negative", limit: 24
-    t.float "tone_neutral", limit: 24
+  create_table "automated_metareviews", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.float "relevance"
+    t.float "content_summative"
+    t.float "content_problem"
+    t.float "content_advisory"
+    t.float "tone_positive"
+    t.float "tone_negative"
+    t.float "tone_neutral"
     t.integer "quantity"
     t.integer "plagiarism"
     t.integer "version_num"
@@ -152,7 +152,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["response_id"], name: "fk_automated_metareviews_responses_id"
   end
 
-  create_table "awarded_badges", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "awarded_badges", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "badge_id"
     t.integer "participant_id"
     t.datetime "created_at", null: false
@@ -162,7 +162,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["participant_id"], name: "index_awarded_badges_on_participant_id"
   end
 
-  create_table "badges", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "badges", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name"
     t.string "description"
     t.string "image_name"
@@ -170,7 +170,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "bids", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "bids", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "topic_id"
     t.integer "team_id"
     t.datetime "created_at"
@@ -180,7 +180,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["topic_id"], name: "index_bids_on_topic_id"
   end
 
-  create_table "bookmark_ratings", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "bookmark_ratings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "bookmark_id"
     t.integer "user_id"
     t.integer "rating"
@@ -188,7 +188,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.datetime "updated_at"
   end
 
-  create_table "bookmarks", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "bookmarks", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.text "url"
     t.text "title"
     t.text "description"
@@ -199,13 +199,13 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["topic_id"], name: "index_bookmarks_on_topic_id"
   end
 
-  create_table "calculated_penalties", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "calculated_penalties", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "participant_id"
     t.integer "deadline_type_id"
     t.integer "penalty_points"
   end
 
-  create_table "content_pages", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "content_pages", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "title"
     t.string "name", default: "", null: false
     t.integer "markup_style_id"
@@ -218,7 +218,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["permission_id"], name: "fk_content_page_permission_id"
   end
 
-  create_table "controller_actions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "controller_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "site_controller_id", default: 0, null: false
     t.string "name", default: "", null: false
     t.integer "permission_id"
@@ -227,7 +227,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["site_controller_id"], name: "fk_controller_action_site_controller_id"
   end
 
-  create_table "courses", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "courses", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name"
     t.integer "instructor_id"
     t.string "directory_path"
@@ -240,15 +240,15 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["instructor_id"], name: "fk_course_users"
   end
 
-  create_table "deadline_rights", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "deadline_rights", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name", limit: 32
   end
 
-  create_table "deadline_types", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "deadline_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name", limit: 32
   end
 
-  create_table "delayed_jobs", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "delayed_jobs", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "priority", default: 0
     t.integer "attempts", default: 0
     t.text "handler"
@@ -263,7 +263,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
-  create_table "due_dates", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "due_dates", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.datetime "due_at"
     t.integer "deadline_type_id"
     t.integer "parent_id"
@@ -286,7 +286,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["submission_allowed_id"], name: "fk_due_date_submission_allowed"
   end
 
-  create_table "duties", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "duties", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name"
     t.integer "max_members_for_duty"
     t.integer "assignment_id"
@@ -295,11 +295,11 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["assignment_id"], name: "index_duties_on_assignment_id"
   end
 
-  create_table "institutions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "institutions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name", default: "", null: false
   end
 
-  create_table "invitations", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "invitations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "assignment_id"
     t.integer "from_id"
     t.integer "to_id"
@@ -309,7 +309,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["to_id"], name: "fk_invitationto_users"
   end
 
-  create_table "join_team_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "join_team_requests", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "participant_id"
     t.integer "team_id"
     t.text "comments"
@@ -318,12 +318,12 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.datetime "updated_at"
   end
 
-  create_table "languages", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "languages", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name", limit: 32
   end
 
-  create_table "late_policies", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.float "penalty_per_unit", limit: 24
+  create_table "late_policies", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.float "penalty_per_unit"
     t.integer "max_penalty", default: 0, null: false
     t.string "penalty_unit", null: false
     t.integer "times_used", default: 0, null: false
@@ -332,21 +332,21 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["instructor_id"], name: "fk_instructor_id"
   end
 
-  create_table "locks", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "locks", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "timeout_period"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "user_id"
-    t.integer "lockable_id"
     t.string "lockable_type"
+    t.integer "lockable_id"
     t.index ["user_id"], name: "fk_rails_426f571216"
   end
 
-  create_table "markup_styles", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "markup_styles", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name", default: "", null: false
   end
 
-  create_table "menu_items", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "menu_items", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "parent_id"
     t.string "name", default: "", null: false
     t.string "label", default: "", null: false
@@ -358,13 +358,13 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["parent_id"], name: "fk_menu_item_parent_id"
   end
 
-  create_table "nodes", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "nodes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "parent_id"
     t.integer "node_object_id"
     t.string "type"
   end
 
-  create_table "notifications", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "notifications", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "subject"
     t.text "description"
     t.date "expiration_date"
@@ -375,7 +375,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["course_id"], name: "index_notifications_on_course_id"
   end
 
-  create_table "participants", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "participants", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.boolean "can_submit", default: true
     t.boolean "can_review", default: true
     t.integer "user_id"
@@ -383,31 +383,31 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.datetime "submitted_at"
     t.boolean "permission_granted"
     t.integer "penalty_accumulated", default: 0, null: false, unsigned: true
-    t.float "grade", limit: 24
+    t.float "grade"
     t.string "type"
     t.string "handle"
     t.datetime "time_stamp"
     t.text "digital_signature"
     t.string "duty"
     t.boolean "can_take_quiz", default: true
-    t.float "Hamer", limit: 24, default: 1.0
-    t.float "Lauw", limit: 24, default: 0.0
+    t.float "Hamer", default: 1.0
+    t.float "Lauw", default: 0.0
     t.integer "duty_id"
     t.index ["duty_id"], name: "index_participants_on_duty_id"
     t.index ["user_id"], name: "fk_participant_users"
   end
 
-  create_table "password_resets", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "password_resets", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "user_email"
     t.string "token"
     t.datetime "updated_at"
   end
 
-  create_table "permissions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "permissions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name", default: "", null: false
   end
 
-  create_table "plagiarism_checker_assignment_submissions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "plagiarism_checker_assignment_submissions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.string "simicheck_id"
     t.datetime "created_at", null: false
@@ -416,7 +416,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["assignment_id"], name: "index_plagiarism_checker_assgt_subm_on_assignment_id"
   end
 
-  create_table "plagiarism_checker_comparisons", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "plagiarism_checker_comparisons", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "plagiarism_checker_assignment_submission_id"
     t.string "similarity_link"
     t.decimal "similarity_percentage", precision: 10
@@ -431,14 +431,14 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["plagiarism_checker_assignment_submission_id"], name: "assignment_submission_index"
   end
 
-  create_table "question_advices", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "question_advices", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "question_id"
     t.integer "score"
     t.text "advice"
     t.index ["question_id"], name: "fk_question_question_advices"
   end
 
-  create_table "questionnaires", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "questionnaires", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name", limit: 64
     t.integer "instructor_id", default: 0, null: false
     t.boolean "private", default: false, null: false
@@ -451,7 +451,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.text "instruction_loc"
   end
 
-  create_table "questions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "questions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.text "txt"
     t.integer "weight"
     t.integer "questionnaire_id"
@@ -465,13 +465,13 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["questionnaire_id"], name: "fk_question_questionnaires"
   end
 
-  create_table "quiz_question_choices", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "quiz_question_choices", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "question_id"
     t.text "txt"
     t.boolean "iscorrect", default: false
   end
 
-  create_table "response_maps", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "response_maps", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "reviewed_object_id", default: 0, null: false
     t.integer "reviewer_id", default: 0, null: false
     t.integer "reviewee_id", default: 0, null: false
@@ -483,7 +483,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["reviewer_id"], name: "fk_response_map_reviewer"
   end
 
-  create_table "responses", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "responses", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "map_id", default: 0, null: false
     t.text "additional_comment"
     t.datetime "created_at"
@@ -495,13 +495,13 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["map_id"], name: "fk_response_response_map"
   end
 
-  create_table "resubmission_times", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "resubmission_times", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "participant_id"
     t.datetime "resubmitted_at"
     t.index ["participant_id"], name: "fk_resubmission_times_participants"
   end
 
-  create_table "review_bids", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "review_bids", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "priority"
     t.integer "signuptopic_id"
     t.integer "participant_id"
@@ -515,7 +515,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["user_id"], name: "fk_rails_6041e1cdb9"
   end
 
-  create_table "review_comment_paste_bins", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "review_comment_paste_bins", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "review_grade_id"
     t.string "title"
     t.text "review_comment"
@@ -524,7 +524,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["review_grade_id"], name: "fk_rails_0a539bcc81"
   end
 
-  create_table "review_grades", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "review_grades", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "participant_id"
     t.integer "grade_for_reviewer"
     t.text "comment_for_reviewer"
@@ -533,7 +533,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["participant_id"], name: "fk_rails_29587cf6a9"
   end
 
-  create_table "roles", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "roles", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name", default: "", null: false
     t.integer "parent_id"
     t.string "description", default: "", null: false
@@ -544,28 +544,28 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["parent_id"], name: "fk_role_parent_id"
   end
 
-  create_table "roles_permissions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "roles_permissions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "role_id", default: 0, null: false
     t.integer "permission_id", default: 0, null: false
     t.index ["permission_id"], name: "fk_roles_permission_permission_id"
     t.index ["role_id"], name: "fk_roles_permission_role_id"
   end
 
-  create_table "sample_reviews", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "sample_reviews", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "assignment_id"
     t.integer "response_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "sections", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "sections", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.text "desc_text"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "sessions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "sessions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "session_id", default: "", null: false
     t.text "data", limit: 16777215
     t.datetime "created_at"
@@ -574,7 +574,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["updated_at"], name: "index_sessions_on_updated_at"
   end
 
-  create_table "sign_up_topics", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "sign_up_topics", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.text "topic_name", null: false
     t.integer "assignment_id", default: 0, null: false
     t.integer "max_choosers", default: 0, null: false
@@ -588,7 +588,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["assignment_id"], name: "index_sign_up_topics_on_assignment_id"
   end
 
-  create_table "signed_up_teams", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "signed_up_teams", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "topic_id", default: 0, null: false
     t.integer "team_id", default: 0, null: false
     t.boolean "is_waitlisted", default: false, null: false
@@ -596,14 +596,14 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["topic_id"], name: "fk_signed_up_users_sign_up_topics"
   end
 
-  create_table "site_controllers", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "site_controllers", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name", default: "", null: false
     t.integer "permission_id", default: 0, null: false
     t.integer "builtin", default: 0
     t.index ["permission_id"], name: "fk_site_controller_permission_id"
   end
 
-  create_table "submission_records", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "submission_records", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "type"
@@ -614,7 +614,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.integer "assignment_id"
   end
 
-  create_table "suggestion_comments", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "suggestion_comments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.text "comments"
     t.string "commenter"
     t.string "vote"
@@ -622,7 +622,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.datetime "created_at"
   end
 
-  create_table "suggestions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "suggestions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "assignment_id"
     t.string "title"
     t.text "description"
@@ -631,7 +631,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.string "signup_preference"
   end
 
-  create_table "survey_deployments", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "survey_deployments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "questionnaire_id"
     t.datetime "start_date"
     t.datetime "end_date"
@@ -642,7 +642,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["questionnaire_id"], name: "fk_rails_7c62b6ef2b"
   end
 
-  create_table "system_settings", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "system_settings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "site_name", default: "", null: false
     t.string "site_subtitle"
     t.string "footer_message", default: ""
@@ -661,14 +661,14 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["site_default_page_id"], name: "fk_system_settings_site_default_page_id"
   end
 
-  create_table "ta_mappings", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "ta_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "ta_id"
     t.integer "course_id"
     t.index ["course_id"], name: "fk_ta_mappings_course_id"
     t.index ["ta_id"], name: "fk_ta_mappings_ta_id"
   end
 
-  create_table "tag_prompt_deployments", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "tag_prompt_deployments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "tag_prompt_id"
     t.integer "assignment_id"
     t.integer "questionnaire_id"
@@ -681,7 +681,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["tag_prompt_id"], name: "index_tag_prompt_deployments_on_tag_prompt_id"
   end
 
-  create_table "tag_prompts", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "tag_prompts", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "prompt"
     t.string "desc"
     t.string "control_type"
@@ -689,7 +689,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "teams", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "teams", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name"
     t.integer "parent_id"
     t.string "type"
@@ -701,7 +701,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.text "comment_for_submission"
   end
 
-  create_table "teams_users", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "teams_users", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "team_id"
     t.integer "user_id"
     t.integer "duty_id"
@@ -710,7 +710,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["user_id"], name: "fk_teams_users"
   end
 
-  create_table "track_notifications", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "track_notifications", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "notification_id"
     t.integer "user_id"
     t.datetime "created_at", null: false
@@ -719,13 +719,13 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["user_id"], name: "index_track_notifications_on_user_id"
   end
 
-  create_table "tree_folders", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "tree_folders", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name"
     t.string "child_type"
     t.integer "parent_id"
   end
 
-  create_table "user_pastebins", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "user_pastebins", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "user_id"
     t.string "short_form"
     t.text "long_form"
@@ -733,7 +733,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "users", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "users", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", default: "", null: false
     t.string "crypted_password", limit: 40, default: "", null: false
     t.integer "role_id", default: 0, null: false
@@ -760,7 +760,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["role_id"], name: "fk_user_role_id"
   end
 
-  create_table "versions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "item_type", null: false
     t.integer "item_id", null: false
     t.string "event", null: false

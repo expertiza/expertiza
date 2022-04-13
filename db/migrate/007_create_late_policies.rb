@@ -1,4 +1,4 @@
-class CreateLatePolicies < ActiveRecord::Migration
+class CreateLatePolicies < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'late_policies', force: true do |t|
       t.column 'penalty_period_in_minutes', :integer

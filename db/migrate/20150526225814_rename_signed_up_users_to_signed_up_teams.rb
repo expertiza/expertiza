@@ -1,4 +1,4 @@
-class RenameSignedUpUsersToSignedUpTeams < ActiveRecord::Migration
+class RenameSignedUpUsersToSignedUpTeams < ActiveRecord::Migration[4.2]
   def self.up
     rename_table :signed_up_users, :signed_up_teams
   end

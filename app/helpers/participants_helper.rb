@@ -18,7 +18,7 @@ module ParticipantsHelper
     attributes['name'] = line_split[config['name'].to_i]
     attributes['fullname'] = config['fullname']
     attributes['email'] = line_split[config['email'].to_i]
-    attributes['password'] = assign_password(8)
+    attributes['password'] = (0...8).map { (65 + rand(26)).chr }.join
     attributes['email_on_submission'] = 1
     attributes['email_on_review'] = 1
     attributes['email_on_review_of_review'] = 1

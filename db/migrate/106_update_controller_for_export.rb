@@ -1,4 +1,4 @@
-class UpdateControllerForExport < ActiveRecord::Migration
+class UpdateControllerForExport < ActiveRecord::Migration[4.2]
   def self.up
     perm = Permission.find_by_name('administer assignments')
     controller = SiteController.find_or_create_by(name: 'export_file')

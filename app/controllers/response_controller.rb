@@ -222,15 +222,6 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @map.save
     participant = Participant.find_by(id: @map.reviewee_id)
-    # E1822: Added logic to insert a student suggested 'Good Teammate' or 'Good Reviewer' badge in the awarded_badges table.
-    if @map.assignment.badge?
-      if @map.is_a?(TeammateReviewResponseMap) && (params[:review][:good_teammate_checkbox] == 'on')
-        AwardedBadge.award_badge(participant.id, 'Good Teammate')
-      end
-      if @map.is_a?(FeedbackResponseMap) && (params[:review][:good_reviewer_checkbox] == 'on')
-        AwardedBadge.award_badge(participant.id, 'Good Reviewer')
-      end
-    end
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Response was successfully saved')
     redirect_to action: 'redirect', id: @map.map_id, return: params.permit(:return)[:return], msg: params.permit(:msg)[:msg], error_msg: params.permit(:error_msg)[:error_msg]
   end

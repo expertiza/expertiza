@@ -172,7 +172,9 @@ class AssignmentParticipant < Participant
     if response_map_id.nil?
       return if participant.nil?
       no_team_path = assignment.path + '/' + participant.name.parameterize(separator: '_') + '_review'
+      puts "No team path: " + no_team_path
       return no_team_path if participant.team.nil?
+      puts participant.team.nil?
     end
 
     response_map = ResponseMap.find(response_map_id)

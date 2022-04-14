@@ -148,15 +148,6 @@ function autogenerate_submission(){
     </td>
   </tr>
 
-  <!--Badge-->
-  <tr>
-    <td style='padding:5px' id='assignment_has_badge_field'>
-      <input name="assignment_form[assignment][has_badge]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][has_badge]', 'true', @assignment_form.assignment.has_badge) %>
-      <%= label_tag('assignment_form[assignment][has_badge]', 'Has badge?') %>
-    </td>
-  </tr>
-
   <!--Conference-->
   <tr>
     <td style='padding:5px' id='assignment_is_conference_assignment_field' colspan="2">

@@ -170,6 +170,8 @@ class AssignmentParticipant < Participant
   # zhewei: this is the file path for reviewer to upload files during peer review
   def review_file_path(response_map_id = nil, participant = nil)
     puts "START \n"
+    puts response_map_id
+    puts participant
     if response_map_id.nil?
       return if participant.nil?
       no_team_path = assignment.path + '/' + participant.name.parameterize(separator: '_') + '_review'

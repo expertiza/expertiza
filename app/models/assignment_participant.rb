@@ -171,6 +171,7 @@ class AssignmentParticipant < Participant
   def review_file_path(response_map_id = nil, participant = nil)
     if response_map_id.nil?
       return if participant.nil?
+      
       no_team_path = assignment.path + '/' + participant.name.parameterize(separator: '_') + '_review'
       return no_team_path if participant.team.nil?
     end

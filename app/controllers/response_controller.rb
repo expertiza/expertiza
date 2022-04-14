@@ -221,7 +221,6 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
-    participant = Participant.find_by(id: @map.reviewee_id)
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Response was successfully saved')
     redirect_to action: 'redirect', id: @map.map_id, return: params.permit(:return)[:return], msg: params.permit(:msg)[:msg], error_msg: params.permit(:error_msg)[:error_msg]
   end

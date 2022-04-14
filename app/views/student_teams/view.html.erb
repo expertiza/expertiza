@@ -13,33 +13,6 @@
   <b style="text-align: center"><%=t ".team_name_up"%> &nbsp;&nbsp;</b><%= @student.team.name(session[:ip]) %> &nbsp;&nbsp;&nbsp;
     <%= link_to t(".edit_name"), controller: 'StudentTeams', action: 'edit', team_id: @student.team.id, student_id: @student.id %>
   
-  <% if @student.assignment.pair_programming_enabled? %>
-    <% if Team.find(@student.team.id).pair_programming_request.nil? || Team.find(@student.team.id).pair_programming_request.zero? %>
-      <% button_enabled = true %>
-      <button style="float: right;"><%= link_to "Request to Pair Program",
-        {:controller => 'pair_programming', :action => 'send_invitations', :team_id=>@student.team.id, :student_id => @student.id},
-        {:onClick => "javascript: return confirm('Confirm if Pair Programming request should be sent');"}
-      %></button>
-    <% else %>
-      <% button_enabled = false %>
-      <% users = TeamsUser.where(team_id: @student.team.id) %>
-      <% pair_programming_team_status = true %>
-      <% users.each do |user| %>
-        <% if user.pair_programming_status == "W" or user.pair_programming_status.nil? %>
-          <% pair_programming_team_status = false %>
-          <% break %>
-        <% end %>
-      <% end %>
-      <% if pair_programming_team_status %>
-        <% Team.find(@student.team.id).update_attributes(pair_programming_request: 2) %>
-        <p style="float: right;">Pair Programming: Yes</p>
-      <% else %>
-        <% Team.find(@student.team.id).update_attributes(pair_programming_request: 1) %>
-        <p style="float: right;">Pair Programming: Pending</p>
-      <% end %>
-    <% end %>
-  <% end %>
-  
   <br/><br/>
   <b><%=t ".team_members"%></b>
   <br/><br/>

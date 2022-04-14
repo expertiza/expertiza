@@ -140,7 +140,7 @@ GEM
       execjs
     coffee-script-source (1.12.2)
     colored2 (3.1.2)
-    concurrent-ruby (1.1.9)
+    concurrent-ruby (1.1.10)
     connection_pool (2.2.5)
     cork (0.3.0)
       colored2 (~> 3.1)
@@ -278,7 +278,7 @@ GEM
     listen (3.5.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
-    loofah (2.14.0)
+    loofah (2.16.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     lumberjack (1.2.8)
@@ -663,4 +663,4 @@ RUBY VERSION
    ruby 2.3.1p112
 
 BUNDLED WITH
-   1.16.6
+   1.17.3

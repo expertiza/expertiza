@@ -4,7 +4,7 @@
   <% files = participant.files(participant.review_file_path(response_map_id).to_s + current_folder.name) %>
 <% else %>
   <% if participant.team.nil? %>
-    <% files = participant.files(participant.review_file_path(participant: participant).to_s + current_folder.name) %>
+    <% files = participant.files(participant.review_file_path(nil, participant).to_s + current_folder.name) %>
   <% else %>
     <% files = participant.team.files(participant.team.path.to_s + current_folder.name) %>
   <% end %>

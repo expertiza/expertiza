@@ -1,7 +1,6 @@
 class InnerTable extends React.Component {
     render() {
         var rows = []
-        var _this = this
         var firstColText = (this.props.dataType === 'questionnaire' ? 'Item' : 'Assignment') + ' name'
         var colWidthArray = ['30%', '0%', '25%', '25%', '20%']
         var colDisplayStyle = {
@@ -39,13 +38,13 @@ class InnerTable extends React.Component {
                         isIntelligent={entry.is_intelligent}
                         allowSuggestions={entry.allow_suggestions}
                         requireQuiz={entry.require_quiz}
-                        dataType={_this.props.dataType}
+                        dataType={this.props.dataType}
                         instructorId={entry.instructor_id}
                         colWidthArray={colWidthArray}
                         colDisplayStyle={colDisplayStyle}
                     />
                 )
-            })
+            }.bind(this))
         }
         return (
             <table className="table table-hover">

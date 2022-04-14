@@ -623,7 +623,7 @@ DEPENDENCIES
   pry-nav
   pry-remote
   puma
-  rails (~> 5.1)
+  rails (~> 5.1.0.rc2)
   rails-controller-testing
   rails4-autocomplete
   railties (= 5.1)

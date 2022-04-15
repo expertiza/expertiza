@@ -1168,9 +1168,10 @@ jQuery(document).ready(function() {
                       onClick={this.handleSearch}>
                 Search
               </button>
-              <a onClick={this.toggleAdvancedSearch}>
+              <label>
+                <input type="checkbox" onClick={this.toggleAdvancedSearch}/>
                 {'Advanced Search'}
-              </a>
+              </label>
             </div>
             {this.state.advancedSearchVisible ? <QuestionnairesAdvancedSearchBar ref={instance => { this.child = instance; }} /> : null}
           </div>
@@ -1356,17 +1357,17 @@ return (
                 onClick={this.handleSearch}>
           Search
         </button>
-
-        <a
+        <label>
+          <input type="checkbox"
             onClick={() => {
               var x = document.getElementById("advancedToggle");
               if (x.style.display === "none") {
                 x.style.display = "block";
               } else {
                 x.style.display = "none";
-              }}}>
+              }}}/>
           Advanced Search
-        </a>
+        </label>
       </div>
 
       <div id="advancedToggle" style={{ display: 'none' }}>

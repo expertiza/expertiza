@@ -162,11 +162,24 @@ class VmQuestionResponse
   end
 
   def number_of_comments_greater_than_10_words
+    countofcomments = 0
     @list_of_reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
         @list_of_rows.each do |row|
-          row.countofcomments = row.countofcomments + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 10
+          row.metric_hash["countofcomments"] = row.metric_hash["countofcomments"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 10
+        end
+      end
+    end
+  end
+
+  def number_of_comments_greater_than_20_words
+    countofcomments20 = 0
+    @list_of_reviews.each do |review|
+      answers = Answer.where(response_id: review.response_id)
+      answers.each do |answer|
+        @list_of_rows.each do |row|
+          row.metric_hash["countofcomments20"] = row.metric_hash["countofcomments20"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 20
         end
       end
     end

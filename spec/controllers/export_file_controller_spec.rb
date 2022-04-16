@@ -23,13 +23,10 @@ describe ExportFileController do
             controller.params = {model: 'Question', id: '1'}
             expect(controller.find_delim_filename('comma', '')).to eq(['Question1.csv', ','])
         end
-        # it 'checks if method generates csv data if model is allowed' do
-        #     controller.params = {model: 'Question', id : '1', options: }
+        # it 'checks if method doesnt generate csv data if model is not allowed' do
+        #     controller.params = {model: ''}
+        #     expect(@csv_data).should be_nil
         # end
-        it 'checks if method doesnt generate csv data if model is not allowed' do
-            controller.params = {model: ''}
-            expect(@csv_data).should be_nil
-        end
     end
 end
 

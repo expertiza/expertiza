@@ -64,6 +64,24 @@ class UsersController < ApplicationController
     @paginated_users = paginate_list
   end
 
+  def search_params
+    search_usrname,search_fulname,search_email = ".*",".*",".*"
+    
+    if params[:search_name].present?
+      search_usrname = ".*" + params[:search_name].strip + ".*"
+    end
+
+    if params[:search_fname].present?
+      search_fulname = ".*" + params[:search_fname].strip + ".*"
+    end
+
+    if params[:search_email].present?
+      search_email = ".*" + params[:search_email].strip + ".*"
+    end
+
+    [search_usrname, search_fulname, search_email]
+  end
+
   # for displaying users which are being searched for editing purposes after checking whether current user is authorized to do so
   def show_if_authorized
     @user = User.find_by(name: params[:user][:name])

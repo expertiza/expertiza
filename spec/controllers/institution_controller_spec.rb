@@ -36,7 +36,6 @@ describe InstitutionController do
 
       context 'when current user is the instructor' do
         it 'allows certain action' do
-          stub_current_user(instructor, instructor.role.name, instructor.role)
           controller.send(:action_allowed?).should be true
         end
       end
@@ -65,12 +64,12 @@ describe InstitutionController do
     context 'when institution is saved successfully' do
       it 'redirects to institution#list page' do
         allow(institution).to receive(:name).and_return('test institution')
-        request_params = {
+        @params = {
           institution: {
             name: 'test institution'
           }
         }
-        post :create, params: request_params
+        post :create, @params
         expect(response).to redirect_to('/institution/list')
       end
     end
@@ -78,12 +77,12 @@ describe InstitutionController do
     context 'when institution is not saved successfully' do
       it 'renders institution#new page' do
         allow(institution).to receive(:save).and_return(false)
-        request_params = {
+        @params = {
           institution: {
             name: ''
           }
         }
-        post :create, params: request_params
+        post :create, params: @params
         expect(flash.now[:error]).to eq('The creation of the institution failed.')
         expect(response).to render_template(:new)
       end
@@ -91,10 +90,10 @@ describe InstitutionController do
   end
   describe '#edit' do
     it 'renders institution#edit' do
-      request_params = {
+      @params = {
         id: 1
       }
-      get :edit, params: request_params
+      get :edit, params: @params
       expect(response).to render_template(:edit)
     end
   end
@@ -102,27 +101,26 @@ describe InstitutionController do
   describe '#update' do
     context 'when institution is updated successfully' do
       it 'renders institution#list' do
-        request_params = {
+        @params = {
           id: 1,
           institution: {
             name: 'test institution'
           }
         }
-        put :update, params: request_params
+        put :update, @params
         expect(response).to redirect_to('/institution/list')
       end
     end
     context 'when institution is not updated successfully' do
       it 'renders institution#edit' do
-        stub_current_user(instructor, instructor.role.name, instructor.role)
-        request_params = {
+        @params = {
           id: 1,
           institution: {
             name: 'test institution'
           }
         }
         allow(institution).to receive(:update_attribute).with(any_args).and_return(false)
-        put :update, params: request_params
+        put :update, @params
         expect(response).to render_template(:edit)
       end
     end
@@ -140,10 +138,10 @@ describe InstitutionController do
   describe '#show' do
     context 'when try to show a institution' do
       it 'renders institution#show when find the target institution' do
-        request_params = {
+        @params = {
           id: 1
         }
-        get :show, params: request_params
+        get :show, params: @params
         expect(response).to render_template(:show)
       end
     end
@@ -152,10 +150,10 @@ describe InstitutionController do
   describe '#delete' do
     context 'when try to delete a institution' do
       it 'renders institution#list when delete successfully' do
-        request_params = {
+        @params = {
           id: 1
         }
-        post :delete, params: request_params, session: session
+        post :delete, @params, session: session
         expect(response).to redirect_to('/institution/list')
       end
     end

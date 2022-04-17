@@ -420,7 +420,7 @@ describe ReviewMappingHelper, type: :helper do
       max_team_size = 3
       @response = create(:response, response_map: @response_map)
       ip_address = '0.0.0.0'
-      reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
+      reviewed_team_name = team_reviewed_link_name?(max_team_size, @response, @reviewee.id, ip_address)
       expect(reviewed_team_name).to eq('(Team_1)')
     end
 
@@ -429,7 +429,7 @@ describe ReviewMappingHelper, type: :helper do
       max_team_size = 2
       @response = create(:response, response_map: @response_map)
       ip_address = '0.0.0.0'
-      reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
+      reviewed_team_name = team_reviewed_link_name?(max_team_size, @response, @reviewee.id, ip_address)
       expect(reviewed_team_name).to eq('(Team_1)')
     end
 
@@ -441,7 +441,7 @@ describe ReviewMappingHelper, type: :helper do
 
       @response = create(:response, response_map: @response_map)
       ip_address = '0.0.0.0'
-      reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
+      reviewed_team_name = team_reviewed_link_name?(max_team_size, @response, @reviewee.id, ip_address)
       expect(reviewed_team_name).to eq('(Adam)')
     end
 
@@ -450,7 +450,7 @@ describe ReviewMappingHelper, type: :helper do
       max_team_size = 0
       @response = create(:response, response_map: @response_map)
       ip_address = '0.0.0.0'
-      reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
+      reviewed_team_name = team_reviewed_link_name?(max_team_size, @response, @reviewee.id, ip_address)
       expect(reviewed_team_name).to eq('(Team_1)')
     end
   end
@@ -510,7 +510,7 @@ describe ReviewMappingHelper, type: :helper do
   # I found the test case by internet, and I think it will fail if the website update in future
   describe 'get_link_updated_at' do
     it 'should return ? by input http://www.example.com' do
-      updated_time = get_link_updated_at('http://www.example.com')
+      updated_time = link_updated_at?('http://www.example.com')
       expect(updated_time).to eq('2019-10-17 03:18:26.000000000 -0400')
     end
   end
@@ -747,7 +747,7 @@ describe ReviewMappingHelper, type: :helper do
 
       @review_scores = { @reviewer.id => { 1 => { @reviewee.id => 10 }, 2 => { @reviewee.id => 20 }, 3 => { @reviewee.id => 30 } } }
 
-      get_awarded_review_score(@reviewer.id, @reviewee.id)
+      awarded_review_score?(@reviewer.id, @reviewee.id)
     end
 
     it 'should return the review score given by a reviewer for round 1 for the defined team' do
@@ -988,11 +988,11 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  describe 'test get_css_style_for_calibration_report' do
+  describe 'test css_style_for_calibration_report' do
     it 'should return correct css class' do
-      css_class_0 = helper.get_css_style_for_calibration_report(0)
-      css_class_1 = helper.get_css_style_for_calibration_report(-1)
-      css_class_6 = helper.get_css_style_for_calibration_report(6)
+      css_class_0 = helper.css_style_for_calibration_report?(0)
+      css_class_1 = helper.css_style_for_calibration_report?(-1)
+      css_class_6 = helper.css_style_for_calibration_report?(6)
       expect(css_class_0). to eq('c5')
       expect(css_class_1). to eq('c4')
       expect(css_class_6). to eq('c1')

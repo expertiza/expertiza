@@ -523,6 +523,16 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :submission_viewing_events do
+    collection do
+      post :record_start_time
+      post :record_end_time
+      post :mark_end_time
+      get :record_start_time
+      get :record_end_time
+    end
+  end
+
   resources :conference
   root to: 'content_pages#view', page_name: 'home'
   post :login, to: 'auth#login'

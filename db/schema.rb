@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220111023859) do
+ActiveRecord::Schema.define(version: 20220418211918) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -337,8 +337,8 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "user_id"
-    t.integer "lockable_id"
     t.string "lockable_type"
+    t.integer "lockable_id"
     t.index ["user_id"], name: "fk_rails_426f571216"
   end
 
@@ -614,6 +614,16 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.integer "assignment_id"
   end
 
+  create_table "submission_viewing_events", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.integer "map_id"
+    t.integer "round"
+    t.string "link"
+    t.datetime "start_at"
+    t.datetime "end_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "suggestion_comments", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.text "comments"
     t.string "commenter"
@@ -768,16 +778,6 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.text "object", limit: 16777215
     t.datetime "created_at"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
-  end
-
-  create_table "submission_viewing_events", force: :cascade do |t|
-    t.integer  "map_id",     limit: 4
-    t.integer  "round",      limit: 4
-    t.string   "link",       limit: 255
-    t.datetime "start_at"
-    t.datetime "end_at"
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
   end
 
   add_foreign_key "answer_tags", "answers"

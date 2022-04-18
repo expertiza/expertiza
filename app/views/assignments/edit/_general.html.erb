@@ -248,7 +248,7 @@ function autogenerate_submission(){
     <td style='padding:5px' class="form-inline" colspan="2">
       <input name="assignment_form[assignment][is_answer_tagging_allowed]" type="hidden" value="false" onclick="useAnswerTagChanged()"/>
       <%= check_box_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'true', @assignment_form.assignment.is_answer_tagging_allowed) %>
-      <%= label_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'Allow feedback comments to be tagged by the author?') %>
+      <%= label_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'Allow tag prompts so author can tag feedback comments?') %>
     </td>
   </tr>
   <!-- End answer tagging code -->

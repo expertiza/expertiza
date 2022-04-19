@@ -1,4 +1,4 @@
-class CreateTaMappings < ActiveRecord::Migration[4.2]
+class CreateTaMappings < ActiveRecord::Migration
   def self.up
     create_table :ta_mappings do |t|
       t.column :ta_id, :integer

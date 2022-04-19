@@ -1,4 +1,4 @@
-class RemoveTopicDependencies < ActiveRecord::Migration[4.2]
+class RemoveTopicDependencies < ActiveRecord::Migration
   def change
     drop_table :topic_dependencies
   end

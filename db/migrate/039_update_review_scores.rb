@@ -1,4 +1,4 @@
-class UpdateReviewScores < ActiveRecord::Migration[4.2]
+class UpdateReviewScores < ActiveRecord::Migration
   def self.up
     add_column 'review_scores', 'questionnaire_type_id', :integer
 

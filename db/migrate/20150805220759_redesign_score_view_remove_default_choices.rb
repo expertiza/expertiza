@@ -1,4 +1,4 @@
-class RedesignScoreViewRemoveDefaultChoices < ActiveRecord::Migration[4.2]
+class RedesignScoreViewRemoveDefaultChoices < ActiveRecord::Migration
   def change
     execute <<-SQL
       CREATE VIEW score_views AS SELECT ques.weight question_weight,ques.type AS type,

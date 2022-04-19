@@ -1,4 +1,4 @@
-class AddTeamIdColumnToSubmissionrecord < ActiveRecord::Migration[4.2]
+class AddTeamIdColumnToSubmissionrecord < ActiveRecord::Migration
   def change
     add_column :submission_records, :assignment_id, :integer
   end

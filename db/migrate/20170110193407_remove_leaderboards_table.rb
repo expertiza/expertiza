@@ -1,4 +1,4 @@
-class RemoveLeaderboardsTable < ActiveRecord::Migration[4.2]
+class RemoveLeaderboardsTable < ActiveRecord::Migration
   def self.up
     drop_table :leaderboards
   end

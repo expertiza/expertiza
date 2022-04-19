@@ -1,4 +1,4 @@
-class DeleteTopicDeadlinesTable < ActiveRecord::Migration[4.2]
+class DeleteTopicDeadlinesTable < ActiveRecord::Migration
   def self.up
     drop_table :topic_deadlines
   end

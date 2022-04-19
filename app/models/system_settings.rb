@@ -1,4 +1,4 @@
-class SystemSettings < ApplicationRecord
+class SystemSettings < ActiveRecord::Base
   self.table_name = 'system_settings'
 
   # rubocop:disable Lint/DuplicateMethods

@@ -1,4 +1,4 @@
-class CreateTaRole < ActiveRecord::Migration[4.2]
+class CreateTaRole < ActiveRecord::Migration
   def self.up
     parent = Role.find_by_name('Student')
     child = Role.find_by_name('Instructor')

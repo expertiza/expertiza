@@ -1,4 +1,4 @@
-class AddIsSubmittedToResponseMaps < ActiveRecord::Migration[4.2]
+class AddIsSubmittedToResponseMaps < ActiveRecord::Migration
   def self.up
     add_column :response_maps, :isSubmitted, :string, null: true
   rescue StandardError

@@ -1,4 +1,4 @@
-class DeadlineRight < ApplicationRecord
+class DeadlineRight < ActiveRecord::Base
   NO = 1
   LATE = 2
   OK   = 3

@@ -1,4 +1,4 @@
-class MergeQuestionnaireAndType < ActiveRecord::Migration[4.2]
+class MergeQuestionnaireAndType < ActiveRecord::Migration
   def self.up
     begin
       execute "ALTER TABLE `scores`

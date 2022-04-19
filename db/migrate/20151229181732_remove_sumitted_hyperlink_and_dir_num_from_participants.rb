@@ -1,4 +1,4 @@
-class RemoveSumittedHyperlinkAndDirNumFromParticipants < ActiveRecord::Migration[4.2]
+class RemoveSumittedHyperlinkAndDirNumFromParticipants < ActiveRecord::Migration
   def change
     remove_column :participants, :submitted_hyperlinks
     remove_column :participants, :directory_num

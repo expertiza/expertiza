@@ -1,4 +1,4 @@
-class InitializeCustom < ActiveRecord::Migration[4.2]
+class InitializeCustom < ActiveRecord::Migration
   def self.up
     create_table 'permissions', force: true do |t|
       t.column 'name', :string, default: '', null: false

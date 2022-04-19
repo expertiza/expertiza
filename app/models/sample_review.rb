@@ -1,2 +1,2 @@
-class SampleReview < ApplicationRecord
+class SampleReview < ActiveRecord::Base
 end

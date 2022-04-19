@@ -102,7 +102,7 @@ class ReviewBidsController < ApplicationController
     matched_topics = run_bidding_algorithm(bidding_data)
     ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
     Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
-    redirect_back fallback_location: root_path
+    redirect_to :back
   end
 
   # call webserver for running assigning algorithm

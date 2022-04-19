@@ -1,4 +1,4 @@
-class TaMapping < ApplicationRecord
+class TaMapping < ActiveRecord::Base
   belongs_to :course
   belongs_to :ta
   has_paper_trail

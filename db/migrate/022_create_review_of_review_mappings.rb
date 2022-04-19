@@ -1,4 +1,4 @@
-class CreateReviewOfReviewMappings < ActiveRecord::Migration[4.2]
+class CreateReviewOfReviewMappings < ActiveRecord::Migration
   def self.up
     create_table 'review_of_review_mappings', force: true do |t|
       t.column 'review_mapping_id', :integer

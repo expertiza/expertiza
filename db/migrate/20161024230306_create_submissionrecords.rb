@@ -1,4 +1,4 @@
-class CreateSubmissionrecords < ActiveRecord::Migration[4.2]
+class CreateSubmissionrecords < ActiveRecord::Migration
   def change
     create_table :submissionrecords do |t|
       t.timestamps null: false

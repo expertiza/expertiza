@@ -1,4 +1,4 @@
-class CreateBooks < ActiveRecord::Migration[4.2]
+class CreateBooks < ActiveRecord::Migration
   def self.up
     create_table :books, &:timestamps
   end

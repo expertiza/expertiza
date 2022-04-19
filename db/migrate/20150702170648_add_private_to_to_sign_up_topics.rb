@@ -1,4 +1,4 @@
-class AddPrivateToToSignUpTopics < ActiveRecord::Migration[4.2]
+class AddPrivateToToSignUpTopics < ActiveRecord::Migration
   def self.up
     add_column 'sign_up_topics', 'private_to', :integer, default: nil
   end

@@ -1,4 +1,4 @@
-class AddTopicIdToParticipants < ActiveRecord::Migration[4.2]
+class AddTopicIdToParticipants < ActiveRecord::Migration
   def self.up
     add_column :participants, :topic_id, :integer, null: true
   end

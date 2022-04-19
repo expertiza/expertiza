@@ -1,4 +1,4 @@
-class AnswerTag < ApplicationRecord
+class AnswerTag < ActiveRecord::Base
   belongs_to :answer
   belongs_to :tag_prompts_deployment
 

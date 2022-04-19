@@ -1,4 +1,4 @@
-class CreateQuestionAdvices < ActiveRecord::Migration[4.2]
+class CreateQuestionAdvices < ActiveRecord::Migration
   def self.up
     create_table 'question_advices', force: true do |t|
       t.column 'question_id', :integer # the question to which this advice belongs

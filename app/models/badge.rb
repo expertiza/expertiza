@@ -1,4 +1,4 @@
-class Badge < ApplicationRecord
+class Badge < ActiveRecord::Base
   has_many :assignment_badges, dependent: :destroy
   has_many :assignments, through: :assignment_badges
   has_many :awarded_badges, dependent: :destroy

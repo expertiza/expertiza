@@ -1,4 +1,4 @@
-class AddMaxBidsToAssigments < ActiveRecord::Migration[4.2]
+class AddMaxBidsToAssigments < ActiveRecord::Migration
   def self.up
     add_column :assignments, :max_bids, :integer
   end

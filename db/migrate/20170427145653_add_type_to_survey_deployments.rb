@@ -1,4 +1,4 @@
-class AddTypeToSurveyDeployments < ActiveRecord::Migration[4.2]
+class AddTypeToSurveyDeployments < ActiveRecord::Migration
   def change
     add_column :survey_deployments, :type, :string
   end

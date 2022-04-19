@@ -1,4 +1,4 @@
-class AddCalibrateToToResponseMaps < ActiveRecord::Migration[4.2]
+class AddCalibrateToToResponseMaps < ActiveRecord::Migration
   def change
     add_column :response_maps, :calibrate_to, :boolean, default: false
   end

@@ -1,4 +1,4 @@
-class AddTypeColumnToDueDatesTable < ActiveRecord::Migration[4.2]
+class AddTypeColumnToDueDatesTable < ActiveRecord::Migration
   def self.up
     add_column :due_dates, :type, :string, null: :false, default: 'AssignmentDueDate'
   end

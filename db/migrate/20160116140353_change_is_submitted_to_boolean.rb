@@ -1,4 +1,4 @@
-class ChangeIsSubmittedToBoolean < ActiveRecord::Migration[4.2]
+class ChangeIsSubmittedToBoolean < ActiveRecord::Migration
   def change
     remove_column :responses, :isSubmitted
     add_column :responses, :is_submitted, :boolean, default: false

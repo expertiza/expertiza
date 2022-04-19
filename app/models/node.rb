@@ -4,7 +4,7 @@
 #
 # Author: AJBUDLON
 # Date: 7/18/2008
-class Node < ApplicationRecord
+class Node < ActiveRecord::Base
   has_paper_trail
   # acts_as_nested_set
 

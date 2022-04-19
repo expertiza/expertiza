@@ -1,4 +1,4 @@
-class AddDescriptionToSignUpTopics < ActiveRecord::Migration[4.2]
+class AddDescriptionToSignUpTopics < ActiveRecord::Migration
   def change
     add_column :sign_up_topics, :description, :string
   end

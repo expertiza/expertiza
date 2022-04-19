@@ -1,4 +1,4 @@
-class UpdateReviewFields < ActiveRecord::Migration[4.2]
+class UpdateReviewFields < ActiveRecord::Migration
   def self.up
     add_column :assignments, :review_assignment_strategy, :string
     add_column :assignments, :max_reviews_per_submission, :integer

@@ -1,4 +1,4 @@
-class CreateTags < ActiveRecord::Migration[4.2]
+class CreateTags < ActiveRecord::Migration
   def self.up
     if table_exists?(:tags) == false
       create_table :tags do |t|

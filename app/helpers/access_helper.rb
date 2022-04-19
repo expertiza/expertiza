@@ -2,7 +2,7 @@ module AccessHelper
   def authorize
     unless all_actions_allowed?
       flash_msg
-      redirect_back fallback_location: root_path
+      redirect_back
     end
   end
 

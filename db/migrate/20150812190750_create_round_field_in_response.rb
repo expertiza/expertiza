@@ -1,4 +1,4 @@
-class CreateRoundFieldInResponse < ActiveRecord::Migration[4.2]
+class CreateRoundFieldInResponse < ActiveRecord::Migration
   def change
     add_column :responses, :round, :integer
   end

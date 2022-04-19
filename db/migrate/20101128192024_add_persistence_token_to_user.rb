@@ -1,4 +1,4 @@
-class AddPersistenceTokenToUser < ActiveRecord::Migration[4.2]
+class AddPersistenceTokenToUser < ActiveRecord::Migration
   def self.up
     add_column :users, :persistence_token, :string
   end

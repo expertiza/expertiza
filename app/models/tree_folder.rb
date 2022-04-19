@@ -1,2 +1,2 @@
-class TreeFolder < ApplicationRecord
+class TreeFolder < ActiveRecord::Base
 end

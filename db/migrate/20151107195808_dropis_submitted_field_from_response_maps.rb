@@ -1,4 +1,4 @@
-class DropisSubmittedFieldFromResponseMaps < ActiveRecord::Migration[4.2]
+class DropisSubmittedFieldFromResponseMaps < ActiveRecord::Migration
   def change
     remove_column 'response_maps', 'isSubmitted'
   end

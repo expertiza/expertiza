@@ -1,4 +1,4 @@
-class MoveGradesCommentsForReviewerAndReviewTimeFromParticipantsTableToReviewGradesTable < ActiveRecord::Migration[4.2]
+class MoveGradesCommentsForReviewerAndReviewTimeFromParticipantsTableToReviewGradesTable < ActiveRecord::Migration
   def change
     Participant.all.each do |participant|
       begin

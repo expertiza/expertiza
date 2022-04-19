@@ -1,4 +1,4 @@
-class RemoveQuestionTypesTable < ActiveRecord::Migration[4.2]
+class RemoveQuestionTypesTable < ActiveRecord::Migration
   def self.up
     drop_table :question_types
   end

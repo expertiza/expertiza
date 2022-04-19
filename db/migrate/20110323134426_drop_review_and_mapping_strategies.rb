@@ -1,4 +1,4 @@
-class DropReviewAndMappingStrategies < ActiveRecord::Migration[4.2]
+class DropReviewAndMappingStrategies < ActiveRecord::Migration
   def self.up
     execute "ALTER TABLE `assignments`
              DROP FOREIGN KEY fk_assignments_mapping_strategies"

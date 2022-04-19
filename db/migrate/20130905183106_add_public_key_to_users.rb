@@ -1,4 +1,4 @@
-class AddPublicKeyToUsers < ActiveRecord::Migration[4.2]
+class AddPublicKeyToUsers < ActiveRecord::Migration
   def self.up
     add_column :users, :public_key, :text
   end

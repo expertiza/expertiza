@@ -1,4 +1,4 @@
-class CreateTagPrompts < ActiveRecord::Migration[4.2]
+class CreateTagPrompts < ActiveRecord::Migration
   def change
     create_table :tag_prompts do |t|
       t.string :prompt

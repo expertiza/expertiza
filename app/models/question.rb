@@ -1,4 +1,4 @@
-class Question < ApplicationRecord
+class Question < ActiveRecord::Base
   belongs_to :questionnaire # each question belongs to a specific questionnaire
   belongs_to :review_of_review_score # ditto
   has_many :question_advices, dependent: :destroy # for each question, there is separate advice about each possible score

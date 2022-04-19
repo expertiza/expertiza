@@ -1,4 +1,4 @@
-class CreateReviewOfReviews < ActiveRecord::Migration[4.2]
+class CreateReviewOfReviews < ActiveRecord::Migration
   def self.up
     create_table 'review_of_reviews', force: true do |t|
       t.column 'reviewed_at', :datetime

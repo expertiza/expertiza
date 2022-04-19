@@ -1,4 +1,4 @@
-class AddReviewerIdToReviewGradesTable < ActiveRecord::Migration[4.2]
+class AddReviewerIdToReviewGradesTable < ActiveRecord::Migration
   def change
     add_column :review_grades, :reviewer_id, :integer
   end

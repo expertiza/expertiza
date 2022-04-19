@@ -1,4 +1,4 @@
-class MenuUpdateTreeDisplay < ActiveRecord::Migration[4.2]
+class MenuUpdateTreeDisplay < ActiveRecord::Migration
   def self.up
     permission1 = Permission.find_by_name('administer assignments')
     menu = MenuItem.find_by_label('Assignment Creation')

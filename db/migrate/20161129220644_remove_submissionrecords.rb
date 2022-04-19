@@ -1,4 +1,4 @@
-class RemoveSubmissionrecords < ActiveRecord::Migration[4.2]
+class RemoveSubmissionrecords < ActiveRecord::Migration
   def change
     drop_table :submissionrecords
   end

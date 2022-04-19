@@ -159,7 +159,7 @@ class SubmittedContentController < ApplicationController
     participant.mail_assigned_reviewers
 
     if params[:origin] == 'review'
-      redirect_back fallback_location: root_path
+      redirect_to :back
     else
       redirect_to action: 'edit', id: participant.id
     end

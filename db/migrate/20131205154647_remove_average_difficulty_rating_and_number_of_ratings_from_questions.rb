@@ -1,4 +1,4 @@
-class RemoveAverageDifficultyRatingAndNumberOfRatingsFromQuestions < ActiveRecord::Migration[4.2]
+class RemoveAverageDifficultyRatingAndNumberOfRatingsFromQuestions < ActiveRecord::Migration
   def self.up
     remove_column :questions, :average_difficulty_rating
     remove_column :questions, :number_of_ratings

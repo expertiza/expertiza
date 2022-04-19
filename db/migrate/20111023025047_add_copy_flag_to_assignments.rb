@@ -1,4 +1,4 @@
-class AddCopyFlagToAssignments < ActiveRecord::Migration[4.2]
+class AddCopyFlagToAssignments < ActiveRecord::Migration
   def self.up
     add_column :assignments, :copy_flag, :boolean, default: false
   end

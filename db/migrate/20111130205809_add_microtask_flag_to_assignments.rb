@@ -1,4 +1,4 @@
-class AddMicrotaskFlagToAssignments < ActiveRecord::Migration[4.2]
+class AddMicrotaskFlagToAssignments < ActiveRecord::Migration
   def self.up
     add_column :assignments, :microtask, :boolean, default: false
   end

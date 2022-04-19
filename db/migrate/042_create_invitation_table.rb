@@ -1,4 +1,4 @@
-class CreateInvitationTable < ActiveRecord::Migration[4.2]
+class CreateInvitationTable < ActiveRecord::Migration
   def self.up
     create_table :invitations do |t|
       # Note: Table name pluralized by convention.

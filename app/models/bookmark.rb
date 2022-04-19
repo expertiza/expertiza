@@ -1,4 +1,4 @@
-class Bookmark < ApplicationRecord
+class Bookmark < ActiveRecord::Base
   belongs_to :user
   belongs_to :topic
   has_many :bookmark_ratings

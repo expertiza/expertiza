@@ -1,4 +1,4 @@
-class AddNotificationAcceptedToResponseMap < ActiveRecord::Migration[4.2]
+class AddNotificationAcceptedToResponseMap < ActiveRecord::Migration
   def self.up
     add_column :response_maps, :notification_accepted, :boolean, default: false
   end

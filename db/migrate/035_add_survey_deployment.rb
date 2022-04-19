@@ -1,4 +1,4 @@
-class AddSurveyDeployment < ActiveRecord::Migration[4.2]
+class AddSurveyDeployment < ActiveRecord::Migration
   def self.up
     add_column 'survey_responses', 'survey_deployment_id', :integer
   end

@@ -1,4 +1,4 @@
-class CreatePlagiarismCheckerComparisons < ActiveRecord::Migration[4.2]
+class CreatePlagiarismCheckerComparisons < ActiveRecord::Migration
   def change
     create_table :plagiarism_checker_comparisons do |t|
       t.references :plagiarism_checker_assignment_submission, index: { name: 'assignment_submission_index' }, foreign_key: true

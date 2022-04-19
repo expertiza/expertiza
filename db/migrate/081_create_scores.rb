@@ -1,4 +1,4 @@
-class CreateScores < ActiveRecord::Migration[4.2]
+class CreateScores < ActiveRecord::Migration
   def self.up
     create_table :scores do |t|
       t.column :instance_id, :integer, null: false

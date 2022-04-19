@@ -1,4 +1,4 @@
-class RemoveLeaderboardPrivaryFromUsersTable < ActiveRecord::Migration[4.2]
+class RemoveLeaderboardPrivaryFromUsersTable < ActiveRecord::Migration
   def self.up
     remove_column :users, :leaderboard_privacy
   end

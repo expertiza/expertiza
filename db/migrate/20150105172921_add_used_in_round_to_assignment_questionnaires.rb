@@ -1,4 +1,4 @@
-class AddUsedInRoundToAssignmentQuestionnaires < ActiveRecord::Migration[4.2]
+class AddUsedInRoundToAssignmentQuestionnaires < ActiveRecord::Migration
   def self.up
     add_column 'assignment_questionnaires', 'used_in_round', :integer
   end

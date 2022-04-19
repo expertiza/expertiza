@@ -1,4 +1,4 @@
-class AddPenaltyUnitToParticipants < ActiveRecord::Migration[4.2]
+class AddPenaltyUnitToParticipants < ActiveRecord::Migration
   def self.up
     add_column :late_policies, :penalty_unit, :string, null: false
   end

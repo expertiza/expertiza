@@ -1,4 +1,4 @@
-class AddAvailabilityFlagToAssignments < ActiveRecord::Migration[4.2]
+class AddAvailabilityFlagToAssignments < ActiveRecord::Migration
   def self.up
     add_column :assignments, :availability_flag, :boolean
   end

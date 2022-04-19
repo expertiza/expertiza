@@ -1,4 +1,4 @@
-class CreateQuestionnaireNodes < ActiveRecord::Migration[4.2]
+class CreateQuestionnaireNodes < ActiveRecord::Migration
   def self.up
     questionnaires = Questionnaire.all
     questionnaires.each do |questionnaire|

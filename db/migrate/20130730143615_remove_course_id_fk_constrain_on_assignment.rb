@@ -1,4 +1,4 @@
-class RemoveCourseIdFkConstrainOnAssignment < ActiveRecord::Migration[4.2]
+class RemoveCourseIdFkConstrainOnAssignment < ActiveRecord::Migration
   def self.up
     execute 'alter table assignments drop foreign key fk_assignments_courses;'
   rescue StandardError

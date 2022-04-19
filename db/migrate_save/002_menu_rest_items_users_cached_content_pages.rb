@@ -1,4 +1,4 @@
-class MenuRestItemsUsersCachedContentPages < ActiveRecord::Migration[4.2]
+class MenuRestItemsUsersCachedContentPages < ActiveRecord::Migration
   def self.up
     # Add URL to use for Actions, to better support REST
     add_column 'controller_actions', 'url_to_use', :string

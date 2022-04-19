@@ -1,4 +1,4 @@
-class CreateAnswerTags < ActiveRecord::Migration[4.2]
+class CreateAnswerTags < ActiveRecord::Migration
   def change
     create_table :answer_tags do |t|
       t.references :answer, index: true, foreign_key: true

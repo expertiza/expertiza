@@ -1,4 +1,4 @@
-class AddPreferenceHomeFlagToUsers < ActiveRecord::Migration[4.2]
+class AddPreferenceHomeFlagToUsers < ActiveRecord::Migration
   def self.up
     add_column :users, :preference_home_flag, :boolean, default: true
   end

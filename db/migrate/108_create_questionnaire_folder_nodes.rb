@@ -1,4 +1,4 @@
-class CreateQuestionnaireFolderNodes < ActiveRecord::Migration[4.2]
+class CreateQuestionnaireFolderNodes < ActiveRecord::Migration
   def self.up
     add_column :tree_folders, :parent_id, :integer, null: true
 

@@ -1,4 +1,4 @@
-class DropQuizResponseTable < ActiveRecord::Migration[4.2]
+class DropQuizResponseTable < ActiveRecord::Migration
   def self.up
     drop_table :quiz_responses
   end

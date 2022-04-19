@@ -1,4 +1,4 @@
-class RemoveTopicIdFromParticipants < ActiveRecord::Migration[4.2]
+class RemoveTopicIdFromParticipants < ActiveRecord::Migration
   def self.up
     remove_column :participants, :topic_id
   end

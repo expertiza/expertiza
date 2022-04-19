@@ -1,4 +1,4 @@
-class ChangeCommentForReviewerInParticiantTableToText < ActiveRecord::Migration[4.2]
+class ChangeCommentForReviewerInParticiantTableToText < ActiveRecord::Migration
   def self.up
     change_column :participants, :comment_for_reviewer, :text, default: nil
   end

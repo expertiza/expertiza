@@ -1,4 +1,4 @@
-class Invitation < ApplicationRecord
+class Invitation < ActiveRecord::Base
   # belongs_to :to_user, class_name: "User", foreign_key: "to_id"
   belongs_to :to_user, class_name: 'User', foreign_key: 'to_id', inverse_of: false
   # belongs_to :from_user, class_name: "User", foreign_key: "from_id"

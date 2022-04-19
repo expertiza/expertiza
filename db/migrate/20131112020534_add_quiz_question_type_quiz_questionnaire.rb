@@ -1,4 +1,4 @@
-class AddQuizQuestionTypeQuizQuestionnaire < ActiveRecord::Migration[4.2]
+class AddQuizQuestionTypeQuizQuestionnaire < ActiveRecord::Migration
   def self.up
     add_column :questionnaires, :quiz_question_type, :text
   end

@@ -1,4 +1,4 @@
-class CreateDeadlineTypes < ActiveRecord::Migration[4.2]
+class CreateDeadlineTypes < ActiveRecord::Migration
   def self.up
     create_table 'deadline_types', force: true do |t|
       t.column 'name', :string, limit: 32

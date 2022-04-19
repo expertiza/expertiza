@@ -1,4 +1,4 @@
-class CreateUserPastebins < ActiveRecord::Migration[4.2]
+class CreateUserPastebins < ActiveRecord::Migration
   def change
     create_table :user_pastebins do |t|
       t.integer :user_id

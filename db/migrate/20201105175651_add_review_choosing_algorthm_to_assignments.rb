@@ -1,4 +1,4 @@
-class AddReviewChoosingAlgorthmToAssignments < ActiveRecord::Migration[4.2]
+class AddReviewChoosingAlgorthmToAssignments < ActiveRecord::Migration
   def self.up
     add_column :assignments, :review_choosing_algorithm, :string, default: 'Simple Choose'
   end

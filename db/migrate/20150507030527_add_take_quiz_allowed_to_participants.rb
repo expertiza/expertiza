@@ -1,4 +1,4 @@
-class AddTakeQuizAllowedToParticipants < ActiveRecord::Migration[4.2]
+class AddTakeQuizAllowedToParticipants < ActiveRecord::Migration
   def self.up
     add_column 'participants', 'take_quiz_allowed', :boolean, default: true
   end

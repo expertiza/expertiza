@@ -1,4 +1,4 @@
-class CreateAssignments < ActiveRecord::Migration[4.2]
+class CreateAssignments < ActiveRecord::Migration
   def self.up
     create_table :assignments do |t|
       t.column :name, :string

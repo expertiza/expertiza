@@ -1,4 +1,4 @@
-class AddSectionColumnToQuestionnaires < ActiveRecord::Migration[4.2]
+class AddSectionColumnToQuestionnaires < ActiveRecord::Migration
   def self.up
     add_column 'questionnaires', 'section', :string # custom rubric section
   end

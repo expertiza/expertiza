@@ -1,4 +1,4 @@
-class UpdateResponseMaps < ActiveRecord::Migration[4.2]
+class UpdateResponseMaps < ActiveRecord::Migration
   def self.up
     add_column :response_maps, :created_at, :datetime
     add_column :response_maps, :updated_at, :datetime

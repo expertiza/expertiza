@@ -1,4 +1,4 @@
-class AccountRequest < ApplicationRecord
+class AccountRequest < ActiveRecord::Base
   before_save { self.email = email.downcase }
   before_save { name }
   validates :name, presence: true, length: { maximum: 50, message: 'is too long' }

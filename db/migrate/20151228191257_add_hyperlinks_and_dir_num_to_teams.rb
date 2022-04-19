@@ -1,4 +1,4 @@
-class AddHyperlinksAndDirNumToTeams < ActiveRecord::Migration[4.2]
+class AddHyperlinksAndDirNumToTeams < ActiveRecord::Migration
   def change
     add_column :teams, :submitted_hyperlinks, :text
     add_column :teams, :directory_num, :integer

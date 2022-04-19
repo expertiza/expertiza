@@ -1,4 +1,4 @@
-class UpdateSurveyDeployments < ActiveRecord::Migration[4.2]
+class UpdateSurveyDeployments < ActiveRecord::Migration
   change_table :survey_deployments do |t|
     t.rename :course_id, :parent_id
     t.rename :course_evaluation_id, :questionnaire_id

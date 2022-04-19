@@ -1,4 +1,4 @@
-class CreateCalculatedPenalties < ActiveRecord::Migration[4.2]
+class CreateCalculatedPenalties < ActiveRecord::Migration
   def self.up
     create_table 'calculated_penalties', force: true do |t|
       t.column 'participant_id', :integer

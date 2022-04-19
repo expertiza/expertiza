@@ -30,7 +30,7 @@ describe TreeDisplayController do
 
   describe '#drill' do
     it 'redirect to list action' do
-      get 'drill', params: { root: 1 }
+      get 'drill', root: 1
       expect(session[:root]).to eq('1')
       expect(response).to redirect_to(list_tree_display_index_path)
     end
@@ -79,29 +79,26 @@ describe TreeDisplayController do
     end
 
     it 'returns a list of course objects(private) as json' do
+      params = FolderNode.all
       @course.private = true
       @course.save
-      request_params = { reactParams: { child_nodes: FolderNode.all.to_json, nodeType: 'FolderNode' } }
-      user_session = { user: @instructor }
-      get :get_folder_contents, params: request_params, session: user_session
+      get :get_folder_contents, { reactParams: { child_nodes: params.to_json, nodeType: 'FolderNode' } }, user: @instructor
       expect(response.body).to match %r{csc517/test}
     end
 
     it 'returns an empty list when there are no private or public courses' do
+      params = FolderNode.all
       Assignment.delete(1)
       Course.delete(1)
-      request_params = { reactParams: { child_nodes: FolderNode.all.to_json, nodeType: 'FolderNode' } }
-      user_session = { user: @instructor }
-      get :get_folder_contents, params: request_params, session: user_session
+      get :get_folder_contents, { reactParams: { child_nodes: params.to_json, nodeType: 'FolderNode' } }, user: @instructor
       expect(response.body).to eq '{"Courses":[]}'
     end
 
     it 'returns a list of course objects(public) as json' do
+      params = FolderNode.all
       @course.private = false
       @course.save
-      request_params = { reactParams: { child_nodes: FolderNode.all.to_json, nodeType: 'FolderNode' } }
-      user_session = { user: @instructor }
-      get :get_folder_contents, session: request_params, session: user_session
+      get :get_folder_contents, { reactParams: { child_nodes: params.to_json, nodeType: 'FolderNode' } }, user: @instructor
       expect(response.body).to match %r{csc517/test}
     end
   end
@@ -161,9 +158,7 @@ describe TreeDisplayController do
       ta_mapping.save!
 
       params = FolderNode.all
-      request_params = { reactParams: { child_nodes: params.to_json, nodeType: 'FolderNode' } }
-      user_session = { user: student }
-      get :get_folder_contents, params: request_params, session: user_session
+      get :get_folder_contents, { reactParams: { child_nodes: params.to_json, nodeType: 'FolderNode' } }, user: student
 
       # service should not return anything as the user is student
       output = JSON.parse(response.body)['Courses']
@@ -181,9 +176,7 @@ describe TreeDisplayController do
       stub_current_user(@ta, @role.name, @role)
 
       params = FolderNode.all
-      request_params = { reactParams: { child_nodes: params.to_json, nodeType: 'FolderNode' } }
-      user_session = { user: @ta }
-      get :get_folder_contents, params: request_params, session: user_session
+      get :get_folder_contents, { reactParams: { child_nodes: params.to_json, nodeType: 'FolderNode' } }, user: @ta
 
       # service should return the course as per the ta-course mapping
       output = JSON.parse(response.body)['Courses']
@@ -197,9 +190,8 @@ describe TreeDisplayController do
 
       # make sure it's the current user
       stub_current_user(@ta, @role.name, @role)
-      request_params = { reactParams: { child_nodes: params.to_json, nodeType: 'FolderNode' } }
-      user_session = { user: @ta }
-      get :get_folder_contents, params: request_params, session: user_session
+
+      get :get_folder_contents, { reactParams: { child_nodes: params.to_json, nodeType: 'FolderNode' } }, user: @ta
 
       # service should not return anything as there is no mapping
       output = JSON.parse(response.body)['Courses']
@@ -235,9 +227,8 @@ describe TreeDisplayController do
 
       # make sure it's the current user
       stub_current_user(@ta, @role.name, @role)
-      request_params = { reactParams: { child_nodes: params.to_json, nodeType: 'FolderNode' } }
-      user_session = { user: @ta }
-      get :get_folder_contents, params: request_params, session: user_session
+
+      get :get_folder_contents, { reactParams: { child_nodes: params.to_json, nodeType: 'FolderNode' } }, user: @ta
 
       output = JSON.parse(response.body)['Courses']
       # service should return 1 course and should be course 1 not course 2
@@ -269,9 +260,8 @@ describe TreeDisplayController do
 
       # make sure it's the current user
       stub_current_user(@ta, @role.name, @role)
-      user_session = { user: @ta }
-      request_params = { reactParams: { child_nodes: params.to_json, nodeType: 'FolderNode' } }
-      get :get_folder_contents, params: request_params, session: user_session
+
+      get :get_folder_contents, { reactParams: { child_nodes: params.to_json, nodeType: 'FolderNode' } }, user: @ta
 
       # service should return 1 course
       output = JSON.parse(response.body)['Courses']
@@ -300,9 +290,8 @@ describe TreeDisplayController do
 
       # make sure it's the current user
       stub_current_user(@ta, @role.name, @role)
-      request_params = { reactParams: { child_nodes: params.to_json, nodeType: 'FolderNode' } }
-      user_session = { user: @ta }
-      get :get_folder_contents, params: request_params, session: user_session
+
+      get :get_folder_contents, { reactParams: { child_nodes: params.to_json, nodeType: 'FolderNode' } }, user: @ta
 
       # service should return 2 assignments as those are mapped
       # the sequence of assignments could be random so just checking for array size
@@ -310,9 +299,7 @@ describe TreeDisplayController do
       expect(output.length).to eq 2
 
       new_params = Node.find_by!(node_object_id: @course1.id)
-      request_params = { reactParams2: { child_nodes: new_params.to_json, nodeType: 'CourseNode' } }
-      user_session = { user: @ta }
-      get :get_folder_contents, params: request_params, session: user_session
+      get :get_folder_contents, { reactParams2: { child_nodes: new_params.to_json, nodeType: 'CourseNode' } }, user: @ta
       output = JSON.parse(response.body)
       expect(output.length).to eq 2
     end
@@ -331,9 +318,8 @@ describe TreeDisplayController do
 
       # make sure it's the current user
       stub_current_user(@ta, @role.name, @role)
-      request_params = { reactParams: { child_nodes: params.to_json, nodeType: 'FolderNode' } }
-      user_session = { user: @ta }
-      get :get_folder_contents, params: request_params, session: user_session
+
+      get :get_folder_contents, { reactParams: { child_nodes: params.to_json, nodeType: 'FolderNode' } }, user: @ta
 
       # service should not return anything as there is no mapping
       output = JSON.parse(response.body)['Assignments']

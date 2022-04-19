@@ -1,4 +1,4 @@
-class CreateAssignmentQuestionnaires < ActiveRecord::Migration[4.2]
+class CreateAssignmentQuestionnaires < ActiveRecord::Migration
   def self.up
     begin
       drop_table :assignments_questionnaires

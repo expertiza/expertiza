@@ -1,4 +1,4 @@
-class CreateReviewComments < ActiveRecord::Migration[4.2]
+class CreateReviewComments < ActiveRecord::Migration
   def self.up
     create_table :review_comments do |t|
       t.integer :review_file_id

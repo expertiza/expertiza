@@ -1,4 +1,4 @@
-class AddPotentialResponseDeadlineToResponseMaps < ActiveRecord::Migration[4.2]
+class AddPotentialResponseDeadlineToResponseMaps < ActiveRecord::Migration
   def self.up
     add_column :response_maps, :potential_response_deadline, :datetime, null: true
   end

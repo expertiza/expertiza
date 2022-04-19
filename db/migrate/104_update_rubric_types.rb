@@ -1,4 +1,4 @@
-class UpdateRubricTypes < ActiveRecord::Migration[4.2]
+class UpdateRubricTypes < ActiveRecord::Migration
   def self.up
     metareview_type = ActiveRecord::Base.connection.select_one("select * from `questionnaire_types` where name = 'Metareview'")
     pnode = QuestionnaireTypeNode.find_by_node_object_id(metareview_type['id'])

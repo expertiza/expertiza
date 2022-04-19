@@ -1,4 +1,4 @@
-class RemoveCommentsTable < ActiveRecord::Migration[4.2]
+class RemoveCommentsTable < ActiveRecord::Migration
   def change
     drop_table :comments
   end

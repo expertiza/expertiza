@@ -1,4 +1,4 @@
-class DropReviewComments < ActiveRecord::Migration[4.2]
+class DropReviewComments < ActiveRecord::Migration
   def change
     drop_table :review_comments
   end

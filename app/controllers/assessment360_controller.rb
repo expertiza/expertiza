@@ -141,7 +141,7 @@ class Assessment360Controller < ApplicationController
   def insure_existence_of(course_participants, course)
     if course_participants.empty?
       flash[:error] = "There is no course participant in course #{course.name}"
-      redirect_back fallback_location: root_path
+      redirect_to(:back)
     end
   end
 

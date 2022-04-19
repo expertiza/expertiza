@@ -1,4 +1,4 @@
-class ReplaceCourseEvaluation < ActiveRecord::Migration[4.2]
+class ReplaceCourseEvaluation < ActiveRecord::Migration
   def up
     Questionnaire.where(type: 'CourseEvaluationQuestionnaire') do |questionnaire|
       Questionnaire.update(questionnaire.id, type: 'CourseSurveyQuestionnaire')

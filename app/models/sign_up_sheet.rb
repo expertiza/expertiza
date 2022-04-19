@@ -1,4 +1,4 @@
-class SignUpSheet < ApplicationRecord
+class SignUpSheet < ActiveRecord::Base
   # Team lazy initialization method [zhewei, 06/27/2015]
   def self.signup_team(assignment_id, user_id, topic_id = nil)
     users_team = SignedUpTeam.find_team_users(assignment_id, user_id)
@@ -26,7 +26,7 @@ class SignUpSheet < ApplicationRecord
     if user_signup.empty?
 
       # Using a DB transaction to ensure atomic inserts
-      ApplicationRecord.transaction do
+      ActiveRecord::Base.transaction do
         # check whether slots exist (params[:id] = topic_id) or has the user selected another topic
         team_id, topic_id = create_SignUpTeam(assignment_id, sign_up, topic_id, user_id)
         result = true if sign_up.save
@@ -38,7 +38,7 @@ class SignUpSheet < ApplicationRecord
       end
 
       # Using a DB transaction to ensure atomic inserts
-      ApplicationRecord.transaction do
+      ActiveRecord::Base.transaction do
         # check whether user is clicking on a topic which is not going to place him in the waitlist
         result = sign_up_wailisted(assignment_id, sign_up, team_id, topic_id)
       end

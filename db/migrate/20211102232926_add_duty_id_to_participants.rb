@@ -1,4 +1,4 @@
-class AddDutyIdToParticipants < ActiveRecord::Migration[4.2]
+class AddDutyIdToParticipants < ActiveRecord::Migration
   def change
     add_reference :participants, :duty, index: true, foreign_key: true
   end

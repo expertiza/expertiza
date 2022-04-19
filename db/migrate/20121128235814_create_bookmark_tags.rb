@@ -1,4 +1,4 @@
-class CreateBookmarkTags < ActiveRecord::Migration[4.2]
+class CreateBookmarkTags < ActiveRecord::Migration
   def self.up
     create_table :bookmark_tags do |t|
       t.string :tag_name

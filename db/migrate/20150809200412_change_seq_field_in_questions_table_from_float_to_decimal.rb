@@ -1,4 +1,4 @@
-class ChangeSeqFieldInQuestionsTableFromFloatToDecimal < ActiveRecord::Migration[4.2]
+class ChangeSeqFieldInQuestionsTableFromFloatToDecimal < ActiveRecord::Migration
   def self.up
     change_column :questions, :seq, :decimal, precision: 6, scale: 2
   end

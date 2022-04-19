@@ -20,7 +20,6 @@ class AccountRequestController < ApplicationController
     end
   end
 
-  # TODO create_approved_user name is misleading. The tests are also wrong for this.
   # Decides whether a new user should be created or not
   def create_approved_user
     # If a user isn't selected before approving or denying, they are given an error message
@@ -36,7 +35,7 @@ class AccountRequestController < ApplicationController
       requested_user.status = is_approved
       if requested_user.status.nil?
         flash[:error] = 'Please Approve or Reject before submitting'
-      elsif requested_user.update_attributes(requested_user_params)
+      elsif requested_user.update_attributes(params[:user])
         flash[:success] = "The user \"#{requested_user.name}\" has been successfully updated."
       end
       # If the users request is approved, they are stored as a user in the database

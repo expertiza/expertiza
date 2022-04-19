@@ -353,7 +353,7 @@
     <input name="_method" type="hidden" value="put"/>
   <% end %>
   <table width="100%">
-    <% @review_questions.each_with_index do |question, i| %>
+    <% @questions.each_with_index do |question, i| %>
       <tr>
         <td>
             <% answer = Answer.where(question_id: question.id, response_id: @response.id).first unless @response.nil? %>
@@ -429,7 +429,7 @@
 <% end %>
 
 <!--Check whether there is a UploadFile question.-->
-<% @review_questions.each do |question| %>
+<% @questions.each do |question| %>
   <% if question.instance_of? UploadFile %>
     <!--params[:origin] means from where do the files upload-->
     <!--If the files uploaded from submitted_work (students hand in assignment), params[:origin] will be nil-->

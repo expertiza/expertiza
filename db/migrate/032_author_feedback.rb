@@ -1,4 +1,4 @@
-class AuthorFeedback < ActiveRecord::Migration[4.2]
+class AuthorFeedback < ActiveRecord::Migration
   def self.up
     add_column 'assignments', 'author_feedback_questionnaire_id', :integer
 

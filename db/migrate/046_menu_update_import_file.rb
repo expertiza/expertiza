@@ -1,4 +1,4 @@
-class MenuUpdateImportFile < ActiveRecord::Migration[4.2]
+class MenuUpdateImportFile < ActiveRecord::Migration
   def self.up
     permission1 = Permission.find_by_name('administer assignments')
     site_controller = SiteController.find_or_create_by(name: 'import_file')

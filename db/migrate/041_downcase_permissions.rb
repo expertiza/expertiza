@@ -1,4 +1,4 @@
-class DowncasePermissions < ActiveRecord::Migration[4.2]
+class DowncasePermissions < ActiveRecord::Migration
   def self.up
     permissions = Permission.all
     permissions.each  do |permission|

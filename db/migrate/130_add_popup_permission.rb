@@ -1,4 +1,4 @@
-class AddPopupPermission < ActiveRecord::Migration[4.2]
+class AddPopupPermission < ActiveRecord::Migration
   def self.up
     sc = SiteController.new
     sc.name = 'popup'

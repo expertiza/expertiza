@@ -1,4 +1,4 @@
-class ChangeDueDateSchemaStringDelayedJobId < ActiveRecord::Migration[4.2]
+class ChangeDueDateSchemaStringDelayedJobId < ActiveRecord::Migration
   def change
     change_table :due_dates do |t|
       # Sidekiq jobs have string job id, hence this change

@@ -1,4 +1,4 @@
-class AddQuestionTypeToQuestions < ActiveRecord::Migration[4.2]
+class AddQuestionTypeToQuestions < ActiveRecord::Migration
   def self.up
     add_column 'questions', 'seq', :float, default: nil
     add_column 'questions', 'q_type', :string

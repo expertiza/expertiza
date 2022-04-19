@@ -1,4 +1,4 @@
-class AddBookmarkratingFolderNodes < ActiveRecord::Migration[4.2]
+class AddBookmarkratingFolderNodes < ActiveRecord::Migration
   def self.up
     Node.where(['type in ("QuestionnaireTypeNode","QuestionnaireNode")']).find_each(&:destroy)
 

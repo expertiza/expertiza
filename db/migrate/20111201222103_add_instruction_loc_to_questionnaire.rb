@@ -1,4 +1,4 @@
-class AddInstructionLocToQuestionnaire < ActiveRecord::Migration[4.2]
+class AddInstructionLocToQuestionnaire < ActiveRecord::Migration
   def self.up
     add_column :questionnaires, :instruction_loc, :text
   end

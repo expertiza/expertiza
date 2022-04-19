@@ -1,4 +1,4 @@
-class CreateFolderNodes < ActiveRecord::Migration[4.2]
+class CreateFolderNodes < ActiveRecord::Migration
   def self.up
     add_column :nodes, :name, :string
     add_column :nodes, :lft, :integer

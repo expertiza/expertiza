@@ -1,4 +1,4 @@
-class MenuUpdateImpersonate < ActiveRecord::Migration[4.2]
+class MenuUpdateImpersonate < ActiveRecord::Migration
   def self.up
     permission1 = Permission.find_by_name('administer assignments')
     permission2 = Permission.find_by_name('do assignments')

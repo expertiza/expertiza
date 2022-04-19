@@ -1,4 +1,4 @@
-class FixTeamColNameComment < ActiveRecord::Migration[4.2]
+class FixTeamColNameComment < ActiveRecord::Migration
   def self.up
     rename_column :teams, :comment, :comments_for_advertisement
   end

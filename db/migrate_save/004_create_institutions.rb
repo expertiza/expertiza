@@ -1,4 +1,4 @@
-class CreateInstitutions < ActiveRecord::Migration[4.2]
+class CreateInstitutions < ActiveRecord::Migration
   def self.up
     create_table :institutions do |t|
       t.column :name, :string # printname of institution (college, university, high school, etc.)

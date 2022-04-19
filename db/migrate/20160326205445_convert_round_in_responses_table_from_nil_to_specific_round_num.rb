@@ -1,4 +1,4 @@
-class ConvertRoundInResponsesTableFromNilToSpecificRoundNum < ActiveRecord::Migration[4.2]
+class ConvertRoundInResponsesTableFromNilToSpecificRoundNum < ActiveRecord::Migration
   def change
     # 1st kind of assignment which has both 'review' and 'rereview' deadline type.
     # this kind of assignment only has one round of 'review' deadline.

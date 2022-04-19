@@ -1,4 +1,4 @@
-class DropTableTeamRolesets < ActiveRecord::Migration[4.2]
+class DropTableTeamRolesets < ActiveRecord::Migration
   def change
     drop_table :team_rolesets
   end

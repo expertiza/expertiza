@@ -1,4 +1,4 @@
-class RenameScoresTableToAnswers < ActiveRecord::Migration[4.2]
+class RenameScoresTableToAnswers < ActiveRecord::Migration
   def self.up
     rename_table :scores, :answers
     rename_column :answers, :score, :answer

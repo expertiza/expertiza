@@ -1,4 +1,4 @@
-class MenuItem < ApplicationRecord
+class MenuItem < ActiveRecord::Base
   attr_accessor :controller_action, :content_page
 
   validates :name, presence: true

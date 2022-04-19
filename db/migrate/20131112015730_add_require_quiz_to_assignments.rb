@@ -1,4 +1,4 @@
-class AddRequireQuizToAssignments < ActiveRecord::Migration[4.2]
+class AddRequireQuizToAssignments < ActiveRecord::Migration
   def self.up
     add_column :assignments, :require_quiz, :boolean
   end

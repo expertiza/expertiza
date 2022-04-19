@@ -22,7 +22,7 @@ class CourseParticipant < Participant
       attributes = ImportFileHelper.define_attributes(row_hash)
       user = ImportFileHelper.create_new_user(attributes, session)
     end
-    course = Course.find(id)
+    course = Course.find_by(id)
     raise ImportError, 'The course with the id "' + id.to_s + '" was not found.' if course.nil?
 
     unless CourseParticipant.exists?(user_id: user.id, parent_id: id)

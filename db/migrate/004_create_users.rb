@@ -1,4 +1,4 @@
-class CreateUsers < ActiveRecord::Migration[4.2]
+class CreateUsers < ActiveRecord::Migration
   def self.up
     create_table 'users', force: true do |t|
       t.column 'name', :string, default: '', null: false

@@ -27,7 +27,11 @@ class DutiesController < ApplicationController
 
   # POST /duties
   def create
-    @duty = Duty.new(duty_params)
+    @duty = Duty.new
+
+    @duty.assignment_id = params[:duty][:assignment_id]
+    @duty.max_members_for_duty = params[:duty][:max_members_for_duty]
+    @duty.name = params[:duty][:name]
 
     if @duty.save
       # When the duty (role) is created successfully we return back to the assignment edit page
@@ -41,7 +45,11 @@ class DutiesController < ApplicationController
   def update
     @duty = Duty.find(params[:id])
 
-    if @duty.update_attributes(duty_params)
+    @duty.assignment_id = params[:duty][:assignment_id]
+    @duty.max_members_for_duty = params[:duty][:max_members_for_duty]
+    @duty.name = params[:duty][:name]
+
+    if @duty.save
       redirect_to edit_assignment_path(params[:duty][:assignment_id]), notice: 'Role was successfully updated.'
     else
       redirect_to_create_page_and_show_error
@@ -74,9 +82,5 @@ class DutiesController < ApplicationController
 
     flash[:error] = error_message
     redirect_to action: :new, id: params[:duty][:assignment_id]
-  end
-
-  def duty_params
-    params.require(:duty).permit(:assignment_id, :max_members_for_duty, :name)
   end
 end

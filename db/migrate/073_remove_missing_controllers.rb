@@ -1,4 +1,4 @@
-class RemoveMissingControllers < ActiveRecord::Migration[4.2]
+class RemoveMissingControllers < ActiveRecord::Migration
   def self.up
     controller = SiteController.find_by_name('courses_users')
     if controller

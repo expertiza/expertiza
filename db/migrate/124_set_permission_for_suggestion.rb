@@ -1,4 +1,4 @@
-class SetPermissionForSuggestion < ActiveRecord::Migration[4.2]
+class SetPermissionForSuggestion < ActiveRecord::Migration
   def self.up
     permission = Permission.find_by_name('administer assignments')
     controller = SiteController.find_or_create_by(name: 'suggestion')

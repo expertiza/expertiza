@@ -1,2 +1,2 @@
-class SignupResubmissionQuota < ApplicationRecord
+class SignupResubmissionQuota < ActiveRecord::Base
 end

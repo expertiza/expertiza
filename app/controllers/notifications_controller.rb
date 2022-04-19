@@ -11,9 +11,7 @@ class NotificationsController < ApplicationController
   end
 
   def run_get_notification
-    if current_user.try(:student?)
-      redirect_to controller: :student_task, action: :view
-    end
+    redirect_to controller: :student_task, action: :view if current_user.try(:student?)
   end
 
   # GET /notifications
@@ -40,7 +38,7 @@ class NotificationsController < ApplicationController
   # POST /notifications
   def create
     if params[:notification]
-      redirect_back fallback_location: root_path
+      redirect_back
       return
     end
     @notification = Notification.new(notification_params)

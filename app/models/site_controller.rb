@@ -1,4 +1,4 @@
-class SiteController < ApplicationRecord
+class SiteController < ActiveRecord::Base
   has_many :controller_actions
   belongs_to :permission
 

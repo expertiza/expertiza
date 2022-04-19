@@ -1,6 +1,6 @@
 require 'redcloth'
 
-class ContentPage < ApplicationRecord
+class ContentPage < ActiveRecord::Base
   validates :name, presence: true
   validates :name, uniqueness: true
 

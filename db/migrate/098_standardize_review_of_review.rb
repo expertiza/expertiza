@@ -1,4 +1,4 @@
-class StandardizeReviewOfReview < ActiveRecord::Migration[4.2]
+class StandardizeReviewOfReview < ActiveRecord::Migration
   def self.up
     remove_column :review_of_reviews, :reviewed_at
     remove_column :review_of_reviews, :review_num_for_author

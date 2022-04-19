@@ -53,9 +53,9 @@ RSpec.describe SampleReviewsController, type: :controller do
   describe '#map_to_assignment' do
     context 'when Instructor selects assignments for sample reviews to be published to' do
       it 'add entry in sampleReviews and marks response visibility to published' do
-        request_params = { id: 1, assignments: [1, 2], format: :json }
-        user_session = { user: build(:instructor, id: 1) }
-        post :map_to_assignment, params: request_params, session: user_session
+        params = { id: 1, assignments: [1, 2], format: :json }
+        session = { user: build(:instructor, id: 1) }
+        post :map_to_assignment, params, session
         expect(responsex).to have_attributes(visibility: 'published')
         expect(response).to have_http_status(201)
       end
@@ -64,9 +64,9 @@ RSpec.describe SampleReviewsController, type: :controller do
   describe '#unmap_from_assignment' do
     context 'when Instructor selects to unmark sample review from all assignments' do
       it 'deletes mapping and marks response visibility to public' do
-        request_params = { id: 1, format: :json }
-        user_session = { user: build(:instructor, id: 1) }
-        post :unmap_from_assignment, params: request_params, session: user_session
+        params = { id: 1, format: :json }
+        session = { user: build(:instructor, id: 1) }
+        post :unmap_from_assignment, params, session
         expect(responsex).to have_attributes(visibility: 'public')
         expect(response).to have_http_status(204)
       end
@@ -75,16 +75,16 @@ RSpec.describe SampleReviewsController, type: :controller do
 
   describe '#index' do
     it 'renders assignments#index page' do
-      request_params = { id: 5 }
-      get :index, params: request_params
+      params = { id: 5 }
+      get :index, params
       expect(response).to render_template(:index)
     end
   end
 
   describe '#show' do
     it 'renders assignments#show page' do
-      request_params = { id: 1, return: 'assignment_edit' }
-      get :show, params: request_params
+      params = { id: 1, return: 'assignment_edit' }
+      get :show, params
       expect(response).to render_template(:show)
     end
   end

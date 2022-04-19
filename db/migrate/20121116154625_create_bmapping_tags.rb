@@ -1,4 +1,4 @@
-class CreateBmappingTags < ActiveRecord::Migration[4.2]
+class CreateBmappingTags < ActiveRecord::Migration
   def self.up
     if table_exists?(:bmappings_tags) == false
       create_table :bmappings_tags do |t|

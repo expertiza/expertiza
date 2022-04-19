@@ -1,4 +1,4 @@
-class DropScoreViewBeforeRemovingDefaultChoices < ActiveRecord::Migration[4.2]
+class DropScoreViewBeforeRemovingDefaultChoices < ActiveRecord::Migration
   def change
     execute <<-SQL
       drop view score_views;

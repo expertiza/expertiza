@@ -1,4 +1,4 @@
-class RemoveFks < ActiveRecord::Migration[4.2]
+class RemoveFks < ActiveRecord::Migration
   def self.up
     execute 'ALTER TABLE response_maps DROP FOREIGN KEY fk_response_map_reviewer'
   end

@@ -1,4 +1,4 @@
-class StandardizeReviewMappings < ActiveRecord::Migration[4.2]
+class StandardizeReviewMappings < ActiveRecord::Migration
   def self.up
     begin
       execute "ALTER TABLE `review_mappings`

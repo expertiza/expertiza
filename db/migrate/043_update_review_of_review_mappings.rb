@@ -1,4 +1,4 @@
-class UpdateReviewOfReviewMappings < ActiveRecord::Migration[4.2]
+class UpdateReviewOfReviewMappings < ActiveRecord::Migration
   def self.up
     begin
       execute "ALTER TABLE `review_of_review_mappings`

@@ -35,6 +35,7 @@ describe VmQuestionResponse  do
         response = VmQuestionResponse.new(metareview_questionnaire, assignment, 1)
         expect(response.round).to eq(1)
         expect(response.rounds).to eq(2)
+        expect(response.questionnaire_type).to eq('MetareviewQuestionnaire')
         expect(response.questionnaire_display_type).to eq('Metareview')
         expect(response.list_of_rows).to eq([])
         expect(response.list_of_reviewers).to eq([])
@@ -77,7 +78,6 @@ describe VmQuestionResponse  do
 
     context 'when initialized with a author feedback questionnaire' do
       it 'adds reviews' do
-        author_feedback_questionnaire.type = "AuthorFeedbackQuestionnaire"
         response = VmQuestionResponse.new(author_feedback_questionnaire, assignment, 1)
         allow(FeedbackResponseMap).to receive(:where).with(reviewer_id: 3).and_return([double(id: 1, reviewer_id: 3, reviewee_id: 4, response_id: 1)])
         response.add_reviews(participant, team, false)
@@ -88,7 +88,6 @@ describe VmQuestionResponse  do
 
     context 'when initialized with a teammate review questionnaire' do
       it 'adds reviews' do
-        teammate_review_questionnaire.type = "TeammateReviewQuestionnaire"
         response = VmQuestionResponse.new(teammate_review_questionnaire, assignment, 1)
         allow(participant).to receive(:teammate_reviews).and_return(reviews)
         allow(TeammateReviewResponseMap).to receive(:find_by).with(id: 1).and_return(double('TeammateReviewResponseMap', reviewer_id: 1))
@@ -102,7 +101,6 @@ describe VmQuestionResponse  do
 
     context 'when initialized with a meta review type' do
       it 'adds reviews' do
-        metareview_questionnaire.type = "MetareviewQuestionnaire"
         response = VmQuestionResponse.new(metareview_questionnaire, assignment, 1)
         allow(participant).to receive(:metareviews).and_return(reviews)
         allow(MetareviewResponseMap).to receive(:find_by).with(id: 1).and_return(double('MetareviewResponseMap', reviewer_id: 1))

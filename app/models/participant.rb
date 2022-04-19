@@ -1,4 +1,4 @@
-class Participant < ApplicationRecord
+class Participant < ActiveRecord::Base
   include Scoring
   include ParticipantsHelper
   has_paper_trail

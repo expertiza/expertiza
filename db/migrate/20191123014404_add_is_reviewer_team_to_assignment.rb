@@ -1,4 +1,4 @@
-class AddIsReviewerTeamToAssignment < ActiveRecord::Migration[4.2]
+class AddIsReviewerTeamToAssignment < ActiveRecord::Migration
   def change
     add_column :assignments, :reviewer_is_team, :boolean
   end

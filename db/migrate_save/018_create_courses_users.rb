@@ -1,4 +1,4 @@
-class CreateCoursesUsers < ActiveRecord::Migration[4.2]
+class CreateCoursesUsers < ActiveRecord::Migration
   def self.up
     # This table is used as a mapping table associating users with courses,
     # but it also contains info as to whether a user has dropped a course.

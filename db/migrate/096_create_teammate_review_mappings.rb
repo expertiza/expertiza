@@ -1,4 +1,4 @@
-class CreateTeammateReviewMappings < ActiveRecord::Migration[4.2]
+class CreateTeammateReviewMappings < ActiveRecord::Migration
   def self.up
     create_table :teammate_review_mappings do |t|
       t.column :reviewer_id, :integer, null: false

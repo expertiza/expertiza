@@ -1,4 +1,4 @@
-class RenameCreatorIdToTeamId < ActiveRecord::Migration[4.2]
+class RenameCreatorIdToTeamId < ActiveRecord::Migration
   def self.up
     rename_column :signed_up_users, :creator_id, :team_id
   end

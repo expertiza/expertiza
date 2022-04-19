@@ -1,4 +1,4 @@
-class CreateDueDates < ActiveRecord::Migration[4.2]
+class CreateDueDates < ActiveRecord::Migration
   def self.up
     create_table :due_dates do |t|
       t.column :due_at, :datetime

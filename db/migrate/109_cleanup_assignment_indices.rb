@@ -1,4 +1,4 @@
-class CleanupAssignmentIndices < ActiveRecord::Migration[4.2]
+class CleanupAssignmentIndices < ActiveRecord::Migration
   # add/remove indices and foreign keys when appropriate
   def self.up
     change_column :assignments, :course_id, :integer, null: true

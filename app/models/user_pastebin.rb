@@ -1,5 +1,6 @@
 class UserPastebin < ActiveRecord::Base
   validates :user_id, uniqueness: { scope: :short_form }
+  attr_accessible :short_form, :long_form
 
   @markdown_character = '\\'
 

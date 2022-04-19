@@ -1,4 +1,4 @@
-class DropRoundFieldFromResponseMaps < ActiveRecord::Migration[4.2]
+class DropRoundFieldFromResponseMaps < ActiveRecord::Migration
   def change
     remove_column 'response_maps', 'round'
   end

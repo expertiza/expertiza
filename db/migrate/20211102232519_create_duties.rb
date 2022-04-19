@@ -1,4 +1,4 @@
-class CreateDuties < ActiveRecord::Migration[4.2]
+class CreateDuties < ActiveRecord::Migration
   def change
     create_table :duties do |t|
       t.string :name

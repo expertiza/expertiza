@@ -1,4 +1,4 @@
-class AddHandleToUsers < ActiveRecord::Migration[4.2]
+class AddHandleToUsers < ActiveRecord::Migration
   def self.up
     add_column :users, :handle, :string, null: true
   rescue StandardError

@@ -1,4 +1,4 @@
-class CreateNotifications < ActiveRecord::Migration[4.2]
+class CreateNotifications < ActiveRecord::Migration
   def self.up
     create_table :notification_limits do |t|
       t.column :user_id, :integer, null: false

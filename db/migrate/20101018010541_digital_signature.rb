@@ -1,4 +1,4 @@
-class DigitalSignature < ActiveRecord::Migration[4.2]
+class DigitalSignature < ActiveRecord::Migration
   def self.up
     add_column :users, :digital_certificate, :text
     add_column :participants, :time_stamp, :datetime

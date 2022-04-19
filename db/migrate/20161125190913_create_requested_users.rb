@@ -1,4 +1,4 @@
-class CreateRequestedUsers < ActiveRecord::Migration[4.2]
+class CreateRequestedUsers < ActiveRecord::Migration
   def change
     create_table :requested_users do |t|
       t.string :name

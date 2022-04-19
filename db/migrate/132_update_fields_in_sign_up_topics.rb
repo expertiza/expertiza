@@ -1,4 +1,4 @@
-class UpdateFieldsInSignUpTopics < ActiveRecord::Migration[4.2]
+class UpdateFieldsInSignUpTopics < ActiveRecord::Migration
   def self.up
     remove_column :sign_up_topics, :start_date
     remove_column :sign_up_topics, :due_date

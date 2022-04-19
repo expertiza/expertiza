@@ -1,4 +1,4 @@
-class CreateTopicDeadlines < ActiveRecord::Migration[4.2]
+class CreateTopicDeadlines < ActiveRecord::Migration
   def self.up
     create_table :topic_deadlines do |t|
       t.column 'due_at', :datetime

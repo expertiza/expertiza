@@ -1,4 +1,4 @@
-class RenameTeamCountToMaxTeamSize < ActiveRecord::Migration[4.2]
+class RenameTeamCountToMaxTeamSize < ActiveRecord::Migration
   def self.up
     rename_column :assignments, :team_count, :max_team_size
   end

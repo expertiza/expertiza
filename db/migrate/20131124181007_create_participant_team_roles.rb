@@ -1,4 +1,4 @@
-class CreateParticipantTeamRoles < ActiveRecord::Migration[4.2]
+class CreateParticipantTeamRoles < ActiveRecord::Migration
   def self.up
     create_table :participant_team_roles do |t|
       t.integer :role_assignment_id

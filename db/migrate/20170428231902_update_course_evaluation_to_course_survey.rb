@@ -1,4 +1,4 @@
-class UpdateCourseEvaluationToCourseSurvey < ActiveRecord::Migration[4.2]
+class UpdateCourseEvaluationToCourseSurvey < ActiveRecord::Migration
   def change
     execute "UPDATE questionnaires set type = 'CourseSurveyQuestionnaire' where type in ('CourseEvaluationQuestionnaire')"
   end

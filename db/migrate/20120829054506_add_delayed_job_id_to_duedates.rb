@@ -1,4 +1,4 @@
-class AddDelayedJobIdToDuedates < ActiveRecord::Migration[4.2]
+class AddDelayedJobIdToDuedates < ActiveRecord::Migration
   def self.up
     add_column :due_dates, :delayed_job_id, :integer
   end

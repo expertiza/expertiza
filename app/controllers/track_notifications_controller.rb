@@ -13,7 +13,7 @@ class TrackNotificationsController < ApplicationController
     track_notification.user_id = current_user.id
     track_notification.notification_id = params[:id]
     track_notification.save
-    redirect_back fallback_location: root_path
+    redirect_back
   end
 
   private

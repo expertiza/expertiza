@@ -1,4 +1,4 @@
-class AddColumnAllowSuggestionsToAssignments < ActiveRecord::Migration[4.2]
+class AddColumnAllowSuggestionsToAssignments < ActiveRecord::Migration
   def self.up
     add_column :assignments, :allow_suggestions, :boolean
   end

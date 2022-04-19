@@ -1,4 +1,4 @@
-class RenameIsLottery < ActiveRecord::Migration[4.2]
+class RenameIsLottery < ActiveRecord::Migration
   def self.up
     rename_column :assignments, :is_lottery, :is_intelligent
   end

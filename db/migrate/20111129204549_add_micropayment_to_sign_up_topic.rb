@@ -1,4 +1,4 @@
-class AddMicropaymentToSignUpTopic < ActiveRecord::Migration[4.2]
+class AddMicropaymentToSignUpTopic < ActiveRecord::Migration
   def self.up
     add_column :sign_up_topics, :micropayment, :integer
   end

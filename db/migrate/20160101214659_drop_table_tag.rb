@@ -1,4 +1,4 @@
-class DropTableTag < ActiveRecord::Migration[4.2]
+class DropTableTag < ActiveRecord::Migration
   def change
     drop_table :tags
   end

@@ -1,4 +1,4 @@
-class CreateQuizDeadlineType < ActiveRecord::Migration[4.2]
+class CreateQuizDeadlineType < ActiveRecord::Migration
   def self.up
     DeadlineType.create name: 'quiz'
   end

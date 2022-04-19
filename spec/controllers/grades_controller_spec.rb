@@ -19,16 +19,7 @@ describe GradesController do
   let(:review_response_map) { build(:review_response_map, id: 1) }
   let(:assignment_due_date) { build(:assignment_due_date) }
   let(:ta) { build(:teaching_assistant, id: 8) }
-  score_view_setup_query = '
-  CREATE OR REPLACE VIEW score_views AS SELECT ques.weight question_weight,ques.type AS type,
-      q1.id "q1_id",q1.NAME AS q1_name,q1.instructor_id AS q1_instructor_id,q1.private AS q1_private,
-      q1.min_question_score AS q1_min_question_score,q1.max_question_score AS q1_max_question_score,
-      q1.created_at AS q1_created_at,q1.updated_at AS q1_updated_at,
-      q1.TYPE AS q1_type,q1.display_type AS q1_display_type,
-      ques.id as ques_id,ques.questionnaire_id as ques_questionnaire_id, s.id AS s_id,s.question_id AS s_question_id,
-      s.answer AS s_score,s.comments AS s_comments,s.response_id AS s_response_id
-      FROM questions ques left join questionnaires q1 on ques.questionnaire_id = q1.id left join answers s on ques.id = s.question_id'
-  ActiveRecord::Base.connection.execute(score_view_setup_query)
+
   before(:each) do
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
     allow(AssignmentParticipant).to receive(:find).with('3').and_return(participant3)
@@ -55,8 +46,8 @@ describe GradesController do
         allow(assignment).to receive(:vary_by_round).and_return(true)
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([assignment_questionnaire])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
-        request_params = { id: 1 }
-        get :view, params: request_params
+        params = { id: 1 }
+        get :view, params
         expect(controller.instance_variable_get(:@questions)[:review1].size).to eq(1)
         expect(response).to render_template(:view)
       end
@@ -66,8 +57,8 @@ describe GradesController do
       it 'calculates scores and renders grades#view page' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
         allow(ReviewResponseMap).to receive(:assessments_for).with(team).and_return([review_response])
-        request_params = { id: 1 }
-        get :view, params: request_params
+        params = { id: 1 }
+        get :view, params
         expect(controller.instance_variable_get(:@questions).size).to eq(1)
         expect(response).to render_template(:view)
       end
@@ -83,8 +74,8 @@ describe GradesController do
     context 'when view_my_scores page is not allowed to access' do
       it 'shows a flash error message and redirects to root path (/)' do
         session[:user] = nil
-        request_params = { id: 1 }
-        get :view_my_scores, params: request_params
+        params = { id: 1 }
+        get :view_my_scores, params
         expect(response).to redirect_to('/')
       end
     end
@@ -102,9 +93,9 @@ describe GradesController do
         allow(assignment).to receive(:late_policy_id).and_return(false)
         allow(assignment).to receive(:calculate_penalty).and_return(false)
         allow_any_instance_of(GradesController).to receive(:compute_total_score).with(assignment, any_args).and_return(100)
-        request_params = { id: 1 }
-        user_session = { user: instructor }
-        get :view_my_scores, params: request_params, session: user_session
+        params = { id: 1 }
+        session = { user: instructor }
+        get :view_my_scores, params, session
         expect(response).to render_template(:view_my_scores)
       end
     end
@@ -113,8 +104,8 @@ describe GradesController do
   xdescribe '#view_team' do
     it 'renders grades#view_team page' do
       allow(participant).to receive(:team).and_return(team2)
-      request_params = { id: 1 }
-      get :view_team, params: request_params
+      params = { id: 1 }
+      get :view_team, params
       expect(response).to render_template(:view_team)
     end
   end
@@ -131,10 +122,10 @@ describe GradesController do
         allow_any_instance_of(GradesController).to receive(:compute_total_score).with(assignment, any_args).and_return(100)
         allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([review_response])
         allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
-        request_params = { id: 1 }
+        params = { id: 1 }
         allow(TaMapping).to receive(:exists?).with(ta_id: 1, course_id: 1).and_return(true)
         stub_current_user(ta, ta.role.name, ta.role)
-        get :view_team, params: request_params
+        get :view_team, params
         expect(response.body).not_to have_content 'TA'
       end
     end
@@ -148,8 +139,8 @@ describe GradesController do
       allow(review_questionnaire).to receive(:get_assessments_for).with(participant).and_return([review_response])
       allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
       allow_any_instance_of(GradesController).to receive(:compute_total_score).with(assignment, any_args).and_return(100)
-      request_params = { id: 1 }
-      get :edit, params: request_params
+      params = { id: 1 }
+      get :edit, params
       expect(response).to render_template(:edit)
     end
   end
@@ -162,9 +153,9 @@ describe GradesController do
         allow(ReviewResponseMap).to receive(:find_or_create_by).with(reviewee_id: 1, reviewer_id: 1, reviewed_object_id: 1).and_return(review_response_map)
         allow(review_response_map).to receive(:new_record?).and_return(false)
         allow(Response).to receive(:find_by).with(map_id: 1).and_return(review_response)
-        request_params = { id: 1 }
-        user_session = { user: instructor }
-        get :instructor_review, params: request_params, session: user_session
+        params = { id: 1 }
+        session = { user: instructor }
+        get :instructor_review, params, session
         expect(response).to redirect_to('/response/edit?return=instructor')
       end
     end
@@ -176,9 +167,9 @@ describe GradesController do
         allow(ReviewResponseMap).to receive(:find_or_create_by).with(reviewee_id: 1, reviewer_id: 2, reviewed_object_id: 1).and_return(review_response_map)
         allow(review_response_map).to receive(:new_record?).and_return(true)
         allow(Response).to receive(:find_by).with(map_id: 1).and_return(review_response)
-        request_params = { id: 1 }
-        user_session = { user: instructor }
-        get :instructor_review, params: request_params, session: user_session
+        params = { id: 1 }
+        session = { user: instructor }
+        get :instructor_review, params, session
         expect(response).to redirect_to('/response/new?id=1&return=instructor')
       end
     end
@@ -187,7 +178,7 @@ describe GradesController do
   describe '#update' do
     context 'when participant\'s grade is update' do
       it 'updates grades and redirects to grades#edit page' do
-        request_params = {
+        params = {
           id: 3,
           total_score: 98,
           participant: {
@@ -195,14 +186,14 @@ describe GradesController do
           }
         }
         allow(participant3).to receive(:update_attribute).with(any_args).and_return(participant3)
-        post :update, params: request_params
+        post :update, params
         expect(flash[:note]).to eq('A score of 98% has been saved for instructor6.')
         expect(response).to redirect_to('/grades/3/edit')
       end
     end
     context 'when total is not equal to participant\'s grade' do
       it 'updates grades and redirects to grades#edit page' do
-        request_params = {
+        params = {
           id: 1,
           total_score: 98,
           participant: {
@@ -210,7 +201,7 @@ describe GradesController do
           }
         }
         allow(participant).to receive(:update_attribute).with(any_args).and_return(participant)
-        post :update, params: request_params
+        post :update, params
         expect(flash[:note]).to eq("The computed score will be used for #{participant.user.name}.")
         expect(response).to redirect_to('/grades/1/edit')
       end
@@ -218,7 +209,7 @@ describe GradesController do
 
     context 'when total is equal to participant\'s grade' do
       it 'redirects to grades#edit page' do
-        request_params = {
+        params = {
           id: 1,
           total_score: 98,
           participant: {
@@ -226,7 +217,7 @@ describe GradesController do
           }
         }
         allow(participant).to receive(:update_attribute).with(any_args).and_return(participant)
-        post :update, params: request_params
+        post :update, params
         expect(flash[:note]).to eq("The computed score will be used for #{participant.user.name}.")
         expect(response).to redirect_to('/grades/1/edit')
       end
@@ -237,12 +228,12 @@ describe GradesController do
     it 'saves grade and comment for submission and refreshes the grades#view_team page' do
       allow(AssignmentParticipant).to receive(:find_by).with(id: '1').and_return(participant)
       allow(participant).to receive(:team).and_return(build(:assignment_team, id: 2, parent_id: 8))
-      request_params = {
+      params = {
         participant_id: 1,
         grade_for_submission: 100,
         comment_for_submission: 'comment'
       }
-      post :save_grade_and_comment_for_submission, params: request_params
+      post :save_grade_and_comment_for_submission, params
       expect(flash[:error]).to be nil
       expect(response).to redirect_to('/grades/view_team?id=1')
     end
@@ -251,12 +242,12 @@ describe GradesController do
       it 'catch error' do
         allow(AssignmentParticipant).to receive(:find_by).with(id: '4').and_return(participant4)
         allow(participant4).to receive(:team).and_return(team2)
-        request_params = {
+        params = {
           participant_id: 4,
           grade_for_submission: 100,
           comment_for_submission: 'comment'
         }
-        post :save_grade_and_comment_for_submission, params: request_params
+        post :save_grade_and_comment_for_submission, params
         allow(team2).to receive(:save).and_raise StandardError
         expect { save_grade_and_comment_for_submission }.to raise_error StandardError
       end
@@ -294,12 +285,12 @@ describe GradesController do
   describe '#redirect_when_disallowed' do
     context 'when a participant without a team exists' do
       it 'redirects to /' do
-        request_params = { id: 1 }
+        params = { id: 1 }
         session
         allow(participant).to receive(:team).and_return(nil)
         allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
         allow(TeamsUser).to receive(:team_id).and_return(1)
-        get :view_my_scores, params: request_params
+        get :view_my_scores, params
         expect(response).to redirect_to('/')
       end
     end

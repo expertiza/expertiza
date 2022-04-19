@@ -1,4 +1,4 @@
-class DropSurveyParticipants < ActiveRecord::Migration[4.2]
+class DropSurveyParticipants < ActiveRecord::Migration
   def change
     drop_table :survey_participants
   end

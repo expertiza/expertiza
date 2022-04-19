@@ -1,4 +1,4 @@
-class AddHandleToParticipants < ActiveRecord::Migration[4.2]
+class AddHandleToParticipants < ActiveRecord::Migration
   def self.up
     add_column :participants, :handle, :string, null: true
     AssignmentParticipant.find_each do |participant|

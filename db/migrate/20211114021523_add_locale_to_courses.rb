@@ -1,4 +1,4 @@
-class AddLocaleToCourses < ActiveRecord::Migration[4.2]
+class AddLocaleToCourses < ActiveRecord::Migration
   def change
     add_column :courses, :locale, :integer, default: 1
   end

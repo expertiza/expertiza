@@ -1,4 +1,4 @@
-class DropParticipantScoreView < ActiveRecord::Migration[4.2]
+class DropParticipantScoreView < ActiveRecord::Migration
   def change
     execute <<-SQL
       DROP VIEW participant_score_views

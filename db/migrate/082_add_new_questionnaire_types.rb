@@ -1,4 +1,4 @@
-class AddNewQuestionnaireTypes < ActiveRecord::Migration[4.2]
+class AddNewQuestionnaireTypes < ActiveRecord::Migration
   def self.up
     execute "UPDATE `questionnaire_types` set name = 'Review' where name in ('Review Rubric', 'Rubric')"
 

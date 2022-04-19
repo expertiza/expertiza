@@ -173,11 +173,10 @@ describe AssignmentsController do
         allow_any_instance_of(AssignmentsController).to receive(:assignment_by_name_and_course).and_return(assignment2)
         allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))
         allow(assignment_form).to receive(:update).with(any_args).and_return(true)
-        allow(Assignment).to receive(:find).and_return(assignment2)
-        allow(assignment2).to receive(:id).and_return('2')
+        allow(assignment2).to receive(:id).and_return(2)
         allow_any_instance_of(AssignmentsController).to receive(:undo_link)
           .with('Assignment "new test assignment" has been created successfully. ').and_return(true)
-        post :create, params: @new_params
+        post :create, @new_params
         expect(response).to redirect_to('/assignments/2/edit')
       end
     end
@@ -185,7 +184,7 @@ describe AssignmentsController do
     context 'when assignment_form is not saved successfully' do
       it 'redirect to assignments#new page' do
         allow(assignment_form).to receive(:save).and_return(false)
-        post :create, params: @used_params
+        post :create, @used_params
         expect(response).to redirect_to('/assignments/new?private=1')
       end
     end
@@ -200,7 +199,7 @@ describe AssignmentsController do
         allow(assignment_form).to receive(:update).with(any_args).and_return(true)
         allow(assignment).to receive(:id).and_return(1)
         allow(Assignment).to receive(:find_by).with(course_id: 1, name: 'test assignment').and_return(assignment)
-        post :create, params: @used_params
+        post :create, @used_params
         expect(flash[:error]).to eq('Failed to create assignment.<br>  test assignment already exists as an assignment name')
         expect(response).to redirect_to('/assignments/new?private=1')
       end
@@ -217,9 +216,9 @@ describe AssignmentsController do
         assignment_due_date = build(:assignment_due_date)
         allow(AssignmentDueDate).to receive(:where).with(parent_id: assignment.id.to_s).and_return([assignment_due_date])
         allow(assignment).to receive(:num_review_rounds).and_return(1)
-        request_params = { id: 1 }
-        user_session = { user: instructor }
-        get :edit, params: request_params, session: user_session
+        params = { id: 1 }
+        session = { user: instructor }
+        get :edit, params, session
         expect(flash.now[:error]).to eq('You did not specify all the necessary rubrics. You need <b>[AuthorFeedback, TeammateReview] '\
           "</b> of assignment <b>test assignment</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>.")
         expect(controller.instance_variable_get(:@metareview_allowed)).to be false
@@ -236,12 +235,12 @@ describe AssignmentsController do
       context 'when assignment is saved successfully' do
         it 'shows a note flash message and redirects to tree_display#index page' do
           allow(assignment).to receive(:save).and_return(true)
-          request_params = {
+          params = {
             id: 1,
             course_id: 1
           }
-          user_session = { user: instructor }
-          post :update, params: request_params, session: user_session
+          session = { user: instructor }
+          post :update, params, session
           expect(flash[:note]).to eq('The assignment was successfully saved.')
           expect(response).to redirect_to('/tree_display/list')
         end
@@ -250,12 +249,12 @@ describe AssignmentsController do
       context 'when assignment is not saved successfully' do
         it 'displays an error flash message and redirects to assignments#edit page' do
           allow(assignment).to receive(:save).and_return(false)
-          request_params = {
+          params = {
             id: 1,
             course_id: 1
           }
-          user_session = { user: instructor }
-          post :update, params: request_params, session: user_session
+          session = { user: instructor }
+          post :update, params, session
           expect(flash[:error]).to eq('Failed to save the assignment: ')
           expect(response).to redirect_to('/assignments/1/edit')
         end
@@ -308,8 +307,8 @@ describe AssignmentsController do
         it 'shows an error message and redirects to assignments#edit page' do
           instructor.timezonepref = nil
           allow(User).to receive(:find).and_return(double('User', timezonepref: 'Eastern Time (US & Canada)'))
-          user_session = { user: instructor }
-          post :update, params: @params, session: user_session
+          session = { user: instructor }
+          post :update, @params, session
           expect(flash[:note]).to eq('The assignment was successfully saved....')
           expect(flash[:error]).to eq('We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. '\
                                       'For now we assume you are in Eastern Time (US & Canada)')
@@ -319,8 +318,8 @@ describe AssignmentsController do
 
       context 'when update assignment_form of the assignment with @params attributes' do
         it 'renders assignments/edit/_topic page' do
-          user_session = { user: instructor }
-          post :update, params: @params, session: user_session
+          session = { user: instructor }
+          post :update, @params, session
           expect(flash[:note]).to eq('The assignment was successfully saved....')
           expect(flash[:error]).to be nil
           expect(response).to render_template('assignments/edit/_topics')
@@ -330,8 +329,8 @@ describe AssignmentsController do
       context 'when update assignment_form is called on an empty questionnaire of non-zero weight' do
         it 'shows an error message and redirects to assignments#edit page' do
           @params[:assignment_form][:assignment_questionnaire][0]['questionnaire_weight'] = '100'
-          user_session = { user: instructor }
-          post :update, params: @params, session: user_session
+          session = { user: instructor }
+          post :update, @params, session
           expect(flash[:note]).to eq('The assignment was successfully saved....')
           expect(flash[:error]).to eq('A rubric has no ScoredQuestions, but still has a weight. Please change the weight to 0.')
           expect(response).to render_template('assignments/edit/_topics')
@@ -342,7 +341,7 @@ describe AssignmentsController do
 
   describe '#show' do
     it 'renders assignments#show page' do
-      get :show, params: { id: 1 }
+      get :show, id: 1
       expect(response).to render_template(:show)
     end
   end
@@ -356,8 +355,8 @@ describe AssignmentsController do
         allow(assignment).to receive(:dup).and_return(new_assignment)
         allow(new_assignment).to receive(:save).and_return(true)
         allow(Assignment).to receive(:find).with(2).and_return(new_assignment)
-        request_params = { id: 1 }
-        get :copy, params: request_params
+        params = { id: 1 }
+        get :copy, params
         expect(flash[:note]).to be_nil
         expect(flash[:error]).to be_nil
         expect(response).to redirect_to('/assignments/2/edit')
@@ -368,8 +367,8 @@ describe AssignmentsController do
       it 'shows an error flash message and redirects to assignments#edit page' do
         allow(assignment).to receive(:dup).and_return(new_assignment)
         allow(new_assignment).to receive(:save).and_return(false)
-        request_params = { id: 1 }
-        get :copy, params: request_params
+        params = { id: 1 }
+        get :copy, params
         expect(flash[:note]).to be_nil
         expect(flash[:error]).to eq('The assignment was not able to be copied. Please check the original assignment for missing information.')
         expect(response).to redirect_to('/tree_display/list')
@@ -383,12 +382,12 @@ describe AssignmentsController do
         assignment_form = AssignmentForm.new
         allow(AssignmentForm).to receive(:new).and_return(assignment_form)
         allow(assignment_form).to receive(:delete).with('true').and_return(true)
-        request_params = {
+        params = {
           id: 1,
           force: 'true'
         }
-        user_session = { user: instructor }
-        post :delete, params: request_params, session: user_session
+        session = { user: instructor }
+        post :delete, params, session
         expect(flash[:error]).to be nil
         expect(flash[:success]).to eq('The assignment was successfully deleted.')
         expect(response).to redirect_to('/tree_display/list')
@@ -400,12 +399,12 @@ describe AssignmentsController do
         assignment_form = AssignmentForm.new
         allow(AssignmentForm).to receive(:new).and_return(assignment_form)
         allow(assignment_form).to receive(:delete).with('true').and_raise('You cannot delete this assignment!')
-        request_params = {
+        params = {
           id: 1,
           force: 'true'
         }
-        user_session = { user: instructor }
-        post :delete, params: request_params, session: user_session
+        session = { user: instructor }
+        post :delete, params, session
         expect(flash[:success]).to be nil
         expect(flash[:error]).to eq('You cannot delete this assignment!')
         expect(response).to redirect_to('/tree_display/list')
@@ -421,8 +420,8 @@ describe AssignmentsController do
         allow(assignment_form).to receive(:remove_assignment_from_course)
         allow(Assignment).to receive(:find).and_return(assignment)
         allow(assignment).to receive(:save).and_return(true)
-        user_session = { user: instructor }
-        get :remove_assignment_from_course, params: { id: 1 }
+        session = { user: instructor }
+        get :remove_assignment_from_course, id: 1
         expect(flash[:error]).to be nil
         expect(response).to redirect_to('/tree_display/list')
       end
@@ -435,12 +434,12 @@ describe AssignmentsController do
         assignment_form = AssignmentForm.new
         allow(AssignmentForm).to receive(:new).and_return(assignment_form)
         allow(assignment_form).to receive(:list_submissions).with('true')
-        request_params = {
+        params = {
           id: 1,
           force: 'true'
         }
-        user_session = { user: instructor }
-        get :list_submissions, params: request_params, session: user_session
+        session = { user: instructor }
+        get :list_submissions, params, session
         expect(flash[:error]).to be nil
       end
     end

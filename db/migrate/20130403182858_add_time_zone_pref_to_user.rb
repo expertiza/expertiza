@@ -1,4 +1,4 @@
-class AddTimeZonePrefToUser < ActiveRecord::Migration[4.2]
+class AddTimeZonePrefToUser < ActiveRecord::Migration
   def self.up
     add_column :users, :timezonepref, :string
   end

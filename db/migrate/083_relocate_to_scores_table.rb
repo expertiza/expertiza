@@ -1,4 +1,4 @@
-class RelocateToScoresTable < ActiveRecord::Migration[4.2]
+class RelocateToScoresTable < ActiveRecord::Migration
   def self.up
     begin
     execute " insert into scores (instance_id, question_id, score, comments, questionnaire_type_id) select

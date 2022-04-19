@@ -1,4 +1,4 @@
-class ChangeAssignmentIdInDueDatesTableToParentId < ActiveRecord::Migration[4.2]
+class ChangeAssignmentIdInDueDatesTableToParentId < ActiveRecord::Migration
   def self.up
     remove_foreign_key :due_dates, column: :assignment_id
     rename_column :due_dates, :assignment_id, :parent_id

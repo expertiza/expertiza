@@ -1,4 +1,4 @@
-class ControllerAction < ApplicationRecord
+class ControllerAction < ActiveRecord::Base
   belongs_to :site_controller
   belongs_to :permission
 

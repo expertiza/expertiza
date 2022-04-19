@@ -1,4 +1,4 @@
-class MenuUpdateTeamList < ActiveRecord::Migration[4.2]
+class MenuUpdateTeamList < ActiveRecord::Migration
   def self.up
     item = MenuItem.find_by_label('Create team')
     unless item.nil?

@@ -1,4 +1,4 @@
-class CreateJoinTeamRequests < ActiveRecord::Migration[4.2]
+class CreateJoinTeamRequests < ActiveRecord::Migration
   def self.up
     create_table :join_team_requests do |t|
       t.column :participant_id, :integer

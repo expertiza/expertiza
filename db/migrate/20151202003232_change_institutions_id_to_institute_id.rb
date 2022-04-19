@@ -1,4 +1,4 @@
-class ChangeInstitutionsIdToInstituteId < ActiveRecord::Migration[4.2]
+class ChangeInstitutionsIdToInstituteId < ActiveRecord::Migration
   def change
     rename_column :users, :institutions_id, :institution_id
   end

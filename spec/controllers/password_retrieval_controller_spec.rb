@@ -6,8 +6,7 @@ describe PasswordRetrievalController do
       @user.fullname = 'John Bumgardner'
       @user.name = 'ex'
       @user.save!
-      request_params = { user: { email: 'example@example.edu' } }
-      post :send_password, params: request_params
+      post :send_password, user: { email: 'example@example.edu' }
       expect(PasswordReset.where(user_email: 'example@example.edu')).to exist
     end
     it 'modifies the token in password_resets_table' do
@@ -21,8 +20,7 @@ describe PasswordRetrievalController do
       @password_retrival.token = @local_token
       @password_retrival.user_email = 'example@example.edu'
       @password_retrival.save!
-      request_params = { user: { email: 'example@example.edu' } }
-      post :send_password, params: request_params
+      post :send_password, user: { email: 'example@example.edu' }
       expect(PasswordReset.find_by(user_email: 'example@example.edu').token).not_to eq(@local_token)
     end
     it 'if no user no entry is created' do
@@ -31,8 +29,7 @@ describe PasswordRetrievalController do
       @user.name = 'Shubham'
       @user.fullname = 'John Bumgardner'
       @user.save!
-      request_params = { user: { email: 'example@example.edu' } }
-      post :send_password, params: request_params
+      post :send_password, user: { email: 'example@example.edu' }
       expect(PasswordReset.where(user_email: 'example@example.edu')).not_to exist
     end
   end
@@ -44,9 +41,9 @@ describe PasswordRetrievalController do
       @password_retrival.token = Digest::SHA1.hexdigest(local_token)
       @password_retrival.user_email = 'example@example.edu'
       @password_retrival.save!
-      request_params = { token: local_token }
+
       Timecop.freeze(Time.zone.today + 2.days) do
-        get :check_reset_url, params: request_params
+        get :check_reset_url, token: local_token
         expect(response).to render_template 'password_retrieval/forgotten'
       end
     end
@@ -58,8 +55,8 @@ describe PasswordRetrievalController do
       @password_retrival.token = Digest::SHA1.hexdigest(local_token)
       @password_retrival.user_email = 'example@example.edu'
       @password_retrival.save!
-      request_params = { token: local_token_sent_as_parameter }
-      get :check_reset_url, params: request_params
+
+      get :check_reset_url, token: local_token_sent_as_parameter
       expect(response).to render_template 'password_retrieval/forgotten'
     end
 
@@ -69,9 +66,8 @@ describe PasswordRetrievalController do
       @password_retrival.token = Digest::SHA1.hexdigest(local_token)
       @password_retrival.user_email = 'example@example.edu'
       @password_retrival.save!
-      request_params = { token: local_token }
       Timecop.freeze(@password_retrival.updated_at + 2.hours) do
-        get :check_reset_url, params: request_params
+        get :check_reset_url, token: local_token
         expect(response).to render_template 'password_retrieval/reset_password'
       end
     end

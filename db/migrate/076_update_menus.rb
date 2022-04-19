@@ -65,6 +65,7 @@ class UpdateMenus < ActiveRecord::Migration[4.2]
     MenuItem.create(name: 'manage/courses', label: 'Courses', parent_id: manage_item.id, seq: 3, controller_action_id: courses_action.id)
     MenuItem.create(name: 'manage/assignments', label: 'Assignments', parent_id: manage_item.id, seq: 4, controller_action_id: assignments_action.id)
 
+
     impersonate_item = MenuItem.find_by_label('Impersonate User')
     impersonate_item.parent_id = manage_item.id
     impersonate_item.seq = 5

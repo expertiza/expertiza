@@ -1,63 +1,63 @@
 <h1>
-  <% if @assignment.spec_location.nil? || @assignment.spec_location.length.zero?%>
-      Submit or Review work for <%= @assignment.name %>
+  <% if @assignment.spec_location.nil? || @assignment.spec_location.length.zero? %>
+    Submit or Review work for <%= @assignment.name %>
   <% else %>
-    <%=t ".submit_review" %> <%= link_to @assignment.name, @assignment.spec_location %>
+    <%= t ".submit_review" %> <%= link_to @assignment.name, @assignment.spec_location %>
   <% end %>
 </h1>
 
 <div class="flash_note">
-  <%=t ".next_click" %> <%= @assignment.name %>
+  <%= t ".next_click" %> <%= @assignment.name %>
 </div>
 <% if @assignment.spec_location && @assignment.spec_location.length > 0 %>
-  <a href="<%= @assignment.spec_location %>" target="new"><%=t ".assignment_description" %></a>
+  <a href="<%= @assignment.spec_location %>" target="new"><%= t ".assignment_description" %></a>
 <% end %>
 <ul>
-  <%if @topics.size > 0 %>
+  <% if @topics.size > 0 %>
     <% if @authorization == 'participant' || @authorization == 'submitter' %>
       <li>
-        <%= link_to t('.signup_sheet'), :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id%>
-        <%=t ".signup_topic" %>
+        <%= link_to t('.signup_sheet'), :controller => 'sign_up_sheet', :action => 'list', :id => @participant.id %>
+        <%= t ".signup_topic" %>
       </li>
       <!--Show bookmarks if they are allowed for this assignment-->
       <% if @use_bookmark %>
         <li>
-            <% if @topic_id and @assignment.submission_allowed(@topic_id) %>
-              <%= link_to "View bookmarks", :controller=>'bookmarks', :action=> 'list', :id => @topic_id %> <%=t ".view_bookmarks_lengthy" %>
-            <% else %>
-              <font color="gray"><%=t ".view_bookmarks" %></font><%=t ".choose_topic" %>
-            <% end %>
+          <% if @topic_id and @assignment.submission_allowed(@topic_id) %>
+            <%= link_to "View bookmarks", :controller => 'bookmarks', :action => 'list', :id => @topic_id %> <%= t ".view_bookmarks_lengthy" %>
+          <% else %>
+            <font color="gray"><%= t ".view_bookmarks" %></font><%= t ".choose_topic" %>
+          <% end %>
         </li>
       <% end %>
     <% end %>
-  <%end%>
+  <% end %>
 
-<!--ACS Here we need to know the size of the team to decide whether or not
-to display the label "Your team" in the student assignment tasks-->
-  <%if @assignment.max_team_size > 1 %>
+  <!--ACS Here we need to know the size of the team to decide whether or not
+  to display the label "Your team" in the student assignment tasks-->
+  <% if @assignment.max_team_size > 1 %>
     <% if @authorization == 'participant' %>
       <li>
         <%= link_to t('.your_team'), view_student_teams_path(student_id: @participant.id) %>
-        <%=t ".view_team" %>
+        <%= t ".view_team" %>
       </li>
     <% end %>
-  <%end%>
+  <% end %>
 
   <!--Your work-->
   <% if @authorization == 'participant' or @can_submit == true %>
     <li>
       <% if @topics.size > 0 %>
         <% if @topic_id and @assignment.submission_allowed(@topic_id) %>
-          <%= link_to t(".your_work"), :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> <%=t ".submit_work" %>
+          <%= link_to t(".your_work"), :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> <%= t ".submit_work" %>
         <% else %>
           <!--if one team do not hold a topic (still in waitlist), they cannot submit their work.-->
-          <font color="gray"><%=t ".your_work" %></font> <%=t ".choose_topic" %>
+          <font color="gray"><%= t ".your_work" %></font> <%= t ".choose_topic" %>
         <% end %>
       <% else %>
         <% if @assignment.submission_allowed(@topic_id) %>
-          <%= link_to t(".your_work"), :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> <%=t ".submit_work" %>
+          <%= link_to t(".your_work"), :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> <%= t ".submit_work" %>
         <% else %>
-          <font color="gray"><%=t ".your_work" %></font> <%=t ".not_allowed" %>
+          <font color="gray"><%= t ".your_work" %></font> <%= t ".not_allowed" %>
         <% end %>
       <% end %>
     </li>
@@ -73,64 +73,64 @@ to display the label "Your team" in the student assignment tasks-->
       <% end %>
       <!--Zhewei: professor mentioned that a submission is reviewable if the submission is in a stage where reviews can be done. It does not depend on the stage of the topic the reviewer is writing on-->
       <!--Akshay: Fix Issue 1218 - this link is disabled if assignment does not require any peer reviews-->
-      <%if @can_review==false and @assignment.is_conference_assignment%>
-        <font color="gray"><%= @alias_name%></font>
+      <% if @can_review == false and @assignment.is_conference_assignment %>
+        <font color="gray"><%= @alias_name %></font>
       <% elsif review_deadline?(@assignment) and (check_reviewable_topics(@assignment) or @assignment.metareview_allowed(nil) or @assignment.current_stage(@topic_id) == "Finished") %>
         <!--Determine what kind of review bidding needs to occur-->
         <% if @assignment.review_choosing_algorithm == 'Bidding' and @assignment.can_choose_topic_to_review? %>
-          <%= link_to "#{@alias_name}",{:controller => 'review_bids', :action => 'show', :id => @participant.id} %>
-        <% elsif @assignment.review_choosing_algorithm == 'Bidding'%>
-          <%= link_to "#{@alias_name}",{:controller => 'review_bids', :action => 'index', :id => @participant.id} %>
-        <%else%>
-          <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
-        <%end%>
+          <%= link_to "#{@alias_name}", { :controller => 'review_bids', :action => 'show', :id => @participant.id } %>
+        <% elsif @assignment.review_choosing_algorithm == 'Bidding' %>
+          <%= link_to "#{@alias_name}", { :controller => 'review_bids', :action => 'index', :id => @participant.id } %>
+        <% else %>
+          <%= link_to "#{@alias_name}", { :controller => 'student_review', :action => 'list', :id => @participant.id } %>
+        <% end %>
       <% else %>
-        <font color="gray"><%= @alias_name%></font>
+        <font color="gray"><%= @alias_name %></font>
       <% end %>
-      <%=t ".give_feedback" %>
+      <%= t ".give_feedback" %>
     </li>
   <% end %>
 
-    <!--Quiz-->
-  <%if @assignment.require_quiz%>
+  <!--Quiz-->
+  <% if @assignment.require_quiz %>
     <% if @authorization == 'participant' or @can_take_quiz == true %>
       <li>
         <% if @assignment.require_quiz and (@assignment.quiz_allowed(@topic_id) or @assignment.current_stage(@topic_id) == "Finished") %>
           <%= link_to t(".take_quizzes"), student_quizzes_path(:id => @participant.id) %>
         <% else %>
-          <font color="gray"><%=t ".take_quizzes" %></font>
+          <font color="gray"><%= t ".take_quizzes" %></font>
         <% end %>
-        <%=t ".quizzes_read" %>
+        <%= t ".quizzes_read" %>
       </li>
     <% end %>
-  <%end%>
+  <% end %>
 
   <% if @team && (@authorization == 'participant' or @can_submit == true) %>
     <li>
       <!--Only if the assignment supports self-review and students submitted self-review can he or she view scores.-->
       <% if @assignment.is_selfreview_enabled and unsubmitted_self_review?(@participant.id) %>
-        <font color="gray"><%=t ".your_scores" %></font> <%=t ".self_review" %>
+        <font color="gray"><%= t ".your_scores" %></font> <%= t ".self_review" %>
       <% else %>
         <%= link_to t(".your_scores"), controller: 'grades', action: 'view_team', id: @participant.id %>
-        <%=t ".view_feedback" %>  &nbsp;  <%= link_to t(".alternate_view"),  controller: 'grades', action: 'view_my_scores', id: @participant.id %>
+        <%= t ".view_feedback" %>  &nbsp;  <%= link_to t(".alternate_view"), controller: 'grades', action: 'view_my_scores', id: @participant.id %>
       <% end %>
     </li>
   <% end %>
-    <%if @can_provide_suggestions == true %>
-      <li><%= link_to t(".suggest_topic"),{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
-    <% end %>
+  <% if @can_provide_suggestions == true %>
+    <li><%= link_to t(".suggest_topic"), { :controller => 'suggestion', :action => 'new', :id => @assignment.id } %></li>
+  <% end %>
 
-    <% if @assignment.current_stage(@topic_id) == "Complete" %>
-      <!-- removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment.id, session[:user].id)  -->
-      <li><%= link_to t(".take_survey"),{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> <%=t ".log_you_out" %></li>
-    <% end %>
-    <li><%= link_to t(".change_handle"), {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> <%=t ".different_handle" %></li>
-  </ul>
-  <br>
+  <% if @assignment.current_stage(@topic_id) == "Complete" %>
+    <!-- removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment.id, session[:user].id)  -->
+    <li><%= link_to t(".take_survey"), { :controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id } %> <%= t ".log_you_out" %></li>
+  <% end %>
+  <li><%= link_to t(".change_handle"), { :controller => 'participants', :action => 'change_handle', :id => @participant.id } %> <%= t ".different_handle" %></li>
+</ul>
+<br>
 
-  <br/>
-  <br/>
-  <%= render 'timeline' %>
-  <br/>
-  <br/>
-  <a href="javascript:window.history.back()"><%=t ".back" %></a>
+<br/>
+<br/>
+<%= render 'timeline' %>
+<br/>
+<br/>
+<a href="javascript:window.history.back()"><%= t ".back" %></a>

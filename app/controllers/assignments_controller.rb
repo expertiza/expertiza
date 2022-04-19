@@ -15,6 +15,7 @@ class AssignmentsController < ApplicationController
 
   # creates and renders a new assignment form
   def new
+    session[:assignment_id] = nil # E2236
     @assignment_form = AssignmentForm.new
     @assignment_form.assignment.instructor ||= current_user
     @num_submissions_round = 0

@@ -38,6 +38,11 @@ end
 
 <br />
 
-<%= link_to 'New late policy', :action => 'new'%><br />
-<%= link_to 'Back', :controller=> 'assignments', :action => 'edit', :id=>session[:assignment_id]%>
-                                                                                <%-# E2236 -%>
+<%= link_to 'New late policy', :action => 'new' %><br/>
+
+<% if session[:assignment_id] %>
+  <%= link_to 'Back', :controller => 'assignments', :action => 'edit', :id => session[:assignment_id] %>
+<% else %>
+  <%= link_to 'Back', :controller => 'assignments', :action => 'new' %>
+<% end %>
+<%- # E2236  -%>

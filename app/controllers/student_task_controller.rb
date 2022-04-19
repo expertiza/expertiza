@@ -97,5 +97,15 @@ class StudentTaskController < ApplicationController
     end
   end
 
+  def email_reviewers
+  end
+
+  def send_email
+
+    subject = params["send_email"]["subject"]
+    body = params["send_email"]["email_body"]
+
+  end
+
   def your_work; end
 end

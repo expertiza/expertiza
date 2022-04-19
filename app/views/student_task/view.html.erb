@@ -9,6 +9,11 @@
 <div class="flash_note">
   <%=t ".next_click" %> <%= @assignment.name %>
 </div>
+
+<div style="float:right">
+   <%= link_to t('Send Email to Reviewers'), email_reviewers_student_task_index_path(participant_id: @participant.id)%>
+</div>
+
 <% if @assignment.spec_location && @assignment.spec_location.length > 0 %>
   <a href="<%= @assignment.spec_location %>" target="new"><%=t ".assignment_description" %></a>
 <% end %>

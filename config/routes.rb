@@ -96,7 +96,7 @@ Expertiza::Application.routes.draw do
   end
 
   resources :duties
-  
+
   resources :eula, only: [] do
     collection do
       get :accept
@@ -406,6 +406,8 @@ Expertiza::Application.routes.draw do
       get :list
       get :view
       put :publishing_rights_update
+      get :email_reviewers
+      post :send_email
       # added a new route for updating publishing rights
       get '/*other', to: redirect('/student_task/list')
     end

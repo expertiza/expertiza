@@ -14,13 +14,12 @@
       <th class="head">Description</th>
       <th class="head">Avg. rating</th>
       <th class="head">Your rating</th>
-      <th class="head">Badge</th>
       <th class="head">Review</th>
       <% unless Bookmark.where(user_id: session[:user].id).blank? %>
         <th class="head" colspan='2'>Action</th>
       <%  end %>
     </tr>
-    <% @bookmark_ids = Array.new %>
+    <% @bookmark_ids = [] %>
     <% @bookmarks.each {|bookmark| @bookmark_ids << bookmark.id} %>
     <% @bookmarks.each do |bookmark| %>
       <tr>
@@ -74,9 +73,6 @@
           <% end %>
         </td>
         <td>
-          <!-- badge rewards for bookmarks -->
-          <!-- full star denotes presence of badge -->
-          <!-- empty star denotes absence of badge -->
           <% if totalAvg.to_f > 3 %>
             <span class="glyphicon glyphicon-star"></span>
           <% else %>

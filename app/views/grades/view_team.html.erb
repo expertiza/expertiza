@@ -108,7 +108,7 @@
               -->
               <br/>
         <% vm.list_of_rows[0].metric_hash.each do |key, value| %>
-            <input type="checkbox" id="<%= key %>" onchange = onChangeCheck(this)><%=key%> </input>
+            <input type="checkbox" id="<%= key %>" onchange = onMetricToggle(this)><%=key%> </input>
         <% end %>
         <div class="hide-scrollbar">
           <table id="scoresTable<%= vm.round.to_s  %>" class="scoresTable tbl_heat tablesorter">

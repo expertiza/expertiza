@@ -56,12 +56,6 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :badges, only: %i[new create] do
-    collection do
-      get :redirect_to_assignment
-    end
-  end
-
   resources :bookmarks, except: %i[index show] do
     collection do
       get :list

@@ -5,9 +5,6 @@
   <td><a href="mailto: <%= participant.user.email(session[:ip]) %>"><%= participant.user.email(session[:ip]) %></a></td>
   <td><%= participant.user.role.name %></td>
   <td align = "left"><%= (User.find(participant.user.parent_id)).name(session[:ip]) %></td>
-  <% if  @model == 'Assignment' && participant.assignment.badge? %>
-    <td align = "left"><%= get_awarded_badges(participant) %></td>
-  <% end %>
   <td align = "left"><%= User.yesorno(participant.user.email_on_review) %></td>
   <td align = "left"><%= User.yesorno(participant.user.email_on_submission) %></td>
   <td align = "left"><%= User.yesorno(participant.user.email_on_review_of_review) %></td>

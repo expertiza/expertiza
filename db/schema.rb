@@ -31,6 +31,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.string "value"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "confidence_level", precision: 10, scale: 5
     t.index ["answer_id"], name: "index_answer_tags_on_answer_id"
     t.index ["tag_prompt_deployment_id"], name: "index_answer_tags_on_tag_prompt_deployment_id"
     t.index ["user_id"], name: "index_answer_tags_on_user_id"
@@ -121,6 +122,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.integer "simicheck_threshold", default: 100
     t.boolean "is_answer_tagging_allowed"
     t.boolean "has_badge"
+    t.integer "sample_assignment_id"
     t.boolean "allow_selecting_additional_reviews_after_1st_round"
     t.boolean "vary_by_topic", default: false
     t.boolean "vary_by_round", default: false
@@ -133,6 +135,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["course_id"], name: "fk_assignments_courses"
     t.index ["instructor_id"], name: "fk_assignments_instructors"
     t.index ["late_policy_id"], name: "fk_late_policy_id"
+    t.index ["sample_assignment_id"], name: "fk_rails_b01b82a1a2"
   end
 
   create_table "automated_metareviews", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -337,8 +340,8 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "user_id"
-    t.integer "lockable_id"
     t.string "lockable_type"
+    t.integer "lockable_id"
     t.index ["user_id"], name: "fk_rails_426f571216"
   end
 
@@ -436,6 +439,10 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.integer "score"
     t.text "advice"
     t.index ["question_id"], name: "fk_question_question_advices"
+  end
+
+  create_table "question_types", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.string "type"
   end
 
   create_table "questionnaires", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -620,6 +627,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.string "vote"
     t.integer "suggestion_id"
     t.datetime "created_at"
+    t.boolean "visible_to_student", default: false
   end
 
   create_table "suggestions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -699,6 +707,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.integer "directory_num"
     t.integer "grade_for_submission"
     t.text "comment_for_submission"
+    t.boolean "make_public", default: false
   end
 
   create_table "teams_users", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -780,6 +789,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
   add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
   add_foreign_key "assignment_questionnaires", "duties"
   add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
+  add_foreign_key "assignments", "assignments", column: "sample_assignment_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
   add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"

@@ -1,4 +1,4 @@
-class CreateTeams < ActiveRecord::Migration
+class CreateTeams < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'teams', force: true do |t|
       t.column 'name', :string

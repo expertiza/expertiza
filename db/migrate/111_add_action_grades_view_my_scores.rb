@@ -1,4 +1,4 @@
-class AddActionGradesViewMyScores < ActiveRecord::Migration
+class AddActionGradesViewMyScores < ActiveRecord::Migration[4.2]
   def self.up
     perm = Permission.find_by_name('do assignments')
     controller = SiteController.find_by_name('grades')

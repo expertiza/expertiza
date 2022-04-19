@@ -1,4 +1,4 @@
-class CreateQuestionnaireTypes < ActiveRecord::Migration
+class CreateQuestionnaireTypes < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'questionnaire_types', force: true do |t|
       t.column 'name', :string, default: '', null: false

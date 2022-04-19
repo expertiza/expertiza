@@ -1,4 +1,4 @@
-class CreateNewDeadlineTypes < ActiveRecord::Migration
+class CreateNewDeadlineTypes < ActiveRecord::Migration[4.2]
   def self.up
     DeadlineType.create name: 'signup'
     DeadlineType.create name: 'team_formation'

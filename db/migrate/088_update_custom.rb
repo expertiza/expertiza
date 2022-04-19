@@ -1,4 +1,4 @@
-class UpdateCustom < ActiveRecord::Migration
+class UpdateCustom < ActiveRecord::Migration[4.2]
   def self.up
     execute 'DELETE FROM `content_pages` where ID in (1,10)'
     execute "INSERT INTO `content_pages` VALUES (1,'Home Page','home',1,'<h1>Welcome to Expertiza</h1> <p> The Expertiza project is a system for using peer review to create reusable learning objects.  Students do different assignments; then peer review selects the best work in each category, and assembles it to create a single unit.</p>',3,'2006-06-12 00:31:56','2007-02-23 10:17:45','<h1>Welcome to Expertiza</h1> <p> The Expertiza project is system for using peer review to create reusable learning objects.  Students do different assignments; then peer review selects the best work in each category, and assembles it to create a single unit.</p>');"

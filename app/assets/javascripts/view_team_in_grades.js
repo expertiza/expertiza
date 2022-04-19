@@ -1,4 +1,4 @@
-$=jQuery;
+$ = jQuery;
 
 $(function () {
     // Changed as part of E1788_OSS_project_Maroon_Heatmap_fixes
@@ -7,6 +7,23 @@ $(function () {
     $("[data-toggle='tooltip']").tooltip();
     $(".scoresTable").tablesorter();
 });
+
+function onMetricToggle(checkedElement) {
+    if (checkedElement.checked == true) {
+        var hide = false
+    }
+    else {
+        var hide = true
+    }
+    var checkedElements = document.getElementsByClassName(checkedElement.id)
+    for (let i = 0; i < checkedElements.length; i++) {
+        if (hide == true)
+            checkedElements[i].style.display = "none";
+        else {
+            checkedElements[i].style.display = "table-cell";
+        }
+    }
+}
 
 var lesser = false;
 // Function to sort the columns based on the total review score
@@ -98,7 +115,7 @@ function tagActionOnLoad() {
     let tagPrompts = getTagPrompts();
 
     // Hide heatgrid and stop load action if no tags exist.
-    if(tagPrompts.length == 0) {
+    if (tagPrompts.length == 0) {
         document.getElementById("tagHeatMap").style.display = 'none';
     } else {
         // Get a HashMap count of all, on, and off tags, and the ratio of done tags to total in decimal and
@@ -107,7 +124,7 @@ function tagActionOnLoad() {
 
         // Get a HashMap containing all review rows, their round, question, and review numbers, whether they have tags,
         // and a reference to an array containing the tag prompt object references.
-        let rowData =  getRowData();
+        let rowData = getRowData();
 
         // Generate the dynamic tagging report heatgrid
         drawTagGrid(rowData);
@@ -147,19 +164,19 @@ function getRowData() {
     let rowsList = $("[id^=rr]");
     // Set up matrix of questionNumber, reviewNumber, hasTag?, and reference to tags if true
     let rowData = new Array(rowsList.length);
-    $.each(rowsList, function(i) {
+    $.each(rowsList, function (i) {
         rowData[i] = new Map();
         //Round Number
-        rowData[i].set('round_num', $( this ).data("round"));
+        rowData[i].set('round_num', $(this).data("round"));
         // Question Number
-        rowData[i].set('question_num', $( this ).data("question_num"));
+        rowData[i].set('question_num', $(this).data("question_num"));
         // Review Number
-        rowData[i].set('review_num',$( this ).data("review_num"));
+        rowData[i].set('review_num', $(this).data("review_num"));
         // Has tag bool?
-        rowData[i].set('has_tag',$( this ).data("has_tag"));
+        rowData[i].set('has_tag', $(this).data("has_tag"));
         // Reference to tag objects
         if (rowData[i].get('has_tag') == true) {
-            rowData[i].set('tag_list', $( this ).find('input[name^="tag_checkboxes"]'));
+            rowData[i].set('tag_list', $(this).find('input[name^="tag_checkboxes"]'));
         }
     });
     return rowData;
@@ -172,29 +189,29 @@ function updateTagsFraction(countMap) {
     // Get element to be updated, Set text of element, and set background color from ratio
     let cell = document.getElementById("tagsSuperNumber");
     cell.innerText = countMap.get("onTags") + " out of " + countMap.get("total");
-    cell.className = "c"+countMap.get("ratioClass").toString();
+    cell.className = "c" + countMap.get("ratioClass").toString();
 
     // If all tags are finished, collapse the heatgrid
-    if(countMap.get("ratioClass") === 5) {
+    if (countMap.get("ratioClass") === 5) {
         $("[id^=hg_row]").each(function () {
-            $( this ).css("display", "none");
+            $(this).css("display", "none");
         });
     } else {
         $("[id^=hg_row]").each(function () {
-            $( this ).css("display", ""); // open the heatgrid if tags are unfinished
+            $(this).css("display", ""); // open the heatgrid if tags are unfinished
         });
     }
 }
 
 // Updates the Review Tag Heat Grid body each time a tag is changed
-function updateTagGrid(tagPrompts){
-    for(let i = 0; i< tagPrompts.length; ++i) {
+function updateTagGrid(tagPrompts) {
+    for (let i = 0; i < tagPrompts.length; ++i) {
         // Get the heatmap cell associated with this tag
         let tempId = tagPrompts[i].getAttribute("data-tag_heatgrid_id");
         let gridCell = document.getElementById(tempId);
 
         // Change cell color by class and replace unicode icon
-        if(tagPrompts[i].value == 0) {
+        if (tagPrompts[i].value == 0) {
             gridCell.setAttribute("class", "c1");
             gridCell.innerText = gridCell.innerText.replace(/[\u{0080}-\u{FFFF}]/u, symTagNotDone);
         }
@@ -208,11 +225,11 @@ function updateTagGrid(tagPrompts){
 // Expand or collapse the heatgrid rows which make up the Map of tags.
 function toggleHeatGridRows() {
     $("[id^=hg_row]").each(function () {
-        if($( this ).css("display") === "none") {
-            $( this ).css("display", "");
+        if ($(this).css("display") === "none") {
+            $(this).css("display", "");
         }
         else {
-            $( this ).css("display", "none");
+            $(this).css("display", "none");
         }
     });
 }
@@ -244,14 +261,14 @@ function drawTagGrid(rowData) {
     let roundNum = 1;
 
     // Loop through all review rows, generating appropriate table rows for each
-    for(let rIndex = 0; rIndex < rowData.length; ++rIndex) {
+    for (let rIndex = 0; rIndex < rowData.length; ++rIndex) {
         let tRow = tBody.insertRow();
         // Handle the backend inconsistency, Question Indices start with One and Review Indices start with Zero
         let questionNum = rowData[rIndex].get('question_num');
         let reviewNum = rowData[rIndex].get('review_num') + 1;
 
         // If this review is for a new question number, add a question label row, eg "Round 2 -- Question 3"
-        if(questionNum !== priorQuestionNum) {
+        if (questionNum !== priorQuestionNum) {
             let labelRowData = drawQuestionRow(priorQuestionNum, questionNum, roundNum, tRow, gridWidth, tooltipText,
                 reviewNum, numRounds, roundPrefix, tBody);
             priorQuestionNum = labelRowData.priorQuestionNum;
@@ -265,7 +282,7 @@ function drawTagGrid(rowData) {
 }
 
 // Generates the header rows and cells for the tag heatgrid with "Tags Completed # out of #"
-function drawHeader(table, headerTooltipText,gridWidth) {
+function drawHeader(table, headerTooltipText, gridWidth) {
     let tHead = table.createTHead();
     let row = tHead.insertRow();
     row.setAttribute("class", "hide-scrollbar tablesorter-headerRow");
@@ -317,7 +334,7 @@ function drawQuestionRow(priorQuestionNum, questionNum, roundNum, tRow, gridWidt
     tRow = tBody.insertRow();
     let reviewNumZeroIndex = reviewNum - 1;
     tRow.id = "hg_row" + questionNum + "_" + reviewNumZeroIndex;
-    return {priorQuestionNum, tRow, roundNum};
+    return { priorQuestionNum, tRow, roundNum };
 }
 
 // Draws a row of grid cells containing information from a single review's tags.
@@ -364,9 +381,9 @@ function addToolTip(element, text) {
 // Find the largest number of tags in a review, if any exist, and return the width that the grid should be drawn to.
 function getGridWidth(rowData) {
     let gridWidth = 0;
-    for(let i=0; i<rowData.length; ++i) {
-        if(rowData[i].get('has_tag') == true && rowData[i].get('tag_list').length > gridWidth) {
-            gridWidth =  rowData[i].get('tag_list').length;
+    for (let i = 0; i < rowData.length; ++i) {
+        if (rowData[i].get('has_tag') == true && rowData[i].get('tag_list').length > gridWidth) {
+            gridWidth = rowData[i].get('tag_list').length;
         }
     }
     return gridWidth;
@@ -374,7 +391,7 @@ function getGridWidth(rowData) {
 
 // Returns as a HashMap the count of all, on, and off tags, and the ratio of done to total in decimal and
 // (special rounding) integer form to associate with existing heatgrid color classes.
-function calcTagRatio(tagPrompts){
+function calcTagRatio(tagPrompts) {
     let countMap = new Map();
     let offTags = 0;
     let onTags = 0;
@@ -395,13 +412,13 @@ function calcTagRatio(tagPrompts){
     // Compute ratio as decimal
     ratio = onTags / length;
     // calculate ratioClass (used in CSS Lookup), and scale ratioClass to 0 <= ratioClass <= 4
-    ratioClass = ratio*4;
+    ratioClass = ratio * 4;
     // increment ratio so the range is 1 <= ratio_class <= 5
     ++ratioClass;
     // round ratioClass down to nearest integer
     ratioClass = Math.floor(ratioClass);
     // For our purposes, ratio_class should fall in the range { 1,2,3,5 } (skips class 4).
-    if(ratioClass === 4) { --ratioClass; }
+    if (ratioClass === 4) { --ratioClass; }
 
     // Add values to the hashmap
     countMap.set("ratioClass", ratioClass);
@@ -414,8 +431,8 @@ function calcTagRatio(tagPrompts){
 function countRounds(rowData) {
     let numRounds = 1;
     let questionNum = 1;
-    for(const row of rowData) {
-        if(row.get('question_num') < questionNum) {
+    for (const row of rowData) {
+        if (row.get('question_num') < questionNum) {
             ++numRounds;
         }
         questionNum = row.get('question_num');

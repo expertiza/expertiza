@@ -94,7 +94,7 @@ function autogenerate_submission(){
     <td style='padding:5px' id='assignment_team_assignment_field'>
 
       <div class="form-inline">
-        <%= check_box_tag('team_assignment', 'true', @assignment_form.assignment.team_assignment?, {:onChange => 'hasTeamsChanged()'}) %>
+        <%= check_box_tag('team_assignment', 'true', @assignment_form.assignment.team_assignment?, {:onChange => 'hasTeamsChanged()'}, disabled=true) %>
         <% @assignment_form.assignment.max_team_size %>
         <%= label_tag('team_assignment', 'Has teams?') %>
 

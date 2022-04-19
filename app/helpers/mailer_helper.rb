@@ -49,8 +49,8 @@ module MailerHelper
           :link => "https://expertiza.ncsu.edu/response/new?id=#{mapping.id}",
           :type => 'submission',
           :first_name => ApplicationHelper.get_user_first_name(reviewer),
-          :partial_name => partial_name
-          :team_name => participant.team
+          :partial_name => partial_name,
+          :team_name => participant.team,
           :body_text => email_content
         }
       }

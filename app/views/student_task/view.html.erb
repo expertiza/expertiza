@@ -125,6 +125,25 @@
     <li><%= link_to t(".take_survey"), { :controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id } %> <%= t ".log_you_out" %></li>
   <% end %>
   <li><%= link_to t(".change_handle"), { :controller => 'participants', :action => 'change_handle', :id => @participant.id } %> <%= t ".different_handle" %></li>
+
+  <%  if @assignment.late_policy_id
+        @penalty_per_unit = LatePolicy.find(@assignment.late_policy_id).penalty_per_unit
+        @max_penalty_for_no_submission = LatePolicy.find(@assignment.late_policy_id).max_penalty
+        @penalty_unit = LatePolicy.find(@assignment.late_policy_id).penalty_unit
+        @penalty_name = LatePolicy.find(@assignment.late_policy_id).policy_name
+      end%>
+
+  <% if @assignment.late_policy_id%>
+    <li> Late Policy:
+      <ul>
+        <li> Penalty name: <%=@penalty_name %>  </li>
+        <li> Penalty per unit: <%= @penalty_per_unit %>  </li>
+        <li> Penalty unit: <%= @penalty_unit %> </li>
+        <li> Maximum penalty: <%= @max_penalty_for_no_submission %></li>
+      </ul>
+    </li>
+  <%end%>
+
 </ul>
 <br>
 

@@ -70,7 +70,10 @@ class SubmittedContentController < ApplicationController
         ExpertizaLogger.error LoggerMessage.new(controller_name, @participant.name, "The URL or URI is invalid. Reason: #{$ERROR_INFO}", request)
         flash[:error] = "The URL or URI is invalid. Reason: #{$ERROR_INFO}"
       end
-      @participant.mail_assigned_reviewers
+      subject = "A submission has been updated since you last reviewed it"
+      partial_name = "updated_submission_since_review"
+      email_content = ""
+      @participant.mail_assigned_reviewers(subject,partial_name,email_content)
       ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully submitted.', request)
       undo_link('The link has been successfully submitted.')
     end

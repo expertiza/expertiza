@@ -72,6 +72,7 @@ class AssignmentsController < ApplicationController
 
   # edits an assignment's deadlines and assigned rubrics
   def edit
+    session[:assignment_id] = nil # E2236
     user_timezone_specified
     edit_params_setting
     assignment_staggered_deadline?
@@ -83,6 +84,8 @@ class AssignmentsController < ApplicationController
     path_warning_and_answer_tag
     @use_bookmark = @assignment.use_bookmark
     @duties = Duty.where(assignment_id: @assignment_form.assignment.id)
+    @assignment = Assignment.find(params[:id])
+    session[:assignment_id] = @assignment.id # E2236
   end
 
   # updates an assignment via an assignment form
@@ -107,7 +110,9 @@ class AssignmentsController < ApplicationController
 
   # displays an assignment via ID
   def show
+    session[:assignment_id] = nil
     @assignment = Assignment.find(params[:id])
+    session[:assignment_id] = @assignment.id # E2236
   end
 
   # gets an assignment's path/url

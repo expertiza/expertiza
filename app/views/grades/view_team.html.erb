@@ -106,6 +106,10 @@
 
                 fix comment end
               -->
+              <br/>
+        <% vm.list_of_rows[0].metric_hash.each do |key, value| %>
+            <input type="checkbox" id="<%= key %>" onchange = onMetricToggle(this)><%=key%> </input>
+        <% end %>
         <div class="hide-scrollbar">
           <table id="scoresTable<%= vm.round.to_s  %>" class="scoresTable tbl_heat tablesorter">
             <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
@@ -132,7 +136,7 @@
               
 
               <% vm.list_of_rows[0].metric_hash.each do |key, value| %>
-                <th class="sorter-false">
+                <th class="sorter-false metric-header <%= key %>" style="display:none">
                   <span  data-toggle="tooltip" data-placement="right" title=<%= "key"%>><%=key%></span>
                 </th>
               <% end %>
@@ -169,7 +173,7 @@
                   </td>
 
                   <% row.metric_hash.each do |key, value| %>
-                    <td  class = 'cf' align="center">
+                    <td  class = 'cf metric-value <%= key %>' align="center" style="display:none">
                       <%= value.to_s %>
                     </td>
                   <% end %>

@@ -1,7 +1,7 @@
 # represents each row of a heatgrid-table, which is represented by the vm_question_response class.
 class VmQuestionResponseRow
   attr_reader :question_seq, :question_text, :question_id, :score_row, :weight
-  attr_accessor :countofcomments
+  attr_accessor :metric_hash
 
   def initialize(question_text, question_id, weight, question_max_score, seq)
     @question_text = question_text
@@ -10,7 +10,7 @@ class VmQuestionResponseRow
     @question_seq = seq
     @question_max_score = question_max_score
     @score_row = []
-    @countofcomments = 0
+    @metric_hash = {}
   end
 
   # the question max score is the max score of the questionnaire, except if the question is a true/false, in which case

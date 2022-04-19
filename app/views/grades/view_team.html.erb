@@ -127,9 +127,16 @@
               <th class="sorter-true" align="right" >
                 Avg<span></span>
               </th>
-              <th class="sorter-false">
-                <span  data-toggle="tooltip" data-placement="right" title="<%=t(".metric_tooltip")%>"><%=t ".metric1"%></span>
-              </th>
+
+                <!-- <span  data-toggle="tooltip" data-placement="right" title="<%=t(".metric_tooltip")%>"><%=t ".metric1"%></span> -->
+              
+
+              <% vm.list_of_rows[0].metric_hash.each do |key, value| %>
+                <th class="sorter-false">
+                  <span  data-toggle="tooltip" data-placement="right" title=<%= "key"%>><%=key%></span>
+                </th>
+              <% end %>
+
             </tr>
             </thead>
 
@@ -160,9 +167,14 @@
                   <td  class = 'cf' align="right">
                     <%= row.average_score_for_row.to_s %>
                   </td>
-                  <td  class = 'cf' align="center">
-                    <%= row.countofcomments.to_s %>
-                  </td>
+
+                  <% row.metric_hash.each do |key, value| %>
+                    <td  class = 'cf' align="center">
+                      <%= value.to_s %>
+                    </td>
+                  <% end %>
+
+
                 </tr>
                 <!--loop that creates the collapsed-by-default row, which lists all comments. -->
                 <tr class="tablesorter-childRow">

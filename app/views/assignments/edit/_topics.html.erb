@@ -21,7 +21,7 @@
 <%= label_tag('assignment_form[assignment][can_choose_topic_to_review]', 'Allow reviewer to choose which topic to review?') %>
 
 <br>
-<% if @assignment_form.assignment.can_choose_topic_to_review? == true %>
+
   <input name="assignment_form[assignment][review_choosing_algorithm]" type="hidden" value="Simple Choose"/>
   <%= label_tag('assignment_form[assignment][review_choosing_algorithm]', 'Method for reviewer to choose which topic to review:') %>
   <%= select('assignment_form[assignment]', 'review_choosing_algorithm',[['Simple Choose', 'Simple Choose'],['Bidding','Bidding']], {:selected => @assignment_form.assignment.review_choosing_algorithm})%>
@@ -31,7 +31,7 @@
   <% if @assignment_form.assignment.review_choosing_algorithm == "Bidding" %>
     <%= button_to 'Run Review Algorithm', :controller=>'review_bids', :action=>'assign_bidding', :assignment_id => @assignment_form.assignment.id %>
   <% end %>
-<% end %>
+
 
 <br>
 <input name="assignment_form[assignment][use_bookmark]" type="hidden" value="false"/>

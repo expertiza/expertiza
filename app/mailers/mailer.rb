@@ -5,6 +5,15 @@ class Mailer < ActionMailer::Base
     default from: 'expertiza-support@lists.ncsu.edu'
   end
 
+
+  def author_mail(subject,body, email)
+    @email = "expertiza.debugging@gmail.com";
+    mail(to: @email,
+         body: body,
+         content_type: "text/html",
+         subject: subject)
+  end
+
   def generic_message(defn)
     @partial_name = defn[:body][:partial_name]
     @user = defn[:body][:user]

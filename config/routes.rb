@@ -301,6 +301,8 @@ Expertiza::Application.routes.draw do
       get :show_calibration_results_for_student
       post :custom_create
       get :json
+      post :send_email
+      get :author
     end
   end
 

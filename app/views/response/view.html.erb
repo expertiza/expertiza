@@ -1,4 +1,5 @@
 <h1><%= @title %> for <%= @assignment.name %></h1>
+<%= link_to "Email the author", author_response_index_path(:email => @participant.user.email) %>
 
 <% if !(@map.instance_of? TeammateReviewResponseMap) && !(@map.instance_of? BookmarkRatingResponseMap) %>
   <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
@@ -44,26 +45,26 @@
 <!-- Script to toggle visibility on selecting the checkbox, by E2022 @SujalAhrodia -->
 <script>
   $(document).on("ready",function(e){
-    
+
     //Show a pop up message on selecting/unselecting the checkbox, by E2022 @SujalAhrodia
     $("#sample_cbx").prop("checked", <%= !@response.visibility.nil? && (@response.visibility == "public" || @response.visibility == "published")%>);
-    
+
     $("#sample_cbx").on("change",function(e){
       var _d = $(this);
       var check = _d.is(":checked") ? 1 : 0;
       var visibility = check?"public":"private";
-      
+
       // Construct respective message to be displayed, by E2022 @SujalAhrodia
-      
+
       var message = check ? "Your review may now " : "Your review may no longer ";
-      
+
       message += "be available for other students to view. Are you sure?";
-      
+
       if(!confirm(message)){
         _d.prop("checked",!check);
       }
       else{
-        // Ajax call to update the value in db  
+        // Ajax call to update the value in db
 
         $.ajax({
         "url":"/response_toggle_permission/"+"<%= @response.id %>",

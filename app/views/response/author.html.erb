@@ -1,0 +1,15 @@
+<%= form_for :send_email , url: "send_email" do |form| %>
+  <p>
+  <%= label_tag "Messsage to Reviewers" %> <br>
+  </p>
+  <p>
+  <%= label_tag "Subject: " %> <br>
+  <%= form.text_area :subject %> <br>
+  </p>
+  <p>
+   <%= label_tag "Email Content: " %> <br>
+  <%= form.text_area :email_body %> <br>
+  </p>
+
+  <%= form.submit "Send Email" %>
+<% end  %>

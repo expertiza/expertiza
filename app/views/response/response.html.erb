@@ -299,12 +299,18 @@
 <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
 <% if !@map.contributor.nil? && !@map.instance_of?(FeedbackResponseMap) %>
   <% if @map.assignment.team_assignment? %>
-    <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id %>
+    <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id%>
+
+    <% participant = Participant.find(team_member) %>
+    <%= participant.user.email%>
+    <%= link_to "Email the author", author_response_index_path(:email => participant.user.email) %>
     <% topic_id = SignedUpTeam.topic_id(@map.assignment.id, team_member) %>
   <% else %>
     <% participant = Participant.find(TeamsUser.find_by_team_id(@map.contributor).user_id) %>
+    <%= link_to "Email the author", author_response_index_path(:email => participant.user.email) %>
     <% topic_id = SignedUpTeam.where(participant.parent_id, participant.user_id) %>
   <% end %>
+
   <% unless topic_id.nil? %>
     <% topic = SignUpTopic.find(topic_id) %>
     <h2>You are reviewing <%= topic.topic_name %></h2>

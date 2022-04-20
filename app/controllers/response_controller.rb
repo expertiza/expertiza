@@ -1,3 +1,4 @@
+$email = ""
 class ResponseController < ApplicationController
   include AuthorizationHelper
 
@@ -139,6 +140,17 @@ class ResponseController < ApplicationController
     store_total_cake_score
     init_answers(questions)
     render action: 'response'
+  end
+
+  def author
+    $email = params[:email]
+  end
+
+  def send_email
+    @subject = params["send_email"]["subject"]
+    @body = params["send_email"]["email_body"]
+    MailerHelper.send_mail_to_author(@subject, @body, $email)
+
   end
 
   def new_feedback
@@ -421,4 +433,5 @@ class ResponseController < ApplicationController
       @total_score[question.id] = total_score
     end
   end
+
 end

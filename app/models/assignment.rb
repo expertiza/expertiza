@@ -553,7 +553,7 @@ class Assignment < ActiveRecord::Base
 
   # This method was refactored by Rajan, Jasmine, Sreenidhi on 03/31/2020
   # Now you can add groups of fields to the hashmap
-  EXPORT_FIELDS = { team_score: ['Team Max', 'Team Min', 'Team Avg'], submitted_score: ['Submitted Max', 'Submitted Min', 'Submitted Avg'], metareview_score: ['Metareview Max', 'Metareview Min', 'Metareview Avg'], author_feedback_score: ['Author Feedback Max, Author Feedback Min, Author Feedback Avg'], teammate_review_score: ['Teammate Review Max', 'Teammate Review Min', 'Teammate Review Avg'] }.freeze
+  EXPORT_FIELDS = { team_score: ['Team Max', 'Team Min', 'Team Avg'], submitted_score: ['Submitted Max', 'Submitted Min', 'Submitted Avg'], metareview_score: ['Metareview Max', 'Metareview Min', 'Metareview Avg'], author_feedback_score: ['Author Feedback Max', 'Author Feedback Min', 'Author Feedback Avg'], teammate_review_score: ['Teammate Review Max', 'Teammate Review Min', 'Teammate Review Avg'] }.freeze
   def self.export_fields(options)
     fields = []
     fields << 'Team Name'

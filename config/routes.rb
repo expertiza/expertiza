@@ -1,8 +1,9 @@
 Expertiza::Application.routes.draw do
-
+  resources :grading_histories
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
 
+  resources :grading_histories, only: [:index]
   resources :admin, only: [] do
     collection do
       get :list_super_administrators
@@ -96,7 +97,7 @@ Expertiza::Application.routes.draw do
   end
 
   resources :duties
-  
+
   resources :eula, only: [] do
     collection do
       get :accept

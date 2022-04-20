@@ -312,6 +312,17 @@ ActiveRecord::Schema.define(version: 20_220_111_023_859) do
 
   add_index "duties", ["assignment_id"], name: "index_duties_on_assignment_id", using: :btree
 
+  create_table "grading_histories", force: :cascade do |t|
+    t.integer  "instructor_id",     limit: 4
+    t.integer  "assignment_id",     limit: 4
+    t.string   "grading_type",      limit: 255
+    t.integer  "grade_receiver_id", limit: 4
+    t.integer  "grade",             limit: 4
+    t.text     "comment",           limit: 65535
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+  end
+
   create_table "institutions", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
   end

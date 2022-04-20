@@ -1,0 +1,38 @@
+<% record = @grading_histories[0]
+  if record == nil
+    receiver = ""
+    assignment = ""
+  else
+    if record.grading_type == "Submission"
+      receiver = "of " + Team.where(id: record.grade_receiver_id).pluck(:name).first
+      assignment = "for the submission " + Assignment.where(id: record.assignment_id).pluck(:name).first
+    else
+      receiver = "of " + User.where(id: record.grade_receiver_id).pluck(:fullname).first
+      assignment = "for review in " + Assignment.where(id: record.assignment_id).pluck(:name).first
+    end
+
+  end
+%>
+<h1 class="center">Grade History <%= receiver %> <%= assignment %></h1>
+
+<table style="border-collapse:collapse; table-layout:fixed; width:1500px;">
+  <thead>
+  <tr>
+    <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Instructor</th>
+    <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Grade</th>
+    <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Comment</th>
+    <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Graded At</th>
+  </tr>
+
+  <!--This is the main view of the table. This will add table with either hyperlink or the content nased on the operation. -->
+  <tbody>
+  <% @grading_histories.each do |record| %>
+    <tr>
+      <td style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;"><%= User.where(id: record.instructor_id).pluck(:fullname).first %></td>
+      <td style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;"><%= record.grade %></td>
+      <td style="padding:10px; border:solid 1.5px black; width:60px; word-wrap:break-word;"><%= record.comment %></td>
+      <td style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;"><%= record.created_at %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

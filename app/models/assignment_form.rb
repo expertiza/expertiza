@@ -420,7 +420,7 @@ class AssignmentForm
     old_assign = Assignment.find(assignment_id)
     new_assign = old_assign.dup
     user.set_instructor(new_assign)
-    new_assign.update_attribute('name', 'Copy of ' + new_assign.name)
+    new_assign.update_attribute('name', name_copied_assignment(old_assign.name))
     new_assign.update_attribute('created_at', Time.now)
     new_assign.update_attribute('updated_at', Time.now)
     new_assign.update_attribute('directory_path', new_assign.directory_path + '_copy') if new_assign.directory_path.present?
@@ -440,6 +440,19 @@ class AssignmentForm
       new_assign_id = nil
     end
     new_assign_id
+  end
+
+  def self.name_copied_assignment(assignment_name)
+    # Set name of new assignment as 'Copy of <old assignment name>'. If it already exists, set it as 'Copy of <old assignment name> (1)'.
+    # Repeated till unique name is found.
+    name_counter = 0
+    new_name = 'Copy of ' + assignment_name
+    until Assignment.find_by(name: new_name).nil?
+      new_name = 'Copy of ' + assignment_name
+      name_counter += 1
+      new_name += ' (' + name_counter.to_s + ')'
+    end
+    return new_name
   end
 
   def self.copy_assignment_questionnaire(old_assign, new_assign, user)

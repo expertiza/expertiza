@@ -1,5 +1,6 @@
 class ExportFileController < ApplicationController
   include AuthorizationHelper
+  include Scoring
 
   def action_allowed?
     current_user_has_ta_privileges?

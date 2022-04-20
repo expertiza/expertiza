@@ -98,23 +98,29 @@ class StudentTaskController < ApplicationController
   end
 
   def email_reviewers
+    @participant = AssignmentParticipant.find(params[:id])
+    puts @participant
   end
 
   def send_email
 
+    @participant = AssignmentParticipant.find(params[:id])
     subject = params["send_email"]["subject"]
     body = params["send_email"]["email_body"]
     participant_id = params["participant_id"]
-    if subject.blank? or body.blank?
-      form_status_msg = 'Please fill in the subject and the Email Content.'
-    else
-      form_status_msg = 'Email will be sent to the Reviewers'
-    end
-    @participant = AssignmentParticipant.find_by(participant_id)
 
     respond_to do |format|
-      format.html { redirect_to controller: 'student_task', action: 'view', id: @participant.id, notice: form_status_msg }
-      format.json { head :no_content }
+      if subject.blank? or body.blank?
+
+        flash[:notice] = 'Please fill in the subject and the Email Content.'
+        format.html { redirect_to controller: 'student_task', action: 'email_reviewers', id: @participant }
+        format.json { head :no_content }
+      else
+        # make a call to method invoking the email process
+        flash[:notice] = 'Email will be sent to the Reviewers.'
+        format.html { redirect_to controller: 'student_task', action: 'view', id: @participant}
+        format.json { head :no_content }
+      end
     end
   end
 

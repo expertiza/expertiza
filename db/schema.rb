@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220111023859) do
+ActiveRecord::Schema.define(version: 20220420015915) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -337,8 +337,8 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "user_id"
-    t.integer "lockable_id"
     t.string "lockable_type"
+    t.integer "lockable_id"
     t.index ["user_id"], name: "fk_rails_426f571216"
   end
 
@@ -770,6 +770,15 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  create_table "waitlist_teams", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.integer "team_id"
+    t.integer "topic_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["team_id"], name: "fk_waitlist_teams"
+    t.index ["topic_id"], name: "fk_waitlist_teams_sign_up_topics"
+  end
+
   add_foreign_key "answer_tags", "answers"
   add_foreign_key "answer_tags", "tag_prompt_deployments"
   add_foreign_key "answer_tags", "users"
@@ -822,4 +831,6 @@ ActiveRecord::Schema.define(version: 20220111023859) do
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
   add_foreign_key "track_notifications", "notifications"
   add_foreign_key "track_notifications", "users"
+  add_foreign_key "waitlist_teams", "sign_up_topics", column: "topic_id", name: "fk_waitlist_teams_sign_up_topics"
+  add_foreign_key "waitlist_teams", "teams", name: "fk_waitlist_teams"
 end

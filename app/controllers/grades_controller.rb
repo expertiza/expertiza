@@ -102,7 +102,6 @@ class GradesController < ApplicationController
         end
       end
       @vmlist << populate_view_model(questionnaire)
-
     end
     @current_role_name = current_role_name
   end

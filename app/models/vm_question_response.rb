@@ -163,6 +163,7 @@ class VmQuestionResponse
 
   def calculate_metrics
     number_of_comments_greater_than_10_words
+    number_of_comments_greater_than_20_words
   end
 
   def number_of_comments_greater_than_10_words
@@ -179,15 +180,15 @@ class VmQuestionResponse
 
   # Incase if new metirc is added
 
-  # def number_of_comments_greater_than_20_words
-  #   @list_of_reviews.each do |review|
-  #     answers = Answer.where(response_id: review.response_id)
-  #     answers.each do |answer|
-  #       @list_of_rows.each do |row|
-  #         row.metric_hash["countofcomments20"] = 0 if row.metric_hash["countofcomments20"] == nil
-  #         row.metric_hash["countofcomments20"] = row.metric_hash["countofcomments20"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 1
-  #       end
-  #     end
-  #   end
-  # end
+  def number_of_comments_greater_than_20_words
+    @list_of_reviews.each do |review|
+      answers = Answer.where(response_id: review.response_id)
+      answers.each do |answer|
+        @list_of_rows.each do |row|
+          row.metric_hash["countofcomments20"] = 0 if row.metric_hash["countofcomments20"] == nil
+          row.metric_hash["countofcomments20"] = row.metric_hash["countofcomments20"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 1
+        end
+      end
+    end
+  end
 end

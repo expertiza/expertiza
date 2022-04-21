@@ -18,4 +18,4 @@ jobs:
         bundler-cache: true
         action_config_path: ".github/config/rubocop_linter_action.yml"
     - name: Run RuboCop
-      run: bundle exec rubocop --parallel --only Lint,Layout app/
+      run: bundle exec rubocop --parallel --only Lint,Layout --except Layout/LineLength app/

@@ -4,96 +4,139 @@ require 'net/http'
 require 'openssl'
 require 'base64'
 
+# Expertiza allows student work to be peer-reviewed, since peers can provide
+# more feedback than the instructor can.
+# However, if we want to assure that all students receive competent feedback,
+# or even use peer-assigned grades,
+# we need a way to judge which peer reviewers are most credible. The solution
+# is the reputation system.
+# Reputation systems have been deployed as web services, peer-review
+# researchers will be able to use them to calculate scores on assignments,
+# both past and present (past data can be used to tune the algorithms).
+#
+# This file is the controller to calculate the reputation scores.
+# A 'reputation' measures how close a reviewer's scores are to other reviewers'
+# scores.
+# This controller implements the calculation of reputation scores.
 class ReputationWebServiceController < ApplicationController
   include AuthorizationHelper
 
-  @@request_body = ''
-  @@response_body = ''
-  @@assignment_id = ''
-  @@another_assignment_id = ''
-  @@round_num = ''
-  @@algorithm = ''
-  @@additional_info = ''
-  @@response = ''
-
+  # Method: action_allowed
+  # This method checks if the currently authenticated user has the authorization
+  # to perform certain actions
+  # Params
+  #
+  # Returns
+  #   true if the user has privileges to perform the action else returns false
   def action_allowed?
     current_user_has_ta_privileges?
   end
 
-  # normal db query, return peer review grades
-  # query="SELECT U.id, RM.reviewee_id as submission_id, "+
-  #     "sum(A.answer * Q.weight) / sum(QN.max_question_score * Q.weight) * 100 as total_score "+
-  #   # new way to calculate the grades of coding artifacts
-  #   #"100 - SUM((QN.max_question_score-A.answer) * Q.weight) AS total_score "+
-  #   "from answers A  "+
-  #   "inner join questions Q on A.question_id = Q.id "+
-  #   "inner join questionnaires QN on Q.questionnaire_id = QN.id "+
-  #   "inner join responses R on A.response_id = R.id "+
-  #   "inner join response_maps RM on R.map_id = RM.id "+
-  #   "inner join participants P on P.id = RM.reviewer_id "+
-  #   "inner join users U on U.id = P.user_id "+
-  #   "inner join teams T on T.id = RM.reviewee_id "
-  #   query += "inner join signed_up_teams SU_team on SU_team.team_id = T.id " if has_topic == true
-  #   query += "where RM.type='ReviewResponseMap' "+
-  #   "and RM.reviewed_object_id = "+  assignment_id.to_s + " " +
-  #   "and A.answer is not null "+
-  #   "and Q.type ='Criterion' "+
-  #   #If one assignment is varying rubric by round (724, 733, 736) or 2-round peer review with (735),
-  #   #the round field in response records corresponding to ReviewResponseMap will be 1 or 2, will not be null.
-  #   "and R.round = 2 "
-  #   query+="and SU_team.is_waitlisted = 0 " if has_topic == true
-  #   query+="group by RM.id "+
-  #   "order by RM.reviewee_id"
-  #
-  #  result = ApplicationRecord.connection.select_all(query)
-  def db_query(assignment_id, round_num, has_topic, another_assignment_id = 0)
+  # Method: get_max_question_score
+  # This method receives a set of answers and gets the maximum question score
+  # Params
+  #   answers: set of answers
+  # Returns
+  #   if no error returns max_question_score of first question else 1
+  def get_max_question_score(answers)
+    begin
+      answers.first.question.questionnaire.max_question_score
+    rescue StandardError
+      1
+    end
+  end
+
+  # Method: get_valid_answers_for_response
+  # This method receives response and filters the valid answers list of the
+  # response ID
+  # Params
+  #   response
+  # Returns
+  #   set of valid answers (returns nil if empty)
+  def get_valid_answers_for_response(response)
+    answers = Answer.where(response_id: response.id)
+    valid_answer = answers.select { |answer| (answer.question.type == 'Criterion') && !answer.answer.nil? }
+    valid_answer.empty? ? nil : valid_answer
+  end
+
+  # Method: calculate_peer_review_grade
+  # This method calculates a cumulative review grade with respect to the set of valid answers
+  # Params
+  #   valid_answer: valid answer to get weight of the answer's question
+  #   max_question_score: used to calculate maximum score for peer review grade
+  # Returns
+  #   peer_review_grade
+  def calculate_peer_review_grade(valid_answer, max_question_score)
+    weighted_score_sum = valid_answer.map { |answer| answer.answer * answer.question.weight }.inject(:+)
+    question_weight_sum = valid_answer.sum { |answer| answer.question.weight }
+    peer_review_grade = 100.0 * weighted_score_sum / (question_weight_sum * max_question_score)
+    peer_review_grade.round(4)
+  end
+
+  # Method: get_peer_reviews_for_responses
+  # This method calculates the peer review grade for each valid response
+  # Params
+  #   reviewer_id: used to create respective element in the peer_review_grades_list
+  #   team_id: used to create respective element in the peer_review_grades_list
+  #   valid_response: to get the valid answer for each valid response
+  # Returns
+  #   peer_review_grades_list
+  def get_peer_reviews_for_responses(reviewer_id, team_id, valid_response)
+    peer_review_grades_list = []
+    valid_response.each do |response|
+      valid_answer = get_valid_answers_for_response(response)
+      next if valid_answer.nil?
+
+      review_grade = calculate_peer_review_grade(valid_answer, get_max_question_score(valid_answer))
+      peer_review_grades_list << [reviewer_id, team_id, review_grade]
+    end
+    peer_review_grades_list
+  end
+
+  # Method: get_peer_reviews
+  # This method retrieves all the reviews for the submissions
+  # Params
+  #   assignment_id_list: used to retrieve response map
+  #   round_num: used to retrieve round_num for the valid response
+  #   has_topic: to get the topic condition
+  # Returns
+  #   raw_data_array: which corresponds to the return of
+  #     get_peer_reviews_for_responses method and appended to the raw_data_array
+  def get_peer_reviews(assignment_id_list, round_num, has_topic)
     raw_data_array = []
-    assignment_ids = []
-    assignment_ids << assignment_id
-    assignment_ids << another_assignment_id unless another_assignment_id.zero?
-    ReviewResponseMap.where('reviewed_object_id in (?) and calibrate_to = ?', assignment_ids, false).each do |response_map|
+    ReviewResponseMap.where('reviewed_object_id in (?) and calibrate_to = ?', assignment_id_list, false).each do |response_map|
       reviewer = response_map.reviewer.user
       team = AssignmentTeam.find(response_map.reviewee_id)
       topic_condition = ((has_topic && (SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false)) || !has_topic)
       last_valid_response = response_map.response.select { |r| r.round == round_num }.max
       valid_response = [last_valid_response] unless last_valid_response.nil?
-      next unless topic_condition && valid_response && !valid_response.empty?
-
-      valid_response.each do |response|
-        answers = Answer.where(response_id: response.id)
-        max_question_score = begin
-                               answers.first.question.questionnaire.max_question_score
-                             rescue StandardError
-                               1
-                             end
-        temp_sum = 0
-        weight_sum = 0
-        valid_answer = answers.select { |a| (a.question.type == 'Criterion') && a.answer }
-        next if valid_answer.empty?
-
-        valid_answer.each do |answer|
-          temp_sum += answer.answer * answer.question.weight
-          weight_sum += answer.question.weight
-        end
-        peer_review_grade = 100.0 * temp_sum / (weight_sum * max_question_score)
-        raw_data_array << [reviewer.id, team.id, peer_review_grade.round(4)]
+      if (topic_condition == true) && !valid_response.nil? && !valid_response.empty?
+        raw_data_array += get_peer_reviews_for_responses(reviewer.id, team.id, valid_response)
       end
     end
     raw_data_array
   end
 
-  # special db query, return quiz scores
-  def db_query_with_quiz_score(assignment_id, another_assignment_id = 0)
-    raw_data_array = []
-    assignment_ids = []
-    assignment_ids << assignment_id
-    assignment_ids << another_assignment_id unless another_assignment_id.zero?
-    teams = AssignmentTeam.where('parent_id in (?)', assignment_ids)
-    team_ids = []
-    teams.each { |team| team_ids << team.id }
+  # Method: get_ids_list
+  # This method maps each object to the corresponding object's ID
+  # Params
+  #   tables: any table
+  # Returns
+  #   id in the tables
+  def get_ids_list(tables)
+    tables.map(&:id)
+  end
+
+  # Method: get_scores
+  # This method gets the quiz score of each participant for respective reviewee
+  # Params
+  #   team_ids: list of team IDs
+  # Returns
+  #   raw_data_array: which is a list of participant, reviewee and the participant's quiz score
+  def get_scores(team_ids)
     quiz_questionnnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
-    quiz_questionnnaire_ids = []
-    quiz_questionnnaires.each { |questionnaire| quiz_questionnnaire_ids << questionnaire.id }
+    quiz_questionnnaire_ids = get_ids_list(quiz_questionnnaires)
+    raw_data_array = []
     QuizResponseMap.where('reviewed_object_id in (?)', quiz_questionnnaire_ids).each do |response_map|
       quiz_score = response_map.quiz_score
       participant = Participant.find(response_map.reviewer_id)
@@ -102,171 +145,283 @@ class ReputationWebServiceController < ApplicationController
     raw_data_array
   end
 
-  def json_generator(assignment_id, another_assignment_id = 0, round_num = 2, type = 'peer review grades')
-    assignment = Assignment.find_by(id: assignment_id)
-    has_topic = !SignUpTopic.where(assignment_id: assignment_id).empty?
+  # Method: get_quiz_score
+  # This method gets the quiz score of assignments
+  # Params
+  #   assignment_id_list: list of assignment IDs
+  # Returns
+  #   raw_data_array: returned by get_scores method, which is a list of participant,
+  #     reviewee and the participant's quiz score
+  def get_quiz_score(assignment_id_list)
+    teams = AssignmentTeam.where('parent_id in (?)', assignment_id_list)
+    team_ids = get_ids_list(teams)
+    get_scores(team_ids)
+  end
 
-    if type == 'peer review grades'
-      @results = db_query(assignment.id, round_num, has_topic, another_assignment_id)
-    elsif type == 'quiz scores'
-      @results = db_query_with_quiz_score(assignment.id, another_assignment_id)
-    end
+  # Method: generate_json_body
+  # This method generates json body for the peer reviews and quiz scores
+  # Params
+  #   results: list of grades with corresponding team/participant ID,
+  #     reviewee ID and their score
+  # Returns
+  #   request_body: returns the formatted body after sorting the hash
+  def generate_json_body(results)
     request_body = {}
-    @results.each_with_index do |record, _index|
+    results.each_with_index do |record, _index|
       request_body['submission' + record[1].to_s] = {} unless request_body.key?('submission' + record[1].to_s)
       request_body['submission' + record[1].to_s]['stu' + record[0].to_s] = record[2]
     end
     # sort the 2-dimension hash
     request_body.each { |k, v| request_body[k] = v.sort.to_h }
     request_body.sort.to_h
+    request_body
   end
 
+  # Method: generate_json_for_peer_reviews
+  # This method retrieves all the peer reviews associated with
+  # the assignment id list by calling the get_peer_reviews method.
+  # It then formats the peer-review list in JSON.
+  # Params
+  #   assignment_id_list: list of assignment ids to get quiz scores for
+  #   round_num: round number of the review
+  # Returns
+  #   request_body: request body populated with the formatted peer review data.
+  def generate_json_for_peer_reviews(assignment_id_list, round_num = 2)
+    has_topic = !SignUpTopic.where(assignment_id: assignment_id_list[0]).empty?
+
+    peer_reviews_list = get_peer_reviews(assignment_id_list, round_num, has_topic)
+    request_body = generate_json_body(peer_reviews_list)
+    request_body
+  end
+
+  # Method: generate_json_for_quiz_scores
+  # This method accepts a list of assignment ids as an argument.
+  # It then calls the get_quiz_score method on the list to get
+  # maps of teams and scores for the given assignments.
+  # The map is then formatted into JSON.
+  # Params
+  #   assignment_id_list: list of assignment ids to get quiz scores for
+  # Returns
+  #   request_body: request body populated with quiz scores
+  def generate_json_for_quiz_scores(assignment_id_list)
+    participant_reviewee_map = get_quiz_score(assignment_id_list)
+    request_body = generate_json_body(participant_reviewee_map)
+    request_body
+  end
+
+  # Method: client
+  # This method is called when the url reputation_web_service/client
+  # is hit using GET method.
+  # This renders the client.html.erb
+  # It also populates the instance variables to be used in the views
+  # Params
+  #
+  # Returns
+  #   nil
   def client
-    @request_body = @@request_body
-    @response_body = @@response_body
     @max_assignment_id = Assignment.last.id
-    @assignment = begin
-                    Assignment.find(@@assignment_id)
-                  rescue StandardError
-                    nil
-                  end
-    @another_assignment = begin
-                            Assignment.find(@@another_assignment_id)
-                          rescue StandardError
-                            nil
-                          end
-    @round_num = @@round_num
-    @algorithm = @@algorithm
-    @additional_info = @@additional_info
-    @response = @@response
+    @assignment = Assignment.find(flash[:assignment_id]) rescue nil
+    @another_assignment = Assignment.find(flash[:another_assignment_id]) rescue nil
   end
 
-  def send_post_request
-    # https://www.socialtext.net/open/very_simple_rest_in_ruby_part_3_post_to_create_a_new_workspace
-    req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader: { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
-    curr_assignment_id = (params[:assignment_id].empty? ? '724' : params[:assignment_id])
-    req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
-    req.body[0] = '' # remove the first '{'
-    @@assignment_id = params[:assignment_id]
-    @@round_num = params[:round_num]
-    @@algorithm = params[:algorithm]
-    @@another_assignment_id = params[:another_assignment_id]
+  # Method: update_participants_reputation
+  # This method accepts the response body in the JSON format.
+  # It then parses the JSON and updates the reputation scores of the
+  # participants in the list.
+  # If the alg variable is not  Hamer/ Lauv, the updation step is skipped.
+  # Params
+  #   reputation_response: The response from the reputation web service
+  # Returns
+  #   nil
+  def update_participants_reputation(reputation_response)
+    JSON.parse(reputation_response.body.to_s).each do |reputation_algorithm, user_resputation_list|
+      next unless %w[Hamer Lauw].include?(reputation_algorithm)
 
+      user_resputation_list.each do |user_id, reputation|
+        Participant.find_by(user_id: user_id).update(reputation_algorithm.to_sym => reputation) unless /leniency/ =~ user_id.to_s
+      end
+    end
+  end
+
+  # Method: process_response_body
+  # This method gets the control after receiving a response from the server.
+  # It receives the response body as an argument
+  # It updates the instance variables related to the response.
+  # It then calls the update_participants_reputation to update the reputation
+  # scores received in the response body.
+  # Params
+  #   reputation_response: The response from the reputation web service
+  # Returns
+  #   nil
+  def process_response_body(reputation_response)
+    flash[:response] = reputation_response
+    flash[:response_body] = reputation_response.body
+    update_participants_reputation(reputation_response)
+  end
+
+  # Method: add_expert_grades
+  # It prepends the request body with the expert grades pertaining
+  # to the default wiki contribution case of 754.
+  # It receives the request body as an argument and prepends it
+  # Params
+  #   body: The request body to add the expert grades to
+  # Returns
+  #   body prepended with the expert grades
+  def add_expert_grades(body)
+    flash[:additional_info] = 'add expert grades'
+    case params[:assignment_id]
+    when '754' # expert grades of Wiki contribution (754)
+      body.prepend('"expert_grades": {"submission25030":95,"submission25031":92,"submission25033":88,"submission25034":98,"submission25035":100,"submission25037":95,"submission25038":95,"submission25039":93,"submission25040":96,"submission25041":90,"submission25042":100,"submission25046":95,"submission25049":90,"submission25050":88,"submission25053":91,"submission25054":96,"submission25055":94,"submission25059":96,"submission25071":85,"submission25082":100,"submission25086":95,"submission25097":90,"submission25098":85,"submission25102":97,"submission25103":94,"submission25105":98,"submission25114":95,"submission25115":94},')
+    end
+  end
+
+  # Method: add_quiz_scores
+  # It gets the assignment id list and generates the json on quiz scores of
+  # those assignments.
+  # Finally processes quiz string is prepended to the request body, received
+  # as an argument, and returns the body to prepare_request_body.
+  # Params
+  #   body: The request body to add the expert grades to
+  # Returns
+  #   body prepended with the expert grades
+  def add_quiz_scores(body)
+    flash[:additional_info] = 'add quiz scores'
+    assignment_id_list_quiz = get_assignment_id_list(params[:assignment_id].to_i, params[:another_assignment_id].to_i)
+    quiz_str =  generate_json_for_quiz_scores(assignment_id_list_quiz).to_json
+    quiz_str[0] = '' # remove first {
+    quiz_str.prepend('"quiz_scores":{') # add quiz_scores tag
+    quiz_str += ','
+    quiz_str = quiz_str.gsub('"N/A"', '20.0') # replace N/A values with 20
+    body.prepend(quiz_str)
+  end
+
+  # Method: add_lauw_reputation_values
+  # This method sets the instance variable @additional_info.
+  # This method is called by the prepare_request_body method
+  # when params receive instruction through the corresponding view's checkbox.
+  # THIS METHOD IS NOT IMPLETEMENTED
+  # Params
+  #
+  # Returns
+  #   nil
+  def add_hamer_reputation_values
+    flash[:additional_info] = 'add initial hamer reputation values'
+  end
+
+  # Method: add_lauw_reputation_values
+  # This method sets the instance variable @additional_info.
+  # This method is called by the prepare_request_body method
+  # when params receive instruction through the corresponding view's checkbox.
+  # THIS METHOD IS NOT IMPLETEMENTED
+  # Params
+  #
+  # Returns
+  #   nil
+  def add_lauw_reputation_values
+    flash[:additional_info] = 'add initial lauw reputation values'
+  end
+
+  # Method: get_assignment_id_list
+  # This method on receipt of individual assignment IDs returns a list with all
+  # the assignment IDs appended into a data structure
+  # This function accepts 2 arguments, with the second argument being optional,
+  # and returns the list assignment_id_list
+  # If the second argument is 0, it is not appended to the list.
+  # Params
+  #   assignment_id_one: first assignment id (required)
+  #   assignment_id_two: second assignment id (optional)
+  # Returns
+  #   assignment_id_list: list containing two assignment ids
+  def get_assignment_id_list(assignment_id_one, assignment_id_two = 0)
+    assignment_id_list = []
+    assignment_id_list << assignment_id_one
+    assignment_id_list << assignment_id_two unless assignment_id_two.zero?
+    assignment_id_list
+  end
+
+  # Method: add_flash_messages
+  # This method sets the flash messages to pass on to the next request i.e
+  # the request redirected to the client
+  # Params
+  #   post_req: This contains the entire post_req that needs to be sent to the reputation
+  #     webservice
+  # Returns
+  #   nil
+  def add_flash_messages(post_req)
+    flash[:assignment_id] = params[:assignment_id]
+    flash[:round_num] = params[:round_num]
+    flash[:algorithm] = params[:algorithm]
+    flash[:another_assignment_id] = params[:another_assignment_id]
+    flash[:request_body] = post_req.body
+  end
+
+  # Method: add_additional_info_details
+  # This method sets the additional info details based on the options
+  # selected in the additional information section. We populate the request
+  # based on the selections
+  # Params
+  #   post_req: This contains the entire post_req that needs to be sent to the reputation
+  #     webservice
+  # Returns
+  #   nil
+  def add_additional_info_details(post_req)
     if params[:checkbox][:expert_grade] == 'Add expert grades'
-      @@additional_info = 'add expert grades'
-      case params[:assignment_id]
-      # for paper purpose, see https://www.researchgate.net/profile/Yang-Song-135/publication/289528736_Pluggable_Reputation_Systems_for_Peer_Review_a_Web-Service_Approach/links/568ec8d008ae78cc05160aed/Pluggable-Reputation-Systems-for-Peer-Review-a-Web-Service-Approach.pdf
-      # can be commented out. comment begin
-      when '724' # expert grades of Wiki 1a (724)
-        if params[:another_assignment_id].to_i.zero?
-          req.body.prepend('"expert_grades": {"submission23967":93,"submission23969":89,"submission23971":95,"submission23972":86,"submission23973":91,"submission23975":94,"submission23979":90,"submission23980":94,"submission23981":87,"submission23982":79,"submission23983":91,"submission23986":92,"submission23987":91,"submission23988":93,"submission23991":98,"submission23992":91,"submission23994":87,"submission23995":93,"submission23998":92,"submission23999":87,"submission24000":93,"submission24001":93,"submission24006":96,"submission24007":87,"submission24008":92,"submission24009":92,"submission24010":93,"submission24012":94,"submission24013":96,"submission24016":91,"submission24018":93,"submission24024":96,"submission24028":88,"submission24031":94,"submission24040":93,"submission24043":95,"submission24044":91,"submission24046":95,"submission24051":92},')
-        else # expert grades of Wiki 1a and 1b (724, 733)
-          req.body.prepend('"expert_grades": {"submission23967":93, "submission23969":89, "submission23971":95, "submission23972":86, "submission23973":91, "submission23975":94, "submission23979":90, "submission23980":94, "submission23981":87, "submission23982":79, "submission23983":91, "submission23986":92, "submission23987":91, "submission23988":93, "submission23991":98, "submission23992":91, "submission23994":87, "submission23995":93, "submission23998":92, "submission23999":87, "submission24000":93, "submission24001":93, "submission24006":96, "submission24007":87, "submission24008":92, "submission24009":92, "submission24010":93, "submission24012":94, "submission24013":96, "submission24016":91, "submission24018":93, "submission24024":96, "submission24028":88, "submission24031":94, "submission24040":93, "submission24043":95, "submission24044":91, "submission24046":95, "submission24051":92, "submission24100":90, "submission24079":92, "submission24298":86, "submission24545":92, "submission24082":96, "submission24080":86, "submission24284":92, "submission24534":93, "submission24285":94, "submission24297":91},')
-        end
-      when '735' # expert grades of program 1 (735)
-        req.body.prepend('"expert_grades": {"submission24083":96.084,"submission24085":88.811,"submission24086":100,"submission24087":100,"submission24088":92.657,"submission24091":96.783,"submission24092":90.21,"submission24093":100,"submission24097":90.909,"submission24098":98.601,"submission24101":99.301,"submission24278":98.601,"submission24279":72.727,"submission24281":54.476,"submission24289":94.406,"submission24291":99.301,"submission24293":93.706,"submission24296":98.601,"submission24302":83.217,"submission24303":91.329,"submission24305":100,"submission24307":100,"submission24308":100,"submission24311":95.804,"submission24313":91.049,"submission24314":100,"submission24315":97.483,"submission24316":91.608,"submission24317":98.182,"submission24320":90.21,"submission24321":90.21,"submission24322":98.601},')
-      when '754' # expert grades of Wiki contribution (754)
-        req.body.prepend('"expert_grades": {"submission25030":95,"submission25031":92,"submission25033":88,"submission25034":98,"submission25035":100,"submission25037":95,"submission25038":95,"submission25039":93,"submission25040":96,"submission25041":90,"submission25042":100,"submission25046":95,"submission25049":90,"submission25050":88,"submission25053":91,"submission25054":96,"submission25055":94,"submission25059":96,"submission25071":85,"submission25082":100,"submission25086":95,"submission25097":90,"submission25098":85,"submission25102":97,"submission25103":94,"submission25105":98,"submission25114":95,"submission25115":94},')
-      when '756' # expert grades of Wikipedia contribution (756)
-        req.body.prepend('"expert_grades": {"submission25107":76.6667,"submission25109":83.3333},')
-        # comment end
-      end
+      add_expert_grades(post_req.body)
     elsif params[:checkbox][:hamer] == 'Add initial Hamer reputation values'
-      @@additional_info = 'add initial hamer reputation values'
+      add_hamer_reputation_values
     elsif params[:checkbox][:lauw] == 'Add initial Lauw reputation values'
-      @@additional_info = 'add initial lauw reputation values'
+      add_lauw_reputation_values
     elsif params[:checkbox][:quiz] == 'Add quiz scores'
-      @@additional_info = 'add quiz scores'
-      quiz_str = json_generator(params[:assignment_id].to_i, params[:another_assignment_id].to_i, params[:round_num].to_i, 'quiz scores').to_json
-      quiz_str[0] = ''
-      quiz_str.prepend('"quiz_scores":{')
-      quiz_str += ','
-      quiz_str = quiz_str.gsub('"N/A"', '20.0')
-      req.body.prepend(quiz_str)
+      add_quiz_scores(post_req.body)
     else
-      @@additional_info = ''
+      flash[:additional_info] = ''
     end
+  end
 
-    # Eg.
-    # "{"initial_hamer_reputation": {"stu1": 0.90, "stu2":0.88, "stu3":0.93, "stu4":0.8, "stu5":0.93, "stu8":0.93},  #optional
-    # "initial_lauw_leniency": {"stu1": 1.90, "stu2":0.98, "stu3":1.12, "stu4":0.94, "stu5":1.24, "stu8":1.18},  #optional
-    # "expert_grades": {"submission1": 90, "submission2":88, "submission3":93},  #optional
-    # "quiz_scores" : {"submission1" : {"stu1":100, "stu3":80}, "submission2":{"stu2":40, "stu1":60}}, #optional
-    # "submission1": {"stu1":91, "stu3":99},"submission2": {"stu5":92, "stu8":90},"submission3": {"stu2":91, "stu4":88}}"
-    req.body.prepend('{')
-    @@request_body = req.body
-    # Encryption
-    # AES symmetric algorithm encrypts raw data
-    aes_encrypted_request_data = aes_encrypt(req.body)
-    req.body = aes_encrypted_request_data[0]
-    # RSA asymmetric algorithm encrypts keys of AES
-    encrypted_key = rsa_public_key1(aes_encrypted_request_data[1])
-    encrypted_vi = rsa_public_key1(aes_encrypted_request_data[2])
-    # fixed length 350
-    req.body.prepend('", "data":"')
-    req.body.prepend(encrypted_vi)
-    req.body.prepend(encrypted_key)
-    # request body should be in JSON format.
-    req.body.prepend('{"keys":"')
-    req.body << '"}'
-    req.body.gsub!(/\n/, '\\n')
-    response = Net::HTTP.new('peerlogic.csc.ncsu.edu').start { |http| http.request(req) }
-    # RSA asymmetric algorithm decrypts keys of AES
-    # Decryption
-    response.body = JSON.parse(response.body)
-    key = rsa_private_key2(response.body['keys'][0, 350])
-    vi = rsa_private_key2(response.body['keys'][350, 350])
-    # AES symmetric algorithm decrypts data
-    aes_encrypted_response_data = response.body['data']
-    response.body = aes_decrypt(aes_encrypted_response_data, key, vi)
-    # {response.body}"
-    @@response = response
-    @@response_body = response.body
+  # Method: prepare_request_body
+  # This method is responsible for preparing the request body in a proper format
+  # to send to the server. It populates the assignment scores and peer review
+  # scores. It also populates the flash messages to send to the next request
+  # It finally sends the prepared request body back to the send_post_request
+  # method.
+  # Params
+  #
+  # Returns
+  #   nil
+  def prepare_request_body
+    reputation_web_service_path = URI.parse(WEBSERVICE_CONFIG['reputation_web_service_url']).path
+    post_req = Net::HTTP::Post.new(reputation_web_service_path, { 'Content-Type' => 'application/json', 'charset' => 'utf-8' })
+    curr_assignment_id = (params[:assignment_id].empty? ? '754' : params[:assignment_id])
+    assignment_id_list_peers = get_assignment_id_list(curr_assignment_id, params[:another_assignment_id].to_i)
 
-    JSON.parse(response.body.to_s).each do |alg, list|
-      next unless alg == 'Hamer' || alg == 'Lauw'
+    post_req.body = generate_json_for_peer_reviews(assignment_id_list_peers, params[:round_num].to_i).to_json
 
-      list.each do |id, rep|
-        Participant.find_by(user_id: id).update(alg.to_sym => rep) unless /leniency/ =~ id.to_s
-      end
+    post_req.body[0] = '' # remove the first '{'
+    add_additional_info_details post_req
+    post_req.body.prepend('{')
+    add_flash_messages post_req
+    post_req
+  end
+
+  # Method: send_post_request
+  # This method calls the prepare_request_body function to get a prepared
+  # request body in proper format to send to the server.
+  # It populates the assignment scores and peer review
+  # scores. It also populates the flash messages to send to the next request
+  # We redirect to the client url to display the results.
+  # Params
+  #
+  # Returns
+  #   nil
+  def send_post_request
+    post_req = prepare_request_body
+    reputation_web_service_hostname = URI.parse(WEBSERVICE_CONFIG['reputation_web_service_url']).host
+    reputation_response = Net::HTTP.new(reputation_web_service_hostname).start { |http| http.request(post_req) }
+    if %w[400 500].include?(reputation_response.code)
+      flash[:error] = 'Post Request Failed'
+    else
+      process_response_body(reputation_response)
     end
-
     redirect_to action: 'client'
-  end
-
-  def rsa_public_key1(data)
-    public_key_file = 'public1.pem'
-    public_key = OpenSSL::PKey::RSA.new(File.read(public_key_file))
-    encrypted_string = Base64.encode64(public_key.public_encrypt(data))
-
-    encrypted_string
-  end
-
-  def rsa_private_key2(ciphertext)
-    private_key_file = 'private2.pem'
-    password = "ZXhwZXJ0aXph\n"
-    encrypted_string = ciphertext
-    private_key = OpenSSL::PKey::RSA.new(File.read(private_key_file), Base64.decode64(password))
-    string = private_key.private_decrypt(Base64.decode64(encrypted_string))
-
-    string
-  end
-
-  def aes_encrypt(data)
-    cipher = OpenSSL::Cipher::AES.new(256, :CBC)
-    cipher.encrypt
-    key = cipher.random_key
-    iv = cipher.random_iv
-    ciphertext = Base64.encode64(cipher.update(data) + cipher.final)
-    [ciphertext, key, iv]
-  end
-
-  def aes_decrypt(ciphertext, key, iv)
-    decipher = OpenSSL::Cipher::AES.new(256, :CBC)
-    decipher.decrypt
-    decipher.key = key
-    decipher.iv = iv
-    plain = decipher.update(Base64.decode64(ciphertext)) + decipher.final
-    plain
   end
 end

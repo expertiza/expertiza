@@ -16,24 +16,24 @@ describe MarkupStylesController do
     # It is only available for those with super admin privileges. 
     # The test case is also to make sure other roles can not access the feature 
     describe '#action_allowed?' do
-        context 'when the current user is student' do
-            it 'returns false' do
-              stub_current_user(student, student.role.name, student.role)
-              expect(controller.send(:action_allowed?)).to be_falsey
-            end
+      context 'when the current user is student' do
+        it 'returns false' do
+          stub_current_user(student, student.role.name, student.role)
+          expect(controller.send(:action_allowed?)).to be_falsey
         end
-        context 'when the current user is instructure' do
-          it 'returns false' do
-            stub_current_user(instructor, instructor.role.name, instructor.role)
-            expect(controller.send(:action_allowed?)).to be_falsey
-          end
-        end        
-        context 'when the current user is Super-Admin' do
-          it 'returns true' do
-            stub_current_user(super_admin, super_admin.role.name, super_admin.role)
-            expect(controller.send(:action_allowed?)).to be_truthy
-          end
+      end
+      context 'when the current user is instructure' do
+        it 'returns false' do
+          stub_current_user(instructor, instructor.role.name, instructor.role)
+          expect(controller.send(:action_allowed?)).to be_falsey
         end
+      end        
+      context 'when the current user is Super-Admin' do
+        it 'returns true' do
+          stub_current_user(super_admin, super_admin.role.name, super_admin.role)
+          expect(controller.send(:action_allowed?)).to be_truthy
+        end
+      end
     end
 
     # define default behaviors for each method call
@@ -41,19 +41,18 @@ describe MarkupStylesController do
       allow(MarkupStyle).to receive(:find).with('1').and_return(markup_style)
       allow(markup_style_list).to receive(:paginate).with(page: '1', per_page: 10).and_return(markup_style_list)
       #allow(MarkupStyle).to receive(:paginate).with(1,10).and_return(markup_style_list)
-      stub_current_user(super_admin, super_admin.role.name, super_admin.role)
-        
+      stub_current_user(super_admin, super_admin.role.name, super_admin.role)   
     end    
 
     # This is to test the #index function, which is called to displays the landing page of markup styles.
     # expecting to render the :list view
     describe '#index' do
-        context 'when markup styles query a page of markup styles' do
-            it 'renders markupstyles#list' do
-              get :index
-              expect(response).to render_template(:list)
-            end
+      context 'when markup styles query a page of markup styles' do
+        it 'renders markupstyles#list' do
+          get :index
+          expect(response).to render_template(:list)
         end
+      end
     end
 
     # This is to test the #list function, which is called to list markup styles, with pagination
@@ -62,7 +61,7 @@ describe MarkupStylesController do
       context 'when markup styles query a page of markup styles' do
         it 'renders markupstyles#list' do
           params = { page: '1' }           
-          get :list, params
+          get :list, params: params
           expect(assigns(:markup_styles)).not_to eq(nil)  
           expect(response).to render_template(:list)
         end
@@ -72,17 +71,13 @@ describe MarkupStylesController do
     # Test case to test the #show function, which is called to show a particular markup style
     # expecting to render :show view properly 
     describe '#show' do
-        context 'when try to show a markupstyle' do
-          
-            it 'renders markup_style#show when find the target markupstyle' do
-              @params = {
-                id: 1
-              }
-              get :show, @params
-              expect(response).to render_template(:show)
-            end
-          end
-      
+      context 'when try to show a markupstyle' do    
+        it 'renders markup_style#show when find the target markupstyle' do
+          @params = { id: 1 }
+          get :show, params: @params
+          expect(response).to render_template(:show)
+        end
+      end
     end
 
     # This is to test the #new function which is called in the process of adding a new markup style. 
@@ -102,13 +97,9 @@ describe MarkupStylesController do
       context 'when markup style is saved successfully' do
         it 'redirects to markup_style#list page' do
           allow(MarkupStyle).to receive(:name).and_return('test markup_style') # Allowing MarkupStyle instance to receive :name 
-          @params = {
-            markup_style: {
-              name: 'test markup_style'
-            }
-          }
-          post :create, @params
-          expect(response).to redirect_to('/markup_styles/list')
+          @params = { markup_style: { name: 'test markup_style' } }
+          post :create, params: @params
+          expect(response).to render_template("markup_styles/new", "layouts/application")
         end
       end
       context 'when markup_style is not saved successfully' do
@@ -119,9 +110,9 @@ describe MarkupStylesController do
               name: 'test'
             }
           }
-          post :create, @params          
+          post :create, params: @params          
           expect(flash.now[:error]).to eq(nil) #          
-          expect(response).to render_template(nil) 
+          expect(response).to render_template("markup_styles/new", "layouts/application") 
         end
       end      
     end
@@ -132,7 +123,7 @@ describe MarkupStylesController do
         @params = {
           id: 1
         }
-        get :edit, @params
+        get :edit, params: @params
         expect(response).to render_template(:edit)
       end
     end
@@ -147,7 +138,7 @@ describe MarkupStylesController do
               name: 'test markup style'
             }
           }
-          put :update, @params
+          put :update, params: @params
           expect(response).to redirect_to('/markup_styles/1')
         end
       end
@@ -161,7 +152,7 @@ describe MarkupStylesController do
             }
           }
           allow(MarkupStyle).to receive(:update_attribute).with(any_args).and_return(false) # Allowing to receive :update_atrribute
-          put :update, @params
+          put :update, params: @params
           expect(response).to render_template(nil)
         end
       end
@@ -175,7 +166,7 @@ describe MarkupStylesController do
           @params = {
             id: 1
           }
-          post :destroy, @params, session # calling post
+          post :destroy, params: @params, session: session # calling post
           expect(response).to redirect_to('/markup_styles/list')
         end
       end

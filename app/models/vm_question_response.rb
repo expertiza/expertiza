@@ -174,8 +174,8 @@ class VmQuestionResponse
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
         @list_of_rows.each do |row|
-          row.metric_hash["comments #10"] = 0 if row.metric_hash["comments #10"].nil?
-          row.metric_hash["comments #10"] = row.metric_hash["comments #10"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 10
+          row.metric_hash["comments#10"] = 0 if row.metric_hash["comments#10"].nil?
+          row.metric_hash["comments#10"] = row.metric_hash["comments#10"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 10
         end
       end
     end

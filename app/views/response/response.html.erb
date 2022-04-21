@@ -397,6 +397,13 @@
   <br>
   <div id="save_confirm"></div>
   <%= submit_tag "Save " + @title, :name => "save", :id => "save_review" %>
+  <!--#E2230 Adding UI for Metrics-->
+  <%= content_tag :div, class: "fetch_review_metric", data: {params: @review_metric_config} do %>
+  <% end %>
+  <%= content_tag :div, class: "fetch_review_metric_api_call_values", data: {params: @review_metric_api_call_values} do %>
+  <% end %>
+  <%= render partial: 'response/response_analysis', locals: {origin: 'review'}%>
+
   <!--#E1600 check title for selfreview to show submit button-->
   <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>
     <%= submit_tag "Submit " + @title, :name => "Submit", :id => "Submit" %>

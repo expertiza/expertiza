@@ -78,6 +78,9 @@ class ResponseController < ApplicationController
   # Prepare the parameters when student clicks "Edit"
   # response questions with answers and scores are rendered in the edit page based on the version number
   def edit
+    @review_metric_config = fetch_review_metric
+    @review_metric_api_call_values = fetch_review_metric_api_call_values
+
     assign_action_parameters
     @prev = Response.where(map_id: @map.id)
     @review_scores = @prev.to_a
@@ -143,6 +146,9 @@ class ResponseController < ApplicationController
   end
 
   def new
+    @review_metric_config = fetch_review_metric
+    @review_metric_api_call_values = fetch_review_metric_api_call_values
+
     assign_action_parameters
     set_content(true)
     @stage = @assignment.current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
@@ -156,6 +162,26 @@ class ResponseController < ApplicationController
     store_total_cake_score
     init_answers(questions)
     render action: 'response'
+  end
+
+  # fetches the review metric configuration from config file review_metrics.yml file
+  def fetch_review_metric
+    @temp = REVIEW_METRIC_CONFIG['metrics']
+    @review_options = []
+    for i in 0..@temp.length-1
+      @review_options.push(@temp[i]) unless REVIEW_METRIC_CONFIG[@temp[i]] == false
+    end
+    @review_options
+  end
+
+  # fetches the review metric api urls from config file review_metrics_api_urls.yml file
+  def fetch_review_metric_api_call_values
+    metrics = REVIEW_METRIC_API_URLS_CONFIG['metrics']
+    api_call_values = {}
+    for metric in metrics
+      api_call_values[metric] = REVIEW_METRIC_API_URLS_CONFIG[metric]
+    end
+    api_call_values
   end
 
   def new_feedback

@@ -1,0 +1,15 @@
+development:
+  metrics: ["sentiment","problem","suggestion"]
+  sentiment:  true
+  problem:  true
+  suggestion: true
+production:
+  metrics: ["sentiment","problem","suggestion"]
+  sentiment:  true
+  problem:  true
+  suggestion: true
+test:
+  metrics: ["sentiment","problem","suggestion"]
+  sentiment:  true
+  problem:  true
+  suggestion: true

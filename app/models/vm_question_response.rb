@@ -161,31 +161,33 @@ class VmQuestionResponse
     end
   end
 
+  # This method calls all the methods that are responsible for calculating different metrics. 
+  # If any new metric is introduced, please call the method that calculates the metric values from this method.
   def calculate_metrics
     number_of_comments_greater_than_10_words
     number_of_comments_greater_than_20_words
   end
 
+  # This method is responsible for checking whether a review comment contians more than 10 words.
   def number_of_comments_greater_than_10_words
     @list_of_reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
         @list_of_rows.each do |row|
-          row.metric_hash["countofcomments"] = 0 if row.metric_hash["countofcomments"] == nil
-          row.metric_hash["countofcomments"] = row.metric_hash["countofcomments"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 10
+          row.metric_hash["comments#10"] = 0 if row.metric_hash["comments#10"].nil?
+          row.metric_hash["comments#10"] = row.metric_hash["comments#10"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 10
         end
       end
     end
   end
 
-  # Incase if new metirc is added
-
+  # In case if new metirc is added. This is a dummy metric added for manual testing and will be removed.
   def number_of_comments_greater_than_20_words
     @list_of_reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
         @list_of_rows.each do |row|
-          row.metric_hash["countofcomments20"] = 0 if row.metric_hash["countofcomments20"] == nil
+          row.metric_hash["countofcomments20"] = 0 if row.metric_hash["countofcomments20"].nil?
           row.metric_hash["countofcomments20"] = row.metric_hash["countofcomments20"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 1
         end
       end

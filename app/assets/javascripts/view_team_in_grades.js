@@ -8,19 +8,20 @@ $(function () {
     $(".scoresTable").tablesorter();
 });
 
-function onMetricToggle(checkedElement) {
-    if (checkedElement.checked == true) {
+// This function receives the clicked metric checkbox as parameter, then it receives the id of that checkbox and queries the table cells which class name corresponding to the id
+// Based on the state of the checkbox, it handles the display of the table cells
+function onMetricToggle(clicked_metric) {
+    if (clicked_metric.checked == true) {
         var hide = false
-    }
-    else {
+    } else {
         var hide = true
     }
-    var checkedElements = document.getElementsByClassName(checkedElement.id)
-    for (let i = 0; i < checkedElements.length; i++) {
+    var metric_cells = document.getElementsByClassName(clicked_metric.id)
+    for (let i = 0; i < metric_cells.length; i++) {
         if (hide == true)
-            checkedElements[i].style.display = "none";
+            metric_cells[i].style.display = "none";
         else {
-            checkedElements[i].style.display = "table-cell";
+            metric_cells[i].style.display = "table-cell";
         }
     }
 }

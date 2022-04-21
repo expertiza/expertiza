@@ -62,6 +62,13 @@
                 :model => 'SignUpSheet',
                 :id => params[:id],
                 :expected_fields => 'Topic identifier, User Name1, User Name2, ...' %>|
+    
+    <%= link_to 'Export Topics', 
+                :controller=>'export_file',
+                :action=>'start',
+                :model=> 'SignUpTopic',
+                :id => params[:id] %>|
+
     <input type="button" value="Delete selected topics" onclick="deleteTopics()" />|
     <input id='select_all' type="checkbox" onClick="selectAll(this)" />Select All |
 <% end %>

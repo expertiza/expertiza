@@ -160,4 +160,43 @@ class SignUpTopic < ActiveRecord::Base
       return 'failed'
     end
   end
+
+  # Export the fields
+  def self.export_fields(options)
+    puts("Entering the export_feilds method")
+    puts("The options parameter is:")
+    puts(options)
+    fields = []
+    fields.push('Topic Id')
+    fields.push('Topic Names')
+    fields.push('Description')
+    fields.push("Participants")
+    fields.push('Num of Slots')
+    fields.push('Available slots')
+    fields.push('Num on waitlist')
+    fields
+  end
+
+  def self.export(csv, _parent_id, options)
+    @assignment = Assignment.find(_parent_id.to_i)
+    @signuptopics = SignUpTopic.where(assignment_id: @assignment.id)
+    # @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
+    # @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
+
+    @signuptopics.each do |signuptopic|
+      tcsv = []
+      tcsv.push(signuptopic.id)
+      tcsv.push(signuptopic.topic_name)
+      tcsv.push(signuptopic.description)
+      @signedupteam = SignedUpTeam.where(topic_id: signuptopic.id)
+      puts(@signedupteam.team_id)
+      # @users = TeamsUser.where(team_id: @signedupteam.team_id).all
+      # ids = ""
+      # @users.each do |user|
+      #   ids += "Student" + user.id + " "
+      # end
+      # tcsv.push(ids)
+      csv << tcsv
+    end
+  end
 end

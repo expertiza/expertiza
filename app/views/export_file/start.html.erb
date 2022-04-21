@@ -59,8 +59,8 @@
     <br/><br/>
   <% end %>
 <% else %>
-  <!-- Hiding Export Details feature from the Course Participant view -->
-  <% if @model != 'CourseParticipant' %>
+  <!-- Hiding Export Details feature from the Course Participant view-->
+  <% if @model != 'CourseParticipant' and @model != 'SignUpTopic' %>
   <h2>Export Details</h2>
   <%= form_tag({:controller => 'export_file', :action => 'exportdetails'}, {:method => 'post', :multipart => true, :name => 'export_details_form'}) do %>
     <table>

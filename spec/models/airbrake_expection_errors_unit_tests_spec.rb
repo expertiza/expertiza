@@ -22,7 +22,7 @@ describe 'Airbrake-1781551925379466692' do
     expect { @return_value = @qs.number_of_comments_greater_than_10_words }.not_to raise_error(NoMethodError)
     expect(@return_value).to be_an_instance_of(Array)
     expect(@return_value[0]).to be_an_instance_of(RSpec::Mocks::InstanceVerifyingDouble)
-    expect(@qs.instance_variable_get(:@list_of_rows)[0].countofcomments).to eq(1)
+    expect(@qs.instance_variable_get(:@list_of_rows)[0].metric_hash["countofcomments"]).to eq(1)
   end
 
   it 'can deal with comment is not nil, with two comments greater than 10' do
@@ -32,7 +32,7 @@ describe 'Airbrake-1781551925379466692' do
     expect { @return_value = @qs.number_of_comments_greater_than_10_words }.not_to raise_error(NoMethodError)
     expect(@return_value).to be_an_instance_of(Array)
     expect(@return_value[0]).to be_an_instance_of(RSpec::Mocks::InstanceVerifyingDouble)
-    expect(@qs.instance_variable_get(:@list_of_rows)[0].countofcomments).to eq(2)
+    expect(@qs.instance_variable_get(:@list_of_rows)[0].metric_hash["countofcomments"]).to eq(2)
   end
 
   it 'can deal with comment is nil' do
@@ -41,7 +41,7 @@ describe 'Airbrake-1781551925379466692' do
     expect { @return_value = @qs.number_of_comments_greater_than_10_words }.not_to raise_error(NoMethodError)
     expect(@return_value).to be_an_instance_of(Array)
     expect(@return_value[0]).to be_an_instance_of(RSpec::Mocks::InstanceVerifyingDouble)
-    expect(@qs.instance_variable_get(:@list_of_rows)[0].countofcomments).to eq(0)
+    expect(@qs.instance_variable_get(:@list_of_rows)[0].metric_hash["countofcomments"]).to eq(0)
   end
 end
 

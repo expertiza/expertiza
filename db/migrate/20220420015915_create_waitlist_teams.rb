@@ -1,7 +1,7 @@
 class CreateWaitlistTeams < ActiveRecord::Migration[5.1]
 
   def self.up
-    create_table 'waitlist_teams' do |t|
+    create_table 'waitlist_teams', id: false do |t|
       t.column 'team_id', :integer
       t.column 'topic_id', :integer
       t.timestamps
@@ -18,6 +18,8 @@ class CreateWaitlistTeams < ActiveRecord::Migration[5.1]
     execute "alter table waitlist_teams
                add constraint fk_waitlist_teams_sign_up_topics
                foreign key (topic_id) references sign_up_topics(id)"
+
+    execute "ALTER TABLE waitlist_teams ADD PRIMARY KEY (team_id, topic_id);"
   end
 
   def self.down

@@ -188,14 +188,14 @@ class SignUpTopic < ActiveRecord::Base
       tcsv.push(signuptopic.id)
       tcsv.push(signuptopic.topic_name)
       tcsv.push(signuptopic.description)
-      @signedupteam = SignedUpTeam.where(topic_id: signuptopic.id)
+      @signedupteam = SignedUpTeam.where(topic_id: signuptopic.id).first
       puts(@signedupteam.team_id)
-      # @users = TeamsUser.where(team_id: @signedupteam.team_id).all
-      # ids = ""
-      # @users.each do |user|
-      #   ids += "Student" + user.id + " "
-      # end
-      # tcsv.push(ids)
+      @users = TeamsUser.where(team_id: @signedupteam.team_id).all
+      ids = ""
+      @users.each do |user|
+        ids += "Student" + user.id.to_s + " "
+      end
+      tcsv.push(ids)
       csv << tcsv
     end
   end

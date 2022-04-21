@@ -516,9 +516,8 @@ class Assignment < ActiveRecord::Base
         names_of_participants += p.fullname
         names_of_participants += '; ' unless p == team[:team].participants.last
       end
-      # tcsv = []
       teams_csv << names_of_participants
-      first_participant = team[:team].participants[0] unless team[:team].participants[0].nil?
+      first_participant = team[:team].participants.first unless team[:team].participants.first.nil?
       pscore = @scores[:participants][first_participant.id.to_s.to_sym]
       export_data_fields(options, team, teams_csv, pscore)
       csv << teams_csv
@@ -538,7 +537,9 @@ class Assignment < ActiveRecord::Base
                                  feedback: 'author_feedback_score',
                                  teammate: 'teammate_review_score' }
     review_hype_mapping_hash.each do |review_type, score_name|
-      export_individual_data_fields(review_type, score_name, tcsv, pscore, options)
+      if options[score_name] == 'true'
+        export_individual_data_fields(review_type, score_name, tcsv, pscore, options)
+      end
     end
     tcsv.push(pscore[:total_score])
   end

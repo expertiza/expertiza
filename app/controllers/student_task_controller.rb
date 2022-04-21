@@ -99,7 +99,6 @@ class StudentTaskController < ApplicationController
 
   def email_reviewers
     @participant = AssignmentParticipant.find(params[:id])
-    puts @participant
   end
 
   def send_email

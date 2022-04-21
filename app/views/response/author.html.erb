@@ -10,6 +10,6 @@
    <%= label_tag "Email Content: " %> <br>
   <%= form.text_area :email_body %> <br>
   </p>
-
+ <input name="response" type="hidden" value="<%= params[:response] %>" />
   <%= form.submit "Send Email" %>
 <% end  %>

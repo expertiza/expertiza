@@ -7,7 +7,7 @@ class Mailer < ActionMailer::Base
 
 
   def author_mail(subject,body, email)
-    @email = "expertiza.debugging@gmail.com";
+    (Rails.env.development? || Rails.env.test?)?   @email = "expertiza.debugging@gmail.com" : @email = email
     mail(to: @email,
          body: body,
          content_type: "text/html",

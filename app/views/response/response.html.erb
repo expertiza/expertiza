@@ -302,12 +302,15 @@
     <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id%>
 
     <% participant = Participant.find(team_member) %>
-    <%= participant.user.email%>
-    <%= link_to "Email the author", author_response_index_path(:email => participant.user.email) %>
+    <div style="float:right">
+      <%= link_to "Email the author", author_response_index_path(:email => participant.user.email) %>
+    </div>
     <% topic_id = SignedUpTeam.topic_id(@map.assignment.id, team_member) %>
   <% else %>
     <% participant = Participant.find(TeamsUser.find_by_team_id(@map.contributor).user_id) %>
-    <%= link_to "Email the author", author_response_index_path(:email => participant.user.email) %>
+    <div style="float:right">
+      <%= link_to "Email the author", author_response_index_path(:email => participant.user.email) %>
+    </div>
     <% topic_id = SignedUpTeam.where(participant.parent_id, participant.user_id) %>
   <% end %>
 

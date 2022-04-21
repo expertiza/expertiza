@@ -147,9 +147,23 @@ class ResponseController < ApplicationController
   end
 
   def send_email
-    @subject = params["send_email"]["subject"]
-    @body = params["send_email"]["email_body"]
-    MailerHelper.send_mail_to_author(@subject, @body, $email)
+    subject = params["send_email"]["subject"]
+    body = params["send_email"]["email_body"]
+    response = params["send_email"]["response"]
+
+    respond_to do |format|
+      if subject.blank? or body.blank?
+        flash[:notice] = 'Please fill in the subject and the Email Content.'
+        format.html { redirect_to controller: 'response', action: 'author', id: response }
+        format.json { head :no_content }
+      else
+        # make a call to method invoking the email process
+        MailerHelper.send_mail_to_author(subject, body, $email)
+        flash[:notice] = 'Email will be sent to the Author.'
+        format.html { redirect_to controller: 'student_task', action: 'list'}
+        format.json { head :no_content }
+      end
+    end
 
   end
 

@@ -64,46 +64,47 @@
 <div id='timeTaken'></div>
 </body>
 <script  src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script>
 
-    //This function makes POST API call to the given url with final_json data
-    function makeRequest(final_json,url)
-    {
-        return new Promise(function (resolve, reject)
-        {
-            let xhr = new XMLHttpRequest();
-            xhr.open('POST', url);
-            xhr.setRequestHeader('content-type', 'application/json');
-            xhr.onload = function ()
-            {
-                if (this.status >= 200 && this.status < 300)
-                {
-                    resolve(xhr.response);
-                }
-                else
-                {
-                    let reason = {
-                        status: this.status,
-                        statusText: xhr.statusText
-                    };
-                    reject(
-                        new Error(JSON.stringify(reason))
-                    );
-                }
-            };
-            xhr.onerror = function ()
-            {
-                let reason = {
-                    status: this.status,
-                    statusText: xhr.statusText
-                };
-                reject(
-                    new Error(JSON.stringify(reason))
-                );
-            };
-            xhr.send(final_json);
-        });
-    }
+<script src="./review_metrics/metric.js"></script>
+<script>
+    // //This function makes POST API call to the given url with final_json data
+    // function makeRequest(final_json,url)
+    // {
+    //     return new Promise(function (resolve, reject)
+    //     {
+    //         let xhr = new XMLHttpRequest();
+    //         xhr.open('POST', url);
+    //         xhr.setRequestHeader('content-type', 'application/json');
+    //         xhr.onload = function ()
+    //         {
+    //             if (this.status >= 200 && this.status < 300)
+    //             {
+    //                 resolve(xhr.response);
+    //             }
+    //             else
+    //             {
+    //                 let reason = {
+    //                     status: this.status,
+    //                     statusText: xhr.statusText
+    //                 };
+    //                 reject(
+    //                     new Error(JSON.stringify(reason))
+    //                 );
+    //             }
+    //         };
+    //         xhr.onerror = function ()
+    //         {
+    //             let reason = {
+    //                 status: this.status,
+    //                 statusText: xhr.statusText
+    //             };
+    //             reject(
+    //                 new Error(JSON.stringify(reason))
+    //             );
+    //         };
+    //         xhr.send(final_json);
+    //     });
+    // }
 
     //fetches the review form comments one by one - formats them into a single stringified json
     function fetch_response_comments()
@@ -164,99 +165,105 @@
         //converts the reviews list into a json object, which is later converted into stringified json.
         var processed_comment_json = {};
         processed_comment_json["reviews"] = reviews;
-        processed_comment_json_string = JSON.stringify(processed_comment_json);
-        return [processed_comment_json_string, number_of_comments]
+        // processed_comment_json_string = JSON.stringify(processed_comment_json);
+        return [processed_comment_json, number_of_comments]
     }
 
-    //combines output from all API calls into a single list object after processing the api output data
-    function combine_api_output(number_of_comments, config_file_values, analysisResponseDict ={})
-    {
-        var pos; var neg; var neu;
-        combined_api_output = [];
-
-        //processes api output comment by comment
-        for(var i =0; i< number_of_comments; i++)
-        {
-            var single_comment_api_output = {};
-            single_comment_api_output["Comment Number"] = i+1;
-
-            //the for loop below does the following : for each comment(row in table) goes through each analysis's response
-            // and add the value into the corresponding column in the given row.
-            for (analysis in analysisResponseDict){
-
-                if(config_file_values.includes(analysis)){
-                    //If there are any analysis that have special processing steps to them then they are added as a if statement below
-                    analysisColumnName = String(analysis).charAt(0).toUpperCase() + String(analysis).slice(1)
-                    //This convert the sentiment api output from sentiment values to positive, negative, neutral string
-                    if(analysis == 'sentiment')
-                    {
-                        response_sentiment = analysisResponseDict['sentiment']
-                        pos = response_sentiment['sentiments'][i]['pos'];
-                        neg = response_sentiment['sentiments'][i]['neg'];
-                        neu = response_sentiment['sentiments'][i]['neu'];
-
-                        if ( pos > neg && pos > neu )
-                            single_comment_api_output[analysisColumnName] = 'Positive';
-                        if ( neu > pos && neu > neg )
-                            single_comment_api_output[analysisColumnName] = 'Neutral';
-                        if ( neg > neu && neg > pos )
-                            single_comment_api_output[analysisColumnName] = 'Negative';
-                        //This is the default processing step
-                    }else {
-                        single_comment_api_output[analysisColumnName] = analysisResponseDict[analysis]['reviews'][i][String(analysis) + 's']
-                    }
-                }
-
-            }
-            combined_api_output.push(single_comment_api_output);
-        }
-        return combined_api_output
-    }
+    // //combines output from all API calls into a single list object after processing the api output data
+    // function combine_api_output(number_of_comments, config_file_values, analysisResponseDict ={})
+    // {
+    //     var pos; var neg; var neu;
+    //     combined_api_output = [];
+    //
+    //     //processes api output comment by comment
+    //     for(var i =0; i< number_of_comments; i++)
+    //     {
+    //         var single_comment_api_output = {};
+    //         single_comment_api_output["Comment Number"] = i+1;
+    //
+    //         //the for loop below does the following : for each comment(row in table) goes through each analysis's response
+    //         // and add the value into the corresponding column in the given row.
+    //         for (analysis in analysisResponseDict){
+    //
+    //             if(config_file_values.includes(analysis)){
+    //                 //If there are any analysis that have special processing steps to them then they are added as a if statement below
+    //                 analysisColumnName = String(analysis).charAt(0).toUpperCase() + String(analysis).slice(1)
+    //                 //This convert the sentiment api output from sentiment values to positive, negative, neutral string
+    //                 if(analysis == 'sentiment')
+    //                 {
+    //                     response_sentiment = analysisResponseDict['sentiment']
+    //                     pos = response_sentiment['sentiments'][i]['pos'];
+    //                     neg = response_sentiment['sentiments'][i]['neg'];
+    //                     neu = response_sentiment['sentiments'][i]['neu'];
+    //
+    //                     if ( pos > neg && pos > neu )
+    //                         single_comment_api_output[analysisColumnName] = 'Positive';
+    //                     if ( neu > pos && neu > neg )
+    //                         single_comment_api_output[analysisColumnName] = 'Neutral';
+    //                     if ( neg > neu && neg > pos )
+    //                         single_comment_api_output[analysisColumnName] = 'Negative';
+    //                     //This is the default processing step
+    //                 }else {
+    //                     single_comment_api_output[analysisColumnName] = analysisResponseDict[analysis]['reviews'][i][String(analysis) + 's']
+    //                 }
+    //             }
+    //
+    //         }
+    //         combined_api_output.push(single_comment_api_output);
+    //     }
+    //     return combined_api_output
+    // }
 
     //This function takes in the processed api output to display a table(populated with API output) on UI
-    function generateTable(combined_api_output, config_file_api_call_values, processed_comment_json_string)
+    function generateTable(analysisResponseDict, metrics)
     {
         //tooltip_json to store the text displayed in tooltip
-        var tooltip_json = {"Comment Number":'The comment number from the top in the form.'}
-        processed_comment_json_string = JSON.parse(processed_comment_json_string)['reviews'];
-        //This goes through each analysis and adds their tool tip and tool tip text to tooltip_json
-        for (analysis in config_file_api_call_values){
-            analysisColumnName = String(analysis).charAt(0).toUpperCase() + String(analysis).slice(1)
-            tooltip_json[analysisColumnName] = config_file_api_call_values[analysis]["toolTipText"]
-        }
+        let tooltip_json = {"Comment Number":'The comment number from the top in the form.'}
+        let columns = ["Comment Number"];
 
-        var col = [];
-        for (var i = 0; i < combined_api_output.length; i++) {
-            for (var key in combined_api_output[i]) {
-                if (col.indexOf(key) === -1) {
-                    col.push(key);
-                }
-            }
+        //This goes through each analysis and adds their tool tip and tool tip text to tooltip_json
+        for (let metric in metrics){
+            tooltip_json[metric.displayName] = metric.toolTipText;
+            columns.push(metric.displayName);
         }
 
         // Create a table header row using the extracted headers above.
-        var table = document.createElement("table");
-        var tr = table.insertRow(-1);                   // table row.
+        let table = document.createElement("table");
+        let tr = table.insertRow(-1);                   // table row.
 
-        for (var i = 0; i < col.length; i++) {
+        for (let i = 0; i < columns.length; i++) {
             var th = document.createElement("th");      // table header.
-            th.innerHTML = col[i] + `<img src="/assets/info.png" title='`+tooltip_json[col[i]]+`'>`;
+            th.innerHTML = columns[i] + `<img src="/assets/info.png" title='`+tooltip_json[columns[i]]+`'>`;
             th.classList.add("parentCell_metric_table");
             tr.appendChild(th);
         }
 
         // add json data to the table as rows.
-        for (var i = 0; i < combined_api_output.length; i++) {
+        // for (var i = 0; i < combined_api_output.length; i++) {
+        //
+        //     tr = table.insertRow(-1);
+        //
+        //     for (var j = 0; j < col.length; j++) {
+        //         var tabCell = tr.insertCell(-1);
+        //         tabCell.innerHTML = combined_api_output[i][col[j]]
+        //         if(j==0) {
+        //             let title = 'Q) '+ processed_comment_json_string[i]['question'] + '   A) ' + processed_comment_json_string[i]['text'];
+        //             tabCell.innerHTML += `<img src="/assets/info.png" title='`+title+`'>`;
+        //         }
+        //     }
+        // }
 
+        for (let review in analysisResponseDict) {
             tr = table.insertRow(-1);
 
-            for (var j = 0; j < col.length; j++) {
+            let index = 0;
+            for (let value in review) {
                 var tabCell = tr.insertCell(-1);
-                tabCell.innerHTML = combined_api_output[i][col[j]]
-                if(j==0) {
-                    let title = 'Q) '+ processed_comment_json_string[i]['question'] + '   A) ' + processed_comment_json_string[i]['text'];
-                    tabCell.innerHTML += `<img src="/assets/info.png" title='`+title+`'>`;
+                tabCell.innerHTML = value;
+                if(index == 0) {
+                    // TODO: Question Number? Special ToolTip?
                 }
+                index++;
             }
         }
         // Now, add the newly created table with json data, to a container.
@@ -284,34 +291,48 @@
 
         //start the timer here - which will be used to calculate total time taken.
         var time_start = performance.now();
-        var processed_comment_json_string = fetch_response_comments();
-        var number_of_comments = processed_comment_json_string[1];
-        processed_comment_json_string = processed_comment_json_string[0];
+        let responseComments = fetch_response_comments();
+        let processed_comment_json = responseComments[0];
+        let number_of_comments = responseComments[1];
 
         //This holds the response value of each analysis as a dictionar/hash(key = analysis name, value = response of analysis)
         var analysisResponseDict = {}
 
         //This loops through each analysis(key) in analysisVals hash/dictionary and gets its respective apiurl(value) and puts the response of the
         //api url into responseDict
-        for (var analysisVal in config_file_api_call_values){
-            if(config_file_values.includes(analysisVal))
-            {
-                apiCall = config_file_api_call_values[analysisVal]['apiCall'];
-                try {
-                    let response = await makeRequest(processed_comment_json_string, apiCall);
-                    analysisResponseDict[analysisVal] = JSON.parse(response);
-                } catch(error) {
-                    time_taken_obj.innerHTML = "Request failed. Please try again.";
-                    throw error;
-                }
 
+        let metricsToCheck = [new SentimentMetric(), new SuggestionMetric(), new ProblemMetric()];
+
+        let questionNumber = 1;
+        for (let review in processed_comment_json['reviews']) {
+            analysisResponseDict[review]['number'] = questionNumber;
+            questionNumber++;
+            for (let metric in metricsToCheck) {
+                // analysisResponseDict[review]['question'] = review['question'];
+                // analysisResponseDict[review]['text'] = review['text'];
+                analysisResponseDict[review][metric.displayName] = await metric.callAPI(review['text']);
             }
-
         }
 
+        // for (var analysisVal in config_file_api_call_values){
+        //     if(config_file_values.includes(analysisVal))
+        //     {
+        //         apiCall = config_file_api_call_values[analysisVal]['apiCall'];
+        //         try {
+        //             let response = await processed_comment_json_string, apiCall
+        //             analysisResponseDict[analysisVal] = JSON.parse(response);
+        //         } catch(error) {
+        //             time_taken_obj.innerHTML = "Request failed. Please try again.";
+        //             throw error;
+        //         }
+        //
+        //     }
+        //
+        // }
+
         //This line places the response of the analysis into a better format for generating a table.
-        let combined_api_output = combine_api_output(number_of_comments, config_file_values, analysisResponseDict);
-        generateTable(combined_api_output, config_file_api_call_values, processed_comment_json_string);
+        //let combined_api_output = combine_api_output(number_of_comments, config_file_values, analysisResponseDict);
+        generateTable(analysisResponseDict, metricsToCheck);
 
         time_end = performance.now();
         var time_taken = time_end - time_start;

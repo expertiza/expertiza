@@ -49,7 +49,7 @@ function toggleFunction(elementId) {
 }
       
 </script>
-<h1>Review Report for sravanth assignment: <%= @assignment.name %></h1>
+<h1>Review Report for assignment: <%= @assignment.name %></h1>
 <h4>Team: <%= @team.name(session[:ip]) %></h4>
 <button class="btn btn-default" onclick="toggleFunction('<%= @type + @participant.id.to_s%>')">Show Submission</button>
 <div id="<%= @type + @participant.id.to_s%>" style="display:none;">

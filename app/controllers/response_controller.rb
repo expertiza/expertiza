@@ -177,11 +177,10 @@ class ResponseController < ApplicationController
         # make a call to method invoking the email process
         MailerHelper.send_mail_to_author(subject, body, $email)
         flash[:notice] = 'Email will be sent to the Author.'
-        format.html { redirect_to controller: 'student_task', action: 'list'}
+        format.html { redirect_to controller: 'student_task', action: 'list' }
         format.json { head :no_content }
       end
     end
-
   end
 
   def new_feedback

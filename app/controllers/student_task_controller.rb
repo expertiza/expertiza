@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class StudentTaskController < ApplicationController
   include AuthorizationHelper
 
@@ -24,7 +26,9 @@ class StudentTaskController < ApplicationController
   end
 
   def list
-    redirect_to(controller: 'eula', action: 'display') if current_user.is_new_user
+    if current_user.is_new_user
+      redirect_to(controller: 'eula', action: 'display')
+    end
     session[:user] = User.find_by(id: current_user.id)
     @student_tasks = StudentTask.from_user current_user
     if session[:impersonate] && !impersonating_as_admin?
@@ -81,7 +85,9 @@ class StudentTaskController < ApplicationController
 
     @review_phase = next_due_date.deadline_type_id
     if (next_due_date.review_of_review_allowed_id == DeadlineRight::LATE) || (next_due_date.review_of_review_allowed_id == DeadlineRight::OK)
-      @can_view_metareview = true if @review_phase == DeadlineType.find_by(name: 'metareview').id
+      if @review_phase == DeadlineType.find_by(name: 'metareview').id
+        @can_view_metareview = true
+      end
     end
 
     @review_mappings = ResponseMap.where(reviewer_id: @participant.id)
@@ -97,19 +103,16 @@ class StudentTaskController < ApplicationController
     end
   end
 
-  def email_reviewers
-    @participant = AssignmentParticipant.find(params[:id])
-  end
+  def email_reviewers; end
 
   def send_email
-
-    @participant = AssignmentParticipant.find(params[:id])
-    subject = params["send_email"]["subject"]
-    body = params["send_email"]["email_body"]
-    participant_id = params["participant_id"]
+    subject = params['send_email']['subject']
+    body = params['send_email']['email_body']
+    participant_id = params['participant_id']
+    @participant = AssignmentParticipant.find_by(participant_id)
 
     respond_to do |format|
-      if subject.blank? or body.blank?
+      if subject.blank? || body.blank?
 
         flash[:notice] = 'Please fill in the subject and the Email Content.'
         format.html { redirect_to controller: 'student_task', action: 'email_reviewers', id: @participant }
@@ -117,7 +120,7 @@ class StudentTaskController < ApplicationController
       else
         # make a call to method invoking the email process
         flash[:notice] = 'Email will be sent to the Reviewers.'
-        format.html { redirect_to controller: 'student_task', action: 'view', id: @participant}
+        format.html { redirect_to controller: 'student_task', action: 'list' }
         format.json { head :no_content }
       end
     end

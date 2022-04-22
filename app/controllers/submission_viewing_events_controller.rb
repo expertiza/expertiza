@@ -7,32 +7,33 @@ class SubmissionViewingEventsController < ApplicationController
   def record_start_time
     param_args = params[:submission_viewing_event]
     # check if this link is already opened and timed
-    submission_viewing_event_records = SubmissionViewingEvent.where(map_id: param_args[:map_id], round: param_args[:round], link: param_args[:link])
+    submission_viewing_event_record = SubmissionViewingEvent.where(map_id: param_args[:map_id], round: param_args[:round], link: param_args[:link])
     # if opened, end these records with current time
-    if submission_viewing_event_records
-      submission_viewing_event_records.each do |time_record|
-        if time_record.end_at.nil?
-          # time_record.update_attribute('end_at', start_at)
-          time_record.destroy
-        end
-      end
+    if submission_viewing_event_record
+      submission_viewing_event_record.update_attribute('start_at', params[:start_at])
+    else
+      submission_viewing_event = SubmissionViewingEvent.new(submission_viewing_event_params)
+      submission_viewing_event.save
     end
     # create new response time record for current link
-    submission_viewing_event = SubmissionViewingEvent.new(submission_viewing_event_params)
-    submission_viewing_event.save
     render nothing: true
   end
 
   # record time when link or file window is closed
   def record_end_time
     data = params.require(:submission_viewing_event)
-    submission_viewing_event_records = SubmissionViewingEvent.where(map_id: data[:map_id], round: data[:round], link: data[:link])
-    submission_viewing_event_records.each do |time_record|
-      if time_record.end_at.nil?
-        time_record.update_attribute('end_at', data[:end_at])
+    submission_viewing_event_record = SubmissionViewingEvent.where(map_id: data[:map_id], round: data[:round], link: data[:link])
+    if submission_viewing_event_record.end_at.nil?
+      submission_viewing_event_record.update_attribute('end_at', data[:end_at])
+      acc_time = (submission_viewing_event_record.start_at.to_i - submission_viewing_event_record.end_at.to_i)/60
+      if acc_time > 90 
         break
       end
+      submission_viewing_event_record.accumulated_time += acc_time
+    else
+      # No record found
     end
+
     respond_to do |format|
       format.json { head :no_content }
     end
@@ -46,7 +47,8 @@ class SubmissionViewingEventsController < ApplicationController
     submission_viewing_event_records.each do |submissionviewingevent_entry|
       if submissionviewingevent_entry.end_at.nil?
         @link_array.push(submissionviewingevent_entry.link)
-        submissionviewingevent_entry.update_attribute('end_at', data[:end_at])
+        # submissionviewingevent_entry.update_attribute('end_at', data[:end_at])
+        submission_viewing_event.record_end_time  
       end
     end
     respond_to do |format|

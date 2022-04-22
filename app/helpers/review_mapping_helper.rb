@@ -24,7 +24,7 @@ module ReviewMappingHelper
   #
   # gets the team name's color according to review and assignment submission status
   #
-  def get_team_color(response_map)
+  def team_color?(response_map)
     # Storing redundantly computed value in a variable
     assignment_created = @assignment.created_at
     # Storing redundantly computed value in a variable
@@ -36,20 +36,16 @@ module ReviewMappingHelper
       elsif response_for_each_round?(response_map)
         'blue'
       else
-        obtain_team_color(response_map, assignment_created, assignment_due_dates)
+        # E2239 moving the obtain_team_color method to team_color?
+        color = []
+        (1..@assignment.num_review_rounds).each do |round|
+          check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+        end
+        color[-1]
       end
     else
       'red'
     end
-  end
-
-  # loops through the number of assignment review rounds and obtains the team colour
-  def obtain_team_color(response_map, assignment_created, assignment_due_dates)
-    color = []
-    (1..@assignment.num_review_rounds).each do |round|
-      check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
-    end
-    color[-1]
   end
 
   # checks the submission state within each round and assigns team colour

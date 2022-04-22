@@ -38,11 +38,11 @@ module MailerHelper
     )
   end
 
-  def self.send_mail_to_assigned_reviewers(reviewer, participant, mapping,subject_suffix,partial_name,email_content)
+  def self.send_mail_to_assigned_reviewers(reviewer, participant, mapping)
     Mailer.sync_message(
       {
         :to => reviewer.email,
-        subject: "Assignment '#{participant.assignment.name}:'"+subject_suffix,
+        subject: "Assignment '#{participant.assignment.name}': A submission has been updated since you last reviewed it",
         cc: participant.assignment.instructor.email,
         :body => {
           :obj_name => participant.assignment.name,

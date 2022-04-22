@@ -163,6 +163,4 @@ class SignUpTopic < ApplicationRecord
       return 'failed'
     end
   end
-
-
 end

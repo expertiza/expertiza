@@ -110,7 +110,7 @@ class StudentTaskController < ApplicationController
     body = params['send_email']['email_body']
     participant_id = params['participant_id']
     assignment_id = params['assignment_id']
-    @participant = AssignmentParticipant.find_by(participant_id)
+    @participant = AssignmentParticipant.find_by(id: participant_id)
     @team = Team.find_by(parent_id: assignment_id)
 
     mappings = ResponseMap.where(reviewed_object_id: assignment_id,
@@ -120,7 +120,7 @@ class StudentTaskController < ApplicationController
     respond_to do |format|
       if subject.blank? || body.blank?
         flash[:notice] = 'Please fill in the subject and the Email Content.'
-        format.html { redirect_to controller: 'student_task', action: 'email_reviewers', id: @participant }
+        format.html { redirect_to controller: 'student_task', action: 'email_reviewers', id: @participant, assignment_id: assignment_id }
         format.json { head :no_content }
       else
         # make a call to method invoking the email process

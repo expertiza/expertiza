@@ -178,6 +178,27 @@ describe User do
         expect(user.get_user_list).to eq([user1, user2])
       end
     end
+
+    context 'when current user is super admin and searches by incorrect user name full name and email' do
+      it 'fetches an empty users list if user with given full name and email is not found' do
+        allow(user).to receive_message_chain("role.super_admin?") { true }
+        expect(user.get_user_list("", "xyzabc pqr", "example@gmail.com")).to eq([])
+      end
+    end
+
+    context 'when current user is super admin and searches by user name and full name' do
+      it 'fetches all users with given user name and full name' do
+        allow(user).to receive_message_chain("role.super_admin?") { true }
+        expect(user.get_user_list("abc", " bbc", "")).to eq([user1, user2])
+      end
+    end
+
+    context 'when current user is super admin and searches by incorrect user name and full name' do
+      it 'fetches an empty users list if user with given user name and full name is not found' do
+        allow(user).to receive_message_chain("role.super_admin?") { true }
+        expect(user.get_user_list("qwerty", " computer", "")).to eq([])
+      end
+    end
   end
 
   describe '#super_admin?' do

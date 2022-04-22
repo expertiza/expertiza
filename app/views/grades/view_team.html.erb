@@ -255,6 +255,13 @@
    @ta_id = @participant.user_id
 %>
 
+  
+  <% if @current_role_name.eql?'Student' and @assignment.show_teammate_reviews==true %>
+    <td>
+    <%=view_heatgrid(@participant.id, "TeammateReviewQuestionnaire") %>
+    </td>    
+  <% end %>
+  
   <h4 style="font-weight:bold;display:inline-block;"><%=t ".grade_and_comment"%></h4><br/>
   <% if ['Student', 'Teaching Assistant'].include? current_user.role.name %>
     <%=t ".grade"%>: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
@@ -268,10 +275,4 @@
       <%= text_area_tag 'comment_for_submission', @team.try(:comment_for_submission), size: '75x10', placeholder: t(".Comment"), class: "form-control width-500" %><br>
       <%= submit_tag t(".save") ,class: "btn btn-default" %>
     <% end %>
-  <% end %>
-
-  <% if @current_role_name.eql?'Student' and @assignment.show_teammate_reviews==true %>
-    <td>
-    <%=view_heatgrid(@participant.id, "TeammateReviewQuestionnaire") %>
-    </td>    
   <% end %>

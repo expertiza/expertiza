@@ -49,15 +49,17 @@ function toggleFunction(elementId) {
 }
       
 </script>
-<h1>Review Report for assignment: <%= @assignment.name %></h1>
-<h4>Team: <%= @team.name(session[:ip]) %></h4>
-<button class="btn btn-default" onclick="toggleFunction('<%= @type + @participant.id.to_s%>')">Show Submission</button>
-<div id="<%= @type + @participant.id.to_s%>" style="display:none;">
-<% if @participant.team.hyperlinks.try(:length) %>
-  <%= render :partial => 'submitted_content/hyperlink', :locals => {participant: @participant, stage: @stage} %>
-  <% else %>
- <b>No Submission</b>
-<% end %>
+<% if !(@current_role_name.eql?'Student') %>
+  <h1>Review Report for assignment: <%= @assignment.name %></h1>
+  <h4>Team: <%= @team.name(session[:ip]) %></h4>
+  <button class="btn btn-default" onclick="toggleFunction('<%= @type + @participant.id.to_s%>')">Show Submission</button>
+  <div id="<%= @type + @participant.id.to_s%>" style="display:none;">
+  <% if @participant.team.hyperlinks.try(:length) %>
+    <%= render :partial => 'submitted_content/hyperlink', :locals => {participant: @participant, stage: @stage} %>
+    <% else %>
+  <b>No Submission</b>
+  <% end %>
+<% end%>
 </div><br>
 
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
@@ -248,8 +250,9 @@ function toggleFunction(elementId) {
     <% end %>
 <% end %>
 
-
+<% if !(@current_role_name.eql?'Student') %>
 <h4 style="font-weight:bold;display:inline-block;">Grade and comment for submission</h4><br/>
 Grade: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
 Comment: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %>
 <!-- termination of the main outer loop. -->
+<% end %>

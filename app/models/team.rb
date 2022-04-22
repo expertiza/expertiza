@@ -79,9 +79,8 @@ class Team < ApplicationRecord
     TeamsUser.where(team_id: team_id).count
   end
 
-  #Create new teams for calibrated assignments with respect to the old team already present
-  #TODO - this method returns an array of old team IDs, which is useful for caller but kind of strange
-  #TODO   - maybe add a separate method for fetching team IDs from an assignment and remove that from this method
+  # Create new teams for calibrated assignments with respect to the old team already present
+  # This method returns the IDs of the teams associated with the old assignment
   def self.copy_and_create_new_team(old_assign, new_assign_id)
     @original_team_values = Team.where(parent_id: old_assign.id)
     old_team_ids = []

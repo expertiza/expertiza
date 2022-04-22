@@ -1,10 +1,10 @@
 class CreateWaitlistTeams < ActiveRecord::Migration[5.1]
 
   def self.up
-    create_table 'waitlist_teams', id: false do |t|
+    create_table 'waitlist_teams' do |t|
       t.column 'team_id', :integer
       t.column 'topic_id', :integer
-      t.timestamps
+      t.column 'created_at', :datetime
     end
 
     add_index 'waitlist_teams', ['team_id'], name: 'fk_waitlist_teams'
@@ -18,8 +18,9 @@ class CreateWaitlistTeams < ActiveRecord::Migration[5.1]
     execute "alter table waitlist_teams
                add constraint fk_waitlist_teams_sign_up_topics
                foreign key (topic_id) references sign_up_topics(id)"
+    
+    add_index 'waitlist_teams', ["team_id", "topic_id"], unique: true
 
-    execute "ALTER TABLE waitlist_teams ADD PRIMARY KEY (team_id, topic_id);"
   end
 
   def self.down

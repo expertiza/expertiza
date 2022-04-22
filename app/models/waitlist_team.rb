@@ -82,7 +82,6 @@ class WaitlistTeam < ApplicationRecord
     assignment_topics.each do |topic|
       list_of_topic_waitlist_counts.append({topic_id: topic.id, count: topic.waitlist_teams.size})
     end
-    p list_of_topic_waitlist_counts
     list_of_topic_waitlist_counts
   end
 

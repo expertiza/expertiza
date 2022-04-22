@@ -5,6 +5,7 @@ class Authority
     @current_user = args[:current_user]
   end
 
+  # Action allowed for specific users
   def allow?(controller, _action)
     return true if current_user && current_user.admin?
     case controller

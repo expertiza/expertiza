@@ -5,7 +5,7 @@ describe ReviewMappingHelper, type: :helper do
   let(:team) { build(:assignment_team, id: 1) }
   let(:test_item) { build(:answer, id: 1, comments: 'https://wiki.archlinux.org/') }
   let(:test_response) { build(:response, id: 1) }
-  describe 'get_team_color' do
+  describe 'team_color?' do
     before(:each) do
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
       @reviewer = create(:participant, review_grade: nil)
@@ -17,7 +17,7 @@ describe ReviewMappingHelper, type: :helper do
     it 'color should be red if response_map does not exist' do
       response_map_dne = create(:review_response_map)
 
-      color = get_team_color(response_map_dne)
+      color = team_color?(response_map_dne)
       expect(color).to eq('red')
     end
 
@@ -38,7 +38,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: response_map_with_reviewee)
 
-      color = get_team_color(response_map_with_reviewee)
+      color = team_color?(response_map_with_reviewee)
       expect(color).to eq('blue')
     end
 
@@ -53,7 +53,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: @response_map)
 
-      color = get_team_color(@response_map)
+      color = team_color?(@response_map)
       expect(color).not_to eq('blue')
     end
 
@@ -63,7 +63,7 @@ describe ReviewMappingHelper, type: :helper do
       response_map_with_grade_reviewer = create(:review_response_map, reviewer: reviewer_with_grade)
       create(:response, response_map: response_map_with_grade_reviewer)
 
-      color = get_team_color(response_map_with_grade_reviewer)
+      color = team_color?(response_map_with_grade_reviewer)
       expect(color).to eq('brown')
     end
 
@@ -78,7 +78,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: @response_map)
 
-      color = get_team_color(@response_map)
+      color = team_color?(@response_map)
       expect(color).to eq('green')
     end
 
@@ -100,7 +100,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: response_map_with_reviewee)
 
-      color = get_team_color(response_map_with_reviewee)
+      color = team_color?(response_map_with_reviewee)
       expect(color).to eq('green')
     end
 
@@ -123,7 +123,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: response_map_with_reviewee)
 
-      color = get_team_color(response_map_with_reviewee)
+      color = team_color?(response_map_with_reviewee)
       expect(color).to eq('purple')
     end
 
@@ -142,7 +142,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: response_map_with_reviewee)
 
-      color = get_team_color(response_map_with_reviewee)
+      color = team_color?(response_map_with_reviewee)
       expect(color).to eq('purple')
     end
   end

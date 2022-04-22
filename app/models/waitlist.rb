@@ -3,7 +3,7 @@ class Waitlist < ApplicationRecord
     waitlisted_topics = SignUpTopic.find_waitlisted_topics(assignment_id, team_id)
     unless waitlisted_topics.nil?
       waitlisted_topics.each do |waitlisted_topic|
-        entry = SignedUpTeam.find_by(topic_id: waitlisted_topic.id)
+        entry = SignedUpTeam.find_by(topic_id: waitlisted_topic.topic_id, team_id: team_id)
         next if entry.nil?
 
         entry.destroy

@@ -44,8 +44,8 @@ class WaitlistTeam < ApplicationRecord
     return WaitlistTeam.where(topic_id: topic_id).empty?
   end
 
-  def self.delete_all_waitlists_for_team(team_id)
-    waitlisted_topics_for_team = get_all_waitlists_for_team team_id
+  def self.delete_all_waitlists_for_team(team_id, assignment_id)
+    waitlisted_topics_for_team = get_all_waitlists_for_team team_id, assignment_id
     unless waitlisted_topics_for_team.nil?
       waitlisted_topics_for_team.each do |entry|
         entry.delete
@@ -68,8 +68,8 @@ class WaitlistTeam < ApplicationRecord
     return true
   end
 
-  def self.get_all_waitlists_for_team(team_id)
-    WaitlistTeam.where(team_id: team_id)
+  def self.get_all_waitlists_for_team(team_id, assignment_id)
+    WaitlistTeam.joins(:topic).where(team_id: team_id, sign_up_topics: {assignment_id: assignment_id})
   end
 
   def self.get_all_waitlists_for_topic(topic_id)

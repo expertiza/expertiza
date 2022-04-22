@@ -51,6 +51,7 @@ class SignUpSheet < ApplicationRecord
     if slotAvailable?(topic_id)
       # if slot exist, then confirm the topic for the user and delete all the waitlist for this user
       result = cancel_all_wailists(assignment_id, sign_up, team_id, topic_id)
+      WaitlistTeam.delete_all_waitlists_for_team team_id, assignment_id
     else
       sign_up.is_waitlisted = true
       result = true if sign_up.save

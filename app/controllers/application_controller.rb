@@ -131,10 +131,6 @@ class ApplicationController < ActionController::Base
     current_user
   end
 
-  def redirect_back(default = :root)
-    redirect_to request.env['HTTP_REFERER'] ? :back : default
-  end
-
   def set_time_zone
     Time.zone = current_user.timezonepref if current_user
   end
@@ -149,7 +145,7 @@ class ApplicationController < ActionController::Base
 
   def invalid_login_status(status)
     flash[:notice] = "You must be logged #{status} to access this page!"
-    redirect_back
+    redirect_back fallback_location: root_path
   end
 
   def available?(user, owner_id)

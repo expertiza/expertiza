@@ -1,4 +1,4 @@
-class CreateResetPassword < ActiveRecord::Migration
+class CreateResetPassword < ActiveRecord::Migration[4.2]
   def self.up
     create_table :password_resets do |t|
       t.string :user_email

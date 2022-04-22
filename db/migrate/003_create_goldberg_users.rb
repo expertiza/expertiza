@@ -1,4 +1,4 @@
-class CreateGoldbergUsers < ActiveRecord::Migration
+class CreateGoldbergUsers < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'goldberg_users', force: true do |t|
       t.column 'name', :string, default: '', null: false

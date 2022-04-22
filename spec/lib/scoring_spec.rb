@@ -65,6 +65,7 @@ describe Scoring do
       allow(ReviewResponseMap).to receive(:assessments_for).with(contributor).and_return([])
       allow(SignedUpTeam).to receive(:find_by).with(team_id: contributor.id).and_return(signed_up_team)
       allow(assignment_helper).to receive(:review_questionnaire_id).and_return(1)
+      allow_any_instance_of(Scoring).to receive(:peer_review_questions_for_team).and_return([question1])
     end
     context 'when current assignment varies rubrics by round' do
       it 'computes avg score and score range for each team in each round and return scores' do

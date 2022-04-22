@@ -50,11 +50,13 @@
                   <td><%= report_line.percentage.to_s %>%</td>
                   <td><%= report_line.no_tagged.to_s %></td>
                   <td><%= report_line.no_not_tagged.to_s %></td>
-                  <!-- E2082 Call chart plotting function from review_mapping_helper -->
+                  <!-- DEPRECATED - E2082 Call chart plotting function from review_mapping_helper -->
                   <td align='left'>
+                    <!-- E2239 Call chart plotting function from review_mapping_chart_helper -->
                     <%= display_tagging_interval_chart(report_line.tag_update_intervals) %>
                   </td>
                   <!-- <td><%= report_line.tag_update_intervals.to_s %></td> -->
+                  <!-- E2239 Call calculate_key_chart_information function from review_mapping_chart_helper -->
                   <% key_chart_information = calculate_key_chart_information(report_line.tag_update_intervals) %>
                   <td>
                     <!-- Populates statistics only if backend returned details -->

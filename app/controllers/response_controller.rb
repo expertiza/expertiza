@@ -413,7 +413,6 @@ class ResponseController < ApplicationController
       Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if answer.nil?
     end
   end
-<<<<<<< HEAD
 
   # Creates a table to store total contribution for Cake question across all reviewers
   def store_total_cake_score
@@ -428,6 +427,4 @@ class ResponseController < ApplicationController
     end
   end
 
-=======
->>>>>>> parent of cf2e8cfb5 (Revert "Merge branch 'beta' of https://github.com/abhi031098/expertiza into beta")
 end

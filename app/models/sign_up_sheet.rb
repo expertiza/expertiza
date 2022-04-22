@@ -79,6 +79,11 @@ class SignUpSheet < ApplicationRecord
       ExpertizaLogger.info LoggerMessage.new('SignUpSheet', user_id, "Sign up sheet created with teamId #{team_id}")
     else
       sign_up.is_waitlisted = true
+      team_id = TeamsUser.team_id(assignment_id, user_id)
+      unless WaitlistTeam.add_team_to_topic_waitlist(team_id, topic_id, user_id)
+        # flash[:error] = "Error occured while waitlisting to topic #{topic_id}"
+        raise ActiveRecord::Rollback 
+      end
     end
     [team_id, topic_id]
   end

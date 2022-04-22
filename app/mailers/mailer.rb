@@ -7,7 +7,7 @@ class Mailer < ActionMailer::Base
     default from: 'expertiza-support@lists.ncsu.edu'
   end
 
-  def author_mail(subject, body, email)
+  def email_author_reviewers(subject, body, email)
     Rails.env.development? || Rails.env.test? ? @email = 'expertiza.debugging@gmail.com' : @email = email
     mail(to: @email,
          body: body,

@@ -57,8 +57,8 @@ module MailerHelper
     )
   end
 
-  def self.send_mail_to_author(subject, body, email)
-    @email = Mailer.author_mail(subject, body, email)
+  def self.send_mail_to_author_reviewers(subject, body, email)
+    @email = Mailer.email_author_reviewers(subject, body, email)
     @email.deliver_now
   end
 end

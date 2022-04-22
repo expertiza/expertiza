@@ -109,16 +109,30 @@ class StudentTaskController < ApplicationController
     subject = params['send_email']['subject']
     body = params['send_email']['email_body']
     participant_id = params['participant_id']
+    assignment_id = params['assignment_id']
     @participant = AssignmentParticipant.find_by(participant_id)
+    @team = Team.find_by(parent_id: assignment_id)
+
+    mappings = ResponseMap.where(reviewed_object_id: assignment_id,
+                                 reviewee_id: @team.id,
+                                 type: 'ReviewResponseMap')
 
     respond_to do |format|
       if subject.blank? || body.blank?
-
         flash[:notice] = 'Please fill in the subject and the Email Content.'
         format.html { redirect_to controller: 'student_task', action: 'email_reviewers', id: @participant }
         format.json { head :no_content }
       else
         # make a call to method invoking the email process
+        unless mappings.length.zero?
+          mappings.each do |mapping|
+            reviewer = mapping.reviewer.user
+            MailerHelper.send_mail_to_author_reviewers(subject, body, reviewer.email)
+
+            # MailerHelper.send_mail_to_assigned_reviewers(reviewer, self, mapping)
+            # prepared_mail.deliver_now
+          end
+    end
         flash[:notice] = 'Email will be sent to the Reviewers.'
         format.html { redirect_to controller: 'student_task', action: 'list' }
         format.json { head :no_content }

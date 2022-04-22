@@ -1,4 +1,6 @@
-$email = ""
+# frozen_string_literal: true
+
+$email = ''
 class ResponseController < ApplicationController
   include AuthorizationHelper
   include ResponseHelper
@@ -24,13 +26,13 @@ class ResponseController < ApplicationController
       return false if response.is_submitted
 
       # Else, return true if the user is a reviewer for that response.
-      return current_user_is_reviewer?(response.map, user_id)
+      current_user_is_reviewer?(response.map, user_id)
 
     # Deny access to anyone except reviewer & author's team
     when 'delete', 'update'
-      return current_user_is_reviewer?(response.map, user_id)
+      current_user_is_reviewer?(response.map, user_id)
     when 'view'
-      return response_edit_allowed?(response.map, user_id)
+      response_edit_allowed?(response.map, user_id)
     else
       user_logged_in?
     end
@@ -131,9 +133,13 @@ class ResponseController < ApplicationController
 
       # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       create_answers(params, questions) unless params[:responses].nil?
-      @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
+      if params['isSubmit'] && params['isSubmit'] == 'Yes'
+        @response.update_attribute('is_submitted', true)
+      end
 
-      @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+      if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+        @response.notify_instructor_on_difference
+      end
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
@@ -146,7 +152,9 @@ class ResponseController < ApplicationController
   def new
     assign_action_parameters
     set_content(true)
-    @stage = @assignment.current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
+    if @assignment
+      @stage = @assignment.current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
+    end
     # Because of the autosave feature and the javascript that sync if two reviewing windows are opened
     # The response must be created when the review begin.
     # So do the answers, otherwise the response object can't find the questionnaire when the user hasn't saved his new review and closed the window.
@@ -164,18 +172,18 @@ class ResponseController < ApplicationController
   end
 
   def send_email
-    subject = params["send_email"]["subject"]
-    body = params["send_email"]["email_body"]
-    response = params["send_email"]["response"]
+    subject = params['send_email']['subject']
+    body = params['send_email']['email_body']
+    response = params['send_email']['response']
 
     respond_to do |format|
-      if subject.blank? or body.blank?
+      if subject.blank? || body.blank?
         flash[:notice] = 'Please fill in the subject and the Email Content.'
         format.html { redirect_to controller: 'response', action: 'author', id: response }
         format.json { head :no_content }
       else
         # make a call to method invoking the email process
-        MailerHelper.send_mail_to_author(subject, body, $email)
+        MailerHelper.send_mail_to_author_reviewers(subject, body, $email)
         flash[:notice] = 'Email will be sent to the Author.'
         format.html { redirect_to controller: 'student_task', action: 'list' }
         format.json { head :no_content }
@@ -205,7 +213,9 @@ class ResponseController < ApplicationController
 
   def create
     map_id = params[:id]
-    map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
+    unless params[:map_id].nil?
+      map_id = params[:map_id]
+    end # pass map_id as a hidden field in the review form
     @map = ResponseMap.find(map_id)
     if params[:review][:questionnaire_id]
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
@@ -253,8 +263,8 @@ class ResponseController < ApplicationController
   def redirect
     error_id = params[:error_msg]
     message_id = params[:msg]
-    flash[:error] = error_id unless error_id && error_id.empty?
-    flash[:note] = message_id unless message_id && message_id.empty?
+    flash[:error] = error_id unless error_id&.empty?
+    flash[:note] = message_id unless message_id&.empty?
     @map = Response.find_by(map_id: params[:id])
     case params[:return]
     when 'feedback'
@@ -409,7 +419,9 @@ class ResponseController < ApplicationController
     questions.each do |q|
       # it's unlikely that these answers exist, but in case the user refresh the browser some might have been inserted.
       answer = Answer.where(response_id: @response.id, question_id: q.id).first
-      Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if answer.nil?
+      if answer.nil?
+        Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '')
+      end
     end
   end
 end

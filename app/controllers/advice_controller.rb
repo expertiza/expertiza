@@ -8,7 +8,7 @@ class AdviceController < ApplicationController
   # In the end, save_advice method is called which updates and saves the changes in the advices and displays the success/failure message.
 
   include AuthorizationHelper
-  # If current user is TA then only current user can edit and update the advice
+  # If current user is TA then only current user can edit and update the advice given
   def action_allowed?
     current_user_has_ta_privileges?
   end

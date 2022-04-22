@@ -132,7 +132,7 @@ class StudentTaskController < ApplicationController
             # MailerHelper.send_mail_to_assigned_reviewers(reviewer, self, mapping)
             # prepared_mail.deliver_now
           end
-    end
+        end
         flash[:notice] = 'Email will be sent to the Reviewers.'
         format.html { redirect_to controller: 'student_task', action: 'list' }
         format.json { head :no_content }

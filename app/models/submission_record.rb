@@ -5,7 +5,7 @@ class SubmissionRecord < ApplicationRecord
   validates :user, presence: true
   validates :assignment_id, presence: true
 
-  def self.copycalibratedsubmissions(old_assign, new_assign_id)
+  def self.copy_assignment_submissions(old_assign, new_assign_id)
     @prev_submission_record = SubmissionRecord.where(assignment_id: old_assign.id)
     @prev_submission_record.each do |catt|
       @new_submission_record = SubmissionRecord.new

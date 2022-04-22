@@ -70,4 +70,12 @@ class CourseTeam < Team
     TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
     add_participant(parent_id, user)
   end
+
+  def add_member_new(participant, _id = nil)
+    raise "The user \"#{participant.name}\" is already a member of the team, \"#{name}\"" if participant?(participant)
+
+    t_user = TeamsUser.create(participant_id: participant.id, team_id: id)
+    parent = TeamNode.find_by(node_object_id: id)
+    TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+  end
 end

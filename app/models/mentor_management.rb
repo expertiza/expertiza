@@ -107,6 +107,7 @@ class MentorManagement
   # Produces a hash mapping mentor's user_ids to the aggregated
   # number of teams they're part of, which acts as a proxy for
   # the number of teams they're mentoring.
+  # TODO: fix when user_id is null
   def self.zip_mentors_with_team_count(assignment_id)
     mentor_ids = mentors_for_assignment(assignment_id).pluck(:user_id)
 

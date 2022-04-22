@@ -1,6 +1,5 @@
 module ReviewMappingChartHelper
-
-  # moves data of reviews in each round from a current round
+# moves data of reviews in each round from a current round
   def initialize_chart_elements(reviewer)
     round = 0
     labels = []
@@ -147,5 +146,5 @@ module ReviewMappingChartHelper
     end
     # if no Hash object is returned, the UI handles it accordingly
   end
-  
+
 end

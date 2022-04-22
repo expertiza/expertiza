@@ -22,13 +22,67 @@ class WaitlistTeam < ApplicationRecord
   end
 
   def self.remove_team_from_topic_waitlist(team_id, topic_id, user_id)
-    waitlisted_team_topic = WaitlistTeam.find_by(topic_id: topic_id, team_id: team_id)
-    unless waitlisted_team_topic.nil?
-      waitlisted_team_topic.destroy
+    waitlisted_team_for_topic = WaitlistTeam.find_by(topic_id: topic_id, team_id: team_id)
+    unless waitlisted_team_for_topic.nil?
+      waitlisted_team_for_topic.destroy
     else
       ExpertizaLogger.info LoggerMessage.new('WaitlistTeam', user_id, "Cannot find Team #{team_id} in waitlist for the topic #{topic_id} to be deleted.")
     end
     return true
+  end
+
+  def self.first_team_in_waitlist_for_topic(topic_id)
+    waitlisted_team_for_topic = WaitlistTeam.where(topic_id: topic_id).order("created_at ASC").first
+    return waitlisted_team_for_topic
+  end
+
+  def self.team_has_any_waitlists?(team_id)
+    return WaitlistTeam.where(team_id: team_id).empty?
+  end
+
+  def self.topic_has_any_waitlists?(topic_id)
+    return WaitlistTeam.where(topic_id: topic_id).empty?
+  end
+
+  def self.delete_all_waitlists_for_team(team_id, assignment_id)
+    waitlisted_topics_for_team = get_all_waitlists_for_team team_id, assignment_id
+    unless waitlisted_topics_for_team.nil?
+      waitlisted_topics_for_team.each do |entry|
+        entry.delete
+      end
+    else
+      ExpertizaLogger.info LoggerMessage.new('WaitlistTeam', user_id, "Cannot find Team #{team_id} in waitlist.")
+    end
+    return true
+  end
+
+  def self.delete_all_waitlists_for_topic(topic_id)
+    waitlisted_teams_for_topic = get_all_waitlists_for_topic topic_id
+    unless waitlisted_teams_for_topic.nil?
+      waitlisted_teams_for_topic.each do |entry|
+        entry.delete
+      end
+    else
+      ExpertizaLogger.info LoggerMessage.new('WaitlistTeam', user_id, "Cannot find Topic #{topic_id} in waitlist.")
+    end
+    return true
+  end
+
+  def self.get_all_waitlists_for_team(team_id, assignment_id)
+    WaitlistTeam.joins(:topic).where(team_id: team_id, sign_up_topics: {assignment_id: assignment_id})
+  end
+
+  def self.get_all_waitlists_for_topic(topic_id)
+    WaitlistTeam.where(topic_id: topic_id)
+  end
+
+  def self.count_all_waitlists_per_topic_per_assignment(assignment_id)
+    list_of_topic_waitlist_counts = []
+    assignment_topics = Assignment.find(assignment_id).sign_up_topics 
+    assignment_topics.each do |topic|
+      list_of_topic_waitlist_counts.append({topic_id: topic.id, count: topic.waitlist_teams.size})
+    end
+    list_of_topic_waitlist_counts
   end
 
 end

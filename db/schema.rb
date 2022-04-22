@@ -773,8 +773,8 @@ ActiveRecord::Schema.define(version: 20220420015915) do
   create_table "waitlist_teams", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "team_id"
     t.integer "topic_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.index ["team_id", "topic_id"], name: "index_waitlist_teams_on_team_id_and_topic_id", unique: true
     t.index ["team_id"], name: "fk_waitlist_teams"
     t.index ["topic_id"], name: "fk_waitlist_teams_sign_up_topics"
   end

@@ -79,6 +79,42 @@ class Team < ApplicationRecord
     TeamsUser.where(team_id: team_id).count
   end
 
+  #Create new teams for calibrated assignments with respect to the old team already present
+  #TODO - this method returns an array of old team IDs, which is useful for caller but kind of strange
+  #TODO   - maybe add a separate method for fetching team IDs from an assignment and remove that from this method
+  def self.copy_and_create_new_team(old_assign, new_assign_id)
+    @original_team_values = Team.where(parent_id: old_assign.id)
+    old_team_ids = []
+    @original_team_values.each do |catt|
+      @prev_assignment = Assignment.find(old_assign.id)
+      @prev_instructor = Participant.find_by(parent_id: old_assign.id, user_id: @prev_assignment.instructor_id)
+      @map = ReviewResponseMap.find_by(reviewed_object_id: old_assign.id, reviewer_id: @prev_instructor.id, reviewee_id: catt.id)
+      if @map
+        @resp = Response.find_by(map_id: @map.id, is_submitted: false)
+        if @resp
+          old_team_ids.append(catt.id)
+          @new_team = Team.new
+          @new_team.name = catt.name
+          @new_team.parent_id = new_assign_id
+          @new_team.type = catt.type
+          @new_team.comments_for_advertisement = catt.comments_for_advertisement
+          @new_team.advertise_for_partner = catt.advertise_for_partner
+          @new_team.submitted_hyperlinks = catt.submitted_hyperlinks
+          @new_team.directory_num = catt.directory_num
+          @new_team.grade_for_submission = catt.grade_for_submission
+          @new_team.comment_for_submission = catt.comment_for_submission
+          @new_team.make_public = catt.make_public
+          @new_team.save
+        else
+          next
+        end
+      else
+        next
+      end
+    end
+    old_team_ids
+  end
+
   # Copy method to copy this team
   def copy_members(new_team)
     members = TeamsUser.where(team_id: id)

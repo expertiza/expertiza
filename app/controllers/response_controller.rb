@@ -413,18 +413,4 @@ class ResponseController < ApplicationController
       Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if answer.nil?
     end
   end
-
-  # Creates a table to store total contribution for Cake question across all reviewers
-  def store_total_cake_score
-    @total_score = {}
-    @questions.each do |question|
-      next unless question.instance_of? Cake
-
-      reviewee_id = ResponseMap.select(:reviewee_id, :type).where(id: @response.map_id.to_s).first
-      total_score = question.get_total_score_for_question(reviewee_id.type, question.id, @participant.id, @assignment.id, reviewee_id.reviewee_id).to_s
-      total_score = 0 if total_score.nil?
-      @total_score[question.id] = total_score
-    end
-  end
-
 end

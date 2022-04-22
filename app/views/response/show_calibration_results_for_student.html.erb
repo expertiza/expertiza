@@ -4,7 +4,7 @@ th, td {
     padding: 5px;
 }
 </style>
-<% @questions.each_with_index do |question, index| %>
+<% @review_questions.each_with_index do |question, index| %>
 	<% next if question.break_before == false %>
 	<% instructor_answer = Answer.where(["question_id = ? and response_id = ?", question.id, @calibration_response.id]).first ||= 0 %>
 	<% stu_answer = Answer.where(["question_id = ? and response_id = ?", question.id, @review_response.id]).first ||= 0 %>
@@ -65,10 +65,10 @@ th, td {
 				<td>N/A</td>
 				<td><%=sanitize stu_answer.comments %></td>
 			<% elsif question.instance_of? TextField %>
-				<% if (index+1) <= @questions.length-1 %>
-					<% next_question = @questions[index+1] %>
-					<% next_instructor_answer = Answer.where(question_id: @questions[index+1].id, response_id: @calibration_response.id).first %>
-					<% next_stu_answer = Answer.where(question_id: @questions[index+1].id, response_id: @review_response.id).first %>
+				<% if (index+1) <= @review_questions.length-1 %>
+					<% next_question = @review_questions[index+1] %>
+					<% next_instructor_answer = Answer.where(question_id: @review_questions[index+1].id, response_id: @calibration_response.id).first %>
+					<% next_stu_answer = Answer.where(question_id: @review_questions[index+1].id, response_id: @review_response.id).first %>
 				<% end %>
 				<% if question.break_before == true and !next_question.nil? and next_question.break_before == false %>
 					<td><%=sanitize instructor_answer.comments %> - <%=sanitize next_instructor_answer.comments %></td>

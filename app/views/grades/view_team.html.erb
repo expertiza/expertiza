@@ -239,6 +239,7 @@
           <div style="margin-top:5px"></div>
           <input class="btn btn-default" type="button" href="#" onclick="col_sort(<%=table_count%>)" data-toggle="tooltip" title="Sort reviews in ascending/descending order of the total score. Consecutive clicks will alternate between ascending and descending sort order" value="Sort by total review score"/>
           <span> <%= vm.display_team_members(session[:ip]) %></span>
+          </div>
           <!-- this elsif terminates the heatgrid code.  -->
         <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
             <br><div class="alert alert-warning"><%=t ".no_review_of"%> <%= vm.questionnaire_type %> TYPE EXISTS. </div>
@@ -268,7 +269,7 @@
       <%= submit_tag t(".save") ,class: "btn btn-default" %>
     <% end %>
   <% end %>
-  
+
   <% if @current_role_name.eql?'Student' and @assignment.show_teammate_reviews==true %>
     <td>
     <%=view_heatgrid(@participant.id, "TeammateReviewQuestionnaire") %>

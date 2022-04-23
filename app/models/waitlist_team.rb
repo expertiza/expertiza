@@ -33,7 +33,7 @@ class WaitlistTeam < ApplicationRecord
 
   def self.first_team_in_waitlist_for_topic(topic_id)
     waitlisted_team_for_topic = WaitlistTeam.where(topic_id: topic_id).order("created_at ASC").first
-    return waitlisted_team_for_topic
+    waitlisted_team_for_topic
   end
 
   def self.team_has_any_waitlists?(team_id)
@@ -48,7 +48,7 @@ class WaitlistTeam < ApplicationRecord
     waitlisted_topics_for_team = get_all_waitlists_for_team team_id, assignment_id
     unless waitlisted_topics_for_team.nil?
       waitlisted_topics_for_team.each do |entry|
-        entry.delete
+        entry.destroy
       end
     else
       ExpertizaLogger.info LoggerMessage.new('WaitlistTeam', user_id, "Cannot find Team #{team_id} in waitlist.")
@@ -83,6 +83,25 @@ class WaitlistTeam < ApplicationRecord
       list_of_topic_waitlist_counts.append({topic_id: topic.id, count: topic.waitlist_teams.size})
     end
     list_of_topic_waitlist_counts
+  end
+
+
+  def self.signup_first_waitlist_team(topic_id)
+    ApplicationRecord.transaction do
+      first_waitlist_team = first_team_in_waitlist_for_topic(topic_id)
+      unless first_waitlist_team.blank?
+        sign_up_waitlist_team = SignedUpTeam.new
+        sign_up_waitlist_team.topic_id = first_waitlist_team.topic_id
+        sign_up_waitlist_team.team_id = first_waitlist_team.team_id
+        if sign_up_waitlist_team.valid?
+          sign_up_waitlist_team.save
+          first_waitlist_team.destroy
+        else
+          ExpertizaLogger.info LoggerMessage.new('WaitlistTeam', session[:user].id, "Cannot find Topic #{topic_id} in waitlist.")
+          raise ActiveRecord::Rollback
+        end
+      end
+    end
   end
 
 end

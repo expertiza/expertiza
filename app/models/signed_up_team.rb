@@ -83,4 +83,27 @@ class SignedUpTeam < ApplicationRecord
       signed_up_teams.first.topic_id
     end
   end
+
+  def self.remove_signed_up_team_for_topic(team_id, topic_id)
+    signed_up_team = SignedUpTeam.find_by(team_id: team_id, topic_id: topic_id)
+    if !signed_up_team.nil?
+      ApplicationRecord.transaction do
+        signed_up_team.destroy
+        
+        signed_up_teams_for_topic = SignedUpTeam.where(topic_id: topic_id)
+        max_choosers_for_topic = SignUpTopic.find(topic_id).max_choosers
+        if signed_up_teams_for_topic.size < max_choosers_for_topic
+          WaitlistTeam.signup_first_waitlist_team topic_id
+        end
+      end
+    end
+  end
+
+  def self.delete_all_signed_up_topics_for_team(team_id)
+    signed_up_topics = SignedUpTeam.where(team_id: team_id)
+    signed_up_topics.each do |signed_up_topic|
+      remove_signed_up_team_for_topic(signed_up_topic.team_id, signed_up_topic.topic_id)
+    end
+  end
+
 end

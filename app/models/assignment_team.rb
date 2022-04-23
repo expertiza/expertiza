@@ -88,13 +88,15 @@ class AssignmentTeam < Team
   end
 
   # Get Participants of the team
-  def participants
+  def participants1
+    debugger
     users = self.users
     participants = []
     users.each do |user|
       participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: parent_id)
       participants << participant unless participant.nil?
     end
+    participants += read_attribute(:participants) unless read_attribute(:participants).nil?
     participants
   end
   alias get_participants participants
@@ -213,7 +215,8 @@ class AssignmentTeam < Team
     return nil if participant.nil?
 
     team = nil
-    teams_users = TeamsUser.where(user_id: participant.user_id)
+    teams_users = TeamsUser.where(user_id: participant.user_id).or(TeamsUser.where(participant_id: participant.id))
+
     return nil unless teams_users
 
     teams_users.each do |teams_user|

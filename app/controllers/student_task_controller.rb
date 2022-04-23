@@ -66,6 +66,7 @@ class StudentTaskController < ApplicationController
     @use_bookmark = @assignment.use_bookmark
     # Timeline feature
     @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
+    @review_mappings = get_review_mappings(@assignment, @team.id)
   end
 
   def others_work
@@ -113,10 +114,10 @@ class StudentTaskController < ApplicationController
     @participant = AssignmentParticipant.find_by(id: participant_id)
     @team = Team.find_by(parent_id: assignment_id)
 
-    mappings = ResponseMap.where(reviewed_object_id: assignment_id,
-                                 reviewee_id: @team.id,
-                                 type: 'ReviewResponseMap')
-
+    # mappings = ResponseMap.where(reviewed_object_id: assignment_id,
+    #                              reviewee_id: @team.id,
+    #                              type: 'ReviewResponseMap')
+    mappings = get_review_mappings(assignment_id, @team.id)
     respond_to do |format|
       if subject.blank? || body.blank?
         flash[:notice] = 'Please fill in the subject and the Email Content.'
@@ -128,9 +129,6 @@ class StudentTaskController < ApplicationController
           mappings.each do |mapping|
             reviewer = mapping.reviewer.user
             MailerHelper.send_mail_to_author_reviewers(subject, body, reviewer.email)
-
-            # MailerHelper.send_mail_to_assigned_reviewers(reviewer, self, mapping)
-            # prepared_mail.deliver_now
           end
         end
         flash[:notice] = 'Email will be sent to the Reviewers.'
@@ -138,6 +136,12 @@ class StudentTaskController < ApplicationController
         format.json { head :no_content }
       end
     end
+  end
+
+  def get_review_mappings(assignment_id, team_id)
+    ResponseMap.where(reviewed_object_id: assignment_id,
+                      reviewee_id: team_id,
+                      type: 'ReviewResponseMap')
   end
 
   def your_work; end

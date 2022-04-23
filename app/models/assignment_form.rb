@@ -64,7 +64,6 @@ class AssignmentForm
     update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
     update_assignment_questionnaires(attributes[:topic_questionnaire]) unless @has_errors || attributes[:assignment][:vary_by_topic] == 'false'
     update_due_dates(attributes[:due_date], user) unless @has_errors
-    update_assigned_badges(attributes[:badge], attributes[:assignment]) unless @has_errors
     add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck])
     # delete the old queued items and recreate new ones if the assignment has late policy.
     if attributes[:due_date] && !@has_errors && has_late_policy
@@ -191,18 +190,6 @@ class AssignmentForm
         @has_errors = true unless dd.update_attributes(due_date)
       end
       @errors += @assignment.errors.to_s if @has_errors
-    end
-  end
-
-  # Adds badges to assignment badges table as part of E1822
-  def update_assigned_badges(badge, assignment)
-    if assignment && badge
-      AssignmentBadge.where(assignment_id: assignment[:id]).map(&:id).each do |assigned_badge_id|
-        AssignmentBadge.delete(assigned_badge_id) unless badge[:id].include?(assigned_badge_id)
-      end
-      badge[:id].each do |badge_id|
-        AssignmentBadge.where(badge_id: badge_id[0], assignment_id: assignment[:id]).first_or_create
-      end
     end
   end
 

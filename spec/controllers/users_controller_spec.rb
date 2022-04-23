@@ -117,6 +117,12 @@ describe UsersController do
     end
   end
 	
+  context '#search_params' do
+    it 'checks that search_params does not fail with controller' do
+      expect{controller.search_params}.not_to raise_error
+    end
+  end
+  
   context '#show_if_authorized' do
     before(:each) do
       allow(User).to receive(:find).with(2).and_return(instructor)

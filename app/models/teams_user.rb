@@ -62,13 +62,15 @@ class TeamsUser < ApplicationRecord
   def self.team_id(assignment_id, user_id)
     # team_id variable represents the team_id for this user in this assignment
     team_id = nil
-    participant_id = Assignment.find(assignment_id).participants.find_by(user_id: user_id).id
-    teams_users = TeamsUser.where(user_id: user_id).or(TeamsUser.where(participant_id: participant_id))
-    teams_users.each do |teams_user|
-      team = Team.find(teams_user.team_id)
-      if team.parent_id == assignment_id
-        team_id = teams_user.team_id
-        break
+    unless assignment_id.nil?
+      participant_id = Assignment.find(assignment_id).participants.find_by(user_id: user_id).id
+      teams_users = TeamsUser.where(user_id: user_id).or(TeamsUser.where(participant_id: participant_id))
+      teams_users.each do |teams_user|
+        team = Team.find(teams_user.team_id)
+        if team.parent_id == assignment_id
+          team_id = teams_user.team_id
+          break
+        end
       end
     end
     team_id

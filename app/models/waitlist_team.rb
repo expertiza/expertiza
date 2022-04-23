@@ -85,7 +85,12 @@ class WaitlistTeam < ApplicationRecord
     list_of_topic_waitlist_counts
   end
 
-
+  def self.check_team_waitlisted_for_topic(team_id,topic_id)
+    if WaitlistTeam.exists?(team_id: team_id, topic_id: topic_id)
+      return true
+    end
+    return false
+  end
   def self.signup_first_waitlist_team(topic_id)
     ApplicationRecord.transaction do
       first_waitlist_team = first_team_in_waitlist_for_topic(topic_id)

@@ -195,10 +195,7 @@ class Team < ApplicationRecord
       if user.nil?
         raise ImportError, "The user '#{teammate}' was not found. <a href='/users/new'>Create</a> this user?"
       else
-        if TeamsUser.find_by_team_id_and_user_id(id, user.id).nil?
-          add_participant_if_not_exist(user)
-          add_participant_to_team(user)
-        end
+        add_member(user) if TeamsUser.find_by_team_id_and_user_id(id, user.id).nil?
       end
     end
   end

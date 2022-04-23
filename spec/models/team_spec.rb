@@ -1,8 +1,9 @@
 describe Team do
   let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
-  let(:participant) { build(:participant, user_id: 1) }
-  let(:participant2) { build(:participant, user_id: 2) }
-  let(:participant3) { build(:participant, user_id: 3) }
+  let(:participant) { build(:participant, user_id: 1, id: 1) }
+  let(:participant2) { build(:participant, user_id: 2, id: 2) }
+  let(:participant3) { build(:participant, user_id: 3, id: 3) }
+  let(:assignment_with_participants) { build(:assignment, id: 1, name: 'no assgt', participants: [participant]) }
   let(:user) { build(:student, id: 1, name: 'no name', fullname: 'no one', participants: [participant]) }
   let(:user2) { build(:student, id: 2) }
   let(:user3) { build(:student, id: 3) }
@@ -100,7 +101,8 @@ describe Team do
         it 'does not raise an error' do
           allow_any_instance_of(Team).to receive(:user?).with(user).and_return(false)
           allow_any_instance_of(Team).to receive(:full?).and_return(false)
-          allow(TeamsUser).to receive(:create).with(user_id: 1, team_id: 1).and_return(team_user)
+          allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
+          allow(TeamsUser).to receive(:create).with(participant_id: 1, team_id: 1).and_return(team_user)
           allow(TeamNode).to receive(:find_by).with(node_object_id: 1).and_return(double('TeamNode', id: 1))
           allow_any_instance_of(Team).to receive(:add_participant).with(1, user).and_return(double('Participant'))
           expect(team.add_member(user)).to be true
@@ -175,7 +177,12 @@ describe Team do
     context 'when can find certain user' do
       it 'adds the user to current team' do
         allow(User).to receive(:find_by).with(name: 'no name').and_return(user)
+        allow(Assignment).to receive(:find).and_return(assignment_with_participants)
+        allow(assignment_with_participants).to receive(:participants).and_return(assignment_with_participants.participants)
+        allow(assignment_with_participants.participants).to receive(:find_by).and_return(participant)
+        allow_any_instance_of(Participant).to receive(:find_by).and_return(participant)
         allow(TeamsUser).to receive(:find_by).with(team_id: 1, user_id: 1).and_return(nil)
+        allow(TeamsUser).to receive(:find_by).with(team_id: 1, participant_id: 1).and_return(nil)
         allow_any_instance_of(Team).to receive(:add_member).with(user).and_return(true)
         expect(team.import_team_members(teammembers: ['no name'])).to eq(['no name'])
       end
@@ -354,6 +361,7 @@ describe Team do
     it 'exports teams to csv' do
       allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team])
       allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
+      allow(User).to receive(:find).with(user.id).and_return(user)
       expect(Team.export([], 1, { team_name: 'false' }, AssignmentTeam.new)).to eq([['no team', 'no name']])
     end
   end

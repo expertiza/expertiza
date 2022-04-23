@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220111023859) do
+ActiveRecord::Schema.define(version: 20220423002828) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -337,8 +337,8 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "user_id"
-    t.integer "lockable_id"
     t.string "lockable_type"
+    t.integer "lockable_id"
     t.index ["user_id"], name: "fk_rails_426f571216"
   end
 
@@ -705,7 +705,9 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.integer "team_id"
     t.integer "user_id"
     t.integer "duty_id"
+    t.bigint "participant_id"
     t.index ["duty_id"], name: "index_teams_users_on_duty_id"
+    t.index ["participant_id"], name: "index_teams_users_on_participant_id"
     t.index ["team_id"], name: "fk_users_teams"
     t.index ["user_id"], name: "fk_teams_users"
   end

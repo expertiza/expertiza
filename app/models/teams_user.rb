@@ -79,7 +79,7 @@ class TeamsUser < ApplicationRecord
     if participant
       participant.user
     else
-      user
+      User.find(self[:user_id])
     end
   end
 

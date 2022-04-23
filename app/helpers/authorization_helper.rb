@@ -109,14 +109,13 @@ module AuthorizationHelper
                (current_user_is_a?('Teaching Assistant') && current_user_has_ta_mapping_for_assignment?(assignment))
              )
     end
-    
+
     if map.is_a? TeammateReviewResponseMap
-        return current_user_has_id?(user_id) ||
-        (current_user_is_a?('Instructor') && current_user_instructs_assignment?(assignment)) ||
+        return (current_user_has_id?(user_id) || (current_user_is_a?('Instructor') && current_user_instructs_assignment?(assignment)) ||
         (assignment.course && current_user_is_a?('Teaching Assistant') && current_user_has_ta_mapping_for_assignment?(assignment)) ||
-        (current_user_is_a?('Student') && assignment.show_teammate_reviews==true)
-    end 
-    
+        (current_user_is_a?('Student') && assignment.show_teammate_reviews==true))
+    end
+
     current_user_has_id?(user_id) ||
       (current_user_is_a?('Instructor') && current_user_instructs_assignment?(assignment)) ||
       (assignment.course && current_user_is_a?('Teaching Assistant') && current_user_has_ta_mapping_for_assignment?(assignment))

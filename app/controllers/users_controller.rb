@@ -31,6 +31,8 @@ class UsersController < ApplicationController
     end
   end
 
+  # Redirects to List to display the list requested for users other than students.
+  # If student , redirect and display "Not Authorized page"
   def index
     if current_user_is_a? 'Student'
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
@@ -40,6 +42,7 @@ class UsersController < ApplicationController
     end
   end
 
+  # function name suggests the working of this function.
   def auto_complete_for_user_name
     user = session[:user]
     role = Role.find(user.role_id)
@@ -120,6 +123,7 @@ class UsersController < ApplicationController
     end
   end
 
+  # If the user is not student,can perform show operations to display the requested list.
   def show
     if params[:id].nil? || ((current_user_is_a? 'Student') && (!current_user_has_id? params[:id]))
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))

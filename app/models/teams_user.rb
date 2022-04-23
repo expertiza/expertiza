@@ -89,7 +89,7 @@ class TeamsUser < ApplicationRecord
 
   def self.find_by_team_id_and_user_id(team_id, user_id)
     teams_user = TeamsUser.find_by(team_id: team_id, user_id: user_id)
-    if teams_user.nil? && team_id.zero?
+    if teams_user.nil? && team_id != "0"
       assignment_id = Team.find(team_id).parent_id
       participant_id = Assignment.find(assignment_id).participants.find_by(user_id: user_id).id
       teams_user = TeamsUser.find_by(team_id: team_id, participant_id: participant_id)

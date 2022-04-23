@@ -3,6 +3,7 @@ describe GradesController do
   let(:assignment) { build(:assignment, id: 1, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
   let(:assignment2) { build(:assignment, id: 2, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
   let(:assignment3) { build(:assignment, id: 3, max_team_size: 0, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
+  let(:assignment_with_participants) { build(:assignment, id: 1, name: 'no assgt', participants: [participant]) }
   let(:assignment_questionnaire) { build(:assignment_questionnaire, used_in_round: 1, assignment: assignment) }
   let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
   let(:participant2) { build(:participant, id: 2, assignment: assignment, user_id: 1) }
@@ -91,7 +92,10 @@ describe GradesController do
 
     context 'when view_my_scores page is allow to access' do
       it 'renders grades#view_my_scores page' do
-        allow(TeamsUser).to receive(:where).with(any_args).and_return([double('TeamsUser', team_id: 1)])
+        teamusers = [double('TeamsUser', team_id: 1)]
+        allow(TeamsUser).to receive(:where).with(any_args).and_return(teamusers)
+        allow(teamusers).to receive(:or).with(any_args).and_return(teamusers)
+
         allow(Team).to receive(:find).with(1).and_return(team)
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
         allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])
@@ -102,9 +106,17 @@ describe GradesController do
         allow(assignment).to receive(:late_policy_id).and_return(false)
         allow(assignment).to receive(:calculate_penalty).and_return(false)
         allow_any_instance_of(GradesController).to receive(:compute_total_score).with(assignment, any_args).and_return(100)
+
+        allow(User).to receive(:find).with(6).and_return(:instructor)
+        allow(Assignment).to receive(:find).and_return(assignment_with_participants)
+        allow(assignment_with_participants).to receive(:participants).and_return(assignment_with_participants.participants)
+        allow(assignment_with_participants.participants).to receive(:find_by).and_return(participant)
+        allow_any_instance_of(Participant).to receive(:find_by).and_return(participant)
+
         request_params = { id: 1 }
         user_session = { user: instructor }
         get :view_my_scores, params: request_params, session: user_session
+
         expect(response).to render_template(:view_my_scores)
       end
     end
@@ -131,6 +143,12 @@ describe GradesController do
         allow_any_instance_of(GradesController).to receive(:compute_total_score).with(assignment, any_args).and_return(100)
         allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([review_response])
         allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
+
+        allow(Assignment).to receive(:find).and_return(assignment_with_participants)
+        allow(assignment_with_participants).to receive(:participants).and_return(assignment_with_participants.participants)
+        allow(assignment_with_participants.participants).to receive(:find_by).and_return(participant)
+        allow_any_instance_of(Participant).to receive(:find_by).and_return(participant)
+
         request_params = { id: 1 }
         allow(TaMapping).to receive(:exists?).with(ta_id: 1, course_id: 1).and_return(true)
         stub_current_user(ta, ta.role.name, ta.role)

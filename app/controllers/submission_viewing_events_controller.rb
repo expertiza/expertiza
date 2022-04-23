@@ -5,6 +5,7 @@ class SubmissionViewingEventsController < ApplicationController
 
   # record time when link or file is opened in new window
   def record_start_time
+    puts "record start time called"
     param_args = params[:submission_viewing_event]
     # check if this link is already opened and timed
     submission_viewing_event_record = SubmissionViewingEvent.where(map_id: param_args[:map_id], round: param_args[:round], link: param_args[:link])
@@ -21,6 +22,7 @@ class SubmissionViewingEventsController < ApplicationController
 
   # record time when link or file window is closed
   def record_end_time
+    puts "record end time called"
     data = params.require(:submission_viewing_event)
     submission_viewing_event_record = SubmissionViewingEvent.where(map_id: data[:map_id], round: data[:round], link: data[:link])
     if submission_viewing_event_record.end_at.nil?
@@ -43,6 +45,7 @@ class SubmissionViewingEventsController < ApplicationController
 
   # mark end_at review time for all uncommited links/files
   def mark_end_time
+    puts "Mark end time called"
     data = params.require(:submission_viewing_event)
     @link_array = []
     submission_viewing_event_records = SubmissionViewingEvent.where(map_id: data[:map_id], round: data[:round])

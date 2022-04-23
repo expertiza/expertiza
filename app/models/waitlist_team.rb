@@ -60,7 +60,7 @@ class WaitlistTeam < ApplicationRecord
     waitlisted_teams_for_topic = get_all_waitlists_for_topic topic_id
     unless waitlisted_teams_for_topic.nil?
       waitlisted_teams_for_topic.each do |entry|
-        entry.delete
+        entry.destroy
       end
     else
       ExpertizaLogger.info LoggerMessage.new('WaitlistTeam', user_id, "Cannot find Topic #{topic_id} in waitlist.")
@@ -103,5 +103,4 @@ class WaitlistTeam < ApplicationRecord
       end
     end
   end
-
 end

@@ -36,6 +36,12 @@ class SignUpSheet < ApplicationRecord
         end
       end
     else
+
+      #See if user signup topic record exists in waitlist table.
+      user_signup.each do |user_signup_topic|
+        return false unless !WaitlistTeam.check_team_waitlisted_for_topic(team_id,user_signup_topic.topic_id)
+      end
+
       # If all the topics chosen by the user are waitlisted,
       user_signup.each do |user_signup_topic|
         return false unless user_signup_topic.is_waitlisted

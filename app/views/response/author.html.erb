@@ -11,5 +11,6 @@
   <%= form.text_area :email_body %> <br>
   </p>
  <input name="response" type="hidden" value="<%= params[:response] %>" />
+ <input name="email" type="hidden" value="<%= params[:email] %>" />
   <%= form.submit "Send Email" %>
 <% end  %>

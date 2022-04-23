@@ -96,13 +96,6 @@ class Team < ApplicationRecord
     can_add_member
   end
 
-  def add_participant_if_not_exist(user)
-    unless full?
-      parent = TeamNode.find_by(node_object_id: id)
-      add_participant(parent.id, user)
-    end
-  end
-
   # Define the size of the team,
   def self.size(team_id)
     TeamsUser.where(team_id: team_id).count

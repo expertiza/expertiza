@@ -34,7 +34,6 @@ class TeamsUsersController < ApplicationController
   end
 
   def create
-    debugger
     user = User.find_by(name: params[:user][:name].strip)
     unless user
       urlCreate = url_for controller: 'users', action: 'new'

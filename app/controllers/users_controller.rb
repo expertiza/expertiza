@@ -61,7 +61,19 @@ class UsersController < ApplicationController
 
   # for displaying the list of users
   def list
-    @paginated_users = paginate_list
+    # @paginated_users = paginate_list
+    user = session[:user]
+    # @users = user.get_user_list
+    # paginate_list is called with the entire list of users
+    # @paginated_users can be used to display set number of users per page
+
+    # Retrieves the search by user names, full names and or email; all criteria that are available
+    search_usrid, search_fulname, search_email = search_params
+
+    # Passes the above received search criteria to the User model to populate the list accordingly.
+    @users = user.get_user_list search_usrid, search_fulname, search_email
+
+    @paginated_users = paginate_list(@users)
   end
 
   def search_params
@@ -250,8 +262,8 @@ class UsersController < ApplicationController
   end
 
   # For filtering the users list with proper search and pagination.
-  def paginate_list
-    paginate_options = { '1' => 25, '2' => 50, '3' => 100 }
+  def paginate_list(users)
+    paginate_options = {"1" => 25, "2" => 50, "3" => 100}
 
     # If the above hash does not have a value for the key,
     # it means that we need to show all the users on the page
@@ -267,7 +279,7 @@ class UsersController < ApplicationController
 
     # paginate
     users = if paginate_options[@per_page.to_s].nil? # displaying all - no pagination
-              User.paginate(page: params[:page], per_page: User.count)
+              User.paginate(page: params[:page], per_page: users.count)
             else # some pagination is active - use the per_page
               User.paginate(page: params[:page], per_page: paginate_options[@per_page.to_s])
             end

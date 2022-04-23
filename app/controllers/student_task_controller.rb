@@ -114,9 +114,6 @@ class StudentTaskController < ApplicationController
     @participant = AssignmentParticipant.find_by(id: participant_id)
     @team = Team.find_by(parent_id: assignment_id)
 
-    # mappings = ResponseMap.where(reviewed_object_id: assignment_id,
-    #                              reviewee_id: @team.id,
-    #                              type: 'ReviewResponseMap')
     mappings = get_review_mappings(assignment_id, @team.id)
     respond_to do |format|
       if subject.blank? || body.blank?

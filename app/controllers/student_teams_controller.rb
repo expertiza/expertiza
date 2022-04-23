@@ -73,7 +73,7 @@ class StudentTeamsController < ApplicationController
       parent = AssignmentNode.find_by node_object_id: student.parent_id
       TeamNode.create parent_id: parent.id, node_object_id: team.id
       user = User.find(student.user_id)
-      team.add_member_new(student, team.parent_id)
+      team.add_participant_to_team(student, team.parent_id)
       # team.add_member(user, team.parent_id)
       team_created_successfully(team)
       redirect_to view_student_teams_path student_id: student.id

@@ -71,7 +71,7 @@ class CourseTeam < Team
     add_participant(parent_id, user)
   end
 
-  def add_member_new(participant, _id = nil)
+  def add_participant_to_team(participant, _id = nil)
     raise "The user \"#{participant.name}\" is already a member of the team, \"#{name}\"" if participant?(participant)
 
     t_user = TeamsUser.create(participant_id: participant.id, team_id: id)

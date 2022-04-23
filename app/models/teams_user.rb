@@ -51,7 +51,7 @@ class TeamsUser < ApplicationRecord
       new_team = AssignmentTeam.where(['id = ? and parent_id = ?', team.team_id, assignment_id]).first
       unless new_team.nil?
         participant = Assignment.find(assignment_id).participants.find_by(user_id: invited_user_id)
-        can_add_member = new_team.add_member_new(participant, assignment_id)
+        can_add_member = new_team.add_participant_to_team(participant, assignment_id)
       end
     end
     can_add_member

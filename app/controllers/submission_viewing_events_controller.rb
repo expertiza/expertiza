@@ -29,7 +29,9 @@ class SubmissionViewingEventsController < ApplicationController
       if acc_time > 90 
         break
       end
-      submission_viewing_event_record.accumulated_time += acc_time
+      # update total time spent 
+      acc_time += submission_viewing_event_record.accumulated_time
+      submission_viewing_event_record.update_attribute('accumulated_time')
     else
       # No record found
     end
@@ -47,8 +49,11 @@ class SubmissionViewingEventsController < ApplicationController
     submission_viewing_event_records.each do |submissionviewingevent_entry|
       if submissionviewingevent_entry.end_at.nil?
         @link_array.push(submissionviewingevent_entry.link)
-        # submissionviewingevent_entry.update_attribute('end_at', data[:end_at])
-        submission_viewing_event.record_end_time  
+        submissionviewingevent_entry.update_attribute('end_at', data[:end_at])
+        start_time = submissionviewingevent_entry.start_at
+        acc_time = (data[:end_at].to_i  - start_time.to_i)/60
+        acc_time += submission_viewing_event_entry.accumulated_time
+        submissionviewingevent_entry.update_attribute('accumulated_time', acc_time)
       end
     end
     respond_to do |format|

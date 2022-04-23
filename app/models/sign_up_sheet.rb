@@ -29,7 +29,11 @@ class SignUpSheet < ApplicationRecord
       ApplicationRecord.transaction do
         # check whether slots exist (params[:id] = topic_id) or has the user selected another topic
         team_id, topic_id = create_SignUpTeam(assignment_id, sign_up, topic_id, user_id)
-        result = true if sign_up.save
+         
+        if sign_up.is_waitlisted == false
+          sign_up.save
+          result = true
+        end
       end
     else
       # If all the topics chosen by the user are waitlisted,

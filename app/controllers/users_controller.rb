@@ -9,6 +9,7 @@ class UsersController < ApplicationController
   verify method: :post, only: %i[destroy create update],
          redirect_to: { action: :list }
 
+  # This function checks the access control to perform specific operation
   def action_allowed?
     case params[:action]
     when 'list_pending_requested'
@@ -61,7 +62,6 @@ class UsersController < ApplicationController
 
   # for displaying the list of users
   def list
-    # @paginated_users = paginate_list
     user = session[:user]
     # @users = user.get_user_list
     # paginate_list is called with the entire list of users
@@ -76,17 +76,22 @@ class UsersController < ApplicationController
     @paginated_users = paginate_list(@users)
   end
 
+  # Modified the code to provide the search parameters to the list method if they were found in the search textboxes.
+  # Creates a list of users to be displayed on the user interface.
   def search_params
     search_usrname,search_fulname,search_email = ".*",".*",".*"
     
+    # If the user name is discovered in the username text field, it is appended to the search criteria.
     if params[:search_name].present?
       search_usrname = ".*" + params[:search_name].strip + ".*"
     end
 
+    # If the complete name(full name) is found in the name text field, it is appended to the search criteria.
     if params[:search_fname].present?
       search_fulname = ".*" + params[:search_fname].strip + ".*"
     end
 
+    # If the email is found in the email text field, it is appended to the search criteria.
     if params[:search_email].present?
       search_email = ".*" + params[:search_email].strip + ".*"
     end

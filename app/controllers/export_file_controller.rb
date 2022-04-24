@@ -8,14 +8,11 @@ class ExportFileController < ApplicationController
   # Assign titles to model for display
   def start
     @model = params[:model]
-    puts("This is model value : " + @model)
     titles = { 'Assignment' => 'Grades', 'CourseParticipant' => 'Course Participants', 'AssignmentTeam' => 'Teams',
                'CourseTeam' => 'Teams', 'User' => 'Users', 'Question' => 'Questions' ,
                'SignUpTopic' => 'Topic'}
     @title = titles[@model]
-    puts("This is title value : " + @title)
     @id = params[:id]
-    puts("This is id value : " + @id)
   end
 
   # Find the filename and delimiter
@@ -61,7 +58,6 @@ class ExportFileController < ApplicationController
   end
 
   def export
-    puts("Entering Export function")
     @delim_type = params[:delim_type]
     filename, delimiter = find_delim_filename(@delim_type, params[:other_char])
 
@@ -78,7 +74,6 @@ class ExportFileController < ApplicationController
                         SignUpTopic]
     csv_data = CSV.generate(col_sep: delimiter) do |csv|
       if allowed_models.include? params[:model]
-        puts("Model is allowed")
         csv << Object.const_get(params[:model]).export_fields(params[:options])
         Object.const_get(params[:model]).export(csv, params[:id], params[:options])
       end

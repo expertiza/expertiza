@@ -163,9 +163,6 @@ class SignUpTopic < ActiveRecord::Base
 
   # Export the fields
   def self.export_fields(options)
-    puts("Entering the export_feilds method")
-    puts("The options parameter is:")
-    puts(options)
     fields = []
     fields.push('Topic Id')
     fields.push('Topic Names')
@@ -180,22 +177,43 @@ class SignUpTopic < ActiveRecord::Base
   def self.export(csv, _parent_id, options)
     @assignment = Assignment.find(_parent_id.to_i)
     @signuptopics = SignUpTopic.where(assignment_id: @assignment.id)
-    # @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
-    # @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
+
+    @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
+    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
 
     @signuptopics.each do |signuptopic|
       tcsv = []
-      tcsv.push(signuptopic.id)
+      tcsv.push(signuptopic.topic_identifier)
       tcsv.push(signuptopic.topic_name)
       tcsv.push(signuptopic.description)
-      @signedupteam = SignedUpTeam.where(topic_id: signuptopic.id).first
-      puts(@signedupteam.team_id)
-      @users = TeamsUser.where(team_id: @signedupteam.team_id).all
-      ids = ""
-      @users.each do |user|
-        ids += "Student" + user.id.to_s + " "
+      if SignedUpTeam.where(topic_id: signuptopic.id).first != nil
+        @signedupteam = SignedUpTeam.where(topic_id: signuptopic.id).first
+        @users = TeamsUser.where(team_id: @signedupteam.team_id).all
+        ids = ""
+        @users.each do |user|
+          ids += user.name.to_s + " "
+        end
+      else
+        ids = ""
+        ids = "No Choosers"
       end
       tcsv.push(ids)
+      tcsv.push(signuptopic.max_choosers) 
+
+      slots_filled_length = @slots_filled.length()
+      @slots_filled.each do |slot|
+        if slot.topic_id  == signuptopic.id
+          tcsv.push(signuptopic.max_choosers.to_i - slot.count.to_i)
+        else
+          slots_filled_length -= 1
+        end
+      end
+
+      if slots_filled_length == 0
+        tcsv.push(signuptopic.max_choosers)
+      end
+      tcsv.push(tcsv[4].to_i - tcsv[5].to_i)
+
       csv << tcsv
     end
   end

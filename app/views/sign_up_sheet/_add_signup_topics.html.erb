@@ -8,9 +8,13 @@
 <% @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id) %>
 <% @participants = SignedUpTeam.find_team_participants(@assignment.id, session[:ip])  %>
 <% @total_bids_per_topic = Hash.new  %>
+<% @priority_per_topic = Hash.new %>
 <% @sign_up_topics.each do |t| %>
 <%   c = Bid.where(topic_id: t.id).count %>
+<%   number_one = Bid.where(topic_id: t.id, priority: 1) %>
+<%   number_two = Bid.where(topic_id: t.id, priority: 2) %>
 <%   @total_bids_per_topic[t.id] = c %>
+<%   @priority_per_topic[t.id] = [number_one, number_two] %>
 <% end %>
 
 <a id="teamsAndMembers" onclick="showHideTeamAndMembers(<%= @sign_up_topics.size%>)">Hide all teams</a>

@@ -23,7 +23,7 @@
     <% @authors.each do |rejoinder| %>
       <% next unless rejoinder %>
       <% if @assignment.vary_by_round %>
-        <% get_each_review_and_feedback_response_map(rejoinder) %> 
+        <% get_each_review_response_map(rejoinder) %> 
       <% else %>
         <% certain_review_and_feedback_response_map?(rejoinder) %>
       <% end %>

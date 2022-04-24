@@ -72,6 +72,12 @@ class User < ApplicationRecord
     recursively_parent_of(p)
   end
 
+  # generate_regex method generates regex corresponding to the parameter passed
+  # returns a regex expression
+  def generate_regex(item)
+    return Regexp.new(item)
+  end
+
   # get_user_list method generates the user list based on the search criteria entered. 
   # If no search criteria is entered then this method will return the result having all the users and displays it via Views. 
   def get_user_list(username_search = '', fullname_search = '', email_search = '')
@@ -113,12 +119,6 @@ class User < ApplicationRecord
     # Returns the unique users in the selected list of users
     # .uniq return a new array removing the duplicate values present
     final_users.uniq
-  end
-
-  # generate_regex method generates regex corresponding to the parameter passed
-  # returns a regex expression
-  def generate_regex(item)
-    return Regexp.new(item)
   end
 
   # Zhewei: anonymized view for demo purposes - 1/3/2018

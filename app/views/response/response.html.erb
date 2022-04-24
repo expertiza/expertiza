@@ -331,17 +331,16 @@
   <hr/>
 <% end %>
 
-
 <!-- display all versions available -->
-<% @responses_versions = [] %>
-<% @responses_versions = @map.get_all_versions %>
-
-<% if @responses_versions.empty? %>
-  <I>No previous review was performed.</I><br/>
-  <hr/><br/>
-<% else %>
-  <%# <%= render :partial => 'review', :locals => { :versions => @responses_versions } %> %>
+<% @review_versions = @map.get_all_versions %>
+<% unless @review_versions.empty? %>
+  <%@review_versions.each do |response| %>
+    <%= response.display_as_html %>
+    <br/>
+  <% end %>
+  <hr/>
 <% end %>
+
 <h2>Directions for the reviewer</h2>
 <input type="checkbox" id="autosave_cbx" checked>
 <label id="autosave_cbx_lbl" for="autosave_cbx"></label>

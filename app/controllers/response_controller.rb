@@ -92,6 +92,7 @@ class ResponseController < ApplicationController
       @largest_version_num = @sorted[0]
     end
     # Added for E1973, team-based reviewing
+    @current_round = @response.round
     @map = @response.map
     if @map.reviewer_is_team
       @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
@@ -313,6 +314,7 @@ class ResponseController < ApplicationController
       @header = 'Edit'
       @next_action = 'update'
       @response = Response.find(params[:id])
+      @current_round = @response.round
       @map = @response.map
       @contributor = @map.contributor
     when 'new'

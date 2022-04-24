@@ -207,6 +207,6 @@ class AssignmentParticipant < Participant
   end
 
   def team_user
-    TeamsUser.where(team_id: team.id, user_id: user_id).first if team
+    TeamsUser.find_by_team_id_and_user_id(team.id, user_id) if team
   end
 end

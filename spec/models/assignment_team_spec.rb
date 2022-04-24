@@ -391,16 +391,17 @@ describe 'AssignmentTeam' do
       @assignment = create(:assignment)
       @student = create(:student)
       @team = create(:assignment_team, parent_id: @assignment.id)
-      @team_user = create(:team_user, team_id: @team.id, user_id: @student.id)
       @participant = create(:participant, id: 1, user_id: @student.id)
     end
     it 'should create a team with users' do
       allow(AssignmentParticipant).to receive(:find_by).with(parent_id: @assignment.id, user_id: @student.id).and_return(@participant)
       new_team = AssignmentTeam.create_team_with_users(@assignment.id, [@student.id])
+      allow(new_team).to receive(:participant_ids).and_return(@participant.id)
       expect(new_team.participants).to include @participant
     end
 
     it 'should remove user from previous team' do
+      create(:team_user, team_id: @team.id, user_id: @student.id)
       allow(AssignmentParticipant).to receive(:find_by).with(parent_id: @assignment.id, user_id: @student.id).and_return(@participant)
       expect(@team.participants).to include @participant
       new_team = AssignmentTeam.create_team_with_users(@assignment.id, [@student.id])

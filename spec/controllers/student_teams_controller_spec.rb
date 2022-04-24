@@ -46,7 +46,7 @@ describe StudentTeamsController do
       it 'saves the team when all the team name is set correctly' do
         allow(AssignmentNode).to receive(:find_by).with(node_object_id: 1).and_return(node1)
         allow(AssignmentTeam).to receive(:new).with(name: 'test', parent_id: 1).and_return(team7)
-        allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
+        allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
         allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
         allow(User).to receive(:find).with(1).and_return(team_user1)
         allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(true)

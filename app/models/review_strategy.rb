@@ -1,6 +1,5 @@
 class ReviewStrategy
   attr_accessor :participants, :teams
-
   def initialize(participants, teams, review_num)
     @participants = participants
     @teams = teams

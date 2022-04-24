@@ -1,0 +1,37 @@
+# File to be used a partial to show the teams that have been reviewed by a certain reviewer
+# Currently only used in _review_report.html.erb
+
+# get team name color
+<% team_name_color = team_color?(reviewer_map) %>
+
+# get link for reviewed team
+<% team_reviewed_link_name = team_reviewed_link_name?(@assignment.max_team_size, reviewer_map.response, reviewer_map.reviewee_id, session[:ip]) %>
+
+#Only do something if Team exists
+<% if Team.where(id: reviewer_map.reviewee_id).length > 0 %>
+    # if this is first team in list, do NOT put a line on top of it (line is for separating different teams)
+    <% if index == 0 %>
+        <% if Response.exists?(map_id: reviewer_map.id) %>
+            <div id = <%= team_name_color %>>&#10004;
+        <% else %>
+            <div id= <%= team_name_color %>>
+        <% end %>
+    # else, it is NOT first, so it needs a line above it (to separate from previous team)
+    <% else %>
+        <% if Response.exists?(map_id: reviewer_map.id) %>
+            <div id = <%= team_name_color %> style='border-top: solid; border-width: 1px;'>&#10004;
+        <% else %>
+            <div id = <%= team_name_color %> style='border-top: solid; border-width: 1px;'>
+        <% end %>
+    <% end %>
+
+    # add link to the review for team
+    <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => reviewer_map.reviewee_id, :id2 => reviewer_map.id, :assignment_id=>@id %>
+    # add links to files associated with link
+    <%= list_review_uploaded_files(reviewer.id, reviewer_map.reviewee_id, reviewer_map.id) %>
+    <!--Hard-coded Dr.Kidd's question in order to display link.-->
+    <!--later we can create a hyperlink question type to deal with this situation.-->
+    <%= list_hyperlink_submission(reviewer_map.id, 5386) if Assignment.find_by(id: @id.to_i).try(:course).try(:instructor).try(:name) == 'Jkidd' %>
+    </div>
+</div>
+<% end %>

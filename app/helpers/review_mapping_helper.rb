@@ -229,8 +229,7 @@ module ReviewMappingHelper
     
     # set values of instance variable for review_responses_round
     { 1 => 'one', 2 => 'two', 3 => 'three' }.each do |key, round_num|
-      instance_variable_set('@review_responses_round_' + round_num,
-                            Response.where(['map_id IN (?) and round = ?', @review_response_map_ids, key]))
+      instance_variable_set('@review_responses_round_' + round_num, Response.where(['map_id IN (?) and round = ?', @review_response_map_ids, key]))
     end
   end
 

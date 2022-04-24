@@ -225,8 +225,12 @@ describe Assessment360Controller do
         allow(participants_list).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(signed_up_team).to receive(:topic_id).with(assignment.id, course_participant.user_id).and_return(1)
         allow(SignUpTopic).to receive(:find_by).with(id: nil).and_return(topic)
+
+        allow_any_instance_of(Assignment).to receive(:participants).and_return(assignment_with_participants.participants)
+
         request_params = { course_id: 1 }
         user_session = { user: instructor }
+
         get :course_student_grade_summary, params: request_params, session: user_session
         expect(controller.send(:action_allowed?)).to be true
         expect(response.status).to eq(200)

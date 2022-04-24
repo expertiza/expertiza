@@ -55,7 +55,9 @@ class Team < ApplicationRecord
 
   # Check if the user exist
   def user?(user)
-    users.include? user
+    participant = AssignmentParticipant.find_by(parent_id: parent_id, user_id: user.id)
+    return false if participant.nil?
+    participant?(participant)
   end
 
   def participant?(participant)

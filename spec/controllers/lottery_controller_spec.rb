@@ -26,6 +26,8 @@ describe LotteryController do
   let(:team_user5) { create(:team_user, team_id: assignment_team3.id, user_id: student5.id, id: 5) }
   let(:team_user6) { create(:team_user, team_id: assignment_team4.id, user_id: student6.id, id: 6) }
 
+  let(:participant) { build(:participant, id: 1, user_id: 1, assignment: assignment) }
+
   before :each do
     assignment_team1.save
     assignment_team2.save
@@ -92,6 +94,7 @@ describe LotteryController do
       expect(TeamNode.count).to eq(0)
       expect(TeamsUser.count).to eq(6)
       expect(TeamUserNode.count).to eq(0)
+      allow(AssignmentParticipant).to receive(find_by).and_return(participant)
       controller.send(:create_new_teams_for_bidding_response, teams, assignment, user_bidding_info)
       expect(AssignmentTeam.count).to eq(6)
       expect(TeamNode.count).to eq(2)
@@ -109,6 +112,7 @@ describe LotteryController do
     end
     context 'with valid assignment id' do
       it 'should not set any error message in the flash' do
+        allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
         controller.run_intelligent_assignment
         expect(controller).not_to set_flash[:error]
       end

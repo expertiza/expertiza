@@ -164,13 +164,13 @@ class SignUpTopic < ActiveRecord::Base
   # Export the fields
   def self.export_fields(options)
     fields = []
-    fields.push('Topic Id')
-    fields.push('Topic Names')
-    fields.push('Description')
-    fields.push("Participants")
-    fields.push('Num of Slots')
-    fields.push('Available slots')
-    fields.push('Num on waitlist')
+    fields.push('Topic Id') if options['topic_identifier'] == 'true'
+    fields.push('Topic Names') if options['topic_name'] == 'true'
+    fields.push('Description') if options['description'] == 'true'
+    fields.push("Participants") if options['participants'] == 'true'
+    fields.push('Num of Slots') if options['num_of_slots'] == 'true'
+    fields.push('Available slots') if options['available_slots'] == 'true'
+    fields.push('Num on waitlist') if options['num_on_waitlist'] == 'true'
     fields
   end
 
@@ -183,9 +183,9 @@ class SignUpTopic < ActiveRecord::Base
 
     @signuptopics.each do |signuptopic|
       tcsv = []
-      tcsv.push(signuptopic.topic_identifier)
-      tcsv.push(signuptopic.topic_name)
-      tcsv.push(signuptopic.description)
+      tcsv.push(signuptopic.topic_identifier) if options['topic_identifier'] == 'true'
+      tcsv.push(signuptopic.topic_name) if options['topic_name'] == 'true'
+      tcsv.push(signuptopic.description) if options['description'] == 'true'
       if SignedUpTeam.where(topic_id: signuptopic.id).first != nil
         @signedupteam = SignedUpTeam.where(topic_id: signuptopic.id).first
         @users = TeamsUser.where(team_id: @signedupteam.team_id).all
@@ -197,22 +197,22 @@ class SignUpTopic < ActiveRecord::Base
         ids = ""
         ids = "No Choosers"
       end
-      tcsv.push(ids)
-      tcsv.push(signuptopic.max_choosers) 
+      tcsv.push(ids) if options['participants'] == 'true'
+      tcsv.push(signuptopic.max_choosers) if options['num_of_slots'] == 'true'
 
       slots_filled_length = @slots_filled.length()
       @slots_filled.each do |slot|
         if slot.topic_id  == signuptopic.id
-          tcsv.push(signuptopic.max_choosers.to_i - slot.count.to_i)
+          tcsv.push(signuptopic.max_choosers.to_i - slot.count.to_i) if options['available_slots'] == 'true'
         else
           slots_filled_length -= 1
         end
       end
 
       if slots_filled_length == 0
-        tcsv.push(signuptopic.max_choosers)
+        tcsv.push(signuptopic.max_choosers) if options['available_slots'] == 'true'
       end
-      tcsv.push(tcsv[4].to_i - tcsv[5].to_i)
+      tcsv.push(tcsv[4].to_i - tcsv[5].to_i) if options['num_on_waitlist'] == 'true'
 
       csv << tcsv
     end

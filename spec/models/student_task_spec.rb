@@ -223,8 +223,8 @@ describe StudentTask do
     context 'when assigned in a assignment_team ' do
       it 'returns the students they are teamed with' do
         allow(user).to receive(:teams).and_return([team])
-        allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: assignment.id).and_return(participant)
-        allow(AssignmentParticipant).to receive(:find_by).with(user_id: 5, parent_id: assignment.id).and_return(participant2)
+        allow(Team).to receive(:find).with(team.id).and_return(team)
+        allow(team).to receive(:participants).and_return([participant, participant2])
         allow(Assignment).to receive(:find_by).with(id: team.parent_id).and_return(assignment)
         expect(StudentTask.teamed_students(user)).to eq(assignment.course_id => [user2.fullname])
       end

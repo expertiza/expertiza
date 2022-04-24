@@ -3,14 +3,14 @@ class Participant < ApplicationRecord
   include ParticipantsHelper
   has_paper_trail
   belongs_to :user
+  has_many :teams_users, dependent: :destroy
+  has_many :teams, through: :teams_users
   belongs_to :topic, class_name: 'SignUpTopic', inverse_of: false
   belongs_to :assignment, foreign_key: 'parent_id', inverse_of: false
   has_many   :join_team_requests, dependent: :destroy
   has_many   :reviews, class_name: 'ResponseMap', foreign_key: 'reviewer_id', dependent: :destroy, inverse_of: false
   has_many   :team_reviews, class_name: 'ReviewResponseMap', foreign_key: 'reviewer_id', dependent: :destroy, inverse_of: false
   has_many :response_maps, class_name: 'ResponseMap', foreign_key: 'reviewee_id', dependent: :destroy, inverse_of: false
-  has_many :awarded_badges, dependent: :destroy
-  has_many :badges, through: :awarded_badges
   has_one :review_grade, dependent: :destroy
   validates :grade, numericality: { allow_nil: true }
   has_paper_trail
@@ -28,7 +28,11 @@ class Participant < ApplicationRecord
   DUTY_MENTOR = 'mentor'.freeze
 
   def team
-    TeamsUser.find_by(user: user).try(:team)
+    team = TeamsUser.find_by(user: user).try(:team)
+    if team.nil?
+      team = TeamsUser.find_by(participant_id: :id)
+    end
+    team
   end
 
   def responses

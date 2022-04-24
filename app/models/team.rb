@@ -1,6 +1,7 @@
 class Team < ApplicationRecord
   has_many :teams_users, dependent: :destroy
-  has_many :users, through: :teams_users
+  has_many :users, through: :teams_users # E2243 Remove this when user_id is removed from teams_users table
+  has_many :participants, through: :teams_users
   has_many :join_team_requests, dependent: :destroy
   has_one :team_node, foreign_key: :node_object_id, dependent: :destroy
   has_many :signed_up_teams, dependent: :destroy
@@ -12,8 +13,16 @@ class Team < ApplicationRecord
   }
 
   # Get the participants of the given team
+  # E2243 Remove this function when user_id is removed from teams_users table
   def participants
-    users.where(parent_id: parent_id || current_user_id).flat_map(&:participants)
+    participants_list_from_users = users.where(parent_id: parent_id || current_user_id).flat_map(&:participants) unless users.to_a.empty?
+    participants_list_from_ids = Participant.where(id: participant_ids)
+    unless participants_list_from_users.nil? && participants_list_from_ids.nil?
+      participants_list = []
+      participants_list += participants_list_from_users unless participants_list_from_users.nil?
+      participants_list += participants_list_from_ids unless participants_list_from_ids.nil?
+      participants_list
+    end
   end
   alias get_participants participants
 
@@ -49,6 +58,10 @@ class Team < ApplicationRecord
     users.include? user
   end
 
+  def participant?(participant)
+    participants.include? participant
+  end
+
   # Check if the current team is full?
   def full?
     return false if parent_id.nil? # course team, does not max_team_size
@@ -65,11 +78,26 @@ class Team < ApplicationRecord
     can_add_member = false
     unless full?
       can_add_member = true
-      t_user = TeamsUser.create(user_id: user.id, team_id: id)
+      parent = TeamNode.find_by(node_object_id: id)
+      add_participant(parent_id, user)
+      participant = AssignmentParticipant.find_by(parent_id: parent_id, user_id: user.id)
+      t_user = TeamsUser.create(participant_id: participant.id, team_id: id)
+      TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+      ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{id}")
+    end
+    can_add_member
+  end
+
+  def add_participant_to_team(participant, _assignment_id = nil)
+    raise "The user #{participant.name} is already a member of the team #{name}" if user?(participant.user)
+    can_add_member = false
+    unless full?
+      can_add_member = true
+      t_user = TeamsUser.create(participant_id: participant.id, team_id: id)
       parent = TeamNode.find_by(node_object_id: id)
       TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
-      add_participant(parent_id, user)
-      ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{id}")
+      # add_participant(parent_id, user)
+      ExpertizaLogger.info LoggerMessage.new('Model:Team', participant.name, "Added member to the team #{id}")
     end
     can_add_member
   end
@@ -173,7 +201,7 @@ class Team < ApplicationRecord
       if user.nil?
         raise ImportError, "The user '#{teammate}' was not found. <a href='/users/new'>Create</a> this user?"
       else
-        add_member(user) if TeamsUser.find_by(team_id: id, user_id: user.id).nil?
+        add_member(user) if TeamsUser.find_by_team_id_and_user_id(id, user.id).nil?
       end
     end
   end

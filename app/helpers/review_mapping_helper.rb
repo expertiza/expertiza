@@ -222,7 +222,6 @@ module ReviewMappingHelper
     # Calculate how many responses one team received from each round
     # It is the feedback number each team member should make
     @review_response_map_ids = ReviewResponseMap.where(['reviewed_object_id = ? and reviewee_id = ?', @id, @team_id]).pluck('id')
-    # feedback_response_map_record(author) 
     # rspan means the all peer reviews one student received, including unfinished one
     @rspan_round_one = @review_responses_round_one.length
     @rspan_round_two = @review_responses_round_two.length

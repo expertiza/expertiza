@@ -85,6 +85,9 @@ describe JoinTeamRequestsController do
         allow(Team).to receive(:find).with('1').and_return(team1)
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
         allow(Participant).to receive(:where).with(user_id: 1, parent_id: '1').and_return([participant])
+
+        # allow(Participant).to receive(:where).with(any_args).and_return([participant])
+
         allow(join_team_request2).to receive(:save).and_return(true)
       end
       it "will change the status to 'P' " do

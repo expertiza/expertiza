@@ -98,7 +98,6 @@ GEM
     bullet (5.7.6)
       activesupport (>= 3.0.0)
       uniform_notifier (~> 1.11.0)
-    byebug (11.0.1)
     capistrano (3.17.0)
       airbrussh (>= 1.0.0)
       i18n
@@ -575,7 +574,6 @@ DEPENDENCIES
   awesome_nested_set (= 3.3.1)
   bootstrap3-datetimepicker-rails (~> 4.17.47)
   bullet (~> 5.7.6)
-  byebug
   capistrano
   capistrano-bundler
   capistrano-db-tasks

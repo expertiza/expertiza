@@ -1,6 +1,6 @@
 class Team < ApplicationRecord
   has_many :teams_users, dependent: :destroy
-  has_many :users, through: :teams_users
+  has_many :users, through: :teams_users # E2243 Remove this when user_id is removed from teams_users table
   has_many :participants, through: :teams_users
   has_many :join_team_requests, dependent: :destroy
   has_one :team_node, foreign_key: :node_object_id, dependent: :destroy
@@ -13,10 +13,16 @@ class Team < ApplicationRecord
   }
 
   # Get the participants of the given team
+  # E2243 Remove this function when user_id is removed from teams_users table
   def participants
-    participants_list = users.where(parent_id: parent_id || current_user_id).flat_map(&:participants)
-    participants_list += Participant.where(id: participant_ids)
-    participants_list
+    participants_list_from_users = users.where(parent_id: parent_id || current_user_id).flat_map(&:participants) unless users.nil?
+    participants_list_from_ids += Participant.where(id: participant_ids)
+    if participants_list_from_users.nil? || participants_list_from_ids.nil?
+      participants_list = []
+      participants_list += participants_list_from_users unless participants_list_from_users.nil?
+      participants_list += participants_list_from_ids unless participants_list_from_ids.nil?
+      participants_list
+    end
   end
   alias get_participants participants
 

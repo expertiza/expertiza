@@ -234,6 +234,8 @@ hi_IN:
       select: "Select"
       questionnaire: "Questionnaire"
       disabled: "(disabled)"
+      num_bids: "Total num. of bids"
+      num_1_2_bids: "Num. #1/#2 bids"
 
     suggested_topic:
       approved_suggestion: "आपका अनुमोदित से सुझाया गया विषय"

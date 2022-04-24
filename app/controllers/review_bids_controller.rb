@@ -99,7 +99,7 @@ class ReviewBidsController < ApplicationController
     # list of reviewer id's from a specific assignment
     reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
     bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
-    matched_topics = run_bidding_algorithm(bidding_data)
+    matched_topics = assign_reviewers(bidding_data)
     ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
     Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
     redirect_to :back
@@ -109,7 +109,7 @@ class ReviewBidsController < ApplicationController
   # passing webserver: student_ids, topic_ids, student_preferences, time_stamps
   # webserver returns:
   # returns matched assignments as json body
-  def run_bidding_algorithm(bidding_data)
+  def assign_reviewers(bidding_data)
     # begin
     url = 'http://app-csc517.herokuapp.com/match_topics' # hard coding for the time being
     response = RestClient.post url, bidding_data.to_json, content_type: 'application/json', accept: :json

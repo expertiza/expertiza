@@ -16,6 +16,15 @@ describe SignUpSheetController do
   let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
   let(:due_date2) { build(:assignment_due_date, deadline_type_id: 2) }
   let(:bid) { Bid.new(topic_id: 1, priority: 1) }
+  let(:assignment_with_participants) do
+    build(:assignment,
+          id: 1,
+          name: 'test_assignment',
+          instructor_id: 2,
+          participants: [build(:participant, id: 1, user_id: 6, assignment: assignment)],
+          course_id: 1)
+  end
+  let(:participants_list) { [build(:participant, id: 1, user_id: 6, assignment: assignment)] }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -765,13 +774,19 @@ describe SignUpSheetController do
 
   describe '#switch_original_topic_to_approved_suggested_topic' do
     it 'redirects to sign_up_sheet#list page' do
-      allow(TeamsUser).to receive(:where).with(user_id: 6).and_return([double('TeamsUser', team_id: 1)])
+      teamusers = [double('TeamsUser', team_id: 1)]
+      allow(TeamsUser).to receive(:where).with(any_args).and_return(teamusers)
+      allow(teamusers).to receive(:or).with(any_args).and_return(teamusers)
+      allow(TeamsUser).to receive(:where).with(user_id: 6).and_return(teamusers)
       allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([double('TeamsUser', team_id: 1, user_id: 8)])
+      allow(TeamsUser).to receive(:where).with(participant_id: 1).and_return(teamusers)
       allow(Team).to receive(:find).with(1).and_return(team)
       team.parent_id = 1
       allow(SignedUpTeam).to receive(:where).with(team_id: 1, is_waitlisted: 0).and_return([signed_up_team])
       allow(SignedUpTeam).to receive(:where).with(topic_id: 1, is_waitlisted: 1).and_return([signed_up_team])
       allow(SignUpSheet).to receive(:signup_team).with(1, 8, 1).and_return('OK!')
+      allow_any_instance_of(Assignment).to receive(:participants).and_return(assignment_with_participants.participants)
+      allow(assignment_with_participants.participants).to receive(:find_by).and_return(participant)
       request_params = {
         id: 1,
         topic_id: 1

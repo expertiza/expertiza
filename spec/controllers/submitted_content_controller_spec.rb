@@ -6,6 +6,16 @@ describe SubmittedContentController do
   let(:team) { build(:assignment_team, id: 1) }
   let(:participant) { build(:participant, id: 1, user_id: 21) }
   let(:assignment) { build(:assignment, id: 1) }
+  let(:assignment_with_participants) do
+    build(:assignment,
+          id: 1,
+          name: 'test_assignment',
+          instructor_id: 2,
+          participants: [build(:participant, id: 1, user_id: 21, assignment: assignment)],
+          course_id: 1)
+  end
+  let(:participants_list) { [build(:participant, id: 1, user_id: 21, assignment: assignment)] }
+
   describe '#action_allowed?' do
     context 'current user is not authorized' do
       it 'does not allow action for no user' do
@@ -341,6 +351,10 @@ describe SubmittedContentController do
       allow(Participant).to receive(:find_by).and_return(participant)
       stub_current_user(instructor1, instructor1.role.name, instructor1.role)
       allow(participant).to receive(:name).and_return('Name')
+
+      allow_any_instance_of(Assignment).to receive(:participants).and_return(assignment_with_participants.participants)
+      allow(assignment_with_participants.participants).to receive(:find_by).and_return(participant)
+
       params = { id: 21 }
       response = get :edit, params: params
       expect(response).to render_template(:edit)

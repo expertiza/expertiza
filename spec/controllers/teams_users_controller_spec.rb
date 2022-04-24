@@ -128,7 +128,7 @@ describe TeamsUsersController do
         allow(Team).to receive(:find).with('1').and_return(team1)
         allow(AssignmentTeam).to receive(:find).with('1').and_return(team1)
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
-        allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
+        allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
         allow(TeamsUser).to receive(:create).with(any_args).and_return(team_user1)
         allow(TeamNode).to receive(:find_by).with(any_args).and_return(student2)
         allow(TeamUserNode).to receive(:create).with(any_args).and_return(true)

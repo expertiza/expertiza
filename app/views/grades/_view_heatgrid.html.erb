@@ -91,7 +91,14 @@ function toggleFunction(elementId) {
 
           <!-- display the table title and tooltips -->
           <span style="width:100%;">
-              <h4 style="font-weight:bold;display:inline-block;"><%= vm.questionnaire_display_type %>
+              <% if vm.questionnaire_display_type == "Author Feedback" %>
+                <% user_name = User.find(@participant.user_id).fullname(session[:ip]).to_s %>
+                <h4 style="font-weight:bold;display:inline-block;"><%= vm.questionnaire_display_type + " by "+ user_name %>
+              <% else %>
+                <% user_name = User.find(@participant.user_id).fullname(session[:ip]).to_s %>
+                <h4 style="font-weight:bold;display:inline-block;"><%= vm.questionnaire_display_type + " for "+ user_name %>
+              <% end %>
+              
                 <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
                     (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
                 <%end %>

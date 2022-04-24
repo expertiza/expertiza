@@ -59,7 +59,7 @@
 </div><br><br>
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% @vmlist.each_with_index do |vm, table_count| %>
-    <% if (vm.questionnaire_display_type == "Metareview" || vm.questionnaire_display_type == "Author Feedback" || vm.questionnaire_display_type == "Teammate Review" || vm.questionnaire_display_type == "Teammate Reviews received by this user from their teammates")  and @current_role_name.eql?'Student' %>
+    <% if (vm.questionnaire_display_type == "Metareview" || vm.questionnaire_display_type == "Author Feedback" || vm.questionnaire_display_type == "Teammate Review")  and @current_role_name.eql?'Student' %>
     <% else %>
         <% if vm.list_of_reviewers.length > 0 %>
 

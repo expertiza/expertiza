@@ -23,9 +23,6 @@ class VmQuestionResponse
     @max_score = questionnaire.max_question_score
     @questionnaire_type = questionnaire.type
     @questionnaire_display_type = questionnaire.display_type
-    if @questionnaire_display_type == "Teammate Review"
-      @questionnaire_display_type = "Teammate Reviews received by this user from their teammates" 
-    end
     @rounds = rounds
     @round = round
     @name  = questionnaire.name

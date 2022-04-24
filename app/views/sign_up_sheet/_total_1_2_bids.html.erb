@@ -1,5 +1,5 @@
 <%# Logic to show #1/#2 bids here%>
-<% @total_bids_per_topic.each do |t, bids| %>
+<% @priority_per_topic.each do |t, bids| %>
      <% if t.to_i == topic.id.to_i %>
 	<td align="center"><%= bids[0] %> / <%= bids[1] %></td>
      <% end %>

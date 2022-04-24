@@ -8,6 +8,7 @@ describe Team do
   let(:user2) { build(:student, id: 2) }
   let(:user3) { build(:student, id: 3) }
   let(:team) { build(:assignment_team, id: 1, name: 'no team', users: [user]) }
+  let(:team_with_participants_mapping) { build(:assignment_team, id: 1, name: 'no team with participants mapping', participants: [participant]) }
   let(:team_user) { build(:team_user, id: 1, user: user) }
   before(:each) do
     allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
@@ -47,16 +48,21 @@ describe Team do
     end
   end
 
-  describe '#user?' do
+  describe '#user? with user_id mapping' do
     context 'when users in current team includes the parameterized user' do
-      it 'returns true' do
+      it 'returns true when user exists' do
+        allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
+        allow(team).to receive(:participants).and_return([participant])
         expect(team.user?(user)).to be true
       end
     end
 
     context 'when users in current team does not include the parameterized user' do
-      it 'returns false' do
-        expect(team.user?(double('User'))).to be false
+      it 'returns false when user does not exists' do
+        mock_user = double('User')
+        allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
+        allow(mock_user).to receive(:id).and_return(nil)
+        expect(team.user?(mock_user)).to be false
       end
     end
   end
@@ -92,6 +98,8 @@ describe Team do
   describe '#add_member' do
     context 'when parameterized user has already joined in current team' do
       it 'raise an error' do
+        allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
+        allow(team).to receive(:participants).and_return([participant])
         expect { team.add_member(user) }.to raise_error(RuntimeError, "The user #{user.name} is already a member of the team #{team.name}")
       end
     end

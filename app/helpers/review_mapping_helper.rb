@@ -217,7 +217,7 @@ module ReviewMappingHelper
   end
 
   # gets review and feedback responses for all rounds for the feedback report
-  def get_each_review_and_feedback_response_map(author)
+  def get_each_review_response_map(author)
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     # Calculate how many responses one team received from each round
     # It is the feedback number each team member should make
@@ -226,12 +226,17 @@ module ReviewMappingHelper
     @rspan_round_one = @review_responses_round_one.length
     @rspan_round_two = @review_responses_round_two.length
     @rspan_round_three = @review_responses_round_three.nil? ? 0 : @review_responses_round_three.length
+    
+    # set values of instance variable for review_responses_round
+    { 1 => 'one', 2 => 'two', 3 => 'three' }.each do |key, round_num|
+      instance_variable_set('@review_responses_round_' + round_num,
+                            Response.where(['map_id IN (?) and round = ?', @review_response_map_ids, key]))
+    end
   end
 
   # gets review and feedback responses for a certain round for the feedback report
   def certain_review_and_feedback_response_map?(author)
     # Setting values of instance variables
-    @feedback_response_maps = FeedbackResponseMap.where(['reviewed_object_id IN (?) and reviewer_id = ?', @all_review_response_ids, author.id])
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     @review_response_map_ids = ReviewResponseMap.where(['reviewed_object_id = ? and reviewee_id = ?', @id, @team_id]).pluck('id')
     @review_responses = Response.where(['map_id IN (?)', @review_response_map_ids])

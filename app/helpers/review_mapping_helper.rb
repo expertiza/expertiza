@@ -229,19 +229,6 @@ module ReviewMappingHelper
     @rspan_round_three = @review_responses_round_three.nil? ? 0 : @review_responses_round_three.length
   end
 
-  # E2239 - This function is repeated in /view/report/_feedback_report.html.erb
-  # This function sets the values of instance variable
-  #def feedback_response_map_record(author)
-  #  { 1 => 'one', 2 => 'two', 3 => 'three' }.each do |key, round_num|
-  #    instance_variable_set('@review_responses_round_' + round_num,
-  #                          Response.where(['map_id IN (?) and round = ?', @review_response_map_ids, key]))
-  #    # Calculate feedback response map records
-  #    instance_variable_set('@feedback_response_maps_round_' + round_num,
-  #                          FeedbackResponseMap.where(['reviewed_object_id IN (?) and reviewer_id = ?',
-  #                                                     instance_variable_get('@all_review_response_ids_round_' + round_num), author.id]))
-  #  end
-  #end
-
   # gets review and feedback responses for a certain round for the feedback report
   def certain_review_and_feedback_response_map?(author)
     # Setting values of instance variables
@@ -264,43 +251,5 @@ module ReviewMappingHelper
                   'c1'
                 end
     css_class
-  end
-
-  class ReviewStrategy
-    attr_accessor :participants, :teams
-
-    def initialize(participants, teams, review_num)
-      @participants = participants
-      @teams = teams
-      @review_num = review_num
-    end
-  end
-
-  class StudentReviewStrategy < ReviewStrategy
-    def reviews_per_team
-      (@participants.size * @review_num * 1.0 / @teams.size).round
-    end
-
-    def reviews_needed
-      @participants.size * @review_num
-    end
-
-    def reviews_per_student
-      @review_num
-    end
-  end
-
-  class TeamReviewStrategy < ReviewStrategy
-    def reviews_per_team
-      @review_num
-    end
-
-    def reviews_needed
-      @teams.size * @review_num
-    end
-
-    def reviews_per_student
-      (@teams.size * @review_num * 1.0 / @participants.size).round
-    end
   end
 end

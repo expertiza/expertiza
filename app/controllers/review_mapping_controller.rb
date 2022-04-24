@@ -390,9 +390,9 @@ class ReviewMappingController < ApplicationController
     participants.each { |participant| participants_hash[participant.id] = 0 }
     # calculate reviewers for each team
     if !student_review_num.zero? && submission_review_num.zero?
-      review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, student_review_num)
+      review_strategy = StudentReviewStrategy.new(participants, teams, student_review_num)
     elsif student_review_num.zero? && !submission_review_num.zero?
-      review_strategy = ReviewMappingHelper::TeamReviewStrategy.new(participants, teams, submission_review_num)
+      review_strategy = TeamReviewStrategy.new(participants, teams, submission_review_num)
     end
 
     peer_review_strategy(assignment_id, review_strategy, participants_hash)

@@ -83,8 +83,10 @@
   <td align="center"><%= topic.max_choosers %></td>
   <%= render :partial => '/sign_up_sheet/available_slots', :locals => {:topic=>topic} %>
   <%= render :partial => '/sign_up_sheet/num_waiting', :locals => {:topic=>topic} %>
-  <%= render :partial => '/sign_up_sheet/total_bids', :locals => {:topic=>topic} %>
-  <%= render :partial => '/sign_up_sheet/total_1_2_bids', :locals => {:topic=>topic}%>
+  <% if session[:user].role_id == 2 %>  
+    <%= render :partial => '/sign_up_sheet/total_bids', :locals => {:topic=>topic} %>
+    <%= render :partial => '/sign_up_sheet/total_1_2_bids', :locals => {:topic=>topic}%>
+  <% end %>
   <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>
       <td align="center"> <%= render :partial => '/sign_up_sheet/actions', :locals => {:i=>i,:topic=>topic, :is_suggested_topic=>is_suggested_topic ||= false} %> </td>
   <% end %>

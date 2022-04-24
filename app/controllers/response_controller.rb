@@ -324,6 +324,7 @@ class ResponseController < ApplicationController
   end
 
 
+
   def set_questions_for_new_response
     @questions = sort_questions(@questionnaire.questions)
     if(@assignment && @assignment.is_revision_planning_enabled)

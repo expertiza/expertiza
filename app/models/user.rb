@@ -117,7 +117,11 @@ class User < ApplicationRecord
   end
 
   def fullname(ip_address = nil)
-    User.anonymized_view?(ip_address) ? role.name + ', ' + id.to_s : self[:fullname]
+    if User.anonymized_view?(ip_address)
+      return "Anonymized_User_#{self[:id]}"
+    else
+      return self[:fullname]
+    end
   end
 
   def first_name(ip_address = nil)

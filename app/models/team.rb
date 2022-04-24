@@ -83,7 +83,7 @@ class Team < ApplicationRecord
   end
 
   def add_participant_to_team(participant, _assignment_id = nil)
-    raise "The user #{participant.name} is already a member of the team #{name}" if user?(participant.user)
+    raise "The user #{participant.name} is already a member of the team #{name}" if participant?(participant.user)
     can_add_member = false
     unless full?
       can_add_member = true

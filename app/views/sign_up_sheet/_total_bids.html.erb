@@ -1,2 +1,12 @@
 <%# Logic to show total bids here%>
-<td align="center">0</td>
+<% found_in_slots = false %>
+<% @total_bids_per_topic.each do |t, bids| %>
+     <% if t.to_i == topic.id.to_i %>
+	<td align="center"><%= bids  %></td>
+	<% found_in_slots = true%>
+     <% end %>
+<% end %>
+
+<% unless found_in_slots %>
+  <td align="center">0</td>
+<% end %>

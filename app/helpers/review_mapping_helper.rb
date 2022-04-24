@@ -183,7 +183,12 @@ module ReviewMappingHelper
 
   # E2239 chart methods moved to review_mapping_chart_helper
 
-  def list_review_submissions(participant_id, reviewee_team_id, response_map_id)
+  # Given a review, list the links to the files (documents, pictures, etc) that the reviewer uploaded for that review
+  #   First this checks to make sure the reviewer and the team they reviewed exist
+  #   If they do not, it returns blank
+  #   If they do exist, it calls submitted_content_helper.rb > display_review_files_directory_tree
+  #     in order to get the (html formatted) list of links to the uploaded files
+  def list_review_uploaded_files(participant_id, reviewee_team_id, response_map_id)
     participant = Participant.find(participant_id)
     team = AssignmentTeam.find(reviewee_team_id)
     html = ''

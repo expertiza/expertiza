@@ -16,8 +16,8 @@
   <b><%=t ".team_members"%></b>
   <br/><br/>
   <!--start team member table-->
-<%= render :partial => 'team_display' %>
-    <% end %>
+  <%= render :partial => 'team_display' %>
+<% end %>
 
 
 <!--render partial for join team request-->
@@ -32,61 +32,34 @@
   <br/><br/>
   <!-- start invited people table -->
   <%= render :partial => 'invited_people',
-             :locals => {:send_invs=>@send_invs}
-  %>
-  <!-- start invited people table -->
+             :locals => {:send_invs=>@send_invs} %>
 <% end %>
-<br/>
 
 <!--display send invitation-->
 <!--send invitation-->
 <% if !@student.team.nil? && @student.assignment.max_team_size > 1 %>
   <%= render :partial => 'send_invitations',
-             :locals => {:student=>@student}
-  %>
+             :locals => {:student=>@student} %>
 <% end %>
 <br/>
 
-
 <!--display a table of received invitation-->
 <% if @received_invs && @received_invs.length > 0 %>
-
   <%= render :partial => 'received_invitations',
-             :locals => {:received_invs=>@received_invs}
-  %>
+             :locals => {:received_invs=>@received_invs} %>
 <% end %>
 <br/>
 
 <!--display the advertisement-->
-
 <% if @student.team && @student.assignment.topics? && @student.team.topic%>
-  <b><%=t ".ad_for_team"%></b>
-  <br>
-  <table style="width:80%" align="center" >
-    <tr>
-      <td>
-        <% if @student.team && @student.team.advertise_for_partner%>
-          <%= @student.team.comments_for_advertisement%>
-          &nbsp;&nbsp;&nbsp;&nbsp;
-          <%= link_to 'Edit', :controller => 'advertise_for_partner', :action => 'edit', :team_id=>@student.team.id %>
-          &nbsp;&nbsp;
-          <%= link_to 'Delete', :controller => 'advertise_for_partner', :action => 'remove', :team_id=>@student.team.id %>
-        <% else %>
-          <%= link_to 'Create', :controller => 'advertise_for_partner', :action => 'new', :team_id=>@student.team.id %>
-        <% end %>
-      </td>
-    </tr>
-  </table>
+  <%= render :partial => 'display_advertisements',
+             :locals => {:student=>@student} %>
 <% end %>
-
-
-
 <br/>
 
 <!--display a list of sent join-team requests-->
 <%= render :partial => 'join_team_requests/list_sent',
            :locals =>{:teams_user_id=>params[:student_id],
-                      :assignment_id => @student.assignment.id
-           } %>
+                      :assignment_id => @student.assignment.id } %>
 <br>
 <a href="javascript:window.history.back()"><%=t ".back"%></a>

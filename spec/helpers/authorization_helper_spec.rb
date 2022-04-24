@@ -527,6 +527,7 @@ describe AuthorizationHelper do
     it 'returns true if map is of type ReviewResponseMap and current user is on the reviewee team' do
       stub_current_user(student, student.role.name, student.role)
       reviewer = create(:participant)
+      create(:participant, user_id: session[:user].id, id: 2)
       team = create(:assignment_team)
       TeamNode.create(node_object_id: team.id)
       team.add_member(session[:user])

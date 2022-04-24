@@ -727,7 +727,7 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  describe 'get_awarded_review_score' do
+  describe 'awarded_review_metrics?' do
     before(:each) do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -747,7 +747,7 @@ describe ReviewMappingHelper, type: :helper do
 
       @review_scores = { @reviewer.id => { 1 => { @reviewee.id => 10 }, 2 => { @reviewee.id => 20 }, 3 => { @reviewee.id => 30 } } }
 
-      awarded_review_score?(@reviewer.id, @reviewee.id)
+      awarded_review_metrics?(@reviewer.id, @reviewee.id)
     end
 
     it 'should return the review score given by a reviewer for round 1 for the defined team' do

@@ -398,9 +398,9 @@
   <div id="save_confirm"></div>
   <%= submit_tag "Save " + @title, :name => "save", :id => "save_review" %>
   <!--#E2230 Adding UI for Metrics-->
-  <%= content_tag :div, class: "fetch_review_metric", data: {params: @review_metric_config} do %>
+  <%= content_tag :div, class: "fetch_review_metric", data: {params: @review_metric_config, id: params[:id]} do %>
   <% end %>
-  <%= content_tag :div, class: "fetch_review_metric_api_call_values", data: {params: @review_metric_api_call_values} do %>
+  <%= content_tag :div, class: "fetch_review_metric_api_call_values", data: {params: @review_metric_api_call_values, id: params[:id]} do %>
   <% end %>
   <%= render partial: 'response/response_analysis', locals: {origin: 'review'}%>
 

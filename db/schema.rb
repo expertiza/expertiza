@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220111023859) do
+ActiveRecord::Schema.define(version: 20220424063124) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -130,6 +130,7 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.boolean "auto_assign_mentor", default: false
     t.boolean "duty_based_assignment?"
     t.boolean "questionnaire_varies_by_duty"
+    t.boolean "is_revision_planning_enabled"
     t.index ["course_id"], name: "fk_assignments_courses"
     t.index ["instructor_id"], name: "fk_assignments_instructors"
     t.index ["late_policy_id"], name: "fk_late_policy_id"
@@ -337,8 +338,8 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "user_id"
-    t.integer "lockable_id"
     t.string "lockable_type"
+    t.integer "lockable_id"
     t.index ["user_id"], name: "fk_rails_426f571216"
   end
 
@@ -531,6 +532,16 @@ ActiveRecord::Schema.define(version: 20220111023859) do
     t.datetime "review_graded_at"
     t.integer "reviewer_id"
     t.index ["participant_id"], name: "fk_rails_29587cf6a9"
+  end
+
+  create_table "revision_plan_team_maps", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.integer "team_id"
+    t.integer "questionnaire_id"
+    t.integer "used_in_round"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["questionnaire_id"], name: "index_revision_plan_team_maps_on_questionnaire_id"
+    t.index ["team_id"], name: "index_revision_plan_team_maps_on_team_id"
   end
 
   create_table "roles", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -809,6 +820,8 @@ ActiveRecord::Schema.define(version: 20220111023859) do
   add_foreign_key "review_bids", "users"
   add_foreign_key "review_comment_paste_bins", "review_grades"
   add_foreign_key "review_grades", "participants"
+  add_foreign_key "revision_plan_team_maps", "questionnaires"
+  add_foreign_key "revision_plan_team_maps", "teams"
   add_foreign_key "sign_up_topics", "assignments", name: "fk_sign_up_topics_assignments"
   add_foreign_key "signed_up_teams", "sign_up_topics", column: "topic_id", name: "fk_signed_up_users_sign_up_topics"
   add_foreign_key "survey_deployments", "questionnaires"

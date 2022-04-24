@@ -105,6 +105,22 @@ to display the label "Your team" in the student assignment tasks-->
     <% end %>
   <%end%>
 
+  <% if @team && @assignment.is_revision_planning_enabled %>
+    <li>
+      <% if @can_submit_revision_plan %>
+        <% if @revision_plan_questionnaire_id %>
+          <%= link_to "Revision Planning", controller: 'revision_plan_questionnaires', action: 'edit', id: @revision_plan_questionnaire_id %> 
+        <% else %>
+          <%= link_to "Revision Planning", controller: 'revision_plan_questionnaires', action: 'new', team_id: @team %>
+        <% end %>
+        (Add new questions to next-round rubric)
+      <% else %>
+        <font color="gray">Revision Planning</font> (You are not allowed to submit your revison plan right now)
+      <% end %>
+    </li>
+  <%end%>
+
+
   <% if @team && (@authorization == 'participant' or @can_submit == true) %>
     <li>
       <!--Only if the assignment supports self-review and students submitted self-review can he or she view scores.-->

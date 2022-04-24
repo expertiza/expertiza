@@ -29,7 +29,8 @@ class Questionnaire < ApplicationRecord
                          'CourseSurveyQuestionnaire',
                          'Bookmark RatingQuestionnaire',
                          'BookmarkRatingQuestionnaire',
-                         'QuizQuestionnaire'].freeze
+                         'QuizQuestionnaire',
+                         'RevisionPlanQuestionnaire'].freeze
   has_paper_trail
 
   def get_weighted_score(assignment, scores)

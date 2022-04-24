@@ -113,7 +113,7 @@ class ResponseController < ApplicationController
       end
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = questionnaire_from_response
-      questions = sort_questions(@questionnaire.questions)
+      questions = set_questions
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
@@ -136,9 +136,8 @@ class ResponseController < ApplicationController
     # A new response has to be created when there hasn't been any reviews done for the current round,
     # or when there has been a submission after the most recent review in this round.
     @response = @response.populate_new_response(@map, @current_round)
-    questions = sort_questions(@questionnaire.questions)
     store_total_cake_score
-    init_answers(questions)
+    init_answers(@questions)
     render action: 'response'
   end
 
@@ -191,7 +190,7 @@ class ResponseController < ApplicationController
 
     # :version_num=>@version)
     # Change the order for displaying questions for editing response views.
-    questions = sort_questions(@questionnaire.questions)
+    questions = set_questions
     create_answers(params, questions) if params[:responses]
     msg = 'Your response was successfully saved.'
     error_msg = ''
@@ -314,7 +313,7 @@ class ResponseController < ApplicationController
     @contributor = @map.contributor
     new_response ? questionnaire_from_response_map : questionnaire_from_response
     set_dropdown_or_scale
-    @questions = sort_questions(@questionnaire.questions)
+    new_response ? set_questions_for_new_response : set_questions  
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
     # The new response is created here so that the controller has access to it in the new method
@@ -323,6 +322,29 @@ class ResponseController < ApplicationController
       @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
     end
   end
+
+
+  def set_questions_for_new_response
+    @questions = sort_questions(@questionnaire.questions)
+    if(@assignment && @assignment.is_revision_planning_enabled)
+      reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
+      current_round = @assignment.number_of_current_round(reviewees_topic)
+      @revision_plan_questionnaire = RevisionPlanTeamMap.find_by(team_id: @map.reviewee_id, used_in_round: current_round).try(:questionnaire)
+      if(@revision_plan_questionnaire)
+        @questions += sort_questions(@revision_plan_questionnaire.questions)
+      end
+    end
+    return @questions
+  end
+
+  def set_questions
+    @questions = []
+    answers = @response.scores
+    questionnaires = @response.questionnaires_by_answers(answers)
+    questionnaires.each {|questionnaire| @questions += sort_questions(questionnaire.questions) }
+    return @questions
+  end
+
 
   # This method is called within the Edit or New actions
   # It will create references to the objects that the controller will need when a user creates a new response or edits an existing one.

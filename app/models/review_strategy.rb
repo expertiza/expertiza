@@ -6,4 +6,3 @@ class ReviewStrategy
     @review_num = review_num
   end
 end
-

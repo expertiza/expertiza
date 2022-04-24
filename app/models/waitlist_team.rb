@@ -4,8 +4,6 @@ class WaitlistTeam < ApplicationRecord
 
   validates :topic_id, :team_id, presence: true
   validates :topic_id, uniqueness: { scope: :team_id }
-  scope :by_team_id, ->(team_id) { where('team_id = ?', team_id) }
-  scope :by_topic_id, ->(topic_id) { where('topic_id = ?', topic_id) }
 
   def self.add_team_to_topic_waitlist(team_id, topic_id, user_id)
     new_waitlist = WaitlistTeam.new
@@ -33,7 +31,7 @@ class WaitlistTeam < ApplicationRecord
 
   def self.first_team_in_waitlist_for_topic(topic_id)
     waitlisted_team_for_topic = WaitlistTeam.where(topic_id: topic_id).order("created_at ASC").first
-    waitlisted_team_for_topic
+    return waitlisted_team_for_topic
   end
 
   def self.team_has_any_waitlists?(team_id)
@@ -60,7 +58,7 @@ class WaitlistTeam < ApplicationRecord
     waitlisted_teams_for_topic = get_all_waitlists_for_topic topic_id
     unless waitlisted_teams_for_topic.nil?
       waitlisted_teams_for_topic.each do |entry|
-        entry.delete
+        entry.destroy
       end
     else
       ExpertizaLogger.info LoggerMessage.new('WaitlistTeam', user_id, "Cannot find Topic #{topic_id} in waitlist.")
@@ -85,27 +83,11 @@ class WaitlistTeam < ApplicationRecord
     list_of_topic_waitlist_counts
   end
 
-  def self.check_team_waitlisted_for_topic(team_id,topic_id)
-    if WaitlistTeam.exists?(team_id: team_id, topic_id: topic_id)
-      return true
-    end
-    return false
-  end
-  def self.signup_first_waitlist_team(topic_id)
+  def self.promote_waitlist_team_to_signup(team_id, topic_id)
+    
+    max_choosers = SignUpTopic.find(signup_topic_id).max_choosers
     ApplicationRecord.transaction do
-      first_waitlist_team = first_team_in_waitlist_for_topic(topic_id)
-      unless first_waitlist_team.blank?
-        sign_up_waitlist_team = SignedUpTeam.new
-        sign_up_waitlist_team.topic_id = first_waitlist_team.topic_id
-        sign_up_waitlist_team.team_id = first_waitlist_team.team_id
-        if sign_up_waitlist_team.valid?
-          sign_up_waitlist_team.save
-          first_waitlist_team.destroy
-        else
-          ExpertizaLogger.info LoggerMessage.new('WaitlistTeam', session[:user].id, "Cannot find Topic #{topic_id} in waitlist.")
-          raise ActiveRecord::Rollback
-        end
-      end
+
     end
   end
 

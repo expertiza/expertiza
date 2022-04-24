@@ -13,7 +13,8 @@ class Invitation < ApplicationRecord
     first_waitlisted_signup.save
 
     # Cancel all topics the user is waitlisted for
-    Waitlist.cancel_all_waitlists(first_waitlisted_signup.team_id, SignUpTopic.find(topic_id).assignment_id)
+    # Waitlist.cancel_all_waitlists(first_waitlisted_signup.team_id, SignUpTopic.find(topic_id).assignment_id)
+    WaitlistTeam.delete_all_waitlists_for_team(first_waitlisted_signup.team_id)
   end
 
   # Remove all invites sent by a user for an assignment.

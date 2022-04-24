@@ -23,76 +23,39 @@ class SignUpSheet < ApplicationRecord
     sign_up.topic_id = topic_id
     sign_up.team_id = team_id
     result = false
-    if user_signup.empty?
 
-      # Using a DB transaction to ensure atomic inserts
-      ApplicationRecord.transaction do
-        # check whether slots exist (params[:id] = topic_id) or has the user selected another topic
-        team_id, topic_id = create_SignUpTeam(assignment_id, sign_up, topic_id, user_id)
-        result=true 
+    # Using a DB transaction to ensure atomic inserts
+    ApplicationRecord.transaction do
+      # check whether slots exist (params[:id] = topic_id)
+      if slotAvailable?(topic_id)
+        result = true if signup_team_to_topic(assignment_id, sign_up, topic_id, user_id, user_signup)
+      elsif user_signup.empty?
+        # only waitlist team if user doesn't have other signups
+        unless WaitlistTeam.add_team_to_topic_waitlist(team_id, topic_id, user_id)
+          raise ActiveRecord::Rollback 
+        else
+          result = true
+        end
       end
     end
     result
   end
-        # if sign_up.is_waitlisted == false
-        #   sign_up.save
-        #   result = true
-        # end      
-    # else
-    #   # # If all the topics chosen by the user are waitlisted,
-    #   # user_signup.each do |user_signup_topic|
-    #   #   return false unless user_signup_topic.is_waitlisted
-    #   # end
 
-    #   # Using a DB transaction to ensure atomic inserts
-    #   ApplicationRecord.transaction do
-    #     # check whether user is clicking on a topic which is not going to place him in the waitlist
-    #     result = sign_up_wailisted(assignment_id, sign_up, team_id, topic_id)
-    #   end
-    # end
-
-  def self.sign_up_wailisted(assignment_id, sign_up, team_id, topic_id)
-    if slotAvailable?(topic_id)
-      # if slot exist, then confirm the topic for the user and delete all the waitlist for this user
-      result = cancel_all_wailists(assignment_id, sign_up, team_id, topic_id)
-      WaitlistTeam.delete_all_waitlists_for_team team_id, assignment_id
-    else
-      sign_up.is_waitlisted = true
-      result = true if sign_up.save
-      ExpertizaLogger.info LoggerMessage.new('SignUpSheet', '', "Sign up sheet created for waitlisted with teamId #{team_id}")
-    end
-    result
-  end
-
-  def self.cancel_all_wailists(assignment_id, sign_up, team_id, topic_id)
-    Waitlist.cancel_all_waitlists(team_id, assignment_id)
+  def self.signup_team_to_topic(assignment_id, sign_up, topic_id, user_id, user_signup)
+    team_id = TeamsUser.team_id(assignment_id, user_id)
     sign_up.is_waitlisted = false
-    sign_up.save
-    # Update topic_id in signed_up_teams table with the topic_id
-    signUp = SignedUpTeam.where(topic_id: topic_id).first
-    signUp.update_attribute('topic_id', topic_id)
-    return true
-  end
-
-  def self.create_SignUpTeam(assignment_id, sign_up, topic_id, user_id)
-    if slotAvailable?(topic_id)
-      sign_up.is_waitlisted = false
-      # Create new record in signed_up_teams table
-      team_id = TeamsUser.team_id(assignment_id, user_id)
-      #topic_id = SignedUpTeam.topic_id(assignment_id, user_id)
-      sign_up.save
-      #is_created=SignedUpTeam.create(topic_id: topic_id, team_id: team_id, is_waitlisted: 0, preference_priority_number: nil)
-      WaitlistTeam.delete_all_waitlists_for_team(team_id,assignment_id)
-      ExpertizaLogger.info LoggerMessage.new('SignUpSheet', user_id, "Sign up sheet created with teamId #{team_id}")
-    else
-      #sign_up.is_waitlisted = true
-      team_id = TeamsUser.team_id(assignment_id, user_id)
-      unless WaitlistTeam.add_team_to_topic_waitlist(team_id, topic_id, user_id)
-        # flash[:error] = "Error occured while waitlisting to topic #{topic_id}"
-        raise ActiveRecord::Rollback 
-      end
+    result = false
+    # has the user selected another topic
+    unless user_signup.empty?
+      SignedUpTeam.delete_all_signed_up_topics_for_team(team_id)
     end
-    [team_id, topic_id]
+
+    # Create new record in signed_up_teams table
+    result = sign_up.save
+
+    WaitlistTeam.delete_all_waitlists_for_team(team_id,assignment_id)
+    ExpertizaLogger.info LoggerMessage.new('SignUpSheet', user_id, "Sign up sheet created with teamId #{team_id}")
+    result
   end
 
   def self.otherConfirmedTopicforUser(assignment_id, team_id)

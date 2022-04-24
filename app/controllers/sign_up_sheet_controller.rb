@@ -219,11 +219,13 @@ class SignUpSheetController < ApplicationController
       # sign up again unless the former was a waitlisted topic
       # if team assignment, then team id needs to be passed as parameter else the user's id
       users_team = SignedUpTeam.find_team_users(@assignment.id, session[:user].id)
-      @selected_topics = if users_team.empty?
-                           nil
-                         else
-                           SignedUpTeam.find_user_signup_topics(@assignment.id, users_team.first.t_id)
-                         end
+      if users_team.empty?
+        @selected_topics = nil
+        @waitlisted_topics = nil
+      else
+        @selected_topics = SignedUpTeam.find_user_signup_topics(@assignment.id, users_team.first.t_id)
+        @waitlisted_topics = WaitlistTeam.get_all_waitlists_for_team(users_team.first.t_id, @assignment.id)
+      end      
     end
     render('sign_up_sheet/intelligent_topic_selection') && return if @assignment.is_intelligent
   end

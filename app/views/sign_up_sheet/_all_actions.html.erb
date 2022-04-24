@@ -28,6 +28,15 @@
               <% end %>
           <% end %>
       <% end %>
+      <% unless @waitlisted_topics.nil? || @waitlisted_topics.size.zero? %>
+          <% @waitlisted_topics.each do | waitlisted_topic |  %>
+              <% if waitlisted_topic.topic_id == topic.id %>
+                  <td align="center"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id=>params[:id], :topic_id => topic.id, :assignment_id => params[:assignment_id] %></td>
+                  <% action_symbol_added = true %>
+              <% end %>
+          <% end %>
+      <% end %>
+
       <% unless action_symbol_added %>
           <!--#if there is a signup topic deadline in current assignment, after the signup topic deadline, student will not see the choice of signing up topics any more. -->
           <% if @assignment.is_intelligent %>

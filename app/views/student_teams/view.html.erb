@@ -39,12 +39,14 @@
 <br/>
 
 <!--display send invitation-->
-  <% if !@student.team.nil? && @student.assignment.max_team_size > 1 %>
-    <%= render :partial => 'send_invitations',
-               :locals => {:student=>@student}
-    %>
-  <% end %>
+<!--send invitation-->
+<% if !@student.team.nil? && @student.assignment.max_team_size > 1 %>
+  <%= render :partial => 'send_invitations',
+             :locals => {:student=>@student}
+  %>
+<% end %>
 <br/>
+
 
 <!--display a table of received invitation-->
 <% if @received_invs && @received_invs.length > 0 %>

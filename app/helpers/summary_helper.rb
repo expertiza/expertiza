@@ -57,7 +57,6 @@ module SummaryHelper
       end
     end
 
-
     def break_up_comments_to_sentences(question_answers)
       # store answers of each question in an array to be converted into json
       comments = []
@@ -71,6 +70,16 @@ module SummaryHelper
         comments.concat(sentences) unless sentences.nil?
       end
       comments
+    end
+
+    def get_sentences(answer)
+      if answer.nil?
+        return nil
+      end
+      sentences = answer.comments.split(/[.,?,!]/) 
+      sentences.each{ |sentence| sentence.strip! }
+
+      sentences
     end
 
     def calculate_avg_score_by_criterion(question_answers, q_max_score)

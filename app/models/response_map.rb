@@ -7,6 +7,10 @@ class ResponseMap < ApplicationRecord
     id
   end
 
+  def add_response(response)
+    @reviewed_object_id = response.response_id
+  end
+
   # return latest versions of the responses
   def self.assessments_for(team)
     responses = []

@@ -212,7 +212,7 @@ class QuestionnairesController < ApplicationController
         flash[:error] = $ERROR_INFO
       end
     end
-    redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+    redirect_to action: 'edit', id: questionnaire_id.to_sym
   end
 
   # Zhewei: This method is used to save all questions in current questionnaire.
@@ -239,7 +239,7 @@ class QuestionnairesController < ApplicationController
     if params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     elsif questionnaire_id
-      redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+      redirect_to action: 'edit', id: questionnaire_id.to_sym
     end
   end
 

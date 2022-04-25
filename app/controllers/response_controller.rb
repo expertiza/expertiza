@@ -126,7 +126,7 @@ class ResponseController < ApplicationController
 
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = questionnaire_from_response
-      questions = sort_questions(@questionnaire.questions)
+      questions = set_questions
 
       # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       create_answers(params, questions) unless params[:responses].nil?
@@ -152,9 +152,8 @@ class ResponseController < ApplicationController
     # A new response has to be created when there hasn't been any reviews done for the current round,
     # or when there has been a submission after the most recent review in this round.
     @response = @response.create_or_get_response(@map, @current_round)
-    questions = sort_questions(@questionnaire.questions)
     store_total_cake_score
-    init_answers(questions)
+    init_answers(@review_questions)
     render action: 'response'
   end
 
@@ -203,7 +202,7 @@ class ResponseController < ApplicationController
 
     # :version_num=>@version)
     # Change the order for displaying questions for editing response views.
-    questions = sort_questions(@questionnaire.questions)
+    questions = set_questions
     create_answers(params, questions) if params[:responses]
     msg = 'Your response was successfully saved.'
     error_msg = ''
@@ -387,4 +386,13 @@ class ResponseController < ApplicationController
       Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if answer.nil?
     end
   end
+
+  def set_questions
+    @questions = []
+    answers = @response.scores
+    questionnaires = @response.questionnaires_by_answers(answers)
+    questionnaires.each {|questionnaire| @questions += sort_questions(questionnaire.questions) }
+    return @questions
+  end
+
 end

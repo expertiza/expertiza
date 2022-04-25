@@ -249,6 +249,27 @@ class Response < ApplicationRecord
     Class.new.extend(Scoring).assessment_score(params)
   end
 
+
+  # Get all the questionnaires for a response, response is a collection of answers 
+  # answers contain reference to their question, and question have a reference to questionnaire
+  def questionnaires_by_answers(answers)
+    answers_with_questionnaires = answers.select{ |ans|  ans && ans.question && ans.question.questionnaire }
+    questionnaires = answers_with_questionnaires.collect{ |ans| ans.question.questionnaire }.uniq
+    unless(questionnaires.any?)
+      questionnaires = []
+      questionnaires << questionnaire_by_answer(answers.first)
+    end
+    questionnaires
+  end
+
+  # Get all questions for this response
+  def get_questions
+    @questions = []
+    questionnaires = questionnaires_by_answers(scores)
+    questionnaires.each {|questionnaire| @questions += questionnaire.questions }
+    return @questions
+  end
+
   private
 
   def construct_instructor_html(identifier, self_id, count)
@@ -276,7 +297,7 @@ class Response < ApplicationRecord
     unless answers.empty?
       questionnaire = questionnaire_by_answer(answers.first)
       questionnaire_max = questionnaire.max_question_score
-      questions = questionnaire.questions.sort_by(&:seq)
+      questions = get_questions
       # get the tag settings this questionnaire
       tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: map.assignment.id) : nil
       code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, current_user

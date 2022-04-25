@@ -1,0 +1,45 @@
+<table id="question_actions_table">
+    <tr>
+      <td>
+        <%= form_tag :action => 'add_new_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private] do %>
+         <p class="form-inline"> <%= submit_tag 'Add', class: "btn btn-default"%>
+          <%= text_field 'question', 'total_num', :size => 1, :value => "1", :class => "form-control" %> more
+          <%= select "question", "type",
+              {"Criterion" =>"Criterion",
+               "Scale"=>"Scale",
+               "Dropdown"=>"Dropdown",
+               "Checkbox"=>"Checkbox",
+               "TextArea"=>"TextArea",
+               "TextField"=>"TextField",
+               "UploadFile"=>"UploadFile",
+               "SectionHeader"=>"SectionHeader",
+               "TableHeader"=>"TableHeader",
+               "ColumnHeader"=>"ColumnHeader",
+               }, {}, {class: "form-control", onchange: "checkQuestionType()"} %> question(s)
+           <span id = "new_question_weight">
+            Add question weight <%= text_field 'question', 'weight', :size => 1, :value => "1", :class => "form-control" %>
+           </span></p>
+        <% end %>
+      </td>
+    </tr>
+  </table>
+
+  <%= form_tag :action => 'save_all_questions', :id => params[:id],  :questionnaire_type => params[:model], :private => params[:private] do %>
+    <table id="questions_table">
+      <tr>
+        <th class="head" align="center" width="30">Action</td>
+        <th class="head" align="center" width="30">Seq</td>
+        <th class="head" align="center" width="300">Question</td>
+        <th class="head" align="center" width="100">Type</td>
+        <th class="head" align="center">Weight</td>
+      </tr>
+      <% i = 1 %>
+      <%questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>
+      <% for @question in questions %>
+        <%=@question.edit(i)%>
+        <% i += 1 %>
+      <% end %>
+    </table>
+    <%= submit_tag "Save #{@questionnaire.display_type.downcase} questionnaire", :name=>"save", :class => "btn btn-primary" %>
+    <input style="margin-left:36em" type="submit" name="view_advice" value="Edit/View advice" class="btn btn-default"/>
+  <% end %>

@@ -99,6 +99,18 @@ class StudentTask
     @started ||= incomplete? && revision?
   end
 
+  def current_round
+    assignment.number_of_current_round(@topic.try(:id))
+  end
+
+  def can_submit_revision_plan?
+    current_stage == 'submission' && current_round > 1
+  end
+
+  def revision_plan_questionnaire_id
+    RevisionPlanTeamMap.find_by(team: @participant.team, used_in_round: current_round).try(:questionnaire_id)
+  end
+
   delegate :topic, to: :participant
 
   def self.teamed_students(user, ip_address = nil)

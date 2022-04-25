@@ -8,7 +8,7 @@ class ResponseMap < ApplicationRecord
   end
 
   def add_response(response)
-    @responses.push(response)
+    @reviewed_object_id = response.response_id
   end
 
   # return latest versions of the responses

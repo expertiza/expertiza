@@ -21,7 +21,6 @@ class Response < ApplicationRecord
 
   def populate_new_response(map, current_round)
     map.add_response(self)
-    
   end
 
   def display_as_html(prefix = nil, count = nil, _file_url = nil, show_tags = nil, current_user = nil)

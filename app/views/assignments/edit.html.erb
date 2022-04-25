@@ -12,9 +12,6 @@
         <% if @assignment_form.assignment.is_calibrated %>
             <li><a href="#tabs-6" id="Calibration">Calibration</a></li>
         <% end %>
-        <% if @assignment_form.assignment.badge? %>
-          <li><a href="#tabs-7" id="Badges">Badges</a></li>
-        <% end %>
         <%# Change Other Stuff to Etc.%>
         <li><a href="#tabs-8" id="Other">Etc.</a></li>
       </ul>
@@ -36,11 +33,6 @@
       <% if @assignment_form.assignment.is_calibrated %>
         <div id="tabs-6">
           <%= render 'assignments/edit/calibration' %>
-        </div>
-      <% end %>
-      <% if @assignment_form.assignment.badge? %>
-        <div id="tabs-7">
-          <%= render 'assignments/edit/badges' %>
         </div>
       <% end %>
       <div id="tabs-8">

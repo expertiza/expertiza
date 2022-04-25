@@ -168,7 +168,14 @@ class AssignmentParticipant < Participant
   end
 
   # zhewei: this is the file path for reviewer to upload files during peer review
-  def review_file_path(response_map_id)
+  def review_file_path(response_map_id = nil, participant = nil)
+    if response_map_id.nil?
+      return if participant.nil?
+
+      no_team_path = assignment.path + '/' + participant.name.parameterize(separator: '_') + '_review'
+      return no_team_path if participant.team.nil?
+    end
+
     response_map = ResponseMap.find(response_map_id)
     first_user_id = TeamsUser.find_by(team_id: response_map.reviewee_id).user_id
     participant = Participant.find_by(parent_id: response_map.reviewed_object_id, user_id: first_user_id)

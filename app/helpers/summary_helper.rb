@@ -42,7 +42,7 @@ module SummaryHelper
     end
 
     def summarize_sentences(comments, summary_ws_url)
-      # summary = ""
+      summary = ""
       param = { sentences: comments }
       # call web service
       begin
@@ -52,7 +52,7 @@ module SummaryHelper
         ps = PragmaticSegmenter::Segmenter.new(text: summary)
         return ps.segment
       rescue StandardError # => e
-        # summary = [err.message]
+        summary = [err.message]
         return ['Problem with WebServices', 'Please contact the Expertiza Development team']
       end
     end
@@ -70,6 +70,15 @@ module SummaryHelper
         comments.concat(sentences) unless sentences.nil?
       end
       comments
+    end
+
+    def get_sentences(sentences)
+      if sentences.nil?
+        return nil
+      else
+        rtn = break_up_comments_to_sentences(sentences)
+      end
+      rtn
     end
 
     def calculate_avg_score_by_criterion(question_answers, q_max_score)

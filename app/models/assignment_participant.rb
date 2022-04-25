@@ -207,6 +207,8 @@ class AssignmentParticipant < Participant
   end
 
   def team_user
+    # E2243: Loads TeamsUser based on team_id and user_id.
+    # If user_id is not present in the table, it loads based on participant_id instead.
     TeamsUser.find_by_team_id_and_user_id(team.id, user_id) if team
   end
 end

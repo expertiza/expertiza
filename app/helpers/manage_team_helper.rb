@@ -17,6 +17,8 @@ module ManageTeamHelper
 
   # check if the user specified by 'user' already belongs to team specified by 'team_id'
   def user?(user, team_id)
+    # E2243: Loads TeamsUser based on team_id and user_id.
+    # If user_id is not present in the table, it loads based on participant_id instead.
     if TeamsUser.find_by_team_id_and_user_id(team_id, user.id)
       true
     else

@@ -126,6 +126,8 @@ class InvitationsController < ApplicationController
       return
     end
 
+    # E2243: Loads TeamsUser based on team_id and user_id.
+    # If user_id is not present in the table, it loads based on participant_id instead.
     # participant information about student you are trying to invite to the team
     team_member = TeamsUser.find_by_team_id_and_user_id(@team.id, @user.id)
     # check if invited user is already in the team

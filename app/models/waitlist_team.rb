@@ -66,7 +66,7 @@ class WaitlistTeam < ApplicationRecord
       ExpertizaLogger.info LoggerMessage.new('WaitlistTeam', user_id, "Cannot find Team #{team_id} in waitlist.")
     end
     return true
-  end
+  end 
 
   def self.delete_all_waitlists_for_topic(topic_id)
     waitlisted_teams_for_topic = get_all_waitlists_for_topic topic_id

@@ -5,7 +5,7 @@ class Invitation < ApplicationRecord
   belongs_to :from_user, class_name: 'User', foreign_key: 'from_id', inverse_of: false
 
   # This method is no longer used and the same functionality is provided by 
-  # the method release_topics_selected_by_team_for_assignment in signed_up_team.rb
+  # The method release_topics_selected_by_team_for_assignment in signed_up_team.rb
   
   # def self.remove_waitlists_for_team(topic_id, _assignment_id)
   #   # first_waitlisted_signup = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first

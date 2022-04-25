@@ -68,7 +68,7 @@ class SignedUpTeam < ApplicationRecord
   #       old_teams_signup.destroy
   #     end
   #   end
-  # end
+  # end 
 
   def self.release_topics_selected_by_team_for_assignment(team_id, assignment_id)
     delete_all_signed_up_topics_for_team(team_id)

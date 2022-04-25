@@ -120,7 +120,7 @@ describe Invitation do
     end
   end
 
-  # remove_waitlists_for_team method is removed from invitation.rb
+  # remove_waitlists_for_team method is removed from invitation.rb 
   # describe '#remove_waitlists_for_team' do
   #   it 'removes a currently waitlisted team from the topic waitlist and removes the team from all other waitlists it was on' do
   #     allow(SignedUpTeam).to receive(:find_by).with(topic_id: topic.id, is_waitlisted: true).and_return(signed_up_team)

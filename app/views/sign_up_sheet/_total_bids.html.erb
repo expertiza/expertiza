@@ -1,18 +1,20 @@
 <%# Logic to show total bids here%>
-<% @total_bids_per_topic = Hash.new  %>
-<% @sign_up_topics.each do |t| %>
-<%   c = Bid.where(topic_id: t.id).count %>
-<%   @total_bids_per_topic[t.id] = c %>
-<% end %>
+<% if @assignment.is_intelligent  %>
+  <% @total_bids_per_topic = Hash.new  %>
+  <% @sign_up_topics.each do |t| %>
+  <%  c = Bid.where(topic_id: t.id).count %>
+  <%  @total_bids_per_topic[t.id] = c %>
+  <% end %>
 
-<% found_in_slots = false %>
-<% @total_bids_per_topic.each do |t, bids| %>
-     <% if t.to_i == topic.id.to_i %>
-	<td align="center"><%= bids  %></td>
-	<% found_in_slots = true%>
-     <% end %>
-<% end %>
+  <% has_nonzero_value = false %>
+  <% @total_bids_per_topic.each do |t, bids| %>
+    <% if t.to_i == topic.id.to_i %>
+      <td align="center"><%= bids  %></td>
+      <% has_nonzero_value = true%>
+    <% end %>
+  <% end %>
 
-<% unless found_in_slots %>
-  <td align="center">0</td>
+  <% unless has_nonzero_value %>
+    <td align="center">0</td>
+  <% end %>
 <% end %>

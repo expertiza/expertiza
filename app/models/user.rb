@@ -116,6 +116,9 @@ class User < ApplicationRecord
     User.anonymized_view?(ip_address) ? role.name + ' ' + id.to_s : self[:name]
   end
 
+  # This method allows us to generate
+  # user fullnames based on whether anonymized view
+  # is set or not.
   def fullname(ip_address = nil)
     if User.anonymized_view?(ip_address)
       return "Anonymized_User_#{self[:id]}"

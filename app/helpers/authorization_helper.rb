@@ -109,7 +109,9 @@ module AuthorizationHelper
                (current_user_is_a?('Teaching Assistant') && current_user_has_ta_mapping_for_assignment?(assignment))
              )
     end
-
+    
+    # if it is a Teammate Review response map, instructors and TA's can always see it. Students can see it if show_teammate_reviews checkbox 
+    # for that assignment is enabled by the Instructor.
     if map.is_a? TeammateReviewResponseMap
         return (current_user_has_id?(user_id) || (current_user_is_a?('Instructor') && current_user_instructs_assignment?(assignment)) ||
         (assignment.course && current_user_is_a?('Teaching Assistant') && current_user_has_ta_mapping_for_assignment?(assignment)) ||

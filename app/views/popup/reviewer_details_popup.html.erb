@@ -33,9 +33,9 @@
 <% end %>
 
 <div id="submissionviewingevent">
-  <% reviewee_list = Array.new %>
-  <% total_time_list = Array.new %>
-  <% timeHash = Hash.new %>
+  <% reviewee_list = {} %>
+  <% total_time_list = {} %>
+  <% timeHash = {} %>
   <h3>Review submission viewing time details</h3>
   <a id = "details" class= "show" onclick="showDetails()">show details</a>
   <div id="chartContainer" style="height: 300px; width: 100%; display: none; "></div>
@@ -49,8 +49,8 @@
         <th align="right">Time per link (mins)</th>
         <th></th>
       </tr>
-    <% @reviewers = Participant.where(user_id: @user.id) %>
-    <% @reviewers.each do |reviewer| %> <!-- for reviewer-->
+    <% reviewers = Participant.where(user_id: @user.id) %>
+    <% reviewers.each do |reviewer| %> <!-- for reviewer-->
       <% @response_maps = ResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: @id)  %>
       <% @number_of_rounds = Assignment.find(@id).rounds_of_reviews %>
       <% reviewee_count = 0 %>
@@ -69,7 +69,7 @@
             <% else %>
                 <% link_list.push(submissionviewingevent_entry.link) %>
                 <tr>
-                <% if @count == 0 %>  <!--- print revieweeId,time, round only for the first row-->
+                <% if @count.zero? %>  <!--- print revieweeId,time, round only for the first row-->
                   <% team = Team.find(@reviewee_id) %>
                   <td><%= team.name %></td>
                   <td id="<%= reviewee_count.to_s %>" align="center"></td>
@@ -87,7 +87,7 @@
                  <% each_link_detail << individual_link_time %>
                  <% @per_round_time << each_link_detail %>
                 <td align="center"><%= sprintf("%.2f",individual_link_time) %></td>
-                <% if @count == 0 %>
+                <% if @count.zero? %>
                 <td><a onclick="drawChart(<%= @reviewee_id.to_s %>,<%= each_round.to_s %>)">Pie chart view </a></td>
                 <% else %> 
                 <td><%= " "%></td>

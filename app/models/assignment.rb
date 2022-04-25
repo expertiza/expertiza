@@ -6,7 +6,7 @@
 
 class Assignment < ActiveRecord::Base
   require 'analytic/assignment_analytic'
-  include Scoring
+  extend Scoring
   include AssignmentAnalytic
   include ReviewAssignment
   include QuizAssignment
@@ -499,7 +499,7 @@ class Assignment < ActiveRecord::Base
       end
       @questions[questionnaire_symbol] = questionnaire.questions
     end
-    @scores = review_grades(self, @questions)
+    @scores = review_grades(@assignment, @questions)
     return csv if @scores[:teams].nil?
 
     export_data(csv, @scores, options)
@@ -516,9 +516,11 @@ class Assignment < ActiveRecord::Base
         names_of_participants += p.fullname
         names_of_participants += '; ' unless p == team[:team].participants.last
       end
-      tcsv << names_of_participants
-      export_data_fields(options, team, tcsv, pscore)
-      csv << tcsv
+      teams_csv << names_of_participants
+      first_participant = team[:team].participants.first unless team[:team].participants.first.nil?
+      pscore = @scores[:participants][first_participant.id.to_s.to_sym]
+      export_data_fields(options, team, teams_csv, pscore)
+      csv << teams_csv
     end
   end
 
@@ -535,12 +537,14 @@ class Assignment < ActiveRecord::Base
                                  feedback: 'author_feedback_score',
                                  teammate: 'teammate_review_score' }
     review_hype_mapping_hash.each do |review_type, score_name|
-      export_individual_data_fields(review_type, score_name, tcsv, pscore, options)
+      if options[score_name] == 'true'
+        export_individual_data_fields(review_type, score_name, tcsv, pscore, options)
+      end
     end
-    teams_csv.push(pscore[:total_score])
+    tcsv.push(pscore[:total_score])
   end
 
-  def self.export_individual_data_fields(review_type, score_name, _tcsv, pscore, options)
+  def self.export_individual_data_fields(review_type, score_name, teams_csv, pscore, options)
     if pscore[review_type]
       teams_csv.push(pscore[review_type][:scores][:max], pscore[review_type][:scores][:min], pscore[review_type][:scores][:avg])
     elsif options[score_name]
@@ -550,7 +554,7 @@ class Assignment < ActiveRecord::Base
 
   # This method was refactored by Rajan, Jasmine, Sreenidhi on 03/31/2020
   # Now you can add groups of fields to the hashmap
-  EXPORT_FIELDS = { team_score: ['Team Max', 'Team Min', 'Team Avg'], submitted_score: ['Submitted Max', 'Submitted Min', 'Submitted Avg'], metareview_score: ['Metareview Max', 'Metareview Min', 'Metareview Avg'], author_feedback_score: ['Author Feedback Max, Author Feedback Min, Author Feedback Avg'], teammate_review_score: ['Teammate Review Max', 'Teammate Review Min', 'Teammate Review Avg'] }.freeze
+  EXPORT_FIELDS = { team_score: ['Team Max', 'Team Min', 'Team Avg'], submitted_score: ['Submitted Max', 'Submitted Min', 'Submitted Avg'], metareview_score: ['Metareview Max', 'Metareview Min', 'Metareview Avg'], author_feedback_score: ['Author Feedback Max', 'Author Feedback Min', 'Author Feedback Avg'], teammate_review_score: ['Teammate Review Max', 'Teammate Review Min', 'Teammate Review Avg'] }.freeze
   def self.export_fields(options)
     fields = []
     fields << 'Team Name'

@@ -76,8 +76,7 @@ describe Response do
       allow(question).to receive(:view_completed_question).with(1, answer, 5, nil, nil).and_return('Question HTML code')
       expect(response.display_as_html('Instructor end', 0)).to eq('<h4><B>Review 0</B></h4><B>Reviewer: </B>no one (no name)&nbsp;&nbsp;&nbsp;'\
           "<a href=\"#\" name= \"review_Instructor end_1Link\" onClick=\"toggleElement('review_Instructor end_1','review');return false;\">"\
-          'hide review</a><BR/><table id="review_Instructor end_1" class="table table-bordered">'\
-          '<tr class="warning"><td>Question HTML code</td></tr><tr><td><b>Additional Comment: </b>Test:<BR/>additional comment</td></tr></table>')
+          'hide review</a><BR/><table id="review_Instructor end_1\" class=\"table table-bordered\"><tr><td>Test:<BR/>additional comment</td></tr></table>')
     end
   end
 

@@ -3,40 +3,20 @@ describe GradesController do
   let(:assignment) { build(:assignment, id: 1, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
   let(:assignment2) { build(:assignment, id: 2, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
   let(:assignment3) { build(:assignment, id: 3, max_team_size: 0, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
-  
-  #############################################
- 
-  #######################
   let(:assignment_questionnaire) { build(:assignment_questionnaire, used_in_round: 1, assignment: assignment) }
   let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
   let(:participant2) { build(:participant, id: 2, assignment: assignment, user_id: 1) }
   let(:participant3) { build(:participant, id: 3, assignment: assignment, user_id: 1, grade: 98) }
   let(:participant4) { build(:participant, id: 4, assignment: assignment2, user_id: 1) }
   let(:participant5) { build(:participant, id: 5, assignment: assignment3, user_id: 1) }
-#####creating test participants for teammate_questionnaire_controller
-  let(:participant6) { build(:participant, id: 6, assignment: assignment4, user_id: 1) }
-  let(:participant7) { build(:participant, id: 7, assignment: assignment4, user_id: 1) }
-###############
   let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
-  #######below
-  let(:teammmate_review_questionnaire) { build(:questionnaire.type("TeammateReviewQuestionnaire"), id: 2, questions: [question]) }
-  ###############################
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:question) { build(:question) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment, users: [instructor]) }
   let(:team2) { build(:assignment_team, id: 2, parent_id: 8) }
-  ########building new team
-  let(:team3) { build(:assignment_team, id: 3, parent_id: 8) }
-  ######
   let(:student) { build(:student, id: 2) }
-  #####students build team 3
-  let(:student) { build(:student, id: 2) }
-  ################
   let(:review_response_map) { build(:review_response_map, id: 1) }
-  #############review responses for newly created team 2
-  let(:review_response_map) { build(:review_response_map, id: 2) }
-  ######################### one thing - see if you can just add another argument, like build(:review_response_map, id:1,2 or something)
   let(:assignment_due_date) { build(:assignment_due_date) }
   let(:ta) { build(:teaching_assistant, id: 8) }
   score_view_setup_query = '
@@ -54,13 +34,8 @@ describe GradesController do
     allow(AssignmentParticipant).to receive(:find).with('3').and_return(participant3)
     allow(AssignmentParticipant).to receive(:find).with('4').and_return(participant4)
     allow(AssignmentParticipant).to receive(:find).with('5').and_return(participant5)
-    #adding dbconnections for newly created participants
-    allow(AssignmentParticipant).to receive(:find).with('6').and_return(participant6)
-    allow(AssignmentParticipant).to receive(:find).with('7').and_return(participant7)
+
     allow(participant).to receive(:team).and_return(team)
-    #######
-    allow(participant.team.participants).to receive(:team).and_return(team)
-    #######
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
@@ -161,46 +136,6 @@ describe GradesController do
         stub_current_user(ta, ta.role.name, ta.role)
         get :view_team, params: request_params
         expect(response.body).not_to have_content 'TA'
-      end
-    end
-  end
-
-  describe '#view_team' do
-    render_views
-    let(:assignment4) { build(:assignment, id: 4, max_team_size: 4, questionnaires: [teammmate_review_questionnaire]) }
-    let(:participant6) { build(:participant, id: 6, assignment: assignment4, user_id: 1) }
-    let(:participant7) { build(:participant, id: 7, assignment: assignment4, user_id: 1) }
-    let(:teammmate_review_questionnaire) { build(:questionnaire.type("TeammateReviewQuestionnaire"), id: 2, questions: [question]) }
-  ###############################
-  let(:admin) { build(:admin) }
-  let(:instructor) { build(:instructor, id: 6) }
-  let(:question) { build(:question) }
-  let(:team) { build(:assignment_team, id: 1, assignment: assignment, users: [instructor]) }
-  let(:team2) { build(:assignment_team, id: 2, parent_id: 8) }
-  ########building new team
-  let(:team3) { build(:assignment_team, id: 3, parent_id: 8) }
-  ######
-  let(:student) { build(:student, id: 2) }
-  #####students build team 3
-  let(:student) { build(:student, id: 2) }
-  ################
-  let(:review_response_map) { build(:review_response_map, id: 1) }
-  #############review responses for newly created team 2
-  let(:review_response_map) { build(:review_response_map, id: 2) }
-  ######################### one thing - see if you can just add another argument, like build(:review_response_map, id:1,2 or something)
-    context 'when view_team page is viewed by a student who is a part of a team with review objects present' do
-      it 'renders grades#view_team page' do
-        allow(participant.team.participants).to receive(:team).and_return(team)
-        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 4, questionnaire_id: 2).and_return(assignment_questionnaire)
-        allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])
-        allow(assignment).to receive(:late_policy_id).and_return(false)
-        allow(assignment).to receive(:calculate_penalty).and_return(false)
-        allow_any_instance_of(GradesController).to receive(:compute_total_score).with(assignment, any_args).and_return(100)
-        allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([review_response])
-        allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
-        request_params = { id: 1 }
-        get :view_team, params: request_params
-        expect(response).to render_template(:view_team)
       end
     end
   end

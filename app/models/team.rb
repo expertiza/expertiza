@@ -57,6 +57,7 @@ class Team < ApplicationRecord
   def user?(user)
     participant = AssignmentParticipant.find_by(parent_id: parent_id, user_id: user.id)
     return false if participant.nil?
+
     participant?(participant)
   end
 
@@ -92,6 +93,7 @@ class Team < ApplicationRecord
 
   def add_participant_to_team(participant, _assignment_id = nil)
     raise "The user #{participant.name} is already a member of the team #{name}" if user?(participant.user)
+
     can_add_member = false
     unless full?
       can_add_member = true

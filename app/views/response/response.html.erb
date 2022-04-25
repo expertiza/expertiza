@@ -354,8 +354,6 @@
   <% end %>
   <table width="100%">
 
-
-
       <% i = 0 %>
       <% @questions.group_by{ |ques| ques.questionnaire }.each do |questionnaire, grouped_questions | %>
       <% if questionnaire.display_heading? %>

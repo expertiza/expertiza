@@ -20,7 +20,7 @@ class AssignmentQuestionnaireController < ApplicationController
   # delete all AssignmentQuestionnaire entry that's associated with an assignment
   def delete_all
     assignment = Assignment.find(params[:assignment_id])
-    
+
     if assignment.nil?
       flash[:error] = 'Assignment #' + params[:assignment_id].to_s + ' does not currently exist.'
       return
@@ -60,13 +60,13 @@ class AssignmentQuestionnaireController < ApplicationController
     respond_to do |format|
       format.json { render json: @assignment_questionnaire }
     end
-  
   end
 
   private
+
   def assignment_questionnaire_params
     params.permit(:assignment_id, :questionnaire_id,
-     :user_id , :notification_limit, :questionnaire_weight,
-    :used_in_round, :dropdown, :topic_id, :duty_id)
+                  :user_id, :notification_limit, :questionnaire_weight,
+                  :used_in_round, :dropdown, :topic_id, :duty_id)
   end
 end

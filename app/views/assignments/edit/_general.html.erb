@@ -111,7 +111,6 @@ function autogenerate_submission(){
       </span>
       &nbsp;&nbsp;&nbsp;&nbsp;
       <!--Maximum number of members per team-->
-    </td>
   </tr>
 
   <!-- E2115 Mentor Management -->
@@ -138,15 +137,6 @@ function autogenerate_submission(){
     <td style='padding:5px' id='assignment_numbers_of_quiz_field' <%= 'hidden' unless @assignment_form.assignment.require_quiz %>>
       <%= label_tag('assignment_form[assignment][num_quiz_questions]', 'Number of Quiz questions:') %>
       <%= text_field_tag('assignment_form[assignment][num_quiz_questions]', @assignment_form.assignment.num_quiz_questions, { :style => 'width:20px'}) %>
-    </td>
-  </tr>
-
-  <!--Badge-->
-  <tr>
-    <td style='padding:5px' id='assignment_has_badge_field'>
-      <input name="assignment_form[assignment][has_badge]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][has_badge]', 'true', @assignment_form.assignment.has_badge) %>
-      <%= label_tag('assignment_form[assignment][has_badge]', 'Has badge?') %>
     </td>
   </tr>
 
@@ -248,7 +238,7 @@ function autogenerate_submission(){
     <td style='padding:5px' class="form-inline" colspan="2">
       <input name="assignment_form[assignment][is_answer_tagging_allowed]" type="hidden" value="false" onclick="useAnswerTagChanged()"/>
       <%= check_box_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'true', @assignment_form.assignment.is_answer_tagging_allowed) %>
-      <%= label_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'Allow feedback comments to be tagged by the author?') %>
+      <%= label_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'Allow tag prompts so author can tag feedback comments?') %>
     </td>
   </tr>
   <!-- End answer tagging code -->

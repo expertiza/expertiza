@@ -1,22 +1,31 @@
 class ResponseController < ApplicationController
   include AuthorizationHelper
+  include ResponseHelper
 
   helper :submitted_content
   helper :file
 
+  before_action :authorize_show_calibration_results, only: %i[show_calibration_results_for_student]
+  before_action :set_response, only: %i[update delete view]
+
+  # E2218: Method to check if that action is allowed for the user.
   def action_allowed?
     response = user_id = nil
     action = params[:action]
+    # Initialize response and user id if action is edit or delete or update or view.
     if %w[edit delete update view].include?(action)
       response = Response.find(params[:id])
       user_id = response.map.reviewer.user_id if response.map.reviewer
     end
     case action
-    when 'edit' # If response has been submitted, no further editing allowed
+    when 'edit'
+      # If response has been submitted, no further editing allowed.
       return false if response.is_submitted
 
+      # Else, return true if the user is a reviewer for that response.
       return current_user_is_reviewer?(response.map, user_id)
-      # Deny access to anyone except reviewer & author's team
+
+    # Deny access to anyone except reviewer & author's team
     when 'delete', 'update'
       return current_user_is_reviewer?(response.map, user_id)
     when 'view'
@@ -26,10 +35,16 @@ class ResponseController < ApplicationController
     end
   end
 
-  # E-1973 - helper method to check if the current user is the reviewer
-  # if the reviewer is an assignment team, we have to check if the current user is on the team
-  def current_user_is_reviewer?(map, _reviewer_id)
-    map.reviewer.current_user_is_reviewer? current_user.try(:id)
+  # E2218: Method to authorize if the reviewer can view the calibration results
+  # When user manipulates the URL, the user should be authorized
+  def authorize_show_calibration_results
+    response_map = ResponseMap.find(params[:review_response_map_id])
+    user_id = response_map.reviewer.user_id if response_map.reviewer
+    # Deny access to the calibration result page if the current user is not a reviewer.
+    unless current_user_is_reviewer?(response_map, user_id)
+      flash[:error] = 'You are not allowed to view this calibration result'
+      redirect_to controller: 'student_review', action: 'list', id: user_id
+    end
   end
 
   # GET /response/json?response_id=xx
@@ -39,10 +54,9 @@ class ResponseController < ApplicationController
     render json: response
   end
 
+  # E2218: Method to delete a response.
   def delete
     # The locking was added for E1973, team-based reviewing. See lock.rb for details
-    @response = Response.find(params[:id])
-    @map = @response.map
     if @map.reviewer_is_team
       @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
       if @response.nil?
@@ -62,6 +76,7 @@ class ResponseController < ApplicationController
   # If so, edit that version otherwise create a new version.
 
   # Prepare the parameters when student clicks "Edit"
+  # response questions with answers and scores are rendered in the edit page based on the version number
   def edit
     assign_action_parameters
     @prev = Response.where(map_id: @map.id)
@@ -90,7 +105,7 @@ class ResponseController < ApplicationController
     # set more handy variables for the view
     set_content
     @review_scores = []
-    @questions.each do |question|
+    @review_questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
     @questionnaire = questionnaire_from_response
@@ -100,22 +115,21 @@ class ResponseController < ApplicationController
   # Update the response and answers when student "edit" existing response
   def update
     render nothing: true unless action_allowed?
-
     msg = ''
     begin
       # the response to be updated
       # Locking functionality added for E1973, team-based reviewing
-      @response = Response.find(params[:id])
-      @map = @response.map
       if @map.reviewer_is_team && !Lock.lock_between?(@response, current_user)
         response_lock_action
         return
       end
+
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = questionnaire_from_response
       questions = set_questions
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
+
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
@@ -123,7 +137,7 @@ class ResponseController < ApplicationController
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
     redirect_to controller: 'response', action: 'save', id: @map.map_id,
                 return: params.permit(:return)[:return], msg: msg, review: params.permit(:review)[:review],
-                 save_options: params.permit(:save_options)[:save_options]
+                save_options: params.permit(:save_options)[:save_options]
   end
 
   def new
@@ -158,8 +172,6 @@ class ResponseController < ApplicationController
 
   # view response
   def view
-    @response = Response.find(params[:id])
-    @map = @response.map
     set_content
   end
 
@@ -178,15 +190,13 @@ class ResponseController < ApplicationController
     # Hence we need to pick the latest response.
     @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first
     if @response.nil?
-      @response = Response.create(
-        map_id: @map.id,
-        additional_comment: params[:review][:comments],
-        round: @round.to_i,
-        is_submitted: is_submitted
-      )
+      @response = Response.create(map_id: @map.id, additional_comment: params[:review][:comments],
+                                  round: @round.to_i, is_submitted: is_submitted)
     end
     was_submitted = @response.is_submitted
-    @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
+
+    # ignore if autoupdate try to save when the response object is not yet created.s
+    @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted)
 
     # :version_num=>@version)
     # Change the order for displaying questions for editing response views.
@@ -194,6 +204,7 @@ class ResponseController < ApplicationController
     create_answers(params, questions) if params[:responses]
     msg = 'Your response was successfully saved.'
     error_msg = ''
+
     # only notify if is_submitted changes from false to true
     if (@map.is_a? ReviewResponseMap) && (!was_submitted && @response.is_submitted) && @response.significant_difference?
       @response.notify_instructor_on_difference
@@ -207,18 +218,6 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
-    participant = Participant.find_by(id: @map.reviewee_id)
-    # E1822: Added logic to insert a student suggested 'Good Teammate' or 'Good Reviewer' badge in the awarded_badges table.
-    if @map.assignment.badge?
-      if @map.is_a?(TeammateReviewResponseMap) && (params[:review][:good_teammate_checkbox] == 'on')
-        badge_id = Badge.get_id_from_name('Good Teammate')
-        AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
-      end
-      if @map.is_a?(FeedbackResponseMap) && (params[:review][:good_reviewer_checkbox] == 'on')
-        badge_id = Badge.get_id_from_name('Good Reviewer')
-        AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
-      end
-    end
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Response was successfully saved')
     redirect_to action: 'redirect', id: @map.map_id, return: params.permit(:return)[:return], msg: params.permit(:msg)[:msg], error_msg: params.permit(:error_msg)[:error_msg]
   end
@@ -255,14 +254,14 @@ class ResponseController < ApplicationController
     end
   end
 
-  # This method controls what is shown students when they view results from a calibration.
-  # Most of the business logic lives in the model, where the :calibration_response_map_id and :review_response_map_id are used
-  # to find the appropriate references to calibration responses, review responses as well as the response questions
+  # This method set the appropriate values to the instance variables used in the 'show_calibration_results_for_student' page
+  # Responses are fetched using calibration_response_map_id and review_response_map_id params passed in the URL
+  # Questions are fetched by querying AssignmentQuestionnaire table to get the valid questions
   def show_calibration_results_for_student
     @assignment = Assignment.find(params[:assignment_id])
-    @calibration_response,
-    @review_response,
-    @questions = Response.calibration_results_info(params[:calibration_response_map_id], params[:review_response_map_id], params[:assignment_id])
+    @calibration_response = ReviewResponseMap.find(params[:calibration_response_map_id]).response[0]
+    @review_response = ReviewResponseMap.find(params[:review_response_map_id]).response[0]
+    @review_questions = AssignmentQuestionnaire.get_questions_by_assignment_id(params[:assignment_id])
   end
 
   def toggle_permission
@@ -289,6 +288,12 @@ class ResponseController < ApplicationController
   end
 
   private
+
+  # E2218: Method to initialize response and response map for update, delete and view methods
+  def set_response
+    @response = Response.find(params[:id])
+    @map = @response.map
+  end
 
   # Added for E1973, team-based reviewing:
   # http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_Project_E1973._Team_Based_Reviewing
@@ -343,7 +348,7 @@ class ResponseController < ApplicationController
     questionnaires.each { |questionnaire| @questions += sort_questions(questionnaire.questions) }
     return @questions
   end
-
+  
   # This method is called within the Edit or New actions
   # It will create references to the objects that the controller will need when a user creates a new response or edits an existing one.
   def assign_action_parameters
@@ -407,11 +412,6 @@ class ResponseController < ApplicationController
     @dropdown_or_scale = (use_dropdown ? 'dropdown' : 'scale')
   end
 
-  # sorts by sequence number
-  def sort_questions(questions)
-    questions.sort_by(&:seq)
-  end
-
   # For each question in the list, starting with the first one, you update the comment and score
   def create_answers(params, questions)
     params[:responses].each_pair do |k, v|
@@ -422,24 +422,13 @@ class ResponseController < ApplicationController
     end
   end
 
+  # This method initialize answers for the questions in the response
+  # Iterates over each questions and create corresponding answer for that
   def init_answers(questions)
     questions.each do |q|
       # it's unlikely that these answers exist, but in case the user refresh the browser some might have been inserted.
       answer = Answer.where(response_id: @response.id, question_id: q.id).first
       Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if answer.nil?
-    end
-  end
-
-  # Creates a table to store total contribution for Cake question across all reviewers
-  def store_total_cake_score
-    @total_score = {}
-    @questions.each do |question|
-      next unless question.instance_of? Cake
-
-      reviewee_id = ResponseMap.select(:reviewee_id, :type).where(id: @response.map_id.to_s).first
-      total_score = question.get_total_score_for_question(reviewee_id.type, question.id, @participant.id, @assignment.id, reviewee_id.reviewee_id).to_s
-      total_score = 0 if total_score.nil?
-      @total_score[question.id] = total_score
     end
   end
 end

@@ -6,7 +6,9 @@
   <% end %>
 <% end %>
 <br/>
-<% if participant.team.hyperlinks.try(:length) %>
+<% if participant.team.nil? %>
+  <% flash[:warn] = 'Submitting content while not on a team is not supported by Expertiza currently.' %>
+<% elsif participant.team.hyperlinks.try(:length) %>
   <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant, stage: @stage} %>
 <% end %>
 <%= render partial: 'submitted_content/submitted_files', locals: {participant: participant, stage: @stage, origin: ''} %>

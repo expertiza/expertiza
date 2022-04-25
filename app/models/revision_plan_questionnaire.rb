@@ -31,6 +31,8 @@ class RevisionPlanQuestionnaire < Questionnaire
       # questionnaire_team_map = RevisionPlanTeamMap.create(team_id: assignment_team.id, used_in_round: current_round, questionnaire_id: questionnaire.id)
       questionnaire = RevisionPlanTeamMap.create(team_id: assignment_team.id, used_in_round: current_round, questionnaire_id: questionnaire.id)
     end
+    return questionnaire
+  end
 
     # Display questionnaire heading in response view
     def display_heading?

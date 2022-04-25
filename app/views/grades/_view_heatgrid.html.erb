@@ -148,6 +148,7 @@ function toggleFunction(elementId) {
             <% j = 1 %>
             <!-- here, starts a series of nested loops. loops for the rows, and for the cells of the rows.-->
             <!-- additionally, there are hidden rows (expandable) which are also generated via iteration. -->
+            <% total = 0.0 %>
             <% vm.list_of_rows.each do |row| %>
 
                 <!-- notice the data-target. because we're toggling via looped code, we need to dynamically generate the identifier. -->
@@ -172,6 +173,11 @@ function toggleFunction(elementId) {
                   <% end %>
 
                   <td  class = 'cf' align="right">
+                    <% if row.average_score_for_row !=nil %>
+                      <% total += row.average_score_for_row %>
+                    <%else%>
+                      <% total += 0.0 %>
+                    <%end%>
                     <%= row.average_score_for_row.to_s %>
                   </td>
                   <td  class = 'cf' align="center">
@@ -248,10 +254,14 @@ function toggleFunction(elementId) {
           <input class="btn btn-default" type="button" href="#" onclick="col_sort(<%=table_count%>)" data-toggle="tooltip" title="Sort reviews in ascending/descending order of the total score. Consecutive clicks will alternate between ascending and descending sort order" value="Sort by total review score"/>
           <br>
           <% table_count += 1%>
-          <span> <%= vm.display_team_members(session[:ip]) %></span>
+          <span> <%= vm.display_team_members(session[:ip]) %>
           <!-- this elsif terminates the heatgrid code.  -->
         <%# elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
             <!--<div class="flash_error">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>-->
+
+        <div style="margin-top:5px"></div>
+        <h5 style="font-weight:bold;display:inline-block;"> Composite score for the heatgrid above is <%= total/count %></h5><br/>
+        <div style="margin-top:5px"></div>
         <% end %>
         <br/> 
     <% end %>

@@ -39,4 +39,9 @@ class RevisionPlanQuestionnaire < Questionnaire
       revision_plan_team_map.team
     end
   
+    # Display questionnaire heading in response view
+    def display_heading?
+      return true
+    end
+
   end

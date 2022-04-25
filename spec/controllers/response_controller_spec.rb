@@ -258,6 +258,7 @@ describe ResponseController do
       allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
       allow(Answer).to receive(:create).with(response_id: 1, question_id: 1, answer: '98', comments: 'LGTM').and_return(answer)
       allow(answer).to receive(:update_attribute).with(any_args).and_return('OK!')
+      allow_any_instance_of(Response).to receive(:get_questions).and_return(questionnaire.questions)
       allow_any_instance_of(Response).to receive(:email).and_return('OK!')
       request_params = {
         id: 1,

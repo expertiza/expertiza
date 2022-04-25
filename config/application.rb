@@ -27,6 +27,7 @@ module Expertiza
     config.filter_parameters += [:password, :password_confirmation, :password, :password_confirmation]
     # config.active_record.whitelist_attributes = false # need protected_attributes gem
     config.autoload_paths << Rails.root.join('lib', '{**}')
+    # config.autoload_paths += %W(#{config.root}/db/migrate)
     config.eager_load_paths << Rails.root.join('lib')
     config.react.addons = true
     config.assets.paths << Rails.root.join('vendor', 'assets', 'components')

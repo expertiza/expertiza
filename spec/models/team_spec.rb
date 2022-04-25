@@ -7,6 +7,7 @@ describe Team do
   let(:user) { build(:student, id: 1, name: 'no name', fullname: 'no one', participants: [participant]) }
   let(:user2) { build(:student, id: 2) }
   let(:user3) { build(:student, id: 3) }
+  let(:team_without_participants) { build(:assignment_team, id: 1, name: 'no team') }
   let(:team) { build(:assignment_team, id: 1, name: 'no team', users: [user]) }
   let(:team_with_participants_mapping) { build(:assignment_team, id: 1, name: 'no team with participants mapping', participants: [participant]) }
   let(:team_user) { build(:team_user, id: 1, user: user) }
@@ -15,7 +16,7 @@ describe Team do
   end
   describe '#participant' do
     it 'gets the participants of current team, by default returns an empty array' do
-      expect(team.participants).to eq([])
+      expect(team_without_participants.participants).to eq([])
     end
   end
 
@@ -62,7 +63,7 @@ describe Team do
         mock_user = double('User')
         allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
         allow(mock_user).to receive(:id).and_return(nil)
-        expect(team.user?(mock_user)).to be false
+        expect(team_without_participants.user?(mock_user)).to be false
       end
     end
   end

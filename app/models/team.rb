@@ -8,9 +8,14 @@ class Team < ApplicationRecord
   has_many :bids, dependent: :destroy
   has_paper_trail
 
-  scope :find_team_for_assignment_and_user, lambda { |assignment_id, user_id|
-    joins(:teams_users).where('teams.parent_id = ? AND teams_users.user_id = ?', assignment_id, user_id)
-  }
+  # E2243: find team by assignment and user id should also check based on participant id
+  # Remove loading based on user_id when user_id is removed from teams_users table
+  def self.find_team_for_assignment_and_user(assignment_id, user_id)
+    participant = Participant.find_by(user_id: user_id, parent_id: assignment_id)
+    team_user = TeamsUser.find_by(participant_id: participant.id)
+    team_user = TeamsUser.where(user_id: user_id).find { |team_user_obj| team_user_obj.team.parent_id == assignment_id } if team_user.nil?
+    Team.find(team_user.team_id)
+  end
 
   # Get the participants of the given team
   # E2243 Remove this function when user_id is removed from teams_users table
@@ -325,8 +330,11 @@ class Team < ApplicationRecord
   end
 
   # Removes the specified user from any team of the specified assignment
+  # E2243: Remove finding TeamsUser based on user_id when user_id field is removed from teams_users table
   def self.remove_user_from_previous_team(parent_id, user_id)
-    team_user = TeamsUser.where(user_id: user_id).find { |team_user_obj| team_user_obj.team.parent_id == parent_id }
+    participant = Participant.find_by(user_id: user_id, parent_id: parent_id)
+    team_user = TeamsUser.find_by(participant_id: participant.id)
+    team_user = TeamsUser.where(user_id: user_id).find { |team_user_obj| team_user_obj.team.parent_id == parent_id } if team_user.nil?
     begin
       team_user.destroy
     rescue StandardError

@@ -39,8 +39,7 @@ module ResponseHelper
     @contributor = @map.contributor
     new_response ? questionnaire_from_response_map : questionnaire_from_response
     set_dropdown_or_scale
-    new_response ? set_questions_for_new_response : set_questions  
-    # @review_questions = sort_questions(@questionnaire.questions)
+    @review_questions = sort_questions(@questionnaire.questions)
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
     # The new response is created here so that the controller has access to it in the new method

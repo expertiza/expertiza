@@ -72,13 +72,15 @@ module SummaryHelper
       comments
     end
 
-    def get_sentences(sentences)
-      if sentences.nil?
+    def get_sentences(answer)
+      if answer.nil?
         return nil
-      else
-        rtn = break_up_comments_to_sentences(sentences)
       end
-      rtn
+      answers = []
+      answers.push(answer)
+      sentences = break_up_comments_to_sentences(answers)
+
+      sentences
     end
 
     def calculate_avg_score_by_criterion(question_answers, q_max_score)

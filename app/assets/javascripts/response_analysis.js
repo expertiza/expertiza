@@ -1,3 +1,5 @@
+// This .js file is used in app/views/response/_response_analysis.html.erb
+
 //fetches the review form comments one by one - formats them into a single stringified json
 function fetch_response_comments() {
 

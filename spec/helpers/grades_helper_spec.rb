@@ -281,7 +281,12 @@ describe GradesHelper, type: :helper do
       it 'the round variable in the new VmQuestionResponse should be nil' do
         # mock the participant for the  AssignmentParticipant.find
         # viewgrid_participant contains a assignment whose questionnaires' type is TeammateReviewQuestionnaire
+        participant_list = [viewgrid_participant]
         allow(AssignmentParticipant).to receive(:find).with(2).and_return(viewgrid_participant)
+        allow(Assignment).to receive(:find).with(5).and_return(assignment_for_viewgrid)
+        allow(assignment_for_viewgrid).to receive(:participants).and_return(participant_list)
+        allow(participant_list).to receive(:find_by).and_return(viewgrid_participant)
+
         allow(viewgrid_participant).to receive(:team).and_return(team)
         view_heatgrid(2, 'TeammateReviewQuestionnaire')
         # testing the object variable

@@ -60,32 +60,53 @@ function fetch_response_comments() {
 }
 
 //This function takes in the processed api output to display a table(populated with API output) on UI
-function generateTable(combined_output, processed_comment_json, metricsToCheck, columns, tooltips) {
+function generate_table(responses,config_file_api_call_values, processed_comment_json, number_of_comments) {
     //tooltip_json to store the text displayed in tooltip
     // Create a table header row using the extracted headers above.
+    
+    let tool_tips = { "Comment Number": 'The comment number from the top in the form.' };
+    let metrics_to_check = ["Comment Number"];
+    let column_names = ["Comment Number"];
+    for (var metric in config_file_api_call_values) {
+        metrics_to_check.push(config_file_api_call_values[metric]['className']);
+        metric_string = String(metric);
+        column_head = metric_string.substring(0, 1).toUpperCase() + metric_string.substring(1, metric_string.length);
+        column_names.push(column_head);
+        tool_tips[column_head] = config_file_api_call_values[metric]['toolTipText'];
+    }
+
+    let merged_responses = [];
+    for(let i=0;i<number_of_comments; i++){
+        single_output = {};
+        single_output["Comment Number"] = i+1;
+        for(let j=1;j< metrics_to_check.length;j++){
+            let arr = responses[metrics_to_check[j]];
+            single_output[metrics_to_check[j]] = arr[i][metrics_to_check[j]];
+        }
+        merged_responses.push(single_output);
+    }
 
     let table = document.createElement("table");
-    let tr = table.insertRow(-1);                   // table row.
+    let table_row = table.insertRow(-1);                   // table row.
 
     processed_comment_json_string = JSON.parse(processed_comment_json)['reviews'];
-    for (let i = 0; i < columns.length; i++) {
-        var th = document.createElement("th");      // table header.
-        th.innerHTML = columns[i] + `<img src="/assets/info.png" title='` + tooltips[columns[i]] + `'>`;
-        th.classList.add("parentCell_metric_table");
-        tr.appendChild(th);
+    for (let i = 0; i < column_names.length; i++) {
+        var table_head = document.createElement("th");      // table header.
+        table_head.innerHTML = column_names[i] + `<img src="/assets/info.png" title='` + tool_tips[column_names[i]] + `'>`;
+        table_head.classList.add("parentCell_metric_table");
+        table_row.appendChild(table_head);
     }
 
     // add json data to the table as rows.
-    for (var i = 0; i < combined_output.length; i++) {
-
-        tr = table.insertRow(-1);
-
-        for (var j = 0; j < columns.length; j++) {
-            var tabCell = tr.insertCell(-1);
-            tabCell.innerHTML = combined_output[i][metricsToCheck[j]]
-            if (j == 0) {
-                let title = 'Q) ' + processed_comment_json_string[i]['question'] + '   A) ' + processed_comment_json_string[i]['text'];
-                tabCell.innerHTML += `<img src="/assets/info.png" title='` + title + `'>`;
+    for (var i = 0; i < merged_responses.length; i++) {
+        table_row = table.insertRow(-1);
+        
+        for (var j = 0; j < metrics_to_check.length; j++) {
+            var table_cell = table_row.insertCell(-1);
+            table_cell.innerHTML = merged_responses[i][metrics_to_check[j]]
+            if(j==0) {
+                let title = 'Q) '+ processed_comment_json_string[i]['question'] + '   A) ' + processed_comment_json_string[i]['text'];
+                table_cell.innerHTML += `<img src="/assets/info.png" title='`+title+`'>`;
             }
         }
     }
@@ -100,40 +121,34 @@ function generateTable(combined_output, processed_comment_json, metricsToCheck, 
 }
 
 // This function makes API calls
-async function makeAPICalls(config_file_api_call_values, config_file_values, processed_comment_json) {
-    let analysisResponseDict = {};
+async function make_api_calls(config_file_api_call_values, config_file_values, processed_comment_json) {
+    let analysis_response_dict = {};
     for (let metric in config_file_api_call_values) {
         if (config_file_values.includes(metric)) {
-            callObject = eval(config_file_api_call_values[metric]['displayName']);
-            const tempObject = new callObject(config_file_api_call_values);
-            analysisResponseDict[config_file_api_call_values[metric]['displayName']] = await tempObject.callAPI(processed_comment_json);
+            metric_object_str = eval(config_file_api_call_values[metric]['className']);
+            const metric_object = new metric_object_str(config_file_api_call_values[metric]['URL']);
+            analysis_response_dict[config_file_api_call_values[metric]['className']] = await metric_object.call_API(processed_comment_json);
         }
     }
-    return analysisResponseDict;
+    return analysis_response_dict;
 }
 
-function combineOutput(config_file_api_call_values, number_of_comments, config_file_values, analysisResponseDict) {
+function combine_api_output(config_file_api_call_values, number_of_comments, config_file_values, analysis_response_dict) {
     // This loop combines the output received by API's in an array
-    let combined_output = [];
-    for (let i = 0; i < number_of_comments; i++) {
+    let responses = {};
 
-        let output = {}
-        output["Comment Number"] = i + 1;
-
-        for (let metric in config_file_api_call_values) {
-            if (config_file_values.includes(metric)) {
-                callObject = eval(config_file_api_call_values[metric]['displayName']);
-                const tempObject = new callObject(config_file_api_call_values);
-                output[config_file_api_call_values[metric]['displayName']] = tempObject.formatResponse(analysisResponseDict, metric, config_file_api_call_values[metric]['displayName'], i);
-            }
+    for (let metric in config_file_api_call_values) {
+        if (config_file_values.includes(metric)) {
+            metric_object_str = eval(config_file_api_call_values[metric]['className']);
+            const metric_object = new metric_object_str(config_file_api_call_values[metric]['URL']);
+            responses[config_file_api_call_values[metric]['className']] = metric_object.format_response(analysis_response_dict, metric, config_file_api_call_values[metric]['className'], number_of_comments);
         }
-        combined_output.push(output);
     }
-    return combined_output;
+    return responses;
 }
 
 //The driver code to fetch the review comments, get API call output and display them in tabular format
-async function getReviewFeedback() {
+async function get_review_feedback() {
     //this variable fetches and stores the review metrics setting stored in config file review_metrics.yml
     var config_file_values = $('.fetch_review_metric').data('params');
 
@@ -146,36 +161,21 @@ async function getReviewFeedback() {
 
     //start the timer here - which will be used to calculate total time taken.
     var time_start = performance.now();
-    let responseComments = fetch_response_comments();
-    let processed_comment_json = responseComments[0];
-    let number_of_comments = responseComments[1];
+    let response_comments = fetch_response_comments();
+    let processed_comment_json = response_comments[0];
+    let number_of_comments = response_comments[1];
     
     //This holds the response value of each analysis as a dictionar/hash(key = analysis name, value = response of analysis)
-    var analysisResponseDict = {};
+    var analysis_response_dict = {};
 
     //This loops through each analysis(key) in analysisVals hash/dictionary and gets its respective apiurl(value) and puts the response of the
     //api url into responseDict
 
-    analysisResponseDict = await makeAPICalls(config_file_api_call_values, config_file_values, processed_comment_json);
+    analysis_response_dict = await make_api_calls(config_file_api_call_values, config_file_values, processed_comment_json);
 
-    let tooltips = { "Comment Number": 'The comment number from the top in the form.' };
-    let metricsToCheck = ["Comment Number"];
-
-    for (var metric in config_file_api_call_values) {
-        metricsToCheck.push(config_file_api_call_values[metric]['displayName']);
-    }
-
-    columnNames = ["Comment Number"]
-    for (let metric in config_file_api_call_values) {
-        metric_string = String(metric);
-        ColumnName = metric_string.substring(0, 1).toUpperCase() + metric_string.substring(1, metric_string.length);
-        columnNames.push(ColumnName);
-        tooltips[ColumnName] = config_file_api_call_values[metric]['toolTipText'];
-    }
-
-    combined_output = combineOutput(config_file_api_call_values, number_of_comments, config_file_values, analysisResponseDict);
-
-    generateTable(combined_output, processed_comment_json, metricsToCheck, columnNames, tooltips);
+    responses = combine_api_output(config_file_api_call_values, number_of_comments, config_file_values, analysis_response_dict);
+   
+    generate_table(responses, config_file_api_call_values, processed_comment_json, number_of_comments);
 
     time_end = performance.now();
     var time_taken = time_end - time_start;

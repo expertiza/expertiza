@@ -40,6 +40,7 @@ module ResponseHelper
     new_response ? questionnaire_from_response_map : questionnaire_from_response
     set_dropdown_or_scale
     new_response ? set_questions_for_new_response : set_questions  
+    # @review_questions = sort_questions(@questionnaire.questions)
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
     # The new response is created here so that the controller has access to it in the new method
@@ -59,6 +60,14 @@ module ResponseHelper
         @review_questions += sort_questions(@revision_plan_questionnaire.questions)
       end
     end
+    return @review_questions
+  end
+
+  def set_questions
+    @review_questions = []
+    answers = @response.scores
+    questionnaires = @response.questionnaires_by_answers(answers)
+    questionnaires.each {|questionnaire| @review_questions += sort_questions(questionnaire.questions) }
     return @review_questions
   end
 

@@ -12,7 +12,7 @@ class User < ApplicationRecord
   has_many :assignment_participants, class_name: 'AssignmentParticipant', foreign_key: 'user_id', dependent: :destroy
   has_many :assignments, through: :participants
   has_many :teams_users, dependent: :destroy
-  has_many :teams, through: :teams_users
+  has_many :teams, through: :teams_users # E2243: remove when user_id field is removed from teams_users table
   has_many :sent_invitations, class_name: 'Invitation', foreign_key: 'from_id', dependent: :destroy
   has_many :received_invitations, class_name: 'Invitation', foreign_key: 'to_id', dependent: :destroy
   has_many :children, class_name: 'User', foreign_key: 'parent_id'
@@ -39,6 +39,13 @@ class User < ApplicationRecord
   scope :students, -> { where role_id: Role.student }
 
   has_paper_trail
+
+  # E2243: teams_users table stores participant_id instead of user_id.
+  # Therefore, direct mapping between teams and users are not available now.
+  # Teams of users have to be fetched via participants
+  def teams
+    Participant.where(user_id: id).flat_map(&:teams)
+  end
 
   def salt_first?
     true

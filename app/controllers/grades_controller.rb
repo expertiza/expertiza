@@ -89,6 +89,7 @@ class GradesController < ApplicationController
     @vmlist = []
 
     counter_for_same_rubric = 0
+    counter_for_rounds = 1
     questionnaires.each do |questionnaire|
       @round = nil
       if @assignment.vary_by_round && questionnaire.type == 'ReviewQuestionnaire'
@@ -102,6 +103,22 @@ class GradesController < ApplicationController
         end
       end
       @vmlist << populate_view_model(questionnaire)
+      # Finds RevisionPlanQuestionnaire, if any
+      rp_questionnaire = RevisionPlanTeamMap.find_by(team: Team.find(@team_id), used_in_round: counter_for_rounds).try(:questionnaire)
+      # Confirms revision planning enabled
+      # Confirms not first round
+      # Confirms haven't surpassed maximum number of rounds
+      if @assignment.is_revision_planning_enabled && rp_questionnaire && counter_for_rounds <= @assignment.rounds_of_reviews
+        # Adds RevisionPlanQuestionnaire to heatgrid
+        vm = VmQuestionResponse.new(rp_questionnaire, @assignment, @round)
+        vmquestions = rp_questionnaire.questions
+        vm.add_questions(vmquestions)
+        vm.add_team_members(@team)
+        vm.add_reviews(@participant, @team, @assignment.vary_by_round)
+        vm.number_of_comments_greater_than_10_words
+        @vmlist << vm
+      end
+      counter_for_rounds += 1
     end
     @current_role_name = current_role_name
   end

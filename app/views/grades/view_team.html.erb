@@ -84,7 +84,7 @@
           <!-- display the table title and tooltips -->
           <span style="width:100%;">
               <h4 style="display:inline-block;"><%= vm.questionnaire_display_type %>
-                <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
+                <% if vm.questionnaire_type == "ReviewQuestionnaire" or vm.questionnaire_type == "RevisionPlanQuestionnaire"%>
                     (<%=t ".round"%>: <%= vm.round.to_s  %> <%=t ".of"%> <%= vm.rounds.to_s  %>)
                 <%end %>
               </h4>

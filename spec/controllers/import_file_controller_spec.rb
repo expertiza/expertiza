@@ -52,6 +52,27 @@ describe ImportFileController do
         expect(response).to render_template(:show)
       end
     end
+
+    context 'when trying to display uploaded csv for SignupTopic model' do
+      it 'renders show template after parsing contents of csv' do
+        stub_current_user(ta, ta.role.name, ta.role)
+        params = {
+          "delim_type"=>"comma", 
+          "has_header"=>"true", 
+          "file"=>Rack::Test::UploadedFile.new("#{Rails.root}/spec/fixtures/SignUpTopic.csv"), 
+          "model"=>"SignUpTopic", 
+          "id"=>"",
+          "category"=>"true",
+          "description"=>"true",
+          "link"=>"true"
+        }
+
+        get :show, params
+        # puts controller.instance_variable_get('@contents_grid')
+        # puts controller.instance_variable_get('@contents_hash')
+        expect(response).to render_template(:show)
+      end
+    end
   end
 
 

@@ -415,7 +415,6 @@ class AssignmentForm
   end
 
   def self.copy_calibrated_reviews(old_assignment, new_assignment_id)
-    # TODO
     # copy submission records for the assignment
     SubmissionRecord.copy_assignment_submissions(old_assignment, new_assignment_id)
 

@@ -118,7 +118,7 @@ describe QuestionnairesController do
       allow_any_instance_of(QuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
       request_params = { id: 1 }
       user_session = { user: instructor }
-      get :bequeath, params: request_params, session: user_session
+      get :copy, params: request_params, session: user_session
       expect(response).to redirect_to('/questionnaires/view?id=2')
       expect(controller.instance_variable_get(:@questionnaire).name).to eq('Copy of ' + questionnaire.name)
       expect(controller.instance_variable_get(:@questionnaire).private).to eq false

@@ -109,7 +109,7 @@ class TeamsController < ApplicationController
         flash[:note] = 'No teams were found when trying to inherit.'
       else
         teams.each do |team|
-          team.bequeath(assignment.id)
+          team.copy(assignment.id)
         end
       end
     else
@@ -134,7 +134,7 @@ class TeamsController < ApplicationController
       end
       teams = assignment.teams
       teams.each do |team|
-        team.bequeath(course.id)
+        team.copy(course.id)
       end
       flash[:note] = teams.length.to_s + ' teams were successfully copied to "' + course.name + '"'
     else

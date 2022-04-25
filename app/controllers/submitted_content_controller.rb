@@ -175,7 +175,7 @@ class SubmittedContentController < ApplicationController
       rename_selected_file
     elsif params[:faction][:move]
       move_selected_file
-    elsif params[:faction][:bequeath]
+    elsif params[:faction][:copy]
       copy_selected_file
     elsif params[:faction][:create]
       create_new_folder
@@ -261,7 +261,7 @@ class SubmittedContentController < ApplicationController
 
   def copy_selected_file
     old_filename = params[:directories][params[:chk_files]] + '/' + params[:filenames][params[:chk_files]]
-    new_filename = params[:directories][params[:chk_files]] + '/' + FileHelper.sanitize_filename(params[:faction][:bequeath])
+    new_filename = params[:directories][params[:chk_files]] + '/' + FileHelper.sanitize_filename(params[:faction][:copy])
     begin
       raise 'A file with this name already exists. Please delete the existing file before copying.' if File.exist?(new_filename)
       raise 'The referenced file does not exist.' unless File.exist?(old_filename)

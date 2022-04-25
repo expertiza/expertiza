@@ -9,6 +9,7 @@ describe InvitationsController do
   let(:assignment) { build(:assignment, id: 2, is_conference_assignment: 1, max_team_size: 100) }
   let(:assignment2) { build(:assignment, id: 2, is_conference_assignment: 0, max_team_size: 100) }
   let(:teamUser) { build(:team_user, id: 3) }
+  let(:teamUser2) { build(:team_user, id: 4) }
   let(:team) { build(:team, id: 3) }
   describe '#action_allowed?' do
     context 'when current user is student' do
@@ -69,6 +70,8 @@ describe InvitationsController do
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow(TeamsUser).to receive(:find).with('1').and_return(teamUser)
       allow(Team).to receive(:find).with('1').and_return(team)
+
+      allow(TeamsUser).to receive(:find_by).with(user_id: 4, team_id: 3).and_return(teamUser2)
       user_session = { user: student1 }
       expect { post :create, params: request_params, session: user_session }.to change(Invitation, :count).by(1).and change(User, :count).by(1)
     end

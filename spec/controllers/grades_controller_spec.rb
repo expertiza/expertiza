@@ -103,11 +103,16 @@ describe GradesController do
         allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
         allow(Participant).to receive(:where).with(parent_id: 1).and_return([participant])
         allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+        allow(Participant).to receive(:where).with(id: [participant.id]).and_return([participant])
         allow(assignment).to receive(:late_policy_id).and_return(false)
         allow(assignment).to receive(:calculate_penalty).and_return(false)
         allow_any_instance_of(GradesController).to receive(:compute_total_score).with(assignment, any_args).and_return(100)
 
+        allow(AssignmentParticipant).to receive(:find_by).with(parent_id: 1, user_id: 6).and_return(participant)
         allow(User).to receive(:find).with(6).and_return(:instructor)
+        allow(team).to receive(:participant_ids).and_return([participant.id])
+
+        allow(User).to receive(:where).with(1).and_return(:student)
         allow(Assignment).to receive(:find).and_return(assignment_with_participants)
         allow(assignment_with_participants).to receive(:participants).and_return(assignment_with_participants.participants)
         allow(assignment_with_participants.participants).to receive(:find_by).and_return(participant)

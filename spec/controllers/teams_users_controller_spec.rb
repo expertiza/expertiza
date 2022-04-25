@@ -1,5 +1,7 @@
 require './spec/support/teams_shared.rb'
 
+
+
 describe TeamsUsersController do
   # Including the stubbed objects from the teams_shared.rb file
   include_context 'object initializations'
@@ -14,6 +16,7 @@ describe TeamsUsersController do
   let(:student) { build(:student) }
   let(:duty) { build(:duty, id: 1, name: 'Role', max_members_for_duty: 2, assignment_id: 1) }
   let(:teams_user1) { TeamsUser.new id: 1, duty_id: 1 }
+  let(:participant2) { build_stubbed(:participant, id: 1, user_id: 1, parent_id: 1) }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -255,7 +258,10 @@ describe TeamsUsersController do
         allow(Team).to receive(:find).with('1').and_return(team1)
         allow(AssignmentTeam).to receive(:find).with('1').and_return(team1)
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
-        allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant2)
+
+        allow(Participant).to receive(:where).and_return({:parent_id=>1})
+
         allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_raise("Member on existing team error")
         user_session = { user: admin }
         request_params = {

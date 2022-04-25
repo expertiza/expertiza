@@ -207,4 +207,40 @@ class ReviewResponseMap < ResponseMap
     end
     review_final_versions[symbol][:response_ids] = response_ids
   end
+
+  # Copies review responses to a new assignment
+  def self.newreviewresp(old_assign, catt, dict, new_assign_id)
+    @old_reviewrespmap = ReviewResponseMap.where(reviewed_object_id: old_assign.id, reviewee_id: catt)
+    @find_newrespmap =  ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[catt])
+    oldreviewrespids = []
+    newreviewrespids = []
+    @old_reviewrespmap.each do |zatt|
+      oldreviewrespids.append(zatt.id)
+    end
+    @find_newrespmap.each do |zatt|
+      newreviewrespids.append(zatt.id)
+    end
+    dict1 = Hash[oldreviewrespids.zip newreviewrespids]
+    dict1.each do |item, value|
+      @oldresp = Response.where(map_id: item)
+      @oldresp.each do |zatt|
+        @newresp = Response.new
+        @newresp.map_id = value
+        @newresp.additional_comment = zatt.additional_comment
+        @newresp.version_num = zatt.version_num
+        @newresp.round = zatt.round
+        @newresp.is_submitted = zatt.is_submitted
+        @newresp.save
+        @oldanswers = Answer.where(response_id:zatt.id)
+        @oldanswers.each do |latt|
+          @newanswer = Answer.new
+          @newanswer.question_id = latt.question_id
+          @newanswer.answer = latt.answer
+          @newanswer.comments = latt.comments
+          @newanswer.response_id = @newresp.id
+          @newanswer.save
+        end
+      end
+    end
+  end
 end

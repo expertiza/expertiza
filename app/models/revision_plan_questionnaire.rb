@@ -34,8 +34,8 @@ class RevisionPlanQuestionnaire < Questionnaire
     return questionnaire
   end
 
-    # Display questionnaire heading in response view
-    def display_heading?
-      return true
-    end
+  # Display questionnaire heading in response view
+  def display_heading?
+    return true
+  end
 end

@@ -38,6 +38,4 @@ class RevisionPlanQuestionnaire < Questionnaire
     def display_heading?
       return true
     end
-
-  end
 end

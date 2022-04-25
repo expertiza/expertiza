@@ -30,6 +30,9 @@ class SignUpTopic < ActiveRecord::Base
     else
       topic.max_choosers = row_hash[:max_choosers]
       topic.topic_identifier = row_hash[:topic_identifier]
+      topic.category = row_hash[:category].strip unless row_hash[:category].nil?
+      topic.description = row_hash[:description].strip unless row_hash[:description].nil?
+      topic.link = row_hash[:link].strip unless row_hash[:link].nil?
       # topic.assignment_id = session[:assignment_id]
       topic.save
     end

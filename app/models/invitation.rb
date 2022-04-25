@@ -4,17 +4,20 @@ class Invitation < ApplicationRecord
   # belongs_to :from_user, class_name: "User", foreign_key: "from_id"
   belongs_to :from_user, class_name: 'User', foreign_key: 'from_id', inverse_of: false
 
-  def self.remove_waitlists_for_team(topic_id, _assignment_id)
-    # first_waitlisted_signup = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
-    first_waitlisted_signup = SignedUpTeam.find_by(topic_id: topic_id, is_waitlisted: true)
+  # This method is no longer used and the same functionality is provided by 
+  # The method release_topics_selected_by_team_for_assignment in signed_up_team.rb
+  
+  # def self.remove_waitlists_for_team(topic_id, _assignment_id)
+  #   # first_waitlisted_signup = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
+  #   first_waitlisted_signup = SignedUpTeam.find_by(topic_id: topic_id, is_waitlisted: true)
 
-    # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
-    first_waitlisted_signup.is_waitlisted = false
-    first_waitlisted_signup.save
+  #   # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
+  #   first_waitlisted_signup.is_waitlisted = false
+  #   first_waitlisted_signup.save
 
-    # Cancel all topics the user is waitlisted for
-    Waitlist.cancel_all_waitlists(first_waitlisted_signup.team_id, SignUpTopic.find(topic_id).assignment_id)
-  end
+  #   # Cancel all topics the user is waitlisted for
+  #   Waitlist.cancel_all_waitlists(first_waitlisted_signup.team_id, SignUpTopic.find(topic_id).assignment_id)
+  # end
 
   # Remove all invites sent by a user for an assignment.
   def self.remove_users_sent_invites_for_assignment(user_id, assignment_id)

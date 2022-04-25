@@ -79,10 +79,8 @@ class Team < ApplicationRecord
     TeamsUser.where(team_id: team_id).count
   end
 
-  # Create new teams for calibrated assignments with respect to the old team already present
-  # This method returns the IDs of the teams associated with the old assignment
-  # TODO - rename method, override in assignment_team to copy assignment_team specific attributes
-  def self.copy_and_create_new_team(old_assign, new_assign_id)
+  # Create new teams, copied from an old assignment, and returns an array of the team IDs copied
+  def self.copy(old_assign, new_assign_id)
     @original_team_values = Team.where(parent_id: old_assign.id)
     old_team_ids = []
     @original_team_values.each do |catt|
@@ -93,17 +91,8 @@ class Team < ApplicationRecord
         @resp = Response.find_by(map_id: @map.id, is_submitted: false)
         if @resp
           old_team_ids.append(catt.id)
-          @new_team = Team.new
-          @new_team.name = catt.name
+          @new_team = catt.dup
           @new_team.parent_id = new_assign_id
-          @new_team.type = catt.type
-          @new_team.comments_for_advertisement = catt.comments_for_advertisement
-          @new_team.advertise_for_partner = catt.advertise_for_partner
-          @new_team.submitted_hyperlinks = catt.submitted_hyperlinks
-          @new_team.directory_num = catt.directory_num
-          @new_team.grade_for_submission = catt.grade_for_submission
-          @new_team.comment_for_submission = catt.comment_for_submission
-          @new_team.make_public = catt.make_public
           @new_team.save
         else
           next

@@ -420,7 +420,7 @@ class AssignmentForm
     SubmissionRecord.copy_assignment_submissions(old_assignment, new_assignment_id)
 
     # copy teams for the old assignment, this returns an array of the old team IDs that we'll want to use later
-    Team.copy_and_create_new_team(old_assignment, new_assignment_id)
+    Team.copy(old_assignment, new_assignment_id)
 
     # recreate participants for copied teams then map the calibrated reviews to them
     # TODO - when we copy the reviews, we need to make sure we properly increment submitter_count

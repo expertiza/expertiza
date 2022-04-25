@@ -339,11 +339,7 @@ ActiveRecord::Schema.define(version: 20220424063124) do
     t.string "type"
   end
 
-<<<<<<< HEAD
   create_table "notifications", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3" do |t|
-=======
-  create_table "notifications", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
->>>>>>> 30f1a9b80098b13ef3a92520dccc79e33c7c1230
     t.string "subject"
     t.text "description"
     t.date "expiration_date"
@@ -376,11 +372,7 @@ ActiveRecord::Schema.define(version: 20220424063124) do
     t.index ["user_id"], name: "fk_participant_users"
   end
 
-<<<<<<< HEAD
   create_table "password_resets", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3" do |t|
-=======
-  create_table "password_resets", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
->>>>>>> 30f1a9b80098b13ef3a92520dccc79e33c7c1230
     t.string "user_email"
     t.string "token"
     t.datetime "updated_at"
@@ -390,11 +382,7 @@ ActiveRecord::Schema.define(version: 20220424063124) do
     t.string "name", default: "", null: false
   end
 
-<<<<<<< HEAD
   create_table "plagiarism_checker_assignment_submissions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3" do |t|
-=======
-  create_table "plagiarism_checker_assignment_submissions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
->>>>>>> 30f1a9b80098b13ef3a92520dccc79e33c7c1230
     t.string "name"
     t.string "simicheck_id"
     t.datetime "created_at", null: false
@@ -403,11 +391,7 @@ ActiveRecord::Schema.define(version: 20220424063124) do
     t.index ["assignment_id"], name: "index_plagiarism_checker_assgt_subm_on_assignment_id"
   end
 
-<<<<<<< HEAD
   create_table "plagiarism_checker_comparisons", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3" do |t|
-=======
-  create_table "plagiarism_checker_comparisons", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
->>>>>>> 30f1a9b80098b13ef3a92520dccc79e33c7c1230
     t.integer "plagiarism_checker_assignment_submission_id"
     t.string "similarity_link"
     t.decimal "similarity_percentage", precision: 10
@@ -510,11 +494,7 @@ ActiveRecord::Schema.define(version: 20220424063124) do
     t.index ["user_id"], name: "fk_rails_6041e1cdb9"
   end
 
-<<<<<<< HEAD
   create_table "review_comment_paste_bins", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3" do |t|
-=======
-  create_table "review_comment_paste_bins", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
->>>>>>> 30f1a9b80098b13ef3a92520dccc79e33c7c1230
     t.integer "review_grade_id"
     t.string "title"
     t.text "review_comment"
@@ -523,11 +503,7 @@ ActiveRecord::Schema.define(version: 20220424063124) do
     t.index ["review_grade_id"], name: "fk_rails_0a539bcc81"
   end
 
-<<<<<<< HEAD
   create_table "review_grades", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3" do |t|
-=======
-  create_table "review_grades", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
->>>>>>> 30f1a9b80098b13ef3a92520dccc79e33c7c1230
     t.integer "participant_id"
     t.integer "grade_for_reviewer"
     t.text "comment_for_reviewer"
@@ -571,11 +547,7 @@ ActiveRecord::Schema.define(version: 20220424063124) do
     t.datetime "updated_at", null: false
   end
 
-<<<<<<< HEAD
   create_table "sections", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci" do |t|
-=======
-  create_table "sections", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
->>>>>>> 30f1a9b80098b13ef3a92520dccc79e33c7c1230
     t.string "name", null: false
     t.text "desc_text"
     t.datetime "created_at"
@@ -744,11 +716,7 @@ ActiveRecord::Schema.define(version: 20220424063124) do
     t.integer "parent_id"
   end
 
-<<<<<<< HEAD
   create_table "user_pastebins", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3" do |t|
-=======
-  create_table "user_pastebins", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
->>>>>>> 30f1a9b80098b13ef3a92520dccc79e33c7c1230
     t.integer "user_id"
     t.string "short_form"
     t.text "long_form"
@@ -756,11 +724,7 @@ ActiveRecord::Schema.define(version: 20220424063124) do
     t.datetime "updated_at", null: false
   end
 
-<<<<<<< HEAD
   create_table "users", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3" do |t|
-=======
-  create_table "users", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
->>>>>>> 30f1a9b80098b13ef3a92520dccc79e33c7c1230
     t.string "name", default: "", null: false
     t.string "crypted_password", limit: 40, default: "", null: false
     t.integer "role_id", default: 0, null: false
@@ -787,11 +751,7 @@ ActiveRecord::Schema.define(version: 20220424063124) do
     t.index ["role_id"], name: "fk_user_role_id"
   end
 
-<<<<<<< HEAD
   create_table "versions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3" do |t|
-=======
-  create_table "versions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
->>>>>>> 30f1a9b80098b13ef3a92520dccc79e33c7c1230
     t.string "item_type", null: false
     t.integer "item_id", null: false
     t.string "event", null: false

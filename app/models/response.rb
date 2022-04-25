@@ -252,8 +252,8 @@ class Response < ApplicationRecord
   # Get all the questionnaires for a response, response is a collection of answers
   # answers contain reference to their question, and question have a reference to questionnaire
   def questionnaires_by_answers(answers)
-    answers_with_questionnaires = answers.select { |ans| ans && ans.question && ans.question.questionnaire }
-    questionnaires = answers_with_questionnaires.collect { |ans| ans.question.questionnaire }.uniq
+    answers_with_questionnaires = answers.select { |answer| answer && answer.question && answer.question.questionnaire }
+    questionnaires = answers_with_questionnaires.collect { |answer| answer.question.questionnaire }.uniq
     unless (questionnaires.any?)
       questionnaires = []
       questionnaires << questionnaire_by_answer(answers.first)

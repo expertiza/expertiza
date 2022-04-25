@@ -74,7 +74,6 @@ class TeamsUser < ApplicationRecord
       end
     end
     team_id
-
   end
 
   def user
@@ -104,4 +103,4 @@ class TeamsUser < ApplicationRecord
     participant_ids = Assignment.find(assignment_id).participants.where(user_id: user_ids).pluck(:id)
     TeamsUser.where(user_id: user_ids).or(TeamsUser.where(participant_id: participant_ids))
   end
-  end
+end

@@ -353,7 +353,6 @@
     <input name="_method" type="hidden" value="put"/>
   <% end %>
   <table width="100%">
-<<<<<<< HEAD
     <% @review_questions.each_with_index do |question, i| %>
       <% i = 0 %>
       <% @questions.group_by{ |ques| ques.questionnaire }.each do |questionnaire, grouped_questions | %>
@@ -385,7 +384,6 @@
       <% end %>
       <% end %>
 
-=======
     <% @questions.each_with_index do |question, i| %>
       <tr>
         <td>
@@ -406,7 +404,6 @@
         </td>
       </tr>
     <% end %>
->>>>>>> parent of 79d2e0b15... review plan header in edit response view
     <tr>
       <td>
         <label for="review_comments">Additional Comments</label><BR/>

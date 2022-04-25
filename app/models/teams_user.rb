@@ -46,7 +46,7 @@ class TeamsUser < ApplicationRecord
   # Add member to the team they were invited to and accepted the invite for
   def self.add_member_to_invited_team(invitee_user_id, invited_user_id, assignment_id)
     can_add_member = false
-    users_teams = TeamsUser.find_by_user_ids_and_assignment_id([invitee_user_id], assignment_id)
+    users_teams = TeamsUser.where_user_ids_and_assignment_id([invitee_user_id], assignment_id)
     users_teams.each do |team|
       new_team = AssignmentTeam.where(['id = ? and parent_id = ?', team.team_id, assignment_id]).first
       unless new_team.nil?
@@ -106,7 +106,7 @@ class TeamsUser < ApplicationRecord
 
   # E2243: Loads TeamsUser based on user_ids and assignment_id.
   # Returns a list not a single object.
-  def self.find_by_user_ids_and_assignment_id(user_ids, assignment_id)
+  def self.where_user_ids_and_assignment_id(user_ids, assignment_id)
     participant_ids = Assignment.find(assignment_id).participants.where(user_id: user_ids).pluck(:id)
     TeamsUser.where(user_id: user_ids).or(TeamsUser.where(participant_id: participant_ids))
   end

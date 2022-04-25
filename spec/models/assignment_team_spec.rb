@@ -144,7 +144,7 @@ describe 'AssignmentTeam' do
       it 'copies the assignment team to course team' do
         assignment = team.assignment
         course = assignment.course
-        expect(team.copy(course.id)).to eq([])
+        expect(team.bequeath(course.id)).to eq([])
       end
     end
   end

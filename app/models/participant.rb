@@ -153,6 +153,8 @@ class Participant < ApplicationRecord
   end
 
   # creates new participants with all the same fields as the old participants
+  # TODO - move this to assignment_participant (see video from last meeting @ 00:23)
+  #      - also look for a better way to do it
   def self.createparticipant(matt,old_assign, new_assign_id)
     @old_participant = Participant.where(user_id: matt.user_id, parent_id: old_assign.id)
     @old_participant.each do |natt|
@@ -175,6 +177,7 @@ class Participant < ApplicationRecord
     end
   end
 
+  # TODO - move this to assignment_participant (see video from last meeting @ 00:23)
   # Copies the reviews from the previous instructors
   def self.mapreviewresponseparticipant(old_assign, new_assign_id, dict)
     @old_assignmentnumber = Assignment.find_by(id: old_assign.id)

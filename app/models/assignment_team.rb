@@ -147,7 +147,8 @@ class AssignmentTeam < Team
   # REFACTOR END:: functionality of import, export handle_duplicate shifted to team.rb
 
   # Copy the current Assignment team to the CourseTeam
-  def copy(course_id)
+  # TODO - rename to bequeath, we will create an actual copy method
+  def bequeath(course_id)
     new_team = CourseTeam.create_team_and_node(course_id)
     new_team.name = name
     new_team.save

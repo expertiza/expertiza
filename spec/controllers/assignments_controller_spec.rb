@@ -357,7 +357,7 @@ describe AssignmentsController do
         allow(new_assignment).to receive(:save).and_return(true)
         allow(Assignment).to receive(:find).with(2).and_return(new_assignment)
         request_params = { id: 1 }
-        get :copy, params: request_params
+        get :bequeath, params: request_params
         expect(flash[:note]).to be_nil
         expect(flash[:error]).to be_nil
         expect(response).to redirect_to('/assignments/2/edit')
@@ -369,7 +369,7 @@ describe AssignmentsController do
         allow(assignment).to receive(:dup).and_return(new_assignment)
         allow(new_assignment).to receive(:save).and_return(false)
         request_params = { id: 1 }
-        get :copy, params: request_params
+        get :bequeath, params: request_params
         expect(flash[:note]).to be_nil
         expect(flash[:error]).to eq('The assignment was not able to be copied. Please check the original assignment for missing information.')
         expect(response).to redirect_to('/tree_display/list')

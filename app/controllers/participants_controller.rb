@@ -91,7 +91,7 @@ class ParticipantsController < ApplicationController
       participants = course.participants
       if !participants.empty?
         participants.each do |participant|
-          new_participant = participant.copy(params[:id])
+          new_participant = participant.bequeath(params[:id])
           @copied_participants.push new_participant if new_participant
         end
         # Only display undo link if copies of participants are created

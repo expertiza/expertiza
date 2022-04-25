@@ -5,6 +5,7 @@ class SubmissionRecord < ApplicationRecord
   validates :user, presence: true
   validates :assignment_id, presence: true
 
+  # Copies all submission records for an old assignment to a new assignment
   def self.copy_assignment_submissions(old_assign, new_assign_id)
     @prev_submission_record = SubmissionRecord.where(assignment_id: old_assign.id)
     @prev_submission_record.each do |catt|

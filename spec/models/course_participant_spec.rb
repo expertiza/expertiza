@@ -9,7 +9,7 @@ describe 'CourseParticipant' do
     it 'create a copy of participant' do
       allow(AssignmentParticipant).to receive(:create).and_return(@assignment_participant)
       allow(@assignment_participant).to receive(:set_handle).and_return(true)
-      expect(@course_participant.copy(@assignment.id)).to be_an_instance_of(AssignmentParticipant)
+      expect(@course_participant.bequeath(@assignment.id)).to be_an_instance_of(AssignmentParticipant)
     end
 
     it 'returns nil if copy exist' do
@@ -17,7 +17,7 @@ describe 'CourseParticipant' do
       allow(AssignmentParticipant).to receive(:first).and_return(@assignment_participant)
       allow(@assignment_participant).to receive(:set_handle).and_return(true)
 
-      expect(@course_participant.copy(@assignment.id)).to be_nil
+      expect(@course_participant.bequeath(@assignment.id)).to be_nil
     end
   end
 

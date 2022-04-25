@@ -81,6 +81,7 @@ class Team < ApplicationRecord
 
   # Create new teams for calibrated assignments with respect to the old team already present
   # This method returns the IDs of the teams associated with the old assignment
+  # TODO - rename method, override in assignment_team to copy assignment_team specific attributes
   def self.copy_and_create_new_team(old_assign, new_assign_id)
     @original_team_values = Team.where(parent_id: old_assign.id)
     old_team_ids = []

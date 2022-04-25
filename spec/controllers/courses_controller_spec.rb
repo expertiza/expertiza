@@ -103,7 +103,7 @@ describe CoursesController do
 
         params = { id: 1 }
         session = { user: instructor }
-        get :copy, params: params, session: session
+        get :bequeath, params: params, session: session
         expect(response).to redirect_to('/courses/edit')
       end
     end

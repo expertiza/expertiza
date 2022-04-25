@@ -46,7 +46,7 @@ Expertiza::Application.routes.draw do
   resources :assignments, except: [:destroy] do
     collection do
       get :place_assignment_in_course
-      get :copy
+      get :bequeath
       get :toggle_access
       get :delayed_mailer
       get :list_submissions
@@ -87,7 +87,7 @@ Expertiza::Application.routes.draw do
   resources :course, controller: 'courses', only: %i[new create edit update delete] do
     collection do
       get :toggle_access
-      get :copy
+      get :bequeath
       get :view_teaching_assistants
       post :add_ta
       get :auto_complete_for_user_name
@@ -240,7 +240,7 @@ Expertiza::Application.routes.draw do
   # Nitin - removed quiz related routes from questionnaires controller
   resources :questionnaires, only: %i[new create edit update] do
     collection do
-      get :copy
+      get :bequeath
       get :select_questionnaire_type
       post :select_questionnaire_type
       get :toggle_access

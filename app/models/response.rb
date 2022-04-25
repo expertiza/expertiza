@@ -262,14 +262,12 @@ class Response < ApplicationRecord
     Class.new.extend(Scoring).assessment_score(params)
   end
 
-
-
-  # Get all the questionnaires for a response, response is a collection of answers 
+  # Get all the questionnaires for a response, response is a collection of answers
   # answers contain reference to their question, and question have a reference to questionnaire
   def questionnaires_by_answers(answers)
-    answers_with_questionnaires = answers.select{ |ans|  ans && ans.question && ans.question.questionnaire }
-    questionnaires = answers_with_questionnaires.collect{ |ans| ans.question.questionnaire }.uniq
-    unless(questionnaires.any?)
+    answers_with_questionnaires = answers.select { |ans| ans && ans.question && ans.question.questionnaire }
+    questionnaires = answers_with_questionnaires.collect { |ans| ans.question.questionnaire }.uniq
+    unless (questionnaires.any?)
       questionnaires = []
       questionnaires << questionnaire_by_answer(answers.first)
     end
@@ -280,11 +278,9 @@ class Response < ApplicationRecord
   def get_questions
     @questions = []
     questionnaires = questionnaires_by_answers(scores)
-    questionnaires.each {|questionnaire| @questions += questionnaire.questions }
+    questionnaires.each { |questionnaire| @questions += questionnaire.questions }
     return @questions
   end
-
-
 
   private
 
@@ -324,9 +320,9 @@ class Response < ApplicationRecord
       else
         assignment = map.assignment
         questions.each do |question|
-          if(question.questionnaire.type == 'ReviewQuestionnaire')
+          if (question.questionnaire.type == 'ReviewQuestionnaire')
             review_questions.append(question)
-          elsif(question.questionnaire.type == 'RevisionPlanQuestionnaire')
+          elsif (question.questionnaire.type == 'RevisionPlanQuestionnaire')
             revision_plan_questions.append(question)
           end
         end

@@ -313,7 +313,7 @@ class ResponseController < ApplicationController
     @contributor = @map.contributor
     new_response ? questionnaire_from_response_map : questionnaire_from_response
     set_dropdown_or_scale
-    new_response ? set_questions_for_new_response : set_questions  
+    new_response ? set_questions_for_new_response : set_questions
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
     # The new response is created here so that the controller has access to it in the new method
@@ -323,15 +323,13 @@ class ResponseController < ApplicationController
     end
   end
 
-
-
   def set_questions_for_new_response
     @questions = sort_questions(@questionnaire.questions)
-    if(@assignment && @assignment.is_revision_planning_enabled)
+    if @assignment && @assignment.is_revision_planning_enabled
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
       current_round = @assignment.number_of_current_round(reviewees_topic)
       @revision_plan_questionnaire = RevisionPlanTeamMap.find_by(team_id: @map.reviewee_id, used_in_round: current_round).try(:questionnaire)
-      if(@revision_plan_questionnaire)
+      if @revision_plan_questionnaire
         @questions += sort_questions(@revision_plan_questionnaire.questions)
       end
     end
@@ -342,10 +340,9 @@ class ResponseController < ApplicationController
     @questions = []
     answers = @response.scores
     questionnaires = @response.questionnaires_by_answers(answers)
-    questionnaires.each {|questionnaire| @questions += sort_questions(questionnaire.questions) }
+    questionnaires.each { |questionnaire| @questions += sort_questions(questionnaire.questions) }
     return @questions
   end
-
 
   # This method is called within the Edit or New actions
   # It will create references to the objects that the controller will need when a user creates a new response or edits an existing one.

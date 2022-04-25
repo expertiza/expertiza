@@ -64,6 +64,7 @@ class RevisionPlanQuestionnaire < Questionnaire
       revision_plan_team_map.team
     end
   
+<<<<<<< HEAD
     # Display questionnaire heading in response view
     def display_heading?
       return true
@@ -79,3 +80,6 @@ class RevisionPlanQuestionnaire < Questionnaire
   end
 end
 >>>>>>> cd0a15dabc8be873b1968c2fe3e444e0ce375884
+=======
+  end
+>>>>>>> parent of 79d2e0b15... review plan header in edit response view

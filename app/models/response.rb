@@ -314,7 +314,7 @@ class Response < ApplicationRecord
           end
         end
         code = add_table_rows questionnaire_max, review_questions, answers, code, tag_prompt_deployments, current_user
-        if assignment.is_revision_planning_enabled && revision_plan_questions.any?
+        if assignment.is_revision_planning_enabled
           code += '</table>' + "<h5>Revision Plan Responses</h5>"
           code += '<table id="review_' + self_id + '" class="table table-bordered">'
           code = add_table_rows questionnaire_max, revision_plan_questions, answers, code, tag_prompt_deployments, current_user

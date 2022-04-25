@@ -423,6 +423,8 @@ class AssignmentForm
     Team.copy_and_create_new_team(old_assignment, new_assignment_id)
 
     # recreate participants for copied teams then map the calibrated reviews to them
+    # TODO - when we copy the reviews, we need to make sure we properly increment submitter_count
+    #        submitter_count is a column in the assignments table
   end
 
   # Copies the inputted assignment into new one and returns the new assignment id

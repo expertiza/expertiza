@@ -201,6 +201,9 @@ class AssignmentTeam < Team
     return nil if participant.nil?
 
     team = nil
+
+    # E2243: This should be modified to load only based on participant_id
+    # when user_id is removed from teams_users table.
     teams_users = TeamsUser.where(user_id: participant.user_id).or(TeamsUser.where(participant_id: participant.id))
 
     return nil unless teams_users

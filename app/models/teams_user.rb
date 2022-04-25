@@ -46,7 +46,7 @@ class TeamsUser < ApplicationRecord
   # Add member to the team they were invited to and accepted the invite for
   def self.add_member_to_invited_team(invitee_user_id, invited_user_id, assignment_id)
     can_add_member = false
-    users_teams = TeamsUser.find_in_assignment_by_user_ids([invitee_user_id], assignment_id)
+    users_teams = TeamsUser.find_by_user_ids_and_assignment_id([invitee_user_id], assignment_id)
     users_teams.each do |team|
       new_team = AssignmentTeam.where(['id = ? and parent_id = ?', team.team_id, assignment_id]).first
       unless new_team.nil?
@@ -64,7 +64,10 @@ class TeamsUser < ApplicationRecord
     team_id = nil
     unless assignment_id.nil?
       participant_id = Assignment.find(assignment_id).participants.find_by(user_id: user_id).id
+
+      # E2243: Fetch only based on participant_id after user_id is removed from teams_users table.
       teams_users = TeamsUser.where(user_id: user_id).or(TeamsUser.where(participant_id: participant_id))
+
       teams_users.each do |teams_user|
         team = Team.find(teams_user.team_id)
         if team.parent_id == assignment_id
@@ -76,6 +79,7 @@ class TeamsUser < ApplicationRecord
     team_id
   end
 
+  # E2243: Just return 'participant.user' after user_id is removed from teams_users table.
   def user
     if participant
       participant.user
@@ -88,6 +92,8 @@ class TeamsUser < ApplicationRecord
     user.id
   end
 
+  # E2243: Remove loading based on user_id after user_id is removed from teams_users table.
+  # Load based on team_id and participant_id wherever possible
   def self.find_by_team_id_and_user_id(team_id, user_id)
     teams_user = TeamsUser.find_by(team_id: team_id, user_id: user_id)
     if teams_user.nil? && team_id != "0"
@@ -98,8 +104,9 @@ class TeamsUser < ApplicationRecord
     teams_user
   end
 
-  # returns a list not an object
-  def self.find_in_assignment_by_user_ids(user_ids, assignment_id)
+  # E2243: Loads TeamsUser based on user_ids and assignment_id.
+  # Returns a list not a single object.
+  def self.find_by_user_ids_and_assignment_id(user_ids, assignment_id)
     participant_ids = Assignment.find(assignment_id).participants.where(user_id: user_ids).pluck(:id)
     TeamsUser.where(user_id: user_ids).or(TeamsUser.where(participant_id: participant_ids))
   end

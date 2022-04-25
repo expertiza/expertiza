@@ -53,7 +53,8 @@ class Team < ApplicationRecord
     names
   end
 
-  # Check if the user exist
+  # Check if the user exist in the team
+  # Use participant? function instead wherever possible
   def user?(user)
     participant = AssignmentParticipant.find_by(parent_id: parent_id, user_id: user.id)
     return false if participant.nil?
@@ -61,6 +62,7 @@ class Team < ApplicationRecord
     participant?(participant)
   end
 
+  # Check if the participant is part of this team
   def participant?(participant)
     participants.include? participant
   end
@@ -74,6 +76,7 @@ class Team < ApplicationRecord
     curr_team_size >= max_team_members
   end
 
+  # E2243: use add_participant_to_team function instead wherever possible.
   # Add member to the team, changed to hash by E1776
   def add_member(user, _assignment_id = nil)
     raise "The user #{user.name} is already a member of the team #{name}" if user?(user)
@@ -91,6 +94,8 @@ class Team < ApplicationRecord
     can_add_member
   end
 
+  # Add participant to a team.
+  # Raise exception if the participant is already part of this team.
   def add_participant_to_team(participant, _assignment_id = nil)
     raise "The user #{participant.name} is already a member of the team #{name}" if user?(participant.user)
 
@@ -100,7 +105,6 @@ class Team < ApplicationRecord
       t_user = TeamsUser.create(participant_id: participant.id, team_id: id)
       parent = TeamNode.find_by(node_object_id: id)
       TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
-      # add_participant(parent_id, user)
       ExpertizaLogger.info LoggerMessage.new('Model:Team', participant.name, "Added member to the team #{id}")
     end
     can_add_member

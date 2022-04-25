@@ -61,6 +61,7 @@ class CourseTeam < Team
     fields.push('Course Name')
   end
 
+  # E2243: use add_participant_to_team function instead wherever possible.
   # Add member to the course team
   def add_member(user, _id = nil)
     raise "The user \"#{user.name}\" is already a member of the team, \"#{name}\"" if user?(user)
@@ -72,6 +73,8 @@ class CourseTeam < Team
     TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
   end
 
+  # Add participant to a team.
+  # Raise exception if the participant is already part of this team.
   def add_participant_to_team(participant, _id = nil)
     raise "The user \"#{participant.name}\" is already a member of the team, \"#{name}\"" if participant?(participant)
 

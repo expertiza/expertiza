@@ -27,6 +27,7 @@ class Participant < ApplicationRecord
   # defined here to add different duty titles
   DUTY_MENTOR = 'mentor'.freeze
 
+  # E2243: return just 'teams_users' after user_id is removed from teams_users table
   def team
     team = TeamsUser.find_by(user: user).try(:team)
     if team.nil?

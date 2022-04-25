@@ -1,5 +1,5 @@
 <%# Logic to show total bids here%>
-<% if @assignment.is_intelligent  %>
+<%# if @assignment.is_intelligent  %>
   <% @total_bids_per_topic = Hash.new  %>
   <% @sign_up_topics.each do |t| %>
   <%  c = Bid.where(topic_id: t.id).count %>
@@ -17,4 +17,4 @@
   <% unless has_nonzero_value %>
     <td align="center">0</td>
   <% end %>
-<% end %>
+<%# end %>

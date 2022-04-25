@@ -15,7 +15,7 @@ module QuestionnaireHelper
       max = questionnaire.max_question_score
       min = questionnaire.min_question_score
 
-      QuestionAdvice.delete_all(['question_id = ? AND (score > ? OR score < ?)', question.id, max, min]) if !max.nil? && !min.nil?
+      QuestionAdvice.delete(['question_id = ? AND (score > ? OR score < ?)', question.id, max, min]) if !max.nil? && !min.nil?
 
       (questionnaire.min_question_score..questionnaire.max_question_score).each do |i|
         qas = QuestionAdvice.where('question_id = ? AND score = ?', question.id, i)

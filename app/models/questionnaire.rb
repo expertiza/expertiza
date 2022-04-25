@@ -120,4 +120,8 @@ class Questionnaire < ApplicationRecord
   def display_heading?
     return false
   end
+  # Return true if user owns questionnaire
+  def owner?(user_id)
+    instructor_id == user_id
+  end
 end

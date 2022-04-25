@@ -2,6 +2,14 @@ require './spec/support/teams_shared.rb'
 
 describe JoinTeamRequestsController do
   let(:participants_list) { [build(:participant, id: 2, user_id: 1006, assignment: assignment1)] }
+  let(:assignment_with_participants) do
+    build(:assignment,
+          id: 1,
+          name: 'test_assignment',
+          instructor_id: 2,
+          participants: [build(:participant, id: 2, user_id: 1006, assignment: assignment1)],
+          course_id: 1)
+  end
 
   # Including the stubbed objects from the teams_shared.rb file
   include_context 'object initializations'
@@ -87,7 +95,6 @@ describe JoinTeamRequestsController do
         allow(Team).to receive(:find).with('1').and_return(team1)
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
         allow(Participant).to receive(:where).with(user_id: 1, parent_id: '1').and_return([participant])
-
         # allow(Participant).to receive(:where).with(any_args).and_return([participant])
 
         allow(join_team_request2).to receive(:save).and_return(true)
@@ -95,6 +102,10 @@ describe JoinTeamRequestsController do
       it "will change the status to 'P' " do
         allow_any_instance_of(Team).to receive(:participants).and_return(participants_list)
         allow(join_team_request2).to receive(:save).and_return(true)
+        participant_array = [participant]
+        allow_any_instance_of(Assignment).to receive(:participants).and_return(participant_array)
+        allow(participant_array).to receive(:find_by).and_return(participant)
+
         request_params = {
           id: 2,
           join_team_request2: {

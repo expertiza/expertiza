@@ -112,7 +112,6 @@ describe TeamsUsersController do
         allow(AssignmentTeam).to receive(:find).with('1').and_return(team1)
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(nil)
-        allow(TeamsUser).to receive(:create).with(args_any).and_return()
         user_session = { user: admin }
         request_params = {
           user: { name: 'student2065' }, id: 1

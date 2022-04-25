@@ -1,4 +1,8 @@
+// Base Metric Class to call the correspondoing API and return the formated respose accordingly
+
 class Metric {
+
+    // Definining the constructor
     constructor(URL) {
         this.URL = URL;
         if (this.constructor == Metric) {
@@ -6,6 +10,7 @@ class Metric {
         }
     }
 
+    // This function is used to call the API and return the response
     async call_API(input) {
 
         try {
@@ -51,10 +56,7 @@ class Metric {
         });
     }
 
-    // callAPI(input) {
-    //     throw new Error("Method 'callAPI()' must be implemented.");
-    // }
-
+    // This function is used to get the response from the API and format it accordingly
     format_response(response, analysis) {
         throw new Error("Method 'formatResponse()' must be implemented.");
     }

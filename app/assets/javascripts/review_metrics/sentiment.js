@@ -5,11 +5,11 @@ class SentimentMetric extends Metric {
         );
     }
 
-
     format_response(response, analysis, metric_name, number_of_comments) {
 
         let combined_api_output = [];
 
+        // loop through each comment
         for (let i = 0; i < number_of_comments; i++) {
 
             let single_output = {}
@@ -22,7 +22,8 @@ class SentimentMetric extends Metric {
             pos = response_sentiment[String(analysis) + 's'][i]['pos'];
             neg = response_sentiment[String(analysis) + 's'][i]['neg'];
             neu = response_sentiment[String(analysis) + 's'][i]['neu'];
-
+            
+            // Add the sentiment values to the output
             if (pos > neg && pos > neu)
                 single_output[metric_name] = 'Positive';
             if (neu > pos && neu > neg)

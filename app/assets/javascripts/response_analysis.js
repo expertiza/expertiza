@@ -3,6 +3,7 @@
 //fetches the review form comments one by one - formats them into a single stringified json
 function fetch_response_comments() {
 
+    // This function fetches the comments from the review form and formats them into a single stringified json
     function create_comment_object(comment_id, review_id, question, class_name) {
         let comment_json = {};
         comment_json["id"] = comment_id + 1;
@@ -22,15 +23,20 @@ function fetch_response_comments() {
     var review_element_ids = [];
     $("*").each(function () {
         current_element_id = this.id
+
+        // if the current element id is a review question
         if (current_element_id && current_element_id.startsWith("responses") && current_element_id.endsWith("comments")) {
             review_element_ids.push(current_element_id);
         }
+
     });
 
     //for loop parses comments from review form and pushes all of them into 'reviews' list
     var reviews = [];
     for (var i = 0; i < review_element_ids.length; i++) {
         curr_review_element_id = review_element_ids[i]
+
+        // if the current element id is not a review question
         if (document.getElementById(curr_review_element_id) == null)
             continue;
         else {
@@ -50,6 +56,8 @@ function fetch_response_comments() {
     if (Object.keys(comment_object).length > 0) {
         reviews.push(comment_object);
     }
+
+    // fetch the number of comments
     var number_of_comments = reviews.length;
 
     //converts the reviews list into a json object, which is later converted into stringified json.
@@ -61,36 +69,49 @@ function fetch_response_comments() {
 }
 
 //This function takes in the processed api output to display a table(populated with API output) on UI
-function generate_table(responses, config_file_api_call_values, processed_comment_json, number_of_comments) {
+function generate_table(responses, config_file_api_call_values, processed_comment_json, number_of_comments, config_file_values) {
+
     // tooltip_json to store the text displayed in tooltip
     // Create a table header row using the extracted headers above.
-
     let tool_tips = { "Comment Number": 'The comment number from the top in the form.' };
     let metrics_to_check = ["Comment Number"];
     let column_names = ["Comment Number"];
     for (var metric in config_file_api_call_values) {
-        metrics_to_check.push(config_file_api_call_values[metric]['className']);
-        metric_string = String(metric);
-        column_head = metric_string.substring(0, 1).toUpperCase() + metric_string.substring(1, metric_string.length);
-        column_names.push(column_head);
-        tool_tips[column_head] = config_file_api_call_values[metric]['toolTipText'];
+        // if the metric is not in the config file, then skip it
+        if (config_file_values.includes(metric)) {
+            metrics_to_check.push(config_file_api_call_values[metric]['className']);
+            metric_string = String(metric);
+            column_head = metric_string.substring(0, 1).toUpperCase() + metric_string.substring(1, metric_string.length);
+            column_names.push(column_head);
+            tool_tips[column_head] = config_file_api_call_values[metric]['toolTipText'];
+        }
     }
 
+    // Create an empty list for our output
     let merged_responses = [];
+
+    // Loop through each response and add the respective response to the merged_responses list to be displayed on UI
     for (let i = 0; i < number_of_comments; i++) {
         single_output = {};
         single_output["Comment Number"] = i + 1;
+
+        // Loop through each metric
         for (let j = 1; j < metrics_to_check.length; j++) {
-            let arr = responses[metrics_to_check[j]];
-            single_output[metrics_to_check[j]] = arr[i][metrics_to_check[j]];
+            let metric_response = responses[metrics_to_check[j]];
+            single_output[metrics_to_check[j]] = metric_response[i][metrics_to_check[j]];
         }
+
+        // Add the single_output to the merged_responses list
         merged_responses.push(single_output);
     }
 
+    // Create the table
     let table = document.createElement("table");
     let table_row = table.insertRow(-1);                   // table row.
 
     processed_comment_json_string = JSON.parse(processed_comment_json)['reviews'];
+
+    // Create the table header
     for (let i = 0; i < column_names.length; i++) {
         var table_head = document.createElement("th");      // table header.
         table_head.innerHTML = column_names[i] + `<img src="/assets/info.png" title='` + tool_tips[column_names[i]] + `'>`;
@@ -125,7 +146,9 @@ function generate_table(responses, config_file_api_call_values, processed_commen
 async function make_api_calls(config_file_api_call_values, config_file_values, processed_comment_json) {
     let analysis_response_dict = {};
     for (let metric in config_file_api_call_values) {
+        // if the metric is not in the config file, then skip it
         if (config_file_values.includes(metric)) {
+            // Converts the String object to the class object and calls the API from the class object
             metric_object_str = eval(config_file_api_call_values[metric]['className']);
             const metric_object = new metric_object_str(config_file_api_call_values[metric]['URL']);
             analysis_response_dict[config_file_api_call_values[metric]['className']] = await metric_object.call_API(processed_comment_json);
@@ -169,18 +192,21 @@ async function get_review_feedback() {
     //This holds the response value of each analysis as a dictionar/hash(key = analysis name, value = response of analysis)
     var analysis_response_dict = {};
 
-    //This loops through each analysis(key) in analysisVals hash/dictionary and gets its respective apiurl(value) and puts the response of the
-    //api url into responseDict
-
+    // function to make API calls
     analysis_response_dict = await make_api_calls(config_file_api_call_values, config_file_values, processed_comment_json);
 
+    // function to combine the output received by API's in an array
     responses = combine_api_output(config_file_api_call_values, number_of_comments, config_file_values, analysis_response_dict);
 
-    generate_table(responses, config_file_api_call_values, processed_comment_json, number_of_comments);
+    // function to display the output in tabular format
+    generate_table(responses, config_file_api_call_values, processed_comment_json, number_of_comments, config_file_values);
 
+    // stop the timer here - which will be used to calculate total time taken.
     time_end = performance.now();
     var time_taken = time_end - time_start;
     var time_taken_obj = document.getElementById('timeTaken');
+
+    //display the time taken in seconds
     time_taken_obj.innerHTML = `<p> Time taken is ${(time_taken / 1000).toFixed(2)} seconds. </p>`;
 
 }

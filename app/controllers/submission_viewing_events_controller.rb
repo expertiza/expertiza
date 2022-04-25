@@ -24,13 +24,6 @@ class SubmissionViewingEventsController < ApplicationController
     # submission_viewing_event.save
     submission_viewing_event = LocalSubmittedContent.new(submission_viewing_event_params)
     store.save(submission_viewing_event)
-
-    #if creating start time for expertiza update end times for all other links.
-    if param_args[:link]=='Expertiza Review' 
-      params[:submission_viewing_event][:link] = nil
-      params[:submission_viewing_event][:end_at] = params[:submission_viewing_event][:start_at]
-      record_end_time()
-    end
     render nothing: true
   end
 

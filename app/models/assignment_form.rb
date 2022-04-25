@@ -414,6 +414,13 @@ class AssignmentForm
     MailWorker.perform_in(find_min_from_now(Time.parse(due_date.due_at.to_s(:db)) + simicheck_delay.to_i.hours).minutes.from_now * 60, @assignment.id, 'compare_files_with_simicheck', due_date.due_at.to_s(:db))
   end
 
+  def self.copy_calibrated_reviews()
+    # TODO
+    # copy submission records for the assignment
+    # copy teams for the old assignment
+    # recreate participants for copied teams then map the calibrated reviews to them
+  end
+
   # Copies the inputted assignment into new one and returns the new assignment id
   def self.copy(assignment_id, user)
     Assignment.record_timestamps = false
@@ -429,6 +436,7 @@ class AssignmentForm
       Assignment.record_timestamps = true
       copy_assignment_questionnaire(old_assign, new_assign, user)
       AssignmentDueDate.copy(old_assign.id, new_assign.id)
+      copy_calibrated_reviews()
       new_assign.create_node
       new_assign_id = new_assign.id
       # also copy topics from old assignment

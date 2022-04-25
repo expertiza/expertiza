@@ -3,27 +3,22 @@
 <% if origin == 'review' %>
   <% files = participant.files(participant.review_file_path(response_map_id).to_s + current_folder.name) %>
 <% else %>
-  <% if participant.team.nil? %>
-    <% files = participant.files(participant.review_file_path(nil, participant).to_s + current_folder.name) %>
-  <% else %>
-    <% files = participant.team.files(participant.team.path.to_s + current_folder.name) %>
-  <% end %>
+  <% files = participant.team.files(participant.team.path.to_s + current_folder.name) %>
 <%end%>
-
 <%session_participant = AssignmentParticipant.where(parent_id: @assignment.id, user_id: session[:user].id).first%>
 <%session_participants_team = AssignmentTeam.team(session_participant)%>
 <%same_team_flag = false %>
-<% if !session_participants_team.nil? && session_participants_team.includes?(participant) %>
+<% if !session_participants_team.nil? and session_participants_team.includes? (participant) %>
   <%same_team_flag = true%>
 <%end%>
 <% if params[:controller] == 'submitted_content' %>
-  <%=t ".or"%>
+  or
 <% end %>
 <br/><br/>
 
-<% if files.length > 0 || stage != "Finished"  %>
+<% if (files.length > 0 or stage != "Finished")  %>
   <% if same_team_flag && stage != "Finished" %>
-    <h4>&#8226; <%=t ".submit_file"%></h4>
+    <h4>&#8226; Submit a file:</h4>
     <%= form_tag({:controller=>'submitted_content',:action=>'submit_file',:id => participant.id, :origin => origin ||= nil, :response_map_id => response_map_id ||= nil},{:method => 'post', :enctype => "multipart/form-data", :onSubmit => "return checkIfFileExists(uploaded_file.value,1);"}) do %>
       <!--<input type="checkbox" name="unzip" value=""/> Unzip submission-->
       <div class="form-group">
@@ -33,7 +28,6 @@
       <br/><br/>
     <% end %>
   <% end %>
-
   <%= form_tag({:controller=>'submitted_content',:action=>'folder_action', :id => participant.id, :origin => origin ||= nil}, {:multipart => true, id: 'folder-action-form'}) do %>
     <% if files.length > 0 and participant.team.directory_num != nil and participant.team.directory_num >= 0 %>
       <% if same_team_flag && stage != "Finished" %>
@@ -52,6 +46,7 @@
       </table>
     <% end %>
   <% end %>
+  
   <% if local_assigns[:submission_check] %>
     <script type="text/javascript">
       var supported_file_type = ["pdf", "txt", "doc", "ppt", "png", "jpg"];
@@ -114,15 +109,7 @@
             url: '/submission_viewing_events/mark_end_time',
             data: $.param({
               submission_viewing_event: {map_id: map_id, round: round, end_at: ISODateString(t)}
-              }),
-            success: function(json){
-              var files = JSON.parse(JSON.stringify(json));
-              for (fl in files)
-                console.log(fl+" review time is complete!");
-            },
-            error: function(json){
-              console.log("review time failed to save!");
-            }
+              })
           });
         }
         $("#1_myDiv #file_table a.fileLink").click(function(event){
@@ -157,15 +144,7 @@
               url: '/submission_viewing_events/record_end_time',
               data: $.param({
                 submission_viewing_event: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}
-                }),
-              /*success: function(json){
-                var links = JSON.parse(JSON.stringigy(json));
-                for (lk in links)
-                  console.log(lk+" review time is complete!");
-              }*/
-              failure: function(){
-                console.log("review time failed to save!");
-              }
+                })
             });
           }
           function checkWindowStatus() {
@@ -180,7 +159,7 @@
         })
       });
     </script>
-    <% end %>
+  <% end %>
 <% else %>
 <!--No files have been submitted.-->
-<% end %>
+<% end %> 

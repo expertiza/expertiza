@@ -4,366 +4,408 @@
 <%= tinymce %>
 <script>
 
-    /*
-     * Added for E1973, team-based reviewing:
-     * http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_Project_E1973._Team_Based_Reviewing
-     * If the user exits this page, we want to release the lock on this object
-     */
-    function release_lock() {
-        $.post("../../../lock/release_lock?id=<%= @response.id %>,&type=Response");
+  /*
+   * Added for E1973, team-based reviewing:
+   * http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_Project_E1973._Team_Based_Reviewing
+   * If the user exits this page, we want to release the lock on this object
+   */
+  function release_lock() {
+    $.post("../../../lock/release_lock?id=<%= @response.id %>,&type=Response");
+  }
+  window.onbeforeunload = release_lock;
+
+  // todo: to be moved to assets, once it's fixed so that not every script is loaded in every page.
+  //detect if the window is in foreground or background
+  var vis = (function(){
+    var stateKey, eventKey, keys = {
+      hidden: "visibilitychange",
+      webkitHidden: "webkitvisibilitychange",
+      mozHidden: "mozvisibilitychange",
+      msHidden: "msvisibilitychange"
+    };
+    for (stateKey in keys) {
+      if (stateKey in document) {
+        eventKey = keys[stateKey];
+        break;
+      }
+    }
+    return function(c) {
+      if (c) document.addEventListener(eventKey, c);
+      return !document[stateKey];
+    }
+  })();
+
+  jQuery(document).ready(function() {
+    var map_id = <%= @map.id %>;
+    var round = <%= @current_round %>;
+    
+    // This interval ensures that we are constantly checking whether or not the user is focusing
+    // on the report or on another tab/application. Polling is an inefficient method, but since
+    // Expertiza text boxes are generated as iFrames it is one of the easiest, consistent methods.
+    setInterval(function checkFocus() {
+      // If the document isn't losing focus to itself (iFrame to iFrame, window to iFrame, etc)
+      if (checkFocus.prev == document.hasFocus()) {
+        return;
+      }
+      if (document.hasFocus()) {
+        // starTime is a function written in E1791 - it creates an entry in the database that
+        // is identified by a "link" which we just call "Expertiza Review."
+        startTime(map_id, round, "Expertiza Review");
+      } else {
+        endTime("Expertiza Review");
+      }
+      checkFocus.prev = document.hasFocus();
+    }, 50);
+   
+    function startTime(map_id, round, link) {
+          var t = new Date();
+          $.ajax({
+            type: "POST",
+            url: '/submission_viewing_events/record_start_time',
+            data: $.param({submission_viewing_event:{map_id: map_id, round: round, link: link, start_at: ISODateString(t)}})
+          });
+        }
+    function endTime(link){
+            var t = new Date();
+            $.ajax({
+              type: 'POST',
+              dataType: 'json',
+              async: false,
+              url: '/submission_viewing_events/record_end_time',
+              data: $.param({submission_viewing_event: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}
+                })
+            });
+          }
+
+    //use barrating for dropdown
+    $('.review-rating').each(function(index, el) {
+      var $El;
+      $El = $(el);
+      $El.barrating({
+        theme: 'fontawesome-stars',
+        initialRating: $El.attr('data-current-rating'),
+        showSelectedRating: true
+      });
+    });
+
+    // auto save every changes to local storage
+    $(function(){
+      $("form").sisyphus({
+        locationBased: true,
+        autoRelease: true
+      });
+    });
+
+    // Server AUTO SAVE: triggers every 60 seconds to save the draft version of the review to database
+    var interval = 60000;
+    var last_save = new Date();
+    // detect how many seconds the userhas been idle
+    var idleTime = 0;
+    //threshold to turn off the autosave
+    var maxIdleTime = 30;
+
+    $('#autosave_cbx_lbl').html("&nbsp;Auto save your response every " + interval / 1000 + " seconds?&nbsp;&nbsp;");
+
+    //if it's was in the background, don't auto save to avoid conflict
+    setInterval(function() {
+      if(vis() && $("#autosave_cbx").prop("checked"))
+        executeSave();
+    }, interval);
+
+
+    //click ajax
+    function executeSave(){
+      timeDiff = (new Date().getTime() - last_save.getTime())/1000;
+      // ignore saving unless the last save was more than 5s
+      if (timeDiff>5 && $('.review_form').length > 0) {
+        $('form').attr('data-remote', 'true');
+        $('#save_review').click();
+        last_save = new Date;
+        if ($('input[name=saved]').value = "0")
+          $('input[name=saved]').val("1");
+        $('form').removeAttr('data-remote');
+      }
+
+      $(document).ajaxError(function(event, request, settings) {
+        if (settings.url.includes("response") && settings.type == "POST")
+          $('#save_progress').html('<span id="tick"> &#9940; </span>' + 'Unable to reach the expertiza server. <br>Create a backup of your comments and you may try to login again in a while');
+      })
+
+      $('form#<%=@modified_object%>').bind('ajax:success', function(evt, data, status, xhr){
+        $('#save_progress').html('<span id="tick"> &#10004; </span>' +
+            'A draft was saved on ' + last_save.toLocaleString('en-US', {
+              weekday: 'short',
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+              hour: 'numeric',
+              minute: 'numeric',
+              second: 'numeric',
+              hour12: true }));
+      });
     }
 
-    window.onbeforeunload = release_lock;
-
-    var vis = (function () {
-        var stateKey, eventKey, keys = {
-            hidden: "visibilitychange",
-            webkitHidden: "webkitvisibilitychange",
-            mozHidden: "mozvisibilitychange",
-            msHidden: "msvisibilitychange"
-        };
-        for (stateKey in keys) {
-            if (stateKey in document) {
-                eventKey = keys[stateKey];
-                break;
-            }
-        }
-        return function (c) {
-            if (c) document.addEventListener(eventKey, c);
-            return !document[stateKey];
-        }
-    })();
-
-    jQuery(document).ready(function () {
-
-        //use bar-rating for dropdown
-        $('.review-rating').each(function (index, el) {
-            var $El;
-            $El = $(el);
-            $El.barrating({
-                theme: 'fontawesome-stars',
-                initialRating: $El.attr('data-current-rating'),
-                showSelectedRating: true
-            });
-        });
-
-        // auto save every changes to local storage
-        $(function () {
-            $("form").sisyphus({
-                locationBased: true,
-                autoRelease: true
-            });
-        });
-
-        // Server AUTO SAVE: triggers every 60 seconds to save the draft version of the review to database
-        var interval = 60000;
-        var last_save = new Date();
-        // detect how many seconds the userhas been idle
-        var idleTime = 0;
-        //threshold to turn off the autosave
-        var maxIdleTime = 30;
-
-        $('#autosave_cbx_lbl').html("&nbsp;Auto save your response every " + interval / 1000 + " seconds?&nbsp;&nbsp;");
-
-        //if it's was in the background, don't auto save to avoid conflict
-        setInterval(function () {
-            if (vis() && $("#autosave_cbx").prop("checked"))
-                executeSave();
-        }, interval);
-
-
-        //click ajax
-        function executeSave() {
-            timeDiff = (new Date().getTime() - last_save.getTime()) / 1000;
-            // ignore saving unless the last save was more than 5s
-            if (timeDiff > 5 && $('.review_form').length > 0) {
-                $('form').attr('data-remote', 'true');
-                $('#save_review').click();
-                last_save = new Date;
-                if ($('input[name=saved]').value = "0")
-                    $('input[name=saved]').val("1");
-                $('form').removeAttr('data-remote');
-            }
-
-            $(document).ajaxError(function (event, request, settings) {
-                if (settings.url.includes("response") && settings.type == "POST")
-                    $('#save_progress').html('<span id="tick"> &#9940; </span>' + 'Unable to reach the expertiza server. <br>Create a backup of your comments and you may try to login again in a while');
-            })
-
-            $('form#<%=@modified_object%>').bind('ajax:success', function (evt, data, status, xhr) {
-                $('#save_progress').html('<span id="tick"> &#10004; </span>' +
-                    'A draft was saved on ' + last_save.toLocaleString('en-US', {
-                        weekday: 'short',
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: 'numeric',
-                        minute: 'numeric',
-                        second: 'numeric',
-                        hour12: true
-                    }));
-            });
-        }
-
-        $('#save_review').click(function () {
-            $('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Saving review!')
-            setTimeout(function () {
-                $('#save_confirm').html('')
-            }, 5000);
-        });
-        $('#Submit').click(function (e) {
-            if (!confirm('Once a review has been submitted, you cannot edit it again')) {
-                e.preventDefault();
-                e.stopPropagation();
-                return;
-            } else {
-                //Top line added for E1973
-                release_lock();
-                jQuery('#isSubmit').val('Yes');
-                window.location.href = "../../../student_review/list?id=<%= @map.reviewer.id %>";
-            }
-        });
-
-        // update the values in the form using ajax
-        function updateForm() {
-            //update the additional comments
-            $.get("../../../response/json?response_id=<%= @response.id %>", function (data) {
-                if (data.additional_comment != null) {
-                    tinymce.get('review_comments').setContent(data.additional_comment);
-                }
-            });
-            //update the questions
-            $.get("../../../answer?response_id=<%= @response.id %>&questionnaire_id=<%= @questionnaire.id %>", function (data) {
-                var index, len;
-                $("[type=radio]").each(function () {
-                    $(this).removeAttr("checked");
-                });
-                var tinymce_index = 0
-                for (index = 0, len = data.length; index < len; ++index) {
-                    switch (data[index].qtype) {
-                        case "Criterion":
-                            if (data[index].answer != null) {
-                                $('#responses_' + index + '_score').val(data[index].answer);
-                                <% if @dropdown_or_scale == "dropdown" %>
-                                $('#responses_' + index + '_score').barrating('set', data[index].answer);
-                                <% else %>
-                                $("input[name='Radio_" + data[index].question_id + "']").each(function () {
-                                    if (data[index].answer == $(this).val())
-                                        $(this).prop("checked", "true");
-                                    else
-                                        $(this).removeProp("checked");
-                                });
-                                <% end %>
-                            }
-                            if (data[index].comments != null)
-                                tinymce.get('responses_' + index + '_comments').setContent(data[index].comments);
-                            break;
-                        case "TextArea" :
-                            if (data[index].comments != null)
-                                tinymce.get('responses_' + index + '_comments').setContent(data[index].comments);
-                            break;
-                        case "TextField":
-                            if (data[index].comments != null)
-                                $('#responses_' + index + '_comments').val(data[index].comments);
-                            break;
-                        case "Checkbox" :
-                            if (data[index].answer != null)
-                                $('#responses_' + index + '_score').prop("checked", data[index].score == 1).change();
-                            break;
-                        case "Dropdown" :
-                            if (data[index].comments != null) {
-                                $('#responses_' + index + '_comments').val(data[index].comments);
-                            }
-                            break;
-                        case "Scale":
-                            $("input[name='Radio_" + data[index].question_id + "']").each(function () {
-                                if (data[index].answer == $(this).val())
-                                    $(this).prop("checked", "true");
-                                else
-                                    $(this).removeProp("checked");
-                            });
-                            break;
-                        default:
-                    }
-                }
-                // release the form
-                removeOverlay();
-            });
-        }
-
-        // update the form after it's back to the foreground.
-        // save review when the window is sent to background
-        vis(function () {
-            // reload review when the window is sent to the foreground
-            if (vis() && $("#autosave_cbx").prop("checked")) {
-                // freeze the form until it's updated
-                displayOverlay("Loading");
-                // delay one second to let the data saved if the user switch back and forth
-                setTimeout(function () {
-                    updateForm();
-                }, 1000);
-                removeOverlay();
-            } else if (!vis() && $("#autosave_cbx").prop("checked")) {
-                executeSave();
-            }
-        });
-
-        //overlay to block user entering new info before the form is updated with data from the server
-        function displayOverlay(text) {
-            $("<table id='overlay'><tbody><tr><td>" + text + "</td></tr></tbody></table>").css({
-                "position": "fixed",
-                "top": "0px",
-                "left": "0px",
-                "width": "100%",
-                "height": "100%",
-                "background-color": "rgba(0,0,0,.5)",
-                "z-index": "10000",
-                "vertical-align": "middle",
-                "text-align": "center",
-                "color": "#fff",
-                "font-size": "40px",
-                "font-weight": "bold",
-                "cursor": "wait"
-            }).appendTo("body");
-        }
-
-        function removeOverlay() {
-            $("#overlay").remove();
-        }
-
-        //Increment the idle time counter every minute and restart the timer if there is a mouse movement or keypress.
-        var idleInterval = setInterval(function () {
-            idleTime = idleTime + 1;
-            if (idleTime >= maxIdleTime && vis() && $("#autosave_cbx").prop("checked")) {
-                $("#autosave_cbx").removeProp("checked");
-                setTimeout(function () {
-                    var r = confirm("The window has been idle more than " + maxIdleTime + " minutes. Auto save is disabled. Do you want to enable it again?");
-                    if (r == true) {
-                        updateForm();
-                        $("#autosave_cbx").prop("checked", "true");
-                    } else
-                        $("#autosave_cbx").removeProp("checked");
-                }, 1000);
-            }
-        }, interval);
-        //Zero the idle timer on mouse movement.
-        $(this).mousemove(function (e) {
-            idleTime = 0;
-        });
-        $(this).keypress(function (e) {
-            idleTime = 0;
-        });
-        //restart the counter if it's just checked
-        $("#autosave_cbx").change(function (e) {
-            if ($(this).prop("checked"))
-                idleTime = 0;
-        });
-        /// end auto reload
-
-        //attach event handler to all tinymce editors
-        tinyMCE.on('AddEditor', function (e) {
-            e.editor.on('blur', function (e) {
-                ed = e.target;
-                if (ed.id.includes("comments")) {
-                    json_review = JSON.stringify({"review": ed.getContent({format: 'text'})})
-
-                    $.ajax({
-                        url: "http://peerlogic.csc.ncsu.edu/sentiment/visualize_sentiment",
-                        type: "POST",
-                        crossDomain: true,
-                        contentType: "application/json",
-                        data: json_review,
-                        dataType: "html",
-                        success: function (response) {
-                            var toneAnalysisResult = '<div class="panel panel-default">' +
-                                '<div class="panel-heading">Tone analysis</div>' +
-                                '<div class="panel-body">' + response + '</div>' +
-                                '</div>'
-                            if (ed.id.includes("responses"))
-                                $('#' + ed.id.replace("responses", "analysis")).html(toneAnalysisResult);
-                            else if (ed.id.includes('review_comments'))
-                                $('#review_comments_analysis').html(toneAnalysisResult);
-                        },
-                        error: function (xhr, status) {
-                            $('#save_progress').html('Unable to reach tone analysis service at the moment')
-                        }
-                    });
-                }
-            });
-        });
-
+    $('#save_review').click(function(){
+      $('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Saving review!')
+      setTimeout(function(){
+        $('#save_confirm').html('')
+      }, 5000);
     });
+    $('#Submit').click(function(e){
+      if(!confirm('Once a review has been submitted, you cannot edit it again')){
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }else{
+        //Top line added for E1973
+        release_lock();
+        jQuery('#isSubmit').val('Yes');
+        window.location.href= "../../../student_review/list?id=<%= @map.reviewer.id %>";
+      }
+    });
+    // update the values in the form using ajax
+    function updateForm(){
+      //update the additional comments
+      $.get("../../../response/json?response_id=<%= @response.id %>", function(data){
+        if(data.additional_comment != null) {
+          tinymce.get('review_comments').setContent(data.additional_comment);
+        }
+      });
+      //update the questions
+      $.get("../../../answer?response_id=<%= @response.id %>&questionnaire_id=<%= @questionnaire.id %>", function(data){
+        var index, len;
+        $("[type=radio]").each(function (){
+          $(this).removeAttr("checked");
+        });
+        var tinymce_index = 0
+        for (index = 0, len = data.length; index < len; ++index) {
+          switch(data[index].qtype){
+            case "Criterion":
+              if(data[index].answer != null) {
+                $('#responses_' + index + '_score').val(data[index].answer);
+            <% if @dropdown_or_scale == "dropdown" %>
+                  $('#responses_' + index + '_score').barrating('set', data[index].answer);
+            <% else %>
+                $("input[name='Radio_" + data[index].question_id +"']").each(function(){
+                  if(data[index].answer == $(this).val())
+                    $(this).prop("checked", "true");
+                  else
+                    $(this).removeProp("checked");
+                });
+            <% end %>
+              }
+              if(data[index].comments != null)
+                tinymce.get('responses_' + index + '_comments').setContent(data[index].comments);
+              break;
+            case "TextArea" :
+              if(data[index].comments != null)
+                tinymce.get('responses_' + index + '_comments').setContent(data[index].comments);
+              break;
+            case "TextField":
+              if(data[index].comments != null)
+                $('#responses_' + index + '_comments').val(data[index].comments);
+              break;
+            case "Checkbox" :
+              if(data[index].answer != null)
+                $('#responses_' + index + '_score').prop( "checked", data[index].score == 1).change();
+              break;
+            case "Dropdown" :
+              if(data[index].comments != null) {
+                $('#responses_' + index + '_comments').val(data[index].comments);
+              }
+              break;
+            case "Scale":
+              $("input[name='Radio_" + data[index].question_id +"']").each(function(){
+                if(data[index].answer == $(this).val())
+                  $(this).prop("checked", "true");
+                else
+                  $(this).removeProp("checked");
+              });
+              break;
+            default:
+          }
+        }
+        // release the form
+        removeOverlay();
+      });
+    }
+
+    // update the form after it's back to the foreground.
+    // save review when the window is sent to background
+    vis(function () {
+      // reload review when the window is sent to the foreground
+      if (vis() && $("#autosave_cbx").prop("checked")){
+        // freeze the form until it's updated
+        displayOverlay("Loading");
+        // delay one second to let the data saved if the user switch back and forth
+        setTimeout(function() {
+          updateForm();
+        }, 1000);
+        removeOverlay();
+      }else if (!vis() && $("#autosave_cbx").prop("checked")){
+        executeSave();
+        //console.log("Saving before going to background at " + new Date().toLocaleString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }));
+      }
+    });
+    //overlay to block user entering new info before the form is updated with data from the server
+    function displayOverlay(text) {
+      $("<table id='overlay'><tbody><tr><td>" + text + "</td></tr></tbody></table>").css({
+        "position": "fixed",
+        "top": "0px",
+        "left": "0px",
+        "width": "100%",
+        "height": "100%",
+        "background-color": "rgba(0,0,0,.5)",
+        "z-index": "10000",
+        "vertical-align": "middle",
+        "text-align": "center",
+        "color": "#fff",
+        "font-size": "40px",
+        "font-weight": "bold",
+        "cursor": "wait"
+      }).appendTo("body");
+    }
+    function removeOverlay() {
+      $("#overlay").remove();
+    }
+
+    //Increment the idle time counter every minute and restart the timer if there is a mouse movement or keypress.
+    var idleInterval = setInterval(function(){
+      idleTime = idleTime + 1;
+      if (idleTime >= maxIdleTime && vis() && $("#autosave_cbx").prop("checked")) {
+        $("#autosave_cbx").removeProp("checked");
+        setTimeout(function(){
+          var r = confirm("The window has been idle more than " + maxIdleTime + " minutes. Auto save is disabled. Do you want to enable it again?");
+          if (r == true) {
+            updateForm();
+            $("#autosave_cbx").prop("checked","true");
+          }else
+            $("#autosave_cbx").removeProp("checked");
+        }, 1000);
+      }
+    }, interval);
+    //Zero the idle timer on mouse movement.
+    $(this).mousemove(function (e) {
+      idleTime = 0;
+    });
+    $(this).keypress(function (e) {
+      idleTime = 0;
+    });
+    //restart the counter if it's just checked
+    $("#autosave_cbx").change(function (e){
+      if($(this).prop("checked"))
+        idleTime = 0;
+    });
+    /// end auto reload
+
+    //attach event handler to all tinymce editors
+    tinyMCE.on('AddEditor', function(e) {
+      e.editor.on('blur', function (e) {
+        ed = e.target;
+        if (ed.id.includes("comments")){
+          json_review = JSON.stringify({ "review": ed.getContent({format : 'text'}) })
+
+          $.ajax({
+            url: "http://peerlogic.csc.ncsu.edu/sentiment/visualize_sentiment",
+            type: "POST",
+            crossDomain: true,
+            contentType: "application/json",
+            data: json_review,
+            dataType: "html",
+            success: function (response) {
+              var toneAnalysisResult = '<div class="panel panel-default">' +
+                                          '<div class="panel-heading">Tone analysis</div>' +
+                                          '<div class="panel-body">' + response + '</div>' +
+                                        '</div>'
+              if(ed.id.includes("responses"))
+                  $('#' + ed.id.replace("responses", "analysis")).html(toneAnalysisResult);
+              else if(ed.id.includes('review_comments'))
+                  $('#review_comments_analysis').html(toneAnalysisResult);
+            },
+            error: function (xhr, status) {
+              $('#save_progress').html('Unable to reach tone analysis service at the moment')
+            }
+          });
+        }
+      });
+    });
+
+  });
 </script>
 
+<% if @map.survey? %>
+    <h1><%= @header %> <%= @title %> for <%= @map.survey_parent.name %></h1>
+<% else %>
+    <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
 
+    <% if !@map.contributor.nil? && !@map.instance_of?(FeedbackResponseMap) %>
+        <% if @map.assignment.team_assignment? %>
+            <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id%>
+            <% topic_id = SignedUpTeam.topic_id(@map.assignment.id, team_member) %>
+        <% else %>
+            <% participant = Participant.find(TeamsUser.find_by_team_id(@map.contributor).user_id) %>
+            <% topic_id = SignedUpTeam.where(participant.parent_id, participant.user_id) %>
+        <% end %>
+        <% if !topic_id.nil? %>
+            <% topic = SignUpTopic.find(topic_id)%>
+            <h2>You are reviewing <%= topic.topic_name %></h2>
+            <% if !topic.description.nil? %>
+              <b>Description &nbsp;&nbsp;&nbsp;</b>
+              <% if topic.description.to_s.length>90 %>
+                <%= topic.description.to_s[0..90]+'...'%>
+                <a style="cursor: pointer" onclick="show_alert('<%= topic.description%>')">more...</a>
+              <% else %>
+                <%= topic.description.to_s%>
+              <% end %>
+              <% if topic.link != nil then %>
+                  <%= link_to image_tag('external-link-16.png', :border => 0, :align => 'middle'), topic.link, :target=>'_blank' %>
+              <% end%>
+            <% end %>
+        <% end %>
 
-<h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
-<% if !@map.contributor.nil? && !@map.instance_of?(FeedbackResponseMap) %>
-  <% if @map.assignment.team_assignment? %>
-    <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id %>
-    <% topic_id = SignedUpTeam.topic_id(@map.assignment.id, team_member) %>
-  <% else %>
-    <% participant = Participant.find(TeamsUser.find_by_team_id(@map.contributor).user_id) %>
-    <% topic_id = SignedUpTeam.where(participant.parent_id, participant.user_id) %>
-  <% end %>
-  <% unless topic_id.nil? %>
-    <% topic = SignUpTopic.find(topic_id) %>
-    <h2>You are reviewing <%= topic.topic_name %></h2>
-    <% unless topic.description.nil? %>
-      <b>Description &nbsp;&nbsp;&nbsp;</b>
-      <% if topic.description.to_s.length > 90 %>
-        <%= topic.description.to_s[0..90] + '...' %>
-        <a style="cursor: pointer" onclick="show_alert('<%= topic.description%>')">more...</a>
-      <% else %>
-        <%= topic.description.to_s %>
-      <% end %>
-      <% unless topic.link.nil? %>
-        <%= link_to image_tag('external-link-16.png', :border => 0, :align => 'middle'), topic.link, :target => '_blank' %>
-      <% end %>
+        <% @submission_check = true %>
+        <%= hidden_field_tag :timeout_flag, :id => 'timeout_flag', :value => 'false' %>
+        <%= hidden_field_tag :restart_link_timing_flag, :id => 'restart_link_timing_flag', :value => 'false' %>
+        <%= hidden_field_tag :restart_file_timing_flag, :id => 'restart_file_timing_flag', :value => 'false' %>
+        <%if @assignment.teams?%>
+            <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
+            <%= render :partial => 'submitted_content/main', :locals => {:reviewee_participant => @contributor.participants.first,:participant => @contributor.participants.first, :stage => @assignment.current_stage(topic_id), :map_id => @map.id, :submission_check => @submission_check, :round => @current_round} %>
+        <%else%>
+            <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
+            <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage => @assignment.current_stage(topic_id), :map_id => @map.id, :submission_check => @submission_check, :round => @current_round} %>
+        <%end%>
+        <hr/>
     <% end %>
-  <% end %>
-  <% if @assignment.teams? %>
-    <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-    <%= render :partial => 'submitted_content/main', :locals => { :reviewee_participant => @contributor.participants.first, :participant => @contributor.participants.first, :stage => @assignment.current_stage(topic_id) } %>
-  <% else %>
-    <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-    <%= render :partial => 'submitted_content/main', :locals => { :participant => @contributor, :stage => @assignment.current_stage(topic_id) } %>
-  <% end %>
-  <hr/>
 <% end %>
-
 
 <!-- display all versions available -->
-<% @responses_versions = [] %>
-<% @responses_versions = @map.get_all_versions %>
+<% @responses_versions = Array.new %>
+<% @responses_versions = @map.get_all_versions() %>
 
 <% if @responses_versions.empty? %>
-  <I>No previous review was performed.</I><br/>
-  <hr/><br/>
+    <I>No previous review was performed.</I><br/><hr/><br/>
 <% else %>
-  <%= render :partial => 'review', :locals => { :versions => @responses_versions } %>
+    <%= render :partial => 'review', :locals => {:versions => @responses_versions} %>
 <% end %>
 <h2>Directions for the reviewer</h2>
-<input type="checkbox" id="autosave_cbx" checked>
+<input type="checkbox" id="autosave_cbx" unchecked>
 <label id="autosave_cbx_lbl" for="autosave_cbx"></label>
 <div id="save_progress"></div>
-<%= form_tag({ :action => @next_action }, :id => @modified_object, :class => "review_form") do %>
-  <%= hidden_field_tag "map_id", @modified_object %>
-  <%= hidden_field_tag "saved", (@header == "New") ? 1 : 0 %>
-  <% if @next_action.eql? 'update' %>
-    <input name="_method" type="hidden" value="put"/>
-  <% end %>
-  <table width="100%">
-    <% @review_questions.each_with_index do |question, i| %>
+<%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form") do %>
+    <%= hidden_field_tag "map_id", @modified_object %>
+    <%= hidden_field_tag "saved", (@header == "New") ? 1 : 0 %>
+    <% if @next_action.eql?'update' %>
+        <input name="_method" type="hidden" value="put" />
+    <%end%>
+    <table width="100%">
+     <% @review_questions.each_with_index do |question, i| %>
       <tr>
         <td>
-            <% answer = Answer.where(question_id: question.id, response_id: @response.id).first unless @response.nil? %>
-            <% if question.instance_of? Criterion %>
+            <% answer = Answer.where(question_id: question.id, response_id: @response.id).first if !@response.nil?%>
+            <% if question.instance_of? Criterion%>
               <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
             <% elsif question.instance_of? Scale %>
               <%= question.complete(i, @questionnaire.min_question_score, @questionnaire.max_question_score, answer) %>
-            <% elsif question.instance_of? Cake %>
-              <%= question.complete(i, answer, @total_score[question.id].to_s) %>
             <% else %>
               <%= question.complete(i, answer) %>
             <% end %>
@@ -371,67 +413,142 @@
             <% if [Criterion, TextArea].include? question.class %>
               <div id="analysis_<%= i.to_s %>_comments"></div>
             <% end %>
+            <% i += 1%>
+          <% end %>
         </td>
       </tr>
-    <% end %>
-    <tr>
-      <td>
-        <label for="review_comments">Additional Comments</label><BR/>
-        <textarea cols="70" rows="1" id="review_comments" name="review[comments]" style="overflow:hidden;" class="tinymce">
-            <% unless controller.action_name == 'new' || @response.additional_comment.nil? %>
-                <%= @response.additional_comment.strip unless @response.nil? %>
+      <tr>
+        <td>
+          <label for="review_comments">Additional Comments</label><BR/>
+          <textarea cols="70" rows="1" id="review_comments" name="review[comments]" style="overflow:hidden;" class="tinymce">
+            <% if controller.action_name != 'new' and @response.additional_comment != nil %>
+                <%= @response.additional_comment.strip if !@response.nil?%>
             <% end %>
           </textarea>
-      </td>
-      <td width="25%">
-        <div id="review_comments_analysis"></div>
-      </td>
-    </tr>
+        </td>
+        <td width="25%">
+          <div id="review_comments_analysis"></div>
+        </td>
+      </tr>
 
-  </table>
-  <% if @current_round %>
-    <%= hidden_field_tag "review[round]", @current_round %>
-  <% end %>
-  <%= hidden_field_tag "review[questionnaire_id]", @questionnaire.id %>
+    </table>
+    <%if @current_round%>
+      <%= hidden_field_tag "review[round]", @current_round %>
+    <%end%>
+    <%= hidden_field_tag "review[questionnaire_id]", @questionnaire.id %>
 
-  <br/>
-  <br>
-  <div id="save_confirm"></div>
-  <%= submit_tag "Save " + @title, :name => "save", :id => "save_review" %>
-  <!--#E1600 check title for selfreview to show submit button-->
-  <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>
-    <%= submit_tag "Submit " + @title, :name => "Submit", :id => "Submit" %>
-    <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
-  <% end %>
-  <%= hidden_field_tag('return', @return) %>
-  <%= hidden_field_tag "isSubmit", :id => "isSubmit" %>
+    <br/>
+    <br>
+    <div id="save_confirm"></div>
+    <%= submit_tag "Save "+@title, :name => "save", :id => "save_review" %>
+    <!--#E1600 check title for selfreview to show submit button-->
+    <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>
+        <%= submit_tag "Submit "+@title, :name => "Submit", :id => "Submit" %>
+        <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
+    <% end %>
+    <%= hidden_field_tag('return', @return) %>
+    <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %>
 <% end %>
 
 <!--Check whether there is a UploadFile question.-->
-<% @review_questions.each do |question| %>
-  <% if question.instance_of? UploadFile %>
-    <!--params[:origin] means from where do the files upload-->
-    <!--If the files uploaded from submitted_work (students hand in assignment), params[:origin] will be nil-->
-    <!--If the files uploaded from peer review, params[:origin] will be 'review'-->
-    <% if params[:action] == 'new' %>
-      <% response_map_id = params[:id] %>
-    <% elsif params[:action] == 'edit' %>
-      <% response_map_id = Response.find(params[:id]).response_map.id %>
+<%@review_questions.each do |question| %>
+    <% if question.instance_of? UploadFile %>
+        <!--params[:origin] means from where do the files upload-->
+        <!--If the files uploaded from submitted_work (students hand in assignment), params[:origin] will be nil-->
+        <!--If the files uploaded from peer review, params[:origin] will be 'review'-->
+        <% if params[:action] == 'new' %>
+            <% response_map_id = params[:id] %>
+        <% elsif params[:action] == 'edit' %>
+            <% response_map_id = Response.find(params[:id]).response_map.id %>
+        <% end %>
+        <%= render partial: 'submitted_content/submitted_files', locals: {participant: @participant, stage: @stage, origin: 'review', response_map_id: response_map_id} %>
     <% end %>
-    <%= render partial: 'submitted_content/submitted_files', locals: { participant: @participant, stage: @stage, origin: 'review', response_map_id: response_map_id } %>
-  <% end %>
 <% end %>
 <%= @map.show_feedback(@response) %>
 <!-- Changed for E1973. If the user clicks back, the lock on this response should be released -->
 <script>
-    document.getElementById('BackLink').onClick = go_back_and_release_lock;
-
-    function go_back_and_release_lock() {
-        release_lock();
-        window.location.href = window.history.back();
-    }
+  document.getElementById('BackLink').onClick = go_back_and_release_lock;
+  function go_back_and_release_lock() {
+    release_lock();
+    window.location.href=window.history.back();
+  }
 </script>
 <div id="BackLink"><a href="javascript:window.history.back()">Back</a></div>
 <div id="dialog-message" style="word-wrap: normal"></div>
 
-
+<% if @submission_check %>
+  <script type="text/javascript">
+    $(document).ready(function(){
+      var map_id = <%= @map.id %>;
+      var round = <%= @current_round %>;
+      var current_window_timer = null;
+      var auto_window_timer = null;
+      var time_out_interval = 120000; // in milliseconds, checkout end time when not interaction on review page
+      var time_period = 30000; // automaticall record end time every minunte
+      var timer_flag = false;
+      startTimer();
+      resetTimer();
+      autoTimer();
+      function timeoutAction(){
+        window.focus();
+        timer_flag = false;
+        markEndTime();
+        if(confirm("Are you still reviewing your submissions? Press OK to continue")){
+          startTimer();
+          resetTimer();
+        } else {
+          clearTimeout(current_window_timer);
+          clearInterval(auto_window_timer);
+          $("#timeout_flag").val("true");
+          //markEndTime();
+          alert("The page has not been interacted for a long time, and will close reference windows and go back!");
+          window.history.back();
+        }
+      }
+      function autoTimer(){
+        clearInterval(auto_window_timer);
+        auto_window_timer = setInterval(autoRecordTime, time_period);
+      }
+      function autoRecordTime(){
+        markEndTime();
+        if (timer_flag == true){
+          startTimer();
+        }
+      }
+      function resetTimer() {
+        clearTimeout(current_window_timer);
+        current_window_timer = setTimeout(timeoutAction, time_out_interval);
+        timer_flag = true;
+      }
+      function startTimer() {
+        // resetTimer();
+        // autoTimer();
+        $("#timeout_flag").val("false");
+        $("#restart_file_timing_flag").val("true");
+        $("#restart_link_timing_flag").val("true");
+        document.onmousemove = resetTimer;
+        document.onkeypress = resetTimer;
+        document.onload = resetTimer;
+        document.onmousedown = resetTimer; // touchscreen presses
+        document.ontouchstart = resetTimer;
+        document.onclick = resetTimer;     // touchpad clicks
+        document.onscroll = resetTimer;    // scrolling with arrow keys
+      }
+      function markEndTime() {
+        var  t = new Date();
+        $.ajax({
+          type: 'POST',
+          dataType: 'json',
+          async: false,
+          url: '/submission_viewing_events/mark_end_time',
+          data: $.param({
+            submission_viewing_event: {map_id: map_id, round: round, end_at: ISODateString(t)}
+            })
+        });
+      }
+      $(":submit").click(function(){
+          markEndTime();
+      });
+    });
+  </script>
+<% end %> 

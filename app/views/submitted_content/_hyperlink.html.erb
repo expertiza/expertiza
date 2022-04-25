@@ -1,10 +1,9 @@
 <%= form_for :hyperlinks, url: '/submitted_content/remove_hyperlink' do |f| %>
-  <% unless stage == "Finished" %>
+  <% if stage != "Finished" %>
     <% team_id = TeamsUser.team_id(participant.parent_id, participant.user_id) %>
     <% display_to_author = Team.exists?(team_id) && Team.find(team_id).user?(@current_user)%>
-
     <% if display_to_author %>
-      <h5><%=t ".hyperlink_action"%></h5>
+      <h5>Hyperlink Actions:</h5>
       <%= f.submit 'Delete selected hyperlink' %>
     <% end  %>
     </br>
@@ -12,13 +11,15 @@
     <%= f.hidden_field :participant_id, value: participant.id %>
     </br>
   <% end %>
-
-  <a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;"><%=t ".hide_link"%></a><br/>
-  <div id="url" style="">
+  
+  <a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">hide links</a><br/>
+  <!-- Setting user-select to none prevents users from copy-pasting url links -->
+  <div id="url" style="user-select: none">
+    <p><b>Note:</b> You can only open one of each link at a time.</p>
     <ul>
       <% participant.team.hyperlinks.each_with_index {
         |link, index| %>
-      <% unless stage == "Complete" %>
+      <% if stage != "Complete" %>
         <% if display_to_author%>
           <% if index == 0 %>
             <input type="radio" id='chk_links' name='chk_links' checked value="<%= index %>"/>
@@ -26,13 +27,17 @@
             <input type="radio" id='chk_links' name='chk_links' value="<%= index %>"/>
           <% end %>
         <% end %>
-              <a href="<%= link %>" target="_blank"><%= link %></a>
-              <br/>
+        <% if local_assigns[:submission_check] %>
+          <a href="<%= link %>" class="review_link"><%= link %></a>
+        <% else %>
+          <a href="<%= link %>" target="_blank"><%= link %></a>
+        <% end %>
+        <br/>
       <% end %>
       <% } %>
     </ul>
   </div>
- <% if local_assigns[:submission_check] %>
+  <% if local_assigns[:submission_check] %>
     <script type="text/javascript">
       function ISODateString(date){
         function pad(num){return num<10? '0'+num: num;}
@@ -43,12 +48,24 @@
                   + pad(date.getUTCMinutes()) + ':'
                   + pad(date.getUTCSeconds());
       }
-      $(document).ready(function(){
+      $(document).ready(function(){	    
         var map_id = <%= @map.id %>;
         var round = <%= @current_round %>;
         var time_out_interval = 500; // in milliseconds
         var linksToUpdate = {};
         var windowsToClose = new Array();
+        $("#url a.review_link").on("contextmenu", function() {
+          return false;
+        });
+        $("#url a.review_link").on("auxclick", function(e) {
+          e.preventDefault();
+        });
+		window.onbeforeunload = function(){
+		  markEndTime();
+		  while (windowsToClose!=null && windowsToClose.length>0){
+            windowsToClose.shift().close();
+          }
+		}
         function timeoutAction(timeout_flag){
           if (timeout_flag) {
             markEndTime();
@@ -83,21 +100,18 @@
             url: '/submission_viewing_events/mark_end_time',
             data: $.param({
               submission_viewing_event: {map_id: map_id, round: round, end_at: ISODateString(t)}
-              }),
-            success: function(json){
-              var links = JSON.parse(JSON.stringify(json));
-              for (lk in links)
-                console.log(lk+" review time is complete!");
-            },
-            error: function(json){
-              console.log("review time failed to save!");
-            }
+              })
           });
         }
-        $("#url a.review_link").click(function linkAction(event){
+        $("#url a.review_link").click(function linkAction(event){		  
           event.preventDefault();
           var link_handler = $(this); // current link
-          var address = link_handler.attr("href"); // url address of the current link
+          var address = link_handler.attr("href"); // url address of the current link		  
+		  if(address in linksToUpdate){
+		    if(linksToUpdate[address]==true){
+			  return; //if the address in already present in the array, prevent the user from opening it again
+			}
+		  }
           var window_handler = window.open(address); // open link in new window/tag
           windowsToClose.push(window_handler);
           $("#restart_link_timing_flag").val('false');
@@ -113,15 +127,7 @@
               url: '/submission_viewing_events/record_end_time',
               data: $.param({
                 submission_viewing_event: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}
-                }),
-              /*success: function(json){
-                var links = JSON.parse(JSON.stringigy(json));
-                for (lk in links)
-                  console.log(lk+" review time is complete!");
-              }*/
-              failure: function(){
-                console.log("review time failed to save!");
-              }
+                })
             });
           }
           function checkWindowStatus(){
@@ -138,3 +144,8 @@
     </script>
   <% end %>
 <% end %>
+© 2022 GitHub, Inc.
+Terms
+Privacy
+Security
+Status

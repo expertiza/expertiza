@@ -34,8 +34,6 @@
   <li>&#10004; Check mark indicates that the student has given consent to make the reviews public</li>
 </ul>
   <p>&nbsp;</p>
-
-  <button onclick="exportTableToCSV('review_scores.csv')">Export Review Scores To CSV File</button>
   <br />
   <br />
   <table id="myTable" class="table table-striped" width="100%" cellspacing='0' cellpadding='2' border='0'>
@@ -56,24 +54,19 @@
     </tr>
     </thead>
     <tbody>
-
+    <% timeHash = Hash.new %>
     <!-- Set the review data and row span for each reviewer -->
     <% sort_reviewer_by_review_volume_desc.each_with_index do |reviewer, index| %>
       <% @response_maps, @rspan = get_data_for_review_report(@id, reviewer.id, @type) %>
       <tr>
         <% unless reviewer.id == 1 %>
           <% user = Participant.find(reviewer.id).user %>
-            
-			<!-- added class attribute and span tag to extract full name and unityID of the user for scraping (Used in export to CSV functionality) -->
             <td>
               <%= index + 1 %>.
               <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post, :class => "user_unityID" %>
               (<span class="user_name"><%= user.fullname(session[:ip]) %></span>)
             </td>
             <!--reviewer-->
-            <td>
-              <%= link_to "review time", :controller => 'popup', :action => 'reviewer_details_popup', :id => reviewer.id, :assignment_id=>@id %>
-            </td>
             <!--# reviews done-->
             <td align = 'left'>
               <% (1..@assignment.num_review_rounds).each do |round| %>
@@ -105,9 +98,8 @@
                 <% end %>
                     <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => reviewer_map.reviewee_id, :id2 => reviewer_map.id, :assignment_id=>@id %>
                     <%= list_review_submissions(reviewer.id, reviewer_map.reviewee_id, reviewer_map.id) %>
-                    <!--Hard-coded Dr.Kidd's question in order to display link.-->
-                    <!--later we can create a hyperlink question type to deal with this situation.-->
-                    <%= list_hyperlink_submission(reviewer_map.id, 5386) if Assignment.find_by(id: @id.to_i).try(:course).try(:instructor).try(:name) == 'Jkidd' %>
+                    <!--Display total time spent on reviewing as a hyperlink to popup which shows the breakdown of time spent between expertiza and other links as piechart-->
+                    <%= render partial: 'review_submissions_time_spent',  locals: {bgcolor: @bgcolor, map_id: reviewer_map.id,id: reviewer.id, reviewee_id: reviewer_map.reviewee_id, timeHash: timeHash} %>
                   </div>
                 </div>
               <% end %>
@@ -192,77 +184,4 @@
         },
         type: 'numeric'
     });
-</script>
-
-<script>
-	function downloadCSV(csv, filename) {
-		var csvFile;
-		var downloadLink;
-
-		// CSV file
-		csvFile = new Blob([csv], {type: "text/csv"});
-
-		// Download link
-		downloadLink = document.createElement("a");
-
-		// File name
-		downloadLink.download = filename;
-
-		// Create a link to the file
-		downloadLink.href = window.URL.createObjectURL(csvFile);
-
-		// Hide download link
-		downloadLink.style.display = "none";
-
-		// Add the link to DOM
-		document.body.appendChild(downloadLink);
-
-		// Click download link
-		downloadLink.click();
-	}
-	
-	// Method to extract review report fields data from HTML Table and convert the data into CSV format.
-	// Currently, it will extract and store data for 'Full Name, Unity ID, Email ID, Grade and Comment' fields into CSV file 
-	function exportTableToCSV(filename) {  	
-		var csv = [];
-		var rows = document.querySelector("table#myTable").rows;
-		var row = [];
-		row = setHeaderForCSV();
-		csv.push(row.join(","));
-		
-    // for each row of information, pull the review report fields and save them to the corresponding variables
-		for (var i = 1; i < rows.length; i++) {
-			var row = [];
-			
-			reviewer_name = "\"" + rows[i].querySelector("td span.user_name").innerHTML + "\"";
-			reviewer_unityid = rows[i].querySelector("td a.user_unityID").innerHTML;
-			reviewer_emailid = reviewer_unityid + "@ncsu.edu";
-			reviewer_grade = rows[i].querySelector("input#grade_for_reviewer").value;
-			reviewer_comment = "\"" + rows[i].querySelector("textarea#comment_for_reviewer").innerHTML.replace(/"/g,"\'") + "\"";
-			
-      // push the information to set the information. 
-			row.push(reviewer_name);
-			row.push(reviewer_unityid);
-			row.push(reviewer_emailid);
-			row.push(reviewer_grade);
-			row.push(reviewer_comment);
-			
-			csv.push(row.join(","));
-              
-		}
-	
-		downloadCSV(csv.join("\n"), filename);
-	}
-	
-	// Method to set names of header columns in Exported CSV file
-	function setHeaderForCSV() {
-		var row = [];
-		row.push("Name");
-		row.push("UnityID");
-		row.push("EmailID");
-		row.push("Grade");
-		row.push("Comment");
-		
-		return row;
-	}
 </script>

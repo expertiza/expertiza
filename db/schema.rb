@@ -592,7 +592,8 @@ ActiveRecord::Schema.define(version: 20220418211918) do
     t.string "link"
     t.datetime "start_at"
     t.datetime "end_at"
-    t.float "accumulated_time"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "suggestion_comments", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|

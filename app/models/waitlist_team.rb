@@ -21,7 +21,7 @@ class WaitlistTeam < ApplicationRecord
     return true
   end
 
-  def self.remove_team_from_topic_waitlist(team_id, topic_id, user_id)
+  def self.remove_team_from_topic_waitlist(team_id, topic_id,user_id)
     waitlisted_team_for_topic = WaitlistTeam.find_by(topic_id: topic_id, team_id: team_id)
     unless waitlisted_team_for_topic.nil?
       waitlisted_team_for_topic.destroy
@@ -60,7 +60,7 @@ class WaitlistTeam < ApplicationRecord
     waitlisted_teams_for_topic = get_all_waitlists_for_topic topic_id
     unless waitlisted_teams_for_topic.nil?
       waitlisted_teams_for_topic.each do |entry|
-        entry.delete
+        entry.destroy
       end
     else
       ExpertizaLogger.info LoggerMessage.new('WaitlistTeam', user_id, "Cannot find Topic #{topic_id} in waitlist.")
@@ -91,7 +91,9 @@ class WaitlistTeam < ApplicationRecord
     end
     return false
   end
+
   def self.signup_first_waitlist_team(topic_id)
+    sign_up_waitlist_team = nil
     ApplicationRecord.transaction do
       first_waitlist_team = first_team_in_waitlist_for_topic(topic_id)
       unless first_waitlist_team.blank?
@@ -107,6 +109,6 @@ class WaitlistTeam < ApplicationRecord
         end
       end
     end
+    sign_up_waitlist_team
   end
-
 end

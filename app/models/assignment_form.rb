@@ -419,7 +419,9 @@ class AssignmentForm
     # copy submission records for the assignment
     SubmissionRecord.copy_assignment_submissions(old_assignment, new_assignment_id)
 
-    # copy teams for the old assignment
+    # copy teams for the old assignment, this returns an array of the old team IDs that we'll want to use later
+    Team.copy_and_create_new_team(old_assignment, new_assignment_id)
+
     # recreate participants for copied teams then map the calibrated reviews to them
   end
 
@@ -455,6 +457,8 @@ class AssignmentForm
   def self.name_copied_assignment(assignment_name)
     # Set name of new assignment as 'Copy of <old assignment name>'. If it already exists, set it as 'Copy of <old assignment name> (1)'.
     # Repeated till unique name is found.
+    # This works for assignments that haven't been copied, could be made smarter to handle cases where you're
+    # copying a previously copied assignment (will give you Copy of Copy of...)
     name_counter = 0
     new_name = 'Copy of ' + assignment_name
     until Assignment.find_by(name: new_name).nil?

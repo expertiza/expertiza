@@ -1,21 +1,23 @@
 class SuggestionMetric extends Metric {
-    constructor(api_call_values) {
+    constructor(URL) {
         super(
-            api_call_values['suggestion']['apiCall']
+            URL
         );
     }
 
-    async callAPI(input) {
-        try{
-            let response = await this.makeRequest(input);
-            return JSON.parse(response);
-        }
-        catch(error){
-            throw error;
-        }
-    }
+    format_response(response,analysis,metric_name,number_of_comments){
 
-    formatResponse(response,analysis,displayName,i){
-        return response[displayName]['reviews'][i][String(analysis) + 's'];
+        let combined_api_output = [];
+        for(let i=0;i<number_of_comments;i++){
+
+            let single_output = {}
+            single_output["Comment Number"] = i+1;
+            
+            single_output[metric_name] = response[metric_name]['reviews'][i][String(analysis) + 's'];
+            combined_api_output.push(single_output);
+        }
+
+        return combined_api_output;
+            
     }
 }

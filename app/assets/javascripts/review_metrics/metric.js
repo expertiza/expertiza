@@ -6,6 +6,17 @@ class Metric {
         }
     }
 
+    async call_API(input) {
+
+        try{
+            let response = await this.makeRequest(input);
+            return JSON.parse(response);
+        }
+        catch(error){
+            throw error;
+        }
+    }
+
     //This function makes POST API call to the given url with final_json data
     makeRequest(final_json){
         let myURL = this.URL;
@@ -40,11 +51,11 @@ class Metric {
         });
     }
 
-    callAPI(input) {
-        throw new Error("Method 'callAPI()' must be implemented.");
-    }
+    // callAPI(input) {
+    //     throw new Error("Method 'callAPI()' must be implemented.");
+    // }
 
-    formatResponse(response,analysis){
+    format_response(response,analysis){
         throw new Error("Method 'formatResponse()' must be implemented.");
     }
 }

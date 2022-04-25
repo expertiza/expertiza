@@ -1,4 +1,11 @@
 <%# Logic to show #1/#2 bids here%>
+<% @priority_per_topic = Hash.new %>
+<% @sign_up_topics.each do |t| %>
+<%   number_one = Bid.where(topic_id: t.id, priority: 1).count %>
+<%   number_two = Bid.where(topic_id: t.id, priority: 2).count %>
+<%   @priority_per_topic[t.id] = [number_one, number_two] %>
+<% end %>
+
 <% @priority_per_topic.each do |t, bids| %>
      <% if t.to_i == topic.id.to_i %>
 	<td align="center"><%= bids[0] %> / <%= bids[1] %></td>

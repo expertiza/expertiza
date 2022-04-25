@@ -1,10 +1,10 @@
 //fetches the review form comments one by one - formats them into a single stringified json
 function fetch_response_comments() {
 
-    function create_comment_object(comment_id, question, class_name) {
+    function create_comment_object(comment_id, review_id, question, class_name) {
         let comment_json = {};
         comment_json["id"] = comment_id + 1;
-        let iframe_id = comment_id >= 0 ? '#responses_' + comment_id + '_comments_ifr' : '#review_comments_ifr';
+        let iframe_id = review_id >= 0 ? '#responses_' + review_id + '_comments_ifr' : '#review_comments_ifr';
         let comment_string = $(iframe_id).contents().find('body[data-id=' + class_name + ']').children().first().text();
         if (comment_string.length == 0) {
             return {};
@@ -14,31 +14,29 @@ function fetch_response_comments() {
         return comment_json;
     }
 
-    var serialized_form = $("form").serialize();
-    var form_value_to_json = [Object.fromEntries(new URLSearchParams(serialized_form))];
-
-    //The while loop counts the number of comments in review form and breaks when
-    //all the comments are found
-    let review_count = 0;
-    let review_mappings = {};
-    while (true) {
-        let comment_element = document.getElementById("responses_" + review_count + "_comments");
-        if (comment_element == null) {
-            break;
+    // Looping over all elements present in the current page and fetching the ones 
+    // which are the review questions based on the element id and 
+    // finds element id of the comments in review form
+    var review_element_ids = [];
+    $("*").each(function () {
+        current_element_id = this.id
+        if (current_element_id && current_element_id.startsWith("responses") && current_element_id.endsWith("comments")) {
+            review_element_ids.push(current_element_id);
         }
-        review_count++;
-    }
+    });
 
     //for loop parses comments from review form and pushes all of them into 'reviews' list
     var reviews = [];
-    for (var i = 0; i < review_count; i++) {
-        if (document.getElementById("responses_" + i + "_comments") == null)
+    for (var i = 0; i < review_element_ids.length; i++) {
+        curr_review_element_id = review_element_ids[i]
+        if (document.getElementById(curr_review_element_id) == null)
             continue;
         else {
-            let question_class = 'responses_' + i;
+            let review_id = curr_review_element_id.split("_")[1]
+            let question_class = 'responses_' + review_id;
             let question = $("label[for=" + question_class + "]").text();
-            let class_name = "responses_" + i + "_comments";
-            let comment_object = create_comment_object(i, question, class_name);
+            let class_name = "responses_" + review_id + "_comments";
+            let comment_object = create_comment_object(i, review_id, question, class_name);
             if (Object.keys(comment_object).length > 0) {
                 reviews.push(comment_object);
             }
@@ -46,7 +44,7 @@ function fetch_response_comments() {
     }
 
     //fetches the 'additional comment' text present at the end of review form
-    let comment_object = create_comment_object(-1, "additional comments", 'review_comments');
+    let comment_object = create_comment_object(-1, -1, "additional comments", 'review_comments');
     if (Object.keys(comment_object).length > 0) {
         reviews.push(comment_object);
     }
@@ -56,14 +54,15 @@ function fetch_response_comments() {
     var processed_comment_json = {};
     processed_comment_json["reviews"] = reviews;
     processed_comment_json_string = JSON.stringify(processed_comment_json);
+
     return [processed_comment_json_string, number_of_comments]
 }
 
 //This function takes in the processed api output to display a table(populated with API output) on UI
-function generate_table(responses,config_file_api_call_values, processed_comment_json, number_of_comments) {
-    //tooltip_json to store the text displayed in tooltip
+function generate_table(responses, config_file_api_call_values, processed_comment_json, number_of_comments) {
+    // tooltip_json to store the text displayed in tooltip
     // Create a table header row using the extracted headers above.
-    
+
     let tool_tips = { "Comment Number": 'The comment number from the top in the form.' };
     let metrics_to_check = ["Comment Number"];
     let column_names = ["Comment Number"];
@@ -76,10 +75,10 @@ function generate_table(responses,config_file_api_call_values, processed_comment
     }
 
     let merged_responses = [];
-    for(let i=0;i<number_of_comments; i++){
+    for (let i = 0; i < number_of_comments; i++) {
         single_output = {};
-        single_output["Comment Number"] = i+1;
-        for(let j=1;j< metrics_to_check.length;j++){
+        single_output["Comment Number"] = i + 1;
+        for (let j = 1; j < metrics_to_check.length; j++) {
             let arr = responses[metrics_to_check[j]];
             single_output[metrics_to_check[j]] = arr[i][metrics_to_check[j]];
         }
@@ -100,13 +99,13 @@ function generate_table(responses,config_file_api_call_values, processed_comment
     // add json data to the table as rows.
     for (var i = 0; i < merged_responses.length; i++) {
         table_row = table.insertRow(-1);
-        
+
         for (var j = 0; j < metrics_to_check.length; j++) {
             var table_cell = table_row.insertCell(-1);
             table_cell.innerHTML = merged_responses[i][metrics_to_check[j]]
-            if(j==0) {
-                let title = 'Q) '+ processed_comment_json_string[i]['question'] + '   A) ' + processed_comment_json_string[i]['text'];
-                table_cell.innerHTML += `<img src="/assets/info.png" title='`+title+`'>`;
+            if (j == 0) {
+                let title = 'Q) ' + processed_comment_json_string[i]['question'] + '\nA) ' + processed_comment_json_string[i]['text'];
+                table_cell.innerHTML += `<img src="/assets/info.png" title='` + title.replace("'", "") + `'>`;
             }
         }
     }
@@ -164,7 +163,7 @@ async function get_review_feedback() {
     let response_comments = fetch_response_comments();
     let processed_comment_json = response_comments[0];
     let number_of_comments = response_comments[1];
-    
+
     //This holds the response value of each analysis as a dictionar/hash(key = analysis name, value = response of analysis)
     var analysis_response_dict = {};
 
@@ -174,7 +173,7 @@ async function get_review_feedback() {
     analysis_response_dict = await make_api_calls(config_file_api_call_values, config_file_values, processed_comment_json);
 
     responses = combine_api_output(config_file_api_call_values, number_of_comments, config_file_values, analysis_response_dict);
-   
+
     generate_table(responses, config_file_api_call_values, processed_comment_json, number_of_comments);
 
     time_end = performance.now();

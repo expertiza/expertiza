@@ -108,10 +108,116 @@ describe ImportFileController do
         expect(response).to redirect_to(list_users_path)
       end
     end
+
+    context 'when import data for SignUpTopic model succeeds with no optional parameters' do
+      it 'redirects to user Asignments/:id page' do
+        stub_current_user(ta, ta.role.name, ta.role)
+        params = {
+          "contents_hash"=>"{:header=>nil, :body=>[[\"E2000\", \"Refactor stage deadlines in assignment.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2001\", \"Refactor questionnaires_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2002\", \"Refactor impersonate_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2003\", \"Refactor and improve assessment360_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2004\", \"Refactor assignment_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2005\", \"Bookmark enhancements\", \"1\"], [\"\", \"\", \"\"], [\"E2006\", \"Refactor tree_display_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2007\", \"Add test cases to review_mapping_helper.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2008\", \"Refactor summary_helper.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2009\", \"Refactor assignment.rb??\", \"1\"], [\"\", \"\", \"\"], [\"E2010\", \"Refactor criterion.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2011\", \"Refactor assignment_creation_spec.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2012\", \"Refactor lottery_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2013\", \"Refactor tree_display.js\", \"1\"], [\"\", \"\", \"\"], [\"E2014\", \"Refactor date_time_picker.js\", \"1\"], [\"\", \"\", \"\"], [\"M2000\", \"Implement the ImageBitmap web API\", \"1\"], [\"\", \"\", \"\"], [\"M2001\", \"Implement charset prescanning for the HTML parser\", \"1\"], [\"\", \"\", \"\"], [\"M2002\", \"Implement support for WebWorker module scripts\", \"1\"]]}", 
+          "has_header"=>"false", 
+          "model"=>"SignUpTopic",
+          "optional_count"=>"0",
+          "select1"=>"topic_identifier", 
+          "select2"=>"topic_name", 
+          "select3"=>"max_choosers",
+          "id"=>"843"
+        }
+
+        allow(SignUpTopic).to receive(:import).with(any_args).and_return(nil)
+        get :import, params, {return_to: "/assignments/843"}
+
+        expect(response).to redirect_to assignment_path "843"
+      end
+    end
+
+    context 'when import data for SignUpTopic model succeeds with one (category) optional parameters' do
+      it 'redirects to user Asignments/:id page' do
+        stub_current_user(ta, ta.role.name, ta.role)
+        params = {
+          "contents_hash"=>"{:header=>nil, :body=>[[\"E2000\", \"Refactor stage deadlines in assignment.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2001\", \"Refactor questionnaires_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2002\", \"Refactor impersonate_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2003\", \"Refactor and improve assessment360_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2004\", \"Refactor assignment_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2005\", \"Bookmark enhancements\", \"1\"], [\"\", \"\", \"\"], [\"E2006\", \"Refactor tree_display_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2007\", \"Add test cases to review_mapping_helper.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2008\", \"Refactor summary_helper.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2009\", \"Refactor assignment.rb??\", \"1\"], [\"\", \"\", \"\"], [\"E2010\", \"Refactor criterion.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2011\", \"Refactor assignment_creation_spec.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2012\", \"Refactor lottery_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2013\", \"Refactor tree_display.js\", \"1\"], [\"\", \"\", \"\"], [\"E2014\", \"Refactor date_time_picker.js\", \"1\"], [\"\", \"\", \"\"], [\"M2000\", \"Implement the ImageBitmap web API\", \"1\"], [\"\", \"\", \"\"], [\"M2001\", \"Implement charset prescanning for the HTML parser\", \"1\"], [\"\", \"\", \"\"], [\"M2002\", \"Implement support for WebWorker module scripts\", \"1\"]]}", 
+          "has_header"=>"false", 
+          "model"=>"SignUpTopic",
+          "optional_count"=>"1",
+          "select1"=>"topic_identifier", 
+          "select2"=>"topic_name", 
+          "select3"=>"max_choosers",
+          "select4"=>"category",
+          "id"=>"843"
+        }
+
+        allow(SignUpTopic).to receive(:import).with(any_args).and_return(nil)
+        get :import, params, {return_to: "/assignments/843"}
+
+        expect(response).to redirect_to assignment_path "843"
+      end
+    end
+
+    context 'when import data for SignUpTopic model succeeds with two (category, description) optional parameters' do
+      it 'redirects to user Asignments/:id page' do
+        stub_current_user(ta, ta.role.name, ta.role)
+        params = {
+          "contents_hash"=>"{:header=>nil, :body=>[[\"E2000\", \"Refactor stage deadlines in assignment.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2001\", \"Refactor questionnaires_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2002\", \"Refactor impersonate_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2003\", \"Refactor and improve assessment360_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2004\", \"Refactor assignment_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2005\", \"Bookmark enhancements\", \"1\"], [\"\", \"\", \"\"], [\"E2006\", \"Refactor tree_display_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2007\", \"Add test cases to review_mapping_helper.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2008\", \"Refactor summary_helper.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2009\", \"Refactor assignment.rb??\", \"1\"], [\"\", \"\", \"\"], [\"E2010\", \"Refactor criterion.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2011\", \"Refactor assignment_creation_spec.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2012\", \"Refactor lottery_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2013\", \"Refactor tree_display.js\", \"1\"], [\"\", \"\", \"\"], [\"E2014\", \"Refactor date_time_picker.js\", \"1\"], [\"\", \"\", \"\"], [\"M2000\", \"Implement the ImageBitmap web API\", \"1\"], [\"\", \"\", \"\"], [\"M2001\", \"Implement charset prescanning for the HTML parser\", \"1\"], [\"\", \"\", \"\"], [\"M2002\", \"Implement support for WebWorker module scripts\", \"1\"]]}", 
+          "has_header"=>"false", 
+          "model"=>"SignUpTopic",
+          "optional_count"=>"2",
+          "select1"=>"topic_identifier", 
+          "select2"=>"topic_name", 
+          "select3"=>"max_choosers",
+          "select4"=>"category",
+          "select5"=>"description",
+          "id"=>"843"
+        }
+
+        allow(SignUpTopic).to receive(:import).with(any_args).and_return(nil)
+        get :import, params, {return_to: "/assignments/843"}
+
+        expect(response).to redirect_to assignment_path "843"
+      end
+    end
+
+     context 'when import data for SignUpTopic model succeeds with all (category, description, link) optional parameters' do
+      it 'redirects to user Asignments/:id page' do
+        stub_current_user(ta, ta.role.name, ta.role)
+        params = {
+          "contents_hash"=>"{:header=>nil, :body=>[[\"E2000\", \"Refactor stage deadlines in assignment.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2001\", \"Refactor questionnaires_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2002\", \"Refactor impersonate_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2003\", \"Refactor and improve assessment360_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2004\", \"Refactor assignment_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2005\", \"Bookmark enhancements\", \"1\"], [\"\", \"\", \"\"], [\"E2006\", \"Refactor tree_display_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2007\", \"Add test cases to review_mapping_helper.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2008\", \"Refactor summary_helper.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2009\", \"Refactor assignment.rb??\", \"1\"], [\"\", \"\", \"\"], [\"E2010\", \"Refactor criterion.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2011\", \"Refactor assignment_creation_spec.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2012\", \"Refactor lottery_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2013\", \"Refactor tree_display.js\", \"1\"], [\"\", \"\", \"\"], [\"E2014\", \"Refactor date_time_picker.js\", \"1\"], [\"\", \"\", \"\"], [\"M2000\", \"Implement the ImageBitmap web API\", \"1\"], [\"\", \"\", \"\"], [\"M2001\", \"Implement charset prescanning for the HTML parser\", \"1\"], [\"\", \"\", \"\"], [\"M2002\", \"Implement support for WebWorker module scripts\", \"1\"]]}", 
+          "has_header"=>"false", 
+          "model"=>"SignUpTopic",
+          "optional_count"=>"3",
+          "select1"=>"topic_identifier", 
+          "select2"=>"topic_name", 
+          "select3"=>"max_choosers",
+          "select4"=>"category",
+          "select5"=>"description",
+          "select6"=>"link",
+          "id"=>"843"
+        }
+
+        allow(SignUpTopic).to receive(:import).with(any_args).and_return(nil)
+        get :import, params, {return_to: "/assignments/843"}
+
+        expect(response).to redirect_to assignment_path "843"
+      end
+    end
+
+    context 'when import data for SignUpTopic model fails and raises exception' do
+      it 'redirects to Asignments/:id page after flashing error message' do
+        stub_current_user(ta, ta.role.name, ta.role)
+        params = {
+          "contents_hash"=>"{:header=>nil, :body=>[[\"E2000\", \"Refactor stage deadlines in assignment.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2001\", \"Refactor questionnaires_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2002\", \"Refactor impersonate_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2003\", \"Refactor and improve assessment360_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2004\", \"Refactor assignment_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2005\", \"Bookmark enhancements\", \"1\"], [\"\", \"\", \"\"], [\"E2006\", \"Refactor tree_display_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2007\", \"Add test cases to review_mapping_helper.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2008\", \"Refactor summary_helper.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2009\", \"Refactor assignment.rb??\", \"1\"], [\"\", \"\", \"\"], [\"E2010\", \"Refactor criterion.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2011\", \"Refactor assignment_creation_spec.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2012\", \"Refactor lottery_controller.rb\", \"1\"], [\"\", \"\", \"\"], [\"E2013\", \"Refactor tree_display.js\", \"1\"], [\"\", \"\", \"\"], [\"E2014\", \"Refactor date_time_picker.js\", \"1\"], [\"\", \"\", \"\"], [\"M2000\", \"Implement the ImageBitmap web API\", \"1\"], [\"\", \"\", \"\"], [\"M2001\", \"Implement charset prescanning for the HTML parser\", \"1\"], [\"\", \"\", \"\"], [\"M2002\", \"Implement support for WebWorker module scripts\", \"1\"]]}", 
+          "has_header"=>"false", 
+          "model"=>"SignUpTopic",
+          "optional_count"=>"0",
+          "select1"=>"topic_identifier", 
+          "select2"=>"topic_name", 
+          "select3"=>"max_choosers",
+          "id"=>"843"
+        }
+
+        expect(SignUpTopic).to receive(:import).and_raise(ActiveRecord::RecordInvalid)
+        get :import, params, {return_to: "/assignments/843"}
+        expect(flash[:error]).to be_present
+        expect(response).to redirect_to assignment_path "843"
+      end
+    end
   end
-
-  
-
-
-
 end

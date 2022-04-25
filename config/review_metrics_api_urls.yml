@@ -2,41 +2,41 @@ development:
   metrics: ["sentiment","problem","suggestion"]
   sentiment:
     toolTipText: 'This column shows the tone of the comment.'
-    displayName: 'SentimentMetric'
-    apiCall: 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk'
+    className: 'SentimentMetric'
+    URL: 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk'
   problem:
     toolTipText: 'This shows whether any problem is mentioned in the comment or not.'
-    displayName: 'ProblemMetric'
-    apiCall: 'http://152.7.99.200:5000/problem'
+    className: 'ProblemMetric'
+    URL: 'http://152.7.99.200:5000/problem'
   suggestion:
     toolTipText: 'This shows whether any suggestion is mentioned in the comment or not.'
-    displayName: 'SuggestionMetric'
-    apiCall: 'http://152.7.99.200:5000/suggestions'
+    className: 'SuggestionMetric'
+    URL: 'http://152.7.99.200:5000/suggestions'
 production:
   metrics: ["sentiment","problem","suggestion"]
   sentiment:
     toolTipText: 'This column shows the tone of the comment.'
-    displayName: 'SentimentMetric'
-    apiCall: 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk'
+    className: 'SentimentMetric'
+    URL: 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk'
   problem:
     toolTipText: 'This shows whether any problem is mentioned in the comment or not.'
-    displayName: 'ProblemMetric'
-    apiCall: 'http://152.7.99.200:5000/problem'
+    className: 'ProblemMetric'
+    URL: 'http://152.7.99.200:5000/problem'
   suggestion:
     toolTipText: 'This shows whether any suggestion is mentioned in the comment or not.'
-    displayName: 'SuggestionMetric'
-    apiCall: 'http://152.7.99.200:5000/suggestions'
+    className: 'SuggestionMetric'
+    URL: 'http://152.7.99.200:5000/suggestions'
 test:
   metrics: ["sentiment","problem","suggestion"]
   sentiment:
     toolTipText: 'This column shows the tone of the comment.'
-    displayName: 'SentimentMetric'
-    apiCall: 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk'
+    className: 'SentimentMetric'
+    URL: 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk'
   problem:
     toolTipText: 'This shows whether any problem is mentioned in the comment or not.'
-    displayName: 'ProblemMetric'
-    apiCall: 'http://152.7.99.200:5000/problem'
+    className: 'ProblemMetric'
+    URL: 'http://152.7.99.200:5000/problem'
   suggestion:
     toolTipText: 'This shows whether any suggestion is mentioned in the comment or not.'
-    displayName: 'SuggestionMetric'
-    apiCall: 'http://152.7.99.200:5000/suggestions'
+    className: 'SuggestionMetric'
+    URL: 'http://152.7.99.200:5000/suggestions'

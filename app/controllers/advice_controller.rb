@@ -10,13 +10,11 @@ class AdviceController < ApplicationController
   include AuthorizationHelper
   # If current user is TA then only current user can edit and update the advice given
   def action_allowed?
-    if current_user_has_ta_privileges?
-      return true
-    end
     questionnaire = Questionnaire.find(params[:id])
     if(user_logged_in? && questionnaire.owner?(session[:user].id))
       return true
     end
+    current_user_has_ta_privileges?
   end
 
   # checks whether the advices for a question in questionnaire have valid attributes

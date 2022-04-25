@@ -42,7 +42,7 @@ module SummaryHelper
     end
 
     def summarize_sentences(comments, summary_ws_url)
-      summary = ""
+      # summary = ""
       param = { sentences: comments }
       # call web service
       begin
@@ -51,8 +51,8 @@ module SummaryHelper
         summary = JSON.parse(sum_json)['summary']
         ps = PragmaticSegmenter::Segmenter.new(text: summary)
         return ps.segment
-      rescue StandardError => e
-        summary = [err.message]
+      rescue StandardError # => e
+        # summary = [err.message]
         return ['Problem with WebServices', 'Please contact the Expertiza Development team']
       end
     end
@@ -60,10 +60,10 @@ module SummaryHelper
     def break_up_comments_to_sentences(question_answers)
       # store answers of each question in an array to be converted into json
       comments = []
-      question_answers.each do |ans|
-        unless ans.comments.nil?
-          ans.comments.gsub!(/[.?!]/, '\1|')
-          sentences = ans.comments.split('|')
+      question_answers.each do |answer|
+        unless answer.comments.nil?
+          answer.comments.gsub!(/[.?!]/, '\1|')
+          sentences = answer.comments.split('|')
           sentences.map!(&:strip)
         end
         # add the comment to an array to be converted as a json request

@@ -1,10 +1,9 @@
 class RevisionPlanQuestionnairesController < QuestionnairesController
-
   def action_allowed?
     case params[:action]
     when 'edit'
       questionnaire = Questionnaire.find(params[:id])
-      questionnaire.team.users.collect { |u| u.id }.include? session[:user].id || super
+      (questionnaire.team.users.collect { |u| u.id }.include? session[:user].id) || super
     else
       super
     end
@@ -18,5 +17,4 @@ class RevisionPlanQuestionnairesController < QuestionnairesController
       flash[:error] = $ERROR_INFO
     end
   end
-
 end

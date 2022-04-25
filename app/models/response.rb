@@ -99,11 +99,11 @@ class Response < ApplicationRecord
     response_map.email(defn, participant, parent)
   end
 
-  # This populate_new_response method returns a Response object used to populate the
+  # This create_or_get_response method returns a Response object used to populate the
   # @response instance object with the correct response according to the rubric review round
   # or with a new Response object that the controller can use
   # this method is called within the new method in response_controller
-  def populate_new_response(response_map, current_round)
+  def create_or_get_response(response_map, current_round)
     response = Response.where(map_id: response_map.id, round: current_round.to_i).order(updated_at: :desc).first
     reviewee_team = AssignmentTeam.find_by(id: response_map.reviewee_id)
 
@@ -214,19 +214,6 @@ class Response < ApplicationRecord
     [scores_assigned.sum / scores_assigned.size.to_f, count]
   end
 
-  # This method returns references to a calibration response, review response, assignment, and questions
-  # This method is used within show_calibration_results_for_student when a student views their calibration results for a particular review/assignment.
-  def self.calibration_results_info(calibration_id, response_id, assignment_id)
-    calibration_response_map = ReviewResponseMap.find(calibration_id)
-    review_response_map = ReviewResponseMap.find(response_id)
-    calibration_response = calibration_response_map.response[0]
-    review_response = review_response_map.response[0]
-    questions = AssignmentQuestionnaire.find_by(['assignment_id = ? and questionnaire_id IN (?)', Assignment.find(assignment_id).id, ReviewQuestionnaire.select('id')])
-                                       .questionnaire.questions.reject { |q| q.is_a?(QuestionnaireHeader) }
-
-    [calibration_response, review_response, questions]
-  end
-
   def notify_instructor_on_difference
     response_map = map
     reviewer_participant_id = response_map.reviewer_id
@@ -262,14 +249,12 @@ class Response < ApplicationRecord
     Class.new.extend(Scoring).assessment_score(params)
   end
 
-
-
-  # Get all the questionnaires for a response, response is a collection of answers 
+  # Get all the questionnaires for a response, response is a collection of answers
   # answers contain reference to their question, and question have a reference to questionnaire
   def questionnaires_by_answers(answers)
-    answers_with_questionnaires = answers.select{ |ans|  ans && ans.question && ans.question.questionnaire }
-    questionnaires = answers_with_questionnaires.collect{ |ans| ans.question.questionnaire }.uniq
-    unless(questionnaires.any?)
+    answers_with_questionnaires = answers.select { |answer| answer && answer.question && answer.question.questionnaire }
+    questionnaires = answers_with_questionnaires.collect { |answer| answer.question.questionnaire }.uniq
+    unless (questionnaires.any?)
       questionnaires = []
       questionnaires << questionnaire_by_answer(answers.first)
     end
@@ -280,11 +265,9 @@ class Response < ApplicationRecord
   def get_questions
     @questions = []
     questionnaires = questionnaires_by_answers(scores)
-    questionnaires.each {|questionnaire| @questions += questionnaire.questions }
+    questionnaires.each { |questionnaire| @questions += questionnaire.questions }
     return @questions
   end
-
-
 
   private
 
@@ -297,13 +280,13 @@ class Response < ApplicationRecord
 
   def construct_student_html(identifier, self_id, count)
     identifier += '<table width="100%">' \
-						 '<tr>' \
-						 '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;' \
-						 '<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' + "'review_" + self_id + "','review'" + ');return false;">hide review</a>' \
-						 '</td>' \
-						 '<td align="left"><b>Last Reviewed:</b>' \
-						 "<span>#{(updated_at.nil? ? 'Not available' : updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>" \
-						 '</tr></table>'
+             '<tr>' \
+             '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;' \
+             '<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' + "'review_" + self_id + "','review'" + ');return false;">hide review</a>' \
+             '</td>' \
+             '<td align="left"><b>Last Reviewed:</b>' \
+             "<span>#{(updated_at.nil? ? 'Not available' : updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>" \
+             '</tr></table>'
     identifier
   end
 
@@ -324,9 +307,9 @@ class Response < ApplicationRecord
       else
         assignment = map.assignment
         questions.each do |question|
-          if(question.questionnaire.type == 'ReviewQuestionnaire')
+          if (question.questionnaire.type == 'ReviewQuestionnaire')
             review_questions.append(question)
-          elsif(question.questionnaire.type == 'RevisionPlanQuestionnaire')
+          elsif (question.questionnaire.type == 'RevisionPlanQuestionnaire')
             revision_plan_questions.append(question)
           end
         end

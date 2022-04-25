@@ -118,6 +118,7 @@ class BookmarksController < ApplicationController
   end
 
   private
+
   # TODO: Create a common definition for both create and update to reduce it to single params method
   # Change create method to take bookmark param as required.
   def create_bookmark_params

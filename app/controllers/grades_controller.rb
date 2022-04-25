@@ -120,7 +120,6 @@ class GradesController < ApplicationController
         @vmlist << vm
       end
       counter_for_rounds += 1
-
     end
     @current_role_name = current_role_name
   end

@@ -106,7 +106,7 @@ function generate_table(responses, config_file_api_call_values, processed_commen
             var table_cell = table_row.insertCell(-1);
             table_cell.innerHTML = merged_responses[i][metrics_to_check[j]]
             if (j == 0) {
-                let title = 'Q) ' + processed_comment_json_string[i]['question'] + '\nA) ' + processed_comment_json_string[i]['text'];
+                let title = "Q) " + processed_comment_json_string[i]['question'] + "\nA) " + processed_comment_json_string[i]['text'];
                 table_cell.innerHTML += `<img src="/assets/info.png" title='` + title.replace("'", "") + `'>`;
             }
         }

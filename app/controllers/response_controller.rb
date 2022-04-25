@@ -168,7 +168,7 @@ class ResponseController < ApplicationController
   def fetch_review_metric
     @temp = REVIEW_METRIC_CONFIG['metrics']
     @review_options = []
-    for i in 0..@temp.length-1
+    for i in (0..(@temp.length - 1))
       @review_options.push(@temp[i]) unless REVIEW_METRIC_CONFIG[@temp[i]] == false
     end
     @review_options

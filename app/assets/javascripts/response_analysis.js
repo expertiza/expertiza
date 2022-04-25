@@ -25,7 +25,7 @@ function fetch_response_comments() {
         current_element_id = this.id
 
         // if the current element id is a review question
-        if (current_element_id && current_element_id.startsWith("responses") && current_element_id.endsWith("comments")) {
+        if (current_element_id && current_element_id.startsWith("responses_") && current_element_id.endsWith("_comments")) {
             review_element_ids.push(current_element_id);
         }
 

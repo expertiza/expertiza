@@ -111,7 +111,6 @@ class StudentTask
     RevisionPlanTeamMap.find_by(team: @participant.team, used_in_round: current_round).try(:questionnaire_id)
   end
 
-
   delegate :topic, to: :participant
 
   def self.teamed_students(user, ip_address = nil)

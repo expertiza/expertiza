@@ -37,5 +37,4 @@ class RevisionPlanQuestionnaire < Questionnaire
   def team
     revision_plan_team_map.team
   end
-
 end

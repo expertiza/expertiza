@@ -348,7 +348,7 @@ class ResponseController < ApplicationController
     questionnaires.each { |questionnaire| @questions += sort_questions(questionnaire.questions) }
     return @questions
   end
-  
+
   # This method is called within the Edit or New actions
   # It will create references to the objects that the controller will need when a user creates a new response or edits an existing one.
   def assign_action_parameters

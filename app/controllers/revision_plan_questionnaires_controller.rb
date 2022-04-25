@@ -1,5 +1,4 @@
 class RevisionPlanQuestionnairesController < QuestionnairesController
-
   def action_allowed?
     case params[:action]
     when 'edit'

@@ -150,7 +150,7 @@ class ResponseController < ApplicationController
     # A new response has to be created when there hasn't been any reviews done for the current round,
     # or when there has been a submission after the most recent review in this round.
     @response = @response.populate_new_response(@map, @current_round)
-    store_total_cake_score
+    store_total_cake_score(@map)
     init_answers(@questions)
     render action: 'response'
   end

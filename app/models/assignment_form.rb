@@ -421,7 +421,23 @@ class AssignmentForm
     # copy teams for the old assignment, this returns an array of the old team IDs that we'll want to use later
     Team.copy(old_assignment, new_assignment_id)
 
+    # TODO - rewrite this part, goal is to copy participants from old teams to new teams
     # recreate participants for copied teams then map the calibrated reviews to them
+    #count = 0
+    #old_team_ids.each do |catt|
+    #  @old_team_user = TeamsUser.where(team_id: catt)
+    #  @old_team_user.each do |matt|
+    #    @new_team_user = TeamsUser.new
+    #    @new_team_user.team_id = new_team_ids[count]
+    #    @new_team_user.user_id = matt.user_id
+    #    @new_team_user.save
+    #    Participant.createparticipant(matt, old_assign, new_assign_id)
+    #  end
+      #Participant.mapreviewresponseparticipant(old_assign, new_assign_id, dict)
+      #ReviewResponseMap.newreviewresp(old_assign, catt, dict, new_assign_id)
+    #  count += 1
+    #end
+
     # TODO - when we copy the reviews, we need to make sure we properly increment submitter_count
     #        submitter_count is a column in the assignments table
   end

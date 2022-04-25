@@ -11,7 +11,7 @@
 
 <% @review_versions = @map.get_all_versions %>
 <% unless @review_versions.empty? %>
-    <%= @review_versions.each do |response| %>
+    <% @review_versions.each do |response| %>
     	<%= response.display_as_html %>
         <br/>
     <% end %>

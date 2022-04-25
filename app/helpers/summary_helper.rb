@@ -76,10 +76,9 @@ module SummaryHelper
       if answer.nil?
         return nil
       end
-      answers = []
-      answers.push(answer)
-      sentences = break_up_comments_to_sentences(answers)
-
+      sentences = answer.comments.split(/[.,?,!]/) 
+      sentences.each{ |sentence| sentence.strip! }
+      
       sentences
     end
 

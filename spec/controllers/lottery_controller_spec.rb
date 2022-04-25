@@ -94,7 +94,7 @@ describe LotteryController do
       expect(TeamNode.count).to eq(0)
       expect(TeamsUser.count).to eq(6)
       expect(TeamUserNode.count).to eq(0)
-      allow(AssignmentParticipant).to receive(find_by).and_return(participant)
+      allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
       controller.send(:create_new_teams_for_bidding_response, teams, assignment, user_bidding_info)
       expect(AssignmentTeam.count).to eq(6)
       expect(TeamNode.count).to eq(2)

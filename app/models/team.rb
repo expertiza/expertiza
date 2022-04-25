@@ -15,7 +15,11 @@ class Team < ApplicationRecord
   # Get the participants of the given team
   # E2243 Remove this function when user_id is removed from teams_users table
   def participants
-    participants_list_from_users = users.where(parent_id: parent_id || current_user_id).flat_map(&:participants) unless users.to_a.empty?
+    unless users.to_a.empty?
+      participants_list_from_users = users.flat_map(&:participants).select do |participant|
+        participant.parent_id == parent_id
+      end
+    end
     participants_list_from_ids = Participant.where(id: participant_ids)
     unless participants_list_from_users.nil? && participants_list_from_ids.nil?
       participants_list = []

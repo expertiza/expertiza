@@ -19,10 +19,6 @@ class Response < ApplicationRecord
     id
   end
 
-  def populate_new_response(map, current_round)
-    map.add_response(self)
-  end
-
   def display_as_html(prefix = nil, count = nil, _file_url = nil, show_tags = nil, current_user = nil)
     identifier = ''
     # The following three lines print out the type of rubric before displaying
@@ -252,12 +248,14 @@ class Response < ApplicationRecord
   def self.score(params)
     Class.new.extend(Scoring).assessment_score(params)
   end
-  # Get all the questionnaires for a response, response is a collection of answers
+
+
+  # Get all the questionnaires for a response, response is a collection of answers 
   # answers contain reference to their question, and question have a reference to questionnaire
   def questionnaires_by_answers(answers)
-    answers_with_questionnaires = answers.select { |answer| answer && answer.question && answer.question.questionnaire }
-    questionnaires = answers_with_questionnaires.collect { |answer| answer.question.questionnaire }.uniq
-    unless (questionnaires.any?)
+    answers_with_questionnaires = answers.select{ |ans|  ans && ans.question && ans.question.questionnaire }
+    questionnaires = answers_with_questionnaires.collect{ |ans| ans.question.questionnaire }.uniq
+    unless(questionnaires.any?)
       questionnaires = []
       questionnaires << questionnaire_by_answer(answers.first)
     end

@@ -127,6 +127,7 @@ class ResponseController < ApplicationController
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = questionnaire_from_response
       questions = set_questions
+
       # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       create_answers(params, questions) unless params[:responses].nil?
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
@@ -301,49 +302,6 @@ class ResponseController < ApplicationController
   # Taken if the response is locked and cannot be edited right now
   def response_lock_action
     redirect_to action: 'redirect', id: @map.map_id, return: 'locked', error_msg: 'Another user is modifying this response or has modified this response. Try again later.'
-  end
-
-  # new_response if a flag parameter indicating that if user is requesting a new rubric to fill
-  # if true: we figure out which questionnaire to use based on current time and records in assignment_questionnaires table
-  # e.g. student click "Begin" or "Update" to start filling out a rubric for others' work
-  # if false: we figure out which questionnaire to display base on @response object
-  # e.g. student click "Edit" or "View"
-  def set_content(new_response = false)
-    @title = @map.get_title
-    if @map.survey?
-      @survey_parent = @map.survey_parent
-    else
-      @assignment = @map.assignment
-    end
-    @participant = @map.reviewer
-    @contributor = @map.contributor
-    new_response ? questionnaire_from_response_map : questionnaire_from_response
-    set_dropdown_or_scale
-    new_response ? set_questions_for_new_response : set_questions
-    @min = @questionnaire.min_question_score
-    @max = @questionnaire.max_question_score
-    # The new response is created here so that the controller has access to it in the new method
-    # This response object is populated later in the new method
-    if new_response
-      @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
-    end
-  end
-
-  def set_questions_for_new_response
-    @questions = sort_questions(@questionnaire.questions)
-    if @assignment && @assignment.is_revision_planning_enabled
-      reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
-      current_round = @assignment.number_of_current_round(reviewees_topic)
-      @revision_plan_questionnaire = RevisionPlanTeamMap.find_by(team_id: @map.reviewee_id, used_in_round: current_round).try(:questionnaire)
-      if @revision_plan_questionnaire
-        @questions += sort_questions(@revision_plan_questionnaire.questions)
-      end
-    end
-    return @questions
-  end
-
-  def set_questions
-    @questions = @response.get_questions
   end
 
   # This method is called within the Edit or New actions

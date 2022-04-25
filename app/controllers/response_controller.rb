@@ -342,11 +342,7 @@ class ResponseController < ApplicationController
   end
 
   def set_questions
-    @questions = []
-    answers = @response.scores
-    questionnaires = @response.questionnaires_by_answers(answers)
-    questionnaires.each { |questionnaire| @questions += sort_questions(questionnaire.questions) }
-    return @questions
+    @questions = @response.get_questions
   end
 
   # This method is called within the Edit or New actions

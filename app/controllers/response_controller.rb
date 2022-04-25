@@ -388,11 +388,7 @@ class ResponseController < ApplicationController
   end
 
   def set_questions
-    @review_questions = []
-    answers = @response.scores
-    questionnaires = @response.questionnaires_by_answers(answers)
-    questionnaires.each {|questionnaire| @review_questions += sort_questions(questionnaire.questions) }
-    return @review_questions
+    @review_questions = @response.get_questions
   end
 
 end

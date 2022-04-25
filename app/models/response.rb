@@ -264,10 +264,10 @@ class Response < ApplicationRecord
 
   # Get all questions for this response
   def get_questions
-    @questions = []
+    @review_questions = []
     questionnaires = questionnaires_by_answers(scores)
-    questionnaires.each {|questionnaire| @questions += questionnaire.questions }
-    return @questions
+    questionnaires.each {|questionnaire| @review_questions += questionnaire.questions.sort_by(&:seq) }
+    return @review_questions
   end
 
   private

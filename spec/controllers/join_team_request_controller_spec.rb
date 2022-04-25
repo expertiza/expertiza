@@ -1,6 +1,8 @@
 require './spec/support/teams_shared.rb'
 
 describe JoinTeamRequestsController do
+  let(:participants_list) { [build(:participant, id: 2, user_id: 1006, assignment: assignment1)] }
+
   # Including the stubbed objects from the teams_shared.rb file
   include_context 'object initializations'
   # Including the shared method from the teams_shared.rb file
@@ -91,6 +93,7 @@ describe JoinTeamRequestsController do
         allow(join_team_request2).to receive(:save).and_return(true)
       end
       it "will change the status to 'P' " do
+        allow_any_instance_of(Team).to receive(:participants).and_return(participants_list)
         allow(join_team_request2).to receive(:save).and_return(true)
         request_params = {
           id: 2,

@@ -19,6 +19,11 @@ class Response < ApplicationRecord
     id
   end
 
+  def populate_new_response(map, current_round)
+    map.add_response(self)
+    
+  end
+
   def display_as_html(prefix = nil, count = nil, _file_url = nil, show_tags = nil, current_user = nil)
     identifier = ''
     # The following three lines print out the type of rubric before displaying

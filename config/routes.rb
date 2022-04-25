@@ -271,7 +271,7 @@ Expertiza::Application.routes.draw do
       post :save_all_questions
     end
   end
-
+  
   resources :questions do
     collection do
       get :types

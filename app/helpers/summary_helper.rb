@@ -51,8 +51,8 @@ module SummaryHelper
         summary = JSON.parse(sum_json)['summary']
         ps = PragmaticSegmenter::Segmenter.new(text: summary)
         return ps.segment
-      rescue StandardError => err
-        summary = [err.message]
+      rescue StandardError => e
+        summary = [e.message]
         return ['Problem with WebServices', 'Please contact the Expertiza Development team']
       end
     end

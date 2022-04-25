@@ -39,7 +39,8 @@ module ResponseHelper
     @contributor = @map.contributor
     new_response ? questionnaire_from_response_map : questionnaire_from_response
     set_dropdown_or_scale
-    @review_questions = sort_questions(@questionnaire.questions)
+    new_response ? set_questions_for_new_response : set_questions  
+    # @review_questions = sort_questions(@questionnaire.questions)
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
     # The new response is created here so that the controller has access to it in the new method
@@ -48,4 +49,26 @@ module ResponseHelper
       @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
     end
   end
+
+  def set_questions_for_new_response
+    @review_questions = sort_questions(@questionnaire.questions)
+    if(@assignment && @assignment.is_revision_planning_enabled)
+      reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
+      current_round = @assignment.number_of_current_round(reviewees_topic)
+      @revision_plan_questionnaire = RevisionPlanTeamMap.find_by(team_id: @map.reviewee_id, used_in_round: current_round).try(:questionnaire)
+      if(@revision_plan_questionnaire)
+        @review_questions += sort_questions(@revision_plan_questionnaire.questions)
+      end
+    end
+    return @review_questions
+  end
+
+  def set_questions
+    @review_questions = []
+    answers = @response.scores
+    questionnaires = @response.questionnaires_by_answers(answers)
+    questionnaires.each {|questionnaire| @review_questions += sort_questions(questionnaire.questions) }
+    return @review_questions
+  end
+
 end

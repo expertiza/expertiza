@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220424063124) do
+ActiveRecord::Schema.define(version: 20220425090237) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -31,6 +31,7 @@ ActiveRecord::Schema.define(version: 20220424063124) do
     t.string "value"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "confidence_level", precision: 10, scale: 5
     t.index ["answer_id"], name: "index_answer_tags_on_answer_id"
     t.index ["tag_prompt_deployment_id"], name: "index_answer_tags_on_tag_prompt_deployment_id"
     t.index ["user_id"], name: "index_answer_tags_on_user_id"
@@ -121,7 +122,7 @@ ActiveRecord::Schema.define(version: 20220424063124) do
     t.boolean "auto_assign_mentor", default: false
     t.boolean "duty_based_assignment?"
     t.boolean "questionnaire_varies_by_duty"
-    t.boolean "is_revision_planning_enabled"
+    t.boolean "is_revision_planning_enabled", default: false
     t.index ["course_id"], name: "fk_assignments_courses"
     t.index ["instructor_id"], name: "fk_assignments_instructors"
     t.index ["late_policy_id"], name: "fk_late_policy_id"
@@ -512,7 +513,7 @@ ActiveRecord::Schema.define(version: 20220424063124) do
     t.index ["participant_id"], name: "fk_rails_29587cf6a9"
   end
 
-  create_table "revision_plan_team_maps", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3" do |t|
+  create_table "revision_plan_team_maps", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "team_id"
     t.integer "questionnaire_id"
     t.integer "used_in_round"

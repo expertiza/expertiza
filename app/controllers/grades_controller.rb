@@ -103,7 +103,6 @@ class GradesController < ApplicationController
         end
       end
       @vmlist << populate_view_model(questionnaire)
-
       # Finds RevisionPlanQuestionnaire, if any
       rp_questionnaire = RevisionPlanTeamMap.find_by(team: Team.find(@team_id), used_in_round: counter_for_rounds).try(:questionnaire)
       # Confirms revision planning enabled

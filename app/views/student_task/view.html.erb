@@ -115,11 +115,10 @@ to display the label "Your team" in the student assignment tasks-->
         <% end %>
         (Add new questions to next-round rubric)
       <% else %>
-        <font color="gray">Revision Planning</font> (You are not allowed to submit your revision plan right now)
+        <font color="gray">Revision Planning</font> (You are not allowed to submit your revison plan right now)
       <% end %>
     </li>
   <%end%>
-
 
   <% if @team && (@authorization == 'participant' or @can_submit == true) %>
     <li>

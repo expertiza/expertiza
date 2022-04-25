@@ -252,7 +252,6 @@ class Response < ApplicationRecord
   def self.score(params)
     Class.new.extend(Scoring).assessment_score(params)
   end
-
   # Get all the questionnaires for a response, response is a collection of answers
   # answers contain reference to their question, and question have a reference to questionnaire
   def questionnaires_by_answers(answers)
@@ -267,10 +266,10 @@ class Response < ApplicationRecord
 
   # Get all questions for this response
   def get_questions
-    @questions = []
+    @review_questions = []
     questionnaires = questionnaires_by_answers(scores)
-    questionnaires.each { |questionnaire| @questions += questionnaire.questions.sort_by(&:seq) }
-    return @questions
+    questionnaires.each {|questionnaire| @review_questions += questionnaire.questions.sort_by(&:seq) }
+    return @review_questions
   end
 
   private
@@ -311,9 +310,9 @@ class Response < ApplicationRecord
       else
         assignment = map.assignment
         questions.each do |question|
-          if (question.questionnaire.type == 'ReviewQuestionnaire')
+          if(question.questionnaire.type == 'ReviewQuestionnaire')
             review_questions.append(question)
-          elsif (question.questionnaire.type == 'RevisionPlanQuestionnaire')
+          elsif(question.questionnaire.type == 'RevisionPlanQuestionnaire')
             revision_plan_questions.append(question)
           end
         end
@@ -330,7 +329,7 @@ class Response < ApplicationRecord
               else
                 additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
               end
-    code += '</table>' + "<h5>Additional Comment</h5>" + '<table id="review_' + self_id + '" class="table table-bordered">' + '<tr><td>' + comment + '</td></tr>' + '</table>'
+              code += '</table>' + "<h5>Additional Comment</h5>" + '<table id="review_' + self_id + '" class="table table-bordered">' + '<tr><td>' + comment + '</td></tr>' + '</table>'
     code
   end
 

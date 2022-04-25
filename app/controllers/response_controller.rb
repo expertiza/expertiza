@@ -127,7 +127,8 @@ class ResponseController < ApplicationController
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = questionnaire_from_response
       questions = set_questions
-      create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+      # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+      create_answers(params, questions) unless params[:responses].nil?
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
 
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
@@ -149,9 +150,9 @@ class ResponseController < ApplicationController
     # So do the answers, otherwise the response object can't find the questionnaire when the user hasn't saved his new review and closed the window.
     # A new response has to be created when there hasn't been any reviews done for the current round,
     # or when there has been a submission after the most recent review in this round.
-    @response = @response.populate_new_response(@map, @current_round)
-    store_total_cake_score(@map)
-    init_answers(@questions)
+    @response = @response.create_or_get_response(@map, @current_round)
+    store_total_cake_score
+    init_answers(@review_questions)
     render action: 'response'
   end
 
@@ -427,4 +428,9 @@ class ResponseController < ApplicationController
       Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if answer.nil?
     end
   end
+
+  def set_questions
+    @review_questions = @response.get_questions
+  end
+
 end

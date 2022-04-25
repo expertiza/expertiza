@@ -27,10 +27,13 @@
 <!--Question part-->
 <hr/>
 <% if !params[:id].nil? and params[:action] == 'edit' %>
-    <%= render :partial => 'questions' %>
-    <hr/>
-    <%= link_to 'Import Questionnaire', :controller=>'import_file', :action=>'start', :model => 'Question', :id=> @questionnaire.id, :expected_fields => 'txt, type ,seq,size, break_before' %>|
-    <%= link_to 'Export Questionnaire', :controller=>'export_file',:action=>'start',:model=> 'Question',:id=> @questionnaire.id %>
+  <% if AnswerHelper.in_active_period(params[:id]) %>
+    A review period is in progress. All existing reviews for the questionnaire <b>will be deleted</b> if you ADD or REMOVE a question.
+  <% end %>
+  <%= render :partial => 'questions' %>
+  <hr/>
+  <%= link_to 'Import Questionnaire', :controller=>'import_file', :action=>'start', :model => 'Question', :id=> @questionnaire.id, :expected_fields => 'txt, type ,seq,size, break_before' %>|
+  <%= link_to 'Export Questionnaire', :controller=>'export_file',:action=>'start',:model=> 'Question',:id=> @questionnaire.id %>
 <% end %>
 <BR/>
 

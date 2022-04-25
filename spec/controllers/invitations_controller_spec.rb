@@ -71,7 +71,7 @@ describe InvitationsController do
       allow(TeamsUser).to receive(:find).with('1').and_return(teamUser)
       allow(Team).to receive(:find).with('1').and_return(team)
 
-      allow(TeamsUser).to receive(:find_by).with(user_id: 4, team_id: 3).and_return(teamUser2)
+      allow(TeamsUser).to receive(:find_by_team_id_and_user_id).and_return(nil)
       user_session = { user: student1 }
       expect { post :create, params: request_params, session: user_session }.to change(Invitation, :count).by(1).and change(User, :count).by(1)
     end

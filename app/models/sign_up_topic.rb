@@ -177,8 +177,8 @@ class SignUpTopic < ActiveRecord::Base
     fields
   end
 
-  def self.export(csv, _parent_id, options)
-    @assignment = Assignment.find(_parent_id.to_i)
+  def self.export(csv, parent_id, options)
+    @assignment = Assignment.find(parent_id.to_i)
     @signuptopics = SignUpTopic.where(assignment_id: @assignment.id)
 
     @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
@@ -205,7 +205,7 @@ class SignUpTopic < ActiveRecord::Base
 
       slots_filled_length = @slots_filled.length()
       @slots_filled.each do |slot|
-        if slot.topic_id  == signuptopic.id
+        if slot.topic_id == signuptopic.id
           tcsv.push(signuptopic.max_choosers.to_i - slot.count.to_i) if options['available_slots'] == 'true'
         else
           slots_filled_length -= 1

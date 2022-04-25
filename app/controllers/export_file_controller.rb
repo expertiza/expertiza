@@ -9,8 +9,8 @@ class ExportFileController < ApplicationController
   def start
     @model = params[:model]
     titles = { 'Assignment' => 'Grades', 'CourseParticipant' => 'Course Participants', 'AssignmentTeam' => 'Teams',
-               'CourseTeam' => 'Teams', 'User' => 'Users', 'Question' => 'Questions' ,
-               'SignUpTopic' => 'Topic'}
+               'CourseTeam' => 'Teams', 'User' => 'Users', 'Question' => 'Questions',
+               'SignUpTopic' => 'Topic' }
     @title = titles[@model]
     @id = params[:id]
   end

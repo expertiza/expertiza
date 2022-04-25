@@ -894,7 +894,7 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  describe 'test list_review_submissions' do
+  describe 'test list_review_uploaded_files' do
     before(:each) do
       @assignment1 = create(:assignment, name: 'name1')
       @questionnaire = create(:questionnaire)
@@ -907,12 +907,12 @@ describe ReviewMappingHelper, type: :helper do
       @team = create(:assignment_team)
     end
     it 'should return an empty string when the file does not exist' do
-      result = helper.list_review_submissions(@participant.id, @team.id, @response_map.id)
+      result = helper.list_review_uploaded_files(@participant.id, @team.id, @response_map.id)
       expect(result).to eq('')
     end
   end
 
-  describe 'test list_review_submissions' do
+  describe 'test list_review_uploaded_files' do
     before(:each) do
       @assignment1 = create(:assignment, name: 'name1')
       @questionnaire = create(:questionnaire)
@@ -927,7 +927,7 @@ describe ReviewMappingHelper, type: :helper do
       allow(team).to receive(:submitted_files).with(any_args).and_return(['./.rspec'])
     end
     it 'should return correct html a tag' do
-      result = helper.list_review_submissions(@participant.id, @team.id, @response_map.id)
+      result = helper.list_review_uploaded_files(@participant.id, @team.id, @response_map.id)
       expect(result).to start_with('<a href')
     end
   end

@@ -56,6 +56,18 @@ class WaitlistTeam < ApplicationRecord
     return true
   end
 
+  def self.delete_all_waitlists_for_team(team_id)
+    waitlisted_topics_for_team = get_all_waitlists_for_team team_id
+    unless waitlisted_topics_for_team.nil?
+      waitlisted_topics_for_team.each do |entry|
+        entry.destroy
+      end
+    else
+      ExpertizaLogger.info LoggerMessage.new('WaitlistTeam', user_id, "Cannot find Team #{team_id} in waitlist.")
+    end
+    return true
+  end
+
   def self.delete_all_waitlists_for_topic(topic_id)
     waitlisted_teams_for_topic = get_all_waitlists_for_topic topic_id
     unless waitlisted_teams_for_topic.nil?
@@ -70,6 +82,10 @@ class WaitlistTeam < ApplicationRecord
 
   def self.get_all_waitlists_for_team(team_id, assignment_id)
     WaitlistTeam.joins(:topic).where(team_id: team_id, sign_up_topics: {assignment_id: assignment_id})
+  end
+
+  def self.get_all_waitlists_for_team(team_id)
+    WaitlistTeam.where(team_id: team_id)
   end
 
   def self.get_all_waitlists_for_topic(topic_id)

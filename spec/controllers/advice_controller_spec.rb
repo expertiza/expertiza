@@ -10,7 +10,7 @@ describe AdviceController do
         # stub_current_user(super_admin, super_admin.role.name, super_admin.role)
         # expect(controller.send(:action_allowed?)).to be_truthy
         current_user = super_admin
-        action_allowed?.to be true
+        expect(controller.send(:action_allowed?)).to be true
       end
     end
     context 'when the role of current user is Instructor' do
@@ -19,7 +19,7 @@ describe AdviceController do
         # stub_current_user(instructor1, instructor1.role.name, instructor1.role)
         # expect(controller.send(:action_allowed?)).to be_truthy
         current_user = instructor1
-        action_allowed?.to be true
+        expect(controller.send(:action_allowed?)).to be true
       end
     end
     context 'when the role of current user is Student' do
@@ -28,7 +28,7 @@ describe AdviceController do
         # stub_current_user(student1, student1.role.name, student1.role)
         # expect(controller.send(:action_allowed?)).to be_falsey
         current_user = student1
-        action_allowed?.to be false
+        expect(controller.send(:action_allowed?)).to be false
       end
     end
   end

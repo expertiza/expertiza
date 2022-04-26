@@ -249,13 +249,13 @@ class Response < ApplicationRecord
     Class.new.extend(Scoring).assessment_score(params)
   end
 
-
-  # Get all the questionnaires for a response, response is a collection of answers 
+  # Get all the questionnaires for a response, response is a collection of answers
   # answers contain reference to their question, and question have a reference to questionnaire
+
   def questionnaires_by_answers(answers)
-    answers_with_questionnaires = answers.select{ |answer|  answer && answer.question && answer.question.questionnaire }
-    questionnaires = answers_with_questionnaires.collect{ |answer| answer.question.questionnaire }.uniq
-    unless(questionnaires.any?)
+    answers_with_questionnaires = answers.select { |answer| answer && answer.question && answer.question.questionnaire }
+    questionnaires = answers_with_questionnaires.collect { |answer| answer.question.questionnaire }.uniq
+    unless (questionnaires.any?)
       questionnaires = []
       questionnaires << questionnaire_by_answer(answers.first)
     end
@@ -266,7 +266,7 @@ class Response < ApplicationRecord
   def get_questions
     @review_questions = []
     questionnaires = questionnaires_by_answers(scores)
-    questionnaires.each {|questionnaire| @review_questions += questionnaire.questions.sort_by(&:seq) }
+    questionnaires.each { |questionnaire| @review_questions += questionnaire.questions.sort_by(&:seq) }
     return @review_questions
   end
 
@@ -308,9 +308,9 @@ class Response < ApplicationRecord
       else
         assignment = map.assignment
         questions.each do |question|
-          if(question.questionnaire.type == 'ReviewQuestionnaire')
+          if (question.questionnaire.type == 'ReviewQuestionnaire')
             review_questions.append(question)
-          elsif(question.questionnaire.type == 'RevisionPlanQuestionnaire')
+          elsif (question.questionnaire.type == 'RevisionPlanQuestionnaire')
             revision_plan_questions.append(question)
           end
         end
@@ -323,11 +323,11 @@ class Response < ApplicationRecord
       end
     end
     comment = if additional_comment.nil?
-                ''
-              else
-                additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
-              end
-              code += '</table>' + "<h5>Additional Comment</h5>" + '<table id="review_' + self_id + '" class="table table-bordered">' + '<tr><td>' + comment + '</td></tr>' + '</table>'
+      ''
+    else
+      additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
+    end
+    code += '</table>' + "<h5>Additional Comment</h5>" + '<table id="review_' + self_id + '" class="table table-bordered">' + '<tr><td>' + comment + '</td></tr>' + '</table>'
     code
   end
 

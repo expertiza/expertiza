@@ -184,8 +184,6 @@ module Scoring
       scores[:max_pts_available] = topic.micropayment
     end
 
-    scores[:total_score] = compute_total_score(assignment, scores)
-
     # update :total_score key in scores hash to user's current grade if they have one
     # update :total_score key in scores hash to 100 if the current value is greater than 100
     if participant.grade

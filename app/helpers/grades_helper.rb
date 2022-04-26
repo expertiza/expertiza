@@ -130,6 +130,7 @@ module GradesHelper
 
     # loop through each questionnaire, and populate the view model for all data necessary
     # to render the html tables.
+    @round = nil
     counter_for_revisions = 0
     counter_for_same_rubric = 0
     questionnaires.each do |questionnaire|
@@ -176,7 +177,7 @@ module GradesHelper
         # Confirms revision planning enabled
         # Confirms not first round
         # Confirms haven't surpassed maximum number of rounds
-        if rp_questionnaire # && counter_for_rounds >= 1
+        if rp_questionnaire && counter_for_rounds >= 1
           # Adds RevisionPlanQuestionnaire to heatgrid
           vm = VmQuestionResponse.new(rp_questionnaire, @assignment, @round)
           vmquestions = rp_questionnaire.questions

@@ -26,7 +26,7 @@ class RevisionPlanQuestionnaire < Questionnaire
       questionnaire.instructor_id = assignment.instructor_id
       questionnaire.max_question_score = 5
       questionnaire.save
-      # questionnaire_team_map = RevisionPlanTeamMap.create(team_id: assignment_team.id, used_in_round: current_round, questionnaire_id: questionnaire.id)
+      questionnaire_team_map = RevisionPlanTeamMap.create(team_id: assignment_team.id, used_in_round: current_round, questionnaire_id: questionnaire.id)
     end
     return questionnaire
   end
@@ -42,6 +42,6 @@ class RevisionPlanQuestionnaire < Questionnaire
 
   # Return true if user owns questionnaire
   def owner?(user_id)
-    team.users.map { |u| u.id }.include?(user_id) || super
+    questionnaire.team.users.map { |u| u.id }.include?(user_id) || super
   end
 end

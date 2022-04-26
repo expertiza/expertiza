@@ -72,6 +72,26 @@ class Cake < ScoredQuestion
     safe_join([''.html_safe, ''.html_safe], html.html_safe)
   end
 
+  # E2218: This Method returns the total cake score for each question.
+  # Its called from the model new method in response controller.
+  # @param review_type  [String]
+  # @param questions [Array]
+  # @param participant_id [Integer]
+  # @param assignment_id [Integer]
+  # @param reviewee_id [Integer]
+  # @return total_scores - a hash with key as question_id and values as total score for each cake question
+  def self.get_total_score_for_questions(review_type, questions, participant_id, assignment_id, reviewee_id)
+    total_scores = {}
+    questions.each do |question|
+      next unless question.instance_of? Cake
+
+      total_score = question.get_total_score_for_question(review_type, question.id, participant_id, assignment_id, reviewee_id).to_s
+      total_score = 0 if total_score.nil?
+      total_scores[question.id] = total_score
+    end
+    total_scores
+  end
+
   # Finds all teammates and calculates the total contribution of all members for the question
   def get_total_score_for_question(review_type, question_id, participant_id, assignment_id, reviewee_id)
     # get the reviewer's team id for the currently answered question

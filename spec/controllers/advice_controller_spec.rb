@@ -2,11 +2,15 @@ describe AdviceController do
   let(:super_admin) { build(:superadmin, id: 1, role_id: 5) }
   let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, name: 'Instructor1') }
   let(:student1) { build(:student, id: 21, role_id: 1) }
+  let(:questionnaire) do
+    build(id: 1, name: 'questionnaire', ta_id: 8, course_id: 1, private: false, min_question_score: 0, max_question_score: 5, type: 'ReviewQuestionnaire')
+  end
 
   describe '#action_allowed?' do
     context 'when the role of current user is Super-Admin' do
       # Checking for Super-Admin
       it 'allows certain action' do
+        controller.params = { id: '1' }
         stub_current_user(super_admin, super_admin.role.name, super_admin.role)
         expect(controller.send(:action_allowed?)).to be_truthy
       end
@@ -14,6 +18,7 @@ describe AdviceController do
     context 'when the role of current user is Instructor' do
       # Checking for Instructor
       it 'allows certain action' do
+        controller.params = { id: '1' }
         stub_current_user(instructor1, instructor1.role.name, instructor1.role)
         expect(controller.send(:action_allowed?)).to be_truthy
       end
@@ -21,6 +26,7 @@ describe AdviceController do
     context 'when the role of current user is Student' do
       # Checking for Student
       it 'refuses certain action' do
+        controller.params = { id: '1' }
         stub_current_user(student1, student1.role.name, student1.role)
         expect(controller.send(:action_allowed?)).to be_falsey
       end

@@ -17,10 +17,9 @@
     <th width="5%"><%=t ".num_bids"%></th>
     <th width="5%"><%=t ".num_1_2_bids"%></th>
   <% end %>
-  <th width="10%"> <%=t ".bookmarks"%>
-    <!--Bookmarks may be disabled for this assignment-->
-    <% unless @use_bookmark %> <%=t ".disabled"%> <% end %>
-  </th>  
+  <% if @use_bookmark %>
+    <th width="10%"><%=t ".bookmarks"%></th>  
+  <% end%>
   <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>
       <th width="10%"><%=t ".actions"%></th>
       <th width="5%"><%=t ".advertise"%></th>

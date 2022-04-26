@@ -119,8 +119,8 @@ class GradesController < ApplicationController
         end
         counter_for_revisions += 1
       elsif @assignment.is_revision_planning_enabled? && questionnaire == questionnaires.last
-        # reviewees_topic = SignedUpTeam.topic_id_by_team_id(@participant.id)
-        # current_round = @assignment.number_of_current_round(reviewees_topic) + 1
+        reviewees_topic = SignedUpTeam.topic_id_by_team_id(@participant.id)
+        current_round = @assignment.number_of_current_round(reviewees_topic)+1
         rp_questionnaire = RevisionPlanTeamMap.find_by(team: Team.find(@team_id)).try(:questionnaire)
         # Confirms revision planning enabled
         # Confirms not first round

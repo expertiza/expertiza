@@ -1,6 +1,6 @@
 <table class="table table-striped grades" class="width: 100%">
   <%if ctrl=='review' && @assignment.vary_by_round %>
-      <% reviews = reviews.select{|response| response.round == round}.reverse.uniq{|response| response.map_id}.sort_by{|response| response.map_id} %>
+      <% reviews = reviews.select{|response| response.round == @round}.reverse.uniq{|response| response.map_id}.sort_by{|response| response.map_id} %>
   <%else%>
       <% reviews = reviews.sort_by{|response| response.map_id} %>
   <%end%>

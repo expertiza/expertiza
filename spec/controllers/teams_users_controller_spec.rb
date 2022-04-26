@@ -259,7 +259,7 @@ describe TeamsUsersController do
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant2)
 
-        allow(Participant).to receive(:where).and_return({:parent_id=>1})
+        allow(Participant).to receive(:where).and_return([:parent_id=>1])
 
         allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_raise("Member on existing team error")
         user_session = { user: admin }

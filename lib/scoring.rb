@@ -52,7 +52,6 @@ module Scoring
 
       weighted_score = 0
       sum_of_weights = 0
-      max_question_score = 0
 
       @questionnaire = Questionnaire.find(@questions.first.questionnaire_id)
 
@@ -197,7 +196,7 @@ module Scoring
                                                      questionnaire.get_assessments_for(participant)
                                                    else
                                                      questionnaire.get_assessments_round_for(participant, round)
-                                                   end 
+                                                   end
       # aggregate_assessment_scores computes the total score for a list of responses to a questionnaire
       scores[questionnaire_symbol][:scores] = aggregate_assessment_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
     end
@@ -306,11 +305,11 @@ end
 
 def calc_review_score(corresponding_response, questions)
   if corresponding_response.empty?
-    this_review_score = -1.0
+    return -1.0
   else
     this_review_score_raw = assessment_score(response: corresponding_response, questions: questions)
     if this_review_score_raw
-      this_review_score = ((this_review_score_raw * 100) / 100.0).round if this_review_score_raw >= 0.0
+      return ((this_review_score_raw * 100) / 100.0).round if this_review_score_raw >= 0.0
     end
   end
 end

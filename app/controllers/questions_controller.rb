@@ -15,7 +15,7 @@ class QuestionsController < ApplicationController
   def action_allowed?
     if ['destroy'].include?(params[:action])
       question = Question.find(params[:id])
-      if(user_logged_in? && question.questionnaire.owner?(session[:user].id))
+      if (user_logged_in? && question.questionnaire.owner?(session[:user].id))
         return true
       end
     end

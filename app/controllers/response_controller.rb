@@ -390,5 +390,4 @@ class ResponseController < ApplicationController
   def set_questions
     @review_questions = @response.get_questions
   end
-
 end

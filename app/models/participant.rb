@@ -176,26 +176,17 @@ class Participant < ApplicationRecord
   end
 
   # Copies the reviews from the previous instructors
+  # This method assumes a old assignment and copied assignment with the same participants
+  #   it attempts to find all ReviewResponseMap records belonging to old assignment
+  #   and recreate them for the new assignment belonging to the participants
   def self.mapreviewresponseparticipant(old_assign, new_assign_id, dict)
+    # TODO - why are these all instance variables if they only need scope within this method?
     @old_assignmentnumber = Assignment.find_by(id: old_assign.id)
     @new_assignmentnumber = Assignment.find_by(id: new_assign_id)
     @find_participant = Participant.find_by(parent_id: old_assign.id, user_id: @old_assignmentnumber.instructor_id)
-    @new_participant = Participant.new
-    @new_participant.can_submit = @find_participant.can_submit
-    @new_participant.can_review = @find_participant.can_review
-    @new_participant.user_id = @new_assignmentnumber.instructor_id
+    @new_participant = @find_participant.dup
     @new_participant.parent_id = new_assign_id
-    @new_participant.submitted_at = @find_participant.submitted_at
-    @new_participant.permission_granted = @find_participant.permission_granted
-    @new_participant.penalty_accumulated = @find_participant.penalty_accumulated
-    @new_participant.grade = @find_participant.grade
-    @new_participant.type = @find_participant.type
-    @new_participant.handle = @find_participant.handle
-    @new_participant.time_stamp = @find_participant.time_stamp
-    @new_participant.digital_signature = @find_participant.digital_signature
-    @new_participant.duty = @find_participant.duty
-    @new_participant.can_take_quiz = @find_participant.can_take_quiz
-    @new_participant.save
+    @new_participant.save # we should check if this is successful before proceeding
     @getnewparticipant = Participant.find_by(parent_id: new_assign_id, user_id: @old_assignmentnumber.instructor_id)
     @old_reviewrespmap = ReviewResponseMap.where(reviewed_object_id: old_assign.id)
     @old_reviewrespmap.each do |satt|

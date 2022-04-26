@@ -2,30 +2,37 @@ describe AdviceController do
   let(:super_admin) { build(:superadmin, id: 1, role_id: 5) }
   let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, name: 'Instructor1') }
   let(:student1) { build(:student, id: 21, role_id: 1) }
+  let(:questionnaire) do
+    build(id: 1, name: 'questionnaire', ta_id: 8, course_id: 1, private: false, min_question_score: 0, max_question_score: 5, type: 'ReviewQuestionnaire')
+  end
+  before(:each) do
+    allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
+  end
 
   describe '#action_allowed?' do
+    let(:questionnaire) { build(:questionnaire, id: 1) }
     context 'when the role of current user is Super-Admin' do
       # Checking for Super-Admin
       it 'allows certain action' do
-        # stub_current_user(super_admin, super_admin.role.name, super_admin.role)
-        # expect(controller.send(:action_allowed?)).to be_truthy
-        check_access(super_admin).to be true
+        controller.params = { id: '1' }
+        stub_current_user(super_admin, super_admin.role.name, super_admin.role)
+        expect(controller.send(:action_allowed?)).to be_truthy
       end
     end
     context 'when the role of current user is Instructor' do
       # Checking for Instructor
       it 'allows certain action' do
-        # stub_current_user(instructor1, instructor1.role.name, instructor1.role)
-        # expect(controller.send(:action_allowed?)).to be_truthy
-        check_access(instructor1).to be true
+        controller.params = { id: '1' }
+        stub_current_user(instructor1, instructor1.role.name, instructor1.role)
+        expect(controller.send(:action_allowed?)).to be_truthy
       end
     end
     context 'when the role of current user is Student' do
       # Checking for Student
       it 'refuses certain action' do
-        # stub_current_user(student1, student1.role.name, student1.role)
-        # expect(controller.send(:action_allowed?)).to be_falsey
-        check_access(student).to be false
+        controller.params = { id: '1' }
+        stub_current_user(student1, student1.role.name, student1.role)
+        expect(controller.send(:action_allowed?)).to be_falsey
       end
     end
   end

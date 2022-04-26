@@ -93,9 +93,15 @@ class TeamsUser < ApplicationRecord
   end
 
   # E2243: Remove loading based on user_id after user_id is removed from teams_users table.
-  # Load based on team_id and participant_id wherever possible
+  # Load based on team_id and participant_id instead wherever possible
+  # teams_users table now stores participant_id instead of user_id but, older entries
+  # have user_id mapping. This function loads teams_user based on user_id for older entries and
+  # based on participant_id for newer entries.
   def self.find_by_team_id_and_user_id(team_id, user_id)
+    # find based on user_id
     teams_user = TeamsUser.find_by(team_id: team_id, user_id: user_id)
+
+    # find based on participant_id if unable to find based on user_id
     if teams_user.nil? && team_id != "0"
       assignment_id = Team.find(team_id).parent_id
       participant_id = Assignment.find(assignment_id).participants.find_by(user_id: user_id).id

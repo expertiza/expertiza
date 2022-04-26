@@ -19,13 +19,20 @@ class Team < ApplicationRecord
 
   # Get the participants of the given team
   # E2243 Remove this function when user_id is removed from teams_users table
+  # teams_users table now stores participant_id instead of user_id but, older entries
+  # have user_id mapping. This function loads participants details directly from the mapping
+  # as well as from user_id if some entries use user_id mapping.
   def participants
+    # load based on user_id mapping if it exists
     unless users.to_a.empty?
       participants_list_from_users = users.flat_map(&:participants).select do |participant|
         participant.parent_id == parent_id
       end
     end
+
+    # load directly using participant_ids
     participants_list_from_ids = Participant.where(id: participant_ids)
+
     unless participants_list_from_users.nil? && participants_list_from_ids.nil?
       participants_list = []
       participants_list += participants_list_from_users unless participants_list_from_users.nil?
@@ -38,7 +45,7 @@ class Team < ApplicationRecord
   # Get the response review map
   def responses
     participants.flat_map(&:responses)
-  end
+  endß
 
   # Delete the given team
   def delete

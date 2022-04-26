@@ -81,15 +81,18 @@ class Team < ApplicationRecord
 
   # Create new teams, copied from an old assignment, and returns an array of the team IDs copied
   def self.copy(old_assign, new_assign_id)
-    @original_team_values = Team.where(parent_id: old_assign.id)
-    old_team_ids = []
+    @original_team_values = Team.where(parent_id: old_assign.id) # get all teams associated with old assignment
+    old_team_ids = []                                            # storing old team IDs to return (better way?)
     @original_team_values.each do |catt|
       @prev_assignment = Assignment.find(old_assign.id)
       @prev_instructor = Participant.find_by(parent_id: old_assign.id, user_id: @prev_assignment.instructor_id)
       @map = ReviewResponseMap.find_by(reviewed_object_id: old_assign.id, reviewer_id: @prev_instructor.id, reviewee_id: catt.id)
+      # if we can find instructor reviews of this team in the previous assignment
       if @map
         @resp = Response.find_by(map_id: @map.id, is_submitted: false)
+        # and if a response exists that is not submitted TODO - the is_submitted part was a problem with the previous implementation?
         if @resp
+          # this a team associated with the old assignment we want to copy, they have a review/response
           old_team_ids.append(catt.id)
           @new_team = catt.dup
           @new_team.parent_id = new_assign_id

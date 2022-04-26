@@ -27,9 +27,6 @@ describe LotteryController do
   let(:team_user6) { create(:team_user, team_id: assignment_team4.id, user_id: student6.id, id: 6) }
 
   let(:participant) { build(:participant, id: 1, user_id: 1, assignment: assignment) }
-  let(:participant1) { build(:participant, id: 2, user_id: student1.id, assignment: assignment) }
-  let(:participant2) { build(:participant, id: 3, user_id: student2.id, assignment: assignment) }
-  let(:participant3) { build(:participant, id: 4, user_id: student3.id, assignment: assignment) }
 
 
   before :each do
@@ -94,13 +91,13 @@ describe LotteryController do
     it 'create new Assignment Teams' do
       user_bidding_info = []
       teams = [[student1.id, student2.id], [student3.id]]
+      create(:participant, id: 2, user_id: student1.id, assignment: assignment)
+      create(:participant, id: 3, user_id: student2.id, assignment: assignment)
+      create(:participant, id: 4, user_id: student3.id, assignment: assignment)
       expect(AssignmentTeam.count).to eq(4)
       expect(TeamNode.count).to eq(0)
       expect(TeamsUser.count).to eq(6)
       expect(TeamUserNode.count).to eq(0)
-      allow(Participant).to receive(:find_by).with(user_id: student1.id, parent_id: assignment.id).and_return(participant1)
-      allow(Participant).to receive(:find_by).with(user_id: student2.id, parent_id: assignment.id).and_return(participant2)
-      allow(Participant).to receive(:find_by).with(user_id: student3.id, parent_id: assignment.id).and_return(participant3)
       controller.send(:create_new_teams_for_bidding_response, teams, assignment, user_bidding_info)
       expect(AssignmentTeam.count).to eq(6)
       expect(TeamNode.count).to eq(2)
@@ -118,7 +115,9 @@ describe LotteryController do
     end
     context 'with valid assignment id' do
       it 'should not set any error message in the flash' do
-        allow(Participant).to receive(:find_by).and_return(participant)
+        participant1 = create(:participant, id: 2, user_id: 2, assignment: assignment)
+        allow(Participant).to receive(:find_by).and_return(participant1)
+        allow(TeamsUser).to receive(:find_by).and_return(nil)
         controller.run_intelligent_assignment
         expect(controller).not_to set_flash[:error]
       end

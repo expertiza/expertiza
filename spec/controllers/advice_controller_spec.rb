@@ -24,7 +24,7 @@ describe AdviceController do
     allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
-
+  
   describe '#action_allowed?' do
     context 'when the role of current user is Super-Admin' do
       # Checking for Super-Admin

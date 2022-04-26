@@ -89,7 +89,7 @@ class Team < ApplicationRecord
       @map = ReviewResponseMap.find_by(reviewed_object_id: old_assign.id, reviewer_id: @prev_instructor.id, reviewee_id: catt.id)
       # if we can find instructor reviews of this team in the previous assignment
       if @map
-        @resp = Response.find_by(map_id: @map.id, is_submitted: false)
+        @resp = Response.find_by(map_id: @map.id, is_submitted: false) # This may be the problem with 'only reviews that have been started are copied'
         # and if a response exists that is not submitted TODO - the is_submitted part was a problem with the previous implementation?
         if @resp
           # this a team associated with the old assignment we want to copy, they have a review/response

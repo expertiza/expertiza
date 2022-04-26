@@ -78,7 +78,32 @@ module Scoring
   # Only scores passed in are included in this sum.
   def compute_total_score(assignment, scores)
     total = 0
-    assignment.questionnaires.each { |questionnaire| total += questionnaire.get_weighted_score(assignment, scores) }
+    # assignment.questionnaires.each { |questionnaire| total += questionnaire.get_weighted_score(assignment, scores) }
+    counter_for_same_rubric = 0
+    assignment.questionnaires.each do |questionnaire|
+      if assignment.vary_by_round? && questionnaire.type == "ReviewQuestionnaire"
+        questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment.id, questionnaire_id: questionnaire.id)
+        if questionnaires.count > 1
+          round = questionnaires[counter_for_same_rubric].used_in_round
+          counter_for_same_rubric += 1
+        else
+          round = questionnaires[0].used_in_round
+          counter_for_same_rubric = 0
+        end
+      else
+        round = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: questionnaire.id).used_in_round
+      end
+      # create symbol for "varying rubrics" feature -Yang
+      questionnaire_symbol = if round.nil?
+                               questionnaire.symbol
+                             else
+                               (questionnaire.symbol.to_s + round.to_s).to_sym
+                             end
+      aq = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: questionnaire.id)
+      if !scores[questionnaire_symbol][:scores][:avg].nil?
+        total += scores[questionnaire_symbol][:scores][:avg] * aq.questionnaire_weight / 100.0
+      end
+    end
     total
   end
 
@@ -177,8 +202,24 @@ module Scoring
   # returns all the associated reviews with a participant, indexed under :assessments
   # returns the score assigned for the TOTAL body of responses associated with the user
   def compute_assignment_score(participant, questions, scores)
+    counter_for_same_rubric = 0
     participant.assignment.questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.find_by(assignment_id: participant.assignment.id, questionnaire_id: questionnaire.id).used_in_round
+
+      if participant.assignment.vary_by_round? && questionnaire.type == "ReviewQuestionnaire"
+        questionnaires = AssignmentQuestionnaire.where(assignment_id: participant.assignment.id, questionnaire_id: questionnaire.id)
+        if questionnaires.count > 1
+          round = questionnaires[counter_for_same_rubric].used_in_round
+          counter_for_same_rubric += 1
+        else
+          round = questionnaires[0].used_in_round
+          counter_for_same_rubric = 0
+        end
+      else
+        round = AssignmentQuestionnaire.find_by(assignment_id: participant.assignment.id, questionnaire_id: questionnaire.id).used_in_round
+      end
+
+      
       # create symbol for "varying rubrics" feature -Yang
       questionnaire_symbol = if round.nil?
                                questionnaire.symbol

@@ -2,7 +2,7 @@
 <%= render :partial => 'submitted_content/main', :locals => {:participant => participant, :stage => participant.assignment.current_stage(topic_id)} %>
 
 <% unless controller.action_name == "view_my_scores" %>
-   <% participant = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, @assignment.id)
+   <% participant = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, @assignment.id).get_reviewer
       reviewer = participant.get_reviewer unless participant.nil?
       #ACS Map the reviewee to a team
       unless reviewer.nil?

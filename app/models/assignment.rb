@@ -45,13 +45,15 @@ class Assignment < ApplicationRecord
   DEFAULT_MAX_REVIEWERS = 3
   DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
 
+  # E2243: Check if a user is on a team based on user_id and participant_id
+  # check based on user_id must be removed when user_id is removed from teams_users table
   def user_on_team?(user)
     teams = self.teams
-    users = []
+    result = false
     teams.each do |team|
-      users << team.users
+      result ||= team.user?(user)
     end
-    users.flatten.include? user
+    result
   end
 
   def self.max_outstanding_reviews

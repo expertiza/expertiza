@@ -69,15 +69,17 @@ class Course < ApplicationRecord
     end
   end
 
+  # E2243: Check if a user is on a team based on user_id and participant_id
+  # check based on user_id must be removed when user_id is removed from teams_users table
   def user_on_team?(user)
     teams = get_teams
-    users = []
+    result = false
     teams.each do |team|
-      users << team.users
+      result ||= team.user?(user)
+      break if result
     end
-    users.flatten.include? user
+    result
   end
-
   require 'analytic/course_analytic'
   include CourseAnalytic
 end

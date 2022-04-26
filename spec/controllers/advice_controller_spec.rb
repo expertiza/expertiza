@@ -7,6 +7,7 @@ describe AdviceController do
   end
 
   describe '#action_allowed?' do
+    let(:questionnaire) { build(:questionnaire, id: 1) }
     context 'when the role of current user is Super-Admin' do
       # Checking for Super-Admin
       it 'allows certain action' do

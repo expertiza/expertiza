@@ -5,6 +5,9 @@ describe AdviceController do
   let(:questionnaire) do
     build(id: 1, name: 'questionnaire', ta_id: 8, course_id: 1, private: false, min_question_score: 0, max_question_score: 5, type: 'ReviewQuestionnaire')
   end
+  before(:each) do
+    allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
+  end
 
   describe '#action_allowed?' do
     let(:questionnaire) { build(:questionnaire, id: 1) }

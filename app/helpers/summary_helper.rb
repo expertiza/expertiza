@@ -42,7 +42,7 @@ module SummaryHelper
     end
 
     def summarize_sentences(comments, summary_ws_url)
-      summary = ""
+      # summary = ""
       param = { sentences: comments }
       # call web service
       begin
@@ -52,7 +52,7 @@ module SummaryHelper
         ps = PragmaticSegmenter::Segmenter.new(text: summary)
         return ps.segment
       rescue StandardError => e
-        summary = [e.message]
+        # summary = [e.message]
         return ['Problem with WebServices', 'Please contact the Expertiza Development team']
       end
     end
@@ -76,8 +76,9 @@ module SummaryHelper
       if answer.nil?
         return nil
       end
-      sentences = answer.comments.split(/[.,?,!]/) 
-      sentences.each{ |sentence| sentence.strip! }
+
+      sentences = answer.comments.split(/[.,?,!]/)
+      sentences.each { |sentence| sentence.strip! }
 
       sentences
     end

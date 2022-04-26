@@ -15,7 +15,7 @@ class RevisionPlanQuestionnairesController < QuestionnairesController
       super
     end
   end
-  
+
   def new
     begin
       questionnaire = RevisionPlanQuestionnaire.get_questionnaire_for_current_round(params[:team_id])
@@ -23,5 +23,5 @@ class RevisionPlanQuestionnairesController < QuestionnairesController
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
-  end 
+  end
 end

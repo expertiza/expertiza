@@ -226,8 +226,8 @@ class SubmittedContentController < ApplicationController
     newloc += '/'
     newloc += params[:faction][:move]
     begin
-        FileHelper.move_file(old_filename, newloc)
-        flash[:note] = "The file was successfully moved from \"/#{params[:filenames][params[:chk_files]]}\" to \"/#{params[:faction][:move]}\""
+      FileHelper.move_file(old_filename, newloc)
+      flash[:note] = "The file was successfully moved from \"/#{params[:filenames][params[:chk_files]]}\" to \"/#{params[:faction][:move]}\""
     rescue StandardError => e
       flash[:error] = 'There was a problem moving the file: ' + e.message
     end

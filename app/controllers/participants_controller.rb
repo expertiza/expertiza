@@ -157,8 +157,8 @@ class ParticipantsController < ApplicationController
     name = contributor.name
     assignment_id = contributor.assignment
     begin
-        contributor.destroy
-        flash[:note] = "\"#{name}\" is no longer a participant in this assignment."
+      contributor.destroy
+      flash[:note] = "\"#{name}\" is no longer a participant in this assignment."
     rescue StandardError
       flash[:error] = "\"#{name}\" was not removed from this assignment. Please ensure that \"#{name}\" is not a reviewer or metareviewer and try again."
     end

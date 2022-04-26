@@ -1,7 +1,29 @@
 describe AdviceController do
+  let(:questionnaire) do
+    build(id: 1, name: 'questionnaire', ta_id: 8, course_id: 1, private: false, min_question_score: 0, max_question_score: 5, type: 'ReviewQuestionnaire')
+  end
+  let(:questionnaire) { build(:questionnaire) }
+  let(:quiz_questionnaire) { build(:questionnaire, type: 'QuizQuestionnaire') }
+  let(:review_questionnaire) { build(:questionnaire, type: 'ReviewQuestionnaire') }
+  let(:question) { build(:question, id: 1) }
+  
   let(:super_admin) { build(:superadmin, id: 1, role_id: 5) }
   let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, name: 'Instructor1') }
   let(:student1) { build(:student, id: 21, role_id: 1) }
+
+  let(:questionnaire1) { build(questionnaire, id: 1, assignment_id: 1, questionnaire_id: 1, used_in_round: 1) }
+  let(:questionnaire2) { build(questionnaire, id: 2, assignment_id: 1, questionnaire_id: 2, used_in_round: 2) }
+  let(:assignment) { build(assignment, id: 1) }
+  let(:due_date1) { build(due_date, id: 1, due_at: '2019-11-30 23:30:12', deadline_type_id: 1, parent_id: 1, round: 1) }
+  let(:due_date2) { build(due_date, id: 2, due_at: '2500-12-30 23:30:12', deadline_type_id: 2, parent_id: 1, round: 1) }
+  let(:due_date3) { build(due_date, id: 3, due_at: '2019-01-30 23:30:12', deadline_type_id: 1, parent_id: 1, round: 2) }
+  let(:due_date4) { build(due_date, id: 4, due_at: '2019-02-28 23:30:12', deadline_type_id: 2, parent_id: 1, round: 2) }
+  let(:assignment_questionnaire1) { build(assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 1, used_in_round: 1) }
+  let(:assignment_questionnaire2) { build(assignment_questionnaire, id: 2, assignment_id: 1, questionnaire_id: 2, used_in_round: 2) }
+  before(:each) do
+    allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
+    stub_current_user(instructor, instructor.role.name, instructor.role)
+  end
 
   describe '#action_allowed?' do
     context 'when the role of current user is Super-Admin' do

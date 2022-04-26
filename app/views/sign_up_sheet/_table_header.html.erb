@@ -13,7 +13,7 @@
   <th width="5%"><%=t ".num_slots"%></th>
   <th width="5%"><%=t ".available_slots"%></th>
   <th width="5%"><%=t ".num_waitlist"%></th>
-  <% if session[:user].role_id == 2 %>    
+  <% if @assignment.is_intelligent && current_user_has_instructor_privileges? %>    
     <th width="5%"><%=t ".num_bids"%></th>
     <th width="5%"><%=t ".num_1_2_bids"%></th>
   <% end %>

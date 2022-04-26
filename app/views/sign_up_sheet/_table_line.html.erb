@@ -83,7 +83,7 @@
   <td align="center"><%= topic.max_choosers %></td>
   <%= render :partial => '/sign_up_sheet/available_slots', :locals => {:topic=>topic} %>
   <%= render :partial => '/sign_up_sheet/num_waiting', :locals => {:topic=>topic} %>
-  <% if session[:user].role_id == 2 %>  
+  <% if @assignment.is_intelligent && current_user_has_instructor_privileges?  %>  
     <%= render :partial => '/sign_up_sheet/total_bids', :locals => {:topic=>topic} %>
     <%= render :partial => '/sign_up_sheet/total_1_2_bids', :locals => {:topic=>topic}%>
   <% end %>

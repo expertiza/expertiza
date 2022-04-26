@@ -8,6 +8,7 @@ describe AdviceController do
       # Checking for Super-Admin
       it 'allows certain action' do
         stub_current_user(super_admin, super_admin.role.name, super_admin.role)
+        controller.params = { id: '1' }
         expect(controller.send(:action_allowed?)).to be_truthy
       end
     end
@@ -15,6 +16,7 @@ describe AdviceController do
       # Checking for Instructor
       it 'allows certain action' do
         stub_current_user(instructor1, instructor1.role.name, instructor1.role)
+        controller.params = { id: '10' }
         expect(controller.send(:action_allowed?)).to be_truthy
       end
     end
@@ -22,6 +24,7 @@ describe AdviceController do
       # Checking for Student
       it 'refuses certain action' do
         stub_current_user(student1, student1.role.name, student1.role)
+        controller.params = { id: '21' }
         expect(controller.send(:action_allowed?)).to be_falsey
       end
     end

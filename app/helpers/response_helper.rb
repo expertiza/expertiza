@@ -51,11 +51,11 @@ module ResponseHelper
 
   def set_questions_for_new_response
     @review_questions = sort_questions(@questionnaire.questions)
-    if(@assignment && @assignment.is_revision_planning_enabled)
+    if (@assignment && @assignment.is_revision_planning_enabled)
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
       current_round = @assignment.number_of_current_round(reviewees_topic)
       @revision_plan_questionnaire = RevisionPlanTeamMap.find_by(team_id: @map.reviewee_id, used_in_round: current_round).try(:questionnaire)
-      if(@revision_plan_questionnaire)
+      if (@revision_plan_questionnaire)
         @review_questions += sort_questions(@revision_plan_questionnaire.questions)
       end
     end
@@ -66,8 +66,7 @@ module ResponseHelper
     @review_questions = []
     answers = @response.scores
     questionnaires = @response.questionnaires_by_answers(answers)
-    questionnaires.each {|questionnaire| @review_questions += sort_questions(questionnaire.questions) }
+    questionnaires.each { |questionnaire| @review_questions += sort_questions(questionnaire.questions) }
     return @review_questions
   end
-
 end

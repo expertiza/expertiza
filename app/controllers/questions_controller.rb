@@ -88,7 +88,7 @@ class QuestionsController < ApplicationController
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
-    if(question.questionnaire.type == 'RevisionPlanQuestionnaire')
+    if (question.questionnaire.type == 'RevisionPlanQuestionnaire')
       redirect_to edit_revision_plan_questionnaire_path(questionnaire_id.to_s.to_sym)
     else
       redirect_to edit_questionnaire_path(questionnaire_id.to_s.to_sym)

@@ -322,10 +322,10 @@ class Response < ApplicationRecord
         end
       end
     end
-    comment = if additional_comment.nil?
-      ''
+    if additional_comment.nil?
+      comment = ''
     else
-      additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
+      comment = additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
     end
     code += '</table>' + "<h5>Additional Comment</h5>" + '<table id="review_' + self_id + '" class="table table-bordered">' + '<tr><td>' + comment + '</td></tr>' + '</table>'
     code

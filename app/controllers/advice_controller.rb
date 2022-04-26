@@ -13,9 +13,10 @@ class AdviceController < ApplicationController
     if (user_logged_in? && questionnaire.owner?(session[:user].id))
       return true
     end
-    
+
     current_user_has_ta_privileges?
   end
+
   # checks whether the advices for a question in questionnaire have valid attributes
   # return true if the number of advices and their scores are invalid, else returns false
   def invalid_advice?(sorted_advice, num_advices, question)
@@ -24,6 +25,7 @@ class AdviceController < ApplicationController
     (sorted_advice[0].score != @questionnaire.max_question_score) ||
     (sorted_advice[sorted_advice.length - 1].score != @questionnaire.min_question_score))
   end
+
   # Modify the advice associated with a questionnaire
   def edit_advice
     # Stores the questionnaire with given id in URL
@@ -46,6 +48,7 @@ class AdviceController < ApplicationController
       end
     end
   end
+
   # save the advice for a questionnaire
   def save_advice
     # Stores the questionnaire with given id in URL

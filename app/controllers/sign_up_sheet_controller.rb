@@ -360,10 +360,10 @@ class SignUpSheetController < ApplicationController
           next if instance_variable_get('@topic_' + deadline_type + '_due_date') == instance_variable_get('@assignment_' + deadline_type + '_due_date')
 
           topic_due_date = begin
-                             TopicDueDate.where(parent_id: topic.id, deadline_type_id: deadline_type_id, round: i).first
-                           rescue StandardError
-                             nil
-                           end
+            TopicDueDate.where(parent_id: topic.id, deadline_type_id: deadline_type_id, round: i).first
+          rescue StandardError
+            nil
+          end
           if topic_due_date.nil? # create a new record
             TopicDueDate.create(
               due_at: instance_variable_get('@topic_' + deadline_type + '_due_date'),

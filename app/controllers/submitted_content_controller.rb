@@ -230,7 +230,7 @@ class SubmittedContentController < ApplicationController
         flash[:note] = "The file was successfully moved from \"/#{params[:filenames][params[:chk_files]]}\" to \"/#{params[:faction][:move]}\""
     rescue StandardError => e
       flash[:error] = 'There was a problem moving the file: ' + e.message
-      end
+    end
   end
 
   def rename_selected_file

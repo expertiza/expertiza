@@ -83,6 +83,7 @@ module SignUpSheetHelper
       team_id = nil
       participants.each do |participant|
         next unless topic.id == participant.topic_id
+
         team_id = participant.team.try(:id)
       end
 
@@ -92,7 +93,7 @@ module SignUpSheetHelper
         sign_up_topic = SignUpTopic.find_by(id: b.topic_id)
         signed_up_topics << sign_up_topic if sign_up_topic
       end
-      
+
       out_string = ''
       signed_up_topics.each_with_index do |t, i|
         out_string += (i + 1).to_s + ". " + t.topic_name + "\r\n"

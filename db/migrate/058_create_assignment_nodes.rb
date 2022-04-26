@@ -1,4 +1,4 @@
-class CreateAssignmentNodes < ActiveRecord::Migration
+class CreateAssignmentNodes < ActiveRecord::Migration[4.2]
   def self.up
     assignments = Assignment.all
 

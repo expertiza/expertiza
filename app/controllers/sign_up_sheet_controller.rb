@@ -400,7 +400,9 @@ class SignUpSheetController < ApplicationController
 
   # This method is called when a student click on the trumpet icon. So this is a bad method name. --Yang
   def show_team
-    if !(assignment = Assignment.find(params[:assignment_id])).nil? && !(topic = SignUpTopic.find(params[:id])).nil?
+    assignment = Assignment.find(params[:assignment_id])
+    topic = SignUpTopic.find(params[:id])
+    if assignment && topic
       @results = ad_info(assignment.id, topic.id)
       @results.each do |result|
         result.keys.each do |key|
@@ -420,8 +422,19 @@ class SignUpSheetController < ApplicationController
   def switch_original_topic_to_approved_suggested_topic
     assignment = AssignmentParticipant.find(params[:id]).assignment
     team_id = TeamsUser.team_id(assignment.id, session[:user].id)
+
+    # Tmp variable to store topic id before change
     original_topic_id = SignedUpTeam.topic_id(assignment.id.to_i, session[:user].id)
-    SignUpTopic.find(params[:topic_id]).update_attribute(:private_to, nil) if SignUpTopic.exists?(params[:topic_id])
+
+    # Check if this sign up topic exists
+    if SignUpTopic.exists?(id: params[:topic_id])
+      SignUpTopic.find_by(id: params[:topic_id]).update_attribute(:private_to, nil)
+    else
+      # Else flash an error
+      flash[:error] = 'Signup topic does not exist.'
+    end
+
+    # Change to dynamic finder method to prevent sql injection
     if SignedUpTeam.exists?(team_id: team_id, is_waitlisted: 0)
       SignedUpTeam.where(team_id: team_id, is_waitlisted: 0).first.update_attribute('topic_id', params[:topic_id].to_i)
     end
@@ -435,7 +448,7 @@ class SignUpSheetController < ApplicationController
   end
 
   def publish_approved_suggested_topic
-    SignUpTopic.find(params[:topic_id]).update_attribute(:private_to, nil) if SignUpTopic.exists?(params[:topic_id])
+    SignUpTopic.find_by(id: params[:topic_id]).update_attribute(:private_to, nil) if SignUpTopic.exists?(id: params[:topic_id])
     redirect_to action: 'list', id: params[:id]
   end
 
@@ -480,7 +493,7 @@ class SignUpSheetController < ApplicationController
   # clicks to see ads related to a topic
   def ad_info(_assignment_id, topic_id)
     @ad_information = []
-    @signed_up_teams = SignedUpTeam.where('topic_id = ?', topic_id.to_s)
+    @signed_up_teams = SignedUpTeam.where(topic_id: topic_id)
     # Iterate through the results of the query and get the required attributes
     @signed_up_teams.each do |signed_up_team|
       team = signed_up_team.team

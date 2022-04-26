@@ -1,4 +1,4 @@
-class Course < ActiveRecord::Base
+class Course < ApplicationRecord
   enum locale: Locale.code_name_to_db_encoding
   has_many :ta_mappings, dependent: :destroy
   has_many :tas, through: :ta_mappings

@@ -3,6 +3,16 @@ FactoryBot.define do
     name 'North Carolina State University'
   end
 
+  factory :markup_style, class: MarkupStyle do
+    name 'Duy Test'
+  end 
+
+  factory :lock, class: Lock do
+    lockable_id 123
+    lockable_type 'Duy lockable test'
+    user_id 1234
+  end 
+
   factory :review_bid, class: ReviewBid do
     priority 2
     signuptopic_id 123
@@ -209,7 +219,6 @@ FactoryBot.define do
     num_reviews_allowed 3
     num_metareviews_allowed 3
     is_calibrated false
-    has_badge false
     allow_selecting_additional_reviews_after_1st_round false
     auto_assign_mentor false
   end
@@ -552,23 +561,6 @@ FactoryBot.define do
     self_introduction 'no one'
   end
 
-  factory :badge, class: Badge do
-    name 'Good Reviewer'
-    description 'description'
-    image_name 'good-reviewer.png'
-  end
-
-  factory :assignment_badge, class: AssignmentBadge do
-    badge { Badge.first || association(:badge) }
-    assignment { Assignment.first || association(:assignment) }
-    threshold 95
-  end
-
-  factory :awarded_badge, class: AwardedBadge do
-    badge { Badge.first || association(:badge) }
-    participant { AssignmentParticipant.first || association(:participant) }
-  end
-
   factory :menu_item, class: MenuItem do
     parent_id nil
     name 'home'
@@ -704,7 +696,6 @@ FactoryBot.define do
     commenter 'oss topic'
     vote 'Y'
     suggestion_id 1
-    visible_to_student 0
   end
 
   factory :answer_tag, class: AnswerTag do

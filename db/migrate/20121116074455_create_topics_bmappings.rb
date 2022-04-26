@@ -1,4 +1,4 @@
-class CreateTopicsBmappings < ActiveRecord::Migration
+class CreateTopicsBmappings< ActiveRecord::Migration[4.2]
   def self.up
     if table_exists?(:bmappings_sign_up_topics) == false
       create_table :bmappings_sign_up_topics, id: false do |t|

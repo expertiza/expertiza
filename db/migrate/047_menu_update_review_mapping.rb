@@ -1,4 +1,4 @@
-class MenuUpdateReviewMapping < ActiveRecord::Migration
+class MenuUpdateReviewMapping < ActiveRecord::Migration[4.2]
   def self.up
     permission1 = Permission.find_by_name('administer assignments')
     menuParent = MenuItem.find_by_label('Assignment Creation')

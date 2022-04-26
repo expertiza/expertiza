@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class JoinTeamRequestsController < ApplicationController
   include AuthorizationHelper
 
@@ -36,6 +38,12 @@ class JoinTeamRequestsController < ApplicationController
     @join_team_request.team_id = params[:team_id]
 
     participant = Participant.where(user_id: session[:user][:id], parent_id: params[:assignment_id]).first
+    team = Team.find(params[:team_id])
+    if team.participants.include? participant
+      flash[:error] = 'You already belong to the team'
+      redirect_back
+      return
+    end
     @join_team_request.participant_id = participant.id
     respond_to do |format|
       if @join_team_request.save
@@ -51,7 +59,7 @@ class JoinTeamRequestsController < ApplicationController
   # update join team request entry for join_team_request table and add it to the table
   def update
     respond_to do |format|
-      if @join_team_request.update_attribute(:comments, params[:join_team_request][:comments])
+      if @join_team_request.update(join_team_request_params)
         format.html { redirect_to(@join_team_request, notice: 'JoinTeamRequest was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -96,5 +104,9 @@ class JoinTeamRequestsController < ApplicationController
       format.html
       format.xml { render xml: request }
     end
+  end
+
+  def join_team_request_params
+    params.require(:join_team_request).permit(:comments, :status)
   end
 end

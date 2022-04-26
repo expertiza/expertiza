@@ -3,19 +3,19 @@ class RevisionPlanQuestionnairesController < QuestionnairesController
     case params[:action]
     when 'edit'
       @team_members = Array.new
-      questionnaire = Questionnaire.find(params[:id])
-        
+      # questionnaire = Questionnaire.find(params[:id])
+
       TeamsUser.where(["team_id = ?", params[:team_id]]).each do |teamuser|
-        @team_members.push( teamuser.user_id)
+        @team_members.push(teamuser.user_id)
       end
-              
-      (user_logged_in? && 
-      @team_members.collect { |u| u.id }.include?(session[:user].id)) || super    
+
+      (user_logged_in? &&
+      @team_members.collect { |u| u.id }.include?(session[:user].id)) || super
     else
       super
     end
   end
-  
+
   def new
     begin
       questionnaire = RevisionPlanQuestionnaire.get_questionnaire_for_current_round(params[:team_id])
@@ -23,5 +23,5 @@ class RevisionPlanQuestionnairesController < QuestionnairesController
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
-  end 
+  end
 end

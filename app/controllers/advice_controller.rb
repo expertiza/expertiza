@@ -13,6 +13,7 @@ class AdviceController < ApplicationController
     if (user_logged_in? && questionnaire.owner?(session[:user].id))
       return true
     end
+    
     current_user_has_ta_privileges?
   end
 
@@ -47,7 +48,7 @@ class AdviceController < ApplicationController
       end
     end
   end
-  
+
   # save the advice for a questionnaire
   def save_advice
     # Stores the questionnaire with given id in URL

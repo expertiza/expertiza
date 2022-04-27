@@ -39,7 +39,7 @@ module ResponseHelper
     @contributor = @map.contributor
     new_response ? questionnaire_from_response_map : questionnaire_from_response
     set_dropdown_or_scale
-    new_response ? set_questions_for_new_response : set_questions  
+    new_response ? set_questions_for_new_response : set_questions
     # @review_questions = sort_questions(@questionnaire.questions)
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
@@ -67,7 +67,7 @@ module ResponseHelper
     @review_questions = []
     answers = @response.scores
     questionnaires = @response.questionnaires_by_answers(answers)
-    questionnaires.each {|questionnaire| @review_questions += sort_questions(questionnaire.questions).sort_by(&:seq)  }
+    questionnaires.each { |questionnaire| @review_questions += sort_questions(questionnaire.questions).sort_by(&:seq) }
     return @review_questions
   end
 end

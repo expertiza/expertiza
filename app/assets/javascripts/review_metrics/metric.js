@@ -36,20 +36,20 @@ class Metric {
                 else {
                     let reason = {
                         status: this.status,
-                        statusText: xhr.statusText
+                        statusText: xhr.statusText //Checking the status for API
                     };
                     reject(
-                        new Error(JSON.stringify(reason))
+                        new Error(JSON.stringify(reason)) // Checking for Errors while loading API
                     );
                 }
             };
             xhr.onerror = function () {
                 let reason = {
                     status: this.status,
-                    statusText: xhr.statusText
+                    statusText: xhr.statusText // Checking for status of API
                 };
                 reject(
-                    new Error(JSON.stringify(reason))
+                    new Error(JSON.stringify(reason)) // Checking for Errors why API is not loading
                 );
             };
             xhr.send(final_json);

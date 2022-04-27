@@ -69,7 +69,7 @@ function fetch_response_comments() {
 }
 
 //This function takes in the processed api output to display a table(populated with API output) on UI
-function generate_table(responses, config_file_api_call_values, processed_comment_json, number_of_comments, config_file_values) {
+function generate_table(responses, config_file_api_call_values, processed_comment_json, config_file_values) {
 
     // tooltip_json to store the text displayed in tooltip
     // Create a table header row using the extracted headers above.
@@ -85,25 +85,7 @@ function generate_table(responses, config_file_api_call_values, processed_commen
             column_names.push(column_head);
             tool_tips[column_head] = config_file_api_call_values[metric]['toolTipText'];
         }
-    }
-
-    // Create an empty list for our output
-    let merged_responses = [];
-
-    // Loop through each response and add the respective response to the merged_responses list to be displayed on UI
-    for (let i = 0; i < number_of_comments; i++) {
-        single_output = {};
-        single_output["Comment Number"] = i + 1;
-
-        // Loop through each metric
-        for (let j = 1; j < metrics_to_check.length; j++) {
-            let metric_response = responses[metrics_to_check[j]];
-            single_output[metrics_to_check[j]] = metric_response[i][metrics_to_check[j]];
-        }
-
-        // Add the single_output to the merged_responses list
-        merged_responses.push(single_output);
-    }
+    }   
 
     // Create the table
     let table = document.createElement("table");
@@ -120,12 +102,12 @@ function generate_table(responses, config_file_api_call_values, processed_commen
     }
 
     // add json data to the table as rows.
-    for (var i = 0; i < merged_responses.length; i++) {
+    for (var i = 0; i < responses.length; i++) {
         table_row = table.insertRow(-1);
 
         for (var j = 0; j < metrics_to_check.length; j++) {
             var table_cell = table_row.insertCell(-1);
-            table_cell.innerHTML = merged_responses[i][metrics_to_check[j]]
+            table_cell.innerHTML = responses[i][metrics_to_check[j]]
             if (j == 0) {
                 let title = "Q) " + processed_comment_json_string[i]['question'] + "\nA) " + processed_comment_json_string[i]['text'];
                 table_cell.innerHTML += `<img src="/assets/info.png" title='` + title.replace("'", "") + `'>`;
@@ -159,14 +141,19 @@ async function make_api_calls(config_file_api_call_values, config_file_values, p
 
 function combine_api_output(config_file_api_call_values, number_of_comments, config_file_values, analysis_response_dict) {
     // This loop combines the output received by API's in an array
-    let responses = {};
+    let responses = [];
 
-    for (let metric in config_file_api_call_values) {
-        if (config_file_values.includes(metric)) {
-            metric_object_str = eval(config_file_api_call_values[metric]['className']);
-            const metric_object = new metric_object_str(config_file_api_call_values[metric]['URL']);
-            responses[config_file_api_call_values[metric]['className']] = metric_object.format_response(analysis_response_dict, metric, config_file_api_call_values[metric]['className'], number_of_comments);
+    for (let i = 0; i < number_of_comments; i++) {
+        let single_comment_output = {}
+        single_comment_output["Comment Number"] = i + 1;
+        for (let metric in config_file_api_call_values) {
+            if (config_file_values.includes(metric)) {
+                metric_object_str = eval(config_file_api_call_values[metric]['className']);
+                const metric_object = new metric_object_str(config_file_api_call_values[metric]['URL']);
+                single_comment_output[config_file_api_call_values[metric]['className']] = metric_object.format_response(analysis_response_dict, metric, config_file_api_call_values[metric]['className'], i);
+            }
         }
+        responses.push(single_comment_output);
     }
     return responses;
 }
@@ -199,7 +186,7 @@ async function get_review_feedback() {
     responses = combine_api_output(config_file_api_call_values, number_of_comments, config_file_values, analysis_response_dict);
 
     // function to display the output in tabular format
-    generate_table(responses, config_file_api_call_values, processed_comment_json, number_of_comments, config_file_values);
+    generate_table(responses, config_file_api_call_values, processed_comment_json, config_file_values);
 
     // stop the timer here - which will be used to calculate total time taken.
     time_end = performance.now();

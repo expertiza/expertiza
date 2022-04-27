@@ -222,7 +222,7 @@ module GradesHelper
         else
           round = questionnaires[0].used_in_round
           counter_for_same_rubric = 0
-        end        
+        end
       end
       questionnaire_symbol = if round.nil?
                                questionnaire.symbol

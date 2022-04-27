@@ -221,7 +221,7 @@ class GradesController < ApplicationController
   end
 
   private
-  
+
   def populate_view_model(questionnaire)
     vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
     vmquestions = questionnaire.questions

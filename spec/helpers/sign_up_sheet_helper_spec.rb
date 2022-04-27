@@ -86,4 +86,24 @@ describe 'SignUpSheetHelper' do
       expect { helper.render_participant_info(@topic1, @assignment1, [@participant1]) }.to raise_exception(NoMethodError)
     end
   end
+
+  describe '#get_team_bids' do
+    before(:each) do
+      @assignment1 = create(:assignment, name: 'final 1', directory_path: 'final_1')
+      @topic1 = create(:topic, assignment: @assignment1)
+      @assignment2 = create(:assignment, name: 'final 2', directory_path: 'final_2')
+      @topic2 = create(:topic, assignment: @assignment2)
+      @participant1 = create(:participant, assignment: @assignment1)
+    end
+
+    it 'The get_team_bids method return an empty string' do
+      out_string = helper.get_team_bids(@topic1, [@participant1])
+      expect(out_string).to be_nil
+    end
+
+    it 'The get_team_bids method should throw an exception' do
+      expect { helper.get_team_bids(@topic1, @assignment1, nil) }.to raise_exception(ArgumentError)
+    end
+  end  
+
 end

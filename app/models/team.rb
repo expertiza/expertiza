@@ -263,7 +263,7 @@ class Team < ApplicationRecord
   # existing logic of User model.
   def name(ip_address = nil)
     if User.anonymized_view?(ip_address)
-      return "Anonymized_Team_#{self[:id]}"
+      return "Team_#{self[:id]}"
     else
       return self[:name]
     end

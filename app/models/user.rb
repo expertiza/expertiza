@@ -121,7 +121,7 @@ class User < ApplicationRecord
   # is set or not.
   def fullname(ip_address = nil)
     if User.anonymized_view?(ip_address)
-      return "Anonymized_User_#{self[:id]}"
+      return "User_#{self[:id]}"
     else
       return self[:fullname]
     end

@@ -93,10 +93,10 @@ function toggleFunction(elementId) {
           <span style="width:100%;">
               <% if vm.questionnaire_display_type == "Author Feedback" %>
                 <% user_name = User.find(@participant.user_id).fullname(session[:ip]).to_s %>
-                <h4 style="font-weight:bold;display:inline-block;"><%= vm.questionnaire_display_type + " by "+ user_name %>
+                <h4 style="font-weight:bold;display:inline-block;"><%= vm.questionnaire_display_type + " for "+ user_name + "'s review"%>
               <% else %>
                 <% user_name = User.find(@participant.user_id).fullname(session[:ip]).to_s %>
-                <h4 style="font-weight:bold;display:inline-block;"><%= vm.questionnaire_display_type + " for "+ user_name %>
+                <h4 style="font-weight:bold;display:inline-block;"><%= vm.questionnaire_display_type + " for "+ user_name + "'s contribution"%>
               <% end %>
               
                 <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
@@ -260,7 +260,7 @@ function toggleFunction(elementId) {
             <!--<div class="flash_error">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>-->
 
         <div style="margin-top:5px"></div>
-        <h5 style="font-weight:bold;display:inline-block;"> Composite score for the heatgrid above is <%= total/count %></h5><br/>
+        <h5 style="font-weight:bold;display:inline-block;"> Composite score for the heatgrid above is <%= (total/count).round(3) %></h5><br/>
         <div style="margin-top:5px"></div>
         <% end %>
         <br/> 

@@ -414,17 +414,19 @@ class AssignmentForm
     MailWorker.perform_in(find_min_from_now(Time.parse(due_date.due_at.to_s(:db)) + simicheck_delay.to_i.hours).minutes.from_now * 60, @assignment.id, 'compare_files_with_simicheck', due_date.due_at.to_s(:db))
   end
 
-  # Create new teams/participants and copy their reviews
+  # Copy teams/participants/reviews needed to move calibrated reviews to new assignment
   def self.copy_calibrated_reviews(old_assignment, new_assignment_id)
-    # copy submission records for the assignment
-    SubmissionRecord.copy_submission_records_for_assignment(old_assignment, new_assignment_id)
-    Team.copy_teams_for_assignment(old_assignment.id, new_assignment_id)
-    Participant.copy_participants_for_assignment(old_assignment.id, new_assignment_id)
-    # Do we care about the 'Teams users' table that maps users to teams?  Participants are still linked to the
-    # assignment by the parent_id
+    if old_assignment.is_calibrated
+      # copy submission records for the assignment
+      SubmissionRecord.copy_submission_records_for_assignment(old_assignment, new_assignment_id)
+      Team.copy_teams_for_assignment(old_assignment.id, new_assignment_id)
+      Participant.copy_participants_for_assignment(old_assignment.id, new_assignment_id)
+      # Next we need to create new TeamsUsers mapping the new participants to the new teams
+      # in the same relationship as the old ones
 
-    # TODO - when we copy the reviews, we need to make sure we properly increment submitter_count
-    #        submitter_count is a column in the assignments table
+      # TODO - when we copy the reviews, we need to make sure we properly increment submitter_count
+      #        submitter_count is a column in the assignments table
+    end
   end
 
   # Copies the inputted assignment into new one and returns the new assignment id

@@ -55,6 +55,10 @@ class TeamsUser < ApplicationRecord
     can_add_member
   end
 
+  def self.create_mapping_from_old_assignment(old_assignment_id, new_assignment_id)
+    #TODO - find how participants/teams were linked in old assignment, setup new participants/teams the same way
+  end
+
   # 2015-5-27 [zhewei]:
   # We just remove the topic_id field from the participants table.
   def self.team_id(assignment_id, user_id)

@@ -82,8 +82,8 @@ class Team < ApplicationRecord
   # Copies all teams with parent_id set to old assignment ID, sets there parent_id to new assignment ID
   def self.copy_teams_for_assignment(old_assign_id, new_assign_id)
     teams_to_copy = Team.where(parent_id: old_assign_id)
-    teams_to_copy.each do |team|
-      new_team = team.dup
+    teams_to_copy.each do |original_team|
+      new_team = original_team.dup
       new_team.parent_id = new_assign_id
       new_team.save # should we check if this successful?
     end

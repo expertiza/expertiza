@@ -153,25 +153,12 @@ class Participant < ApplicationRecord
   end
 
   # creates new participants with all the same fields as the old participants
-  def self.createparticipant(matt,old_assign, new_assign_id)
-    @old_participant = Participant.where(user_id: matt.user_id, parent_id: old_assign.id)
-    @old_participant.each do |natt|
-      @new_participant = Participant.new
-      @new_participant.can_submit = natt.can_submit
-      @new_participant.can_review = natt.can_review
-      @new_participant.user_id = matt.user_id
-      @new_participant.parent_id = new_assign_id
-      @new_participant.submitted_at = natt.submitted_at
-      @new_participant.permission_granted = natt.permission_granted
-      @new_participant.penalty_accumulated = natt.penalty_accumulated
-      @new_participant.grade = natt.grade
-      @new_participant.type = natt.type
-      @new_participant.handle = natt.handle
-      @new_participant.time_stamp = natt.time_stamp
-      @new_participant.digital_signature = natt.digital_signature
-      @new_participant.duty = natt.duty
-      @new_participant.can_take_quiz = natt.can_take_quiz
-      @new_participant.save
+  def self.copy_participants_for_assignment(old_assign_id, new_assign_id)
+    participants_to_copy = Participant.where(parent_id: old_assign_id)
+    participants_to_copy.each do |original_participant|
+      new_participant = original_participant.dup
+      new_participant.parent_id = new_assign_id
+      new_participant.save # should we check it this is successful?
     end
   end
 

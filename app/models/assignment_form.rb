@@ -417,10 +417,11 @@ class AssignmentForm
   # Create new teams/participants and copy their reviews
   def self.copy_calibrated_reviews(old_assignment, new_assignment_id)
     # copy submission records for the assignment
-    SubmissionRecord.copy_assignment_submissions(old_assignment, new_assignment_id)
+    SubmissionRecord.copy_submission_records_for_assignment(old_assignment, new_assignment_id)
     Team.copy_teams_for_assignment(old_assignment.id, new_assignment_id)
-    #@new_teams = Team.where(parent_id: new_assignment_id)
-    #news_teams_ids = @new_teams.pluck(:id)
+    Participant.copy_participants_for_assignment(old_assignment.id, new_assignment_id)
+    # Do we care about the 'Teams users' table that maps users to teams?  Participants are still linked to the
+    # assignment by the parent_id
 
     # TODO - when we copy the reviews, we need to make sure we properly increment submitter_count
     #        submitter_count is a column in the assignments table

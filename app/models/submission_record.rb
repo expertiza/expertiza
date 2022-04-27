@@ -5,10 +5,11 @@ class SubmissionRecord < ApplicationRecord
   validates :user, presence: true
   validates :assignment_id, presence: true
 
-  def self.copy_assignment_submissions(old_assign, new_assign_id)
-    prev_submission_record = SubmissionRecord.where(assignment_id: old_assign.id)
-    prev_submission_record.each do |catt|
-      new_submission_record = catt.dup
+  # Copy all submission records for an old assignment to a new assignment
+  def self.copy_submission_records_for_assignment(old_assign_id, new_assign_id)
+    submission_records_to_copy = SubmissionRecord.where(assignment_id: old_assign_id)
+    submission_records_to_copy.each do |original_submission_record|
+      new_submission_record = original_submission_record.dup
       new_submission_record.assignment_id = new_assign_id
       new_submission_record.save # should we check if this is successful?
     end

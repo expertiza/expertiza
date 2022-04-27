@@ -188,7 +188,6 @@ module GradesHelper
           @vmlist << vm
         end
       end
-
     end
     # @current_role_name = current_role_name/
     render 'grades/view_heatgrid.html.erb'

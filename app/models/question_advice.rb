@@ -1,5 +1,5 @@
-class QuestionAdvice < ActiveRecord::Base
-  attr_accessible :score, :advice
+class QuestionAdvice < ApplicationRecord
+  # attr_accessible :score, :advice
   belongs_to :question
 
   # This method returns an array of fields present in question advice model

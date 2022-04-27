@@ -4,7 +4,7 @@
 ###
 ###
 
-class Assignment < ActiveRecord::Base
+class Assignment < ApplicationRecord
   require 'analytic/assignment_analytic'
   include Scoring
   include AssignmentAnalytic
@@ -30,8 +30,6 @@ class Assignment < ActiveRecord::Base
   has_many :response_maps, foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: :assignment
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: :assignment
   has_many :plagiarism_checker_assignment_submissions, dependent: :destroy
-  has_many :assignment_badges, dependent: :destroy
-  has_many :badges, through: :assignment_badges
   validates :name, presence: true
   validates :name, uniqueness: { scope: :course_id }
   validate :valid_num_review
@@ -60,8 +58,11 @@ class Assignment < ActiveRecord::Base
     DEFAULT_MAX_OUTSTANDING_REVIEWS
   end
 
+  # TODO app breaks when max team size is set as > 1 and team has only one member
   def team_assignment?
-    max_team_size > 1
+    # All assignments should be team assignments
+    # max_team_size > 1
+    true
   end
   alias team_assignment team_assignment?
 
@@ -261,11 +262,6 @@ class Assignment < ActiveRecord::Base
     microtask.nil? ? false : microtask
   end
 
-  # Check to see if assignment has badge
-  def badge?
-    has_badge.nil? ? false : has_badge
-  end
-
   # add a new participant to this assignment
   # manual addition
   # user_name - the user account name of the participant to add
@@ -392,9 +388,9 @@ class Assignment < ActiveRecord::Base
     @assignment = Assignment.find(parent_id)
     @answers = {} # Contains all answer objects for this assignment
     # Find all unique response types
-    @uniq_response_type = ResponseMap.uniq.pluck(:type)
+    @uniq_response_type = ResponseMap.all.uniq.pluck(:type)
     # Find all unique round numbers
-    @uniq_rounds = Response.uniq.pluck(:round)
+    @uniq_rounds = Response.all.uniq.pluck(:round)
     # create the nested hash that holds all the answers organized by round # and response type
     @uniq_rounds.each do |round_num|
       @answers[round_num] = {}

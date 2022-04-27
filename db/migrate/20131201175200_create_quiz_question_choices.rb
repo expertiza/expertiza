@@ -1,4 +1,4 @@
-class CreateQuizQuestionChoices < ActiveRecord::Migration
+class CreateQuizQuestionChoices < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'quiz_question_choices', force: true do |t|
       t.column 'question_id', :integer # the question to which this advice belongs

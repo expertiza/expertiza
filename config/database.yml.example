@@ -3,6 +3,8 @@ default: &default
   host: localhost
   username: root
   password: 
+  encoding: utf8
+  collation: utf8_general_ci
 
 development:
   <<: *default

@@ -414,29 +414,32 @@ class AssignmentForm
     MailWorker.perform_in(find_min_from_now(Time.parse(due_date.due_at.to_s(:db)) + simicheck_delay.to_i.hours).minutes.from_now * 60, @assignment.id, 'compare_files_with_simicheck', due_date.due_at.to_s(:db))
   end
 
+  # Create new teams/participants and copy their reviews
   def self.copy_calibrated_reviews(old_assignment, new_assignment_id)
     # copy submission records for the assignment
     SubmissionRecord.copy_assignment_submissions(old_assignment, new_assignment_id)
 
     # copy teams for the old assignment, this returns an array of the old team IDs that we'll want to use later
-    Team.copy(old_assignment, new_assignment_id)
+    old_team_ids = Team.copy(old_assignment, new_assignment_id)
+    @new_teams = Team.where(parent_id: new_assignment_id)
+    news_teams_ids = @new_teams.pluck(:id)
 
     # TODO - rewrite this part, goal is to copy participants from old teams to new teams
     # recreate participants for copied teams then map the calibrated reviews to them
-    #count = 0
-    #old_team_ids.each do |catt|
-    #  @old_team_user = TeamsUser.where(team_id: catt)
-    #  @old_team_user.each do |matt|
-    #    @new_team_user = TeamsUser.new
-    #    @new_team_user.team_id = new_team_ids[count]
-    #    @new_team_user.user_id = matt.user_id
-    #    @new_team_user.save
-    #    Participant.createparticipant(matt, old_assign, new_assign_id)
-    #  end
+    count = 0
+    old_team_ids.each do |catt|
+      @old_team_user = TeamsUser.where(team_id: catt)
+      @old_team_user.each do |matt|
+        @new_team_user = TeamsUser.new
+        @new_team_user.team_id = new_team_ids[count]
+        @new_team_user.user_id = matt.user_id
+        @new_team_user.save
+        Participant.createparticipant(matt, old_assign, new_assign_id)
+      end
       #Participant.mapreviewresponseparticipant(old_assign, new_assign_id, dict)
       #ReviewResponseMap.newreviewresp(old_assign, catt, dict, new_assign_id)
-    #  count += 1
-    #end
+      count += 1
+    end
 
     # TODO - when we copy the reviews, we need to make sure we properly increment submitter_count
     #        submitter_count is a column in the assignments table
@@ -451,6 +454,7 @@ class AssignmentForm
     new_assign.update_attribute('name', name_copied_assignment(old_assign.name))
     new_assign.update_attribute('created_at', Time.now)
     new_assign.update_attribute('updated_at', Time.now)
+    # TODO - we need to also make the directory_path unique, it will not allow us to save if it matches a previous directory name
     new_assign.update_attribute('directory_path', new_assign.directory_path + '_copy') if new_assign.directory_path.present?
     new_assign.copy_flag = true
     if new_assign.save

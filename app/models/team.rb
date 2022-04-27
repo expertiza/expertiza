@@ -45,7 +45,7 @@ class Team < ApplicationRecord
   # Get the response review map
   def responses
     participants.flat_map(&:responses)
-  endß
+  end
 
   # Delete the given team
   def delete

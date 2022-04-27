@@ -383,7 +383,7 @@ ActiveRecord::Schema.define(version: 2022_04_14_172528) do
     t.string "name", default: "", null: false
   end
 
-  create_table "plagiarism_checker_assignment_submissions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1 force: :cascade do |t|
+  create_table "plagiarism_checker_assignment_submissions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" force: :cascade do |t|
     t.string "name"
     t.string "simicheck_id"
     t.datetime "created_at", null: false

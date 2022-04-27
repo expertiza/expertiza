@@ -418,28 +418,9 @@ class AssignmentForm
   def self.copy_calibrated_reviews(old_assignment, new_assignment_id)
     # copy submission records for the assignment
     SubmissionRecord.copy_assignment_submissions(old_assignment, new_assignment_id)
-
-    # copy teams for the old assignment, this returns an array of the old team IDs that we'll want to use later
-    old_team_ids = Team.copy(old_assignment, new_assignment_id)
-    @new_teams = Team.where(parent_id: new_assignment_id)
-    news_teams_ids = @new_teams.pluck(:id)
-
-    # TODO - rewrite this part, goal is to copy participants from old teams to new teams
-    # recreate participants for copied teams then map the calibrated reviews to them
-    count = 0
-    old_team_ids.each do |catt|
-      @old_team_user = TeamsUser.where(team_id: catt)
-      @old_team_user.each do |matt|
-        @new_team_user = TeamsUser.new
-        @new_team_user.team_id = new_team_ids[count]
-        @new_team_user.user_id = matt.user_id
-        @new_team_user.save
-        Participant.createparticipant(matt, old_assign, new_assign_id)
-      end
-      #Participant.mapreviewresponseparticipant(old_assign, new_assign_id, dict)
-      #ReviewResponseMap.newreviewresp(old_assign, catt, dict, new_assign_id)
-      count += 1
-    end
+    Team.copy_teams_for_assignment(old_assignment.id, new_assignment_id)
+    #@new_teams = Team.where(parent_id: new_assignment_id)
+    #news_teams_ids = @new_teams.pluck(:id)
 
     # TODO - when we copy the reviews, we need to make sure we properly increment submitter_count
     #        submitter_count is a column in the assignments table
@@ -454,8 +435,7 @@ class AssignmentForm
     new_assign.update_attribute('name', name_copied_assignment(old_assign.name))
     new_assign.update_attribute('created_at', Time.now)
     new_assign.update_attribute('updated_at', Time.now)
-    # TODO - we need to also make the directory_path unique, it will not allow us to save if it matches a previous directory name
-    new_assign.update_attribute('directory_path', new_assign.directory_path + '_copy') if new_assign.directory_path.present?
+    new_assign.update_attribute('directory_path', name_copied_directory(new_assign.directory_path)) if new_assign.directory_path.present?
     new_assign.copy_flag = true
     if new_assign.save
       Assignment.record_timestamps = true
@@ -475,15 +455,26 @@ class AssignmentForm
     new_assign_id
   end
 
+  # Returns unqiue assingment name, e.g. Copy of assign, Copy of assign (2), Copy of assign (3)...
   def self.name_copied_assignment(assignment_name)
-    # Set name of new assignment as 'Copy of <old assignment name>'. If it already exists, set it as 'Copy of <old assignment name> (1)'.
-    # Repeated till unique name is found.
-    # This works for assignments that haven't been copied, could be made smarter to handle cases where you're
-    # copying a previously copied assignment (will give you Copy of Copy of...)
     name_counter = 0
     new_name = 'Copy of ' + assignment_name
     until Assignment.find_by(name: new_name).nil?
       new_name = 'Copy of ' + assignment_name
+      name_counter += 1
+      new_name += ' (' + name_counter.to_s + ')'
+    end
+    return new_name
+  end
+
+  # Returns unqiue assingment directory path, e.g. Copy of assign, Copy of assign (2), Copy of assign (3)...
+  # This violates DRY, the name_copied_method does the same thing.  Could combine if we figure out how to
+  # pass attribute type, then our find_by would just use the attribute type
+  def self.name_copied_directory(directory_name)
+    name_counter = 0
+    new_name = 'Copy of ' + directory_name
+    until Assignment.find_by(directory_path: new_name).nil?
+      new_name = 'Copy of ' + directory_name
       name_counter += 1
       new_name += ' (' + name_counter.to_s + ')'
     end

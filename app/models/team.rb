@@ -85,9 +85,7 @@ class Team < ApplicationRecord
     teams_to_copy.each do |team|
       new_team = team.dup
       new_team.parent_id = new_assign_id
-      if new_team.save # should we check if this successful?
-        puts "added new team to database - fox"
-      end
+      new_team.save # should we check if this successful?
     end
   end
 

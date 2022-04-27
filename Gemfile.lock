@@ -611,7 +611,6 @@ DEPENDENCIES
   gdata
   geckodriver-helper (~> 0.0.3)
   gherkin
-  google-protobuf
   guard-rails
   guard-rspec
   haml-rails

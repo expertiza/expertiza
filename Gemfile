@@ -37,7 +37,6 @@ gem 'font-awesome-rails'
 gem 'foreman'
 gem 'gchartrb', require: 'google_chart'
 gem 'gdata', require: false
-gem 'google-protobuf'
 gem 'haml-rails'
 gem 'jquery-colorbox-rails'
 gem 'jquery-datetimepicker-rails'

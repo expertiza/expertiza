@@ -39,6 +39,7 @@ before_script:
   - cp config/database.yml.example config/database.yml
   - cp config/secrets.yml.example config/secrets.yml
   - export JAVA_HOME=/usr/lib/jvm/java-6-openjdk-amd64
+  - gem install google-protobuf
   - bundle install
   - bundle exec rails db:setup
   # Test coverage offered by Code Climate

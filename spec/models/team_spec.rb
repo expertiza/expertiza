@@ -189,7 +189,7 @@ describe Team do
   describe '#anonymized_view' do
     it 'returns anonymized name of team when anonymized view is set' do
       allow(User).to receive(:anonymized_view?).and_return(true)
-      expect(team.name).to eq 'Anonymized_Team_' + team.id.to_s
+      expect(team.name).to eq 'Team_' + team.id.to_s
       expect(team.name).not_to eq 'no team'
     end
 

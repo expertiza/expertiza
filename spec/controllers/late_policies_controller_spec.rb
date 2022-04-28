@@ -133,7 +133,7 @@ describe LatePoliciesController do
           }
         }
         post :create, params: request_params
-        expect(flash[:error]).to eq('Penalty per unit cannot be negative')
+        expect(flash[:error]).to eq('Penalty per unit cannot be negative.')
       end
     end
 

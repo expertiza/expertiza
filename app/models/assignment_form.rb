@@ -424,7 +424,7 @@ class AssignmentForm
       teams_mapping = Team.copy_teams_for_assignment(old_assignment.id, new_assignment_id)
       Participant.copy_participants_for_assignment(old_assignment.id, new_assignment_id)
       TeamsUser.create_mapping_from_old_assignment(teams_mapping, new_assignment_id)
-
+      Participant.mapreviewresponseparticipant(old_assignment, new_assignment_id, teams_mapping)
       # TODO - make sure submitter_count is incremented properly
     end
   end

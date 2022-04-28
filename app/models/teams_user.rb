@@ -55,8 +55,21 @@ class TeamsUser < ApplicationRecord
     can_add_member
   end
 
-  def self.create_mapping_from_old_assignment(old_assignment_id, new_assignment_id)
-    #TODO - find how participants/teams were linked in old assignment, setup new participants/teams the same way
+  # Uses a hash map of team ids with copied teams ids to create new TeamsUsers
+  def self.create_mapping_from_old_assignment(teams_mapping, new_assignment_id)
+    teams_mapping.each do |old_team_id, new_team_id|
+      # find TeamsUser with old team ID
+      # get participant belonging to new_assignment_id with new_team_id
+      # make new teamsUser this participants user_id and new_team_id
+      old_team_users = TeamsUser.where(team_id: old_team_id)
+      old_team_users.each do |team_user_to_copy|
+        #new_participant_to_associate = Participant.find_by(user_id: old_team_users.user_id, parent_id: new_assignment_id)
+        new_team_user = TeamsUser.new
+        new_team_user.team_id = new_team_id
+        new_team_user.user_id = team_user_to_copy.user_id
+        new_team_user.save
+      end
+    end
   end
 
   # 2015-5-27 [zhewei]:

@@ -80,13 +80,18 @@ class Team < ApplicationRecord
   end
 
   # Copies all teams with parent_id set to old assignment ID, sets there parent_id to new assignment ID
+  # Returns a hash map that maps the old team IDs to the new team IDs
   def self.copy_teams_for_assignment(old_assign_id, new_assign_id)
+    teams_mapping = Hash.new
     teams_to_copy = Team.where(parent_id: old_assign_id)
     teams_to_copy.each do |original_team|
       new_team = original_team.dup
       new_team.parent_id = new_assign_id
-      new_team.save # should we check if this successful?
+      if new_team.save
+        teams_mapping.store(original_team.id, new_team.id)
+      end
     end
+    return teams_mapping
   end
 
   # Copy method to copy this team

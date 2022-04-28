@@ -7,13 +7,13 @@ namespace :db do
 
     begin
       db_config = YAML.safe_load(File.new('config/database.yml').read)
-      db_user = db_config['development']['username']
       db_pass = db_config['development']['password']
       password_args = (db_pass.nil? ? '' : "--password=#{db_pass}")
 
       `mysqldump -u root -d pg_development #{password_args} > ./db/tmp_schema.sql`
       `sqlt-graph -f MySQL -o ./db/pg_development.png -t png db/tmp_schema.sql`
-    rescue Exception => e
+    rescue
+      nil
     else
     ensure
       `rm -f db/tmp_schema.sql`

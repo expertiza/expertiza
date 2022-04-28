@@ -87,7 +87,7 @@ describe ImportFileController do
         }
 
         allow(User).to receive(:import).with(any_args).and_return(nil)
-        get :import, params: params, {return_to: list_users_path}
+        get :import, params: params, session: {return_to: list_users_path}
 
         expect(response).to redirect_to(list_users_path)
       end
@@ -124,7 +124,7 @@ describe ImportFileController do
         }
 
         allow(SignUpTopic).to receive(:import).with(any_args).and_return(nil)
-        get :import, params: params, {return_to: "/assignments/843"}
+        get :import, params: params, session: {return_to: "/assignments/843"}
 
         expect(response).to redirect_to assignment_path "843"
       end
@@ -146,7 +146,7 @@ describe ImportFileController do
         }
 
         allow(SignUpTopic).to receive(:import).with(any_args).and_return(nil)
-        get :import, params: params, {return_to: "/assignments/843"}
+        get :import, params: params, session: {return_to: "/assignments/843"}
 
         expect(response).to redirect_to assignment_path "843"
       end
@@ -169,7 +169,7 @@ describe ImportFileController do
         }
 
         allow(SignUpTopic).to receive(:import).with(any_args).and_return(nil)
-        get :import, params: params, {return_to: "/assignments/843"}
+        get :import, params: params, session: {return_to: "/assignments/843"}
 
         expect(response).to redirect_to assignment_path "843"
       end
@@ -193,7 +193,7 @@ describe ImportFileController do
         }
 
         allow(SignUpTopic).to receive(:import).with(any_args).and_return(nil)
-        get :import, params: params, {return_to: "/assignments/843"}
+        get :import, params: params, session: {return_to: "/assignments/843"}
 
         expect(response).to redirect_to assignment_path "843"
       end
@@ -214,7 +214,7 @@ describe ImportFileController do
         }
 
         expect(SignUpTopic).to receive(:import).and_raise(ActiveRecord::RecordInvalid)
-        get :import, params: params, {return_to: "/assignments/843"}
+        get :import, params: params, session: {return_to: "/assignments/843"}
         expect(flash[:error]).to be_present
         expect(response).to redirect_to assignment_path "843"
       end

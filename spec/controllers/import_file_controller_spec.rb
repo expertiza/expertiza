@@ -103,7 +103,7 @@ describe ImportFileController do
         }
 
         expect(User).to receive(:import).and_raise(ActiveRecord::RecordInvalid)
-        get :import, params: params, {return_to: list_users_path}
+        get :import, params: params, session: {return_to: list_users_path}
         expect(flash[:error]).to be_present
         expect(response).to redirect_to(list_users_path)
       end

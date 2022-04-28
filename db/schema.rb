@@ -262,7 +262,7 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.index ["submission_allowed_id"], name: "fk_due_date_submission_allowed"
   end
 
-  create_table "duties", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci" do |t|
+  create_table "duties", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
     t.string "name"
     t.integer "max_members_for_duty"
     t.integer "assignment_id"
@@ -309,7 +309,7 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.index ["instructor_id"], name: "fk_instructor_id"
   end
 
-  create_table "locks", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci" do |t|
+  create_table "locks", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
     t.integer "timeout_period"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -482,7 +482,7 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.index ["participant_id"], name: "fk_resubmission_times_participants"
   end
 
-  create_table "review_bids", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci" do |t|
+  create_table "review_bids", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb" do |t|
     t.integer "priority"
     t.integer "signuptopic_id"
     t.integer "participant_id"
@@ -532,7 +532,7 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.index ["role_id"], name: "fk_roles_permission_role_id"
   end
 
-  create_table "sample_reviews", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci" do |t|
+  create_table "sample_reviews", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4" do |t|
     t.integer "assignment_id"
     t.integer "response_id"
     t.datetime "created_at", null: false

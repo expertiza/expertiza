@@ -61,7 +61,7 @@ describe ExportFileController do
                 expect(@controller).to receive(:send_data).with(csv_string, csv_options) {
                     @controller.render nothing: true # to prevent a 'missing template' error
                 }
-                get :export, params
+                get :export, params: params
             end    
         end    
     end
@@ -85,7 +85,7 @@ describe ExportFileController do
                 expect(@controller).to receive(:send_data).with(csv_string, csv_options) {
                     @controller.render nothing: true # to prevent a 'missing template' error
                 }
-                get :exportdetails, params
+                get :exportdetails, params: params
             end
         end
         context 'when exporting details for other Models' do
@@ -101,7 +101,7 @@ describe ExportFileController do
                     "id"=>"1",
                     "model"=>"User"
                 }
-                get :exportdetails, params
+                get :exportdetails, params: params
                 expect(flash[:error]).to be_present
                 expect(response).to redirect_to(start_export_file_index_path)
             end

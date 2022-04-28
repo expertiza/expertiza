@@ -101,32 +101,4 @@ class ResponseMap < ApplicationRecord
     team
   end
 
-  # Creates new mapping between participants as reviewers and teams as reviewees
-  # Mapping coppied from an old assignment teams/participants
-  # TODO - rewrite this method, come up with a more meaningful name
-  def self.mapreviewresponseparticipant(old_assign, new_assign_id, dict)
-    old_assignmentnumber = Assignment.find_by(id: old_assign.id)
-    new_assignmentnumber = Assignment.find_by(id: new_assign_id)
-    find_participant = Participant.find_by(parent_id: old_assign.id, user_id: @old_assignmentnumber.instructor_id)
-    new_participant = @find_participant.dup
-    new_participant.parent_id = new_assign_id
-    new_participant.save # we should check if this is successful before proceeding
-    getnewparticipant = Participant.find_by(parent_id: new_assign_id, user_id: @old_assignmentnumber.instructor_id)
-    old_reviewrespmap = ReviewResponseMap.where(reviewed_object_id: old_assign.id)
-    old_reviewrespmap.each do |satt|
-      if dict.key?(satt.reviewee_id)
-        new_reviewrespmap = ReviewResponseMap.new
-        new_reviewrespmap.reviewed_object_id = new_assign_id
-        new_reviewrespmap.reviewer_id = @getnewparticipant.id
-        new_reviewrespmap.reviewee_id = dict[satt.reviewee_id]
-        new_reviewrespmap.type = satt.type
-        new_reviewrespmap.created_at = satt.created_at
-        new_reviewrespmap.calibrate_to = satt.calibrate_to
-        new_reviewrespmap.save
-      else
-        next
-      end
-    end
-  end
-
 end

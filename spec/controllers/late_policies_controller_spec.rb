@@ -101,7 +101,7 @@ describe LatePoliciesController do
       end
     end
 
-    context 'when maximum penalty is greater than 100' do
+    context 'when maximum penalty is greater than 100' doz
       before(:each) do
         latePolicy = LatePolicy.new
         allow(latePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
@@ -133,7 +133,7 @@ describe LatePoliciesController do
           }
         }
         post :create, params: request_params
-        expect(flash[:error]).to eq('The following error occurred while saving the late policy: ')
+        expect(flash[:error]).to eq('Penalty per unit cannot be negative')
       end
     end
 
@@ -151,7 +151,7 @@ describe LatePoliciesController do
           }
         }
         post :create, params: request_params
-        expect(flash[:error]).to eq('A policy with the same name already exists.')
+        expect(flash[:error]).to eq('A policy with the same name Policy1 already exists.')
       end
     end
 

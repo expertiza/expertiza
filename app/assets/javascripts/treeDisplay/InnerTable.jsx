@@ -14,8 +14,8 @@ class InnerTable extends React.Component {
         } else if (this.props.dataType === 'course') {
             colWidthArray = ['20%', '20%', '20%', '20%', '20%']
         }
-        if (this.props.tableContent) {
-            this.props.tableContent.forEach(function (entry, i) {
+        if (this.props.itemsDisplayed) {
+            this.props.itemsDisplayed.forEach(function (entry, i) {
                 rows.push(
                     <InnerTableRow
                         key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}

@@ -26,7 +26,7 @@ class OuterTableDetailsRow extends React.Component {
                 <td colSpan={colSpan}>
                     <InnerTable
                         key={'innertable_' + this.props.id}
-                        tableContent={this.props.children}
+                        itemsDisplayed={this.props.children}
                         dataType={this.props.dataType}
                     />
                 </td>

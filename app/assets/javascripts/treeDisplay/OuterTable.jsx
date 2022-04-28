@@ -30,7 +30,7 @@ class OuterTable extends React.Component {
     }
 
     populateOuterTableRows(rows, public, colWidthArray, colDisplayStyle) {
-        Array.prototype.forEach.call(this.props.tableContent, function (entry, i) {
+        Array.prototype.forEach.call(this.props.itemsDisplayed, function (entry, i) {
             if (((entry.name && entry.name.indexOf(this.props.filterText) !== -1) ||
                 (entry.creation_date && entry.creation_date.indexOf(this.props.filterText) !== -1) ||
                 (entry.institution && entry.institution.indexOf(this.props.filterText) !== -1) ||

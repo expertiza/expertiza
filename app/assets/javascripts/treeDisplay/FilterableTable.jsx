@@ -5,7 +5,7 @@ class FilterableTable extends React.Component {
         this.state = {
             filterText: '',
             showOthersWork: false,
-            tableData: this.props.tableContent
+            tableData: this.props.itemsDisplayed
         }
         this.handleUserInput = this.handleUserInput.bind(this);
         this.handleUserClick = this.handleUserClick.bind(this);
@@ -15,7 +15,7 @@ class FilterableTable extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         this.setState({
-            tableData: nextProps.tableContent
+            tableData: nextProps.itemsDisplayed
         })
     }
 
@@ -80,7 +80,7 @@ class FilterableTable extends React.Component {
                 />
                 <NewItemButton dataType={this.props.dataType} private={true} />
                 <OuterTable
-                    tableContent={this.state.tableData}
+                    itemsDisplayed={this.state.tableData}
                     filterText={this.state.filterText}
                     onUserClick={this.handleUserClick}
                     dataType={this.props.dataType}

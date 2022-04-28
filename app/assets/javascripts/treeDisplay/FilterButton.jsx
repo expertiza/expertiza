@@ -1,8 +1,5 @@
-var FilterButton = React.createClass({
-    handleChange: function () {
-        this.props.onUserFilter(this.props.filterOption, this.refs.filterCheckbox.getDOMNode().checked)
-    },
-    render: function () {
+class FilterButton extends React.Component {
+    render() {
         return (
             <span
                 className="show-checkbox"
@@ -12,11 +9,11 @@ var FilterButton = React.createClass({
                     type="checkbox"
                     checked={this.props.inputCheckboxValue}
                     ref="filterCheckbox"
-                    onChange={this.handleChange}
+                    onChange={() => this.props.onUserFilter(!this.props.inputCheckboxValue)}
                 >
                     {" Include others' items"}
                 </input>
             </span>
         )
     }
-})
+}

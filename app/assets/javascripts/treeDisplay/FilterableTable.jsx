@@ -1,70 +1,71 @@
 /** beta branch isnt getting a prop related to the data to be displayed in the dropdown */
-var FilterableTable = React.createClass({
-    getInitialState: function () {
-        return {
+class FilterableTable extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
             filterText: '',
-            privateCheckbox: false,
-            publicCheckbox: false,
-            tableData: this.props.data
+            showOthersWork: false,
+            tableData: this.props.tableContent
         }
-    },
-    handleUserInput: function (filterText) {
+        this.handleUserInput = this.handleUserInput.bind(this);
+        this.handleUserClick = this.handleUserClick.bind(this);
+        this.toggleShowOthersWork = this.toggleShowOthersWork.bind(this);
+        this.updateTableDataFromChild = this.updateTableDataFromChild.bind(this);
+    }
+
+    componentWillReceiveProps(nextProps) {
         this.setState({
-            filterText: filterText
+            tableData: nextProps.tableContent
         })
-    },
-    handleUserClick: function (colName, order) {
+    }
+
+    handleUserInput(filterText) {
+        this.setState({
+            filterText,
+        })
+    }
+
+    handleUserClick(colName, order) {
         var tmpData = this.state.tableData
         tmpData.sort(function (a, b) {
-            var a_val = eval('a.' + colName)
-            var b_val = eval('b.' + colName)
-            if (order === 'normal') {
-                if (!a_val && b_val) {
-                    return 1
-                }
-                if (!b_val && a_val) {
-                    return -1
-                }
-                if (!a_val && !b_val) {
-                    return 0
-                }
-                return -a_val.localeCompare(b_val)
-            } else {
-                if (!a_val && b_val) {
-                    return -1
-                }
-                if (!b_val && a_val) {
-                    return 1
-                }
-                if (!a_val && !b_val) {
-                    return 0
-                }
-                return a_val.localeCompare(b_val)
+            if (!a[colName] && b[colName]) {
+                return order === 'normal' ? 1 : -1;
             }
-        })
-        // this.setState({
-        //   tableData: tmpData
-        // })
-    },
-    componentWillReceiveProps: function (nextProps) {
-        this.setState({
-            tableData: nextProps.data
-        })
-    },
-    handleUserFilter: function (name, checked) {
-        var publicCheckboxStatus = this.state.publicCheckbox
-        publicCheckboxStatus = checked
-        var tmpData = this.props.data.filter(function (element) {
-            if (publicCheckboxStatus) {
-                return true
-            } else return element.private === true
+            if (!b[colName] && a[colName]) {
+                return order === 'normal' ? -1 : 1;
+            }
+            if (!a[colName] && !b[colName]) {
+                return 0
+            }
+            if (colName === "institution") {
+                aVal = a[colName].length > 0 ? a[colName][0].name : "";
+                bVal = b[colName].length > 0 ? b[colName][0].name : "";
+            } else {
+                aVal = a[colName];
+                bVal = b[colName];
+            }
+            return order === 'normal' ? -aVal.localeCompare(bVal) : aVal.localeCompare(bVal)
         })
         this.setState({
-            tableData: tmpData,
-            publicCheckbox: publicCheckboxStatus
+            tableData: tmpData
         })
-    },
-    render: function () {
+    }
+
+    toggleShowOthersWork(checked) {
+        this.setState({
+            showOthersWork: checked
+        })
+    }
+
+    updateTableDataFromChild(id, response) {
+        var tableData = this.state.tableData;
+        tableData[id.split('_')[2]]['children'] = response;
+        this.setState({
+            tableData,
+        })
+    }
+
+    render() {
         return (
             <div className="filterable_table">
                 <SearchBar
@@ -73,20 +74,20 @@ var FilterableTable = React.createClass({
                     dataType={this.props.dataType}
                 />
                 <FilterButton
-                    filterOption="public"
-                    onUserFilter={this.handleUserFilter}
-                    inputCheckboxValue={this.state.publicCheckbox}
+                    onUserFilter={this.toggleShowOthersWork}
+                    inputCheckboxValue={this.state.showOthersWork}
                     dataType={this.props.dataType}
                 />
                 <NewItemButton dataType={this.props.dataType} private={true} />
                 <OuterTable
-                    data={this.state.tableData}
+                    tableContent={this.state.tableData}
                     filterText={this.state.filterText}
                     onUserClick={this.handleUserClick}
                     dataType={this.props.dataType}
-                    showPublic={this.state.publicCheckbox}
+                    showOthersWork={this.state.showOthersWork}
+                    updateData={this.updateTableDataFromChild}
                 />
             </div>
         )
     }
-})
+}

@@ -343,20 +343,20 @@ jQuery(document).ready(function () {
           onAfterChange={this.handleTabChange}
         >
           <ReactSimpleTabs.Panel title="Courses">
-            <FilterableTable key="table1" dataType="course" data={this.state.tableContent.Courses} />
+            <FilterableTable key="table1" dataType="course" tableContent={this.state.tableContent.Courses} />
           </ReactSimpleTabs.Panel>
           <ReactSimpleTabs.Panel title="Assignments">
             <FilterableTable
               key="table2"
               dataType="assignment"
-              data={this.state.tableContent.Assignments}
+              tableContent={this.state.tableContent.Assignments}
             />
           </ReactSimpleTabs.Panel>
           <ReactSimpleTabs.Panel title="Questionnaires">
             <FilterableTable
               key="table2"
               dataType="questionnaire"
-              data={this.state.tableContent.Questionnaires}
+              tableContent={this.state.tableContent.Questionnaires}
             />
           </ReactSimpleTabs.Panel>
         </ReactSimpleTabs>

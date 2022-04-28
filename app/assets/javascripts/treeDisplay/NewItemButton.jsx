@@ -1,5 +1,5 @@
-var NewItemButton = React.createClass({
-    render: function () {
+class NewItemButton extends React.Component {
+    render() {
         var renderContent = []
         var formStyle = {
             margin: 0,
@@ -31,4 +31,4 @@ var NewItemButton = React.createClass({
         }
         return <span>{renderContent}</span>
     }
-})
+}

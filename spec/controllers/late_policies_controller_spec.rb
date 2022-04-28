@@ -101,7 +101,7 @@ describe LatePoliciesController do
       end
     end
 
-    context 'when maximum penalty is greater than 100' doz
+    context 'when maximum penalty is greater than 100' do
       before(:each) do
         latePolicy = LatePolicy.new
         allow(latePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)

@@ -458,7 +458,7 @@ class AssignmentForm
     new_assign_id
   end
 
-  # Returns unqiue assingment name, e.g. Copy of assign, Copy of assign (2), Copy of assign (3)...
+  # Returns unique assignment name, e.g. Copy of assign, Copy of assign (2), Copy of assign (3)...
   def self.name_copied_assignment(assignment_name)
     name_counter = 0
     new_name = 'Copy of ' + assignment_name
@@ -470,7 +470,7 @@ class AssignmentForm
     return new_name
   end
 
-  # Returns unqiue assingment directory path, e.g. Copy of assign, Copy of assign (2), Copy of assign (3)...
+  # Returns unique assignment directory path, e.g. Copy of assign, Copy of assign (2), Copy of assign (3)...
   # This violates DRY, the name_copied_method does the same thing.  Could combine if we figure out how to
   # pass attribute type, then our find_by would just use the attribute type
   def self.name_copied_directory(directory_name)

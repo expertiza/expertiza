@@ -152,7 +152,8 @@ class Participant < ApplicationRecord
     fields
   end
 
-  # creates new participants with all the same fields as the old participants
+  # creates new participants, copied from an old assignment with parent_id as new assignment id
+  # this could probably be moved to assignment_participant
   def self.copy_participants_for_assignment(old_assign_id, new_assign_id)
     participants_to_copy = Participant.where(parent_id: old_assign_id)
     participants_to_copy.each do |original_participant|
@@ -163,7 +164,7 @@ class Participant < ApplicationRecord
   end
 
   # Copies the reviews from the previous instructors
-  # This method assumes a old assignment and copied assignment with the same participants
+  # This method assumes an old assignment and copied assignment with the same participants
   #   it attempts to find all ReviewResponseMap records belonging to old assignment
   #   and recreate them for the new assignment belonging to the participants
   def self.mapreviewresponseparticipant(old_assign, new_assign_id, dict)

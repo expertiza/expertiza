@@ -422,9 +422,9 @@ class AssignmentForm
     if old_assignment.is_calibrated
       SubmissionRecord.copy_submission_records_for_assignment(old_assignment, new_assignment_id)
       teams_mapping = Team.copy_teams_for_assignment(old_assignment.id, new_assignment_id)
-      Participant.copy_participants_for_assignment(old_assignment.id, new_assignment_id)
+      participants_mapping = Participant.copy_participants_for_assignment(old_assignment.id, new_assignment_id)
       TeamsUser.create_mapping_from_old_assignment(teams_mapping, new_assignment_id)
-      #ReviewResponseMap.mapreviewresponseparticipant(old_assignment, new_assignment_id, teams_mapping)
+      ReviewResponseMap.copy_review_response_map(teams_mapping, participants_mapping)
       # TODO - make sure submitter_count is incremented properly
     end
   end

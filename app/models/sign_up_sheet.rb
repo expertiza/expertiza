@@ -49,7 +49,7 @@ class SignUpSheet < ApplicationRecord
     result = false
     # Create new record in signed_up_teams table
     result = sign_up.save
-    WaitlistTeam.delete_all_waitlists_for_team(team_id,assignment_id)
+    WaitlistTeam.delete_all_waitlists_for_team(team_id)
     ExpertizaLogger.info LoggerMessage.new('SignUpSheet', user_id, "Sign up sheet created with teamId #{team_id}")
     result
   end

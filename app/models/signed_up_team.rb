@@ -54,25 +54,9 @@ class SignedUpTeam < ApplicationRecord
   end
 
   # If a signup sheet exists then release topics that the given team has selected for the given assignment.
-
-  # def self.release_topics_selected_by_team_for_assignment(team_id, assignment_id)
-  #   old_teams_signups = SignedUpTeam.where(team_id: team_id)
-
-  #   # If the team has signed up for the topic and they are on the waitlist then remove that team from the waitlist.
-  #   unless old_teams_signups.nil?
-  #     old_teams_signups.each do |old_teams_signup|
-  #       if old_teams_signup.is_waitlisted == false # i.e., if the old team was occupying a slot, & thus is releasing a slot ...
-  #         first_waitlisted_signup = SignedUpTeam.find_by(topic_id: old_teams_signup.topic_id, is_waitlisted: true)
-  #         Invitation.remove_waitlists_for_team(old_teams_signup.topic_id, assignment_id) unless first_waitlisted_signup.nil?
-  #       end
-  #       old_teams_signup.destroy
-  #     end
-  #   end
-  # end 
-
   def self.release_topics_selected_by_team_for_assignment(team_id, assignment_id)
     delete_all_signed_up_topics_for_team(team_id)
-    WaitlistTeam.delete_all_waitlists_for_team(team_id, assignment_id)
+    WaitlistTeam.delete_all_waitlists_for_team(team_id)
   end
 
   def self.topic_id(assignment_id, user_id)

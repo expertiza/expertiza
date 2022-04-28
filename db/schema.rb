@@ -374,7 +374,7 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.index ["user_id"], name: "fk_participant_users"
   end
 
-  create_table "password_resets", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=lati1" do |t|
+  create_table "password_resets", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "user_email"
     t.string "token"
     t.datetime "updated_at"

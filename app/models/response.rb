@@ -335,7 +335,7 @@ class Response < ApplicationRecord
       original_responses.each do |original_response|
         new_response = original_response.dup
         new_response.map_id = new_map_id
-        new_response.save
+        new_response.save # should verify this is successful, so far in testing it is
       end
     end
   end

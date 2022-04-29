@@ -230,6 +230,7 @@ class ReviewResponseMap < ResponseMap
         end
       end
     end
+    return review_response_map_mapping
   end
 
 end

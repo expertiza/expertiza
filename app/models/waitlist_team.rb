@@ -31,15 +31,15 @@ class WaitlistTeam < ApplicationRecord
 
   def self.first_team_in_waitlist_for_topic(topic_id)
     waitlisted_team_for_topic = WaitlistTeam.where(topic_id: topic_id).order("created_at ASC").first
-    return waitlisted_team_for_topic
+    waitlisted_team_for_topic
   end
 
   def self.team_has_any_waitlists?(team_id)
-    return WaitlistTeam.where(team_id: team_id).empty?
+    WaitlistTeam.where(team_id: team_id).empty?
   end
 
   def self.topic_has_any_waitlists?(topic_id)
-    return WaitlistTeam.where(topic_id: topic_id).empty?
+    WaitlistTeam.where(topic_id: topic_id).empty?
   end
 
   def self.delete_all_waitlists_for_team(team_id)
@@ -83,11 +83,41 @@ class WaitlistTeam < ApplicationRecord
     list_of_topic_waitlist_counts
   end
 
-  def self.promote_waitlist_team_to_signup(team_id, topic_id)
+  def self.find_waitlisted_teams_for_asignment(assignment_id, ip_address = nil)
+    waitlisted_participants = WaitlistTeam.joins('INNER JOIN sign_up_topics ON waitlist_teams.topic_id = sign_up_topics.id')
+                .select('waitlist_teams.id as id, sign_up_topics.id as topic_id, sign_up_topics.topic_name as name,
+                  sign_up_topics.topic_name as team_name_placeholder, sign_up_topics.topic_name as user_name_placeholder,
+                  waitlist_teams.team_id as team_id')
+                .where('sign_up_topics.assignment_id = ?', assignment_id)
     
-    max_choosers = SignUpTopic.find(signup_topic_id).max_choosers
-    ApplicationRecord.transaction do
+    SignedUpTeam.fill_participant_names waitlisted_participants, ip_address
+    waitlisted_participants
+  end
 
+  def self.check_team_waitlisted_for_topic(team_id,topic_id)
+    if WaitlistTeam.exists?(team_id: team_id, topic_id: topic_id)
+      return true
+    end
+    return false
+  end
+
+  def self.signup_first_waitlist_team(topic_id)
+    sign_up_waitlist_team = nil
+    ApplicationRecord.transaction do
+      first_waitlist_team = first_team_in_waitlist_for_topic(topic_id)
+      unless first_waitlist_team.blank?
+        sign_up_waitlist_team = SignedUpTeam.new
+        sign_up_waitlist_team.topic_id = first_waitlist_team.topic_id
+        sign_up_waitlist_team.team_id = first_waitlist_team.team_id
+        if sign_up_waitlist_team.valid?
+          sign_up_waitlist_team.save
+          first_waitlist_team.destroy
+          delete_all_waitlists_for_team sign_up_waitlist_team.team_id
+        else
+          ExpertizaLogger.info LoggerMessage.new('WaitlistTeam', session[:user].id, "Cannot find Topic #{topic_id} in waitlist.")
+          raise ActiveRecord::Rollback
+        end
+      end
     end
     sign_up_waitlist_team
   end

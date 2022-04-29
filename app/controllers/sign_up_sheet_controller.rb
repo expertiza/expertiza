@@ -158,6 +158,7 @@ class SignUpSheetController < ApplicationController
     # Though called participants, @participants are actually records in signed_up_teams table, which
     # is a mapping table between teams and topics (waitlisted recorded are also counted)
     @participants = SignedUpTeam.find_team_participants(assignment_id, session[:ip])
+    @waitlisted_participants = WaitlistTeam.find_waitlisted_teams_for_asignment(assignment_id, session[:ip])
   end
 
   def set_values_for_new_topic

@@ -16,6 +16,7 @@
         <%# Change Other Stuff to Etc.%>
         <li><a href="#tabs-8" id="Other">Etc.</a></li>
       </ul>
+
       <div id="tabs-1">
         <%= render 'assignments/edit/general' %>
       </div>
@@ -48,8 +49,8 @@
       <%= button_tag "Save", :id => 'submit_btn', class: 'btn btn-md btn-default', :style => "margin-left: 20px;" %> | <%= render :partial => '/shared_scripts/back' %>
       </div>
     </div>
-    <script>
 
+    <script>
       var useBookmarkChanged = function () {
           jQuery("#questionnaire_table_BookmarkRatingQuestionnaire").remove()
           var bookmark_checkbox = jQuery('#assignment_form_assignment_use_bookmark');
@@ -77,6 +78,7 @@
         $('#Rubrics').click();
       });      
     </script>
-    <%= javascript_include_tag('edit_assignments.js') %>
   <% end %>
+<%= javascript_include_tag('edit_assignments.js') %>
 <br/>
+

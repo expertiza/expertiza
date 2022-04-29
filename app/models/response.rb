@@ -327,4 +327,17 @@ class Response < ApplicationRecord
     end
     code
   end
+
+  # creates new responses, copied from those associated with old review_response_map, associates with new review_response_map
+  def self.copy_review_responses_from_old_map_to_new_map(review_response_map_mapping) # I'm sorry for this argument name
+    review_response_map_mapping.each do |old_map_id, new_map_id|
+      original_responses = Response.where(map_id: old_map_id)
+      original_responses.each do |original_response|
+        new_response = original_response.dup
+        new_response.map_id = new_map_id
+        new_response.save
+      end
+    end
+  end
+
 end

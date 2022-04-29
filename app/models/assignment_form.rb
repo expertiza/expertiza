@@ -415,16 +415,21 @@ class AssignmentForm
   end
 
   # Copy calibrated reviews:
-  # This requires getting making new teams and participants, copied from the old assignment
-  # Creating new TeamsUsers records to map our new teams/participants the same as the old assignment
-  # Copying reviews/responses
+  # This requires making new teams and participants, copied from the old assignment
+  # Creating new TeamsUsers records to map our new teams/participants verbatim to old assignment
+  # Creating a new ReviewResponseMap records, mapping reviewees/reviewers verbatim to old assignment
+  # Creating new reviews (copies of old reviews)
+  # TODO - all actions are showing as begin on copied assignment calibration tab, conditional for rendering actions in view on next line
+  # reviewed_object_id: params[:id], reviewer_id: instructor.id, reviewee_id: team.id, calibrate_to: true
+  #reviewed_object_id is set to new assign_id, reviewer_id and reviewee_ids look correct,
   def self.copy_calibrated_reviews(old_assignment, new_assignment_id)
     if old_assignment.is_calibrated
       SubmissionRecord.copy_submission_records_for_assignment(old_assignment, new_assignment_id)
       teams_mapping = Team.copy_teams_for_assignment(old_assignment.id, new_assignment_id)
       participants_mapping = Participant.copy_participants_for_assignment(old_assignment.id, new_assignment_id)
       TeamsUser.create_mapping_from_old_assignment(teams_mapping, new_assignment_id)
-      ReviewResponseMap.copy_review_response_map(teams_mapping, participants_mapping)
+      review_response_map_mapping = ReviewResponseMap.copy_review_response_map(teams_mapping, participants_mapping, new_assignment_id)
+      Response.copy_review_responses_from_old_map_to_new_map(review_response_map_mapping)
       # TODO - make sure submitter_count is incremented properly
     end
   end

@@ -208,46 +208,11 @@ class ReviewResponseMap < ResponseMap
     review_final_versions[symbol][:response_ids] = response_ids
   end
 
-  # Copies review responses to a new assignment
-  # TODO - rewrite this method
-  def self.newreviewresp(old_assign, catt, dict, new_assign_id)
-    @old_reviewrespmap = ReviewResponseMap.where(reviewed_object_id: old_assign.id, reviewee_id: catt)
-    @find_newrespmap =  ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[catt])
-    oldreviewrespids = []
-    newreviewrespids = []
-    @old_reviewrespmap.each do |zatt|
-      oldreviewrespids.append(zatt.id)
-    end
-    @find_newrespmap.each do |zatt|
-      newreviewrespids.append(zatt.id)
-    end
-    dict1 = Hash[oldreviewrespids.zip newreviewrespids]
-    dict1.each do |item, value|
-      @oldresp = Response.where(map_id: item)
-      @oldresp.each do |zatt|
-        @newresp = Response.new
-        @newresp.map_id = value
-        @newresp.additional_comment = zatt.additional_comment
-        @newresp.version_num = zatt.version_num
-        @newresp.round = zatt.round
-        @newresp.is_submitted = zatt.is_submitted
-        @newresp.save
-        @oldanswers = Answer.where(response_id:zatt.id)
-        @oldanswers.each do |latt|
-          @newanswer = Answer.new
-          @newanswer.question_id = latt.question_id
-          @newanswer.answer = latt.answer
-          @newanswer.comments = latt.comments
-          @newanswer.response_id = @newresp.id
-          @newanswer.save
-        end
-      end
-    end
-  end
-
   # Creates new mapping between participants as reviewers and teams as reviewees
   # Mapping copied from an old assignment teams/participants
-  def self.copy_review_response_map(teams_mapping, participants_mapping)
+  # Return map of old review_response_map ids to new review_response_map ids
+  def self.copy_review_response_map(teams_mapping, participants_mapping, new_assignment_id)
+    review_response_map_mapping = Hash.new
     # old teams were unique to old assignment (single parent_id), we can find all response maps with old team IDs as reviewee_id
     teams_mapping.each do |old_team_id, new_team_id|
       original_response_maps = ReviewResponseMap.where(reviewee_id: old_team_id)
@@ -256,8 +221,12 @@ class ReviewResponseMap < ResponseMap
         if participants_mapping.has_key?(original_map.reviewer_id)
           # create new review response map with same attributes, but using new team ID and new participant ID
           new_review_response_map = original_map.dup
+          new_review_response_map.reviewed_object_id = new_assignment_id
           new_review_response_map.reviewee_id = new_team_id
           new_review_response_map.reviewer_id = participants_mapping[original_map.reviewer_id]
+          if new_review_response_map.save
+            review_response_map_mapping.store(original_map.id, new_review_response_map.id)
+          end
         end
       end
     end

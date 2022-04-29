@@ -333,13 +333,17 @@
 
 <!-- display all versions available -->
 <% @review_versions = @map.get_all_versions %>
-<% unless @review_versions.empty? %>
+<% if @review_versions.empty? %>
+  <I>No previous review was performed.</I><br/>
+  <hr/><br/>
+<% else %>
   <%@review_versions.each do |response| %>
     <%= response.display_as_html %>
     <br/>
   <% end %>
-  <hr/>
 <% end %>
+
+
 
 <h2>Directions for the reviewer</h2>
 <input type="checkbox" id="autosave_cbx" checked>
@@ -419,7 +423,7 @@
   <div id="save_confirm"></div>
   <%= submit_tag "Save " + @title, :name => "save", :id => "save_review" %>
   <!--#E1600 check title for selfreview to show submit button-->
-  <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review') || (@title.eql? 'Metareview')) %>
+  <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review') || (@title.eql? 'MetaReview')) %>
     <%= submit_tag "Submit " + @title, :name => "Submit", :id => "Submit" %>
     <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
   <% end %>

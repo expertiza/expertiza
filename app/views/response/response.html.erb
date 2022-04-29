@@ -333,13 +333,17 @@
 
 <!-- display all versions available -->
 <% @review_versions = @map.get_all_versions %>
-<% unless @review_versions.empty? %>
+<% if @review_versions.empty? %>
+  <I>No previous review was performed.</I><br/>
+  <hr/><br/>
+<% else %>
   <%@review_versions.each do |response| %>
     <%= response.display_as_html %>
     <br/>
   <% end %>
-  <hr/>
 <% end %>
+
+
 
 <h2>Directions for the reviewer</h2>
 <input type="checkbox" id="autosave_cbx" checked>

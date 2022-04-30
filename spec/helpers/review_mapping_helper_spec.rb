@@ -510,7 +510,7 @@ describe ReviewMappingHelper, type: :helper do
   # I found the test case by internet, and I think it will fail if the website update in future
   describe 'get_link_updated_at' do
     it 'should return ? by input http://www.example.com' do
-      updated_time = link_updated_at?('http://www.example.com')
+      updated_time = link_updated_at('http://www.example.com')
       expect(updated_time).to eq('2019-10-17 03:18:26.000000000 -0400')
     end
   end

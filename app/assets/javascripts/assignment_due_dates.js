@@ -48,7 +48,7 @@ function removeDueDateTableElement(deadline_type, round_no) {
 }
 
 //E1654. Improve date-picker and deadlines Code change starts
-//This is a generic funtion to add and substract days and months
+//This is a generic function to add and subtract days and months
 function addDaysOrMonth(mul, type) {
     var days = parseInt($('#days').val(), 10); // days variable stores the number of days to change the deadline
     var months = parseInt($('#months').val(), 10);  // days variable stores the number of days to change the deadline

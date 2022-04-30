@@ -137,3 +137,35 @@ async function addTagPromptDropdown(placeholder_id, tag_dep_id, questionnaire_id
     html += "</div></td></tr></table>"
     $("#" + placeholder_id).append(html)
 }
+
+function insertTeamBasedElements(isTeamsAssignment) {
+    var varyByDutyDiv = jQuery('#vary_by_duty');
+    if (isTeamsAssignment) {
+        varyByDutyDiv.removeAttr('hidden');
+        var varyByDutyCheckbox = jQuery('#vary_by_duty_checkbox');
+        if (varyByDutyCheckbox.is(':checked')) {
+            addDutyBasedQuestionnaires();
+        } else {
+            addDefaultTeammateReviewQuestionnaire();
+        }
+    } else {
+        // removing vary by duty div
+        varyByDutyDiv.attr('hidden', true);
+        // removing appropriate questionnaire rows
+        removeDutyBasedQuestionnaires()
+        removeQuestionnaireTableRow('TeammateReviewQuestionnaire');
+
+    }
+}
+
+function toggleTeammateReviewDutyQuestionnaires(isVaryByDutyChecked) {
+    if (isVaryByDutyChecked) {
+        // remove existing default teammate review questionnaire
+        removeQuestionnaireTableRow('TeammateReviewQuestionnaire');
+        // add duty based questionnaires
+        addDutyBasedQuestionnaires();
+    } else {
+        removeDutyBasedQuestionnaires();
+        addDefaultTeammateReviewQuestionnaire();
+    }
+}

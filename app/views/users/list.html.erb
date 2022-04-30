@@ -13,11 +13,11 @@
 <% end %>
 
 <%= render :partial => 'links' %>
-
 <div>
   <table class="table table-hover" style="width: 100%">
-    <tr><th class="head">UserID</th><th class="head">Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Meta-review</th></tr>
-    <% @paginated_users.each do |user| %>
+    <tr>
+      <th class="head">UserID</th><th class="head">Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Meta-review</th></tr>
+    <% for user in @paginated_users %>
       <% if (params[:show] != 'true' && !user.name(session[:ip]).include?("_hidden")) || params[:show] == 'true'%>
         <tr>
           <td><%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %></td>

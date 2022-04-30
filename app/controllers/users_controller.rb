@@ -74,7 +74,7 @@ class UsersController < ApplicationController
     search_usrid, search_fulname, search_email = search_params
 
     # Passes the above received search criteria to the User model to populate the list accordingly.
-    @users = user.get_user_list search_usrid, search_fulname, search_email
+    @users = user.get_user_list(search_usrid, search_fulname, search_email)
 
     @paginated_users = paginate_list(@users)
   end
@@ -82,11 +82,12 @@ class UsersController < ApplicationController
   # Modified the code to provide the search parameters to the list method if they were found in the search textboxes.
   # Creates a list of users to be displayed on the user interface.
   def search_params
-    search_usrname,search_fulname,search_email = ".*",".*",".*"
-    
+    search_usrname = ".*"
+    search_fulname = ".*"
+    search_email = ".*"
     # If the user name is discovered in the username text field, it is appended to the search criteria.
-    if params[:search_name].present?
-      search_usrname = ".*" + params[:search_name].strip + ".*"
+    if params[:search_usrid].present?
+      search_usrname = ".*" + params[:search_usrid].strip + ".*"
     end
 
     # If the complete name(full name) is found in the name text field, it is appended to the search criteria.
@@ -287,12 +288,8 @@ class UsersController < ApplicationController
     # users = User.search_users(role, user_id, letter, @search_by)
 
     # paginate
-    users = if paginate_options[@per_page.to_s].nil? # displaying all - no pagination
-              User.paginate(page: params[:page], per_page: users.count)
-            else # some pagination is active - use the per_page
-              User.paginate(page: params[:page], per_page: paginate_options[@per_page.to_s])
-            end
-    users
+    @selected_ids = users.map(&:id)
+    User.where(id: @selected_ids).page(params[:page]).per_page(paginate_options[@per_page.to_s])
   end
 
   # generate the undo link

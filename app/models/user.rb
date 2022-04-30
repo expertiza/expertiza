@@ -112,8 +112,8 @@ class User < ApplicationRecord
     # Cannot use collect because collect return all value including false ones
     final_users = user_list.select do |item|
       username_regex.match(item.name) \
-      and fullname_regex.match(item.fullname) \
-      and email_regex.match(item.email)
+      && fullname_regex.match(item.fullname) \
+      && email_regex.match(item.email)
     end
 
     # Returns the unique users in the selected list of users

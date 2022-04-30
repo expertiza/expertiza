@@ -1,10 +1,3 @@
-function microtaskChanged() {
-    if (jQuery('#assignment_microtask').is(':checked')) {
-  
-    } else {
-  
-    }
-  }
   
   //This function replaces whitespace ' ' in assignment name by '_' and assign to directory path field value
   $(function() {

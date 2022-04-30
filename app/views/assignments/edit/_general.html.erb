@@ -2,14 +2,6 @@
 
 <script type="text/javascript">
 
-function microtaskChanged() {
-  if (jQuery('#assignment_microtask').is(':checked')) {
-
-  } else {
-
-  }
-}
-
 //This function replaces whitespace ' ' in assignment name by '_' and assign to directory path field value
 $(function() {
     $("#assignment_form_assignment_name").change(function() {
@@ -180,7 +172,7 @@ function autogenerate_submission(){
   <tr>
     <td style='padding:5px' id='assignment_microtask_field'>
       <input name="assignment_form[assignment][microtask]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][microtask]', 'true', @assignment_form.assignment.microtask, {:onchange => 'microtaskChanged()'}) %>
+      <%= check_box_tag('assignment_form[assignment][microtask]', 'true', @assignment_form.assignment.microtask) %>
       <%= label_tag('assignment_form[assignment][microtask]', 'Micro-task assignment?') %>
     </td>
   </tr>

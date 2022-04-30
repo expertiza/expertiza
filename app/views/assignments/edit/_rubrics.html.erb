@@ -1,5 +1,3 @@
-<%= javascript_include_tag('assignment_rubrics.js') %>
-
 <script type="text/javascript">
     function addQuestionnaireTableRow(questionnaire_type, assignment_questionnaire, questionnaire, questionnaire_options, round_no, duty_id, duty_name) {
         var questionnaire_table = jQuery('#assignment_questionnaire_table>tbody>tr');
@@ -243,107 +241,115 @@
 
 <!--Add a review varies by round checkbox. -->
 <!-- This is vary_by_round attribute of assignment created by migration -->
-<input name="assignment_form[assignment][vary_by_round]" type="hidden" value="false" />
-<%= check_box_tag('assignment_form[assignment][vary_by_round]', 'true', @assignment_form.assignment.vary_by_round, onclick: "handleCheckReviewVaryByRound(this)") %>
-<%= label_tag('assignment_form[assignment][vary_by_round]', 'Review rubric varies by round?') %>
-<br>
+<div>
+  <input name="assignment_form[assignment][vary_by_round]" type="hidden" value="false" />
+  <%= check_box_tag('assignment_form[assignment][vary_by_round]', 'true', @assignment_form.assignment.vary_by_round, onclick: "handleCheckReviewVaryByRound(this)") %>
+  <%= label_tag('assignment_form[assignment][vary_by_round]', 'Review rubric varies by round?') %>
+</div>
+
 <!-- Add a review varies by topic checkbox -->
 <!-- This is vary_by_topic attribute of assignment created by migration -->
-<input name="assignment_form[assignment][vary_by_topic]" type="hidden" value="false" />
-<%= check_box_tag('assignment_form[assignment][vary_by_topic]', 'true', @assignment_form.assignment.vary_by_topic) %>
-<%= label_tag('assignment_form[assignment][vary_by_topic]', 'Review rubric varies by topic?') %>
-<br>
+<div>
+  <input name="assignment_form[assignment][vary_by_topic]" type="hidden" value="false" />
+  <%= check_box_tag('assignment_form[assignment][vary_by_topic]', 'true', @assignment_form.assignment.vary_by_topic) %>
+  <%= label_tag('assignment_form[assignment][vary_by_topic]', 'Review rubric varies by topic?') %>
+</div>
+
 <!--Add a review varies by duties (role in the UI) checkbox if teams is allowed -->
 <!-- This is questionnaire_varies_by_duty attribute of assignment created by migration -->
 <div id="vary_by_duty" <% 'hidden' unless @assignment_form.assignment.team_assignment? %> >
-    <input name="assignment_form[assignment][questionnaire_varies_by_duty]" type="hidden" value="false" />
-    <%= check_box_tag('assignment_form[assignment][questionnaire_varies_by_duty]', 'true', @assignment_form.assignment.questionnaire_varies_by_duty, {:id => "vary_by_duty_checkbox", onclick: "toggleTeammateReviewDutyQuestionnaires(this.checked)"}) %>
-    <%= label_tag('assignment_form[assignment][questionnaire_varies_by_duty]', 'Review rubric varies by role?') %>
+  <input name="assignment_form[assignment][questionnaire_varies_by_duty]" type="hidden" value="false" />
+  <%= check_box_tag('assignment_form[assignment][questionnaire_varies_by_duty]', 'true', @assignment_form.assignment.questionnaire_varies_by_duty, {:id => "vary_by_duty_checkbox", onclick: "toggleTeammateReviewDutyQuestionnaires(this.checked)"}) %>
+  <%= label_tag('assignment_form[assignment][questionnaire_varies_by_duty]', 'Review rubric varies by role?') %>
 </div>
-<div>
+
 <table class='exp table table-striped' id='assignment_questionnaire_table' style='padding:20px; font-size: 15px; width: 100%'>
   <tr class='heading'>
     <th width="10%"></th>
     <th style="text-align: center;" width="30%">Questionnaire</th>
     <th style="text-align: center;" width="15%">Use dropdown<br/>instead
-      <img src="/assets/info.png" title="If instructor choose 'Use dropdown instead', a simple dropdown will be used for student to do peer review instead of the corresponding questionnare.">
+        <img src="/assets/info.png" title="If instructor choose 'Use dropdown instead', a simple dropdown will be used for student to do peer review instead of the corresponding questionnare.">
     </th>
     <th style="text-align: center;" width="15%">Scored-question<br/>display style
-      <img src="/assets/info.png" title="Instructor can decide for scored questions, should they be displayed as scaled questions (the scores are displayed in the next line as a set of radio buttons) or criterion questions (the scores displayed as dropdown).">
+        <img src="/assets/info.png" title="Instructor can decide for scored questions, should they be displayed as scaled questions (the scores are displayed in the next line as a set of radio buttons) or criterion questions (the scores displayed as dropdown).">
     </th>
     <th style="text-align: center;" width="15%">Weight</th>
     <th style="text-align: center;" width="15%">Notification Limit
-      <img src="/assets/info.png" title="If a new review differ from existing reviews on the same artifact by more than this percentage, the instructor will be notified by e-mail.">
+        <img src="/assets/info.png" title="If a new review differ from existing reviews on the same artifact by more than this percentage, the instructor will be notified by e-mail.">
     </th>
   </tr>
+
   <script>
-      jQuery(document).ready(function () {
-          // Adding an event listener to the team assignment checkbox.
-          jQuery('#team_assignment').change(function() {
-              insertTeamBasedElements(this.checked)
-          });
+        jQuery(document).ready(function () {
+            // Adding an event listener to the team assignment checkbox.
+            jQuery('#team_assignment').change(function() {
+                insertTeamBasedElements(this.checked)
+            });
 
-          <% if @assignment_form.assignment.vary_by_round %>
-          <% 1.upto(@assignment_form.assignment.rounds_of_reviews) do |i| %>
-          <% assignment_questionnaire = @assignment_form.assignment_questionnaire('ReviewQuestionnaire', i, nil) %>
-          <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire') %>
-          addQuestionnaireTableRow(
-              'ReviewQuestionnaire',
-              <%= assignment_questionnaire.to_json.html_safe %>,
-              <%= questionnaire.to_json.html_safe %>,
-              <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>,
-              <%= i %>
-          );
-          <% end %>
-          <% else %>
-          <% assignment_questionnaire = @assignment_form.assignment_questionnaire('ReviewQuestionnaire', nil, nil) %>
-          <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire') %>
-          addQuestionnaireTableRow(
-              'ReviewQuestionnaire',
-              <%= assignment_questionnaire.to_json.html_safe %>,
-              <%= questionnaire.to_json.html_safe %>,
-              <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>,
-              null
-          );
-          <% end %>
-          var metareview_allowed_checkbox = jQuery('#metareview_allowed');
-          if (metareview_allowed_checkbox.is(':checked')) {
-              <% assignment_questionnaire = @assignment_form.assignment_questionnaire('MetareviewQuestionnaire', nil, nil) %>
-              <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'MetareviewQuestionnaire') %>
-              addQuestionnaireTableRow(
-                  'MetareviewQuestionnaire',
-                  <%= assignment_questionnaire.to_json.html_safe %>,
-                  <%= questionnaire.to_json.html_safe %>,
-                  <%= questionnaire_options('MetareviewQuestionnaire').to_json.html_safe %>,
-                  null
-              );
-          }
-          <% assignment_questionnaire = @assignment_form.assignment_questionnaire('AuthorFeedbackQuestionnaire', nil, nil) %>
-          <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'AuthorFeedbackQuestionnaire') %>
-          addQuestionnaireTableRow(
-              'AuthorFeedbackQuestionnaire',
-              <%= assignment_questionnaire.to_json.html_safe %>,
-              <%= questionnaire.to_json.html_safe %>,
-              <%= questionnaire_options('AuthorFeedbackQuestionnaire').to_json.html_safe %>,
-              null
-          );
+            <% if @assignment_form.assignment.vary_by_round %>
+            <% 1.upto(@assignment_form.assignment.rounds_of_reviews) do |i| %>
+            <% assignment_questionnaire = @assignment_form.assignment_questionnaire('ReviewQuestionnaire', i, nil) %>
+            <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire') %>
+            addQuestionnaireTableRow(
+                'ReviewQuestionnaire',
+                <%= assignment_questionnaire.to_json.html_safe %>,
+                <%= questionnaire.to_json.html_safe %>,
+                <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>,
+                <%= i %>
+            );
+            <% end %>
+            <% else %>
+            <% assignment_questionnaire = @assignment_form.assignment_questionnaire('ReviewQuestionnaire', nil, nil) %>
+            <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire') %>
+            addQuestionnaireTableRow(
+                'ReviewQuestionnaire',
+                <%= assignment_questionnaire.to_json.html_safe %>,
+                <%= questionnaire.to_json.html_safe %>,
+                <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>,
+                null
+            );
+            <% end %>
+            var metareview_allowed_checkbox = jQuery('#metareview_allowed');
+            if (metareview_allowed_checkbox.is(':checked')) {
+                <% assignment_questionnaire = @assignment_form.assignment_questionnaire('MetareviewQuestionnaire', nil, nil) %>
+                <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'MetareviewQuestionnaire') %>
+                addQuestionnaireTableRow(
+                    'MetareviewQuestionnaire',
+                    <%= assignment_questionnaire.to_json.html_safe %>,
+                    <%= questionnaire.to_json.html_safe %>,
+                    <%= questionnaire_options('MetareviewQuestionnaire').to_json.html_safe %>,
+                    null
+                );
+            }
+            <% assignment_questionnaire = @assignment_form.assignment_questionnaire('AuthorFeedbackQuestionnaire', nil, nil) %>
+            <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'AuthorFeedbackQuestionnaire') %>
+            addQuestionnaireTableRow(
+                'AuthorFeedbackQuestionnaire',
+                <%= assignment_questionnaire.to_json.html_safe %>,
+                <%= questionnaire.to_json.html_safe %>,
+                <%= questionnaire_options('AuthorFeedbackQuestionnaire').to_json.html_safe %>,
+                null
+            );
 
-          var teamAssignmentCheckbox = jQuery('#team_assignment')
-          insertTeamBasedElements(teamAssignmentCheckbox.is(':checked'))
+            var teamAssignmentCheckbox = jQuery('#team_assignment')
+            insertTeamBasedElements(teamAssignmentCheckbox.is(':checked'))
 
-          var bookmark_checkbox = jQuery('#assignment_form_assignment_use_bookmark');
-          if (bookmark_checkbox.is(':checked')) {
-              <% assignment_questionnaire = @assignment_form.assignment_questionnaire('BookmarkRatingQuestionnaire', nil, nil) %>
-              <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'BookmarkRatingQuestionnaire') %>
-              addQuestionnaireTableRow(
-                  'BookmarkRatingQuestionnaire',
-                  <%= assignment_questionnaire.to_json.html_safe %>,
-                  <%= questionnaire.to_json.html_safe %>,
-                  <%= questionnaire_options('BookmarkRatingQuestionnaire').to_json.html_safe %>,
-                  null
-              );
-          }
-      });
+            var bookmark_checkbox = jQuery('#assignment_form_assignment_use_bookmark');
+            if (bookmark_checkbox.is(':checked')) {
+                <% assignment_questionnaire = @assignment_form.assignment_questionnaire('BookmarkRatingQuestionnaire', nil, nil) %>
+                <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'BookmarkRatingQuestionnaire') %>
+                addQuestionnaireTableRow(
+                    'BookmarkRatingQuestionnaire',
+                    <%= assignment_questionnaire.to_json.html_safe %>,
+                    <%= questionnaire.to_json.html_safe %>,
+                    <%= questionnaire_options('BookmarkRatingQuestionnaire').to_json.html_safe %>,
+                    null
+                );
+            }
+        });
   </script>
+
 </table>
-</div>
+
+
+<%= javascript_include_tag('assignment_rubrics.js') %>

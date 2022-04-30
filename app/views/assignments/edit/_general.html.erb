@@ -1,61 +1,44 @@
-<%= javascript_include_tag('assignment_general.js') %>
-
-<script type="text/javascript">
-
-//This function replaces whitespace ' ' in assignment name by '_' and assign to directory path field value
-$(function() {
-    $("#assignment_form_assignment_name").change(function() {
-        filename = $( "#assignment_form_assignment_name" ).val().replace(/ /g,"_").replace(/[/\\?%*:|"<>/$&!#%^@]/g, '');;
-        $('#assignment_form_assignment_directory_path').val(filename);
-    });
-});
-//E2138 added function
-function autogenerate_submission(){
-  assignment_form.assignment.directory_path = assignment_form.assignment.name;
-}
-
-</script>
-
 <table id='assignment_general_info_table' class="borderless">
-<tr class='heading'>
-<th width="0%"></th>
-<th width="100%"></th>
-</tr>
+  <tr class='heading'>
+    <th width="0%"></th>
+    <th width="100%"></th>
+  </tr>
 
-<%= hidden_field_tag('assignment_form[assignment][instructor_id]', @assignment_form.assignment.instructor_id) %>
-<%= hidden_field_tag('assignment_form[assignment][course_id]', @assignment_form.assignment.course_id) %>
-<%= hidden_field_tag('assignment_form[assignment][id]', @assignment_form.assignment.id) %>
+  <%= hidden_field_tag('assignment_form[assignment][instructor_id]', @assignment_form.assignment.instructor_id) %>
+  <%= hidden_field_tag('assignment_form[assignment][course_id]', @assignment_form.assignment.course_id) %>
+  <%= hidden_field_tag('assignment_form[assignment][id]', @assignment_form.assignment.id) %>
 
-<tr>
-<td style='padding:5px'><%= label_tag('assignment_form[assignment][name]', 'Assignment name:') %></td>
-<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][name]', @assignment_form.assignment.name, :style => 'width:250px', class: 'form-control') %></td>
-</tr>
+  <tr>
+    <td style='padding:5px'><%= label_tag('assignment_form[assignment][name]', 'Assignment name:') %></td>
+    <td style='padding:5px'><%= text_field_tag('assignment_form[assignment][name]', @assignment_form.assignment.name, :style => 'width:250px', class: 'form-control') %></td>
+  </tr>
 
-<tr>
-<td style='padding:5px'><%= label_tag('assignment_form[assignment][course_id]', 'Course:') %></td>
-<td style='padding:5px'><%= select('assignment_form[assignment]', 'course_id', course_options(@assignment_form.assignment.instructor), {:selected => @assignment_form.assignment.course_id}, {:class => "form-control", :style => 'width: 250px'}) %></td>
-</tr>
+  <tr>
+  <td style='padding:5px'><%= label_tag('assignment_form[assignment][course_id]', 'Course:') %></td>
+  <td style='padding:5px'><%= select('assignment_form[assignment]', 'course_id', course_options(@assignment_form.assignment.instructor), {:selected => @assignment_form.assignment.course_id}, {:class => "form-control", :style => 'width: 250px'}) %></td>
+  </tr>
 
-<tr><div class="form-inline">
-<td style='padding:5px'><%= label_tag('assignment_form[assignment][directory_path]', 'Submission directory:') %></td>
-<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px', class: 'form-control') %>  (Mandatory field. No space or special chars. <br/> Directory name will be auto-generated if not provided. In the form of assignment_[assignment_id].)
-  <img src="/assets/info.png" title='- DO NOT change this filed for an on-going assignment. This may cause lost of student submitted file.'>
-</td></div>
-</tr>
+  <tr>
+    <div class="form-inline">
+      <td style='padding:5px'><%= label_tag('assignment_form[assignment][directory_path]', 'Submission directory:') %></td>
+      <td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px', class: 'form-control') %>  (Mandatory field. No space or special chars. <br/> Directory name will be auto-generated if not provided. In the form of assignment_[assignment_id].)
+        <img src="/assets/info.png" title='- DO NOT change this filed for an on-going assignment. This may cause lost of student submitted file.'>
+      </td>
+    </div>
+  </tr>
 
-<tr>
-<td style='padding:5px'><%= label_tag('assignment_form[assignment][spec_location]', 'Description URL: ') %></td>
-<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][spec_location]', @assignment_form.assignment.spec_location, :style => 'width:250px', class: 'form-control') %></td>
-</tr>
+  <tr>
+    <td style='padding:5px'><%= label_tag('assignment_form[assignment][spec_location]', 'Description URL: ') %></td>
+    <td style='padding:5px'><%= text_field_tag('assignment_form[assignment][spec_location]', @assignment_form.assignment.spec_location, :style => 'width:250px', class: 'form-control') %></td>
+  </tr>
 </table>
 
-<br/>
-<hr/>
+<hr>
 
 <table id='assignment_general_setting_table' class="borderless table-not-full-width">
-<tr class='heading'>
-<th width=82%></th>
-<th width=100%></th>
+  <tr class='heading'>
+    <th width=82%></th>
+    <th width=100%></th>
   </tr>
 
   <tr>
@@ -81,10 +64,12 @@ function autogenerate_submission(){
           <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:50px;', class: 'form-control'}) %>
         </span>
       </div>
+      
       <span id='assignment_show_teammate_reviews' class="form-inline"  <%= 'hidden' unless @assignment_form.assignment.team_assignment?%>>
         <%= check_box_tag('assignment_form[assignment][show_teammate_reviews]', 'true', @assignment_form.assignment.show_teammate_reviews) %>
         <%= label_tag('assignment_form[assignment][show_teammate_reviews]', 'Show teammate reviews?') %>
       </span>
+
       &nbsp;&nbsp;&nbsp;&nbsp;
       <!--Maximum number of members per team-->
     </td>
@@ -134,10 +119,7 @@ function autogenerate_submission(){
       <%= label_tag('assignment_form[assignment][is_conference_assignment]','Will this assignment be used to review papers for conference?') %>
     </td>
   </tr>
-  <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
-  <script type="text/javascript">
-       new Clipboard('button');
-  </script>
+
   <tr>
     <% if current_page?(action: 'edit') %>
       <% if @assignment_form.assignment.is_conference_assignment %>
@@ -202,6 +184,7 @@ function autogenerate_submission(){
       </div>
     </td>
   </tr>
+
   <tr colspan="3">
     <td style='padding:5px'>
       <input type="checkbox" name = "toggle_simicheck_setting" id="toggle_simicheck_setting" <%= "checked" if @assignment_form.assignment.simicheck != -1 %> onclick="useSimicheckChanged()"></input>
@@ -210,10 +193,10 @@ function autogenerate_submission(){
         <div class="form-inline">
           <%= label_tag('assignment_form[assignment][simicheck]', 'SimiCheck Delay') %>
           <%= select('assignment_form[assignment]', 'simicheck', (-1..100).to_a.map{|n| n== -1? ['No SimiCheck', -1] : [n, n]}, {:selected => @assignment_form.assignment.simicheck}, {:class => 'form-control', :style => 'width: 150px'}) %><b> hours</b>
-          <br></br>
+          <br>
           <%= label_tag('assignment_form[assignment][simicheck_threshold]', 'SimiCheck Similarity Threshold') %>
           <%= select('assignment_form[assignment]', 'simicheck_threshold', (0..100).to_a.map{|n| n== 100? ['', 100]: [n, n]}, {:selected => @assignment_form.assignment.simicheck_threshold}, {:class => 'form-control', :style => 'width: 70px'}) %><b> %</b>
-          <br>(Filter that refers to % text same between 2 docs)</br>
+          <br>(Filter that refers to % text same between 2 docs)
         </div>
       </div>
     </td>
@@ -237,67 +220,86 @@ function autogenerate_submission(){
       <%= label_tag('assignment_form[assignment][availability_flag]', 'Available to students?') %>
     </td>
   </tr>
+
 </table>
 
 
-<script type="text/javascript">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js">
+
+  new Clipboard('button');
+
+  //This function replaces whitespace ' ' in assignment name by '_' and assign to directory path field value
+  $(function() {
+      $("#assignment_form_assignment_name").change(function() {
+          filename = $( "#assignment_form_assignment_name" ).val().replace(/ /g,"_").replace(/[/\\?%*:|"<>/$&!#%^@]/g, '');;
+          $('#assignment_form_assignment_directory_path').val(filename);
+      });
+  });
+
+  //E2138 added function
+  function autogenerate_submission(){
+    assignment_form.assignment.directory_path = assignment_form.assignment.name;
+  }
     
-    function staggeredDeadlineChanged() {
-      var msg = 'Warning! Unchecking all topics for this assignment will now have the same deadline.'
-      if (!jQuery('#assignment_staggered_deadline').is(':checked')) {
-        if (!confirm(msg)) {
-          jQuery('#assignment_staggered_deadline').prop('checked', true);
-        }
+  function staggeredDeadlineChanged() {
+    var msg = 'Warning! Unchecking all topics for this assignment will now have the same deadline.'
+    if (!jQuery('#assignment_staggered_deadline').is(':checked')) {
+      if (!confirm(msg)) {
+        jQuery('#assignment_staggered_deadline').prop('checked', true);
       }
     }
+  }
 
-   function reviewStrategyChanged() {
-     var val = jQuery('#assignment_form_assignment_review_assignment_strategy').val();
-        if (val == 'Auto-Selected') {
-          jQuery('#assignment_review_topic_threshold_row').removeAttr('hidden');
-          jQuery('#instructor_selected_review_mapping_mechanism').attr('hidden', true);
-        } else {
-          jQuery('#instructor_selected_review_mapping_mechanism').removeAttr('hidden');
-          jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
-        }
-   }
-
-
-    function hasQuizChanged() {
-      if (jQuery('#assignment_form[assignment][require_quiz]').is(':checked')) {
-        jQuery('#assignment_numbers_of_quiz_field').removeAttr('hidden');
+  function reviewStrategyChanged() {
+    var val = jQuery('#assignment_form_assignment_review_assignment_strategy').val();
+      if (val == 'Auto-Selected') {
+        jQuery('#assignment_review_topic_threshold_row').removeAttr('hidden');
+        jQuery('#instructor_selected_review_mapping_mechanism').attr('hidden', true);
       } else {
-        jQuery('#assignment_numbers_of_quiz_field').attr('hidden', true);
+        jQuery('#instructor_selected_review_mapping_mechanism').removeAttr('hidden');
+        jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
       }
-    }
+  }
 
-    function useSimicheckChanged(){
-      if (jQuery('#toggle_simicheck_setting').is(':checked')) {
-        jQuery('#assignment_simicheck_field').show();
-        jQuery('#assignment_simicheck_threshold').show();
-      } else {
-        jQuery('#assignment_simicheck_field').hide();
-        jQuery('#assignment_simicheck_threshold').hide();
+
+  function hasQuizChanged() {
+    if (jQuery('#assignment_form[assignment][require_quiz]').is(':checked')) {
+      jQuery('#assignment_numbers_of_quiz_field').removeAttr('hidden');
+    } else {
+      jQuery('#assignment_numbers_of_quiz_field').attr('hidden', true);
+    }
+  }
+
+  function useSimicheckChanged(){
+    if (jQuery('#toggle_simicheck_setting').is(':checked')) {
+      jQuery('#assignment_simicheck_field').show();
+      jQuery('#assignment_simicheck_threshold').show();
+    } else {
+      jQuery('#assignment_simicheck_field').hide();
+      jQuery('#assignment_simicheck_threshold').hide();
+    }
+  }
+
+  jQuery(document).ready(function() {
+    jQuery('#first_submit_tag').add('#second_submit_tag').click(function(e){
+      if(<%= @participants_count == 0 &&  @teams_count == 0 &&  @assignment_form.assignment.max_team_size > 1 %>) {
+        alert('Please create participants and teams for this assignment before assigning reviewers.');
+        e.preventDefault();
+        e.stopPropagation();
       }
-    }
-
-    jQuery(document).ready(function() {
-     jQuery('#first_submit_tag').add('#second_submit_tag').click(function(e){
-       if(<%= @participants_count == 0 &&  @teams_count == 0 &&  @assignment_form.assignment.max_team_size > 1 %>) {
-         alert('Please create participants and teams for this assignment before assigning reviewers.');
-         e.preventDefault();
-         e.stopPropagation();
-       }
-       else if(<%= @participants_count == 0 %>){
-         alert('Please create participants for this assignment before assigning reviewers.');
-         e.preventDefault();
-         e.stopPropagation();
-       }
-       else if(<%= @teams_count == 0 %> && <%= @assignment_form.assignment.max_team_size > 1 %>){
-         alert('Please create teams for this assignment before assigning reviewers.');
-         e.preventDefault();
-         e.stopPropagation();
-       }
-     });
+      else if(<%= @participants_count == 0 %>){
+        alert('Please create participants for this assignment before assigning reviewers.');
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      else if(<%= @teams_count == 0 %> && <%= @assignment_form.assignment.max_team_size > 1 %>){
+        alert('Please create teams for this assignment before assigning reviewers.');
+        e.preventDefault();
+        e.stopPropagation();
+      }
     });
-  </script>
+  });
+
+</script>
+
+<%= javascript_include_tag('assignment_general.js') %>

@@ -1,7 +1,109 @@
-<%= javascript_include_tag('assignment_due_dates.js') %>
+<div style='padding: 5px' id='review_round' class="form-inline">
+  <%= label_tag('assignment_form[assignment][rounds_of_reviews]', 'Number of review rounds:') %>
+  <%= text_field_tag('assignment_form[assignment][rounds_of_reviews]', @assignment_form.assignment.rounds_of_reviews, :style => 'width:150px', class: "form-control") %>
+  <button type="button" id="set_rounds" class="btn btn-default">Set</button>
+  <label style='padding-left: 300px; text-align:right;'>Timezone : <%= current_user.timezonepref %></label>
+</div>
 
-<script type="text/javascript">
-    jQuery(document).ready(function () {
+<%= hidden_field(:set_pressed, :bool, :value => true) %>
+
+<% if @assignment_form.assignment.rounds_of_reviews > 1 %>
+  <!--Add a change name or url checkbox. By: Xiaoqiang Shao-->
+  <input name="changenameurl" type="hidden" value="false"/>
+  <%= check_box_tag('changenameurl', 'true', @due_date_nameurl_not_empty_checkbox, :onclick => "handleChangenameurl(this.checked,due_date_name_column,due_date_url_column)") %>
+  <%= label_tag('changenameurl', 'Name and description URL vary by round') %>
+  <br>
+<% end %>
+
+<% if @assignment_form.assignment.topics? %>
+  <input name="signupAllowed" type="hidden" value="false"/>
+  <%= check_box_tag('signupAllowed', 'true', @signup_allowed, :onclick => "removeOrAddSignup()") %>
+  <%= label_tag('signupAllowed', 'Use signup deadline') %><br/>
+
+  <input name="dropTopicAllowed" type="hidden" value="false"/>
+  <%= check_box_tag('dropTopicAllowed', 'true', @drop_topic_allowed, :onclick => "removeOrAddDropTopic()") %>
+  <%= label_tag('dropTopicAllowed', 'Use drop topic deadline') %><br/>
+<% end %>
+
+<span id='team_formation_due_date_checkbox' <%= 'hidden' unless @assignment_form.assignment.team_assignment? %>>
+    <input name="teamFormationAllowed" type="hidden" value="false">
+    <%= check_box_tag('teamFormationAllowed', 'true', @team_formation_allowed, :onclick => "removeOrAddTeamFormation()") %>
+    <%= label_tag('teamFormationAllowed', 'Use team formation deadline') %><br/>
+</span>
+
+<input name="metareview_allowed" type="hidden" value="false"/>
+<%= check_box_tag('metareview_allowed', 'true', @metareview_allowed, :onclick => "removeOrAddMetareview()") %>
+<%= label_tag('metareview_allowed', 'Use meta-review deadline') %><br/><br/>
+
+<div id="date_updater_div">
+  <button type="button" id="show_date_updater" class="btn btn-default" style="margin-bottom: 20px; margin-right: 10px; float: left">Show/Hide Date Updater</button>
+</div>
+<img style="margin-left: 30px" src="/assets/info.png" title='Enter the number of days by which you want to prepone/postpone the deadline. Then select rows using the checkbox provided under Use Date Updater column. Then use +/- to change the Date and Time.   '>
+<div id="date_updater_inner" style="float: left; margin-left: 40px">
+
+
+    <%= label_tag('Days') %>
+    <button type="button" id="addDays_btn" class="btn btn-default">+</button>
+    <input id="days" type="number" name="quantity" min="0" value="1" style="width:50px">
+    <button type="button" id="subDays_btn" class="btn btn-default">-</button>
+
+
+</div>
+
+<table class='exp table table-striped' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden; font-size: 15px'>
+
+  <tr id='due_date_heading'>
+    <th width=10% style="text-align:left;">Deadline type</th>
+    <th width=10% style="text-align:center;">Date & time</th>
+    <th width=5% style="text-align:center;">Use Date Updater</th>
+    <th width=10% style="text-align:center;">Submission allowed</th>
+    <th width=8% style="text-align:center;">Review allowed</th>
+    <th width=8% style="text-align:center;">Teammate review allowed</th>
+    <th width=10% style="text-align:center;">Meta-review allowed</th>
+    <% if @assignment_form.assignment.require_quiz %>
+      <th width=9% style="text-align:center;">Has quiz</th>
+    <% end %>
+    <th width=8% style="text-align:center;">Reminder(hrs)</th>
+    <th width=10% id="due_date_name_column" style="text-align:center;">Due date name</th>
+    <th width=10% id="due_date_url_column" style="text-align:center;">Description URL</th>
+
+  </tr>
+  <tr id='blank' style='display:hidden'></tr>
+  <script>
+      function addTeamInformation() {
+          <% if @assignment_form.assignment.team_assignment? && due_date(@assignment_form.assignment, 'team_formation').due_at %>
+            addDueDateTableElement(<%= @due_date_nameurl_not_empty.nil? ? false:@due_date_nameurl_not_empty %>, 'team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
+          <% end %>
+      }
+
+      jQuery(document).ready(function () {
+          addTeamInformation()
+          <% if @assignment_form.assignment.topics? %>
+          <% if due_date(@assignment_form.assignment, 'signup').due_at %>
+          addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
+          <% end %>
+          <% if due_date(@assignment_form.assignment, 'drop_topic').due_at %>
+          addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'drop_topic', 0, <%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>);
+          <% end %>
+          <% end %>
+          <% 1.upto @assignment_form.assignment.rounds_of_reviews do |i| %>
+          addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'submission', <%=i%>, <%= due_date(@assignment_form.assignment, 'submission', i-1).to_json.html_safe %>); // or use questionnaire_options(@assignment, nil).to_json
+          addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'review', <%=i%>, <%= due_date(@assignment_form.assignment, 'review', i-1).to_json.html_safe %>);
+          <% end %>
+          <% if @metareview_allowed %>
+          addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
+          <%end %>
+
+          //after webpage refreshes, hide or display name and url according to whether names and urls are empty in DB
+          var due_date_name_column = document.getElementById("due_date_name_column");
+          var due_date_url_column = document.getElementById("due_date_url_column");
+          <% if @due_date_nameurl_not_empty.nil? or @due_date_nameurl_not_empty.eql? false %>
+          due_date_name_column.style.display = "none";
+          due_date_url_column.style.display = "none";
+          <% end %>
+
+      }());
+      jQuery(document).ready(function () {
         jQuery("#set_rounds").click(function () {
             changeReviewRounds();
             jQuery("#set_pressed_bool").val(true)
@@ -13,25 +115,25 @@
         });
 
 
-        //E1654. Improve date-picker and deadlines Code change starts
-        //Hide date updater
+        // E1654. Improve date-picker and deadlines Code change starts
+        // Hide date updater
         $("#date_updater_inner").hide();
-        //This on-click function toggles date updater div
+        // This on-click function toggles date updater div
         jQuery("#show_date_updater").click(function () {
 
             $("#date_updater_inner").toggle();
         });
-        //The functions below update the required parameter for the assignments that have their check-boxes marked for updation.
+        // The functions below update the required parameter for the assignments that have their check-boxes marked for updation.
 
-        //This function adds days to the date
+        // This function adds days to the date
         jQuery("#addDays_btn").click(function () {
-//calls the function addDaysOrMonth
+            // Calls the function addDaysOrMonth
             addDaysOrMonth(1, "days");
             event.preventDefault();
 
         });
 
-        //This function removes days from the date
+        // This function removes days from the date
         jQuery("#subDays_btn").click(function () {
 
             addDaysOrMonth(-1, "days");
@@ -40,13 +142,13 @@
         });
 
 
-        //E1654. Improve date-picker and deadlines Code change starts
+        // E1654. Improve date-picker and deadlines Code change starts
 
     });
 
     function addDueDateTableElement(addnameurl, deadline_type, round_no, due_date) {
-//round_no = 0 for submission and review is not possible
-//round_no = 0 is used for other deadlines
+    //round_no = 0 for submission and review is not possible
+    //round_no = 0 is used for other deadlines
 
         var previous_element;
         previous_element = createPreviousElement(deadline_type, round_no);
@@ -102,12 +204,8 @@
             '" type="checkbox" name="updatorCheck" style="width: 20px">' + '</td>';
 
         html += '<td ' + style_center + ' class="due_date_due_at" width="10%">';
-        // if(deadline_type == 'team_formation'){
-        //     html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]" disabled>'
-        // }
-        // else{
+
         html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]" class="form-control" style="width: 75px">'
-        // }
         html +=
             '<option value="1">No</option>' +
             '<option value="2">Late</option>' +
@@ -115,12 +213,8 @@
             '</select></td>';
 
         html += '<td '  + style_center + ' class="due_date_review_allowed_id" width="10%">';
-        // if(deadline_type == 'team_formation'){
-        //     html += '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]" disabled>'
-        // }
-        // else{
+
         html += '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]" class="form-control" style="width: 75px">'
-        // }
         html +=
             '<option value="1">No</option>' +
             '<option value="2">Late</option>' +
@@ -136,12 +230,7 @@
             '</select></td>';
 
         html += '<td '  + style_center +  ' class="due_date_review_of_review_allowed_id" width="10%">';
-        // if(deadline_type == 'team_formation'){
-        //     html += '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]" disabled>'
-        // }
-        // else{
         html += '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]" class="form-control" style="width: 75px">'
-        // }
         html +=
             '<option value="1">No</option>' +
             '<option value="2">Late</option>' +
@@ -378,112 +467,9 @@
         <%@metareview_allowed_checkbox=true%>
     }
     //E1654. Improve date-picker and deadlines Code change ends
-
-</script>
-
-<div style='padding: 5px' id='review_round' class="form-inline">
-  <%= label_tag('assignment_form[assignment][rounds_of_reviews]', 'Number of review rounds:') %>
-  <%= text_field_tag('assignment_form[assignment][rounds_of_reviews]', @assignment_form.assignment.rounds_of_reviews, :style => 'width:150px', class: "form-control") %>
-  <button type="button" id="set_rounds" class="btn btn-default">Set</button>
-  <label style='padding-left: 300px; text-align:right;'>Timezone : <%= current_user.timezonepref %></label>
-</div>
-
-<%= hidden_field(:set_pressed, :bool, :value => true) %>
-
-<% if @assignment_form.assignment.rounds_of_reviews > 1 %>
-  <!--Add a change name or url checkbox. By: Xiaoqiang Shao-->
-  <input name="changenameurl" type="hidden" value="false"/>
-  <%= check_box_tag('changenameurl', 'true', @due_date_nameurl_not_empty_checkbox, :onclick => "handleChangenameurl(this.checked,due_date_name_column,due_date_url_column)") %>
-  <%= label_tag('changenameurl', 'Name and description URL vary by round') %>
-  <br>
-<% end %>
-
-<% if @assignment_form.assignment.topics? %>
-  <input name="signupAllowed" type="hidden" value="false"/>
-  <%= check_box_tag('signupAllowed', 'true', @signup_allowed, :onclick => "removeOrAddSignup()") %>
-  <%= label_tag('signupAllowed', 'Use signup deadline') %><br/>
-
-  <input name="dropTopicAllowed" type="hidden" value="false"/>
-  <%= check_box_tag('dropTopicAllowed', 'true', @drop_topic_allowed, :onclick => "removeOrAddDropTopic()") %>
-  <%= label_tag('dropTopicAllowed', 'Use drop topic deadline') %><br/>
-<% end %>
-
-<span id='team_formation_due_date_checkbox' <%= 'hidden' unless @assignment_form.assignment.team_assignment? %>
-<input name="teamFormationAllowed" type="hidden" value="false"/>
-<%= check_box_tag('teamFormationAllowed', 'true', @team_formation_allowed, :onclick => "removeOrAddTeamFormation()") %>
-<%= label_tag('teamFormationAllowed', 'Use team formation deadline') %><br/>
-</span>
-
-<input name="metareview_allowed" type="hidden" value="false"/>
-<%= check_box_tag('metareview_allowed', 'true', @metareview_allowed, :onclick => "removeOrAddMetareview()") %>
-<%= label_tag('metareview_allowed', 'Use meta-review deadline') %><br/><br/>
-<div id="date_updater_div">
-  <button type="button" id="show_date_updater" class="btn btn-default" style="margin-bottom: 20px; margin-right: 10px; float: left">Show/Hide Date Updater</button>
-</div>
-<img style="margin-left: 30px" src="/assets/info.png" title='Enter the number of days by which you want to prepone/postpone the deadline. Then select rows using the checkbox provided under Use Date Updater column. Then use +/- to change the Date and Time.   '>
-<div id="date_updater_inner" style="float: left; margin-left: 40px">
-
-
-    <%= label_tag('Days') %>
-    <button type="button" id="addDays_btn" class="btn btn-default">+</button>
-    <input id="days" type="number" name="quantity" min="0" value="1" style="width:50px">
-    <button type="button" id="subDays_btn" class="btn btn-default">-</button>
-
-
-</div>
-<table class='exp table table-striped' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden; font-size: 15px'>
-
-  <tr id='due_date_heading'>
-    <th width=10% style="text-align:left;">Deadline type</th>
-    <th width=10% style="text-align:center;">Date & time</th>
-    <th width=5% style="text-align:center;">Use Date Updater</th>
-    <th width=10% style="text-align:center;">Submission allowed</th>
-    <th width=8% style="text-align:center;">Review allowed</th>
-    <th width=8% style="text-align:center;">Teammate review allowed</th>
-    <th width=10% style="text-align:center;">Meta-review allowed</th>
-    <% if @assignment_form.assignment.require_quiz %>
-      <th width=9% style="text-align:center;">Has quiz</th>
-    <% end %>
-    <th width=8% style="text-align:center;">Reminder(hrs)</th>
-    <th width=10% id="due_date_name_column" style="text-align:center;">Due date name</th>
-    <th width=10% id="due_date_url_column" style="text-align:center;">Description URL</th>
-
-  </tr>
-  <tr id='blank' style='display:hidden'></tr>
-  <script>
-      function addTeamInformation() {
-          <% if @assignment_form.assignment.team_assignment? && due_date(@assignment_form.assignment, 'team_formation').due_at %>
-            addDueDateTableElement(<%= @due_date_nameurl_not_empty.nil? ? false:@due_date_nameurl_not_empty %>, 'team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
-          <% end %>
-      }
-      jQuery(document).ready(function () {
-          addTeamInformation()
-          <% if @assignment_form.assignment.topics? %>
-          <% if due_date(@assignment_form.assignment, 'signup').due_at %>
-          addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
-          <% end %>
-          <% if due_date(@assignment_form.assignment, 'drop_topic').due_at %>
-          addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'drop_topic', 0, <%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>);
-          <% end %>
-          <% end %>
-          <% 1.upto @assignment_form.assignment.rounds_of_reviews do |i| %>
-          addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'submission', <%=i%>, <%= due_date(@assignment_form.assignment, 'submission', i-1).to_json.html_safe %>); // or use questionnaire_options(@assignment, nil).to_json
-          addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'review', <%=i%>, <%= due_date(@assignment_form.assignment, 'review', i-1).to_json.html_safe %>);
-          <% end %>
-          <% if @metareview_allowed %>
-          addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
-          <%end %>
-
-          //after webpage refreshes, hide or display name and url according to whether names and urls are empty in DB
-          var due_date_name_column = document.getElementById("due_date_name_column");
-          var due_date_url_column = document.getElementById("due_date_url_column");
-          <% if @due_date_nameurl_not_empty.nil? or @due_date_nameurl_not_empty.eql? false %>
-          due_date_name_column.style.display = "none";
-          due_date_url_column.style.display = "none";
-          <% end %>
-
-      }());
   </script>
 </table>
 
 <%= render :partial => 'assignments/edit/late_policy' %>
+
+<%= javascript_include_tag('assignment_due_dates.js') %>

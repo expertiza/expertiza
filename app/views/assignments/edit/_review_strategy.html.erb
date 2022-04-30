@@ -1,15 +1,13 @@
-<%= javascript_include_tag('assignment_review_strategy.js') %>
-
-
 <!--The reason why add an empty form_tag here. (https://github.com/expertiza/expertiza/commit/4d1a9d50833aca4e8771afd851daa40455d4fc37)-->
 <%= form_tag controller: 'assignment', action: 'edit', assignment_id: @assignment_form.assignment.id do %>
 <% end %>
-<table border=0 class="table-hover table-borderless" style="width: 100%">
+
+<table class="table-hover table-borderless" style="width: 100%">
   <col width="150"/>
   <col width="70"/>
   <col width="70"/>
 
-<!-- Improved the UI and capitalization of the words by team E1839 @Rayan Dasoriya -->
+  <!-- Improved the UI and capitalization of the words by team E1839 @Rayan Dasoriya -->
   <tr id='assignment_review_assignment_strategy_row' class="form-inline">
     <td>
       <%= label_tag('assignment_form[assignment][review_assignment_strategy]', 'Review strategy:') %>
@@ -81,7 +79,6 @@
            <%else%>
           <%= text_field_tag('assignment_form[assignment][num_metareviews_allowed]',  3, size: 1, class: "form-control width-70", :style => 'margin-left :100px') %>
             <%end%>
-          </br>
           <%= label_tag('assignment_form[assignment][num_metareviews_allowed]', 'Set required number of meta-reviews per reviewer') %>
 
           <%if @assignment_form.assignment.num_metareviews_allowed && @assignment_form.assignment.num_metareviews_allowed >= 0 %>
@@ -107,14 +104,14 @@
         <%= radio_button_tag 'num_reviews', 'submission', false %>
         <%= label_tag('num_reviews_per_submission', 'Set minimum number of reviews done for each submission') %>
         <span id='num_reviews_per_submission_threshold' hidden='hidden'>
-            <%= text_field_tag('num_reviews_per_submission', 0, {:style => 'width:20px'}) %>
+          <%= text_field_tag('num_reviews_per_submission', 0, {:style => 'width:20px'}) %>
           <%= submit_tag 'Assign reviewers', :id => 'second_submit_tag' %>
-          </span><br/>
+        </span><br/>
 
         <%= radio_button_tag 'num_reviews', 'calibrated_and_uncalibrated', false %>
         <%= label_tag('assign_both_calibrated_and_uncalibrated_artifacts', 'Set both calibrated and uncalibrated artifacts') %>
         <span id='calibrated_and_uncalibrated_artifacts_threshold' hidden='hidden'>
-            <%= text_field_tag('num_calibrated_artifacts', 0, {:style => 'width:20px'}) %>
+          <%= text_field_tag('num_calibrated_artifacts', 0, {:style => 'width:20px'}) %>
           <%= label_tag('num_calibrated_artifacts', 'of calibrated artifacts and ') %>
           <%= text_field_tag('num_uncalibrated_artifacts', 0, {:style => 'width:20px'}) %>
           <%= label_tag('num_uncalibrated_artifacts', 'of uncalibrated artifacts done by each student') %>
@@ -183,3 +180,5 @@
         }
     }
 </script>
+
+<%= javascript_include_tag('assignment_review_strategy.js') %>

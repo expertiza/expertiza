@@ -57,7 +57,7 @@ module ReviewMappingHelper
       if link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
         color.push 'green'
       else
-        link_updated_at = link_updated_at?(link)
+        link_updated_at = link_updated_at(link)
         color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
       end
     end
@@ -95,7 +95,7 @@ module ReviewMappingHelper
 
   # returns last modified header date
   # only checks certain links (wiki)
-  def link_updated_at?(link)
+  def link_updated_at(link)
     uri = URI(link)
     res = Net::HTTP.get_response(uri)['last-modified']
     res.to_time

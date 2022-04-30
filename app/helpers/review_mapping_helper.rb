@@ -33,7 +33,7 @@ module ReviewMappingHelper
     if Response.exists?(map_id: response_map.id)
       if !response_map.try(:reviewer).try(:review_grade).nil?
         'brown'
-      elsif response_for_each_round?(response_map)
+      elsif response_for_each_round(response_map)
         'blue'
       else
         # E2239 moving the obtain_team_color method to team_color?
@@ -64,7 +64,7 @@ module ReviewMappingHelper
   end
 
   # checks if a review was submitted in every round and gives the total responses count
-  def response_for_each_round?(response_map)
+  def response_for_each_round(response_map)
     num_responses = 0
     total_num_rounds = @assignment.num_review_rounds
     (1..total_num_rounds).each do |round|

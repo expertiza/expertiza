@@ -138,10 +138,10 @@ class LatePoliciesController < ApplicationController
     valid_penalty, error_message = true, nil
 
     if is_update
-        existing_late_policy = LatePolicy.find(params[:id])
-        if existing_late_policy.policy_name == params[:late_policy][:policy_name]
-            should_check = false
-        end
+      existing_late_policy = LatePolicy.find(params[:id])
+      if existing_late_policy.policy_name == params[:late_policy][:policy_name]
+        should_check = false
+      end
     end
 
     if should_check

@@ -9,17 +9,6 @@ function hasReviewChanged() {
         jQuery('#assignment_form_assignment_num_reviews_allowed').val('-1');
     }
 }
-// function hasMetaReviewChanged() {
-//     var checkbox = jQuery('#meta_review');
-//     var meta_reviews_allowed_field = jQuery('#meta_reviews_allowed');
-//     if (checkbox.is(':checked')) {
-//         meta_reviews_allowed_field.removeAttr('hidden');
-//         jQuery('#assignment_form_assignment_num_metareviews_allowed').val(<%=@assignment_form.assignment.num_metareviews_allowed ||= 3%>);
-//     } else {
-//         meta_reviews_allowed_field.attr('hidden', true);
-//         jQuery('#assignment_form_assignment_num_metareviews_allowed').val('-1');
-//     }
-// }
 function hasDutiesChanged() {
     var checkbox = jQuery('#is_duty_checkbox');
     var add_duties_div = jQuery('#add_duties');

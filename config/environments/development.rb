@@ -58,7 +58,7 @@ Expertiza::Application.configure do
   # This option may cause significant delays in view rendering with a large
   # number of complex assets.
   config.assets.debug = true
-  config.assets.precompile = %w( application-*.js assignment_rubrics.js)
+  config.assets.precompile = %w( application-*.js assignment_rubrics.js assignment_due_dates.js)
   config.react.variant = :development
   config.active_record.logger = nil
   # Line 63-69 are for 'bullet' gem initialization.

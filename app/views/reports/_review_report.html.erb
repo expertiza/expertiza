@@ -1,154 +1,171 @@
-<!-- the table creation is changed top accommodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
+<!-- the table creation is changed top accommodate functionality of tablesorter, which requires thead and tbody separately. Previously, headers were in tbody only -->
 <div class='reviewreport'>
   <!-- Added headers for tablesorter -->
 
   <script type='text/javascript'>
       $(window).load(function () {
-          $("#myTable tbody").sortable().disableSelection();
+          $("#myTable tbody");
+          //to add drag and drop, uncomment this, and comment the above line
+          //$("#myTable tbody").sortable();
           $("#dialog").dialog({
-            autoOpen: false,
-            modal: true,
-            show: "blind",
-            hide: "blind",
-            buttons: {
-              Ok: function() {
-                $(this).dialog("close");
+              autoOpen: false,
+              modal: true,
+              show: "blind",
+              hide: "blind",
+              buttons: {
+                  Ok: function() {
+                      $(this).dialog("close");
+                  }
               }
-            }
           });
       });
   </script>
 
   <div id="dialog" title="Success">Grade and comment for reviewer successfully saved.</div>
 
+  <!-- Sets the styling configuration for the review display based on the status of the review -->
   <p> **In "Team reviewed" column text in:</p>
-    <ul style="list-style-type:square">
-  <li><i style="color:red">red</i> indicates that the review is not  completed in any rounds;</li>
-  <li><i style="color:blue">blue</i> indicates that a review is completed in every round and the review grade is not assigned;</li>
-  <li><i style="color:green">green</i> indicates that there is no submitted work to review within the round;</li>
-  <li><i style="color:purple">purple</i> indicates that there is no review for a submitted work within the round;</li>
-  <li><i style="color: #986633">brown</i> indicates that the review grade has been assigned</li>
-</ul>
+  <ul style="list-style-type:square">
+    <li><i style="color:red">red</i> indicates that the review is not  completed in any rounds;</li>
+    <li><i style="color:blue">blue</i> indicates that a review is completed in every round and the review grade is not assigned;</li>
+    <li><i style="color:green">green</i> indicates that there is no submitted work to review within the round;</li>
+    <li><i style="color:purple">purple</i> indicates that there is no review for a submitted work within the round;</li>
+    <li><i style="color: #986633">brown</i> indicates that the review grade has been assigned</li>
+    <li>&#10004; Check mark indicates that the student has given consent to make the reviews public</li>
+  </ul>
   <p>&nbsp;</p>
 
-  <table id="myTable" class="tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
+  <button onclick="exportTableToCSV('review_scores.csv')">Export Review Scores To CSV File</button>
+  <br />
+  <br />
+  <table id="myTable" class="table table-striped" width="100%" cellspacing='0' cellpadding='2' border='0'>
     <thead>
     <tr bgcolor='#CCCCCC'>
       <!-- class value decides whether the column should be sortable or not  -->
-      <th width="16%" class="sorter-true">Reviewer <span></span></th>
-      <th width="10%" class="sorter-false">Reviews done<span></span></th>
-      <th width="24%" class="sorter-false">Team reviewed <span></span></th>
-      <th width="13%" class="sorter-false">Score awarded / Avg. score <span></span></th>
-      <th width="13%" class="sorter-true">Metrics <span></span></th>
-      <th class="sorter-false">Assign grade and write comments <span></span></th>
+      <th rowspan ="2" width="16%" class="sorter-true">Reviewer <span></span></th>
+      <th rowspan ="2" width="10%" class="sorter-true">Reviews done<span></span></th>
+      <th rowspan ="2" width="24%" class="sorter-true">Team reviewed <span></span></th>
+      <th width="6%" colspan=  "2" class="sorter-false">Scores<span></span></th>
+      <th rowspan ="2" width="14%" class="sorter-true">Metrics <span></span></th>
+      <th rowspan ="2" class="sorter-false">Assign grade and write comments <span></span></th>
+    </tr>
+    <tr bgcolor='#CCCCCC'>
+
+      <th width="6%" class="sorter-true"> Score awarded <span></span></th>
+      <th width="6%" class="sorter-true"> AVG Score <span></span></th>
     </tr>
     </thead>
     <tbody>
 
-    <% sort_reviewer_by_review_volume_desc.each do |r| %>
-      <% @response_maps, @rspan = get_data_for_review_report(@id, r.id, @type) %>
-      <tr>
-        <% if r.id != -1 %>
-          <% user = Participant.find(r.id).user %>
-            <!--reviewer-->
-            <td>
-              <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
-              (<%= user.fullname(session[:ip]) %>)
-            </td>
-            <!--# reviews done-->
-            <td align = 'left'>
-              <% (1..@assignment.num_review_rounds).each do |round| %>
-                <%= instance_variable_get("@review_in_round_" + round.to_s) %>/<%= @rspan %>
-                <%= ', ' unless round == @assignment.num_review_rounds %>
-              <% end %>
-              <%= link_to "summary", {:controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id}, target: :_blank %>
-            </td>
-          <!--Team reviewed / Author feedback-->
-          <td align = 'left'>
-          <% @response_maps.each_with_index do |ri, index| %>
-            <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
-            <% team_name_color = get_team_colour(ri) %>
-            <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, ri.response, ri.reviewee_id) %>
-              <% if Team.where(id: ri.reviewee_id).length > 0 %>
-                <!--Team reviewed-->
-                <% if index == 0 %>
-                  <div id= <%= team_name_color %>/>
-                <% else %>
-                  <div style="border-top: solid; border-width: 1px;" id = <%= team_name_color %> >
+    <!-- Set the review data and row span for each reviewer -->
+    <% sort_reviewer_by_review_volume_desc.each_with_index do |reviewer, index| %>
+        <% @response_maps, @rspan = get_data_for_review_report(@id, reviewer.id, @type) %>
+        <tr>
+          <% unless reviewer.id == 1 %>
+              <% user = Participant.find(reviewer.id).user %>
+              <!--reviewer-->
+
+              <!-- added class attribute and span tag to extract full name and unityID of the user for scraping (Used in export to CSV functionality) -->
+              <td>
+                <%= index + 1 %>.
+                <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post, :class => "user_unityID" %>
+                (<span class="user_name"><%= user.fullname(session[:ip]) %></span>)
+              </td>
+              <!--# reviews done-->
+              <td align = 'left'>
+                <% (1..@assignment.num_review_rounds).each do |round| %>
+                    <%= instance_variable_get("@review_in_round_" + round.to_s) %>/<%= @rspan %>
+                    <%= ', ' unless round == @assignment.num_review_rounds %>
                 <% end %>
-                    <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
-                    <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
-                    <!--Hard-coded Dr.Kidd's question in order to display link.-->
-                    <!--later we can create a hyperlink question type to deal with this situation.-->
-                    <%= list_hyperlink_submission(ri.id, 5386) if Assignment.find_by(id: @id.to_i).course.instructor.name == 'Jkidd' %>
-                    <div style="display: inline; float: right; font-size: 10px"><%= "done at - " + ri.response.last.updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p") if ri.response and ri.response.last %>&nbsp&nbsp&nbsp</div>
-                  </div>
+                <%= link_to "summary", {:controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => reviewer.id, :assignment_id=>@id}, target: :_blank %>
+              </td>
+              <!--Team reviewed / Author feedback-->
+              <td align = 'left'>
+                <% @response_maps.each_with_index do |reviewer_map, index| %>
+                    <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
+                    <% team_name_color = get_team_color(reviewer_map) %>
+                    <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, reviewer_map.response, reviewer_map.reviewee_id, session[:ip]) %>
+                    <% if Team.where(id: reviewer_map.reviewee_id).length > 0 %>
+                        <!--Team reviewed-->
+                        <% if index == 0 %>
+                            <% if Response.exists?(map_id: reviewer_map.id) %>
+                                <div id = <%= team_name_color %>>&#10004;
+                            <% else %>
+                                <div id= <%= team_name_color %>>
+                            <% end %>
+                        <% else %>
+                            <% if Response.exists?(map_id: reviewer_map.id) %>
+                                <div id = <%= team_name_color %> style='border-top: solid; border-width: 1px;'>&#10004;
+                            <% else %>
+                                <div id = <%= team_name_color %> style='border-top: solid; border-width: 1px;'>
+                        <% end %>
+                        <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => reviewer_map.reviewee_id, :id2 => reviewer_map.id, :assignment_id=>@id %>
+                        <%= list_review_submissions(reviewer.id, reviewer_map.reviewee_id, reviewer_map.id) %>
+                        <!--Hard-coded Dr.Kidd's question in order to display link.-->
+                        <!--later we can create a hyperlink question type to deal with this situation.-->
+                        <%= list_hyperlink_submission(reviewer_map.id, 5386) if Assignment.find_by(id: @id.to_i).try(:course).try(:instructor).try(:name) == 'Jkidd' %>
+                        </div>
+                        </div>
+                    <% end %>
+                <% end %>
+              </td>
+              <!--Render partial view corresponding to the overall score awarded to a team-->
+              <td align='left'>
+                <% @response_maps.each_with_index do |reviewer_map, index| %>
+                    <% if Team.where(id: reviewer_map.reviewee_id).length > 0 %>
+                        <% @team = Team.find(reviewer_map.reviewee_id) %>
+                        <%= render partial: 'team_score_score_awarded', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: reviewer.id} %>
+                    <% end %>
+                <% end %>
+              </td>
+              <!--Render partial view corresponding to the average score awarded to a team-->
+              <td align='left'>
+                <% @response_maps.each_with_index do |reviewer_map, index| %>
+                    <% if Team.where(id: reviewer_map.reviewee_id).length > 0 %>
+                        <% @team = Team.find(reviewer_map.reviewee_id) %>
+                        <%= render partial: 'team_score', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: reviewer.id} %>
+                    <% end %>
+                <% end %>
+              </td>
+              <!--Metrics-->
+              <td align='left'>
+                <%= display_volume_metric_chart(reviewer) %>
+              </td>
+              <!--Assign grade and write comments-->
+              <td align='left'>
+                <%= form_tag save_grade_and_comment_for_reviewer_review_mapping_index_path, remote: true do %>
+                    <%= hidden_field_tag :participant_id, r.id %>
+                    <%= hidden_field_tag :assignment_id, @id %>
+                    <table class="inline-transparent">
+                      <tr style="margin-bottom: 4px">
+                        <td colspan="3"><%= number_field_tag 'grade_for_reviewer', r.review_grade.try(:grade_for_reviewer), min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="3">
+                          <%= text_area_tag 'comment_for_reviewer', r.review_grade.try(:comment_for_reviewer), placeholder: 'Comment', class: "awesome_input", 'data-multiple' => '', 'data-minchars' => "1" %>
+                        </td>
+                      </tr>
 
-                <!--Author feedback-->
-                <!--Dr.Kidd required to add a "author feedback" column that shows the average score the reviewers received from the authors. In this case, she can see all the data on a single screen.-->
-                <!--Dr.Kidd's course-->
-                <!--
-                <% if @assignment.instructor_id == 2026 %>
-                  <% if index == 0 %>
-                  <div>
-                  <% else %>
-                  <div style="border-top: solid; border-width: 1px;">
-                  <% end %>
-                    <%= calcutate_average_author_feedback_score(@assignment.id, @assignment.max_team_size, ri.id, ri.reviewee_id) %>
-                  </div>
-                <% end %>-->
-              <% end %>
-            <% end %>
-          </td>
-          <!--Score awarded / Avg. score-->
-          <td align='left'>
-            <% @response_maps.each_with_index do |ri, index| %>
-              <% if Team.where(id: ri.reviewee_id).length > 0 %>
-                <% @team = Team.find(ri.reviewee_id) %>
-                <%= render partial: 'team_score', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: r.id} %>
-              <% end %>
-            <% end %>
-          </td>
-          <!--Metrics-->
-          <td align='left'>
-            <%= display_volume_metric_chart(r) %>
-            <%= display_review_metrics_chart(r) %>
-          </td>
-          <!--Assign grade and write comments-->
-          <td align='left'>
-            <%= form_tag save_grade_and_comment_for_reviewer_review_mapping_index_path, remote: true do %>
-              <%= hidden_field_tag :participant_id, r.id %>
-              <%= hidden_field_tag :assignment_id, @id %>
-              <table class="inline-transparent">
-              <tr style="margin-bottom: 4px">
-                <td colspan="3"><%= number_field_tag 'grade_for_reviewer', r.review_grade.try(:grade_for_reviewer), min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %>
-                </td>
-              </tr>
-                <tr>
-                  <td colspan="3">
-              <%= text_area_tag 'comment_for_reviewer', r.review_grade.try(:comment_for_reviewer), placeholder: 'Comment', class: "awesome_input", 'data-multiple' => '', 'data-minchars' => "1" %>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>
-                    <%= image_tag 'text_macro.png', :border => 2, :title => 'Text Macro/Pastebin', :style => 'width: 24px; height:30px', :onclick => 'show_text_macros()' %>
-                  </td>
-                  <td>
-                    <%= submit_tag 'Save' %>
-                  </td>
-                  <td>
-                    <%= link_to "Grading History", grading_histories_path(grade_receiver_id: Participant.where(id: r.id).pluck(:user_id).first, participant_id: r.id, grade_type: "Review") %>
-                  </td>
-                </tr>
-              </table>
-            <% end %>
-          </td>
-        <% end %>
-      </tr>
+                      <tr>
+                        <td>
+                          <%= image_tag 'text_macro.png', :border => 2, :title => 'Text Macro/Pastebin', :style => 'width: 24px; height:30px', :onclick => 'show_text_macros()' %>
+                        </td>
+                        <td>
+                          <%= submit_tag 'Save' %>
+                        </td>
+                        <td>
+                          <%= link_to "Grading History", grading_histories_path(grade_receiver_id: Participant.where(id: r.id).pluck(:user_id).first, participant_id: r.id, grade_type: "Review") %>
+                        </td>
+                      </tr>
+                    </table>
+                <% end %>
+              </td>
+          <% end %>
+        </tr>
     <% end %>
     </table>
- </div>
+</div>
 <!--Partial for text macro form-->
 <%= render :partial => '/user_pastebins/save_text_macros' %>
 
@@ -179,4 +196,77 @@
         },
         type: 'numeric'
     });
+</script>
+
+<script>
+    function downloadCSV(csv, filename) {
+        var csvFile;
+        var downloadLink;
+
+        // CSV file
+        csvFile = new Blob([csv], {type: "text/csv"});
+
+        // Download link
+        downloadLink = document.createElement("a");
+
+        // File name
+        downloadLink.download = filename;
+
+        // Create a link to the file
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+
+        // Hide download link
+        downloadLink.style.display = "none";
+
+        // Add the link to DOM
+        document.body.appendChild(downloadLink);
+
+        // Click download link
+        downloadLink.click();
+    }
+
+    // Method to extract review report fields data from HTML Table and convert the data into CSV format.
+    // Currently, it will extract and store data for 'Full Name, Unity ID, Email ID, Grade and Comment' fields into CSV file
+    function exportTableToCSV(filename) {
+        var csv = [];
+        var rows = document.querySelector("table#myTable").rows;
+        var row = [];
+        row = setHeaderForCSV();
+        csv.push(row.join(","));
+
+        // for each row of information, pull the review report fields and save them to the corresponding variables
+        for (var i = 1; i < rows.length; i++) {
+            var row = [];
+
+            reviewer_name = "\"" + rows[i].querySelector("td span.user_name").innerHTML + "\"";
+            reviewer_unityid = rows[i].querySelector("td a.user_unityID").innerHTML;
+            reviewer_emailid = reviewer_unityid + "@ncsu.edu";
+            reviewer_grade = rows[i].querySelector("input#grade_for_reviewer").value;
+            reviewer_comment = "\"" + rows[i].querySelector("textarea#comment_for_reviewer").innerHTML.replace(/"/g,"\'") + "\"";
+
+            // push the information to set the information.
+            row.push(reviewer_name);
+            row.push(reviewer_unityid);
+            row.push(reviewer_emailid);
+            row.push(reviewer_grade);
+            row.push(reviewer_comment);
+
+            csv.push(row.join(","));
+
+        }
+
+        downloadCSV(csv.join("\n"), filename);
+    }
+
+    // Method to set names of header columns in Exported CSV file
+    function setHeaderForCSV() {
+        var row = [];
+        row.push("Name");
+        row.push("UnityID");
+        row.push("EmailID");
+        row.push("Grade");
+        row.push("Comment");
+
+        return row;
+    }
 </script>

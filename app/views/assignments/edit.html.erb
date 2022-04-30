@@ -18,6 +18,7 @@
         <%# Change Other Stuff to Etc.%>
         <li><a href="#tabs-8" id="Other">Etc.</a></li>
       </ul>
+
       <div id="tabs-1">
         <%= render 'assignments/edit/general' %>
       </div>
@@ -50,6 +51,10 @@
       <%= button_tag "Save", :id => 'submit_btn', class: 'btn btn-md btn-default', :style => "margin-left: 20px;" %> | <%= render :partial => '/shared_scripts/back' %>
       </div>
     </div>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2e55214... modified indentation
     <script>
       var useBookmarkChanged = function () {
           jQuery("#questionnaire_table_BookmarkRatingQuestionnaire").remove()
@@ -128,5 +133,11 @@
       });
     </script>
   <% end %>
+<<<<<<< HEAD
 
   <br/>
+=======
+<%= javascript_include_tag('edit_assignments.js') %>
+<br/>
+
+>>>>>>> 2e55214... modified indentation

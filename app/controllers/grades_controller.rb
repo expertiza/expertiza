@@ -162,6 +162,10 @@ class GradesController < ApplicationController
     @team = participant.team
     @team.grade_for_submission = params[:grade_for_submission]
     @team.comment_for_submission = params[:comment_for_submission]
+    # create a grading history entry for this assignment
+    # save the grade, comment, receiver, and instructor
+    # this should be updated to Rails 5 convention at some point
+    # but it works for now
     begin
       GradingHistory.create(instructor_id: session[:user].id,
                             assignment_id: participant.assignment.id,

@@ -418,6 +418,10 @@ class ReviewMappingController < ApplicationController
     review_grade.comment_for_reviewer = params[:comment_for_reviewer] if params[:comment_for_reviewer]
     review_grade.review_graded_at = Time.now
     review_grade.reviewer_id = session[:user].id
+    # create a grading history entry for this review
+    # save the grade, comment, receiver, and instructor
+    # this should be updated to Rails 5 convention at some point
+    # but it works for now
     begin
       GradingHistory.create(instructor_id: session[:user].id,
                             assignment_id: params[:assignment_id],

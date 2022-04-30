@@ -147,7 +147,7 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  describe 'response_for_each_round?' do
+  describe 'response_for_each_round' do
     before(:each) do
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
       @reviewer = create(:participant, review_grade: nil)
@@ -162,7 +162,7 @@ describe ReviewMappingHelper, type: :helper do
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
 
       create(:response, response_map: @response_map)
-      check_response = response_for_each_round?(@response_map)
+      check_response = response_for_each_round(@response_map)
       expect(check_response).to eq(false)
     end
 
@@ -180,7 +180,7 @@ describe ReviewMappingHelper, type: :helper do
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
       create(:response, response_map: response_map_with_reviewee)
 
-      check_response = response_for_each_round?(response_map_with_reviewee)
+      check_response = response_for_each_round(response_map_with_reviewee)
       expect(check_response).to eq(true)
     end
 
@@ -202,7 +202,7 @@ describe ReviewMappingHelper, type: :helper do
       create(:response, response_map: response_map_with_reviewee, round: 1)
       create(:response, response_map: response_map_with_reviewee, round: 2)
 
-      check_response = response_for_each_round?(response_map_with_reviewee)
+      check_response = response_for_each_round(response_map_with_reviewee)
       expect(check_response).to eq(true)
     end
 
@@ -223,7 +223,7 @@ describe ReviewMappingHelper, type: :helper do
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone + 6.day)
       create(:response, response_map: response_map_with_reviewee, round: 1)
 
-      check_response = response_for_each_round?(response_map_with_reviewee)
+      check_response = response_for_each_round(response_map_with_reviewee)
       expect(check_response).to eq(false)
     end
 
@@ -244,7 +244,7 @@ describe ReviewMappingHelper, type: :helper do
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone - 2.day)
       create(:response, response_map: response_map_with_reviewee, round: 2)
 
-      check_response = response_for_each_round?(response_map_with_reviewee)
+      check_response = response_for_each_round(response_map_with_reviewee)
       expect(check_response).to eq(false)
     end
   end

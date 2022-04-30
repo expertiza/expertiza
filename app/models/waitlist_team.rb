@@ -4,8 +4,6 @@ class WaitlistTeam < ApplicationRecord
 
   validates :topic_id, :team_id, presence: true
   validates :topic_id, uniqueness: { scope: :team_id }
-  scope :by_team_id, ->(team_id) { where('team_id = ?', team_id) }
-  scope :by_topic_id, ->(topic_id) { where('topic_id = ?', topic_id) }
 
   def self.add_team_to_topic_waitlist(team_id, topic_id, user_id)
     new_waitlist = WaitlistTeam.new
@@ -37,30 +35,18 @@ class WaitlistTeam < ApplicationRecord
   end
 
   def self.team_has_any_waitlists?(team_id)
-    return WaitlistTeam.where(team_id: team_id).empty?
+    WaitlistTeam.where(team_id: team_id).empty?
   end
 
   def self.topic_has_any_waitlists?(topic_id)
-    return WaitlistTeam.where(topic_id: topic_id).empty?
-  end
-
-  def self.delete_all_waitlists_for_team(team_id, assignment_id)
-    waitlisted_topics_for_team = get_all_waitlists_for_team team_id, assignment_id
-    unless waitlisted_topics_for_team.nil?
-      waitlisted_topics_for_team.each do |entry|
-        entry.destroy
-      end
-    else
-      ExpertizaLogger.info LoggerMessage.new('WaitlistTeam', user_id, "Cannot find Team #{team_id} in waitlist.")
-    end
-    return true
+    WaitlistTeam.where(topic_id: topic_id).empty?
   end
 
   def self.delete_all_waitlists_for_team(team_id)
     waitlisted_topics_for_team = get_all_waitlists_for_team team_id
     unless waitlisted_topics_for_team.nil?
       waitlisted_topics_for_team.each do |entry|
-        entry.destroy
+       entry.destroy
       end
     else
       ExpertizaLogger.info LoggerMessage.new('WaitlistTeam', user_id, "Cannot find Team #{team_id} in waitlist.")
@@ -80,12 +66,8 @@ class WaitlistTeam < ApplicationRecord
     return true
   end
 
-  def self.get_all_waitlists_for_team(team_id, assignment_id)
-    WaitlistTeam.joins(:topic).where(team_id: team_id, sign_up_topics: {assignment_id: assignment_id})
-  end
-
   def self.get_all_waitlists_for_team(team_id)
-    WaitlistTeam.where(team_id: team_id)
+    WaitlistTeam.joins(:topic).select('waitlist_teams.id, topic_name, team_id, topic_id, created_at').where(team_id: team_id)
   end
 
   def self.get_all_waitlists_for_topic(topic_id)
@@ -99,6 +81,17 @@ class WaitlistTeam < ApplicationRecord
       list_of_topic_waitlist_counts.append({topic_id: topic.id, count: topic.waitlist_teams.size})
     end
     list_of_topic_waitlist_counts
+  end
+
+  def self.find_waitlisted_teams_for_asignment(assignment_id, ip_address = nil)
+    waitlisted_participants = WaitlistTeam.joins('INNER JOIN sign_up_topics ON waitlist_teams.topic_id = sign_up_topics.id')
+                .select('waitlist_teams.id as id, sign_up_topics.id as topic_id, sign_up_topics.topic_name as name,
+                  sign_up_topics.topic_name as team_name_placeholder, sign_up_topics.topic_name as user_name_placeholder,
+                  waitlist_teams.team_id as team_id')
+                .where('sign_up_topics.assignment_id = ?', assignment_id)
+    
+    SignedUpTeam.fill_participant_names waitlisted_participants, ip_address
+    waitlisted_participants
   end
 
   def self.check_team_waitlisted_for_topic(team_id,topic_id)
@@ -119,6 +112,7 @@ class WaitlistTeam < ApplicationRecord
         if sign_up_waitlist_team.valid?
           sign_up_waitlist_team.save
           first_waitlist_team.destroy
+          delete_all_waitlists_for_team sign_up_waitlist_team.team_id
         else
           ExpertizaLogger.info LoggerMessage.new('WaitlistTeam', session[:user].id, "Cannot find Topic #{topic_id} in waitlist.")
           raise ActiveRecord::Rollback

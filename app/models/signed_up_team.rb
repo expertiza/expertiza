@@ -6,14 +6,9 @@ class SignedUpTeam < ApplicationRecord
   validates :topic_id, :team_id, presence: true
   scope :by_team_id, ->(team_id) { where('team_id = ?', team_id) }
 
-  def self.find_team_participants(assignment_id, ip_address = nil)
-    @participants = SignedUpTeam.joins('INNER JOIN sign_up_topics ON signed_up_teams.topic_id = sign_up_topics.id')
-                                .select('signed_up_teams.id as id, sign_up_topics.id as topic_id, sign_up_topics.topic_name as name,
-                                  sign_up_topics.topic_name as team_name_placeholder, sign_up_topics.topic_name as user_name_placeholder,
-                                  signed_up_teams.is_waitlisted as is_waitlisted, signed_up_teams.team_id as team_id')
-                                .where('sign_up_topics.assignment_id = ?', assignment_id)
+  def self.fill_participant_names(participants, ip_address = nil)
     i = 0
-    @participants.each do |participant|
+    participants.each do |participant|
       participant_names = User.joins('INNER JOIN teams_users ON users.id = teams_users.user_id')
                               .joins('INNER JOIN teams ON teams.id = teams_users.team_id')
                               .select('users.name as u_name, teams.name as team_name')
@@ -33,10 +28,18 @@ class SignedUpTeam < ApplicationRecord
           team_name_added = true
         end
       end
-      @participants[i].name = names
+      participants[i].name = names
       i += 1
     end
+  end
 
+  def self.find_team_participants(assignment_id, ip_address = nil)
+    @participants = SignedUpTeam.joins('INNER JOIN sign_up_topics ON signed_up_teams.topic_id = sign_up_topics.id')
+                                .select('signed_up_teams.id as id, sign_up_topics.id as topic_id, sign_up_topics.topic_name as name,
+                                  sign_up_topics.topic_name as team_name_placeholder, sign_up_topics.topic_name as user_name_placeholder,
+                                  signed_up_teams.is_waitlisted as is_waitlisted, signed_up_teams.team_id as team_id')
+                                .where('sign_up_topics.assignment_id = ?', assignment_id)
+    fill_participant_names @participants, ip_address
     @participants
   end
 
@@ -48,31 +51,16 @@ class SignedUpTeam < ApplicationRecord
 
   def self.find_user_signup_topics(assignment_id, team_id)
     SignedUpTeam.joins('INNER JOIN sign_up_topics ON signed_up_teams.topic_id = sign_up_topics.id')
+                .joins('INNER JOIN sign_up_topics ON signed_up_teams.topic_id = sign_up_topics.id')
                 .select('sign_up_topics.id as topic_id, sign_up_topics.topic_name as topic_name, signed_up_teams.is_waitlisted as is_waitlisted,
                   signed_up_teams.preference_priority_number as preference_priority_number')
                 .where('sign_up_topics.assignment_id = ? and signed_up_teams.team_id = ?', assignment_id, team_id)
   end
 
   # If a signup sheet exists then release topics that the given team has selected for the given assignment.
-
-  # def self.release_topics_selected_by_team_for_assignment(team_id, assignment_id)
-  #   old_teams_signups = SignedUpTeam.where(team_id: team_id)
-
-  #   # If the team has signed up for the topic and they are on the waitlist then remove that team from the waitlist.
-  #   unless old_teams_signups.nil?
-  #     old_teams_signups.each do |old_teams_signup|
-  #       if old_teams_signup.is_waitlisted == false # i.e., if the old team was occupying a slot, & thus is releasing a slot ...
-  #         first_waitlisted_signup = SignedUpTeam.find_by(topic_id: old_teams_signup.topic_id, is_waitlisted: true)
-  #         Invitation.remove_waitlists_for_team(old_teams_signup.topic_id, assignment_id) unless first_waitlisted_signup.nil?
-  #       end
-  #       old_teams_signup.destroy
-  #     end
-  #   end
-  # end 
-
   def self.release_topics_selected_by_team_for_assignment(team_id, assignment_id)
     delete_all_signed_up_topics_for_team(team_id)
-    WaitlistTeam.delete_all_waitlists_for_team(team_id, assignment_id)
+    WaitlistTeam.delete_all_waitlists_for_team(team_id)
   end
 
   def self.topic_id(assignment_id, user_id)

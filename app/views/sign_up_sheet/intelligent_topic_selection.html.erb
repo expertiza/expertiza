@@ -9,15 +9,22 @@
     <!--Topics table-->
     <table style="width: 48%; float: left" class="general">
       <tr><%= render :partial => 'table_header' %></tr>
-      <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
-          <b>Your topic(s):</b>
+      <% if (!@selected_topics.nil? && @selected_topics.size != 0 )|| (!@waitlisted_topics.nil? && @waitlisted_topics.size != 0) %>
+          <b><%=t ".your_topics"%></b>
+      <% end %>
+
+      <% if !@selected_topics.nil? %>
           <% for selected_topic in @selected_topics %>
               <br/><%= selected_topic.topic_name %>
-              <% if selected_topic.is_waitlisted == true %>
-                  <font color='red'>(waitlisted)</font>
-              <% end %>
           <% end %>
       <% end %>
+      <% if !@waitlisted_topics.nil? %>
+          <% for waitlisted_topic in @waitlisted_topics %>
+          <br/><%= waitlisted_topic.topic_name %>
+              <font color='red'><%=t ".waitlisted"%></font>
+          <% end %>
+      <% end %>
+
       <br/><br/>
       <% i=1 %>
       <tbody id="topics"  class="connectedSortable">

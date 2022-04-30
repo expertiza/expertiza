@@ -78,8 +78,8 @@ module SignUpSheetHelper
   end
 
   # renders the team's chosen bids in a list sorted by priority
-  def get_team_bids(topic, participants)
-    if participants.present? and current_user_has_instructor_privileges?
+  def team_bids(topic, participants)
+    if participants.present? && current_user_has_instructor_privileges?
       team_id = nil
       participants.each do |participant|
         next unless topic.id == participant.topic_id

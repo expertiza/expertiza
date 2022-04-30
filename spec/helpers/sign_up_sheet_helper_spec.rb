@@ -87,7 +87,7 @@ describe 'SignUpSheetHelper' do
     end
   end
 
-  describe '#get_team_bids' do
+  describe '#team_bids' do
     before(:each) do
       @assignment1 = create(:assignment, name: 'final 1', directory_path: 'final_1')
       @topic1 = create(:topic, assignment: @assignment1)
@@ -96,13 +96,13 @@ describe 'SignUpSheetHelper' do
       @participant1 = create(:participant, assignment: @assignment1)
     end
 
-    it 'The get_team_bids method return an empty string' do
-      out_string = helper.get_team_bids(@topic1, [@participant1])
+    it 'The team_bids method return an empty string' do
+      out_string = helper.team_bids(@topic1, [@participant1])
       expect(out_string).to be_nil
     end
 
-    it 'The get_team_bids method should throw an exception' do
-      expect { helper.get_team_bids(@topic1, @assignment1, nil) }.to raise_exception(ArgumentError)
+    it 'The team_bids method should throw an exception' do
+      expect { helper.team_bids(@topic1, @assignment1, nil) }.to raise_exception(ArgumentError)
     end
   end  
 

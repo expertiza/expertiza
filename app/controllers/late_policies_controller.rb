@@ -146,8 +146,8 @@ class LatePoliciesController < ApplicationController
 
     if should_check
       if LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
-          error_message = prefix + 'A policy with the same name ' + params[:late_policy][:policy_name] + ' already exists.'
-          valid_penalty = false
+        error_message = prefix + 'A policy with the same name ' + params[:late_policy][:policy_name] + ' already exists.'
+        valid_penalty = false
       end
     end
     return valid_penalty, error_message
@@ -159,7 +159,6 @@ class LatePoliciesController < ApplicationController
     max_penalty = params[:late_policy][:max_penalty].to_i
     penalty_per_unit = params[:late_policy][:penalty_per_unit].to_i
 
-    valid_penalty, error_message = true, nil
     valid_penalty, error_message = duplicate_name_check(is_update)
     prefix = is_update ? "Cannot edit the policy. " : ""
 

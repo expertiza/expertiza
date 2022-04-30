@@ -13,6 +13,39 @@ function getSubFolderResults(params) {
     return fetchJSONData(request);
 }
 
+function getFolderResults() {
+    var request = {
+        method: 'GET',
+        url: '/tree_display/get_folder_contents',
+        headers: {
+            "X-CSRF-Token": document.querySelector("[name='csrf-token']").content
+        }
+    }
+    return fetchJSONData(request);
+}
+
+function setSessionLastOpenTab(queryParams) {
+    var request = {
+        method: 'GET',
+        url: '/tree_display/set_session_last_open_tab?tab=' + queryParams.toString(),
+        headers: {
+            "X-CSRF-Token": document.querySelector("[name='csrf-token']").content
+        }
+    }
+    return fetchJSONData(request);
+}
+
+function getSessionLastOpenTab() {
+    var request = {
+        method: 'GET',
+        url: '/tree_display/session_last_open_tab',
+        headers: {
+            "X-CSRF-Token": document.querySelector("[name='csrf-token']").content
+        }
+    }
+    return fetchJSONData(request);
+}
+
 function serialize(obj, prefix) {
     var str = [],
         p;

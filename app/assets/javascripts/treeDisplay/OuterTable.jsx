@@ -11,9 +11,12 @@ class OuterTable extends React.Component {
 
     handleExpandClick(id, collapsed, newParams) {
         if (collapsed) {
-            this.setState((prevState) => ({
-                expandedRow: prevState.expandedRow.concat([id])
-            }))
+            this.setState(function (prevState) {
+                return {
+                    expandedRow: prevState.expandedRow.concat([id])
+                };
+            })
+            console.log(newParams)
             getSubFolderResults(newParams).then(function (response) {
                 this.props.updateData(id, response);
             }.bind(this))

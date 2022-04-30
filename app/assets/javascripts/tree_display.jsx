@@ -1,7 +1,6 @@
 // initialize a global object available throughout the application
 // can be useful on different pages
 let app_variables = {
-
   currentUserId: null,
   homeActionShowFlag: null
 };
@@ -248,14 +247,6 @@ jQuery(document).ready(function () {
     // set the user preference to homeActionshowflag 
     app_variables.homeActionShowFlag = treeDisplayDiv.dataset.userShow;
 
-  }
-  var preloadedImages = []
-  function preloadImages() {
-    for (var idx = 0; idx < arguments.length; idx++) {
-      var oneImage = new Image()
-      oneImage.src = arguments[idx]
-      preloadedImages.push(oneImage)
-    }
   }
 
   if (document.getElementById('tree_display')) {

@@ -1,6 +1,8 @@
-var TabSystem = React.createClass({
-    getInitialState: function () {
-        return {
+class TabSystem extends React.Component {
+
+    constructor(props) {
+        super(props)
+        this.state = {
             allItemsDisplayed: {
                 Courses: {},
                 Assignments: {},
@@ -8,9 +10,9 @@ var TabSystem = React.createClass({
             },
             activeTab: '1'
         }
-    },
-    componentWillMount: function () {
-        var _this = this
+    }
+
+    componentWillMount() {
         preloadImages(
             '/assets/tree_view/edit-icon-24.png',
             '/assets/tree_view/delete-icon-24.png',
@@ -36,46 +38,44 @@ var TabSystem = React.createClass({
             '/assets/tree_view/view-delayed-mailer.png',
             '/assets/tree_view/view-publish-rights-24.png'
         )
-        jQuery.get('/tree_display/session_last_open_tab', function (data) {
-            _this.setState({
-                activeTab: data
+
+        getSessionLastOpenTab().then(function (response) {
+            this.setState({
+                activeTab: response
             })
-        })
-        jQuery.get(
-            '/tree_display/get_folder_contents',
-            function (data2, status) {
-                jQuery.each(data2, function (nodeType, outerNode) {
-                    jQuery.each(outerNode, function (i, node) {
-                        var newParams = {
-                            key: node.name + '|' + node.directory,
-                            nodeType: nodeType,
-                            child_nodes: node.nodeinfo
-                        }
-                        if (nodeType === 'Assignments') {
-                            node['children'] = null
-                            node[newParams] = newParams
-                        } else if (nodeType === 'Courses') {
-                            newParams['nodeType'] = 'CourseNode'
-                            node['newParams'] = newParams
-                        } else if (nodeType === 'Questionnaires') {
-                            newParams['nodeType'] = 'FolderNode'
-                            node['newParams'] = newParams
-                        }
-                    })
+        }.bind(this))
+
+        getFolderResults().then(function (response) {
+            jQuery.each(response, function (nodeType, outerNode) {
+                Array.prototype.forEach.call(outerNode, function (node, i) {
+                    var newParams = {
+                        key: node.name + '|' + node.directory,
+                        nodeType: nodeType,
+                        child_nodes: node.nodeinfo
+                    }
+                    if (nodeType === 'Assignments') {
+                        node['children'] = null
+                        node[newParams] = newParams
+                    } else if (nodeType === 'Courses') {
+                        newParams['nodeType'] = 'CourseNode'
+                        node['newParams'] = newParams
+                    } else if (nodeType === 'Questionnaires') {
+                        newParams['nodeType'] = 'FolderNode'
+                        node['newParams'] = newParams
+                    }
                 })
-                if (data2) {
-                    _this.setState({
-                        allItemsDisplayed: data2
-                    })
-                }
-            },
-            'json'
-        )
-    },
-    handleTabChange: function (tabIndex) {
-        jQuery.get('/tree_display/set_session_last_open_tab?tab=' + tabIndex.toString())
-    },
-    render: function () {
+            })
+            this.setState({
+                allItemsDisplayed: response
+            })
+        }.bind(this))
+    }
+
+    handleTabChange(tabIndex) {
+        setSessionLastOpenTab(tabIndex)
+    }
+
+    render() {
         return (
             <ReactSimpleTabs
                 className="tab-system"
@@ -102,4 +102,4 @@ var TabSystem = React.createClass({
             </ReactSimpleTabs>
         )
     }
-})
+}

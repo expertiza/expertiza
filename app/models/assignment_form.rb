@@ -419,8 +419,6 @@ class AssignmentForm
   # Creating new TeamsUsers records to map our new teams/participants verbatim to old assignment
   # Creating a new ReviewResponseMap records, mapping reviewees/reviewers verbatim to old assignment
   # Creating new reviews (copies of old reviews)
-  # TODO - all actions are showing as begin on copied assignment calibration tab, conditional for rendering actions in view on next line
-  # reviewed_object_id: params[:id], reviewer_id: instructor.id, reviewee_id: team.id, calibrate_to: true
   #reviewed_object_id is set to new assign_id, reviewer_id and reviewee_ids look correct,
   def self.copy_calibrated_reviews(old_assignment, new_assignment_id)
     if old_assignment.is_calibrated

@@ -41,7 +41,9 @@ class Menu
     end
   end
 
+  # rubocop:disable Lint/DuplicateMethods
   attr_accessor :root, :selected
+  # rubocop:enable Lint/DuplicateMethods
 
   def initialize(role = nil)
     @root = Node.new
@@ -105,9 +107,11 @@ class Menu
   end
 
   # Returns the name of the currently-selected item or nil if no item is selected.
+  # rubocop:disable Lint/DuplicateMethods
   def selected
     @vector.last.try(:name)
   end
+  # rubocop:enable Lint/DuplicateMethods
 
   # Returns true if the specified item is selected; false if otherwise.
   def selected?(menu_id)

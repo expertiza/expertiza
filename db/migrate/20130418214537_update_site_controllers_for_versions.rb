@@ -1,4 +1,4 @@
-class UpdateSiteControllersForVersions < ActiveRecord::Migration
+class UpdateSiteControllersForVersions < ActiveRecord::Migration[4.2]
   def self.up
     @permission = Permission.find_by_name('public actions - execute')
     @controller = SiteController.find_or_create_by(name: 'versions')

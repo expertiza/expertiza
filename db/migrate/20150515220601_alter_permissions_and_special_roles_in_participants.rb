@@ -1,4 +1,4 @@
-class AlterPermissionsAndSpecialRolesInParticipants < ActiveRecord::Migration
+class AlterPermissionsAndSpecialRolesInParticipants < ActiveRecord::Migration[4.2]
   def self.up
     change_table :participants do |t|
       t.rename :submit_allowed, :can_submit

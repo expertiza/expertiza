@@ -1,4 +1,4 @@
-class CreateTeamsUsers < ActiveRecord::Migration
+class CreateTeamsUsers < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'teams_users', force: true do |t|
       t.column 'team_id', :integer

@@ -122,15 +122,13 @@ class ApplicationController < ActionController::Base
     current_user.role
   end
 
+  # rubocop:disable Lint/DuplicateMethods
   alias current_user_role? current_user_role
+  # rubocop:enable Lint/DuplicateMethods
 
   def logged_in?
     # Recommendation: rename to ever_logged_in? because that's how this actually works
     current_user
-  end
-
-  def redirect_back(default = :root)
-    redirect_to request.env['HTTP_REFERER'] ? :back : default
   end
 
   def set_time_zone
@@ -147,7 +145,7 @@ class ApplicationController < ActionController::Base
 
   def invalid_login_status(status)
     flash[:notice] = "You must be logged #{status} to access this page!"
-    redirect_back
+    redirect_back fallback_location: root_path
   end
 
   def available?(user, owner_id)

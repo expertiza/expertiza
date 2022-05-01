@@ -1,4 +1,4 @@
-class ReviewBid < ActiveRecord::Base
+class ReviewBid < ApplicationRecord
   belongs_to :topic, class_name: 'SignUpTopic'
   belongs_to :participant, class_name: 'Participant'
   belongs_to :assignment, class_name: 'Assignment'
@@ -6,7 +6,6 @@ class ReviewBid < ActiveRecord::Base
   # method to get bidding data
   # returns the bidding data needed for the assigning algorithm
   # student_ids, topic_ids, student_preferences, topic_preferences, max reviews allowed
-  public
 
   def self.bidding_data(assignment_id, reviewer_ids)
     # create basic hash and set basic hash data

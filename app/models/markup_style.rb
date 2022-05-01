@@ -1,5 +1,5 @@
-class MarkupStyle < ActiveRecord::Base
+class MarkupStyle < ApplicationRecord
   validates :name, presence: true
   validates :name, uniqueness: true
-  attr_accessible :name
+  # attr_accessible :name
 end

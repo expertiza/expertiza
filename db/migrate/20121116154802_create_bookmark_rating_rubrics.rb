@@ -1,4 +1,4 @@
-class CreateBookmarkRatingRubrics < ActiveRecord::Migration
+class CreateBookmarkRatingRubrics < ActiveRecord::Migration[4.2]
   def self.up
     if table_exists?(:bookmark_rating_rubrics) == false
       create_table :bookmark_rating_rubrics do |t|

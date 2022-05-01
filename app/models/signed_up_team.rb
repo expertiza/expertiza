@@ -97,5 +97,4 @@ class SignedUpTeam < ApplicationRecord
       remove_signed_up_team_for_topic(signed_up_topic.team_id, signed_up_topic.topic_id)
     end
   end
-
 end

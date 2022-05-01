@@ -101,8 +101,7 @@ function autogenerate_submission(){
           <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:50px;', class: 'form-control'}) %>
         </span>
       </div>
-      <%= onload='hasTeamsChanged()' %>
-      <span id='assignment_show_teammate_reviews' class="form-inline"  <%= 'hidden' unless @assignment_form.assignment.team_assignment?%>>
+      <span id='assignment_show_teammate_reviews' class="form-inline" onload="hasTeamsChanged()" <%= 'hidden' unless @assignment_form.assignment.team_assignment?%>>
         <%= check_box_tag('assignment_form[assignment][show_teammate_reviews]', 'true', @assignment_form.assignment.show_teammate_reviews) %>
         <%= label_tag('assignment_form[assignment][show_teammate_reviews]', 'Show teammate reviews?') %>
       </span>

@@ -146,7 +146,7 @@ class WaitlistTeam < ApplicationRecord
                                           .select('waitlist_teams.id as id, sign_up_topics.id as topic_id, sign_up_topics.topic_name as name,
                                             sign_up_topics.topic_name as team_name_placeholder, sign_up_topics.topic_name as user_name_placeholder,
                                             waitlist_teams.team_id as team_id')
-                                          .where('sign_up_topics.assignment_id = ?',assignment_id)
+                                          .where('sign_up_topics.assignment_id = ?', assignment_id)
     SignedUpTeam.fill_participant_names waitlisted_participants, ip_address
     waitlisted_participants
   end

@@ -44,7 +44,7 @@ to display the label "Your team" in the student assignment tasks-->
   <%end%>
 
   <!--Your work-->
-  <% if @authorization == 'participant' or @can_submit == true %>
+  <% if @team && (@authorization == 'participant' || @can_submit == true) %>
     <li>
       <% if @topics.size > 0 %>
         <% if @topic_id and @assignment.submission_allowed(@topic_id) %>

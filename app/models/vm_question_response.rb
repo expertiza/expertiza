@@ -161,14 +161,13 @@ class VmQuestionResponse
     end
   end
 
-  # This method calls all the methods that are responsible for calculating different metrics. 
-  # If any new metric is introduced, please call the method that calculates the metric values from this method.
+  # This method calls all the methods that are responsible for calculating different metrics.If any new metric is introduced, please call the method that calculates the metric values from this method.
   def calculate_metrics
     number_of_comments_greater_than_10_words
     number_of_comments_greater_than_20_words
   end
 
-  # This method is responsible for checking whether a review comment contians more than 10 words.
+  # This method is responsible for checking whether a review comment contains more than 10 words.
   def number_of_comments_greater_than_10_words
     @list_of_reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)

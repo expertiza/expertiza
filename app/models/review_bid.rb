@@ -7,7 +7,7 @@ class ReviewBid < ActiveRecord::Base
   # returns the bidding data needed for the assigning algorithm
   # student_ids, topic_ids, student_preferences, topic_preferences, max reviews allowed
 
-  def self.bidding_data(assignment_id, reviewer_ids)
+  def bidding_data(assignment_id, reviewer_ids)
     # create basic hash and set basic hash data
     bidding_data = { 'tid' => [], 'users' => {}, 'max_accepted_proposals' => [] }
     bidding_data['tid'] = SignUpTopic.where(assignment_id: assignment_id).ids
@@ -15,13 +15,13 @@ class ReviewBid < ActiveRecord::Base
 
     # loop through reviewer_ids to get reviewer specific bidding data
     reviewer_ids.each do |reviewer_id|
-      bidding_data['users'][reviewer_id] = reviewer_bidding_data(reviewer_id, assignment_id)
+      bidding_data['users'][reviewer_id] = ReviewBid.reviewer_bidding_data(reviewer_id, assignment_id)
     end
     bidding_data
   end
 
   # assigns topics to reviews as matched by the webservice algorithm
-  def self.assign_review_topics(assignment_id, reviewer_ids, matched_topics, _min_num_reviews = 2)
+  def assign_review_topics(assignment_id, reviewer_ids, matched_topics, _min_num_reviews = 2)
     # if review response map already created, delete it
     if ReviewResponseMap.where(reviewed_object_id: assignment_id)
       ReviewResponseMap.where(reviewed_object_id: assignment_id).destroy_all
@@ -30,7 +30,7 @@ class ReviewBid < ActiveRecord::Base
     reviewer_ids.each do |reviewer_id|
       topics_to_assign = matched_topics[reviewer_id.to_s]
       topics_to_assign.each do |topic|
-        assign_topic_to_reviewer(assignment_id, reviewer_id, topic)
+        ReviewBid.assign_topic_to_reviewer(assignment_id, reviewer_id, topic)
       end
     end
   end

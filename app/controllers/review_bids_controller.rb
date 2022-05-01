@@ -50,7 +50,6 @@ class ReviewBidsController < ApplicationController
     @num_participants = AssignmentParticipant.where(parent_id: @assignment.id).count
     @selected_topics = nil # this is used to list the topics assigned to review. (ie select == assigned i believe)
     @bids = ReviewBid.where(participant_id: @participant, assignment_id: @assignment.id)
-    @count = ReviewBid.all.count
     signed_up_topics = []
     @bids.each do |bid|
       sign_up_topic = SignUpTopic.find_by(id: bid.signuptopic_id)
@@ -99,9 +98,10 @@ class ReviewBidsController < ApplicationController
     assignment_id = params[:assignment_id].to_i
     # list of reviewer id's from a specific assignment
     reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
-    bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
+    bidding_data_object = new ReviewBid
+    bidding_data = bidding_data_object.bidding_data(assignment_id, reviewer_ids)
     matched_topics = assign_reviewers(bidding_data)
-    ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
+    bidding_data_object.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
     Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
     redirect_to :back
   end

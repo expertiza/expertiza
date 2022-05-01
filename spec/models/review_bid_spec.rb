@@ -9,6 +9,10 @@ describe ReviewBid do
   let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1) }
   let(:team1) { build(:assignment_team, id: 2, name: 'team has name') }
 
+
+
+
+
   describe 'test review bid parameters'  do
     it 'returns the signuptopic_id of the bid' do
       expect(bid1.signuptopic_id).to eq(123)
@@ -28,23 +32,29 @@ describe ReviewBid do
   end
 
   describe '#bidding_data validation' do
+    before do
+      @bidding_data_object = ReviewBid.new
+    end
     it 'checks if get_bidding_data returns bidding_data as a hash' do
       test_reviewers = [1]
       allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
       allow(SignedUpTeam).to receive(:topic_id).and_return(1)
       allow(ReviewBid).to receive(:where).and_return([bid1, bid2])
-      expect(ReviewBid.bidding_data(bid1.assignment_id, test_reviewers)).to eq('max_accepted_proposals' => nil, 'tid' => [], 'users' => { 1 => { 'otid' => 1, 'priority' => [3, 2], 'tid' => [123, 124], 'time' => ['2018-01-01 00:00:00.000000000 +0000', nil] } })
+      expect(@bidding_data_object.bidding_data(bid1.assignment_id, test_reviewers)).to eq('max_accepted_proposals' => nil, 'tid' => [], 'users' => { 1 => { 'otid' => 1, 'priority' => [3, 2], 'tid' => [123, 124], 'time' => ['2018-01-01 00:00:00.000000000 +0000', nil] } })
     end
   end
 
   describe '#assign_review_topics' do
+    before do
+      @bidding_data_object = ReviewBid.new
+    end
     it 'calls assigns_topics_to_reviewer for as many topics associated' do
       maps = [response_map]
       matched_topics = { '1' => [topic] }
       allow(ReviewResponseMap).to receive(:where).and_return(maps)
       allow(maps).to receive(:destroy_all).and_return(true)
       expect(ReviewBid).to receive(:assign_topic_to_reviewer).with(1, 1, topic)
-      ReviewBid.assign_review_topics(1, [1], matched_topics)
+      @bidding_data_object.assign_review_topics(1, [1], matched_topics)
     end
   end
 

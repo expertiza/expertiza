@@ -29,11 +29,11 @@ class SignUpSheet < ApplicationRecord
       ApplicationRecord.transaction do
         # check whether slots exist (params[:id] = topic_id)
         if slotAvailable?(topic_id)
-          result = true if signup_team_to_topic(assignment_id, sign_up, user_id)
+          result = true if signup_team_to_topic(sign_up, user_id)
         else
           # only waitlist team if user doesn't have other signups
           unless WaitlistTeam.add_team_to_topic_waitlist(team_id, topic_id, user_id)
-            raise ActiveRecord::Rollback 
+            raise ActiveRecord::Rollback
           else
             result = true
           end
@@ -43,9 +43,8 @@ class SignUpSheet < ApplicationRecord
     result
   end
 
-  def self.signup_team_to_topic(assignment_id, sign_up, user_id)
+  def self.signup_team_to_topic(sign_up, user_id)
     sign_up.is_waitlisted = false
-    result = false
     # Create new record in signed_up_teams table
     result = sign_up.save
     WaitlistTeam.delete_all_waitlists_for_team(sign_up.team_id)

@@ -226,7 +226,7 @@ class SignUpSheetController < ApplicationController
       else
         @selected_topics = SignedUpTeam.find_user_signup_topics(@assignment.id, users_team.first.t_id)
         @waitlisted_topics = WaitlistTeam.get_all_waitlists_for_team(users_team.first.t_id)
-      end      
+      end
     end
     render('sign_up_sheet/intelligent_topic_selection') && return if @assignment.is_intelligent
   end

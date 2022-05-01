@@ -8,11 +8,6 @@ describe ReviewBid do
   let(:reviewer1) { double('Participant', id: 1, name: 'reviewer') }
   let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1) }
   let(:team1) { build(:assignment_team, id: 2, name: 'team has name') }
-
-
-
-
-
   describe 'test review bid parameters'  do
     it 'returns the signuptopic_id of the bid' do
       expect(bid1.signuptopic_id).to eq(123)

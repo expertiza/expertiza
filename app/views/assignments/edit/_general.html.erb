@@ -107,7 +107,7 @@ function autogenerate_submission(){
       &nbsp;&nbsp;&nbsp;&nbsp;
       <!--Maximum number of members per team-->
   </tr>
-
+  <%= puts("adding due date table now \n")%>
   <body onload="addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);">
 
   <!-- E2115 Mentor Management -->

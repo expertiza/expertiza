@@ -7,7 +7,7 @@ class WaitlistTeam < ApplicationRecord
 
   # E2240
   # This method adds an entry in the waitlist_teams table
-  # Returns true if a team is succesfully added to a topic waitlist else false
+  # Returns true if a team is successfully added to a topic waitlist else false
   # @param team_id [Integer]
   # @param topic_id [Integer]
   # @param user_id [Integer]
@@ -28,7 +28,7 @@ class WaitlistTeam < ApplicationRecord
 
   # E2240
   # This method removes an entry in the waitlist_teams table
-  # Returns true if a team is succesfully removed from a topic's waitlist else false
+  # Returns true if a team is successfully removed from a topic's waitlist else false
   # @param team_id [Integer]
   # @param topic_id [Integer]
   # @param user_id [Integer]

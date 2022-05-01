@@ -1,3 +1,10 @@
+# Rspec tests documentation (before writing additional tests
+# Test results before new commits to beta: 
+# 73 examples, 0 failures (all tests passed)
+# Test results after new commits to beta as of 05/01/2022 5:00pm EST:
+# 73 examples, 0 failures (all tests passed)
+# Summary: Added code does not break any tests in expertiza/spec/models/assignment_form_spec.rb 
+
 describe AssignmentForm do
   let(:assignment) { build(:assignment, id: 1) }
   let(:due_date) { build(:assignment_due_date) }

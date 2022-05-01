@@ -173,8 +173,8 @@ class VmQuestionResponse
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
         @list_of_rows.each do |row|
-          row.metric_hash["comments#10"] = 0 if row.metric_hash["comments#10"].nil?
-          row.metric_hash["comments#10"] = row.metric_hash["comments#10"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 10
+          row.metric_hash["> 10 Word Comments"] = 0 if row.metric_hash["> 10 Word Comments"].nil?
+          row.metric_hash["> 10 Word Comments"] = row.metric_hash["> 10 Word Comments"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 10
         end
       end
     end
@@ -186,8 +186,8 @@ class VmQuestionResponse
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
         @list_of_rows.each do |row|
-          row.metric_hash["countofcomments20"] = 0 if row.metric_hash["countofcomments20"].nil?
-          row.metric_hash["countofcomments20"] = row.metric_hash["countofcomments20"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 1
+          row.metric_hash["> 20 Word Comments"] = 0 if row.metric_hash["> 20 Word Comments"].nil?
+          row.metric_hash["> 20 Word Comments"] = row.metric_hash["> 20 Word Comments"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 1
         end
       end
     end

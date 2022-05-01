@@ -104,6 +104,8 @@ class StudentTaskController < ApplicationController
 
   def email_reviewers; end
 
+  # This method is used to send email from Author to Reviewers.
+  # Email body and subject are inputted from Author and passed to send_mail_to_author_reviewers method in mailhelper.
   def send_email
     subject = params['send_email']['subject']
     body = params['send_email']['email_body']
@@ -133,6 +135,7 @@ class StudentTaskController < ApplicationController
     end
   end
 
+  # retrieves review mappings for an assignment from ResponseMap table.
   def get_review_mappings(assignment_id, team_id)
     ResponseMap.where(reviewed_object_id: assignment_id,
                       reviewee_id: team_id,

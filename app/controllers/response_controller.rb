@@ -166,6 +166,8 @@ class ResponseController < ApplicationController
 
   def author; end
 
+  # This method is used to send email from a Reviewer to an Author.
+  # Email body and subject are inputted from Reviewer and passed to send_mail_to_author_reviewers method in MailerHelper.
   def send_email
     subject = params['send_email']['subject']
     body = params['send_email']['email_body']

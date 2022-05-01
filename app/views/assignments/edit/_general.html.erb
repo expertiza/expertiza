@@ -107,8 +107,6 @@ function autogenerate_submission(){
       &nbsp;&nbsp;&nbsp;&nbsp;
       <!--Maximum number of members per team-->
   </tr>
-  <%= puts("adding due date table now \n")%>
-  <body onload="addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);">
 
   <!-- E2115 Mentor Management -->
   <tr>
@@ -300,28 +298,6 @@ function autogenerate_submission(){
     }
     <% end %>
 
-    <!-- Violation of DRY principle, adds input field and handles checkboxes hidden states in other views -->
-    function hasTeamsChanged() {
-        var msg = 'Warning! Unchecking this box will hide teams that already exist.';
-        var checkbox = jQuery('#team_assignment');
-        var team_count_field = jQuery('#assignment_team_count_field');
-        var teammate_reviews_field = jQuery('#assignment_show_teammate_reviews');
-        var team_formation_due_date_checkbox = jQuery('#team_formation_due_date_checkbox');
-        var autoAssignMentorCheckbox = jQuery('#auto_assign_mentor_checkbox');
-
-        jQuery("#questionnaire_table_TeammateReviewQuestionnaire").remove()
-
-        team_count_field.removeAttr('hidden');
-        team_formation_due_date_checkbox.removeAttr('hidden')
-        jQuery('#assignment_form_assignment_max_team_size').val('2');
-        teammate_reviews_field.removeAttr('hidden');
-        // E2115 hide auto assign mentor checkbox when an
-        // an assignment does not have teams
-        // what would the mentor be assigned to if there are no teams?
-        autoAssignMentorCheckbox.hide();
-        addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
-    }
-
     function staggeredDeadlineChanged() {
       var msg = 'Warning! Unchecking all topics for this assignment will now have the same deadline.'
       if (!jQuery('#assignment_staggered_deadline').is(':checked')) {
@@ -362,6 +338,7 @@ function autogenerate_submission(){
     }
 
     jQuery(document).ready(function() {
+      addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
       jQuery('input[type=radio][name=num_reviews]').change(function(){
         if (this.value == 'student'){
           jQuery('#num_reviews_per_student_threshold').removeAttr('hidden');

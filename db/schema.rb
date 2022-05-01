@@ -268,6 +268,7 @@ ActiveRecord::Schema.define(version: 20220414172528) do
     t.integer  "team_id",        limit: 4
     t.text     "comments",       limit: 65535
     t.string   "status",         limit: 1
+  end
   create_table "courses", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
     t.integer "instructor_id"

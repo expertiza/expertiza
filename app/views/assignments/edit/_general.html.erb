@@ -92,9 +92,8 @@ function autogenerate_submission(){
 
   <tr>
     <td style='padding:5px' id='assignment_team_assignment_field'>
-
       <div class="form-inline">
-        <span style='padding:5px' class="form-inline" id='assignment_team_count_field' <%= 'hidden' %>>
+        <span style='padding:5px' class="form-inline" id='assignment_team_count_field' <%= 'hidden' unless @assignment_form.assignment.team_assignment?%>>
           <!--Teammate reviews fields-->
           <input name="assignment_form[assignment][show_teammate_reviews]" type="hidden" value="false"/>
           <%= label_tag('assignment_form[assignment][max_team_size]', 'Maximum number of members per team:') %>
@@ -109,9 +108,11 @@ function autogenerate_submission(){
       <!--Maximum number of members per team-->
   </tr>
 
+  <body onload="addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);">
+
   <!-- E2115 Mentor Management -->
   <tr>
-    <td style='padding:5px' id='assignment_auto_assign_mentor_field' onload="hasTeamsChanged()">
+    <td style='padding:5px' id='assignment_auto_assign_mentor_field'>
       <input name="assignment_form[assignment][auto_assign_mentor]" type="hidden" value="false"/>
       <%= check_box_tag(
             'assignment_form[assignment][auto_assign_mentor]',

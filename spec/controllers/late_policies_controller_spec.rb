@@ -133,7 +133,7 @@ describe LatePoliciesController do
           }
         }
         post :create, params: request_params
-        expect(flash[:error]).to eq('The following error occurred while saving the late policy: ')
+        expect(flash[:error]).to eq('Penalty per unit cannot be negative.')
       end
     end
 
@@ -151,7 +151,7 @@ describe LatePoliciesController do
           }
         }
         post :create, params: request_params
-        expect(flash[:error]).to eq('A policy with the same name already exists.')
+        expect(flash[:error]).to eq('A policy with the same name Policy1 already exists.')
       end
     end
 

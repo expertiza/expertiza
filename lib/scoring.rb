@@ -3,6 +3,7 @@ module Scoring
   # parameters
   #  assessments - a list of assessments of some type (e.g., author feedback, teammate review)
   #  questions - the list of questions that was filled out in the process of doing those assessments
+  # Called in: bookmarks_controller.rb (total_average_score), scoring.rb
   def aggregate_assessment_scores(assessments, questions)
     scores = {}
     if assessments.present?
@@ -40,6 +41,7 @@ module Scoring
   # params
   #  assessment - specifies the assessment for which the total score is being calculated
   #  questions  - specifies the list of questions being evaluated in the assessment
+  # Called in: bookmarks_controller.rb (specific_average_score), grades_helper.rb (score_vector), response.rb (self.score), scoring.rb
   def assessment_score(params)
     @response = params[:response].last
     return -1.0 if @response.nil?
@@ -50,7 +52,6 @@ module Scoring
 
       weighted_score = 0
       sum_of_weights = 0
-      max_question_score = 0
 
       @questionnaire = Questionnaire.find(@questions.first.questionnaire_id)
 
@@ -76,6 +77,7 @@ module Scoring
 
   # Compute total score for this assignment by summing the scores given on all questionnaires.
   # Only scores passed in are included in this sum.
+  # Called in: scoring.rb
   def compute_total_score(assignment, scores)
     total = 0
     assignment.questionnaires.each { |questionnaire| total += questionnaire.get_weighted_score(assignment, scores) }
@@ -102,6 +104,7 @@ module Scoring
   #          } ,
   #   }
   # }
+  # Called in: grades_controller.rb (view), assignment.rb (self.export)
   def review_grades(assignment, questions)
     scores = { participants: {}, teams: {} }
     assignment.participants.each do |participant|
@@ -140,6 +143,7 @@ module Scoring
   #       :scores => {:max => max_score, :min => min_score, :avg => average_score}
   #   }
   # }
+  # Called in: assessment360_controller.rb (find_peer_review_score), grades_controller.rb (view_my_scores, view_team, edit), scoring.rb
   def participant_scores(participant, questions)
     assignment = participant.assignment
     scores = {}
@@ -176,6 +180,7 @@ module Scoring
   # retrieves the symbol of eeach questionnaire associated with a participant on a given assignment
   # returns all the associated reviews with a participant, indexed under :assessments
   # returns the score assigned for the TOTAL body of responses associated with the user
+  # Called in: scoring.rb
   def compute_assignment_score(participant, questions, scores)
     participant.assignment.questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.find_by(assignment_id: participant.assignment.id, questionnaire_id: questionnaire.id).used_in_round
@@ -191,7 +196,7 @@ module Scoring
                                                      questionnaire.get_assessments_for(participant)
                                                    else
                                                      questionnaire.get_assessments_round_for(participant, round)
-                                                   end 
+                                                   end
       # aggregate_assessment_scores computes the total score for a list of responses to a questionnaire
       scores[questionnaire_symbol][:scores] = aggregate_assessment_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
     end
@@ -199,7 +204,8 @@ module Scoring
 
   # for each assignment review all scores and determine a max, min and average value
   # this will be called when the assignment has various rounds, so we need to aggregate the scores across rounds
-  # achieves this by returning all the reviews, no longer delineated by round, and by returning the max, min and averafe
+  # achieves this by returning all the reviews, no longer delineated by round, and by returning the max, min and average
+  # Called in: scoring.rb
   def merge_scores(participant, scores)
     review_sym = 'review'.to_sym
     scores[review_sym] = {}
@@ -230,6 +236,7 @@ module Scoring
     scores[review_sym][:scores][:avg] = total_score / scores[review_sym][:assessments].length.to_f
   end
 
+  # Called in: scoring.rb
   def update_max_or_min(scores, round_sym, review_sym, symbol)
     op = :< if symbol == :max
     op = :> if symbol == :min
@@ -242,6 +249,7 @@ module Scoring
     end
   end
 
+  # Called in: report_formatter_helper.rb (review_response_map)
   def compute_reviews_hash(assignment)
     review_scores = {}
     response_type = 'ReviewResponseMap'
@@ -255,6 +263,7 @@ module Scoring
   end
 
   # calculate the avg score and score range for each reviewee(team), only for peer-review
+  # Called in: report_formatter_helper.rb (review_response_map)
   def compute_avg_and_ranges_hash(assignment)
     scores = {}
     contributors = assignment.contributors # assignment_teams
@@ -296,11 +305,11 @@ end
 
 def calc_review_score(corresponding_response, questions)
   if corresponding_response.empty?
-    this_review_score = -1.0
+    return -1.0
   else
     this_review_score_raw = assessment_score(response: corresponding_response, questions: questions)
     if this_review_score_raw
-      this_review_score = ((this_review_score_raw * 100) / 100.0).round if this_review_score_raw >= 0.0
+      return ((this_review_score_raw * 100) / 100.0).round if this_review_score_raw >= 0.0
     end
   end
 end

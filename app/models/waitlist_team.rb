@@ -33,7 +33,7 @@ class WaitlistTeam < ApplicationRecord
   # @param topic_id [Integer]
   # @param user_id [Integer]
   # @return true or false [boolean]
-  def self.remove_team_from_topic_waitlist(team_id, topic_id,user_id)
+  def self.remove_team_from_topic_waitlist(team_id, topic_id, user_id)
     waitlisted_team_for_topic = WaitlistTeam.find_by(topic_id: topic_id, team_id: team_id)
     unless waitlisted_team_for_topic.nil?
       waitlisted_team_for_topic.destroy
@@ -132,7 +132,7 @@ class WaitlistTeam < ApplicationRecord
     list_of_topic_waitlist_counts = []
     assignment_topics = Assignment.find(assignment_id).sign_up_topics
     assignment_topics.each do |topic|
-      list_of_topic_waitlist_counts.append({topic_id: topic.id, count: topic.waitlist_teams.size})
+      list_of_topic_waitlist_counts.append({ topic_id: topic.id, count: topic.waitlist_teams.size })
     end
     list_of_topic_waitlist_counts
   end
@@ -146,7 +146,7 @@ class WaitlistTeam < ApplicationRecord
                                           .select('waitlist_teams.id as id, sign_up_topics.id as topic_id, sign_up_topics.topic_name as name,
                                             sign_up_topics.topic_name as team_name_placeholder, sign_up_topics.topic_name as user_name_placeholder,
                                             waitlist_teams.team_id as team_id')
-                                          .where('sign_up_topics.assignment_id = ?', assignment_id)
+                                          .where('sign_up_topics.assignment_id = ?',assignment_id)
     SignedUpTeam.fill_participant_names waitlisted_participants, ip_address
     waitlisted_participants
   end
@@ -156,14 +156,14 @@ class WaitlistTeam < ApplicationRecord
   # @param team_id [Integer] - team_id from teams table
   # @param topic_id [Integer] - topic_id from sign_up_topics tables
   # @return true or false [Boolean]
-  def self.check_team_waitlisted_for_topic(team_id,topic_id)
+  def self.check_team_waitlisted_for_topic(team_id, topic_id)
     WaitlistTeam.exists?(team_id: team_id, topic_id: topic_id)
   end
 
   # E2240
   # This method signs up the first waitlist team whenever a team that is signed up for that topic is dropped/removed
-  # After this method is executed successfully, a record entry is created in signed_up_table and 
-  # a record entry is deleted in waitlist_team table if there are teams in waitlist for the topic 
+  # After this method is executed successfully, a record entry is created in signed_up_table and
+  # a record entry is deleted in waitlist_team table if there are teams in waitlist for the topic
   # @param topic_id [Integer] - topic_id from sign_up_topics tables
   # @return SignedUpTeam object [Boolean]
   def self.signup_first_waitlist_team(topic_id)

@@ -94,7 +94,7 @@ function autogenerate_submission(){
     <td style='padding:5px' id='assignment_team_assignment_field'>
 
       <div class="form-inline">
-        <span style='padding:5px' class="form-inline" id='assignment_team_count_field' onLoad='hasTeamsChanged()' <%= 'hidden' unless @assignment_form.assignment.team_assignment?%>>
+        <span style='padding:5px' class="form-inline" id='assignment_team_count_field' onload='hasTeamsChanged()' <%= 'hidden' unless @assignment_form.assignment.team_assignment?%>>
           <!--Teammate reviews fields-->
           <input name="assignment_form[assignment][show_teammate_reviews]" type="hidden" value="false"/>
           <%= label_tag('assignment_form[assignment][max_team_size]', 'Maximum number of members per team:') %>

@@ -96,6 +96,7 @@ function autogenerate_submission(){
       <div class="form-inline">
         <span style='padding:5px' class="form-inline" id='assignment_team_count_field' <%= 'hidden' unless @assignment_form.assignment.team_assignment?%>>
           <!--Teammate reviews fields-->
+          <%= hasTeamsChanged() %>
           <input name="assignment_form[assignment][show_teammate_reviews]" type="hidden" value="false"/>
           <%= label_tag('assignment_form[assignment][max_team_size]', 'Maximum number of members per team:') %>
           <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:50px;', class: 'form-control'}) %>
@@ -309,33 +310,16 @@ function autogenerate_submission(){
         var autoAssignMentorCheckbox = jQuery('#auto_assign_mentor_checkbox');
 
         jQuery("#questionnaire_table_TeammateReviewQuestionnaire").remove()
-        if (checkbox.is(':checked')) {
-            team_count_field.removeAttr('hidden');
-            team_formation_due_date_checkbox.removeAttr('hidden')
-            jQuery('#assignment_form_assignment_max_team_size').val('2');
-            teammate_reviews_field.removeAttr('hidden');
-            // E2115 hide auto assign mentor checkbox when an
-            // an assignment does not have teams
-            // what would the mentor be assigned to if there are no teams?
-            autoAssignMentorCheckbox.hide();
-            addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
-        } else {
-            if (confirm(msg)) {
-              team_count_field.attr('hidden', true);
-              team_formation_due_date_checkbox.attr('hidden', true)
-              teammate_reviews_field.attr('hidden', true);
-              // E2115 show auto assign mentor checkbox when an
-              // an assignment has teams
-              autoAssignMentorCheckbox.show();
-              document.getElementById('assignment_form_assignment_max_team_size').value = '1';
-              removeDueDateTableElement('team_formation', 0);
-            } else {
-              checkbox.prop('checked', true);
-            }
-            if (<%= !@assignment_form.assignment.team_assignment?%>){
-              team_count_field.attr('hidden', true);
-            }
-          } 
+
+        team_count_field.removeAttr('hidden');
+        team_formation_due_date_checkbox.removeAttr('hidden')
+        jQuery('#assignment_form_assignment_max_team_size').val('2');
+        teammate_reviews_field.removeAttr('hidden');
+        // E2115 hide auto assign mentor checkbox when an
+        // an assignment does not have teams
+        // what would the mentor be assigned to if there are no teams?
+        autoAssignMentorCheckbox.hide();
+        addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
     }
 
     function staggeredDeadlineChanged() {

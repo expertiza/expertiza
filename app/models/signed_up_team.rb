@@ -51,14 +51,13 @@ class SignedUpTeam < ApplicationRecord
 
   def self.find_user_signup_topics(assignment_id, team_id)
     SignedUpTeam.joins('INNER JOIN sign_up_topics ON signed_up_teams.topic_id = sign_up_topics.id')
-                .joins('INNER JOIN sign_up_topics ON signed_up_teams.topic_id = sign_up_topics.id')
                 .select('sign_up_topics.id as topic_id, sign_up_topics.topic_name as topic_name, signed_up_teams.is_waitlisted as is_waitlisted,
                   signed_up_teams.preference_priority_number as preference_priority_number')
                 .where('sign_up_topics.assignment_id = ? and signed_up_teams.team_id = ?', assignment_id, team_id)
   end
 
   # If a signup sheet exists then release topics that the given team has selected for the given assignment.
-  def self.release_topics_selected_by_team_for_assignment(team_id, assignment_id)
+  def self.release_topics_selected_by_team(team_id)
     delete_all_signed_up_topics_for_team(team_id)
     WaitlistTeam.delete_all_waitlists_for_team(team_id)
   end
@@ -82,9 +81,7 @@ class SignedUpTeam < ApplicationRecord
     signed_up_team = SignedUpTeam.find_by(team_id: team_id, topic_id: topic_id)
     if !signed_up_team.nil?
       ApplicationRecord.transaction do
-
         signed_up_team.destroy
-        
         signed_up_teams_for_topic = SignedUpTeam.where(topic_id: topic_id)
         max_choosers_for_topic = SignUpTopic.find(topic_id).max_choosers
         if signed_up_teams_for_topic.size < max_choosers_for_topic

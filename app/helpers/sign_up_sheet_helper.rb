@@ -55,7 +55,6 @@ module SignUpSheetHelper
     'rgb(' + red + ',' + green + ',0)'
   end
 
-
   def generate_html_for_particpants(topic, assignment, participants, is_waitlisted)
     html = ''
     if participants.present?

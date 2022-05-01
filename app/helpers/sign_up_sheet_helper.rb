@@ -83,4 +83,29 @@ module SignUpSheetHelper
 
     html.html_safe
   end
+
+  # renders the team's chosen bids in a list sorted by priority
+  def team_bids(topic, participants)
+    if participants.present? && current_user_has_instructor_privileges?
+      team_id = nil
+      participants.each do |participant|
+        next unless topic.id == participant.topic_id
+
+        team_id = participant.team.try(:id)
+      end
+
+      bids = Bid.where(team_id: team_id).order(:priority)
+      signed_up_topics = []
+      bids.each do |b|
+        sign_up_topic = SignUpTopic.find_by(id: b.topic_id)
+        signed_up_topics << sign_up_topic if sign_up_topic
+      end
+
+      out_string = ''
+      signed_up_topics.each_with_index do |t, i|
+        out_string += (i + 1).to_s + ". " + t.topic_name + "\r\n"
+      end
+      out_string
+    end
+  end
 end

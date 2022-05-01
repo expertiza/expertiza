@@ -83,13 +83,18 @@
   <td align="center"><%= topic.max_choosers %></td>
   <%= render :partial => '/sign_up_sheet/available_slots', :locals => {:topic=>topic} %>
   <%= render :partial => '/sign_up_sheet/waitlisted_choosers', :locals => {:topic=>topic} %>
+  <!-- Only view the bids metrics to Instructor role and when the "Biddiing for topic" option in Assignment >> Topic is enabled-->
+  <% if @assignment.is_intelligent && current_user_has_instructor_privileges?  %>  
+    <%= render :partial => '/sign_up_sheet/total_bids', :locals => {:topic=>topic} %>
+    <%= render :partial => '/sign_up_sheet/total_1_2_bids', :locals => {:topic=>topic}%>
+  <% end %>
   <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>
       <td align="center"> <%= render :partial => '/sign_up_sheet/actions', :locals => {:i=>i,:topic=>topic, :is_suggested_topic=>is_suggested_topic ||= false} %> </td>
   <% end %>
-  <td align="center">
   <% if SignUpSheet.has_teammate_ads?(topic.id) %>
+  <td align="center">  
       <%# link_to :controller => 'sign_up_sheet', :action => 'show_team', :assignment_id=>params[:id], :id=>topic.id do %>
-      <%= link_to image_tag('ad_horn.png', :border => 0, :title => 'Ad', :align => 'middle', :style => 'width: 24px; height:24px'), :controller=>'sign_up_sheet', :action=> 'show_team', :assignment_id=>@assignment.id, :id=>topic.id%>
-  <% end %>
+      <%= link_to image_tag('ad_horn.png', :border => 0, :title => 'Ad', :align => 'middle', :style => 'width: 24px; height:24px'), :controller=>'sign_up_sheet', :action=> 'show_team', :assignment_id=>@assignment.id, :id=>topic.id%>  
   </td>
+  <% end %>
 <% end %>

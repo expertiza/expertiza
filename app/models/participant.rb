@@ -152,20 +152,4 @@ class Participant < ApplicationRecord
     fields
   end
 
-  # creates new participants, copied from an old assignment with parent_id as new assignment id
-  # returns a mapping of old participants IDs to new participant IDs
-  # this could probably be moved to assignment_participant
-  def self.copy_participants_for_assignment(old_assign_id, new_assign_id)
-    participants_mapping = Hash.new
-    participants_to_copy = Participant.where(parent_id: old_assign_id)
-    participants_to_copy.each do |original_participant|
-      new_participant = original_participant.dup
-      new_participant.parent_id = new_assign_id
-      if new_participant.save # should we check it this is successful?
-        participants_mapping.store(original_participant.id, new_participant.id)
-      end
-    end
-    return participants_mapping
-  end
-
 end

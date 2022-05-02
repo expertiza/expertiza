@@ -64,7 +64,9 @@ class StudentTaskController < ApplicationController
     @use_bookmark = @assignment.use_bookmark
     # Timeline feature
     @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
-    @review_mappings = get_review_mappings(@assignment, @team.id)
+    # To get the current active reviewers of a team assignment.
+    # Used in the view to disable or enable the link for sending email to reviewers.
+    @review_mappings = review_mappings(@assignment, @team.id)
   end
 
   def others_work
@@ -114,7 +116,7 @@ class StudentTaskController < ApplicationController
     @participant = AssignmentParticipant.find_by(id: participant_id)
     @team = Team.find_by(parent_id: assignment_id)
 
-    mappings = get_review_mappings(assignment_id, @team.id)
+    mappings = review_mappings(assignment_id, @team.id)
     respond_to do |format|
       if subject.blank? || body.blank?
         flash[:notice] = 'Please fill in the subject and the Email Content.'
@@ -136,7 +138,7 @@ class StudentTaskController < ApplicationController
   end
 
   # retrieves review mappings for an assignment from ResponseMap table.
-  def get_review_mappings(assignment_id, team_id)
+  def review_mappings(assignment_id, team_id)
     ResponseMap.where(reviewed_object_id: assignment_id,
                       reviewee_id: team_id,
                       type: 'ReviewResponseMap')

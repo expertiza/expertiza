@@ -60,12 +60,6 @@ class SubmittedContentController < ApplicationController
       flash[:error] = 'You or your teammate(s) have already submitted the same hyperlink.'
     else
       begin
-        
-        # only increment submitter_count if we don't have any files or hyperlinks submitted.
-        if (team.hyperlinks.count == 0)
-          @participant.assignment.update_attribute('submitter_count', @participant.assignment.submitter_count + 1)
-        end
-
         team.submit_hyperlink(params['submission'])
         SubmissionRecord.create(team_id: team.id,
                                 content: params['submission'],
@@ -91,12 +85,6 @@ class SubmittedContentController < ApplicationController
     team = @participant.team
     hyperlink_to_delete = team.hyperlinks[params['chk_links'].to_i]
     team.remove_hyperlink(hyperlink_to_delete)
-
-    # Decrease submitter_count if we are removing the only hyperlink on the page
-    if(team.hyperlinks.count == 0 && hyperlink_to_delete != nil)
-      @participant.assignment.update_attribute('submitter_count', @participant.assignment.submitter_count - 1)
-    end
-
     ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully removed.', request)
     undo_link('The link has been successfully removed.')
     # determine if the user should be redirected to "edit" or  "view" based on the current deadline right
@@ -157,12 +145,6 @@ class SubmittedContentController < ApplicationController
     end
     assignment = Assignment.find(participant.parent_id)
     team = participant.team
-
-    # Only increase submitter_count if we have no hyperlinks (or files submitted / FILES PART NOT YET IMPLEMENTED).
-    if (team.hyperlinks.count == 0)
-      @participant.assignment.update_attribute('submitter_count', @participant.assignment.submitter_count + 1)
-    end 
-
     SubmissionRecord.create(team_id: team.id,
                             content: full_filename,
                             user: participant.name,
@@ -274,12 +256,7 @@ class SubmittedContentController < ApplicationController
                             user: participant.try(:name),
                             assignment_id: assignment.try(:id),
                             operation: 'Remove File')
-    # Decrease submitter_count if we are removing the last file on the page
-    # TODO: Find a way to check if its the ONLY/LAST file on the page
-    if(team.hyperlinks.count == 0)
-      participant.assignment.update_attribute('submitter_count', participant.assignment.submitter_count - 1)
-    end
-    ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The selected file has been deleted.', request)
+   ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The selected file has been deleted.', request)
   end
 
   def copy_selected_file

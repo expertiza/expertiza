@@ -414,23 +414,6 @@ class AssignmentForm
     MailWorker.perform_in(find_min_from_now(Time.parse(due_date.due_at.to_s(:db)) + simicheck_delay.to_i.hours).minutes.from_now * 60, @assignment.id, 'compare_files_with_simicheck', due_date.due_at.to_s(:db))
   end
 
-  # Copy calibrated reviews:
-  # This requires making new teams and participants, copied from the old assignment
-  # Creating new TeamsUsers records to map our new teams/participants verbatim to old assignment
-  # Creating a new ReviewResponseMap records, mapping reviewees/reviewers verbatim to old assignment
-  # Creating new reviews (copies of old reviews)
-  #reviewed_object_id is set to new assign_id, reviewer_id and reviewee_ids look correct,
-  def self.copy_calibrated_reviews(old_assignment, new_assignment_id)
-    if old_assignment.is_calibrated
-      SubmissionRecord.copy_submission_records_for_assignment(old_assignment, new_assignment_id)
-      teams_mapping = Team.copy_teams_for_assignment(old_assignment.id, new_assignment_id)
-      participants_mapping = Participant.copy_participants_for_assignment(old_assignment.id, new_assignment_id)
-      TeamsUser.create_mapping_from_old_assignment(teams_mapping, new_assignment_id)
-      review_response_map_mapping = ReviewResponseMap.copy_review_response_map(teams_mapping, participants_mapping, new_assignment_id)
-      Response.copy_review_responses_from_old_map_to_new_map(review_response_map_mapping)
-    end
-  end
-
   # Copies the inputted assignment into new one and returns the new assignment id
   def self.copy(assignment_id, user)
     Assignment.record_timestamps = false
@@ -449,7 +432,7 @@ class AssignmentForm
       AssignmentDueDate.copy(old_assign.id, new_assign.id)
       new_assign.create_node
       new_assign_id = new_assign.id
-      copy_calibrated_reviews(old_assign, new_assign_id)
+      Assignment.copy_calibrated_reviews(old_assign, new_assign_id)
       # also copy topics from old assignment
       topics = SignUpTopic.where(assignment_id: old_assign.id)
       topics.each do |topic|

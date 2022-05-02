@@ -442,6 +442,7 @@ class AssignmentForm
     new_assign.update_attribute('created_at', Time.now)
     new_assign.update_attribute('updated_at', Time.now)
     new_assign.update_attribute('directory_path', name_copied_directory(new_assign.directory_path)) if new_assign.directory_path.present?
+    new_assign.update_attribute('submitter_count', old_assign.submitter_count)
     new_assign.copy_flag = true
     if new_assign.save
       Assignment.record_timestamps = true

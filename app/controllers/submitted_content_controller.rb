@@ -72,6 +72,7 @@ class SubmittedContentController < ApplicationController
       end
       @participant.mail_assigned_reviewers
       ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully submitted.', request)
+      @participant.assignment.update_attribute('submitter_count', @participant.assignment.submitter_count + 1);
       undo_link('The link has been successfully submitted.')
     end
     redirect_to action: 'edit', id: @participant.id

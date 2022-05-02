@@ -86,12 +86,16 @@ class SubmittedContentController < ApplicationController
     team = @participant.team
     hyperlink_to_delete = team.hyperlinks[params['chk_links'].to_i]
     team.remove_hyperlink(hyperlink_to_delete)
+
+    # below line doesn't change submitter_count if there is no hyperlink selected to delete
+    if (hyperlink_to_delete != nil)
+      @participant.assignment.update_attribute('submitter_count', @participant.assignment.submitter_count - 1)
+    end
     ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully removed.', request)
     undo_link('The link has been successfully removed.')
     # determine if the user should be redirected to "edit" or  "view" based on the current deadline right
     topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     assignment = Assignment.find(@participant.parent_id)
-    @participant.assignment.update_attribute('submitter_count', @participant.assignment.submitter_count - 1)
     SubmissionRecord.create(team_id: team.id,
                             content: hyperlink_to_delete,
                             user: @participant.name,

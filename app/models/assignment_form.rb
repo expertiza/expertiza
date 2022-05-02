@@ -428,7 +428,6 @@ class AssignmentForm
       TeamsUser.create_mapping_from_old_assignment(teams_mapping, new_assignment_id)
       review_response_map_mapping = ReviewResponseMap.copy_review_response_map(teams_mapping, participants_mapping, new_assignment_id)
       Response.copy_review_responses_from_old_map_to_new_map(review_response_map_mapping)
-      # TODO - make sure submitter_count is incremented properly
     end
   end
 

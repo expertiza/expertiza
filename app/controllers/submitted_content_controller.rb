@@ -146,6 +146,7 @@ class SubmittedContentController < ApplicationController
     end
     assignment = Assignment.find(participant.parent_id)
     team = participant.team
+    participant.assignment.update_attribute('submitter_count', participant.assignment.submitter_count + 1)
     SubmissionRecord.create(team_id: team.id,
                             content: full_filename,
                             user: participant.name,

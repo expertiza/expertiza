@@ -60,7 +60,7 @@
     </td>
   </tr>
   
-  <tr style="display:<%='none' if !@metareview_allowed%>">   
+  <tr style="display:<%='none' unless @metareview_allowed%>">   
   <!-- Added the meta_reviews_allowed variable to hide/show metareview section on UI -->
   <!-- Improved the UI  by team E2235 -->  
   <td>
@@ -70,7 +70,7 @@
     </td>
   </tr>
 
-  <tr id="assignment_review_topic_threshold_row" style="display:<%='none' if !@metareview_allowed%>">
+  <tr id="assignment_review_topic_threshold_row" style="display:<%='none' unless @metareview_allowed%>">
   <!-- Added the meta_reviews_allowed variable to hide/show metareview section on UI -->
   <!-- Improved the UI  by team E2235 -->  
     <td>

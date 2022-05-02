@@ -72,7 +72,7 @@ class SubmittedContentController < ApplicationController
       end
       @participant.mail_assigned_reviewers
       ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully submitted.', request)
-      @participant.assignment.update_attribute('submitter_count', @participant.assignment.submitter_count + 1);
+      @participant.assignment.update_attribute('submitter_count', @participant.assignment.submitter_count + 1)
       undo_link('The link has been successfully submitted.')
     end
     redirect_to action: 'edit', id: @participant.id
@@ -91,6 +91,7 @@ class SubmittedContentController < ApplicationController
     # determine if the user should be redirected to "edit" or  "view" based on the current deadline right
     topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     assignment = Assignment.find(@participant.parent_id)
+    @participant.assignment.update_attribute('submitter_count', @participant.assignment.submitter_count - 1)
     SubmissionRecord.create(team_id: team.id,
                             content: hyperlink_to_delete,
                             user: @participant.name,
@@ -258,6 +259,7 @@ class SubmittedContentController < ApplicationController
                             user: participant.try(:name),
                             assignment_id: assignment.try(:id),
                             operation: 'Remove File')
+    participant.assignment.update_attribute('submitter_count', participant.assignment.submitter_count - 1)
     ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The selected file has been deleted.', request)
   end
 

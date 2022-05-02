@@ -80,18 +80,12 @@ describe '.confirm_topic' do
     user_signup = SignedUpTeam.new
     user_signup.is_waitlisted = true
     allow(SignUpSheet).to receive(:otherConfirmedTopicforUser) { [user_signup] }
-    expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be_nil
+    expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be(false)
   end
 
   it 'returns true for SignUpSheet.confirmTopic ' do
     allow(SignUpTopic).to receive(:slotAvailable?) { true }
-    user_signup = SignedUpTeam.new
-    user_signup.is_waitlisted = true
-    allow(SignUpSheet).to receive(:update_attribute) { [user_signup] }
-    allow(SignedUpTeam).to receive(:where) { user_signup }
-    allow(user_signup).to receive(:first) { user_signup }
-    allow(user_signup).to receive(:update_attribute)
-    allow(SignUpSheet).to receive(:otherConfirmedTopicforUser) { [user_signup] }
+    allow(SignUpSheet).to receive(:signup_team_to_topic) { true }
     expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be(true)
   end
 end

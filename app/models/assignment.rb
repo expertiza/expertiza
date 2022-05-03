@@ -30,8 +30,6 @@ class Assignment < ApplicationRecord
   has_many :response_maps, foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: :assignment
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: :assignment
   has_many :plagiarism_checker_assignment_submissions, dependent: :destroy
-  has_many :assignment_badges, dependent: :destroy
-  has_many :badges, through: :assignment_badges
   validates :name, presence: true
   validates :name, uniqueness: { scope: :course_id }
   validate :valid_num_review
@@ -62,7 +60,9 @@ class Assignment < ApplicationRecord
 
   # TODO app breaks when max team size is set as > 1 and team has only one member
   def team_assignment?
-    max_team_size > 1
+    # All assignments should be team assignments
+    # max_team_size > 1
+    true
   end
   alias team_assignment team_assignment?
 
@@ -260,11 +260,6 @@ class Assignment < ApplicationRecord
   # Check to see if assignment is a microtask
   def microtask?
     microtask.nil? ? false : microtask
-  end
-
-  # Check to see if assignment has badge
-  def badge?
-    has_badge.nil? ? false : has_badge
   end
 
   # add a new participant to this assignment

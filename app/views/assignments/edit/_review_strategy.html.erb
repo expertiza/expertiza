@@ -60,15 +60,20 @@
       </span>
     </td>
   </tr>
-  <tr>
-    <td>
+  
+  <tr style="display:<%='none' unless @metareview_allowed%>">   
+  <!-- Added the meta_reviews_allowed variable to hide/show metareview section on UI -->
+  <!-- Improved the UI  by team E2235 -->  
+  <td>
       <%= check_box_tag('meta_review', 'true', true, {:onChange => 'hasMetaReviewChanged()'}) %>
       <%= label_tag('meta_review', 'Has meta-review limit?') %>  
       <img src="/assets/info.png" title='You can set if a particular submission can have a Meta-review or not.'>
     </td>
   </tr>
 
-  <tr id="assignment_review_topic_threshold_row">
+  <tr id="assignment_review_topic_threshold_row" style="display:<%='none' unless @metareview_allowed%>">
+  <!-- Added the meta_reviews_allowed variable to hide/show metareview section on UI -->
+  <!-- Improved the UI  by team E2235 -->  
     <td>
         <span id="meta_reviews_allowed" <%= 'hidden' if @assignment_form.assignment.num_metareviews_allowed.nil?%> class="form-inline">
 

@@ -94,10 +94,6 @@ function autogenerate_submission(){
     <td style='padding:5px' id='assignment_team_assignment_field'>
 
       <div class="form-inline">
-        <%= check_box_tag('team_assignment', 'true', @assignment_form.assignment.team_assignment?, {:onChange => 'hasTeamsChanged()'}) %>
-        <% @assignment_form.assignment.max_team_size %>
-        <%= label_tag('team_assignment', 'Has teams?') %>
-
         <span style='padding:5px' class="form-inline" id='assignment_team_count_field' <%= 'hidden' unless @assignment_form.assignment.team_assignment?%>>
           <!--Teammate reviews fields-->
           <input name="assignment_form[assignment][show_teammate_reviews]" type="hidden" value="false"/>
@@ -111,7 +107,6 @@ function autogenerate_submission(){
       </span>
       &nbsp;&nbsp;&nbsp;&nbsp;
       <!--Maximum number of members per team-->
-    </td>
   </tr>
 
   <!-- E2115 Mentor Management -->
@@ -138,15 +133,6 @@ function autogenerate_submission(){
     <td style='padding:5px' id='assignment_numbers_of_quiz_field' <%= 'hidden' unless @assignment_form.assignment.require_quiz %>>
       <%= label_tag('assignment_form[assignment][num_quiz_questions]', 'Number of Quiz questions:') %>
       <%= text_field_tag('assignment_form[assignment][num_quiz_questions]', @assignment_form.assignment.num_quiz_questions, { :style => 'width:20px'}) %>
-    </td>
-  </tr>
-
-  <!--Badge-->
-  <tr>
-    <td style='padding:5px' id='assignment_has_badge_field'>
-      <input name="assignment_form[assignment][has_badge]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][has_badge]', 'true', @assignment_form.assignment.has_badge) %>
-      <%= label_tag('assignment_form[assignment][has_badge]', 'Has badge?') %>
     </td>
   </tr>
 

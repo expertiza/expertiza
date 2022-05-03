@@ -12,9 +12,6 @@
     <th class="head">Email Address</th>
     <th class="head">Role</th>
     <th class="head">Parent</th>
-    <% if params[:model] == 'Assignment' and Assignment.find_by(id: params[:id]).badge? %>
-      <th class="head">Badges</th>
-    <% end %>  
     <th class="head">Review</th>
     <th class="head">Submission</th>
     <th class="head">Metareview</th>

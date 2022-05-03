@@ -27,18 +27,6 @@ module StudentTaskHelper
     true
   end
 
-  def get_awarded_badges(participant)
-    info = ''
-    participant.awarded_badges.each do |awarded_badge|
-      badge = awarded_badge.badge
-      # In the student task homepage, list only those badges that are approved
-      if awarded_badge.approved?
-        info += '<img width="30px" src="/assets/badges/' + badge.image_name + '" title="' + badge.name + '" />'
-      end
-    end
-    info.html_safe
-  end
-
   def review_deadline?(assignment)
     assignment.find_due_dates('review').present?
   end

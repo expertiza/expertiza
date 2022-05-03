@@ -214,10 +214,10 @@ class ReviewMappingController < ApplicationController
     assignment = Assignment.find(params[:assignment_id])
     metareviewer = AssignmentParticipant.where(user_id: params[:metareviewer_id], parent_id: assignment.id).first
     
-    #this will prvide a flash warning instead of page crash when there are no review to Meta review.
-    begin 
+    # this will prvide a flash warning instead of page crash when there are no review to Meta review.
+    begin
       assignment.assign_metareviewer_dynamically(metareviewer)
-    rescue StandardError => e   
+    rescue StandardError => e
       flash[:error] = e.message
     end
     redirect_to controller: 'student_review', action: 'list', id: metareviewer.id

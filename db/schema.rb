@@ -31,6 +31,7 @@ ActiveRecord::Schema.define(version: 20220414172528) do
     t.string "value"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "confidence_level", precision: 10, scale: 5
     t.index ["answer_id"], name: "index_answer_tags_on_answer_id"
     t.index ["tag_prompt_deployment_id"], name: "index_answer_tags_on_tag_prompt_deployment_id"
     t.index ["user_id"], name: "index_answer_tags_on_user_id"
@@ -304,6 +305,7 @@ ActiveRecord::Schema.define(version: 20220414172528) do
     t.integer "times_used", default: 0, null: false
     t.integer "instructor_id", null: false
     t.string "policy_name", null: false
+    t.boolean "private", default: true, null: false
     t.index ["instructor_id"], name: "fk_instructor_id"
   end
 
@@ -312,8 +314,8 @@ ActiveRecord::Schema.define(version: 20220414172528) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "user_id"
-    t.string "lockable_type"
     t.integer "lockable_id"
+    t.string "lockable_type"
     t.index ["user_id"], name: "fk_rails_426f571216"
   end
 
@@ -679,6 +681,7 @@ ActiveRecord::Schema.define(version: 20220414172528) do
     t.integer "directory_num"
     t.integer "grade_for_submission"
     t.text "comment_for_submission"
+    t.boolean "make_public", default: false
     t.integer "pair_programming_request", limit: 1
   end
 

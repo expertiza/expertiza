@@ -60,9 +60,7 @@ class Assignment < ApplicationRecord
 
   # TODO app breaks when max team size is set as > 1 and team has only one member
   def team_assignment?
-    # All assignments should be team assignments
-    # max_team_size > 1
-    true
+    max_team_size > 1
   end
   alias team_assignment team_assignment?
 

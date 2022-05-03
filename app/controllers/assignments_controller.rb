@@ -19,6 +19,7 @@ class AssignmentsController < ApplicationController
     @assignment_form.assignment.instructor ||= current_user
     @num_submissions_round = 0
     @num_reviews_round = 0
+    @default_num_metareviews_required = 3
   end
 
   # creates a new assignment via the assignment form

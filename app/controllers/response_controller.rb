@@ -176,13 +176,13 @@ class ResponseController < ApplicationController
 
     respond_to do |format|
       if subject.blank? || body.blank?
-        flash[:notice] = 'Please fill in the subject and the Email Content.'
+        flash[:error] = 'Please fill in the subject and the email content.'
         format.html { redirect_to controller: 'response', action: 'author', response: response, email: email }
         format.json { head :no_content }
       else
         # make a call to method invoking the email process
         MailerHelper.send_mail_to_author_reviewers(subject, body, email)
-        flash[:notice] = 'Email will be sent to the Author.'
+        flash[:success] = 'Email sent to the author.'
         format.html { redirect_to controller: 'student_task', action: 'list' }
         format.json { head :no_content }
       end

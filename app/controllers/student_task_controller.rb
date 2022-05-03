@@ -119,7 +119,7 @@ class StudentTaskController < ApplicationController
     mappings = review_mappings(assignment_id, @team.id)
     respond_to do |format|
       if subject.blank? || body.blank?
-        flash[:notice] = 'Please fill in the subject and the Email Content.'
+        flash[:error] = 'Please fill in the subject and the email content.'
         format.html { redirect_to controller: 'student_task', action: 'email_reviewers', id: @participant, assignment_id: assignment_id }
         format.json { head :no_content }
       else
@@ -130,7 +130,7 @@ class StudentTaskController < ApplicationController
             MailerHelper.send_mail_to_author_reviewers(subject, body, reviewer.email)
           end
         end
-        flash[:notice] = 'Email will be sent to the Reviewers.'
+        flash[:success] = 'Email sent to the reviewers.'
         format.html { redirect_to controller: 'student_task', action: 'list' }
         format.json { head :no_content }
       end

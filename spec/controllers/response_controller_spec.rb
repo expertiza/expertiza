@@ -303,7 +303,7 @@ describe ResponseController do
         
         post :send_email, params: request_params
 
-        expect(flash[:notice]).to eq('Please fill in the subject and the Email Content.')
+        expect(flash[:error]).to eq('Please fill in the subject and the email content.')
         expect(response).to redirect_to ('/response/author')
      
       end
@@ -322,7 +322,7 @@ describe ResponseController do
         
         post :send_email, params: request_params
 
-        expect(flash[:notice]).to eq('Please fill in the subject and the Email Content.')
+        expect(flash[:error]).to eq('Please fill in the subject and the email content.')
         expect(response).to redirect_to ('/response/author')
      
       end
@@ -341,7 +341,7 @@ describe ResponseController do
         
         post :send_email, params: request_params
 
-        expect(flash[:notice]).to eq('Email will be sent to the Author.')
+        expect(flash[:success]).to eq('Email sent to the author.')
         expect(response).to redirect_to ('/student_task/list')
      
       end
@@ -360,7 +360,7 @@ describe ResponseController do
         
         post :send_email, params: request_params
 
-        expect(flash[:notice]).to eq('Please fill in the subject and the Email Content.')
+        expect(flash[:error]).to eq('Please fill in the subject and the email content.')
         expect(response).to redirect_to ('/response/author')
      
       end

@@ -1,4 +1,4 @@
-class AddDynamicReviewFieldsToAssignments < ActiveRecord::Migration
+class AddDynamicReviewFieldsToAssignments < ActiveRecord::Migration[4.2]
   def self.up
     add_column :assignments, :dynamic_reviewer_assignments_enabled, :boolean, default: 0
     add_column :assignments, :dynamic_reviewer_response_time_limit_hours, :integer

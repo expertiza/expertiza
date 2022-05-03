@@ -19,10 +19,7 @@ class AssignmentsController < ApplicationController
     @assignment_form.assignment.instructor ||= current_user
     @num_submissions_round = 0
     @num_reviews_round = 0
-  end
-
-  def assignment_by_name_and_course(name, course_id)
-    Assignment.find_by(name: name, course_id: course_id)
+    @default_num_metareviews_required = 3
   end
 
   # creates a new assignment via the assignment form
@@ -35,30 +32,33 @@ class AssignmentsController < ApplicationController
       find_existing_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
       if !find_existing_assignment && !find_existing_directory && @assignment_form.save # No existing names/directories
         @assignment_form.create_assignment_node
-        current_assignment = assignment_by_name_and_course(@assignment_form.assignment.name, @assignment_form.assignment.course_id)
-        assignment_form_params[:assignment][:id] = current_assignment.id.to_s
+        exist_assignment = Assignment.find(@assignment_form.assignment.id)
+        assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
+        if assignment_form_params[:assignment][:directory_path].blank?
+          assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
+        end
         ques_array = assignment_form_params[:assignment_questionnaire]
         due_array = assignment_form_params[:due_date]
         ques_array.each do |cur_questionnaire|
-          cur_questionnaire[:assignment_id] = current_assignment.id.to_s
+          cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
         end
         due_array.each do |cur_due|
-          cur_due[:parent_id] = current_assignment.id.to_s
+          cur_due[:parent_id] = exist_assignment.id.to_s
         end
         assignment_form_params[:assignment_questionnaire] = ques_array
         assignment_form_params[:due_date] = due_array
         @assignment_form.update(assignment_form_params, current_user)
-        aid = assignment_by_name_and_course(@assignment_form.assignment.name, @assignment_form.assignment.course_id).id
+        aid = Assignment.find(@assignment_form.assignment.id).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
         redirect_to edit_assignment_path aid
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
         return
       else
         flash[:error] = 'Failed to create assignment.'
-        if find_existing_assignment # Throw error if assignment name already found.
+        if find_existing_assignment
           flash[:error] << '<br>  ' + @assignment_form.assignment.name + ' already exists as an assignment name'
         end
-        if find_existing_directory # Throw error if directory path already found.
+        if find_existing_directory
           flash[:error] << '<br>  ' + dir_path + ' already exists as a submission directory name'
         end
         redirect_to '/assignments/new?private=1'
@@ -78,19 +78,9 @@ class AssignmentsController < ApplicationController
     check_questionnaires_usage
     @due_date_all = update_nil_dd_deadline_name(@due_date_all)
     @due_date_all = update_nil_dd_description_url(@due_date_all)
-    # only when instructor does not assign rubrics and in assignment edit page will show this error message.
     unassigned_rubrics_warning
     path_warning_and_answer_tag
-    # assigned badges will hold all the badges that have been assigned to an assignment
-    # added it to display the assigned badges while creating a badge in the assignments page
-
-    update_assignment_badges
-
-    @assigned_badges = @assignment_form.assignment.badges
-    @badges = Badge.all
     @use_bookmark = @assignment.use_bookmark
-
-    # E2147 : gets duties of a particular assignment. Returns empty if no duties are found
     @duties = Duty.where(assignment_id: @assignment_form.assignment.id)
   end
 
@@ -106,7 +96,6 @@ class AssignmentsController < ApplicationController
     update_feedback_attributes
     query_participants_and_alert
 
-    # What to do next depends on how we got here
     if params['button'].nil?
       render partial: 'assignments/edit/topics'
     else
@@ -349,8 +338,6 @@ class AssignmentsController < ApplicationController
   # populates values and settings of the assignment for editing
   def edit_params_setting
     @assignment = Assignment.find(params[:id])
-    # store the assignment in session, it will be used to go back to assignment being created/edited, while creating new late policy.
-    session[:assignment] = @assignment
     @num_submissions_round = @assignment.find_due_dates('submission').nil? ? 0 : @assignment.find_due_dates('submission').count
     @num_reviews_round = @assignment.find_due_dates('review').nil? ? 0 : @assignment.find_due_dates('review').count
 
@@ -447,12 +434,6 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  # update the current assignment's badges when editing
-  def update_assignment_badges
-    @assigned_badges = @assignment_form.assignment.badges
-    @badges = Badge.all
-  end
-
   # flash notice if the time zone is not specified for an assignment's due date
   def user_timezone_specified
     ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, 'Timezone not specified', request) if current_user.timezonepref.nil?
@@ -483,11 +464,8 @@ class AssignmentsController < ApplicationController
     params[:assignment_form][:assignment_questionnaire].reject! do |q|
       q[:questionnaire_id].empty?
     end
-
     # Deleting Due date info from table if meta-review is unchecked. - UNITY ID: ralwan and vsreeni
-
-    @due_date_info = DueDate.find_each(parent_id: params[:id])
-
+    @due_date_info = DueDate.where(parent_id: params[:id])
     DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all if params[:metareview_allowed] == 'false'
   end
 

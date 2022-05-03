@@ -1,4 +1,4 @@
-class CreateWikiTypes < ActiveRecord::Migration
+class CreateWikiTypes < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'wiki_types', force: true do |t|
       t.column 'name', :string, default: '', null: false

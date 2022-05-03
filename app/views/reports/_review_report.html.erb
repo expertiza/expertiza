@@ -134,12 +134,12 @@
           </td>
           <!--Assign grade and write comments-->
           <td align='left'>
-            <%= form_tag save_grade_and_comment_for_reviewer_review_mapping_index_path, remote: true do %>
-              <%= hidden_field_tag :participant_id, reviewer.id %>
-              <%= hidden_field_tag :assignment_id, @id %>
-              <%= number_field_tag 'grade_for_reviewer', reviewer.review_grade.try(:grade_for_reviewer), min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %>
+            <%= form_with model: reviewer.review_grade, url: save_grade_and_comment_for_reviewer_review_mapping_index_path, method: 'post' do |form| %>
+              <%= form.hidden_field :participant_id, :value => reviewer.id %>
+              <%= form.hidden_field :assignment_id, :value => @id %>
+              <%= form.number_field :grade_for_reviewer, :value => reviewer.review_grade.try(:grade_for_reviewer), min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %>
               <br/>
-              <%= text_area_tag 'comment_for_reviewer', reviewer.review_grade.try(:comment_for_reviewer), placeholder: 'Comment', class: "awesome_input", 'data-multiple' => '', 'data-minchars' => "1" %>
+              <%= form.text_area :comment_for_reviewer, :value => reviewer.review_grade.try(:comment_for_reviewer), placeholder: 'Comment', class: "awesome_input", 'data-multiple' => '', 'data-minchars' => "1" %>
               <table class="inline-transparent">
                 <tr>
                   <td>
@@ -148,7 +148,7 @@
                 </tr>
                 <tr>
                   <td>
-                    <%= submit_tag 'Save' %>
+                    <%= form.submit 'Save' %>
                   </td>
                 </tr>
               </table>

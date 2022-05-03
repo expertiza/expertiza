@@ -1,4 +1,4 @@
-class AddAttributesToSubmissionrecords < ActiveRecord::Migration
+class AddAttributesToSubmissionrecords < ActiveRecord::Migration[4.2]
   def change
     add_column :submissionrecords, :type, :text
     add_column :submissionrecords, :content, :string

@@ -1,4 +1,4 @@
-class Participant < ActiveRecord::Base
+class Participant < ApplicationRecord
   include Scoring
   include ParticipantsHelper
   has_paper_trail
@@ -9,8 +9,6 @@ class Participant < ActiveRecord::Base
   has_many   :reviews, class_name: 'ResponseMap', foreign_key: 'reviewer_id', dependent: :destroy, inverse_of: false
   has_many   :team_reviews, class_name: 'ReviewResponseMap', foreign_key: 'reviewer_id', dependent: :destroy, inverse_of: false
   has_many :response_maps, class_name: 'ResponseMap', foreign_key: 'reviewee_id', dependent: :destroy, inverse_of: false
-  has_many :awarded_badges, dependent: :destroy
-  has_many :badges, through: :awarded_badges
   has_one :review_grade, dependent: :destroy
   validates :grade, numericality: { allow_nil: true }
   has_paper_trail
@@ -70,6 +68,21 @@ class Participant < ActiveRecord::Base
       '<center>&#8212;</center>' # em dash
     else
       topic.topic_name
+    end
+  end
+
+  # send email to team's reviewers in case a new submission is made
+  def mail_assigned_reviewers
+    # Find review mappings for the work done by this participant's team
+    mappings = ResponseMap.where(reviewed_object_id: self.assignment.id,
+                                 reviewee_id: self.team.id,
+                                 type: 'ReviewResponseMap')
+    unless mappings.nil?
+      mappings.each do |mapping|
+        reviewer = mapping.reviewer.user
+        prepared_mail = MailerHelper.send_mail_to_assigned_reviewers(reviewer, self, mapping)
+        prepared_mail.deliver_now
+      end
     end
   end
 

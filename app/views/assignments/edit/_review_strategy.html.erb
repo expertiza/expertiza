@@ -59,15 +59,20 @@
       </span>
     </td>
   </tr>
-  <tr>
-    <td>
+  
+  <tr style="display:<%='none' unless @metareview_allowed%>">   
+  <!-- Added the meta_reviews_allowed variable to hide/show metareview section on UI -->
+  <!-- Improved the UI  by team E2235 -->  
+  <td>
       <%= check_box_tag('meta_review', 'true', true, {:onChange => 'hasMetaReviewChanged()'}) %>
       <%= label_tag('meta_review', 'Has meta-review limit?') %>  
       <img src="/assets/info.png" title='You can set if a particular submission can have a Meta-review or not.'>
     </td>
   </tr>
 
-  <tr id="assignment_review_topic_threshold_row">
+  <tr id="assignment_review_topic_threshold_row" style="display:<%='none' unless @metareview_allowed%>">
+  <!-- Added the meta_reviews_allowed variable to hide/show metareview section on UI -->
+  <!-- Improved the UI  by team E2235 -->  
     <td>
         <span id="meta_reviews_allowed" <%= 'hidden' if @assignment_form.assignment.num_metareviews_allowed.nil?%> class="form-inline">
 
@@ -79,13 +84,8 @@
           <%= text_field_tag('assignment_form[assignment][num_metareviews_allowed]',  3, size: 1, class: "form-control width-70", :style => 'margin-left :100px') %>
             <%end%>
           </br>
-          <%= label_tag('assignment_form[assignment][num_metareviews_allowed]', 'Set required number of meta-reviews per reviewer') %>
-
-          <%if @assignment_form.assignment.num_metareviews_allowed && @assignment_form.assignment.num_metareviews_allowed >= 0 %>
-              <%= text_field_tag('assignment_form[assignment][num_metareviews_allowed]', @assignment_form.assignment.num_metareviews_allowed ||= 3, size: 1, class: "form-control width-70", :style => 'margin-left :90px') %>
-        <%else%>
-              <%= text_field_tag('assignment_form[assignment][num_metareviews_allowed]',  3, size: 1, class: "form-control width-70", :style => 'margin-left :90px') %>
-        <%end%>
+          <%= label_tag('assignment_form[assignment][num_metareviews_required]', 'Set required number of meta-reviews per reviewer') %>
+          <%= text_field_tag('assignment_form[assignment][num_metareviews_required]',  @assignment_form.assignment.num_metareviews_required ||= @default_num_metareviews_required, size: 1, class: "form-control width-70", :style => 'margin-left :90px') %>
         </span>
     </td>
   </tr>

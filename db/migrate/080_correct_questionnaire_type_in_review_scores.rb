@@ -1,4 +1,4 @@
-class CorrectQuestionnaireTypeInReviewScores < ActiveRecord::Migration
+class CorrectQuestionnaireTypeInReviewScores < ActiveRecord::Migration[4.2]
   def self.up
     review_rubric = ActiveRecord::Base.connection.select_one("select * from questionnaire_types where name = 'Review Rubric'")
 

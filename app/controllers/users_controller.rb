@@ -56,7 +56,7 @@ class UsersController < ApplicationController
       anonymized_view_starter_ips += " #{session[:ip]}"
     end
     $redis.set('anonymized_view_starter_ips', anonymized_view_starter_ips)
-    redirect_to :back
+    redirect_back fallback_location: root_path
   end
 
   # for displaying the list of users
@@ -67,7 +67,10 @@ class UsersController < ApplicationController
   # for displaying users which are being searched for editing purposes after checking whether current user is authorized to do so
   def show_if_authorized
     @user = User.find_by(name: params[:user][:name])
-    if !@user.nil?
+    if @user.nil?
+      flash[:note] = params[:user][:name] + ' does not exist.'
+      redirect_to action: 'list'
+    else
       role
       # check whether current user is authorized to edit the user being searched, call show if true
 
@@ -79,9 +82,6 @@ class UsersController < ApplicationController
         flash[:note] = 'The specified user is not available for editing.'
         redirect_to action: 'list'
       end
-    else
-      flash[:note] = params[:user][:name] + ' does not exist.'
-      redirect_to action: 'list'
     end
   end
 
@@ -142,6 +142,8 @@ class UsersController < ApplicationController
   end
 
   def update
+    # TODO: Remove this permit! and replace it with appropriate strong params after testing.
+    # method :- user_params
     params.permit!
     @user = User.find params[:id]
     # update username, when the user cannot be deleted

@@ -13,7 +13,7 @@ class ReviewBidsController < ApplicationController
        'Administrator',
        'Super-Administrator',
        'Student'].include?(current_role_name) &&
-        ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], 'participant' 'reader', 'submitter', 'reviewer') : true)
+        ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer') : true)
     else
       ['Instructor',
        'Teaching Assistant',
@@ -102,7 +102,7 @@ class ReviewBidsController < ApplicationController
     matched_topics = run_bidding_algorithm(bidding_data)
     ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
     Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
-    redirect_to :back
+    redirect_back fallback_location: root_path
   end
 
   # call webserver for running assigning algorithm

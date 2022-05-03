@@ -37,4 +37,21 @@ module MailerHelper
       }
     )
   end
+
+  def self.send_mail_to_assigned_reviewers(reviewer, participant, mapping)
+    Mailer.sync_message(
+      {
+        :to => reviewer.email,
+        subject: "Assignment '#{participant.assignment.name}': A submission has been updated since you last reviewed it",
+        cc: participant.assignment.instructor.email,
+        :body => {
+          :obj_name => participant.assignment.name,
+          :link => "https://expertiza.ncsu.edu/response/new?id=#{mapping.id}",
+          :type => 'submission',
+          :first_name => ApplicationHelper.get_user_first_name(reviewer),
+          :partial_name => 'updated_submission_since_review'
+        }
+      }
+    )
+  end
 end

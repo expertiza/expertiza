@@ -12,6 +12,7 @@
 <% else %>
   <b style="text-align: center"><%=t ".team_name_up"%> &nbsp;&nbsp;</b><%= @student.team.name(session[:ip]) %> &nbsp;&nbsp;&nbsp;
     <%= link_to t(".edit_name"), controller: 'StudentTeams', action: 'edit', team_id: @student.team.id, student_id: @student.id %>
+  
   <br/><br/>
   <b><%=t ".team_members"%></b>
   <br/><br/>
@@ -250,5 +251,5 @@
                       :assignment_id => @student.assignment.id
            } %>
 <br>
-   <a href="javascript:window.history.back()"><%=t ".back"%></a>
+   <%= link_to 'Back', :controller => 'student_task', :action => 'list' %>
 

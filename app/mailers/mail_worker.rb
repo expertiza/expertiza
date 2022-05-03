@@ -22,29 +22,40 @@ class MailWorker
       drop_outstanding_reviews if self.deadline_type == 'drop_outstanding_reviews'
       perform_simicheck_comparisons(self.assignment_id) if self.deadline_type == 'compare_files_with_simicheck'
     else
-      # Can we rename deadline_type(metareview) to "teammate review". If, yes then we donot need this if clause below!
-      deadlineText = if self.deadline_type == 'metareview'
-                       'teammate review'
-                     else
-                       self.deadline_type
-                     end
+      # Can we rename deadline_type(metareview) to "teammate review". If, yes then we do not need this if clause below!
+      deadline_text = if self.deadline_type == 'metareview'
+                        'teammate review'
+                      else
+                        self.deadline_type
+                      end
 
-      email_reminder(participant_mails, deadlineText) unless participant_mails.empty?
+      email_reminder(participant_mails, deadline_text) unless participant_mails.empty?
     end
   end
 
   def email_reminder(emails, deadline_type)
     assignment = Assignment.find(assignment_id)
     subject = "Message regarding #{deadline_type} for assignment #{assignment.name}"
-    body = "This is a reminder to complete #{deadline_type} for assignment #{assignment.name}. \
-    Deadline is #{due_at}.If you have already done the  #{deadline_type}, Please ignore this mail."
+
+    # Defining the body of mail
+    body = "This is a reminder to complete #{deadline_type} for assignment #{assignment.name}.\n"
 
     emails.each do |mail|
+      # Since the email is not unique fetching the first instance in results returned when searching via email
+      user = User.where(email: mail).first
+
+      # Finding the mapping between participant and assignment so that it can be sent as a query param
+      participant_assignment_id = Participant.where(user_id: user.id.to_s, parent_id: self.assignment_id.to_s).first.id
+
+      # This is the link which User can use to navigate
+      link_to_destination = "Please follow the link: http://expertiza.ncsu.edu/student_task/view?id=#{participant_assignment_id}\n"
+      body += link_to_destination + "Deadline is #{self.due_at}. If you have already done the #{deadline_type}, then please ignore this mail.";
+
+      # Send mail to the user
+      @mail = Mailer.delayed_message(bcc: mail, subject: subject, body: body)
+      @mail.deliver_now
       Rails.logger.info mail
     end
-
-    @mail = Mailer.delayed_message(bcc: emails, subject: subject, body: body)
-    @mail.deliver_now
   end
 
   def find_participant_emails

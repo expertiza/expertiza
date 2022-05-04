@@ -11,7 +11,7 @@
 </div>
 
 <div style="float:right">
-  <%= link_to_if !@review_mappings.length().zero?, t('Send Email to Reviewers'), email_reviewers_student_task_index_path(id: @participant.id, assignment_id: @assignment.id)%>
+  <%= link_to_if @review_mappings, t('Send Email to Reviewers'), email_reviewers_student_task_index_path(id: @participant.id, assignment_id: @assignment.id)%>
 </div>
 
 <% if @assignment.spec_location && @assignment.spec_location.length > 0 %>

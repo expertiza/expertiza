@@ -111,8 +111,12 @@ function autogenerate_submission(){
       </span>
       &nbsp;&nbsp;&nbsp;&nbsp;
       <!--Maximum number of members per team-->
-      <br>
-      <!--E2244: Pair Programming-->
+    <br>      
+  </tr>
+
+  <!--E2244: Pair Programming-->
+  <tr>
+    <td style='padding:5px' id='assignment_pair_programming_field'>
       <span id='assignment_pair_programming' class="form-inline"  <%= 'hidden' unless @assignment_form.assignment.team_assignment?%>>
         <input name="assignment_form[assignment][enable_pair_programming]" type="hidden" value="false"/>
         <%= check_box_tag('assignment_form[assignment][enable_pair_programming]', 'true', @assignment_form.assignment.enable_pair_programming) %>

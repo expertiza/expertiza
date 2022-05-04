@@ -36,9 +36,11 @@ describe MetareviewResponseMap do
   let(:review_questionnaire) { build(:questionnaire, id: 1) }
   let(:response3) { build(:response) }
   let(:response_map) { build(:review_response_map, reviewer_id: 2, response: [response3]) }
-  let(:qmetareview_response_map) { build(:meta_review_response_map, id: 3, review_mapping: review_response_map3) }
+  let(:assignment3) { build(:assignment, id: 4, questionnaires: []) }
+  let(:participant2) { build(:participant, id: 3, parent_id: 4, user: student2) }
+  let(:qmetareview_response_map) { build(:meta_review_response_map, id: 3, review_mapping: review_response_map3, reviewee: participant2) }
   let(:review_response_map3) { build(:review_response_map, id: 3, assignment: assignment3, reviewer: participant, reviewee: team) }
-  let(:assignment3) { build(:assignment, id: 4, questionnaires: [questionnaire2]) }
+  
   let(:assignment_questionnaire3) { build(:assignment_questionnaire, id: 3, assignment_id: 4, questionnaire: questionnaire2) }
   before(:each) do
     allow(review_response_map).to receive(:response).and_return(response)
@@ -61,13 +63,12 @@ describe MetareviewResponseMap do
         expect(metareview_response_map.contributor).to eq(team)
       end
 
-      # it 'finds the questionaire' do
-      #   # puts qmetareview_response_map.review_mapping.assignment.questionnaires
-      #   allow(Questionnaire).to receive(:find_by).with(type: 'MetareviewQuestionnaire').and_return(questionnaire2)
-      #   allow(AssignmentQuestionnaire).to receive(:find_by).and_return(assignment_questionnaire3)
-      #   allow(MetareviewResponseMap).to receive(:where).and_return(qmetareview_response_map)
-      #   expect(qmetareview_response_map.questionnaire[0]).to eq(questionnaire2)
-      # end
+      it 'finds the nil questionaire' do
+        # questionnaire should return nil correctly if no questionnaire in assignment, rather than garbage result
+        participant2.assignment = assignment3
+        allow(MetareviewResponseMap).to receive(:where).and_return([metareview_response_map])
+        expect(qmetareview_response_map.questionnaire).to eq(nil)
+      end
 
       it 'finds title' do
         allow(Response).to receive(:find).and_return(response)

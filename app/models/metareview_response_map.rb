@@ -32,7 +32,7 @@ class MetareviewResponseMap < ResponseMap
   end
 
   def questionnaire
-    assignment.questionnaires
+    assignment.questionnaires.find_by(type: 'MetareviewQuestionnaire') # filter for MetaReview Questionnaire
   end
 
   def get_title

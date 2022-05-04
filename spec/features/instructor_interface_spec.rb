@@ -21,21 +21,6 @@ describe 'Integration tests for instructor interface' do
     end
   end
 
-  describe 'Create a course' do
-    it 'is able to create a public course or a private course' do
-      login_as('instructor6')
-      visit '/courses/new?private=0'
-      fill_in 'Course Name', with: 'public course for test'
-      click_button 'Create'
-      expect(Course.where(name: 'public course for test')).to exist
-
-      visit '/courses/new?private=1'
-      fill_in 'Course Name', with: 'private course for test'
-      click_button 'Create'
-      expect(Course.where(name: 'private course for test')).to exist
-    end
-  end
-
   describe 'View Copyright Grants' do
     it 'should display teams for assignment without topic' do
       login_as('instructor6')

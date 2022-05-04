@@ -66,7 +66,7 @@ class StudentTaskController < ApplicationController
     @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
     # To get the current active reviewers of a team assignment.
     # Used in the view to disable or enable the link for sending email to reviewers.
-    @review_mappings = review_mappings(@assignment, @team.id)
+    @review_mappings = review_mappings(@assignment, @team.id) if @team
   end
 
   def others_work

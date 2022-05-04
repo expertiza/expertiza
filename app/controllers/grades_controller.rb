@@ -194,7 +194,7 @@ class GradesController < ApplicationController
     vm.add_questions(vmquestions)
     vm.add_team_members(@team)
     vm.add_reviews(@participant, @team, @assignment.vary_by_round)
-    vm.number_of_comments_greater_than_10_words
+    vm.calculate_metrics
     vm
   end
 

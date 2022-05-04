@@ -612,6 +612,10 @@ class Assignment < ApplicationRecord
     questionnaire_ids
   end
 
+  def pair_programming_enabled?
+    self.enable_pair_programming
+  end
+
   private
 
   # returns true if assignment has staggered deadline and topic_id is nil

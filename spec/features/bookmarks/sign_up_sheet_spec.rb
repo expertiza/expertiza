@@ -28,12 +28,4 @@ describe 'sign_up_sheet/list.html.erb' do
       expect(page).to_not have_content 'Bookmarks (disabled)'
     end
   end
-
-  context 'when bookmarks are disabled' do
-    it 'should not display bookmark links' do
-      create_assignment_no_bookmarks
-      view_sign_up_sheet
-      expect(page).to have_content 'Bookmarks (disabled)'
-    end
-  end
 end

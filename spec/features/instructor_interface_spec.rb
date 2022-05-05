@@ -11,7 +11,6 @@ describe 'Integration tests for instructor interface' do
       visit '/tree_display/list'
       expect(page).to have_content('Manage content')
     end
-
     it 'with invalid username and password' do
       visit root_path
       fill_in 'login_name', with: 'instructor6'

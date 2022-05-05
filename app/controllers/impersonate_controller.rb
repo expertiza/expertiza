@@ -77,7 +77,7 @@ class ImpersonateController < ApplicationController
   def check_if_input_is_valid
     if params[:user] && warn_for_special_chars(params[:user][:name], 'Username')
       flash[:error] = 'Please enter valid user name'
-      redirect_back
+      redirect_back fallback_location: root_path
     elsif params[:impersonate] && warn_for_special_chars(params[:impersonate][:name], 'Username')
       flash[:error] = 'Please enter valid user name'
       redirect_back fallback_location: root_path

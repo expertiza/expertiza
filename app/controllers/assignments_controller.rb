@@ -19,6 +19,7 @@ class AssignmentsController < ApplicationController
     @assignment_form.assignment.instructor ||= current_user
     @num_submissions_round = 0
     @num_reviews_round = 0
+    @default_num_metareviews_required = 3
   end
 
   # creates a new assignment via the assignment form
@@ -79,9 +80,6 @@ class AssignmentsController < ApplicationController
     @due_date_all = update_nil_dd_description_url(@due_date_all)
     unassigned_rubrics_warning
     path_warning_and_answer_tag
-    update_assignment_badges
-    @assigned_badges = @assignment_form.assignment.badges
-    @badges = Badge.all
     @use_bookmark = @assignment.use_bookmark
     @duties = Duty.where(assignment_id: @assignment_form.assignment.id)
   end
@@ -434,12 +432,6 @@ class AssignmentsController < ApplicationController
       adjust_due_date_for_timezone(dd)
       break if validate_due_date
     end
-  end
-
-  # update the current assignment's badges when editing
-  def update_assignment_badges
-    @assigned_badges = @assignment_form.assignment.badges
-    @badges = Badge.all
   end
 
   # flash notice if the time zone is not specified for an assignment's due date

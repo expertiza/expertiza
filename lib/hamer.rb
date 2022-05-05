@@ -5,7 +5,7 @@ module Hamer
 
     # Iterate until convergence
     iterations = 0
-    begin
+    loop do
       # Store previous weights to determine convergence
       previous_weights = submissions.map { |s| s.reviews.map(&:weight) }
 
@@ -38,9 +38,8 @@ module Hamer
         end
       end
       iterations += 1
-    end until converged?(previous_weights,
-                         submissions.map { |s| s.reviews.map(&:weight) })
-
+      break if converged?(previous_weights, submissions.map { |s| s.reviews.map(&:weight) })
+    end
     { iterations: iterations }
   end
 

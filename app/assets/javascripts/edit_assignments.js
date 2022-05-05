@@ -2,6 +2,8 @@ $ = jQuery;
 
 jQuery(document).ready(function () {
     
+    // Function to check if team size is greater than 1
+
     jQuery("#submit_btn").click(function(e) {
         var max_team_size = jQuery('#assignment_form_assignment_max_team_size').val();
         if (max_team_size == '1' && jQuery('#team_assignment').is(':checked')) {
@@ -9,6 +11,8 @@ jQuery(document).ready(function () {
             e.preventDefault()
         }
     })
+
+    // Function to save current tab state when switching between tabs
 
     jQuery("#tabs").tabs({
         // Changing from one tab to another is sort of like a "save" action

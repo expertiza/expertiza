@@ -1,3 +1,5 @@
+// Functions to chekc the status of the Reviews and Duties.
+
 function hasReviewChanged() {
     var checkbox = jQuery('#review');
     var reviews_allowed_field = jQuery('#reviews_allowed');

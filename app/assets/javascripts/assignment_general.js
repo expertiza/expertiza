@@ -6,18 +6,21 @@
           $('#assignment_form_assignment_directory_path').val(filename);
       });
   });
-  //E2138 added function
+
+
+
   function autogenerate_submission(){
     assignment_form.assignment.directory_path = assignment_form.assignment.name;
   }
   
+  // Functions below are to change componenets that are named in the function name.
   
   function staggeredDeadlineChanged() {
       var msg = 'Warning! Unchecking all topics for this assignment will now have the same deadline.'
       if (!jQuery('#assignment_staggered_deadline').is(':checked')) {
       if (!confirm(msg)) {
           jQuery('#assignment_staggered_deadline').prop('checked', true);
-      }
+        }
       }
   }
   

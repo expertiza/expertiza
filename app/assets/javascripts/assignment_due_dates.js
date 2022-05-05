@@ -37,6 +37,7 @@ jQuery(document).ready(function () {
 
 });
 
+
 function removeDueDateTableElement(deadline_type, round_no) {
     var element_id;
     if (round_no == 0) {

@@ -11,28 +11,12 @@ describe 'Integration tests for instructor interface' do
       visit '/tree_display/list'
       expect(page).to have_content('Manage content')
     end
-
     it 'with invalid username and password' do
       visit root_path
       fill_in 'login_name', with: 'instructor6'
       fill_in 'login_password', with: 'something'
       click_button 'Sign in'
       expect(page).to have_text('Your username or password is incorrect.')
-    end
-  end
-
-  describe 'Create a course' do
-    it 'is able to create a public course or a private course' do
-      login_as('instructor6')
-      visit '/courses/new?private=0'
-      fill_in 'Course Name', with: 'public course for test'
-      click_button 'Create'
-      expect(Course.where(name: 'public course for test')).to exist
-
-      visit '/courses/new?private=1'
-      fill_in 'Course Name', with: 'private course for test'
-      click_button 'Create'
-      expect(Course.where(name: 'private course for test')).to exist
     end
   end
 

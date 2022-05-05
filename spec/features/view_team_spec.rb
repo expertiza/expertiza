@@ -78,24 +78,4 @@ describe 'peer review testing' do
     expect(page).to have_content 'Your response was successfully saved.'
     click_link 'Logout'
   end
-
-  it 'Should contain html target and javascript calls for tag heatgrid' do
-    # Load Summary Report with no reviews
-    load_your_scores
-    expect(page).to have_content 'Average peer review score:'
-
-    # Add review as first user
-    click_link 'Logout'
-    add_review
-
-    # View Your Scores with one review
-    load_your_scores
-
-    # Check for target to build new heatgrid onto
-    expect(page.body).to include '<table id="tag_heat_grid" class="tag_heat_grid"></table>'
-    # Check for Javascript action to generate the heatgrid
-    expect(page.body).to include 'tagActionOnLoad();'
-    # Check for Javascript action to turn the heatgrid on and off with answer tag toggle
-    expect(page.body).to include "$('.tag_heat_grid').toggle();"
-  end
 end

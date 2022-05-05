@@ -104,22 +104,4 @@ describe 'Questionnaire tests for instructor interface' do
       end
     end
   end
-
-  describe 'Edit a review advice' do
-    it 'is able to edit a public review advice' do
-      # create review advice
-      load_question 'Criterion'
-      click_button 'Edit/View advice'
-      expect(page).to have_content('Edit an existing questionnaire')
-      first(:css, "textarea[id^='horizontal_'][id$='advice']").set('Advice 1')
-      click_button 'Save and redisplay advice'
-      expect(page).to have_content('advice was successfully saved')
-      expect(page).to have_content('Advice 1')
-      # edit review advice
-      first(:css, "textarea[id^='horizontal_'][id$='advice']").set('Advice edit')
-      click_button 'Save and redisplay advice'
-      expect(page).to have_content('advice was successfully saved')
-      expect(page).to have_content('Advice edit')
-    end
-  end
 end

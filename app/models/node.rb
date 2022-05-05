@@ -1,9 +1,3 @@
-# Base Node class
-# Provides common method definitions, but minimal functoinality.
-# Must be subclassed for use in tree_display code
-#
-# Author: AJBUDLON
-# Date: 7/18/2008
 class Node < ApplicationRecord
   has_paper_trail
   # acts_as_nested_set

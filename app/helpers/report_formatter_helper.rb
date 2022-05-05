@@ -37,10 +37,10 @@ module ReportFormatterHelper
     assign_basics(params)
     user = session[:user]
     participant = begin
-                    AssignmentParticipant.where(parent_id: @id, user_id: user.id).first
-                  rescue StandardError
-                    nil
-                  end
+      AssignmentParticipant.where(parent_id: @id, user_id: user.id).first
+    rescue StandardError
+      nil
+    end
     create_participant(@id, user.id) if participant.nil?
     @review_questionnaire_ids = ReviewQuestionnaire.select('id')
     @assignment_questionnaire = AssignmentQuestionnaire.retrieve_questionnaire_for_assignment(@id).first

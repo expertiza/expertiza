@@ -76,7 +76,7 @@ module ChartsHelper
     if ratio < 1.0
       level = format('%02x', 256 * ratio)
       color = 'ff' + level + level
-    elsif ratio == 1.0
+    elsif ratio.to_d == 1.0.to_d
       color = 'ffffff'
     else
       level = format('%02x', 256 * (2.0 - ratio))

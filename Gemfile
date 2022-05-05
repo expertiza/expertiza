@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '2.7.5'
+ruby '2.7.3'
 
 gem 'rails', '~> 5.2'
 
@@ -37,6 +37,7 @@ gem 'font-awesome-rails'
 gem 'foreman'
 gem 'gchartrb', require: 'google_chart'
 gem 'gdata', require: false
+gem 'google-protobuf', '~> 3.17.3'
 gem 'haml-rails'
 gem 'jquery-colorbox-rails'
 gem 'jquery-datetimepicker-rails'

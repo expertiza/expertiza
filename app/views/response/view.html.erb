@@ -30,7 +30,7 @@
   <% files = @participant.files(@participant.review_file_path(response_map_id).to_s + current_folder.name) %>
   <% session_participant = AssignmentParticipant.where(parent_id: @assignment.id, user_id: session[:user].id).first %>
   <% session_participants_team = AssignmentTeam.team(session_participant) %>
-  <% @questions.each do |question| %>
+  <% @review_questions.each do |question| %>
     <% if question.instance_of? UploadFile %>
       <%= display_directory_tree(@participant, files, true).html_safe %>
     <% end %>

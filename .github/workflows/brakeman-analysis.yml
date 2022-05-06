@@ -5,10 +5,10 @@ name: Brakeman Scan
 
 on:
   push:
-    branches: [ beta ]
+    branches: [ main ]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ beta ]
+    branches: [ main ]
   schedule:
     - cron: '33 19 * * 6'
 

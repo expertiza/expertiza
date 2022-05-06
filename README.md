@@ -3,8 +3,8 @@ E2168. Testing - reputations
 Expertiza
 =========
 
-[![Build Status](https://travis-ci.org/expertiza/expertiza.svg?branch=master)](https://travis-ci.org/expertiza/expertiza)
-[![Coverage Status](https://coveralls.io/repos/github/expertiza/expertiza/badge.svg?branch=master)](https://coveralls.io/github/expertiza/expertiza?branch=master)
+[![Build Status](https://travis-ci.org/expertiza/expertiza.svg?branch=main)](https://travis-ci.org/expertiza/expertiza)
+[![Coverage Status](https://coveralls.io/repos/github/expertiza/expertiza/badge.svg?branch=main)](https://coveralls.io/github/expertiza/expertiza?branch=main)
 [![Maintainability](https://api.codeclimate.com/v1/badges/f3a41f16c2b6e45aa9d4/maintainability)](https://codeclimate.com/github/expertiza/expertiza/maintainability)
 
 #### Peer review system
@@ -49,7 +49,7 @@ All new files/contributions should:
  * Use unix line endings (Windows users: configure git to use [autocrlf](http://help.github.com/line-endings))
  * Indent with 2 spaces (no tabs; configure your editor) both in ruby and erb
  * Follow the [Ruby Style Guide](https://github.com/bbatsov/ruby-style-guide) style for syntax, formatting, and naming
- * Follow the [design guidelines](https://github.com/expertiza/expertiza/blob/master/design_document.md) for the views.
+ * Follow the [design guidelines](https://github.com/expertiza/expertiza/blob/main/design_document.md) for the views.
 
 When editing existing files:
 

@@ -4,8 +4,8 @@ class GoogleDocFetcher
   class << self
     def supports_url?(url)
       lower_case_url = url.downcase
-      (HttpRequest.valid_url?(url) &&
-       ((lower_case_url.include? 'drive.google.com') || (lower_case_url.include? 'docs.google.com')))
+      allowed_hosts = ["drive.google.com", "docs.google.com"]
+      (HttpRequest.valid_url?(url) && (allowed_hosts.include? lower_case_url)
     end
   end
 

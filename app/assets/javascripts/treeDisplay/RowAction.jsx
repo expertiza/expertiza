@@ -32,7 +32,7 @@ class RowAction extends React.Component {
                 // check if the user id exists
                 // check if the current user id matches the user/instructor id associated with a questionnaire/survey
                 // show edit button only for the items which are associated to that user
-                // if (app_variables.currentUserId == null || this.props.instructorId == app_variables.currentUserId) {
+                // if (appVariables.currentUserId == null || this.props.instructorId == appVariables.currentUserId) {
                 moreContent.push(
                     <span>
                         <a
@@ -69,7 +69,7 @@ class RowAction extends React.Component {
             if (nodeAttributes.isCourse(this.props.dataType))
                 moreContent.push(<br />, ...nodeAttributes.course.getActions(parseInt(this.props.id) / 2))
         }
-        if (nodeAttributes.isAssignment(this.props.dataType) && app_variables.homeActionShowFlag == 'true') {
+        if (nodeAttributes.isAssignment(this.props.dataType) && appVariables.homeActionShowFlag == 'true') {
             // Assignment tab starts here
             // Now is_intelligent and Add Manager related buttons have not been added into the new UI
             moreContent.push(...nodeAttributes.assignment.getActions(this.props))

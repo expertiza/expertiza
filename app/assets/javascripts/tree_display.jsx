@@ -1,6 +1,6 @@
 // initialize a global object available throughout the application
 // can be useful on different pages
-let app_variables = {
+let appVariables = {
   currentUserId: null,
   homeActionShowFlag: null
 };
@@ -233,23 +233,21 @@ window.addEventListener('load', (e) => {
   // check if the html element is present requested in the query above
   if (treeDisplayDiv) {
     // set the userid for the current user
-    app_variables.currentUserId = treeDisplayDiv.dataset.userId
+    appVariables.currentUserId = treeDisplayDiv.dataset.userId
 
   }
 })
 
-jQuery(document).ready(function () {
-  // This preloadedImages function is refered from http://jsfiddle.net/slashingweapon/8jAeu/
-  // Actually I am not using the values in preloadedImages, but image loading speed is indeed getting faster
+document.addEventListener('DOMContentLoaded', function () {
   let treeDisplayDiv = document.querySelector('#tree_display');
 
   if (treeDisplayDiv) {
     // set the user preference to homeActionshowflag 
-    app_variables.homeActionShowFlag = treeDisplayDiv.dataset.userShow;
+    appVariables.homeActionShowFlag = treeDisplayDiv.dataset.userShow;
 
   }
 
   if (document.getElementById('tree_display')) {
     React.render(React.createElement(TabSystem), document.getElementById('tree_display'))
   }
-})
+}, false);

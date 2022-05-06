@@ -1,12 +1,10 @@
 class GoogleDocFetcher
   require 'http_request'
 
-  class << self
-    def supports_url?(url)
-      lower_case_url = url.downcase
-      allowed_hosts = ["drive.google.com", "docs.google.com"]
-      (HttpRequest.valid_url?(url) && (allowed_hosts.include? lower_case_url)
-    end
+  def self.supports_url?(url)
+    lower_case_url = url.downcase
+    allowed_hosts = ["drive.google.com", "docs.google.com"]
+    (HttpRequest.valid_url?(url) && (allowed_hosts.include? lower_case_url)
   end
 
   def initialize(params)

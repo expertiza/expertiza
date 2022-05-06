@@ -43,73 +43,69 @@ function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.substring(1).toLowerCase();
 }
 
-function checkForm()
-{
+function checkForm() {
   return checkWeights(); // && checkDeadlines();
 }
 
-function checkWeights()
-{
+function checkWeights() {
   var reviewWeight = document.getElementById('weights_review').value
-    var metareviewWeight = document.getElementById('weights_metareview').value
-    var feedbackWeight = document.getElementById('weights_feedback').value
-    var teammateWeight = document.getElementById('weights_teammate').value
-    var bookmarkratingWeight = document.getElementById('weights_bookmarkrating').value
-    var total = parseFloat(reviewWeight) + parseFloat(metareviewWeight) + parseFloat(feedbackWeight) + parseFloat(teammateWeight) + parseFloat(bookmarkratingWeight)
-    if (total == 100) return true
-    else {
-      alert ("The total of the weights given to an assignment must equal 100%. Your total weight percentage is "+total+"%.")
-        return false	   
-    }
-}	   
+  var metareviewWeight = document.getElementById('weights_metareview').value
+  var feedbackWeight = document.getElementById('weights_feedback').value
+  var teammateWeight = document.getElementById('weights_teammate').value
+  var bookmarkratingWeight = document.getElementById('weights_bookmarkrating').value
+  var total = parseFloat(reviewWeight) + parseFloat(metareviewWeight) + parseFloat(feedbackWeight) + parseFloat(teammateWeight) + parseFloat(bookmarkratingWeight)
+  if (total == 100) return true
+  else {
+    alert("The total of the weights given to an assignment must equal 100%. Your total weight percentage is " + total + "%.")
+    return false
+  }
+}
 
-function getDate(invar)
-{	
-  var year = parseInt(invar.value.substring(0,4));
-  var month = parseInt(invar.value.substring(5,7));
-  var day = parseInt(invar.value.substring(8,10));
+function getDate(invar) {
+  var year = parseInt(invar.value.substring(0, 4));
+  var month = parseInt(invar.value.substring(5, 7));
+  var day = parseInt(invar.value.substring(8, 10));
 
-  var hour = parseInt(invar.value.substring(11,13));
-  var minute = parseInt(invar.value.substring(14,16));
-  var second = parseInt(invar.value.substring(17,19));
+  var hour = parseInt(invar.value.substring(11, 13));
+  var minute = parseInt(invar.value.substring(14, 16));
+  var second = parseInt(invar.value.substring(17, 19));
 
-  var date = new Date();	
-  date.setFullYear(year,month,day);
-  date.setHours(hour,minute,second);
+  var date = new Date();
+  date.setFullYear(year, month, day);
+  date.setHours(hour, minute, second);
   return date
-}	
+}
 
-function checkDeadlines()
-{
+function checkDeadlines() {
 
   var dates = new Array();
   var inputs = document.getElementsByTagName('input');
   var index = 0;
-  for(i = 0; i < inputs.length; i++){
-    if(inputs[i].id.match("due_date")){
+  for (i = 0; i < inputs.length; i++) {
+    if (inputs[i].id.match("due_date")) {
       if (inputs[i].value == "") {
         alert("Please specify a date for each deadline before continuing.")
-          return false
+        return false
       }
       else
-        dates[index++] = inputs[i]	  	   	     	    
+        dates[index++] = inputs[i]
     }
   }
 
-  for(i = 0; i < dates.length-1; i++){
+  for (i = 0; i < dates.length - 1; i++) {
     var date1 = getDate(dates[i]);
-    var date2 = getDate(dates[i+1]);
+    var date2 = getDate(dates[i + 1]);
 
     var error = false;
-    if (date1 >= date2) error = true;		
+    if (date1 >= date2) error = true;
     if (error) alert("At least one set of deadlines occur out of chronological order. Please correct this and try again.")
-      return !error		
+    return !error
   }
 }
 
-function updateDropDownMenu(advice,question,min){			
-  var id = 'responses_' + question + '_score'			
-    document.getElementById(id).selectedIndex = advice - min
+function updateDropDownMenu(advice, question, min) {
+  var id = 'responses_' + question + '_score'
+  document.getElementById(id).selectedIndex = advice - min
 }
 
 function toggleVis(id) {
@@ -140,15 +136,15 @@ function toggleVis(id) {
  */
 
 var dateFormat = function () {
-  var	token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g,
-      timezone = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g,
-      timezoneClip = /[^-+\dA-Z]/g,
-      pad = function (val, len) {
-        val = String(val);
-        len = len || 2;
-        while (val.length < len) val = "0" + val;
-        return val;
-      };
+  var token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g,
+    timezone = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g,
+    timezoneClip = /[^-+\dA-Z]/g,
+    pad = function (val, len) {
+      val = String(val);
+      len = len || 2;
+      while (val.length < len) val = "0" + val;
+      return val;
+    };
 
   // Regexes and supporting functions are cached through closure
   return function (date, mask, utc) {
@@ -172,45 +168,45 @@ var dateFormat = function () {
       utc = true;
     }
 
-    var	_ = utc ? "getUTC" : "get",
-        d = date[_ + "Date"](),
-        D = date[_ + "Day"](),
-        m = date[_ + "Month"](),
-        y = date[_ + "FullYear"](),
-        H = date[_ + "Hours"](),
-        M = date[_ + "Minutes"](),
-        s = date[_ + "Seconds"](),
-        L = date[_ + "Milliseconds"](),
-        o = utc ? 0 : date.getTimezoneOffset(),
-        flags = {
-          d:    d,
-          dd:   pad(d),
-          ddd:  dF.i18n.dayNames[D],
-          dddd: dF.i18n.dayNames[D + 7],
-          m:    m + 1,
-          mm:   pad(m + 1),
-          mmm:  dF.i18n.monthNames[m],
-          mmmm: dF.i18n.monthNames[m + 12],
-          yy:   String(y).slice(2),
-          yyyy: y,
-          h:    H % 12 || 12,
-          hh:   pad(H % 12 || 12),
-          H:    H,
-          HH:   pad(H),
-          M:    M,
-          MM:   pad(M),
-          s:    s,
-          ss:   pad(s),
-          l:    pad(L, 3),
-          L:    pad(L > 99 ? Math.round(L / 10) : L),
-          t:    H < 12 ? "a"  : "p",
-          tt:   H < 12 ? "am" : "pm",
-          T:    H < 12 ? "A"  : "P",
-          TT:   H < 12 ? "AM" : "PM",
-          Z:    utc ? "UTC" : (String(date).match(timezone) || [""]).pop().replace(timezoneClip, ""),
-          o:    (o > 0 ? "-" : "+") + pad(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4),
-          S:    ["th", "st", "nd", "rd"][d % 10 > 3 ? 0 : (d % 100 - d % 10 != 10) * d % 10]
-        };
+    var _ = utc ? "getUTC" : "get",
+      d = date[_ + "Date"](),
+      D = date[_ + "Day"](),
+      m = date[_ + "Month"](),
+      y = date[_ + "FullYear"](),
+      H = date[_ + "Hours"](),
+      M = date[_ + "Minutes"](),
+      s = date[_ + "Seconds"](),
+      L = date[_ + "Milliseconds"](),
+      o = utc ? 0 : date.getTimezoneOffset(),
+      flags = {
+        d: d,
+        dd: pad(d),
+        ddd: dF.i18n.dayNames[D],
+        dddd: dF.i18n.dayNames[D + 7],
+        m: m + 1,
+        mm: pad(m + 1),
+        mmm: dF.i18n.monthNames[m],
+        mmmm: dF.i18n.monthNames[m + 12],
+        yy: String(y).slice(2),
+        yyyy: y,
+        h: H % 12 || 12,
+        hh: pad(H % 12 || 12),
+        H: H,
+        HH: pad(H),
+        M: M,
+        MM: pad(M),
+        s: s,
+        ss: pad(s),
+        l: pad(L, 3),
+        L: pad(L > 99 ? Math.round(L / 10) : L),
+        t: H < 12 ? "a" : "p",
+        tt: H < 12 ? "am" : "pm",
+        T: H < 12 ? "A" : "P",
+        TT: H < 12 ? "AM" : "PM",
+        Z: utc ? "UTC" : (String(date).match(timezone) || [""]).pop().replace(timezoneClip, ""),
+        o: (o > 0 ? "-" : "+") + pad(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4),
+        S: ["th", "st", "nd", "rd"][d % 10 > 3 ? 0 : (d % 100 - d % 10 != 10) * d % 10]
+      };
 
     return mask.replace(token, function ($0) {
       return $0 in flags ? flags[$0] : $0.slice(1, $0.length - 1);
@@ -220,17 +216,17 @@ var dateFormat = function () {
 
 // Some common format strings
 dateFormat.masks = {
-  "default":      "ddd mmm dd yyyy HH:MM:ss",
-  shortDate:      "m/d/yy",
-  mediumDate:     "mmm d, yyyy",
-  longDate:       "mmmm d, yyyy",
-  fullDate:       "dddd, mmmm d, yyyy",
-  shortTime:      "h:MM TT",
-  mediumTime:     "h:MM:ss TT",
-  longTime:       "h:MM:ss TT Z",
-  isoDate:        "yyyy-mm-dd",
-  isoTime:        "HH:MM:ss",
-  isoDateTime:    "yyyy-mm-dd'T'HH:MM:ss",
+  "default": "ddd mmm dd yyyy HH:MM:ss",
+  shortDate: "m/d/yy",
+  mediumDate: "mmm d, yyyy",
+  longDate: "mmmm d, yyyy",
+  fullDate: "dddd, mmmm d, yyyy",
+  shortTime: "h:MM TT",
+  mediumTime: "h:MM:ss TT",
+  longTime: "h:MM:ss TT Z",
+  isoDate: "yyyy-mm-dd",
+  isoTime: "HH:MM:ss",
+  isoDateTime: "yyyy-mm-dd'T'HH:MM:ss",
   isoUtcDateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss'Z'"
 };
 
@@ -238,12 +234,12 @@ dateFormat.masks = {
 dateFormat.i18n = {
   dayNames: [
     "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat",
-  "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
-    ],
+    "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+  ],
   monthNames: [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-  "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
-    ]
+    "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+  ]
 };
 
 // For convenience...
@@ -251,21 +247,21 @@ Date.prototype.format = function (mask, utc) {
   return dateFormat(this, mask, utc);
 };
 
-function show_alert(alertMessage){
-    $("#dialog-message").html(alertMessage);
-    $("#dialog-message").dialog({
-        modal: true,
-        draggable: true,
-        resizable: true,
-        position: ['center', 'center'],
-        show: 'blind',
-        hide: 'blind',
-        width: 400,
-        dialogClass: 'ui-dialog-osx',
-        buttons: {
-            "Ok": function() {
-                $(this).dialog("close");
-            }
-        }
-    });
+function show_alert(alertMessage) {
+  $("#dialog-message").html(alertMessage);
+  $("#dialog-message").dialog({
+    modal: true,
+    draggable: true,
+    resizable: true,
+    position: ['center', 'center'],
+    show: 'blind',
+    hide: 'blind',
+    width: 400,
+    dialogClass: 'ui-dialog-osx',
+    buttons: {
+      "Ok": function () {
+        $(this).dialog("close");
+      }
+    }
+  });
 }

@@ -46,7 +46,8 @@ class TabSystem extends React.Component {
         }.bind(this))
 
         getFolderResults().then(function (response) {
-            jQuery.each(response, function (nodeType, outerNode) {
+            var allItemsDisplayed = {}
+            for (var [nodeType, outerNode] of Object.entries(response)) {
                 Array.prototype.forEach.call(outerNode, function (node, i) {
                     var newParams = {
                         key: node.name + '|' + node.directory,
@@ -55,7 +56,7 @@ class TabSystem extends React.Component {
                     }
                     if (nodeType === 'Assignments') {
                         node['children'] = null
-                        node[newParams] = newParams
+                        node['newParams'] = newParams
                     } else if (nodeType === 'Courses') {
                         newParams['nodeType'] = 'CourseNode'
                         node['newParams'] = newParams
@@ -64,9 +65,10 @@ class TabSystem extends React.Component {
                         node['newParams'] = newParams
                     }
                 })
-            })
+                allItemsDisplayed[nodeType] = outerNode;
+            }
             this.setState({
-                allItemsDisplayed: response
+                allItemsDisplayed,
             })
         }.bind(this))
     }

@@ -16,7 +16,6 @@ class OuterTable extends React.Component {
                     expandedRow: prevState.expandedRow.concat([id])
                 };
             })
-            console.log(newParams)
             getSubFolderResults(newParams).then(function (response) {
                 this.props.updateData(id, response);
             }.bind(this))

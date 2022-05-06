@@ -1,3 +1,4 @@
+// TabSystem contains the tabs containing courses, assignments and questionnaires
 class TabSystem extends React.Component {
 
     constructor(props) {

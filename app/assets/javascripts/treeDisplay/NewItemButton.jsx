@@ -1,3 +1,4 @@
+//NewItemButton is a button which on clicked leads to a page for new assignment/course. Child component of FilterableTable
 class NewItemButton extends React.Component {
     render() {
         var renderContent = []

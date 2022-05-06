@@ -1,3 +1,5 @@
+//InnerTableRow contains the components making up the contents of a single row in InnerTable. Child component of InnerTable
+
 class InnerTableRow extends React.Component {
     render() {
         var creationDate

@@ -1,3 +1,4 @@
+// RowAction contains the action button in each row of a table
 class RowAction extends React.Component {
     constructor(props) {
         super(props)

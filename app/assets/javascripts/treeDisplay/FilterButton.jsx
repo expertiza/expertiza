@@ -1,3 +1,4 @@
+// FilterButton is a child of FilterableTable and contains an input used to toggle viewing others' courses and assignments. Child component of FilterableTable
 class FilterButton extends React.Component {
     render() {
         return (
@@ -8,7 +9,6 @@ class FilterButton extends React.Component {
                 <input
                     type="checkbox"
                     checked={this.props.inputCheckboxValue}
-                    ref="filterCheckbox"
                     onChange={() => this.props.onUserFilter(!this.props.inputCheckboxValue)}
                 >
                     {" Include others' items"}

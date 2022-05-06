@@ -1,3 +1,4 @@
+// OuterTableDetailsRow contains the inner table that will be displayed when an outer table row is clicked. Child component of OuterTable.
 class OuterTableDetailsRow extends React.Component {
     render() {
         var colSpan = '5'
@@ -31,7 +32,6 @@ class OuterTableDetailsRow extends React.Component {
                     />
                 </td>
             </tr>
-            /** no data is being passed in here after inspecting */
         )
     }
 }

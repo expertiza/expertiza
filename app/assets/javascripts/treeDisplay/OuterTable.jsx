@@ -1,3 +1,4 @@
+// OuterTable contains the main outer table. Child component of FilterableTable
 class OuterTable extends React.Component {
 
     constructor(props) {
@@ -95,7 +96,6 @@ class OuterTable extends React.Component {
             rows.push(<TitleRow title="My Assignments" />)
         }
         this.populateOuterTableRows(rows, false, colWidthArray, colDisplayStyle)
-        /** this was protecting an always null field, weird TODO */
         if (this.props.showOthersWork) {
             if (this.props.dataType === 'course')
                 rows.push(<TitleRow title="Others' Public Courses" />)

@@ -1,3 +1,4 @@
+// SearchBar contains the search bar to search for a course/assignment. Child component of FilterableTable
 class SearchBar extends React.Component {
     render() {
         return (

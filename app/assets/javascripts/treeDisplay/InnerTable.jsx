@@ -1,3 +1,4 @@
+//InnerTable component is the inner table which shows up when an outer table row is clicked. Child component of OuterTableDetailsRow.
 class InnerTable extends React.Component {
     render() {
         var rows = []

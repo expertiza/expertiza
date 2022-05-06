@@ -1,4 +1,4 @@
-/** beta branch isnt getting a prop related to the data to be displayed in the dropdown */
+// FilterTable contains OuterTable, SearchBar, FilterButton and NewItemButton. Child component of TabSystem.
 class FilterableTable extends React.Component {
     constructor(props) {
         super(props)

@@ -1,3 +1,4 @@
+// SortToggle is used to sort enteries in the table according to table headers
 class SortToggle extends React.Component {
     constructor(props) {
         super(props)

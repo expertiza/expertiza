@@ -4,7 +4,7 @@
 
 1. Install `rvm`
 2. Install ruby version `2.6.6` using the `rvm`
-3. Install `mysql`
+3. Install `mysql-server`
 
 ## `/.travis.yml`
 

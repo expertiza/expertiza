@@ -4,7 +4,9 @@
 
 1. Install `rvm`
 2. Install ruby version `2.6.6` using the `rvm`
-3. Install `mysql-server`
+3. Install `mysql-server` and `mysql-devel`
+4. install `git` (`sudo yum install git`)
+5. Ensure the required files are available on the server `secrets.yml, database.yml, public1.pem, private2.pem`
 
 ## `/.travis.yml`
 
@@ -16,6 +18,7 @@ after_success:
 - openssl aes-256-cbc -k $DEPLOY_KEY -in config/deploy_id_rsa_enc_travis -d -a -out config/deploy_id_rsa
 - chmod 400 config/deploy_id_rsa_enc_travis
 - chmod 400 config/deploy_id_rsa
+- ssh-add -k config/deploy_id_rsa
 - bundle exec cap staging deploy --trace
 ```
 
@@ -48,7 +51,7 @@ gem 'bcrypt_pbkdf', '>= 1.0', '< 2.0'
 2. Edit line and set to `lock '~> 3.17.0'`
 3. Edit line and set to `set :repo_url, 'https://github.com/<YOUR_GITHUB_USER>/expertiza.git'`
 4. Edit line and set to `set :rvm_ruby_version, '2.6.6'`
-5. Edit line and set to `set :deploy_to, "/home/krshah3/expertiza_deploy"`
+5. Edit line and set to `set :deploy_to, <deploy path>"` E.g.:`/home/krshah3/expertiza_deploy"`
 
 ## `/config/deploy/staging.rb`
 

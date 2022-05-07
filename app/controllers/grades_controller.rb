@@ -52,6 +52,7 @@ class GradesController < ApplicationController
     @avg_of_avg = mean(averages)
     penalties(@assignment.id)
     @show_reputation = false
+    puts @scores
   end
 
   def view_my_scores

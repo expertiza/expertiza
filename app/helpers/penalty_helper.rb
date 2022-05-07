@@ -3,7 +3,6 @@ module PenaltyHelper
     @submission_deadline_type_id = 1
     @review_deadline_type_id = 2
     @meta_review_deadline_type_id = 5
-
     @participant = AssignmentParticipant.find(participant_id)
     @assignment = @participant.assignment
     if @assignment.late_policy_id
@@ -12,16 +11,12 @@ module PenaltyHelper
       @penalty_unit = LatePolicy.find(@assignment.late_policy_id).penalty_unit
     end
     penalties = { submission: 0, review: 0, meta_review: 0 }
-    calculate_penalty = @assignment.calculate_penalty
-    # use its value to check if the penalty is to be calculated for the assignment or not
-    if calculate_penalty
-      topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
-      stage = @assignment.current_stage(topic_id)
-      if stage == 'Finished'
-        penalties[:submission] = calculate_submission_penalty
-        penalties[:review] = calculate_review_penalty
-        penalties[:meta_review] = calculate_meta_review_penalty
-      end
+    topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
+    stage = @assignment.current_stage(topic_id)
+    if stage == 'Finished'
+      penalties[:submission] = calculate_submission_penalty
+      penalties[:review] = calculate_review_penalty
+      penalties[:meta_review] = calculate_meta_review_penalty
     end
     penalties
   end
@@ -29,9 +24,10 @@ module PenaltyHelper
   def calculate_submission_penalty
     submission_due_date = AssignmentDueDate.where(deadline_type_id: @submission_deadline_type_id,
                                                   parent_id: @assignment.id).first.due_at
-    resubmission_times = @participant.resubmission_times
+    submission_records = SubmissionRecord.where(team_id: @participant.team.id, assignment_id: @participant.assignment.id)
+    resubmission_times = submission_records.select { |submission_record| submission_record.updated_at > submission_due_date }
     if resubmission_times.any?
-      last_submission_time = resubmission_times.at(resubmission_times.size - 1).resubmitted_at
+      last_submission_time = resubmission_times.last.updated_at
       if last_submission_time > submission_due_date
         time_difference = last_submission_time - submission_due_date
         penalty_units = calculate_penalty_units(time_difference, @penalty_unit)

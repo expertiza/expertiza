@@ -5,6 +5,15 @@
 1. Install `rvm`
 2. Install ruby version `2.6.6` using the `rvm`
 3. Install `mysql-server`
+4. Install `mysql-devel`
+5. Install Java JDK 8 with `sudo dnf install java-1.8.0-openjdk-devel`
+6. Run following commands to set relevant Java environment variables:
+
+```bash
+export JAVA_HOME=$(dirname $(dirname $(readlink $(readlink $(which javac)))))
+export PATH=$PATH:$JAVA_HOME/bin
+export CLASSPATH=.:$JAVA_HOME/jre/lib:$JAVA_HOME/lib:$JAVA_HOME/lib/tools.jar
+```
 
 ## `/.travis.yml`
 
@@ -49,6 +58,7 @@ gem 'bcrypt_pbkdf', '>= 1.0', '< 2.0'
 3. Edit line and set to `set :repo_url, 'https://github.com/<YOUR_GITHUB_USER>/expertiza.git'`
 4. Edit line and set to `set :rvm_ruby_version, '2.6.6'`
 5. Edit line and set to `set :deploy_to, "/home/krshah3/expertiza_deploy"`
+6. Edit line and set to `set :branch, 'deploy'`
 
 ## `/config/deploy/staging.rb`
 

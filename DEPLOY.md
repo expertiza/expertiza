@@ -50,7 +50,8 @@ gem 'ed25519', '1.2.4'
 gem 'bcrypt_pbkdf', '>= 1.0', '< 2.0'
 ```
 
-3. run `bundle lock --update` after above changes to generate a new Gemfile.lock.
+3. run `bundle lock --update` after above changes to generate a new Gemfile.lock.</br>
+**ERROR:** `Could not find gem 'ruby (~> 2.3.1.0)' in the local ruby installation. The source contains 'ruby' at: 2.6.6.146` error. : Make sure you are on the right `deploy` branch.
 
 ## `/config/deploy.rb`
 

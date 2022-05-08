@@ -6,8 +6,9 @@
 2. Install ruby version `2.6.6` using the `rvm`
 3. Install `mysql-server`
 4. Install `mysql-devel`
-5. Install Java JDK 8 with `sudo dnf install java-1.8.0-openjdk-devel`
-6. Run following commands to set relevant Java environment variables:
+5. Install Node.js with `dnf module install nodejs:16`
+6. Install Java JDK 8 with `sudo dnf install java-1.8.0-openjdk-devel`
+7. Run following commands to set relevant Java environment variables:
 
 ```bash
 export JAVA_HOME=$(dirname $(dirname $(readlink $(readlink $(which javac)))))

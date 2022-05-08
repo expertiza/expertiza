@@ -59,6 +59,7 @@ gem 'bcrypt_pbkdf', '>= 1.0', '< 2.0'
 4. Edit line and set to `set :rvm_ruby_version, '2.6.6'`
 5. Edit line and set to `set :deploy_to, "/home/krshah3/expertiza_deploy"`
 6. Edit line and set to `set :branch, 'deploy'`
+7. Make sure `JAVA_HOME` under `set :default_env` is correctly set according to the value in the remote server.
 
 ## `/config/deploy/staging.rb`
 

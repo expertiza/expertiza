@@ -6,9 +6,15 @@
 2. Install ruby version `2.6.6` using the `rvm`
 3. Install `mysql-server`
 4. Install `mysql-devel`
-5. Install Node.js with `dnf module install nodejs:16`
-6. Install Java JDK 8 with `sudo dnf install java-1.8.0-openjdk-devel`
-7. Run following commands to set relevant Java environment variables:
+5. Install `sudo yum install git -y`
+6. Install Node.js with 
+```bash
+sudo yum install -y gcc-c++ make 
+curl -sL https://rpm.nodesource.com/setup_14.x | sudo -E bash - 
+sudo yum install nodejs -y
+```
+7. Install Java JDK 8 with `sudo yum install java-1.8.0-openjdk-devel -y`
+8. Run following commands to set relevant Java environment variables:
 
 ```bash
 export JAVA_HOME=$(dirname $(dirname $(readlink $(readlink $(which javac)))))
@@ -29,21 +35,6 @@ after_success:
 - bundle exec cap staging deploy --trace
 ```
 
-## `/Gemfile`
-
-1. Edit the following lines:
-```ruby
-ruby '2.6.6'
-gem 'rails', '= 5.1.0.rc2'
-...
-gem 'actionpack', '5.1.0.rc2'
-gem 'activerecord', '5.1.0.rc2'
-...
-gem 'activesupport', '5.1.0.rc2'
-...
-gem 'railties', '5.1.0.rc2'
-```
-
 2. Add the following lines at the end:
 ```ruby
 gem 'ed25519', '1.2.4'
@@ -59,7 +50,7 @@ gem 'bcrypt_pbkdf', '>= 1.0', '< 2.0'
 2. Edit line and set to `lock '~> 3.17.0'`
 3. Edit line and set to `set :repo_url, 'https://github.com/<YOUR_GITHUB_USER>/expertiza.git'`
 4. Edit line and set to `set :rvm_ruby_version, '2.6.6'`
-5. Edit line and set to `set :deploy_to, "/home/krshah3/expertiza_deploy"`
+5. Edit line and set to `set :deploy_to, "/home/<username>/expertiza_deploy"`
 6. Edit line and set to `set :branch, 'deploy'`
 7. Make sure `JAVA_HOME` under `set :default_env` is correctly set according to the value in the remote server.
 
@@ -73,6 +64,10 @@ role :web, %w[<SERVER_USER>@<YOUR_DEPLOYMENT_SERVER>]
 role :db,  %w[<SERVER_USER>@<YOUR_DEPLOYMENT_SERVER>]
 ```
 
+## Gemfile
+1. Add `gem 'capistrano-bower'` to Gemfile, to install all the npm dependencies in the target server.
+2. Add dependency `"tinymce": "latest"` in the bower.json file.
+
 ## Remote server
 
 Run command to add Travis servers to firewall:
@@ -83,4 +78,12 @@ sudo iptables -I INPUT -p tcp -s "$(dig +short nat.travisci.net | tr -s '\r\n' '
 
 ## Local machine
 
-Follow the steps given here: https://gist.github.com/waynegraham/5c6ab006862123398d07 to setup Travis password encryption keys.
+Follow the bewlo steps to encrypt the secret private key and upload it in the repository. This private key would be used to ssh and deploy into the target server.
+```bash
+gem instal travis
+travis login --pro --github-token <token>
+travis encrypt DEPLOY_KEY="password for encryption" --add
+openssl aes-256-cbc -k "password for encryption" -in ~/.ssh/id_rsa -out deploy_id_rsa_enc_travis -a
+```
+
+Check for further reference: https://gist.github.com/waynegraham/5c6ab006862123398d07 .

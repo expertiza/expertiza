@@ -21,6 +21,7 @@ export JAVA_HOME=$(dirname $(dirname $(readlink $(readlink $(which javac)))))
 export PATH=$PATH:$JAVA_HOME/bin
 export CLASSPATH=.:$JAVA_HOME/jre/lib:$JAVA_HOME/lib:$JAVA_HOME/lib/tools.jar
 ```
+9. Ensure the required files are available on the server `secrets.yml, database.yml, public1.pem, private2.pem` at `<project-root>/config`
 
 ## `/.travis.yml`
 
@@ -32,6 +33,7 @@ after_success:
 - openssl aes-256-cbc -k $DEPLOY_KEY -in config/deploy_id_rsa_enc_travis -d -a -out config/deploy_id_rsa
 - chmod 400 config/deploy_id_rsa_enc_travis
 - chmod 400 config/deploy_id_rsa
+- ssh-add -k config/deploy_id_rsa
 - bundle exec cap staging deploy --trace
 ```
 
@@ -54,9 +56,10 @@ Add `require 'capistrano/bower'` to Capfile to install all the npm dependencies 
 2. Edit line and set to `lock '~> 3.17.0'`
 3. Edit line and set to `set :repo_url, 'https://github.com/<YOUR_GITHUB_USER>/expertiza.git'`
 4. Edit line and set to `set :rvm_ruby_version, '2.6.6'`
-5. Edit line and set to `set :deploy_to, "/home/<username>/expertiza_deploy"`
+5. Edit line and set to `set :deploy_to, "/home/<username>/expertiza_deploy"` E.g.:`/home/krshah3/expertiza_deploy"`
 6. Edit line and set to `set :branch, 'deploy'`
 7. Make sure `JAVA_HOME` under `set :default_env` is correctly set according to the value in the remote server.
+
 
 ## `/config/deploy/staging.rb`
 

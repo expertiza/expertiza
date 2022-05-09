@@ -21,7 +21,7 @@ export JAVA_HOME=$(dirname $(dirname $(readlink $(readlink $(which javac)))))
 export PATH=$PATH:$JAVA_HOME/bin
 export CLASSPATH=.:$JAVA_HOME/jre/lib:$JAVA_HOME/lib:$JAVA_HOME/lib/tools.jar
 ```
-9. Ensure the required files are available on the server `secrets.yml, database.yml, public1.pem, private2.pem` at `<project-root>/config`
+9. Ensure the required files are available on the server `secrets.yml, database.yml, public1.pem, private2.pem` at `<project-root>/shared/config`
 
 ## `/.travis.yml`
 

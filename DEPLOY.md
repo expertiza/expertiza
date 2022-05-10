@@ -6,22 +6,28 @@
 2. Install ruby version `2.6.6` using the `rvm`
 3. Install `mysql-server`
 4. Install `mysql-devel`
-5. Install `sudo yum install git -y`
-6. Install Node.js with 
+5. Make sure user `root` has remote login enabled with no password on both `localhost` and `127.0.0.1`. Use the following commands:
+```sql
+create user 'root'@'127.0.0.1' identified by '';
+grant all privileges on *.* to 'root'@'127.0.0.1' with grant option;
+flush privileges;
+```
+6. Install `sudo yum install git -y`
+7. Install Node.js with 
 ```bash
 sudo yum install -y gcc-c++ make 
-curl -sL https://rpm.nodesource.com/setup_14.x | sudo -E bash - 
+curl -sL https://rpm.nodesource.com/setup_16.x | sudo -E bash - 
 sudo yum install nodejs -y
 ```
-7. Install Java JDK 8 with `sudo yum install java-1.8.0-openjdk-devel -y`
-8. Run following commands to set relevant Java environment variables:
+8. Install Java JDK 8 with `sudo yum install java-1.8.0-openjdk-devel -y`
+9. Run following commands to set relevant Java environment variables:
 
 ```bash
 export JAVA_HOME=$(dirname $(dirname $(readlink $(readlink $(which javac)))))
 export PATH=$PATH:$JAVA_HOME/bin
 export CLASSPATH=.:$JAVA_HOME/jre/lib:$JAVA_HOME/lib:$JAVA_HOME/lib/tools.jar
 ```
-9. Ensure the required files are available on the server `secrets.yml, database.yml, public1.pem, private2.pem` at `<project-root>/shared/config`
+10. Ensure the required files are available on the server `secrets.yml, database.yml, public1.pem, private2.pem` at `<project-root>/shared/config`
 
 ## `/.travis.yml`
 
@@ -43,12 +49,9 @@ gem 'ed25519', '1.2.4'
 gem 'bcrypt_pbkdf', '>= 1.0', '< 2.0'
 ```
 
-3. run `bundle lock --update` after above changes to generate a new Gemfile.lock.</br>
-**ERROR:** `Could not find gem 'ruby (~> 2.3.1.0)' in the local ruby installation. The source contains 'ruby' at: 2.6.6.146` error. : Make sure you are on the right `deploy` branch.
-
 ## Capfile
 
-Add `require 'capistrano/bower'` to Capfile to install all the npm dependencies during deployment.
+Add `require 'capistrano/bower'` to Capfile to install all the npm dependencies defined in `/bower.json` during deployment.
 
 ## `/config/deploy.rb`
 
@@ -60,6 +63,7 @@ Add `require 'capistrano/bower'` to Capfile to install all the npm dependencies 
 6. Edit line and set to `set :branch, 'deploy'`
 7. Make sure `JAVA_HOME` under `set :default_env` is correctly set according to the value in the remote server.
 
+**TIP:** Add `Rake::Task["deploy:migrate"].clear_actions` to `deploy.rb` to disable the migrate rake tasks during deployment. 
 
 ## `/config/deploy/staging.rb`
 
@@ -73,7 +77,11 @@ role :db,  %w[<SERVER_USER>@<YOUR_DEPLOYMENT_SERVER>]
 
 ## Gemfile
 1. Add `gem 'capistrano-bower'` to Gemfile, to install all the npm dependencies in the target server.
-2. Add dependency `"tinymce": "latest"` in the bower.json file.
+2. run `bundle lock --update` after above changes to generate a new Gemfile.lock.</br>
+**ERROR:** `Could not find gem 'ruby (~> 2.3.1.0)' in the local ruby installation. The source contains 'ruby' at: 2.6.6.146` error. : Make sure you are on the right `deploy` branch.
+
+## `/bower.json`
+1. Add dependency `"tinymce": "latest"` in the bower.json file.
 
 ## Remote server
 

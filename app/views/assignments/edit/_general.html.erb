@@ -294,6 +294,7 @@ function autogenerate_submission(){
 
     function maxTeamSizeFieldChanged() {
       if (<%= @assignment_form.assignment.max_team_size > 1 %>) {
+        <%= puts("CHANGED!!!!\n") %>
         addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false : @due_date_nameurl_not_empty %>, 'team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
       } else {
         removeDueDateTableElement('team_formation', 0);

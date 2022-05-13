@@ -329,7 +329,7 @@
                 removeDueDateTableElement('review', i);
             }
             removeDueDateTableElement('metareview', 0);
-            addDueDateTableElement(false, 'team_formation', 0, <%= due_date(@assignment_form.assignment,'team_formation', 0).to_json.html_safe %>);
+            addDueDateTableElement(true, 'team_formation', 0, <%= due_date(@assignment_form.assignment,'team_formation', 0).to_json.html_safe %>);
             <% for i in 1..@assignment_form.assignment.rounds_of_reviews %>
             addDueDateTableElement(false, 'submission', <%=i%>, <%= due_date(@assignment_form.assignment,'submission', i-1).to_json.html_safe %>);
             addDueDateTableElement(false, 'review', <%=i%>, <%= due_date(@assignment_form.assignment,'review', i-1).to_json.html_safe %>);

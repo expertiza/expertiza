@@ -343,7 +343,6 @@ function autogenerate_submission(){
     }
 
     jQuery(document).ready(function() {
-      //addDueDateTableElement('team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>)
       jQuery('input[type=radio][name=num_reviews]').change(function(){
         if (this.value == 'student'){
           jQuery('#num_reviews_per_student_threshold').removeAttr('hidden');

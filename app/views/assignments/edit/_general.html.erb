@@ -1,23 +1,5 @@
 <script>
 
-function teamAssignmentChanged() {
-  var msg = 'Warning! Unchecking this box will hide teams that already exist.'
-
-  if (jQuery('#assignment_team_assignment').is(':checked')) {
-    jQuery('#assignment_team_count_field').removeAttr('hidden');
-     <% if due_date(@assignment_form.assignment, 'team_formation') %>
-      addDueDateTableElement('team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>)
-     <% end %>
-  } else {
-    if (confirm(msg)) {
-      jQuery('#assignment_team_count_field').attr('hidden', true);
-      removeDueDateTableElement('team_formation', 0);
-    } else {
-      jQuery('#assignment_team_assignment').prop('checked', true);
-    }
-  }
-}
-
 function microtaskChanged() {
   if (jQuery('#assignment_microtask').is(':checked')) {
 
@@ -350,6 +332,7 @@ function autogenerate_submission(){
     }
 
     jQuery(document).ready(function() {
+      //addDueDateTableElement('team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>)
       jQuery('input[type=radio][name=num_reviews]').change(function(){
         if (this.value == 'student'){
           jQuery('#num_reviews_per_student_threshold').removeAttr('hidden');

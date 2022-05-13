@@ -323,13 +323,13 @@
         }
         if (state == false && round_count > 1) {
             //hide name and url columns
-            removeDueDateTableElement('team_formation', 0);
+            //removeDueDateTableElement('team_formation', 0);
             for (i = 1; i <= round_count; i++) {
                 removeDueDateTableElement('submission', i);
                 removeDueDateTableElement('review', i);
             }
             removeDueDateTableElement('metareview', 0);
-            addDueDateTableElement(true, 'team_formation', 0, <%= due_date(@assignment_form.assignment,'team_formation', 0).to_json.html_safe %>);
+            addDueDateTableElement(false, 'team_formation', 0, <%= due_date(@assignment_form.assignment,'team_formation', 0).to_json.html_safe %>);
             <% for i in 1..@assignment_form.assignment.rounds_of_reviews %>
             addDueDateTableElement(false, 'submission', <%=i%>, <%= due_date(@assignment_form.assignment,'submission', i-1).to_json.html_safe %>);
             addDueDateTableElement(false, 'review', <%=i%>, <%= due_date(@assignment_form.assignment,'review', i-1).to_json.html_safe %>);

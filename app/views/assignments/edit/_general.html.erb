@@ -293,7 +293,11 @@ function autogenerate_submission(){
     <% end %>
 
     function maxTeamSizeFieldChanged() {
-      addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
+      if (<%= @assignment_form.assignment.max_team_size > 1 %>) {
+        addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false : @due_date_nameurl_not_empty %>, 'team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
+      } else {
+        removeDueDateTableElement('team_formation', 0);
+      }    
     }
 
     function staggeredDeadlineChanged() {

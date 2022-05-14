@@ -379,23 +379,14 @@
         }
     }
 
-    function insertTeamBasedElements(isTeamsAssignment) {
+    function insertTeamBasedElements() {
         var varyByDutyDiv = jQuery('#vary_by_duty');
-        if (isTeamsAssignment) {
-            varyByDutyDiv.removeAttr('hidden');
-            var varyByDutyCheckbox = jQuery('#vary_by_duty_checkbox');
-            if (varyByDutyCheckbox.is(':checked')) {
-                addDutyBasedQuestionnaires();
-            } else {
-                addDefaultTeammateReviewQuestionnaire();
-            }
+        varyByDutyDiv.removeAttr('hidden');
+        var varyByDutyCheckbox = jQuery('#vary_by_duty_checkbox');
+        if (varyByDutyCheckbox.is(':checked')) {
+            addDutyBasedQuestionnaires();
         } else {
-            // removing vary by duty div
-            varyByDutyDiv.attr('hidden', true);
-            // removing appropriate questionnaire rows
-            removeDutyBasedQuestionnaires()
-            removeQuestionnaireTableRow('TeammateReviewQuestionnaire');
-
+            addDefaultTeammateReviewQuestionnaire();
         }
     }
 </script>
@@ -438,8 +429,8 @@
   <script>
       jQuery(document).ready(function () {
           // Adding an event listener to the team assignment checkbox.
-          jQuery('#team_assignment').change(function() {
-              insertTeamBasedElements(this.checked)
+          jQuery('#assignment_form[assignment][max_team_size]').change(function() {
+              insertTeamBasedElements()
           });
 
           <% if @assignment_form.assignment.vary_by_round %>
@@ -488,7 +479,7 @@
           );
 
           var teamAssignmentCheckbox = jQuery('#team_assignment')
-          insertTeamBasedElements(teamAssignmentCheckbox.is(':checked'))
+          insertTeamBasedElements()
 
           var bookmark_checkbox = jQuery('#assignment_form_assignment_use_bookmark');
           if (bookmark_checkbox.is(':checked')) {

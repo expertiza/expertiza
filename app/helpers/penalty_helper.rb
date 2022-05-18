@@ -6,18 +6,16 @@ module PenaltyHelper
     @participant = AssignmentParticipant.find(participant_id)
     @assignment = @participant.assignment
     if @assignment.late_policy_id
-      @penalty_per_unit = LatePolicy.find(@assignment.late_policy_id).penalty_per_unit
-      @max_penalty_for_no_submission = LatePolicy.find(@assignment.late_policy_id).max_penalty
-      @penalty_unit = LatePolicy.find(@assignment.late_policy_id).penalty_unit
+      late_policy = LatePolicy.find(@assignment.late_policy_id)
+      @penalty_per_unit = late_policy.penalty_per_unit
+      @max_penalty_for_no_submission = late_policy.max_penalty
+      @penalty_unit = late_policy.penalty_unit
     end
     penalties = { submission: 0, review: 0, meta_review: 0 }
     topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
-    stage = @assignment.current_stage(topic_id)
-    if stage == 'Finished'
-      penalties[:submission] = calculate_submission_penalty
-      penalties[:review] = calculate_review_penalty
-      penalties[:meta_review] = calculate_meta_review_penalty
-    end
+    penalties[:submission] = calculate_submission_penalty
+    penalties[:review] = calculate_review_penalty
+    penalties[:meta_review] = calculate_meta_review_penalty
     penalties
   end
 
@@ -39,7 +37,7 @@ module PenaltyHelper
         end
       end
     else
-      @max_penalty_for_no_submission
+      submission_records.any? ? 0 : @max_penalty_for_no_submission
     end
   end
 

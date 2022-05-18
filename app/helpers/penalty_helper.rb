@@ -12,7 +12,6 @@ module PenaltyHelper
       @penalty_unit = late_policy.penalty_unit
     end
     penalties = { submission: 0, review: 0, meta_review: 0 }
-    topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     penalties[:submission] = calculate_submission_penalty
     penalties[:review] = calculate_review_penalty
     penalties[:meta_review] = calculate_meta_review_penalty

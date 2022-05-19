@@ -6,7 +6,6 @@ module PenaltyHelper
     @participant = AssignmentParticipant.find(participant_id)
     @assignment = @participant.assignment
     if @assignment.late_policy_id
-      puts 'got here'
       late_policy = LatePolicy.find(@assignment.late_policy_id)
       @penalty_per_unit = late_policy.penalty_per_unit
       @max_penalty_for_no_submission = late_policy.max_penalty
@@ -23,9 +22,9 @@ module PenaltyHelper
     submission_due_date = AssignmentDueDate.where(deadline_type_id: @submission_deadline_type_id,
                                                   parent_id: @assignment.id).first.due_at
     submission_records = SubmissionRecord.where(team_id: @participant.team.id, assignment_id: @participant.assignment.id)
-    resubmission_times = submission_records.select { |submission_record| submission_record.updated_at > submission_due_date }
-    if resubmission_times.any?
-      last_submission_time = resubmission_times.last.updated_at
+    late_submission_times = submission_records.select { |submission_record| submission_record.updated_at > submission_due_date }
+    if late_submission_times.any?
+      last_submission_time = late_submission_times.last.updated_at
       if last_submission_time > submission_due_date
         time_difference = last_submission_time - submission_due_date
         penalty_units = calculate_penalty_units(time_difference, @penalty_unit)

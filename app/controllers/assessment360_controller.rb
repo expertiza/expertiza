@@ -136,7 +136,7 @@ class Assessment360Controller < ApplicationController
     # instructor grade is stored in the team model, which is found by finding the user's team for the assignment
     team_id = TeamsUser.team_id(assignment_id, user_id)
     team = Team.find(team_id)
-    @assignment_grades[cp.id][assignment_id] = (team[:grade_for_submission] - penalties[:submission]).round(2)
+    @assignment_grades[cp.id][assignment_id] = team[:grade_for_submission] ? (team[:grade_for_submission] - penalties[:submission]).round(2) : nil
     return if @assignment_grades[cp.id][assignment_id].nil?
 
     @final_grades[cp.id] += @assignment_grades[cp.id][assignment_id]

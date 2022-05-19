@@ -85,7 +85,7 @@ class GradesController < ApplicationController
     questionnaires = @assignment.questionnaires
     @questions = retrieve_questions(questionnaires, @assignment.id)
     @pscore = participant_scores(@participant, @questions)
-
+    @penalties = calculate_penalty(@participant.id)
     @vmlist = []
 
     counter_for_same_rubric = 0

@@ -281,6 +281,7 @@
   <% if ['Student', 'Teaching Assistant'].include? current_user.role.name %>
     <%=t ".grade"%>: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
     <%=t ".Comment"%>: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %><br>
+    <%=t ".late_penalty"%>: <%= label_tag 'late_penalty', @penalties[:submission] %><br/>
   <% end %>
   <% if TaMapping.where(ta_id: @ta_id, course_id: @course_id).exists? || current_user == @assignment.instructor%>
   <h4 style="font-weight:bold;display:inline-block;">TA Grade-Comment:</h4><br/>

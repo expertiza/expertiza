@@ -6,6 +6,7 @@ module PenaltyHelper
     @participant = AssignmentParticipant.find(participant_id)
     @assignment = @participant.assignment
     if @assignment.late_policy_id
+      puts 'got here'
       late_policy = LatePolicy.find(@assignment.late_policy_id)
       @penalty_per_unit = late_policy.penalty_per_unit
       @max_penalty_for_no_submission = late_policy.max_penalty

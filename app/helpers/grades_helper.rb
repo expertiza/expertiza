@@ -70,16 +70,6 @@ module GradesHelper
     @assignment[:is_penalty_calculated] = true unless @assignment.is_penalty_calculated
   end
 
-  def assign_all_penalties(participant, penalties)
-    puts participant.calculated_penalty
-    @all_penalties[participant.id] = {
-      submission: penalties[:submission],
-      review: penalties[:review],
-      meta_review: penalties[:meta_review],
-      total_penalty: @total_penalty
-    }
-  end
-
   def has_team_and_metareview?
     if params[:action] == 'view'
       @assignment = Assignment.find(params[:id])

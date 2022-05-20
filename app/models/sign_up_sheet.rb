@@ -18,7 +18,6 @@ class SignUpSheet < ApplicationRecord
   def self.confirmTopic(user_id, team_id, topic_id, assignment_id)
     # check whether user has signed up already
     user_signup = SignUpSheet.otherConfirmedTopicforUser(assignment_id, team_id)
-    
     users_team = SignedUpTeam.find_team_users(assignment_id, user_id)
     team = Team.find(users_team.first.t_id)
     if SignedUpTeam.where(team_id: team.id, topic_id: topic_id).any?

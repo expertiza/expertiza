@@ -5,6 +5,7 @@ Expertiza::Application.routes.draw do
 
   resources :admin, only: [] do
     collection do
+      
       get :list_super_administrators
       get :list_administrators
       get :list_instructors

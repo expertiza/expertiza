@@ -305,6 +305,7 @@ ActiveRecord::Schema.define(version: 2022_04_14_172528) do
     t.integer "times_used", default: 0, null: false
     t.integer "instructor_id", null: false
     t.string "policy_name", null: false
+    t.boolean "private", default: true, null: false
     t.index ["instructor_id"], name: "fk_instructor_id"
   end
 

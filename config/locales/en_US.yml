@@ -1,5 +1,5 @@
 # Sample localization file for English. Add more files in this directory for other locales.
-# See http://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
+# See http://github.com/svenfuchs/rails-i18n/tree/main/rails%2Flocale for starting points.
 
 en_US:
   display_name: "English"
@@ -240,6 +240,8 @@ en_US:
       select: "Select"
       questionnaire: "Questionnaire"
       disabled: "(disabled)"
+      num_bids: "Total num. of bids"
+      num_1_2_bids: "Num. #1/#2 bids"
 
 
     suggested_topic:

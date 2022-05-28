@@ -1,0 +1,16 @@
+<%= form_for :send_email , url: "send_email" do |form| %>
+  <p>
+ <h1> <%=  "Message to Author" %> <br></h1>
+  </p>
+  <p>
+  <%= label_tag "Subject: " %> <br>
+  <%= form.text_field :subject %> <br>
+  </p>
+  <p>
+   <%= label_tag "Email Content: " %> <br>
+  <%= form.text_area :email_body %> <br>
+  </p>
+ <input name="response" type="hidden" value="<%= params[:response] %>" />
+ <input name="email" type="hidden" value="<%= params[:email] %>" />
+  <%= form.submit "Send Email" %>
+<% end  %>

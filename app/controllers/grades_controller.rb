@@ -85,7 +85,7 @@ class GradesController < ApplicationController
     questionnaires = @assignment.questionnaires
     @questions = retrieve_questions(questionnaires, @assignment.id)
     @pscore = participant_scores(@participant, @questions)
-
+    @penalties = calculate_penalty(@participant.id)
     @vmlist = []
 
     counter_for_same_rubric = 0
@@ -194,7 +194,7 @@ class GradesController < ApplicationController
     vm.add_questions(vmquestions)
     vm.add_team_members(@team)
     vm.add_reviews(@participant, @team, @assignment.vary_by_round)
-    vm.number_of_comments_greater_than_10_words
+    vm.calculate_metrics
     vm
   end
 

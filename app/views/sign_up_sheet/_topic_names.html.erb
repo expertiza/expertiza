@@ -22,7 +22,7 @@
 <% end %>
 <!--if 'Has teams' is not checked, the UI should not show the team name on the topic list.-->
 
-<div id="<%= i %>_myDiv">
+<div id="<%= i %>_myDiv" data-toggle="tooltip" title="<%= team_bids(topic, @participants) %>">
 <!--Though called participants, @participants are actually records in signed_up_teams table-->
   <%= render_participant_info(topic, @assignment, @participants) %>
   <div id="dialog-message" style="word-wrap: normal"></div>

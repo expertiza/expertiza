@@ -58,9 +58,8 @@ class Assignment < ApplicationRecord
     DEFAULT_MAX_OUTSTANDING_REVIEWS
   end
 
-  # TODO app breaks when max team size is set as > 1 and team has only one member
   def team_assignment?
-    max_team_size > 1
+    max_team_size > 0
   end
   alias team_assignment team_assignment?
 
@@ -610,6 +609,10 @@ class Assignment < ApplicationRecord
       end
     end
     questionnaire_ids
+  end
+
+  def pair_programming_enabled?
+    self.enable_pair_programming
   end
 
   private

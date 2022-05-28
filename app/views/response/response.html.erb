@@ -299,12 +299,21 @@
 <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
 <% if !@map.contributor.nil? && !@map.instance_of?(FeedbackResponseMap) %>
   <% if @map.assignment.team_assignment? %>
-    <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id %>
+    <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id%>
+
+    <% participant = Participant.find(team_member) %>
+    <div style="float:right">
+      <%= link_to "Email the author", author_response_index_path(email: participant.user.email, response: @response.id) %>
+    </div>
     <% topic_id = SignedUpTeam.topic_id(@map.assignment.id, team_member) %>
   <% else %>
     <% participant = Participant.find(TeamsUser.find_by_team_id(@map.contributor).user_id) %>
+    <div style="float:right">
+      <%= link_to "Email the author", author_response_index_path(email: participant.user.email, response: @response.id) %>
+    </div>
     <% topic_id = SignedUpTeam.where(participant.parent_id, participant.user_id) %>
   <% end %>
+
   <% unless topic_id.nil? %>
     <% topic = SignUpTopic.find(topic_id) %>
     <h2>You are reviewing <%= topic.topic_name %></h2>
@@ -331,17 +340,20 @@
   <hr/>
 <% end %>
 
-
 <!-- display all versions available -->
-<% @responses_versions = [] %>
-<% @responses_versions = @map.get_all_versions %>
-
-<% if @responses_versions.empty? %>
+<% @review_versions = @map.get_all_versions %>
+<% if @review_versions.empty? %>
   <I>No previous review was performed.</I><br/>
   <hr/><br/>
 <% else %>
-  <%= render :partial => 'review', :locals => { :versions => @responses_versions } %>
+  <%@review_versions.each do |response| %>
+    <%= response.display_as_html %>
+    <br/>
+  <% end %>
 <% end %>
+
+
+
 <h2>Directions for the reviewer</h2>
 <input type="checkbox" id="autosave_cbx" checked>
 <label id="autosave_cbx_lbl" for="autosave_cbx"></label>
@@ -398,7 +410,7 @@
   <div id="save_confirm"></div>
   <%= submit_tag "Save " + @title, :name => "save", :id => "save_review" %>
   <!--#E1600 check title for selfreview to show submit button-->
-  <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>
+  <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review') || (@title.eql? 'Metareview')) %>
     <%= submit_tag "Submit " + @title, :name => "Submit", :id => "Submit" %>
     <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
   <% end %>

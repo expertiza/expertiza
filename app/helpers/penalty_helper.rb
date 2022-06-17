@@ -19,9 +19,8 @@ module PenaltyHelper
   end
 
   def calculate_submission_penalty
-    if @penalty_per_unit.nil?
-      return 0
-    end
+    return 0 if @penalty_per_unit.nil?
+
     submission_due_date = AssignmentDueDate.where(deadline_type_id: @submission_deadline_type_id,
                                                   parent_id: @assignment.id).first.due_at
     submission_records = SubmissionRecord.where(team_id: @participant.team.id, assignment_id: @participant.assignment.id)

@@ -19,6 +19,9 @@ module PenaltyHelper
   end
 
   def calculate_submission_penalty
+    if @penalty_per_unit.nil?
+      return 0
+    end
     submission_due_date = AssignmentDueDate.where(deadline_type_id: @submission_deadline_type_id,
                                                   parent_id: @assignment.id).first.due_at
     submission_records = SubmissionRecord.where(team_id: @participant.team.id, assignment_id: @participant.assignment.id)
@@ -43,7 +46,7 @@ module PenaltyHelper
   def calculate_review_penalty
     penalty = 0
     num_of_reviews_required = @assignment.num_reviews
-    if num_of_reviews_required > 0
+    if num_of_reviews_required > 0 && !@penalty_per_unit.nil?
       review_mappings = ReviewResponseMap.where(reviewer_id: @participant.get_reviewer.id)
       review_due_date = AssignmentDueDate.where(deadline_type_id: @review_deadline_type_id,
                                                 parent_id: @assignment.id).first
@@ -55,7 +58,7 @@ module PenaltyHelper
   def calculate_meta_review_penalty
     penalty = 0
     num_of_meta_reviews_required = @assignment.num_review_of_reviews
-    if num_of_meta_reviews_required > 0
+    if num_of_meta_reviews_required > 0 && !@penalty_per_unit.nil?
       meta_review_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
       meta_review_due_date = AssignmentDueDate.where(deadline_type_id: @meta_review_deadline_type_id,
                                                      parent_id: @assignment.id).first

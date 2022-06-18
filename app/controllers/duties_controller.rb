@@ -54,13 +54,7 @@ class DutiesController < ApplicationController
     @duty.destroy
     redirect_to edit_assignment_path(params[:assignment_id]), notice: 'Role was successfully destroyed.'
   end
-
-  def delete_duty
-    @duty = Duty.find(params[:id])
-    @duty.destroy
-    redirect_to edit_assignment_path(params[:assignment_id]), notice: 'Role was successfully deleted.'
-  end
-
+  
   private
 
   # Use callbacks to share common setup or constraints between actions.

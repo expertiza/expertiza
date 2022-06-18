@@ -218,7 +218,13 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :profile, only: %i[edit update]
+  resources :profile, only: [] do
+    collection do
+      get :edit
+      post :update
+      patch :update
+    end
+  end
 
   resources :publishing, only: [] do
     collection do
@@ -482,6 +488,18 @@ Expertiza::Application.routes.draw do
       post :get_sub_folder_contents
       get :session_last_open_tab
       get :set_session_last_open_tab
+      get :goto_courses
+      get :goto_assignments
+      get :goto_questionnaires
+      get :goto_review_rubrics
+      get :goto_metareview_rubrics
+      get :goto_teammatereview_rubrics
+      get :goto_author_feedbacks
+      get :goto_global_survey
+      get :goto_surveys
+      get :goto_course_surveys
+      get :goto_bookmarkrating_rubrics
+      get :list
     end
   end
 
@@ -533,9 +551,9 @@ Expertiza::Application.routes.draw do
   post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
   get 'instructions/home'
   get 'response/', to: 'response#saving'
-  get ':controller/service.wsdl', action: 'wsdl'
+  # get ':controller/service.wsdl', action: 'wsdl'
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
-  get ':controller(/:action(/:id))(.:format)'
+  # get ':controller(/:action(/:id))(.:format)'
   match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
   post '/response_toggle_permission/:id' => 'response#toggle_permission'
   post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'

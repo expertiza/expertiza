@@ -53,6 +53,7 @@ Expertiza::Application.routes.draw do
       get :delete_delayed_mailer
       get :remove_assignment_from_course
       get :instant_flash
+      get :edit
     end
   end
 
@@ -415,11 +416,18 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :course_team do
+    collection do
+      get :list
+    end
+  end
+
   resources :student_teams, only: %i[create edit update] do
     collection do
       get :view
       get :remove_participant
       get :auto_complete_for_user_name
+      get :edit
     end
   end
 
@@ -468,6 +476,9 @@ Expertiza::Application.routes.draw do
       get :list
       post :create_teams
       post :inherit
+      get :delete
+      get :delete_all
+      get :bequeath_all
     end
   end
 
@@ -475,6 +486,7 @@ Expertiza::Application.routes.draw do
     collection do
       post :list
       post :update_duties
+      get :delete
     end
   end
 
@@ -500,6 +512,7 @@ Expertiza::Application.routes.draw do
       get :goto_course_surveys
       get :goto_bookmarkrating_rubrics
       get :list
+      get :drill
     end
   end
 
@@ -536,6 +549,14 @@ Expertiza::Application.routes.draw do
   resources :versions, only: %i[index show] do
     collection do
       get :search
+    end
+  end
+
+  resources :pair_programming, only: [] do
+    collection do
+      get :send_invitations
+      get :accept
+      get :decline
     end
   end
 

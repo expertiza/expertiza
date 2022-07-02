@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DutiesController < ApplicationController
   include AuthorizationHelper
 
@@ -48,17 +50,11 @@ class DutiesController < ApplicationController
     end
   end
 
-  # DELETE /duties/1
-  def destroy
+  def delete
     @duty = Duty.find(params[:id])
     @duty.destroy
-    redirect_to edit_assignment_path(params[:assignment_id]), notice: 'Role was successfully destroyed.'
-  end
-
-  def delete_duty
-    @duty = Duty.find(params[:id])
-    @duty.destroy
-    redirect_to edit_assignment_path(params[:assignment_id]), notice: 'Role was successfully deleted.'
+    redirect_to edit_assignment_path(params[:assignment_id]),
+                notice: 'Role was successfully deleted.'
   end
 
   private
@@ -69,9 +65,9 @@ class DutiesController < ApplicationController
   end
 
   def redirect_to_create_page_and_show_error
-    error_message = ''
-    @duty.errors.each { |_field, error| error_message << error }
-
+    error_messages = []
+    @duty.errors.each { |_, error| error_messages.append(error) }
+    error_message = error_messages.join('. ')
     flash[:error] = error_message
     redirect_to action: :new, id: params[:duty][:assignment_id]
   end

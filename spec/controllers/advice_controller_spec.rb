@@ -154,7 +154,7 @@ describe AdviceController do
         result = get :save_advice, params: params, session: session
         expect(flash[:notice]).to eq('The advice was successfully saved!')
         expect(result.status).to eq 302
-        expect(result).to redirect_to('/advice/edit_advice/1')
+        expect(result).to redirect_to('/advice/edit_advice?id=1')
       end
 
       it "does not save the advice" do
@@ -166,7 +166,7 @@ describe AdviceController do
         result = get :save_advice, params: params, session: session
         expect(flash[:notice]).not_to be_present
         expect(result.status).to eq 302
-        expect(result).to redirect_to('/advice/edit_advice/1')
+        expect(result).to redirect_to('/advice/edit_advice?id=1')
       end
     end
   end

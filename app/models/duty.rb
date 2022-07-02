@@ -4,10 +4,10 @@ class Duty < ApplicationRecord
   # same name cannot be assigned to multiple duties in particular assignment.
   validates :name,
             format: { with: /\A[^`!@#\$%\^&*+_=]+\z/,
-                      message: 'Please enter a valid role name. ' },
+                      message: 'Please enter a valid role name' },
             length: {
               minimum: 3,
-              message: 'Role name is too short (minimum is 3 characters). '
+              message: 'Role name is too short (minimum is 3 characters)'
             },
             uniqueness: {
               case_sensitive: false, scope: :assignment,
@@ -16,7 +16,7 @@ class Duty < ApplicationRecord
   validates_numericality_of :max_members_for_duty,
                             only_integer: true,
                             greater_than_or_equal_to: 1,
-                            message: 'Value for max members for role is invalid. '
+                            message: 'Value for max members for role is invalid'
 
   # E2147 : check if the duty selected is available for selection in that particular team. Checks whether
   # current duty count in the team is less than the max_members_for_duty set for that particular duty

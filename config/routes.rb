@@ -1,5 +1,4 @@
 Expertiza::Application.routes.draw do
-
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
 
@@ -14,7 +13,6 @@ Expertiza::Application.routes.draw do
       get :show_instructor
       get :show_administrator
       get :show_super_administrator
-
     end
   end
 
@@ -48,7 +46,6 @@ Expertiza::Application.routes.draw do
       get :all_students_all_reviews
       get :assignment_grade_summary
       get :insure_existence_of
-      
     end
   end
 
@@ -71,7 +68,7 @@ Expertiza::Application.routes.draw do
     collection do
       post :create
     end
-  end 
+  end
 
   resources :bookmarks, except: %i[index show] do
     collection do
@@ -423,7 +420,6 @@ Expertiza::Application.routes.draw do
       post :set_priority
       post :save_topic_deadlines
       post :delete_all_selected_topics
-      
     end
   end
 
@@ -465,10 +461,8 @@ Expertiza::Application.routes.draw do
   resources :student_task do
     collection do
       post :update
-
     end
   end
-
 
   resources :course_team do
     collection do
@@ -482,6 +476,7 @@ Expertiza::Application.routes.draw do
       get :remove_participant
       get :auto_complete_for_user_name
       get :edit
+      post :update
     end
   end
 
@@ -545,7 +540,6 @@ Expertiza::Application.routes.draw do
       post :update_duties
       get :delete
       post :delete_selected
-
     end
   end
   resources :popup do
@@ -645,7 +639,9 @@ Expertiza::Application.routes.draw do
   # get ':controller/service.wsdl', action: 'wsdl'
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
   # get ':controller(/:action(/:id))(.:format)'
-  match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
+  unless Rails.env.development?
+    match '*path' => 'content_pages#view', :via => %i[get post]
+  end
   post '/response_toggle_permission/:id' => 'response#toggle_permission'
   post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
   post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'

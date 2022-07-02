@@ -104,7 +104,7 @@ describe CoursesController do
         params = { id: 1 }
         session = { user: instructor }
         get :copy, params: params, session: session
-        expect(response).to redirect_to('/courses/edit')
+        expect(response).to redirect_to('/course/edit')
       end
     end
 

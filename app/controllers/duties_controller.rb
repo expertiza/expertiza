@@ -50,7 +50,7 @@ class DutiesController < ApplicationController
     end
   end
 
-  def delete_duty
+  def delete
     @duty = Duty.find(params[:id])
     @duty.destroy
     redirect_to edit_assignment_path(params[:assignment_id]),
@@ -65,9 +65,9 @@ class DutiesController < ApplicationController
   end
 
   def redirect_to_create_page_and_show_error
-    error_message = ''
-    @duty.errors.each { |_field, error| error_message << error }
-
+    error_messages = []
+    @duty.errors.each { |_, error| error_messages.append(error) }
+    error_message = error_messages.join('. ')
     flash[:error] = error_message
     redirect_to action: :new, id: params[:duty][:assignment_id]
   end

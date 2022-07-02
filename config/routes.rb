@@ -109,7 +109,11 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :duties
+  resources :duties do
+    collection do
+      delete :delete
+    end
+  end
 
   resources :eula, only: [] do
     collection do
@@ -219,7 +223,6 @@ Expertiza::Application.routes.draw do
   resources :notifications do
     collection do
       get :run_get_notification
-
     end
   end
 
@@ -269,7 +272,7 @@ Expertiza::Application.routes.draw do
       get :set_publish_permission
     end
   end
-  # Nitin - removed quiz related routes from questionnaires controller
+
   resources :questionnaires, only: %i[new create edit update] do
     collection do
       get :copy
@@ -281,23 +284,29 @@ Expertiza::Application.routes.draw do
       post :save_all_questions
       get :delete
       post :create_questionnaire
-
     end
   end
+
   resources :quiz do
     collection do
       get :view
     end
   end
-  #   resources :quiz_questionnaire, only: %i[new create edit update] do
-  #     collection do
-  #       get :new_quiz
-  #       post :create_quiz_questionnaire
-  #       get :edit_quiz
-  #       post :update_quiz
-  #
-  #     end
-  #   end
+
+  resources :quiz_questionnaires do
+    collection do
+      get :edit
+      get :edit_quiz
+      get :new
+      get :new_quiz
+      get :view
+      post :update
+      post :update_quiz
+      post :update
+      post :create
+      post :create_quiz_questionnaire
+    end
+  end
 
   resources :author_feedback_questionnaires, controller: :questionnaires
   resources :review_questionnaires, controller: :questionnaires

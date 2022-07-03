@@ -94,7 +94,6 @@ group :development do
 end
 
 group :test do
-  gem 'capybara'
   gem 'database_cleaner'
   gem "factory_bot_rails", '4.8.2'
   gem 'geckodriver-helper', '~> 0.0.3'
@@ -105,7 +104,6 @@ group :test do
   gem 'rspec-rails', '4.1.2'
   gem 'rails-controller-testing'
   gem 'puma'
-  gem 'selenium-webdriver'
   gem 'shoulda'
 end
 

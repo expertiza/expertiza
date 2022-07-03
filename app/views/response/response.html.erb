@@ -399,6 +399,28 @@
       </td>
     </tr>
 
+    <!-- Add a Good Teammate badge to the Teammate Review Questionnaire if the assignment has badges -->
+    <% if @assignment.badge? and (@questionnaire.type == 'TeammateReviewQuestionnaire' or @questionnaire.type == 'Teammate ReviewQuestionnaire') and AssignmentBadge.where(assignment_id: @assignment.id, badge_id: Badge.get_id_from_name('Good Teammate')).any? %>
+      <tr>
+        <td>
+          <img width="100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Teammate")}" %> title="GoodTeammate">
+          Would you like to award a Good Teammate badge?
+          <input type="checkbox" id="good_teammate_checkbox" name="review[good_teammate_checkbox]">
+        </td>
+      </tr>
+    <% end %>
+
+    <!-- Add a Good Reviewer badge to the Feedback Review Questionnaire if the assignment has badges -->
+    <% if @assignment.badge? and (@questionnaire.type == 'AuthorFeedbackQuestionnaire' or @questionnaire.type == 'Author FeedbackQuestionnaire') and AssignmentBadge.where(assignment_id: @assignment.id, badge_id: Badge.get_id_from_name('Good Reviewer')).any? %>
+      <tr>
+        <td>
+          <img width="100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Reviewer")}" %> title="GoodReviewer">
+          Would you like to award a Good Reviewer badge?
+          <input type="checkbox" id="good_reviewer_checkbox" name="review[good_reviewer_checkbox]">
+        </td>
+      </tr>
+    <% end %>
+
   </table>
   <% if @current_round %>
     <%= hidden_field_tag "review[round]", @current_round %>

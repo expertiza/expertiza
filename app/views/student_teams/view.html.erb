@@ -11,7 +11,6 @@
   <% end %>
 <% else %>
   <b style="text-align: center"><%=t ".team_name_up"%> &nbsp;&nbsp;</b><%= @student.team.name(session[:ip]) %> &nbsp;&nbsp;&nbsp;
-    <%= link_to t(".edit_name"), :controller => 'student_teams', action: 'edit', team_id: @student.team.id, student_id: @student.id %>
   
   <% if @student.assignment.pair_programming_enabled? %>
     <% if Team.find(@student.team.id).pair_programming_request.nil? || Team.find(@student.team.id).pair_programming_request.zero? %>
@@ -39,6 +38,7 @@
       <% end %>
     <% end %>
   <% end %>
+    <%= link_to t(".edit_name"), controller: 'student_teams', action: 'edit', team_id: @student.team.id, student_id: @student.id %>
   <br/><br/>
   <b><%=t ".team_members"%></b>
   <br/><br/>

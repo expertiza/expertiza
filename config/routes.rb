@@ -624,6 +624,14 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :badges do
+    collection do
+      post :create
+      get :redirect_to_assignment
+      get :new
+    end
+  end
+
   resources :conference
   root to: 'content_pages#view', page_name: 'home'
   post :login, to: 'auth#login'

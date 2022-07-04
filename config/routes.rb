@@ -624,7 +624,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :badges_controller do
+  resources :badges do
     collection do
       post :create
       get :redirect_to_assignment

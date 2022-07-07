@@ -122,9 +122,9 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.boolean "is_answer_tagging_allowed"
     t.boolean "has_badge"
     t.boolean "allow_selecting_additional_reviews_after_1st_round"
-    t.boolean "vary_by_topic", default: false
-    t.boolean "vary_by_round", default: false
-    t.boolean "reviewer_is_team"
+    t.boolean "vary_by_topic?", default: false
+    t.boolean "vary_by_round?", default: false
+    t.boolean "team_reviewing_enabled?", default: false
     t.string "review_choosing_algorithm", default: "Simple Choose"
     t.boolean "is_conference_assignment", default: false
     t.boolean "auto_assign_mentor", default: false
@@ -481,7 +481,7 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean "calibrate_to", default: false
-    t.boolean "reviewer_is_team"
+    t.boolean "team_reviewing_enabled?", default: false
     t.index ["reviewer_id"], name: "fk_response_map_reviewer"
   end
 

@@ -8,7 +8,7 @@ class ReviewResponseMap < ResponseMap
   # ReviewResponseMap was created in so many places, I thought it best to add this here as a catch-all
   def after_initialize
     # If an assignment supports team reviews, it is marked in each mapping
-    assignment.reviewer_is_team
+    assignment.team_reviewing_enabled?
   end
 
   # Find a review questionnaire associated with this review response map's assignment
@@ -116,7 +116,7 @@ class ReviewResponseMap < ResponseMap
   # the assignment is used to determine if the reviewer is a participant or a team
   def self.get_reviewer_with_id(assignment_id, reviewer_id)
     assignment = Assignment.find(assignment_id)
-    if assignment.reviewer_is_team
+    if assignment.team_reviewing_enabled?
       return AssignmentTeam.find(reviewer_id)
     else
       return AssignmentParticipant.find(reviewer_id)
@@ -142,7 +142,7 @@ class ReviewResponseMap < ResponseMap
         @reviewers << ReviewResponseMap.get_reviewer_with_id(assignment.id, reviewer_id_from_response_map.reviewer_id)
       end
       # we sort the reviewer by name here, using whichever class it is an instance of
-      @reviewers = if assignment.reviewer_is_team
+      @reviewers = if assignment.team_reviewing_enabled?
                      Team.sort_by_name(@reviewers)
                    else
                      Participant.sort_by_name(@reviewers)
@@ -151,7 +151,7 @@ class ReviewResponseMap < ResponseMap
       # This is a search, so find reviewers by user's full name
       user_ids = User.select('DISTINCT id').where('fullname LIKE ?', '%' + review_user[:fullname] + '%')
       # E1973 - we use a separate query depending on if the reviewer is a team or participant
-      if assignment.reviewer_is_team
+      if assignment.team_reviewing_enabled?
         reviewer_participants = AssignmentTeam.where('id IN (?) and parent_id = ?', team_ids, assignment.id)
         @reviewers = []
         reviewer_participants.each do |participant|

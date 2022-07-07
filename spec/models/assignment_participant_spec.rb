@@ -30,7 +30,7 @@ describe AssignmentParticipant do
   describe '#get_reviewer' do
     context 'when the associated assignment is reviewed by his team' do
       it 'returns the team' do
-        allow(assignment).to receive(:reviewer_is_team).and_return(true)
+        allow(assignment).to receive(:team_reviewing_enabled?).and_return(true)
         allow(participant).to receive(:team).and_return(team)
         expect(participant.get_reviewer).to eq(team)
       end

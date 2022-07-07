@@ -1,6 +1,6 @@
 describe 'teams as reviewers' do
   before(:each) do
-    @assignment = create(:assignment, name: 'automatic review mapping test', max_team_size: 4, reviewer_is_team: true)
+    @assignment = create(:assignment, name: 'automatic review mapping test', max_team_size: 4, team_reviewing_enabled?: true)
     create(:assignment_node)
     create(:deadline_type, name: 'submission')
     review_type = create(:deadline_type, name: 'review')
@@ -23,7 +23,7 @@ describe 'teams as reviewers' do
       create :team_user, user: student, team: @team
     end
 
-    @assignment.reviewer_is_team = true
+    @assignment.team_reviewing_enabled? = true
     date1 = create(:assignment_due_date, due_at: Date.yesterday)
     date2 = create(:assignment_due_date, due_at: Date.tomorrow + 1, deadline_type: review_type)
     @assignment.due_dates = [date1, date2]

@@ -491,7 +491,7 @@ class Assignment < ApplicationRecord
     @questions = {}
     questionnaires = @assignment.questionnaires
     questionnaires.each do |questionnaire|
-      if @assignment.vary_by_round
+      if @assignment.vary_by_round?
         round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: @questionnaire.id).used_in_round
         questionnaire_symbol = round.nil? ? questionnaire.symbol : (questionnaire.symbol.to_s + round.to_s).to_sym
       else

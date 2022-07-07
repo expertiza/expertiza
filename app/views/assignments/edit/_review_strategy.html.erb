@@ -131,10 +131,10 @@
   </tr>
 
   <tr>
-    <td id='reviewer_is_team'>
-      <input name="assignment_form[assignment][reviewer_is_team]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][reviewer_is_team]', 'true', @assignment_form.assignment.reviewer_is_team) %>
-      <%= label_tag('assignment_form[assignment][reviewer_is_team]', 'Is Review done by Teams?') %>
+    <td id='team_reviewing_enabled?'>
+      <input name="assignment_form[assignment][team_reviewing_enabled?]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][team_reviewing_enabled?]', 'true', @assignment_form.assignment.team_reviewing_enabled?) %>
+      <%= label_tag('assignment_form[assignment][team_reviewing_enabled?]', 'Is Review done by Teams?') %>
       <img src="/assets/info.png" title='You can select whether the reviews should be done by individual students or teams'>
     </td>
   </tr>

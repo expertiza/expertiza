@@ -2,7 +2,7 @@ describe TeammateReviewResponseMap do
   let(:questionnaire) { Questionnaire.new name: 'abc', private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234 }
   let(:assignment_questionnaire1) { build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 2, duty_id: 1) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
-  let(:teammate_review_response_map) { TeammateReviewResponseMap.new reviewer: participant, reviewer_is_team: true, assignment: assignment }
+  let(:teammate_review_response_map) { TeammateReviewResponseMap.new reviewer: participant, team_reviewing_enabled?: true, assignment: assignment }
 
   let(:team) { build(:assignment_team, id: 1, name: 'team no name', assignment: assignment, users: [student], parent_id: 1) }
   let(:teammate_review_response_map1) { build(:teammate_review_response_map, id: 1, assignment: assignment1, reviewer: participant, reviewee: participant1) }

@@ -2,7 +2,7 @@
 
 ## Remote deployment server
 
-1. Install `rvm`
+1. Install `rvm`. Run `sudo ln -s /usr/share/rvm/ /usr/local/rvm` after successful rvm install.
 2. Install ruby version `2.6.6` using the `rvm`
 3. Install `mysql-server`
 4. Install `mysql-devel`

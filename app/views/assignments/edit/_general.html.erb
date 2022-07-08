@@ -95,9 +95,9 @@ function autogenerate_submission(){
   <tr>
     <td style='padding:5px' id='assignment_pair_programming_field'>
       <span id='assignment_pair_programming' class="form-inline"  <%= 'hidden' unless @assignment_form.assignment.team_assignment?%>>
-        <input name="assignment_form[assignment][pair_programming_enabled?]" type="hidden" value="false"/>
-        <%= check_box_tag('assignment_form[assignment][pair_programming_enabled?]', 'true', @assignment_form.assignment.pair_programming_enabled?) %>
-        <%= label_tag('assignment_form[assignment][pair_programming_enabled?]', 'Pair Programming?') %>
+        <input name="assignment_form[assignment][enable_pair_programming]" type="hidden" value="false"/>
+        <%= check_box_tag('assignment_form[assignment][enable_pair_programming]', 'true', @assignment_form.assignment.enable_pair_programming) %>
+        <%= label_tag('assignment_form[assignment][enable_pair_programming]', 'Pair Programming?') %>
       </span>
       <br>
     </td>
@@ -106,11 +106,11 @@ function autogenerate_submission(){
   <!-- E2115 Mentor Management -->
   <tr>
     <td style='padding:5px' id='assignment_auto_assign_mentor_field'>
-      <input name="assignment_form[assignment][auto_assign_mentor?]" type="hidden" value="false"/>
+      <input name="assignment_form[assignment][auto_assign_mentor]" type="hidden" value="false"/>
       <%= check_box_tag(
-            'assignment_form[assignment][auto_assign_mentor?]',
+            'assignment_form[assignment][auto_assign_mentor]',
             value='true',
-            checked=@assignment_form.assignment.auto_assign_mentor?
+            checked=@assignment_form.assignment.auto_assign_mentor
           ) %>
       <%= label_tag('auto_assign_mentor_label', 'Auto assign mentors when team hits > 50% capacity?') %>
     </td>
@@ -142,9 +142,9 @@ function autogenerate_submission(){
   <!--Conference-->
   <tr>
     <td style='padding:5px' id='assignment_is_conference_assignment_field' colspan="2">
-      <input name="assignment_form[assignment][conference_assignment?]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][conference_assignment?]', 'true', @assignment_form.assignment.conference_assignment?) %>
-      <%= label_tag('assignment_form[assignment][conference_assignment?]','Will this assignment be used to review papers for conference?') %>
+      <input name="assignment_form[assignment][is_conference_assignment]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][is_conference_assignment]', 'true', @assignment_form.assignment.is_conference_assignment) %>
+      <%= label_tag('assignment_form[assignment][is_conference_assignment]','Will this assignment be used to review papers for conference?') %>
     </td>
   </tr>
   <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
@@ -153,7 +153,7 @@ function autogenerate_submission(){
   </script>
   <tr>
     <% if current_page?(action: 'edit') %>
-      <% if @assignment_form.assignment.conference_assignment? %>
+      <% if @assignment_form.assignment.is_conference_assignment %>
         <%  url = polymorphic_url :conference, action: 'new',role: 'Student', assignment_id: @assignment.id %>
         <div>Link to join conference assignment:
           <%# <%= link_to conference_user_path(assignment_id: @assignment.id, role: 'Student')%> 

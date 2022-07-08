@@ -196,7 +196,7 @@ class UsersController < ApplicationController
 
   private
 
-  # add user etc_icons_on_homepage
+  # add user preference_home_flag
   def user_params
     params.require(:user).permit(:name,
                                  :crypted_password,
@@ -219,7 +219,7 @@ class UsersController < ApplicationController
                                  :public_key,
                                  :copy_of_emails,
                                  :institution_id,
-                                 :etc_icons_on_homepage)
+                                 :preference_home_flag)
   end
 
   # to find the role of a given user object and set the @role accordingly

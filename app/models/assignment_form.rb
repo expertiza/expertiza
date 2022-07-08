@@ -5,8 +5,8 @@ class AssignmentForm
                 :assignment_questionnaires,
                 :due_dates,
                 :tag_prompt_deployments,
-                :conference_assignment?,
-                :auto_assign_mentor?
+                :is_conference_assignment,
+                :auto_assign_mentor
 
   attr_accessor :errors
 

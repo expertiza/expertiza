@@ -11,13 +11,13 @@
   <%= render :partial => 'users/institutions' %>
   <%= render :partial => 'users/prefs' %>
   <p><strong><%=t ".action_pref"%></strong></p>
-
-
-  <%= check_box_tag(:no_show_action, 'not_show_actions', checked = @user.etc_icons_on_homepage) %>
-  <%= label_tag(:no_show_action, t(".homepage_cant")) %>  
-
+  <%# Create 2 radio button for user to select if show action button on their assignment home page%>
+  <%= radio_button_tag(:no_show_action, 'not_show_actions',checked = @user.preference_home_flag ? false : true) %>
+  <%= label_tag(:no_show_action, t(".homepage_cant")) %>
+  <%= radio_button_tag(:no_show_action, 'show_actions', checked = @user.preference_home_flag) %>
+  <%= label_tag(:no_show_action, t(".homepage_can")) %>
   <%= render :partial => 'handle' %>
-  <% unless @user.role.parent_id.nil? %>
+  <% if @user.role.parent_id != nil %>
     <%= render :partial => 'limit' %>
   <% end %>
   <p class="form-inline"><label class="width-266"><%=t ".preferred_time_zone"%>: </label>

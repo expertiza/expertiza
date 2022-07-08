@@ -619,7 +619,7 @@ class Assignment < ApplicationRecord
   end
 
   def pair_programming_enabled?
-    self.pair_programming_enabled?
+    self.enable_pair_programming
   end
 
   private

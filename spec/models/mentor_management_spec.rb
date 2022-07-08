@@ -3,7 +3,7 @@ describe MentorManagement do
   # this could also be accomplished with before(:each) and instance methods
   # but the rest of the code base makes use of let a lot, so this is consistent
   # with that, while achieving the same goal as before(:each)
-  let!(:assignment) { create(:assignment, id: 999, auto_assign_mentor?: true) }
+  let!(:assignment) { create(:assignment, id: 999, auto_assign_mentor: true) }
   let!(:ta) { create(:teaching_assistant, id: 999) }
   let!(:student1) { create(:student, id: 998) }
   let!(:student2) { create(:student, id: 997) }
@@ -22,7 +22,7 @@ describe MentorManagement do
   end
 
   describe '#update_mentor_state' do
-    it 'returns early if auto_assign_mentor? is false' do
+    it 'returns early if auto_assign_mentor is false' do
       no_mentor_assignment = FactoryBot.build(:assignment)
       allow(Assignment).to receive(:find).with(no_mentor_assignment.id).and_return(no_mentor_assignment)
       allow(Team).to receive(:find).with(team.id).and_return(team)

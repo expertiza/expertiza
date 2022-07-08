@@ -12,10 +12,6 @@ class ProfileController < ApplicationController
 
   def update
     @user = session[:user]
-    puts "\n\n\n"
-    puts params.inspect
-    puts "\n\n\n"
-
 
     unless params[:assignment_questionnaire].nil? || params[:assignment_questionnaire][:notification_limit].blank?
       aq = AssignmentQuestionnaire.where(['user_id = ? and assignment_id is null and questionnaire_id is null', @user.id]).first
@@ -23,7 +19,7 @@ class ProfileController < ApplicationController
     end
     if @user.update_attributes(user_params)
       ExpertizaLogger.info LoggerMessage.new(controller_name, @user.name, 'Your profile was successfully updated.', request)
-      # @user.etc_icons_on_homepage = params[:no_show_action] != 'not_show_actions'
+      @user.preference_home_flag = params[:no_show_action] != 'not_show_actions'
       @user.save!
       flash[:success] = 'Your profile was successfully updated.'
     else

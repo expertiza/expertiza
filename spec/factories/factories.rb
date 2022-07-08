@@ -221,7 +221,7 @@ FactoryBot.define do
     is_calibrated false
     has_badge false
     allow_selecting_additional_reviews_after_1st_round false
-    auto_assign_mentor? false
+    auto_assign_mentor false
   end
 
   factory :late_policy, class: LatePolicy do

@@ -27,7 +27,7 @@ class MentorManagement
   end
 
   # = Mentor Management
-  # E2115: Handles calls when an assignment has the auto_assign_mentor flag enabled and triggered by the event when a new member joins an assignment team.
+  # E2115: Handles calls when an assignment has the auto_assign_mentor? flag enabled and triggered by the event when a new member joins an assignment team.
   #
   # This event happens when:
   #   1.) An invited student user accepts and successfully added to a team from
@@ -46,7 +46,7 @@ class MentorManagement
 
     # RuboCop 'use guard clause instead of nested conditionals'
     # return if assignments can't accept mentors
-    return unless assignment.auto_assign_mentor
+    return unless assignment.auto_assign_mentor?
 
     # RuboCop 'use guard clause instead of nested conditionals'
     # return if the assignment or team already have a topic

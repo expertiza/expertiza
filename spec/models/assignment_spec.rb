@@ -719,8 +719,8 @@ describe Assignment do
   end
 
   describe '#pair_programming_enabled?' do
-    let(:assignment1) { build(:assignment, id: 1, name: 'assignment 1', enable_pair_programming: false) }
-    let(:assignment2) { build(:assignment, id: 2, name: 'assignment 2', enable_pair_programming: true) }
+    let(:assignment1) { build(:assignment, id: 1, name: 'assignment 1', pair_programming_enabled?: false) }
+    let(:assignment2) { build(:assignment, id: 2, name: 'assignment 2', pair_programming_enabled?: true) }
     context 'checks if pair_programming is enabled' do
       it 'returns false' do
         expect(assignment1.pair_programming_enabled?).to be_falsey

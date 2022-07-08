@@ -126,11 +126,11 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.boolean "vary_by_round?", default: false
     t.boolean "team_reviewing_enabled?", default: false
     t.string "review_choosing_algorithm", default: "Simple Choose"
-    t.boolean "is_conference_assignment", default: false
-    t.boolean "auto_assign_mentor", default: false
+    t.boolean "conference_assignment?", default: false
+    t.boolean "auto_assign_mentor?", default: false
     t.boolean "duty_based_assignment?"
     t.boolean "questionnaire_varies_by_duty"
-    t.boolean "enable_pair_programming"
+    t.boolean "pair_programming_enabled?", default: false
     t.index ["course_id"], name: "fk_assignments_courses"
     t.index ["instructor_id"], name: "fk_assignments_instructors"
     t.index ["late_policy_id"], name: "fk_late_policy_id"
@@ -759,7 +759,7 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.text "public_key", limit: 16777215
     t.boolean "copy_of_emails", default: false
     t.integer "institution_id"
-    t.boolean "preference_home_flag", default: true
+    t.boolean "etc_icons_on_homepage", default: true
     t.integer "locale", default: 0
     t.index ["role_id"], name: "fk_user_role_id"
   end

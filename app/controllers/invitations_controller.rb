@@ -88,7 +88,7 @@ class InvitationsController < ApplicationController
     # User/Author has information about the participant
     @student = AssignmentParticipant.find(params[:student_id])
     @assignment = Assignment.find(@student.parent_id)
-    @user ||= create_coauthor if @assignment.is_conference_assignment
+    @user ||= create_coauthor if @assignment.conference_assignment?
 
     return unless current_user_id?(@student.user_id)
 
@@ -105,7 +105,7 @@ class InvitationsController < ApplicationController
     @participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', @user.id, @student.parent_id).first
     # check if the user is a participant in the assignment
     unless @participant
-      if @assignment.is_conference_assignment
+      if @assignment.conference_assignment?
         add_participant_coauthor
       else
         flash[:error] = "The user \"#{params[:user][:name].strip}\" is not a participant in this assignment."

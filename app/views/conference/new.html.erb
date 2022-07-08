@@ -1,4 +1,4 @@
-<% if  @assignment.nil? || !@assignment.is_conference_assignment?%>
+<% if  @assignment.nil? || !@assignment.conference_assignment??%>
   <h1>New User</h1>
 <% else %>
   <h1>Conference User</h1>
@@ -11,7 +11,7 @@
   
 <div class="g-recaptcha" data-sitekey="6Lfb_uEZAAAAAOrVHOhLI7i2yewc3Fgr87IohvaH"></div>
 
-<% if @assignment.nil? || !@assignment.is_conference_assignment?%>
+<% if @assignment.nil? || !@assignment.conference_assignment??%>
     <%= submit_tag "Create" %>
   <% else%>
     <%= submit_tag "Join Conference" %>

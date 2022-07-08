@@ -60,7 +60,7 @@ describe 'Integration tests for instructor interface' do
       expect(page).to have_content('Action Preference')
       choose 'no_show_action_not_show_actions'
       click_button 'Save'
-      expect(User.where(name: 'instructor6').first.preference_home_flag).to eq(false)
+      expect(User.where(name: 'instructor6').first.etc_icons_on_homepage).to eq(false)
     end
   end
 

@@ -250,10 +250,9 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :profile, only: [] do
+  resources :profile do
     collection do
       get :edit
-      post :update
       patch :update
     end
   end

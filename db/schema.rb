@@ -759,7 +759,7 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.text "public_key", limit: 16777215
     t.boolean "copy_of_emails", default: false
     t.integer "institution_id"
-    t.boolean "etc_icons_at_homepage", default: true
+    t.boolean "etc_icons_on_homepage", default: true
     t.integer "locale", default: 0
     t.index ["role_id"], name: "fk_user_role_id"
   end

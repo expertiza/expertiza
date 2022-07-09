@@ -122,15 +122,15 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.boolean "is_answer_tagging_allowed"
     t.boolean "has_badge"
     t.boolean "allow_selecting_additional_reviews_after_1st_round"
-    t.boolean "vary_by_topic", default: false
-    t.boolean "vary_by_round", default: false
-    t.boolean "reviewer_is_team"
-    t.string "review_choosing_algorithm", default: "Simple Choose"
+    t.boolean "vary_by_topic?", default: false
+    t.boolean "vary_by_round?", default: false
+    t.boolean "team_reviewing_enabled", default: false
+    t.boolean "bidding_for_reviews_enabled", default: false
     t.boolean "is_conference_assignment", default: false
     t.boolean "auto_assign_mentor", default: false
     t.boolean "duty_based_assignment?"
     t.boolean "questionnaire_varies_by_duty"
-    t.boolean "enable_pair_programming"
+    t.boolean "enable_pair_programming", default: false
     t.index ["course_id"], name: "fk_assignments_courses"
     t.index ["instructor_id"], name: "fk_assignments_instructors"
     t.index ["late_policy_id"], name: "fk_late_policy_id"
@@ -481,7 +481,7 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean "calibrate_to", default: false
-    t.boolean "reviewer_is_team"
+    t.boolean "team_reviewing_enabled", default: false
     t.index ["reviewer_id"], name: "fk_response_map_reviewer"
   end
 
@@ -759,7 +759,7 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.text "public_key", limit: 16777215
     t.boolean "copy_of_emails", default: false
     t.integer "institution_id"
-    t.boolean "preference_home_flag", default: true
+    t.boolean "etc_icons_on_homepage", default: true
     t.integer "locale", default: 0
     t.index ["role_id"], name: "fk_user_role_id"
   end

@@ -62,7 +62,7 @@ class AssignmentForm
     end
     update_assignment(attributes[:assignment])
     update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
-    update_assignment_questionnaires(attributes[:topic_questionnaire]) unless @has_errors || attributes[:assignment][:vary_by_topic] == 'false'
+    update_assignment_questionnaires(attributes[:topic_questionnaire]) unless @has_errors || attributes[:assignment][:vary_by_topic?] == 'false'
     update_due_dates(attributes[:due_date], user) unless @has_errors
     update_assigned_badges(attributes[:badge], attributes[:assignment]) unless @has_errors
     add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck])
@@ -240,21 +240,21 @@ class AssignmentForm
         # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
         return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
       end
-    elsif @assignment.vary_by_round && @assignment.vary_by_topic
+    elsif @assignment.vary_by_round? && @assignment.vary_by_topic?
       # Get all AQs for the assignment and specified round number and topic
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number, topic_id: topic_id)
       assignment_questionnaires.each do |aq|
         # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
         return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
       end
-    elsif @assignment.vary_by_round
+    elsif @assignment.vary_by_round?
       # Get all AQs for the assignment and specified round number by round #
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number)
       assignment_questionnaires.each do |aq|
         # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
         return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
       end
-    elsif @assignment.vary_by_topic
+    elsif @assignment.vary_by_topic?
       # Get all AQs for the assignment and specified round number by topic
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, topic_id: topic_id)
       assignment_questionnaires.each do |aq|

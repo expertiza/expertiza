@@ -124,7 +124,7 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.boolean "allow_selecting_additional_reviews_after_1st_round"
     t.boolean "vary_by_topic", default: false
     t.boolean "vary_by_round", default: false
-    t.boolean "reviewer_is_team"
+    t.boolean "team_reviewing_enabled", default: false
     t.string "review_choosing_algorithm", default: "Simple Choose"
     t.boolean "is_conference_assignment", default: false
     t.boolean "auto_assign_mentor", default: false
@@ -481,7 +481,7 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean "calibrate_to", default: false
-    t.boolean "reviewer_is_team"
+    t.boolean "team_reviewing_enabled", default: false
     t.index ["reviewer_id"], name: "fk_response_map_reviewer"
   end
 
@@ -759,7 +759,7 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.text "public_key", limit: 16777215
     t.boolean "copy_of_emails", default: false
     t.integer "institution_id"
-    t.boolean "preference_home_flag", default: true
+    t.boolean "etc_icons_at_homepage", default: true
     t.integer "locale", default: 0
     t.index ["role_id"], name: "fk_user_role_id"
   end

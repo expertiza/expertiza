@@ -12,9 +12,9 @@
   <%= render :partial => 'users/prefs' %>
   <p><strong><%=t ".action_pref"%></strong></p>
   <%# Create 2 radio button for user to select if show action button on their assignment home page%>
-  <%= radio_button_tag(:no_show_action, 'not_show_actions',checked = @user.preference_home_flag ? false : true) %>
+  <%= radio_button_tag(:no_show_action, 'not_show_actions',checked = @user.etc_icons_at_homepage ? false : true) %>
   <%= label_tag(:no_show_action, t(".homepage_cant")) %>
-  <%= radio_button_tag(:no_show_action, 'show_actions', checked = @user.preference_home_flag) %>
+  <%= radio_button_tag(:no_show_action, 'show_actions', checked = @user.etc_icons_at_homepage) %>
   <%= label_tag(:no_show_action, t(".homepage_can")) %>
   <%= render :partial => 'handle' %>
   <% if @user.role.parent_id != nil %>

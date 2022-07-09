@@ -122,15 +122,15 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.boolean "is_answer_tagging_allowed"
     t.boolean "has_badge"
     t.boolean "allow_selecting_additional_reviews_after_1st_round"
-    t.boolean "vary_by_topic", default: false
-    t.boolean "vary_by_round", default: false
+    t.boolean "vary_by_topic?", default: false
+    t.boolean "vary_by_round?", default: false
     t.boolean "team_reviewing_enabled", default: false
     t.string "review_choosing_algorithm", default: "Simple Choose"
     t.boolean "is_conference_assignment", default: false
     t.boolean "auto_assign_mentor", default: false
     t.boolean "duty_based_assignment?"
     t.boolean "questionnaire_varies_by_duty"
-    t.boolean "enable_pair_programming"
+    t.boolean "enable_pair_programming", default: false
     t.index ["course_id"], name: "fk_assignments_courses"
     t.index ["instructor_id"], name: "fk_assignments_instructors"
     t.index ["late_policy_id"], name: "fk_late_policy_id"

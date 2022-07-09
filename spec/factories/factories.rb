@@ -199,8 +199,8 @@ FactoryBot.define do
     review_topic_threshold 0
     copy_flag false
     rounds_of_reviews 2
-    vary_by_round false
-    vary_by_topic false
+    vary_by_round? false
+    vary_by_topic? false
     microtask false
     require_quiz false
     num_quiz_questions 0

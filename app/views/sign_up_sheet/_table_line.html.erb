@@ -45,13 +45,13 @@
       <td align="center"><%= topic.micropayment %></td>
   <% end %>
 
-  <% if @assignment.vary_by_topic %>
+  <% if @assignment.vary_by_topic? %>
     <% table_id = "topic_questionnaire_table" + i.to_s %>
     <td>
       <table id = <%=table_id %>>
         <tr>
           <script>
-              <% if @assignment.vary_by_round %>
+              <% if @assignment.vary_by_round? %>
               <% 1.upto(@assignment.rounds_of_reviews) do |round| %>
               <% assignment_questionnaire = @assignment_form.assignment_questionnaire('ReviewQuestionnaire', round, topic.id) %>
               <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire') %>

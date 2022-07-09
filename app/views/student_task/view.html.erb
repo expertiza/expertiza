@@ -87,9 +87,9 @@ to display the label "Your team" in the student assignment tasks-->
         <font color="gray"><%= @alias_name%></font>
       <% elsif review_deadline?(@assignment) and (check_reviewable_topics(@assignment) or @assignment.metareview_allowed(nil) or @assignment.current_stage(@topic_id) == "Finished") %>
         <!--Determine what kind of review bidding needs to occur-->
-        <% if @assignment.review_choosing_algorithm == 'Bidding' and @assignment.can_choose_topic_to_review? %>
+        <% if @assignment.bidding_for_reviews_enabled and @assignment.can_choose_topic_to_review? %>
           <%= link_to "#{@alias_name}",{:controller => 'review_bids', :action => 'show', :id => @participant.id} %>
-        <% elsif @assignment.review_choosing_algorithm == 'Bidding'%>
+        <% elsif @assignment.bidding_for_reviews_enabled %>
           <%= link_to "#{@alias_name}",{:controller => 'review_bids', :action => 'index', :id => @participant.id} %>
         <%else%>
           <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>

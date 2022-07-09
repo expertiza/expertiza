@@ -125,7 +125,7 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.boolean "vary_by_topic?", default: false
     t.boolean "vary_by_round?", default: false
     t.boolean "team_reviewing_enabled", default: false
-    t.string "review_choosing_algorithm", default: "Simple Choose"
+    t.boolean "bidding_for_reviews_enabled", default: false
     t.boolean "is_conference_assignment", default: false
     t.boolean "auto_assign_mentor", default: false
     t.boolean "duty_based_assignment?"

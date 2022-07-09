@@ -57,7 +57,7 @@ class ResponseController < ApplicationController
   # E2218: Method to delete a response.
   def delete
     # The locking was added for E1973, team-based reviewing. See lock.rb for details
-    if @map.team_reviewing_enabled?
+    if @map.team_reviewing_enabled
       @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
       if @response.nil?
         response_lock_action
@@ -93,7 +93,7 @@ class ResponseController < ApplicationController
     end
     # Added for E1973, team-based reviewing
     @map = @response.map
-    if @map.team_reviewing_enabled?
+    if @map.team_reviewing_enabled
       @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
       if @response.nil?
         response_lock_action
@@ -119,7 +119,7 @@ class ResponseController < ApplicationController
     begin
       # the response to be updated
       # Locking functionality added for E1973, team-based reviewing
-      if @map.team_reviewing_enabled? && !Lock.lock_between?(@response, current_user)
+      if @map.team_reviewing_enabled && !Lock.lock_between?(@response, current_user)
         response_lock_action
         return
       end

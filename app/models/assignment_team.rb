@@ -62,7 +62,7 @@ class AssignmentTeam < Team
     assignment = Assignment.find(parent_id)
     raise 'The assignment cannot be found.' if assignment.nil?
 
-    ReviewResponseMap.create(reviewee_id: id, reviewer_id: reviewer.get_reviewer.id, reviewed_object_id: assignment.id, team_reviewing_enabled?: assignment.team_reviewing_enabled?)
+    ReviewResponseMap.create(reviewee_id: id, reviewer_id: reviewer.get_reviewer.id, reviewed_object_id: assignment.id, team_reviewing_enabled: assignment.team_reviewing_enabled)
   end
 
   # E-1973 If a team is being treated as a reviewer of an assignment, then they are the reviewer

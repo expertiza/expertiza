@@ -28,7 +28,7 @@ class StudentReviewController < ApplicationController
     if @participant.get_reviewer
       # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
-      @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.get_reviewer.id, team_reviewing_enabled?: @assignment.team_reviewing_enabled?)
+      @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.get_reviewer.id, team_reviewing_enabled: @assignment.team_reviewing_enabled)
     else
       @review_mappings = []
     end

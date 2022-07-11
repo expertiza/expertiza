@@ -47,7 +47,7 @@ class PopupController < ApplicationController
       # However, we want their user_id. This is not possible for teams, so we just return the current id
       reviewer_id = ResponseMap.find(params[:id2]).reviewer_id
       # E2060 - we had to change this if/else clause in order to properly view reports page
-      @reviewer_id = if @assignment.reviewer_is_team
+      @reviewer_id = if @assignment.team_reviewing_enabled
                        reviewer_id
                      else
                        Participant.find(reviewer_id).user_id
@@ -89,7 +89,7 @@ class PopupController < ApplicationController
     @reviews = []
 
     assignment = Assignment.find(@assignment_id)
-    flash.now[:error] = 'This report is not implemented for assignments where the rubric varies by topic.' if assignment.vary_by_topic
+    flash.now[:error] = 'This report is not implemented for assignments where the rubric varies by topic.' if assignment.vary_by_topic?
   end
 
   # this can be called from "response_report" by clicking reviewer names from instructor end.

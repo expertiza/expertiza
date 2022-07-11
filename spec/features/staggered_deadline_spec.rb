@@ -5,7 +5,7 @@ describe 'Staggered deadline test' do
            name: 'Assignment1665',
            directory_path: 'Assignment1665',
            rounds_of_reviews: 2,
-           vary_by_round: true,
+           vary_by_round?: true,
            staggered_deadline: true,
            max_team_size: 1,
            allow_selecting_additional_reviews_after_1st_round: true)

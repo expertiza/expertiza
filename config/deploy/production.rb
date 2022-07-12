@@ -8,6 +8,8 @@
 # server "db.example.com", user: "deploy", roles: %w{db}
 server 'expertiza.ncsu.edu', user: 'rails', roles: %w[web app]
 
+set :default_env, 'JAVA_HOME' => '/usr/lib/jvm/java-1.8.0-openjdk.x86_64'
+
 # role-based syntax
 # ==================
 

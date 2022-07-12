@@ -39,7 +39,7 @@
 
 <!--ACS Here we need to know the size of the team to decide whether or not
 to display the label "Your team" in the student assignment tasks-->
-  <%if @assignment.max_team_size > 1 %>
+  <%if @assignment.max_team_size > 0 %>
     <% if @authorization == 'participant' %>
       <li>
         <%= link_to t('.your_team'), view_student_teams_path(student_id: @participant.id) %>
@@ -49,22 +49,27 @@ to display the label "Your team" in the student assignment tasks-->
   <%end%>
 
   <!--Your work-->
-  <% if @authorization == 'participant' or @can_submit == true %>
+  <% if @authorization == 'participant' || @can_submit == true %>
     <li>
-      <% if @topics.size > 0 %>
-        <% if @topic_id and @assignment.submission_allowed(@topic_id) %>
-          <%= link_to t(".your_work"), :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> <%=t ".submit_work" %>
+      <% if @team %>
+        <% if @topics.size > 0 %>
+          <% if @topic_id && @assignment.submission_allowed(@topic_id) %>
+            <%= link_to t(".your_work"), :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> <%=t ".submit_work" %>
+          <% else %>
+            <!--if one team do not hold a topic (still in waitlist), they cannot submit their work.-->
+            <font color="gray"><%=t ".your_work" %></font> <%=t ".choose_topic" %>
+          <% end %>
         <% else %>
-          <!--if one team do not hold a topic (still in waitlist), they cannot submit their work.-->
-          <font color="gray"><%=t ".your_work" %></font> <%=t ".choose_topic" %>
+          <% if @assignment.submission_allowed(@topic_id) %>
+            <%= link_to t(".your_work"), :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> <%=t ".submit_work" %>
+          <% else %>
+            <font color="gray"><%=t ".your_work" %></font> <%=t ".not_allowed" %>
+          <% end %>
         <% end %>
       <% else %>
-        <% if @assignment.submission_allowed(@topic_id) %>
-          <%= link_to t(".your_work"), :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> <%=t ".submit_work" %>
-        <% else %>
-          <font color="gray"><%=t ".your_work" %></font> <%=t ".not_allowed" %>
-        <% end %>
-      <% end %>
+        <!-- Must be on a team to click "Your Work" -->
+        <font color="gray"><%=t ".your_work" %></font> <%=t ".not_allowed" %>
+      <% end%>
     </li>
   <% end %>
 
@@ -82,9 +87,9 @@ to display the label "Your team" in the student assignment tasks-->
         <font color="gray"><%= @alias_name%></font>
       <% elsif review_deadline?(@assignment) and (check_reviewable_topics(@assignment) or @assignment.metareview_allowed(nil) or @assignment.current_stage(@topic_id) == "Finished") %>
         <!--Determine what kind of review bidding needs to occur-->
-        <% if @assignment.review_choosing_algorithm == 'Bidding' and @assignment.can_choose_topic_to_review? %>
+        <% if @assignment.bidding_for_reviews_enabled and @assignment.can_choose_topic_to_review? %>
           <%= link_to "#{@alias_name}",{:controller => 'review_bids', :action => 'show', :id => @participant.id} %>
-        <% elsif @assignment.review_choosing_algorithm == 'Bidding'%>
+        <% elsif @assignment.bidding_for_reviews_enabled %>
           <%= link_to "#{@alias_name}",{:controller => 'review_bids', :action => 'index', :id => @participant.id} %>
         <%else%>
           <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>

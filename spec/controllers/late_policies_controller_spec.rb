@@ -77,7 +77,7 @@ describe LatePoliciesController do
         id: 1
       }
       delete :new, params: request_params
-      expect(get: 'late_policies/destroy/1').to route_to('late_policies#destroy', id: '1')
+      expect(response).to be_success
     end
   end
 

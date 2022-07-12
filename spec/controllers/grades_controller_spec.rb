@@ -19,6 +19,7 @@ describe GradesController do
   let(:review_response_map) { build(:review_response_map, id: 1) }
   let(:assignment_due_date) { build(:assignment_due_date) }
   let(:ta) { build(:teaching_assistant, id: 8) }
+  let(:late_policy) { build(:late_policy) }
   score_view_setup_query = '
   CREATE OR REPLACE VIEW score_views AS SELECT ques.weight question_weight,ques.type AS type,
       q1.id "q1_id",q1.NAME AS q1_name,q1.instructor_id AS q1_instructor_id,q1.private AS q1_private,
@@ -34,11 +35,13 @@ describe GradesController do
     allow(AssignmentParticipant).to receive(:find).with('3').and_return(participant3)
     allow(AssignmentParticipant).to receive(:find).with('4').and_return(participant4)
     allow(AssignmentParticipant).to receive(:find).with('5').and_return(participant5)
-
+    allow(AssignmentDueDate).to receive(:where).and_return([assignment_due_date])
     allow(participant).to receive(:team).and_return(team)
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
+    allow_any_instance_of(Assignment).to receive(:late_policy_id).and_return(1)
+    allow(controller).to receive(:calculate_penalty).and_return({ submission: 0, review: 0, meta_review: 0 })
   end
 
   describe '#view' do
@@ -52,7 +55,7 @@ describe GradesController do
 
     context 'when current assignment varies rubrics by round' do
       it 'retrieves questions, calculates scores and renders grades#view page' do
-        allow(assignment).to receive(:vary_by_round).and_return(true)
+        allow(assignment).to receive(:vary_by_round?).and_return(true)
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([assignment_questionnaire])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
         request_params = { id: 1 }
@@ -124,6 +127,7 @@ describe GradesController do
     context 'when view_team page is viewed by a student who is also a TA for another course' do
       it 'renders grades#view_team page' do
         allow(participant).to receive(:team).and_return(team)
+        allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
         allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])
         allow(assignment).to receive(:late_policy_id).and_return(false)

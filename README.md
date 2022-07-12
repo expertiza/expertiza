@@ -1,5 +1,3 @@
-E2168. Testing - reputations
-
 Expertiza
 =========
 
@@ -59,3 +57,11 @@ When editing existing files:
 
 Please do no go crazy changing old code to match these guidelines; it will just create lots of potential merge conflicts.
 Applying style guidelines to code you add and modify is good enough. :-)
+
+
+Instructions to get production database ssh into a computer running Expertiza, e.g., an NCSU VCL node. 
+ssh into expertiza.csc.ncsu.edu 
+On production server, run mysqldump -uroot -p --databases expertiza_production > dump.sql #exports database from production 
+On VCL, run sudo iptables -I INPUT -p TCP -s <IP_OF_PRODUCTION> -j ACCEPT #allows SCP requests 
+Run SCP to your VCL scp dump.sql <unity_id>@<VCL_IP>:/home/<unity_id> 
+mysql -uroot -p expertiza_development < dump.sql #loads database into production

@@ -12,7 +12,7 @@ describe ResponseController do
   let(:assignment_due_date) { build(:assignment_due_date) }
   let(:bookmark) { build(:bookmark) }
   let(:team_response) { build(:response, id: 2, map_id: 2) }
-  let(:team_response_map) { build(:review_response_map, id: 2, reviewer: participant, reviewer_is_team: true) }
+  let(:team_response_map) { build(:review_response_map, id: 2, reviewer: participant, team_reviewing_enabled: true) }
   let(:team_questionnaire) { build(:questionnaire, id: 2) }
   let(:team_assignment) { build(:assignment, id: 2) }
   let(:assignment_team) { build(:assignment_team, id: 1) }

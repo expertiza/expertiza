@@ -1,23 +1,5 @@
 <script>
 
-function teamAssignmentChanged() {
-  var msg = 'Warning! Unchecking this box will hide teams that already exist.'
-
-  if (jQuery('#assignment_team_assignment').is(':checked')) {
-    jQuery('#assignment_team_count_field').removeAttr('hidden');
-     <% if due_date(@assignment_form.assignment, 'team_formation') %>
-      addDueDateTableElement('team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>)
-     <% end %>
-  } else {
-    if (confirm(msg)) {
-      jQuery('#assignment_team_count_field').attr('hidden', true);
-      removeDueDateTableElement('team_formation', 0);
-    } else {
-      jQuery('#assignment_team_assignment').prop('checked', true);
-    }
-  }
-}
-
 function microtaskChanged() {
   if (jQuery('#assignment_microtask').is(':checked')) {
 
@@ -92,12 +74,7 @@ function autogenerate_submission(){
 
   <tr>
     <td style='padding:5px' id='assignment_team_assignment_field'>
-
       <div class="form-inline">
-        <%= check_box_tag('team_assignment', 'true', @assignment_form.assignment.team_assignment?, {:onChange => 'hasTeamsChanged()'}) %>
-        <% @assignment_form.assignment.max_team_size %>
-        <%= label_tag('team_assignment', 'Has teams?') %>
-
         <span style='padding:5px' class="form-inline" id='assignment_team_count_field' <%= 'hidden' unless @assignment_form.assignment.team_assignment?%>>
           <!--Teammate reviews fields-->
           <input name="assignment_form[assignment][show_teammate_reviews]" type="hidden" value="false"/>
@@ -105,7 +82,7 @@ function autogenerate_submission(){
           <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:50px;', class: 'form-control'}) %>
         </span>
       </div>
-      <span id='assignment_show_teammate_reviews' class="form-inline"  <%= 'hidden' unless @assignment_form.assignment.team_assignment?%>>
+      <span id='assignment_show_teammate_reviews' class="form-inline" <%= 'hidden' unless @assignment_form.assignment.team_assignment?%>>
         <%= check_box_tag('assignment_form[assignment][show_teammate_reviews]', 'true', @assignment_form.assignment.show_teammate_reviews) %>
         <%= label_tag('assignment_form[assignment][show_teammate_reviews]', 'Show teammate reviews?') %>
       </span>
@@ -123,6 +100,7 @@ function autogenerate_submission(){
         <%= label_tag('assignment_form[assignment][enable_pair_programming]', 'Pair Programming?') %>
       </span>
       <br>
+    </td>
   </tr>
 
   <!-- E2115 Mentor Management -->
@@ -149,6 +127,15 @@ function autogenerate_submission(){
     <td style='padding:5px' id='assignment_numbers_of_quiz_field' <%= 'hidden' unless @assignment_form.assignment.require_quiz %>>
       <%= label_tag('assignment_form[assignment][num_quiz_questions]', 'Number of Quiz questions:') %>
       <%= text_field_tag('assignment_form[assignment][num_quiz_questions]', @assignment_form.assignment.num_quiz_questions, { :style => 'width:20px'}) %>
+    </td>
+  </tr>
+
+  <!--Badge-->
+  <tr>
+    <td style='padding:5px' id='assignment_has_badge_field'>
+      <input name="assignment_form[assignment][has_badge]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][has_badge]', 'true', @assignment_form.assignment.has_badge) %>
+      <%= label_tag('assignment_form[assignment][has_badge]', 'Has badge?') %>
     </td>
   </tr>
 
@@ -314,48 +301,6 @@ function autogenerate_submission(){
         }
     }
     <% end %>
-
-    <!-- Violation of DRY principle, adds input field and handles checkboxes hidden states in other views -->
-    function hasTeamsChanged() {
-        var msg = 'Warning! Unchecking this box will hide teams that already exist.';
-        var checkbox = jQuery('#team_assignment');
-        var team_count_field = jQuery('#assignment_team_count_field');
-        var teammate_reviews_field = jQuery('#assignment_show_teammate_reviews');
-        var team_formation_due_date_checkbox = jQuery('#team_formation_due_date_checkbox');
-        var autoAssignMentorCheckbox = jQuery('#auto_assign_mentor_checkbox');
-        var pair_programming_field = jQuery('#assignment_pair_programming');
-
-        jQuery("#questionnaire_table_TeammateReviewQuestionnaire").remove()
-        if (checkbox.is(':checked')) {
-            team_count_field.removeAttr('hidden');
-            team_formation_due_date_checkbox.removeAttr('hidden')
-            jQuery('#assignment_form_assignment_max_team_size').val('2');
-            teammate_reviews_field.removeAttr('hidden');
-            pair_programming_field.removeAttr('hidden');
-            // E2115 hide auto assign mentor checkbox when an
-            // an assignment does not have teams
-            // what would the mentor be assigned to if there are no teams?
-            autoAssignMentorCheckbox.hide();
-            addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
-        } else {
-            if (confirm(msg)) {
-              team_count_field.attr('hidden', true);
-              team_formation_due_date_checkbox.attr('hidden', true)
-              teammate_reviews_field.attr('hidden', true);
-              pair_programming_field.attr('hidden',true);
-              // E2115 show auto assign mentor checkbox when an
-              // an assignment has teams
-              autoAssignMentorCheckbox.show();
-              document.getElementById('assignment_form_assignment_max_team_size').value = '1';
-              removeDueDateTableElement('team_formation', 0);
-            } else {
-              checkbox.prop('checked', true);
-            }
-            if (<%= !@assignment_form.assignment.team_assignment?%>){
-              team_count_field.attr('hidden', true);
-            }
-          } 
-    }
 
     function staggeredDeadlineChanged() {
       var msg = 'Warning! Unchecking all topics for this assignment will now have the same deadline.'

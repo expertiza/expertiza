@@ -19,7 +19,7 @@ class ProfileController < ApplicationController
     end
     if @user.update_attributes(user_params)
       ExpertizaLogger.info LoggerMessage.new(controller_name, @user.name, 'Your profile was successfully updated.', request)
-      @user.preference_home_flag = params[:no_show_action] != 'not_show_actions'
+      @user.etc_icons_on_homepage = params[:no_show_action] != 'not_show_actions'
       @user.save!
       flash[:success] = 'Your profile was successfully updated.'
     else

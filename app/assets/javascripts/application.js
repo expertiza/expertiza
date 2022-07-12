@@ -14,11 +14,9 @@
 //= require react_ujs
 //= require components
 //= require jquery
-//= require bootstrap-sass/assets/javascripts/bootstrap-sprockets
 //= require jquery_ujs
 //= require jquery-colorbox
 //= require jquery.colorbox
-//= require tinymce-jquery
 //= require jquery.datetimepicker
 //= require jquery.datetimepicker/init
 //= require hoverIntent

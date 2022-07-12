@@ -539,6 +539,7 @@ describe SignUpSheetController do
         context 'when creating team related objects successfully' do
           it 'shows a flash success message and redirects to assignment#edit page' do
             allow(SignedUpTeam).to receive(:find_team_users).with('1', 8).and_return([team])
+            allow(Team).to receive(:find).and_return(team)
             allow(team).to receive(:t_id).and_return(1)
             allow(TeamsUser).to receive(:team_id).with('1', 8).and_return(1)
             allow(SignedUpTeam).to receive(:topic_id).with('1', 8).and_return(1)

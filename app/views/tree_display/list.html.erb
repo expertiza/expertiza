@@ -5,5 +5,5 @@
 <%# associated with current logged in user %>
 <%# done to make it available in the frontend %>
 <%# pass the user_preference_flag to tree_display.jsx %>
-<div id="tree_display" params="#{@reactjsParams}" data-user-id="<%= current_user.id %>" data-user-show="<%= current_user.preference_home_flag %>" data-menu-item= '<%= "#{@currCtlr}" %>'></div>
+<div id="tree_display" params="#{@reactjsParams}" data-user-id="<%= current_user.id %>" data-user-show="<%= current_user.etc_icons_on_homepage %>" data-menu-item= '<%= "#{@currCtlr}" %>'></div>
 

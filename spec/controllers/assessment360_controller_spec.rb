@@ -240,6 +240,8 @@ describe Assessment360Controller do
       end
 
       it 'has participants, next assignment participant exists, but team id exists and maps are nil' do
+        allow(Participant).to receive(:find_by).and_return(participant)
+        allow(controller).to receive(:calculate_penalty).and_return({ submission: 0, review: 0, meta_review: 0 })
         allow(course).to receive(:assignments).and_return(assignment_with_participants_list)
         allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
         allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
@@ -268,6 +270,8 @@ describe Assessment360Controller do
       end
 
       it 'has participants, next assignment participant exists, but team id exists and maps are not nil' do
+        allow(Participant).to receive(:find_by).and_return(participant)
+        allow(controller).to receive(:calculate_penalty).and_return({ submission: 0, review: 0, meta_review: 0 })
         allow(course).to receive(:assignments).and_return(assignment_with_participants_list)
         allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
         allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
@@ -356,6 +360,8 @@ describe Assessment360Controller do
       end
 
       it 'has participants, has team id' do
+        allow(Participant).to receive(:find_by).and_return(participant)
+        allow(controller).to receive(:calculate_penalty).and_return({ submission: 0, review: 0, meta_review: 0 })
         allow(course).to receive(:assignments).and_return(assignment_with_participants_list)
         allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
         allow(course).to receive(:get_participants).and_return([course_participant]) # has participants

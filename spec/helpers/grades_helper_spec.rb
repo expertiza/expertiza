@@ -6,9 +6,9 @@ describe GradesHelper, type: :helper do
   let(:team) { build(:assignment_team, id: 1) }
   let(:assignment_participant) { build(:participant, id: 1, assignment: assignment) }
   let(:viewgrid_participant) { build(:participant, id: 2, assignment: assignment_for_viewgrid) }
-  let(:assignment) { build(:assignment, id: 1, max_team_size: 1, questionnaires: questionnaires, late_policy_id: 1, is_penalty_calculated: true, rounds_of_reviews: 1, vary_by_round: true) }
-  let(:assignment_for_penalty) { build(:assignment, id: 4, max_team_size: 1, questionnaires: questionnaires, late_policy_id: 1, is_penalty_calculated: false, rounds_of_reviews: 1, vary_by_round: true) }
-  let(:assignment_for_viewgrid) { build(:assignment, id: 5, max_team_size: 1, questionnaires: [questionnaire3], late_policy_id: 1, is_penalty_calculated: false, rounds_of_reviews: 1, vary_by_round: false) }
+  let(:assignment) { build(:assignment, id: 1, max_team_size: 1, questionnaires: questionnaires, late_policy_id: 1, is_penalty_calculated: true, rounds_of_reviews: 1, vary_by_round?: true) }
+  let(:assignment_for_penalty) { build(:assignment, id: 4, max_team_size: 1, questionnaires: questionnaires, late_policy_id: 1, is_penalty_calculated: false, rounds_of_reviews: 1, vary_by_round?: true) }
+  let(:assignment_for_viewgrid) { build(:assignment, id: 5, max_team_size: 1, questionnaires: [questionnaire3], late_policy_id: 1, is_penalty_calculated: false, rounds_of_reviews: 1, vary_by_round?: false) }
   let(:single_assignment) { build(:assignment, id: 1, max_team_size: 1, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
   let(:team_assignment) { build(:assignment, id: 2, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
   let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }

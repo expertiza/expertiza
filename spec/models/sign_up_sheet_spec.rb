@@ -59,6 +59,11 @@ describe SignUpSheet do
 end
 
 describe '.confirm_topic' do
+  before(:each) do
+    allow(SignedUpTeam).to receive(:find_team_users).and_return([TeamsUser.new])
+    allow_any_instance_of(TeamsUser).to receive(:t_id).and_return(1)
+    allow(Team).to receive(:find).and_return(Team.new)
+  end  
   it 'create SignedUpTeam' do
     allow(SignUpTopic).to receive(:slotAvailable?) { true }
     expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be(false)
@@ -88,11 +93,11 @@ describe '.confirm_topic' do
     user_signup = SignedUpTeam.new
     user_signup.is_waitlisted = true
     allow(SignUpSheet).to receive(:update_attribute) { [user_signup] }
-    allow(SignedUpTeam).to receive(:where) { user_signup }
+    allow(SignedUpTeam).to receive(:where) { [user_signup] }
     allow(user_signup).to receive(:first) { user_signup }
     allow(user_signup).to receive(:update_attribute)
     allow(SignUpSheet).to receive(:otherConfirmedTopicforUser) { [user_signup] }
-    expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be(true)
+    expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be(false)
   end
 end
 

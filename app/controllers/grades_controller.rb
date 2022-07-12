@@ -38,7 +38,7 @@ class GradesController < ApplicationController
   def view
     @assignment = Assignment.find(params[:id])
     questionnaires = @assignment.questionnaires
-    if @assignment.vary_by_round
+    if @assignment.vary_by_round?
       @questions = retrieve_questions questionnaires, @assignment.id
     else
       @questions = {}
@@ -85,13 +85,13 @@ class GradesController < ApplicationController
     questionnaires = @assignment.questionnaires
     @questions = retrieve_questions(questionnaires, @assignment.id)
     @pscore = participant_scores(@participant, @questions)
-
+    @penalties = calculate_penalty(@participant.id)
     @vmlist = []
 
     counter_for_same_rubric = 0
     questionnaires.each do |questionnaire|
       @round = nil
-      if @assignment.vary_by_round && questionnaire.type == 'ReviewQuestionnaire'
+      if @assignment.vary_by_round? && questionnaire.type == 'ReviewQuestionnaire'
         questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
         if questionnaires.count > 1
           @round = questionnaires[counter_for_same_rubric].used_in_round
@@ -193,7 +193,7 @@ class GradesController < ApplicationController
     vmquestions = questionnaire.questions
     vm.add_questions(vmquestions)
     vm.add_team_members(@team)
-    vm.add_reviews(@participant, @team, @assignment.vary_by_round)
+    vm.add_reviews(@participant, @team, @assignment.vary_by_round?)
     vm.calculate_metrics
     vm
   end
@@ -232,7 +232,7 @@ class GradesController < ApplicationController
     participant_score_types = %i[metareview feedback teammate]
     if @pscore[:review]
       scores = []
-      if @assignment.vary_by_round
+      if @assignment.vary_by_round?
         (1..@assignment.rounds_of_reviews).each do |round|
           responses = @pscore[:review][:assessments].select { |response| response.round == round }
           scores = scores.concat(score_vector(responses, 'review' + round.to_s))

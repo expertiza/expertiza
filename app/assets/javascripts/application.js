@@ -272,9 +272,11 @@ Files I've removed for which I couldn't find any use:
   3.  awesomplete
   4.  bootstrap-sass/assets/javascripts/bootstrap-sprockets
   5.  tinymce-jquery
-If at any point of time the application does not renders reqyured page correctly, open the console and see if the above files 
-are what causing the error. If that is the case, add as follows at the requires on the top of page.
-*/
-//= require filename
+  6.  awesome_input
+If at any point of time the application does not renders required page correctly, open the console and see if the above files 
+are what causing the error. I might have also messed up the ordering of the files listed above (they are processed in top to down
+. If that is the case, update the ordering and/or add as follows at the requires on the top of page.
+"//= require filename"
 
-// Naman Shrimali <namanshrimali@gmail.com>
+Naman Shrimali <namanshrimali@gmail.com>
+*/

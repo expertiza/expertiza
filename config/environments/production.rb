@@ -21,7 +21,7 @@ Expertiza::Application.configure do
   # config.action_dispatch.rack_cache = true
 
   # Disable Rails's static file server (Apache or nginx will already do this).
-  config.serve_static_files = false
+  config.public_file_server.enabled = false
 
   # Compress JavaScripts and CSS.
   config.assets.js_compressor = :uglifier
@@ -40,8 +40,10 @@ Expertiza::Application.configure do
   # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for apache
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
 
-  # Enable serving of images, stylesheets, and javascripts from an asset server
-  # config.action_controller.asset_host = "http://assets.example.com"
+  # Use a real queuing backend for Active Job (and separate queues per environment)
+  # config.active_job.queue_adapter     = :resque
+  # config.active_job.queue_name_prefix = "railsdiff_#{Rails.env}"
+  config.action_mailer.perform_caching = false
 
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false
@@ -60,6 +62,7 @@ Expertiza::Application.configure do
 
   # Use a different logger for distributed setups.
   # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
+  config.log_tags = [ :request_id ]
 
   # Use a different cache store in production.
   config.cache_store = :redis_store, 'redis://localhost:6379/0/cache', { raise_errors: false }
@@ -87,6 +90,15 @@ Expertiza::Application.configure do
 
   # Use default logging formatter so that PID and timestamp are not suppressed.
   config.log_tags = %i[remote_ip uuid]
+  # Use a different logger for distributed setups.
+  # require 'syslog/logger'
+  # config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new 'app-name')
+
+  if ENV["RAILS_LOG_TO_STDOUT"].present?
+    logger           = ActiveSupport::Logger.new(STDOUT)
+    logger.formatter = config.log_formatter
+    config.logger    = ActiveSupport::TaggedLogging.new(logger)
+  end
 
   config.log_formatter = proc do |s, ts, pg, msg|
     if msg.is_a?(LoggerMessage)

@@ -1,4 +1,4 @@
-require File.expand_path('boot', __dir__)
+require_relative 'boot'
 require 'net/https'
 require 'csv'
 require 'rails/all'
@@ -9,6 +9,7 @@ Bundler.require(*Rails.groups)
 
 module Expertiza
   class Application < Rails::Application
+    config.load_defaults 5.2
     # This is a logger to capture internal server errors that do not show up when testing javascript. Look in log/diagnostic.txt when there is a 500 error.
     if Rails.env == 'test'
       require File.expand_path('diagnostic.rb', __dir__)

@@ -1,18 +1,19 @@
 source 'https://rubygems.org'
 
-ruby '2.3.1'
+ruby '2.7.3'
 
-gem 'rails', '= 5.1.0.rc2'
+gem 'rails', '~> 5.2'
 
 ## Gems in Alphabetical Order
-gem 'actionpack', '5.1.0.rc2'
-gem 'activerecord', '5.1.0.rc2'
+gem 'actionpack', '~> 5.2.1.rc1'
+gem 'activerecord', '~> 5.2.1.rc1'
 gem 'activerecord-session_store', '1.1.3'
-gem 'activesupport', '5.1.0.rc2'
+gem 'activesupport', '~> 5.2.1.rc1'
 gem 'airbrake', '5.2.0'
 gem 'authlogic', '4.5.0'
 gem 'awesome_nested_set', '3.3.1'
 # gem 'bind-it'
+gem 'bigdecimal', '1.4.2'
 gem 'bootstrap3-datetimepicker-rails', '~> 4.17.47'
 gem 'bullet', '~> 5.7.6'
 gem 'capistrano'
@@ -36,6 +37,7 @@ gem 'font-awesome-rails'
 gem 'foreman'
 gem 'gchartrb', require: 'google_chart'
 gem 'gdata', require: false
+gem 'google-protobuf', '~> 3.17.3'
 gem 'haml-rails'
 gem 'jquery-colorbox-rails'
 gem 'jquery-datetimepicker-rails'
@@ -81,8 +83,9 @@ gem 'tinymce-rails'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
-gem 'railties', '5.1.0.rc2'
+gem 'railties', '~> 5.1'
 gem 'redis-actionpack', '5.0.1'
+gem 'scanf'
 
 group :development do
   gem 'daemons'
@@ -94,7 +97,6 @@ group :development do
 end
 
 group :test do
-  gem 'capybara'
   gem 'database_cleaner'
   gem "factory_bot_rails", '4.8.2'
   gem 'geckodriver-helper', '~> 0.0.3'
@@ -105,7 +107,6 @@ group :test do
   gem 'rspec-rails', '4.1.2'
   gem 'rails-controller-testing'
   gem 'puma'
-  gem 'selenium-webdriver'
   gem 'shoulda'
 end
 

@@ -10,31 +10,9 @@
 // WARNING: THE FIRST BLANK LINE MARKS THE END OF WHAT'S TO BE PROCESSED, ANY BLANK LINE SHOULD
 // GO AFTER THE REQUIRES BELOW.
 //
-//= require react
-//= require react_ujs
-//= require components
-//= require jquery
-//= require jquery_ujs
-//= require jquery-colorbox
-//= require jquery.colorbox
-//= require jquery.datetimepicker
-//= require jquery.datetimepicker/init
-//= require hoverIntent
-//= require superfish
-//= require jquery.ui.all
-//= require react-simpletabs
-//= require sisyphus
-//= require awesomplete
 //= require_self
 //= require_tree .
-//= require jquery.datetimepicker
-//= require jquery-tablesorter
-//= require awesome_input
-//= require jquery-bar-rating/jquery.barrating
-//= require Chart.min
-//= require moment
-//= require bootstrap-datetimepicker
-// Eliminate the “element.dispatchEvent is not a function” error
+
 jQuery.noConflict();
 
 function capitalize(str) {

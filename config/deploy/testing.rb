@@ -6,8 +6,8 @@
 # server "example.com", user: "deploy", roles: %w{app db web}, my_property: :my_value
 # server "example.com", user: "deploy", roles: %w{app web}, other_property: :other_value
 # server "db.example.com", user: "deploy", roles: %w{db}
-server '152.7.98.236', user: 'cterse', roles: %w[web app], my_property: :my_value
-# server '152.7.99.157', user: 'cterse', roles: %w[web app], my_property: :my_value
+server '152.7.98.99', user: 'nshrima', roles: %w[web app], my_property: :my_value
+# server '152.7.99.157', user: 'nshrima', roles: %w[web app], my_property: :my_value
 
 set :default_env, 'JAVA_HOME' => '/usr/lib/jvm/java-8-oracle'
 set :branch, 'main'
@@ -24,12 +24,12 @@ set :rvm_ruby_version, '2.3.1'
 # role :app, %w{deploy@example.com}, my_property: :my_value
 # role :web, %w{user1@primary.com user2@additional.com}, other_property: :other_value
 # role :db,  %w{deploy@example.com}
-role :app, %w[cterse@152.7.98.236]
-role :web, %w[cterse@152.7.98.236]
-role :db,  %w[cterse@152.7.98.236]
-# role :app, %w[cterse@152.7.99.157]
-# role :web, %w[cterse@152.7.99.157]
-# role :db,  %w[cterse@152.7.99.157]
+role :app, %w[nshrima@152.7.98.99]
+role :web, %w[nshrima@152.7.98.99]
+role :db,  %w[nshrima@152.7.98.99]
+# role :app, %w[nshrima@152.7.99.157]
+# role :web, %w[nshrima@152.7.99.157]
+# role :db,  %w[nshrima@152.7.99.157]
 
 # Configuration
 # =============

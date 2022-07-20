@@ -12,7 +12,6 @@
 //
 //= require components
 //= require jquery
-//= require jquery-bar-rating/jquery.barrating
 //= require jquery-colorbox
 //= require jquery.colorbox
 //= require jquery.datetimepicker
@@ -273,6 +272,7 @@ Files I've removed for which I couldn't find any use:
   4.  bootstrap-sass/assets/javascripts/bootstrap-sprockets
   5.  tinymce-jquery
   6.  awesome_input
+  7.  jquery-bar-rating/jquery.barrating
 If at any point of time the application does not renders required page correctly, open the console and see if the above files 
 are what causing the error. I might have also messed up the ordering of the files listed above (they are processed in top to down
 . If that is the case, update the ordering and/or add as follows at the requires on the top of page.

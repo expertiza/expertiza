@@ -83,6 +83,7 @@ gem 'will_paginate'
 gem 'zip-zip'
 gem 'railties', '5.1.0.rc2'
 gem 'redis-actionpack', '5.0.1'
+gem 'capistrano-bower', '~> 1.1'
 
 group :development do
   gem 'daemons'

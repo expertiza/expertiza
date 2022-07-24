@@ -16,6 +16,7 @@ gem 'awesome_nested_set', '3.3.1'
 gem 'bootstrap3-datetimepicker-rails', '~> 4.17.47'
 gem 'bullet', '~> 5.7.6'
 gem 'capistrano'
+gem 'capistrano-bower', '~> 1.1'
 gem 'capistrano-bundler'
 gem 'capistrano-db-tasks', require: false
 # https://www.phusionpassenger.com/library/deploy/apache/automating_app_updates/ruby/

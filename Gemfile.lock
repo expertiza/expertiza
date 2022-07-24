@@ -103,6 +103,8 @@ GEM
       i18n
       rake (>= 10.0.0)
       sshkit (>= 1.9.0)
+    capistrano-bower (1.1.0)
+      capistrano (~> 3.0)
     capistrano-bundler (2.0.1)
       capistrano (~> 3.1)
     capistrano-db-tasks (0.6)
@@ -539,8 +541,6 @@ GEM
     timecop (0.9.5)
     tins (1.31.0)
       sync
-    tinymce-rails (5.10.3)
-      railties (>= 3.1.1)
     tzinfo (1.2.9)
       thread_safe (~> 0.1)
     unf (0.1.4)
@@ -573,6 +573,7 @@ DEPENDENCIES
   bootstrap3-datetimepicker-rails (~> 4.17.47)
   bullet (~> 5.7.6)
   capistrano
+  capistrano-bower (~> 1.1)
   capistrano-bundler
   capistrano-db-tasks
   capistrano-passenger
@@ -647,12 +648,10 @@ DEPENDENCIES
   shoulda-matchers
   sidekiq
   simplecov
-  sprockets
   superfish-rails
   therubyracer
   thin
   timecop
-  tinymce-rails
   will_paginate
   zip-zip
 

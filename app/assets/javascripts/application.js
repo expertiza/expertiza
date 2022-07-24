@@ -12,8 +12,8 @@
 //
 //= require components
 //= require jquery
+//= require jquery-bar-rating/jquery.barrating
 //= require jquery-colorbox
-//= require jquery.colorbox
 //= require jquery.datetimepicker
 //= require jquery.datetimepicker/init
 //= require jquery-tablesorter
@@ -28,6 +28,10 @@
 //= require Chart.min
 //= require moment
 //= require bootstrap-datetimepicker
+//= require awesome_input
+//= require hoverIntent
+//= require superfish
+//= require awesomplete
 // Eliminate the “element.dispatchEvent is not a function” error
 
 jQuery.noConflict();
@@ -265,14 +269,9 @@ function show_alert(alertMessage){
 
 
 /*
-Files I've removed for which I couldn't find any use:
-  1.  hoverIntent
-  2.  superfish
-  3.  awesomplete
-  4.  bootstrap-sass/assets/javascripts/bootstrap-sprockets
-  5.  tinymce-jquery
-  6.  awesome_input
-  7.  jquery-bar-rating/jquery.barrating
+Files I've removed for which I couldn't find any use:  
+  1.  bootstrap-sass/assets/javascripts/bootstrap-sprockets
+  2.  tinymce-jquery
 If at any point of time the application does not renders required page correctly, open the console and see if the above files 
 are what causing the error. I might have also messed up the ordering of the files listed above (they are processed in top to down
 . If that is the case, update the ordering and/or add as follows at the requires on the top of page.

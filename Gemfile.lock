@@ -543,8 +543,6 @@ GEM
       railties (>= 3.1.1)
     tzinfo (1.2.9)
       thread_safe (~> 0.1)
-    uglifier (4.2.0)
-      execjs (>= 0.3.0, < 3)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.8.1)
@@ -655,7 +653,6 @@ DEPENDENCIES
   thin
   timecop
   tinymce-rails
-  uglifier
   will_paginate
   zip-zip
 
@@ -663,4 +660,4 @@ RUBY VERSION
    ruby 2.3.1p112
 
 BUNDLED WITH
-   1.17.3
+   2.3.18

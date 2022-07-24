@@ -17,7 +17,7 @@ Expertiza::Application.configure do
   config.action_controller.perform_caching = false
   # config.active_record.whitelist_attributes = false # need protected_attributes gem
 
-  config.assets.js_compressor = Uglifier.new(harmony: true)
+  config.assets.js_compressor = Uglifier.new(:harmony => true)
 
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = true

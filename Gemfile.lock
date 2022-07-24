@@ -541,8 +541,12 @@ GEM
     timecop (0.9.5)
     tins (1.31.0)
       sync
+    tinymce-rails (6.1.0)
+      railties (>= 3.1.1)
     tzinfo (1.2.9)
       thread_safe (~> 0.1)
+    uglifier (4.2.0)
+      execjs (>= 0.3.0, < 3)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.8.1)
@@ -648,10 +652,13 @@ DEPENDENCIES
   shoulda-matchers
   sidekiq
   simplecov
+  sprockets
   superfish-rails
   therubyracer
   thin
   timecop
+  tinymce-rails
+  uglifier
   will_paginate
   zip-zip
 

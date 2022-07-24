@@ -17,7 +17,7 @@ Expertiza::Application.configure do
   config.static_cache_control = 'public, max-age=3600'
 
   # Compress JavaScripts and CSS.
-  config.assets.js_compressor = Uglifier.new(harmony: true)
+  # config.assets.js_compressor = Uglifier.new(harmony: true)
   
 
   # Show full error reports and disable caching.

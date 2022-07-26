@@ -10,7 +10,7 @@ server '152.7.98.236', user: 'cterse', roles: %w[web app], my_property: :my_valu
 # server '152.7.99.157', user: 'cterse', roles: %w[web app], my_property: :my_value
 
 set :default_env, 'JAVA_HOME' => '/usr/lib/jvm/java-8-oracle'
-set :branch, 'main'
+set :branch, 'deployment_fix'
 set :rvm_ruby_version, '2.3.1'
 
 # role-based syntax

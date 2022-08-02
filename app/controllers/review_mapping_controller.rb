@@ -26,18 +26,18 @@ class ReviewMappingController < ApplicationController
 
   def add_calibration
     participant = begin
-                    AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first
-                  rescue StandardError
-                    nil
-                  end
+      AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first
+    rescue StandardError
+      nil
+    end
     if participant.nil?
       participant = AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
     end
     map = begin
-            ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: participant.get_reviewer.id, reviewee_id: params[:team_id], calibrate_to: true).first
-          rescue StandardError
-            nil
-          end
+      ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: participant.get_reviewer.id, reviewee_id: params[:team_id], calibrate_to: true).first
+    rescue StandardError
+      nil
+    end
     map = ReviewResponseMap.create(reviewed_object_id: params[:id], reviewer_id: participant.get_reviewer.id, reviewee_id: params[:team_id], calibrate_to: true) if map.nil?
     redirect_to controller: 'response', action: 'new', id: map.id, assignment_id: params[:id], return: 'assignment_edit'
   end
@@ -118,10 +118,10 @@ class ReviewMappingController < ApplicationController
           else # assignment without topic -Yang
             assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
             assignment_team = begin
-                                assignment_teams.to_a.sample
-                              rescue StandardError
-                                nil
-                              end
+              assignment_teams.to_a.sample
+            rescue StandardError
+              nil
+            end
             if assignment_team.nil?
               flash[:error] = 'No artifacts are available to review at this time. Please try later.'
             else

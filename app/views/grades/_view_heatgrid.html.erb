@@ -102,6 +102,13 @@ function toggleFunction(elementId) {
             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience.">interaction legend</span>
 
           </span>
+          
+          <br/>
+          <!-- This iterates over the list of metrics and shows them as checkboxes which can be used for toggling the metric in heatgrid-->
+          <% vm.list_of_rows.first.metric_hash.each do |key, value| %>
+              <% newKey = key.split(" ").join("") %>
+              <input type="checkbox" id="<%= newKey %>" onchange = onMetricToggle(this)><%=key%> </input>
+          <% end %>
 
           <table id='<%="scoresTable"+@type + @participant.id.to_s%>' class="table tbl_heat tablesorter">
             <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
@@ -127,9 +134,13 @@ function toggleFunction(elementId) {
               <th class="sorter-true" align="right" >
                 Avg<span></span>
               </th>
-              <th class="sorter-false">
-                <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1</span>
-              </th>
+              <!-- Iterating over the list of metrics and showing them in the header of table -->
+              <% vm.list_of_rows.first.metric_hash.each do |key, value| %>
+                <% newKey = key.split(" ").join("") %>
+                <th class="sorter-false metric-header <%= newKey %>" style="display:none">
+                  <span  data-toggle="tooltip" data-placement="right" title="<%=t(".metric_tooltip")%>" ><%=key%></span>
+                </th>
+              <% end %>
 
             </tr>
             </thead>
@@ -165,9 +176,13 @@ function toggleFunction(elementId) {
                   <td  class = 'cf' align="right">
                     <%= row.average_score_for_row.to_s %>
                   </td>
-                  <td  class = 'cf' align="center">
-                    <%= row.countofcomments.to_s %>
-                  </td>
+                  <!-- Iterating over the list of metrics and showing them in the table -->
+                  <% row.metric_hash.each do |key, value| %>
+                    <% newKey = key.split(" ").join("") %>
+                    <td  class = 'cf metric-value <%= newKey %>' align="center" style="display:none">
+                      <%= value.to_s %>
+                    </td>
+                  <% end %>
                 </tr>
                 <!--loop that creates the collapsed-by-default row, which lists all comments. -->
                 <tr class="tablesorter-childRow">

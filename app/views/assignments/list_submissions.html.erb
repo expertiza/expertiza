@@ -27,6 +27,12 @@
         <% if @assignment.max_team_size > 1 %>
           <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Team name</th>
           <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Team member(s)</th>
+          <% if @assignment.pair_programming_enabled? %>
+            <% pair_programming_enabled = true %>
+            <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Pair Programming</th>
+          <% else %>
+            <% pair_programming_enabled = false %>
+          <% end %>
         <% else %>
           <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Participant name</th>
         <% end %>  
@@ -65,6 +71,13 @@
                   (<%= user.fullname(session[:ip])%>)<br>
               <% end %>
           </td>
+
+        <!-- Pair Programming -->
+          <% if pair_programming_enabled %>
+            <td>
+              <%= Team.find(team.id).pair_programming_request == 2 ? "Yes": "No" %>
+            </td>
+          <% end %>
 
         <!--Submitted item(s)-->
         <td>

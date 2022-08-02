@@ -272,7 +272,7 @@ describe AssignmentsController do
         allow(Questionnaire).to receive(:find).with('666').and_return(questionnaire)
         allow(new_assignment_questionnaire).to receive(:save).and_return(true)
         @params = {
-          vary_by_topic: true,
+          vary_by_topic?: true,
           id: 1,
           course_id: 1,
           set_pressed: {

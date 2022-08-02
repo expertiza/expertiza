@@ -1,8 +1,18 @@
+# frozen_string_literal: true
+
 class Mailer < ActionMailer::Base
   if Rails.env.development? || Rails.env.test?
     default from: 'expertiza.debugging@gmail.com'
   else
     default from: 'expertiza-support@lists.ncsu.edu'
+  end
+
+  def email_author_reviewers(subject, body, email)
+    Rails.env.development? || Rails.env.test? ? @email = 'expertiza.debugging@gmail.com' : @email = email
+    mail(to: @email,
+         body: body,
+         content_type: 'text/html',
+         subject: subject)
   end
 
   def generic_message(defn)
@@ -15,7 +25,9 @@ class Mailer < ActionMailer::Base
     @assignment = defn[:body][:assignment]
     @conference_variable = defn[:body][:conference_variable]
 
-    defn[:to] = 'expertiza.debugging@gmail.com' if Rails.env.development? || Rails.env.test?
+    if Rails.env.development? || Rails.env.test?
+      defn[:to] = 'expertiza.debugging@gmail.com'
+    end
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:bcc])
@@ -29,7 +41,9 @@ class Mailer < ActionMailer::Base
     @avg_pct = defn[:body][:avg_pct]
     @assignment = defn[:body][:assignment]
 
-    defn[:to] = 'expertiza.debugging@gmail.com' if Rails.env.development? || Rails.env.test?
+    if Rails.env.development? || Rails.env.test?
+      defn[:to] = 'expertiza.debugging@gmail.com'
+    end
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:bcc])
@@ -43,7 +57,9 @@ class Mailer < ActionMailer::Base
     @first_name = defn[:body][:first_name]
     @partial_name = defn[:body][:partial_name]
 
-    defn[:to] = 'expertiza.debugging@gmail.com' if Rails.env.development? || Rails.env.test?
+    if Rails.env.development? || Rails.env.test?
+      defn[:to] = 'expertiza.debugging@gmail.com'
+    end
     mail(subject: defn[:subject],
          to: defn[:to])
   end
@@ -61,7 +77,9 @@ class Mailer < ActionMailer::Base
     @topic_name = defn[:body][:approved_topic_name]
     @proposer = defn[:body][:proposer]
 
-    defn[:to] = 'expertiza.debugging@gmail.com' if Rails.env.development? || Rails.env.test?
+    if Rails.env.development? || Rails.env.test?
+      defn[:to] = 'expertiza.debugging@gmail.com'
+    end
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:cc])
@@ -79,7 +97,9 @@ class Mailer < ActionMailer::Base
     @summary_url = @body[:summary_url]
     @assignment_edit_url = @body[:assignment_edit_url]
 
-    defn[:to] = 'expertiza.debugging@gmail.com' if Rails.env.development? || Rails.env.test?
+    if Rails.env.development? || Rails.env.test?
+      defn[:to] = 'expertiza.debugging@gmail.com'
+    end
     mail(subject: defn[:subject],
          to: defn[:to])
   end
@@ -90,7 +110,9 @@ class Mailer < ActionMailer::Base
     @answers = defn[:body][:answers]
     @name = defn[:body][:name]
     @assignment_name = defn[:body][:assignment_name]
-    defn[:to] = 'expertiza.debugging@gmail.com' if Rails.env.development? || Rails.env.test?
+    if Rails.env.development? || Rails.env.test?
+      defn[:to] = 'expertiza.debugging@gmail.com'
+    end
     mail(subject: defn[:subject],
          to: defn[:to])
   end

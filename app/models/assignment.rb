@@ -30,6 +30,8 @@ class Assignment < ApplicationRecord
   has_many :response_maps, foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: :assignment
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: :assignment
   has_many :plagiarism_checker_assignment_submissions, dependent: :destroy
+  has_many :assignment_badges, dependent: :destroy
+  has_many :badges, through: :assignment_badges
   validates :name, presence: true
   validates :name, uniqueness: { scope: :course_id }
   validate :valid_num_review
@@ -58,11 +60,8 @@ class Assignment < ApplicationRecord
     DEFAULT_MAX_OUTSTANDING_REVIEWS
   end
 
-  # TODO app breaks when max team size is set as > 1 and team has only one member
   def team_assignment?
-    # All assignments should be team assignments
-    # max_team_size > 1
-    true
+    max_team_size > 0
   end
   alias team_assignment team_assignment?
 
@@ -260,6 +259,11 @@ class Assignment < ApplicationRecord
   # Check to see if assignment is a microtask
   def microtask?
     microtask.nil? ? false : microtask
+  end
+
+  # Check to see if assignment has badge
+  def badge?
+    has_badge.nil? ? false : has_badge
   end
 
   # add a new participant to this assignment
@@ -487,7 +491,7 @@ class Assignment < ApplicationRecord
     @questions = {}
     questionnaires = @assignment.questionnaires
     questionnaires.each do |questionnaire|
-      if @assignment.vary_by_round
+      if @assignment.vary_by_round?
         round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: @questionnaire.id).used_in_round
         questionnaire_symbol = round.nil? ? questionnaire.symbol : (questionnaire.symbol.to_s + round.to_s).to_sym
       else
@@ -612,6 +616,10 @@ class Assignment < ApplicationRecord
       end
     end
     questionnaire_ids
+  end
+
+  def pair_programming_enabled?
+    self.enable_pair_programming
   end
 
   private

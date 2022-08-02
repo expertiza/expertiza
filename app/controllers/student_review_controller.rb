@@ -28,7 +28,7 @@ class StudentReviewController < ApplicationController
     if @participant.get_reviewer
       # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
-      @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.get_reviewer.id, reviewer_is_team: @assignment.reviewer_is_team)
+      @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.get_reviewer.id, team_reviewing_enabled: @assignment.team_reviewing_enabled)
     else
       @review_mappings = []
     end
@@ -61,7 +61,7 @@ class StudentReviewController < ApplicationController
     end
 
     # Redirect review bidding to the review bid controller if bidding enabled
-    if @assignment.review_choosing_algorithm == 'Bidding'
+    if @assignment.bidding_for_reviews_enabled
       redirect_to controller: 'review_bids', action: 'index', assignment_id: params[:assignment_id], id: params[:id]
     end
   end

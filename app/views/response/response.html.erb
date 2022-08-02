@@ -299,12 +299,21 @@
 <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
 <% if !@map.contributor.nil? && !@map.instance_of?(FeedbackResponseMap) %>
   <% if @map.assignment.team_assignment? %>
-    <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id %>
+    <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id%>
+
+    <% participant = Participant.find(team_member) %>
+    <div style="float:right">
+      <%= link_to "Email the author", author_response_index_path(email: participant.user.email, response: @response.id) %>
+    </div>
     <% topic_id = SignedUpTeam.topic_id(@map.assignment.id, team_member) %>
   <% else %>
     <% participant = Participant.find(TeamsUser.find_by_team_id(@map.contributor).user_id) %>
+    <div style="float:right">
+      <%= link_to "Email the author", author_response_index_path(email: participant.user.email, response: @response.id) %>
+    </div>
     <% topic_id = SignedUpTeam.where(participant.parent_id, participant.user_id) %>
   <% end %>
+
   <% unless topic_id.nil? %>
     <% topic = SignUpTopic.find(topic_id) %>
     <h2>You are reviewing <%= topic.topic_name %></h2>
@@ -389,6 +398,28 @@
         <div id="review_comments_analysis"></div>
       </td>
     </tr>
+
+    <!-- Add a Good Teammate badge to the Teammate Review Questionnaire if the assignment has badges -->
+    <% if @assignment.badge? and (@questionnaire.type == 'TeammateReviewQuestionnaire' or @questionnaire.type == 'Teammate ReviewQuestionnaire') and AssignmentBadge.where(assignment_id: @assignment.id, badge_id: Badge.get_id_from_name('Good Teammate')).any? %>
+      <tr>
+        <td>
+          <img width="100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Teammate")}" %> title="GoodTeammate">
+          Would you like to award a Good Teammate badge?
+          <input type="checkbox" id="good_teammate_checkbox" name="review[good_teammate_checkbox]">
+        </td>
+      </tr>
+    <% end %>
+
+    <!-- Add a Good Reviewer badge to the Feedback Review Questionnaire if the assignment has badges -->
+    <% if @assignment.badge? and (@questionnaire.type == 'AuthorFeedbackQuestionnaire' or @questionnaire.type == 'Author FeedbackQuestionnaire') and AssignmentBadge.where(assignment_id: @assignment.id, badge_id: Badge.get_id_from_name('Good Reviewer')).any? %>
+      <tr>
+        <td>
+          <img width="100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Reviewer")}" %> title="GoodReviewer">
+          Would you like to award a Good Reviewer badge?
+          <input type="checkbox" id="good_reviewer_checkbox" name="review[good_reviewer_checkbox]">
+        </td>
+      </tr>
+    <% end %>
 
   </table>
   <% if @current_round %>

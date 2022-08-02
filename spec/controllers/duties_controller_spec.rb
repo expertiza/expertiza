@@ -93,7 +93,7 @@ describe DutiesController do
           }
         }
         post :create, params: request_params
-        expect(flash[:error]).to eq('Value for max members for role is invalid. ')
+        expect(flash[:error]).to eq('Value for max members for role is invalid')
         expect(response).to redirect_to('/duties/new?id=1')
       end
     end
@@ -130,19 +130,19 @@ describe DutiesController do
           }
         }
         post :create, params: request_params
-        expect(flash[:error]).to eq('Role name is too short (minimum is 3 characters). ')
+        expect(flash[:error]).to eq('Role name is too short (minimum is 3 characters)')
         expect(response).to redirect_to('/duties/new?id=1')
       end
     end
   end
 
-  describe '#destroy' do
+  describe '#delete' do
     context 'when duty can be found' do
       it 'redirects to assignment#edit page' do
         request_params = { id: 1, assignment_id: 1 }
-        post :destroy, params: request_params
+        post :delete, params: request_params
         expect(response).to redirect_to('/assignments/1/edit')
-        expect(flash[:notice]).to match(/Role was successfully destroyed.*/)
+        expect(flash[:notice]).to match(/Role was successfully deleted.*/)
       end
     end
   end

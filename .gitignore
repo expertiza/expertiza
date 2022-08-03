@@ -15,6 +15,7 @@ app/controllers/auth_controller.rb
 nohup.out
 pg_data/*
 .initialized
+expertiza-db/*
 
 #################
 ## scrubbed_db ##

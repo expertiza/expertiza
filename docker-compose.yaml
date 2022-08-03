@@ -37,7 +37,7 @@ services:
       - ./expertiza-db:/var/lib/mysql:rw
     environment:
       MYSQL_ROOT_PASSWORD: expertiza
-      MYSQL_DATABASE: expertiza_development
+      MYSQL_DATABASE: expertiza_production
     healthcheck:
       test: out=$$(mysqladmin ping -h localhost -P 3306 -u root --password=$$MYSQL_ROOT_PASSWORD 2>&1); echo $$out | grep 'mysqld is alive' || { echo $$out; exit 1; }
       timeout: 20s

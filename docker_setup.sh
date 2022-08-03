@@ -1,6 +1,7 @@
 apt-get update
 curl -sL https://deb.nodesource.com/setup_14.x | sh -
 apt-get install -y nodejs
+apt-get install -y npm
 apt-get install -y default-mysql-client
 npm install -g bower
 apt-get install -y openjdk-8-jdk

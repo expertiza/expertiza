@@ -379,38 +379,29 @@
         }
     }
 
-    function insertTeamBasedElements(isTeamsAssignment) {
+    function insertTeamBasedElements() {
         var varyByDutyDiv = jQuery('#vary_by_duty');
-        if (isTeamsAssignment) {
-            varyByDutyDiv.removeAttr('hidden');
-            var varyByDutyCheckbox = jQuery('#vary_by_duty_checkbox');
-            if (varyByDutyCheckbox.is(':checked')) {
-                addDutyBasedQuestionnaires();
-            } else {
-                addDefaultTeammateReviewQuestionnaire();
-            }
+        varyByDutyDiv.removeAttr('hidden');
+        var varyByDutyCheckbox = jQuery('#vary_by_duty_checkbox');
+        if (varyByDutyCheckbox.is(':checked')) {
+            addDutyBasedQuestionnaires();
         } else {
-            // removing vary by duty div
-            varyByDutyDiv.attr('hidden', true);
-            // removing appropriate questionnaire rows
-            removeDutyBasedQuestionnaires()
-            removeQuestionnaireTableRow('TeammateReviewQuestionnaire');
-
+            addDefaultTeammateReviewQuestionnaire();
         }
     }
 </script>
 
 <!--Add a review varies by round checkbox. -->
-<!-- This is vary_by_round attribute of assignment created by migration -->
-<input name="assignment_form[assignment][vary_by_round]" type="hidden" value="false" />
-<%= check_box_tag('assignment_form[assignment][vary_by_round]', 'true', @assignment_form.assignment.vary_by_round, onclick: "handleCheckReviewVaryByRound(this)") %>
-<%= label_tag('assignment_form[assignment][vary_by_round]', 'Review rubric varies by round?') %>
+<!-- This is vary_by_round? attribute of assignment created by migration -->
+<input name="assignment_form[assignment][vary_by_round?]" type="hidden" value="false" />
+<%= check_box_tag('assignment_form[assignment][vary_by_round?]', 'true', @assignment_form.assignment.vary_by_round?, onclick: "handleCheckReviewVaryByRound(this)") %>
+<%= label_tag('assignment_form[assignment][vary_by_round?]', 'Review rubric varies by round?') %>
 <br>
 <!-- Add a review varies by topic checkbox -->
-<!-- This is vary_by_topic attribute of assignment created by migration -->
-<input name="assignment_form[assignment][vary_by_topic]" type="hidden" value="false" />
-<%= check_box_tag('assignment_form[assignment][vary_by_topic]', 'true', @assignment_form.assignment.vary_by_topic) %>
-<%= label_tag('assignment_form[assignment][vary_by_topic]', 'Review rubric varies by topic?') %>
+<!-- This is vary_by_topic? attribute of assignment created by migration -->
+<input name="assignment_form[assignment][vary_by_topic?]" type="hidden" value="false" />
+<%= check_box_tag('assignment_form[assignment][vary_by_topic?]', 'true', @assignment_form.assignment.vary_by_topic?) %>
+<%= label_tag('assignment_form[assignment][vary_by_topic?]', 'Review rubric varies by topic?') %>
 <br>
 <!--Add a review varies by duties (role in the UI) checkbox if teams is allowed -->
 <!-- This is questionnaire_varies_by_duty attribute of assignment created by migration -->
@@ -438,11 +429,11 @@
   <script>
       jQuery(document).ready(function () {
           // Adding an event listener to the team assignment checkbox.
-          jQuery('#team_assignment').change(function() {
-              insertTeamBasedElements(this.checked)
+          jQuery('#assignment_form[assignment][max_team_size]').change(function() {
+              insertTeamBasedElements()
           });
 
-          <% if @assignment_form.assignment.vary_by_round %>
+          <% if @assignment_form.assignment.vary_by_round? %>
           <% 1.upto(@assignment_form.assignment.rounds_of_reviews) do |i| %>
           <% assignment_questionnaire = @assignment_form.assignment_questionnaire('ReviewQuestionnaire', i, nil) %>
           <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire') %>
@@ -488,7 +479,7 @@
           );
 
           var teamAssignmentCheckbox = jQuery('#team_assignment')
-          insertTeamBasedElements(teamAssignmentCheckbox.is(':checked'))
+          insertTeamBasedElements()
 
           var bookmark_checkbox = jQuery('#assignment_form_assignment_use_bookmark');
           if (bookmark_checkbox.is(':checked')) {

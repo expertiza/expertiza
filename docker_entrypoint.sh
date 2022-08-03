@@ -12,11 +12,11 @@ if [ ! -f .initialized ]; then
   host: mysql
   username: root
   password: expertiza
-  database: expertiza_development" >> ./config/database.yml
+  database: expertiza_production" >> ./config/database.yml
 
     # Begin to mount
     echo "Inserting scrubbed db into database... this may take awhile!"
-    mysql --user=root --password=expertiza --host=mysql expertiza_development < /app/expertiza.sql
+    mysql --user=root --password=expertiza --host=mysql expertiza_production < /app/expertiza.sql
 
     if [ $? -ne 0 ]; then
         echo "Failed to import db"

@@ -1258,7 +1258,7 @@ jQuery(document).ready(function() {
     }
   })
 
-  /** beta branch isn't getting a prop related to the data to be displayed in the dropdown */
+  /** main branch isn't getting a prop related to the data to be displayed in the dropdown */
   var FilterableTable = React.createClass({
     getInitialState: function() {
       return {

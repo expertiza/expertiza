@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe QuestionnairesController do
   let(:questionnaire) do
     build(id: 1, name: 'questionnaire', ta_id: 8, course_id: 1, private: false, min_question_score: 0, max_question_score: 5, type: 'ReviewQuestionnaire')
@@ -176,10 +178,10 @@ describe QuestionnairesController do
   describe '#create' do
     it 'redirects to questionnaires#edit page after create a new questionnaire' do
       request_params = { questionnaire: { name: 'test questionnaire',
-                                  private: false,
-                                  min_question_score: 0,
-                                  max_question_score: 5,
-                                  type: 'ReviewQuestionnaire' } }
+                                          private: false,
+                                          min_question_score: 0,
+                                          max_question_score: 5,
+                                          type: 'ReviewQuestionnaire' } }
       user_session = { user: instructor }
       tree_folder = double('TreeFolder', id: 1)
       allow(TreeFolder).to receive_message_chain(:where, :first).with(['name like ?', 'Review']).with(no_args).and_return(tree_folder)
@@ -208,9 +210,9 @@ describe QuestionnairesController do
       context 'when questionnaire type is not QuizQuestionnaire' do
         it 'redirects to submitted_content#edit page' do
           request_params = { aid: 1,
-                     pid: 1,
-                     questionnaire: { name: review_questionnaire.name,
-                                      type: review_questionnaire.type } }
+                             pid: 1,
+                             questionnaire: { name: review_questionnaire.name,
+                                              type: review_questionnaire.type } }
           # create_questionnaire
           allow(ReviewQuestionnaire).to receive(:new).with(any_args).and_return(review_questionnaire)
           user_session = { user: build(:teaching_assistant, id: 1) }
@@ -260,29 +262,29 @@ describe QuestionnairesController do
       @questionnaire1 = double('Questionnaire', id: 1)
       allow(Questionnaire).to receive(:find).with('1').and_return(@questionnaire1)
       @request_params = { id: 1,
-                  questionnaire: { name: 'test questionnaire',
-                                   instructor_id: 6,
-                                   private: 0,
-                                   min_question_score: 0,
-                                   max_question_score: 5,
-                                   type: 'ReviewQuestionnaire',
-                                   display_type: 'Review',
-                                   instructor_loc: '' } }
+                          questionnaire: { name: 'test questionnaire',
+                                           instructor_id: 6,
+                                           private: 0,
+                                           min_question_score: 0,
+                                           max_question_score: 5,
+                                           type: 'ReviewQuestionnaire',
+                                           display_type: 'Review',
+                                           instructor_loc: '' } }
       @request_params_with_question = { id: 1,
-                                questionnaire: { name: 'test questionnaire',
-                                                 instructor_id: 6,
-                                                 private: 0,
-                                                 min_question_score: 0,
-                                                 max_question_score: 5,
-                                                 type: 'ReviewQuestionnaire',
-                                                 display_type: 'Review',
-                                                 instructor_loc: '' },
-                                question: { '1' => { seq: 66.0,
-                                                     txt: 'WOW',
-                                                     weight: 10,
-                                                     size: '50,3',
-                                                     max_label: 'Strong agree',
-                                                     min_label: 'Not agree' } } }
+                                        questionnaire: { name: 'test questionnaire',
+                                                         instructor_id: 6,
+                                                         private: 0,
+                                                         min_question_score: 0,
+                                                         max_question_score: 5,
+                                                         type: 'ReviewQuestionnaire',
+                                                         display_type: 'Review',
+                                                         instructor_loc: '' },
+                                        question: { '1' => { seq: 66.0,
+                                                             txt: 'WOW',
+                                                             weight: 10,
+                                                             size: '50,3',
+                                                             max_label: 'Strong agree',
+                                                             min_label: 'Not agree' } } }
     end
     context 'successfully updates the attributes of questionnaire' do
       it 'redirects to questionnaires#edit page after updating' do
@@ -317,18 +319,18 @@ describe QuestionnairesController do
     context 'when request_params[:view_advice] is not nil' do
       it 'redirects to advice#edit_advice page' do
         request_params = { id: 1,
-                   view_advice: true }
+                           view_advice: true }
         post :update, params: request_params
-        expect(response).to redirect_to('/advice/edit_advice/1')
+        expect(response).to redirect_to('/advice/edit_advice?id=1')
       end
     end
 
     context 'when request_params[:add_new_questions] is not nil' do
       it 'redirects to questionnaire#add_new_questions' do
         request_params = { id: 1,
-                   add_new_questions: true,
-                   new_question: { total_num: 2,
-                                   type: 'Criterion' } }
+                           add_new_questions: true,
+                           new_question: { total_num: 2,
+                                           type: 'Criterion' } }
         post :update, params: request_params
         expect(response).to redirect_to action: 'add_new_questions', id: request_params[:id], question: request_params[:new_question]
       end
@@ -399,8 +401,8 @@ describe QuestionnairesController do
         allow_any_instance_of(Array).to receive(:ids).and_return([2]) # need to stub since .ids isn't recognized in the context of testing
         allow(question).to receive(:save).and_return(true)
         request_params = { id: 1,
-                   question: { total_num: 2,
-                               type: 'Criterion' } }
+                           question: { total_num: 2,
+                                       type: 'Criterion' } }
         post :add_new_questions, params: request_params
         expect(response).to redirect_to('/questionnaires/1/edit')
       end
@@ -412,8 +414,8 @@ describe QuestionnairesController do
         allow_any_instance_of(Array).to receive(:ids).and_return([3]) # need to stub since .ids isn't recognized in the context of testing
         allow(question).to receive(:save).and_return(true)
         request_params = { id: 1,
-                   question: { total_num: 2,
-                               type: 'Dropdown' } }
+                           question: { total_num: 2,
+                                       type: 'Dropdown' } }
         post :add_new_questions, params: request_params
         expect(response).to redirect_to('/questionnaires/1/edit')
       end
@@ -424,8 +426,8 @@ describe QuestionnairesController do
         allow(AnswerHelper).to receive(:in_active_period).with('1').and_return(false)
         expect(AnswerHelper).to receive(:in_active_period).with('1')
         request_params = { id: 1,
-                   question: { total_num: 2,
-                               type: 'Criterion' } }
+                           question: { total_num: 2,
+                                       type: 'Criterion' } }
         post :add_new_questions, params: request_params
       end
     end
@@ -436,8 +438,8 @@ describe QuestionnairesController do
         allow(AnswerHelper).to receive(:delete_existing_responses).with([], '1')
         expect(AnswerHelper).to receive(:delete_existing_responses).with([], '1')
         request_params = { id: 1,
-                   question: { total_num: 2,
-                               type: 'Criterion' } }
+                           question: { total_num: 2,
+                                       type: 'Criterion' } }
         post :add_new_questions, params: request_params
       end
     end
@@ -449,13 +451,13 @@ describe QuestionnairesController do
         allow(Question).to receive(:find).with('1').and_return(question)
         allow(question).to receive(:save).and_return(true)
         request_params = { id: 1,
-                   save: true,
-                   question: { '1' => { seq: 66.0,
-                                        txt: 'WOW',
-                                        weight: 10,
-                                        size: '50,3',
-                                        max_label: 'Strong agree',
-                                        min_label: 'Not agree' } } }
+                           save: true,
+                           question: { '1' => { seq: 66.0,
+                                                txt: 'WOW',
+                                                weight: 10,
+                                                size: '50,3',
+                                                max_label: 'Strong agree',
+                                                min_label: 'Not agree' } } }
         post :save_all_questions, params: request_params
         expect(flash[:success]).to eq('All questions have been successfully saved!')
         expect(response).to redirect_to('/questionnaires/1/edit')
@@ -465,10 +467,10 @@ describe QuestionnairesController do
     context 'when request_params[:save] is nil, params: request_params[:view_advice] is not nil' do
       it 'redirects to advice#edit_advice page' do
         request_params = { id: 1,
-                   view_advice: true,
-                   question: {} }
+                           view_advice: true,
+                           question: {} }
         post :save_all_questions, params: request_params
-        expect(response).to redirect_to('/advice/edit_advice/1')
+        expect(response).to redirect_to('/advice/edit_advice?id=1')
       end
     end
   end

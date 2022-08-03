@@ -2,6 +2,7 @@ class Assessment360Controller < ApplicationController
   include GradesHelper
   include AuthorizationHelper
   include Scoring
+  include PenaltyHelper
   # Added the @instructor to display the instructor name in the home page of the 360 degree assessment
   def action_allowed?
     current_user_has_ta_privileges?
@@ -107,8 +108,11 @@ class Assessment360Controller < ApplicationController
         # break out of the loop if the participant has no team
         next if TeamsUser.team_id(assignment_id, user_id).nil?
 
+        assignment_participant = Participant.find_by(user_id: user_id, parent_id: assignment_id)
+        penalties = calculate_penalty(assignment_participant.id)
+
         # pull information about the student's grades for particular assignment
-        assignment_grade_summary(cp, assignment_id)
+        assignment_grade_summary(cp, assignment_id, penalties)
         peer_review_score = find_peer_review_score(user_id, assignment_id)
 
         next if peer_review_score.nil? # Skip if there are no peers
@@ -124,7 +128,7 @@ class Assessment360Controller < ApplicationController
     end
   end
 
-  def assignment_grade_summary(cp, assignment_id)
+  def assignment_grade_summary(cp, assignment_id, penalties)
     user_id = cp.user_id
     # topic exists if a team signed up for a topic, which can be found via the user and the assignment
     topic_id = SignedUpTeam.topic_id(assignment_id, user_id)
@@ -132,7 +136,7 @@ class Assessment360Controller < ApplicationController
     # instructor grade is stored in the team model, which is found by finding the user's team for the assignment
     team_id = TeamsUser.team_id(assignment_id, user_id)
     team = Team.find(team_id)
-    @assignment_grades[cp.id][assignment_id] = team[:grade_for_submission]
+    @assignment_grades[cp.id][assignment_id] = team[:grade_for_submission] ? (team[:grade_for_submission] - penalties[:submission]).round(2) : nil
     return if @assignment_grades[cp.id][assignment_id].nil?
 
     @final_grades[cp.id] += @assignment_grades[cp.id][assignment_id]

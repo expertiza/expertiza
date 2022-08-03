@@ -93,6 +93,15 @@ describe ReviewMappingController do
         expect(response).to redirect_to '/review_mapping/list_mappings?id=1&msg='
       end
     end
+
+    context 'when instructor tries to assign a student their own artifact for reviewing' do
+      it 'flashes an error message' do
+        allow(TeamsUser).to receive(:exists?).with(team_id: '1', user_id: 1).and_return(true)
+        post :add_reviewer, params: @params
+        expect(flash[:error]).to eq('You cannot assign this student to review his/her own artifact.')
+        expect(response).to redirect_to '/review_mapping/list_mappings?id=1'
+      end
+    end
   end
 
   describe '#assign_reviewer_dynamically' do

@@ -27,7 +27,7 @@ describe Invitation do
     end
   end
 
-  describe '#accept_invite' do
+  describe '#accept_invitation' do
     context 'a user is not on a team and wishes to join a team with open slots' do
       it 'places the user on a team and returns true' do
         team_id = 0
@@ -36,7 +36,7 @@ describe Invitation do
         allow(TeamsUser).to receive(:add_member_to_invited_team).with(user2.id, user3.id, assignment.id).and_return(true)
         allow(Invitation).to receive(:update_users_topic_after_invite_accept).with(user2.id, user3.id, assignment.id).and_return(true)
         allow(MentorManagement).to receive(:assign_mentor)
-        expect(Invitation.accept_invite(team_id, user2.id, user3.id, assignment.id)).to eq(true)
+        expect(Invitation.accept_invitation(team_id, user2.id, user3.id, assignment.id)).to eq(true)
       end
     end
     context 'a user is on a team and wishes to join a team with open slots' do
@@ -51,7 +51,7 @@ describe Invitation do
         allow(TeamsUser).to receive(:add_member_to_invited_team).with(user2.id, user3.id, assignment.id).and_return(true)
         allow(Invitation).to receive(:update_users_topic_after_invite_accept).with(user2.id, user3.id, assignment.id).and_return(true)
         allow(MentorManagement).to receive(:assign_mentor)
-        expect(Invitation.accept_invite(team_id, user2.id, user3.id, assignment.id)).to eq(true)
+        expect(Invitation.accept_invitation(team_id, user2.id, user3.id, assignment.id)).to eq(true)
       end
     end
     context 'a user is on a team and wishes to join a team without slots' do
@@ -64,7 +64,7 @@ describe Invitation do
         allow(AssignmentTeam).to receive(:remove_team_by_id).with(team_id).and_return(true)
         allow(Invitation).to receive(:remove_users_sent_invites_for_assignment).with(user3.id, assignment.id).and_return(true)
         allow(TeamsUser).to receive(:add_member_to_invited_team).with(user2.id, user3.id, assignment.id).and_return(false)
-        expect(Invitation.accept_invite(team_id, user2.id, user3.id, assignment.id)).to eq(false)
+        expect(Invitation.accept_invitation(team_id, user2.id, user3.id, assignment.id)).to eq(false)
       end
     end
     context 'a user is not on a team and wishes to join a team without slots' do
@@ -73,7 +73,7 @@ describe Invitation do
         allow(TeamsUser).to receive(:team_empty?).with(team_id).and_return(false)
         allow(Invitation).to receive(:remove_users_sent_invites_for_assignment).with(user3.id, assignment.id).and_return(true)
         allow(TeamsUser).to receive(:add_member_to_invited_team).with(user2.id, user3.id, assignment.id).and_return(false)
-        expect(Invitation.accept_invite(team_id, user2.id, user3.id, assignment.id)).to eq(false)
+        expect(Invitation.accept_invitation(team_id, user2.id, user3.id, assignment.id)).to eq(false)
       end
     end
   end

@@ -1,0 +1,49 @@
+version: "3.9" # optional since v1.27.0
+services:
+  web:
+    build:
+      context: .
+      dockerfile: local.dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    links:
+      - redis
+      - mysql
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      JAVA_HOME: "/usr/lib/jvm/java-1.8.0-openjdk-amd64"
+      RAILS_ENV: development
+      REDIS_HOST: redis
+    entrypoint: ["/app/docker_entrypoint.sh"]
+    restart: on-failure:3
+    command: /bin/sh "while sleep 1000; do :; done"
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+  mysql:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./expertiza-db:/var/lib/mysql:rw
+    environment:
+      MYSQL_ROOT_PASSWORD: expertiza
+      MYSQL_DATABASE: expertiza_production
+    healthcheck:
+      test: out=$$(mysqladmin ping -h localhost -P 3306 -u root --password=$$MYSQL_ROOT_PASSWORD 2>&1); echo $$out | grep 'mysqld is alive' || { echo $$out; exit 1; }
+      timeout: 20s
+      retries: 25
+    restart: on-failure:3
+    user: mysql
+    command: [--ignore-db-dir=lost+found]
+volumes:
+  logvolume01: {}

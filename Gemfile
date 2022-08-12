@@ -1,7 +1,5 @@
 source 'https://rubygems.org'
 
-ruby '2.3.8'
-
 gem 'rails', '= 5.1.0.rc2'
 
 ## Gems in Alphabetical Order
@@ -12,7 +10,6 @@ gem 'activesupport', '5.1.0.rc2'
 gem 'airbrake', '5.2.0'
 gem 'authlogic', '4.5.0'
 gem 'awesome_nested_set', '3.3.1'
-# gem 'bind-it'
 gem 'bootstrap3-datetimepicker-rails', '~> 4.17.47'
 gem 'bullet', '~> 5.7.6'
 gem 'capistrano'
@@ -52,7 +49,6 @@ gem 'omniauth-google-oauth2'
 gem 'open-uri-cached'
 gem 'paper_trail'
 gem 'pragmatic_segmenter'
-# gem 'protected_attributes'
 gem 'rails4-autocomplete'
 gem 'rake'
 gem 'rb-readline'
@@ -72,13 +68,11 @@ gem 'seer'
 gem 'shoulda-matchers'
 gem 'sidekiq'
 gem 'sprockets'
-# gem 'stanford-core-nlp'
 gem 'superfish-rails'
 gem 'therubyracer'
 gem 'thin'
 gem 'timecop'
 gem 'tinymce-rails'
-gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
 gem 'railties', '5.1.0.rc2'
@@ -94,7 +88,6 @@ group :development do
 end
 
 group :test do
-  gem 'capybara'
   gem 'database_cleaner'
   gem "factory_bot_rails", '4.8.2'
   gem 'geckodriver-helper', '~> 0.0.3'
@@ -105,7 +98,6 @@ group :test do
   gem 'rspec-rails', '4.1.2'
   gem 'rails-controller-testing'
   gem 'puma'
-  gem 'selenium-webdriver'
   gem 'shoulda'
 end
 

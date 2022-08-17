@@ -73,6 +73,7 @@ gem 'therubyracer'
 gem 'thin'
 gem 'timecop'
 gem 'tinymce-rails'
+gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
 gem 'railties', '5.1.0.rc2'
@@ -83,7 +84,6 @@ group :development do
   gem 'pry'
   gem 'pry-nav'
   gem 'pry-remote'
-  # gem 'quiet_assets'
   gem 'rubocop'
 end
 

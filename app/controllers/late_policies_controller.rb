@@ -19,34 +19,34 @@ class LatePoliciesController < ApplicationController
 
   # This method lists all the late policies records from late_policies table in database.
   def index
-    @penalty_policies = LatePolicy.where(['instructor_id = ? OR private = 0', instructor_id])
+    @late_policies = LatePolicy.where(['instructor_id = ? OR private = 0', instructor_id])
     respond_to do |format|
       format.html # index.html.erb
-      format.xml  { render xml: @penalty_policies }
+      format.xml  { render xml: @late_policies }
     end
   end
 
   # This method displays a certain record in late_policies table in the database.
   def show
-    @penalty_policy = LatePolicy.find(params[:id])
+    @late_policy = LatePolicy.find(params[:id])
     respond_to do |format|
       format.html # show.html.erb
-      format.xml  { render xml: @penalty_policy }
+      format.xml  { render xml: @late_policy }
     end
   end
 
   # New method creates instance of a late policy in the late_policies's table but does not saves in the database.
   def new
-    @penalty_policy = LatePolicy.new
+    @late_policy = LatePolicy.new
     respond_to do |format|
       format.html # new.html.erb
-      format.xml  { render xml: @penalty_policy }
+      format.xml  { render xml: @late_policy }
     end
   end
 
   # This method just fetch a particular record in LatePolicy table.
   def edit
-    @penalty_policy = LatePolicy.find(params[:id])
+    @late_policy = LatePolicy.find(params[:id])
   end
 
   # Create method can create a new late policy.
@@ -79,7 +79,7 @@ class LatePoliciesController < ApplicationController
 
   # Update method can update late policy. There are few check points before updating a late policy which are written in the if/else statements.
   def update
-    penalty_policy = LatePolicy.find(params[:id])
+    late_policy = LatePolicy.find(params[:id])
 
     # First this function validates the input then save if the input is valid.
     _valid_penalty, error_message = validate_input(true)
@@ -89,9 +89,9 @@ class LatePoliciesController < ApplicationController
     # If there are no errors, then save the record.
     else
       begin
-        penalty_policy.update_attributes(late_policy_params)
-        penalty_policy.save!
-        LatePolicy.update_calculated_penalty_objects(penalty_policy)
+        late_policy.update_attributes(late_policy_params)
+        late_policy.save!
+        LatePolicy.update_calculated_penalty_objects(late_policy)
         flash[:notice] = 'The late policy was successfully updated.'
         redirect_to action: 'index'
       # If something unexpected happens while updating, then redirect to the edit page of that policy again.
@@ -104,9 +104,9 @@ class LatePoliciesController < ApplicationController
 
   # This method fetches a particular record in the late_policy table and try to destroy's it.
   def destroy
-    @penalty_policy = LatePolicy.find(params[:id])
+    @late_policy = LatePolicy.find(params[:id])
     begin
-      @penalty_policy.destroy
+      @late_policy.destroy
     rescue StandardError
       flash[:error] = 'This policy is in use and hence cannot be deleted.'
     end
@@ -128,7 +128,7 @@ class LatePoliciesController < ApplicationController
 
   def late_policy
     # This function checks if the id exists in parameters and assigns it to the instance variable of penalty policy.
-    @penalty_policy ||= @late_policy || LatePolicy.find(params[:id]) if params[:id]
+    @late_policy ||= @late_policy || LatePolicy.find(params[:id]) if params[:id]
   end
 
   # This function checks if the policy name already exists or not and returns boolean value for penalty and the error message.

@@ -90,28 +90,6 @@ class SuggestionController < ApplicationController
     end
   end
 
-  # If the user submits a suggestion and gets it approved -> Send email
-  # If user submits a suggestion anonymously and it gets approved -> DOES NOT get an email
-  def send_email
-    proposer = User.find_by(id: @user_id)
-    if proposer
-      teams_users = TeamsUser.where(team_id: @team_id)
-      cc_mail_list = []
-      teams_users.each do |teams_user|
-        cc_mail_list << User.find(teams_user.user_id).email if teams_user.user_id != proposer.id
-      end
-      Mailer.suggested_topic_approved_message(
-        to: proposer.email,
-        cc: cc_mail_list,
-        subject: "Suggested topic '#{@suggestion.title}' has been approved",
-        body: {
-          approved_topic_name: @suggestion.title,
-          proposer: proposer.name
-        }
-      ).deliver_now!
-    end
-  end
-
   def notification
     if @suggestion.signup_preference == 'Y'
       if @team_id.nil?
@@ -127,12 +105,12 @@ class SuggestionController < ApplicationController
           @signuptopic.private_to = @user_id
           @signuptopic.save
           # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
-          send_email
+          Mailer.notify_suggestion_approval(@used_id, @team_id, @suggestion.title)
         end
       end
     else
       # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
-      send_email
+      Mailer.notify_suggestion_approval(@used_id, @team_id, @suggestion.title)
     end
   end
 

@@ -181,5 +181,7 @@ class LatePoliciesController < ApplicationController
     end
 
     return valid_penalty, error_message
+
+    
   end
 end

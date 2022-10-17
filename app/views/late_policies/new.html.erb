@@ -1,7 +1,7 @@
 <h1>New late policy</h1>
 
-<%= form_for @penalty_policy, :url => { :action => "create" } do |f| %>
-  <%= error_messages_for @penalty_policy %>
+<%= form_for @late_policy, :url => { :action => "create" } do |f| %>
+  <%= error_messages_for @late_policy %>
 
   <%= render partial: 'form', locals: { f: f } %>
 

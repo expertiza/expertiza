@@ -19,7 +19,7 @@ end
     <% end %>
   </tr>
 
-  <% @penalty_policies.each do |penalty_policy| %>
+  <% @late_policies.each do |penalty_policy| %>
     <% if instructor_id == penalty_policy.instructor_id || is_admin %>
       <tr>
         <td><%= penalty_policy.policy_name %></td>

@@ -83,7 +83,8 @@ class SuggestionController < ApplicationController
     if !params[:add_comment].nil?
       add_comment
     elsif !params[:approve_suggestion].nil?
-      approve_suggestion
+      # Approve the suggestion and notify the team
+      approve_suggestion_and_notify
     elsif !params[:reject_suggestion].nil?
       reject_suggestion
     end
@@ -135,8 +136,9 @@ class SuggestionController < ApplicationController
     end
   end
 
-  def approve_suggestion
-    approve
+  # Approve the suggestion and notify the team via email.
+  def approve_suggestion_and_notify
+    approve_suggestion
     notification
     redirect_to action: 'show', id: @suggestion
   end
@@ -158,7 +160,8 @@ class SuggestionController < ApplicationController
                                        :status, :unityID, :signup_preference)
   end
 
-  def approve
+  # Approve the suggestion 
+  def approve_suggestion
     @suggestion = Suggestion.find(params[:id])
     @user_id = User.find_by(name: @suggestion.unityID).try(:id)
     if @user_id

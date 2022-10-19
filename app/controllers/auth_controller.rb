@@ -1,3 +1,4 @@
+# change for initial commit
 class AuthController < ApplicationController
   include AuthorizationHelper
   helper :auth

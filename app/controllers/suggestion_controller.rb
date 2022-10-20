@@ -91,93 +91,43 @@ class SuggestionController < ApplicationController
     redirect_to action: 'new', id: @suggestion.assignment_id
   end
 
-  #will submit the vote for a a particular suggestion
+  #will submit the vote for a particular suggestion
   def submit
     if !params[:add_comment].nil?
       add_comment
     elsif !params[:approve_suggestion].nil?
-      approve_suggestion
+      # Approve the suggestion and notify the team
+      approve_suggestion_and_notify
     elsif !params[:reject_suggestion].nil?
       reject_suggestion
     end
   end
 
-  # If the user submits a suggestion and gets it approved -> Send email
-  # If user submits a suggestion anonymously and it gets approved -> DOES NOT get an email
-  def send_email
-    proposer = User.find_by(id: @user_id)
-    if proposer
-      teams_users = TeamsUser.where(team_id: @team_id)
-      cc_mail_list = []
-      teams_users.each do |teams_user|
-        cc_mail_list << User.find(teams_user.user_id).email if teams_user.user_id != proposer.id
-      end
-      Mailer.suggested_topic_approved_message(
-        to: proposer.email,
-        cc: cc_mail_list,
-        subject: "Suggested topic '#{@suggestion.title}' has been approved",
-        body: {
-          approved_topic_name: @suggestion.title,
-          proposer: proposer.name
-        }
-      ).deliver_now!
-    end
-  end
-
-  
-  # def notification
-  #   if @suggestion.signup_preference == 'Y'
-  #     if @team_id.nil?
-  #       new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s,
-  #                                        parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
-  #       new_team.create_new_team(@user_id, @signuptopic)
-  #     else
-  #       if @topic_id.nil?
-  #         # clean waitlists
-  #         SignedUpTeam.where(team_id: @team_id, is_waitlisted: 1).destroy_all
-  #         SignedUpTeam.create(topic_id: @signuptopic.id, team_id: @team_id, is_waitlisted: 0)
-  #       else
-  #         @signuptopic.private_to = @user_id
-  #         @signuptopic.save
-  #         # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
-  #         send_email
-  #       end
-  #     end
-  #   else
-  #     # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
-  #     send_email
-  #   end
-  # end
-
-
   #will provie notification/email based on the suggestion being approved or not
   #will create and assign team if user is not in any team
   def notification
-    if @suggestion.signup_preference == 'Y' & @teamidd.nil?
-        new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s,
-                                         parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
-        new_team.create_new_team(@user_id, @signuptopic)
-    else 
-        if @suggestion.signup_preference == 'Y' & @topic_id.nil?
-            # clean waitlists
-            SignedUpTeam.where(team_id: @team_id, is_waitlisted: 1).destroy_all
-            SignedUpTeam.create(topic_id: @signuptopic.id, team_id: @team_id, is_waitlisted: 0)
-        else
-            @signuptopic.private_to = @user_id
-            @signuptopic.save
-            # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
-            send_email
-        end
+    if @suggestion.signup_preference == 'Y' and @team_id.nil?
+      new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s,
+                                        parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
+      new_team.create_new_team(@user_id, @signuptopic)
+    elsif @suggestion.signup_preference == 'Y' and !@team_id.nil? and @topic_id.nil?
+      # clean waitlists
+      SignedUpTeam.where(team_id: @team_id, is_waitlisted: 1).destroy_all
+      SignedUpTeam.create(topic_id: @signuptopic.id, team_id: @team_id, is_waitlisted: 0)
+    elsif @suggestion.signup_preference == 'Y' and !@team_id.nil? and !@topic_id.nil?
+      @signuptopic.private_to = @user_id
+      @signuptopic.save
+      # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
+      Mailer.notify_suggestion_approval(@used_id, @team_id, @suggestion.title)
     else
-        # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
-      send_email
+      # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
+      Mailer.notify_suggestion_approval(@used_id, @team_id, @suggestion.title)
     end
+  end
 
-
-
-  # this method is used to indicate that a notification has been sent
-  def approve_suggestion
-    approve
+  # Approve the suggestion and notify the team via email.
+  def approve_suggestion_and_notify
+    approve_suggestion
     notification
     redirect_to action: 'show', id: @suggestion
   end
@@ -206,7 +156,7 @@ class SuggestionController < ApplicationController
   #will approve suggestion base  on 
   #if signup  topic -> suggestion approved
   #else-> error
-  def approve
+  def approve_suggestion
     @suggestion = Suggestion.find(params[:id])
     @user_id = User.find_by(name: @suggestion.unityID).try(:id)
     if @user_id

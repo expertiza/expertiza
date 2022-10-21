@@ -7,6 +7,7 @@ class PasswordRetrievalController < ApplicationController
     render template: 'password_retrieval/forgotten'
   end
 
+  # on click of request password button, sends a password reset url with a randomly generated token parameter to an authenticated user email
   def send_password
     if params[:user][:email].nil? || params[:user][:email].strip.empty?
       flash[:error] = 'Please enter an e-mail address.'
@@ -14,10 +15,13 @@ class PasswordRetrievalController < ApplicationController
     else
       user = User.find_by(email: params[:user][:email])
       if user
+        # formats password reset url to include a queryable token parameter 
         url_format = '/password_edit/validate_password_token?token='
+        # generates a random URL-safe base64 token with default length of 16 characters
         token = SecureRandom.urlsafe_base64
         PasswordReset.save_token(user, token)
         url = request.base_url + url_format + token
+        # delivers formatted password reset url to a valid user email
         MailerHelper.send_mail_to_user(user, 'Expertiza password reset', 'send_password', url).deliver_now
         ExpertizaLogger.info LoggerMessage.new(controller_name, user.name, 'A link to reset your password has been sent to users e-mail address.', request)
         flash[:success] = 'A link to reset your password has been sent to your e-mail address.'

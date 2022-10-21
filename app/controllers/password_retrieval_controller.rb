@@ -10,6 +10,7 @@ class PasswordRetrievalController < ApplicationController
   def send_password
     if params[:user][:email].nil? || params[:user][:email].strip.empty?
       flash[:error] = 'Please enter an e-mail address.'
+      render template: 'password_retrieval/forgotten'
     else
       user = User.find_by(email: params[:user][:email])
       if user

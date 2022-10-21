@@ -2,7 +2,7 @@ class SuggestionController < ApplicationController
   include AuthorizationHelper
 
   #This method determines if the action the user makes, is allowed or not 
-  #depending on the criteraa that the user has student privelages or TA privelages
+  #depending on the criteraa that the user has student privileges or TA privileges
   def action_allowed?
     case params[:action]
     when 'create', 'new', 'student_view', 'student_edit', 'update_suggestion', 'submit'
@@ -147,7 +147,7 @@ class SuggestionController < ApplicationController
 
   private
 
-  #will retreive parameters
+  #will retrieve parameters
   def suggestion_params
     params.require(:suggestion).permit(:assignment_id, :title, :description,
                                        :status, :unityID, :signup_preference)

@@ -75,9 +75,7 @@ describe SignUpSheetController do
       context 'when new topic cannot be saved successfully' do
         it 'sets up a new topic and renders sign_up_sheet#new page' do
           allow(SignUpTopic).to receive(:where).with(topic_name: 'Hello world!', assignment_id: '1').and_return([nil])
-          allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
-            .with('The topic: "Hello world!" has been created successfully. ').and_return('OK')
-          allow(topic).to receive(:save).and_return('OK')
+          allow(topic).to receive(:save)
           request_params = {
             id: 1,
             topic: {

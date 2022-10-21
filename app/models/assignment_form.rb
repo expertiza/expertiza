@@ -69,6 +69,7 @@ class AssignmentForm
     # delete the old queued items and recreate new ones if the assignment has late policy.
     if attributes[:due_date] && !@has_errors && has_late_policy
       delete_from_delayed_queue
+      delete_from_scheduled_set
       add_to_delayed_queue
     end
     update_tag_prompt_deployments(attributes[:tag_prompt_deployments])
@@ -322,7 +323,10 @@ class AssignmentForm
       assignmentId = job.args.first
       job.delete if @assignment.id == assignmentId
     end
+  end
 
+  # Deletes the job with id equal to "delayed_job_id" from the scheduled set
+  def delete_from_scheduled_set
     queue = Sidekiq::ScheduledSet.new
     queue.each do |job|
       assignmentId = job.args.first
@@ -333,6 +337,7 @@ class AssignmentForm
   def delete(force = nil)
     # delete from delayed_jobs queue related to this assignment
     delete_from_delayed_queue
+    delete_from_scheduled_set
     @assignment.delete(force)
   end
 
@@ -400,6 +405,7 @@ class AssignmentForm
 
   def add_simicheck_to_delayed_queue(simicheck_delay)
     delete_from_delayed_queue
+    delete_from_scheduled_set
     if simicheck_delay.to_i >= 0
       duedates = AssignmentDueDate.where(parent_id: @assignment.id)
       duedates.each do |due_date|

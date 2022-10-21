@@ -39,8 +39,7 @@ class PasswordRetrievalController < ApplicationController
     days_until_token_expiration = 1
 
     if params[:token].nil?
-      flash[:error] = 'Password reset page can only be accessed with a generated link, sent to your email'
-      render template: 'password_retrieval/forgotten'
+      require_password_reset_token
     else
       @token = Digest::SHA1.hexdigest(params[:token])
       password_reset = PasswordReset.find_by(token: @token)
@@ -66,8 +65,7 @@ class PasswordRetrievalController < ApplicationController
 
   # avoid users to access this page without a valid token
   def reset_password
-    flash[:error] = 'Password reset page can only be accessed with a generated link, sent to your email'
-    render template: 'password_retrieval/forgotten'
+    require_password_reset_token
   end
 
   # called after entering password and repassword, checks for validation and updates the password of the email
@@ -92,4 +90,10 @@ class PasswordRetrievalController < ApplicationController
       render template: 'password_retrieval/reset_password'
     end
   end
+
+  def require_password_reset_token
+    flash[:error] = 'Password reset page can only be accessed with a generated link, sent to your email'
+    render template: 'password_retrieval/forgotten'
+  end
+    
 end

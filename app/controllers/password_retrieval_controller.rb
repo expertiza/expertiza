@@ -45,13 +45,13 @@ class PasswordRetrievalController < ApplicationController
           @email = password_reset.user_email
           render template: 'password_retrieval/reset_password'
         else
-          ExpertizaLogger.error LoggerMessage.new(controller_name, '', 'User tried to access expired link!', request)
+          ExpertizaLogger.error LoggerMessage.new(controller_name, '', 'User tried to use an expired link!', request)
           flash[:error] = 'Link expired . Please request to reset password again'
           render template: 'password_retrieval/forgotten'
         end
       else
-        ExpertizaLogger.error LoggerMessage.new(controller_name, '', 'User tried to access either expired link or wrong token!', request)
-        flash[:error] = 'Link either expired or wrong Token. Please request to reset password again'
+        ExpertizaLogger.error LoggerMessage.new(controller_name, '', 'User tried to use the link with an invalid token!', request)
+        flash[:error] = 'Link is invalid. Please request to reset password again'
         render template: 'password_retrieval/forgotten'
       end
     end

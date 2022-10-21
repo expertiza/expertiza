@@ -476,6 +476,10 @@ class AssignmentsController < ApplicationController
       q[:questionnaire_id].empty?
     end
     # Deleting Due date info from table if meta-review is unchecked. - UNITY ID: ralwan and vsreeni
+    delete_table_due_date
+  end
+
+  def delete_table_due_date
     @due_date_info = DueDate.where(parent_id: params[:id])
     DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all if params[:metareview_allowed] == 'false'
   end

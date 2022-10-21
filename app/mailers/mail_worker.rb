@@ -23,16 +23,12 @@ class MailWorker
       perform_simicheck_comparisons(self.assignment_id) if self.deadline_type == 'compare_files_with_simicheck'
     else
       # Can we rename deadline_type(metareview) to "teammate review". If, yes then we do not need this if clause below!
-      deadline_text = if self.deadline_type == 'metareview'
-                        'teammate review'
-                      else
-                        self.deadline_type
-                      end
-
+      deadline_text = self.deadline_type == 'metareview' ? 'teammate review' : self.deadline_type
       email_reminder(participant_mails, deadline_text) unless participant_mails.empty?
     end
   end
 
+  # creates and sends email reminder
   def email_reminder(emails, deadline_type)
     assignment = Assignment.find(assignment_id)
     subject = "Message regarding #{deadline_type} for assignment #{assignment.name}"
@@ -58,6 +54,7 @@ class MailWorker
     end
   end
 
+  # collect array of participant emails for the assignment
   def find_participant_emails
     emails = []
     participants = Participant.where(parent_id: assignment_id)
@@ -67,6 +64,7 @@ class MailWorker
     emails
   end
 
+  # remove topics containing only 1 participant
   def drop_one_member_topics
     teams = TeamsUser.all.group(:team_id).count(:team_id)
     teams.keys.each do |team_id|
@@ -77,6 +75,7 @@ class MailWorker
     end
   end
 
+  # remove reviews from outstanding reviews list, once they've been started
   def drop_outstanding_reviews
     reviews = ResponseMap.where(reviewed_object_id: assignment_id)
     reviews.each do |review|
@@ -88,6 +87,7 @@ class MailWorker
     end
   end
 
+  # plagiarism check
   def perform_simicheck_comparisons(assignment_id)
     PlagiarismCheckerHelper.run(assignment_id)
   end

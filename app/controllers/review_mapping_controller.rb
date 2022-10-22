@@ -64,7 +64,42 @@ class ReviewMappingController < ApplicationController
     @mapping = ResponseMap.find(params[:id])
   end
 
-  def add_reviewer
+=begin
+  Used: to assign an new reviewer (who is not already assigned) to a team
+  Implements: checks if a ReviewResponse map exists for that reviewer (user). 
+              Raises error if reviewer is already assigned to the team.
+  Returns: error_msg
+=end
+  def assign_unseen_reviewer_to_team(assignment, user_id)
+    error_msg = ''
+    begin
+      user = User.from_params(params)
+      # contributor_id is team_id
+      regurl = url_for id: assignment.id,
+                       user_id: user.id,
+                       contributor_id: params[:contributor_id]
+
+      # Get the assignment's participant corresponding to the user
+      reviewer = get_reviewer(user, assignment, regurl)
+      # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
+      # to treat all assignments as team assignments
+      if ReviewResponseMap.where(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id).first.nil?
+        ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+      else
+        raise 'The reviewer, "' + reviewer.name + '", is already assigned to this contributor.'
+      end
+    rescue StandardError => e
+      error_msg = e.message
+    end
+    error_msg
+  end
+
+=begin
+  Used: to assign a user as a reviewer to a team
+  Implements: checks if a user belongs to one's own team, in which case they cannot self-review.
+               Else, redirects to the SignUpSheet and assigns an unseen reviewer to a team
+=end
+  def add_reviewer_to_team
     assignment = Assignment.find(params[:id])
     topic_id = params[:topic_id]
     user_id = User.where(name: params[:user][:name]).first.id
@@ -75,29 +110,12 @@ class ReviewMappingController < ApplicationController
     else
       # Team lazy initialization
       SignUpSheet.signup_team(assignment.id, user_id, topic_id)
-      msg = ''
-      begin
-        user = User.from_params(params)
-        # contributor_id is team_id
-        regurl = url_for id: assignment.id,
-                         user_id: user.id,
-                         contributor_id: params[:contributor_id]
-
-        # Get the assignment's participant corresponding to the user
-        reviewer = get_reviewer(user, assignment, regurl)
-        # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
-        # to treat all assignments as team assignments
-        if ReviewResponseMap.where(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id).first.nil?
-          ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
-        else
-          raise 'The reviewer, "' + reviewer.name + '", is already assigned to this contributor.'
-        end
-      rescue StandardError => e
-        msg = e.message
-      end
+      msg = assign_unseen_reviewer_to_team(assignment, user_id)
     end
     redirect_to action: 'list_mappings', id: assignment.id, msg: msg
   end
+
+  
 
   # 7/12/2015 -zhewei
   # This method is used for assign submissions to students for peer review.

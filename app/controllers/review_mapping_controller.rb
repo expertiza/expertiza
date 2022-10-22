@@ -1,3 +1,8 @@
+=begin
+  Implements: assigning reviewers to projects and reviewers to teams
+  Used: for automatic review mapping, peer review, self review and dynamic reviewer assignment.
+=end
+
 class ReviewMappingController < ApplicationController
   include AuthorizationHelper
 
@@ -24,7 +29,15 @@ class ReviewMappingController < ApplicationController
     end
   end
 
-  def add_calibration
+=begin
+  Used: when instructor wants to do an expert peer-review and adds calibration 
+  Implements: checking by user_id, if the the instructor is a participant in the assignment.
+              If not, he is made a new participant. When the record in the ReviewReponseMap 
+              doesn't exist, it creates a new record. The record's id is then passed to the 
+              response controller to create a new response. 
+=end
+
+  def add_calibration_for_instructor
     participant = begin
                     AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first
                   rescue StandardError

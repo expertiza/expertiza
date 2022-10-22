@@ -152,7 +152,6 @@ class SignUpSheetController < ApplicationController
 
   # simple function that redirects ti the /add_signup_topics page
   def redirect_to_sign_up(assignment_id)
-    assignment = Assignment.find(assignment_id)
     redirect_to action: 'add_signup_topics', id: assignment_id
   end
 

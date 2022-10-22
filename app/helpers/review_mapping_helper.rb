@@ -29,7 +29,7 @@ module ReviewMappingHelper
     assignment_created = @assignment.created_at
     # Storing redundantly computed value in a variable
     assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
-    # Returning colour based on conditions
+    # Returning color based on conditions
     if Response.exists?(map_id: response_map.id)
       if !response_map.try(:reviewer).try(:review_grade).nil?
         'brown'
@@ -43,7 +43,7 @@ module ReviewMappingHelper
     end
   end
 
-  # loops through the number of assignment review rounds and obtains the team colour
+  # loops through the number of assignment review rounds and obtains the team color
   def obtain_team_color(response_map, assignment_created, assignment_due_dates)
     color = []
     (1..@assignment.num_review_rounds).each do |round|
@@ -52,7 +52,7 @@ module ReviewMappingHelper
     color[-1]
   end
 
-  # checks the submission state within each round and assigns team colour
+  # checks the submission state within each round and assigns team color
   def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
     if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
       color.push 'purple'

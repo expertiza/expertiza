@@ -266,7 +266,6 @@ class ReviewMappingController < ApplicationController
   Implements: Finds the assignment and meatreviewer and assigns the metareviwer to the 
               assignment dynamically.
 =end
-
   def assign_metareviewer_dynamically
     assignment = Assignment.find(params[:assignment_id])
     metareviewer = AssignmentParticipant.where(user_id: params[:metareviewer_id], parent_id: assignment.id).first
@@ -284,7 +283,6 @@ class ReviewMappingController < ApplicationController
   Implements: Checking if reviewer exists and if not, an error is thrown asking the user
               to register the user.
 =end
-
   def get_reviewer(user, assignment, reg_url)
     reviewer = AssignmentParticipant.where(user_id: user.id, parent_id: assignment.id).first
     raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue." if reviewer.nil?
@@ -299,7 +297,6 @@ class ReviewMappingController < ApplicationController
   Implements: deletes reviewers from ReviewResponseMap and after the deletions, if values
               still exist in ReviewResponseMap, then the method throws an alert.
 =end
-
   def delete_outstanding_reviewers
     assignment = Assignment.find(params[:id])
     team = AssignmentTeam.find(params[:contributor_id])
@@ -324,14 +321,13 @@ class ReviewMappingController < ApplicationController
   Implements: checks the number of unsuccesful deletions and if greater than 0, it throws
               an alert.
 =end
-
   def delete_all_metareviewers
     mapping = ResponseMap.find(params[:id])
-    mmappings = MetareviewResponseMap.where(reviewed_object_id: mapping.map_id)
+    meta_reviwer_mappings = MetareviewResponseMap.where(reviewed_object_id: mapping.map_id)
     num_unsuccessful_deletes = 0
-    mmappings.each do |mmapping|
+    meta_reviwer_mappings.each do |meta_reviwer_mapping|
       begin
-        mmapping.delete(ActiveModel::Type::Boolean.new.cast(params[:force]))
+        meta_reviwer_mapping.delete(ActiveModel::Type::Boolean.new.cast(params[:force]))
       rescue StandardError
         num_unsuccessful_deletes += 1
       end
@@ -364,6 +360,11 @@ class ReviewMappingController < ApplicationController
   end
   # E1721 changes End
 
+=begin
+  Used: to delete the review mappings from review response maps
+  Implements: deleting the review mapping if it exists but if review is already done, 
+  the method shows an error that the review annot be deleted.
+=end
   def delete_reviewer
     review_response_map = ReviewResponseMap.find_by(id: params[:id])
     if review_response_map && !Response.exists?(map_id: review_response_map.id)
@@ -375,6 +376,11 @@ class ReviewMappingController < ApplicationController
     redirect_back fallback_location: root_path
   end
 
+=begin
+  Used: to delete the meta review mapping from meta review reponse map
+  Implements: finding the mapping using id, then deletes the mapping from the map. 
+              Upon deletion failure, method allows forceful deletion by the user
+=end
   def delete_metareviewer
     mapping = MetareviewResponseMap.find(params[:id])
     assignment_id = mapping.assignment.id

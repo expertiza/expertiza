@@ -554,7 +554,12 @@ class ReviewMappingController < ApplicationController
     end
   end
 
-
+=begin 
+  E1600
+  Used: to start a self-review
+  Implements: checking if a self-review has started and if not, creates a self review mapping when user
+              requests a self-review
+=end 
   def start_self_review
     user_id = params[:reviewer_userid]
     assignment = Assignment.find(params[:assignment_id])

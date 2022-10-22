@@ -532,6 +532,11 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id
   end
 
+=begin
+  Used: save grade and comments for the reviewer
+  Implements: checks if a review grade exists for a participant, if not, creates a review grade record 
+              and assigns grade and other values for the reviewer. Throws error message if review grade is not updated succesfully
+=end
   def save_grade_and_comment_for_reviewer
     review_grade = ReviewGrade.find_or_create_by(participant_id: params[:review_grade][:participant_id])
     review_grade.attributes = review_mapping_params
@@ -549,8 +554,7 @@ class ReviewMappingController < ApplicationController
     end
   end
 
-  # E1600
-  # Start self review if not started yet - Creates a self-review mapping when user requests a self-review
+
   def start_self_review
     user_id = params[:reviewer_userid]
     assignment = Assignment.find(params[:assignment_id])

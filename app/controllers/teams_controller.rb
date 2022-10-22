@@ -3,24 +3,27 @@ class TeamsController < ApplicationController
 
   autocomplete :user, :name
 
+  # These routes can only be accessed by a TA
   def action_allowed?
     current_user_has_ta_privileges?
   end
 
-  # This function is used to create teams with random names.
-  # Instructors can call by clicking "Create teams" icon and then click "Create teams" at the bottom.
+  # Randomizes teams based on an Assignment or Course
   def create_teams
-    parent = Object.const_get(session[:team_type]).find(params[:id])
-    Team.randomize_all_by_parent(parent, session[:team_type], params[:team_size].to_i)
-    undo_link('Random teams have been successfully created.')
-    ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Random teams have been successfully created', request)
-    redirect_to action: 'list', id: parent.id
+    Team.randomize_all_by_parent(team_parent, team_type, team_size)
+
+    success_message = 'Random teams have been successfully created.'
+    ExpertizaLogger.info LoggerMessage.new(controller_name, '', success_message, request)
+    undo_link(success_message)
+
+    redirect_to action: 'list', id: team_parent.id
   end
 
   def list
     allowed_types = %w[Assignment Course]
     session[:team_type] = params[:type] if params[:type] && allowed_types.include?(params[:type])
-    @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == 'Assignment'
+
+    @assignment = team_parent if session[:team_type] == 'Assignment'
     begin
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
@@ -141,5 +144,26 @@ class TeamsController < ApplicationController
       flash[:error] = 'No course was found for this assignment.'
     end
     redirect_to controller: 'teams', action: 'list', id: assignment.id
+  end
+
+  private
+
+  def team_size
+    params[:team_size].to_i
+  end
+
+  # Gets the model representing the parent of the team.
+  def team_type
+    if session[:team_type] == 'Assignment'
+      Assignment
+    elsif session[:team_type] == 'Course'
+      Course
+    end
+  end
+
+  # Finds the object containing the students
+  # which the team will be generated from.
+  def team_parent
+    @team_parent ||= team_type.find(params[:id])
   end
 end

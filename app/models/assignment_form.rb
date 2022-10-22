@@ -35,15 +35,15 @@ class AssignmentForm
     assignment_form
   end
 
+  # determines if an error exists with the assignments weight
   def rubric_weight_error(attributes)
     error = false
     attributes[:assignment_questionnaire].each do |assignment_questionnaire|
       # Check rubrics to make sure weight is 0 if there are no Scored Questions
-      scored_questionnaire = false
       questionnaire = Questionnaire.find(assignment_questionnaire[:questionnaire_id])
       questions = Question.where(questionnaire_id: questionnaire.id)
       questions.each do |question|
-        scored_questionnaire = true if question.is_a? ScoredQuestion
+        scored_questionnaire = question.is_a? ScoredQuestion
       end
       unless scored_questionnaire || assignment_questionnaire[:questionnaire_weight].to_i.zero?
         error = true
@@ -55,6 +55,7 @@ class AssignmentForm
   def update(attributes, user, _vary_by_topic_desired = false)
     @has_errors = false
     has_late_policy = false
+    # checks if the assignment has a late policy
     if attributes[:assignment][:late_policy_id].to_i > 0
       has_late_policy = true
     else
@@ -106,7 +107,7 @@ class AssignmentForm
         topic_id = attr[:topic_id] if attr.key?(:topic_id)
         duty_id = attr[:duty_id] if attr.key?(:duty_id) # if duty_id is present in the attributes, save it.
         aq = assignment_questionnaire(questionnaire_type, attr[:used_in_round], topic_id, duty_id)
-        if aq.id.nil?
+        if aq.id.nil?  # checks if the assignment questionnaire exists
           unless aq.save
             @errors = @assignment.errors.to_s
             @has_errors = true
@@ -172,7 +173,7 @@ class AssignmentForm
     attributes.each do |due_date|
       next if due_date[:due_at].blank?
 
-      # parse the dd and convert it to utc before saving it to db
+      # parse the dueDate and convert it to utc before saving it to db
       # eg. 2015-06-22 12:05:00 -0400
       current_local_time = Time.parse(due_date[:due_at][0..15])
       tz = ActiveSupport::TimeZone[user.timezonepref].tzinfo
@@ -184,12 +185,12 @@ class AssignmentForm
                                             current_local_time.strftime('%S').to_i))
       due_date[:due_at] = utc_time
       if due_date[:id].nil? || due_date[:id].blank?
-        dd = AssignmentDueDate.new(due_date)
-        @has_errors = true unless dd.save
+        dueDate = AssignmentDueDate.new(due_date)
+        @has_errors = true unless dueDate.save
       else
-        dd = AssignmentDueDate.find(due_date[:id])
+        dueDate = AssignmentDueDate.find(due_date[:id])
         # get deadline for review
-        @has_errors = true unless dd.update_attributes(due_date)
+        @has_errors = true unless dueDate.update_attributes(due_date)
       end
       @errors += @assignment.errors.to_s if @has_errors
     end
@@ -212,10 +213,10 @@ class AssignmentForm
     duedates = AssignmentDueDate.where(parent_id: @assignment.id)
     duedates.each do |due_date|
       deadline_type = DeadlineType.find(due_date.deadline_type_id).name
-      diff_btw_time_left_and_threshold, min_left = get_time_diff_btw_due_date_and_now(due_date)
-      next unless diff_btw_time_left_and_threshold > 0
+      diff_between_time_left_and_threshold, min_left = get_time_diff_between_due_date_and_now(due_date)
+      next unless diff_between_time_left_and_threshold > 0
 
-      delayed_job_id = add_delayed_job(@assignment, deadline_type, due_date, diff_btw_time_left_and_threshold)
+      delayed_job_id = add_delayed_job(@assignment, deadline_type, due_date, diff_between_time_left_and_threshold)
       due_date.update_attribute(:delayed_job_id, delayed_job_id)
       # If the deadline type is review, add a delayed job to drop outstanding review
       add_delayed_job(@assignment, 'drop_outstanding_reviews', due_date, min_left) if deadline_type == 'review'
@@ -302,13 +303,14 @@ class AssignmentForm
     Object.const_get(questionnaire_type).new
   end
 
-  def get_time_diff_btw_due_date_and_now(due_date)
+  # determines time left until due date
+  def get_time_diff_between_due_date_and_now(due_date)
     due_at = due_date.due_at.to_s(:db)
     Time.parse(due_at)
     due_at = Time.parse(due_at)
     time_left_in_min = find_min_from_now(due_at)
-    diff_btw_time_left_and_threshold = time_left_in_min - due_date.threshold * 60
-    [diff_btw_time_left_and_threshold, time_left_in_min]
+    diff_between_time_left_and_threshold = time_left_in_min - due_date.threshold * 60
+    [diff_between_time_left_and_threshold, time_left_in_min]
   end
 
   # add DelayedJob into queue and return it
@@ -335,7 +337,7 @@ class AssignmentForm
   end
 
   def delete(force = nil)
-    # delete from delayed_jobs queue related to this assignment
+    # delete from delayed_jobs queue and scheduled set related to this assignment
     delete_from_delayed_queue
     delete_from_scheduled_set
     @assignment.delete(force)
@@ -448,6 +450,7 @@ class AssignmentForm
     new_assign_id
   end
 
+  # creates copy of assignment questionnaire
   def self.copy_assignment_questionnaire(old_assign, new_assign, user)
     old_assign.assignment_questionnaires.each do |aq|
       AssignmentQuestionnaire.create(

@@ -24,7 +24,7 @@ describe TeamsController do
         allow(Version).to receive_message_chain(:where, :last).with(any_args).and_return(0.1)
         request_params = { id: assignment1.id, team_size: 2 }
         user_session = { user: instructor, team_type: 'Assignment' }
-        result = get :create_teams, params: request_params, session: user_session
+        result = get :randomize_teams, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(action: 'list', id: assignment1.id)
@@ -225,13 +225,13 @@ describe TeamsController do
       end
     end
   end
-  
+
   describe '#bequeath_all' do
     context 'when the team type is user_session' do
       it 'flashes an error' do
         user_session = {team_type: 'Course', user: ta}
         request_params = { id: team5.id }
-        post :bequeath_all, params: request_params, session: user_session 
+        post :bequeath_all, params: request_params, session: user_session
         expect(flash[:error]).to eq('Invalid team type for bequeathal')
       end
     end

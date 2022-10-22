@@ -9,7 +9,7 @@ class TeamsController < ApplicationController
   end
 
   # Randomizes teams based on an Assignment or Course
-  def create_teams
+  def randomize_teams
     Team.randomize_all_by_parent(team_parent, team_type, team_size)
 
     success_message = 'Random teams have been successfully created.'

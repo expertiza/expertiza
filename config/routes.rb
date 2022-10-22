@@ -526,7 +526,7 @@ Expertiza::Application.routes.draw do
   resources :teams, only: %i[new create edit update] do
     collection do
       get :list
-      post :create_teams
+      post :randomize_teams
       post :inherit
       get :delete
       get :delete_all

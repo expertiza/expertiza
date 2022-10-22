@@ -582,6 +582,50 @@ class ReviewMappingController < ApplicationController
 
   private
 
+=begin
+  Used: to generate sorted teams hash
+  Implements: generates an unsorted hash then sorts it
+  Returns: sorted teams hash
+=end
+  def generate_sorted_teams_hash(assignment_id)
+    unsorted_teams_hash = {}
+
+    ReviewResponseMap.where(reviewed_object_id: assignment_id,
+                            calibrate_to: 0).each do |response_map|
+      if unsorted_teams_hash.key? response_map.reviewee_id
+        unsorted_teams_hash[response_map.reviewee_id] += 1
+      else
+        unsorted_teams_hash[response_map.reviewee_id] = 1
+      end
+    end
+    unsorted_teams_hash.sort_by { |_, v| v }.to_h
+  end
+
+=begin
+  Used: to increment value in teams hash
+  Implements: finds participants with insufficient num of reviews and increments the team hash accordingly
+=end
+  def increment_teams_hash(participants_with_insufficient_review_num, teams_hash, assignment_id)
+    participants_with_insufficient_review_num.each do |participant_id|
+      teams_hash.each_key do |team_id, _num_review_received|
+        next if TeamsUser.exists?(team_id: team_id,
+                                  user_id: Participant.find(participant_id).user_id)
+
+        participant = AssignmentParticipant.find(participant_id)
+        ReviewResponseMap.where(reviewee_id: team_id, reviewer_id: participant.get_reviewer.id,
+                                reviewed_object_id: assignment_id).first_or_create
+
+        teams_hash[team_id] += 1
+        teams_hash = teams_hash.sort_by { |_, v| v }.to_h
+        break
+      end
+    end
+  end
+
+=begin
+  Used: assigns reviewers for a team
+  Implemets: finds participants who have insufficient reviews and assigns reviewers to them
+=end
   def assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
     if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0)
                         .where('created_at > :time',
@@ -591,32 +635,10 @@ class ReviewMappingController < ApplicationController
       participants_hash.each do |participant_id, review_num|
         participants_with_insufficient_review_num << participant_id if review_num < review_strategy.reviews_per_student
       end
-      unsorted_teams_hash = {}
-
-      ReviewResponseMap.where(reviewed_object_id: assignment_id,
-                              calibrate_to: 0).each do |response_map|
-        if unsorted_teams_hash.key? response_map.reviewee_id
-          unsorted_teams_hash[response_map.reviewee_id] += 1
-        else
-          unsorted_teams_hash[response_map.reviewee_id] = 1
-        end
-      end
-      teams_hash = unsorted_teams_hash.sort_by { |_, v| v }.to_h
-
-      participants_with_insufficient_review_num.each do |participant_id|
-        teams_hash.each_key do |team_id, _num_review_received|
-          next if TeamsUser.exists?(team_id: team_id,
-                                    user_id: Participant.find(participant_id).user_id)
-
-          participant = AssignmentParticipant.find(participant_id)
-          ReviewResponseMap.where(reviewee_id: team_id, reviewer_id: participant.get_reviewer.id,
-                                  reviewed_object_id: assignment_id).first_or_create
-
-          teams_hash[team_id] += 1
-          teams_hash = teams_hash.sort_by { |_, v| v }.to_h
-          break
-        end
-      end
+      
+      sorted_teams_hash = generate_sorted_teams_hash(assignment_id)
+      increment_teams_hash(participants_with_insufficient_review_num, sorted_teams_hash, assignment_id)
+      
     end
     @@time_create_last_review_mapping_record = ReviewResponseMap
                                                .where(reviewed_object_id: assignment_id)

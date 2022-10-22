@@ -234,6 +234,12 @@ class ReviewMappingController < ApplicationController
     redirect_to student_quizzes_path(id: reviewer.id)
   end
 
+=begin
+  Used: to create a metareviewer to a reviewer.
+  Implements: finding a user from the params and checking if a reviewer is already assigned
+              as a metareviewer. If so, then it throws a flash message, else it creates
+              a meta reviewer.
+=end
   def add_metareviewer
     mapping = ResponseMap.find(params[:id])
     msg = ''
@@ -255,6 +261,12 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: mapping.assignment.id, msg: msg
   end
 
+=begin
+  Used: to assign a metareviwer dynamically.
+  Implements: Finds the assignment and meatreviewer and assigns the metareviwer to the 
+              assignment dynamically.
+=end
+
   def assign_metareviewer_dynamically
     assignment = Assignment.find(params[:assignment_id])
     metareviewer = AssignmentParticipant.where(user_id: params[:metareviewer_id], parent_id: assignment.id).first
@@ -267,6 +279,12 @@ class ReviewMappingController < ApplicationController
     redirect_to controller: 'student_review', action: 'list', id: metareviewer.id
   end
 
+=begin
+  Used: to retrieve reviewer from AssignmentParticipant
+  Implements: Checking if reviewer exists and if not, an error is thrown asking the user
+              to register the user.
+=end
+
   def get_reviewer(user, assignment, reg_url)
     reviewer = AssignmentParticipant.where(user_id: user.id, parent_id: assignment.id).first
     raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue." if reviewer.nil?
@@ -275,6 +293,12 @@ class ReviewMappingController < ApplicationController
   rescue StandardError => e
     flash[:error] = e.message
   end
+
+=begin
+  Used: to remove reviwers not working on any reviews.
+  Implements: deletes reviewers from ReviewResponseMap and after the deletions, if values
+              still exist in ReviewResponseMap, then the method throws an alert.
+=end
 
   def delete_outstanding_reviewers
     assignment = Assignment.find(params[:id])
@@ -294,6 +318,12 @@ class ReviewMappingController < ApplicationController
     end
     redirect_to action: 'list_mappings', id: assignment.id
   end
+
+=begin
+  Used: to delete all meta reviewers and to keep track of unsuccesful deletions.
+  Implements: checks the number of unsuccesful deletions and if greater than 0, it throws
+              an alert.
+=end
 
   def delete_all_metareviewers
     mapping = ResponseMap.find(params[:id])

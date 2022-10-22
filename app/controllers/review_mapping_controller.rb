@@ -115,7 +115,44 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id, msg: msg
   end
 
-  
+=begin
+  Used: to assign reviewer when topic is known
+  Implements: finds topics to be reviewed by reviewer, raises error if no topics are present
+=end
+  def assign_reviewer_with_topic(assignment,reviewer)
+    topic = if params[:topic_id]
+    SignUpTopic.find(params[:topic_id])
+    else
+      begin
+        assignment.candidate_topics_to_review(reviewer).to_a.sample
+      rescue StandardError
+        nil
+      end
+    end
+    if topic.nil?
+      flash[:error] = 'No topics are available to review at this time. Please try later.'
+    else
+      assignment.assign_reviewer_dynamically(reviewer, topic)
+    end
+  end
+
+=begin
+  Used: to assign reviewer to assignment_team's submission, when topic is not known
+  Implements: finds an assignment_team whose assignment has no previous reviewer
+=end
+  def assign_reviewer_without_topic(assignment, reviewer)
+    assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
+    assignment_team = begin
+                        assignment_teams.to_a.sample
+                      rescue StandardError
+                        nil
+                      end
+    if assignment_team.nil?
+      flash[:error] = 'No artifacts are available to review at this time. Please try later.'
+    else
+      assignment.assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
+    end
+  end
 
   # 7/12/2015 -zhewei
   # This method is used for assign submissions to students for peer review.
@@ -132,32 +169,9 @@ class ReviewMappingController < ApplicationController
         if check_outstanding_reviews?(assignment, reviewer)
           # begin
           if assignment.topics? # assignment with topics
-            topic = if params[:topic_id]
-                      SignUpTopic.find(params[:topic_id])
-                    else
-                      begin
-                        assignment.candidate_topics_to_review(reviewer).to_a.sample
-                      rescue StandardError
-                        nil
-                      end
-                    end
-            if topic.nil?
-              flash[:error] = 'No topics are available to review at this time. Please try later.'
-            else
-              assignment.assign_reviewer_dynamically(reviewer, topic)
-            end
+            assign_reviewer_with_topic(assignment,reviewer)
           else # assignment without topic -Yang
-            assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
-            assignment_team = begin
-                                assignment_teams.to_a.sample
-                              rescue StandardError
-                                nil
-                              end
-            if assignment_team.nil?
-              flash[:error] = 'No artifacts are available to review at this time. Please try later.'
-            else
-              assignment.assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
-            end
+            assign_reviewer_without_topic(assignment, reviewer)
           end
         else
           flash[:error] = 'You cannot do more reviews when you have ' + Assignment.max_outstanding_reviews + 'reviews to do'

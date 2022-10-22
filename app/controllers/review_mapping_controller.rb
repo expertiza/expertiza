@@ -497,24 +497,31 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment_id
   end
 
+=begin
+  Used: to perform peer review strategy and assign reviewers for a team
+  Implements: calculates reviewers for each team and calls peer review strategy if review strategy exists.
+              If there are some peer reviewers without enough peer reviews, assign them to valid teams
+=end
   def automatic_review_mapping_strategy(assignment_id,
-                                        participants, teams, student_review_num = 0,
-                                        submission_review_num = 0)
+                                        participants, teams, num_students_review = 0,
+                                        num_submission_review = 0)
     participants_hash = {}
     participants.each { |participant| participants_hash[participant.id] = 0 }
     # calculate reviewers for each team
-    if !student_review_num.zero? && submission_review_num.zero?
-      review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, student_review_num)
-    elsif student_review_num.zero? && !submission_review_num.zero?
-      review_strategy = ReviewMappingHelper::TeamReviewStrategy.new(participants, teams, submission_review_num)
+    if !num_students_review.zero? && num_submission_review.zero?
+      review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, num_students_review)
+    elsif num_students_review.zero? && !num_submission_review.zero?
+      review_strategy = ReviewMappingHelper::TeamReviewStrategy.new(participants, teams, num_submission_review)
     end
 
-    peer_review_strategy(assignment_id, review_strategy, participants_hash)
+    if review_strategy
+      peer_review_strategy(assignment_id, review_strategy, participants_hash)
 
-    # after assigning peer reviews for each team,
-    # if there are still some peer reviewers not obtain enough peer review,
-    # just assign them to valid teams
-    assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
+      # after assigning peer reviews for each team,
+      # if there are still some peer reviewers not obtain enough peer review,
+      # just assign them to valid teams
+      assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
+    end
   end
 
   # This is for staggered deadline assignment

@@ -183,8 +183,8 @@ class SubmittedContentController < ApplicationController
   end
 
   def download
-    folder_name = params['current_folder']['name']
-    file_name = params['download']
+    folder_name = params[:current_folder][:name]
+    file_name = params[:download]
     raise 'Folder_name is nil.' if folder_name.nil?
     raise 'File_name is nil.' if file_name.nil?
     raise 'Cannot send a whole folder.' if File.directory?(folder_name + '/' + file_name)

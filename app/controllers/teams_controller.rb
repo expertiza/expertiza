@@ -108,9 +108,7 @@ class TeamsController < ApplicationController
       if teams.empty?
         flash[:note] = 'No teams were found when trying to inherit.'
       else
-        teams.each do |team|
-          team.copy(assignment.id)
-        end
+        Team.copy_teams_to_collection(teams, assignment.id)
       end
     else
       flash[:error] = 'No course was found for this assignment.'
@@ -133,9 +131,7 @@ class TeamsController < ApplicationController
         return
       end
       teams = assignment.teams
-      teams.each do |team|
-        team.copy(course.id)
-      end
+      Team.copy_teams_to_collection(teams, course.id)
       flash[:note] = teams.length.to_s + ' teams were successfully copied to "' + course.name + '"'
     else
       flash[:error] = 'No course was found for this assignment.'

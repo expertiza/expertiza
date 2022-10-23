@@ -57,7 +57,7 @@ class SignUpSheetController < ApplicationController
     if topic.nil?
       setup_new_topic
     else
-      update_existing_topic topic
+      update_existing_topic topic # Required?
     end
   end
 
@@ -90,14 +90,8 @@ class SignUpSheetController < ApplicationController
   def update
     @topic = SignUpTopic.find(params[:id])
     if @topic
-      @topic.topic_identifier = params[:topic][:topic_identifier]
-      update_max_choosers @topic
-      @topic.category = params[:topic][:category]
-      @topic.topic_name = params[:topic][:topic_name]
-      @topic.micropayment = params[:topic][:micropayment]
-      @topic.description = params[:topic][:description]
-      @topic.link = params[:topic][:link]
-      @topic.save
+      update_waitlist @topic
+      @topic.update_attributes(topic_params)
       undo_link("The topic: \"#{@topic.topic_name}\" has been successfully updated. ")
     else
       flash[:error] = 'The topic could not be updated.'
@@ -465,25 +459,21 @@ class SignUpSheetController < ApplicationController
     end
   end
 
-  def update_existing_topic(topic)
-    topic.topic_identifier = params[:topic][:topic_identifier]
-    update_max_choosers(topic)
-    topic.category = params[:topic][:category]
-    # topic.assignment_id = params[:id]
-    topic.save
-    redirect_to_sign_up(params[:id])
+  def update_existing_topic(topic)  # TODO: Method necessary? 
+      update_waitlist topic
+      topic.update_attributes(topic_params)
+      redirect_to_sign_up(params[:id])
   end
 
-  def update_max_choosers(topic)
+  def update_waitlist(topic)
     # While saving the max choosers you should be careful; if there are users who have signed up for this particular
     # topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
     # there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
     # it.
-    if SignedUpTeam.find_by(topic_id: topic.id).nil? || topic.max_choosers == params[:topic][:max_choosers]
-      topic.max_choosers = params[:topic][:max_choosers]
-    elsif topic.max_choosers.to_i < params[:topic][:max_choosers].to_i
-      topic.update_waitlisted_users params[:topic][:max_choosers]
-      topic.max_choosers = params[:topic][:max_choosers]
+    if SignedUpTeam.find_by(topic_id: topic.id).nil? || topic.max_choosers == topic_params[:max_choosers]
+      return
+    elsif topic.max_choosers.to_i < topic_params[:max_choosers].to_i
+      topic.update_waitlisted_users topic_params[:max_choosers]
     else
       flash[:error] = 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'
     end
@@ -513,5 +503,9 @@ class SignUpSheetController < ApplicationController
 
   def delete_signup_for_topic(assignment_id, topic_id, user_id)
     SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
+  end
+
+  def topic_params
+    params.require(:topic).permit(:topic_identifier, :category, :topic_name, :micropayment, :description, :link, :max_choosers)
   end
 end

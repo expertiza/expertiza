@@ -136,7 +136,7 @@ module ReviewMappingHelper
 
   # gets the review score awarded based on each round of the review
 
-  def get_awarded_review_score(reviewer_id, team_id)
+  def awarded_review_score(reviewer_id, team_id)
     # Storing redundantly computed value in num_rounds variable
     num_rounds = @assignment.num_review_rounds
     # Setting values of instance variables

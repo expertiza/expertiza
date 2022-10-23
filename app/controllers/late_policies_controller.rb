@@ -145,19 +145,25 @@ class LatePoliciesController < ApplicationController
     end
 
     if should_check
-      if LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
-        error_message = prefix + 'A policy with the same name ' + params[:late_policy][:policy_name] + ' already exists.'
-        valid_penalty = false
-      end
+      valid_penalty, error_message = check_if_policy_exists(prefix)
     end
     return valid_penalty, error_message
+  end
+
+  def check_if_policy_exists(prefix)
+    error_message = nil
+    if LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
+      error_message = prefix + 'A policy with the same name ' + params[:late_policy][:policy_name] + ' already exists.'
+      return false, error_message
+    end
+    return true, nil
   end
 
   # This function validates the input.
   def validate_input(is_update = false)
     # Validates input for create and update forms
-    max_penalty = params[:late_policy][:max_penalty].to_i
-    penalty_per_unit = params[:late_policy][:penalty_per_unit].to_i
+    max_penalty = late_policy_params[:max_penalty].to_i
+    penalty_per_unit = late_policy_params[:penalty_per_unit].to_i
 
     valid_penalty, error_message = duplicate_name_check(is_update)
     prefix = is_update ? "Cannot edit the policy. " : ""

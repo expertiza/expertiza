@@ -25,7 +25,7 @@ module ReviewMappingHelper
   # gets the team name's color according to review and assignment submission status
   #
   def team_color(response_map)
-    # Storing redundantly computed value in a variable
+    # Storing redundantly computed value in a variable 
     assignment_created = @assignment.created_at
     # Storing redundantly computed value in a variable
     assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)

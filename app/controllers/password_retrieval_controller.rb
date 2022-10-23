@@ -66,14 +66,15 @@ class PasswordRetrievalController < ApplicationController
     render template: 'password_retrieval/forgotten'
   end
 
-  # called after entering password and repassword, checks for validation and updates the password of the email
+  # Updates the user password and deletes all password reset tokens associated with the user email ID
   def update_password
     if params[:reset][:password] == params[:reset][:repassword]
+      # If the password and password confirmation fields match, then updates the user password
       user = User.find_by(email: params[:reset][:email])
       user.password = params[:reset][:password]
       user.password_confirmation = params[:reset][:repassword]
       if user.save
-        PasswordReset.delete_all(user_email: user.email)
+        PasswordReset.delete_all(user_email: user.email) # Deletes all password reset tokens associated with the email ID of the user
         ExpertizaLogger.info LoggerMessage.new(controller_name, user.name, 'Password was reset for the user', request)
         flash[:success] = 'Password was successfully reset'
       else
@@ -82,6 +83,7 @@ class PasswordRetrievalController < ApplicationController
       end
       redirect_to '/'
     else
+      # If the password and password confirmation fields don't match, then flashes error message
       ExpertizaLogger.error LoggerMessage.new(controller_name, '', 'Password provided by the user did not match', request)
       flash[:error] = 'Password and confirm-password do not match. Try again'
       @email = params[:reset][:email]

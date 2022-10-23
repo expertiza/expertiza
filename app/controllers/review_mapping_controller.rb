@@ -645,6 +645,81 @@ class ReviewMappingController < ApplicationController
                                                .last.created_at
   end
 
+=begin
+  Used: to generate a random participant index
+  Implements: checks for participants with min assigned reviews and if it is blank or if there is only one 
+              element in participants_with_min_assigned_reviews, it does not allow a user to review their artifact.
+              It instead generates an index of a random participant. 
+=end
+  def generate_random_participant_index(iterator, participants_hash, num_participants)
+    if iterator.zero?
+      random_participant_index = rand(0..num_participants - 1)
+    else
+      min_value = participants_hash.values.min
+      # get the temp array including indices of participants, each participant has minimum review number in hash table.
+      participants_with_min_assigned_reviews = []
+      participants.each do |participant|
+        participants_with_min_assigned_reviews << participants.index(participant) if participants_hash[participant.id] == min_value
+      end
+      # if participants_with_min_assigned_reviews is blank
+      check_min_assigned_reviews = participants_with_min_assigned_reviews.empty?
+      # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
+      check_participants_with_min_reviews = ((participants_with_min_assigned_reviews.size == 1) && TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
+      random_participant_index = if check_min_review_participants || check_participants_with_min_reviews
+                   # use original method to get random number
+                   rand(0..num_participants - 1)
+                 else
+                   # random_participant_index should be the position of this participant in original array
+                   participants_with_min_assigned_reviews[rand(0..participants_with_min_assigned_reviews.size - 1)]
+                 end
+    end
+    random_participant_index
+  end
+
+=begin
+  Used: to even out the number of reviews among teams for a given assignment id.
+  Implements: tracks num of reviews assigned to a participant and uses selected_participants to track particiant
+              ids which are selected to review for a particular team. 
+=end
+  def distribute_reviews_among_teams(team, assignment_id, review_strategy, selected_participants, participants_hash, iterator, num_participants, participants)
+    while selected_participants.size < review_strategy.reviews_per_team
+      num_participants_this_team = TeamsUser.where(team_id: team.id).size
+      # If there are some submitters or reviewers in this team, they are not treated as normal participants.
+      # They should be removed from 'num_participants_this_team'
+      TeamsUser.where(team_id: team.id).each do |team_user|
+        temp_participant = Participant.where(user_id: team_user.user_id, parent_id: assignment_id).first
+        num_participants_this_team -= 1 unless temp_participant.can_review && temp_participant.can_submit
+      end
+      # if all outstanding participants are already in selected_participants, just break the loop.
+      break if selected_participants.size == participants.size - num_participants_this_team
+
+      # generate random number
+      random_participant_index = generate_random_participant_index(iterator, participants_hash, num_participants)
+      # prohibit one student to review his/her own artifact
+      next if TeamsUser.exists?(team_id: team.id, user_id: participants[random_participant_index].user_id)
+
+      check_reviews_per_participant = (participants_hash[participants[random_participant_index].id] < review_strategy.reviews_per_student)
+      is_participant_in_selected_participants = (!selected_participants.include? participants[random_participant_index].id)
+      if check_reviews_per_participant && is_participant_in_selected_participants
+        # selected_participants cannot include duplicate num
+        selected_participants << participants[random_participant_index].id
+        participants_hash[participants[random_participant_index].id] += 1
+      end
+      # remove students who have already been assigned enough num of reviews out of participants array
+      participants.each do |participant|
+        if participants_hash[participant.id] == review_strategy.reviews_per_student
+          participants.delete_at(random_participant_index)
+          num_participants -= 1
+        end
+      end
+    end
+  end
+
+=begin
+  Used: to allocate reviews to participants
+  Implements: a strategy to allocate reviews using the conecept of evenly distributing the reviews to participants
+              and not assigning the participant to review their work.
+=end
   def peer_review_strategy(assignment_id, review_strategy, participants_hash)
     teams = review_strategy.teams
     participants = review_strategy.participants
@@ -654,57 +729,7 @@ class ReviewMappingController < ApplicationController
       selected_participants = []
       if !team.equal? teams.last
         # need to even out the # of reviews for teams
-        while selected_participants.size < review_strategy.reviews_per_team
-          num_participants_this_team = TeamsUser.where(team_id: team.id).size
-          # If there are some submitters or reviewers in this team, they are not treated as normal participants.
-          # They should be removed from 'num_participants_this_team'
-          TeamsUser.where(team_id: team.id).each do |team_user|
-            temp_participant = Participant.where(user_id: team_user.user_id, parent_id: assignment_id).first
-            num_participants_this_team -= 1 unless temp_participant.can_review && temp_participant.can_submit
-          end
-          # if all outstanding participants are already in selected_participants, just break the loop.
-          break if selected_participants.size == participants.size - num_participants_this_team
-
-          # generate random number
-          if iterator.zero?
-            rand_num = rand(0..num_participants - 1)
-          else
-            min_value = participants_hash.values.min
-            # get the temp array including indices of participants, each participant has minimum review number in hash table.
-            participants_with_min_assigned_reviews = []
-            participants.each do |participant|
-              participants_with_min_assigned_reviews << participants.index(participant) if participants_hash[participant.id] == min_value
-            end
-            # if participants_with_min_assigned_reviews is blank
-            if_condition_1 = participants_with_min_assigned_reviews.empty?
-            # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
-            if_condition_2 = ((participants_with_min_assigned_reviews.size == 1) && TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
-            rand_num = if if_condition_1 || if_condition_2
-                         # use original method to get random number
-                         rand(0..num_participants - 1)
-                       else
-                         # rand_num should be the position of this participant in original array
-                         participants_with_min_assigned_reviews[rand(0..participants_with_min_assigned_reviews.size - 1)]
-                       end
-          end
-          # prohibit one student to review his/her own artifact
-          next if TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
-
-          if_condition_1 = (participants_hash[participants[rand_num].id] < review_strategy.reviews_per_student)
-          if_condition_2 = (!selected_participants.include? participants[rand_num].id)
-          if if_condition_1 && if_condition_2
-            # selected_participants cannot include duplicate num
-            selected_participants << participants[rand_num].id
-            participants_hash[participants[rand_num].id] += 1
-          end
-          # remove students who have already been assigned enough num of reviews out of participants array
-          participants.each do |participant|
-            if participants_hash[participant.id] == review_strategy.reviews_per_student
-              participants.delete_at(rand_num)
-              num_participants -= 1
-            end
-          end
-        end
+        distribute_reviews_among_teams(team, assignment_id, review_strategy, selected_participants, participants_hash, iterator, num_participants, participants)
       else
         # REVIEW: num for last team can be different from other teams.
         # prohibit one student to review his/her own artifact and selected_participants cannot include duplicate num

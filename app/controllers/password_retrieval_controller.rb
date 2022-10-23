@@ -33,7 +33,6 @@ class PasswordRetrievalController < ApplicationController
   # Checks the request for a valid, unexpired password reset token
   def check_reset_url
     if params[:token].nil?
-      # If token from the request params is nil, then flashes error message
       flash[:error] = 'Password reset page can only be accessed with a generated link, sent to your email'
       render template: 'password_retrieval/forgotten'
     else
@@ -69,7 +68,6 @@ class PasswordRetrievalController < ApplicationController
   # Updates the user password and deletes all password reset tokens associated with the user email ID
   def update_password
     if params[:reset][:password] == params[:reset][:repassword]
-      # If the password and password confirmation fields match, then updates the user password
       user = User.find_by(email: params[:reset][:email])
       user.password = params[:reset][:password]
       user.password_confirmation = params[:reset][:repassword]
@@ -83,7 +81,6 @@ class PasswordRetrievalController < ApplicationController
       end
       redirect_to '/'
     else
-      # If the password and password confirmation fields don't match, then flashes error message
       ExpertizaLogger.error LoggerMessage.new(controller_name, '', 'Password provided by the user did not match', request)
       flash[:error] = 'Password and confirm-password do not match. Try again'
       @email = params[:reset][:email]

@@ -151,7 +151,6 @@ class LatePoliciesController < ApplicationController
   end
 
   def check_if_policy_exists(prefix)
-    error_message = nil
     if LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
       error_message = prefix + 'A policy with the same name ' + params[:late_policy][:policy_name] + ' already exists.'
       return false, error_message
@@ -187,6 +186,5 @@ class LatePoliciesController < ApplicationController
     end
 
     return valid_penalty, error_message
-    
   end
 end

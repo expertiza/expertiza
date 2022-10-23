@@ -7,8 +7,8 @@ class AuthController < ApplicationController
   verify method: :post, only: %i[login logout],
          redirect_to: { action: :list }
 
-  before_action :log_logging_in, only: :after_login
-  before_action :log_logging_out, only: :logout
+  before_action :log_user_login, only: :after_login
+  before_action :log_user_logout, only: :logout
 
   def action_allowed?
     case params[:action]
@@ -95,11 +95,11 @@ class AuthController < ApplicationController
     redirect_to controller: 'password_retrieval', action: 'forgotten'
   end
 
-  def log_logging_out
+  def log_user_logout
     ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Logging out!', request)
   end
 
-  def log_logging_in
+  def log_user_login
     ExpertizaLogger.info LoggerMessage.new('', user.name, 'Login successful')
   end
 

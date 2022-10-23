@@ -81,4 +81,12 @@ class SignedUpTeam < ApplicationRecord
       signed_up_teams.first.topic_id
     end
   end
+
+  def self.delete_team_from_waitlist(team_id)
+    # if there is another team in waitlist, make this team hold this topic
+    topic_id = team_id.first.topic_id
+    next_wait_listed_team = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
+    # if slot exist, then confirm the topic for this team and delete all waitlists for this team
+    SignUpTopic.assign_to_first_waiting_team(next_wait_listed_team) if next_wait_listed_team
+  end
 end

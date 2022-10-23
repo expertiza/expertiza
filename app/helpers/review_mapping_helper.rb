@@ -99,7 +99,7 @@ module ReviewMappingHelper
 
   # returns last modified header date
   # only checks certain links (wiki)
-  def get_link_updated_at(link)
+  def link_updated_at(link)
     uri = URI(link)
     res = Net::HTTP.get_response(uri)['last-modified']
     res.to_time

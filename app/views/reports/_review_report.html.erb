@@ -84,7 +84,7 @@
           <% @response_maps.each_with_index do |reviewer_map, index| %>
             <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
             <% team_name_color = team_color(reviewer_map) %>
-            <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, reviewer_map.response, reviewer_map.reviewee_id, session[:ip]) %>
+            <% team_reviewed_link_name = team_reviewed_link_name(@assignment.max_team_size, reviewer_map.response, reviewer_map.reviewee_id, session[:ip]) %>
               <% if Team.where(id: reviewer_map.reviewee_id).length > 0 %>
                 <!--Team reviewed-->
                 <% if index == 0 %>

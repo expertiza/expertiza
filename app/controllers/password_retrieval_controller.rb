@@ -65,14 +65,16 @@ class PasswordRetrievalController < ApplicationController
     render template: 'password_retrieval/forgotten'
   end
 
-  # Updates the user password and deletes all password reset tokens associated with the user email ID
+  # Updates the user password and invalidates reset tokens associated with the user email ID
   def update_password
+    # Performs confirm password validation to catch user typos
     if params[:reset][:password] == params[:reset][:repassword]
       user = User.find_by(email: params[:reset][:email])
       user.password = params[:reset][:password]
       user.password_confirmation = params[:reset][:repassword]
       if user.save
-        PasswordReset.delete_all(user_email: user.email) # Deletes all password reset tokens associated with the email ID of the user
+        # Deletes all password reset tokens of the user to invalidate the used and previous tokens
+        PasswordReset.delete_all(user_email: user.email)
         ExpertizaLogger.info LoggerMessage.new(controller_name, user.name, 'Password was reset for the user', request)
         flash[:success] = 'Password was successfully reset'
       else

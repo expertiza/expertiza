@@ -362,7 +362,7 @@ module ReviewMappingHelper
   end
 
   # gets review and feedback responses for all rounds for the feedback report
-  def get_each_review_and_feedback_response_map(author)
+  def each_review_and_feedback_response_map(author)
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     # Calculate how many responses one team received from each round
     # It is the feedback number each team member should make

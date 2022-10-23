@@ -172,7 +172,7 @@ describe TeamsController do
     #         allow('if').to receive('true'.to_s)
     #         #controller.instance_variable_set(:@signed_up_team, team5)
     #         #allow(@signed_up_team).to receive(:==).and_return(1)
-    #         #controller.instance_variable_set(:@signUps, team5)
+    #         #controller.instance_variable_set(:@@signups, team5)
     #         #allow(team5).to receive_message_chain(:first, :is_waitlisted).and_return(false)
     #         #allow(@signed_up_team).to receive_message_chain(:first, :topic_id).and_return(5)
     #         allow(team5).to receive(:destroy).and_return(nil)

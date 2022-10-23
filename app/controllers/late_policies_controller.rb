@@ -53,7 +53,7 @@ class LatePoliciesController < ApplicationController
   # There are few check points before creating a late policy which are written in the if/else statements.
   def create
     # First this function validates the input then save if the input is valid.
-    valid_penalty, error_message = validate_input
+    valid_penalty, error_message = validate_input(late_policy_params,false)
     if error_message
       flash[:error] = error_message
     end
@@ -82,7 +82,7 @@ class LatePoliciesController < ApplicationController
     late_policy = LatePolicy.find(params[:id])
 
     # First this function validates the input then save if the input is valid.
-    _valid_penalty, error_message = validate_input(true)
+    _valid_penalty, error_message = validate_input(late_policy_params, true)
     if error_message
       flash[:error] = error_message
       redirect_to action: 'edit', id: params[:id]
@@ -132,40 +132,35 @@ class LatePoliciesController < ApplicationController
   end
 
   # This function checks if the policy name already exists or not and returns boolean value for penalty and the error message.
-  def duplicate_name_check(is_update = false)
-    should_check = true
-    prefix = is_update ? "Cannot edit the policy. " : ""
-    valid_penalty, error_message = true, nil
-
-    if is_update
+  def check_if_policy_name_exists_on_update(late_policy_object, prefix)
       existing_late_policy = LatePolicy.find(params[:id])
-      if existing_late_policy.policy_name == params[:late_policy][:policy_name]
-        should_check = false
+      if existing_late_policy.policy_name != late_policy_object[:policy_name]
+        return check_if_policy_name_exists(late_policy_object, prefix)
       end
-    end
-
-    if should_check
-      valid_penalty, error_message = check_if_policy_exists(prefix)
-    end
-    return valid_penalty, error_message
+      return true, nil
   end
 
-  def check_if_policy_exists(prefix)
-    if LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
-      error_message = prefix + 'A policy with the same name ' + params[:late_policy][:policy_name] + ' already exists.'
+  def check_if_policy_name_exists(late_policy_object, prefix)
+    if LatePolicy.check_policy_with_same_name(late_policy_object[:policy_name], instructor_id)
+      error_message = prefix + 'A policy with the same name ' + late_policy_object[:policy_name] + ' already exists.'
       return false, error_message
     end
     return true, nil
   end
 
   # This function validates the input.
-  def validate_input(is_update = false)
+  def validate_input(late_policy_object, is_update = false)
     # Validates input for create and update forms
-    max_penalty = late_policy_params[:max_penalty].to_i
-    penalty_per_unit = late_policy_params[:penalty_per_unit].to_i
+    max_penalty = late_policy_object[:max_penalty].to_i
+    penalty_per_unit = late_policy_object[:penalty_per_unit].to_i
 
-    valid_penalty, error_message = duplicate_name_check(is_update)
-    prefix = is_update ? "Cannot edit the policy. " : ""
+    prefix = ""
+    if is_update
+      prefix =  "Cannot edit the policy. "
+      valid_penalty, error_message = check_if_policy_name_exists_on_update(late_policy_object, prefix)
+    else
+      valid_penalty, error_message = check_if_policy_name_exists(late_policy_object, prefix)
+    end
 
     # This check validates the maximum penalty.
     if max_penalty < penalty_per_unit

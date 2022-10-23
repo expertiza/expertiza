@@ -387,7 +387,7 @@ module ReviewMappingHelper
   end
 
   # gets review and feedback responses for a certain round for the feedback report
-  def get_certain_review_and_feedback_response_map(author)
+  def certain_review_and_feedback_response_map(author)
     # Setting values of instance variables
     @feedback_response_maps = FeedbackResponseMap.where(['reviewed_object_id IN (?) and reviewer_id = ?', @all_review_response_ids, author.id])
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
@@ -399,7 +399,7 @@ module ReviewMappingHelper
   #
   # for calibration report
   #
-  def get_css_style_for_calibration_report(diff)
+  def css_style_for_calibration_report(diff)
     # diff - difference between stu's answer and instructor's answer
     dict = { 0 => 'c5', 1 => 'c4', 2 => 'c3', 3 => 'c2' }
     css_class = if dict.key?(diff.abs)

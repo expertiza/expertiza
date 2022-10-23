@@ -53,7 +53,7 @@ class LatePoliciesController < ApplicationController
   # There are few check points before creating a late policy which are written in the if/else statements.
   def create
     # First this function validates the input then save if the input is valid.
-    valid_penalty, error_message = validate_input(late_policy_params,false)
+    valid_penalty, error_message = validate_input(late_policy_params, false)
     if error_message
       flash[:error] = error_message
     end
@@ -133,11 +133,12 @@ class LatePoliciesController < ApplicationController
 
   # This function checks if the policy name already exists or not and returns boolean value for penalty and the error message.
   def check_if_policy_name_exists_on_update(late_policy_object, prefix)
-      existing_late_policy = LatePolicy.find(params[:id])
-      if existing_late_policy.policy_name != late_policy_object[:policy_name]
-        return check_if_policy_name_exists(late_policy_object, prefix)
-      end
-      return true, nil
+    existing_late_policy = LatePolicy.find(params[:id])
+    if existing_late_policy.policy_name != late_policy_object[:policy_name]
+      return check_if_policy_name_exists(late_policy_object, prefix)
+    end
+
+    return true, nil
   end
 
   def check_if_policy_name_exists(late_policy_object, prefix)
@@ -156,7 +157,7 @@ class LatePoliciesController < ApplicationController
 
     prefix = ""
     if is_update
-      prefix =  "Cannot edit the policy. "
+      prefix = 'Cannot edit the policy. '
       valid_penalty, error_message = check_if_policy_name_exists_on_update(late_policy_object, prefix)
     else
       valid_penalty, error_message = check_if_policy_name_exists(late_policy_object, prefix)

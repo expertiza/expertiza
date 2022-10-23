@@ -21,10 +21,10 @@ describe SuggestionController do
   end
 
   describe '#student_view' do
-    it 'renders suggestions#student_view' do
+    it 'renders suggestions#show' do
       stub_current_user(student, student.role.name, student.role)
-      get :student_view, params: { id: 1 }
-      expect(response).to render_template(:student_view)
+      get :show, params: { id: 1 }
+      expect(response).to render_template(:show)
     end
   end
 

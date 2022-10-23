@@ -5,7 +5,7 @@ class SuggestionController < ApplicationController
   #depending on the criteraa that the user has student privileges or TA privileges
   def action_allowed?
     case params[:action]
-    when 'create', 'new', 'student_view', 'student_edit', 'update_suggestion', 'submit'
+    when 'create', 'new', 'student_edit', 'update_suggestion', 'submit'
       current_user_has_student_privileges?
     else
       current_user_has_ta_privileges?
@@ -23,11 +23,7 @@ class SuggestionController < ApplicationController
     else
       flash[:error] = 'There was an error in adding your comment.'
     end
-    if current_user_has_student_privileges?
-      redirect_to action: 'student_view', id: params[:id]
-    else
-      redirect_to action: 'show', id: params[:id]
-    end
+    redirect_to action: 'show', id: params[:id]
   end
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
@@ -39,11 +35,6 @@ class SuggestionController < ApplicationController
   def list
     @suggestions = Suggestion.where(assignment_id: params[:id])
     @assignment = Assignment.find(params[:id])
-  end
-
-  #will get the suggestion for the student_view file
-  def student_view
-    @suggestion = Suggestion.find(params[:id])
   end
 
  #will get the suggestion made by user in student_edit file

@@ -60,7 +60,7 @@ class PasswordRetrievalController < ApplicationController
     end
   end
 
-  # avoid users to access this page without a valid token
+  # Renders the password retrieval page with an error message
   def reset_password
     flash[:error] = 'Password reset page can only be accessed with a generated link, sent to your email'
     render template: 'password_retrieval/forgotten'

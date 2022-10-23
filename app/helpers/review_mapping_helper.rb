@@ -6,7 +6,7 @@ module ReviewMappingHelper
   #
   # gets the response map data such as reviewer id, reviewed object id and type for the review report
   #
-  def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
+  def data_for_review_report(reviewed_object_id, reviewer_id, type)
     rspan = 0
     (1..@assignment.num_review_rounds).each { |round| instance_variable_set('@review_in_round_' + round.to_s, 0) }
 

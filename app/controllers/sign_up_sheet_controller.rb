@@ -178,7 +178,7 @@ class SignUpSheetController < ApplicationController
   end
 
   # method to return a list of topics for which a bid has been made by a team
-  def compute_signed_up_topics #new
+  def compute_signed_up_topics
 	signed_up_topics = []
 	@bids.each do |bid|
 	  sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
@@ -188,18 +188,26 @@ class SignUpSheetController < ApplicationController
 	return signed_up_topics
   end
 
+ # loads variables from assignment
+  def load_assignment_info (assignment)
+    @assignment = assignment
+    @max_team_size = @assignment.max_team_size
+    @use_bookmark = @assignment.use_bookmark
+    @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
+    @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
+  end 
+
   def list
     @participant = AssignmentParticipant.find(params[:id].to_i)
-    @assignment = @participant.assignment
+    load_assignment_info(@participant.assignment)
     @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
     @show_actions = true
     @priority = 0
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
-    @max_team_size = @assignment.max_team_size
     team_id = @participant.team.try(:id)
-    @use_bookmark = @assignment.use_bookmark
-
+   
+   # if assignment is intelligent, want to track which ones the team has bid on
     if @assignment.is_intelligent
       @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
       @bids = compute_signed_up_topics()
@@ -207,8 +215,6 @@ class SignUpSheetController < ApplicationController
     end
 
     @num_of_topics = @sign_up_topics.size
-    @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
-    @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
     @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
 
     unless @assignment.due_dates.find_by(deadline_type_id: 1).nil?

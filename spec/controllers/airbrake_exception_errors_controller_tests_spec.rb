@@ -20,6 +20,8 @@ describe TeamsController do
       signed_up_teams = [double('SignedUpTeam', topic_id: 1, is_waitlisted: true)]
       controller.session[:team_type] = 'Assignment'
 
+      allow(SignedUpTeam).to receive(:destroy).and_return(nil)
+      allow(Waitlist).to receive(:remove_from_waitlists).and_return(nil)
       allow(Team).to receive(:find).with(any_args).and_return(team)
       allow(Team).to receive(:find_by).with(any_args).and_return(team)
       allow(Assignment).to receive(:find).with(any_args).and_return(double('Course'))

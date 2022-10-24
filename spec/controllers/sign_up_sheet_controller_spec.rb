@@ -44,7 +44,7 @@ describe SignUpSheetController do
     it 'builds a new sign up topic and renders sign_up_sheet#new page' do
       request_params = { id: 1 }
       get :new, params: request_params
-      expect(controller.instance_variable_get(:@sign_up_topic).assignment).to eq(assignment)
+      expect(controller.instance_variable_get(:@signup_topic).assignment).to eq(assignment)
       expect(response).to render_template(:new)
     end
   end
@@ -508,7 +508,7 @@ describe SignUpSheetController do
         user_session = { user: instructor }
         get :list, params: request_params, session: user_session
         expect(controller.instance_variable_get(:@bids).size).to eq(1)
-        expect(controller.instance_variable_get(:@sign_up_topics)).to be_empty
+        expect(controller.instance_variable_get(:@signup_topics)).to be_empty
         expect(response).to render_template('sign_up_sheet/intelligent_topic_selection')
       end
     end

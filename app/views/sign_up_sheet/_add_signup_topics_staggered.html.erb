@@ -1,5 +1,5 @@
 <% @assignment = Assignment.find(params[:id]) %>
-<% @sign_up_topics = SignUpTopic.where(['assignment_id = ?', @assignment.id]) %>
+<% @signup_topics = SignUpTopic.where(['assignment_id = ?', @assignment.id]) %>
 <% @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)  %>
 <% @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id) %>
 <% @participants = SignedUpTeam.find_team_participants(@assignment.id, session[:ip])  %>
@@ -11,14 +11,14 @@
 <%= form_tag controller: 'assignment', action: 'edit', assignment_id: @assignment.id do %>
 <% end %>
 
-  <% if @sign_up_topics.size != 0 %>
+  <% if @signup_topics.size != 0 %>
     <table class="table table-striped" id="topics">
       <thead>
       <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
     </thead>
     <tbody>
       <% i=1 %>
-      <% @sign_up_topics.each do | topic | %>
+      <% @signup_topics.each do | topic | %>
         <tr>
           <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
         </tr>
@@ -36,7 +36,7 @@
 <%= render :partial => '/sign_up_sheet/add_topics' %>
 
 <%# The show and hide start/end due date link will only show up if there is any topic on the page. %>
-<% if @assignment.staggered_deadline == true and @sign_up_topics.size != 0 %>
+<% if @assignment.staggered_deadline == true and @signup_topics.size != 0 %>
   <a href="#due_date" onClick="toggleVis('due_date');">
     <span class="inline" id="due_date_show">Show start/due date</span>
     <span class="inline" id="due_date_hide" style="display: none">Hide start/due date</span>

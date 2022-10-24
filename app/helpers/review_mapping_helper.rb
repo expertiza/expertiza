@@ -333,18 +333,6 @@ module ReviewMappingHelper
     # if no Hash object is returned, the UI handles it accordingly
   end
 
-  def list_review_submissions(participant_id, reviewee_team_id, response_map_id)
-    participant = Participant.find(participant_id)
-    team = AssignmentTeam.find(reviewee_team_id)
-    html = ''
-    unless team.nil? || participant.nil?
-      review_submissions_path = team.path + '_review' + '/' + response_map_id.to_s
-      files = team.submitted_files(review_submissions_path)
-      html += display_review_files_directory_tree(participant, files) if files.present?
-    end
-    html.html_safe
-  end
-
   # Zhewei - 2016-10-20
   # This is for Dr.Kidd's assignment (806)
   # She wanted to quickly see if students pasted in a link (in the text field at the end of the rubric) without opening each review

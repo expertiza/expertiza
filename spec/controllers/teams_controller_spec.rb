@@ -20,6 +20,7 @@ describe TeamsController do
   describe 'create teams method' do
     context 'when correct parameters are passed' do
       it 'creates teams with random names' do
+        allow(ExpertizaLogger).to receive(:info).and_return(nil)
         allow(Object).to receive_message_chain(:const_get, :find).with(any_args).and_return(assignment1)
         allow(Version).to receive_message_chain(:where, :last).with(any_args).and_return(0.1)
         request_params = { id: assignment1.id, team_size: 2 }
@@ -153,6 +154,7 @@ describe TeamsController do
     end
     context 'when called and team is not nil and it does not hold a topic' do
       it 'deletes the team' do
+        allow(Waitlist).to receive(:remove_from_waitlists).and_return(nil)
         allow(Team).to receive(:find_by).and_return(team5)
         allow(Object).to receive_message_chain(:const_get, :find).and_return(course1)
         allow(team5).to receive(:destroy).and_return(nil)

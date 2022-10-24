@@ -109,43 +109,22 @@ class SubmittedContentController < ApplicationController
     file = params[:uploaded_file]
     file_size_limit = 5
 
-    # check file size
-    unless check_content_size(file, file_size_limit)
-      flash[:error] = "File size must smaller than #{file_size_limit}MB"
-      redirect_to action: 'edit', id: participant.id
-      return
-    end
-
-    file_content = file.read
-
-    # check file type
-    unless check_content_type_integrity(file_content)
-      flash[:error] = 'File type error'
+    if (!check_file(file, file_size_limit))
       redirect_to action: 'edit', id: participant.id
       return
     end
 
     participant.team.set_student_directory_num
-    @current_folder = DisplayOption.new
-    @current_folder.name = '/'
-    @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name]) if params[:current_folder]
-    curr_directory = if params[:origin] == 'review'
-                       participant.review_file_path(params[:response_map_id]).to_s + @current_folder.name
-                     else
-                       participant.team.path.to_s + @current_folder.name
-                     end
+    curr_directory = get_curr_directory(participant)
     FileUtils.mkdir_p(curr_directory) unless File.exist? curr_directory
-    safe_filename = file.original_filename.tr('\\', '/')
-    safe_filename = FileHelper.sanitize_filename(safe_filename) # new code to sanitize file path before upload*
-    full_filename = curr_directory + File.split(safe_filename).last.tr(' ', '_') # safe_filename #curr_directory +
-    File.open(full_filename, 'wb') { |f| f.write(file_content) }
+    sanitized_file_path = get_sanitized_file_path(file)
+    File.open(sanitized_file_path, 'wb') { |f| f.write(file_content) }
     if params['unzip']
-      SubmittedContentHelper.unzip_file(full_filename, curr_directory, true) if file_type(safe_filename) == 'zip'
+      SubmittedContentHelper.unzip_file(sanitized_file_path, curr_directory, true) if file_type(safe_filename) == 'zip'
     end
     assignment = Assignment.find(participant.parent_id)
-    team = participant.team
-    SubmissionRecord.create(team_id: team.id,
-                            content: full_filename,
+    SubmissionRecord.create(team_id: participant.team.id,
+                            content: sanitized_file_path,
                             user: participant.name,
                             assignment_id: assignment.id,
                             operation: "Submit File")
@@ -159,6 +138,46 @@ class SubmittedContentController < ApplicationController
     else
       redirect_to action: 'edit', id: participant.id
     end
+  end
+
+  # Check file content size and file type
+  def check_file (file, file_size_limit)
+    # check file size
+    unless check_content_size(file, file_size_limit)
+      flash[:error] = "File size must smaller than #{file_size_limit}MB"
+      return false
+    end
+
+    file_content = file.read
+
+    # check file type
+    unless check_content_type_integrity(file_content)
+      flash[:error] = 'File type error'
+      return false
+    end
+
+    return true
+  end
+
+  # Sanitize and return the file name
+  def get_sanitized_file_path (file, curr_directory)
+    safe_filename = file.original_filename.tr('\\', '/')
+    safe_filename = FileHelper.sanitize_filename(safe_filename) # new code to sanitize file path before upload*
+    sanitized_file_path = curr_directory + File.split(safe_filename).last.tr(' ', '_') # safe_filename #curr_directory 
+    return sanitized_file_path
+  end
+
+  # Get current directory path
+  def get_curr_directory (participant)
+    current_folder = DisplayOption.new
+    current_folder.name = '/'
+    current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name]) if params[:current_folder]
+    curr_directory = if params[:origin] == 'review'
+                      participant.review_file_path(params[:response_map_id]).to_s + current_folder.name
+                    else
+                      participant.team.path.to_s + current_folder.name
+                    end
+    return curr_directory                
   end
 
   def folder_action

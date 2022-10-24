@@ -85,9 +85,7 @@ class TeamsController < ApplicationController
       @signed_up_team = SignedUpTeam.where(team_id: @team.id)
       @teams_users = TeamsUser.where(team_id: @team.id)
 
-      if @signed_up_team == 1 && !@signups.first.is_waitlisted # this team hold a topic
-        SignedUpTeam.delete_team_from_waitlist(@signed_up_team)
-      end
+      Waitlist.remove_from_waitlists(@signed_up_team)
 
       @sign_up_team.destroy_all if @sign_up_team
       @teams_users.destroy_all if @teams_users

@@ -425,10 +425,10 @@ class SignUpSheetController < ApplicationController
     end
   end
 
-  def update_existing_topic(topic)  # TODO: Method necessary? 
-      update_waitlist topic
-      topic.update_attributes(topic_params)
-      redirect_to_sign_up(params[:id])
+  def update_existing_topic(topic)
+    update_waitlist topic
+    topic.update_attributes(topic_params)
+    redirect_to_sign_up(params[:id])
   end
 
   def update_waitlist(topic)

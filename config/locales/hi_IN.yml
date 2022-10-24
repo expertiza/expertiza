@@ -215,7 +215,7 @@ hi_IN:
       different_handle: "(इस असाइनमेंट के लिए एक अलग हैंडल प्रदान करें)"
       back: "वापस पीछे"
 
-  sign_up_sheet:
+  signup_sheet:
     list:
       signup_sheet: "साइनअप शीट फॉर"
       assignment_lower: "असाइनमेंट"

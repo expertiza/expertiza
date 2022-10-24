@@ -93,8 +93,8 @@
   <% end %>
   <% if SignUpSheet.has_teammate_ads?(topic.id) %>
   <td align="center">  
-      <%# link_to :controller => 'sign_up_sheet', :action => 'show_team', :assignment_id=>params[:id], :id=>topic.id do %>
-      <%= link_to image_tag('ad_horn.png', :border => 0, :title => 'Ad', :align => 'middle', :style => 'width: 24px; height:24px'), :controller=>'sign_up_sheet', :action=> 'show_team', :assignment_id=>@assignment.id, :id=>topic.id%>  
+      <%# link_to :controller => 'signup_sheet', :action => 'show_team', :assignment_id=>params[:id], :id=>topic.id do %>
+      <%= link_to image_tag('ad_horn.png', :border => 0, :title => 'Ad', :align => 'middle', :style => 'width: 24px; height:24px'), :controller=>'signup_sheet', :action=> 'show_team', :assignment_id=>@assignment.id, :id=>topic.id%>  
   </td>
   <% end %>
 <% end %>

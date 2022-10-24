@@ -41,7 +41,7 @@
     <span class="inline" id="due_date_show">Show start/due date</span>
     <span class="inline" id="due_date_hide" style="display: none">Hide start/due date</span>
   </a>
-  <%= form_tag :controller => 'sign_up_sheet', :action => 'save_topic_deadlines', :assignment_id => @assignment.id do %>
+  <%= form_tag :controller => 'signup_sheet', :action => 'save_topic_deadlines', :assignment_id => @assignment.id do %>
     <div id="due_date_myDiv" style="display:none" align="left">
       <br/><%= render :partial => '/signup_sheet/due_dates', :locals => {review_rounds: review_rounds, assignment_submission_due_dates: assignment_submission_due_dates, assignment_review_due_dates: assignment_review_due_dates} %>
     </div>

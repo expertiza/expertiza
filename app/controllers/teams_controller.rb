@@ -3,6 +3,8 @@ class TeamsController < ApplicationController
 
   autocomplete :user, :name
 
+  before_action :bequeath_all, only: %i[ ensure_course_team ]
+
   # These routes can only be accessed by a TA
   def action_allowed?
     current_user_has_ta_privileges?
@@ -122,36 +124,30 @@ class TeamsController < ApplicationController
   # Copies existing teams from an assignment to a course if the 
   # course doesn't already have teams.
   def bequeath_all
-    # Stop bequeathing if the team is of the wrong type
-    if session[:team_type] == 'Course'
-      flash[:error] = 'Invalid team type for bequeathal'
-      # Return to the 
-      redirect_to controller: 'teams', action: 'list', id: params[:id]
-      return
-    end
-
-    # Get the assignment the teams are associated with
     assignment = Assignment.find(params[:id])
-    # Get the course of the assignment if it exists
     course = Course.find(assignment.course_id) if assignment.course_id
 
     if !assignment.course_id
-      # Error if there was no course for the ID
       flash[:error] = 'No course was found for this assignment.'
     elsif course.course_teams.any?
-      # Error if there is already course teams
       flash[:error] = 'The course already has associated teams'
     else
-      # Otherwise copy the teams to the course from the assignment
       teams = assignment.teams
       Team.copy_teams_to_collection(teams, course.id)
       flash[:note] = teams.length.to_s + ' teams were successfully copied to "' + course.name + '"'
     end
-    # Return t
     redirect_to controller: 'teams', action: 'list', id: assignment.id
   end
 
   private
+
+  # Redirects if the team is not a CourseTeam 
+  def ensure_course_team
+    if session[:team_type] == 'Course'
+      flash[:error] = 'Invalid team type for bequeathal'
+      redirect_to controller: 'teams', action: 'list', id: params[:id]
+    end
+  end
 
   def team_size
     params[:team_size].to_i

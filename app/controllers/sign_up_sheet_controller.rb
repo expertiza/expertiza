@@ -179,13 +179,13 @@ class SignUpSheetController < ApplicationController
 
   # method to return a list of topics for which a bid has been made by a team
   def compute_signed_up_topics
-	signed_up_topics = []
-	@bids.each do |bid|
-	  sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
-	  signed_up_topics << sign_up_topic if sign_up_topic
-	end
-	signed_up_topics &= @sign_up_topics
-	return signed_up_topics
+    signed_up_topics = []
+    @bids.each do |bid|
+      sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
+      signed_up_topics << sign_up_topic if sign_up_topic
+    end
+    signed_up_topics &= @sign_up_topics
+    return signed_up_topics
   end
 
  # loads variables from info from  assignment

@@ -183,20 +183,15 @@ class SignUpSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: assignment_id
   end
 
-  def compute_signup_topics (team_id)
-      @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
-      signed_up_topics = []
-      @bids.each do |bid|
-        sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
-        signed_up_topics << sign_up_topic if sign_up_topic
-      end
-      signed_up_topics &= @sign_up_topics
-      @sign_up_topics -= signed_up_topics
-      @bids = signed_up_topics
-  end
-
-  def compute??
-
+  # method to return a list of topics for which a bid has been made by a team
+  def compute_signed_up_topics #new
+	signed_up_topics = []
+	@bids.each do |bid|
+	  sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
+	  signed_up_topics << sign_up_topic if sign_up_topic
+	end
+	signed_up_topics &= @sign_up_topics
+	return signed_up_topics
   end
 
   def list
@@ -212,7 +207,9 @@ class SignUpSheetController < ApplicationController
     @use_bookmark = @assignment.use_bookmark
 
     if @assignment.is_intelligent
-      compute_signup_topics (team_id)
+      @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
+      @bids = compute_signed_up_topics()
+      @sign_up_topics -= @bids
     end
 
     @num_of_topics = @sign_up_topics.size

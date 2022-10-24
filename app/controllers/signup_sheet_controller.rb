@@ -8,7 +8,7 @@
 # Hence each topic has a field called assignment_id which points which can be used to identify the assignment that this topic belongs
 # to
 
-class SignUpSheetController < ApplicationController
+class SignupSheetController < ApplicationController
   include AuthorizationHelper
 
   require 'rgl/adjacency'
@@ -202,7 +202,7 @@ class SignUpSheetController < ApplicationController
                            SignedUpTeam.find_user_signup_topics(@assignment.id, users_team.first.t_id)
                          end
     end
-    render('sign_up_sheet/intelligent_topic_selection') && return if @assignment.is_intelligent
+    render('signup_sheet/intelligent_topic_selection') && return if @assignment.is_intelligent
   end
 
   def sign_up

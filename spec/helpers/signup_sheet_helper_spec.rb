@@ -1,4 +1,4 @@
-describe 'SignUpSheetHelper' do
+describe 'SignupSheetHelper' do
   describe '#check_topic_due_date_value' do
     before(:each) do
       @assignment = create(:assignment)

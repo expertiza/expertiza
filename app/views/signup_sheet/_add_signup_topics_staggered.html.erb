@@ -14,13 +14,13 @@
   <% if @signup_topics.size != 0 %>
     <table class="table table-striped" id="topics">
       <thead>
-      <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
+      <tr><%= render :partial => '/signup_sheet/table_header' %></tr>
     </thead>
     <tbody>
       <% i=1 %>
       <% @signup_topics.each do | topic | %>
         <tr>
-          <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
+          <%= render :partial => '/signup_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
         </tr>
         <% i=i+1 %>
       <% end %>
@@ -33,7 +33,7 @@
 
 <% session[:return_to] = request.url %>
 <br/><br/>
-<%= render :partial => '/sign_up_sheet/add_topics' %>
+<%= render :partial => '/signup_sheet/add_topics' %>
 
 <%# The show and hide start/end due date link will only show up if there is any topic on the page. %>
 <% if @assignment.staggered_deadline == true and @signup_topics.size != 0 %>
@@ -43,7 +43,7 @@
   </a>
   <%= form_tag :controller => 'sign_up_sheet', :action => 'save_topic_deadlines', :assignment_id => @assignment.id do %>
     <div id="due_date_myDiv" style="display:none" align="left">
-      <br/><%= render :partial => '/sign_up_sheet/due_dates', :locals => {review_rounds: review_rounds, assignment_submission_due_dates: assignment_submission_due_dates, assignment_review_due_dates: assignment_review_due_dates} %>
+      <br/><%= render :partial => '/signup_sheet/due_dates', :locals => {review_rounds: review_rounds, assignment_submission_due_dates: assignment_submission_due_dates, assignment_review_due_dates: assignment_review_due_dates} %>
     </div>
   <% end %>
 <% end %>

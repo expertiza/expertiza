@@ -1,4 +1,4 @@
-describe 'sign_up_sheet/list.html.erb' do
+describe 'signup_sheet/list.html.erb' do
   def create_assignment_bookmarks
     create(:assignment, name: 'TestAssignment', directory_path: 'TestAssignment', use_bookmark: true)
     create_list(:participant, 3)

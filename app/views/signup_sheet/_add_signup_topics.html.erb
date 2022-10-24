@@ -11,12 +11,12 @@
 <a id="teamsAndMembers" onclick="showHideTeamAndMembers(<%= @signup_topics.size%>)">Hide all teams</a>
 <% unless @signup_topics.size.zero? %>
     <table class="table table-striped" id="topics">
-      <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
+      <tr><%= render :partial => '/signup_sheet/table_header' %></tr>
 
       <% i=1 %>
       <% @signup_topics.each do | topic | %>
           <tr>
-            <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
+            <%= render :partial => '/signup_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
           </tr>
           <% i=i+1 %>
       <% end %>
@@ -32,5 +32,5 @@
 <% session[:return_to] = request.url %>
 <br/><br/>
 
-<%= render :partial => '/sign_up_sheet/add_topics' %>
+<%= render :partial => '/signup_sheet/add_topics' %>
 <a href="javascript:history.back()">Back</a>

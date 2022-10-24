@@ -8,16 +8,21 @@ class PasswordRetrievalController < ApplicationController
     render template: 'password_retrieval/forgotten'
   end
 
+  # on click of request password button, sends a password reset url with a randomly generated token parameter to an authenticated user email
   def send_password
     if params[:user][:email].nil? || params[:user][:email].strip.empty?
       flash[:error] = 'Please enter an e-mail address.'
+      render template: 'password_retrieval/forgotten'
     else
       user = User.find_by(email: params[:user][:email])
       if user
-        url_format = '/password_edit/check_reset_url?token='
+        # formats password reset url to include a queryable token parameter 
+        url_format = '/password_edit/validate_password_token?token='
+        # generates a random URL-safe base64 token with default length of 16 characters
         token = SecureRandom.urlsafe_base64
         PasswordReset.save_token(user, token)
         url = request.base_url + url_format + token
+        # delivers formatted password reset url to a valid user email
         MailerHelper.send_mail_to_user(user, 'Expertiza password reset', 'send_password', url).deliver_now
         ExpertizaLogger.info LoggerMessage.new(controller_name, user.name, 'A link to reset your password has been sent to users e-mail address.', request)
         flash[:success] = 'A link to reset your password has been sent to your e-mail address.'
@@ -31,17 +36,18 @@ class PasswordRetrievalController < ApplicationController
   end
 
   # Checks the request for a valid, unexpired password reset token
-  def check_reset_url
+  def validate_password_token
+    days_until_token_expiration = 1
+
     if params[:token].nil?
-      flash[:error] = 'Password reset page can only be accessed with a generated link, sent to your email'
-      render template: 'password_retrieval/forgotten'
+      require_password_reset_token
     else
       # Decrypts the token and searches for a matching token in the database
       @token = Digest::SHA1.hexdigest(params[:token])
       password_reset = PasswordReset.find_by(token: @token)
       if password_reset
         # URL expires after 1 day
-        expired_url = password_reset.updated_at + 1.day
+        expired_url = password_reset.updated_at + days_until_token_expiration.day
         if Time.now < expired_url
           # redirect_to action: 'reset_password', email: password_reset.user_email
           @email = password_reset.user_email
@@ -61,8 +67,7 @@ class PasswordRetrievalController < ApplicationController
 
   # Renders the password retrieval page with an error message
   def reset_password
-    flash[:error] = 'Password reset page can only be accessed with a generated link, sent to your email'
-    render template: 'password_retrieval/forgotten'
+    require_password_reset_token
   end
 
   # Updates the user password and invalidates reset tokens associated with the user email ID
@@ -89,4 +94,10 @@ class PasswordRetrievalController < ApplicationController
       render template: 'password_retrieval/reset_password'
     end
   end
+
+  def require_password_reset_token
+    flash[:error] = 'Password reset page can only be accessed with a generated link, sent to your email'
+    render template: 'password_retrieval/forgotten'
+  end
+    
 end

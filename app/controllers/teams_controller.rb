@@ -3,7 +3,7 @@ class TeamsController < ApplicationController
 
   autocomplete :user, :name
 
-  before_action :bequeath_all, only: %i[ ensure_course_team ]
+  before_action :ensure_course_team, only: %i[ bequeath_all ]
 
   # These routes can only be accessed by a TA
   def action_allowed?

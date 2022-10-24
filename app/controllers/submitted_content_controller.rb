@@ -4,6 +4,7 @@ class SubmittedContentController < ApplicationController
 
   include AuthorizationHelper
 
+  # Validate whether a particular action is allowed by the current user or not based on the priveleges
   def action_allowed?
     case params[:action]
     when 'edit'
@@ -48,6 +49,7 @@ class SubmittedContentController < ApplicationController
     redirect_to action: 'edit', id: params[:id], view: true
   end
 
+  # submit_hyperlink is called when a new hyperlink is added to an assignment
   def submit_hyperlink
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
@@ -76,7 +78,7 @@ class SubmittedContentController < ApplicationController
     redirect_to action: 'edit', id: @participant.id
   end
 
-  # Note: This is not used yet in the view until we all decide to do so
+  # remove_hypelink is called when an existing hyperlink is removed from an assignment
   def remove_hyperlink
     @participant = AssignmentParticipant.find(params[:hyperlinks][:participant_id])
     return unless current_user_id?(@participant.user_id)
@@ -86,7 +88,7 @@ class SubmittedContentController < ApplicationController
     team.remove_hyperlink(hyperlink_to_delete)
     ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully removed.', request)
     undo_link('The link has been successfully removed.')
-    # determine if the user should be redirected to "edit" or  "view" based on the current deadline right
+    # determine if the user should be redirected to "edit" or  "view" based on the current deadline
     topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     assignment = Assignment.find(@participant.parent_id)
     SubmissionRecord.create(team_id: team.id,
@@ -98,6 +100,7 @@ class SubmittedContentController < ApplicationController
     redirect_to action: action, id: @participant.id
   end
 
+  # submit_file is called when a new file is uploaded to an assignment
   def submit_file
     participant = AssignmentParticipant.find(params[:id])
     unless current_user_id?(participant.user_id)
@@ -182,6 +185,7 @@ class SubmittedContentController < ApplicationController
     redirect_to action: 'edit', id: @participant.id
   end
 
+  # download is called when a user opens an existing uploaded file
   def download
     folder_name = params['current_folder']['name']
     file_name = params['download']

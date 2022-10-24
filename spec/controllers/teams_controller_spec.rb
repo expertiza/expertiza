@@ -180,7 +180,7 @@ describe TeamsController do
         # result = get :delete, params: request_params, session: user_session
         # expect(result.status).to eq 302
       # end
-    end
+    # end
   end
 
   describe 'copy_to_assignment method' do

@@ -47,7 +47,7 @@ class TeamsController < ApplicationController
   def create
     check_for_existing_team
 
-    @team = Object.const_get(session[:team_type] + 'Team').create(name: params[:team][:name], parent_id: parent.id)
+    @team = Object.const_get(session[:team_type] + 'Team').create(name: params[:team][:name], parent_id: team_parent.id)
     TeamNode.create(parent_id: team_parent.id, node_object_id: @team.id)
 
     undo_link("The team \"#{@team.name}\" has been successfully created.")
@@ -92,7 +92,7 @@ class TeamsController < ApplicationController
       @signed_up_team = SignedUpTeam.where(team_id: @team.id)
       @teams_users = TeamsUser.where(team_id: @team.id)
 
-      Waitlist.remove_from_waitlists(@signed_up_team)
+      Waitlist.remove_from_waitlists(@team.id)
 
       @sign_up_team&.destroy_all
       @teams_users&.destroy_all

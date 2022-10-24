@@ -117,14 +117,14 @@ class SubmittedContentController < ApplicationController
     participant.team.set_student_directory_num
     curr_directory = get_curr_directory(participant)
     FileUtils.mkdir_p(curr_directory) unless File.exist? curr_directory
-    full_filename = get_file_name(file)
-    File.open(full_filename, 'wb') { |f| f.write(file_content) }
+    sanitized_file_path = get_sanitized_file_path(file)
+    File.open(sanitized_file_path, 'wb') { |f| f.write(file_content) }
     if params['unzip']
-      SubmittedContentHelper.unzip_file(full_filename, curr_directory, true) if file_type(safe_filename) == 'zip'
+      SubmittedContentHelper.unzip_file(sanitized_file_path, curr_directory, true) if file_type(safe_filename) == 'zip'
     end
     assignment = Assignment.find(participant.parent_id)
     SubmissionRecord.create(team_id: participant.team.id,
-                            content: full_filename,
+                            content: sanitized_file_path,
                             user: participant.name,
                             assignment_id: assignment.id,
                             operation: "Submit File")
@@ -160,11 +160,11 @@ class SubmittedContentController < ApplicationController
   end
 
   # Sanitize and return the file name
-  def get_file_name (file, curr_directory)
+  def get_sanitized_file_path (file, curr_directory)
     safe_filename = file.original_filename.tr('\\', '/')
     safe_filename = FileHelper.sanitize_filename(safe_filename) # new code to sanitize file path before upload*
-    full_filename = curr_directory + File.split(safe_filename).last.tr(' ', '_') # safe_filename #curr_directory 
-    return full_filename
+    sanitized_file_path = curr_directory + File.split(safe_filename).last.tr(' ', '_') # safe_filename #curr_directory 
+    return sanitized_file_path
   end
 
   # Get current directory path

@@ -30,7 +30,7 @@
 <% if @parent.instance_of?(Assignment) && !@parent.course.nil? && !@parent.course.course_teams.size.zero?%>
   <H2> Inherit Teams From Course </H2>
   <p> Use the teams that are currently defined for the course.</p>
-  <%= form_tag :action => 'inherit' do %>
+  <%= form_tag :action => 'copy_to_assignment' do %>
     <%= hidden_field_tag 'id', @parent.id %>
 
     <%= submit_tag "Inherit" %>

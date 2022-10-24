@@ -527,7 +527,7 @@ Expertiza::Application.routes.draw do
     collection do
       get :list
       post :randomize_teams
-      post :inherit
+      post :copy_to_assignment
       get :delete
       get :delete_all
       get :bequeath_all

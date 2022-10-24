@@ -105,13 +105,13 @@ class TeamsController < ApplicationController
 
   # Copies existing teams from a course down to an assignment
   # The team and team members are all copied.
-  def inherit
+  def copy_to_assignment
     assignment = Assignment.find(params[:id])
     if assignment.course_id
       course = Course.find(assignment.course_id)
       teams = course.get_teams
       if teams.empty?
-        flash[:note] = 'No teams were found when trying to inherit.'
+        flash[:note] = 'No teams were found when trying to copy to assignment.'
       else
         Team.copy_teams_to_collection(teams, assignment.id)
       end

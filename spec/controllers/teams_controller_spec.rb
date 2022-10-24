@@ -184,7 +184,7 @@ describe TeamsController do
     #     end
   end
 
-  describe 'inherit method' do
+  describe 'copy_to_assignment method' do
     context 'called when assignment belongs to course and team is not empty' do
       it 'copies teams from course to the assignment' do
         allow(Assignment).to receive(:find).and_return(assignment1)
@@ -192,7 +192,7 @@ describe TeamsController do
         allow(course1).to receive(:get_teams).and_return([team5, team6])
         request_params = { id: team5.id }
         user_session = { user: ta }
-        result = get :inherit, params: request_params, session: user_session
+        result = get :copy_to_assignment, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(controller: 'teams', action: 'list', id: assignment1.id)
@@ -204,7 +204,7 @@ describe TeamsController do
         allow(Course).to receive(:find).and_return(course1)
         request_params = { id: team5.id }
         user_session = { user: ta }
-        result = get :inherit, params: request_params, session: user_session
+        result = get :copy_to_assignment, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(controller: 'teams', action: 'list', id: assignment1.id)
@@ -218,7 +218,7 @@ describe TeamsController do
         allow(Course).to receive(:find).and_return(course1)
         request_params = { id: team5.id }
         user_session = { user: ta }
-        result = get :inherit, params: request_params, session: user_session
+        result = get :copy_to_assignment, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(controller: 'teams', action: 'list', id: fasg.id)

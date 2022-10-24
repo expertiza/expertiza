@@ -165,21 +165,21 @@ describe TeamsController do
       end
     end
     # this next test is work in progress
-    context 'gets called and team is not nil and it holds a topic' do
-      it 'it reassigns topic and then deletes the team' do
-        allow(Team).to receive(:find_by).and_return(team5)
-        allow(Object).to receive_message_chain(:const_get, :find).and_return(course1)
-        allow('if').to receive('true'.to_s)
-        controller.instance_variable_set(:@signed_up_team, team5)
-        allow(@signed_up_team).to receive(:==).and_return(1)
-        allow(team5).to receive_message_chain(:first, :is_waitlisted).and_return(false)
-        allow(@signed_up_team).to receive_message_chain(:first, :topic_id).and_return(5)
-        allow(team5).to receive(:destroy).and_return(nil)
-        request_params = {id: 5}
-        user_session = {user: instructor, team_type: 'CourseTeam'}
-        result = get :delete, params: request_params, session: user_session
-        expect(result.status).to eq 302
-      end
+    # context 'gets called and team is not nil and it holds a topic' do
+      # it 'it reassigns topic and then deletes the team' do
+        # allow(Team).to receive(:find_by).and_return(team5)
+        # allow(Object).to receive_message_chain(:const_get, :find).and_return(course1)
+        # allow('if').to receive('true'.to_s)
+        # controller.instance_variable_set(:@signed_up_team, team5)
+        # allow(@signed_up_team).to receive(:==).and_return(1)
+        # allow(team5).to receive_message_chain(:first, :is_waitlisted).and_return(false)
+        # allow(@signed_up_team).to receive_message_chain(:first, :topic_id).and_return(5)
+        # allow(team5).to receive(:destroy).and_return(nil)
+        # request_params = {id: 5}
+        # user_session = {user: instructor, team_type: 'CourseTeam'}
+        # result = get :delete, params: request_params, session: user_session
+        # expect(result.status).to eq 302
+      # end
     end
   end
 

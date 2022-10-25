@@ -1,4 +1,3 @@
-# change for initial commit
 class AuthController < ApplicationController
   include AuthorizationHelper
   helper :auth
@@ -6,6 +5,9 @@ class AuthController < ApplicationController
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[login logout],
          redirect_to: { action: :list }
+
+  before_action :log_user_login, only: :after_login
+  before_action :log_user_logout, only: :logout
 
   def action_allowed?
     case params[:action]
@@ -25,8 +27,9 @@ class AuthController < ApplicationController
         after_login(user)
       else
         ExpertizaLogger.error LoggerMessage.new(controller_name, '', 'Failed login attempt. Invalid username/password', request)
-        flash[:error] = 'Your username or password is incorrect.'
-        redirect_to controller: 'password_retrieval', action: 'forgotten'
+        #flash[:error] = 'Your username or password is incorrect.'
+        #redirect_to controller: 'password_retrieval', action: 'forgotten' #TODO: combine with below
+        login_failed
       end
     end
   end # def login
@@ -35,19 +38,12 @@ class AuthController < ApplicationController
   def after_login(user)
     session[:user] = user
     session[:impersonate] = false
-    ExpertizaLogger.info LoggerMessage.new('', user.name, 'Login successful')
     AuthController.set_current_role(user.role_id, session)
     redirect_to controller: AuthHelper.get_home_controller(session[:user]),
                 action: AuthHelper.get_home_action(session[:user])
   end
 
-  def login_failed
-    flash.now[:error] = 'Your username or password is incorrect.'
-    render action: 'forgotten'
-  end
-
   def logout
-    ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Logging out!', request)
     AuthController.logout(session)
     redirect_to '/'
   end
@@ -60,9 +56,7 @@ class AuthController < ApplicationController
     if role_id
       role = Role.find(role_id)
       if role
-        Role.rebuild_cache if !role.cache || !role.cache.try(:has_key?, :credentials)
-        session[:credentials] = role.cache[:credentials]
-        session[:menu] = role.cache[:menu]
+        rebuild_role_cache(role, session)
         ExpertizaLogger.info "Logging in user as role #{session[:credentials].class}"
       else
         ExpertizaLogger.error 'Something went seriously wrong with the role.'
@@ -86,14 +80,31 @@ class AuthController < ApplicationController
     session[:user_id] = nil
     session[:user] = '' # sets user to an empty string instead of nil, to show that the user was logged in
     role = Role.student
-    if role
-      Role.rebuild_cache if !role.cache || !role.cache.key?(:credentials)
-      session[:credentials] = role.cache[:credentials]
-      session[:menu] = role.cache[:menu]
-    end
+    rebuild_role_cache(role, session) if role
     session[:clear] = true
     session[:assignment_id] = assignment_id
     session[:original_user] = nil
     session[:impersonate] = nil
+  end
+
+  private
+
+  def login_failed
+    flash.now[:error] = 'Your username or password is incorrect.'
+    redirect_to controller: 'password_retrieval', action: 'forgotten'
+  end
+
+  def log_user_logout
+    ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Logging out!', request)
+  end
+
+  def log_user_login
+    ExpertizaLogger.info LoggerMessage.new('', user.name, 'Login successful')
+  end
+
+  def self.rebuild_role_cache(role, session)
+    Role.rebuild_cache if !role.cache || !role.cache.try(:has_key?, :credentials)
+    session[:credentials] = role.cache[:credentials]
+    session[:menu] = role.cache[:menu]
   end
 end

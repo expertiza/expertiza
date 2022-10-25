@@ -32,7 +32,9 @@ class StudentTeamsController < ApplicationController
     when 'create'
       current_user_has_id? student.user_id
     when 'edit', 'update'
-      current_user_has_id? team.user_id
+      if @team!=nil
+        current_user_has_id? team.user_id
+      end
     else
       true
     end
@@ -107,7 +109,7 @@ class StudentTeamsController < ApplicationController
 
   def remove_participant
     # remove the record from teams_participants table
-    team_user = TeamsParticipant.where(team_id: params[:team_id], user_id: student.user_id)
+    team_user = TeamsParticipant.find_by_team_id_and_user_id(params[:team_id], student.user_id)
     remove_team_user(team_user)
     # if your old team does not have any members, delete the entry for the team
     if TeamsParticipant.where(team_id: params[:team_id]).empty?

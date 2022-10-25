@@ -137,7 +137,7 @@ class LatePoliciesController < ApplicationController
     if existing_late_policy.policy_name != late_policy_params[:policy_name]
       return check_if_policy_name_exists(prefix)
     end
-  
+
     return true, nil
   end
 
@@ -167,7 +167,7 @@ class LatePoliciesController < ApplicationController
 
     # This check validates the maximum penalty.
     if max_penalty < penalty_per_unit
-      error_message = "#{error_message}" +prefix + 'The maximum penalty cannot be less than penalty per unit. '
+      error_message = "#{error_message}" + prefix + 'The maximum penalty cannot be less than penalty per unit. '
       valid_penalty = false
     end
 

@@ -27,7 +27,7 @@ class TeamsParticipant < ApplicationRecord
 
   # Removes entry in the TeamUsers table for the given user and given team id
   def self.remove_team(user_id, team_id)
-    team_user = TeamsParticipant.where('user_id = ? and team_id = ?', user_id, team_id).first
+    team_user = TeamsParticipant.find_by_team_id_and_user_id(team.id, user.id).first
     team_user&.destroy
   end
 
@@ -40,6 +40,33 @@ class TeamsParticipant < ApplicationRecord
   def self.team_empty?(team_id)
     team_members = TeamsParticipant.where('team_id = ?', team_id)
     team_members.blank?
+  end
+
+  def user
+    if participant
+      participant.user
+    else
+      user
+    end
+  end
+
+  def user_id
+    user.id
+  end
+
+  def self.find_by_team_id_and_user_id(team_id, user_id)
+    teams_participant = TeamsParticipant.find_by(team_id: team_id, user_id: user_id)
+    if teams_participant.nil? && team_id != "0"
+      assignment_id = Team.find(team_id).parent_id
+      participant_id = Assignment.find(assignment_id).participants.find_by(user_id: user_id).id
+      teams_participant = TeamsParticipant.find_by(team_id: team_id, participant_id: participant_id)
+    end
+    teams_participant
+  end
+
+  def self.find_in_assignment_by_user_ids(user_ids, assignment_id)
+    participant_ids = Assignment.find(assignment_id).participants.where(user_id: user_ids).pluck(:id)
+    TeamsParticipant.where(user_id: user_ids).or(TeamsParticipant.where(participant_id: participant_ids))
   end
 
   # Add member to the team they were invited to and accepted the invite for

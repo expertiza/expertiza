@@ -66,20 +66,6 @@ function moveSelectedFile(){
 	}
 }
 
-function copySelectedFile(){	
-	var old_filename = getSelectedName();
-	var new_filename = prompt("Enter a new location for the copy of " + old_filename + "\nExample: /folder1/file.doc","");
-	var form = $('#folder-action-form')[0];
-	input1 = document.createElement("input");
-	input1.type = "hidden";
-	input1.name = "faction[copy]";
-	input1.value = new_filename;
-	form.appendChild(input1);
-	if ((new_filename!=null) && (new_filename!='')) {
-		form.submit();
-	}
-}
-
 function renameFile(){        
 	var old_filename = getSelectedName();
 	var new_filename = prompt("Enter a new name for " + old_filename,"");

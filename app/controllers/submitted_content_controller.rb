@@ -4,6 +4,8 @@ class SubmittedContentController < ApplicationController
 
   include AuthorizationHelper
 
+  before_action :ensure_current_user_is_participant, only: %i[edit view submit_hyperlink folder_action submit_file]
+
   # Validate whether a particular action is allowed by the current user or not based on the privileges
   def action_allowed?
     case params[:action]
@@ -25,9 +27,6 @@ class SubmittedContentController < ApplicationController
   # The view have already tested that @assignment.submission_allowed(topic_id) is true,
   # so @can_submit should be true
   def edit
-    @participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(@participant.user_id)
-
     @assignment = @participant.assignment
     # ACS We have to check if this participant has team or not
     SignUpSheet.signup_team(@assignment.id, @participant.user_id, nil) if @participant.team.nil?
@@ -39,9 +38,6 @@ class SubmittedContentController < ApplicationController
   # view is called when @assignment.submission_allowed(topic_id) is false
   # so @can_submit should be false
   def view
-    @participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(@participant.user_id)
-
     @assignment = @participant.assignment
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = false
@@ -51,9 +47,6 @@ class SubmittedContentController < ApplicationController
 
   # submit_hyperlink is called when a new hyperlink is added to an assignment
   def submit_hyperlink
-    @participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(@participant.user_id)
-
     team = @participant.team
     team_hyperlinks = team.hyperlinks
     if team_hyperlinks.include?(params['submission'])
@@ -102,44 +95,37 @@ class SubmittedContentController < ApplicationController
 
   # submit_file is called when a new file is uploaded to an assignment
   def submit_file
-    participant = AssignmentParticipant.find(params[:id])
-    unless current_user_id?(participant.user_id)
-      flash[:error] = "Authentication Error"
-      redirect_to action: 'edit', id: participant.id
-      return
-    end
-
     file = params[:uploaded_file]
     file_size_limit = 5
 
     if (!check_file(file, file_size_limit))
-      redirect_to action: 'edit', id: participant.id
+      redirect_to action: 'edit', id: @participant.id
       return
     end
 
-    participant.team.set_student_directory_num
-    curr_directory = get_curr_directory(participant)
+    @participant.team.set_student_directory_num
+    curr_directory = get_curr_directory(@participant)
     FileUtils.mkdir_p(curr_directory) unless File.exist? curr_directory
     sanitized_file_path = get_sanitized_file_path(file)
     File.open(sanitized_file_path, 'wb') { |f| f.write(file_content) }
     if params['unzip']
       SubmittedContentHelper.unzip_file(sanitized_file_path, curr_directory, true) if file_type(safe_filename) == 'zip'
     end
-    assignment = Assignment.find(participant.parent_id)
-    SubmissionRecord.create(team_id: participant.team.id,
+    assignment = Assignment.find(@participant.parent_id)
+    SubmissionRecord.create(team_id: @participant.team.id,
                             content: sanitized_file_path,
-                            user: participant.name,
+                            user: @participant.name,
                             assignment_id: assignment.id,
                             operation: "Submit File")
-    ExpertizaLogger.info LoggerMessage.new(controller_name, participant.name, 'The file has been submitted.', request)
+    ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The file has been submitted.', request)
 
     # Notify all reviewers assigned to this reviewee
-    participant.mail_assigned_reviewers
+    @participant.mail_assigned_reviewers
 
     if params[:origin] == 'review'
       redirect_back fallback_location: root_path
     else
-      redirect_to action: 'edit', id: participant.id
+      redirect_to action: 'edit', id: @participant.id
     end
   end
 
@@ -184,9 +170,6 @@ class SubmittedContentController < ApplicationController
   end
 
   def folder_action
-    @participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(@participant.user_id)
-
     @current_folder = DisplayOption.new
     @current_folder.name = '/'
     @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name]) if params[:current_folder]
@@ -196,8 +179,6 @@ class SubmittedContentController < ApplicationController
       rename_selected_file
     elsif params[:faction][:move]
       move_selected_file
-    elsif params[:faction][:copy]
-      copy_selected_file
     elsif params[:faction][:create]
       create_new_folder
     end
@@ -281,19 +262,6 @@ class SubmittedContentController < ApplicationController
     ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The selected file has been deleted.', request)
   end
 
-  def copy_selected_file
-    old_filename = params[:directories][params[:chk_files]] + '/' + params[:filenames][params[:chk_files]]
-    new_filename = params[:directories][params[:chk_files]] + '/' + FileHelper.sanitize_filename(params[:faction][:copy])
-    begin
-      raise 'A file with this name already exists. Please delete the existing file before copying.' if File.exist?(new_filename)
-      raise 'The referenced file does not exist.' unless File.exist?(old_filename)
-
-      FileUtils.cp_r(old_filename, new_filename)
-    rescue StandardError => e
-      flash[:error] = 'There was a problem copying the file: ' + e.message
-    end
-  end
-
   def create_new_folder
     newloc = @participant.dir_path
     newloc += '/'
@@ -316,5 +284,14 @@ class SubmittedContentController < ApplicationController
     @topics = SignUpTopic.where(assignment_id: @participant.parent_id)
     # check one assignment has topics or not
     (!@topics.empty? && !SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id).nil?) || @topics.empty?
+  end
+
+  def ensure_current_user_is_participant
+    @participant = AssignmentParticipant.find(params[:id])
+    unless current_user_id?(@participant.user_id)
+      flash[:error] = "Authentication Error"
+      redirect_to action: 'edit', id: @participant.id
+      return
+    end
   end
 end

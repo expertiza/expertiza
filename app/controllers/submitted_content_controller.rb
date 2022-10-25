@@ -4,7 +4,7 @@ class SubmittedContentController < ApplicationController
 
   include AuthorizationHelper
 
-  before_action :ensure_current_user_is_participant, only: %i[edit view submit_hyperlink folder_action submit_file]
+  before_action :ensure_current_user_is_participant, only: %i[edit view submit_hyperlink folder_action]
 
   # Validate whether a particular action is allowed by the current user or not based on the privileges
   def action_allowed?
@@ -95,37 +95,44 @@ class SubmittedContentController < ApplicationController
 
   # submit_file is called when a new file is uploaded to an assignment
   def submit_file
+    participant = AssignmentParticipant.find(params[:id])
+    unless current_user_id?(participant.user_id)
+      flash[:error] = "Authentication Error"
+      redirect_to action: 'edit', id: participant.id
+      return
+    end
+
     file = params[:uploaded_file]
     file_size_limit = 5
 
     if (!check_file(file, file_size_limit))
-      redirect_to action: 'edit', id: @participant.id
+      redirect_to action: 'edit', id: participant.id
       return
     end
 
-    @participant.team.set_student_directory_num
-    curr_directory = get_curr_directory(@participant)
+    participant.team.set_student_directory_num
+    curr_directory = get_curr_directory(participant)
     FileUtils.mkdir_p(curr_directory) unless File.exist? curr_directory
     sanitized_file_path = get_sanitized_file_path(file)
     File.open(sanitized_file_path, 'wb') { |f| f.write(file_content) }
     if params['unzip']
       SubmittedContentHelper.unzip_file(sanitized_file_path, curr_directory, true) if file_type(safe_filename) == 'zip'
     end
-    assignment = Assignment.find(@participant.parent_id)
-    SubmissionRecord.create(team_id: @participant.team.id,
+    assignment = Assignment.find(participant.parent_id)
+    SubmissionRecord.create(team_id: participant.team.id,
                             content: sanitized_file_path,
-                            user: @participant.name,
+                            user: participant.name,
                             assignment_id: assignment.id,
                             operation: "Submit File")
-    ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The file has been submitted.', request)
+    ExpertizaLogger.info LoggerMessage.new(controller_name, participant.name, 'The file has been submitted.', request)
 
     # Notify all reviewers assigned to this reviewee
-    @participant.mail_assigned_reviewers
+    participant.mail_assigned_reviewers
 
     if params[:origin] == 'review'
       redirect_back fallback_location: root_path
     else
-      redirect_to action: 'edit', id: @participant.id
+      redirect_to action: 'edit', id: participant.id
     end
   end
 
@@ -288,10 +295,6 @@ class SubmittedContentController < ApplicationController
 
   def ensure_current_user_is_participant
     @participant = AssignmentParticipant.find(params[:id])
-    unless current_user_id?(@participant.user_id)
-      flash[:error] = "Authentication Error"
-      redirect_to action: 'edit', id: @participant.id
-      return
-    end
+    return unless current_user_id?(@participant.user_id)
   end
 end

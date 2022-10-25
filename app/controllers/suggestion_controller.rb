@@ -5,7 +5,7 @@ class SuggestionController < ApplicationController
   #depending on the criteraa that the user has student privileges or TA privileges
   def action_allowed?
     case params[:action]
-    when 'create', 'new', 'student_edit', 'update_suggestion', 'submit'
+    when 'create', 'new', 'show', 'student_edit', 'update_suggestion', 'submit'
       current_user_has_student_privileges?
     else
       current_user_has_ta_privileges?

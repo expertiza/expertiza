@@ -1,6 +1,6 @@
 require './spec/support/teams_shared.rb'
 
-describe TeamsUsersController do
+describe TeamsParticipantsController do
   # Including the stubbed objects from the teams_shared.rb file
   include_context 'object initializations'
   # Objects initialization for team users

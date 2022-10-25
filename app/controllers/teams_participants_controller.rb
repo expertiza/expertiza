@@ -1,4 +1,4 @@
-class TeamsUsersController < ApplicationController
+class TeamsParticipantsController < ApplicationController
   include AuthorizationHelper
 
   def action_allowed?

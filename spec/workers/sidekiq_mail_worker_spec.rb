@@ -13,20 +13,20 @@ describe MailWorker do
 
   describe 'Tests mailer with sidekiq' do
     it "should have sent welcome email after user was created" do
-      email = ActionMailer::Base.deliveries.first
-      expect(email.from[0]).to eq("expertiza.development@gmail.com")
-      expect(email.to[0]).to eq("expertiza.development@gmail.com")
+      email = Mailer.deliveries.first
+      expect(email.from[0]).to eq("expertiza.debugging@gmail.com")
+      expect(email.to[0]).to eq("expertiza.debugging@gmail.com")
       expect(email.subject).to eq("Your Expertiza account and password has been created")
     end
 
     it 'should send reminder email to required email address with proper content' do
       Sidekiq::Testing.inline!
-      ActionMailer::Base.deliveries.clear
+      Mailer.deliveries.clear
       worker = MailWorker.new
       worker.perform("1", "metareview", "2018-12-31 00:00:01")
-      expect(ActionMailer::Base.deliveries.size).to eq(1)
-      email = ActionMailer::Base.deliveries.first
-      expect(email.from[0]).to eq("expertiza.development@gmail.com")
+      expect(Mailer.deliveries.size).to eq(1)
+      email = Mailer.deliveries.first
+      expect(email.from[0]).to eq("expertiza.debugging@gmail.com")
       expect(email.bcc[0]).to eq("psingh22@ncsu.edu")
       expect(email.subject).to eq("Message regarding teammate review for assignment no assignment")
       expect(email.body).to eq("This is a reminder to complete teammate review for assignment no assignment.\nPlease follow the link: http://expertiza.ncsu.edu/student_task/view?id=1\nDeadline is 2018-12-31 00:00:01. If you have already done the teammate review, then please ignore this mail.")

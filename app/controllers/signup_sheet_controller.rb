@@ -53,7 +53,7 @@ class SignupSheetController < ApplicationController
   # that assignment id will virtually be the signup sheet id as well as we have assumed
   # that every assignment will have only one signup sheet
   def create
-    topic = SignUpTopic.where(topic_name: params[:topic][:topic_name], assignment_id: params[:id]).first
+    topic = SignUpTopic.where(topic_name: topic_params[:topic_name], assignment_id: params[:id]).first
     if topic.nil?
       setup_new_topic
     else
@@ -136,10 +136,10 @@ class SignupSheetController < ApplicationController
 
   def set_values_for_new_topic
     @signup_topic = SignUpTopic.new
-    @signup_topic.topic_identifier = params[:topic][:topic_identifier]
-    @signup_topic.topic_name = params[:topic][:topic_name]
-    @signup_topic.max_choosers = params[:topic][:max_choosers]
-    @signup_topic.category = params[:topic][:category]
+    @signup_topic.topic_identifier = topic_params[:topic_identifier]
+    @signup_topic.topic_name = topic_params[:topic_name]
+    @signup_topic.max_choosers = topic_params[:max_choosers]
+    @signup_topic.category = topic_params[:category]
     @signup_topic.assignment_id = params[:id]
     @assignment = Assignment.find(params[:id])
   end

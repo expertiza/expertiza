@@ -145,7 +145,7 @@ class LatePoliciesController < ApplicationController
   def check_if_policy_name_exists(prefix)
     error_message = nil
     if LatePolicy.check_policy_with_same_name(late_policy_params[:policy_name], instructor_id)
-      error_message = prefix + 'A policy with the same name ' + late_policy_params[:policy_name] + ' already exists.'
+      error_message = prefix + 'A policy with the same name ' + late_policy_params[:policy_name] + ' already exists. '
       return false, error_message
     end
     return true, error_message
@@ -167,19 +167,19 @@ class LatePoliciesController < ApplicationController
 
     # This check validates the maximum penalty.
     if max_penalty < penalty_per_unit
-      error_message = prefix + 'The maximum penalty cannot be less than penalty per unit.'
+      error_message = "#{error_message}" + prefix + 'The maximum penalty cannot be less than penalty per unit. '
       valid_penalty = false
     end
 
     # This check validates the penalty per unit for a late policy.
     if penalty_per_unit < 0
-      error_message = 'Penalty per unit cannot be negative.'
+      error_message = "#{error_message}Penalty per unit cannot be negative. "
       valid_penalty = false
     end
 
     # This checks maximum penalty does not exceed 100.
     if max_penalty >= 100
-      error_message = prefix + 'Maximum penalty cannot be greater than or equal to 100'
+      error_message = "#{error_message}" + prefix + 'Maximum penalty cannot be greater than or equal to 100. '
       valid_penalty = false
     end
 

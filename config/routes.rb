@@ -534,7 +534,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :teams_users, only: %i[new create update] do
+  resources :teams_participants, only: %i[new create update] do
     collection do
       post :list
       post :update_duties

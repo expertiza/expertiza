@@ -332,8 +332,8 @@ describe TeamsUsersController do
         request_params = { item: [1, 2] }
         user_session = { user: instructor }
         post :delete_selected, params: request_params, session: user_session
-        # Expect the response to redirect to 'http://test.host/teams_users/list'
-        expect(response).to redirect_to('http://test.host/teams_users/list')
+        # Expect the response to redirect to 'http://test.host/teams_participants/list'
+        expect(response).to redirect_to('http://test.host/teams_participants/list')
       end
     end
   end

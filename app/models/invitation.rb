@@ -22,7 +22,7 @@ class Invitation < ApplicationRecord
     invites.each(&:destroy)
   end
 
-  # After a users accepts an invite, the teams_users table needs to be updated.
+  # After a users accepts an invite, the teams_participants table needs to be updated.
   def self.update_users_topic_after_invite_accept(invitee_user_id, invited_user_id, assignment_id)
     new_team_id = TeamsUser.team_id(assignment_id, invitee_user_id)
     # check the invited_user_id have ever join other team in this assignment before
@@ -66,7 +66,7 @@ class Invitation < ApplicationRecord
       # Since there are two places in the code base where members are added to
       # teams we have to call the MentorManagement class in both places.
       # Those places are here when a student accepts an invitation to join a
-      # team, and in teams_users_controller.rb. Ideally, both code paths would
+      # team, and in teams_participants_controller.rb. Ideally, both code paths would
       # call the same method to perform this action and we could DRY this up.
       # It is worth noting that while ultimately, both code paths do call Team#add_member
       # adding this code there would risk a recursive loop since MentorManagement

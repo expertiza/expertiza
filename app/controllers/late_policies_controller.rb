@@ -181,7 +181,7 @@ class LatePoliciesController < ApplicationController
     end
 
     # This checks if any error message was generated and sets valid_penalty accordingly.
-    if error_message.nil? 
+    if error_message.nil?
       valid_penalty = true
     else
       valid_penalty = false

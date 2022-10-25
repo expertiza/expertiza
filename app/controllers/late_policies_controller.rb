@@ -137,7 +137,7 @@ class LatePoliciesController < ApplicationController
     if existing_late_policy.policy_name != late_policy_params[:policy_name]
       return check_if_policy_name_exists(prefix)
     end
-    
+
     return true, nil
   end
 

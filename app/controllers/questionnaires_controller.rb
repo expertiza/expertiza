@@ -183,28 +183,24 @@ class QuestionnairesController < ApplicationController
 
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
-    questionnaire_id = params[:id] unless params[:id].nil?
     # If the questionnaire is being used in the active period of an assignment, delete existing responses before adding new questions
-    if AnswerHelper.check_and_delete_responses(questionnaire_id)
+    if AnswerHelper.check_and_delete_responses(params[:id])
       flash[:success] = 'You have successfully added a new question. Any existing reviews for the questionnaire have been deleted!'
     else
       flash[:success] = 'You have successfully added a new question.'
     end
 
-    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
+    num_of_existed_questions = Questionnaire.find(params[:id]).questions.size
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
-      question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
+      question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: params[:id], seq: i, type: params[:question][:type], break_before: true)
       if question.is_a? ScoredQuestion
         question.weight = params[:question][:weight]
-        question.max_label = 'Strongly agree'
-        question.min_label = 'Strongly disagree'
+        question.max_label = Question::MAX_LABEL
+        question.min_label = Question::MIN_LABEL
       end
 
-      question.size = '50, 3' if question.is_a? Criterion
-      question.size = '50, 3' if question.is_a? Cake
-      question.alternatives = '0|1|2|3|4|5' if question.is_a? Dropdown
-      question.size = '60, 5' if question.is_a? TextArea
-      question.size = '30' if question.is_a? TextField
+      question.size = Question.SIZES[question.class.name] if question.is_any? [Criterion, Cake, TextArea, TextField]
+      question.alternatives = Question.ALTERNATIVES[question.class.name] if question.is_a? Dropdown
 
       begin
         question.save
@@ -212,12 +208,11 @@ class QuestionnairesController < ApplicationController
         flash[:error] = $ERROR_INFO
       end
     end
-    redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+    redirect_to edit_questionnaire_path(params[:id].to_sym)
   end
 
   # Zhewei: This method is used to save all questions in current questionnaire.
   def save_all_questions
-    questionnaire_id = params[:id]
     begin
       if params[:save]
         params[:question].each_pair do |k, v|
@@ -238,8 +233,8 @@ class QuestionnairesController < ApplicationController
 
     if params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
-    elsif questionnaire_id
-      redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+    elsif params[:id]
+      redirect_to edit_questionnaire_path(params[:id].to_sym)
     end
   end
 

@@ -309,7 +309,7 @@ class AssignmentsController < ApplicationController
   # update assignment_form with assignment_questionnaire and due_date
   def update_assignment_form(exist_assignment)
     assignment_form_params[:assignment_questionnaire] = assign_questionnaire_array
-    assignment_form_params[:due_date]
+    assignment_form_params[:due_date] = assign_due_date_array
     @assignment_form.update(assignment_form_params, current_user)
   end
 

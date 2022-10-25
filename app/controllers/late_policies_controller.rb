@@ -131,24 +131,24 @@ class LatePoliciesController < ApplicationController
     @late_policy ||= @late_policy || LatePolicy.find(params[:id]) if params[:id]
   end
 
-  # This function checks on update if the policy name is updated and calls check_if_policy_name_exists function. It returns boolean value for penalty and the error message.
+  # This function checks on update if the policy name is updated and calls check_if_policy_name_exists function. It returns the error message.
   def check_if_policy_name_exists_on_update(prefix)
     existing_late_policy = LatePolicy.find(params[:id])
     if existing_late_policy.policy_name != late_policy_params[:policy_name]
       return check_if_policy_name_exists(prefix)
     end
 
-    return true, nil
+    return nil
   end
 
-  # This function checks if the policy name already exists or not and returns boolean value for penalty and the error message.
+  # This function checks if the policy name already exists or not and returns the error message.
   def check_if_policy_name_exists(prefix)
     error_message = nil
     if LatePolicy.check_policy_with_same_name(late_policy_params[:policy_name], instructor_id)
       error_message = prefix + 'A policy with the same name ' + late_policy_params[:policy_name] + ' already exists. '
-      return false, error_message
+      return error_message
     end
-    return true, error_message
+    return error_message
   end
 
   # This function validates the input.
@@ -160,26 +160,30 @@ class LatePoliciesController < ApplicationController
     prefix = ""
     if is_update
       prefix = 'Cannot edit the policy. '
-      valid_penalty, error_message = check_if_policy_name_exists_on_update(prefix)
+      error_message = check_if_policy_name_exists_on_update(prefix)
     else
-      valid_penalty, error_message = check_if_policy_name_exists(prefix)
+      error_message = check_if_policy_name_exists(prefix)
     end
 
     # This check validates the maximum penalty.
     if max_penalty < penalty_per_unit
       error_message = "#{error_message}" + prefix + 'The maximum penalty cannot be less than penalty per unit. '
-      valid_penalty = false
     end
 
     # This check validates the penalty per unit for a late policy.
     if penalty_per_unit < 0
       error_message = "#{error_message}Penalty per unit cannot be negative. "
-      valid_penalty = false
     end
 
     # This checks maximum penalty does not exceed 100.
     if max_penalty >= 100
       error_message = "#{error_message}" + prefix + 'Maximum penalty cannot be greater than or equal to 100. '
+    end
+
+    # This checks if any error message was generated and sets valid_penalty accordingly.
+    if error_message.nil? 
+      valid_penalty = true
+    else
       valid_penalty = false
     end
 

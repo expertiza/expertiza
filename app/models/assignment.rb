@@ -100,7 +100,7 @@ class Assignment < ApplicationRecord
 
   # remove empty teams (teams with no users) from assignment
   def remove_empty_teams
-    empty_teams = teams.reload.select { |team| team.teams_users.empty? }
+    empty_teams = teams.reload.select { |team| team.teams_participants.empty? }
     teams.delete(empty_teams)
   end
 

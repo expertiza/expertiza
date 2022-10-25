@@ -36,7 +36,7 @@ describe TagPromptDeployment do
     before(:each) do
       questions_ids = double(1)
       response_ids = double(241)
-      allow(Team).to receive(:joins).with(:teams_users).and_return(team)
+      allow(Team).to receive(:joins).with(:teams_participants).and_return(team)
       allow(team).to receive(:where).with(team_users: { parent_id: tag_dep1.assignment_id }, user_id: 1).and_return(team)
       allow(Response).to receive(:joins).with(:response_maps).and_return(response)
       allow(response).to receive(:where).with(response_maps: { reviewed_object_id: tag_dep1.assignment.id, reviewee_id: team.id }).and_return(rp)
@@ -49,7 +49,7 @@ describe TagPromptDeployment do
     end
     context 'when user_id is null' do
       it 'given out an error message' do
-        allow(Team).to receive(:joins).with(:teams_users).and_return(team)
+        allow(Team).to receive(:joins).with(:teams_participants).and_return(team)
         allow(team).to receive(:where).with(team_users: { parent_id: tag_dep1.assignment_id }, user_id: nil).and_raise(ActiveRecord::ActiveRecordError)
         expect { tag_dep1.get_number_of_taggable_answers(nil) }.to raise_error ActiveRecord::ActiveRecordError
       end

@@ -94,9 +94,9 @@ class SuggestionController < ApplicationController
   def send_email
     proposer = User.find_by(id: @user_id)
     if proposer
-      teams_users = TeamsUser.where(team_id: @team_id)
+      teams_participants = TeamsUser.where(team_id: @team_id)
       cc_mail_list = []
-      teams_users.each do |teams_user|
+      teams_participants.each do |teams_user|
         cc_mail_list << User.find(teams_user.user_id).email if teams_user.user_id != proposer.id
       end
       Mailer.suggested_topic_approved_message(

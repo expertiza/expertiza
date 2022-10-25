@@ -3,7 +3,7 @@ class TeamUserNode < Node
   # attr_accessible :parent_id, :node_object_id  # unnecessary protected attributes
 
   def self.table
-    'teams_users'
+    'teams_participants'
   end
 
   def get_name(ip_address = nil)
@@ -11,10 +11,10 @@ class TeamUserNode < Node
   end
 
   def self.get(parent_id)
-    nodes = Node.joins('INNER JOIN teams_users ON nodes.node_object_id = teams_users.id')
+    nodes = Node.joins('INNER JOIN teams_participants ON nodes.node_object_id = teams_participants.id')
                 .select('nodes.*')
                 .where("nodes.type = 'TeamUserNode'")
-    nodes.where('teams_users.team_id = ?', parent_id) if parent_id
+    nodes.where('teams_participants.team_id = ?', parent_id) if parent_id
   end
 
   def is_leaf

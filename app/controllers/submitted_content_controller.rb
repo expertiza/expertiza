@@ -4,7 +4,9 @@ class SubmittedContentController < ApplicationController
 
   include AuthorizationHelper
 
-  # Validate whether a particular action is allowed by the current user or not based on the priveleges
+  before_action :ensure_current_user_is_participant, only: %i[edit view submit_hyperlink folder_action]
+
+  # Validate whether a particular action is allowed by the current user or not based on the privileges
   def action_allowed?
     case params[:action]
     when 'edit'
@@ -25,9 +27,6 @@ class SubmittedContentController < ApplicationController
   # The view have already tested that @assignment.submission_allowed(topic_id) is true,
   # so @can_submit should be true
   def edit
-    @participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(@participant.user_id)
-
     @assignment = @participant.assignment
     # ACS We have to check if this participant has team or not
     SignUpSheet.signup_team(@assignment.id, @participant.user_id, nil) if @participant.team.nil?
@@ -39,9 +38,6 @@ class SubmittedContentController < ApplicationController
   # view is called when @assignment.submission_allowed(topic_id) is false
   # so @can_submit should be false
   def view
-    @participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(@participant.user_id)
-
     @assignment = @participant.assignment
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = false
@@ -51,9 +47,6 @@ class SubmittedContentController < ApplicationController
 
   # submit_hyperlink is called when a new hyperlink is added to an assignment
   def submit_hyperlink
-    @participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(@participant.user_id)
-
     team = @participant.team
     team_hyperlinks = team.hyperlinks
     if team_hyperlinks.include?(params['submission'])
@@ -144,7 +137,7 @@ class SubmittedContentController < ApplicationController
   end
 
   # Check file content size and file type
-  def check_file (file, file_size_limit)
+  def check_file(file, file_size_limit)
     # check file size
     unless check_content_size(file, file_size_limit)
       flash[:error] = "File size must smaller than #{file_size_limit}MB"
@@ -163,30 +156,27 @@ class SubmittedContentController < ApplicationController
   end
 
   # Sanitize and return the file name
-  def get_sanitized_file_path (file, curr_directory)
+  def get_sanitized_file_path(file, curr_directory)
     safe_filename = file.original_filename.tr('\\', '/')
     safe_filename = FileHelper.sanitize_filename(safe_filename) # new code to sanitize file path before upload*
-    sanitized_file_path = curr_directory + File.split(safe_filename).last.tr(' ', '_') # safe_filename #curr_directory 
+    sanitized_file_path = curr_directory + File.split(safe_filename).last.tr(' ', '_') # safe_filename #curr_directory
     return sanitized_file_path
   end
 
   # Get current directory path
-  def get_curr_directory (participant)
+  def get_curr_directory(participant)
     current_folder = DisplayOption.new
     current_folder.name = '/'
     current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name]) if params[:current_folder]
     curr_directory = if params[:origin] == 'review'
-                      participant.review_file_path(params[:response_map_id]).to_s + current_folder.name
-                    else
-                      participant.team.path.to_s + current_folder.name
-                    end
-    return curr_directory                
+                       participant.review_file_path(params[:response_map_id]).to_s + current_folder.name
+                     else
+                       participant.team.path.to_s + current_folder.name
+                     end
+    return curr_directory
   end
 
   def folder_action
-    @participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(@participant.user_id)
-
     @current_folder = DisplayOption.new
     @current_folder.name = '/'
     @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name]) if params[:current_folder]
@@ -196,8 +186,6 @@ class SubmittedContentController < ApplicationController
       rename_selected_file
     elsif params[:faction][:move]
       move_selected_file
-    elsif params[:faction][:copy]
-      copy_selected_file
     elsif params[:faction][:create]
       create_new_folder
     end
@@ -281,19 +269,6 @@ class SubmittedContentController < ApplicationController
     ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The selected file has been deleted.', request)
   end
 
-  def copy_selected_file
-    old_filename = params[:directories][params[:chk_files]] + '/' + params[:filenames][params[:chk_files]]
-    new_filename = params[:directories][params[:chk_files]] + '/' + FileHelper.sanitize_filename(params[:faction][:copy])
-    begin
-      raise 'A file with this name already exists. Please delete the existing file before copying.' if File.exist?(new_filename)
-      raise 'The referenced file does not exist.' unless File.exist?(old_filename)
-
-      FileUtils.cp_r(old_filename, new_filename)
-    rescue StandardError => e
-      flash[:error] = 'There was a problem copying the file: ' + e.message
-    end
-  end
-
   def create_new_folder
     newloc = @participant.dir_path
     newloc += '/'
@@ -316,5 +291,10 @@ class SubmittedContentController < ApplicationController
     @topics = SignUpTopic.where(assignment_id: @participant.parent_id)
     # check one assignment has topics or not
     (!@topics.empty? && !SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id).nil?) || @topics.empty?
+  end
+
+  def ensure_current_user_is_participant
+    @participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(@participant.user_id)
   end
 end

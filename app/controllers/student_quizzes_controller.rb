@@ -1,6 +1,7 @@
 class StudentQuizzesController < ApplicationController
   include AuthorizationHelper
 
+  #Checks authorization for any action based on user type: Student or Teaching Assistant
   def action_allowed?
     if current_user_is_a? 'Student'
       if action_name.eql? 'index'
@@ -13,10 +14,11 @@ class StudentQuizzesController < ApplicationController
     end
   end
 
+  #returns quizzes to be reviewed for a participant
   def index
     @participant = AssignmentParticipant.find(params[:id])
+    #checks if logged in user is not a participant
     return unless current_user_id?(@participant.user_id)
-
     @assignment = Assignment.find(@participant.parent_id)
     @quiz_mappings = QuizResponseMap.mappings_for_reviewer(@participant.id)
   end

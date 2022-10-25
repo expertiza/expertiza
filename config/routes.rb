@@ -645,7 +645,7 @@ Expertiza::Application.routes.draw do
   get 'instructions/home'
   get 'response/', to: 'response#saving'
   # get ':controller/service.wsdl', action: 'wsdl'
-  get 'password_edit/validate_password_token', controller: :password_retrieval, action: :validate_password_token
+  get 'password_edit/check_token_validity', controller: :password_retrieval, action: :check_token_validity
   # get ':controller(/:action(/:id))(.:format)'
   unless Rails.env.development?
     match '*path' => 'content_pages#view', :via => %i[get post]

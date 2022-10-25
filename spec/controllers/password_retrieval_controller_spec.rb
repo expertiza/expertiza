@@ -46,7 +46,7 @@ describe PasswordRetrievalController do
       @password_retrival.save!
       request_params = { token: local_token }
       Timecop.freeze(Time.zone.today + 2.days) do
-        get :validate_password_token, params: request_params
+        get :check_token_validity, params: request_params
         expect(response).to render_template 'password_retrieval/forgotten'
       end
     end
@@ -59,7 +59,7 @@ describe PasswordRetrievalController do
       @password_retrival.user_email = 'example@example.edu'
       @password_retrival.save!
       request_params = { token: local_token_sent_as_parameter }
-      get :validate_password_token, params: request_params
+      get :check_token_validity, params: request_params
       expect(response).to render_template 'password_retrieval/forgotten'
     end
 
@@ -71,7 +71,7 @@ describe PasswordRetrievalController do
       @password_retrival.save!
       request_params = { token: local_token }
       Timecop.freeze(@password_retrival.updated_at + 2.hours) do
-        get :validate_password_token, params: request_params
+        get :check_token_validity, params: request_params
         expect(response).to render_template 'password_retrieval/reset_password'
       end
     end

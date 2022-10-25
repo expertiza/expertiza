@@ -128,7 +128,7 @@ class LatePoliciesController < ApplicationController
 
   def late_policy
     # This function checks if the id exists in parameters and assigns it to the instance variable of penalty policy.
-    @late_policy ||= @late_policy || LatePolicy.find(params[:id]) if params[:id]
+    @late_policy ||= LatePolicy.find(params[:id]) if params[:id]
   end
 
   # This function checks if the policy name already exists or not and returns boolean value for penalty and the error message.

@@ -39,7 +39,7 @@ class SignedUpTeam < ApplicationRecord
   end
 
   def self.find_team_users(assignment_id, user_id)
-    TeamsUser.joins('INNER JOIN teams ON teams_participants.team_id = teams.id')
+    TeamsParticipant.joins('INNER JOIN teams ON teams_participants.team_id = teams.id')
              .select('teams.id as t_id')
              .where('teams.parent_id = ? and teams_participants.user_id = ?', assignment_id, user_id)
   end
@@ -69,7 +69,7 @@ class SignedUpTeam < ApplicationRecord
 
   def self.topic_id(assignment_id, user_id)
     # team_id variable represents the team_id for this user in this assignment
-    team_id = TeamsUser.team_id(assignment_id, user_id)
+    team_id = TeamsParticipant.team_id(assignment_id, user_id)
     topic_id_by_team_id(team_id) if team_id
   end
 

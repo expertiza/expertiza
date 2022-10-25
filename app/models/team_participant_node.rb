@@ -1,5 +1,5 @@
-class TeamUserNode < Node
-  belongs_to :node_object, class_name: 'TeamsUser'
+class TeamParticipantNode < Node
+  belongs_to :node_object, class_name: 'TeamsParticipant'
   # attr_accessible :parent_id, :node_object_id  # unnecessary protected attributes
 
   def self.table
@@ -7,7 +7,7 @@ class TeamUserNode < Node
   end
 
   def get_name(ip_address = nil)
-    TeamsUser.find(node_object_id).name(ip_address)
+    TeamsParticipant.find(node_object_id).name(ip_address)
   end
 
   def self.get(parent_id)

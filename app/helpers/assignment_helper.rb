@@ -76,7 +76,7 @@ module AssignmentHelper
   end
 
   def get_data_for_list_submissions(team)
-    teams_participants = TeamsUser.where(team_id: team.id)
+    teams_participants = TeamsParticipant.where(team_id: team.id)
     topic = SignedUpTeam.where(team_id: team.id).first.try :topic
     topic_identifier = topic.try :topic_identifier
     topic_name = topic.try :topic_name

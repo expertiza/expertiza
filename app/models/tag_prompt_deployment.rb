@@ -47,7 +47,7 @@ class TagPromptDeployment < ApplicationRecord
 
         answers = answers.select { |answer| answer.comments.length > answer_length_threshold } unless answer_length_threshold.nil?
         answers_ids = answers.map(&:id)
-        teams_participants = TeamsUser.where(team_id: team.id)
+        teams_participants = TeamsParticipant.where(team_id: team.id)
         users = teams_participants.map { |teams_user| User.find(teams_user.user_id) }
 
         users.each do |user|

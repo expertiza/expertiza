@@ -17,7 +17,7 @@
 
     <% teams.each do |team| %>
         <tr>
-          <% teams_participants = TeamsUser.where(team_id: team.id) %>
+          <% teams_participants = TeamsParticipant.where(team_id: team.id) %>
           <% users_for_curr_team = "" %>
           <% teams_participants.each do |teams_user| %>
               <% user = User.find(teams_user.user_id) %>

@@ -305,7 +305,7 @@ describe 'AssignmentTeam' do
         teamuser = build(:team_user, id: 1, team_id: team.id, user_id: user1.id)
         allow(team).to receive(:users).with(no_args).and_return([user1])
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(participant1)
-        allow(TeamsUser).to receive(:where).with(user_id: participant1.user_id).and_return([teamuser])
+        allow(TeamsParticipant).to receive(:where).with(user_id: participant1.user_id).and_return([teamuser])
         allow(Team).to receive(:find).with(teamuser.team_id).and_return(team)
         expect(AssignmentTeam.team(participant1)).to eq(team)
       end

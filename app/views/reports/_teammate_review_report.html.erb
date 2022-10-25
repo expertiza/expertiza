@@ -28,7 +28,7 @@
     <% @reviewers.each do |reviewer| %>
       <% @teammate_review_response_maps = ResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and type = ?", @id, reviewer.reviewer_id, @type]) %>
       <% @user = User.find(Participant.find(reviewer.reviewer_id).user_id) %>
-      <% @team_id = TeamsUser.team_id(@id.to_i, @user.id) %>
+      <% @team_id = TeamsParticipant.team_id(@id.to_i, @user.id) %>
       <% @team_member_count = TeammateReviewResponseMap.where(reviewer_id: reviewer.reviewer_id, reviewed_object_id: @id).count %>
       <tr>
         <% @count = 0 %>

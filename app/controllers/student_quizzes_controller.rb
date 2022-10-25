@@ -114,9 +114,6 @@ class StudentQuizzesController < ApplicationController
     end
   end
 
-  def graded?(response, question)
-    Answer.where(question_id: question.id, response_id: response.id).first
-  end
 
   # This method is only for quiz questionnaires, it is called when instructors click "view quiz questions" on the pop-up panel.
   def review_questions

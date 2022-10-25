@@ -20,7 +20,7 @@ class TeamsUser < ApplicationRecord
     TeamUserNode.find_by(node_object_id: id).destroy
     team = self.team
     destroy
-    team.delete if team.teams_participants.empty?
+    team.delete if team.teams_users.empty?
   end
 
   def get_team_members(team_id); end
@@ -60,8 +60,8 @@ class TeamsUser < ApplicationRecord
   def self.team_id(assignment_id, user_id)
     # team_id variable represents the team_id for this user in this assignment
     team_id = nil
-    teams_participants = TeamsUser.where(user_id: user_id)
-    teams_participants.each do |teams_user|
+    teams_users = TeamsUser.where(user_id: user_id)
+    teams_users.each do |teams_user|
       team = Team.find(teams_user.team_id)
       if team.parent_id == assignment_id
         team_id = teams_user.team_id

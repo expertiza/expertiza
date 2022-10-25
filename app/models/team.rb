@@ -1,6 +1,6 @@
 class Team < ApplicationRecord
-  has_many :teams_participants, dependent: :destroy
-  has_many :users, through: :teams_participants
+  has_many :teams_users, dependent: :destroy
+  has_many :users, through: :teams_users
   has_many :join_team_requests, dependent: :destroy
   has_one :team_node, foreign_key: :node_object_id, dependent: :destroy
   has_many :signed_up_teams, dependent: :destroy
@@ -8,7 +8,7 @@ class Team < ApplicationRecord
   has_paper_trail
 
   scope :find_team_for_assignment_and_user, lambda { |assignment_id, user_id|
-    joins(:teams_participants).where('teams.parent_id = ? AND teams_participants.user_id = ?', assignment_id, user_id)
+    joins(:teams_users).where('teams.parent_id = ? AND teams_users.user_id = ?', assignment_id, user_id)
   }
 
   # Get the participants of the given team
@@ -107,8 +107,8 @@ class Team < ApplicationRecord
     teams_num = teams.size
     i = 0
     teams_num.times do
-      teams_participants = TeamsUser.where(team_id: teams[i].id)
-      teams_participants.each do |teams_user|
+      teams_users = TeamsUser.where(team_id: teams[i].id)
+      teams_users.each do |teams_user|
         users.delete(User.find(teams_user.user_id))
       end
       if Team.size(teams.first.id) >= min_team_size

@@ -33,7 +33,7 @@ class MentorManagement
   #   1.) An invited student user accepts and successfully added to a team from
   #       app/models/invitation.rb
   #   2.) A student user is successfully added to the team manually from
-  #       app/controllers/teams_participants_controller.rb.
+  #       app/controllers/teams_users_controller.rb.
   #
   # This method will determine if a mentor needs to be assigned, if so,
   # selects one, and adds the mentor to the team if:

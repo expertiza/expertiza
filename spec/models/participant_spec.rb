@@ -68,7 +68,7 @@ describe Participant do
     end
     it 'delete participant with associations and force is true and single team_user' do
       allow(participant).to receive(:team).and_return(team)
-      allow(team).to receive(:teams_participants).and_return(length: 1)
+      allow(team).to receive(:teams_users).and_return(length: 1)
       expect(participant.delete(true)).to eq(participant)
     end
     it 'raises error, delete participant with associations and force is nil' do

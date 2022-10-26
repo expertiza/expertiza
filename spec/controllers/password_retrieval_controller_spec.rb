@@ -41,6 +41,12 @@ describe PasswordRetrievalController do
       expect(response).to render_template 'password_retrieval/forgotten'
       expect(flash[:error]).to be_present
     end
+    it 'if user in request param is blank flash error' do
+      request_params = { user: { email: '' } }
+      post :send_password, params: request_params
+      expect(response).to render_template 'password_retrieval/forgotten'
+      expect(flash[:error]).to be_present
+    end
   end
 
   describe 'check if token is expired' do

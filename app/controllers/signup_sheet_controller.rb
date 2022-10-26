@@ -169,6 +169,8 @@ class SignupSheetController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
     @signup_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
+    @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
+    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
     @show_actions = true
     @priority = 0
     team_id = @participant.team.try(:id)

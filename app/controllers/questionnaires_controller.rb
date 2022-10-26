@@ -86,17 +86,6 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-  def create_questionnaire
-    @questionnaire = Object.const_get(params[:questionnaire][:type]).new(questionnaire_params)
-    # Create Quiz content has been moved to Quiz Questionnaire Controller
-    if @questionnaire.type != 'QuizQuestionnaire' # checking if it is a quiz questionnaire
-      @questionnaire.instructor_id = Ta.get_my_instructor(session[:user].id) if session[:user].role.name == 'Teaching Assistant'
-      save
-
-      redirect_to controller: 'tree_display', action: 'list'
-    end
-  end
-
   # Edit a questionnaire
   def edit
     @questionnaire = Questionnaire.find(params[:id])

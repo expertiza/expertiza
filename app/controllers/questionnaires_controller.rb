@@ -292,7 +292,7 @@ class QuestionnairesController < ApplicationController
     save_new_questions questionnaire_id
 
     if params[:question]
-      params[:question].keys.each do |question_key|
+      params[:question].each_key do |question_key|
         if params[:question][question_key][:txt].strip.empty?
           # question text is empty, delete the question
           Question.delete(question_key)

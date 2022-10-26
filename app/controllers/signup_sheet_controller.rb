@@ -168,7 +168,6 @@ class SignupSheetController < ApplicationController
   def list
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
-    @max_team_size = @assignment.max_team_size
     @signup_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     @show_actions = true
     @priority = 0

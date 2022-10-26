@@ -23,7 +23,7 @@
       <tbody id="topics"  class="connectedSortable">
       <tr class="sort-disabled"><td></td><td></td></tr>
       <% for topic in @signup_topics %>
-          <%= get_intelligent_topic_row(topic, @selected_topics, @max_team_size) %>
+          <%= get_intelligent_topic_row(topic, @selected_topics, @assignment.max_team_size) %>
           <% is_suggested_topic = false %>
           <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
           </tr>
@@ -39,7 +39,7 @@
       <tbody id="selections" data-update-url=<%= "/signup_sheet/set_priority?participant_id=#{@participant.id}" %> class="connectedSortable">
         <tr class="sort-disabled"><td></td><td></td></tr>
         <% for topic in @bids %>
-          <tr style= "background-color:<%= get_topic_bg_color(topic, @max_team_size) %>" id="topic_<%= topic.id %>">
+          <tr style= "background-color:<%= get_topic_bg_color(topic, @assignment.max_team_size) %>" id="topic_<%= topic.id %>">
              <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
           </tr>
           <% i=i+1 %>

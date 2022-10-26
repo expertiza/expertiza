@@ -70,7 +70,7 @@ class StudentQuizzesController < ApplicationController
 
 
   # This method is only for quiz questionnaires, it is called when instructors click "view quiz questions" on the pop-up panel.
-  def review_questions
+  def get_questions_created_by_id
     @quiz_creator_user_id = params[:id]
     @quiz_questionnaires = []
     Team.where(parent_id: params[:id]).each do |quiz_creator| #Get all teams of participant who created quizzes

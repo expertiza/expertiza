@@ -278,42 +278,42 @@ describe SubmittedContentController do
 
   let(:student1) { build_stubbed(:student, id: 21, role_id: 1) }
   let(:participant) { build(:participant, id: 1, user_id: 21) }
-  describe 'student#view' do
-    it 'student#view it' do
+  describe 'student#show' do
+    it 'student#show it' do
       allow(AssignmentParticipant).to receive(:find).and_return(participant)
       stub_current_user(student1, student1.role.name, student1.role)
       allow(participant).to receive(:name).and_return('Name')
       params = { id: 21 }
-      response = get :view, params: params
-      expect(response).to redirect_to(action: :edit, view: true, id: 21)
+      response = get :show, params: params
+      expect(response).to redirect_to(action: :edit, view_only: true, id: 21)
     end
   end
 
   let(:instructor1) { build_stubbed(:instructor, id: 21, role_id: 1) }
   let(:participant) { build(:participant, id: 1, user_id: 21) }
 
-  describe 'instructor#view' do
-    it 'instructor#view it' do
+  describe 'instructor#show' do
+    it 'instructor#show it' do
       allow(AssignmentParticipant).to receive(:find).and_return(participant)
       stub_current_user(instructor1, instructor1.role.name, instructor1.role)
       allow(participant).to receive(:name).and_return('Name')
       params = { id: 21 }
-      response = get :view, params: params
-      expect(response).to redirect_to(action: :edit, view: true, id: 21)
+      response = get :show, params: params
+      expect(response).to redirect_to(action: :edit, view_only: true, id: 21)
     end
   end
 
   let(:superadmin1) { build_stubbed(:superadmin, id: 21, role_id: 1) }
   let(:participant) { build(:participant, id: 1, user_id: 21) }
 
-  describe 'superadmin#view' do
-    it 'superadmin#view it' do
+  describe 'superadmin#show' do
+    it 'superadmin#show it' do
       allow(AssignmentParticipant).to receive(:find).and_return(participant)
       stub_current_user(superadmin1, superadmin1.role.name, superadmin1.role)
       allow(participant).to receive(:name).and_return('Name')
       params = { id: 21 }
-      response = get :view, params: params
-      expect(response).to redirect_to(action: :edit, view: true, id: 21)
+      response = get :show, params: params
+      expect(response).to redirect_to(action: :edit, view_only: true, id: 21)
     end
   end
 

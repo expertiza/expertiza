@@ -4,7 +4,7 @@ class SubmittedContentController < ApplicationController
 
   include AuthorizationHelper
 
-  before_action :ensure_current_user_is_participant, only: %i[edit view submit_hyperlink folder_action]
+  before_action :ensure_current_user_is_participant, only: %i[edit show submit_hyperlink folder_action]
 
   # Validate whether a particular action is allowed by the current user or not based on the privileges
   def action_allowed?
@@ -31,18 +31,18 @@ class SubmittedContentController < ApplicationController
     # ACS We have to check if this participant has team or not
     SignUpSheet.signup_team(@assignment.id, @participant.user_id, nil) if @participant.team.nil?
     # @can_submit is the flag indicating if the user can submit or not in current stage
-    @can_submit = !params.key?(:view)
+    @can_submit = !params.key?(:view_only)
     @stage = @assignment.current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
   end
 
   # view is called when @assignment.submission_allowed(topic_id) is false
   # so @can_submit should be false
-  def view
+  def show
     @assignment = @participant.assignment
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = false
     @stage = @assignment.current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
-    redirect_to action: 'edit', id: params[:id], view: true
+    redirect_to action: 'edit', id: params[:id], view_only: true
   end
 
   # submit_hyperlink is called when a new hyperlink is added to an assignment
@@ -89,7 +89,7 @@ class SubmittedContentController < ApplicationController
                             user: @participant.name,
                             assignment_id: assignment.id,
                             operation: 'Remove Hyperlink')
-    action = (assignment.submission_allowed(topic_id) ? 'edit' : 'view')
+    action = (assignment.submission_allowed(topic_id) ? 'edit' : 'show')
     redirect_to action: action, id: @participant.id
   end
 

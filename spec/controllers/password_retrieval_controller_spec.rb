@@ -92,7 +92,21 @@ describe PasswordRetrievalController do
       expect(response).to redirect_to '/'
     end
 
-    it 'check if password and repassword do not match' do
+    it 'checks if password reset is deleted' do
+        @user = User.new
+        @user.email = 'example@example.edu'
+        @user.fullname = 'John Doe'
+        @user.name = 'classman'
+        @user.save!
+        @password_retreival = PasswordReset.new
+        @password_retreival.user_email = 'example@example.edu'
+        @password_retreival.save!
+        request_params = { reset: { password: 'AAAAAAAAA123!!', repassword: 'AAAAAAAAA123!!', email: 'example@example.edu' } }
+        post :update_password, params: request_params
+        expect(PasswordReset.where(user_email: 'example@example.edu')).not_to exist
+    end
+
+    it 'checks if password and repassword do not match' do
         @user = User.new
         @user.email = 'example@example.edu'
         @user.fullname = 'John Doe'

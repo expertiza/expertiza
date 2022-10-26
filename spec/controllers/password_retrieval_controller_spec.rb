@@ -35,6 +35,12 @@ describe PasswordRetrievalController do
       post :send_password, params: request_params
       expect(PasswordReset.where(user_email: 'example@example.edu')).not_to exist
     end
+    it 'if user in request param is nil flash error' do
+      request_params = { user: { email: nil } }
+      post :send_password, params: request_params
+      expect(response).to render_template 'password_retrieval/forgotten'
+      expect(flash[:error]).to be_present
+    end
   end
 
   describe 'check if token is expired' do

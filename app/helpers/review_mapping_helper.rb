@@ -26,7 +26,7 @@ module ReviewMappingHelper
   #
   def team_color(response_map)
     color = 'red'
-    # Storing redundantly computed value in a variable 
+    # Storing redundantly computed value in a variable
     assignment_created = @assignment.created_at
     # Storing redundantly computed value in a variable
     assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)

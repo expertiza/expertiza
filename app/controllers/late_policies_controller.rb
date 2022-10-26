@@ -53,13 +53,13 @@ class LatePoliciesController < ApplicationController
   # There are few check points before creating a late policy which are written in the if/else statements.
   def create
     # this function validates the policy name
-    _valid_name_penalty, error_message = check_if_policy_name_exists('')
+    valid_name_penalty, error_message = check_if_policy_name_exists('')
 
     # First this function validates the input then save if the input is valid.
-    _valid_attr_penalty, error_message = validate_input('', error_message)
+    valid_attr_penalty, error_message = validate_input('', error_message)
 
-    valid_penalty = _valid_name_penalty && _valid_attr_penalty
-    
+    valid_penalty = valid_name_penalty && valid_attr_penalty
+   
     if error_message
       flash[:error] = error_message
     end
@@ -86,16 +86,16 @@ class LatePoliciesController < ApplicationController
   # Update method can update late policy. There are few check points before updating a late policy which are written in the if/else statements.
   def update
     late_policy = LatePolicy.find(params[:id])
-    
+
     # this function checks if the policy name was update and then validates the policy name
     prefix = 'Cannot edit the policy. '
     if late_policy.policy_name != late_policy_params[:policy_name]
-      _valid_name_penalty, error_message = check_if_policy_name_exists(prefix)
+      valid_name_penalty, error_message = check_if_policy_name_exists(prefix)
     end
 
     # First this function validates the input then save if the input is valid.
-    _valid_attr_penalty, error_message = validate_input(prefix, error_message)
-    _valid_penalty = _valid_name_penalty && _valid_attr_penalty
+    valid_attr_penalty, error_message = validate_input(prefix, error_message)
+    valid_penalty = valid_name_penalty && valid_attr_penalty
 
     if error_message
       flash[:error] = error_message

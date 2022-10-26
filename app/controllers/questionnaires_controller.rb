@@ -194,7 +194,7 @@ class QuestionnairesController < ApplicationController
       if Question::ALTERNATIVES.key?(question.class.name)
         question.alternatives = Question::ALTERNATIVES[question.class.name]
       end
-      
+
       begin
         question.save
       rescue StandardError

@@ -31,6 +31,10 @@ class Question < ApplicationRecord
   ANSWERS_TRUE_FALSE = [['1', 1], ['2', 2]].freeze
   ANSWERS_MCQ_CHECKED = [['1', 1], ['0', 2]].freeze
   RATINGS = [['Very Easy', 1], ['Easy', 2], ['Medium', 3], ['Difficult', 4], ['Very Difficult', 5]].freeze
+  MAX_LABEL = 'Strongly agree'.freeze
+  MIN_LABEL = 'Strongly disagree'.freeze
+  SIZES = { 'Criterion' => '50, 3', 'Cake' =>'50, 3', 'TextArea' => '60, 5', 'TextField' => '30' }.freeze
+  ALTERNATIVES = { 'Dropdown' => '0|1|2|3|4|5' }.freeze
   attr_accessor :checked
 
   def delete

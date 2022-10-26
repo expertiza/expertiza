@@ -79,7 +79,7 @@ class PasswordRetrievalController < ApplicationController
       user.password_confirmation = params[:reset][:repassword]
       if user.save
         # Deletes all password reset tokens of the user to invalidate the used and previous tokens
-        PasswordReset.delete_all(user_email: user.email)
+        PasswordReset.where(user_email: user.email).delete_all
         ExpertizaLogger.info LoggerMessage.new(controller_name, user.name, 'Password was reset for the user', request)
         flash[:success] = 'Password was successfully reset'
       else
@@ -94,10 +94,11 @@ class PasswordRetrievalController < ApplicationController
       render template: 'password_retrieval/reset_password'
     end
   end
-
-  def require_password_reset_token
-    flash[:error] = 'Password reset page can only be accessed with a generated link, sent to your email'
-    render template: 'password_retrieval/forgotten'
-  end
+  
+  private
+    def require_password_reset_token
+      flash[:error] = 'Password reset page can only be accessed with a generated link, sent to your email'
+      render template: 'password_retrieval/forgotten'
+    end
     
 end

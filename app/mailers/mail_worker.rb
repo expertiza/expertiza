@@ -15,7 +15,7 @@ class MailWorker
     # - drop_one_member_topics = Remove topics that only contain a single teammate/user
     # - drop_outstanding_reviews = Remove assignments that require a review that haven't yet been given to a requesting peer for review from the outstanding
     #   queue once it has been assigned to a peer/user
-    # - compare_files_with_simicheck = Stage that causes plaigarism to be searched for once this deadline has passed
+    # - compare_files_with_simicheck = Stage that causes plagiarism to be searched for once this deadline has passed
     self.deadline_type = deadline_type
     self.due_at = due_at
 

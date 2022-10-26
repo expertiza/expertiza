@@ -293,7 +293,7 @@ class ReviewMappingController < ApplicationController
   end
 
 =begin
-  Used: to remove reviwers not working on any reviews.
+  Used: to remove reviewers not working on any reviews.
   Implements: deletes reviewers from ReviewResponseMap and after the deletions, if values
               still exist in ReviewResponseMap, then the method throws an alert.
 =end
@@ -317,8 +317,8 @@ class ReviewMappingController < ApplicationController
   end
 
 =begin
-  Used: to delete all meta reviewers and to keep track of unsuccesful deletions.
-  Implements: checks the number of unsuccesful deletions and if greater than 0, it throws
+  Used: to delete all meta reviewers and to keep track of unsuccessful deletions.
+  Implements: checks the number of unsuccessful deletions and if greater than 0, it throws
               an alert.
 =end
   def delete_all_metareviewers
@@ -377,7 +377,7 @@ class ReviewMappingController < ApplicationController
   end
 
 =begin
-  Used: to delete the meta review mapping from meta review reponse map
+  Used: to delete the meta review mapping from meta review response map
   Implements: finding the mapping using id, then deletes the mapping from the map. 
               Upon deletion failure, method allows forceful deletion by the user
 =end
@@ -472,7 +472,7 @@ class ReviewMappingController < ApplicationController
 =begin
   Used: to perform automatic review mapping
   Implements: checks if the assignment is an individual assignment, if so, it creates a team. 
-              Depending on the num of calibrated and uncalibrated artifacts, repective mapping strategies are performed. 
+              Depending on the num of calibrated and uncalibrated artifacts, respective mapping strategies are performed. 
 =end
   def automatic_review_mapping
     assignment_id = params[:id].to_i
@@ -535,7 +535,7 @@ class ReviewMappingController < ApplicationController
 =begin
   Used: save grade and comments for the reviewer
   Implements: checks if a review grade exists for a participant, if not, creates a review grade record 
-              and assigns grade and other values for the reviewer. Throws error message if review grade is not updated succesfully
+              and assigns grade and other values for the reviewer. Throws error message if review grade is not updated successfully
 =end
   def save_grade_and_comment_for_reviewer
     review_grade = ReviewGrade.find_or_create_by(participant_id: params[:review_grade][:participant_id])
@@ -717,7 +717,7 @@ class ReviewMappingController < ApplicationController
 
 =begin
   Used: to allocate reviews to participants
-  Implements: a strategy to allocate reviews using the conecept of evenly distributing the reviews to participants
+  Implements: a strategy to allocate reviews using the concept of evenly distributing the reviews to participants
               and not assigning the participant to review their work.
 =end
   def peer_review_strategy(assignment_id, review_strategy, participants_hash)

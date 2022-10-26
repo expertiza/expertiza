@@ -35,13 +35,13 @@ class StudentQuizzesController < ApplicationController
   # Return an array of quiz questions for reviewer with reviewer_id
   def self.get_quiz_questionnaire(assignment_id, reviewer_id)
     quiz_questions = []
-    reviewer = Participant.where(user_id: reviewer_id, parent_id: assignment_id).first
-    reviewed_team_response_maps = ReviewResponseMap.where(reviewer_id: reviewer.id)
-    reviewed_team_response_maps.each do |team_response_map_record|
-      reviewee_id = team_response_map_record.reviewee_id
-      reviewee_team = Team.find(reviewee_id) # reviewees should always be teams
-      next unless reviewee_team.parent_id == assignment_id
-      quiz_questionnaire = QuizQuestionnaire.where(instructor_id: reviewee_team.id).first
+    reviewer = Participant.where(user_id: reviewer_id, parent_id: assignment_id).first  # Get reviewer
+    reviewed_team_response_maps = ReviewResponseMap.where(reviewer_id: reviewer.id) # Get reviewed_team_response_maps based on reviewer_id
+    reviewed_team_response_maps.each do |team_response_map_record|  
+      reviewee_id = team_response_map_record.reviewee_id 
+      reviewee_team = Team.find(reviewee_id) # Get team of the reviewer
+      next unless reviewee_team.parent_id == assignment_id 
+      quiz_questionnaire = QuizQuestionnaire.where(instructor_id: reviewee_team.id).first # Get the latest quiz questions of the team of reviewer
       # if the reviewee team has created quiz
       if quiz_questionnaire
         quiz_questions << quiz_questionnaire unless quiz_questionnaire.taken_by? reviewer

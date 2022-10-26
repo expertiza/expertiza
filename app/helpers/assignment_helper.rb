@@ -83,8 +83,9 @@ module AssignmentHelper
     users_for_curr_team = []
     participants = []
     teams_participants.each do |teams_user|
-      if !teams_user.user_id.nil?
-        user = User.find(teams_user.user_id)
+      if !teams_user.participant_id.nil?
+        participant = Participant.find(teams_user.participant_id)
+        user = User.find(participant.user_id)
         users_for_curr_team << user
         participants << Participant.where(['parent_id = ? AND user_id = ?', @assignment.id, user.id]).first
       end

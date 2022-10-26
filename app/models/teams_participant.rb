@@ -30,7 +30,7 @@ class TeamsParticipant < ApplicationRecord
 
   # Removes entry in the TeamUsers table for the given user and given team id
   def self.remove_team(user_id, team_id)
-    team_user = TeamsParticipant.find_by_team_id_and_user_id(team.id, user.id)
+    team_user = TeamsParticipant.find_by_team_id_and_user_id(team_id, user_id)
     team_user&.destroy
   end
 
@@ -56,7 +56,7 @@ class TeamsParticipant < ApplicationRecord
 
   def self.where_user_ids_and_assignment_id(user_ids, assignment_id)
     participant_ids = Assignment.find(assignment_id).participants.where(user_id: user_ids).pluck(:id)
-    TeamsParticipant.where(user_id: user_ids).or(TeamsParticipant.where(participant_id: participant_ids))
+    TeamsParticipant.where(participant_id: participant_ids)
   end
 
   def self.find_in_assignment_by_user_ids(user_ids, assignment_id)
@@ -72,7 +72,8 @@ class TeamsParticipant < ApplicationRecord
       new_team = AssignmentTeam.where(['id = ? and parent_id = ?', team.team_id, assignment_id]).first
       unless new_team.nil?
         participant = Assignment.find(assignment_id).participants.find_by(user_id: invited_user_id)
-        can_add_member = new_team.add_participant_to_team(participant, assignment_id)      end
+        can_add_member = new_team.add_participant_to_team(participant, assignment_id) 
+      end
     end
     can_add_member
   end

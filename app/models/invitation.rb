@@ -30,7 +30,7 @@ class Invitation < ApplicationRecord
     original_team_id = TeamsParticipant.team_id(assignment_id, invited_user_id)
     if original_team_id
       # team_user_mapping = TeamsParticipant.where(team_id: original_team_id, user_id: invited_user_id).first
-      team_user_mapping = TeamsParticipant.find_by(team_id: original_team_id, user_id: invited_user_id)
+      team_user_mapping = TeamsParticipant.find_by(team_id: original_team_id, participant_id: invited_user_id)
       TeamsParticipant.update(team_user_mapping.id, team_id: new_team_id)
     else
       TeamsParticipant.create(team_id: new_team_id, user_id: invited_user_id)

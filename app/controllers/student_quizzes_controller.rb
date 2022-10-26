@@ -4,23 +4,22 @@ class StudentQuizzesController < ApplicationController
   #Checks authorization for any action based on user type: Student or Teaching Assistant
   def action_allowed?
     if current_user_is_a? 'Student'
-      if action_name.eql? 'index'
+      if action_name.eql? 'index' #For Student, check if student has authorizations of reviewer & submitter
         are_needed_authorizations_present?(params[:id], 'reviewer', 'submitter')
       else
-        true
+        true #returns true for any action other than 'index'
       end
     else
-      current_user_has_ta_privileges?
+      current_user_has_ta_privileges? #check if user is Teaching Assistant
     end
   end
 
-  #returns quizzes to be reviewed for a participant
+  #Returns quizzes to be reviewed for a participant
   def index
-    @participant = AssignmentParticipant.find(params[:id])
-    #checks if logged in user is not a participant
-    return unless current_user_id?(@participant.user_id)
-    @assignment = Assignment.find(@participant.parent_id)
-    @quiz_mappings = QuizResponseMap.mappings_for_reviewer(@participant.id)
+    @participant = AssignmentParticipant.find(params[:id]) #Get participant object
+    return unless current_user_id?(@participant.user_id)   #checks if logged in user is not a participant
+    @assignment = Assignment.find(@participant.parent_id)  #Get assignment created by parent_id
+    @quiz_mappings = QuizResponseMap.mappings_for_reviewer(@participant.id) #returns quizzes to be reviewed by participant
   end
 
   def finished_quiz

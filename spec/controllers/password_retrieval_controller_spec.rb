@@ -35,6 +35,18 @@ describe PasswordRetrievalController do
       post :send_password, params: request_params
       expect(PasswordReset.where(user_email: 'example@example.edu')).not_to exist
     end
+    it 'if user in request param is nil flash error' do
+      request_params = { user: { email: nil } }
+      post :send_password, params: request_params
+      expect(response).to render_template 'password_retrieval/forgotten'
+      expect(flash[:error]).to be_present
+    end
+    it 'if user in request param is blank flash error' do
+      request_params = { user: { email: '' } }
+      post :send_password, params: request_params
+      expect(response).to render_template 'password_retrieval/forgotten'
+      expect(flash[:error]).to be_present
+    end
   end
 
   describe 'check if token is expired' do
@@ -86,6 +98,7 @@ describe PasswordRetrievalController do
       @user.save!
       @password_retrieval = PasswordReset.new
       @password_retrieval.user_email = 'example@example.edu'
+      @password_retrieval.token = 'random_token'
       @password_retrieval.save!
       request_params = { reset: { password: 'AAAAAAAAA123!!', repassword: 'AAAAAAAAA123!!', email: 'example@example.edu' } }
       post :update_password, params: request_params
@@ -93,21 +106,37 @@ describe PasswordRetrievalController do
       expect(response).to redirect_to '/'
     end
 
+    it 'check if password validation fails' do
+      @user = User.new
+      @user.email = 'example@example.edu'
+      @user.fullname = 'John Doe'
+      @user.name = 'classman'
+      @user.save!
+      @password_retrieval = PasswordReset.new
+      @password_retrieval.user_email = 'example@example.edu'
+      @password_retrieval.token = 'random_token'
+      @password_retrieval.save!
+      request_params = { reset: { password: 'A', repassword: 'A', email: 'example@example.edu' } }
+      post :update_password, params: request_params
+      expect(response).to redirect_to '/'
+      expect(flash[:error]).to be_present
+    end
 
     it 'checks if password and repassword do not match' do
-        @user = User.new
-        @user.email = 'example@example.edu'
-        @user.fullname = 'John Doe'
-        @user.name = 'classman'
-        @user.save!
-        @password_retrieval = PasswordReset.new
-        @password_retrieval.user_email = 'example@example.edu'
-        @password_retrieval.save!
-        request_params = { reset: { password: 'BAAAAAAAAA123!!', repassword: 'AAAAAAAAA123!!', email: 'example@example.edu' } }
-        post :update_password, params: request_params
-        expect(PasswordReset.where(user_email: 'example@example.edu')).to exist
-        expect(response).to render_template 'password_retrieval/reset_password'
-        expect(flash[:error]).to be_present      
+      @user = User.new
+      @user.email = 'example@example.edu'
+      @user.fullname = 'John Doe'
+      @user.name = 'classman'
+      @user.save!
+      @password_retrieval = PasswordReset.new
+      @password_retrieval.user_email = 'example@example.edu'
+      @password_retrieval.token = 'random_token'
+      @password_retrieval.save!
+      request_params = { reset: { password: 'BAAAAAAAAA123!!', repassword: 'AAAAAAAAA123!!', email: 'example@example.edu' } }
+      post :update_password, params: request_params
+      expect(PasswordReset.where(user_email: 'example@example.edu')).to exist
+      expect(response).to render_template 'password_retrieval/reset_password'
+      expect(flash[:error]).to be_present
     end
   end
 end

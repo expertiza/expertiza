@@ -130,7 +130,7 @@ class InvitationsController < ApplicationController
     team_member = TeamsParticipant.find_by_team_id_and_user_id(@team.id, @user.id)
     # check if invited user is already in the team
 
-    return if team_member.empty?
+    return if team_member.nil?
 
     flash[:error] = "The user \"#{@user.name}\" is already a member of the team."
     redirect_to view_student_teams_path student_id: @student.id

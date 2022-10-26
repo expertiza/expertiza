@@ -100,7 +100,7 @@ class Team < ApplicationRecord
       can_add_member = true
       parent = TeamNode.find_by(node_object_id: id)
       participant = AssignmentParticipant.find_by(parent_id: parent_id, user_id: user.id)
-      t_user = TeamsUser.create(participant_id: participant.id, team_id: id)
+      t_user = TeamsParticipant.create(participant_id: participant.id, team_id: id)
       TeamParticipantNode.create(parent_id: parent.id, node_object_id: t_user.id)
       ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{id}")
     end
@@ -115,7 +115,7 @@ class Team < ApplicationRecord
     can_add_member = false
     unless full?
       can_add_member = true
-      t_user = TeamsUser.create(participant_id: participant.id, team_id: id)
+      t_user = TeamsParticipant.create(participant_id: participant.id, team_id: id)
       parent = TeamNode.find_by(node_object_id: id)
       TeamParticipantNode.create(parent_id: parent.id, node_object_id: t_user.id)
       ExpertizaLogger.info LoggerMessage.new('Model:Team', participant.name, "Added member to the team #{id}")
@@ -158,7 +158,9 @@ class Team < ApplicationRecord
     teams_num.times do
       teams_participants = TeamsParticipant.where(team_id: teams[i].id)
       teams_participants.each do |teams_user|
-        users.delete(User.find(teams_user.user_id))
+        if !teams_user.user_id.nil?
+          users.delete(User.find(teams_user.user_id))
+        end
       end
       if Team.size(teams.first.id) >= min_team_size
         teams.delete(teams.first)
@@ -222,7 +224,7 @@ class Team < ApplicationRecord
       if user.nil?
         raise ImportError, "The user '#{teammate}' was not found. <a href='/users/new'>Create</a> this user?"
       else
-        add_member(user) if TeamsUser.find_by_team_id_and_user_id(id, user.id).nil?      end
+        add_member(user) if TeamsParticipant.find_by_team_id_and_user_id(id, user.id).nil?      end
     end
   end
 
@@ -335,8 +337,8 @@ class Team < ApplicationRecord
   # Removes the specified user from any team of the specified assignment
   def self.remove_user_from_previous_team(parent_id, user_id)
     participant = Participant.find_by(user_id: user_id, parent_id: parent_id)
-    team_user = TeamsUser.find_by(participant_id: participant.id)
-    team_user = TeamsUser.where(user_id: user_id).find { |team_user_obj| team_user_obj.team.parent_id == parent_id } if team_user.nil?    begin
+    team_user = TeamsParticipant.find_by(participant_id: participant.id)
+    team_user = TeamsParticipant.where(user_id: user_id).find { |team_user_obj| team_user_obj.team.parent_id == parent_id } if team_user.nil?    begin
       team_user.destroy
     rescue StandardError
       nil

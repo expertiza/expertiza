@@ -1,5 +1,5 @@
 <tr>
-    <td><%= inv.to_user.name(session_ip]) %></td>
+    <td><%= inv.to_user.name(session_ip) %></td>
     <td><%= inv.to_user.fullname(session_ip) %></td>
     <td><%= inv.to_user.email(session_ip) %></td>
     <% if inv.reply_status == 'A' %>
@@ -9,4 +9,5 @@
     <% else %>
         <td align = "center">Waiting for reply
         &nbsp;&nbsp;<%= link_to "Retract", {:controller => 'invitations', :action => 'cancel', :inv_id => inv.id, :student_id => student.id} %></td>
+    <% end %>
 </tr>

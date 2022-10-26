@@ -18,14 +18,14 @@ class TeamsParticipantsController < ApplicationController
 
   # Example of duties: manager, designer, programmer, tester. Finds TeamsParticipant and save preferred Duty
   def update_duties
-    team_user = TeamsParticipant.find(params[:teams_user_id])
-    team_user.update_attribute(:duty_id, params[:teams_user]['duty_id'])
+    team_participant = TeamsParticipant.find(params[:teams_user_id])
+    team_participant.update_attribute(:duty_id, params[:teams_user]['duty_id'])
     redirect_to controller: 'student_teams', action: 'view', student_id: params[:participant_id]
   end
 
   def list
-    @team = Team.find(params[:id])
-    @assignment = Assignment.find(@team.parent_id)
+    # @team = Team.find(params[:id])
+    # @assignment = Assignment.find(@team.parent_id)
     @teams_participants = TeamsParticipant.page(params[:page]).per_page(10).where(['team_id = ?', params[:id]])
   end
 
@@ -54,7 +54,8 @@ class TeamsParticipantsController < ApplicationController
           flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
         else
           begin
-            add_member_return = team.add_member(user, team.parent_id)
+            participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
+            add_member_return = team.add_participant_to_team(participant, team.parent_id)
           rescue
             flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
             redirect_back fallback_location: root_path

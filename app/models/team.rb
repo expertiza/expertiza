@@ -22,19 +22,11 @@ class Team < ApplicationRecord
   # as well as from user_id if some entries use user_id mapping.
   # Get the participants of the given team
   def participants
-    # load based on user_id mapping if it exists
-    unless users.to_a.empty?
-      participants_list_from_users = users.flat_map(&:participants).select do |participant|
-        participant.parent_id == parent_id
-      end
-    end
-
     # load directly using participant_ids
     participants_list_from_ids = Participant.where(id: participant_ids)
 
-    unless participants_list_from_users.nil? && participants_list_from_ids.nil?
+    unless participants_list_from_ids.nil?
       participants_list = []
-      participants_list += participants_list_from_users unless participants_list_from_users.nil?
       participants_list += participants_list_from_ids unless participants_list_from_ids.nil?
       participants_list
     end
@@ -158,8 +150,9 @@ class Team < ApplicationRecord
     teams_num.times do
       teams_participants = TeamsParticipant.where(team_id: teams[i].id)
       teams_participants.each do |teams_user|
-        if !teams_user.user_id.nil?
-          users.delete(User.find(teams_user.user_id))
+        if !teams_user.participant_id.nil?
+          participant = Participant.find(teams_user.participant_id)
+          users.delete(User.find(participant.user_id))
         end
       end
       if Team.size(teams.first.id) >= min_team_size

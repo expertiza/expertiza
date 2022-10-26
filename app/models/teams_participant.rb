@@ -7,14 +7,16 @@ class TeamsParticipant < ApplicationRecord
   # attr_accessible :user_id, :team_id # unnecessary protected attributes
 
   def name(ip_address = nil)
-    name = user.name(ip_address)
+    if !user.nil?
+      name = user.name(ip_address)
 
-    # E2115 Mentor Management
-    # Indicate that someone is a Mentor in the UI. The view code is
-    # often hard to follow, and this is the best place we could find
-    # for this to go.
-    name += ' (Mentor)' if MentorManagement.user_a_mentor?(user)
-    name
+      # E2115 Mentor Management
+      # Indicate that someone is a Mentor in the UI. The view code is
+      # often hard to follow, and this is the best place we could find
+      # for this to go.
+      name += ' (Mentor)' if MentorManagement.user_a_mentor?(user)
+      name
+    end
   end
 
   def delete
@@ -28,7 +30,7 @@ class TeamsParticipant < ApplicationRecord
 
   # Removes entry in the TeamUsers table for the given user and given team id
   def self.remove_team(user_id, team_id)
-    team_user = TeamsParticipant.find_by_team_id_and_user_id(team.id, user.id).first
+    team_user = TeamsParticipant.find_by_team_id_and_user_id(team.id, user.id)
     team_user&.destroy
   end
 
@@ -44,8 +46,7 @@ class TeamsParticipant < ApplicationRecord
   end
 
   def self.find_by_team_id_and_user_id(team_id, user_id)
-    teams_participant = TeamsParticipant.find_by(team_id: team_id, user_id: user_id)
-    if teams_participant.nil? && team_id != "0"
+    if team_id != "0"
       assignment_id = Team.find(team_id).parent_id
       participant_id = Assignment.find(assignment_id).participants.find_by(user_id: user_id).id
       teams_participant = TeamsParticipant.find_by(team_id: team_id, participant_id: participant_id)
@@ -85,7 +86,7 @@ class TeamsParticipant < ApplicationRecord
       participant_id = Assignment.find(assignment_id).participants.find_by(user_id: user_id).id
 
       # E2263: Fetch only based on participant_id after user_id is removed from teams_users table.
-      teams_users = TeamsParticipant.where(user_id: user_id).or(TeamsParticipant.where(participant_id: participant_id))
+      teams_users = TeamsParticipant.where(participant_id: participant_id)
 
       teams_users.each do |teams_user|
         team = Team.find(teams_user.team_id)

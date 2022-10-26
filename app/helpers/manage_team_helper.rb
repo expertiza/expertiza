@@ -17,7 +17,7 @@ module ManageTeamHelper
 
   # check if the user specified by 'user' already belongs to team specified by 'team_id'
   def user?(user, team_id)
-    if TeamsParticipant.find_by_team_id_and_user_id(@team.id, @user.id).first
+    if TeamsParticipant.find_by_team_id_and_user_id(@team.id, @user.id)
       true
     else
       false

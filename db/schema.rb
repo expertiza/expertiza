@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20221025180058) do
+ActiveRecord::Schema.define(version: 20221026090606) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -938,14 +938,12 @@ ActiveRecord::Schema.define(version: 20221025180058) do
 
   create_table "teams_participants", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "team_id"
-    t.integer "user_id"
     t.integer "duty_id"
     t.string "pair_programming_status", limit: 1
     t.integer "participant_id"
     t.index ["duty_id"], name: "index_teams_participants_on_duty_id"
     t.index ["participant_id"], name: "fk_rails_f4d20198de"
     t.index ["team_id"], name: "fk_users_teams"
-    t.index ["user_id"], name: "fk_teams_users"
   end
 
   create_table "track_notifications", id: :integer, force: :cascade, options: "ENGINE=MyISAM DEFAULT CHARSET=latin1" do |t|
@@ -1079,5 +1077,4 @@ ActiveRecord::Schema.define(version: 20221025180058) do
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
   add_foreign_key "teams_participants", "duties"
   add_foreign_key "teams_participants", "teams", name: "fk_users_teams"
-  add_foreign_key "teams_participants", "users", name: "fk_teams_users"
 end

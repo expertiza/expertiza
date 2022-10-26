@@ -106,6 +106,21 @@ describe PasswordRetrievalController do
       expect(response).to redirect_to '/'
     end
 
+    it 'check if password validation fails' do
+      @user = User.new
+      @user.email = 'example@example.edu'
+      @user.fullname = 'John Doe'
+      @user.name = 'classman'
+      @user.save!
+      @password_retrieval = PasswordReset.new
+      @password_retrieval.user_email = 'example@example.edu'
+      @password_retrieval.token = 'random_token'
+      @password_retrieval.save!
+      request_params = { reset: { password: 'A', repassword: 'A', email: 'example@example.edu' } }
+      post :update_password, params: request_params
+      expect(response).to redirect_to '/'
+      expect(flash[:error]).to be_present
+    end
 
     it 'checks if password and repassword do not match' do
       @user = User.new

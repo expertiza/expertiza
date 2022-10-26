@@ -32,24 +32,22 @@ class StudentQuizzesController < ApplicationController
     @participant_quiz_score = @quiz_response_map.quiz_score #Populating quiz score of the Participant
   end
 
-  # Create an array of candidate quizzes for current reviewer
-  def self.take_quiz(assignment_id, reviewer_id)
-    quizzes = []
+  # Create an array of candidate quiz_questions for current reviewer
+  def self.get_quiz_questionnaire(assignment_id, reviewer_id)
+    quiz_questions = []
     reviewer = Participant.where(user_id: reviewer_id, parent_id: assignment_id).first
     reviewed_team_response_maps = ReviewResponseMap.where(reviewer_id: reviewer.id)
     reviewed_team_response_maps.each do |team_response_map_record|
       reviewee_id = team_response_map_record.reviewee_id
       reviewee_team = Team.find(reviewee_id) # reviewees should always be teams
       next unless reviewee_team.parent_id == assignment_id
-
       quiz_questionnaire = QuizQuestionnaire.where(instructor_id: reviewee_team.id).first
-
       # if the reviewee team has created quiz
       if quiz_questionnaire
-        quizzes << quiz_questionnaire unless quiz_questionnaire.taken_by? reviewer
+        quiz_questions << quiz_questionnaire unless quiz_questionnaire.taken_by? reviewer
       end
     end
-    quizzes
+    quiz_questions
   end
 
   # check if there is any response for this map_id. This is to prevent student take same quiz twice

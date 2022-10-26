@@ -1,8 +1,8 @@
 class SuggestionController < ApplicationController
   include AuthorizationHelper
 
-  #This method determines if the action the user makes, is allowed or not 
-  #depending on the criteraa that the user has student privileges or TA privileges
+  # This method determines if the action the user makes, is allowed or not 
+  # depending on the criteraa that the user has student privileges or TA privileges
   def action_allowed?
     case params[:action]
     when 'create', 'new', 'show', 'student_edit', 'update_suggestion', 'submit'
@@ -12,8 +12,7 @@ class SuggestionController < ApplicationController
     end
   end
 
-
-  #will allow user to add comment to the suggestion
+  # will allow user to add comment to the suggestion
   def add_comment
     @suggestion_comment = SuggestionComment.new(vote: params[:suggestion_comment][:vote], comments: params[:suggestion_comment][:comments])
     @suggestion_comment.suggestion_id = params[:id]
@@ -30,24 +29,23 @@ class SuggestionController < ApplicationController
   verify method: :post, only: %i[destroy create update],
          redirect_to: { action: :list }
 
-
-  #will get the list of suggestions 
+  # will get the list of suggestions
   def list
     @suggestions = Suggestion.where(assignment_id: params[:id])
     @assignment = Assignment.find(params[:id])
   end
 
- #will get the suggestion made by user in student_edit file
+  # will get the suggestion made by user in student_edit file
   def student_edit
     @suggestion = Suggestion.find(params[:id])
   end
 
- #will get the suggestion, to the show file 
+  # will get the suggestion, to the show file
   def show
     @suggestion = Suggestion.find(params[:id])
   end
 
-  #will get suggestion data  to update 
+  # will get suggestion data  to update
   def update_suggestion
     Suggestion.find(params[:id]).update_attributes(title: params[:suggestion][:title],
                                                    description: params[:suggestion][:description],
@@ -55,7 +53,7 @@ class SuggestionController < ApplicationController
     redirect_to action: 'new', id: Suggestion.find(params[:id]).assignment_id
   end
 
-  #will get the suggestions data to display in 'new' file
+  # will get the suggestions data to display in 'new' file
   def new
     @suggestion = Suggestion.new
     session[:assignment_id] = params[:id]
@@ -63,7 +61,7 @@ class SuggestionController < ApplicationController
     @assignment = Assignment.find(params[:id])
   end
 
-  #will create a new suggestion and save for the assignment
+  # will create a new suggestion and save for the assignment
   def create
     @suggestion = Suggestion.new(suggestion_params)
     @suggestion.assignment_id = session[:assignment_id]
@@ -82,7 +80,7 @@ class SuggestionController < ApplicationController
     redirect_to action: 'new', id: @suggestion.assignment_id
   end
 
-  #will submit the vote for a particular suggestion
+  # will submit the vote for a particular suggestion
   def submit
     if !params[:add_comment].nil?
       add_comment
@@ -94,12 +92,11 @@ class SuggestionController < ApplicationController
     end
   end
 
-  #will provie notification/email based on the suggestion being approved or not
-  #will create and assign team if user is not in any team
+  # will provie notification/email based on the suggestion being approved or not
+  # will create and assign team if user is not in any team
   def notification
     if @suggestion.signup_preference == 'Y' and @team_id.nil?
-      new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s,
-                                        parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
+      new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s, parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
       new_team.create_new_team(@user_id, @signuptopic)
     elsif @suggestion.signup_preference == 'Y' and !@team_id.nil? and @topic_id.nil?
       # clean waitlists
@@ -123,9 +120,9 @@ class SuggestionController < ApplicationController
     redirect_to action: 'show', id: @suggestion
   end
 
-  #will get  the suggestion to reject
-  #if the status is updated to reject-> suggestionn rejected
-  #else-> error
+  # will get  the suggestion to reject
+  # if the status is updated to reject-> suggestionn rejected
+  # else-> error
   def reject_suggestion
     @suggestion = Suggestion.find(params[:id])
     if @suggestion.update_attribute('status', 'Rejected')
@@ -138,15 +135,15 @@ class SuggestionController < ApplicationController
 
   private
 
-  #will retrieve parameters
+  # will retrieve parameters
   def suggestion_params
     params.require(:suggestion).permit(:assignment_id, :title, :description,
                                        :status, :unityID, :signup_preference)
   end
 
-  #will approve suggestion base  on 
-  #if signup  topic -> suggestion approved
-  #else-> error
+  # will approve suggestion base on
+  # if signup  topic -> suggestion approved
+  # else-> error
   def approve_suggestion
     @suggestion = Suggestion.find(params[:id])
     @user_id = User.find_by(name: @suggestion.unityID).try(:id)

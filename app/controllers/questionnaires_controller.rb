@@ -199,9 +199,13 @@ class QuestionnairesController < ApplicationController
         question.min_label = Question::MIN_LABEL
       end
 
-      question.size = Question.SIZES[question.class.name] if question.is_any? [Criterion, Cake, TextArea, TextField]
-      question.alternatives = Question.ALTERNATIVES[question.class.name] if question.is_a? Dropdown
-
+      if Question::SIZES.key?(question.class.name)
+        question.size = Question::SIZES[question.class.name]
+      end
+      if Question::ALTERNATIVES.key?(question.class.name)
+        question.alternatives = Question::ALTERNATIVES[question.class.name]
+      end
+      
       begin
         question.save
       rescue StandardError

@@ -32,7 +32,7 @@ class StudentQuizzesController < ApplicationController
     @participant_quiz_score = @quiz_response_map.quiz_score #Populating quiz score of the Participant
   end
 
-  # Create an array of candidate quiz_questions for current reviewer
+  # Return an array of quiz questions for reviewer with reviewer_id
   def self.get_quiz_questionnaire(assignment_id, reviewer_id)
     quiz_questions = []
     reviewer = Participant.where(user_id: reviewer_id, parent_id: assignment_id).first

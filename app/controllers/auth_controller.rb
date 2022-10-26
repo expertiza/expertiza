@@ -27,9 +27,8 @@ class AuthController < ApplicationController
         after_login(user)
       else
         ExpertizaLogger.error LoggerMessage.new(controller_name, '', 'Failed login attempt. Invalid username/password', request)
-        #flash[:error] = 'Your username or password is incorrect.'
-        #redirect_to controller: 'password_retrieval', action: 'forgotten' #TODO: combine with below
-        login_failed
+        flash[:error] = 'Your username or password is incorrect.'
+        redirect_to controller: 'password_retrieval', action: 'forgotten'
       end
     end
   end # def login
@@ -88,11 +87,6 @@ class AuthController < ApplicationController
   end
 
   private
-
-  def login_failed
-    flash.now[:error] = 'Your username or password is incorrect.'
-    redirect_to controller: 'password_retrieval', action: 'forgotten'
-  end
 
   def log_user_logout
     ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Logging out!', request)

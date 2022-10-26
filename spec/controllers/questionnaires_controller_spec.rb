@@ -200,6 +200,41 @@ describe QuestionnairesController do
     end
   end
 
+  describe '#create_questionnaire and #save' do
+    context 'when quiz is valid' do
+      before(:each) do
+        # create_quiz_questionnaire
+        allow_any_instance_of(QuestionnairesController).to receive(:validate_quiz).and_return('valid')
+      end
+
+      context 'when questionnaire type is not QuizQuestionnaire' do
+        it 'redirects to submitted_content#edit page' do
+          request_params = { aid: 1,
+                             pid: 1,
+                             questionnaire: { name: review_questionnaire.name,
+                                              type: review_questionnaire.type } }
+          # create_questionnaire
+          allow(ReviewQuestionnaire).to receive(:new).with(any_args).and_return(review_questionnaire)
+          user_session = { user: build(:teaching_assistant, id: 1) }
+          allow(Ta).to receive(:get_my_instructor).with(1).and_return(6)
+          # save
+          allow(TreeFolder).to receive(:find_by).with(name: 'Review').and_return(double('TreeFolder', id: 1))
+          allow(FolderNode).to receive(:find_by).with(node_object_id: 1).and_return(double('FolderNode'))
+          allow_any_instance_of(QuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
+          post :create_questionnaire, params: request_params, session: user_session
+          expect(flash[:note]).to be nil
+          expect(response).to redirect_to('/tree_display/list')
+          expect(controller.instance_variable_get(:@questionnaire).private).to eq false
+          expect(controller.instance_variable_get(:@questionnaire).name).to eq review_questionnaire.name
+          expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
+          expect(controller.instance_variable_get(:@questionnaire).max_question_score).to eq 5
+          expect(controller.instance_variable_get(:@questionnaire).type).to eq review_questionnaire.type
+          expect(controller.instance_variable_get(:@questionnaire).instructor_id).to eq 6
+        end
+      end
+    end
+  end
+
   describe '#edit' do
     context 'when @questionnaire is not nil' do
       it 'renders the questionnaires#edit page' do

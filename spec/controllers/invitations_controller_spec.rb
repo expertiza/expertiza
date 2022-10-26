@@ -8,7 +8,7 @@ describe InvitationsController do
   let(:participant) { build(:participant, id: 1) }
   let(:assignment) { build(:assignment, id: 2, is_conference_assignment: 1, max_team_size: 100) }
   let(:assignment2) { build(:assignment, id: 2, is_conference_assignment: 0, max_team_size: 100) }
-  let(:teamUser) { build(:team_user, id: 3) }
+  let(:teamUser) { build(:team_user, participant_id: 3) }
   let(:team) { build(:team, id: 3) }
   describe '#action_allowed?' do
     context 'when current user is student' do

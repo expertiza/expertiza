@@ -30,6 +30,8 @@ describe Assignment do
     context 'when the user is on a team associated with the assignment' do
       it 'returns true' do
         allow_any_instance_of(Team).to receive(:users).and_return([student])
+        allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
+        allow_any_instance_of(Team).to receive(:participants).and_return([participant])
         expect(assignment.user_on_team?(student)).to be_truthy
       end
     end

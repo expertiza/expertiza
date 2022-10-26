@@ -224,7 +224,8 @@ class Team < ApplicationRecord
       if user.nil?
         raise ImportError, "The user '#{teammate}' was not found. <a href='/users/new'>Create</a> this user?"
       else
-        add_member(user) if TeamsParticipant.find_by_team_id_and_user_id(id, user.id).nil?      end
+        add_member(user) if TeamsParticipant.find_by_team_id_and_user_id(id, user.id).nil?
+      end
     end
   end
 
@@ -338,7 +339,8 @@ class Team < ApplicationRecord
   def self.remove_user_from_previous_team(parent_id, user_id)
     participant = Participant.find_by(user_id: user_id, parent_id: parent_id)
     team_user = TeamsParticipant.find_by(participant_id: participant.id)
-    team_user = TeamsParticipant.where(user_id: user_id).find { |team_user_obj| team_user_obj.team.parent_id == parent_id } if team_user.nil?    begin
+    team_user = TeamsParticipant.where(user_id: user_id).find { |team_user_obj| team_user_obj.team.parent_id == parent_id } if team_user.nil?    
+    begin
       team_user.destroy
     rescue StandardError
       nil

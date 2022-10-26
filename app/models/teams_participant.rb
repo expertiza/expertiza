@@ -1,6 +1,7 @@
 class TeamsParticipant < ApplicationRecord
   belongs_to :user
   belongs_to :team
+  belongs_to :participant
   has_one :team_participant_node, foreign_key: 'node_object_id', dependent: :destroy
   has_paper_trail
   # attr_accessible :user_id, :team_id # unnecessary protected attributes
@@ -52,6 +53,11 @@ class TeamsParticipant < ApplicationRecord
     teams_participant
   end
 
+  def self.where_user_ids_and_assignment_id(user_ids, assignment_id)
+    participant_ids = Assignment.find(assignment_id).participants.where(user_id: user_ids).pluck(:id)
+    TeamsParticipant.where(user_id: user_ids).or(TeamsParticipant.where(participant_id: participant_ids))
+  end
+
   def self.find_in_assignment_by_user_ids(user_ids, assignment_id)
     participant_ids = Assignment.find(assignment_id).participants.where(user_id: user_ids).pluck(:id)
     TeamsParticipant.where(user_id: user_ids).or(TeamsParticipant.where(participant_id: participant_ids))
@@ -60,12 +66,12 @@ class TeamsParticipant < ApplicationRecord
   # Add member to the team they were invited to and accepted the invite for
   def self.add_member_to_invited_team(invitee_user_id, invited_user_id, assignment_id)
     can_add_member = false
-    users_teams = TeamsParticipant.where(['user_id = ?', invitee_user_id])
+    users_teams = TeamsParticipant.where_user_ids_and_assignment_id([invitee_user_id], assignment_id)
     users_teams.each do |team|
       new_team = AssignmentTeam.where(['id = ? and parent_id = ?', team.team_id, assignment_id]).first
       unless new_team.nil?
-        can_add_member = new_team.add_member(User.find(invited_user_id), assignment_id)
-      end
+        participant = Assignment.find(assignment_id).participants.find_by(user_id: invited_user_id)
+        can_add_member = new_team.add_participant_to_team(participant, assignment_id)      end
     end
     can_add_member
   end
@@ -75,12 +81,18 @@ class TeamsParticipant < ApplicationRecord
   def self.team_id(assignment_id, user_id)
     # team_id variable represents the team_id for this user in this assignment
     team_id = nil
-    teams_participants = TeamsParticipant.where(user_id: user_id)
-    teams_participants.each do |teams_user|
-      team = Team.find(teams_user.team_id)
-      if team.parent_id == assignment_id
-        team_id = teams_user.team_id
-        break
+    unless assignment_id.nil?
+      participant_id = Assignment.find(assignment_id).participants.find_by(user_id: user_id).id
+
+      # E2263: Fetch only based on participant_id after user_id is removed from teams_users table.
+      teams_users = TeamsParticipant.where(user_id: user_id).or(TeamsParticipant.where(participant_id: participant_id))
+
+      teams_users.each do |teams_user|
+        team = Team.find(teams_user.team_id)
+        if team.parent_id == assignment_id
+          team_id = teams_user.team_id
+          break
+        end
       end
     end
     team_id

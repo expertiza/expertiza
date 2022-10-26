@@ -11,6 +11,8 @@ class Participant < ApplicationRecord
   has_many :response_maps, class_name: 'ResponseMap', foreign_key: 'reviewee_id', dependent: :destroy, inverse_of: false
   has_many :awarded_badges, dependent: :destroy
   has_many :badges, through: :awarded_badges
+  has_many :teams_participants, dependent: :destroy
+  has_many :teams, through: :teams_participants
   has_one :review_grade, dependent: :destroy
   validates :grade, numericality: { allow_nil: true }
   has_paper_trail
@@ -28,7 +30,11 @@ class Participant < ApplicationRecord
   DUTY_MENTOR = 'mentor'.freeze
 
   def team
-    TeamsParticipant.find_by(user: user).try(:team)
+    # team = TeamsParticipant.find_by(user: user).try(:team)
+    if team.nil?
+      team = TeamsParticipant.find_by(participant_id: :id)
+    end
+    team
   end
 
   def responses

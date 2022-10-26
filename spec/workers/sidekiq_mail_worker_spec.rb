@@ -41,17 +41,17 @@ describe MailWorker do
 
     it "should not return email if deadline is compare_files_with_simicheck" do
       Sidekiq::Testing.inline!
-      Mailer.delivieries.clear
+      Mailer.deliveries.clear
       worker = MailWorker.new
       worker.perform("1", "compare_files_with_simicheck", "2018-12-31 00:00:01")
-      expect(Mailer.delivieries.size).to eq(0)      
+      expect(Mailer.deliveries.size).to eq(0)      
     end
 
     it "should not return email if deadline is drop_outstanding_reviews" do
       Sidekiq::Testing.inline!
-      Mailer.delivieries.clear
+      Mailer.deliveries.clear
       worker = MailWorker.new
       worker.perform("1", "drop_outstanding_reviews", "2018-12-31 00:00:01")
-      expect(Mailer.delivieries.size).to eq(0)
+      expect(Mailer.deliveries.size).to eq(0)
   end
 end

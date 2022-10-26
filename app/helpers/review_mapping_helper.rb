@@ -25,6 +25,7 @@ module ReviewMappingHelper
   # gets the team name's color according to review and assignment submission status
   #
   def team_color(response_map)
+    color = 'red'
     # Storing redundantly computed value in a variable 
     assignment_created = @assignment.created_at
     # Storing redundantly computed value in a variable
@@ -32,37 +33,36 @@ module ReviewMappingHelper
     # Returning color based on conditions
     if Response.exists?(map_id: response_map.id)
       if !response_map.try(:reviewer).try(:review_grade).nil?
-        'brown'
+        color = 'brown'
       elsif response_for_each_round?(response_map)
-        'blue'
+        color = 'blue'
       else
-        obtain_team_color(response_map, assignment_created, assignment_due_dates)
+        color = obtain_team_color(response_map, assignment_created, assignment_due_dates)
       end
-    else
-      'red'
+      color #returning the value of color
     end
   end
 
   # loops through the number of assignment review rounds and obtains the team color
   def obtain_team_color(response_map, assignment_created, assignment_due_dates)
-    color = []
+    color = 'red' # assigning the color default to red
     (1..@assignment.num_review_rounds).each do |round|
       check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
     end
-    color[-1]
+    color
   end
 
   # checks the submission state within each round and assigns team color
   def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
     if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
-      color.push 'purple'
+      color = 'purple'
     else
       link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
       if link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
-        color.push 'green'
+        color = 'green'
       else
         link_updated_at = get_link_updated_at(link)
-        color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
+        color = link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
       end
     end
   end

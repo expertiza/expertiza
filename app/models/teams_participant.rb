@@ -42,18 +42,6 @@ class TeamsParticipant < ApplicationRecord
     team_members.blank?
   end
 
-  def user
-    if participant
-      participant.user
-    else
-      user
-    end
-  end
-
-  def user_id
-    user.id
-  end
-
   def self.find_by_team_id_and_user_id(team_id, user_id)
     teams_participant = TeamsParticipant.find_by(team_id: team_id, user_id: user_id)
     if teams_participant.nil? && team_id != "0"

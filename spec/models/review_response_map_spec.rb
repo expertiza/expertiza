@@ -160,7 +160,7 @@ describe ReviewResponseMap do
     allow(AssignmentTeam).to receive(:create).and_return(double('team', id: 1))
     allow(TeamsParticipant).to receive(:create).with(team_id: 1, user_id: 1).and_return(double('teams_participants', id: 1, team_id: 1, user_id: 1))
     allow(TeamNode).to receive(:create).with(parent_id: assignment_id, node_object_id: 1).and_return(double('team_node', id: 1, parent_id: 1, node_object_id: 1))
-    allow(TeamUserNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('team_user_node', id: 1, parent_id: 1, node_object_id: 1))
+    allow(TeamParticipantNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('team_user_node', id: 1, parent_id: 1, node_object_id: 1))
     allow(User).to receive(:find_by).with(name: 'name1').and_return(student1)
     allow(AssignmentParticipant).to receive(:find_by).with(user_id: 2, parent_id: 1).and_return(participant1)
     allow(ReviewResponseMap).to receive(:find_or_create_by)

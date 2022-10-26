@@ -79,7 +79,7 @@ class LotteryController < ApplicationController
 
   # This method creates new AssignmentTeam objects based on the list of teams
   # received from the webservice
-  # It also creates the corresponding TeamNode and TeamsParticipants and TeamUserNode
+  # It also creates the corresponding TeamNode and TeamsParticipants and TeamParticipantNode
   # for each user in the new team while removing the users from any previous old
   # teams
   def create_new_teams_for_bidding_response(teams, assignment, users_bidding_info)

@@ -91,12 +91,12 @@ describe LotteryController do
       expect(AssignmentTeam.count).to eq(4)
       expect(TeamNode.count).to eq(0)
       expect(TeamsParticipant.count).to eq(6)
-      expect(TeamUserNode.count).to eq(0)
+      expect(TeamParticipantNode.count).to eq(0)
       controller.send(:create_new_teams_for_bidding_response, teams, assignment, user_bidding_info)
       expect(AssignmentTeam.count).to eq(6)
       expect(TeamNode.count).to eq(2)
       expect(TeamsParticipant.count).to eq(6)
-      expect(TeamUserNode.count).to eq(3)
+      expect(TeamParticipantNode.count).to eq(3)
     end
   end
 

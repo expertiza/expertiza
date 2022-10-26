@@ -165,6 +165,11 @@ class SignupSheetController < ApplicationController
     return signed_up_topics
   end
 
+  def find_topic_deadlines
+    @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
+    @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
+  end
+
   def list
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
@@ -184,6 +189,7 @@ class SignupSheetController < ApplicationController
 
     @num_of_topics = @signup_topics.size
     @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
+    find_topic_deadlines()
 
     unless @assignment.due_dates.find_by(deadline_type_id: 1).nil?
       @show_actions = false if !@assignment.staggered_deadline? && (@assignment.due_dates.find_by(deadline_type_id: 1).due_at < Time.now)

@@ -433,7 +433,7 @@ Expertiza::Application.routes.draw do
   resources :student_quizzes, only: [:index] do
     collection do
       post :student_quizzes
-      post :record_response
+      post :save_quiz_response
       get :finished_quiz
       get :take_quiz
       get :review_questions

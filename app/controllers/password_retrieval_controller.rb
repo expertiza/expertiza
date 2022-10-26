@@ -17,7 +17,7 @@ class PasswordRetrievalController < ApplicationController
       user = User.find_by(email: params[:user][:email])
       if user
         # formats password reset url to include a queryable token parameter 
-        url_format = '/password_edit/validate_password_token?token='
+        url_format = '/password_edit/check_token_validity?token='
         # generates a random URL-safe base64 token with default length of 16 characters
         token = SecureRandom.urlsafe_base64
         PasswordReset.save_token(user, token)
@@ -36,7 +36,7 @@ class PasswordRetrievalController < ApplicationController
   end
 
   # Checks the request for a valid, unexpired password reset token
-  def validate_password_token
+  def check_token_validity
     days_until_token_expiration = 1
 
     if params[:token].nil?

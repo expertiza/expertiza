@@ -27,7 +27,7 @@ describe ReviewMappingController do
     allow(reviewer).to receive(:get_reviewer).and_return(reviewer)
   end
 
-  describe '#add_calibration' do
+  describe '#add_calibration_for_instructor' do
     context 'when both participant and review_response_map have already existed' do
       it 'does not need to create new objects and redirects to responses#new maps' do
         allow(AssignmentParticipant).to receive_message_chain(:where, :first)
@@ -36,7 +36,8 @@ describe ReviewMappingController do
           .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).with(no_args).and_return(review_response_map)
         request_params = { id: 1, team_id: 1 }
         user_session = { user: build(:instructor, id: 1) }
-        get :add_calibration, params: request_params, session: user_session
+        get :add_calibration_for_instructor, params: request_params, session: user_session
+        puts response
         expect(response).to redirect_to '/response/new?assignment_id=1&id=1&return=assignment_edit'
       end
     end
@@ -53,13 +54,13 @@ describe ReviewMappingController do
           .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).and_return(review_response_map)
         request_params = { id: 1, team_id: 1 }
         user_session = { user: build(:instructor, id: 1) }
-        get :add_calibration, params: request_params, session: user_session
+        get :add_calibration_for_instructor, params: request_params, session: user_session
         expect(response).to redirect_to '/response/new?assignment_id=1&id=1&return=assignment_edit'
       end
     end
   end
 
-  describe '#add_reviewer and #get_reviewer' do
+  describe '#add_reviewer_to_team and #get_reviewer' do
     before(:each) do
       allow(User).to receive_message_chain(:where, :first).with(name: 'expertiza').with(no_args).and_return(double('User', id: 1))
       @params = {
@@ -73,7 +74,7 @@ describe ReviewMappingController do
     context 'when team_user does not exist' do
       it 'shows an error message and redirects to review_mapping#list_mappings page' do
         allow(TeamsUser).to receive(:exists?).with(team_id: '1', user_id: 1).and_return(true)
-        post :add_reviewer, params: @params
+        post :add_reviewer_to_team, params: @params
         expect(response).to redirect_to '/review_mapping/list_mappings?id=1'
       end
     end
@@ -89,7 +90,7 @@ describe ReviewMappingController do
         allow(ReviewResponseMap).to receive_message_chain(:where, :first)
           .with(reviewee_id: '1', reviewer_id: 1).with(no_args).and_return(nil)
         allow(ReviewResponseMap).to receive(:create).with(reviewee_id: '1', reviewer_id: 1, reviewed_object_id: 1).and_return(nil)
-        post :add_reviewer, params: @params
+        post :add_reviewer_to_team, params: @params
         expect(response).to redirect_to '/review_mapping/list_mappings?id=1&msg='
       end
     end
@@ -97,7 +98,7 @@ describe ReviewMappingController do
     context 'when instructor tries to assign a student their own artifact for reviewing' do
       it 'flashes an error message' do
         allow(TeamsUser).to receive(:exists?).with(team_id: '1', user_id: 1).and_return(true)
-        post :add_reviewer, params: @params
+        post :add_reviewer_to_team, params: @params
         expect(flash[:error]).to eq('You cannot assign this student to review his/her own artifact.')
         expect(response).to redirect_to '/review_mapping/list_mappings?id=1'
       end

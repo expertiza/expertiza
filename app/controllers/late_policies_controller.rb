@@ -95,6 +95,7 @@ class LatePoliciesController < ApplicationController
 
     # First this function validates the input then save if the input is valid.
     valid_attr_penalty, error_message = validate_input(prefix, error_message)
+    _valid_penalty = valid_name_penalty && valid_attr_penalty
 
     if error_message
       flash[:error] = error_message

@@ -102,7 +102,7 @@ class StudentQuizzesController < ApplicationController
   def save_quiz_response
     participant_response = ResponseMap.find(params[:map_id])
     if participant_response.response.empty? # If there is no instance of the response of the student, create new and save.
-      response = Response.new 
+      response = Response.new
       response.map_id = params[:map_id]
       response.created_at = DateTime.current
       response.updated_at = DateTime.current
@@ -117,11 +117,11 @@ class StudentQuizzesController < ApplicationController
 
   # This method is only for quiz questionnaires, it is called when instructors click "view quiz questions" on the pop-up panel.
   def review_questions
-    @assignment_id = params[:id]
+    @quiz_creator_user_id = params[:id]
     @quiz_questionnaires = []
     Team.where(parent_id: params[:id]).each do |quiz_creator|
       Questionnaire.where(instructor_id: quiz_creator.id).each do |questionnaire|
-        @quiz_questionnaires.push questionnaire
+        @quiz_questionnaires.push questionnaire 
       end
     end
   end

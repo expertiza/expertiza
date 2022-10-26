@@ -22,14 +22,14 @@ class StudentQuizzesController < ApplicationController
     @quiz_mappings = QuizResponseMap.mappings_for_reviewer(@participant.id) #returns quizzes to be reviewed by participant
   end
 
+ # Populating Quiz Response Data
   def finished_quiz
-    @response = Response.where(map_id: params[:map_id]).first
-    @response_map = QuizResponseMap.find(params[:map_id])
-    @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id) # for quiz response map, the reivewed_object_id is questionnaire id
-    @map = ResponseMap.find(params[:map_id])
-    @participant = AssignmentTeam.find(@map.reviewee_id).participants.first
-
-    @quiz_score = @response_map.quiz_score
+    @response = Response.where(map_id: params[:map_id]).first # Populating participant response
+    @response_map = QuizResponseMap.find(params[:map_id]) #Populating Quiz Response
+    @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id) #Populating Quiz Questions
+    @map = ResponseMap.find(params[:map_id]) #Populating ResponseMap
+    @participant = AssignmentTeam.find(@map.reviewee_id).participants.first #Populating participant who gave the quiz
+    @quiz_score = @response_map.quiz_score #Populating quiz score of the Participant
   end
 
   # Create an array of candidate quizzes for current reviewer

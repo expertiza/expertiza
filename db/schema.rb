@@ -1078,7 +1078,6 @@ ActiveRecord::Schema.define(version: 20221025180058) do
   add_foreign_key "tag_prompt_deployments", "questionnaires"
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
   add_foreign_key "teams_participants", "duties"
-  add_foreign_key "teams_participants", "participants"
   add_foreign_key "teams_participants", "teams", name: "fk_users_teams"
   add_foreign_key "teams_participants", "users", name: "fk_teams_users"
 end

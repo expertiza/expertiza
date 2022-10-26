@@ -96,7 +96,7 @@ describe LatePoliciesController do
           }
         }
         post :create, params: request_params
-        expect(flash[:error]).to eq('The maximum penalty cannot be less than penalty per unit. ')
+        expect(flash[:error]).to eq('The maximum penalty cannot be less than penalty per unit.')
         expect(response).to redirect_to('/late_policies/new')
       end
     end
@@ -115,7 +115,7 @@ describe LatePoliciesController do
           }
         }
         post :create, params: request_params
-        expect(flash[:error]).to eq('Maximum penalty cannot be greater than or equal to 100. ')
+        expect(flash[:error]).to eq('Maximum penalty cannot be greater than or equal to 100.')
         expect(response).to redirect_to('/late_policies/new')
       end
     end
@@ -133,7 +133,7 @@ describe LatePoliciesController do
           }
         }
         post :create, params: request_params
-        expect(flash[:error]).to eq('Penalty per unit cannot be negative. ')
+        expect(flash[:error]).to eq('Penalty per unit cannot be negative.')
       end
     end
 
@@ -151,7 +151,7 @@ describe LatePoliciesController do
           }
         }
         post :create, params: request_params
-        expect(flash[:error]).to eq('A policy with the same name Policy1 already exists. ')
+        expect(flash[:error]).to eq('A policy with the same name Policy1 already exists.')
       end
     end
 
@@ -201,7 +201,7 @@ describe LatePoliciesController do
           id: 1
         }
         post :update, params: request_params
-        expect(flash[:error]).to eq('Cannot edit the policy. The maximum penalty cannot be less than penalty per unit. ')
+        expect(flash[:error]).to eq('Cannot edit the policy. The maximum penalty cannot be less than penalty per unit.')
         expect(response).to redirect_to('/late_policies/1/edit')
       end
     end
@@ -220,7 +220,7 @@ describe LatePoliciesController do
           id: 1
         }
         post :update, params: request_params
-        expect(flash[:error]).to eq('Cannot edit the policy. A policy with the same name Policy1 already exists. ')
+        expect(flash[:error]).to eq('Cannot edit the policy. A policy with the same name Policy1 already exists.')
       end
     end
 

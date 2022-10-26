@@ -165,25 +165,16 @@ class SignupSheetController < ApplicationController
     return signed_up_topics
   end
 
-  # loads variables from info from  assignment
-  def load_assignment_info(assignment)
-    @assignment = assignment
-    @max_team_size = @assignment.max_team_size
-    @use_bookmark = @assignment.use_bookmark
-    @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
-    @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
-    @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
-    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
-    @signup_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
-  end
-
   def list
     @participant = AssignmentParticipant.find(params[:id].to_i)
-    load_assignment_info(@participant.assignment)
+    @assignment = @participant.assignment
+    @max_team_size = @assignment.max_team_size
+    @signup_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     @show_actions = true
     @priority = 0
     team_id = @participant.team.try(:id)
-    # if assignment is intelligent, want to track which ones the team has bid on
+
+    # if assignment is intelligent, want to know which topics the team has already bid on
     if @assignment.is_intelligent
       @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
       @bids = compute_signed_up_topics()

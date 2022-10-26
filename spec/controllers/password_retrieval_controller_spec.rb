@@ -98,6 +98,7 @@ describe PasswordRetrievalController do
       @user.save!
       @password_retrieval = PasswordReset.new
       @password_retrieval.user_email = 'example@example.edu'
+      @password_retrieval.token = 'random_token'
       @password_retrieval.save!
       request_params = { reset: { password: 'AAAAAAAAA123!!', repassword: 'AAAAAAAAA123!!', email: 'example@example.edu' } }
       post :update_password, params: request_params
@@ -114,6 +115,7 @@ describe PasswordRetrievalController do
       @user.save!
       @password_retrieval = PasswordReset.new
       @password_retrieval.user_email = 'example@example.edu'
+      @password_retrieval.token = 'random_token'
       @password_retrieval.save!
       request_params = { reset: { password: 'BAAAAAAAAA123!!', repassword: 'AAAAAAAAA123!!', email: 'example@example.edu' } }
       post :update_password, params: request_params

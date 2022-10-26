@@ -104,8 +104,9 @@ class SubmittedContentController < ApplicationController
 
     file = params[:uploaded_file]
     file_size_limit = 5
+    file_content = file.read
 
-    if (!check_file(file, file_size_limit))
+    if (!validate_file_size_type(file, file_size_limit, file_content))
       redirect_to action: 'edit', id: participant.id
       return
     end
@@ -113,7 +114,7 @@ class SubmittedContentController < ApplicationController
     participant.team.set_student_directory_num
     curr_directory = get_curr_directory(participant)
     FileUtils.mkdir_p(curr_directory) unless File.exist? curr_directory
-    sanitized_file_path = get_sanitized_file_path(file)
+    sanitized_file_path = get_sanitized_file_path(file, curr_directory)
     File.open(sanitized_file_path, 'wb') { |f| f.write(file_content) }
     if params['unzip']
       SubmittedContentHelper.unzip_file(sanitized_file_path, curr_directory, true) if file_type(safe_filename) == 'zip'
@@ -137,14 +138,12 @@ class SubmittedContentController < ApplicationController
   end
 
   # Check file content size and file type
-  def check_file(file, file_size_limit)
+  def validate_file_size_type(file, file_size_limit, file_content)
     # check file size
     unless check_content_size(file, file_size_limit)
       flash[:error] = "File size must smaller than #{file_size_limit}MB"
       return false
     end
-
-    file_content = file.read
 
     # check file type
     unless check_content_type_integrity(file_content)
@@ -152,7 +151,7 @@ class SubmittedContentController < ApplicationController
       return false
     end
 
-    return true
+    true
   end
 
   # Sanitize and return the file name
@@ -160,7 +159,7 @@ class SubmittedContentController < ApplicationController
     safe_filename = file.original_filename.tr('\\', '/')
     safe_filename = FileHelper.sanitize_filename(safe_filename) # new code to sanitize file path before upload*
     sanitized_file_path = curr_directory + File.split(safe_filename).last.tr(' ', '_') # safe_filename #curr_directory
-    return sanitized_file_path
+    sanitized_file_path
   end
 
   # Get current directory path
@@ -173,7 +172,7 @@ class SubmittedContentController < ApplicationController
                      else
                        participant.team.path.to_s + current_folder.name
                      end
-    return curr_directory
+    curr_directory
   end
 
   def folder_action

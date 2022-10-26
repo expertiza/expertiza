@@ -235,11 +235,12 @@ class QuestionnairesController < ApplicationController
   private
 
   # save questionnaire object after create or edit
-  # def save
-  #   @questionnaire.save!
-  #   save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
-  #   undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
-  # end
+  def save
+    puts("hello - testing")
+    @questionnaire.save!
+    save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
+    undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
+  end
 
   # save questions that have been added to a questionnaire
   def save_new_questions(questionnaire_id)

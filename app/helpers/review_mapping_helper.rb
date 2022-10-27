@@ -39,7 +39,7 @@ module ReviewMappingHelper
       else
         color = obtain_team_color(response_map, assignment_created, assignment_due_dates)
       end
-      color #returning the value of color
+      color # returning the value of color
     end
   end
 
@@ -47,13 +47,14 @@ module ReviewMappingHelper
   def obtain_team_color(response_map, assignment_created, assignment_due_dates)
     color = 'red' # assigning the color default to red
     (1..@assignment.num_review_rounds).each do |round|
-      check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+      color = check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
     end
     color
   end
 
   # checks the submission state within each round and assigns team color
   def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+    color = 'red'
     if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
       color = 'purple'
     else
@@ -65,6 +66,7 @@ module ReviewMappingHelper
         color = link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
       end
     end
+    color
   end
 
   # checks if a review was submitted in every round and gives the total responses count
@@ -186,7 +188,7 @@ module ReviewMappingHelper
   end
 
   # Generalized function which takes in string parameter specifying the metric to be sorted
-  def sort_reviewer_by_review_metric_desc(metric) #metric is the string value of the metric to be sorted with
+  def sort_reviewer_by_review_metric_desc(metric) # metric is the string value of the metric to be sorted with
     if (metric.eql?("review_volume"))
       @reviewers.each do |r|
         # get the volume of review comments

@@ -561,7 +561,7 @@ describe ReviewMappingHelper, type: :helper do
     end
 
     it 'should return the number of responses given in round 1 reviews' do
-      get_each_review_and_feedback_response_map(@reviewer)
+      each_review_and_feedback_response_map(@reviewer)
 
       # rspan means the all peer reviews one student received, including unfinished one
       # retrieved from method call in review_mapping_helper.rb file
@@ -569,7 +569,7 @@ describe ReviewMappingHelper, type: :helper do
     end
 
     it 'should return the number of responses given in round 2 reviews' do
-      get_each_review_and_feedback_response_map(@reviewer)
+      each_review_and_feedback_response_map(@reviewer)
 
       # rspan means the all peer reviews one student received, including unfinished one
       # retrieved from method call in review_mapping_helper.rb file
@@ -583,7 +583,7 @@ describe ReviewMappingHelper, type: :helper do
       @feedback_response_map_list << FeedbackResponseMap.create(reviewed_object_id: @response_3.id, reviewer_id: @reviewer.id)
       @all_review_response_ids << @response_3.id
 
-      get_each_review_and_feedback_response_map(@reviewer)
+      each_review_and_feedback_response_map(@reviewer)
 
       # rspan means the all peer reviews one student received, including unfinished one
       # retrieved from method call in review_mapping_helper.rb file
@@ -592,7 +592,7 @@ describe ReviewMappingHelper, type: :helper do
 
     it 'should return 0 responses for no round 3 reviews' do
       # no feedback responses set before method call
-      get_each_review_and_feedback_response_map(@reviewer)
+      each_review_and_feedback_response_map(@reviewer)
 
       # rspan means the all peer reviews one student received, including unfinished one
       # retrieved from method call in review_mapping_helper.rb file
@@ -600,7 +600,7 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  # feedback_response_map_record is called within get_each_review_and_feedback_response_map
+  # feedback_response_map_record is called within each_review_and_feedback_response_map
   describe 'feedback_response_map_record' do
     before(:each) do
       @reviewer = create(:participant)

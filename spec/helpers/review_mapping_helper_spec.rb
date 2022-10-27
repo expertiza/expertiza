@@ -406,7 +406,7 @@ describe ReviewMappingHelper, type: :helper do
   end
 
   # input max_team_size, response, reviewee_id, ip_address
-  describe 'get_team_reviewed_link_name' do
+  describe 'team_reviewed_link_name' do
     before(:each) do
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
       @reviewer = create(:participant, review_grade: nil)
@@ -420,7 +420,7 @@ describe ReviewMappingHelper, type: :helper do
       max_team_size = 3
       @response = create(:response, response_map: @response_map)
       ip_address = '0.0.0.0'
-      reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
+      reviewed_team_name = team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
       expect(reviewed_team_name).to eq('(Team_1)')
     end
 
@@ -429,7 +429,7 @@ describe ReviewMappingHelper, type: :helper do
       max_team_size = 2
       @response = create(:response, response_map: @response_map)
       ip_address = '0.0.0.0'
-      reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
+      reviewed_team_name = team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
       expect(reviewed_team_name).to eq('(Team_1)')
     end
 
@@ -441,7 +441,7 @@ describe ReviewMappingHelper, type: :helper do
 
       @response = create(:response, response_map: @response_map)
       ip_address = '0.0.0.0'
-      reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
+      reviewed_team_name = team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
       expect(reviewed_team_name).to eq('(Adam)')
     end
 
@@ -450,7 +450,7 @@ describe ReviewMappingHelper, type: :helper do
       max_team_size = 0
       @response = create(:response, response_map: @response_map)
       ip_address = '0.0.0.0'
-      reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
+      reviewed_team_name = team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
       expect(reviewed_team_name).to eq('(Team_1)')
     end
   end

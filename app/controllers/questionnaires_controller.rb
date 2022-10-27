@@ -66,7 +66,7 @@ class QuestionnairesController < ApplicationController
           display_type = display_type.split(/(?=[A-Z])/).join('%')
         end
         # setting the object variables
-        adding_question_variables(questionnaire_private,display_type)
+        adding_question_variables(questionnaire_private, display_type)
         # Create node
         create_node()
       rescue StandardError
@@ -77,7 +77,7 @@ class QuestionnairesController < ApplicationController
   end
 
   # Assigns corrresponding variables to questionnaire object.
-  def adding_question_variables(prv,display)
+  def adding_question_variables(prv, display)
     @questionnaire.private = prv
     @questionnaire.name = params[:questionnaire][:name]
     @questionnaire.instructor_id = session[:user].id

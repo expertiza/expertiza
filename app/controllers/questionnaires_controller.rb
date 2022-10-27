@@ -65,15 +65,10 @@ class QuestionnairesController < ApplicationController
         if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey BookmarkRating].include?(display_type)
           display_type = display_type.split(/(?=[A-Z])/).join('%')
         end
-
         # setting the object variables
         adding_question_variables(questionnaire_private,display_type)
         # Create node
         create_node()
-        # tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
-        # parent = FolderNode.find_by(node_object_id: tree_folder.id)
-        # QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
-        # flash[:success] = 'You have successfully created a questionnaire!'
       rescue StandardError
         flash[:error] = $ERROR_INFO
       end
@@ -93,7 +88,7 @@ class QuestionnairesController < ApplicationController
     @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
     @questionnaire.save
   end
-  
+
   # Creates tree node
   def create_node()
     tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first

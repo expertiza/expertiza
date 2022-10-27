@@ -520,7 +520,7 @@ describe ReviewMappingHelper, type: :helper do
   # display_tagging_interval_chart
   # list_review_submissions
   # list_hyperlink_submission
-  # get_certain_review_and_feedback_response_map
+  # certain_review_and_feedback_response_map
 
   describe 'get_each_review_and_feedback_response' do
     before(:each) do

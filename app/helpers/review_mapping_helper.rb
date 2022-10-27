@@ -54,7 +54,6 @@ module ReviewMappingHelper
 
   # checks the submission state within each round and assigns team color
   def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
-    color = 'red'
     if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
       color = 'purple'
     else
@@ -212,8 +211,6 @@ module ReviewMappingHelper
     end
     @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
     end
-
-
   end
 
   # moves data of reviews in each round from a current round

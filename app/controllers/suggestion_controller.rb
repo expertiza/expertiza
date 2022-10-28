@@ -2,7 +2,7 @@ class SuggestionController < ApplicationController
   include AuthorizationHelper
 
   # This method determines if the action the user makes, is allowed or not 
-  # depending on the criteraa that the user has student privileges or TA privileges
+  # depending on the criteria that the user has student privileges or TA privileges
   def action_allowed?
     case params[:action]
     when 'create', 'new', 'show', 'student_edit', 'update_suggestion', 'submit'
@@ -92,7 +92,7 @@ class SuggestionController < ApplicationController
     end
   end
 
-  # will provie notification/email based on the suggestion being approved or not
+  # will provide notification/email based on the suggestion being approved or not
   # will create and assign team if user is not in any team
   def notification
     if @suggestion.signup_preference == 'Y' and @team_id.nil?
@@ -121,7 +121,7 @@ class SuggestionController < ApplicationController
   end
 
   # will get  the suggestion to reject
-  # if the status is updated to reject-> suggestionn rejected
+  # if the status is updated to reject-> suggestion rejected
   # else-> error
   def reject_suggestion
     @suggestion = Suggestion.find(params[:id])
@@ -142,7 +142,7 @@ class SuggestionController < ApplicationController
   end
 
   # will approve suggestion base on
-  # if signup  topic -> suggestion approved
+  # if signup topic -> suggestion approved
   # else-> error
   def approve_suggestion
     @suggestion = Suggestion.find(params[:id])
@@ -153,7 +153,7 @@ class SuggestionController < ApplicationController
     end
     # After getting topic from user/team, get the suggestion
     @signuptopic = SignUpTopic.new_topic_from_suggestion(@suggestion)
-    # Get success only if the signuptopic object was returned from its class
+    # Get success only if the signup topic object was returned from its class
     if @signuptopic != 'failed'
       flash[:success] = 'The suggestion was successfully approved.'
     else

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Expertiza::Application.routes.draw do
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
@@ -365,10 +367,10 @@ Expertiza::Application.routes.draw do
 
   resources :review_mapping, only: [] do
     collection do
-      get :add_calibration
+      get :add_calibration_for_instructor
       get :list_mappings
       get :unsubmit_review
-      post :add_reviewer
+      post :add_reviewer_to_team
       post :add_metareviewer
       post :add_user_to_assignment
       post :assign_metareviewer_dynamically

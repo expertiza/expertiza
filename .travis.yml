@@ -33,12 +33,12 @@ before_install:
   - geckodriver --version
   - redis-server --version
   - redis-server &
+  - gem install bundler:1.16.6
 before_script:
   - mysql -u root < db/grant_expertiza.sql
   - cp config/database.yml.example config/database.yml
   - cp config/secrets.yml.example config/secrets.yml
   - export JAVA_HOME=/usr/lib/jvm/java-6-openjdk-amd64
-  - gem install bundler:1.16.6
   - bundle install
   - bundle exec rails db:setup
   # Test coverage offered by Code Climate

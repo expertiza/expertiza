@@ -106,7 +106,7 @@ class ReviewMappingController < ApplicationController
     else
       # Team lazy initialization
       SignUpSheet.signup_team(assignment.id, user_id, topic_id)
-      msg = assign_unseen_reviewer_to_team(assignment, user_id)
+      msg = assign_unseen_reviewer_to_team(assignment)
     end
     redirect_to action: 'list_mappings', id: assignment.id, msg: msg
   end

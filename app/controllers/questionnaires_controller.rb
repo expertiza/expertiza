@@ -183,6 +183,7 @@ class QuestionnairesController < ApplicationController
 
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
+    questionnaire_id = params[:id] unless params[:id].nil?
     # If the questionnaire is being used in the active period of an assignment, delete existing responses before adding new questions
     if AnswerHelper.check_and_delete_responses(params[:id])
       flash[:success] = 'You have successfully added a new question. Any existing reviews for the questionnaire have been deleted!'
@@ -192,7 +193,7 @@ class QuestionnairesController < ApplicationController
 
     num_of_existed_questions = Questionnaire.find(params[:id]).questions.size
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
-      question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: params[:id], seq: i, type: params[:question][:type], break_before: true)
+      question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
       if question.is_a? ScoredQuestion
         question.weight = params[:question][:weight]
         question.max_label = Question::MAX_LABEL

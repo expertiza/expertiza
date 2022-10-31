@@ -37,8 +37,8 @@ class AssignmentsController < ApplicationController
         if assignment_form_params[:assignment][:directory_path].blank? # No existing assignment for assignment form
           assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
         end
-        assignment_form_params[:assignment_questionnaire] = assign_questionnaire_array
-        assignment_form_params[:due_date] = assign_due_date_array
+        assignment_form_params[:assignment_questionnaire] = assign_questionnaire_array(exist_assignment)
+        assignment_form_params[:due_date] = assign_due_date_array(exist_assignment)
         @assignment_form.update(assignment_form_params, current_user)
         aid = Assignment.find(@assignment_form.assignment.id).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
@@ -308,20 +308,20 @@ class AssignmentsController < ApplicationController
 
   # update assignment_form with assignment_questionnaire and due_date
   def update_assignment_form(exist_assignment)
-    assignment_form_params[:assignment_questionnaire] = assign_questionnaire_array
-    assignment_form_params[:due_date] = assign_due_date_array
+    assignment_form_params[:assignment_questionnaire] = assign_questionnaire_array(exist_assignment)
+    assignment_form_params[:due_date] = assign_due_date_array(exist_assignment)
     @assignment_form.update(assignment_form_params, current_user)
   end
 
   # creates array of questionnaires
-  def assign_questionnaire_array
+  def assign_questionnaire_array(exist_assignment)
     questionnaire_array = assignment_form_params[:assignment_questionnaire]
     questionnaire_array.each { |cur_questionnaire| cur_questionnaire[:assignment_id] = exist_assignment.id.to_s }
     questionnaire_array
   end
 
   # creates array of due dates
-  def assign_due_date_array
+  def assign_due_date_array(exist_assignment)
     due_array = assignment_form_params[:due_date]
     due_array.each { |cur_due| cur_due[:parent_id] = exist_assignment.id.to_s }
     due_array

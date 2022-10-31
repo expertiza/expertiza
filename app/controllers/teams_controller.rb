@@ -14,7 +14,7 @@ class TeamsController < ApplicationController
 
   # Randomizes teams based on an Assignment or Course
   def randomize_teams
-    Team.randomize_all_by_parent(team_parent, team_type, team_size)
+    Team.randomize_all_by_parent(team_parent, session[:team_type], team_size)
 
     success_message = 'Random teams have been successfully created.'
     undo_link(success_message)

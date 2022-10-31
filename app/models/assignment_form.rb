@@ -44,7 +44,7 @@ class AssignmentForm
       questionnaire = Questionnaire.find(assignment_questionnaire[:questionnaire_id])
       questions = Question.where(questionnaire_id: questionnaire.id)
       questions.each do |question|
-        scored_questionnaire = question.is_a? ScoredQuestion
+        scored_questionnaire = question.is_a? true if question.is_a? ScoredQuestion
       end
       unless scored_questionnaire || assignment_questionnaire[:questionnaire_weight].to_i.zero?
         error = true

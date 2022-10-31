@@ -41,6 +41,7 @@ class AssignmentForm
     error = false
     attributes[:assignment_questionnaire].each do |assignment_questionnaire|
       # Check rubrics to make sure weight is 0 if there are no Scored Questions
+      scored_questionnaire = false
       questionnaire = Questionnaire.find(assignment_questionnaire[:questionnaire_id])
       questions = Question.where(questionnaire_id: questionnaire.id)
       questions.each do |question|

@@ -19,6 +19,7 @@ class AssignmentForm
       @assignment.instructor = @assignment.course.instructor if @assignment.course
       @assignment.max_team_size = DEFAULT_MAX_TEAM_SIZE
     end
+    # set number of required reviews to number allowed
     @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
     @assignment_questionnaires = Array(args[:assignment_questionnaires])
     @due_dates = Array(args[:due_dates])
@@ -134,7 +135,7 @@ class AssignmentForm
     end
   end
 
-  # s required by answer tagging
+  # is required by answer tagging
   def update_tag_prompt_deployments(attributes)
     unless attributes.nil?
       attributes.each do |key, value|
@@ -142,6 +143,7 @@ class AssignmentForm
         TagPromptDeployment.where(id: value['deleted']).destroy_all if value.key?('deleted')
         next unless value.key?('tag_prompt')
 
+        # update the metadata for tag deployment
         (0..value['tag_prompt'].count - 1).each do |i|
           tag_dep = nil
           if !((value['id'][i] == 'undefined') || (value['id'][i] == 'null') || value['id'][i].nil?)
@@ -280,6 +282,7 @@ class AssignmentForm
     default_weight['TeammateReviewQuestionnaire'] = 0
     default_weight['BookmarkRatingQuestionnaire'] = 0
     default_aq = AssignmentQuestionnaire.where(user_id: @assignment.instructor_id, assignment_id: nil, questionnaire_id: nil).first
+    # the default assignment questionnaire limit is 15
     default_limit = if default_aq.blank?
                       15
                     else
@@ -405,6 +408,7 @@ class AssignmentForm
     require_quiz
   end
 
+  # delay similarity check
   def add_simicheck_to_delayed_queue(simicheck_delay)
     delete_from_delayed_queue
     delete_from_scheduled_set
@@ -418,6 +422,7 @@ class AssignmentForm
     end
   end
 
+  # similarity check of files
   def enqueue_simicheck_task(due_date, simicheck_delay)
     MailWorker.perform_in(find_min_from_now(Time.parse(due_date.due_at.to_s(:db)) + simicheck_delay.to_i.hours).minutes.from_now * 60, @assignment.id, 'compare_files_with_simicheck', due_date.due_at.to_s(:db))
   end
@@ -435,6 +440,7 @@ class AssignmentForm
     new_assign.copy_flag = true
     if new_assign.save
       Assignment.record_timestamps = true
+      # create assignment copy
       copy_assignment_questionnaire(old_assign, new_assign, user)
       AssignmentDueDate.copy(old_assign.id, new_assign.id)
       new_assign.create_node

@@ -26,7 +26,7 @@ class AssignmentsController < ApplicationController
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
     if params[:button]
-      # E2138 issue #3
+      # first check if assignment name exists, if not then create new, otherwise don't create new assignment
       find_existing_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
       dir_path = assignment_form_params[:assignment][:directory_path]
       find_existing_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
@@ -480,6 +480,7 @@ class AssignmentsController < ApplicationController
     delete_table_due_date
   end
 
+  # remove due dates that are not needed
   def delete_table_due_date
     @due_date_info = DueDate.where(parent_id: params[:id])
     DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all if params[:metareview_allowed] == 'false'

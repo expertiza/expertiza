@@ -175,26 +175,26 @@ describe QuizQuestionnairesController do
             expect(response).to render_template(:new_quiz)
           end
 
-          it 'shows error message and redirects to submitted_content#view if current participant does not have a team' do
+          it 'shows error message and redirects to submitted_content#show if current participant does not have a team' do
             allow(AssignmentParticipant).to receive_message_chain(:find, :team).with('1').with(no_args).and_return(nil)
             get :new, params: @request_params
             expect(flash[:error]).to eq('You should create or join a team first.')
-            expect(response).to redirect_to('/submitted_content/view?id=1')
+            expect(response).to redirect_to('/submitted_content/show?id=1')
           end
 
-          it 'shows error message and redirects to submitted_content#view if current participant have a team w/o topic' do
+          it 'shows error message and redirects to submitted_content#show if current participant have a team w/o topic' do
             team = double('AssignmentTeam')
             allow(AssignmentParticipant).to receive_message_chain(:find, :team).with('1').with(no_args).and_return(team)
             allow(@assignment).to receive(:topics?).and_return(true)
             allow(team).to receive(:topic).and_return(nil)
             get :new, params: @request_params
             expect(flash[:error]).to eq('Your team should have a topic.')
-            expect(response).to redirect_to('/submitted_content/view?id=1')
+            expect(response).to redirect_to('/submitted_content/show?id=1')
           end
         end
 
         context 'when an assignment does not require quiz' do
-          it 'shows error message and redirects to submitted_content#view' do
+          it 'shows error message and redirects to submitted_content#show' do
             request_params = { aid: 1,
                        model: 'QuizQuestionnaire',
                        pid: 1,
@@ -204,7 +204,7 @@ describe QuizQuestionnairesController do
             allow(assignment).to receive(:require_quiz?).and_return(false)
             get :new, params: request_params
             expect(flash[:error]).to eq('This assignment is not configured to use quizzes.')
-            expect(response).to redirect_to('/submitted_content/view?id=1')
+            expect(response).to redirect_to('/submitted_content/show?id=1')
           end
         end
       end
@@ -226,29 +226,29 @@ describe QuizQuestionnairesController do
         end
 
         context 'when current questionnaire has been taken by someone' do
-          it 'shows flash[:error] message and redirects to submitted_content#view page' do
+          it 'shows flash[:error] message and redirects to submitted_content#show page' do
             stub_current_user(student, student.role.name, student.role) # action only permitted for Student role
             allow(@questionnaire).to receive(:taken_by_anyone?).and_return(true)
             request_params = { id: 1, pid: 1 }
             get :edit, params: request_params
             expect(flash[:error]).to eq('Your quiz has been taken by one or more students; you cannot edit it anymore.')
-            expect(response).to redirect_to('/submitted_content/view?id=1')
+            expect(response).to redirect_to('/submitted_content/show?id=1')
           end
         end
       end
 
       describe '#update' do
         context 'when @questionnaire is nil' do
-          it 'redirects to submitted_content#view page' do
+          it 'redirects to submitted_content#show page' do
             allow(Questionnaire).to receive(:find).with('1').and_return(nil)
             request_params = { id: 1, pid: 1 }
             post :update, params: request_params
-            expect(response).to redirect_to('/submitted_content/view?id=1')
+            expect(response).to redirect_to('/submitted_content/show?id=1')
           end
         end
 
         context 'when @questionnaire is not nil' do
-          it 'updates all quiz questions and redirects to submitted_content#view page' do
+          it 'updates all quiz questions and redirects to submitted_content#show page' do
             request_params = { id: 1,
                        pid: 1,
                        save: true,
@@ -306,7 +306,7 @@ describe QuizQuestionnairesController do
             allow(qc).to receive(:update_attributes).with(any_args).and_return(true)
             allow(qc_tf).to receive(:update_attributes).with(any_args).and_return(true)
             post :update, params: request_params
-            expect(response).to redirect_to('/submitted_content/view?id=1')
+            expect(response).to redirect_to('/submitted_content/show?id=1')
           end
         end
       end

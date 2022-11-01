@@ -63,10 +63,12 @@ class QuestionnairesController < ApplicationController
         # In the future, we need to write migration files to make them consistency.
         # E1903 : We are not sure of other type of cases, so have added a if statement. If there are only 5 cases, remove the if statement
         if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey BookmarkRating].include?(display_type)
-          display_type = display_type.split(/(?=[A-Z])/).join('%')
+          display_type = display_type.split(/(?=[A-Z])/).join('%') # removed unnecessary brackets
         end
+        # assignment moved to a separate function to make sure create function doesn't do too much
         # setting the object variables
         adding_question_variables(questionnaire_private, display_type)
+        # code moved to a separate function to make sure create function doesn't do too much
         # Create node
         create_node()
       rescue StandardError
@@ -76,8 +78,10 @@ class QuestionnairesController < ApplicationController
     end
   end
 
+  # create questionnaire was removed as it wasn't being used anywhere in the latest version
+
   # Assigns corrresponding variables to questionnaire object.
-  def adding_question_variables(prv, display)
+  def adding_question_variables(prv, display) # named as prv as private is a key word
     @questionnaire.private = prv
     @questionnaire.name = params[:questionnaire][:name]
     @questionnaire.instructor_id = session[:user].id

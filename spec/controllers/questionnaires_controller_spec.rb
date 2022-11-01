@@ -200,6 +200,8 @@ describe QuestionnairesController do
     end
   end
 
+#removed test as corresponding function was removed as it was not being used
+
   describe '#edit' do
     context 'when @questionnaire is not nil' do
       it 'renders the questionnaires#edit page' do

@@ -142,12 +142,25 @@ describe SignupSheetController do
 
   describe '#destroy' do
     context 'when topic can be found' do
-      it 'redirects to assignment#edit page' do
-        allow_any_instance_of(SignupSheetController).to receive(:undo_link)
-          .with('The topic: "Hello world!" has been successfully deleted. ').and_return('OK')
-        request_params = { id: 1, assignment_id: 1 }
-        post :destroy, params: request_params
-        expect(response).to redirect_to('/assignments/1/edit')
+      context 'when it\'s the only topic' do
+        it 'redirects to assignment#edit page' do
+          allow_any_instance_of(SignupSheetController).to receive(:undo_link)
+            .with('The topic: "Hello world!" has been successfully deleted. ').and_return('OK')
+          request_params = { id: 1, assignment_id: 1 }
+          post :destroy, params: request_params
+          expect(response).to redirect_to('/assignments/1/edit')
+        end
+      end
+
+      context 'when there are other topics' do
+        it 'redirects to assignment#edit#tabs-2 page' do
+          create(:topic, id: 2, assignment_id: 1)
+          allow_any_instance_of(SignupSheetController).to receive(:undo_link)
+            .with('The topic: "Hello world!" has been successfully deleted. ').and_return('OK')
+          request_params = { id: 1, assignment_id: 1 }
+          post :destroy, params: request_params
+          expect(response).to redirect_to('/assignments/1/edit#tabs-2')
+        end
       end
     end
 

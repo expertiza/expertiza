@@ -7,6 +7,7 @@ class SubmittedContentController < ApplicationController
   before_action :ensure_current_user_is_participant, only: %i[edit show submit_hyperlink folder_action]
 
   # Validate whether a particular action is allowed by the current user or not based on the privileges
+  # @return [Boolean] the result of validation
   def action_allowed?
     case params[:action]
     when 'edit'
@@ -20,6 +21,7 @@ class SubmittedContentController < ApplicationController
     end
   end
 
+  # This function sets up the locale for the view as per the language selected by the user
   def controller_locale
     locale_for_student
   end
@@ -45,7 +47,8 @@ class SubmittedContentController < ApplicationController
     redirect_to action: 'edit', id: params[:id], view_only: true
   end
 
-  # submit_hyperlink is called when a new hyperlink is added to an assignment
+  # submit_hyperlink is called when a new hyperlink is added to an assignment.
+  # This also verifies that the hyperlink doesn't already exist in the assignment submissions.
   def submit_hyperlink
     team = @participant.team
     team_hyperlinks = team.hyperlinks
@@ -93,7 +96,9 @@ class SubmittedContentController < ApplicationController
     redirect_to action: action, id: @participant.id
   end
 
-  # submit_file is called when a new file is uploaded to an assignment
+  # submit_file is called when a new file is uploaded to an assignment.
+  # This validates the file with respect to file type and file size and if it is valid
+  # it uploads the file and adds it to the assignemt.
   def submit_file
     participant = AssignmentParticipant.find(params[:id])
     unless current_user_id?(participant.user_id)
@@ -138,6 +143,10 @@ class SubmittedContentController < ApplicationController
   end
 
   # Check file content size and file type
+  # @param file [Object] uploaded file
+  # @param file_size_limit [Integer] maximum size(MB)
+  # @param file_content [Object] content of the uploaded file
+  # @return [Boolean] the result of validation
   def validate_file_size_type(file, file_size_limit, file_content)
     # check file size
     unless check_content_size(file, file_size_limit)
@@ -155,6 +164,9 @@ class SubmittedContentController < ApplicationController
   end
 
   # Sanitize and return the file name
+  # @param file [Object] uploaded file
+  # @param curr_directory [String] directory path for the file
+  # @return sanitized_file_path [String] sanitized file path
   def get_sanitized_file_path(file, curr_directory)
     safe_filename = file.original_filename.tr('\\', '/')
     safe_filename = FileHelper.sanitize_filename(safe_filename) # new code to sanitize file path before upload*
@@ -163,6 +175,8 @@ class SubmittedContentController < ApplicationController
   end
 
   # Get current directory path
+  # @param participant [Object] participant object
+  # @return curr_directory [String] current directory path for the participant
   def get_curr_directory(participant)
     current_folder = DisplayOption.new
     current_folder.name = '/'
@@ -175,6 +189,7 @@ class SubmittedContentController < ApplicationController
     curr_directory
   end
 
+  # folder_action is called by the view when a file is deleted from the list of uploaded files.
   def folder_action
     @current_folder = DisplayOption.new
     @current_folder.name = '/'
@@ -218,11 +233,15 @@ class SubmittedContentController < ApplicationController
     file.size <= size * 1024 * 1024
   end
 
+  # file_type returns the type of file from the file name
+  # @param file_name [String] file name
+  # @return [String] type of the uploaded file
   def file_type(file_name)
     base = File.basename(file_name)
     base.split('.')[base.split('.').size - 1] if base.split('.').size > 1
   end
 
+  # This function is responsible for deleting the uploaded files from the assignment
   def delete_selected_files
     filename = params[:directories][params[:chk_files]] + '/' + params[:filenames][params[:chk_files]]
     FileUtils.rm_r(filename)
@@ -249,6 +268,7 @@ class SubmittedContentController < ApplicationController
     (!@topics.empty? && !SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id).nil?) || @topics.empty?
   end
 
+  # This check ensures that the current user accessing the assignment is a participant for that particular assignment.
   def ensure_current_user_is_participant
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)

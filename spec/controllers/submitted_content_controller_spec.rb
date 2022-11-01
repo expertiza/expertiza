@@ -6,6 +6,7 @@ describe SubmittedContentController do
   let(:team) { build(:assignment_team, id: 1) }
   let(:participant) { build(:participant, id: 1, user_id: 21) }
   let(:assignment) { build(:assignment, id: 1) }
+  let(:signup_topic) { build(:signup_topic) }
   describe '#action_allowed?' do
     context 'current user is not authorized' do
       it 'does not allow action for no user' do
@@ -380,6 +381,25 @@ describe SubmittedContentController do
     end
     it 'type should be txt' do
       expect(controller.send(:file_type, 'test.png.txt')).to eql('txt')
+    end
+  end
+
+  # Test to verify is one_team_can_submit_work? function is working as expected
+  describe '#one_team_can_submit_work' do
+    it 'participant cannot submit work if team doesnt hold a topic' do
+      allow(AssignmentParticipant).to receive(:find).and_return(participant)
+      allow(SignUpTopic).to receive(:where).and_return([nil])
+      params = { id: 21 }
+      allow(controller).to receive(:params).and_return(params)
+      expect(controller.send(:one_team_can_submit_work?)).to eql(false)
+    end
+    it 'participant can submit work if team holds a topic' do
+      allow(AssignmentParticipant).to receive(:find).and_return(participant)
+      allow(SignUpTopic).to receive(:where).and_return([signup_topic])
+      allow(SignedUpTeam).to receive(:topic_id).and_return(1)
+      params = { id: 21 }
+      allow(controller).to receive(:params).and_return(params)
+      expect(controller.send(:one_team_can_submit_work?)).to eql(true)
     end
   end
 end

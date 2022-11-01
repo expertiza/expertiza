@@ -39,11 +39,12 @@ describe PasswordRetrievalController do
 
   describe 'check if token is expired' do
     it 'checks when token is expired' do
+      days_until_expiration = 2
       non_encrypted_token = 'factory_bot_token'
       @password_retrieval = FactoryBot.build(:password_reset, token: Digest::SHA1.hexdigest(non_encrypted_token))
       @password_retrieval.save!
       request_params = { token: non_encrypted_token }
-      Timecop.freeze(Time.zone.today + 2.days) do
+      Timecop.freeze(Time.zone.today + days_until_expiration.days) do
         get :check_token_validity, params: request_params
         expect(response).to render_template 'password_retrieval/forgotten'
       end

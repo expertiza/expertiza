@@ -122,6 +122,7 @@ describe SubmittedContentController do
       it 'flashes error for file exceeding size limit' do
         allow(controller).to receive(:check_content_size).and_return(false)
         file = Rack::Test::UploadedFile.new("#{Rails.root}/spec/fixtures/files/the-rspec-book_p2_1.pdf")
+        allow_any_instance_of(Rack::Test::UploadedFile::String).to receive(:read).and_return("")
         params = {uploaded_file: file, id: 1}
         response = get :submit_file, params: params
         expect(response).to redirect_to(action: :edit, id: 1)
@@ -202,6 +203,7 @@ describe SubmittedContentController do
       it 'flashes error for file exceeding size limit' do
         allow(controller).to receive(:check_content_size).and_return(false)
         file = Rack::Test::UploadedFile.new("#{Rails.root}/spec/fixtures/files/the-rspec-book_p2_1.pdf")
+        allow_any_instance_of(Rack::Test::UploadedFile::String).to receive(:read).and_return("")
         params = {uploaded_file: file,
                   id: 1}
         response = get :submit_file, params: params
@@ -384,7 +386,7 @@ describe SubmittedContentController do
     end
   end
 
-  # Test to verify is one_team_can_submit_work? function is working as expected
+  # Test to verify if one_team_can_submit_work? function is working as expected
   describe '#one_team_can_submit_work' do
     it 'participant cannot submit work if team doesnt hold a topic' do
       allow(AssignmentParticipant).to receive(:find).and_return(participant)

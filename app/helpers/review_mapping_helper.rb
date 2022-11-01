@@ -46,7 +46,7 @@ module ReviewMappingHelper
   # Loops through the number of assignment review rounds and obtains the team colour
   def obtain_team_color(response_map, assignment_created, assignment_due_dates)
     color = []
-    
+
     (1..@assignment.num_review_rounds).each do |round|
       check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
     end
@@ -59,12 +59,12 @@ module ReviewMappingHelper
     if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
       return color.push 'purple'
     end
-      
+
     link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
     if link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # Can be extended for github links in future
       return color.push 'green'
     end
-    
+
     link_updated_at = get_link_updated_at(link)
     color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
   end
@@ -84,7 +84,7 @@ module ReviewMappingHelper
   # Checks if a work was submitted within a given round
   def submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
     submission = SubmissionRecord.where(team_id: response_map.reviewee_id, operation: ['Submit File', 'Submit Hyperlink'])
-    
+
     submission_due_date = assignment_due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
     subm_created_at = submission.where(created_at: assignment_created..submission_due_date)
 
@@ -92,7 +92,7 @@ module ReviewMappingHelper
       submission_due_last_round = assignment_due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
       subm_created_at = submission.where(created_at: submission_due_last_round..submission_due_date)
     end
-    
+
     !subm_created_at.try(:first).try(:created_at).nil?
   end
 
@@ -130,7 +130,7 @@ module ReviewMappingHelper
                                 Team.find(reviewee_id).name
                               end
     team_reviewed_link_name = '(' + team_reviewed_link_name + ')'
-    
+
     team_reviewed_link_name
   end
 
@@ -384,7 +384,7 @@ module ReviewMappingHelper
     # It is the feedback number each team member should make
     @review_response_map_ids = ReviewResponseMap.where(['reviewed_object_id = ? and reviewee_id = ?', @id, @team_id]).pluck('id')
     feedback_response_map_record(author)
-    
+
     # The rspan means the all peer reviews one student received, including unfinished one
     @rspan_round_one = @review_responses_round_one.length
     @rspan_round_two = @review_responses_round_two.length

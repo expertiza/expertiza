@@ -1,3 +1,12 @@
+##
+# Modules are somewhat similar to classes they are things that hold methods. However, modules can not be instantiated (not possible to create objects
+# from them).
+# With modules we can share methods between classes: Modules can be included into classes, 
+# This is useful if we have methods that we want to reuse in certain classes, but also want to keep them in a central place.
+#
+# render partial is used to render the process into manageable chunks. It provides a way to reuse the code across templates and allow local variables
+# like headers to be passed across templates.
+##
 module ReviewMappingHelper
   include ChartGeneratorHelper
   def create_report_table_header(headers = {})
@@ -7,7 +16,7 @@ module ReviewMappingHelper
   #
   # gets the response map data such as reviewer id, reviewed object id and type for the review report
   #
-  def data_for_review_report(reviewed_object_id, reviewer_id, type)
+  def responsemaps_data_for_review_report(reviewed_object_id, reviewer_id, type)
     rspan = 0
     (1..@assignment.num_review_rounds).each { |round| instance_variable_set('@review_in_round_' + round.to_s, 0) }
 
@@ -19,7 +28,25 @@ module ReviewMappingHelper
         instance_variable_set('@review_in_round_' + round.to_s, instance_variable_get('@review_in_round_' + round.to_s) + 1) if responses.exists?(round: round)
       end
     end
-    [response_maps, rspan]
+    response_maps
+  end
+
+  #
+  # gets the rspan data such as reviewer id, reviewed object id and type for the review report
+  #
+  def rspan_data_for_review_report(reviewed_object_id, reviewer_id, type)
+    rspan = 0
+    (1..@assignment.num_review_rounds).each { |round| instance_variable_set('@review_in_round_' + round.to_s, 0) }
+
+    response_maps = ResponseMap.where(['reviewed_object_id = ? AND reviewer_id = ? AND type = ?', reviewed_object_id, reviewer_id, type])
+    response_maps.each do |ri|
+      rspan += 1 if Team.exists?(id: ri.reviewee_id)
+      responses = ri.response
+      (1..@assignment.num_review_rounds).each do |round|
+        instance_variable_set('@review_in_round_' + round.to_s, instance_variable_get('@review_in_round_' + round.to_s) + 1) if responses.exists?(round: round)
+      end
+    end
+    rspan
   end
 
   #
@@ -126,15 +153,6 @@ module ReviewMappingHelper
     # if !response.empty? and !response.last.is_submitted?
     team_reviewed_link_name
   end
-
-  # if the current stage is "submission" or "review", function returns the current round number otherwise,
-  # if the current stage is "Finished" or "metareview", function returns the number of rounds of review completed.
-  # def get_current_round(reviewer_id)
-  #   user_id = Participant.find(reviewer_id).user.id
-  #   topic_id = SignedUpTeam.topic_id(@assignment.id, user_id)
-  #   @assignment.number_of_current_round(topic_id)
-  #   @assignment.num_review_rounds if @assignment.get_current_stage(topic_id) == "Finished" || @assignment.get_current_stage(topic_id) == "metareview"
-  # end
 
   # gets the review score awarded based on each round of the review
 

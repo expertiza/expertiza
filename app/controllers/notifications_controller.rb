@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class NotificationsController < ApplicationController
   before_action :set_notification, only: %i[show edit update destroy]
   helper_method :validate_params

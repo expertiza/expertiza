@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ParticipantsHelper
   # separates the file into the necessary elements to create a new user
   def self.upload_users(filename, session, params, home_page)
@@ -18,7 +20,7 @@ module ParticipantsHelper
     attributes['name'] = line_split[config['name'].to_i]
     attributes['fullname'] = config['fullname']
     attributes['email'] = line_split[config['email'].to_i]
-    attributes['password'] = (0...8).map { (65 + rand(26)).chr }.join
+    attributes['password'] = (0...8).map { rand(65..90).chr }.join
     attributes['email_on_submission'] = 1
     attributes['email_on_review'] = 1
     attributes['email_on_review_of_review'] = 1
@@ -33,7 +35,7 @@ module ParticipantsHelper
     elsif !params[:assignment_id].nil?
       participant = add_user_to_assignment(params, user)
     end
-    participant.email(attrs['password'], home_page) unless participant.nil?
+    participant&.email(attrs['password'], home_page)
     user
   end
 
@@ -48,7 +50,7 @@ module ParticipantsHelper
   def self.add_user_to_assignment(params, user)
     assignment = Assignment.find params[:assignment_id]
     if AssignmentParticipant.where('user_id = ? AND parent_id = ?', user.id, assignment.id).empty?
-      return AssignmentParticipant.create(parent_id: assignment.id, user_id: user.id)
+      AssignmentParticipant.create(parent_id: assignment.id, user_id: user.id)
     end
   end
 

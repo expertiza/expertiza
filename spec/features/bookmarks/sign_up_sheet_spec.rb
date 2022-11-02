@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'sign_up_sheet/list.html.erb' do
   def create_assignment_bookmarks
     create(:assignment, name: 'TestAssignment', directory_path: 'TestAssignment', use_bookmark: true)

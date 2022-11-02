@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Badge do
   let(:awarded_badge) { build(:awarded_badge) }
   describe '#get_id_from_name' do

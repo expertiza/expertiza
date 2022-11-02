@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'peer review testing' do
   before(:each) do
     # create assignment and topic

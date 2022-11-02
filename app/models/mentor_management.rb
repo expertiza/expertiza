@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MentorManagement
   # Select a mentor using the following algorithm
   #
@@ -61,7 +63,9 @@ class MentorManagement
 
     # RuboCop 'use guard clause instead of nested conditionals'
     # return if there's already a mentor in place
-    return if team.participants.any? { |participant| participant.duty == Participant::DUTY_MENTOR }
+    if team.participants.any? { |participant| participant.duty == Participant::DUTY_MENTOR }
+      return
+    end
 
     mentor_user = select_mentor(assignment_id)
 

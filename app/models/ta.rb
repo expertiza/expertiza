@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Ta < User
   has_many :ta_mappings, dependent: :destroy
 

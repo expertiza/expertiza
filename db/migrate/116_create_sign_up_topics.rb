@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateSignUpTopics < ActiveRecord::Migration[4.2]
   def self.up
     create_table :sign_up_topics do |t|

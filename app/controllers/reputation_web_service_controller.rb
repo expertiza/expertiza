@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'json'
 require 'uri'
 require 'net/http'
@@ -39,11 +41,9 @@ class ReputationWebServiceController < ApplicationController
   # Returns
   #   if no error returns max_question_score of first question else 1
   def get_max_question_score(answers)
-    begin
-      answers.first.question.questionnaire.max_question_score
-    rescue StandardError
-      1
-    end
+    answers.first.question.questionnaire.max_question_score
+  rescue StandardError
+    1
   end
 
   # Method: get_valid_answers_for_response
@@ -168,7 +168,9 @@ class ReputationWebServiceController < ApplicationController
   def generate_json_body(results)
     request_body = {}
     results.each_with_index do |record, _index|
-      request_body['submission' + record[1].to_s] = {} unless request_body.key?('submission' + record[1].to_s)
+      unless request_body.key?('submission' + record[1].to_s)
+        request_body['submission' + record[1].to_s] = {}
+      end
       request_body['submission' + record[1].to_s]['stu' + record[0].to_s] = record[2]
     end
     # sort the 2-dimension hash
@@ -220,8 +222,16 @@ class ReputationWebServiceController < ApplicationController
   #   nil
   def client
     @max_assignment_id = Assignment.last.id
-    @assignment = Assignment.find(flash[:assignment_id]) rescue nil
-    @another_assignment = Assignment.find(flash[:another_assignment_id]) rescue nil
+    @assignment = begin
+                    Assignment.find(flash[:assignment_id])
+                  rescue StandardError
+                    nil
+                  end
+    @another_assignment = begin
+                            Assignment.find(flash[:another_assignment_id])
+                          rescue StandardError
+                            nil
+                          end
   end
 
   # Method: update_participants_reputation
@@ -238,7 +248,9 @@ class ReputationWebServiceController < ApplicationController
       next unless %w[Hamer Lauw].include?(reputation_algorithm)
 
       user_resputation_list.each do |user_id, reputation|
-        Participant.find_by(user_id: user_id).update(reputation_algorithm.to_sym => reputation) unless /leniency/ =~ user_id.to_s
+        unless /leniency/ =~ user_id.to_s
+          Participant.find_by(user_id: user_id).update(reputation_algorithm.to_sym => reputation)
+        end
       end
     end
   end

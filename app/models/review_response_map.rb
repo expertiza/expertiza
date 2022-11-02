@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ReviewResponseMap < ResponseMap
   belongs_to :reviewee, class_name: 'Team', foreign_key: 'reviewee_id', inverse_of: false
   belongs_to :contributor, class_name: 'Team', foreign_key: 'reviewee_id', inverse_of: false
@@ -49,7 +51,9 @@ class ReviewResponseMap < ResponseMap
     raise ArgumentError, 'Cannot find reviewee user.' unless reviewee_user
 
     reviewee_participant = AssignmentParticipant.find_by(user_id: reviewee_user.id, parent_id: assignment_id)
-    raise ArgumentError, 'Reviewee user is not a participant in this assignment.' unless reviewee_participant
+    unless reviewee_participant
+      raise ArgumentError, 'Reviewee user is not a participant in this assignment.'
+    end
 
     reviewee_team = AssignmentTeam.team(reviewee_participant)
     if reviewee_team.nil? # lazy team creation: if the reviewee does not have team, create one.
@@ -66,7 +70,9 @@ class ReviewResponseMap < ResponseMap
       next if reviewer_user_name.empty?
 
       reviewer_participant = AssignmentParticipant.find_by(user_id: reviewer_user.id, parent_id: assignment_id)
-      raise ArgumentError, 'Reviewer user is not a participant in this assignment.' unless reviewer_participant
+      unless reviewer_participant
+        raise ArgumentError, 'Reviewer user is not a participant in this assignment.'
+      end
 
       ReviewResponseMap.find_or_create_by(reviewed_object_id: assignment_id,
                                           reviewer_id: reviewer_participant.get_reviewer.id,
@@ -79,7 +85,7 @@ class ReviewResponseMap < ResponseMap
     return unless self.response.any? && response
 
     map = FeedbackResponseMap.find_by(reviewed_object_id: response.id)
-    map.response.last.display_as_html if map && map.response.any?
+    map.response.last.display_as_html if map&.response&.any?
   end
 
   def metareview_response_maps
@@ -117,9 +123,9 @@ class ReviewResponseMap < ResponseMap
   def self.get_reviewer_with_id(assignment_id, reviewer_id)
     assignment = Assignment.find(assignment_id)
     if assignment.team_reviewing_enabled
-      return AssignmentTeam.find(reviewer_id)
+      AssignmentTeam.find(reviewer_id)
     else
-      return AssignmentParticipant.find(reviewer_id)
+      AssignmentParticipant.find(reviewer_id)
     end
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RemoveRereviewAndResubmissionDeadlineTypes < ActiveRecord::Migration[4.2]
   def change
     DeadlineType.find_by(name: 'resubmission').delete

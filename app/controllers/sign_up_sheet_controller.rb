@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # contains all functions related to management of the signup sheet for an assignment
 # functions to add new topics to an assignment, edit properties of a particular topic, delete a topic, etc
 # are included here
@@ -213,7 +215,9 @@ class SignUpSheetController < ApplicationController
     @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
 
     unless @assignment.due_dates.find_by(deadline_type_id: 1).nil?
-      @show_actions = false if !@assignment.staggered_deadline? && (@assignment.due_dates.find_by(deadline_type_id: 1).due_at < Time.now)
+      if !@assignment.staggered_deadline? && (@assignment.due_dates.find_by(deadline_type_id: 1).due_at < Time.now)
+        @show_actions = false
+      end
 
       # Find whether the user has signed up for any topics; if so the user won't be able to
       # sign up again unless the former was a waitlisted topic
@@ -225,7 +229,9 @@ class SignUpSheetController < ApplicationController
                            SignedUpTeam.find_user_signup_topics(@assignment.id, users_team.first.t_id)
                          end
     end
-    render('sign_up_sheet/intelligent_topic_selection') && return if @assignment.is_intelligent
+    if @assignment.is_intelligent
+      render('sign_up_sheet/intelligent_topic_selection') && return
+    end
   end
 
   def sign_up
@@ -234,7 +240,9 @@ class SignUpSheetController < ApplicationController
     # Always use team_id ACS
     # s = Signupsheet.new
     # Team lazy initialization: check whether the user already has a team for this assignment
-    flash[:error] = "You've already signed up for a topic!" unless SignUpSheet.signup_team(@assignment.id, @user_id, params[:topic_id])
+    unless SignUpSheet.signup_team(@assignment.id, @user_id, params[:topic_id])
+      flash[:error] = "You've already signed up for a topic!"
+    end
     redirect_to action: 'list', id: params[:id]
   end
 
@@ -357,7 +365,9 @@ class SignUpSheetController < ApplicationController
         @assignment_review_due_date = DateTime.parse(@assignment_review_due_dates[i - 1].due_at.to_s).strftime('%Y-%m-%d %H:%M')
         %w[submission review].each do |deadline_type|
           deadline_type_id = DeadlineType.find_by_name(deadline_type).id
-          next if instance_variable_get('@topic_' + deadline_type + '_due_date') == instance_variable_get('@assignment_' + deadline_type + '_due_date')
+          if instance_variable_get('@topic_' + deadline_type + '_due_date') == instance_variable_get('@assignment_' + deadline_type + '_due_date')
+            next
+          end
 
           topic_due_date = begin
                              TopicDueDate.where(parent_id: topic.id, deadline_type_id: deadline_type_id, round: i).first
@@ -448,7 +458,9 @@ class SignUpSheetController < ApplicationController
   end
 
   def publish_approved_suggested_topic
-    SignUpTopic.find_by(id: params[:topic_id]).update_attribute(:private_to, nil) if SignUpTopic.exists?(id: params[:topic_id])
+    if SignUpTopic.exists?(id: params[:topic_id])
+      SignUpTopic.find_by(id: params[:topic_id]).update_attribute(:private_to, nil)
+    end
     redirect_to action: 'list', id: params[:id]
   end
 
@@ -456,7 +468,9 @@ class SignUpSheetController < ApplicationController
 
   def setup_new_topic
     set_values_for_new_topic
-    @sign_up_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
+    if @assignment.microtask?
+      @sign_up_topic.micropayment = params[:topic][:micropayment]
+    end
     if @sign_up_topic.save
       undo_link "The topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
       redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + '#tabs-2'

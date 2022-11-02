@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class QuizResponse < Response
   belongs_to :assignment
   belongs_to :questionnaire

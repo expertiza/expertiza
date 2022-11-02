@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'redcloth'
 
 class ContentPage < ApplicationRecord
@@ -5,17 +7,16 @@ class ContentPage < ApplicationRecord
   validates :name, uniqueness: true
 
   belongs_to :permission
-
-  # rubocop:disable Lint/DuplicateMethods
   attr_accessor :content_html
-  # rubocop:enable Lint/DuplicateMethods
 
   def url
     "/#{name}"
   end
 
   def markup_style
-    @markup_style = MarkupStyle.find markup_style_id if !@markup_style && markup_style_id && markup_style_id > 0
+    if !@markup_style && markup_style_id && markup_style_id > 0
+      @markup_style = MarkupStyle.find markup_style_id
+    end
   end
 
   before_save :setup_save
@@ -37,7 +38,7 @@ class ContentPage < ApplicationRecord
 
   def markup_content
     markup = markup_style
-    if markup && markup.name
+    if markup&.name
       if markup.name == 'Textile'
         RedCloth.new(content).to_html(:textile)
       elsif markup.name == 'Markdown'

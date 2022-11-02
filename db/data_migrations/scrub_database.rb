@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ScrubDatabase
   def self.run!
     User.find_each do |user|

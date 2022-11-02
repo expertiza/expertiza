@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ScoreView < ApplicationRecord
   # setting this to false so that factories can be created
   # to test the grading of weighted quiz questionnaires

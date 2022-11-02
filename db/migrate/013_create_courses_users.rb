@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateCoursesUsers < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'courses_users', force: true do |t|

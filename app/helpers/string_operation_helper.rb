@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module StringOperationHelper
   def string_similarity(str1, str2)
     # Perform bigram comparison between two strings and return a percentage match in decimal form

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SystemSettingsController < ApplicationController
   include AuthorizationHelper
 
@@ -70,7 +72,9 @@ class SystemSettingsController < ApplicationController
     @roles = Role.order('name')
     @pages = ContentPage.order('name')
     @markup_styles = MarkupStyle.order('name')
-    @markup_styles.unshift MarkupStyle.new(id: nil, name: '(none)') unless @markup_style.nil?
+    unless @markup_style.nil?
+      @markup_styles.unshift MarkupStyle.new(id: nil, name: '(none)')
+    end
   end
 
   private

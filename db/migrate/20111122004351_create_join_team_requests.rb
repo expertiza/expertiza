@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateJoinTeamRequests < ActiveRecord::Migration[4.2]
   def self.up
     create_table :join_team_requests do |t|

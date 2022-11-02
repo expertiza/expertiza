@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 describe GradesHelper, type: :helper do
   let(:review_response) { build(:response, id: 1, map_id: 1) }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MoveGradesCommentsForReviewerAndReviewTimeFromParticipantsTableToReviewGradesTable < ActiveRecord::Migration[4.2]
   def change
     Participant.all.each do |participant|

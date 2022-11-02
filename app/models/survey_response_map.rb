@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # this class has 2 sub-classes: CourseSurveyResponseMap and AssignmentSurveyResponseMap
 # The reviewed_object id is either assignment or course id;
 # The reviewer_id is either assignment participant id or course participant id;

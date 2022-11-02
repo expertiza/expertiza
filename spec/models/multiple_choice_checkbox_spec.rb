@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe MultipleChoiceCheckbox do
   let(:multiple_choice_checkbox) { build(:multiple_choice_checkbox, id: 1) }
   let(:questionnaire1) { build(:questionnaire, id: 1, type: 'ReviewQuestionnaire') }

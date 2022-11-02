@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class QuizQuestionnaire < Questionnaire
   attr_accessor :questionnaire
   after_initialize :post_initialization

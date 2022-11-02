@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Instructor do
   let(:assignment) { build(:assignment, id: 1, name: 'no assignment') }
   let(:instructor) { build(:instructor, id: 6) }

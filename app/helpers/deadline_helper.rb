@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This helper contains methods to manipulate due dates of topics in an assignment. This helper if used by
 # sign_up_controller
 module DeadlineHelper

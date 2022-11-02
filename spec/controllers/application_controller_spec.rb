@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe ApplicationController do
   describe 'remove_non_utf8' do
     it 'should not remove utf8 characters' do

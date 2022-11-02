@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Scoring
   # Computes the total score for a *list of assessments*
   # parameters
@@ -15,7 +17,9 @@ module Scoring
         curr_score = assessment_score(response: [assessment], questions: questions)
 
         scores[:max] = curr_score if curr_score > scores[:max]
-        scores[:min] = curr_score unless curr_score >= scores[:min] || curr_score == -1
+        unless curr_score >= scores[:min] || curr_score == -1
+          scores[:min] = curr_score
+        end
 
         # Check if the review is invalid. If is not valid do not include in score calculation
         if curr_score == -1
@@ -57,7 +61,9 @@ module Scoring
 
       # Retrieve data for questionnaire (max score, sum of scores, weighted scores, etc.)
       questionnaire_data = ScoreView.questionnaire_data(@questions[0].questionnaire_id, @response.id)
-      weighted_score = questionnaire_data.weighted_score.to_f unless questionnaire_data.weighted_score.nil?
+      unless questionnaire_data.weighted_score.nil?
+        weighted_score = questionnaire_data.weighted_score.to_f
+      end
       sum_of_weights = questionnaire_data.sum_of_weights.to_f
       answers = Answer.where(response_id: @response.id)
       answers.each do |answer|
@@ -68,9 +74,9 @@ module Scoring
       end
       max_question_score = questionnaire_data.q1_max_question_score.to_f
       if sum_of_weights > 0 && max_question_score && weighted_score > 0
-        return (weighted_score / (sum_of_weights * max_question_score)) * 100
+        (weighted_score / (sum_of_weights * max_question_score)) * 100
       else
-        return -1.0 # indicating no score
+        -1.0 # indicating no score
       end
     end
   end
@@ -215,7 +221,9 @@ module Scoring
     (1..participant.assignment.num_review_rounds).each do |i|
       round_sym = ('review' + i.to_s).to_sym
       # check if that assignment round is empty
-      next if scores[round_sym].nil? || scores[round_sym][:assessments].nil? || scores[round_sym][:assessments].empty?
+      if scores[round_sym].nil? || scores[round_sym][:assessments].nil? || scores[round_sym][:assessments].empty?
+        next
+      end
 
       length_of_assessments = scores[round_sym][:assessments].length.to_f
       scores[review_sym][:assessments] += scores[round_sym][:assessments]
@@ -225,7 +233,9 @@ module Scoring
       # update the min value if that rounds min exists and is lower than the current min
       update_max_or_min(scores, round_sym, review_sym, :min)
       # Compute average score for current round, and sets overall total score to be average_from_round * length of assignment (# of questions)
-      total_score += scores[round_sym][:scores][:avg] * length_of_assessments unless scores[round_sym][:scores][:avg].nil?
+      unless scores[round_sym][:scores][:avg].nil?
+        total_score += scores[round_sym][:scores][:avg] * length_of_assessments
+      end
     end
     # if the scores max and min weren't updated set them to zero.
     if scores[review_sym][:scores][:max] == -999_999_999 && scores[review_sym][:scores][:min] == 999_999_999
@@ -299,17 +309,23 @@ def peer_review_questions_for_team(assignment, team, round_number = nil)
 
   signed_up_team = SignedUpTeam.find_by(team_id: team.id)
   topic_id = signed_up_team.topic_id unless signed_up_team.nil?
-  review_questionnaire_id = assignment.review_questionnaire_id(round_number, topic_id) unless team.nil?
-  Question.where(questionnaire_id: review_questionnaire_id).to_a unless team.nil?
+  unless team.nil?
+    review_questionnaire_id = assignment.review_questionnaire_id(round_number, topic_id)
+  end
+  unless team.nil?
+    Question.where(questionnaire_id: review_questionnaire_id).to_a
+  end
 end
 
 def calc_review_score(corresponding_response, questions)
   if corresponding_response.empty?
-    return -1.0
+    -1.0
   else
     this_review_score_raw = assessment_score(response: corresponding_response, questions: questions)
     if this_review_score_raw
-      return ((this_review_score_raw * 100) / 100.0).round if this_review_score_raw >= 0.0
+      if this_review_score_raw >= 0.0
+        ((this_review_score_raw * 100) / 100.0).round
+      end
     end
   end
 end
@@ -321,9 +337,13 @@ def scores_varying_rubrics(assignment, review_scores, response_maps)
       questions = peer_review_questions_for_team(assignment, response_map.reviewee, round)
       reviewer = review_scores[response_map.reviewer_id]
       corresponding_response = Response.where('map_id = ?', response_map.id)
-      corresponding_response = corresponding_response.select { |response| response.round == round } unless corresponding_response.empty?
+      unless corresponding_response.empty?
+        corresponding_response = corresponding_response.select { |response| response.round == round }
+      end
       respective_scores = {}
-      respective_scores = reviewer[round] unless reviewer.nil? || reviewer[round].nil?
+      unless reviewer.nil? || reviewer[round].nil?
+        respective_scores = reviewer[round]
+      end
       this_review_score = calc_review_score(corresponding_response, questions)
       respective_scores[response_map.reviewee_id] = this_review_score
       reviewer = {} if reviewer.nil?
@@ -360,7 +380,9 @@ def compute_grades_by_rounds(assignment, questions, team)
     round_sym = ('review' + i.to_s).to_sym
     grades_by_rounds[round_sym] = aggregate_assessment_scores(assessments, questions[round_sym])
     total_num_of_assessments += assessments.size
-    total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f unless grades_by_rounds[round_sym][:avg].nil?
+    unless grades_by_rounds[round_sym][:avg].nil?
+      total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f
+    end
   end
   [grades_by_rounds, total_num_of_assessments, total_score]
 end

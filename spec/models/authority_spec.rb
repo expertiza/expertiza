@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Authority do
   let(:user1) { create(:student, name: 'expertizauser', id: 1) }
   let(:admin) { build(:admin) }

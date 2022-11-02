@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class LatePolicy < ApplicationRecord
   belongs_to :user
 

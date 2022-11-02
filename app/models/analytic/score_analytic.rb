@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ScoreAnalytic
   def unique_character_count
     comments.gsub(/[^0-9A-Za-z ]/, '').downcase.split(' ').uniq.count

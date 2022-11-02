@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddShowTeammateReviewsToAssignments < ActiveRecord::Migration[4.2]
   def self.up
     add_column :assignments, :show_teammate_reviews, :boolean

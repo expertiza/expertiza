@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # E1600
 # A new type called SelfReviewResponseMap was created for ResponseMap to handle self-reviews independent
 class SelfReviewResponseMap < ResponseMap

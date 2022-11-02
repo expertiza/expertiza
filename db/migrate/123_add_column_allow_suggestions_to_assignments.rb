@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddColumnAllowSuggestionsToAssignments < ActiveRecord::Migration[4.2]
   def self.up
     add_column :assignments, :allow_suggestions, :boolean

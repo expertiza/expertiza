@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe ContentPagesController do
   let(:instructor) { build(:instructor, id: 6) }
   let(:content_page_home) { build(:content_page, id: 1) }

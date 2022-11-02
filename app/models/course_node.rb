@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CourseNode < Node
   belongs_to :course, class_name: 'Course', foreign_key: 'node_object_id'
   belongs_to :node_object, class_name: 'Course', foreign_key: 'node_object_id'
@@ -66,7 +68,7 @@ class CourseNode < Node
   def self.get_parent_id
     folder = TreeFolder.find_by(name: 'Courses')
     parent = FolderNode.find_by(node_object_id: folder.id)
-    parent.id if parent
+    parent&.id
   end
 
   # Gets any children associated with this object

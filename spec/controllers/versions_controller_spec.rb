@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe VersionsController do
   let(:admin) { build(:admin, id: 3) }
   let(:instructor) { build(:instructor, id: 2) }
@@ -28,7 +30,6 @@ describe VersionsController do
         stub_current_user(super_admin, super_admin.role.name, super_admin.role)
         expect(controller.send(:action_allowed?)).to be true
       end
-
     end
   end
 
@@ -44,10 +45,9 @@ describe VersionsController do
     it 'render show' do
       stub_current_user(admin, admin.role.name, admin.role)
       allow(Version).to receive(:find).with('1').and_return(version)
-      get 'show', params: {id: 1}
+      get 'show', params: { id: 1 }
       expect(response).to render_template('show')
     end
-
   end
 
   describe 'GET /search' do
@@ -63,5 +63,4 @@ describe VersionsController do
       expect(response).to render_template('search')
     end
   end
-
 end

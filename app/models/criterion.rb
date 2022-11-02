@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Initial commit
 class Criterion < ScoredQuestion
   include ActionView::Helpers
@@ -51,14 +53,22 @@ class Criterion < ScoredQuestion
     question_advices = QuestionAdvice.where(question_id: id).sort_by(&:id)
     advice_total_length = 0
     question_advices.each do |question_advice|
-      advice_total_length += question_advice.advice.length if question_advice.advice && question_advice.advice != ''
+      if question_advice.advice && question_advice.advice != ''
+        advice_total_length += question_advice.advice.length
+      end
     end
     # show advice given for different questions
-    html += advices_criterion_question(count, question_advices) if !question_advices.empty? && (advice_total_length > 0)
+    if !question_advices.empty? && (advice_total_length > 0)
+      html += advices_criterion_question(count, question_advices)
+    end
     # dropdown options to rate a project based on the question
-    html += dropdown_criterion_question(count, answer, questionnaire_min, questionnaire_max) if dropdown_or_scale == 'dropdown'
+    if dropdown_or_scale == 'dropdown'
+      html += dropdown_criterion_question(count, answer, questionnaire_min, questionnaire_max)
+    end
     # scale options to rate a project based on the question
-    html += scale_criterion_question(count, answer, questionnaire_min, questionnaire_max) if dropdown_or_scale == 'scale'
+    if dropdown_or_scale == 'scale'
+      html += scale_criterion_question(count, answer, questionnaire_min, questionnaire_max)
+    end
     safe_join([''.html_safe, ''.html_safe], html.html_safe)
   end
 
@@ -88,7 +98,9 @@ class Criterion < ScoredQuestion
   # dropdown options to rate a project based on the question
   def dropdown_criterion_question(count, answer = nil, questionnaire_min, questionnaire_max)
     current_value = ''
-    current_value += 'data-current-rating =' + answer.answer.to_s unless answer.nil?
+    unless answer.nil?
+      current_value += 'data-current-rating =' + answer.answer.to_s
+    end
     html = '<div><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" class="review-rating" ' + current_value + '>'
     html += "<option value = ''>--</option>"
     questionnaire_min.upto(questionnaire_max).each do |j|
@@ -129,7 +141,9 @@ class Criterion < ScoredQuestion
 
     (questionnaire_min..questionnaire_max).each do |j|
       html += '<td width="10%"><input type="radio" id="' + j.to_s + '" value="' + j.to_s + '" name="Radio_' + id.to_s + '"'
-      html += 'checked="checked"' if (!answer.nil? && answer.answer == j) || (answer.nil? && questionnaire_min == j)
+      if (!answer.nil? && answer.answer == j) || (answer.nil? && questionnaire_min == j)
+        html += 'checked="checked"'
+      end
       html += '></td>'
     end
     html += '<script>jQuery("input[name=Radio_' + id.to_s + ']:radio").change(function() {'

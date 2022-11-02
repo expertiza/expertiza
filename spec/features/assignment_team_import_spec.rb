@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 include InstructorInterfaceHelperSpec
 
 describe 'create team by importing file' do

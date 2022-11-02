@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddGradeForSubmissionAndCommentForSubmissionInTeamsTable < ActiveRecord::Migration[4.2]
   def self.up
     add_column :teams, :grade_for_submission, :integer, default: nil

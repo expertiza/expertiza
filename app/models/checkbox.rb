@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Checkbox < UnscoredQuestion
   include ActionView::Helpers
   # This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)

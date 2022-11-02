@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 describe CoursesController do
   let(:instructor) { build(:instructor, id: 6) }
-  let(:instructor2) { build(:instructor, id:6666)}
+  let(:instructor2) { build(:instructor, id: 6666) }
   let(:student) { build(:student) }
   let(:course) { double('Course', instructor_id: 6, path: '/cscs', name: 'abc') }
   describe '#action_allowed?' do
@@ -84,14 +86,14 @@ describe CoursesController do
 
   describe '#auto_complete_for_user_name' do
     it 'should return a list of users' do
-      allow(User).to receive(:find).with(:all, { conditions: [ 'LOWER(login) LIKE ?', '%test%' ], limit: 10 }).and_return([])
-      get :auto_complete_for_user_name, params: {user: { login: 'test' }}
+      allow(User).to receive(:find).with(:all, { conditions: ['LOWER(login) LIKE ?', '%test%'], limit: 10 }).and_return([])
+      get :auto_complete_for_user_name, params: { user: { login: 'test' } }
       expect(response).to be_redirect
     end
   end
 
   describe '#copy' do
-    let(:ccc) { build(:course)}
+    let(:ccc) { build(:course) }
 
     context 'when new course id fetches successfully' do
       it 'redirects to the new course' do
@@ -145,8 +147,8 @@ describe CoursesController do
   end
 
   describe '#add_ta' do
-    let(:user) { build(:student)}
-    let(:course) { build(:course)}
+    let(:user) { build(:student) }
+    let(:course) { build(:course) }
 
     it 'should add a ta to the course' do
       allow(Course).to receive(:find).with('1').and_return(course)
@@ -162,9 +164,9 @@ describe CoursesController do
   end
 
   describe '#remove_ta' do
-    let(:ta) { build(:student)}
-    let(:course) { build(:course)}
-    let(:ta_mapping) { build(:ta_mapping)}
+    let(:ta) { build(:student) }
+    let(:course) { build(:course) }
+    let(:ta_mapping) { build(:ta_mapping) }
 
     it 'should remove a ta from the course' do
       allow(TaMapping).to receive(:find).with('1').and_return(ta_mapping)

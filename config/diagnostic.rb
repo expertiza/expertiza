@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module MyApp
   # Logger to sit between test and server end. When using Selenium these are not reported in tests, error pages are just another web page
   class DiagnosticMiddleware
-    FILENAME = 'log/diagnostic.txt'.freeze
+    FILENAME = 'log/diagnostic.txt'
 
     def initialize(app)
       @app = app

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Answer do
   let(:questionnaire) { create(:questionnaire, id: 1) }
   let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }

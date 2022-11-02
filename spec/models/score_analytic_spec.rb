@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ScoreAnalyticTestDummyClass
   attr_accessor :comments
   require 'analytic/score_analytic'

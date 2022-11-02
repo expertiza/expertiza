@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PenaltyHelper
   def calculate_penalty(participant_id)
     @submission_deadline_type_id = 1
@@ -49,7 +51,9 @@ module PenaltyHelper
       review_mappings = ReviewResponseMap.where(reviewer_id: @participant.get_reviewer.id)
       review_due_date = AssignmentDueDate.where(deadline_type_id: @review_deadline_type_id,
                                                 parent_id: @assignment.id).first
-      penalty = compute_penalty_on_reviews(review_mappings, review_due_date.due_at, num_of_reviews_required) unless review_due_date.nil?
+      unless review_due_date.nil?
+        penalty = compute_penalty_on_reviews(review_mappings, review_due_date.due_at, num_of_reviews_required)
+      end
     end
     penalty
   end
@@ -61,7 +65,9 @@ module PenaltyHelper
       meta_review_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
       meta_review_due_date = AssignmentDueDate.where(deadline_type_id: @meta_review_deadline_type_id,
                                                      parent_id: @assignment.id).first
-      penalty = compute_penalty_on_reviews(meta_review_mappings, meta_review_due_date.due_at, num_of_meta_reviews_required) unless meta_review_due_date.nil?
+      unless meta_review_due_date.nil?
+        penalty = compute_penalty_on_reviews(meta_review_mappings, meta_review_due_date.due_at, num_of_meta_reviews_required)
+      end
     end
     penalty
   end

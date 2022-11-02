@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'Airbrake exception errors' do
   before(:each) do
     create(:assignment, name: 'TestAssignment', directory_path: 'test_assignment')

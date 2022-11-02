@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe LatePoliciesController do
   let(:instructor) { build(:instructor, id: 6) }
 

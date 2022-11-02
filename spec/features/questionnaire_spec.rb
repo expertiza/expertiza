@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 include InstructorInterfaceHelperSpec
 
 question_type = %w[Criterion Scale Dropdown Checkbox TextArea TextField UploadFile SectionHeader TableHeader ColumnHeader]

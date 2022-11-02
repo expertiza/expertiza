@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SubmittedContentHelper
   def display_directory_tree(participant, files, display_to_reviewer_flag)
     index = 0
@@ -83,7 +85,9 @@ module SubmittedContentHelper
       index += 1
       disp = file + '/' + path
       ret += '<li>'
-      ret += "<input type=radio id='chk_files' name='chk_files' value='#{index}'>" if @check_stage != 'Complete' && @flag == false
+      if @check_stage != 'Complete' && @flag == false
+        ret += "<input type=radio id='chk_files' name='chk_files' value='#{index}'>"
+      end
       ret += "<input type=hidden id='filenames_#{index}' name='filenames[#{index}]' value='" + File.dirname(disp) + '/' + File.basename(path) + "'>"
       if File.ftype(disp) == 'directory'
         ret += "<a title='Expand/Collapse' href='#' onclick='javascript:collapseSubDirectory(#{index}); return false;'><img id='expand.#{index}' alt='Expand/Collapse' title='Expand/Collapse' src='/assets/up.png'></a>&nbsp;"

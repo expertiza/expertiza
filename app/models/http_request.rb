@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class HttpRequest
   require 'net/http'
 
@@ -17,7 +19,7 @@ class HttpRequest
       end
 
       case res
-      when Net::HTTPSuccess then
+      when Net::HTTPSuccess
         res
 
       when Net::HTTPRedirection then

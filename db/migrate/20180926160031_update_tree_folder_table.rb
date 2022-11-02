@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UpdateTreeFolderTable < ActiveRecord::Migration[4.2]
   def up
     tree_folder = TreeFolder.find_by_id(11)

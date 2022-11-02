@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe LockController do
   let(:super_admin) { build(:superadmin, id: 1, role_id: 5) }
   let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, name: 'Instructor1') }
@@ -13,7 +15,7 @@ describe LockController do
         stub_current_user(instructor1, instructor1.role.name, instructor1.role)
         expect(controller.send(:action_allowed?)).to be_truthy
       end
-    end 
+    end
     context 'when the role of current user is Student' do
       it 'refuses the action' do
         stub_current_user(student1, student1.role.name, student1.role)
@@ -27,7 +29,7 @@ describe LockController do
       end
     end
   end
-  # This test case is to test the release_lock function. We call HTTP get with a test @params input 
+  # This test case is to test the release_lock function. We call HTTP get with a test @params input
   # and expect the response to redirect to :back view once done
   describe '#release_lock' do
     context 'when release lock ' do

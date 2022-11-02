@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Question < ApplicationRecord
   belongs_to :questionnaire # each question belongs to a specific questionnaire
   belongs_to :review_of_review_score # ditto
@@ -14,16 +16,16 @@ class Question < ApplicationRecord
   has_paper_trail
 
   # Class variables
-  NUMERIC = 'Numeric'.freeze # Display string for NUMERIC questions
-  TRUE_FALSE = 'True/False'.freeze # Display string for TRUE_FALSE questions
+  NUMERIC = 'Numeric' # Display string for NUMERIC questions
+  TRUE_FALSE = 'True/False' # Display string for TRUE_FALSE questions
   GRADING_TYPES = [[NUMERIC, false], [TRUE_FALSE, true]].freeze
 
-  CHECKBOX = 'Checkbox'.freeze # Display string for NUMERIC questions
-  TEXT_FIELD = 'TextField'.freeze
-  TEXTAREA = 'TextArea'.freeze # Display string for TRUE_FALSE questions
-  DROPDOWN = 'DropDown'.freeze
-  UPLOAD_FILE = 'UploadFile'.freeze
-  RATING = 'Rating'.freeze
+  CHECKBOX = 'Checkbox' # Display string for NUMERIC questions
+  TEXT_FIELD = 'TextField'
+  TEXTAREA = 'TextArea' # Display string for TRUE_FALSE questions
+  DROPDOWN = 'DropDown'
+  UPLOAD_FILE = 'UploadFile'
+  RATING = 'Rating'
 
   GRADING_TYPES_CUSTOM = [[CHECKBOX, 0], [TEXT_FIELD, 1], [TEXTAREA, 2], [DROPDOWN, 3], [UPLOAD_FILE, 4], [RATING, 5]].freeze
   WEIGHTS = [['1', 1], ['2', 2], ['3', 3], ['4', 4], ['5', 5]].freeze

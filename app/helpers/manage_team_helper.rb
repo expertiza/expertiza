@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This helper contains all functions associated with team management.
 # These include creating a new team, adding a new member to a team etc
 # This helper is used by both sign_up_sheet controller and signup controller

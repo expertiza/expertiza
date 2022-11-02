@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module QuizAssignment
   # Returns a set of topics that can be used for taking the quiz.
   # We choose the topics if one of its quiz submissions has been attempted the fewest times so far
@@ -28,7 +30,9 @@ module QuizAssignment
     # select topic page and other students have already selected this topic.
     # Another scenario is someone that deliberately modifies the view.
     if topic
-      raise 'Too many quizzes have been taken for this topic; please select another one.' unless candidate_topics_for_quiz.include?(topic)
+      unless candidate_topics_for_quiz.include?(topic)
+        raise 'Too many quizzes have been taken for this topic; please select another one.'
+      end
     end
 
     contributor_set = Array.new(contributors)
@@ -40,7 +44,9 @@ module QuizAssignment
       (signed_up_topic(contributor) != topic) || # both will be nil for assignments with no signup sheet
         contributor.includes?(reviewer) # ##or !contributor.has_quiz?
     end
-    raise "There are no more submissions to take quiz on for this #{work}." if contributor_set.empty?
+    if contributor_set.empty?
+      raise "There are no more submissions to take quiz on for this #{work}."
+    end
 
     # Reviewer/quiz taker can take quiz for each submission only once
     contributor_set.reject! { |contributor| quiz_taken_by?(contributor, reviewer) }

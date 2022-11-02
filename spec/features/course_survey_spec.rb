@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 include InstructorInterfaceHelperSpec
 
 def create_course_questionnaire(survey_name)

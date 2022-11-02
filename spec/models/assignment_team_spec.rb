@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'AssignmentTeam' do
   let(:team_without_submitted_hyperlinks) { build(:assignment_team, submitted_hyperlinks: '') }
   let(:team) { build(:assignment_team, id: 1, parent_id: 1) }

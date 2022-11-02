@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This is a new model create by E1577 (heat map)
 # represents each table in the view_team view.
 # the important piece to note is that the @listofrows is a  list of type VmQuestionResponse_Row, which represents a row of the heatgrid table.
@@ -173,8 +175,12 @@ class VmQuestionResponse
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
         @list_of_rows.each do |row|
-          row.metric_hash["> 10 Word Comments"] = 0 if row.metric_hash["> 10 Word Comments"].nil?
-          row.metric_hash["> 10 Word Comments"] = row.metric_hash["> 10 Word Comments"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 10
+          if row.metric_hash['> 10 Word Comments'].nil?
+            row.metric_hash['> 10 Word Comments'] = 0
+          end
+          if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 10
+            row.metric_hash['> 10 Word Comments'] = row.metric_hash['> 10 Word Comments'] + 1
+          end
         end
       end
     end
@@ -186,8 +192,12 @@ class VmQuestionResponse
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
         @list_of_rows.each do |row|
-          row.metric_hash["> 20 Word Comments"] = 0 if row.metric_hash["> 20 Word Comments"].nil?
-          row.metric_hash["> 20 Word Comments"] = row.metric_hash["> 20 Word Comments"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 1
+          if row.metric_hash['> 20 Word Comments'].nil?
+            row.metric_hash['> 20 Word Comments'] = 0
+          end
+          if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 1
+            row.metric_hash['> 20 Word Comments'] = row.metric_hash['> 20 Word Comments'] + 1
+          end
         end
       end
     end

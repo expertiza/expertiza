@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddDeadlineNameAndDescriptionUrlToDueDates < ActiveRecord::Migration[4.2]
   def self.up
     add_column 'due_dates', 'deadline_name', :string

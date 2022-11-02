@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'peer review testing' do
   before(:each) do
     create(:assignment, name: 'TestAssignment', directory_path: 'test_assignment')

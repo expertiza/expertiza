@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DowncasePermissions < ActiveRecord::Migration[4.2]
   def self.up
     permissions = Permission.all

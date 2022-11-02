@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateBmappingTags < ActiveRecord::Migration[4.2]
   def self.up
     if table_exists?(:bmappings_tags) == false

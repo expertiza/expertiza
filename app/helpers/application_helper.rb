@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Methods added to this helper will be available to all templates in the application.
 module ApplicationHelper
   def available?(user, owner_id)
@@ -20,7 +22,9 @@ module ApplicationHelper
   end
 
   def flash_message(type)
-    "<div class='flash_#{type} alert alert-#{type}'>#{flash[type]}</div>".html_safe if flash[type]
+    if flash[type]
+      "<div class='flash_#{type} alert alert-#{type}'>#{flash[type]}</div>".html_safe
+    end
   end
 
   def text_field_with_auto_complete(model, field, options)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe TrueFalse do
   let(:true_false) { build(:true_false, id: 1) }
   describe '#edit' do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MultipleChoiceCheckbox < QuizQuestion
   def edit
     quiz_question_choices = QuizQuestionChoice.where(question_id: id)

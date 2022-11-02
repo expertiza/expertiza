@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TeamNode < Node
   belongs_to :node_object, class_name: 'Team'
   # attr_accessible :parent_id, :node_object_id  # unnecessary protected attributes

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'analytic/assignment_analytic'
 module CourseAnalytic
   #====== general statistics ======#
@@ -15,7 +17,9 @@ module CourseAnalytic
   end
 
   def average_num_assignment_teams
-    return total_num_assignment_teams.to_f / num_assignments unless num_assignments == 0
+    unless num_assignments == 0
+      return total_num_assignment_teams.to_f / num_assignments
+    end
 
     0
   end
@@ -30,7 +34,9 @@ module CourseAnalytic
 
   #===== assignment score =====#
   def average_assignment_score
-    return assignment_average_scores.inject(:+).to_f / num_assignments unless num_assignments == 0
+    unless num_assignments == 0
+      return assignment_average_scores.inject(:+).to_f / num_assignments
+    end
 
     0
   end
@@ -61,7 +67,9 @@ module CourseAnalytic
   end
 
   def average_num_assignment_reviews
-    return total_num_assignment_reviews.to_f / num_assignments unless num_assignments == 0
+    unless num_assignments == 0
+      return total_num_assignment_reviews.to_f / num_assignments
+    end
 
     0
   end

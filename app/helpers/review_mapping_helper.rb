@@ -1,3 +1,14 @@
+# frozen_string_literal: true
+
+##
+# Modules are somewhat similar to classes they are things that hold methods. However, modules can not be instantiated (not possible to create objects
+# from them).
+# With modules we can share methods between classes: Modules can be included into classes,
+# This is useful if we have methods that we want to reuse in certain classes, but also want to keep them in a central place.
+#
+# render partial is used to render the process into manageable chunks. It provides a way to reuse the code across templates and allow local variables
+# like headers to be passed across templates.
+##
 module ReviewMappingHelper
   include ChartGeneratorHelper
   def create_report_table_header(headers = {})
@@ -7,7 +18,7 @@ module ReviewMappingHelper
   #
   # gets the response map data such as reviewer id, reviewed object id and type for the review report
   #
-  def data_for_review_report(reviewed_object_id, reviewer_id, type)
+  def responsemaps_data_for_review_report(reviewed_object_id, reviewer_id, type)
     rspan = 0
     (1..@assignment.num_review_rounds).each { |round| instance_variable_set('@review_in_round_' + round.to_s, 0) }
 
@@ -16,10 +27,32 @@ module ReviewMappingHelper
       rspan += 1 if Team.exists?(id: ri.reviewee_id)
       responses = ri.response
       (1..@assignment.num_review_rounds).each do |round|
-        instance_variable_set('@review_in_round_' + round.to_s, instance_variable_get('@review_in_round_' + round.to_s) + 1) if responses.exists?(round: round)
+        if responses.exists?(round: round)
+          instance_variable_set('@review_in_round_' + round.to_s, instance_variable_get('@review_in_round_' + round.to_s) + 1)
+        end
       end
     end
-    [response_maps, rspan]
+    response_maps
+  end
+
+  #
+  # gets the rspan data such as reviewer id, reviewed object id and type for the review report
+  #
+  def rspan_data_for_review_report(reviewed_object_id, reviewer_id, type)
+    rspan = 0
+    (1..@assignment.num_review_rounds).each { |round| instance_variable_set('@review_in_round_' + round.to_s, 0) }
+
+    response_maps = ResponseMap.where(['reviewed_object_id = ? AND reviewer_id = ? AND type = ?', reviewed_object_id, reviewer_id, type])
+    response_maps.each do |ri|
+      rspan += 1 if Team.exists?(id: ri.reviewee_id)
+      responses = ri.response
+      (1..@assignment.num_review_rounds).each do |round|
+        if responses.exists?(round: round)
+          instance_variable_set('@review_in_round_' + round.to_s, instance_variable_get('@review_in_round_' + round.to_s) + 1)
+        end
+      end
+    end
+    rspan
   end
 
   #
@@ -74,7 +107,9 @@ module ReviewMappingHelper
     num_responses = 0
     total_num_rounds = @assignment.num_review_rounds
     (1..total_num_rounds).each do |round|
-      num_responses += 1 if Response.exists?(map_id: response_map.id, round: round)
+      if Response.exists?(map_id: response_map.id, round: round)
+        num_responses += 1
+      end
     end
     num_responses == total_num_rounds
   end
@@ -126,15 +161,6 @@ module ReviewMappingHelper
     # if !response.empty? and !response.last.is_submitted?
     team_reviewed_link_name
   end
-
-  # if the current stage is "submission" or "review", function returns the current round number otherwise,
-  # if the current stage is "Finished" or "metareview", function returns the number of rounds of review completed.
-  # def get_current_round(reviewer_id)
-  #   user_id = Participant.find(reviewer_id).user.id
-  #   topic_id = SignedUpTeam.topic_id(@assignment.id, user_id)
-  #   @assignment.number_of_current_round(topic_id)
-  #   @assignment.num_review_rounds if @assignment.get_current_stage(topic_id) == "Finished" || @assignment.get_current_stage(topic_id) == "metareview"
-  # end
 
   # gets the review score awarded based on each round of the review
 
@@ -189,7 +215,7 @@ module ReviewMappingHelper
 
   # Generalized function which takes in string parameter specifying the metric to be sorted
   def sort_reviewer_by_review_metric_desc(metric) # metric is the string value of the metric to be sorted with
-    if (metric.eql?("review_volume"))
+    if metric.eql?('review_volume')
       @reviewers.each do |r|
         # get the volume of review comments
         review_volumes = Response.volume_of_review_comments(@assignment.id, r.id)
@@ -223,10 +249,14 @@ module ReviewMappingHelper
     assignment = Assignment.find(@id)
     curr_round = assignment.try(:num_review_rounds)
     curr_response = Response.where(map_id: response_map_id, round: curr_round).first
-    answer_with_link = Answer.where(response_id: curr_response.id, question_id: question_id).first if curr_response
+    if curr_response
+      answer_with_link = Answer.where(response_id: curr_response.id, question_id: question_id).first
+    end
     comments = answer_with_link.try(:comments)
     html = ''
-    html += display_hyperlink_in_peer_review_question(comments) if comments.present? && comments.start_with?('http')
+    if comments.present? && comments.start_with?('http')
+      html += display_hyperlink_in_peer_review_question(comments)
+    end
     html.html_safe
   end
 

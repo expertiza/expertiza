@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'add TA', js: true do
   before(:each) do
     @course = create(:course, name: 'TA course')

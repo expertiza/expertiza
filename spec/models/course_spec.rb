@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe CourseTeam do
   let(:course) { build(:course, id: 1, name: 'ECE517') }
   let(:course_team1) { build(:course_team, id: 1) }

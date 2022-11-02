@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class AddBookmarkQuestionnaireToMenu < ActiveRecord::Migration[4.2]
-    def self.up
+  def self.up
     site_controller = SiteController.find_by_name('tree_display')
 
     bookmarkreview_rubrics_action = ControllerAction.find_or_create_by(name: 'goto_bookmark_reviews')
@@ -15,6 +17,6 @@ end
 
   def self.down
     menu = MenuItem.find_by_label('Bookmark Rating rubrics')
-    menu.delete if menu
+    menu&.delete
   end
 end

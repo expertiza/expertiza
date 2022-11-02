@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Removed failing test cases regarding the reviews_by_reviewer method in assignment_participant, which was removed because it was unused elsewhere in the application.
 # Committed by lburgess07 on 10/14/2020 hash: 76d145836
 describe CollusionCycle do

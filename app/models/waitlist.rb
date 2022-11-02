@@ -1,13 +1,13 @@
+# frozen_string_literal: true
+
 class Waitlist < ApplicationRecord
   def self.cancel_all_waitlists(team_id, assignment_id)
     waitlisted_topics = SignUpTopic.find_waitlisted_topics(assignment_id, team_id)
-    unless waitlisted_topics.nil?
-      waitlisted_topics.each do |waitlisted_topic|
-        entry = SignedUpTeam.find_by(topic_id: waitlisted_topic.id)
-        next if entry.nil?
+    waitlisted_topics&.each do |waitlisted_topic|
+      entry = SignedUpTeam.find_by(topic_id: waitlisted_topic.id)
+      next if entry.nil?
 
-        entry.destroy
-      end
+      entry.destroy
     end
   end
 
@@ -21,7 +21,9 @@ class Waitlist < ApplicationRecord
       next unless non_waitlisted_users.length < max_choosers
 
       first_waitlisted_team = SignedUpTeam.find_by(topic_id: signup_topic_id, is_waitlisted: true)
-      SignUpTopic.assign_to_first_waiting_team(first_waitlisted_team) if first_waitlisted_team
+      if first_waitlisted_team
+        SignUpTopic.assign_to_first_waiting_team(first_waitlisted_team)
+      end
     end
   end
 end

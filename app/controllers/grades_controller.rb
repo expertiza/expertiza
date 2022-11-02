@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GradesController < ApplicationController
   helper :file
   helper :submitted_content

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe ReputationWebServiceController do
   let(:instructor) { build(:instructor, id: 1) }
   describe 'custom test' do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateLatePolicies < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'late_policies', force: true do |t|

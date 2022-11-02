@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreatePlagiarismCheckerComparisons < ActiveRecord::Migration[4.2]
   def change
     create_table :plagiarism_checker_comparisons do |t|

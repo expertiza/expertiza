@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe QuizQuestionnaire do
   let(:quiz_questionnaire) { QuizQuestionnaire.new }
   let(:quiz_response_map) { build(:quiz_response_map) }

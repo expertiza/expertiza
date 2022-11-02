@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ###
 ###
 ### We have spent a lot of time on refactoring this file, PLEASE consult with Expertiza development team before putting code in.
@@ -41,8 +43,8 @@ class Assignment < ApplicationRecord
   REVIEW_QUESTIONNAIRES = { author_feedback: 0, metareview: 1, review: 2, teammate_review: 3 }.freeze
 
   #  Review Strategy information.
-  RS_AUTO_SELECTED = 'Auto-Selected'.freeze
-  RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'.freeze
+  RS_AUTO_SELECTED = 'Auto-Selected'
+  RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'
   REVIEW_STRATEGIES = [RS_AUTO_SELECTED, RS_INSTRUCTOR_SELECTED].freeze
   DEFAULT_MAX_REVIEWERS = 3
   DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
@@ -127,17 +129,23 @@ class Assignment < ApplicationRecord
     response_map_set = Array.new(review_mappings)
     # Reject response maps without responses
     response_map_set.reject! { |response_map| response_map.response.empty? }
-    raise 'There are no reviews to metareview at this time for this assignment.' if response_map_set.empty?
+    if response_map_set.empty?
+      raise 'There are no reviews to metareview at this time for this assignment.'
+    end
 
     # Reject reviews where the meta_reviewer was the reviewer or the contributor
     response_map_set.reject! do |response_map|
       (response_map.reviewee == metareviewer) || (response_map.reviewer == metareviewer)
     end
-    raise 'There are no more reviews to metareview for this assignment.' if response_map_set.empty?
+    if response_map_set.empty?
+      raise 'There are no more reviews to metareview for this assignment.'
+    end
 
     # Metareviewer can only metareview each review once
     response_map_set.reject! { |response_map| response_map.metareviewed_by?(metareviewer) }
-    raise 'You have already metareviewed all reviews for this assignment.' if response_map_set.empty?
+    if response_map_set.empty?
+      raise 'You have already metareviewed all reviews for this assignment.'
+    end
 
     # Reduce to the response maps with the least number of metareviews received
     min_metareviews = min_metareview(response_map_set)
@@ -151,7 +159,9 @@ class Assignment < ApplicationRecord
 
     # Pick the response map whose most recent meta_reviewer was assigned longest ago
     min_metareviews = min_metareview(response_map_set)
-    response_map_set.sort! { |a, b| a.metareview_response_maps.last.id <=> b.metareview_response_maps.last.id } if min_metareviews > 0
+    if min_metareviews > 0
+      response_map_set.sort! { |a, b| a.metareview_response_maps.last.id <=> b.metareview_response_maps.last.id }
+    end
     # The first review_map is the best to metareview
     response_map_set.first
   end
@@ -407,7 +417,9 @@ class Assignment < ApplicationRecord
     @uniq_rounds.each do |round_num|
       @uniq_response_type.each do |res_type|
         round_type = check_empty_rounds(@answers, round_num, res_type)
-        csv << [round_type, '---', '---', '---', '---', '---', '---', '---'] unless round_type.nil?
+        unless round_type.nil?
+          csv << [round_type, '---', '---', '---', '---', '---', '---', '---']
+        end
         @answers[round_num][res_type].each do |answer|
           csv << csv_row(detail_options, answer)
         end
@@ -441,12 +453,22 @@ class Assignment < ApplicationRecord
     @reviewee = Participant.find(map.reviewee_id).user if @reviewee.nil?
     reviewer = Participant.find(map.reviewer_id).user
     teams_csv << handle_nil(@reviewee.id) if detail_options['team_id'] == 'true'
-    teams_csv << handle_nil(@reviewee.name) if detail_options['team_name'] == 'true'
-    teams_csv << handle_nil(reviewer.name) if detail_options['reviewer'] == 'true'
-    teams_csv << handle_nil(answer.question.txt) if detail_options['question'] == 'true'
-    teams_csv << handle_nil(answer.question.id) if detail_options['question_id'] == 'true'
+    if detail_options['team_name'] == 'true'
+      teams_csv << handle_nil(@reviewee.name)
+    end
+    if detail_options['reviewer'] == 'true'
+      teams_csv << handle_nil(reviewer.name)
+    end
+    if detail_options['question'] == 'true'
+      teams_csv << handle_nil(answer.question.txt)
+    end
+    if detail_options['question_id'] == 'true'
+      teams_csv << handle_nil(answer.question.id)
+    end
     teams_csv << handle_nil(answer.id) if detail_options['comment_id'] == 'true'
-    teams_csv << handle_nil(answer.comments) if detail_options['comments'] == 'true'
+    if detail_options['comments'] == 'true'
+      teams_csv << handle_nil(answer.comments)
+    end
     teams_csv << handle_nil(answer.answer) if detail_options['score'] == 'true'
     teams_csv
   end
@@ -612,14 +634,16 @@ class Assignment < ApplicationRecord
                         end
     if questionnaire_ids.empty?
       AssignmentQuestionnaire.where(assignment_id: id).find_each do |aq|
-        questionnaire_ids << aq if aq.questionnaire.type == 'ReviewQuestionnaire'
+        if aq.questionnaire.type == 'ReviewQuestionnaire'
+          questionnaire_ids << aq
+        end
       end
     end
     questionnaire_ids
   end
 
   def pair_programming_enabled?
-    self.enable_pair_programming
+    enable_pair_programming
   end
 
   private

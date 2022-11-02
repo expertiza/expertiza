@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ConferenceHelper
   def is_valid_conference_assignment?
     # if assignment id is present in url the check if it's a valid conference assignment.
@@ -36,7 +38,9 @@ module ConferenceHelper
   end
 
   def create_author
-    params[:user][:name] = params[:user][:email] unless !params[:user][:name].nil? && !params[:user][:name].empty?
+    unless !params[:user][:name].nil? && !params[:user][:name].empty?
+      params[:user][:name] = params[:user][:email]
+    end
     is_author = true
     # Assign all user params for creating author using assign_user_params function
     @user = assign_user_params(is_author)

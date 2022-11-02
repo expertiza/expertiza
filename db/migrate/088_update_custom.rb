@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UpdateCustom < ActiveRecord::Migration[4.2]
   def self.up
     execute 'DELETE FROM `content_pages` where ID in (1,10)'

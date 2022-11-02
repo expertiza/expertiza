@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This test was added for E1973:
 # http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_Project_E1973._Team_Based_Reviewing
 # For this project, it was only necessary that responses be locked. If you plan on using Lock for another model,

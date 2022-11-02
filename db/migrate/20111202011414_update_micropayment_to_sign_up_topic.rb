@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UpdateMicropaymentToSignUpTopic < ActiveRecord::Migration[4.2]
   def self.up
     change_column :sign_up_topics, :micropayment, :integer, default: 0

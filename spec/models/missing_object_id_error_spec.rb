@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe MissingObjectIDError do
   describe 'missing_object_id_error' do
     it 'raises an error' do

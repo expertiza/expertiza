@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateTeamRolesetsMaps < ActiveRecord::Migration[4.2]
   def self.up
     create_table :team_rolesets_maps do |t|

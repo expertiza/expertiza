@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AuthorizationHelper
   # Notes:
   # We use session directly instead of current_role_name and the like

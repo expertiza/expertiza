@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AlterAssignments < ActiveRecord::Migration[4.2]
   def self.up
     add_column 'assignments', 'selfreview_questionnaire_id', :integer

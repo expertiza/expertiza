@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Participant do
   let(:team) { build(:assignment_team, id: 1, name: 'myTeam') }
   let(:user) { build(:student, id: 4, name: 'no name', fullname: 'no two') }
@@ -163,4 +165,3 @@ describe Participant do
     end
   end
 end
-

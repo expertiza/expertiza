@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 class MenuUpdateTreeDisplay < ActiveRecord::Migration[4.2]
   def self.up
     permission1 = Permission.find_by_name('administer assignments')
     menu = MenuItem.find_by_label('Assignment Creation')
-    menu.delete if menu
+    menu&.delete
     menu = MenuItem.find_by_label('Participants')
-    menu.delete if menu
+    menu&.delete
     menu = MenuItem.find_by_label('Questionnaires')
-    menu.delete if menu
+    menu&.delete
     menu = MenuItem.find_by_label('Courses')
-    menu.delete if menu
+    menu&.delete
 
     site_controller = SiteController.find_or_create_by(name: 'survey_deployment')
     site_controller.permission_id = permission1.id

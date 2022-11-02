@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ChangeDueDateSchemaStringDelayedJobId < ActiveRecord::Migration[4.2]
   def change
     change_table :due_dates do |t|

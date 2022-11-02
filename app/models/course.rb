@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Course < ApplicationRecord
   enum locale: Locale.code_name_to_db_encoding
   has_many :ta_mappings, dependent: :destroy
@@ -21,7 +23,9 @@ class Course < ApplicationRecord
 
   # Returns this object's submission directory
   def path
-    raise 'Path can not be created. The course must be associated with an instructor.' if instructor_id.nil?
+    if instructor_id.nil?
+      raise 'Path can not be created. The course must be associated with an instructor.'
+    end
 
     Rails.root + '/pg_data/' + FileHelper.clean_path(User.find(instructor_id).name) + '/' + FileHelper.clean_path(directory_path) + '/'
   end

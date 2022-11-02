@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # represents each row of a heatgrid-table, which is represented by the vm_question_response class.
 class VmQuestionResponseRow
   attr_reader :question_seq, :question_text, :question_id, :score_row, :weight

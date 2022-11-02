@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe PathError do
   describe 'path_error' do
     it 'raises an error' do

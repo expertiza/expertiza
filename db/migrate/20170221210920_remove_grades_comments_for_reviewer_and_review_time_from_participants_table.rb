@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RemoveGradesCommentsForReviewerAndReviewTimeFromParticipantsTable < ActiveRecord::Migration[4.2]
   def change
     remove_column :participants, :grade_for_reviewer

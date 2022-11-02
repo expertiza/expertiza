@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UnscoredQuestion < ChoiceQuestion
   def edit; end
 

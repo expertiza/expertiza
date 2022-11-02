@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Locale
   attr_reader :code_name, :display_name, :database_encoding
 

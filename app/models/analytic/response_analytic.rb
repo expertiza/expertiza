@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'analytic/score_analytic'
 module ResponseAnalytic
   def num_questions
@@ -6,7 +8,9 @@ module ResponseAnalytic
 
   #====== score =======#
   def average_score
-    return question_score_list.inject(:+) / num_questions unless num_questions == 0
+    unless num_questions == 0
+      return question_score_list.inject(:+) / num_questions
+    end
 
     0
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FileHelper
   def self.sanitize_filename(file_name)
     just_filename = File.basename(file_name)

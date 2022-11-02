@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DeadlineRight < ApplicationRecord
   NO = 1
   LATE = 2

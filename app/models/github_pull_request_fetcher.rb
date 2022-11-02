@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GithubPullRequestFetcher
   require 'http_request'
 

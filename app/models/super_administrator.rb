@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SuperAdministrator < User
   def self.get_user_list
     user_list = []

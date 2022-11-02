@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe AuthorizationHelper do
   # Set up some dummy users
   # Inspired by spec/controllers/users_controller_spec.rb

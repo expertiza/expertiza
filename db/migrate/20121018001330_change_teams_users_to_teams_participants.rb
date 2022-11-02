@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ChangeTeamsUsersToTeamsParticipants < ActiveRecord::Migration[4.2]
   def self.up
     rename_table :teams_participants, :teams_participants

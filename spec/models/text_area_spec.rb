@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe TextArea do
   let(:text_area) { create(:text_area) }
   let!(:answer) { create(:answer, comments: 'test comment') }

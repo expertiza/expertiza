@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Language do
   describe '#the name of the language' do
     it 'is settable and returnable' do

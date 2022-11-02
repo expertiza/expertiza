@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe DutiesController do
   let(:assignment) { build(:assignment, id: 1, course_id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true) }
   let(:admin) { build(:admin) }

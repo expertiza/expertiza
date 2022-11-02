@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateBmappings < ActiveRecord::Migration[4.2]
   def self.up
     if table_exists?(:bmappings) == false

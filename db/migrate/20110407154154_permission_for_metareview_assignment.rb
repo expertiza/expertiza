@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PermissionForMetareviewAssignment < ActiveRecord::Migration[4.2]
   def self.up
     controller_id = SiteController.find_by_name('review_mapping').id

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe MenuItem do
   ###
   # Use factories to `build` necessary objects.

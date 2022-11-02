@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UpdateSiteControllersForVersions < ActiveRecord::Migration[4.2]
   def self.up
     @permission = Permission.find_by_name('public actions - execute')

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Configures your navigation
 SimpleNavigation::Configuration.run do |navigation|
   # Specify a custom renderer if needed.

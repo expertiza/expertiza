@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe JoinTeamRequestsHelper do
   let(:join_team_request1) { build(:join_team_request) }
   describe '#display_request_status' do

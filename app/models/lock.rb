@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This class was added to facilitate functionality in E1973:
 # http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_Project_E1973._Team_Based_Reviewing
 # But was generalized at the behest of Dr. Gehringer.
@@ -57,11 +59,11 @@ class Lock < ApplicationRecord
   def self.lock_between?(lockable, user)
     lock = find_by(lockable_id: lockable.id, user_id: user.id)
     if lock.nil?
-      return false
+      false
     else
       lock.destroy
       create_lock(lockable, user, lock.timeout_period)
-      return true
+      true
     end
   end
 

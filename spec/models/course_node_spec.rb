@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe CourseNode do
   let(:course) { build(:course, id: 1, name: 'ECE517') }
   let(:course_node) { build(:course_node, id: 1) }

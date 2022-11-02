@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe TreeDisplayController do
   # Airbrake-1517247902792549741
   describe '#list' do

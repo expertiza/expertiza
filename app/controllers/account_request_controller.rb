@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AccountRequestController < ApplicationController
   include AuthorizationHelper
   autocomplete :user, :name
@@ -20,7 +22,7 @@ class AccountRequestController < ApplicationController
     end
   end
 
-  # TODO create_approved_user name is misleading. The tests are also wrong for this.
+  # TODO: create_approved_user name is misleading. The tests are also wrong for this.
   # Decides whether a new user should be created or not
   def create_approved_user
     # If a user isn't selected before approving or denying, they are given an error message

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SignUpSheetHelper
   # if the instructor does not specific the topic due date, it should be the same as assignment due date;
   # otherwise, it should display the topic due date.
@@ -69,7 +71,9 @@ module SignUpSheetHelper
           html += '<a href="/sign_up_sheet/delete_signup_as_instructor/' + participant.team_id.to_s + '?topic_id=' + topic.id.to_s + '"">'
           html += '<img border="0" align="middle" src="/assets/delete_icon.png" title="Drop Student"></a>'
         end
-        html += '<font color="red">(waitlisted)</font>' if participant.is_waitlisted
+        if participant.is_waitlisted
+          html += '<font color="red">(waitlisted)</font>'
+        end
         html += '<br/>'
       end
       html += 'No choosers.' unless chooser_present
@@ -96,7 +100,7 @@ module SignUpSheetHelper
 
       out_string = ''
       signed_up_topics.each_with_index do |t, i|
-        out_string += (i + 1).to_s + ". " + t.topic_name + "\r\n"
+        out_string += (i + 1).to_s + '. ' + t.topic_name + "\r\n"
       end
       out_string
     end

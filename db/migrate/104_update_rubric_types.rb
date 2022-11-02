@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UpdateRubricTypes < ActiveRecord::Migration[4.2]
   def self.up
     metareview_type = ActiveRecord::Base.connection.select_one("select * from `questionnaire_types` where name = 'Metareview'")

@@ -44,6 +44,7 @@ class SignupSheetController < ApplicationController
   def new
     @id = params[:id]
     @signup_topic = SignUpTopic.new
+    # assign the new topic to the current assignment
     @signup_topic.assignment = Assignment.find(params[:id])
     @topic = @signup_topic
   end
@@ -54,10 +55,11 @@ class SignupSheetController < ApplicationController
   # that every assignment will have only one signup sheet
   def create
     topic = SignUpTopic.where(topic_name: topic_params[:topic_name], assignment_id: params[:id]).first
+    # if the topic doesn't exist, create a new one otherwise update existing
     if topic.nil?
       setup_new_topic
     else
-      update_existing_topic topic # Required?
+      update_existing_topic topic
     end
   end
 
@@ -86,10 +88,11 @@ class SignupSheetController < ApplicationController
     @topic = SignUpTopic.find(params[:id])
   end
 
-  # updates the database tables to reflect the new values for the assignment. Used in conjunction with edit
+  # updates the topic to reflect the new values for the assignment, also updates waitlist. Used in conjunction with edit
   def update
     @topic = SignUpTopic.find(params[:id])
     if @topic
+      # update teams on the waitlist for topic based on update of max_choosers
       update_waitlist @topic
       @topic.update_attributes(topic_params)
       undo_link("The topic: \"#{@topic.topic_name}\" has been successfully updated. ")
@@ -400,6 +403,8 @@ class SignupSheetController < ApplicationController
   end
 
   def update_existing_topic(topic)
+    # This method is called as a fall-back for create, when the topic entered already exists it updates the existing
+    # Updates the waitlist for the topic based of update of max choosers
     update_waitlist topic
     topic.update_attributes(topic_params)
     redirect_to_sign_up(params[:id])
@@ -410,8 +415,10 @@ class SignupSheetController < ApplicationController
     # topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
     # there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
     # it.
+    # if no team has signed up for this topic/max choosers hasn't changed, allow update
     if SignedUpTeam.find_by(topic_id: topic.id).nil? || topic.max_choosers == topic_params[:max_choosers]
       return
+    # if max choosers has increased, remove teams from the waitlist accordingly
     elsif topic.max_choosers.to_i < topic_params[:max_choosers].to_i
       topic.update_waitlisted_users topic_params[:max_choosers]
     else

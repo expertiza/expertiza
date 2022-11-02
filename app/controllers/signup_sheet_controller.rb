@@ -359,6 +359,8 @@ class SignupSheetController < ApplicationController
     end
   end
 
+  # This method is used to support the option given to students to suggest a topic for their project
+  # If their topic is approved by the instructor, they can go ahead and switch their topic to it from whatever they were assigned previously
   def switch_original_topic_to_approved_suggested_topic
     assignment = AssignmentParticipant.find(params[:id]).assignment
     team_id = TeamsUser.team_id(assignment.id, session[:user].id)
@@ -455,6 +457,7 @@ class SignupSheetController < ApplicationController
     SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
   end
 
+  # filter topic level params from all params
   def topic_params
     params.require(:topic).permit(:topic_identifier, :category, :topic_name, :micropayment, :description, :link, :max_choosers)
   end

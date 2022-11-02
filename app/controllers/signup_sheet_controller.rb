@@ -403,7 +403,7 @@ class SignupSheetController < ApplicationController
 
   private
 
-  # Create and setup a new topic if we cannot find it 
+  # Create and setup a new topic if we cannot find it
   # Called by create
   def setup_new_topic
     set_values_for_new_topic

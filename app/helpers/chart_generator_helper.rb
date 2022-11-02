@@ -146,6 +146,5 @@ module ChartGeneratorHelper
     end
     # if no Hash object is returned, the UI handles it accordingly
   end
-
-
+  
 end

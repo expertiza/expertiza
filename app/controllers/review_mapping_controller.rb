@@ -11,7 +11,7 @@ class ReviewMappingController < ApplicationController
   helper :submitted_content
   # including the following helper to refactor the code in response_report function
   # include ReportFormatterHelper
-
+  cattr_reader :time_create_last_review_mapping_record
   @@time_create_last_review_mapping_record = nil
 
   # E1600
@@ -426,6 +426,7 @@ class ReviewMappingController < ApplicationController
                        '[or "participants" if it is an individual assignment].'
     else
       # REVIEW: mapping strategy
+      # flash[:error] = 'pass'
       automatic_review_mapping_strategy(assignment_id, participants, teams, num_student_reviews, num_submission_reviews)
     end
   end
@@ -605,9 +606,8 @@ class ReviewMappingController < ApplicationController
       increment_teams_hash(participants_with_insufficient_review_num, sorted_teams_hash, assignment_id)
 
     end
-    @@time_create_last_review_mapping_record = ReviewResponseMap
-                                               .where(reviewed_object_id: assignment_id)
-                                               .last.created_at
+    @@time_create_last_review_mapping_record = ReviewResponseMap.where(reviewed_object_id: assignment_id)
+                                                                .last.created_at
   end
 
   #   Used: to generate a random participant index

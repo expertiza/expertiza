@@ -540,6 +540,54 @@ describe ReviewMappingController do
         expect(ReviewMappingController.new.send(:generate_sorted_teams_hash, id)).to eql({})
       end
     end
+
+    context 'to test assigning reviewers for a team' do
+      it 'finds participants who have insufficient reviews and assigns reviewers to them' do
+        allow(AssignmentParticipant).to receive_message_chain(:where, :first)
+          .with(parent_id: '1', user_id: 1).with(no_args).and_return(nil)
+        allow(AssignmentParticipant).to receive(:create)
+          .with(parent_id: '1', user_id: 1, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle').and_return(participant)
+
+        allow(ReviewResponseMap).to receive_message_chain(:where, :first)
+          .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).with(no_args).and_return(nil)
+        allow(ReviewResponseMap).to receive(:create)
+          .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).and_return(review_response_map)
+        allow(ReviewResponseMap).to receive(:where).with(reviewer_id: 1, reviewed_object_id: 1)
+                                                   .and_return(:review_response_map)
+
+        allow(ReviewResponseMap).to receive(:last).with(no_args)
+                                                  .and_return(:review_response_map)
+
+        allow(ReviewResponseMap).to receive_message_chain(:where, :where, :size)
+          .with(reviewed_object_id: 1, assignment_id: 1, calibrate_to: false).with('created_at > :time', time: nil).with(no_args).and_return(0)
+
+        assignment_id = 1
+        obj_review_mapping_controller = ReviewMappingController.new
+
+        allow(ReviewResponseMap).to receive_message_chain(:where, :last)
+          .with(reviewed_object_id: 1, calibrate_to: false, created_at: ReviewMappingController.time_create_last_review_mapping_record).with(no_args).and_return(nil)
+
+        allow(ReviewResponseMap).to receive_message_chain(:where, :each)
+          .with(reviewed_object_id: assignment_id, calibrate_to: 0)
+          .with(no_args).and_return(:review_response_map)
+
+        allow(ReviewResponseMap).to receive_message_chain(:where, :last, :created_at)
+          .with(reviewed_object_id: assignment_id)
+          .with(no_args).with(no_args).and_return(nil)
+
+        participants = [participant1, participant2]
+        participants_hash = {}
+        participants.each { |participant| participants_hash[participant.id] = 0 }
+        team1 = double('AssignmentTeam')
+        team2 = double('AssignmentTeam')
+        teams = [team1, team2]
+        num_students_review = 1
+        review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, num_students_review)
+
+        puts obj_review_mapping_controller.send(:assign_reviewers_for_team, assignment, review_strategy, participants_hash)
+      end
+    end
+
   end
 
   describe '#automatic_review_mapping' do

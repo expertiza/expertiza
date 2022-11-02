@@ -526,6 +526,16 @@ describe SignupSheetController do
       end
     end
 
+    context 'when current assignment is not intelligent assignment' do
+      it 'renders signup_sheet#list page' do
+        assignment.is_intelligent = false
+        allow(Bid).to receive(:where).with(team_id: 1).and_return([double('Bid', topic_id: 1)])
+        request_params = { id: 1 }
+        get :list, params: request_params
+        expect(response).to render_template(:list)
+      end
+    end
+
     context 'when current assignment is not intelligent assignment and has submission duedate (deadline_type_id 1)' do
       it 'renders signup_sheet#list page' do
         allow(Bid).to receive(:where).with(team_id: 1).and_return([double('Bid', topic_id: 1)])

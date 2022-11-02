@@ -168,11 +168,14 @@ class SignupSheetController < ApplicationController
     return signed_up_topics
   end
 
+  # method to load deadline instance variables
   def find_topic_deadlines
     @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
     @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
   end
 
+  # method to list possible signup topics
+  # renders either list.html or intelligent_topic_selection.html
   def list
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment

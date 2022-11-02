@@ -81,8 +81,8 @@ class QuestionnairesController < ApplicationController
   # create questionnaire was removed as it wasn't being used anywhere in the latest version
 
   # Assigns corrresponding variables to questionnaire object.
-  def adding_question_variables(prv, display) # named as prv as private is a key word
-    @questionnaire.private = prv
+  def adding_question_variables(private_flag, display) 
+    @questionnaire.private = private_flag
     @questionnaire.name = params[:questionnaire][:name]
     @questionnaire.instructor_id = session[:user].id
     @questionnaire.min_question_score = params[:questionnaire][:min_question_score]

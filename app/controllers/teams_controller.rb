@@ -91,13 +91,9 @@ class TeamsController < ApplicationController
     unless @team.nil?
       @signed_up_team = SignedUpTeam.where(team_id: @team.id)
       @teams_users = TeamsUser.where(team_id: @team.id)
-
+      
+      # remove deleted team from any waitlists
       Waitlist.remove_from_waitlists(@team.id)
-
-      # @sign_up_team.destroy_all if @sign_up_team
-      # @teams_users.destroy_all if @teams_users
-      # @team.destroy if @team
-      # undo_link("The team \"#{@team.name}\" has been successfully deleted.")
 
       @sign_up_team&.destroy_all
       @teams_users&.destroy_all

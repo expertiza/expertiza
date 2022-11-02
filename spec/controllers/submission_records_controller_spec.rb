@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe SubmissionRecordsController do
   # initialize objects using factories.rb required for stubbing in test cases
   let(:super_admin) { build(:superadmin, id: 1) }
@@ -9,12 +11,12 @@ describe SubmissionRecordsController do
   let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
   let(:team) { build(:assignment_team, id: 1, name: 'team no name', assignment: assignment, users: [student], parent_id: 1) }
 
-  let(:submission_record) { build(:submission_record, id: 1, team_id: 27158, assignment_id: 1) }
+  let(:submission_record) { build(:submission_record, id: 1, team_id: 27_158, assignment_id: 1) }
 
   # Redirects to a page when index method called
   describe '#index' do
     it 'call index method' do
-      params = { team_id: 27158 }
+      params = { team_id: 27_158 }
       allow(AssignmentTeam).to receive(:find).with(any_args).and_return(team)
       allow(Assignment).to receive(:find).with(any_args).and_return(assignment)
       allow(SubmissionRecord).to receive(:where).with(any_args).and_return([submission_record])
@@ -24,7 +26,7 @@ describe SubmissionRecordsController do
 
       controller.send(:index)
       expect(controller.instance_variable_get(:@submission_records)).to eq [submission_record]
-      end
+    end
   end
 
   # To allow the functionality only if the accessing user is a super admin
@@ -69,7 +71,7 @@ describe SubmissionRecordsController do
     context 'when current user is a TA but NOT the TA of course which current assignment belongs to' do
       it 'refuses certain action' do
         stub_current_user(ta, ta.role.name, ta.role)
-        allow(TaMapping).to receive(:exists?).with(ta_id: 8, course_id: 1).and_return(false )
+        allow(TaMapping).to receive(:exists?).with(ta_id: 8, course_id: 1).and_return(false)
         expect(controller.send(:action_allowed?)).to be false
       end
     end

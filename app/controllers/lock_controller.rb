@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A controller for interacting with locks from view classes
 # The reason this was added was to ensure that a lock was released when a user left the page for
 # review responses. See app/views/response/response.html.erb

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TextField < TextResponse
   def complete(count, answer = nil)
     html = '<p style="width: 80%;">'
@@ -15,7 +17,9 @@ class TextField < TextResponse
       html = '<b>' + count.to_s + '. ' + txt + '</b>'
       html += '&nbsp;&nbsp;&nbsp;&nbsp;'
       html += answer.comments.to_s
-      html += '<BR/><BR/>' if Question.exists?(answer.question_id + 1) && Question.find(answer.question_id + 1).break_before == true
+      if Question.exists?(answer.question_id + 1) && Question.find(answer.question_id + 1).break_before == true
+        html += '<BR/><BR/>'
+      end
     else
       html = txt
       html += answer.comments

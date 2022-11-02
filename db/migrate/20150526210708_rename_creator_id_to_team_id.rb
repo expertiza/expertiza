@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RenameCreatorIdToTeamId < ActiveRecord::Migration[4.2]
   def self.up
     rename_column :signed_up_users, :creator_id, :team_id

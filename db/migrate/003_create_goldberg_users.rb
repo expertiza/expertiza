@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateGoldbergUsers < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'goldberg_users', force: true do |t|

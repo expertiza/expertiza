@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rscore do
   describe '#initialize' do
     it 'allows max, min, and avg to be accessible' do

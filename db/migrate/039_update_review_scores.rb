@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UpdateReviewScores < ActiveRecord::Migration[4.2]
   def self.up
     add_column 'review_scores', 'questionnaire_type_id', :integer

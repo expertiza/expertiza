@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BookmarkRatingQuestionnaire < Questionnaire
   after_initialize :post_initialization
   @print_name = 'Bookmark Rating Rubric'

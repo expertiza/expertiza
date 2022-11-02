@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ReviewBidsHelper
   # renders the topic row for the topics table
   # in review_bids/show.html.erb

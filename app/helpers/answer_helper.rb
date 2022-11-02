@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # E1924 Spring 2019 Addition
 
 module AnswerHelper
@@ -13,7 +15,9 @@ module AnswerHelper
     begin
       user_id_to_answers.each do |response_id, answers| # The dictionary has key [response_id] and info as "answers"
         # Feeds review_mailer (email, answers, name, assignment_name) info. Emails and then deletes answers
-        delete_answers(response_id) if review_mailer(answers[:email], answers[:answers], answers[:name], answers[:assignment_name])
+        if review_mailer(answers[:email], answers[:answers], answers[:name], answers[:assignment_name])
+          delete_answers(response_id)
+        end
       end
     rescue StandardError
       raise $ERROR_INFO
@@ -25,7 +29,9 @@ module AnswerHelper
     response_ids = []
     question_ids.each do |question|
       Answer.where(question_id: question).each do |answer| # For each of the question's answers, log the response_id if in active period
-        response_ids << answer.response_id if in_active_period(questionnaire_id, answer)
+        if in_active_period(questionnaire_id, answer)
+          response_ids << answer.response_id
+        end
       end
     end
     response_ids
@@ -42,7 +48,9 @@ module AnswerHelper
       user = Participant.find(reviewer_id).user
       answers_per_user = Answer.find_by(response_id: response_id).comments
       # For each response_id, add its info to the dictionary
-      user_id_to_answers[response_id] = { email: user.email, answers: answers_per_user, name: user.name, assignment_name: assignment_name } unless user.nil?
+      unless user.nil?
+        user_id_to_answers[response_id] = { email: user.email, answers: answers_per_user, name: user.name, assignment_name: assignment_name }
+      end
     end
     user_id_to_answers
   end
@@ -82,7 +90,9 @@ module AnswerHelper
       # There can be multiple possible review periods: If round_number is nil, all rounds of reviews use the same questionnaire.
       # If it is in any of the possible review period now, return true.
       start_dates.zip(end_dates).each do |start_date, end_date|
-        return true if start_date.due_at < time_now && end_date.due_at > time_now
+        if start_date.due_at < time_now && end_date.due_at > time_now
+          return true
+        end
       end
     end
     false

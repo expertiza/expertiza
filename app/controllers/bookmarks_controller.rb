@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BookmarksController < ApplicationController
   include AuthorizationHelper
   include Scoring
@@ -28,8 +30,12 @@ class BookmarksController < ApplicationController
   end
 
   def create
-    params[:url] = params[:url].gsub!(%r{http://}, '') if params[:url].start_with?('http://')
-    params[:url] = params[:url].gsub!(%r{https://}, '') if params[:url].start_with?('https://')
+    if params[:url].start_with?('http://')
+      params[:url] = params[:url].gsub!(%r{http://}, '')
+    end
+    if params[:url].start_with?('https://')
+      params[:url] = params[:url].gsub!(%r{https://}, '')
+    end
     begin
       Bookmark.create(url: create_bookmark_params[:url], title: create_bookmark_params[:title], description: create_bookmark_params[:description], user_id: session[:user].id, topic_id: create_bookmark_params[:topic_id])
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Your bookmark has been successfully created!', request)
@@ -90,7 +96,7 @@ class BookmarksController < ApplicationController
       ).flat_map { |r| Response.where(map_id: r.id) }
       score = assessment_score(response: responses, questions: questions)
       if score.nil?
-        return '-'
+        '-'
       else
         (score * 5.0 / 100.0).round(2)
       end
@@ -110,7 +116,7 @@ class BookmarksController < ApplicationController
       ).flat_map { |r| Response.where(map_id: r.id) }
       totalScore = aggregate_assessment_scores(responses, questions)
       if totalScore[:avg].nil?
-        return '-'
+        '-'
       else
         (totalScore[:avg] * 5.0 / 100.0).round(2)
       end

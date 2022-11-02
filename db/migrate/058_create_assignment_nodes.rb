@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateAssignmentNodes < ActiveRecord::Migration[4.2]
   def self.up
     assignments = Assignment.all

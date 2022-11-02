@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UserMapping
   def self.run!
     file = File.open('user_mapping.csv', 'w')

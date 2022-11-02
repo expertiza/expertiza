@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe BookmarkRatingResponseMap do
   let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
   let(:questionnaire1) { build(:questionnaire, id: 1, type: 'MetareviewQuestionnaire') }

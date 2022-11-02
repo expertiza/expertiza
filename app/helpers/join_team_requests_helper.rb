@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module JoinTeamRequestsHelper
   def display_request_status(join_team_request)
     status = case join_team_request.status

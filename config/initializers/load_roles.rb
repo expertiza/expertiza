@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'credentials'
 require 'menu'
 CACHED_STUDENT_MENU = YAML.load_file("#{Rails.root}/config/role_student.yml")[Rails.env]

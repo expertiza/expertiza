@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe "check 'Begin review' showing up before due date and 'Assign grade' after due date" do
   let(:team) { build(:assignment_team, id: 1, name: 'team1') }
 

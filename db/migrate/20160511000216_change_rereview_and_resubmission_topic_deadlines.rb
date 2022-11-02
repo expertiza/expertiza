@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ChangeRereviewAndResubmissionTopicDeadlines < ActiveRecord::Migration[4.2]
   def change
     resubmission_deadlines = TopicDeadline.where(deadline_type_id: 3)

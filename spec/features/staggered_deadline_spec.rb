@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'Staggered deadline test' do
   before(:each) do
     # assignment and topic

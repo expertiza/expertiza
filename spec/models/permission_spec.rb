@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Permission do
   it { should have_many(:content_pages) }
   it { should have_many(:controller_actions) }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Scoring do
   include Scoring
   let(:assignment_helper) { Class.new { extend AssignmentHelper } }

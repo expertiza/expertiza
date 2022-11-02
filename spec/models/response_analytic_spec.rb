@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ResponseAnalyticTestDummyClass
   attr_accessor :scores
   require 'analytic/response_analytic'

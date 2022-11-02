@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RenameQTypeToTypeInQuestionsTable < ActiveRecord::Migration[4.2]
   def self.up
     rename_column :questions, :q_type, :type

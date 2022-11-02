@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 describe EulaController do
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student) }
-  
+
   describe '#action_allowed?' do
     context 'when current user is student' do
       # first test to make sure student cannot do all actions
@@ -10,13 +12,13 @@ describe EulaController do
       end
       # then test to make sure student can do accept and decline actions
       it 'allows accept action' do
-        controller.params = {action: 'accept'}
+        controller.params = { action: 'accept' }
         user = student
         stub_current_user(user, user.role.name, user.role)
         expect(controller.send(:action_allowed?)).to be true
       end
       it 'allows decline action' do
-        controller.params = {action: 'decline'}
+        controller.params = { action: 'decline' }
         user = student
         stub_current_user(user, user.role.name, user.role)
         expect(controller.send(:action_allowed?)).to be true
@@ -31,7 +33,7 @@ describe EulaController do
       end
     end
   end
-  
+
   describe '#display' do
     # check it displays current page
     it 'displays current page' do
@@ -42,14 +44,14 @@ describe EulaController do
   describe '#accept' do
     # test if the is_new_user attribute is updated
     it 'updates is_new_user attribute' do
-      params = {id: 1}
-      session = {user: student}
+      params = { id: 1 }
+      session = { user: student }
       get :accept, params: params, session: session
       expect(session[:user].is_new_user).to eq(false)
     end
-    it 'accept redirects to student_task/list' do      
-      params = {id: 1}
-      session = {user: student}
+    it 'accept redirects to student_task/list' do
+      params = { id: 1 }
+      session = { user: student }
       post :accept, params: params, session: session
       expect(response).to redirect_to('/student_task/list')
     end
@@ -58,15 +60,15 @@ describe EulaController do
   describe '#decline' do
     # test if the message is displayed before redirect
     it 'displays the flash notice' do
-      params = {id: 1}
-      session = {user: student}
+      params = { id: 1 }
+      session = { user: student }
       get :decline, params: params, session: session
       expect(flash[:notice]).to eq 'Please accept the license agreement in order to use the system.'
     end
     # test if it shows the same page again
     it 'redirects to display same page' do
-      params = {id: 1}
-      session = {user: student}
+      params = { id: 1 }
+      session = { user: student }
       get :decline, params: params, session: session
       expect(response).to redirect_to('/eula/display')
     end

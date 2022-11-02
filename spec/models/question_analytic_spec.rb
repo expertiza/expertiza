@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class QuestionAnalyticTestDummyClass
   attr_accessor :txt
   require 'analytic/question_analytic'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UpdateAssignmentAddRounds < ActiveRecord::Migration[4.2]
   def self.up
     add_column :assignments, :rounds_of_reviews, :integer, default: 1

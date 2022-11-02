@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe VmUserAnswerTagging do
   let(:user1) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
   describe '#initialize' do

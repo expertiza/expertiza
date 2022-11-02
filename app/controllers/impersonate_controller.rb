@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Controller for performing Impersonate Operation in Expertiza
 
 class ImpersonateController < ApplicationController
@@ -34,7 +36,9 @@ class ImpersonateController < ApplicationController
   # Called whenever we want to enter the impersonate mode in the application.
 
   def start
-    flash[:error] = "This page doesn't take any query string." unless request.GET.empty?
+    unless request.GET.empty?
+      flash[:error] = "This page doesn't take any query string."
+    end
   end
 
   # This method is created to return the impersonated session
@@ -93,17 +97,15 @@ class ImpersonateController < ApplicationController
   def check_if_user_impersonateable
     if params[:impersonate].nil?
       user = real_user(params[:user][:name])
-      unless @original_user.can_impersonate? user
+      if @original_user.can_impersonate? user
+        overwrite_session
+      else
         @message = "You cannot impersonate '#{params[:user][:name]}'."
         temp
         AuthController.clear_user_info(session, nil)
-      else
-        overwrite_session
       end
     else
-      unless params[:impersonate][:name].empty?
-        overwrite_session
-      end
+      overwrite_session unless params[:impersonate][:name].empty?
     end
   end
 
@@ -112,43 +114,41 @@ class ImpersonateController < ApplicationController
   # checking if user impersonateable, if not throw corresponding error message
 
   def impersonate
-    begin
-      @original_user = session[:super_user] || session[:user]
-      if params[:impersonate].nil?
-        @message = "You cannot impersonate '#{params[:user][:name]}'."
-        @message = 'User name cannot be empty' if params[:user][:name].empty?
-        user = real_user(params[:user][:name])
-        check_if_user_impersonateable if user
-      elsif !params[:impersonate][:name].empty?
-        # Impersonate a new account
-        @message = "You cannot impersonate '#{params[:impersonate][:name]}'."
-        user = real_user(params[:impersonate][:name])
-        check_if_user_impersonateable if user
-      # Revert to original account when currently in the impersonated session
-      elsif !session[:super_user].nil?
-        AuthController.clear_user_info(session, nil)
-        session[:user] = session[:super_user]
-        user = session[:user]
-        session[:super_user] = nil
-      end
-      # Navigate to user's home location as the default landing page after impersonating or reverting
-      AuthController.set_current_role(user.role_id, session)
-      redirect_to action: AuthHelper.get_home_action(session[:user]),
-                  controller: AuthHelper.get_home_controller(session[:user])
-    rescue StandardError
-      flash[:error] = @message
-      redirect_back fallback_location: root_path
+    @original_user = session[:super_user] || session[:user]
+    if params[:impersonate].nil?
+      @message = "You cannot impersonate '#{params[:user][:name]}'."
+      @message = 'User name cannot be empty' if params[:user][:name].empty?
+      user = real_user(params[:user][:name])
+      check_if_user_impersonateable if user
+    elsif !params[:impersonate][:name].empty?
+      # Impersonate a new account
+      @message = "You cannot impersonate '#{params[:impersonate][:name]}'."
+      user = real_user(params[:impersonate][:name])
+      check_if_user_impersonateable if user
+    # Revert to original account when currently in the impersonated session
+    elsif !session[:super_user].nil?
+      AuthController.clear_user_info(session, nil)
+      session[:user] = session[:super_user]
+      user = session[:user]
+      session[:super_user] = nil
     end
+    # Navigate to user's home location as the default landing page after impersonating or reverting
+    AuthController.set_current_role(user.role_id, session)
+    redirect_to action: AuthHelper.get_home_action(session[:user]),
+                controller: AuthHelper.get_home_controller(session[:user])
+  rescue StandardError
+    flash[:error] = @message
+    redirect_back fallback_location: root_path
   end
 
   # This method checks if the user is in anonymized view and accordingly returns the user object associated with the parameter
 
   def real_user(name)
-    if User.anonymized_view?(session[:ip])
-      user = User.real_user_from_anonymized_name(name)
-    else
-      user = User.find_by(name: name)
-    end
-    return user
+    user = if User.anonymized_view?(session[:ip])
+             User.real_user_from_anonymized_name(name)
+           else
+             User.find_by(name: name)
+           end
+    user
   end
 end

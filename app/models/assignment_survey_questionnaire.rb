@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AssignmentSurveyQuestionnaire < SurveyQuestionnaire
   after_initialize :post_initialization
   @print_name = 'Assignment Survey'

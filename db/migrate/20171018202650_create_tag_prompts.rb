@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateTagPrompts < ActiveRecord::Migration[4.2]
   def change
     create_table :tag_prompts do |t|

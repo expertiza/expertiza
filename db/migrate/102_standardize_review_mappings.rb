@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class StandardizeReviewMappings < ActiveRecord::Migration[4.2]
   def self.up
     begin

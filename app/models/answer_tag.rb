@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AnswerTag < ApplicationRecord
   belongs_to :answer
   belongs_to :tag_prompts_deployment

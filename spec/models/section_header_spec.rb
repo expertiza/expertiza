@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe SectionHeader do
   let(:section_header) { build(:section_header) }
   describe '#complete' do

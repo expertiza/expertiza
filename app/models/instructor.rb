@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Instructor < User
   # has_many :questionnaires
   has_many :questionnaires, dependent: :nullify
@@ -29,7 +31,9 @@ class Instructor < User
     ta_ids = []
     courses.each do |course|
       ta_mappings = TaMapping.where(course_id: course.id)
-      ta_mappings.each { |mapping| ta_ids << mapping.ta_id } unless ta_mappings.empty?
+      unless ta_mappings.empty?
+        ta_mappings.each { |mapping| ta_ids << mapping.ta_id }
+      end
     end
     ta_ids
   end
@@ -50,7 +54,9 @@ class Instructor < User
       next if assignment_participants.empty?
 
       assignment_participants.each do |participant|
-        user_list << participant.user if user.role.has_all_privileges_of?(participant.user.role)
+        if user.role.has_all_privileges_of?(participant.user.role)
+          user_list << participant.user
+        end
       end
     end
     user_list

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Credentials
   attr_accessor :role_id, :updated_at, :role_ids
   attr_accessor :permission_ids

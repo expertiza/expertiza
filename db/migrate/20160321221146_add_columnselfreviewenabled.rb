@@ -1,4 +1,6 @@
-#E1600
+# frozen_string_literal: true
+
+# E1600
 class AddColumnselfreviewenabled < ActiveRecord::Migration[4.2]
   def self.up
     add_column :assignments, :is_selfreview_enabled, :boolean

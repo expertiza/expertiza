@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_support/time_with_zone'
 
 class AssignmentForm
@@ -16,7 +18,9 @@ class AssignmentForm
     @assignment = Assignment.new(args[:assignment])
     if args[:assignment].nil?
       @assignment.course = Course.find(args[:parent_id]) if args[:parent_id]
-      @assignment.instructor = @assignment.course.instructor if @assignment.course
+      if @assignment.course
+        @assignment.instructor = @assignment.course.instructor
+      end
       @assignment.max_team_size = DEFAULT_MAX_TEAM_SIZE
     end
     @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
@@ -61,10 +65,16 @@ class AssignmentForm
       attributes[:assignment][:late_policy_id] = nil
     end
     update_assignment(attributes[:assignment])
-    update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
-    update_assignment_questionnaires(attributes[:topic_questionnaire]) unless @has_errors || attributes[:assignment][:vary_by_topic?] == 'false'
+    unless @has_errors
+      update_assignment_questionnaires(attributes[:assignment_questionnaire])
+    end
+    unless @has_errors || attributes[:assignment][:vary_by_topic?] == 'false'
+      update_assignment_questionnaires(attributes[:topic_questionnaire])
+    end
     update_due_dates(attributes[:due_date], user) unless @has_errors
-    update_assigned_badges(attributes[:badge], attributes[:assignment]) unless @has_errors
+    unless @has_errors
+      update_assigned_badges(attributes[:badge], attributes[:assignment])
+    end
     add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck])
     # delete the old queued items and recreate new ones if the assignment has late policy.
     if attributes[:due_date] && !@has_errors && has_late_policy
@@ -103,7 +113,9 @@ class AssignmentForm
 
         questionnaire_type = Questionnaire.find(attr[:questionnaire_id]).type
         topic_id = attr[:topic_id] if attr.key?(:topic_id)
-        duty_id = attr[:duty_id] if attr.key?(:duty_id) # if duty_id is present in the attributes, save it.
+        if attr.key?(:duty_id)
+          duty_id = attr[:duty_id]
+        end # if duty_id is present in the attributes, save it.
         aq = assignment_questionnaire(questionnaire_type, attr[:used_in_round], topic_id, duty_id)
         if aq.id.nil?
           unless aq.save
@@ -134,30 +146,28 @@ class AssignmentForm
 
   # s required by answer tagging
   def update_tag_prompt_deployments(attributes)
-    unless attributes.nil?
-      attributes.each do |key, value|
-        # We need to use destroy_all to delete all the dependents also.
-        TagPromptDeployment.where(id: value['deleted']).destroy_all if value.key?('deleted')
-        next unless value.key?('tag_prompt')
+    # We need to use destroy_all to delete all the dependents also.
+    attributes&.each do |key, value|
+      # We need to use destroy_all to delete all the dependents also.
+      if value.key?('deleted')
+        TagPromptDeployment.where(id: value['deleted']).destroy_all
+      end
+      next unless value.key?('tag_prompt')
 
-        (0..value['tag_prompt'].count - 1).each do |i|
-          tag_dep = nil
-          if !((value['id'][i] == 'undefined') || (value['id'][i] == 'null') || value['id'][i].nil?)
-            tag_dep = TagPromptDeployment.find(value['id'][i])
-            if tag_dep
-              tag_dep.update(assignment_id: @assignment.id,
-                             questionnaire_id: key,
-                             tag_prompt_id: value['tag_prompt'][i],
-                             question_type: value['question_type'][i],
-                             answer_length_threshold: value['answer_length_threshold'][i])
-            end
-          else
-            TagPromptDeployment.new(assignment_id: @assignment.id,
-                                    questionnaire_id: key,
-                                    tag_prompt_id: value['tag_prompt'][i],
-                                    question_type: value['question_type'][i],
-                                    answer_length_threshold: value['answer_length_threshold'][i]).save
-          end
+      (0..value['tag_prompt'].count - 1).each do |i|
+        if !((value['id'][i] == 'undefined') || (value['id'][i] == 'null') || value['id'][i].nil?)
+          tag_dep = TagPromptDeployment.find(value['id'][i])
+          tag_dep&.update(assignment_id: @assignment.id,
+                          questionnaire_id: key,
+                          tag_prompt_id: value['tag_prompt'][i],
+                          question_type: value['question_type'][i],
+                          answer_length_threshold: value['answer_length_threshold'][i])
+        else
+          TagPromptDeployment.new(assignment_id: @assignment.id,
+                                  questionnaire_id: key,
+                                  tag_prompt_id: value['tag_prompt'][i],
+                                  question_type: value['question_type'][i],
+                                  answer_length_threshold: value['answer_length_threshold'][i]).save
         end
       end
     end
@@ -198,7 +208,9 @@ class AssignmentForm
   def update_assigned_badges(badge, assignment)
     if assignment && badge
       AssignmentBadge.where(assignment_id: assignment[:id]).map(&:id).each do |assigned_badge_id|
-        AssignmentBadge.delete(assigned_badge_id) unless badge[:id].include?(assigned_badge_id)
+        unless badge[:id].include?(assigned_badge_id)
+          AssignmentBadge.delete(assigned_badge_id)
+        end
       end
       badge[:id].each do |badge_id|
         AssignmentBadge.where(badge_id: badge_id[0], assignment_id: assignment[:id]).first_or_create
@@ -217,9 +229,13 @@ class AssignmentForm
       delayed_job_id = add_delayed_job(@assignment, deadline_type, due_date, diff_btw_time_left_and_threshold)
       due_date.update_attribute(:delayed_job_id, delayed_job_id)
       # If the deadline type is review, add a delayed job to drop outstanding review
-      add_delayed_job(@assignment, 'drop_outstanding_reviews', due_date, min_left) if deadline_type == 'review'
+      if deadline_type == 'review'
+        add_delayed_job(@assignment, 'drop_outstanding_reviews', due_date, min_left)
+      end
       # If the deadline type is team_formation, add a delayed job to drop one member team
-      next unless (deadline_type == 'team_formation') && @assignment.team_assignment?
+      unless (deadline_type == 'team_formation') && @assignment.team_assignment?
+        next
+      end
 
       add_delayed_job(@assignment, 'drop_one_member_topics', due_date, min_left)
     end
@@ -238,35 +254,45 @@ class AssignmentForm
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, duty_id: duty_id)
       assignment_questionnaires.each do |aq|
         # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+        if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+          return aq
+        end
       end
     elsif @assignment.vary_by_round? && @assignment.vary_by_topic?
       # Get all AQs for the assignment and specified round number and topic
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number, topic_id: topic_id)
       assignment_questionnaires.each do |aq|
         # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+        if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+          return aq
+        end
       end
     elsif @assignment.vary_by_round?
       # Get all AQs for the assignment and specified round number by round #
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number)
       assignment_questionnaires.each do |aq|
         # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+        if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+          return aq
+        end
       end
     elsif @assignment.vary_by_topic?
       # Get all AQs for the assignment and specified round number by topic
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, topic_id: topic_id)
       assignment_questionnaires.each do |aq|
         # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+        if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+          return aq
+        end
       end
     else
       # Get all AQs for the assignment
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
       assignment_questionnaires.each do |aq|
         # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+        if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+          return aq
+        end
       end
     end
 
@@ -293,7 +319,9 @@ class AssignmentForm
 
   # Find a questionnaire for the given AQ and questionnaire type
   def questionnaire(assignment_questionnaire, questionnaire_type)
-    return Object.const_get(questionnaire_type).new if assignment_questionnaire.nil?
+    if assignment_questionnaire.nil?
+      return Object.const_get(questionnaire_type).new
+    end
 
     questionnaire = Questionnaire.find_by(id: assignment_questionnaire.questionnaire_id)
     return questionnaire unless questionnaire.nil?
@@ -351,7 +379,7 @@ class AssignmentForm
 
   # create a node for the assignment
   def create_assignment_node
-    @assignment.create_node unless @assignment.nil?
+    @assignment&.create_node
   end
 
   # NOTE: many of these functions actually belongs to other models
@@ -362,7 +390,9 @@ class AssignmentForm
   end
 
   def staggered_deadline
-    @assignment.staggered_deadline = false if @assignment.staggered_deadline.nil?
+    if @assignment.staggered_deadline.nil?
+      @assignment.staggered_deadline = false
+    end
   end
 
   def availability_flag
@@ -374,11 +404,15 @@ class AssignmentForm
   end
 
   def reviews_visible_to_all
-    @assignment.reviews_visible_to_all = false if @assignment.reviews_visible_to_all.nil?
+    if @assignment.reviews_visible_to_all.nil?
+      @assignment.reviews_visible_to_all = false
+    end
   end
 
   def review_assignment_strategy
-    @assignment.review_assignment_strategy = '' if @assignment.review_assignment_strategy.nil?
+    if @assignment.review_assignment_strategy.nil?
+      @assignment.review_assignment_strategy = ''
+    end
   end
 
   def require_quiz
@@ -403,7 +437,9 @@ class AssignmentForm
     if simicheck_delay.to_i >= 0
       duedates = AssignmentDueDate.where(parent_id: @assignment.id)
       duedates.each do |due_date|
-        next if DeadlineType.find(due_date.deadline_type_id).name != 'submission'
+        if DeadlineType.find(due_date.deadline_type_id).name != 'submission'
+          next
+        end
 
         enqueue_simicheck_task(due_date, simicheck_delay)
       end
@@ -423,7 +459,9 @@ class AssignmentForm
     new_assign.update_attribute('name', 'Copy of ' + new_assign.name)
     new_assign.update_attribute('created_at', Time.now)
     new_assign.update_attribute('updated_at', Time.now)
-    new_assign.update_attribute('directory_path', new_assign.directory_path + '_copy') if new_assign.directory_path.present?
+    if new_assign.directory_path.present?
+      new_assign.update_attribute('directory_path', new_assign.directory_path + '_copy')
+    end
     new_assign.copy_flag = true
     if new_assign.save
       Assignment.record_timestamps = true

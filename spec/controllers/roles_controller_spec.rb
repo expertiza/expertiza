@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe RolesController do
   let(:super_admin) { build(:superadmin, id: 1, role_id: 5) }
   let(:student) { build(:student, id: 1, role_id: 1) }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe QuestionnaireTypeNode do
   let(:questionnaire_type_node) { build(:questionnaire_type_node) }
   let(:questionnaire) { build(:questionnaire) }

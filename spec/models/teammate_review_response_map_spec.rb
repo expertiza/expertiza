@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe TeammateReviewResponseMap do
   let(:questionnaire) { Questionnaire.new name: 'abc', private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234 }
   let(:assignment_questionnaire1) { build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 2, duty_id: 1) }

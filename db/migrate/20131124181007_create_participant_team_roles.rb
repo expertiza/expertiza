@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateParticipantTeamRoles < ActiveRecord::Migration[4.2]
   def self.up
     create_table :participant_team_roles do |t|

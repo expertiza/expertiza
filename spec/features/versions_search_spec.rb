@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'is able show search logs' do
   it 'admin must be able to search logs' do
     admin = create(:admin, id: 5)

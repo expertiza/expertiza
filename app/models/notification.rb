@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Notification < ApplicationRecord
   validates :subject, presence: true
   validates :description, presence: true

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 describe ReportsController do
   let(:assignment) { double('Assignment', id: 1) }

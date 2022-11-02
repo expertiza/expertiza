@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe SelfReviewResponseMap do
   let(:assignment) { build(:assignment, id: 1) }
   let(:assignment_questionnaire1) { build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 1) }

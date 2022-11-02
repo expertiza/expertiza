@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Assessment360Controller < ApplicationController
   include GradesHelper
   include AuthorizationHelper
@@ -67,9 +69,13 @@ class Assessment360Controller < ApplicationController
   def overall_review_count(assignments, overall_teammate_review_count, overall_meta_review_count)
     assignments.each do |assignment|
       temp_count = overall_teammate_review_count[assignment.id]
-      overall_teammate_review_count[assignment.id] = 1 if temp_count.nil? || temp_count.zero?
+      if temp_count.nil? || temp_count.zero?
+        overall_teammate_review_count[assignment.id] = 1
+      end
       temp_count = overall_meta_review_count[assignment.id]
-      overall_meta_review_count[assignment.id] = 1 if temp_count.nil? || temp_count.zero?
+      if temp_count.nil? || temp_count.zero?
+        overall_meta_review_count[assignment.id] = 1
+      end
     end
   end
 
@@ -161,8 +167,12 @@ class Assessment360Controller < ApplicationController
                                review_info_per_stu)
     # If a student has not taken an assignment or if they have not received any grade for the same,
     # assign it as 0 instead of leaving it blank. This helps in easier calculation of overall grade
-    overall_review_grade_hash[assignment.id] = 0 unless overall_review_grade_hash.key?(assignment.id)
-    overall_review_count_hash[assignment.id] = 0 unless overall_review_count_hash.key?(assignment.id)
+    unless overall_review_grade_hash.key?(assignment.id)
+      overall_review_grade_hash[assignment.id] = 0
+    end
+    unless overall_review_count_hash.key?(assignment.id)
+      overall_review_count_hash[assignment.id] = 0
+    end
     grades = 0
     # Check if they person has gotten any review for the assignment
     if reviews.count > 0

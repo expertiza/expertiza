@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe AssignmentForm do
   let(:assignment) { build(:assignment, id: 1) }
   let(:due_date) { build(:assignment_due_date) }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'analytic/question_analytic'
 module QuestionnaireAnalytic
   # return all possible question types

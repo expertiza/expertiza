@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe QuizAssignment do
   let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
   let(:instructor) { build(:instructor, id: 6) }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe TagPromptDeployment do
   let(:tag_dep) { TagPromptDeployment.new id: 1, tag_prompt: tp, tag_prompt_id: 1, question_type: 'Criterion', answer_length_threshold: 5, questionnaire: questionnaire, assignment: assignment }
   let(:tag_dep1) { TagPromptDeployment.new id: 1, tag_prompt: tp, tag_prompt_id: 1, question_type: 'Criterion', answer_length_threshold: nil, assignment_id: 1, assignment: assignment, questionnaire: questionnaire }

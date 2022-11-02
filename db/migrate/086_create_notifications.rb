@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateNotifications < ActiveRecord::Migration[4.2]
   def self.up
     create_table :notification_limits do |t|

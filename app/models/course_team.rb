@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CourseTeam < Team
   belongs_to :course, class_name: 'Course', foreign_key: 'parent_id'
 
@@ -41,7 +43,9 @@ class CourseTeam < Team
 
   # Import from csv
   def self.import(row, course_id, options)
-    raise ImportError, 'The course with the id "' + course_id.to_s + "\" was not found. <a href='/courses/new'>Create</a> this course?" if Course.find(course_id).nil?
+    if Course.find(course_id).nil?
+      raise ImportError, 'The course with the id "' + course_id.to_s + "\" was not found. <a href='/courses/new'>Create</a> this course?"
+    end
 
     @course_team = prototype
     Team.import(row, course_id, options, @course_team)
@@ -63,7 +67,9 @@ class CourseTeam < Team
 
   # Add member to the course team
   def add_member(user, _id = nil)
-    raise "The user \"#{user.name}\" is already a member of the team, \"#{name}\"" if user?(user)
+    if user?(user)
+      raise "The user \"#{user.name}\" is already a member of the team, \"#{name}\""
+    end
 
     t_user = TeamsUser.create(user_id: user.id, team_id: id)
     parent = TeamNode.find_by(node_object_id: id)

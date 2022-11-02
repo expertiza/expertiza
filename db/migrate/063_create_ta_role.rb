@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateTaRole < ActiveRecord::Migration[4.2]
   def self.up
     parent = Role.find_by_name('Student')

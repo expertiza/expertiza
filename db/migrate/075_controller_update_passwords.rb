@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 class ControllerUpdatePasswords < ActiveRecord::Migration[4.2]
   def self.up
     controller = SiteController.find_by_name('auth')
     if controller
       action = ControllerAction.where(name: 'forgotten', site_controller_id: controller.id).first
-      action.destroy if action
+      action&.destroy
     end
 
     permission = Permission.find_by_name('public actions - execute')

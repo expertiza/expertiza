@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Waitlist do
   let(:topic1) { build(:topic, id: 1) }
   let(:topic2) { build(:topic, id: 2) }

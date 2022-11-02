@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AlterMaxTeamSize
   def self.run!
     improper_assignments = Assignment.all(conditions: 'max_team_size = 0')

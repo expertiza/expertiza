@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'csv'
 
 module ImportTopicsHelper
@@ -6,8 +8,12 @@ module ImportTopicsHelper
     attributes['topic_identifier'] = row_hash[:topic_identifier].strip
     attributes['topic_name'] = row_hash[:topic_name].strip
     attributes['max_choosers'] = row_hash[:max_choosers].strip
-    attributes['category'] = row_hash[:category].strip unless row_hash[:category].nil?
-    attributes['description'] = row_hash[:description].strip unless row_hash[:description].nil?
+    unless row_hash[:category].nil?
+      attributes['category'] = row_hash[:category].strip
+    end
+    unless row_hash[:description].nil?
+      attributes['description'] = row_hash[:description].strip
+    end
     attributes['link'] = row_hash[:link].strip unless row_hash[:link].nil?
     attributes
   end

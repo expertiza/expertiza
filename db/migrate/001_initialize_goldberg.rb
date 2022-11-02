@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class InitializeGoldberg < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'goldberg_permissions', force: true do |t|

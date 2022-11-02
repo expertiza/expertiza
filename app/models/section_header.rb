@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SectionHeader < QuestionnaireHeader
   def complete(_count, _answer = nil)
     html = '<b style="color: #986633; font-size: x-large">' + txt + '</b><br/><br/>'

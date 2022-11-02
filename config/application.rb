@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.expand_path('boot', __dir__)
 require 'net/https'
 require 'csv'
@@ -20,11 +22,11 @@ module Expertiza
     # setting the default ssl setting to false
     config.use_ssl = false
     # Configure the default encoding used in templates for Ruby 1.9.
-    config.encoding = "utf-8"
-    #When you are ready, you can opt into the new behavior and remove the deprecation warning by adding following configuration to your config/application.rb
-    #config.active_record.raise_in_transactional_callbacks = true
+    config.encoding = 'utf-8'
+    # When you are ready, you can opt into the new behavior and remove the deprecation warning by adding following configuration to your config/application.rb
+    # config.active_record.raise_in_transactional_callbacks = true
     # Configure sensitive parameters which will be filtered from the log file.
-    config.filter_parameters += [:password, :password_confirmation, :password, :password_confirmation]
+    config.filter_parameters += %i[password password_confirmation password password_confirmation]
     # config.active_record.whitelist_attributes = false # need protected_attributes gem
     config.autoload_paths << Rails.root.join('lib', '{**}')
     config.eager_load_paths << Rails.root.join('lib')

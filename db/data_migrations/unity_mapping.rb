@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UnityMapping
   def self.run!
     file = File.open('unity_mapping.csv', 'w')

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe ConferenceController do
   let(:admin) { build(:admin, id: 3) }
   let(:super_admin) { build(:superadmin) }

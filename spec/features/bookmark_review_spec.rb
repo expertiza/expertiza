@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'bookmark review testing' do
   let(:bookmark_rating_response_map) { build(:review_response_map, type: 'BookmarkRatingResponseMap') }
   before(:each) do

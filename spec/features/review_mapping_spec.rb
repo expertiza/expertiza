@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 def login_and_assign_reviewer(user, assignment_id, student_num, submission_num)
   login_as(user)
   visit "/assignments/#{assignment_id}/edit"

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'peer review testing' do
   # User first and second are on AssignmentTeam first
   # User third is on AssignmentTeam second

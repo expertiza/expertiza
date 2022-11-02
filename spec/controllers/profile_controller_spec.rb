@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe ProfileController do
@@ -67,8 +69,7 @@ describe ProfileController do
             id: 1,
             no_show_action: 'not_show_actions',
             assignment_questionnaire: { 'assignment_id' => '1', 'questionnaire_id' => '666', 'dropdown' => 'true',
-                                      'questionnaire_weight' => '0', 'notification_limit' => '15', 'used_in_round' => '1' 
-                                      }
+                                        'questionnaire_weight' => '0', 'notification_limit' => '15', 'used_in_round' => '1' }
           }
         }
         post :update, params: params
@@ -83,7 +84,7 @@ describe ProfileController do
         stub_current_user(instructor1, instructor1.role.name, instructor1.role)
         allow(instructor1).to receive(:update_attributes).with(any_args).and_return(false)
         params = {
-          user: { 
+          user: {
             id: 1
           }
         }
@@ -92,6 +93,5 @@ describe ProfileController do
         expect(response).to redirect_to('/profile/edit')
       end
     end
-
   end
 end

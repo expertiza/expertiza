@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddNewMappingStrategy < ActiveRecord::Migration[4.2]
   def self.up
     execute "INSERT INTO mapping_strategies (`id`, `name`) VALUES

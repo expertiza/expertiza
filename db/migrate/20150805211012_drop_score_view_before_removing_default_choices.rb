@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DropScoreViewBeforeRemovingDefaultChoices < ActiveRecord::Migration[4.2]
   def change
     execute <<-SQL

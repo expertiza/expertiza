@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MenuItem < ApplicationRecord
   attr_accessor :controller_action, :content_page
 
@@ -72,7 +74,9 @@ class MenuItem < ApplicationRecord
       if item.controller_action_id.to_i > 0
         item.controller_action = ControllerAction.find(item.controller_action_id)
         if perms
-          items << item if perms.key?(item.controller_action.effective_permission_id)
+          if perms.key?(item.controller_action.effective_permission_id)
+            items << item
+          end
         else
           items << item
         end

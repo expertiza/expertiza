@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :db do
   desc 'Outputs the current database schema diagram to ./db'
   task :diagram do
@@ -12,7 +14,7 @@ namespace :db do
 
       `mysqldump -u root -d pg_development #{password_args} > ./db/tmp_schema.sql`
       `sqlt-graph -f MySQL -o ./db/pg_development.png -t png db/tmp_schema.sql`
-    rescue
+    rescue StandardError
       nil
     else
     ensure

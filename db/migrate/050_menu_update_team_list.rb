@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MenuUpdateTeamList < ActiveRecord::Migration[4.2]
   def self.up
     item = MenuItem.find_by_label('Create team')

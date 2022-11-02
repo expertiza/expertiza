@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EulaController < ApplicationController
   include AuthorizationHelper
 

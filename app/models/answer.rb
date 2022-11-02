@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'analytic/score_analytic'
 
 class Answer < ApplicationRecord

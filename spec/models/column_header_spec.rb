@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe ColumnHeader do
   describe '#complete' do
     it 'returns the header' do

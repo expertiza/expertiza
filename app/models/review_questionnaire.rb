@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ReviewQuestionnaire < Questionnaire
   after_initialize :post_initialization
   @print_name = 'Review Rubric'
@@ -31,7 +33,9 @@ class ReviewQuestionnaire < Questionnaire
         next if map.response.empty?
 
         map.response.each do |response|
-          responses << response if response.round == round && response.is_submitted
+          if response.round == round && response.is_submitted
+            responses << response
+          end
         end
       end
       # responses = Response.find(:all, :include => :map, :conditions => ['reviewee_id = ? and type = ?',participant.id, self.to_s])

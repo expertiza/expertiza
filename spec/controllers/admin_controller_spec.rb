@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe AdminController do
   let(:admin1) { build(:admin, id: 3, role_id: 4, parent_id: 1, name: 'Administrator1') }
   let(:admin2) { build(:admin, id: 4, role_id: 4, parent_id: 1, name: 'Administrator2') }

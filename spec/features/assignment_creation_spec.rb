@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 def questionnaire_options(type)
   questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', session[:user].id]).order('name')
   options = []

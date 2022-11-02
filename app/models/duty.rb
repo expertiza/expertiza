@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Duty < ApplicationRecord
   belongs_to :assignment
   # validates name with format matching regex, length to be at least 3 and

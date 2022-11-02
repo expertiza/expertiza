@@ -58,8 +58,10 @@
     <tbody>
 
     <!-- Set the review data and row span for each reviewer -->
-    <% sort_reviewer_by_review_volume_desc.each_with_index do |reviewer, index| %>
-      <% @response_maps, @rspan = get_data_for_review_report(@id, reviewer.id, @type) %>
+    <% sort_reviewer_by_review_metric_desc("review_volume").each_with_index do |reviewer, index| %>
+      <% @rspan = rspan_data_for_review_report(@id, reviewer.id, @type) %>
+      <% @response_maps = responsemaps_data_for_review_report(@id, reviewer.id, @type) %>
+
       <tr>
         <% unless reviewer.id == 1 %>
           <% user = Participant.find(reviewer.id).user %>
@@ -83,8 +85,8 @@
           <td align = 'left'>
           <% @response_maps.each_with_index do |reviewer_map, index| %>
             <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
-            <% team_name_color = get_team_color(reviewer_map) %>
-            <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, reviewer_map.response, reviewer_map.reviewee_id, session[:ip]) %>
+            <% team_name_color = team_color(reviewer_map) %>
+            <% team_reviewed_link_name = team_reviewed_link_name(@assignment.max_team_size, reviewer_map.response, reviewer_map.reviewee_id, session[:ip]) %>
               <% if Team.where(id: reviewer_map.reviewee_id).length > 0 %>
                 <!--Team reviewed-->
                 <% if index == 0 %>
@@ -101,7 +103,6 @@
                         <% end %>
                 <% end %>
                     <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => reviewer_map.reviewee_id, :id2 => reviewer_map.id, :assignment_id=>@id %>
-                    <%= list_review_submissions(reviewer.id, reviewer_map.reviewee_id, reviewer_map.id) %>
                     <!--Hard-coded Dr.Kidd's question in order to display link.-->
                     <!--later we can create a hyperlink question type to deal with this situation.-->
                     <%= list_hyperlink_submission(reviewer_map.id, 5386) if Assignment.find_by(id: @id.to_i).try(:course).try(:instructor).try(:name) == 'Jkidd' %>

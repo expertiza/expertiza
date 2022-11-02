@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe CourseSurveyResponseMap do
   let(:participant) { build(:participant, user_id: 1, user: build(:student, name: 'Jane', fullname: 'Doe, Jane', id: 1)) }
   let(:course_survey_questionnaire) { CourseSurveyQuestionnaire.new id: 985, name: 'course_survey', private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234 }

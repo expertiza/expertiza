@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe AssignmentsController do
   let(:assignment) do
     build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true, directory_path: 'test_assignment',

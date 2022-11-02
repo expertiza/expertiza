@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DropQuizResponseTable < ActiveRecord::Migration[4.2]
   def self.up
     drop_table :quiz_responses

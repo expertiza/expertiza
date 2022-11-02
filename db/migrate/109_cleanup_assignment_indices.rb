@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CleanupAssignmentIndices < ActiveRecord::Migration[4.2]
   # add/remove indices and foreign keys when appropriate
   def self.up

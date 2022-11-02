@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class VmTagPromptAnswer
   def initialize(answer, tag_prompt, tag_dep)
     @answer = answer

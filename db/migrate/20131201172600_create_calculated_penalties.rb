@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateCalculatedPenalties < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'calculated_penalties', force: true do |t|

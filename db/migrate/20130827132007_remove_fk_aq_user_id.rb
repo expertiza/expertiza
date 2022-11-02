@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RemoveFkAqUserId < ActiveRecord::Migration[4.2]
   def self.up
     execute 'alter table assignment_questionnaires drop foreign key fk_aq_user_id;'

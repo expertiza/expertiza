@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AnswerTagsController < ApplicationController
   include AuthorizationHelper
 
@@ -16,12 +18,18 @@ class AnswerTagsController < ApplicationController
     @tag_prompts = []
 
     tag_deployments = TagPromptDeployment.all
-    tag_deployments = tag_deployments.where(assignment_id: params[:assignment_id]) if params.key?(:assignment_id)
-    tag_deployments = tag_deployments.where(questionnaire_id: params[:questionnaire_id]) if params.key?(:questionnaire_id)
+    if params.key?(:assignment_id)
+      tag_deployments = tag_deployments.where(assignment_id: params[:assignment_id])
+    end
+    if params.key?(:questionnaire_id)
+      tag_deployments = tag_deployments.where(questionnaire_id: params[:questionnaire_id])
+    end
 
     tag_deployments.each do |tag_dep|
       stored_tags_records = AnswerTag.where(tag_prompt_deployment_id: tag_dep.id)
-      stored_tags_records = stored_tags_records.where(user_id: params[:user_id]) if params.key?(:user_id)
+      if params.key?(:user_id)
+        stored_tags_records = stored_tags_records.where(user_id: params[:user_id])
+      end
       stored_tags_records.each do |stored_tag|
         @tag_prompts.append stored_tag
       end

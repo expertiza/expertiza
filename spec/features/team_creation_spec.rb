@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 xdescribe 'Team Creation' do
   before(:each) do
     create(:assignment)

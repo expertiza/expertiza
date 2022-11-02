@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 
 gem 'rails', '= 5.1.0.rc2'
@@ -24,7 +26,7 @@ gem 'coffee-rails'
 gem 'coveralls', require: false
 gem 'danger', git: 'https://github.com/Winbobob/danger.git', ref: '1ccfed23f809a1e5c46e2533cfd7a3138f6cd821', require: false
 gem 'delayed_job_active_record', '4.1.4'
-gem 'dotenv-rails', :require => 'dotenv/rails-now'
+gem 'dotenv-rails', require: 'dotenv/rails-now'
 gem 'dynamic_form'
 gem 'edavis10-ruby-web-search'
 gem 'engtagger'
@@ -50,11 +52,13 @@ gem 'open-uri-cached'
 gem 'paper_trail'
 gem 'pragmatic_segmenter'
 gem 'rails4-autocomplete'
+gem 'railties', '5.1.0.rc2'
 gem 'rake'
 gem 'rb-readline'
 gem 'react-rails'
 gem 'recaptcha', require: 'recaptcha/rails'
 gem 'RedCloth'
+gem 'redis-actionpack', '5.0.1'
 gem 'redis-namespace'
 gem 'redis-rails', '5.0.1'
 gem 'rest-client'
@@ -76,8 +80,6 @@ gem 'tinymce-rails'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
-gem 'railties', '5.1.0.rc2'
-gem 'redis-actionpack', '5.0.1'
 
 group :development do
   gem 'daemons'
@@ -89,15 +91,15 @@ end
 
 group :test do
   gem 'database_cleaner'
-  gem "factory_bot_rails", '4.8.2'
+  gem 'factory_bot_rails', '4.8.2'
   gem 'geckodriver-helper', '~> 0.0.3'
   gem 'gherkin'
   gem 'guard-rails'
   gem 'guard-rspec'
   gem 'launchy'
-  gem 'rspec-rails', '4.1.2'
-  gem 'rails-controller-testing'
   gem 'puma'
+  gem 'rails-controller-testing'
+  gem 'rspec-rails', '4.1.2'
   gem 'shoulda'
 end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'helpers/assignment_creation_helper'
 
 describe 'Assignment creation topics tab', js: true do

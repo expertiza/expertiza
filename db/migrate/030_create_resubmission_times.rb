@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateResubmissionTimes < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'resubmission_times', force: true do |t|

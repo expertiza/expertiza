@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Rscore
   attr_accessor :my_max, :my_min, :my_avg, :my_type
   # def initialize(max = 0.0, min = 0.0, avg = 0.0, type = nil)

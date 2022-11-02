@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ControllerUpdateCoursesUsers < ActiveRecord::Migration[4.2]
   def self.up
     permission1 = Permission.find_or_create_by(name: 'administer courses')

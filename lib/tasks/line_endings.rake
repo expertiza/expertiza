@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 desc 'Convert line endings to unix for all files under the current directory'
 task :alldos2unix do
   `find ./*`.split("\n").each do |str|

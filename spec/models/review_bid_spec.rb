@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe ReviewBid do
   let(:bid1) { build(:review_bid, priority: 3, participant_id: 7601, signuptopic_id: 123, assignment_id: 2085, updated_at: '2018-01-01 00:00:00') }
   let(:bid2) { build(:review_bid, priority: 2, participant_id: '7602', signuptopic_id: 124, assignment_id: 2086) }

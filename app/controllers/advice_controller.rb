@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AdviceController < ApplicationController
   # Advice_controller first checks whether current user has TA privileges or not by implementing action_allowed? method. Secondly it sets the number of advices based on score and sort it in descending order. Then it checks four conditions for the advices.
   # 1. If number of advices is not equal to given advices
@@ -16,7 +18,7 @@ class AdviceController < ApplicationController
   # checks whether the advices for a question in questionnaire have valid attributes
   # return true if the number of advices and their scores are invalid, else returns false
   def invalid_advice?(sorted_advice, num_advices, question)
-    return ((question.question_advices.length != num_advices) ||
+    ((question.question_advices.length != num_advices) ||
     sorted_advice.empty? ||
     (sorted_advice[0].score != @questionnaire.max_question_score) ||
     (sorted_advice[sorted_advice.length - 1].score != @questionnaire.min_question_score))
@@ -38,7 +40,7 @@ class AdviceController < ApplicationController
                     end
 
       # sorting question advices in descending order by score
-      sorted_advice = question.question_advices.sort_by { |x| x.score }.reverse
+      sorted_advice = question.question_advices.sort_by(&:score).reverse
 
       # Checks the condition for adjusting the advice size
       if invalid_advice?(sorted_advice, num_advices, question)

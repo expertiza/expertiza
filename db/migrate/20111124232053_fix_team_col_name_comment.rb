@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FixTeamColNameComment < ActiveRecord::Migration[4.2]
   def self.up
     rename_column :teams, :comment, :comments_for_advertisement

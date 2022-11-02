@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe GradesController do
   let(:review_response) { build(:response) }
   let(:assignment) { build(:assignment, id: 1, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true) }

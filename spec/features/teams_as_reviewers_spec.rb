@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'teams as reviewers' do
   before(:each) do
     @assignment = create(:assignment, name: 'automatic review mapping test', max_team_size: 4, team_reviewing_enabled: true)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SurveyQuestionnaire < Questionnaire
   after_initialize :post_initialization
   def post_initialization

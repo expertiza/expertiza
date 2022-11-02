@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe AssignmentHelper do
   let(:assignment_helper) { Class.new { extend AssignmentHelper } }
   let(:questionnaire) { create(:questionnaire, id: 1) }
@@ -15,8 +17,8 @@ describe AssignmentHelper do
   let(:course1) { build(:course, id: 1, name: 'ECE517') }
   let(:course2) { build(:course, id: 2, name: 'ECE506') }
   let(:course3) { build(:course, id: 3, name: 'ECE216') }
-  let(:ta_mapping1) { build(:ta_mapping, id: 1, course_id: 1)}
-  let(:ta_mapping2) { build(:ta_mapping, id: 2, course_id: 2)}
+  let(:ta_mapping1) { build(:ta_mapping, id: 1, course_id: 1) }
+  let(:ta_mapping2) { build(:ta_mapping, id: 2, course_id: 2) }
   describe '#questionnaire_options' do
     it 'throws exception if type argument nil' do
       expect { questionnaire_options(nil) }.to raise_exception(NoMethodError)
@@ -30,7 +32,7 @@ describe AssignmentHelper do
         allow(Course).to receive(:find).with(2).and_return(course2)
         allow_any_instance_of(Ta).to receive(:ta_mappings).and_return([ta_mapping1, ta_mapping2])
         stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
-        expect(course_options).to eq([["ECE506", 2], ["ECE517", 1]])
+        expect(course_options).to eq([['ECE506', 2], ['ECE517', 1]])
       end
     end
     context 'when the user is an admin' do
@@ -50,7 +52,7 @@ describe AssignmentHelper do
         allow(Course).to receive(:find).with(2).and_return(course2)
         allow(Instructor).to receive(:find).and_return(instructor)
         stub_current_user(instructor, instructor.role.name, instructor.role)
-        expect(course_options).to eq([["-----------", nil], ["ECE506", 2], ["ECE517", 1]])
+        expect(course_options).to eq([['-----------', nil], ['ECE506', 2], ['ECE517', 1]])
       end
     end
   end

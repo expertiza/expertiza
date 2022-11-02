@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ReplaceCourseEvaluation < ActiveRecord::Migration[4.2]
   def up
     Questionnaire.where(type: 'CourseEvaluationQuestionnaire') do |questionnaire|

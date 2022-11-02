@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreatePlagiarismCheckerAssignmentSubmissions < ActiveRecord::Migration[4.2]
   def change
     create_table :plagiarism_checker_assignment_submissions do |t|

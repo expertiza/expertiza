@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe QuizQuestion do
   let(:quiz_question) { QuizQuestion.new }
   let(:quiz_question_choice1) { QuizQuestionChoice.new }

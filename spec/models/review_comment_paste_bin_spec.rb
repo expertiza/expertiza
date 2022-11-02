@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe ReviewCommentPasteBin do
   it { should belong_to(:review_grade) }
   describe 'instance variables' do

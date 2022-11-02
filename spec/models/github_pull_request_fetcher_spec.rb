@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'GithubPullRequestFetcher' do
   it 'supports any valid URL' do
     expect(GithubPullRequestFetcher.supports_url?('https://github.com/totallybradical/simicheck-expertiza-sandbox/pull/3')).to be_truthy

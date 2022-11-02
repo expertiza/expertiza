@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CourseParticipant < Participant
   belongs_to :course, class_name: 'Course', foreign_key: 'parent_id'
   # Copy this participant to an assignment
@@ -17,13 +19,17 @@ class CourseParticipant < Participant
 
     user = User.find_by(name: row_hash[:name])
     if user.nil?
-      raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
+      if row_hash.length < 4
+        raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items."
+      end
 
       attributes = ImportFileHelper.define_attributes(row_hash)
       user = ImportFileHelper.create_new_user(attributes, session)
     end
     course = Course.find(id)
-    raise ImportError, 'The course with the id "' + id.to_s + '" was not found.' if course.nil?
+    if course.nil?
+      raise ImportError, 'The course with the id "' + id.to_s + '" was not found.'
+    end
 
     unless CourseParticipant.exists?(user_id: user.id, parent_id: id)
       CourseParticipant.create(user_id: user.id, parent_id: id)

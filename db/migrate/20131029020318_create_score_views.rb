@@ -1,7 +1,8 @@
-class CreateScoreViews < ActiveRecord::Migration[4.2]
+# frozen_string_literal: true
 
-    def self.up
-      execute <<-SQL
+class CreateScoreViews < ActiveRecord::Migration[4.2]
+  def self.up
+    execute <<-SQL
       CREATE VIEW score_views AS SELECT ques.weight question_weight,ques.type AS type,
       q1.id "q1_id",q1.NAME AS q1_name,q1.instructor_id AS q1_instructor_id,q1.private AS q1_private,
       q1.min_question_score AS q1_min_question_score,q1.max_question_score AS q1_max_question_score,
@@ -11,7 +12,7 @@ class CreateScoreViews < ActiveRecord::Migration[4.2]
       s.answer AS s_score,s.comments AS s_comments,s.response_id AS s_response_id
       FROM questions ques left join questionnaires q1 on ques.questionnaire_id = q1.id left join answers s on ques.id = s.question_id
     SQL
-  end
+end
 
   def self.down
     execute <<-SQL

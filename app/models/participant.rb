@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Participant < ApplicationRecord
   include Scoring
   include ParticipantsHelper
@@ -25,7 +27,7 @@ class Participant < ApplicationRecord
   # table to define participants who can mentor teams, topics, or assignments
   # since the column's type is VARCHAR(255), other string constants should be
   # defined here to add different duty titles
-  DUTY_MENTOR = 'mentor'.freeze
+  DUTY_MENTOR = 'mentor'
 
   def team
     TeamsUser.find_by(user: user).try(:team)
@@ -50,17 +52,21 @@ class Participant < ApplicationRecord
   def delete(force = nil)
     maps = ResponseMap.where('reviewee_id = ? or reviewer_id = ?', id, id)
 
-    raise 'Associations exist for this participant.' unless force || (maps.blank? && team.nil?)
+    unless force || (maps.blank? && team.nil?)
+      raise 'Associations exist for this participant.'
+    end
 
     force_delete(maps)
   end
 
   def force_delete(maps)
-    maps && maps.each(&:destroy)
+    maps&.each(&:destroy)
     if team && (team.teams_users.length == 1)
       team.delete
     elsif team
-      team.teams_users.each { |teams_user| teams_user.destroy if teams_user.user_id == id }
+      team.teams_users.each do |teams_user|
+        teams_user.destroy if teams_user.user_id == id
+      end
     end
     destroy
   end
@@ -76,15 +82,13 @@ class Participant < ApplicationRecord
   # send email to team's reviewers in case a new submission is made
   def mail_assigned_reviewers
     # Find review mappings for the work done by this participant's team
-    mappings = ResponseMap.where(reviewed_object_id: self.assignment.id,
-                                 reviewee_id: self.team.id,
+    mappings = ResponseMap.where(reviewed_object_id: assignment.id,
+                                 reviewee_id: team.id,
                                  type: 'ReviewResponseMap')
-    unless mappings.nil?
-      mappings.each do |mapping|
-        reviewer = mapping.reviewer.user
-        prepared_mail = MailerHelper.send_mail_to_assigned_reviewers(reviewer, self, mapping)
-        prepared_mail.deliver_now
-      end
+    mappings&.each do |mapping|
+      reviewer = mapping.reviewer.user
+      prepared_mail = MailerHelper.send_mail_to_assigned_reviewers(reviewer, self, mapping)
+      prepared_mail.deliver_now
     end
   end
 
@@ -133,10 +137,14 @@ class Participant < ApplicationRecord
     where(parent_id: parent_id).find_each do |part|
       tcsv = []
       user = part.user
-      tcsv.push(user.name, user.fullname, user.email) if options['personal_details'] == 'true'
+      if options['personal_details'] == 'true'
+        tcsv.push(user.name, user.fullname, user.email)
+      end
       tcsv.push(user.role.name) if options['role'] == 'true'
       tcsv.push(user.parent.name) if options['parent'] == 'true'
-      tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review) if options['email_options'] == 'true'
+      if options['email_options'] == 'true'
+        tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review)
+      end
       tcsv.push(part.handle) if options['handle'] == 'true'
       csv << tcsv
     end
@@ -144,10 +152,14 @@ class Participant < ApplicationRecord
 
   def self.export_fields(options)
     fields = []
-    fields.push('name', 'full name', 'email') if options['personal_details'] == 'true'
+    if options['personal_details'] == 'true'
+      fields.push('name', 'full name', 'email')
+    end
     fields.push('role') if options['role'] == 'true'
     fields.push('parent') if options['parent'] == 'true'
-    fields.push('email on submission', 'email on review', 'email on metareview') if options['email_options'] == 'true'
+    if options['email_options'] == 'true'
+      fields.push('email on submission', 'email on review', 'email on metareview')
+    end
     fields.push('handle') if options['handle'] == 'true'
     fields
   end

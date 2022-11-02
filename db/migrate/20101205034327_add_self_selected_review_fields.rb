@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddSelfSelectedReviewFields < ActiveRecord::Migration[4.2]
   def self.up
     add_column :assignments, :user_selected_dynamic_reviewer_assignments_enabled, :boolean, default: 0

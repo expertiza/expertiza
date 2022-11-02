@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class QuizQuestionnairesController < QuestionnairesController
   include AuthorizationHelper
 
@@ -61,7 +63,9 @@ class QuizQuestionnairesController < QuestionnairesController
         @successful_create = true
         save
         save_choices @questionnaire.id
-        flash[:note] = 'The quiz was successfully created.' if @successful_create
+        if @successful_create
+          flash[:note] = 'The quiz was successfully created.'
+        end
         redirect_to controller: 'submitted_content', action: 'edit', id: participant_id
       end
     else
@@ -99,8 +103,12 @@ class QuizQuestionnairesController < QuestionnairesController
         question_index = 1
         @quiz_question_choices.each do |question_choice| # Updates state of each question choice for selected question
           # Call private methods to handle question types
-          update_checkbox(question_choice, question_index) if @question.type == 'MultipleChoiceCheckbox'
-          update_radio(question_choice, question_index) if @question.type == 'MultipleChoiceRadio'
+          if @question.type == 'MultipleChoiceCheckbox'
+            update_checkbox(question_choice, question_index)
+          end
+          if @question.type == 'MultipleChoiceRadio'
+            update_radio(question_choice, question_index)
+          end
           update_truefalse(question_choice) if @question.type == 'TrueFalse'
           question_index += 1
         end
@@ -230,7 +238,9 @@ class QuizQuestionnairesController < QuestionnairesController
   # save questionnaire
   def save
     @questionnaire.save!
-    save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
+    unless @questionnaire.id.nil? || @questionnaire.id <= 0
+      save_questions @questionnaire.id
+    end
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
   end
 
@@ -238,15 +248,17 @@ class QuizQuestionnairesController < QuestionnairesController
   def save_questions(questionnaire_id)
     delete_questions questionnaire_id # delete existing questionnaire if any
     save_new_questions questionnaire_id # save new questions
-    if params[:question]
-      params[:question].each_key do |question_key|
-        if params[:question][question_key][:txt].strip.empty?
-          # question text is empty, delete the question
-          Question.delete(question_key)
-        else
-          # Update existing question.
-          question = Question.find(question_key)
-          Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
+    # question text is empty, delete the question
+    # Update existing question.
+    params[:question]&.each_key do |question_key|
+      if params[:question][question_key][:txt].strip.empty?
+        # question text is empty, delete the question
+        Question.delete(question_key)
+      else
+        # Update existing question.
+        question = Question.find(question_key)
+        unless question.update_attributes(params[:question][question_key])
+          Rails.logger.info(question.errors.messages.inspect)
         end
       end
     end

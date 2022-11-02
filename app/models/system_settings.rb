@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SystemSettings < ApplicationRecord
   self.table_name = 'system_settings'
 

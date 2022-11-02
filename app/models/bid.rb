@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Bid < ApplicationRecord
   belongs_to :topic, class_name: 'SignUpTopic'
   belongs_to :team
@@ -40,7 +42,9 @@ class Bid < ApplicationRecord
     bidding_matrix_summary = []
     bidding_matrix.each do |topic_id, value|
       # Exclude topics that no one bid for
-      bidding_matrix_summary << [value.count { |i| i != 0 }, value.inject(:+), topic_id] unless value.inject(:+).zero?
+      unless value.inject(:+).zero?
+        bidding_matrix_summary << [value.count { |i| i != 0 }, value.inject(:+), topic_id]
+      end
     end
     bidding_matrix_summary.sort! { |b1, b2| [b2[0], b1[1]] <=> [b1[0], b2[1]] }
     # Result of sorting first element descendingly and second element ascendingly.

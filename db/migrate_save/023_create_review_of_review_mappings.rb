@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateReviewOfReviewMappings < ActiveRecord::Migration[4.2]
   # This table should have essentially the same format as review_mappings
   def self.up

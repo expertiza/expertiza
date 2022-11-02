@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe VmTagPromptAnswer do
   let!(:answer) { create(:answer, comments: 'test comment') }
   let(:tp) { TagPrompt.new(prompt: 'test prompt', desc: 'test desc', control_type: 'Checkbox') }

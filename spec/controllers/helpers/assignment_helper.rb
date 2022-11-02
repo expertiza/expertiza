@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AssignmentHelper
   def assignment1
     Assignment.where(name: 'assignment1').first || Assignment.new('id' => '101',

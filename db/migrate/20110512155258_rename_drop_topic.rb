@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RenameDropTopic < ActiveRecord::Migration[4.2]
   def self.up
     drop_topic = DeadlineType.find_by_name('drop topic')

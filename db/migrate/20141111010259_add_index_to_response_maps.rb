@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddIndexToResponseMaps < ActiveRecord::Migration[4.2]
   def self.up
     # add_index :response_maps, :reviewee_id

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe UsersController do
   let(:admin) { build(:admin, id: 3) }
   let(:super_admin) { build(:superadmin) }
@@ -43,21 +45,21 @@ describe UsersController do
 
   context '#auto_complete_for_user_name' do
     it 'checks if auto_complete returns actionview error' do
-	stub_current_user(student1, student1.role.name, student1.role)
-    	session = { user: student1 }
-    	@params = {user: student1}
-    	allow(controller).to receive(:params).and_return(@params)
-    	expect{controller.auto_complete_for_user_name}.to raise_error(ActionView::Template::Error)
+      stub_current_user(student1, student1.role.name, student1.role)
+      session = { user: student1 }
+      @params = { user: student1 }
+      allow(controller).to receive(:params).and_return(@params)
+      expect { controller.auto_complete_for_user_name }.to raise_error(ActionView::Template::Error)
     end
 
     it 'checks if get auto_complete redirects to test host' do
-    	stub_current_user(student1, student1.role.name, student1.role)
-    	session = { user: student1 }
-    	@params = {user: student1}
-    	allow(controller).to receive(:params).and_return(@params)
-    	get :auto_complete_for_user_name, params: @params, session: session
-    	expect(response).to redirect_to("http://test.host/")
-    end  
+      stub_current_user(student1, student1.role.name, student1.role)
+      session = { user: student1 }
+      @params = { user: student1 }
+      allow(controller).to receive(:params).and_return(@params)
+      get :auto_complete_for_user_name, params: @params, session: session
+      expect(response).to redirect_to('http://test.host/')
+    end
   end
 
   context '#set_anonymized_view' do
@@ -108,7 +110,7 @@ describe UsersController do
 
   context '#list' do
     it 'checks that paginate_list does not fail with controller' do
-      expect{controller.list}.not_to raise_error
+      expect { controller.list }.not_to raise_error
     end
 
     it 'checks that paginate_list does not fail with post' do
@@ -116,7 +118,7 @@ describe UsersController do
       expect(response.status).to eq(200)
     end
   end
-	
+
   context '#show_if_authorized' do
     before(:each) do
       allow(User).to receive(:find).with(2).and_return(instructor)
@@ -295,22 +297,22 @@ describe UsersController do
       get :edit, params: request_params, session: user_session
       expect(response).to render_template(:edit)
     end
-	  
+
     it 'checks if role renders through edit' do
       new_student = User.new
       new_student = student1
-      new_student.role_id = nil  
+      new_student.role_id = nil
       allow(User).to receive(:find).with(any_args).and_return(new_student)
       get :edit
       expect(response).to render_template(:edit)
     end
-	 
+
     it 'checks if role fails through edit' do
       new_student = User.new
       new_student = student1
-      new_student.role_id = nil  
+      new_student.role_id = nil
       allow(User).to receive(:find).with(any_args).and_return(new_student)
-      expect{controller.edit}.not_to raise_error
+      expect { controller.edit }.not_to raise_error
     end
   end
 
@@ -331,7 +333,7 @@ describe UsersController do
       expect(response).to render_template(:edit)
     end
   end
-	
+
   context '#destroy' do
     it 'check if user was successfully destroyed' do
       allow(User).to receive(:find).with(any_args).and_return(student1)
@@ -360,7 +362,7 @@ describe UsersController do
       allow(AssignmentQuestionnaire).to receive(:destroy).with(any_args).and_return(true)
       allow(User).to receive(:destroy).with(any_args).and_return(true)
       post :destroy
-      expect(response).to redirect_to :action=> :list
+      expect(response).to redirect_to action: :list
     end
 
     it 'check if error during destroy leads to redirect' do
@@ -370,9 +372,8 @@ describe UsersController do
       allow(AssignmentQuestionnaire).to receive(:destroy).with(any_args).and_return(true)
       allow(User).to receive(:destroy).with(any_args).and_return(true)
       post :destroy
-      expect(response).to redirect_to :action=> :list
+      expect(response).to redirect_to action: :list
     end
-
   end
 
   context '#keys' do

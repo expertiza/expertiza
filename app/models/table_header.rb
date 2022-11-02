@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TableHeader < QuestionnaireHeader
   def complete(_count, _answer = nil)
     html = '<br/><big><b>' + txt + '</b></big><br/>'

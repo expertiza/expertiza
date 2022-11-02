@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Credentials do
   let(:role) { build(:role_of_student) }
   describe '#initialize' do

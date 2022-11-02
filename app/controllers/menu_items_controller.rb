@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'menu'
 
 class MenuItemsController < ApplicationController

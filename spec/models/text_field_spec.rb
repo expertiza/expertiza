@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe TextField do
   let!(:answer) { create(:answer, comments: 'test comment') }
   describe '#complete' do

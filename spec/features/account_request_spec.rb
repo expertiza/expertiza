@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'new user request' do
   before(:each) do
     # create(:role_of_student)

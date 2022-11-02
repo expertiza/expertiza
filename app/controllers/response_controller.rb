@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ResponseController < ApplicationController
   include AuthorizationHelper
   include ResponseHelper

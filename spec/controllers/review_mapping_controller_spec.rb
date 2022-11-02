@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 describe ReviewMappingController do
   let(:assignment) { double('Assignment', id: 1) }
@@ -262,7 +264,7 @@ describe ReviewMappingController do
     context 'when corresponding response map exists' do
       it 'shows a flash error and redirects to student_quizzes page' do
         allow(ResponseMap).to receive_message_chain(:where, :first).with(reviewed_object_id: '1', reviewer_id: '1')
-          .with(no_args).and_return(double('ResponseMap'))
+                                                                   .with(no_args).and_return(double('ResponseMap'))
 
         post :assign_quiz_dynamically, params: @params
         expect(flash[:error]).to eq('You have already taken that quiz.')
@@ -641,7 +643,7 @@ describe ReviewMappingController do
       }
 
       # Perform test
-      session_params = {user: stub_current_user(instructor, instructor.role.name, instructor.role) }
+      session_params = { user: stub_current_user(instructor, instructor.role.name, instructor.role) }
       post :save_grade_and_comment_for_reviewer, params: request_params, session: session_params
       expect(flash[:note]).to be nil
       expect(response).to redirect_to('/reports/response_report')

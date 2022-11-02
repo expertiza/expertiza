@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Invitation < ApplicationRecord
   # belongs_to :to_user, class_name: "User", foreign_key: "to_id"
   belongs_to :to_user, class_name: 'User', foreign_key: 'to_id', inverse_of: false

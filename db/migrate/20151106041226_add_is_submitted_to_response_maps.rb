@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddIsSubmittedToResponseMaps < ActiveRecord::Migration[4.2]
   def self.up
     add_column :response_maps, :isSubmitted, :string, null: true

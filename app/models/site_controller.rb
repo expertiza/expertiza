@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SiteController < ApplicationRecord
   has_many :controller_actions
   belongs_to :permission
@@ -20,8 +22,10 @@ class SiteController < ApplicationRecord
     classes = {}
 
     ObjectSpace.each_object(Class) do |klass|
-      if klass < ApplicationController
-        classes[klass.controller_name] = klass if klass.respond_to?(:controller_name)
+      next unless klass < ApplicationController
+
+      if klass.respond_to?(:controller_name)
+        classes[klass.controller_name] = klass
       end
     end
     classes

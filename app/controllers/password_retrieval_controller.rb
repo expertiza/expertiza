@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PasswordRetrievalController < ApplicationController
   def action_allowed?
     true

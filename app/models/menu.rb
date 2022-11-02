@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Menu
   class Node
     attr_accessor :parent, :parent_id, :children
@@ -40,10 +42,7 @@ class Menu
       @children << child.id
     end
   end
-
-  # rubocop:disable Lint/DuplicateMethods
   attr_accessor :root, :selected
-  # rubocop:enable Lint/DuplicateMethods
 
   def initialize(role = nil)
     @root = Node.new
@@ -87,7 +86,7 @@ class Menu
     @vector = []
     @crumbs = []
 
-    while node && node.id
+    while node&.id
       @selected[node.id] = node
       @vector.unshift node
       @crumbs.unshift node.id

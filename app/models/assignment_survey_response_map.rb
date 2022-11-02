@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AssignmentSurveyResponseMap < SurveyResponseMap
   belongs_to :survey_deployment, class_name: 'SurveyDeployment', foreign_key: 'reviewee_id'
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'

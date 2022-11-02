@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AssignmentCreationHelper
   def get_questionnaire(finder_var = nil)
     if finder_var.nil?

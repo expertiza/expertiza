@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Expertiza::Application.configure do
   # Settings specified here will take precedence over those in config/environment.rb
 
@@ -24,7 +26,7 @@ Expertiza::Application.configure do
   config.serve_static_files = false
 
   # Compress JavaScripts and CSS.
-  config.assets.js_compressor = Uglifier.new(:harmony => true)
+  config.assets.js_compressor = Uglifier.new(harmony: true)
   # config.assets.css_compressor = :sass
 
   # Do not fallback to assets pipeline if a precompiled asset is missed.

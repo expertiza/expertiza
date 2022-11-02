@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateTeammateReviewMappings < ActiveRecord::Migration[4.2]
   def self.up
     create_table :teammate_review_mappings do |t|

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe StudentViewController do
   let(:instructor) { build(:instructor, id: 2) }
   let(:student1) { build(:student, id: 30, name: :Amanda) }

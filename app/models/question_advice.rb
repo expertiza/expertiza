@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class QuestionAdvice < ApplicationRecord
   # attr_accessible :score, :advice
   belongs_to :question

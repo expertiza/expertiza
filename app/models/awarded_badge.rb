@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AwardedBadge < ApplicationRecord
   belongs_to :badge
   belongs_to :participant

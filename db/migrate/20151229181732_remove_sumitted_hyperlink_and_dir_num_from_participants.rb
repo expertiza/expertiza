@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RemoveSumittedHyperlinkAndDirNumFromParticipants < ActiveRecord::Migration[4.2]
   def change
     remove_column :participants, :submitted_hyperlinks

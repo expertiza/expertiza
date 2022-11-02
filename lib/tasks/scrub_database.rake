@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :db do
   namespace :data do
     desc 'Scrubs the database of user information'

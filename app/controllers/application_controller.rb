@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ApplicationController < ActionController::Base
   include AccessHelper
 
@@ -50,7 +52,9 @@ class ApplicationController < ActionController::Base
 
       # Find assignment from participant and find locale from the assignment
       assignment = participant.assignment
-      return assignment.course.locale unless assignment.course.nil? || assignment.course.locale.nil?
+      unless assignment.course.nil? || assignment.course.locale.nil?
+        return assignment.course.locale
+      end
     else
       return locale_from_user_courses
     end
@@ -91,12 +95,14 @@ class ApplicationController < ActionController::Base
   helper_method :current_user_role?
 
   def user_for_paper_trail
-    session[:user].try :id if session[:user]
+    session[:user]&.try :id
   end
 
   def undo_link(message)
     version = Version.where('whodunnit = ?', session[:user].id).last
-    return unless version.try(:created_at) && Time.now.in_time_zone - version.created_at < 5.0
+    unless version.try(:created_at) && Time.now.in_time_zone - version.created_at < 5.0
+      return
+    end
 
     link_name = params[:redo] == 'true' ? 'redo' : 'undo'
     message + "<a href = #{url_for(controller: :versions, action: :revert, id: version.id, redo: !params[:redo])}>#{link_name}</a>"

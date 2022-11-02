@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateDeadlineRights < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'deadline_rights', force: true do |t|

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SignUpTopic < ApplicationRecord
   has_many :signed_up_teams, foreign_key: 'topic_id', dependent: :destroy
   has_many :teams, through: :signed_up_teams # list all teams choose this topic, no matter in waitlist or not
@@ -55,13 +57,9 @@ class SignUpTopic < ApplicationRecord
     no_of_students_who_selected_the_topic = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: false)
 
     if no_of_students_who_selected_the_topic.nil?
-      return true
+      true
     else
-      if topic.max_choosers > no_of_students_who_selected_the_topic.size
-        return true
-      else
-        return false
-      end
+      topic.max_choosers > no_of_students_who_selected_the_topic.size
     end
   end
 
@@ -97,7 +95,7 @@ class SignUpTopic < ApplicationRecord
           end
         end
       end
-      signup_record.destroy unless signup_record.nil?
+      signup_record&.destroy
       ExpertizaLogger.info LoggerMessage.new('SignUpTopic', session_user_id, "Topic dropped: #{topic_id}")
     else
       # flash[:error] = "You cannot drop this topic because the drop deadline has passed."
@@ -118,7 +116,9 @@ class SignUpTopic < ApplicationRecord
     num_of_users_promotable.times do
       next_wait_listed_team = SignedUpTeam.where(topic_id: id, is_waitlisted: true).first
       # if slot exist, then confirm the topic for this team and delete all waitlists for this team
-      SignUpTopic.assign_to_first_waiting_team(next_wait_listed_team) if next_wait_listed_team
+      if next_wait_listed_team
+        SignUpTopic.assign_to_first_waiting_team(next_wait_listed_team)
+      end
     end
   end
 
@@ -155,9 +155,9 @@ class SignUpTopic < ApplicationRecord
     signuptopic.max_choosers = 1
     # return this model based on these checks
     if signuptopic.save && suggestion.update_attribute('status', 'Approved')
-      return signuptopic
+      signuptopic
     else
-      return 'failed'
+      'failed'
     end
   end
 end

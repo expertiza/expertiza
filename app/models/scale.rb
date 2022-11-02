@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Scale < ScoredQuestion
   # This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
   def edit(_count)
@@ -56,7 +58,9 @@ class Scale < ScoredQuestion
     (questionnaire_min..questionnaire_max).each do |j|
       html += '<td width="10%"><input type="radio" id="' + j.to_s
       html += '" value="' + j.to_s + '" name="Radio_' + id.to_s + '"'
-      html += 'checked="checked"' unless (answer.nil? || (answer.answer != j)) && (answer || (questionnaire_min != j))
+      unless (answer.nil? || (answer.answer != j)) && (answer || (questionnaire_min != j))
+        html += 'checked="checked"'
+      end
       html += '></td>'
     end
     html += '<script>jQuery("input[name=Radio_' + id.to_s + ']:radio").change(function() {'

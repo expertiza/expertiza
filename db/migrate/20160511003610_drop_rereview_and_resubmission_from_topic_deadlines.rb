@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DropRereviewAndResubmissionFromTopicDeadlines < ActiveRecord::Migration[4.2]
   def change
     remove_column :topic_deadlines, :resubmission_allowed_id

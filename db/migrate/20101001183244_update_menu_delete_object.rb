@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UpdateMenuDeleteObject < ActiveRecord::Migration[4.2]
   def self.up
     permission = Permission.find_by_name('administer assignments')

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'cake' do
   let(:questionnaire) { Questionnaire.new min_question_score: 0, max_question_score: 5 }
   let(:cake) { Cake.new id: 1, type: 'Cake', seq: 1.0, txt: 'Cake type question?', weight: 1, questionnaire: questionnaire, size: '50' }

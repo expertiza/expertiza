@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddingAttributesSubmissionCode < ActiveRecord::Migration[4.2]
   def change
     add_column :submission_records, :type, :text

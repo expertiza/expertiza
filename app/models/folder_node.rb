@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FolderNode < Node
   belongs_to :folder, class_name: 'TreeFolder', foreign_key: 'node_object_id'
   belongs_to :node_object, class_name: 'TreeFolder'

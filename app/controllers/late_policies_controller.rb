@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A controller for interacting with late policies from view classes.
 # The reason this was added was to perform CRUD operations on late policies.
 # See app/views/late_policies.
@@ -54,9 +56,7 @@ class LatePoliciesController < ApplicationController
   def create
     # First this function validates the input then save if the input is valid.
     valid_penalty, error_message = validate_input
-    if error_message
-      flash[:error] = error_message
-    end
+    flash[:error] = error_message if error_message
 
     # If penalty  is valid then tries to update and save.
     if valid_penalty
@@ -128,14 +128,17 @@ class LatePoliciesController < ApplicationController
 
   def late_policy
     # This function checks if the id exists in parameters and assigns it to the instance variable of penalty policy.
-    @penalty_policy ||= @late_policy || LatePolicy.find(params[:id]) if params[:id]
+    if params[:id]
+      @penalty_policy ||= @late_policy || LatePolicy.find(params[:id])
+    end
   end
 
   # This function checks if the policy name already exists or not and returns boolean value for penalty and the error message.
   def duplicate_name_check(is_update = false)
     should_check = true
-    prefix = is_update ? "Cannot edit the policy. " : ""
-    valid_penalty, error_message = true, nil
+    prefix = is_update ? 'Cannot edit the policy. ' : ''
+    valid_penalty = true
+    error_message = nil
 
     if is_update
       existing_late_policy = LatePolicy.find(params[:id])
@@ -150,7 +153,7 @@ class LatePoliciesController < ApplicationController
         valid_penalty = false
       end
     end
-    return valid_penalty, error_message
+    [valid_penalty, error_message]
   end
 
   # This function validates the input.
@@ -160,7 +163,7 @@ class LatePoliciesController < ApplicationController
     penalty_per_unit = params[:late_policy][:penalty_per_unit].to_i
 
     valid_penalty, error_message = duplicate_name_check(is_update)
-    prefix = is_update ? "Cannot edit the policy. " : ""
+    prefix = is_update ? 'Cannot edit the policy. ' : ''
 
     # This check validates the maximum penalty.
     if max_penalty < penalty_per_unit
@@ -180,6 +183,6 @@ class LatePoliciesController < ApplicationController
       valid_penalty = false
     end
 
-    return valid_penalty, error_message
+    [valid_penalty, error_message]
   end
 end

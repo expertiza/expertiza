@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ChangeDefaultValueOfQuizAllowedIdInDueDatesTable < ActiveRecord::Migration[4.2]
   def self.up
     change_column_default :due_dates, :quiz_allowed_id, 1

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe SignUpTopic do
   let(:topic) { build(:topic) }
   let(:suggestion) { build(:suggestion, id: 1, assignment_id: 1) }

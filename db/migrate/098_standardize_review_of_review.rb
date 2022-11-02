@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class StandardizeReviewOfReview < ActiveRecord::Migration[4.2]
   def self.up
     remove_column :review_of_reviews, :reviewed_at

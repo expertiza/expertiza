@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe FeedbackResponseMap do
   let(:questionnaire1) { build(:questionnaire, id: 1, type: 'AuthorFeedbackQuestionnaire') }
   let(:questionnaire2) { build(:questionnaire, id: 2, type: 'MetareviewQuestionnaire') }

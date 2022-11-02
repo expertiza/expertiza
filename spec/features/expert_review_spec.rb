@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'expert review' do
   ###
   # Please follow the TDD process as much as you can.

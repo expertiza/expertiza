@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'CourseParticipant' do
   describe '#copy' do
     before(:each) do

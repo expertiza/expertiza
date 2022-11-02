@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UpdateFieldsInSignUpTopics < ActiveRecord::Migration[4.2]
   def self.up
     remove_column :sign_up_topics, :start_date

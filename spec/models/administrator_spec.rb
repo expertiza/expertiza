@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Administrator do
   describe 'class' do
     it 'creates a valid object' do

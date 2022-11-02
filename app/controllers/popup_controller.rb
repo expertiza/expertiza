@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PopupController < ApplicationController
   include StringOperationHelper
   include AuthorizationHelper
@@ -89,7 +91,9 @@ class PopupController < ApplicationController
     @reviews = []
 
     assignment = Assignment.find(@assignment_id)
-    flash.now[:error] = 'This report is not implemented for assignments where the rubric varies by topic.' if assignment.vary_by_topic?
+    if assignment.vary_by_topic?
+      flash.now[:error] = 'This report is not implemented for assignments where the rubric varies by topic.'
+    end
   end
 
   # this can be called from "response_report" by clicking reviewer names from instructor end.

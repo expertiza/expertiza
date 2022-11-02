@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UpdateSurveyDeployments < ActiveRecord::Migration[4.2]
   change_table :survey_deployments do |t|
     t.rename :course_id, :parent_id

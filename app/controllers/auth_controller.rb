@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AuthController < ApplicationController
   include AuthorizationHelper
   helper :auth
@@ -20,7 +22,7 @@ class AuthController < ApplicationController
       AuthController.clear_session(session)
     else
       user = User.find_by_login(params[:login][:name])
-      if user && user.valid_password?(params[:login][:password])
+      if user&.valid_password?(params[:login][:password])
         after_login(user)
       else
         ExpertizaLogger.error LoggerMessage.new(controller_name, '', 'Failed login attempt. Invalid username/password', request)
@@ -59,7 +61,9 @@ class AuthController < ApplicationController
     if role_id
       role = Role.find(role_id)
       if role
-        Role.rebuild_cache if !role.cache || !role.cache.try(:has_key?, :credentials)
+        if !role.cache || !role.cache.try(:has_key?, :credentials)
+          Role.rebuild_cache
+        end
         session[:credentials] = role.cache[:credentials]
         session[:menu] = role.cache[:menu]
         ExpertizaLogger.info "Logging in user as role #{session[:credentials].class}"

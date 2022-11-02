@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module StudentTaskHelper
   def get_review_grade_info(participant)
     if participant.try(:review_grade).try(:grade_for_reviewer).nil? ||
@@ -13,10 +15,14 @@ module StudentTaskHelper
   end
 
   def check_reviewable_topics(assignment)
-    return true if !assignment.topics? && (assignment.current_stage != 'submission')
+    if !assignment.topics? && (assignment.current_stage != 'submission')
+      return true
+    end
 
     sign_up_topics = SignUpTopic.where(assignment_id: assignment.id)
-    sign_up_topics.each { |topic| return true if assignment.can_review(topic.id) }
+    sign_up_topics.each do |topic|
+      return true if assignment.can_review(topic.id)
+    end
     false
   end
 

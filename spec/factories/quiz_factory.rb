@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This file defines factory methods that are functionally related
 # to the Expertiza quiz feature. Factories can be used to create
 # objects unique to quizzes, including:

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class InvitationsController < ApplicationController
   include AuthorizationHelper
   include ConferenceHelper
@@ -37,7 +39,7 @@ class InvitationsController < ApplicationController
 
     old_entry = JoinTeamRequest.where('participant_id = ? and team_id = ?', participant.id, params[:team_id]).first
     # Status code A for accepted
-    old_entry.update_attribute('status', 'A') if old_entry
+    old_entry&.update_attribute('status', 'A')
   end
 
   def auto_complete_for_user_name
@@ -48,7 +50,9 @@ class InvitationsController < ApplicationController
   def accept
     # Accept the invite and check whether the add was successful
     accepted = Invitation.accept_invitation(params[:team_id], @inv.from_id, @inv.to_id, @student.parent_id)
-    flash[:error] = 'The system failed to add you to the team that invited you.' unless accepted
+    unless accepted
+      flash[:error] = 'The system failed to add you to the team that invited you.'
+    end
 
     ExpertizaLogger.info "Accepting Invitation #{params[:inv_id]}: #{accepted}"
     redirect_to view_student_teams_path student_id: params[:student_id]

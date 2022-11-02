@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TeamsUsersController < ApplicationController
   include AuthorizationHelper
 
@@ -45,7 +47,7 @@ class TeamsUsersController < ApplicationController
       if team.is_a?(AssignmentTeam)
         assignment = Assignment.find(team.parent_id)
         if assignment.user_on_team?(user)
-          flash[:error] = "This user is already assigned to a team for this assignment"
+          flash[:error] = 'This user is already assigned to a team for this assignment'
           redirect_back fallback_location: root_path
           return
         end
@@ -55,12 +57,14 @@ class TeamsUsersController < ApplicationController
         else
           begin
             add_member_return = team.add_member(user, team.parent_id)
-          rescue
+          rescue StandardError
             flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
             redirect_back fallback_location: root_path
             return
           end
-          flash[:error] = 'This team already has the maximum number of members.' if add_member_return == false
+          if add_member_return == false
+            flash[:error] = 'This team already has the maximum number of members.'
+          end
           # E2115 Mentor Management
           # Kick off the Mentor Management workflow
           # Note: this is _not_ supported for CourseTeams which is why the other
@@ -74,7 +78,7 @@ class TeamsUsersController < ApplicationController
       else # CourseTeam
         course = Course.find(team.parent_id)
         if course.user_on_team?(user)
-          flash[:error] = "This user is already assigned to a team for this course"
+          flash[:error] = 'This user is already assigned to a team for this course'
           redirect_back fallback_location: root_path
           return
         end
@@ -84,12 +88,14 @@ class TeamsUsersController < ApplicationController
         else
           begin
             add_member_return = team.add_member(user, team.parent_id)
-          rescue
+          rescue StandardError
             flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
             redirect_back fallback_location: root_path
             return
           end
-          flash[:error] = 'This team already has the maximum number of members.' if add_member_return == false
+          if add_member_return == false
+            flash[:error] = 'This team already has the maximum number of members.'
+          end
           if add_member_return
             @teams_user = TeamsUser.last
             undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")

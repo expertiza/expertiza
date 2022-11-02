@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe QuestionnaireHeader do
   let(:questionnaire_header) { build(:questionnaire_header) }
   describe '#view_question_text' do

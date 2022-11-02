@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'Impersonate a student whose assignment has no course attribute' do
   it 'is redirected to "/student_task/list"' do
     # 1. create data for test

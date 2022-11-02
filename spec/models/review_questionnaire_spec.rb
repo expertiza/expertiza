@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe ReviewQuestionnaire do
   let(:participant) { build(:participant, id: 1, reviews: [response_map]) }
   let(:questionnaire) { build(:questionnaire, id: 1) }

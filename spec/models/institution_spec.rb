@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Institution do
   subject do
     described_class.new(name: 'NC State University')

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 include InstructorInterfaceHelperSpec
 
 describe 'Integration tests for instructor interface' do

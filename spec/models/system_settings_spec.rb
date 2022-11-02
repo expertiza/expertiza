@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe SystemSettings do
   before :all do
     @system_settings = SystemSettings.new

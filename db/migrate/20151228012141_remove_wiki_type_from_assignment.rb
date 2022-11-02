@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RemoveWikiTypeFromAssignment < ActiveRecord::Migration[4.2]
   def self.up
     execute 'alter table assignments drop foreign key `fk_assignments_wiki_types`;'

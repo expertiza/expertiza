@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Duty do
   let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
   let(:participant) { build(:participant, id: 1, user_id: 1) }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # These rpec will test the validity of the SubmissionRecord model. It tests for
 # valid team_id, operation, user, assignment id.
 describe SubmissionRecord do

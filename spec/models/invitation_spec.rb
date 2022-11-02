@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Invitation do
   let(:user2) { build(:student, id: 2) }
   let(:user3) { build(:student, id: 3) }

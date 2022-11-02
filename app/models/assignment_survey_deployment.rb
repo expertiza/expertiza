@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AssignmentSurveyDeployment < SurveyDeployment
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'parent_id'
 

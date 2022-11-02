@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe PopupController do
   let(:superadmin) { build_stubbed(:superadmin) }
   let(:admin) { build_stubbed(:admin) }

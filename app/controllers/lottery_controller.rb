@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class LotteryController < ApplicationController
   include AuthorizationHelper
 
@@ -56,7 +58,9 @@ class LotteryController < ApplicationController
         bid_record = Bid.find_by(team_id: team.id, topic_id: topic.id)
         bids << (bid_record.try(:priority) || 0)
       end
-      team.users.each { |user| users_bidding_info << { pid: user.id, ranks: bids } } unless bids.uniq == [0]
+      unless bids.uniq == [0]
+        team.users.each { |user| users_bidding_info << { pid: user.id, ranks: bids } }
+      end
     end
     users_bidding_info
   end

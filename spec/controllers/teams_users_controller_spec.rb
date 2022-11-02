@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require './spec/support/teams_shared.rb'
 
 describe TeamsUsersController do
@@ -249,7 +251,7 @@ describe TeamsUsersController do
         allow(AssignmentTeam).to receive(:find).with('1').and_return(team1)
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
-        allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_raise("Member on existing team error")
+        allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_raise('Member on existing team error')
         user_session = { user: admin }
         request_params = {
           user: { name: 'student2065' }, id: 1
@@ -293,7 +295,7 @@ describe TeamsUsersController do
         allow(CourseTeam).to receive(:find).with('5').and_return(team5)
         allow(Course).to receive(:find).with(1).and_return(course1)
         allow(CourseParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
-        allow_any_instance_of(CourseTeam).to receive(:add_member).with(any_args).and_raise("Member on existing team error")
+        allow_any_instance_of(CourseTeam).to receive(:add_member).with(any_args).and_raise('Member on existing team error')
         user_session = { user: admin }
         request_params = {
           user: { name: 'student2065' }, id: 5

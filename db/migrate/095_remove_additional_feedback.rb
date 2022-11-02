@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RemoveAdditionalFeedback < ActiveRecord::Migration[4.2]
   # delete any duplicate feedback objects. Keep only the most current
   def self.up

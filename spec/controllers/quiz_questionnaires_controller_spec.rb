@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe QuizQuestionnairesController do
   let(:questionnaire) do
     build(id: 1, name: 'questionnaire', ta_id: 8, course_id: 1, private: false, min_question_score: 0, max_question_score: 5, type: 'ReviewQuestionnaire')
@@ -42,11 +44,11 @@ describe QuizQuestionnairesController do
         context 'when questionnaire type is QuizQuestionnaire' do
           it 'redirects to submitted_content#edit page' do
             request_params = { aid: 1,
-                       pid: 1,
-                       questionnaire: { name: 'Test questionnaire',
-                                        type: 'QuizQuestionnaire',
-                                        min_question_score: 0,
-                                        max_question_score: 5 } }
+                               pid: 1,
+                               questionnaire: { name: 'Test questionnaire',
+                                                type: 'QuizQuestionnaire',
+                                                min_question_score: 0,
+                                                max_question_score: 5 } }
             # create_questionnaire
             participant = double('Participant')
             allow(Participant).to receive(:find).with('1').and_return(participant)
@@ -72,11 +74,11 @@ describe QuizQuestionnairesController do
         context 'when questionnaire type is QuizQuestionnaire and max_question_score value is negative' do
           it 'creates error: The maximum question score must be a positive integer.' do
             request_params = { aid: 1,
-                       pid: 1,
-                       questionnaire: { name: 'Test questionnaire',
-                                        type: 'QuizQuestionnaire',
-                                        min_question_score: -2,
-                                        max_question_score: -1 } }
+                               pid: 1,
+                               questionnaire: { name: 'Test questionnaire',
+                                                type: 'QuizQuestionnaire',
+                                                min_question_score: -2,
+                                                max_question_score: -1 } }
             # create_questionnaire
             participant = double('Participant')
             allow(Participant).to receive(:find).with('1').and_return(participant)
@@ -97,11 +99,11 @@ describe QuizQuestionnairesController do
         context 'when questionnaire type is QuizQuestionnaire and min_question_score value is negative' do
           it 'creates error: The minimum question score must be a positive integer.' do
             request_params = { aid: 1,
-                       pid: 1,
-                       questionnaire: { name: 'Test questionnaire',
-                                        type: 'QuizQuestionnaire',
-                                        min_question_score: 2,
-                                        max_question_score: 1 } }
+                               pid: 1,
+                               questionnaire: { name: 'Test questionnaire',
+                                                type: 'QuizQuestionnaire',
+                                                min_question_score: 2,
+                                                max_question_score: 1 } }
             # create_questionnaire
             participant = double('Participant')
             allow(Participant).to receive(:find).with('1').and_return(participant)
@@ -131,9 +133,9 @@ describe QuizQuestionnairesController do
         context 'when quiz is invalid and questionnaire type is QuizQuestionnaire' do
           it 'redirects to submitted_content#edit page' do
             request_params = { aid: 1,
-                       pid: 1,
-                       questionnaire: { name: 'test questionnaire',
-                                        type: 'QuizQuestionnaire' } }
+                               pid: 1,
+                               questionnaire: { name: 'test questionnaire',
+                                                type: 'QuizQuestionnaire' } }
             # create_quiz_questionnaire
             allow_any_instance_of(QuizQuestionnairesController).to receive(:validate_quiz).and_return('Please select a correct answer for all questions')
             request.env['HTTP_REFERER'] = 'www.google.com'
@@ -158,9 +160,9 @@ describe QuizQuestionnairesController do
         context 'when an assignment requires quiz' do
           before(:each) do
             @request_params = { aid: 1,
-                        model: 'QuizQuestionnaire',
-                        pid: 1,
-                        private: 0 }
+                                model: 'QuizQuestionnaire',
+                                pid: 1,
+                                private: 0 }
             @assignment = double('Assignment')
             allow(Assignment).to receive(:find).with('1').and_return(@assignment)
             allow(@assignment).to receive(:require_quiz?).and_return(true)
@@ -196,9 +198,9 @@ describe QuizQuestionnairesController do
         context 'when an assignment does not require quiz' do
           it 'shows error message and redirects to submitted_content#view' do
             request_params = { aid: 1,
-                       model: 'QuizQuestionnaire',
-                       pid: 1,
-                       private: 0 }
+                               model: 'QuizQuestionnaire',
+                               pid: 1,
+                               private: 0 }
             assignment = double('Assignment')
             allow(Assignment).to receive(:find).with('1').and_return(assignment)
             allow(assignment).to receive(:require_quiz?).and_return(false)
@@ -250,37 +252,37 @@ describe QuizQuestionnairesController do
         context 'when @questionnaire is not nil' do
           it 'updates all quiz questions and redirects to submitted_content#view page' do
             request_params = { id: 1,
-                       pid: 1,
-                       save: true,
-                       questionnaire: { name: 'test questionnaire',
-                                        instructor_id: 6,
-                                        private: 0,
-                                        min_question_score: 0,
-                                        max_question_score: 5,
-                                        type: 'ReviewQuestionnaire',
-                                        display_type: 'Review',
-                                        instructor_loc: '' },
-                       question: { '1' => { txt: 'Q1' },
-                                   '2' => { txt: 'Q2' },
-                                   '3' => { txt: 'Q3' },
-                                   '4' => { txt: 'Q4' } },
-                       quiz_question_choices: { '1' => { MultipleChoiceRadio:
+                               pid: 1,
+                               save: true,
+                               questionnaire: { name: 'test questionnaire',
+                                                instructor_id: 6,
+                                                private: 0,
+                                                min_question_score: 0,
+                                                max_question_score: 5,
+                                                type: 'ReviewQuestionnaire',
+                                                display_type: 'Review',
+                                                instructor_loc: '' },
+                               question: { '1' => { txt: 'Q1' },
+                                           '2' => { txt: 'Q2' },
+                                           '3' => { txt: 'Q3' },
+                                           '4' => { txt: 'Q4' } },
+                               quiz_question_choices: { '1' => { MultipleChoiceRadio:
                                                           { :correctindex => 1,
                                                             '1' => { txt: 'a11' },
                                                             '2' => { txt: 'a12' },
                                                             '3' => { txt: 'a13' },
                                                             '4' => { txt: 'a14' } } },
-                                                '2' => { TrueFalse: { '1' => { iscorrect: 'True' } } },
-                                                '3' => { MultipleChoiceCheckbox:
+                                                        '2' => { TrueFalse: { '1' => { iscorrect: 'True' } } },
+                                                        '3' => { MultipleChoiceCheckbox:
                                                           { '1' => { iscorrect: '0', txt: 'a31' },
                                                             '2' => { iscorrect: '1', txt: 'a32' },
                                                             '3' => { iscorrect: '0', txt: 'a33' },
                                                             '4' => { iscorrect: '1', txt: 'a34' } } },
-                                                '4' => { TrueFalse: { '1' => { iscorrect: 'False' } } } },
-                       question_weights: { '1' => { txt: '1' },
-                                           '2' => { txt: '1' },
-                                           '3' => { txt: '1' },
-                                           '4' => { txt: '1' } } }
+                                                        '4' => { TrueFalse: { '1' => { iscorrect: 'False' } } } },
+                               question_weights: { '1' => { txt: '1' },
+                                                   '2' => { txt: '1' },
+                                                   '3' => { txt: '1' },
+                                                   '4' => { txt: '1' } } }
             questionnaire = double('Questionnaire')
             allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
             allow(questionnaire).to receive(:update_attributes).with(any_args).and_return(true)

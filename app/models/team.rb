@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Team < ApplicationRecord
   has_many :teams_users, dependent: :destroy
   has_many :users, through: :teams_users
@@ -26,7 +28,7 @@ class Team < ApplicationRecord
   def delete
     TeamsUser.where(team_id: id).find_each(&:destroy)
     node = TeamNode.find_by(node_object_id: id)
-    node.destroy if node
+    node&.destroy
     destroy
   end
 
@@ -60,7 +62,9 @@ class Team < ApplicationRecord
 
   # Add member to the team, changed to hash by E1776
   def add_member(user, _assignment_id = nil)
-    raise "The user #{user.name} is already a member of the team #{name}" if user?(user)
+    if user?(user)
+      raise "The user #{user.name} is already a member of the team #{name}"
+    end
 
     can_add_member = false
     unless full?
@@ -92,7 +96,9 @@ class Team < ApplicationRecord
   # Check if the team exists
   def self.check_for_existing(parent, name, team_type)
     list = Object.const_get(team_type + 'Team').where(parent_id: parent.id, name: name)
-    raise TeamExistsError, "The team name #{name} is already in use." unless list.empty?
+    unless list.empty?
+      raise TeamExistsError, "The team name #{name} is already in use."
+    end
   end
 
   # Algorithm
@@ -120,9 +126,13 @@ class Team < ApplicationRecord
     # sort teams by decreasing team size
     teams.sort_by { |team| Team.size(team.id) }.reverse!
     # insert users who are not in any team to teams still need team members
-    assign_single_users_to_teams(min_team_size, parent, teams, users) if !users.empty? && !teams.empty?
+    if !users.empty? && !teams.empty?
+      assign_single_users_to_teams(min_team_size, parent, teams, users)
+    end
     # If all the existing teams are fill to the min_team_size and we still have more users, create teams for them.
-    create_team_from_single_users(min_team_size, parent, team_type, users) unless users.empty?
+    unless users.empty?
+      create_team_from_single_users(min_team_size, parent, team_type, users)
+    end
   end
 
   def self.create_team_from_single_users(min_team_size, parent, team_type, users)
@@ -173,14 +183,18 @@ class Team < ApplicationRecord
       if user.nil?
         raise ImportError, "The user '#{teammate}' was not found. <a href='/users/new'>Create</a> this user?"
       else
-        add_member(user) if TeamsUser.find_by(team_id: id, user_id: user.id).nil?
+        if TeamsUser.find_by(team_id: id, user_id: user.id).nil?
+          add_member(user)
+        end
       end
     end
   end
 
   #  changed to hash by E1776
   def self.import(row_hash, id, options, teamtype)
-    raise ArgumentError, 'Not enough fields on this line.' if row_hash.empty? || (row_hash[:teammembers].empty? && (options[:has_teamname] == 'true_first' || options[:has_teamname] == 'true_last')) || (row_hash[:teammembers].empty? && (options[:has_teamname] == 'true_first' || options[:has_teamname] == 'true_last'))
+    if row_hash.empty? || (row_hash[:teammembers].empty? && (options[:has_teamname] == 'true_first' || options[:has_teamname] == 'true_last')) || (row_hash[:teammembers].empty? && (options[:has_teamname] == 'true_first' || options[:has_teamname] == 'true_last'))
+      raise ArgumentError, 'Not enough fields on this line.'
+    end
 
     if options[:has_teamname] == 'true_first' || options[:has_teamname] == 'true_last'
       name = row_hash[:teamname].to_s
@@ -202,7 +216,9 @@ class Team < ApplicationRecord
 
     # insert team members into team unless team was pre-existing & we ignore duplicate teams
 
-    team.import_team_members(row_hash) unless team_exists && options[:handle_dups] == 'ignore'
+    unless team_exists && options[:handle_dups] == 'ignore'
+      team.import_team_members(row_hash)
+    end
   end
 
   # Handle existence of the duplicate team
@@ -219,9 +235,9 @@ class Team < ApplicationRecord
     end
     if handle_dups == 'replace' # replace: delete old team
       team.delete
-      return name
+      name
     else # handle_dups = "insert"
-      return nil
+      nil
     end
   end
 
@@ -263,9 +279,9 @@ class Team < ApplicationRecord
   # existing logic of User model.
   def name(ip_address = nil)
     if User.anonymized_view?(ip_address)
-      return "Anonymized_Team_#{self[:id]}"
+      "Anonymized_Team_#{self[:id]}"
     else
-      return self[:name]
+      self[:name]
     end
   end
 

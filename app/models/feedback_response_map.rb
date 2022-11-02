@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FeedbackResponseMap < ResponseMap
   belongs_to :reviewee, class_name: 'Participant', foreign_key: 'reviewee_id'
   belongs_to :review, class_name: 'Response', foreign_key: 'reviewed_object_id'
@@ -50,12 +52,16 @@ class FeedbackResponseMap < ResponseMap
       @all_review_response_ids_round_two = []
       @all_review_response_ids_round_three = []
       @temp_review_responses.each do |response|
-        next if @temp_response_map_ids.include? response.map_id.to_s + response.round.to_s
+        if @temp_response_map_ids.include? response.map_id.to_s + response.round.to_s
+          next
+        end
 
         @temp_response_map_ids << response.map_id.to_s + response.round.to_s
         @all_review_response_ids_round_one << response.id if response.round == 1
         @all_review_response_ids_round_two << response.id if response.round == 2
-        @all_review_response_ids_round_three << response.id if response.round == 3
+        if response.round == 3
+          @all_review_response_ids_round_three << response.id
+        end
       end
     else
       @all_review_response_ids = []
@@ -69,9 +75,9 @@ class FeedbackResponseMap < ResponseMap
     # @feedback_response_map_ids = ResponseMap.where(["reviewed_object_id IN (?) and type = ?", @all_review_response_ids, type]).pluck("id")
     # @feedback_responses = Response.where(["map_id IN (?)", @feedback_response_map_ids]).pluck("id")
     if Assignment.find(id).vary_by_round?
-      return @authors, @all_review_response_ids_round_one, @all_review_response_ids_round_two, @all_review_response_ids_round_three
+      [@authors, @all_review_response_ids_round_one, @all_review_response_ids_round_two, @all_review_response_ids_round_three]
     else
-      return @authors, @all_review_response_ids
+      [@authors, @all_review_response_ids]
     end
   end
 

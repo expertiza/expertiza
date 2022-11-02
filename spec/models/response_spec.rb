@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Response do
   let(:user) { build(:student, id: 1, role_id: 1, name: 'no name', fullname: 'no one') }
   let(:user2) { build(:student, id: 2, role_id: 2, name: 'no name2', fullname: 'no one2') }
@@ -228,7 +230,7 @@ describe Response do
       allow(assignment).to receive(:num_review_rounds).and_return(2)
       allow(Question).to receive(:get_all_questions_with_comments_available).with(1).and_return([1, 2])
       allow(ReviewResponseMap).to receive_message_chain(:where, :find_each).with(reviewed_object_id: 1, reviewer_id: 1)
-        .with(no_args).and_yield(review_response_map)
+                                                                           .with(no_args).and_yield(review_response_map)
       response1 = double('Response', round: 1, additional_comment: '')
       response2 = double('Response', round: 2, additional_comment: 'LGTM')
       allow(review_response_map).to receive(:response).and_return([response1, response2])

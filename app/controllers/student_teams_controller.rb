@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class StudentTeamsController < ApplicationController
   include AuthorizationHelper
 
@@ -27,7 +29,7 @@ class StudentTeamsController < ApplicationController
       if are_needed_authorizations_present?(params[:student_id], 'reader', 'reviewer', 'submitter')
         return true if current_user_has_id? student.user_id
       else
-        return false
+        false
       end
     when 'create'
       current_user_has_id? student.user_id
@@ -54,7 +56,9 @@ class StudentTeamsController < ApplicationController
     @current_due_date = DueDate.current_due_date(@student.assignment.due_dates)
 
     # this line generates a list of users on the waiting list for the topic of a student's team,
-    @users_on_waiting_list = (SignUpTopic.find(@student.team.topic).users_on_waiting_list if student_team_requirements_met?)
+    @users_on_waiting_list = (if student_team_requirements_met?
+                                SignUpTopic.find(@student.team.topic).users_on_waiting_list
+                              end)
     @teammate_review_allowed = DueDate.teammate_review_allowed(@student)
   end
 

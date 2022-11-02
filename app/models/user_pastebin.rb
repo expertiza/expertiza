@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UserPastebin < ActiveRecord::Base
   validates :user_id, uniqueness: { scope: :short_form }
 

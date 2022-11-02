@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe QuizResponseMap do
   let(:quiz_questionnaire) { QuizQuestionnaire.new }
   let(:team) { build(:assignment_team, id: 1, parent_id: 1) }

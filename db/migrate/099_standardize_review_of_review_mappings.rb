@@ -1,4 +1,6 @@
-class StandardizeReviewOfReviewMappings < ActiveRecord::Migration[4.2]  
+# frozen_string_literal: true
+
+class StandardizeReviewOfReviewMappings < ActiveRecord::Migration[4.2]
   def self.up
     begin
       execute "ALTER TABLE `review_of_review_mappings`

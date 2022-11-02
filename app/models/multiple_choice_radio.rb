@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MultipleChoiceRadio < QuizQuestion
   def edit
     quiz_question_choices = QuizQuestionChoice.where(question_id: id)
@@ -88,7 +90,9 @@ class MultipleChoiceRadio < QuizQuestion
       correct_count += 1 if value.key?(:iscorrect)
     end
     # valid = "Please select a correct answer for all questions" if correct_count == 0
-    valid = 'Please select a correct answer for all questions' if correct_count.zero?
+    if correct_count.zero?
+      valid = 'Please select a correct answer for all questions'
+    end
     valid
   end
 end

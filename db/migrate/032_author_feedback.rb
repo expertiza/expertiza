@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AuthorFeedback < ActiveRecord::Migration[4.2]
   def self.up
     add_column 'assignments', 'author_feedback_questionnaire_id', :integer

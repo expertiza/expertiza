@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ChartGeneratorHelper
   # moves data of reviews in each round from a current round
   def initialize_chart_elements(reviewer)

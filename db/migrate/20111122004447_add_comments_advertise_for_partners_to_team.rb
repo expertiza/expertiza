@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddCommentsAdvertiseForPartnersToTeam < ActiveRecord::Migration[4.2]
   def self.up
     add_column :teams, :comment, :text

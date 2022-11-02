@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AccessHelper
   def authorize
     unless all_actions_allowed?

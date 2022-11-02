@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Bid do
   let(:assignment) { create(:assignment, is_intelligent: true, name: 'assignment') }
 

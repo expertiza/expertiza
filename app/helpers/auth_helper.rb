@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AuthHelper
   def self.get_home_action(user)
     user.role.get_home_action

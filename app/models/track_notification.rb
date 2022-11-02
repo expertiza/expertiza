@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TrackNotification < ApplicationRecord
   # attr_accessible :notification
   validates :notification_id, presence: true

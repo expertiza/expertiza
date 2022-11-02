@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DataMigrations
   def self.run!
     files = Dir['./db/data_migrations/*.rb'].reject do |s|

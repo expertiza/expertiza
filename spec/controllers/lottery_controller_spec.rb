@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe LotteryController do
   let(:assignment) { create(:assignment, is_intelligent: true, name: 'assignment', directory_path: 'assignment') }
   let(:assignment_2) { create(:assignment, is_intelligent: false, name: 'assignment_2', directory_path: 'assignment_2') }

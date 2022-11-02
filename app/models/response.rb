@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'analytic/response_analytic'
 require 'lingua/en/readability'
 
@@ -25,7 +27,9 @@ class Response < ApplicationRecord
     # feedback.  Currently this is only done if the rubric is Author Feedback.
     # It doesn't seem necessary to print out the rubric type in the case of
     # a ReviewResponseMap.
-    identifier += '<h3>Feedback from author</h3>' if map.type.to_s == 'FeedbackResponseMap'
+    if map.type.to_s == 'FeedbackResponseMap'
+      identifier += '<h3>Feedback from author</h3>'
+    end
     if prefix # has prefix means view_score page in instructor end
       self_id = prefix + '_' + id.to_s
       code = construct_instructor_html identifier, self_id, count
@@ -45,7 +49,9 @@ class Response < ApplicationRecord
     scores.each do |s|
       question = Question.find(s.question_id)
       # For quiz responses, the weights will be 1 or 0, depending on if correct
-      sum += s.answer * question.weight unless s.answer.nil? || !question.is_a?(ScoredQuestion)
+      unless s.answer.nil? || !question.is_a?(ScoredQuestion)
+        sum += s.answer * question.weight
+      end
     end
     sum
   end
@@ -72,7 +78,9 @@ class Response < ApplicationRecord
     total_weight = 0
     scores.each do |s|
       question = Question.find(s.question_id)
-      total_weight += question.weight unless s.answer.nil? || !question.is_a?(ScoredQuestion)
+      unless s.answer.nil? || !question.is_a?(ScoredQuestion)
+        total_weight += question.weight
+      end
     end
     questionnaire = if scores.empty?
                       questionnaire_by_answer(nil)
@@ -107,7 +115,9 @@ class Response < ApplicationRecord
     response = Response.where(map_id: response_map.id, round: current_round.to_i).order(updated_at: :desc).first
     reviewee_team = AssignmentTeam.find_by(id: response_map.reviewee_id)
 
-    most_recent_submission_by_reviewee = reviewee_team.most_recent_submission if reviewee_team
+    if reviewee_team
+      most_recent_submission_by_reviewee = reviewee_team.most_recent_submission
+    end
 
     if response.nil? || (most_recent_submission_by_reviewee && most_recent_submission_by_reviewee.updated_at > response.updated_at)
       response = Response.create(map_id: response_map.id, additional_comment: '', round: current_round, is_submitted: 0)
@@ -149,7 +159,9 @@ class Response < ApplicationRecord
         next if last_response_in_current_round.nil?
 
         last_response_in_current_round.scores.each do |answer|
-          comments += answer.comments if question_ids.include? answer.question_id
+          if question_ids.include? answer.question_id
+            comments += answer.comments
+          end
           @comments_in_round[round] += (answer.comments ||= '')
         end
         additional_comment = last_response_in_current_round.additional_comment
@@ -295,7 +307,9 @@ class Response < ApplicationRecord
     count = 0
     # loop through questions so the the questions are displayed in order based on seq (sequence number)
     questions.each do |question|
-      count += 1 if !question.is_a?(QuestionnaireHeader) && (question.break_before == true)
+      if !question.is_a?(QuestionnaireHeader) && (question.break_before == true)
+        count += 1
+      end
       answer = answers.find { |a| a.question_id == question.id }
       row_class = count.even? ? 'info' : 'warning'
       row_class = '' if question.is_a? QuestionnaireHeader

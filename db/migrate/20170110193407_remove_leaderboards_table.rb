@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RemoveLeaderboardsTable < ActiveRecord::Migration[4.2]
   def self.up
     drop_table :leaderboards

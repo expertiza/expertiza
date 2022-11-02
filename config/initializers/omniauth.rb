@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 OmniAuth.config.logger = Rails.logger
 
 # Secret client and secret key configuration for google app

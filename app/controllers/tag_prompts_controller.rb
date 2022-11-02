@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TagPromptsController < ApplicationController
   skip_before_action :verify_authenticity_token
 
@@ -16,9 +18,15 @@ class TagPromptsController < ApplicationController
 
   def index
     @tagprompts = TagPrompt.all.order('prompt asc')
-    @tagprompts.where!('prompt LIKE ?', "%#{params[:prompt]}%") if params.key?(:prompt) && (!params[:prompt] == '')
-    @tagprompts.where!('desc LIKE ?', "%#{params[:desc]}%") if params.key?(:desc) && (!params[:desc] == '')
-    @tagprompts.where!('control_type LIKE ?', "%#{params[:control_type]}%") if params.key?(:control_type) && (!params[:control_type] == '')
+    if params.key?(:prompt) && (!params[:prompt] == '')
+      @tagprompts.where!('prompt LIKE ?', "%#{params[:prompt]}%")
+    end
+    if params.key?(:desc) && (!params[:desc] == '')
+      @tagprompts.where!('desc LIKE ?', "%#{params[:desc]}%")
+    end
+    if params.key?(:control_type) && (!params[:control_type] == '')
+      @tagprompts.where!('control_type LIKE ?', "%#{params[:control_type]}%")
+    end
     render json: @tagprompts
   end
 

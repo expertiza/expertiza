@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'badge system' do
   ###
   # Please follow the TDD process as much as you can.

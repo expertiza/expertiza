@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PermissionForQuizQuestionnaire < ActiveRecord::Migration[4.2]
   def self.up
     controller_id = SiteController.find_by_name('questionnaire').id

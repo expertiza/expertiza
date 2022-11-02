@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Base Node class
 # Provides common method definitions, but minimal functoinality.
 # Must be subclassed for use in tree_display code

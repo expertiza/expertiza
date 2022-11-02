@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'analytic/assignment_team_analytic'
 module AssignmentAnalytic
   #====== general statistics ======#
@@ -76,7 +78,9 @@ module AssignmentAnalytic
   def questionnaire_types
     questionnaire_type_list = []
     questionnaires.each do |questionnaire|
-      questionnaire_type_list << questionnaire.type unless questionnaires.include?(questionnaire.type)
+      unless questionnaires.include?(questionnaire.type)
+        questionnaire_type_list << questionnaire.type
+      end
     end
     questionnaire_type_list
   end
@@ -95,7 +99,9 @@ module AssignmentAnalytic
       assignment.questionnaire_types.each do |questionnaire_type|
         questionnaire_list = []
         assignment.questionnaires.each do |questionnaire|
-          questionnaire_list << questionnaire if questionnaire.type == questionnaire_type
+          if questionnaire.type == questionnaire_type
+            questionnaire_list << questionnaire
+          end
           return false if questionnaire_list.count > 1
         end
       end

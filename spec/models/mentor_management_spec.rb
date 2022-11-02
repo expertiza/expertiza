@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe MentorManagement do
   # using let! so that state is automatically set up before each example group
   # this could also be accomplished with before(:each) and instance methods

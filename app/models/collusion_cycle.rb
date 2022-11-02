@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # new class created to handle code related to cycles between reviews
 # This code was previously in AssignmentParticipant and is not being used anywhere yet
 class CollusionCycle

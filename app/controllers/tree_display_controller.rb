@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TreeDisplayController < ApplicationController
   helper :application
   include SecurityHelper
@@ -72,7 +74,9 @@ class TreeDisplayController < ApplicationController
     @currCtlr = params[:currCtlr]
     redirect_to controller: :content_pages, action: :view unless user_logged_in?
 
-    redirect_to controller: :student_task, action: :list if current_user.try(:student?)
+    if current_user.try(:student?)
+      redirect_to controller: :student_task, action: :list
+    end
   end
 
   # Returns the contents of each top level folder as a json object.
@@ -121,7 +125,9 @@ class TreeDisplayController < ApplicationController
 
   # for child nodes
   def children_node_ng
-    flash[:error] = 'Invalid JSON in the TreeList' unless json_valid? params[:reactParams][:child_nodes]
+    unless json_valid? params[:reactParams][:child_nodes]
+      flash[:error] = 'Invalid JSON in the TreeList'
+    end
     child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
     tmp_res = {}
     begin
@@ -177,22 +183,30 @@ class TreeDisplayController < ApplicationController
 
   # check if nodetype is coursenode
   def course_node_for_current_ta?(ta_mappings, node)
-    ta_mappings.each { |ta_mapping| return true if ta_mapping.course_id == node.node_object_id }
+    ta_mappings.each do |ta_mapping|
+      return true if ta_mapping.course_id == node.node_object_id
+    end
     false
   end
 
   # check if nodetype is assignmentnode
   def assignment_node_for_current_ta?(ta_mappings, node)
     course_id = Assignment.find(node.node_object_id).course_id
-    ta_mappings.each { |ta_mapping| return true if ta_mapping.course_id == course_id }
+    ta_mappings.each do |ta_mapping|
+      return true if ta_mapping.course_id == course_id
+    end
     false
   end
 
   # check if user is ta for current course
   def ta_for_current_course?(node)
     ta_mappings = TaMapping.where(ta_id: session[:user].id)
-    return course_node_for_current_ta?(ta_mappings, node) if node.is_a? CourseNode
-    return assignment_node_for_current_ta?(ta_mappings, node) if node.is_a? AssignmentNode
+    if node.is_a? CourseNode
+      return course_node_for_current_ta?(ta_mappings, node)
+    end
+    if node.is_a? AssignmentNode
+      return assignment_node_for_current_ta?(ta_mappings, node)
+    end
 
     false
   end
@@ -232,22 +246,23 @@ class TreeDisplayController < ApplicationController
   def res_node_for_child_2(ch_nodes)
     res = []
 
-    if ch_nodes
-      ch_nodes.each do |child|
-        node_type = child.type
-        res2 = {
-          'nodeinfo' => child,
-          'name' => child.get_name,
-          'instructor_id' => child.get_instructor_id, # add instructor id to the payload to make it available in the frontend
-          'key' => params[:reactParams2][:key],
-          'type' => node_type,
-          'private' => child.get_private,
-          'creation_date' => child.get_creation_date,
-          'updated_date' => child.get_modified_date
-        }
-        coursenode_assignmentnode(res2, child) if %w[CourseNode AssignmentNode].include? node_type
-        res << res2
+    # add instructor id to the payload to make it available in the frontend
+    ch_nodes&.each do |child|
+      node_type = child.type
+      res2 = {
+        'nodeinfo' => child,
+        'name' => child.get_name,
+        'instructor_id' => child.get_instructor_id, # add instructor id to the payload to make it available in the frontend
+        'key' => params[:reactParams2][:key],
+        'type' => node_type,
+        'private' => child.get_private,
+        'creation_date' => child.get_creation_date,
+        'updated_date' => child.get_modified_date
+      }
+      if %w[CourseNode AssignmentNode].include? node_type
+        coursenode_assignmentnode(res2, child)
       end
+      res << res2
     end
     res
   end

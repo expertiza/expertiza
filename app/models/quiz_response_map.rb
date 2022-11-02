@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class QuizResponseMap < ResponseMap
   belongs_to :reviewee, class_name: 'Participant', foreign_key: 'reviewee_id', inverse_of: false
   belongs_to :contributor, class_name: 'Participant', foreign_key: 'reviewee_id', inverse_of: false
@@ -14,7 +16,7 @@ class QuizResponseMap < ResponseMap
   end
 
   def delete
-    response.delete unless response.nil?
+    response&.delete
     destroy
   end
 

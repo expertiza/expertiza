@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ResponseMap < ApplicationRecord
   extend Scoring
   has_many :response, foreign_key: 'map_id', dependent: :destroy, inverse_of: false
@@ -53,7 +55,7 @@ class ResponseMap < ApplicationRecord
     # get_reviewer may return an AssignmentParticipant or an AssignmentTeam
     # map = where(reviewee_id: team.id, reviewer_id: reviewer.get_reviewer.id)
     map = where(reviewee_id: team.id, reviewer_id: reviewer.id)
-    Response.where(map_id: map.first.id).sort { |m1, m2| comparator(m1, m2) }.first
+    Response.where(map_id: map.first.id).min { |m1, m2| comparator(m1, m2) }
   end
 
   # Placeholder method, override in derived classes if required.

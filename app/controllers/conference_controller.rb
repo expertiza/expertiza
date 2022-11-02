@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ConferenceController < ApplicationController
   include AuthorizationHelper
   include ConferenceHelper
@@ -45,7 +47,7 @@ class ConferenceController < ApplicationController
       add_conference_user_as_participant
     else
       url = polymorphic_url :conference, action: 'new', role: 'Student', assignment_id: params[:user][:assignment]
-      return redirect_to url
+      redirect_to url
     end
   end
 

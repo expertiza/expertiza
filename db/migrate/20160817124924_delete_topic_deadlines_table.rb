@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DeleteTopicDeadlinesTable < ActiveRecord::Migration[4.2]
   def self.up
     drop_table :topic_deadlines

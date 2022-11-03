@@ -15,6 +15,7 @@ class SignupSheetController < ApplicationController
   require 'rgl/dot'
   require 'rgl/topsort'
 
+  # Make sure all these methods are only accessed by privileged users
   def action_allowed?
     case params[:action]
     when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
@@ -36,6 +37,7 @@ class SignupSheetController < ApplicationController
   verify method: :post, only: %i[destroy create update],
          redirect_to: { action: :list }
 
+  # Used to return locale of the website
   def controller_locale
     locale_for_student
   end
@@ -137,6 +139,8 @@ class SignupSheetController < ApplicationController
     SignUpSheet.add_signup_topic(params[:id])
   end
 
+  # Separated from setup_new_topic
+  # Only used to setup the parameters of new topic
   def set_values_for_new_topic
     @signup_topic = SignUpTopic.new
     @signup_topic.topic_identifier = topic_params[:topic_identifier]
@@ -213,6 +217,7 @@ class SignupSheetController < ApplicationController
     render('signup_sheet/intelligent_topic_selection') && return if @assignment.is_intelligent
   end
 
+  # Signup for a topic
   def sign_up
     @assignment = AssignmentParticipant.find(params[:id]).assignment
     @user_id = session[:user].id
@@ -246,6 +251,7 @@ class SignupSheetController < ApplicationController
     redirect_to action: 'list', id: params[:id]
   end
 
+  # Set the priority and bid for the topics in the assignment
   def set_priority
     participant = AssignmentParticipant.find_by(id: params[:participant_id])
     assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
@@ -389,6 +395,7 @@ class SignupSheetController < ApplicationController
     redirect_to action: 'list', id: params[:id]
   end
 
+  # Used to public topics in the _all_actions.html.erb
   def publish_approved_suggested_topic
     SignUpTopic.find_by(id: params[:topic_id]).update_attribute(:private_to, nil) if SignUpTopic.exists?(id: params[:topic_id])
     redirect_to action: 'list', id: params[:id]
@@ -396,6 +403,8 @@ class SignupSheetController < ApplicationController
 
   private
 
+  # Create and setup a new topic if we cannot find it
+  # Called by create
   def setup_new_topic
     set_values_for_new_topic
     @signup_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
@@ -407,6 +416,8 @@ class SignupSheetController < ApplicationController
     end
   end
 
+  # Update the existing topic, instead of creating a new one
+  # Called by create
   def update_existing_topic(topic)
     # This method is called as a fall-back for create, when the topic entered already exists it updates the existing
     # Updates the waitlist for the topic based of update of max choosers
@@ -415,6 +426,7 @@ class SignupSheetController < ApplicationController
     redirect_to_sign_up(params[:id])
   end
 
+  # Update teams on the waitlist for the topic based on update of max_choosers
   def update_waitlist(topic)
     # While saving the max choosers you should be careful; if there are users who have signed up for this particular
     # topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
@@ -453,6 +465,8 @@ class SignupSheetController < ApplicationController
     @ad_information
   end
 
+  # Separated from delete_signup()
+  # Students could drop topic if there is no drop topic deadline
   def delete_signup_for_topic(assignment_id, topic_id, user_id)
     SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
   end

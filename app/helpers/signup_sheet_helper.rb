@@ -65,10 +65,6 @@ module SignupSheetHelper
 
         chooser_present = true
         html += participant.user_name_placeholder
-        if assignment.max_team_size > 1
-          html += '<a href="/signup_sheet/delete_signup_as_instructor/' + participant.team_id.to_s + '?topic_id=' + topic.id.to_s + '"">'
-          html += '<img border="0" align="middle" src="/assets/delete_icon.png" title="Drop Student"></a>'
-        end
         html += '<font color="red">(waitlisted)</font>' if participant.is_waitlisted
         html += '<br/>'
       end

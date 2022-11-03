@@ -412,10 +412,7 @@ Expertiza::Application.routes.draw do
       get :team_details
       get :intelligent_sign_up
       get :intelligent_save
-      get :signup_as_instructor
-      get :delete_signup_as_instructor
       post :delete_all_topics_for_assignment
-      post :signup_as_instructor_action
       post :set_priority
       post :save_topic_deadlines
       post :delete_all_selected_topics

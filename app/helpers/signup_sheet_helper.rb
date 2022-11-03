@@ -56,7 +56,7 @@ module SignupSheetHelper
   end
 
   # Render the participant info for a topic and assignment.
-  def render_participant_info(topic, assignment, participants)
+  def render_participant_info(topic, participants)
     html = ''
     if participants.present?
       chooser_present = false

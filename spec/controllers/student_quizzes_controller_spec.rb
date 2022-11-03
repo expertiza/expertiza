@@ -33,6 +33,12 @@ describe StudentQuizzesController do
             stub_current_user(student, student.role.name, student.role)
             expect(controller.send(:action_allowed?)).to be true
         end
+
+        it "when the current user is teaching assistant" do
+            # To stub the user into session
+            stub_current_user(student, student.role.name, student.role)
+            expect(controller.send(:action_allowed?)).to be true
+        end
     end
 
     describe "GET index" do

@@ -37,10 +37,10 @@ class StudentQuizzesController < ApplicationController
     quiz_questions = []
     reviewer = Participant.where(user_id: reviewer_id, parent_id: assignment_id).first  # Get reviewer
     reviewed_team_response_maps = ReviewResponseMap.where(reviewer_id: reviewer.id) # Get reviewed_team_response_maps based on reviewer_id
-    reviewed_team_response_maps.each do |team_response_map_record|  
-      reviewee_id = team_response_map_record.reviewee_id 
+    reviewed_team_response_maps.each do |team_response_map_record|
+      reviewee_id = team_response_map_record.reviewee_id
       reviewee_team = Team.find(reviewee_id) # Get team of the reviewer
-      next unless reviewee_team.parent_id == assignment_id 
+      next unless reviewee_team.parent_id == assignment_id
       quiz_questionnaire = QuizQuestionnaire.where(instructor_id: reviewee_team.id).first # Get the latest quiz questions of the team of reviewer
       # if the reviewee team has created quiz
       if quiz_questionnaire
@@ -68,7 +68,7 @@ class StudentQuizzesController < ApplicationController
 
 
   # This method is only for quiz questionnaires, it is called when instructors click "view quiz questions" on the pop-up panel.
-  def get_questions_created_by_id
+  def review_questions
     @quiz_creator_user_id = params[:id]
     @quiz_questionnaires = []
     Team.where(parent_id: params[:id]).each do |quiz_creator| #Get all teams of participant who created quizzes

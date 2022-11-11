@@ -85,13 +85,12 @@
         jQuery("#impersonate-form").submit()
     });
 
-    $(function() {
-        $('button.navbar-toggle').click(function() {
-            if ($('.container').css('margin-top') === '-30px') {
-                $('.container').css('margin-top', '+=255');
-            } else {
-                $('.container').css('margin-top', '-30px');
-            }
-        });
+
+    $('.navbar-toggle').click(function() {
+      if ($('.container').css('margin-top') === '-30px') {
+          $('.container').css('margin-top', '+=255');
+      } else {
+          $('.container').css('margin-top', '-30px');
+      }
     });
 </script>

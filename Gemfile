@@ -19,7 +19,7 @@ gem 'capistrano-db-tasks', require: false
 gem 'capistrano-passenger'
 gem 'capistrano-rails'
 gem 'capistrano-rvm'
-gem 'chartjs-ror'
+gem 'chartjs-ror', '3.6.2'
 gem 'coffee-rails'
 gem 'coveralls', require: false
 gem 'danger', git: 'https://github.com/Winbobob/danger.git', ref: '1ccfed23f809a1e5c46e2533cfd7a3138f6cd821', require: false
@@ -73,7 +73,6 @@ gem 'therubyracer'
 gem 'thin'
 gem 'timecop'
 gem 'tinymce-rails'
-gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
 gem 'railties', '5.1.0.rc2'

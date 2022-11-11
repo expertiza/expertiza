@@ -60,6 +60,7 @@ class AssignmentForm
     else
       attributes[:assignment][:late_policy_id] = nil
     end
+    
     update_assignment(attributes[:assignment])
     update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
     update_assignment_questionnaires(attributes[:topic_questionnaire]) unless @has_errors || attributes[:assignment][:vary_by_topic?] == 'false'
@@ -80,7 +81,7 @@ class AssignmentForm
   # Code to update values of assignment
   def update_assignment(attributes)
     unless @assignment.update_attributes(attributes)
-      @errors = @assignment.errors.to_s
+      @errors = @assignment.errors.messages
       @has_errors = true
     end
     @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
@@ -93,7 +94,7 @@ class AssignmentForm
 
     if attributes[0].key?(:questionnaire_weight)
       validate_assignment_questionnaires_weights(attributes)
-      @errors = @assignment.errors.to_s
+      @errors = @assignment.errors.messages
       topic_id = nil
     end
     unless @has_errors
@@ -107,13 +108,13 @@ class AssignmentForm
         aq = assignment_questionnaire(questionnaire_type, attr[:used_in_round], topic_id, duty_id)
         if aq.id.nil?
           unless aq.save
-            @errors = @assignment.errors.to_s
+            @errors = @assignment.errors.messages
             @has_errors = true
             next
           end
         end
         unless aq.update_attributes(attr)
-          @errors = @assignment.errors.to_s
+          @errors = @assignment.errors.messages
           @has_errors = true
         end
       end
@@ -190,7 +191,7 @@ class AssignmentForm
         # get deadline for review
         @has_errors = true unless dd.update_attributes(due_date)
       end
-      @errors += @assignment.errors.to_s if @has_errors
+      @errors += @assignment.errors.messages if @has_errors
     end
   end
 

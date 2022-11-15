@@ -5,7 +5,7 @@ describe MailWorker do
   let(:user) { build(:student, id: 1, email: 'psingh22@ncsu.edu') }
   let(:review_response_map) { build(:review_response_map, id: 1, reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1) }
   let(:topic) { build(:topic, id: 1, topic_name: 'New Topic') }
-  let(:signedupteam) { build(:signed_up_team) }
+  let(:signedupteam) { build(:signed_up_team, team_id: team.id, topic: topic) }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -14,6 +14,7 @@ describe MailWorker do
     allow(Participant).to receive(:where).with(user_id: '1', parent_id: '1').and_return([participant])
     allow(ResponseMap).to receive(:where).with(reviewed_object_id: '1').and_return([review_response_map])
     allow(ResponseMap).to receive(:where).with(id: 1).and_return([review_response_map])
+    allow(SignedUpTeam).to receive(:where).with(team_id: 1).and_return([signedupteam])
   end
 
   describe 'Tests mailer with sidekiq' do

@@ -350,28 +350,44 @@ class AssignmentsController < ApplicationController
 
   # helper methods for edit
 
+  def set_submissions_and_reviews_rounds
+    # The submission round i.e. Round 1 (before 1st deadline), Round 2 (after first peer review, before 2nd deadline)
+    @num_submissions_round = @assignment.find_due_dates('submission').nil? ? 0 : @assignment.find_due_dates('submission').count
+    @num_reviews_round = @assignment.find_due_dates('review').nil? ? 0 : @assignment.find_due_dates('review').count
+  end
+
+
   # populates values and settings of the assignment for editing
   def edit_params_setting
     @assignment = Assignment.find(params[:id])
-    @num_submissions_round = @assignment.find_due_dates('submission').nil? ? 0 : @assignment.find_due_dates('submission').count
-    @num_reviews_round = @assignment.find_due_dates('review').nil? ? 0 : @assignment.find_due_dates('review').count
-
     @topics = SignUpTopic.where(assignment_id: params[:id])
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @user = current_user
+    
+    set_submissions_and_reviews_rounds
 
     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
+    
+    # Set due date
     @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
     @due_date_nameurl_not_empty = false
     @due_date_nameurl_not_empty_checkbox = false
+    
+    # Set metareview (self-review)
     @metareview_allowed = false
     @metareview_allowed_checkbox = false
+
+    # Set up signup and drop topic
     @signup_allowed = false
     @signup_allowed_checkbox = false
     @drop_topic_allowed = false
     @drop_topic_allowed_checkbox = false
+
+    # Set up team formation
     @team_formation_allowed = false
     @team_formation_allowed_checkbox = false
+
+    # Set up participants and teams counts
     @participants_count = @assignment_form.assignment.participants.size
     @teams_count = @assignment_form.assignment.teams.size
   end

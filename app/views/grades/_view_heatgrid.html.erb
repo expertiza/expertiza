@@ -223,6 +223,13 @@ function toggleFunction(elementId) {
                 </tr>
                 <% j += 1 %>
             <% end %>
+            
+            <tr>
+              <th> Avg </th>
+              <% vm.average_review_score.each do |myarr| %>
+                <td><%= myarr %></td>
+              <% end %>
+            </tr>
 
             <!--displays the row for the add'l comments, by default: collapsed. -->
             <tr>

@@ -293,4 +293,10 @@
     <% end %>
   <% end %>
 
+<% if @current_role_name.eql?'Student' and @assignment.show_teammate_reviews==true %>
+  <td>
+    <%=view_heatgrid(@participant.id, "TeammateReviewQuestionnaire") %>
+  </td>
+<% end %>
+
 <%= link_to 'Back', :back %>

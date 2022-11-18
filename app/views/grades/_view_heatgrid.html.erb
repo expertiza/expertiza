@@ -89,12 +89,21 @@ function toggleFunction(elementId) {
 
           <!-- display the table title and tooltips -->
           <span style="width:100%;">
-              <h4 style="font-weight:bold;display:inline-block;"><%= vm.questionnaire_display_type %>
-                <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
-                    (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
-                <%end %>
-              </h4>
-              <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= @type + @participant.id.to_s + vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>
+            <h4 style="font-weight:bold;display:inline-block;"><%= vm.questionnaire_display_type %>
+              <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
+                  (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
+              <%end %>
+            </h4>
+
+            <% if vm.questionnaire_display_type == "AuthorFeedbackQuestionnaire" %>
+              <% user_name = User.find(@participant.user_id).fullname(session[:ip]).to_s %>
+              <h4 style="font-weight:bold;display:inline-block;"><%= " for "+ user_name + "'s review"%></h4>
+            <% else if vm.questionnaire_type == "TeammateReviewQuestionnaire" %>
+              <% user_name = User.find(@participant.user_id).fullname(session[:ip]).to_s %>
+              <h4 style="font-weight:bold;display:inline-block;"><%= " for "+ user_name + "'s contribution"%></h4>
+            <% end %>
+
+            <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= @type + @participant.id.to_s + vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>
             <% if @assignment.is_answer_tagging_allowed %>
             <span class="spn_qsttog" id="tag_prompt_toggler" title="">hide tags</span>
             <% end %>
@@ -268,3 +277,4 @@ function toggleFunction(elementId) {
 Grade: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
 Comment: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %>
 <!-- termination of the main outer loop. -->
+<% end %>

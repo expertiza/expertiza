@@ -93,9 +93,6 @@ function toggleFunction(elementId) {
               <% elsif vm.questionnaire_type == "TeammateReviewQuestionnaire" %>
                 <% user_name = User.find(@participant.user_id).fullname(session[:ip]).to_s %>
                 of <%= user_name %>'s contribution
-              <% elsif vm.questionnaire_type == "AuthorFeedbackQuestionnaire" %>
-                <% user_name = User.find(@participant.user_id).fullname(session[:ip]).to_s %>
-                by <%= user_name %>
               <% end %>
             </h4>
 

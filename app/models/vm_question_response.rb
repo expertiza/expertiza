@@ -193,7 +193,7 @@ class VmQuestionResponse
     end
   end
 
-  def average_review_score()
+  def average_review_score
     average_score_array = []
     @list_of_reviews.each do |review|
       average_score = 0
@@ -207,12 +207,11 @@ class VmQuestionResponse
       end
       unless count.zero?
         average_score /= count
-        average_score.round(2)
-        average_score_array << average_score
+        average_score_array.push(average_score)
       end
     end
-    composite_score = (average_score_array.sum.to_f / average_score_array.size.to_f).round(2)
-    average_score_array << composite_score
+    composite_score = (average_score_array.sum.to_f / average_score_array.size.to_f)
+    average_score_array.push(composite_score)
   end
 
 end

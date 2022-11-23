@@ -249,6 +249,13 @@ class Response < ApplicationRecord
     Class.new.extend(Scoring).assessment_score(params)
   end
 
+  def copy_to_response_map(response_map)
+    new_response = dup
+    new_response.map_id = response_map.id
+    new_response.save
+    new_response
+  end
+
   private
 
   def construct_instructor_html(identifier, self_id, count)

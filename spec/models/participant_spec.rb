@@ -165,10 +165,8 @@ describe Participant do
   end
 
   describe '#copy_to_assignment' do
-    it "should copy participant to an assignment" do
+    it 'should copy participant to an assignment' do
       new_participant = participant.copy_to_assignment(assignment2)
-      puts new_participant.parent_id
-      puts assignment2.id
       expect(new_participant.parent_id).to eq(assignment2.id)
     end
   end

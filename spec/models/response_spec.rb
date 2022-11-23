@@ -4,7 +4,9 @@ describe Response do
   let(:participant) { build(:participant, id: 1, parent_id: 1, user: user) }
   let(:participant2) { build(:participant, id: 2, parent_id: 2, user: user2) }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
-  let(:team) { build(:assignment_team) }
+  let(:assignment2) { build(:assignment, id: 2, name: 'Test Assgt 2') }
+  let(:team) { build(:assignment_team, id: 1) }
+  let(:team) { build(:assignment_team, id: 2) }
   let(:signed_up_team) { build(:signed_up_team, team_id: team.id) }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer]) }
@@ -22,6 +24,7 @@ describe Response do
   let(:tag_prompt) { TagPrompt.new(id: 1, prompt: 'prompt') }
   let(:tag_prompt_deployment) { TagPromptDeployment.new(id: 1, tag_prompt_id: 1, assignment_id: 1, questionnaire_id: 1, question_type: 'Criterion') }
   let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1, reviewee_id: 1) }
+  let(:response_map2) { create(:review_response_map, id: 2, reviewed_object_id: 2, reviewee_id: 2) }
   let!(:response_record) { create(:response, id: 1, map_id: 1, response_map: response_map, updated_at: '2020-03-24 12:10:20') }
   before(:each) do
     allow(response).to receive(:map).and_return(review_response_map)
@@ -353,6 +356,13 @@ describe Response do
       allow(User).to receive(:find).with(1).and_return(user)
       allow(Role).to receive(:find).with(1).and_return(build(:role_of_student))
       expect(response.done_by_staff_participant?).to eq(false)
+    end
+  end
+
+  describe '#copy_to_response_map' do
+    it 'should copy response to a response map' do
+      new_response = response.copy_to_response_map(response_map2)
+      expect(new_response.map_id).to eq(response_map2.id)
     end
   end
 end

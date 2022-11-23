@@ -50,6 +50,7 @@ class AssignmentsController < ApplicationController
         @assignment_form.update(assignment_form_params, current_user)
         aid = Assignment.find(@assignment_form.assignment.id).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
+        session[:assignment_id] = aid
         redirect_to edit_assignment_path aid
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
         return
@@ -71,6 +72,7 @@ class AssignmentsController < ApplicationController
 
   # edits an assignment's deadlines and assigned rubrics
   def edit
+    session[:assignment_id] = nil
     user_timezone_specified
     edit_params_setting
     assignment_staggered_deadline?
@@ -85,6 +87,8 @@ class AssignmentsController < ApplicationController
     @badges = Badge.all
     @use_bookmark = @assignment.use_bookmark
     @duties = Duty.where(assignment_id: @assignment_form.assignment.id)
+    @assignment = Assignment.find(params[:id])
+    session[:assignment_id] = @assignment.id
   end
 
   # updates an assignment via an assignment form
@@ -109,7 +113,9 @@ class AssignmentsController < ApplicationController
 
   # displays an assignment via ID
   def show
+    session[:assignment_id] = nil
     @assignment = Assignment.find(params[:id])
+    session[:assignment_id] = @assignment.id
   end
 
   # gets an assignment's path/url

@@ -151,4 +151,8 @@ class Participant < ApplicationRecord
     fields.push('handle') if options['handle'] == 'true'
     fields
   end
+
+  def copy_to_assignment(assignment)
+    # Initial Commit
+  end
 end

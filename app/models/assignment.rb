@@ -622,6 +622,39 @@ class Assignment < ApplicationRecord
     self.enable_pair_programming
   end
 
+  def copy_calibration_submissions(new_assignment)
+    response_maps = ResponseMap.where(reviewed_object_id: id, calibrate_to: 1)
+    old_team_hashes = {}
+
+    response_maps.each do |response_map|
+      new_response_map = response_map.dup
+      new_response_map.reviewed_object_id = new_assignment.id
+
+      if old_team_hashes.include? response_map.reviewee_id
+        new_response_map.reviewee_id = old_team_hashes[response_map.reviewee_id]
+        new_response_map.save
+        next
+      end
+
+      team = Team.where(id: new_response_map.reviewee_id).first
+      new_team = team.copy_to_assignment(new_assignment)
+
+      old_team_hashes[team.id] = new_team.id
+      new_response_map.reviewee_id = new_team.id
+      new_response_map.save
+
+      submission_records = SubmissionRecord.where(assignment_id: id, team_id: team.id)
+      submission_records.each do |submission_record|
+        submission_record.copy_to_team(new_team)
+      end
+
+      responses = Response.where(map_id: response_map.id)
+      responses.each do |response|
+        response.copy_to_response_map(new_response_map)
+      end
+    end
+  end
+
   private
 
   # returns true if assignment has staggered deadline and topic_id is nil

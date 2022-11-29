@@ -304,7 +304,7 @@ class Team < ApplicationRecord
 
     team_users = TeamsUser.where(team_id: new_team.id)
     team_users.each do |team_user|
-      # TODO Check if participant already exists
+      # TODO: Check if participant already exists
       participant = Participant.where(parent_id: parent_id, user_id: team_user.user_id).first
       participant.copy_to_assignment(assignment)
     end

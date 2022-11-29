@@ -63,8 +63,6 @@ function toggleFunction(elementId) {
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% table_count = 0 %>
 <% @vmlist.each do |vm| %>
-    <% if (vm.questionnaire_display_type == "Metareview" or vm.questionnaire_display_type == "Author Feedback" or vm.questionnaire_display_type == "Teammate Review") and @current_role_name.eql?'Student' %>
-    <% else %>
         <% if vm.list_of_reviewers.length > 0 %>
 
         <h2>

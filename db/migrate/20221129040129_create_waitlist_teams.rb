@@ -19,7 +19,7 @@ class CreateWaitlistTeams < ActiveRecord::Migration[5.1]
                add constraint fk_waitlist_teams_sign_up_topics
                foreign key (topic_id) references sign_up_topics(id)"
     
-    add_index 'waitlist_teams', ["team_id", "topic_id"], unique: truehttps://github.com/hss69017/expertiza-E2281.git
+    add_index 'waitlist_teams', ["team_id", "topic_id"], unique: true
 
   end
 

@@ -293,4 +293,22 @@ class Team < ApplicationRecord
       nil
     end
   end
+
+  # copies Team to a particular assignment along with TeamUsers, TeamUserNodes and Participants
+  def copy_to_assignment(assignment)
+    new_team = dup
+    new_team.parent_id = assignment.id
+    new_team.save
+
+    copy_members(new_team)
+
+    team_users = TeamsUser.where(team_id: new_team.id)
+    team_users.each do |team_user|
+      # TODO Check if participant already exists
+      participant = Participant.where(parent_id: parent_id, user_id: team_user.user_id).first
+      participant.copy_to_assignment(assignment)
+    end
+
+    new_team
+  end
 end

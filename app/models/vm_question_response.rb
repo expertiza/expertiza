@@ -192,26 +192,17 @@ class VmQuestionResponse
       end
     end
   end
-
-  def average_review_score
-    average_score_array = []
-    @list_of_reviews.each do |review|
-      average_score = 0
-      count = 0
-      answers = Answer.where(response_id:  review.response_id)
-      answers.each do |answer|
-        if answer.answer.is_a? Numeric
-          count += 1
-          average_score += answer.answer.to_f
-        end
-      end
-      unless count.zero?
-        average_score /= count
-        average_score_array.push(average_score)
-      end
+  
+  # Calculates the compositie (average of all reviews) score for each heatgrid
+  def composite_score
+    average_row_score = 0
+    number_of_rows = 0
+    composite_score = 0
+    @list_of_rows.each do |row|
+      number_of_rows += 1
+      average_row_score += row.average_score_for_row.to_f
     end
-    composite_score = (average_score_array.sum.to_f / average_score_array.size.to_f)
-    average_score_array.push(composite_score)
+    composite_score = (average_row_score/number_of_rows).round(2).to_s
   end
 
 end

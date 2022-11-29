@@ -89,7 +89,7 @@ function toggleFunction(elementId) {
             <h4 style="font-weight:bold;display:inline-block;"><%= vm.questionnaire_display_type %>
               <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
                   (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
-              <!-- Display a more descriptive title if the reviews are teammate reviews either for or about the sutdent -->
+              <!-- Display a more descriptive title if the table is teammate reviews about the sutdent -->
               <% elsif vm.questionnaire_type == "TeammateReviewQuestionnaire" %>
                 <% user_name = User.find(@participant.user_id).fullname(session[:ip]).to_s %>
                 of <%= user_name %>'s contribution

@@ -4,8 +4,8 @@ describe 'peer review testing' do
   # User third is mapped to review team one
   # User second is mapped to review team two
   before(:each) do
-    create(:assignment, name: 'TestAssignment', directory_path: 'test_assignment')
-    create_list(:participant, 3)
+    create(:assignment, name: 'TestAssignment', directory_path: 'test_assignment', show_teammate_reviews: true)
+    create_list(:participant, 4)
     create(:assignment_node)
     create(:deadline_type, name: 'submission')
     create(:deadline_type, name: 'review')
@@ -18,21 +18,28 @@ describe 'peer review testing' do
     create(:deadline_right, name: 'OK')
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now.in_time_zone + 1.day)
     create(:topic)
-    create(:topic, topic_name: 'TestReview')
+    create(:topic, topic_name: 'TestReview', topic_identifier: '2')
     create(:team_user, user: User.where(role_id: 1).first)
     create(:team_user, user: User.where(role_id: 1).second)
     create(:assignment_team)
+    create(:assignment_team)
     create(:team_user, user: User.where(role_id: 1).third, team: AssignmentTeam.second)
+    create(:team_user, user: User.where(role_id: 1).first, team: AssignmentTeam.first)
+    create(:team_user, user: User.where(role_id: 1).second, team: AssignmentTeam.first)
     create(:signed_up_team)
     create(:signed_up_team, team_id: 2, topic: SignUpTopic.second)
+    create(:signed_up_team, team_id: 1, topic: SignUpTopic.first)
     create(:assignment_questionnaire)
     create(:question)
-    create(:submission_record)
+    create(:submission_record, team_id: 1)
     create(:submission_record, team_id: 2)
-    create(:review_response_map, reviewer_id: User.where(role_id: 1).third.id)
+    create(:review_response_map, reviewer_id: User.where(role_id: 1).third.id, reviewee: AssignmentTeam.first)
     create(:review_response_map, reviewer_id: User.where(role_id: 1).first.id, reviewee: AssignmentTeam.second)
     create(:review_response_map, reviewer_id: User.where(role_id: 1).second.id, reviewee: AssignmentTeam.second)
-
+    create(:teammate_questionnaire)
+    create(:question)
+    create(:assignment_teammate_questionnaire, user_id: User.where(role_id: 1).third.id)
+    create(:teammate_review_response_map, reviewer: Participant.second, reviewee: Participant.first)
     create(:review_grade, review_graded_at: Time.now.in_time_zone)
   end
 
@@ -51,12 +58,13 @@ describe 'peer review testing' do
 
     click_link 'Your scores'
     expect(page).to have_content 'Summary Report for assignment: TestAssignment'
+    expect(page).to have_text 'Teammate Review'
   end
 
   # User 1 adds a review to Team 2
   def add_review
-    login_as(User.where(role_id: 1).first.name)
-    expect(page).to have_content 'User: ' + User.where(role_id: 1).first.name
+    login_as(User.where(role_id: 1).second.name)
+    expect(page).to have_content 'User: ' + User.where(role_id: 1).second.name
 
     expect(page).to have_content 'TestAssignment'
 
@@ -67,8 +75,8 @@ describe 'peer review testing' do
     click_link "Others' work"
     expect(page).to have_content 'Reviews for "TestAssignment"'
 
-    choose 'topic_id'
-    click_button 'Request a new submission to review'
+    # choose 'topic_id'
+    # click_button 'Request a new submission to review'
 
     click_link 'Begin'
 

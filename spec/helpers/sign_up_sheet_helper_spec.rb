@@ -30,6 +30,8 @@ describe 'SignUpSheetHelper' do
 
     it 'The get_suggested_topics method should return the suggested topics' do
       session[:user] = create(:student)
+      participant = create(:participant, user_id: session[:user].id, id: 1)
+      allow(@assignment).to receive(:participants).and_return([participant])
       topic = helper.get_suggested_topics(@assignment.id)
       expect(topic).to be_empty
     end
@@ -104,6 +106,6 @@ describe 'SignUpSheetHelper' do
     it 'The team_bids method should throw an exception' do
       expect { helper.team_bids(@topic1, @assignment1, nil) }.to raise_exception(ArgumentError)
     end
-  end  
+  end
 
 end

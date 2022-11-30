@@ -4,7 +4,7 @@ describe 'peer review testing' do
   # User third is mapped to review team one
   # User second is mapped to review team two
   before(:each) do
-    create(:assignment, name: 'TestAssignment', directory_path: 'test_assignment', show_teammate_reviews: true)
+    create(:assignment, name: 'TestAssignment', directory_path: 'test_assignment', show_teammate_reviews: false)
     create_list(:participant, 4)
     create(:assignment_node)
     create(:deadline_type, name: 'submission')
@@ -36,15 +36,12 @@ describe 'peer review testing' do
     create(:review_response_map, reviewer_id: User.where(role_id: 1).third.id, reviewee: AssignmentTeam.first)
     create(:review_response_map, reviewer_id: User.where(role_id: 1).first.id, reviewee: AssignmentTeam.second)
     create(:review_response_map, reviewer_id: User.where(role_id: 1).second.id, reviewee: AssignmentTeam.second)
-    create(:teammate_questionnaire)
-    create(:question)
-    create(:assignment_teammate_questionnaire, user_id: User.where(role_id: 1).third.id)
-    create(:teammate_review_response_map, reviewer: Participant.second, reviewee: Participant.first)
     create(:review_grade, review_graded_at: Time.now.in_time_zone)
   end
 
   # User 3 navigates to the Your scores page
   def load_your_scores
+
     login_as(User.where(role_id: 1).third.name)
     expect(page).to have_content 'User: ' + User.where(role_id: 1).third.name
 
@@ -58,7 +55,8 @@ describe 'peer review testing' do
 
     click_link 'Your scores'
     expect(page).to have_content 'Summary Report for assignment: TestAssignment'
-    expect(page).to have_text 'Teammate Review'
+    # Negative case - assignment was set to not show teammate reviews so they should not be shown
+    expect(page).to_not have_text 'Teammate Review'
   end
 
   # User 1 adds a review to Team 2

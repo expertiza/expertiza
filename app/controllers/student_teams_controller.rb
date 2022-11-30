@@ -32,7 +32,9 @@ class StudentTeamsController < ApplicationController
     when 'create'
       current_user_has_id? student.user_id
     when 'edit', 'update'
-      current_user_has_id? team.user_id
+      if @team!=nil
+        current_user_has_id? team.user_id
+      end
     else
       true
     end
@@ -72,8 +74,7 @@ class StudentTeamsController < ApplicationController
       team.save
       parent = AssignmentNode.find_by node_object_id: student.parent_id
       TeamNode.create parent_id: parent.id, node_object_id: team.id
-      user = User.find(student.user_id)
-      team.add_member(user, team.parent_id)
+      team.add_participant_to_team(student, team.parent_id)
       team_created_successfully(team)
       redirect_to view_student_teams_path student_id: student.id
 
@@ -107,7 +108,7 @@ class StudentTeamsController < ApplicationController
 
   def remove_participant
     # remove the record from teams_users table
-    team_user = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id)
+    team_user = TeamsUser.find_by_team_id_and_user_id(params[:team_id], student.user_id)
     remove_team_user(team_user)
     # if your old team does not have any members, delete the entry for the team
     if TeamsUser.where(team_id: params[:team_id]).empty?
@@ -129,7 +130,7 @@ class StudentTeamsController < ApplicationController
   def remove_team_user(team_user)
     return false unless team_user
 
-    team_user.destroy_all
+    team_user.destroy
     undo_link "The user \"#{team_user.name}\" has been successfully removed from the team."
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'User removed a participant from the team', request)
   end

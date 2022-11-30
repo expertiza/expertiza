@@ -54,7 +54,9 @@ class TeamsUsersController < ApplicationController
           flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
         else
           begin
-            add_member_return = team.add_member(user, team.parent_id)
+            participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
+            flash[:error] = "User from user_id #{user.id}, user from participant id #{participant.id},#{participant.id}"
+            # add_member_return = team.add_participant_to_team(participant, team.parent_id)
           rescue
             flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
             redirect_back fallback_location: root_path

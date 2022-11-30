@@ -2,7 +2,7 @@
     <tr>
     <td><%= inv.from_user.name(session_ip) %></td>
     <td>
-        <% teams_participants = TeamsParticipant.where(['participant_id = ?', inv.from_id]) %>
+        <% teams_participants = TeamsUser.where(['participant_id = ?', inv.from_id]) %>
         <% teams_participants.each do |teams_user| %>
             <% current_team = Team.where(['id = ? and parent_id = ?', teams_user.team_id, student.assignment.id]).first %>
             <%= Team.find(current_team.id).name unless current_team.nil?%>

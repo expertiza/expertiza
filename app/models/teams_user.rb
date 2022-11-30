@@ -84,7 +84,7 @@ class TeamsUser < ApplicationRecord
     unless assignment_id.nil?
       participant_id = Assignment.find(assignment_id).participants.find_by(user_id: user_id).id
       # E2283: Fetch only based on participant_id after user_id is removed from teams_users table.
-      teams_users = TeamsUser.where(participant_id: participant_id)
+      teams_users = TeamsUser.where(user_id: user_id).or(TeamsUser.where(participant_id: participant_id))
 
       teams_users.each do |teams_user|
         team = Team.find(teams_user.team_id)
@@ -95,5 +95,18 @@ class TeamsUser < ApplicationRecord
       end
     end
     team_id
+  end
+
+  # E2283: Just return 'participant.user' after user_id is removed from teams_users table.
+  def user
+    if participant
+      participant.user
+    else
+      User.find(self[:user_id])
+    end
+  end
+
+  def user_id
+    user.id
   end
 end

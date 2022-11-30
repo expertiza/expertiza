@@ -11,6 +11,7 @@ class Team < ApplicationRecord
    def self.find_team_for_assignment_and_user(assignment_id, user_id)
     participant = Participant.find_by(user_id: user_id, parent_id: assignment_id)
     team_user = TeamsUser.find_by(participant_id: participant.id)
+    team_user = TeamsUser.where(user_id: user_id).find { |team_user_obj| team_user_obj.team.parent_id == assignment_id } if team_user.nil?
     Team.find(team_user.team_id)
   end
 
@@ -330,7 +331,7 @@ class Team < ApplicationRecord
   def self.remove_user_from_previous_team(parent_id, user_id)
     participant = Participant.find_by(user_id: user_id, parent_id: parent_id)
     team_user = TeamsUser.find_by(participant_id: participant.id)
-    team_user = TeamsUser.where(user_id: user_id).find { |team_user_obj| team_user_obj.team.parent_id == parent_id } if team_user.nil?    
+    team_user = TeamsUser.where(user_id: user_id).find { |team_user_obj| team_user_obj.team.parent_id == parent_id } if team_user.nil?
     begin
       team_user.destroy
     rescue StandardError

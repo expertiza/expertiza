@@ -253,6 +253,13 @@ class Response < ApplicationRecord
     new_response = dup
     new_response.map_id = response_map.id
     new_response.save
+
+    answers = Answer.where(response_id: id)
+
+    answers.each do |answer|
+      new_answer = answer.copy_to_response(new_response)
+    end
+
     new_response
   end
 

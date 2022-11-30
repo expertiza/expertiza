@@ -59,7 +59,16 @@ class StudentQuizzesController < ApplicationController
       response.created_at = DateTime.current
       response.updated_at = DateTime.current
       response.save
-      calculate_score participant_response, response
+      score_response = calculate_score participant_response, response
+      if score_response["valid"]
+        score_response["scores"].each(&:save)
+        redirect_to controller: 'student_quizzes', action: 'finished_quiz', map_id: participant_response.id
+      else
+        score_response["quiz_response"].destroy
+        flash[:error] = 'Please answer every question.'
+        questionnaire = Questionnaire.find(participant_response.reviewed_object_id)
+        redirect_to action: :take_quiz, assignment_id: params[:assignment_id], questionnaire_id: questionnaire.id, map_id: participant_response.id
+      end
     else  #Quiz is already taken.
       flash[:error] = 'You have already taken this quiz, below are your responses.'
       redirect_to controller: 'student_quizzes', action: 'finished_quiz', map_id: participant_response.id

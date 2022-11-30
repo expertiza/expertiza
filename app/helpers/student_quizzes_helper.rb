@@ -13,10 +13,15 @@ module StudentQuizzesHelper
                 valid = score_multiple_choice_radio(correct_answers, params, question, scores, quiz_response, valid)
             end
         end
-        save_scores_if_valid(valid, scores, quiz_response,participant_response)
+        #save_scores_if_valid?(valid, scores, quiz_response,participant_response)
+        score_response = Hash.new
+        score_response["valid"] = valid
+        score_response["scores"] = scores
+        score_response["quiz_response"] = quiz_response
+        score_response
     end
 
-    def save_scores_if_valid(valid, scores, quiz_response,participant_response)
+    def save_scores_if_valid?(valid, scores, quiz_response,participant_response)
         if valid
             scores.each(&:save)
             redirect_to controller: 'student_quizzes', action: 'finished_quiz', map_id: participant_response.id

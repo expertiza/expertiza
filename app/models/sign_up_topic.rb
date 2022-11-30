@@ -80,7 +80,7 @@ class SignUpTopic < ApplicationRecord
       signup_record = SignedUpTeam.where(topic_id: topic_id, team_id:  users_team[0].t_id).first
       assignment = Assignment.find(assignment_id)
       # if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
-      unless assignment.is_intelligent?
+      unless assignment.bid_for_topics?
         unless signup_record.try(:is_waitlisted)
           # find the first wait listed user if exists
           first_waitlisted_user = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first

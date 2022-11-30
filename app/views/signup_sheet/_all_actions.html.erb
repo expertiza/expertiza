@@ -17,7 +17,7 @@
               <% elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted%>
                   <td align="center">
                     <%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'signup_sheet', :action=> 'delete_signup', :id=>params[:id], :topic_id => topic.id, :assignment_id => params[:assignment_id] %>
-                    <% if @assignment.is_intelligent %>
+                    <% if @assignment.bid_for_topics %>
                         <%= form_tag({:controller=>"signup_sheet", :action=>"set_priority",:id => topic.id,:assignment_id => params[:assignment_id]}, method: :post) do %>
                             <%= number_field_tag :priority, selected_topic.preference_priority_number %>
                             <%= submit_tag  'Set priority', name: nil  %>
@@ -30,7 +30,7 @@
       <% end %>
       <% unless action_symbol_added %>
           <!--#if there is a signup topic deadline in current assignment, after the signup topic deadline, student will not see the choice of signing up topics any more. -->
-          <% if @assignment.is_intelligent %>
+          <% if @assignment.bid_for_topics %>
             <td><%= form_tag({:controller=>"signup_sheet", :action=>"set_priority",:id => topic.id,:assignment_id => params[:assignment_id]}, method: :post) do %>
             <% if @student_bids.all? {|sb| sb.topic_id != topic.id} %>
               <%= number_field_tag :priority, nil, min: 1, max: @num_of_topics, place_holder: 0 %>
@@ -51,7 +51,7 @@
   <% end %>
 <% else %>
   <td align="center">
-    <% if @assignment.is_intelligent %>
+    <% if @assignment.bid_for_topics %>
       <td><%= form_tag({:controller=>"signup_sheet", :action=>"set_priority",:id => topic.id,:assignment_id => params[:assignment_id]}, method: :post) do %>
       <% if @student_bids.all? {|sb| sb.topic_id != topic.id} %>
         <%= number_field_tag :priority, nil, min: 1, max: @num_of_topics, place_holder: 0 %>

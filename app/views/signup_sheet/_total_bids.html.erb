@@ -1,5 +1,5 @@
 <%# Logic to show total bids here%>
-<%# if @assignment.is_intelligent  %>
+<%# if @assignment.bid_for_topics  %>
   <% @total_bids_per_topic = {}  %>
   <% @signup_topics.each do |t| %>
   <%  c = Bid.where(topic_id: t.id).count %>

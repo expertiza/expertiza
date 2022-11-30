@@ -37,7 +37,7 @@ describe 'Assignment creation topics tab', js: true do
   end
   it 'can edit topics properties' do
     check('assignment_form_assignment_allow_suggestions')
-    check('assignment_form_assignment_is_intelligent')
+    check('assignment_form_assignment_bid_for_topics')
     check('assignment_form_assignment_can_review_same_topic')
     check('assignment_form_assignment_can_choose_topic_to_review')
     check('assignment_form_assignment_use_bookmark')
@@ -45,7 +45,7 @@ describe 'Assignment creation topics tab', js: true do
     assignment = Assignment.where(name: 'public assignment for test').first
     expect(assignment).to have_attributes(
       allow_suggestions: true,
-      is_intelligent: true,
+      bid_for_topics: true,
       can_review_same_topic: true,
       can_choose_topic_to_review: true,
       use_bookmark: true
@@ -54,7 +54,7 @@ describe 'Assignment creation topics tab', js: true do
 
   it 'proceeds without topics properties' do
     uncheck('assignment_form_assignment_allow_suggestions')
-    uncheck('assignment_form_assignment_is_intelligent')
+    uncheck('assignment_form_assignment_bid_for_topics')
     uncheck('assignment_form_assignment_can_review_same_topic')
     uncheck('assignment_form_assignment_can_choose_topic_to_review')
     uncheck('assignment_form_assignment_use_bookmark')
@@ -62,7 +62,7 @@ describe 'Assignment creation topics tab', js: true do
     assignment = Assignment.where(name: 'public assignment for test').first
     expect(assignment).to have_attributes(
       allow_suggestions: false,
-      is_intelligent: false,
+      bid_for_topics: false,
       can_review_same_topic: false,
       can_choose_topic_to_review: false,
       use_bookmark: false

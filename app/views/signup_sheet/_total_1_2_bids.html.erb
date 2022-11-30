@@ -1,5 +1,5 @@
 <%# Logic to show #1/#2 bids here%>
-<%# if @assignment.is_intelligent %>
+<%# if @assignment.bid_for_topics %>
   <% @priority_per_topic = {} %>
   <% @signup_topics.each do |t| %>
   <%  number_one = Bid.where(topic_id: t.id, priority: 1).count %>

@@ -623,6 +623,9 @@ class Assignment < ApplicationRecord
   end
 
   def copy_calibration_submissions(new_assignment)
+    instructor_participant = Participant.where(parent_id: id, user_id: instructor_id).first
+    new_instructor_participant = instructor_participant.copy_to_assignment(new_assignment)
+
     response_maps = ResponseMap.where(reviewed_object_id: id, calibrate_to: 1)
     old_team_hashes = {}
 

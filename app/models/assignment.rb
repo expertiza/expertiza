@@ -627,22 +627,14 @@ class Assignment < ApplicationRecord
     new_instructor_participant = instructor_participant.copy_to_assignment(new_assignment)
 
     response_maps = ResponseMap.where(reviewed_object_id: id, calibrate_to: 1)
-    old_team_hashes = {}
 
     response_maps.each do |response_map|
-      new_response_map = response_map.dup
-      new_response_map.reviewed_object_id = new_assignment.id
-
-      if old_team_hashes.include? response_map.reviewee_id
-        new_response_map.reviewee_id = old_team_hashes[response_map.reviewee_id]
-        new_response_map.save
-        next
-      end
-
-      team = Team.where(id: new_response_map.reviewee_id).first
+      team = Team.where(id: response_map.reviewee_id).first
       new_team = team.copy_to_assignment(new_assignment)
 
-      old_team_hashes[team.id] = new_team.id
+      new_response_map = response_map.dup
+      new_response_map.reviewed_object_id = new_assignment.id
+      new_response_map.reviewer_id = new_instructor_participant.id
       new_response_map.reviewee_id = new_team.id
       new_response_map.save
 

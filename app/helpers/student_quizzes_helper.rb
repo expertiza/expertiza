@@ -21,17 +21,17 @@ module StudentQuizzesHelper
         score_response
     end
 
-    def save_scores_if_valid?(valid, scores, quiz_response,participant_response)
-        if valid
-            scores.each(&:save)
-            redirect_to controller: 'student_quizzes', action: 'finished_quiz', map_id: participant_response.id
-        else
-            quiz_response.destroy
-            flash[:error] = 'Please answer every question.'
-            questionnaire = Questionnaire.find(participant_response.reviewed_object_id)
-            redirect_to action: :take_quiz, assignment_id: params[:assignment_id], questionnaire_id: questionnaire.id, map_id: participant_response.id
-        end
-    end
+#     def save_scores_if_valid?(valid, scores, quiz_response,participant_response)
+#         if valid
+#             scores.each(&:save)
+#             redirect_to controller: 'student_quizzes', action: 'finished_quiz', map_id: participant_response.id
+#         else
+#             quiz_response.destroy
+#             flash[:error] = 'Please answer every question.'
+#             questionnaire = Questionnaire.find(participant_response.reviewed_object_id)
+#             redirect_to action: :take_quiz, assignment_id: params[:assignment_id], questionnaire_id: questionnaire.id, map_id: participant_response.id
+#         end
+#     end
 
     def get_all_questions(participant_response)
         questionnaire = Questionnaire.find(participant_response.reviewed_object_id)

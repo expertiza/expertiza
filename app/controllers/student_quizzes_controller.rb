@@ -16,18 +16,18 @@ class StudentQuizzesController < ApplicationController
 
   #Returns quizzes to be reviewed for a participant
   def index
-    @participant = AssignmentParticipant.find(params[:id]) #Get participant object
+    @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)   #checks if logged in user is not a participant
-    @assignment = Assignment.find(@participant.parent_id)  #Get assignment created by parent_id
+    @assignment = Assignment.find(@participant.parent_id)
     @quiz_mappings = QuizResponseMap.mappings_for_reviewer(@participant.id) #returns quizzes to be reviewed by participant
   end
 
  # Populating Quiz Response Data
   def finished_quiz
-    @participant_response = Response.where(map_id: params[:map_id]).first # Populating participant response
-    @quiz_response_map = QuizResponseMap.find(params[:map_id]) #Populating Quiz Response
-    @quiz_questions = Question.where(questionnaire_id: @quiz_response_map.reviewed_object_id) #Populating Quiz Questions
-    response_map = ResponseMap.find(params[:map_id]) #Populating ResponseMap
+    @participant_response = Response.where(map_id: params[:map_id]).first 
+    @quiz_response_map = QuizResponseMap.find(params[:map_id])
+    @quiz_questions = Question.where(questionnaire_id: @quiz_response_map.reviewed_object_id)
+    response_map = ResponseMap.find(params[:map_id])
     @participant = AssignmentTeam.find(response_map.reviewee_id).participants.first #Populating participant who gave the quiz
     @participant_quiz_score = @quiz_response_map.quiz_score #Populating quiz score of the Participant
   end
@@ -35,7 +35,7 @@ class StudentQuizzesController < ApplicationController
   # Return an array of quiz questions for reviewer with reviewer_id
   def self.get_quiz_questionnaire(assignment_id, reviewer_id)
     quiz_questions = []
-    reviewer = Participant.where(user_id: reviewer_id, parent_id: assignment_id).first  # Get reviewer
+    reviewer = Participant.where(user_id: reviewer_id, parent_id: assignment_id).first
     reviewed_team_response_maps = ReviewResponseMap.where(reviewer_id: reviewer.id) # Get reviewed_team_response_maps based on reviewer_id
     reviewed_team_response_maps.each do |team_response_map_record|
       reviewee_id = team_response_map_record.reviewee_id

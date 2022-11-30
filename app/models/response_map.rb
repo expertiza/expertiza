@@ -101,4 +101,22 @@ class ResponseMap < ApplicationRecord
     end
     team
   end
+
+  def copy_to_assignment(assignment, team, instructor_participant)
+    new_response_map = dup
+    new_response_map.reviewed_object_id = assignment.id
+    new_response_map.reviewer_id = instructor_participant.id
+    new_response_map.reviewee_id = team.id
+    new_response_map.save
+
+    submission_records = SubmissionRecord.where(assignment_id: reviewed_object_id, team_id: reviewee_id)
+    submission_records.each do |submission_record|
+      submission_record.copy_to_team(team)
+    end
+
+    responses = Response.where(map_id: id)
+    responses.each do |response|
+      response.copy_to_response_map(new_response_map)
+    end
+  end
 end

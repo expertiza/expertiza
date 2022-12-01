@@ -203,8 +203,10 @@ class VmQuestionResponse
       average_row_score += row.average_score_for_row.to_f
     end
     unless number_of_rows.zero?
-      composite_score = (average_row_score/number_of_rows).round(2).to_s
+      composite_score = (average_row_score/number_of_rows)
     end
+    # Return initialized value of composite score if array is empty
+    composite_score.round(2).to_s
   end
 
 end

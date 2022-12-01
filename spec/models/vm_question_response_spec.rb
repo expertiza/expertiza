@@ -156,9 +156,7 @@ describe VmQuestionResponse  do
 
     context 'when passed a nil array' do
       it 'return a composite score of zero' do
-        teammate_review_questionnaire.type = "TeammateReviewQuestionnaire"
-        response = VmQuestionResponse.new(teammate_review_questionnaire, assignment, 1)
-        response.instance_variable_set(:@list_of_rows, [])
+        @response.instance_variable_set(:@list_of_rows, [])
         expect(response.composite_score).to eq("0.0")
       end
     end

@@ -120,5 +120,7 @@ class ResponseMap < ApplicationRecord
     responses.each do |response|
       response.copy_to_response_map(new_response_map)
     end
+
+    new_response_map
   end
 end

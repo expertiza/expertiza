@@ -88,16 +88,16 @@ class AssignmentTeam < Team
   end
 
   # Get Participants of the team
-  def participants
-    users = self.users
-    participants = []
-    users.each do |user|
-      participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: parent_id)
-      participants << participant unless participant.nil?
-    end
-    participants
-  end
-  alias get_participants participants
+  # def participants
+  #   users = self.users
+  #   participants = []
+  #   users.each do |user|
+  #     participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: parent_id)
+  #     participants << participant unless participant.nil?
+  #   end
+  #   participants
+  # end
+  # alias get_participants participants
 
   # Delete the team
   def delete

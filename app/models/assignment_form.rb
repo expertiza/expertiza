@@ -432,6 +432,8 @@ class AssignmentForm
       new_assign.create_node
       new_assign_id = new_assign.id
 
+      # Copies all calibration submissions along with Participants, Teams, TeamUsers, SubmissionRecords and Responses
+      # of the old assignment on to the new Assignment
       old_assign.copy_calibration_submissions(new_assign)
 
       # also copy topics from old assignment

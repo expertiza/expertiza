@@ -5,7 +5,7 @@ class SubmissionRecord < ApplicationRecord
   validates :user, presence: true
   validates :assignment_id, presence: true
 
-  # copies submission record to a team
+  # Creates a duplicate SubmissionRecord object, associates it to the specified Team
   def copy_to_team(team)
     new_submission_record = dup
     new_submission_record.team_id = team.id

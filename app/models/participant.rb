@@ -152,7 +152,7 @@ class Participant < ApplicationRecord
     fields
   end
 
-  # copies a duplicate participant to a particular assignment
+  # Creates a duplicate Participant object, associates the new object to a specific Assignment
   def copy_to_assignment(assignment)
     new_participant = dup
     new_participant.parent_id = assignment.id

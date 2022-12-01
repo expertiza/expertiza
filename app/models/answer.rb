@@ -38,6 +38,7 @@ class Answer < ApplicationRecord
     question_answers
   end
 
+  # Creates a duplicate Answer, associates the new Answer object to the specified Response object
   def copy_to_response(response)
     new_answer = dup
     new_answer.response_id = response.id

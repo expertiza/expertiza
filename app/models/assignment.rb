@@ -622,13 +622,17 @@ class Assignment < ApplicationRecord
     self.enable_pair_programming
   end
 
+  # Copies all calibration submissions along with Participants, Teams, TeamUsers, SubmissionRecords and Responses of
+  # the old assignment on to the new Assignment
   def copy_calibration_submissions(new_assignment)
+    # Create Participant entry for instructors to allow them to become reviewers
     instructor_participant = Participant.where(parent_id: id, user_id: instructor_id).first
     new_instructor_participant = instructor_participant.copy_to_assignment(new_assignment)
 
     response_maps = ResponseMap.where(reviewed_object_id: id, calibrate_to: 1)
-
     response_maps.each do |response_map|
+      # Create a duplicate Team object from the Team associated with the ResponseMap object to add teams who's
+      # submissions were used for calibration in the previous Assignment
       team = Team.where(id: response_map.reviewee_id).first
       new_team = team.copy_to_assignment(new_assignment)
 

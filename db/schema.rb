@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20221129040129) do
+ActiveRecord::Schema.define(version: 20221201154204) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -810,7 +810,6 @@ ActiveRecord::Schema.define(version: 20221129040129) do
   create_table "signed_up_teams", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "topic_id", default: 0, null: false
     t.integer "team_id", default: 0, null: false
-    t.boolean "is_waitlisted", default: false, null: false
     t.integer "preference_priority_number"
     t.index ["topic_id"], name: "fk_signed_up_users_sign_up_topics"
   end

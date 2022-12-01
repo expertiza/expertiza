@@ -162,7 +162,7 @@ describe VmQuestionResponse  do
     end
 
     context 'when passed an array of integer score cells' do
-      it 'return a calculated composite score' do
+      it 'return a non-zero composite score' do
         scores = [@score1, @score1, @score2, @score2]
         @row1.instance_variable_set(:@score_row, scores)
         @row2.instance_variable_set(:@score_row, scores)
@@ -192,7 +192,7 @@ describe VmQuestionResponse  do
     end
 
     context 'when passed an array of mixed numeric and non-numeric score cells' do
-      it 'return a composite score of zero' do
+      it 'return a non-zero composite score' do
         scores = [@score1, @score2, @score3, @score4]
         @row1.instance_variable_set(:@score_row, scores)
         @row2.instance_variable_set(:@score_row, scores)

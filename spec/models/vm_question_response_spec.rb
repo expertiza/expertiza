@@ -143,6 +143,17 @@ describe VmQuestionResponse  do
   end
 
   describe '#composite_score' do
+    before(:each) do
+      @response = VmQuestionResponse.new(teammate_review_questionnaire, assignment, 1)
+      @row1 = FactoryBot.build(:vm_question_response_row)
+      @row2 = FactoryBot.build(:vm_question_response_row)
+      @rows = [@row1, @row2]
+      @score1 = FactoryBot.build(:vm_question_response_score_cell, score_value: 0)
+      @score2 = FactoryBot.build(:vm_question_response_score_cell, score_value: 5)
+      @score3 = FactoryBot.build(:vm_question_response_score_cell, score_value: 'X')
+      @score4 = FactoryBot.build(:vm_question_response_score_cell, score_value: '')
+    end
+
     context 'when passed a nil array' do
       it 'return a composite score of zero' do
         teammate_review_questionnaire.type = "TeammateReviewQuestionnaire"
@@ -154,58 +165,41 @@ describe VmQuestionResponse  do
 
     context 'when passed an array of integer score cells' do
       it 'return a calculated composite score' do
-        teammate_review_questionnaire.type = "TeammateReviewQuestionnaire"
-        response = VmQuestionResponse.new(teammate_review_questionnaire, assignment, 1)
-        row1 = FactoryBot.build(:vm_question_response_row)
-        row2 = FactoryBot.build(:vm_question_response_row)
-        score1 = FactoryBot.build(:vm_question_response_score_cell, score_value: 0)
-        score2 = FactoryBot.build(:vm_question_response_score_cell, score_value: 0)
-        score3 = FactoryBot.build(:vm_question_response_score_cell, score_value: 5)
-        score4 = FactoryBot.build(:vm_question_response_score_cell, score_value: 5)
-        scores = [score1, score2, score3, score4]
-        row1.instance_variable_set(:@score_row, scores)
-        row2.instance_variable_set(:@score_row, scores)
-        rows = [row1, row2]
-        response.instance_variable_set(:@list_of_rows, rows)
-        expect(response.composite_score).to eq("2.5")
+        scores = [@score1, @score1, @score2, @score2]
+        @row1.instance_variable_set(:@score_row, scores)
+        @row2.instance_variable_set(:@score_row, scores)
+        @response.instance_variable_set(:@list_of_rows, @rows)
+        expect(@response.composite_score).to eq("2.5")
       end
     end
 
     context 'when passed an array of non-numeric score cells' do
       it 'return a composite score of zero' do
-        teammate_review_questionnaire.type = "TeammateReviewQuestionnaire"
-        response = VmQuestionResponse.new(teammate_review_questionnaire, assignment, 1)
-        row1 = FactoryBot.build(:vm_question_response_row)
-        row2 = FactoryBot.build(:vm_question_response_row)
-        score1 = FactoryBot.build(:vm_question_response_score_cell, score_value: 'X')
-        score2 = FactoryBot.build(:vm_question_response_score_cell, score_value: 'X')
-        score3 = FactoryBot.build(:vm_question_response_score_cell, score_value: 'X')
-        score4 = FactoryBot.build(:vm_question_response_score_cell, score_value: 'X')
-        scores = [score1, score2, score3, score4]
-        row1.instance_variable_set(:@score_row, scores)
-        row2.instance_variable_set(:@score_row, scores)
-        rows = [row1, row2]
-        response.instance_variable_set(:@list_of_rows, rows)
+        scores = [@score3, @score3, @score3, @score3]
+        @row1.instance_variable_set(:@score_row, scores)
+        @row2.instance_variable_set(:@score_row, scores)
+        @response.instance_variable_set(:@list_of_rows, @rows)
+        expect(response.composite_score).to eq("0.0")
+      end
+    end
+
+    context 'when passed an array of empty values' do
+      it 'return a composite score of zero' do
+        scores = [@score4, @score4, @score4, @score4]
+        @row1.instance_variable_set(:@score_row, scores)
+        @row2.instance_variable_set(:@score_row, scores)
+        @response.instance_variable_set(:@list_of_rows, @rows)
         expect(response.composite_score).to eq("0.0")
       end
     end
 
     context 'when passed an array of mixed numeric and non-numeric score cells' do
       it 'return a composite score of zero' do
-        teammate_review_questionnaire.type = "TeammateReviewQuestionnaire"
-        response = VmQuestionResponse.new(teammate_review_questionnaire, assignment, 1)
-        row1 = FactoryBot.build(:vm_question_response_row)
-        row2 = FactoryBot.build(:vm_question_response_row)
-        score1 = FactoryBot.build(:vm_question_response_score_cell, score_value: 0)
-        score2 = FactoryBot.build(:vm_question_response_score_cell, score_value: 5)
-        score3 = FactoryBot.build(:vm_question_response_score_cell, score_value: 'X')
-        score4 = FactoryBot.build(:vm_question_response_score_cell, score_value: 'X')
-        scores = [score1, score2, score3, score4]
-        row1.instance_variable_set(:@score_row, scores)
-        row2.instance_variable_set(:@score_row, scores)
-        rows = [row1, row2]
-        response.instance_variable_set(:@list_of_rows, rows)
-        expect(response.composite_score).to eq("2.5")
+        scores = [@score1, @score2, @score3, @score4]
+        @row1.instance_variable_set(:@score_row, scores)
+        @row2.instance_variable_set(:@score_row, scores)
+        @response.instance_variable_set(:@list_of_rows, @rows)
+        expect(@response.composite_score).to eq("2.5")
       end
     end
   end

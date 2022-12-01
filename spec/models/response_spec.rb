@@ -9,9 +9,9 @@ describe Response do
   let(:team) { build(:assignment_team, id: 2) }
   let(:signed_up_team) { build(:signed_up_team, team_id: team.id) }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
-  let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer]) }
-  let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
-  let(:answer2) { Answer.new(answer: 2, comments: 'Answer text', question_id: 2) }
+  let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer, answer2]) }
+  let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1, response_id: 1) }
+  let(:answer2) { Answer.new(answer: 2, comments: 'Answer text', question_id: 2, response_id: 2) }
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
   let(:questionnaire1) { create(:questionnaire, id: 1) }
   let(:question1) { create(:question, questionnaire: questionnaire1, weight: 1, id: 1) }
@@ -363,6 +363,7 @@ describe Response do
     it 'should copy response to a response map' do
       new_response = response.copy_to_response_map(response_map2)
       expect(new_response.map_id).to eq(response_map2.id)
+      expect(new_response.scores.size).to eq(response.scores.size)
     end
   end
 end

@@ -209,7 +209,7 @@ class QuestionnairesController < ApplicationController
       end
     end
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do
-      max_seq += 1 
+      max_seq += 1
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: max_seq, type: params[:question][:type], break_before: true)
       if question.is_a? ScoredQuestion
         question.weight = params[:question][:weight]

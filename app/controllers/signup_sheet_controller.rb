@@ -137,6 +137,7 @@ class SignupSheetController < ApplicationController
   # Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics can have different deadlines.
   def add_signup_topics
     SignUpSheet.add_signup_topic(params[:id])
+    @team_members = SignedUpTeam.find_team_participants(params[:assignment_id],session[:ip])
   end
 
   def add_signup_topics_staggered

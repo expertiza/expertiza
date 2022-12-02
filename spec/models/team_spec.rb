@@ -359,8 +359,15 @@ describe Team do
     end
   end
 
+  # Checks if the team is copied on to an assignment by verifying if the team users have been copied.
   describe '#copy_to_assignment' do
     it 'should copy team to an assignment' do
+      allow(TeamsUser).to receive(:create).and_call_original
+      allow(TeamsUser).to receive(:where).with(team_id: 2).and_call_original
+
+      allow(Participant).to receive(:where).with(parent_id: 2, user_id: 1).and_call_original
+      allow(Participant).to receive(:where).with(parent_id: 1, user_id: 1).and_return([participant])
+
       new_team = team.copy_to_assignment(assignment2)
 
       expect(new_team.parent_id).to eq(assignment2.id)

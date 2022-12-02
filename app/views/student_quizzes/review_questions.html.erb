@@ -1,4 +1,4 @@
-<h1 xmlns="http://www.w3.org/1999/html"> <%=t ".quiz_listings"%> <%= Assignment.find(@assignment_id).name %> </h1>
+<h1 xmlns="http://www.w3.org/1999/html"> <%=t ".quiz_listings"%> <%= Assignment.find(@quiz_creator_user_id).name %> </h1>
 <table>
   <%@quiz_questionnaires.each do |questionnaire|%>
       <%author_team = Team.find(questionnaire.instructor_id)%>

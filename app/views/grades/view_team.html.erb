@@ -63,6 +63,10 @@
     <% else %>
         <% if vm.list_of_reviewers.length > 0 %>
 
+          <h2>
+            Composite Score: <%= vm.composite_score %>
+          </h2>
+
           <!-- display the list of questions for this questionnaire -->
           <div id="hid<%= vm.questionnaire_type + vm.round.to_s %>" class="accordion-body collapse" style="max-width: 80%">
             <table class="table table-striped">

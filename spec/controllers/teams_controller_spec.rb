@@ -115,17 +115,32 @@ describe TeamsController do
   end
 
   describe 'update method' do
-    it 'updates the team name' do
-      allow(Team).to receive(:find).and_return(team1)
-      allow(Assignment).to receive(:find).and_return(assignment1)
-      request_params = { id: team1.id, team: { name: 'rando team' } }
-      user_session = { user: ta, team_type: 'Assignment' }
-      # result = get :update, params: request_params, session: user_session
-      # expect(result.status).to eq 302
-      # expect(result).to redirect_to(:action => 'list', :id => assignment1.id)
+    let(:request_team) {{ name: 'rando team' }}
+    let(:request_params) {{ id: assignment1.id, team: request_team }}
+    let(:user_session) {{ user: ta, team_type: 'Assignment' }}
+
+    context 'when team name not in use' do
+      it 'updates the team name' do
+        allow(Team).to receive(:find).and_return(team1)
+        allow(Assignment).to receive(:find).and_return(assignment1)
+        allow(team1).to receive(:save)
+        result = get :update, params: request_params, session: user_session
+        expect(result.status).to eq 302
+        expect(result).to redirect_to(:action => 'list', :id => assignment1.id)
+      end
     end
-    # this test will fail even though it should normally pass, that's because it runs into an error at @team.save
-    # RumtimeError: stubbed models are not allowed to access the database - AssignmentTeam#save()
+
+    context 'when team name is already used' do # this is work in progress
+      it 'throws an error' do
+        allow(Team).to receive(:find).and_return(team1)
+        allow(Assignment).to receive(:find).and_return(assignment1)
+        allow(Team).to receive(:check_for_existing).with(assignment1, request_team[:name], user_session[:team_type]).and_raise(TeamExistsError)
+
+        get :update, params: request_params, session: user_session
+        expect(response).to redirect_to(:action => 'edit', :id => team1.id)
+      end
+    end
+
   end
 
   describe 'edit method' do

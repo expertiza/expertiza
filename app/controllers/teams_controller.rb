@@ -60,7 +60,7 @@ class TeamsController < ApplicationController
   def update
     @team = Team.find(params[:id])
     begin
-      check_for_existing_team
+      check_for_existing_team # Validate the new name
 
       @team.name = params[:team][:name]
       @team.save
@@ -91,7 +91,7 @@ class TeamsController < ApplicationController
     unless @team.nil?
       @signed_up_team = SignedUpTeam.where(team_id: @team.id)
       @teams_users = TeamsUser.where(team_id: @team.id)
-      
+
       # remove deleted team from any waitlists
       Waitlist.remove_from_waitlists(@team.id)
 

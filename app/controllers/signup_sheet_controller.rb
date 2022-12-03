@@ -32,6 +32,8 @@ class SignupSheetController < ApplicationController
   include ManageTeamHelper
   # Includes functions for Dead line management. Refer /app/helpers/DeadLineHelper
   include DeadlineHelper
+  # Includes functions for Sign up Sheet management
+  include SignupSheetHelper
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],
@@ -118,18 +120,13 @@ class SignupSheetController < ApplicationController
 
   # This deletes all selected topics for the given assignment
   def delete_all_selected_topics
-    load_all_selected_topics
+    @selected_topics = SignUpTopic.where(assignment_id: params[:assignment_id], topic_identifier: params[:topic_ids])
     @selected_topics.each(&:destroy)
     flash[:success] = 'All selected topics have been deleted successfully.'
     respond_to do |format|
       format.html { redirect_to edit_assignment_path(params[:assignment_id]) + '#tabs-2' }
       format.js {}
     end
-  end
-
-  # This loads all selected topics based on all the topic identifiers selected for that assignment into stopics variable
-  def load_all_selected_topics
-    @selected_topics = SignUpTopic.where(assignment_id: params[:assignment_id], topic_identifier: params[:topic_ids])
   end
 
   # This displays a page that lists all the available topics for an assignment.
@@ -169,17 +166,6 @@ class SignupSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: assignment_id
   end
 
-  # method to return a list of topics for which a bid has been made by a team
-  def compute_signed_up_topics
-    signed_up_topics = []
-    @bids.each do |bid|
-      signup_topic = SignUpTopic.find_by(id: bid.topic_id)
-      signed_up_topics << signup_topic if signup_topic
-    end
-    signed_up_topics &= @signup_topics
-    return signed_up_topics
-  end
-
   # method to load deadline instance variables
   def find_topic_deadlines
     @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
@@ -201,7 +187,7 @@ class SignupSheetController < ApplicationController
     # if assignment is intelligent, want to know which topics the team has already bid on
     if @assignment.bid_for_topics
       @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
-      @bids = compute_signed_up_topics()
+      @bids = compute_signed_up_topics(@bids)
       @signup_topics -= @bids
     end
 

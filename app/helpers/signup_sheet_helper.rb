@@ -97,4 +97,15 @@ module SignupSheetHelper
       out_string
     end
   end
+  # method to return a list of topics for which a bid has been made by a team
+  def compute_signed_up_topics(bids)
+    signed_up_topics = []
+    bids.each do |bid|
+      signup_topic = SignUpTopic.find_by(id: bid.topic_id)
+      signed_up_topics << signup_topic if signup_topic
+    end
+    signed_up_topics &= @signup_topics
+    return signed_up_topics
+  end
+
 end

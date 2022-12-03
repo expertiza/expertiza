@@ -41,6 +41,7 @@ module StudentQuizzesHelper
     end
 
     def is_valid_checkbox(params, question, valid)
+        # Checking whether the answer was attempted or left empty
         if params[question.id.to_s].nil?
             valid = false;
         end

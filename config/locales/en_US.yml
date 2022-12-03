@@ -68,14 +68,14 @@ en_US:
       show_members: "Show all team members"
 
     new:
-      randomize_teams_for: "Create Teams for"
+      randomize_teams_for: "Create Random Teams for"
       automatically: "Automatically"
       uses_insofar: "Uses, insofar as possible, the number of members specified when the assignment was created."
       team_size: "Team Size:"
-      randomize_teams: "Create Teams"
+      randomize_teams: "Create Random Teams"
       manually: "Manually"
       specify_team_them: "Specify Team name, then add members to team, one by one."
-      inherit_teams: "Inherent Teams From Course"
+      inherit_teams: "Inherit Teams From Course"
       use_the_teams: "Use the teams that are currently defined for the course."
       team_name: "Team Name"
 

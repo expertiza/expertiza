@@ -53,7 +53,7 @@ module StudentQuizzesHelper
     def score_checkbox(scores, params, question, valid, quiz_response, score)
         params[question.id.to_s].each do |choice| # checking for the input for each of the checkbox pattern question
             new_score = Answer.new comments: choice, question_id: question.id, response_id: quiz_response.id, answer: score
-            valid = false unless new_score.valid?
+            valid = false unless new_score.valid? #flagging false if the answer goes unattemtpted
             scores.push(new_score)
         end
         valid

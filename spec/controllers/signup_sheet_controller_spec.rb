@@ -79,7 +79,7 @@ describe SignupSheetController do
           request_params = {
             id: 1,
             topic: {
-              topic_identifier: 1,
+              topic_identifier: 18573935670, # max valid length is 10
               topic_name: 'Hello world!',
               category: '',
               micropayment: 1

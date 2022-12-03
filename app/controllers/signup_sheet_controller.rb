@@ -143,15 +143,15 @@ class SignupSheetController < ApplicationController
 
   # Separated from setup_new_topic
   # Only used to setup the parameters of new topic
-  def set_values_for_new_topic
-    @signup_topic = SignUpTopic.new
-    @signup_topic.topic_identifier = topic_params[:topic_identifier]
-    @signup_topic.topic_name = topic_params[:topic_name]
-    @signup_topic.max_choosers = topic_params[:max_choosers]
-    @signup_topic.category = topic_params[:category]
-    @signup_topic.assignment_id = params[:id]
-    @assignment = Assignment.find(params[:id])
-  end
+  #def set_values_for_new_topic
+    #@signup_topic = SignUpTopic.new(topic_params)
+    # @signup_topic.topic_identifier = topic_params[:topic_identifier]
+    # @signup_topic.topic_name = topic_params[:topic_name]
+    # @signup_topic.max_choosers = topic_params[:max_choosers]
+    # @signup_topic.category = topic_params[:category]
+    #@signup_topic.assignment_id = params[:id]
+    #@assignment = Assignment.find(params[:id])
+  #end
 
   # simple function that redirects ti the /add_signup_topics or the /add_signup_topics_staggered page depending on assignment type
   # staggered means that different topics can have different deadlines.
@@ -400,7 +400,9 @@ class SignupSheetController < ApplicationController
   # Create and setup a new topic if we cannot find it
   # Called by create
   def setup_new_topic
-    set_values_for_new_topic
+    @signup_topic = SignUpTopic.new(topic_params)
+    @signup_topic.assignment_id = params[:id]
+    @assignment = Assignment.find(params[:id])
     @signup_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
     if @signup_topic.save
       undo_link "The topic: \"#{@signup_topic.topic_name}\" has been created successfully. "

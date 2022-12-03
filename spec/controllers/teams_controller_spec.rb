@@ -17,7 +17,7 @@ describe TeamsController do
     end
   end
 
-  describe 'create teams method' do
+  describe 'randomize_teams method' do
     context 'when correct parameters are passed' do
       it 'creates teams with random names' do
         allow(ExpertizaLogger).to receive(:info).and_return(nil)
@@ -89,25 +89,27 @@ describe TeamsController do
   end
 
   describe 'create method' do
-    context 'when invoked with a team which does not exist' do
+    let(:request_team) {{ name: 'rando team' }}
+    let(:request_params) {{ id: assignment1.id, team: request_team }}
+    let(:user_session) {{ user: ta, team_type: 'Assignment' }}
+
+    context 'when team does not yet exist' do
       it 'creates it' do
         allow(Assignment).to receive(:find).and_return(assignment1)
-        request_params = { id: assignment1.id, team: { name: 'rando team' } }
-        user_session = { user: ta, team_type: 'Assignment' }
         result = get :create, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(action: 'list', id: assignment1.id)
       end
     end
-    context 'when invoked with a team which does exist' do # this is work in progress
+
+    context 'when team already exists' do
       it 'throws an error' do
         allow(Assignment).to receive(:find).and_return(assignment1)
-        request_params = { id: assignment1.id, team: { name: 'rando team' } }
-        user_session = { user: ta, team_type: 'Assignment' }
-        # result = get :create, params: request_params, session: user_session
-        # expect(result.status).to eq 302
-        # expect(result).to redirect_to(:action => 'new', :id => assignment1.id)
+        allow(Team).to receive(:check_for_existing).with(assignment1, request_team[:name], user_session[:team_type]).and_raise(TeamExistsError)
+
+        get :create, params: request_params, session: user_session
+        expect(response).to redirect_to(:action => 'new', :id => assignment1.id)
       end
     end
   end

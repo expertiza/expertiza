@@ -51,7 +51,7 @@ module StudentQuizzesHelper
     
     # Update and append the new_score object in scores array and update the valid flag by performing validations 
     def score_checkbox(scores, params, question, valid, quiz_response, score)
-        params[question.id.to_s].each do |choice|
+        params[question.id.to_s].each do |choice| # checking for the input for each of the checkbox pattern question
             new_score = Answer.new comments: choice, question_id: question.id, response_id: quiz_response.id, answer: score
             valid = false unless new_score.valid?
             scores.push(new_score)

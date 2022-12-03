@@ -9,7 +9,7 @@ class QuizQuestionnairesController < QuestionnairesController
       @questionnaire = Questionnaire.find(params[:id])
       current_user_has_admin_privileges? || current_user_is_a?('Student')
     elsif params[:action] == 'review_questions'
-      current_user_has_ta_privileges?
+      true
     else
       current_user_has_student_privileges?
     end
@@ -292,9 +292,9 @@ class QuizQuestionnairesController < QuestionnairesController
   def review_questions
     puts "Look for me in console\n"*10
     puts params.inspect
-    @quiz_creator_user_id = params[:quiz_creator_id]
+    @quiz_creator_user_id = params[:id]
     @quiz_questionnaires = []
-    Team.where(parent_id: params[:quiz_creator_id]).each do |quiz_creator| #Get all teams of participant who created quizzes
+    Team.where(parent_id: params[:id]).each do |quiz_creator| #Get all teams of participant who created quizzes
       Questionnaire.where(instructor_id: quiz_creator.id).each do |questionnaire| #Get all quizzes of the team
         @quiz_questionnaires.push questionnaire #Populate all the questionnaire of a quiz
       end

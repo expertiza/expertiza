@@ -290,7 +290,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :quiz_questionnaires, only: [] do
+  resources :quiz_questionnaires do
     collection do
       get :edit
       get :edit_quiz

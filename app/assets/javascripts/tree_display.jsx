@@ -54,7 +54,7 @@ const node_attributes = {
           ? {
               title: 'View quiz questions',
               href:
-                '/quiz_questionnaires/review_questions?id=' +
+                '/quiz_questionnaires/review_questions?quiz_creator_id=' +
                 `${parseInt(props.id) / 2}` +
                 '&type=Assignment',
               src: '/assets/tree_view/view-survey-24.png'

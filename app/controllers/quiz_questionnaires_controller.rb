@@ -286,9 +286,9 @@ class QuizQuestionnairesController < QuestionnairesController
   end
 
   def review_questions
-    @quiz_creator_user_id = params[:id]
+    @quiz_creator_user_id = params[:quiz_creator_id]
     @quiz_questionnaires = []
-    Team.where(parent_id: params[:id]).each do |quiz_creator| #Get all teams of participant who created quizzes
+    Team.where(parent_id: params[:quiz_creator_id]).each do |quiz_creator| #Get all teams of participant who created quizzes
       Questionnaire.where(instructor_id: quiz_creator.id).each do |questionnaire| #Get all quizzes of the team
         @quiz_questionnaires.push questionnaire #Populate all the questionnaire of a quiz
       end

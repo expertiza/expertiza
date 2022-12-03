@@ -203,9 +203,11 @@ class VmQuestionResponse
     composite_score_array = []
 
     @list_of_rows.each do |row|
-      number_of_rows += 1
-      average_row_score += row.average_score_for_row.to_f
-      total_question_score += row.question_max_score.to_f
+      if (row.question_max_score.to_f != 0) 
+        average_row_score += row.average_score_for_row.to_f
+        total_question_score += row.question_max_score.to_f
+        number_of_rows += 1
+      end
     end
     unless number_of_rows.zero?
       composite_review_score = (average_row_score/number_of_rows)

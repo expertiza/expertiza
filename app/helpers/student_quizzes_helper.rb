@@ -63,7 +63,7 @@ module StudentQuizzesHelper
         correct_answer = correct_answers.first
         score = correct_answer.txt == params[question.id.to_s] ? 1 : 0    #checking whether the answser is correct and assigning score 0 or 1
         new_score = Answer.new comments: params[question.id.to_s], question_id: question.id, response_id: quiz_response.id, answer: score
-        valid = false if new_score.nil? || new_score.comments.nil? || new_score.comments.empty?
+        valid = false if new_score.nil? || new_score.comments.nil? || new_score.comments.empty? # flagging false if questions goes unattempted
         scores.push(new_score)
         valid
     end

@@ -8,6 +8,8 @@ class QuizQuestionnairesController < QuestionnairesController
     if params[:action] == 'edit'
       @questionnaire = Questionnaire.find(params[:id])
       current_user_has_admin_privileges? || current_user_is_a?('Student')
+    elsif params[:action] == 'review_questions'
+      current_user_has_ta_privileges?
     else
       current_user_has_student_privileges?
     end

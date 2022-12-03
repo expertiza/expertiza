@@ -286,6 +286,8 @@ class QuizQuestionnairesController < QuestionnairesController
   end
 
   def review_questions
+    puts "Look for me in console\n"*10
+    puts params.inspect
     @quiz_creator_user_id = params[:quiz_creator_id]
     @quiz_questionnaires = []
     Team.where(parent_id: params[:quiz_creator_id]).each do |quiz_creator| #Get all teams of participant who created quizzes

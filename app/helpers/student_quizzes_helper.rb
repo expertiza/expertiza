@@ -41,7 +41,7 @@ module StudentQuizzesHelper
         params[question.id.to_s].each do |choice|
             # loop the quiz taker's choices and see if 1)all the correct choice are checked and 2) # of quiz taker's choice matches the # of the correct choices
             correct_answers.each do |correct|
-                score += 1 if choice.eql? correct.txt
+                score += 1 if choice.eql? correct.txt #adding scores based on each correct answer
             end
         end
         score = score == correct_answers.count && score == params[question.id.to_s].count ? 1 : 0
@@ -51,9 +51,9 @@ module StudentQuizzesHelper
     
     # Update and append the new_score object in scores array and update the valid flag by performing validations 
     def score_checkbox(scores, params, question, valid, quiz_response, score)
-        params[question.id.to_s].each do |choice|
+        params[question.id.to_s].each do |choice| # checking for the input for each of the checkbox pattern question
             new_score = Answer.new comments: choice, question_id: question.id, response_id: quiz_response.id, answer: score
-            valid = false unless new_score.valid?
+            valid = false unless new_score.valid? #flagging false if the answer goes unattemtpted
             scores.push(new_score)
         end
         valid
@@ -63,7 +63,7 @@ module StudentQuizzesHelper
         correct_answer = correct_answers.first
         score = correct_answer.txt == params[question.id.to_s] ? 1 : 0    #checking whether the answser is correct and assigning score 0 or 1
         new_score = Answer.new comments: params[question.id.to_s], question_id: question.id, response_id: quiz_response.id, answer: score
-        valid = false if new_score.nil? || new_score.comments.nil? || new_score.comments.empty?
+        valid = false if new_score.nil? || new_score.comments.nil? || new_score.comments.empty? # flagging false if questions goes unattempted
         scores.push(new_score)
         valid
     end

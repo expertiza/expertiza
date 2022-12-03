@@ -297,6 +297,7 @@ Expertiza::Application.routes.draw do
       get :new
       get :new_quiz
       get :view
+      get :review_questions
       post :update
       post :update_quiz
       post :update
@@ -436,7 +437,7 @@ Expertiza::Application.routes.draw do
       post :save_quiz_response
       get :finished_quiz
       get :take_quiz
-      get :review_questions
+      # get :review_questions
     end
   end
 

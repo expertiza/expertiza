@@ -3,6 +3,8 @@ class QuizQuestionnairesController < QuestionnairesController
 
   # Quiz questionnaire edit option to be allowed for student
   def action_allowed?
+    puts "Look for me in console\n"*10
+    puts params.inspect
     if params[:action] == 'edit'
       @questionnaire = Questionnaire.find(params[:id])
       current_user_has_admin_privileges? || current_user_is_a?('Student')

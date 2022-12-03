@@ -41,7 +41,7 @@ module StudentQuizzesHelper
         params[question.id.to_s].each do |choice|
             # loop the quiz taker's choices and see if 1)all the correct choice are checked and 2) # of quiz taker's choice matches the # of the correct choices
             correct_answers.each do |correct|
-                score += 1 if choice.eql? correct.txt
+                score += 1 if choice.eql? correct.txt #adding scores based on each correct answer
             end
         end
         score = score == correct_answers.count && score == params[question.id.to_s].count ? 1 : 0

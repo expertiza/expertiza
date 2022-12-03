@@ -199,7 +199,7 @@ class SignupSheetController < ApplicationController
     team_id = @participant.team.try(:id)
 
     # if assignment is intelligent, want to know which topics the team has already bid on
-    if @assignment.is_intelligent
+    if @assignment.bid_for_topics
       @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
       @bids = compute_signed_up_topics()
       @signup_topics -= @bids
@@ -222,7 +222,7 @@ class SignupSheetController < ApplicationController
                            SignedUpTeam.find_user_signup_topics(@assignment.id, users_team.first.t_id)
                          end
     end
-    render('signup_sheet/intelligent_topic_selection') && return if @assignment.is_intelligent
+    render('signup_sheet/intelligent_topic_selection') && return if @assignment.bid_for_topics
   end
 
   # Signup for a topic

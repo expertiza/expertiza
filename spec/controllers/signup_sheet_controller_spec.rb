@@ -514,7 +514,7 @@ describe SignupSheetController do
 
     context 'when current assignment is intelligent assignment and has submission duedate (deadline_type_id 1)' do
       it 'renders signup_sheet#intelligent_topic_selection page' do
-        assignment.is_intelligent = true
+        assignment.bid_for_topics = true
         allow(Bid).to receive_message_chain(:where, :order).with(team_id: 1).with(:priority).and_return([double('Bid', topic_id: 1)])
         allow(SignUpTopic).to receive(:find_by).with(id: 1).and_return(topic)
         request_params = { id: 1 }
@@ -528,7 +528,7 @@ describe SignupSheetController do
 
     context 'when current assignment is not intelligent assignment' do
       it 'renders signup_sheet#list page' do
-        assignment.is_intelligent = false
+        assignment.bid_for_topics = false
         allow(Bid).to receive(:where).with(team_id: 1).and_return([double('Bid', topic_id: 1)])
         request_params = { id: 1 }
         get :list, params: request_params

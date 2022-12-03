@@ -86,8 +86,8 @@ class AssignmentNode < Node
     Assignment.find_by(id: node_object_id).try(:max_team_size)
   end
 
-  def get_is_intelligent
-    Assignment.find_by(id: node_object_id).try(:is_intelligent)
+  def get_bid_for_topics
+    Assignment.find_by(id: node_object_id).try(:bid_for_topics)
   end
 
   def get_require_quiz

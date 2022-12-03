@@ -1,5 +1,5 @@
 describe Bid do
-  let(:assignment) { create(:assignment, is_intelligent: true, name: 'assignment') }
+  let(:assignment) { create(:assignment, bid_for_topics: true, name: 'assignment') }
 
   let(:topic1) { create(:topic, assignment_id: assignment.id) }
   let(:topic2) { create(:topic, assignment_id: assignment.id) }

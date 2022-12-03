@@ -197,16 +197,24 @@ class VmQuestionResponse
   def composite_score
     average_row_score = 0
     number_of_rows = 0
-    composite_score = 0
+    composite_question_score = 0
+    composite_review_score = 0
+    total_question_score = 0
+    composite_score_array = []
+
     @list_of_rows.each do |row|
       number_of_rows += 1
       average_row_score += row.average_score_for_row.to_f
+      total_question_score += row.question_max_score.to_f
     end
     unless number_of_rows.zero?
-      composite_score = (average_row_score/number_of_rows)
+      composite_review_score = (average_row_score/number_of_rows)
+      composite_question_score = (total_question_score/number_of_rows)
     end
+
     # Return initialized value of composite score if array is empty
-    composite_score.round(2).to_s
+    composite_score_array.push(composite_review_score.round(2).to_s)
+    composite_score_array.push(composite_question_score.round(2).to_s)
   end
 
 end

@@ -65,9 +65,7 @@ function toggleFunction(elementId) {
 <% @vmlist.each do |vm| %>
         <% if vm.list_of_reviewers.length > 0 %>
 
-        <h2>
-          Composite Score: <%= vm.composite_score %>
-        </h2>
+          <%= render "view_composite_score", vm: vm %>
 
           <!-- display the list of questions for this questionnaire -->
           <div id="hid<%= @type + @participant.id.to_s + vm.questionnaire_type + vm.round.to_s %>" class="accordion-body collapse" >

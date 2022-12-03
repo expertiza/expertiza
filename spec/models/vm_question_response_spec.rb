@@ -157,7 +157,7 @@ describe VmQuestionResponse  do
     context 'when passed a nil array' do
       it 'return a composite score of zero' do
         @response.instance_variable_set(:@list_of_rows, [])
-        expect(response.composite_score).to eq("0.0")
+        expect(response.composite_score[0]).to eq("0.0")
       end
     end
 
@@ -167,7 +167,7 @@ describe VmQuestionResponse  do
         @row1.instance_variable_set(:@score_row, scores)
         @row2.instance_variable_set(:@score_row, scores)
         @response.instance_variable_set(:@list_of_rows, @rows)
-        expect(@response.composite_score).to eq("2.5")
+        expect(@response.composite_score[0]).to eq("2.5")
       end
     end
 
@@ -177,7 +177,7 @@ describe VmQuestionResponse  do
         @row1.instance_variable_set(:@score_row, scores)
         @row2.instance_variable_set(:@score_row, scores)
         @response.instance_variable_set(:@list_of_rows, @rows)
-        expect(response.composite_score).to eq("0.0")
+        expect(response.composite_score[0]).to eq("0.0")
       end
     end
 
@@ -187,7 +187,7 @@ describe VmQuestionResponse  do
         @row1.instance_variable_set(:@score_row, scores)
         @row2.instance_variable_set(:@score_row, scores)
         @response.instance_variable_set(:@list_of_rows, @rows)
-        expect(response.composite_score).to eq("0.0")
+        expect(response.composite_score[0]).to eq("0.0")
       end
     end
 
@@ -197,7 +197,7 @@ describe VmQuestionResponse  do
         @row1.instance_variable_set(:@score_row, scores)
         @row2.instance_variable_set(:@score_row, scores)
         @response.instance_variable_set(:@list_of_rows, @rows)
-        expect(@response.composite_score).to eq("2.5")
+        expect(@response.composite_score[0]).to eq("2.5")
       end
     end
   end

@@ -34,7 +34,8 @@ module StudentQuizzesHelper
 #             redirect_to action: :take_quiz, assignment_id: params[:assignment_id], questionnaire_id: questionnaire.id, map_id: participant_response.id
 #         end
 #     end
-
+    
+    # Return all the questions in the questionnaire which is fetched via the review done by the student
     def get_all_questions(participant_response)
         questionnaire = Questionnaire.find(participant_response.reviewed_object_id)
         Question.where(questionnaire_id: questionnaire.id)

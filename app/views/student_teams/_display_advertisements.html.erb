@@ -2,7 +2,7 @@
     <tr>
     <td>
     <% if student.team && student.team.advertise_for_partner%>
-        <%= comments_for_advertisement%>
+        <%= student.team.comments_for_advertisement%>
         &nbsp;&nbsp;&nbsp;&nbsp;
         <%= link_to 'Edit', :controller => 'advertise_for_partner', :action => 'edit', :team_id=>student_team_id %>
         &nbsp;&nbsp;

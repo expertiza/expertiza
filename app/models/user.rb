@@ -40,6 +40,13 @@ class User < ApplicationRecord
 
   has_paper_trail
 
+  # E2283: teams_users table stores participant_id instead of user_id.
+  # So, irect mapping between teams and users are not available now.
+  # Teams have to be fetched via participants
+  def teams
+    Participant.where(user_id: id).flat_map(&:teams)
+  end
+
   def salt_first?
     true
   end

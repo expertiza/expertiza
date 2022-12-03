@@ -3,9 +3,11 @@ module StudentQuizzesHelper
     def calculate_score(participant_response, quiz_response)
         scores = []
         valid = true
+        # Get the entire questionnaire assigned to 'participant_response'
         get_all_questions(participant_response).each do |question|
-            correct_answers = QuizQuestionChoice.where(question_id: question.id, iscorrect: true)
+            correct_answers = QuizQuestionChoice.where(question_id: question.id, iscorrect: true) # Get correct answer for each question in the questionnaire
             ques_type = question.type
+            # Update valid flag based on the question type i.e. Radio or Multiple Checkbox or True or False.
             if ques_type.eql? 'MultipleChoiceCheckbox'
                 valid = is_valid_checkbox(params, question, valid)
                 valid = score_multiple_choice_checkbox(correct_answers, question, params, valid, scores, quiz_response)
@@ -69,7 +71,7 @@ module StudentQuizzesHelper
 
     def score_multiple_choice_radio(correct_answers, params, question, scores, quiz_response, valid)
         correct_answer = correct_answers.first
-        score = correct_answer.txt == params[question.id.to_s] ? 1 : 0
+        score = correct_answer.txt == params[question.id.to_s] ? 1 : 0    #checking whether the answser is correct and assigning score 0 or 1
         new_score = Answer.new comments: params[question.id.to_s], question_id: question.id, response_id: quiz_response.id, answer: score
         valid = false if new_score.nil? || new_score.comments.nil? || new_score.comments.empty?
         scores.push(new_score)

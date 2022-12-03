@@ -1,4 +1,9 @@
-class Waitlist < ApplicationRecord
+class WaitlistTeam < ApplicationRecord
+  belongs_to :topic, class_name: 'SignUpTopic'
+  belongs_to :team, class_name: 'Team'
+
+  validates :topic_id, :team_id, presence: true
+  validates :topic_id, uniqueness: { scope: :team_id }
   def self.cancel_all_waitlists(team_id, assignment_id)
     waitlisted_topics = SignUpTopic.find_waitlisted_topics(assignment_id, team_id)
     unless waitlisted_topics.nil?

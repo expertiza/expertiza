@@ -1,5 +1,5 @@
 class MigrateWaitlistsToWaitlistTeams < ActiveRecord::Migration[5.1]
-  def up
+  def self.up
     waitlists_to_be_migrated = SignedUpTeam.where(is_waitlisted: true)
     waitlists_to_be_migrated.each do |signed_up_waitlist|
       waitlist = WaitlistTeam.new
@@ -19,7 +19,7 @@ class MigrateWaitlistsToWaitlistTeams < ActiveRecord::Migration[5.1]
 
   end
   
-  def down
+  def self.down
     add_column :signed_up_teams, :is_waitlisted, :boolean, null: false
   end
 end

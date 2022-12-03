@@ -3,8 +3,10 @@ class QuizQuestionnairesController < QuestionnairesController
 
   # Quiz questionnaire edit option to be allowed for student
   def action_allowed?
-    puts "Look for me in console\n"*10
-    puts params.inspect
+    if params[:action] == 'review_questions'
+      review_questions
+      return true
+    end
     if params[:action] == 'edit'
       @questionnaire = Questionnaire.find(params[:id])
       current_user_has_admin_privileges? || current_user_is_a?('Student')
@@ -288,8 +290,6 @@ class QuizQuestionnairesController < QuestionnairesController
   end
 
   def review_questions
-    puts "Look for me in console\n"*10
-    puts params.inspect
     @quiz_creator_user_id = params[:aid]
     @quiz_questionnaires = []
     Team.where(parent_id: params[:aid]).each do |quiz_creator| #Get all teams of participant who created quizzes

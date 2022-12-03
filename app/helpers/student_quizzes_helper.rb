@@ -34,7 +34,8 @@ module StudentQuizzesHelper
 #             redirect_to action: :take_quiz, assignment_id: params[:assignment_id], questionnaire_id: questionnaire.id, map_id: participant_response.id
 #         end
 #     end
-
+    
+    # Return all the questions in the questionnaire which is fetched via the review done by the student
     def get_all_questions(participant_response)
         questionnaire = Questionnaire.find(participant_response.reviewed_object_id)
         Question.where(questionnaire_id: questionnaire.id)
@@ -60,7 +61,8 @@ module StudentQuizzesHelper
         # for MultipleChoiceCheckbox, score =1 means the quiz taker have done this question correctly, not just make select this choice correctly.
         score_checkbox(scores, params, question, valid, quiz_response, score)
     end
-
+    
+    # Update and append the new_score object in scores array and update the valid flag by performing validations 
     def score_checkbox(scores, params, question, valid, quiz_response, score)
         params[question.id.to_s].each do |choice|
             new_score = Answer.new comments: choice, question_id: question.id, response_id: quiz_response.id, answer: score

@@ -5,6 +5,8 @@ class WaitlistTeam < ApplicationRecord
   validates :topic_id, :team_id, presence: true
   validates :topic_id, uniqueness: { scope: :team_id }
 
+  # Creates a new instance of waitlist team using the topic and users team
+  # More specifcally adds the team to the database
   def self.add_team_to_topic_waitlist(team_id, topic_id, user_id)
     new_waitlist = WaitlistTeam.new
     new_waitlist.topic_id = topic_id
@@ -19,6 +21,8 @@ class WaitlistTeam < ApplicationRecord
     return true
   end
 
+  # Removes team from topic waitlist
+  # More specifically removes team from the database
   def self.remove_team_from_topic_waitlist(team_id, topic_id, user_id)
     waitlisted_team_for_topic = WaitlistTeam.find_by(topic_id: topic_id, team_id: team_id)
     unless waitlisted_team_for_topic.nil?
@@ -28,7 +32,9 @@ class WaitlistTeam < ApplicationRecord
     end
     return true
   end
-  
+
+  # Removes team from all waitlist
+  # Usually needed when team has been disbanded or once they been assigned a topic
   def self.cancel_all_waitlists(team_id, assignment_id)
     waitlisted_topics = SignUpTopic.find_waitlisted_topics(assignment_id, team_id)
     unless waitlisted_topics.nil?
@@ -38,20 +44,6 @@ class WaitlistTeam < ApplicationRecord
 
         entry.destroy
       end
-    end
-  end
-
-  def self.remove_from_waitlists(team_id)
-    signups = SignedUpTeam.where(team_id: team_id)
-    signups.each do |signup|
-      signup_topic_id = signup.topic_id
-      signup.destroy
-      non_waitlisted_users = SignedUpTeam.where(topic_id: signup_topic_id, is_waitlisted: false)
-      max_choosers = SignUpTopic.find(signup_topic_id).max_choosers
-      next unless non_waitlisted_users.length < max_choosers
-
-      first_waitlisted_team = SignedUpTeam.find_by(topic_id: signup_topic_id, is_waitlisted: true)
-      SignUpTopic.assign_to_first_waiting_team(first_waitlisted_team) if first_waitlisted_team
     end
   end
 end

@@ -84,7 +84,7 @@
                 }
             });
         } else {
-            window.location.href = '<%= edit_assignment_path(@assignment.id) + "#tabs-2" %>';
+            window.location.href = '<%= edit_assignment_path(@assignment.id, anchor: 'tabs-2') %>';
         }
     }
 </script> 

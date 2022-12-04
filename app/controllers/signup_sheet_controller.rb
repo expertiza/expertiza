@@ -81,7 +81,7 @@ class SignupSheetController < ApplicationController
     # Akshay - redirect to topics tab if there are still any topics left, otherwise redirect to
     # assignment's edit page
     if assignment.topics?
-      redirect_to edit_assignment_path(params[:assignment_id]) + '#tabs-2'
+      redirect_to edit_assignment_path(params[:assignment_id], anchor: 'tabs-2')
     else
       redirect_to edit_assignment_path(params[:assignment_id])
     end
@@ -104,7 +104,7 @@ class SignupSheetController < ApplicationController
       flash[:error] = 'The topic could not be updated.'
     end
     # Akshay - correctly changing the redirection url to topics tab in edit assignment view.
-    redirect_to edit_assignment_path(params[:assignment_id]) + '#tabs-2'
+    redirect_to edit_assignment_path(params[:assignment_id], anchor: 'tabs-2')
   end
 
   # This deletes all topics for the given assignment
@@ -124,7 +124,7 @@ class SignupSheetController < ApplicationController
     @selected_topics.each(&:destroy)
     flash[:success] = 'All selected topics have been deleted successfully.'
     respond_to do |format|
-      format.html { redirect_to edit_assignment_path(params[:assignment_id]) + '#tabs-2' }
+      format.html { redirect_to edit_assignment_path(params[:assignment_id], anchor: 'tabs-2') }
       format.js {}
     end
   end
@@ -381,7 +381,7 @@ class SignupSheetController < ApplicationController
     @signup_topic.micropayment = topic_params[:micropayment] if @assignment.microtask?
     if @signup_topic.save
       undo_link "The topic: \"#{@signup_topic.topic_name}\" has been created successfully. "
-      redirect_to edit_assignment_path(@signup_topic.assignment_id) + '#tabs-2'
+      redirect_to edit_assignment_path(@signup_topic.assignment_id, anchor: 'tabs-2')
     else
       render action: 'new', id: params[:id]
     end

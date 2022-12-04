@@ -130,7 +130,7 @@ describe TeamsController do
       end
     end
 
-    context 'when team name is already used' do # this is work in progress
+    context 'when team name is already used' do
       it 'throws an error' do
         allow(Team).to receive(:find).and_return(team1)
         allow(Assignment).to receive(:find).and_return(assignment1)

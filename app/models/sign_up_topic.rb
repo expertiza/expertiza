@@ -3,6 +3,7 @@ class SignUpTopic < ApplicationRecord
   has_many :teams, through: :signed_up_teams # list all teams choose this topic, no matter in waitlist or not
   has_many :due_dates, class_name: 'TopicDueDate', foreign_key: 'parent_id', dependent: :destroy
   has_many :bids, foreign_key: 'topic_id', dependent: :destroy
+  has_many :waitlist_teams, foreign_key: 'topic_id', dependent: :destroy
   has_many :assignment_questionnaires, class_name: 'AssignmentQuestionnaire', foreign_key: 'topic_id', dependent: :destroy
   belongs_to :assignment
 
@@ -43,11 +44,12 @@ class SignUpTopic < ApplicationRecord
   def self.find_slots_waitlisted(assignment_id)
     # SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id +  " and u.is_waitlisted = true GROUP BY t.id")
     SignUpTopic.find_by_sql(['SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id = ? and u.is_waitlisted = true GROUP BY t.id', assignment_id])
+    WaitlistTeam.count_all_waitlists_per_topic_per_assignment(assignment_id)
   end
 
   def self.find_waitlisted_topics(assignment_id, team_id)
     # SignedUpTeam.find_by_sql("SELECT u.id FROM sign_up_topics t, signed_up_teams u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = " + assignment_id.to_s + " and u.team_id = " + team_id.to_s)
-    SignedUpTeam.find_by_sql(['SELECT u.id FROM sign_up_topics t, signed_up_teams u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = ? and u.team_id = ?', assignment_id.to_s, team_id.to_s])
+    SignedUpTeam.find_by_sql(['SELECT u.topic_id FROM sign_up_topics t, signed_up_teams u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = ? and u.team_id = ?', assignment_id.to_s, team_id.to_s])
   end
 
   def self.slotAvailable?(topic_id)
@@ -78,26 +80,13 @@ class SignUpTopic < ApplicationRecord
       # users_team will contain the team id of the team to which the user belongs
       users_team = SignedUpTeam.find_team_users(assignment_id, session_user_id)
       signup_record = SignedUpTeam.where(topic_id: topic_id, team_id:  users_team[0].t_id).first
-      assignment = Assignment.find(assignment_id)
+
       # if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
-      unless assignment.is_intelligent?
-        unless signup_record.try(:is_waitlisted)
-          # find the first wait listed user if exists
-          first_waitlisted_user = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
-
-          unless first_waitlisted_user.nil?
-            # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
-            ### Bad policy!  Should be changed! (once users are allowed to specify waitlist priorities) -efg
-            first_waitlisted_user.is_waitlisted = false
-            first_waitlisted_user.save
-
-            # ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
-            # to treat all assignments as team assignments
-            Waitlist.cancel_all_waitlists(first_waitlisted_user.team_id, assignment_id)
-          end
-        end
+      unless signup_record.nil?
+        SignedUpTeam.remove_signed_up_team_for_topic(users_team[0].t_id, topic_id)
+      else
+        WaitlistTeam.remove_team_from_topic_waitlist(users_team[0].t_id, topic_id, session_user_id)
       end
-      signup_record.destroy unless signup_record.nil?
       ExpertizaLogger.info LoggerMessage.new('SignUpTopic', session_user_id, "Topic dropped: #{topic_id}")
     else
       # flash[:error] = "You cannot drop this topic because the drop deadline has passed."

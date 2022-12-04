@@ -1,11 +1,11 @@
 class WaitlistTeamController < ApplicationController
   include AuthorizationHelper
+
+  # belongs_to :topic, class_name: 'SignUpTopic'
+  # belongs_to :team, class_name: 'Team'
   
-  belongs_to :topic, class_name: 'SignUpTopic'
-  belongs_to :team, class_name: 'Team'
-  
-  validates :topic_id, :team_id, presence: true
-  validates :topic_id, uniqueness: { scope: :team_id }
+  # validates :topic_id, :team_id, presence: true
+  # validates :topic_id, uniqueness: { scope: :team_id }
 
 
   def self.first_team_in_waitlist_for_topic(topic_id)

@@ -742,4 +742,21 @@ FactoryBot.define do
     ta_id 1
     course_id 1
   end
+
+  factory :vm_question_response_row, class: VmQuestionResponseRow do
+    question_text 'FactoryQuestion'
+    question_id 1 
+    weight 1
+    question_max_score 5
+    seq 1
+    initialize_with { new(question_text, question_id, weight, question_max_score, seq) }    
+  end  
+  
+  factory :vm_question_response_score_cell, class: VmQuestionResponseScoreCell do
+    score_value 1
+    color_code '#000000'
+    comments 'FactoryBotComment'
+    vmprompts 'FactoryBotPrompt'
+    initialize_with { new(score_value, color_code, comments, vmprompts) }    
+  end  
 end

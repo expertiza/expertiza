@@ -1,4 +1,3 @@
-# change for initial commit
 class GradesController < ApplicationController
   helper :file
   helper :submitted_content

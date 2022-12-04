@@ -90,18 +90,6 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-  # def create_questionnaire
-  #   puts "create_questionnaire called."
-  #   @questionnaire = Object.const_get(params[:questionnaire][:type]).new(questionnaire_params)
-  #   # Create Quiz content has been moved to Quiz Questionnaire Controller
-  #   if @questionnaire.type != 'QuizQuestionnaire' # checking if it is a quiz questionnaire
-  #     @questionnaire.instructor_id = Ta.get_my_instructor(session[:user].id) if session[:user].role.name == 'Teaching Assistant'
-  #     save
-
-  #     redirect_to controller: 'tree_display', action: 'list'
-  #   end
-  # end
-
   # Edit a questionnaire
   def edit
     puts "edit called."
@@ -110,41 +98,20 @@ class QuestionnairesController < ApplicationController
     session[:return_to] = request.original_url
   end
 
-  # def update
-  #   puts "update called."
-  #   # If 'Add' or 'Edit/View advice' is clicked, redirect appropriately
-  #   if params[:add_new_questions]
-  #     # redirect_to action: 'add_new_questions', id: params.permit(:id)[:id], question: params.permit(:new_question)[:new_question]
-  #     nested_keys = params[:new_question].keys
-  #     permitted_params = params.permit(:id, :new_question => nested_keys)
-  #     redirect_to action: 'add_new_questions', id: permitted_params[:id], question: permitted_params[:new_question]
-  #   elsif params[:view_advice]
-  #     redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
-  #   else
-  #     @questionnaire = Questionnaire.find(params[:id])
-  #     begin
-  #       # Save questionnaire information
-  #       @questionnaire.update_attributes(questionnaire_params)
+  def update
+    puts "update called."
+    @questionnaire = Questionnaire.find(params[:id])
+    puts @questionnaire
+    begin
+      # Save questionnaire information
+      @questionnaire.update_attributes(questionnaire_params)
 
-  #       # Save all questions
-  #       unless params[:question].nil?
-  #         params[:question].each_pair do |k, v|
-  #           @question = Question.find(k)
-  #           # example of 'v' value
-  #           # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
-  #           v.each_pair do |key, value|
-  #             @question.send(key + '=', value) unless @question.send(key) == value
-  #           end
-  #           @question.save
-  #         end
-  #       end
-  #       flash[:success] = 'The questionnaire has been successfully updated!'
-  #     rescue StandardError
-  #       flash[:error] = $ERROR_INFO
-  #     end
-  #     redirect_to action: 'edit', id: @questionnaire.id.to_s.to_sym
-  #   end
-  # end
+      flash[:success] = 'The questionnaire has been successfully updated!'
+    rescue StandardError
+      flash[:error] = $ERROR_INFO
+    end
+    redirect_to action: 'edit', id: @questionnaire.id.to_s.to_sym
+  end
 
   # Remove a given questionnaire
   def delete
@@ -179,17 +146,6 @@ class QuestionnairesController < ApplicationController
     redirect_to action: 'list', controller: 'tree_display'
   end
 
-  # Toggle the access permission for this assignment from public to private, or vice versa
-  def toggle_access
-    puts "toggle_access called."
-    @questionnaire = Questionnaire.find(params[:id])
-    @questionnaire.private = !@questionnaire.private
-    @questionnaire.save
-    @access = @questionnaire.private == true ? 'private' : 'public'
-    undo_link("The questionnaire \"#{@questionnaire.name}\" has been successfully made #{@access}. ")
-    redirect_to controller: 'tree_display', action: 'list'
-  end
-
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
     puts "add_new_questions called."
@@ -203,9 +159,9 @@ class QuestionnairesController < ApplicationController
 
     num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
     max_seq = 0
-    Questionnaire.find(questionnaire_id).questions.each do |i|
-      if i.seq > max_seq
-        max_seq = i.seq
+    Questionnaire.find(questionnaire_id).questions.each do |question|
+      if question.seq > max_seq
+        max_seq = question.seq
       end
     end
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do
@@ -262,81 +218,6 @@ class QuestionnairesController < ApplicationController
   end
 
   private
-
-  # # save questionnaire object after create or edit
-  # def save
-  #   puts "save called."
-  #   @questionnaire.save!
-  #   save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
-  #   undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
-  # end
-
-  # # save questions that have been added to a questionnaire
-  # def save_new_questions(questionnaire_id)
-  #   puts "save_new_questions called."
-  #   if params[:new_question]
-  #     # The new_question array contains all the new questions
-  #     # that should be saved to the database
-  #     params[:new_question].keys.each_with_index do |question_key, index|
-  #       q = Question.new
-  #       q.txt = params[:new_question][question_key]
-  #       q.questionnaire_id = questionnaire_id
-  #       q.type = params[:question_type][question_key][:type]
-  #       q.seq = question_key.to_i
-  #       if @questionnaire.type == 'QuizQuestionnaire'
-  #         # using the weight user enters when creating quiz
-  #         weight_key = "question_#{index + 1}"
-  #         q.weight = params[:question_weights][weight_key.to_sym]
-  #       end
-  #       q.save unless q.txt.strip.empty?
-  #     end
-  #   end
-  # end
-
-  # # delete questions from a questionnaire
-  # # @param [Object] questionnaire_id
-  # def delete_questions(questionnaire_id)
-  #   puts "delete_questions called."
-  #   # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
-  #   questions = Question.where('questionnaire_id = ?', questionnaire_id)
-  #   @deleted_questions = []
-  #   questions.each do |question|
-  #     should_delete = true
-  #     unless question_params.nil?
-  #       params[:question].each_key do |question_key|
-  #         should_delete = false if question_key.to_s == question.id.to_s
-  #       end
-  #     end
-
-  #     next unless should_delete
-
-  #     question.question_advices.each(&:destroy)
-  #     # keep track of the deleted questions
-  #     @deleted_questions.push(question)
-  #     question.destroy
-  #   end
-  # end
-
-  # # Handles questions whose wording changed as a result of the edit
-  # # @param [Object] questionnaire_id
-  # def save_questions(questionnaire_id)
-  #   puts "save_questions called."
-  #   delete_questions questionnaire_id
-  #   save_new_questions questionnaire_id
-
-  #   if params[:question]
-  #     params[:question].keys.each do |question_key|
-  #       if params[:question][question_key][:txt].strip.empty?
-  #         # question text is empty, delete the question
-  #         Question.delete(question_key)
-  #       else
-  #         # Update existing question.
-  #         question = Question.find(question_key)
-  #         Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
-  #       end
-  #     end
-  #   end
-  # end
 
   def questionnaire_params
     params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,

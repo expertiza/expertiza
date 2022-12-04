@@ -9,9 +9,9 @@ describe Response do
   let(:team) { build(:assignment_team, id: 2) }
   let(:signed_up_team) { build(:signed_up_team, team_id: team.id) }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
-  let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer, answer2]) }
+  let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer]) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1, response_id: 1) }
-  let(:answer2) { Answer.new(answer: 2, comments: 'Answer text', question_id: 2, response_id: 2) }
+  let(:answer2) { Answer.new(answer: 2, comments: 'Answer text', question_id: 2) }
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
   let(:questionnaire1) { create(:questionnaire, id: 1) }
   let(:question1) { create(:question, questionnaire: questionnaire1, weight: 1, id: 1) }
@@ -231,7 +231,7 @@ describe Response do
       allow(assignment).to receive(:num_review_rounds).and_return(2)
       allow(Question).to receive(:get_all_questions_with_comments_available).with(1).and_return([1, 2])
       allow(ReviewResponseMap).to receive_message_chain(:where, :find_each).with(reviewed_object_id: 1, reviewer_id: 1)
-        .with(no_args).and_yield(review_response_map)
+                                                                           .with(no_args).and_yield(review_response_map)
       response1 = double('Response', round: 1, additional_comment: '')
       response2 = double('Response', round: 2, additional_comment: 'LGTM')
       allow(review_response_map).to receive(:response).and_return([response1, response2])
@@ -295,8 +295,8 @@ describe Response do
       allow(calibration_response_map).to receive(:response).and_return([calibration_response])
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow(AssignmentQuestionnaire).to receive(:find_by)
-        .with(['assignment_id = ? and questionnaire_id IN (?)', 1, ReviewQuestionnaire.select('id')])
-        .and_return(assignment_questionnaire)
+                                          .with(['assignment_id = ? and questionnaire_id IN (?)', 1, ReviewQuestionnaire.select('id')])
+                                          .and_return(assignment_questionnaire)
     end
   end
 
@@ -314,18 +314,18 @@ describe Response do
       mail = double
       allow(mail).to receive(:deliver_now)
       expect(Mailer).to receive(:notify_grade_conflict_message)
-        .with(to: assignment.instructor.email,
-              subject: 'Expertiza Notification: A review score is outside the acceptable range',
-              body: {
-                reviewer_name: 'no one',
-                type: 'review',
-                reviewee_name: 'no one2',
-                new_score: 0.5,
-                assignment: assignment,
-                conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=1',
-                summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=2',
-                assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/1/edit'
-              }).and_return(mail)
+                          .with(to: assignment.instructor.email,
+                                subject: 'Expertiza Notification: A review score is outside the acceptable range',
+                                body: {
+                                  reviewer_name: 'no one',
+                                  type: 'review',
+                                  reviewee_name: 'no one2',
+                                  new_score: 0.5,
+                                  assignment: assignment,
+                                  conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=1',
+                                  summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=2',
+                                  assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/1/edit'
+                                }).and_return(mail)
       response.notify_instructor_on_difference
     end
   end
@@ -359,11 +359,39 @@ describe Response do
     end
   end
 
-  describe '#copy_to_response_map' do
-    it 'should copy response to a response map' do
-      new_response = response.copy_to_response_map(response_map2)
-      expect(new_response.map_id).to eq(response_map2.id)
-      expect(new_response.scores.size).to eq(response.scores.size)
+  context 'all entries are persisted in the database before the test' do
+    let(:user3) { create(:student, id: 5, role_id: 1, name: 'student1', fullname: 'no one') }
+    let(:user4) { create(:instructor, id: 6, role_id: 2, name: 'instructor1', fullname: 'no one') }
+
+    let(:assignment3) { create(:assignment, id: 3, name: 'Test Assgt', directory_path: "x", instructor: user4) }
+    let(:assignment4) { create(:assignment, id: 4, name: 'Test Assgt2', directory_path: "y", instructor: user4) }
+
+    let(:team3) { create(:assignment_team, id: 3, assignment: assignment3) }
+    let(:team4) { create(:assignment_team, id: 4, assignment: assignment4) }
+
+    let(:participant3) { create(:participant, id: 3, parent_id: 3, user: user3) }
+    let(:participant4) { create(:participant, id: 4, parent_id: 3, user: user4) }
+    let(:participant5) { create(:participant, id: 5, parent_id: 4, user: user3) }
+    let(:participant6) { create(:participant, id: 6, parent_id: 4, user: user4) }
+
+    let(:response_map3) { create(:review_response_map, id: 3, assignment: assignment3, reviewer: participant4, reviewee: team3) }
+    let(:response_map4) { create(:review_response_map, id: 4, assignment: assignment4, reviewer: participant6, reviewee: team4) }
+
+    let(:response3) { create(:response, id: 3, map_id: 3, response_map: response_map3) }
+
+    let!(:questionnaire3) { create(:questionnaire, id: 3) }
+    let!(:question3) { create(:question, id: 3, weight: 1, questionnaire: questionnaire3) }
+
+    let!(:answer3) { Answer.create(answer: 1, comments: 'Answer text', question: question3, response: response3) }
+    let!(:answer4) { Answer.create(answer: 2, comments: 'Answer text', question: question3, response: response3) }
+
+    describe '#copy_to_response_map' do
+      it 'should copy response to a response map' do
+        new_response = response3.copy_to_response_map(response_map4)
+
+        expect(new_response.map_id).to eq(response_map4.id)
+        expect(new_response.scores.size).to eq(response3.scores.size)
+      end
     end
   end
 end

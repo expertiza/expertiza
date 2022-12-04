@@ -594,6 +594,7 @@ ActiveRecord::Schema.define(version: 20221201154204) do
     t.integer "topic_id", default: 0, null: false
     t.integer "team_id", default: 0, null: false
     t.integer "preference_priority_number"
+    t.boolean "is_waitlisted", null: false
     t.index ["topic_id"], name: "fk_signed_up_users_sign_up_topics"
   end
 

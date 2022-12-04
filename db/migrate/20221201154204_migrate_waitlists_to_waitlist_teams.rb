@@ -15,11 +15,11 @@ class MigrateWaitlistsToWaitlistTeams < ActiveRecord::Migration[5.1]
       end
     end
 
-    remove_column :signed_up_teams, :is_waitlisted
+    # remove_column :signed_up_teams, :is_waitlisted
 
   end
   
   def self.down
-    add_column :signed_up_teams, :is_waitlisted, :boolean, null: false
+    # add_column :signed_up_teams, :is_waitlisted, :boolean, null: false
   end
 end

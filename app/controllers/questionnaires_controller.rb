@@ -43,67 +43,27 @@ class QuestionnairesController < ApplicationController
   end
 
   # factory method to create the appropriate questionnaire based on the type
-  def questionnaire_factory(type, params = nil)
+  def questionnaire_factory(type)
     if type == 'ReviewQuestionnaire'
-      if params != nil
-        return ReviewQuestionnaire.new(params)
-      else
-        return ReviewQuestionnaire.new
-      end
+      return ReviewQuestionnaire.new
     elsif type == 'MetareviewQuestionnaire'
-      if params != nil
-        return MetareviewQuestionnaire.new(params)
-      else
-        return MetareviewQuestionnaire.new
-      end
+      return MetareviewQuestionnaire.new
     elsif type == 'AuthorFeedbackQuestionnaire'
-      if params != nil
-        return AuthorFeedbackQuestionnaire.new(params)
-      else
-        return AuthorFeedbackQuestionnaire.new
-      end
+      return AuthorFeedbackQuestionnaire.new(params)
     elsif type == 'TeammateReviewQuestionnaire'
-      if params != nil
-        return TeammateReviewQuestionnaire.new(params)
-      else
-        return TeammateReviewQuestionnaire.new
-      end
+      return TeammateReviewQuestionnaire.new
     elsif type == 'AssignmentSurveyQuestionnaire'
-      if params != nil
-        return AssignmentSurveyQuestionnaire.new(params)
-      else
-        return AssignmentSurveyQuestionnaire.new
-      end
+      return AssignmentSurveyQuestionnaire.new
     elsif type == 'SurveyQuestionnaire'
-      if params != nil
-        return SurveyQuestionnaire.new(params)
-      else
-        return SurveyQuestionnaire.new
-      end
+      return SurveyQuestionnaire.new
     elsif type == 'GlobalSurveyQuestionnaire'
-      if params != nil
-        return GlobalSurveyQuestionnaire.new(params)
-      else
-        return GlobalSurveyQuestionnaire.new
-      end
+      return GlobalSurveyQuestionnaire.new
     elsif type == 'CourseSurveyQuestionnaire'
-      if params != nil
-        return CourseSurveyQuestionnaire.new(params)
-      else
-        return CourseSurveyQuestionnaire.new
-      end
+      return CourseSurveyQuestionnaire.new
     elsif type == 'BookmarkRatingQuestionnaire'
-      if params != nil
-        return BookmarkRatingQuestionnaire.new(params)
-      else
-        return BookmarkRatingQuestionnaire.new
-      end
+      return BookmarkRatingQuestionnaire.new
     elsif type == 'QuizQuestionnaire'
-      if params != nil
-        return QuizQuestionnaire.new(params)
-      else
-        return QuizQuestionnaire.new
-      end
+      return QuizQuestionnaire.new
     end
   end
 

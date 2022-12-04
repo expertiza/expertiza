@@ -49,7 +49,7 @@ class QuestionnairesController < ApplicationController
     elsif type == 'MetareviewQuestionnaire'
       return MetareviewQuestionnaire.new
     elsif type == 'AuthorFeedbackQuestionnaire'
-      return AuthorFeedbackQuestionnaire.new(params)
+      return AuthorFeedbackQuestionnaire.new
     elsif type == 'TeammateReviewQuestionnaire'
       return TeammateReviewQuestionnaire.new
     elsif type == 'AssignmentSurveyQuestionnaire'

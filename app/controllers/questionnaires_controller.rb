@@ -42,9 +42,75 @@ class QuestionnairesController < ApplicationController
     @questionnaire = Questionnaire.find(params[:id])
   end
 
+  # factory method to create the appropriate questionnaire based on the type
+  def questionnaire_factory(type, params = nil)
+    if type == 'ReviewQuestionnaire'
+      if params != nil
+        return ReviewQuestionnaire.new(params)
+      else
+        return ReviewQuestionnaire.new
+      end
+    elsif type == 'MetareviewQuestionnaire'
+      if params != nil
+        return MetareviewQuestionnaire.new(params)
+      else
+        return MetareviewQuestionnaire.new
+      end
+    elsif type == 'AuthorFeedbackQuestionnaire'
+      if params != nil
+        return AuthorFeedbackQuestionnaire.new(params)
+      else
+        return AuthorFeedbackQuestionnaire.new
+      end
+    elsif type == 'TeammateReviewQuestionnaire'
+      if params != nil
+        return TeammateReviewQuestionnaire.new(params)
+      else
+        return TeammateReviewQuestionnaire.new
+      end
+    elsif type == 'AssignmentSurveyQuestionnaire'
+      if params != nil
+        return AssignmentSurveyQuestionnaire.new(params)
+      else
+        return AssignmentSurveyQuestionnaire.new
+      end
+    elsif type == 'SurveyQuestionnaire'
+      if params != nil
+        return SurveyQuestionnaire.new(params)
+      else
+        return SurveyQuestionnaire.new
+      end
+    elsif type == 'GlobalSurveyQuestionnaire'
+      if params != nil
+        return GlobalSurveyQuestionnaire.new(params)
+      else
+        return GlobalSurveyQuestionnaire.new
+      end
+    elsif type == 'CourseSurveyQuestionnaire'
+      if params != nil
+        return CourseSurveyQuestionnaire.new(params)
+      else
+        return CourseSurveyQuestionnaire.new
+      end
+    elsif type == 'BookmarkRatingQuestionnaire'
+      if params != nil
+        return BookmarkRatingQuestionnaire.new(params)
+      else
+        return BookmarkRatingQuestionnaire.new
+      end
+    elsif type == 'QuizQuestionnaire'
+      if params != nil
+        return QuizQuestionnaire.new(params)
+      else
+        return QuizQuestionnaire.new
+      end
+    end
+  end
+
   def new
     puts "new called."
-    @questionnaire = Object.const_get(params[:model].split.join).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model].split.join
+    type = params[:model].split.join
+    @questionnaire = questionnaire_factory(type) if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model].split.join
   rescue StandardError
     flash[:error] = $ERROR_INFO
   end
@@ -58,7 +124,8 @@ class QuestionnairesController < ApplicationController
       questionnaire_private = params[:questionnaire][:private] == 'true'
       display_type = params[:questionnaire][:type].split('Questionnaire')[0]
       begin
-        @questionnaire = Object.const_get(params[:questionnaire][:type]).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
+        type = params[:questionnaire][:type]
+        @questionnaire = questionnaire_factory(type) if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
       rescue StandardError
         flash[:error] = $ERROR_INFO
       end

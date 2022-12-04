@@ -141,29 +141,11 @@ class SignupSheetController < ApplicationController
     add_signup_topics
   end
 
-  # Separated from setup_new_topic
-  # Only used to setup the parameters of new topic
-  #def set_values_for_new_topic
-    #@signup_topic = SignUpTopic.new(topic_params)
-    # @signup_topic.topic_identifier = topic_params[:topic_identifier]
-    # @signup_topic.topic_name = topic_params[:topic_name]
-    # @signup_topic.max_choosers = topic_params[:max_choosers]
-    # @signup_topic.category = topic_params[:category]
-    #@signup_topic.assignment_id = params[:id]
-    #@assignment = Assignment.find(params[:id])
-  #end
-
   # simple function that redirects ti the /add_signup_topics or the /add_signup_topics_staggered page depending on assignment type
   # staggered means that different topics can have different deadlines.
   def redirect_to_sign_up(assignment_id)
     assignment = Assignment.find(assignment_id)
     assignment.staggered_deadline == true ? (redirect_to action: 'add_signup_topics_staggered', id: assignment_id) : (redirect_to action: 'add_signup_topics', id: assignment_id)
-  end
-
-  # simple function that redirects to assignment->edit->topic panel to display /add_signup_topics or the /add_signup_topics_staggered page
-  # staggered means that different topics can have different deadlines.
-  def redirect_to_assignment_edit(assignment_id)
-    redirect_to controller: 'assignments', action: 'edit', id: assignment_id
   end
 
   # method to load deadline instance variables
@@ -335,7 +317,7 @@ class SignupSheetController < ApplicationController
         end
       end
     end
-    redirect_to_assignment_edit(params[:assignment_id])
+    redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
   end
 
   # This method is called when a student click on the trumpet icon. So this is a bad method name. --Yang
@@ -403,7 +385,7 @@ class SignupSheetController < ApplicationController
     @signup_topic = SignUpTopic.new(topic_params)
     @signup_topic.assignment_id = params[:id]
     @assignment = Assignment.find(params[:id])
-    @signup_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
+    @signup_topic.micropayment = topic_params[:micropayment] if @assignment.microtask?
     if @signup_topic.save
       undo_link "The topic: \"#{@signup_topic.topic_name}\" has been created successfully. "
       redirect_to edit_assignment_path(@signup_topic.assignment_id) + '#tabs-2'

@@ -14,7 +14,7 @@ class TeamsController < ApplicationController
 
   # Randomizes teams based on an Assignment or Course
   def randomize_teams
-    Team.randomize_all_by_parent(team_parent, session[:team_type], team_size)
+    Team.randomize_all_by_parent(team_parent, session[:team_type], params[:team_size].to_i)
 
     success_message = 'Random teams have been successfully created.'
     undo_link(success_message)
@@ -31,7 +31,7 @@ class TeamsController < ApplicationController
 
     @assignment = team_parent if session[:team_type] == 'Assignment'
     begin
-      @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
+      @root_node = get_team_type_const('Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
     rescue StandardError
       flash[:error] = $ERROR_INFO
@@ -47,14 +47,14 @@ class TeamsController < ApplicationController
   def create
     check_for_existing_team
 
-    @team = Object.const_get(session[:team_type] + 'Team').create(name: params[:team][:name], parent_id: team_parent.id)
-    TeamNode.create(parent_id: team_parent.id, node_object_id: @team.id)
+    @team = get_team_type_const('Team').create(name: params[:team][:name], parent_id: params[:id])
+    TeamNode.create(parent_id: params[:id], node_object_id: @team.id)
 
     undo_link("The team \"#{@team.name}\" has been successfully created.")
-    redirect_to action: 'list', id: team_parent.id
+    redirect_to action: 'list', id: params[:id]
   rescue TeamExistsError
     flash[:error] = $ERROR_INFO
-    redirect_to action: 'new', id: team_parent.id
+    redirect_to action: 'new', id: params[:id]
   end
 
   def update
@@ -67,7 +67,7 @@ class TeamsController < ApplicationController
 
       flash[:success] = "The team \"#{@team.name}\" has been successfully updated."
       undo_link('')
-      redirect_to action: 'list', id: team_parent.id
+      redirect_to action: 'list', id: params[:id]
     rescue TeamExistsError
       flash[:error] = $ERROR_INFO
       redirect_to action: 'edit', id: @team.id
@@ -79,7 +79,7 @@ class TeamsController < ApplicationController
   end
 
   def delete_all
-    root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
+    root_node = get_team_type_const('Node').find_by(node_object_id: params[:id])
     child_nodes = root_node.get_teams.map(&:node_object_id)
     Team.destroy_all if child_nodes
     redirect_to action: 'list', id: params[:id]
@@ -149,10 +149,6 @@ class TeamsController < ApplicationController
     end
   end
 
-  def team_size
-    params[:team_size].to_i
-  end
-
   # Gets the model representing the parent of the team
   def team_type
     if session[:team_type] == 'Assignment'
@@ -174,3 +170,9 @@ class TeamsController < ApplicationController
     Team.check_for_existing(team_parent, params[:team][:name], session[:team_type])
   end
 end
+
+  # Checks for and returns the constant related to the team type.
+  # Should either be 'Node' or 'Team'
+  def get_team_type_const (const_type)
+    Object.const_get(session[:team_type] + const_type)
+  end

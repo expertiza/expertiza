@@ -58,7 +58,7 @@ class WaitlistTeamController < ApplicationController
     list_of_topic_waitlist_counts
   end
 
-  def self.find_waitlisted_teams_for_asignment(assignment_id, ip_address = nil)
+  def self.find_waitlisted_teams_for_assignment(assignment_id, ip_address = nil)
     waitlisted_participants = WaitlistTeam.joins('INNER JOIN sign_up_topics ON waitlist_teams.topic_id = sign_up_topics.id')
                                           .select('waitlist_teams.id as id, sign_up_topics.id as topic_id, sign_up_topics.topic_name as name,
                                             sign_up_topics.topic_name as team_name_placeholder, sign_up_topics.topic_name as user_name_placeholder,

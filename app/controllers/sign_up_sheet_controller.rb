@@ -158,7 +158,7 @@ class SignUpSheetController < ApplicationController
     # Though called participants, @participants are actually records in signed_up_teams table, which
     # is a mapping table between teams and topics (waitlisted recorded are also counted)
     @participants = SignedUpTeam.find_team_participants(assignment_id, session[:ip])
-    @waitlisted_participants = WaitlistTeam.find_waitlisted_teams_for_asignment(assignment_id, session[:ip])
+    @waitlisted_participants = WaitlistTeamController.find_waitlisted_teams_for_assignment(assignment_id, session[:ip])
   end
 
   def set_values_for_new_topic
@@ -442,7 +442,7 @@ class SignUpSheetController < ApplicationController
       SignedUpTeam.where(team_id: team_id).first.update_attribute('topic_id', params[:topic_id].to_i)
     end
     # check the waitlist of original topic. Let the first waitlisted team hold the topic, if exists.
-    waitlisted_teams = WaitlistTeam.first_team_in_waitlist_for_topic(original_topic_id)
+    waitlisted_teams = WaitlistTeamController.first_team_in_waitlist_for_topic(original_topic_id)
     if waitlisted_teams.present?
       waitlisted_first_team_first_user_id = TeamsUser.where(team_id: waitlisted_teams.first.team_id).first.user_id
       SignUpSheet.signup_team(assignment.id, waitlisted_first_team_first_user_id, original_topic_id)

@@ -403,10 +403,8 @@ Expertiza::Application.routes.draw do
       get :delete_signup
       get :add_signup_topics
       get :add_signup_topics_staggered
-      get :delete_signup
       get :list
       get :signup_topics
-      get :signup
       get :sign_up
       get :show_team
       get :switch_original_topic_to_approved_suggested_topic

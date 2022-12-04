@@ -260,7 +260,7 @@ class QuestionnairesController < ApplicationController
     end
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do
       max_seq += 1
-      question = question_factory(params[:question][:type], questionnaire_id, i)
+      question = question_factory(params[:question][:type], questionnaire_id, max_seq)
       if question.is_a? ScoredQuestion
         question.weight = params[:question][:weight]
         question.max_label = 'Strongly agree'

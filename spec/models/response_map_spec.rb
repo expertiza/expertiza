@@ -32,6 +32,8 @@ describe ResponseMap do
   let(:response4) { build(:response, id: 5, map_id: 5, round: 1, response_map: review_response_map2, is_submitted: true) }
   let(:response5) { build(:response, id: 6, map_id: 5, round: 1, response_map: review_response_map2, is_submitted: false) }
 
+  let(:submission_record) { build(:submission_record, assignment_id: 1, team_id: 1) }
+
   before(:each) do
     allow(review_response_map).to receive(:response).and_return([response])
     allow(review_response_map1).to receive(:response).and_return([response1])
@@ -127,13 +129,18 @@ describe ResponseMap do
 
   describe '#copy_to_assignment' do
     it 'copies response_map to an assignment with all associated submission records, responses and answers' do
+      allow(Response).to receive(:where).with(map_id: 1).and_return([response])
+      allow(SubmissionRecord).to receive(:where).with(assignment_id: assignment.id, team_id: team.id).and_return([submission_record])
+      allow(SubmissionRecord).to receive(:where).with(assignment_id: assignment1.id, team_id: team3.id).and_call_original
+
       new_review_response_map = review_response_map.copy_to_assignment(assignment1, team3, participant6)
 
       expect(new_review_response_map.reviewed_object_id).to eq(assignment1.id)
       expect(new_review_response_map.reviewer_id).to eq(participant6.id)
       expect(new_review_response_map.reviewee_id).to eq(team3.id)
 
-      expect(Response.where(map_id: new_review_response_map.id).size).to eq(review_response_map.response_ids.size)
+      expect(SubmissionRecord.where(assignment_id: assignment1.id, team_id: team3.id).size).to eq(SubmissionRecord.where(assignment_id: assignment.id, team_id: team.id).size)
+      expect(new_review_response_map.response_ids.size).to eq(review_response_map.response_ids.size)
     end
   end
 end

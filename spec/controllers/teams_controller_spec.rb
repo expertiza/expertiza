@@ -155,6 +155,13 @@ describe TeamsController do
     # this method has only 1 line which is just to look up a team with the id present in the request_params
   end
 
+  describe 'delete_all method' do
+    # delete_all is not yet implemented
+    context 'when there are child nodes' do
+      it 'deletes all teams for the root_node'
+    end
+  end
+
   describe 'delete method' do
     before(:each) { request.env['HTTP_REFERER'] = root_url }
     context 'when called and team is nil' do

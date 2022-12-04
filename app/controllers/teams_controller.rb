@@ -78,10 +78,13 @@ class TeamsController < ApplicationController
     @team = Team.find(params[:id])
   end
 
+  # TODO This method does not work
+  # It should delete all teams for an assingment or course
   def delete_all
     root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
     child_nodes = root_node.get_teams.map(&:node_object_id)
-    Team.destroy_all if child_nodes
+    # BAD this will destroy all teams if it succeeds
+    # Team.destroy_all if child_nodes
     redirect_to action: 'list', id: params[:id]
   end
 

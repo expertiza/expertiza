@@ -110,8 +110,8 @@ class TeamsController < ApplicationController
   # The team and team members are all copied
   def copy_to_assignment
     assignment = Assignment.find(params[:id])
-    if assignment.course_id
-      course = Course.find(assignment.course_id)
+    course = assignment.course
+    if course
       teams = course.get_teams
       if teams.empty?
         flash[:note] = 'No teams were found when trying to copy to assignment.'

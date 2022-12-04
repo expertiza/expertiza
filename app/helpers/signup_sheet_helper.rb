@@ -108,4 +108,21 @@ module SignupSheetHelper
     signed_up_topics &= @signup_topics
     return signed_up_topics
   end
+
+  # Update teams on the waitlist for the topic based on update of max_choosers
+  def update_waitlist(topic)
+    # While saving the max choosers you should be careful; if there are users who have signed up for this particular
+    # topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
+    # there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
+    # it.
+    # if no team has signed up for this topic/max choosers hasn't changed, allow update
+    if SignedUpTeam.find_by(topic_id: topic.id).nil? || topic.max_choosers == topic_params[:max_choosers]
+      return
+    # if max choosers has increased, remove teams from the waitlist accordingly
+    elsif topic.max_choosers.to_i < topic_params[:max_choosers].to_i
+      topic.update_waitlisted_users topic_params[:max_choosers]
+    else
+      flash[:error] = 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'
+    end
+  end
 end

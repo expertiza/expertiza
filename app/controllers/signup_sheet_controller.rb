@@ -148,12 +148,6 @@ class SignupSheetController < ApplicationController
     assignment.staggered_deadline == true ? (redirect_to action: 'add_signup_topics_staggered', id: assignment_id) : (redirect_to action: 'add_signup_topics', id: assignment_id)
   end
 
-  # method to load deadline instance variables
-  def find_topic_deadlines
-    @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
-    @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
-  end
-
   # method to list possible signup topics
   # renders either list.html or intelligent_topic_selection.html
   def list
@@ -166,7 +160,7 @@ class SignupSheetController < ApplicationController
     @priority = 0
     team_id = @participant.team.try(:id)
 
-    # if assignment is intelligent, want to know which topics the team has already bid on
+    # if assignment has topics for bidding, want to know which topics the team has already bid on
     if @assignment.bid_for_topics
       @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
       @bids = compute_signed_up_topics(@bids)
@@ -175,7 +169,8 @@ class SignupSheetController < ApplicationController
 
     @num_of_topics = @signup_topics.size
     @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
-    find_topic_deadlines()
+    @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
+    @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
 
     unless @assignment.due_dates.find_by(deadline_type_id: 1).nil?
       @show_actions = false if !@assignment.staggered_deadline? && (@assignment.due_dates.find_by(deadline_type_id: 1).due_at < Time.now)
@@ -197,8 +192,6 @@ class SignupSheetController < ApplicationController
   def sign_up
     @assignment = AssignmentParticipant.find(params[:id]).assignment
     @user_id = session[:user].id
-    # Always use team_id ACS
-    # s = Signupsheet.new
     # Team lazy initialization: check whether the user already has a team for this assignment
     flash[:error] = "You've already signed up for a topic!" unless SignUpSheet.signup_team(@assignment.id, @user_id, params[:topic_id])
     redirect_to action: 'list', id: params[:id]
@@ -404,22 +397,22 @@ class SignupSheetController < ApplicationController
     redirect_to_sign_up(params[:id])
   end
 
-  # Update teams on the waitlist for the topic based on update of max_choosers
-  def update_waitlist(topic)
-    # While saving the max choosers you should be careful; if there are users who have signed up for this particular
-    # topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
-    # there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
-    # it.
-    # if no team has signed up for this topic/max choosers hasn't changed, allow update
-    if SignedUpTeam.find_by(topic_id: topic.id).nil? || topic.max_choosers == topic_params[:max_choosers]
-      return
-    # if max choosers has increased, remove teams from the waitlist accordingly
-    elsif topic.max_choosers.to_i < topic_params[:max_choosers].to_i
-      topic.update_waitlisted_users topic_params[:max_choosers]
-    else
-      flash[:error] = 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'
-    end
-  end
+  # # Update teams on the waitlist for the topic based on update of max_choosers
+  # def update_waitlist(topic)
+  #   # While saving the max choosers you should be careful; if there are users who have signed up for this particular
+  #   # topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
+  #   # there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
+  #   # it.
+  #   # if no team has signed up for this topic/max choosers hasn't changed, allow update
+  #   if SignedUpTeam.find_by(topic_id: topic.id).nil? || topic.max_choosers == topic_params[:max_choosers]
+  #     return
+  #   # if max choosers has increased, remove teams from the waitlist accordingly
+  #   elsif topic.max_choosers.to_i < topic_params[:max_choosers].to_i
+  #     topic.update_waitlisted_users topic_params[:max_choosers]
+  #   else
+  #     flash[:error] = 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'
+  #   end
+  # end
 
   # get info related to the ad for partners so that it can be displayed when an assignment_participant
   # clicks to see ads related to a topic

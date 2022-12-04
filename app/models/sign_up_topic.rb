@@ -44,7 +44,7 @@ class SignUpTopic < ApplicationRecord
   def self.find_slots_waitlisted(assignment_id)
     # SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id +  " and u.is_waitlisted = true GROUP BY t.id")
     SignUpTopic.find_by_sql(['SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id = ? and u.is_waitlisted = true GROUP BY t.id', assignment_id])
-    WaitlistTeam.count_all_waitlists_per_topic_per_assignment(assignment_id)
+    WaitlistTeamController.count_all_waitlists_per_topic_per_assignment(assignment_id)
   end
 
   def self.find_waitlisted_topics(assignment_id, team_id)

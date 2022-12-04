@@ -2,15 +2,21 @@
 
 <table class="general">
   <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
-  <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
+  <% if (!@selected_topics.nil? && @selected_topics.size != 0 )|| (!@waitlisted_topics.nil? && @waitlisted_topics.size != 0) %>
       <b><%=t ".your_topics"%></b>
+  <% end %>
+  <% if !@selected_topics.nil? %>
       <% for selected_topic in @selected_topics %>
-        <br/><%= selected_topic.topic_name %>
-        <% if selected_topic.is_waitlisted == true %>
-          <font color='red'><%=t ".waitlisted"%></font>
-        <% end %>
+          <br/><%= selected_topic.topic_name %>
       <% end %>
   <% end %>
+  <% if !@waitlisted_topics.nil? %>
+      <% for waitlisted_topic in @waitlisted_topics %>
+      <br/><%= waitlisted_topic.topic_name %>
+          <font color='red'><%=t ".waitlisted"%></font>
+      <% end %>
+  <% end %>
+
   <br/><br/>
 
   <% i=1 %>
@@ -18,9 +24,15 @@
     <% for topic in @sign_up_topics %>
       <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
         <% for selected_topic in @selected_topics %>
-          <% if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted %>
+          <% if selected_topic.topic_id == topic.id%>
             <tr bgcolor="yellow">
-          <% elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted%>
+          <% else %>
+            <tr id="topic_<%= topic.id %>">
+          <% end %>
+        <% end %>
+      <% elsif !@waitlisted_topics.nil? && @waitlisted_topics.size != 0 %>
+        <% for waitlisted_topic in @waitlisted_topics %>
+          <% if waitlisted_topic.topic_id == topic.id%>
            <tr bgcolor="lightgray">
           <% else %>
             <tr id="topic_<%= topic.id %>">
@@ -41,7 +53,6 @@
 <% if SignUpTopic.has_suggested_topic?(@assignment.id) %>
     <%= render :partial => '/sign_up_sheet/suggested_topic' %>
 <% end %>
-
 <% session[:return_to] = request.url %>
 <br/><br/>
 <a href="javascript:history.back()"><%=t ".back"%></a>

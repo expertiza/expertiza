@@ -63,7 +63,7 @@ module SignUpSheetHelper
         next unless topic.id == participant.topic_id
 
         html += participant.user_name_placeholder
-        if assignment.max_team_size > 1
+        if assignment.max_team_size > 0
           html += '<a href="/sign_up_sheet/delete_signup_as_instructor/' + participant.team_id.to_s + '?topic_id=' + topic.id.to_s + '"">'
           html += '<img border="0" align="middle" src="/assets/delete_icon.png" title="Drop Student"></a>'
         end

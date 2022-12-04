@@ -3,7 +3,7 @@ class QuizQuestionnairesController < QuestionnairesController
 
   # Quiz questionnaire edit option to be allowed for student
   def action_allowed?
-    if params[:action] == 'review_questions'
+    if params[:action] == 'review_questions' && current_user_has_ta_privileges?
       review_questions
       return true
     end

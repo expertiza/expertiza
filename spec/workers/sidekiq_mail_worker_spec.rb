@@ -61,16 +61,5 @@ describe MailWorker do
       worker.perform("1", "drop_outstanding_reviews", "2018-12-31 00:00:01")
       expect(Mailer.deliveries.size).to eq(0)
     end
-
-    # Commented out because dependency PlagiarismCheckerHelper contains an uninitialized variable request
-    # it "should not return email if deadline is compare_files_with_simicheck" do
-    #   Sidekiq::Testing.inline!
-    #   Mailer.deliveries.clear
-    #   worker = MailWorker.new
-
-    # Calls PlagiarismCheckerHelper.run method
-    #   worker.perform('1', 'compare_files_with_simicheck', '2018-12-31 00:00:01')
-    #   expect(Mailer.deliveries.size).to eq(0)
-    # end
   end
 end

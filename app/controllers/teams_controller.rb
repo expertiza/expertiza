@@ -71,7 +71,7 @@ class TeamsController < ApplicationController
   def delete_all
     root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
     child_nodes = root_node.get_teams.map(&:node_object_id)
-    Team.destroy_all if child_nodes
+    Team.destroy_all(id: child_nodes) if child_nodes
     redirect_to action: 'list', id: params[:id]
   end
 
@@ -81,16 +81,7 @@ class TeamsController < ApplicationController
     unless @team.nil?
       @signed_up_team = SignedUpTeam.where(team_id: @team.id)
       @teams_users = TeamsUser.where(team_id: @team.id)
-
-      if @signed_up_team == 1 && !@signUps.first.is_waitlisted # this team hold a topic
-        # if there is another team in waitlist, make this team hold this topic
-        topic_id = @signed_up_team.first.topic_id
-        next_wait_listed_team = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
-        # if slot exist, then confirm the topic for this team and delete all waitlists for this team
-        SignUpTopic.assign_to_first_waiting_team(next_wait_listed_team) if next_wait_listed_team
-      end
-
-      @sign_up_team.destroy_all if @sign_up_team
+      SignedUpTeam.release_topics_selected_by_team(@team.id)
       @teams_users.destroy_all if @teams_users
       @team.destroy if @team
       undo_link("The team \"#{@team.name}\" has been successfully deleted.")

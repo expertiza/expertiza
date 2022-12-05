@@ -477,15 +477,7 @@ en_US:
       answers: "Answers"
       quiz_score: "Quiz score: "
       back: "Back"
-
-    review_questions:
-      quiz_listings: "Listing of all quiz questions for"
-      quiz_create: "Quiz created by"
-      topic: "Topic:"
-      quiz_taker: "Quiz taker"
-      quiz_score: "Quiz score"
-      avg_score: "Average score for quiz takers: "
-
+      
     take_quiz:
       questions: "Questions"
       submit_quiz: "Submit Quiz"

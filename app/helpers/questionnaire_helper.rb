@@ -24,4 +24,29 @@ module QuestionnaireHelper
       end
     end
   end
+  
+  # factory method to create the appropriate questionnaire based on the type
+  def questionnaire_factory(type)
+    if type == 'ReviewQuestionnaire'
+      return ReviewQuestionnaire.new
+    elsif type == 'MetareviewQuestionnaire'
+      return MetareviewQuestionnaire.new
+    elsif type == 'AuthorFeedbackQuestionnaire'
+      return AuthorFeedbackQuestionnaire.new
+    elsif type == 'TeammateReviewQuestionnaire'
+      return TeammateReviewQuestionnaire.new
+    elsif type == 'AssignmentSurveyQuestionnaire'
+      return AssignmentSurveyQuestionnaire.new
+    elsif type == 'SurveyQuestionnaire'
+      return SurveyQuestionnaire.new
+    elsif type == 'GlobalSurveyQuestionnaire'
+      return GlobalSurveyQuestionnaire.new
+    elsif type == 'CourseSurveyQuestionnaire'
+      return CourseSurveyQuestionnaire.new
+    elsif type == 'BookmarkRatingQuestionnaire'
+      return BookmarkRatingQuestionnaire.new
+    elsif type == 'QuizQuestionnaire'
+      return QuizQuestionnaire.new
+    end
+  end
 end

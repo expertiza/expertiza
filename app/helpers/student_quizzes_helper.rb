@@ -48,8 +48,8 @@ module StudentQuizzesHelper
         # for MultipleChoiceCheckbox, score =1 means the quiz taker have done this question correctly, not just make select this choice correctly.
         score_checkbox(scores, params, question, valid, quiz_response, score)
     end
-    
-    # Update and append the new_score object in scores array and update the valid flag by performing validations 
+
+    # Update and append the new_score object in scores array and update the valid flag by performing validations
     def score_checkbox(scores, params, question, valid, quiz_response, score)
         params[question.id.to_s].each do |choice| # checking for the input for each of the checkbox pattern question
             new_score = Answer.new comments: choice, question_id: question.id, response_id: quiz_response.id, answer: score
@@ -59,12 +59,13 @@ module StudentQuizzesHelper
         valid
     end
 
+    
     def score_single_choice_radio(correct_answers, params, question, scores, quiz_response, valid)
         correct_answer = correct_answers.first
         score = correct_answer.txt == params[question.id.to_s] ? 1 : 0    #checking whether the answser is correct and assigning score 0 or 1
         new_score = Answer.new comments: params[question.id.to_s], question_id: question.id, response_id: quiz_response.id, answer: score
         valid = false if new_score.nil? || new_score.comments.nil? || new_score.comments.empty? # flagging false if questions goes unattempted
-        scores.push(new_score)
+        scores.push(new_score) # Appending into score array
         valid
     end
 end

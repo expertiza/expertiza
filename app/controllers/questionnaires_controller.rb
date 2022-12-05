@@ -76,7 +76,7 @@ class QuestionnairesController < ApplicationController
   end
 
   # Assigns corrresponding variables to questionnaire object.
-  def adding_question_variables(private_flag, display)
+  def setting_questionnaire_parameters(private_flag, display)
     @questionnaire.private = private_flag
     @questionnaire.name = params[:questionnaire][:name]
     @questionnaire.instructor_id = session[:user].id
@@ -89,7 +89,7 @@ class QuestionnairesController < ApplicationController
   end
 
   # Creates tree node
-  def create_node()
+  def create_tree_node()
     tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
     parent = FolderNode.find_by(node_object_id: tree_folder.id)
     QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
@@ -115,14 +115,13 @@ class QuestionnairesController < ApplicationController
         # In the future, we need to write migration files to make them consistency.
         # E1903 : We are not sure of other type of cases, so have added a if statement. If there are only 5 cases, remove the if statement
         if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey BookmarkRating].include?(display_type)
-          display_type = display_type.split(/(?=[A-Z])/).join('%') # removed unnecessary brackets
+          display_type = display_type.split(/(?=[A-Z])/).join('%')
         end
         # assignment moved to a separate function to make sure create function doesn't do too much
         # setting the object variables
-        adding_question_variables(questionnaire_private, display_type)
-        # code moved to a separate function to make sure create function doesn't do too much
-        # Create node
-        create_node()
+        setting_questionnaire_parameters(questionnaire_private, display_type)
+        # Create node - adds this questionnaire to the tree_display list
+        create_tree_node()
       rescue StandardError
         flash[:error] = $ERROR_INFO
       end
@@ -224,14 +223,14 @@ class QuestionnairesController < ApplicationController
       flash[:success] = 'You have successfully added a new question.'
     end
 
-    num_of_existed_questions = Questionnaire.find(params[:id]).questions.size
+    current_num_of_questions = Questionnaire.find(params[:id]).questions.size
     max_seq = 0
     Questionnaire.find(questionnaire_id).questions.each do |question|
       if question.seq > max_seq
         max_seq = question.seq
       end
     end
-    ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do
+    ((current_num_of_questions + 1)..(current_num_of_questions + params[:question][:total_num].to_i)).each do
       max_seq += 1
       question = question_factory(params[:question][:type], questionnaire_id, max_seq)
       if question.is_a? ScoredQuestion

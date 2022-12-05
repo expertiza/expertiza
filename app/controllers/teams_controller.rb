@@ -23,6 +23,7 @@ class TeamsController < ApplicationController
     redirect_to action: 'list', id: params[:id]
   end
 
+  # Set the list of a teams for an Assignment or Course for the view
   def list
     allowed_types = %w[Assignment Course]
     if params[:type] && allowed_types.include?(params[:type])
@@ -38,6 +39,7 @@ class TeamsController < ApplicationController
     end
   end
 
+  # Set the team parent for the new page
   def new
     session[:team_type] ||= 'Assignment'
     @parent = team_type.find(params[:id])
@@ -57,6 +59,7 @@ class TeamsController < ApplicationController
     redirect_to action: 'new', id: params[:id]
   end
 
+  # Update a specific team and validate the new name
   def update
     @team = Team.find(params[:id])
     begin
@@ -74,6 +77,7 @@ class TeamsController < ApplicationController
     end
   end
 
+  # Get the team for the team edit view
   def edit
     @team = Team.find(params[:id])
   end
@@ -88,6 +92,7 @@ class TeamsController < ApplicationController
     redirect_to action: 'list', id: params[:id]
   end
 
+  # Delete a specific team
   def delete
     # delete records in team, teams_users, signed_up_teams table
     @team = Team.find_by(id: params[:id])

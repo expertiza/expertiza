@@ -18,9 +18,11 @@ class Assessment360Controller < ApplicationController
     # hashes for view
     @meta_review = {}
     @teammate_review = {}
-    @teamed_count = {}
+    @team_members_count = {}
+    # hashmaps of assignments to store if an entire column is empty
     @teammate_review_exist = {}
     @meta_review_exist = {}
+    # used to calculate required colspan for a particular assignment
     @assignment_columns = {}
     # for course
     # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
@@ -34,11 +36,12 @@ class Assessment360Controller < ApplicationController
       # [aggregrate_review_grades_per_stu, review_count_per_stu] --> [0, 0]
       %w[teammate meta].each { |type| instance_variable_set("@#{type}_review_info_per_stu", [0, 0]) }
       students_teamed = StudentTask.teamed_students(cp.user)
-      @teamed_count[cp.id] = students_teamed[course.id].try(:size).to_i
+      @team_members_count[cp.id] = students_teamed[course.id].try(:size).to_i
       @assignments.each do |assignment|
         @meta_review[cp.id] = {} unless @meta_review.key?(cp.id)
         @teammate_review[cp.id] = {} unless @teammate_review.key?(cp.id)
         assignment_participant = assignment.participants.find_by(user_id: cp.user_id)
+        # initializing assignment_columns with default 0 for all the columns
         @assignment_columns[assignment.id].nil? ? @assignment_columns[assignment.id] = {} : nil
         @assignment_columns[assignment.id]["meta_review"].nil? ? @assignment_columns[assignment.id]["meta_review"] = 0 : nil
         @assignment_columns[assignment.id]["teammate_review"].nil? ? @assignment_columns[assignment.id]["teammate_review"] = 0 : nil
@@ -61,10 +64,14 @@ class Assessment360Controller < ApplicationController
                                  @overall_meta_review_count,
                                  @meta_review_info_per_stu)
 
+        # If meta review exists for particular assignment then update meta_review_exist to true
+        # and make assignment_columns as 1 to add to colspan
         if !@meta_review[cp.id][assignment.id].nil?
           @meta_review_exist[assignment.id] = true
           @assignment_columns[assignment.id]["meta_review"] = 1
         end
+        # If teammate review exists for particular assignment then update teammate_review_exist to true
+        # and make assignment_columns as 1 to add to colspan
         if !@teammate_review[cp.id][assignment.id].nil?
           @teammate_review_exist[assignment.id] = true
           @assignment_columns[assignment.id]["teammate_review"] = 1
@@ -103,15 +110,18 @@ class Assessment360Controller < ApplicationController
   # http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2018_E1871_Grade_Summary_By_Student
   def course_student_grade_summary
     @topics = {}
-    @topics_exist = {}
     @assignment_grades = {}
-    @assignment_grades_exist = {}
     @peer_review_scores = {}
-    @peer_review_scores_exist = {}
     @final_grades = {}
-    @total_final_grades = {}
     @total_peer_score = {}
+    # store total number of grades and reviews which are not nil
+    @total_final_grades = {}
     @total_peer_reviews = {}
+    # hashmaps of assignments to store if an entire column is empty
+    @topics_exist = {}
+    @assignment_grades_exist = {}
+    @peer_review_scores_exist = {}
+    # used to calculate required colspan for a particular assignment
     @assignment_columns = {}
     course = Course.find(params[:course_id])
     @assignments = course.assignments.reject(&:is_calibrated).reject { |a| a.participants.empty? }
@@ -128,6 +138,7 @@ class Assessment360Controller < ApplicationController
       @assignments.each do |assignment|
         user_id = cp.user_id
         assignment_id = assignment.id
+        # initializing assignment_columns with default 0 for all the columns
         @assignment_columns[assignment.id].nil? ? @assignment_columns[assignment.id] = {} : nil
         @assignment_columns[assignment_id]["topics"].nil? ? @assignment_columns[assignment_id]["topics"] = 0 : nil
         @assignment_columns[assignment_id]["peer_review"].nil? ? @assignment_columns[assignment_id]["peer_review"] = 0 : nil
@@ -153,8 +164,11 @@ class Assessment360Controller < ApplicationController
         next if peer_review_score[:review][:scores][:avg].nil?
 
         @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
+        # calculating total peer scores
         @total_peer_score[cp.id] += @peer_review_scores[cp.id][assignment_id]
         @total_peer_reviews[cp.id] += 1
+        # If peer score exists for particular assignment then update peer_review_scores_exist to true
+        # and make assignment_columns as 1 to add to colspan
         @peer_review_scores_exist[assignment_id] = true
         @assignment_columns[assignment_id]["peer_review"] = 1
       end
@@ -167,6 +181,8 @@ class Assessment360Controller < ApplicationController
     topic_id = SignedUpTeam.topic_id(assignment_id, user_id)
     @topics[cp.id][assignment_id] = SignUpTopic.find_by(id: topic_id)
     if !@topics[cp.id][assignment_id].nil?
+      # If topic exists for particular assignment then update topics_exist to true
+      # and make assignment_columns as 1 to add to colspan
       @topics_exist[assignment_id] = true
       @assignment_columns[assignment_id]["topics"] = 1
     end
@@ -178,6 +194,8 @@ class Assessment360Controller < ApplicationController
 
     @final_grades[cp.id] += @assignment_grades[cp.id][assignment_id]
     @total_final_grades[cp.id] += 1
+    # If grades exists for particular assignment then update assignment_grades_exist to true
+    # and make assignment_columns as 1 to add to colspan
     @assignment_grades_exist[assignment_id] = true
     @assignment_columns[assignment_id]["assignment_grade"] = 1
   end

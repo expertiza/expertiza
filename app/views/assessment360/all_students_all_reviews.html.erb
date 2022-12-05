@@ -36,7 +36,7 @@
     <% @course_participants.each do |cp|%>
         <tr>
             <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
-            <td><%= @teamed_count[cp.id] %></td>
+            <td><%= @team_members_count[cp.id] %></td>
             <% @assignments.each do |assignment|%>
                 <% if !@meta_review_exist[assignment.id].nil? %> <td class="metaReviews"><%= format_score(@meta_review[cp.id][assignment.id]) unless @meta_review.nil? %></td> <% end %>
                 <% if !@teammate_review_exist[assignment.id].nil? %> <td class="teammateReviews"><%= format_score(@teammate_review[cp.id][assignment.id]) unless @teammate_review.nil? %></td> <% end %>

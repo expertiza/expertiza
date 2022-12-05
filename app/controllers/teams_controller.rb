@@ -166,7 +166,7 @@ class TeamsController < ApplicationController
   # exists with the same parent and name
   def check_for_existing_team
     begin
-      Team.check_for_existing(team_parent, params[:team][:name], session[:team_type])
+      Team.check_for_existing(team_type.find(params[:id]), params[:team][:name], session[:team_type])
       return false
     rescue TeamExistsError
       flash[:error] = $ERROR_INFO

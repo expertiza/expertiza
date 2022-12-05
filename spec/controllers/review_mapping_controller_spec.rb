@@ -629,9 +629,21 @@ describe ReviewMappingController do
       # Use factories to create stubs (user must be instructor or above to perform this action)
       review_grade = build(:review_grade)
       instructor = build(:instructor)
+      session_params = {user: stub_current_user(instructor, instructor.role.name, instructor.role) }
+
       # Stub out other items
       allow(ReviewGrade).to receive(:find_by).with(participant_id: '1').and_return(review_grade)
       allow(review_grade).to receive(:save).and_return(true)
+
+      allow(GradingHistory).to receive(:create)
+
+      allow(GradingHistory).to receive(:create).with(instructor_id: session_params[:user].id,
+                                                     assignment_id: '1',
+                                                     grading_type: 'Review',
+                                                     grade_receiver_id: 2,
+                                                     grade: '90',
+                                                     comment: 'keke')
+
       request_params = {
         review_grade: {
           participant_id: 1,
@@ -641,7 +653,6 @@ describe ReviewMappingController do
       }
 
       # Perform test
-      session_params = {user: stub_current_user(instructor, instructor.role.name, instructor.role) }
       post :save_grade_and_comment_for_reviewer, params: request_params, session: session_params
       expect(flash[:note]).to be nil
       expect(response).to redirect_to('/reports/response_report')

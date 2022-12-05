@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220405222420) do
+ActiveRecord::Schema.define(version: 20221204181030) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -297,6 +297,17 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["assignment_id"], name: "index_duties_on_assignment_id"
+  end
+
+  create_table "grading_histories", force: :cascade do |t|
+    t.integer  "instructor_id",     limit: 4
+    t.integer  "assignment_id",     limit: 4
+    t.string   "grading_type",      limit: 255
+    t.integer  "grade_receiver_id", limit: 4
+    t.integer  "grade",             limit: 4
+    t.text     "comment",           limit: 65535
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
   end
 
   create_table "institutions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|

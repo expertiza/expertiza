@@ -45,32 +45,30 @@ class TeamsController < ApplicationController
 
   # Called when a instructor tries to create an empty team manually
   def create
-    check_for_existing_team
+    if check_for_existing_team do
+      flash[:error] = $ERROR_INFO
+      redirect_to action: 'new', id: params[:id]
+    else
+      @team = get_team_type_const('Team').create(name: params[:team][:name], parent_id: params[:id])
+      TeamNode.create(parent_id: params[:id], node_object_id: @team.id)
 
-    @team = get_team_type_const('Team').create(name: params[:team][:name], parent_id: params[:id])
-    TeamNode.create(parent_id: params[:id], node_object_id: @team.id)
-
-    undo_link("The team \"#{@team.name}\" has been successfully created.")
-    redirect_to action: 'list', id: params[:id]
-  rescue TeamExistsError
-    flash[:error] = $ERROR_INFO
-    redirect_to action: 'new', id: params[:id]
+      undo_link("The team \"#{@team.name}\" has been successfully created.")
+      redirect_to action: 'list', id: params[:id]
+    end
   end
 
   def update
     @team = Team.find(params[:id])
-    begin
-      check_for_existing_team # Validate the new name
-
+    if check_for_existing_team do # Validate the new name
+      flash[:error] = $ERROR_INFO
+      redirect_to action: 'edit', id: @team.id
+    else
       @team.name = params[:team][:name]
       @team.save
 
       flash[:success] = "The team \"#{@team.name}\" has been successfully updated."
       undo_link('')
       redirect_to action: 'list', id: params[:id]
-    rescue TeamExistsError
-      flash[:error] = $ERROR_INFO
-      redirect_to action: 'edit', id: @team.id
     end
   end
 
@@ -167,10 +165,14 @@ class TeamsController < ApplicationController
     @team_parent ||= team_type.find(params[:id])
   end
 
-  # Raises a TeamExistsError if a team already
+  # Returns true if a team already
   # exists with the same parent and name
   def check_for_existing_team
-    Team.check_for_existing(team_parent, params[:team][:name], session[:team_type])
+    begin
+      Team.check_for_existing(team_parent, params[:team][:name], session[:team_type])
+      return false
+    rescue TeamExistsError
+      return true
   end
 end
 

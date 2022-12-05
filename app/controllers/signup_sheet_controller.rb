@@ -141,13 +141,6 @@ class SignupSheetController < ApplicationController
     add_signup_topics
   end
 
-  # simple function that redirects ti the /add_signup_topics or the /add_signup_topics_staggered page depending on assignment type
-  # staggered means that different topics can have different deadlines.
-  def redirect_to_sign_up(assignment_id)
-    assignment = Assignment.find(assignment_id)
-    assignment.staggered_deadline == true ? (redirect_to action: 'add_signup_topics_staggered', id: assignment_id) : (redirect_to action: 'add_signup_topics', id: assignment_id)
-  end
-
   # method to list possible signup topics
   # renders either list.html or intelligent_topic_selection.html
   def list
@@ -394,7 +387,6 @@ class SignupSheetController < ApplicationController
     # Updates the waitlist for the topic based of update of max choosers
     update_waitlist topic
     topic.update_attributes(topic_params)
-    # redirect_to_sign_up(params[:id])
     redirect_to edit_assignment_path(params[:id], anchor: 'tabs-2')
   end
 

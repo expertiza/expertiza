@@ -303,6 +303,10 @@ FactoryBot.define do
     preference_priority_number nil
   end
 
+  factory :waitlist_team, class: WaitlistTeam do
+    topic { SignUpTopic.first || association(:topic) }
+  end
+  
   factory :participant, class: AssignmentParticipant do
     can_submit true
     can_review true

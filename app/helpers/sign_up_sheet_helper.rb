@@ -76,7 +76,6 @@ module SignUpSheetHelper
 
   # Render the participant info for a topic and assignment.
   def render_participant_info(topic, assignment, participants, waitlisted_participants)
-
     html = ''
     html += generate_html_for_participants(topic, assignment, participants, false)
     html += generate_html_for_participants(topic, assignment, waitlisted_participants, true)

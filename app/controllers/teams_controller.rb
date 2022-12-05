@@ -153,7 +153,7 @@ class TeamsController < ApplicationController
     end
   end
 
-  # Raises a TeamExistsError if a team already
+  # Returns true if a team already
   # exists with the same parent and name
   def check_for_existing_team
     begin

@@ -3,6 +3,7 @@
     text-align: center;
 }
 
+  /* used to toggle visibility of columns */
   .visibility {
     display: none
   }
@@ -18,7 +19,9 @@
       <th rowspan=2 width="320">Students</th>
       <th rowspan=2 width="30">Teammate Count</th>
       <% @assignments.each do |assignment| %>
+        <!-- check if atleast one column is not nil for particular assignment  -->
         <% if !@teammate_review_exist[assignment.id].nil? || !@meta_review_exist[assignment.id].nil? %>
+          <!-- total colspan is calculated as sum of assignment_columns for all columns -->
           <th colspan="<%= @assignment_columns[assignment.id]["meta_review"] + @assignment_columns[assignment.id]["teammate_review"] %>" width="300" class="assignment-header" id="<%= assignment.id %>"> <%= assignment.name %> </th>
         <% end %>
       <% end %>
@@ -26,6 +29,7 @@
     </tr>
     <tr>
       <% @assignments.each do |assignment| %>
+        <!-- header is hidden or visible based on the check for existence of data -->
         <% if !@meta_review_exist[assignment.id].nil? %> <td class="metaReviews" id="metaReviews-<%= assignment.id %>"><b>Metareviews</b></td> <% end %>
         <% if !@teammate_review_exist[assignment.id].nil? %> <td class="teammateReviews" id="teammateReviews-<%= assignment.id %>"><b>Teammate Reviews</b></td> <% end %>
       <% end %>
@@ -38,6 +42,7 @@
             <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
             <td><%= @team_members_count[cp.id] %></td>
             <% @assignments.each do |assignment|%>
+                <!-- value is hidden or visible based on the check for existence of data -->
                 <% if !@meta_review_exist[assignment.id].nil? %> <td class="metaReviews"><%= format_score(@meta_review[cp.id][assignment.id]) unless @meta_review.nil? %></td> <% end %>
                 <% if !@teammate_review_exist[assignment.id].nil? %> <td class="teammateReviews"><%= format_score(@teammate_review[cp.id][assignment.id]) unless @teammate_review.nil? %></td> <% end %>
             <% end%>
@@ -49,6 +54,7 @@
             <td><b>Class Average</b></td>
             <td></td>
             <% @assignments.each do |assignment|%>
+                <!-- value is hidden or visible based on the check for existence of data -->
                 <% if !@meta_review_exist[assignment.id].nil? %> <td class="metaReviews"><%= "#{@overall_meta_review_grades[assignment.id] / @overall_meta_review_count[assignment.id]}%" %></td> <% end %>
                 <% if !@teammate_review_exist[assignment.id].nil? %> <td class="teammateReviews"><%= "#{@overall_teammate_review_grades[assignment.id] / @overall_teammate_review_count[assignment.id]}%" %></td> <% end %>
             <% end%>
@@ -69,20 +75,28 @@
 </div>
 
 <script>
+// get all the elements that are related to meta reviews
 const metaReviewClasses = document.querySelectorAll('.metaReviews');
+// get all the elements that are related to teammate reviews
 const teammateReviewClasses = document.querySelectorAll('.teammateReviews');
 
+// get aggregate score header element to dynamically vary colspan
 aggregateScoreHeader = document.getElementById("aggregate-score-header");
 aggregateScoreColSpan = 2;
+// get all assignment headers to dynamically vary colspan
 assignmentHeaderClasses = document.querySelectorAll(".assignment-header");
 
+// when meta review checkbox is changed
 metaReviewCheckBox = document.getElementById('meta-review-box');
 metaReviewCheckBox.addEventListener('change', function() {
+  // colspan is calculated and updated for that aggregate score header
   this.checked ? aggregateScoreColSpan += 1 : aggregateScoreColSpan -= 1;
   aggregateScoreHeader.setAttribute("colspan", aggregateScoreColSpan);
+  // all elements related to meta reviews are made visible/hidden
   metaReviewClasses.forEach(el => {
         el.classList.toggle('visibility');
         })
+  // colspan is calculated and updated for that particular assignment
   assignmentHeaderClasses.forEach(el => {
         assignmentColSpan = Number(el.getAttribute("colspan"));
         this.checked ? assignmentColSpan += 1 : assignmentColSpan -= 1;
@@ -99,13 +113,17 @@ metaReviewCheckBox.addEventListener('change', function() {
         })
 });
 
+// when teammate review checkbox is changed
 teammateReviewCheckBox = document.getElementById('teammate-review-box');
 teammateReviewCheckBox.addEventListener('change', function() {
+  // colspan is calculated and updated for that aggregate score header
   this.checked ? aggregateScoreColSpan += 1 : aggregateScoreColSpan -= 1;
   aggregateScoreHeader.setAttribute("colspan", aggregateScoreColSpan);
+  // all elements related to meta reviews are made visible/hidden
   teammateReviewClasses.forEach(el => {
         el.classList.toggle('visibility');
         })
+  // colspan is calculated and updated for that particular assignment
   assignmentHeaderClasses.forEach(el => {
         assignmentColSpan = Number(el.getAttribute("colspan"));
         this.checked ? assignmentColSpan += 1 : assignmentColSpan -= 1;

@@ -505,7 +505,6 @@ Expertiza::Application.routes.draw do
       post :update_suggestion
       get :student_edit
       get :add_comment
-      get :student_view
     end
   end
 

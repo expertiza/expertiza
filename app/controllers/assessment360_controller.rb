@@ -46,7 +46,6 @@ class Assessment360Controller < ApplicationController
 
         teammate_reviews = assignment_participant.teammate_reviews
         meta_reviews = assignment_participant.metareviews
-        
         calc_overall_review_info(assignment,
                                  cp,
                                  teammate_reviews,
@@ -167,7 +166,7 @@ class Assessment360Controller < ApplicationController
     # topic exists if a team signed up for a topic, which can be found via the user and the assignment
     topic_id = SignedUpTeam.topic_id(assignment_id, user_id)
     @topics[cp.id][assignment_id] = SignUpTopic.find_by(id: topic_id)
-    if !@topics[cp.id][assignment_id].nil? 
+    if !@topics[cp.id][assignment_id].nil?
       @topics_exist[assignment_id] = true
       @assignment_columns[assignment_id]["topics"] = 1
     end

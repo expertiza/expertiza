@@ -632,7 +632,7 @@ class Assignment < ApplicationRecord
     response_maps = ResponseMap.where(reviewed_object_id: id, calibrate_to: 1)
     response_maps.each do |response_map|
       # Create a duplicate Team object from the Team associated with the ResponseMap object to add teams who's
-      # submissions were used for calibration in the previous Assignment
+      # submissions were used for calibration in the previous Assignments
       team = Team.where(id: response_map.reviewee_id).first
       new_team = team.copy_to_another_assignment(new_assignment)
 

@@ -32,7 +32,7 @@ class TeamsController < ApplicationController
 
     @assignment = team_type.find(params[:id]) if session[:team_type] == 'Assignment'
     begin
-      @root_node = get_team_type_const('Node').find_by(node_object_id: params[:id])
+      @root_node = team_type('Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
     rescue StandardError
       flash[:error] = $ERROR_INFO
@@ -50,7 +50,7 @@ class TeamsController < ApplicationController
     if check_for_existing_team
       redirect_to action: 'new', id: params[:id]
     else
-      @team = get_team_type_const('Team').create(name: params[:team][:name], parent_id: params[:id])
+      @team = team_type('Team').create(name: params[:team][:name], parent_id: params[:id])
       TeamNode.create(parent_id: params[:id], node_object_id: @team.id)
 
       undo_link("The team \"#{@team.name}\" has been successfully created.")
@@ -81,7 +81,7 @@ class TeamsController < ApplicationController
   # TODO This method does not work
   # It should delete all teams for an assingment or course
   def delete_all
-    root_node = get_team_type_const('Node').find_by(node_object_id: params[:id])
+    root_node = team_type('Node').find_by(node_object_id: params[:id])
     child_nodes = root_node.get_teams.map(&:node_object_id)
     # BAD this will destroy all teams if it succeeds
     # Team.destroy_all if child_nodes
@@ -153,15 +153,6 @@ class TeamsController < ApplicationController
     end
   end
 
-  # Gets the model representing the parent of the team
-  def team_type
-    if session[:team_type] == 'Assignment'
-      Assignment
-    elsif session[:team_type] == 'Course'
-      Course
-    end
-  end
-
   # Raises a TeamExistsError if a team already
   # exists with the same parent and name
   def check_for_existing_team
@@ -174,9 +165,11 @@ class TeamsController < ApplicationController
     end
   end
 
-  # Checks for and returns the constant related to the team type.
-  # Should either be 'Node' or 'Team'
-  def get_team_type_const (const_type)
+  # Gets an Object representing the parent, node, or team
+  # E.g. Assignment, Course, AssignmentNode, CourseTeam
+  # const_type should be either blank, Node, or Team
+  # session[:team_type] should be Assignment or Course
+  def team_type(const_type='')
     Object.const_get(session[:team_type] + const_type)
   end
 end

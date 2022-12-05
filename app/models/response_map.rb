@@ -113,7 +113,7 @@ class ResponseMap < ApplicationRecord
 
     submission_records = SubmissionRecord.where(assignment_id: reviewed_object_id, team_id: reviewee_id)
     submission_records.each do |submission_record|
-      submission_record.copy_to_team(team)
+      submission_record.copy_to_another_team(team)
     end
 
     responses = Response.where(map_id: id)

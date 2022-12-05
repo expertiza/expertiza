@@ -22,7 +22,7 @@ describe SubmissionRecord do
 
   describe '#copy_to_team' do
     it 'should copy submission record to a team' do
-      new_submission_record = submission_record.copy_to_team(team2)
+      new_submission_record = submission_record.copy_to_another_team(team2)
 
       expect(new_submission_record.assignment_id).to eq(assignment2.id)
       expect(new_submission_record.team_id).to eq(team2.id)

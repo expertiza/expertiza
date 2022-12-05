@@ -1,3 +1,5 @@
+require 'sidekiq'
+
 class MailWorker < Worker
     attr_accessor :assignment
     attr_accessor :deadline_type
@@ -9,20 +11,24 @@ class MailWorker < Worker
     def perform(assignment_id, deadline_type, due_at)
       self.assignment = Assignment.find(assignment_id)
       self.deadline_type = deadline_type
-      self.deadline_text = deadline_type
       self.due_at = due_at
   
       participant_emails = find_participant_emails
   
       # Can we rename deadline_type(metareview) to "teammate review". If, yes then we do not need this if clause below!
-      self.deadline_text = self.deadline_type == "metareview" ? "teammate review" : self.deadline_type
+      self.deadline_text = self.deadline_type == 'metareview' ? 'teammate review' : self.deadline_type
   
-      email_reminder(participant_emails, self.deadline_text) unless participant_emails.empty?
+      # should not return email if deadline is drop_outstanding_reviews, 
+      # where outstanding reviews means the reviews which have not been started
+      # https://expertiza.csc.ncsu.edu/index.php/CSC/ECE_517_Spring_2015_E1529_GLDS
+      if deadline_type != 'drop_outstanding_reviews'
+        email_reminder(participant_emails, self.deadline_text) unless participant_emails.empty?
+      end
     end
   
     private
   
-    #Formats and sends the email to the users of the proper team
+    # Formats and sends the email to the users of the proper team
     def email_reminder(emails, deadline_type)
       subject = "Message regarding #{deadline_type} for assignment #{self.assignment.name}"
       body = "This is a reminder to complete #{deadline_type} for assignment #{self.assignment.name}. \
@@ -36,7 +42,7 @@ class MailWorker < Worker
       @mail.deliver_now
     end
   
-    #Finds the emails of the users on an assignment
+    # Finds the emails of the users on an assignment
     def find_participant_emails
       emails = []
       participants = Participant.where(parent_id: self.assignment.id)

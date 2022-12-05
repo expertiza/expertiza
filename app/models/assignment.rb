@@ -636,7 +636,7 @@ class Assignment < ApplicationRecord
       team = Team.where(id: response_map.reviewee_id).first
       new_team = team.copy_to_another_assignment(new_assignment)
 
-      response_map.copy_to_assignment(new_assignment, new_team, new_instructor_participant)
+      response_map.copy_to_another_assignment(new_assignment, new_team, new_instructor_participant)
     end
   end
 

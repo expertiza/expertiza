@@ -133,7 +133,7 @@ describe ResponseMap do
       allow(SubmissionRecord).to receive(:where).with(assignment_id: assignment.id, team_id: team.id).and_return([submission_record])
       allow(SubmissionRecord).to receive(:where).with(assignment_id: assignment1.id, team_id: team3.id).and_call_original
 
-      new_review_response_map = review_response_map.copy_to_assignment(assignment1, team3, participant6)
+      new_review_response_map = review_response_map.copy_to_another_assignment(assignment1, team3, participant6)
 
       expect(new_review_response_map.reviewed_object_id).to eq(assignment1.id)
       expect(new_review_response_map.reviewer_id).to eq(participant6.id)

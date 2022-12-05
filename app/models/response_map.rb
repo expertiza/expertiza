@@ -104,7 +104,7 @@ class ResponseMap < ApplicationRecord
 
   # Creates a duplicate ResponseMap, associates the new ResponseMap object to the specified Assignment and Team,
   # copies all SubmissionRecords associated to the Team in the assignment, copies all Responses and their Answers
-  def copy_to_assignment(assignment, team, instructor_participant)
+  def copy_to_another_assignment(assignment, team, instructor_participant)
     new_response_map = dup
     new_response_map.reviewed_object_id = assignment.id
     new_response_map.reviewer_id = instructor_participant.id

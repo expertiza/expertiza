@@ -443,15 +443,7 @@ hi_IN:
       answers: "जवाब"
       quiz_score: "प्रश्नोत्तरी के लिए अंक"
       back: "वापस पीछे"
-
-    review_questions:
-      quiz_listings: "सभी प्रश्नोत्तरी इसके लिए :"
-      quiz_create: "यह प्रश्नोत्तरी उनके द्वारा बनाई गई थी: "
-      topic: "विषय :"
-      quiz_taker: "प्रश्नोत्तरी लेने वाला व्यक्ति"
-      quiz_score: "प्रश्नोत्तरी के लिए अंक"
-      avg_score: "प्रश्नोत्तरी लेने वाले के लिए औसत अंक"
-
+      
     take_quiz:
       questions: "प्रशन"
       submit_quiz: "कृपया प्रश्नोत्तरी जमा करें"

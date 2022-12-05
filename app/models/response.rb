@@ -251,7 +251,7 @@ class Response < ApplicationRecord
 
   # Creates a duplicate Response object, associates it to a specified ResponseMap, copies all associated Answer
   # objects to the new Response object
-  def copy_to_response_map(response_map)
+  def copy_to_another_response_map(response_map)
     new_response = dup
     new_response.map_id = response_map.id
     new_response.save

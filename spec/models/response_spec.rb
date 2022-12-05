@@ -387,7 +387,7 @@ describe Response do
 
     describe '#copy_to_response_map' do
       it 'should copy response to a response map' do
-        new_response = response3.copy_to_response_map(response_map4)
+        new_response = response3.copy_to_another_response_map(response_map4)
 
         expect(new_response.map_id).to eq(response_map4.id)
         expect(new_response.scores.size).to eq(response3.scores.size)

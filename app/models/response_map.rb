@@ -118,7 +118,7 @@ class ResponseMap < ApplicationRecord
 
     responses = Response.where(map_id: id)
     responses.each do |response|
-      response.copy_to_response_map(new_response_map)
+      response.copy_to_another_response_map(new_response_map)
     end
 
     new_response_map

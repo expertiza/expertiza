@@ -303,11 +303,11 @@ class AssignmentsController < ApplicationController
 
   # handle assignment form saved condition
   def assignment_form_save_handler
-    exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
+    exist_assignment = Assignment.find(@assignment_form.assignment.id)
     assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
     fix_assignment_missing_path
     update_assignment_form(exist_assignment)
-    assignment_id = Assignment.find_by(name: @assignment_form.assignment.name)
+    assignment_id = Assignment.find(@assignment_form.assignment.id).id
     ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
     redirect_to edit_assignment_path assignment_id
     undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")

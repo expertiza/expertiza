@@ -1,5 +1,4 @@
 <style>
-
   table {
     border-collapse: collapse;
     width: 100%;
@@ -10,17 +9,20 @@
   }
 
   td.topic {
-    display:inline-block;
     margin-top: -1px;
     white-space:nowrap;
     position:relative; /* must be relative */
     width:250px; /* fit to table cell width */
     overflow:hidden;
   }
+
+  .visiblity {
+    display: none;
+  }
 </style>
 
 <script>
-    $(function() {
+$(function() {
         /*Function for sorting the table */
         $(".sortable").tablesorter({
             sortList: [[0,0]] // sort by Student name
@@ -28,22 +30,30 @@
     });
 </script>
 
+<p><b>Hide/Unhide Columns:</b></p>
+<input type="checkbox" value="show-hide" checked="checked" id="topic-box"> Topic &emsp;&emsp;
+<input type="checkbox" value="show-hide" checked="checked" id="peer-score-box"> Peer Score &emsp;&emsp;
+<input type="checkbox" value="show-hide" checked="checked" id="instr-grade-box"> Instructor Grade
+
 <table class="table table-striped sortable">
   <thead>
     <tr>
       <th rowspan=2 width="320" class="sorter-true">Students</th>
       <% @assignments.each do |assignment| %>
-        <th colspan=3 class="sorter-false"> <%= assignment.name %> </th>
+        <% if !@topics_exist[assignment.id].nil? || !@peer_review_scores_exist[assignment.id].nil? || !@assignment_grades_exist[assignment.id].nil? %>
+          <th colspan="<%= @assignment_columns[assignment.id]["topics"] + @assignment_columns[assignment.id]["peer_review"] + @assignment_columns[assignment.id]["assignment_grade"] %>" class="sorter-false assignment-header" id="<%= assignment.id %>"> <%= assignment.name %> </th>
+        <% end %>
       <% end %>
-      <th colspan=2>Final Grades</th>
+      <th colspan=2 id="final-grade-header">Final Grades</th>
     </tr>
     <tr>
-      <% (1..@assignments.size).each do %>
-        <th><b>Topic</b></th>
-        <th><b>Peer Score</b></th>
-        <th><b>Instructor Grade</b></th>
+      <% @assignments.each do |assignment| %>
+        <% if !@topics_exist[assignment.id].nil? %> <th class="topics" id="topics-<%= assignment.id %>"><b>Topic</b></th> <% end %>
+        <% if !@peer_review_scores_exist[assignment.id].nil? %> <th class="peerScores" id="peerScores-<%= assignment.id %>"><b>Peer Score</b></th> <% end %>
+        <% if !@assignment_grades_exist[assignment.id].nil? %> <th class="intructorGrades" id="intructorGrades-<%= assignment.id %>"><b>Instructor Grade</b></th> <% end %>
     <% end %>
-      <th class="sorter-true"><b>Total Instructor Grade</b></th>
+      <th class="sorter-true intructorGrades"><b>Total Instructor Grade</b></th>
+      <th class="sorter-true peerScores"><b>Average Peer Score</b></th>
     </tr>
   </thead>
 
@@ -51,15 +61,95 @@
       <tr>
           <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
           <% @assignments.each do |assignment|%>
+              <% if !@topics_exist[assignment.id].nil? %>
               <% topic = format_topic(@topics[cp.id][assignment.id]) %>
-              <td title="<%= topic %>" class="topic topic-tooltip">
+              <td title="<%= topic %>" class="topic topic-tooltip topics">
                 <%= topic %>
               </td>
-              <td><%= format_score(@peer_review_scores[cp.id][assignment.id]) %></td>
-              <td><%= format_score(@assignment_grades[cp.id][assignment.id]) %> </td>
+              <% end %>
+              <% if !@peer_review_scores_exist[assignment.id].nil? %> <td class="peerScores"><%= format_score(@peer_review_scores[cp.id][assignment.id]) %></td> <% end %>
+              <% if !@assignment_grades_exist[assignment.id].nil? %> <td class="intructorGrades"><%= format_score(@assignment_grades[cp.id][assignment.id]) %> </td> <% end %>
           <% end %>
 
-          <td><%= @final_grades[cp.id] %></td>
+          <td class="intructorGrades"><%= @total_final_grades[cp.id] > 0 ? @final_grades[cp.id] : '--'  %></td>
+          <td class="peerScores"><%= @total_peer_reviews[cp.id] > 0 ? @total_peer_score[cp.id]/@total_peer_reviews[cp.id] : '--' %></td>
       </tr>
   <% end %>
 </table>
+
+<script>
+    const topicClasses = document.querySelectorAll('.topics');
+    const peerScoreClasses = document.querySelectorAll('.peerScores');
+    const intructorGradeClasses = document.querySelectorAll('.intructorGrades');
+    finalGradeHeader = document.getElementById("final-grade-header");
+    finalGradeColSpan = 2;
+    assignmentHeaderClasses = document.querySelectorAll(".assignment-header");
+
+    topicCheckBox = document.getElementById('topic-box');
+    topicCheckBox.addEventListener('change', function() {
+      topicClasses.forEach(el => {
+            el.classList.toggle('visiblity');
+            })
+      assignmentHeaderClasses.forEach(el => {
+            assignmentColSpan = Number(el.getAttribute("colspan"));
+            this.checked ? assignmentColSpan += 1 : assignmentColSpan -= 1;
+            var element =  document.getElementById('topics-'+el.id);
+            if (typeof(element) != 'undefined' && element != null){
+              el.setAttribute("colspan", assignmentColSpan);
+              if (assignmentColSpan > 0){
+                el.style.display = null;
+              }
+              else {
+                el.style.display = "none";
+              }
+            }
+            })
+    });
+
+    peerScoreCheckBox = document.getElementById('peer-score-box');
+    peerScoreCheckBox.addEventListener('change', function() {
+      this.checked ? finalGradeColSpan += 1 : finalGradeColSpan -= 1;
+      finalGradeHeader.setAttribute("colspan", finalGradeColSpan);
+      peerScoreClasses.forEach(el => {
+            el.classList.toggle('visiblity');
+            });
+      assignmentHeaderClasses.forEach(el => {
+            assignmentColSpan = Number(el.getAttribute("colspan"));
+            this.checked ? assignmentColSpan += 1 : assignmentColSpan -= 1;
+            var element =  document.getElementById('peerScores-'+el.id);
+            if (typeof(element) != 'undefined' && element != null){
+              el.setAttribute("colspan", assignmentColSpan);
+              if (assignmentColSpan > 0){
+                el.style.display = null;
+              }
+              else {
+                el.style.display = "none";
+              }
+            }
+            });
+    });
+
+    instructorGradeCheckBox = document.getElementById('instr-grade-box');
+    instructorGradeCheckBox.addEventListener('change', function() {
+      this.checked ? finalGradeColSpan += 1 : finalGradeColSpan -= 1;
+      finalGradeHeader.setAttribute("colspan", finalGradeColSpan);
+      intructorGradeClasses.forEach(el => {
+            el.classList.toggle('visiblity');
+            });
+      assignmentHeaderClasses.forEach(el => {
+            assignmentColSpan = Number(el.getAttribute("colspan"));
+            this.checked ? assignmentColSpan += 1 : assignmentColSpan -= 1;
+            var element =  document.getElementById("intructorGrades-"+el.id);
+            if (typeof(element) != 'undefined' && element != null){
+              el.setAttribute("colspan", assignmentColSpan);
+              if (assignmentColSpan > 0){
+                el.style.display = null;
+              }
+              else {
+                el.style.display = "none";
+              }
+            }
+            });
+    });
+    
+</script>

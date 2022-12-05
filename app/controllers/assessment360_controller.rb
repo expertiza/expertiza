@@ -88,9 +88,16 @@ class Assessment360Controller < ApplicationController
   # http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2018_E1871_Grade_Summary_By_Student
   def course_student_grade_summary
     @topics = {}
+    @topics_exist = {}
     @assignment_grades = {}
+    @assignment_grades_exist = {}
     @peer_review_scores = {}
+    @peer_review_scores_exist = {}
     @final_grades = {}
+    @total_final_grades = {}
+    @total_peer_score = {}
+    @total_peer_reviews = {}
+    @assignment_columns = {}
     course = Course.find(params[:course_id])
     @assignments = course.assignments.reject(&:is_calibrated).reject { |a| a.participants.empty? }
     @course_participants = course.get_participants
@@ -100,9 +107,16 @@ class Assessment360Controller < ApplicationController
       @assignment_grades[cp.id] = {}
       @peer_review_scores[cp.id] = {}
       @final_grades[cp.id] = 0
+      @total_final_grades[cp.id] = 0
+      @total_peer_score[cp.id] = 0
+      @total_peer_reviews[cp.id] = 0
       @assignments.each do |assignment|
         user_id = cp.user_id
         assignment_id = assignment.id
+        @assignment_columns[assignment.id].nil? ? @assignment_columns[assignment.id] = {} : nil
+        @assignment_columns[assignment_id]["topics"].nil? ? @assignment_columns[assignment_id]["topics"] = 0 : nil
+        @assignment_columns[assignment_id]["peer_review"].nil? ? @assignment_columns[assignment_id]["peer_review"] = 0 : nil
+        @assignment_columns[assignment_id]["assignment_grade"].nil? ? @assignment_columns[assignment_id]["assignment_grade"] = 0 : nil
         # break out of the loop if there are no participants in the assignment
         next if assignment.participants.find_by(user_id: user_id).nil?
         # break out of the loop if the participant has no team
@@ -124,6 +138,10 @@ class Assessment360Controller < ApplicationController
         next if peer_review_score[:review][:scores][:avg].nil?
 
         @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
+        @total_peer_score[cp.id] += @peer_review_scores[cp.id][assignment_id]
+        @total_peer_reviews[cp.id] += 1
+        @peer_review_scores_exist[assignment_id] = true
+        @assignment_columns[assignment_id]["peer_review"] = 1
       end
     end
   end
@@ -133,6 +151,10 @@ class Assessment360Controller < ApplicationController
     # topic exists if a team signed up for a topic, which can be found via the user and the assignment
     topic_id = SignedUpTeam.topic_id(assignment_id, user_id)
     @topics[cp.id][assignment_id] = SignUpTopic.find_by(id: topic_id)
+    if !@topics[cp.id][assignment_id].nil? 
+      @topics_exist[assignment_id] = true
+      @assignment_columns[assignment_id]["topics"] = 1
+    end
     # instructor grade is stored in the team model, which is found by finding the user's team for the assignment
     team_id = TeamsUser.team_id(assignment_id, user_id)
     team = Team.find(team_id)
@@ -140,6 +162,9 @@ class Assessment360Controller < ApplicationController
     return if @assignment_grades[cp.id][assignment_id].nil?
 
     @final_grades[cp.id] += @assignment_grades[cp.id][assignment_id]
+    @total_final_grades[cp.id] += 1
+    @assignment_grades_exist[assignment_id] = true
+    @assignment_columns[assignment_id]["assignment_grade"] = 1
   end
 
   def insure_existence_of(course_participants, course)
@@ -190,11 +215,11 @@ class Assessment360Controller < ApplicationController
   end
 
   def format_topic(topic)
-    topic.nil? ? '-' : topic.format_for_display
+    topic.nil? ? '--' : topic.format_for_display
   end
 
   def format_score(score)
-    score.nil? ? '-' : score
+    score.nil? ? '--' : score
   end
 
   helper_method :format_score

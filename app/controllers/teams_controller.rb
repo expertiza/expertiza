@@ -171,6 +171,7 @@ class TeamsController < ApplicationController
     rescue TeamExistsError
       flash[:error] = $ERROR_INFO
       return true
+    end
   end
 
   # Checks for and returns the constant related to the team type.

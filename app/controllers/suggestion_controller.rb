@@ -3,7 +3,7 @@ class SuggestionController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'create', 'new', 'student_view', 'student_edit', 'update_suggestion', 'submit'
+    when 'create', 'new', 'student_view', 'student_edit', 'update', 'submit'
       current_user_has_student_privileges?
     else
       current_user_has_ta_privileges?
@@ -47,7 +47,7 @@ class SuggestionController < ApplicationController
     @suggestion = Suggestion.find(params[:id])
   end
 
-  def update_suggestion
+  def update
     Suggestion.find(params[:id]).update_attributes(title: params[:suggestion][:title],
                                                    description: params[:suggestion][:description],
                                                    signup_preference: params[:suggestion][:signup_preference])
@@ -84,8 +84,8 @@ class SuggestionController < ApplicationController
       add_comment
     elsif !params[:approve_suggestion].nil?
       approve_suggestion
-    elsif !params[:reject_suggestion].nil?
-      reject_suggestion
+    elsif !params[:reject].nil?
+      reject
     end
   end
 
@@ -111,7 +111,7 @@ class SuggestionController < ApplicationController
     end
   end
 
-  def notification
+  def notify_suggester
     if @suggestion.signup_preference == 'Y'
       if @team_id.nil?
         new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s,
@@ -137,11 +137,11 @@ class SuggestionController < ApplicationController
 
   def approve_suggestion
     approve
-    notification
+    notify_suggester
     redirect_to action: 'show', id: @suggestion
   end
 
-  def reject_suggestion
+  def reject
     @suggestion = Suggestion.find(params[:id])
     if @suggestion.update_attribute('status', 'Rejected')
       flash[:notice] = 'The suggestion has been successfully rejected.'

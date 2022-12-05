@@ -502,7 +502,7 @@ Expertiza::Application.routes.draw do
       get :list
       post :submit
       post :student_submit
-      post :update_suggestion
+      post :update
       get :student_edit
       get :add_comment
       get :student_view

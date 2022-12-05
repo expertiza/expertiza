@@ -288,7 +288,7 @@ class QuizQuestionnairesController < QuestionnairesController
     params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
                                           :max_question_score, :type, :display_type, :instruction_loc)
   end
-
+  #This method is only for quiz questionnaires, it is called when instructors click "view quiz questions" on the pop-up panel.
   def review_questions
     @quiz_creator_user_id = params[:aid]
     @quiz_questionnaires = []

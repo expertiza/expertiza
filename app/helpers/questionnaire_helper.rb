@@ -24,7 +24,7 @@ module QuestionnaireHelper
       end
     end
   end
-  
+
   # factory method to create the appropriate questionnaire based on the type
   def questionnaire_factory(type)
     if type == 'ReviewQuestionnaire'

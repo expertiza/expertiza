@@ -22,7 +22,9 @@ describe StudentQuizzesController do
     let(:admin) {
         build(:admin, id: 7) #creating admin
     }
-
+    let(:instructor) {
+        build(:instructor, id: 6) #creating admin
+    }
     describe "#action_allowed?" do
         it "when the current user is admin" do
             # To stub the user into session
@@ -36,9 +38,9 @@ describe StudentQuizzesController do
             expect(controller.send(:action_allowed?)).to be true
         end
 
-        it "when the current user is teaching assistant" do
+        it "when the current user is instructor" do
             # To stub the user into session
-            stub_current_user(student, student.role.name, student.role)
+            stub_current_user(instructor, instructor.role.name, instructor.role)
             expect(controller.send(:action_allowed?)).to be true
         end
     end

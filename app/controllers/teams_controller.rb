@@ -60,7 +60,7 @@ class TeamsController < ApplicationController
   def update
     @team = Team.find(params[:id])
     begin
-      check_for_existing_team
+      check_for_existing_team # Validate the new name
 
       @team.name = params[:team][:name]
       @team.save
@@ -78,10 +78,13 @@ class TeamsController < ApplicationController
     @team = Team.find(params[:id])
   end
 
+  # TODO This method does not work
+  # It should delete all teams for an assingment or course
   def delete_all
     root_node = get_team_type_const('Node').find_by(node_object_id: params[:id])
     child_nodes = root_node.get_teams.map(&:node_object_id)
-    Team.destroy_all if child_nodes
+    # BAD this will destroy all teams if it succeeds
+    # Team.destroy_all if child_nodes
     redirect_to action: 'list', id: params[:id]
   end
 
@@ -91,7 +94,7 @@ class TeamsController < ApplicationController
     unless @team.nil?
       @signed_up_team = SignedUpTeam.where(team_id: @team.id)
       @teams_users = TeamsUser.where(team_id: @team.id)
-      
+
       # remove deleted team from any waitlists
       Waitlist.remove_from_waitlists(@team.id)
 
@@ -107,8 +110,8 @@ class TeamsController < ApplicationController
   # The team and team members are all copied
   def copy_to_assignment
     assignment = Assignment.find(params[:id])
-    if assignment.course_id
-      course = Course.find(assignment.course_id)
+    course = assignment.course
+    if course
       teams = course.get_teams
       if teams.empty?
         flash[:note] = 'No teams were found when trying to copy to assignment.'

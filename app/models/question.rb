@@ -14,23 +14,23 @@ class Question < ApplicationRecord
   has_paper_trail
 
   # Class variables
-  NUMERIC = 'Numeric'.freeze # Display string for NUMERIC questions
-  TRUE_FALSE = 'True/False'.freeze # Display string for TRUE_FALSE questions
-  GRADING_TYPES = [[NUMERIC, false], [TRUE_FALSE, true]].freeze
-
-  CHECKBOX = 'Checkbox'.freeze # Display string for NUMERIC questions
-  TEXT_FIELD = 'TextField'.freeze
-  TEXTAREA = 'TextArea'.freeze # Display string for TRUE_FALSE questions
-  DROPDOWN = 'DropDown'.freeze
-  UPLOAD_FILE = 'UploadFile'.freeze
-  RATING = 'Rating'.freeze
-
-  GRADING_TYPES_CUSTOM = [[CHECKBOX, 0], [TEXT_FIELD, 1], [TEXTAREA, 2], [DROPDOWN, 3], [UPLOAD_FILE, 4], [RATING, 5]].freeze
-  WEIGHTS = [['1', 1], ['2', 2], ['3', 3], ['4', 4], ['5', 5]].freeze
-  ANSWERS = [['1', 1], ['2', 2], ['3', 3], ['4', 4]].freeze # a hash used while creating a quiz questionnaire
-  ANSWERS_TRUE_FALSE = [['1', 1], ['2', 2]].freeze
-  ANSWERS_MCQ_CHECKED = [['1', 1], ['0', 2]].freeze
-  RATINGS = [['Very Easy', 1], ['Easy', 2], ['Medium', 3], ['Difficult', 4], ['Very Difficult', 5]].freeze
+  # NUMERIC = 'Numeric'.freeze # Display string for NUMERIC questions
+  # TRUE_FALSE = 'True/False'.freeze # Display string for TRUE_FALSE questions
+  # GRADING_TYPES = [[NUMERIC, false], [TRUE_FALSE, true]].freeze
+  #
+  # CHECKBOX = 'Checkbox'.freeze # Display string for NUMERIC questions
+  # TEXT_FIELD = 'TextField'.freeze
+  # TEXTAREA = 'TextArea'.freeze # Display string for TRUE_FALSE questions
+  # DROPDOWN = 'DropDown'.freeze
+  # UPLOAD_FILE = 'UploadFile'.freeze
+  # RATING = 'Rating'.freeze
+  #
+  # GRADING_TYPES_CUSTOM = [[CHECKBOX, 0], [TEXT_FIELD, 1], [TEXTAREA, 2], [DROPDOWN, 3], [UPLOAD_FILE, 4], [RATING, 5]].freeze
+  # WEIGHTS = [['1', 1], ['2', 2], ['3', 3], ['4', 4], ['5', 5]].freeze
+  # ANSWERS = [['1', 1], ['2', 2], ['3', 3], ['4', 4]].freeze # a hash used while creating a quiz questionnaire
+  # ANSWERS_TRUE_FALSE = [['1', 1], ['2', 2]].freeze
+  # ANSWERS_MCQ_CHECKED = [['1', 1], ['0', 2]].freeze
+  # RATINGS = [['Very Easy', 1], ['Easy', 2], ['Medium', 3], ['Difficult', 4], ['Very Difficult', 5]].freeze
   MAX_LABEL = 'Strongly agree'.freeze
   MIN_LABEL = 'Strongly disagree'.freeze
   SIZES = { 'Criterion' => '50, 3', 'Cake' => '50, 3', 'TextArea' => '60, 5', 'TextField' => '30' }.freeze

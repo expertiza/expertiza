@@ -131,10 +131,9 @@ class SignupSheetController < ApplicationController
 
   # This displays a page that lists all the available topics for an assignment.
   # Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics can have different deadlines.
-  # This was previously redirected to after attempting to create a new topic with the same name/id as an existing one
-  # However the view is broken, due to a missing method in a different controller class
-  # and the naming/use is very unclear. We have changed it so that the new topic form updates the existing topic and redirects back to assignment/edit instead of these.
-  # The methods are now unused, but keeping them incase a future team fixes the views or re-considers this functionality.
+  # Previously, attempting to create a new topic with the same name as an existing topic redirected to this view
+  # However this functionality was broken and confusing, now when attempting to create a new topic with the same name as an existing one
+  # You will be redirected back to the assignment topics edit page
 
   def add_signup_topics
     SignUpSheet.add_signup_topic(params[:id])

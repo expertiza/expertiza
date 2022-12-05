@@ -31,6 +31,7 @@ class Mailer < ActionMailer::Base
          bcc: defn[:bcc])
   end
 
+  # Ensures emails are being sent upon a submission via the sync_message protocol.
   def sync_message(defn)
     @body = defn[:body]
     @type = defn[:body][:type]
@@ -46,6 +47,7 @@ class Mailer < ActionMailer::Base
          to: defn[:to])
   end
 
+  
   def delayed_message(defn)
     ret = mail(subject: defn[:subject],
                body: defn[:body],
@@ -53,6 +55,7 @@ class Mailer < ActionMailer::Base
                bcc: defn[:bcc])
     ExpertizaLogger.info(ret.encoded.to_s)
   end
+
 
   def suggested_topic_approved_message(defn)
     @body = defn[:body]

@@ -1,6 +1,7 @@
 class QuestionnairesController < ApplicationController
   include AuthorizationHelper
-
+  include QuestionnaireHelper
+  include QuestionHelper
   # Controller for Questionnaire objects
   # A Questionnaire can be of several types (QuestionnaireType)
   # Each Questionnaire contains zero or more questions (Question)
@@ -40,31 +41,6 @@ class QuestionnairesController < ApplicationController
   def view
     puts "view called."
     @questionnaire = Questionnaire.find(params[:id])
-  end
-
-  # factory method to create the appropriate questionnaire based on the type
-  def questionnaire_factory(type)
-    if type == 'ReviewQuestionnaire'
-      return ReviewQuestionnaire.new
-    elsif type == 'MetareviewQuestionnaire'
-      return MetareviewQuestionnaire.new
-    elsif type == 'AuthorFeedbackQuestionnaire'
-      return AuthorFeedbackQuestionnaire.new
-    elsif type == 'TeammateReviewQuestionnaire'
-      return TeammateReviewQuestionnaire.new
-    elsif type == 'AssignmentSurveyQuestionnaire'
-      return AssignmentSurveyQuestionnaire.new
-    elsif type == 'SurveyQuestionnaire'
-      return SurveyQuestionnaire.new
-    elsif type == 'GlobalSurveyQuestionnaire'
-      return GlobalSurveyQuestionnaire.new
-    elsif type == 'CourseSurveyQuestionnaire'
-      return CourseSurveyQuestionnaire.new
-    elsif type == 'BookmarkRatingQuestionnaire'
-      return BookmarkRatingQuestionnaire.new
-    elsif type == 'QuizQuestionnaire'
-      return QuizQuestionnaire.new
-    end
   end
 
   def new
@@ -183,33 +159,6 @@ class QuestionnairesController < ApplicationController
       end
     end
     redirect_to action: 'list', controller: 'tree_display'
-  end
-
-  # factory method to create the appropriate question based on the type
-  def question_factory(type, questionnaire_id, seq)
-    if type == 'Criterion'
-      return Criterion.create(txt: '', questionnaire_id: questionnaire_id, seq: seq, type: type, break_before: true)
-    elsif type == 'Scale'
-      return Scale.create(txt: '', questionnaire_id: questionnaire_id, seq: seq, type: type, break_before: true)
-    elsif type == 'Cake'
-      return Cake.create(txt: '', questionnaire_id: questionnaire_id, seq: seq, type: type, break_before: true)
-    elsif type == 'Dropdown'
-      return Dropdown.create(txt: '', questionnaire_id: questionnaire_id, seq: seq, type: type, break_before: true)
-    elsif type == 'Checkbox'
-      return Checkbox.create(txt: '', questionnaire_id: questionnaire_id, seq: seq, type: type, break_before: true)
-    elsif type == 'TextArea'
-      return TextArea.create(txt: '', questionnaire_id: questionnaire_id, seq: seq, type: type, break_before: true)
-    elsif type == 'TextField'
-      return TextField.create(txt: '', questionnaire_id: questionnaire_id, seq: seq, type: type, break_before: true)
-    elsif type == 'UploadFile'
-      return UploadFile.create(txt: '', questionnaire_id: questionnaire_id, seq: seq, type: type, break_before: true)
-    elsif type == 'SectionHeader'
-      return SectionHeader.create(txt: '', questionnaire_id: questionnaire_id, seq: seq, type: type, break_before: true)
-    elsif type == 'TableHeader'
-      return TableHeader.create(txt: '', questionnaire_id: questionnaire_id, seq: seq, type: type, break_before: true)
-    elsif type == 'ColumnHeader'
-      return ColumnHeader.create(txt: '', questionnaire_id: questionnaire_id, seq: seq, type: type, break_before: true)
-    end
   end
 
   # Zhewei: This method is used to add new questions when editing questionnaire.

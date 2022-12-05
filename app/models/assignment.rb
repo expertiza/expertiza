@@ -627,7 +627,7 @@ class Assignment < ApplicationRecord
   def copy_calibration_submissions(new_assignment)
     # Create Participant entry for instructors to allow them to become reviewers
     instructor_participant = Participant.where(parent_id: id, user_id: instructor_id).first
-    new_instructor_participant = instructor_participant.copy_to_assignment(new_assignment)
+    new_instructor_participant = instructor_participant.copy_to_another_assignment(new_assignment)
 
     response_maps = ResponseMap.where(reviewed_object_id: id, calibrate_to: 1)
     response_maps.each do |response_map|

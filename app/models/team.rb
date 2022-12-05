@@ -312,7 +312,7 @@ class Team < ApplicationRecord
 
       if participant_missing
         participant = Participant.where(parent_id: parent_id, user_id: team_user.user_id).first
-        participant.copy_to_assignment(new_assignment)
+        participant.copy_to_another_assignment(new_assignment)
       end
     end
 

@@ -88,7 +88,7 @@ class WaitlistTeamController < ApplicationController
         sign_up_waitlist_team.topic_id = first_waitlist_team.topic_id
         sign_up_waitlist_team.team_id = first_waitlist_team.team_id
         if sign_up_waitlist_team.valid?
-          sign_up_waitlist_team.is_waitlisted=false
+          sign_up_waitlist_team.is_waitlisted = false
           sign_up_waitlist_team.save
           first_waitlist_team.destroy
           delete_all_waitlists_for_team sign_up_waitlist_team.team_id

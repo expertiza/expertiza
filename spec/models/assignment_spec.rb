@@ -1,6 +1,8 @@
 describe Assignment do
   let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team], max_team_size: 2) }
+  let(:assignment2) { create(:assignment, id: 2, name: 'no assignment2', directory_path: 'csc517/test2') }
   let(:instructor) { build(:instructor, id: 6) }
+  let(:instructor_participant) { build(:participant, id: 2, user: instructor) }
   let(:student) { build(:student, id: 3, name: 'no one') }
   let(:review_response_map) { build(:review_response_map, response: [response], reviewer: build(:participant), reviewee: build(:assignment_team)) }
   let(:teammate_review_response_map) { build(:review_response_map, type: 'TeammateReviewResponseMap') }
@@ -11,7 +13,7 @@ describe Assignment do
   let(:course) { build(:course) }
   let(:assignment_due_date) do
     build(:assignment_due_date, due_at: '2011-11-11 11:11:11', deadline_name: 'Review',
-                                description_url: 'https://expertiza.ncsu.edu/', round: 1)
+          description_url: 'https://expertiza.ncsu.edu/', round: 1)
   end
   let(:topic_due_date) { build(:topic_due_date, deadline_name: 'Submission', description_url: 'https://github.com/expertiza/expertiza') }
   let(:deadline_type) { build(:deadline_type, id: 1) }
@@ -728,6 +730,40 @@ describe Assignment do
 
       it 'returns true' do
         expect(assignment2.pair_programming_enabled?).to be_truthy
+      end
+    end
+  end
+
+  context 'all entries are persisted in the database before the test' do
+    let(:user3) { create(:student, id: 5, role_id: 1, name: 'student1', fullname: 'no one') }
+    let(:user4) { create(:instructor, id: 6, role_id: 2, name: 'instructor1', fullname: 'no one') }
+
+    let(:assignment3) { create(:assignment, id: 3, name: 'Test Assgt', directory_path: "x", instructor: user4) }
+    let(:assignment4) { create(:assignment, id: 4, name: 'Test Assgt2', directory_path: "y", instructor: user4) }
+
+    let(:team3) { create(:assignment_team, id: 3, assignment: assignment3) }
+    let(:team_user3) { create(:team_user, id: 4, team: team3, user: user3) }
+
+    let(:participant3) { create(:participant, id: 3, parent_id: 3, user: user3) }
+    let(:participant4) { create(:participant, id: 4, parent_id: 3, user: user4) }
+
+    let(:response_map3) { create(:review_response_map, id: 3, assignment: assignment3, reviewer: participant4, reviewee: team3, calibrate_to: 1) }
+
+    let(:response3) { create(:response, id: 3, map_id: 3, response_map: response_map3) }
+
+    let!(:questionnaire3) { create(:questionnaire, id: 3) }
+    let!(:question3) { create(:question, id: 3, weight: 1, questionnaire: questionnaire3) }
+
+    let!(:answer3) { Answer.create(answer: 1, comments: 'Answer text', question: question3, response: response3) }
+    let!(:answer4) { Answer.create(answer: 2, comments: 'Answer text', question: question3, response: response3) }
+
+    describe '#copy_to_response_map' do
+      it 'should copy response to a response map' do
+        assignment3.copy_calibration_submissions(assignment4)
+
+        expect(Participant.where(user_id: assignment4.instructor_id, parent_id: assignment4.id)).not_to be_empty
+        expect(ResponseMap.where(reviewed_object_id: assignment4.id, calibrate_to: 1).size
+        ).to eq(ResponseMap.where(reviewed_object_id: assignment3.id, calibrate_to: 1).size)
       end
     end
   end

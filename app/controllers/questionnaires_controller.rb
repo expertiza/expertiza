@@ -46,6 +46,7 @@ class QuestionnairesController < ApplicationController
   def new
     puts "new called."
     type = params[:model].split.join
+    # Create questionnaire object based on type using questionnaire_factory
     @questionnaire = questionnaire_factory(type) if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model].split.join
   rescue StandardError
     flash[:error] = $ERROR_INFO
@@ -82,6 +83,7 @@ class QuestionnairesController < ApplicationController
       display_type = params[:questionnaire][:type].split('Questionnaire')[0]
       begin
         type = params[:questionnaire][:type]
+        # Create questionnaire object based on type using questionnaire_factory
         @questionnaire = questionnaire_factory(type) if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
       rescue StandardError
         flash[:error] = $ERROR_INFO
@@ -181,6 +183,7 @@ class QuestionnairesController < ApplicationController
     end
     ((current_num_of_questions + 1)..(current_num_of_questions + params[:question][:total_num].to_i)).each do
       max_seq += 1
+      # Create question object based on type using question_factory
       question = question_factory(params[:question][:type], questionnaire_id, max_seq)
       if question.is_a? ScoredQuestion
         question.weight = params[:question][:weight]

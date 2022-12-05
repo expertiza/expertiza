@@ -437,7 +437,6 @@ Expertiza::Application.routes.draw do
       post :save_quiz_response
       get :finished_quiz
       get :take_quiz
-      # get :review_questions
     end
   end
 

@@ -394,7 +394,8 @@ class SignupSheetController < ApplicationController
     # Updates the waitlist for the topic based of update of max choosers
     update_waitlist topic
     topic.update_attributes(topic_params)
-    redirect_to_sign_up(params[:id])
+    #redirect_to_sign_up(params[:id])
+    redirect_to edit_assignment_path(params[:id], anchor: 'tabs-2')
   end
 
   # get info related to the ad for partners so that it can be displayed when an assignment_participant

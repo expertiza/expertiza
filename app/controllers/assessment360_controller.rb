@@ -19,6 +19,9 @@ class Assessment360Controller < ApplicationController
     @meta_review = {}
     @teammate_review = {}
     @teamed_count = {}
+    @teammate_review_exist = {}
+    @meta_review_exist = {}
+    @assignment_columns = {}
     # for course
     # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
     # @overall_teammate_review_count = {assgt_id1: 1, assgt_id2: 2, ...}
@@ -36,10 +39,14 @@ class Assessment360Controller < ApplicationController
         @meta_review[cp.id] = {} unless @meta_review.key?(cp.id)
         @teammate_review[cp.id] = {} unless @teammate_review.key?(cp.id)
         assignment_participant = assignment.participants.find_by(user_id: cp.user_id)
+        @assignment_columns[assignment.id].nil? ? @assignment_columns[assignment.id] = {} : nil
+        @assignment_columns[assignment.id]["meta_review"].nil? ? @assignment_columns[assignment.id]["meta_review"] = 0 : nil
+        @assignment_columns[assignment.id]["teammate_review"].nil? ? @assignment_columns[assignment.id]["teammate_review"] = 0 : nil
         next if assignment_participant.nil?
 
         teammate_reviews = assignment_participant.teammate_reviews
         meta_reviews = assignment_participant.metareviews
+        
         calc_overall_review_info(assignment,
                                  cp,
                                  teammate_reviews,
@@ -54,6 +61,15 @@ class Assessment360Controller < ApplicationController
                                  @overall_meta_review_grades,
                                  @overall_meta_review_count,
                                  @meta_review_info_per_stu)
+
+        if !@meta_review[cp.id][assignment.id].nil?
+          @meta_review_exist[assignment.id] = true
+          @assignment_columns[assignment.id]["meta_review"] = 1
+        end
+        if !@teammate_review[cp.id][assignment.id].nil?
+          @teammate_review_exist[assignment.id] = true
+          @assignment_columns[assignment.id]["teammate_review"] = 1
+        end
       end
       # calculate average grade for each student on all assignments in this course
       avg_review_calc_per_student(cp, @teammate_review_info_per_stu, @teammate_review)

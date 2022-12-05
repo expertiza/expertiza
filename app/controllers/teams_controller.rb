@@ -47,7 +47,7 @@ class TeamsController < ApplicationController
 
   # Called when a instructor tries to create an empty team manually
   def create
-    if check_for_existing_team do
+    if check_for_existing_team
       redirect_to action: 'new', id: params[:id]
     else
       @team = get_team_type_const('Team').create(name: params[:team][:name], parent_id: params[:id])
@@ -61,7 +61,7 @@ class TeamsController < ApplicationController
   # Update a specific team and validate the new name
   def update
     @team = Team.find(params[:id])
-    if check_for_existing_team do # Validate the new name
+    if check_for_existing_team # Validate the new name
       redirect_to action: 'edit', id: @team.id
     else
       @team.name = params[:team][:name]

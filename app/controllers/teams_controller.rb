@@ -48,7 +48,6 @@ class TeamsController < ApplicationController
   # Called when a instructor tries to create an empty team manually
   def create
     if check_for_existing_team do
-      flash[:error] = $ERROR_INFO
       redirect_to action: 'new', id: params[:id]
     else
       @team = get_team_type_const('Team').create(name: params[:team][:name], parent_id: params[:id])
@@ -63,7 +62,6 @@ class TeamsController < ApplicationController
   def update
     @team = Team.find(params[:id])
     if check_for_existing_team do # Validate the new name
-      flash[:error] = $ERROR_INFO
       redirect_to action: 'edit', id: @team.id
     else
       @team.name = params[:team][:name]
@@ -171,6 +169,7 @@ class TeamsController < ApplicationController
       Team.check_for_existing(team_parent, params[:team][:name], session[:team_type])
       return false
     rescue TeamExistsError
+      flash[:error] = $ERROR_INFO
       return true
   end
 

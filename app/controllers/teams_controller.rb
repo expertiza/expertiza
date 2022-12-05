@@ -14,13 +14,13 @@ class TeamsController < ApplicationController
 
   # Randomizes teams based on an Assignment or Course
   def randomize_teams
-    Team.randomize_all_by_parent(team_parent, session[:team_type], params[:team_size].to_i)
+    Team.randomize_all_by_parent(team_type.find(params[:id]), session[:team_type], params[:team_size].to_i)
 
     success_message = 'Random teams have been successfully created.'
     undo_link(success_message)
     ExpertizaLogger.info LoggerMessage.new(controller_name, '', success_message, request)
 
-    redirect_to action: 'list', id: team_parent.id
+    redirect_to action: 'list', id: params[:id]
   end
 
   def list
@@ -29,7 +29,7 @@ class TeamsController < ApplicationController
       session[:team_type] = params[:type]
     end
 
-    @assignment = team_parent if session[:team_type] == 'Assignment'
+    @assignment = team_type.find(params[:id]) if session[:team_type] == 'Assignment'
     begin
       @root_node = get_team_type_const('Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
@@ -40,7 +40,7 @@ class TeamsController < ApplicationController
 
   def new
     session[:team_type] ||= 'Assignment'
-    @parent = team_parent
+    @parent = team_type.find(params[:id])
   end
 
   # Called when a instructor tries to create an empty team manually
@@ -161,21 +161,15 @@ class TeamsController < ApplicationController
     end
   end
 
-  # Finds the object containing the students
-  # which the team will be generated from
-  def team_parent
-    @team_parent ||= team_type.find(params[:id])
-  end
-
   # Raises a TeamExistsError if a team already
   # exists with the same parent and name
   def check_for_existing_team
-    Team.check_for_existing(team_parent, params[:team][:name], session[:team_type])
+    Team.check_for_existing(team_type.find(params[:id]), params[:team][:name], session[:team_type])
   end
-end
 
   # Checks for and returns the constant related to the team type.
   # Should either be 'Node' or 'Team'
   def get_team_type_const (const_type)
     Object.const_get(session[:team_type] + const_type)
   end
+end

@@ -16,7 +16,7 @@
     overflow:hidden;
   }
 
-  .visiblity {
+  .visibility {
     display: none;
   }
 </style>
@@ -88,7 +88,7 @@ $(function() {
     topicCheckBox = document.getElementById('topic-box');
     topicCheckBox.addEventListener('change', function() {
       topicClasses.forEach(el => {
-            el.classList.toggle('visiblity');
+            el.classList.toggle('visibility');
             })
       assignmentHeaderClasses.forEach(el => {
             assignmentColSpan = Number(el.getAttribute("colspan"));
@@ -111,7 +111,7 @@ $(function() {
       this.checked ? finalGradeColSpan += 1 : finalGradeColSpan -= 1;
       finalGradeHeader.setAttribute("colspan", finalGradeColSpan);
       peerScoreClasses.forEach(el => {
-            el.classList.toggle('visiblity');
+            el.classList.toggle('visibility');
             });
       assignmentHeaderClasses.forEach(el => {
             assignmentColSpan = Number(el.getAttribute("colspan"));
@@ -134,7 +134,7 @@ $(function() {
       this.checked ? finalGradeColSpan += 1 : finalGradeColSpan -= 1;
       finalGradeHeader.setAttribute("colspan", finalGradeColSpan);
       intructorGradeClasses.forEach(el => {
-            el.classList.toggle('visiblity');
+            el.classList.toggle('visibility');
             });
       assignmentHeaderClasses.forEach(el => {
             assignmentColSpan = Number(el.getAttribute("colspan"));

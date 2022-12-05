@@ -3,7 +3,7 @@
     text-align: center;
 }
 
-  .visiblity {
+  .visibility {
     display: none
   }
 </style>
@@ -81,7 +81,7 @@ metaReviewCheckBox.addEventListener('change', function() {
   this.checked ? aggregateScoreColSpan += 1 : aggregateScoreColSpan -= 1;
   aggregateScoreHeader.setAttribute("colspan", aggregateScoreColSpan);
   metaReviewClasses.forEach(el => {
-        el.classList.toggle('visiblity');
+        el.classList.toggle('visibility');
         })
   assignmentHeaderClasses.forEach(el => {
         assignmentColSpan = Number(el.getAttribute("colspan"));
@@ -104,7 +104,7 @@ teammateReviewCheckBox.addEventListener('change', function() {
   this.checked ? aggregateScoreColSpan += 1 : aggregateScoreColSpan -= 1;
   aggregateScoreHeader.setAttribute("colspan", aggregateScoreColSpan);
   teammateReviewClasses.forEach(el => {
-        el.classList.toggle('visiblity');
+        el.classList.toggle('visibility');
         })
   assignmentHeaderClasses.forEach(el => {
         assignmentColSpan = Number(el.getAttribute("colspan"));

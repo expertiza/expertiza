@@ -193,7 +193,7 @@ class VmQuestionResponse
     end
   end
   
-  # Calculates the compositie (average of all reviews) score for each heatgrid
+  # Calculates the composite (average of all reviews) score for each heatgrid
   def composite_score
     total_row_score = 0
     number_of_rows = 0

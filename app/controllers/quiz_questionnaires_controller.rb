@@ -290,6 +290,7 @@ class QuizQuestionnairesController < QuestionnairesController
   end
   
   # It is called when instructors click "view quiz questions" on the pop-up panel.
+  # Return all the quizzes created by the student for the assignment.
   def review_questions
     @quiz_creator_user_id = params[:aid]
     @quiz_questionnaires = []

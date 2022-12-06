@@ -484,4 +484,27 @@ describe User do
       expect(User.search_users(role, @user_id, '', search_by)).to eq user
     end
   end
+
+  describe "conditional contexts" do
+    ip_address = "152.7.178.100"
+    condition = User.anonymized_view?(ip_address)
+    context "when user is anonymized", if: condition do
+      it 'passes' do
+        expect(user).to match(/\nnn\z/)
+      end
+    end
+  
+    context "when user not in anonymized view ", else: !condition do
+      it 'passes' do
+        expect(user).to be_valid
+      end
+    end
+  
+    condition = "non-nil"
+    context "will not be run", if: condition.nil? do
+      it 'will not get run' do
+        expect(nil).to be_nil
+      end
+    end
+  end
 end

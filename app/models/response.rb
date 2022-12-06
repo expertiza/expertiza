@@ -259,7 +259,7 @@ class Response < ApplicationRecord
     answers = Answer.where(response_id: id)
 
     answers.each do |answer|
-      new_answer = answer.copy_to_response(new_response)
+      answer.copy_to_response(new_response)
     end
 
     new_response

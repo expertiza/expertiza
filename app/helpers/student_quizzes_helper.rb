@@ -59,7 +59,7 @@ module StudentQuizzesHelper
         valid
     end
 
-    # Return valid flag indicating whether the option is marked or left empty and appending the score parameters of the particular question in scores array.
+    # Calculates score for single choice radio button and adds it to scores array
     def score_single_choice_radio(correct_answers, params, question, scores, quiz_response, valid)
         correct_answer = correct_answers.first
         score = correct_answer.txt == params[question.id.to_s] ? 1 : 0    #checking whether the answser is correct and assigning score 0 or 1

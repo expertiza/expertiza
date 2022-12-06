@@ -25,7 +25,6 @@ class QuestionnairesController < ApplicationController
   # Create a clone of the given questionnaire, copying all associated
   # questions. The name and creator are updated.
   def copy
-    puts "copy called."
     instructor_id = session[:user].instructor_id
     @questionnaire = Questionnaire.copy_questionnaire_details(params, instructor_id)
     p_folder = TreeFolder.find_by(name: @questionnaire.display_type)
@@ -39,12 +38,10 @@ class QuestionnairesController < ApplicationController
   end
 
   def view
-    puts "view called."
     @questionnaire = Questionnaire.find(params[:id])
   end
 
   def new
-    puts "new called."
     type = params[:model].split.join
     # Create questionnaire object based on type using questionnaire_factory
     @questionnaire = questionnaire_factory(type) if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model].split.join
@@ -53,7 +50,7 @@ class QuestionnairesController < ApplicationController
   end
 
   # Assigns corrresponding variables to questionnaire object.
-  def setting_questionnaire_parameters(private_flag, display)
+  def set_questionnaire_parameters(private_flag, display)
     @questionnaire.private = private_flag
     @questionnaire.name = params[:questionnaire][:name]
     @questionnaire.instructor_id = session[:user].id
@@ -74,7 +71,6 @@ class QuestionnairesController < ApplicationController
   end
 
   def create
-    puts "create called."
     if params[:questionnaire][:name].blank?
       flash[:error] = 'A rubric or survey must have a title.'
       redirect_to controller: 'questionnaires', action: 'new', model: params[:questionnaire][:type], private: params[:questionnaire][:private]
@@ -95,9 +91,8 @@ class QuestionnairesController < ApplicationController
         if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey BookmarkRating].include?(display_type)
           display_type = display_type.split(/(?=[A-Z])/).join('%')
         end
-        # assignment moved to a separate function to make sure create function doesn't do too much
-        # setting the object variables
-        setting_questionnaire_parameters(questionnaire_private, display_type)
+        # set the parameters for questionnaires object
+        set_questionnaire_parameters(questionnaire_private, display_type)
         # Create node - adds this questionnaire to the tree_display list
         create_tree_node()
       rescue StandardError
@@ -109,16 +104,13 @@ class QuestionnairesController < ApplicationController
 
   # Edit a questionnaire
   def edit
-    puts "edit called."
     @questionnaire = Questionnaire.find(params[:id])
     redirect_to Questionnaire if @questionnaire.nil?
     session[:return_to] = request.original_url
   end
 
   def update
-    puts "update called."
     @questionnaire = Questionnaire.find(params[:id])
-    puts @questionnaire
     begin
       # Save questionnaire information
       @questionnaire.update_attributes(questionnaire_params)
@@ -132,7 +124,6 @@ class QuestionnairesController < ApplicationController
 
   # Remove a given questionnaire
   def delete
-    puts "delete called."
     @questionnaire = Questionnaire.find(params[:id])
     if @questionnaire
       begin
@@ -209,7 +200,6 @@ class QuestionnairesController < ApplicationController
 
   # Zhewei: This method is used to save all questions in current questionnaire.
   def save_all_questions
-    puts "save_all_questions called."
     begin
       if params[:save]
         params[:question].each_pair do |k, v|

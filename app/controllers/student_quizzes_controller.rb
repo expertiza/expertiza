@@ -67,7 +67,7 @@ class StudentQuizzesController < ApplicationController
         score_response["quiz_response"].destroy
         flash[:error] = 'Please answer every question.'
         questionnaire = Questionnaire.find(participant_response.reviewed_object_id)
-        redirect_to action: :take_quiz, assignment_id: params[:assignment_id], questionnaire_id: questionnaire.id, map_id: participant_response.id
+        redirect_to action: :self.get_quiz_questionnaire, assignment_id: params[:assignment_id], questionnaire_id: questionnaire.id, map_id: participant_response.id
       end
     else  #Quiz is already taken.
       flash[:error] = 'You have already taken this quiz, below are your responses.'

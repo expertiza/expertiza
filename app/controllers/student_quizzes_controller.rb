@@ -50,7 +50,7 @@ class StudentQuizzesController < ApplicationController
     quiz_questions
   end
 
-  # check if there is any response for this map_id. This is to prevent student take same quiz twice
+  # check if there is any response for the map_id in ResponseMap. This is to prevent student take same quiz twice
   def save_quiz_response
     participant_response = ResponseMap.find(params[:map_id])
     if participant_response.response.empty? # If there is no instance of the response of the student, create new and save.

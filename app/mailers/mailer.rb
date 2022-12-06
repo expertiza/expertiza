@@ -7,6 +7,7 @@ class Mailer < ActionMailer::Base
     default from: 'expertiza-support@lists.ncsu.edu'
   end
 
+  # Sends emails to both authors or reviewers.
   def email_author_reviewers(subject, body, email)
     Rails.env.development? || Rails.env.test? ? @email = 'expertiza.debugging@gmail.com' : @email = email
     mail(to: @email,
@@ -15,6 +16,7 @@ class Mailer < ActionMailer::Base
          subject: subject)
   end
 
+  # This method is used to request a message to a user by passing the super_user details, user name and the email subject.
   def request_user_message(defn)
     @user = defn[:body][:user]
     @super_user = defn[:body][:super_user]
@@ -47,7 +49,7 @@ class Mailer < ActionMailer::Base
          to: defn[:to])
   end
 
-  
+  # Contains the subect and body of the message.
   def delayed_message(defn)
     ret = mail(subject: defn[:subject],
                body: defn[:body],
@@ -56,7 +58,7 @@ class Mailer < ActionMailer::Base
     ExpertizaLogger.info(ret.encoded.to_s)
   end
 
-
+  # Ensures an email is sent upon approval of a suggested topic.
   def suggested_topic_approved_message(defn)
     @body = defn[:body]
     @topic_name = defn[:body][:approved_topic_name]
@@ -70,6 +72,7 @@ class Mailer < ActionMailer::Base
          bcc: defn[:cc])
   end
 
+  # Ensures an email is sent when a score is outside the acceptable value.
   def notify_grade_conflict_message(defn)
     @body = defn[:body]
 

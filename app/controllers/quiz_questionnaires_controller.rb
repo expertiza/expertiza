@@ -288,8 +288,7 @@ class QuizQuestionnairesController < QuestionnairesController
     params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
                                           :max_question_score, :type, :display_type, :instruction_loc)
   end
-  
-  # It is called when instructors click "view quiz questions" on the pop-up panel.
+ 
   # Return all the quizzes created by the student for the assignment.
   def review_questions
     @quiz_creator_user_id = params[:aid]

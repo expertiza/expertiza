@@ -133,8 +133,7 @@ class SuggestionController < ApplicationController
   # class to send an email with "notify_suggestion_approval".
   def notify_suggester
     if @suggestion.signup_preference == 'Y' and @team_id.nil?
-      new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s,
-                                        parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
+      new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s, parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
       new_team.create_new_team(@user_id, @signuptopic)
     elsif @suggestion.signup_preference == 'Y' and !@team_id.nil? and @topic_id.nil?
       # clean waitlists
@@ -144,10 +143,10 @@ class SuggestionController < ApplicationController
       @signuptopic.private_to = @user_id
       @signuptopic.save
       # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
-      Mailer.notify_suggestion_approval(@used_id, @team_id, @suggestion.title)
+      Mailer.notify_suggestion_approval(@team_id, @suggestion.title)
     else
       # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
-      Mailer.notify_suggestion_approval(@used_id, @team_id, @suggestion.title)
+      Mailer.notify_suggestion_approval(@team_id, @suggestion.title)
     end
   end
 

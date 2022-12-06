@@ -119,8 +119,8 @@ class Mailer < ActionMailer::Base
 
   # If the user submits a suggestion and gets it approved -> Send email
   # If user submits a suggestion anonymously and it gets approved -> DOES NOT get an email
-  def notify_suggestion_approval(used_id, team_id, suggestion_title)
-    proposer = User.find_by(id: user_id)
+  def notify_suggestion_approval(team_id, suggestion_title)
+    proposer = User.find_by(id: @user_id)
     if proposer
       teams_users = TeamsUser.where(team_id: team_id)
       cc_mail_list = []

@@ -7,6 +7,7 @@ class SimicheckWorker < Worker
   
     private
   
+    # Similarity check refers to % text same between 2 docs
     def perform_simicheck_comparisons(assignment_id)
       PlagiarismCheckerHelper.run(assignment_id)
     end

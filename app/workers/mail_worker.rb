@@ -7,7 +7,7 @@ class MailWorker < Worker
     attr_accessor :due_at
   
     # Note the name perform is required for the MailWorker to properly use Sidekiq
-    # Performs the delayed mailer funcction for sending the deadline emails using Sidekiq
+    # Performs the delayed mailer function for sending the deadline emails using Sidekiq
     def perform(assignment_id, deadline_type, due_at)
       self.assignment = Assignment.find(assignment_id)
       self.deadline_type = deadline_type
@@ -20,7 +20,6 @@ class MailWorker < Worker
   
       # should not return email if deadline is drop_outstanding_reviews, 
       # where outstanding reviews means the reviews which have not been started
-      # https://expertiza.csc.ncsu.edu/index.php/CSC/ECE_517_Spring_2015_E1529_GLDS
       if deadline_type != 'drop_outstanding_reviews'
         email_reminder(participant_emails, self.deadline_text) unless participant_emails.empty?
       end

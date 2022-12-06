@@ -41,7 +41,7 @@ $(function() {
     <tr>
       <th rowspan=2 width="320" class="sorter-true">Students</th>
       <% @assignments.each do |assignment| %>
-        <!-- check if atleast one column is not nil for particular assignment  -->
+        <!-- check if at least one column is not nil for particular assignment  -->
         <% if !@topics_exist[assignment.id].nil? || !@peer_review_scores_exist[assignment.id].nil? || !@assignment_grades_exist[assignment.id].nil? %>
           <!-- total colspan is calculated as sum of assignment_columns for all columns -->
           <th colspan="<%= @assignment_columns[assignment.id]["topics"] + @assignment_columns[assignment.id]["peer_review"] + @assignment_columns[assignment.id]["assignment_grade"] %>" class="sorter-false assignment-header" id="<%= assignment.id %>"> <%= assignment.name %> </th>

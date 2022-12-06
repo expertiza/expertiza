@@ -19,7 +19,7 @@
       <th rowspan=2 width="320">Students</th>
       <th rowspan=2 width="30">Teammate Count</th>
       <% @assignments.each do |assignment| %>
-        <!-- check if atleast one column is not nil for particular assignment  -->
+        <!-- check if at least one column is not nil for particular assignment  -->
         <% if !@teammate_review_exist[assignment.id].nil? || !@meta_review_exist[assignment.id].nil? %>
           <!-- total colspan is calculated as sum of assignment_columns for all columns -->
           <th colspan="<%= @assignment_columns[assignment.id]["meta_review"] + @assignment_columns[assignment.id]["teammate_review"] %>" width="300" class="assignment-header" id="<%= assignment.id %>"> <%= assignment.name %> </th>

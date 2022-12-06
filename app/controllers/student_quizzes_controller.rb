@@ -3,7 +3,7 @@ class StudentQuizzesController < ApplicationController
   include StudentQuizzesHelper
   #Checks authorization for any action based on user type: Student or Teaching Assistant
   def action_allowed?
-    if current_user_is_a? 'Student'
+    if current_user_has_student_privileges? 'Student'
       if action_name.eql? 'index' #For Student, check if student has authorizations of reviewer & submitter
         are_needed_authorizations_present?(params[:id], 'reviewer', 'submitter')
       else

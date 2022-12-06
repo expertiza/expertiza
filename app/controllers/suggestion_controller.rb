@@ -3,7 +3,7 @@ class SuggestionController < ApplicationController
 
   ##### action_allowed? #####
   # action_allowed? is used to determine if a user has the proper student or
-  # ta privileges prior to 
+  # ta privileges.
   def action_allowed?
     case params[:action]
     when 'create', 'new', 'student_view', 'student_edit', 'update', 'submit'
@@ -168,7 +168,7 @@ class SuggestionController < ApplicationController
   # notify_suggester is called whenever a suggestion is approved by the function "approve_suggestion_and_notify", and
   # when it's called it will check to see if the user is already in the team or if the topic hasn't been created.
   # If either of these haven't been created, it'll create the team or topic respectively, which doesn't provide a
-  # notification through the Mailer in this portion of the code. Otherwise, it will queue an email through the Mailer 
+  # notification through the Mailer in this portion of the code. Otherwise, it will queue an email through the Mailer
   # class to send an email with "notify_suggestion_approval".
   def notify_suggester
     if @suggestion.signup_preference == 'Y'
@@ -197,7 +197,7 @@ class SuggestionController < ApplicationController
   ##### approve_and_notify #####
   # approve_and_notify is a function that calls both the approve function, which is responsible for
   # propogating the choice to approve a suggestion. Afterwards, it calls the "notify_suggester" function
-  # to send out emails if that's appropriate. 
+  # to send out emails if that's appropriate.
   def approve_and_notify
     approve
     notify_suggester

@@ -19,10 +19,13 @@ class Assessment360Controller < ApplicationController
     @meta_review = {}
     @teammate_review = {}
     @team_members_count = {}
-    # hashmaps of assignments to store if an entire column is empty
+    # hashmaps to map assignment id's to existence of columns
+    # nil implies absence and true implies presence of columns. These are utlized by the UI to conditionally show columns.
     @teammate_review_exist = {}
     @meta_review_exist = {}
     # used to calculate required colspan for a particular assignment
+    # which is then utlized in html file to assign the colspan value for assignment headers
+    # 0 implies the absence of column and 1 implies the presence of column
     @assignment_columns = {}
     # for course
     # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
@@ -41,7 +44,7 @@ class Assessment360Controller < ApplicationController
         @meta_review[cp.id] = {} unless @meta_review.key?(cp.id)
         @teammate_review[cp.id] = {} unless @teammate_review.key?(cp.id)
         assignment_participant = assignment.participants.find_by(user_id: cp.user_id)
-        # initializing assignment_columns with default 0 for all the columns
+        # initializing assignment_columns with default 0 colspan for all the columns
         @assignment_columns[assignment.id].nil? ? @assignment_columns[assignment.id] = {} : nil
         @assignment_columns[assignment.id]["meta_review"].nil? ? @assignment_columns[assignment.id]["meta_review"] = 0 : nil
         @assignment_columns[assignment.id]["teammate_review"].nil? ? @assignment_columns[assignment.id]["teammate_review"] = 0 : nil
@@ -117,11 +120,14 @@ class Assessment360Controller < ApplicationController
     # store total number of grades and reviews which are not nil
     @total_final_grades = {}
     @total_peer_reviews = {}
-    # hashmaps of assignments to store if an entire column is empty
+    # hashmaps to map assignment id's to existence of columns
+    # nil implies absence and true implies presence of columns. These are utlized by the UI to conditionally show columns.
     @topics_exist = {}
     @assignment_grades_exist = {}
     @peer_review_scores_exist = {}
     # used to calculate required colspan for a particular assignment
+    # which is then utlized in html file to assign the colspan value for assignment headers
+    # 0 implies the absence of column and 1 implies the presence of column
     @assignment_columns = {}
     course = Course.find(params[:course_id])
     @assignments = course.assignments.reject(&:is_calibrated).reject { |a| a.participants.empty? }
@@ -138,7 +144,7 @@ class Assessment360Controller < ApplicationController
       @assignments.each do |assignment|
         user_id = cp.user_id
         assignment_id = assignment.id
-        # initializing assignment_columns with default 0 for all the columns
+        # initializing assignment_columns with default 0 colspan for all the columns
         @assignment_columns[assignment.id].nil? ? @assignment_columns[assignment.id] = {} : nil
         @assignment_columns[assignment_id]["topics"].nil? ? @assignment_columns[assignment_id]["topics"] = 0 : nil
         @assignment_columns[assignment_id]["peer_review"].nil? ? @assignment_columns[assignment_id]["peer_review"] = 0 : nil

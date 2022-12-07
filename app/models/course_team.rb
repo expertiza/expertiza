@@ -61,17 +61,6 @@ class CourseTeam < Team
     fields.push('Course Name')
   end
 
-  # Add member to the course team
-  def add_member(user, _id = nil)
-    raise "The user \"#{user.name}\" is already a member of the team, \"#{name}\"" if user?(user)
-
-    add_participant(parent_id, user)
-    participant = CourseParticipant.find_by(parent_id: parent_id, user_id: user.id)
-    t_user = TeamsUser.create(participant_id: participant.id, team_id: id)
-    parent = TeamNode.find_by(node_object_id: id)
-    TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
-  end
-
   # Add participant to a team.
   # Raise exception if the participant is already part of this team.
   def add_participant_to_team(participant, _id = nil)

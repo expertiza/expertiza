@@ -24,9 +24,9 @@ class Team < ApplicationRecord
     # load directly using participant_ids
     participants_list_from_ids = Participant.where(id: participant_ids)
 
-    unless participants_list_from_ids.nil?
+    unless participants_list_from_ids.empty?
       participants_list = []
-      participants_list += participants_list_from_ids unless participants_list_from_ids.nil?
+      participants_list.append(participants_list_from_ids)
       participants_list
     end
   end
@@ -61,6 +61,7 @@ class Team < ApplicationRecord
 
   # Check if the user exist in the team
   def user?(user)
+    puts "printing User #{user}"
     participant = AssignmentParticipant.find_by(parent_id: parent_id, user_id: user.id)
     return false if participant.nil?
 
@@ -69,6 +70,7 @@ class Team < ApplicationRecord
 
   # Check if the participant is part of this team
   def participant?(participant)
+    puts "printing Participant #{participant}"
     participants.include? participant
   end
 

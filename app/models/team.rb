@@ -61,7 +61,6 @@ class Team < ApplicationRecord
 
   # Check if the user exist in the team
   def user?(user)
-    puts "printing User #{user}"
     participant = AssignmentParticipant.find_by(parent_id: parent_id, user_id: user.id)
     return false if participant.nil?
 
@@ -70,7 +69,6 @@ class Team < ApplicationRecord
 
   # Check if the participant is part of this team
   def participant?(participant)
-    puts "printing Participant #{participant}"
     participants.include? participant
   end
 

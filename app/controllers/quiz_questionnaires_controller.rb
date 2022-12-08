@@ -289,7 +289,7 @@ class QuizQuestionnairesController < QuestionnairesController
                                           :max_question_score, :type, :display_type, :instruction_loc)
   end
  
-  # Return all the quizzes created by the student for the assignment.
+  # Return all the quizzes created by team for the assignment.
   def review_questions
     @quiz_creator_user_id = params[:aid]
     @quiz_questionnaires = []

@@ -19,11 +19,11 @@ set :local_assets_dir, %w[public/assets public/att]
 set :locals_rails_env, 'production'
 
 # config valid for current version and patch releases of Capistrano
-lock '~> 3.10.1'
+# lock '~> 3.10.1'
 
 set :application, 'expertiza'
 set :repo_url, 'https://github.com/expertiza/expertiza.git'
-set :rvm_ruby_version, '2.2.7'
+set :rvm_ruby_version, '2.4'
 # Default branch is :main
 # ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
 
@@ -44,8 +44,8 @@ set :rvm_ruby_version, '2.2.7'
 # append :linked_files, "config/database.yml", "config/secrets.yml"
 set :linked_files, %w[config/database.yml
                       config/secrets.yml
-                      public1.pem
-                      private2.pem]
+                      public.pem
+                      private.pem]
 
 # Default value for linked_dirs is []
 # append :linked_dirs, "log", "tmp/pids", "tmp/cache", "tmp/sockets", "public/system"
@@ -55,7 +55,7 @@ set :linked_dirs, %w[log pg_data vendor/assets/components]
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
 set :default_env,
     'PASSENGER_INSTANCE_REGISTRY_DIR' => '/var/run/passenger-instreg',
-    'JAVA_HOME' => '/usr/lib/jvm/java-1.8.0-openjdk.x86_64'
+    'JAVA_HOME' => '/usr/jdk-11'
 
 # Default value for local_user is ENV['USER']
 # set :local_user, -> { `git config user.name`.chomp }

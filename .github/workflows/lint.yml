@@ -1,6 +1,6 @@
 name: Lint
 
-on: [pull_request]
+on: [workflow_dispatch, pull_request]
 
 jobs:
   codespell:
@@ -10,9 +10,9 @@ jobs:
       matrix:
         python-version: [3.8]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
@@ -27,7 +27,7 @@ jobs:
     name: Check spelling all files in commit with misspell
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install
         run: wget -O - -q https://git.io/misspell | sh -s -- -b .
       - name: Misspell

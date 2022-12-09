@@ -67,7 +67,7 @@ jobs:
       - name: Format code coverage report
         run: ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.${{ matrix.folder }}.json"
 
-      - name: Upload coverage articats
+      - name: Upload coverage artifacts
         uses: actions/upload-artifact@v3
         with:
           name: code-coverage-artifacts
@@ -89,7 +89,7 @@ jobs:
           curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
           chmod +x ./cc-test-reporter
           ./cc-test-reporter sum-coverage coverage/codeclimate.*.json 
-          ./cc-test-reporter after-build -t simplecov -r "${{ secrets.CC_TEST_REPORTER_ID }}" 
+          ./cc-test-reporter after-build -t simplecov -r ${{ secrets.CC_TEST_REPORTER_ID }}
   
   deploy-on-dev:
     needs: test

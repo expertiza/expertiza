@@ -1,0 +1,16 @@
+name: Ansible System Setup
+on:
+  workflow_dispatch:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run playbook
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: setup/setup_playbook.yml
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          inventory: node ansible_host=${{ secrets.SSH_HOST }} ansible_user=${{ secrets.SSH_USER }}
+          options: --verbose

@@ -26,7 +26,7 @@ class Team < ApplicationRecord
 
     unless participants_list_from_ids.empty?
       participants_list = []
-      participants_list.append(participants_list_from_ids)
+      participants_list.push(*participants_list_from_ids) unless participants_list_from_ids.empty?
       participants_list
     end
   end

@@ -55,7 +55,6 @@ class TeamsUsersController < ApplicationController
         else
           begin
             participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
-            # flash[:error] = "User from user_id #{user.id}, user from participant id #{participant.id},#{participant.id}"
             add_member_return = team.add_participant_to_team(participant, team.parent_id)
           rescue
             flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
@@ -80,12 +79,16 @@ class TeamsUsersController < ApplicationController
           redirect_back fallback_location: root_path
           return
         end
-        if CourseParticipant.find_by(user_id: user.id, parent_id: course.id).nil?
+
+        # E2283: Find the participant in the course using user id and course id
+        participant = CourseParticipant.find_by(user_id: user.id, parent_id: course.id)
+        
+        if participant.nil?
           urlCourseParticipantList = url_for controller: 'participants', action: 'list', id: course.id, model: 'Course', authorization: 'participant'
           flash[:error] = "\"#{user.name}\" is not a participant of the current course. Please <a href=\"#{urlCourseParticipantList}\">add</a> this user before continuing."
         else
           begin
-            add_member_return = team.add_member(user, team.parent_id)
+            add_member_return = team.add_participant_to_team(participant, team.parent_id)
           rescue
             flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
             redirect_back fallback_location: root_path
@@ -103,10 +106,14 @@ class TeamsUsersController < ApplicationController
     redirect_to controller: 'teams', action: 'list', id: team.parent_id
   end
 
+  ##
+  # Delte participant from an assignment when it is not in a team and is not assigned to review someone's else work 
+  ##
   def delete
     @teams_user = TeamsUser.find(params[:id])
     parent_id = Team.find(@teams_user.team_id).parent_id
-    @user = User.find(@teams_user.user_id)
+    participant = participant.find_by(id: @teams_user.participant_id)
+    @user = User.find(participant.user_id)
     @teams_user.destroy
     undo_link("The team user \"#{@user.name}\" has been successfully removed. ")
     redirect_to controller: 'teams', action: 'list', id: parent_id

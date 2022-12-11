@@ -25,6 +25,8 @@ describe StudentQuizzesController do
     let(:instructor) {
         build(:instructor, id: 6) #creating admin
     }
+    
+    # Testing the action_allowed method which returns a boolean whether the logged in user has permissions to perform a particular action or not.
     describe "#action_allowed?" do
         it "when the current user is admin" do
             # To stub the user into session
@@ -48,6 +50,7 @@ describe StudentQuizzesController do
             expect(controller.send(:action_allowed?)).to be true
     end
 
+    # Tests the index method in the controller
     describe "GET index" do
         render_views
         it "call index method" do

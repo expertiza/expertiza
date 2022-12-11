@@ -1,6 +1,9 @@
 class TeamsUsersController < ApplicationController
   include AuthorizationHelper
 
+  ##
+  # E2283: Return true if the current user is student else return false
+  ##
   def action_allowed?
     # Allow duty updation for a team if current user is student, else require TA or above Privileges.
     if %w[update_duties].include? params[:action]
@@ -10,6 +13,9 @@ class TeamsUsersController < ApplicationController
     end
   end
 
+  ##
+  # E2283: Auto completes the username when the user enters the username in the field
+  ##
   def auto_complete_for_user_name
     team = Team.find(session[:team_id])
     @users = team.get_possible_team_members(params[:user][:name])
@@ -23,6 +29,9 @@ class TeamsUsersController < ApplicationController
     redirect_to controller: 'student_teams', action: 'view', student_id: params[:participant_id]
   end
 
+  ##
+  # E2283: Show the list of team members with their credentials, 10 per page on the team formation page 
+  ##
   def list
     @team = Team.find(params[:id])
     @assignment = Assignment.find(@team.parent_id)
@@ -33,6 +42,10 @@ class TeamsUsersController < ApplicationController
     @team = Team.find(params[:id])
   end
 
+  ##
+  # E2283: Creating a user and adding it to the team. A user cannot be added if he/she is not a participant in the current course and is not added to the
+  # assignmnet. The participant can also not be added if the team has reached it's limit.
+  ##
   def create
     user = User.find_by(name: params[:user][:name].strip)
     unless user

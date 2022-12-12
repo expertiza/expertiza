@@ -30,7 +30,7 @@ class TeamsUsersController < ApplicationController
   end
 
   ##
-  # E2283: Show the list of team members with their credentials, 10 per page on the team formation page 
+  # E2283: Show the list of team members with their credentials, 10 per page on the team formation page
   ##
   def list
     @team = Team.find(params[:id])
@@ -57,17 +57,17 @@ class TeamsUsersController < ApplicationController
     unless user.nil?
       if team.is_a?(AssignmentTeam)
         assignment = Assignment.find(team.parent_id)
-        if assignment.user_on_team?(user)
+        participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
+        if assignment.participant_on_team?(participant)
           flash[:error] = "This user is already assigned to a team for this assignment"
           redirect_back fallback_location: root_path
           return
         end
-        if AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id).nil?
+        if participant.nil?
           urlAssignmentParticipantList = url_for controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment', authorization: 'participant'
           flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
         else
           begin
-            participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
             add_member_return = team.add_participant_to_team(participant, team.parent_id)
           rescue
             flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
@@ -87,15 +87,14 @@ class TeamsUsersController < ApplicationController
         end
       else # CourseTeam
         course = Course.find(team.parent_id)
-        if course.user_on_team?(user)
+        # E2283: Find the participant in the course using user id and course id
+        participant = CourseParticipant.find_by(user_id: user.id, parent_id: course.id)
+        if course.participant_on_team?(participant)
           flash[:error] = "This user is already assigned to a team for this course"
           redirect_back fallback_location: root_path
           return
         end
 
-        # E2283: Find the participant in the course using user id and course id
-        participant = CourseParticipant.find_by(user_id: user.id, parent_id: course.id)
-        
         if participant.nil?
           urlCourseParticipantList = url_for controller: 'participants', action: 'list', id: course.id, model: 'Course', authorization: 'participant'
           flash[:error] = "\"#{user.name}\" is not a participant of the current course. Please <a href=\"#{urlCourseParticipantList}\">add</a> this user before continuing."

@@ -1,6 +1,6 @@
 class Team < ApplicationRecord
   has_many :teams_users, dependent: :destroy
-  has_many :users, through: :teams_users
+  # has_many :users, through: :teams_users
   has_many :join_team_requests, dependent: :destroy
   has_one :team_node, foreign_key: :node_object_id, dependent: :destroy
   has_many :signed_up_teams, dependent: :destroy
@@ -14,23 +14,6 @@ class Team < ApplicationRecord
     team_user = TeamsUser.where(user_id: user_id).find { |team_user_obj| team_user_obj.team.parent_id == assignment_id } if team_user.nil?
     Team.find(team_user.team_id)
   end
-
- # E2283 Remove this function when user_id is removed from teams_users table
-  # teams_participants table now stores participant_id instead of user_id but, older entries
-  # have user_id mapping. This function loads participants details directly from the mapping
-  # as well as from user_id if some entries use user_id mapping.
-  # Get the participants of the given team
-  def participants
-    # load directly using participant_ids
-    participants_list_from_ids = Participant.where(id: participant_ids)
-
-    unless participants_list_from_ids.empty?
-      participants_list = []
-      participants_list.push(*participants_list_from_ids) unless participants_list_from_ids.empty?
-      participants_list
-    end
-  end
-  alias get_participants participants
 
   # Get the response review map
   def responses

@@ -47,13 +47,13 @@ class Assignment < ApplicationRecord
   DEFAULT_MAX_REVIEWERS = 3
   DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
 
-  def user_on_team?(user)
+   def participant_on_team?(participant)
     teams = self.teams
-    users = []
+    result = false
     teams.each do |team|
-      users << team.users
+      result ||= team.participant?(participant)
     end
-    users.flatten.include? user
+    result
   end
 
   def self.max_outstanding_reviews

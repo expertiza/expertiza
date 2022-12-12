@@ -5,7 +5,6 @@ class Team < ApplicationRecord
   has_one :team_node, foreign_key: :node_object_id, dependent: :destroy
   has_many :signed_up_teams, dependent: :destroy
   has_many :bids, dependent: :destroy
-  has_many :waitlist_teams, foreign_key: 'team_id', dependent: :destroy
   has_paper_trail
 
   scope :find_team_for_assignment_and_user, lambda { |assignment_id, user_id|

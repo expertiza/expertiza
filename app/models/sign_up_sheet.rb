@@ -47,7 +47,7 @@ class SignUpSheet < ApplicationRecord
     sign_up.is_waitlisted = false
     # Create new record in signed_up_teams table
     result = sign_up.save
-    WaitlistTeamController.delete_all_waitlists_for_team(sign_up.team_id)
+    WaitlistController.delete_all_waitlists_for_team(sign_up.team_id)
     ExpertizaLogger.info LoggerMessage.new('SignUpSheet', user_id, "Sign up sheet created with teamId #{sign_up.team_id}")
     result
   end

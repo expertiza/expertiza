@@ -6,7 +6,7 @@ class WaitlistTeam < ApplicationRecord
   validates :topic_id, uniqueness: { scope: :team_id }
 
   # Creates a new instance of waitlist team using the topic and users team
-  # More specifcally adds the team to the database
+  # More specifically adds the team to the database
   def self.add_team_to_topic_waitlist(team_id, topic_id, user_id)
     new_waitlist = WaitlistTeam.new
     new_waitlist.topic_id = topic_id

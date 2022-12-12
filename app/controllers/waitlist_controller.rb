@@ -1,20 +1,20 @@
-class WaitlistTeamController < ApplicationController
+class WaitlistController < ApplicationController
   include AuthorizationHelper
 
   # Determines first team on waitlist based on date/time of entry
   # into the database
-  def self.first_team_in_waitlist_for_topic(topic_id)
+  def self.first_team_on_waitlist(topic_id)
     waitlisted_team_for_topic = WaitlistTeam.where(topic_id: topic_id).order("created_at ASC").first
     waitlisted_team_for_topic
   end
 
   # Searches database for waitlist entries for team
-  def self.team_has_any_waitlists?(team_id)
+  def self.team_is_on_any_waitlists?(team_id)
     WaitlistTeam.where(team_id: team_id).empty?
   end
 
   # Searches database for waitlist entries for topic
-  def self.topic_has_any_waitlists?(topic_id)
+  def self.topic_has_waitlist?(topic_id)
     WaitlistTeam.where(topic_id: topic_id).empty?
   end
 
@@ -79,10 +79,10 @@ class WaitlistTeamController < ApplicationController
 
   # Find team at top of queue and converts to SignedUpTeam
   # Returns team as a SignedUpTeam so it can be moved in proper database
-  def self.signup_first_waitlist_team(topic_id)
+  def self.sign_up_first_waitlisted_team(topic_id)
     sign_up_waitlist_team = nil
     ApplicationRecord.transaction do
-      first_waitlist_team = first_team_in_waitlist_for_topic(topic_id)
+      first_waitlist_team = first_team_on_waitlist(topic_id)
       unless first_waitlist_team.blank?
         sign_up_waitlist_team = SignedUpTeam.new
         sign_up_waitlist_team.topic_id = first_waitlist_team.topic_id

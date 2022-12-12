@@ -3,7 +3,7 @@
 <% @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)  %>
 <% @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id) %>
 <% @participants = SignedUpTeam.find_team_participants(@assignment.id, session[:ip])  %>
-<% @waitlisted_participants = WaitlistTeamController.find_waitlisted_teams_for_assignment(@assignment.id, session[:ip])  %>
+<% @waitlisted_participants = WaitlistController.find_waitlisted_teams_for_assignment(@assignment.id, session[:ip])  %>
 
 <!--Zhewei: the reason why we(E1524) put an empty form_tag is because these reasons:-->
 <!--1.Now we decide to remove the 'Edit sign up sheet' icon on assignment pop up dialog and merge these content into assignment->edit->topics panel-->

@@ -7,7 +7,7 @@
 <% @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)  %>
 <% @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id) %>
 <% @participants = SignedUpTeam.find_team_participants(@assignment.id, session[:ip])  %>
-<% @waitlisted_participants = WaitlistTeamController.find_waitlisted_teams_for_assignment(@assignment.id, session[:ip]) %>
+<% @waitlisted_participants = WaitlistController.find_waitlisted_teams_for_assignment(@assignment.id, session[:ip]) %>
 
 <a id="teamsAndMembers" onclick="showHideTeamAndMembers(<%= @sign_up_topics.size%>)">Hide all teams</a>
 <% unless @sign_up_topics.size.zero? %>

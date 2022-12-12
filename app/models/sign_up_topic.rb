@@ -41,13 +41,10 @@ class SignUpTopic < ApplicationRecord
 
   def self.find_slots_waitlisted(assignment_id)
     SignUpTopic.joins("JOIN signed_up_teams u ON sign_up_topics.id = u.topic_id").where("sign_up_topics.assignment_id = ? and u.is_waitlisted = true", assignment_id).group("sign_up_topics.id").select("topic_id as topic_id, COUNT(sign_up_topics.max_choosers) as count")
-    # SignUpTopic.find_by_sql(['SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id = ? and u.is_waitlisted = true GROUP BY t.id', assignment_id])
   end
 
   def self.find_waitlisted_topics(assignment_id, team_id)
-    # SignUpTopic.joins("signed_up_teams").where("sign_up_topics.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = ? and u.team_id = ?", assignment_id.to_s).select("u.id")
-    # SignedUpTeam.find_by_sql("SELECT u.id FROM sign_up_topics t, signed_up_teams u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = " + assignment_id.to_s + " and u.team_id = " + team_id.to_s)
-    SignedUpTeam.find_by_sql(['SELECT u.id FROM sign_up_topics t, signed_up_teams u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = ? and u.team_id = ?', assignment_id.to_s, team_id.to_s])
+    SignUpTopic.joins("signed_up_teams").where("sign_up_topics.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = ? and u.team_id = ?", assignment_id.to_s, team_id.to_s).select("u.id")
   end
 
   def self.slotAvailable?(topic_id)
@@ -134,7 +131,10 @@ class SignUpTopic < ApplicationRecord
     if waitlisted_signed_up_teams.present?
       waitlisted_signed_up_teams.each do |waitlisted_signed_up_team|
         assignment_team = AssignmentTeam.find(waitlisted_signed_up_team.team_id)
-        waitlisted_users << assignment_team.users
+        assignment_team.participants.each do |participant|
+          waitlisted_users << User.find(participant.user_id)
+        end
+        # waitlisted_users << assignment_team.users
       end
     end
     waitlisted_users.flatten

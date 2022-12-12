@@ -2,9 +2,11 @@ describe SignUpTopic do
   let(:topic) { build(:topic) }
   let(:suggestion) { build(:suggestion, id: 1, assignment_id: 1) }
   let(:signed_up_team) { build(:signed_up_team) }
-  let(:team) { create(:assignment_team, id: 1, name: 'team 1', users: [user, user2]) }
+  let(:team) { create(:assignment_team, id: 1, name: 'team 1', participants: [participant, participant2]) }
   let(:user) { create(:student) }
   let(:user2) { create(:student, name: 'qwertyui', id: 5) }
+  let(:participant) { build(:participant, id: 1, user_id: user.id, parent_id: 1) }
+  let(:participant2) { build(:participant, id: 2, user_id: user2.id, parent_id: 1) }
   describe '.import' do
     context 'when record is empty' do
       it 'raises an ArgumentError' do

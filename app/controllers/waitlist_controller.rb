@@ -1,4 +1,4 @@
-class WaitlistTeamController < ApplicationController
+class WaitlistController < ApplicationController
   include AuthorizationHelper
 
   # Determines first team on waitlist based on date/time of entry

@@ -59,7 +59,7 @@ class SignedUpTeam < ApplicationRecord
   # If a signup sheet exists then release topics that the given team has selected for the given assignment.
   def self.release_topics_selected_by_team(team_id)
     delete_all_signed_up_topics_for_team(team_id)
-    WaitlistTeamController.delete_all_waitlists_for_team(team_id)
+    WaitlistController.delete_all_waitlists_for_team(team_id)
   end
 
   def self.topic_id(assignment_id, user_id)
@@ -85,7 +85,7 @@ class SignedUpTeam < ApplicationRecord
         signed_up_teams_for_topic = SignedUpTeam.where(topic_id: topic_id)
         max_choosers_for_topic = SignUpTopic.find(topic_id).max_choosers
         if signed_up_teams_for_topic.size < max_choosers_for_topic
-          WaitlistTeamController.signup_first_waitlist_team topic_id
+          WaitlistController.signup_first_waitlist_team topic_id
         end
       end
     end

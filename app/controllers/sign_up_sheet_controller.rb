@@ -158,7 +158,7 @@ class SignUpSheetController < ApplicationController
     # Though called participants, @participants are actually records in signed_up_teams table, which
     # is a mapping table between teams and topics (waitlisted recorded are also counted)
     @participants = SignedUpTeam.find_team_participants(assignment_id, session[:ip])
-    @waitlisted_participants = WaitlistTeamController.find_waitlisted_teams_for_assignment(assignment_id, session[:ip])
+    @waitlisted_participants = WaitlistController.find_waitlisted_teams_for_assignment(assignment_id, session[:ip])
   end
 
   def set_values_for_new_topic
@@ -225,7 +225,7 @@ class SignUpSheetController < ApplicationController
         @waitlisted_topics = nil
       else
         @selected_topics = SignedUpTeam.find_user_signup_topics(@assignment.id, users_team.first.t_id)
-        @waitlisted_topics = WaitlistTeamController.get_all_waitlists_for_team(users_team.first.t_id)
+        @waitlisted_topics = WaitlistController.get_all_waitlists_for_team(users_team.first.t_id)
       end
     end
     render('sign_up_sheet/intelligent_topic_selection') && return if @assignment.is_intelligent
@@ -442,7 +442,7 @@ class SignUpSheetController < ApplicationController
       SignedUpTeam.where(team_id: team_id).first.update_attribute('topic_id', params[:topic_id].to_i)
     end
     # check the waitlist of original topic. Let the first waitlisted team hold the topic, if exists.
-    waitlisted_teams = WaitlistTeamController.first_team_in_waitlist_for_topic(original_topic_id)
+    waitlisted_teams = WaitlistController.first_team_in_waitlist_for_topic(original_topic_id)
     if waitlisted_teams.present?
       waitlisted_first_team_first_user_id = TeamsUser.where(team_id: waitlisted_teams.first.team_id).first.user_id
       SignUpSheet.signup_team(assignment.id, waitlisted_first_team_first_user_id, original_topic_id)

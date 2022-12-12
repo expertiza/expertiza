@@ -442,7 +442,7 @@ class SignUpSheetController < ApplicationController
       SignedUpTeam.where(team_id: team_id).first.update_attribute('topic_id', params[:topic_id].to_i)
     end
     # check the waitlist of original topic. Let the first waitlisted team hold the topic, if exists.
-    waitlisted_teams = WaitlistController.first_team_in_waitlist_for_topic(original_topic_id)
+    waitlisted_teams = WaitlistController.first_team_on_waitlist(original_topic_id)
     if waitlisted_teams.present?
       waitlisted_first_team_first_user_id = TeamsUser.where(team_id: waitlisted_teams.first.team_id).first.user_id
       SignUpSheet.signup_team(assignment.id, waitlisted_first_team_first_user_id, original_topic_id)

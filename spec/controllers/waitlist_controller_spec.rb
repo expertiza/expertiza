@@ -26,19 +26,19 @@ describe WaitlistController do
 
     it 'adds first waitlist team in the topic waitlist' do
       WaitlistTeam.add_team_to_topic_waitlist(waitlist_team1.team_id, waitlist_team1.topic_id,1)
-      signed_up_team = WaitlistController.signup_first_waitlist_team(1)
+      signed_up_team = WaitlistController.sign_up_first_waitlisted_team(1)
       expect(signed_up_team).to be_instance_of(SignedUpTeam) or  expect(signed_up_team).to be_nil
-      expect(WaitlistController.team_has_any_waitlists?(waitlist_team1.team_id)).to be_truthy
+      expect(WaitlistController.team_is_on_any_waitlists?(waitlist_team1.team_id)).to be_truthy
     end
     
     it 'check if team does not has any waitlists' do
       WaitlistTeam.add_team_to_topic_waitlist(waitlist_team1.team_id, waitlist_team1.topic_id,1)
-      expect(WaitlistController.team_has_any_waitlists?(waitlist_team1.team_id)).to be_falsey
+      expect(WaitlistController.team_is_on_any_waitlists?(waitlist_team1.team_id)).to be_falsey
     end
     
     it 'check if topic does not has any waitlists' do
       WaitlistTeam.add_team_to_topic_waitlist(waitlist_team1.team_id, waitlist_team1.topic_id,1)
-      expect(WaitlistController.topic_has_any_waitlists?(waitlist_team1.topic_id)).to be_falsey
+      expect(WaitlistController.topic_has_waitlist?(waitlist_team1.topic_id)).to be_falsey
     end
     
     it 'check and delete all waitlists for a team' do

@@ -85,7 +85,7 @@ class SignedUpTeam < ApplicationRecord
         signed_up_teams_for_topic = SignedUpTeam.where(topic_id: topic_id)
         max_choosers_for_topic = SignUpTopic.find(topic_id).max_choosers
         if signed_up_teams_for_topic.size < max_choosers_for_topic
-          WaitlistController.signup_first_waitlist_team topic_id
+          WaitlistController.sign_up_first_waitlisted_team topic_id
         end
       end
     end

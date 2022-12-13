@@ -295,6 +295,7 @@ class Team < ApplicationRecord
   end
 
   # Copies Team to a particular assignment along with the associated TeamUsers, TeamUserNodes and Participants
+  # and it used while copying calibration submissions.
   def copy_to_another_assignment(new_assignment)
     new_team = dup
     new_team.parent_id = new_assignment.id

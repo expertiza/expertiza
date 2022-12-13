@@ -153,6 +153,7 @@ class Participant < ApplicationRecord
   end
 
   # Creates a duplicate Participant object, associates the new object to a specific Assignment
+  # and it used while copying calibration submissions.
   def copy_to_another_assignment(assignment)
     new_participant = dup
     new_participant.parent_id = assignment.id

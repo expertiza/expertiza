@@ -39,6 +39,7 @@ class Answer < ApplicationRecord
   end
 
   # Creates a duplicate Answer, associates the new Answer object to the specified Response object
+  # and it used while copying calibration submissions.
   def copy_to_response(response)
     new_answer = dup
     new_answer.response_id = response.id

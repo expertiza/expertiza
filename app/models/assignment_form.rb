@@ -434,7 +434,9 @@ class AssignmentForm
 
       # Copies all calibration submissions along with Participants, Teams, TeamUsers, SubmissionRecords and Responses
       # of the old assignment on to the new Assignment
-      old_assign.copy_calibration_submissions(new_assign)
+      if old_assign.is_calibrated
+        old_assign.copy_calibration_submissions(new_assign)
+      end
 
       # also copy topics from old assignment
       topics = SignUpTopic.where(assignment_id: old_assign.id)

@@ -293,30 +293,4 @@ class Team < ApplicationRecord
       nil
     end
   end
-
-  # Copies Team to a particular assignment along with the associated TeamUsers, TeamUserNodes and Participants
-  # and it used while copying calibration submissions.
-  def copy_to_another_assignment(new_assignment)
-    new_team = dup
-    new_team.parent_id = new_assignment.id
-    new_team.save
-
-    copy_members(new_team)
-
-    # Creates a new Participant for every User in the Team and associates the Participant to the new Assignment
-    team_users = TeamsUser.where(team_id: new_team.id)
-    team_users.each do |team_user|
-      # Checks if Participant for the new Assignment is missing for the given User
-      participant_missing = Participant.where(
-        parent_id: new_assignment.id, user_id: team_user.user_id
-      ).first.nil?
-
-      if participant_missing
-        participant = Participant.where(parent_id: parent_id, user_id: team_user.user_id).first
-        participant.copy_to_another_assignment(new_assignment)
-      end
-    end
-
-    new_team
-  end
 end

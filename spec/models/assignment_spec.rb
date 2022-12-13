@@ -13,7 +13,7 @@ describe Assignment do
   let(:course) { build(:course) }
   let(:assignment_due_date) do
     build(:assignment_due_date, due_at: '2011-11-11 11:11:11', deadline_name: 'Review',
-          description_url: 'https://expertiza.ncsu.edu/', round: 1)
+                                description_url: 'https://expertiza.ncsu.edu/', round: 1)
   end
   let(:topic_due_date) { build(:topic_due_date, deadline_name: 'Submission', description_url: 'https://github.com/expertiza/expertiza') }
   let(:deadline_type) { build(:deadline_type, id: 1) }

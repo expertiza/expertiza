@@ -231,7 +231,7 @@ describe Response do
       allow(assignment).to receive(:num_review_rounds).and_return(2)
       allow(Question).to receive(:get_all_questions_with_comments_available).with(1).and_return([1, 2])
       allow(ReviewResponseMap).to receive_message_chain(:where, :find_each).with(reviewed_object_id: 1, reviewer_id: 1)
-                                                                           .with(no_args).and_yield(review_response_map)
+        .with(no_args).and_yield(review_response_map)
       response1 = double('Response', round: 1, additional_comment: '')
       response2 = double('Response', round: 2, additional_comment: 'LGTM')
       allow(review_response_map).to receive(:response).and_return([response1, response2])
@@ -295,8 +295,8 @@ describe Response do
       allow(calibration_response_map).to receive(:response).and_return([calibration_response])
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow(AssignmentQuestionnaire).to receive(:find_by)
-                                          .with(['assignment_id = ? and questionnaire_id IN (?)', 1, ReviewQuestionnaire.select('id')])
-                                          .and_return(assignment_questionnaire)
+        .with(['assignment_id = ? and questionnaire_id IN (?)', 1, ReviewQuestionnaire.select('id')])
+        .and_return(assignment_questionnaire)
     end
   end
 
@@ -314,18 +314,18 @@ describe Response do
       mail = double
       allow(mail).to receive(:deliver_now)
       expect(Mailer).to receive(:notify_grade_conflict_message)
-                          .with(to: assignment.instructor.email,
-                                subject: 'Expertiza Notification: A review score is outside the acceptable range',
-                                body: {
-                                  reviewer_name: 'no one',
-                                  type: 'review',
-                                  reviewee_name: 'no one2',
-                                  new_score: 0.5,
-                                  assignment: assignment,
-                                  conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=1',
-                                  summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=2',
-                                  assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/1/edit'
-                                }).and_return(mail)
+        .with(to: assignment.instructor.email,
+              subject: 'Expertiza Notification: A review score is outside the acceptable range',
+              body: {
+                reviewer_name: 'no one',
+                type: 'review',
+                reviewee_name: 'no one2',
+                new_score: 0.5,
+                assignment: assignment,
+                conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=1',
+                summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=2',
+                assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/1/edit'
+              }).and_return(mail)
       response.notify_instructor_on_difference
     end
   end

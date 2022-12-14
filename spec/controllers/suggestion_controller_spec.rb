@@ -49,7 +49,7 @@ describe SuggestionController do
   end
 
   describe '#add_comment' do
-    it 'adds a participant is succesfull' do
+    it 'adds a participant is successful' do
       allow(Assignment).to receive(:find).with('1').and_return(assignment)
       allow(User).to receive(:find_by).with(name: student.name).and_return(student)
       allow(SuggestionComment).to receive(:new).and_return(suggestion_comment)
@@ -59,7 +59,7 @@ describe SuggestionController do
       get :add_comment, params: request_params, session: user_session, xhr: true
       expect(flash[:notice]).to eq 'Your comment has been successfully added.'
     end
-    it 'adds a participant is not successfull' do
+    it 'adds a participant is not successful' do
       allow_any_instance_of(SuggestionComment).to receive(:save).and_return(false)
       request_params = { id: 1, suggestion_comment: { vote: 'Y', comments: 'comments' } }
       user_session = { user: instructor }
@@ -70,7 +70,7 @@ describe SuggestionController do
 
   describe '#submit' do
     context 'when you want to reject a suggestion' do
-      it 'rejecting a suggestion is succesfull' do
+      it 'rejecting a suggestion is successful' do
         allow(Suggestion).to receive(:find).and_return(suggestion)
         allow_any_instance_of(Suggestion).to receive(:update_attribute).and_return(true)
         request_params = { id: 1, reject: true }
@@ -78,7 +78,7 @@ describe SuggestionController do
         get :submit, params: request_params, session: user_session, xhr: true
         expect(flash[:notice]).to eq 'The suggestion has been successfully rejected.'
       end
-      it 'rejecting a suggestion is not successfull' do
+      it 'rejecting a suggestion is not successful' do
         allow_any_instance_of(Suggestion).to receive(:update_attribute).and_return(false)
         request_params = { id: 1, reject: true }
         user_session = { user: instructor }
@@ -87,7 +87,7 @@ describe SuggestionController do
       end
     end
     context 'when you want to accept a suggestion' do
-      it 'accept a suggestion is succesfull' do
+      it 'accept a suggestion is successful' do
         allow(Suggestion).to receive(:find).and_return(suggestion)
         allow(User).to receive(:find_by).and_return(instructor)
         allow(TeamsUser).to receive(:team_id).and_return(1)
@@ -99,7 +99,7 @@ describe SuggestionController do
         get :submit, params: request_params, session: user_session, xhr: true
         expect(flash[:success]).to eq 'The suggestion was successfully approved.'
       end
-      it 'accept a suggestion is not successfull' do
+      it 'accept a suggestion is not successful' do
         allow(SignUpTopic).to receive(:new_topic_from_suggestion).and_return('failed')
         allow_any_instance_of(SuggestionController).to receive(:notify_suggester).and_return(true)
         request_params = { id: 1, approve_suggestion: true }

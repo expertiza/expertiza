@@ -39,7 +39,7 @@ class TeamsController < ApplicationController
     end
   end
 
-  # Set the team parent for the new page
+  # Get the Assignment which the team is being created for
   def new
     session[:team_type] ||= 'Assignment'
     @parent = team_type.find(params[:id])
@@ -58,7 +58,7 @@ class TeamsController < ApplicationController
     end
   end
 
-  # Update a specific team and validate the new name
+  # Rename a team and validate the new name
   def update
     @team = Team.find(params[:id])
     if check_for_existing_team # Validate the new name

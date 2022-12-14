@@ -95,7 +95,7 @@ class Cake < ScoredQuestion
   # Finds all teammates and calculates the total contribution of all members for the question
   def get_total_score_for_question(review_type, question_id, participant_id, assignment_id, reviewee_id)
     # get the reviewer's team id for the currently answered question
-    team_id = Team.joins([:teams_users, teams_users: [{ user: :participants }]]).where('participants.id = ? and teams.parent_id in (?)', participant_id, assignment_id).first
+    team_id = Team.joins([:teams_users, teams_users: [{ participant: :participants }]]).where('participants.id = ? and teams.parent_id in (?)', participant_id, assignment_id).first
     team_id = team_id.id if team_id
     if review_type == 'TeammateReviewResponseMap'
       answers_for_team_members = get_answers_for_teammatereview(team_id, question_id, participant_id, assignment_id, reviewee_id)

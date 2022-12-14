@@ -7,7 +7,8 @@ describe SubmissionRecordsController do
 
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt', rounds_of_reviews: 2, instructor_id: 10) }
   let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
-  let(:team) { build(:assignment_team, id: 1, name: 'team no name', assignment: assignment, users: [student], parent_id: 1) }
+  let(:participant) { build(:participant, id: 1, user: student) }
+  let(:team) { build(:assignment_team, id: 1, name: 'team no name', assignment: assignment, participants: [participant], parent_id: 1) }
 
   let(:submission_record) { build(:submission_record, id: 1, team_id: 27158, assignment_id: 1) }
 

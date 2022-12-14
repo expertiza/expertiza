@@ -70,7 +70,7 @@ class Course < ApplicationRecord
   end
 
   def participant_on_team?(participant)
-    teams = self.teams
+    teams = get_teams
     result = false
     teams.each do |team|
       result ||= team.participant?(participant)

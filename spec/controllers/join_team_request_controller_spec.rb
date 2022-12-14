@@ -9,8 +9,11 @@ describe JoinTeamRequestsController do
           instructor_id: 2,
           participants: [build(:participant, id: 2, user_id: 1006, assignment: assignment1)],
           course_id: 1)
+  let(:user) { build(:user, id: 1) }
+  let(:participant) { build(:participant, id: 1, user_id: 1)}
+  let(:teamUser) { build(:team_user, id: 1, team_id: 1, participant: 1) }
   end
-  
+
   # Including the stubbed objects from the teams_shared.rb file
   include_context 'object initializations'
   # Including the shared method from the teams_shared.rb file

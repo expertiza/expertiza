@@ -169,7 +169,8 @@ class ReviewResponseMap < ResponseMap
 
   def email(defn, _participant, assignment)
     defn[:body][:type] = 'Peer Review'
-    AssignmentTeam.find(reviewee_id).users.each do |user|
+    AssignmentTeam.find(reviewee_id).participants.each do |participant|
+      user = User.find(participant.user_id)
       defn[:body][:obj_name] = assignment.name
       defn[:body][:first_name] = User.find(user.id).fullname
       defn[:to] = User.find(user.id).email

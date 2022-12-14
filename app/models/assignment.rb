@@ -454,13 +454,13 @@ class Assignment < ApplicationRecord
   # Populate answers will review information
   def self.generate_answer(answers, assignment)
     # get all response maps for this assignment
-    @response_maps_for_assignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{assignment.id}"])
+    @response_maps_for_assignment = ResponseMap.where("reviewed_object_id = ?",assignment.id)
     # for each map, get the response & answer associated with it
     @response_maps_for_assignment.each do |map|
-      @response_for_this_map = Response.find_by_sql(["SELECT * FROM responses WHERE map_id = #{map.id}"])
+      @response_for_this_map = Response.where("map_id = ?", map.id)
       # for this response, get the answer associated with it
       @response_for_this_map.each do |resp|
-        @associated_answers = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{resp.id}"])
+        @associated_answers = Answer.where("response_id = ?", resp.id)
         @associated_answers.each do |answer|
           answers[resp.round][map.type].push(answer)
         end

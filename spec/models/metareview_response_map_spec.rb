@@ -1,8 +1,8 @@
 describe MetareviewResponseMap do
-  let(:team) { build(:assignment_team, id: 1, name: 'team no name', assignment: assignment, users: [student], parent_id: 1) }
+  let(:team) { build(:assignment_team, id: 1, name: 'team no name', assignment: assignment, participants: [participant], parent_id: 1) }
   let(:team2) { build(:assignment_team, id: 3, name: 'no team') }
-  let(:team1) { build(:assignment_team, id: 2, name: 'team has name', assignment: assignment, users: [student]) }
-  let(:team3) { build(:assignment_team, id: 4, name: 'team has name1', assignment: assignment, users: [student1]) }
+  let(:team1) { build(:assignment_team, id: 2, name: 'team has name', assignment: assignment, participants: [participants]) }
+  let(:team3) { build(:assignment_team, id: 4, name: 'team has name1', assignment: assignment, participants: [participants1]) }
   let(:review_response_map) { build(:review_response_map, id: 1, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:review_response_map1) do
     build :review_response_map,
@@ -40,7 +40,7 @@ describe MetareviewResponseMap do
   let(:participant2) { build(:participant, id: 3, parent_id: 4, user: student2) }
   let(:qmetareview_response_map) { build(:meta_review_response_map, id: 3, review_mapping: review_response_map3, reviewee: participant2) }
   let(:review_response_map3) { build(:review_response_map, id: 3, assignment: assignment3, reviewer: participant, reviewee: team) }
-  
+
   let(:assignment_questionnaire3) { build(:assignment_questionnaire, id: 3, assignment_id: 4, questionnaire: questionnaire2) }
   before(:each) do
     allow(review_response_map).to receive(:response).and_return(response)

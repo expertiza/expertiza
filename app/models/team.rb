@@ -36,7 +36,8 @@ class Team < ApplicationRecord
   # Get the names of the users
   def author_names
     names = []
-    users.each do |user|
+    participants.each do |participant|
+      user = User.find(participant.user_id)
       names << user.fullname
     end
     names
@@ -84,7 +85,7 @@ class Team < ApplicationRecord
   # Add participant to a team.
   # Raise exception if the participant is already part of this team.
   def add_participant_to_team(participant, _assignment_id = nil)
-    raise "The user #{participant.name} is already a member of the team #{name}" if user?(participant.user)
+    raise "The user #{participant.name} is already a member of the team #{name}" if participant?(participant)
 
     can_add_member = false
     unless full?

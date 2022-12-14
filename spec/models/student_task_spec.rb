@@ -2,20 +2,21 @@ describe StudentTask do
   # Write your mocked object here!
   let(:participant) { build(:participant, id: 1, user_id: user.id, parent_id: assignment.id) }
   let(:participant2) { build(:participant, id: 2, user_id: user2.id, parent_id: assignment.id) }
+  let(:participant3) { build(:participant, id: 3, user_id: user3.id, parent_id: assignment.id) }
   let(:user) { create(:student) }
   let(:user2) { create(:student, name: 'qwertyui', id: 5) }
   let(:user3) { create(:student, name: 'qwertyui1234', id: 6) }
   let(:course) { build(:course) }
   let(:assignment) { build(:assignment, name: 'assignment', directory_path: 'assignment') }
   let(:assignment2) { build(:assignment, name: 'assignment2', directory_path: 'assignment2') }
-  let(:team) { create(:assignment_team, id: 1, name: 'team 1', parent_id: assignment.id, users: [user, user2]) }
-  let(:team2) { create(:assignment_team, id: 2, name: 'team 2', parent_id: assignment2.id, users: [user3]) }
-  let(:team_user) { create(:team_user, id: 3, team_id: team.id, user_id: user.id) }
-  let(:team_user2) { create(:team_user, id: 4, team_id: team.id, user_id: user2.id) }
-  let(:team2_user3) { create(:team_user, id: 5, team_id: team2.id, user_id: user3.id) }
+  let(:team) { create(:assignment_team, id: 1, name: 'team 1', parent_id: assignment.id, participants: [participant, participant2]) }
+  let(:team2) { create(:assignment_team, id: 2, name: 'team 2', parent_id: assignment2.id, participants: [participant3]) }
+  let(:team_user) { create(:team_user, id: 3, team_id: team.id, participant_id: participant.id) }
+  let(:team_user2) { create(:team_user, id: 4, team_id: team.id, participant_id: participant2.id) }
+  let(:team2_user3) { create(:team_user, id: 5, team_id: team2.id, participant_id: participant3.id) }
   let(:course_team) { create(:course_team, id: 3, name: 'course team 1', parent_id: course.id) }
-  let(:cource_team_user) { create(:team_user, id: 6, team_id: course_team.id, user_id: user.id) }
-  let(:cource_team_user2) { create(:team_user, id: 7, team_id: course_team.id, user_id: user2.id) }
+  let(:cource_team_user) { create(:team_user, id: 6, team_id: course_team.id, participant_id: participant.id) }
+  let(:cource_team_user2) { create(:team_user, id: 7, team_id: course_team.id, participant_id: participant2.id) }
   let(:topic) { build(:topic) }
   let(:topic2) { create(:topic, topic_name: 'TestReview') }
   let(:topic3) { create(:topic) }

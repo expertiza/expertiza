@@ -124,7 +124,7 @@ class TeamsUsersController < ApplicationController
   def delete
     @teams_user = TeamsUser.find(params[:id])
     parent_id = Team.find(@teams_user.team_id).parent_id
-    participant = participant.find_by(id: @teams_user.participant_id)
+    participant = Participant.find_by(id: @teams_user.participant_id)
     @user = User.find(participant.user_id)
     @teams_user.destroy
     undo_link("The team user \"#{@user.name}\" has been successfully removed. ")

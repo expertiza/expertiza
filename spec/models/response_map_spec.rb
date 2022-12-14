@@ -1,7 +1,7 @@
 describe ResponseMap do
-  let(:team) { build(:assignment_team, id: 1, name: 'team no name', assignment: assignment, users: [student], parent_id: 1) }
-  let(:team1) { build(:assignment_team, id: 2, name: 'team has name', assignment: assignment, users: [student1]) }
-  let(:team2) { build(:assignment_team, id: 3, name: 'team has a name', assignment: assignment, users: [student2]) }
+  let(:team) { build(:assignment_team, id: 1, name: 'team no name', assignment: assignment, participants: [participant], parent_id: 1) }
+  let(:team1) { build(:assignment_team, id: 2, name: 'team has name', assignment: assignment, participants: [participant1]) }
+  let(:team2) { build(:assignment_team, id: 3, name: 'team has a name', assignment: assignment, participants: [participant2]) }
   let(:participant) { build(:participant, id: 1, parent_id: 1, user: student) }
   let(:participant1) { build(:participant, id: 2, parent_id: 2, user: student1) }
   let(:participant2) { build(:participant, id: 3, parent_id: 3, user: student2) }

@@ -8,7 +8,7 @@ describe Team do
   let(:user2) { build(:student, id: 2) }
   let(:user3) { build(:student, id: 3) }
   let(:team_without_participants) { build(:assignment_team, id: 1, name: 'no team') }
-  let(:team) { build(:assignment_team, id: 1, name: 'no team', users: [user]) }
+  let(:team) { build(:assignment_team, id: 1, name: 'no team', participants: [participant]) }
   let(:team_with_participants_mapping) { build(:assignment_team, id: 1, name: 'no team with participants mapping', participants: [participant]) }
   let(:team_user) { build(:team_user, id: 1, user: user) }
   before(:each) do
@@ -45,6 +45,7 @@ describe Team do
 
   describe '#author_names' do
     it 'returns an array of author\'s name' do
+      allow(User).to receive(:find).with(1).and_return(user)
       expect(team.author_names).to eq(['no one'])
     end
   end
@@ -159,6 +160,9 @@ describe Team do
       allow(User).to receive(:find).with(1).and_return(user)
       allow(User).to receive(:find).with(2).and_return(user2)
       allow(User).to receive(:find).with(3).and_return(user3)
+      allow(Participant).to receive(:find).with(1).and_return(participant)
+      allow(Participant).to receive(:find).with(1).and_return(participant2)
+      allow(Participant).to receive(:find).with(1).and_return(participant3)
       allow(Team).to receive(:where).with(parent_id: 1, type: 'AssignmentTeam').and_return([team])
       allow(Team).to receive(:size).with(any_args).and_return(1)
       allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(true)

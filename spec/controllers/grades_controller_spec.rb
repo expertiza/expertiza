@@ -13,8 +13,9 @@ describe GradesController do
   let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
+  let(:participant6) { build(:participant, id: 6, user_id: 6) }
   let(:question) { build(:question) }
-  let(:team) { build(:assignment_team, id: 1, assignment: assignment, users: [instructor]) }
+  let(:team) { build(:assignment_team, id: 1, assignment: assignment, participants: [participant]) }
   let(:team2) { build(:assignment_team, id: 2, parent_id: 8) }
   let(:student) { build(:student, id: 2) }
   let(:review_response_map) { build(:review_response_map, id: 1) }

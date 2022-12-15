@@ -82,7 +82,7 @@ class LotteryController < ApplicationController
 
   # This method creates new AssignmentTeam objects based on the list of teams
   # received from the webservice
-  # It also creates the corresponding TeamNode and TeamsUsers and TeamUserNode
+  # It also creates the corresponding TeamNode and TeamsParticipant and TeamsParticipantNode
   # for each user in the new team while removing the users from any previous old
   # teams
   def create_new_teams_for_bidding_response(teams, assignment, users_bidding_info)
@@ -130,8 +130,8 @@ class LotteryController < ApplicationController
     # and we also need to think about, how to sort teams when they have the same team size and number of bids
     # maybe we can use timestamps in this case
     unassigned_teams.sort! do |t1, t2|
-      [TeamsUser.where(team_id: t2.id).size, Bid.where(team_id: t1.id).size] <=>
-        [TeamsUser.where(team_id: t1.id).size, Bid.where(team_id: t2.id).size]
+      [TeamsParticipant.where(team_id: t2.id).size, Bid.where(team_id: t1.id).size] <=>
+        [TeamsParticipant.where(team_id: t1.id).size, Bid.where(team_id: t2.id).size]
     end
 
     teams_bidding_info = construct_teams_bidding_info(unassigned_teams, sign_up_topics)

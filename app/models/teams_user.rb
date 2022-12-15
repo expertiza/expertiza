@@ -43,6 +43,7 @@ class TeamsUser < ApplicationRecord
     team_members.blank?
   end
 
+  # Fetch teams_user from team_id from teams table and user_id from participants table
   def self.find_by_team_id_and_user_id(team_id, user_id)
     if team_id != "0"
       assignment_id = Team.find(team_id).parent_id
@@ -52,11 +53,13 @@ class TeamsUser < ApplicationRecord
     teams_user
   end
 
+  # Fetch all the teams_user s with team_id and assignment_id
   def self.where_user_ids_and_assignment_id(user_ids, assignment_id)
     participant_ids = Assignment.find(assignment_id).participants.where(user_id: user_ids).pluck(:id)
     TeamsUser.where(participant_id: participant_ids)
   end
 
+  # Fetch teams_user s from user_id and assignment_id
   def self.find_in_assignment_by_user_ids(user_ids, assignment_id)
     participant_ids = Assignment.find(assignment_id).participants.where(user_id: user_ids).pluck(:id)
     TeamsUser.where(user_id: user_ids).or(TeamsUser.where(participant_id: participant_ids))

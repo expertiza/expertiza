@@ -43,7 +43,7 @@ class Team < ApplicationRecord
     names
   end
 
-  # Check if the user exist in the team
+  # Check if the user exists in the team
   def user?(user)
     participant = AssignmentParticipant.find_by(parent_id: parent_id, user_id: user.id)
     return false if participant.nil?

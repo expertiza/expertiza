@@ -47,6 +47,7 @@ class Assignment < ApplicationRecord
   DEFAULT_MAX_REVIEWERS = 3
   DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
 
+  # Check whether the participant is part of any team in this assignment.
    def participant_on_team?(participant)
     teams = self.teams
     result = false

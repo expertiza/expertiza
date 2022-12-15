@@ -69,6 +69,7 @@ class Course < ApplicationRecord
     end
   end
 
+  # Check whether the participant is part of any team in this course.
   def participant_on_team?(participant)
     teams = get_teams
     result = false

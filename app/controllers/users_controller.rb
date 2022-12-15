@@ -163,9 +163,9 @@ class UsersController < ApplicationController
     begin
       @user = User.find(params[:id])
       participant_ids = AssignmentParticipant.where(user_id: @user.id).pluck(:id)
-      TeamsParticipant.where(participant_id: participant_ids).each(&:delete)
+      TeamsUser.where(participant_id: participant_ids).each(&:delete)
       # AssignmentParticipant.where(user_id: @user.id).each(&:delete)
-      # TeamsParticipant.where(user_id: @user.id).each(&:delete)
+      # TeamsUser.where(user_id: @user.id).each(&:delete)
       AssignmentQuestionnaire.where(user_id: @user.id).each(&:destroy)
       # Participant.delete(true)
       @user.destroy

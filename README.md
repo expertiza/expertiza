@@ -23,9 +23,12 @@ and switch to another environment if you don't like the one you started with.
 
 Steps after getting a VCL reservation
   * Clone the code
-  * Run setup.sh
-  * Run gem install bundler -v 1.16.6
-  * bundle install
+  * Run `bash setup.sh`
+  * Run `sudo gem install bundler -v 1.16.6`
+  * Run `bundle install`
+  * Open `config/database.yml` and add the password as `expertiza`
+  * Run `rails db:migrate`
+  * Run `rails s`
 
 
 ### Installing locally

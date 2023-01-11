@@ -21,6 +21,13 @@ with network lag and having to reinstall gems every time you connect. Installing
 Life is full of tradeoffs. :-) The good news is that you can start on one environment, push your work to git,
 and switch to another environment if you don't like the one you started with.
 
+Steps after getting a VCL reservation
+  * Clone the code
+  * Run setup.sh
+  * Run gem install bundler -v 1.16.6
+  * bundle install
+
+
 ### Installing locally
 
 See the Google doc on [setting up the Expertiza development environment](https://docs.google.com/document/d/1tXmwju6R7KQbvycku-bdXxa6rXSUN4BMyvjY3ROmMSw/edit).

@@ -476,6 +476,7 @@ Expertiza::Application.routes.draw do
       get :remove_participant
       get :auto_complete_for_user_name
       get :edit
+      post :create
       post :update
     end
   end

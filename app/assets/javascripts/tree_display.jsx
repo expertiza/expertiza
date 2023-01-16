@@ -340,13 +340,13 @@ jQuery(document).ready(function() {
           </span>
         )
 
-        if (node_attributes.isCourse(this.props.dataType)) {
+        if (node_attributes.isCourse(this.props.nodeType)) {
           moreContent.push(<br />)
           moreContent.push(...node_attributes.course.getActions(parseInt(this.props.id) / 2))
 
         }
       }
-      if (node_attributes.isAssignment(this.props.dataType) && app_variables.homeActionShowFlag == 'true') {
+      if (node_attributes.isAssignment(this.props.nodeType) && app_variables.homeActionShowFlag == 'true') {
         // Assignment tab starts here
         // Now is_intelligent and Add Manager related buttons have not been added into the new UI
         moreContent.push(...node_attributes.assignment.getActions(this.props))

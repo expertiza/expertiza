@@ -325,6 +325,7 @@ Expertiza::Application.routes.draw do
     collection do
       post :response_report
       get :response_report
+      post :save_pastebin
     end
   end
 

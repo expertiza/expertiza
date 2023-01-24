@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220405222420) do
+ActiveRecord::Schema.define(version: 20221201154204) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -31,7 +31,6 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.string "value"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.decimal "confidence_level", precision: 10, scale: 5
     t.index ["answer_id"], name: "index_answer_tags_on_answer_id"
     t.index ["tag_prompt_deployment_id"], name: "index_answer_tags_on_tag_prompt_deployment_id"
     t.index ["user_id"], name: "index_answer_tags_on_user_id"
@@ -123,7 +122,6 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.boolean "is_answer_tagging_allowed"
     t.boolean "has_badge"
     t.boolean "allow_selecting_additional_reviews_after_1st_round"
-    t.integer "sample_assignment_id"
     t.boolean "vary_by_topic?", default: false
     t.boolean "vary_by_round?", default: false
     t.boolean "team_reviewing_enabled", default: false
@@ -136,7 +134,6 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.index ["course_id"], name: "fk_assignments_courses"
     t.index ["instructor_id"], name: "fk_assignments_instructors"
     t.index ["late_policy_id"], name: "fk_late_policy_id"
-    t.index ["sample_assignment_id"], name: "fk_rails_b01b82a1a2"
   end
 
   create_table "automated_metareviews", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -443,10 +440,6 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.index ["question_id"], name: "fk_question_question_advices"
   end
 
-  create_table "question_types", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.string "type"
-  end
-
   create_table "questionnaires", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name", limit: 64
     t.integer "instructor_id", default: 0, null: false
@@ -600,8 +593,8 @@ ActiveRecord::Schema.define(version: 20220405222420) do
   create_table "signed_up_teams", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "topic_id", default: 0, null: false
     t.integer "team_id", default: 0, null: false
-    t.boolean "is_waitlisted", default: false, null: false
     t.integer "preference_priority_number"
+    t.boolean "is_waitlisted", null: false
     t.index ["topic_id"], name: "fk_signed_up_users_sign_up_topics"
   end
 
@@ -629,7 +622,6 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.string "vote"
     t.integer "suggestion_id"
     t.datetime "created_at"
-    t.boolean "visible_to_student", default: false
   end
 
   create_table "suggestions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -709,7 +701,6 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.integer "directory_num"
     t.integer "grade_for_submission"
     t.text "comment_for_submission"
-    t.boolean "make_public", default: false
     t.integer "pair_programming_request", limit: 1
   end
 
@@ -723,13 +714,13 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.index ["user_id"], name: "fk_teams_users"
   end
 
-  create_table "track_notifications", id: :integer, force: :cascade, options: "ENGINE=MyISAM DEFAULT CHARSET=latin1" do |t|
+  create_table "track_notifications", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.integer "notification_id"
     t.integer "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer "notification_id", null: false
-    t.index ["notification_id"], name: "notification_id"
-    t.index ["user_id"], name: "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["notification_id"], name: "index_track_notifications_on_notification_id"
+    t.index ["user_id"], name: "index_track_notifications_on_user_id"
   end
 
   create_table "tree_folders", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -783,6 +774,15 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  create_table "waitlist_teams", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.integer "team_id"
+    t.integer "topic_id"
+    t.datetime "created_at"
+    t.index ["team_id", "topic_id"], name: "index_waitlist_teams_on_team_id_and_topic_id", unique: true
+    t.index ["team_id"], name: "fk_waitlist_teams"
+    t.index ["topic_id"], name: "fk_waitlist_teams_sign_up_topics"
+  end
+
   add_foreign_key "answer_tags", "answers"
   add_foreign_key "answer_tags", "tag_prompt_deployments"
   add_foreign_key "answer_tags", "users"
@@ -793,7 +793,6 @@ ActiveRecord::Schema.define(version: 20220405222420) do
   add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
   add_foreign_key "assignment_questionnaires", "duties"
   add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
-  add_foreign_key "assignments", "assignments", column: "sample_assignment_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
   add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
@@ -834,4 +833,8 @@ ActiveRecord::Schema.define(version: 20220405222420) do
   add_foreign_key "teams_users", "duties"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
+  add_foreign_key "track_notifications", "notifications"
+  add_foreign_key "track_notifications", "users"
+  add_foreign_key "waitlist_teams", "sign_up_topics", column: "topic_id", name: "fk_waitlist_teams_sign_up_topics"
+  add_foreign_key "waitlist_teams", "teams", name: "fk_waitlist_teams"
 end

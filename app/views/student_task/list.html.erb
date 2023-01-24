@@ -26,7 +26,7 @@
             selected_topics = SignedUpTeam.find_user_signup_topics(participant.assignment.id,users_team[0].t_id)
           end
 
-          if selected_topics.nil? || selected_topics.length == 0
+          if selected_topics.nil? || selected_topics.length == 0 #todo
             # there is a signup sheet and user/team hasn't signed up yet, produce a link to do so
             controller = "sign_up_sheet"
             action = "list"
@@ -34,10 +34,10 @@
           end
       elsif stage == "review" or stage == "metareview"
         assignment = Assignment.find(participant.assignment.id)
-        if assignment.bidding_for_reviews_enabled == 'Bidding' and assignment.can_choose_topic_to_review?
+        if assignment.review_choosing_algorithm == 'Bidding' and assignment.can_choose_topic_to_review?
           controller = "review_bids"
           action = "show"
-        elsif assignment.bidding_for_reviews_enabled == 'Bidding'
+        elsif assignment.review_choosing_algorithm == 'Bidding'
           controller = "review_bids"
           action = "index"
         else
@@ -93,7 +93,7 @@
     <% end %>
 <% end %>
 </div>
-<div class="topictable" style="float: left;width: 80%;margin-bottom: 10px; display: inline; ">
+<div class="topictable" style="float: left;width: 80%;margin-bottom: 10px; display: inline; ">  
  <table class="table table-striped" cellpadding="2">
     <tr class="taskheader">
       <th><%=t ".assignment_name" %></th>
@@ -101,7 +101,6 @@
       <th><%=t ".topic" %></th>
       <th><%=t ".current_stage" %></th>
       <th><%=t ".review_grade" %></th>
-      <th><%=t ".badges" %></th>
       <th><%=t ".stage_deadline" %><img src="/assets/info.png" title="You can change 'Preferred Time Zone' in 'Profile' in the banner."/></th>
       <th><%=t ".publishing_rights" %><img src="/assets/info.png" title="Grant publishing rights"/></th>
     </tr>
@@ -129,18 +128,17 @@
               <% end %>
           </td>
           <!--review grade-->
-
+          
 	      <td><%= get_review_grade_info(participant) %></td>
-          <!--badges-->
-          <td><%= get_awarded_badges(participant) %></td>
+	  
           <!--stage deadline-->
           <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref) %></td>
           <!--publish rights-->
-
+	  
           <td align=center>
 		<input class='make-permit-change' id="<%= participant.id %>" type="checkbox" <% if participant.permission_granted %>checked<%end%>>
 </td>
-
+	
         </tr>
       <% end %>
     <% end %>

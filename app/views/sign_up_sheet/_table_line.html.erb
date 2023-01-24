@@ -82,7 +82,7 @@
 
   <td align="center"><%= topic.max_choosers %></td>
   <%= render :partial => '/sign_up_sheet/available_slots', :locals => {:topic=>topic} %>
-  <%= render :partial => '/sign_up_sheet/num_waiting', :locals => {:topic=>topic} %>
+  <%= render :partial => '/sign_up_sheet/waitlisted_choosers', :locals => {:topic=>topic} %>
   <!-- Only view the bids metrics to Instructor role and when the "Biddiing for topic" option in Assignment >> Topic is enabled-->
   <% if @assignment.is_intelligent && current_user_has_instructor_privileges?  %>  
     <%= render :partial => '/sign_up_sheet/total_bids', :locals => {:topic=>topic} %>

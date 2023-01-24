@@ -105,6 +105,17 @@ class StudentTeamsController < ApplicationController
     end
   end
 
+  # The following two methods are necessary to improve readability
+  # update the advertise_for_partner of team table
+  def advertise_for_partners
+    Team.update_all advertise_for_partner: true, id: params[:team_id]
+  end
+
+  def remove_advertisement
+    Team.update_all advertise_for_partner: false, id: params[:team_id]
+    redirect_to view_student_teams_path student_id: params[:team_id]
+  end
+
   def remove_participant
     # remove the record from teams_users table
     team_user = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id)
@@ -113,10 +124,9 @@ class StudentTeamsController < ApplicationController
     if TeamsUser.where(team_id: params[:team_id]).empty?
       old_team = AssignmentTeam.find params[:team_id]
       if old_team && !old_team.received_any_peer_review?
-        old_team.destroy
         # if assignment has signup sheet then the topic selected by the team has to go back to the pool
-        # or to the first team in the waitlist
-        Waitlist.remove_from_waitlists(params[:team_id])
+        SignedUpTeam.delete_all_signed_up_topics_for_team(old_team.id)
+        old_team.destroy
       end
     end
     # remove all the sent invitations

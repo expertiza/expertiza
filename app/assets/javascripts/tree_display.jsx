@@ -346,7 +346,7 @@ jQuery(document).ready(function() {
 
         }
       }
-      if (node_attributes.isAssignment(this.props.dataType) && app_variables.homeActionShowFlag == 'true') {
+      if (node_attributes.isAssignment(this.props.nodeType) && app_variables.homeActionShowFlag == 'true') {
         // Assignment tab starts here
         // Now is_intelligent and Add Manager related buttons have not been added into the new UI
         moreContent.push(...node_attributes.assignment.getActions(this.props))

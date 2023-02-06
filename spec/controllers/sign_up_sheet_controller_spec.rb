@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe SignUpSheetController do
   let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true, directory_path: 'assignment') }
   let(:assignment2) { create(:assignment, id: 2, microtask: false, staggered_deadline: false, private: true, directory_path: 'assignment2') }
@@ -660,7 +662,7 @@ describe SignUpSheetController do
         allow(due_date).to receive(:find_by).with(deadline_type_id: 6).and_return(due_date)
         allow(team).to receive(:submitted_files).and_return([])
         allow(team).to receive(:hyperlinks).and_return([])
-        request_params = { 
+        request_params = {
           id: 1,
           due_date: {
             '1_submission_1_due_date' => nil,
@@ -701,9 +703,9 @@ describe SignUpSheetController do
         assignment_id: 1,
         topic: ['1'],
         due_date: {
-            '1_submission_1_due_date' => nil,
-            '1_review_1_due_date' => nil
-          }
+          '1_submission_1_due_date' => nil,
+          '1_review_1_due_date' => nil
+        }
       }
       post :set_priority, params: request_params
       expect(response).to redirect_to('/sign_up_sheet/list?assignment_id=1')
@@ -725,7 +727,7 @@ describe SignUpSheetController do
             '1_review_1_due_date' => nil
           }
         }
-        
+
         post :save_topic_deadlines, params: request_params
         expect(response).to redirect_to('/assignments/1/edit')
       end

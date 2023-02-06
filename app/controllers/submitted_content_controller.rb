@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SubmittedContentController < ApplicationController
   require 'mimemagic'
   require 'mimemagic/overlay'
@@ -30,7 +32,9 @@ class SubmittedContentController < ApplicationController
     @assignment = @participant.assignment
     # ACS We have to check if this participant has team or not
     # hence use team count for the check
-    SignUpSheet.signup_team(@assignment.id, @participant.user_id, nil) if @participant.team.nil?
+    if @participant.team.nil?
+      SignUpSheet.signup_team(@assignment.id, @participant.user_id, nil)
+    end
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = !params.key?(:view)
     @stage = @assignment.current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
@@ -102,7 +106,7 @@ class SubmittedContentController < ApplicationController
   def submit_file
     participant = AssignmentParticipant.find(params[:id])
     unless current_user_id?(participant.user_id)
-      flash[:error] = "Authentication Error"
+      flash[:error] = 'Authentication Error'
       redirect_to action: 'edit', id: participant.id
       return
     end
@@ -129,7 +133,9 @@ class SubmittedContentController < ApplicationController
     participant.team.set_student_directory_num
     @current_folder = DisplayOption.new
     @current_folder.name = '/'
-    @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name]) if params[:current_folder]
+    if params[:current_folder]
+      @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name])
+    end
     curr_directory = if params[:origin] == 'review'
                        participant.review_file_path(params[:response_map_id]).to_s + @current_folder.name
                      else
@@ -141,7 +147,9 @@ class SubmittedContentController < ApplicationController
     full_filename = curr_directory + File.split(safe_filename).last.tr(' ', '_') # safe_filename #curr_directory +
     File.open(full_filename, 'wb') { |f| f.write(file_content) }
     if params['unzip']
-      SubmittedContentHelper.unzip_file(full_filename, curr_directory, true) if file_type(safe_filename) == 'zip'
+      if file_type(safe_filename) == 'zip'
+        SubmittedContentHelper.unzip_file(full_filename, curr_directory, true)
+      end
     end
     assignment = Assignment.find(participant.parent_id)
     team = participant.team
@@ -149,7 +157,7 @@ class SubmittedContentController < ApplicationController
                             content: full_filename,
                             user: participant.name,
                             assignment_id: assignment.id,
-                            operation: "Submit File")
+                            operation: 'Submit File')
     ExpertizaLogger.info LoggerMessage.new(controller_name, participant.name, 'The file has been submitted.', request)
 
     # Notify all reviewers assigned to this reviewee
@@ -168,7 +176,9 @@ class SubmittedContentController < ApplicationController
 
     @current_folder = DisplayOption.new
     @current_folder.name = '/'
-    @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name]) if params[:current_folder]
+    if params[:current_folder]
+      @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name])
+    end
     if params[:faction][:delete]
       delete_selected_files
     elsif params[:faction][:rename]
@@ -188,8 +198,12 @@ class SubmittedContentController < ApplicationController
     file_name = params['download']
     raise 'Folder_name is nil.' if folder_name.nil?
     raise 'File_name is nil.' if file_name.nil?
-    raise 'Cannot send a whole folder.' if File.directory?(folder_name + '/' + file_name)
-    raise 'File does not exist.' unless File.exist?(folder_name + '/' + file_name)
+    if File.directory?(folder_name + '/' + file_name)
+      raise 'Cannot send a whole folder.'
+    end
+    unless File.exist?(folder_name + '/' + file_name)
+      raise 'File does not exist.'
+    end
 
     send_file(folder_name + '/' + file_name, disposition: 'inline')
   rescue StandardError => e
@@ -237,7 +251,9 @@ class SubmittedContentController < ApplicationController
     old_filename = params[:directories][params[:chk_files]] + '/' + params[:filenames][params[:chk_files]]
     new_filename = params[:directories][params[:chk_files]] + '/' + FileHelper.sanitize_filename(params[:faction][:rename])
     begin
-      raise "A file already exists in this directory with the name \"#{params[:faction][:rename]}\"" if File.exist?(new_filename)
+      if File.exist?(new_filename)
+        raise "A file already exists in this directory with the name \"#{params[:faction][:rename]}\""
+      end
 
       File.send('rename', old_filename, new_filename)
     rescue StandardError => e
@@ -263,8 +279,12 @@ class SubmittedContentController < ApplicationController
     old_filename = params[:directories][params[:chk_files]] + '/' + params[:filenames][params[:chk_files]]
     new_filename = params[:directories][params[:chk_files]] + '/' + FileHelper.sanitize_filename(params[:faction][:copy])
     begin
-      raise 'A file with this name already exists. Please delete the existing file before copying.' if File.exist?(new_filename)
-      raise 'The referenced file does not exist.' unless File.exist?(old_filename)
+      if File.exist?(new_filename)
+        raise 'A file with this name already exists. Please delete the existing file before copying.'
+      end
+      unless File.exist?(old_filename)
+        raise 'The referenced file does not exist.'
+      end
 
       FileUtils.cp_r(old_filename, new_filename)
     rescue StandardError => e

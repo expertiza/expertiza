@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe BookmarkRating do
   let(:user1) { create(:student, name: 'expertizauser', id: 1) }
   bookmark1 = nil

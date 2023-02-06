@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ParticipantsController < ApplicationController
   include AuthorizationHelper
   include ParticipantsHelper
@@ -30,7 +32,9 @@ class ParticipantsController < ApplicationController
   end
 
   def add
-    curr_object = Object.const_get(params[:model]).find(params[:id]) if Participant::PARTICIPANT_TYPES.include? params[:model]
+    if Participant::PARTICIPANT_TYPES.include? params[:model]
+      curr_object = Object.const_get(params[:model]).find(params[:id])
+    end
     begin
       permissions = participant_permissions(params[:authorization])
       can_submit = permissions[:can_submit]
@@ -205,7 +209,9 @@ class ParticipantsController < ApplicationController
     # set by default
     permission_granted = false
     assignment.participants.each do |participant|
-      permission_granted = participant.permission_granted? if team_user.id == participant.user.id
+      if team_user.id == participant.user.id
+        permission_granted = participant.permission_granted?
+      end
     end
     # If permission is granted, set the publisting rights string
     user[:pub_rights] = permission_granted ? 'Granted' : 'Denied'

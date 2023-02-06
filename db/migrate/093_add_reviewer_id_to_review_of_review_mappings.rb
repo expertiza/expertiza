@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddReviewerIdToReviewOfReviewMappings < ActiveRecord::Migration[4.2]
   def self.up
     add_column :review_of_review_mappings, :reviewer_id, :integer, null: true

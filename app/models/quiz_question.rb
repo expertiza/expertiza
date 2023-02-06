@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class QuizQuestion < Question
   has_many :quiz_question_choices, class_name: 'QuizQuestionChoice', foreign_key: 'question_id', inverse_of: false, dependent: :nullify
   def edit; end

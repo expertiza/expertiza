@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateQuestionnaireFolderNodes < ActiveRecord::Migration[4.2]
   def self.up
     add_column :tree_folders, :parent_id, :integer, null: true

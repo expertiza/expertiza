@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'due_date_functions' do
   before(:each) do
     @deadline_type = build(:deadline_type)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AssignmentHelper
   def course_options(instructor = nil)
     courses = []

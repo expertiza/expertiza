@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddDropdownToAssignmentQuestionnairesTable < ActiveRecord::Migration[4.2]
   def self.up
     add_column :assignment_questionnaires, :dropdown, :boolean, default: true

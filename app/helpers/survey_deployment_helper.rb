@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SurveyDeploymentHelper
   # Returns an array containing the number of responses for a question in a survey deployment
   def get_responses_for_question_in_a_survey_deployment(q_id, sd_id)

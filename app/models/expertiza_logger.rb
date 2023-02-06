@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # expertiza_logger.rb
 class ExpertizaLogFormatter < Logger::Formatter
   # This method is invoked when a log event occurs

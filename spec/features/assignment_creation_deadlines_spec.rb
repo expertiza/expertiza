@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'helpers/assignment_creation_helper'
 
 # instructor can set in which deadline can student reviewers take the quizzes

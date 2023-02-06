@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'penalty_helper'
 include PenaltyHelper
 describe LatePolicy do

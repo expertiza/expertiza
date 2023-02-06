@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe ParticipantsController do
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student) }
@@ -248,5 +250,4 @@ describe ParticipantsController do
       expect(pc.send(:get_signup_topics_for_assignment, topic.assignment.id, topic, signed_up_team.team_id)).to eq(true)
     end
   end
-
 end

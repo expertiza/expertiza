@@ -1,5 +1,6 @@
-class AssignmentsAddColumns < ActiveRecord::Migration[4.2]
+# frozen_string_literal: true
 
+class AssignmentsAddColumns < ActiveRecord::Migration[4.2]
   def self.up
     add_column :assignments, :calculate_penalty, :boolean, null: false, default: FALSE
     add_column :assignments, :late_policy_id, :integer, null: true

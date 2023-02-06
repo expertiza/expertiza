@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 class GoogleDocFetcher
   require 'http_request'
 
   class << self
     def supports_url?(url)
       lower_case_url = url.downcase
-      allowed_hosts = ["drive.google.com", "docs.google.com"]
+      allowed_hosts = ['drive.google.com', 'docs.google.com']
       allowed_hosts.each do |allowed_host|
-        if (HttpRequest.valid_url?(url) && lower_case_url.include?(allowed_host))
+        if HttpRequest.valid_url?(url) && lower_case_url.include?(allowed_host)
           return true
         end
       end
-      return false
+      false
     end
   end
 

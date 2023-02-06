@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SampleReviewsController < ApplicationController
   def action_allowed?
     ['Instructor',

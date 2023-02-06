@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Repl0ValsInAuthFb < ActiveRecord::Migration[4.2]
   def self.up
     execute ' ALTER TABLE `assignments` CHANGE `author_feedback_questionnaire_id` `author_feedback_questionnaire_id` INT( 11 ) NULL'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class VmUserAnswerTagging
   def initialize(user, percentage, no_tagged, no_not_tagged, no_tagable, tag_update_intervals)
     @user = user

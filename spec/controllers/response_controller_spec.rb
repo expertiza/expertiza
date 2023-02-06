@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe ResponseController do
   let(:assignment) { build(:assignment, instructor_id: 6, id: 1) }
   let(:instructor) { build(:instructor, id: 6) }
@@ -291,79 +293,75 @@ describe ResponseController do
   end
 
   describe '#send_email' do
-      it 'should redirect to same page if no subject' do
-        request_params = { 
-          send_email:{
-            subject: '',
-            email_body: 'Hello',
-            response:9320,
-            email:'expertiza.debugging@gmail.com' 
-          }
+    it 'should redirect to same page if no subject' do
+      request_params = {
+        send_email: {
+          subject: '',
+          email_body: 'Hello',
+          response: 9320,
+          email: 'expertiza.debugging@gmail.com'
         }
-        
-        post :send_email, params: request_params
+      }
 
-        expect(flash[:error]).to eq('Please fill in the subject and the email content.')
-        expect(response).to redirect_to ('/response/author')
-     
-      end
-  end
-  
-  describe '#send_email' do
-      it 'should redirect to same page if no body' do
-        request_params = { 
-          send_email:{
-            subject: 'Hello',
-            email_body: '',
-            response:9320,
-            email:'expertiza.debugging@gmail.com' 
-          }
-        }
-        
-        post :send_email, params: request_params
+      post :send_email, params: request_params
 
-        expect(flash[:error]).to eq('Please fill in the subject and the email content.')
-        expect(response).to redirect_to ('/response/author')
-     
-      end
+      expect(flash[:error]).to eq('Please fill in the subject and the email content.')
+      expect(response).to redirect_to '/response/author'
+    end
   end
 
   describe '#send_email' do
-      it 'should redirect to student task list on success' do
-        request_params = { 
-          send_email:{
-            subject: 'Hello',
-            email_body: 'Hi',
-            response:9320,
-            email:'expertiza.debugging@gmail.com' 
-          }
+    it 'should redirect to same page if no body' do
+      request_params = {
+        send_email: {
+          subject: 'Hello',
+          email_body: '',
+          response: 9320,
+          email: 'expertiza.debugging@gmail.com'
         }
-        
-        post :send_email, params: request_params
+      }
 
-        expect(flash[:success]).to eq('Email sent to the author.')
-        expect(response).to redirect_to ('/student_task/list')
-     
-      end
+      post :send_email, params: request_params
+
+      expect(flash[:error]).to eq('Please fill in the subject and the email content.')
+      expect(response).to redirect_to '/response/author'
+    end
   end
 
   describe '#send_email' do
-      it 'should redirect to same page if no body or subject' do
-        request_params = { 
-          send_email:{
-            subject: '',
-            email_body: '',
-            response:9320,
-            email:'expertiza.debugging@gmail.com' 
-          }
+    it 'should redirect to student task list on success' do
+      request_params = {
+        send_email: {
+          subject: 'Hello',
+          email_body: 'Hi',
+          response: 9320,
+          email: 'expertiza.debugging@gmail.com'
         }
-        
-        post :send_email, params: request_params
+      }
 
-        expect(flash[:error]).to eq('Please fill in the subject and the email content.')
-        expect(response).to redirect_to ('/response/author')
-     
-      end
+      post :send_email, params: request_params
+
+      expect(flash[:success]).to eq('Email sent to the author.')
+      expect(response).to redirect_to '/student_task/list'
+    end
+  end
+
+  describe '#send_email' do
+    it 'should redirect to same page if no body or subject' do
+      request_params = {
+        send_email: {
+          subject: '',
+          email_body: '',
+          response: 9320,
+          email: 'expertiza.debugging@gmail.com'
+        }
+      }
+
+      post :send_email, params: request_params
+
+      expect(flash[:error]).to eq('Please fill in the subject and the email content.')
+      expect(response).to redirect_to '/response/author'
+    end
   end
 
   describe '#redirect' do

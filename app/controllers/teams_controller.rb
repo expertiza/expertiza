@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TeamsController < ApplicationController
   include AuthorizationHelper
 
@@ -19,8 +21,12 @@ class TeamsController < ApplicationController
 
   def list
     allowed_types = %w[Assignment Course]
-    session[:team_type] = params[:type] if params[:type] && allowed_types.include?(params[:type])
-    @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == 'Assignment'
+    if params[:type] && allowed_types.include?(params[:type])
+      session[:team_type] = params[:type]
+    end
+    if session[:team_type] == 'Assignment'
+      @assignment = Assignment.find_by(id: params[:id])
+    end
     begin
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
@@ -87,12 +93,14 @@ class TeamsController < ApplicationController
         topic_id = @signed_up_team.first.topic_id
         next_wait_listed_team = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
         # if slot exist, then confirm the topic for this team and delete all waitlists for this team
-        SignUpTopic.assign_to_first_waiting_team(next_wait_listed_team) if next_wait_listed_team
+        if next_wait_listed_team
+          SignUpTopic.assign_to_first_waiting_team(next_wait_listed_team)
+        end
       end
 
-      @sign_up_team.destroy_all if @sign_up_team
-      @teams_users.destroy_all if @teams_users
-      @team.destroy if @team
+      @sign_up_team&.destroy_all
+      @teams_users&.destroy_all
+      @team&.destroy
       undo_link("The team \"#{@team.name}\" has been successfully deleted.")
     end
     redirect_back fallback_location: root_path

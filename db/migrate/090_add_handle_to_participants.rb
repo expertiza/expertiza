@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddHandleToParticipants < ActiveRecord::Migration[4.2]
   def self.up
     add_column :participants, :handle, :string, null: true

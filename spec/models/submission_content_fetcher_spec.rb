@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'SubmissionContentFetcher' do
   it 'cannot be instantiated' do
     expect { SubmissionContentFetcher.new }.to raise_error(NoMethodError)

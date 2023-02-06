@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module QuestionAnalytic
   def unique_character_count
     txt.gsub(/\s+/, '').downcase.split(//).uniq.length

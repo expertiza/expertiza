@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddUsedInRoundToAssignmentQuestionnaires < ActiveRecord::Migration[4.2]
   def self.up
     add_column 'assignment_questionnaires', 'used_in_round', :integer

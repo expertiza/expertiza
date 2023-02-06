@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GradesHelper
   include PenaltyHelper
   # Render the title
@@ -62,12 +64,16 @@ module GradesHelper
 
         @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
         l_policy = LatePolicy.find(@assignment.late_policy_id)
-        @total_penalty = l_policy.max_penalty if @total_penalty > l_policy.max_penalty
+        if @total_penalty > l_policy.max_penalty
+          @total_penalty = l_policy.max_penalty
+        end
         attributes(@participant) if calculate_for_participants
       end
       assign_all_penalties(participant, penalties)
     end
-    @assignment[:is_penalty_calculated] = true unless @assignment.is_penalty_calculated
+    unless @assignment.is_penalty_calculated
+      @assignment[:is_penalty_calculated] = true
+    end
   end
 
   def has_team_and_metareview?
@@ -154,7 +160,7 @@ module GradesHelper
     if question.type == 'Checkbox'
       10_003
     elsif question.is_a? ScoredQuestion
-      return 9311 + row.question_max_score
+      9311 + row.question_max_score
     else
       9998
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe InvitationsController do
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, parent_id: 2, id: 1) }

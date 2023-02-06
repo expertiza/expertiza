@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Questionnaire < ApplicationRecord
   # for doc on why we do it this way,
   # see http://blog.hasmanythrough.com/2007/1/15/basic-rails-association-cardinality
@@ -13,7 +15,7 @@ class Questionnaire < ApplicationRecord
 
   DEFAULT_MIN_QUESTION_SCORE = 0  # The lowest score that a reviewer can assign to any questionnaire question
   DEFAULT_MAX_QUESTION_SCORE = 5  # The highest score that a reviewer can assign to any questionnaire question
-  DEFAULT_QUESTIONNAIRE_URL = 'http://www.courses.ncsu.edu/csc517'.freeze
+  DEFAULT_QUESTIONNAIRE_URL = 'http://www.courses.ncsu.edu/csc517'
   QUESTIONNAIRE_TYPES = ['ReviewQuestionnaire',
                          'MetareviewQuestionnaire',
                          'Author FeedbackQuestionnaire',
@@ -67,7 +69,7 @@ class Questionnaire < ApplicationRecord
     questions.each(&:delete)
 
     node = QuestionnaireNode.find_by(node_object_id: id)
-    node.destroy if node
+    node&.destroy
 
     destroy
   end
@@ -91,7 +93,9 @@ class Questionnaire < ApplicationRecord
     questions.each do |question|
       new_question = question.dup
       new_question.questionnaire_id = questionnaire.id
-      new_question.size = '50,3' if (new_question.is_a?(Criterion) || new_question.is_a?(TextResponse)) && new_question.size.nil?
+      if (new_question.is_a?(Criterion) || new_question.is_a?(TextResponse)) && new_question.size.nil?
+        new_question.size = '50,3'
+      end
       new_question.save!
       advices = QuestionAdvice.where(question_id: question.id)
       next if advices.empty?
@@ -107,9 +111,15 @@ class Questionnaire < ApplicationRecord
 
   # validate the entries for this questionnaire
   def validate_questionnaire
-    errors.add(:max_question_score, 'The maximum question score must be a positive integer.') if max_question_score < 1
-    errors.add(:min_question_score, 'The minimum question score must be a positive integer.') if min_question_score < 0
-    errors.add(:min_question_score, 'The minimum question score must be less than the maximum.') if min_question_score >= max_question_score
+    if max_question_score < 1
+      errors.add(:max_question_score, 'The maximum question score must be a positive integer.')
+    end
+    if min_question_score < 0
+      errors.add(:min_question_score, 'The minimum question score must be a positive integer.')
+    end
+    if min_question_score >= max_question_score
+      errors.add(:min_question_score, 'The minimum question score must be less than the maximum.')
+    end
 
     results = Questionnaire.where('id <> ? and name = ? and instructor_id = ?', id, name, instructor_id)
     errors.add(:name, 'Questionnaire names must be unique.') if results.present?

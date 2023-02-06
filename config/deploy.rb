@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # CapistranoDbTasks (https://github.com/sgruhier/capistrano-db-tasks)
 require 'capistrano-db-tasks'
 

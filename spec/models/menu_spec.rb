@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Node do
   let(:node) { Menu::Node.new }
   let(:content_page) { double('ContentPage', id: 1, name: 'name') }

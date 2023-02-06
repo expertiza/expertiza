@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ReviewBidsController < ApplicationController
   require 'json'
   require 'uri'
@@ -33,7 +35,9 @@ class ReviewBidsController < ApplicationController
     # Finding how many reviews have been completed
     @num_reviews_completed = 0
     @review_mappings.each do |map|
-      @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
+      if !map.response.empty? && map.response.last.is_submitted
+        @num_reviews_completed += 1
+      end
     end
 
     # render view for completing reviews after review bidding has been completed

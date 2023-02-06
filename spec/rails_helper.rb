@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV['RAILS_ENV'] ||= 'test'
 require 'spec_helper'
@@ -14,7 +16,7 @@ require 'shoulda-matchers'
 # run twice. It is recommended that you do not name files matching this glob to
 # end with _spec.rb. You can configure this pattern with the --pattern
 # option on the command line or in ~/.rspec, .rspec or `.rspec-local`.
-Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
+Dir[Rails.root.join('spec/support/**/*.rb')].sort.each { |f| require f }
 
 # Checks for pending migrations before tests are run.
 # If you are not using ActiveRecord, you can remove this line.
@@ -79,7 +81,9 @@ RSpec.configure do |config|
   end
 
   def stub_current_user(current_user, current_role_name = 'Student', current_role)
-    allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(current_user) if defined?(session)
+    if defined?(session)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(current_user)
+    end
     allow_any_instance_of(ApplicationController).to receive(:current_role_name).and_return(current_role_name)
     allow_any_instance_of(ApplicationController).to receive(:current_role).and_return(current_role)
     # Also pop this stub user into the session to support the authorization helper

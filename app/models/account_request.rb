@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AccountRequest < ApplicationRecord
   before_save { self.email = email.downcase }
   before_save { name }

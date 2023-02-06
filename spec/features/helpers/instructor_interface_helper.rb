@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module InstructorInterfaceHelperSpec
   def set_deadline_type
     create(:deadline_type, name: 'submission')

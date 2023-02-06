@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require './spec/support/teams_shared.rb'
 
 describe AdvertiseForPartnerController do
@@ -5,7 +7,7 @@ describe AdvertiseForPartnerController do
   include_context 'object initializations'
   let(:team1user1) { build_stubbed(:team_user, id: 1, team: team1, user: student1) }
   let(:team1user2) { build_stubbed(:team_user, id: 2, team: team1, user: student2) }
-  let(:participant) { build(:participant,  id: 1) }
+  let(:participant) { build(:participant, id: 1) }
   # Performs authorization check for user
   describe 'action allowed method' do
     context 'when called directly' do

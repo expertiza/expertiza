@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'internationalization', js: true do
   before(:each) do
     instructor = create(:instructor, name: 'hindi_instructor')

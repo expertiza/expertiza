@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe PasswordRetrievalController do
   describe 'password reset' do
     it 'create new entry in password_resets table' do

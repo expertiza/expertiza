@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MenuRestItemsUsersCachedContentPages < ActiveRecord::Migration[4.2]
   def self.up
     # Add URL to use for Actions, to better support REST

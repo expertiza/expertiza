@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ControllerAction < ApplicationRecord
   belongs_to :site_controller
   belongs_to :permission

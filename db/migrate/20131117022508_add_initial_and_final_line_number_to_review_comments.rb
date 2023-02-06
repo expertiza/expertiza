@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddInitialAndFinalLineNumberToReviewComments < ActiveRecord::Migration[4.2]
   def self.up
     add_column :review_comments, :initial_line_number, :integer

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe MarkupStyle do
   it 'is invalid without valid attributes' do
     expect(MarkupStyle.new).not_to be_valid

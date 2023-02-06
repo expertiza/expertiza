@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TeammateReviewQuestionnaire < Questionnaire
   after_initialize :post_initialization
   @print_name = 'Team Review Rubric'

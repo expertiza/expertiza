@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe AwardedBadge do
   let(:awarded_badge) { build(:awarded_badge) }
   describe '#approved?' do

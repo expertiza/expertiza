@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SubmissionRecord < ApplicationRecord
   validates :content, presence: true
   validates :operation, presence: true

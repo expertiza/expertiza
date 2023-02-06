@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class UpdateReviewFeedbacks < ActiveRecord::Migration[4.2]
-  def self.up    
+  def self.up
     rename_column :review_feedbacks, :user_id, :author_id
     rename_column :review_feedbacks, :txt, :additional_comment
   end

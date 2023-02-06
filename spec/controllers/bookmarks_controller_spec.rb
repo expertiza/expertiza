@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe BookmarksController do
   # initialize any recurring objects
   let(:bookmark) { build(:bookmark) }

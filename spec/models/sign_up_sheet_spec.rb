@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe SignUpSheet do
   describe '.add_signup_topic' do
     it 'will return an empty Hash when there are no topics' do
@@ -63,7 +65,7 @@ describe '.confirm_topic' do
     allow(SignedUpTeam).to receive(:find_team_users).and_return([TeamsUser.new])
     allow_any_instance_of(TeamsUser).to receive(:t_id).and_return(1)
     allow(Team).to receive(:find).and_return(Team.new)
-  end  
+  end
   it 'create SignedUpTeam' do
     allow(SignUpTopic).to receive(:slotAvailable?) { true }
     expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be(false)

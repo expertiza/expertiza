@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe StudentTask do
   # Write your mocked object here!
   let(:participant) { build(:participant, id: 1, user_id: user.id, parent_id: assignment.id) }

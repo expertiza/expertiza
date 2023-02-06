@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class QuestionnairesController < ApplicationController
   include AuthorizationHelper
 
@@ -41,7 +43,9 @@ class QuestionnairesController < ApplicationController
   end
 
   def new
-    @questionnaire = Object.const_get(params[:model].split.join).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model].split.join
+    if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model].split.join
+      @questionnaire = Object.const_get(params[:model].split.join).new
+    end
   rescue StandardError
     flash[:error] = $ERROR_INFO
   end
@@ -54,7 +58,9 @@ class QuestionnairesController < ApplicationController
       questionnaire_private = params[:questionnaire][:private] == 'true'
       display_type = params[:questionnaire][:type].split('Questionnaire')[0]
       begin
-        @questionnaire = Object.const_get(params[:questionnaire][:type]).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
+        if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
+          @questionnaire = Object.const_get(params[:questionnaire][:type]).new
+        end
       rescue StandardError
         flash[:error] = $ERROR_INFO
       end
@@ -69,7 +75,7 @@ class QuestionnairesController < ApplicationController
         # In the future, we need to write migration files to make them consistency.
         # E1903 : We are not sure of other type of cases, so have added a if statement. If there are only 5 cases, remove the if statement
         if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey BookmarkRating].include?(display_type)
-          display_type = (display_type.split(/(?=[A-Z])/)).join('%')
+          display_type = display_type.split(/(?=[A-Z])/).join('%')
         end
         @questionnaire.display_type = display_type
         @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
@@ -90,7 +96,9 @@ class QuestionnairesController < ApplicationController
     @questionnaire = Object.const_get(params[:questionnaire][:type]).new(questionnaire_params)
     # Create Quiz content has been moved to Quiz Questionnaire Controller
     if @questionnaire.type != 'QuizQuestionnaire' # checking if it is a quiz questionnaire
-      @questionnaire.instructor_id = Ta.get_my_instructor(session[:user].id) if session[:user].role.name == 'Teaching Assistant'
+      if session[:user].role.name == 'Teaching Assistant'
+        @questionnaire.instructor_id = Ta.get_my_instructor(session[:user].id)
+      end
       save
 
       redirect_to controller: 'tree_display', action: 'list'
@@ -109,7 +117,7 @@ class QuestionnairesController < ApplicationController
     if params[:add_new_questions]
       # redirect_to action: 'add_new_questions', id: params.permit(:id)[:id], question: params.permit(:new_question)[:new_question]
       nested_keys = params[:new_question].keys
-      permitted_params = params.permit(:id, :new_question => nested_keys)
+      permitted_params = params.permit(:id, new_question: nested_keys)
       redirect_to action: 'add_new_questions', id: permitted_params[:id], question: permitted_params[:new_question]
     elsif params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
@@ -120,16 +128,16 @@ class QuestionnairesController < ApplicationController
         @questionnaire.update_attributes(questionnaire_params)
 
         # Save all questions
-        unless params[:question].nil?
-          params[:question].each_pair do |k, v|
-            @question = Question.find(k)
-            # example of 'v' value
-            # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
-            v.each_pair do |key, value|
-              @question.send(key + '=', value) unless @question.send(key) == value
-            end
-            @question.save
+        # example of 'v' value
+        # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
+        params[:question]&.each_pair do |k, v|
+          @question = Question.find(k)
+          # example of 'v' value
+          # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
+          v.each_pair do |key, value|
+            @question.send(key + '=', value) unless @question.send(key) == value
           end
+          @question.save
         end
         flash[:success] = 'The questionnaire has been successfully updated!'
       rescue StandardError
@@ -153,7 +161,9 @@ class QuestionnairesController < ApplicationController
         questions = @questionnaire.questions
         # if this rubric had some answers, flash error
         questions.each do |question|
-          raise 'There are responses based on this rubric, we suggest you do not delete it.' unless question.answers.empty?
+          unless question.answers.empty?
+            raise 'There are responses based on this rubric, we suggest you do not delete it.'
+          end
         end
         questions.each do |question|
           advices = question.question_advices
@@ -248,28 +258,29 @@ class QuestionnairesController < ApplicationController
   # save questionnaire object after create or edit
   def save
     @questionnaire.save!
-    save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
+    unless @questionnaire.id.nil? || @questionnaire.id <= 0
+      save_questions @questionnaire.id
+    end
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
   end
 
   # save questions that have been added to a questionnaire
   def save_new_questions(questionnaire_id)
-    if params[:new_question]
-      # The new_question array contains all the new questions
-      # that should be saved to the database
-      params[:new_question].keys.each_with_index do |question_key, index|
-        q = Question.new
-        q.txt = params[:new_question][question_key]
-        q.questionnaire_id = questionnaire_id
-        q.type = params[:question_type][question_key][:type]
-        q.seq = question_key.to_i
-        if @questionnaire.type == 'QuizQuestionnaire'
-          # using the weight user enters when creating quiz
-          weight_key = "question_#{index + 1}"
-          q.weight = params[:question_weights][weight_key.to_sym]
-        end
-        q.save unless q.txt.strip.empty?
+    # The new_question array contains all the new questions
+    # that should be saved to the database
+    # using the weight user enters when creating quiz
+    params[:new_question]&.keys&.each_with_index do |question_key, index|
+      q = Question.new
+      q.txt = params[:new_question][question_key]
+      q.questionnaire_id = questionnaire_id
+      q.type = params[:question_type][question_key][:type]
+      q.seq = question_key.to_i
+      if @questionnaire.type == 'QuizQuestionnaire'
+        # using the weight user enters when creating quiz
+        weight_key = "question_#{index + 1}"
+        q.weight = params[:question_weights][weight_key.to_sym]
       end
+      q.save unless q.txt.strip.empty?
     end
   end
 
@@ -302,15 +313,17 @@ class QuestionnairesController < ApplicationController
     delete_questions questionnaire_id
     save_new_questions questionnaire_id
 
-    if params[:question]
-      params[:question].keys.each do |question_key|
-        if params[:question][question_key][:txt].strip.empty?
-          # question text is empty, delete the question
-          Question.delete(question_key)
-        else
-          # Update existing question.
-          question = Question.find(question_key)
-          Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
+    # question text is empty, delete the question
+    # Update existing question.
+    params[:question]&.keys&.each do |question_key|
+      if params[:question][question_key][:txt].strip.empty?
+        # question text is empty, delete the question
+        Question.delete(question_key)
+      else
+        # Update existing question.
+        question = Question.find(question_key)
+        unless question.update_attributes(params[:question][question_key])
+          Rails.logger.info(question.errors.messages.inspect)
         end
       end
     end

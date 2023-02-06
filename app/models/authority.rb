@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Authority
   attr_reader :current_user
 
@@ -6,7 +8,7 @@ class Authority
   end
 
   def allow?(controller, _action)
-    return true if current_user && current_user.admin?
+    return true if current_user&.admin?
 
     case controller
     when 'pages'

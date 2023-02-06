@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe AnswerHelper do
   before(:each) do
     @assignment1 = create(:assignment, name: 'name1', directory_path: 'name1')

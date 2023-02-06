@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class QuestionnaireAnalyticTestDummyClass
   attr_accessor :questions
   require 'analytic/questionnaire_analytic'

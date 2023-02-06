@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Institution < ApplicationRecord
   # attr_accessible :name
   has_many :courses, dependent: :destroy, foreign_key: 'institutions_id'

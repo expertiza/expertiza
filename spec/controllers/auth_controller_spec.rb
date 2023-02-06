@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe AuthController do
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }

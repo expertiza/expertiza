@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe TeamsController do
   # Airbrake-1807465099223895248
   describe '#delete' do

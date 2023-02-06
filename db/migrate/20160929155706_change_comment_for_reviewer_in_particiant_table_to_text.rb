@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ChangeCommentForReviewerInParticiantTableToText < ActiveRecord::Migration[4.2]
   def self.up
     change_column :participants, :comment_for_reviewer, :text, default: nil

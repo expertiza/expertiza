@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateCourseNodes < ActiveRecord::Migration[4.2]
   def self.up
     courses = Course.all

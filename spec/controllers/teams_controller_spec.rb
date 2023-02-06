@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require './spec/support/teams_shared.rb'
 
 describe TeamsController do
@@ -225,20 +227,20 @@ describe TeamsController do
       end
     end
   end
-  
+
   describe '#bequeath_all' do
     context 'when the team type is user_session' do
       it 'flashes an error' do
-        user_session = {team_type: 'Course', user: ta}
+        user_session = { team_type: 'Course', user: ta }
         request_params = { id: team5.id }
-        post :bequeath_all, params: request_params, session: user_session 
+        post :bequeath_all, params: request_params, session: user_session
         expect(flash[:error]).to eq('Invalid team type for bequeathal')
       end
     end
     context 'when there is no course associated with this assignment' do
       it 'flashes an error' do
         request_params = { id: 1 }
-        user_session = {team_type: 'Assignment', user: ta}
+        user_session = { team_type: 'Assignment', user: ta }
         allow(Assignment).to receive(:find).and_return(assignment1)
         allow_any_instance_of(Assignment).to receive(:course_id).and_return(nil)
         post :bequeath_all, params: request_params, session: user_session
@@ -248,7 +250,7 @@ describe TeamsController do
     context 'when the course already has teams associated with it' do
       it 'flashes an error' do
         request_params = { id: 1 }
-        user_session = {team_type: 'Assignment', user: ta}
+        user_session = { team_type: 'Assignment', user: ta }
         allow(Assignment).to receive(:find).and_return(assignment1)
         allow_any_instance_of(Assignment).to receive(:course_id).and_return(1)
         allow(Course).to receive(:find).and_return(course1)
@@ -260,14 +262,14 @@ describe TeamsController do
     context 'when bequeathal is successful in copying 2 teams' do
       it 'flashes a note stating 2 teams were copied' do
         request_params = { id: 1 }
-        user_session = {team_type: 'Assignment', user: ta}
+        user_session = { team_type: 'Assignment', user: ta }
         allow(Assignment).to receive(:find).and_return(assignment1)
         allow_any_instance_of(Assignment).to receive(:course_id).and_return(1)
         allow(Course).to receive(:find).and_return(course1)
         allow_any_instance_of(Course).to receive(:course_teams).and_return([])
         allow_any_instance_of(Assignment).to receive(:teams).and_return([team1, team2])
         post :bequeath_all, params: request_params, session: user_session
-        expect(flash[:note]).to eq("2 teams were successfully copied to \"TestCourse\"")
+        expect(flash[:note]).to eq('2 teams were successfully copied to "TestCourse"')
       end
     end
   end

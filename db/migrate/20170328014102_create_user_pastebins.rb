@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateUserPastebins < ActiveRecord::Migration[4.2]
   def change
     create_table :user_pastebins do |t|

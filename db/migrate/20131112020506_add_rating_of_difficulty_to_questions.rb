@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddRatingOfDifficultyToQuestions < ActiveRecord::Migration[4.2]
   def self.up
     add_column :questions, :average_difficulty_rating, :float, default: 0

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ReviewMappingController < ApplicationController
   include AuthorizationHelper
 
@@ -38,7 +40,9 @@ class ReviewMappingController < ApplicationController
           rescue StandardError
             nil
           end
-    map = ReviewResponseMap.create(reviewed_object_id: params[:id], reviewer_id: participant.get_reviewer.id, reviewee_id: params[:team_id], calibrate_to: true) if map.nil?
+    if map.nil?
+      map = ReviewResponseMap.create(reviewed_object_id: params[:id], reviewer_id: participant.get_reviewer.id, reviewee_id: params[:team_id], calibrate_to: true)
+    end
     redirect_to controller: 'response', action: 'new', id: map.id, assignment_id: params[:id], return: 'assignment_edit'
   end
 
@@ -162,7 +166,9 @@ class ReviewMappingController < ApplicationController
     else
       @num_reviews_completed = 0
       @review_mappings.each do |map|
-        @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
+        if !map.response.empty? && map.response.last.is_submitted
+          @num_reviews_completed += 1
+        end
       end
       @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
       @num_reviews_in_progress < Assignment.max_outstanding_reviews
@@ -224,7 +230,9 @@ class ReviewMappingController < ApplicationController
 
   def get_reviewer(user, assignment, reg_url)
     reviewer = AssignmentParticipant.where(user_id: user.id, parent_id: assignment.id).first
-    raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue." if reviewer.nil?
+    if reviewer.nil?
+      raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue."
+    end
 
     reviewer.get_reviewer
   rescue StandardError => e
@@ -460,7 +468,9 @@ class ReviewMappingController < ApplicationController
 
       participants_with_insufficient_review_num = []
       participants_hash.each do |participant_id, review_num|
-        participants_with_insufficient_review_num << participant_id if review_num < review_strategy.reviews_per_student
+        if review_num < review_strategy.reviews_per_student
+          participants_with_insufficient_review_num << participant_id
+        end
       end
       unsorted_teams_hash = {}
 
@@ -509,10 +519,14 @@ class ReviewMappingController < ApplicationController
           # They should be removed from 'num_participants_this_team'
           TeamsUser.where(team_id: team.id).each do |team_user|
             temp_participant = Participant.where(user_id: team_user.user_id, parent_id: assignment_id).first
-            num_participants_this_team -= 1 unless temp_participant.can_review && temp_participant.can_submit
+            unless temp_participant.can_review && temp_participant.can_submit
+              num_participants_this_team -= 1
+            end
           end
           # if all outstanding participants are already in selected_participants, just break the loop.
-          break if selected_participants.size == participants.size - num_participants_this_team
+          if selected_participants.size == participants.size - num_participants_this_team
+            break
+          end
 
           # generate random number
           if iterator.zero?
@@ -522,7 +536,9 @@ class ReviewMappingController < ApplicationController
             # get the temp array including indices of participants, each participant has minimum review number in hash table.
             participants_with_min_assigned_reviews = []
             participants.each do |participant|
-              participants_with_min_assigned_reviews << participants.index(participant) if participants_hash[participant.id] == min_value
+              if participants_hash[participant.id] == min_value
+                participants_with_min_assigned_reviews << participants.index(participant)
+              end
             end
             # if participants_with_min_assigned_reviews is blank
             if_condition_1 = participants_with_min_assigned_reviews.empty?
@@ -537,7 +553,9 @@ class ReviewMappingController < ApplicationController
                        end
           end
           # prohibit one student to review his/her own artifact
-          next if TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
+          if TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
+            next
+          end
 
           if_condition_1 = (participants_hash[participants[rand_num].id] < review_strategy.reviews_per_student)
           if_condition_2 = (!selected_participants.include? participants[rand_num].id)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # require 'analytic/response_analytic'
 module AssignmentTeamAnalytic
   #======= general ==========#

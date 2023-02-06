@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddGradeForReviewerAndCommentForReviewerInParticipantsTable < ActiveRecord::Migration[4.2]
   def self.up
     add_column :participants, :grade_for_reviewer, :integer, default: nil

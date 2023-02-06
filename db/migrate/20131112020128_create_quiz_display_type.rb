@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateQuizDisplayType < ActiveRecord::Migration[4.2]
   def self.up
     TreeFolder.create name: 'Quiz', child_type: 'QuestionnaireNode'

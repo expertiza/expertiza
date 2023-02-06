@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Locale do
   let(:no_pref_locale) { Locale.new(:no_pref, 'No Preference', 0) }
 

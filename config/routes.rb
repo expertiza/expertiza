@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Expertiza::Application.routes.draw do
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'

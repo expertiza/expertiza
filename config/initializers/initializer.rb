@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ActionController::ForceSSL::ClassMethods.module_eval do
   def force_ssl(options = {})
     config = Rails.application.config
@@ -5,7 +7,9 @@ ActionController::ForceSSL::ClassMethods.module_eval do
     return unless config.use_ssl # <= this is new
 
     host = options.delete(:host)
-    port = config.ssl_port if config.respond_to?(:ssl_port) && config.ssl_port.present? # <= this is also new
+    if config.respond_to?(:ssl_port) && config.ssl_port.present?
+      port = config.ssl_port
+    end # <= this is also new
 
     before_action(options) do
       unless request.ssl? # && !Rails.env.development? # commented out the exclusion of the development environment

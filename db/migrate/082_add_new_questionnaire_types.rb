@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddNewQuestionnaireTypes < ActiveRecord::Migration[4.2]
   def self.up
     execute "UPDATE `questionnaire_types` set name = 'Review' where name in ('Review Rubric', 'Rubric')"

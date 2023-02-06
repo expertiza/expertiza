@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ReviewAssignment
   def contributors
     # ACS Contributors are just teams, so removed check to see if it is a team assignment
@@ -33,7 +35,9 @@ module ReviewAssignment
 
     # if this assignment does not allow reviewer to review other artifacts on the same topic,
     # remove those teams from candidate list.
-    contributor_set = reject_by_same_topic(contributor_set, reviewer) unless can_review_same_topic?
+    unless can_review_same_topic?
+      contributor_set = reject_by_same_topic(contributor_set, reviewer)
+    end
 
     # Add topics for all remaining submissions to a list of available topics for review
     candidate_topics = Set.new
@@ -100,7 +104,9 @@ module ReviewAssignment
   # Parameter assignment_team is the candidate assignment team, it cannot be a team w/o submission, or have reviewed by reviewer, or reviewer's own team.
   # (guaranteed by candidate_assignment_teams_to_review method)
   def assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
-    raise 'There are no more submissions available for that review right now. Try again later.' if assignment_team.nil?
+    if assignment_team.nil?
+      raise 'There are no more submissions available for that review right now. Try again later.'
+    end
 
     assignment_team.assign_reviewer(reviewer)
   end
@@ -129,7 +135,9 @@ module ReviewAssignment
     if reviewer_team
       topic_id = reviewer_team.topic
       # it is also possible that this reviewer has team, but this team has no topic yet, if so, do nothing
-      contributor_set = contributor_set.reject { |contributor| contributor.topic == topic_id } if topic_id
+      if topic_id
+        contributor_set = contributor_set.reject { |contributor| contributor.topic == topic_id }
+      end
     end
 
     contributor_set
@@ -165,7 +173,9 @@ module ReviewAssignment
     # This condition might happen if the reviewer waited too much time in the
     # select topic page and other students have already selected this topic.
     # Another scenario is someone that deliberately modifies the view.
-    raise 'This topic has too many reviews; please select another one.' if topic && !candidate_topics_to_review(reviewer).include?(topic)
+    if topic && !candidate_topics_to_review(reviewer).include?(topic)
+      raise 'This topic has too many reviews; please select another one.'
+    end
 
     contributor_set = Array.new(contributors)
     work = topic.nil? ? 'assignment' : 'topic'
@@ -178,11 +188,15 @@ module ReviewAssignment
         !contributor.has_submissions?
     end
 
-    raise "There are no more submissions to review on this #{work}." if contributor_set.empty?
+    if contributor_set.empty?
+      raise "There are no more submissions to review on this #{work}."
+    end
 
     # Reviewer can review each contributor only once
     contributor_set.reject! { |contributor| contributor.reviewed_by?(reviewer) }
-    raise "You have already reviewed all submissions for this #{work}." if contributor_set.empty?
+    if contributor_set.empty?
+      raise "You have already reviewed all submissions for this #{work}."
+    end
 
     # Reduce to the contributors with the least number of reviews ("responses") received
     min_contributor = contributor_set.min_by { |a| a.responses.count }
@@ -190,7 +204,9 @@ module ReviewAssignment
     contributor_set.reject! { |contributor| contributor.responses.count > min_reviews }
 
     # Pick the contributor whose most recent reviewer was assigned longest ago
-    contributor_set.sort! { |a, b| a.review_mappings.last.id <=> b.review_mappings.last.id } if min_reviews > 0
+    if min_reviews > 0
+      contributor_set.sort! { |a, b| a.review_mappings.last.id <=> b.review_mappings.last.id }
+    end
 
     # Choose a contributor at random (.sample) from the remaining contributors.
     # Actually, we SHOULD pick the contributor who was least recently picked.  But sample

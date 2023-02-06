@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TextArea < TextResponse
   def complete(count, answer = nil)
     if size.nil?

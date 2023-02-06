@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # require for webservice calls
 require 'json'
 require 'rest_client'
@@ -51,17 +53,19 @@ module SummaryHelper
         # store each summary in a hashmap and use the question as the key
         summary = JSON.parse(sum_json)['summary']
         ps = PragmaticSegmenter::Segmenter.new(text: summary)
-        return ps.segment
+        ps.segment
       rescue StandardError => e
         logger.warn "Standard Error: #{e.inspect}"
-        return ['Problem with WebServices', 'Please contact the Expertiza Development team']
+        ['Problem with WebServices', 'Please contact the Expertiza Development team']
       end
     end
 
     # convert answers to each question to sentences
     def get_sentences(answer)
-      sentences = answer.comments.gsub!(/[.?!]/, '\1|').try(:split, '|') || nil unless answer.nil? || answer.comments.nil?
-      sentences.map!(&:strip) unless sentences.nil?
+      unless answer.nil? || answer.comments.nil?
+        sentences = answer.comments.gsub!(/[.?!]/, '\1|').try(:split, '|') || nil
+      end
+      sentences&.map!(&:strip)
       sentences
     end
 

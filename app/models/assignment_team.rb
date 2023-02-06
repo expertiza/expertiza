@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AssignmentTeam < Team
   require File.dirname(__FILE__) + '/analytic/assignment_team_analytic'
   include AssignmentTeamAnalytic
@@ -156,7 +158,9 @@ class AssignmentTeam < Team
 
   # Add Participants to the current Assignment Team
   def add_participant(assignment_id, user)
-    return if AssignmentParticipant.find_by(parent_id: assignment_id, user_id: user.id)
+    if AssignmentParticipant.find_by(parent_id: assignment_id, user_id: user.id)
+      return
+    end
 
     AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted)
   end
@@ -187,10 +191,14 @@ class AssignmentTeam < Team
     hyperlink.strip!
     raise 'The hyperlink cannot be empty!' if hyperlink.empty?
 
-    hyperlink = 'http://' + hyperlink unless hyperlink.start_with?('http://', 'https://')
+    unless hyperlink.start_with?('http://', 'https://')
+      hyperlink = 'http://' + hyperlink
+    end
     # If not a valid URL, it will throw an exception
     response_code = Net::HTTP.get_response(URI(hyperlink))
-    raise "HTTP status code: #{response_code}" if response_code =~ /[45][0-9]{2}/
+    if response_code =~ /[45][0-9]{2}/
+      raise "HTTP status code: #{response_code}"
+    end
 
     hyperlinks = self.hyperlinks
     hyperlinks << hyperlink
@@ -234,7 +242,7 @@ class AssignmentTeam < Team
   # Remove a team given the team id
   def self.remove_team_by_id(id)
     old_team = AssignmentTeam.find(id)
-    old_team.destroy unless old_team.nil?
+    old_team&.destroy
   end
 
   # Get the path of the team directory

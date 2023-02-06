@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Badge < ApplicationRecord
   has_many :assignment_badges, dependent: :destroy
   has_many :assignments, through: :assignment_badges

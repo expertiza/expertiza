@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddChangeHandleAction < ActiveRecord::Migration[4.2]
   def self.up
     controller = SiteController.find_by_name('participants')

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'uri'
 require 'yaml'
 # Code Review: Notice that Participant overloads two different concepts:
@@ -117,7 +119,9 @@ class AssignmentParticipant < Participant
 
     # if user with provided name in csv file is not present then new user will be created.
     if user.nil?
-      raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
+      if row_hash.length < 4
+        raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items."
+      end
 
       # define_attributes method will return an element that stores values from the row_hash.
       attributes = ImportFileHelper.define_attributes(row_hash)
@@ -126,7 +130,9 @@ class AssignmentParticipant < Participant
       user = ImportFileHelper.create_new_user(attributes, session)
 
     end
-    raise ImportError, "The assignment with id \"#{id}\" was not found." if Assignment.find(id).nil?
+    if Assignment.find(id).nil?
+      raise ImportError, "The assignment with id \"#{id}\" was not found."
+    end
 
     # if user is already added to the assignment then return.
     return if AssignmentParticipant.exists?(user_id: user.id, parent_id: id)

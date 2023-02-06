@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateRoles < ActiveRecord::Migration[4.2]
   # This table need not be created in migration, as it is already created by Goldberg
   def self.up

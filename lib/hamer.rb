@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Hamer
   def self.calculate_weighted_scores_and_reputation(submissions, reviewers)
     # Initialize weights
@@ -38,7 +40,9 @@ module Hamer
         end
       end
       iterations += 1
-      break if converged?(previous_weights, submissions.map { |s| s.reviews.map(&:weight) })
+      if converged?(previous_weights, submissions.map { |s| s.reviews.map(&:weight) })
+        break
+      end
     end
     { iterations: iterations }
   end
@@ -64,7 +68,7 @@ module Hamer
   module Test
     module Mock
       def initialize(&block)
-        block.call(self) if block
+        block&.call(self)
       end
     end
 

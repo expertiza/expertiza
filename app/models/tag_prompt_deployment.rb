@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TagPromptDeployment < ApplicationRecord
   belongs_to :tag_prompt
   belongs_to :assignment
@@ -21,7 +23,9 @@ class TagPromptDeployment < ApplicationRecord
 
       answers = Answer.where(question_id: questions_ids, response_id: responses_ids)
 
-      answers = answers.where(conditions: "length(comments) < #{answer_length_threshold}") unless answer_length_threshold.nil?
+      unless answer_length_threshold.nil?
+        answers = answers.where(conditions: "length(comments) < #{answer_length_threshold}")
+      end
       return answers.count
     end
     0
@@ -45,7 +49,9 @@ class TagPromptDeployment < ApplicationRecord
         responses_ids = responses.map(&:id)
         answers = Answer.where(question_id: questions_ids, response_id: responses_ids)
 
-        answers = answers.select { |answer| answer.comments.length > answer_length_threshold } unless answer_length_threshold.nil?
+        unless answer_length_threshold.nil?
+          answers = answers.select { |answer| answer.comments.length > answer_length_threshold }
+        end
         answers_ids = answers.map(&:id)
         teams_users = TeamsUser.where(team_id: team.id)
         users = teams_users.map { |teams_user| User.find(teams_user.user_id) }

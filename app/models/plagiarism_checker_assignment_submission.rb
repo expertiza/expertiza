@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PlagiarismCheckerAssignmentSubmission < ApplicationRecord
   # attr_accessible :name
   belongs_to :assignment

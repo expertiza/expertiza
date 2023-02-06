@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TrueFalse < QuizQuestion
   def edit
     quiz_question_choices = QuizQuestionChoice.where(question_id: id)
@@ -81,7 +83,9 @@ class TrueFalse < QuizQuestion
       end
       correct_count += 1 if value[:iscorrect] == 1.to_s
     end
-    valid = 'Please select a correct answer for all questions' if correct_count == 0
+    if correct_count == 0
+      valid = 'Please select a correct answer for all questions'
+    end
     valid
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AssignmentsController < ApplicationController
   include AssignmentHelper
   include AuthorizationHelper
@@ -52,7 +54,7 @@ class AssignmentsController < ApplicationController
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
         redirect_to edit_assignment_path aid
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
-        return
+        nil
       else
         flash[:error] = 'Failed to create assignment.'
         if find_existing_assignment
@@ -236,9 +238,13 @@ class AssignmentsController < ApplicationController
   # Removes questionnaire types from the rubric list that shouldn't be there
   # e.g. remove teammate review questionnaire if the maximum team size is one person (there are no teammates)
   def remove_invalid_questionnaires(rubrics_list)
-    rubrics_list.delete('TeammateReviewQuestionnaire') if @assignment_form.assignment.max_team_size == 1
+    if @assignment_form.assignment.max_team_size == 1
+      rubrics_list.delete('TeammateReviewQuestionnaire')
+    end
     rubrics_list.delete('MetareviewQuestionnaire') unless @metareview_allowed
-    rubrics_list.delete('BookmarkRatingQuestionnaire') unless @assignment_form.assignment.use_bookmark
+    unless @assignment_form.assignment.use_bookmark
+      rubrics_list.delete('BookmarkRatingQuestionnaire')
+    end
   end
 
   # lists parts of the assignment that need a rubric assigned
@@ -387,7 +393,9 @@ class AssignmentsController < ApplicationController
 
   # adjusts the time zone for a due date
   def adjust_due_date_for_timezone(dd)
-    dd.due_at = dd.due_at.to_s.in_time_zone(current_user.timezonepref) if dd.due_at.present?
+    if dd.due_at.present?
+      dd.due_at = dd.due_at.to_s.in_time_zone(current_user.timezonepref)
+    end
   end
 
   # ensures due dates ahave a name, description and at least either meta reviews, topic drops, signups, or team formations
@@ -425,7 +433,9 @@ class AssignmentsController < ApplicationController
       flash.now[:error] = 'You did not specify your submission directory.'
       ExpertizaLogger.error LoggerMessage.new(controller_name, '', 'Submission directory not specified', request)
     end
-    @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id]) if @assignment_form.assignment.is_answer_tagging_allowed
+    if @assignment_form.assignment.is_answer_tagging_allowed
+      @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id])
+    end
   end
 
   # update values for an assignment's due date when editing
@@ -445,8 +455,12 @@ class AssignmentsController < ApplicationController
 
   # flash notice if the time zone is not specified for an assignment's due date
   def user_timezone_specified
-    ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, 'Timezone not specified', request) if current_user.timezonepref.nil?
-    flash.now[:error] = 'You have not specified your preferred timezone yet. Please do this before you set up the deadlines.' if current_user.timezonepref.nil?
+    if current_user.timezonepref.nil?
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, 'Timezone not specified', request)
+    end
+    if current_user.timezonepref.nil?
+      flash.now[:error] = 'You have not specified your preferred timezone yet. Please do this before you set up the deadlines.'
+    end
   end
 
   # helper methods for update
@@ -475,7 +489,9 @@ class AssignmentsController < ApplicationController
     end
     # Deleting Due date info from table if meta-review is unchecked. - UNITY ID: ralwan and vsreeni
     @due_date_info = DueDate.where(parent_id: params[:id])
-    DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all if params[:metareview_allowed] == 'false'
+    if params[:metareview_allowed] == 'false'
+      DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all
+    end
   end
 
   # sets assignment time zone if not specified and flashes a warning

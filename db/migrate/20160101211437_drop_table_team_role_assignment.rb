@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DropTableTeamRoleAssignment < ActiveRecord::Migration[4.2]
   def change
     execute 'ALTER TABLE teamrole_assignment DROP FOREIGN KEY fk_teamrole_assignment_team_rolesets;'

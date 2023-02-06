@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ChartsHelper
   # labels: array of labels
   # values: array of values

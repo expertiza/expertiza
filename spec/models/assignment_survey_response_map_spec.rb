@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe AssignmentSurveyResponseMap, type: :model do
   let(:participant) { build(:participant, user_id: 1, user: build(:student, name: 'Jane', fullname: 'Doe, Jane', id: 1)) }
   let(:assignment_questionnaire1) { build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 1) }

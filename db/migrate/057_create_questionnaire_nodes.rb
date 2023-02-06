@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateQuestionnaireNodes < ActiveRecord::Migration[4.2]
   def self.up
     questionnaires = Questionnaire.all

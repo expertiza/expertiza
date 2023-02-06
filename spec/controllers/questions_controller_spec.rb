@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe QuestionsController do
   let(:instructor) { build(:instructor, id: 6) }
   let!(:questionnaire) { create(:questionnaire, id: 1) }

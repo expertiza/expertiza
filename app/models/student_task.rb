@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Author: Andrew Kofink, 2013-09-28
 class StudentTask
   attr_accessor :assignment, :current_stage, :participant, :stage_deadline, :topic
@@ -140,7 +142,9 @@ class StudentTask
         label: sr.operation.humanize,
         updated_at: sr.updated_at.strftime('%a, %d %b %Y %H:%M')
       }
-      timeline[:link] = sr.content if sr.operation == 'Submit Hyperlink' || sr.operation == 'Remove Hyperlink'
+      if sr.operation == 'Submit Hyperlink' || sr.operation == 'Remove Hyperlink'
+        timeline[:link] = sr.content
+      end
       timeline_list << timeline
     end
   end

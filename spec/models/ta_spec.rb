@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Ta do
   let!(:ta) { create(:teaching_assistant, id: 999) }
   let(:course1) { build(:course, id: 1, name: 'ECE517') }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SimiCheckWebService
   @@api_key = PLAGIARISM_CHECKER_CONFIG['simicheck_api_key']
   @@base_uri = 'https://www.simicheck.com/api'

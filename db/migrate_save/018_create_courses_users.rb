@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateCoursesUsers < ActiveRecord::Migration[4.2]
   def self.up
     # This table is used as a mapping table associating users with courses,

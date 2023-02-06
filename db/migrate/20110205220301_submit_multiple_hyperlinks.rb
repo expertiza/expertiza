@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'yaml'
 
 class SubmitMultipleHyperlinks < ActiveRecord::Migration[4.2]

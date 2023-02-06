@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ResponseHelper
   # E2218: this module contains methods that are used in response_controller class
 

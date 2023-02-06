@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CourseAnalyticTestDummyClass
   attr_accessor :course, :participants, :assignments
   require 'analytic/course_analytic'

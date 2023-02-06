@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SuggestionController < ApplicationController
   include AuthorizationHelper
 
@@ -73,8 +75,12 @@ class SuggestionController < ApplicationController
                           end
 
     if @suggestion.save
-      flash[:success] = 'Thank you for your suggestion!' unless @suggestion.unityID.empty?
-      flash[:success] = 'You have submitted an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID.empty?
+      unless @suggestion.unityID.empty?
+        flash[:success] = 'Thank you for your suggestion!'
+      end
+      if @suggestion.unityID.empty?
+        flash[:success] = 'You have submitted an anonymous suggestion. It will not show in the suggested topic table below.'
+      end
     end
     redirect_to action: 'new', id: @suggestion.assignment_id
   end
@@ -97,7 +103,9 @@ class SuggestionController < ApplicationController
       teams_users = TeamsUser.where(team_id: @team_id)
       cc_mail_list = []
       teams_users.each do |teams_user|
-        cc_mail_list << User.find(teams_user.user_id).email if teams_user.user_id != proposer.id
+        if teams_user.user_id != proposer.id
+          cc_mail_list << User.find(teams_user.user_id).email
+        end
       end
       Mailer.suggested_topic_approved_message(
         to: proposer.email,

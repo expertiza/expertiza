@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe VmQuestionResponseRow do
   let(:row) { VmQuestionResponseRow.new('Question for testing average score', 1, 1, 5, 1) }
 

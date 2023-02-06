@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TeamsUser < ApplicationRecord
   belongs_to :user
   belongs_to :team

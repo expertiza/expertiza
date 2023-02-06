@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe DeadlineHelper do
   before(:each) do
     @deadline_type = create(:deadline_type)

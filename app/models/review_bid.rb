@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ReviewBid < ApplicationRecord
   belongs_to :topic, class_name: 'SignUpTopic'
   belongs_to :participant, class_name: 'Participant'
@@ -23,9 +25,7 @@ class ReviewBid < ApplicationRecord
   # assigns topics to reviews as matched by the webservice algorithm
   def self.assign_review_topics(assignment_id, reviewer_ids, matched_topics, _min_num_reviews = 2)
     # if review response map already created, delete it
-    if ReviewResponseMap.where(reviewed_object_id: assignment_id)
-      ReviewResponseMap.where(reviewed_object_id: assignment_id).destroy_all
-    end
+    ReviewResponseMap.where(reviewed_object_id: assignment_id)&.destroy_all
     # loop through reviewer_ids to assign reviews to each reviewer
     reviewer_ids.each do |reviewer_id|
       topics_to_assign = matched_topics[reviewer_id.to_s]

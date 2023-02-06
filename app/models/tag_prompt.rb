@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TagPrompt < ApplicationRecord
   validates :prompt, presence: true
   validates :desc, presence: true
@@ -12,7 +14,9 @@ class TagPrompt < ApplicationRecord
       if tag_prompt_deployment.answer_length_threshold.nil?
         length_valid = true
       else
-        length_valid = true unless answer.comments.nil? || answer.comments.length <= tag_prompt_deployment.answer_length_threshold
+        unless answer.comments.nil? || answer.comments.length <= tag_prompt_deployment.answer_length_threshold
+          length_valid = true
+        end
       end
 
       if length_valid && answer.question.type.eql?(tag_prompt_deployment.question_type)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'will_paginate/array'
 
 class UsersController < ApplicationController
@@ -123,7 +125,9 @@ class UsersController < ApplicationController
       # ensures that these users have a default value of 15% for notifications.
       # TAs and Students do not need a default. TAs inherit the default from the instructor,
       # Students do not have any checks for this information.
-      AssignmentQuestionnaire.create(user_id: @user.id) if (@user.role.name == 'Instructor') || (@user.role.name == 'Administrator')
+      if (@user.role.name == 'Instructor') || (@user.role.name == 'Administrator')
+        AssignmentQuestionnaire.create(user_id: @user.id)
+      end
       undo_link("The user \"#{@user.name}\" has been successfully created. ")
       redirect_to action: 'list'
     else
@@ -149,7 +153,9 @@ class UsersController < ApplicationController
     # update username, when the user cannot be deleted
     # rename occurs in 'show' page, not in 'edit' page
     # eg. /users/5408?name=5408
-    @user.name += '_hidden' if request.original_fullpath == "/users/#{@user.id}?name=#{@user.id}"
+    if request.original_fullpath == "/users/#{@user.id}?name=#{@user.id}"
+      @user.name += '_hidden'
+    end
 
     if @user.update_attributes(params[:user])
       flash[:success] = "The user \"#{@user.name}\" has been successfully updated."
@@ -224,7 +230,7 @@ class UsersController < ApplicationController
 
   # to find the role of a given user object and set the @role accordingly
   def role
-    if @user && @user.role_id
+    if @user&.role_id
       @role = Role.find(@user.role_id)
     elsif @user
       @role = Role.new(id: nil, name: '(none)')

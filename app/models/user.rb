@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class User < ApplicationRecord
   enum locale: Locale.code_name_to_db_encoding(Locale.available_locale_preferences)
   acts_as_authentic do |config|
@@ -98,7 +100,9 @@ class User < ApplicationRecord
   # Zhewei: anonymized view for demo purposes - 1/3/2018
   def self.anonymized_view?(ip_address = nil)
     anonymized_view_starter_ips = $redis.get('anonymized_view_starter_ips') || ''
-    return true if ip_address && anonymized_view_starter_ips.include?(ip_address)
+    if ip_address && anonymized_view_starter_ips.include?(ip_address)
+      return true
+    end
 
     false
   end
@@ -162,7 +166,9 @@ class User < ApplicationRecord
   end
 
   def self.import(row_hash, _row_header, session, _id = nil)
-    raise ArgumentError, "Only #{row_hash.length} column(s) is(are) found. It must contain at least username, full name, email." if row_hash.length < 3
+    if row_hash.length < 3
+      raise ArgumentError, "Only #{row_hash.length} column(s) is(are) found. It must contain at least username, full name, email."
+    end
 
     user = User.find_by_name(row_hash[:name])
     if user.nil?
@@ -235,7 +241,9 @@ class User < ApplicationRecord
     if replacing_key
       participants = AssignmentParticipant.where(user_id: id)
       participants.each do |participant|
-        participant.assign_copyright(new_key.to_pem) if participant.permission_granted
+        if participant.permission_granted
+          participant.assign_copyright(new_key.to_pem)
+        end
       end
     end
 
@@ -257,11 +265,17 @@ class User < ApplicationRecord
     users = User.all
     users.each do |user|
       tcsv = []
-      tcsv.push(user.name, user.fullname, user.email) if options['personal_details'] == 'true'
+      if options['personal_details'] == 'true'
+        tcsv.push(user.name, user.fullname, user.email)
+      end
       tcsv.push(user.role.name) if options['role'] == 'true'
       tcsv.push(user.parent.name) if options['parent'] == 'true'
-      tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails) if options['email_options'] == 'true'
-      tcsv.push(user.etc_icons_on_homepage) if options['etc_icons_on_homepage'] == 'true'
+      if options['email_options'] == 'true'
+        tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails)
+      end
+      if options['etc_icons_on_homepage'] == 'true'
+        tcsv.push(user.etc_icons_on_homepage)
+      end
       tcsv.push(user.handle) if options['handle'] == 'true'
       csv << tcsv
     end
@@ -273,11 +287,17 @@ class User < ApplicationRecord
 
   def self.export_fields(options)
     fields = []
-    fields.push('name', 'full name', 'email') if options['personal_details'] == 'true'
+    if options['personal_details'] == 'true'
+      fields.push('name', 'full name', 'email')
+    end
     fields.push('role') if options['role'] == 'true'
     fields.push('parent') if options['parent'] == 'true'
-    fields.push('email on submission', 'email on review', 'email on metareview', 'copy of emails') if options['email_options'] == 'true'
-    fields.push('preference home flag') if options['etc_icons_on_homepage'] == 'true'
+    if options['email_options'] == 'true'
+      fields.push('email on submission', 'email on review', 'email on metareview', 'copy of emails')
+    end
+    if options['etc_icons_on_homepage'] == 'true'
+      fields.push('preference home flag')
+    end
     fields.push('handle') if options['handle'] == 'true'
     fields
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class StudentReviewController < ApplicationController
   include AuthorizationHelper
 
@@ -33,7 +35,9 @@ class StudentReviewController < ApplicationController
       @review_mappings = []
     end
     # if it is an calibrated assignment, change the response_map order in a certain way
-    @review_mappings = @review_mappings.sort_by { |mapping| mapping.id % 5 } if @assignment.is_calibrated
+    if @assignment.is_calibrated
+      @review_mappings = @review_mappings.sort_by { |mapping| mapping.id % 5 }
+    end
     @metareview_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
     # Calculate the number of reviews that the user has completed so far.
 
@@ -41,7 +45,9 @@ class StudentReviewController < ApplicationController
     # Add the reviews which are requested and not began.
     @num_reviews_completed = 0
     @review_mappings.each do |map|
-      @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
+      if !map.response.empty? && map.response.last.is_submitted
+        @num_reviews_completed += 1
+      end
     end
 
     @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed

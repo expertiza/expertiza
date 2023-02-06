@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'SignUpSheetHelper' do
   describe '#check_topic_due_date_value' do
     before(:each) do
@@ -104,6 +106,5 @@ describe 'SignUpSheetHelper' do
     it 'The team_bids method should throw an exception' do
       expect { helper.team_bids(@topic1, @assignment1, nil) }.to raise_exception(ArgumentError)
     end
-  end  
-
+  end
 end

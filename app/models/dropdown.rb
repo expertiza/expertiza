@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Dropdown < UnscoredQuestion
   include ActionView::Helpers
   validates :alternatives, presence: true

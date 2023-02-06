@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PlagiarismCheckerHelper
   require 'simicheck_webservice'
   require 'submission_content_fetcher'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Assessment360Controller do
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 6) }
@@ -41,7 +43,7 @@ describe Assessment360Controller do
   let(:participant) { build(:participant) }
   let(:scores) {}
   let(:topic) { build(:topic) }
-  REDIRECT_PATH = 'http://example.com'.freeze
+  REDIRECT_PATH = 'http://example.com'
 
   describe 'checking controller permissions' do
     context 'when different roles call the controller' do

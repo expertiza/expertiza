@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class StudentViewController < ApplicationController
   include AuthorizationHelper
 

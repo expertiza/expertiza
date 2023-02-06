@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ChangeAssignmentIdInDueDatesTableToParentId < ActiveRecord::Migration[4.2]
   def self.up
     remove_foreign_key :due_dates, column: :assignment_id

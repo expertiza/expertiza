@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class StudentQuizzesController < ApplicationController
   include AuthorizationHelper
 
@@ -44,9 +46,9 @@ class StudentQuizzesController < ApplicationController
       quiz_questionnaire = QuizQuestionnaire.where(instructor_id: reviewee_team.id).first
 
       # if the reviewee team has created quiz
-      if quiz_questionnaire
-        quizzes << quiz_questionnaire unless quiz_questionnaire.taken_by? reviewer
-      end
+      next unless quiz_questionnaire
+
+      quizzes << quiz_questionnaire unless quiz_questionnaire.taken_by? reviewer
     end
     quizzes
   end
@@ -83,7 +85,9 @@ class StudentQuizzesController < ApplicationController
         correct_answer = correct_answers.first
         score = correct_answer.txt == params[question.id.to_s] ? 1 : 0
         new_score = Answer.new comments: params[question.id.to_s], question_id: question.id, response_id: response.id, answer: score
-        valid = false if new_score.nil? || new_score.comments.nil? || new_score.comments.empty?
+        if new_score.nil? || new_score.comments.nil? || new_score.comments.empty?
+          valid = false
+        end
         scores.push(new_score)
       end
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe 'add assignment team member test' do
   before(:each) do
     create(:assignment)

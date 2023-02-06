@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RemoveAverageDifficultyRatingAndNumberOfRatingsFromQuestions < ActiveRecord::Migration[4.2]
   def self.up
     remove_column :questions, :average_difficulty_rating

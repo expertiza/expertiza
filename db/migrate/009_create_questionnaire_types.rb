@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateQuestionnaireTypes < ActiveRecord::Migration[4.2]
   def self.up
     create_table 'questionnaire_types', force: true do |t|

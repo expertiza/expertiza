@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe BookmarkRatingQuestionnaire do
   let(:questionnaire) { build(:bookmark_questionnaire, id: 2) }
   let(:participant) { build(:participant, id: 1) }

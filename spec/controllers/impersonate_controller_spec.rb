@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe ImpersonateController do
   let(:instructor) { build(:instructor, id: 2) }
   let(:student1) { build(:student, id: 30, name: :Amanda) }
@@ -132,7 +134,7 @@ describe ImpersonateController do
     end
 
     it 'admin should be able to impersonate a student with their real name' do
-      stub_current_user(admin, admin.role.name, admin.role)       
+      stub_current_user(admin, admin.role.name, admin.role)
       allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
       allow(admin).to receive(:can_impersonate?).with(student1).and_return(true)
       request.env['HTTP_REFERER'] = 'http://www.example.com'
@@ -185,7 +187,7 @@ describe ImpersonateController do
     end
 
     it 'super admin should be able to impersonate a student with their real name' do
-      stub_current_user(super_admin, super_admin.role.name, super_admin.role)       
+      stub_current_user(super_admin, super_admin.role.name, super_admin.role)
       allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
       allow(super_admin).to receive(:can_impersonate?).with(student1).and_return(true)
       request.env['HTTP_REFERER'] = 'http://www.example.com'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PasswordReset < ApplicationRecord
   validates :user_email, presence: true
   # attr_accessible :user_email, :token

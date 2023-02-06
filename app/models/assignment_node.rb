@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Node type for Assignments
 
 # Author: ajbudlon

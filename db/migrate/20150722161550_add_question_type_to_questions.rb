@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddQuestionTypeToQuestions < ActiveRecord::Migration[4.2]
   def self.up
     add_column 'questions', 'seq', :float, default: nil

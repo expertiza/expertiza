@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Dropdown do
   let(:dropdown) { build(:dropdown, id: 1) }
   let(:questionnaire) { create(:questionnaire, id: 1) }

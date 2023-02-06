@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateUsers < ActiveRecord::Migration[4.2]
   def self.up
     # t.column :username, :string, :limit=>32  --  called "name" in Goldberg

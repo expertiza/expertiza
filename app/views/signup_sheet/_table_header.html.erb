@@ -18,7 +18,7 @@
     <th width="5%"><%=t ".num_bids"%></th>
     <th width="5%"><%=t ".num_1_2_bids"%></th>
   <% end %>
-  <% if @use_bookmark %>
+  <% if @assignment.use_bookmark %>
     <th width="10%"> <%=t ".bookmarks"%>
   <% end %>
   <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>

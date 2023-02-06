@@ -1,8 +1,8 @@
 # This helper contains all functions associated with team management.
 # These include creating a new team, adding a new member to a team etc
-# This helper is used by both sign_up_sheet controller and signup controller
+# This helper is used by both signup_sheet controller and signup controller
 module ManageTeamHelper
-  # Adds a user specified bu 'user' object to a team specified by 'team_id'
+  # Adds a user specified by 'user' object to a team specified by 'team_id'
   def create_team_users(user, team_id)
     # if user does not exist flash message
     unless user

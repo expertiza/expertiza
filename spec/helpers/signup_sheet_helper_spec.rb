@@ -1,4 +1,4 @@
-describe 'SignUpSheetHelper' do
+describe 'SignupSheetHelper' do
   describe '#check_topic_due_date_value' do
     before(:each) do
       @assignment = create(:assignment)
@@ -78,12 +78,12 @@ describe 'SignUpSheetHelper' do
     end
 
     it 'The render_participant_info method should return an empty html' do
-      name_html = helper.render_participant_info(@topic1, @assignment2, nil)
+      name_html = helper.render_participant_info(@topic1, nil)
       expect(name_html).to be_empty
     end
 
     it 'The render_participant_info method should throw an exception' do
-      expect { helper.render_participant_info(@topic1, @assignment1, [@participant1]) }.to raise_exception(NoMethodError)
+      expect { helper.render_participant_info(@topic1, [@participant1]) }.to raise_exception(NoMethodError)
     end
   end
 

@@ -1,4 +1,4 @@
-describe 'sign_up_sheet/list.html.erb' do
+describe 'signup_sheet/list.html.erb' do
   def create_assignment_bookmarks
     create(:assignment, name: 'TestAssignment', directory_path: 'TestAssignment', use_bookmark: true)
     create_list(:participant, 3)
@@ -12,7 +12,7 @@ describe 'sign_up_sheet/list.html.erb' do
     create(:topic)
   end
 
-  def view_sign_up_sheet
+  def view_signup_sheet
     login_as('student2064')
     expect(page).to have_content 'User: student2064'
     expect(page).to have_content 'TestAssignment'
@@ -24,7 +24,7 @@ describe 'sign_up_sheet/list.html.erb' do
   context 'when bookmarks are enabled' do
     it 'should display bookmark links' do
       create_assignment_bookmarks
-      view_sign_up_sheet
+      view_signup_sheet
       expect(page).to_not have_content 'Bookmarks (disabled)'
     end
   end
@@ -32,7 +32,7 @@ describe 'sign_up_sheet/list.html.erb' do
   context 'when bookmarks are disabled' do
     it 'should not display bookmark links' do
       create_assignment_no_bookmarks
-      view_sign_up_sheet
+      view_signup_sheet
       expect(page).to have_content 'Bookmarks (disabled)'
     end
   end

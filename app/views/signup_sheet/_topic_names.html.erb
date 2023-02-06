@@ -8,10 +8,6 @@
     <span class="inline" id="<%= i %>_show"><%= topic.topic_name %> </span>
 <% end %>
 
-<% if (session[:user].id == @assignment.instructor_id || (TaMapping.where(course_id: @assignment.course_id).map(&:ta_id).include? session[:user].id)) && (@signup_topic_deadline.nil? || Time.now < @signup_topic_deadline.due_at) && (!@assignment.staggered_deadline? || get_topic_deadline([@assignment.due_dates.find_by(deadline_type_id: 1)], topic.id).nil? || Time.now < get_topic_deadline([@assignment.due_dates.find_by(deadline_type_id: 1)], topic.id)) %>
-    <%= link_to image_tag('signup.png', :border => 0, :title => 'Sign Up Student', :align => 'middle'), signup_as_instructor_sign_up_sheet_index_path( assignment_id: params[:id], topic_id: topic.id) %>
-<% end  %>
-
 <% unless topic.description.nil? %>
     <br/>
     <p style="font-size: 12px"><%= truncate(topic.description.to_s, length: 90, omission: '...') %>
@@ -24,6 +20,6 @@
 
 <div id="<%= i %>_myDiv" data-toggle="tooltip" title="<%= team_bids(topic, @participants) %>">
 <!--Though called participants, @participants are actually records in signed_up_teams table-->
-  <%= render_participant_info(topic, @assignment, @participants) %>
+  <%= render_participant_info(topic, @participants) %>
   <div id="dialog-message" style="word-wrap: normal"></div>
 </div>

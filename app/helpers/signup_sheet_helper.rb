@@ -1,4 +1,4 @@
-module SignUpSheetHelper
+module SignupSheetHelper
   # if the instructor does not specific the topic due date, it should be the same as assignment due date;
   # otherwise, it should display the topic due date.
   def check_topic_due_date_value(assignment_due_dates, topic_id, deadline_type_id = 1, review_round = 1)
@@ -56,7 +56,7 @@ module SignUpSheetHelper
   end
 
   # Render the participant info for a topic and assignment.
-  def render_participant_info(topic, assignment, participants)
+  def render_participant_info(topic, participants)
     html = ''
     if participants.present?
       chooser_present = false
@@ -65,10 +65,6 @@ module SignUpSheetHelper
 
         chooser_present = true
         html += participant.user_name_placeholder
-        if assignment.max_team_size > 1
-          html += '<a href="/sign_up_sheet/delete_signup_as_instructor/' + participant.team_id.to_s + '?topic_id=' + topic.id.to_s + '"">'
-          html += '<img border="0" align="middle" src="/assets/delete_icon.png" title="Drop Student"></a>'
-        end
         html += '<font color="red">(waitlisted)</font>' if participant.is_waitlisted
         html += '<br/>'
       end

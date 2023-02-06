@@ -8,13 +8,14 @@
 # Hence each topic has a field called assignment_id which points which can be used to identify the assignment that this topic belongs
 # to
 
-class SignUpSheetController < ApplicationController
+class SignupSheetController < ApplicationController
   include AuthorizationHelper
 
   require 'rgl/adjacency'
   require 'rgl/dot'
   require 'rgl/topsort'
 
+  # Make sure all these methods are only accessed by privileged users
   def action_allowed?
     case params[:action]
     when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
@@ -36,6 +37,7 @@ class SignUpSheetController < ApplicationController
   verify method: :post, only: %i[destroy create update],
          redirect_to: { action: :list }
 
+  # Used to return locale of the website
   def controller_locale
     locale_for_student
   end
@@ -43,9 +45,10 @@ class SignUpSheetController < ApplicationController
   # Prepares the form for adding a new topic. Used in conjunction with create
   def new
     @id = params[:id]
-    @sign_up_topic = SignUpTopic.new
-    @sign_up_topic.assignment = Assignment.find(params[:id])
-    @topic = @sign_up_topic
+    @signup_topic = SignUpTopic.new
+    # assign the new topic to the current assignment
+    @signup_topic.assignment = Assignment.find(params[:id])
+    @topic = @signup_topic
   end
 
   # This method is used to create signup topics
@@ -53,7 +56,8 @@ class SignUpSheetController < ApplicationController
   # that assignment id will virtually be the signup sheet id as well as we have assumed
   # that every assignment will have only one signup sheet
   def create
-    topic = SignUpTopic.where(topic_name: params[:topic][:topic_name], assignment_id: params[:id]).first
+    topic = SignUpTopic.where(topic_name: topic_params[:topic_name], assignment_id: params[:id]).first
+    # if the topic doesn't exist, create a new one otherwise update existing
     if topic.nil?
       setup_new_topic
     else
@@ -86,18 +90,13 @@ class SignUpSheetController < ApplicationController
     @topic = SignUpTopic.find(params[:id])
   end
 
-  # updates the database tables to reflect the new values for the assignment. Used in conjunction with edit
+  # updates the topic to reflect the new values for the assignment, also updates waitlist. Used in conjunction with edit
   def update
     @topic = SignUpTopic.find(params[:id])
     if @topic
-      @topic.topic_identifier = params[:topic][:topic_identifier]
-      update_max_choosers @topic
-      @topic.category = params[:topic][:category]
-      @topic.topic_name = params[:topic][:topic_name]
-      @topic.micropayment = params[:topic][:micropayment]
-      @topic.description = params[:topic][:description]
-      @topic.link = params[:topic][:link]
-      @topic.save
+      # update teams on the waitlist for topic based on update of max_choosers
+      update_waitlist @topic
+      @topic.update_attributes(topic_params)
       undo_link("The topic: \"#{@topic.topic_name}\" has been successfully updated. ")
     else
       flash[:error] = 'The topic could not be updated.'
@@ -137,80 +136,70 @@ class SignUpSheetController < ApplicationController
   # Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
   # Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics can have different deadlines.
   def add_signup_topics
-    load_add_signup_topics(params[:id])
     SignUpSheet.add_signup_topic(params[:id])
   end
 
-  def add_signup_topics_staggered
-    add_signup_topics
-  end
-
-  # retrieves all the data associated with the given assignment. Includes all topics,
-  def load_add_signup_topics(assignment_id)
-    @id = assignment_id
-    @sign_up_topics = SignUpTopic.where('assignment_id = ?', assignment_id)
-    @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
-    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment_id)
-
-    @assignment = Assignment.find(assignment_id)
-    # ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
-    # Though called participants, @participants are actually records in signed_up_teams table, which
-    # is a mapping table between teams and topics (waitlisted recorded are also counted)
-    @participants = SignedUpTeam.find_team_participants(assignment_id, session[:ip])
-  end
-
+  # Separated from setup_new_topic
+  # Only used to setup the parameters of new topic
   def set_values_for_new_topic
-    @sign_up_topic = SignUpTopic.new
-    @sign_up_topic.topic_identifier = params[:topic][:topic_identifier]
-    @sign_up_topic.topic_name = params[:topic][:topic_name]
-    @sign_up_topic.max_choosers = params[:topic][:max_choosers]
-    @sign_up_topic.category = params[:topic][:category]
-    @sign_up_topic.assignment_id = params[:id]
+    @signup_topic = SignUpTopic.new
+    @signup_topic.topic_identifier = topic_params[:topic_identifier]
+    @signup_topic.topic_name = topic_params[:topic_name]
+    @signup_topic.max_choosers = topic_params[:max_choosers]
+    @signup_topic.category = topic_params[:category]
+    @signup_topic.assignment_id = params[:id]
     @assignment = Assignment.find(params[:id])
   end
 
-  # simple function that redirects ti the /add_signup_topics or the /add_signup_topics_staggered page depending on assignment type
-  # staggered means that different topics can have different deadlines.
+  # simple function that redirects ti the /add_signup_topics page
   def redirect_to_sign_up(assignment_id)
-    assignment = Assignment.find(assignment_id)
-    assignment.staggered_deadline == true ? (redirect_to action: 'add_signup_topics_staggered', id: assignment_id) : (redirect_to action: 'add_signup_topics', id: assignment_id)
+    redirect_to action: 'add_signup_topics', id: assignment_id
   end
 
-  # simple function that redirects to assignment->edit->topic panel to display /add_signup_topics or the /add_signup_topics_staggered page
-  # staggered means that different topics can have different deadlines.
+  # simple function that redirects to assignment->edit->topic panel to display /add_signup_topics page
   def redirect_to_assignment_edit(assignment_id)
     redirect_to controller: 'assignments', action: 'edit', id: assignment_id
   end
 
+  # method to return a list of topics for which a bid has been made by a team
+  def compute_signed_up_topics
+    signed_up_topics = []
+    @bids.each do |bid|
+      signup_topic = SignUpTopic.find_by(id: bid.topic_id)
+      signed_up_topics << signup_topic if signup_topic
+    end
+    signed_up_topics &= @signup_topics
+    return signed_up_topics
+  end
+
+  # method to load deadline instance variables
+  def find_topic_deadlines
+    @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
+    @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
+  end
+
+  # method to list possible signup topics
+  # renders either list.html or intelligent_topic_selection.html
   def list
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
+    @signup_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
     @show_actions = true
     @priority = 0
-    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
-    @max_team_size = @assignment.max_team_size
     team_id = @participant.team.try(:id)
-    @use_bookmark = @assignment.use_bookmark
 
+    # if assignment is intelligent, want to know which topics the team has already bid on
     if @assignment.is_intelligent
       @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
-      signed_up_topics = []
-      @bids.each do |bid|
-        sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
-        signed_up_topics << sign_up_topic if sign_up_topic
-      end
-      signed_up_topics &= @sign_up_topics
-      @sign_up_topics -= signed_up_topics
-      @bids = signed_up_topics
+      @bids = compute_signed_up_topics()
+      @signup_topics -= @bids
     end
 
-    @num_of_topics = @sign_up_topics.size
-    @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
-    @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
+    @num_of_topics = @signup_topics.size
     @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
+    find_topic_deadlines()
 
     unless @assignment.due_dates.find_by(deadline_type_id: 1).nil?
       @show_actions = false if !@assignment.staggered_deadline? && (@assignment.due_dates.find_by(deadline_type_id: 1).due_at < Time.now)
@@ -225,9 +214,10 @@ class SignUpSheetController < ApplicationController
                            SignedUpTeam.find_user_signup_topics(@assignment.id, users_team.first.t_id)
                          end
     end
-    render('sign_up_sheet/intelligent_topic_selection') && return if @assignment.is_intelligent
+    render('signup_sheet/intelligent_topic_selection') && return if @assignment.is_intelligent
   end
 
+  # Signup for a topic
   def sign_up
     @assignment = AssignmentParticipant.find(params[:id]).assignment
     @user_id = session[:user].id
@@ -236,30 +226,6 @@ class SignUpSheetController < ApplicationController
     # Team lazy initialization: check whether the user already has a team for this assignment
     flash[:error] = "You've already signed up for a topic!" unless SignUpSheet.signup_team(@assignment.id, @user_id, params[:topic_id])
     redirect_to action: 'list', id: params[:id]
-  end
-
-  # routes to new page to specficy student
-  def signup_as_instructor; end
-
-  def signup_as_instructor_action
-    user = User.find_by(name: params[:username])
-    if user.nil? # validate invalid user
-      flash[:error] = 'That student does not exist!'
-    else
-      if AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id]
-        if SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
-          flash[:success] = 'You have successfully signed up the student for the topic!'
-          ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor signed up student for topic: ' + params[:topic_id].to_s)
-        else
-          flash[:error] = 'The student has already signed up for a topic!'
-          ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor is signing up a student who already has a topic')
-        end
-      else
-        flash[:error] = 'The student is not registered for the assignment!'
-        ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'The student is not registered for the assignment: ' << user.id)
-      end
-    end
-    redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
   end
 
   # this function is used to delete a previous signup
@@ -285,27 +251,7 @@ class SignUpSheetController < ApplicationController
     redirect_to action: 'list', id: params[:id]
   end
 
-  def delete_signup_as_instructor
-    # find participant using assignment using team and topic ids
-    team = Team.find(params[:id])
-    assignment = Assignment.find(team.parent_id)
-    user = TeamsUser.find_by(team_id: team.id).user
-    participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
-    drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
-    if !participant.team.submitted_files.empty? || !participant.team.hyperlinks.empty?
-      flash[:error] = 'The student has already submitted their work, so you are not allowed to remove them.'
-      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for already submitted work: ' + params[:topic_id].to_s)
-    elsif !drop_topic_deadline.nil? && (Time.now > drop_topic_deadline.due_at)
-      flash[:error] = 'You cannot drop a student after the drop topic deadline!'
-      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for ended work: ' + params[:topic_id].to_s)
-    else
-      delete_signup_for_topic(assignment.id, params[:topic_id], participant.user_id)
-      flash[:success] = 'You have successfully dropped the student from the topic!'
-      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Student has been dropped from the topic: ' + params[:topic_id].to_s)
-    end
-    redirect_to controller: 'assignments', action: 'edit', id: assignment.id
-  end
-
+  # Set the priority and bid for the topics in the assignment
   def set_priority
     participant = AssignmentParticipant.find_by(id: params[:participant_id])
     assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
@@ -419,6 +365,8 @@ class SignUpSheetController < ApplicationController
     end
   end
 
+  # This method is used to support the option given to students to suggest a topic for their project
+  # If their topic is approved by the instructor, they can go ahead and switch their topic to it from whatever they were assigned previously
   def switch_original_topic_to_approved_suggested_topic
     assignment = AssignmentParticipant.find(params[:id]).assignment
     team_id = TeamsUser.team_id(assignment.id, session[:user].id)
@@ -447,6 +395,7 @@ class SignUpSheetController < ApplicationController
     redirect_to action: 'list', id: params[:id]
   end
 
+  # Used to public topics in the _all_actions.html.erb
   def publish_approved_suggested_topic
     SignUpTopic.find_by(id: params[:topic_id]).update_attribute(:private_to, nil) if SignUpTopic.exists?(id: params[:topic_id])
     redirect_to action: 'list', id: params[:id]
@@ -454,36 +403,41 @@ class SignUpSheetController < ApplicationController
 
   private
 
+  # Create and setup a new topic if we cannot find it
+  # Called by create
   def setup_new_topic
     set_values_for_new_topic
-    @sign_up_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
-    if @sign_up_topic.save
-      undo_link "The topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
-      redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + '#tabs-2'
+    @signup_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
+    if @signup_topic.save
+      undo_link "The topic: \"#{@signup_topic.topic_name}\" has been created successfully. "
+      redirect_to edit_assignment_path(@signup_topic.assignment_id) + '#tabs-2'
     else
       render action: 'new', id: params[:id]
     end
   end
 
+  # Update the existing topic, instead of creating a new one
+  # Called by create
   def update_existing_topic(topic)
-    topic.topic_identifier = params[:topic][:topic_identifier]
-    update_max_choosers(topic)
-    topic.category = params[:topic][:category]
-    # topic.assignment_id = params[:id]
-    topic.save
+    # This method is called as a fall-back for create, when the topic entered already exists it updates the existing
+    # Updates the waitlist for the topic based of update of max choosers
+    update_waitlist topic
+    topic.update_attributes(topic_params)
     redirect_to_sign_up(params[:id])
   end
 
-  def update_max_choosers(topic)
+  # Update teams on the waitlist for the topic based on update of max_choosers
+  def update_waitlist(topic)
     # While saving the max choosers you should be careful; if there are users who have signed up for this particular
     # topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
     # there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
     # it.
-    if SignedUpTeam.find_by(topic_id: topic.id).nil? || topic.max_choosers == params[:topic][:max_choosers]
-      topic.max_choosers = params[:topic][:max_choosers]
-    elsif topic.max_choosers.to_i < params[:topic][:max_choosers].to_i
-      topic.update_waitlisted_users params[:topic][:max_choosers]
-      topic.max_choosers = params[:topic][:max_choosers]
+    # if no team has signed up for this topic/max choosers hasn't changed, allow update
+    if SignedUpTeam.find_by(topic_id: topic.id).nil? || topic.max_choosers == topic_params[:max_choosers]
+      return
+    # if max choosers has increased, remove teams from the waitlist accordingly
+    elsif topic.max_choosers.to_i < topic_params[:max_choosers].to_i
+      topic.update_waitlisted_users topic_params[:max_choosers]
     else
       flash[:error] = 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'
     end
@@ -511,7 +465,14 @@ class SignUpSheetController < ApplicationController
     @ad_information
   end
 
+  # Separated from delete_signup()
+  # Students could drop topic if there is no drop topic deadline
   def delete_signup_for_topic(assignment_id, topic_id, user_id)
     SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
+  end
+
+  # filter topic level params from all params
+  def topic_params
+    params.require(:topic).permit(:topic_identifier, :category, :topic_name, :micropayment, :description, :link, :max_choosers)
   end
 end

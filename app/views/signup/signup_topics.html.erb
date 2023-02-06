@@ -19,7 +19,7 @@
   <% for topic in @sign_up_topics %>
     amrut
     <%= render :partial => 'choose_line_color', :locals => {:i=>i, :topic=>topic} %>
-    <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
+    <%= render :partial => '/signup_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
     apte
   </tr>
   <% i=i+1 %>

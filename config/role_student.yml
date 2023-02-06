@@ -99,7 +99,7 @@ development:
         goto_teammatereview_rubrics: false
       grades:
         view_my_scores: true
-      sign_up_sheet:
+      signup_sheet:
         signup_topics: true
         signup: true
         delete_signup: true
@@ -169,7 +169,7 @@ development:
       export_file: false
       response: true
       popup: false
-      sign_up_sheet: false
+      signup_sheet: false
       suggestion: false
       delete_object: false
       assessment360: false
@@ -376,7 +376,7 @@ test:
         goto_teammate_reviews: false
         goto_metareview_rubrics: false
         goto_teammatereview_rubrics: false
-      sign_up_sheet:
+      signup_sheet:
         list: true
         signup: true
         delete_signup: true
@@ -440,7 +440,7 @@ test:
       publishing: true
       export_file: false
       response: true
-      sign_up_sheet: false
+      signup_sheet: false
       suggestion: false
       delete_object: false
       advertise_for_partner: true
@@ -641,7 +641,7 @@ production:
         goto_teammatereview_rubrics: false
       grades:
         view_my_scores: true
-      sign_up_sheet:
+      signup_sheet:
         signup_topics: true
         signup: true
         delete_signup: true
@@ -711,7 +711,7 @@ production:
       export_file: false
       response: true
       popup: false
-      sign_up_sheet: false
+      signup_sheet: false
       suggestion: false
       delete_object: false
       assessment360: false

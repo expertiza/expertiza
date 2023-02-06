@@ -37,9 +37,9 @@
 <input name="hidden_topic_id" type="hidden" value=<%=topic.id %> >
 
 <td><%= topic.topic_identifier %></td>
-<td><%= render :partial => 'sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
+<td><%= render :partial => 'signup_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
 <% if ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? current_user_role?.name %>
   <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>
-      <td align="center"> <%= render :partial => 'sign_up_sheet/all_actions', :locals => {:i=>i,:topic=>topic, :is_suggested_topic=>is_suggested_topic ||= false} %> </td>
+      <td align="center"> <%= render :partial => 'signup_sheet/all_actions', :locals => {:i=>i,:topic=>topic, :is_suggested_topic=>is_suggested_topic ||= false} %> </td>
   <% end %>
 <% end %>

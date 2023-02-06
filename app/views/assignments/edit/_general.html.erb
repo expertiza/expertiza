@@ -285,7 +285,7 @@ function autogenerate_submission(){
             if (confirm(msg)) {
                 // If this box is un-checked, remove all topics and reload page
                 jQuery.ajax({
-                    url: '/sign_up_sheet/delete_all_topics_for_assignment',
+                    url: '/signup_sheet/delete_all_topics_for_assignment',
                     method: 'POST',
                     data: {
                         assignment_id: <%= @assignment.id %>

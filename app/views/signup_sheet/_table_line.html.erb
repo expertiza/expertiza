@@ -38,7 +38,7 @@
 
 <td id='topic_id'><%= topic.topic_identifier %></td>
 <td><input id='topic_check' type="checkbox" name="Selected-Box"></td>
-<td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
+<td><%= render :partial => '/signup_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
 <% if not @assignment.is_intelligent or ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].
   include? current_user_role?.name %>
   <% if @assignment.microtask? %>
@@ -81,20 +81,20 @@
   <% end %>
 
   <td align="center"><%= topic.max_choosers %></td>
-  <%= render :partial => '/sign_up_sheet/available_slots', :locals => {:topic=>topic} %>
-  <%= render :partial => '/sign_up_sheet/num_waiting', :locals => {:topic=>topic} %>
+  <%= render :partial => '/signup_sheet/available_slots', :locals => {:topic=>topic} %>
+  <%= render :partial => '/signup_sheet/num_waiting', :locals => {:topic=>topic} %>
   <!-- Only view the bids metrics to Instructor role and when the "Biddiing for topic" option in Assignment >> Topic is enabled-->
   <% if @assignment.is_intelligent && current_user_has_instructor_privileges?  %>  
-    <%= render :partial => '/sign_up_sheet/total_bids', :locals => {:topic=>topic} %>
-    <%= render :partial => '/sign_up_sheet/total_1_2_bids', :locals => {:topic=>topic}%>
+    <%= render :partial => '/signup_sheet/total_bids', :locals => {:topic=>topic} %>
+    <%= render :partial => '/signup_sheet/total_1_2_bids', :locals => {:topic=>topic}%>
   <% end %>
   <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>
-      <td align="center"> <%= render :partial => '/sign_up_sheet/actions', :locals => {:i=>i,:topic=>topic, :is_suggested_topic=>is_suggested_topic ||= false} %> </td>
+      <td align="center"> <%= render :partial => '/signup_sheet/actions', :locals => {:i=>i,:topic=>topic, :is_suggested_topic=>is_suggested_topic ||= false} %> </td>
   <% end %>
   <% if SignUpSheet.has_teammate_ads?(topic.id) %>
   <td align="center">  
-      <%# link_to :controller => 'sign_up_sheet', :action => 'show_team', :assignment_id=>params[:id], :id=>topic.id do %>
-      <%= link_to image_tag('ad_horn.png', :border => 0, :title => 'Ad', :align => 'middle', :style => 'width: 24px; height:24px'), :controller=>'sign_up_sheet', :action=> 'show_team', :assignment_id=>@assignment.id, :id=>topic.id%>  
+      <%# link_to :controller => 'signup_sheet', :action => 'show_team', :assignment_id=>params[:id], :id=>topic.id do %>
+      <%= link_to image_tag('ad_horn.png', :border => 0, :title => 'Ad', :align => 'middle', :style => 'width: 24px; height:24px'), :controller=>'signup_sheet', :action=> 'show_team', :assignment_id=>@assignment.id, :id=>topic.id%>  
   </td>
   <% end %>
 <% end %>

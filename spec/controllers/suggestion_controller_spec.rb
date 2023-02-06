@@ -36,20 +36,20 @@ describe SuggestionController do
     end
   end
 
-  describe '#update_suggestion' do
+  describe '#update' do
     it 'checks updated is saved and redirect to the new' do
       allow(Suggestion).to receive(:find).and_return(suggestion)
       allow_any_instance_of(Suggestion).to receive(:update_attributes).and_return(true)
       allow_any_instance_of(SuggestionController).to receive(:current_user_has_student_privileges?).and_return(true)
       request_params = { id: 1, suggestion: { title: 'new title', description: 'new description', signup_preference: 'N' } }
       user_session = { user: instructor }
-      post :update_suggestion, params: request_params, session: user_session
+      post :update, params: request_params, session: user_session
       expect(response).to redirect_to('/suggestion/new?id=1')
     end
   end
 
   describe '#add_comment' do
-    it 'adds a participant' do
+    it 'adds a participant is successful' do
       allow(Assignment).to receive(:find).with('1').and_return(assignment)
       allow(User).to receive(:find_by).with(name: student.name).and_return(student)
       allow(SuggestionComment).to receive(:new).and_return(suggestion_comment)
@@ -59,31 +59,53 @@ describe SuggestionController do
       get :add_comment, params: request_params, session: user_session, xhr: true
       expect(flash[:notice]).to eq 'Your comment has been successfully added.'
     end
+    it 'adds a participant is not successful' do
+      allow_any_instance_of(SuggestionComment).to receive(:save).and_return(false)
+      request_params = { id: 1, suggestion_comment: { vote: 'Y', comments: 'comments' } }
+      user_session = { user: instructor }
+      get :add_comment, params: request_params, session: user_session, xhr: true
+      expect(flash[:error]).to eq 'There was an error in adding your comment.'
+    end
   end
 
   describe '#submit' do
     context 'when you want to reject a suggestion' do
-      it 'reject a suggestion' do
+      it 'rejecting a suggestion is successful' do
         allow(Suggestion).to receive(:find).and_return(suggestion)
         allow_any_instance_of(Suggestion).to receive(:update_attribute).and_return(true)
-        request_params = { id: 1, reject_suggestion: true }
+        request_params = { id: 1, reject: true }
         user_session = { user: instructor }
         get :submit, params: request_params, session: user_session, xhr: true
         expect(flash[:notice]).to eq 'The suggestion has been successfully rejected.'
       end
+      it 'rejecting a suggestion is not successful' do
+        allow_any_instance_of(Suggestion).to receive(:update_attribute).and_return(false)
+        request_params = { id: 1, reject: true }
+        user_session = { user: instructor }
+        get :submit, params: request_params, session: user_session, xhr: true
+        expect(flash[:error]).to eq 'An error occurred when rejecting the suggestion.'
+      end
     end
     context 'when you want to accept a suggestion' do
-      it 'accept a suggestion' do
+      it 'accept a suggestion is successful' do
         allow(Suggestion).to receive(:find).and_return(suggestion)
         allow(User).to receive(:find_by).and_return(instructor)
         allow(TeamsUser).to receive(:team_id).and_return(1)
         allow(SignedUpTeam).to receive(:topic_id).and_return(1)
         allow(SignUpTopic).to receive(:new_topic_from_suggestion).and_return(true)
-        allow_any_instance_of(SuggestionController).to receive(:notification).and_return(true)
+        allow_any_instance_of(SuggestionController).to receive(:notify_suggester).and_return(true)
         request_params = { id: 1, approve_suggestion: true }
         user_session = { user: instructor }
         get :submit, params: request_params, session: user_session, xhr: true
         expect(flash[:success]).to eq 'The suggestion was successfully approved.'
+      end
+      it 'accept a suggestion is not successful' do
+        allow(SignUpTopic).to receive(:new_topic_from_suggestion).and_return('failed')
+        allow_any_instance_of(SuggestionController).to receive(:notify_suggester).and_return(true)
+        request_params = { id: 1, approve_suggestion: true }
+        user_session = { user: instructor }
+        get :submit, params: request_params, session: user_session, xhr: true
+        expect(flash[:error]).to eq 'An error occurred when approving the suggestion.'
       end
     end
   end

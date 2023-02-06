@@ -102,7 +102,7 @@ FactoryBot.define do
 
   factory :student, class: User do
     # Zhewei: In order to keep students the same names (2065, 2066, 2064) before each example.
-    sequence(:name) { |n| n = n % 3; "student206#{n + 4}" }
+    sequence(:name) { |n| n = n % 4; "student206#{n + 4}" }
     role { Role.where(name: 'Student').first || association(:role_of_student) }
     password 'password'
     password_confirmation 'password'
@@ -742,4 +742,21 @@ FactoryBot.define do
     ta_id 1
     course_id 1
   end
+
+  factory :vm_question_response_row, class: VmQuestionResponseRow do
+    question_text 'FactoryQuestion'
+    question_id 1 
+    weight 1
+    question_max_score 5
+    seq 1
+    initialize_with { new(question_text, question_id, weight, question_max_score, seq) }    
+  end  
+  
+  factory :vm_question_response_score_cell, class: VmQuestionResponseScoreCell do
+    score_value 1
+    color_code '#000000'
+    comments 'FactoryBotComment'
+    vmprompts 'FactoryBotPrompt'
+    initialize_with { new(score_value, color_code, comments, vmprompts) }    
+  end  
 end

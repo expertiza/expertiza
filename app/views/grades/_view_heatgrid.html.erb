@@ -63,10 +63,9 @@ function toggleFunction(elementId) {
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% table_count = 0 %>
 <% @vmlist.each do |vm| %>
-
-    <% if (vm.questionnaire_display_type == "Metareview" or vm.questionnaire_display_type == "Author Feedback" or vm.questionnaire_display_type == "Teammate Review") and @current_role_name.eql?'Student' %>
-    <% else %>
         <% if vm.list_of_reviewers.length > 0 %>
+
+          <%= render "view_composite_score", vm: vm %>
 
           <!-- display the list of questions for this questionnaire -->
           <div id="hid<%= @type + @participant.id.to_s + vm.questionnaire_type + vm.round.to_s %>" class="accordion-body collapse" >
@@ -89,12 +88,17 @@ function toggleFunction(elementId) {
 
           <!-- display the table title and tooltips -->
           <span style="width:100%;">
-              <h4 style="font-weight:bold;display:inline-block;"><%= vm.questionnaire_display_type %>
-                <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
-                    (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
-                <%end %>
-              </h4>
-              <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= @type + @participant.id.to_s + vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>
+            <h4 style="font-weight:bold;display:inline-block;"><%= vm.questionnaire_display_type %>
+              <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
+                  (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
+              <!-- Display a more descriptive title if the table is teammate reviews about the student -->
+              <% elsif vm.questionnaire_type == "TeammateReviewQuestionnaire" %>
+                <% user_name = User.find(@participant.user_id).fullname(session[:ip]).to_s %>
+                of <%= user_name %>'s contribution
+              <% end %>
+            </h4>
+
+            <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= @type + @participant.id.to_s + vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>
             <% if @assignment.is_answer_tagging_allowed %>
             <span class="spn_qsttog" id="tag_prompt_toggler" title="">hide tags</span>
             <% end %>
@@ -254,13 +258,11 @@ function toggleFunction(elementId) {
           <input class="btn btn-default" type="button" href="#" onclick="col_sort(<%=table_count%>)" data-toggle="tooltip" title="Sort reviews in ascending/descending order of the total score. Consecutive clicks will alternate between ascending and descending sort order" value="Sort by total review score"/>
           <br>
           <% table_count += 1%>
-          <span> <%= vm.display_team_members %></span>
-          <!-- this elsif terminates the heatgrid code.  -->
-        <%# elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
-            <!--<div class="flash_error">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>-->
+          <span> <%= vm.display_team_members(session[:ip]) %></span>
+          <!-- this end terminates the heatgrid code.  -->
         <% end %>
         <br/> 
-    <% end %>
+    <%# end %>
 <% end %>
 
 

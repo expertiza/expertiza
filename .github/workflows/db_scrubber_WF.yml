@@ -31,8 +31,7 @@ jobs:
     # change this to (see https://github.com/ruby/setup-ruby#versioning):
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: ${{ matrix.ruby-version }}
-        bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+        ruby-version: 2.4
     - name: Install dependencies
       run: bundle install  
     - name: Run db scrubbing script

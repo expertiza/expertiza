@@ -37,7 +37,7 @@ class ReviewBidsController < ApplicationController
     end
 
     # render view for completing reviews after review bidding has been completed
-    render 'sign_up_sheet/review_bids_others_work'
+    render 'signup_sheet/review_bids_others_work'
   end
 
   # provides variables for review bidding page
@@ -65,7 +65,7 @@ class ReviewBidsController < ApplicationController
     end
 
     # explicitly render view since it's in the sign up sheet views
-    render 'sign_up_sheet/review_bids_show'
+    render 'signup_sheet/review_bids_show'
   end
 
   # function that assigns and updates priorities for review bids

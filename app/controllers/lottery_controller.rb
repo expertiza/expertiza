@@ -108,10 +108,10 @@ class LotteryController < ApplicationController
     end
   end
 
-  # This method is called for assignments which have their is_intelligent property set to 1.
+  # This method is called for assignments which have their bid_for_topics property set to 1.
   # It runs a stable match algorithm and assigns topics to strongest contenders (team strength, priority of bids)
   def match_new_teams_to_topics(assignment)
-    unless assignment.is_intelligent
+    unless assignment.bid_for_topics
       flash[:error] = "This action is not allowed. The assignment #{assignment.name} does not enable intelligent assignments."
       return
     end
@@ -134,8 +134,8 @@ class LotteryController < ApplicationController
     teams_bidding_info = construct_teams_bidding_info(unassigned_teams, sign_up_topics)
     assign_available_slots(teams_bidding_info)
 
-    # Remove is_intelligent property from assignment so that it can revert to the default sign-up state
-    assignment.update_attributes(is_intelligent: false)
+    # Remove bid_for_topics property from assignment so that it can revert to the default sign-up state
+    assignment.update_attributes(bid_for_topics: false)
     flash[:success] = 'The intelligent assignment was successfully completed for ' + assignment.name + '.'
   end
   # rubocop:enable Metrics/AbcSize

@@ -1,4 +1,4 @@
-module SignUpSheetHelper
+module SignupSheetHelper
   # if the instructor does not specific the topic due date, it should be the same as assignment due date;
   # otherwise, it should display the topic due date.
   def check_topic_due_date_value(assignment_due_dates, topic_id, deadline_type_id = 1, review_round = 1)
@@ -56,7 +56,7 @@ module SignUpSheetHelper
   end
 
   # Render the participant info for a topic and assignment.
-  def render_participant_info(topic, assignment, participants)
+  def render_participant_info(topic, participants)
     html = ''
     if participants.present?
       chooser_present = false
@@ -65,10 +65,6 @@ module SignUpSheetHelper
 
         chooser_present = true
         html += participant.user_name_placeholder
-        if assignment.max_team_size > 1
-          html += '<a href="/sign_up_sheet/delete_signup_as_instructor/' + participant.team_id.to_s + '?topic_id=' + topic.id.to_s + '"">'
-          html += '<img border="0" align="middle" src="/assets/delete_icon.png" title="Drop Student"></a>'
-        end
         html += '<font color="red">(waitlisted)</font>' if participant.is_waitlisted
         html += '<br/>'
       end
@@ -99,6 +95,34 @@ module SignUpSheetHelper
         out_string += (i + 1).to_s + ". " + t.topic_name + "\r\n"
       end
       out_string
+    end
+  end
+
+  # method to return a list of topics for which a bid has been made by a team
+  def compute_signed_up_topics(bids)
+    signed_up_topics = []
+    bids.each do |bid|
+      signup_topic = SignUpTopic.find_by(id: bid.topic_id)
+      signed_up_topics << signup_topic if signup_topic
+    end
+    signed_up_topics &= @signup_topics
+    return signed_up_topics
+  end
+
+  # Update teams on the waitlist for the topic based on update of max_choosers
+  def update_waitlist(topic)
+    # While saving the max choosers you should be careful; if there are users who have signed up for this particular
+    # topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
+    # there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
+    # it.
+    # if no team has signed up for this topic/max choosers hasn't changed, allow update
+    if SignedUpTeam.find_by(topic_id: topic.id).nil? || topic.max_choosers == topic_params[:max_choosers]
+      return
+    # if max choosers has increased, remove teams from the waitlist accordingly
+    elsif topic.max_choosers.to_i < topic_params[:max_choosers].to_i
+      topic.update_waitlisted_users topic_params[:max_choosers]
+    else
+      flash[:error] = 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'
     end
   end
 end

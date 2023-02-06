@@ -3,20 +3,20 @@
     <div class="flash_note"><%= flash_message :notice %></div>
 <% end %>
 
-<% @sign_up_topics = SignUpTopic.where(['assignment_id = ?', @assignment.id]) %>
+<% @signup_topics = SignUpTopic.where(['assignment_id = ?', @assignment.id]) %>
 <% @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)  %>
 <% @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id) %>
-<% @participants = SignedUpTeam.find_team_participants(@assignment.id, session[:ip])  %>
+<% @team_members = SignedUpTeam.find_team_participants(@assignment.id, session[:ip])  %>
 
-<a id="teamsAndMembers" onclick="showHideTeamAndMembers(<%= @sign_up_topics.size%>)">Hide all teams</a>
-<% unless @sign_up_topics.size.zero? %>
+<a id="teamsAndMembers" onclick="showHideTeamAndMembers(<%= @signup_topics.size%>)">Hide all teams</a>
+<% unless @signup_topics.size.zero? %>
     <table class="table table-striped" id="topics">
-      <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
+      <tr><%= render :partial => '/signup_sheet/table_header' %></tr>
 
       <% i=1 %>
-      <% @sign_up_topics.each do | topic | %>
+      <% @signup_topics.each do | topic | %>
           <tr>
-            <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
+            <%= render :partial => '/signup_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
           </tr>
           <% i=i+1 %>
       <% end %>
@@ -32,5 +32,5 @@
 <% session[:return_to] = request.url %>
 <br/><br/>
 
-<%= render :partial => '/sign_up_sheet/add_topics' %>
+<%= render :partial => '/signup_sheet/add_topics' %>
 <a href="javascript:history.back()">Back</a>

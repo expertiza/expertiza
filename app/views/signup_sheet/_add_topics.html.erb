@@ -1,8 +1,8 @@
-<% if @sign_up_topics.count == 0%>
+<% if @signup_topics.count == 0%>
 
     <%= link_to 'New topic',
                 {
-                    :controller => 'sign_up_sheet',
+                    :controller => 'signup_sheet',
                     :action => 'new',
                     :id => params[:id]
                 },
@@ -35,7 +35,7 @@
 <% else %>
 
     <%= link_to 'New topic',
-                :controller => 'sign_up_sheet',
+                :controller => 'signup_sheet',
                 :action => 'new',
                 :id => params[:id]%> |
 
@@ -73,7 +73,7 @@
             });
             
             jQuery.ajax({
-                url: '/sign_up_sheet/delete_all_selected_topics',
+                url: '/signup_sheet/delete_all_selected_topics',
                 method: 'POST',
                 data: {
                     topic_ids: topic_identifiers,
@@ -84,7 +84,7 @@
                 }
             });
         } else {
-            window.location.href = '<%= edit_assignment_path(@assignment.id) + "#tabs-2" %>';
+            window.location.href = '<%= edit_assignment_path(@assignment.id, anchor: 'tabs-2') %>';
         }
     }
 </script> 

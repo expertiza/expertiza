@@ -221,7 +221,7 @@ en_US:
       different_handle: "(Provide a different handle for this assignment)"
       back: "Back"
 
-  sign_up_sheet:
+  signup_sheet:
     list:
       signup_sheet: "Signup sheet for"
       assignment_lower: "assignment"

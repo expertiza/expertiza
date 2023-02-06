@@ -9,16 +9,16 @@
 <% if @assignment.microtask? %>
   <th width="5%"><%=t ".micro_payment"%></th>
 <% end %>
-<% if not @assignment.is_intelligent or  ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? current_user_role?.name %>
+<% if not @assignment.bid_for_topics or  ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? current_user_role?.name %>
   <th width="5%"><%=t ".num_slots"%></th>
   <th width="5%"><%=t ".available_slots"%></th>
   <th width="5%"><%=t ".num_waitlist"%></th>
   <!-- Only view the bids metrics to Instructor role and when the "Biddiing for topic" option in Assignment >> Topic is enabled-->
-  <% if @assignment.is_intelligent && current_user_has_instructor_privileges? %>    
+  <% if @assignment.bid_for_topics && current_user_has_instructor_privileges? %>    
     <th width="5%"><%=t ".num_bids"%></th>
     <th width="5%"><%=t ".num_1_2_bids"%></th>
   <% end %>
-  <% if @use_bookmark %>
+  <% if @assignment.use_bookmark %>
     <th width="10%"> <%=t ".bookmarks"%>
   <% end %>
   <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>

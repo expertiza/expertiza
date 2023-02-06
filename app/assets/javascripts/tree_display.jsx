@@ -76,7 +76,7 @@ const node_attributes = {
         src: '/assets/tree_view/view-review-report-24.png'
       }),
       (props) =>
-        props.is_intelligent
+        props.bid_for_topics
           ? {
               title: 'Intelligent Assignment',
               href: '/lottery/run_intelligent_assignment/' + `${parseInt(props.id) / 2}`,
@@ -348,7 +348,7 @@ jQuery(document).ready(function() {
       }
       if (node_attributes.isAssignment(this.props.dataType) && app_variables.homeActionShowFlag == 'true') {
         // Assignment tab starts here
-        // Now is_intelligent and Add Manager related buttons have not been added into the new UI
+        // Now bid_for_topics and Add Manager related buttons have not been added into the new UI
         moreContent.push(...node_attributes.assignment.getActions(this.props))
       } else if (node_attributes.isQuestionnaire(this.props.dataType)) {
         moreContent.push(
@@ -423,7 +423,7 @@ jQuery(document).ready(function() {
                 is_available={this.props.is_available}
                 course_id={this.props.course_id}
                 max_team_size={this.props.max_team_size}
-                is_intelligent={this.props.is_intelligent}
+                bid_for_topics={this.props.bid_for_topics}
                 require_quiz={this.props.require_quiz}
                 allow_suggestions={this.props.allow_suggestions}
                 has_topic={this.props.has_topic}
@@ -449,7 +449,7 @@ jQuery(document).ready(function() {
                 is_available={this.props.is_available}
                 course_id={this.props.course_id}
                 max_team_size={this.props.max_team_size}
-                is_intelligent={this.props.is_intelligent}
+                bid_for_topics={this.props.bid_for_topics}
                 require_quiz={this.props.require_quiz}
                 allow_suggestions={this.props.allow_suggestions}
                 has_topic={this.props.has_topic}
@@ -502,7 +502,7 @@ jQuery(document).ready(function() {
                 is_available={entry.is_available}
                 course_id={entry.course_id}
                 max_team_size={entry.max_team_size}
-                is_intelligent={entry.is_intelligent}
+                bid_for_topics={entry.bid_for_topics}
                 allow_suggestions={entry.allow_suggestions}
                 require_quiz={entry.require_quiz}
                 has_topic={entry.has_topic}
@@ -531,7 +531,7 @@ jQuery(document).ready(function() {
                 is_available={entry.is_available}
                 course_id={entry.course_id}
                 max_team_size={entry.max_team_size}
-                is_intelligent={entry.is_intelligent}
+                bid_for_topics={entry.bid_for_topics}
                 allow_suggestions={entry.allow_suggestions}
                 require_quiz={entry.require_quiz}
                 has_topic={entry.has_topic}
@@ -684,7 +684,7 @@ jQuery(document).ready(function() {
                 is_available={this.props.is_available}
                 course_id={this.props.course_id}
                 max_team_size={this.props.max_team_size}
-                is_intelligent={this.props.is_intelligent}
+                bid_for_topics={this.props.bid_for_topics}
                 require_quiz={this.props.require_quiz}
                 allow_suggestions={this.props.allow_suggestions}
                 has_topic={this.props.has_topic}
@@ -718,7 +718,7 @@ jQuery(document).ready(function() {
                 is_available={this.props.is_available}
                 course_id={this.props.course_id}
                 max_team_size={this.props.max_team_size}
-                is_intelligent={this.props.is_intelligent}
+                bid_for_topics={this.props.bid_for_topics}
                 require_quiz={this.props.require_quiz}
                 allow_suggestions={this.props.allow_suggestions}
                 has_topic={this.props.has_topic}
@@ -977,7 +977,7 @@ jQuery(document).ready(function() {
                 is_available={entry.is_available}
                 course_id={entry.course_id}
                 max_team_size={entry.max_team_size}
-                is_intelligent={entry.is_intelligent}
+                bid_for_topics={entry.bid_for_topics}
                 require_quiz={entry.require_quiz}
                 dataType={_this.props.dataType}
                 //this is just a hack. All current users courses are marked as private during fetch for display purpose.
@@ -1051,7 +1051,7 @@ jQuery(document).ready(function() {
                     is_available={entry.is_available}
                     course_id={entry.course_id}
                     max_team_size={entry.max_team_size}
-                    is_intelligent={entry.is_intelligent}
+                    bid_for_topics={entry.bid_for_topics}
                     require_quiz={entry.require_quiz}
                     dataType={_this.props.dataType}
                     private={entry.private}
@@ -1126,7 +1126,7 @@ jQuery(document).ready(function() {
                     is_available={entry.is_available}
                     course_id={entry.course_id}
                     max_team_size={entry.max_team_size}
-                    is_intelligent={entry.is_intelligent}
+                    bid_for_topics={entry.bid_for_topics}
                     require_quiz={entry.require_quiz}
                     dataType={_this.props.dataType}
                     private={entry.private}

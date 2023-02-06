@@ -3,9 +3,9 @@
 <%= check_box_tag('assignment_form[assignment][allow_suggestions]', 'true', @assignment_form.assignment.allow_suggestions) %>
 <%= label_tag('assignment_form[assignment][allow_suggestions]', 'Allow topic suggestions from students?') %>
 <br>
-<input name="assignment_form[assignment][is_intelligent]" type="hidden" value="false"/>
-<%= check_box_tag('assignment_form[assignment][is_intelligent]', 'true', @assignment_form.assignment.is_intelligent?)%>
-<%= label_tag('assignment_form[assignment][is_intelligent]', 'Enable bidding for topics?') %>
+<input name="assignment_form[assignment][bid_for_topics]" type="hidden" value="false"/>
+<%= check_box_tag('assignment_form[assignment][bid_for_topics]', 'true', @assignment_form.assignment.bid_for_topics?)%>
+<%= label_tag('assignment_form[assignment][bid_for_topics]', 'Enable bidding for topics?') %>
 <img src="/assets/info.png" title="This feature allow students to &quot;bid&quot; for topics.
       Instructor must specify when topics are assigned, by going to the Due Dates tab and
       entering a due date for &quot;signup&quot;."/>
@@ -44,7 +44,7 @@
 
 <br><br>
 <% if @assignment_form.assignment.staggered_deadline == true %>
-    <%= render partial: '/sign_up_sheet/add_signup_topics_staggered', locals: {review_rounds: @review_rounds, assignment_submission_due_dates: @assignment_submission_due_dates, assignment_review_due_dates: @assignment_review_due_dates} %>
+    <%= render partial: '/signup_sheet/add_signup_topics_staggered', locals: {review_rounds: @review_rounds, assignment_submission_due_dates: @assignment_submission_due_dates, assignment_review_due_dates: @assignment_review_due_dates} %>
 <% else %>
-    <%= render '/sign_up_sheet/add_signup_topics' %>
+    <%= render '/signup_sheet/add_signup_topics' %>
 <% end %>

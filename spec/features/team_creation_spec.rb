@@ -33,7 +33,7 @@ xdescribe 'Team Creation' do
 
       # click Signup check button
       assignment_id = Assignment.first.id
-      visit "/sign_up_sheet/sign_up?id=#{assignment_id}&topic_id=1"
+      visit "/signup_sheet/sign_up?id=#{assignment_id}&topic_id=1"
       expect(page).to have_content('Your topic(s): Hello world! ')
 
       visit '/student_task/list'
@@ -80,7 +80,7 @@ xdescribe 'Team Creation' do
       click_link 'Signup sheet'
       expect(page).to have_content('Signup sheet for final2 assignment')
 
-      visit '/sign_up_sheet/sign_up?assignment_id=1&id=1'
+      visit '/signup_sheet/sign_up?assignment_id=1&id=1'
       # expect(page).to have_content('Your topic(s)')
       # signup for topic for user1 finish
       user = User.find_by(name: 'student2065')
@@ -94,7 +94,7 @@ xdescribe 'Team Creation' do
       click_link 'Signup sheet'
       expect(page).to have_content('Signup sheet for final2 assignment')
 
-      visit '/sign_up_sheet/sign_up?assignment_id=1&id=2'
+      visit '/signup_sheet/sign_up?assignment_id=1&id=2'
       # expect(page).to have_content('Your topic(s)')
       # signup for topic for user2 finish
       user = User.find_by(name: 'student2064')
@@ -146,7 +146,7 @@ xdescribe 'Team Creation' do
       expect(page).to have_content('Signup sheet for final2 assignment')
 
       assignment_id = Assignment.first.id
-      visit "/sign_up_sheet/sign_up?id=#{assignment_id}&topic_id=1"
+      visit "/signup_sheet/sign_up?id=#{assignment_id}&topic_id=1"
       expect(page).to have_content('Your topic(s)')
 
       user = User.find_by(name: 'student2064')
@@ -205,7 +205,7 @@ xdescribe 'Team Creation' do
       expect(page).to have_content('Signup sheet for final2 assignment')
 
       assignment_id = Assignment.first.id
-      visit "/sign_up_sheet/sign_up?id=#{assignment_id}&topic_id=1"
+      visit "/signup_sheet/sign_up?id=#{assignment_id}&topic_id=1"
       expect(page).to have_content('Your topic(s)')
 
       # choose a topic for student5710

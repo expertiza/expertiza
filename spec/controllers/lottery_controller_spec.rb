@@ -1,6 +1,6 @@
 describe LotteryController do
-  let(:assignment) { create(:assignment, is_intelligent: true, name: 'assignment', directory_path: 'assignment') }
-  let(:assignment_2) { create(:assignment, is_intelligent: false, name: 'assignment_2', directory_path: 'assignment_2') }
+  let(:assignment) { create(:assignment, bid_for_topics: true, name: 'assignment', directory_path: 'assignment') }
+  let(:assignment_2) { create(:assignment, bid_for_topics: false, name: 'assignment_2', directory_path: 'assignment_2') }
 
   let(:student1) { create(:student, name: 'student1') }
   let(:student2) { create(:student, name: 'student2') }
@@ -143,16 +143,16 @@ describe LotteryController do
 
   describe '#match_new_teams_to_topics' do
     it 'assigns topics to teams' do
-      expect(assignment_2.is_intelligent).to eq(false)
+      expect(assignment_2.bid_for_topics).to eq(false)
       controller.send(:match_new_teams_to_topics, assignment_2)
-      expect(assignment_2.is_intelligent).to eq(false)
+      expect(assignment_2.bid_for_topics).to eq(false)
       expect(controller).to set_flash[:error]
 
-      expect(assignment.is_intelligent).to eq(true)
+      expect(assignment.bid_for_topics).to eq(true)
       Bid.create(team_id: assignment_team1.id, topic_id: topic1.id)
       Bid.create(team_id: assignment_team2.id, topic_id: topic2.id)
       controller.send(:match_new_teams_to_topics, assignment)
-      expect(assignment.is_intelligent).to eq(false)
+      expect(assignment.bid_for_topics).to eq(false)
       expect(controller).to set_flash[:success]
     end
   end

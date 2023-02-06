@@ -205,7 +205,7 @@ FactoryBot.define do
     require_quiz false
     num_quiz_questions 0
     is_coding_assignment false
-    is_intelligent false
+    bid_for_topics false
     calculate_penalty false
     late_policy_id nil
     is_penalty_calculated false

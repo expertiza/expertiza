@@ -1,0 +1,180 @@
+---
+- name: Setup Expertiza System
+  hosts: node
+  become: true
+
+  vars:
+    user: expertiza
+    group: expertiza
+    user_home: "/home/{{ user }}"
+    app_root: /var/www/expertiza
+    ruby_version: 2.4
+
+  tasks:
+    # Required Installation
+    - name: Create a expertiza directory
+      ansible.builtin.file:
+        path: "{{ app_root }}"
+        state: directory
+        owner: "{{ user }}"
+        group: "{{ group }}"
+        mode: '0775'
+        recurse: yes
+
+    - name: Enable Epel packages
+      ansible.builtin.shell: |
+        sudo yum install -y yum-utils
+        sudo yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(< /etc/redhat-release tr -dc '0-9.'|cut -d \. -f1).noarch.rpm
+        sudo yum-config-manager --enable epel
+        sudo yum clean all
+        sudo subscription-manager register --username $RHN_USERNAME --password $RHN_PASSWORD --auto-attach
+        sudo subscription-manager repos --enable rhel-7-server-optional-rpms
+
+    - name: Install git
+      ansible.builtin.yum:
+        name: git
+        state: present
+        update_cache: yes
+
+    - name: Install NodeJs
+      ansible.builtin.shell: |
+        curl -fsSL https://rpm.nodesource.com/setup_16.x | bash - 
+        yum install -y nodejs
+
+    - name: Install Bower
+      community.general.npm:
+        name: bower
+        global: true
+
+    - name: Install Java
+      ansible.builtin.shell: |
+        wget https://download.java.net/openjdk/jdk11/ri/openjdk-11+28_linux-x64_bin.tar.gz
+        tar -zxvf openjdk-11+28_linux-x64_bin.tar.gz -C /usr
+
+    - name: Set Java environment variables
+      ansible.builtin.blockinfile:
+        path: "{{ item }}/.bashrc"
+        block: |
+          export PATH=$PATH:/usr/jdk-11/bin
+          export JAVA_HOME=/usr/jdk-11
+      loop:
+        - "{{ user_home }}"
+        -  "/root"
+
+    - name: Install Ruby
+      ansible.builtin.shell: |
+        curl -sSL https://rvm.io/mpapis.asc | gpg2 --import -
+        curl -sSL https://rvm.io/pkuczynski.asc | gpg2 --import -
+        curl -L get.rvm.io | sudo bash -s stable
+        /usr/local/rvm/bin/rvm reload
+        /usr/local/rvm/bin/rvm requirements run
+        /usr/local/rvm/bin/rvm install 2.4
+        rm -rf /usr/bin/ruby
+        ln -s /usr/local/rvm/rubies/ruby-2.4.10/bin/ruby /usr/bin/ruby
+        /usr/local/rvm/bin/rvm use 2.4 --default
+
+    - name: Add users to RVM group
+      ansible.builtin.shell: |
+        sudo usermod -a -G rvm {{ item }}
+      loop:
+        - "{{ user }}"
+        - root
+
+    - name: Install Passenger packages
+      ansible.builtin.shell: |
+        sudo yum install -y pygpgme curl
+        sudo curl --fail -sSLo /etc/yum.repos.d/passenger.repo https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo
+        sudo yum install -y mod_passenger || { sudo yum-config-manager --enable cr && sudo yum install -y mod_passenger ; }
+
+    - name: Install Mysql & Redis
+      ansible.builtin.yum:
+        name:
+          - mysql-devel
+          - mysql
+          - mariadb-server
+          - redis
+        state: present
+
+    - name: Restart Apache & Mysql service
+      ansible.builtin.shell: |
+        sudo systemctl enable mariadb
+        sudo systemctl restart mariadb
+        sudo systemctl enable httpd
+        sudo systemctl restart httpd
+        redis-server > /dev/null 2>&1 &
+        sudo systemctl enable --now redis
+
+    # Expertiza clone repo, install gems
+    - name: Clone Expertiza repository
+      ansible.builtin.git:
+        repo: https://github.com/mundra-ankur/expertiza.git
+        dest: "{{ app_root }}/code"
+        clone: yes
+        update: no
+        version: main
+
+    - name: Copy config/database.yml.example to config/database.yml
+      ansible.builtin.copy:
+        src: "{{ app_root }}/code/config/database.yml.example"
+        dest: "{{ app_root }}/code/config/database.yml"
+        owner: "{{ user }}"
+        mode: '0644'
+        remote_src: yes
+
+    - name: Copy config/secrets.yml.example to config/secrets.yml
+      ansible.builtin.copy:
+        src: "{{ app_root }}/code/config/secrets.yml.example"
+        dest: "{{ app_root }}/code/config/secrets.yml"
+        owner: "{{ user }}"
+        mode: '0644'
+        remote_src: yes
+
+    - name: Install packages based on bower.json
+      community.general.bower:
+        path: "{{ app_root }}/code"
+
+    # Capistrano deployment - prerequisite
+    - name: Create a shared/config directory for capistrano deployment
+      ansible.builtin.file:
+        path: "{{ app_root }}/shared/config"
+        state: directory
+        owner: "{{ user }}"
+        mode: '0775'
+        recurse: yes
+
+    - name: Copy vendor assets to shared directory
+      ansible.builtin.copy:
+        src: "{{ app_root }}/code/vendor"
+        dest:  "{{ app_root }}/shared"
+        owner: "{{ user }}"
+        directory_mode: '0644'
+        remote_src: yes
+
+    - name: Copy config/database.yml to shared directory
+      ansible.builtin.copy:
+        src: "{{ app_root }}/code/config/database.yml"
+        dest: "{{ app_root }}/shared/config/database.yml"
+        owner: "{{ user }}"
+        mode: '0644'
+        remote_src: yes
+
+    - name: Copy config/secrets.yml.example to shared directory
+      ansible.builtin.copy:
+        src: "{{ app_root }}/code/config/secrets.yml"
+        dest: "{{ app_root }}/shared/config/secrets.yml"
+        owner: "{{ user }}"
+        mode: '0644'
+        remote_src: yes
+
+    - name: Add public/private key pair to shared directory
+      ansible.builtin.shell: |
+        ssh-keygen -f "{{ user_home }}/.ssh/id_rsa.pub" -m 'PEM' -e > "{{ app_root }}/shared/public.pem"
+        cp "{{ user_home }}/.ssh/id_rsa" "{{ app_root }}/shared/private.pem"
+
+    - name: Recursively change ownership of expertiza directory
+      ansible.builtin.file:
+        path: "{{ app_root }}"
+        state: directory
+        recurse: yes
+        owner: "{{ user }}"
+        group: "{{ group }}"

@@ -1,4 +1,20 @@
-name: Ansible System Setup
+# This GitHub Action is designed to automate the process of setting up a RHEL server for Expertiza development.
+# The end result will be a fully functional server, ready for Expertiza development.
+# It is triggered by a manual event (workflow_dispatch) and runs a job called "setup".
+
+# The job consists of two steps:
+# Checkout: This step uses the actions/checkout@v3 action to check out the code from the repository.
+#           This is necessary so that the Ansible playbook can be executed on the system.
+# Run playbook: This step uses the dawidd6/action-ansible-playbook@v2 action to run an Ansible playbook called "setup/setup_playbook.yml".
+#          The playbook is executed with the following parameters:
+#          key: This parameter specifies the SSH private key required to connect to the remote node. The value of this parameter is read
+#               from the SSH_PRIVATE_KEY secret.
+#          inventory: This parameter specifies the inventory file for the Ansible playbook. The node is the name of the server being targeted,
+#                     and ansible_host, ansible_user are the host and user credentials required to connect to the remote system. 
+#                     The values of these parameters are read from the SSH_HOST and SSH_USER secrets, respectively.
+#          options: This parameter specifies any additional command-line options to be passed to the Ansible playbook, 
+#                   in this case, --verbose for extra logging.
+name: Ansible system set up
 on:
   workflow_dispatch:
 

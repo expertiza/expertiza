@@ -38,7 +38,7 @@ Follow the below steps to encrypt the secret private key and upload it in the re
     ```bash
     ssh-keygen
     ```
-2. Export public key to the `authorized_keys` to allow the usage of this keypair to login
+2. Export the public key to the `authorized_keys` file to allow for remote login.
     ```bash
     cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
     ```

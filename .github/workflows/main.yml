@@ -1,4 +1,4 @@
-# This workflow will install a prebuilt Ruby version, install dependencies, and run tests.
+# This workflow will install a prebuilt Ruby version, install dependencies, and run Rspec tests.
 name: "Test Expertiza"
 on:
   workflow_dispatch:
@@ -13,14 +13,14 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        folder: [controllers, models, helpers, lib]
+      matrix: # we will be running rspec tests in controllers, models, helpers, and lib folders
+         folder: [controllers, models, helpers, lib]
 
     services:
       mysql:
-        image: mysql:8.0.0
+        image: mysql:8.0
         env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: 1
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
           MYSQL_DATABASE: expertiza_test
         ports:
           - 3306
@@ -54,10 +54,10 @@ jobs:
 
       - name: Run tests
         run: |
-          cp config/database.yml.example config/database.yml
+          cp config/database.yml.github config/database.yml
           cp config/secrets.yml.example config/secrets.yml
           sudo /etc/init.d/mysql start
-          mysql -u root -proot  < db/grant_expertiza.sql
+          mysql -u root -proot < db/grant_expertiza.sql
           bundle exec rails db:setup
           RUBYOPT="-W0" bundle exec rspec spec/${{ matrix.folder }}
         env:
@@ -73,6 +73,7 @@ jobs:
           name: code-coverage-artifacts
           path: coverage/
   
+  # Publish code coverage report to code climate 
   publish-code-coverage:
     needs: test
     if: github.event_name == 'push'
@@ -91,6 +92,8 @@ jobs:
           ./cc-test-reporter sum-coverage coverage/codeclimate.*.json 
           ./cc-test-reporter after-build -t simplecov -r ${{ secrets.CC_TEST_REPORTER_ID }}
   
+  # Deploy the latest version of Expertiza development branch to the development server 
+  # when changes are pushed to the development branch
   deploy-on-dev:
     needs: test
     if: github.event_name == 'push' && github.ref == 'refs/heads/development'
@@ -106,8 +109,10 @@ jobs:
         target: development
         enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_DEV }}
         deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
-        
-  deploy-on-staging:
+
+  # Deploy the latest version of Expertiza main branch to the test server 
+  # when changes are pushed to the main branch      
+  deploy-on-test:
     needs: test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest

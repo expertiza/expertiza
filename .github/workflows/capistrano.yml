@@ -1,4 +1,4 @@
-# This is a basic workflow to help you get started with Actions
+# This is a basic workflow that uses Capistrano to deploy Expertiza on Production, Test, and Development servers
 name: Deploy with Capistrano
 
 # Controls when the workflow will run
@@ -8,19 +8,19 @@ on:
       environment:
         description: 'Deployment Environment'
         required: true
-        default: 'staging'
+        default: 'test'
         type: choice
         options:
           - production
           - development
-          - staging
+          - test
 
 jobs:
   production:
     if: inputs.environment == 'production'
     runs-on: ubuntu-latest
     steps:
-      - name: create wireguard tunnel to deploy on private network
+      - name: create wireguard tunnel to deploy Expertiza on private network
         run: |
           sudo apt install wireguard
           echo "${{ secrets.WIREGUARD_PRIVATE_KEY }}" > privatekey
@@ -41,6 +41,7 @@ jobs:
           enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_PROD }}
           deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
 
+# development and test jobs are identical - with different target environment and server keys
   development:
     if: inputs.environment == 'development'
     runs-on: ubuntu-latest
@@ -56,8 +57,8 @@ jobs:
           enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_DEV }}
           deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
 
-  staging:
-    if: inputs.environment == 'staging'
+  test:
+    if: inputs.environment == 'test'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

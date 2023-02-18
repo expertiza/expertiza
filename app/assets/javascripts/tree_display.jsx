@@ -340,7 +340,7 @@ jQuery(document).ready(function() {
           </span>
         )
 
-        if (node_attributes.isCourse(this.props.dataType)) {
+        if (node_attributes.isCourse(this.props.nodeType)) {
           moreContent.push(<br />)
           moreContent.push(...node_attributes.course.getActions(parseInt(this.props.id) / 2))
 

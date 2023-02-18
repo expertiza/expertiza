@@ -1,0 +1,129 @@
+# This workflow will install a prebuilt Ruby version, install dependencies, and run Rspec tests.
+name: "Test Expertiza"
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main, development]
+    paths-ignore: ['**.md', '**.yml']
+  push:
+    branches: [main, development]
+    paths-ignore: ['**.md', '**.yml']
+  
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: # we will be running rspec tests in controllers, models, helpers, and lib folders
+         folder: [controllers, models, helpers, lib]
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+          MYSQL_DATABASE: expertiza_test
+        ports:
+          - 3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install bower
+        run: npm install -g bower
+      - run: bower install
+
+      - name: Install Ruby and Gems
+        uses: ruby/setup-ruby@v1.118.0
+        with:
+          ruby-version: 2.4
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+
+      - name: Set up code climate test-reporter
+        run: |
+          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+          chmod +x ./cc-test-reporter
+          ./cc-test-reporter before-build
+
+      - name: Start redis
+        uses: supercharge/redis-github-action@1.4.0
+
+      - name: Run tests
+        run: |
+          cp config/database.yml.github config/database.yml
+          cp config/secrets.yml.example config/secrets.yml
+          sudo /etc/init.d/mysql start
+          mysql -u root -proot < db/grant_expertiza.sql
+          bundle exec rails db:setup
+          RUBYOPT="-W0" bundle exec rspec spec/${{ matrix.folder }}
+        env:
+          DB_PORT: 3306
+          RAILS_ENV: test
+      
+      - name: Format code coverage report
+        run: ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.${{ matrix.folder }}.json"
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: code-coverage-artifacts
+          path: coverage/
+  
+  # Publish code coverage report to code climate 
+  publish-code-coverage:
+    needs: test
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: code-coverage-artifacts
+          path: coverage
+      - name: Upload code coverage report
+        run: |
+          export GIT_BRANCH="${GITHUB_REF/refs\/heads\//}"
+          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+          chmod +x ./cc-test-reporter
+          ./cc-test-reporter sum-coverage coverage/codeclimate.*.json 
+          ./cc-test-reporter after-build -t simplecov -r ${{ secrets.CC_TEST_REPORTER_ID }}
+  
+  # Deploy the latest version of Expertiza development branch to the development server 
+  # when changes are pushed to the development branch
+  deploy-on-dev:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/development'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.4
+        bundler-cache: true
+    - uses: miloserdow/capistrano-deploy@master
+      with:
+        target: development
+        enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_DEV }}
+        deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
+
+  # Deploy the latest version of Expertiza main branch to the test server 
+  # when changes are pushed to the main branch      
+  deploy-on-test:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.4
+        bundler-cache: true
+    - uses: miloserdow/capistrano-deploy@master
+      with:
+        target: staging 
+        enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_STAGING }}
+        deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}

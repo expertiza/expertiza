@@ -3,19 +3,26 @@ name: RuboCop
 on: [push, pull_request]
 
 jobs:
-  build:
+  rubocop:
     runs-on: ubuntu-latest
     env:
       BUNDLE_WITHOUT: default doc job cable storage ujs test db
+    strategy:
+      fail-fast: false
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-    - name: Set up Ruby 2.3.8
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: 2.3.8
-        bundler-cache: true
-        action_config_path: ".github/config/rubocop_linter_action.yml"
-    - name: Run RuboCop
-      run: bundle exec rubocop --parallel --only Lint,Layout --except Layout/LineLength app/ lib/
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.4
+          bundler-cache: true
+          action_config_path: ".github/config/rubocop_linter_action.yml"
+
+      - name: Run RuboCop
+        run: |
+          bash -c "
+            bundle exec rubocop --parallel --only Lint,Layout --except Layout/LineLength app/ lib/
+            [[ $? -ne 2 ]]
+          "

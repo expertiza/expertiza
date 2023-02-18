@@ -1,0 +1,73 @@
+# This is a basic workflow that uses Capistrano to deploy Expertiza on Production, Test, and Development servers
+name: Deploy with Capistrano
+
+# Controls when the workflow will run
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment Environment'
+        required: true
+        default: 'test'
+        type: choice
+        options:
+          - production
+          - development
+          - test
+
+jobs:
+  production:
+    if: inputs.environment == 'production'
+    runs-on: ubuntu-latest
+    steps:
+      - name: create wireguard tunnel to deploy Expertiza on private network
+        run: |
+          sudo apt install wireguard
+          echo "${{ secrets.WIREGUARD_PRIVATE_KEY }}" > privatekey
+          sudo ip link add wg0 type wireguard
+          sudo ip address add 10.0.0.2/24 dev wg0
+          sudo wg set wg0 private-key privatekey
+          sudo ip link set wg0 up
+          sudo wg set wg0 peer ${{ secrets.WIREGUARD_SERVER_PUBLIC_KEY }} allowed-ips 10.0.0.1/32 endpoint 152.14.92.215:50000
+          ping -c 4 10.0.0.1
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.4
+          bundler-cache: true
+      - uses: miloserdow/capistrano-deploy@master
+        with:
+          target: production # Defines the environment for the deployment
+          enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_PROD }}
+          deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
+
+# development and test jobs are identical - with different target environment and server keys
+  development:
+    if: inputs.environment == 'development'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.4
+          bundler-cache: true
+      - uses: miloserdow/capistrano-deploy@master
+        with:
+          target: development
+          enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_DEV }}
+          deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
+
+  test:
+    if: inputs.environment == 'test'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.4
+          bundler-cache: true
+      - uses: miloserdow/capistrano-deploy@master
+        with:
+          target: staging
+          enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_STAGING }}
+          deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}

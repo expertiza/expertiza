@@ -336,13 +336,12 @@ class TreeDisplayController < ApplicationController
       'creation_date' => node.get_creation_date,
       'updated_date' => node.get_modified_date
     }
-
-    if (node.type == 'Courses') || (node.type == 'Assignments')
+    if (node.type == 'CourseNode') || (node.type == 'AssignmentNode')
       json['directory'] = node.get_directory
       json['instructor_id'] = node.get_instructor_id
       json['instructor'] = node.get_instructor_id ? User.find(node.get_instructor_id).name(session[:ip]) : nil
       json['is_available'] = course_is_available?(node)
-      serialize_assignment_to_json(node, json) if folder_type == 'Assignments'
+      serialize_assignment_to_json(node, json) if node.type == 'AssignmentNode'
     end
 
     json

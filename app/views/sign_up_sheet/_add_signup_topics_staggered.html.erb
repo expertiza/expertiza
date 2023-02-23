@@ -8,7 +8,7 @@
 <!--2.The assignment edit panel itself is a big form, and we have one smaller form to save staggered deadlines. And rails is not support one form inside another form very well-->
 <!--3.During debugging, we found that the action of the button ('Save start/due dates') in smaller form is actually submit the whole assignment edit page.-->
 <!--4.So according to this, we build another empty form and place it before the original smaller forms used to save staggered deadlines. The new small form even do not have 'submit' button. So all forms work well now.-->
-<%= form_tag controller: 'assignment', action: 'edit', assignment_id: @assignment.id do %>
+<%= form_tag controller: 'assignments', action: 'edit', assignment_id: @assignment.id do %>
 <% end %>
 
   <% if @sign_up_topics.size != 0 %>

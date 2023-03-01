@@ -37,7 +37,6 @@
 <input name="hidden_topic_id" type="hidden" value=<%=topic.id %> >
 
 <td id='topic_id'><%= topic.topic_identifier %></td>
-<td><input id='topic_check' type="checkbox" name="Selected-Box"></td>
 <td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
 <% if not @assignment.is_intelligent or ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].
   include? current_user_role?.name %>

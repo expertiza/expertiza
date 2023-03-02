@@ -1,258 +1,241 @@
 <script>
-
-function microtaskChanged() {
-  if (jQuery('#assignment_microtask').is(':checked')) {
-
-  } else {
-
-  }
-}
-
-//This function replaces whitespace ' ' in assignment name by '_' and assign to directory path field value
-$(function() {
-    $("#assignment_form_assignment_name").change(function() {
-        filename = $( "#assignment_form_assignment_name" ).val().replace(/ /g,"_").replace(/[/\\?%*:|"<>/$&!#%^@]/g, '');;
-        $('#assignment_form_assignment_directory_path').val(filename);
+    function microtaskChanged() {
+      if (jQuery('#assignment_microtask').is(':checked')) {
+    
+      } else {
+    
+      }
+    }
+    
+    //This function replaces whitespace ' ' in assignment name by '_' and assign to directory path field value
+    $(function() {
+        $("#assignment_form_assignment_name").change(function() {
+            filename = $( "#assignment_form_assignment_name" ).val().replace(/ /g,"_").replace(/[/\\?%*:|"<>/$&!#%^@]/g, '');;
+            $('#assignment_form_assignment_directory_path').val(filename);
+        });
     });
-});
-//E2138 added function
-function autogenerate_submission(){
-  assignment_form.assignment.directory_path = assignment_form.assignment.name;
-}
-
+    //E2138 added function
+    function autogenerate_submission(){
+      assignment_form.assignment.directory_path = assignment_form.assignment.name;
+    }
+    
 </script>
-
 <table id='assignment_general_info_table' class="borderless">
-<tr class='heading'>
-<th width="0%"></th>
-<th width="100%"></th>
-</tr>
-
-<%= hidden_field_tag('assignment_form[assignment][instructor_id]', @assignment_form.assignment.instructor_id) %>
-<%= hidden_field_tag('assignment_form[assignment][course_id]', @assignment_form.assignment.course_id) %>
-<%= hidden_field_tag('assignment_form[assignment][id]', @assignment_form.assignment.id) %>
-
-<tr>
-<td style='padding:5px'><%= label_tag('assignment_form[assignment][name]', 'Assignment name:') %></td>
-<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][name]', @assignment_form.assignment.name, :style => 'width:250px', class: 'form-control') %></td>
-</tr>
-
-<tr>
-<td style='padding:5px'><%= label_tag('assignment_form[assignment][course_id]', 'Course:') %></td>
-<td style='padding:5px'><%= select('assignment_form[assignment]', 'course_id', course_options(@assignment_form.assignment.instructor), {:selected => @assignment_form.assignment.course_id}, {:class => "form-control", :style => 'width: 250px'}) %></td>
-</tr>
-
-<tr><div class="form-inline">
-<td style='padding:5px'><%= label_tag('assignment_form[assignment][directory_path]', 'Submission directory:') %></td>
-<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px', class: 'form-control') %>  (Mandatory field. No space or special chars. <br/> Directory name will be auto-generated if not provided. In the form of assignment_[assignment_id].)
-  <img src="/assets/info.png" title='- DO NOT change this filed for an on-going assignment. This may cause lost of student submitted file.'>
-</td></div>
-</tr>
-
-<tr>
-<td style='padding:5px'><%= label_tag('assignment_form[assignment][spec_location]', 'Description URL: ') %></td>
-<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][spec_location]', @assignment_form.assignment.spec_location, :style => 'width:250px', class: 'form-control') %></td>
-</tr>
+    <tr class='heading'>
+        <th width="0%"></th>
+        <th width="100%"></th>
+    </tr>
+    <%= hidden_field_tag('assignment_form[assignment][instructor_id]', @assignment_form.assignment.instructor_id) %>
+    <%= hidden_field_tag('assignment_form[assignment][course_id]', @assignment_form.assignment.course_id) %>
+    <%= hidden_field_tag('assignment_form[assignment][id]', @assignment_form.assignment.id) %>
+    <tr>
+        <td style='padding:5px'><%= label_tag('assignment_form[assignment][name]', 'Assignment name:') %></td>
+        <td style='padding:5px'><%= text_field_tag('assignment_form[assignment][name]', @assignment_form.assignment.name, :style => 'width:250px', class: 'form-control') %></td>
+    </tr>
+    <tr>
+        <td style='padding:5px'><%= label_tag('assignment_form[assignment][course_id]', 'Course:') %></td>
+        <td style='padding:5px'><%= select('assignment_form[assignment]', 'course_id', course_options(@assignment_form.assignment.instructor), {:selected => @assignment_form.assignment.course_id}, {:class => "form-control", :style => 'width: 250px'}) %></td>
+    </tr>
+    <tr>
+        <div class="form-inline">
+            <td style='padding:5px'><%= label_tag('assignment_form[assignment][directory_path]', 'Submission directory:') %></td>
+            <td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px', class: 'form-control') %>  (Mandatory field. No space or special chars. <br/> Directory name will be auto-generated if not provided. In the form of assignment_[assignment_id].)
+                <img src="/assets/info.png" title='- DO NOT change this filed for an on-going assignment. This may cause lost of student submitted file.'>
+            </td>
+        </div>
+    </tr>
+    <tr>
+        <td style='padding:5px'><%= label_tag('assignment_form[assignment][spec_location]', 'Description URL: ') %></td>
+        <td style='padding:5px'><%= text_field_tag('assignment_form[assignment][spec_location]', @assignment_form.assignment.spec_location, :style => 'width:250px', class: 'form-control') %></td>
+    </tr>
 </table>
-
 <br/>
 <hr/>
-
 <table id='assignment_general_setting_table' class="borderless table-not-full-width">
-<tr class='heading'>
-<th width=82%></th>
-<th width=100%></th>
-  </tr>
-
-  <tr>
-    <td style='padding:5px' id='assignment_access'>
-      <p><input name="assignment_form[assignment][private]" type="hidden" value="false"/>
-        <%= check_box_tag('assignment_form[assignment][private]', 'true', @assignment_form.assignment.private? || !params[:private].to_i.zero?) %>
-        <%= label_tag('assignment_form[assignment][private]', 'Private assignment') %></p>
-    </td>
-  </tr>
-
-  <tr>
-    <td style='padding:5px' id='assignment_team_assignment_field'>
-      <div class="form-inline">
-        <span style='padding:5px' class="form-inline" id='assignment_team_count_field' <%= 'hidden' unless @assignment_form.assignment.team_assignment?%>>
-          <!--Teammate reviews fields-->
-          <input name="assignment_form[assignment][show_teammate_reviews]" type="hidden" value="false"/>
-          <%= label_tag('assignment_form[assignment][max_team_size]', 'Maximum number of members per team:') %>
-          <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:50px;', class: 'form-control'}) %>
-        </span>
-      </div>
-      <span id='assignment_show_teammate_reviews' class="form-inline" <%= 'hidden' unless @assignment_form.assignment.team_assignment?%>>
-        <%= check_box_tag('assignment_form[assignment][show_teammate_reviews]', 'true', @assignment_form.assignment.show_teammate_reviews) %>
-        <%= label_tag('assignment_form[assignment][show_teammate_reviews]', 'Show teammate reviews?') %>
-      </span>
-      &nbsp;&nbsp;&nbsp;&nbsp;
-      <!--Maximum number of members per team-->
-    <br>      
-  </tr>
-
-  <!--E2244: Pair Programming-->
-  <tr>
-    <td style='padding:5px' id='assignment_pair_programming_field'>
-      <span id='assignment_pair_programming' class="form-inline"  <%= 'hidden' unless @assignment_form.assignment.team_assignment?%>>
-        <input name="assignment_form[assignment][enable_pair_programming]" type="hidden" value="false"/>
-        <%= check_box_tag('assignment_form[assignment][enable_pair_programming]', 'true', @assignment_form.assignment.enable_pair_programming) %>
-        <%= label_tag('assignment_form[assignment][enable_pair_programming]', 'Pair Programming?') %>
-      </span>
-      <br>
-    </td>
-  </tr>
-
-  <!-- E2115 Mentor Management -->
-  <tr>
-    <td style='padding:5px' id='assignment_auto_assign_mentor_field'>
-      <input name="assignment_form[assignment][auto_assign_mentor]" type="hidden" value="false"/>
-      <%= check_box_tag(
-            'assignment_form[assignment][auto_assign_mentor]',
-            value='true',
-            checked=@assignment_form.assignment.auto_assign_mentor
-          ) %>
-      <%= label_tag('auto_assign_mentor_label', 'Auto assign mentors when team hits > 50% capacity?') %>
-    </td>
-  </tr>
-
-  <!--Quiz fields-->
-  <tr>
-    <td style='padding:5px' id='assignment_require_quiz_field'>
-      <input name="assignment_form[assignment][require_quiz]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][require_quiz]', 'true', @assignment_form.assignment.require_quiz, {:onChange => 'hasQuizChanged()'}) %>
-      <%= label_tag('assignment_form[assignment][require_quiz]', 'Has quiz?') %>
-    </td>
-
-    <td style='padding:5px' id='assignment_numbers_of_quiz_field' <%= 'hidden' unless @assignment_form.assignment.require_quiz %>>
-      <%= label_tag('assignment_form[assignment][num_quiz_questions]', 'Number of Quiz questions:') %>
-      <%= text_field_tag('assignment_form[assignment][num_quiz_questions]', @assignment_form.assignment.num_quiz_questions, { :style => 'width:20px'}) %>
-    </td>
-  </tr>
-
-  <!--Badge-->
-  <tr>
-    <td style='padding:5px' id='assignment_has_badge_field'>
-      <input name="assignment_form[assignment][has_badge]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][has_badge]', 'true', @assignment_form.assignment.has_badge) %>
-      <%= label_tag('assignment_form[assignment][has_badge]', 'Has badge?') %>
-    </td>
-  </tr>
-
-  <!--Conference-->
-  <tr>
-    <td style='padding:5px' id='assignment_is_conference_assignment_field' colspan="2">
-      <input name="assignment_form[assignment][is_conference_assignment]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][is_conference_assignment]', 'true', @assignment_form.assignment.is_conference_assignment) %>
-      <%= label_tag('assignment_form[assignment][is_conference_assignment]','Will this assignment be used to review papers for conference?') %>
-    </td>
-  </tr>
-  <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
-  <script type="text/javascript">
-       new Clipboard('button');
-  </script>
-  <tr>
-    <% if current_page?(action: 'edit') %>
-      <% if @assignment_form.assignment.is_conference_assignment %>
+    <tr class='heading'>
+        <th width=82%></th>
+        <th width=100%></th>
+    </tr>
+    <tr>
+        <td style='padding:5px' id='assignment_access'>
+            <p><input name="assignment_form[assignment][private]" type="hidden" value="false"/>
+                <%= check_box_tag('assignment_form[assignment][private]', 'true', @assignment_form.assignment.private? || !params[:private].to_i.zero?) %>
+                <%= label_tag('assignment_form[assignment][private]', 'Private assignment') %>
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td style='padding:5px' id='assignment_team_assignment_field'>
+            <div class="form-inline">
+                <% if(@assignment_form.assignment.max_team_size == 1)%>
+                <%= check_box_tag('team_assignment', 'true', false, {:onChange => 'hasTeamsChanged()'}) %>
+                <% else %>
+                <%= check_box_tag('team_assignment', 'true', @assignment_form.assignment.team_assignment?, {:onChange => 'hasTeamsChanged()'}) %>
+                <% end %>
+                <% @assignment_form.assignment.max_team_size %>
+                <%= label_tag('team_assignment', 'Has teams?') %>
+                <span style='padding:5px' class="form-inline" id='assignment_team_count_field' <%= 'hidden' if @assignment_form.assignment.max_team_size == 1%>>
+                    <!--Teammate reviews fields-->
+                    <input name="assignment_form[assignment][show_teammate_reviews]" type="hidden" value="false"/>
+                    <%= label_tag('assignment_form[assignment][max_team_size]', 'Maximum number of members per team:') %>
+                    <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:50px;', class: 'form-control'}) %>
+                </span>
+            </div>
+            <span id='assignment_show_teammate_reviews' class="form-inline" <%= 'hidden' if @assignment_form.assignment.max_team_size < 2%>>
+            <%= check_box_tag('assignment_form[assignment][show_teammate_reviews]', 'true', @assignment_form.assignment.show_teammate_reviews) %>
+            <%= label_tag('assignment_form[assignment][show_teammate_reviews]', 'Show teammate reviews?') %>
+            </span>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <!--Maximum number of members per team-->
+        </td>
+    </tr>
+    <!--E2244: Pair Programming-->
+    <tr>
+        <td style='padding:5px' id='assignment_pair_programming_field'>
+            <span id='assignment_pair_programming' class="form-inline"  <%= 'hidden' unless @assignment_form.assignment.team_assignment?%>>
+            <input name="assignment_form[assignment][enable_pair_programming]" type="hidden" value="false"/>
+            <%= check_box_tag('assignment_form[assignment][enable_pair_programming]', 'true', @assignment_form.assignment.enable_pair_programming) %>
+            <%= label_tag('assignment_form[assignment][enable_pair_programming]', 'Pair Programming?') %>
+            </span>
+            <br>
+        </td>
+    </tr>
+    <!-- E2115 Mentor Management -->
+    <tr>
+        <td style='padding:5px' id='assignment_auto_assign_mentor_field'>
+            <input name="assignment_form[assignment][auto_assign_mentor]" type="hidden" value="false"/>
+            <%= check_box_tag(
+                'assignment_form[assignment][auto_assign_mentor]',
+                value='true',
+                checked=@assignment_form.assignment.auto_assign_mentor
+                ) %>
+            <%= label_tag('auto_assign_mentor_label', 'Auto assign mentors when team hits > 50% capacity?') %>
+        </td>
+    </tr>
+    <!--Quiz fields-->
+    <tr>
+        <td style='padding:5px' id='assignment_require_quiz_field'>
+            <input name="assignment_form[assignment][require_quiz]" type="hidden" value="false"/>
+            <%= check_box_tag('assignment_form[assignment][require_quiz]', 'true', @assignment_form.assignment.require_quiz, {:onChange => 'hasQuizChanged()'}) %>
+            <%= label_tag('assignment_form[assignment][require_quiz]', 'Has quiz?') %>
+        </td>
+        <td style='padding:5px' id='assignment_numbers_of_quiz_field' <%= 'hidden' unless @assignment_form.assignment.require_quiz %>>
+            <%= label_tag('assignment_form[assignment][num_quiz_questions]', 'Number of Quiz questions:') %>
+            <%= text_field_tag('assignment_form[assignment][num_quiz_questions]', @assignment_form.assignment.num_quiz_questions, { :style => 'width:20px'}) %>
+        </td>
+    </tr>
+    <!--Badge-->
+    <tr>
+        <td style='padding:5px' id='assignment_has_badge_field'>
+            <input name="assignment_form[assignment][has_badge]" type="hidden" value="false"/>
+            <%= check_box_tag('assignment_form[assignment][has_badge]', 'true', @assignment_form.assignment.has_badge) %>
+            <%= label_tag('assignment_form[assignment][has_badge]', 'Has badge?') %>
+        </td>
+    </tr>
+    <!--Conference-->
+    <tr>
+        <td style='padding:5px' id='assignment_is_conference_assignment_field' colspan="2">
+            <input name="assignment_form[assignment][is_conference_assignment]" type="hidden" value="false"/>
+            <%= check_box_tag('assignment_form[assignment][is_conference_assignment]', 'true', @assignment_form.assignment.is_conference_assignment) %>
+            <%= label_tag('assignment_form[assignment][is_conference_assignment]','Will this assignment be used to review papers for conference?') %>
+        </td>
+    </tr>
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+    <script type="text/javascript">
+        new Clipboard('button');
+    </script>
+    <tr>
+        <% if current_page?(action: 'edit') %>
+        <% if @assignment_form.assignment.is_conference_assignment %>
         <%  url = polymorphic_url :conference, action: 'new',role: 'Student', assignment_id: @assignment.id %>
         <div>Link to join conference assignment:
-          <%# <%= link_to conference_user_path(assignment_id: @assignment.id, role: 'Student')%> 
-          <span> <a id = "link" style="color: #5d0a0a"> <%=url%> </a> </span> 
+            <%# <%= link_to conference_user_path(assignment_id: @assignment.id, role: 'Student')%> 
+            <span> <a id = "link" style="color: #5d0a0a"> <%=url%> </a> </span> 
         </div>
-      <% end %>
+        <% end %>
+        <% end %>
+    </tr>
+    <% if current_page?(action: 'edit') %>
+    <!--Topics-->
+    <tr>
+        <td style='padding:5px' id='assignment_has_topics_field'>
+            <%= check_box_tag('assignment_has_topics', 'true', @assignment_form.assignment.topics?, {:onChange => 'topicsChanged()'}) %>
+            <%= label_tag('assignment_has_topics', 'Has topics?') %>
+        </td>
+    </tr>
     <% end %>
-  </tr>
-
-  <% if current_page?(action: 'edit') %>
-  <!--Topics-->
-  <tr>
-    <td style='padding:5px' id='assignment_has_topics_field'>
-      <%= check_box_tag('assignment_has_topics', 'true', @assignment_form.assignment.topics?, {:onChange => 'topicsChanged()'}) %>
-      <%= label_tag('assignment_has_topics', 'Has topics?') %>
-    </td>
-  </tr>
-  <% end %>
-
-  <!--staggered_deadline-->
-  <tr>
-    <td style='padding:5px' id='assignment_staggered_deadline_field'>
-      <input name="assignment_form[assignment][staggered_deadline]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][staggered_deadline]', 'true', @assignment_form.assignment.staggered_deadline, {:onChange => 'staggeredDeadlineChanged()'}) %>
-      <%= label_tag('assignment_form[assignment][staggered_deadline]', 'Staggered deadline assignment?') %>
-    </td>
-  </tr>
-
-  <tr>
-    <td style='padding:5px' id='assignment_microtask_field'>
-      <input name="assignment_form[assignment][microtask]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][microtask]', 'true', @assignment_form.assignment.microtask, {:onchange => 'microtaskChanged()'}) %>
-      <%= label_tag('assignment_form[assignment][microtask]', 'Micro-task assignment?') %>
-    </td>
-  </tr>
-
-  <tr>
-    <td style='padding:5px' id='assignment_review_visible_to_all_field'>
-      <input name="assignment_form[assignment][reviews_visible_to_all]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][reviews_visible_to_all]', 'true', @assignment_form.assignment.reviews_visible_to_all) %>
-      <%= label_tag('assignment_form[assignment][reviews_visible_to_all]', 'Reviews visible to all other reviewers?') %>
-    </td>
-  </tr>
-
-  <tr>
-    <td style='padding:5px' id='assignment_is_calibrated_field'>
-      <input name="assignment_form[assignment][is_calibrated]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][is_calibrated]', 'true', @assignment_form.assignment.is_calibrated) %>
-      <%= label_tag('assignment_form[assignment][is_calibrated]', 'Calibration for training?') %>
-    </td>
-  </tr>
-
-  <tr>
-    <td style='padding:5px' id='assignment_reputation_algorithm_field'>
-      <div class="form-inline">
-      <!--<input name="assignment_form[assignment][reputation_algorithm]" type="hidden" value="false"/>-->
-      <%= label_tag('assignment_form[assignment][reputation_algorithm]', 'Reputation Algorithm?') %>
-      <%= select('assignment_form[assignment]', 'reputation_algorithm', [['--', ''], %w[Lauw Lauw], %w[Hamer Hamer]], { :selected => @assignment_form.assignment.reputation_algorithm}, { :class => 'form-control', :style => 'width: 100px'}) %>
-      </div>
-    </td>
-  </tr>
-  <tr colspan="3">
-    <td style='padding:5px'>
-      <input type="checkbox" name = "toggle_simicheck_setting" id="toggle_simicheck_setting" <%= "checked" if @assignment_form.assignment.simicheck != -1 %> onclick="useSimicheckChanged()"></input>
-      <%= label_tag('toggle_simicheck_setting', 'Use simicheck?') %>
-      <div style='padding:5px' id='assignment_simicheck_field' <%= "hidden" if @assignment_form.assignment.simicheck == -1 %> >
-        <div class="form-inline">
-          <%= label_tag('assignment_form[assignment][simicheck]', 'SimiCheck Delay') %>
-          <%= select('assignment_form[assignment]', 'simicheck', (-1..100).to_a.map{|n| n== -1? ['No SimiCheck', -1] : [n, n]}, {:selected => @assignment_form.assignment.simicheck}, {:class => 'form-control', :style => 'width: 150px'}) %><b> hours</b>
-          <br></br>
-          <%= label_tag('assignment_form[assignment][simicheck_threshold]', 'SimiCheck Similarity Threshold') %>
-          <%= select('assignment_form[assignment]', 'simicheck_threshold', (0..100).to_a.map{|n| n== 100? ['', 100]: [n, n]}, {:selected => @assignment_form.assignment.simicheck_threshold}, {:class => 'form-control', :style => 'width: 70px'}) %><b> %</b>
-          <br>(Filter that refers to % text same between 2 docs)</br>
-        </div>
-      </div>
-    </td>
-  </tr>
-
-  <!-- Start answer tagging code -->
-  <tr>
-    <td style='padding:5px' class="form-inline" colspan="2">
-      <input name="assignment_form[assignment][is_answer_tagging_allowed]" type="hidden" value="false" onclick="useAnswerTagChanged()"/>
-      <%= check_box_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'true', @assignment_form.assignment.is_answer_tagging_allowed) %>
-      <%= label_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'Allow tag prompts so author can tag feedback comments?') %>
-    </td>
-  </tr>
-  <!-- End answer tagging code -->
-
-  <!--"available to student?" should be the last checkbox-->
-  <tr>
-    <td style='padding:5px' id='assignment_availability_flag_field'>
-      <input name="assignment_form[assignment][availability_flag]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][availability_flag]', 'true', @assignment_form.assignment.availability_flag) %>
-      <%= label_tag('assignment_form[assignment][availability_flag]', 'Available to students?') %>
-    </td>
-  </tr>
+    <!--staggered_deadline-->
+    <tr>
+        <td style='padding:5px' id='assignment_staggered_deadline_field'>
+            <input name="assignment_form[assignment][staggered_deadline]" type="hidden" value="false"/>
+            <%= check_box_tag('assignment_form[assignment][staggered_deadline]', 'true', @assignment_form.assignment.staggered_deadline, {:onChange => 'staggeredDeadlineChanged()'}) %>
+            <%= label_tag('assignment_form[assignment][staggered_deadline]', 'Staggered deadline assignment?') %>
+        </td>
+    </tr>
+    <tr>
+        <td style='padding:5px' id='assignment_microtask_field'>
+            <input name="assignment_form[assignment][microtask]" type="hidden" value="false"/>
+            <%= check_box_tag('assignment_form[assignment][microtask]', 'true', @assignment_form.assignment.microtask, {:onchange => 'microtaskChanged()'}) %>
+            <%= label_tag('assignment_form[assignment][microtask]', 'Micro-task assignment?') %>
+        </td>
+    </tr>
+    <tr>
+        <td style='padding:5px' id='assignment_review_visible_to_all_field'>
+            <input name="assignment_form[assignment][reviews_visible_to_all]" type="hidden" value="false"/>
+            <%= check_box_tag('assignment_form[assignment][reviews_visible_to_all]', 'true', @assignment_form.assignment.reviews_visible_to_all) %>
+            <%= label_tag('assignment_form[assignment][reviews_visible_to_all]', 'Reviews visible to all other reviewers?') %>
+        </td>
+    </tr>
+    <tr>
+        <td style='padding:5px' id='assignment_is_calibrated_field'>
+            <input name="assignment_form[assignment][is_calibrated]" type="hidden" value="false"/>
+            <%= check_box_tag('assignment_form[assignment][is_calibrated]', 'true', @assignment_form.assignment.is_calibrated) %>
+            <%= label_tag('assignment_form[assignment][is_calibrated]', 'Calibration for training?') %>
+        </td>
+    </tr>
+    <tr>
+        <td style='padding:5px' id='assignment_reputation_algorithm_field'>
+            <div class="form-inline">
+                <!--<input name="assignment_form[assignment][reputation_algorithm]" type="hidden" value="false"/>-->
+                <%= label_tag('assignment_form[assignment][reputation_algorithm]', 'Reputation Algorithm?') %>
+                <%= select('assignment_form[assignment]', 'reputation_algorithm', [['--', ''], %w[Lauw Lauw], %w[Hamer Hamer]], { :selected => @assignment_form.assignment.reputation_algorithm}, { :class => 'form-control', :style => 'width: 100px'}) %>
+            </div>
+        </td>
+    </tr>
+    <tr colspan="3">
+        <td style='padding:5px'>
+            <input type="checkbox" name = "toggle_simicheck_setting" id="toggle_simicheck_setting" <%= "checked" if @assignment_form.assignment.simicheck != -1 %> onclick="useSimicheckChanged()"></input>
+            <%= label_tag('toggle_simicheck_setting', 'Use simicheck?') %>
+            <div style='padding:5px' id='assignment_simicheck_field' <%= "hidden" if @assignment_form.assignment.simicheck == -1 %> >
+                <div class="form-inline">
+                    <%= label_tag('assignment_form[assignment][simicheck]', 'SimiCheck Delay') %>
+                    <%= select('assignment_form[assignment]', 'simicheck', (-1..100).to_a.map{|n| n== -1? ['No SimiCheck', -1] : [n, n]}, {:selected => @assignment_form.assignment.simicheck}, {:class => 'form-control', :style => 'width: 150px'}) %><b> hours</b>
+                    <br></br>
+                    <%= label_tag('assignment_form[assignment][simicheck_threshold]', 'SimiCheck Similarity Threshold') %>
+                    <%= select('assignment_form[assignment]', 'simicheck_threshold', (0..100).to_a.map{|n| n== 100? ['', 100]: [n, n]}, {:selected => @assignment_form.assignment.simicheck_threshold}, {:class => 'form-control', :style => 'width: 70px'}) %><b> %</b>
+                    <br>(Filter that refers to % text same between 2 docs)</br>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <!-- Start answer tagging code -->
+    <tr>
+        <td style='padding:5px' class="form-inline" colspan="2">
+            <input name="assignment_form[assignment][is_answer_tagging_allowed]" type="hidden" value="false" onclick="useAnswerTagChanged()"/>
+            <%= check_box_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'true', @assignment_form.assignment.is_answer_tagging_allowed) %>
+            <%= label_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'Allow tag prompts so author can tag feedback comments?') %>
+        </td>
+    </tr>
+    <!-- End answer tagging code -->
+    <!--"available to student?" should be the last checkbox-->
+    <tr>
+        <td style='padding:5px' id='assignment_availability_flag_field'>
+            <input name="assignment_form[assignment][availability_flag]" type="hidden" value="false"/>
+            <%= check_box_tag('assignment_form[assignment][availability_flag]', 'true', @assignment_form.assignment.availability_flag) %>
+            <%= label_tag('assignment_form[assignment][availability_flag]', 'Available to students?') %>
+        </td>
+    </tr>
 </table>
-
-
 <script>
     <% if current_page?(action: 'edit') %>
     jQuery(document).ready(function () {
@@ -266,16 +249,16 @@ function autogenerate_submission(){
             jQuery("#topics_tab_header").hide();
         }
     });
-
+    
     function topicsChanged() {
         var msg = 'Warning! Un-checking this box will remove all topics that have been created.';
         var checkbox = jQuery('#assignment_has_topics');
-
+    
         // E2115 - bind enabled state of mentor checkbox to checked property
         // of topics checkbox
         var mentorCheckbox = jQuery("#auto_assign_mentor_checkbox");
         mentorCheckbox.prop("disabled", checkbox.is(':checked'));
-
+    
         if (checkbox.is(':checked')) {
             // If this box is checked, display the 'Topics' tab
             jQuery("#topics_tab_header").show();
@@ -301,7 +284,39 @@ function autogenerate_submission(){
         }
     }
     <% end %>
-
+    
+      function hasTeamsChanged() {
+      var msg = 'Warning! Unchecking this box will hide teams that already exist.';
+        var checkbox = jQuery('#team_assignment');
+        var team_count_field = jQuery('#assignment_team_count_field');
+        var teammate_reviews_field = jQuery('#assignment_show_teammate_reviews');
+        var team_formation_due_date_checkbox = jQuery('#team_formation_due_date_checkbox')
+    
+        jQuery("#questionnaire_table_TeammateReviewQuestionnaire").remove()
+        if (checkbox.is(':checked')) {
+          team_count_field.removeAttr('hidden');
+          team_formation_due_date_checkbox.removeAttr('hidden')
+          jQuery('#assignment_form_assignment_max_team_size').val('2');
+          teammate_reviews_field.removeAttr('hidden');
+          addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
+    
+        } else {
+            if (confirm(msg)) {
+              team_count_field.attr('hidden', true);
+              team_formation_due_date_checkbox.attr('hidden', true)
+              teammate_reviews_field.attr('hidden', true);
+              document.getElementById('assignment_form_assignment_max_team_size').value = '1';
+              removeDueDateTableElement('team_formation', 0);
+    
+            } else {
+              checkbox.prop('checked', true);
+            }
+            if (<%= @assignment_form.assignment.max_team_size == 1%>){
+              team_count_field.attr('hidden', true);
+            }
+          } 
+    }
+    
     function staggeredDeadlineChanged() {
       var msg = 'Warning! Unchecking all topics for this assignment will now have the same deadline.'
       if (!jQuery('#assignment_staggered_deadline').is(':checked')) {
@@ -310,8 +325,8 @@ function autogenerate_submission(){
         }
       }
     }
-
-   function reviewStrategyChanged() {
+    
+    function reviewStrategyChanged() {
      var val = jQuery('#assignment_form_assignment_review_assignment_strategy').val();
         if (val == 'Auto-Selected') {
           jQuery('#assignment_review_topic_threshold_row').removeAttr('hidden');
@@ -320,9 +335,9 @@ function autogenerate_submission(){
           jQuery('#instructor_selected_review_mapping_mechanism').removeAttr('hidden');
           jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
         }
-   }
-
-
+    }
+    
+    
     function hasQuizChanged() {
       if (jQuery('#assignment_form[assignment][require_quiz]').is(':checked')) {
         jQuery('#assignment_numbers_of_quiz_field').removeAttr('hidden');
@@ -330,7 +345,7 @@ function autogenerate_submission(){
         jQuery('#assignment_numbers_of_quiz_field').attr('hidden', true);
       }
     }
-
+    
     function useSimicheckChanged(){
       if (jQuery('#toggle_simicheck_setting').is(':checked')) {
         jQuery('#assignment_simicheck_field').show();
@@ -340,7 +355,7 @@ function autogenerate_submission(){
         jQuery('#assignment_simicheck_threshold').hide();
       }
     }
-
+    
     jQuery(document).ready(function() {
       jQuery('input[type=radio][name=num_reviews]').change(function(){
         if (this.value == 'student'){
@@ -383,4 +398,4 @@ function autogenerate_submission(){
        }
      });
     });
-  </script>
+</script>

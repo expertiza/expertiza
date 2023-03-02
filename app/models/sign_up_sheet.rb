@@ -5,7 +5,7 @@ class SignUpSheet < ApplicationRecord
     if users_team.empty?
       # if team is not yet created, create new team.
       # create Team and TeamNode
-      team = AssignmentTeam.create_team_and_node(assignment_id)
+      team = AssignmentTeam.create_team_with_users(assignment_id, [user_id])
       # create SignedUpTeam
       confirmationStatus = SignUpSheet.confirmTopic(user_id, team.id, topic_id, assignment_id) if topic_id
     else
@@ -37,7 +37,8 @@ class SignUpSheet < ApplicationRecord
         result = true if sign_up.save
       end
     else
-      # If all the topics chosen by the user are waitlisted,
+      # This line of code checks if the "user_signup_topic" is on the waitlist. If it is not on the waitlist, then the code returns 
+      # false. If it is on the waitlist, the code continues to execute.
       user_signup.each do |user_signup_topic|
         return false unless user_signup_topic.is_waitlisted
       end

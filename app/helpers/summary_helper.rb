@@ -13,17 +13,27 @@ module SummaryHelper
       self.avg_scores_by_round = ({})
       self.avg_scores_by_criterion = ({})
       self.summary_ws_url = summary_ws_url
-
+      
       # get all answers for each question and send them to summarization WS
       questions.each_with_index do |question, index|
         round = index + 1
         summary[round.to_s] = {}
         avg_scores_by_criterion[round.to_s] = {}
         avg_scores_by_round[round.to_s] = 0.0
-        next if question.type.eql?('SectionHeader')
+        
+        question_iterator = nil
+        if question[1] == nil
+          question_iterator = [*question]
+        else
+          question_iterator = question[1]
+        end
 
-        summarize_reviews_by_reviewee_question(assignment, reviewee_id, question, round)
-        avg_scores_by_round[round.to_s] = calculate_avg_score_by_round(avg_scores_by_criterion[round.to_s], questions[round])
+        question_iterator.each do |question| 
+          next if question.type.eql?('SectionHeader')
+
+          summarize_reviews_by_reviewee_question(assignment, reviewee_id, question, round)
+          avg_scores_by_round[round.to_s] = calculate_avg_score_by_round(avg_scores_by_criterion[round.to_s], questions[round])
+        end
       end
       self
     end
@@ -99,10 +109,11 @@ module SummaryHelper
       question_score
     end
 
-    def calculate_round_score(avg_scores_by_criterion, criteria)
+    def calculate_round_score(avg_scores_by_criterion, criterions)
       round_score = sum_weight = 0.0
       # include this score in the average round score if the weight is valid & q is criterion
-      unless criteria.nil?
+      criterions = [*criterions]
+      criterions.each do |criteria|
         if !criteria.weight.nil? && (criteria.weight > 0) && criteria.type.eql?('Criterion')
           round_score += avg_scores_by_criterion.values.first * criteria.weight
           sum_weight += criteria.weight
@@ -112,8 +123,8 @@ module SummaryHelper
       round_score
     end
 
-    def calculate_avg_score_by_round(avg_scores_by_criterion, criteria)
-      round_score = calculate_round_score(avg_scores_by_criterion, criteria)
+    def calculate_avg_score_by_round(avg_scores_by_criterion, criterions)
+      round_score = calculate_round_score(avg_scores_by_criterion, criterions)
       round_score.round(2)
     end
   end

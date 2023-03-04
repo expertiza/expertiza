@@ -56,11 +56,7 @@ class User < ApplicationRecord
   end
 
   def can_impersonate?(user)
-    return true if role.super_admin?
-    return true if teaching_assistant_for?(user)
-    return true if recursively_parent_of(user)
-
-    false
+    role.super_admin? || teaching_assistant_for?(user) || recursively_parent_of(user)
   end
 
   def recursively_parent_of(user)

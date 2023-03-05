@@ -20,7 +20,6 @@ class SignUpTopic < ApplicationRecord
     topic = SignUpTopic.where(topic_name: row_hash[:topic_name], assignment_id: session[:assignment_id]).first
     if topic.nil?
       attributes = ImportTopicsHelper.define_attributes(row_hash)
-
       ImportTopicsHelper.create_new_sign_up_topic(attributes, session)
     else
       topic.max_choosers = row_hash[:max_choosers]
@@ -29,14 +28,20 @@ class SignUpTopic < ApplicationRecord
     end
   end
 
+  def get_chooser_count(assignment_id, is_waitlisted)
+    # NOTE: Cannot change the inner join query unless the model has the associations setup for identifying the keys correctly.
+    SignUpTopic.where(assignment_id: assignment_id).joins('INNER JOIN signed_up_teams ON sign_up_topics.topic_id = signed_up_teams.id').where('signed_up_teams.is_waitlisted = ?', is_waitlisted).group("id").count(:max_choosers)
+  end
+
   def self.find_slots_filled(assignment_id)
-    SignUpTopic.find_by_sql(['SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id = ? and u.is_waitlisted = false GROUP BY t.id', assignment_id])
+    return get_chooser_count(assignment_id, false)
   end
 
   def self.find_slots_waitlisted(assignment_id)
-    SignUpTopic.find_by_sql(['SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id = ? and u.is_waitlisted = true GROUP BY t.id', assignment_id])
+    return get_chooser_count(assignment_id, true)
   end
 
+  # NOTE: TODO: MOVE THIS TO SIGNED_UP_TEAM SINCE THIS IS A TEAM BASED ACTION.
   def self.find_waitlisted_topics(assignment_id, team_id)
     SignedUpTeam.find_by_sql(['SELECT u.id FROM sign_up_topics t, signed_up_teams u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = ? and u.team_id = ?', assignment_id.to_s, team_id.to_s])
   end

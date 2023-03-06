@@ -4,7 +4,7 @@ describe TeammateReviewResponseMap do
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
   let(:teammate_review_response_map) { TeammateReviewResponseMap.new reviewer: participant, team_reviewing_enabled: true, assignment: assignment }
 
-  let(:team) { build(:assignment_team, id: 1, name: 'team no name', assignment: assignment, users: [student], parent_id: 1) }
+  let(:team) { build(:assignment_team, id: 1, name: 'team no name', assignment: assignment, participants: [participant], parent_id: 1) }
   let(:teammate_review_response_map1) { build(:teammate_review_response_map, id: 1, assignment: assignment1, reviewer: participant, reviewee: participant1) }
   let(:review_response_map) { build(:review_response_map, id: 1, assignment: assignment, reviewer: participant, reviewee: team) }
 
@@ -96,7 +96,7 @@ describe TeammateReviewResponseMap do
         allow(AssignmentParticipant).to receive(:find).with(2).and_return(participant)
         allow(Assignment).to receive(:find).with(1).and_return(assignment)
         allow(AssignmentTeam).to receive(:find).with(1).and_return(team)
-        allow(AssignmentTeam).to receive(:users).and_return(student)
+        allow(AssignmentTeam).to receive(:participants).and_return(participant)
         allow(User).to receive(:find).with(1).and_return(student)
         review_response_map.reviewee_id = 1
         defn = { body: { type: 'TeammateReview', obj_name: 'Test Assgt', first_name: 'no one', partial_name: 'new_submission' }, to: 'expertiza@mailinator.com' }

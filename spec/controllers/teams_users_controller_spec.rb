@@ -14,6 +14,7 @@ describe TeamsUsersController do
   let(:student) { build(:student) }
   let(:duty) { build(:duty, id: 1, name: 'Role', max_members_for_duty: 2, assignment_id: 1) }
   let(:teams_user1) { TeamsUser.new id: 1, duty_id: 1 }
+  let(:participant1) { build_stubbed(:participant, id: 1, user_id: 1, parent_id: 1) }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -127,8 +128,12 @@ describe TeamsUsersController do
         allow(Team).to receive(:find).with('1').and_return(team1)
         allow(AssignmentTeam).to receive(:find).with('1').and_return(team1)
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
-        allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
-        allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(false)
+        allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
+        allow(TeamsUser).to receive(:create).with(any_args).and_return(team_user1)
+        allow(TeamNode).to receive(:find_by).with(any_args).and_return(student2)
+        allow(TeamUserNode).to receive(:create).with(any_args).and_return(true)
+        allow(Team).to receive(:size).with(any_args).and_return(3)
+        allow_any_instance_of(Team).to receive(:add_participant_to_team).with(any_args).and_return(false)
         user_session = { user: admin }
         request_params = {
           user: { name: 'student2065' }, id: 1
@@ -148,8 +153,9 @@ describe TeamsUsersController do
         allow(AssignmentTeam).to receive(:find).with('1').and_return(team1)
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
-        allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(true)
+        allow_any_instance_of(Team).to receive(:add_participant_to_team).with(any_args).and_return(true)
         allow(TeamsUser).to receive(:last).with(any_args).and_return(student1)
+        allow_any_instance_of(Team).to receive(:add_participant_to_team).with(any_args).and_return(true)
         user_session = { user: admin }
         request_params = {
           user: { name: 'student2065' }, id: 1
@@ -186,7 +192,7 @@ describe TeamsUsersController do
         allow(CourseTeam).to receive(:find).with('5').and_return(team5)
         allow(Course).to receive(:find).with(1).and_return(course1)
         allow(CourseParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
-        allow_any_instance_of(CourseTeam).to receive(:add_member).with(any_args).and_return(false)
+        allow_any_instance_of(CourseTeam).to receive(:add_participant_to_team).with(any_args).and_return(false)
         user_session = { user: admin }
         request_params = {
           user: { name: 'student2065' }, id: 5
@@ -209,7 +215,7 @@ describe TeamsUsersController do
         allow(TeamUserNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('TeamUserNode', id: 1))
         allow(Course).to receive(:find).with(1).and_return(course1)
         allow(CourseParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
-        allow_any_instance_of(CourseTeam).to receive(:add_member).with(any_args).and_return(true)
+        allow_any_instance_of(CourseTeam).to receive(:add_participant_to_team).with(any_args).and_return(true)
         user_session = { user: admin }
         request_params = {
           user: { name: 'student2065' }, id: 5
@@ -227,9 +233,9 @@ describe TeamsUsersController do
         allow(AssignmentTeam).to receive(:find).with('1').and_return(team1)
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
-        allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(true)
+        allow_any_instance_of(Team).to receive(:add_participant_to_team).with(any_args).and_return(true)
         allow(TeamsUser).to receive(:last).with(any_args).and_return(student1)
-        allow(assignment1).to receive(:user_on_team?).with(student1).and_return(true)
+        allow(assignment1).to receive(:participant_on_team?).with(participant).and_return(true)
         user_session = { user: admin }
         request_params = {
           user: { name: 'student2065' }, id: 1
@@ -248,8 +254,9 @@ describe TeamsUsersController do
         allow(Team).to receive(:find).with('1').and_return(team1)
         allow(AssignmentTeam).to receive(:find).with('1').and_return(team1)
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
-        allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
-        allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_raise("Member on existing team error")
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant1)
+        allow(Participant).to receive(:where).and_return([:parent_id=>1])
+        allow_any_instance_of(Team).to receive(:add_participant_to_team).with(any_args).and_raise("Member on existing team error")
         user_session = { user: admin }
         request_params = {
           user: { name: 'student2065' }, id: 1
@@ -272,8 +279,8 @@ describe TeamsUsersController do
         allow(TeamUserNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('TeamUserNode', id: 1))
         allow(Course).to receive(:find).with(1).and_return(course1)
         allow(CourseParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
-        allow_any_instance_of(CourseTeam).to receive(:add_member).with(any_args).and_return(true)
-        allow(course1).to receive(:user_on_team?).with(student1).and_return(true)
+        allow_any_instance_of(CourseTeam).to receive(:add_participant_to_team).with(any_args).and_return(true)
+        allow(course1).to receive(:participant_on_team?).with(participant).and_return(true)
         user_session = { user: admin }
         request_params = {
           user: { name: 'student2065' }, id: 5
@@ -293,7 +300,7 @@ describe TeamsUsersController do
         allow(CourseTeam).to receive(:find).with('5').and_return(team5)
         allow(Course).to receive(:find).with(1).and_return(course1)
         allow(CourseParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
-        allow_any_instance_of(CourseTeam).to receive(:add_member).with(any_args).and_raise("Member on existing team error")
+        allow_any_instance_of(CourseTeam).to receive(:add_participant_to_team).with(any_args).and_raise("Member on existing team error")
         user_session = { user: admin }
         request_params = {
           user: { name: 'student2065' }, id: 5
@@ -313,6 +320,7 @@ describe TeamsUsersController do
       it 'it deletes the user and redirects to Teams#list page' do
         allow(TeamsUser).to receive(:find).with('1').and_return(teamUser)
         allow(Team).to receive(:find).with(teamUser.team_id).and_return(team1)
+        allow(Participant).to receive(:find_by).with(id: teamUser.participant_id).and_return(participant1)
         allow(User).to receive(:find).with(teamUser.user_id).and_return(student1)
         request_params = { id: 1 }
         user_session = { user: instructor }

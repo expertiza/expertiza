@@ -12,13 +12,13 @@
         <%= tscore[:team].name(session[:ip]) + ' (' + SignUpTopic.find(topic_id).topic_identifier + ')' %>
       <% else %>
         <% if @assignment.max_team_size == 1 %>
-          <%= tscore[:team].users.first.name(session[:ip]) + ' (' + tscore[:team].users.first.fullname(session[:ip]) + ')' rescue '' %>
+          <%= tscore[:team].participants.first.user.name(session[:ip]) + ' (' + tscore[:team].participants.first.user.fullname(session[:ip]) + ')' rescue '' %>
         <% else %>
           <%= tscore[:team].name(session[:ip]) %> |
-          <% for index in 0..tscore[:team].users.length - 2 %>
-            <%= tscore[:team].users[index].name(session[:ip]) %>,
+          <% for index in 0..tscore[:team].participants.length - 2 %>
+            <%= User.find(tscore[:team].participants[index].user_id).name(session[:ip]) %>,
           <% end %>
-          <%= tscore[:team].users[tscore[:team].users.length - 1].name(session[:ip]) unless tscore[:team].users[tscore[:team].users.length - 1].nil?%>
+          <%= User.find(tscore[:team].participants[tscore[:team].participants.length - 1].user_id).name(session[:ip]) unless tscore[:team].participants[tscore[:team].participants.length - 1].nil?%>
         <% end %>
       <% end %>
   </td>

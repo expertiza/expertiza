@@ -116,14 +116,14 @@ describe CourseTeam do
       it 'returns false' do
         allow(course).to receive(:teams).and_return([course_team1])
         allow_any_instance_of(Team).to receive(:users).and_return([user1])
-        expect(course.user_on_team?(user2)).to be_falsey
+        expect(course.participant_on_team?(participant2)).to be_falsey
       end
     end
     context 'when the user is on a team associated with the assignment' do
       it 'returns true' do
         allow(course).to receive(:get_teams).and_return([course_team1])
-        allow_any_instance_of(CourseTeam).to receive(:users).and_return([user1, user2])
-        expect(course.user_on_team?(user2)).to be_truthy
+        allow_any_instance_of(CourseTeam).to receive(:participants).and_return([participant, participant2])
+        expect(course.participant_on_team?(participant2)).to be_truthy
       end
     end
   end

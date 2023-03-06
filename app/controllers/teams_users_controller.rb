@@ -1,6 +1,9 @@
 class TeamsUsersController < ApplicationController
   include AuthorizationHelper
 
+  ##
+  # E2283: Return true if the current user is student else return false
+  ##
   def action_allowed?
     # Allow duty updation for a team if current user is student, else require TA or above Privileges.
     if %w[update_duties].include? params[:action]
@@ -10,6 +13,9 @@ class TeamsUsersController < ApplicationController
     end
   end
 
+  ##
+  # E2283: Auto completes the username when the user enters the username in the field
+  ##
   def auto_complete_for_user_name
     team = Team.find(session[:team_id])
     @users = team.get_possible_team_members(params[:user][:name])
@@ -23,6 +29,9 @@ class TeamsUsersController < ApplicationController
     redirect_to controller: 'student_teams', action: 'view', student_id: params[:participant_id]
   end
 
+  ##
+  # E2283: Show the list of team members with their credentials, 10 per page on the team formation page
+  ##
   def list
     @team = Team.find(params[:id])
     @assignment = Assignment.find(@team.parent_id)
@@ -33,6 +42,10 @@ class TeamsUsersController < ApplicationController
     @team = Team.find(params[:id])
   end
 
+  ##
+  # E2283: Creating a user and adding it to the team. A user cannot be added if he/she is not a participant in the current course and is not added to the
+  # assignmnet. The participant can also not be added if the team has reached it's limit.
+  ##
   def create
     user = User.find_by(name: params[:user][:name].strip)
     unless user
@@ -44,17 +57,18 @@ class TeamsUsersController < ApplicationController
     unless user.nil?
       if team.is_a?(AssignmentTeam)
         assignment = Assignment.find(team.parent_id)
-        if assignment.user_on_team?(user)
+        participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
+        if assignment.participant_on_team?(participant)
           flash[:error] = "This user is already assigned to a team for this assignment"
           redirect_back fallback_location: root_path
           return
         end
-        if AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id).nil?
+        if participant.nil?
           urlAssignmentParticipantList = url_for controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment', authorization: 'participant'
           flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
         else
           begin
-            add_member_return = team.add_member(user, team.parent_id)
+            add_member_return = team.add_participant_to_team(participant, team.parent_id)
           rescue
             flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
             redirect_back fallback_location: root_path
@@ -73,17 +87,20 @@ class TeamsUsersController < ApplicationController
         end
       else # CourseTeam
         course = Course.find(team.parent_id)
-        if course.user_on_team?(user)
+        # E2283: Find the participant in the course using user id and course id
+        participant = CourseParticipant.find_by(user_id: user.id, parent_id: course.id)
+        if course.participant_on_team?(participant)
           flash[:error] = "This user is already assigned to a team for this course"
           redirect_back fallback_location: root_path
           return
         end
-        if CourseParticipant.find_by(user_id: user.id, parent_id: course.id).nil?
+
+        if participant.nil?
           urlCourseParticipantList = url_for controller: 'participants', action: 'list', id: course.id, model: 'Course', authorization: 'participant'
           flash[:error] = "\"#{user.name}\" is not a participant of the current course. Please <a href=\"#{urlCourseParticipantList}\">add</a> this user before continuing."
         else
           begin
-            add_member_return = team.add_member(user, team.parent_id)
+            add_member_return = team.add_participant_to_team(participant, team.parent_id)
           rescue
             flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
             redirect_back fallback_location: root_path
@@ -101,15 +118,22 @@ class TeamsUsersController < ApplicationController
     redirect_to controller: 'teams', action: 'list', id: team.parent_id
   end
 
+  ##
+  # E2283: Delte participant from an assignment when it is not in a team and is not assigned to review someone's else work
+  ##
   def delete
     @teams_user = TeamsUser.find(params[:id])
     parent_id = Team.find(@teams_user.team_id).parent_id
-    @user = User.find(@teams_user.user_id)
+    participant = Participant.find_by(id: @teams_user.participant_id)
+    @user = User.find(participant.user_id)
     @teams_user.destroy
     undo_link("The team user \"#{@user.name}\" has been successfully removed. ")
     redirect_to controller: 'teams', action: 'list', id: parent_id
   end
 
+  ##
+  # E2283: Destroy the selected user
+  ##
   def delete_selected
     params[:item].each do |item_id|
       team_user = TeamsUser.find(item_id).first

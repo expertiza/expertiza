@@ -69,13 +69,14 @@ class Course < ApplicationRecord
     end
   end
 
-  def user_on_team?(user)
+  # Check whether the participant is part of any team in this course.
+  def participant_on_team?(participant)
     teams = get_teams
-    users = []
+    result = false
     teams.each do |team|
-      users << team.users
+      result ||= team.participant?(participant)
     end
-    users.flatten.include? user
+    result
   end
 
   require 'analytic/course_analytic'

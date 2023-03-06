@@ -7,14 +7,14 @@ describe Duty do
   let(:user2) { build(:student, id: 2, name: 'no name2', fullname: 'no one2', participants: [participant2]) }
   let(:user3) { build(:student, id: 3, name: 'no name3', fullname: 'no one3', participants: [participant3]) }
 
-  let(:team1) { build(:assignment_team, id: 1, name: 'no team', users: [user, user2, user3]) }
+  let(:team1) { build(:assignment_team, id: 1, name: 'no team', participants: [participant, participant2, participant3]) }
   let(:sample_duty_taken) { build(:duty, id: 1, name: 'Developer', max_members_for_duty: 1, assignment_id: 1) }
   let(:sample_duplicate_duty) { build(:duty, id: 2, name: 'Developer', max_members_for_duty: 1, assignment_id: 1) }
   let(:sample_duty_not_taken) { build(:duty, id: 1, max_members_for_duty: 2, assignment_id: 1) }
 
-  let(:team_user1) { build(:team_user, id: 1, user: user) }
-  let(:team_user2) { build(:team_user, id: 2, user: user2) }
-  let(:team_user3) { build(:team_user, id: 3, user: user3, duty_id: 1) }
+  let(:team_user1) { build(:team_user, id: 1, participant: participant) }
+  let(:team_user2) { build(:team_user, id: 2, participant: participant2) }
+  let(:team_user3) { build(:team_user, id: 3, participant: participant3, duty_id: 1) }
 
   before(:each) do
     allow(team1).to receive(:participants).and_return([participant, participant2, participant3])

@@ -1,8 +1,8 @@
 describe ReviewResponseMap do
-  let(:team) { build(:assignment_team, id: 1, name: 'team no name', assignment: assignment, users: [student], parent_id: 1) }
+  let(:team) { build(:assignment_team, id: 1, name: 'team no name', assignment: assignment, participants: [participant], parent_id: 1) }
   let(:team2) { build(:assignment_team, id: 3, name: 'no team') }
-  let(:team1) { build(:assignment_team, id: 2, name: 'team has name', assignment: assignment, users: [student]) }
-  let(:team3) { build(:assignment_team, id: 4, name: 'team has name1', assignment: assignment, users: [student1]) }
+  let(:team1) { build(:assignment_team, id: 2, name: 'team has name', assignment: assignment, participants: [participant]) }
+  let(:team3) { build(:assignment_team, id: 4, name: 'team has name1', assignment: assignment, participants: [participant1]) }
   let(:review_response_map) { build(:review_response_map, id: 1, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:review_response_map1) do
     build :review_response_map,
@@ -231,7 +231,7 @@ describe ReviewResponseMap do
     allow(Participant).to receive(:find).with(1).and_return(participant)
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
     allow(AssignmentTeam).to receive(:find).with(1).and_return(team)
-    allow(AssignmentTeam).to receive(:users).and_return(student)
+    allow(AssignmentTeam).to receive(:participants).and_return(participant)
     allow(User).to receive(:find).with(1).and_return(student)
     review_response_map.reviewee_id = 1
     defn = { body: { type: 'Peer Review', obj_name: 'Test Assgt', first_name: 'no one', partial_name: 'new_submission' }, to: 'expertiza@mailinator.com' }

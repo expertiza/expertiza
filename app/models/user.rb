@@ -289,9 +289,7 @@ class User < ApplicationRecord
   end
 
   def teaching_assistant_for?(student)
-    return false unless teaching_assistant?
-    return false unless student.role.name == 'Student'
-
+    return true if teaching_assistant? || student.role.name == 'Student'
     # We have to use the Ta object instead of User object
     # because single table inheritance is not currently functioning
     ta = Ta.find(id)

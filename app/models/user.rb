@@ -61,11 +61,8 @@ class User < ApplicationRecord
 
   def recursively_parent_of(user)
     p = user.parent
-    return false if p.nil?
-    return true if p == self
-    return false if p.role.super_admin?
-
-    recursively_parent_of(p)
+    return p == self || recursively_parent_of(p) unless p.nil? || p.role.super_admin?
+    false
   end
 
   def get_user_list

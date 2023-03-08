@@ -51,9 +51,14 @@ class User < ApplicationRecord
     role.super_admin? || teaching_assistant_for?(user) || recursively_parent_of(user)
   end
 
+  # def recursively_parent_of(user)
+  #   p = user.parent
+  #   return p == self || recursively_parent_of(p) unless p.nil? || (not p.role.nil? and p.role.super_admin?)
+  #   false
+  # end
   def recursively_parent_of(user)
     p = user.parent
-    return p == self || recursively_parent_of(p) unless p.nil? || p.role.super_admin?
+    return p == self || recursively_parent_of(p) unless p.nil? || (p.role && p.role.super_admin?)
     false
   end
 
@@ -281,7 +286,7 @@ class User < ApplicationRecord
   end
 
   def teaching_assistant_for?(student)
-    return true if teaching_assistant? || student.role.name == 'Student'
+    return false unless teaching_assistant? && student && student.role && student.role.name == 'Student'
     # We have to use the Ta object instead of User object
     # because single table inheritance is not currently functioning
     ta = Ta.find(id)

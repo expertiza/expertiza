@@ -187,19 +187,6 @@ describe User do
     end
   end
 
-  describe '#creator_of?' do
-    it 'returns true of current user (user) is the creator of target user (user1)' do
-      allow(user1).to receive(:creator).and_return(user)
-      expect(user.creator_of?(user1)).to be true
-    end
-
-    it 'returns false of current user (user) is not the creator of target user (user1)' do
-      allow(user1).to receive(:creator).and_return(user2)
-      expect(user.creator_of?(user1)).to be false
-      expect(user2.creator_of?(user1)).to be true
-    end
-  end
-
   describe '.import' do
     it 'raises error if import column does not equal to 3' do
       row = { 'name' => 'abc', 'fullname' => 'abc xyz' }

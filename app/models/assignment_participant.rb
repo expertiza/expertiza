@@ -177,7 +177,7 @@ class AssignmentParticipant < Participant
     end
 
     response_map = ResponseMap.find(response_map_id)
-    first_user_id = TeamsUser.find_by(team_id: response_map.reviewee_id).user_id
+    first_user_id = TeamsParticipant.find_by(team_id: response_map.reviewee_id).user_id
     participant = Participant.find_by(parent_id: response_map.reviewed_object_id, user_id: first_user_id)
     return if participant.nil?
 
@@ -200,13 +200,13 @@ class AssignmentParticipant < Participant
   end
 
   # E2147 : Gets duty id of the assignment participant by mapping teams user with help of
-  # user_id. Will no longer be needed once teams_user is converted into participant_teams
+  # user_id. Will no longer be needed once teams_participant is converted into participant_teams
   def duty_id
     participant = team_user
     return participant.duty_id if participant
   end
 
   def team_user
-    TeamsUser.where(team_id: team.id, user_id: user_id).first if team
+    TeamsParticipant.where(team_id: team.id, user_id: user_id).first if team
   end
 end

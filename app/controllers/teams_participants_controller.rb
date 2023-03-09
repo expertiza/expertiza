@@ -1,4 +1,4 @@
-class TeamsUsersController < ApplicationController
+class TeamsParticipantsController < ApplicationController
   include AuthorizationHelper
 
   def action_allowed?
@@ -16,17 +16,17 @@ class TeamsUsersController < ApplicationController
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 
-  # Example of duties: manager, designer, programmer, tester. Finds TeamsUser and save preferred Duty
+  # Example of duties: manager, designer, programmer, tester. Finds TeamsParticipant and save preferred Duty
   def update_duties
-    team_user = TeamsUser.find(params[:teams_user_id])
-    team_user.update_attribute(:duty_id, params[:teams_user]['duty_id'])
+    team_user = TeamsParticipant.find(params[:teams_user_id])
+    team_user.update_attribute(:duty_id, params[:teams_participant]['duty_id'])
     redirect_to controller: 'student_teams', action: 'view', student_id: params[:participant_id]
   end
 
   def list
     @team = Team.find(params[:id])
     @assignment = Assignment.find(@team.parent_id)
-    @teams_users = TeamsUser.page(params[:page]).per_page(10).where(['team_id = ?', params[:id]])
+    @teams_participants = TeamsParticipant.page(params[:page]).per_page(10).where(['team_id = ?', params[:id]])
   end
 
   def new
@@ -66,8 +66,8 @@ class TeamsUsersController < ApplicationController
           # Note: this is _not_ supported for CourseTeams which is why the other
           # half of this if block does not include the same code
           if add_member_return
-            user = TeamsUser.last
-            undo_link("The team @teams_user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
+            user = TeamsParticipant.last
+            undo_link("The team @teams_participant \"#{user.name}\" has been successfully added to \"#{team.name}\".")
             MentorManagement.assign_mentor(assignment.id, team.id)
           end
         end
@@ -91,7 +91,7 @@ class TeamsUsersController < ApplicationController
           end
           flash[:error] = 'This team already has the maximum number of members.' if add_member_return == false
           if add_member_return
-            @teams_user = TeamsUser.last
+            @teams_participant = TeamsParticipant.last
             undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
           end
         end
@@ -102,17 +102,17 @@ class TeamsUsersController < ApplicationController
   end
 
   def delete
-    @teams_user = TeamsUser.find(params[:id])
-    parent_id = Team.find(@teams_user.team_id).parent_id
-    @user = User.find(@teams_user.user_id)
-    @teams_user.destroy
+    @teams_participant = TeamsParticipant.find(params[:id])
+    parent_id = Team.find(@teams_participant.team_id).parent_id
+    @user = User.find(@teams_participant.user_id)
+    @teams_participant.destroy
     undo_link("The team user \"#{@user.name}\" has been successfully removed. ")
     redirect_to controller: 'teams', action: 'list', id: parent_id
   end
 
   def delete_selected
     params[:item].each do |item_id|
-      team_user = TeamsUser.find(item_id).first
+      team_user = TeamsParticipant.find(item_id).first
       team_user.destroy
     end
 

@@ -49,11 +49,11 @@ describe PairProgrammingController do
 
   describe '#send_invitations' do
     it 'sends pair programming invitation to all the team members' do
-      users = allow(TeamsUser).to receive(:where).and_return([team_user1,team_user2])
+      users = allow(TeamsParticipant).to receive(:where).and_return([team_user1, team_user2])
       [users].each do |user|
         allow(user).to receive(:update_attributes).and_return(true)
       end
-      user1 = allow(TeamsUser).to receive(:find_by).and_return(team_user1)
+      user1 = allow(TeamsParticipant).to receive(:find_by).and_return(team_user1)
       allow(user1).to receive(:update_attributes).and_return(true)
       team1 = allow(Team).to receive(:find).and_return(team)
       allow(team1).to receive(:update_attributes).and_return(true)
@@ -68,7 +68,7 @@ describe PairProgrammingController do
 
   describe '#accept' do
     it 'accepts the pair programming request' do
-      user1 = allow(TeamsUser).to receive(:find_by).and_return(team_user1)
+      user1 = allow(TeamsParticipant).to receive(:find_by).and_return(team_user1)
       allow(user1).to receive(:update_attributes).and_return(true)
       user_session = { user: student1 }
       params = {team_id: team.id, user_id: student1.id}
@@ -81,7 +81,7 @@ describe PairProgrammingController do
 
   describe '#decline' do
     it 'declines the pair programming request' do
-      user1 = allow(TeamsUser).to receive(:find_by).and_return(team_user1)
+      user1 = allow(TeamsParticipant).to receive(:find_by).and_return(team_user1)
       allow(user1).to receive(:update_attributes).and_return(true)
       team1 = allow(Team).to receive(:find).and_return(team)
       allow(team1).to receive(:update_attributes).and_return(true)

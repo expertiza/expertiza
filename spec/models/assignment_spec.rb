@@ -91,8 +91,8 @@ describe Assignment do
     before :each do
       @assignment = create(:assignment)
       @student = create(:student)
-      @empty_team = create(:assignment_team, assignment: @assignment, teams_users: [])
-      @non_empty_team = create(:assignment_team, assignment: @assignment, teams_users: [create(:team_user, user: @student)])
+      @empty_team = create(:assignment_team, assignment: @assignment, teams_participants: [])
+      @non_empty_team = create(:assignment_team, assignment: @assignment, teams_participants: [create(:team_user, user: @student)])
     end
     it 'should reduce the number of teams by the number of empty teams in the assignment' do
       expect(@assignment.teams).to include @empty_team

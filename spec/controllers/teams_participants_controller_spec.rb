@@ -1,6 +1,6 @@
 require './spec/support/teams_shared.rb'
 
-describe TeamsUsersController do
+describe TeamsParticipantsController do
   # Including the stubbed objects from the teams_shared.rb file
   include_context 'object initializations'
   # Objects initialization for team users
@@ -13,7 +13,7 @@ describe TeamsUsersController do
   let(:assignment_form) { double('AssignmentForm', assignment: assignment) }
   let(:student) { build(:student) }
   let(:duty) { build(:duty, id: 1, name: 'Role', max_members_for_duty: 2, assignment_id: 1) }
-  let(:teams_user1) { TeamsUser.new id: 1, duty_id: 1 }
+  let(:teams_user1) { TeamsParticipant.new id: 1, duty_id: 1 }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -37,11 +37,11 @@ describe TeamsUsersController do
 
   describe '#update_duties' do
     it 'updates the duties for the participant' do
-      allow(TeamsUser).to receive(:find).with('1').and_return(teams_user1)
+      allow(TeamsParticipant).to receive(:find).with('1').and_return(teams_user1)
       allow(teams_user1).to receive(:update_attribute).with(any_args).and_return('OK')
       request_params = {
         teams_user_id: '1',
-        teams_user: { duty_id: '1' },
+        teams_participant: { duty_id: '1' },
         participant_id: '1'
       }
       user_session = { user: stub_current_user(student, student.role.name, student.role) }
@@ -149,7 +149,7 @@ describe TeamsUsersController do
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
         allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(true)
-        allow(TeamsUser).to receive(:last).with(any_args).and_return(student1)
+        allow(TeamsParticipant).to receive(:last).with(any_args).and_return(student1)
         user_session = { user: admin }
         request_params = {
           user: { name: 'student2065' }, id: 1
@@ -204,7 +204,7 @@ describe TeamsUsersController do
         allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
         allow(Team).to receive(:find).with('5').and_return(team5)
         allow(CourseTeam).to receive(:find).with('5').and_return(team5)
-        allow(TeamsUser).to receive(:create).with(user_id: 1, team_id: 5).and_return(double('TeamsUser', id: 1))
+        allow(TeamsParticipant).to receive(:create).with(user_id: 1, team_id: 5).and_return(double('TeamsParticipant', id: 1))
         allow(TeamNode).to receive(:find_by).with(node_object_id: 5).and_return(double('TeamNode', id: 1))
         allow(TeamUserNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('TeamUserNode', id: 1))
         allow(Course).to receive(:find).with(1).and_return(course1)
@@ -228,7 +228,7 @@ describe TeamsUsersController do
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
         allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(true)
-        allow(TeamsUser).to receive(:last).with(any_args).and_return(student1)
+        allow(TeamsParticipant).to receive(:last).with(any_args).and_return(student1)
         allow(assignment1).to receive(:user_on_team?).with(student1).and_return(true)
         user_session = { user: admin }
         request_params = {
@@ -267,7 +267,7 @@ describe TeamsUsersController do
         allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
         allow(Team).to receive(:find).with('5').and_return(team5)
         allow(CourseTeam).to receive(:find).with('5').and_return(team5)
-        allow(TeamsUser).to receive(:create).with(user_id: 1, team_id: 5).and_return(double('TeamsUser', id: 1))
+        allow(TeamsParticipant).to receive(:create).with(user_id: 1, team_id: 5).and_return(double('TeamsParticipant', id: 1))
         allow(TeamNode).to receive(:find_by).with(node_object_id: 5).and_return(double('TeamNode', id: 1))
         allow(TeamUserNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('TeamUserNode', id: 1))
         allow(Course).to receive(:find).with(1).and_return(course1)
@@ -311,7 +311,7 @@ describe TeamsUsersController do
   describe '#delete' do
     context 'when user is deleted' do
       it 'it deletes the user and redirects to Teams#list page' do
-        allow(TeamsUser).to receive(:find).with('1').and_return(teamUser)
+        allow(TeamsParticipant).to receive(:find).with('1').and_return(teamUser)
         allow(Team).to receive(:find).with(teamUser.team_id).and_return(team1)
         allow(User).to receive(:find).with(teamUser.user_id).and_return(student1)
         request_params = { id: 1 }
@@ -327,8 +327,8 @@ describe TeamsUsersController do
   describe '#delete_selected' do
     context 'when selected users are deleted' do
       it 'it deletes the selected users and redirects to Teams#list page' do
-        allow(TeamsUser).to receive(:find).with('1').and_return([teamUser])
-        allow(TeamsUser).to receive(:find).with('2').and_return([teamUser2])
+        allow(TeamsParticipant).to receive(:find).with('1').and_return([teamUser])
+        allow(TeamsParticipant).to receive(:find).with('2').and_return([teamUser2])
         request_params = { item: [1, 2] }
         user_session = { user: instructor }
         post :delete_selected, params: request_params, session: user_session

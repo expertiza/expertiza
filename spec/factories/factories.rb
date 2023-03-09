@@ -262,7 +262,7 @@ FactoryBot.define do
     directory_num 0
   end
 
-  factory :team_user, class: TeamsUser do
+  factory :team_user, class: TeamsParticipant do
     team { AssignmentTeam.first || association(:assignment_team) }
     # Beware: it is fragile to assume that role_id of student is 2 (or any other unchanging value)
     user { User.where(role_id: 2).first || association(:student) }

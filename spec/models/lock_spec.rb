@@ -76,12 +76,12 @@ describe Lock do
   end
 
   describe '#lock_between?' do
-    it 'Should correctly report when users do own locks on resources' do
+    it 'Should correctly report when users do own locks on teams_participants' do
       expect(Lock.get_lock(@response, @smyoder, 10)).to eq(@response)
       expect(Lock.lock_between?(@response, @smyoder)).to be true
     end
 
-    it 'Should correctly report when users do not own locks on resources' do
+    it 'Should correctly report when users do not own locks on teams_participants' do
       expect(Lock.lock_between?(@response, @smyoder)).to be false
       expect(Lock.get_lock(@response, @smyoder1, 10)).to eq(@response)
       expect(Lock.lock_between?(@response, @smyoder)).to be false

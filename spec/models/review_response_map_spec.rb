@@ -158,7 +158,7 @@ describe ReviewResponseMap do
     # when reviewee_team = nil
     allow(AssignmentTeam).to receive(:team).with(participant).and_return(nil)
     allow(AssignmentTeam).to receive(:create).and_return(double('team', id: 1))
-    allow(TeamsUser).to receive(:create).with(team_id: 1, user_id: 1).and_return(double('teams_users', id: 1, team_id: 1, user_id: 1))
+    allow(TeamsParticipant).to receive(:create).with(team_id: 1, user_id: 1).and_return(double('teams_participants', id: 1, team_id: 1, user_id: 1))
     allow(TeamNode).to receive(:create).with(parent_id: assignment_id, node_object_id: 1).and_return(double('team_node', id: 1, parent_id: 1, node_object_id: 1))
     allow(TeamUserNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('team_user_node', id: 1, parent_id: 1, node_object_id: 1))
     allow(User).to receive(:find_by).with(name: 'name1').and_return(student1)

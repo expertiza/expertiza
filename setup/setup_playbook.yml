@@ -4,7 +4,7 @@
   become: true
 
   vars:
-    user: sbapat2
+    user: expertiza
     group: expertiza
     user_home: "/home/{{ user }}"
     app_root: /var/www/expertiza

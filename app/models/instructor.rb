@@ -35,24 +35,34 @@ class Instructor < User
   end
 
   def self.get_user_list(user)
-    participants = []
-    user_list = []
-    # Refactor
-    courses = Course.where(instructor_id: user.id)
-    courses.each do |course|
-      participants << course.get_participants
-    end
-    assignments = Assignment.includes([:participants]).where(instructor_id: user.id)
-    assignments.each do |assignment|
-      participants << assignment.participants
-    end
-    participants.each do |assignment_participants|
-      next if assignment_participants.empty?
-
-      assignment_participants.each do |participant|
-        user_list << participant.user if user.role.has_all_privileges_of?(participant.user.role)
-      end
-    end
+    participants = get_participants(user)
+    user_list = filter_participants_by_role(participants, user.role)
     user_list
   end
-end
+
+  def self.get_participants(user)
+    participants = []
+    courses = get_courses_for_user(user)
+    assignments = get_assignments_for_user(user)
+    courses.each { |course| participants << course.get_participants }
+    assignments.each { |assignment| participants << assignment.participants }
+    participants
+  end
+
+  def self.filter_participants_by_role(participants, role)
+    participants
+      .reject(&:empty?)
+      .flatten
+      .map(&:user)
+      .select { |u| role.has_all_privileges_of?(u.role) }
+  end
+
+  def self.get_courses_for_user(user)
+    Course.where(instructor_id: user.id)
+  end
+
+  def self.get_assignments_for_user(user)
+    Assignment.includes(:participants).where(instructor_id: user.id)
+  end
+
+  end

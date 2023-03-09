@@ -126,10 +126,6 @@ class User < ApplicationRecord
 
   delegate :student?, to: :role
 
-  def creator_of?(user)
-    self == user.creator
-  end
-
   # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
   def email_welcome
     # this will send an account creation notification to user via email.

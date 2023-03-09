@@ -4,7 +4,7 @@
   become: true
 
   vars:
-    user: expertiza
+    user: sbapat2
     group: expertiza
     user_home: "/home/{{ user }}"
     app_root: /var/www/expertiza
@@ -107,7 +107,7 @@
     # Expertiza clone repo, install gems
     - name: Clone Expertiza repository
       ansible.builtin.git:
-        repo: https://github.com/mundra-ankur/expertiza.git
+        repo: https://github.com/sukruthimodem/expertiza.git
         dest: "{{ app_root }}/code"
         clone: yes
         update: no

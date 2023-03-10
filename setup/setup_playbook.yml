@@ -1,5 +1,5 @@
 ---
--  name: Setup Expertiza System
+- name: Setup Expertiza System
   hosts: node
   become: true
 

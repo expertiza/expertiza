@@ -5,8 +5,8 @@
 
   vars:
     user: smaraba
-    user_home: "/home/{{ user }}"
-    app_root: "{{ user_home }}/expertiza"
+    user_home: "/home/smaraba"
+    app_root: "/home/smaraba/expertiza"
     ruby_version: 2.4
 
   tasks:

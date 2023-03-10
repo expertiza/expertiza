@@ -1,13 +1,12 @@
 ---
-- name: Setup Expertiza System
+-  name: Setup Expertiza System
   hosts: node
   become: true
 
   vars:
-    user: expertiza
-    group: expertiza
+    user: smaraba
     user_home: "/home/{{ user }}"
-    app_root: /var/www/expertiza
+    app_root: "{{ user_home }}/expertiza"
     ruby_version: 2.4
 
   tasks:

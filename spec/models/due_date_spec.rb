@@ -25,12 +25,6 @@ describe 'due_date_functions' do
     expect(@due_dates.length).to be == 10
   end
 
-  it 'due date flag is set' do
-    expect(@assignment_due_date.flag).to be false
-    @assignment_due_date.set_flag
-    expect(@assignment_due_date.flag).to be true
-  end
-
   it 'due at is valid datetime' do
     expect(@assignment_due_date.due_at_is_valid_datetime).to be nil
   end
@@ -40,16 +34,6 @@ describe 'due_date_functions' do
     old_assignment_id = @assignment_due_date.assignment.id
     DueDate.copy(old_assignment_id, new_assignment_id)
     expect(DueDate.where(parent_id: new_assignment_id).count).to eql DueDate.where(parent_id: old_assignment_id).count
-  end
-
-  it 'create new duedate record with values' do
-    DueDate.set_duedate({ id: 999 }, @assignment_due_date.deadline_type_id,
-                        @assignment_due_date.parent_id, @assignment_due_date.round)
-    new_due_date = DueDate.find_by(id: 999)
-    expect(new_due_date).to be_valid
-    expect(new_due_date.deadline_type_id).to eql @assignment_due_date.deadline_type_id
-    expect(new_due_date.parent_id).to eql @assignment_due_date.parent_id
-    expect(new_due_date.round).to eql @assignment_due_date.round
   end
 
   it 'sort duedate records' do

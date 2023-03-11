@@ -1,5 +1,5 @@
-#/lib/due_date_mixin.rb
-def AssignmentDueDate
+# lib/due_date_mix_in.rb
+module DueDateMixIn
   # Check whether review, metareview, etc.. is allowed
   # The permissions of TopicDueDate is the same as AssignmentDueDate.
   # Here, column is usually something like 'review_allowed_id'

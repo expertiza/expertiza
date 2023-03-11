@@ -11,7 +11,7 @@ class Assignment < ApplicationRecord
   include ReviewAssignment
   include QuizAssignment
   include AssignmentHelper
-  include AssignmentDueDate
+  include DueDateMixIn
   has_paper_trail
   # When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;

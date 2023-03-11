@@ -26,10 +26,7 @@ class User < ApplicationRecord
 
   before_validation :randomize_password, if: ->(user) { user.new_record? && user.password.blank? } # AuthLogic
 
-  scope :superadministrators, -> { where role_id: Role.superadministrator }
-  scope :superadmins, -> { superadministrators }
-  scope :administrators, -> { where role_id: Role.administrator }
-  scope :admins, -> { administrators }
+  scope :admins, -> { where role_id: Role.administrator }
   scope :instructors, -> { where role_id: Role.instructor }
   scope :tas, -> { where role_id: Role.ta }
   scope :students, -> { where role_id: Role.student }

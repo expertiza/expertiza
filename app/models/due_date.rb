@@ -27,11 +27,6 @@ class DueDate < ApplicationRecord
         due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
   end
 
-  def set_flag
-    self.flag = true
-    save
-  end
-
   def due_at_is_valid_datetime
     if due_at.present?
       errors.add(:due_at, 'must be a valid datetime') if (begin
@@ -49,14 +44,6 @@ class DueDate < ApplicationRecord
       new_due_date.parent_id = new_assignment_id
       new_due_date.save
     end
-  end
-
-  def self.set_duedate(duedate, deadline, assign_id, max_round)
-    submit_duedate = DueDate.new(duedate)
-    submit_duedate.deadline_type_id = deadline
-    submit_duedate.parent_id = assign_id
-    submit_duedate.round = max_round
-    submit_duedate.save
   end
 
   def self.deadline_sort(due_dates)

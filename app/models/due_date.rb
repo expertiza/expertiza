@@ -8,14 +8,7 @@ class DueDate < ApplicationRecord
 
   def self.current_due_date(due_dates)
     # Get the current due date from list of due dates
-    due_dates.each do |due_date|
-      if due_date.due_at > Time.now
-        current_due_date = due_date
-        return current_due_date
-      end
-    end
-    # in case current due date not found
-    nil
+    due_dates.detect { |due_date| due_date.due_at > Time.now }
   end
 
   def self.teammate_review_allowed(student)

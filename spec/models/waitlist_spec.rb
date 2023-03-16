@@ -13,9 +13,8 @@ describe Waitlist do
   end
   describe '#cancel_all_waitlists' do
     it 'destroys signed up teams' do
-      allow(SignUpTopic).to receive(:find_waitlisted_topics).and_return([topic1, topic2])
-      allow(SignedUpTeam).to receive(:find_by).with(topic_id: 1).and_return(signedupteam1)
-      allow(SignedUpTeam).to receive(:find_by).with(topic_id: 2).and_return(signedupteam2)
+      allow(SignUpTopic).to receive(:find_waitlisted_topics_for_team).and_return([topic1, topic2])
+      allow(SignedUpTeam).to receive(:destroy).with([1,2]).and_return(true)
       allow_any_instance_of(SignedUpTeam).to receive(:destroy).and_return(true)
       expect(Waitlist.cancel_all_waitlists(0, 0)).to be_truthy
     end

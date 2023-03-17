@@ -7,22 +7,23 @@ class QuestionnaireNode < Node
   end
 
   def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = nil)
-    user_role = User.find(user_id).role.name
+    conditions = if show
+                   if User.find(user_id).role.name != 'Teaching Assistant'
+                     'questionnaires.instructor_id = ?'
+                   else
+                     'questionnaires.instructor_id in (?)'
+                   end
+                 elsif User.find(user_id).role.name != 'Teaching Assistant'
+                   '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
+                 else
+                   '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
+                 end
 
-    conditions =
-      if show
-        user_role != 'Teaching Assistant' ? 'questionnaires.instructor_id = ?' : 'questionnaires.instructor_id in (?)'
-      else
-        '(questionnaires.private = 0 or questionnaires.instructor_id = ?)' unless user_role == 'Teaching Assistant'
-        '(questionnaires.private = 0 or questionnaires.instructor_id in (?))' if user_role == 'Teaching Assistant'
-      end
-
-    values =
-      if user_role == 'Teaching Assistant'
-        Ta.get_mapped_instructor_ids(user_id)
-      else
-        user_id
-      end
+    values = if User.find(user_id).role.name == 'Teaching Assistant'
+               Ta.get_mapped_instructor_ids(user_id)
+             else
+               user_id
+             end
 
     if parent_id
       name = TreeFolder.find(parent_id).name + 'Questionnaire'

@@ -27,7 +27,7 @@ class ImpersonateController < ApplicationController
   # This function does not seem to work
 
   def auto_complete_for_user_name
-    @users = session[:user].get_available_users(params[:user][:name])
+    @users = session[:user].get_visible_users_with_lesser_roles(params[:user][:name])
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 

@@ -38,7 +38,7 @@ class QuestionnaireNode < Node
   end
 
   def get_attribute(attribute_name)
-    Questionnaire.find_by(id: node_object_id)&.send(attribute_name)
+    Questionnaire.find_by(id: node_object_id).try(attribute_name)
   end
 
   # this method return name associated with a questionnaire

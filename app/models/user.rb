@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   extend AnonymizedHelper
+  extend UserHelper
   enum locale: Locale.code_name_to_db_encoding(Locale.available_locale_preferences)
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = { if: -> { false } } # Don't validate email uniqueness
@@ -146,15 +147,7 @@ class User < ApplicationRecord
     user
   end
 
-  def self.yesorno(elt)
-    if elt == true
-      'yes'
-    elsif elt == false
-      'no'
-    else
-      ''
-    end
-  end
+
 
   # locate User based on provided login.
   # If user supplies e-mail or name, the

@@ -106,10 +106,13 @@ class User < ApplicationRecord
     role.name == 'Super-Administrator'
   end
 
-  delegate :admin?, to: :role
+  def admin?
+    role.name == 'Administrator'
+  end
 
-  delegate :student?, to: :role
-
+  def student?
+    role.name == 'Student'
+  end
   # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
   def email_welcome
     # this will send an account creation notification to user via email.

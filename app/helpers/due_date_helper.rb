@@ -1,4 +1,4 @@
-module DueDatesHelper
+module DueDateHelper
   def current_due_date(due_dates)
     due_dates.detect { |due_date| due_date.due_at > Time.now }
   end

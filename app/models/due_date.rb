@@ -46,17 +46,19 @@ class DueDate < ApplicationRecord
     end
   end
 
-  def self.deadline_sort(due_dates)
-    due_dates.sort do |m1, m2|
-      if m1.due_at && m2.due_at
-        m1.due_at <=> m2.due_at
-      elsif m1.due_at
-        -1
-      else
-        1
-      end
+
+  def <=>(other)
+    if self.due_at && other.due_at
+      self.due_at <=>other.due_at
+    elsif self.due_at
+      -1
+    else
+      1
     end
   end
+
+  def self.deadline_sort(due_dates)
+    due_dates.sort
 
   def self.done_in_assignment_round(assignment_id, response)
     # for author feedback, quiz, teammate review and metareview, Expertiza only support one round, so the round # should be 1

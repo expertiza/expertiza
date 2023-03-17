@@ -8,14 +8,7 @@ class DueDate < ApplicationRecord
 
   def self.current_due_date(due_dates)
     # Get the current due date from list of due dates
-    due_dates.each do |due_date|
-      if due_date.due_at > Time.now
-        current_due_date = due_date
-        return current_due_date
-      end
-    end
-    # in case current due date not found
-    nil
+    due_dates.detect { |due_date| due_date.due_at > Time.now }
   end
 
   def self.teammate_review_allowed(student)
@@ -62,52 +55,21 @@ class DueDate < ApplicationRecord
   end
   
 
-  def self.assignment_latest_assignment_review_round(assignment_id, response)
+  def self.assignment_latest_review_round(assignment_id, response)
     # for author feedback, quiz, teammate review and metareview, Expertiza only support one round, so the round # should be 1
-    return 0 if ResponseMap.find(response.map_id).type != 'ReviewResponseMap'
+    return 0 if ResponseMap.where(id: response.map_id, type: 'ReviewResponseMap').empty?
 
-    due_dates = DueDate.where(parent_id: assignment_id)
     # sorted so that the earliest deadline is at the first
-    sorted_deadlines = deadline_sort(due_dates)
-    due_dates.reject { |due_date| due_date.deadline_type_id != 1 && due_date.deadline_type_id != 2 }
+    sorted_deadlines = deadline_sort(DueDate.where(parent_id: assignment_id))
     round = 1
     sorted_deadlines.each do |due_date|
-      break if response.created_at < due_date.due_at
-
-      round += 1 if due_date.deadline_type_id == 2
+      if response.created_at < due_date.due_at
+        break
+      elsif due_date.deadline_type_id == 2
+        round += 1
+      end
     end
     round
   end
-
-  def self.get_next_due_date(assignment_id, topic_id = nil)
-    if Assignment.find(assignment_id).staggered_deadline?
-      next_due_date = TopicDueDate.find_by(['parent_id = ? and due_at >= ?', topic_id, Time.zone.now])
-      # if certion TopicDueDate is not exist, we should query next corresponding AssignmentDueDate.
-      # eg. Time.now is 08/28/2016
-      # One topic uses following deadlines:
-      # TopicDueDate      08/01/2016
-      # TopicDueDate      08/02/2016
-      # TopicDueDate      08/03/2016
-      # AssignmentDueDate 09/04/2016
-      # In this case, we cannot find due_at later than Time.now in TopicDueDate.
-      # So we should find next corresponding AssignmentDueDate, starting with the 4th one, not the 1st one!
-      if next_due_date.nil?
-        topic_due_date_size = TopicDueDate.where(parent_id: topic_id).size
-        following_assignment_due_dates = AssignmentDueDate.where(parent_id: assignment_id)[topic_due_date_size..-1]
-        unless following_assignment_due_dates.nil?
-          following_assignment_due_dates.each do |assignment_due_date|
-            if assignment_due_date.due_at >= Time.zone.now
-              next_due_date = assignment_due_date
-              break
-            end
-          end
-        end
-      end
-    else
-      next_due_date = AssignmentDueDate.find_by(['parent_id = ? && due_at >= ?', assignment_id, Time.zone.now])
-    end
-    next_due_date
-  end
-
 end
 

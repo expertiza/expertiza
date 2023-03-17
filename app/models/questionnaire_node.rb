@@ -30,42 +30,33 @@ class QuestionnaireNode < Node
       name.gsub!(/[^\w]/, '')
       conditions += " and questionnaires.type = \"#{name}\""
     end
-
     sortvar = 'name' if sortvar.nil? || (sortvar == 'directory_path')
     sortorder = 'ASC' if sortorder.nil?
-
     (includes(:questionnaire).where([conditions, values]).order("questionnaires.#{sortvar} #{sortorder}") if Questionnaire.column_names.include?(sortvar) &&
         %w[ASC DESC asc desc].include?(sortorder))
   end
 
-  def get_attribute(attribute_name)
-    Questionnaire.find_by(id: node_object_id).try(attribute_name)
-  end
-
-  # this method return name associated with a questionnaire
-  # expects no arguments
-  # returns string
   def get_name
-    get_attribute(:name)
+    Questionnaire.find_by(id: node_object_id).try(:name)
   end
 
   # this method return instructor id associated with a questionnaire
   # expects no arguments
   # returns int
   def get_instructor_id
-    get_attribute(:instructor_id)
+    Questionnaire.find_by(id: node_object_id).try(:instructor_id)
   end
 
   def get_private
-    get_attribute(:private)
+    Questionnaire.find_by(id: node_object_id).try(:private)
   end
 
   def get_creation_date
-    get_attribute(:created_at)
+    Questionnaire.find_by(id: node_object_id).try(:created_at)
   end
 
   def get_modified_date
-    get_attribute(:updated_at)
+    Questionnaire.find_by(id: node_object_id).try(:updated_at)
   end
 
   def is_leaf

@@ -17,14 +17,15 @@ describe TeamsController do
     end
   end
 
-  describe 'create teams method' do
+  describe 'randomize_teams method' do
     context 'when correct parameters are passed' do
       it 'creates teams with random names' do
+        allow(ExpertizaLogger).to receive(:info).and_return(nil)
         allow(Object).to receive_message_chain(:const_get, :find).with(any_args).and_return(assignment1)
         allow(Version).to receive_message_chain(:where, :last).with(any_args).and_return(0.1)
         request_params = { id: assignment1.id, team_size: 2 }
         user_session = { user: instructor, team_type: 'Assignment' }
-        result = get :create_teams, params: request_params, session: user_session
+        result = get :randomize_teams, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(action: 'list', id: assignment1.id)
@@ -88,41 +89,58 @@ describe TeamsController do
   end
 
   describe 'create method' do
-    context 'when invoked with a team which does not exist' do
+    let(:request_team) {{ name: 'rando team' }}
+    let(:request_params) {{ id: assignment1.id, team: request_team }}
+    let(:user_session) {{ user: ta, team_type: 'Assignment' }}
+
+    context 'when team does not yet exist' do
       it 'creates it' do
         allow(Assignment).to receive(:find).and_return(assignment1)
-        request_params = { id: assignment1.id, team: { name: 'rando team' } }
-        user_session = { user: ta, team_type: 'Assignment' }
         result = get :create, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(action: 'list', id: assignment1.id)
       end
     end
-    context 'when invoked with a team which does exist' do # this is work in progress
+
+    context 'when team already exists' do
       it 'throws an error' do
         allow(Assignment).to receive(:find).and_return(assignment1)
-        request_params = { id: assignment1.id, team: { name: 'rando team' } }
-        user_session = { user: ta, team_type: 'Assignment' }
-        # result = get :create, params: request_params, session: user_session
-        # expect(result.status).to eq 302
-        # expect(result).to redirect_to(:action => 'new', :id => assignment1.id)
+        allow(Team).to receive(:check_for_existing).with(assignment1, request_team[:name], user_session[:team_type]).and_raise(TeamExistsError)
+
+        get :create, params: request_params, session: user_session
+        expect(response).to redirect_to(:action => 'new', :id => assignment1.id)
       end
     end
   end
 
   describe 'update method' do
-    it 'updates the team name' do
-      allow(Team).to receive(:find).and_return(team1)
-      allow(Assignment).to receive(:find).and_return(assignment1)
-      request_params = { id: team1.id, team: { name: 'rando team' } }
-      user_session = { user: ta, team_type: 'Assignment' }
-      # result = get :update, params: request_params, session: user_session
-      # expect(result.status).to eq 302
-      # expect(result).to redirect_to(:action => 'list', :id => assignment1.id)
+    let(:request_team) {{ name: 'rando team' }}
+    let(:request_params) {{ id: assignment1.id, team: request_team }}
+    let(:user_session) {{ user: ta, team_type: 'Assignment' }}
+
+    context 'when team name not in use' do
+      it 'updates the team name' do
+        allow(Team).to receive(:find).and_return(team1)
+        allow(Assignment).to receive(:find).and_return(assignment1)
+        allow(team1).to receive(:save)
+        result = get :update, params: request_params, session: user_session
+        expect(result.status).to eq 302
+        expect(result).to redirect_to(:action => 'list', :id => assignment1.id)
+      end
     end
-    # this test will fail even though it should normally pass, that's because it runs into an error at @team.save
-    # RumtimeError: stubbed models are not allowed to access the database - AssignmentTeam#save()
+
+    context 'when team name is already used' do
+      it 'throws an error' do
+        allow(Team).to receive(:find).and_return(team1)
+        allow(Assignment).to receive(:find).and_return(assignment1)
+        allow(Team).to receive(:check_for_existing).with(assignment1, request_team[:name], user_session[:team_type]).and_raise(TeamExistsError)
+
+        get :update, params: request_params, session: user_session
+        expect(response).to redirect_to(:action => 'edit', :id => team1.id)
+      end
+    end
+
   end
 
   describe 'edit method' do
@@ -135,6 +153,13 @@ describe TeamsController do
       expect(controller.instance_variable_get(:@team)).to eq team1
     end
     # this method has only 1 line which is just to look up a team with the id present in the request_params
+  end
+
+  describe 'delete_all method' do
+    # delete_all is not yet implemented
+    context 'when there are child nodes' do
+      it 'deletes all teams for the root_node'
+    end
   end
 
   describe 'delete method' do
@@ -153,6 +178,7 @@ describe TeamsController do
     end
     context 'when called and team is not nil and it does not hold a topic' do
       it 'deletes the team' do
+        allow(Waitlist).to receive(:remove_from_waitlists).and_return(nil)
         allow(Team).to receive(:find_by).and_return(team5)
         allow(Object).to receive_message_chain(:const_get, :find).and_return(course1)
         allow(team5).to receive(:destroy).and_return(nil)
@@ -164,74 +190,49 @@ describe TeamsController do
         expect(controller.instance_variable_get(:@team)).to eq team5
       end
     end
-    # this next test is work in progress
-    #     context 'gets called and team is not nil and it holds a topic' do
-    #       it 'it reassigns topic and then deletes the team' do
-    #         allow(Team).to receive(:find_by).and_return(team5)
-    #         allow(Object).to receive_message_chain(:const_get, :find).and_return(course1)
-    #         allow('if').to receive('true'.to_s)
-    #         #controller.instance_variable_set(:@signed_up_team, team5)
-    #         #allow(@signed_up_team).to receive(:==).and_return(1)
-    #         #controller.instance_variable_set(:@signUps, team5)
-    #         #allow(team5).to receive_message_chain(:first, :is_waitlisted).and_return(false)
-    #         #allow(@signed_up_team).to receive_message_chain(:first, :topic_id).and_return(5)
-    #         allow(team5).to receive(:destroy).and_return(nil)
-    #         request_params = {id: 5}
-    #         user_session = {user: instructor, team_type: 'CourseTeam'}
-    #         result = get :delete, params: request_params, session: user_session
-    #         expect(result.status).to eq 302
-    #       end
-    #     end
   end
 
-  describe 'inherit method' do
-    context 'called when assignment belongs to course and team is not empty' do
+  describe 'copy_to_assignment method' do
+    let(:request_params) {{ id: team5.id }}
+    let(:user_session) {{ user: ta }}
+
+    context 'when assignment belongs to course and team is not empty' do
       it 'copies teams from course to the assignment' do
         allow(Assignment).to receive(:find).and_return(assignment1)
-        allow(Course).to receive(:find).and_return(course1)
+        allow(assignment1).to receive(:course).and_return(course1)
         allow(course1).to receive(:get_teams).and_return([team5, team6])
-        request_params = { id: team5.id }
-        user_session = { user: ta }
-        result = get :inherit, params: request_params, session: user_session
-        # status code 302: Redirect url
-        expect(result.status).to eq 302
+        result = get :copy_to_assignment, params: request_params, session: user_session
         expect(result).to redirect_to(controller: 'teams', action: 'list', id: assignment1.id)
       end
     end
-    context 'called when assignment belongs to course but team is empty' do
+
+    context 'when assignment belongs to course but team is empty' do
       it 'flashes note' do
         allow(Assignment).to receive(:find).and_return(assignment1)
-        allow(Course).to receive(:find).and_return(course1)
-        request_params = { id: team5.id }
-        user_session = { user: ta }
-        result = get :inherit, params: request_params, session: user_session
-        # status code 302: Redirect url
-        expect(result.status).to eq 302
+        result = get :copy_to_assignment, params: request_params, session: user_session
+        expect(flash[:note]).to be_present
         expect(result).to redirect_to(controller: 'teams', action: 'list', id: assignment1.id)
       end
     end
-    context 'called when assignment belongs to no course' do
-      let(:fasg) { build_stubbed(:assignment, id: 1074, course_id: -2) }
+
+    context 'when assignment has no course' do
       # a temporary assignment object is created with an abnormal course_id so that we can check the fail condition of the method
+      let(:fasg) { build_stubbed(:assignment, id: 1074, course_id: -2) }
       it 'flashes error' do
         allow(Assignment).to receive(:find).and_return(fasg)
-        allow(Course).to receive(:find).and_return(course1)
-        request_params = { id: team5.id }
-        user_session = { user: ta }
-        result = get :inherit, params: request_params, session: user_session
-        # status code 302: Redirect url
-        expect(result.status).to eq 302
+        result = get :copy_to_assignment, params: request_params, session: user_session
+        expect(flash[:error]).to be_present
         expect(result).to redirect_to(controller: 'teams', action: 'list', id: fasg.id)
       end
     end
   end
-  
+
   describe '#bequeath_all' do
     context 'when the team type is user_session' do
       it 'flashes an error' do
         user_session = {team_type: 'Course', user: ta}
         request_params = { id: team5.id }
-        post :bequeath_all, params: request_params, session: user_session 
+        post :bequeath_all, params: request_params, session: user_session
         expect(flash[:error]).to eq('Invalid team type for bequeathal')
       end
     end

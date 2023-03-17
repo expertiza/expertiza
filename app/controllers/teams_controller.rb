@@ -1,80 +1,94 @@
+# frozen_string_literal: true
+
 class TeamsController < ApplicationController
   include AuthorizationHelper
 
   autocomplete :user, :name
 
+  before_action :ensure_course_team, only: %i[bequeath_all]
+
+  # These routes can only be accessed by a TA
   def action_allowed?
     current_user_has_ta_privileges?
   end
 
-  # This function is used to create teams with random names.
-  # Instructors can call by clicking "Create teams" icon and then click "Create teams" at the bottom.
-  def create_teams
-    parent = Object.const_get(session[:team_type]).find(params[:id])
-    Team.randomize_all_by_parent(parent, session[:team_type], params[:team_size].to_i)
-    undo_link('Random teams have been successfully created.')
-    ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Random teams have been successfully created', request)
-    redirect_to action: 'list', id: parent.id
+  # Randomizes teams based on an Assignment or Course
+  def randomize_teams
+    Team.randomize_all_by_parent(team_type.find(params[:id]), session[:team_type], params[:team_size].to_i)
+
+    success_message = 'Random teams have been successfully created.'
+    undo_link(success_message)
+    ExpertizaLogger.info LoggerMessage.new(controller_name, '', success_message, request)
+
+    redirect_to action: 'list', id: params[:id]
   end
 
+  # Set the list of a teams for an Assignment or Course for the view
   def list
     allowed_types = %w[Assignment Course]
-    session[:team_type] = params[:type] if params[:type] && allowed_types.include?(params[:type])
-    @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == 'Assignment'
+    if params[:type] && allowed_types.include?(params[:type])
+      session[:team_type] = params[:type]
+    end
+
+    @assignment = team_type.find(params[:id]) if session[:team_type] == 'Assignment'
     begin
-      @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
+      @root_node = team_type('Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
   end
 
+  # Get the Assignment which the team is being created for
   def new
-    @parent = Object.const_get(session[:team_type] ||= 'Assignment').find(params[:id])
+    session[:team_type] ||= 'Assignment'
+    @parent = team_type.find(params[:id])
   end
 
-  # called when a instructor tries to create an empty team manually.
+  # Called when a instructor tries to create an empty team manually
   def create
-    parent = Object.const_get(session[:team_type]).find(params[:id])
-    begin
-      Team.check_for_existing(parent, params[:team][:name], session[:team_type])
-      @team = Object.const_get(session[:team_type] + 'Team').create(name: params[:team][:name], parent_id: parent.id)
-      TeamNode.create(parent_id: parent.id, node_object_id: @team.id)
+    if check_for_existing_team # Validate the team name
+      redirect_to action: 'new', id: params[:id]
+    else
+      @team = team_type('Team').create(name: params[:team][:name], parent_id: params[:id])
+      TeamNode.create(parent_id: params[:id], node_object_id: @team.id)
+
       undo_link("The team \"#{@team.name}\" has been successfully created.")
-      redirect_to action: 'list', id: parent.id
-    rescue TeamExistsError
-      flash[:error] = $ERROR_INFO
-      redirect_to action: 'new', id: parent.id
+      redirect_to action: 'list', id: params[:id]
     end
   end
 
+  # Rename a team and validate the new name
   def update
     @team = Team.find(params[:id])
-    parent = Object.const_get(session[:team_type]).find(@team.parent_id)
-    begin
-      Team.check_for_existing(parent, params[:team][:name], session[:team_type])
+    if check_for_existing_team # Validate the new name
+      redirect_to action: 'edit', id: @team.id
+    else
       @team.name = params[:team][:name]
       @team.save
+
       flash[:success] = "The team \"#{@team.name}\" has been successfully updated."
       undo_link('')
-      redirect_to action: 'list', id: parent.id
-    rescue TeamExistsError
-      flash[:error] = $ERROR_INFO
-      redirect_to action: 'edit', id: @team.id
+      redirect_to action: 'list', id: params[:id]
     end
   end
 
+  # Get the team for the team edit view
   def edit
     @team = Team.find(params[:id])
   end
 
+  # TODO This method does not work
+  # It should delete all teams for an assingment or course
   def delete_all
-    root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
+    root_node = team_type('Node').find_by(node_object_id: params[:id])
     child_nodes = root_node.get_teams.map(&:node_object_id)
-    Team.destroy_all if child_nodes
+    # BAD this will destroy all teams if it succeeds
+    # Team.destroy_all if child_nodes
     redirect_to action: 'list', id: params[:id]
   end
 
+  # Delete a specific team
   def delete
     # delete records in team, teams_users, signed_up_teams table
     @team = Team.find_by(id: params[:id])
@@ -82,35 +96,28 @@ class TeamsController < ApplicationController
       @signed_up_team = SignedUpTeam.where(team_id: @team.id)
       @teams_users = TeamsUser.where(team_id: @team.id)
 
-      if @signed_up_team == 1 && !@signUps.first.is_waitlisted # this team hold a topic
-        # if there is another team in waitlist, make this team hold this topic
-        topic_id = @signed_up_team.first.topic_id
-        next_wait_listed_team = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
-        # if slot exist, then confirm the topic for this team and delete all waitlists for this team
-        SignUpTopic.assign_to_first_waiting_team(next_wait_listed_team) if next_wait_listed_team
-      end
+      # remove deleted team from any waitlists
+      Waitlist.remove_from_waitlists(@team.id)
 
-      @sign_up_team.destroy_all if @sign_up_team
-      @teams_users.destroy_all if @teams_users
-      @team.destroy if @team
+      @sign_up_team&.destroy_all
+      @teams_users&.destroy_all
+      @team&.destroy
       undo_link("The team \"#{@team.name}\" has been successfully deleted.")
     end
     redirect_back fallback_location: root_path
   end
 
   # Copies existing teams from a course down to an assignment
-  # The team and team members are all copied.
-  def inherit
+  # The team and team members are all copied
+  def copy_to_assignment
     assignment = Assignment.find(params[:id])
-    if assignment.course_id
-      course = Course.find(assignment.course_id)
+    course = assignment.course
+    if course
       teams = course.get_teams
       if teams.empty?
-        flash[:note] = 'No teams were found when trying to inherit.'
+        flash[:note] = 'No teams were found when trying to copy to assignment.'
       else
-        teams.each do |team|
-          team.copy(assignment.id)
-        end
+        Team.copy_teams_to_collection(teams, assignment.id)
       end
     else
       flash[:error] = 'No course was found for this assignment.'
@@ -118,28 +125,51 @@ class TeamsController < ApplicationController
     redirect_to controller: 'teams', action: 'list', id: assignment.id
   end
 
+  # Copies existing teams from an assignment to a
+  # course if the course doesn't already have teams
   def bequeath_all
+    assignment = Assignment.find(params[:id])
+    course = Course.find(assignment.course_id) if assignment.course_id
+
+    if !assignment.course_id
+      flash[:error] = 'No course was found for this assignment.'
+    elsif course.course_teams.any?
+      flash[:error] = 'The course already has associated teams'
+    else
+      teams = assignment.teams
+      Team.copy_teams_to_collection(teams, course.id)
+      flash[:note] = teams.length.to_s + ' teams were successfully copied to "' + course.name + '"'
+    end
+    redirect_to controller: 'teams', action: 'list', id: assignment.id
+  end
+
+  private
+
+  # Redirects if the team is not a CourseTeam
+  def ensure_course_team
     if session[:team_type] == 'Course'
       flash[:error] = 'Invalid team type for bequeathal'
       redirect_to controller: 'teams', action: 'list', id: params[:id]
-      return
     end
-    assignment = Assignment.find(params[:id])
-    if assignment.course_id
-      course = Course.find(assignment.course_id)
-      if course.course_teams.any?
-        flash[:error] = 'The course already has associated teams'
-        redirect_to controller: 'teams', action: 'list', id: assignment.id
-        return
-      end
-      teams = assignment.teams
-      teams.each do |team|
-        team.copy(course.id)
-      end
-      flash[:note] = teams.length.to_s + ' teams were successfully copied to "' + course.name + '"'
-    else
-      flash[:error] = 'No course was found for this assignment.'
+  end
+
+  # Returns true if a team already
+  # exists with the same parent and name
+  def check_for_existing_team
+    begin
+      Team.check_for_existing(team_type.find(params[:id]), params[:team][:name], session[:team_type])
+      return false
+    rescue TeamExistsError
+      flash[:error] = $ERROR_INFO
+      return true
     end
-    redirect_to controller: 'teams', action: 'list', id: assignment.id
+  end
+
+  # Gets an Object representing the parent, node, or team
+  # E.g. Assignment, Course, AssignmentNode, CourseTeam
+  # const_type should be either blank, Node, or Team
+  # session[:team_type] should be Assignment or Course
+  def team_type(const_type='')
+    Object.const_get(session[:team_type] + const_type)
   end
 end

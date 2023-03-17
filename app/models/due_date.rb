@@ -59,8 +59,10 @@ class DueDate < ApplicationRecord
 
   def self.deadline_sort(due_dates)
     due_dates.sort
+  end
+  
 
-  def self.done_in_assignment_round(assignment_id, response)
+  def self.assignment_latest_assignment_review_round(assignment_id, response)
     # for author feedback, quiz, teammate review and metareview, Expertiza only support one round, so the round # should be 1
     return 0 if ResponseMap.find(response.map_id).type != 'ReviewResponseMap'
 
@@ -106,4 +108,6 @@ class DueDate < ApplicationRecord
     end
     next_due_date
   end
+
 end
+

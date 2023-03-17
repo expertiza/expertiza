@@ -67,21 +67,23 @@ class UsersController < ApplicationController
   # for displaying users which are being searched for editing purposes after checking whether current user is authorized to do so
   def show_if_authorized
     @user = User.find_by(name: params[:user][:name])
-    if @user.nil?
-      flash[:note] = params[:user][:name] + ' does not exist.'
-      redirect_to action: 'list'
-    else
-      role
-      # check whether current user is authorized to edit the user being searched, call show if true
 
-      if @role.parent_id.nil? || @role.parent_id < session[:user].role_id || @user.id == session[:user].id
-        @total_user_num = User.count
-        @assignment_participant_num = AssignmentParticipant.where(user_id: @user.id).count
-        render action: 'show'
-      else
-        flash[:note] = 'The specified user is not available for editing.'
-        redirect_to action: 'list'
-      end
+    if @user.nil?
+      flash[:note] = "#{params[:user][:name]} does not exist."
+      redirect_to action: 'list'
+      return
+    end
+
+    # check whether current user is authorized to edit the user being searched, call show if true
+    role
+
+    if @role.parent_id.nil? || @role.parent_id < session[:user].role_id || @user.id == session[:user].id
+      @total_user_num = User.count
+      @assignment_participant_num = AssignmentParticipant.where(user_id: @user.id).count
+      render action: 'show'
+    else
+      flash[:note] = 'The specified user is not available for editing.'
+      redirect_to action: 'list'
     end
   end
 

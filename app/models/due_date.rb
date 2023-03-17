@@ -63,6 +63,7 @@ class DueDate < ApplicationRecord
         break
       elsif due_date.deadline_type_id == 2
         round += 1
+      end
     end
     round
   end

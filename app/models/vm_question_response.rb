@@ -24,7 +24,7 @@ class VmQuestionResponse
     @questionnaire_type = questionnaire.type
     @questionnaire_display_type = questionnaire.display_type
     @rounds = rounds
-    @round = round
+
     @name  = questionnaire.name
   end
 

@@ -433,7 +433,7 @@
               insertTeamBasedElements()
           });
 
-          <% if @assignment_form.assignment.vary_by_round? %>
+          <% if @assignment_form.assignment.varying_rubrics_by_round? %>
           <% 1.upto(@assignment_form.assignment.rounds_of_reviews) do |i| %>
           <% assignment_questionnaire = @assignment_form.assignment_questionnaire('ReviewQuestionnaire', i, nil) %>
           <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire') %>

@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  extend AnonymizedHelper
   enum locale: Locale.code_name_to_db_encoding(Locale.available_locale_preferences)
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = { if: -> { false } } # Don't validate email uniqueness
@@ -83,21 +84,6 @@ class User < ApplicationRecord
   end
 
   # Zhewei: anonymized view for demo purposes - 1/3/2018
-  def self.anonymized_view?(ip_address = nil)
-    anonymized_view_starter_ips = $redis.get('anonymized_view_starter_ips') || ''
-    return true if ip_address && anonymized_view_starter_ips.include?(ip_address)
-
-    false
-  end
-
-  # E1991 : This function returns original name of the user
-  # from their anonymized names. The process of obtaining
-  # real name is exactly opposite of what we'd do to get
-  # anonymized name from their real name.
-  def self.real_user_from_anonymized_name(anonymized_name)
-    user = User.find_by(name: anonymized_name)
-    user
-  end
 
   def name(ip_address = nil)
     User.anonymized_view?(ip_address) ? role.name + ' ' + id.to_s : self[:name]

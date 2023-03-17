@@ -104,38 +104,53 @@ class UsersController < ApplicationController
     @rolename = Role.find_by(name: params[:role])
     foreign
   end
-
   def create
-    # if the user name already exists, register the user by email address
+    check_username_availability
+    create_user
+  end
+
+  def check_username_availability
     check = User.find_by(name: params[:user][:name])
     if check
       params[:user][:name] = params[:user][:email]
       flash[:note] = "That username already exists. Username has been set to the user's email address"
     end
+  end
+
+  def create_user
     is_user = true
-    # Assign all user params for creating user using assign_user_params function
     @user = assign_user_params(is_user)
     if @user.save
-      password = @user.reset_password # the password is reset
-      prepared_mail = MailerHelper.send_mail_to_user(@user, 'Your Expertiza account and password have been created.', 'user_welcome', password)
-      prepared_mail.deliver
-      flash[:success] = "A new password has been sent to new user's e-mail address."
-      # Instructor and Administrator users need to have a default set for their notifications
-      # the creation of an AssignmentQuestionnaire object with only the User ID field populated
-      # ensures that these users have a default value of 15% for notifications.
-      # TAs and Students do not need a default. TAs inherit the default from the instructor,
-      # Students do not have any checks for this information.
-      AssignmentQuestionnaire.create(user_id: @user.id) if (@user.role.name == 'Instructor') || (@user.role.name == 'Administrator')
-      undo_link("The user \"#{@user.name}\" has been successfully created. ")
+      send_welcome_email
+      create_questionnaire
+      undo_link("The user \"#{@user.name}\" has been successfully created.")
       redirect_to action: 'list'
     else
-      foreign
-      error_message = ''
-      @user.errors.each { |_field, error| error_message << error }
-      flash[:error] = error_message
-      redirect_to action: 'list'
+      handle_user_create_error
     end
   end
+
+  def send_welcome_email
+    password = @user.reset_password
+    prepared_mail = MailerHelper.send_mail_to_user(@user, 'Your Expertiza account and password have been created.', 'user_welcome', password)
+    prepared_mail.deliver
+    flash[:success] = "A new password has been sent to new user's e-mail address."
+  end
+
+  def create_questionnaire
+    if (@user.role.name == 'Instructor') || (@user.role.name == 'Administrator')
+      AssignmentQuestionnaire.create(user_id: @user.id)
+    end
+  end
+
+  def handle_user_create_error
+    foreign
+    error_message = ''
+    @user.errors.each { |_field, error| error_message << error }
+    flash[:error] = error_message
+    redirect_to action: 'list'
+  end
+
 
   def edit
     @user = User.find(params[:id])

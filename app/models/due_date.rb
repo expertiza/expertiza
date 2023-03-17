@@ -1,5 +1,7 @@
 class DueDate < ApplicationRecord
-  validate :due_at_is_valid_datetime
+  # validate :due_at_is_valid_datetime
+  validates :due_at, presence: true, format: { with: /\A\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\z/, message: 'must be a valid datetime' }
+
   #  has_paper_trail
 
   def self.default_permission(deadline_type, permission_type)
@@ -27,15 +29,17 @@ class DueDate < ApplicationRecord
         due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
   end
 
-  def due_at_is_valid_datetime
-    if due_at.present?
-      errors.add(:due_at, 'must be a valid datetime') if (begin
-                                                            DateTime.strptime(due_at.to_s, '%Y-%m-%d %H:%M:%S')
-                                                          rescue StandardError
-                                                            ArgumentError
-                                                          end) == ArgumentError
-    end
-  end
+  # def due_at_is_valid_datetime
+  #   if due_at.present?
+  #     errors.add(:due_at, 'must be a valid datetime') if (begin
+  #                                                           DateTime.strptime(due_at.to_s, '%Y-%m-%d %H:%M:%S')
+  #                                                         rescue StandardError
+  #                                                           ArgumentError
+  #                                                         end) == ArgumentError
+  #   end
+  # end
+
+
 
   def self.copy(old_assignment_id, new_assignment_id)
     duedates = where(parent_id: old_assignment_id)

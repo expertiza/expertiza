@@ -36,31 +36,31 @@ class QuestionnaireNode < Node
         %w[ASC DESC asc desc].include?(sortorder))
   end
 
-  def get_attr
-    Questionnaire.find_by(id: node_object_id)
+  def get_attr(attr_name)
+    Questionnaire.find_by(id: node_object_id).try(attr_name)
   end
 
   def get_name
-    get_attr.try(:name)
+    get_attr(:name)
   end
 
   # this method return instructor id associated with a questionnaire
   # expects no arguments
   # returns int
   def get_instructor_id
-    get_attr.try(:instructor_id)
+    get_attr(:instructor_id)
   end
 
   def get_private
-    get_attr.try(:private)
+    get_attr(:private)
   end
 
   def get_creation_date
-    get_attr.try(:created_at)
+    get_attr(:created_at)
   end
 
   def get_modified_date
-    get_attr.try(:updated_at)
+    get_attr(:updated_at)
   end
 
   def is_leaf

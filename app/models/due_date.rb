@@ -30,7 +30,6 @@ class DueDate < ApplicationRecord
 
   def self.deadline_sort(due_dates)
     due_dates.sort
-  end
 
 
   def self.assignment_latest_review_round(assignment_id, response)
@@ -50,3 +49,4 @@ class DueDate < ApplicationRecord
     round
   end
 end
+

@@ -44,34 +44,34 @@ describe 'due_date_functions' do
     expect(sorted_due_dates.each_cons(2).all? { |m1, m2| (m1.due_at <=> m2.due_at) != 1 }).to eql true
   end
 
-  describe '#done_in_assignment_round' do
+  describe '#assignment_latest_review_round' do
     it 'return 0 when no response map' do
       response = ReviewResponseMap.create
       response.type = 'ResponseMap'
       response.save
-      expect(DueDate.done_in_assignment_round(1, response)).to eql 0
+      expect(DueDate.assignment_latest_review_round(1, response)).to eql 0
     end
 
     it 'return round 1 for single round' do
       response = ReviewResponseMap.create
-      expect(DueDate.done_in_assignment_round(@assignment_due_date.parent_id, response)).to eql 1
+      expect(DueDate.assignment_latest_review_round(@assignment_due_date.parent_id, response)).to eql 1
     end
   end
 
   describe '#get_next_due_date' do
     it 'no subsequent due date' do
-      expect(DueDate.get_next_due_date(@assignment_due_date.parent_id)).to be nil
+      expect(assignment.get_next_due_date(@assignment_due_date.parent_id)).to be nil
     end
 
     it 'nil value throws exception' do
-      expect { DueDate.get_next_due_date(nil) }.to raise_exception(ActiveRecord::RecordNotFound)
+      expect { assignment.get_next_due_date(nil) }.to raise_exception(ActiveRecord::RecordNotFound)
     end
 
     it 'get next assignment due date' do
       due_date = create(:assignment_due_date, deadline_type: @deadline_type,
                                               submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
                                               review_of_review_allowed_id: @deadline_right.id, due_at: Time.zone.now + 5000)
-      expect(DueDate.get_next_due_date(due_date.parent_id)).to be_valid
+      expect(assignment.get_next_due_date(due_date.parent_id)).to be_valid
     end
 
     it 'get next due date from topic for staggered deadline' do
@@ -79,12 +79,12 @@ describe 'due_date_functions' do
       due_date = create(:topic_due_date, deadline_type: @deadline_type,
                                          submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
                                          review_of_review_allowed_id: @deadline_right.id, due_at: Time.zone.now + 5000, parent_id: assignment_id)
-      expect(DueDate.get_next_due_date(assignment_id, due_date.parent_id)).to be_valid
+      expect(assignment.get_next_due_date(assignment_id, due_date.parent_id)).to be_valid
     end
 
     it 'next due date does not exist for staggered deadline' do
       assignment_id = create(:assignment, staggered_deadline: true, name: 'TestAssignment2', directory_path: 'TestAssignment2').id
-      expect(DueDate.get_next_due_date(assignment_id)).to be nil
+      expect(assignment.get_next_due_date(assignment_id)).to be nil
     end
 
     it 'next due date is before Time.now for staggered deadline' do
@@ -92,7 +92,7 @@ describe 'due_date_functions' do
       due_date = create(:topic_due_date, deadline_type: @deadline_type,
                                          submission_allowed_id: @deadline_right, review_allowed_id: @deadline_right,
                                          review_of_review_allowed_id: @deadline_right, due_at: Time.zone.now - 5000, parent_id: assignment_id)
-      expect(DueDate.get_next_due_date(assignment_id, due_date.parent_id)).to be nil
+      expect(assignment.get_next_due_date(assignment_id, due_date.parent_id)).to be nil
     end
 
     it 'get next due date from assignment for staggered deadline' do
@@ -100,7 +100,7 @@ describe 'due_date_functions' do
       due_date = create(:assignment_due_date, deadline_type: @deadline_type,
                                               submission_allowed_id: @deadline_right, review_allowed_id: @deadline_right,
                                               review_of_review_allowed_id: @deadline_right, due_at: Time.zone.now + 5000, parent_id: assignment_id)
-      expect(DueDate.get_next_due_date(assignment_id)).to be_valid
+      expect(assignment.get_next_due_date(assignment_id)).to be_valid
     end
   end
 

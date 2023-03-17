@@ -36,7 +36,7 @@ describe SelfReviewResponseMap do
       end
 
       it 'returns correct questionnaire found by topic_id if only topic_id is given and there is no current round used in the due date' do
-        allow(DueDate).to receive(:get_next_due_date).with(assignment.id).and_return(nil)
+        allow(assignment).to receive(:get_next_due_date).with(assignment.id).and_return(nil)
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: nil, topic_id: 1).and_return(
           [assignment_questionnaire1]
         )
@@ -45,7 +45,7 @@ describe SelfReviewResponseMap do
       end
 
       it 'returns correct questionnaire found by used_in_round and topic_id if only topic_id is given, but current round is found by the due date' do
-        allow(DueDate).to receive(:get_next_due_date).with(assignment.id).and_return(next_due_date)
+        allow(assignment).to receive(:get_next_due_date).with(assignment.id).and_return(next_due_date)
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return(
           [assignment_questionnaire1]
         )

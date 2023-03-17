@@ -1,5 +1,5 @@
 class DueDate < ApplicationRecord
-  validates :due_at, presence: true, format: { with: /\A\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\z/, message: 'must be a valid datetime' }
+  validates :due_at, presence: true, if: -> { :due_at.to_s.is_a?(DateTime) }
   #  has_paper_trail
 
   def self.default_permission(deadline_type, permission_type)

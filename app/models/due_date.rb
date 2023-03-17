@@ -41,7 +41,9 @@ class DueDate < ApplicationRecord
     sorted_deadlines = deadline_sort(DueDate.where(parent_id: assignment_id))
     round = 1
     sorted_deadlines.each do |due_date|
-      break if response.created_at < due_date.due_at else round += 1 if due_date.deadline_type_id == 2
+      break if response.created_at < due_date.due_at
+
+      round += 1 if due_date.deadline_type_id == 2
     end
     round
   end

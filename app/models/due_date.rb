@@ -53,17 +53,16 @@ class DueDate < ApplicationRecord
 
   def self.done_in_assignment_round(assignment_id, response)
     # for author feedback, quiz, teammate review and metareview, Expertiza only support one round, so the round # should be 1
-    return 0 if ResponseMap.find(response.map_id).type != 'ReviewResponseMap'
+    return 0 if ResponseMap.where(id: response.map_id, type: 'ReviewResponseMap').empty?
 
-    due_dates = DueDate.where(parent_id: assignment_id)
     # sorted so that the earliest deadline is at the first
-    sorted_deadlines = deadline_sort(due_dates)
-    due_dates.reject { |due_date| due_date.deadline_type_id != 1 && due_date.deadline_type_id != 2 }
+    sorted_deadlines = deadline_sort(DueDate.where(parent_id: assignment_id))
     round = 1
     sorted_deadlines.each do |due_date|
-      break if response.created_at < due_date.due_at
-
-      round += 1 if due_date.deadline_type_id == 2
+      if response.created_at < due_date.due_at
+        break
+      elsif due_date.deadline_type_id == 2
+        round += 1
     end
     round
   end

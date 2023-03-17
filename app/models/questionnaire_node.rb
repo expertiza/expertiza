@@ -39,7 +39,10 @@ class QuestionnaireNode < Node
   def get_attribute(attribute_name)
     Questionnaire.find_by(id: node_object_id)&.send(attribute_name)
   end
-
+  
+  # this method return name associated with a questionnaire
+  # expects no arguments 
+  # returns string
   def get_name
     get_attribute(:name)
   end
@@ -50,7 +53,7 @@ class QuestionnaireNode < Node
   def get_instructor_id
     get_attribute(:instructor_id)
   end
-
+  
   def get_private
     get_attribute(:private)
   end

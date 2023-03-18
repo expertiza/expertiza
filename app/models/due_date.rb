@@ -29,7 +29,7 @@ class DueDate < ApplicationRecord
   def self.deadline_sort(due_dates)
     due_dates.sort
   end
-  
+
   def self.assignment_latest_review_round(assignment_id, response)
     # for author feedback, quiz, teammate reviews, rounds # should be 1
     maps = ResponseMap.where(id: response.map_id, type: 'ReviewResponseMap')

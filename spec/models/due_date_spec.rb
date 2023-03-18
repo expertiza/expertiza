@@ -49,12 +49,12 @@ describe 'due_date_functions' do
       response = ReviewResponseMap.create
       response.type = 'ResponseMap'
       response.save
-      expect(DueDate.assignment_latest_review_round(1, response)).to eql 0
+      expect(response.assignment_latest_review_round(1, response)).to eql 0
     end
 
     it 'return round 1 for single round' do
       response = ReviewResponseMap.create
-      expect(DueDate.assignment_latest_review_round(@assignment_due_date.parent_id, response)).to eql 1
+      expect(response.assignment_latest_review_round(@assignment_due_date.parent_id, response)).to eql 1
     end
   end
 

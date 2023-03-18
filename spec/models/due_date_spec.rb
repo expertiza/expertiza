@@ -44,19 +44,7 @@ describe 'due_date_functions' do
     expect(sorted_due_dates.each_cons(2).all? { |m1, m2| (m1.due_at <=> m2.due_at) != 1 }).to eql true
   end
 
-  describe '#done_in_assignment_round' do
-    it 'return 0 when no response map' do
-      response = ReviewResponseMap.create
-      response.type = 'ResponseMap'
-      response.save
-      expect(DueDate.done_in_assignment_round(1, response)).to eql 0
-    end
-
-    it 'return round 1 for single round' do
-      response = ReviewResponseMap.create
-      expect(DueDate.done_in_assignment_round(@assignment_due_date.parent_id, response)).to eql 1
-    end
-  end
+## Moved from here due_date_assignment_round
 
   describe '#get_next_due_date' do
     it 'no subsequent due date' do

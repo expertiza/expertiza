@@ -190,6 +190,22 @@ describe Response do
     end
   end
 
+
+  describe '#assignment_latest_review_round' do
+    it 'return 0 when no response map' do
+      response = ReviewResponseMap.create
+      response.type = 'ResponseMap'
+      response.save
+      expect(Response.assignment_latest_review_round(1, response)).to eql 0
+    end
+
+    it 'return round 1 for single round' do
+      response = ReviewResponseMap.create
+      expect(Response.assignment_latest_review_round(@assignment_due_date.parent_id, response)).to eql 1
+    end
+  end
+  
+
   describe '#questionnaire_by_answer' do
     before(:each) do
       allow(SignedUpTeam).to receive(:find_by).with(team_id: team.id).and_return(signed_up_team)

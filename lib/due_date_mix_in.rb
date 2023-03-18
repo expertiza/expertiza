@@ -1,5 +1,9 @@
 # lib/due_date_mix_in.rb
 module DueDateMixIn
+  def set_topic_by_user
+    @participant = AssignmentParticipant.find(params[:id])
+    @sel_topic_id = SignedUpTeam.topic_id(id, @participant.user_id)
+  end
   # Check whether review, metareview, etc.. is allowed
   # The permissions of TopicDueDate is the same as AssignmentDueDate.
   # Here, column is usually something like 'review_allowed_id'
@@ -9,12 +13,23 @@ module DueDateMixIn
 
     right_id = next_due_date.send column
     right = DeadlineRight.find(right_id)
-    right && (right.name == 'OK' || right.name == 'Late')
+    # check is assignment action deadline is ok or late (i.e. not no)
+    right && (right.name != 'No')
   end
 
   # Determine if the next due date from now allows for submissions
-  def submission_allowed(topic_id = nil)
-    check_condition('submission_allowed_id', topic_id)
+  def submission_allowed(assignment_id, participant_id)
+    # check_condition('submission_allowed_id', topic_id)
+    # @topic_id = SignedUpTeam.topic_id(@assignemnt.id,@participant.user_id)
+    topic_id = SignedUpTeam.topic_id(id, participant_id)
+    # only need to pass @particpiant to search, can this be done locally
+    next_due_date = DueDate.get_next_due_date(id, topic_id)
+    return false if next_due_date.nil?
+
+    right_id = next_due_date.submission_allowed_id
+    right = DeadlineRight.find(right_id)
+    # check is assignment action deadline is ok or late (i.e. not no)
+    right && (right.name != 'No')
   end
   # Determine if the next due date from now allows for reviews
   def can_review(topic_id = nil)

@@ -2,9 +2,6 @@ class DueDate < ApplicationRecord
   validate :due_at_is_valid_datetime
   #  has_paper_trail
 
-  def default_permission(deadline_type, permission_type)
-    DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
-
   def self.current_due_date(due_dates)
     # Get the current due date from list of due dates
     due_dates.each do |due_date|
@@ -16,6 +13,9 @@ class DueDate < ApplicationRecord
     # in case current due date not found
     nil
   end
+
+  def default_permission(deadline_type, permission_type)
+    DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
 
   def self.teammate_review_allowed(student)
     # time when teammate review is allowed
@@ -108,6 +108,6 @@ class DueDate < ApplicationRecord
     next_due_date
   end
 
-  
+
 end
 

@@ -34,7 +34,7 @@ class QuizQuestionnairesController < QuestionnairesController
       @questionnaire.private = params[:private]
       render 'questionnaires/new_quiz'
     else
-      redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
+      redirect_to controller: 'submitted_content', action: 'show', id: params[:pid]
     end
   end
 
@@ -75,7 +75,7 @@ class QuizQuestionnairesController < QuestionnairesController
     @questionnaire = Questionnaire.find(params[:id])
     if @questionnaire.taken_by_anyone?
       flash[:error] = 'Your quiz has been taken by one or more students; you cannot edit it anymore.'
-      redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
+      redirect_to controller: 'submitted_content', action: 'show', id: params[:pid]
     else # quiz can be edited only if its not taken by anyone
       render :'questionnaires/edit'
     end
@@ -85,7 +85,7 @@ class QuizQuestionnairesController < QuestionnairesController
   def update
     @questionnaire = Questionnaire.find(params[:id])
     if @questionnaire.nil?
-      redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
+      redirect_to controller: 'submitted_content', action: 'show', id: params[:pid]
       return
     end
     if params['save'] && params[:question].try(:keys)
@@ -106,7 +106,7 @@ class QuizQuestionnairesController < QuestionnairesController
         end
       end
     end
-    redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
+    redirect_to controller: 'submitted_content', action: 'show', id: params[:pid]
   end
 
   # validate quiz name, questions, answers

@@ -38,10 +38,6 @@
     <% if files.length > 0 and participant.team.directory_num != nil and participant.team.directory_num >= 0 %>
       <% if same_team_flag && stage != "Finished" %>
         <div style="padding-bottom:0.6em"><h5>File actions:</h5>
-        <!--<input type="button" onclick="createNewFolder()"     value="Create new folder"    />
-          <input type="button" onclick="copySelectedFile()"    value="Copy selected file"   />
-          <input type="button" onclick="moveSelectedFile()"    value="Move selected file"   />
-          <input type="button" onclick="renameFile()"          value="Rename selected file" />-->
           <input type="button" onclick="deleteSelectedFile();" value="Delete selected file" />
           <input type="reset" value="Reset">
         </div>

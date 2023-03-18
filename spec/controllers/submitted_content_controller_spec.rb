@@ -6,6 +6,7 @@ describe SubmittedContentController do
   let(:team) { build(:assignment_team, id: 1) }
   let(:participant) { build(:participant, id: 1, user_id: 21) }
   let(:assignment) { build(:assignment, id: 1) }
+  let(:signup_topic) { build(:signup_topic) }
   describe '#action_allowed?' do
     context 'current user is not authorized' do
       it 'does not allow action for no user' do
@@ -121,6 +122,7 @@ describe SubmittedContentController do
       it 'flashes error for file exceeding size limit' do
         allow(controller).to receive(:check_content_size).and_return(false)
         file = Rack::Test::UploadedFile.new("#{Rails.root}/spec/fixtures/files/the-rspec-book_p2_1.pdf")
+        allow_any_instance_of(Rack::Test::UploadedFile::String).to receive(:read).and_return("")
         params = {uploaded_file: file, id: 1}
         response = get :submit_file, params: params
         expect(response).to redirect_to(action: :edit, id: 1)
@@ -201,6 +203,7 @@ describe SubmittedContentController do
       it 'flashes error for file exceeding size limit' do
         allow(controller).to receive(:check_content_size).and_return(false)
         file = Rack::Test::UploadedFile.new("#{Rails.root}/spec/fixtures/files/the-rspec-book_p2_1.pdf")
+        allow_any_instance_of(Rack::Test::UploadedFile::String).to receive(:read).and_return("")
         params = {uploaded_file: file,
                   id: 1}
         response = get :submit_file, params: params
@@ -278,42 +281,42 @@ describe SubmittedContentController do
 
   let(:student1) { build_stubbed(:student, id: 21, role_id: 1) }
   let(:participant) { build(:participant, id: 1, user_id: 21) }
-  describe 'student#view' do
-    it 'student#view it' do
+  describe 'student#show' do
+    it 'student#show it' do
       allow(AssignmentParticipant).to receive(:find).and_return(participant)
       stub_current_user(student1, student1.role.name, student1.role)
       allow(participant).to receive(:name).and_return('Name')
       params = { id: 21 }
-      response = get :view, params: params
-      expect(response).to redirect_to(action: :edit, view: true, id: 21)
+      response = get :show, params: params
+      expect(response).to redirect_to(action: :edit, view_only: true, id: 21)
     end
   end
 
   let(:instructor1) { build_stubbed(:instructor, id: 21, role_id: 1) }
   let(:participant) { build(:participant, id: 1, user_id: 21) }
 
-  describe 'instructor#view' do
-    it 'instructor#view it' do
+  describe 'instructor#show' do
+    it 'instructor#show it' do
       allow(AssignmentParticipant).to receive(:find).and_return(participant)
       stub_current_user(instructor1, instructor1.role.name, instructor1.role)
       allow(participant).to receive(:name).and_return('Name')
       params = { id: 21 }
-      response = get :view, params: params
-      expect(response).to redirect_to(action: :edit, view: true, id: 21)
+      response = get :show, params: params
+      expect(response).to redirect_to(action: :edit, view_only: true, id: 21)
     end
   end
 
   let(:superadmin1) { build_stubbed(:superadmin, id: 21, role_id: 1) }
   let(:participant) { build(:participant, id: 1, user_id: 21) }
 
-  describe 'superadmin#view' do
-    it 'superadmin#view it' do
+  describe 'superadmin#show' do
+    it 'superadmin#show it' do
       allow(AssignmentParticipant).to receive(:find).and_return(participant)
       stub_current_user(superadmin1, superadmin1.role.name, superadmin1.role)
       allow(participant).to receive(:name).and_return('Name')
       params = { id: 21 }
-      response = get :view, params: params
-      expect(response).to redirect_to(action: :edit, view: true, id: 21)
+      response = get :show, params: params
+      expect(response).to redirect_to(action: :edit, view_only: true, id: 21)
     end
   end
 
@@ -383,6 +386,25 @@ describe SubmittedContentController do
     end
     it 'type should be txt' do
       expect(controller.send(:file_type, 'test.png.txt')).to eql('txt')
+    end
+  end
+
+  # Test to verify if one_team_can_submit_work? function is working as expected
+  describe '#one_team_can_submit_work' do
+    it 'participant cannot submit work if team doesnt hold a topic' do
+      allow(AssignmentParticipant).to receive(:find).and_return(participant)
+      allow(SignUpTopic).to receive(:where).and_return([nil])
+      params = { id: 21 }
+      allow(controller).to receive(:params).and_return(params)
+      expect(controller.send(:one_team_can_submit_work?)).to eql(false)
+    end
+    it 'participant can submit work if team holds a topic' do
+      allow(AssignmentParticipant).to receive(:find).and_return(participant)
+      allow(SignUpTopic).to receive(:where).and_return([signup_topic])
+      allow(SignedUpTeam).to receive(:topic_id).and_return(1)
+      params = { id: 21 }
+      allow(controller).to receive(:params).and_return(params)
+      expect(controller.send(:one_team_can_submit_work?)).to eql(true)
     end
   end
 end

@@ -742,4 +742,9 @@ FactoryBot.define do
     ta_id 1
     course_id 1
   end
+
+  factory :signup_topic, class: SignUpTopic do
+    topic_identifier 1
+    topic_name 'Topic'
+  end
 end

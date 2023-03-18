@@ -2,9 +2,7 @@ class DueDate < ApplicationRecord
   validate :due_at_is_valid_datetime
   #  has_paper_trail
 
-  def self.default_permission(deadline_type, permission_type)
-    DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
-  end
+  
 
   def self.current_due_date(due_dates)
     # Get the current due date from list of due dates
@@ -60,7 +58,7 @@ class DueDate < ApplicationRecord
   def self.deadline_sort(due_dates)
     due_dates.sort
   end
-  
+
 
   def self.assignment_latest_assignment_review_round(assignment_id, response)
     # for author feedback, quiz, teammate review and metareview, Expertiza only support one round, so the round # should be 1

@@ -3,6 +3,8 @@ class BookmarksController < ApplicationController
   include Scoring
   helper_method :specific_average_score
   helper_method :total_average_score
+  before_action :get_topic, only: [:list, :new]
+  before_action :get_bookmark, only: [:edit, :update, :destroy, :bookmark_rating, :save_bookmark_rating_score]
 
   def action_allowed?
     case params[:action]
@@ -17,19 +19,28 @@ class BookmarksController < ApplicationController
     @current_role_name = current_role_name
   end
 
-  def list
-    @bookmarks = Bookmark.where(topic_id: params[:id])
+  def get_topic
     @topic = SignUpTopic.find(params[:id])
   end
 
+  def get_bookmark
+    @bookmark = Bookmark.find(params[:id])
+  end
+
+  def remove_url_protocol(url)
+    url.gsub(/\Ahttps?:\/\//, '')
+  end
+
+  def list
+    @bookmarks = Bookmark.where(topic_id: params[:id])
+  end
+
   def new
-    @topic = SignUpTopic.find(params[:id])
     @bookmark = Bookmark.new
   end
 
   def create
-    params[:url] = params[:url].gsub!(%r{http://}, '') if params[:url].start_with?('http://')
-    params[:url] = params[:url].gsub!(%r{https://}, '') if params[:url].start_with?('https://')
+    params[:url] = remove_url_protocol(params[:url])
     begin
       Bookmark.create(url: create_bookmark_params[:url], title: create_bookmark_params[:title], description: create_bookmark_params[:description], user_id: session[:user].id, topic_id: create_bookmark_params[:topic_id])
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Your bookmark has been successfully created!', request)
@@ -42,11 +53,9 @@ class BookmarksController < ApplicationController
   end
 
   def edit
-    @bookmark = Bookmark.find(params[:id])
   end
 
   def update
-    @bookmark = Bookmark.find(params[:id])
     @bookmark.update_attributes(url: update_bookmark_params[:bookmark][:url], title: update_bookmark_params[:bookmark][:title], description: update_bookmark_params[:bookmark][:description])
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Your bookmark has been successfully updated!', request)
     flash[:success] = 'Your bookmark has been successfully updated!'
@@ -54,7 +63,6 @@ class BookmarksController < ApplicationController
   end
 
   def destroy
-    @bookmark = Bookmark.find(params[:id])
     @bookmark.destroy
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Your bookmark has been successfully deleted!', request)
     flash[:success] = 'Your bookmark has been successfully deleted!'
@@ -62,11 +70,9 @@ class BookmarksController < ApplicationController
   end
 
   def bookmark_rating
-    @bookmark = Bookmark.find(params[:id])
   end
 
   def save_bookmark_rating_score
-    @bookmark = Bookmark.find(params[:id])
     @bookmark_rating = BookmarkRating.where(bookmark_id: @bookmark.id, user_id: session[:user].id).first
     if @bookmark_rating.blank?
       BookmarkRating.create(bookmark_id: @bookmark.id, user_id: session[:user].id, rating: create_bookmark_params[:rating])

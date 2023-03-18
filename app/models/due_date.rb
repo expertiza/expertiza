@@ -2,8 +2,6 @@ class DueDate < ApplicationRecord
   validate :due_at_is_valid_datetime
   #  has_paper_trail
 
-  
-
   def self.current_due_date(due_dates)
     # Get the current due date from list of due dates
     due_dates.each do |due_date|

@@ -7,8 +7,6 @@ class DueDate < ApplicationRecord
     DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
   end
 
-
-
   def self.copy(old_assignment_id, new_assignment_id)
     duedates = where(parent_id: old_assignment_id)
     duedates.each do |orig_due_date|
@@ -33,17 +31,15 @@ class DueDate < ApplicationRecord
   end
   
   def self.assignment_latest_review_round(assignment_id, response)
-    # for author feedback, quiz, teammate review and metareview, rounds # should be 1
-    review_response_maps = ResponseMap.where(id: response.map_id, type: 'ReviewResponseMap')
-    return 0 if review_response_maps.empty?
+    # for author feedback, quiz, teammate reviews, rounds # should be 1
+    maps = ResponseMap.where(id: response.map_id, type: 'ReviewResponseMap')
+    return 0 if maps.empty?
 
     # sorted so that the earliest deadline is at the first
     sorted_deadlines = deadline_sort(DueDate.where(parent_id: assignment_id))
     round = 1
     sorted_deadlines.each do |due_date|
-      break if response.created_at < due_date.due_at
-
-      round += 1 if due_date.deadline_type_id == 2
+      round += 1 if due_date.deadline_type_id == 2 && response.created_at >= due_date.due_at
     end
     round
   end

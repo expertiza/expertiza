@@ -622,34 +622,6 @@ class Assignment < ApplicationRecord
     self.enable_pair_programming
   end
 
-  private
-
-  # returns true if assignment has staggered deadline and topic_id is nil
-  def staggered_and_no_topic?(topic_id)
-    staggered_deadline? && topic_id.nil?
-  end
-
-  # returns true if reviews required is greater than reviews allowed
-  def num_reviews_greater?(reviews_required, reviews_allowed)
-    reviews_allowed && reviews_allowed != -1 && reviews_required > reviews_allowed
-  end
-
-  def min_metareview(response_map_set)
-    response_map_set.sort! { |a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
-    min_metareviews = response_map_set.first.metareview_response_maps.count
-    min_metareviews
-  end
-
-  # returns a map of reviewer to meta_reviews
-  def reviewer_metareviews_map(response_map_set)
-    reviewers = {}
-    response_map_set.each do |response_map|
-      reviewer = response_map.reviewer
-      reviewers.member?(reviewer) ? reviewers[reviewer] += 1 : reviewers[reviewer] = 1
-    end
-    reviewers = reviewers.sort_by { |a| a[1] }
-  end
-
   def get_next_due_date(assignment_id, topic_id = nil)
     if Assignment.find(assignment_id).staggered_deadline?
       next_due_date = TopicDueDate.find_by(['parent_id = ? and due_at >= ?', topic_id, Time.zone.now])
@@ -676,5 +648,33 @@ class Assignment < ApplicationRecord
   def get_following_assignment_due_dates(assignment_id, topic_id = nil)
     topic_due_date_size = TopicDueDate.where(parent_id: topic_id).size
     following_assignment_due_dates = AssignmentDueDate.where(parent_id: assignment_id)[topic_due_date_size..-1]
+  end
+
+  private
+
+  # returns true if assignment has staggered deadline and topic_id is nil
+  def staggered_and_no_topic?(topic_id)
+    staggered_deadline? && topic_id.nil?
+  end
+
+  # returns true if reviews required is greater than reviews allowed
+  def num_reviews_greater?(reviews_required, reviews_allowed)
+    reviews_allowed && reviews_allowed != -1 && reviews_required > reviews_allowed
+  end
+
+  def min_metareview(response_map_set)
+    response_map_set.sort! { |a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
+    min_metareviews = response_map_set.first.metareview_response_maps.count
+    min_metareviews
+  end
+
+  # returns a map of reviewer to meta_reviews
+  def reviewer_metareviews_map(response_map_set)
+    reviewers = {}
+    response_map_set.each do |response_map|
+      reviewer = response_map.reviewer
+      reviewers.member?(reviewer) ? reviewers[reviewer] += 1 : reviewers[reviewer] = 1
+    end
+    reviewers = reviewers.sort_by { |a| a[1] }
   end
 end

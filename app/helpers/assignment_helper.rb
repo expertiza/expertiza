@@ -61,7 +61,6 @@ module AssignmentHelper
 
     due_dates.delete_if { |due_date| due_date.due_at.nil? }
     due_dates.sort! { |x, y| x.due_at <=> y.due_at }
-
   
     if due_dates[round].nil? || round < 0
       due_date = AssignmentDueDate.new
@@ -75,8 +74,6 @@ module AssignmentHelper
       due_dates[round]
     end
   end
-
-
 
   def get_data_for_list_submissions(team)
     teams_users = TeamsUser.where(team_id: team.id)

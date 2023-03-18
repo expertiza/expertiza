@@ -3,7 +3,7 @@ class DueDate < ApplicationRecord
   validates :due_at, presence: true, if: -> { :due_at.to_s.is_a?(DateTime) }
   #  has_paper_trail
 
-  def self.default_permission(deadline_type, permission_type)
+  def default_permission(deadline_type, permission_type)
     DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
   end
 

@@ -111,4 +111,38 @@ describe 'due_date_functions' do
   it 'review submission_allowed default permission NO' do
     expect(DueDate.new.default_permission('review', 'submission_allowed')).to be == DeadlineRight::NO
   end
+
+  describe '#get_following_assignment_due_dates' do
+    it 'no following due dates' do
+      expect(Assignment.new.get_following_assignment_due_dates(@assignment_due_date.parent_id).empty?).to be true
+    end
+
+    it 'get following assignment due dates' do
+      due_date = create(:assignment_due_date, deadline_type: @deadline_type,
+                                              submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
+                                              review_of_review_allowed_id: @deadline_right.id, due_at: Time.zone.now + 5000)
+      expect(Assignment.new.get_following_assignment_due_dates(due_date.parent_id).first).to be_valid
+    end
+
+    it 'following due dates does not exist for staggered deadline' do
+      assignment_id = create(:assignment, staggered_deadline: true, name: 'TestAssignment2', directory_path: 'TestAssignment2').id
+      expect(Assignment.new.get_following_assignment_due_dates(assignment_id).empty?).to be true
+    end
+
+    it 'following due dates is before Time.now for staggered deadline' do
+      assignment_id = create(:assignment, staggered_deadline: true, name: 'TestAssignment3', directory_path: 'TestAssignment3').id
+      due_date = create(:topic_due_date, deadline_type: @deadline_type,
+                                         submission_allowed_id: @deadline_right, review_allowed_id: @deadline_right,
+                                         review_of_review_allowed_id: @deadline_right, due_at: Time.zone.now - 5000, parent_id: assignment_id)
+      expect(Assignment.new.get_following_assignment_due_dates(assignment_id, due_date.parent_id)).to be nil
+    end
+
+    it 'get following due dates from assignment for staggered deadline' do
+      assignment_id = create(:assignment, staggered_deadline: true, name: 'TestAssignment4', directory_path: 'TestAssignment4').id
+      due_date = create(:assignment_due_date, deadline_type: @deadline_type,
+                                              submission_allowed_id: @deadline_right, review_allowed_id: @deadline_right,
+                                              review_of_review_allowed_id: @deadline_right, due_at: Time.zone.now + 5000, parent_id: assignment_id)
+      expect(Assignment.new.get_following_assignment_due_dates(assignment_id).first).to be_valid
+    end
+  end
 end

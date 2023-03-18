@@ -108,5 +108,6 @@ class DueDate < ApplicationRecord
     next_due_date
   end
 
+  
 end
 

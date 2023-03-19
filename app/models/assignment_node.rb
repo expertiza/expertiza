@@ -123,19 +123,19 @@ class AssignmentNode < Node
     Assignment.find_by(id: node_object_id).try(:private)
   end
 
-  def get_max_team_size
+  def get_max_assignment_team_size
     Assignment.find_by(id: node_object_id).try(:max_team_size)
   end
 
-  def get_is_intelligent
+  def get_assignment_is_intelligent
     Assignment.find_by(id: node_object_id).try(:is_intelligent)
   end
 
-  def get_require_quiz
+  def get_assignment_require_quiz
     Assignment.find_by(id: node_object_id).try(:require_quiz)
   end
 
-  def get_allow_suggestions
+  def get_assignment_allow_suggestions
     Assignment.find_by(id: node_object_id).try(:allow_suggestions)
   end
 

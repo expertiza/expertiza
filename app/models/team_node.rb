@@ -12,10 +12,12 @@ class TeamNode < Node
     nodes.where('teams.parent_id = ?', parent_id) if parent_id
   end
 
+  # Get the team name based on the node object id
   def get_name(_ip_address = nil)
     Team.find(node_object_id).name
   end
 
+  # Gets all the team users based on the node object id
   def get_children(_sortvar = nil, _sortorder = nil, _user_id = nil, _parent_id = nil, _search = nil)
     TeamUserNode.get(node_object_id)
   end

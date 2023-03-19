@@ -3,8 +3,9 @@ class BookmarksController < ApplicationController
   include Scoring
   helper_method :specific_average_score
   helper_method :total_average_score
-  before_action :get_topic, only: [:list, :new]
-  before_action :get_bookmark, only: [:edit, :update, :destroy, :bookmark_rating, :save_bookmark_rating_score]
+  before_action :fetch_topic, only: %i[list new]
+  before_action :fetch_bookmark, only: %i[edit update destroy]
+  before_action :fetch_bookmark, only: %i[bookmark_rating save_bookmark_rating_score]
 
   def action_allowed?
     case params[:action]
@@ -19,16 +20,16 @@ class BookmarksController < ApplicationController
     @current_role_name = current_role_name
   end
 
-  def get_topic
+  def fetch_topic
     @topic = SignUpTopic.find(params[:id])
   end
 
-  def get_bookmark
+  def fetch_bookmark
     @bookmark = Bookmark.find(params[:id])
   end
 
   def remove_url_protocol(url)
-    url.gsub(/\Ahttps?:\/\//, '')
+    url.gsub(%r{\Ahttps?://}, '')
   end
 
   def list
@@ -52,8 +53,7 @@ class BookmarksController < ApplicationController
     redirect_to action: 'list', id: params[:topic_id]
   end
 
-  def edit
-  end
+  def edit; end
 
   def update
     @bookmark.update_attributes(url: update_bookmark_params[:bookmark][:url], title: update_bookmark_params[:bookmark][:title], description: update_bookmark_params[:bookmark][:description])
@@ -69,8 +69,7 @@ class BookmarksController < ApplicationController
     redirect_to action: 'list', id: @bookmark.topic_id
   end
 
-  def bookmark_rating
-  end
+  def bookmark_rating; end
 
   def save_bookmark_rating_score
     @bookmark_rating = BookmarkRating.where(bookmark_id: @bookmark.id, user_id: session[:user].id).first

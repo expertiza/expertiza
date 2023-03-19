@@ -324,6 +324,7 @@ describe SubmittedContentController do
     it 'student#edit it' do
       allow(AssignmentParticipant).to receive(:find).and_return(participant)
       allow(Participant).to receive(:find_by).and_return(participant)
+      allow(User).to receive(:find).and_return(participant)
       stub_current_user(student1, student1.role.name, student1.role)
       allow(participant).to receive(:name).and_return('Name')
       params = { id: 21 }
@@ -339,6 +340,7 @@ describe SubmittedContentController do
     it 'instructor#edit it' do
       allow(AssignmentParticipant).to receive(:find).and_return(participant)
       allow(Participant).to receive(:find_by).and_return(participant)
+      allow(User).to receive(:find).and_return(participant)
       stub_current_user(instructor1, instructor1.role.name, instructor1.role)
       allow(participant).to receive(:name).and_return('Name')
       params = { id: 21 }
@@ -354,6 +356,7 @@ describe SubmittedContentController do
     it 'superadmin#edit it' do
       allow(AssignmentParticipant).to receive(:find).and_return(participant)
       allow(Participant).to receive(:find_by).and_return(participant)
+      allow(User).to receive(:find).and_return(participant)
       stub_current_user(superadmin1, superadmin1.role.name, superadmin1.role)
       allow(participant).to receive(:name).and_return('Name')
       params = { id: 21 }

@@ -48,6 +48,8 @@ class CourseNode < Node
                      "((courses.private = 0 and courses.instructor_id != #{user_id}) or courses.instructor_id = #{user_id})"
                    end
                  end
+    puts "Conditions for courses"
+    puts conditions
     conditions
   end
 
@@ -59,6 +61,8 @@ class CourseNode < Node
              else
                Ta.get_mapped_courses(user_id)
              end
+    puts "Value for courses"
+    puts values
     values
   end
 
@@ -75,38 +79,62 @@ class CourseNode < Node
     AssignmentNode.get(sortvar, sortorder, user_id, show, node_object_id, search)
   end
 
+  # Gets the name of the course 
+  # Expects no arguements
+  # Return varchar datatype
   def get_name
     Course.find_by(id: node_object_id).try(:name)
   end
 
+  # Gets the directory of the course
+  # Expects no arguements
+  # Return varchar datatype
   def get_directory
     Course.find_by(id: node_object_id).try(:directory_path)
   end
 
+  # Gets the creation date of the course
+  # Expects no arguements
+  # Return datetime datatype
   def get_creation_date
     Course.find_by(id: node_object_id).try(:created_at)
   end
 
+  # Gets the modified date of the course
+  # Expects no arguements
+  # Return datetime datatype
   def get_modified_date
     Course.find_by(id: node_object_id).try(:updated_at)
   end
 
+  # Gets only private ?
   def get_private
     Course.find_by(id: node_object_id).try(:private)
   end
 
+  # Gets the id of the instructor for the course
+  # Expects no arguements
+  # Return int datatype
   def get_instructor_id
     Course.find_by(id: node_object_id).try(:instructor_id)
   end
 
+  # Gets the id of the retrieved institution
+  # Expects no arguements
+  # Return int datatype
   def retrieve_institution_id
     Course.find_by(id: node_object_id).try(:institutions_id)
   end
 
+  # Gets the teams for the course
+  # Expects no arguements
   def get_teams
     TeamNode.get(node_object_id)
   end
 
+  # Gets the id of survey distribution of the course
+  # Expects no arguements
+  # Return int datatype
   def get_survey_distribution_id
     Course.find_by(id: node_object_id).try(:survey_distribution_id)
   end

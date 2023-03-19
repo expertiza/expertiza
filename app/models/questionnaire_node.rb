@@ -78,24 +78,30 @@ class QuestionnaireNode < Node
   end
 
   # this method return instructor id associated with a questionnaire
-  # expects no arguments
   # returns int
   def get_instructor_id
     Questionnaire.find_by(id: node_object_id).try(:instructor_id)
   end
 
+  # Gets if the questionnaire is private or not 
+  # Return tinyint datatype :- 1 or 0
   def get_private
     Questionnaire.find_by(id: node_object_id).try(:private)
   end
 
+  # Gets the creation date of the questionnaire
+  # Returns datetime datatype
   def get_creation_date
     Questionnaire.find_by(id: node_object_id).try(:created_at)
   end
 
+  # Gets the date whe the questionnaire was modified
+  # Returns datetime datatype
   def get_modified_date
     Questionnaire.find_by(id: node_object_id).try(:updated_at)
   end
 
+  # Indicates that this object is always a leaf
   def is_leaf
     true
   end

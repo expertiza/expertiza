@@ -6,10 +6,12 @@ class FolderNode < Node
     joins(:folder).where('type = ? and tree_folders.parent_id is NULL', self)
   end
 
+  # Gets the name of the folder in the tree depending on the node object id
   def get_name
     TreeFolder.find(node_object_id).name
   end
 
+  # Returns the partial name depending on the object's parent ID
   def get_partial_name
     if parent_id.nil?
       get_name.downcase + '_folder_actions'
@@ -18,10 +20,13 @@ class FolderNode < Node
     end
   end
 
+
+  # Returns the model type name contained in this folder
   def get_folder_child_type
     TreeFolder.find(node_object_id).child_type
   end
 
+  # Const_get?
   def get_children(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, search = nil)
     parent_id = folder.id unless folder.parent_id.nil?
     Object.const_get(get_folder_child_type).get(sortvar, sortorder, user_id, show, parent_id, search)

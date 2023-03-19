@@ -142,24 +142,24 @@ class AssignmentNode < Node
 
   # Gets the maximum number of participants allowed on the team.
   # Returns int data type
-  def get_max_team_size
+  def get_max_assignment_team_size
     Assignment.find_by(id: node_object_id).try(:max_team_size)
   end
 
   # Gets the topics assigned by 'intelligent algorithm' to the teams 
   # Returns tinyint datatype - 1 or 0 or assignments based on 0 or 1?
-  def get_is_intelligent
+  def get_assignment_is_intelligent
     Assignment.find_by(id: node_object_id).try(:is_intelligent)
   end
 
   # Gets assignments depending on whether quiz is required or not
   # Returns tinyint datatype - 1 or 0 ?
-  def get_require_quiz
+  def get_assignment_require_quiz
     Assignment.find_by(id: node_object_id).try(:require_quiz)
   end
  
   # Gets if the assignment allows suggestions from participants or not
-  def get_allow_suggestions
+  def get_assignment_allow_suggestions
     Assignment.find_by(id: node_object_id).try(:allow_suggestions)
   end
 

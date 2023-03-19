@@ -22,13 +22,13 @@ class FolderNode < Node
 
 
   # Returns the model type name contained in this folder
-  def get_child_type
+  def get_folder_child_type
     TreeFolder.find(node_object_id).child_type
   end
 
   # Const_get?
   def get_children(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, search = nil)
     parent_id = folder.id unless folder.parent_id.nil?
-    Object.const_get(get_child_type).get(sortvar, sortorder, user_id, show, parent_id, search)
+    Object.const_get(get_folder_child_type).get(sortvar, sortorder, user_id, show, parent_id, search)
   end
 end

@@ -135,7 +135,7 @@ class CourseNode < Node
   # Gets the id of survey distribution of the course
   # Expects no arguements
   # Return int datatype
-  def get_survey_distribution_id
+  def get_course_survey_distribution_id
     Course.find_by(id: node_object_id).try(:survey_distribution_id)
   end
 end

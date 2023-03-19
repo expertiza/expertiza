@@ -6,35 +6,72 @@ class QuestionnaireNode < Node
     'questionnaires'
   end
 
-  def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = nil)
+  def self.get(_sortvar = 'name', _sortorder = 'desc', user_id = nil, show = nil, parent_id = nil, _search = nil)
+    sortvar = 'name' if sortvar.nil? || (sortvar == 'directory_path')
+    sortorder = 'ASC' if sortorder.nil?
+    (includes(:questionnaire).where([get_questionnaire_query_conditions(show, user_id, parent_id), get_questionnaires_managed_by_user(user_id)]).order("questionnaires.#{sortvar} #{sortorder}") if Questionnaire.column_names.include?(sortvar) && %w[ASC DESC asc desc].include?(sortorder))
+  end
+
+  # get the query conditions for a questionnaire 
+  def self.get_questionnaire_query_conditions(show = nil, user_id = nil, parent_id = nil)
+    current_user = User.find_by(id: user_id)
     conditions = if show
-                   if User.find(user_id).role.name != 'Teaching Assistant'
-                     'questionnaires.instructor_id = ?'
-                   else
-                     'questionnaires.instructor_id in (?)'
-                   end
-                 elsif User.find(user_id).role.name != 'Teaching Assistant'
-                   '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
-                 else
-                   '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
-                 end
-
-    values = if User.find(user_id).role.name == 'Teaching Assistant'
-               Ta.get_mapped_instructor_ids(user_id)
-             else
-               user_id
-             end
-
+                    if current_user.role.name != 'Teaching Assistant'
+                      'questionnaires.instructor_id = ?'
+                    else
+                      'questionnaires.instructor_id in (?)'
+                    end
+                elsif current_user.role.name != 'Teaching Assistant'
+                    '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
+                else
+                    '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
+                end
     if parent_id
       name = TreeFolder.find(parent_id).name + 'Questionnaire'
       name.gsub!(/[^\w]/, '')
       conditions += " and questionnaires.type = \"#{name}\""
     end
-    sortvar = 'name' if sortvar.nil? || (sortvar == 'directory_path')
-    sortorder = 'ASC' if sortorder.nil?
-    (includes(:questionnaire).where([conditions, values]).order("questionnaires.#{sortvar} #{sortorder}") if Questionnaire.column_names.include?(sortvar) &&
-        %w[ASC DESC asc desc].include?(sortorder))
+    conditions
   end
+
+  # get the questionnaire managed by the user
+  def self.get_questionnaires_managed_by_user(user_id = nil)
+    current_user = User.find(user_id)
+    values = if current_user.role.name == 'Teaching Assistant'
+              Ta.get_mapped_instructor_ids(user_id)
+            else
+              user_id
+            end
+    values
+  end
+  
+ 
+
+  # def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = nil)
+  #   conditions = if show
+  #                  if User.find(user_id).role.name != 'Teaching Assistant'
+  #                    'questionnaires.instructor_id = ?'
+  #                  else
+  #                    'questionnaires.instructor_id in (?)'
+  #                  end
+  #                elsif User.find(user_id).role.name != 'Teaching Assistant'
+  #                  '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
+  #                else
+  #                  '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
+  #                end
+
+  #   values = if User.find(user_id).role.name == 'Teaching Assistant'
+  #              Ta.get_mapped_instructor_ids(user_id)
+  #            else
+  #              user_id
+  #            end
+
+   
+  #   sortvar = 'name' if sortvar.nil? || (sortvar == 'directory_path')
+  #   sortorder = 'ASC' if sortorder.nil?
+  #   (includes(:questionnaire).where([conditions, values]).order("questionnaires.#{sortvar} #{sortorder}") if Questionnaire.column_names.include?(sortvar) &&
+  #       %w[ASC DESC asc desc].include?(sortorder))
+  # end
 
   def get_name
     Questionnaire.find_by(id: node_object_id).try(:name)

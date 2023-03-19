@@ -120,6 +120,27 @@ describe 'due_date_functions' do
     end
   end
 
+  describe "#find_min_from_now_duration" do
+    it "returns time difference between due_date and now" do
+      allow(DateTime).to receive(:now).and_return(DateTime.new(2021, 10, 20, 11, 11, 11).in_time_zone)
+      due_at = Time.parse(DateTime.new(2021, 10, 20, 12, 12, 12).in_time_zone.to_s(:db))
+      expect(DueDate.find_min_from_now_duration(due_at)).to eq(61)
+    end
+  end
+
+  describe "#get_dequeue_time_as_seconds_duration_from_now" do
+    it "returns time difference between now and dequeue of job in seconds" do
+      allow(DateTime).to receive(:now).and_return(DateTime.new(2021, 10, 20, 11, 00, 00).in_time_zone)
+      due_at = DateTime.new(2021, 10, 20, 12, 00, 00)
+      delay_duration = 1.hour
+      assignment_id = create(:assignment, staggered_deadline: true, name: "testassignment").id
+      due_date = create(:topic_due_date, deadline_type: @deadline_type,
+                                         submission_allowed_id: @deadline_right, review_allowed_id: @deadline_right,
+                                         review_of_review_allowed_id: @deadline_right, due_at: due_at, parent_id: assignment_id)
+      expect(DueDate.get_dequeue_time_as_seconds_duration_from_now(due_date, delay_duration)).to eq(7200)
+    end
+  end
+
   it 'metareview review_of_review_allowed default permission OK' do
     expect(DueDate.default_permission('metareview', 'review_of_review_allowed')).to be == DeadlineRight::OK
   end

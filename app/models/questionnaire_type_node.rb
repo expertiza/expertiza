@@ -6,15 +6,19 @@ class QuestionnaireTypeNode < FolderNode
     'tree_folders'
   end
 
-  def self.get(_sortvar = nil, _sortorder = nil, _user_id = nil, _show = nil, _parent_id = nil, _search = nil)
-    parent = TreeFolder.find_by(name: 'Questionnaires')
-    folders = TreeFolder.where(parent_id: parent.id)
+  def self.return_nodes_list(folders)
     nodes = []
     folders.each do |folder|
       node = FolderNode.find_by(node_object_id: folder.id)
       nodes << node if node
     end
     nodes
+  end
+
+  def self.get(_sortvar = nil, _sortorder = nil, _user_id = nil, _show = nil, _parent_id = nil, _search = nil)
+    parent = TreeFolder.find_by(name: 'Questionnaires')
+    folders = TreeFolder.where(parent_id: parent.id)
+    return_nodes_list(folders)
   end
 
   def get_partial_name

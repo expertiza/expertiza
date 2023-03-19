@@ -58,7 +58,7 @@ describe AuthController do
   end
   describe '#after_login' do
     it 'calls set current role and redirects to home controller' do
-      allow(controller).to receive(:redirect_to)
+      expect(controller).to receive(:redirect_to)
       expect(AuthController).to receive(:set_current_role)
       controller.after_login(instructor)
     end
@@ -83,6 +83,11 @@ describe AuthController do
         expect(ExpertizaLogger).to receive(:info)
         AuthController.set_current_role(2, {})
       end
+      it 'rebuilds the role cache' do
+        allow(Role).to receive(:find).and_return(instructor_role)
+        expect(AuthController).to receive(:rebuild_role_cache)
+        AuthController.set_current_role(2, {})
+      end
     end
     context 'when the role is not found' do
       it 'throws an error' do
@@ -105,6 +110,12 @@ describe AuthController do
       allow(Role).to receive(:student).and_return(instructor_role)
       expect(AuthController.clear_user_info(session, 1)).to be_nil
       expect(session[:clear]).to be_truthy
+    end
+    it 'rebuilds the role cache' do
+      session = { user: instructor }
+      allow(Role).to receive(:student).and_return(instructor_role)
+      expect(AuthController).to receive(:rebuild_role_cache)
+      AuthController.clear_user_info(session, 1)
     end
   end
 end

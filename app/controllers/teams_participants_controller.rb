@@ -44,17 +44,18 @@ class TeamsParticipantsController < ApplicationController
     unless user.nil?
       if team.is_a?(AssignmentTeam)
         assignment = Assignment.find(team.parent_id)
-        if assignment.user_on_team?(user)
+        participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
+        if assignment.participant_on_team?(participant)
           flash[:error] = "This user is already assigned to a team for this assignment"
           redirect_back fallback_location: root_path
           return
         end
-        if AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id).nil?
+        if participant.nil?
           urlAssignmentParticipantList = url_for controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment', authorization: 'participant'
           flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
         else
           begin
-            add_member_return = team.add_member(user, team.parent_id)
+            add_member_return = team.add_participant_to_team(participant, team.parent_id)
           rescue
             flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
             redirect_back fallback_location: root_path
@@ -73,17 +74,18 @@ class TeamsParticipantsController < ApplicationController
         end
       else # CourseTeam
         course = Course.find(team.parent_id)
-        if course.user_on_team?(user)
+        participant = CourseParticipant.find_by(user_id: user.id, parent_id: course.id)
+        if course.participant_on_team?(participant)
           flash[:error] = "This user is already assigned to a team for this course"
           redirect_back fallback_location: root_path
           return
         end
-        if CourseParticipant.find_by(user_id: user.id, parent_id: course.id).nil?
+        if participant.nil?
           urlCourseParticipantList = url_for controller: 'participants', action: 'list', id: course.id, model: 'Course', authorization: 'participant'
           flash[:error] = "\"#{user.name}\" is not a participant of the current course. Please <a href=\"#{urlCourseParticipantList}\">add</a> this user before continuing."
         else
           begin
-            add_member_return = team.add_member(user, team.parent_id)
+            add_member_return = team.add_participant_to_team(participant, team.parent_id)
           rescue
             flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
             redirect_back fallback_location: root_path
@@ -104,7 +106,8 @@ class TeamsParticipantsController < ApplicationController
   def delete
     @teams_participant = TeamsParticipant.find(params[:id])
     parent_id = Team.find(@teams_participant.team_id).parent_id
-    @user = User.find(@teams_participant.user_id)
+    participant = Participant.find_by(id: @teams_participant.participant_id)
+    @user = User.find(participant.user_id)
     @teams_participant.destroy
     undo_link("The team user \"#{@user.name}\" has been successfully removed. ")
     redirect_to controller: 'teams', action: 'list', id: parent_id

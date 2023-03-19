@@ -73,7 +73,8 @@ class StudentTeamsController < ApplicationController
       parent = AssignmentNode.find_by node_object_id: student.parent_id
       TeamNode.create parent_id: parent.id, node_object_id: team.id
       user = User.find(student.user_id)
-      team.add_member(user, team.parent_id)
+
+      team.add_participant_to_team(student, team.parent_id)
       team_created_successfully(team)
       redirect_to view_student_teams_path student_id: student.id
 
@@ -129,7 +130,7 @@ class StudentTeamsController < ApplicationController
   def remove_team_user(team_user)
     return false unless team_user
 
-    team_user.destroy_all
+    team_user.destroy
     undo_link "The user \"#{team_user.name}\" has been successfully removed from the team."
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'User removed a participant from the team', request)
   end

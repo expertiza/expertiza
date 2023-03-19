@@ -102,16 +102,16 @@ class ResponseMap < ApplicationRecord
     team
   end
 
-  def assignment_latest_review_round(assignment_id, response)
+  def assignment_latest_review_round(assignment_id)
     # for author feedback, quiz, teammate reviews, rounds # should be 1
-    maps = ResponseMap.where(id: response.map_id, type: 'ReviewResponseMap')
+    maps = ResponseMap.where(id: map_id, type: 'ReviewResponseMap')
     return 0 if maps.empty?
 
     # sorted so that the earliest deadline is at the first
     sorted_deadlines = DueDate.deadline_sort(DueDate.where(parent_id: assignment_id))
     round = 1
     sorted_deadlines.each do |due_date|
-      round += 1 if due_date.deadline_type_id == 2 && response.created_at >= due_date.due_at
+      round += 1 if due_date.deadline_type_id == 2 && created_at >= due_date.due_at
     end
     round
   end

@@ -307,6 +307,7 @@ class TreeDisplayController < ApplicationController
       'name' => node.get_name,
       'type' => node.type
     }
+   
 
     if folder_type == 'Courses' || folder_type == 'Assignments'
       json.merge!(

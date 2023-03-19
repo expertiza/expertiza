@@ -107,7 +107,7 @@ class CourseNode < Node
     TeamNode.get(node_object_id)
   end
 
-  def get_survey_distribution_id
+  def get_course_survey_distribution_id
     Course.find_by(id: node_object_id).try(:survey_distribution_id)
   end
 end

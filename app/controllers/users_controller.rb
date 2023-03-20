@@ -74,10 +74,13 @@ class UsersController < ApplicationController
       return
     end
 
-    # check whether current user is authorized to edit the user being searched, call show if true
+    # check whether current user is authorized \\
+    # to edit the user being searched, call show if true
     role
 
-    if @role.parent_id.nil? || @role.parent_id < session[:user].role_id || @user.id == session[:user].id
+    if @role.parent_id.nil? ||
+       @role.parent_id < session[:user].role_id ||
+       @user.id == session[:user].id
       @total_user_num = User.count
       @assignment_participant_num = AssignmentParticipant.where(user_id: @user.id).count
       render action: 'show'
@@ -104,6 +107,7 @@ class UsersController < ApplicationController
     @rolename = Role.find_by(name: params[:role])
     get_roles
   end
+
   def create
     check_username_availability
     create_user
@@ -113,7 +117,8 @@ class UsersController < ApplicationController
     check = User.find_by(name: params[:user][:name])
     if check
       params[:user][:name] = params[:user][:email]
-      flash[:note] = "That username already exists. Username has been set to the user's email address"
+      flash[:note] = "That username already exists. Username \\
+                      has been set to the user's email address"
     end
   end
 
@@ -132,13 +137,15 @@ class UsersController < ApplicationController
 
   def send_welcome_email
     password = @user.reset_password
-    prepared_mail = MailerHelper.send_mail_to_user(@user, 'Your Expertiza account and password have been created.', 'user_welcome', password)
+    prepared_mail = MailerHelper.send_mail_to_user(@user, 'Your Expertiza account \\
+                and password have been created.', 'user_welcome', password)
     prepared_mail.deliver
-    flash[:success] = "A new password has been sent to new user's e-mail address."
+    flash[:success] = "A new password has been sent \\
+                       to new user's e-mail address."
   end
 
   def create_questionnaire
-    if (@user.role.name == 'Instructor') || (@user.role.name == 'Administrator')
+    unless !((@user.role.name == 'Instructor') || (@user.role.name == 'Administrator'))
       AssignmentQuestionnaire.create(user_id: @user.id)
     end
   end
@@ -150,7 +157,6 @@ class UsersController < ApplicationController
     flash[:error] = error_message
     redirect_to action: 'list'
   end
-
 
   def edit
     @user = User.find(params[:id])

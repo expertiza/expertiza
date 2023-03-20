@@ -41,7 +41,6 @@ describe AssignmentForm do
       allow_any_instance_of(AssignmentForm).to receive(:update_due_dates).with(attributes[:due_date], user).and_return(true)
       allow_any_instance_of(AssignmentForm).to receive(:add_simicheck_to_delayed_queue).with(attributes[:assignment][:simicheck]).and_return(true)
       allow_any_instance_of(AssignmentForm).to receive(:delete_from_delayed_queue).and_return(true)
-      allow_any_instance_of(AssignmentForm).to receive(:delete_from_scheduled_set).and_return(true)
       allow_any_instance_of(AssignmentForm).to receive(:add_to_delayed_queue).and_return(true)
       expect(assignment_form.update(attributes, user)).to be true
     end

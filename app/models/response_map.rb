@@ -108,7 +108,7 @@ class ResponseMap < ApplicationRecord
     return 0 if maps.empty?
 
     # sorted so that the earliest deadline is at the first
-    sorted_deadlines = DueDate.deadline_sort(DueDate.where(parent_id: assignment_id))
+    sorted_deadlines = DueDate.where(parent_id: assignment_id).sort
     round = 1
     sorted_deadlines.each do |due_date|
       round += 1 if due_date.deadline_type_id == 2 && created_at >= due_date.due_at

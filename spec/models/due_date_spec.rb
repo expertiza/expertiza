@@ -40,7 +40,7 @@ describe 'due_date_functions' do
     sorted_due_dates = @due_dates
     expect(sorted_due_dates.each_cons(2).all? { |m1, m2| (m1.due_at <=> m2.due_at) != 1 }).to eql false
 
-    sorted_due_dates = DueDate.deadline_sort(@due_dates)
+    sorted_due_dates = @due_dates.sort
     expect(sorted_due_dates.each_cons(2).all? { |m1, m2| (m1.due_at <=> m2.due_at) != 1 }).to eql true
   end
 

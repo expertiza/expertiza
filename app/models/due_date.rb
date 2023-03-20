@@ -25,8 +25,4 @@ class DueDate < ApplicationRecord
       1
     end
   end
-
-  def self.deadline_sort(due_dates)
-    due_dates.sort
-  end
 end

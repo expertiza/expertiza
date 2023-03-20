@@ -623,9 +623,10 @@ class Assignment < ApplicationRecord
   end
 
   def get_next_due_date(assignment_id, topic_id = nil)
-    if Assignment.find(assignment_id).staggered_deadline?
+    assignment = Assignment.find(assignment_id)
+    if assignment.staggered_deadline?
       next_due_date = TopicDueDate.find_by(['parent_id = ? and due_at >= ?', topic_id, Time.zone.now])
-      following_assignment_due_dates = get_following_assignment_due_dates(assignment_id, topic_id)
+      upcoming_due_dates_after_topic_date = assignment.upcoming_due_dates_after_topic_date(topic_id)
       # if certion TopicDueDate is not exist, we should query next corresponding AssignmentDueDate.
       # eg. Time.now is 08/28/2016
       # One topic uses following deadlines:
@@ -635,8 +636,8 @@ class Assignment < ApplicationRecord
       # AssignmentDueDate 09/04/2016
       # In this case, we cannot find due_at later than Time.now in TopicDueDate.
       # So we should find next corresponding AssignmentDueDate, starting with the 4th one, not the 1st one!
-      if next_due_date.nil? && following_assignment_due_dates
-        next_due_date = following_assignment_due_dates.detect { |assignment_due_date| assignment_due_date.due_at >= Time.zone.now }
+      if next_due_date.nil? && upcoming_due_dates_after_topic_date
+        next_due_date = upcoming_due_dates_after_topic_date.detect { |assignment_due_date| assignment_due_date.due_at >= Time.zone.now }
       end
     else
       next_due_date = AssignmentDueDate.find_by(['parent_id = ? && due_at >= ?', assignment_id, Time.zone.now])
@@ -644,10 +645,10 @@ class Assignment < ApplicationRecord
     next_due_date
   end
 
-  # Create separate method to get following assignment due dates to follow single responsibility principle
-  def get_following_assignment_due_dates(assignment_id, topic_id = nil)
+  # Create separate method to get next dates after topic dates to follow single responsibility principle
+  def upcoming_due_dates_after_topic_date(topic_id = nil)
     topic_due_date_size = TopicDueDate.where(parent_id: topic_id).size
-    following_assignment_due_dates = AssignmentDueDate.where(parent_id: assignment_id)[topic_due_date_size..-1]
+    upcoming_due_dates_after_topic_date = AssignmentDueDate.where(parent_id: id)[topic_due_date_size..-1]
   end
 
   def current_due_date

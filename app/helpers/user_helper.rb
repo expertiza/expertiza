@@ -1,5 +1,9 @@
 module UserHelper
   def yesorno(elt)
-    return ([true,false].include? elt) ? ( elt ? 'yes' : 'no')  : ''
+    if [true,false].include? elt
+      elt ? 'yes' : 'no'
+    else
+      ''
+    end
   end
 end

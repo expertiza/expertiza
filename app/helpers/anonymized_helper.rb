@@ -1,7 +1,10 @@
+# AnonymizedHelper
 module AnonymizedHelper
   def anonymized_view?(ip_address = nil)
-    anonymized_view_starter_ips = $redis.get('anonymized_view_starter_ips') || ''
-    return true if ip_address && anonymized_view_starter_ips.include?(ip_address)
+    anonymized_view_starter_ips =
+      $redis.get('anonymized_view_starter_ips') || ''
+    return true if ip_address &&
+      anonymized_view_starter_ips.include?(ip_address)
 
     false
   end

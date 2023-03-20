@@ -1,3 +1,4 @@
+# UserHelper module
 module UserHelper
   # User Helper Module
   def yesorno(elt)

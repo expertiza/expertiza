@@ -26,7 +26,7 @@ class AssignmentsController < ApplicationController
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
     if params[:button]
-      # E2138 issue #3
+      # first check if assignment name exists, if not then create new, otherwise don't create new assignment
       find_existing_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
       dir_path = assignment_form_params[:assignment][:directory_path]
       find_existing_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
@@ -34,19 +34,11 @@ class AssignmentsController < ApplicationController
         @assignment_form.create_assignment_node
         exist_assignment = Assignment.find(@assignment_form.assignment.id)
         assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
-        if assignment_form_params[:assignment][:directory_path].blank?
+        if assignment_form_params[:assignment][:directory_path].blank? # No existing assignment for assignment form
           assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
         end
-        ques_array = assignment_form_params[:assignment_questionnaire]
-        due_array = assignment_form_params[:due_date]
-        ques_array.each do |cur_questionnaire|
-          cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
-        end
-        due_array.each do |cur_due|
-          cur_due[:parent_id] = exist_assignment.id.to_s
-        end
-        assignment_form_params[:assignment_questionnaire] = ques_array
-        assignment_form_params[:due_date] = due_array
+        assignment_form_params[:assignment_questionnaire] = assign_questionnaire_array(exist_assignment)
+        assignment_form_params[:due_date] = assign_due_date_array(exist_assignment)
         @assignment_form.update(assignment_form_params, current_user)
         aid = Assignment.find(@assignment_form.assignment.id).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
@@ -127,7 +119,7 @@ class AssignmentsController < ApplicationController
     update_copy_session
     # check new assignment submission directory and old assignment submission directory
     new_assign_id = AssignmentForm.copy(params[:id], @user)
-    if new_assign_id
+    if new_assign_id # id is non-null
       if check_same_directory?(params[:id], new_assign_id)
         flash[:note] = 'Warning: The submission directory for the copy of this assignment will be the same as the submission directory '\
           'for the existing assignment. This will allow student submissions to one assignment to overwrite submissions to the other assignment. '\
@@ -147,7 +139,7 @@ class AssignmentsController < ApplicationController
       user = session[:user]
       # Issue 1017 - allow instructor to delete assignment created by TA.
       # FixA : TA can only delete assignment created by itself.
-      # FixB : Instrucor will be able to delete any assignment belonging to his/her courses.
+      # FixB : Instructor will be able to delete any assignment belonging to his/her courses.
       if (user.role.name == 'Instructor') || ((user.role.name == 'Teaching Assistant') && (user.id == assignment_form.assignment.instructor_id))
         assignment_form.delete(params[:force])
         ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Assignment #{assignment_form.assignment.id} was deleted.", request)
@@ -188,6 +180,7 @@ class AssignmentsController < ApplicationController
     redirect_to list_tree_display_index_path
   end
 
+  # deletes job from queue if delayed.
   def delete_delayed_mailer
     queue = Sidekiq::Queue.new('mailers')
     queue.each do |job|
@@ -315,15 +308,24 @@ class AssignmentsController < ApplicationController
 
   # update assignment_form with assignment_questionnaire and due_date
   def update_assignment_form(exist_assignment)
-    questionnaire_array = assignment_form_params[:assignment_questionnaire]
-    questionnaire_array.each { |cur_questionnaire| cur_questionnaire[:assignment_id] = exist_assignment.id.to_s }
-    assignment_form_params[:assignment_questionnaire]
-    due_array = assignment_form_params[:due_date]
-    due_array.each { |cur_due| cur_due[:parent_id] = exist_assignment.id.to_s }
-    assignment_form_params[:due_date]
+    assignment_form_params[:assignment_questionnaire] = assign_questionnaire_array(exist_assignment)
+    assignment_form_params[:due_date] = assign_due_date_array(exist_assignment)
     @assignment_form.update(assignment_form_params, current_user)
   end
 
+  # creates array of questionnaires
+  def assign_questionnaire_array(exist_assignment)
+    questionnaire_array = assignment_form_params[:assignment_questionnaire]
+    questionnaire_array.each { |cur_questionnaire| cur_questionnaire[:assignment_id] = exist_assignment.id.to_s }
+    questionnaire_array
+  end
+
+  # creates array of due dates
+  def assign_due_date_array(exist_assignment)
+    due_array = assignment_form_params[:due_date]
+    due_array.each { |cur_due| cur_due[:parent_id] = exist_assignment.id.to_s }
+    due_array
+  end
   # helper methods for copy
   # checks if two assignments are in the same directory
   def check_same_directory?(old_id, new_id)
@@ -467,13 +469,19 @@ class AssignmentsController < ApplicationController
     end
   end
 
+  # retrieves all non-blank items of assignment form
   def retrieve_assignment_form
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @assignment_form.assignment.instructor ||= current_user
-    params[:assignment_form][:assignment_questionnaire].reject! do |q|
+    params[:assignment_form][:assignment_questionnaire].reject! do |q| # returns items that exist
       q[:questionnaire_id].empty?
     end
     # Deleting Due date info from table if meta-review is unchecked. - UNITY ID: ralwan and vsreeni
+    delete_table_due_date
+  end
+
+  # remove due dates that are not needed
+  def delete_table_due_date
     @due_date_info = DueDate.where(parent_id: params[:id])
     DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all if params[:metareview_allowed] == 'false'
   end
@@ -504,6 +512,7 @@ class AssignmentsController < ApplicationController
     ExpertizaLogger.info LoggerMessage.new('', session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)
   end
 
+  # checks if assignment and it's participants exist
   def query_participants_and_alert
     assignment = Assignment.find(params[:id])
     if assignment.participants.empty?

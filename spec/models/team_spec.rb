@@ -357,4 +357,12 @@ describe Team do
       expect(Team.export([], 1, { team_name: 'false' }, AssignmentTeam.new)).to eq([['no team', 'no name']])
     end
   end
+
+  describe '.copy_teams_to_collection' do
+    it 'calls copy on each team' do
+      # The team is either a AssignmentTeam or a CourseTeam
+      expect(team).to receive(:copy).with(1)
+      Team.copy_teams_to_collection([team], 1)
+    end
+  end
 end

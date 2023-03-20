@@ -63,11 +63,11 @@ hi_IN:
       show_members: "सभी टीम नंबर दिखाएं"
 
     new:
-      create_teams_for: "टीम्स बनाना फॉर"
+      randomize_teams_for: "टीम्स बनाना फॉर"
       automatically: "खुद ब खुद"
       uses_insofar: "जब असाइनमेंट बनाया गया था, निर्दिष्ट किए गए सदस्यों की संख्या का उपयोग करता है."
       team_size: "टीम का परिमाण:"
-      create_teams: "टीम्स बनाना"
+      randomize_teams: "टीम्स बनाना"
       manually: "मैन्युअल रूप से"
       specify_team_them: "टीम का नाम निर्दिष्ट करें और टीम में सदस्यों को एक एक करके चुने."
       inherit_teams: "पाठ्यक्रम से निहित टीमों "
@@ -565,7 +565,7 @@ hi_IN:
     - शुक्र
     - शनि
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -591,7 +591,7 @@ hi_IN:
       long: "%d %B %Y"
       short: "%d %b"
     month_names:
-    - 
+    -
     - जनवरी
     - फरवरी
     - मार्च

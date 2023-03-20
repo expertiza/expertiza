@@ -269,6 +269,16 @@ class Team < ApplicationRecord
     end
   end
 
+  # E2254 : This method copies a list of teams to another collection.
+  # It is used in the Team model with copy_to_assignment and bequeath_all
+  # to copy teams from assignments to courses and vice versa.
+  # The teams parameter is either a list of CourseTeams or AssignmentTeams.
+  def self.copy_teams_to_collection(teams, recipient_collection_id)
+    teams.each do |team|
+      team.copy(recipient_collection_id)
+    end
+  end
+
   # REFACTOR END:: class methods import export moved from course_team & assignment_team to here
 
   # Create the team with corresponding tree node and given users

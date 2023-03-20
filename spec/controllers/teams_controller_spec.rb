@@ -20,11 +20,12 @@ describe TeamsController do
   describe 'create teams method' do
     context 'when correct parameters are passed' do
       it 'creates teams with random names' do
+        allow(ExpertizaLogger).to receive(:info).and_return(nil)
         allow(Object).to receive_message_chain(:const_get, :find).with(any_args).and_return(assignment1)
         allow(Version).to receive_message_chain(:where, :last).with(any_args).and_return(0.1)
         request_params = { id: assignment1.id, team_size: 2 }
         user_session = { user: instructor, team_type: 'Assignment' }
-        result = get :create_teams, params: request_params, session: user_session
+        result = get :randomize_teams, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(action: 'list', id: assignment1.id)
@@ -153,6 +154,7 @@ describe TeamsController do
     end
     context 'when called and team is not nil and it does not hold a topic' do
       it 'deletes the team' do
+        allow(Waitlist).to receive(:remove_from_waitlists).and_return(nil)
         allow(Team).to receive(:find_by).and_return(team5)
         allow(Object).to receive_message_chain(:const_get, :find).and_return(course1)
         allow(team5).to receive(:destroy).and_return(nil)
@@ -165,26 +167,25 @@ describe TeamsController do
       end
     end
     # this next test is work in progress
-    #     context 'gets called and team is not nil and it holds a topic' do
-    #       it 'it reassigns topic and then deletes the team' do
-    #         allow(Team).to receive(:find_by).and_return(team5)
-    #         allow(Object).to receive_message_chain(:const_get, :find).and_return(course1)
-    #         allow('if').to receive('true'.to_s)
-    #         #controller.instance_variable_set(:@signed_up_team, team5)
-    #         #allow(@signed_up_team).to receive(:==).and_return(1)
-    #         #controller.instance_variable_set(:@signUps, team5)
-    #         #allow(team5).to receive_message_chain(:first, :is_waitlisted).and_return(false)
-    #         #allow(@signed_up_team).to receive_message_chain(:first, :topic_id).and_return(5)
-    #         allow(team5).to receive(:destroy).and_return(nil)
-    #         request_params = {id: 5}
-    #         user_session = {user: instructor, team_type: 'CourseTeam'}
-    #         result = get :delete, params: request_params, session: user_session
-    #         expect(result.status).to eq 302
-    #       end
-    #     end
+    # context 'gets called and team is not nil and it holds a topic' do
+      # it 'it reassigns topic and then deletes the team' do
+        # allow(Team).to receive(:find_by).and_return(team5)
+        # allow(Object).to receive_message_chain(:const_get, :find).and_return(course1)
+        # allow('if').to receive('true'.to_s)
+        # controller.instance_variable_set(:@signed_up_team, team5)
+        # allow(@signed_up_team).to receive(:==).and_return(1)
+        # allow(team5).to receive_message_chain(:first, :is_waitlisted).and_return(false)
+        # allow(@signed_up_team).to receive_message_chain(:first, :topic_id).and_return(5)
+        # allow(team5).to receive(:destroy).and_return(nil)
+        # request_params = {id: 5}
+        # user_session = {user: instructor, team_type: 'CourseTeam'}
+        # result = get :delete, params: request_params, session: user_session
+        # expect(result.status).to eq 302
+      # end
+    # end
   end
 
-  describe 'inherit method' do
+  describe 'copy_to_assignment method' do
     context 'called when assignment belongs to course and team is not empty' do
       it 'copies teams from course to the assignment' do
         allow(Assignment).to receive(:find).and_return(assignment1)
@@ -192,7 +193,7 @@ describe TeamsController do
         allow(course1).to receive(:get_teams).and_return([team5, team6])
         request_params = { id: team5.id }
         user_session = { user: ta }
-        result = get :inherit, params: request_params, session: user_session
+        result = get :copy_to_assignment, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(controller: 'teams', action: 'list', id: assignment1.id)
@@ -204,7 +205,7 @@ describe TeamsController do
         allow(Course).to receive(:find).and_return(course1)
         request_params = { id: team5.id }
         user_session = { user: ta }
-        result = get :inherit, params: request_params, session: user_session
+        result = get :copy_to_assignment, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(controller: 'teams', action: 'list', id: assignment1.id)
@@ -218,20 +219,20 @@ describe TeamsController do
         allow(Course).to receive(:find).and_return(course1)
         request_params = { id: team5.id }
         user_session = { user: ta }
-        result = get :inherit, params: request_params, session: user_session
+        result = get :copy_to_assignment, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(controller: 'teams', action: 'list', id: fasg.id)
       end
     end
   end
-  
+
   describe '#bequeath_all' do
     context 'when the team type is user_session' do
       it 'flashes an error' do
         user_session = {team_type: 'Course', user: ta}
         request_params = { id: team5.id }
-        post :bequeath_all, params: request_params, session: user_session 
+        post :bequeath_all, params: request_params, session: user_session
         expect(flash[:error]).to eq('Invalid team type for bequeathal')
       end
     end

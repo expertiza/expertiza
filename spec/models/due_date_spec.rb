@@ -40,7 +40,7 @@ describe 'due_date_functions' do
     sorted_due_dates = @due_dates
     expect(sorted_due_dates.each_cons(2).all? { |m1, m2| (m1.due_at <=> m2.due_at) != 1 }).to eql false
 
-    sorted_due_dates = DueDate.deadline_sort(@due_dates)
+    sorted_due_dates = @due_dates.sort
     expect(sorted_due_dates.each_cons(2).all? { |m1, m2| (m1.due_at <=> m2.due_at) != 1 }).to eql true
   end
 
@@ -112,21 +112,21 @@ describe 'due_date_functions' do
     expect(DueDate.new.default_permission('review', 'submission_allowed')).to be == DeadlineRight::NO
   end
 
-  describe '#get_following_assignment_due_dates' do
+  describe '#upcoming_due_dates_after_topic_date' do
     it 'no following due dates' do
-      expect(Assignment.new.get_following_assignment_due_dates(@assignment_due_date.parent_id).empty?).to be true
+      expect(Assignment.find(@assignment_due_date.parent_id).upcoming_due_dates_after_topic_date.empty?).to be true
     end
 
     it 'get following assignment due dates' do
       due_date = create(:assignment_due_date, deadline_type: @deadline_type,
                                               submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
                                               review_of_review_allowed_id: @deadline_right.id, due_at: Time.zone.now + 5000)
-      expect(Assignment.new.get_following_assignment_due_dates(due_date.parent_id).first).to be_valid
+      expect(Assignment.find(due_date.parent_id).upcoming_due_dates_after_topic_date.first).to be_valid
     end
 
     it 'following due dates does not exist for staggered deadline' do
       assignment_id = create(:assignment, staggered_deadline: true, name: 'TestAssignment2', directory_path: 'TestAssignment2').id
-      expect(Assignment.new.get_following_assignment_due_dates(assignment_id).empty?).to be true
+      expect(Assignment.find(assignment_id).upcoming_due_dates_after_topic_date.empty?).to be true
     end
 
     it 'following due dates is before Time.now for staggered deadline' do
@@ -134,7 +134,7 @@ describe 'due_date_functions' do
       due_date = create(:topic_due_date, deadline_type: @deadline_type,
                                          submission_allowed_id: @deadline_right, review_allowed_id: @deadline_right,
                                          review_of_review_allowed_id: @deadline_right, due_at: Time.zone.now - 5000, parent_id: assignment_id)
-      expect(Assignment.new.get_following_assignment_due_dates(assignment_id, due_date.parent_id)).to be nil
+      expect(Assignment.find(assignment_id).upcoming_due_dates_after_topic_date(due_date.parent_id)).to be nil
     end
 
     it 'get following due dates from assignment for staggered deadline' do
@@ -142,7 +142,7 @@ describe 'due_date_functions' do
       due_date = create(:assignment_due_date, deadline_type: @deadline_type,
                                               submission_allowed_id: @deadline_right, review_allowed_id: @deadline_right,
                                               review_of_review_allowed_id: @deadline_right, due_at: Time.zone.now + 5000, parent_id: assignment_id)
-      expect(Assignment.new.get_following_assignment_due_dates(assignment_id).first).to be_valid
+      expect(Assignment.find(assignment_id).upcoming_due_dates_after_topic_date.first).to be_valid
     end
   end
 end

@@ -118,6 +118,15 @@ class Participant < ApplicationRecord
     authorization
   end
 
+  def teammate_review_allowed
+    # time when teammate review is allowed
+    due_date = assignment.current_due_date
+    assignment.find_current_stage == 'Finished' ||
+      due_date &&
+        (due_date.teammate_review_allowed_id == 3 ||
+        due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
+  end
+
   # Sort a set of participants based on their user names.
   # Please make sure there is no duplicated participant in this input array.
   # There should be a more beautiful way to handle this, though.  -Yang

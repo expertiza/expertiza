@@ -117,8 +117,7 @@ class UsersController < ApplicationController
     check = User.find_by(name: params[:user][:name])
     if check
       params[:user][:name] = params[:user][:email]
-      flash[:note] = "That username already exists. Username \\
-                      has been set to the user's email address"
+      flash[:note] = "That username already exists.Username has been set to the user's email address"
     end
   end
 
@@ -137,11 +136,10 @@ class UsersController < ApplicationController
 
   def send_welcome_email
     password = @user.reset_password
-    prepared_mail = MailerHelper.send_mail_to_user(@user, 'Your Expertiza account \\
+    prepared_mail = MailerHelper.send_mail_to_user(@user, 'Your Expertiza account \
                 and password have been created.', 'user_welcome', password)
     prepared_mail.deliver
-    flash[:success] = "A new password has been sent \\
-                       to new user's e-mail address."
+    flash[:success] = "A new password has been sent to new user's e-mail address."
   end
 
   def create_questionnaire

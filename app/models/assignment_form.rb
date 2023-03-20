@@ -19,7 +19,6 @@ class AssignmentForm
       @assignment.instructor = @assignment.course.instructor if @assignment.course
       @assignment.max_team_size = DEFAULT_MAX_TEAM_SIZE
     end
-    # set number of required reviews to number allowed
     @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
     @assignment_questionnaires = Array(args[:assignment_questionnaires])
     @due_dates = Array(args[:due_dates])
@@ -36,7 +35,6 @@ class AssignmentForm
     assignment_form
   end
 
-  # determines if an error exists with the assignments weight
   def rubric_weight_error(attributes)
     error = false
     attributes[:assignment_questionnaire].each do |assignment_questionnaire|
@@ -57,7 +55,6 @@ class AssignmentForm
   def update(attributes, user, _vary_by_topic_desired = false)
     @has_errors = false
     has_late_policy = false
-    # checks if the assignment has a late policy
     if attributes[:assignment][:late_policy_id].to_i > 0
       has_late_policy = true
     else
@@ -72,7 +69,6 @@ class AssignmentForm
     # delete the old queued items and recreate new ones if the assignment has late policy.
     if attributes[:due_date] && !@has_errors && has_late_policy
       delete_from_delayed_queue
-      delete_from_scheduled_set
       add_to_delayed_queue
     end
     update_tag_prompt_deployments(attributes[:tag_prompt_deployments])
@@ -109,7 +105,7 @@ class AssignmentForm
         topic_id = attr[:topic_id] if attr.key?(:topic_id)
         duty_id = attr[:duty_id] if attr.key?(:duty_id) # if duty_id is present in the attributes, save it.
         aq = assignment_questionnaire(questionnaire_type, attr[:used_in_round], topic_id, duty_id)
-        if aq.id.nil?  # checks if the assignment questionnaire exists
+        if aq.id.nil?
           unless aq.save
             @errors = @assignment.errors.to_s
             @has_errors = true
@@ -136,7 +132,7 @@ class AssignmentForm
     end
   end
 
-  # is required by answer tagging
+  # s required by answer tagging
   def update_tag_prompt_deployments(attributes)
     unless attributes.nil?
       attributes.each do |key, value|
@@ -144,7 +140,6 @@ class AssignmentForm
         TagPromptDeployment.where(id: value['deleted']).destroy_all if value.key?('deleted')
         next unless value.key?('tag_prompt')
 
-        # update the metadata for tag deployment
         (0..value['tag_prompt'].count - 1).each do |i|
           tag_dep = nil
           if !((value['id'][i] == 'undefined') || (value['id'][i] == 'null') || value['id'][i].nil?)
@@ -176,7 +171,7 @@ class AssignmentForm
     attributes.each do |due_date|
       next if due_date[:due_at].blank?
 
-      # parse the dueDate and convert it to utc before saving it to db
+      # parse the dd and convert it to utc before saving it to db
       # eg. 2015-06-22 12:05:00 -0400
       current_local_time = Time.parse(due_date[:due_at][0..15])
       tz = ActiveSupport::TimeZone[user.timezonepref].tzinfo
@@ -188,12 +183,12 @@ class AssignmentForm
                                             current_local_time.strftime('%S').to_i))
       due_date[:due_at] = utc_time
       if due_date[:id].nil? || due_date[:id].blank?
-        dueDate = AssignmentDueDate.new(due_date)
-        @has_errors = true unless dueDate.save
+        dd = AssignmentDueDate.new(due_date)
+        @has_errors = true unless dd.save
       else
-        dueDate = AssignmentDueDate.find(due_date[:id])
+        dd = AssignmentDueDate.find(due_date[:id])
         # get deadline for review
-        @has_errors = true unless dueDate.update_attributes(due_date)
+        @has_errors = true unless dd.update_attributes(due_date)
       end
       @errors += @assignment.errors.to_s if @has_errors
     end
@@ -216,10 +211,10 @@ class AssignmentForm
     duedates = AssignmentDueDate.where(parent_id: @assignment.id)
     duedates.each do |due_date|
       deadline_type = DeadlineType.find(due_date.deadline_type_id).name
-      diff_between_time_left_and_threshold, min_left = get_time_diff_between_due_date_and_now(due_date)
-      next unless diff_between_time_left_and_threshold > 0
+      diff_btw_time_left_and_threshold, min_left = get_time_diff_btw_due_date_and_now(due_date)
+      next unless diff_btw_time_left_and_threshold > 0
 
-      delayed_job_id = add_delayed_job(@assignment, deadline_type, due_date, diff_between_time_left_and_threshold)
+      delayed_job_id = add_delayed_job(@assignment, deadline_type, due_date, diff_btw_time_left_and_threshold)
       due_date.update_attribute(:delayed_job_id, delayed_job_id)
       # If the deadline type is review, add a delayed job to drop outstanding review
       add_delayed_job(@assignment, 'drop_outstanding_reviews', due_date, min_left) if deadline_type == 'review'
@@ -283,7 +278,6 @@ class AssignmentForm
     default_weight['TeammateReviewQuestionnaire'] = 0
     default_weight['BookmarkRatingQuestionnaire'] = 0
     default_aq = AssignmentQuestionnaire.where(user_id: @assignment.instructor_id, assignment_id: nil, questionnaire_id: nil).first
-    # the default assignment questionnaire limit is 15
     default_limit = if default_aq.blank?
                       15
                     else
@@ -307,14 +301,13 @@ class AssignmentForm
     Object.const_get(questionnaire_type).new
   end
 
-  # determines time left until due date
-  def get_time_diff_between_due_date_and_now(due_date)
+  def get_time_diff_btw_due_date_and_now(due_date)
     due_at = due_date.due_at.to_s(:db)
     Time.parse(due_at)
     due_at = Time.parse(due_at)
     time_left_in_min = find_min_from_now(due_at)
-    diff_between_time_left_and_threshold = time_left_in_min - due_date.threshold * 60
-    [diff_between_time_left_and_threshold, time_left_in_min]
+    diff_btw_time_left_and_threshold = time_left_in_min - due_date.threshold * 60
+    [diff_btw_time_left_and_threshold, time_left_in_min]
   end
 
   # add DelayedJob into queue and return it
@@ -329,10 +322,7 @@ class AssignmentForm
       assignmentId = job.args.first
       job.delete if @assignment.id == assignmentId
     end
-  end
 
-  # Deletes the job with id equal to "delayed_job_id" from the scheduled set
-  def delete_from_scheduled_set
     queue = Sidekiq::ScheduledSet.new
     queue.each do |job|
       assignmentId = job.args.first
@@ -341,9 +331,8 @@ class AssignmentForm
   end
 
   def delete(force = nil)
-    # delete from delayed_jobs queue and scheduled set related to this assignment
+    # delete from delayed_jobs queue related to this assignment
     delete_from_delayed_queue
-    delete_from_scheduled_set
     @assignment.delete(force)
   end
 
@@ -409,10 +398,8 @@ class AssignmentForm
     require_quiz
   end
 
-  # delay similarity check
   def add_simicheck_to_delayed_queue(simicheck_delay)
     delete_from_delayed_queue
-    delete_from_scheduled_set
     if simicheck_delay.to_i >= 0
       duedates = AssignmentDueDate.where(parent_id: @assignment.id)
       duedates.each do |due_date|
@@ -423,9 +410,10 @@ class AssignmentForm
     end
   end
 
-  # similarity check of files
-  def enqueue_simicheck_task(due_date, simicheck_delay)
-    MailWorker.perform_in(find_min_from_now(Time.parse(due_date.due_at.to_s(:db)) + simicheck_delay.to_i.hours).minutes.from_now * 60, @assignment.id, 'compare_files_with_simicheck', due_date.due_at.to_s(:db))
+  def enqueue_simicheck_task(due_date, simicheck_delay_hours_duration)
+    dequeue_time_as_seconds_duration_from_now = DueDate.get_dequeue_time_as_seconds_duration_from_now(due_date, simicheck_delay_hours_duration)
+
+    SimicheckWorker.perform_in(dequeue_time_as_seconds_duration_from_now.to_i, @assignment.id)
   end
 
   # Copies the inputted assignment into new one and returns the new assignment id
@@ -441,7 +429,6 @@ class AssignmentForm
     new_assign.copy_flag = true
     if new_assign.save
       Assignment.record_timestamps = true
-      # create assignment copy
       copy_assignment_questionnaire(old_assign, new_assign, user)
       AssignmentDueDate.copy(old_assign.id, new_assign.id)
       new_assign.create_node
@@ -457,7 +444,6 @@ class AssignmentForm
     new_assign_id
   end
 
-  # creates copy of assignment questionnaire
   def self.copy_assignment_questionnaire(old_assign, new_assign, user)
     old_assign.assignment_questionnaires.each do |aq|
       AssignmentQuestionnaire.create(

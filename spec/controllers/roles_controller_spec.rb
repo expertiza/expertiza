@@ -107,7 +107,7 @@ describe RolesController do
     it 'returns users associated with role' do
       controller.instance_variable_set(:@role, student_role)
       allow(student_role).to receive(:users).and_return([student])
-      expect(controller.foreign).to eq([student])
+      expect(controller.get_roles).to eq([student])
     end
   end
 end

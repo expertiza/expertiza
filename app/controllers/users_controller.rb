@@ -102,7 +102,7 @@ class UsersController < ApplicationController
   def new
     @user = User.new
     @rolename = Role.find_by(name: params[:role])
-    foreign
+    get_roles
   end
   def create
     check_username_availability
@@ -144,7 +144,7 @@ class UsersController < ApplicationController
   end
 
   def handle_user_create_error
-    foreign
+    get_roles
     error_message = ''
     @user.errors.each { |_field, error| error_message << error }
     flash[:error] = error_message
@@ -155,7 +155,7 @@ class UsersController < ApplicationController
   def edit
     @user = User.find(params[:id])
     role
-    foreign
+    get_roles
   end
 
   def update
@@ -198,7 +198,7 @@ class UsersController < ApplicationController
 
   protected
 
-  def foreign
+  def get_roles
     # stores all the roles that are possible
     # when a new user joins or an existing user updates his/her profile they will get to choose
     # from all the roles available

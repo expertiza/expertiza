@@ -650,6 +650,10 @@ class Assignment < ApplicationRecord
     following_assignment_due_dates = AssignmentDueDate.where(parent_id: assignment_id)[topic_due_date_size..-1]
   end
 
+  def current_due_date
+    due_dates.detect { |due_date| due_date.due_at > Time.now }
+  end
+
   private
 
   # returns true if assignment has staggered deadline and topic_id is nil

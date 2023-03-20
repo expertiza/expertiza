@@ -23,7 +23,9 @@ class User < ApplicationRecord
   belongs_to :role
 
   validates :name, presence: true, uniqueness: true, format: { without: /\s/ }
-  validates :email, presence: { message: "can't be blank" }, format: { with: /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, allow_blank: true }
+  validates :email,
+            presence: { message: "can't be blank" },
+            format: { with: /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, allow_blank: true }
   validates :fullname, presence: true
 
   before_validation :randomize_password, if: ->(user) { user.new_record? && user.password.blank? } # AuthLogic
@@ -47,17 +49,16 @@ class User < ApplicationRecord
   end
 
   def can_impersonate?(user)
-    role.super_admin? || teaching_assistant_for?(user) || recursively_parent_of(user)
+    role.super_admin? ||
+    teaching_assistant_for?(user) ||
+    recursively_parent_of(user)
   end
 
-  # def recursively_parent_of(user)
-  #   p = user.parent
-  #   return p == self || recursively_parent_of(p) unless p.nil? || (not p.role.nil? and p.role.super_admin?)
-  #   false
-  # end
   def recursively_parent_of(user)
     p = user.parent
-    return p == self || recursively_parent_of(p) unless p.nil? || (p.role && p.role.super_admin?)
+    return p == self ||
+      recursively_parent_of(p) unless p.nil? ||
+      (p.role && p.role.super_admin?)
     false
   end
 
@@ -113,6 +114,7 @@ class User < ApplicationRecord
   def student?
     role.name == 'Student'
   end
+
   # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
   def email_welcome
     # this will send an account creation notification to user via email.
@@ -149,8 +151,6 @@ class User < ApplicationRecord
     end
     user
   end
-
-
 
   # locate User based on provided login.
   # If user supplies e-mail or name, the
@@ -261,7 +261,10 @@ class User < ApplicationRecord
   end
 
   def teaching_assistant_for?(student)
-    return false unless teaching_assistant? && student && student.role && student.role.name == 'Student'
+    return false unless teaching_assistant? &&
+      student &&
+      student.role &&
+      student.role.name == 'Student'
     # We have to use the Ta object instead of User object
     # because single table inheritance is not currently functioning
     ta = Ta.find(id)

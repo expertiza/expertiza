@@ -1,3 +1,5 @@
+require 'active_support/time_with_zone'
+
 class DueDate < ApplicationRecord
   validate :due_at_is_valid_datetime
   #  has_paper_trail
@@ -116,5 +118,36 @@ class DueDate < ApplicationRecord
       next_due_date = AssignmentDueDate.find_by(['parent_id = ? && due_at >= ?', assignment_id, Time.zone.now])
     end
     next_due_date
+  end
+
+  def self.get_time_diff_btw_due_date_and_now(due_date)
+    due_date_time = to_time(due_date)
+    time_left_in_minutes_duration = find_min_from_now_duration(due_date_time)
+    diff_btw_time_left_and_threshold_minutes_duration = time_left_in_minutes_duration - (due_date.threshold * 60)
+    [diff_btw_time_left_and_threshold_minutes_duration, time_left_in_minutes_duration]
+  end
+
+  def self.get_dequeue_time_as_seconds_duration_from_now(due_date, delay_duration)
+    due_date_time = to_time(due_date)
+    delay_seconds = delay_duration.to_i # ActiveSupport::Duration::to_i returns the duration in seconds
+    dequeue_time = due_date_time + delay_seconds
+    find_seconds_from_now_duration(dequeue_time)
+  end
+
+  private
+
+  def self.find_min_from_now_duration(due_at_time)
+    find_seconds_from_now_duration(due_at_time).to_i / 60
+  end
+
+  def self.find_seconds_from_now_duration(due_at_time)
+    current_datetime = DateTime.now.in_time_zone.to_s(:db)
+    current_time = Time.parse(current_datetime)
+
+    due_at_time - current_time
+  end
+
+  def self.to_time(due_date)
+    Time.parse(due_date.due_at.to_s(:db))
   end
 end

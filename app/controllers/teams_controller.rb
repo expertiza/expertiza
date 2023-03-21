@@ -7,10 +7,27 @@ class TeamsController < ApplicationController
     current_user_has_ta_privileges?
   end
 
+  # attempt to initialize team type in session
+  def init_team_type(type)
+    if type && Team.allowed_types.include?(type)
+      session[:team_type] = type
+    end
+  end
+
+  # retrieve an object's parent by its ID
+  def parent_by_id(id)
+    Object.const_get(session[:team_type]).find(id)
+  end
+
+  # retrieve an object's parent from the object's parent ID
+  def parent_from_child(child)
+    Object.const_get(session[:team_type]).find(child.parent_id)
+  end
+
   # This function is used to create teams with random names.
   # Instructors can call by clicking "Create teams" icon and then click "Create teams" at the bottom.
   def create_teams
-    parent = Object.const_get(session[:team_type]).find(params[:id])
+    parent = parent_by_id(params[:id])
     Team.randomize_all_by_parent(parent, session[:team_type], params[:team_size].to_i)
     undo_link('Random teams have been successfully created.')
     ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Random teams have been successfully created', request)
@@ -18,9 +35,9 @@ class TeamsController < ApplicationController
   end
 
   def list
-    allowed_types = %w[Assignment Course]
-    session[:team_type] = params[:type] if params[:type] && allowed_types.include?(params[:type])
-    @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == 'Assignment'
+    init_team_type(params[:type])
+    @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == Team.allowed_types[0]
+    @is_valid_assignment = session[:team_type] == Team.allowed_types[0] && @assignment.max_team_size > 1
     begin
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
@@ -30,12 +47,13 @@ class TeamsController < ApplicationController
   end
 
   def new
-    @parent = Object.const_get(session[:team_type] ||= 'Assignment').find(params[:id])
+    init_team_type(Team.allowed_types[0]) unless session[:team_type]
+    @parent = Object.const_get(session[:team_type]).find(params[:id])
   end
 
   # called when a instructor tries to create an empty team manually.
   def create
-    parent = Object.const_get(session[:team_type]).find(params[:id])
+    parent = parent_by_id(params[:id])
     begin
       Team.check_for_existing(parent, params[:team][:name], session[:team_type])
       @team = Object.const_get(session[:team_type] + 'Team').create(name: params[:team][:name], parent_id: parent.id)
@@ -50,7 +68,7 @@ class TeamsController < ApplicationController
 
   def update
     @team = Team.find(params[:id])
-    parent = Object.const_get(session[:team_type]).find(@team.parent_id)
+    parent = parent_from_child(@team.parent_id)
     begin
       Team.check_for_existing(parent, params[:team][:name], session[:team_type])
       @team.name = params[:team][:name]

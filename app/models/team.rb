@@ -11,6 +11,12 @@ class Team < ApplicationRecord
     joins(:teams_users).where('teams.parent_id = ? AND teams_users.user_id = ?', assignment_id, user_id)
   }
 
+  # Allowed types of teams -- ASSIGNMENT teams or COURSE teams
+  def self.allowed_types
+    # non-interpolated array of single-quoted strings
+    %w[Assignment Course]
+  end
+
   # Get the participants of the given team
   def participants
     users.where(parent_id: parent_id || current_user_id).flat_map(&:participants)

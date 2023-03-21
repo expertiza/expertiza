@@ -102,7 +102,7 @@ describe Team do
           allow_any_instance_of(Team).to receive(:full?).and_return(false)
           allow(TeamsUser).to receive(:create).with(user_id: 1, team_id: 1).and_return(team_user)
           allow(TeamNode).to receive(:find_by).with(node_object_id: 1).and_return(double('TeamNode', id: 1))
-          allow_any_instance_of(Team).to receive(:add_participant).with(1, user).and_return(participant)
+          allow_any_instance_of(Team).to receive(:add_participant).with(1, user).and_return(double('Participant'))
           expect(team.add_member(user)).to be true
         end
       end

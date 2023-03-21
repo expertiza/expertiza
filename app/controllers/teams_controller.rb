@@ -109,7 +109,7 @@ class TeamsController < ApplicationController
         flash[:note] = 'No teams were found when trying to inherit.'
       else
         teams.each do |team|
-          team.copy(assignment.id)
+          team.copy_to_assignment_team(assignment.id)
         end
       end
     else

@@ -53,11 +53,11 @@ class AssignmentForm
     error
   end
 
-  # update assignment attributes in db after editing, fixes queue if due date changed
+  # update assignment attributes in db after editing, resets queue if due date is changed
   def update(attributes, user, _vary_by_topic_desired = false)
     @has_errors = false
     has_late_policy = false
-    if attributes[:assignment][:late_policy_id].to_i > 0
+    if attributes.dig(:assignment,:late_policy_id).to_i > 0
       has_late_policy = true
     else
       attributes[:assignment][:late_policy_id] = nil
@@ -238,22 +238,23 @@ class AssignmentForm
 
     # Default value of duty_id is nil, and when duty_id is not nil, then it means that the function call
     # is made to access assignment_questionnaire of that particular duty.
-    if duty_id && @assignment.questionnaire_varies_by_duty
+    case
+    when duty_id && @assignment.questionnaire_varies_by_duty
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, duty_id: duty_id)
       assignment_questionnaires.each do |aq|
         return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
       end
-    elsif @assignment.vary_by_round? && @assignment.vary_by_topic?
+    when @assignment.vary_by_round? && @assignment.vary_by_topic?
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number, topic_id: topic_id)
       assignment_questionnaires.each do |aq|
         return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
       end
-    elsif @assignment.vary_by_round?
+    when @assignment.vary_by_round?
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number)
       assignment_questionnaires.each do |aq|
         return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
       end
-    elsif @assignment.vary_by_topic?
+    when @assignment.vary_by_topic?
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, topic_id: topic_id)
       assignment_questionnaires.each do |aq|
         return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
@@ -265,14 +266,20 @@ class AssignmentForm
       end
     end
 
-    # Create a new AQ if it was not found based on the attributes
+    # return a default AQ if it was not found based on the attributes
+    default_assignment_questionnaire(questionnaire_type, @assignment)
+  end
+
+  # Creates a default questionnaire given type and assignment
+  def default_assignment_questionnaire(questionnaire_type, assignment)
     default_weight = {}
     default_weight['ReviewQuestionnaire'] = 100
     default_weight['MetareviewQuestionnaire'] = 0
     default_weight['AuthorFeedbackQuestionnaire'] = 0
     default_weight['TeammateReviewQuestionnaire'] = 0
     default_weight['BookmarkRatingQuestionnaire'] = 0
-    default_aq = AssignmentQuestionnaire.where(user_id: @assignment.instructor_id, assignment_id: nil, questionnaire_id: nil).first
+
+    default_aq = AssignmentQuestionnaire.where(user_id: assignment.instructor_id, assignment_id: nil, questionnaire_id: nil).first
     default_limit = if default_aq.blank?
                       15
                     else
@@ -282,7 +289,8 @@ class AssignmentForm
     aq = AssignmentQuestionnaire.new
     aq.questionnaire_weight = default_weight[questionnaire_type]
     aq.notification_limit = default_limit
-    aq.assignment = @assignment
+    aq.assignment = assignment
+
     aq
   end
 

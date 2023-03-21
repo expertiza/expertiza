@@ -8,10 +8,52 @@ class AuthController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'login', 'logout', 'login_failed'
+    when 'login', 'logout', 'login_failed', 'google_login', 'oauth_login'
       true
     else
       current_user_has_super_admin_privileges?
+    end
+  end
+
+  # Spring 2023, E2300
+  # Uses oauth protocol to attempt to authorize user for either google or Github
+  def oauth_login
+    case params[:provider]
+    when "github"
+      github_login
+    when "google_oauth2"
+      google_login
+    when "github2021" # due to  github https://developer.github.com/changes/2020-02-10-deprecating-auth-through-query-param/
+      custom_github_login
+    else
+      ExpertizaLogger.error LoggerMessage.new(controller_name, user.name, "Invalid OAuth Provider", "")
+    end
+  end
+
+
+  # new method to satisfy the change of the auth
+  def custom_github_login
+    session_code = request.env['rack.request.query_hash']['code']
+    result = RestClient.post('https://github.com/login/oauth/access_token',
+                               {:client_id => GITHUB_CONFIG['client_key'],
+                                :client_secret => GITHUB_CONFIG['client_secret'],
+                                :code => session_code},
+                               :accept => :json)
+    access_token = JSON.parse(result)['access_token']
+    session["github_access_token"] = access_token
+    redirect_to controller: 'assignments', action: 'list_submissions', id: session["assignment_id"]
+  end
+
+
+
+  # Spring 2023, E2300
+  # Login functionality for Github login feature using omniAuth2
+  def github_login
+    session["github_access_token"] = env['omniauth.auth']["credentials"]["token"]
+    if session["github_view_type"] == "view_submissions"
+      redirect_to controller: 'assignments', action: 'list_submissions', id: session["assignment_id"]
+    elsif session["github_view_type"] == "view_scores"
+      redirect_to view_grades_path(id: session["assignment_id"])
     end
   end
 
@@ -78,6 +120,11 @@ class AuthController < ApplicationController
     session[:assignment_id] = nil
     session[:original_user] = nil
     session[:impersonate] = nil
+  end
+
+  def google_login
+    g_email = env['omniauth.auth'].info.email
+    end
   end
 
   # clears any identifying info from session

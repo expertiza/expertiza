@@ -4,7 +4,7 @@ class StudentQuizzesController < ApplicationController
   def action_allowed?
     if current_user_is_a? 'Student'
       if action_name.eql? 'index'
-        return are_needed_authorizations_present?(params[:id], "reviewer", "submitter")
+        are_needed_authorizations_present?(params[:id], 'reviewer', 'submitter')
       else
         true
       end
@@ -16,6 +16,7 @@ class StudentQuizzesController < ApplicationController
   def index
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
+
     @assignment = Assignment.find(@participant.parent_id)
     @quiz_mappings = QuizResponseMap.mappings_for_reviewer(@participant.id)
   end
@@ -39,6 +40,7 @@ class StudentQuizzesController < ApplicationController
       reviewee_id = team_response_map_record.reviewee_id
       reviewee_team = Team.find(reviewee_id) # reviewees should always be teams
       next unless reviewee_team.parent_id == assignment_id
+
       quiz_questionnaire = QuizQuestionnaire.where(instructor_id: reviewee_team.id).first
 
       # if the reviewee team has created quiz
@@ -90,7 +92,7 @@ class StudentQuizzesController < ApplicationController
       redirect_to controller: 'student_quizzes', action: 'finished_quiz', map_id: map.id
     else
       response.destroy
-      flash[:error] = "Please answer every question."
+      flash[:error] = 'Please answer every question.'
       redirect_to action: :take_quiz, assignment_id: params[:assignment_id], questionnaire_id: questionnaire.id, map_id: map.id
     end
   end
@@ -107,7 +109,7 @@ class StudentQuizzesController < ApplicationController
 
       calculate_score map, response
     else
-      flash[:error] = "You have already taken this quiz, below are the records for your responses."
+      flash[:error] = 'You have already taken this quiz, below are the records for your responses.'
       redirect_to controller: 'student_quizzes', action: 'finished_quiz', map_id: map.id
     end
   end

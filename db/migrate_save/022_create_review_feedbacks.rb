@@ -1,11 +1,11 @@
-class CreateReviewFeedbacks < ActiveRecord::Migration
+class CreateReviewFeedbacks < ActiveRecord::Migration[4.2]
   def self.up
     create_table :review_feedbacks do |t|
       # Note: Table name pluralized by convention.  Do *NOT* refer to "feedbacks" in any documentation!
-      t.column :assignment_id, :integer  # the assignment to which this feedback pertains.
-      t.column :review_id, :integer  # the review to which this feedback pertains; if it is null, the feedback is general, for all reviewers.
+      t.column :assignment_id, :integer # the assignment to which this feedback pertains.
+      t.column :review_id, :integer # the review to which this feedback pertains; if it is null, the feedback is general, for all reviewers.
       t.column :user_id, :integer # ID of the user making the feedback.  Typically this will be the author of the submission, but it may be, e.g., the instructor or TA.
-      t.column :feedback_at, :datetime  # time that the feedback was saved
+      t.column :feedback_at, :datetime # time that the feedback was saved
       t.column :txt, :text
     end
     execute "alter table review_feedbacks

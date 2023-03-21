@@ -16,7 +16,11 @@ class StudentTask
       assignment: participant.assignment,
       topic: participant.topic,
       current_stage: participant.current_stage,
-      stage_deadline: (Time.parse(participant.stage_deadline) rescue Time.now + 1.year)
+      stage_deadline: (begin
+                         Time.parse(participant.stage_deadline)
+                       rescue StandardError
+                         Time.now + 1.year
+                       end)
     )
   end
 
@@ -25,7 +29,7 @@ class StudentTask
   end
 
   def self.from_user(user)
-    user.assignment_participants.map do |participant|
+    user.assignment_participants.includes(%i[assignment topic]).map do |participant|
       StudentTask.from_participant participant
     end.sort_by(&:stage_deadline)
   end
@@ -39,7 +43,7 @@ class StudentTask
   end
 
   def content_submitted_in_current_stage?
-    current_stage == "submission" && hyperlinks.present?
+    current_stage == 'submission' && hyperlinks.present?
   end
 
   delegate :course, to: :assignment
@@ -53,7 +57,7 @@ class StudentTask
   end
 
   def metareviews_given?
-    response_maps.inject(nil) {|i, j| i || (j.response && j.class.to_s[/Metareview/]) }
+    response_maps.inject(nil) { |i, j| i || (j.response && j.class.to_s[/Metareview/]) }
   end
 
   def metareviews_given_in_current_stage?
@@ -72,7 +76,7 @@ class StudentTask
   delegate :response_maps, to: :participant
 
   def reviews_given?
-    response_maps.inject(nil) {|i, j| i || (j.response && j.class.to_s[/Review/]) }
+    response_maps.inject(nil) { |i, j| i || (j.response && j.class.to_s[/Review/]) }
   end
 
   def reviews_given_in_current_stage?
@@ -103,15 +107,17 @@ class StudentTask
       next unless team.is_a?(AssignmentTeam)
       # Teammates in calibration assignment should not be counted in teaming requirement.
       next if Assignment.find_by(id: team.parent_id).is_calibrated
+
       teammates = []
       course_id = Assignment.find_by(id: team.parent_id).course_id
-      team_participants = Team.find(team.id).participants.reject {|p| p.name == user.name }
-      team_participants.each {|p| teammates << p.user.fullname(ip_address) }
+      team_participants = Team.find(team.id).participants.reject { |p| p.name == user.name }
+      team_participants.each { |p| teammates << p.user.fullname(ip_address) }
       next if teammates.empty?
+
       if students_teamed[course_id].nil?
         students_teamed[course_id] = teammates
       else
-        teammates.each {|teammate| students_teamed[course_id] << teammate }
+        teammates.each { |teammate| students_teamed[course_id] << teammate }
       end
       students_teamed[course_id].uniq! if students_teamed.key?(course_id)
     end
@@ -120,7 +126,7 @@ class StudentTask
 
   def self.get_due_date_data(assignment, timeline_list)
     assignment.due_dates.each do |dd|
-      timeline = {label: (dd.deadline_type.name + ' Deadline').humanize}
+      timeline = { label: (dd.deadline_type.name + ' Deadline').humanize }
       unless dd.due_at.nil?
         timeline[:updated_at] = dd.due_at.strftime('%a, %d %b %Y %H:%M')
         timeline_list << timeline
@@ -143,6 +149,7 @@ class StudentTask
     ReviewResponseMap.where(reviewer_id: participant_id).find_each do |rm|
       response = Response.where(map_id: rm.id).last
       next if response.nil?
+
       timeline = {
         id: response.id,
         label: ('Round ' + response.round.to_s + ' Peer Review').humanize,
@@ -156,6 +163,7 @@ class StudentTask
     FeedbackResponseMap.where(reviewer_id: participant_id).find_each do |rm|
       response = Response.where(map_id: rm.id).last
       next if response.nil?
+
       timeline = {
         id: response.id,
         label: 'Author feedback',
@@ -166,12 +174,12 @@ class StudentTask
   end
 
   # static method for the building timeline data
-  def self.get_timeline_data(assignment, participant, team)
+  def self.get_timeline_data(assignment, participant, _team)
     timeline_list = []
     get_due_date_data(assignment, timeline_list)
-    get_submission_data(assignment.try(:id), team.try(:id), timeline_list)
+    # get_submission_data(assignment.try(:id), team.try(:id), timeline_list)
     get_peer_review_data(participant.get_reviewer.try(:id), timeline_list)
     get_author_feedback_data(participant.try(:id), timeline_list)
-    timeline_list.sort_by {|f| Time.zone.parse f[:updated_at] }
+    timeline_list.sort_by { |f| Time.zone.parse f[:updated_at] }
   end
 end

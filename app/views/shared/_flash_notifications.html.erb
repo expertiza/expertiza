@@ -1,7 +1,7 @@
 <%# this page will display the notifications as a flash message Randal Myers, 22 March 2017 %>
 
 <% course_ids = [] %>
-<% current_user.participants.each{|p| course_ids << p.assignment.course.id if p.assignment and p.assignment.course} %>
+<% current_user.participants.includes(:assignment, assignment: [:course]).each{|p| course_ids << p.assignment.course.id if p.assignment && p.assignment.course} %>
 <% notifications = Notification.where(course_id: course_ids.uniq, active_flag: true) %>
 <% if notifications %>
   <% notifications.each do |notification| %>

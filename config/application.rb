@@ -1,8 +1,7 @@
-require File.expand_path('../boot', __FILE__)
+require File.expand_path('boot', __dir__)
 require 'net/https'
 require 'csv'
 require 'rails/all'
-
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -10,24 +9,23 @@ Bundler.require(*Rails.groups)
 
 module Expertiza
   class Application < Rails::Application
-
-    #This is a logger to capture internal server errors that do not show up when testing javascript. Look in log/diagnostic.txt when there is a 500 error.
+    # This is a logger to capture internal server errors that do not show up when testing javascript. Look in log/diagnostic.txt when there is a 500 error.
     if Rails.env == 'test'
-      require File.expand_path("../diagnostic.rb", __FILE__)
+      require File.expand_path('diagnostic.rb', __dir__)
       config.middleware.use(MyApp::DiagnosticMiddleware)
     end
     # Do not access db or load models while precompiling
     config.assets.initialize_on_precompile = false
     config.time_zone = 'UTC'
-    #setting the default ssl setting to false
+    # setting the default ssl setting to false
     config.use_ssl = false
     # Configure the default encoding used in templates for Ruby 1.9.
     config.encoding = "utf-8"
     #When you are ready, you can opt into the new behavior and remove the deprecation warning by adding following configuration to your config/application.rb
-    config.active_record.raise_in_transactional_callbacks = true
+    #config.active_record.raise_in_transactional_callbacks = true
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password, :password_confirmation, :password, :password_confirmation]
-    config.active_record.whitelist_attributes = false
+    # config.active_record.whitelist_attributes = false # need protected_attributes gem
     config.autoload_paths << Rails.root.join('lib', '{**}')
     config.eager_load_paths << Rails.root.join('lib')
     config.react.addons = true
@@ -39,7 +37,7 @@ module Expertiza
       config.assets.paths << bower_path
     end
     # Precompile Bootstrap fonts
-    config.assets.precompile << %r(bootstrap-sass/assets/fonts/bootstrap/[\w-]+\.(?:eot|svg|ttf|woff2?)$)
+    config.assets.precompile << %r{bootstrap-sass/assets/fonts/bootstrap/[\w-]+\.(?:eot|svg|ttf|woff2?)$}
     # Minimum Sass number precision required by bootstrap-sass
     ::Sass::Script::Value::Number.precision = [8, ::Sass::Script::Value::Number.precision].max
   end
@@ -58,12 +56,11 @@ module Expertiza
       # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
 
       # Languages for the application
-      config.i18n.available_locales = [:en_US, :hi_IN]
+      config.i18n.available_locales = %i[en_US hi_IN]
       config.i18n.default_locale = :en_US # english
 
       # Do not swallow errors in after_commit/after_rollback callbacks.
-      config.active_record.raise_in_transactional_callbacks = true
+      # config.active_record.raise_in_transactional_callbacks = true
     end
   end
-
 end

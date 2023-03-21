@@ -31,14 +31,14 @@ describe Locale do
 
   describe '#code_name_to_db_encoding' do
     it 'correctly produces a mapping between the code_name and the db_encoding' do
-      expect(Locale.code_name_to_db_encoding([no_pref_locale])).to eq({ no_pref: 0 })
+      expect(Locale.code_name_to_db_encoding([no_pref_locale])).to eq(no_pref: 0)
     end
   end
 
   describe '#tabulate' do
     it 'produces a 2D array with rows corresponding to the given array and columns corresponding to the given fields' do
       expect(Locale.tabulate([no_pref_locale, Locale.new(:asd, 'Asd', 12)],
-                             [:display_name, :code_name])).to eq([['No Preference', :no_pref], ['Asd', :asd]])
+                             %i[display_name code_name])).to eq([['No Preference', :no_pref], ['Asd', :asd]])
     end
   end
 end

@@ -1,7 +1,7 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
-ENV["RAILS_ENV"] ||= 'test'
+ENV['RAILS_ENV'] ||= 'test'
 require 'spec_helper'
-require File.expand_path("../../config/environment", __FILE__)
+require File.expand_path('../config/environment', __dir__)
 require 'rspec/rails'
 require 'capybara/rspec'
 require 'capybara/rails'
@@ -14,7 +14,7 @@ require 'shoulda-matchers'
 # run twice. It is recommended that you do not name files matching this glob to
 # end with _spec.rb. You can configure this pattern with the --pattern
 # option on the command line or in ~/.rspec, .rspec or `.rspec-local`.
-Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f }
+Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 
 # Checks for pending migrations before tests are run.
 # If you are not using ActiveRecord, you can remove this line.
@@ -59,7 +59,7 @@ RSpec.configure do |config|
   def login_as(user_name)
     user = User.find_by(name: user_name)
     msg = user.to_yaml
-    File.open('log/diagnostic.txt', 'a') {|f| f.write msg }
+    File.open('log/diagnostic.txt', 'a') { |f| f.write msg }
 
     visit root_path
     fill_in 'login_name', with: user_name
@@ -71,11 +71,11 @@ RSpec.configure do |config|
   def login_as_other_user(user_name)
     # user =  User.find_by(name: user_name)
     login_as(user_name)
-    click_link "Home"
+    click_link 'Home'
     end
 
   def logout
-    click_link "Logout"
+    click_link 'Logout'
   end
 
   def stub_current_user(current_user, current_role_name = 'Student', current_role)
@@ -92,20 +92,20 @@ RSpec.configure do |config|
 
   def http_status_factory(status_code)
     if status_code == 200
-      Net::HTTPSuccess.new(1.0, 200, "OK")
+      Net::HTTPSuccess.new(1.0, 200, 'OK')
     elsif status_code == 500
-      Net::HTTPServerError.new(1.0, 500, "Internal Server Error")
+      Net::HTTPServerError.new(1.0, 500, 'Internal Server Error')
     else
       raise ArgumentError
     end
   end
 
   def http_mock_wrap_text(text)
-    "<head></head><body>" + text + "</body>"
+    '<head></head><body>' + text + '</body>'
   end
 
   def http_mock_success_text(add_html)
-    text = "Success"
+    text = 'Success'
     if add_html
       http_mock_wrap_text(text)
     else
@@ -114,7 +114,7 @@ RSpec.configure do |config|
   end
 
   def http_mock_error_text(add_html)
-    text = "Error"
+    text = 'Error'
     if add_html
       http_mock_wrap_text(text)
     else
@@ -155,4 +155,3 @@ Shoulda::Matchers.configure do |config|
     with.library :rails
   end
 end
-

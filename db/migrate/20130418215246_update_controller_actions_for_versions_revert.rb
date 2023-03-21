@@ -1,4 +1,4 @@
-class UpdateControllerActionsForVersionsRevert < ActiveRecord::Migration
+class UpdateControllerActionsForVersionsRevert < ActiveRecord::Migration[4.2]
   def self.up
     @permission = Permission.find_by_name('public actions - execute')
     @controller = SiteController.find_by_name('versions')
@@ -10,6 +10,5 @@ class UpdateControllerActionsForVersionsRevert < ActiveRecord::Migration
     Role.rebuild_cache
   end
 
-  def self.down
-  end
+  def self.down; end
 end

@@ -1,13 +1,13 @@
 describe LotteryController do
-  let(:assignment) { create(:assignment, is_intelligent: true, name: "assignment", directory_path:"assignment") }
-  let(:assignment_2) { create(:assignment, is_intelligent: false, name: "assignment_2", directory_path:"assignment_2") }
+  let(:assignment) { create(:assignment, is_intelligent: true, name: 'assignment', directory_path: 'assignment') }
+  let(:assignment_2) { create(:assignment, is_intelligent: false, name: 'assignment_2', directory_path: 'assignment_2') }
 
-  let(:student1) { create(:student, name: "student1") }
-  let(:student2) { create(:student, name: "student2") }
-  let(:student3) { create(:student, name: "student3") }
-  let(:student4) { create(:student, name: "student4") }
-  let(:student5) { create(:student, name: "student5") }
-  let(:student6) { create(:student, name: "student6") }
+  let(:student1) { create(:student, name: 'student1') }
+  let(:student2) { create(:student, name: 'student2') }
+  let(:student3) { create(:student, name: 'student3') }
+  let(:student4) { create(:student, name: 'student4') }
+  let(:student5) { create(:student, name: 'student5') }
+  let(:student6) { create(:student, name: 'student6') }
 
   let(:topic1) { create(:topic, assignment_id: assignment.id) }
   let(:topic2) { create(:topic, assignment_id: assignment.id) }
@@ -55,8 +55,8 @@ describe LotteryController do
     @sign_up_topics = assignment.sign_up_topics
   end
 
-  describe "#action_allowed?" do
-    it "allows Instructors, Teaching Assistants, Administrators to run the bid" do
+  describe '#action_allowed?' do
+    it 'allows Instructors, Teaching Assistants, Administrators to run the bid' do
       session[:user] = build(:instructor)
       expect(controller.action_allowed?).to be true
       session[:user] = build(:teaching_assistant)
@@ -64,7 +64,7 @@ describe LotteryController do
       session[:user] = build(:admin)
       expect(controller.action_allowed?).to be true
     end
-    it "does not allow Students or Visitors to run the bid" do
+    it 'does not allow Students or Visitors to run the bid' do
       session[:user] = student1
       expect(controller.action_allowed?).to be false
       session[:user] = nil
@@ -72,20 +72,20 @@ describe LotteryController do
     end
   end
 
-  describe "#construct_users_bidding_info" do
-    it "generate users bidding information hash" do
+  describe '#construct_users_bidding_info' do
+    it 'generate users bidding information hash' do
       # Only members in assignment_team1 and assignment_team2 are involved in the bidding process
-      @expected_users_bidding_info = [{pid: student1.id, ranks: [1, 0, 0, 3]},
-                                      {pid: student2.id, ranks: [1, 0, 0, 3]},
-                                      {pid: student3.id, ranks: [1, 0, 0, 3]},
-                                      {pid: student4.id, ranks: [0, 2, 5, 1]}]
+      @expected_users_bidding_info = [{ pid: student1.id, ranks: [1, 0, 0, 3] },
+                                      { pid: student2.id, ranks: [1, 0, 0, 3] },
+                                      { pid: student3.id, ranks: [1, 0, 0, 3] },
+                                      { pid: student4.id, ranks: [0, 2, 5, 1] }]
       users_bidding_info = controller.send(:construct_users_bidding_info, @sign_up_topics, @teams)
       expect(users_bidding_info).to eq(@expected_users_bidding_info)
     end
   end
 
-  describe "#create_new_teams_for_bidding_response" do
-    it "create new Assignment Teams" do
+  describe '#create_new_teams_for_bidding_response' do
+    it 'create new Assignment Teams' do
       user_bidding_info = []
       teams = [[student1.id, student2.id], [student3.id]]
       expect(AssignmentTeam.count).to eq(4)
@@ -100,40 +100,40 @@ describe LotteryController do
     end
   end
 
-  describe "#run_intelligent_assignment" do
+  describe '#run_intelligent_assignment' do
     before :each do
       session[:user] = build(:instructor)
       params = ActionController::Parameters.new(id: assignment.id)
       allow(controller).to receive(:params).and_return(params)
-      allow(controller).to receive(:redirect_to).with(controller: 'tree_display', action: "list")
+      allow(controller).to receive(:redirect_to).with(controller: 'tree_display', action: 'list')
     end
-    context "with valid assignment id" do
-      it "should not set any error message in the flash" do
+    context 'with valid assignment id' do
+      it 'should not set any error message in the flash' do
         controller.run_intelligent_assignment
         expect(controller).not_to set_flash[:error]
       end
-      it "should redirect to list action in tree_display controller" do
-        expect(controller).to receive(:redirect_to).with(controller: 'tree_display', action: "list")
+      it 'should redirect to list action in tree_display controller' do
+        expect(controller).to receive(:redirect_to).with(controller: 'tree_display', action: 'list')
         controller.run_intelligent_assignment
       end
     end
-    context "with no participants" do
+    context 'with no participants' do
       before :each do
         allow(controller).to receive(:construct_users_bidding_info).and_return([])
       end
-      it "should set error message in the flash" do
+      it 'should set error message in the flash' do
         controller.run_intelligent_assignment
         expect(controller).to set_flash[:error]
       end
-      it "should redirect to list action in tree_display controller" do
-        expect(controller).to receive(:redirect_to).with(controller: 'tree_display', action: "list")
+      it 'should redirect to list action in tree_display controller' do
+        expect(controller).to receive(:redirect_to).with(controller: 'tree_display', action: 'list')
         controller.run_intelligent_assignment
       end
     end
   end
 
-  describe "#construct_teams_bidding_info" do
-    it "should generate teams bidding info hash based on newly created teams" do
+  describe '#construct_teams_bidding_info' do
+    it 'should generate teams bidding info hash based on newly created teams' do
       unassigned_teams = [assignment_team1, assignment_team2]
       sign_up_topics = [topic1, topic2]
       teams_bidding_info = controller.send(:construct_teams_bidding_info, unassigned_teams, sign_up_topics)
@@ -141,8 +141,8 @@ describe LotteryController do
     end
   end
 
-  describe "#match_new_teams_to_topics" do
-    it "assigns topics to teams" do
+  describe '#match_new_teams_to_topics' do
+    it 'assigns topics to teams' do
       expect(assignment_2.is_intelligent).to eq(false)
       controller.send(:match_new_teams_to_topics, assignment_2)
       expect(assignment_2.is_intelligent).to eq(false)
@@ -157,10 +157,10 @@ describe LotteryController do
     end
   end
 
-  describe "#assign_available_slots" do
-    it "should assign topic to team of biggest size" do
-      topic_bids = [{topic_id: topic1.id, priority: 1}]
-      teams_bidding_info = [{team_id: assignment_team1.id, bids: topic_bids}]
+  describe '#assign_available_slots' do
+    it 'should assign topic to team of biggest size' do
+      topic_bids = [{ topic_id: topic1.id, priority: 1 }]
+      teams_bidding_info = [{ team_id: assignment_team1.id, bids: topic_bids }]
       number_of_signed_up_teams = SignedUpTeam.count
       controller.send(:assign_available_slots, teams_bidding_info)
       expect(SignedUpTeam.count).to eq(number_of_signed_up_teams + 1)

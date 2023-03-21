@@ -2,9 +2,9 @@ require 'spec_helper'
 require 'rails_helper'
 
 describe ReviewMappingHelper, type: :helper do
-  let(:team){build(:assignment_team, id:1)}
-  let(:test_item) {build(:answer, id:1, comments: "https://wiki.archlinux.org/")}
-  let(:test_response){build(:response, id:1)}
+  let(:team) { build(:assignment_team, id: 1) }
+  let(:test_item) { build(:answer, id: 1, comments: 'https://wiki.archlinux.org/') }
+  let(:test_response) { build(:response, id: 1) }
   describe 'get_team_color' do
     before(:each) do
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
@@ -156,8 +156,8 @@ describe ReviewMappingHelper, type: :helper do
       @response_map = create(:review_response_map, reviewer: @reviewer)
     end
 
-    #one round, no response
-    it 'should return false if response wasnt submitted in every round' do
+    # one round, no response
+    it 'should return false if response was not submitted in every round' do
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
 
@@ -166,7 +166,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(check_response).to eq(false)
     end
 
-    #one round, one response
+    # one round, one response
     it 'should return true if there is one response with one round' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -184,7 +184,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(check_response).to eq(true)
     end
 
-    #two round,two response
+    # two round,two response
     it 'should return true if there were both response' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -206,7 +206,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(check_response).to eq(true)
     end
 
-    #two round, only have first response
+    # two round, only have first response
     it 'should return false if only have first response' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -227,7 +227,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(check_response).to eq(false)
     end
 
-    #two round,only have second response
+    # two round,only have second response
     it 'should return false if only have second response' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -249,7 +249,7 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  #round, response_map, assignment_created, assignment_due_dates
+  # round, response_map, assignment_created, assignment_due_dates
   describe 'submitted_within_round?' do
     before(:each) do
       @assignment = create(:assignment, name: 'assignment', created_at: DateTime.now.in_time_zone - 13.day)
@@ -261,7 +261,7 @@ describe ReviewMappingHelper, type: :helper do
       @round = 2
     end
 
-    #for two round, both of the submissions are on time
+    # for two round, both of the submissions are on time
     it 'should return true if works were submitted within 2 round' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -279,7 +279,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(check_submitetd).to eq(true)
     end
 
-    #for two round, both of the submissions are late
+    # for two round, both of the submissions are late
     it 'should return false if both works was submitted late' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -336,10 +336,9 @@ describe ReviewMappingHelper, type: :helper do
       check_submitetd = submitted_within_round?(@round, @response_map, assignment_created, assignment_due_dates)
       expect(check_submitetd).to eq(false)
     end
-
   end
 
-  #round, response_map, assignment_created, assignment_due_dates
+  # round, response_map, assignment_created, assignment_due_dates
   describe 'submitted_hyperlink' do
     before(:each) do
       @assignment = create(:assignment, name: 'assignment', created_at: DateTime.now.in_time_zone - 13.day)
@@ -406,7 +405,7 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  #input max_team_size, response, reviewee_id, ip_address
+  # input max_team_size, response, reviewee_id, ip_address
   describe 'get_team_reviewed_link_name' do
     before(:each) do
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
@@ -516,13 +515,12 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-
-  #initialize_chart_elements
-  #display_volume_metric_chart
-  #display_tagging_interval_chart
-  #list_review_submissions
-  #list_hyperlink_submission
-  #get_certain_review_and_feedback_response_map
+  # initialize_chart_elements
+  # display_volume_metric_chart
+  # display_tagging_interval_chart
+  # list_review_submissions
+  # list_hyperlink_submission
+  # get_certain_review_and_feedback_response_map
 
   describe 'get_each_review_and_feedback_response' do
     before(:each) do
@@ -747,49 +745,44 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:team_user, user: student, team: @reviewee)
 
-      @review_scores = {@reviewer.id => {1 => {@reviewee.id => 10}, 2 => {@reviewee.id => 20}, 3 => {@reviewee.id => 30}}}
+      @review_scores = { @reviewer.id => { 1 => { @reviewee.id => 10 }, 2 => { @reviewee.id => 20 }, 3 => { @reviewee.id => 30 } } }
 
       get_awarded_review_score(@reviewer.id, @reviewee.id)
     end
 
-
     it 'should return the review score given by a reviewer for round 1 for the defined team' do
-      expect(@score_awarded_round_1).to eq "10%"
+      expect(@score_awarded_round_1).to eq '10%'
     end
 
     it 'should return the review score given by a reviewer for round 2 for the defined team' do
-      expect(@score_awarded_round_2).to eq "20%"
+      expect(@score_awarded_round_2).to eq '20%'
     end
 
     it 'should return the review score given by a reviewer for round 3 for the defined team' do
-      expect(@score_awarded_round_3).to eq "30%"
+      expect(@score_awarded_round_3).to eq '30%'
     end
   end
-	
 
   # rspec test for link_updated_since_last? method
   describe 'link_updated_since_last?' do
-
     before(:each) do
-
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
-      
+
       # create assignment and respective reviewer, reviewee instance variables
       assignment = create(:assignment, name: 'assignment', created_at: DateTime.now.in_time_zone - 13.day)
       reviewer = create(:participant, review_grade: nil)
       reviewee = create(:assignment_team, assignment: assignment)
       response_map = create(:review_response_map, reviewer: reviewer, reviewee: reviewee)
-      
+
       # create due dates for assignment
       @round = 2
       create(:assignment_due_date, round: 1, due_at: DateTime.now.in_time_zone + 5.day)
       create(:assignment_due_date, round: 2, due_at: DateTime.now.in_time_zone + 10.day)
       @due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
-
     end
-    
+
     # This test case asserts that false is returned when submission link is not updated from the last round
     it 'should return false if submission link was not updated between the last round and the current one' do
       link_updated_at = DateTime.now.in_time_zone + 1.day
@@ -797,7 +790,7 @@ describe ReviewMappingHelper, type: :helper do
       result = link_updated_since_last?(@round, @due_dates, link_updated_at)
       expect(result).to eq(false)
     end
-    
+
     # This test case asserts that true is returned when submission link is updated from last round
     it 'should return true if submission link was updated between the last round and the current one' do
       link_updated_at = DateTime.now.in_time_zone + 7.day
@@ -805,14 +798,11 @@ describe ReviewMappingHelper, type: :helper do
       result = link_updated_since_last?(@round, @due_dates, link_updated_at)
       expect(result).to eq(true)
     end
-
   end
 
   # rspec test for obtain_team_color method
   describe 'obtain_team_color' do
-
     before(:each) do
-      
       # create assignment and respective reviewer, reviewee instance variables
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
       @reviewer = create(:participant, review_grade: nil)
@@ -821,7 +811,6 @@ describe ReviewMappingHelper, type: :helper do
     end
 
     # Following test cases to assert whether the right color is returned by obtain_team_color for the given combination of pre-conditions
-    
 
     it 'should return purple if previous round was not submitted but submitted in current round' do
       create(:deadline_right, name: 'No')
@@ -836,11 +825,9 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
 
-
       last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('purple')
     end
-
 
     it 'should return color for 4th round in a 4-round assignment' do
       create(:deadline_right, name: 'No')
@@ -863,14 +850,12 @@ describe ReviewMappingHelper, type: :helper do
 
       last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('purple')
-
     end
 
     it 'should return green if there was no assignment submission in any round' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
-
 
       create(:response, response_map: @response_map)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
@@ -882,7 +867,6 @@ describe ReviewMappingHelper, type: :helper do
       last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('green')
     end
-
 
     it 'should return color of 3rd round in a 3-round submitted assignment' do
       create(:deadline_right, name: 'No')
@@ -900,20 +884,16 @@ describe ReviewMappingHelper, type: :helper do
 
       last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('purple')
-
     end
-
   end
 
   # rspec test for review_metrics method
   describe 'review_metrics' do
-
     before(:each) do
-
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
-	
+
       # create assignment(with due dates for each round) and respective reviewer, reviewee instance variables
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
@@ -928,37 +908,36 @@ describe ReviewMappingHelper, type: :helper do
       # Each round in avg_and_ranges must have a symbol and a string for the metric as indicated by corresponding source code
       # Here, key is the round number (1, 2, 3 ., etc) and the value is the metrics (min, max, avg) for the given round number.
       @avg_and_ranges = {
-          @reviewee.id =>
-              {
-                  1 => {
-                      :min => 2,
-                      'min' => 2,
-                      :max => 4,
-                      'max' => 4,
-                      :avg => 3,
-                      'avg' => 3
-                  },
-                  2 => {
-                      'min' => 5,
-                      :min => 5,
-                      'max' => 7,
-                      :max => 7,
-                      'avg' => 6,
-                      :avg => 6
-                  },
-                  3 => {
-                      'min' => 8,
-                      :min => 8,
-                      'max' => 10,
-                      :max => 10,
-                      'avg' => 9,
-                      :avg => 9
-                  }
+        @reviewee.id =>
+            {
+              1 => {
+                :min => 2,
+                'min' => 2,
+                :max => 4,
+                'max' => 4,
+                :avg => 3,
+                'avg' => 3
+              },
+              2 => {
+                'min' => 5,
+                :min => 5,
+                'max' => 7,
+                :max => 7,
+                'avg' => 6,
+                :avg => 6
+              },
+              3 => {
+                'min' => 8,
+                :min => 8,
+                'max' => 10,
+                :max => 10,
+                'avg' => 9,
+                :avg => 9
               }
+            }
       }
 
       create(:team_user, user: student, team: @reviewee)
-
     end
 
     # assert the value for metrics in round 1 for given team_id
@@ -969,7 +948,6 @@ describe ReviewMappingHelper, type: :helper do
       expect(@max).to eq '4%'
       expect(@avg).to eq '3%'
     end
-
 
     # assert the value for metrics in round 2 for given team_id
     it 'should return the minimum, maximum and average score for round 2' do
@@ -991,9 +969,9 @@ describe ReviewMappingHelper, type: :helper do
   end
   describe 'test calculate_key_chart_information' do
     it 'should return new Hash if intervals are not empty' do
-      intervals = [1.00,2.00,3.00,4.00,5.00,6.00]
+      intervals = [1.00, 2.00, 3.00, 4.00, 5.00, 6.00]
       result = helper.calculate_key_chart_information(intervals)
-      expect(result).to be_a_kind_of(Hash) 
+      expect(result).to be_a_kind_of(Hash)
       expect(result[:mean]).to eq(3.50)
       expect(result[:min]).to eq(1.00)
       expect(result[:max]).to eq(6.00)
@@ -1023,14 +1001,14 @@ describe ReviewMappingHelper, type: :helper do
 
   describe 'test list_review_submissions' do
     before(:each) do
-      @assignment1 = create(:assignment, name: "name1")
+      @assignment1 = create(:assignment, name: 'name1')
       @questionnaire = create(:questionnaire)
       @question = create(:question, questionnaire_id: @questionnaire.id)
-      @user = create(:student, name: "name", fullname: "name")
+      @user = create(:student, name: 'name', fullname: 'name')
       @participant = create(:participant, user_id: @user.id, parent_id: @assignment1.id)
       @response_map = create(:review_response_map, reviewer: @participant, assignment: @assignment1)
-      @response = create(:response, response_map: @response_map, created_at: "2019-11-01 23:30:00")
-      @answer = create(:answer, response_id: @response.id, question_id: @question.id, comments: "comment")
+      @response = create(:response, response_map: @response_map, created_at: '2019-11-01 23:30:00')
+      @answer = create(:answer, response_id: @response.id, question_id: @question.id, comments: 'comment')
       @team = create(:assignment_team)
     end
     it 'should return an empty string when the file does not exist' do
@@ -1041,30 +1019,30 @@ describe ReviewMappingHelper, type: :helper do
 
   describe 'test list_review_submissions' do
     before(:each) do
-      @assignment1 = create(:assignment, name: "name1")
+      @assignment1 = create(:assignment, name: 'name1')
       @questionnaire = create(:questionnaire)
       @question = create(:question, questionnaire_id: @questionnaire.id)
-      @user = create(:student, name: "name", fullname: "name")
+      @user = create(:student, name: 'name', fullname: 'name')
       @participant = create(:participant, user_id: @user.id, parent_id: @assignment1.id)
       @response_map = create(:review_response_map, reviewer: @participant, assignment: @assignment1)
-      @response = create(:response, response_map: @response_map, created_at: "2019-11-01 23:30:00")
-      @answer = create(:answer, response_id: @response.id, question_id: @question.id, comments: "comment")
+      @response = create(:response, response_map: @response_map, created_at: '2019-11-01 23:30:00')
+      @answer = create(:answer, response_id: @response.id, question_id: @question.id, comments: 'comment')
       @team = create(:assignment_team)
       allow(AssignmentTeam).to receive(:find).with(@team.id).and_return(team)
-      allow(team).to receive(:submitted_files).with(any_args).and_return(["./.rspec"])
+      allow(team).to receive(:submitted_files).with(any_args).and_return(['./.rspec'])
     end
     it 'should return correct html a tag' do
       result = helper.list_review_submissions(@participant.id, @team.id, @response_map.id)
-      expect(result).to start_with("<a href")
+      expect(result).to start_with('<a href')
     end
   end
 
   describe 'test list_hyperlink_submission' do
     before(:each) do
-      @assignment1 = create(:assignment, name: "name1")
+      @assignment1 = create(:assignment, name: 'name1')
       @questionnaire = create(:questionnaire)
       @question = create(:question, questionnaire_id: @questionnaire.id)
-      @user = create(:student, name: "name", fullname: "name")
+      @user = create(:student, name: 'name', fullname: 'name')
       @participant = create(:participant, user_id: @user.id, parent_id: @assignment1.id)
       @response_map = create(:review_response_map, reviewer: @participant, assignment: @assignment1)
       @id = @assignment1.id
@@ -1077,10 +1055,10 @@ describe ReviewMappingHelper, type: :helper do
 
   describe 'test list_hyperlink_submission' do
     before(:each) do
-      @assignment1 = create(:assignment, name: "name1")
+      @assignment1 = create(:assignment, name: 'name1')
       @questionnaire = create(:questionnaire)
       @question = create(:question, questionnaire_id: @questionnaire.id)
-      @user = create(:student, name: "name", fullname: "name")
+      @user = create(:student, name: 'name', fullname: 'name')
       @participant = create(:participant, user_id: @user.id, parent_id: @assignment1.id)
       @response_map = create(:review_response_map, reviewer: @participant, assignment: @assignment1)
       @id = @assignment1.id

@@ -1,10 +1,9 @@
-<% if @map.survey? %>
-    <h1><%= @title %> for <%= @survey_parent.name %></h1>
-<% else %>
-    <h1><%= @title %> for <%= @assignment.name %></h1>
-<% end %>
+<h1><%= @title %> for <%= @assignment.name %></h1>
+<div style="float:right">
+<%= link_to "Email the author", author_response_index_path(email: @participant.user.email,response: @response.id) %>
+</div>
 
-<% if !(@map.instance_of? TeammateReviewResponseMap) && !@map.survey? && !(@map.instance_of? BookmarkRatingResponseMap) %>
+<% if !(@map.instance_of? TeammateReviewResponseMap) && !(@map.instance_of? BookmarkRatingResponseMap) %>
   <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor.participants.first, :stage => @assignment.current_stage(topic_id)} %>
 <% end %>
@@ -15,7 +14,7 @@
 
 <% @review_versions = @map.get_all_versions %>
 <% unless @review_versions.empty? %>
-    <%= @review_versions.each do |response| %>
+    <% @review_versions.each do |response| %>
     	<%= response.display_as_html %>
         <br/>
     <% end %>
@@ -28,17 +27,17 @@
 
 <!--Check whether there is a UploadFile question.-->
 <%if @map.instance_of?(ReviewResponseMap)%>
-<% current_folder = DisplayOption.new %>
-<% current_folder.name = "" %>
-<% response_map_id = Response.find(params[:id]).response_map.id %>
-<% files = @participant.files(@participant.review_file_path(response_map_id).to_s + current_folder.name) %>
-<%session_participant = AssignmentParticipant.where(parent_id: @assignment.id, user_id: session[:user].id).first%>
-<%session_participants_team = AssignmentTeam.team(session_participant)%>
-<%@questions.each do |question| %>
+  <% current_folder = DisplayOption.new %>
+  <% current_folder.name = "~/" %>
+  <% response_map_id = Response.find(params[:id]).response_map.id %>
+  <% files = @participant.files(@participant.review_file_path(response_map_id).to_s + current_folder.name) %>
+  <% session_participant = AssignmentParticipant.where(parent_id: @assignment.id, user_id: session[:user].id).first %>
+  <% session_participants_team = AssignmentTeam.team(session_participant) %>
+  <% @review_questions.each do |question| %>
     <% if question.instance_of? UploadFile %>
-        <%= display_directory_tree(@participant, files, true).html_safe %>
+      <%= display_directory_tree(@participant, files, true).html_safe %>
     <% end %>
-<% end %>
+  <% end %>
 <%end%>
 
 <%= @map.show_feedback(@response) %>
@@ -48,26 +47,26 @@
 <!-- Script to toggle visibility on selecting the checkbox, by E2022 @SujalAhrodia -->
 <script>
   $(document).on("ready",function(e){
-    
+
     //Show a pop up message on selecting/unselecting the checkbox, by E2022 @SujalAhrodia
-    $("#sample_cbx").prop("checked",<%= !@response.visibility.nil? && (@response.visibility=="public" || @response.visibility=="published")%>);
-    
+    $("#sample_cbx").prop("checked", <%= !@response.visibility.nil? && (@response.visibility == "public" || @response.visibility == "published")%>);
+
     $("#sample_cbx").on("change",function(e){
       var _d = $(this);
-      var check = _d.is(":checked")?1:0;
+      var check = _d.is(":checked") ? 1 : 0;
       var visibility = check?"public":"private";
-      
+
       // Construct respective message to be displayed, by E2022 @SujalAhrodia
-      
-      var message = check?"Your review may now ":"Your review may no longer ";
-      
+
+      var message = check ? "Your review may now " : "Your review may no longer ";
+
       message += "be available for other students to view. Are you sure?";
-      
+
       if(!confirm(message)){
         _d.prop("checked",!check);
       }
       else{
-        // Ajax call to update the value in db  
+        // Ajax call to update the value in db
 
         $.ajax({
         "url":"/response_toggle_permission/"+"<%= @response.id %>",

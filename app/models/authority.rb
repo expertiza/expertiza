@@ -7,6 +7,7 @@ class Authority
 
   def allow?(controller, _action)
     return true if current_user && current_user.admin?
+
     case controller
     when 'pages'
       true

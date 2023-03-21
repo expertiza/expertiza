@@ -1,4 +1,4 @@
-xdescribe "SimiCheckWebservice" do
+xdescribe 'SimiCheckWebservice' do
   def poll(comp_id)
     is_success = false
     until is_success
@@ -12,63 +12,63 @@ xdescribe "SimiCheckWebservice" do
     end
   end
 
-  describe ".get_all_comparisons" do
-    context "any time called" do
-      it "returns a response with code 200 and body containing all comparisons" do
+  describe '.get_all_comparisons' do
+    context 'any time called' do
+      it 'returns a response with code 200 and body containing all comparisons' do
         response = SimiCheckWebService.all_comparisons
         json_response = JSON.parse(response.body)
         expect(response.code).to eql(200)
-        expect(json_response["comparisons"]).to be_truthy
+        expect(json_response['comparisons']).to be_truthy
       end
     end
   end
 
-  describe ".new_comparison" do
-    context "called with a comparison_name" do
-      it "returns a response with code 200, and body containing the name and new id for this comparison" do
+  describe '.new_comparison' do
+    context 'called with a comparison_name' do
+      it 'returns a response with code 200, and body containing the name and new id for this comparison' do
         response = SimiCheckWebService.new_comparison('test new comparison')
         json_response = JSON.parse(response.body)
-        comp_id = json_response["id"]
+        comp_id = json_response['id']
         expect(response.code).to eql(200)
-        expect(json_response["id"]).to be_truthy
+        expect(json_response['id']).to be_truthy
         SimiCheckWebService.delete_comparison(comp_id)
       end
     end
   end
 
-  describe ".delete_comparison" do
-    context "called with a comparison id" do
-      it "returns a response with code 200" do
+  describe '.delete_comparison' do
+    context 'called with a comparison id' do
+      it 'returns a response with code 200' do
         response = SimiCheckWebService.new_comparison('test new comparison')
         json_response = JSON.parse(response.body)
-        comp_id = json_response["id"]
+        comp_id = json_response['id']
         response = SimiCheckWebService.delete_comparison(comp_id)
         expect(response.code).to eql(200)
       end
     end
   end
 
-  describe ".get_comparison_details" do
-    context "called with a comparison id" do
-      it "returns a response with code 200 and body containing info about the comparison" do
+  describe '.get_comparison_details' do
+    context 'called with a comparison id' do
+      it 'returns a response with code 200 and body containing info about the comparison' do
         response = SimiCheckWebService.new_comparison('test new comparison')
         json_response = JSON.parse(response.body)
-        comp_id = json_response["id"]
+        comp_id = json_response['id']
         response = SimiCheckWebService.get_comparison_details(comp_id)
         json_response = JSON.parse(response.body)
         expect(response.code).to eql(200)
-        expect(json_response["name"]).to be_truthy
+        expect(json_response['name']).to be_truthy
         SimiCheckWebService.delete_comparison(comp_id)
       end
     end
   end
 
-  describe ".update_comparison" do
-    context "called with a new comparison name" do
-      it "returns a response with code 200 and body containing info about the comparison" do
+  describe '.update_comparison' do
+    context 'called with a new comparison name' do
+      it 'returns a response with code 200 and body containing info about the comparison' do
         response = SimiCheckWebService.new_comparison('test new comparison')
         json_response = JSON.parse(response.body)
-        comp_id = json_response["id"]
+        comp_id = json_response['id']
         response = SimiCheckWebService.update_comparison(comp_id, 'updated name')
         expect(response.code).to eql(200)
         SimiCheckWebService.delete_comparison(comp_id)
@@ -76,34 +76,34 @@ xdescribe "SimiCheckWebservice" do
     end
   end
 
-  describe ".upload_file" do
-    context "called with a comparison id and filepath" do
-      it "returns a response with code 200 and body containing info about the file" do
+  describe '.upload_file' do
+    context 'called with a comparison id and filepath' do
+      it 'returns a response with code 200 and body containing info about the file' do
         response = SimiCheckWebService.new_comparison('test new comparison')
         json_response = JSON.parse(response.body)
-        comp_id = json_response["id"]
+        comp_id = json_response['id']
         test_upload_text = 'This is some sample text.'
         filepath = '/tmp/test_upload.txt'
-        File.open(filepath, "w") {|file| file.write(test_upload_text) }
+        File.open(filepath, 'w') { |file| file.write(test_upload_text) }
         response = SimiCheckWebService.upload_file(comp_id, filepath)
         File.delete(filepath) if File.exist?(filepath)
         expect(response.code).to eql(200)
-        expect(json_response["id"]).to be_truthy
+        expect(json_response['id']).to be_truthy
         SimiCheckWebService.delete_comparison(comp_id)
       end
     end
   end
 
-  describe ".delete_files" do
-    context "called with a comparison id and filenames to delete" do
-      it "returns a response with code 200" do
+  describe '.delete_files' do
+    context 'called with a comparison id and filenames to delete' do
+      it 'returns a response with code 200' do
         response = SimiCheckWebService.new_comparison('test new comparison')
         json_response = JSON.parse(response.body)
-        comp_id = json_response["id"]
+        comp_id = json_response['id']
         test_upload_text = 'This is some sample text.'
         filename = 'test_upload.txt'
         filepath = '/tmp/test_upload.txt'
-        File.open(filepath, "w") {|file| file.write(test_upload_text) }
+        File.open(filepath, 'w') { |file| file.write(test_upload_text) }
         SimiCheckWebService.upload_file(comp_id, filepath)
         File.delete(filepath) if File.exist?(filepath)
         response = SimiCheckWebService.delete_files(comp_id, [filename])
@@ -113,20 +113,20 @@ xdescribe "SimiCheckWebservice" do
     end
   end
 
-  describe ".get_similarity_nxn" do
-    context "called with a comparison id" do
-      it "returns a response with code 200 and body containing info about the results" do
+  describe '.get_similarity_nxn' do
+    context 'called with a comparison id' do
+      it 'returns a response with code 200 and body containing info about the results' do
         response = SimiCheckWebService.new_comparison('test new comparison')
         json_response = JSON.parse(response.body)
-        comp_id = json_response["id"]
+        comp_id = json_response['id']
         test_upload_text = 'This is some sample text.'
         filepath = '/tmp/test_upload.txt'
-        File.open(filepath, "w") {|file| file.write(test_upload_text) }
+        File.open(filepath, 'w') { |file| file.write(test_upload_text) }
         SimiCheckWebService.upload_file(comp_id, filepath)
         File.delete(filepath) if File.exist?(filepath)
         test_upload_text = 'This is some more sample text.'
         filepath = '/tmp/test_upload2.txt'
-        File.open(filepath, "w") {|file| file.write(test_upload_text) }
+        File.open(filepath, 'w') { |file| file.write(test_upload_text) }
         SimiCheckWebService.upload_file(comp_id, filepath)
         File.delete(filepath) if File.exist?(filepath)
         SimiCheckWebService.post_similarity_nxn(comp_id)
@@ -134,26 +134,26 @@ xdescribe "SimiCheckWebservice" do
         response = SimiCheckWebService.get_similarity_nxn(comp_id)
         expect(response.code).to eql(200)
         json_response = JSON.parse(response.body)
-        expect(json_response["similarities"]).to be_truthy
+        expect(json_response['similarities']).to be_truthy
         SimiCheckWebService.delete_comparison(comp_id)
       end
     end
   end
 
-  describe ".visualize_similarity" do
-    context "called with a comparison id" do
-      it "returns a response with code 200 and body containing the visualize url path" do
+  describe '.visualize_similarity' do
+    context 'called with a comparison id' do
+      it 'returns a response with code 200 and body containing the visualize url path' do
         response = SimiCheckWebService.new_comparison('test new comparison')
         json_response = JSON.parse(response.body)
-        comp_id = json_response["id"]
+        comp_id = json_response['id']
         test_upload_text = 'This is some sample text.'
         filepath = '/tmp/test_upload.txt'
-        File.open(filepath, "w") {|file| file.write(test_upload_text) }
+        File.open(filepath, 'w') { |file| file.write(test_upload_text) }
         SimiCheckWebService.upload_file(comp_id, filepath)
         File.delete(filepath) if File.exist?(filepath)
         test_upload_text = 'This is some more sample text.'
         filepath = '/tmp/test_upload2.txt'
-        File.open(filepath, "w") {|file| file.write(test_upload_text) }
+        File.open(filepath, 'w') { |file| file.write(test_upload_text) }
         SimiCheckWebService.upload_file(comp_id, filepath)
         File.delete(filepath) if File.exist?(filepath)
         SimiCheckWebService.post_similarity_nxn(comp_id)
@@ -166,21 +166,21 @@ xdescribe "SimiCheckWebservice" do
     end
   end
 
-  describe ".visualize_comparison" do
-    context "called with a comparison id and two filenames" do
-      it "returns a response with code 200 and body containing the visualize url path" do
+  describe '.visualize_comparison' do
+    context 'called with a comparison id and two filenames' do
+      it 'returns a response with code 200 and body containing the visualize url path' do
         response = SimiCheckWebService.new_comparison('test new comparison')
         json_response = JSON.parse(response.body)
-        comp_id = json_response["id"]
+        comp_id = json_response['id']
         test_upload_text = 'This is some sample text.'
         filepath = '/tmp/test_upload.txt'
-        File.open(filepath, "w") {|file| file.write(test_upload_text) }
-        file1_id = JSON.parse(SimiCheckWebService.upload_file(comp_id, filepath).body)["id"]
+        File.open(filepath, 'w') { |file| file.write(test_upload_text) }
+        file1_id = JSON.parse(SimiCheckWebService.upload_file(comp_id, filepath).body)['id']
         File.delete(filepath) if File.exist?(filepath)
         test_upload_text = 'This is some more sample text.'
         filepath = '/tmp/test_upload2.txt'
-        File.open(filepath, "w") {|file| file.write(test_upload_text) }
-        file2_id = JSON.parse(SimiCheckWebService.upload_file(comp_id, filepath).body)["id"]
+        File.open(filepath, 'w') { |file| file.write(test_upload_text) }
+        file2_id = JSON.parse(SimiCheckWebService.upload_file(comp_id, filepath).body)['id']
         File.delete(filepath) if File.exist?(filepath)
         SimiCheckWebService.post_similarity_nxn(comp_id)
         poll(comp_id)

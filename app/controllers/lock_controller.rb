@@ -10,14 +10,14 @@ class LockController < ApplicationController
     else ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name
     end
   end
-  
+
   # Release the lock on the resource passed in in the parameters
   # Since lockable objects are polymorphic, the type needs to be passed in as a parameter
   def release_lock
     # Find the id in the table with the given type
     lockable = Object.const_get(params[:type]).find(params[:id])
     Lock.release_lock(lockable)
-    #Avoid a big error because of no redirect
-    redirect_to :back
+    # Avoid a big error because of no redirect
+    redirect_back fallback_location: root_path
   end
 end

@@ -7,7 +7,7 @@
       #ACS Map the reviewee to a team
       unless reviewer.nil?
          reviewee = participant.team  
-         map = ReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)        
+         map = ReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id) unless reviewee.nil?        
       end       
             
       unless map.nil? || map.response.empty?

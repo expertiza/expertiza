@@ -4,7 +4,7 @@ class AssignmentSurveyResponseMap < SurveyResponseMap
   belongs_to :reviewer, class_name: 'Participant', foreign_key: 'reviewer_id'
 
   def questionnaire
-    Questionnaire.find_by(id: self.survey_deployment.questionnaire_id)
+    Questionnaire.find_by(id: survey_deployment.questionnaire_id)
   end
 
   def contributor
@@ -12,10 +12,10 @@ class AssignmentSurveyResponseMap < SurveyResponseMap
   end
 
   def survey_parent
-    self.assignment
+    assignment
   end
 
   def get_title
-    "Assignment Survey"
+    'Assignment Survey'
   end
 end

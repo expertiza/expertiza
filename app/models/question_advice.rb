@@ -1,5 +1,5 @@
-class QuestionAdvice < ActiveRecord::Base
-  attr_accessible :score, :advice
+class QuestionAdvice < ApplicationRecord
+  # attr_accessible :score, :advice
   belongs_to :question
 
   # This method returns an array of fields present in question advice model
@@ -16,7 +16,7 @@ class QuestionAdvice < ActiveRecord::Base
     questionnaire = Questionnaire.find(parent_id)
     questions = questionnaire.questions
     questions.each do |question|
-      question_advices = QuestionAdvice.where("question_id = ?", question.id)
+      question_advices = QuestionAdvice.where('question_id = ?', question.id)
       question_advices.each do |advice|
         tcsv = []
         advice.attributes.each_pair do |_name, value|

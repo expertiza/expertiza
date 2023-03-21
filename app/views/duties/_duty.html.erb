@@ -1,0 +1,14 @@
+<table>
+  <tr>
+    <td><label for="name">Role name: </label></td>
+    <td><%= text_field 'duty', 'name', size: 42 %></td>
+  </tr>
+  <tr>
+    <td><label for="max_members_for_duty">Maximum member limit: <img src="/assets/info.png" title='The maximum number of members on the team that can have the role.'></label></td>
+    <td><%= number_field 'duty', 'max_members_for_duty', min: 1 %></td>
+  </tr>
+  <tr hidden>
+    <td><%= number_field 'duty', 'assignment_id', {:value => @id} %></td>
+  </tr>
+</table>
+<br/>

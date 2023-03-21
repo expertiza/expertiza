@@ -1,21 +1,21 @@
 module ReviewMappingHelper
   def create_report_table_header(headers = {})
-    render partial: 'report_table_header', locals: {headers: headers}
+    render partial: 'report_table_header', locals: { headers: headers }
   end
 
   #
-  # gets the response map data such as reviewer id, reviewd object id and type for the review report
+  # gets the response map data such as reviewer id, reviewed object id and type for the review report
   #
   def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
     rspan = 0
-    (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@review_in_round_" + round.to_s, 0) }
+    (1..@assignment.num_review_rounds).each { |round| instance_variable_set('@review_in_round_' + round.to_s, 0) }
 
-    response_maps = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", reviewed_object_id, reviewer_id, type])
+    response_maps = ResponseMap.where(['reviewed_object_id = ? AND reviewer_id = ? AND type = ?', reviewed_object_id, reviewer_id, type])
     response_maps.each do |ri|
       rspan += 1 if Team.exists?(id: ri.reviewee_id)
       responses = ri.response
       (1..@assignment.num_review_rounds).each do |round|
-        instance_variable_set("@review_in_round_" + round.to_s, instance_variable_get("@review_in_round_" + round.to_s) + 1) if responses.exists?(round: round)
+        instance_variable_set('@review_in_round_' + round.to_s, instance_variable_get('@review_in_round_' + round.to_s) + 1) if responses.exists?(round: round)
       end
     end
     [response_maps, rspan]
@@ -58,7 +58,7 @@ module ReviewMappingHelper
       color.push 'purple'
     else
       link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
-      if link.nil? or (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
+      if link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
         color.push 'green'
       else
         link_updated_at = get_link_updated_at(link)
@@ -113,15 +113,15 @@ module ReviewMappingHelper
   end
 
   # For assignments with 1 team member, the following method returns user's fullname else it returns "team name" that a particular reviewee belongs to.
-  def get_team_reviewed_link_name(max_team_size, response, reviewee_id, ip_address)
+  def get_team_reviewed_link_name(max_team_size, _response, reviewee_id, ip_address)
     team_reviewed_link_name = if max_team_size == 1
                                 TeamsUser.where(team_id: reviewee_id).first.user.fullname(ip_address)
                               else
                                 # E1991 : check anonymized view here
                                 Team.find(reviewee_id).name
                               end
-    team_reviewed_link_name = "(" + team_reviewed_link_name + ")"
-    #if !response.empty? and !response.last.is_submitted?
+    team_reviewed_link_name = '(' + team_reviewed_link_name + ')'
+    # if !response.empty? and !response.last.is_submitted?
     team_reviewed_link_name
   end
 
@@ -140,20 +140,20 @@ module ReviewMappingHelper
     # Storing redundantly computed value in num_rounds variable
     num_rounds = @assignment.num_review_rounds
     # Setting values of instance variables
-    (1..num_rounds).each { |round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }
+    (1..num_rounds).each { |round| instance_variable_set('@score_awarded_round_' + round.to_s, '-----') }
     # Iterating through list
     (1..num_rounds).each do |round|
       # Changing values of instance variable based on below condition
       unless team_id.nil? || team_id == -1.0
-        instance_variable_set("@score_awarded_round_" + round.to_s, @review_scores[reviewer_id][round][team_id].to_s + '%')
+        instance_variable_set('@score_awarded_round_' + round.to_s, @review_scores[reviewer_id][round][team_id].to_s + '%')
       end
     end
   end
 
   # gets minimum, maximum and average grade value for all the reviews present
   def review_metrics(round, team_id)
-    %i[max min avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
-    if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? {|k| @avg_and_ranges[team_id][round].key? k }
+    %i[max min avg].each { |metric| instance_variable_set('@' + metric.to_s, '-----') }
+    if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? { |k| @avg_and_ranges[team_id][round].key? k }
       %i[max min avg].each do |metric|
         metric_value = @avg_and_ranges[team_id][round][metric].nil? ? '-----' : @avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
         instance_variable_set('@' + metric.to_s, metric_value)
@@ -178,13 +178,12 @@ module ReviewMappingHelper
     # get the number of review rounds for the assignment
     @num_rounds = @assignment.num_review_rounds.to_f.to_i
     @all_reviewers_avg_vol_per_round = []
-    @all_reviewers_overall_avg_vol = @reviewers.inject(0) {|sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @all_reviewers_overall_avg_vol = @reviewers.inject(0) { |sum, r| sum + r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
     @num_rounds.times do |round|
-      @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) {|sum, r| sum += r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
+      @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) { |sum, r| sum + r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
     end
-    @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
+    @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
-
 
   # moves data of reviews in each round from a current round
   def initialize_chart_elements(reviewer)
@@ -193,14 +192,14 @@ module ReviewMappingHelper
     reviewer_data = []
     all_reviewers_data = []
 
-    #display avg volume for all reviewers per round
+    # display avg volume for all reviewers per round
     @num_rounds.times do |rnd|
-      if @all_reviewers_avg_vol_per_round[rnd] > 0
-        round += 1
-        labels.push round
-        reviewer_data.push reviewer.avg_vol_per_round[rnd]
-        all_reviewers_data.push @all_reviewers_avg_vol_per_round[rnd]
-      end
+      next unless @all_reviewers_avg_vol_per_round[rnd] > 0
+
+      round += 1
+      labels.push round
+      reviewer_data.push reviewer.avg_vol_per_round[rnd]
+      all_reviewers_data.push @all_reviewers_avg_vol_per_round[rnd]
     end
 
     labels.push 'Total'
@@ -217,17 +216,17 @@ module ReviewMappingHelper
       datasets: [
         {
           label: 'vol.',
-          backgroundColor: "rgba(255,99,132,0.8)",
+          backgroundColor: 'rgba(255,99,132,0.8)',
           borderWidth: 1,
           data: reviewer_data,
-          yAxisID: "bar-y-axis1"
+          yAxisID: 'bar-y-axis1'
         },
         {
           label: 'avg. vol.',
-          backgroundColor: "rgba(255,206,86,0.8)",
+          backgroundColor: 'rgba(255,206,86,0.8)',
           borderWidth: 1,
           data: all_reviewers_data,
-          yAxisID: "bar-y-axis2"
+          yAxisID: 'bar-y-axis2'
         }
       ]
     }
@@ -238,17 +237,17 @@ module ReviewMappingHelper
           usePointStyle: true
         }
       },
-      width: "200",
-      height: "125",
+      width: '200',
+      height: '125',
       scales: {
         yAxes: [{
           stacked: true,
-          id: "bar-y-axis1",
+          id: 'bar-y-axis1',
           barThickness: 10
         }, {
           display: false,
           stacked: true,
-          id: "bar-y-axis2",
+          id: 'bar-y-axis2',
           barThickness: 15,
           type: 'category',
           categoryPercentage: 0.8,
@@ -274,36 +273,36 @@ module ReviewMappingHelper
   def display_tagging_interval_chart(intervals)
     # if someone did not do any tagging in 30 seconds, then ignore this interval
     threshold = 30
-    intervals = intervals.select{|v| v < threshold}
-    unless  intervals.empty?
+    intervals = intervals.select { |v| v < threshold }
+    unless intervals.empty?
       interval_mean = intervals.reduce(:+) / intervals.size.to_f
     end
-    #build the parameters for the chart
+    # build the parameters for the chart
     data = {
       labels: [*1..intervals.length],
       datasets: [
         {
-          backgroundColor: "rgba(255,99,132,0.8)",
+          backgroundColor: 'rgba(255,99,132,0.8)',
           data: intervals,
-          label: "time intervals"
+          label: 'time intervals'
         },
-        unless  intervals.empty?
+        unless intervals.empty?
           {
             data: Array.new(intervals.length, interval_mean),
-            label: "Mean time spent"
+            label: 'Mean time spent'
           }
         end
       ]
     }
     options = {
-      width: "200",
-      height: "125",
+      width: '200',
+      height: '125',
       scales: {
         yAxes: [{
           stacked: false,
           ticks: {
-                beginAtZero: true
-            }
+            beginAtZero: true
+          }
         }],
         xAxes: [{
           stacked: false
@@ -313,25 +312,25 @@ module ReviewMappingHelper
     line_chart data, options
   end
 
-  #Calculate mean, min, max, variance, and stand deviation for tagging intervals
+  # Calculate mean, min, max, variance, and stand deviation for tagging intervals
   def calculate_key_chart_information(intervals)
     # if someone did not do any tagging in 30 seconds, then ignore this interval
     threshold = 30
-    interval_precision = 2 #Round to 2 Decimal Places
-    intervals = intervals.select{|v| v < threshold}
+    interval_precision = 2 # Round to 2 Decimal Places
+    intervals = intervals.select { |v| v < threshold }
 
-    #Get Metrics once tagging intervals are available
+    # Get Metrics once tagging intervals are available
     unless intervals.empty?
-      metrics = Hash.new
+      metrics = {}
       metrics[:mean] = (intervals.reduce(:+) / intervals.size.to_f).round(interval_precision)
       metrics[:min] = intervals.min
       metrics[:max] = intervals.max
-      sum = intervals.inject(0){|accum, i| accum +(i- metrics[:mean])**2}
-      metrics[:variance] = (sum/(intervals.size).to_f).round(interval_precision)
+      sum = intervals.inject(0) { |accum, i| accum + (i - metrics[:mean])**2 }
+      metrics[:variance] = (sum / intervals.size.to_f).round(interval_precision)
       metrics[:stand_dev] = Math.sqrt(metrics[:variance]).round(interval_precision)
       metrics
     end
-    #if no Hash object is returned, the UI handles it accordingly
+    # if no Hash object is returned, the UI handles it accordingly
   end
 
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)
@@ -339,7 +338,7 @@ module ReviewMappingHelper
     team = AssignmentTeam.find(reviewee_team_id)
     html = ''
     unless team.nil? || participant.nil?
-      review_submissions_path = team.path + "_review" + "/" + response_map_id.to_s
+      review_submissions_path = team.path + '_review' + '/' + response_map_id.to_s
       files = team.submitted_files(review_submissions_path)
       html += display_review_files_directory_tree(participant, files) if files.present?
     end
@@ -358,7 +357,7 @@ module ReviewMappingHelper
     answer_with_link = Answer.where(response_id: curr_response.id, question_id: question_id).first if curr_response
     comments = answer_with_link.try(:comments)
     html = ''
-    html += display_hyperlink_in_peer_review_question(comments) if comments.present? and comments.start_with?('http')
+    html += display_hyperlink_in_peer_review_question(comments) if comments.present? && comments.start_with?('http')
     html.html_safe
   end
 
@@ -367,7 +366,7 @@ module ReviewMappingHelper
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     # Calculate how many responses one team received from each round
     # It is the feedback number each team member should make
-    @review_response_map_ids = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ?", @id, @team_id]).pluck("id")
+    @review_response_map_ids = ReviewResponseMap.where(['reviewed_object_id = ? and reviewee_id = ?', @id, @team_id]).pluck('id')
     feedback_response_map_record(author)
     # rspan means the all peer reviews one student received, including unfinished one
     @rspan_round_one = @review_responses_round_one.length
@@ -377,12 +376,12 @@ module ReviewMappingHelper
 
   # This function sets the values of instance variable
   def feedback_response_map_record(author)
-    {1 => 'one', 2 => 'two', 3 => 'three'}.each do |key, round_num|
+    { 1 => 'one', 2 => 'two', 3 => 'three' }.each do |key, round_num|
       instance_variable_set('@review_responses_round_' + round_num,
-                            Response.where(["map_id IN (?) and round = ?", @review_response_map_ids, key]))
+                            Response.where(['map_id IN (?) and round = ?', @review_response_map_ids, key]))
       # Calculate feedback response map records
       instance_variable_set('@feedback_response_maps_round_' + round_num,
-                            FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?",
+                            FeedbackResponseMap.where(['reviewed_object_id IN (?) and reviewer_id = ?',
                                                        instance_variable_get('@all_review_response_ids_round_' + round_num), author.id]))
     end
   end
@@ -390,10 +389,10 @@ module ReviewMappingHelper
   # gets review and feedback responses for a certain round for the feedback report
   def get_certain_review_and_feedback_response_map(author)
     # Setting values of instance variables
-    @feedback_response_maps = FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?", @all_review_response_ids, author.id])
+    @feedback_response_maps = FeedbackResponseMap.where(['reviewed_object_id IN (?) and reviewer_id = ?', @all_review_response_ids, author.id])
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
-    @review_response_map_ids = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ?", @id, @team_id]).pluck("id")
-    @review_responses = Response.where(["map_id IN (?)", @review_response_map_ids])
+    @review_response_map_ids = ReviewResponseMap.where(['reviewed_object_id = ? and reviewee_id = ?', @id, @team_id]).pluck('id')
+    @review_responses = Response.where(['map_id IN (?)', @review_response_map_ids])
     @rspan = @review_responses.length
   end
 
@@ -402,11 +401,11 @@ module ReviewMappingHelper
   #
   def get_css_style_for_calibration_report(diff)
     # diff - difference between stu's answer and instructor's answer
-    dict = {0 => 'c5',1 => 'c4',2 => 'c3',3 => 'c2'}
+    dict = { 0 => 'c5', 1 => 'c4', 2 => 'c3', 3 => 'c2' }
     css_class = if dict.key?(diff.abs)
                   dict[diff.abs]
                 else
-                  css_class = 'c1'
+                  'c1'
                 end
     css_class
   end

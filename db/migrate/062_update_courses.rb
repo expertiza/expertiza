@@ -1,9 +1,9 @@
-class UpdateCourses < ActiveRecord::Migration
+class UpdateCourses < ActiveRecord::Migration[4.2]
   def self.up
     rename_column :courses, :title, :name
     add_column :courses, :created_at, :datetime
     add_column :courses, :updated_at, :datetime
-    add_column :courses, :private, :boolean, :default => 0, :null => false
+    add_column :courses, :private, :boolean, default: 0, null: false
   end
 
   def self.down

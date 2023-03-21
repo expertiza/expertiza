@@ -1,4 +1,4 @@
-class CreateJoinTeamRequests < ActiveRecord::Migration
+class CreateJoinTeamRequests < ActiveRecord::Migration[4.2]
   def self.up
     create_table :join_team_requests do |t|
       t.column :participant_id, :integer
@@ -8,7 +8,6 @@ class CreateJoinTeamRequests < ActiveRecord::Migration
       t.timestamps
     end
   end
-
 
   def self.down
     drop_table :join_team_requests

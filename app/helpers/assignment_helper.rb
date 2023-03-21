@@ -1,18 +1,17 @@
 module AssignmentHelper
-  def course_options(instructor)
+  def course_options(instructor = nil)
+    courses = []
     if session[:user].role.name == 'Teaching Assistant'
-      courses = []
       ta = Ta.find(session[:user].id)
-      ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id) }
+      ta.ta_mappings.each { |mapping| courses << Course.find(mapping.course_id) }
       # If a TA created some courses before, s/he can still add new assignments to these courses.
-      #Only those courses should be shown in the dropdown list of courses, the assignment is part of and the instructor or TA has access to.
+      # Only those courses should be shown in the dropdown list of courses, the assignment is part of and the instructor or TA has access to.
       courses << Course.where(instructor_id: ta.id)
-      courses.flatten!
     # Administrator and Super-Administrator can see all courses
     elsif session[:user].role.name == 'Administrator' || session[:user].role.name == 'Super-Administrator'
-      courses = Course.all
+      courses << Course.all
     elsif session[:user].role.name == 'Instructor'
-      courses = Course.where(instructor_id: instructor.id)
+      courses << Course.where(instructor_id: session[:user].id)
       # instructor can see courses his/her TAs created
       ta_ids = []
       instructor = Instructor.find(session[:user].id)
@@ -20,11 +19,11 @@ module AssignmentHelper
       ta_ids.flatten!
       ta_ids.each do |ta_id|
         ta = Ta.find(ta_id)
-        ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id) }
+        ta.ta_mappings.each { |mapping| courses << Course.find(mapping.course_id) }
       end
     end
+    courses.flatten!
     options = []
-    # Only instructors, but not TAs, would then be allowed to change an assignment to be part of no course
     if session[:user].role.name == 'Administrator' || session[:user].role.name == 'Super-Administrator' || session[:user].role.name == 'Instructor'
       options << ['-----------', nil]
     end
@@ -38,7 +37,7 @@ module AssignmentHelper
   def questionnaire_options(type)
     questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', session[:user].id]).order('name')
     options = []
-    questionnaires.select {|x| x.type == type }.each do |questionnaire|
+    questionnaires.select { |x| x.type == type }.each do |questionnaire|
       options << [questionnaire.name, questionnaire.id]
     end
     options
@@ -60,14 +59,13 @@ module AssignmentHelper
   def due_date(assignment, type, round = 0)
     due_dates = assignment.find_due_dates(type)
 
-    due_dates.delete_if {|due_date| due_date.due_at.nil? }
-    due_dates.sort! {|x, y| x.due_at <=> y.due_at }
+    due_dates.delete_if { |due_date| due_date.due_at.nil? }
+    due_dates.sort! { |x, y| x.due_at <=> y.due_at }
 
     if due_dates[round].nil? || round < 0
       due_date = AssignmentDueDate.new
       due_date.deadline_type_id = DeadlineType.find_by(name: type).id
       # creating new round
-      # TODO: add code to assign default permission to the newly created due_date according to the due_date type
       due_date.submission_allowed_id = AssignmentDueDate.default_permission(type, 'submission_allowed')
       due_date.review_allowed_id = AssignmentDueDate.default_permission(type, 'can_review')
       due_date.review_of_review_allowed_id = AssignmentDueDate.default_permission(type, 'review_of_review_allowed')
@@ -76,7 +74,7 @@ module AssignmentHelper
       due_dates[round]
     end
   end
-  
+
   def get_data_for_list_submissions(team)
     teams_users = TeamsUser.where(team_id: team.id)
     topic = SignedUpTeam.where(team_id: team.id).first.try :topic
@@ -87,9 +85,11 @@ module AssignmentHelper
     teams_users.each do |teams_user|
       user = User.find(teams_user.user_id)
       users_for_curr_team << user
-      participants << Participant.where(["parent_id = ? AND user_id = ?", @assignment.id, user.id]).first
+      participants << Participant.where(['parent_id = ? AND user_id = ?', @assignment.id, user.id]).first
     end
-    [topic_identifier ||= "", topic_name ||= "", users_for_curr_team, participants]
+    topic_identifier ||= ''
+    topic_name ||= ''
+    [topic_identifier, topic_name, users_for_curr_team, participants]
   end
 
   def get_team_name_color_in_list_submission(team)
@@ -99,6 +99,4 @@ module AssignmentHelper
       '#0984e3' # submission grade is not assigned yet.
     end
   end
-
 end
-

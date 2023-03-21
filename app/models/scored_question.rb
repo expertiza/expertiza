@@ -11,7 +11,7 @@ class ScoredQuestion < ChoiceQuestion
   def view_completed_question; end
 
   def self.compute_question_score(response_id)
-    answer = Answer.find_by(question_id: self.id, response_id: response_id)
-    self.weight * answer.answer
+    answer = Answer.find_by(question_id: id, response_id: response_id)
+    weight * answer.answer
   end
 end

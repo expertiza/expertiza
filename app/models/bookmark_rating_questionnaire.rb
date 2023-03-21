@@ -1,6 +1,6 @@
 class BookmarkRatingQuestionnaire < Questionnaire
   after_initialize :post_initialization
-  @print_name = "Bookmark Rating Rubric"
+  @print_name = 'Bookmark Rating Rubric'
 
   class << self
     attr_reader :print_name
@@ -11,7 +11,7 @@ class BookmarkRatingQuestionnaire < Questionnaire
   end
 
   def symbol
-    "bookmark".to_sym
+    'bookmark'.to_sym
   end
 
   def get_assessments_for(participant)

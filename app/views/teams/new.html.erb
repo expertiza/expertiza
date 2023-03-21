@@ -6,11 +6,10 @@
   assignment was created.</p>
 
 <%= form_tag :action => 'create_teams' do %>
-    <!-- BUG FIX: Check if the parent is course, then set the max size as 4 otherwise the max team size of assignment team-->
     <% if @parent.is_a?(Course)%>
-          Team Size:<%= select_tag 'team_size', options_for_select(2..4), size: 1 %>
+          Team Size:<%= select_tag 'team_size', options_for_select(1..4), size: 1 %>
     <% else %>
-          Team Size:<%= select_tag 'team_size', options_for_select(2..@parent.max_team_size), size: 1 %>
+          Team Size:<%= select_tag 'team_size', options_for_select(1..@parent.max_team_size), size: 1 %>
     <% end %>
 <%= hidden_field_tag 'id', @parent.id %>
 
@@ -28,7 +27,7 @@
 <% end %>
 
 <BR/>
-<% if not @parent.instance_of?(Course) and not @parent.course.nil? %>
+<% if @parent.instance_of?(Assignment) && !@parent.course.nil? && !@parent.course.course_teams.size.zero?%>
   <H2> Inherit Teams From Course </H2>
   <p> Use the teams that are currently defined for the course.</p>
   <%= form_tag :action => 'inherit' do %>

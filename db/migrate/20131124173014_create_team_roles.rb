@@ -1,13 +1,12 @@
-class CreateTeamRoles < ActiveRecord::Migration
+class CreateTeamRoles < ActiveRecord::Migration[4.2]
   def self.up
-    create_table "team_roles", :force => true do |t|
-      t.string "role_names"
-      t.integer "questionnaire_id"
+    create_table 'team_roles', force: true do |t|
+      t.string 'role_names'
+      t.integer 'questionnaire_id'
     end
     execute "ALTER TABLE `team_roles`
              ADD CONSTRAINT `fk_team_roles_questionnaire`
              FOREIGN KEY (questionnaire_id) references questionnaires(id)"
-
   end
 
   def self.down

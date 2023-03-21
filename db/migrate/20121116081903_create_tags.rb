@@ -1,9 +1,9 @@
-class CreateTags < ActiveRecord::Migration
+class CreateTags < ActiveRecord::Migration[4.2]
   def self.up
-    if(table_exists?(:tags)==false)
-    create_table :tags do |t|
-    	t.column "tagname", :string, :null=> false
-    end
+    if table_exists?(:tags) == false
+      create_table :tags do |t|
+        t.column 'tagname', :string, null: false
+      end
     end
   end
 
@@ -11,4 +11,3 @@ class CreateTags < ActiveRecord::Migration
     drop_table :tags
   end
 end
-

@@ -48,11 +48,6 @@ const nodeAttributes = {
         href: '/review_mapping/list_mappings?id=' + `${parseInt(props.id) / 2}`,
         src: '/assets/tree_view/assign-reviewers-24.png'
       }),
-      (props) => ({
-        title: 'Assign survey',
-        href: '/survey_deployment/new?id=' + `${parseInt(props.id) / 2}` + '&type=AssignmentSurveyDeployment',
-        src: '/assets/tree_view/assign-survey-24.png'
-      }),
       (props) =>
         props.requireQuiz
           ? {
@@ -78,11 +73,6 @@ const nodeAttributes = {
         title: 'View reports',
         href: '/reports/response_report?id=' + `${parseInt(props.id) / 2}`,
         src: '/assets/tree_view/view-review-report-24.png'
-      }),
-      (props) => ({
-        title: 'View survey responses',
-        href: '/survey_deployment/view_responses?id=' + `${parseInt(props.id) / 2}`,
-        src: '/assets/tree_view/view-survey-24.png'
       }),
       (props) =>
         props.isIntelligent
@@ -164,11 +154,6 @@ const nodeAttributes = {
         title: 'View grade summary by student',
         href: '/assessment360/course_student_grade_summary?course_id=',
         src: '/assets/tree_view/360-dashboard-24.png'
-      },
-      {
-        title: 'Assign survey',
-        href: '/survey_deployment/new?type=CourseSurveyDeployment&id=',
-        src: '/assets/tree_view/assign-survey-24.png'
       },
       {
         title: 'View aggregated teammate & meta reviews',

@@ -1,4 +1,4 @@
-describe Credentials do 
+describe Credentials do
   let(:role) { build(:role_of_student) }
   describe '#initialize' do
     it 'sets instance variables' do

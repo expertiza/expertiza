@@ -21,14 +21,14 @@ class LotteryController < ApplicationController
     teams = assignment.teams
 
     users_bidding_info = construct_users_bidding_info(assignment.sign_up_topics, teams)
-    bidding_data = {users: users_bidding_info, max_team_size: assignment.max_team_size}
+    bidding_data = { users: users_bidding_info, max_team_size: assignment.max_team_size }
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Bidding data for assignment #{assignment.name}: #{bidding_data}", request)
 
     begin
-      url = WEBSERVICE_CONFIG["topic_bidding_webservice_url"]
+      url = WEBSERVICE_CONFIG['topic_bidding_webservice_url']
       response = RestClient.post url, bidding_data.to_json, content_type: :json, accept: :json
       # Structure of teams variable: [[user_id1, user_id2], [user_id3, user_id4]]
-      teams = JSON.parse(response)["teams"]
+      teams = JSON.parse(response)['teams']
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Team formation info for assignment #{assignment.name}: #{teams}", request)
       create_new_teams_for_bidding_response(teams, assignment, users_bidding_info)
       assignment.remove_empty_teams
@@ -48,7 +48,7 @@ class LotteryController < ApplicationController
   def construct_users_bidding_info(sign_up_topics, teams)
     users_bidding_info = []
     # Exclude any teams already signed up
-    teams_not_signed_up = teams.reject {|team| SignedUpTeam.where(team_id: team.id, is_waitlisted: 0).any? }
+    teams_not_signed_up = teams.reject { |team| SignedUpTeam.where(team_id: team.id, is_waitlisted: 0).any? }
     teams_not_signed_up.each do |team|
       # Grab student id and list of bids
       bids = []
@@ -56,7 +56,7 @@ class LotteryController < ApplicationController
         bid_record = Bid.find_by(team_id: team.id, topic_id: topic.id)
         bids << (bid_record.try(:priority) || 0)
       end
-      team.users.each {|user| users_bidding_info << {pid: user.id, ranks: bids} } unless bids.uniq == [0]
+      team.users.each { |user| users_bidding_info << { pid: user.id, ranks: bids } } unless bids.uniq == [0]
     end
     users_bidding_info
   end
@@ -69,10 +69,10 @@ class LotteryController < ApplicationController
       topic_bids = []
       sign_up_topics.each do |topic|
         bid = Bid.find_by(team_id: team.id, topic_id: topic.id)
-        topic_bids << {topic_id: topic.id, priority: bid.priority} if bid
+        topic_bids << { topic_id: topic.id, priority: bid.priority } if bid
       end
-      topic_bids.sort! {|bid| bid[:priority] }
-      teams_bidding_info << {team_id: team.id, bids: topic_bids}
+      topic_bids.sort! { |bid| bid[:priority] }
+      teams_bidding_info << { team_id: team.id, bids: topic_bids }
     end
     teams_bidding_info
   end
@@ -97,7 +97,8 @@ class LotteryController < ApplicationController
   def assign_available_slots(teams_bidding_info)
     teams_bidding_info.each do |tb|
       tb[:bids].each do |bid|
-        num_of_signed_up_teams = SignedUpTeam.where(topic_id: bid[:topic_id]).count
+        topic_id = bid[:topic_id]
+        num_of_signed_up_teams = SignedUpTeam.where(topic_id: topic_id).count
         max_choosers = SignUpTopic.find(bid[:topic_id]).try(:max_choosers)
         if num_of_signed_up_teams < max_choosers
           SignedUpTeam.create(team_id: tb[:team_id], topic_id: bid[:topic_id])
@@ -117,7 +118,7 @@ class LotteryController < ApplicationController
     # Getting sign-up topics with max_choosers > 0
     sign_up_topics = SignUpTopic.where('assignment_id = ? AND max_choosers > 0', assignment.id)
     unassigned_teams = assignment.teams.reload.select do |t|
-      SignedUpTeam.where(team_id: t.id, is_waitlisted: 0).blank? and Bid.where(team_id: t.id).any?
+      SignedUpTeam.where(team_id: t.id, is_waitlisted: 0).blank? && Bid.where(team_id: t.id).any?
     end
 
     # Sorting unassigned_teams by team size desc, number of bids in current team asc
@@ -127,7 +128,7 @@ class LotteryController < ApplicationController
     # maybe we can use timestamps in this case
     unassigned_teams.sort! do |t1, t2|
       [TeamsUser.where(team_id: t2.id).size, Bid.where(team_id: t1.id).size] <=>
-          [TeamsUser.where(team_id: t1.id).size, Bid.where(team_id: t2.id).size]
+        [TeamsUser.where(team_id: t1.id).size, Bid.where(team_id: t2.id).size]
     end
 
     teams_bidding_info = construct_teams_bidding_info(unassigned_teams, sign_up_topics)

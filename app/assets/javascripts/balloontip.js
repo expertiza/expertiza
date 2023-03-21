@@ -1,13 +1,13 @@
 //Rich HTML Balloon Tooltip: http://www.dynamicdrive.com/dynamicindex5/balloontooltip.htm
 //Created: September 10th, 2006
 
-var disappeardelay=250  //tooltip disappear delay (in miliseconds)
+var disappeardelay=250  //tooltip disappear delay (in milliseconds)
 var verticaloffset=0 //vertical offset of tooltip from anchor link, if any
 var enablearrowhead=1 //0 or 1, to disable or enable the arrow image
 var arrowheadimg=["/assets/arrowdown.gif", "/assets/arrowup.gif"] //path to down and up arrow images
 var arrowheadheight=11 //height of arrow image (amount to reveal)
 
-/////No further editting needed
+/////No further editing needed
 
 var ie=document.all
 var ns6=document.getElementById&&!document.all

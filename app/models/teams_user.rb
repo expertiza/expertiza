@@ -1,27 +1,25 @@
-class TeamsUser < ActiveRecord::Base
+class TeamsUser < ApplicationRecord
   belongs_to :user
   belongs_to :team
   has_one :team_user_node, foreign_key: 'node_object_id', dependent: :destroy
   has_paper_trail
-  attr_accessible :user_id, :team_id
+  # attr_accessible :user_id, :team_id # unnecessary protected attributes
 
   def name(ip_address = nil)
-    name = self.user.name(ip_address)
+    name = user.name(ip_address)
 
     # E2115 Mentor Management
     # Indicate that someone is a Mentor in the UI. The view code is
     # often hard to follow, and this is the best place we could find
     # for this to go.
-    if MentorManagement.user_a_mentor?(self.user)
-      name += " (Mentor)"
-    end
+    name += ' (Mentor)' if MentorManagement.user_a_mentor?(user)
     name
   end
 
   def delete
-    TeamUserNode.find_by(node_object_id: self.id).destroy
+    TeamUserNode.find_by(node_object_id: id).destroy
     team = self.team
-    self.destroy
+    destroy
     team.delete if team.teams_users.empty?
   end
 
@@ -30,26 +28,29 @@ class TeamsUser < ActiveRecord::Base
   # Removes entry in the TeamUsers table for the given user and given team id
   def self.remove_team(user_id, team_id)
     team_user = TeamsUser.where('user_id = ? and team_id = ?', user_id, team_id).first
-    team_user.destroy unless team_user.nil?
+    team_user&.destroy
   end
 
   # Returns the first entry in the TeamUsers table for a given team id
   def self.first_by_team_id(team_id)
-    TeamsUser.where("team_id = ?", team_id).first
+    TeamsUser.where('team_id = ?', team_id).first
   end
 
   # Determines whether a team is empty of not
   def self.team_empty?(team_id)
-    team_members = TeamsUser.where("team_id = ?", team_id)
+    team_members = TeamsUser.where('team_id = ?', team_id)
     team_members.blank?
   end
 
   # Add member to the team they were invited to and accepted the invite for
   def self.add_member_to_invited_team(invitee_user_id, invited_user_id, assignment_id)
+    can_add_member = false
     users_teams = TeamsUser.where(['user_id = ?', invitee_user_id])
-    for team in users_teams
+    users_teams.each do |team|
       new_team = AssignmentTeam.where(['id = ? and parent_id = ?', team.team_id, assignment_id]).first
-      can_add_member = new_team.add_member(User.find(invited_user_id), assignment_id) unless new_team.nil?
+      unless new_team.nil?
+        can_add_member = new_team.add_member(User.find(invited_user_id), assignment_id)
+      end
     end
     can_add_member
   end

@@ -1,9 +1,9 @@
-class Bid < ActiveRecord::Base
+class Bid < ApplicationRecord
   belongs_to :topic, class_name: 'SignUpTopic'
   belongs_to :team
 
   # Create new bids for team based on `ranks` variable for each team member
-  # Structure of users_bidding_info variable: 
+  # Structure of users_bidding_info variable:
   # [[topic_1_priority, topic_2_priority, ...], [topic_1_priority, topic_2_priority, ...], ...]
   # Currently, it is possible (already proved by db records) that
   # some teams have multiple 1st priority, multiply 2nd priority.
@@ -22,7 +22,7 @@ class Bid < ActiveRecord::Base
     #   3: [2, 3, 1],
     #   4: [2, 0, 1]
     # }
-    bidding_matrix = Hash.new {|hash, key| hash[key] = [] }
+    bidding_matrix = Hash.new { |hash, key| hash[key] = [] }
     users_bidding_info.each do |bids|
       sign_up_topics.each_with_index do |topic, index|
         bidding_matrix[topic.id] << bids[index]
@@ -40,9 +40,9 @@ class Bid < ActiveRecord::Base
     bidding_matrix_summary = []
     bidding_matrix.each do |topic_id, value|
       # Exclude topics that no one bid for
-      bidding_matrix_summary << [value.count {|i| i != 0 }, value.inject(:+), topic_id] unless value.inject(:+).zero?
+      bidding_matrix_summary << [value.count { |i| i != 0 }, value.inject(:+), topic_id] unless value.inject(:+).zero?
     end
-    bidding_matrix_summary.sort! {|b1, b2| [b2[0], b1[1]] <=> [b1[0], b2[1]] }
+    bidding_matrix_summary.sort! { |b1, b2| [b2[0], b1[1]] <=> [b1[0], b2[1]] }
     # Result of sorting first element descendingly and second element ascendingly.
     # We want the topic with most bids and lowest sum of priorities at the top.
     # [

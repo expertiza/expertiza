@@ -1,8 +1,8 @@
-class CreateQuestions < ActiveRecord::Migration
+class CreateQuestions < ActiveRecord::Migration[4.2]
   def self.up
     create_table :questions do |t|
       t.column :txt, :text
-      t.column :true_false, :boolean  # either it's a true/false question, or it's a question that is to be given a numeric score
+      t.column :true_false, :boolean # either it's a true/false question, or it's a question that is to be given a numeric score
       t.column :weight, :integer
       t.column :questionnaire_id, :integer
     end

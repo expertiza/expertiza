@@ -26,11 +26,11 @@ describe AssignmentParticipant do
       expect(participant.reviewers).to eq([participant2])
     end
   end
-  
+
   describe '#get_reviewer' do
     context 'when the associated assignment is reviewed by his team' do
       it 'returns the team' do
-        allow(assignment).to receive(:reviewer_is_team).and_return(true)
+        allow(assignment).to receive(:team_reviewing_enabled).and_return(true)
         allow(participant).to receive(:team).and_return(team)
         expect(participant.get_reviewer).to eq(team)
       end
@@ -45,7 +45,7 @@ describe AssignmentParticipant do
       expect(participant.path).to eq('assignment780/780')
     end
   end
-  
+
   describe '#copy_to_course' do
     it 'copies assignment participants to a certain course' do
       expect { participant.copy_to_course(123) }.to change { CourseParticipant.count }.from(0).to(1)
@@ -55,42 +55,42 @@ describe AssignmentParticipant do
   end
 
   describe '#feedback' do
-    it 'returns corrsponding author feedback responses given by current participant' do
+    it 'returns corresponding author feedback responses given by current participant' do
       allow(FeedbackResponseMap).to receive(:assessments_for).with(participant).and_return([response])
       expect(participant.feedback).to eq([response])
     end
   end
 
   describe '#reviews' do
-    it 'returns corrsponding peer review responses given by current team' do
+    it 'returns corresponding peer review responses given by current team' do
       allow(ReviewResponseMap).to receive(:assessments_for).with(team).and_return([response])
       expect(participant.reviews).to eq([response])
     end
   end
 
   describe '#quizzes_taken' do
-    it 'returns corrsponding quiz responses given by current participant' do
+    it 'returns corresponding quiz responses given by current participant' do
       allow(QuizResponseMap).to receive(:assessments_for).with(participant).and_return([response])
       expect(participant.quizzes_taken).to eq([response])
     end
   end
 
   describe '#metareviews' do
-    it 'returns corrsponding metareview responses given by current participant' do
+    it 'returns corresponding metareview responses given by current participant' do
       allow(MetareviewResponseMap).to receive(:assessments_for).with(participant).and_return([response])
       expect(participant.metareviews).to eq([response])
     end
   end
 
   describe '#teammate_reviews' do
-    it 'returns corrsponding teammate review responses given by current participant' do
+    it 'returns corresponding teammate review responses given by current participant' do
       allow(TeammateReviewResponseMap).to receive(:assessments_for).with(participant).and_return([response])
       expect(participant.teammate_reviews).to eq([response])
     end
   end
 
   describe '#bookmark_reviews' do
-    it 'returns corrsponding bookmark review responses given by current participant' do
+    it 'returns corresponding bookmark review responses given by current participant' do
       allow(BookmarkRatingResponseMap).to receive(:assessments_for).with(participant).and_return([response])
       expect(participant.bookmark_reviews).to eq([response])
     end
@@ -98,34 +98,34 @@ describe AssignmentParticipant do
 
   describe '#assign_copyright' do
     it 'grant publishing rights to one or more assignments using the supplied private key' do
-      # create new RSA key-pair 
+      # create new RSA key-pair
       key = OpenSSL::PKey::RSA.new 2048
       participant.user.public_key = key.public_key.to_pem
 
       participant.assign_copyright(key)
-      expect(participant.permission_granted).to eq(true) 
+      expect(participant.permission_granted).to eq(true)
     end
   end
 
   describe '#files' do
     context 'when there is not subdirectory in current directory' do
       it 'returns all files in current directory' do
-        expect(participant.files('./hooks')).to eq(["./hooks/pre-commit"])
+        expect(participant.files('./hooks')).to eq(['./hooks/pre-commit'])
       end
     end
 
     context 'when there is subdirectory in current directory' do
       it 'recursively returns all files in current directory' do
-        allow(Dir).to receive(:[]).with("a/*").and_return(["a/b"])
-        allow(File).to receive(:directory?).with("a/b").and_return(true)
-        allow(Dir).to receive(:[]).with("a/b/*").and_return(["a/b/k.rb"])
-        allow(File).to receive(:directory?).with("a/b/k.rb").and_return(false)
-        expect(participant.files("a")).to eq(%w[a/b/k.rb a/b])
+        allow(Dir).to receive(:[]).with('a/*').and_return(['a/b'])
+        allow(File).to receive(:directory?).with('a/b').and_return(true)
+        allow(Dir).to receive(:[]).with('a/b/*').and_return(['a/b/k.rb'])
+        allow(File).to receive(:directory?).with('a/b/k.rb').and_return(false)
+        expect(participant.files('a')).to eq(%w[a/b/k.rb a/b])
       end
     end
   end
 
-  describe ".import" do
+  describe '.import' do
     context 'when record is empty' do
       it 'raises an ArgumentError' do
         expect { AssignmentParticipant.import({}, nil, nil, nil) }.to raise_error(ArgumentError, 'No user id has been specified.')
@@ -135,7 +135,7 @@ describe AssignmentParticipant do
     context 'when no user is found by offered username' do
       context 'when the record has less than 4 items' do
         it 'raises an ArgumentError' do
-          row = {name: 'no one', fullname: 'no one', email: 'no_one@email.com'}
+          row = { name: 'no one', fullname: 'no one', email: 'no_one@email.com' }
           expect(ImportFileHelper).not_to receive(:create_new_user)
           expect { AssignmentParticipant.import(row, nil, nil, nil) }.to raise_error('The record containing no one does not have enough items.')
         end
@@ -143,14 +143,14 @@ describe AssignmentParticipant do
 
       context 'when new user needs to be created' do
         let(:row) do
-          {name: 'no one', fullname: 'no one', email: 'name@email.com', role:'user_role_name', parent: 'user_parent_name'}
+          { name: 'no one', fullname: 'no one', email: 'name@email.com', role: 'user_role_name', parent: 'user_parent_name' }
         end
         let(:attributes) do
-          {role_id: 1, name: 'no one', fullname: 'no one', email: 'name@email.com', email_on_submission: 'name@email.com',
-           email_on_review: 'name@email.com', email_on_review_of_review: 'name@email.com'}
+          { role_id: 1, name: 'no one', fullname: 'no one', email: 'name@email.com', email_on_submission: 'name@email.com',
+            email_on_review: 'name@email.com', email_on_review_of_review: 'name@email.com' }
         end
         let(:test_user) do
-          {name: 'abc', email: 'abcbbc@gmail.com'}
+          { name: 'abc', email: 'abcbbc@gmail.com' }
         end
         it 'create the user and number of mails sent should be 1' do
           ActionMailer::Base.deliveries.clear
@@ -159,26 +159,29 @@ describe AssignmentParticipant do
             test_user = User.new(name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com')
             test_user.id = 123
             test_user.save!
+            password = test_user.reset_password # the password is reset
+            prepared_mail = MailerHelper.send_mail_to_user(test_user, 'Your Expertiza account and password have been created.', 'user_welcome', password)
+            prepared_mail.deliver
             test_user
           end
-          #allow(ImportFileHelper).to receive(:create_new_user).with(attributes, {}).and_return()
+          # allow(ImportFileHelper).to receive(:create_new_user).with(attributes, {}).and_return()
           allow(Assignment).to receive(:find).with(1).and_return(assignment)
           allow(User).to receive(:exists?).with(name: 'no one').and_return(false)
           allow(participant).to receive(:set_handle).and_return('handle')
           allow(AssignmentParticipant).to receive(:exists?).and_return(false)
           allow(AssignmentParticipant).to receive(:create).and_return(participant)
           allow(AssignmentParticipant).to receive(:set_handle)
-          expect{(AssignmentParticipant.import(row, nil, {}, 1))}.to change { ActionMailer::Base.deliveries.count }.by(1)
+          expect { AssignmentParticipant.import(row, nil, {}, 1) }.to change { ActionMailer::Base.deliveries.count }.by(1)
         end
       end
 
       context 'when the record has more than 4 items' do
         let(:row) do
-          {name: 'no one', fullname: 'no one', email: 'name@email.com', role:'user_role_name', parent: 'user_parent_name'}
+          { name: 'no one', fullname: 'no one', email: 'name@email.com', role: 'user_role_name', parent: 'user_parent_name' }
         end
         let(:attributes) do
-          {role_id: 1, name: 'no one', fullname: 'no one', email: 'name@email.com', email_on_submission: 'name@email.com',
-           email_on_review: 'name@email.com', email_on_review_of_review: 'name@email.com'}
+          { role_id: 1, name: 'no one', fullname: 'no one', email: 'name@email.com', email_on_submission: 'name@email.com',
+            email_on_review: 'name@email.com', email_on_review_of_review: 'name@email.com' }
         end
         before(:each) do
           allow(ImportFileHelper).to receive(:define_attributes).with(row).and_return(attributes)
@@ -211,17 +214,17 @@ describe AssignmentParticipant do
     it 'exports all participants in current assignment' do
       allow(AssignmentParticipant).to receive_message_chain(:where, :find_each).with(parent_id: 1).with(no_args).and_yield(participant)
       allow(participant).to receive(:user).and_return(build(:student, name: 'student2065', fullname: '2065, student'))
-      options = {'personal_details' => 'true', 'role' => 'true', 'handle' => 'true', 'parent' => 'true', 'email_options' => 'true'}
+      options = { 'personal_details' => 'true', 'role' => 'true', 'handle' => 'true', 'parent' => 'true', 'email_options' => 'true' }
       expect(AssignmentParticipant.export([], 1, options)).to eq(
-        [["student2065",
-          "2065, student",
-          "expertiza@mailinator.com",
-          "Student",
-          "instructor6",
+        [['student2065',
+          '2065, student',
+          'expertiza@mailinator.com',
+          'Student',
+          'instructor6',
           true,
           true,
           true,
-          "handle"]]
+          'handle']]
       )
     end
   end

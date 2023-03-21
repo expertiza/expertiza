@@ -19,7 +19,7 @@ class Locale
   # A locale used to represent the lack of a locale preference
   # == Example
   # A new user who has not configured his locale preference may be initialized with this as his locale preference
-  @no_preference = Locale.new(:no_pref, "No Preference", 0)
+  @no_preference = Locale.new(:no_pref, 'No Preference', 0)
 
   class << self
     # Returns the list of all locales for which there is a registered I18n locale.
@@ -40,7 +40,7 @@ class Locale
     # == Example
     #   Locale.code_name_to_db_encoding([Locale.new(:no_pref, 'No Preference', 0)])) # {no_pref: 1}
     def code_name_to_db_encoding(locales = Locale.available_locales)
-      tabulate(locales, [:code_name, :database_encoding]).to_h
+      tabulate(locales, %i[code_name database_encoding]).to_h
     end
 
     def tabulate(enumerable, fields)
@@ -55,8 +55,7 @@ class Locale
     #   Locale.find_by_code(:en_US) == Locale.new(:en_US, 'English', 1)
     #   # Where 'English' is defined in en_US.yml under and the key display_name, and '1' under database_encoding
     def from_i18n_locale(locale)
-      I18n.with_locale(locale) { Locale.new(locale, I18n.t(".display_name"), I18n.t(".database_encoding")) }
+      I18n.with_locale(locale) { Locale.new(locale, I18n.t('.display_name'), I18n.t('.database_encoding')) }
     end
   end
-
 end

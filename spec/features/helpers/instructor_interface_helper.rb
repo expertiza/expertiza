@@ -1,11 +1,11 @@
 module InstructorInterfaceHelperSpec
   def set_deadline_type
-    create(:deadline_type, name: "submission")
-    create(:deadline_type, name: "review")
-    create(:deadline_type, name: "metareview")
-    create(:deadline_type, name: "drop_topic")
-    create(:deadline_type, name: "signup")
-    create(:deadline_type, name: "team_formation")
+    create(:deadline_type, name: 'submission')
+    create(:deadline_type, name: 'review')
+    create(:deadline_type, name: 'metareview')
+    create(:deadline_type, name: 'drop_topic')
+    create(:deadline_type, name: 'signup')
+    create(:deadline_type, name: 'team_formation')
   end
 
   def set_deadline_right
@@ -35,14 +35,14 @@ module InstructorInterfaceHelperSpec
   end
 
   def import_topics(filepath)
-    login_as("instructor6")
+    login_as('instructor6')
     visit '/assignments/1/edit'
-    click_link "Topics"
-    click_link "Import topics"
+    click_link 'Topics'
+    click_link 'Import topics'
     file_path = Rails.root + filepath
     attach_file('file', file_path)
-    click_button "Import"
-    click_link "Topics"
+    click_button 'Import'
+    click_link 'Topics'
   end
 
   def expect_page_content_to_have(content, has_content)

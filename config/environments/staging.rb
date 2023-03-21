@@ -24,7 +24,6 @@ Expertiza::Application.configure do
   config.serve_static_files = false
 
   # Compress JavaScripts and CSS.
-  config.assets.js_compressor = :uglifier
   # config.assets.css_compressor = :sass
 
   # Do not fallback to assets pipeline if a precompiled asset is missed.
@@ -37,7 +36,7 @@ Expertiza::Application.configure do
   config.assets.version = '1.0'
 
   # Specifies the header that your server uses for sending files.
-  #config.action_dispatch.x_sendfile_header = "X-Sendfile" # for apache
+  # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for apache
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
 
   # Enable serving of images, stylesheets, and javascripts from an asset server
@@ -86,7 +85,7 @@ Expertiza::Application.configure do
   # config.autoflush_log = false
 
   # Use default logging formatter so that PID and timestamp are not suppressed.
-  config.log_tags = [ :remote_ip, :uuid ]
+  config.log_tags = %i[remote_ip uuid]
 
   config.log_formatter = proc do |s, ts, pg, msg|
     if msg.is_a?(LoggerMessage)
@@ -97,7 +96,7 @@ Expertiza::Application.configure do
   end
 
   def filter(msg)
-    msg.tr("\n",' ')
+    msg.tr("\n", ' ')
   end
 
   config.action_view.logger = nil

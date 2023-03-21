@@ -1,24 +1,24 @@
 class ReviewBidsController < ApplicationController
-  require "json"
-  require "uri"
-  require "net/http"
-  require "rest_client"
+  require 'json'
+  require 'uri'
+  require 'net/http'
+  require 'rest_client'
 
-  #action allowed function checks the action allowed based on the user working
+  # action allowed function checks the action allowed based on the user working
   def action_allowed?
     case params[:action]
-      when 'show', 'set_priority', 'index'
-        ['Instructor',
-         'Teaching Assistant',
-         'Administrator',
-         'Super-Administrator',
-         'Student'].include? current_role_name and
-            ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], "participant" "reader", "submitter", "reviewer") : true)
-      else
-        ['Instructor',
-         'Teaching Assistant',
-         'Administrator',
-         'Super-Administrator'].include? current_role_name
+    when 'show', 'set_priority', 'index'
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include?(current_role_name) &&
+        ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer') : true)
+    else
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator'].include? current_role_name
     end
   end
 
@@ -26,6 +26,7 @@ class ReviewBidsController < ApplicationController
   def index
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
+
     @assignment = @participant.assignment
     @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
 
@@ -39,7 +40,7 @@ class ReviewBidsController < ApplicationController
     render 'sign_up_sheet/review_bids_others_work'
   end
 
-  # provides vaiables for review bidding page
+  # provides variables for review bidding page
   def show
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
@@ -47,8 +48,8 @@ class ReviewBidsController < ApplicationController
     my_topic = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     @sign_up_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: my_topic)
     @num_participants = AssignmentParticipant.where(parent_id: @assignment.id).count
-    @selected_topics = nil #this is used to list the topics assigned to review. (ie select == assigned i believe)
-    @bids = ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id)
+    @selected_topics = nil # this is used to list the topics assigned to review. (ie select == assigned i believe)
+    @bids = ReviewBid.where(participant_id: @participant, assignment_id: @assignment.id)
     signed_up_topics = []
     @bids.each do |bid|
       sign_up_topic = SignUpTopic.find_by(id: bid.signuptopic_id)
@@ -59,8 +60,7 @@ class ReviewBidsController < ApplicationController
     @bids = signed_up_topics
     @num_of_topics = @sign_up_topics.size
     @assigned_review_maps = []
-    selected_topics = []
-    ReviewResponseMap.where({:reviewed_object_id => @assignment.id, :reviewer_id => @participant.id}).each do |review_map|
+    ReviewResponseMap.where(reviewed_object_id: @assignment.id, reviewer_id: @participant.id).each do |review_map|
       @assigned_review_maps << review_map
     end
 
@@ -73,7 +73,6 @@ class ReviewBidsController < ApplicationController
     if params[:topic].nil?
       ReviewBid.where(participant_id: params[:id]).destroy_all
     else
-      participant = AssignmentParticipant.find_by(id: params[:id])
       assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
       @bids = ReviewBid.where(participant_id: params[:id])
       signed_up_topics = ReviewBid.where(participant_id: params[:id]).map(&:signuptopic_id)
@@ -102,24 +101,21 @@ class ReviewBidsController < ApplicationController
     bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
     matched_topics = run_bidding_algorithm(bidding_data)
     ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
-    Assignment.find(assignment_id).update(can_choose_topic_to_review: false) #turns off bidding for students
-    redirect_to :back
-
+    Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
+    redirect_back fallback_location: root_path
   end
 
-  # call webserver for running assigning algorthim
+  # call webserver for running assigning algorithm
   # passing webserver: student_ids, topic_ids, student_preferences, time_stamps
-  # webserver returns: 
+  # webserver returns:
   # returns matched assignments as json body
   def run_bidding_algorithm(bidding_data)
     # begin
-    url = WEBSERVICE_CONFIG["review_bidding_webservice_url"] #won't work unless ENV variables are configured
-    url = 'http://app-csc517.herokuapp.com/match_topics' #hard coding for the time being
+    url = 'http://app-csc517.herokuapp.com/match_topics' # hard coding for the time being
     response = RestClient.post url, bidding_data.to_json, content_type: 'application/json', accept: :json
-    return JSON.parse(response.body)
+    JSON.parse(response.body)
   rescue StandardError
-    return false
+    false
     # end
   end
-
 end

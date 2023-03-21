@@ -1,4 +1,3 @@
-
 class HttpRequest
   require 'net/http'
 
@@ -9,7 +8,7 @@ class HttpRequest
     end
 
     def get(url, limit = 5)
-      return "" if limit <= 0
+      return '' if limit <= 0
 
       uri = URI.parse(url)
       req = Net::HTTP::Get.new(uri.to_s)
@@ -28,10 +27,10 @@ class HttpRequest
           new_uri.scheme = uri.scheme
           new_uri.host = uri.host
         end
-        self.get(new_uri.to_s, limit - 1)
+        get(new_uri.to_s, limit - 1)
 
       else
-        ""
+        ''
       end
     end
 

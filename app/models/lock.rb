@@ -6,29 +6,27 @@
 # Because this was made for that purpose, ActiveRecord.lock! is not used on the resource. However, it may be useful
 # for you if you wish to use this to implement a lock just on a database entry.
 # There is information here: https://api.rubyonrails.org/v5.2.3/classes/ActiveRecord/Locking/Pessimistic.html
-class Lock < ActiveRecord::Base
-  #The resource being locked can be any class
+class Lock < ApplicationRecord
+  # The resource being locked can be any class
   belongs_to :lockable, polymorphic: true
   belongs_to :user, class_name: 'User', foreign_key: 'user_id', inverse_of: false
   # How many minutes of inactivity before this lock is released?
   validates :timeout_period, presence: true
-  
+
   # For E1973, we're just going to use the default timeout period of 20 minutes.
   DEFAULT_TIMEOUT = 20
-  
+
   # Requests a lock on the given resource for the given user
   # Since resources can be of any class, the class name for the resource must be provided
   # Return the resource if it's available or nil if it is not
   # Automatically handles creating/destroying locks and timeout periods
   # However, once a user is done with a lock, it is their responsibility to destroy it by using Lock.unlock
   def self.get_lock(lockable, user, timeout)
-    if lockable.nil? || user.nil?
-      return nil
-    end
+    return nil if lockable.nil? || user.nil?
+
     lock = find_by(lockable: lockable)
-    if lock.nil?
-      return create_lock(lockable, user, timeout)
-    end
+    return create_lock(lockable, user, timeout) if lock.nil?
+
     # We need to put an actual database lock on this object to prevent concurrent acquisition of this object
     # If two users were to request a lock at the same time, they might otherwise be able to acquire this lock simultaneously
     lock.with_lock do
@@ -44,9 +42,9 @@ class Lock < ActiveRecord::Base
       end
     end
     # Return nil because a lock could not be obtained on the resource
-    return nil
+    nil
   end
-  
+
   # Checks to see if there exists a lock between the given resource and user
   # If I am a user who uses a resource for so long that the timeout period has passed AND another
   # user has locked, modified, and unlocked the resource, I do NOT want to modify the resource
@@ -66,25 +64,21 @@ class Lock < ActiveRecord::Base
       return true
     end
   end
-  
-  #Destroys the lock on the given resource by the given user (if it exists)
+
+  # Destroys the lock on the given resource by the given user (if it exists)
   def self.release_lock(lockable)
-    if lockable.nil?
-      return
-    end
+    return if lockable.nil?
+
     lock = find_by(lockable: lockable)
-    unless lock.nil?
-      Lock.where(lockable: lockable).destroy_all
-    end
+    Lock.where(lockable: lockable).destroy_all unless lock.nil?
   end
-  
-  private
+
   # Just a little helper method to help keep this code DRY
   # If for some reason, the lock had trouble being created, returns nil because there is no
   # lock on the object
   def self.create_lock(lockable, user, timeout)
     # This method is still a potential location for a race condition.
-    # Unfortunately, database locks can't be created for nonexistant entries.
+    # Unfortunately, database locks can't be created for nonexistent entries.
     # This was the way I found online avoid the race condition but I'm not sure exactly how it works
     transaction do
       lock = Lock.new(lockable: lockable, user: user, timeout_period: timeout)

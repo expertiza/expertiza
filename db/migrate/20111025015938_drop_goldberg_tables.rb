@@ -1,4 +1,4 @@
-class DropGoldbergTables < ActiveRecord::Migration
+class DropGoldbergTables < ActiveRecord::Migration[4.2]
   def self.up
     drop_table :goldberg_content_pages
     drop_table :goldberg_controller_actions
@@ -12,6 +12,5 @@ class DropGoldbergTables < ActiveRecord::Migration
     drop_table :goldberg_users
   end
 
-  def self.down
-  end
+  def self.down; end
 end

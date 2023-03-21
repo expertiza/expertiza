@@ -35,7 +35,8 @@
     score not being computed and shown for multi-round reviews. Check for :review1 and :review2 symbols, generate arithmetic
     means of each, and take arithmetic mean of both to display. If :review symbol present, use original logic.
 -->
-<% if @pscore[:review1] && @pscore[:review2] %>
+<% if @pscore[:review1] && @pscore[:review2] && @pscore[:review1]
+  [:assessments].any? && @pscore[:review2][:assessments].any? %>
   <% rscore_review1 = Rscore.new(@pscore,:review1) %>
   <% rscore_review2 = Rscore.new(@pscore,:review2) %>
   <% average = rscore_review1.my_avg + rscore_review2.my_avg %>
@@ -105,6 +106,14 @@
 
                 fix comment end
               -->
+              <br/>
+
+        <!-- This iterates over the list of metrics and shows them as checkboxes which can be used for toggling the metric in heatgrid-->
+        <% vm.list_of_rows.first.metric_hash.each do |key, value| %>
+            <% newKey = key.split(" ").join("") %>
+            <input type="checkbox" id="<%= newKey %>" onchange = onMetricToggle(this)><%=key%> </input>
+        <% end %>
+
         <div class="hide-scrollbar">
           <table id="scoresTable<%= vm.round.to_s  %>" class="scoresTable tbl_heat tablesorter">
             <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
@@ -126,9 +135,17 @@
               <th class="sorter-true" align="right" >
                 Avg<span></span>
               </th>
-              <th class="sorter-false">
-                <span  data-toggle="tooltip" data-placement="right" title="<%=t(".metric_tooltip")%>"><%=t ".metric1"%></span>
-              </th>
+
+                <!-- <span  data-toggle="tooltip" data-placement="right" title="<%=t(".metric_tooltip")%>"><%=t ".metric1"%></span> -->
+              
+              <!-- Iterating over the list of metrics and showing them in the header of table -->
+              <% vm.list_of_rows.first.metric_hash.each do |key, value| %>
+                <% newKey = key.split(" ").join("") %>
+                <th class="sorter-false metric-header <%= newKey %>" style="display:none">
+                  <span  data-toggle="tooltip" data-placement="right" title="<%=t(".metric_tooltip")%>" ><%=key%></span>
+                </th>
+              <% end %>
+
             </tr>
             </thead>
 
@@ -159,9 +176,16 @@
                   <td  class = 'cf' align="right">
                     <%= row.average_score_for_row.to_s %>
                   </td>
-                  <td  class = 'cf' align="center">
-                    <%= row.countofcomments.to_s %>
-                  </td>
+
+                  <!-- Iterating over the list of metrics and showing them in the table -->
+                  <% row.metric_hash.each do |key, value| %>
+                    <% newKey = key.split(" ").join("") %>
+                    <td  class = 'cf metric-value <%= newKey %>' align="center" style="display:none">
+                      <%= value.to_s %>
+                    </td>
+                  <% end %>
+
+
                 </tr>
                 <!--loop that creates the collapsed-by-default row, which lists all comments. -->
                 <tr class="tablesorter-childRow">
@@ -257,6 +281,7 @@
   <% if ['Student', 'Teaching Assistant'].include? current_user.role.name %>
     <%=t ".grade"%>: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
     <%=t ".Comment"%>: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %><br>
+    <%=t ".late_penalty"%>: <%= label_tag 'late_penalty', @penalties[:submission] %><br/>
   <% end %>
   <% if TaMapping.where(ta_id: @ta_id, course_id: @course_id).exists? || current_user == @assignment.instructor%>
   <h4 style="font-weight:bold;display:inline-block;">TA Grade-Comment:</h4><br/>
@@ -267,3 +292,5 @@
       <%= submit_tag t(".save") ,class: "btn btn-default" %>
     <% end %>
   <% end %>
+
+<%= link_to 'Back', :back %>

@@ -12,7 +12,7 @@ class InstitutionController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],
-         redirect_to: {action: :list}
+         redirect_to: { action: :list }
 
   def list
     @institutions = Institution.all
@@ -27,7 +27,7 @@ class InstitutionController < ApplicationController
   end
 
   def create
-    @institution = Institution.new(name: params[:institution][:name])
+    @institution = Institution.new(institution_params)
     if @institution.save
       flash[:success] = 'The institution was successfully created.'
       redirect_to action: 'list'
@@ -55,5 +55,11 @@ class InstitutionController < ApplicationController
   def delete
     Institution.find(params[:id]).destroy
     redirect_to action: 'list'
+  end
+
+  private
+
+  def institution_params
+    params.require(:institution).permit(:name)
   end
 end

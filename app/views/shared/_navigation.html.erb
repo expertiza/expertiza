@@ -12,10 +12,30 @@
     <div class="navbar-collapse collapse">
 
       <ul class="nav navbar-nav menuposition">
-        <% if session[:menu] %>
-            <%= render :partial => 'menu_items/suckerfish',
-                       :locals => { items: session[:menu].get_menu(0), level: 0 } %>
-        <% end %>
+      <% if session[:menu] %>
+            <!-- if student_view is inactive (session[:flip_user] is not set to true),
+                 show the standard navigation menu -->
+          <% if !session[:flip_user] || session[:flip_user].nil?  %>
+              <%= render :partial => 'menu_items/suckerfish',
+                           :locals => { items: session[:menu].get_menu(0) - [59], level: 0 } %>
+          <!-- if student_view is active for instructor, render student view navigation menu,
+               including the Instructor View button -->
+          <% elsif session[:user].role.name == 'Instructor' %>
+              <% session[:menu] = Role.student.cache[:menu] %>
+              <%= render :partial => 'menu_items/suckerfish',
+                         :locals => { items: session[:menu].get_menu(0), level: 0 } %>
+              <% session[:menu] = Role.instructor.cache[:menu] %>
+              <%= render :partial => 'menu_items/suckerfish',
+                         :locals => { items: session[:menu].get_menu(0) & [59], level: 0 } %>
+              <script>
+                  $("[title='Pending_surveys']").prop('href', '/response/pending_surveys');
+              </script>
+          <!-- otherwise, render standard student view for non-instructors-->
+          <% else %>
+              <%= render :partial => 'menu_items/suckerfish',
+                         :locals => { items: session[:menu].get_menu(0), level: 0 } %>
+          <% end %>
+      <% end %>
       </ul>
 
       <ul class="nav navbar-nav navbar-right">

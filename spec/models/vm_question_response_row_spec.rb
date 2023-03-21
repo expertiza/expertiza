@@ -1,7 +1,7 @@
 describe VmQuestionResponseRow do
-  let(:row){ VmQuestionResponseRow.new('Question for testing average score', 1, 1, 5, 1)}
+  let(:row) { VmQuestionResponseRow.new('Question for testing average score', 1, 1, 5, 1) }
 
-  describe "#average_score_for_row" do
+  describe '#average_score_for_row' do
     it 'returns correct average score for all not nil scores' do
       score1 = VmQuestionResponseScoreCell.new(5, '#D98880', 'Case_2_score_value1 = 5')
       score2 = VmQuestionResponseScoreCell.new(4, '#CD6155', 'Case_2_score_value2 = 4')

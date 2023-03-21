@@ -1,16 +1,12 @@
-class AddIsSubmittedToResponses < ActiveRecord::Migration
+class AddIsSubmittedToResponses < ActiveRecord::Migration[4.2]
   def self.up
-    begin
-      add_column :responses, :isSubmitted, :string, :null => true
-    rescue
-      put $!
-    end
+    add_column :responses, :isSubmitted, :string, null: true
+  rescue StandardError
+    put $ERROR_INFO
   end
 
   def self.down
-    begin
-      remove_column :responses, :isSubmitted
-    rescue
-    end
+    remove_column :responses, :isSubmitted
+  rescue StandardError
   end
 end

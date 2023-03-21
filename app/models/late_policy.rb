@@ -1,4 +1,4 @@
-class LatePolicy < ActiveRecord::Base
+class LatePolicy < ApplicationRecord
   belongs_to :user
 
   # has_many :assignments
@@ -10,13 +10,13 @@ class LatePolicy < ActiveRecord::Base
   validates :penalty_per_unit, presence: true
   validates :penalty_unit, presence: true
 
-  validates :max_penalty, numericality: {greater_than: 0}
-  validates :max_penalty, numericality: {less_than: 100}
-  validates :penalty_per_unit, numericality: {greater_than: 0}
+  validates :max_penalty, numericality: { greater_than: 0 }
+  validates :max_penalty, numericality: { less_than: 100 }
+  validates :penalty_per_unit, numericality: { greater_than: 0 }
 
-  validates :policy_name, format: {with: /\A[A-Za-z0-9][A-Za-z0-9\s'._-]+\z/i}
+  validates :policy_name, format: { with: /\A[A-Za-z0-9][A-Za-z0-9\s'._-]+\z/i }
 
-  attr_accessible :penalty_per_unit, :max_penalty, :penalty_unit, :times_used, :policy_name
+  # attr_accessible :penalty_per_unit, :max_penalty, :penalty_unit, :times_used, :policy_name
 
   # method to check whether the policy name given as a parameter already exists under the current instructor id
   # it return true if there's another policy with the same name under current instructor else false
@@ -38,6 +38,7 @@ class LatePolicy < ActiveRecord::Base
       @participant = AssignmentParticipant.find(pen.participant_id)
       @assignment = @participant.assignment
       next unless @assignment.late_policy_id == late_policy.id
+
       @penalties = calculate_penalty(pen.participant_id)
       @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
       if pen.deadline_type_id.to_i == 1

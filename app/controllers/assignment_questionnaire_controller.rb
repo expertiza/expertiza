@@ -2,7 +2,6 @@
 # Email: hliu11@ncsu.edu
 
 class AssignmentQuestionnaireController < ApplicationController
-
   include AuthorizationHelper
 
   # According to Dr. Gehringer, only the instructor, an ancestor of the instructor,
@@ -12,18 +11,18 @@ class AssignmentQuestionnaireController < ApplicationController
 
     if assignment
       current_user_teaching_staff_of_assignment?(assignment.id) ||
-          current_user_ancestor_of?(assignment.instructor)
+        current_user_ancestor_of?(assignment.instructor)
     else
       false
     end
   end
 
-
   # delete all AssignmentQuestionnaire entry that's associated with an assignment
   def delete_all
     assignment = Assignment.find(params[:assignment_id])
+
     if assignment.nil?
-      flash[:error] = "Assignment #" + assignment.id + " does not currently exist."
+      flash[:error] = 'Assignment #' + params[:assignment_id].to_s + ' does not currently exist.'
       return
     end
 
@@ -36,31 +35,38 @@ class AssignmentQuestionnaireController < ApplicationController
   end
 
   def create
-    if params[:assignment_id].nil?
-      flash[:error] = "Missing assignment:" + params[:assignment_id]
+    if assignment_questionnaire_params[:assignment_id].nil?
+      flash[:error] = "Missing assignment"
       return
-    elsif params[:questionnaire_id].nil?
-      flash[:error] = "Missing questionnaire:" + params[:questionnaire_id]
+    elsif assignment_questionnaire_params[:questionnaire_id].nil?
+      flash[:error] = "Missing questionnaire"
       return
     end
 
-    assignment = Assignment.find(params[:assignment_id])
+    assignment = Assignment.find(assignment_questionnaire_params[:assignment_id])
     if assignment.nil?
-      flash[:error] = "Assignment #" + assignment.id + " does not currently exist."
+      flash[:error] = 'Assignment #' + params[:assignment_id].to_s + ' does not currently exist.'
       return
     end
 
-    questionnaire = Questionnaire.find(params[:questionnaire_id])
+    questionnaire = Questionnaire.find(assignment_questionnaire_params[:questionnaire_id])
     if questionnaire.nil?
-      flash[:error] = "Questionaire #" + questionnaire.id + " does not currently exist."
+      flash[:error] = 'Questionnaire #' + params[:questionnaire_id].to_s + ' does not currently exist.'
       return
     end
-
-    @assignment_questionnaire = AssignmentQuestionnaire.new(params)
+    @assignment_questionnaire = AssignmentQuestionnaire.new(assignment_questionnaire_params)
     @assignment_questionnaire.save
 
     respond_to do |format|
       format.json { render json: @assignment_questionnaire }
     end
+  end
+
+  private
+
+  def assignment_questionnaire_params
+    params.permit(:assignment_id, :questionnaire_id,
+                  :user_id, :notification_limit, :questionnaire_weight,
+                  :used_in_round, :dropdown, :topic_id, :duty_id)
   end
 end

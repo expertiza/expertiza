@@ -1,20 +1,20 @@
 describe MentorManagement do
   # using let! so that state is automatically set up before each example group
   # this could also be accomplished with before(:each) and instance methods
-  # but the rest of the code base makes use of let alot, so this is consistent
+  # but the rest of the code base makes use of let a lot, so this is consistent
   # with that, while achieving the same goal as before(:each)
   let!(:assignment) { create(:assignment, id: 999, auto_assign_mentor: true) }
   let!(:ta) { create(:teaching_assistant, id: 999) }
   let!(:student1) { create(:student, id: 998) }
   let!(:student2) { create(:student, id: 997) }
-  let!(:mentor) { create(:participant, id: 998, user_id: 999, parent_id: assignment.id, duty: Participant::DUTY_MENTOR)}
+  let!(:mentor) { create(:participant, id: 998, user_id: 999, parent_id: assignment.id, duty: Participant::DUTY_MENTOR) }
   let!(:team) { create(:assignment_team, id: 999) }
 
   describe '#select_mentor' do
     it 'returns the mentor with the fewest teams they mentor' do
       allow(MentorManagement).to receive(:zip_mentors_with_team_count)
-                                   .with(assignment.id)
-                                   .and_return([mentor.id, 0])
+        .with(assignment.id)
+        .and_return([mentor.id, 0])
       allow(User).to receive(:where).with(id: mentor.id).and_return([mentor])
       mentor_user = MentorManagement.select_mentor assignment.id
       expect(mentor_user).to eq mentor
@@ -73,7 +73,7 @@ describe MentorManagement do
       allow(Team).to receive(:find).with(team.id).and_return(team)
 
       # add 2 students to our team
-      [student1, student2].each { |student| FactoryBot.create(:team_user, team_id: team.id, user_id: student.id)}
+      [student1, student2].each { |student| FactoryBot.create(:team_user, team_id: team.id, user_id: student.id) }
 
       allow(assignment).to receive(:topics?).and_return(false)
       allow(team).to receive(:topics).and_return(nil)
@@ -100,8 +100,8 @@ describe MentorManagement do
   describe '#get_mentors_for_assignment' do
     it 'returns all mentors for the given assignment' do
       allow(Participant).to receive(:where)
-                              .with(parent_id: assignment.id, duty: Participant::DUTY_MENTOR)
-                              .and_return([mentor])
+        .with(parent_id: assignment.id, duty: Participant::DUTY_MENTOR)
+        .and_return([mentor])
       mentor_user = MentorManagement.mentors_for_assignment(assignment.id).first
       expect(mentor_user).to eq mentor
     end
@@ -111,11 +111,11 @@ describe MentorManagement do
     it 'returns sorted tuples of (mentor ID, # of teams they mentor)' do
       team_count = 3
       r = Random.new(42)
-      team_ids = team_count.times.map {
-        random_id = r.rand(1000..10000)
+      team_ids = team_count.times.map do
+        random_id = r.rand(1000..10_000)
         FactoryBot.create(:team, id: random_id)
         random_id
-      }
+      end
       team_ids.each { |team_id| FactoryBot.create(:team_user, team_id: team_id, user_id: ta.id) }
       expect(MentorManagement.zip_mentors_with_team_count(assignment.id)).to eq [[mentor.user_id, team_count]]
     end

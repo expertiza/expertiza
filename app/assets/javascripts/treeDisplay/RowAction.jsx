@@ -67,10 +67,10 @@ class RowAction extends React.Component {
                     </a>
                 </span>
             )
-            if (nodeAttributes.isCourse(this.props.dataType))
+            if (nodeAttributes.isCourse(this.props.nodeType))
                 moreContent.push(<br />, ...nodeAttributes.course.getActions(parseInt(this.props.id) / 2))
         }
-        if (nodeAttributes.isAssignment(this.props.dataType) && appVariables.homeActionShowFlag == 'true') {
+        if (nodeAttributes.isAssignment(this.props.nodeType) && appVariables.homeActionShowFlag == 'true') {
             // Assignment tab starts here
             // Now is_intelligent and Add Manager related buttons have not been added into the new UI
             moreContent.push(...nodeAttributes.assignment.getActions(this.props))

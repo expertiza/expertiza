@@ -1,22 +1,22 @@
-class MenuUpdateUsers < ActiveRecord::Migration
+class MenuUpdateUsers < ActiveRecord::Migration[4.2]
   def self.up
     permission = Permission.find_by_name('administer assignments')
-    if permission != nil
+    unless permission.nil?
       site_controller = SiteController.find_by_name('users')
-      if site_controller != nil  
-        action = ControllerAction.where(['site_controller_id = ? and name = ?',site_controller.id,'list']).first
-        if action != nil
-          action.permission_id = permission.id   
+      unless site_controller.nil?
+        action = ControllerAction.where(['site_controller_id = ? and name = ?', site_controller.id, 'list']).first
+        unless action.nil?
+          action.permission_id = permission.id
           action.save
-        end      
+        end
       end
       page = ContentPage.find_by_name('site_admin')
-      if page != nil
+      unless page.nil?
         page.permission_id = permission.id
         page.save
       end
       page = ContentPage.find_by_name('admin')
-      if page != nil
+      unless page.nil?
         page.permission_id = permission.id
         page.save
       end
@@ -26,14 +26,14 @@ class MenuUpdateUsers < ActiveRecord::Migration
 
   def self.down
     site_controller = SiteController.find_by_name('users')
-    if site_controller != nil
-      action = ControllerAction.where(['site_controller_id = ? and name = ?',site_controller.id,'list']).first
-      if action != nil
+    unless site_controller.nil?
+      action = ControllerAction.where(['site_controller_id = ? and name = ?', site_controller.id, 'list']).first
+      unless action.nil?
         action.permission_id = nil
         action.save
       end
     end
-    
+
     Role.rebuild_cache
   end
 end

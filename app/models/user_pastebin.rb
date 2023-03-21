@@ -1,8 +1,7 @@
 class UserPastebin < ActiveRecord::Base
-  validates :user_id, uniqueness: {scope: :short_form}
-  attr_accessible :short_form, :long_form
+  validates :user_id, uniqueness: { scope: :short_form }
 
-  @markdown_character = "\\"
+  @markdown_character = '\\'
 
   def self.get_current_user_pastebin(user)
     @user_pastebins = UserPastebin.where(user_id: user.id)

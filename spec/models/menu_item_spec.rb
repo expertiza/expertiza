@@ -5,12 +5,12 @@ describe MenuItem do
   # RSpec tutorial video (until 9:32): https://youtu.be/dzkVfaKChSU?t=35s
   # RSpec unit tests examples: https://github.com/expertiza/expertiza/blob/3ce553a2d0258ea05bced910abae5d209a7f55d6/spec/models/response_spec.rb
   ###
-  let!(:test1) { create(:menu_item, name: "home1", parent_id: nil,  seq: 1) }
-  let!(:test2) { create(:menu_item, name: "home2", parent_id: 1,    seq: 2) }
-  let!(:test3) { create(:menu_item, name: "home3", parent_id: 1,    seq: 3) }
-  let!(:test4) { create(:menu_item, name: "home4", parent_id: 1,    seq: 4) }
-  let!(:test5) { create(:menu_item, name: "home5", parent_id: nil,  seq: 2) }
-  let!(:test6) { create(:menu_item, name: "home6", parent_id: nil,  seq: 5) }
+  let!(:test1) { create(:menu_item, name: 'home1', parent_id: nil,  seq: 1) }
+  let!(:test2) { create(:menu_item, name: 'home2', parent_id: 1,    seq: 2) }
+  let!(:test3) { create(:menu_item, name: 'home3', parent_id: 1,    seq: 3) }
+  let!(:test4) { create(:menu_item, name: 'home4', parent_id: 1,    seq: 4) }
+  let!(:test5) { create(:menu_item, name: 'home5', parent_id: nil,  seq: 2) }
+  let!(:test6) { create(:menu_item, name: 'home6', parent_id: nil,  seq: 5) }
   (1..3).each do |i|
     let!("controller_action#{i}".to_sym) { ControllerAction.create(site_controller_id: i, name: 'name', permission_id: 1) }
     let!("content_page#{i}".to_sym) { ContentPage.create(title: "home page#{i}", name: "home#{i}", content: '', permission_id: i, content_cache: '') }
@@ -18,7 +18,7 @@ describe MenuItem do
 
   describe '.find_or_create_by_name' do
     it 'returns a menu item with corresponding name' do
-      expect(MenuItem.find_or_create_by_name("home").name).to eq("home")
+      expect(MenuItem.find_or_create_by_name('home').name).to eq('home')
     end
   end
 

@@ -11,31 +11,76 @@
   <% end %>
 <% else %>
   <b style="text-align: center"><%=t ".team_name_up"%> &nbsp;&nbsp;</b><%= @student.team.name(session[:ip]) %> &nbsp;&nbsp;&nbsp;
-    <%= link_to t(".edit_name"), controller: 'StudentTeams', action: 'edit', team_id: @student.team.id, student_id: @student.id %>
+  
+  <% if @student.assignment.pair_programming_enabled? %>
+    <% if Team.find(@student.team.id).pair_programming_request.nil? || Team.find(@student.team.id).pair_programming_request.zero? %>
+      <% button_enabled = true %>
+      <button style="float: right;"><%= link_to "Request to Pair Program",
+        {:controller => 'pair_programming', :action => 'send_invitations', :team_id=>@student.team.id, :student_id => @student.id},
+        {:onClick => "javascript: return confirm('Confirm if Pair Programming request should be sent');"}
+      %></button>
+    <% else %>
+      <% button_enabled = false %>
+      <% users = TeamsUser.where(team_id: @student.team.id) %>
+      <% pair_programming_team_status = true %>
+      <% users.each do |user| %>
+        <% if user.pair_programming_status == "W" or user.pair_programming_status.nil? %>
+          <% pair_programming_team_status = false %>
+          <% break %>
+        <% end %>
+      <% end %>
+      <% if pair_programming_team_status %>
+        <% Team.find(@student.team.id).update_attributes(pair_programming_request: 2) %>
+        <p style="float: right;">Pair Programming: Yes</p>
+      <% else %>
+        <% Team.find(@student.team.id).update_attributes(pair_programming_request: 1) %>
+        <p style="float: right;">Pair Programming: Pending</p>
+      <% end %>
+    <% end %>
+  <% end %>
+    <%= link_to t(".edit_name"), controller: 'student_teams', action: 'edit', team_id: @student.team.id, student_id: @student.id %>
   <br/><br/>
   <b><%=t ".team_members"%></b>
   <br/><br/>
   <!--start team member table-->
   <table style="width:80%" align="center" >
     <tr style="border: 1px outset #000000; padding: 10px 20px" >
-      <th class="head"><%=t ".username"%></th>
-      <th class="head"><%=t ".fullname"%></th>
-      <th class="head">Team-member role (duty)</th>
-      <th class="head"><%=t ".email_address"%></th>
+      <th class="head">Username</th>
+      <th class="head">Full name</th>
+      <% if @student.assignment.duty_based_assignment? %>
+          <th class="head">Role</th>
+      <% end %>
+      <th class="head">Email address</th>
+
       <% if @teammate_review_allowed %>
         <th class="head"><%=t ".review_action"%></th>
       <% end %>
     </tr>
 
-    <% for member in @student.team.participants %> <!--start team member content-->
-      <tr>
+    <% @student.team.participants.each do |member| %> <!--start team member content-->
+        <tr>
         <td><%= member.user.name(session[:ip]) %></td>
         <td><%= member.user.fullname(session[:ip]) %></td>
-        <td><%= member.duty.nil? ? "" : member.duty.capitalize %></td>
+        <%if @student.assignment.duty_based_assignment? %>
+            <% team_user = member.team_user %>
+              <!-- Gets duty of member if the assignment is duty based and member has a duty -->
+            <%unless team_user.duty_id.nil?%>
+               <td><%= Duty.find(team_user.duty_id).name %></td>
+            <%else%>
+                <td>
+                  <%if  member.user.id == session[:user].id%>
+                      <%= render :partial=>'select_duty_form', :locals => {:assignment_id => @student.assignment.id, :participant_id => member.id, :teams_user_id => team_user.id}%>
+                  <%else%>
+                      Not Selected
+                  <%end%>
+                </td>
+            <%end%>
+        <%end%>
         <td><%= member.user.email(session[:ip]) %></td>
 
         <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
-        <% if @teammate_review_allowed %>
+        <% if @teammate_review_allowed &&
+          ((@student.assignment.duty_based_assignment? && !team_user.duty_id.nil?) || (!@student.assignment.duty_based_assignment?))%>
           <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
             <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
             if map.nil?
@@ -62,7 +107,7 @@
         <br/>
         <%= link_to t(".leave_team"), remove_participant_student_teams_path(student_id: @student.id, team_id: @student.team.id) %>
       <td>
-    </tr> <!--E2081 TODO Table for self contribution Cake questions-->
+    </tr>
     <%# <% if @teammate_review_allowed %>
       <%# <tr style="border: 1px outset #000000; padding: 10px 20px" >
         <th class="head">Teammate review question</th>
@@ -72,15 +117,60 @@
   </table>
 <% end %>
 
+<% if @student.assignment.pair_programming_enabled? %>
+  <% if !@student.team.nil? && Team.find(@student.team.id).pair_programming_request!=0 && !button_enabled %>
+    <div>
+      <% if !@student.team.nil? && @student.assignment.max_team_size > 1 %>  
+        <br/><br/>
+        <b><%=t ".Pair Programming Invitations"%></b>
+        <br/><br/>
+
+        <table style="width:80%" align="center" >
+          <tr style="border: 1px outset #000000; padding: 10px 20px" >
+            <th class="head">Username</th>
+            <th class="head">Full name</th>
+            <th class="head">Email address</th>
+            <th class="head">Status</th>
+          </tr>
+          <% @student.team.participants.each do |member| %> <!--start Pair Programming content-->
+            <tr>
+              <td><%= member.user.name(session[:ip]) %></td>
+              <td><%= member.user.fullname(session[:ip]) %></td>
+              <td><%= member.user.email(session[:ip]) %></td>
+              <% status = TeamsUser.find_by(user_id: member.user.id, team_id: member.team.id).pair_programming_status %>
+              <% if (status == "W" || status.nil?) and current_user.id != member.user.id %>
+                <td>Request Pending</td>
+              <% elsif  (status == "W" || status.nil? ) and current_user.id == member.user.id%>
+                <td><%= link_to "Accept",
+                      {:controller => 'pair_programming', :action => 'accept', :student_id => @student.id, :team_id => @student.team.id},
+                      {:onClick => "javascript: return confirm('Are you sure you want to accept the Pair Programming Request?');"}
+                    %>
+                    |
+                    <%= link_to "Decline",
+                      {:controller => 'pair_programming', :action => 'decline', :student_id => @student.id, :team_id => @student.team.id},
+                      {:onClick => "javascript: return confirm('Are you sure you want to decline the Pair Programming Request?');"}
+                    %>
+                </td>
+              <% elsif status == "A" %>
+                <td>Accepted</td>
+              <% else %>
+                <td>Rejected</td>
+              <% end %>
+            </tr>
+          <% end %>
+        </table>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
+
 <!--render partial for join team request-->
-  <% if @student.team!=nil %>
     <%= render :partial => 'join_team_requests/list_received',
     :locals =>{:team_id=>@student.team.id,
                :teams_user_id=>params[:student_id],
-               :assignment_id => @student.assignment.id} %>
-  <% end %>
+               :assignment_id => @student.assignment.id} unless @student.team.nil? %>
 
-    <% if @send_invs && @send_invs.length > 0 %>
+    <% if @send_invs && @send_invs.any? %>
     <br/><br/>
     <b>Sent invitations</b>
     <br/><br/>
@@ -92,7 +182,7 @@
           <th class="head"><b><%=t ".email_address"%></b></th>
           <th class="head" align="center"><b><%=t ".status"%></b></th>
         </tr>
-          <% for inv in @send_invs %>
+          <% @send_invs.each do |inv| %>
             <tr>
               <td><%= inv.to_user.name(session[:ip]) %></td>
               <td><%= inv.to_user.fullname(session[:ip]) %></td>
@@ -113,8 +203,8 @@
 <br/>
 
 <!--send invitation-->
-<% if @student.team != nil && @student.assignment.max_team_size > 1 %>
-     <% if @student.team == nil %> <!--dead code-->
+<% if !@student.team.nil? && @student.assignment.max_team_size > 1 %>
+     <% if @student.team.nil? %> <!--dead code-->
        <h3><%=t ".name_team"%></h3>
        <%= form_tag :controller => 'student_teams', :action => 'create' do %>
          <%= hidden_field_tag 'student_id', @student.id %>
@@ -168,21 +258,19 @@
         <th class="head"><%=t ".team_name_no_colon"%> </th>
         <th class="head"><%=t ".reply"%> </th>
       </tr>
-      <% for inv in @received_invs %>
+      <% @received_invs.each do |inv| %>
           <% if inv.reply_status == 'W' %>
               <tr>
                 <td><%= inv.from_user.name(session[:ip]) %></td>
                 <td>
-                  <% teamsusers = TeamsUser.where(['user_id = ?', inv.from_id]) %>
-                  <% for teamsuser in teamsusers %>
-                      <% current_team = Team.where(['id = ? and parent_id = ?', teamsuser.team_id, @student.assignment.id]).first %>
-                      <% if current_team != nil %>
-                          <%= Team.find(current_team.id).name %>
-                      <% end %>
+                  <% teams_users = TeamsUser.where(['user_id = ?', inv.from_id]) %>
+                  <% teams_users.each do |teams_user| %>
+                      <% current_team = Team.where(['id = ? and parent_id = ?', teams_user.team_id, @student.assignment.id]).first %>
+                      <%= Team.find(current_team.id).name unless current_team.nil?%>
                   <% end %>
                 </td>
                 <td>
-                  <%if @student.team == nil
+                  <%if @student.team.nil?
                       @team_id = 0
                     else
                       @team_id = @student.team.id
@@ -236,5 +324,5 @@
                       :assignment_id => @student.assignment.id
            } %>
 <br>
-   <a href="javascript:window.history.back()"><%=t ".back"%></a>
+   <%= link_to 'Back', :controller => 'student_task', :action => 'list' %>
 

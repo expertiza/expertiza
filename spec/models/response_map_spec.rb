@@ -6,8 +6,8 @@ describe ResponseMap do
   let(:participant1) { build(:participant, id: 2, parent_id: 2, user: student1) }
   let(:participant2) { build(:participant, id: 3, parent_id: 3, user: student2) }
   let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
-  let(:student1) { build(:student, id: 2, name: "name1", fullname: 'no one', email: 'expertiza@mailinator.com') }
-  let(:student2) { build(:student, id: 3, name: "name2", fullname: 'no one', email: 'expertiza@mailinator.com') }
+  let(:student1) { build(:student, id: 2, name: 'name1', fullname: 'no one', email: 'expertiza@mailinator.com') }
+  let(:student2) { build(:student, id: 3, name: 'name2', fullname: 'no one', email: 'expertiza@mailinator.com') }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt', rounds_of_reviews: 2) }
   let(:assignment1) { build(:assignment, id: 2, name: 'Test Assgt2', rounds_of_reviews: 2) }
 
@@ -19,12 +19,12 @@ describe ResponseMap do
   let(:metareview_response_map) { build(:meta_review_response_map, id: 6, reviewer: participant1, review_mapping: review_response_map) }
   let(:metareview_response_map1) { build(:meta_review_response_map, reviewed_object_id: review_response_map1.id, reviewer_id: participant2.id, reviewee_id: team.id) }
 
-  #let(:review_response_map1){ build(:review_response_map, id: 2, assignment: assignment,reviewer: participant1, reviewee: team1, reviewed_object_id: 1, response: [response], calibrate_to: 0) }
+  # let(:review_response_map1){ build(:review_response_map, id: 2, assignment: assignment,reviewer: participant1, reviewee: team1, reviewed_object_id: 1, response: [response], calibrate_to: 0) }
   let(:response) { build(:response, id: 1, map_id: 1, round: 1, response_map: review_response_map, is_submitted: true) }
   let(:response1) { build(:response, id: 2, map_id: 2, round: 1, response_map: review_response_map1, is_submitted: false) }
   let(:response2) { build(:response, id: 3, map_id: 3, round: 1, response_map: teammate_review_response_map,  is_submitted: true) }
   let(:response3) { build(:response, id: 4, map_id: 4, round: 1, response_map: teammate_review_response_map1, is_submitted: false) }
-  let(:response4) { build(:response, id: 5, map_id: 5, round: 1, response_map: review_response_map2,  is_submitted: true) }
+  let(:response4) { build(:response, id: 5, map_id: 5, round: 1, response_map: review_response_map2, is_submitted: true) }
   let(:response5) { build(:response, id: 6, map_id: 5, round: 1, response_map: review_response_map2, is_submitted: false) }
 
   before(:each) do
@@ -43,7 +43,7 @@ describe ResponseMap do
         allow(Response).to receive(:where).with(map_id: 1).and_return([response])
         allow(Response).to receive(:where).with(map_id: 2).and_return([response1])
         responses = ResponseMap.assessments_for(team)
-	expect(responses).to eq([response])
+        expect(responses).to eq([response])
       end
     end
 
@@ -54,37 +54,35 @@ describe ResponseMap do
         allow(Response).to receive(:where).with(map_id: 3).and_return([response2])
         allow(Response).to receive(:where).with(map_id: 4).and_return([response3])
         responses = ResponseMap.assessments_for(participant2)
-	expect(responses).to eq([response2, response3])
+        expect(responses).to eq([response2, response3])
       end
     end
-
   end
 
   describe 'self.reviewer_assessments_for' do
     context 'Returning latest version of responses by reviewer' do
       it 'returns the second response' do
-        allow(ResponseMap).to receive(:where).with(reviewee_id: team2.id, reviewer_id: participant2.id ).and_return([review_response_map2])
+        allow(ResponseMap).to receive(:where).with(reviewee_id: team2.id, reviewer_id: participant2.id).and_return([review_response_map2])
         allow(Response).to receive(:where).with(map_id: review_response_map2.id).and_return([response4, response5])
         responses = ResponseMap.reviewer_assessments_for(team2, participant2)
-	expect(responses).to eq(response5)
+        expect(responses).to eq(response5)
       end
       it 'returns the response with the version number' do
         response4.version_num = 2
-        allow(ResponseMap).to receive(:where).with(reviewee_id: team2.id, reviewer_id: participant2.id ).and_return([review_response_map2])
+        allow(ResponseMap).to receive(:where).with(reviewee_id: team2.id, reviewer_id: participant2.id).and_return([review_response_map2])
         allow(Response).to receive(:where).with(map_id: review_response_map2.id).and_return([response4, response5])
         responses = ResponseMap.reviewer_assessments_for(team2, participant2)
-	expect(responses).to eq(response4)
+        expect(responses).to eq(response4)
       end
       it 'returns the response with the highest version number' do
         response4.version_num = 3
         response5.version_num = 2
-        allow(ResponseMap).to receive(:where).with(reviewee_id: team2.id, reviewer_id: participant2.id ).and_return([review_response_map2])
+        allow(ResponseMap).to receive(:where).with(reviewee_id: team2.id, reviewer_id: participant2.id).and_return([review_response_map2])
         allow(Response).to receive(:where).with(map_id: review_response_map2.id).and_return([response4, response5])
         responses = ResponseMap.reviewer_assessments_for(team2, participant2)
-	expect(responses).to eq(response4)
+        expect(responses).to eq(response4)
       end
     end
-
   end
 
   describe 'metareviewed_by?' do
@@ -94,7 +92,6 @@ describe ResponseMap do
         expect(review_response_map.metareviewed_by?(participant1)).to eq(true)
       end
     end
-
   end
 
   describe 'assign_metareviewer' do
@@ -102,11 +99,11 @@ describe ResponseMap do
       it 'creates a metareview response map' do
         metareview_response_map_temp = create(:meta_review_response_map, reviewed_object_id: review_response_map1.id, reviewer_id: participant2.id, reviewee_id: participant1.id)
         allow(MetareviewResponseMap).to receive(:create).with(reviewed_object_id: review_response_map1.id, reviewer_id: participant2.id, reviewee_id: participant1.id).and_return(\
-          metareview_response_map_temp)
+          metareview_response_map_temp
+        )
         expect(review_response_map1.assign_metareviewer(participant2)).to eq(metareview_response_map_temp)
       end
     end
-
   end
 
   describe 'find_team_member' do
@@ -121,7 +118,5 @@ describe ResponseMap do
         expect(review_response_map.find_team_member).to eq(team)
       end
     end
-
   end
-
 end

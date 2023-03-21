@@ -1,7 +1,7 @@
 describe AnswerHelper do
   before(:each) do
-    @assignment1 = create(:assignment, name: "name1", directory_path: "name1")
-    @assignment2 = create(:assignment, name: "name2", directory_path: "name2")
+    @assignment1 = create(:assignment, name: 'name1', directory_path: 'name1')
+    @assignment2 = create(:assignment, name: 'name2', directory_path: 'name2')
     @questionnaire1 = create(:questionnaire)
     @questionnaire2 = create(:questionnaire)
     @questionnaire3 = create(:questionnaire)
@@ -20,18 +20,18 @@ describe AnswerHelper do
     @assignment_questionnaire1 = create(:assignment_questionnaire, id: 1, assignment_id: @assignment1.id, questionnaire_id: @questionnaire1.id, used_in_round: 1)
     @assignment_questionnaire2 = create(:assignment_questionnaire, id: 2, assignment_id: @assignment1.id, questionnaire_id: @questionnaire2.id, used_in_round: 2)
     @assignment_questionnaire3 = create(:assignment_questionnaire, id: 3, assignment_id: @assignment2.id, questionnaire_id: @questionnaire3.id, used_in_round: nil)
-    @user = create(:student, name: "name", fullname: "name")
+    @user = create(:student, name: 'name', fullname: 'name')
     @participant = create(:participant, user_id: @user.id, parent_id: @assignment1.id)
     @response_map = create(:review_response_map, reviewer: @participant, assignment: @assignment1)
-    @response = create(:response, response_map: @response_map, created_at: "2019-11-01 23:30:00")
-    @answer = create(:answer, response_id: @response.id, question_id: @question.id, comments: "comment")
+    @response = create(:response, response_map: @response_map, created_at: '2019-11-01 23:30:00')
+    @answer = create(:answer, response_id: @response.id, question_id: @question.id, comments: 'comment')
   end
 
   describe '#delete_existing_responses' do
     context 'when the response is in reviewing period' do
       it 'deletes the answers' do
         allow(AnswerHelper).to receive(:log_answer_responses).with([@question.id], @questionnaire2.id).and_return([@answer.response_id])
-        allow(AnswerHelper).to receive(:log_response_info).with([@answer.response_id]).and_return({@answer.response_id=>{:email => @user.email, :answers => @answer.comments, :name => @user.name, :assignment_name => @assignment1.name}})
+        allow(AnswerHelper).to receive(:log_response_info).with([@answer.response_id]).and_return(@answer.response_id => { email: @user.email, answers: @answer.comments, name: @user.name, assignment_name: @assignment1.name })
         expect(AnswerHelper).to receive(:review_mailer).with(@user.email, @answer.comments, @user.name, @assignment1.name).and_return(true)
         expect(Answer.exists?(response_id: @answer.response_id)).to eql(true) # verify the answer exists before deleting
         AnswerHelper.delete_existing_responses([@question.id], @questionnaire2.id)
@@ -50,7 +50,7 @@ describe AnswerHelper do
   describe '#log_response_info' do
     it 'logs info from each response_id to be used in answer deletion' do
       AnswerHelper.log_response_info([@answer.response_id])
-      expect(AnswerHelper.log_response_info([@answer.response_id])).to eql({1=>{:email=>"expertiza@mailinator.com", :answers=>"comment", :name=>"name", :assignment_name=>"name1"}})
+      expect(AnswerHelper.log_response_info([@answer.response_id])).to eql(1 => { email: 'expertiza@mailinator.com', answers: 'comment', name: 'name', assignment_name: 'name1' })
     end
   end
 
@@ -63,7 +63,8 @@ describe AnswerHelper do
           name: @user.name,
           assignment_name: @assignment1.name,
           answers: @answer.comments
-        }).and_return(@mail)
+        }
+      ).and_return(@mail)
       allow(@mail).to receive(:deliver_now)
       expect(Mailer).to receive(:notify_review_rubric_change).once
       AnswerHelper.review_mailer(@user.email, @answer.comments, @user.name, @assignment1.name)

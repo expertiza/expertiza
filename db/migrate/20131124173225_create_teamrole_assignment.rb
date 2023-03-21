@@ -1,8 +1,8 @@
-class CreateTeamroleAssignment < ActiveRecord::Migration
+class CreateTeamroleAssignment < ActiveRecord::Migration[4.2]
   def self.up
-    create_table "teamrole_assignment", :force => true do |t|
-      t.integer "team_roleset_id"
-      t.integer "assignment_id"
+    create_table 'teamrole_assignment', force: true do |t|
+      t.integer 'team_roleset_id'
+      t.integer 'assignment_id'
     end
     execute "ALTER TABLE `teamrole_assignment`
              ADD CONSTRAINT `fk_teamrole_assignment_team_rolesets`
@@ -10,7 +10,6 @@ class CreateTeamroleAssignment < ActiveRecord::Migration
     execute "ALTER TABLE `teamrole_assignment`
              ADD CONSTRAINT `fk_teamrole_assignment_assignments`
              FOREIGN KEY (assignment_id) references assignments(id)"
-
   end
 
   def self.down

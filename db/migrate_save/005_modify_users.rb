@@ -1,4 +1,4 @@
-class ModifyUsers < ActiveRecord::Migration
+class ModifyUsers < ActiveRecord::Migration[4.2]
   def self.up
     # t.column :username, :string, :limit=>32  --  called "name" in Goldberg
     # t.column :password, :string -- already included in Goldberg table
@@ -10,17 +10,17 @@ class ModifyUsers < ActiveRecord::Migration
     add_column :users, :private_by_default, :boolean # whether assgts. & questionnaires created by this instructor should be private (i.e., not viewable by others).  Can be overridden when creating a new one.
     # We used to have a home_directory_path column, but now we are just using the user name in place of the home_directory_path
     # add_column :users, :home_directory_path, :string # for an instructor, the home directory above which (s)he is not allowed access; otherwise empty
-    add_column :users, :mru_directory_path, :string, :limit => 128 # for an instructor, the directory that (s)he was working in the previous time he used the system; this is the pathname relative to the home_directory_path; empty for a non-instructor
+    add_column :users, :mru_directory_path, :string, limit: 128 # for an instructor, the directory that (s)he was working in the previous time he used the system; this is the pathname relative to the home_directory_path; empty for a non-instructor
     # t.column :email_address, :string, :limit=>80  -- called "email" in Goldberg
     add_column :users, :email_on_review, :boolean
     add_column :users, :email_on_submission, :boolean
     add_column :users, :email_on_review_of_review, :boolean
 
-    execute "alter table users 
+    execute "alter table users
              add constraint fk_institutions_users
              foreign key (institution_id) references institutions(id)"
 
-    user = User.create(:username => "suadmin", :password=> User.hash_password("2wolfpack"),:role_id => "3",:parent_id => 1)#This should be the first user created in the system
+    user = User.create(username: 'suadmin', password: User.hash_password('2wolfpack'), role_id: '3', parent_id: 1) # This should be the first user created in the system
     user.save
   end
 

@@ -1,4 +1,4 @@
-class DueDate < ActiveRecord::Base
+class DueDate < ApplicationRecord
   validate :due_at_is_valid_datetime
   #  has_paper_trail
 
@@ -7,34 +7,38 @@ class DueDate < ActiveRecord::Base
   end
 
   def self.current_due_date(due_dates)
-    #Get the current due date from list of due dates
+    # Get the current due date from list of due dates
     due_dates.each do |due_date|
       if due_date.due_at > Time.now
         current_due_date = due_date
         return current_due_date
       end
     end
-    #in case current due date not found
-    return nil 
+    # in case current due date not found
+    nil
   end
 
   def self.teammate_review_allowed(student)
     # time when teammate review is allowed
     due_date = current_due_date(student.assignment.due_dates)
     student.assignment.find_current_stage == 'Finished' ||
-    due_date &&
-    (due_date.teammate_review_allowed_id == 3 ||
-    due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
+      due_date &&
+        (due_date.teammate_review_allowed_id == 3 ||
+        due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
   end
 
   def set_flag
     self.flag = true
-    self.save
+    save
   end
 
   def due_at_is_valid_datetime
     if due_at.present?
-      errors.add(:due_at, 'must be a valid datetime') if (DateTime.strptime(due_at.to_s, '%Y-%m-%d %H:%M:%S') rescue ArgumentError) == ArgumentError
+      errors.add(:due_at, 'must be a valid datetime') if (begin
+                                                            DateTime.strptime(due_at.to_s, '%Y-%m-%d %H:%M:%S')
+                                                          rescue StandardError
+                                                            ArgumentError
+                                                          end) == ArgumentError
     end
   end
 
@@ -57,7 +61,7 @@ class DueDate < ActiveRecord::Base
 
   def self.deadline_sort(due_dates)
     due_dates.sort do |m1, m2|
-      if m1.due_at and m2.due_at
+      if m1.due_at && m2.due_at
         m1.due_at <=> m2.due_at
       elsif m1.due_at
         -1
@@ -69,14 +73,16 @@ class DueDate < ActiveRecord::Base
 
   def self.done_in_assignment_round(assignment_id, response)
     # for author feedback, quiz, teammate review and metareview, Expertiza only support one round, so the round # should be 1
-    return 0 if ResponseMap.find(response.map_id).type != "ReviewResponseMap"
+    return 0 if ResponseMap.find(response.map_id).type != 'ReviewResponseMap'
+
     due_dates = DueDate.where(parent_id: assignment_id)
     # sorted so that the earliest deadline is at the first
     sorted_deadlines = deadline_sort(due_dates)
-    due_dates.reject {|due_date| due_date.deadline_type_id != 1 && due_date.deadline_type_id != 2 }
+    due_dates.reject { |due_date| due_date.deadline_type_id != 1 && due_date.deadline_type_id != 2 }
     round = 1
     sorted_deadlines.each do |due_date|
       break if response.created_at < due_date.due_at
+
       round += 1 if due_date.deadline_type_id == 2
     end
     round
@@ -93,7 +99,7 @@ class DueDate < ActiveRecord::Base
       # TopicDueDate      08/03/2016
       # AssignmentDueDate 09/04/2016
       # In this case, we cannot find due_at later than Time.now in TopicDueDate.
-      # So we should find next corrsponding AssignmentDueDate, starting with the 4th one, not the 1st one!
+      # So we should find next corresponding AssignmentDueDate, starting with the 4th one, not the 1st one!
       if next_due_date.nil?
         topic_due_date_size = TopicDueDate.where(parent_id: topic_id).size
         following_assignment_due_dates = AssignmentDueDate.where(parent_id: assignment_id)[topic_due_date_size..-1]

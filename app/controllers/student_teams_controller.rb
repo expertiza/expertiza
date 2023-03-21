@@ -21,9 +21,10 @@ class StudentTeamsController < ApplicationController
   def action_allowed?
     # note, this code replaces the following line that cannot be called before action allowed?
     return false unless current_user_has_student_privileges?
+
     case action_name
     when 'view'
-      if are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter")
+      if are_needed_authorizations_present?(params[:student_id], 'reader', 'reviewer', 'submitter')
         return true if current_user_has_id? student.user_id
       else
         return false
@@ -42,7 +43,7 @@ class StudentTeamsController < ApplicationController
   end
 
   def view
-    # View will check if send_invs and recieved_invs are set before showing
+    # View will check if send_invs and received_invs are set before showing
     # only the owner should be able to see those.
 
     return unless current_user_id? student.user_id
@@ -50,12 +51,10 @@ class StudentTeamsController < ApplicationController
     @send_invs = Invitation.where from_id: student.user.id, assignment_id: student.assignment.id
     @received_invs = Invitation.where to_id: student.user.id, assignment_id: student.assignment.id, reply_status: 'W'
 
-
     @current_due_date = DueDate.current_due_date(@student.assignment.due_dates)
 
-    #this line generates a list of users on the waiting list for the topic of a student's team,  
+    # this line generates a list of users on the waiting list for the topic of a student's team,
     @users_on_waiting_list = (SignUpTopic.find(@student.team.topic).users_on_waiting_list if student_team_requirements_met?)
-
     @teammate_review_allowed = DueDate.teammate_review_allowed(@student)
   end
 
@@ -73,8 +72,8 @@ class StudentTeamsController < ApplicationController
       team.save
       parent = AssignmentNode.find_by node_object_id: student.parent_id
       TeamNode.create parent_id: parent.id, node_object_id: team.id
-      user = User.find student.user_id
-      team.add_member user, team.parent_id
+      user = User.find(student.user_id)
+      team.add_member(user, team.parent_id)
       team_created_successfully(team)
       redirect_to view_student_teams_path student_id: student.id
 
@@ -93,31 +92,17 @@ class StudentTeamsController < ApplicationController
     if matching_teams.length.zero?
       if team.update_attribute('name', params[:team][:name])
         team_created_successfully
-
         redirect_to view_student_teams_path student_id: params[:student_id]
-
       end
-    elsif matching_teams.length == 1 && (matching_teams.name == team.name)
-
+    elsif matching_teams.length == 1 && matching_teams.name == team.name
       team_created_successfully
       redirect_to view_student_teams_path student_id: params[:student_id]
-
     else
       flash[:notice] = 'That team name is already in use.'
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Team name being updated to was already in use', request)
       redirect_to view_student_teams_path student_id: params[:student_id]
 
     end
-  end
-  #The following two methods are necessary to improve readability
-  #update the advertise_for_partner of team table
-  def advertise_for_partners
-    Team.update_all advertise_for_partner: true, id: params[:team_id]
-  end
-  
-  def remove_advertisement
-    Team.update_all advertise_for_partner: false, id: params[:team_id]
-    redirect_to view_student_teams_path student_id: params[:team_id]
   end
 
   def remove_participant
@@ -143,6 +128,7 @@ class StudentTeamsController < ApplicationController
 
   def remove_team_user(team_user)
     return false unless team_user
+
     team_user.destroy_all
     undo_link "The user \"#{team_user.name}\" has been successfully removed from the team."
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'User removed a participant from the team', request)
@@ -163,20 +149,14 @@ class StudentTeamsController < ApplicationController
     redirect_to view_questionnaires_path id: @assignment.questionnaires.find_by(type: 'AuthorFeedbackQuestionnaire').id
   end
 
-
-  #used to check student team requirements
+  # used to check student team requirements
   def student_team_requirements_met?
-    #checks if the student has a team
-    if @student.team.nil?
-      return false
-    end
-    #checks that the student's team has a topic
-    if @student.team.topic.nil? 
-      return false
-    end
-    #checks that the student has selected some topics
+    # checks if the student has a team
+    return false if @student.team.nil?
+    # checks that the student's team has a topic
+    return false if @student.team.topic.nil?
+
+    # checks that the student has selected some topics
     @student.assignment.topics?
-
   end
-
 end

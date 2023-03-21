@@ -1,0 +1,7 @@
+<h1>New Role</h1>
+<%= form_tag :action => 'create' do %>
+    <%= render :partial => 'duty', duty: @duty %>
+    <%= submit_tag "Create"%>
+<% end %>
+
+<%= link_to 'Back', edit_assignment_path(@id) %>

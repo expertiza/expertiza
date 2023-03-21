@@ -5,7 +5,7 @@ describe 'List Team' do
     assignment_team = create(:assignment_team)
     create(:team_user)
 
-    login_as("instructor6")
+    login_as('instructor6')
     visit '/teams/list?id=1&type=Assignment'
 
     page.all('#theTable tr').each do |tr|

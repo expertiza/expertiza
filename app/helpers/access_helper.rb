@@ -2,7 +2,7 @@ module AccessHelper
   def authorize
     unless all_actions_allowed?
       flash_msg
-      redirect_back
+      redirect_back fallback_location: root_path
     end
   end
 
@@ -12,13 +12,17 @@ module AccessHelper
                         "An #{current_role_name.try(:downcase)} is not allowed to create this/these #{params[:controller]}"
                       else
                         "An #{current_role_name.try(:downcase)} is not allowed to #{params[:action]} this/these #{params[:controller]}"
-                                      end
+                      end
                     else
                       if params[:action] == 'new'
-                        "A #{current_role_name.try(:downcase)} is not allowed to create this/these #{params[:controller]}"
+                        if current_role_name.nil?
+                          "Please complete the CAPTCHA. You are not allowed to create this/these #{params[:controller]}"
+                        else
+                          "A #{current_role_name.try(:downcase)} is not allowed to create this/these #{params[:controller]}"
+                        end
                       else
                         "A #{current_role_name.try(:downcase)} is not allowed to #{params[:action]} this/these #{params[:controller]}"
-                                      end
+                      end
                     end
   end
 
@@ -32,5 +36,9 @@ module AccessHelper
 
   def action_allowed?
     # default action_allowed is nil. So to allow any action, we need to override this in the controller.
+    if current_user && current_role.instructor?
+      # allow action when the user is an instructor
+      true
+    end
   end
 end

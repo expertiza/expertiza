@@ -43,9 +43,9 @@ class MenuItemsController < ApplicationController
 
   def create
     # Flash an error if neither an action nor a page has been selected
-    if params[:menu_item][:controller_action_id].blank? and
-        params[:menu_item][:content_page_id].blank?
-      flash[:error] = "You must specify either an action or a page!"
+    if params[:menu_item][:controller_action_id].blank? &&
+       params[:menu_item][:content_page_id].blank?
+      flash[:error] = 'You must specify either an action or a page!'
       @menu_item = MenuItem.new(menu_item_params)
       @parent_item = MenuItem.find(params[:menu_item][:parent_id])
       foreign
@@ -77,9 +77,9 @@ class MenuItemsController < ApplicationController
 
   def update
     # Flash an error if neither an action nor a page has been selected
-    if params[:menu_item][:controller_action_id].blank? and
-        params[:menu_item][:content_page_id].blank?
-      flash[:error] = "You must specify either an action or a page!"
+    if params[:menu_item][:controller_action_id].blank? &&
+       params[:menu_item][:content_page_id].blank?
+      flash[:error] = 'You must specify either an action or a page!'
       edit
       render action: 'edit'
       return
@@ -148,8 +148,8 @@ class MenuItemsController < ApplicationController
     if node
       redirect_to node.url
     else
-      logger.error "(error in menu)"
-      redirect_to "/"
+      logger.error '(error in menu)'
+      redirect_to '/'
     end
   end
 
@@ -162,8 +162,8 @@ class MenuItemsController < ApplicationController
   protected
 
   def foreign
-    @parents = if self.respond_to?(:id)
-                 MenuItem.where('id != ?', self.id).order(:name)
+    @parents = if respond_to?(:id)
+                 MenuItem.where('id != ?', id).order(:name)
                else
                  MenuItem.order(:name)
                end

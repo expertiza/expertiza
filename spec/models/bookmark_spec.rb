@@ -7,7 +7,7 @@ describe Bookmark do
 
   describe '#url' do
     it 'should not be blank' do
-      bookmark.url = ""
+      bookmark.url = ''
       expect(bookmark).not_to be_valid
     end
     it 'should not be nil' do
@@ -17,7 +17,7 @@ describe Bookmark do
   end
   describe '#title' do
     it 'should not be blank' do
-      bookmark.title = ""
+      bookmark.title = ''
       expect(bookmark).not_to be_valid
     end
     it 'should not be nil' do
@@ -27,7 +27,7 @@ describe Bookmark do
   end
   describe '#description' do
     it 'should not be blank' do
-      bookmark.description = ""
+      bookmark.description = ''
       expect(bookmark).not_to be_valid
     end
     it 'should not be nil' do

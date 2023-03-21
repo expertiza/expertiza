@@ -1,4 +1,4 @@
-describe "add assignment team member test" do
+describe 'add assignment team member test' do
   before(:each) do
     create(:assignment)
     create_list(:participant, 3)
@@ -7,10 +7,9 @@ describe "add assignment team member test" do
     create(:assignment_team_node)
   end
 
-  describe "#add_participant" do
-
+  describe '#add_participant' do
     # to test adding a assignment participant to an assignment team that exist and not full
-    it "is able to add a member to an assignment team" do
+    it 'is able to add a member to an assignment team' do
       login_as('instructor6')
       assignment = Assignment.first
       team = AssignmentTeam.first

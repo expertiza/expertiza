@@ -2,11 +2,11 @@ require 'analytic/assignment_team_analytic'
 module AssignmentAnalytic
   #====== general statistics ======#
   def num_participants
-    self.participants.count
+    participants.count
   end
 
   def num_teams
-    self.teams.count
+    teams.count
   end
 
   #==== number of team reviews ====#
@@ -35,21 +35,21 @@ module AssignmentAnalytic
     if num_teams == 0
       0
     else
-      self.team_scores.inject(:+).to_f / num_teams
+      team_scores.inject(:+).to_f / num_teams
     end
   end
 
   def max_team_score
-    self.team_scores.max
+    team_scores.max
   end
 
   def min_team_score
-    self.team_scores.min
+    team_scores.min
   end
 
   def team_review_counts
     list = []
-    self.teams.each do |team|
+    teams.each do |team|
       list << team.num_reviews
     end
 
@@ -62,7 +62,7 @@ module AssignmentAnalytic
 
   def team_scores
     list = []
-    self.teams.each do |team|
+    teams.each do |team|
       list << team.average_review_score
     end
     if list.empty?
@@ -75,8 +75,8 @@ module AssignmentAnalytic
   # return all questionnaire types associated this assignment
   def questionnaire_types
     questionnaire_type_list = []
-    self.questionnaires.each do |questionnaire|
-      questionnaire_type_list << questionnaire.type unless self.questionnaires.include?(questionnaire.type)
+    questionnaires.each do |questionnaire|
+      questionnaire_type_list << questionnaire.type unless questionnaires.include?(questionnaire.type)
     end
     questionnaire_type_list
   end
@@ -84,14 +84,14 @@ module AssignmentAnalytic
   # return questionnaire of a type related to the assignment
   # assumptions: only 1 questionnaire of each type exist which should be the case
   def questionnaire_of_type(type_name_in_string)
-    self.questionnaires.each do |questionnaire|
+    questionnaires.each do |questionnaire|
       return questionnaire if questionnaire.type == type_name_in_string
     end
   end
 
   # helper function do to verify the assumption made above
   def self.questionnaire_unique?
-    self.find_each do |assignment|
+    find_each do |assignment|
       assignment.questionnaire_types.each do |questionnaire_type|
         questionnaire_list = []
         assignment.questionnaires.each do |questionnaire|
@@ -104,10 +104,10 @@ module AssignmentAnalytic
   end
 
   def has_review_questionnaire?
-    questionnaire_types.include?("ReviewQuestionnaire")
+    questionnaire_types.include?('ReviewQuestionnaire')
   end
 
   def review_questionnaire
-    questionnaire_of_type("ReviewQuestionnaire")
+    questionnaire_of_type('ReviewQuestionnaire')
   end
 end

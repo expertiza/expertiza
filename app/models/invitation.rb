@@ -1,8 +1,8 @@
-class Invitation < ActiveRecord::Base
+class Invitation < ApplicationRecord
   # belongs_to :to_user, class_name: "User", foreign_key: "to_id"
-  belongs_to :to_user, class_name: "User", foreign_key: "to_id", inverse_of: false
+  belongs_to :to_user, class_name: 'User', foreign_key: 'to_id', inverse_of: false
   # belongs_to :from_user, class_name: "User", foreign_key: "from_id"
-  belongs_to :from_user, class_name: "User", foreign_key: "from_id", inverse_of: false
+  belongs_to :from_user, class_name: 'User', foreign_key: 'from_id', inverse_of: false
 
   def self.remove_waitlists_for_team(topic_id, _assignment_id)
     # first_waitlisted_signup = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
@@ -37,14 +37,14 @@ class Invitation < ActiveRecord::Base
     end
   end
 
-  # This method handles all that needs to be done upon a user accepting an invite.
+  # This method handles all that needs to be done upon a user accepting an invitation.
   # First the users previous team is deleted if they were the only member of that
   # team and topics that the old team signed up for will be deleted.
   # Then invites the user that accepted the invite sent will be removed.
   # Last the users team entry will be added to the TeamsUser table and their assigned topic is updated
-  def self.accept_invite(team_id, inviter_user_id, invited_user_id, assignment_id)
+  def self.accept_invitation(team_id, inviter_user_id, invited_user_id, assignment_id)
     # if you are on a team and you accept another invitation and if your old team does not have any members, delete the entry for the team
-    if TeamsUser.team_empty?(team_id) and team_id != '0'
+    if TeamsUser.team_empty?(team_id) && (team_id != '0')
       assignment_id = AssignmentTeam.find(team_id).assignment.id
       # Release topics for the team has selected by the invited users empty team
       SignedUpTeam.release_topics_selected_by_team_for_assignment(team_id, assignment_id)

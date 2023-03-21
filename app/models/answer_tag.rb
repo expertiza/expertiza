@@ -1,4 +1,4 @@
-class AnswerTag < ActiveRecord::Base
+class AnswerTag < ApplicationRecord
   belongs_to :answer
   belongs_to :tag_prompts_deployment
 
@@ -8,13 +8,13 @@ class AnswerTag < ActiveRecord::Base
   validates :user_id, presence: true
 
   def tag_prompt
-    tag_dep = TagPromptDeployment.find(self.tag_prompt_deployment_id)
+    tag_dep = TagPromptDeployment.find(tag_prompt_deployment_id)
     TagPrompt.find(tag_dep.tag_prompt_id)
   end
 
-  def tag_prompt_html_control (user_id)
-    tag_dep = TagPromptDeployment.find(self.tag_prompt_deployment_id)
+  def tag_prompt_html_control(user_id)
+    tag_dep = TagPromptDeployment.find(tag_prompt_deployment_id)
     tag_prompt = TagPrompt.find(tag_dep.tag_prompt_id)
-    tag_prompt.html_control(tag_dep, self.answer, user_id)
+    tag_prompt.html_control(tag_dep, answer, user_id)
   end
 end

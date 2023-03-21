@@ -12,7 +12,7 @@ class PopupController < ApplicationController
     @response_id = params[:response_id]
     @reviewee_id = params[:reviewee_id]
     first_question_in_questionnaire = Answer.where(response_id: @response_id).first
-    unless @response_id.nil? or first_question_in_questionnaire.nil?
+    unless @response_id.nil? || first_question_in_questionnaire.nil?
       questionnaire_id = Question.find(first_question_in_questionnaire.question_id).questionnaire_id
       questionnaire = Questionnaire.find(questionnaire_id)
       @maxscore = questionnaire.max_question_score
@@ -46,17 +46,18 @@ class PopupController < ApplicationController
       # If the reviewer is a participant, the id is currently the id of the assignment participant.
       # However, we want their user_id. This is not possible for teams, so we just return the current id
       reviewer_id = ResponseMap.find(params[:id2]).reviewer_id
-      # E2060 - we had to change this if/else clause in order to properly view reports page 
-      if @assignment.reviewer_is_team
-        @reviewer_id = reviewer_id
-      else
-        @reviewer_id = Participant.find(reviewer_id).user_id   
-      end
+      # E2060 - we had to change this if/else clause in order to properly view reports page
+      @reviewer_id = if @assignment.team_reviewing_enabled
+                       reviewer_id
+                     else
+                       Participant.find(reviewer_id).user_id
+                     end
       # get the last response in each round from response_map id
       (1..@assignment.num_review_rounds).each do |round|
         response = Response.where(map_id: params[:id2], round: round).last
         instance_variable_set('@response_round_' + round.to_s, response)
         next if response.nil?
+
         instance_variable_set('@response_id_round_' + round.to_s, response.id)
         instance_variable_set('@scores_round_' + round.to_s, Answer.where(response_id: response.id))
         questionnaire = Response.find(response.id).questionnaire_by_answer(instance_variable_get('@scores_round_' + round.to_s).first)
@@ -69,7 +70,7 @@ class PopupController < ApplicationController
       end
     end
 
-    all_assignments = Assignment.where(:instructor_id=>session[:user].id)
+    all_assignments = Assignment.where(instructor_id: session[:user].id)
     @similar_assignments = []
     all_assignments.each do |assignment|
       if string_similarity(@assignment.name, assignment.name) > ASSIGNMENT_NAME_SIMILARITY_THRESHOLD
@@ -88,7 +89,7 @@ class PopupController < ApplicationController
     @reviews = []
 
     assignment = Assignment.find(@assignment_id)
-    flash.now[:error] = "This report is not implemented for assignments where the rubric varies by topic." if assignment.vary_by_topic
+    flash.now[:error] = 'This report is not implemented for assignments where the rubric varies by topic.' if assignment.vary_by_topic?
   end
 
   # this can be called from "response_report" by clicking reviewer names from instructor end.

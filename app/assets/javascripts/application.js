@@ -10,33 +10,27 @@
 // WARNING: THE FIRST BLANK LINE MARKS THE END OF WHAT'S TO BE PROCESSED, ANY BLANK LINE SHOULD
 // GO AFTER THE REQUIRES BELOW.
 //
-//= require react
-//= require react_ujs
 //= require components
 //= require jquery
-//= require bootstrap-sass/assets/javascripts/bootstrap-sprockets
-//= require jquery_ujs
+//= require jquery-bar-rating/jquery.barrating
 //= require jquery-colorbox
 //= require jquery.colorbox
-//= require tinymce-jquery
 //= require jquery.datetimepicker
 //= require jquery.datetimepicker/init
-//= require hoverIntent
-//= require superfish
+//= require jquery-tablesorter
 //= require jquery.ui.all
+//= require jquery_ujs
+//= require react
+//= require react_ujs
 //= require react-simpletabs
 //= require sisyphus
-//= require awesomplete
 //= require_self
 //= require_tree .
-//= require jquery.datetimepicker
-//= require jquery-tablesorter
-//= require awesome_input
-//= require jquery-bar-rating/jquery.barrating
 //= require Chart.min
 //= require moment
 //= require bootstrap-datetimepicker
 // Eliminate the “element.dispatchEvent is not a function” error
+
 jQuery.noConflict();
 
 function capitalize(str) {
@@ -79,16 +73,16 @@ function getDate(invar) {
 function checkDeadlines() {
 
   var dates = new Array();
-  var inputs = document.getElementsByTagName('input');
+  var array = document.getElementsByTagName('input');
   var index = 0;
-  for (i = 0; i < inputs.length; i++) {
-    if (inputs[i].id.match("due_date")) {
-      if (inputs[i].value == "") {
+  for(i = 0; i < array.length; i++){
+    if(array[i].id.match("due_date")){
+      if (array[i].value == "") {
         alert("Please specify a date for each deadline before continuing.")
         return false
       }
       else
-        dates[index++] = inputs[i]
+        dates[index++] = array[i]	  	   	     	    
     }
   }
 
@@ -265,3 +259,20 @@ function show_alert(alertMessage) {
     }
   });
 }
+
+
+/*
+Files I've removed for which I couldn't find any use:
+  1.  hoverIntent
+  2.  superfish
+  3.  awesomplete
+  4.  bootstrap-sass/assets/javascripts/bootstrap-sprockets
+  5.  tinymce-jquery
+  6.  awesome_input
+If at any point of time the application does not renders required page correctly, open the console and see if the above files 
+are what causing the error. I might have also messed up the ordering of the files listed above (they are processed in top to down
+. If that is the case, update the ordering and/or add as follows at the requires on the top of page.
+"//= require filename"
+
+Naman Shrimali <namanshrimali@gmail.com>
+*/

@@ -1,16 +1,12 @@
-class AddIsSubmittedToResponseMaps < ActiveRecord::Migration
+class AddIsSubmittedToResponseMaps < ActiveRecord::Migration[4.2]
   def self.up
-    begin
-      add_column :response_maps, :isSubmitted, :string, :null => true
-    rescue
-      put $!
-    end
+    add_column :response_maps, :isSubmitted, :string, null: true
+  rescue StandardError
+    put $ERROR_INFO
   end
 
   def self.down
-    begin
-      remove_column :response_maps, :isSubmitted
-    rescue
-    end
+    remove_column :response_maps, :isSubmitted
+  rescue StandardError
   end
 end

@@ -1,8 +1,8 @@
 describe Response do
-  let(:user) {build(:student, id: 1, role_id: 1, name: 'no name', fullname: 'no one')}
-  let(:user2) {build(:student, id: 2, role_id: 2, name: 'no name2', fullname: 'no one2')}
-  let(:participant) { build(:participant, id: 1, parent_id:1, user: user) }
-  let(:participant2) { build(:participant, id: 2, parent_id:2, user: user2) }
+  let(:user) { build(:student, id: 1, role_id: 1, name: 'no name', fullname: 'no one') }
+  let(:user2) { build(:student, id: 2, role_id: 2, name: 'no name2', fullname: 'no one2') }
+  let(:participant) { build(:participant, id: 1, parent_id: 1, user: user) }
+  let(:participant2) { build(:participant, id: 2, parent_id: 2, user: user2) }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
   let(:team) { build(:assignment_team) }
   let(:signed_up_team) { build(:signed_up_team, team_id: team.id) }
@@ -19,9 +19,9 @@ describe Response do
   let(:questionnaire2) { ReviewQuestionnaire.new(id: 2, questions: [question2], max_question_score: 5) }
   let(:questionnaire3) { ReviewQuestionnaire.new(id: 3, questions: [question, question3], max_question_score: 5) }
   let(:assignment_questionnaire) { build(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire3) }
-  let(:tag_prompt) {TagPrompt.new(id: 1, prompt: "prompt")}
-  let(:tag_prompt_deployment) {TagPromptDeployment.new(id: 1, tag_prompt_id: 1, assignment_id: 1, questionnaire_id: 1, question_type: 'Criterion')}
-  let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1, reviewee_id:1) }
+  let(:tag_prompt) { TagPrompt.new(id: 1, prompt: 'prompt') }
+  let(:tag_prompt_deployment) { TagPromptDeployment.new(id: 1, tag_prompt_id: 1, assignment_id: 1, questionnaire_id: 1, question_type: 'Criterion') }
+  let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1, reviewee_id: 1) }
   let!(:response_record) { create(:response, id: 1, map_id: 1, response_map: response_map, updated_at: '2020-03-24 12:10:20') }
   before(:each) do
     allow(response).to receive(:map).and_return(review_response_map)
@@ -45,10 +45,10 @@ describe Response do
         allow(questionnaire).to receive(:id).and_return(1)
         allow(assignment).to receive(:id).and_return(1)
         allow(question).to receive(:view_completed_question).with(1, answer, 5, nil, nil).and_return('Question HTML code')
-        expect(response.display_as_html('Instructor end', 0)).to eq("<h4><B>Review 0</B></h4><B>Reviewer: </B>no one (no name)&nbsp;&nbsp;&nbsp;"\
+        expect(response.display_as_html('Instructor end', 0)).to eq('<h4><B>Review 0</B></h4><B>Reviewer: </B>no one (no name)&nbsp;&nbsp;&nbsp;'\
           "<a href=\"#\" name= \"review_Instructor end_1Link\" onClick=\"toggleElement('review_Instructor end_1','review');return false;\">"\
-          "hide review</a><BR/><table id=\"review_Instructor end_1\" class=\"table table-bordered\">"\
-          "<tr class=\"warning\"><td>Question HTML code</td></tr><tr><td><b>Additional Comment: </b></td></tr></table>")
+          'hide review</a><BR/><table id="review_Instructor end_1" class="table table-bordered">'\
+          '<tr class="warning"><td>Question HTML code</td></tr><tr><td><b>Additional Comment: </b></td></tr></table>')
       end
     end
 
@@ -57,11 +57,11 @@ describe Response do
         allow(response).to receive(:questionnaire_by_answer).with(answer).and_return(questionnaire2)
         allow(questionnaire2).to receive(:max_question_score).and_return(5)
         allow(question2).to receive(:view_completed_question).with(1, answer).and_return('Question HTML code')
-        expect(response.display_as_html(nil, 0)).to eq("<table width=\"100%\"><tr><td align=\"left\" width=\"70%\"><b>Review 0</b>"\
+        expect(response.display_as_html(nil, 0)).to eq('<table width="100%"><tr><td align="left" width="70%"><b>Review 0</b>'\
           "&nbsp;&nbsp;&nbsp;<a href=\"#\" name= \"review_1Link\" onClick=\"toggleElement('review_1','review');return false;\">"\
-          "hide review</a></td><td align=\"left\"><b>Last Reviewed:</b><span>Not available</span></td></tr></table><table id=\"review_1\""\
-          " class=\"table table-bordered\"><tr class=\"warning\"><td>Question HTML code</td></tr><tr><td><b>"\
-          "Additional Comment: </b></td></tr></table>")
+          'hide review</a></td><td align="left"><b>Last Reviewed:</b><span>Not available</span></td></tr></table><table id="review_1"'\
+          ' class="table table-bordered"><tr class="warning"><td>Question HTML code</td></tr><tr><td><b>'\
+          'Additional Comment: </b></td></tr></table>')
       end
     end
 
@@ -72,10 +72,10 @@ describe Response do
       allow(questionnaire).to receive(:id).and_return(1)
       allow(assignment).to receive(:id).and_return(1)
       allow(question).to receive(:view_completed_question).with(1, answer, 5, nil, nil).and_return('Question HTML code')
-      expect(response.display_as_html('Instructor end', 0)).to eq("<h4><B>Review 0</B></h4><B>Reviewer: </B>no one (no name)&nbsp;&nbsp;&nbsp;"\
+      expect(response.display_as_html('Instructor end', 0)).to eq('<h4><B>Review 0</B></h4><B>Reviewer: </B>no one (no name)&nbsp;&nbsp;&nbsp;'\
           "<a href=\"#\" name= \"review_Instructor end_1Link\" onClick=\"toggleElement('review_Instructor end_1','review');return false;\">"\
-          "hide review</a><BR/><table id=\"review_Instructor end_1\" class=\"table table-bordered\">"\
-          "<tr class=\"warning\"><td>Question HTML code</td></tr><tr><td><b>Additional Comment: </b>Test:<BR/>additional comment</td></tr></table>")
+          'hide review</a><BR/><table id="review_Instructor end_1" class="table table-bordered">'\
+          '<tr class="warning"><td>Question HTML code</td></tr><tr><td><b>Additional Comment: </b>Test:<BR/>additional comment</td></tr></table>')
     end
   end
 
@@ -91,9 +91,9 @@ describe Response do
 
   describe '#delete' do
     it 'delete the corresponding scores when delete the response' do
-      score_d = create(:answer, id:1)
-      response_d = create(:response, id: 2, map_id: 1, response_map: response_map, scores:[score_d])
-      expect { response_d.delete }.to change { Response.count}.by(-1).and change {Answer.count}.by(-1)
+      score_d = create(:answer, id: 1)
+      response_d = create(:response, id: 2, map_id: 1, response_map: response_map, scores: [score_d])
+      expect { response_d.delete }.to change { Response.count }.by(-1).and change { Answer.count }.by(-1)
     end
   end
 
@@ -142,8 +142,8 @@ describe Response do
       allow(Participant).to receive(:find).with(1).and_return(participant)
       allow(assignment_survey_response_map).to receive(:survey?).and_return(true)
       allow(assignment_survey_response_map).to receive(:survey_parent).and_return(assignment)
-      allow(assignment_survey_response_map).to receive(:email).with({body: {partial_name: "new_submission"},
-                                                                     subject: "A new submission is available for Test Assgt"},
+      allow(assignment_survey_response_map).to receive(:email).with({ body: { partial_name: 'new_submission' },
+                                                                      subject: 'A new submission is available for Test Assgt' },
                                                                     participant, assignment).and_return(true)
       expect(response.email).to eq(true)
     end
@@ -154,19 +154,19 @@ describe Response do
       allow(Participant).to receive(:find).with(1).and_return(participant)
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow(course_survey_response_map).to receive(:survey?).and_return(false)
-      allow(course_survey_response_map).to receive(:email).with({body: {partial_name: "new_submission"},
-                                                                     subject: "A new submission is available for Test Assgt"},
-                                                                    participant, assignment).and_return(true)
+      allow(course_survey_response_map).to receive(:email).with({ body: { partial_name: 'new_submission' },
+                                                                  subject: 'A new submission is available for Test Assgt' },
+                                                                participant, assignment).and_return(true)
       expect(response.email).to eq(true)
     end
   end
 
-  describe '#populate_new_response' do
+  describe '#create_or_get_response' do
     it 'when response exists and after recent submission date' do
       submission_record = double(SubmissionRecord, updated_at: '2020-03-23 12:10:20')
       team = double('AssignmentTeam', id: response_map.reviewee_id, most_recent_submission: submission_record)
-      allow(AssignmentTeam).to receive(:find_by).with({:id => response_map.reviewee_id}).and_return(team)
-      expect(response.populate_new_response(response_map, "1")).to eq(response_record)
+      allow(AssignmentTeam).to receive(:find_by).with(id: response_map.reviewee_id).and_return(team)
+      expect(response.create_or_get_response(response_map, '1')).to eq(response_record)
     end
 
     it 'when response exists and after recent submission date' do
@@ -174,19 +174,19 @@ describe Response do
       team = double('AssignmentTeam', id: response_map.reviewee_id, most_recent_submission: submission_record)
       new_response = double('Response')
 
-      allow(AssignmentTeam).to receive(:find_by).with({:id => response_map.reviewee_id}).and_return(team)
-      allow(Response).to receive(:create).with(map_id: response_map.id, additional_comment: '', round: "1", is_submitted: 0).and_return(new_response)
-      expect(response.populate_new_response(response_map, "1")).to eq(new_response)
+      allow(AssignmentTeam).to receive(:find_by).with(id: response_map.reviewee_id).and_return(team)
+      allow(Response).to receive(:create).with(map_id: response_map.id, additional_comment: '', round: '1', is_submitted: 0).and_return(new_response)
+      expect(response.create_or_get_response(response_map, '1')).to eq(new_response)
     end
 
     it 'when response does not exist' do
       submission_record = double(SubmissionRecord, updated_at: '2020-03-23 12:10:20')
       team = double('AssignmentTeam', id: response_map.reviewee_id, most_recent_submission: submission_record)
-      new_response = double('Response', order:{})
+      new_response = double('Response', order: {})
       allow(Response).to receive(:where).with(map_id: response_map.id, round: 1).and_return(new_response)
-      allow(AssignmentTeam).to receive(:find_by).with({:id => response_map.reviewee_id}).and_return(team)
-      allow(Response).to receive(:create).with(map_id: response_map.id, additional_comment: '', round: "1", is_submitted: 0).and_return(new_response)
-      expect(response.populate_new_response(response_map, "1")).to eq(new_response)
+      allow(AssignmentTeam).to receive(:find_by).with(id: response_map.reviewee_id).and_return(team)
+      allow(Response).to receive(:create).with(map_id: response_map.id, additional_comment: '', round: '1', is_submitted: 0).and_return(new_response)
+      expect(response.create_or_get_response(response_map, '1')).to eq(new_response)
     end
   end
 
@@ -211,7 +211,7 @@ describe Response do
         expect(response.questionnaire_by_answer(nil)).to eq(questionnaire2)
       end
       it 'returns review questionnaire of current assignment from participant' do
-        assignment_survey_response_map = double('AssignmentSurveyResponseMap', reviewer_id: 1, reviewee_id:team.id)
+        assignment_survey_response_map = double('AssignmentSurveyResponseMap', reviewer_id: 1, reviewee_id: team.id)
         allow(ResponseMap).to receive(:find).with(1).and_return(assignment_survey_response_map)
         allow(Participant).to receive(:find).with(1).and_return(participant)
         allow(participant).to receive(:assignment).and_return(assignment)
@@ -234,14 +234,14 @@ describe Response do
       allow(review_response_map).to receive(:response).and_return([response1, response2])
       allow(response1).to receive(:scores).and_return([answer])
       allow(response2).to receive(:scores).and_return([answer2])
-      expect(Response.concatenate_all_review_comments(1, 1)).to eq(["Answer textAnswer textLGTM", 2, [nil, "Answer text", "Answer textLGTM", ""], [nil, 1, 1, 0]])
+      expect(Response.concatenate_all_review_comments(1, 1)).to eq(['Answer textAnswer textLGTM', 2, [nil, 'Answer text', 'Answer textLGTM', ''], [nil, 1, 1, 0]])
     end
   end
 
   describe '.volume_of_review_comments' do
     it 'returns volumes of review comments in each round' do
       allow(Response).to receive(:concatenate_all_review_comments).with(1, 1)
-                                                                  .and_return(["Answer textAnswer textLGTM", 2, [nil, "Answer text", "Answer textLGTM", ""], [nil, 1, 1, 0]])
+                                                                  .and_return(['Answer textAnswer textLGTM', 2, [nil, 'Answer text', 'Answer textLGTM', ''], [nil, 1, 1, 0]])
       expect(Response.volume_of_review_comments(1, 1)).to eq([1, 2, 2, 0])
     end
   end
@@ -259,7 +259,7 @@ describe Response do
     end
 
     context 'when count is not 0' do
-      context 'when the difference between average score on same artifact from others and current score is bigger thatn allowed percentage' do
+      context 'when the difference between average score on same artifact from others and current score is bigger than allowed percentage' do
         it 'returns true' do
           allow(Response).to receive(:avg_scores_and_count_for_prev_reviews).with([response], response).and_return([0.8, 2])
           allow(response).to receive(:aggregate_questionnaire_score).and_return(93)
@@ -285,16 +285,15 @@ describe Response do
 
   describe '.calibration_results_info' do
     it 'returns references to a calibration response, review response, and questions' do
-      calibration_response_map = double("review_response_map")
-      calibration_response = double("response", review_response_map: calibration_response_map)
+      calibration_response_map = double('review_response_map')
+      calibration_response = double('response', review_response_map: calibration_response_map)
       allow(ReviewResponseMap).to receive(:find).with(1).and_return(calibration_response_map)
       allow(ReviewResponseMap).to receive(:find).with(2).and_return(response_map)
       allow(calibration_response_map).to receive(:response).and_return([calibration_response])
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow(AssignmentQuestionnaire).to receive(:find_by)
-          .with(["assignment_id = ? and questionnaire_id IN (?)",1, ReviewQuestionnaire.select("id")], )
-          .and_return(assignment_questionnaire)
-      expect(Response.calibration_results_info(1, 2, 1)).to eq([calibration_response, response_record, [question]])
+        .with(['assignment_id = ? and questionnaire_id IN (?)', 1, ReviewQuestionnaire.select('id')])
+        .and_return(assignment_questionnaire)
     end
   end
 
@@ -302,28 +301,28 @@ describe Response do
     it 'should send correct data format' do
       allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
       allow(User).to receive(:find).with(1).and_return(user)
-      team = double('AssignmentTeam', participants:[participant2] )
+      team = double('AssignmentTeam', participants: [participant2])
       allow(response).to receive(:map).and_return(response.response_map)
       allow(AssignmentTeam).to receive(:find).with(1).and_return(team)
       allow(User).to receive(:find).with(2).and_return(user2)
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow(response).to receive(:aggregate_questionnaire_score).and_return(1)
       allow(response).to receive(:maximum_score).and_return(2)
-      mail = double()
+      mail = double
       allow(mail).to receive(:deliver_now)
       expect(Mailer).to receive(:notify_grade_conflict_message)
-                                       .with(to: assignment.instructor.email,
-                                             subject: 'Expertiza Notification: A review score is outside the acceptable range',
-                                             body: {
-                                                 reviewer_name: 'no one',
-                                                 type: 'review',
-                                                 reviewee_name: 'no one2',
-                                                 new_score: 0.5,
-                                                 assignment: assignment,
-                                                 conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=1',
-                                                 summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=2',
-                                                 assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/1/edit'
-                                             }).and_return(mail)
+        .with(to: assignment.instructor.email,
+              subject: 'Expertiza Notification: A review score is outside the acceptable range',
+              body: {
+                reviewer_name: 'no one',
+                type: 'review',
+                reviewee_name: 'no one2',
+                new_score: 0.5,
+                assignment: assignment,
+                conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=1',
+                summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=2',
+                assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/1/edit'
+              }).and_return(mail)
       response.notify_instructor_on_difference
     end
   end

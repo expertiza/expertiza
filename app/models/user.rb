@@ -1,12 +1,12 @@
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   enum locale: Locale.code_name_to_db_encoding(Locale.available_locale_preferences)
   acts_as_authentic do |config|
-    config.validates_uniqueness_of_email_field_options = {if: -> { false }} # Don't validate email uniqueness
+    config.validates_uniqueness_of_email_field_options = { if: -> { false } } # Don't validate email uniqueness
     config.crypto_provider = Authlogic::CryptoProviders::Sha1
     Authlogic::CryptoProviders::Sha1.join_token = ''
     Authlogic::CryptoProviders::Sha1.stretches = 1
   end
-  #Added for E1973. A user can hold a lock on a resource
+  # Added for E1973. A user can hold a lock on a resource
   has_many :locks, class_name: 'Lock', foreign_key: 'user_id', dependent: :destroy, inverse_of: false
   has_many :participants, class_name: 'Participant', foreign_key: 'user_id', dependent: :destroy
   has_many :assignment_participants, class_name: 'AssignmentParticipant', foreign_key: 'user_id', dependent: :destroy
@@ -21,13 +21,14 @@ class User < ActiveRecord::Base
   belongs_to :role
   validates :name, presence: true
   validates :name, uniqueness: true
-  validates :name, format: {without: /\s/}
+  validates :name, format: { without: /\s/ }
 
-  validates :email, presence: {message: "can't be blank"}
-  validates :email, format: {with: /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, allow_blank: true}
+  validates :email, presence: { message: "can't be blank" }
+  validates :email, format: { with: /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, allow_blank: true }
+
+  validates :fullname, presence: true
 
   before_validation :randomize_password, if: ->(user) { user.new_record? && user.password.blank? } # AuthLogic
-  after_create :email_welcome
 
   scope :superadministrators, -> { where role_id: Role.superadministrator }
   scope :superadmins, -> { superadministrators }
@@ -44,20 +45,21 @@ class User < ActiveRecord::Base
   end
 
   def list_mine(object_type, user_id)
-    object_type.where(["instructor_id = ?", user_id])
+    object_type.where(['instructor_id = ?', user_id])
   end
 
   def get_available_users(name)
     lesser_roles = role.get_parents
     all_users = User.all(conditions: ['name LIKE ?', "#{name}%"], limit: 20) # higher limit, since we're filtering
-    visible_users = all_users.select {|user| lesser_roles.include? user.role }
+    visible_users = all_users.select { |user| lesser_roles.include? user.role }
     visible_users[0, 10] # the first 10
   end
 
   def can_impersonate?(user)
-    return true if self.role.super_admin?
-    return true if self.teaching_assistant_for?(user)
-    return true if self.recursively_parent_of(user)
+    return true if role.super_admin?
+    return true if teaching_assistant_for?(user)
+    return true if recursively_parent_of(user)
+
     false
   end
 
@@ -66,25 +68,26 @@ class User < ActiveRecord::Base
     return false if p.nil?
     return true if p == self
     return false if p.role.super_admin?
-    self.recursively_parent_of(p)
+
+    recursively_parent_of(p)
   end
 
   def get_user_list
     user_list = []
     # If the user is a super admin, fetch all users
-    user_list = SuperAdministrator.get_user_list if self.role.super_admin?
+    user_list = SuperAdministrator.get_user_list if role.super_admin?
 
     # If the user is an instructor, fetch all users in his course/assignment
-    user_list = Instructor.get_user_list(self) if self.role.instructor?
+    user_list = Instructor.get_user_list(self) if role.instructor?
 
     # If the user is a TA, fetch all users in his courses
-    user_list = Ta.get_user_list(self) if self.role.ta?
+    user_list = Ta.get_user_list(self) if role.ta?
 
     # Add the children to the list
-    unless self.role.super_admin?
-      User.all.find_each do |u|
-        if recursively_parent_of(u)
-          user_list << u unless user_list.include?(u)
+    unless role.super_admin?
+      User.includes(:parent, :role, parent: %i[parent role]).find_each do |user|
+        if recursively_parent_of(user)
+          user_list << user unless user_list.include?(user)
         end
       end
     end
@@ -95,33 +98,34 @@ class User < ActiveRecord::Base
   # Zhewei: anonymized view for demo purposes - 1/3/2018
   def self.anonymized_view?(ip_address = nil)
     anonymized_view_starter_ips = $redis.get('anonymized_view_starter_ips') || ''
-    return true if ip_address and anonymized_view_starter_ips.include? ip_address
+    return true if ip_address && anonymized_view_starter_ips.include?(ip_address)
+
     false
   end
 
-  # E1991 : This function returns original name of the user 
+  # E1991 : This function returns original name of the user
   # from their anonymized names. The process of obtaining
   # real name is exactly opposite of what we'd do to get
   # anonymized name from their real name.
   def self.real_user_from_anonymized_name(anonymized_name)
     user = User.find_by(name: anonymized_name)
-    return user
+    user
   end
 
   def name(ip_address = nil)
-    User.anonymized_view?(ip_address) ? self.role.name + ' ' + self.id.to_s : self[:name]
+    User.anonymized_view?(ip_address) ? role.name + ' ' + id.to_s : self[:name]
   end
 
   def fullname(ip_address = nil)
-    User.anonymized_view?(ip_address) ? self.role.name + ', ' + self.id.to_s : self[:fullname]
+    User.anonymized_view?(ip_address) ? role.name + ', ' + id.to_s : self[:fullname]
   end
 
   def first_name(ip_address = nil)
-    User.anonymized_view?(ip_address) ? self.role.name : fullname.try(:[], /,.+/).try(:[], /\w+/) || ''
+    User.anonymized_view?(ip_address) ? role.name : fullname.try(:[], /,.+/).try(:[], /\w+/) || ''
   end
 
   def email(ip_address = nil)
-    User.anonymized_view?(ip_address) ? self.role.name + '_' + self.id.to_s + '@mailinator.com' : self[:email]
+    User.anonymized_view?(ip_address) ? role.name + '_' + id.to_s + '@mailinator.com' : self[:email]
   end
 
   def super_admin?
@@ -138,13 +142,16 @@ class User < ActiveRecord::Base
 
   # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
   def email_welcome
-    #this will send an account creation notification to user via email.
-    MailerHelper.send_mail_to_user(self, "Your Expertiza account and password has been created", "user_welcome", password).deliver_now
+    # this will send an account creation notification to user via email.
+    MailerHelper.send_mail_to_user(self, 'Your Expertiza account and password has been created', 'user_welcome', password).deliver_now
   end
 
   def valid_password?(password)
     Authlogic::CryptoProviders::Sha1.stretches = 1
-    Authlogic::CryptoProviders::Sha1.matches?(crypted_password, self.password_salt.to_s + password)
+    # authlogic internally changed the matches function, so old passwords work with the first line
+    old_validation = Authlogic::CryptoProviders::Sha1.matches?(crypted_password, password_salt.to_s + password)
+    new_validation = Authlogic::CryptoProviders::Sha1.matches?(crypted_password, password, password_salt)
+    old_validation || new_validation
   end
 
   # Resets the password to be mailed to the user
@@ -154,8 +161,9 @@ class User < ActiveRecord::Base
     password
   end
 
-  def self.import(row_hash, _row_header, session, id = nil)
+  def self.import(row_hash, _row_header, session, _id = nil)
     raise ArgumentError, "Only #{row_hash.length} column(s) is(are) found. It must contain at least username, full name, email." if row_hash.length < 3
+
     user = User.find_by_name(row_hash[:name])
     if user.nil?
       attributes = ImportFileHelper.define_attributes(row_hash)
@@ -166,16 +174,16 @@ class User < ActiveRecord::Base
       user.parent_id = (session[:user]).id
       user.save
     end
-
+    user
   end
 
   def self.yesorno(elt)
     if elt == true
-      "yes"
+      'yes'
     elsif elt == false
-      "no"
+      'no'
     else
-      ""
+      ''
     end
   end
 
@@ -185,20 +193,20 @@ class User < ActiveRecord::Base
   def self.find_by_login(login)
     user = User.find_by(email: login)
     if user.nil?
-      items = login.split("@")
+      items = login.split('@')
       short_name = items[0]
-      user_list = User.where("name = ?", short_name)
-      user = user_list.first if !user_list.nil? && user_list.length == 1
+      user_list = User.where('name = ?', short_name)
+      user = user_list.first if user_list.any? && user_list.length == 1
     end
     user
   end
 
   def set_instructor(new_assignment)
-    new_assignment.instructor_id = self.id
+    new_assignment.instructor_id = id
   end
 
   def get_instructor
-    self.id
+    id
   end
 
   def instructor_id
@@ -215,7 +223,7 @@ class User < ActiveRecord::Base
   # save in the database. The private key is returned by the method but not saved.
   def generate_keys
     # check if we are replacing a digital certificate already generated
-    replacing_key = true unless self.digital_certificate.nil?
+    replacing_key = true unless digital_certificate.nil?
 
     # generate the new key pair
     new_key = OpenSSL::PKey::RSA.generate(1024)
@@ -225,7 +233,7 @@ class User < ActiveRecord::Base
 
     # when replacing an existing key, update any digital signatures made previously with the new key
     if replacing_key
-      participants = AssignmentParticipant.where(user_id: self.id)
+      participants = AssignmentParticipant.where(user_id: id)
       participants.each do |participant|
         participant.assign_copyright(new_key.to_pem) if participant.permission_granted
       end
@@ -233,7 +241,7 @@ class User < ActiveRecord::Base
 
     # return the new private key
     new_key.to_pem
-    end
+  end
 
   def initialize(attributes = nil)
     super(attributes)
@@ -242,19 +250,19 @@ class User < ActiveRecord::Base
     @email_on_submission = true
     @email_on_review_of_review = true
     @copy_of_emails = false
-    @preference_home_flag = true
+    @etc_icons_on_homepage = true
   end
 
   def self.export(csv, _parent_id, options)
     users = User.all
     users.each do |user|
       tcsv = []
-      tcsv.push(user.name, user.fullname, user.email) if options["personal_details"] == "true"
-      tcsv.push(user.role.name) if options["role"] == "true"
-      tcsv.push(user.parent.name) if options["parent"] == "true"
-      tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails) if options["email_options"] == "true"
-      tcsv.push(user.handle) if options["handle"] == "true"
-      tcsv.push(user.preference_home_flag) if options["preference_home_flag"] == "true"
+      tcsv.push(user.name, user.fullname, user.email) if options['personal_details'] == 'true'
+      tcsv.push(user.role.name) if options['role'] == 'true'
+      tcsv.push(user.parent.name) if options['parent'] == 'true'
+      tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails) if options['email_options'] == 'true'
+      tcsv.push(user.etc_icons_on_homepage) if options['etc_icons_on_homepage'] == 'true'
+      tcsv.push(user.handle) if options['handle'] == 'true'
       csv << tcsv
     end
   end
@@ -265,11 +273,12 @@ class User < ActiveRecord::Base
 
   def self.export_fields(options)
     fields = []
-    fields.push("name", "full name", "email") if options["personal_details"] == "true"
-    fields.push("role") if options["role"] == "true"
-    fields.push("parent") if options["parent"] == "true"
-    fields.push("email on submission", "email on review", "email on metareview") if options["email_options"] == "true"
-    fields.push("handle") if options["handle"] == "true"
+    fields.push('name', 'full name', 'email') if options['personal_details'] == 'true'
+    fields.push('role') if options['role'] == 'true'
+    fields.push('parent') if options['parent'] == 'true'
+    fields.push('email on submission', 'email on review', 'email on metareview', 'copy of emails') if options['email_options'] == 'true'
+    fields.push('preference home flag') if options['etc_icons_on_homepage'] == 'true'
+    fields.push('handle') if options['handle'] == 'true'
     fields
   end
 
@@ -289,6 +298,7 @@ class User < ActiveRecord::Base
   def teaching_assistant_for?(student)
     return false unless teaching_assistant?
     return false unless student.role.name == 'Student'
+
     # We have to use the Ta object instead of User object
     # because single table inheritance is not currently functioning
     ta = Ta.find(id)
@@ -298,18 +308,18 @@ class User < ActiveRecord::Base
   end
 
   def teaching_assistant?
-    true if self.role.ta?
+    true if role.ta?
   end
 
   def self.search_users(role, user_id, letter, search_by)
-    key_word = {'1' => 'name', '2' => 'fullname', '3' => 'email'}
+    key_word = { '1' => 'name', '2' => 'fullname', '3' => 'email' }
     sql = "(role_id in (?) or id = ?) and #{key_word[search_by]} like ?"
     if key_word.include? search_by
       search_filter = '%' + letter + '%'
       users = User.order('name').where(sql, role.get_available_roles, user_id, search_filter)
     else # default used when clicking on letters
       search_filter = letter + '%'
-      users = User.order('name').where("(role_id in (?) or id = ?) and name like ?", role.get_available_roles, user_id, search_filter)
+      users = User.order('name').where('(role_id in (?) or id = ?) and name like ?', role.get_available_roles, user_id, search_filter)
     end
     users
   end

@@ -1,4 +1,4 @@
-class Questionnaire < ActiveRecord::Base
+class Questionnaire < ApplicationRecord
   # for doc on why we do it this way,
   # see http://blog.hasmanythrough.com/2007/1/15/basic-rails-association-cardinality
   has_many :questions, dependent: :destroy # the collection of questions associated with this Questionnaire
@@ -13,7 +13,7 @@ class Questionnaire < ActiveRecord::Base
 
   DEFAULT_MIN_QUESTION_SCORE = 0  # The lowest score that a reviewer can assign to any questionnaire question
   DEFAULT_MAX_QUESTION_SCORE = 5  # The highest score that a reviewer can assign to any questionnaire question
-  DEFAULT_QUESTIONNAIRE_URL = "http://www.courses.ncsu.edu/csc517".freeze
+  DEFAULT_QUESTIONNAIRE_URL = 'http://www.courses.ncsu.edu/csc517'.freeze
   QUESTIONNAIRE_TYPES = ['ReviewQuestionnaire',
                          'MetareviewQuestionnaire',
                          'Author FeedbackQuestionnaire',
@@ -34,48 +34,48 @@ class Questionnaire < ActiveRecord::Base
 
   def get_weighted_score(assignment, scores)
     # create symbol for "varying rubrics" feature -Yang
-    round = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: self.id).used_in_round
-    questionnaire_symbol = unless round.nil?
-                             (self.symbol.to_s + round.to_s).to_sym
+    round = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: id).used_in_round
+    questionnaire_symbol = if round.nil?
+                             symbol
                            else
-                             self.symbol
+                             (symbol.to_s + round.to_s).to_sym
                            end
     compute_weighted_score(questionnaire_symbol, assignment, scores)
   end
 
   def compute_weighted_score(symbol, assignment, scores)
-    aq = self.assignment_questionnaires.find_by(assignment_id: assignment.id)
-    unless scores[symbol][:scores][:avg].nil?
-      scores[symbol][:scores][:avg] * aq.questionnaire_weight / 100.0
-    else
+    aq = assignment_questionnaires.find_by(assignment_id: assignment.id)
+    if scores[symbol][:scores][:avg].nil?
       0
+    else
+      scores[symbol][:scores][:avg] * aq.questionnaire_weight / 100.0
     end
   end
 
   # Does this questionnaire contain true/false questions?
   def true_false_questions?
-    questions.each {|question| return true if question.type == "Checkbox" }
+    questions.each { |question| return true if question.type == 'Checkbox' }
     false
   end
 
   def delete
-    self.assignments.each do |assignment|
+    assignments.each do |assignment|
       raise "The assignment #{assignment.name} uses this questionnaire.
             Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
     end
 
-    self.questions.each(&:delete)
+    questions.each(&:delete)
 
-    node = QuestionnaireNode.find_by(node_object_id: self.id)
+    node = QuestionnaireNode.find_by(node_object_id: id)
     node.destroy if node
 
-    self.destroy
+    destroy
   end
 
   def max_possible_score
     results = Questionnaire.joins('INNER JOIN questions ON questions.questionnaire_id = questionnaires.id')
                            .select('SUM(questions.weight) * questionnaires.max_question_score as max_score')
-                           .where('questionnaires.id = ?', self.id)
+                           .where('questionnaires.id = ?', id)
     results[0].max_score
   end
 
@@ -91,10 +91,11 @@ class Questionnaire < ActiveRecord::Base
     questions.each do |question|
       new_question = question.dup
       new_question.questionnaire_id = questionnaire.id
-      new_question.size = '50,3' if (new_question.is_a? Criterion or new_question.is_a? TextResponse) and new_question.size.nil?
+      new_question.size = '50,3' if (new_question.is_a?(Criterion) || new_question.is_a?(TextResponse)) && new_question.size.nil?
       new_question.save!
       advices = QuestionAdvice.where(question_id: question.id)
       next if advices.empty?
+
       advices.each do |advice|
         new_advice = advice.dup
         new_advice.question_id = new_question.id
@@ -102,15 +103,15 @@ class Questionnaire < ActiveRecord::Base
       end
     end
     questionnaire
-  end  
+  end
 
   # validate the entries for this questionnaire
   def validate_questionnaire
-    errors.add(:max_question_score, "The maximum question score must be a positive integer.") if max_question_score < 1
-    errors.add(:min_question_score, "The minimum question score must be a positive integer.") if min_question_score < 0
-    errors.add(:min_question_score, "The minimum question score must be less than the maximum.") if min_question_score >= max_question_score
+    errors.add(:max_question_score, 'The maximum question score must be a positive integer.') if max_question_score < 1
+    errors.add(:min_question_score, 'The minimum question score must be a positive integer.') if min_question_score < 0
+    errors.add(:min_question_score, 'The minimum question score must be less than the maximum.') if min_question_score >= max_question_score
 
-    results = Questionnaire.where("id <> ? and name = ? and instructor_id = ?", id, name, instructor_id)
-    errors.add(:name, "Questionnaire names must be unique.") if results.present?
+    results = Questionnaire.where('id <> ? and name = ? and instructor_id = ?', id, name, instructor_id)
+    errors.add(:name, 'Questionnaire names must be unique.') if results.present?
   end
 end

@@ -1,10 +1,9 @@
-class CreateTeamRoleQuestionnaire < ActiveRecord::Migration
+class CreateTeamRoleQuestionnaire < ActiveRecord::Migration[4.2]
   def self.up
-    create_table "team_role_questionnaire", :force  => true do |t|
+    create_table 'team_role_questionnaire', force: true do |t|
       t.integer :team_roles_id
       t.integer :questionnaire_id
       t.timestamps
-
     end
     execute "ALTER TABLE `team_role_questionnaire`
     ADD CONSTRAINT fk_team_roles_id

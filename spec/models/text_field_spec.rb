@@ -1,5 +1,5 @@
 describe TextField do
-  let!(:answer) { create(:answer, comments: "test comment") }
+  let!(:answer) { create(:answer, comments: 'test comment') }
   describe '#complete' do
     it 'returns html' do
       tf = TextField.new

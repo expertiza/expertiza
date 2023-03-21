@@ -4,8 +4,8 @@ module SurveyDeploymentHelper
     question = Question.find(q_id)
     responses = []
     type_of_response_map = %w[AssignmentSurveyResponseMap CourseSurveyResponseMap GlobalSurveyResponseMap]
-    response_map_list = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE " \
-      "reviewee_id = ? AND (type = ? OR type = ? OR type = ?)", sd_id, type_of_response_map[0], type_of_response_map[1], type_of_response_map[2]])
+    response_map_list = ResponseMap.find_by_sql(['SELECT * FROM response_maps WHERE ' \
+      'reviewee_id = ? AND (type = ? OR type = ? OR type = ?)', sd_id, type_of_response_map[0], type_of_response_map[1], type_of_response_map[2]])
     @range_of_scores.each do |i|
       count = 0
       response_map_list.each do |response_map|
@@ -21,6 +21,6 @@ module SurveyDeploymentHelper
 
   # Statistics are displayed only for Criterion and Checkbox type questions
   def allowed_question_type?(question)
-    question.type == "Criterion" || question.type == "Checkbox"
+    question.type == 'Criterion' || question.type == 'Checkbox'
   end
 end

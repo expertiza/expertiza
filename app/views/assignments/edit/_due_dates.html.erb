@@ -322,7 +322,7 @@
             return;
         }
         if (state == false && round_count > 1) {
-            //hide name and url colomns
+            //hide name and url columns
             removeDueDateTableElement('team_formation', 0);
             for (i = 1; i <= round_count; i++) {
                 removeDueDateTableElement('submission', i);
@@ -340,7 +340,7 @@
             due_date_url_column.style.display = "none";
         }
         if (state == true && round_count > 1) {
-            //display name and url colomns
+            //display name and url columns
             removeDueDateTableElement('team_formation', 0);
             for (i = 1; i <= round_count; i++) {
                 removeDueDateTableElement('submission', i);
@@ -434,7 +434,7 @@
     }
 
     //E1654. Improve date-picker and deadlines Code change starts
-    //This is a generic funtion to add and substract days and months
+    //This is a generic function to add and subtract days and months
     function addDaysOrMonth(mul, type) {
         var days = parseInt($('#days').val(), 10); // days variable stores the number of days to change the deadline
         var months = parseInt($('#months').val(), 10);  // days variable stores the number of days to change the deadline
@@ -496,7 +496,7 @@
   <%= label_tag('dropTopicAllowed', 'Use drop topic deadline') %><br/>
 <% end %>
 
-<span id='team_formation_due_date_checkbox' <%= 'hidden' if @assignment_form.assignment.max_team_size == 1 %>
+<span id='team_formation_due_date_checkbox' <%= 'hidden' unless @assignment_form.assignment.team_assignment? %>
 <input name="teamFormationAllowed" type="hidden" value="false"/>
 <%= check_box_tag('teamFormationAllowed', 'true', @team_formation_allowed, :onclick => "removeOrAddTeamFormation()") %>
 <%= label_tag('teamFormationAllowed', 'Use team formation deadline') %><br/>
@@ -539,10 +539,13 @@
   </tr>
   <tr id='blank' style='display:hidden'></tr>
   <script>
-      jQuery(document).ready(function () {
-          <% if @assignment_form.assignment.max_team_size > 1 && due_date(@assignment_form.assignment, 'team_formation').due_at %>
-          addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
+      function addTeamInformation() {
+          <% if @assignment_form.assignment.team_assignment? && due_date(@assignment_form.assignment, 'team_formation').due_at %>
+            addDueDateTableElement(<%= @due_date_nameurl_not_empty.nil? ? false:@due_date_nameurl_not_empty %>, 'team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
           <% end %>
+      }
+      jQuery(document).ready(function () {
+          addTeamInformation()
           <% if @assignment_form.assignment.topics? %>
           <% if due_date(@assignment_form.assignment, 'signup').due_at %>
           addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);

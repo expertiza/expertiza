@@ -7,13 +7,13 @@ class UsersController < ApplicationController
   autocomplete :user, :name
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],
-         redirect_to: {action: :list}
+         redirect_to: { action: :list }
 
   def action_allowed?
     case params[:action]
     when 'list_pending_requested'
       current_user_has_admin_privileges?
-    when 'new', 'create_requested_user_record'
+    when 'new'
       true
     when 'keys', 'index'
       # These action methods are all written with the clear expectation
@@ -56,36 +56,32 @@ class UsersController < ApplicationController
       anonymized_view_starter_ips += " #{session[:ip]}"
     end
     $redis.set('anonymized_view_starter_ips', anonymized_view_starter_ips)
-    redirect_to :back
+    redirect_back fallback_location: root_path
   end
 
   # for displaying the list of users
   def list
-    user = session[:user]
-    @users = user.get_user_list
-    # paginate_list is called with the entire list of users
-    # @paginated_users can be used to display set number of users per page
-    @paginated_users = paginate_list(@users)
+    @paginated_users = paginate_list
   end
-
-
 
   # for displaying users which are being searched for editing purposes after checking whether current user is authorized to do so
   def show_if_authorized
     @user = User.find_by(name: params[:user][:name])
-    if !@user.nil?
+    if @user.nil?
+      flash[:note] = params[:user][:name] + ' does not exist.'
+      redirect_to action: 'list'
+    else
       role
-      #check whether current user is authorized to edit the user being searched, call show if true
+      # check whether current user is authorized to edit the user being searched, call show if true
 
       if @role.parent_id.nil? || @role.parent_id < session[:user].role_id || @user.id == session[:user].id
+        @total_user_num = User.count
+        @assignment_participant_num = AssignmentParticipant.where(user_id: @user.id).count
         render action: 'show'
       else
         flash[:note] = 'The specified user is not available for editing.'
         redirect_to action: 'list'
       end
-    else
-      flash[:note] = params[:user][:name] + ' does not exist.'
-      redirect_to action: 'list'
     end
   end
 
@@ -94,13 +90,9 @@ class UsersController < ApplicationController
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
       @user = User.find(params[:id])
-      role
-      # obtain number of assignments participated
-      @assignment_participant_num = 0
-      AssignmentParticipant.where(user_id: @user.id).each {|_participant| @assignment_participant_num += 1 }
-      # judge whether this user become reviewer or reviewee
+      @role = @user.role
+      @assignment_participant_num = AssignmentParticipant.where(user_id: @user.id).count
       @maps = ResponseMap.where('reviewee_id = ? or reviewer_id = ?', params[:id], params[:id])
-      # count the number of users in DB
       @total_user_num = User.count
     end
   end
@@ -111,7 +103,6 @@ class UsersController < ApplicationController
     foreign
   end
 
-
   def create
     # if the user name already exists, register the user by email address
     check = User.find_by(name: params[:user][:name])
@@ -121,10 +112,10 @@ class UsersController < ApplicationController
     end
     is_user = true
     # Assign all user params for creating user using assign_user_params function
-    @user=assign_user_params(is_user)
+    @user = assign_user_params(is_user)
     if @user.save
       password = @user.reset_password # the password is reset
-      prepared_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)
+      prepared_mail = MailerHelper.send_mail_to_user(@user, 'Your Expertiza account and password have been created.', 'user_welcome', password)
       prepared_mail.deliver
       flash[:success] = "A new password has been sent to new user's e-mail address."
       # Instructor and Administrator users need to have a default set for their notifications
@@ -132,79 +123,16 @@ class UsersController < ApplicationController
       # ensures that these users have a default value of 15% for notifications.
       # TAs and Students do not need a default. TAs inherit the default from the instructor,
       # Students do not have any checks for this information.
-      AssignmentQuestionnaire.create(user_id: @user.id) if @user.role.name == "Instructor" or @user.role.name == "Administrator"
+      AssignmentQuestionnaire.create(user_id: @user.id) if (@user.role.name == 'Instructor') || (@user.role.name == 'Administrator')
       undo_link("The user \"#{@user.name}\" has been successfully created. ")
       redirect_to action: 'list'
     else
       foreign
-      render action: 'new'
+      error_message = ''
+      @user.errors.each { |_field, error| error_message << error }
+      flash[:error] = error_message
+      redirect_to action: 'list'
     end
-  end
-
-  def create_requested_user_record
-    requested_user = RequestedUser.new(requested_user_params)
-    if params[:user][:institution_id].empty?
-      institution = Institution.find_or_create_by(name: params[:institution][:name])
-      requested_user.institution_id = institution.id
-    end
-    requested_user.status = 'Under Review'
-    # The super admin receives a mail about a new user request with the user name
-    user_existed = User.find_by(name: requested_user.name) or User.find_by(name: requested_user.email)
-    requested_user_saved = requested_user.save
-    if !user_existed and requested_user_saved
-      super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')
-      super_users.each do |super_user|
-        prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, requested_user, 'New account Request')
-        prepared_mail.deliver
-      end
-      ExpertizaLogger.info LoggerMessage.new(controller_name, requested_user.name, 'The account you are requesting has been created successfully.', request)
-      flash[:success] = "User signup for \"#{requested_user.name}\" has been successfully requested."
-      redirect_to '/instructions/home'
-      return
-    elsif user_existed
-      flash[:error] = "The account you are requesting has already existed in Expertiza."
-    else
-      flash[:error] = requested_user.errors.full_messages.to_sentence
-    end
-    ExpertizaLogger.error LoggerMessage.new(controller_name, requested_user.name, flash[:error], request)
-    redirect_to controller: 'users', action: 'new', role: 'Student'
-  end
-
-  def create_approved_user
-    requested_user = RequestedUser.find_by(id: params[:id])
-    requested_user.status = params[:status]
-    if requested_user.status.nil?
-      flash[:error] = "Please Approve or Reject before submitting"
-    elsif requested_user.update_attributes(params[:user])
-      flash[:success] = "The user \"#{requested_user.name}\" has been successfully updated."
-    end
-    if requested_user.status == "Approved"
-      new_user = User.new
-      new_user.name = requested_user.name
-      new_user.role_id = requested_user.role_id
-      new_user.institution_id = requested_user.institution_id
-      new_user.fullname = requested_user.fullname
-      new_user.email = requested_user.email
-      new_user.parent_id = session[:user].id
-      new_user.timezonepref = User.find_by(id: new_user.parent_id).timezonepref
-      if new_user.save
-        # Mail is sent to the user with a new password
-        flash[:success] = "A new password has been sent to new user's e-mail address."
-        undo_link("The user \"#{requested_user.name}\" has been successfully created. ")
-      else
-        foreign
-      end
-    elsif requested_user.status == "Rejected"
-      # If the user request has been rejected, a flash message is shown and redirected to review page
-      if requested_user.update_columns(status: params[:status])
-        flash[:success] = "The user \"#{requested_user.name}\" has been Rejected."
-        redirect_to action: 'list_pending_requested'
-        return
-      else
-        flash[:error] = "Error processing request."
-      end
-    end
-    redirect_to action: 'list_pending_requested'
   end
 
   def edit
@@ -214,6 +142,8 @@ class UsersController < ApplicationController
   end
 
   def update
+    # TODO: Remove this permit! and replace it with appropriate strong params after testing.
+    # method :- user_params
     params.permit!
     @user = User.find params[:id]
     # update username, when the user cannot be deleted
@@ -257,7 +187,7 @@ class UsersController < ApplicationController
   protected
 
   def foreign
-    # stores all the roles that are possible 
+    # stores all the roles that are possible
     # when a new user joins or an existing user updates his/her profile they will get to choose
     # from all the roles available
     role = Role.find(session[:user].role_id)
@@ -265,7 +195,8 @@ class UsersController < ApplicationController
   end
 
   private
- #add user preference_home_flag
+
+  # add user etc_icons_on_homepage
   def user_params
     params.require(:user).permit(:name,
                                  :crypted_password,
@@ -288,10 +219,10 @@ class UsersController < ApplicationController
                                  :public_key,
                                  :copy_of_emails,
                                  :institution_id,
-                                 :preference_home_flag)
+                                 :etc_icons_on_homepage)
   end
 
-  #to find the role of a given user object and set the @role accordingly
+  # to find the role of a given user object and set the @role accordingly
   def role
     if @user && @user.role_id
       @role = Role.find(@user.role_id)
@@ -301,8 +232,8 @@ class UsersController < ApplicationController
   end
 
   # For filtering the users list with proper search and pagination.
-  def paginate_list(users)
-    paginate_options = {"1" => 25, "2" => 50, "3" => 100}
+  def paginate_list
+    paginate_options = { '1' => 25, '2' => 50, '3' => 100 }
 
     # If the above hash does not have a value for the key,
     # it means that we need to show all the users on the page
@@ -318,7 +249,7 @@ class UsersController < ApplicationController
 
     # paginate
     users = if paginate_options[@per_page.to_s].nil? # displaying all - no pagination
-              User.paginate(page: params[:page], per_page: users.count)
+              User.paginate(page: params[:page], per_page: User.count)
             else # some pagination is active - use the per_page
               User.paginate(page: params[:page], per_page: paginate_options[@per_page.to_s])
             end

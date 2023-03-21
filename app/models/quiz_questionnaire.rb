@@ -6,7 +6,7 @@ class QuizQuestionnaire < Questionnaire
   end
 
   def symbol
-    "quiz".to_sym
+    'quiz'.to_sym
   end
 
   def get_assessments_for(participant)
@@ -27,10 +27,10 @@ class QuizQuestionnaire < Questionnaire
   end
 
   def taken_by_anyone?
-    !ResponseMap.where(reviewed_object_id: self.id, type: 'QuizResponseMap').empty?
+    !ResponseMap.where(reviewed_object_id: id, type: 'QuizResponseMap').empty?
   end
 
   def taken_by?(participant)
-    !ResponseMap.where(reviewed_object_id: self.id, type: 'QuizResponseMap', reviewer_id: participant.id).empty?
+    !ResponseMap.where(reviewed_object_id: id, type: 'QuizResponseMap', reviewer_id: participant.id).empty?
   end
 end

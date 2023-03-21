@@ -1,4 +1,4 @@
-class CreateBadges < ActiveRecord::Migration
+class CreateBadges < ActiveRecord::Migration[4.2]
   def change
     create_table :badges do |t|
       t.string :name
@@ -6,7 +6,7 @@ class CreateBadges < ActiveRecord::Migration
       t.string :image_name
       t.timestamps null: false
     end
-    
+
     Badge.create name: 'Good Reviewer',
                  description: 'This badge is awarded to students who receive very high review grades.',
                  image_name: 'good-reviewer.png'

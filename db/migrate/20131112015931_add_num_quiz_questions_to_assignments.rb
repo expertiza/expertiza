@@ -1,6 +1,6 @@
-class AddNumQuizQuestionsToAssignments < ActiveRecord::Migration
+class AddNumQuizQuestionsToAssignments < ActiveRecord::Migration[4.2]
   def self.up
-    add_column :assignments, :num_quiz_questions, :integer, :default => 0, :null => false
+    add_column :assignments, :num_quiz_questions, :integer, default: 0, null: false
   end
 
   def self.down

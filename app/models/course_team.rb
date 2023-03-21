@@ -7,7 +7,7 @@ class CourseTeam < Team
 
   # Get parent course
   def parent_model
-    "Course"
+    'Course'
   end
 
   def self.parent_model(id)
@@ -41,7 +41,8 @@ class CourseTeam < Team
 
   # Import from csv
   def self.import(row, course_id, options)
-    raise ImportError, "The course with the id \"" + course_id.to_s + "\" was not found. <a href='/courses/new'>Create</a> this course?" if Course.find(course_id).nil?
+    raise ImportError, 'The course with the id "' + course_id.to_s + "\" was not found. <a href='/courses/new'>Create</a> this course?" if Course.find(course_id).nil?
+
     @course_team = prototype
     Team.import(row, course_id, options, @course_team)
   end
@@ -55,17 +56,18 @@ class CourseTeam < Team
   # Export the fields of the csv column
   def self.export_fields(options)
     fields = []
-    fields.push("Team Name")
-    fields.push("Team members") if options[:team_name] == "false"
-    fields.push("Course Name")
+    fields.push('Team Name')
+    fields.push('Team members') if options[:team_name] == 'false'
+    fields.push('Course Name')
   end
 
   # Add member to the course team
-  def add_member(user, id = nil)
-    raise "The user \"#{user.name}\" is already a member of the team, \"#{self.name}\"" if user?(user)
-    t_user = TeamsUser.create(user_id: user.id, team_id: self.id)
-    parent = TeamNode.find_by(node_object_id: self.id)
+  def add_member(user, _id = nil)
+    raise "The user \"#{user.name}\" is already a member of the team, \"#{name}\"" if user?(user)
+
+    t_user = TeamsUser.create(user_id: user.id, team_id: id)
+    parent = TeamNode.find_by(node_object_id: id)
     TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
-    add_participant(self.parent_id, user)
+    add_participant(parent_id, user)
   end
 end

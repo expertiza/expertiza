@@ -1,4 +1,4 @@
-class AddInitialAndFinalLineNumberToReviewComments < ActiveRecord::Migration
+class AddInitialAndFinalLineNumberToReviewComments < ActiveRecord::Migration[4.2]
   def self.up
     add_column :review_comments, :initial_line_number, :integer
     add_column :review_comments, :last_line_number, :integer
@@ -9,4 +9,3 @@ class AddInitialAndFinalLineNumberToReviewComments < ActiveRecord::Migration
     remove_column :review_comments, :last_line_number
   end
 end
-

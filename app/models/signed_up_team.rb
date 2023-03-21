@@ -1,10 +1,10 @@
-class SignedUpTeam < ActiveRecord::Base
+class SignedUpTeam < ApplicationRecord
   belongs_to :topic, class_name: 'SignUpTopic'
   belongs_to :team, class_name: 'Team'
 
   # the below has been added to make is consistent with the database schema
   validates :topic_id, :team_id, presence: true
-  scope :by_team_id, ->(team_id) { where("team_id = ?", team_id) }
+  scope :by_team_id, ->(team_id) { where('team_id = ?', team_id) }
 
   def self.find_team_participants(assignment_id, ip_address = nil)
     @participants = SignedUpTeam.joins('INNER JOIN sign_up_topics ON signed_up_teams.topic_id = sign_up_topics.id')
@@ -12,8 +12,7 @@ class SignedUpTeam < ActiveRecord::Base
                                   sign_up_topics.topic_name as team_name_placeholder, sign_up_topics.topic_name as user_name_placeholder,
                                   signed_up_teams.is_waitlisted as is_waitlisted, signed_up_teams.team_id as team_id')
                                 .where('sign_up_topics.assignment_id = ?', assignment_id)
-    i = 0
-    @participants.each do |participant|
+    @participants.each_with_index do |participant, i|
       participant_names = User.joins('INNER JOIN teams_users ON users.id = teams_users.user_id')
                               .joins('INNER JOIN teams ON teams.id = teams_users.team_id')
                               .select('users.name as u_name, teams.name as team_name')
@@ -23,18 +22,17 @@ class SignedUpTeam < ActiveRecord::Base
       names = '(missing team)'
 
       participant_names.each do |participant_name|
-        unless team_name_added
-          names = "[" + participant_name.team_name + "] " + User.find_by(name: participant_name.u_name).name(ip_address) + " "
-          participant.team_name_placeholder = participant_name.team_name
-          participant.user_name_placeholder = User.find_by(name: participant_name.u_name).name(ip_address) + " "
-          team_name_added = true
+        if team_name_added
+          names += User.find_by(name: participant_name.u_name).name(ip_address) + ' '
+          participant.user_name_placeholder += User.find_by(name: participant_name.u_name).name(ip_address) + ' '
         else
-          names += User.find_by(name: participant_name.u_name).name(ip_address) + " "
-          participant.user_name_placeholder += User.find_by(name: participant_name.u_name).name(ip_address) + " "
+          names = '[' + participant_name.team_name + '] ' + User.find_by(name: participant_name.u_name).name(ip_address) + ' '
+          participant.team_name_placeholder = participant_name.team_name
+          participant.user_name_placeholder = User.find_by(name: participant_name.u_name).name(ip_address) + ' '
+          team_name_added = true
         end
       end
       @participants[i].name = names
-      i += 1
     end
 
     @participants
@@ -61,7 +59,7 @@ class SignedUpTeam < ActiveRecord::Base
     unless old_teams_signups.nil?
       old_teams_signups.each do |old_teams_signup|
         if old_teams_signup.is_waitlisted == false # i.e., if the old team was occupying a slot, & thus is releasing a slot ...
-          first_waitlisted_signup = SignedUpTeam.find_by(topic_id: old_teams_signup.topic_id, is_waitlisted:  true)
+          first_waitlisted_signup = SignedUpTeam.find_by(topic_id: old_teams_signup.topic_id, is_waitlisted: true)
           Invitation.remove_waitlists_for_team(old_teams_signup.topic_id, assignment_id) unless first_waitlisted_signup.nil?
         end
         old_teams_signup.destroy
@@ -69,7 +67,6 @@ class SignedUpTeam < ActiveRecord::Base
     end
   end
 
-  # This method is used to returns topic_id from [signed_up_teams] table and the inputs are assignment_id and user_id.
   def self.topic_id(assignment_id, user_id)
     # team_id variable represents the team_id for this user in this assignment
     team_id = TeamsUser.team_id(assignment_id, user_id)

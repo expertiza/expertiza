@@ -1,4 +1,4 @@
-class CreateAutomatedMetareviews < ActiveRecord::Migration
+class CreateAutomatedMetareviews < ActiveRecord::Migration[4.2]
   def self.up
     create_table :automated_metareviews do |t|
       t.float :relevance
@@ -12,20 +12,19 @@ class CreateAutomatedMetareviews < ActiveRecord::Migration
       t.integer :plagiarism
       t.integer :version_num
       t.integer :response_id
-      
+
       t.timestamps
     end
-    
-    #add a foreign key
+
+    # add a foreign key
     execute <<-SQL
       ALTER TABLE automated_metareviews
         ADD CONSTRAINT fk_automated_metareviews_responses_id
         FOREIGN KEY (response_id)
         REFERENCES responses(id)
     SQL
-    
   end
-             
+
   def self.down
     drop_table :automated_metareviews
   end

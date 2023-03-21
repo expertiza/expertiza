@@ -21,8 +21,8 @@ describe Ta do
   end
   describe '#courses_assisted_with' do
     it 'returns a map of courses' do
-    	ta_mapping = TaMapping.new
-    	allow(ta_mapping).to receive(:course_id).and_return(1)
+      ta_mapping = TaMapping.new
+      allow(ta_mapping).to receive(:course_id).and_return(1)
       allow(TaMapping).to receive(:where).with(ta_id: 999).and_return([ta_mapping])
       allow(Course).to receive(:find).with(1).and_return(course1)
       expect(ta.courses_assisted_with).to eq([course1])
@@ -30,28 +30,28 @@ describe Ta do
   end
   describe '#list_all' do
     it 'returns all objects of a given type associated with a user' do
-      allow(Assignment).to receive(:where).with(["instructor_id = ? OR private = 0", 6]).and_return([assignment])
+      allow(Assignment).to receive(:where).with(['instructor_id = ? OR private = 0', 6]).and_return([assignment])
       expect(ta.list_all(Assignment, 6)).to eq([assignment])
     end
   end
   describe '#list_mine' do
     context 'when the object is an assignment' do
       it 'finds associated assignments with TA' do
-        allow(Assignment).to receive(:find_by_sql).with(["select assignments.id, assignments.name, assignments.directory_path " \
-      "from assignments, ta_mappings where assignments.course_id = ta_mappings.course_id and ta_mappings.ta_id=?", 6]).and_return([assignment])
+        allow(Assignment).to receive(:find_by_sql).with(['select assignments.id, assignments.name, assignments.directory_path ' \
+      'from assignments, ta_mappings where assignments.course_id = ta_mappings.course_id and ta_mappings.ta_id=?', 6]).and_return([assignment])
         expect(ta.list_mine(Assignment, 6)).to eq([assignment])
       end
     end
     context 'when the object is not an assignment' do
       it 'finds associated courses with TA' do
-        allow(Course).to receive(:where).with(["instructor_id = ?", 6]).and_return([course1, course2])
+        allow(Course).to receive(:where).with(['instructor_id = ?', 6]).and_return([course1, course2])
         expect(ta.list_mine(Course, 6)).to eq([course1, course2])
       end
     end
   end
   describe '#get' do
     it 'returns all objects of a given type associated with a user' do
-      allow(Assignment).to receive(:where).with(["id = ? AND (instructor_id = ? OR private = 0)", 999, 6]).and_return([assignment])
+      allow(Assignment).to receive(:where).with(['id = ? AND (instructor_id = ? OR private = 0)', 999, 6]).and_return([assignment])
       expect(ta.get(Assignment, 999, 6)).to eq(assignment)
     end
   end
@@ -64,7 +64,7 @@ describe Ta do
     end
     context 'there are  TaMappings for the user' do
       it 'returns an empty array' do
-      	ta_mapping = TaMapping.new
+        ta_mapping = TaMapping.new
         allow(TaMapping).to receive(:where).with(ta_id: 999).and_return([ta_mapping])
         allow(ta_mapping).to receive(:course_id).and_return(1)
         allow(Course).to receive(:find).with(1).and_return(course1)
@@ -97,17 +97,16 @@ describe Ta do
   end
   describe '#get_user_list' do
     it 'gets a list of users that belong to the TA' do
-    	@student_role = build(:role_of_student, id: 1, name: "Student_role_test", description: '', parent_id: nil, default_page_id: nil)
+      @student_role = build(:role_of_student, id: 1, name: 'Student_role_test', description: '', parent_id: nil, default_page_id: nil)
       allow(Ta).to receive(:get_mapped_courses).with(999).and_return([1])
       allow(Course).to receive(:find).with(1).and_return(course1)
       allow(course1).to receive(:get_participants).and_return([participant])
       allow(participant).to receive(:user).and_return(user)
       r = Role.new
       allow(user).to receive(:role).and_return(@student_role)
-      @student_role.name = "Student"
-      allow(@student_role).to receive(:hasAllPrivilegesOf).with(participant.user.role).and_return(true)
+      @student_role.name = 'Student'
+      allow(@student_role).to receive(:has_all_privileges_of?).with(participant.user.role).and_return(true)
       expect(Ta.get_user_list(ta)).to eq([user])
-
     end
   end
 end

@@ -1,12 +1,13 @@
 require 'analytic/score_analytic'
 module ResponseAnalytic
   def num_questions
-    self.scores.count
+    scores.count
   end
 
   #====== score =======#
   def average_score
     return question_score_list.inject(:+) / num_questions unless num_questions == 0
+
     0
   end
 
@@ -25,6 +26,7 @@ module ResponseAnalytic
 
   def average_word_count
     return total_word_count.to_f / num_questions unless num_questions == 0
+
     0
   end
 
@@ -43,6 +45,7 @@ module ResponseAnalytic
 
   def average_character_count
     return total_character_count.to_f / num_questions unless num_questions == 0
+
     0
   end
 
@@ -57,7 +60,7 @@ module ResponseAnalytic
   # return an array of strings containing the word count of al the comments
   def word_count_list
     list = []
-    self.scores.each do |score|
+    scores.each do |score|
       list << score.word_count
     end
     if list.empty?
@@ -69,7 +72,7 @@ module ResponseAnalytic
 
   def character_count_list
     list = []
-    self.scores.each do |score|
+    scores.each do |score|
       list << score.character_count
     end
     if list.empty?
@@ -82,7 +85,7 @@ module ResponseAnalytic
   # return score for all of the questions in an array
   def question_score_list
     list = []
-    self.scores.each do |score|
+    scores.each do |score|
       list << score.score
     end
     if list.empty?
@@ -95,7 +98,7 @@ module ResponseAnalytic
   # return an array of strings containing all of the comments
   def comments_text_list
     comments_list = []
-    self.scores.each do |score|
+    scores.each do |score|
       comments_list << score.comments
     end
     comments_list

@@ -19,16 +19,16 @@ RSpec.describe SampleReviewsController, type: :controller do
   let(:participant1) { build(:participant, id: 2, parent_id: 2, user: student1) }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt', rounds_of_reviews: 2) }
   let(:assignment1) { build(:assignment, id: 2, name: 'Test Assgt', rounds_of_reviews: 1) }
-  let(:responsex) { build(:response, id: 1, map_id: 1, round: 1, response_map: review_response_map,  is_submitted: true) }
+  let(:responsex) { build(:response, id: 1, map_id: 1, round: 1, response_map: review_response_map, is_submitted: true) }
   let(:response1) { build(:response, id: 2, map_id: 1, round: 2, response_map: review_response_map) }
   let(:response2) { build(:response, id: 3, map_id: 1, round: nil, response_map: review_response_map, is_submitted: true) }
   let(:metareview_response_map) { build(:meta_review_response_map, reviewed_object_id: 1) }
   let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
-  let(:student1) { build(:student, id: 2, name: "name1", fullname: 'no one', email: 'expertiza@mailinator.com') }
+  let(:student1) { build(:student, id: 2, name: 'name1', fullname: 'no one', email: 'expertiza@mailinator.com') }
   let(:questionnaire) { Questionnaire.new(id: 1, type: 'ReviewQuestionnaire') }
-  let(:answer) {Answer.new(id: 5, question_id: 1)}
-  let(:samplereview1) { SampleReview.new id: 3, assignment_id: 10, response_id: 5}
-  let(:samplereview2) { SampleReview.new id: 4, assignment_id: 10, response_id: 6}
+  let(:answer) { Answer.new(id: 5, question_id: 1) }
+  let(:samplereview1) { SampleReview.new id: 3, assignment_id: 10, response_id: 5 }
+  let(:samplereview2) { SampleReview.new id: 4, assignment_id: 10, response_id: 6 }
   let(:review_response) { build(:response, id: 1, map_id: 1) }
   let(:review_response_map) { build(:review_response_map, id: 1, reviewer: participant) }
   let(:assignment_questionnaire) { build(:assignment_questionnaire) }
@@ -53,20 +53,20 @@ RSpec.describe SampleReviewsController, type: :controller do
   describe '#map_to_assignment' do
     context 'when Instructor selects assignments for sample reviews to be published to' do
       it 'add entry in sampleReviews and marks response visibility to published' do
-        params = {id: 1, assignments: [1,2],format: :json}
-        session = {user: build(:instructor, id: 1)}
-        post :map_to_assignment, params, session
+        request_params = { id: 1, assignments: [1, 2], format: :json }
+        user_session = { user: build(:instructor, id: 1) }
+        post :map_to_assignment, params: request_params, session: user_session
         expect(responsex).to have_attributes(visibility: 'published')
         expect(response).to have_http_status(201)
       end
     end
   end
   describe '#unmap_from_assignment' do
-    context 'when Instructor selects to umark sample review from all assignments' do
+    context 'when Instructor selects to unmark sample review from all assignments' do
       it 'deletes mapping and marks response visibility to public' do
-        params = {id: 1,format: :json}
-        session = {user: build(:instructor, id: 1)}
-        post :unmap_from_assignment, params, session
+        request_params = { id: 1, format: :json }
+        user_session = { user: build(:instructor, id: 1) }
+        post :unmap_from_assignment, params: request_params, session: user_session
         expect(responsex).to have_attributes(visibility: 'public')
         expect(response).to have_http_status(204)
       end
@@ -75,18 +75,17 @@ RSpec.describe SampleReviewsController, type: :controller do
 
   describe '#index' do
     it 'renders assignments#index page' do
-      params = {id: 5}
-      get :index, params
+      request_params = { id: 5 }
+      get :index, params: request_params
       expect(response).to render_template(:index)
     end
   end
-  
+
   describe '#show' do
-  it 'renders assignments#show page' do
-      params = {id: 1, return: 'assignment_edit'}
-      get :show, params
+    it 'renders assignments#show page' do
+      request_params = { id: 1, return: 'assignment_edit' }
+      get :show, params: request_params
       expect(response).to render_template(:show)
+    end
   end
 end
-
-  end

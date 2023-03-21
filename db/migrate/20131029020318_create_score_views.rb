@@ -1,4 +1,4 @@
-class CreateScoreViews < ActiveRecord::Migration
+class CreateScoreViews < ActiveRecord::Migration[4.2]
 
     def self.up
       execute <<-SQL
@@ -10,12 +10,12 @@ class CreateScoreViews < ActiveRecord::Migration
       ques.id as ques_id,ques.questionnaire_id as ques_questionnaire_id, s.id AS s_id,s.question_id AS s_question_id,
       s.answer AS s_score,s.comments AS s_comments,s.response_id AS s_response_id
       FROM questions ques left join questionnaires q1 on ques.questionnaire_id = q1.id left join answers s on ques.id = s.question_id
-      SQL
-    end
-    def self.down
-      execute <<-SQL
-      DROP VIEW score_views
-      SQL
-    end
+    SQL
+  end
 
+  def self.down
+    execute <<-SQL
+    DROP VIEW score_views
+    SQL
+  end
 end

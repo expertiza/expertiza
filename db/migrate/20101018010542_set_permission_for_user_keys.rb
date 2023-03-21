@@ -1,4 +1,4 @@
-class SetPermissionForUserKeys < ActiveRecord::Migration
+class SetPermissionForUserKeys < ActiveRecord::Migration[4.2]
   def self.up
     permission = Permission.find_by_name('do assignments')
     controller = SiteController.find_or_create_by(name: 'users')
@@ -13,6 +13,5 @@ class SetPermissionForUserKeys < ActiveRecord::Migration
     Role.rebuild_cache
   end
 
-  def self.down
-  end
+  def self.down; end
 end

@@ -14,8 +14,8 @@ class QuestionnairesController < ApplicationController
     when 'edit'
       @questionnaire = Questionnaire.find(params[:id])
       current_user_has_admin_privileges? ||
-          (current_user_is_a?('Instructor') && current_user_id?(@questionnaire.try(:instructor_id))) ||
-          (current_user_is_a?('Teaching Assistant') && session[:user].instructor_id == @questionnaire.try(:instructor_id))
+        (current_user_is_a?('Instructor') && current_user_id?(@questionnaire.try(:instructor_id))) ||
+        (current_user_is_a?('Teaching Assistant') && session[:user].instructor_id == @questionnaire.try(:instructor_id))
     else
       current_user_has_student_privileges?
     end
@@ -24,18 +24,16 @@ class QuestionnairesController < ApplicationController
   # Create a clone of the given questionnaire, copying all associated
   # questions. The name and creator are updated.
   def copy
-    begin
-      instructor_id = session[:user].instructor_id
-      @questionnaire = Questionnaire.copy_questionnaire_details(params, instructor_id)
-      p_folder = TreeFolder.find_by(name: @questionnaire.display_type)
-      parent = FolderNode.find_by(node_object_id: p_folder.id)
-      QuestionnaireNode.find_or_create_by(parent_id: parent.id, node_object_id: @questionnaire.id)
-      undo_link("Copy of questionnaire #{@questionnaire.name} has been created successfully.")
-      redirect_to controller: 'questionnaires', action: 'view', id: @questionnaire.id
-    rescue StandardError
-      flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.' + $ERROR_INFO.to_s
-      redirect_to action: 'list', controller: 'tree_display'
-    end
+    instructor_id = session[:user].instructor_id
+    @questionnaire = Questionnaire.copy_questionnaire_details(params, instructor_id)
+    p_folder = TreeFolder.find_by(name: @questionnaire.display_type)
+    parent = FolderNode.find_by(node_object_id: p_folder.id)
+    QuestionnaireNode.find_or_create_by(parent_id: parent.id, node_object_id: @questionnaire.id)
+    undo_link("Copy of questionnaire #{@questionnaire.name} has been created successfully.")
+    redirect_to controller: 'questionnaires', action: 'view', id: @questionnaire.id
+  rescue StandardError
+    flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.' + $ERROR_INFO.to_s
+    redirect_to action: 'list', controller: 'tree_display'
   end
 
   def view
@@ -43,11 +41,9 @@ class QuestionnairesController < ApplicationController
   end
 
   def new
-    begin
-      @questionnaire = Object.const_get(params[:model].split.join).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model].split.join
-    rescue StandardError
-      flash[:error] = $ERROR_INFO
-    end
+    @questionnaire = Object.const_get(params[:model].split.join).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model].split.join
+  rescue StandardError
+    flash[:error] = $ERROR_INFO
   end
 
   def create
@@ -73,7 +69,7 @@ class QuestionnairesController < ApplicationController
         # In the future, we need to write migration files to make them consistency.
         # E1903 : We are not sure of other type of cases, so have added a if statement. If there are only 5 cases, remove the if statement
         if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey BookmarkRating].include?(display_type)
-          display_type = (display_type.split /(?=[A-Z])/).join("%")
+          display_type = (display_type.split(/(?=[A-Z])/)).join('%')
         end
         @questionnaire.display_type = display_type
         @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
@@ -93,8 +89,8 @@ class QuestionnairesController < ApplicationController
   def create_questionnaire
     @questionnaire = Object.const_get(params[:questionnaire][:type]).new(questionnaire_params)
     # Create Quiz content has been moved to Quiz Questionnaire Controller
-    if @questionnaire.type != "QuizQuestionnaire" # checking if it is a quiz questionnaire
-      @questionnaire.instructor_id = Ta.get_my_instructor(session[:user].id) if session[:user].role.name == "Teaching Assistant"
+    if @questionnaire.type != 'QuizQuestionnaire' # checking if it is a quiz questionnaire
+      @questionnaire.instructor_id = Ta.get_my_instructor(session[:user].id) if session[:user].role.name == 'Teaching Assistant'
       save
 
       redirect_to controller: 'tree_display', action: 'list'
@@ -111,7 +107,10 @@ class QuestionnairesController < ApplicationController
   def update
     # If 'Add' or 'Edit/View advice' is clicked, redirect appropriately
     if params[:add_new_questions]
-      redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
+      # redirect_to action: 'add_new_questions', id: params.permit(:id)[:id], question: params.permit(:new_question)[:new_question]
+      nested_keys = params[:new_question].keys
+      permitted_params = params.permit(:id, :new_question => nested_keys)
+      redirect_to action: 'add_new_questions', id: permitted_params[:id], question: permitted_params[:new_question]
     elsif params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     else
@@ -150,10 +149,11 @@ class QuestionnairesController < ApplicationController
         unless @questionnaire.assignments.empty?
           raise "The assignment <b>#{@questionnaire.assignments.first.try(:name)}</b> uses this questionnaire. Are sure you want to delete the assignment?"
         end
+
         questions = @questionnaire.questions
         # if this rubric had some answers, flash error
         questions.each do |question|
-          raise "There are responses based on this rubric, we suggest you do not delete it." unless question.answers.empty?
+          raise 'There are responses based on this rubric, we suggest you do not delete it.' unless question.answers.empty?
         end
         questions.each do |question|
           advices = question.question_advices
@@ -176,7 +176,7 @@ class QuestionnairesController < ApplicationController
     @questionnaire = Questionnaire.find(params[:id])
     @questionnaire.private = !@questionnaire.private
     @questionnaire.save
-    @access = @questionnaire.private == true ? "private" : "public"
+    @access = @questionnaire.private == true ? 'private' : 'public'
     undo_link("The questionnaire \"#{@questionnaire.name}\" has been successfully made #{@access}. ")
     redirect_to controller: 'tree_display', action: 'list'
   end
@@ -186,9 +186,9 @@ class QuestionnairesController < ApplicationController
     questionnaire_id = params[:id] unless params[:id].nil?
     # If the questionnaire is being used in the active period of an assignment, delete existing responses before adding new questions
     if AnswerHelper.check_and_delete_responses(questionnaire_id)
-      flash[:success] = "You have successfully added a new question. Any existing reviews for the questionnaire have been deleted!"
+      flash[:success] = 'You have successfully added a new question. Any existing reviews for the questionnaire have been deleted!'
     else
-      flash[:success] = "You have successfully added a new question."
+      flash[:success] = 'You have successfully added a new question.'
     end
 
     num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
@@ -248,14 +248,7 @@ class QuestionnairesController < ApplicationController
   # save questionnaire object after create or edit
   def save
     @questionnaire.save!
-
     save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
-    # We do not create node for quiz questionnaires
-    unless @questionnaire.type == "QuizQuestionnaire"
-      p_folder = TreeFolder.find_by(name: @questionnaire.display_type)
-      parent = FolderNode.find_by(node_object_id: p_folder.id)
-      # create_new_node_if_necessary(parent)
-    end
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
   end
 
@@ -270,7 +263,7 @@ class QuestionnairesController < ApplicationController
         q.questionnaire_id = questionnaire_id
         q.type = params[:question_type][question_key][:type]
         q.seq = question_key.to_i
-        if @questionnaire.type == "QuizQuestionnaire"
+        if @questionnaire.type == 'QuizQuestionnaire'
           # using the weight user enters when creating quiz
           weight_key = "question_#{index + 1}"
           q.weight = params[:question_weights][weight_key.to_sym]
@@ -284,7 +277,7 @@ class QuestionnairesController < ApplicationController
   # @param [Object] questionnaire_id
   def delete_questions(questionnaire_id)
     # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
-    questions = Question.where("questionnaire_id = ?", questionnaire_id)
+    questions = Question.where('questionnaire_id = ?', questionnaire_id)
     @deleted_questions = []
     questions.each do |question|
       should_delete = true
@@ -295,6 +288,7 @@ class QuestionnairesController < ApplicationController
       end
 
       next unless should_delete
+
       question.question_advices.each(&:destroy)
       # keep track of the deleted questions
       @deleted_questions.push(question)
@@ -331,6 +325,4 @@ class QuestionnairesController < ApplicationController
     params.require(:question).permit(:txt, :weight, :questionnaire_id, :seq, :type, :size,
                                      :alternatives, :break_before, :max_label, :min_label)
   end
-
-  # FIXME: These private methods belong in the Questionnaire model
 end

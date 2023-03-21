@@ -1,5 +1,5 @@
 describe QuestionAdvice do
-  let(:questionnaire) { Questionnaire.new id: 1, name: "abc", private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234 }
+  let(:questionnaire) { Questionnaire.new id: 1, name: 'abc', private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234 }
   let(:question) { build(:question, id: 1) }
   let(:question_advice) { build(:question_advice) }
   describe 'has correct csv values?' do

@@ -17,8 +17,8 @@
 <div class="exp">
   <table>
     <tr><th colspan=5></th><th colspan=3 class="head">E-mail on ...</th></tr>
-    <tr><th class="head">Name</th><th class="head">Full Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Meta-review</th></tr>
-    <% for user in @paginated_users %>
+    <tr><th class="head">Name</th><th class="head">Full Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Meta-review</th><th class="head">Delete</th></tr>
+    <% @paginated_users.each do |user| %>
       <% if (params[:show] != 'true' && !user.name(session[:ip]).include?("_hidden")) || params[:show] == 'true'%>
         <tr class="exp">
           <td><%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %></td>
@@ -29,6 +29,7 @@
           <td><%= User.yesorno(user.email_on_review) %></td>
           <td><%= User.yesorno(user.email_on_submission) %></td>
           <td><%= User.yesorno(user.email_on_review_of_review) %></td>
+          <td> <%= link_to 'Delete', {:action => 'destroy', :id => user}, :confirm => "Do you want to delete this user?", :method => :delete if session[:user].can_impersonate? user %> </td>
         </tr>
       <% end %>
     <% end -%>

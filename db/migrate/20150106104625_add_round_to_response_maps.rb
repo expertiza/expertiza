@@ -1,9 +1,9 @@
-class AddRoundToResponseMaps < ActiveRecord::Migration
+class AddRoundToResponseMaps < ActiveRecord::Migration[4.2]
   def self.up
-    add_column "response_maps","round",:integer
+    add_column 'response_maps', 'round', :integer
   end
 
   def self.down
-    remove_column "response_maps","round", :integer
+    remove_column 'response_maps', 'round', :integer
   end
 end

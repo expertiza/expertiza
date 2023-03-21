@@ -1,17 +1,28 @@
 <script type="text/javascript">
-    function addQuestionnaireTableRow(questionnaire_type, assignment_questionnaire, questionnaire, questionnaire_options, round_no) {
+    function addQuestionnaireTableRow(questionnaire_type, assignment_questionnaire, questionnaire, questionnaire_options, round_no, duty_id, duty_name) {
         var questionnaire_table = jQuery('#assignment_questionnaire_table>tbody>tr');
         var row_id = 'questionnaire_table_' + questionnaire_type;
+        // E2147 : If duty_id is not undefined, add duty_id with the row_id to create a unique row id
+        if (duty_id != undefined){
+            row_id = row_id + duty_id
+        }
+
         var i;
         var html = '<tr id=' + row_id + '>';
-
         html += '<input name="assignment_form[assignment_questionnaire][][assignment_id]" type="hidden" value="' + '<%= @assignment_form.assignment.id %>' +'">';
 
-        //Rubric name
-        if (round_no == null) {
-            html += '<td><label for="questionnaire_id">' + questionnaire.display_type + ':</label></td>';
+        // E2147 : Add duty_id as hidden input for this particular row so that it can be saved in assignment_questionnaire table
+        if (duty_id != undefined) {
+            html += '<input name="assignment_form[assignment_questionnaire][][duty_id]" type="hidden" value="' + duty_id +'">';
         }
-        else {
+        //Rubric name
+        if (round_no == null && duty_id == undefined) {
+            html += '<td><label for="questionnaire_id">' + questionnaire.display_type + ':</label></td>';
+        } else if (round_no == null && duty_id != undefined) {
+            // E2147 : Add name of duty infront of the questionnaire type to select for which duty the questionnaire is being selected
+            html += '<td><label for="questionnaire_id">' + questionnaire.display_type +  ' Role ' + duty_name + ':</label></td>';
+        }
+        else if (round_no!=null && duty_id == undefined) {
             html += '<td><label for="questionnaire_id">' + questionnaire.display_type + ' Round '+ round_no + ':</label></td>';
         }
         //Rubric options
@@ -200,8 +211,8 @@
     initTagPrompts();
     <%end%>
     // end tag prompt code
-    function removeQuestionnaireTableRow(questionnaire_type) {
-      var row_id = 'questionnaire_table_' + questionnaire_type;
+    function removeQuestionnaireTableRow(questionnaire_type, duty_id='') {
+      var row_id = 'questionnaire_table_' + questionnaire_type + duty_id;
       jQuery('#' + row_id).remove();
       <%if @assignment_form.assignment.is_answer_tagging_allowed %>
       jQuery('#' + row_id + '_add_tag_prompt').remove();
@@ -226,7 +237,7 @@
             <%= assignment_questionnaire.to_json.html_safe %>,
             <%= questionnaire.to_json.html_safe %>,
             <%= questionnaire_options('MetareviewQuestionnaire').to_json.html_safe %>,
-            null
+            null, null, null
         );
         <% assignment_questionnaire = @assignment_form.assignment_questionnaire('AuthorFeedbackQuestionnaire', nil, nil) %>
         <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'AuthorFeedbackQuestionnaire') %>
@@ -235,7 +246,7 @@
             <%= assignment_questionnaire.to_json.html_safe %>,
             <%= questionnaire.to_json.html_safe %>,
             <%= questionnaire_options('AuthorFeedbackQuestionnaire').to_json.html_safe %>,
-            null
+            null, null, null
         );
         <% assignment_questionnaire = @assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil) %>
         <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'TeammateReviewQuestionnaire') %>
@@ -244,7 +255,7 @@
             <%= assignment_questionnaire.to_json.html_safe %>,
             <%= questionnaire.to_json.html_safe %>,
             <%= questionnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>,
-            null
+            null, null, null
         );
     }
     //zhewei: varying rubric by round still not add 'BookmarkRatingQuestionnaire' yet.
@@ -267,7 +278,7 @@
                 <%= assignment_questionnaire.to_json.html_safe %>,
                 <%= questionnaire.to_json.html_safe %>,
                 <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>,
-                <%= i %>
+                <%= i %>, null, null
             );
             <% end %>
             addRubricsTableRows();
@@ -292,26 +303,113 @@
                 <%= assignment_questionnaire.to_json.html_safe %>,
                 <%= questionnaire.to_json.html_safe %>,
                 <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>,
-                null
+                null, null, null
             );
             addRubricsTableRows();
             initTagPrompts();
         }
     }
+
+    function handleCheckReviewVaryByDuty(checkvalue) {
+        var state = checkvalue.checked;
+        <%unless @duties.nil? or @duties.empty?%>
+          if (state) {
+              // make it display by duty
+              removeQuestionnaireTableRow('TeammateReviewQuestionnaire')
+              addDutyBasedQuestionnaires()
+          } else {
+              // loop as many times as number of duties, remove TeammateReviewQuestionnaire
+              removeDutyBasedQuestionnaires();
+              addDefaultTeammateReviewQuestionnaire();
+         }
+        <%end%>
+    }
+
+    function addDutyBasedQuestionnaires() {
+        <%unless @duties.nil? or @duties.empty?%>
+        // iterate over the available duties (roles) for the
+        // for the assignment and add questionnaire table row.
+          <% @duties.each do |duty| %>
+            <% assignment_questionnaire = @assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil, duty.id) %>
+            <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'TeammateReviewQuestionnaire') %>
+
+            addQuestionnaireTableRow(
+                'TeammateReviewQuestionnaire',
+                <%= assignment_questionnaire.to_json.html_safe %>,
+                <%= questionnaire.to_json.html_safe %>,
+                <%= questionnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>,
+                null,
+                '<%= duty.id %>',
+                '<%= duty.name %>'
+            );
+          <% end %>
+          <%@avoidrepeatsign=1%>;
+        <%end%>
+    }
+    function removeDutyBasedQuestionnaires() {
+        <%unless @duties.nil? or @duties.empty? %>
+          // loop as many times as number of duties, remove TeammateReviewQuestionnaire for that duty
+          <% @duties.each do |duty| %>
+            removeQuestionnaireTableRow('TeammateReviewQuestionnaire', <%= duty.id %>);
+          <% end %>
+        <%end%>
+    }
+
+    function addDefaultTeammateReviewQuestionnaire() {
+        // add the default TeammateReviewQuestionnaire
+        <% assignment_questionnaire = @assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil) %>
+        <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'TeammateReviewQuestionnaire') %>
+        addQuestionnaireTableRow(
+            'TeammateReviewQuestionnaire',
+            <%= assignment_questionnaire.to_json.html_safe %>,
+            <%= questionnaire.to_json.html_safe %>,
+            <%= questionnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>,
+            null
+        );
+    }
+    function toggleTeammateReviewDutyQuestionnaires(isVaryByDutyChecked) {
+        if (isVaryByDutyChecked) {
+            // remove existing default teammate review questionnaire
+            removeQuestionnaireTableRow('TeammateReviewQuestionnaire');
+            // add duty based questionnaires
+            addDutyBasedQuestionnaires();
+        } else {
+            removeDutyBasedQuestionnaires();
+            addDefaultTeammateReviewQuestionnaire();
+        }
+    }
+
+    function insertTeamBasedElements() {
+        var varyByDutyDiv = jQuery('#vary_by_duty');
+        varyByDutyDiv.removeAttr('hidden');
+        var varyByDutyCheckbox = jQuery('#vary_by_duty_checkbox');
+        if (varyByDutyCheckbox.is(':checked')) {
+            addDutyBasedQuestionnaires();
+        } else {
+            addDefaultTeammateReviewQuestionnaire();
+        }
+    }
 </script>
 
 <!--Add a review varies by round checkbox. -->
-<!-- This is vary_by_round attribute of assignment created by migration -->
-<input name="assignment_form[assignment][vary_by_round]" type="hidden" value="false" />
-<%= check_box_tag('assignment_form[assignment][vary_by_round]', 'true', @assignment_form.assignment.vary_by_round, onclick: "handleCheckReviewVaryByRound(this)") %>
-<%= label_tag('assignment_form[assignment][vary_by_round]', 'Review rubric varies by round?') %>
+<!-- This is vary_by_round? attribute of assignment created by migration -->
+<input name="assignment_form[assignment][vary_by_round?]" type="hidden" value="false" />
+<%= check_box_tag('assignment_form[assignment][vary_by_round?]', 'true', @assignment_form.assignment.vary_by_round?, onclick: "handleCheckReviewVaryByRound(this)") %>
+<%= label_tag('assignment_form[assignment][vary_by_round?]', 'Review rubric varies by round?') %>
 <br>
 <!-- Add a review varies by topic checkbox -->
-<!-- This is vary_by_topic attribute of assignment created by migration -->
-<input name="assignment_form[assignment][vary_by_topic]" type="hidden" value="false" />
-<%= check_box_tag('assignment_form[assignment][vary_by_topic]', 'true', @assignment_form.assignment.vary_by_topic) %>
-<%= label_tag('assignment_form[assignment][vary_by_topic]', 'Review rubric varies by topic?') %>
-
+<!-- This is vary_by_topic? attribute of assignment created by migration -->
+<input name="assignment_form[assignment][vary_by_topic?]" type="hidden" value="false" />
+<%= check_box_tag('assignment_form[assignment][vary_by_topic?]', 'true', @assignment_form.assignment.vary_by_topic?) %>
+<%= label_tag('assignment_form[assignment][vary_by_topic?]', 'Review rubric varies by topic?') %>
+<br>
+<!--Add a review varies by duties (role in the UI) checkbox if teams is allowed -->
+<!-- This is questionnaire_varies_by_duty attribute of assignment created by migration -->
+<div id="vary_by_duty" <% 'hidden' unless @assignment_form.assignment.team_assignment? %> >
+    <input name="assignment_form[assignment][questionnaire_varies_by_duty]" type="hidden" value="false" />
+    <%= check_box_tag('assignment_form[assignment][questionnaire_varies_by_duty]', 'true', @assignment_form.assignment.questionnaire_varies_by_duty, {:id => "vary_by_duty_checkbox", onclick: "toggleTeammateReviewDutyQuestionnaires(this.checked)"}) %>
+    <%= label_tag('assignment_form[assignment][questionnaire_varies_by_duty]', 'Review rubric varies by role?') %>
+</div>
 <div>
 <table class='exp table table-striped' id='assignment_questionnaire_table' style='padding:20px; font-size: 15px; width: 100%'>
   <tr class='heading'>
@@ -330,7 +428,12 @@
   </tr>
   <script>
       jQuery(document).ready(function () {
-          <% if @assignment_form.assignment.vary_by_round %>
+          // Adding an event listener to the team assignment checkbox.
+          jQuery('#assignment_form[assignment][max_team_size]').change(function() {
+              insertTeamBasedElements()
+          });
+
+          <% if @assignment_form.assignment.vary_by_round? %>
           <% 1.upto(@assignment_form.assignment.rounds_of_reviews) do |i| %>
           <% assignment_questionnaire = @assignment_form.assignment_questionnaire('ReviewQuestionnaire', i, nil) %>
           <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire') %>
@@ -374,18 +477,10 @@
               <%= questionnaire_options('AuthorFeedbackQuestionnaire').to_json.html_safe %>,
               null
           );
-          var team_assignment_checkbox = jQuery('#team_assignment');
-          if (team_assignment_checkbox.is(':checked')) {
-              <% assignment_questionnaire = @assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil) %>
-              <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'TeammateReviewQuestionnaire') %>
-              addQuestionnaireTableRow(
-                  'TeammateReviewQuestionnaire',
-                  <%= assignment_questionnaire.to_json.html_safe %>,
-                  <%= questionnaire.to_json.html_safe %>,
-                  <%= questionnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>,
-                  null
-              );
-          }
+
+          var teamAssignmentCheckbox = jQuery('#team_assignment')
+          insertTeamBasedElements()
+
           var bookmark_checkbox = jQuery('#assignment_form_assignment_use_bookmark');
           if (bookmark_checkbox.is(':checked')) {
               <% assignment_questionnaire = @assignment_form.assignment_questionnaire('BookmarkRatingQuestionnaire', nil, nil) %>

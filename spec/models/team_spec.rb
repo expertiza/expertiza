@@ -128,7 +128,7 @@ describe Team do
       it 'raises a TeamExistsError' do
         allow(AssignmentTeam).to receive(:where).with(parent_id: 1, name: 'no name').and_return([team])
         expect { Team.check_for_existing(assignment, 'no name', 'Assignment') }
-          .to raise_error(TeamExistsError, "The team name no name is already in use.")
+          .to raise_error(TeamExistsError, 'The team name no name is already in use.')
       end
     end
 
@@ -167,8 +167,8 @@ describe Team do
     context 'when cannot find a user by name' do
       it 'raises an ImportError' do
         allow(User).to receive(:find_by).with(name: 'no name').and_return(nil)
-        expect { team.import_team_members(0, {teammembers: ['no name']}) }.to raise_error(ImportError,
-                                                                           "The user 'no name' was not found. <a href='/users/new'>Create</a> this user?")
+        expect { team.import_team_members(teammembers: ['no name']) }.to raise_error(ImportError,
+                                                                                     "The user 'no name' was not found. <a href='/users/new'>Create</a> this user?")
       end
     end
 
@@ -177,12 +177,12 @@ describe Team do
         allow(User).to receive(:find_by).with(name: 'no name').and_return(user)
         allow(TeamsUser).to receive(:find_by).with(team_id: 1, user_id: 1).and_return(nil)
         allow_any_instance_of(Team).to receive(:add_member).with(user).and_return(true)
-        expect(team.import_team_members(0, {teammembers: ['no name']})).to eq(['no name'])
+        expect(team.import_team_members(teammembers: ['no name'])).to eq(['no name'])
       end
     end
   end
 
-  # E1991 : we check whether anonymized view 
+  # E1991 : we check whether anonymized view
   # sets the team name to anonymized. the test
   # case should test both when anonymized view
   # is set and when anonymized view is not set
@@ -198,12 +198,12 @@ describe Team do
       expect(team.name).not_to eq 'Team_' + team.id.to_s
       expect(team.name).to eq 'no team'
     end
-  end 
+  end
 
   describe '.import' do
     context 'when row is empty and has_column_names option is not true' do
       it 'raises an ArgumentError' do
-        expect { Team.import({}, 1, {has_column_names: 'false'}, AssignmentTeam.new) }
+        expect { Team.import({}, 1, { has_column_names: 'false' }, AssignmentTeam.new) }
           .to raise_error(ArgumentError, 'Not enough fields on this line.')
       end
     end
@@ -211,59 +211,59 @@ describe Team do
     # Add tests to handle duplicates in various ways, in .import method and handle_duplicates method
     context 'when there are duplicates in new teams with existing teams' do
       let(:row) do
-        {teammembers: %w(member1 member2), teamname: 'name'}
+        { teammembers: %w[member1 member2], teamname: 'name' }
       end
       let(:options) do
-        {has_teamname: 'true_first'}
+        { has_teamname: 'true_first' }
       end
-      let(:id) {1}
+      let(:id) { 1 }
       before(:each) do
-        allow(Team).to receive_message_chain(:where, :first).with(["name =? && parent_id =?", row[:teamname], id]).with(no_args).and_return(team)
+        allow(Team).to receive_message_chain(:where, :first).with(['name =? && parent_id =?', row[:teamname], id]).with(no_args).and_return(team)
         allow(AssignmentTeam).to receive(:create_team_and_node).with(id).and_return(team)
         allow(team).to receive(:save).and_return(true)
         allow(team).to receive(:import_team_members)
       end
       context 'when choosing to ignore the new team' do
         it 'handles duplicates with "ignore" argument' do
-          options[:handle_dups] = "ignore"
-          allow(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, "ignore", AssignmentTeam).and_return(nil)
-          expect(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, "ignore", AssignmentTeam).and_return(nil)
+          options[:handle_dups] = 'ignore'
+          allow(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, 'ignore', AssignmentTeam).and_return(nil)
+          expect(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, 'ignore', AssignmentTeam).and_return(nil)
           Team.import(row, id, options, AssignmentTeam)
         end
       end
 
       context 'when choosing to replace the existing team with the new team' do
         it 'handles duplicates with "replace" argument' do
-          options[:handle_dups] = "replace"
-          allow(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, "replace", AssignmentTeam).and_return(row[:teamname])
-          expect(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, "replace", AssignmentTeam).and_return(row[:teamname])
+          options[:handle_dups] = 'replace'
+          allow(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, 'replace', AssignmentTeam).and_return(row[:teamname])
+          expect(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, 'replace', AssignmentTeam).and_return(row[:teamname])
           Team.import(row, id, options, AssignmentTeam)
         end
       end
 
       context 'when choosing to insert any new members to existing team' do
         it 'handles duplicates with "insert" argument' do
-          options[:handle_dups] = "insert"
-          allow(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, "insert", AssignmentTeam).and_return(nil)
-          expect(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, "insert", AssignmentTeam).and_return(nil)
+          options[:handle_dups] = 'insert'
+          allow(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, 'insert', AssignmentTeam).and_return(nil)
+          expect(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, 'insert', AssignmentTeam).and_return(nil)
           Team.import(row, id, options, AssignmentTeam)
         end
       end
 
       context 'when choosing to rename the new team and import' do
         it 'handles duplicates with "rename" argument' do
-          options[:handle_dups] = "rename"
-          allow(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, "rename", AssignmentTeam).and_return(row[:teamname])
-          expect(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, "rename", AssignmentTeam).and_return(row[:teamname])
+          options[:handle_dups] = 'rename'
+          allow(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, 'rename', AssignmentTeam).and_return(row[:teamname])
+          expect(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, 'rename', AssignmentTeam).and_return(row[:teamname])
           Team.import(row, id, options, AssignmentTeam)
         end
       end
 
       context 'when choosing to rename the existing team and import' do
         it 'handles duplicates with "rename_existing" argument' do
-          options[:handle_dups] = "rename_existing"
-          allow(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, "rename_existing", AssignmentTeam).and_return(row[:teamname])
-          expect(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, "rename_existing", AssignmentTeam).and_return(row[:teamname])
+          options[:handle_dups] = 'rename_existing'
+          allow(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, 'rename_existing', AssignmentTeam).and_return(row[:teamname])
+          expect(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, 'rename_existing', AssignmentTeam).and_return(row[:teamname])
           Team.import(row, id, options, AssignmentTeam)
         end
       end
@@ -354,7 +354,7 @@ describe Team do
     it 'exports teams to csv' do
       allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team])
       allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
-      expect(Team.export([], 1, {team_name: 'false'}, AssignmentTeam.new)).to eq([["no team", "no name"]])
+      expect(Team.export([], 1, { team_name: 'false' }, AssignmentTeam.new)).to eq([['no team', 'no name']])
     end
   end
 end

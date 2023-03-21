@@ -1,20 +1,16 @@
-class CreateNotifications < ActiveRecord::Migration
+class CreateNotifications < ActiveRecord::Migration[4.2]
   def self.up
-        
     create_table :notification_limits do |t|
-      t.column :user_id, :integer, :null => false
-      t.column :assignment_id, :integer, :null => true
-      t.column :questionnaire_id, :integer, :null => true
-      t.column :limit, :integer, :null => false, :default => 15          
+      t.column :user_id, :integer, null: false
+      t.column :assignment_id, :integer, null: true
+      t.column :questionnaire_id, :integer, null: true
+      t.column :limit, :integer, null: false, default: 15
     end
-    
-    
-    
-    User.find_by_sql("select * from users where role_id in (select id from roles where not (parent_id is null))").each{
-      |user|
+
+    User.find_by_sql('select * from users where role_id in (select id from roles where not (parent_id is null))').each do |user|
       execute "INSERT INTO `notification_limits` (`user_id`, `limit`) VALUES
-            (#{user.id}, 15);"       
-    }
+            (#{user.id}, 15);"
+    end
   end
 
   def self.down

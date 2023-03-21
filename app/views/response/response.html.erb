@@ -15,8 +15,6 @@
 
     window.onbeforeunload = release_lock;
 
-    // todo: to be moved to assets, once it's fixed so that not every script is loaded in every page.
-    //detect if the window is in foreground or background
     var vis = (function () {
         var stateKey, eventKey, keys = {
             hidden: "visibilitychange",
@@ -296,57 +294,66 @@
     });
 </script>
 
-<% if @map.survey? %>
-  <h1><%= @header %> <%= @title %> for <%= @map.survey_parent.name %></h1>
-<% else %>
-  <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
 
-  <% if !@map.contributor.nil? && !@map.instance_of?(FeedbackResponseMap) %>
-    <% if @map.assignment.team_assignment? %>
-      <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id %>
-      <% topic_id = SignedUpTeam.topic_id(@map.assignment.id, team_member) %>
-    <% else %>
-      <% participant = Participant.find(TeamsUser.find_by_team_id(@map.contributor).user_id) %>
-      <% topic_id = SignedUpTeam.where(participant.parent_id, participant.user_id) %>
-    <% end %>
-    <% unless topic_id.nil? %>
-      <% topic = SignUpTopic.find(topic_id) %>
-      <h2>You are reviewing <%= topic.topic_name %></h2>
-      <% unless topic.description.nil? %>
-        <b>Description &nbsp;&nbsp;&nbsp;</b>
-        <% if topic.description.to_s.length > 90 %>
-          <%= topic.description.to_s[0..90] + '...' %>
-          <a style="cursor: pointer" onclick="show_alert('<%= topic.description%>')">more...</a>
-        <% else %>
-          <%= topic.description.to_s %>
-        <% end %>
-        <% unless topic.link.nil? %>
-          <%= link_to image_tag('external-link-16.png', :border => 0, :align => 'middle'), topic.link, :target => '_blank' %>
-        <% end %>
+
+<h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
+<% if !@map.contributor.nil? && !@map.instance_of?(FeedbackResponseMap) %>
+  <% if @map.assignment.team_assignment? %>
+    <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id%>
+
+    <% participant = Participant.find(team_member) %>
+    <div style="float:right">
+      <%= link_to "Email the author", author_response_index_path(email: participant.user.email, response: @response.id) %>
+    </div>
+    <% topic_id = SignedUpTeam.topic_id(@map.assignment.id, team_member) %>
+  <% else %>
+    <% participant = Participant.find(TeamsUser.find_by_team_id(@map.contributor).user_id) %>
+    <div style="float:right">
+      <%= link_to "Email the author", author_response_index_path(email: participant.user.email, response: @response.id) %>
+    </div>
+    <% topic_id = SignedUpTeam.where(participant.parent_id, participant.user_id) %>
+  <% end %>
+
+  <% unless topic_id.nil? %>
+    <% topic = SignUpTopic.find(topic_id) %>
+    <h2>You are reviewing <%= topic.topic_name %></h2>
+    <% unless topic.description.nil? %>
+      <b>Description &nbsp;&nbsp;&nbsp;</b>
+      <% if topic.description.to_s.length > 90 %>
+        <%= topic.description.to_s[0..90] + '...' %>
+        <a style="cursor: pointer" onclick="show_alert('<%= topic.description%>')">more...</a>
+      <% else %>
+        <%= topic.description.to_s %>
+      <% end %>
+      <% unless topic.link.nil? %>
+        <%= link_to image_tag('external-link-16.png', :border => 0, :align => 'middle'), topic.link, :target => '_blank' %>
       <% end %>
     <% end %>
-
-    <% if @assignment.teams? %>
-      <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-      <%= render :partial => 'submitted_content/main', :locals => { :reviewee_participant => @contributor.participants.first, :participant => @contributor.participants.first, :stage => @assignment.current_stage(topic_id) } %>
-    <% else %>
-      <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-      <%= render :partial => 'submitted_content/main', :locals => { :participant => @contributor, :stage => @assignment.current_stage(topic_id) } %>
-    <% end %>
-    <hr/>
   <% end %>
+  <% if @assignment.teams? %>
+    <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
+    <%= render :partial => 'submitted_content/main', :locals => { :reviewee_participant => @contributor.participants.first, :participant => @contributor.participants.first, :stage => @assignment.current_stage(topic_id) } %>
+  <% else %>
+    <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
+    <%= render :partial => 'submitted_content/main', :locals => { :participant => @contributor, :stage => @assignment.current_stage(topic_id) } %>
+  <% end %>
+  <hr/>
 <% end %>
 
 <!-- display all versions available -->
-<% @responses_versions = [] %>
-<% @responses_versions = @map.get_all_versions %>
-
-<% if @responses_versions.empty? %>
+<% @review_versions = @map.get_all_versions %>
+<% if @review_versions.empty? %>
   <I>No previous review was performed.</I><br/>
   <hr/><br/>
 <% else %>
-  <%= render :partial => 'review', :locals => { :versions => @responses_versions } %>
+  <%@review_versions.each do |response| %>
+    <%= response.display_as_html %>
+    <br/>
+  <% end %>
 <% end %>
+
+
+
 <h2>Directions for the reviewer</h2>
 <input type="checkbox" id="autosave_cbx" checked>
 <label id="autosave_cbx_lbl" for="autosave_cbx"></label>
@@ -358,28 +365,26 @@
     <input name="_method" type="hidden" value="put"/>
   <% end %>
   <table width="100%">
-    <tr>
-      <td>
-        <% i = 0 %>
-        <% @questions.each do |question| %>
-          <% answer = Answer.where(question_id: question.id, response_id: @response.id).first unless @response.nil? %>
-          <% if question.instance_of? Criterion %>
-            <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
-          <% elsif question.instance_of? Scale %>
-            <%= question.complete(i, @questionnaire.min_question_score, @questionnaire.max_question_score, answer) %>
-          <% elsif question.instance_of? Cake %>
-            <%= question.complete(i, answer, @total_score[question.id].to_s) %>
-          <% else %>
-            <%= question.complete(i, answer) %>
-          <% end %>
+    <% @review_questions.each_with_index do |question, i| %>
+      <tr>
+        <td>
+            <% answer = Answer.where(question_id: question.id, response_id: @response.id).first unless @response.nil? %>
+            <% if question.instance_of? Criterion %>
+              <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
+            <% elsif question.instance_of? Scale %>
+              <%= question.complete(i, @questionnaire.min_question_score, @questionnaire.max_question_score, answer) %>
+            <% elsif question.instance_of? Cake %>
+              <%= question.complete(i, answer, @total_score[question.id].to_s) %>
+            <% else %>
+              <%= question.complete(i, answer) %>
+            <% end %>
 
-          <% if [Criterion, TextArea].include? question.class %>
-            <div id="analysis_<%= i.to_s %>_comments"></div>
-          <% end %>
-          <% i += 1 %>
-        <% end %>
-      </td>
-    </tr>
+            <% if [Criterion, TextArea].include? question.class %>
+              <div id="analysis_<%= i.to_s %>_comments"></div>
+            <% end %>
+        </td>
+      </tr>
+    <% end %>
     <tr>
       <td>
         <label for="review_comments">Additional Comments</label><BR/>
@@ -427,7 +432,7 @@
   <div id="save_confirm"></div>
   <%= submit_tag "Save " + @title, :name => "save", :id => "save_review" %>
   <!--#E1600 check title for selfreview to show submit button-->
-  <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>
+  <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review') || (@title.eql? 'Metareview')) %>
     <%= submit_tag "Submit " + @title, :name => "Submit", :id => "Submit" %>
     <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
   <% end %>
@@ -436,7 +441,7 @@
 <% end %>
 
 <!--Check whether there is a UploadFile question.-->
-<% @questions.each do |question| %>
+<% @review_questions.each do |question| %>
   <% if question.instance_of? UploadFile %>
     <!--params[:origin] means from where do the files upload-->
     <!--If the files uploaded from submitted_work (students hand in assignment), params[:origin] will be nil-->
@@ -461,3 +466,5 @@
 </script>
 <div id="BackLink"><a href="javascript:window.history.back()">Back</a></div>
 <div id="dialog-message" style="word-wrap: normal"></div>
+
+

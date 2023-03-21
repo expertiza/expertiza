@@ -9,7 +9,7 @@ module JoinTeamRequestsHelper
                "Accepted: The team has accepted your request.\nYou should receive an invitation in \"Your Team\" page."
              else
                join_team_request.status
-    end
+             end
     status
   end
 end

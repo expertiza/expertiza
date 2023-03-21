@@ -15,11 +15,10 @@ cache:
   directories:
     - vendor/assets/components
 rvm:
-  - 2.2.7
+  - 2.4
 branches:
   only:
-    - master
-    - beta
+    - main
 before_install:
   - uname -a
   - lsb_release -a
@@ -40,8 +39,7 @@ before_script:
   - cp config/secrets.yml.example config/secrets.yml
   - export JAVA_HOME=/usr/lib/jvm/java-6-openjdk-amd64
   - bundle install
-  - bundle exec danger --verbose
-  - bundle exec rake db:setup
+  - bundle exec rails db:setup
   # Test coverage offered by Code Climate
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-0.7.0-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
@@ -56,7 +54,7 @@ after_script:
   - 
   - ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$TESTFOLDER.json"
   # https://docs.travis-ci.com/user/environment-variables#convenience-variables
-  - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then export TRAVIS_PULL_REQUEST=master; fi
+  - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then export TRAVIS_PULL_REQUEST=main; fi
   - ls -lah coverage/
   - cd $HOME
   - git config --global user.email "zhu6@ncsu.edu"
@@ -67,7 +65,7 @@ after_script:
   - cp -Rf $HOME/build/expertiza/expertiza/coverage/codeclimate.$TESTFOLDER.json $HOME/$REPORT_REPO_NAME/$TRAVIS_PULL_REQUEST/codeclimate.$TESTFOLDER.json
   - git add --all
   - git commit -m "Add code climate coverage report"
-  - git push origin master
+  - git push origin main
   # Sum coverage parts into coverage/codeclimate.json and upload coverage/codeclimate.json
   - if [ "$TESTFOLDER" == "models" ] && [ "$TRAVIS_TEST_RESULT" == 0 ]; then $HOME/build/expertiza/expertiza/cc-test-reporter sum-coverage $HOME/$REPORT_REPO_NAME/$TRAVIS_PULL_REQUEST/codeclimate.*.json && $HOME/build/expertiza/expertiza/cc-test-reporter upload-coverage; fi
 services:

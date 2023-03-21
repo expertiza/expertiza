@@ -4,8 +4,8 @@ describe CourseNode do
   let(:user1) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
   let(:assignment) { build(:assignment, id: 1) }
   before(:each) do
-  	course_node.node_object_id = 1
-  	course.private = true
+    course_node.node_object_id = 1
+    course.private = true
     allow(course).to receive(:survey_distribution_id).and_return(1)
     allow(Course).to receive(:find_by).with(id: 1).and_return(course)
     allow(User).to receive(:find_by).with(id: 1).and_return(user1)
@@ -44,7 +44,7 @@ describe CourseNode do
     end
   end
   describe '#get_courses_managed_by_users' do
-    context 'when you arent a TA' do
+    context 'when you are not a TA' do
       it 'returns the user id' do
         allow(user1).to receive(:teaching_assistant?).and_return(false)
         expect(CourseNode.get_courses_managed_by_user(1)).to eq(1)
@@ -54,8 +54,8 @@ describe CourseNode do
   describe '#get_parent_id' do
     context 'when parent is found' do
       it 'returns the id of the parent folder' do
-      	parent = 'parent'
-      	allow(parent).to receive(:id).and_return(1)
+        parent = 'parent'
+        allow(parent).to receive(:id).and_return(1)
         allow(TreeFolder).to receive(:find_by).with(name: 'Courses').and_return(course)
         allow(FolderNode).to receive(:find_by).with(node_object_id: 1).and_return(parent)
         expect(CourseNode.get_parent_id).to eq(1)
@@ -63,7 +63,7 @@ describe CourseNode do
     end
     context 'when parent is not found' do
       it 'returns nil' do
-      	parent = false
+        parent = false
         allow(TreeFolder).to receive(:find_by).with(name: 'Courses').and_return(course)
         allow(FolderNode).to receive(:find_by).with(node_object_id: 1).and_return(parent)
         expect(CourseNode.get_parent_id).to eq(nil)

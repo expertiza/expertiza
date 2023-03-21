@@ -1,5 +1,5 @@
 <!--The reason why add an empty form_tag here. (https://github.com/expertiza/expertiza/commit/4d1a9d50833aca4e8771afd851daa40455d4fc37)-->
-<%= form_tag controller: 'assignment', action: 'edit', assignment_id: @assignment_form.assignment.id do %>
+<%= form_tag controller: 'assignments', action: 'edit', assignment_id: @assignment_form.assignment.id do %>
 <% end %>
 <table border=0 class="table-hover table-borderless" style="width: 100%">
   <col width="150"/>
@@ -59,15 +59,20 @@
       </span>
     </td>
   </tr>
-  <tr>
-    <td>
+  
+  <tr style="display:<%='none' unless @metareview_allowed%>">   
+  <!-- Added the meta_reviews_allowed variable to hide/show metareview section on UI -->
+  <!-- Improved the UI  by team E2235 -->  
+  <td>
       <%= check_box_tag('meta_review', 'true', true, {:onChange => 'hasMetaReviewChanged()'}) %>
       <%= label_tag('meta_review', 'Has meta-review limit?') %>  
       <img src="/assets/info.png" title='You can set if a particular submission can have a Meta-review or not.'>
     </td>
   </tr>
 
-  <tr id="assignment_review_topic_threshold_row">
+  <tr id="assignment_review_topic_threshold_row" style="display:<%='none' unless @metareview_allowed%>">
+  <!-- Added the meta_reviews_allowed variable to hide/show metareview section on UI -->
+  <!-- Improved the UI  by team E2235 -->  
     <td>
         <span id="meta_reviews_allowed" <%= 'hidden' if @assignment_form.assignment.num_metareviews_allowed.nil?%> class="form-inline">
 
@@ -79,13 +84,8 @@
           <%= text_field_tag('assignment_form[assignment][num_metareviews_allowed]',  3, size: 1, class: "form-control width-70", :style => 'margin-left :100px') %>
             <%end%>
           </br>
-          <%= label_tag('assignment_form[assignment][num_metareviews_allowed]', 'Set required number of meta-reviews per reviewer') %>
-
-          <%if @assignment_form.assignment.num_metareviews_allowed && @assignment_form.assignment.num_metareviews_allowed >= 0 %>
-              <%= text_field_tag('assignment_form[assignment][num_metareviews_allowed]', @assignment_form.assignment.num_metareviews_allowed ||= 3, size: 1, class: "form-control width-70", :style => 'margin-left :90px') %>
-        <%else%>
-              <%= text_field_tag('assignment_form[assignment][num_metareviews_allowed]',  3, size: 1, class: "form-control width-70", :style => 'margin-left :90px') %>
-        <%end%>
+          <%= label_tag('assignment_form[assignment][num_metareviews_required]', 'Set required number of meta-reviews per reviewer') %>
+          <%= text_field_tag('assignment_form[assignment][num_metareviews_required]',  @assignment_form.assignment.num_metareviews_required ||= @default_num_metareviews_required, size: 1, class: "form-control width-70", :style => 'margin-left :90px') %>
         </span>
     </td>
   </tr>
@@ -131,10 +131,10 @@
   </tr>
 
   <tr>
-    <td id='reviewer_is_team'>
-      <input name="assignment_form[assignment][reviewer_is_team]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][reviewer_is_team]', 'true', @assignment_form.assignment.reviewer_is_team) %>
-      <%= label_tag('assignment_form[assignment][reviewer_is_team]', 'Is Review done by Teams?') %>
+    <td id='team_reviewing_enabled'>
+      <input name="assignment_form[assignment][team_reviewing_enabled]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][team_reviewing_enabled]', 'true', @assignment_form.assignment.team_reviewing_enabled) %>
+      <%= label_tag('assignment_form[assignment][team_reviewing_enabled]', 'Is Review done by Teams?') %>
       <img src="/assets/info.png" title='You can select whether the reviews should be done by individual students or teams'>
     </td>
   </tr>
@@ -149,6 +149,10 @@
     </td>
   </tr>
 
+  <!-- #E2147 -->
+  <div id="duty_assignment_chkbx" hidden>
+    <%= render '/duties/checkbox' %>
+  </div>
   <!--#E1870-->
   <% if @assignment_form.assignment.rounds_of_reviews > 1 %>
     <tr>
@@ -185,4 +189,25 @@
             jQuery('#assignment_form_assignment_num_metareviews_allowed').val('-1');
         }
     }
+    function hasDutiesChanged() {
+        var checkbox = jQuery('#is_duty_checkbox');
+        var add_duties_div = jQuery('#add_duties');
+
+        if (checkbox.is(':checked')) {
+            add_duties_div.removeAttr('hidden');
+        }
+        else {
+            add_duties_div.attr('hidden', true);
+        }
+    }
+    jQuery(document).ready(function () {
+        var has_teams_checkbox = jQuery('#team_assignment');
+        var duty_assignment_chkbx =  jQuery('#duty_assignment_chkbx')
+        if (has_teams_checkbox.is(':checked')) {
+            duty_assignment_chkbx.removeAttr('hidden');
+        } else {
+            duty_assignment_chkbx.attr('hidden', true);
+        }
+    })
+
 </script>

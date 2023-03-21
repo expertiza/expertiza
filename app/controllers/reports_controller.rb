@@ -2,7 +2,6 @@ class ReportsController < ApplicationController
   include AuthorizationHelper
 
   autocomplete :user, :name
-  require 'gchart'
   helper :submitted_content
   include ReportFormatterHelper
 
@@ -32,7 +31,7 @@ class ReportsController < ApplicationController
   end
 
   # function to check for detail_options and return the correct csv
-  def self.export_details(csv, parent_id, detail_options)
+  def self.export_details(csv, _parent_id, detail_options)
     return csv unless detail_options
   end
 end

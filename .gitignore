@@ -1,5 +1,6 @@
 dump.rdb
 .bundle
+.vscode
 db/*.sqlite3
 db/*.sql
 *.sql
@@ -13,8 +14,14 @@ coverage
 app/controllers/auth_controller.rb
 nohup.out
 pg_data/*
+.initialized
+expertiza-db/*
 
-
+#################
+## scrubbed_db ##
+#################
+expertiza.sql
+docker-start.sh
 
 #################
 ## scrubbed_db ##

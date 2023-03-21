@@ -41,7 +41,9 @@ class Menu
     end
   end
 
+  # rubocop:disable Lint/DuplicateMethods
   attr_accessor :root, :selected
+  # rubocop:enable Lint/DuplicateMethods
 
   def initialize(role = nil)
     @root = Node.new
@@ -53,6 +55,7 @@ class Menu
     items = MenuItem.items_for_permissions(role.try(:cache)[:credentials].try(:permission_ids))
     # return if items.nil? or items.empty?
     return if items.blank?
+
     # Build hashes of items by name and id
     items.each do |item|
       node = Node.new
@@ -78,6 +81,7 @@ class Menu
 
   def select(name)
     return unless @by_name.key?(name)
+
     node = @by_name[name]
     @selected = {}
     @vector = []
@@ -103,9 +107,11 @@ class Menu
   end
 
   # Returns the name of the currently-selected item or nil if no item is selected.
+  # rubocop:disable Lint/DuplicateMethods
   def selected
     @vector.last.try(:name)
   end
+  # rubocop:enable Lint/DuplicateMethods
 
   # Returns true if the specified item is selected; false if otherwise.
   def selected?(menu_id)
@@ -114,7 +120,7 @@ class Menu
 
   def crumbs
     crumbs = []
-    @crumbs.each {|crumb| crumbs << get_item(crumb) }
+    @crumbs.each { |crumb| crumbs << get_item(crumb) }
     crumbs
   end
 end

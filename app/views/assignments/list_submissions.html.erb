@@ -27,6 +27,12 @@
         <% if @assignment.max_team_size > 1 %>
           <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Team name</th>
           <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Team member(s)</th>
+          <% if @assignment.pair_programming_enabled? %>
+            <% pair_programming_enabled = true %>
+            <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Pair Programming</th>
+          <% else %>
+            <% pair_programming_enabled = false %>
+          <% end %>
         <% else %>
           <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Participant name</th>
         <% end %>  
@@ -34,9 +40,7 @@
         <th class="sorter-false" style="font-weight: bold; font-size: 15px;"></th>
       </tr>                    
     </thead>
-    <% @l = -1 %>
     <% @teams.each do |team| %>
-      <% @l = @l+1 %>
       <tr>
         <% topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team) %>
 
@@ -46,7 +50,7 @@
         <% end %>
 
         <!--Team name-->
-        <% if @assignment.max_team_size > 1 %>
+        <% if @assignment.max_team_size >= 1 %>
           <% team_name_color = get_team_name_color_in_list_submission(team) %>
           <td><p style = <%="color:#{team_name_color}"%>><%= team.name(session[:ip]) %></p>
           <% unless participants.empty? %>
@@ -68,11 +72,18 @@
               <% end %>
           </td>
 
+        <!-- Pair Programming -->
+          <% if pair_programming_enabled %>
+            <td>
+              <%= Team.find(team.id).pair_programming_request == 2 ? "Yes": "No" %>
+            </td>
+          <% end %>
+
         <!--Submitted item(s)-->
         <td>
         <!--Display submitted hyperlinks-->
           <% participant = participants.compact.first %>
-          <% if participant and !team.hyperlinks.empty? %>
+          <% if participant && !team.hyperlinks.empty? %>
             <% team.hyperlinks.each do |link| %>
               <a href="<%= link %>" target="_blank">- <%= link %></a><br/>
             <% end %>
@@ -80,9 +91,9 @@
           <br>
           <!--Display submitted files-->
           <% team.submitted_files %>
-          <% if participant and !team.submitted_files.empty? %>
+          <% if participant && !team.submitted_files.empty? %>
             <% files = team.submitted_files %>
-            <%= display_directory_tree(participant, files, true).html_safe if files and files.length > 0 %>
+            <%= display_directory_tree(participant, files, true).html_safe if files && files.length > 0 %>
           <% end %>
         </td>
         <td width="10%">

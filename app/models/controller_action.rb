@@ -1,71 +1,73 @@
-class ControllerAction < ActiveRecord::Base
+class ControllerAction < ApplicationRecord
   belongs_to :site_controller
   belongs_to :permission
 
   validates :name, presence: true
-  validates :name, uniqueness: {scope: 'site_controller_id'}
+  validates :name, uniqueness: { scope: 'site_controller_id' }
 
+  # rubocop:disable Lint/DuplicateMethods
   attr_accessor :controller, :permission, :url, :allowed, :specific_name
 
-  scope :order_by_controller_and_action, -> {
-    joins('left outer join site_controllers on site_controller_id = site_controllers.id').
-      order('site_controllers.name, name')
+  scope :order_by_controller_and_action, lambda {
+    joins('left outer join site_controllers on site_controller_id = site_controllers.id')
+      .order('site_controllers.name, name')
   }
 
   def controller
-    @controller ||= SiteController.find(self.site_controller_id)
+    @controller ||= SiteController.find(site_controller_id)
   end
 
   def permission
-    @permission ||= if self.permission_id
-                      Permission.find(self.permission_id)
+    @permission ||= if permission_id
+                      Permission.find(permission_id)
                     else
                       Permission.new(id: nil,
-                                     name: "(default -- #{self.controller.permission.name})")
+                                     name: "(default -- #{controller.permission.name})")
                     end
     @permission
   end
 
   def effective_permission_id
-    self.permission_id || self.controller.permission_id
+    permission_id || controller.permission_id
   end
 
   def fullname
-    if self.site_controller_id and self.site_controller_id > 0
-      "#{self.controller.name}: #{self.name}"
+    if site_controller_id && (site_controller_id > 0)
+      "#{controller.name}: #{name}"
     else
-      self.name.to_s
-      end
+      name.to_s
+    end
   end
 
   def url
-    @url ||= "/#{self.controller.name}/#{self.name}"
+    @url ||= "/#{controller.name}/#{name}"
     @url
   end
+  # rubocop:enable Lint/DuplicateMethods
 
   def self.actions_allowed(permission_ids)
     # Hash for faster & easier lookups
     if permission_ids
       perms = {}
-      for id in permission_ids do
+      permission_ids.each do |id|
         perms[id] = true
       end
     end
 
     actions = ControllerAction.all
-    for action in actions do
+    actions.each do |action|
       action.allowed = if action.permission_id
                          if perms.key?(action.permission_id)
                            1
                          else
                            0
-                                          end
+                         end
                        else # Controller's permission
                          if perms.key?(action.controller.permission_id)
                            1
                          else
                            0
-                                          end
+                         end
                        end
     end
 

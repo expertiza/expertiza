@@ -1,6 +1,5 @@
 <th width="5%"><%=t ".topic_id"%></th>
-<th width="5%"><%=t ".select"%></th>
-<% if @assignment.vary_by_topic %>
+<% if @assignment.vary_by_topic? %>
   <th width="25%"><%=t ".topic_name"%></th>
   <th width="25%"><%=t ".questionnaire"%></th>
 <% else %>
@@ -13,10 +12,14 @@
   <th width="5%"><%=t ".num_slots"%></th>
   <th width="5%"><%=t ".available_slots"%></th>
   <th width="5%"><%=t ".num_waitlist"%></th>
-  <th width="10%"> <%=t ".bookmarks"%>
-    <!--Bookmarks may be disabled for this assignment-->
-    <% unless @use_bookmark %> <%=t ".disabled"%> <% end %>
-  </th>
+  <!-- Only view the bids metrics to Instructor role and when the "Biddiing for topic" option in Assignment >> Topic is enabled-->
+  <% if @assignment.is_intelligent && current_user_has_instructor_privileges? %>    
+    <th width="5%"><%=t ".num_bids"%></th>
+    <th width="5%"><%=t ".num_1_2_bids"%></th>
+  <% end %>
+  <% if @use_bookmark %>
+    <th width="10%"> <%=t ".bookmarks"%>
+  <% end %>
   <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>
       <th width="10%"><%=t ".actions"%></th>
       <th width="5%"><%=t ".advertise"%></th>

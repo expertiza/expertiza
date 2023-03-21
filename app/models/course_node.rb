@@ -1,6 +1,6 @@
 class CourseNode < Node
-  belongs_to :course, class_name: "Course", foreign_key: "node_object_id"
-  belongs_to :node_object, class_name: "Course", foreign_key: "node_object_id"
+  belongs_to :course, class_name: 'Course', foreign_key: 'node_object_id'
+  belongs_to :node_object, class_name: 'Course', foreign_key: 'node_object_id'
 
   # Creates a new courese node from the given course
   def self.create_course_node(course)
@@ -13,7 +13,7 @@ class CourseNode < Node
 
   # Returns the table in which to locate Courses
   def self.table
-    "courses"
+    'courses'
   end
 
   # parameters:
@@ -24,18 +24,18 @@ class CourseNode < Node
 
   # returns: list of CourseNodes based on query
   # the get method will return all courses meeting the criteria, but the method name is necessary due to polymorphism
-  def self.get(sortvar = 'name', _sortorder = 'desc', user_id = nil, show = nil, _parent_id = nil, _search = nil)
+  def self.get(_sortvar = 'name', _sortorder = 'desc', user_id = nil, show = nil, _parent_id = nil, _search = nil)
     sortvar = 'created_at'
     if Course.column_names.include? sortvar
-      self.includes(:course).where([get_course_query_conditions(show, user_id), get_courses_managed_by_user(user_id)])
-          .order("courses.#{sortvar} desc")
+      includes(:course).where([get_course_query_conditions(show, user_id), get_courses_managed_by_user(user_id)])
+                       .order("courses.#{sortvar} desc")
     end
   end
 
   # get the query conditions for a public course
   def self.get_course_query_conditions(show = nil, user_id = nil)
     current_user = User.find_by(id: user_id)
-    conditions = if show and current_user
+    conditions = if show && current_user
                    if current_user.teaching_assistant? == false
                      "courses.instructor_id = #{user_id}"
                    else
@@ -72,42 +72,42 @@ class CourseNode < Node
   # Gets any children associated with this object
   # the get_children method will return assignments belonging to a course, but the method name is necessary due to polymorphism
   def get_children(sortvar = nil, sortorder = nil, user_id = nil, show = nil, _parent_id = nil, search = nil)
-    AssignmentNode.get(sortvar, sortorder, user_id, show, self.node_object_id, search)
+    AssignmentNode.get(sortvar, sortorder, user_id, show, node_object_id, search)
   end
 
   def get_name
-    Course.find_by(id: self.node_object_id).try(:name)
+    Course.find_by(id: node_object_id).try(:name)
   end
 
   def get_directory
-    Course.find_by(id: self.node_object_id).try(:directory_path)
+    Course.find_by(id: node_object_id).try(:directory_path)
   end
 
   def get_creation_date
-    Course.find_by(id: self.node_object_id).try(:created_at)
+    Course.find_by(id: node_object_id).try(:created_at)
   end
 
   def get_modified_date
-    Course.find_by(id: self.node_object_id).try(:updated_at)
+    Course.find_by(id: node_object_id).try(:updated_at)
   end
 
   def get_private
-    Course.find_by(id: self.node_object_id).try(:private)
+    Course.find_by(id: node_object_id).try(:private)
   end
 
   def get_instructor_id
-    Course.find_by(id: self.node_object_id).try(:instructor_id)
+    Course.find_by(id: node_object_id).try(:instructor_id)
   end
 
   def retrieve_institution_id
-    Course.find_by(id: self.node_object_id).try(:institutions_id)
+    Course.find_by(id: node_object_id).try(:institutions_id)
   end
 
   def get_teams
-    TeamNode.get(self.node_object_id)
+    TeamNode.get(node_object_id)
   end
 
   def get_survey_distribution_id
-    Course.find_by(id: self.node_object_id).try(:survey_distribution_id)
+    Course.find_by(id: node_object_id).try(:survey_distribution_id)
   end
 end

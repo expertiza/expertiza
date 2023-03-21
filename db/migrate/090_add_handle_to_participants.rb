@@ -1,28 +1,23 @@
-class AddHandleToParticipants < ActiveRecord::Migration
+class AddHandleToParticipants < ActiveRecord::Migration[4.2]
   def self.up
-    begin
-      add_column :participants, :handle, :string, :null => true
-      AssignmentParticipant.find_each{
-        |participant|
-        if participant.handle.nil?
-          user = User.find(participant.user_id)
-          if user.handle.nil?
-            participant.handle = user.name
-          else
-            participant.handle = user.handle
-          end
-          participant.save
-        end
-      }
-    rescue
-       put $!
+    add_column :participants, :handle, :string, null: true
+    AssignmentParticipant.find_each do |participant|
+      if participant.handle.nil?
+        user = User.find(participant.user_id)
+        participant.handle = if user.handle.nil?
+                               user.name
+                             else
+                               user.handle
+                             end
+        participant.save
+      end
     end
+  rescue StandardError
+    put $ERROR_INFO
   end
 
   def self.down
-    begin
-      remove_column :users, :handle
-    rescue
-    end
+    remove_column :users, :handle
+  rescue StandardError
   end
 end

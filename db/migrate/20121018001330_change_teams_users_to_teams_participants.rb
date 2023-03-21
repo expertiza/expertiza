@@ -1,11 +1,8 @@
-class ChangeTeamsUsersToTeamsParticipants < ActiveRecord::Migration
+class ChangeTeamsUsersToTeamsParticipants < ActiveRecord::Migration[4.2]
   def self.up
-    begin
-      rename_table :teams_participants, :teams_participants
-    rescue
-    end
+    rename_table :teams_participants, :teams_participants
+  rescue StandardError
   end
 
-  def self.down
-  end
+  def self.down; end
 end

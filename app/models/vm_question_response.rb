@@ -10,8 +10,8 @@ class VmQuestionResponse
   def initialize(questionnaire, assignment = nil, round = nil)
     @assignment = assignment
     @questionnaire = questionnaire
-    if questionnaire.type == "ReviewQuestionnaire"
-      @round = round ? round : AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
+    if questionnaire.type == 'ReviewQuestionnaire'
+      @round = round || AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
     end
 
     @rounds = @assignment.rounds_of_reviews
@@ -43,7 +43,7 @@ class VmQuestionResponse
   end
 
   def add_reviews(participant, team, vary)
-    if @questionnaire_type == "ReviewQuestionnaire"
+    if @questionnaire_type == 'ReviewQuestionnaire'
       reviews = if vary
                   ReviewResponseMap.get_responses_for_team_round(team, @round)
                 else
@@ -57,23 +57,23 @@ class VmQuestionResponse
         end
       end
       @list_of_reviews = reviews
-    elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"   #ISSUE E-1967 updated
+    elsif @questionnaire_type == 'AuthorFeedbackQuestionnaire' # ISSUE E-1967 updated
       reviews = []
-      #finding feedbacks where current pariticipant of assignment (author) is reviewer 
-      feedbacks = FeedbackResponseMap.where(reviewer_id: participant.id) 
+      # finding feedbacks where current pariticipant of assignment (author) is reviewer
+      feedbacks = FeedbackResponseMap.where(reviewer_id: participant.id)
       feedbacks.each do |feedback|
-        #finding the participant ids for each reviewee of feedback
-        #participant is really reviewee here.
+        # finding the participant ids for each reviewee of feedback
+        # participant is really reviewee here.
         participant = Participant.find_by(id: feedback.reviewee_id)
-        #finding the all the responses for the feedback
+        # finding the all the responses for the feedback
         response = Response.where(map_id: feedback.id).order('updated_at').last
         if response
           reviews << response
           @list_of_reviews << response
-        end 
+        end
         @list_of_reviewers << participant
       end
-    elsif @questionnaire_type == "TeammateReviewQuestionnaire"
+    elsif @questionnaire_type == 'TeammateReviewQuestionnaire'
       reviews = participant.teammate_reviews
       reviews.each do |review|
         review_mapping = TeammateReviewResponseMap.find_by(id: review.map_id)
@@ -83,7 +83,7 @@ class VmQuestionResponse
         @list_of_reviewers << participant
         @list_of_reviews << review
       end
-    elsif @questionnaire_type == "MetareviewQuestionnaire"
+    elsif @questionnaire_type == 'MetareviewQuestionnaire'
       reviews = participant.metareviews
       reviews.each do |review|
         review_mapping = MetareviewResponseMap.find_by(id: review.map_id)
@@ -101,11 +101,11 @@ class VmQuestionResponse
   end
 
   def display_team_members(ip_address = nil)
-    @output = ""
-    if @questionnaire_type == "MetareviewQuestionnaire" || @questionnaire_type == "ReviewQuestionnaire"
-      @output = "Team members:"
+    @output = ''
+    if @questionnaire_type == 'MetareviewQuestionnaire' || @questionnaire_type == 'ReviewQuestionnaire'
+      @output = 'Team members:'
       @list_of_team_participants.each do |participant|
-        @output = @output + " (" + participant.fullname(ip_address) + ") "
+        @output = @output + ' (' + participant.fullname(ip_address) + ') '
       end
 
     end
@@ -126,6 +126,7 @@ class VmQuestionResponse
     # question row.
     @list_of_rows.each do |row|
       next unless row.question_id == answer.question_id
+
       # Go ahead and calculate what the color code for this score should be.
       question_max_score = row.question_max_score
 
@@ -139,16 +140,16 @@ class VmQuestionResponse
         color_code_number = 1 if color_code_number.zero?
       end
 
-      # Find out the tag prompts assosiated with the question
+      # Find out the tag prompts associated with the question
       tag_deps = TagPromptDeployment.where(questionnaire_id: @questionnaire.id, assignment_id: @assignment.id)
       vm_tag_prompts = []
 
       question = Question.find(answer.question_id)
 
-      # check if the tag prompt applies for thsi question type and if the comment length is above the threshold
+      # check if the tag prompt applies for this question type and if the comment length is above the threshold
       # if it does, then associate this answer with the tag_prompt and tag deployment (the setting)
       tag_deps.each do |tag_dep|
-        if tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold
+        if (tag_dep.question_type == question.type) && (answer.comments.length > tag_dep.answer_length_threshold)
           vm_tag_prompts.append(VmTagPromptAnswer.new(answer, TagPrompt.find(tag_dep.tag_prompt_id), tag_dep))
         end
       end
@@ -160,12 +161,33 @@ class VmQuestionResponse
     end
   end
 
+  # This method calls all the methods that are responsible for calculating different metrics.If any new metric is introduced, please call the method that calculates the metric values from this method.
+  def calculate_metrics
+    number_of_comments_greater_than_10_words
+    number_of_comments_greater_than_20_words
+  end
+
+  # This method is responsible for checking whether a review comment contains more than 10 words.
   def number_of_comments_greater_than_10_words
     @list_of_reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
         @list_of_rows.each do |row|
-          row.countofcomments = row.countofcomments + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 10
+          row.metric_hash["> 10 Word Comments"] = 0 if row.metric_hash["> 10 Word Comments"].nil?
+          row.metric_hash["> 10 Word Comments"] = row.metric_hash["> 10 Word Comments"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 10
+        end
+      end
+    end
+  end
+
+  # In case if new metirc is added. This is a dummy metric added for manual testing and will be removed.
+  def number_of_comments_greater_than_20_words
+    @list_of_reviews.each do |review|
+      answers = Answer.where(response_id: review.response_id)
+      answers.each do |answer|
+        @list_of_rows.each do |row|
+          row.metric_hash["> 20 Word Comments"] = 0 if row.metric_hash["> 20 Word Comments"].nil?
+          row.metric_hash["> 20 Word Comments"] = row.metric_hash["> 20 Word Comments"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 1
         end
       end
     end

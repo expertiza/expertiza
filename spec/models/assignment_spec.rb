@@ -1,6 +1,5 @@
 describe Assignment do
-
-  let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
+  let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team], max_team_size: 2) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 3, name: 'no one') }
   let(:review_response_map) { build(:review_response_map, response: [response], reviewer: build(:participant), reviewee: build(:assignment_team)) }
@@ -20,6 +19,21 @@ describe Assignment do
   let(:assignment_questionnaire2) { build(:assignment_questionnaire, id: 2, assignment_id: 1, questionnaire_id: 2) }
   let(:questionnaire1) { build(:questionnaire, id: 1, type: 'ReviewQuestionnaire') }
   let(:questionnaire2) { build(:questionnaire, id: 2, type: 'MetareviewQuestionnaire') }
+
+  describe '#user_on_team?' do
+    context 'when the user is not on a team associated with the assignment' do
+      it 'returns false' do
+        allow_any_instance_of(Team).to receive(:users).and_return([instructor])
+        expect(assignment.user_on_team?(student)).to be_falsey
+      end
+    end
+    context 'when the user is on a team associated with the assignment' do
+      it 'returns true' do
+        allow_any_instance_of(Team).to receive(:users).and_return([student])
+        expect(assignment.user_on_team?(student)).to be_truthy
+      end
+    end
+  end
 
   describe '.max_outstanding_reviews' do
     it 'returns 2 by default' do
@@ -73,23 +87,21 @@ describe Assignment do
     end
   end
 
-
   describe '#remove_empty_teams' do
     before :each do
       @assignment = create(:assignment)
       @student = create(:student)
       @empty_team = create(:assignment_team, assignment: @assignment, teams_users: [])
-      @non_empty_team = create(:assignment_team, assignment: @assignment, teams_users: [ create(:team_user, user: @student) ])
+      @non_empty_team = create(:assignment_team, assignment: @assignment, teams_users: [create(:team_user, user: @student)])
     end
     it 'should reduce the number of teams by the number of empty teams in the assignment' do
-      expect(@assignment.teams).to include @empty_team 
+      expect(@assignment.teams).to include @empty_team
       @assignment.remove_empty_teams
       expect(@assignment.teams).to_not include @empty_team
       expect(@assignment.teams).to include @non_empty_team
     end
   end
-  
-  
+
   describe '#vary_rubrics_by_round?' do
     context 'when rubrics varies over rounds' do
       it 'should return true' do
@@ -178,7 +190,7 @@ describe Assignment do
       end
     end
   end
-  
+
   describe '#questionnaire_ids' do
     context 'when the assignment does not have rounds' do
       it 'it returns the ids of the associated questionnaires' do
@@ -286,7 +298,7 @@ describe Assignment do
       allow(TeammateReviewResponseMap).to receive(:where).with(reviewed_object_id: 1).and_return([teammate_review_response_map])
     end
     context 'when there is at least one review response in current assignment' do
-      it 'raises an error messge and current assignment cannot be deleted' do
+      it 'raises an error message and current assignment cannot be deleted' do
         allow(review_response_map).to receive(:delete).with(nil)
                                                       .and_raise('Mysql2::Error: Cannot delete or update a parent row: a foreign key constraint fails')
         expect { assignment.delete }.to raise_error('There is at least one review response that exists for no assignment.')
@@ -294,7 +306,7 @@ describe Assignment do
     end
 
     context 'when there is no review response in current assignment and at least one teammate review response in current assignment' do
-      it 'raises an error messge and current assignment cannot be deleted' do
+      it 'raises an error message and current assignment cannot be deleted' do
         allow(review_response_map).to receive(:delete).with(nil).and_return(true)
         allow(teammate_review_response_map).to receive(:delete).with(nil).and_raise('Something wrong during deletion')
         expect { assignment.delete }.to raise_error('There is at least one teammate review response that exists for no assignment.')
@@ -342,7 +354,7 @@ describe Assignment do
       it 'raises an error' do
         allow(User).to receive(:find_by).with(name: 'no one').and_return(nil)
         allow_any_instance_of(Assignment).to receive(:url_for).with(controller: 'users', action: 'new').and_return('users/new/1')
-        expect { assignment.add_participant('no one', nil, nil, nil) }.to raise_error(RuntimeError, /a href='users\/new\/1'>create<\/a> the user first/)
+        expect { assignment.add_participant('no one', nil, nil, nil) }.to raise_error(RuntimeError, %r{a href='users/new/1'>create</a> the user first})
       end
     end
 
@@ -370,7 +382,7 @@ describe Assignment do
       allow(CourseNode).to receive(:find_by).with(node_object_id: 1).and_return(double('CourseNode', id: 1))
       expect { assignment.create_node }.to change { AssignmentNode.count }.from(0).to(1)
       expect(AssignmentNode.first.parent_id).to eq(1)
-      expect(AssignmentNode.table).to eq("assignments")
+      expect(AssignmentNode.table).to eq('assignments')
       expect(AssignmentNode.first.is_leaf).to eq(true)
       allow(Assignment).to receive(:find_by).with(id: 1).and_return(assignment)
       expect(AssignmentNode.first.get_private).to eq(false)
@@ -506,20 +518,23 @@ describe Assignment do
     context 'when corresponding active record for assignment_questionnaire is found' do
       before(:each) do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
-            [assignment_questionnaire1, assignment_questionnaire2])
+          [assignment_questionnaire1, assignment_questionnaire2]
+        )
         allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire1)
       end
 
       it 'returns correct questionnaire id found by used_in_round and topic_id if both used_in_round and topic_id are given' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return(
-            [assignment_questionnaire1])
+          [assignment_questionnaire1]
+        )
         allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
         expect(assignment.review_questionnaire_id(1, 1)).to eq(questionnaire1.id)
       end
 
       it 'returns correct questionnaire id found by used_in_round if only used_in_round is given' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: nil).and_return(
-            [assignment_questionnaire1])
+          [assignment_questionnaire1]
+        )
         allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
         expect(assignment.review_questionnaire_id(1, nil)).to eq(questionnaire1.id)
       end
@@ -527,7 +542,8 @@ describe Assignment do
       it 'returns correct questionnaire id found by topic_id if only topic_id is given and there is no current round used in the due date' do
         allow(DueDate).to receive(:get_next_due_date).with(assignment.id).and_return(nil)
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: nil, topic_id: 1).and_return(
-            [assignment_questionnaire1])
+          [assignment_questionnaire1]
+        )
         allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
         expect(assignment.review_questionnaire_id(nil, 1)).to eq(questionnaire1.id)
       end
@@ -535,7 +551,8 @@ describe Assignment do
       it 'returns correct questionnaire id found by used_in_round and topic_id if only topic_id is given, but current round is found by the due date' do
         allow(DueDate).to receive(:get_next_due_date).with(assignment.id).and_return(assignment_due_date)
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return(
-            [assignment_questionnaire1])
+          [assignment_questionnaire1]
+        )
         allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
         expect(assignment.review_questionnaire_id(nil, 1)).to eq(questionnaire1.id)
       end
@@ -544,7 +561,8 @@ describe Assignment do
     context 'when corresponding active record for assignment_questionnaire is not found' do
       it 'returns correct questionnaire id found by type' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
-            [assignment_questionnaire1, assignment_questionnaire2])
+          [assignment_questionnaire1, assignment_questionnaire2]
+        )
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return([])
         allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
         allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(nil)
@@ -557,15 +575,16 @@ describe Assignment do
     context 'when corresponding active record for assignment_questionnaire is found, but for questionnaire is not found' do
       it 'returns nil' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
-            [assignment_questionnaire1, assignment_questionnaire2])
+          [assignment_questionnaire1, assignment_questionnaire2]
+        )
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
-            [assignment_questionnaire1])
+          [assignment_questionnaire1]
+        )
         allow(assignment_questionnaire1).to receive(:questionnaire_id).and_return(nil)
         allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
         expect(assignment.review_questionnaire_id(1, 1)).to eq(nil)
       end
     end
-
   end
 
   describe 'has correct csv values?' do
@@ -578,10 +597,10 @@ describe Assignment do
       create(:question)
       create(:review_response_map)
       create(:response)
-      @options = {'team_id' => 'true', 'team_name' => 'true',
-                  'reviewer' => 'true', 'question' => 'true',
-                  'question_id' => 'true', 'comment_id' => 'true',
-                  'comments' => 'true', 'score' => 'true'}
+      @options = { 'team_id' => 'true', 'team_name' => 'true',
+                   'reviewer' => 'true', 'question' => 'true',
+                   'question_id' => 'true', 'comment_id' => 'true',
+                   'comments' => 'true', 'score' => 'true' }
     end
 
     def generated_csv(t_assignment, t_options)
@@ -635,14 +654,14 @@ describe Assignment do
         dead_rigth = create(:deadline_right)
         @deadline_type = create(:deadline_type)
         @assignment_due_date = create(:assignment_due_date, parent_id: assignment.id, review_allowed_id: dead_rigth.id, review_of_review_allowed_id: dead_rigth.id, submission_allowed_id: dead_rigth.id, deadline_type: @deadline_type)
-        expect(assignment.find_due_dates("submission").first).to eq(@assignment_due_date)
+        expect(assignment.find_due_dates('submission').first).to eq(@assignment_due_date)
       end
     end
 
     context 'if deadline is of assignment' do
       it ' return assignment nil' do
         assignment = create(:assignment)
-        expect(assignment.find_due_dates("submission").first).to eq(nil)
+        expect(assignment.find_due_dates('submission').first).to eq(nil)
       end
     end
   end
@@ -696,6 +715,20 @@ describe Assignment do
       expect(assignment.course_id).to eq(2)
       assignment.remove_assignment_from_course
       expect(assignment.course_id).to be_nil
+    end
+  end
+
+  describe '#pair_programming_enabled?' do
+    let(:assignment1) { build(:assignment, id: 1, name: 'assignment 1', enable_pair_programming: false) }
+    let(:assignment2) { build(:assignment, id: 2, name: 'assignment 2', enable_pair_programming: true) }
+    context 'checks if pair_programming is enabled' do
+      it 'returns false' do
+        expect(assignment1.pair_programming_enabled?).to be_falsey
+      end
+
+      it 'returns true' do
+        expect(assignment2.pair_programming_enabled?).to be_truthy
+      end
     end
   end
 end

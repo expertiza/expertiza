@@ -13,7 +13,7 @@ module ReportFormatterHelper
   def feedback_response_map(params, _session = nil)
     assign_basics(params)
     # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model
-    if @assignment.vary_by_round
+    if @assignment.vary_by_round?
       @authors, @all_review_response_ids_round_one, @all_review_response_ids_round_two, @all_review_response_ids_round_three =
         FeedbackResponseMap.feedback_response_report(@id, @type)
     else
@@ -31,16 +31,20 @@ module ReportFormatterHelper
     assign_basics(params)
     @reviewers = BookmarkRatingResponseMap.bookmark_response_report(@id)
     @topics = @assignment.sign_up_topics
-   end
+  end
 
   def calibration(params, session)
     assign_basics(params)
     user = session[:user]
-    participant = AssignmentParticipant.where(parent_id: @id, user_id: user.id).first rescue nil
+    participant = begin
+                    AssignmentParticipant.where(parent_id: @id, user_id: user.id).first
+                  rescue StandardError
+                    nil
+                  end
     create_participant(@id, user.id) if participant.nil?
-    @review_questionnaire_ids = ReviewQuestionnaire.select("id")
+    @review_questionnaire_ids = ReviewQuestionnaire.select('id')
     @assignment_questionnaire = AssignmentQuestionnaire.retrieve_questionnaire_for_assignment(@id).first
-    @questions = @assignment_questionnaire.questionnaire.questions.select {|q| q.type == 'Criterion' || q.type == 'Scale' }
+    @questions = @assignment_questionnaire.questionnaire.questions.select { |q| q.type == 'Criterion' || q.type == 'Scale' }
     @calibration_response_maps = ReviewResponseMap.where(reviewed_object_id: @id, calibrate_to: 1)
     @review_response_map_ids = ReviewResponseMap.select('id').where(reviewed_object_id: @id, calibrate_to: 0)
     @responses = Response.where(map_id: @review_response_map_ids)
@@ -101,7 +105,7 @@ module ReportFormatterHelper
   def calculate_formatted_percentage(line)
     number_tagged = @user_tagging_report[line.user.name].no_tagged.to_f
     number_taggable = @user_tagging_report[line.user.name].no_tagable
-    formatted_percentage = format("%.1f", (number_tagged / number_taggable) * 100)
+    formatted_percentage = format('%.1f', (number_tagged / number_taggable) * 100)
     @user_tagging_report[line.user.name].no_tagable.zero? ? '-' : formatted_percentage
   end
 end

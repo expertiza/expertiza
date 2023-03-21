@@ -12,7 +12,7 @@ class TeamsController < ApplicationController
   def create_teams
     parent = Object.const_get(session[:team_type]).find(params[:id])
     Team.randomize_all_by_parent(parent, session[:team_type], params[:team_size].to_i)
-    undo_link("Random teams have been successfully created.")
+    undo_link('Random teams have been successfully created.')
     ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Random teams have been successfully created', request)
     redirect_to action: 'list', id: parent.id
   end
@@ -22,7 +22,7 @@ class TeamsController < ApplicationController
     session[:team_type] = params[:type] if params[:type] && allowed_types.include?(params[:type])
     @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == 'Assignment'
     begin
-      @root_node = Object.const_get(session[:team_type] + "Node").find_by(node_object_id: params[:id])
+      @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
     rescue StandardError
       flash[:error] = $ERROR_INFO
@@ -56,7 +56,7 @@ class TeamsController < ApplicationController
       @team.name = params[:team][:name]
       @team.save
       flash[:success] = "The team \"#{@team.name}\" has been successfully updated."
-      undo_link("")
+      undo_link('')
       redirect_to action: 'list', id: parent.id
     rescue TeamExistsError
       flash[:error] = $ERROR_INFO
@@ -69,17 +69,16 @@ class TeamsController < ApplicationController
   end
 
   def delete_all
-    root_node = Object.const_get(session[:team_type] + "Node").find_by(node_object_id: params[:id])
-    child_nodes = root_node.get_teams.map{|e| e.node_object_id}
-    Team.destroy_all(id: child_nodes) if child_nodes
+    root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
+    child_nodes = root_node.get_teams.map(&:node_object_id)
+    Team.destroy_all if child_nodes
     redirect_to action: 'list', id: params[:id]
-  end  
+  end
 
   def delete
     # delete records in team, teams_users, signed_up_teams table
     @team = Team.find_by(id: params[:id])
     unless @team.nil?
-      course = Object.const_get(session[:team_type]).find(@team.parent_id)
       @signed_up_team = SignedUpTeam.where(team_id: @team.id)
       @teams_users = TeamsUser.where(team_id: @team.id)
 
@@ -96,40 +95,50 @@ class TeamsController < ApplicationController
       @team.destroy if @team
       undo_link("The team \"#{@team.name}\" has been successfully deleted.")
     end
-    redirect_to :back
+    redirect_back fallback_location: root_path
   end
 
   # Copies existing teams from a course down to an assignment
   # The team and team members are all copied.
   def inherit
     assignment = Assignment.find(params[:id])
-    if assignment.course_id >= 0
+    if assignment.course_id
       course = Course.find(assignment.course_id)
       teams = course.get_teams
-      unless teams.empty?
+      if teams.empty?
+        flash[:note] = 'No teams were found when trying to inherit.'
+      else
         teams.each do |team|
           team.copy(assignment.id)
         end
-      else
-        flash[:note] = "No teams were found when trying to inherit."
       end
     else
-      flash[:error] = "No course was found for this assignment."
+      flash[:error] = 'No course was found for this assignment.'
     end
     redirect_to controller: 'teams', action: 'list', id: assignment.id
   end
 
-  # Copies existing teams from an assignment up to a course
-  # The team and team members are all copied.
-  def bequeath
-    team = AssignmentTeam.find(params[:id])
-    assignment = Assignment.find(team.parent_id)
-    if assignment.course_id >= 0
+  def bequeath_all
+    if session[:team_type] == 'Course'
+      flash[:error] = 'Invalid team type for bequeathal'
+      redirect_to controller: 'teams', action: 'list', id: params[:id]
+      return
+    end
+    assignment = Assignment.find(params[:id])
+    if assignment.course_id
       course = Course.find(assignment.course_id)
-      team.copy(course.id)
-      flash[:note] = "The team \"" + team.name + "\" was successfully copied to \"" + course.name + "\""
+      if course.course_teams.any?
+        flash[:error] = 'The course already has associated teams'
+        redirect_to controller: 'teams', action: 'list', id: assignment.id
+        return
+      end
+      teams = assignment.teams
+      teams.each do |team|
+        team.copy(course.id)
+      end
+      flash[:note] = teams.length.to_s + ' teams were successfully copied to "' + course.name + '"'
     else
-      flash[:error] = "This assignment is not #{url_for(controller: 'assignment', action: 'assign', id: assignment.id)} with a course."
+      flash[:error] = 'No course was found for this assignment.'
     end
     redirect_to controller: 'teams', action: 'list', id: assignment.id
   end

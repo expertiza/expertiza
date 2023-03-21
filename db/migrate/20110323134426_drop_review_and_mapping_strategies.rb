@@ -1,9 +1,9 @@
-class DropReviewAndMappingStrategies < ActiveRecord::Migration
+class DropReviewAndMappingStrategies < ActiveRecord::Migration[4.2]
   def self.up
-    execute "ALTER TABLE `assignments` 
-             DROP FOREIGN KEY fk_assignments_mapping_strategies"  
-    execute "ALTER TABLE `assignments` 
-             DROP FOREIGN KEY fk_assignments_review_strategies"  
+    execute "ALTER TABLE `assignments`
+             DROP FOREIGN KEY fk_assignments_mapping_strategies"
+    execute "ALTER TABLE `assignments`
+             DROP FOREIGN KEY fk_assignments_review_strategies"
     remove_column :assignments, :review_strategy_id
     remove_column :assignments, :mapping_strategy_id
     drop_table :review_strategies
@@ -22,12 +22,12 @@ class DropReviewAndMappingStrategies < ActiveRecord::Migration
     add_column :assignments, :review_strategy_id, :integer
     add_column :assignments, :mapping_strategy_id, :integer
 
-    execute "ALTER TABLE `assignments` 
+    execute "ALTER TABLE `assignments`
              ADD CONSTRAINT `fk_assignments_review_strategies`
-             FOREIGN KEY (review_strategy_id) references review_strategies(id)"  
-             
-    execute "ALTER TABLE `assignments` 
+             FOREIGN KEY (review_strategy_id) references review_strategies(id)"
+
+    execute "ALTER TABLE `assignments`
              ADD CONSTRAINT `fk_assignments_mapping_strategies`
-             FOREIGN KEY (mapping_strategy_id) references mapping_strategies(id)"  
+             FOREIGN KEY (mapping_strategy_id) references mapping_strategies(id)"
   end
 end

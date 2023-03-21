@@ -22,7 +22,7 @@
 
     <% @authors.each do |rejoinder| %>
       <% next unless rejoinder %>
-      <% if @assignment.vary_by_round %>
+      <% if @assignment.vary_by_round? %>
         <% get_each_review_and_feedback_response_map(rejoinder) %> 
       <% else %>
         <% get_certain_review_and_feedback_response_map(rejoinder) %>
@@ -31,7 +31,7 @@
       <% @first_col_identifier = true %>
       
       <!-- if the assignment varies by round, prepare data for table: -->
-      <% if @assignment.vary_by_round %> 
+      <% if @assignment.vary_by_round? %> 
           <!--data prepare-->
           <% @count_round_one, @count_round_two, @count_round_three = 0, 0, 0 %>
           <% unless @feedback_response_maps_round_one.nil? %>
@@ -55,7 +55,7 @@
             <% @reviewer_name = rejoinder.user.fullname(session[:ip]) %>
             <%row_span = @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>
         <%# If no  feedback has been submitted, rowspan is seen as 0, then rowspan manually set to 1 so that it takes up its own row.%>
-          <% if row_span == 0 %>
+          <% if row_span.zero? %>
           <%# Rowspan manually set to 1 to represent an empty row. %>
             <tr><td rowspan = <% 1 %>>
               <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => rejoinder.id, :assignment_id => @id %>
@@ -76,7 +76,7 @@
           <!--# Author Feedbacks Done-->
           <% @rspan_certain_round = instance_variable_get("@rspan_round_#{round}") %>
           <% @count_certain_round = instance_variable_get("@count_round_#{round}") %>
-          <% unless @rspan_certain_round == 0 %>
+          <% unless @rspan_certain_round.zero? %>
             <td align="left" rowspan= <%= @rspan_certain_round %>>
               <%= @count_certain_round %>/<%= @rspan_certain_round %></td>
           <% end %>
@@ -135,7 +135,7 @@
           <!-- @rspan_round_one and @rspan are set in methods get_each_review_and_feedback_response_map and get_certain_review_and_feedback_response_map above -->
            <%row_span= @assignment.varying_rubrics_by_round? ? (@rspan_round_one.to_i + @rspan_round_two.to_i + @rspan_round_three.to_i) : @rspan.to_i %>
            <!-- If row_span is zero, (no reviews completed), then manually set rowspan to 1 to fix formatting -->
-           <% if row_span == 0 %>
+           <% if row_span.zero? %>
             <tr><td rowspan=  <%1%>>
               <% @reviewer_name = rejoinder.user.fullname(session[:ip]) %>
               <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => rejoinder.id, :assignment_id => @id %>
@@ -152,12 +152,12 @@
         <%end %>          
 
           <!--# author feedbacks done-->
-          <% unless @rspan == 0 %>
+          <% unless @rspan.zero? %>
             <td align="left" rowspan= <%= @rspan %>>
               <%= @count %>/<%= @rspan %>
             </td>
           <% end %>
-          <% @review_responses.each do |review_response| %>
+          <% @review_responses.includes([:response_map]).each do |review_response| %>
             <!-- Get 'FeedbackReponseMap' for each review response, 'FeedbackResponseMap' alias as 'frm' -->
             <% @frm = FeedbackResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and reviewee_id = ?", review_response.id, rejoinder.id, review_response.response_map.reviewer_id]).first %>
 
@@ -194,7 +194,7 @@
                   (<%= @reviewee_name %>)
                 </td>
                 <!--Last rejoined at-->
-                <!-- Since the reponse DNE, last rejoined at is 'No' -->
+                <!-- Since the response does not exist, last rejoined at is 'No' -->
                 <td  style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
               <% end %>
             <% end %>

@@ -33,7 +33,7 @@ module ReviewAssignment
 
     # if this assignment does not allow reviewer to review other artifacts on the same topic,
     # remove those teams from candidate list.
-    contributor_set = reject_by_same_topic(contributor_set, reviewer) unless self.can_review_same_topic?
+    contributor_set = reject_by_same_topic(contributor_set, reviewer) unless can_review_same_topic?
 
     # Add topics for all remaining submissions to a list of available topics for review
     candidate_topics = Set.new
@@ -49,11 +49,11 @@ module ReviewAssignment
     # Look for the topic_id where the team_id equals the contributor id (contributor is a team or a participant)
 
     # If this is an assignment with quiz required
-    if self.require_quiz?
+    if require_quiz?
       sign_ups = SignedUpTeam.where(team_id: team.id)
       sign_ups.each do |sign_up|
         sign_up_topic = SignUpTopic.find(sign_up.topic_id)
-        if sign_up_topic.assignment_id == self.id
+        if sign_up_topic.assignment_id == id
           contributors_sign_up_topic = sign_up_topic
           return contributors_sign_up_topic
         end
@@ -62,6 +62,7 @@ module ReviewAssignment
 
     # Look for the topic_id where the team_id equals the contributor id (contributor is a team)
     return if SignedUpTeam.where(team_id: team.id, is_waitlisted: 0).empty?
+
     topic_id = SignedUpTeam.find_by(team_id: team.id, is_waitlisted: 0).topic_id
     SignUpTopic.find(topic_id)
   end
@@ -99,7 +100,7 @@ module ReviewAssignment
   # Parameter assignment_team is the candidate assignment team, it cannot be a team w/o submission, or have reviewed by reviewer, or reviewer's own team.
   # (guaranteed by candidate_assignment_teams_to_review method)
   def assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
-    raise "There are no more submissions available for that review right now. Try again later." if assignment_team.nil?
+    raise 'There are no more submissions available for that review right now. Try again later.' if assignment_team.nil?
 
     assignment_team.assign_reviewer(reviewer)
   end
@@ -107,14 +108,18 @@ module ReviewAssignment
   private
 
   def reject_by_least_reviewed(contributor_set)
-    contributor = contributor_set.min_by {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count }
-    min_reviews = contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count rescue 0
-    contributor_set.reject! {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count > min_reviews + review_topic_threshold }
+    contributor = contributor_set.min_by { |contributor_item| contributor_item.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count }
+    min_reviews = begin
+                    contributor.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count
+                  rescue StandardError
+                    0
+                  end
+    contributor_set.reject! { |contributor_item| contributor_item.review_mappings.reject { |review_mapping| review_mapping.response.nil? }.count > min_reviews + review_topic_threshold }
     contributor_set
   end
 
   def reject_by_max_reviews_per_submission(contributor_set)
-    contributor_set.reject! {|contributor| contributor.responses.reject {|response| !response.is_submitted }.count >= max_reviews_per_submission }
+    contributor_set.reject! { |contributor| contributor.responses.select(&:is_submitted).count >= max_reviews_per_submission }
     contributor_set
   end
 
@@ -124,32 +129,32 @@ module ReviewAssignment
     if reviewer_team
       topic_id = reviewer_team.topic
       # it is also possible that this reviewer has team, but this team has no topic yet, if so, do nothing
-      contributor_set = contributor_set.reject {|contributor| contributor.topic == topic_id } if topic_id
+      contributor_set = contributor_set.reject { |contributor| contributor.topic == topic_id } if topic_id
     end
 
     contributor_set
   end
 
   def reject_previously_reviewed_submissions(contributor_set, reviewer)
-    contributor_set = contributor_set.reject {|contributor| contributor.reviewed_by?(reviewer) }
+    contributor_set = contributor_set.reject { |contributor| contributor.reviewed_by?(reviewer) }
     contributor_set
   end
 
   def reject_own_submission(contributor_set, reviewer)
-    contributor_set.reject! {|contributor| contributor.user?(User.find(reviewer.user_id)) }
+    contributor_set.reject! { |contributor| contributor.user?(User.find(reviewer.user_id)) }
     contributor_set
   end
 
   def reject_by_deadline(contributor_set)
     contributor_set.reject! do |contributor|
-      contributor.assignment.current_stage(signed_up_topic(contributor).id) == 'Complete' or
-          !contributor.assignment.can_review(signed_up_topic(contributor).id)
+      (contributor.assignment.current_stage(signed_up_topic(contributor).id) == 'Complete') ||
+        !contributor.assignment.can_review(signed_up_topic(contributor).id)
     end
     contributor_set
   end
 
   def reject_by_no_topic_selection_or_no_submission(contributor_set)
-    contributor_set.reject! {|contributor| signed_up_topic(contributor).nil? or !contributor.has_submissions? }
+    contributor_set.reject! { |contributor| signed_up_topic(contributor).nil? || !contributor.has_submissions? }
     contributor_set
   end
 
@@ -169,23 +174,23 @@ module ReviewAssignment
     # 3) remove contributors that have not submitted work yet
     contributor_set.reject! do |contributor|
       signed_up_topic(contributor) != topic || # both will be nil for assignments with no signup sheet
-          contributor.includes?(reviewer) ||
-          !contributor.has_submissions?
+        contributor.includes?(reviewer) ||
+        !contributor.has_submissions?
     end
 
     raise "There are no more submissions to review on this #{work}." if contributor_set.empty?
 
     # Reviewer can review each contributor only once
-    contributor_set.reject! {|contributor| contributor.reviewed_by?(reviewer) }
+    contributor_set.reject! { |contributor| contributor.reviewed_by?(reviewer) }
     raise "You have already reviewed all submissions for this #{work}." if contributor_set.empty?
 
     # Reduce to the contributors with the least number of reviews ("responses") received
-    min_contributor = contributor_set.min_by {|a| a.responses.count }
+    min_contributor = contributor_set.min_by { |a| a.responses.count }
     min_reviews = min_contributor.responses.count
-    contributor_set.reject! {|contributor| contributor.responses.count > min_reviews }
+    contributor_set.reject! { |contributor| contributor.responses.count > min_reviews }
 
     # Pick the contributor whose most recent reviewer was assigned longest ago
-    contributor_set.sort! {|a, b| a.review_mappings.last.id <=> b.review_mappings.last.id } if min_reviews > 0
+    contributor_set.sort! { |a, b| a.review_mappings.last.id <=> b.review_mappings.last.id } if min_reviews > 0
 
     # Choose a contributor at random (.sample) from the remaining contributors.
     # Actually, we SHOULD pick the contributor who was least recently picked.  But sample

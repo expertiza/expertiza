@@ -1,0 +1,23 @@
+ <%= form_for :send_email, url: "send_email" do |form| %>
+  <p>
+  <h1><%= label_tag "Message to Reviewers" %> <br></h1>
+  </p>
+  <p>
+  <%= label_tag "Subject: " %> <br>
+  <%= form.text_field :subject %> <br>
+  </p>
+  <p>
+   <%= label_tag "Email Content: " %> <br>
+  <%= form.text_area :email_body %> <br>
+  </p>
+  <input name="participant_id" type="hidden" value="<%= params[:id] %>" />
+  <input name="assignment_id" type="hidden" value="<%= params[:assignment_id] %>" />
+  <%= form.submit "Send Email" %>
+<% end  %>
+
+
+
+
+
+
+

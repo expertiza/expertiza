@@ -3,11 +3,12 @@ describe Participant do
   let(:user) { build(:student, id: 4, name: 'no name', fullname: 'no two') }
   let(:team_user) { build(:team_user, id: 1, user: user, team: team) }
   let(:topic) { build(:topic) }
-  let(:participant) { build(:participant, user: build(:student, name: "Jane", fullname: "Doe, Jane", id: 1)) }
-  let(:participant2) { build(:participant, user: build(:student, name: "John", fullname: "Doe, John", id: 2)) }
-  let(:participant3) { build(:participant, can_review: false, user: build(:student, name: "King", fullname: "Titan, King", id: 3)) }
+  let(:participant) { build(:participant, user: build(:student, name: 'Jane', fullname: 'Doe, Jane', id: 1)) }
+  let(:participant2) { build(:participant, user: build(:student, name: 'John', fullname: 'Doe, John', id: 2)) }
+  let(:participant3) { build(:participant, can_review: false, user: build(:student, name: 'King', fullname: 'Titan, King', id: 3)) }
   let(:participant4) { Participant.new }
   let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
+  let(:participant5) { build(:participant, user: user, assignment: assignment) }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
   let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer]) }
@@ -30,26 +31,27 @@ describe Participant do
 
   describe '#response' do
     it 'Returns the participant responses' do
-      allow(participant.response_maps).to receive(:map).and_return(response)
+      allow(participant).to receive(:response_maps).and_return(review_response_map)
+      allow(review_response_map).to receive(:map).and_return(response)
       expect(participant.responses).to eq(response)
     end
   end
 
-  describe "#name" do
-    it "returns the name of the user" do
-      expect(participant.name).to eq("Jane")
+  describe '#name' do
+    it 'returns the name of the user' do
+      expect(participant.name).to eq('Jane')
     end
   end
 
-  describe "#fullname" do
-    it "returns the full name of the user" do
-      expect(participant.fullname).to eq("Doe, Jane")
+  describe '#fullname' do
+    it 'returns the full name of the user' do
+      expect(participant.fullname).to eq('Doe, Jane')
     end
   end
 
   describe '#handle' do
     it 'returns the handle of the participant' do
-      expect(participant.handle(nil)).to eq("handle")
+      expect(participant.handle(nil)).to eq('handle')
     end
   end
 
@@ -71,7 +73,7 @@ describe Participant do
     end
     it 'raises error, delete participant with associations and force is nil' do
       allow(participant).to receive(:team).and_return(team)
-      expect { participant.delete(nil) }.to raise_error.with_message("Associations exist for this participant.")
+      expect { participant.delete(nil) }.to raise_error.with_message('Associations exist for this participant.')
     end
   end
 
@@ -83,7 +85,7 @@ describe Participant do
     end
     it 'returns the participant topic name when not nil' do
       allow(participant).to receive(:topic).and_return(topic)
-      expect(participant.topic_name).to eq("Hello world!")
+      expect(participant.topic_name).to eq('Hello world!')
     end
   end
 
@@ -98,7 +100,7 @@ describe Participant do
 
   describe '#email' do
     it 'sends an email to the participant' do
-      expect { participant.email("Missing 'pw'", "Missing 'home_page'") }.to change { ActionMailer::Base.deliveries.count }.by(2)
+      expect { participant.email("Missing 'pw'", "Missing 'home_page'") }.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
   end
 
@@ -151,4 +153,14 @@ describe Participant do
       expect(Participant.sort_by_name(unsorted)).to eq(sorted)
     end
   end
+
+  describe 'check if email is being sent or not' do
+    it 'participants assignment reviewers are sent email for a new submission' do
+      allow(AssignmentTeam).to receive(:team).and_return(team)
+      allow(TeamsUser).to receive(:find_by).and_return(team_user)
+      allow(ResponseMap).to receive(:where).and_return([review_response_map])
+      expect { participant5.mail_assigned_reviewers }.to change { ActionMailer::Base.deliveries.count }.by(1)
+    end
+  end
 end
+

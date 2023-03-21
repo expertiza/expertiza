@@ -41,18 +41,18 @@ class AssignmentsController < ApplicationController
       existing_directory = find_existing_directory
       if !existing_assignment && !existing_directory && @assignment_form.save # No existing names/directories
         @assignment_form.create_assignment_node
-        exist_assignment = Assignment.find(@assignment_form.assignment.id)
-        assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
+        new_assignment = Assignment.find(@assignment_form.assignment.id)
+        assignment_form_params[:assignment][:id] = new_assignment.id.to_s
         if assignment_form_params[:assignment][:directory_path].blank?
           assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
         end
         questionnaire_array = assignment_form_params[:assignment_questionnaire]
         due_date_array = assignment_form_params[:due_date]
         questionnaire_array.each do |cur_questionnaire|
-          cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
+          cur_questionnaire[:assignment_id] = new_assignment.id.to_s
         end
         due_date_array.each do |cur_due|
-          cur_due[:parent_id] = exist_assignment.id.to_s
+          cur_due[:parent_id] = new_assignment.id.to_s
         end
         assignment_form_params[:assignment_questionnaire] = questionnaire_array
         assignment_form_params[:due_date] = due_date_array

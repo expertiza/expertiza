@@ -3,11 +3,12 @@ class TeamsController < ApplicationController
 
   autocomplete :user, :name
 
+  # Calls method that check if the current user has TA privileges
   def action_allowed?
     current_user_has_ta_privileges?
   end
 
-  # This function is used to create teams with random names.
+  # Creates teams with random names when called by an instructor.
   # Instructors can call by clicking "Create teams" icon and then click "Create teams" at the bottom.
   def create_teams
     parent = Object.const_get(session[:team_type]).find(params[:id])
@@ -17,6 +18,7 @@ class TeamsController < ApplicationController
     redirect_to action: 'list', id: parent.id
   end
 
+  # Displays a list of teams for a given parent object (either an assignment or a course).
   def list
     allowed_types = %w[Assignment Course]
     session[:team_type] = params[:type] if params[:type] && allowed_types.include?(params[:type])
@@ -28,12 +30,12 @@ class TeamsController < ApplicationController
       flash[:error] = $ERROR_INFO
     end
   end
-
+  # Create an empty team manually
   def new
     @parent = Object.const_get(session[:team_type] ||= 'Assignment').find(params[:id])
   end
 
-  # called when a instructor tries to create an empty team manually.
+  # Called when a instructor tries to create an empty team manually
   def create
     parent = Object.const_get(session[:team_type]).find(params[:id])
     begin
@@ -47,7 +49,7 @@ class TeamsController < ApplicationController
       redirect_to action: 'new', id: parent.id
     end
   end
-
+  # Update the team
   def update
     @team = Team.find(params[:id])
     parent = Object.const_get(session[:team_type]).find(@team.parent_id)
@@ -63,18 +65,18 @@ class TeamsController < ApplicationController
       redirect_to action: 'edit', id: @team.id
     end
   end
-
+  # Edit the team
   def edit
     @team = Team.find(params[:id])
   end
-
+  # Deleting all teams associated with a given parent object
   def delete_all
     root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
     child_nodes = root_node.get_teams.map(&:node_object_id)
     Team.destroy_all if child_nodes
     redirect_to action: 'list', id: params[:id]
   end
-
+  # Deleting a specific team associated with a given parent object
   def delete
     # delete records in team, teams_users, signed_up_teams table
     @team = Team.find_by(id: params[:id])
@@ -118,6 +120,7 @@ class TeamsController < ApplicationController
     redirect_to controller: 'teams', action: 'list', id: assignment.id
   end
 
+  # This method allows teams to be passed down from a parent object down to its children
   def bequeath_all
     if session[:team_type] == 'Course'
       flash[:error] = 'Invalid team type for bequeathal'

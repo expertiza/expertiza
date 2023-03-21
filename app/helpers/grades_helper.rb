@@ -177,4 +177,57 @@ module GradesHelper
     end
     questions
   end
+  
+  def metrics_table(team)
+    metrics = Metric.where("team_id = ?", team)
+
+    unless metrics.nil?
+      data_array = {}
+      metrics.each do |metric|
+        unless metric.participant_id.nil?
+          #Lookup user if ID was stored at query time
+          user = User.find(metric.participant_id)
+        else
+          # If not, try to find user by recently-entered github ID
+          user = User.find_by_github_id(metric.github_id)
+          # If still not, try to find user by their NCSU email if it's the same as github.com
+          user = User.find_by_email(metric.github_id) if user.nil?
+        end
+
+        #Finally, if user was not found, handle by using github email in the
+        # Student Name field, or Student Fullname if found.
+        user_fullname = user.nil? ? "Github Email: " + metric.github_id : user.fullname
+        if data_array[user_fullname]
+          data_array[user_fullname][:commits] += metric.total_commits
+        else
+          data_array[user_fullname] = {}
+          data_array[user_fullname][:commits] = metric.total_commits
+        end
+      end
+      map = data_array.map {|k,v| v[:commits]}
+      max = map.max
+      min = map.min
+      mean = map.sum / map.size unless map.size.zero?
+      data_array.each do |key, element|
+        case element[:commits]
+        when min
+          element[:color] = "c1"
+        when max
+          element[:color] = "c5"
+        when mean
+          element[:color] = "c3"
+        when min..mean
+          element[:color] = "c2"
+        when mean .. max
+          element[:color] = "c4"
+        else
+          element[:color] = "c3"
+        end
+      end
+      data_array
+    else
+      nil
+    end
+  end
 end
+

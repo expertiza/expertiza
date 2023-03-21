@@ -5,7 +5,8 @@ class QuestionnaireNode < Node
   def self.table
     'questionnaires'
   end
-
+  
+  # returns the list of all questionnaire nodes based on current user type
   def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = nil)
     conditions = if show
                    if User.find(user_id).role.name != 'Teaching Assistant'
@@ -36,10 +37,12 @@ class QuestionnaireNode < Node
         %w[ASC DESC asc desc].include?(sortorder))
   end
 
+  # returns the attribute given the attribute name
   def get_attr(attr_name)
     Questionnaire.find_by(id: node_object_id).try(attr_name)
   end
 
+  # returns the name of the Questionnaire
   def get_name
     get_attr(:name)
   end
@@ -51,18 +54,22 @@ class QuestionnaireNode < Node
     get_attr(:instructor_id)
   end
 
+  # returns the status of weather the Questionnaire is private or not
   def get_private
     get_attr(:private)
   end
 
+  # returns the created date of the Questionnaire
   def get_creation_date
     get_attr(:created_at)
   end
 
+  # returns the modified date of the Questionnaire
   def get_modified_date
     get_attr(:updated_at)
   end
 
+  # returns true is the node is the leaf node
   def is_leaf
     true
   end

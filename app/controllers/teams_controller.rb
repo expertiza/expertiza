@@ -126,47 +126,59 @@ class TeamsController < ApplicationController
   # Copies existing teams from a course down to an assignment
   # The team and team members are all copied.
   def inherit
+    copy_teams(Team.team_operation[:inherit])
+  end
+
+  # Handovers all teams to the course that contains the corresponding assignment
+  # The team and team members are all copied.
+  def bequeath_all
+    if session[:team_type] == Team.allowed_types[1]
+      flash[:error] = 'Invalid team type for bequeath all'
+      redirect_to controller: 'teams', action: 'list', id: params[:id]
+    else
+      copy_teams(Team.team_operation[:bequeath])
+    end
+  end
+
+  # Method to abstract the functionality to copy teams.
+  def copy_teams(operation)
     assignment = Assignment.find(params[:id])
     if assignment.course_id
-      course = Course.find(assignment.course_id)
-      teams = course.get_teams
-      if teams.empty?
-        flash[:note] = 'No teams were found when trying to inherit.'
-      else
-        teams.each do |team|
-          team.copy(assignment.id)
-        end
-      end
+      choose_copy_type(assignment, operation)
     else
       flash[:error] = 'No course was found for this assignment.'
     end
     redirect_to controller: 'teams', action: 'list', id: assignment.id
   end
 
-  # Allows teams to be passed down from parent object down to its children
-  def bequeath_all
-
-    if session[:team_type] == 'Course'
-      flash[:error] = 'Invalid team type for bequeathal'
-      redirect_to controller: 'teams', action: 'list', id: params[:id]
-      return
-    end
-    assignment = Assignment.find(params[:id])
-    if assignment.course_id
-      course = Course.find(assignment.course_id)
-      if course.course_teams.any?
-        flash[:error] = 'The course already has associated teams'
-        redirect_to controller: 'teams', action: 'list', id: assignment.id
-        return
-      end
-      teams = assignment.teams
-      teams.each do |team|
-        team.copy(course.id)
-      end
-      flash[:note] = teams.length.to_s + ' teams were successfully copied to "' + course.name + '"'
+  def choose_copy_type(assignment, operation)
+    course = Course.find(assignment.course_id)
+    if operation == Team.team_operation[:bequeath]
+      bequeath_copy(assignment, course)
     else
-      flash[:error] = 'No course was found for this assignment.'
+      inherit_copy(assignment, course)
     end
-    redirect_to controller: 'teams', action: 'list', id: assignment.id
+  end
+
+  # Method to perform a copy of assignment teams to course
+  def bequeath_copy(assignment, course)
+    teams = assignment.teams
+    if course.course_teams.any?
+      flash[:error] = 'The course already has associated teams'
+    else
+      Team.copy_content(teams, course)
+      flash[:note] = teams.length.to_s + ' teams were successfully copied to "' + course.name + '"'
+    end
+  end
+
+  # Method to inherit teams from course by copying
+  def inherit_copy(assignment, course)
+    teams = course.course_teams
+    if teams.empty?
+      flash[:error] = 'No teams were found when trying to inherit.'
+    else
+      Team.copy_content(teams, assignment)
+      flash[:note] = teams.length.to_s + ' teams were successfully copied to "' + assignment.name + '"'
+    end
   end
 end

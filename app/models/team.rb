@@ -23,6 +23,18 @@ class Team < ApplicationRecord
   end
   alias get_participants participants
 
+  # copies content of one object to the another
+  def self.copy_content(source, destination)
+    source.each do |each_element|
+      each_element.copy(destination.id)
+    end
+  end
+
+  # enum method for team clone operations
+  def self.team_operation
+    { inherit: 'inherit', bequeath: 'bequeath' }.freeze
+  end
+
   # Get the response review map
   def responses
     participants.flat_map(&:responses)
@@ -110,20 +122,9 @@ class Team < ApplicationRecord
     users = participants.map { |p| User.find(p.user_id) }.to_a
     # find teams still need team members and users who are not in any team
     teams = Team.where(parent_id: parent.id, type: parent.class.to_s + 'Team').to_a
-    teams_num = teams.size
-    i = 0
-    teams_num.times do
-      teams_users = TeamsUser.where(team_id: teams[i].id)
-      teams_users.each do |teams_user|
-        users.delete(User.find(teams_user.user_id))
-      end
-      if Team.size(teams.first.id) >= min_team_size
-        teams.delete(teams.first)
-      else
-        i += 1
-      end
-    end
-    # sort teams by decreasing team size
+    teams.each { |team| TeamsUser.where(team_id: team.id).each { |teams_user| users.delete(User.find(teams_user.user_id)) } }
+    teams.reject! { |team| Team.size(team.id) >= min_team_size }
+    # sort teams that still need members by decreasing team size
     teams.sort_by { |team| Team.size(team.id) }.reverse!
     # insert users who are not in any team to teams still need team members
     assign_single_users_to_teams(min_team_size, parent, teams, users) if !users.empty? && !teams.empty?

@@ -4,8 +4,12 @@ class BookmarksController < ApplicationController
   helper_method :specific_average_score
   helper_method :total_average_score
   before_action :fetch_topic, only: %i[list new]
-  before_action :fetch_bookmark, only: %i[edit update destroy]
-  before_action :fetch_bookmark, only: %i[bookmark_rating save_bookmark_rating_score]
+  before_action :fetch_bookmark, only: %i[update destroy bookmark_rating]
+  before_action :fetch_bookmark, only: %i[edit save_bookmark_rating_score]
+
+  # This function checks if the logged in user is a student or not.
+  # If it is a student, does not allow the new, create bookmarks functionalities.
+  # All users can view the bookmarks.
 
   def action_allowed?
     case params[:action]
@@ -20,26 +24,33 @@ class BookmarksController < ApplicationController
     @current_role_name = current_role_name
   end
 
+  # This function fetches a SignUpTopic based on the provided ID.
   def fetch_topic
     @topic = SignUpTopic.find(params[:id])
   end
 
+  # This function fetches a Bookmark based on the provided ID.
   def fetch_bookmark
     @bookmark = Bookmark.find(params[:id])
   end
 
+  # This function removes the protocol from the url if present
   def remove_url_protocol(url)
     url.gsub(%r{\Ahttps?://}, '')
   end
 
+  # This function retrieves a list of bookmarks for the given topic ID.
   def list
     @bookmarks = Bookmark.where(topic_id: params[:id])
   end
 
+  # This function initializes a new Bookmark object.
+  # which can be used to build a new bookmark form
   def new
     @bookmark = Bookmark.new
   end
 
+  # This function creates a new bookmark.
   def create
     params[:url] = remove_url_protocol(params[:url])
     begin
@@ -55,6 +66,7 @@ class BookmarksController < ApplicationController
 
   def edit; end
 
+  # This function updates the attributes of an existing bookmark
   def update
     @bookmark.update_attributes(url: update_bookmark_params[:bookmark][:url], title: update_bookmark_params[:bookmark][:title], description: update_bookmark_params[:bookmark][:description])
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Your bookmark has been successfully updated!', request)
@@ -62,6 +74,7 @@ class BookmarksController < ApplicationController
     redirect_to action: 'list', id: @bookmark.topic_id
   end
 
+  # This function deletes an existing bookmark record from the database.
   def destroy
     @bookmark.destroy
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Your bookmark has been successfully deleted!', request)
@@ -71,6 +84,7 @@ class BookmarksController < ApplicationController
 
   def bookmark_rating; end
 
+  # This function saves the rating score of a bookmark for the current user.
   def save_bookmark_rating_score
     @bookmark_rating = BookmarkRating.where(bookmark_id: @bookmark.id, user_id: session[:user].id).first
     if @bookmark_rating.blank?

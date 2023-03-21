@@ -241,12 +241,20 @@ describe GradesController do
     it 'saves grade and comment for submission and refreshes the grades#view_team page' do
       allow(AssignmentParticipant).to receive(:find_by).with(id: '1').and_return(participant)
       allow(participant).to receive(:team).and_return(build(:assignment_team, id: 2, parent_id: 8))
+      session_params = {user: instructor}
+      team = participant.team
+      allow(GradingHistory).to receive(:create).with(instructor_id: session_params[:user].id,
+                                                     assignment_id: 1,
+                                                     grading_type: "Submission",
+                                                     grade_receiver_id: 2,
+                                                     grade: 100,
+                                                     comment: 'comment')
       request_params = {
         participant_id: 1,
         grade_for_submission: 100,
         comment_for_submission: 'comment'
       }
-      post :save_grade_and_comment_for_submission, params: request_params
+      post :save_grade_and_comment_for_submission, params: request_params, session: session_params
       expect(flash[:error]).to be nil
       expect(response).to redirect_to('/grades/view_team?id=1')
     end

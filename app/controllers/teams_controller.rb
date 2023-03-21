@@ -151,6 +151,7 @@ class TeamsController < ApplicationController
     redirect_to controller: 'teams', action: 'list', id: assignment.id
   end
 
+  # Abstraction over different methods
   def choose_copy_type(assignment, operation)
     course = Course.find(assignment.course_id)
     if operation == Team.team_operation[:bequeath]

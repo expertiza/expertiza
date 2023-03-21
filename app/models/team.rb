@@ -132,6 +132,8 @@ class Team < ApplicationRecord
     create_team_from_single_users(min_team_size, parent, team_type, users) unless users.empty?
   end
 
+  # Creates teams from a list of users based on minimum team size
+  # Then assigns the created team to the parent object
   def self.create_team_from_single_users(min_team_size, parent, team_type, users)
     num_of_teams = users.length.fdiv(min_team_size).ceil
     next_team_member_index = 0
@@ -148,6 +150,7 @@ class Team < ApplicationRecord
     end
   end
 
+  # Assigns list of users to list of teams based on minimum team size
   def self.assign_single_users_to_teams(min_team_size, parent, teams, users)
     teams.each do |team|
       curr_team_size = Team.size(team.id)

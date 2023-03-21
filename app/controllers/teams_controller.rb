@@ -18,7 +18,7 @@ class TeamsController < ApplicationController
     redirect_to action: 'list', id: parent.id
   end
 
-  # Displays a list of teams for a given parent object (either an assignment or a course).
+  # Displays list of teams for a parent object(either assignment/course)
   def list
     allowed_types = %w[Assignment Course]
     session[:team_type] = params[:type] if params[:type] && allowed_types.include?(params[:type])
@@ -30,6 +30,7 @@ class TeamsController < ApplicationController
       flash[:error] = $ERROR_INFO
     end
   end
+
   # Create an empty team manually
   def new
     @parent = Object.const_get(session[:team_type] ||= 'Assignment').find(params[:id])
@@ -49,6 +50,7 @@ class TeamsController < ApplicationController
       redirect_to action: 'new', id: parent.id
     end
   end
+
   # Update the team
   def update
     @team = Team.find(params[:id])
@@ -65,10 +67,12 @@ class TeamsController < ApplicationController
       redirect_to action: 'edit', id: @team.id
     end
   end
+
   # Edit the team
   def edit
     @team = Team.find(params[:id])
   end
+
   # Deleting all teams associated with a given parent object
   def delete_all
     root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
@@ -76,6 +80,7 @@ class TeamsController < ApplicationController
     Team.destroy_all if child_nodes
     redirect_to action: 'list', id: params[:id]
   end
+
   # Deleting a specific team associated with a given parent object
   def delete
     # delete records in team, teams_users, signed_up_teams table
@@ -120,8 +125,9 @@ class TeamsController < ApplicationController
     redirect_to controller: 'teams', action: 'list', id: assignment.id
   end
 
-  # This method allows teams to be passed down from a parent object down to its children
+  # Allows teams to be passed down from parent object down to its children
   def bequeath_all
+
     if session[:team_type] == 'Course'
       flash[:error] = 'Invalid team type for bequeathal'
       redirect_to controller: 'teams', action: 'list', id: params[:id]

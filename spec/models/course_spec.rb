@@ -87,7 +87,8 @@ describe CourseTeam do
         allow(participant2).to receive(:user_id).and_return(2)
         allow(course).to receive(:add_participant).with('abc').and_raise('The user abc is already a participant.', StandardError)
         allow(course).to receive(:add_participant).with('bcd').and_raise('The user bcd is already a participant.', StandardError)
-        expect { course.copy_assignment_participants(1) }.to raise_error(TypeError)
+        expect { course.copy_assignment_participants(1) }
+          .to raise_error(TypeError)
       end
     end
     context 'when there are no errors' do

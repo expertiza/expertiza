@@ -26,6 +26,7 @@ class Course < ApplicationRecord
     Rails.root + '/pg_data/' + FileHelper.clean_path(User.find(instructor_id).name) + '/' + FileHelper.clean_path(directory_path) + '/'
   end
 
+  # Returns Course Participants
   def get_participants
     CourseParticipant.where(parent_id: id)
   end
@@ -44,25 +45,28 @@ class Course < ApplicationRecord
     end
   end
 
+  # Copies the Assignment Participants to Course Participants
   def copy_assignment_participants(assignment_id)
     participants = AssignmentParticipant.where(parent_id: assignment_id)
     errors = []
-    error_msg = ''
     participants.each do |participant|
       user = User.find(participant.user_id)
-
       begin
         add_participant(user.name)
       rescue StandardError
         errors << $ERROR_INFO
       end
     end
-    unless errors.empty?
-      errors.each do |error|
-        error_msg = error_msg + '<BR/>' + error if error
-      end
-      raise error_msg
+    raise_errors(errors) unless errors.empty?
+  end
+
+  # Raise error messages
+  def raise_errors(errors)
+    error_msg = ''
+    errors.each do |error|
+      error_msg = error_msg + '<BR/>' + error if error
     end
+    raise error_msg
   end
 
   def user_on_team?(user)

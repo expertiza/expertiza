@@ -3,7 +3,7 @@ class TeamsController < ApplicationController
 
   autocomplete :user, :name
 
-  # Calls method that check if the current user has TA privileges
+  # Check if the current user has TA privileges
   def action_allowed?
     current_user_has_ta_privileges?
   end

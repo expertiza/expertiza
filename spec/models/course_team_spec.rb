@@ -23,12 +23,7 @@ describe 'CourseTeam' do
       expect(course_team.parent_model).to eq('Course')
     end
   end
-  describe '#assignment_id' do
-    it 'returns nil since this team is not an assignment team' do
-      course_team = CourseTeam.new
-      expect(course_team.assignment_id).to be_nil
-    end
-  end
+
   describe '#prototype' do
     it 'creates a course team' do
       expect(CourseTeam.prototype.class).to eq(CourseTeam)

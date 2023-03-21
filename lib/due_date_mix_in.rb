@@ -18,7 +18,7 @@ module DueDateMixIn
   end
 
   # Determine if the next due date from now allows for submissions
-  def submission_allowed(assignment_id, participant_id)
+  def submission_allowed(participant_id = nil)
     # check_condition('submission_allowed_id', topic_id)
     # @topic_id = SignedUpTeam.topic_id(@assignemnt.id,@participant.user_id)
     topic_id = SignedUpTeam.topic_id(id, participant_id)
@@ -32,13 +32,29 @@ module DueDateMixIn
     right && (right.name != 'No')
   end
   # Determine if the next due date from now allows for reviews
-  def can_review(topic_id = nil)
-    check_condition('review_allowed_id', topic_id)
+  def can_review(participant_id = nil)
+    topic_id = SignedUpTeam.topic_id(id, participant_id)
+    next_due_date = DueDate.get_next_due_date(id, topic_id)
+    return false if next_due_date.nil?
+
+    right_id = next_due_date.submission_allowed_id
+    right = DeadlineRight.find(right_id)
+    # check is assignment action deadline is ok or late (i.e. not no)
+    right && (right.name != 'No')
   end
 
   # Determine if the next due date from now allows for metareviews
-  def metareview_allowed(topic_id = nil)
-    check_condition('review_of_review_allowed_id', topic_id)
+  def metareview_allowed(participant_id = nil)
+    if participant_id.nil? topic_id = nil
+    else topic_id = SignedUpTeam.topic_id(id, participant_id)
+    end
+    next_due_date = DueDate.get_next_due_date(id, topic_id)
+    return false if next_due_date.nil?
+
+    right_id = next_due_date.review_of_review_allowed_id # meta-review id
+    right = DeadlineRight.find(right_id)
+    # check is assignment action deadline is ok or late (i.e. not no)
+    right && (right.name != 'No')
   end
   # if current  stage is submission or review, find the round number
   # otherwise, return 0

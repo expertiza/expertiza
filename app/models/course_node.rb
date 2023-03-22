@@ -66,7 +66,8 @@ class CourseNode < Node
     values
   end
 
-  # get parent id
+  # Returns id of the parent node for the node object
+  # Null id indicates top of the tree
   def self.get_parent_id
     folder = TreeFolder.find_by(name: 'Courses')
     parent = FolderNode.find_by(node_object_id: folder.id)
@@ -80,28 +81,24 @@ class CourseNode < Node
   end
 
   # Gets the name of the course 
-  # Expects no arguements
   # Return varchar datatype
   def get_name
     Course.find_by(id: node_object_id).try(:name)
   end
 
   # Gets the directory of the course
-  # Expects no arguements
   # Return varchar datatype
   def get_directory
     Course.find_by(id: node_object_id).try(:directory_path)
   end
 
   # Gets the creation date of the course
-  # Expects no arguements
   # Return datetime datatype
   def get_creation_date
     Course.find_by(id: node_object_id).try(:created_at)
   end
 
   # Gets the modified date of the course
-  # Expects no arguements
   # Return datetime datatype
   def get_modified_date
     Course.find_by(id: node_object_id).try(:updated_at)
@@ -113,27 +110,23 @@ class CourseNode < Node
   end
 
   # Gets the id of the instructor for the course
-  # Expects no arguements
   # Return int datatype
   def get_instructor_id
     Course.find_by(id: node_object_id).try(:instructor_id)
   end
 
   # Gets the id of the retrieved institution
-  # Expects no arguements
   # Return int datatype
   def retrieve_institution_id
     Course.find_by(id: node_object_id).try(:institutions_id)
   end
 
   # Gets the teams for the course
-  # Expects no arguements
   def get_teams
     TeamNode.get(node_object_id)
   end
 
   # Gets the id of survey distribution of the course
-  # Expects no arguements
   # Return int datatype
   def get_course_survey_distribution_id
     Course.find_by(id: node_object_id).try(:survey_distribution_id)

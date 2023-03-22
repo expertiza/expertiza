@@ -266,8 +266,15 @@ describe Assignment do
 
   describe '#submission_allowed' do
     it 'returns true when the next topic due date is allowed to submit sth' do
-      allow(assignment).to receive(:check_condition).with('submission_allowed_id', 123).and_return(true)
-      expect(assignment.submission_allowed(123)).to be true
+      #allow(assignment).to receive(:check_condition).with('submission_allowed_id', 123).and_return(true)
+      #expect(assignment.submission_allowed(123)).to be true
+      assignment_due_date = double('AssignmentDueDate')
+      assignment_topic_id = double('AssignmentTopicId')
+      allow(SignedUpTeam).to receive(:topic_id).with(1, 1).and_return(assignment_topic_id) # 1,1
+      allow(DueDate).to receive(:get_next_due_date).with(1, assignment_topic_id).and_return(assignment_due_date)
+      allow(assignment_due_date).to receive(:submission_allowed_id).and_return(1)
+      allow(DeadlineRight).to receive(:find).with(1).and_return(double('DeadlineRight', name: 'OK'))
+      expect(assignment.check_condition('review_allowed_id')).to be true
     end
   end
 

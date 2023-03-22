@@ -187,11 +187,6 @@ class Assignment < ApplicationRecord
     path_text
   end
 
-  # Determine if the next due date from now allows to take the quizzes
-  def quiz_allowed(topic_id = nil)
-    check_condition('quiz_allowed_id', topic_id)
-  end
-
   # Deletes all instances created as part of assignment and finally destroys itself.
   def delete(force = nil)
     begin

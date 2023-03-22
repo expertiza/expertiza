@@ -12,25 +12,32 @@ class QuestionnaireNode < Node
     is_ta = user.role.name == 'Teaching Assistant'
 
     if show
-      conditions = is_ta ?
-        'questionnaires.instructor_id in (?)' :
-        'questionnaires.instructor_id = ?'
+      if is_ta
+        conditions = 'questionnaires.instructor_id in (?)'
+        values = Ta.get_mapped_instructor_ids(user_id)
+      else
+        conditions = 'questionnaires.instructor_id = ?'
+        values = user_id
+      end
     else
-      conditions = is_ta ?
-        '(questionnaires.private = 0 or questionnaires.instructor_id in (?))' :
-        '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
-
+      if is_ta
+        conditions = '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
+        values = Ta.get_mapped_instructor_ids(user_id)
+      else
+        conditions = '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
+        values = user_id
+      end
     end
-
-    values = is_ta ? Ta.get_mapped_instructor_ids(user_id) : user_id
 
     if parent_id
       name = TreeFolder.find(parent_id).name + 'Questionnaire'
       name.gsub!(/[^\w]/, '')
       conditions += " and questionnaires.type = \"#{name}\""
     end
+
     sortvar = 'name' if sortvar.nil? || (sortvar == 'directory_path')
     sortorder = 'ASC' if sortorder.nil?
+
     (includes(:questionnaire).where([conditions, values]).order("questionnaires.#{sortvar} #{sortorder}") if Questionnaire.column_names.include?(sortvar) &&
         %w[ASC DESC asc desc].include?(sortorder))
   end
@@ -51,7 +58,7 @@ class QuestionnaireNode < Node
   def get_instructor_id
     get_attr(:instructor_id)
   end
-
+  
   # returns the status of weather the Questionnaire is private or not
   def get_private
     get_attr(:private)

@@ -10,6 +10,7 @@ class CourseTeam < Team
     'Course'
   end
 
+  # Get the course
   def self.parent_model(id)
     Course.find(id)
   end
@@ -27,7 +28,7 @@ class CourseTeam < Team
     copy_members(new_team)
   end
 
-  # deprecated: the functionality belongs to course
+  # Adds a participant to the CourseTeam
   def add_participant(course_id, user)
     if CourseParticipant.find_by(parent_id: course_id, user_id: user.id).nil?
       CourseParticipant.create(parent_id: course_id, user_id: user.id, permission_granted: user.master_permission_granted)

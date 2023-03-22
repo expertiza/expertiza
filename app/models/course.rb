@@ -31,6 +31,7 @@ class Course < ApplicationRecord
     CourseParticipant.where(parent_id: id)
   end
 
+  # Adds participant to the course
   def add_participant(user_name)
     user = User.find_by(name: user_name)
     if user.nil?
@@ -69,6 +70,7 @@ class Course < ApplicationRecord
     raise error_msg
   end
 
+  # Check if user is a member of any CourseTeam
   def user_on_team?(user)
     teams = get_teams
     users = []

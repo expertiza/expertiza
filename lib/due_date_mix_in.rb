@@ -2,16 +2,21 @@
 
 # lib/due_date_mix_in.rb
 module DueDateMixIn
+  # finds the topic_id given the participant user_id
+  def find_topic_id(participant_id)
+    topic_id = if participant_id.nil?
+                 nil
+               else
+                 SignedUpTeam.topic_id(id, participant_id)
+               end
+  end
+
   # Determine if the next due date from now allows for submissions
   def submission_allowed(participant_id = nil)
     # Find topic id for given participant for selected assignment
     # Return nil if no participant is given
-    topic_id = if participant_id.nil?
-                 yield nil
-               else
-                 SignedUpTeam.topic_id(id, participant_id)
-               end
-    # only need to pass @particpiant to search, can this be done locally
+    topic_id = find_topic_id(participant_id)
+    # only need to pass @participiant to search, can this be done locally
     next_due_date = DueDate.get_next_due_date(id, topic_id)
     return false if next_due_date.nil?
 
@@ -23,13 +28,9 @@ module DueDateMixIn
   end
 
   # Determine if the next due date from now allows for reviews
-  # Shoule be renamed to review_allowed from can_review
+  # Should be renamed to review_allowed from can_review
   def can_review(participant_id = nil)
-    topic_id = if participant_id.nil?
-                 yield nil
-               else
-                 SignedUpTeam.topic_id(id, participant_id)
-               end
+    topic_id = find_topic_id(participant_id)
     next_due_date = DueDate.get_next_due_date(id, topic_id)
     return false if next_due_date.nil?
 
@@ -42,11 +43,7 @@ module DueDateMixIn
 
   # Determine if the next due date from now allows for metareviews
   def metareview_allowed(participant_id = nil)
-    topic_id = if participant_id.nil?
-                 yield nil
-               else
-                 SignedUpTeam.topic_id(id, participant_id)
-               end
+    topic_id = find_topic_id(participant_id)
     next_due_date = DueDate.get_next_due_date(id, topic_id)
     return false if next_due_date.nil?
 

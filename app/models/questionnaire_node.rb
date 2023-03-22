@@ -20,13 +20,18 @@ class QuestionnaireNode < Node
         values = user_id
       end
     else
+      conditions = '(questionnaires.private = 0'
+      values = []
+
       if is_ta
-        conditions = '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
+        conditions += ' or questionnaires.instructor_id in (?)'
         values = Ta.get_mapped_instructor_ids(user_id)
       else
-        conditions = '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
-        values = user_id
+        conditions += ' or questionnaires.instructor_id = ?'
+        values = [user_id]
       end
+
+      conditions += ')'
     end
 
     if parent_id

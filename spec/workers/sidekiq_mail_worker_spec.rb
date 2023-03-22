@@ -7,7 +7,7 @@ describe MailWorker do
   let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
   let(:participant) { build(:participant, id: 1, parent_id: 1, user: user) }
   let(:team) { build(:assignment_team, id: 1, name: 'no team', users: [user], parent_id: 1) }
-  let(:user) { build(:student, id: 1, email: 'psingh22@ncsu.edu') }
+  let(:user) { build(:student, id: 1, email: 'tkini@ncsu.edu') }
   let(:review_response_map) { build(:review_response_map, id: 1, reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1) }
   #let(:assignments) { create(:assignment) }
   let(:deadline_type) { 'review' }
@@ -17,7 +17,7 @@ describe MailWorker do
   before(:each) do
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
     allow(Participant).to receive(:where).with(parent_id: 1).and_return([participant])
-    allow(User).to receive(:where).with(email: "psingh22@ncsu.edu").and_return([user])
+    allow(User).to receive(:where).with(email: "tkini@ncsu.edu").and_return([user])
     allow(Participant).to receive(:where).with(user_id: 1, parent_id: 1).and_return([participant])
     allow(ResponseMap).to receive(:where).with(reviewed_object_id: 1).and_return([review_response_map])
     allow(ResponseMap).to receive(:where).with(id: 1).and_return([review_response_map])
@@ -66,6 +66,20 @@ describe MailWorker do
     end
   end
   
+  describe '#find_participant_emails' do
+    let(:worker) { described_class.new}
+    assignments = Assignment.create(id:1, name:'Assignment 1')
+
+    before do
+      worker.assignment = assignments
+    end
+
+
+    it 'returns the emails of the users on the assignment' do
+      expect(worker.send(:find_participant_emails)).to eq(['tkini@ncsu.edu'])
+    end
+  end
+
   describe 'Tests mailer with sidekiq' do 
     it "1. should have sent welcome email after user was created" do
       Sidekiq::Testing.inline!  # executes the jobs immediately when they are placed in the queue

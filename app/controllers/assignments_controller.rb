@@ -34,7 +34,6 @@ class AssignmentsController < ApplicationController
   # creates a new assignment via the assignment form
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
-    return render 'new' unless request.post?
 
     if params[:button]
       # E2138 issue #3
@@ -43,13 +42,15 @@ class AssignmentsController < ApplicationController
 
       # if assignment or directory already exists, flash appropriate error. (Early Return)
       if existing_assignment || existing_directory
-        flash[:error] << '<br>  ' + @assignment_form.assignment.name + 
-        ' already exists as an assignment name' if existing_assignment
-        flash[:error] << '<br>  ' + assignment_form_params[:assignment][:directory_path] + 
-        ' already exists as a submission directory name' if existing_directory
-        return redirect_to '/assignments/new?private=1'
-      end    
-      else  
+        flash[:error] = 'Failed to create assignment.'
+        if existing_assignment
+          flash[:error] << '<br>  ' + @assignment_form.assignment.name + ' already exists as an assignment name'
+        end
+        if existing_directory
+          flash[:error] << '<br>  ' + assignment_form_params[:assignment][:directory_path] + ' already exists as a submission directory name'
+        end
+        return redirect_to '/assignments/new?private=1'    
+      elsif @assignment_form.save
         @assignment_form.create_assignment_node
         new_assignment = Assignment.find(@assignment_form.assignment.id)
         assignment_form_params[:assignment][:id] = new_assignment.id.to_s
@@ -72,6 +73,9 @@ class AssignmentsController < ApplicationController
         redirect_to edit_assignment_path aid
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
         return
+      else
+        flash[:error] = 'Failed to create new assignment.'
+        return redirect_to '/assignments/new?private=1'
       end
     else
       render 'new'

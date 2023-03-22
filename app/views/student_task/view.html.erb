@@ -105,7 +105,7 @@ to display the label "Your team" in the student assignment tasks-->
   <%if @assignment.require_quiz%>
     <% if @authorization == 'participant' or @can_take_quiz == true %>
       <li>
-        <% if @assignment.require_quiz and (@assignment.quiz_allowed(@topic_id) or @assignment.current_stage(@topic_id) == "Finished") %>
+        <% if @assignment.require_quiz and (@assignment.quiz_allowed(@participant.user_id) or @assignment.current_stage(@topic_id) == "Finished") %>
           <%= link_to t(".take_quizzes"), student_quizzes_path(:id => @participant.id) %>
         <% else %>
           <font color="gray"><%=t ".take_quizzes" %></font>

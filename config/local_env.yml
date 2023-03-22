@@ -1,0 +1,14 @@
+# E2300 Github Metrics -- Used to list Expertiza Organization Members whose commits should not be credited to student projects.
+# Add account Expertiza developing team's github account into this file
+# For example, setting:
+# COLLABORATORS: 'Expertiza Developer'
+# extend this list with comma separated github ids
+# the list is available as ENV["COLLABORATORS"]
+development:
+  COLLABORATORS: 'smodem@ncsu.edu, skaalam@ncsu.edu, sbapat2@gmail.com'
+
+test:
+  COLLABORATORS: 'smodem@ncsu.edu,skaalam@ncsu.edu,sbapat2@gmail.com'
+
+production:
+  COLLABORATORS: 'smodem@ncsu.edu,skaalam@ncsu.edu,sbapat2@gmail.com'

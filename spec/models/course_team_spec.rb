@@ -21,7 +21,7 @@ describe 'CourseTeam' do
     it 'returns parent_model' do
       course_team = CourseTeam.new
       expect(course_team.parent_model).to eq('Course')
-    end
+     end
   end
 
   describe '#prototype' do

@@ -134,7 +134,7 @@ class TeamsController < ApplicationController
       end
       teams = assignment.teams
       teams.each do |team|
-        team.copy(course.id)
+        team.copy_to_course_team(course.id)
       end
       flash[:note] = teams.length.to_s + ' teams were successfully copied to "' + course.name + '"'
     else

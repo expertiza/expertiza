@@ -124,7 +124,6 @@ class AuthController < ApplicationController
 
   def google_login
     g_email = env['omniauth.auth'].info.email
-    end
   end
 
   # clears any identifying info from session

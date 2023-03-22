@@ -5,25 +5,25 @@ class QuestionnaireNode < Node
   def self.table
     'questionnaires'
   end
-  
+
   # returns the list of all questionnaire nodes based on current user type
   def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = nil)
     user = User.find(user_id)
     is_ta = user.role.name == 'Teaching Assistant'
 
     if show
-      conditions = is_ta ? 'questionnaires.instructor_id in (?)' : 'questionnaires.instructor_id = ?'
+      conditions = is_ta ?
+        'questionnaires.instructor_id in (?)' :
+        'questionnaires.instructor_id = ?'
     else
-      conditions = is_ta ? '(questionnaires.private = 0 or questionnaires.instructor_id in (?))' : '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
+      conditions = is_ta ?
+        '(questionnaires.private = 0 or questionnaires.instructor_id in (?))' :
+        '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
+
     end
 
-    
-    if is_ta 
-      values = Ta.get_mapped_instructor_ids(user_id)
-    else
-      values = user_id
-    end
-    
+    values = is_ta ? Ta.get_mapped_instructor_ids(user_id) : user_id
+
     if parent_id
       name = TreeFolder.find(parent_id).name + 'Questionnaire'
       name.gsub!(/[^\w]/, '')

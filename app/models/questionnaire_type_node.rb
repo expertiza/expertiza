@@ -7,7 +7,7 @@ class QuestionnaireTypeNode < FolderNode
   end
 
   # this function returns the list of nodes corresponding to each folder
-  # from the list of folders passed as parameter 
+  # from the list of folders passed as parameter
   def self.return_nodes_list(folders)
     nodes = []
     folders.each do |folder|
@@ -17,7 +17,7 @@ class QuestionnaireTypeNode < FolderNode
     nodes
   end
 
-  # this function returns the child nodes of the all the folders given its parent node name
+  # This function returns the child nodes of all the folders given its parent node name.
   def self.get(_sortvar = nil, _sortorder = nil, _user_id = nil, _show = nil, _parent_id = nil, _search = nil)
     parent = TreeFolder.find_by(name: 'Questionnaires')
     folders = TreeFolder.where(parent_id: parent.id)

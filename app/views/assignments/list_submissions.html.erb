@@ -69,7 +69,7 @@
         <td><p style = <%="color:#{team_name_color}"%>><%= team.name(session[:ip]) %></p>
           <% unless participants.empty? %>
             <!-- “Assign Grade” will show if the final deadline of this assignment pass -->
-            <% if @assignment.get_current_stage() == "Finished" %>
+            <% if @assignment.current_stage == "Finished" %>
               <%= link_to 'Assign grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %>
               <!-- if current user(TA/instructor) is participant in assignment then the user can perform review -->
             <%elsif current_user_is_assignment_participant?(@assignment.id) %>

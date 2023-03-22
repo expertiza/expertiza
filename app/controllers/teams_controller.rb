@@ -103,6 +103,12 @@ class TeamsController < ApplicationController
   def delete
     # delete records in team, teams_users, signed_up_teams table
     @team = Team.find_by(id: params[:id])
+    delete_team
+    redirect_back fallback_location: root_path
+  end
+
+  #Function to delete team,
+  def delete_team
     unless @team.nil?
       @signed_up_team = SignedUpTeam.where(team_id: @team.id)
       @teams_users = TeamsUser.where(team_id: @team.id)
@@ -120,7 +126,6 @@ class TeamsController < ApplicationController
       @team.destroy if @team
       undo_link("The team \"#{@team.name}\" has been successfully deleted.")
     end
-    redirect_back fallback_location: root_path
   end
 
   # Copies existing teams from a course down to an assignment

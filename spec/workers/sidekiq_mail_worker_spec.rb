@@ -9,6 +9,10 @@ describe MailWorker do
   let(:team) { build(:assignment_team, id: 1, name: 'no team', users: [user], parent_id: 1) }
   let(:user) { build(:student, id: 1, email: 'psingh22@ncsu.edu') }
   let(:review_response_map) { build(:review_response_map, id: 1, reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1) }
+  #let(:assignments) { create(:assignment) }
+  let(:deadline_type) { 'review' }
+  let(:due_at) { Time.now }
+  #let(:assignments) { build :assignment }
 
   before(:each) do
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
@@ -26,6 +30,42 @@ describe MailWorker do
     queue.clear
   end
 
+  describe '#perform' do
+    context 'when deadline type is not drop_outstanding_reviews' do
+      let(:worker) { described_class.new }
+      let(:participant_emails) { ['tkini@ncsu.com', 'user2@example.com'] }
+
+      before do
+        allow(worker).to receive(:assignment).and_return(assignment)
+        allow(worker).to receive(:deadline_type).and_return(deadline_type)
+        allow(worker).to receive(:due_at).and_return(due_at)
+        allow(worker).to receive(:find_participant_emails).and_return(participant_emails)
+        allow(worker).to receive(:email_reminder).and_return(nil)
+      end
+
+      it 'finds participant emails and sends email reminder' do
+        expect(worker).to receive(:find_participant_emails)
+        expect(worker).to receive(:email_reminder).with(participant_emails, deadline_type)
+        worker.perform(assignment.id, deadline_type, due_at)
+      end
+    end
+
+    context 'when deadline type is drop_outstanding_reviews' do
+      let(:worker) { described_class.new }
+
+      before do
+        allow(worker).to receive(:deadline_type).and_return('drop_outstanding_reviews')
+        allow(worker).to receive(:email_reminder).and_return(nil)
+      end
+
+      it 'does not find participant emails or send email reminder' do
+        expect(worker).not_to receive(:find_participant_emails)
+        expect(worker).not_to receive(:email_reminder)
+        worker.perform(assignment.id, 'drop_outstanding_reviews', due_at)
+      end
+    end
+  end
+  
   describe 'Tests mailer with sidekiq' do 
     it "1. should have sent welcome email after user was created" do
       Sidekiq::Testing.inline!  # executes the jobs immediately when they are placed in the queue

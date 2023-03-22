@@ -5,6 +5,7 @@ class TeamNode < Node
     'teams'
   end
 
+  # Returns a list of team nodes based on the query
   def self.get(parent_id)
     nodes = Node.joins('INNER JOIN teams ON nodes.node_object_id = teams.id')
                 .select('nodes.*')

@@ -46,6 +46,8 @@ class QuestionnaireNode < Node
   end
 
   
+  # Gets the name of the questionnaire 
+  # Returns varchar datatype
   def get_name
     Questionnaire.find_by(id: node_object_id).try(:name)
   end

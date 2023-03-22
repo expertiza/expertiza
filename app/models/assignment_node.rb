@@ -111,7 +111,9 @@ class AssignmentNode < Node
     Assignment.find_by(id: node_object_id).try(:institution_id)
   end
 
-  # Gets only private ?
+  # Returns if the assignment is private or not.
+  # Return tinyint datatype
+  # 1 for true, 0 for false
   def get_private
     Assignment.find_by(id: node_object_id).try(:private)
   end

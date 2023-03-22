@@ -6,6 +6,7 @@ class QuestionnaireTypeNode < FolderNode
     'tree_folders'
   end
 
+  # Returns a list of Questionnaire type nodes based on the query
   def self.get(_sortvar = nil, _sortorder = nil, _user_id = nil, _show = nil, _parent_id = nil, _search = nil)
     parent = TreeFolder.find_by(name: 'Questionnaires')
     folders = TreeFolder.where(parent_id: parent.id)
@@ -16,15 +17,23 @@ class QuestionnaireTypeNode < FolderNode
     end
     nodes
   end
-
+  
+  # Returns the partial name as string for questionnaire type of node
   def get_partial_name
     'questionnaire_type_actions'
   end
 
+  # Gets the name of the Questionnare type node in the Tree folder
   def get_name
     TreeFolder.find(node_object_id).name
   end
 
+  # Gets the children of the questionnaire node depending on the arguements passed
+  # parameters:
+  #   sortvar: valid strings - name, created_at, updated_at
+  #   sortorder: valid strings - asc, desc
+  #   user_id: instructor id for Questionnaire
+  #   parent_id: not used for this type of object
   def get_children(sortvar = nil, sortorder = nil, user_id = nil, show = nil, _parent_id = nil, search = nil)
     QuestionnaireNode.get(sortvar, sortorder, user_id, show, node_object_id, search)
   end

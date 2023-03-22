@@ -48,6 +48,8 @@ class CourseNode < Node
                      "((courses.private = 0 and courses.instructor_id != #{user_id}) or courses.instructor_id = #{user_id})"
                    end
                  end
+    puts "Conditions for courses"
+    puts conditions
     conditions
   end
 
@@ -59,10 +61,13 @@ class CourseNode < Node
              else
                Ta.get_mapped_courses(user_id)
              end
+    puts "Value for courses"
+    puts values
     values
   end
 
-  # get parent id
+  # Returns id of the parent node for the node object
+  # Null id indicates top of the tree
   def self.get_parent_id
     folder = TreeFolder.find_by(name: 'Courses')
     parent = FolderNode.find_by(node_object_id: folder.id)
@@ -75,39 +80,55 @@ class CourseNode < Node
     AssignmentNode.get(sortvar, sortorder, user_id, show, node_object_id, search)
   end
 
+  # Gets the name of the course 
+  # Return varchar datatype
   def get_name
     Course.find_by(id: node_object_id).try(:name)
   end
 
+  # Gets the directory of the course
+  # Return varchar datatype
   def get_directory
     Course.find_by(id: node_object_id).try(:directory_path)
   end
 
+  # Gets the creation date of the course
+  # Return datetime datatype
   def get_creation_date
     Course.find_by(id: node_object_id).try(:created_at)
   end
 
+  # Gets the modified date of the course
+  # Return datetime datatype
   def get_modified_date
     Course.find_by(id: node_object_id).try(:updated_at)
   end
 
+  # Gets only private ?
   def get_private
     Course.find_by(id: node_object_id).try(:private)
   end
 
+  # Gets the id of the instructor for the course
+  # Return int datatype
   def get_instructor_id
     Course.find_by(id: node_object_id).try(:instructor_id)
   end
 
+  # Gets the id of the retrieved institution
+  # Return int datatype
   def retrieve_institution_id
     Course.find_by(id: node_object_id).try(:institutions_id)
   end
 
+  # Gets the teams for the course
   def get_teams
     TeamNode.get(node_object_id)
   end
 
-  def get_survey_distribution_id
+  # Gets the id of survey distribution of the course
+  # Return int datatype
+  def get_course_survey_distribution_id
     Course.find_by(id: node_object_id).try(:survey_distribution_id)
   end
 end

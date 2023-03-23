@@ -13,6 +13,8 @@ Expertiza::Application.routes.draw do
       get :remove_instructor
       post :remove_instructor
       get :show_instructor
+      get :show_administrator
+      get :show_super_administrator
     end
   end
 
@@ -20,6 +22,8 @@ Expertiza::Application.routes.draw do
     collection do
       get :remove
       post ':id', action: :update
+      get :update
+      get :edit
     end
   end
 

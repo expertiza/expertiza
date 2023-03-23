@@ -1,4 +1,4 @@
-class CreateGradingHistories < ActiveRecord::Migration
+class CreateGradingHistories < ActiveRecord::Migration[4.2]
     def change
       create_table :grading_histories do |t|
           t.integer :instructor_id

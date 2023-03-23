@@ -6,43 +6,32 @@ class QuestionnaireNode < Node
     'questionnaires'
   end
 
-  # returns the list of all questionnaire nodes based on current user type
   def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = nil)
-    user = User.find(user_id)
-    is_ta = user.role.name == 'Teaching Assistant'
+    conditions = if show
+                   if User.find(user_id).role.name != 'Teaching Assistant'
+                     'questionnaires.instructor_id = ?'
+                   else
+                     'questionnaires.instructor_id in (?)'
+                   end
+                 elsif User.find(user_id).role.name != 'Teaching Assistant'
+                   '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
+                 else
+                   '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
+                 end
 
-    if show
-      if is_ta
-        conditions = 'questionnaires.instructor_id in (?)'
-        values = Ta.get_mapped_instructor_ids(user_id)
-      else
-        conditions = 'questionnaires.instructor_id = ?'
-        values = user_id
-      end
-    else
-      conditions = '(questionnaires.private = 0'
-      values = []
-
-      if is_ta
-        conditions += ' or questionnaires.instructor_id in (?)'
-        values = Ta.get_mapped_instructor_ids(user_id)
-      else
-        conditions += ' or questionnaires.instructor_id = ?'
-        values = [user_id]
-      end
-
-      conditions += ')'
-    end
+    values = if User.find(user_id).role.name == 'Teaching Assistant'
+               Ta.get_mapped_instructor_ids(user_id)
+             else
+               user_id
+             end
 
     if parent_id
       name = TreeFolder.find(parent_id).name + 'Questionnaire'
       name.gsub!(/[^\w]/, '')
       conditions += " and questionnaires.type = \"#{name}\""
     end
-
     sortvar = 'name' if sortvar.nil? || (sortvar == 'directory_path')
     sortorder = 'ASC' if sortorder.nil?
-
     (includes(:questionnaire).where([conditions, values]).order("questionnaires.#{sortvar} #{sortorder}") if Questionnaire.column_names.include?(sortvar) &&
         %w[ASC DESC asc desc].include?(sortorder))
   end

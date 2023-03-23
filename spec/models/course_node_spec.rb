@@ -81,9 +81,9 @@ describe CourseNode do
       expect(course_node.get_private).to be_truthy
     end
   end
-  describe '#get_survey_distribution_id' do
+  describe '#get_course_survey_distribution_id' do
     it 'returns whether the course is private' do
-      expect(course_node.get_survey_distribution_id).to eq(1)
+      expect(course_node.get_course_survey_distribution_id).to eq(1)
     end
   end
 end

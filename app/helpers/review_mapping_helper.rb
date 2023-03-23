@@ -2,22 +2,8 @@ module ReviewMappingHelper
   def create_report_table_header(headers = {})
     render partial: 'report_table_header', locals: { headers: headers }
   end
-
-  # gets the response map data of reviewer id, reviewed object id and type for the review report
-  # def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
-  #   rspan = 0
-  #   (1..@assignment.num_review_rounds).each { |round| instance_variable_set('@review_in_round_' + round.to_s, 0) }
-  #   response_maps = ResponseMap.where(['reviewed_object_id = ? AND reviewer_id = ? AND type = ?', reviewed_object_id, reviewer_id, type])
-  #   response_maps.each do |ri|
-  #     rspan += 1 if Team.exists?(id: ri.reviewee_id)
-  #     responses = ri.response
-  #     (1..@assignment.num_review_rounds).each do |round|
-  #       instance_variable_set('@review_in_round_' + round.to_s, instance_variable_get('@review_in_round_' + round.to_s) + 1) if responses.exists?(round: round)
-  #     end
-  #   end
-  #   [response_maps, rspan]
-  # end
   
+  # gets the response map data of reviewer id, reviewed object id and type for the review report 
   def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
     response_maps = ResponseMap.where(reviewed_object_id: reviewed_object_id, reviewer_id: reviewer_id, type: type)
     response_counts = Array.new(@assignment.num_review_rounds, 0)
@@ -35,11 +21,9 @@ module ReviewMappingHelper
   
       response_maps_accumulator << response_map
     end.then { |response_maps_accumulator, rspan| [response_maps_accumulator, rspan, response_counts] }
-  end
-  
+  end 
 
   # gets the team name's color according to review and assignment submission status
-  
   def get_team_color(response_map)
     if Response.exists?(map_id: response_map.id)
       if !response_map.try(:reviewer).try(:review_grade).nil?
@@ -50,12 +34,9 @@ module ReviewMappingHelper
     else
       return 'red'
     end
-  
     obtain_team_color(response_map, @assignment.created_at, DueDate.where(parent_id: response_map.reviewed_object_id))
   end
   
-  
-
   # loops through the number of assignment review rounds and obtains the team colour
   def obtain_team_color(response_map, assignment_created, assignment_due_dates)
     color = []
@@ -70,8 +51,7 @@ module ReviewMappingHelper
     if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
       color.push('purple')
     else
-      link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
-      
+      link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)    
       if link.nil? || !link.start_with?('https://wiki')
         color.push('green')
       else
@@ -85,7 +65,6 @@ module ReviewMappingHelper
     end
   end
   
-
   # checks if a review was submitted in every round and gives the total responses count
   def response_for_each_round?(response_map)
     num_responses = 0
@@ -98,8 +77,7 @@ module ReviewMappingHelper
 
   # checks if a work was submitted within a given round
   def submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
-    submission_due_date = assignment_due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
-    
+    submission_due_date = assignment_due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)  
     submission = SubmissionRecord.where(team_id: response_map.reviewee_id, operation: ['Submit File', 'Submit Hyperlink'])
     if round > 1
       submission_due_last_round = assignment_due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
@@ -107,11 +85,9 @@ module ReviewMappingHelper
     else
       submission = submission.where(created_at: assignment_created..submission_due_date)
     end
-    
     submission.exists?
   end
   
-
   # returns hyperlink of the assignment that has been submitted on the due date
   def submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
     submission_due_date = assignment_due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
@@ -152,9 +128,7 @@ module ReviewMappingHelper
   def get_awarded_review_score(reviewer_id, team_id)
     num_rounds = @assignment.num_review_rounds
     round_variable_names = (1..num_rounds).map { |round| '@score_awarded_round_' + round.to_s }
-  
     round_variable_names.each { |name| instance_variable_set(name, '-----') }
-  
     unless team_id.nil? || team_id == -1.0
       (1..num_rounds).each do |round|
         score = @review_scores[reviewer_id][round][team_id]
@@ -163,16 +137,12 @@ module ReviewMappingHelper
     end
   end
   
-  
-
   # gets minimum, maximum and average grade value for all the reviews present
   def review_metrics(round, team_id)
     %i[max min avg].each do |metric|
       instance_variable_set("@#{metric}", '-----')
     end
-  
     avg_and_ranges = @avg_and_ranges&.dig(team_id, round)
-  
     if avg_and_ranges && avg_and_ranges.values_at(:max, :min, :avg).all?(&:present?)
       avg_and_ranges.each do |metric, value|
         metric_value = "#{value.round(0)}%"
@@ -180,9 +150,8 @@ module ReviewMappingHelper
       end
     end
   end
-  
-  
 
+  # sorts the reviewers by the average volume of reviews in each round, in descending order
   def sort_reviewer_by_review_volume_desc
     # Get the volume of review comments for each reviewer
     @reviewers.each do |reviewer|
@@ -191,16 +160,13 @@ module ReviewMappingHelper
       reviewer.overall_avg_vol = review_volumes.first
       reviewer.avg_vol_per_round.concat(review_volumes[1..-1])
     end
-  
     # Sort reviewers by their review volume in descending order
     @reviewers.sort_by! { |reviewer| -reviewer.overall_avg_vol }
-  
     # Get the number of review rounds for the assignment
     @num_rounds = @assignment.num_review_rounds.to_i
     @all_reviewers_avg_vol_per_round = []
   end
   
-
   # moves data of reviews in each round from a current round
   def initialize_chart_elements(reviewer)
     labels, reviewer_data, all_reviewers_data = [], [], []
@@ -215,7 +181,6 @@ module ReviewMappingHelper
     all_reviewers_data << @all_reviewers_overall_avg_vol
     [labels, reviewer_data, all_reviewers_data]
   end
-  
 
   # The data of all the reviews is displayed in the form of a bar chart
   def display_volume_metric_chart(reviewer)
@@ -259,41 +224,31 @@ module ReviewMappingHelper
     }
     horizontal_bar_chart(data, options)
   end
-  
 
   # E2082 Generate chart for review tagging time intervals
   def display_tagging_interval_chart(intervals)
     threshold = 30
     intervals = intervals.select { |v| v < threshold }
-  
-    if intervals.empty?
-      return ''
-    end
-  
-    interval_mean = intervals.sum / intervals.size.to_f
+    interval_mean = intervals.sum / intervals.size.to_f unless intervals.empty?
     data = {
       labels: [*1..intervals.length],
       datasets: [
         { backgroundColor: 'rgba(255,99,132,0.8)', data: intervals, label: 'time intervals' },
-        { data: [interval_mean] * intervals.length, label: 'Mean time spent' }
+        *(!intervals.empty? && [{ data: [interval_mean] * intervals.length, label: 'Mean time spent' }])
       ]
     }
     options = {
       width: '200', height: '125',
       scales: { yAxes: [{ stacked: false, ticks: { beginAtZero: true } }], xAxes: [{ stacked: false }] }
     }
-  
     line_chart(data, options)
   end
   
-
   # Calculate mean, min, max, variance, and stand deviation for tagging intervals
-  
   def calculate_key_chart_information(intervals)
     threshold = 30
     interval_precision = 2
     valid_intervals = intervals.select { |v| v < threshold }
-  
     if valid_intervals.empty?
       nil
     else
@@ -309,19 +264,6 @@ module ReviewMappingHelper
     end
   end
   
-
-  # def list_review_submissions(participant_id, reviewee_team_id, response_map_id)
-  #   participant = Participant.find(participant_id)
-  #   team = AssignmentTeam.find(reviewee_team_id)
-  #   html = ''
-  #   unless team.nil? || participant.nil?
-  #     review_submissions_path = team.path + '_review' + '/' + response_map_id.to_s
-  #     files = team.submitted_files(review_submissions_path)
-  #     html += display_review_files_directory_tree(participant, files) if files.present?
-  #   end
-  #   html.html_safe
-  # end
-
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)
     participant = Participant.find(participant_id)
     team = AssignmentTeam.find(reviewee_team_id)

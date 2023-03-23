@@ -17,7 +17,8 @@ class QuestionnaireTypeNode < FolderNode
     nodes
   end
 
-  # This function returns the child nodes of all the folders given its parent node name.
+  # This function returns the child nodes of all the folders,
+  # given its parent node name.
   def self.get(_sortvar = nil, _sortorder = nil, _user_id = nil, _show = nil, _parent_id = nil, _search = nil)
     parent = TreeFolder.find_by(name: 'Questionnaires')
     folders = TreeFolder.where(parent_id: parent.id)

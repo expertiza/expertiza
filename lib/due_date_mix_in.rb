@@ -56,11 +56,7 @@ module DueDateMixIn
 
   # Determine if the next due date from now allows to take the quizzes
   def quiz_allowed(participant_id = nil)
-    topic_id = if participant_id.nil?
-                 yield nil
-               else
-                 SignedUpTeam.topic_id(id, participant_id)
-               end
+    topic_id = find_topic_id(participant_id)
     next_due_date = DueDate.get_next_due_date(id, topic_id)
     return false if next_due_date.nil?
 

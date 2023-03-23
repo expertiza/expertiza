@@ -94,11 +94,11 @@
                           <div id= <%= team_name_color %>>
                         <% end %>
                 <% else %>
-                        <% if Response.exists?(map_id: reviewer_map.id) %>
-                            <div id = <%= team_name_color %> style='border-top: solid; border-width: 1px;'>&#10004;
-                        <% else %>
-                            <div id = <%= team_name_color %> style='border-top: solid; border-width: 1px;'>
-                        <% end %>
+                    <% if Response.exists?(map_id: reviewer_map.id) %>
+                      <div id = <%= team_name_color %> style='border-top: solid; border-width: 1px;'>&#10004;
+                    <% else %>
+                      <div id = <%= team_name_color %> style='border-top: solid; border-width: 1px;'>
+                    <% end %>
                 <% end %>
                     <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => reviewer_map.reviewee_id, :id2 => reviewer_map.id, :assignment_id=>@id %>
                     <%= list_review_submissions(reviewer.id, reviewer_map.reviewee_id, reviewer_map.id) %>

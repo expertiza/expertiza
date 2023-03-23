@@ -48,8 +48,6 @@ class CourseNode < Node
                      "((courses.private = 0 and courses.instructor_id != #{user_id}) or courses.instructor_id = #{user_id})"
                    end
                  end
-    puts "Conditions for courses"
-    puts conditions
     conditions
   end
 
@@ -61,8 +59,6 @@ class CourseNode < Node
              else
                Ta.get_mapped_courses(user_id)
              end
-    puts "Value for courses"
-    puts values
     values
   end
 

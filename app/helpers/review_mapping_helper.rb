@@ -3,45 +3,58 @@ module ReviewMappingHelper
     render partial: 'report_table_header', locals: { headers: headers }
   end
 
-  #
-  # gets the response map data such as reviewer id, reviewed object id and type for the review report
-  #
+  # gets the response map data of reviewer id, reviewed object id and type for the review report
+  # def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
+  #   rspan = 0
+  #   (1..@assignment.num_review_rounds).each { |round| instance_variable_set('@review_in_round_' + round.to_s, 0) }
+  #   response_maps = ResponseMap.where(['reviewed_object_id = ? AND reviewer_id = ? AND type = ?', reviewed_object_id, reviewer_id, type])
+  #   response_maps.each do |ri|
+  #     rspan += 1 if Team.exists?(id: ri.reviewee_id)
+  #     responses = ri.response
+  #     (1..@assignment.num_review_rounds).each do |round|
+  #       instance_variable_set('@review_in_round_' + round.to_s, instance_variable_get('@review_in_round_' + round.to_s) + 1) if responses.exists?(round: round)
+  #     end
+  #   end
+  #   [response_maps, rspan]
+  # end
+  
   def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
-    rspan = 0
-    (1..@assignment.num_review_rounds).each { |round| instance_variable_set('@review_in_round_' + round.to_s, 0) }
-
-    response_maps = ResponseMap.where(['reviewed_object_id = ? AND reviewer_id = ? AND type = ?', reviewed_object_id, reviewer_id, type])
-    response_maps.each do |ri|
-      rspan += 1 if Team.exists?(id: ri.reviewee_id)
-      responses = ri.response
-      (1..@assignment.num_review_rounds).each do |round|
-        instance_variable_set('@review_in_round_' + round.to_s, instance_variable_get('@review_in_round_' + round.to_s) + 1) if responses.exists?(round: round)
+    response_maps = ResponseMap.where(reviewed_object_id: reviewed_object_id, reviewer_id: reviewer_id, type: type)
+    response_counts = Array.new(@assignment.num_review_rounds, 0)
+  
+    response_maps.each_with_object([[], 0]) do |response_map, (response_maps_accumulator, rspan)|
+      next unless Team.exists?(id: response_map.reviewee_id)
+  
+      rspan += 1
+      responses = response_map.response
+  
+      response_counts = (1..@assignment.num_review_rounds).each_with_object(response_counts) do |round, response_counts_accumulator|
+        response_counts_accumulator[round - 1] += 1 if responses.exists?(round: round)
+        response_counts_accumulator
       end
-    end
-    [response_maps, rspan]
+  
+      response_maps_accumulator << response_map
+    end.then { |response_maps_accumulator, rspan| [response_maps_accumulator, rspan, response_counts] }
   end
+  
 
-  #
   # gets the team name's color according to review and assignment submission status
-  #
+  
   def get_team_color(response_map)
-    # Storing redundantly computed value in a variable
-    assignment_created = @assignment.created_at
-    # Storing redundantly computed value in a variable
-    assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
-    # Returning colour based on conditions
     if Response.exists?(map_id: response_map.id)
       if !response_map.try(:reviewer).try(:review_grade).nil?
-        'brown'
+        return 'brown'
       elsif response_for_each_round?(response_map)
-        'blue'
-      else
-        obtain_team_color(response_map, assignment_created, assignment_due_dates)
+        return 'blue'
       end
     else
-      'red'
+      return 'red'
     end
+  
+    obtain_team_color(response_map, @assignment.created_at, DueDate.where(parent_id: response_map.reviewed_object_id))
   end
+  
+  
 
   # loops through the number of assignment review rounds and obtains the team colour
   def obtain_team_color(response_map, assignment_created, assignment_due_dates)
@@ -55,17 +68,23 @@ module ReviewMappingHelper
   # checks the submission state within each round and assigns team colour
   def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
     if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
-      color.push 'purple'
+      color.push('purple')
     else
       link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
-      if link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
-        color.push 'green'
+      
+      if link.nil? || !link.start_with?('https://wiki')
+        color.push('green')
       else
         link_updated_at = get_link_updated_at(link)
-        color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
+        if link_updated_since_last?(round, assignment_due_dates, link_updated_at)
+          color.push('purple')
+        else
+          color.push('green')
+        end
       end
     end
   end
+  
 
   # checks if a review was submitted in every round and gives the total responses count
   def response_for_each_round?(response_map)
@@ -80,14 +99,18 @@ module ReviewMappingHelper
   # checks if a work was submitted within a given round
   def submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
     submission_due_date = assignment_due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
+    
     submission = SubmissionRecord.where(team_id: response_map.reviewee_id, operation: ['Submit File', 'Submit Hyperlink'])
-    subm_created_at = submission.where(created_at: assignment_created..submission_due_date)
     if round > 1
       submission_due_last_round = assignment_due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
-      subm_created_at = submission.where(created_at: submission_due_last_round..submission_due_date)
+      submission = submission.where(created_at: submission_due_last_round..submission_due_date)
+    else
+      submission = submission.where(created_at: assignment_created..submission_due_date)
     end
-    !subm_created_at.try(:first).try(:created_at).nil?
+    
+    submission.exists?
   end
+  
 
   # returns hyperlink of the assignment that has been submitted on the due date
   def submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
@@ -125,88 +148,74 @@ module ReviewMappingHelper
     team_reviewed_link_name
   end
 
-  # if the current stage is "submission" or "review", function returns the current round number otherwise,
-  # if the current stage is "Finished" or "metareview", function returns the number of rounds of review completed.
-  # def get_current_round(reviewer_id)
-  #   user_id = Participant.find(reviewer_id).user.id
-  #   topic_id = SignedUpTeam.topic_id(@assignment.id, user_id)
-  #   @assignment.number_of_current_round(topic_id)
-  #   @assignment.num_review_rounds if @assignment.get_current_stage(topic_id) == "Finished" || @assignment.get_current_stage(topic_id) == "metareview"
-  # end
-
   # gets the review score awarded based on each round of the review
-
   def get_awarded_review_score(reviewer_id, team_id)
-    # Storing redundantly computed value in num_rounds variable
     num_rounds = @assignment.num_review_rounds
-    # Setting values of instance variables
-    (1..num_rounds).each { |round| instance_variable_set('@score_awarded_round_' + round.to_s, '-----') }
-    # Iterating through list
-    (1..num_rounds).each do |round|
-      # Changing values of instance variable based on below condition
-      unless team_id.nil? || team_id == -1.0
-        instance_variable_set('@score_awarded_round_' + round.to_s, @review_scores[reviewer_id][round][team_id].to_s + '%')
+    round_variable_names = (1..num_rounds).map { |round| '@score_awarded_round_' + round.to_s }
+  
+    round_variable_names.each { |name| instance_variable_set(name, '-----') }
+  
+    unless team_id.nil? || team_id == -1.0
+      (1..num_rounds).each do |round|
+        score = @review_scores[reviewer_id][round][team_id]
+        instance_variable_set('@score_awarded_round_' + round.to_s, score.to_s + '%') unless score.nil?
       end
     end
   end
+  
+  
 
   # gets minimum, maximum and average grade value for all the reviews present
   def review_metrics(round, team_id)
-    %i[max min avg].each { |metric| instance_variable_set('@' + metric.to_s, '-----') }
-    if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? { |k| @avg_and_ranges[team_id][round].key? k }
-      %i[max min avg].each do |metric|
-        metric_value = @avg_and_ranges[team_id][round][metric].nil? ? '-----' : @avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
-        instance_variable_set('@' + metric.to_s, metric_value)
+    %i[max min avg].each do |metric|
+      instance_variable_set("@#{metric}", '-----')
+    end
+  
+    avg_and_ranges = @avg_and_ranges&.dig(team_id, round)
+  
+    if avg_and_ranges && avg_and_ranges.values_at(:max, :min, :avg).all?(&:present?)
+      avg_and_ranges.each do |metric, value|
+        metric_value = "#{value.round(0)}%"
+        instance_variable_set("@#{metric}", metric_value)
       end
     end
   end
+  
+  
 
-  # sorts the reviewers by the average volume of reviews in each round, in descending order
   def sort_reviewer_by_review_volume_desc
-    @reviewers.each do |r|
-      # get the volume of review comments
-      review_volumes = Response.volume_of_review_comments(@assignment.id, r.id)
-      r.avg_vol_per_round = []
-      review_volumes.each_index do |i|
-        if i.zero?
-          r.overall_avg_vol = review_volumes[0]
-        else
-          r.avg_vol_per_round.push(review_volumes[i])
-        end
-      end
+    # Get the volume of review comments for each reviewer
+    @reviewers.each do |reviewer|
+      reviewer.avg_vol_per_round = []
+      review_volumes = Response.volume_of_review_comments(@assignment.id, reviewer.id)
+      reviewer.overall_avg_vol = review_volumes.first
+      reviewer.avg_vol_per_round.concat(review_volumes[1..-1])
     end
-    # get the number of review rounds for the assignment
-    @num_rounds = @assignment.num_review_rounds.to_f.to_i
+  
+    # Sort reviewers by their review volume in descending order
+    @reviewers.sort_by! { |reviewer| -reviewer.overall_avg_vol }
+  
+    # Get the number of review rounds for the assignment
+    @num_rounds = @assignment.num_review_rounds.to_i
     @all_reviewers_avg_vol_per_round = []
-    @all_reviewers_overall_avg_vol = @reviewers.inject(0) { |sum, r| sum + r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @num_rounds.times do |round|
-      @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) { |sum, r| sum + r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
-    end
-    @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
+  
 
   # moves data of reviews in each round from a current round
   def initialize_chart_elements(reviewer)
-    round = 0
-    labels = []
-    reviewer_data = []
-    all_reviewers_data = []
-
-    # display avg volume for all reviewers per round
+    labels, reviewer_data, all_reviewers_data = [], [], []
     @num_rounds.times do |rnd|
-      next unless @all_reviewers_avg_vol_per_round[rnd] > 0
-
-      round += 1
-      labels.push round
-      reviewer_data.push reviewer.avg_vol_per_round[rnd]
-      all_reviewers_data.push @all_reviewers_avg_vol_per_round[rnd]
+      next if @all_reviewers_avg_vol_per_round[rnd] <= 0
+      labels << (rnd + 1)
+      reviewer_data << reviewer.avg_vol_per_round[rnd]
+      all_reviewers_data << @all_reviewers_avg_vol_per_round[rnd]
     end
-
-    labels.push 'Total'
-    reviewer_data.push reviewer.overall_avg_vol
-    all_reviewers_data.push @all_reviewers_overall_avg_vol
+    labels << 'Total'
+    reviewer_data << reviewer.overall_avg_vol
+    all_reviewers_data << @all_reviewers_overall_avg_vol
     [labels, reviewer_data, all_reviewers_data]
   end
+  
 
   # The data of all the reviews is displayed in the form of a bar chart
   def display_volume_metric_chart(reviewer)
@@ -231,119 +240,104 @@ module ReviewMappingHelper
       ]
     }
     options = {
-      legend: {
-        position: 'top',
-        labels: {
-          usePointStyle: true
-        }
-      },
-      width: '200',
-      height: '125',
+      legend: { position: 'top', labels: { usePointStyle: true } },
+      width: '200', height: '125',
       scales: {
-        yAxes: [{
-          stacked: true,
-          id: 'bar-y-axis1',
-          barThickness: 10
-        }, {
-          display: false,
-          stacked: true,
-          id: 'bar-y-axis2',
-          barThickness: 15,
-          type: 'category',
-          categoryPercentage: 0.8,
-          barPercentage: 0.9,
-          gridLines: {
-            offsetGridLines: true
+        yAxes: [
+          { stacked: true, id: 'bar-y-axis1', barThickness: 10 },
+          {
+            display: false, stacked: true, id: 'bar-y-axis2',
+            barThickness: 15, type: 'category',
+            categoryPercentage: 0.8, barPercentage: 0.9,
+            gridLines: { offsetGridLines: true }
           }
-        }],
-        xAxes: [{
-          stacked: false,
-          ticks: {
-            beginAtZero: true,
-            stepSize: 50,
-            max: 400
-          }
-        }]
+        ],
+        xAxes: [
+          { stacked: false, ticks: { beginAtZero: true, stepSize: 50, max: 400 } }
+        ]
       }
     }
-    horizontal_bar_chart data, options
+    horizontal_bar_chart(data, options)
   end
+  
 
   # E2082 Generate chart for review tagging time intervals
   def display_tagging_interval_chart(intervals)
-    # if someone did not do any tagging in 30 seconds, then ignore this interval
     threshold = 30
     intervals = intervals.select { |v| v < threshold }
-    unless intervals.empty?
-      interval_mean = intervals.reduce(:+) / intervals.size.to_f
+  
+    if intervals.empty?
+      return ''
     end
-    # build the parameters for the chart
+  
+    interval_mean = intervals.sum / intervals.size.to_f
     data = {
       labels: [*1..intervals.length],
       datasets: [
-        {
-          backgroundColor: 'rgba(255,99,132,0.8)',
-          data: intervals,
-          label: 'time intervals'
-        },
-        unless intervals.empty?
-          {
-            data: Array.new(intervals.length, interval_mean),
-            label: 'Mean time spent'
-          }
-        end
+        { backgroundColor: 'rgba(255,99,132,0.8)', data: intervals, label: 'time intervals' },
+        { data: [interval_mean] * intervals.length, label: 'Mean time spent' }
       ]
     }
     options = {
-      width: '200',
-      height: '125',
-      scales: {
-        yAxes: [{
-          stacked: false,
-          ticks: {
-            beginAtZero: true
-          }
-        }],
-        xAxes: [{
-          stacked: false
-        }]
-      }
+      width: '200', height: '125',
+      scales: { yAxes: [{ stacked: false, ticks: { beginAtZero: true } }], xAxes: [{ stacked: false }] }
     }
-    line_chart data, options
+  
+    line_chart(data, options)
   end
+  
 
   # Calculate mean, min, max, variance, and stand deviation for tagging intervals
+  
   def calculate_key_chart_information(intervals)
-    # if someone did not do any tagging in 30 seconds, then ignore this interval
     threshold = 30
-    interval_precision = 2 # Round to 2 Decimal Places
-    intervals = intervals.select { |v| v < threshold }
-
-    # Get Metrics once tagging intervals are available
-    unless intervals.empty?
-      metrics = {}
-      metrics[:mean] = (intervals.reduce(:+) / intervals.size.to_f).round(interval_precision)
-      metrics[:min] = intervals.min
-      metrics[:max] = intervals.max
-      sum = intervals.inject(0) { |accum, i| accum + (i - metrics[:mean])**2 }
-      metrics[:variance] = (sum / intervals.size.to_f).round(interval_precision)
-      metrics[:stand_dev] = Math.sqrt(metrics[:variance]).round(interval_precision)
-      metrics
+    interval_precision = 2
+    valid_intervals = intervals.select { |v| v < threshold }
+  
+    if valid_intervals.empty?
+      nil
+    else
+      mean = valid_intervals.sum / valid_intervals.size.to_f
+      variance = valid_intervals.sum { |v| (v - mean) ** 2 } / valid_intervals.size.to_f
+      {
+        mean: mean.round(interval_precision),
+        min: valid_intervals.min,
+        max: valid_intervals.max,
+        variance: variance.round(interval_precision),
+        stand_dev: Math.sqrt(variance).round(interval_precision)
+      }
     end
-    # if no Hash object is returned, the UI handles it accordingly
   end
+  
+
+  # def list_review_submissions(participant_id, reviewee_team_id, response_map_id)
+  #   participant = Participant.find(participant_id)
+  #   team = AssignmentTeam.find(reviewee_team_id)
+  #   html = ''
+  #   unless team.nil? || participant.nil?
+  #     review_submissions_path = team.path + '_review' + '/' + response_map_id.to_s
+  #     files = team.submitted_files(review_submissions_path)
+  #     html += display_review_files_directory_tree(participant, files) if files.present?
+  #   end
+  #   html.html_safe
+  # end
 
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)
     participant = Participant.find(participant_id)
     team = AssignmentTeam.find(reviewee_team_id)
     html = ''
-    unless team.nil? || participant.nil?
+    if review_submissions_available?(team, participant)
       review_submissions_path = team.path + '_review' + '/' + response_map_id.to_s
       files = team.submitted_files(review_submissions_path)
       html += display_review_files_directory_tree(participant, files) if files.present?
     end
     html.html_safe
   end
+  
+  def review_submissions_available?(team, participant)
+    team.present? && participant.present?
+  end
+  
 
   # Zhewei - 2016-10-20
   # This is for Dr.Kidd's assignment (806)

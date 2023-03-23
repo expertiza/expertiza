@@ -22,10 +22,12 @@ class AssignmentsController < ApplicationController
     @default_num_metareviews_required = 3
   end
 
+  # Finds and returns a assignment by given name and course_id (user params) if already present
   def find_existing_assignment
     Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
   end
   
+  # Finds and returns a directory by given directory path and course_id (user params) if already present
   def find_existing_directory
     Assignment.find_by(directory_path: assignment_form_params[:assignment][:directory_path],
                         course_id: @assignment_form.assignment.course_id)

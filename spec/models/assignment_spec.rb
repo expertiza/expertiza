@@ -3,6 +3,8 @@ describe Assignment do
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 3, name: 'no one') }
   let(:review_response_map) { build(:review_response_map, response: [response], reviewer: build(:participant), reviewee: build(:assignment_team)) }
+  let(:instructor_participant) { build(:participant, id: 6, user: instructor)}
+  let(:student_participant) { build(:participant, id: 3, user: student)}
   let(:teammate_review_response_map) { build(:review_response_map, type: 'TeammateReviewResponseMap') }
   let(:participant) { build(:participant, id: 1) }
   let(:question) { double('Question') }
@@ -23,14 +25,14 @@ describe Assignment do
   describe '#user_on_team?' do
     context 'when the user is not on a team associated with the assignment' do
       it 'returns false' do
-        allow_any_instance_of(Team).to receive(:users).and_return([instructor])
-        expect(assignment.user_on_team?(student)).to be_falsey
+        allow_any_instance_of(Team).to receive(:participants).and_return([instructor_participant])
+        expect(assignment.participant_on_team?(participant)).to be_falsey
       end
     end
     context 'when the user is on a team associated with the assignment' do
       it 'returns true' do
-        allow_any_instance_of(Team).to receive(:users).and_return([student])
-        expect(assignment.user_on_team?(student)).to be_truthy
+        allow_any_instance_of(Team).to receive(:participants).and_return([student_participant])
+        expect(assignment.participant_on_team?(student_participant)).to be_truthy
       end
     end
   end

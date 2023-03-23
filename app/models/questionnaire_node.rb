@@ -52,7 +52,7 @@ class QuestionnaireNode < Node
   def get_instructor_id
     get_attr(:instructor_id)
   end
-  
+
   # returns the status of weather the Questionnaire is private or not
   def get_private
     get_attr(:private)

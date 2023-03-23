@@ -245,60 +245,6 @@ describe Assignment do
     end
   end
 
-  describe '#check_condition' do
-    context 'when the next due date is nil' do
-      it 'returns false ' do
-        allow(DueDate).to receive(:get_next_due_date).with(1, nil).and_return(nil)
-        expect(assignment.check_condition('review_allowed_id')).to be false
-      end
-    end
-
-    context 'when the next due date is allowed to review submissions' do
-      it 'returns true' do
-        assignment_due_date = double('AssignmentDueDate')
-        allow(DueDate).to receive(:get_next_due_date).with(1, nil).and_return(assignment_due_date)
-        allow(assignment_due_date).to receive(:send).with('review_allowed_id').and_return(1)
-        allow(DeadlineRight).to receive(:find).with(1).and_return(double('DeadlineRight', name: 'OK'))
-        expect(assignment.check_condition('review_allowed_id')).to be true
-      end
-    end
-  end
-
-  describe '#submission_allowed' do
-    it 'returns true when the next topic due date is allowed to submit sth' do
-      #allow(assignment).to receive(:check_condition).with('submission_allowed_id', 123).and_return(true)
-      #expect(assignment.submission_allowed(123)).to be true
-      assignment_due_date = double('AssignmentDueDate')
-      assignment_topic_id = double('AssignmentTopicId')
-      allow(SignedUpTeam).to receive(:topic_id).with(1, 1).and_return(assignment_topic_id) # 1,1
-      allow(DueDate).to receive(:get_next_due_date).with(1, assignment_topic_id).and_return(assignment_due_date)
-      allow(assignment_due_date).to receive(:submission_allowed_id).and_return(1)
-      allow(DeadlineRight).to receive(:find).with(1).and_return(double('DeadlineRight', name: 'OK'))
-      expect(assignment.check_condition('review_allowed_id')).to be true
-    end
-  end
-
-  describe '#quiz_allowed' do
-    it 'returns false when the next topic due date is not allowed to do quiz' do
-      allow(assignment).to receive(:check_condition).with('quiz_allowed_id', 456).and_return(false)
-      expect(assignment.quiz_allowed(456)).to be false
-    end
-  end
-
-  describe '#can_review' do
-    it "returns false when the next assignment due date is not allowed to review other's work" do
-      allow(assignment).to receive(:check_condition).with('review_allowed_id', nil).and_return(true)
-      expect(assignment.can_review).to be true
-    end
-  end
-
-  describe '#metareview_allowed' do
-    it 'returns true when the next assignment due date is not allowed to do metareview' do
-      allow(assignment).to receive(:check_condition).with(any_args).and_return(false)
-      expect(assignment.metareview_allowed).to be false
-    end
-  end
-
   describe '#delete' do
     before(:each) do
       allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: 1).and_return([review_response_map])

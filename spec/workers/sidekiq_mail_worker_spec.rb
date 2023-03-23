@@ -80,6 +80,31 @@ describe MailWorker do
     end
   end
 
+  describe '#email_reminder' do
+    assignments = Assignment.create(id:1, name:'Assignment 1')
+
+
+    let(:worker) { described_class.new }
+    before do
+      worker.assignment = assignments
+    end
+    let(:participant_emails) { ['tkini@ncsu.edu'] }
+    let(:subject) { "Message regarding #{deadline_type} for assignment #{assignments.name}" }
+    let(:body) { "This is a reminder to complete #{deadline_type} for assignment #{assignments.name}. Deadline is #{due_at}. If you have already done the #{deadline_type}, please ignore this mail." }
+    let(:deadline_type) { "review" }
+
+    before do
+      allow(Mailer).to receive_message_chain(:delayed_message, :deliver_now)
+    end
+
+
+    it 'sends an email reminder to the participant emails' do
+
+      expect(Mailer).to receive_message_chain(:delayed_message, :deliver_now).with(bcc: participant_emails, subject: subject, body: body).and_return(:delayed_message)
+      worker.send(:email_reminder, participant_emails, deadline_type)
+    end
+  end
+
   describe 'Tests mailer with sidekiq' do 
     it "1. should have sent welcome email after user was created" do
       Sidekiq::Testing.inline!  # executes the jobs immediately when they are placed in the queue
@@ -100,12 +125,11 @@ describe MailWorker do
       expect(email.subject).to eq("Your Expertiza account and password has been created")
     end
 
+    # MailWorker contains one public method perform, which is an instance method not class method
+    # perform(assignment_id, deadline_type, due_at)
     it "2. should send email to required email address with proper content" do
       Sidekiq::Testing.inline!
-
-      # MailWorker contains one public method, which is an instance method not class method
-      mailworker = MailWorker.new
-      # perform(assignment_id, deadline_type, due_at)
+      mailworker = MailWorker.new      
       mailworker.perform(1, 'metareview', '2022-12-31 00:00:01')
       email = ActionMailer::Base.deliveries.first
       expect(email.from[0]).to eq('expertiza.debugging@gmail.com')
@@ -113,7 +137,7 @@ describe MailWorker do
       expect(email.subject).to eq('Message regarding teammate review for assignment no assignment')
     end
 
-    it "3. should not return email if deadline is drop_outstanding_reviews" do
+    it "3. should not return email if deadline_type is drop_outstanding_reviews" do
       Sidekiq::Testing.inline!
       Mailer.deliveries.clear
       worker = MailWorker.new

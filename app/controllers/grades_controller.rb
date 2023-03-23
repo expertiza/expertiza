@@ -162,6 +162,8 @@ class GradesController < ApplicationController
     @team = participant.team
     @team.grade_for_submission = params[:grade_for_submission]
     @team.comment_for_submission = params[:comment_for_submission]
+    # create a grading history entry for this assignment
+    # save the grade, comment, receiver, and instructor
     begin
       @team.save
       flash[:success] = 'Grade and comment for submission successfully saved.'

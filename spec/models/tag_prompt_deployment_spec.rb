@@ -118,7 +118,7 @@ describe TagPromptDeployment do
     it 'does not vary by round' do
       allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
       allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])
-      allow(assignment).to receive(:vary_by_round?).and_return(false)
+      allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
       allow(ResponseMap).to receive(:assessments_for).and_return([response])
       allow(Answer).to receive(:where).and_return(answersObjectArray)
       allow(TeamsUser).to receive(:where).with(team_id: team.id).and_return([team_user1, team_user2])
@@ -147,7 +147,7 @@ describe TagPromptDeployment do
     it 'varies by round' do
       allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
       allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])
-      allow(assignment).to receive(:vary_by_round?).and_return(true)
+      allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
       allow(ReviewResponseMap).to receive(:get_responses_for_team_round).and_return([response])
       allow(Answer).to receive(:where).and_return(answersObjectArray)
       allow(TeamsUser).to receive(:where).with(team_id: team.id).and_return([team_user1, team_user2])
@@ -176,7 +176,7 @@ describe TagPromptDeployment do
     it 'varies by round, there are no tags' do
       allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
       allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])
-      allow(assignment).to receive(:vary_by_round?).and_return(true)
+      allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
       allow(ReviewResponseMap).to receive(:get_responses_for_team_round).and_return([response])
       allow(Answer).to receive(:where).and_return(answersObjectArray)
       allow(TeamsUser).to receive(:where).with(team_id: team.id).and_return([team_user1, team_user2])

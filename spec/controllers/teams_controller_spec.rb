@@ -1,5 +1,5 @@
 require './spec/support/teams_shared.rb'
-
+  
 describe TeamsController do
   # Performs authorization check for user
   include_context 'object initializations'

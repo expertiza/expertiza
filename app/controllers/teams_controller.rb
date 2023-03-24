@@ -10,9 +10,9 @@ class TeamsController < ApplicationController
 
   # attempt to initialize team type in session
   def init_team_type(type)
-    if type && Team.allowed_types.include?(type)
-      session[:team_type] = type
-    end
+    return unless type && Team.allowed_types.include?(type)
+
+    session[:team_type] = type
   end
 
   # retrieve an object's parent by its ID

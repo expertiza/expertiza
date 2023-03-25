@@ -1,3 +1,116 @@
+class MetricsController < ApplicationController
+  include AuthorizationHelper
+  include AssignmentHelper
+  include MetricsHelper
+  # currently only give instructor the right to view, query, and update metric statistics
+  def action_allowed?
+    current_user_has_instructor_privileges?
+  end
+  #Runs a query against all the link submissions for all teams for an entire assignment, populating the DB fields that are
+  # used by the view_team in grades heatgrid showing user contributions. This method must also be run  to enable
+  # "Github metrics" link on the list_assignments page.
+  def query_assignment_statistics
+    @assignment = Assignment.find(params[:id])
+    teams = @assignment.teams
+    teams.each do |team|
+      topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team)
+      single_submission_initial_query(participants.first.id) unless participants.first.nil?
+    end
+    redirect_to controller: 'assignments', action: 'list_submissions', id: @assignment.id
+  end
+  # render the view_github_metrics page, which displays detailed metrics for a single team of participants.
+  # Shows two charts, a barchart timeline, and a piechart of total contributions by team member, as well as pull request
+  # statistics if available
+  def show
+    single_submission_initial_query(params[:id])
+  end
+  # authorize with token to use github API with 5000 rate limits. Unauthorized user only has 60 limits, which is not enough.
+  def authorize_github
+    redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
+  end
+  # Master query method that runs a query based on links contained within a single team's submission. Sets up instance
+  # variables, then passes control to retrieve_github_data to handle the logic for the individual links. Finally, store
+  # a small subset of data as Metrics in the metrics table containing participants, their total contribution,
+  # (in number of commits), their github email, and a reference to their User account (if mapping exists or can be determined)
+  def single_submission_initial_query(id)
+    if session["github_access_token"].nil? # check if there is a github_access_token in current session
+      session["participant_id"] = id # team number
+      session["assignment_id"] = AssignmentParticipant.find(id).assignment.id
+      session["github_view_type"] = "view_submissions"
+      # redirect_to authorize_github if no github_access_token present, redirect to authorization page
+       redirect_to :controller => 'metrics', :action => 'authorize_github'
+      return
+    end
+    @head_refs = {} # global reference hash, key is PR number, value is the head commit global id, owner, and repo
+    @parsed_data = {} # a hash track each author's commits grouped by date
+    @authors = {} # pull request authors
+    @dates = {} # dates info for dates that have commits
+    @total_additions = 0 # num of lines added
+    @total_deletions = 0 # num of lines deleted
+    @total_commits = 0 # num of commits in this PR
+    @total_files_changed = 0 # num of files changed in this PR
+    @merge_status = {} # merge status of this PR open or closed
+    @check_statuses = {} # statuses info for each PR
+    @token = session["github_access_token"]
+    @participant = AssignmentParticipant.find(id)
+    @assignment = @participant.assignment # participant has belong_to relationship with assignment
+    @team = @participant.team # team method in AssignmentParticipant return the AssignmentTeam of this participant
+    @team_id = @team.id
+    # retrieve github data and store in the instance variables defined above
+    retrieve_github_data
+    # get each PR's status info
+    query_all_merge_statuses
+    #@authors = @authors.keys # only keep the author name info
+    @dates = @dates.keys.sort # only keep the date info and sort
+    @participants = get_data_for_list_submissions(@team)
+    # Create database entry for basic statistics. These data are queried later by view_team in grades (the heatgrid)
+    @authors.each do |author|
+      # Check to see if this author is a member of the expertiza dev team. This COULD be done with a query,
+      # But will only work if the authenticated user running the query has push access to the github repository
+      # (Per Github API security rules)
+      unless LOCAL_ENV["COLLABORATORS"].include? author[1]
+        # If author is a student, keep the commit data and store the total as a Metric
+        data_object = {}
+        data_object[:author] = author[0] # Github Name
+        data_object[:email] = author[1] # Github Email
+        data_object[:commits] = @parsed_data[author[0]].values.inject(0) {|sum, value| sum += value} #Sum of commits
+        create_github_metric(@team_id, author[1], data_object[:commits])
+      end
+    end
+  end
+  ##################### Process Links and Branch according to Pull Request or Repo ############################
+  # For a single assignment team, process the submitted links, determine whether they are pull request links or
+  # repository links, and branch accordingly to query github for the data from the type of link found. The github API
+  # works differently and has different available data for pull requests and repositories.
+  def retrieve_github_data
+    team_links = @team.hyperlinks # all links that a team submitted
+    pull_links = team_links.select do |link|
+      link.match(/pull/) && link.match(/github.com/) # all links that contain both pull and github.com
+    end
+    if !pull_links.empty? # have pull links, retrieve pull request info
+      query_all_pull_requests(pull_links)
+    else # retrieve repo info if no PR is submitted
+    repo_links = team_links.select do |link|
+      link.match(/github.com/)
+    end
+    retrieve_repository_data(repo_links)
+    end
+  end
+  ############### Handling of Pull Request Links #####################
+  # Iterate through all pull request links, and initiate the github graphql API queries for each link. Then, call
+  # parse_pull_request_data to process the returned data from each link
+  def query_all_pull_requests(pull_links)
+    pull_links.each do |hyperlink|
+      submission_hyperlink_tokens = hyperlink.split('/') # parse the link
+      hyperlink_data = {}
+      #Example: https://github.com/student/expertiza/pull/1234
+      # submission_hyperlink_tokens[6] == 1234
+      # submission_hyperlink_tokens[5] == "pull"
+      # submission_hyperlink_tokens[4] == "expertiza"
+      # submission_hyperlink_tokens[3] == "student"
+      # submission_hyperlink_tokens[2] == "github.com"
+      # submission_hyperlink_tokens[1] == ""
+      # submission_hyperlink_tokens[0] == "https:"
       hyperlink_data["pull_request_number"] = submission_hyperlink_tokens[6]
       hyperlink_data["repository_name"] = submission_hyperlink_tokens[4] # expertiza
       hyperlink_data["owner_name"] = submission_hyperlink_tokens[3] # expertiza

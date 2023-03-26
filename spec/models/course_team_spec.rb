@@ -59,6 +59,7 @@ describe 'CourseTeam' do
     it 'writes to a csv' do
       allow(CourseTeam).to receive(:where).with(parent_id: 1).and_return([course_team1])
       allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_user])
+      allow(User).to receive(:find).with(user2.id).and_return(user2)
       expect(CourseTeam.export([], 1, team_name: 'false')).to eq([['no team', 'no name']])
     end
   end
@@ -70,19 +71,20 @@ describe 'CourseTeam' do
   describe '#add_member' do
     context 'when the user is already on the team' do
       it 'raises an error' do
-        allow(course_team1).to receive(:user?).with(user2).and_return(true)
-        expect { course_team1.add_member(user2) }.to raise_error('The user "no name" is already a member of the team, "no team"')
+        allow(course_team1).to receive(:participant?).with(participant).and_return(true)
+        expect { course_team1.add_participant_to_team(participant) }.to raise_error('The user "no name" is already a member of the team, "no team"')
       end
     end
     context 'when the user is not on the team' do
-      it 'creates and returns a participant' do
+      it 'adds user' do
         node = TeamNode.new
         allow(course_team1).to receive(:user?).with(user2).and_return(false)
-        allow(TeamsParticipant).to receive(:create).with(user_id: 2, team_id: 1).and_return(team_user)
+        allow(TeamsParticipant).to receive(:create).with(participant_id: participant.id, team_id: 1).and_return(team_user)
         allow(TeamNode).to receive(:find_by).with(node_object_id: 1).and_return(node)
         allow(course_team1).to receive(:add_participant).with(1, user2).and_return(participant)
+        allow(CourseParticipant).to receive(:find_by).with(parent_id: 1, user_id: user2.id).and_return(participant)
         allow(course_team1).to receive(:parent_id).and_return(1)
-        expect(course_team1.add_member(user2)).to eq(participant)
+        expect(course_team1.add_participant_to_team(participant).node_object_id).to eq(team_user.id)
       end
     end
   end

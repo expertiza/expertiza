@@ -59,17 +59,17 @@ class Team < ApplicationRecord
   end
 
   # Add member to the team, changed to hash by E1776
-  def add_member(user, _assignment_id = nil)
-    raise "The user #{user.name} is already a member of the team #{name}" if user?(user)
+  def add_participant_to_team(participant, _assignment_id = nil)
+    raise "The user #{participant.name} is already a member of the team #{name}" if participant?(participant)
 
     can_add_member = false
     unless full?
       can_add_member = true
-      t_user = TeamsParticipant.create(user_id: user.id, team_id: id)
+      t_user = TeamsParticipant.create(participant_id: participant.id, team_id: id)
       parent = TeamNode.find_by(node_object_id: id)
       TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
-      add_participant(parent_id, user)
-      ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{id}")
+      # add_participant(parent_id, user)
+      ExpertizaLogger.info LoggerMessage.new('Model:Team', participant.name, "Added member to the team #{id}")
     end
     can_add_member
   end

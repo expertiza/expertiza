@@ -22,7 +22,10 @@ describe GradesHelper, type: :helper do
   let(:vmQ1) { VmQuestionResponse.new(questionnaire1, assignment, 1) }
   let(:vmQ2) { VmQuestionResponse.new(questionnaire2, assignment, 2) }
   let(:helper) { Class.new { extend GradesHelper } }
-
+  let(:assignment_with_participant) do
+    build(:assignment ,id: 1, name: 'test_assignment', instructor_id: 2, participants:[build(:participant, id: 1, user_id: 21, assignment: assignment)], course_id: 1)
+  end
+  let(:participants_list) { [build(:participant, id: 1, user_id: 21, assignment: assignment)]}
   describe 'accordion_title' do
     it 'should render is_first:true if last_topic is nil' do
       title_html = accordion_title(nil, 'last question')
@@ -233,6 +236,8 @@ describe GradesHelper, type: :helper do
   describe 'view_heatgrid' do
     context 'when all questionnaires do not match the target type' do
       it 'render the view with empty list of  VmQuestionResponse' do
+        allow_any_instance_of(Assignment).to receive(:participants).and_return(assignemnt_with_participants.participants)
+        allow(assignemnt_with_participants.participants).to receive(:find_by).and_return(participant)
         # mock the participant for the  AssignmentParticipant.find
         allow(AssignmentParticipant).to receive(:find).with(1).and_return(assignment_participant)
         allow(assignment_participant).to receive(:team).and_return(team)
@@ -248,6 +253,8 @@ describe GradesHelper, type: :helper do
     end
     context 'when all questionnaires match the target type' do
       it 'render the view with nonempty list of  VmQuestionResponse' do
+        allow_any_instance_of(Assignment).to receive(:participants).and_return(assignemnt_with_participants.participants)
+        allow(assignemnt_with_participants.participants).to receive(:find_by).and_return(participant)
         # mock the participant for the  AssignmentParticipant.find
         allow(AssignmentParticipant).to receive(:find).with(1).and_return(assignment_participant)
         allow(assignment_participant).to receive(:team).and_return(team)
@@ -266,7 +273,11 @@ describe GradesHelper, type: :helper do
       it 'the round variable in the new VmQuestionResponse should be nil' do
         # mock the participant for the  AssignmentParticipant.find
         # viewgrid_participant contains a assignment whose questionnaires' type is TeammateReviewQuestionnaire
+        participant_list = [viewgrid_participant]
         allow(AssignmentParticipant).to receive(:find).with(2).and_return(viewgrid_participant)
+        allow(Assignment).to receive(:find).with(5).and_return(assignment_for_viewgrid)
+        allow(assignment_for_viewgrid).to receive(:participants).and_return(participant_list)
+        allow(participant_list).to receive(:find_by).and_return(viewgrid_participant)
         allow(viewgrid_participant).to receive(:team).and_return(team)
         view_heatgrid(2, 'TeammateReviewQuestionnaire')
         # testing the object variable

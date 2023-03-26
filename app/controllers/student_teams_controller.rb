@@ -108,8 +108,8 @@ class StudentTeamsController < ApplicationController
 
   def remove_participant
     # remove the record from teams_participants table
-    team_user = TeamsParticipant.where(team_id: params[:team_id], user_id: student.user_id)
-    remove_team_user(team_user)
+    team_participant = TeamsParticipant.where(team_id: params[:team_id], user_id: student.user_id)
+    remove_team_user(team_participant)
     # if your old team does not have any members, delete the entry for the team
     if TeamsParticipant.where(team_id: params[:team_id]).empty?
       old_team = AssignmentTeam.find params[:team_id]

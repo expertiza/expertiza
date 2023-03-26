@@ -43,7 +43,10 @@
   <b><%=t ".team_members"%></b>
   <br/><br/>
   <!--start team member table-->
-  <%= render :partial => 'team_display' %>
+
+<%= render :partial => 'team_display' %>
+
+
 <% end %>
 
 <% if @student.assignment.pair_programming_enabled? %>
@@ -112,7 +115,9 @@
           <th class="head" align="center"><b><%=t ".status"%></b></th>
         </tr>
           <% @send_invs.each do |inv| %>
-            <% render :partial=> 'invited_people', :locals => {:inv => inv, :session_ip => session[:ip], :student => @student} %>
+
+    <%=render :partial=> 'invited_people', :locals => {:inv => inv, :session_ip => session[:ip], :student => @student} %>
+
           <% end %>
       </table>
       <!-- start invited people table -->
@@ -121,7 +126,10 @@
 
 <!--send invitation-->
 <% if !@student.team.nil? && @student.assignment.max_team_size > 1 %>
-  <% render :partial=> 'send_invitations', :locals => {:student => @student} %>
+
+<%= render :partial=> 'send_invitations', :locals => {:student => @student} %>
+
+
 <% end %>
 
 <!--display a table of received invitation-->
@@ -134,7 +142,9 @@
         <th class="head"><%=t ".reply"%> </th>
       </tr>
       <% @received_invs.each do |inv| %>
-          <% render :partial=> 'received_invitations', :locals => {:inv => inv, :session_ip => session[:ip], :student => @student} %>
+
+    <%= render :partial => 'received_invitations', :locals => {:inv => inv, :session_ip => session[:ip], :student => @student} %>
+
       <% end %>
     </table>
 
@@ -146,7 +156,9 @@
   <% if @student.team && @student.assignment.topics? && @student.team.topic%>
     <b><%=t ".ad_for_team"%></b>
     <br>
-    <% render :partial => 'display_advertisements', :locals => {:student_team_id => @student.team.id, :student => @student} %>
+
+  <%= render :partial => 'display_advertisements' , :locals => {:student_team_id => @student.team.id, :student => @student}%>
+
   <% end %>
 
 

@@ -173,11 +173,8 @@ module GradesHelper
                              else
                                (questionnaire.symbol.to_s + round.to_s).to_sym
                              end
-      puts round
       questions[questionnaire_symbol] = questionnaire.questions
     end
-    puts "questions"
-    puts questions
     questions
   end
 end

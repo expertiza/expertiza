@@ -47,16 +47,15 @@ module Scoring
     return -1.0 if @response.nil?
 
     if @response
-      @questions = params[:questions]
-      return -1.0 if @questions.nil?
+      questions = params[:questions]
+      return -1.0 if questions.nil?
 
       weighted_score = 0
       sum_of_weights = 0
-
-      @questionnaire = Questionnaire.find(@questions.first.questionnaire_id)
+      @questionnaire = Questionnaire.find(questions.first.questionnaire_id)
 
       # Retrieve data for questionnaire (max score, sum of scores, weighted scores, etc.)
-      questionnaire_data = ScoreView.questionnaire_data(@questions[0].questionnaire_id, @response.id)
+      questionnaire_data = ScoreView.questionnaire_data(questions[0].questionnaire_id, @response.id)
       weighted_score = questionnaire_data.weighted_score.to_f unless questionnaire_data.weighted_score.nil?
       sum_of_weights = questionnaire_data.sum_of_weights.to_f
       answers = Answer.where(response_id: @response.id)

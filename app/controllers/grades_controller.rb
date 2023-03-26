@@ -193,12 +193,7 @@ class GradesController < ApplicationController
     vmquestions = questionnaire.questions
     vm.add_questions(vmquestions)
     vm.add_team_members(@team)
-    # puts @assignment.inspect
     qn = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: 2).size >= 1
-    puts "value off qn is"
-    puts qn
-    puts "value of @assignment.varying_rubrics_by_round? is"
-    puts @assignment.varying_rubrics_by_round?
     vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
     vm.calculate_metrics
     vm

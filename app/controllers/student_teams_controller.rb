@@ -107,8 +107,8 @@ class StudentTeamsController < ApplicationController
 
   def remove_participant
     # remove the record from teams_participants table
-    team_participant = TeamsParticipant.where(team_id: params[:team_id], user_id: student.user_id)
-    remove_team_participant(team_participant)
+    team_user = TeamsParticipant.where(team_id: params[:team_id], user_id: student.user_id)
+    remove_team_user(team_user)
     # if your old team does not have any members, delete the entry for the team
     if TeamsParticipant.where(team_id: params[:team_id]).empty?
       old_team = AssignmentTeam.find params[:team_id]
@@ -126,12 +126,11 @@ class StudentTeamsController < ApplicationController
     redirect_to view_student_teams_path student_id: student.id
   end
 
-  # Method for removing a participant from a team
-  def remove_team_participant(team_participant)
-    return false unless team_participant
+  def remove_team_user(team_user)
+    return false unless team_user
 
-    team_participant.destroy_all
-    undo_link "The user \"#{team_participant.user.name}\" has been successfully removed from the team."
+    team_user.destroy_all
+    undo_link "The user \"#{team_user.name}\" has been successfully removed from the team."
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'User removed a participant from the team', request)
   end
 

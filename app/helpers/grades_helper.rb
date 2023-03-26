@@ -14,7 +14,7 @@ module GradesHelper
   def score_vector(reviews, symbol)
     scores = []
     reviews.each do |review|
-      scores << Response.assessment_score(response: [review], questions: @questions[symbol.to_sym], q_types: [])
+      scores << Response.score(response: [review], questions: @questions[symbol.to_sym], q_types: [])
     end
     scores
   end
@@ -173,8 +173,11 @@ module GradesHelper
                              else
                                (questionnaire.symbol.to_s + round.to_s).to_sym
                              end
+      puts round
       questions[questionnaire_symbol] = questionnaire.questions
     end
+    puts "questions"
+    puts questions
     questions
   end
 end

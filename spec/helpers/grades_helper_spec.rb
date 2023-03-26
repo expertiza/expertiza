@@ -56,7 +56,7 @@ describe GradesHelper, type: :helper do
 
   describe 'score_vector' do
     it 'should return the scores from the questions in a vector' do
-      allow(Response).to receive(:assessment_score).with(response: [review_response], questions: [question], q_types: []).and_return(75)
+      allow(Response).to receive(:score).with(response: [review_response], questions: [question], q_types: []).and_return(75)
       @questions = { s: [question] }
       expect(score_vector([review_response, review_response], 's')).to eq([75, 75])
     end
@@ -67,7 +67,7 @@ describe GradesHelper, type: :helper do
       symbol = :s
       @grades_bar_charts = { s: nil }
       @participant_score = { symbol => { assessments: [review_response, review_response] } }
-      allow(Response).to receive(:assessment_score).with(response: [review_response], questions: [question], q_types: []).and_return(75)
+      allow(Response).to receive(:score).with(response: [review_response], questions: [question], q_types: []).and_return(75)
       allow(GradesController).to receive(:bar_chart).with([75, 75]).and_return(
         'http://chart.apis.google.com/chart?chs=800x200&cht=bvg&chco=0000ff,ff0000,00ff00&chd=s:yoeKey,KUeoy9,9yooy9&chdl=Trend+1|Trend+2|Trend+3&chtt=Bar+Chart'
       )

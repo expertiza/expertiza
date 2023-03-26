@@ -55,7 +55,10 @@ class GradesController < ApplicationController
   end
 
   def view_my_scores
+    # view reviews of team
+    # find participant by id
     @participant = AssignmentParticipant.find(params[:id])
+    # find team of the participant using parent_id and user_id
     @team_id = TeamsParticipant.team_id(@participant.parent_id, @participant.user_id)
     return if redirect_when_disallowed
 

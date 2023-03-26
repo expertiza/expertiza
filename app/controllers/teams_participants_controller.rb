@@ -104,10 +104,15 @@ class TeamsParticipantsController < ApplicationController
   end
 
   def delete
+    # find participant by id
     @teams_participant = TeamsParticipant.find(params[:id])
+    # find the parent_id of the team to which the participant belongs to
     parent_id = Team.find(@teams_participant.team_id).parent_id
+    # find the participant
     participant = Participant.find_by(id: @teams_participant.participant_id)
+    # find the user
     @user = User.find(participant.user_id)
+    # delete the participant
     @teams_participant.destroy
     undo_link("The team user \"#{@user.name}\" has been successfully removed. ")
     redirect_to controller: 'teams', action: 'list', id: parent_id

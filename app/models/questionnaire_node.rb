@@ -76,7 +76,7 @@ class QuestionnaireNode < Node
     Questionnaire.find_by(id: node_object_id).try(:created_at)
   end
 
-  # Gets the date whe the questionnaire was modified
+  # Gets the date when the questionnaire was modified
   # Returns datetime datatype
   def get_modified_date
     Questionnaire.find_by(id: node_object_id).try(:updated_at)

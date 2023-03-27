@@ -95,7 +95,7 @@ class AssignmentNode < Node
     @assign_node ? @assign_node.course_id : Assignment.find_by(id: node_object_id).try(:course_id)
   end
 
-  # Checks if the assigment belongs to a particular course
+  # Checks if the assignment belongs to a particular course
   # Returns true or false
   def belongs_to_course?
     !get_course_id.nil?

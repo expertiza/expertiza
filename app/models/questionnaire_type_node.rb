@@ -28,7 +28,7 @@ class QuestionnaireTypeNode < FolderNode
     TreeFolder.find(node_object_id).name
   end
 
-  # Gets the children of the questionnaire node depending on the arguements passed
+  # Gets the children of the questionnaire node depending on the arguments passed
   # parameters:
   #   sortvar: valid strings - name, created_at, updated_at
   #   sortorder: valid strings - asc, desc

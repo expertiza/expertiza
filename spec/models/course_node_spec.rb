@@ -87,7 +87,7 @@ describe CourseNode do
     end
   end
 
-  # This test is commented as it will be used in the future when certain changes to the db are done.
+  # This test is commented as it will be used in the future when certain changes to the database are done.
   # describe '#course_is_private?' do
   #   it 'returns true or false depending on whether the course is private or not.' do
   #     expect(course_node.course_is_private?).to be true

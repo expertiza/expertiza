@@ -153,7 +153,8 @@ class ImportFileController < ApplicationController
       rescue StandardError
         errors << $ERROR_INFO
       end
-    else # params[:model] = "User"
+    else
+      # params[:model] = "User"
       contents_hash = eval(params[:contents_hash])
       if params[:has_header] == 'true'
         @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])

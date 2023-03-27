@@ -7,21 +7,20 @@ module ReviewMappingHelper
   def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
     response_maps = ResponseMap.where(reviewed_object_id: reviewed_object_id, reviewer_id: reviewer_id, type: type)
     response_counts = Array.new(@assignment.num_review_rounds, 0)
-  
-    response_maps.each_with_object([[], 0]) do |response_map, (response_maps_accumulator, rspan)|
+    response_maps_accumulator = []
+    rspan = 0
+    response_maps.each do |response_map|
       next unless Team.exists?(id: response_map.reviewee_id)
-  
       rspan += 1
       responses = response_map.response
-  
-      response_counts = (1..@assignment.num_review_rounds).each_with_object(response_counts) do |round, response_counts_accumulator|
-        response_counts_accumulator[round - 1] += 1 if responses.exists?(round: round)
-        response_counts_accumulator
+      (1..@assignment.num_review_rounds).each do |round|
+        response_counts[round - 1] += 1 if responses.exists?(round: round)
       end
-  
       response_maps_accumulator << response_map
-    end.then { |response_maps_accumulator, rspan| [response_maps_accumulator, rspan, response_counts] }
-  end 
+    end
+    [response_maps_accumulator, rspan, response_counts]
+end
+
 
   # gets the team name's color according to review and assignment submission status
   def get_team_color(response_map)
@@ -129,13 +128,13 @@ module ReviewMappingHelper
     num_rounds = @assignment.num_review_rounds
     round_variable_names = (1..num_rounds).map { |round| '@score_awarded_round_' + round.to_s }
     round_variable_names.each { |name| instance_variable_set(name, '-----') }
-    unless team_id.nil? || team_id == -1.0
-      (1..num_rounds).each do |round|
-        score = @review_scores[reviewer_id][round][team_id]
-        instance_variable_set('@score_awarded_round_' + round.to_s, score.to_s + '%') unless score.nil?
-      end
+    return if team_id.nil? || team_id == -1.0
+    (1..num_rounds).each do |round|
+      score = @review_scores.dig(reviewer_id, round, team_id)
+      instance_variable_set('@score_awarded_round_' + round.to_s, "#{score}%" ) unless score.nil?
     end
   end
+  
   
   # gets minimum, maximum and average grade value for all the reviews present
   def review_metrics(round, team_id)

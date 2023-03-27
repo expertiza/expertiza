@@ -98,10 +98,10 @@ describe TeamsController do
   end
 
   describe 'create method' do
-    context 'when invoked with a team which does not exist' do
+    context 'when invoked with a team which exists' do
       it 'creates it' do
         allow(Assignment).to receive(:find).and_return(assignment1)
-        request_params = { id: assignment1.id, team: { name: 'rando team' } }
+        request_params = { id: assignment1.id, team: { name: 'no team' } }
         user_session = { user: ta, team_type: 'Assignment' }
         result = get :create, params: request_params, session: user_session
         # status code 302: Redirect url
@@ -109,14 +109,18 @@ describe TeamsController do
         expect(result).to redirect_to(action: 'list', id: assignment1.id)
       end
     end
-    context 'when invoked with a team which does exist' do # this is work in progress
-      it 'throws an error' do
+    context 'when invoked with a team which does not exist' do
+      it 'raises an error' do
         allow(Assignment).to receive(:find).and_return(assignment1)
-        request_params = { id: assignment1.id, team: { name: 'rando team' } }
+
+        # Set up the request parameters with a non-existent team name
+        request_params = { id: assignment1.id, team: { name: 'non-existent team' } }
         user_session = { user: ta, team_type: 'Assignment' }
-        # result = get :create, params: request_params, session: user_session
-        # expect(result.status).to eq 302
-        # expect(result).to redirect_to(:action => 'new', :id => assignment1.id)
+
+        # Expect an error to be raised when the create method is called
+        expect {
+          get :create, params: request_params, session: user_session
+        }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end
@@ -125,7 +129,7 @@ describe TeamsController do
     it 'updates the team name' do
       allow(Team).to receive(:find).and_return(team1)
       allow(Assignment).to receive(:find).and_return(assignment1)
-      request_params = { id: team1.id, team: { name: 'rando team' } }
+      request_params = { id: team1.id, team: { name: 'no team' } }
       user_session = { user: ta, team_type: 'Assignment' }
       # result = get :update, params: request_params, session: user_session
       # expect(result.status).to eq 302
@@ -174,26 +178,9 @@ describe TeamsController do
         expect(controller.instance_variable_get(:@team)).to eq team5
       end
     end
-    # this next test is work in progress
-    #     context 'gets called and team is not nil and it holds a topic' do
-    #       it 'it reassigns topic and then deletes the team' do
-    #         allow(Team).to receive(:find_by).and_return(team5)
-    #         allow(Object).to receive_message_chain(:const_get, :find).and_return(course1)
-    #         allow('if').to receive('true'.to_s)
-    #         #controller.instance_variable_set(:@signed_up_team, team5)
-    #         #allow(@signed_up_team).to receive(:==).and_return(1)
-    #         #controller.instance_variable_set(:@signUps, team5)
-    #         #allow(team5).to receive_message_chain(:first, :is_waitlisted).and_return(false)
-    #         #allow(@signed_up_team).to receive_message_chain(:first, :topic_id).and_return(5)
-    #         allow(team5).to receive(:destroy).and_return(nil)
-    #         request_params = {id: 5}
-    #         user_session = {user: instructor, team_type: 'CourseTeam'}
-    #         result = get :delete, params: request_params, session: user_session
-    #         expect(result.status).to eq 302
-    #       end
-    #     end
   end
 
+  #the below two tests are for inherit_copy and bequeath_copy respectively
   describe 'inherit method' do
     context 'called when assignment belongs to course and team is not empty' do
       it 'copies teams from course to the assignment' do

@@ -30,6 +30,16 @@ describe TeamsController do
         expect(result).to redirect_to(action: 'list', id: assignment1.id)
       end
     end
+    context 'when incorrect parameters are passed' do
+      it 'raises an error' do
+        # Expect an error to be raised when incorrect parameters are passed
+        request_params = { id: nil, team_size: 'abc' }
+        user_session = { user: instructor, team_type: 'Assignment' }
+        expect {
+          get :create_teams, params: request_params, session: user_session
+        }.to raise_error(ArgumentError)
+      end
+    end
   end
 
   describe 'list method' do

@@ -92,7 +92,7 @@ class Team < ApplicationRecord
     can_add_member
   end
 
-  # Define the size of the team,
+  # Define the size of the team
   def self.size(team_id)
     TeamsUser.where(team_id: team_id).count
   end

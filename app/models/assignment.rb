@@ -350,6 +350,7 @@ class Assignment < ApplicationRecord
     rounds
   end
 
+  # Find current stage of the assignment, whether submitted or review or finished
   def find_current_stage(topic_id = nil)
     next_due_date = get_next_due_date(id, topic_id)
     return 'Finished' if next_due_date.nil?
@@ -622,6 +623,7 @@ class Assignment < ApplicationRecord
     self.enable_pair_programming
   end
 
+  # Get next date when the assignment is due
   def get_next_due_date(assignment_id, topic_id = nil)
     assignment = Assignment.find(assignment_id)
     if assignment.staggered_deadline?
@@ -651,6 +653,7 @@ class Assignment < ApplicationRecord
     upcoming_due_dates_after_topic_date = AssignmentDueDate.where(parent_id: id)[topic_due_date_size..-1]
   end
 
+  # Get current date when the assignment is due
   def current_due_date
     due_dates.detect { |due_date| due_date.due_at > Time.now }
   end

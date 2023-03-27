@@ -69,7 +69,8 @@ module DueDateMixIn
 
   # if current  stage is submission or review, find the round number
   # otherwise, return 0
-  def number_of_current_round(topic_id)
+  def number_of_current_round(participant_id = nil)
+    topic_id = find_topic_id(participant_id)
     next_due_date = DueDate.get_next_due_date(id, topic_id)
     return 0 if next_due_date.nil?
 

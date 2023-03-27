@@ -54,12 +54,12 @@ class CourseNode < Node
   # get the courses managed by the user
   def self.get_courses_managed_by_user(user_id = nil)
     current_user = User.find(user_id)
-    values = if current_user.teaching_assistant? == false
+    courses = if current_user.teaching_assistant? == false
                user_id
              else
                Ta.get_mapped_courses(user_id)
              end
-    values
+    courses
   end
 
   # Returns id of the parent node for the node object

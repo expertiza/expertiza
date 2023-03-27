@@ -37,12 +37,12 @@ class QuestionnaireNode < Node
   # get the questionnaire managed by the user
   def self.get_questionnaires_managed_by_user(user_id = nil)
     current_user = User.find(user_id)
-    values = if current_user.role.name == 'Teaching Assistant'
+    questionnaires = if current_user.role.name == 'Teaching Assistant'
               Ta.get_mapped_instructor_ids(user_id)
             else
               user_id
             end
-    values
+    questionnaires
   end
   
  

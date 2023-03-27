@@ -3,10 +3,18 @@ class DueDate < ApplicationRecord
   validates :due_at, presence: true, if: -> { :due_at.to_s.is_a?(DateTime) }
   #  has_paper_trail
 
+  # Returns permissions allowed for each assignment stage
+  # Example: 
+  # 'signup' => { 
+  #     'submission_allowed' => OK,
+  #     'can_review' => NO,
+  #     'review_of_review_allowed' => NO
+  #  }
   def default_permission(deadline_type, permission_type)
     DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
   end
 
+  # Copy due dates from one assignment object to another
   def self.copy(old_assignment_id, new_assignment_id)
     duedates = where(parent_id: old_assignment_id)
     duedates.each do |orig_due_date|
@@ -16,6 +24,7 @@ class DueDate < ApplicationRecord
     end
   end
 
+  # Comparator to compare two due dates
   def <=>(other)
     if due_at && other.due_at
       due_at <=> other.due_at

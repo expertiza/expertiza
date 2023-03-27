@@ -102,6 +102,7 @@ class ResponseMap < ApplicationRecord
     team
   end
 
+  # Get the latest round number for a given assignment
   def assignment_latest_review_round(assignment_id)
     # for author feedback, quiz, teammate reviews, rounds # should be 1
     maps = ResponseMap.where(id: map_id, type: 'ReviewResponseMap')

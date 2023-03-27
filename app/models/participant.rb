@@ -118,6 +118,7 @@ class Participant < ApplicationRecord
     authorization
   end
 
+  # Check if teammate is allowed to review today.
   def teammate_review_allowed
     # time when teammate review is allowed
     due_date = assignment.current_due_date

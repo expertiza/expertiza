@@ -98,6 +98,7 @@ module DueDateMixIn
   end
 
   def find_current_stage(participant_id = nil)
+    topic_id = find_topic_id(participant_id)
     next_due_date = DueDate.get_next_due_date(id, topic_id)
     return 'Finished' if next_due_date.nil?
 

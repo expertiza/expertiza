@@ -100,7 +100,7 @@ class CourseNode < Node
     Course.find_by(id: node_object_id).try(:updated_at)
   end
 
-  # Gets only private ?
+  # Gets only private courses
   def get_private
     Course.find_by(id: node_object_id).try(:private)
   end
@@ -128,3 +128,12 @@ class CourseNode < Node
     Course.find_by(id: node_object_id).try(:survey_distribution_id)
   end
 end
+
+
+# This method is commented as it will be used in the future when certain changes to the db are done.
+# This method returns true or false depending on whether the course is private or not.
+# def course_is_private?(course)
+#   if course.private==0:
+#     false
+#   else
+#     true

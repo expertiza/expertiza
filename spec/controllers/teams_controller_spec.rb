@@ -37,7 +37,7 @@ describe TeamsController do
         user_session = { user: instructor, team_type: 'Assignment' }
         expect {
           get :create_teams, params: request_params, session: user_session
-        }.to raise_error(ArgumentError)
+        }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end
@@ -113,8 +113,8 @@ describe TeamsController do
       it 'raises an error' do
         allow(Assignment).to receive(:find).and_return(assignment1)
 
-        # Set up the request parameters with a non-existent team name
-        request_params = { id: assignment1.id, team: { name: 'non-existent team' } }
+        # Set up the request parameters with a wrong data type for team name
+        request_params = { id: assignment1.id, team: { name:  123 } }
         user_session = { user: ta, team_type: 'Assignment' }
 
         # Expect an error to be raised when the create method is called

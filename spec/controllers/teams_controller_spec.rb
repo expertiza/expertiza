@@ -109,20 +109,6 @@ describe TeamsController do
         expect(result).to redirect_to(action: 'list', id: assignment1.id)
       end
     end
-    context 'when invoked with a team which does not exist' do
-      it 'raises an error' do
-        allow(Assignment).to receive(:find).and_return(assignment1)
-
-        # Set up the request parameters with a wrong data type for team name
-        request_params = { id: assignment1.id, team: { name:  123 } }
-        user_session = { user: ta, team_type: 'Assignment' }
-
-        # Expect an error to be raised when the create method is called
-        expect {
-          get :create, params: request_params, session: user_session
-        }.to raise_error(ActiveRecord::RecordNotFound)
-      end
-    end
   end
 
   describe 'update method' do
@@ -139,16 +125,26 @@ describe TeamsController do
     # RumtimeError: stubbed models are not allowed to access the database - AssignmentTeam#save()
   end
 
+  # as edit method has only 1 line which is just to look up a team with the id present in the request_params
   describe 'edit method' do
-    it 'successfully returns the team with the given team id' do
-      allow(Team).to receive(:find).and_return(team1)
-      request_params = { id: team1.id }
-      user_session = { user: ta }
-      result = get :edit, params: request_params, session: user_session
-      expect(result.status).to eq 200
-      expect(controller.instance_variable_get(:@team)).to eq team1
+    context 'when team with given id that exists' do
+      it 'successfully returns the team with the given team id' do
+        allow(Team).to receive(:find).and_return(team1)
+        request_params = { id: team1.id }
+        user_session = { user: ta }
+        result = get :edit, params: request_params, session: user_session
+        expect(result.status).to eq 200
+        expect(controller.instance_variable_get(:@team)).to eq team1
+      end
     end
-    # this method has only 1 line which is just to look up a team with the id present in the request_params
+
+    context 'when team with given id does not exist' do
+      it 'raises an ActiveRecord::RecordNotFound error' do
+        expect {
+          get :edit, params: { id: 999 }, session: { user: ta }
+        }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
   end
 
   describe 'delete method' do

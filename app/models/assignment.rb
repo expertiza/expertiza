@@ -190,7 +190,7 @@ class Assignment < ApplicationRecord
   # The permissions of TopicDueDate is the same as AssignmentDueDate.
   # Here, column is usually something like 'review_allowed_id'
   def check_condition(column, topic_id = nil)
-    next_due_date = DueDate.get_next_due_date(id, topic_id)
+    next_due_date = get_next_due_date(id, topic_id)
     return false if next_due_date.nil?
 
     right_id = next_due_date.send column
@@ -297,7 +297,7 @@ class Assignment < ApplicationRecord
   # if current  stage is submission or review, find the round number
   # otherwise, return 0
   def number_of_current_round(topic_id)
-    next_due_date = DueDate.get_next_due_date(id, topic_id)
+    next_due_date = get_next_due_date(id, topic_id)
     return 0 if next_due_date.nil?
 
     next_due_date.round ||= 0
@@ -350,8 +350,9 @@ class Assignment < ApplicationRecord
     rounds
   end
 
+  # Find current stage of the assignment, whether submitted or review or finished
   def find_current_stage(topic_id = nil)
-    next_due_date = DueDate.get_next_due_date(id, topic_id)
+    next_due_date = get_next_due_date(id, topic_id)
     return 'Finished' if next_due_date.nil?
 
     next_due_date
@@ -369,7 +370,7 @@ class Assignment < ApplicationRecord
   def review_questionnaire_id(round_number = nil, topic_id = nil)
     # If round is not given, try to retrieve current round from the next due date
     if round_number.nil?
-      next_due_date = DueDate.get_next_due_date(id)
+      next_due_date = get_next_due_date(id)
       round_number = next_due_date.try(:round)
     end
     # Create assignment_form that we can use to retrieve AQ with all the same attributes and questionnaire based on AQ
@@ -620,6 +621,41 @@ class Assignment < ApplicationRecord
 
   def pair_programming_enabled?
     self.enable_pair_programming
+  end
+
+  # Get next date when the assignment is due
+  def get_next_due_date(assignment_id, topic_id = nil)
+    assignment = Assignment.find(assignment_id)
+    if assignment.staggered_deadline?
+      next_due_date = TopicDueDate.find_by(['parent_id = ? and due_at >= ?', topic_id, Time.zone.now])
+      upcoming_due_dates_after_topic_date = assignment.upcoming_due_dates_after_topic_date(topic_id)
+      # if certion TopicDueDate is not exist, we should query next corresponding AssignmentDueDate.
+      # eg. Time.now is 08/28/2016
+      # One topic uses following deadlines:
+      # TopicDueDate      08/01/2016
+      # TopicDueDate      08/02/2016
+      # TopicDueDate      08/03/2016
+      # AssignmentDueDate 09/04/2016
+      # In this case, we cannot find due_at later than Time.now in TopicDueDate.
+      # So we should find next corresponding AssignmentDueDate, starting with the 4th one, not the 1st one!
+      if next_due_date.nil? && upcoming_due_dates_after_topic_date
+        next_due_date = upcoming_due_dates_after_topic_date.detect { |assignment_due_date| assignment_due_date.due_at >= Time.zone.now }
+      end
+    else
+      next_due_date = AssignmentDueDate.find_by(['parent_id = ? && due_at >= ?', assignment_id, Time.zone.now])
+    end
+    next_due_date
+  end
+
+  # Create separate method to get next dates after topic dates to follow single responsibility principle
+  def upcoming_due_dates_after_topic_date(topic_id = nil)
+    topic_due_date_size = TopicDueDate.where(parent_id: topic_id).size
+    upcoming_due_dates_after_topic_date = AssignmentDueDate.where(parent_id: id)[topic_due_date_size..-1]
+  end
+
+  # Get current date when the assignment is due
+  def current_due_date
+    due_dates.detect { |due_date| due_date.due_at > Time.now }
   end
 
   private

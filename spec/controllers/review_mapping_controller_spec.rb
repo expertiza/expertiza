@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 describe ReviewMappingController do
   let(:assignment) { double('Assignment', id: 1) }
@@ -27,7 +29,7 @@ describe ReviewMappingController do
     allow(reviewer).to receive(:get_reviewer).and_return(reviewer)
   end
 
-  describe '#add_calibration' do
+  describe '#add_calibration_for_instructor' do
     context 'when both participant and review_response_map have already existed' do
       it 'does not need to create new objects and redirects to responses#new maps' do
         allow(AssignmentParticipant).to receive_message_chain(:where, :first)
@@ -36,7 +38,8 @@ describe ReviewMappingController do
           .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).with(no_args).and_return(review_response_map)
         request_params = { id: 1, team_id: 1 }
         user_session = { user: build(:instructor, id: 1) }
-        get :add_calibration, params: request_params, session: user_session
+        get :add_calibration_for_instructor, params: request_params, session: user_session
+        puts response
         expect(response).to redirect_to '/response/new?assignment_id=1&id=1&return=assignment_edit'
       end
     end
@@ -53,13 +56,13 @@ describe ReviewMappingController do
           .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).and_return(review_response_map)
         request_params = { id: 1, team_id: 1 }
         user_session = { user: build(:instructor, id: 1) }
-        get :add_calibration, params: request_params, session: user_session
+        get :add_calibration_for_instructor, params: request_params, session: user_session
         expect(response).to redirect_to '/response/new?assignment_id=1&id=1&return=assignment_edit'
       end
     end
   end
 
-  describe '#add_reviewer and #get_reviewer' do
+  describe '#add_reviewer_to_team and #get_reviewer' do
     before(:each) do
       allow(User).to receive_message_chain(:where, :first).with(name: 'expertiza').with(no_args).and_return(double('User', id: 1))
       @params = {
@@ -73,7 +76,7 @@ describe ReviewMappingController do
     context 'when team_user does not exist' do
       it 'shows an error message and redirects to review_mapping#list_mappings page' do
         allow(TeamsUser).to receive(:exists?).with(team_id: '1', user_id: 1).and_return(true)
-        post :add_reviewer, params: @params
+        post :add_reviewer_to_team, params: @params
         expect(response).to redirect_to '/review_mapping/list_mappings?id=1'
       end
     end
@@ -89,7 +92,7 @@ describe ReviewMappingController do
         allow(ReviewResponseMap).to receive_message_chain(:where, :first)
           .with(reviewee_id: '1', reviewer_id: 1).with(no_args).and_return(nil)
         allow(ReviewResponseMap).to receive(:create).with(reviewee_id: '1', reviewer_id: 1, reviewed_object_id: 1).and_return(nil)
-        post :add_reviewer, params: @params
+        post :add_reviewer_to_team, params: @params
         expect(response).to redirect_to '/review_mapping/list_mappings?id=1&msg='
       end
     end
@@ -97,7 +100,7 @@ describe ReviewMappingController do
     context 'when instructor tries to assign a student their own artifact for reviewing' do
       it 'flashes an error message' do
         allow(TeamsUser).to receive(:exists?).with(team_id: '1', user_id: 1).and_return(true)
-        post :add_reviewer, params: @params
+        post :add_reviewer_to_team, params: @params
         expect(flash[:error]).to eq('You cannot assign this student to review his/her own artifact.')
         expect(response).to redirect_to '/review_mapping/list_mappings?id=1'
       end
@@ -262,7 +265,7 @@ describe ReviewMappingController do
     context 'when corresponding response map exists' do
       it 'shows a flash error and redirects to student_quizzes page' do
         allow(ResponseMap).to receive_message_chain(:where, :first).with(reviewed_object_id: '1', reviewer_id: '1')
-          .with(no_args).and_return(double('ResponseMap'))
+                                                                   .with(no_args).and_return(double('ResponseMap'))
 
         post :assign_quiz_dynamically, params: @params
         expect(flash[:error]).to eq('You have already taken that quiz.')
@@ -501,6 +504,92 @@ describe ReviewMappingController do
     end
   end
 
+  describe ReviewMappingController do
+    let(:assignment) { double('Assignment', id: 1) }
+    let(:reviewer) { double('Participant', id: 1, name: 'reviewer') }
+    let(:review_response_map) do
+      double('ReviewResponseMap', id: 1, map_id: 1, assignment: assignment, reviewed_object_id: 1,
+                                  reviewer: reviewer, reviewee: double('Participant', id: 2, name: 'reviewee'))
+    end
+    let(:metareview_response_map) do
+      double('MetareviewResponseMap', id: 1, map_id: 1, assignment: assignment,
+                                      reviewer: reviewer, reviewee: double('Participant', id: 2, name: 'reviewee'))
+    end
+    let(:participant) { double('AssignmentParticipant', id: 1, can_review: false, user: double('User', id: 1)) }
+    let(:participant1) { double('AssignmentParticipant', id: 2, can_review: true, user: double('User', id: 2)) }
+    let(:user) { double('User', id: 3) }
+    let(:participant2) { double('AssignmentParticipant', id: 3, can_review: true, user: user) }
+    let(:team) { double('AssignmentTeam', name: 'no one') }
+    let(:team1) { double('AssignmentTeam', name: 'no one1') }
+
+    before(:each) do
+      allow(Assignment).to receive(:find).with('1').and_return(assignment)
+      instructor = build(:instructor)
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      allow(participant).to receive(:get_reviewer).and_return(participant)
+      allow(participant1).to receive(:get_reviewer).and_return(participant1)
+      allow(participant2).to receive(:get_reviewer).and_return(participant2)
+      allow(reviewer).to receive(:get_reviewer).and_return(reviewer)
+    end
+
+    context 'to test generating a sorted teams hash' do
+      it 'returns an empty hash' do
+        allow(ReviewResponseMap).to receive(:create)
+          .with(reviewed_object_id: '2', reviewer_id: 2, reviewee_id: '1', calibrate_to: true).and_return(review_response_map)
+        id = 1
+        expect(ReviewMappingController.new.send(:generate_sorted_teams_hash, id)).to eql({})
+      end
+    end
+
+    context 'to test assigning reviewers for a team' do
+      it 'finds participants who have insufficient reviews and assigns reviewers to them' do
+        allow(AssignmentParticipant).to receive_message_chain(:where, :first)
+          .with(parent_id: '1', user_id: 1).with(no_args).and_return(nil)
+        allow(AssignmentParticipant).to receive(:create)
+          .with(parent_id: '1', user_id: 1, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle').and_return(participant)
+
+        allow(ReviewResponseMap).to receive_message_chain(:where, :first)
+          .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).with(no_args).and_return(nil)
+        allow(ReviewResponseMap).to receive(:create)
+          .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).and_return(review_response_map)
+        allow(ReviewResponseMap).to receive(:where).with(reviewer_id: 1, reviewed_object_id: 1)
+                                                   .and_return(:review_response_map)
+
+        allow(ReviewResponseMap).to receive(:last).with(no_args)
+                                                  .and_return(:review_response_map)
+
+        allow(ReviewResponseMap).to receive_message_chain(:where, :where, :size)
+          .with(reviewed_object_id: 1, assignment_id: 1, calibrate_to: false).with('created_at > :time', time: nil).with(no_args).and_return(0)
+
+        assignment_id = 1
+        obj_review_mapping_controller = ReviewMappingController.new
+
+        allow(ReviewResponseMap).to receive_message_chain(:where, :last)
+          .with(reviewed_object_id: 1, calibrate_to: false, created_at: ReviewMappingController.time_create_last_review_mapping_record).with(no_args).and_return(nil)
+
+        allow(ReviewResponseMap).to receive_message_chain(:where, :each)
+          .with(reviewed_object_id: assignment_id, calibrate_to: 0)
+          .with(no_args).and_return(:review_response_map)
+
+        allow(ReviewResponseMap).to receive_message_chain(:where, :last, :created_at)
+          .with(reviewed_object_id: assignment_id)
+          .with(no_args).with(no_args).and_return(nil)
+
+        participants = [participant1, participant2]
+        participants_hash = {}
+        participants.each { |participant| participants_hash[participant.id] = 0 }
+        team1 = double('AssignmentTeam')
+        team2 = double('AssignmentTeam')
+        teams = [team1, team2]
+        num_students_review = 1
+        review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, num_students_review)
+
+        puts obj_review_mapping_controller.send(:assign_reviewers_for_team, assignment, review_strategy, participants_hash)
+      end
+    end
+
+  end
+
   describe '#automatic_review_mapping' do
     before(:each) do
       allow(AssignmentParticipant).to receive(:where).with(parent_id: 1).and_return([participant, participant1, participant2])
@@ -641,7 +730,7 @@ describe ReviewMappingController do
       }
 
       # Perform test
-      session_params = {user: stub_current_user(instructor, instructor.role.name, instructor.role) }
+      session_params = { user: stub_current_user(instructor, instructor.role.name, instructor.role) }
       post :save_grade_and_comment_for_reviewer, params: request_params, session: session_params
       expect(flash[:note]).to be nil
       expect(response).to redirect_to('/reports/response_report')
@@ -680,4 +769,8 @@ describe ReviewMappingController do
       end
     end
   end
+
+  # describe ReviewMappingController do
+
+  # end
 end

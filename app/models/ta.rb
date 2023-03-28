@@ -8,6 +8,7 @@ class Ta < User
                 ['All public assignments', 'list_all']].freeze
 
   def courses_assisted_with
+    # return courses assisted with Ta
     courses = TaMapping.where(ta_id: id)
     courses.map { |c| Course.find(c.course_id) }
   end
@@ -63,6 +64,7 @@ class Ta < User
   end
 
   def self.get_mapped_instructor_ids(user_id)
+    # This function takes in a user_id and returns an array of instructor ids mapped to the TA with the given user_id.
     ids = []
     mappings = TaMapping.where(ta_id: user_id)
     mappings.each do |map|
@@ -72,6 +74,7 @@ class Ta < User
   end
 
   def self.get_mapped_courses(user_id)
+    # This function takes in a user_id and returns an array of course ids mapped to the TA with the given user_id
     ids = []
     mappings = TaMapping.where(ta_id: user_id)
     mappings.each do |map|
@@ -81,23 +84,32 @@ class Ta < User
   end
 
   def get_instructor
+    # This function returns the instructor associated with the TA instance on which it is called.
     Ta.get_my_instructor(id)
   end
 
   def set_instructor(new_assign)
+    # This function takes a new assignment as an argument and sets its instructor_id and course_id
+    # attributes based on the instructor associated with the TA instance on which it is called
     new_assign.instructor_id = Ta.get_my_instructor(id)
     new_assign.course_id = TaMapping.get_course_id(id)
   end
 
   def assign_courses_to_assignment
+    # This function sets the @courses instance variable to an array of courses mapped
+    # to the TA instance on which it is called
     @courses = TaMapping.get_courses(id)
   end
 
   def teaching_assistant?
+    # check if teaching_assistant
     true
   end
 
   def self.get_user_list(user)
+    # This function takes a user object as an argument and returns an array of users who have
+    # the same or lower privileges than the given user and who are participants in at least one
+    # of the courses mapped to the TA instance on which it is called.
     courses = Ta.get_mapped_courses(user.id)
     participants = []
     user_list = []

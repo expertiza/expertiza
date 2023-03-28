@@ -6,20 +6,17 @@ module ReviewMappingHelper
   # gets the response map data of reviewer id, reviewed object id and type for the review report 
   def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
     response_maps = ResponseMap.where(reviewed_object_id: reviewed_object_id, reviewer_id: reviewer_id, type: type)
-    response_counts = Array.new(@assignment.num_review_rounds, 0)
-    response_maps_accumulator = []
-    rspan = 0
-    response_maps.each do |response_map|
-      next unless Team.exists?(id: response_map.reviewee_id)
-      rspan += 1
-      responses = response_map.response
-      (1..@assignment.num_review_rounds).each do |round|
-        response_counts[round - 1] += 1 if responses.exists?(round: round)
-      end
-      response_maps_accumulator << response_map
+    response_counts = calculate_response_counts(response_maps)
+    response_maps_with_counts = response_maps.select { |response_map| Team.exists?(id: response_map.reviewee_id) }
+    [response_maps_with_counts, response_maps_with_counts.size, response_counts]
+  end
+  
+  # calculates the response counts for each round
+  def calculate_response_counts(response_maps)
+    (1..@assignment.num_review_rounds).map do |round|
+      response_maps.count { |response_map| response_map.response.exists?(round: round) }
     end
-    [response_maps_accumulator, rspan, response_counts]
-end
+  end
 
 
   # gets the team name's color according to review and assignment submission status
@@ -126,14 +123,16 @@ end
   # gets the review score awarded based on each round of the review
   def get_awarded_review_score(reviewer_id, team_id)
     num_rounds = @assignment.num_review_rounds
-    round_variable_names = (1..num_rounds).map { |round| '@score_awarded_round_' + round.to_s }
+    round_variable_names = (1..num_rounds).map { |round| "@score_awarded_round_#{round}" }
     round_variable_names.each { |name| instance_variable_set(name, '-----') }
     return if team_id.nil? || team_id == -1.0
     (1..num_rounds).each do |round|
       score = @review_scores.dig(reviewer_id, round, team_id)
-      instance_variable_set('@score_awarded_round_' + round.to_s, "#{score}%" ) unless score.nil?
+      next if score.nil?
+      instance_variable_set("@score_awarded_round_#{round}", "#{score}%")
     end
   end
+  
   
   
   # gets minimum, maximum and average grade value for all the reviews present
@@ -248,20 +247,37 @@ end
     threshold = 30
     interval_precision = 2
     valid_intervals = intervals.select { |v| v < threshold }
-    if valid_intervals.empty?
-      nil
-    else
-      mean = valid_intervals.sum / valid_intervals.size.to_f
-      variance = valid_intervals.sum { |v| (v - mean) ** 2 } / valid_intervals.size.to_f
-      {
-        mean: mean.round(interval_precision),
-        min: valid_intervals.min,
-        max: valid_intervals.max,
-        variance: variance.round(interval_precision),
-        stand_dev: Math.sqrt(variance).round(interval_precision)
-      }
-    end
+    return nil if valid_intervals.empty?
+  
+    {
+      mean: calculate_mean(valid_intervals, interval_precision),
+      min: valid_intervals.min,
+      max: valid_intervals.max,
+      variance: calculate_variance(valid_intervals, interval_precision),
+      stand_dev: calculate_standard_deviation(valid_intervals, interval_precision)
+    }
   end
+  
+  # Calculate mean for tagging intervals
+  def calculate_mean(intervals, interval_precision)
+    mean = intervals.sum / intervals.size.to_f
+    mean.round(interval_precision)
+  end
+  
+  # Calculate variance for taggin intervals
+  def calculate_variance(intervals, interval_precision)
+    mean = intervals.sum / intervals.size.to_f
+    variance = intervals.sum { |v| (v - mean) ** 2 } / intervals.size.to_f
+    variance.round(interval_precision)
+  end
+  
+  # Calculate standard deviation for tagging intervals
+  def calculate_standard_deviation(intervals, interval_precision)
+    mean = intervals.sum / intervals.size.to_f
+    variance = intervals.sum { |v| (v - mean) ** 2 } / intervals.size.to_f
+    Math.sqrt(variance).round(interval_precision)
+  end
+  
   
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)
     participant = Participant.find(participant_id)

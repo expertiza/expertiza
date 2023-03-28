@@ -77,10 +77,11 @@ module DueDateMixIn
     next_due_date.round ||= 0
   end
 
-  def link_for_current_stage(topic_id = nil)
+  def link_for_current_stage(participant_id = nil)
+    topic_id = find_topic_id(participant_id)
     return nil if staggered_and_no_topic?(topic_id)
 
-    due_date = find_current_stage(topic_id)
+    due_date = find_current_stage(participant_id)
     if due_date.nil? || (due_date == 'Finished') || due_date.is_a?(TopicDueDate)
       return nil
     end

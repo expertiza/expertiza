@@ -283,10 +283,11 @@ class Assignment < ApplicationRecord
     AssignmentQuestionnaire.where(assignment_id: id, used_in_round: 2).size > 1
   end
 
-  def stage_deadline(topic_id = nil)
+  def stage_deadline(participant_id = nil)
+    topic_id = find_topic_id(participant_id)
     return 'Unknown' if staggered_and_no_topic?(topic_id)
 
-    due_date = find_current_stage(topic_id)
+    due_date = find_current_stage(participant_id)
     due_date.nil? || due_date == 'Finished' ? due_date : due_date.due_at.to_s
   end
 

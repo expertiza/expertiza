@@ -97,6 +97,7 @@ class AssignmentTeam < Team
     end
     participants
   end
+
   alias get_participants participants
 
   # Delete the team
@@ -129,13 +130,27 @@ class AssignmentTeam < Team
 
   # REFACTOR BEGIN:: functionality of import,export, handle_duplicate shifted to team.rb
   # Import csv file to form teams directly
-  def self.import(row, assignment_id, options)
-    unless Assignment.find_by(id: assignment_id)
-      raise ImportError, 'The assignment with the id "' + assignment_id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
-    end
 
-    @assignment_team = prototype
-    Team.import(row, assignment_id, options, @assignment_team)
+  def self.import(row_hash, session = nil, id, options)
+    raise ArgumentError, "Record does not contain required items." if row_hash.length < self.required_import_fields.length
+    raise ImportError, "The assignment with the id \"" + id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?" if Assignment.find_by(id: id).nil?
+    Team.import_helper(row_hash, id, options, prototype)
+  end
+
+  def self.required_import_fields
+    { "teammembers" => "Team Members" }
+  end
+
+  def self.optional_import_fields(id = nil)
+    { "teamname" => "Team Name" }
+  end
+
+  def self.import_options
+    { "handle_dups" => { "display" => "Handle Duplicates",
+                         "options" => { "ignore" => "Ignore new team name",
+                                        "replace" => "Replace the existing team with the new team",
+                                        "insert" => "Insert any new team members into the existing team",
+                                        "rename" => "Rename the new team and import" } } }
   end
 
   # Export the existing teams in a csv file

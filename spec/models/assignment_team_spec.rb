@@ -189,25 +189,33 @@ describe 'AssignmentTeam' do
   end
 
   describe '.import' do
-    context 'when an assignment team does not already exist with the same id' do
-      it 'cannot be imported' do
+    let(:row) do
+      { teammembers: 'none' }
+    end
+    context "when an assignment team does not exist with id" do
+      it "raises ImportError" do
         assignment_id = 1
         allow(Assignment).to receive(:find_by).with(id: assignment_id).and_return(nil)
         error_message = 'The assignment with the id "' + assignment_id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
-        expect { AssignmentTeam.import([], assignment_id, []) }
+        expect { AssignmentTeam.import(row, nil, assignment_id, nil) }
           .to raise_error(ImportError, error_message)
+      end
+    end
+
+    context "when the assignment team does not have the required fields" do
+      it "raises ArgumentError" do
+        expect { AssignmentTeam.import([], nil, 1, nil) }.
+          to raise_error(ArgumentError)
       end
     end
 
     context 'when an assignment team with the same id already exists' do
       it 'gets imported through Team.import' do
-        row = []
         assignment_id = 1
         options = []
         allow(Assignment).to receive(:find_by).with(id: assignment_id).and_return(assignment)
-        allow(Team).to receive(:import).with(row, assignment_id, options, instance_of(AssignmentTeam))
-        expect(Team).to receive(:import).with(row, assignment_id, options, instance_of(AssignmentTeam))
-        AssignmentTeam.import(row, assignment_id, options)
+        expect(Team).to receive(:import_helper).with(row, assignment_id, options, instance_of(AssignmentTeam))
+        AssignmentTeam.import(row, nil, assignment_id, options)
       end
     end
   end
@@ -233,7 +241,7 @@ describe 'AssignmentTeam' do
       team = build(:assignment_team, id: 1, parent_id: 1, directory_num: -1)
       max_num = 0
       allow(AssignmentTeam).to receive_message_chain(:where, :order, :first, :directory_num)
-        .with(parent_id: team.parent_id).with(:directory_num, :desc).with(no_args).with(no_args).and_return(max_num)
+                                 .with(parent_id: team.parent_id).with(:directory_num, :desc).with(no_args).with(no_args).and_return(max_num)
       expect(team.set_student_directory_num).to be true
     end
   end
@@ -333,7 +341,7 @@ describe 'AssignmentTeam' do
       it 'assign the reviewer to the team' do
         allow(Assignment).to receive(:find).with(team.parent_id).and_return(assignment)
         allow(ReviewResponseMap).to receive(:create)
-          .with(reviewee_id: team.id, reviewer_id: participant1.id, reviewed_object_id: assignment.id, team_reviewing_enabled: false).and_return(review_response_map)
+                                      .with(reviewee_id: team.id, reviewer_id: participant1.id, reviewed_object_id: assignment.id, team_reviewing_enabled: false).and_return(review_response_map)
         expect(team.assign_reviewer(participant1)).to eq(review_response_map)
       end
     end

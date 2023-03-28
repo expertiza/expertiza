@@ -50,15 +50,17 @@ class User < ApplicationRecord
 
   def can_impersonate?(user)
     role.super_admin? ||
-    teaching_assistant_for?(user) ||
-    recursively_parent_of(user)
+      teaching_assistant_for?(user) ||
+      recursively_parent_of(user)
   end
 
   def recursively_parent_of(user)
     p = user.parent
-    return p == self ||
-      recursively_parent_of(p) unless p.nil? ||
-      (p.role && p.role.super_admin?)
+    unless p.nil? ||
+           p.role&.super_admin?
+      return p == self ||
+             recursively_parent_of(p)
+    end
     false
   end
 
@@ -76,8 +78,8 @@ class User < ApplicationRecord
     # Add the children to the list
     unless role.super_admin?
       User.includes(:parent, :role, parent: %i[parent role]).find_each do |user|
-        if recursively_parent_of(user)
-          user_list << user unless user_list.include?(user)
+        if recursively_parent_of(user) && !user_list.include?(user)
+          user_list << user
         end
       end
     end
@@ -88,11 +90,11 @@ class User < ApplicationRecord
   # Zhewei: anonymized view for demo purposes - 1/3/2018
 
   def name(ip_address = nil)
-    User.anonymized_view?(ip_address) ? role.name + ' ' + id.to_s : self[:name]
+    User.anonymized_view?(ip_address) ? "#{role.name} #{id.to_s}" : self[:name]
   end
 
   def fullname(ip_address = nil)
-    User.anonymized_view?(ip_address) ? role.name + ', ' + id.to_s : self[:fullname]
+    User.anonymized_view?(ip_address) ? "#{role.name}, #{id.to_s}" : self[:fullname]
   end
 
   def first_name(ip_address = nil)
@@ -100,7 +102,7 @@ class User < ApplicationRecord
   end
 
   def email(ip_address = nil)
-    User.anonymized_view?(ip_address) ? role.name + '_' + id.to_s + '@mailinator.com' : self[:email]
+    User.anonymized_view?(ip_address) ? "#{role.name}_#{id.to_s}@mailinator.com" : self[:email]
   end
 
   def super_admin?
@@ -118,7 +120,8 @@ class User < ApplicationRecord
   # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
   def email_welcome
     # this will send an account creation notification to user via email.
-    MailerHelper.send_mail_to_user(self, 'Your Expertiza account and password has been created', 'user_welcome', password).deliver_now
+    MailerHelper.send_mail_to_user(self, 'Your Expertiza account and password has been created', 'user_welcome', 
+                                   password).deliver_now
   end
 
   def valid_password?(password)
@@ -137,7 +140,10 @@ class User < ApplicationRecord
   end
 
   def self.import(row_hash, _row_header, session, _id = nil)
-    raise ArgumentError, "Only #{row_hash.length} column(s) is(are) found. It must contain at least username, full name, email." if row_hash.length < 3
+    if row_hash.length < 3
+      raise ArgumentError, 
+            "Only #{row_hash.length} column(s) is(are) found. It must contain at least username, full name, email."
+    end
 
     user = User.find_by_name(row_hash[:name])
     if user.nil?
@@ -225,7 +231,10 @@ class User < ApplicationRecord
       tcsv.push(user.name, user.fullname, user.email) if options['personal_details'] == 'true'
       tcsv.push(user.role.name) if options['role'] == 'true'
       tcsv.push(user.parent.name) if options['parent'] == 'true'
-      tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails) if options['email_options'] == 'true'
+      if options['email_options'] == 'true'
+        tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, 
+                  user.copy_of_emails)
+      end
       tcsv.push(user.etc_icons_on_homepage) if options['etc_icons_on_homepage'] == 'true'
       tcsv.push(user.handle) if options['handle'] == 'true'
       csv << tcsv
@@ -241,7 +250,10 @@ class User < ApplicationRecord
     fields.push('name', 'full name', 'email') if options['personal_details'] == 'true'
     fields.push('role') if options['role'] == 'true'
     fields.push('parent') if options['parent'] == 'true'
-    fields.push('email on submission', 'email on review', 'email on metareview', 'copy of emails') if options['email_options'] == 'true'
+    if options['email_options'] == 'true'
+      fields.push('email on submission', 'email on review', 'email on metareview', 
+                  'copy of emails')
+    end
     fields.push('preference home flag') if options['etc_icons_on_homepage'] == 'true'
     fields.push('handle') if options['handle'] == 'true'
     fields
@@ -262,9 +274,10 @@ class User < ApplicationRecord
 
   def teaching_assistant_for?(student)
     return false unless teaching_assistant? &&
-      student &&
-      student.role &&
-      student.role.name == 'Student'
+                        student &&
+                        student.role &&
+                        student.role.name == 'Student'
+
     # We have to use the Ta object instead of User object
     # because single table inheritance is not currently functioning
     ta = Ta.find(id)
@@ -281,11 +294,12 @@ class User < ApplicationRecord
     key_word = { '1' => 'name', '2' => 'fullname', '3' => 'email' }
     sql = "(role_id in (?) or id = ?) and #{key_word[search_by]} like ?"
     if key_word.include? search_by
-      search_filter = '%' + letter + '%'
+      search_filter = "%#{letter}%"
       users = User.order('name').where(sql, role.get_available_roles, user_id, search_filter)
     else # default used when clicking on letters
-      search_filter = letter + '%'
-      users = User.order('name').where('(role_id in (?) or id = ?) and name like ?', role.get_available_roles, user_id, search_filter)
+      search_filter = "#{letter}%"
+      users = User.order('name').where('(role_id in (?) or id = ?) and name like ?', role.get_available_roles, user_id, 
+                                       search_filter)
     end
     users
   end

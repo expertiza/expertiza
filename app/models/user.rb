@@ -38,6 +38,7 @@ class User < ApplicationRecord
   has_paper_trail
 
   def list_mine(object_type, user_id)
+    # Takes an object type and a user ID and returns a list of objects owned by the user with the provided ID.
     object_type.where(['instructor_id = ?', user_id])
   end
 
@@ -49,12 +50,14 @@ class User < ApplicationRecord
   end
 
   def can_impersonate?(user)
+    # Takes a user object and returns true if the current user has permission to impersonate the provided user.
     role.super_admin? ||
       teaching_assistant_for?(user) ||
       recursively_parent_of(user)
   end
 
   def recursively_parent_of(user)
+    # Takes a user object and returns true if the current user is the parent or a recursively higher-level parent of the provided user.
     p = user.parent
     unless p.nil? ||
            p.role&.super_admin?
@@ -65,6 +68,11 @@ class User < ApplicationRecord
   end
 
   def get_user_list
+    # Returns a list of all users visible to the current user depending on the user's role.
+    # If the user is a super admin, all users are returned. If the user is an instructor,
+    # all users in their course/assignment are returned.
+    # If the user is a TA, all users in their courses are returned.
+    # Otherwise, all children of the current user are returned.
     user_list = []
     # If the user is a super admin, fetch all users
     user_list = SuperAdministrator.get_user_list if role.super_admin?
@@ -173,6 +181,7 @@ class User < ApplicationRecord
   end
 
   def set_instructor(new_assignment)
+    # Takes an assignment object and sets the instructor ID to the current user's ID.
     new_assignment.instructor_id = id
   end
 
@@ -225,6 +234,7 @@ class User < ApplicationRecord
   end
 
   def self.export(csv, _parent_id, options)
+    # export csv
     users = User.all
     users.each do |user|
       tcsv = []
@@ -246,6 +256,7 @@ class User < ApplicationRecord
   end
 
   def self.export_fields(options)
+    # export the fields in options
     fields = []
     fields.push('name', 'full name', 'email') if options['personal_details'] == 'true'
     fields.push('role') if options['role'] == 'true'

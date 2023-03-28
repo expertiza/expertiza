@@ -26,11 +26,11 @@ class AssignmentsController < ApplicationController
   def assignment_name_exists?
     Assignment.exists?(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
   end
-  
+
   # Returns True if a directory by given directory path and course_id (user params) if already present
   def assignment_directory_exists?
     Assignment.exists?(directory_path: assignment_form_params[:assignment][:directory_path],
-                        course_id: @assignment_form.assignment.course_id)
+                       course_id: @assignment_form.assignment.course_id)
   end
 
   # creates a new assignment via the assignment form
@@ -47,7 +47,7 @@ class AssignmentsController < ApplicationController
         if assignment_directory_exists?
           flash[:error] << '<br>  ' + assignment_form_params[:assignment][:directory_path] + ' already exists as a submission directory name'
         end
-        return redirect_to '/assignments/new?private=1'    
+        return redirect_to '/assignments/new?private=1'
       elsif @assignment_form.save
         @assignment_form.create_assignment_node
         new_assignment = Assignment.find(@assignment_form.assignment.id)
@@ -481,8 +481,8 @@ class AssignmentsController < ApplicationController
 
   # this function does multiple things
   # 1. returns an assignment form based on param id
-  # 2. removes any questionnaires from the assignment_questionnaire field of the params hash that have an empty questionnaire_id field. 
-  # 3. set due_date_info 
+  # 2. removes any questionnaires from the assignment_questionnaire field of the params hash that have an empty questionnaire_id field.
+  # 3. set due_date_info
   # 4. delete all Due date info from table if meta-review is unchecked.
   def retrieve_assignment_form
     @assignment_form = AssignmentForm.create_form_object(params[:id])

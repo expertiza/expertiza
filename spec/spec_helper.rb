@@ -13,7 +13,7 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
                                                                  SimpleCov::Formatter::HTMLFormatter,
                                                                  Coveralls::SimpleCov::Formatter
                                                                ])
-SimpleCov.start do
+SimpleCov.start 'rails' do
   add_filter './models/course_participant_spec.rb'
   add_filter './models/assignment_participant_spec.rb'
   add_filter './models/due_date_spec.rb'

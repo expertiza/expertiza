@@ -57,7 +57,7 @@ class AssignmentForm
   def update(attributes, user, _vary_by_topic_desired = false)
     @has_errors = false
     has_late_policy = false
-    if attributes.dig(:assignment,:late_policy_id).to_i > 0
+    if attributes.dig(:assignment, :late_policy_id).to_i > 0
       has_late_policy = true
     else
       attributes[:assignment][:late_policy_id] = nil
@@ -228,12 +228,12 @@ class AssignmentForm
   end
 
   # Finds an AQ based on the given values
-  # Gets all AQs for the assignment based on how assignment varies. Can vary by duty_id,
-  # topic and round # together, and topic and round # separately. 
-  # Otherwise gets all AQs.
+  # Gets all AQs for the assignment based on how assignment varies.
+  # Can vary by duty_id, topic and round # together,
+  # and topic and round # separately. Otherwise gets all AQs.
   # If the AQ questionnaire matches the type of the questionnaire that
   # needs to be updated, return it
-  # for each assigment_questionair we check the condition specified
+  # for each assigment_questionnaire we check the condition specified
   # after the value is set by the conditional statement preceding it
 
   def assignment_questionnaire(questionnaire_type, round_number, topic_id, duty_id = nil)
@@ -271,8 +271,8 @@ class AssignmentForm
     default_weight['TeammateReviewQuestionnaire'] = 0
     default_weight['BookmarkRatingQuestionnaire'] = 0
 
-    default_aq = AssignmentQuestionnaire.where(user_id: assignment.instructor_id, 
-    assignment_id: nil, questionnaire_id: nil).first
+    default_aq = AssignmentQuestionnaire.where(user_id: assignment.instructor_id,
+                                               assignment_id: nil, questionnaire_id: nil).first
     default_limit = if default_aq.blank?
                       15
                     else
@@ -298,7 +298,7 @@ class AssignmentForm
   end
 
   # Parses due_date string and returns time difference between time left and
-  # due date threshold in minutes and also returns time left 
+  # due date threshold in minutes and also returns time left
   # until due date in minutes
   def get_time_diff_btw_due_date_and_now(due_date)
     due_at = due_date.due_at.to_s(:db)
@@ -335,7 +335,7 @@ class AssignmentForm
     @assignment.delete(force)
   end
 
-  # This functions finds the epoch time in seconds of the due_at parameter and finds 
+  # This functions finds the epoch time in seconds of the due_at parameter and finds
   # the difference of it from the current time and returns this difference in minutes
   def find_min_from_now(due_at)
     curr_time = DateTime.now.in_time_zone('UTC').to_s(:db)
@@ -412,12 +412,12 @@ class AssignmentForm
     end
   end
 
-  # Adds task to the simicheck queue and sets the task to be dequed after due_date + 
+  # Adds task to the simicheck queue and sets the task to be dequed after due_date +
   # simicheck_delay_hours_duration
   # time has passed
   def enqueue_simicheck_task(due_date, simicheck_delay_hours_duration)
-    dequeue_time_as_seconds_duration_from_now = DueDate.get_dequeue_time_as_seconds_duration_from_now(
-      due_date, simicheck_delay_hours_duration)
+    dequeue_time_as_seconds_duration_from_now =
+      DueDate.get_dequeue_time_as_seconds_duration_from_now(due_date, simicheck_delay_hours_duration)
 
     SimicheckWorker.perform_in(dequeue_time_as_seconds_duration_from_now.to_i, @assignment.id)
   end

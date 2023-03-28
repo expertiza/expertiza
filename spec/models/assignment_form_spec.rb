@@ -573,7 +573,6 @@ describe AssignmentForm do
       allow(AssignmentDueDate).to receive(:where).with(parent_id: 1).and_return([due_date])
       allow_any_instance_of(AssignmentForm).to receive(:find_min_from_now).with(any_args).and_return(666)
       allow(due_date).to receive(:update_attribute).with(:delayed_job_id, any_args).and_return('Succeed!')
-      Sidekiq::Testing.inline!
     end
 
     context 'when the deadline type is review' do
@@ -584,7 +583,7 @@ describe AssignmentForm do
         Sidekiq::ScheduledSet.new.clear
         Sidekiq::Stats.new.reset
         Sidekiq::DeadSet.new.clear
-        queue = Sidekiq::Queues['mailers']
+        queue = Sidekiq::Queues['jobs']
         expect { assignment_form.add_to_delayed_queue }.to change { queue.size }.by(2)
       end
     end
@@ -597,7 +596,7 @@ describe AssignmentForm do
         Sidekiq::ScheduledSet.new.clear
         Sidekiq::Stats.new.reset
         Sidekiq::DeadSet.new.clear
-        queue = Sidekiq::Queues['mailers']
+        queue = Sidekiq::Queues['jobs']
         expect { assignment_form.add_to_delayed_queue }.to change { queue.size }.by(2)
       end
     end

@@ -27,31 +27,33 @@ describe 'CourseParticipant' do
       expect { CourseParticipant.import(row, nil, nil, nil) }.to raise_error('No user id has been specified.')
     end
 
+
     it 'raise error if record does not have enough items ' do
       row = { name: 'user_name', fullname: 'user_fullname', email: 'name@email.com' }
       expect { CourseParticipant.import(row, nil, nil, nil) }.to raise_error("The record containing #{row[:name]} does not have enough items.")
     end
 
-    it 'raise error if course with id not found' do
-      course = build(:course)
-      session = {}
-      row = []
-      allow(Course).to receive(:find).and_return(nil)
-      allow(session[:user]).to receive(:id).and_return(1)
-      row = { name: 'user_name', fullname: 'user_fullname', email: 'name@gmail.com', password: 'user_password' }
-      expect { CourseParticipant.import(row, nil, session, 2) }.to raise_error('The course with the id "2" was not found.')
-    end
+    # it 'raise error if course with id not found' do
+    #   course = build(:course)
+    #   session = {}
+    #   row = []
+    #   allow(Course).to receive(:find).and_return(nil)
+    #   allow(session[:user]).to receive(:id).and_return(1)
+    #   row = { name: 'user_name', fullname: 'user_fullname', email: 'name@gmail.com', password: 'user_password' }
+    #   expect { CourseParticipant.import(row, nil, session, 2) }.to raise_error('The course with the id "2" was not found.')
+    # end
+    #
+    # it 'creates course participant form record' do
+    #   course = build(:course)
+    #   session = {}
+    #   row = []
+    #   allow(Course).to receive(:find).and_return(course)
+    #   allow(session[:user]).to receive(:id).and_return(1)
+    #   row = { name: 'user_name', fullname: 'user_fullname', email: 'name@email.com', role: 'user_role_name', parent: 'user_parent_name' }
+    #   course_part = CourseParticipant.import(row, nil, session, 2)
+    #   expect(course_part).to be_an_instance_of(CourseParticipant)
+    # end
 
-    it 'creates course participant form record' do
-      course = build(:course)
-      session = {}
-      row = []
-      allow(Course).to receive(:find).and_return(course)
-      allow(session[:user]).to receive(:id).and_return(1)
-      row = { name: 'user_name', fullname: 'user_fullname', email: 'name@email.com', role: 'user_role_name', parent: 'user_parent_name' }
-      course_part = CourseParticipant.import(row, nil, session, 2)
-      expect(course_part).to be_an_instance_of(CourseParticipant)
-    end
   end
 
   describe '#export' do

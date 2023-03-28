@@ -12,6 +12,7 @@ class AssignmentForm
 
   DEFAULT_MAX_TEAM_SIZE = 1
 
+  # Initialize assignment arguments and attributes
   def initialize(args = {})
     @assignment = Assignment.new(args[:assignment])
     if args[:assignment].nil?
@@ -24,7 +25,7 @@ class AssignmentForm
     @due_dates = Array(args[:due_dates])
   end
 
-  # create a form object for this assignment_id
+  # Create a form object for this assignment_id
   def self.create_form_object(assignment_id)
     assignment_form = AssignmentForm.new
     assignment_form.assignment = Assignment.find(assignment_id)
@@ -35,10 +36,10 @@ class AssignmentForm
     assignment_form
   end
 
+  # Check rubrics to make sure weight is 0 if there are no Scored Questions
   def rubric_weight_error(attributes)
     error = false
     attributes[:assignment_questionnaire].each do |assignment_questionnaire|
-      # Check rubrics to make sure weight is 0 if there are no Scored Questions
       scored_questionnaire = false
       questionnaire = Questionnaire.find(assignment_questionnaire[:questionnaire_id])
       questions = Question.where(questionnaire_id: questionnaire.id)
@@ -52,10 +53,11 @@ class AssignmentForm
     error
   end
 
+  # update assignment attributes in db after editing, resets queue if due date is changed
   def update(attributes, user, _vary_by_topic_desired = false)
     @has_errors = false
     has_late_policy = false
-    if attributes[:assignment][:late_policy_id].to_i > 0
+    if attributes.dig(:assignment, :late_policy_id).to_i > 0
       has_late_policy = true
     else
       attributes[:assignment][:late_policy_id] = nil
@@ -132,7 +134,8 @@ class AssignmentForm
     end
   end
 
-  # s required by answer tagging
+  # When updating assignment form, tags need updating as well
+  # This is required by answer tagging
   def update_tag_prompt_deployments(attributes)
     unless attributes.nil?
       attributes.each do |key, value|
@@ -165,14 +168,14 @@ class AssignmentForm
   # end required by answer tagging
 
   # code to save due dates
+  # parses the dd and converts it to utc before saving it to db
+  #  eg. 2015-06-22 12:05:00 -0400
   def update_due_dates(attributes, user)
     return false unless attributes
 
     attributes.each do |due_date|
       next if due_date[:due_at].blank?
 
-      # parse the dd and convert it to utc before saving it to db
-      # eg. 2015-06-22 12:05:00 -0400
       current_local_time = Time.parse(due_date[:due_at][0..15])
       tz = ActiveSupport::TimeZone[user.timezonepref].tzinfo
       utc_time = tz.local_to_utc(Time.local(current_local_time.year,
@@ -187,7 +190,6 @@ class AssignmentForm
         @has_errors = true unless dd.save
       else
         dd = AssignmentDueDate.find(due_date[:id])
-        # get deadline for review
         @has_errors = true unless dd.update_attributes(due_date)
       end
       @errors += @assignment.errors.to_s if @has_errors
@@ -225,59 +227,52 @@ class AssignmentForm
     end
   end
 
-  # Find an AQ based on the given values
+  # Finds an AQ based on the given values
+  # Gets all AQs for the assignment based on how assignment varies.
+  # Can vary by duty_id, topic and round # together,
+  # and topic and round # separately. Otherwise gets all AQs.
+  # If the AQ questionnaire matches the type of the questionnaire that
+  # needs to be updated, return it
+  # for each assigment_questionnaire we check the condition specified
+  # after the value is set by the conditional statement preceding it
+
   def assignment_questionnaire(questionnaire_type, round_number, topic_id, duty_id = nil)
     round_number = nil if round_number.blank?
     topic_id = nil if topic_id.blank?
 
-    # Default value of duty_id is nil, and when duty_id is not nil, then it means that the function call
-    # is made to access assignment_questionnaire of that particular duty. If questionnaires varies by duty,
-    # then find the relevant questionnaire and return.
+    # Default value of duty_id is nil, and when duty_id is not nil, then it means that
+    # the function calls
+    # is made to access assignment_questionnaire of that particular duty.
     if duty_id && @assignment.questionnaire_varies_by_duty
-      # Get all AQs for the assignment and specified duty_id
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, duty_id: duty_id)
-      assignment_questionnaires.each do |aq|
-        # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
-      end
     elsif @assignment.vary_by_round? && @assignment.vary_by_topic?
-      # Get all AQs for the assignment and specified round number and topic
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number, topic_id: topic_id)
-      assignment_questionnaires.each do |aq|
-        # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
-      end
     elsif @assignment.vary_by_round?
-      # Get all AQs for the assignment and specified round number by round #
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number)
-      assignment_questionnaires.each do |aq|
-        # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
-      end
     elsif @assignment.vary_by_topic?
-      # Get all AQs for the assignment and specified round number by topic
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, topic_id: topic_id)
-      assignment_questionnaires.each do |aq|
-        # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
-      end
     else
-      # Get all AQs for the assignment
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
-      assignment_questionnaires.each do |aq|
-        # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
-      end
     end
 
-    # Create a new AQ if it was not found based on the attributes
+    assignment_questionnaires.each do |aq|
+      return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+    end
+    # return a default AQ if it was not found based on the attributes
+    default_assignment_questionnaire(questionnaire_type, @assignment)
+  end
+
+  # Creates a default questionnaire given type and assignment
+  def default_assignment_questionnaire(questionnaire_type, assignment)
     default_weight = {}
     default_weight['ReviewQuestionnaire'] = 100
     default_weight['MetareviewQuestionnaire'] = 0
     default_weight['AuthorFeedbackQuestionnaire'] = 0
     default_weight['TeammateReviewQuestionnaire'] = 0
     default_weight['BookmarkRatingQuestionnaire'] = 0
-    default_aq = AssignmentQuestionnaire.where(user_id: @assignment.instructor_id, assignment_id: nil, questionnaire_id: nil).first
+
+    default_aq = AssignmentQuestionnaire.where(user_id: assignment.instructor_id,
+                                               assignment_id: nil, questionnaire_id: nil).first
     default_limit = if default_aq.blank?
                       15
                     else
@@ -287,7 +282,8 @@ class AssignmentForm
     aq = AssignmentQuestionnaire.new
     aq.questionnaire_weight = default_weight[questionnaire_type]
     aq.notification_limit = default_limit
-    aq.assignment = @assignment
+    aq.assignment = assignment
+
     aq
   end
 
@@ -301,6 +297,9 @@ class AssignmentForm
     Object.const_get(questionnaire_type).new
   end
 
+  # Parses due_date string and returns time difference between time left and
+  # due date threshold in minutes and also returns time left
+  # until due date in minutes
   def get_time_diff_btw_due_date_and_now(due_date)
     due_at = due_date.due_at.to_s(:db)
     Time.parse(due_at)
@@ -310,7 +309,7 @@ class AssignmentForm
     [diff_btw_time_left_and_threshold, time_left_in_min]
   end
 
-  # add DelayedJob into queue and return it
+  # Add DelayedJob into queue and return it
   def add_delayed_job(_assignment, deadline_type, due_date, min_left)
     MailWorker.perform_in(min_left * 60, due_date.parent_id, deadline_type, due_date.due_at)
   end
@@ -330,14 +329,14 @@ class AssignmentForm
     end
   end
 
+  # Force deletes assignment from delayed_jobs queue
   def delete(force = nil)
-    # delete from delayed_jobs queue related to this assignment
     delete_from_delayed_queue
     @assignment.delete(force)
   end
 
-  # This functions finds the epoch time in seconds of the due_at parameter and finds the difference of it
-  # from the current time and returns this difference in minutes
+  # This functions finds the epoch time in seconds of the due_at parameter and finds
+  # the difference of it from the current time and returns this difference in minutes
   def find_min_from_now(due_at)
     curr_time = DateTime.now.in_time_zone('UTC').to_s(:db)
     curr_time = Time.parse(curr_time)
@@ -387,6 +386,7 @@ class AssignmentForm
       @assignment.num_quiz_questions = 0
     end
   end
+  #======end=of=setup=methods=========#
 
   # NOTE: unfortunately this method is needed due to bad data in db @_@
   def set_up_defaults
@@ -398,6 +398,8 @@ class AssignmentForm
     require_quiz
   end
 
+  # First deletes any duplicate assignment tasks in queue then adds
+  # current assignment to queue with inputted delay
   def add_simicheck_to_delayed_queue(simicheck_delay)
     delete_from_delayed_queue
     if simicheck_delay.to_i >= 0
@@ -410,8 +412,14 @@ class AssignmentForm
     end
   end
 
-  def enqueue_simicheck_task(due_date, simicheck_delay)
-    MailWorker.perform_in(find_min_from_now(Time.parse(due_date.due_at.to_s(:db)) + simicheck_delay.to_i.hours).minutes.from_now * 60, @assignment.id, 'compare_files_with_simicheck', due_date.due_at.to_s(:db))
+  # Adds task to the simicheck queue and sets the task to be dequed after due_date +
+  # simicheck_delay_hours_duration
+  # time has passed
+  def enqueue_simicheck_task(due_date, simicheck_delay_hours_duration)
+    dequeue_time_as_seconds_duration_from_now =
+      DueDate.get_dequeue_time_as_seconds_duration_from_now(due_date, simicheck_delay_hours_duration)
+
+    SimicheckWorker.perform_in(dequeue_time_as_seconds_duration_from_now.to_i, @assignment.id)
   end
 
   # Copies the inputted assignment into new one and returns the new assignment id
@@ -442,6 +450,8 @@ class AssignmentForm
     new_assign_id
   end
 
+  # Copies the questionnaires of an inputted assignment and creates them in
+  # the second inputted assignment, assigning them all the same user_id
   def self.copy_assignment_questionnaire(old_assign, new_assign, user)
     old_assign.assignment_questionnaires.each do |aq|
       AssignmentQuestionnaire.create(

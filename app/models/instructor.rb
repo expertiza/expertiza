@@ -83,7 +83,7 @@ class Instructor < User
   end
 
   def self.get_assignments_for_user(user)
-    # get the assingment for the user with user.id
+    # get the assignment for the user with user.id
     Assignment.includes(:participants).where(instructor_id: user.id)
   end
 end

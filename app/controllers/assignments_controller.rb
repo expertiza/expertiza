@@ -23,13 +23,13 @@ class AssignmentsController < ApplicationController
   end
 
   # Finds and returns a assignment by given name and course_id (user params) if already present
-  def find_existing_assignment
-    Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
+  def assignment_name_exists?
+    Assignment.exists?(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
   end
   
   # Finds and returns a directory by given directory path and course_id (user params) if already present
-  def find_existing_directory
-    Assignment.find_by(directory_path: assignment_form_params[:assignment][:directory_path],
+  def assignment_directory_exists?
+    Assignment.exists?(directory_path: assignment_form_params[:assignment][:directory_path],
                         course_id: @assignment_form.assignment.course_id)
   end
 
@@ -38,17 +38,13 @@ class AssignmentsController < ApplicationController
     @assignment_form = AssignmentForm.new(assignment_form_params)
 
     if params[:button]
-      # E2138 issue #3
-      existing_assignment = find_existing_assignment
-      existing_directory = find_existing_directory
-
       # if assignment or directory already exists, flash appropriate error. (Early Return)
-      if existing_assignment || existing_directory
+      if assignment_name_exists? || assignment_directory_exists?
         flash[:error] = 'Failed to create assignment.'
-        if existing_assignment
+        if assignment_name_exists?
           flash[:error] << '<br>  ' + @assignment_form.assignment.name + ' already exists as an assignment name'
         end
-        if existing_directory
+        if assignment_directory_exists?
           flash[:error] << '<br>  ' + assignment_form_params[:assignment][:directory_path] + ' already exists as a submission directory name'
         end
         return redirect_to '/assignments/new?private=1'    

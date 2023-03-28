@@ -264,18 +264,18 @@ class Assignment < ApplicationRecord
   end
 
   # For varying rubric feature
-  def current_stage_name(topic_id = nil)
-    if staggered_deadline?
-      return (topic_id.nil? ? 'Unknown' : current_stage(topic_id))
-    end
+  # def current_stage_name(topic_id = nil)
+  #   if staggered_deadline?
+  #     return (topic_id.nil? ? 'Unknown' : current_stage(topic_id))
+  #   end
 
-    due_date = find_current_stage(topic_id)
-    unless due_date == 'Finished' || due_date.nil? || due_date.deadline_name.nil?
-      return due_date.deadline_name
-    end
+  #   due_date = find_current_stage(topic_id)
+  #   unless due_date == 'Finished' || due_date.nil? || due_date.deadline_name.nil?
+  #     return due_date.deadline_name
+  #   end
 
-    current_stage(topic_id)
-  end
+  #   current_stage(topic_id)
+  # end
 
   # check if this assignment has multiple review phases with different review rubrics
   def varying_rubrics_by_round?
@@ -291,12 +291,12 @@ class Assignment < ApplicationRecord
   end
 
   # Zhewei: this method is almost the same as 'stage_deadline'
-  def current_stage(topic_id = nil)
-    return 'Unknown' if staggered_and_no_topic?(topic_id)
+  # def current_stage(topic_id = nil)
+  #   return 'Unknown' if staggered_and_no_topic?(topic_id)
 
-    due_date = find_current_stage(topic_id)
-    due_date.nil? || due_date == 'Finished' ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
-  end
+  #   due_date = find_current_stage(topic_id)
+  #   due_date.nil? || due_date == 'Finished' ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
+  # end
 
   # Find the ID of a review questionnaire for this assignment
   def review_questionnaire_id(round_number = nil, topic_id = nil)

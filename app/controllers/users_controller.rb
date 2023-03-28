@@ -10,6 +10,7 @@ class UsersController < ApplicationController
          redirect_to: { action: :list }
 
   def action_allowed?
+    # check if action is allowed
     case params[:action]
     when 'list_pending_requested'
       current_user_has_admin_privileges?
@@ -31,6 +32,7 @@ class UsersController < ApplicationController
   end
 
   def index
+    # Redirect to home page if user is a student, otherwise render the user list.
     if current_user_is_a? 'Student'
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
@@ -40,6 +42,7 @@ class UsersController < ApplicationController
   end
 
   def auto_complete_for_user_name
+    # Get available users for the given name input in the user search bar.
     user = session[:user]
     role = Role.find(user.role_id)
     @users = User.where('name LIKE ? and (role_id in (?) or id = ?)', "#{params[:user][:name]}%", role.get_available_roles, user.id)
@@ -48,6 +51,7 @@ class UsersController < ApplicationController
 
   # for anonymized view for demo purposes
   def set_anonymized_view
+    # view page as anonymized
     anonymized_view_starter_ips = $redis.get('anonymized_view_starter_ips') || ''
     session[:ip] = request.remote_ip
     if anonymized_view_starter_ips.include? session[:ip]
@@ -91,6 +95,7 @@ class UsersController < ApplicationController
   end
 
   def show
+    # Shows the user profile if authorized, otherwise redirects to the appropriate page.
     if params[:id].nil? || ((current_user_is_a? 'Student') && (!current_user_has_id? params[:id]))
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
@@ -103,17 +108,20 @@ class UsersController < ApplicationController
   end
 
   def new
+    # Initializes a new User object and renders the new user registration form
     @user = User.new
     @rolename = Role.find_by(name: params[:role])
     get_available_roles
   end
 
   def create
+    # create user
     check_username_availability
     create_user
   end
 
   def check_username_availability
+    # check if the username is available
     check = User.find_by(name: params[:user][:name])
     if check
       params[:user][:name] = params[:user][:email]
@@ -135,6 +143,7 @@ class UsersController < ApplicationController
   end
 
   def send_welcome_email
+    # send welcome email
     password = @user.reset_password
     prepared_mail = MailerHelper.send_mail_to_user(@user, 'Your Expertiza account \
                 and password have been created.', 'user_welcome', password)
@@ -149,6 +158,7 @@ class UsersController < ApplicationController
   end
 
   def handle_user_create_error
+    # handle error while creating users
     get_available_roles
     error_message = ''
     @user.errors.each { |_field, error| error_message << error }
@@ -157,6 +167,7 @@ class UsersController < ApplicationController
   end
 
   def edit
+    # edit user with the given id
     @user = User.find(params[:id])
     role
     get_available_roles
@@ -179,6 +190,7 @@ class UsersController < ApplicationController
   end
 
   def destroy
+    # Delete user with the given id
     begin
       @user = User.find(params[:id])
       # Participant.delete(true)

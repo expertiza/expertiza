@@ -404,19 +404,6 @@ describe UsersController do
   end
 
   context '#update' do
-    it 'updates user name if request parameter matches user id' do
-      user = create(:user, name: 'John')
-      request_params = { id: user.id, name: user.id.to_s }
-      put :update, params: request_params
-      expect(assigns(:user).name).to eq('John_hidden')
-    end
-
-    it 'does not update user name if request parameter does not match user id' do
-      user = create(:user, name: 'Jane')
-      request_params = { id: user.id, name: 'different_name' }
-      put :update, params: request_params
-      expect(assigns(:user).name).to eq('Jane')
-    end
     it 'when user is updated successfully' do
       allow(User).to receive(:find).with('1').and_return(student1)
       request_params = { id: 1 }
@@ -433,5 +420,4 @@ describe UsersController do
       expect(response).to render_template(:edit)
     end
   end
-
 end

@@ -176,7 +176,6 @@ class AssignmentForm
     attributes.each do |due_date|
       next if due_date[:due_at].blank?
 
-
       current_local_time = Time.parse(due_date[:due_at][0..15])
       tz = ActiveSupport::TimeZone[user.timezonepref].tzinfo
       utc_time = tz.local_to_utc(Time.local(current_local_time.year,
@@ -230,42 +229,35 @@ class AssignmentForm
 
   # Finds an AQ based on the given values
   # Gets all AQs for the assignment based on how assignment varies. Can vary by duty_id,
-  # topic and round # together, and topic and round # separately. Otherwise gets all AQs.
-  # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
+  # topic and round # together, and topic and round # separately. 
+  # Otherwise gets all AQs.
+  # If the AQ questionnaire matches the type of the questionnaire that
+  # needs to be updated, return it
+  # for each assigment_questionair we check the condition specified
+  # after the value is set by the conditional statement preceding it
+
   def assignment_questionnaire(questionnaire_type, round_number, topic_id, duty_id = nil)
     round_number = nil if round_number.blank?
     topic_id = nil if topic_id.blank?
 
-    # Default value of duty_id is nil, and when duty_id is not nil, then it means that the function call
+    # Default value of duty_id is nil, and when duty_id is not nil, then it means that
+    # the function calls
     # is made to access assignment_questionnaire of that particular duty.
-    case
-    when duty_id && @assignment.questionnaire_varies_by_duty
+    if duty_id && @assignment.questionnaire_varies_by_duty
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, duty_id: duty_id)
-      assignment_questionnaires.each do |aq|
-        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
-      end
-    when @assignment.vary_by_round? && @assignment.vary_by_topic?
+    elsif @assignment.vary_by_round? && @assignment.vary_by_topic?
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number, topic_id: topic_id)
-      assignment_questionnaires.each do |aq|
-        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
-      end
-    when @assignment.vary_by_round?
+    elsif @assignment.vary_by_round?
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number)
-      assignment_questionnaires.each do |aq|
-        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
-      end
-    when @assignment.vary_by_topic?
+    elsif @assignment.vary_by_topic?
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, topic_id: topic_id)
-      assignment_questionnaires.each do |aq|
-        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
-      end
     else
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
-      assignment_questionnaires.each do |aq|
-        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
-      end
     end
 
+    assignment_questionnaires.each do |aq|
+      return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+    end
     # return a default AQ if it was not found based on the attributes
     default_assignment_questionnaire(questionnaire_type, @assignment)
   end
@@ -279,7 +271,8 @@ class AssignmentForm
     default_weight['TeammateReviewQuestionnaire'] = 0
     default_weight['BookmarkRatingQuestionnaire'] = 0
 
-    default_aq = AssignmentQuestionnaire.where(user_id: assignment.instructor_id, assignment_id: nil, questionnaire_id: nil).first
+    default_aq = AssignmentQuestionnaire.where(user_id: assignment.instructor_id, 
+    assignment_id: nil, questionnaire_id: nil).first
     default_limit = if default_aq.blank?
                       15
                     else
@@ -305,7 +298,8 @@ class AssignmentForm
   end
 
   # Parses due_date string and returns time difference between time left and
-  # due date threshold in minutes and also returns time left until due date in minutes
+  # due date threshold in minutes and also returns time left 
+  # until due date in minutes
   def get_time_diff_btw_due_date_and_now(due_date)
     due_at = due_date.due_at.to_s(:db)
     Time.parse(due_at)
@@ -341,8 +335,8 @@ class AssignmentForm
     @assignment.delete(force)
   end
 
-  # This functions finds the epoch time in seconds of the due_at parameter and finds the difference of it
-  # from the current time and returns this difference in minutes
+  # This functions finds the epoch time in seconds of the due_at parameter and finds 
+  # the difference of it from the current time and returns this difference in minutes
   def find_min_from_now(due_at)
     curr_time = DateTime.now.in_time_zone('UTC').to_s(:db)
     curr_time = Time.parse(curr_time)
@@ -418,10 +412,12 @@ class AssignmentForm
     end
   end
 
-  # Adds task to the simicheck queue and sets the task to be dequed after due_date + simicheck_delay_hours_duration
+  # Adds task to the simicheck queue and sets the task to be dequed after due_date + 
+  # simicheck_delay_hours_duration
   # time has passed
   def enqueue_simicheck_task(due_date, simicheck_delay_hours_duration)
-    dequeue_time_as_seconds_duration_from_now = DueDate.get_dequeue_time_as_seconds_duration_from_now(due_date, simicheck_delay_hours_duration)
+    dequeue_time_as_seconds_duration_from_now = DueDate.get_dequeue_time_as_seconds_duration_from_now(
+      due_date, simicheck_delay_hours_duration)
 
     SimicheckWorker.perform_in(dequeue_time_as_seconds_duration_from_now.to_i, @assignment.id)
   end

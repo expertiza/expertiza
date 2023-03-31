@@ -10,6 +10,7 @@ class VmQuestionResponse
   def initialize(questionnaire, assignment = nil, round = nil)
     @assignment = assignment
     @questionnaire = questionnaire
+    @round = round
     if questionnaire.type == 'ReviewQuestionnaire'
       @round = round || AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
     end

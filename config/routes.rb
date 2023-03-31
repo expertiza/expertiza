@@ -637,6 +637,7 @@ Expertiza::Application.routes.draw do
   root to: 'content_pages#view', page_name: 'home'
   post :login, to: 'auth#login'
   post :logout, to: 'auth#logout'
+  get 'auth/:provider/callback', to: 'auth#oauth_login'
   get 'auth/failure', to: 'content_pages#view'
   get '/auth/*path', to: redirect('/')
   get '/menu/*name', controller: :menu_items, action: :link
@@ -645,16 +646,14 @@ Expertiza::Application.routes.draw do
   post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
   get 'instructions/home'
   get 'response/', to: 'response#saving'
-  # get ':controller/service.wsdl', action: 'wsdl'
+  get ':controller/service.wsdl', action: 'wsdl'
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
-  # get ':controller(/:action(/:id))(.:format)'
-  unless Rails.env.development?
-    match '*path' => 'content_pages#view', :via => %i[get post]
-  end
+  get ':controller(/:action(/:id))(.:format)'
+  match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
   post '/response_toggle_permission/:id' => 'response#toggle_permission'
   post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
   post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
-  post 'student_task/publishing_rights_update', controller: :student_task, action: :publishing_rights_update, method: :put
-  get 'student_view/flip_view', controller: :student_view, action: :flip_view
-  # updated route and added specific controller action upon accessing this route
+
+  post '/github_metric_uses/:assignment_id', controller: :github_metric_uses, action: :save
+  delete '/github_metric_uses/:assignment_id', controller: :github_metric_uses, action: :delete
 end

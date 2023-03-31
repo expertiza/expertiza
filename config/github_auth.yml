@@ -1,0 +1,14 @@
+#This file contains the CLIENT_KEY & CLIENT_SECRET for Google OmniAuth 2.0
+
+development:
+  client_key: 'bb76e7273cd07bedc561'
+  client_secret: 'ea8f0ea61c7f80dd8ad8d1e711e5fbf44bac78fd'
+
+test:
+  client_key: 'bb76e7273cd07bedc561'
+  client_secret: 'ea8f0ea61c7f80dd8ad8d1e711e5fbf44bac78fd'
+
+# Set these to appropriate values when deploying to production
+production:
+  client_key: <%= ENV['GITHUB_KEY'] %>
+  client_secret: <%= ENV['GITHUB_SECRET'] %>

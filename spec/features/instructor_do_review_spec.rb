@@ -126,6 +126,6 @@ describe "check 'Begin review' showing up before due date and 'Assign grade' aft
 
     visit("/assignments/list_submissions?id=#{assignment_test.id}")
     expect(page).to have_content('https://www.expertiza.ncsu.edu')
-    expect(page).to have_link('Assign Grade', exact: true)
+    expect(page).to have_link('Assign grade', exact: true)
   end
 end

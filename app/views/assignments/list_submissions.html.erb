@@ -1,12 +1,30 @@
 <!--E1877 script added to sort the table-->
 <script>
-  $(function () {
-    /*E1877: Function for sorting the table */
-    $("#submissionsTable").tablesorter({
-      sortList: [[0,0]] //E1877: sort First Column by default when page loads
+    $(function () {
+        /*E1877: Function for sorting the table */
+        $("#submissionsTable").tablesorter({
+            sortList: [[0,0]] //E1877: sort First Column by default when page loads
+        });
     });
-  });
+
+    // E2300 Used to display the laoding icon when a github query is running
+    function showLoadIcon(){
+        icon = document.getElementById("load_icon");
+        icon.setAttribute("style", "")
+    }
+
 </script>
+<h4><%=@assignment.name%> </h4><h6><%="  Created on:  " + @assignment.created_at.to_s[0..10]%></h6>
+<%#check if use github? %>
+<% if GithubMetricUsesController.exist(@assignment.id) %>
+  <% if session["github_access_token"].nil? %>
+    <% topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(@teams.first) %>
+    <%= link_to 'Login to Query Github data', { controller: 'metrics', action: 'show', id: participants.first.id } %>
+  <% else %>
+    <%= link_to 'Refresh Github data', { controller: 'metrics', action: 'query_assignment_statistics', id: @assignment.id}, :onclick => "showLoadIcon()"%>
+    <img id="load_icon" src="<%= image_url('ajax-loader.gif') %>" style="display:none">
+  <% end %>
+<% end %>
 <% headers = {} %>
 <% headers["Topic_name"] = "16%" if @assignment.topics? %>
 <% if @assignment.max_team_size > 1 %>
@@ -14,95 +32,91 @@
   <% headers["Team member(s)"] = "18%" %>
 <% else %>
   <% headers["Participant name"] = "18%" %>
-<% end %>                              
+<% end %>
 <% headers["Submitted item(s)"] = nil %>
 <!--E1877: table id changed -->
 <table id ="submissionsTable" class="table table-striped" style="margin-top: 50px">
-    <thead>
-    <!--E1877: class="sorter-true" added to sort all attributes-->
-      <tr>
-        <% if @assignment.topics? %>
-          <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Topic name</th>
-        <% end %>
-        <% if @assignment.max_team_size > 1 %>
-          <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Team name</th>
-          <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Team member(s)</th>
-          <% if @assignment.pair_programming_enabled? %>
-            <% pair_programming_enabled = true %>
-            <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Pair Programming</th>
-          <% else %>
-            <% pair_programming_enabled = false %>
-          <% end %>
-        <% else %>
-          <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Participant name</th>
-        <% end %>  
-        <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Links</th> 
-        <th class="sorter-false" style="font-weight: bold; font-size: 15px;"></th>
-      </tr>                    
-    </thead>
-    <% @teams.each do |team| %>
-      <tr>
-        <% topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team) %>
+  <thead>
+  <!--E1877: class="sorter-true" added to sort all attributes-->
+  <tr>
+    <% if @assignment.topics? %>
+      <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Topic name</th>
+    <% end %>
+    <% if @assignment.max_team_size > 1 %>
+      <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Team name</th>
+      <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Team member(s)</th>
+    <% else %>
+      <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Participant name</th>
+    <% end %>
+    <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Links</th>
+    <th class="sorter-false" style="font-weight: bold; font-size: 15px;"></th>
+  </tr>
+  </thead>
+  <% @l = -1 %>
+  <% @teams.each do |team| %>
+    <% @l = @l+1 %>
+    <tr>
+      <% topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team) %>
 
-        <!--Topic name-->
-        <% if @assignment.topics? %>
-          <td><%= topic_identifier + '. ' + topic_name %></td>
-        <% end %>
+      <!--Topic name-->
+      <% if @assignment.topics? %>
+        <td><%= topic_identifier + '. ' + topic_name %></td>
+      <% end %>
 
-        <!--Team name-->
-        <% if @assignment.max_team_size >= 1 %>
-          <% team_name_color = get_team_name_color_in_list_submission(team) %>
-          <td><p style = <%="color:#{team_name_color}"%>><%= team.name(session[:ip]) %></p>
+      <!--Team name-->
+      <% if @assignment.max_team_size > 1 %>
+        <% team_name_color = get_team_name_color_in_list_submission(team) %>
+        <td><p style = <%="color:#{team_name_color}"%>><%= team.name(session[:ip]) %></p>
           <% unless participants.empty? %>
             <!-- “Assign Grade” will show if the final deadline of this assignment pass -->
             <% if @assignment.current_stage == "Finished" %>
-              <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
-            <!-- if current user(TA/instructor) is participant in assignment then the user can perform review -->
+              <%= link_to 'Assign grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %>
+              <!-- if current user(TA/instructor) is participant in assignment then the user can perform review -->
             <%elsif current_user_is_assignment_participant?(@assignment.id) %>
               <%= render :partial => 'responses', :locals => {:team => team ,:topic_id => topic_identifier, :title => 'Review'} %>
             <% end %>
-          <% end %>
-        <% end %>
-
-        <!--Team member(s) / Participant name-->
-          <td>
-              <% users_for_curr_team.each do |user| %>
-                  <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
-                  (<%= user.fullname(session[:ip])%>)<br>
+            <br>
+            <%#check if use github? %>
+            <%if GithubMetricUsesController.exist(@assignment.id) %>
+              <% unless Metric.find_by_team_id(team.id).nil? %>
+                <%= link_to 'GitHub metrics', { controller: 'metrics', action: 'show', id: participants.first.id }, target: '_blank' %></td>
               <% end %>
-          </td>
-
-        <!-- Pair Programming -->
-          <% if pair_programming_enabled %>
-            <td>
-              <%= Team.find(team.id).pair_programming_request == 2 ? "Yes": "No" %>
-            </td>
-          <% end %>
-
-        <!--Submitted item(s)-->
-        <td>
-        <!--Display submitted hyperlinks-->
-          <% participant = participants.compact.first %>
-          <% if participant && !team.hyperlinks.empty? %>
-            <% team.hyperlinks.each do |link| %>
-              <a href="<%= link %>" target="_blank">- <%= link %></a><br/>
             <% end %>
           <% end %>
-          <br>
-          <!--Display submitted files-->
-          <% team.submitted_files %>
-          <% if participant && !team.submitted_files.empty? %>
-            <% files = team.submitted_files %>
-            <%= display_directory_tree(participant, files, true).html_safe if files && files.length > 0 %>
+      <% end %>
+
+      <!--Team member(s) / Participant name-->
+      <td>
+        <% users_for_curr_team.each do |user| %>
+          <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
+          (<%= user.fullname(session[:ip])%>)<br>
+        <% end %>
+      </td>
+
+      <!--Submitted item(s)-->
+      <td>
+        <!--Display submitted hyperlinks-->
+        <% participant = participants.compact.first %>
+        <% if participant and !team.hyperlinks.empty? %>
+          <% team.hyperlinks.each do |link| %>
+            <a href="<%= link %>" target="_blank">- <%= link %></a><br/>
           <% end %>
-        </td>
-        <td width="10%">
+        <% end %>
+        <br>
+        <!--Display submitted files-->
+        <% p team.submitted_files %>
+        <% if participant and !team.submitted_files.empty? %>
+          <% files = team.submitted_files %>
+          <%= display_directory_tree(participant, files, true).html_safe if files and files.length > 0 %>
+        <% end %>
+      </td>
+      <td width="10%">
 
-          <%= link_to "History", submission_records_path(team_id: team.id) %>
+        <%= link_to "History", submission_records_path(team_id: team.id) %>
 
-        </td>
-      </tr>
-    <% end %>
-  </table>
-  <p> **In "Team name" column, text in <i style = "color:#0984e3">blue</i> indicates that the submission grade is not assigned; text in <i style = "color: #cd6133">brown</i> indicates that the submission grade has been assigned.</p>
+      </td>
+    </tr>
+  <% end %>
+</table>
+<p> **In "Team name" column, text in <i style = "color:#0984e3">blue</i> indicates that the submission grade is not assigned; text in <i style = "color: #cd6133">brown</i> indicates that the submission grade has been assigned.</p>
 </div>

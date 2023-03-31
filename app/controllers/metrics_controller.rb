@@ -194,7 +194,7 @@ def retrieve_repository_data(repo_links)
       query_text = Metric.repo_query(query_data, @assignment.created_at, end_cursor)
       github_data = query_commit_statistics(query_text)
       break if github_data.nil? || github_data['errors']
-      # Process data returned by a respository query, stripping unecessary layers off of data hash, and organizing data for use
+      # Process data returned by a repository query, stripping unnecessary layers off of data hash, and organizing data for use
       # elsewhere in the app. Also calls accounting method for each commit, and sorting method to sort the data upon completion.
       # Finally,  calls team_statistics to parse the organized datasets and assemble key instance variables for the views.
       parse_repository_data(github_data)

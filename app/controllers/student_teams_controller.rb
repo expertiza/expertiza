@@ -1,4 +1,4 @@
-class StudentTeamsController < ApplicationController
+class StudentTeamsController < ApplicationController 
   include AuthorizationHelper
 
   autocomplete :user, :name

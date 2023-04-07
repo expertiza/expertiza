@@ -320,6 +320,7 @@ class Assignment < ApplicationRecord
   # check if this assignment has multiple review phases with different review rubrics
   def varying_rubrics_by_round?
     # E-2084 corrected '>=' to '>' to fix logic
+    #This is a hack, we should actually check if we have more than one rubric of a given type eg, review
     AssignmentQuestionnaire.where(assignment_id: id, used_in_round: 2).size >= 1
   end
 

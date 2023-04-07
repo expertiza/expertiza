@@ -35,12 +35,19 @@ module ReviewMappingHelper
   
   # loops through the number of assignment review rounds and obtains the team colour
   def obtain_team_color(response_map, assignment_created, assignment_due_dates)
-    color = []
+    # We will store the colors in this array.
+    colors = []
+    # Loop through each round of review.
     (1..@assignment.num_review_rounds).each do |round|
-      check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+      # Call the check_submission_state method to get the color for the current round.
+      color_for_round = check_submission_state(response_map, assignment_created, assignment_due_dates, round)
+      # Add the color to the colors array.
+      colors << color_for_round
     end
-    color[-1]
+    # Return the color for the latest round.
+    colors.last
   end
+
 
   # checks the submission state within each round and assigns team colour
   def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)

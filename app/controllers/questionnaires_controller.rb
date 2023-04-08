@@ -59,26 +59,18 @@ class QuestionnairesController < ApplicationController
         flash[:error] = $ERROR_INFO
       end
       begin
-        @questionnaire.private = questionnaire_private
-        @questionnaire.name = params[:questionnaire][:name]
-        @questionnaire.instructor_id = session[:user].id
-        @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
-        @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
-        @questionnaire.type = params[:questionnaire][:type]
         # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
         # In the future, we need to write migration files to make them consistency.
         # E1903 : We are not sure of other type of cases, so have added a if statement. If there are only 5 cases, remove the if statement
         if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey BookmarkRating].include?(display_type)
-          display_type = (display_type.split(/(?=[A-Z])/)).join('%')
+          display_type = display_type.split(/(?=[A-Z])/).join('%') # removed unnecessary brackets
         end
-        @questionnaire.display_type = display_type
-        @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
-        @questionnaire.save
+        # assignment moved to a separate function to make sure create function doesn't do too much
+        # setting the object variables
+        adding_question_variables(questionnaire_private, display_type)
+        # code moved to a separate function to make sure create function doesn't do too much
         # Create node
-        tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
-        parent = FolderNode.find_by(node_object_id: tree_folder.id)
-        QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
-        flash[:success] = 'You have successfully created a questionnaire!'
+        create_node()
       rescue StandardError
         flash[:error] = $ERROR_INFO
       end
@@ -86,15 +78,27 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-  def create_questionnaire
-    @questionnaire = Object.const_get(params[:questionnaire][:type]).new(questionnaire_params)
-    # Create Quiz content has been moved to Quiz Questionnaire Controller
-    if @questionnaire.type != 'QuizQuestionnaire' # checking if it is a quiz questionnaire
-      @questionnaire.instructor_id = Ta.get_my_instructor(session[:user].id) if session[:user].role.name == 'Teaching Assistant'
-      save
+  # create questionnaire was removed as it wasn't being used anywhere in the latest version
 
-      redirect_to controller: 'tree_display', action: 'list'
-    end
+  # Assigns corrresponding variables to questionnaire object.
+  def adding_question_variables(private_flag, display) 
+    @questionnaire.private = private_flag
+    @questionnaire.name = params[:questionnaire][:name]
+    @questionnaire.instructor_id = session[:user].id
+    @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
+    @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
+    @questionnaire.type = params[:questionnaire][:type]
+    @questionnaire.display_type = display
+    @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
+    @questionnaire.save
+  end
+
+  # Creates tree node
+  def create_node()
+    tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
+    parent = FolderNode.find_by(node_object_id: tree_folder.id)
+    QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
+    flash[:success] = 'You have successfully created a questionnaire!'
   end
 
   # Edit a questionnaire
@@ -185,26 +189,27 @@ class QuestionnairesController < ApplicationController
   def add_new_questions
     questionnaire_id = params[:id] unless params[:id].nil?
     # If the questionnaire is being used in the active period of an assignment, delete existing responses before adding new questions
-    if AnswerHelper.check_and_delete_responses(questionnaire_id)
+    if AnswerHelper.check_and_delete_responses(params[:id])
       flash[:success] = 'You have successfully added a new question. Any existing reviews for the questionnaire have been deleted!'
     else
       flash[:success] = 'You have successfully added a new question.'
     end
 
-    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
+    num_of_existed_questions = Questionnaire.find(params[:id]).questions.size
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
       if question.is_a? ScoredQuestion
         question.weight = params[:question][:weight]
-        question.max_label = 'Strongly agree'
-        question.min_label = 'Strongly disagree'
+        question.max_label = Question::MAX_LABEL
+        question.min_label = Question::MIN_LABEL
       end
 
-      question.size = '50, 3' if question.is_a? Criterion
-      question.size = '50, 3' if question.is_a? Cake
-      question.alternatives = '0|1|2|3|4|5' if question.is_a? Dropdown
-      question.size = '60, 5' if question.is_a? TextArea
-      question.size = '30' if question.is_a? TextField
+      if Question::SIZES.key?(question.class.name)
+        question.size = Question::SIZES[question.class.name]
+      end
+      if Question::ALTERNATIVES.key?(question.class.name)
+        question.alternatives = Question::ALTERNATIVES[question.class.name]
+      end
 
       begin
         question.save
@@ -212,12 +217,11 @@ class QuestionnairesController < ApplicationController
         flash[:error] = $ERROR_INFO
       end
     end
-    redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+    redirect_to edit_questionnaire_path(params[:id].to_sym)
   end
 
   # Zhewei: This method is used to save all questions in current questionnaire.
   def save_all_questions
-    questionnaire_id = params[:id]
     begin
       if params[:save]
         params[:question].each_pair do |k, v|
@@ -238,8 +242,8 @@ class QuestionnairesController < ApplicationController
 
     if params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
-    elsif questionnaire_id
-      redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+    elsif params[:id]
+      redirect_to edit_questionnaire_path(params[:id].to_sym)
     end
   end
 
@@ -303,7 +307,7 @@ class QuestionnairesController < ApplicationController
     save_new_questions questionnaire_id
 
     if params[:question]
-      params[:question].keys.each do |question_key|
+      params[:question].each_key do |question_key|
         if params[:question][question_key][:txt].strip.empty?
           # question text is empty, delete the question
           Question.delete(question_key)

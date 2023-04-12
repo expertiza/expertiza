@@ -30,6 +30,18 @@ Steps after getting a VCL reservation
   * Run `rails db:migrate`
   * Run `rails s`
 
+*Updated* 
+Here are step-by-step instructions for setting up Expertiza:
+
+1. Copy the "/root/setup_expertiza.sh" script to your home directory. sudo cp /root/setup_expertiza.sh ~/setup_expertiza.sh
+2. Make the script executable. sudo chmod +x setup_expertiza.sh
+3. Run the script. ./setup_expertiza.sh
+4. Provide the GitHub repository URL. Once the script runs, you will be prompted to enter the GitHub repository URL for the project you want to work on.
+5. Select the project type (Refactoring or Reimplementation)
+6. Wait for the setup to complete and terminate the terminals.
+7. Change the username in config/database.yml from root to dev on line 4 --- username: dev 
+
+That's it! You've successfully set up Expertiza on your VCL image and can start working on your project.
 
 ### Installing locally
 

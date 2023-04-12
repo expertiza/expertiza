@@ -66,8 +66,9 @@ class AssignmentsController < ApplicationController
         existing_assignment = Assignment.find(@assignment_form.assignment.id)
         assignment_form_params = update_form_params_with_existing(existing_assignment, assignment_form_params)
         @assignment_form.update(assignment_form_params, current_user)
-        assignment_id = Assignment.find(@assignment_form.assignment.id).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
+        assignment_id = Assignment.find(@assignment_form.assignment.id).id
+        session[:assignment_id] = assignment_id #passing it in session so that redirect works
         redirect_to edit_assignment_path assignment_id
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
         return
@@ -89,6 +90,7 @@ class AssignmentsController < ApplicationController
 
   # edits an assignment's deadlines and assigned rubrics
   def edit
+    session[:assignment_id] = nil
     user_timezone_specified
     edit_params_setting
     assignment_staggered_deadline?
@@ -103,6 +105,8 @@ class AssignmentsController < ApplicationController
     @badges = Badge.all
     @use_bookmark = @assignment.use_bookmark
     @duties = Duty.where(assignment_id: @assignment_form.assignment.id)
+    assignment_id = Assignment.find(@assignment_form.assignment.id).id
+    session[:assignment_id] = assignment_id
   end
 
   # updates an assignment via an assignment form
@@ -127,7 +131,9 @@ class AssignmentsController < ApplicationController
 
   # displays an assignment via ID
   def show
+    session[:assignment_id] = nil
     @assignment = Assignment.find(params[:id])
+    session[:assignment_id] = @assignment.id
   end
 
   # gets an assignment's path/url
@@ -319,9 +325,9 @@ class AssignmentsController < ApplicationController
     assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
     fix_assignment_missing_path
     update_assignment_form(exist_assignment)
-    aid = Assignment.find_by(name: @assignment_form.assignment.name).id
+    assignment_id = Assignment.find_by(name: @assignment_form.assignment.name).id
     ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
-    redirect_to edit_assignment_path aid
+    redirect_to edit_assignment_path assignment_id
     undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
   end
 

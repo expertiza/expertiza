@@ -22,15 +22,28 @@ class AssignmentsController < ApplicationController
     @default_num_metareviews_required = 3
   end
 
+  # E2327 - Refactoring to improve readability
+  # Finds whether existing assignment with same name and course id exists
+  def check_if_assignment_unique(name, course_id)
+    find_existing_assignment = Assignment.find_by(name: name, course_id: course_id)
+    !find_existing_assignment
+  end
+
+  # Finds whether existing directory with same directory path and course id exists
+  def check_if_directory_unique(dir_path, course_id)
+    find_existing_directory = Assignment.find_by(directory_path: dir_path, course_id: course_id)
+    !find_existing_directory
+  end
+
+
   # creates a new assignment via the assignment form
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
     if params[:button]
-      # E2138 issue #3
-      find_existing_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
-      dir_path = assignment_form_params[:assignment][:directory_path]
-      find_existing_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
-      if !find_existing_assignment && !find_existing_directory && @assignment_form.save # No existing names/directories
+      assignment_unique = check_if_assignment_unique(@assignment_form.assignment.name, @assignment_form.assignment.course_id)
+      directory_unique = check_if_directory_unique(assignment_form_params[:assignment][:directory_path],
+                                                   @assignment_form.assignment.course_id)
+      if assignment_unique && directory_unique && @assignment_form.save # No existing names/directories
         @assignment_form.create_assignment_node
         exist_assignment = Assignment.find(@assignment_form.assignment.id)
         assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
@@ -55,10 +68,10 @@ class AssignmentsController < ApplicationController
         return
       else
         flash[:error] = 'Failed to create assignment.'
-        if find_existing_assignment
+        unless assignment_unique
           flash[:error] << '<br>  ' + @assignment_form.assignment.name + ' already exists as an assignment name'
         end
-        if find_existing_directory
+        unless directory_unique
           flash[:error] << '<br>  ' + dir_path + ' already exists as a submission directory name'
         end
         redirect_to '/assignments/new?private=1'

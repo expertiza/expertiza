@@ -8,7 +8,8 @@ class AssignmentForm
                 :is_conference_assignment,
                 :auto_assign_mentor
 
-  attr_accessor :errors
+  # Changing the access to reader as errors are only read from and not modified
+  attr_reader :errors
 
   DEFAULT_MAX_TEAM_SIZE = 1
 

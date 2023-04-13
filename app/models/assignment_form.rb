@@ -418,29 +418,29 @@ class AssignmentForm
   # Copies the inputted assignment into new one and returns the new assignment id
   def self.copy(assignment_id, user)
     Assignment.record_timestamps = false
-    old_assign = Assignment.find(assignment_id)
-    new_assign = old_assign.dup
-    user.set_instructor(new_assign)
-    new_assign.update_attribute('name', 'Copy of ' + new_assign.name)
-    new_assign.update_attribute('created_at', Time.now)
-    new_assign.update_attribute('updated_at', Time.now)
-    new_assign.update_attribute('directory_path', new_assign.directory_path + '_copy') if new_assign.directory_path.present?
-    new_assign.copy_flag = true
-    if new_assign.save
+    old_assignment = Assignment.find(assignment_id)
+    new_assignment = old_assignment.dup
+    user.set_instructor(new_assignment)
+    new_assignment.update_attribute('name', 'Copy of ' + new_assignment.name)
+    new_assignment.update_attribute('created_at', Time.now)
+    new_assignment.update_attribute('updated_at', Time.now)
+    new_assignment.update_attribute('directory_path', new_assignment.directory_path + '_copy') if new_assignment.directory_path.present?
+    new_assignment.copy_flag = true
+    if new_assignment.save
       Assignment.record_timestamps = true
-      copy_assignment_questionnaire(old_assign, new_assign, user)
-      AssignmentDueDate.copy(old_assign.id, new_assign.id)
-      new_assign.create_node
-      new_assign_id = new_assign.id
+      copy_assignment_questionnaire(old_assignment, new_assignment, user)
+      AssignmentDueDate.copy(old_assignment.id, new_assignment.id)
+      new_assignment.create_node
+      new_assignment_id = new_assignment.id
       # also copy topics from old assignment
-      topics = SignUpTopic.where(assignment_id: old_assign.id)
+      topics = SignUpTopic.where(assignment_id: old_assignment.id)
       topics.each do |topic|
-        SignUpTopic.create(topic_name: topic.topic_name, assignment_id: new_assign_id, max_choosers: topic.max_choosers, category: topic.category, topic_identifier: topic.topic_identifier, micropayment: topic.micropayment)
+        SignUpTopic.create(topic_name: topic.topic_name, assignment_id: new_assignment_id, max_choosers: topic.max_choosers, category: topic.category, topic_identifier: topic.topic_identifier, micropayment: topic.micropayment)
       end
     else
-      new_assign_id = nil
+      new_assignment_id = nil
     end
-    new_assign_id
+    new_assignment_id
   end
 
   def self.copy_assignment_questionnaire(old_assign, new_assign, user)

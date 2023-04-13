@@ -1,4 +1,3 @@
-
 require_relative 'features/helpers/assignment_creation_helper'
 
 describe 'Assignment creation topics tab', js: true do

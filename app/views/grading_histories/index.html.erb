@@ -1,24 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Grade History</title>
+  <style>
+    .center {
+      text-align: center;
+    }
 
-<h1 class="center">Grade History <%= receiver %> <%= assignment %></h1>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
 
-<table style="border-collapse:collapse; table-layout:fixed; width:1500px;">
-  <thead>
-  <tr>
-    <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Instructor</th>
-    <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Grade</th>
-    <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Comment</th>
-    <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Graded At</th>
-  </tr>
+    th, td {
+      padding: 10px;
+      border: solid 1.5px black;
+      word-wrap: break-word;
+    }
 
-  <!--This is the main view of the table. This will add table with either hyperlink or the content nased on the operation. -->
-  <tbody>
-  <% @grading_histories.each do |record| %>
-    <tr>
-      <td style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;"><%= User.where(id: record.instructor_id).pluck(:fullname).first %></td>
-      <td style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;"><%= record.grade %></td>
-      <td style="padding:10px; border:solid 1.5px black; width:60px; word-wrap:break-word;"><%= record.comment %></td>
-      <td style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;"><%= record.created_at %></td>
-    </tr>
-  <% end %>
-  </tbody>
-</table>
+    th:nth-child(1), td:nth-child(1) {
+      width: 25%;
+    }
+
+    th:nth-child(2), td:nth-child(2) {
+      width: 25%;
+    }
+
+    th:nth-child(3), td:nth-child(3) {
+      width: 25%;
+    }
+
+    th:nth-child(4), td:nth-child(4) {
+      width: 25%;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="center">Grade History <%= receiver %> <%= assignment %></h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Instructor</th>
+        <th>Grade</th>
+        <th>Comment</th>
+        <th>Graded At</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @grading_histories.each do |record| %>
+        <tr>
+          <td><%= record.instructor.fullname %></td>
+          <td><%= record.grade %></td>
+          <td><%= record.comment %></td>
+          <td><%= record.created_at %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</body>
+</html>

@@ -1,18 +1,4 @@
-<% record = @grading_histories[0]
-   if record == nil
-     receiver = ""
-     assignment = ""
-   else
-     if record.grading_type == "Submission"
-       receiver = "of " + Team.where(id: record.grade_receiver_id).pluck(:name).first
-       assignment = "for the submission " + Assignment.where(id: record.assignment_id).pluck(:name).first
-     else
-       receiver = "of " + User.where(id: record.grade_receiver_id).pluck(:fullname).first
-       assignment = "for review in " + Assignment.where(id: record.assignment_id).pluck(:name).first
-     end
 
-   end
-%>
 <h1 class="center">Grade History <%= receiver %> <%= assignment %></h1>
 
 <table style="border-collapse:collapse; table-layout:fixed; width:1500px;">

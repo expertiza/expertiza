@@ -4,20 +4,26 @@ class GradingHistoriesController < ApplicationController
 
   # Checks if user is allowed to view a grading history
   def action_allowed?
-    # admins and superadmins are always allowed
-    return true if current_user_has_admin_privileges?
-    # populate assignment fields
-    assignment_for_history(params[:grade_type])
-    # if not admin/superadmin, check permissions
-    if @assignment.instructor_id == current_user.id
-      true
-    elsif TaMapping.exists?(ta_id: current_user.id, course_id: @assignment.course_id) &&
-      (TaMapping.where(course_id: @assignment.course_id).include? TaMapping.where(ta_id: current_user.id, course_id: @assignment.course_id).first)
-      true
-    elsif @assignment.course_id && Course.find(@assignment.course_id).instructor_id == current_user.id
-      true
-    end
+  # Admins and superadmins are always allowed
+  return true if current_user_has_admin_privileges?
+
+  # Populate assignment fields
+  assignment_for_history(params[:grade_type])
+
+  # Check permissions
+  if @assignment.instructor_id == current_user.id # If the current user is the instructor of the assignment
+    true # Return true
+  elsif TaMapping.exists?(ta_id: current_user.id, course_id: @assignment.course_id) && 
+        TaMapping.where(course_id: @assignment.course_id).include?(TaMapping.where(ta_id: current_user.id, course_id: @assignment.course_id).first)
+    true # Return true if the current user is a TA for the course that the assignment belongs to
+  elsif @assignment.course_id && Course.find(@assignment.course_id).instructor_id == current_user.id # If the current user is the instructor of the course that the assignment belongs to
+    true # Return true
   end
+
+  # Return false if none of the above conditions are met
+  false
+end
+
 
   # populate the assignment fields according to type
   def assignment_for_history(type)

@@ -30,6 +30,8 @@ describe Assignment do
     context 'when the user is on a team associated with the assignment' do
       it 'returns true' do
         allow_any_instance_of(Team).to receive(:users).and_return([student])
+        allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
+        allow_any_instance_of(Team).to receive(:participants).and_return([participant])
         expect(assignment.user_on_team?(student)).to be_truthy
       end
     end
@@ -91,8 +93,8 @@ describe Assignment do
     before :each do
       @assignment = create(:assignment)
       @student = create(:student)
-      @empty_team = create(:assignment_team, assignment: @assignment, teams_users: [])
-      @non_empty_team = create(:assignment_team, assignment: @assignment, teams_users: [create(:team_user, user: @student)])
+      @empty_team = create(:assignment_team, assignment: @assignment, teams_participants: [])
+      @non_empty_team = create(:assignment_team, assignment: @assignment, teams_participants: [create(:team_user, user: @student)])
     end
     it 'should reduce the number of teams by the number of empty teams in the assignment' do
       expect(@assignment.teams).to include @empty_team

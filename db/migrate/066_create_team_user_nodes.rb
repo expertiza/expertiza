@@ -1,4 +1,4 @@
-class CreateTeamUserNodes < ActiveRecord::Migration[4.2]
+class CreateTeamParticipantNodes < ActiveRecord::Migration[4.2]
   def self.up
     begin
       remove_column :teams_users, :assignment_id
@@ -9,7 +9,7 @@ class CreateTeamUserNodes < ActiveRecord::Migration[4.2]
     teamsusers.each  do |user|
       parent = TeamNode.find_by_node_object_id(user.team_id)
       if parent
-        TeamUserNode.create(node_object_id: user.id, parent_id: parent.id)
+        TeamParticipantNode.create(node_object_id: user.id, parent_id: parent.id)
       end
     end
   end

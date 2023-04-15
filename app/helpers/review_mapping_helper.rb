@@ -115,7 +115,7 @@ module ReviewMappingHelper
   # For assignments with 1 team member, the following method returns user's fullname else it returns "team name" that a particular reviewee belongs to.
   def get_team_reviewed_link_name(max_team_size, _response, reviewee_id, ip_address)
     team_reviewed_link_name = if max_team_size == 1
-                                TeamsUser.where(team_id: reviewee_id).first.user.fullname(ip_address)
+                                TeamsParticipant.where(team_id: reviewee_id).first.user.fullname(ip_address)
                               else
                                 # E1991 : check anonymized view here
                                 Team.find(reviewee_id).name
@@ -363,7 +363,7 @@ module ReviewMappingHelper
 
   # gets review and feedback responses for all rounds for the feedback report
   def get_each_review_and_feedback_response_map(author)
-    @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
+    @team_id = TeamsParticipant.team_id(@id.to_i, author.user_id)
     # Calculate how many responses one team received from each round
     # It is the feedback number each team member should make
     @review_response_map_ids = ReviewResponseMap.where(['reviewed_object_id = ? and reviewee_id = ?', @id, @team_id]).pluck('id')
@@ -390,7 +390,7 @@ module ReviewMappingHelper
   def get_certain_review_and_feedback_response_map(author)
     # Setting values of instance variables
     @feedback_response_maps = FeedbackResponseMap.where(['reviewed_object_id IN (?) and reviewer_id = ?', @all_review_response_ids, author.id])
-    @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
+    @team_id = TeamsParticipant.team_id(@id.to_i, author.user_id)
     @review_response_map_ids = ReviewResponseMap.where(['reviewed_object_id = ? and reviewee_id = ?', @id, @team_id]).pluck('id')
     @review_responses = Response.where(['map_id IN (?)', @review_response_map_ids])
     @rspan = @review_responses.length

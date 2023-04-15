@@ -49,11 +49,11 @@ class Assignment < ApplicationRecord
 
   def user_on_team?(user)
     teams = self.teams
-    users = []
+    result = false
     teams.each do |team|
-      users << team.users
+      result ||= team.user?(user)
     end
-    users.flatten.include? user
+    result
   end
 
   def self.max_outstanding_reviews
@@ -100,7 +100,7 @@ class Assignment < ApplicationRecord
 
   # remove empty teams (teams with no users) from assignment
   def remove_empty_teams
-    empty_teams = teams.reload.select { |team| team.teams_users.empty? }
+    empty_teams = teams.reload.select { |team| team.teams_participants.empty? }
     teams.delete(empty_teams)
   end
 

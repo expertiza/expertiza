@@ -22,18 +22,18 @@ class Invitation < ApplicationRecord
     invites.each(&:destroy)
   end
 
-  # After a users accepts an invite, the teams_users table needs to be updated.
+  # After a users accepts an invite, the teams_participants table needs to be updated.
   def self.update_users_topic_after_invite_accept(invitee_user_id, invited_user_id, assignment_id)
-    new_team_id = TeamsUser.team_id(assignment_id, invitee_user_id)
+    new_team_id = TeamsParticipant.team_id(assignment_id, invitee_user_id)
     # check the invited_user_id have ever join other team in this assignment before
     # if so, update the original record; else create a new record
-    original_team_id = TeamsUser.team_id(assignment_id, invited_user_id)
+    original_team_id = TeamsParticipant.team_id(assignment_id, invited_user_id)
     if original_team_id
-      # team_user_mapping = TeamsUser.where(team_id: original_team_id, user_id: invited_user_id).first
-      team_user_mapping = TeamsUser.find_by(team_id: original_team_id, user_id: invited_user_id)
-      TeamsUser.update(team_user_mapping.id, team_id: new_team_id)
+      # team_user_mapping = TeamsParticipant.where(team_id: original_team_id, user_id: invited_user_id).first
+      team_user_mapping = TeamsParticipant.find_by(team_id: original_team_id, participant_id: invited_user_id)
+      TeamsParticipant.update(team_user_mapping.id, team_id: new_team_id)
     else
-      TeamsUser.create(team_id: new_team_id, user_id: invited_user_id)
+      TeamsParticipant.create(team_id: new_team_id, user_id: invited_user_id)
     end
   end
 
@@ -41,10 +41,10 @@ class Invitation < ApplicationRecord
   # First the users previous team is deleted if they were the only member of that
   # team and topics that the old team signed up for will be deleted.
   # Then invites the user that accepted the invite sent will be removed.
-  # Last the users team entry will be added to the TeamsUser table and their assigned topic is updated
+  # Last the users team entry will be added to the TeamsParticipant table and their assigned topic is updated
   def self.accept_invitation(team_id, inviter_user_id, invited_user_id, assignment_id)
     # if you are on a team and you accept another invitation and if your old team does not have any members, delete the entry for the team
-    if TeamsUser.team_empty?(team_id) && (team_id != '0')
+    if TeamsParticipant.team_empty?(team_id) && (team_id != '0')
       assignment_id = AssignmentTeam.find(team_id).assignment.id
       # Release topics for the team has selected by the invited users empty team
       SignedUpTeam.release_topics_selected_by_team_for_assignment(team_id, assignment_id)
@@ -55,8 +55,8 @@ class Invitation < ApplicationRecord
     Invitation.remove_users_sent_invites_for_assignment(invited_user_id, assignment_id)
 
     # Create a new team_user entry for the accepted invitation
-    @team_user = TeamsUser.new
-    can_add_member = TeamsUser.add_member_to_invited_team(inviter_user_id, invited_user_id, assignment_id)
+    @team_user = TeamsParticipant.new
+    can_add_member = TeamsParticipant.add_member_to_invited_team(inviter_user_id, invited_user_id, assignment_id)
 
     if can_add_member # The member was successfully added to the team (the team was not full)
       Invitation.update_users_topic_after_invite_accept(inviter_user_id, invited_user_id, assignment_id)
@@ -66,12 +66,12 @@ class Invitation < ApplicationRecord
       # Since there are two places in the code base where members are added to
       # teams we have to call the MentorManagement class in both places.
       # Those places are here when a student accepts an invitation to join a
-      # team, and in teams_users_controller.rb. Ideally, both code paths would
+      # team, and in teams_participants_controller.rb. Ideally, both code paths would
       # call the same method to perform this action and we could DRY this up.
       # It is worth noting that while ultimately, both code paths do call Team#add_member
       # adding this code there would risk a recursive loop since MentorManagement
       # also calls Team#add_member to add a mentor to the team
-      new_team_id = TeamsUser.team_id(assignment_id, inviter_user_id)
+      new_team_id = TeamsParticipant.team_id(assignment_id, inviter_user_id)
       MentorManagement.assign_mentor(assignment_id, new_team_id)
 
       # invited_participant = Participant.where(user_id: invited_user_id, parent_id: assignment_id).first

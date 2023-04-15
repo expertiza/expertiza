@@ -11,6 +11,8 @@ class Participant < ApplicationRecord
   has_many :response_maps, class_name: 'ResponseMap', foreign_key: 'reviewee_id', dependent: :destroy, inverse_of: false
   has_many :awarded_badges, dependent: :destroy
   has_many :badges, through: :awarded_badges
+  has_many :teams_participants, dependent: :destroy
+  has_many :teams, through: :teams_participants
   has_one :review_grade, dependent: :destroy
   validates :grade, numericality: { allow_nil: true }
   has_paper_trail
@@ -28,7 +30,11 @@ class Participant < ApplicationRecord
   DUTY_MENTOR = 'mentor'.freeze
 
   def team
-    TeamsUser.find_by(user: user).try(:team)
+    # team = TeamsParticipant.find_by(user: user).try(:team)
+    if team.nil?
+      team = TeamsParticipant.find_by(participant_id: :id)
+    end
+    team
   end
 
   def responses
@@ -57,10 +63,10 @@ class Participant < ApplicationRecord
 
   def force_delete(maps)
     maps && maps.each(&:destroy)
-    if team && (team.teams_users.length == 1)
+    if team && (team.teams_participants.length == 1)
       team.delete
     elsif team
-      team.teams_users.each { |teams_user| teams_user.destroy if teams_user.user_id == id }
+      team.teams_participants.each { |teams_user| teams_user.destroy if teams_user.user_id == id }
     end
     destroy
   end

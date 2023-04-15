@@ -21,7 +21,7 @@
       %></button>
     <% else %>
       <% button_enabled = false %>
-      <% users = TeamsUser.where(team_id: @student.team.id) %>
+      <% users = TeamsParticipant.where(team_id: @student.team.id) %>
       <% pair_programming_team_status = true %>
       <% users.each do |user| %>
         <% if user.pair_programming_status == "W" or user.pair_programming_status.nil? %>
@@ -108,12 +108,6 @@
         <%= link_to t(".leave_team"), remove_participant_student_teams_path(student_id: @student.id, team_id: @student.team.id) %>
       <td>
     </tr>
-    <%# <% if @teammate_review_allowed %>
-      <%# <tr style="border: 1px outset #000000; padding: 10px 20px" >
-        <th class="head">Teammate review question</th>
-        <th class="head">Self contribution percentage</th>
-      </tr> %>
-    <%# <% end %> <!--end self contribution for Cake questions-->
   </table>
 <% end %>
 
@@ -137,7 +131,7 @@
               <td><%= member.user.name(session[:ip]) %></td>
               <td><%= member.user.fullname(session[:ip]) %></td>
               <td><%= member.user.email(session[:ip]) %></td>
-              <% status = TeamsUser.find_by(user_id: member.user.id, team_id: member.team.id).pair_programming_status %>
+              <% status = TeamsParticipant.find_by(user_id: member.user.id, team_id: member.team.id).pair_programming_status %>
               <% if (status == "W" || status.nil?) and current_user.id != member.user.id %>
                 <td>Request Pending</td>
               <% elsif  (status == "W" || status.nil? ) and current_user.id == member.user.id%>
@@ -183,19 +177,7 @@
           <th class="head" align="center"><b><%=t ".status"%></b></th>
         </tr>
           <% @send_invs.each do |inv| %>
-            <tr>
-              <td><%= inv.to_user.name(session[:ip]) %></td>
-              <td><%= inv.to_user.fullname(session[:ip]) %></td>
-              <td><%= inv.to_user.email(session[:ip]) %></td>
-                <% if inv.reply_status == 'A' %>
-                  <td align = "center"><%=t ".accepted"%></td>
-                <% elsif inv.reply_status == 'D' %>
-                  <td align = "center"><%=t ".declined"%></td>
-                <% else %>
-                  <td align = "center">Waiting for reply
-                  &nbsp;&nbsp;<%= link_to "Retract", {:controller => 'invitations', :action => 'cancel', :inv_id => inv.id, :student_id => @student.id} %></td>
-                <% end %>
-             </tr>
+          <%= render :partial=>'invited_people', :locals => {:inv => inv,:session_ip=>session[:ip], :student=>@student} %>
           <% end %>
       </table>
       <!-- start invited people table -->
@@ -226,8 +208,8 @@
             </td>
            </tr>
          </table>
-     <% end %>
-   <% end %>
+      <% end %>
+<% end %>
 
   <!--waiting listed users on the same topic-->
   <% if @users_on_waiting_list && @users_on_waiting_list.count>0%>
@@ -258,34 +240,9 @@
         <th class="head"><%=t ".team_name_no_colon"%> </th>
         <th class="head"><%=t ".reply"%> </th>
       </tr>
+      
       <% @received_invs.each do |inv| %>
-          <% if inv.reply_status == 'W' %>
-              <tr>
-                <td><%= inv.from_user.name(session[:ip]) %></td>
-                <td>
-                  <% teams_users = TeamsUser.where(['user_id = ?', inv.from_id]) %>
-                  <% teams_users.each do |teams_user| %>
-                      <% current_team = Team.where(['id = ? and parent_id = ?', teams_user.team_id, @student.assignment.id]).first %>
-                      <%= Team.find(current_team.id).name unless current_team.nil?%>
-                  <% end %>
-                </td>
-                <td>
-                  <%if @student.team.nil?
-                      @team_id = 0
-                    else
-                      @team_id = @student.team.id
-                    end %>
-                  <%= link_to "Accept",
-                              {:controller => 'invitations', :action => 'accept', :inv_id => inv.id, :student_id => @student.id, :team_id => @team_id},
-                              {:onClick => "javascript: return confirm('Your topic (or place on waiting lists) will be relinquished if you accept the invitation. Do you want to continue?');"}
-                  %>
-                  |
-                  <%= link_to "Decline",
-                              {:controller => 'invitations', :action => 'decline', :inv_id => inv.id, :student_id => @student.id}
-                  %>
-                </td>
-              </tr>
-          <% end %>
+      <%= render :partial=>'received_invitations', :locals => {:inv => inv,:session_ip=>session[:ip], :student=>@student} %>
       <% end %>
     </table>
 
@@ -297,21 +254,7 @@
   <% if @student.team && @student.assignment.topics? && @student.team.topic%>
     <b><%=t ".ad_for_team"%></b>
     <br>
-    <table style="width:80%" align="center" >
-      <tr>
-        <td>
-        <% if @student.team && @student.team.advertise_for_partner%>
-            <%= @student.team.comments_for_advertisement%>
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <%= link_to 'Edit', :controller => 'advertise_for_partner', :action => 'edit', :team_id=>@student.team.id %>
-            &nbsp;&nbsp;
-            <%= link_to 'Delete', :controller => 'advertise_for_partner', :action => 'remove', :team_id=>@student.team.id %>
-        <% else %>
-            <%= link_to 'Create', :controller => 'advertise_for_partner', :action => 'new', :team_id=>@student.team.id %>
-        <% end %>
-        </td>
-      </tr>
-    </table>
+    <%= render :partial=>'display_advertisements', :locals => {:student_team_id => @student.team.id, :student=>@student,comments_for_advertisement=>@student.team.comments_for_advertisement} %>
   <% end %>
 
 

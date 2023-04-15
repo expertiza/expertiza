@@ -320,7 +320,8 @@ class Assignment < ApplicationRecord
   # check if this assignment has multiple review phases with different review rubrics
   def varying_rubrics_by_round?
     # E-2084 corrected '>=' to '>' to fix logic
-    AssignmentQuestionnaire.where(assignment_id: id, used_in_round: 2).size > 1
+    #This is a hack, we should actually check if we have more than one rubric of a given type eg, review
+    AssignmentQuestionnaire.where(assignment_id: id, used_in_round: 2).size >= 1
   end
 
   def link_for_current_stage(topic_id = nil)
@@ -491,7 +492,7 @@ class Assignment < ApplicationRecord
     @questions = {}
     questionnaires = @assignment.questionnaires
     questionnaires.each do |questionnaire|
-      if @assignment.vary_by_round?
+      if @assignment.varying_rubrics_by_round?
         round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: @questionnaire.id).used_in_round
         questionnaire_symbol = round.nil? ? questionnaire.symbol : (questionnaire.symbol.to_s + round.to_s).to_sym
       else

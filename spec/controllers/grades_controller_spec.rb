@@ -55,7 +55,7 @@ describe GradesController do
 
     context 'when current assignment varies rubrics by round' do
       it 'retrieves questions, calculates scores and renders grades#view page' do
-        allow(assignment).to receive(:vary_by_round?).and_return(true)
+        allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([assignment_questionnaire])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
         request_params = { id: 1 }

@@ -45,7 +45,7 @@ describe Scoring do
       it 'scores varying rubrics and returns review scores' do
         allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
         allow(assignment).to receive(:rounds_of_reviews).and_return(1)
-        expect(compute_reviews_hash(assignment)).to eq({})
+        expect(compute_reviews_hash(assignment)).to eq({1=>{1=>{1=>50}}, 2=>{1=>{1=>30}}})
       end
     end
     context 'when current assignment does not vary rubrics by round' do

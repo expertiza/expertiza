@@ -1,9 +1,9 @@
 Expertiza::Application.routes.draw do
-  resources :grading_histories
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
 
   resources :grading_histories, only: [:index]
+
   resources :admin, only: [] do
     collection do
       get :list_super_administrators
@@ -30,6 +30,7 @@ Expertiza::Application.routes.draw do
   resources :advice, only: [] do
     collection do
       post :save_advice
+      put :edit_advice
     end
   end
 
@@ -45,6 +46,8 @@ Expertiza::Application.routes.draw do
     collection do
       get :course_student_grade_summary
       get :all_students_all_reviews
+      get :assignment_grade_summary
+      get :insure_existence_of
     end
   end
 
@@ -58,6 +61,14 @@ Expertiza::Application.routes.draw do
       get :delete_delayed_mailer
       get :remove_assignment_from_course
       get :instant_flash
+      patch :edit
+      post :delete
+    end
+  end
+
+  resources :assignment_questionnaire do
+    collection do
+      post :create
     end
   end
 
@@ -91,10 +102,17 @@ Expertiza::Application.routes.draw do
       post :add_ta
       get :auto_complete_for_user_name
       post :remove_ta
+      post :edit
+      post :set_course_fields
+      post :delete
     end
   end
 
-  resources :duties
+  resources :duties do
+    collection do
+      delete :delete
+    end
+  end
 
   resources :eula, only: [] do
     collection do
@@ -157,6 +175,7 @@ Expertiza::Application.routes.draw do
     collection do
       get :list
       post ':id', action: :update
+      post :delete
     end
   end
 
@@ -172,11 +191,17 @@ Expertiza::Application.routes.draw do
     collection do
       post :decline
       get :index
+      get :destroy
+      get :show
     end
   end
 
   resources :late_policies
-  resources :markup_styles
+  resources :markup_styles do
+    collection do
+      get :list
+    end
+  end
 
   resources :menu_items do
     collection do
@@ -194,7 +219,11 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :notifications
+  resources :notifications do
+    collection do
+      get :run_get_notification
+    end
+  end
 
   resources :participants, only: [:destroy] do
     collection do
@@ -223,7 +252,13 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :profile, only: %i[edit update]
+  resources :profile, only: [] do
+    collection do
+      get :edit
+      post :update
+      patch :update
+    end
+  end
 
   resources :publishing, only: [] do
     collection do
@@ -236,7 +271,7 @@ Expertiza::Application.routes.draw do
       get :set_publish_permission
     end
   end
-  # Nitin - removed quiz related routes from questionnaires controller
+
   resources :questionnaires, only: %i[new create edit update] do
     collection do
       get :copy
@@ -246,19 +281,31 @@ Expertiza::Application.routes.draw do
       get :view
       post :add_new_questions
       post :save_all_questions
+      get :delete
+      post :create_questionnaire
     end
   end
-  # #Nitin - Created new routes for quiz_questionnaire
-  #   resources :quiz_questionnaire, only: %i[new create edit update] do
-  #     collection do
-  #       get :new_quiz
-  #       post :create_quiz_questionnaire
-  #       get :edit_quiz
-  #       post :update_quiz
-  #
-  #     end
-  #   end
-  resources :quiz_questionnaires
+
+  resources :quiz do
+    collection do
+      get :view
+    end
+  end
+
+  resources :quiz_questionnaires do
+    collection do
+      get :edit
+      get :edit_quiz
+      get :new
+      get :new_quiz
+      get :view
+      post :update
+      post :update_quiz
+      post :update
+      post :create
+      post :create_quiz_questionnaire
+    end
+  end
 
   resources :author_feedback_questionnaires, controller: :questionnaires
   resources :review_questionnaires, controller: :questionnaires
@@ -300,6 +347,11 @@ Expertiza::Application.routes.draw do
       get :show_calibration_results_for_student
       post :custom_create
       get :json
+      post :send_email
+      get :author
+      get :run_get_notification
+      post :edit
+      post :delete
     end
   end
 
@@ -308,40 +360,31 @@ Expertiza::Application.routes.draw do
       post :assign_bidding
       post :set_priority
       post :index
+      post :run_bidding_algorithm
+      get :show
     end
   end
 
   resources :review_mapping, only: [] do
     collection do
-      post :add_metareviewer
-      get :add_reviewer
-      post :add_reviewer
-      post :add_self_reviewer
-      get :add_self_reviewer
-      get :add_user_to_assignment
-      get :auto_complete_for_user_name
-      get :delete_all_metareviewers
-      get :delete_outstanding_reviewers
-      get :delete_metareviewer
-      get :delete_reviewer
-      get :distribution
+      get :add_calibration
       get :list_mappings
-      # post :response_report
-      # get :response_report
-      get :select_metareviewer
-      get :select_reviewer
-      get :select_mapping
-      post :assign_quiz_dynamically
-      get :assign_reviewer_dynamically
-      post :assign_reviewer_dynamically
-      get :assign_metareviewer_dynamically
+      get :unsubmit_review
+      post :add_reviewer
+      post :add_metareviewer
+      post :add_user_to_assignment
       post :assign_metareviewer_dynamically
       post :automatic_review_mapping
       post :automatic_review_mapping_staggered
-      # E1600
+      post :assign_reviewer_dynamically
+      post :assign_quiz_dynamically
       post :start_self_review
       post :save_grade_and_comment_for_reviewer
-      get :unsubmit_review
+      post :delete_reviewer
+      post :delete_metareview
+      post :delete_metareviewer
+      post :delete_all_metareviewers
+      post :delete_outstanding_reviewers
     end
   end
 
@@ -349,6 +392,8 @@ Expertiza::Application.routes.draw do
     collection do
       get :list
       post ':id', action: :update
+      post :update
+      post :destroy
     end
   end
 
@@ -365,10 +410,13 @@ Expertiza::Application.routes.draw do
       get :signup_topics
       get :signup
       get :sign_up
+      get :show_team
+      get :switch_original_topic_to_approved_suggested_topic
       get :team_details
       get :intelligent_sign_up
       get :intelligent_save
       get :signup_as_instructor
+      get :delete_signup_as_instructor
       post :delete_all_topics_for_assignment
       post :signup_as_instructor_action
       post :set_priority
@@ -405,8 +453,22 @@ Expertiza::Application.routes.draw do
       get :list
       get :view
       put :publishing_rights_update
+      get :email_reviewers
+      post :send_email
       # added a new route for updating publishing rights
       get '/*other', to: redirect('/student_task/list')
+    end
+  end
+
+  resources :student_task do
+    collection do
+      post :update
+    end
+  end
+
+  resources :course_team do
+    collection do
+      get :list
     end
   end
 
@@ -415,6 +477,9 @@ Expertiza::Application.routes.draw do
       get :view
       get :remove_participant
       get :auto_complete_for_user_name
+      get :edit
+      post :create
+      post :update
     end
   end
 
@@ -441,6 +506,9 @@ Expertiza::Application.routes.draw do
       post :submit
       post :student_submit
       post :update_suggestion
+      get :student_edit
+      get :add_comment
+      get :student_view
     end
   end
 
@@ -463,6 +531,9 @@ Expertiza::Application.routes.draw do
       get :list
       post :create_teams
       post :inherit
+      get :delete
+      get :delete_all
+      get :bequeath_all
     end
   end
 
@@ -470,6 +541,17 @@ Expertiza::Application.routes.draw do
     collection do
       post :list
       post :update_duties
+      get :delete
+      post :delete_selected
+    end
+  end
+  resources :popup do
+    collection do
+      get :reviewer_details_popup
+      get :team_users_popup
+      get :view_review_scores_popup
+      get :self_review_popup
+      get :author_feedback_popup
     end
   end
 
@@ -483,6 +565,19 @@ Expertiza::Application.routes.draw do
       post :get_sub_folder_contents
       get :session_last_open_tab
       get :set_session_last_open_tab
+      get :goto_courses
+      get :goto_assignments
+      get :goto_questionnaires
+      get :goto_review_rubrics
+      get :goto_metareview_rubrics
+      get :goto_teammatereview_rubrics
+      get :goto_author_feedbacks
+      get :goto_global_survey
+      get :goto_surveys
+      get :goto_course_surveys
+      get :goto_bookmarkrating_rubrics
+      get :list
+      get :drill
     end
   end
 
@@ -496,6 +591,8 @@ Expertiza::Application.routes.draw do
       get :set_anonymized_view
       get :keys
       delete :destroy
+      get :edit
+      get :show
     end
   end
 
@@ -522,6 +619,22 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :pair_programming, only: [] do
+    collection do
+      get :send_invitations
+      get :accept
+      get :decline
+    end
+  end
+
+  resources :badges do
+    collection do
+      post :create
+      get :redirect_to_assignment
+      get :new
+    end
+  end
+
   resources :conference
   root to: 'content_pages#view', page_name: 'home'
   post :login, to: 'auth#login'
@@ -534,10 +647,12 @@ Expertiza::Application.routes.draw do
   post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
   get 'instructions/home'
   get 'response/', to: 'response#saving'
-  get ':controller/service.wsdl', action: 'wsdl'
+  # get ':controller/service.wsdl', action: 'wsdl'
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
-  get ':controller(/:action(/:id))(.:format)'
-  match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
+  # get ':controller(/:action(/:id))(.:format)'
+  unless Rails.env.development?
+    match '*path' => 'content_pages#view', :via => %i[get post]
+  end
   post '/response_toggle_permission/:id' => 'response#toggle_permission'
   post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
   post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'

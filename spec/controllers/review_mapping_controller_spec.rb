@@ -632,7 +632,17 @@ describe ReviewMappingController do
       # Stub out other items
       allow(ReviewGrade).to receive(:find_by).with(participant_id: '1').and_return(review_grade)
       allow(review_grade).to receive(:save).and_return(true)
-      request_params = {
+      session = {user: double('User', id: 1)}
+
+      allow(GradingHistory).to receive(:create)
+
+      allow(GradingHistory).to receive(:create).with(instructor_id: session[:user].id,
+                                                     assignment_id: '1',
+                                                     grading_type: 'Review',
+                                                     grade_receiver_id: 2,
+                                                     grade: '90',
+                                                     comment: 'keke')
+      params = {
         review_grade: {
           participant_id: 1,
           grade_for_reviewer: 90,
@@ -641,8 +651,7 @@ describe ReviewMappingController do
       }
 
       # Perform test
-      session_params = {user: stub_current_user(instructor, instructor.role.name, instructor.role) }
-      post :save_grade_and_comment_for_reviewer, params: request_params, session: session_params
+      post :save_grade_and_comment_for_reviewer, params, session
       expect(flash[:note]).to be nil
       expect(response).to redirect_to('/reports/response_report')
     end

@@ -22,7 +22,7 @@
 
     <% @authors.each do |rejoinder| %>
       <% next unless rejoinder %>
-      <% if @assignment.vary_by_round? %>
+      <% if @assignment.varying_rubrics_by_round? %>
         <% get_each_review_and_feedback_response_map(rejoinder) %> 
       <% else %>
         <% get_certain_review_and_feedback_response_map(rejoinder) %>
@@ -31,7 +31,7 @@
       <% @first_col_identifier = true %>
       
       <!-- if the assignment varies by round, prepare data for table: -->
-      <% if @assignment.vary_by_round? %> 
+      <% if @assignment.varying_rubrics_by_round? %> 
           <!--data prepare-->
           <% @count_round_one, @count_round_two, @count_round_three = 0, 0, 0 %>
           <% unless @feedback_response_maps_round_one.nil? %>

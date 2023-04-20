@@ -1,29 +1,6 @@
 class GradingHistoriesController < ApplicationController
   before_action :set_grading_history, only: %i[show]
 
-  def show
-    @grading_histories = GradingHistory.includes(:grade_receiver, :assignment, :instructor).where(id: params[:id]).order(created_at: :desc)
-    set_receiver_and_assignment
-  end
-
-  private
-
-  def set_receiver_and_assignment
-    record = @grading_histories.first
-    if record.nil?
-      @receiver = ""
-      @assignment = ""
-    else
-      if record.grading_type == "Submission"
-        @receiver = "of #{record.grade_receiver.name}"
-        @assignment = "for the submission #{record.assignment.name}"
-      else
-        @receiver = "of #{record.grade_receiver.fullname}"
-        @assignment = "for review in #{record.assignment.name}"
-      end
-    end
-  end
-
   def action_allowed?
     return true if ['Super-Administrator', 'Administrator'].include? current_role_name
     check_type(params[:grade_type])

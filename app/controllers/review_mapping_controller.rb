@@ -413,12 +413,12 @@ class ReviewMappingController < ApplicationController
   end
 
   def save_grade_and_comment_for_reviewer
-    review_grade = ReviewGrade.find_or_create_by(participant_id: params[:review_grade][:participant_id])
-    review_grade.attributes = review_mapping_params
+    review_grade = ReviewGrade.find_by(participant_id: params[:participant_id])
+    review_grade = ReviewGrade.create(participant_id: params[:participant_id]) if review_grade.nil?
+    review_grade.grade_for_reviewer = params[:grade_for_reviewer] if params[:grade_for_reviewer]
+    review_grade.comment_for_reviewer = params[:comment_for_reviewer] if params[:comment_for_reviewer]
     review_grade.review_graded_at = Time.now
     review_grade.reviewer_id = session[:user].id
-    # create a grading history entry for this review
-    # save the grade, comment, receiver, and instructor
     begin
       GradingHistory.create(instructor_id: session[:user].id,
                             assignment_id: params[:assignment_id],

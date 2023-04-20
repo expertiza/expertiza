@@ -52,5 +52,18 @@ class GradingHistoriesController < ApplicationController
 
   def index
     @grading_histories = GradingHistory.where(grade_receiver_id: params[:grade_receiver_id], grading_type: params[:grade_type]).reverse_order
+    record = @grading_histories.first
+    if record.nil?
+      @receiver = ""
+      @assignment = ""
+    else
+      if record.grading_type == "Submission"
+        @receiver = "of #{record.grade_receiver.name}"
+        @assignment = "for the submission #{record.assignment.name}"
+      else
+        @receiver = "of #{record.grade_receiver.fullname}"
+        @assignment = "for review in #{record.assignment.name}"
+      end
+    end
   end
 end

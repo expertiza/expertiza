@@ -50,7 +50,7 @@
     <tbody>
       <% @grading_histories.each do |record| %>
         <tr>
-          <td><%= record.instructor.fullname %></td>
+          <td><%= User.where(id: record.instructor_id).pluck(:fullname).first %></td>
           <td><%= record.grade %></td>
           <td><%= record.comment %></td>
           <td><%= record.created_at %></td>

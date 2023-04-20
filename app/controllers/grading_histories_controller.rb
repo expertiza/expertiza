@@ -1,7 +1,6 @@
 class GradingHistoriesController < ApplicationController
-  include AuthorizationHelper
   before_action :set_grading_history, only: %i[show]
-
+  
   def show
     @grading_histories = GradingHistory.includes(:grade_receiver, :assignment, :instructor).where(id: params[:id]).order(created_at: :desc)
     set_receiver_and_assignment

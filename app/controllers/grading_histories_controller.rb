@@ -35,11 +35,11 @@ class GradingHistoriesController < ApplicationController
       @assignment = ""
     else
       if record.grading_type == "Submission"
-        @receiver = "of #{record.grade_receiver.name}"
-        @assignment = "for the submission #{record.assignment.name}"
+        @receiver = "of " + Team.where(id: record.grade_receiver_id).pluck(:name).first
+        @assignment = "for the submission " + Assignment.where(id: record.assignment_id).pluck(:name).first
       else
-        @receiver = "of #{record.grade_receiver.fullname}"
-        @assignment = "for review in #{record.assignment.name}"
+        @receiver = "of " + User.where(id: record.grade_receiver_id).pluck(:fullname).first
+        @assignment = "for review in " + Assignment.where(id: record.assignment_id).pluck(:name).first
       end
     end
   end

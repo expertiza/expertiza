@@ -24,7 +24,6 @@ class GradingHistoriesController < ApplicationController
       end
     end
   end
-end
 
   # Checks if user is allowed to view a grading history
   def action_allowed?

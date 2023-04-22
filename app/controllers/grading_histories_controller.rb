@@ -4,14 +4,15 @@ class GradingHistoriesController < ApplicationController
   def action_allowed?
     return true if ['Super-Administrator', 'Administrator'].include? current_role_name
     check_type(params[:grade_type])
-    if @assignment.instructor_id == current_user.id
-      true
-    elsif TaMapping.exists?(ta_id: current_user.id, course_id: @assignment.course_id) &&
-      (TaMapping.where(course_id: @assignment.course_id).include? TaMapping.where(ta_id: current_user.id, course_id: @assignment.course_id).first)
-      true
-    elsif @assignment.course_id && Course.find(@assignment.course_id).instructor_id == current_user.id
-      true
-    end
+    # check permissions
+    assignment_instructor = @assignment.instructor_id
+    assignment_course_id = @assignment.course_id
+    current_user_is_instructor = assignment_instructor == current_user.id
+    current_user_is_ta_for_course = TaMapping.exists?(ta_id: current_user.id, course_id: assignment_course_id)
+    current_user_is_ta_for_assignment = current_user_is_ta_for_course && TaMapping.where(course_id: assignment_course_id).include?(TaMapping.where(ta_id: current_user.id, course_id: assignment_course_id).first)
+    current_user_is_instructor_of_course = assignment_course_id && Course.find(assignment_course_id).instructor_id == current_user.id
+
+    current_user_is_instructor || current_user_is_ta_for_assignment || current_user_is_instructor_of_course
   end
 
   def check_type(type)

@@ -4,7 +4,7 @@ module ReviewMappingHelper
   end
   
   # gets the response map data of reviewer id, reviewed object id and type for the review report 
-  def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
+  def review_report_data(reviewed_object_id, reviewer_id, type)
     response_maps = ResponseMap.where(reviewed_object_id: reviewed_object_id, reviewer_id: reviewer_id, type: type)
     response_counts = calculate_response_counts(response_maps)
     response_maps_with_counts = response_maps.select { |response_map| Team.exists?(id: response_map.reviewee_id) }
@@ -40,9 +40,7 @@ module ReviewMappingHelper
     # Loop through each round of review.
     (1..@assignment.num_review_rounds).each do |round|
       # Call the check_submission_state method to get the color for the current round.
-      color_for_round = check_submission_state(response_map, assignment_created, assignment_due_dates, round)
-      # Add the color to the colors array.
-      colors << color_for_round
+      check_submission_state(response_map, assignment_created, assignment_due_dates, round, colors)
     end
     # Return the color for the latest round.
     colors.last
@@ -50,19 +48,19 @@ module ReviewMappingHelper
 
 
   # checks the submission state within each round and assigns team colour
-  def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+  def check_submission_state(response_map, assignment_created, assignment_due_dates, round, colors)
     if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
-      color.push('purple')
+      colors.push('purple')
     else
       link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)    
       if link.nil? || !link.start_with?('https://wiki')
-        color.push('green')
+        colors.push('green')
       else
-        link_updated_at = get_link_updated_at(link)
+        link_updated_at = last_modified_date_for_link(link)
         if link_updated_since_last?(round, assignment_due_dates, link_updated_at)
-          color.push('purple')
+          colors.push('purple')
         else
-          color.push('green')
+          colors.push('green')
         end
       end
     end
@@ -101,7 +99,7 @@ module ReviewMappingHelper
 
   # returns last modified header date
   # only checks certain links (wiki)
-  def get_link_updated_at(link)
+  def last_modified_date_for_link(link)
     uri = URI(link)
     res = Net::HTTP.get_response(uri)['last-modified']
     res.to_time
@@ -115,7 +113,7 @@ module ReviewMappingHelper
   end
 
   # For assignments with 1 team member, the following method returns user's fullname else it returns "team name" that a particular reviewee belongs to.
-  def get_team_reviewed_link_name(max_team_size, _response, reviewee_id, ip_address)
+  def reviewed_link_name_for_team(max_team_size, _response, reviewee_id, ip_address)
     team_reviewed_link_name = if max_team_size == 1
                                 TeamsUser.where(team_id: reviewee_id).first.user.fullname(ip_address)
                               else
@@ -128,7 +126,7 @@ module ReviewMappingHelper
   end
 
   # gets the review score awarded based on each round of the review
-  def get_awarded_review_score(reviewer_id, team_id)
+  def awarded_review_score(reviewer_id, team_id)
     num_rounds = @assignment.num_review_rounds
     round_variable_names = (1..num_rounds).map { |round| "@score_awarded_round_#{round}" }
     round_variable_names.each { |name| instance_variable_set(name, '-----') }
@@ -320,7 +318,7 @@ module ReviewMappingHelper
   end
 
   # gets review and feedback responses for all rounds for the feedback report
-  def get_each_review_and_feedback_response_map(author)
+  def calculate_review_and_feedback_responses(author)
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     # Calculate how many responses one team received from each round
     # It is the feedback number each team member should make
@@ -357,7 +355,7 @@ module ReviewMappingHelper
   #
   # for calibration report
   #
-  def get_css_style_for_calibration_report(diff)
+  def css_class_for_calibration_report(diff)
     # diff - difference between stu's answer and instructor's answer
     dict = { 0 => 'c5', 1 => 'c4', 2 => 'c3', 3 => 'c2' }
     css_class = if dict.key?(diff.abs)

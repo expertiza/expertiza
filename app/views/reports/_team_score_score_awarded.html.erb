@@ -11,7 +11,7 @@
 <%else%>
     <!--Assignments have vary_rubric_by_rounds-->
     <!--Score awarded-->
-    <% get_awarded_review_score(reviewer_id, team_id) %>
+    <% awarded_review_score(reviewer_id, team_id) %>
     <div>
     <% (1..@assignment.num_review_rounds).each do |round| %>
         <% review_metrics(round, team_id) %>

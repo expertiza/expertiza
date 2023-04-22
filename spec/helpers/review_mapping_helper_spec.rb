@@ -1,6 +1,7 @@
 require 'spec_helper'
 require 'rails_helper'
 
+
 describe ReviewMappingHelper, type: :helper do
   let(:team) { build(:assignment_team, id: 1) }
   let(:test_item) { build(:answer, id: 1, comments: 'https://wiki.archlinux.org/') }
@@ -406,7 +407,7 @@ describe ReviewMappingHelper, type: :helper do
   end
 
   # input max_team_size, response, reviewee_id, ip_address
-  describe 'get_team_reviewed_link_name' do
+  describe 'reviewed_link_name_for_team' do
     before(:each) do
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
       @reviewer = create(:participant, review_grade: nil)
@@ -420,7 +421,7 @@ describe ReviewMappingHelper, type: :helper do
       max_team_size = 3
       @response = create(:response, response_map: @response_map)
       ip_address = '0.0.0.0'
-      reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
+      reviewed_team_name = reviewed_link_name_for_team(max_team_size, @response, @reviewee.id, ip_address)
       expect(reviewed_team_name).to eq('(Team_1)')
     end
 
@@ -429,7 +430,7 @@ describe ReviewMappingHelper, type: :helper do
       max_team_size = 2
       @response = create(:response, response_map: @response_map)
       ip_address = '0.0.0.0'
-      reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
+      reviewed_team_name = reviewed_link_name_for_team(max_team_size, @response, @reviewee.id, ip_address)
       expect(reviewed_team_name).to eq('(Team_1)')
     end
 
@@ -441,7 +442,7 @@ describe ReviewMappingHelper, type: :helper do
 
       @response = create(:response, response_map: @response_map)
       ip_address = '0.0.0.0'
-      reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
+      reviewed_team_name = reviewed_link_name_for_team(max_team_size, @response, @reviewee.id, ip_address)
       expect(reviewed_team_name).to eq('(Adam)')
     end
 
@@ -450,7 +451,7 @@ describe ReviewMappingHelper, type: :helper do
       max_team_size = 0
       @response = create(:response, response_map: @response_map)
       ip_address = '0.0.0.0'
-      reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
+      reviewed_team_name = reviewed_link_name_for_team(max_team_size, @response, @reviewee.id, ip_address)
       expect(reviewed_team_name).to eq('(Team_1)')
     end
   end
@@ -508,9 +509,9 @@ describe ReviewMappingHelper, type: :helper do
   end
 
   # I found the test case by internet, and I think it will fail if the website update in future
-  describe 'get_link_updated_at' do
+  describe 'last_modified_date_for_link' do
     it 'should return ? by input http://www.example.com' do
-      updated_time = get_link_updated_at('http://www.example.com')
+      updated_time = last_modified_date_for_link('http://www.example.com')
       expect(updated_time).to eq('2019-10-17 03:18:26.000000000 -0400')
     end
   end
@@ -561,7 +562,7 @@ describe ReviewMappingHelper, type: :helper do
     end
 
     it 'should return the number of responses given in round 1 reviews' do
-      get_each_review_and_feedback_response_map(@reviewer)
+      calculate_review_and_feedback_responses(@reviewer)
 
       # rspan means the all peer reviews one student received, including unfinished one
       # retrieved from method call in review_mapping_helper.rb file
@@ -569,7 +570,7 @@ describe ReviewMappingHelper, type: :helper do
     end
 
     it 'should return the number of responses given in round 2 reviews' do
-      get_each_review_and_feedback_response_map(@reviewer)
+      calculate_review_and_feedback_responses(@reviewer)
 
       # rspan means the all peer reviews one student received, including unfinished one
       # retrieved from method call in review_mapping_helper.rb file
@@ -583,7 +584,7 @@ describe ReviewMappingHelper, type: :helper do
       @feedback_response_map_list << FeedbackResponseMap.create(reviewed_object_id: @response_3.id, reviewer_id: @reviewer.id)
       @all_review_response_ids << @response_3.id
 
-      get_each_review_and_feedback_response_map(@reviewer)
+      calculate_review_and_feedback_responses(@reviewer)
 
       # rspan means the all peer reviews one student received, including unfinished one
       # retrieved from method call in review_mapping_helper.rb file
@@ -592,7 +593,7 @@ describe ReviewMappingHelper, type: :helper do
 
     it 'should return 0 responses for no round 3 reviews' do
       # no feedback responses set before method call
-      get_each_review_and_feedback_response_map(@reviewer)
+      calculate_review_and_feedback_responses(@reviewer)
 
       # rspan means the all peer reviews one student received, including unfinished one
       # retrieved from method call in review_mapping_helper.rb file
@@ -600,7 +601,7 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  # feedback_response_map_record is called within get_each_review_and_feedback_response_map
+  # feedback_response_map_record is called within calculate_review_and_feedback_responses
   describe 'feedback_response_map_record' do
     before(:each) do
       @reviewer = create(:participant)
@@ -727,7 +728,7 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  describe 'get_awarded_review_score' do
+  describe 'awarded_review_score' do
     before(:each) do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -747,7 +748,7 @@ describe ReviewMappingHelper, type: :helper do
 
       @review_scores = { @reviewer.id => { 1 => { @reviewee.id => 10 }, 2 => { @reviewee.id => 20 }, 3 => { @reviewee.id => 30 } } }
 
-      get_awarded_review_score(@reviewer.id, @reviewee.id)
+      awarded_review_score(@reviewer.id, @reviewee.id)
     end
 
     it 'should return the review score given by a reviewer for round 1 for the defined team' do
@@ -988,11 +989,11 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  describe 'test get_css_style_for_calibration_report' do
+  describe 'test css_class_for_calibration_report' do
     it 'should return correct css class' do
-      css_class_0 = helper.get_css_style_for_calibration_report(0)
-      css_class_1 = helper.get_css_style_for_calibration_report(-1)
-      css_class_6 = helper.get_css_style_for_calibration_report(6)
+      css_class_0 = helper.css_class_for_calibration_report(0)
+      css_class_1 = helper.css_class_for_calibration_report(-1)
+      css_class_6 = helper.css_class_for_calibration_report(6)
       expect(css_class_0). to eq('c5')
       expect(css_class_1). to eq('c4')
       expect(css_class_6). to eq('c1')

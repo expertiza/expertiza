@@ -129,7 +129,6 @@
               <%= form.hidden_field :participant_id, :value => reviewer.id %>
               <%= form.hidden_field :assignment_id, :value => @id %>
               <%= form.number_field :grade_for_reviewer, :value => reviewer.review_grade.try(:grade_for_reviewer), min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %>
-              <%= link_to "Grading History", grading_histories_path(grade_receiver_id: Participant.where(id: reviewer.id).pluck(:user_id).first, participant_id: reviewer.id, grade_type: "Review") %>
               <br/>
               <%= form.text_area :comment_for_reviewer, :value => reviewer.review_grade.try(:comment_for_reviewer), placeholder: 'Comment', class: "awesome_input", 'data-multiple' => '', 'data-minchars' => "1" %>
               <table class="inline-transparent">
@@ -144,7 +143,9 @@
                   </td>
                 </tr>
               </table>
-            <% end %>
+              <br/>
+              <%= link_to "Grading History", grading_histories_path(grade_receiver_id: Participant.where(id: reviewer.id).pluck(:user_id).first, participant_id: reviewer.id, grade_type: "Review") %>
+          <% end %>
           </td>
         <% end %>
       </tr>

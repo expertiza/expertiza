@@ -14,6 +14,7 @@ class GradingHistoriesController < ApplicationController
     end
   end
 
+
   def check_type(type)
     if type.eql? "Submission"
       assignment_team = AssignmentTeam.find(params[:grade_receiver_id])

@@ -28,7 +28,7 @@ Expertiza::Application.routes.draw do
   resources :advice, only: [] do
     collection do
       post :save_advice
-      put :edit_advice
+      get :edit_advice
     end
   end
 

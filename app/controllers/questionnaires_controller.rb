@@ -199,7 +199,7 @@ class QuestionnairesController < ApplicationController
     current_num_of_questions = Questionnaire.find(questionnaire_id).questions.size
     max_seq = 0
     Questionnaire.find(questionnaire_id).questions.each do |question|
-      if question.seq > max_seq
+      if !question.seq.nil? && question.seq > max_seq
         max_seq = question.seq
       end
     end

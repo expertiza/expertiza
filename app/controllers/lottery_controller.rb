@@ -127,8 +127,8 @@ class LotteryController < ApplicationController
     # and we also need to think about, how to sort teams when they have the same team size and number of bids
     # maybe we can use timestamps in this case
     unassigned_teams.sort! do |t1, t2|
-      [TeamsUser.where(team_id: t2.id).size, Bid.where(team_id: t1.id).size] <=>
-        [TeamsUser.where(team_id: t1.id).size, Bid.where(team_id: t2.id).size]
+      [TeamsParticipant.where(team_id: t2.id).size, Bid.where(team_id: t1.id).size] <=>
+        [TeamsParticipant.where(team_id: t1.id).size, Bid.where(team_id: t2.id).size]
     end
 
     teams_bidding_info = construct_teams_bidding_info(unassigned_teams, sign_up_topics)

@@ -33,7 +33,7 @@ class MentorManagement
   #   1.) An invited student user accepts and successfully added to a team from
   #       app/models/invitation.rb
   #   2.) A student user is successfully added to the team manually from
-  #       app/controllers/teams_users_controller.rb.
+  #       app/controllers/teams_participants_controller.rb.
   #
   # This method will determine if a mentor needs to be assigned, if so,
   # selects one, and adds the mentor to the team if:
@@ -114,7 +114,7 @@ class MentorManagement
 
     team_counts = {}
     mentor_ids.each { |id| team_counts[id] = 0 }
-    team_counts.update(TeamsUser.where(user_id: mentor_ids).group(:user_id).count(:team_id))
+    team_counts.update(TeamsParticipant.where(user_id: mentor_ids).group(:user_id).count(:team_id))
 
     team_counts.sort_by { |_, v| v }
   end

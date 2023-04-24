@@ -17,7 +17,7 @@ class Lock < ApplicationRecord
   DEFAULT_TIMEOUT = 20
 
   # Requests a lock on the given resource for the given user
-  # Since resources can be of any class, the class name for the resource must be provided
+  # Since teams_participants can be of any class, the class name for the resource must be provided
   # Return the resource if it's available or nil if it is not
   # Automatically handles creating/destroying locks and timeout periods
   # However, once a user is done with a lock, it is their responsibility to destroy it by using Lock.unlock

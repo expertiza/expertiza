@@ -127,7 +127,7 @@ class InvitationsController < ApplicationController
     end
 
     # participant information about student you are trying to invite to the team
-    team_member = TeamsUser.where('team_id = ? and user_id = ?', @team.id, @user.id)
+    team_member = TeamsParticipant.where('team_id = ? and user_id = ?', @team.id, @user.id)
     # check if invited user is already in the team
 
     return if team_member.empty?
@@ -141,9 +141,11 @@ class InvitationsController < ApplicationController
     # check if the inviter's team is still existing, and have available slot to add the invitee
     inviter_assignment_team = AssignmentTeam.team(AssignmentParticipant.find_by(user_id: @inv.from_id, parent_id: @inv.assignment_id))
     if inviter_assignment_team.nil?
+      #check if team exists else throw error
       flash[:error] = 'The team that invited you does not exist anymore.'
       redirect_to view_student_teams_path student_id: params[:student_id]
     elsif inviter_assignment_team.full?
+      # checking if team has space
       flash[:error] = 'The team that invited you is full now.'
       redirect_to view_student_teams_path student_id: params[:student_id]
     else
@@ -158,6 +160,6 @@ class InvitationsController < ApplicationController
 
     @student = Participant.find(params[:student_id])
     # Remove the users previous team since they are accepting an invite for possibly a new team.
-    TeamsUser.remove_team(@student.user_id, params[:team_id])
+    TeamsParticipant.remove_team(@student.user_id, params[:team_id])
   end
 end

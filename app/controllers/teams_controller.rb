@@ -25,6 +25,7 @@ class TeamsController < ApplicationController
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
     rescue StandardError
+      puts "error here"
       flash[:error] = $ERROR_INFO
     end
   end
@@ -76,11 +77,11 @@ class TeamsController < ApplicationController
   end
 
   def delete
-    # delete records in team, teams_users, signed_up_teams table
+    # delete records in team, teams_participants, signed_up_teams table
     @team = Team.find_by(id: params[:id])
     unless @team.nil?
       @signed_up_team = SignedUpTeam.where(team_id: @team.id)
-      @teams_users = TeamsUser.where(team_id: @team.id)
+      @teams_participants = TeamsParticipant.where(team_id: @team.id)
 
       if @signed_up_team == 1 && !@signUps.first.is_waitlisted # this team hold a topic
         # if there is another team in waitlist, make this team hold this topic
@@ -91,7 +92,7 @@ class TeamsController < ApplicationController
       end
 
       @sign_up_team.destroy_all if @sign_up_team
-      @teams_users.destroy_all if @teams_users
+      @teams_participants.destroy_all if @teams_participants
       @team.destroy if @team
       undo_link("The team \"#{@team.name}\" has been successfully deleted.")
     end

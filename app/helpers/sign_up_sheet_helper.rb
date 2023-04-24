@@ -20,8 +20,8 @@ module SignUpSheetHelper
   # Retrieve topics suggested by signed in user for
   # the assignment.
   def get_suggested_topics(assignment_id)
-    team_id = TeamsUser.team_id(assignment_id, session[:user].id)
-    teams_users = TeamsUser.where(team_id: team_id)
+    team_id = TeamsParticipant.team_id(assignment_id, session[:user].id)
+    teams_users = TeamsParticipant.where(team_id: team_id)
     teams_users_array = []
     teams_users.each do |teams_user|
       teams_users_array << teams_user.user_id

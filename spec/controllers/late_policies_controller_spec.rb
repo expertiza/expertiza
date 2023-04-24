@@ -275,7 +275,7 @@ describe LatePoliciesController do
         request_params = {
           late_policy: {
             max_penalty: 30,
-            penalty_per_unit: -10,
+            penalty_per_unit: 10,
             policy_name: 'Invalid_Policy'
           },
           id: 1

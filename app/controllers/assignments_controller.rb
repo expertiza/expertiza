@@ -63,11 +63,24 @@ class AssignmentsController < ApplicationController
                                                    @assignment_form.assignment.course_id)
       if assignment_unique && directory_unique && @assignment_form.save # No existing names/directories
         @assignment_form.create_assignment_node
-        existing_assignment = Assignment.find(@assignment_form.assignment.id)
-        assignment_form_params = update_form_params_with_existing(existing_assignment, assignment_form_params)
+        exist_assignment = Assignment.find(@assignment_form.assignment.id)
+        assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
+        if assignment_form_params[:assignment][:directory_path].blank?
+          assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
+        end
+        ques_array = assignment_form_params[:assignment_questionnaire]
+        due_array = assignment_form_params[:due_date]
+        ques_array.each do |cur_questionnaire|
+          cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
+        end
+        due_array.each do |cur_due|
+          cur_due[:parent_id] = exist_assignment.id.to_s
+        end
+        assignment_form_params[:assignment_questionnaire] = ques_array
+        assignment_form_params[:due_date] = due_array
         @assignment_form.update(assignment_form_params, current_user)
-        ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
         assignment_id = Assignment.find(@assignment_form.assignment.id).id
+        ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
         session[:assignment_id] = assignment_id #passing it in session so that redirect works
         redirect_to edit_assignment_path assignment_id
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
@@ -80,7 +93,7 @@ class AssignmentsController < ApplicationController
         unless directory_unique
           flash[:error] << '<br>  ' + dir_path + ' already exists as a submission directory name'
         end
-        redirect_to new_assignment_path(private: 1)
+        redirect_to '/assignments/new?private=1'
       end
     else
       render 'new'
@@ -105,7 +118,7 @@ class AssignmentsController < ApplicationController
     @badges = Badge.all
     @use_bookmark = @assignment.use_bookmark
     @duties = Duty.where(assignment_id: @assignment_form.assignment.id)
-    assignment_id = Assignment.find(@assignment_form.assignment.id).id
+    assignment_id = Assignment.find(@assignment_form.assignment.id.to_s).id
     session[:assignment_id] = assignment_id
   end
 

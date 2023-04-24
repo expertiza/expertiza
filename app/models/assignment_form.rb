@@ -8,8 +8,7 @@ class AssignmentForm
                 :is_conference_assignment,
                 :auto_assign_mentor
 
-  # Changing the access to reader as errors are only read from and not modified
-  attr_reader :errors
+  attr_accessor :errors
 
   DEFAULT_MAX_TEAM_SIZE = 1
 
@@ -81,7 +80,7 @@ class AssignmentForm
   # Code to update values of assignment
   def update_assignment(attributes)
     unless @assignment.update_attributes(attributes)
-      @errors = @assignment.errors.full_messages
+      @errors = @assignment.errors.to_s
       @has_errors = true
     end
     @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
@@ -94,7 +93,7 @@ class AssignmentForm
 
     if attributes[0].key?(:questionnaire_weight)
       validate_assignment_questionnaires_weights(attributes)
-      @errors = @assignment.errors.full_messages
+      @errors = @assignment.errors.to_s
       topic_id = nil
     end
     unless @has_errors
@@ -108,13 +107,13 @@ class AssignmentForm
         aq = assignment_questionnaire(questionnaire_type, attr[:used_in_round], topic_id, duty_id)
         if aq.id.nil?
           unless aq.save
-            @errors = @assignment.errors.full_messages
+            @errors = @assignment.errors.to_s
             @has_errors = true
             next
           end
         end
         unless aq.update_attributes(attr)
-          @errors = @assignment.errors.full_messages
+          @errors = @assignment.errors.to_s
           @has_errors = true
         end
       end
@@ -191,7 +190,7 @@ class AssignmentForm
         # get deadline for review
         @has_errors = true unless dd.update_attributes(due_date)
       end
-      @errors += @assignment.errors.full_messages if @has_errors
+      @errors += @assignment.errors.to_s if @has_errors
     end
   end
 
@@ -320,14 +319,14 @@ class AssignmentForm
   def delete_from_delayed_queue
     queue = Sidekiq::Queue.new('mailers')
     queue.each do |job|
-      assignment_id = job.args.first
-      job.delete if @assignment.id == assignment_id
+      assignmentId = job.args.first
+      job.delete if @assignment.id == assignmentId
     end
 
     queue = Sidekiq::ScheduledSet.new
     queue.each do |job|
-      assignment_id = job.args.first
-      job.delete if @assignment.id == assignment_id
+      assignmentId = job.args.first
+      job.delete if @assignment.id == assignmentId
     end
   end
 
@@ -418,29 +417,29 @@ class AssignmentForm
   # Copies the inputted assignment into new one and returns the new assignment id
   def self.copy(assignment_id, user)
     Assignment.record_timestamps = false
-    old_assignment = Assignment.find(assignment_id)
-    new_assignment = old_assignment.dup
-    user.set_instructor(new_assignment)
-    new_assignment.update_attribute('name', 'Copy of ' + new_assignment.name)
-    new_assignment.update_attribute('created_at', Time.now)
-    new_assignment.update_attribute('updated_at', Time.now)
-    new_assignment.update_attribute('directory_path', new_assignment.directory_path + '_copy') if new_assignment.directory_path.present?
-    new_assignment.copy_flag = true
-    if new_assignment.save
+    old_assign = Assignment.find(assignment_id)
+    new_assign = old_assign.dup
+    user.set_instructor(new_assign)
+    new_assign.update_attribute('name', 'Copy of ' + new_assign.name)
+    new_assign.update_attribute('created_at', Time.now)
+    new_assign.update_attribute('updated_at', Time.now)
+    new_assign.update_attribute('directory_path', new_assign.directory_path + '_copy') if new_assign.directory_path.present?
+    new_assign.copy_flag = true
+    if new_assign.save
       Assignment.record_timestamps = true
-      copy_assignment_questionnaire(old_assignment, new_assignment, user)
-      AssignmentDueDate.copy(old_assignment.id, new_assignment.id)
-      new_assignment.create_node
-      new_assignment_id = new_assignment.id
+      copy_assignment_questionnaire(old_assign, new_assign, user)
+      AssignmentDueDate.copy(old_assign.id, new_assign.id)
+      new_assign.create_node
+      new_assign_id = new_assign.id
       # also copy topics from old assignment
-      topics = SignUpTopic.where(assignment_id: old_assignment.id)
+      topics = SignUpTopic.where(assignment_id: old_assign.id)
       topics.each do |topic|
-        SignUpTopic.create(topic_name: topic.topic_name, assignment_id: new_assignment_id, max_choosers: topic.max_choosers, category: topic.category, topic_identifier: topic.topic_identifier, micropayment: topic.micropayment)
+        SignUpTopic.create(topic_name: topic.topic_name, assignment_id: new_assign_id, max_choosers: topic.max_choosers, category: topic.category, topic_identifier: topic.topic_identifier, micropayment: topic.micropayment)
       end
     else
-      new_assignment_id = nil
+      new_assign_id = nil
     end
-    new_assignment_id
+    new_assign_id
   end
 
   def self.copy_assignment_questionnaire(old_assign, new_assign, user)

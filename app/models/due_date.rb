@@ -2,10 +2,6 @@ class DueDate < ApplicationRecord
   validate :due_at_is_valid_datetime
   #  has_paper_trail
 
-  def self.default_permission(deadline_type, permission_type)
-    DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
-  end
-
   def self.current_due_date(due_dates)
     # Get the current due date from list of due dates
     due_dates.each do |due_date|
@@ -27,11 +23,6 @@ class DueDate < ApplicationRecord
         due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
   end
 
-  def set_flag
-    self.flag = true
-    save
-  end
-
   def due_at_is_valid_datetime
     if due_at.present?
       errors.add(:due_at, 'must be a valid datetime') if (begin
@@ -51,27 +42,23 @@ class DueDate < ApplicationRecord
     end
   end
 
-  def self.set_duedate(duedate, deadline, assign_id, max_round)
-    submit_duedate = DueDate.new(duedate)
-    submit_duedate.deadline_type_id = deadline
-    submit_duedate.parent_id = assign_id
-    submit_duedate.round = max_round
-    submit_duedate.save
-  end
 
-  def self.deadline_sort(due_dates)
-    due_dates.sort do |m1, m2|
-      if m1.due_at && m2.due_at
-        m1.due_at <=> m2.due_at
-      elsif m1.due_at
-        -1
-      else
-        1
-      end
+  def <=>(other)
+    if self.due_at && other.due_at
+      self.due_at <=>other.due_at
+    elsif self.due_at
+      -1
+    else
+      1
     end
   end
 
-  def self.done_in_assignment_round(assignment_id, response)
+  def self.deadline_sort(due_dates)
+    due_dates.sort
+  end
+
+
+  def self.assignment_latest_assignment_review_round(assignment_id, response)
     # for author feedback, quiz, teammate review and metareview, Expertiza only support one round, so the round # should be 1
     return 0 if ResponseMap.find(response.map_id).type != 'ReviewResponseMap'
 
@@ -117,4 +104,6 @@ class DueDate < ApplicationRecord
     end
     next_due_date
   end
+
 end
+

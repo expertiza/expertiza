@@ -80,7 +80,7 @@ class AssignmentsController < ApplicationController
         unless directory_unique
           flash[:error] << '<br>  ' + dir_path + ' already exists as a submission directory name'
         end
-        redirect_to new_assignment_path(private: 1)
+        redirect_to '/assignments/new?private=1'
       end
     else
       render 'new'
@@ -105,7 +105,7 @@ class AssignmentsController < ApplicationController
     @badges = Badge.all
     @use_bookmark = @assignment.use_bookmark
     @duties = Duty.where(assignment_id: @assignment_form.assignment.id)
-    assignment_id = Assignment.find(@assignment_form.assignment.id).id
+    assignment_id = Assignment.find(@assignment_form.assignment.id.to_s).id
     session[:assignment_id] = assignment_id
   end
 

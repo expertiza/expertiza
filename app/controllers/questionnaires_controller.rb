@@ -207,22 +207,13 @@ class QuestionnairesController < ApplicationController
     questionnaire_id = params[:id]
     begin
       if params[:save]
-        params[:question].each_pair do |k, v|
-          @question = Question.find(k)
-          # example of 'v' value
-          # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
-          v.each_pair do |key, value|
-            @question.send(key + '=', value) unless @question.send(key) == value
-          end
-
-          @question.save
-          flash[:success] = 'All questions have been successfully saved!'
-        end
+        update_questions
+        flash[:success] = 'All questions have been successfully saved!'
       end
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
-
+  
     if params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     elsif questionnaire_id
@@ -318,9 +309,9 @@ class QuestionnairesController < ApplicationController
   end
 
   def questionnaire_params
-    if action_name == 
-    params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
-                                          :max_question_score, :type, :display_type, :instruction_loc)
+    if action_name == 'update'
+      params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
+                                            :max_question_score, :type, :display_type, :instruction_loc)
   end
 
   def question_params

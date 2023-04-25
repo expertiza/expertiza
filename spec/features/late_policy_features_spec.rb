@@ -14,6 +14,7 @@ describe 'Assignment creation topics tab', js: true do
     click_link 'Due Dates'
   end
 
+  # Test for flash error message on new late policy page
   it 'Flash Error Message on New Late Policy Page', js: true do
     assignment = Assignment.where(name: 'assignment for late policy test').first
     create(:topic, assignment_id: assignment.id)
@@ -25,6 +26,7 @@ describe 'Assignment creation topics tab', js: true do
   end
 end
 
+# Test for back button interaction on new late policy page
 it 'Back Button Interation on New Late Policy Page', js: true do
   assignment = Assignment.where(name: 'assignment for late policy test').first
   create(:topic, assignment_id: assignment.id)
@@ -35,6 +37,7 @@ it 'Back Button Interation on New Late Policy Page', js: true do
   expect(page).to route_to("/assignments/#{assignment.id}/edit")
 end
 
+# Test for back button interaction on new late policy page while creating
 it 'Back Button Interation on New Late Policy Page while creating', js: true do
   assignment = Assignment.where(name: 'assignment for late policy test').first
   create(:topic, assignment_id: assignment.id)

@@ -1,6 +1,7 @@
 class QuestionnairesController < ApplicationController
   include AuthorizationHelper
-
+  include QuestionnaireHelper
+  include QuestionHelper
   # Controller for Questionnaire objects
   # A Questionnaire can be of several types (QuestionnaireType)
   # Each Questionnaire contains zero or more questions (Question)
@@ -41,9 +42,32 @@ class QuestionnairesController < ApplicationController
   end
 
   def new
-    @questionnaire = Object.const_get(params[:model].split.join).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model].split.join
+    type = params[:model].split.join
+    # Create questionnaire object based on type using questionnaire_factory
+    @questionnaire = questionnaire_factory(type) if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model].split.join
   rescue StandardError
     flash[:error] = $ERROR_INFO
+  end
+
+  # Assigns corrresponding variables to questionnaire object.
+  def set_questionnaire_parameters(private_flag, display)
+    @questionnaire.private = private_flag
+    @questionnaire.name = params[:questionnaire][:name]
+    @questionnaire.instructor_id = session[:user].id
+    @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
+    @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
+    @questionnaire.type = params[:questionnaire][:type]
+    @questionnaire.display_type = display
+    @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
+    @questionnaire.save
+  end
+
+  # Creates tree node
+  def create_tree_node
+    tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
+    parent = FolderNode.find_by(node_object_id: tree_folder.id)
+    QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
+    flash[:success] = 'You have successfully created a questionnaire!'
   end
 
   def create
@@ -54,46 +78,27 @@ class QuestionnairesController < ApplicationController
       questionnaire_private = params[:questionnaire][:private] == 'true'
       display_type = params[:questionnaire][:type].split('Questionnaire')[0]
       begin
-        @questionnaire = Object.const_get(params[:questionnaire][:type]).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
+        type = params[:questionnaire][:type]
+        # Create questionnaire object based on type using questionnaire_factory
+        @questionnaire = questionnaire_factory(type) if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
       rescue StandardError
         flash[:error] = $ERROR_INFO
       end
       begin
-        @questionnaire.private = questionnaire_private
-        @questionnaire.name = params[:questionnaire][:name]
-        @questionnaire.instructor_id = session[:user].id
-        @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
-        @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
-        @questionnaire.type = params[:questionnaire][:type]
         # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
-        # In the future, we need to write migration files to make them consistency.
+        # In the future, we need to write migration files to make them have consistency.
         # E1903 : We are not sure of other type of cases, so have added a if statement. If there are only 5 cases, remove the if statement
         if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey BookmarkRating].include?(display_type)
-          display_type = (display_type.split(/(?=[A-Z])/)).join('%')
+          display_type = display_type.split(/(?=[A-Z])/).join('%')
         end
-        @questionnaire.display_type = display_type
-        @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
-        @questionnaire.save
-        # Create node
-        tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
-        parent = FolderNode.find_by(node_object_id: tree_folder.id)
-        QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
-        flash[:success] = 'You have successfully created a questionnaire!'
-      rescue StandardError
-        flash[:error] = $ERROR_INFO
+        # set the parameters for questionnaires object
+        set_questionnaire_parameters(questionnaire_private, display_type)
+        # Create node - adds this questionnaire to the tree_display list
+        create_tree_node
+      rescue StandardError => e
+        flash[:error] = e.message
       end
       redirect_to controller: 'questionnaires', action: 'edit', id: @questionnaire.id
-    end
-  end
-
-  def create_questionnaire
-    @questionnaire = Object.const_get(params[:questionnaire][:type]).new(questionnaire_params)
-    # Create Quiz content has been moved to Quiz Questionnaire Controller
-    if @questionnaire.type != 'QuizQuestionnaire' # checking if it is a quiz questionnaire
-      @questionnaire.instructor_id = Ta.get_my_instructor(session[:user].id) if session[:user].role.name == 'Teaching Assistant'
-      save
-
-      redirect_to controller: 'tree_display', action: 'list'
     end
   end
 
@@ -191,25 +196,34 @@ class QuestionnairesController < ApplicationController
       flash[:success] = 'You have successfully added a new question.'
     end
 
-    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
-    ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
-      question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
+    current_num_of_questions = Questionnaire.find(questionnaire_id).questions.size
+    max_seq = 0
+    Questionnaire.find(questionnaire_id).questions.each do |question|
+      if !question.seq.nil? && question.seq > max_seq
+        max_seq = question.seq
+      end
+    end
+    ((current_num_of_questions + 1)..(current_num_of_questions + params[:question][:total_num].to_i)).each do
+      max_seq += 1
+      # Create question object based on type using question_factory
+      question = question_factory(params[:question][:type], questionnaire_id, max_seq)
       if question.is_a? ScoredQuestion
         question.weight = params[:question][:weight]
-        question.max_label = 'Strongly agree'
-        question.min_label = 'Strongly disagree'
+        question.max_label = Question::MAX_LABEL
+        question.min_label = Question::MIN_LABEL
       end
 
-      question.size = '50, 3' if question.is_a? Criterion
-      question.size = '50, 3' if question.is_a? Cake
-      question.alternatives = '0|1|2|3|4|5' if question.is_a? Dropdown
-      question.size = '60, 5' if question.is_a? TextArea
-      question.size = '30' if question.is_a? TextField
+      if Question::SIZES.key?(question.class.name)
+        question.size = Question::SIZES[question.class.name]
+      end
+      if Question::ALTERNATIVES.key?(question.class.name)
+        question.alternatives = Question::ALTERNATIVES[question.class.name]
+      end
 
       begin
         question.save
-      rescue StandardError
-        flash[:error] = $ERROR_INFO
+      rescue StandardError => e
+        flash[:error] = e.message
       end
     end
     redirect_to edit_questionnaire_path(questionnaire_id.to_sym)

@@ -15,13 +15,41 @@ module QuestionnaireHelper
       max = questionnaire.max_question_score
       min = questionnaire.min_question_score
 
-      QuestionAdvice.delete_all(['question_id = ? AND (score > ? OR score < ?)', question.id, max, min]) if !max.nil? && !min.nil?
+      QuestionAdvice.delete(['question_id = ? AND (score > ? OR score < ?)', question.id, max, min]) if !max.nil? && !min.nil?
 
       (questionnaire.min_question_score..questionnaire.max_question_score).each do |i|
         qas = QuestionAdvice.where('question_id = ? AND score = ?', question.id, i)
         question.question_advices << QuestionAdvice.new(score: i) if qas.first.nil?
         QuestionAdvice.delete(['question_id = ? AND score = ?', question.id, i]) if qas.size > 1
       end
+    end
+  end
+
+  # factory method to create the appropriate questionnaire based on the type
+  def questionnaire_factory(type)
+    case type
+    when 'ReviewQuestionnaire'
+      return ReviewQuestionnaire.new
+    when 'MetareviewQuestionnaire'
+      return MetareviewQuestionnaire.new
+    when 'AuthorFeedbackQuestionnaire'
+      return AuthorFeedbackQuestionnaire.new
+    when 'TeammateReviewQuestionnaire'
+      return TeammateReviewQuestionnaire.new
+    when'AssignmentSurveyQuestionnaire'
+      return AssignmentSurveyQuestionnaire.new
+    when 'SurveyQuestionnaire'
+      return SurveyQuestionnaire.new
+    when 'GlobalSurveyQuestionnaire'
+      return GlobalSurveyQuestionnaire.new
+    when 'CourseSurveyQuestionnaire'
+      return CourseSurveyQuestionnaire.new
+    when 'BookmarkRatingQuestionnaire'
+      return BookmarkRatingQuestionnaire.new
+    when 'QuizQuestionnaire'
+      return QuizQuestionnaire.new
+    else
+      flash[:error] = "Error: Undefined Questionnaire"
     end
   end
 end

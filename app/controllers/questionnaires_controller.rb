@@ -112,36 +112,23 @@ class QuestionnairesController < ApplicationController
   def update
     # If 'Add' or 'Edit/View advice' is clicked, redirect appropriately
     if params[:add_new_questions]
-      # redirect_to action: 'add_new_questions', id: params.permit(:id)[:id], question: params.permit(:new_question)[:new_question]
-      nested_keys = params[:new_question].keys
-      permitted_params = params.permit(:id, :new_question => nested_keys)
-      redirect_to action: 'add_new_questions', id: permitted_params[:id], question: permitted_params[:new_question]
+      permitted_params = params.permit(:id, new_question: params[:new_question].keys)
+      redirect_to(action: 'add_new_questions', id: permitted_params[:id], question: permitted_params[:new_question])
     elsif params[:view_advice]
-      redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
+      redirect_to(controller: 'advice', action: 'edit_advice', id: params[:id])
     else
-      @questionnaire = Questionnaire.find(params[:id])
-      begin
-        # Save questionnaire information
-        @questionnaire.update_attributes(questionnaire_params)
-
-        # Save all questions
-        unless params[:question].nil?
-          params[:question].each_pair do |k, v|
-            @question = Question.find(k)
-            # example of 'v' value
-            # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
-            v.each_pair do |key, value|
-              @question.send(key + '=', value) unless @question.send(key) == value
-            end
-            @question.save
-          end
-        end
+      if @questionnaire.update(questionnaire_params)
+        update_questions
         flash[:success] = 'The questionnaire has been successfully updated!'
-      rescue StandardError
-        flash[:error] = $ERROR_INFO
+      else
+        flash[:error] = @questionnaire.errors.full_messages.join(', ')
       end
-      redirect_to action: 'edit', id: @questionnaire.id.to_s.to_sym
+
+      redirect_to(action: 'edit', id: @questionnaire.id.to_s.to_sym)
     end
+  rescue StandardError => e
+    flash[:error] = e.message
+    redirect_to(action: 'edit', id: @questionnaire.id.to_s.to_sym)
   end
 
   # Remove a given questionnaire
@@ -234,22 +221,13 @@ class QuestionnairesController < ApplicationController
     questionnaire_id = params[:id]
     begin
       if params[:save]
-        params[:question].each_pair do |k, v|
-          @question = Question.find(k)
-          # example of 'v' value
-          # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
-          v.each_pair do |key, value|
-            @question.send(key + '=', value) unless @question.send(key) == value
-          end
-
-          @question.save
-          flash[:success] = 'All questions have been successfully saved!'
-        end
+        update_questions
+        flash[:success] = 'All questions have been successfully saved!'
       end
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
-
+  
     if params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     elsif questionnaire_id
@@ -286,6 +264,27 @@ class QuestionnairesController < ApplicationController
       end
     end
   end
+
+  def load_questionnaire
+    @questionnaire = Questionnaire.find(params[:id])
+  end
+
+  def questionnaire_params
+    params.require(:questionnaire).permit(:name, :description, :status, :published_at)
+  end
+
+  def update_questions
+    return if params[:question].nil?
+  
+    params[:question].each_pair do |k, v|
+      question = Question.find(k)
+      v.each_pair do |key, value|
+        question.send(key + '=', value) unless question.send(key) == value
+      end
+      question.save
+    end
+  end
+  
 
   # delete questions from a questionnaire
   # @param [Object] questionnaire_id
@@ -332,7 +331,7 @@ class QuestionnairesController < ApplicationController
 
   def questionnaire_params
     params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
-                                          :max_question_score, :type, :display_type, :instruction_loc)
+                                            :max_question_score, :type, :display_type, :instruction_loc)
   end
 
   def question_params

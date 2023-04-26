@@ -280,6 +280,26 @@ describe QuestionnairesController do
         expect(response).to redirect_to('/questionnaires/1/edit')
       end
     end
+
+    context 'when request_params[:view_advice] is not nil' do
+      it 'redirects to advice#edit_advice page' do
+        request_params = { id: 1,
+                           view_advice: true }
+        post :update, params: request_params
+        expect(response).to redirect_to('/advice/edit_advice?id=1')
+      end
+    end
+
+    context 'when request_params[:add_new_questions] is not nil' do
+      it 'redirects to questionnaire#add_new_questions' do
+        request_params = { id: 1,
+                           add_new_questions: true,
+                           new_question: { total_num: 2,
+                                           type: 'Criterion' } }
+        post :update, params: request_params
+        expect(response).to redirect_to action: 'add_new_questions', id: request_params[:id], question: request_params[:new_question]
+      end
+    end
   end
 
   describe '#delete' do

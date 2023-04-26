@@ -4,7 +4,7 @@ module QuestionHelper
     case type
     when 'Criterion'
       return Criterion.create(txt: '', questionnaire_id: questionnaire_id, seq: seq, type: type, break_before: true)
-    when type == 'Scale'
+    when 'Scale'
       return Scale.create(txt: '', questionnaire_id: questionnaire_id, seq: seq, type: type, break_before: true)
     when 'Cake'
       return Cake.create(txt: '', questionnaire_id: questionnaire_id, seq: seq, type: type, break_before: true)

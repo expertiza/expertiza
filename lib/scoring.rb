@@ -324,7 +324,9 @@ def scores_varying_rubrics(assignment, review_scores, response_maps)
       respective_scores = {}
       respective_scores = reviewer[round] unless reviewer.nil? || reviewer[round].nil?
       this_review_score = calc_review_score(corresponding_response, questions)
+      review_scores[response_map.reviewer_id] = {} unless review_scores[response_map.reviewer_id]
       respective_scores[response_map.reviewee_id] = this_review_score
+      review_scores[response_map.reviewer_id][round] = respective_scores
       reviewer = {} if reviewer.nil?
       reviewer[round] = {} if reviewer[round].nil?
       reviewer[round] = respective_scores

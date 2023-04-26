@@ -260,10 +260,17 @@ class QuestionnairesController < ApplicationController
   end
 
   def update_questions
-    @questionnaire.questions.where(id: params[:question]&.keys).each do |question|
-      question.update(params[:question][question.id.to_s].permit!)
+    return if params[:question].nil?
+  
+    params[:question].each_pair do |k, v|
+      question = Question.find(k)
+      v.each_pair do |key, value|
+        question.send(key + '=', value) unless question.send(key) == value
+      end
+      question.save
     end
   end
+  
 
   # delete questions from a questionnaire
   # @param [Object] questionnaire_id

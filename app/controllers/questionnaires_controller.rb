@@ -309,8 +309,7 @@ class QuestionnairesController < ApplicationController
   end
 
   def questionnaire_params
-    if action_name == 'update'
-      params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
+    params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
                                             :max_question_score, :type, :display_type, :instruction_loc)
   end
 

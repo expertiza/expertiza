@@ -91,9 +91,34 @@ class QuestionsController < ApplicationController
     render json: types.to_a
   end
 
+  # save questions that have been added to a questionnaire
+  def save_new_questions
+    questionnaire_id = params[:questionnaire_id]
+    questionnaire_type = params[:questionnaire_type]
+    if params[:new_question]
+      # The new_question array contains all the new questions
+      # that should be saved to the database
+      params[:new_question].keys.each_with_index do |question_key, index|
+        q = Question.new
+        q.txt = params[:new_question][question_key]
+        q.questionnaire_id = questionnaire_id
+        q.type = params[:question_type][question_key][:type]
+        q.seq = question_key.to_i
+        if questionnaire_type == 'QuizQuestionnaire'
+          # using the weight user enters when creating quiz
+          weight_key = "question_#{index + 1}"
+          q.weight = params[:question_weights][weight_key.to_sym]
+        end
+        q.save unless q.txt.strip.empty?
+      end
+    end
+    redirect_to request.original_url
+  end
+
   private
 
   def question_params
     params.permit(:id, :question)
   end
 end
+

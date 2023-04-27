@@ -251,28 +251,29 @@ class QuestionnairesController < ApplicationController
     save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
   end
-
-  # save questions that have been added to a questionnaire
-  def save_new_questions(questionnaire_id)
-    if params[:new_question]
-      # The new_question array contains all the new questions
-      # that should be saved to the database
-      params[:new_question].keys.each_with_index do |question_key, index|
-        q = Question.new
-        q.txt = params[:new_question][question_key]
-        q.questionnaire_id = questionnaire_id
-        q.type = params[:question_type][question_key][:type]
-        q.seq = question_key.to_i
-        if @questionnaire.type == 'QuizQuestionnaire'
-          # using the weight user enters when creating quiz
-          weight_key = "question_#{index + 1}"
-          q.weight = params[:question_weights][weight_key.to_sym]
-        end
-        q.save unless q.txt.strip.empty?
-      end
-    end
-  end
-
+  #=begin
+  ## save questions that have been added to a questionnaire
+  #def save_new_questions(questionnaire_id)
+  #  if params[:new_question]
+  #    # The new_question array contains all the new questions
+  #    # that should be saved to the database
+  #    params[:new_question].keys.each_with_index do |question_key, index|
+  #      q = Question.new
+  #      q.txt = params[:new_question][question_key]
+  #      q.questionnaire_id = questionnaire_id
+  #      q.type = params[:question_type][question_key][:type]
+  #      q.seq = question_key.to_i
+  #      if @questionnaire.type == 'QuizQuestionnaire'
+  #        # using the weight user enters when creating quiz
+  #        weight_key = "question_#{index + 1}"
+  #        q.weight = params[:question_weights][weight_key.to_sym]
+  #      end
+  #      q.save unless q.txt.strip.empty?
+  #    end
+  #  end
+  #end
+  #=end
+  
   # delete questions from a questionnaire
   # @param [Object] questionnaire_id
   def delete_questions(questionnaire_id)
@@ -301,7 +302,7 @@ class QuestionnairesController < ApplicationController
   def save_questions(questionnaire_id)
     delete_questions questionnaire_id
     save_new_questions questionnaire_id
-
+    
     if params[:question]
       params[:question].keys.each do |question_key|
         if params[:question][question_key][:txt].strip.empty?

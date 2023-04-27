@@ -300,9 +300,7 @@ class QuestionnairesController < ApplicationController
   # Handles questions whose wording changed as a result of the edit
   # @param [Object] questionnaire_id
   def save_questions(questionnaire_id)
-    delete_questions questionnaire_id
-    save_new_questions questionnaire_id
-    
+    delete_questions questionnaire_id    
     if params[:question]
       params[:question].keys.each do |question_key|
         if params[:question][question_key][:txt].strip.empty?
@@ -315,6 +313,7 @@ class QuestionnairesController < ApplicationController
         end
       end
     end
+    redirect_to controller: 'question', action: 'save_new_questions', questionnaire_id: @questionnaire.id, questionnaire_type: @questionnaire.type
   end
 
   def questionnaire_params

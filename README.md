@@ -5,16 +5,6 @@ Expertiza
 [![Coverage Status](https://coveralls.io/repos/github/expertiza/expertiza/badge.svg?branch=main)](https://coveralls.io/github/expertiza/expertiza?branch=main)
 [![Maintainability](https://api.codeclimate.com/v1/badges/23b8a211854207919986/maintainability)](https://codeclimate.com/github/expertiza/expertiza/maintainability)
 
-### Testing
-
-- Expertiza Website Link: http://152.7.177.207:8080/
-
-- Credentials:
-
-```
-username: administrator_star
-password: password
-```
 
 #### Peer review system
 

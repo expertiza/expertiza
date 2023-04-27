@@ -24,13 +24,13 @@ class AssignmentsController < ApplicationController
 
   # E2327 - Refactoring to improve readability
   # Finds whether existing assignment with same name and course id exists
-  def check_if_assignment_unique(name, course_id)
+  def assignment_unique?(name, course_id)
     find_existing_assignment = Assignment.find_by(name: name, course_id: course_id)
     !find_existing_assignment
   end
 
   # Finds whether existing directory with same directory path and course id exists
-  def check_if_directory_unique(dir_path, course_id)
+  def directory_unique?(dir_path, course_id)
     find_existing_directory = Assignment.find_by(directory_path: dir_path, course_id: course_id)
     !find_existing_directory
   end
@@ -38,8 +38,8 @@ class AssignmentsController < ApplicationController
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
     if params[:button]
-      assignment_unique = check_if_assignment_unique(@assignment_form.assignment.name, @assignment_form.assignment.course_id)
-      directory_unique = check_if_directory_unique(assignment_form_params[:assignment][:directory_path],
+      assignment_unique = assignment_unique?(@assignment_form.assignment.name, @assignment_form.assignment.course_id)
+      directory_unique = directory_unique?(assignment_form_params[:assignment][:directory_path],
                                                    @assignment_form.assignment.course_id)
       if assignment_unique && directory_unique && @assignment_form.save # No existing names/directories
         @assignment_form.create_assignment_node
@@ -533,3 +533,4 @@ class AssignmentsController < ApplicationController
     params.require(:assignment_form).permit!
   end
 end
+

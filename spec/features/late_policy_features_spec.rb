@@ -26,7 +26,7 @@ describe 'Assignment creation topics tab', js: true do
   end
 end
 
-# Test for back button interaction on new late policy page
+# Test that back button on new late policy page takes us to previous page
 it 'Back Button Interaction on New Late Policy Page', js: true do
   assignment = Assignment.where(name: 'assignment for late policy test').first
   create(:topic, assignment_id: assignment.id)
@@ -37,7 +37,7 @@ it 'Back Button Interaction on New Late Policy Page', js: true do
   expect(page).to route_to("/assignments/#{assignment.id}/edit")
 end
 
-# Test for back button interaction on new late policy page while creating
+# Test that back button on new late policy page while creating takes us to previous page
 it 'Back Button Interaction on New Late Policy Page while creating', js: true do
   assignment = Assignment.where(name: 'assignment for late policy test').first
   create(:topic, assignment_id: assignment.id)

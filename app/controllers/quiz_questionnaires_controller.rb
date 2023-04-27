@@ -236,7 +236,7 @@ class QuizQuestionnairesController < QuestionnairesController
 
   # save questions
   def save_questions(questionnaire_id)
-    delete_questions questionnaire_id # delete existing questionnaire if any
+    redirect_to controller: 'question', action: 'delete_questions', questionnaire_id: @questionnaire.id
     redirect_to controller: 'question', action: 'save_new_questions', questionnaire_id: @questionnaire.id, questionnaire_type: @questionnaire.type
     if params[:question]
       params[:question].each_key do |question_key|

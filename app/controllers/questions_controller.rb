@@ -115,6 +115,28 @@ class QuestionsController < ApplicationController
     redirect_to request.original_url
   end
 
+  def delete_questions
+    # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
+    questionnaire_id = params[:questionnaire_id]
+    questions = Question.where('questionnaire_id = ?', questionnaire_id)
+    @deleted_questions = []
+    questions.each do |question|
+      should_delete = true
+      unless question_params.nil?
+        params[:question].each_key do |question_key|
+          should_delete = false if question_key.to_s == question.id.to_s
+        end
+      end
+
+      next unless should_delete
+
+      question.question_advices.each(&:destroy)
+      # keep track of the deleted questions
+      @deleted_questions.push(question)
+      question.destroy
+    end
+    return
+  end
   private
 
   def question_params

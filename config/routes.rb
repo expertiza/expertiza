@@ -576,6 +576,7 @@ Expertiza::Application.routes.draw do
       get :goto_bookmarkrating_rubrics
       get :list
       get :drill
+      get :confirm
     end
   end
 

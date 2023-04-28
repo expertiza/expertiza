@@ -1,8 +1,8 @@
 class AddParticipantIdAndPopulate < ActiveRecord::Migration[5.1]
 
   def up
-    # add_column :teams_users, :participant_id, :integer, limit: 4, index: true
-    # add_foreign_key :teams_users, :participants
+    add_column :teams_users, :participant_id, :integer, limit: 4, index: true
+    add_foreign_key :teams_users, :participants
     # firstly, fetch all TeamsUser rows
     teams_participants = TeamsUser.all
     # for each TeamsUser row
@@ -32,8 +32,8 @@ class AddParticipantIdAndPopulate < ActiveRecord::Migration[5.1]
   end
 
   def down
-    # remove foreign key constraint of participant_id added to the teams_users table
-    # remove the column participant_id added to the teams_users table
+    remove foreign key constraint of participant_id added to the teams_users table
+    remove the column participant_id added to the teams_users table
     remove_foreign_key :teams_users, :participant_id
     remove_column :teams_users, :participant_id
   end

@@ -93,8 +93,6 @@ class QuestionsController < ApplicationController
 
   # save questions that have been added to a questionnaire
   def save_new_questions(questionnaire_id, questionnaire_type)
-    #questionnaire_id = params[:questionnaire_id]
-    #questionnaire_type = params[:questionnaire_type]
     if params[:new_question]
       # The new_question array contains all the new questions
       # that should be saved to the database
@@ -112,14 +110,12 @@ class QuestionsController < ApplicationController
         q.save unless q.txt.strip.empty?
       end
     end
-    #redirect_to request.original_url
     return
   end
   # delete questions from a questionnaire
   # @param [Object] questionnaire_id
   def delete_questions(questionnaire_id)
     # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
-    #questionnaire_id = params[:questionnaire_id]
     questions = Question.where('questionnaire_id = ?', questionnaire_id)
     @deleted_questions = []
     questions.each do |question|
@@ -158,7 +154,6 @@ class QuestionsController < ApplicationController
         end
       end
     end
-    #redirect_to controller: 'question', action: '', questionnaire_id: @questionnaire.id, questionnaire_type: @questionnaire.type
     return
   end
   private

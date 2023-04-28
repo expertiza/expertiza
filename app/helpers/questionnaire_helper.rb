@@ -38,4 +38,31 @@ module QuestionnaireHelper
     end
   end
 
+  def create_questionnaire_question(question_type, questionnaire_id, seq)
+    Object.const_get(question_type).create(
+      txt: '',
+      questionnaire_id: questionnaire_id,
+      seq: seq,
+      type: question_type,
+      break_before: true
+    )
+  end
+  
+  def configure_questionnaire_question(question, question_params)
+    case question
+    when ScoredQuestion
+      question.weight = question_params[:weight]
+      question.max_label = 'Strongly agree'
+      question.min_label = 'Strongly disagree'
+    when Criterion, Cake
+      question.size = '50, 3'
+    when Dropdown
+      question.alternatives = '0|1|2|3|4|5'
+    when TextArea
+      question.size = '60, 5'
+    when TextField
+      question.size = '30'
+    end
+  end
+
 end

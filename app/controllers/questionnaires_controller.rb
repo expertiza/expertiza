@@ -1,7 +1,9 @@
 class QuestionnairesController < ApplicationController
   include AuthorizationHelper
+  before_action [:create_questionnaire, :save], only: [:list]
   include QuestionnaireHelper
   include QuestionHelper
+  
   # Controller for Questionnaire objects
   # A Questionnaire can be of several types (QuestionnaireType)
   # Each Questionnaire contains zero or more questions (Question)
@@ -101,6 +103,7 @@ class QuestionnairesController < ApplicationController
       redirect_to controller: 'questionnaires', action: 'edit', id: @questionnaire.id
     end
   end
+
 
   # Edit a questionnaire
   def edit
@@ -240,88 +243,9 @@ class QuestionnairesController < ApplicationController
   # save questionnaire object after create or edit
   def save
     @questionnaire.save!
-    save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
+    #save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
+    redirect_to controller: 'questions', action: 'save_questions', questionnaire_id: @questionnaire.id, questionnaire_type: @questionnaire.type and return unless @questionnaire.id.nil? || @questionnaire.id <= 0
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
-  end
-
-  # save questions that have been added to a questionnaire
-  def save_new_questions(questionnaire_id)
-    if params[:new_question]
-      # The new_question array contains all the new questions
-      # that should be saved to the database
-      params[:new_question].keys.each_with_index do |question_key, index|
-        q = Question.new
-        q.txt = params[:new_question][question_key]
-        q.questionnaire_id = questionnaire_id
-        q.type = params[:question_type][question_key][:type]
-        q.seq = question_key.to_i
-        if @questionnaire.type == 'QuizQuestionnaire'
-          # using the weight user enters when creating quiz
-          weight_key = "question_#{index + 1}"
-          q.weight = params[:question_weights][weight_key.to_sym]
-        end
-        q.save unless q.txt.strip.empty?
-      end
-    end
-  end
-
-  def load_questionnaire
-    @questionnaire = Questionnaire.find(params[:id])
-  end
-
-  def update_questions
-    return if params[:question].nil?
-  
-    params[:question].each_pair do |k, v|
-      question = Question.find(k)
-      v.each_pair do |key, value|
-        question.send(key + '=', value) unless question.send(key) == value
-      end
-      question.save
-    end
-  end
-
-  # delete questions from a questionnaire
-  # @param [Object] questionnaire_id
-  def delete_questions(questionnaire_id)
-    # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
-    questions = Question.where('questionnaire_id = ?', questionnaire_id)
-    @deleted_questions = []
-    questions.each do |question|
-      should_delete = true
-      unless question_params.nil?
-        params[:question].each_key do |question_key|
-          should_delete = false if question_key.to_s == question.id.to_s
-        end
-      end
-
-      next unless should_delete
-
-      question.question_advices.each(&:destroy)
-      # keep track of the deleted questions
-      @deleted_questions.push(question)
-      question.destroy
-    end
-  end
-
-  # Handles questions whose wording changed as a result of the edit
-  # @param [Object] questionnaire_id
-  def save_questions(questionnaire_id)
-    delete_questions questionnaire_id
-    save_new_questions questionnaire_id
-
-    if params[:question]
-      params[:question].keys.each do |question_key|
-        if params[:question][question_key][:txt].strip.empty?
-          # question text is empty, delete the question
-          Question.delete(question_key)
-        else
-          # Update existing question.
-          question = Question.find(question_key)
-          Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
-        end
-      end
-    end
   end
 
   def questionnaire_params

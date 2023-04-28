@@ -138,7 +138,7 @@
       </tr>
       <% @received_invs.each do |inv| %>
         <!-- added partial view -->
-        <% render :partial => 'received_invitaions', :locals => {:inv => inv, :session_ip => session[:ip], :stduent => @student} %>
+        <% render :partial => 'received_invitations', :locals => {:inv => inv, :session_ip => session[:ip], :student => @student} %>
       <% end %>
     </table>
 

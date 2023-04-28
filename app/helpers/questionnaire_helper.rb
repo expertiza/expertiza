@@ -8,6 +8,7 @@ module QuestionnaireHelper
   CSV_TYPE = 1
   CSV_PARAM = 2
   CSV_WEIGHT = 3
+
   def self.adjust_advice_size(questionnaire, question)
     # now we only support question advices for scored questions
     if question.is_a?(ScoredQuestion)
@@ -24,4 +25,17 @@ module QuestionnaireHelper
       end
     end
   end
+
+  def update_questionnaire_questions
+    return if params[:question].nil?
+
+    params[:question].each_pair do |k, v|
+      question = Question.find(k)
+      v.each_pair do |key, value|
+        question.send(key + '=', value) unless question.send(key) == value
+      end
+      question.save
+    end
+  end
+
 end

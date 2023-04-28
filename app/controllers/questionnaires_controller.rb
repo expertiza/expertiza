@@ -1,6 +1,6 @@
 class QuestionnairesController < ApplicationController
   include AuthorizationHelper
-
+  include QuestionnaireHelper
   # Controller for Questionnaire objects
   # A Questionnaire can be of several types (QuestionnaireType)
   # Each Questionnaire contains zero or more questions (Question)
@@ -108,22 +108,22 @@ class QuestionnairesController < ApplicationController
     # If 'Add' or 'Edit/View advice' is clicked, redirect appropriately
     if params[:add_new_questions]
       permitted_params = params.permit(:id, new_question: params[:new_question].keys)
-      redirect_to(action: 'add_new_questions', id: permitted_params[:id], question: permitted_params[:new_question])
+      redirect_to action: 'add_new_questions', id: permitted_params[:id], question: permitted_params[:new_question]
     elsif params[:view_advice]
-      redirect_to(controller: 'advice', action: 'edit_advice', id: params[:id])
+      redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     else
-      if @questionnaire.update(questionnaire_params)
-        update_questions
+      @questionnaire = Questionnaire.find(params[:id])
+      if @questionnaire.update_attributes(questionnaire_params)
+        update_questionnaire_questions
         flash[:success] = 'The questionnaire has been successfully updated!'
       else
         flash[:error] = @questionnaire.errors.full_messages.join(', ')
       end
-
-      redirect_to(action: 'edit', id: @questionnaire.id.to_s.to_sym)
+      redirect_to action: 'edit', id: @questionnaire.id.to_s.to_sym
     end
   rescue StandardError => e
     flash[:error] = e.message
-    redirect_to(action: 'edit', id: @questionnaire.id.to_s.to_sym)
+    redirect_to action: 'edit', id: @questionnaire.id.to_s.to_sym
   end
 
   # Remove a given questionnaire
@@ -207,7 +207,7 @@ class QuestionnairesController < ApplicationController
     questionnaire_id = params[:id]
     begin
       if params[:save]
-        update_questions
+        update_questionnaire_questions
         flash[:success] = 'All questions have been successfully saved!'
       end
     rescue StandardError
@@ -251,24 +251,8 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-  def load_questionnaire
-    @questionnaire = Questionnaire.find(params[:id])
-  end
-
   def questionnaire_params
     params.require(:questionnaire).permit(:name, :description, :status, :published_at)
-  end
-
-  def update_questions
-    return if params[:question].nil?
-  
-    params[:question].each_pair do |k, v|
-      question = Question.find(k)
-      v.each_pair do |key, value|
-        question.send(key + '=', value) unless question.send(key) == value
-      end
-      question.save
-    end
   end
   
 

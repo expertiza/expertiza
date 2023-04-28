@@ -230,13 +230,14 @@ class QuizQuestionnairesController < QuestionnairesController
   # save questionnaire
   def save
     @questionnaire.save!
-    save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
+    #save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
+    redirect_to controller: 'questions', action: 'save_questions', questionnaire_id: @questionnaire.id, questionnaire_type: @questionnaire.type unless @questionnaire.id.nil? || @questionnaire.id <= 0
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
   end
 
   # save questions
   def save_questions(questionnaire_id)
-    redirect_to controller: 'question', action: 'delete_questions', questionnaire_id: @questionnaire.id
+    redirect_to controller: 'questions', action: 'delete_questions', questionnaire_id: @questionnaire.id and return
     redirect_to controller: 'question', action: 'save_new_questions', questionnaire_id: @questionnaire.id, questionnaire_type: @questionnaire.type
     if params[:question]
       params[:question].each_key do |question_key|

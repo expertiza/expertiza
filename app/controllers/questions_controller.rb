@@ -92,9 +92,9 @@ class QuestionsController < ApplicationController
   end
 
   # save questions that have been added to a questionnaire
-  def save_new_questions
-    questionnaire_id = params[:questionnaire_id]
-    questionnaire_type = params[:questionnaire_type]
+  def save_new_questions(questionnaire_id, questionnaire_type)
+    #questionnaire_id = params[:questionnaire_id]
+    #questionnaire_type = params[:questionnaire_type]
     if params[:new_question]
       # The new_question array contains all the new questions
       # that should be saved to the database
@@ -112,12 +112,14 @@ class QuestionsController < ApplicationController
         q.save unless q.txt.strip.empty?
       end
     end
-    redirect_to request.original_url
+    #redirect_to request.original_url
+    return
   end
-
-  def delete_questions
+  # delete questions from a questionnaire
+  # @param [Object] questionnaire_id
+  def delete_questions(questionnaire_id)
     # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
-    questionnaire_id = params[:questionnaire_id]
+    #questionnaire_id = params[:questionnaire_id]
     questions = Question.where('questionnaire_id = ?', questionnaire_id)
     @deleted_questions = []
     questions.each do |question|
@@ -135,6 +137,28 @@ class QuestionsController < ApplicationController
       @deleted_questions.push(question)
       question.destroy
     end
+    return
+  end
+  # Handles questions whose wording changed as a result of the edit
+  # @param [Object] questionnaire_id
+  def save_questions
+    questionnaire_id = params[:questionnaire_id]
+    questionnaire_type = params[:questionnaire_type]
+    delete_questions questionnaire_id
+    save_new_questions(questionnaire_id, questionnaire_type)
+    if params[:question]
+      params[:question].keys.each do |question_key|
+        if params[:question][question_key][:txt].strip.empty?
+          # question text is empty, delete the question
+          Question.delete(question_key)
+        else
+          # Update existing question.
+          question = Question.find(question_key)
+          Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
+        end
+      end
+    end
+    #redirect_to controller: 'question', action: '', questionnaire_id: @questionnaire.id, questionnaire_type: @questionnaire.type
     return
   end
   private

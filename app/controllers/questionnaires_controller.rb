@@ -1,5 +1,6 @@
 class QuestionnairesController < ApplicationController
   include AuthorizationHelper
+  before_action [:create_questionnaire, :save], only: [:list]
 
   # Controller for Questionnaire objects
   # A Questionnaire can be of several types (QuestionnaireType)
@@ -91,7 +92,7 @@ class QuestionnairesController < ApplicationController
     # Create Quiz content has been moved to Quiz Questionnaire Controller
     if @questionnaire.type != 'QuizQuestionnaire' # checking if it is a quiz questionnaire
       @questionnaire.instructor_id = Ta.get_my_instructor(session[:user].id) if session[:user].role.name == 'Teaching Assistant'
-      save
+      #save
 
       redirect_to controller: 'tree_display', action: 'list'
     end
@@ -248,52 +249,11 @@ class QuestionnairesController < ApplicationController
   # save questionnaire object after create or edit
   def save
     @questionnaire.save!
-    save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
+    #save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
+    redirect_to controller: 'questions', action: 'save_questions', questionnaire_id: @questionnaire.id, questionnaire_type: @questionnaire.type and return unless @questionnaire.id.nil? || @questionnaire.id <= 0
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
   end
   
-  # delete questions from a questionnaire
-  # @param [Object] questionnaire_id
-  def delete_questions(questionnaire_id)
-    # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
-    questions = Question.where('questionnaire_id = ?', questionnaire_id)
-    @deleted_questions = []
-    questions.each do |question|
-      should_delete = true
-      unless question_params.nil?
-        params[:question].each_key do |question_key|
-          should_delete = false if question_key.to_s == question.id.to_s
-        end
-      end
-
-      next unless should_delete
-
-      question.question_advices.each(&:destroy)
-      # keep track of the deleted questions
-      @deleted_questions.push(question)
-      question.destroy
-    end
-  end
-
-  # Handles questions whose wording changed as a result of the edit
-  # @param [Object] questionnaire_id
-  def save_questions(questionnaire_id)
-    redirect_to controller: 'question', action: 'delete_questions', questionnaire_id: @questionnaire.id 
-    if params[:question]
-      params[:question].keys.each do |question_key|
-        if params[:question][question_key][:txt].strip.empty?
-          # question text is empty, delete the question
-          Question.delete(question_key)
-        else
-          # Update existing question.
-          question = Question.find(question_key)
-          Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
-        end
-      end
-    end
-    redirect_to controller: 'question', action: 'save_new_questions', questionnaire_id: @questionnaire.id, questionnaire_type: @questionnaire.type
-  end
-
   def questionnaire_params
     params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
                                           :max_question_score, :type, :display_type, :instruction_loc)

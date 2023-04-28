@@ -4,6 +4,7 @@ class QuestionnairesController < ApplicationController
   include QuestionnaireHelper
   include QuestionHelper
   
+
   # Controller for Questionnaire objects
   # A Questionnaire can be of several types (QuestionnaireType)
   # Each Questionnaire contains zero or more questions (Question)
@@ -116,22 +117,22 @@ class QuestionnairesController < ApplicationController
     # If 'Add' or 'Edit/View advice' is clicked, redirect appropriately
     if params[:add_new_questions]
       permitted_params = params.permit(:id, new_question: params[:new_question].keys)
-      redirect_to(action: 'add_new_questions', id: permitted_params[:id], question: permitted_params[:new_question])
+      redirect_to action: 'add_new_questions', id: permitted_params[:id], question: permitted_params[:new_question]
     elsif params[:view_advice]
-      redirect_to(controller: 'advice', action: 'edit_advice', id: params[:id])
+      redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     else
-      if @questionnaire.update(questionnaire_params)
-        update_questions
+      @questionnaire = Questionnaire.find(params[:id])
+      if @questionnaire.update_attributes(questionnaire_params)
+        update_questionnaire_questions
         flash[:success] = 'The questionnaire has been successfully updated!'
       else
         flash[:error] = @questionnaire.errors.full_messages.join(', ')
       end
-
-      redirect_to(action: 'edit', id: @questionnaire.id.to_s.to_sym)
+      redirect_to action: 'edit', id: @questionnaire.id.to_s.to_sym
     end
   rescue StandardError => e
     flash[:error] = e.message
-    redirect_to(action: 'edit', id: @questionnaire.id.to_s.to_sym)
+    redirect_to action: 'edit', id: @questionnaire.id.to_s.to_sym
   end
 
   # Remove a given questionnaire
@@ -178,38 +179,20 @@ class QuestionnairesController < ApplicationController
 
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
-    questionnaire_id = params[:id] unless params[:id].nil?
+    questionnaire_id = params[:id]
+    return if questionnaire_id.nil?
+  
     # If the questionnaire is being used in the active period of an assignment, delete existing responses before adding new questions
     if AnswerHelper.check_and_delete_responses(questionnaire_id)
       flash[:success] = 'You have successfully added a new question. Any existing reviews for the questionnaire have been deleted!'
     else
       flash[:success] = 'You have successfully added a new question.'
     end
-
-    current_num_of_questions = Questionnaire.find(questionnaire_id).questions.size
-    max_seq = 0
-    Questionnaire.find(questionnaire_id).questions.each do |question|
-      if !question.seq.nil? && question.seq > max_seq
-        max_seq = question.seq
-      end
-    end
-    ((current_num_of_questions + 1)..(current_num_of_questions + params[:question][:total_num].to_i)).each do
-      max_seq += 1
-      # Create question object based on type using question_factory
-      question = question_factory(params[:question][:type], questionnaire_id, max_seq)
-      if question.is_a? ScoredQuestion
-        question.weight = params[:question][:weight]
-        question.max_label = Question::MAX_LABEL
-        question.min_label = Question::MIN_LABEL
-      end
-
-      if Question::SIZES.key?(question.class.name)
-        question.size = Question::SIZES[question.class.name]
-      end
-      if Question::ALTERNATIVES.key?(question.class.name)
-        question.alternatives = Question::ALTERNATIVES[question.class.name]
-      end
-
+    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
+    new_questions_count = params[:question][:total_num].to_i
+    (num_of_existed_questions + 1).upto(num_of_existed_questions + new_questions_count) do |i|
+      question = create_questionnaire_question(params[:question][:type], questionnaire_id, i)
+      configure_questionnaire_question(question, params[:question])
       begin
         question.save
       rescue StandardError => e
@@ -219,12 +202,13 @@ class QuestionnairesController < ApplicationController
     redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
   end
 
+
   # Zhewei: This method is used to save all questions in current questionnaire.
   def save_all_questions
     questionnaire_id = params[:id]
     begin
       if params[:save]
-        update_questions
+        update_questionnaire_questions
         flash[:success] = 'All questions have been successfully saved!'
       end
     rescue StandardError
@@ -247,7 +231,7 @@ class QuestionnairesController < ApplicationController
     redirect_to controller: 'questions', action: 'save_questions', questionnaire_id: @questionnaire.id, questionnaire_type: @questionnaire.type and return unless @questionnaire.id.nil? || @questionnaire.id <= 0
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
   end
-
+  
   def questionnaire_params
     params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
                                           :max_question_score, :type, :display_type, :instruction_loc)

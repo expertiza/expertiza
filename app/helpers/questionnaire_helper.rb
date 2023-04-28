@@ -25,31 +25,27 @@ module QuestionnaireHelper
     end
   end
 
+  #Map type to questionnaire
+  QUESTIONNAIRE_MAP = {
+    'ReviewQuestionnaire' => ReviewQuestionnaire,
+    'MetareviewQuestionnaire' => MetareviewQuestionnaire,
+    'AuthorFeedbackQuestionnaire' => AuthorFeedbackQuestionnaire,
+    'TeammateReviewQuestionnaire' => TeammateReviewQuestionnaire,
+    'AssignmentSurveyQuestionnaire' => AssignmentSurveyQuestionnaire,
+    'SurveyQuestionnaire' => SurveyQuestionnaire,
+    'GlobalSurveyQuestionnaire' => GlobalSurveyQuestionnaire,
+    'CourseSurveyQuestionnaire' => CourseSurveyQuestionnaire,
+    'BookmarkRatingQuestionnaire' => BookmarkRatingQuestionnaire,
+    'QuizQuestionnaire' => QuizQuestionnaire
+  }
+
   # factory method to create the appropriate questionnaire based on the type
   def questionnaire_factory(type)
-    case type
-    when 'ReviewQuestionnaire'
-      return ReviewQuestionnaire.new
-    when 'MetareviewQuestionnaire'
-      return MetareviewQuestionnaire.new
-    when 'AuthorFeedbackQuestionnaire'
-      return AuthorFeedbackQuestionnaire.new
-    when 'TeammateReviewQuestionnaire'
-      return TeammateReviewQuestionnaire.new
-    when'AssignmentSurveyQuestionnaire'
-      return AssignmentSurveyQuestionnaire.new
-    when 'SurveyQuestionnaire'
-      return SurveyQuestionnaire.new
-    when 'GlobalSurveyQuestionnaire'
-      return GlobalSurveyQuestionnaire.new
-    when 'CourseSurveyQuestionnaire'
-      return CourseSurveyQuestionnaire.new
-    when 'BookmarkRatingQuestionnaire'
-      return BookmarkRatingQuestionnaire.new
-    when 'QuizQuestionnaire'
-      return QuizQuestionnaire.new
-    else
+    questionnaire = QUESTIONNAIRE_MAP[type]
+    if questionnaire.nil?
       flash[:error] = "Error: Undefined Questionnaire"
+    else
+      questionnaire.new
     end
   end
 end

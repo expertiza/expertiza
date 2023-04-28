@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220405222420) do
+ActiveRecord::Schema.define(version: 20230415194444) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -709,7 +709,9 @@ ActiveRecord::Schema.define(version: 20220405222420) do
     t.integer "user_id"
     t.integer "duty_id"
     t.string "pair_programming_status", limit: 1
-    t.index ["duty_id"], name: "index_teams_users_on_duty_id"
+    t.integer "participant_id"
+    t.index ["duty_id"], name: "index_teams_participants_on_duty_id"
+    t.index ["participant_id"], name: "fk_rails_f4d20198de"
     t.index ["team_id"], name: "fk_users_teams"
     t.index ["user_id"], name: "fk_teams_users"
   end
@@ -822,6 +824,7 @@ ActiveRecord::Schema.define(version: 20220405222420) do
   add_foreign_key "tag_prompt_deployments", "questionnaires"
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
   add_foreign_key "teams_users", "duties"
+  add_foreign_key "teams_users", "participants"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
   add_foreign_key "track_notifications", "notifications"

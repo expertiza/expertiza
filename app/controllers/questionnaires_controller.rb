@@ -269,10 +269,6 @@ class QuestionnairesController < ApplicationController
     @questionnaire = Questionnaire.find(params[:id])
   end
 
-  def questionnaire_params
-    params.require(:questionnaire).permit(:name, :description, :status, :published_at)
-  end
-
   def update_questions
     return if params[:question].nil?
   
@@ -284,7 +280,6 @@ class QuestionnairesController < ApplicationController
       question.save
     end
   end
-  
 
   # delete questions from a questionnaire
   # @param [Object] questionnaire_id
@@ -331,7 +326,7 @@ class QuestionnairesController < ApplicationController
 
   def questionnaire_params
     params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
-                                            :max_question_score, :type, :display_type, :instruction_loc)
+                                          :max_question_score, :type, :display_type, :instruction_loc)
   end
 
   def question_params

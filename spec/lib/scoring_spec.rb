@@ -43,14 +43,14 @@ describe Scoring do
     end
     context 'when current assignment varies rubrics by round' do
       it 'scores varying rubrics and returns review scores' do
-        allow(assignment).to receive(:vary_by_round?).and_return(true)
+        allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
         allow(assignment).to receive(:rounds_of_reviews).and_return(1)
-        expect(compute_reviews_hash(assignment)).to eq({})
+        expect(compute_reviews_hash(assignment)).to eq({1=>{1=>{1=>50}}, 2=>{1=>{1=>30}}})
       end
     end
     context 'when current assignment does not vary rubrics by round' do
       it 'scores rubrics and returns review scores' do
-        allow(assignment).to receive(:vary_by_round?).and_return(false)
+        allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
         allow(DueDate).to receive(:get_next_due_date).with(assignment.id).and_return(double(:DueDate, round: 1))
         expect(compute_reviews_hash(assignment)).to eq(1 => { 1 => 50 }, 2 => { 1 => 30 })
       end
@@ -69,14 +69,14 @@ describe Scoring do
     end
     context 'when current assignment varies rubrics by round' do
       it 'computes avg score and score range for each team in each round and return scores' do
-        allow(assignment_helper).to receive(:vary_by_round?).and_return(true)
+        allow(assignment_helper).to receive(:varying_rubrics_by_round?).and_return(true)
         allow(assignment_helper).to receive(:rounds_of_reviews).and_return(1)
         expect(compute_avg_and_ranges_hash(assignment_helper)).to eq(1 => { 1 => { min: 50.0, max: 50.0, avg: 50.0 } })
       end
     end
     context 'when current assignment does not vary rubrics by round' do
       it 'computes avg score and score range for each team and return scores' do
-        allow(assignment_helper).to receive(:vary_by_round?).and_return(false)
+        allow(assignment_helper).to receive(:varying_rubrics_by_round?).and_return(false)
         expect(compute_avg_and_ranges_hash(assignment_helper)).to eq(1 => { min: 50.0, max: 50.0, avg: 50.0 })
       end
     end
@@ -105,7 +105,7 @@ describe Scoring do
     end
     context 'when assignment is not varying rubric by round and not an microtask' do
       it 'calculates scores that this participant has been given' do
-        allow(assignment).to receive(:vary_by_round?).and_return(false)
+        allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
         expect(ResponseMap.participant_scores(participant, review1: [question]).inspect).to eq('{:participant=>#<AssignmentParticipant id: 1, can_submit: true, can_review: true, '\
           'user_id: 1, parent_id: 1, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, '\
           'type: "AssignmentParticipant", handle: "handle", time_stamp: nil, digital_signature: nil, duty: nil, '\
@@ -117,7 +117,7 @@ describe Scoring do
 
     context 'when assignment is varying rubric by round but not an microtask' do
       it 'calculates scores that this participant has been given' do
-        allow(assignment).to receive(:vary_by_round?).and_return(true)
+        allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         expect(ResponseMap.participant_scores(participant, review1: [question]).inspect).to eq('{:participant=>#<AssignmentParticipant id: 1, can_submit: true, can_review: true, '\
           'user_id: 1, parent_id: 1, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, '\
@@ -134,7 +134,7 @@ describe Scoring do
     context 'when assignment is not varying rubric by round but an microtask' do
       it 'calculates scores that this participant has been given' do
         assignment.microtask = true
-        allow(assignment).to receive(:vary_by_round?).and_return(false)
+        allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
         allow(SignUpTopic).to receive(:find_by).with(assignment_id: 1).and_return(double('SignUpTopic', micropayment: 66))
         expect(ResponseMap.participant_scores(participant, review1: [question]).inspect).to eq('{:participant=>#<AssignmentParticipant id: 1, can_submit: true, can_review: true, '\
           'user_id: 1, parent_id: 1, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, '\

@@ -57,6 +57,7 @@ describe ReviewResponseMap do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return(
           [assignment_questionnaire1]
         )
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
         allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
         expect(review_response_map.questionnaire(1, 1)).to eq(questionnaire1)
       end
@@ -65,6 +66,7 @@ describe ReviewResponseMap do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: nil).and_return(
           [assignment_questionnaire1]
         )
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
         allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
         expect(review_response_map.questionnaire(1, nil)).to eq(questionnaire1)
       end
@@ -74,6 +76,7 @@ describe ReviewResponseMap do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: nil, topic_id: 1).and_return(
           [assignment_questionnaire1]
         )
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
         allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
         expect(review_response_map.questionnaire(nil, 1)).to eq(questionnaire1)
       end
@@ -83,6 +86,7 @@ describe ReviewResponseMap do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return(
           [assignment_questionnaire1]
         )
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
         allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
         expect(review_response_map.questionnaire(nil, 1)).to eq(questionnaire1)
       end
@@ -93,6 +97,7 @@ describe ReviewResponseMap do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
           [assignment_questionnaire1, assignment_questionnaire2]
         )
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return([])
         allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
         allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(nil)

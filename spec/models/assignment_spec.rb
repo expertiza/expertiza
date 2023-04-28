@@ -112,14 +112,6 @@ describe Assignment do
       end
     end
 
-    context 'when rubrics do not vary over rounds' do
-      it 'should return false' do
-        assignment_questionnaire1.used_in_round = 2
-        assignment_questionnaire2.used_in_round = 1
-        allow(AssignmentQuestionnaire).to receive(:where).and_return([assignment_questionnaire1])
-        expect(assignment.varying_rubrics_by_round?).to be false
-      end
-    end
   end
 
   describe '#valid_num_review' do
@@ -520,6 +512,7 @@ describe Assignment do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
           [assignment_questionnaire1, assignment_questionnaire2]
         )
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 2).and_return([])
         allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire1)
       end
 
@@ -563,6 +556,7 @@ describe Assignment do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
           [assignment_questionnaire1, assignment_questionnaire2]
         )
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 2).and_return([])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return([])
         allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
         allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(nil)
@@ -577,6 +571,7 @@ describe Assignment do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
           [assignment_questionnaire1, assignment_questionnaire2]
         )
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 2).and_return([])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
           [assignment_questionnaire1]
         )

@@ -3,7 +3,7 @@ class QuestionnairesController < ApplicationController
   before_action [:create_questionnaire, :save], only: [:list]
   include QuestionnaireHelper
   include QuestionHelper
-  
+
 
   # Controller for Questionnaire objects
   # A Questionnaire can be of several types (QuestionnaireType)
@@ -105,7 +105,6 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-
   # Edit a questionnaire
   def edit
     @questionnaire = Questionnaire.find(params[:id])
@@ -181,7 +180,7 @@ class QuestionnairesController < ApplicationController
   def add_new_questions
     questionnaire_id = params[:id]
     return if questionnaire_id.nil?
-  
+
     # If the questionnaire is being used in the active period of an assignment, delete existing responses before adding new questions
     if AnswerHelper.check_and_delete_responses(questionnaire_id)
       flash[:success] = 'You have successfully added a new question. Any existing reviews for the questionnaire have been deleted!'
@@ -202,7 +201,6 @@ class QuestionnairesController < ApplicationController
     redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
   end
 
-
   # Zhewei: This method is used to save all questions in current questionnaire.
   def save_all_questions
     questionnaire_id = params[:id]
@@ -214,7 +212,7 @@ class QuestionnairesController < ApplicationController
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
-  
+
     if params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     elsif questionnaire_id
@@ -231,7 +229,7 @@ class QuestionnairesController < ApplicationController
     redirect_to controller: 'questions', action: 'save_questions', questionnaire_id: @questionnaire.id, questionnaire_type: @questionnaire.type and return unless @questionnaire.id.nil? || @questionnaire.id <= 0
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
   end
-  
+
   def questionnaire_params
     params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
                                           :max_question_score, :type, :display_type, :instruction_loc)

@@ -264,7 +264,7 @@ class QuizQuestionnairesController < QuestionnairesController
     questions.each do |question|
       q_type = params[:question_type][question_num.to_s][:type]
       q_answer_choices = params[:new_choices][question_num.to_s][q_type]
-      q_answer_choices.each_pair do |choice_key, _| #_ is dummy variable
+      q_answer_choices.each_pair do |choice_key, _| # _ is dummy variable
         question_factory(q_type, question, choice_key, q_answer_choices) # allow factory method to create appropriate question
       end
       question_num += 1

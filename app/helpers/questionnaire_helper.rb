@@ -78,13 +78,13 @@ module QuestionnaireHelper
     'CourseSurveyQuestionnaire' => CourseSurveyQuestionnaire,
     'BookmarkRatingQuestionnaire' => BookmarkRatingQuestionnaire,
     'QuizQuestionnaire' => QuizQuestionnaire
-  }
+  }.freeze
 
   # factory method to create the appropriate questionnaire based on the type
   def questionnaire_factory(type)
     questionnaire = QUESTIONNAIRE_MAP[type]
     if questionnaire.nil?
-      flash[:error] = "Error: Undefined Questionnaire"
+      flash[:error] = 'Error: Undefined Questionnaire'
     else
       questionnaire.new
     end

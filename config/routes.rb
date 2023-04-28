@@ -29,6 +29,7 @@ Expertiza::Application.routes.draw do
     collection do
       post :save_advice
       put :edit_advice
+      get :edit_advice
     end
   end
 
@@ -318,6 +319,8 @@ Expertiza::Application.routes.draw do
   resources :questions do
     collection do
       get :types
+      post :delete_questions
+      post :save_questions
     end
   end
 
@@ -576,6 +579,7 @@ Expertiza::Application.routes.draw do
       get :goto_bookmarkrating_rubrics
       get :list
       get :drill
+      get :confirm
     end
   end
 

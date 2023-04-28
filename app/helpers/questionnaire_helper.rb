@@ -16,7 +16,7 @@ module QuestionnaireHelper
       max = questionnaire.max_question_score
       min = questionnaire.min_question_score
 
-      QuestionAdvice.delete_all(['question_id = ? AND (score > ? OR score < ?)', question.id, max, min]) if !max.nil? && !min.nil?
+      QuestionAdvice.delete(['question_id = ? AND (score > ? OR score < ?)', question.id, max, min]) if !max.nil? && !min.nil?
 
       (questionnaire.min_question_score..questionnaire.max_question_score).each do |i|
         qas = QuestionAdvice.where('question_id = ? AND score = ?', question.id, i)
@@ -25,6 +25,7 @@ module QuestionnaireHelper
       end
     end
   end
+
 
   def update_questionnaire_questions
     return if params[:question].nil?
@@ -62,6 +63,30 @@ module QuestionnaireHelper
       question.size = '60, 5'
     when TextField
       question.size = '30'
+    end
+  end
+
+  #Map type to questionnaire
+  QUESTIONNAIRE_MAP = {
+    'ReviewQuestionnaire' => ReviewQuestionnaire,
+    'MetareviewQuestionnaire' => MetareviewQuestionnaire,
+    'AuthorFeedbackQuestionnaire' => AuthorFeedbackQuestionnaire,
+    'TeammateReviewQuestionnaire' => TeammateReviewQuestionnaire,
+    'AssignmentSurveyQuestionnaire' => AssignmentSurveyQuestionnaire,
+    'SurveyQuestionnaire' => SurveyQuestionnaire,
+    'GlobalSurveyQuestionnaire' => GlobalSurveyQuestionnaire,
+    'CourseSurveyQuestionnaire' => CourseSurveyQuestionnaire,
+    'BookmarkRatingQuestionnaire' => BookmarkRatingQuestionnaire,
+    'QuizQuestionnaire' => QuizQuestionnaire
+  }
+
+  # factory method to create the appropriate questionnaire based on the type
+  def questionnaire_factory(type)
+    questionnaire = QUESTIONNAIRE_MAP[type]
+    if questionnaire.nil?
+      flash[:error] = "Error: Undefined Questionnaire"
+    else
+      questionnaire.new
     end
   end
 

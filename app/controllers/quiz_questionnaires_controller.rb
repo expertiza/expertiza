@@ -230,14 +230,15 @@ class QuizQuestionnairesController < QuestionnairesController
   # save questionnaire
   def save
     @questionnaire.save!
-    save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
+    #save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
+    redirect_to controller: 'questions', action: 'save_questions', questionnaire_id: @questionnaire.id, questionnaire_type: @questionnaire.type unless @questionnaire.id.nil? || @questionnaire.id <= 0
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
   end
 
   # save questions
   def save_questions(questionnaire_id)
-    delete_questions questionnaire_id # delete existing questionnaire if any
-    save_new_questions questionnaire_id # save new questions
+    redirect_to controller: 'questions', action: 'delete_questions', questionnaire_id: @questionnaire.id and return
+    redirect_to controller: 'question', action: 'save_new_questions', questionnaire_id: @questionnaire.id, questionnaire_type: @questionnaire.type
     if params[:question]
       params[:question].each_key do |question_key|
         if params[:question][question_key][:txt].strip.empty?
@@ -263,7 +264,7 @@ class QuizQuestionnairesController < QuestionnairesController
     questions.each do |question|
       q_type = params[:question_type][question_num.to_s][:type]
       q_answer_choices = params[:new_choices][question_num.to_s][q_type]
-      q_answer_choices.each_pair do |choice_key, _|
+      q_answer_choices.each_pair do |choice_key, _| #_ is dummy variable
         question_factory(q_type, question, choice_key, q_answer_choices) # allow factory method to create appropriate question
       end
       question_num += 1

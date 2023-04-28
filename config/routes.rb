@@ -318,6 +318,8 @@ Expertiza::Application.routes.draw do
   resources :questions do
     collection do
       get :types
+      post :delete_questions
+      post :save_questions
     end
   end
 

@@ -8,7 +8,7 @@
     group: expertiza
     user_home: "/home/{{ user }}"
     app_root: /var/www/expertiza
-    ruby_version: 3.2.0
+    ruby_version: 2.4
 
   tasks:
     # Required Installation
@@ -107,7 +107,7 @@
     # Expertiza clone repo, install gems
     - name: Clone Expertiza repository
       ansible.builtin.git:
-        repo: https://github.com/sukruthimodem/expertiza.git
+        repo: https://github.com/mundra-ankur/expertiza.git
         dest: "{{ app_root }}/code"
         clone: yes
         update: no

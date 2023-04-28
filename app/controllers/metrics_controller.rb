@@ -8,8 +8,8 @@ class MetricsController < ApplicationController
     current_user_has_instructor_privileges?
   end
 
-  #Runs a query against all the link submissions for all teams for an entire assignment, populating the DB fields that are
-  # used by the view_team in grades heatgrid showing user contributions. This method must also be run  to enable
+  # This populates the database fields required to display user contributions in the view_team for grades heatgrid. 
+  # It executes a query for all link submissions for an entire assignment, and runs the necessary queries to enable the 
   # "Github metrics" link on the list_assignments page.
   def query_assignment_statistics
     @assignment = Assignment.find(params[:id])

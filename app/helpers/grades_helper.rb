@@ -206,7 +206,7 @@ module GradesHelper
     end
 
     # Extract all commit values from the data_array sub-hashes
-    map = data_array.values.map { |v| v[:commits] }
+    map = data_array.values.map { |k,v| v[:commits] }
     
     # Calculate the max, min, and mean commit values
     max = map.max
@@ -214,7 +214,7 @@ module GradesHelper
     mean = map.sum / map.size unless map.empty?
 
     # Assign a color to each sub-hash based on its commit value
-    data_array.each do |_, element|
+    data_array.each do |key, element|
       case element[:commits]
       when min
         element[:color] = "c1"

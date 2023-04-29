@@ -112,6 +112,8 @@ class QuestionnairesController < ApplicationController
     session[:return_to] = request.original_url
   end
 
+  # Updates a questionnaire's attributes and questions based on form data and redirects to the edit page,
+  # displaying a flash message if the update is successful or not.
   def update
     # If 'Add' or 'Edit/View advice' is clicked, redirect appropriately
     if params[:add_new_questions]
@@ -182,7 +184,6 @@ class QuestionnairesController < ApplicationController
   end
 
   # Zhewei: This method is used to add new questions when editing questionnaire.
-
   def add_new_questions
     questionnaire_id = params[:id]
     # If the questionnaire is being used in the active period of an assignment, delete existing responses before adding new questions

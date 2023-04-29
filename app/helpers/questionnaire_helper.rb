@@ -26,7 +26,7 @@ module QuestionnaireHelper
     end
   end
 
-
+# Updates the attributes of questionnaire questions based on form data, without modifying unchanged attributes.
   def update_questionnaire_questions
     return if params[:question].nil?
 

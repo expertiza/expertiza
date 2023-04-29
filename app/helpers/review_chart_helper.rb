@@ -27,8 +27,17 @@ module ReviewChartHelper
     {
       labels: labels,
       datasets: [
-        build_chart_dataset('vol.', 'rgba(255,99,132,0.8)', reviewer_data, 'bar-y-axis1'),
-        build_chart_dataset('avg. vol.', 'rgba(255,206,86,0.8)', all_reviewers_data, 'bar-y-axis2')
+        build_chart_dataset(
+          'vol.', 
+          'rgba(255,99,132,0.8)', 
+          reviewer_data, 'bar-y-axis1'
+          ),
+        build_chart_dataset(
+          'avg. vol.', 
+          'rgba(255,206,86,0.8)', 
+          all_reviewers_data, 
+          'bar-y-axis2'
+          )
       ]
     }
   end
@@ -79,18 +88,35 @@ module ReviewChartHelper
     threshold = 30
     intervals = intervals.select { |v| v < threshold }
     interval_mean = intervals.sum / intervals.size.to_f unless intervals.empty?
-    data = {
+    data = build_tagging_chart_data(intervals, interval_mean)
+    options = tagging_chart_options
+    line_chart(data, options)
+  end
+
+  # Build tagging chart data
+  def build_tagging_chart_data(intervals, interval_mean)
+    {
       labels: [*1..intervals.length],
       datasets: [
         { backgroundColor: 'rgba(255,99,132,0.8)', data: intervals, label: 'time intervals' },
-        *(!intervals.empty? && [{ data: [interval_mean] * intervals.length, label: 'Mean time spent' }])
+        *interval_mean && [{ data: [interval_mean] * intervals.length, label: 'Mean time spent' }]
       ]
     }
-    options = {
+  end
+
+  def tagging_chart_options
+    {
       width: '200', height: '125',
-      scales: { yAxes: [{ stacked: false, ticks: { beginAtZero: true } }], xAxes: [{ stacked: false }] }
+      scales: { 
+        yAxes: [
+          { 
+            stacked: false, 
+            ticks: { beginAtZero: true } 
+          }
+        ], 
+        xAxes: [{ stacked: false }] 
+      }
     }
-    line_chart(data, options)
   end
 
   # Calculate mean for tagging intervals
@@ -113,7 +139,7 @@ module ReviewChartHelper
     Math.sqrt(variance).round(interval_precision)
   end
 
-  # Calculate mean, min, max, variance, and stand deviation for tagging intervals
+  # Calculate mean,min,max,variance and stand deviation for tagging intervals
   def calculate_key_chart_information(intervals)
     threshold = 30
     interval_precision = 2

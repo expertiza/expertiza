@@ -104,7 +104,7 @@ module ReviewChartHelper
       datasets: [
         {
           backgroundColor: 'rgba(255,99,132,0.8)',
-          data: intervals, label: 'time intervals' 
+          data: intervals, label: 'time intervals'
         },
         *interval_mean && [
           {
@@ -120,7 +120,7 @@ module ReviewChartHelper
     {
       width: '200', height: '125',
       scales: {
-        yAxes: [{ stacked: false, ticks: { beginAtZero: true }}],
+        yAxes: [{ stacked: false, ticks: { beginAtZero: true } } ],
         xAxes: [{ stacked: false }]
       }
     }

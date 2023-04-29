@@ -3,7 +3,6 @@ class MetricsController < ApplicationController
   include AssignmentHelper
   include MetricsHelper
 
-  # currently only give instructor the right to view, query, and update metric statistics
   def action_allowed?
     current_user_has_instructor_privileges?
   end
@@ -16,7 +15,7 @@ class MetricsController < ApplicationController
     teams = @assignment.teams
     teams.each do |team|
       topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team)
-      single_submission_initial_query(participants.first.id) unless participants.first.nil?
+      github_metrics_for_submission(participants.first.id) unless participants.first.nil?
     end
     redirect_to controller: 'assignments', action: 'list_submissions', id: @assignment.id
   end
@@ -25,10 +24,11 @@ class MetricsController < ApplicationController
   # Shows two charts, a barchart timeline, and a piechart of total contributions by team member, as well as pull request
   # statistics if available
   def show
-    single_submission_initial_query(params[:id])
+    github_metrics_for_submission(params[:id])
   end
 
-  # authorize with token to use github API with 5000 rate limits. Unauthorized user only has 60 limits, which is not enough.
+  # Authorize with token to use Github API with a higher rate limit of 5000 requests per hour. 
+  # An unauthorized user only has 60 requests per hour limit, which is not sufficient.
   def authorize_github
     redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
   end
@@ -37,13 +37,13 @@ class MetricsController < ApplicationController
   # variables, then passes control to retrieve_github_data to handle the logic for the individual links. Finally, store
   # a small subset of data as Metrics in the metrics table containing participants, their total contribution,
   # (in number of commits), their github email, and a reference to their User account (if mapping exists or can be determined)
-  def single_submission_initial_query(id)
-    if session["github_access_token"].nil? # check if there is a github_access_token in current session
-      session["participant_id"] = id # team number
+  def github_metrics_for_submission(id)
+    # redirect_to authorize_github if github_access_token is not present.
+    if session["github_access_token"].nil?
+      session["participant_id"] = id 
       session["assignment_id"] = AssignmentParticipant.find(id).assignment.id
       session["github_view_type"] = "view_submissions"
-      # redirect_to authorize_github if no github_access_token present, redirect to authorization page
-       redirect_to :controller => 'metrics', :action => 'authorize_github'
+      redirect_to :controller => 'metrics', :action => 'authorize_github'
       return
     end
 
@@ -93,8 +93,6 @@ class MetricsController < ApplicationController
   end
 
 
-
-
   ##################### Process Links and Branch according to Pull Request or Repo ############################
   # For a single assignment team, process the submitted links, determine whether they are pull request links or
   # repository links, and branch accordingly to query github for the data from the type of link found. The github API
@@ -121,22 +119,9 @@ class MetricsController < ApplicationController
   # parse_pull_request_data to process the returned data from each link
   def query_all_pull_requests(pull_links)
     pull_links.each do |hyperlink|
-      submission_hyperlink_tokens = hyperlink.split('/') # parse the link
-      hyperlink_data = {}
-      #Example: https://github.com/student/expertiza/pull/1234
-      # submission_hyperlink_tokens[6] == 1234
-      # submission_hyperlink_tokens[5] == "pull"
-      # submission_hyperlink_tokens[4] == "expertiza"
-      # submission_hyperlink_tokens[3] == "student"
-      # submission_hyperlink_tokens[2] == "github.com"
-      # submission_hyperlink_tokens[1] == ""
-      # submission_hyperlink_tokens[0] == "https:"
-      hyperlink_data["pull_request_number"] = submission_hyperlink_tokens[6]
-      hyperlink_data["repository_name"] = submission_hyperlink_tokens[4] # expertiza
-      hyperlink_data["owner_name"] = submission_hyperlink_tokens[3] # expertiza
-      # yet another wrapper fot github api call, take repository name, owner name, and pull request number as parameter
+      hyperlink_data = parse_hyperlink_data(hyperlink)
       github_data = pull_request_data(hyperlink_data)
-
+  
       # save the global reference id for this pull request
       @head_refs[hyperlink_data["pull_request_number"]] = {
         head_commit: github_data["data"]["repository"]["pullRequest"]["headRefOid"],
@@ -146,6 +131,17 @@ class MetricsController < ApplicationController
       parse_pull_request_data(github_data)
     end
   end
+  
+  #
+  def parse_hyperlink_data(hyperlink)
+    tokens = hyperlink.split('/')
+    {
+      "pull_request_number" => tokens[6],
+      "repository_name" => tokens[4],
+      "owner_name" => tokens[3]
+    }
+  end
+  
 
   # Iterate across pages of 100 commits queried from the Github API, getting the query from the Metric model, running
   # the query, then calling the data parser

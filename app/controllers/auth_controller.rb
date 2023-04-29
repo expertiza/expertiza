@@ -2,7 +2,7 @@ class AuthController < ApplicationController
   include AuthorizationHelper
   helper :auth
 
-  # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
+  # This method Ensures that GET requests are safe by only allowing the HTTP POST method for the login and logout actions. (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[login logout],
          redirect_to: { action: :list }
 
@@ -15,7 +15,8 @@ class AuthController < ApplicationController
     end
   end
 
-  # Spring 2023, E2300
+  # The method attempts to authorize the user through the OAuth protocol for either Google or Github, 
+  # checks the provider parameter to determine which authorization flow to use.
   # Uses oauth protocol to attempt to authorize user for either google or Github
   def oauth_login
     case params[:provider]
@@ -30,8 +31,8 @@ class AuthController < ApplicationController
     end
   end
 
-
-  # new method to satisfy the change of the auth
+  # This method is specifically for handling Github login requests due to a change in the authentication process, 
+  # It receives a code from the Github API and exchanges it for an access token, which is stored in the user's session.
   def custom_github_login
     session_code = request.env['rack.request.query_hash']['code']
     result = RestClient.post('https://github.com/login/oauth/access_token',
@@ -44,10 +45,7 @@ class AuthController < ApplicationController
     redirect_to controller: 'assignments', action: 'list_submissions', id: session["assignment_id"]
   end
 
-
-
-  # Spring 2023, E2300
-  # Login functionality for Github login feature using omniAuth2
+  # handles Github login attempts using the omniAuth2 gem.
   def github_login
     session["github_access_token"] = env['omniauth.auth']["credentials"]["token"]
     if session["github_view_type"] == "view_submissions"
@@ -72,7 +70,8 @@ class AuthController < ApplicationController
     end
   end # def login
 
-  # function to handle common functionality for conventional user login and google login
+
+  # Handles common functionality for conventional user login and google login
   def after_login(user)
     session[:user] = user
     session[:impersonate] = false
@@ -82,6 +81,7 @@ class AuthController < ApplicationController
                 action: AuthHelper.get_home_action(session[:user])
   end
 
+  # when login fails, this method renders the password retrieval page with an error message.
   def login_failed
     flash.now[:error] = 'Your username or password is incorrect.'
     render action: 'forgotten'
@@ -126,7 +126,7 @@ class AuthController < ApplicationController
     g_email = env['omniauth.auth'].info.email
   end
 
-  # clears any identifying info from session
+  # clears user identification info from session variables and sets the assignment ID.
   def self.clear_user_info(session, assignment_id)
     session[:user_id] = nil
     session[:user] = '' # sets user to an empty string instead of nil, to show that the user was logged in

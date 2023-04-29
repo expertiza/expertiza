@@ -148,7 +148,7 @@ describe MetricsController do
       before(:each) do
         params = {id: 900}
         allow(controller).to receive(:authorize_github)
-        allow(controller).to receive(:single_submission_initial_query)
+        allow(controller).to receive(:github_metrics_for_submission)
         allow(controller).to receive(:show)
         session["github_access_token"] = nil
       end

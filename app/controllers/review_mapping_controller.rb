@@ -412,30 +412,43 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id
   end
 
-  def save_grade_and_comment_for_reviewer
-    review_grade = ReviewGrade.find_by(participant_id: params[:participant_id])
-    review_grade = ReviewGrade.create(participant_id: params[:participant_id]) if review_grade.nil?
-    review_grade.grade_for_reviewer = params[:grade_for_reviewer] if params[:grade_for_reviewer]
-    review_grade.comment_for_reviewer = params[:comment_for_reviewer] if params[:comment_for_reviewer]
-    review_grade.review_graded_at = Time.now
-    review_grade.reviewer_id = session[:user].id
-    begin
-      GradingHistory.create(instructor_id: session[:user].id,
-                            assignment_id: params[:assignment_id],
-                            grading_type: "Review",
-                            grade_receiver_id: Participant.find(params[:participant_id]).user_id,
-                            grade: params[:grade_for_reviewer],
-                            comment: params[:comment_for_reviewer])
-      review_grade.save!
-      flash[:success] = 'Grade and comment for reviewer successfully saved.'
-    rescue StandardError
-      flash[:error] = $ERROR_INFO
-    end
-    respond_to do |format|
-      format.js { render action: 'save_grade_and_comment_for_reviewer.js.erb', layout: false }
-      format.html { redirect_to controller: 'reports', action: 'response_report', id: params[:assignment_id] }
-    end
+  # This method saves the grade and comment for a reviewer
+def save_grade_and_comment_for_reviewer
+  # Find the review grade or create a new one if none exists
+  review_grade = ReviewGrade.find_by(participant_id: params[:participant_id])
+  review_grade = ReviewGrade.create(participant_id: params[:participant_id]) if review_grade.nil?
+  
+  # Update the grade and comment fields of the review grade object
+  review_grade.grade_for_reviewer = params[:grade_for_reviewer] if params[:grade_for_reviewer]
+  review_grade.comment_for_reviewer = params[:comment_for_reviewer] if params[:comment_for_reviewer]
+  
+  # Update the review graded at and reviewer id fields of the review grade object
+  review_grade.review_graded_at = Time.now
+  review_grade.reviewer_id = session[:user].id
+  
+  begin
+    # Create a new grading history object with the appropriate fields
+    GradingHistory.create(
+      instructor_id: session[:user].id,
+      assignment_id: params[:assignment_id],
+      grading_type: "Review",
+      grade_receiver_id: Participant.find(params[:participant_id]).user_id,
+      grade: params[:grade_for_reviewer],
+      comment: params[:comment_for_reviewer]
+    )
+    review_grade.save!
+    flash[:success] = 'Grade and comment for reviewer successfully saved.'
+  rescue StandardError #raise and exception if create fails
+    flash[:error] = $ERROR_INFO
   end
+  
+  # Respond with JavaScript or HTML depending on the request format
+  respond_to do |format|
+    format.js { render action: 'save_grade_and_comment_for_reviewer.js.erb', layout: false }
+    format.html { redirect_to controller: 'reports', action: 'response_report', id: params[:assignment_id] }
+  end
+end
+
 
   # E1600
   # Start self review if not started yet - Creates a self-review mapping when user requests a self-review

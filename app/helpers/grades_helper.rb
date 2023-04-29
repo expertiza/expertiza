@@ -178,56 +178,60 @@ module GradesHelper
     questions
   end
   
+    # This method generates a metrics table for a given team and returns it as a hash
   def metrics_table(team)
+    # Find all metrics associated with the given team
     metrics = Metric.where("team_id = ?", team)
+    
+    # Return nil if no metrics are found
+    return nil if metrics.empty?
+    
+    # Initialize an empty hash to store the table data
+    data_array = {}
 
-    unless metrics.nil?
-      data_array = {}
-      metrics.each do |metric|
-        unless metric.participant_id.nil?
-          #Lookup user if ID was stored at query time
-          user = User.find(metric.participant_id)
-        else
-          # If not, try to find user by recently-entered github ID
-          user = User.find_by_github_id(metric.github_id)
-          # If still not, try to find user by their NCSU email if it's the same as github.com
-          user = User.find_by_email(metric.github_id) if user.nil?
-        end
-
-        #Finally, if user was not found, handle by using github email in the
-        # Student Name field, or Student Fullname if found.
-        user_fullname = user.nil? ? "Github Email: " + metric.github_id : user.fullname
-        if data_array[user_fullname]
-          data_array[user_fullname][:commits] += metric.total_commits
-        else
-          data_array[user_fullname] = {}
-          data_array[user_fullname][:commits] = metric.total_commits
-        end
-      end
-      map = data_array.map {|k,v| v[:commits]}
-      max = map.max
-      min = map.min
-      mean = map.sum / map.size unless map.size.zero?
-      data_array.each do |key, element|
-        case element[:commits]
-        when min
-          element[:color] = "c1"
-        when max
-          element[:color] = "c5"
-        when mean
-          element[:color] = "c3"
-        when min..mean
-          element[:color] = "c2"
-        when mean .. max
-          element[:color] = "c4"
-        else
-          element[:color] = "c3"
-        end
-      end
-      data_array
-    else
-      nil
+    # Loop through each metric and extract relevant data
+    metrics.each do |metric|
+      # Try to find a user by participant_id, github_id, or email
+      user = User.find_by(participant_id: metric.participant_id) || User.find_by_github_id(metric.github_id) || User.find_by_email(metric.github_id)
+      
+      # Use the user's full name or Github email address as the key in the hash
+      user_fullname = user.nil? ? "Github Email: #{metric.github_id}" : user.fullname
+      
+      # If the user key is not yet present in the hash, create a new sub-hash
+      data_array[user_fullname] ||= {}
+      
+      # Increment the total number of commits for the current user
+      data_array[user_fullname][:commits] ||= 0
+      data_array[user_fullname][:commits] += metric.total_commits
     end
+
+    # Extract all commit values from the data_array sub-hashes
+    map = data_array.values.map { |v| v[:commits] }
+    
+    # Calculate the max, min, and mean commit values
+    max = map.max
+    min = map.min
+    mean = map.sum / map.size unless map.empty?
+
+    # Assign a color to each sub-hash based on its commit value
+    data_array.each do |_, element|
+      case element[:commits]
+      when min
+        element[:color] = "c1"
+      when max
+        element[:color] = "c5"
+      when mean
+        element[:color] = "c3"
+      when min..mean
+        element[:color] = "c2"
+      when mean..max
+        element[:color] = "c4"
+      else
+        element[:color] = "c3"
+      end
+    end
+
+    # Return the completed data_array hash
+    data_array
   end
 end
-

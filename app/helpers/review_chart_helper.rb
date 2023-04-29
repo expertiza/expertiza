@@ -16,7 +16,8 @@ module ReviewChartHelper
 
   # The data of all the reviews is displayed in the form of a bar chart
   def display_volume_metric_chart(reviewer)
-    labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
+    labels, reviewer_data, 
+      all_reviewers_data = initialize_chart_elements(reviewer)
     data = build_chart_data(labels, reviewer_data, all_reviewers_data)
     options = build_chart_options
     horizontal_bar_chart(data, options)
@@ -28,16 +29,16 @@ module ReviewChartHelper
       labels: labels,
       datasets: [
         build_chart_dataset(
-          'vol.', 
-          'rgba(255,99,132,0.8)', 
+          'vol.',
+          'rgba(255,99,132,0.8)',
           reviewer_data, 'bar-y-axis1'
-          ),
+        ),
         build_chart_dataset(
-          'avg. vol.', 
-          'rgba(255,206,86,0.8)', 
-          all_reviewers_data, 
+          'avg. vol.',
+          'rgba(255,206,86,0.8)',
+          all_reviewers_data,
           'bar-y-axis2'
-          )
+        )
       ]
     }
   end
@@ -63,7 +64,10 @@ module ReviewChartHelper
           build_chart_y_axis('bar-y-axis2', 15, true)
         ],
         xAxes: [
-          { stacked: false, ticks: { beginAtZero: true, stepSize: 50, max: 400 } }
+          { 
+            stacked: false,
+            ticks: { beginAtZero: true, stepSize: 50, max: 400 }
+          }
         ]
       }
     }
@@ -98,8 +102,15 @@ module ReviewChartHelper
     {
       labels: [*1..intervals.length],
       datasets: [
-        { backgroundColor: 'rgba(255,99,132,0.8)', data: intervals, label: 'time intervals' },
-        *interval_mean && [{ data: [interval_mean] * intervals.length, label: 'Mean time spent' }]
+        { 
+          backgroundColor: 'rgba(255,99,132,0.8)',
+          data: intervals, label: 'time intervals' },
+        *interval_mean && [
+          { 
+            data: [interval_mean] * intervals.length, 
+            label: 'Mean time spent' 
+          }
+        ]
       ]
     }
   end
@@ -107,14 +118,9 @@ module ReviewChartHelper
   def tagging_chart_options
     {
       width: '200', height: '125',
-      scales: { 
-        yAxes: [
-          { 
-            stacked: false, 
-            ticks: { beginAtZero: true } 
-          }
-        ], 
-        xAxes: [{ stacked: false }] 
+      scales: {
+        yAxes: [{stacked: false, ticks: { beginAtZero: true }}],
+        xAxes: [{ stacked: false }]
       }
     }
   end
@@ -145,7 +151,6 @@ module ReviewChartHelper
     interval_precision = 2
     valid_intervals = intervals.select { |v| v < threshold }
     return nil if valid_intervals.empty?
-
     {
       mean: calculate_mean(valid_intervals, interval_precision),
       min: valid_intervals.min,
@@ -154,5 +159,4 @@ module ReviewChartHelper
       stand_dev: calculate_standard_deviation(valid_intervals, interval_precision)
     }
   end
-
 end

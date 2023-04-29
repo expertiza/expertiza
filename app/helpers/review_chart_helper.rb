@@ -16,7 +16,7 @@ module ReviewChartHelper
 
   # The data of all the reviews is displayed in the form of a bar chart
   def display_volume_metric_chart(reviewer)
-    labels, reviewer_data, all_reviewers_data = 
+    labels, reviewer_data, all_reviewers_data =
       initialize_chart_elements(reviewer)
     data = build_chart_data(labels, reviewer_data, all_reviewers_data)
     options = build_chart_options
@@ -28,8 +28,17 @@ module ReviewChartHelper
     {
       labels: labels,
       datasets: [
-        build_chart_dataset('vol.','rgba(255,99,132,0.8)',reviewer_data, 'bar-y-axis1'),
-        build_chart_dataset('avg. vol.','rgba(255,206,86,0.8)',all_reviewers_data,'bar-y-axis2')
+        build_chart_dataset(
+          'vol.',
+          'rgba(255,99,132,0.8)',
+          reviewer_data, 'bar-y-axis1'
+        ),
+        build_chart_dataset(
+          'avg. vol.',
+          'rgba(255,206,86,0.8)',
+          all_reviewers_data,
+          'bar-y-axis2'
+        )
       ]
     }
   end
@@ -55,7 +64,7 @@ module ReviewChartHelper
           build_chart_y_axis('bar-y-axis2', 15, true)
         ],
         xAxes: [
-          { 
+          {
             stacked: false,
             ticks: { beginAtZero: true, stepSize: 50, max: 400 }
           }
@@ -93,13 +102,14 @@ module ReviewChartHelper
     {
       labels: [*1..intervals.length],
       datasets: [
-        { 
+        {
           backgroundColor: 'rgba(255,99,132,0.8)',
-          data: intervals, label: 'time intervals' },
+          data: intervals, label: 'time intervals' 
+        },
         *interval_mean && [
-          { 
-            data: [interval_mean] * intervals.length, 
-            label: 'Mean time spent' 
+          {
+            data: [interval_mean] * intervals.length,
+            label: 'Mean time spent'
           }
         ]
       ]
@@ -138,7 +148,7 @@ module ReviewChartHelper
 
   # Calculate mean,min,max,variance and stand deviation for tagging intervals
   def calculate_key_chart_information(intervals)
-    threshold, interval_precision = 30,2
+    threshold, interval_precision = 30, 2
     valid_intervals = intervals.select { |v| v < threshold }
     return nil if valid_intervals.empty?
     {

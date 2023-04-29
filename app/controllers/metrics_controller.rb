@@ -132,62 +132,61 @@ class MetricsController < ApplicationController
     end
   end
   
-  #
-  def parse_hyperlink_data(hyperlink)
-    tokens = hyperlink.split('/')
-    {
-      "pull_request_number" => tokens[6],
-      "repository_name" => tokens[4],
-      "owner_name" => tokens[3]
-    }
-  end
-  
-
-  # Iterate across pages of 100 commits queried from the Github API, getting the query from the Metric model, running
-  # the query, then calling the data parser
+  # This function pulls data for a pull request from the Github API.
+  # It iterates across pages of 100 commits, getting the query from the Metric model,
+  # running the query, and then calling the data parser.
   def pull_request_data(hyperlink_data)
-    has_next_page = true # parameter for github api call
-    end_cursor = nil # parameter needed for github api call
-    all_edges = []
-    response_data = {}
+    has_next_page = true # Initialize parameter for Github API call
+    end_cursor = nil # Initialize parameter needed for Github API call
+    all_edges = [] # Initialize an array to store all commits
+    response_data = {} # Initialize an empty hash for the response data
+
+    # Loop through all pages of commits
     while has_next_page
-      # 1.make the query message
-      # 2.make the http request with the query
-      # response_data is a ruby Hash class
+      # Make the query message and execute the HTTP request with the query
+      # response_data is a Ruby Hash class
       response_data = query_commit_statistics(Metric.pull_query(hyperlink_data, end_cursor))
-      # every commits in this pull request and page info
+
+      # Extract all commits in this pull request and the page info
       current_commits = response_data["data"]["repository"]["pullRequest"]["commits"]
-      # page info for commits in this pull request, because too many commits may spread multiple pages
-      current_page_info = current_commits["pageInfo"]
-      # push every node, which is a single commit, onto all_edges
-      # every element in all_edges is a single commit in the pull request
+      current_page_info = current_commits["pageInfo"] # Page info for commits in this pull request, because too many commits may spread multiple pages
+
+      # Append each node (i.e., single commit) to all_edges
+      # Every element in all_edges is a single commit in the pull request
       all_edges.push(*current_commits["edges"])
-      # page info used in query for next page
+
+      # Get page info for the next page
       has_next_page = current_page_info["hasNextPage"]
       end_cursor = current_page_info["endCursor"]
     end
-    # add every single commit into response_data hash and return it
+
+    # Add every single commit into the response_data hash and return it
     response_data["data"]["repository"]["pullRequest"]["commits"]["edges"] = all_edges
     response_data
   end
 
-  # Parse through data returned from  github API, strip unnecessary layers from hashes, and organize data
+  # Parse through data returned from GitHub API, strip unnecessary layers from hashes, and organize data
   # into accessible hash for use elsewhere
   def parse_pull_request_data(github_data)
     team_statistics(github_data, :pull)
-    pull_request_object = github_data["data"]["repository"]["pullRequest"]
-    commit_objects = pull_request_object["commits"]["edges"]
-    # loop through all commits and do the accounting
+
+    # Get commit objects from pull request object
+    commit_objects = github_data.dig("data", "repository", "pullRequest", "commits", "edges")
+
+    # Loop through all commits and do the accounting
     commit_objects.each do |commit_object|
-      commit = commit_object["node"]["commit"] # each commit
-      author_name = commit["author"]["name"]
-      author_email = commit["author"]["email"]
-      commit_date = commit["committedDate"].to_s # datetime object to string in format 2019-04-30T02:44:08Z
-      count_github_authors_and_dates(author_name, author_email, commit_date[0, 10])
+      commit = commit_object.dig("node", "commit")
+      author_name = commit.dig("author", "name")
+      author_email = commit.dig("author", "email")
+      commit_date = commit.dig("committedDate").to_s[0, 10] # Convert datetime object to string in format 2019-04-30
+
+      count_github_authors_and_dates(author_name, author_email, commit_date)
     end
-    # sort author's commits based on dates
+
+    # Sort author's commits based on dates
     sort_commit_dates
   end
+
 
   # iterate through each pull request, and query for the merge and other status information (Merged, rejected, conflicted)
   def query_all_merge_statuses
@@ -201,27 +200,29 @@ class MetricsController < ApplicationController
   # Iterate through repository links, and for each link, iterate across pages of 100 commits (API Limit), calling corresponding
   # methods to query the github API  for data on each page, then parse and process the data accordingly.
   def retrieve_repository_data(repo_links)
-    has_next_page = true # parameter for github api call
-    end_cursor = nil # parameter needed for github api call
-
+    has_next_page = true # flag indicating if there are more pages of commits to retrieve
+    end_cursor = nil # parameter needed for Github API call
+  
+    # iterate through each repository link provided
     repo_links.each do |hyperlink|
-      submission_hyperlink_tokens = hyperlink.split('/') # parse the link
+      # parse the link into its constituent parts
+      submission_hyperlink_tokens = hyperlink.split('/')
       hyperlink_data = {}
-      #Example: https://github.com/student/expertiza.git
-      # submission_hyperlink_tokens[4] == "expertiza.git"
-      # submission_hyperlink_tokens[3] == "student"
-      # submission_hyperlink_tokens[2] == "github.com"
-      # submission_hyperlink_tokens[1] == ""
-      # submission_hyperlink_tokens[0] == "https:"
+      # extract repository and owner names from the parsed link and add to the hyperlink_data hash
       hyperlink_data["repository_name"] = submission_hyperlink_tokens[4].gsub('.git', '')
       hyperlink_data["owner_name"] = submission_hyperlink_tokens[3]
+  
+      # iterate across pages of 100 commits until no more pages are found
       while has_next_page
+        # generate query for Github API call using hyperlink_data and other parameters
         query_text = Metric.repo_query(hyperlink_data, @assignment.created_at, end_cursor)
         github_data = query_commit_statistics(query_text)
-        # Parse repository data only if API did not return  an error; otherwise, drop API return hash
-        parse_repository_data(github_data) unless github_data.nil? || github_data["errors"] || github_data["data"].nil? || github_data["data"]["repository"].nil? || github_data["data"]["repository"]["ref"].nil?
-        # Only run iteration across an additional page in case of no API errors and presence of additional pages of commits are detected
-        has_next_page = false if github_data.nil? || github_data["data"].nil? || github_data["data"]["repository"].nil? || github_data["data"]["repository"]["ref"].nil?|| github_data["errors"] || github_data["data"]["repository"]["ref"]["target"]["history"]["pageInfo"]["hasNextPage"] != "true"
+        # parse repository data only if API did not return an error; otherwise, drop API return hash
+        unless github_data.nil? || github_data["errors"] || github_data["data"].nil? || github_data["data"]["repository"].nil? || github_data["data"]["repository"]["ref"].nil?
+          parse_repository_data(github_data)
+        end
+        # only run iteration across an additional page if no API errors and presence of additional pages of commits are detected
+        has_next_page = false if github_data.nil? || github_data["data"].nil? || github_data["data"]["repository"].nil? || github_data["data"]["repository"]["ref"].nil? || github_data["errors"] || github_data["data"]["repository"]["ref"]["target"]["history"]["pageInfo"]["hasNextPage"] != "true"
       end
     end
   end
@@ -232,12 +233,14 @@ class MetricsController < ApplicationController
   def parse_repository_data(github_data)
     commit_objects = github_data["data"]["repository"]["ref"]["target"]["history"]["edges"]
     commit_objects.each do |commit_object|
+      # extract commit author name, email, and date from the commit object and count them using the accounting method
       commit_author = commit_object["node"]["author"]
       author_name = commit_author["name"]
       author_email = commit_author["email"]
       commit_date = commit_author["date"].to_s
       count_github_authors_and_dates(author_name, author_email, commit_date[0, 10])
     end
+    # sort commit dates and call team_statistics to process the organized data and assemble instance variables for the views
     sort_commit_dates
     team_statistics(github_data, :repo)
   end
@@ -248,54 +251,36 @@ class MetricsController < ApplicationController
   # pull request queries and repository queries
   def team_statistics(github_data, data_type)
     if data_type == :pull
-      @total_additions += github_data["data"]["repository"]["pullRequest"]["additions"] # additions in this PR
-      @total_deletions += github_data["data"]["repository"]["pullRequest"]["deletions"] # deletions in this PR
-      @total_files_changed += github_data["data"]["repository"]["pullRequest"]["changedFiles"] # num of files changed in this PR
-      @total_commits += github_data["data"]["repository"]["pullRequest"]["commits"]["totalCount"] # num of commits in this PR
-      pull_request_number = github_data["data"]["repository"]["pullRequest"]["number"] # PR number
-      # merged or mergeable
-      @merge_status[pull_request_number] = if github_data["data"]["repository"]["pullRequest"]["merged"]
-                                             "MERGED"
-                                           else
-                                             github_data["data"]["repository"]["pullRequest"]["mergeable"]
-                                           end
-    else
-      @total_additions = "Not Available" # additions in this PR
-      @total_deletions = "Not Available" # deletions in this PR
-      @total_files_changed = "Not Available" # num of files changed in this PR
-      pull_request_number = -1
-      # merged or mergeable
-      @merge_status[pull_request_number] = "Not A Pull Request"
+      if github_data["data"] && github_data["data"]["repository"] && github_data["data"]["repository"]["pullRequest"]
+        pull_request = github_data["data"]["repository"]["pullRequest"]
+        @total_additions += pull_request["additions"]
+        @total_deletions += pull_request["deletions"]
+        @total_files_changed += pull_request["changedFiles"]
+        @total_commits += pull_request.dig("commits", "totalCount") || 0
+        pull_request_number = pull_request["number"]
+        @merge_status[pull_request_number] = if pull_request["merged"]
+                                               "MERGED"
+                                             else
+                                               pull_request["mergeable"]
+                                             end
+      else
+        @total_additions = "Not Available"
+        @total_deletions = "Not Available"
+        @total_files_changed = "Not Available"
+        pull_request_number = -1
+        @merge_status[pull_request_number] = "Not A Pull Request"
+      end
     end
-  end
+  end  
 
   # do accounting, aggregate each authors' number of commits on each date
   def count_github_authors_and_dates(author_name, author_email, commit_date)
-    # Only count a commit if it was not made by a member of the Expertiza development team
-    unless LOCAL_ENV["COLLABORATORS"].include? author_name
-      @authors[author_name] ||= author_email # a hash record all the authors and their emails
-      @dates[commit_date] ||= 1 # a hash record all the date that has commits
-      @parsed_data[author_name] ||= {} # a hash account each author's commits grouped by date
-      @parsed_data[author_name][commit_date] = if @parsed_data[author_name][commit_date]
-                                                 @parsed_data[author_name][commit_date] + 1
-                                               else
-                                                 1
-                                               end
-
-    end
-  end
-
-  # sort each author's commits based on date
-  def sort_commit_dates
-    @dates.each_key do |date|
-      @parsed_data.each_value do |commits|
-        commits[date] ||= 0
-      end
-    end
-    @parsed_data.each do |author, commits|
-      @parsed_data[author] = Hash[commits.sort_by {|date, _commit_count| date }]
-      @total_commits += commits.inject (0) {|sum,value| sum + value[1] }
-    end
+    return if LOCAL_ENV["COLLABORATORS"].include?(author_name)
+  
+    @authors[author_name] ||= author_email
+    @dates[commit_date] ||= 1
+    @parsed_data[author_name] ||= Hash.new(0)
+    @parsed_data[author_name][commit_date] += 1
   end
 
   ######################## HTTP Query Execution #########################
@@ -327,40 +312,38 @@ class MetricsController < ApplicationController
   def create_github_metric(team_id, github_id, total_commits)
     metric = Metric.where("team_id = ? AND github_id = ?", team_id, github_id).first
     # Attempt to find user by their github email -- Mapping already exists
-    user = User.find_by_github_id(github_id)
+    user = User.find_by_github_id(github_id) || find_user_by_github_email(github_id)
 
-    # If mapping does not exist, attempt to figure out their github email from the information we have
-    if user.nil?
-      email = github_id.split('@')
-      #Check if NCSU email
-      if email[1] == 'ncsu.edu'
-        user = User.find_by_email(github_id)
-        # If success, go ahead and save this mapping for future queries
-        user.github_id = github_id unless user.nil?
-        user.save unless user.nil?
-      else # Try mapping from unityID@any_email_provider.com or unityID@anotherprovider.com
-        user = User.find_by_email(email[0] + "@ncsu.edu")
-        # If success, go ahead and save this mapping for future queries
-        user.github_id = github_id unless user.nil?
-        user.save unless user.nil?
-      end
-    end
+    participant_id = user&.id
 
-    # Finally, use results of mapping attempts, or successful query, to set the participant ID to be stored in the
-    # metrics table. If no participant ID is found, store as NULL, and handle NULL results at the view
-    participant_id = user.nil? ? nil : user.id
-
-    # Now, if a record already exists for this user and assignment, update it
     unless metric.nil?
-      metric.total_commits=total_commits
+      metric.total_commits = total_commits
       metric.participant_id = participant_id
       metric.save
-    else #Otherwise, create a new record
-    Metric.create :metric_source_id => MetricSource.find_by_name("Github").id,
-                  :team_id => team_id,
-                  :github_id => github_id,
-                  :participant_id => participant_id,
-                  :total_commits => total_commits
+    else
+      Metric.create(
+        metric_source_id: MetricSource.find_by_name("Github").id,
+        team_id: team_id,
+        github_id: github_id,
+        participant_id: participant_id,
+        total_commits: total_commits
+      )
     end
+  end
+
+  def find_user_by_github_email(email)
+  email_parts = email.split('@')
+
+  if email_parts[1] == 'ncsu.edu'
+    user = User.find_by_email(email)
+    user.github_id = email unless user.nil?
+    user&.save
+  else
+    user = User.find_by_email("#{email_parts[0]}@ncsu.edu")
+    user.github_id = email unless user.nil?
+    user&.save
+  end
+
+  user
   end
 end

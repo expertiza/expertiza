@@ -1,6 +1,5 @@
 module MetricsHelper
   include Chartjs::ChartHelpers::Implicit
-  # Fall 2018, E1858
   # Creates the bar graph for the github metrics data.
   # Links the authors with their github data and assigns
   # them a color. Currently supports up to 6 different colors and will
@@ -52,7 +51,6 @@ module MetricsHelper
       link
   end
 
-  # Fall 2018, E1858
   # Defines the general settings of the github metrics chart
   def chart_options
     {
@@ -64,7 +62,6 @@ module MetricsHelper
     }
   end
 
-  # Fall 2018, E1858
   # Defines the labels and display of the data on the github metrics chart
   def graph_scales
     {
@@ -91,5 +88,27 @@ module MetricsHelper
                 }
               }]
     }
+  end
+
+  def parse_hyperlink_data(hyperlink)
+    tokens = hyperlink.split('/')
+    {
+      "pull_request_number" => tokens[6],
+      "repository_name" => tokens[4],
+      "owner_name" => tokens[3]
+    }
+  end
+
+  # sort each author's commits based on date
+  def sort_commit_dates
+    @dates.each_key do |date|
+      @parsed_data.each_value do |commits|
+        commits[date] ||= 0
+      end
+    end
+    @parsed_data.each do |author, commits|
+      @parsed_data[author] = Hash[commits.sort_by {|date, _commit_count| date }]
+      @total_commits += commits.inject (0) {|sum,value| sum + value[1] }
+    end
   end
 end

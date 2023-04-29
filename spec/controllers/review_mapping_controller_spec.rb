@@ -625,37 +625,45 @@ describe ReviewMappingController do
   end
 
   describe '#save_grade_and_comment_for_reviewer' do
-    it 'redirects to reports#response_report page' do
-      # Use factories to create stubs (user must be instructor or above to perform this action)
-      review_grade = build(:review_grade)
-      instructor = build(:instructor)
-      # Stub out other items
-      allow(ReviewGrade).to receive(:find_by).with(participant_id: '1').and_return(review_grade)
-      allow(review_grade).to receive(:save).and_return(true)
-      session = {user: double('User', id: 1)}
+  it 'redirects to reports#response_report page' do
+    # Create stubs using factories
+    review_grade = build(:review_grade)
+    instructor = build(:instructor)
+    
+    # Stub out methods to prevent unwanted behavior during testing
+    allow(ReviewGrade).to receive(:find_by).with(participant_id: '1').and_return(review_grade)
+    allow(review_grade).to receive(:save).and_return(true)
+    session = {user: double('User', id: 1)}
 
-      allow(GradingHistory).to receive(:create)
+    # Stub out GradingHistory#create to prevent actual database writes
+    allow(GradingHistory).to receive(:create)
 
-      allow(GradingHistory).to receive(:create).with(instructor_id: session[:user].id,
-                                                     assignment_id: '1',
-                                                     grading_type: 'Review',
-                                                     grade_receiver_id: 2,
-                                                     grade: '90',
-                                                     comment: 'keke')
-      params = {
-        review_grade: {
-          participant_id: 1,
-          grade_for_reviewer: 90,
-          comment_for_reviewer: 'keke'
-        }
+    # Set up expected parameters to pass to GradingHistory#create
+    allow(GradingHistory).to receive(:create).with(instructor_id: session[:user].id,
+                                                   assignment_id: '1',
+                                                   grading_type: 'Review',
+                                                   grade_receiver_id: 2,
+                                                   grade: '90',
+                                                   comment: 'keke')
+    
+    # Set up parameters to pass to the controller action
+    params = {
+      review_grade: {
+        participant_id: 1,
+        grade_for_reviewer: 90,
+        comment_for_reviewer: 'keke'
       }
+    }
 
-      # Perform test
-      post :save_grade_and_comment_for_reviewer, params, session
-      expect(flash[:note]).to be nil
-      expect(response).to redirect_to('/reports/response_report')
-    end
+    # Call the controller action with the given parameters and session
+    post :save_grade_and_comment_for_reviewer, params, session
+    
+    # Expectations
+    expect(flash[:note]).to be nil
+    expect(response).to redirect_to('/reports/response_report')
   end
+end
+
 
   describe '#start_self_review' do
     before(:each) do

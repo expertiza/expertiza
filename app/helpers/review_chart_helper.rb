@@ -1,5 +1,5 @@
 module ReviewChartHelper
-# moves data of reviews in each round from a current round
+  # moves data of reviews in each round from a current round
   def initialize_chart_elements(reviewer)
     labels, reviewer_data, all_reviewers_data = [], [], []
     @num_rounds.times do |rnd|
@@ -17,44 +17,61 @@ module ReviewChartHelper
   # The data of all the reviews is displayed in the form of a bar chart
   def display_volume_metric_chart(reviewer)
     labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
-    data = {
-    labels: labels,
-    datasets: [
-        {
-          label: 'vol.',
-          backgroundColor: 'rgba(255,99,132,0.8)',
-          borderWidth: 1,
-          data: reviewer_data,
-          yAxisID: 'bar-y-axis1'
-        },
-        {
-          label: 'avg. vol.',
-          backgroundColor: 'rgba(255,206,86,0.8)',
-          borderWidth: 1,
-          data: all_reviewers_data,
-          yAxisID: 'bar-y-axis2'
-        }
+    data = build_chart_data(labels, reviewer_data, all_reviewers_data)
+    options = build_chart_options
+    horizontal_bar_chart(data, options)
+  end
+
+  # Get chart labels and datasets
+  def build_chart_data(labels, reviewer_data, all_reviewers_data)
+    {
+      labels: labels,
+      datasets: [
+        build_chart_dataset('vol.', 'rgba(255,99,132,0.8)', reviewer_data, 'bar-y-axis1'),
+        build_chart_dataset('avg. vol.', 'rgba(255,206,86,0.8)', all_reviewers_data, 'bar-y-axis2')
       ]
     }
-    options = {
-    legend: { position: 'top', labels: { usePointStyle: true } },
-    width: '200', height: '125',
-    scales: {
+  end
+
+  # Get list of chart datasets
+  def build_chart_dataset(label, color, data, y_axis_id)
+    {
+      label: label,
+      backgroundColor: color,
+      borderWidth: 1,
+      data: data,
+      yAxisID: y_axis_id
+    }
+  end
+
+  def build_chart_options
+    {
+      legend: { position: 'top', labels: { usePointStyle: true } },
+      width: '200', height: '125',
+      scales: {
         yAxes: [
-          { stacked: true, id: 'bar-y-axis1', barThickness: 10 },
-          {
-            display: false, stacked: true, id: 'bar-y-axis2',
-            barThickness: 15, type: 'category',
-            categoryPercentage: 0.8, barPercentage: 0.9,
-            gridLines: { offsetGridLines: true }
-          }
+          build_chart_y_axis('bar-y-axis1', 10),
+          build_chart_y_axis('bar-y-axis2', 15, true)
         ],
         xAxes: [
           { stacked: false, ticks: { beginAtZero: true, stepSize: 50, max: 400 } }
         ]
       }
     }
-    horizontal_bar_chart(data, options)
+  end
+
+  # Configure the y axis of the chart
+  def build_chart_y_axis(id, bar_thickness, display = false)
+    {
+      display: display,
+      stacked: true,
+      id: id,
+      barThickness: bar_thickness,
+      type: 'category',
+      categoryPercentage: 0.8,
+      barPercentage: 0.9,
+      gridLines: { offsetGridLines: true }
+    }
   end
 
   # E2082 Generate chart for review tagging time intervals
@@ -65,8 +82,8 @@ module ReviewChartHelper
     data = {
       labels: [*1..intervals.length],
       datasets: [
-          { backgroundColor: 'rgba(255,99,132,0.8)', data: intervals, label: 'time intervals' },
-          *(!intervals.empty? && [{ data: [interval_mean] * intervals.length, label: 'Mean time spent' }])
+        { backgroundColor: 'rgba(255,99,132,0.8)', data: intervals, label: 'time intervals' },
+        *(!intervals.empty? && [{ data: [interval_mean] * intervals.length, label: 'Mean time spent' }])
       ]
     }
     options = {
@@ -81,21 +98,21 @@ module ReviewChartHelper
     mean = intervals.sum / intervals.size.to_f
     mean.round(interval_precision)
   end
-    
+
   # Calculate variance for tagging intervals
   def calculate_variance(intervals, interval_precision)
     mean = intervals.sum / intervals.size.to_f
-    variance = intervals.sum { |v| (v - mean) ** 2 } / intervals.size.to_f
+    variance = intervals.sum { |v| (v - mean)**2 } / intervals.size.to_f
     variance.round(interval_precision)
   end
-  
+
   # Calculate standard deviation for tagging intervals
   def calculate_standard_deviation(intervals, interval_precision)
     mean = intervals.sum / intervals.size.to_f
-    variance = intervals.sum { |v| (v - mean) ** 2 } / intervals.size.to_f
+    variance = intervals.sum { |v| (v - mean)**2 } / intervals.size.to_f
     Math.sqrt(variance).round(interval_precision)
   end
-  
+
   # Calculate mean, min, max, variance, and stand deviation for tagging intervals
   def calculate_key_chart_information(intervals)
     threshold = 30
@@ -111,4 +128,5 @@ module ReviewChartHelper
       stand_dev: calculate_standard_deviation(valid_intervals, interval_precision)
     }
   end
+
 end

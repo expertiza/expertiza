@@ -16,8 +16,8 @@ module ReviewChartHelper
 
   # The data of all the reviews is displayed in the form of a bar chart
   def display_volume_metric_chart(reviewer)
-    labels, reviewer_data, 
-      all_reviewers_data = initialize_chart_elements(reviewer)
+    labels, reviewer_data, all_reviewers_data = 
+      initialize_chart_elements(reviewer)
     data = build_chart_data(labels, reviewer_data, all_reviewers_data)
     options = build_chart_options
     horizontal_bar_chart(data, options)
@@ -28,12 +28,14 @@ module ReviewChartHelper
     {
       labels: labels,
       datasets: [
-        build_chart_dataset(
+        build_chart_dataset
+        (
           'vol.',
           'rgba(255,99,132,0.8)',
           reviewer_data, 'bar-y-axis1'
         ),
-        build_chart_dataset(
+        build_chart_dataset
+        (
           'avg. vol.',
           'rgba(255,206,86,0.8)',
           all_reviewers_data,
@@ -119,7 +121,7 @@ module ReviewChartHelper
     {
       width: '200', height: '125',
       scales: {
-        yAxes: [{stacked: false, ticks: { beginAtZero: true }}],
+        yAxes: [{ stacked: false, ticks: { beginAtZero: true }}],
         xAxes: [{ stacked: false }]
       }
     }
@@ -147,8 +149,7 @@ module ReviewChartHelper
 
   # Calculate mean,min,max,variance and stand deviation for tagging intervals
   def calculate_key_chart_information(intervals)
-    threshold = 30
-    interval_precision = 2
+    threshold, interval_precision = 30,2
     valid_intervals = intervals.select { |v| v < threshold }
     return nil if valid_intervals.empty?
     {

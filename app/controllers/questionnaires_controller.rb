@@ -182,21 +182,41 @@ class QuestionnairesController < ApplicationController
   end
 
   # Zhewei: This method is used to add new questions when editing questionnaire.
+
   def add_new_questions
     questionnaire_id = params[:id]
-    return if questionnaire_id.nil?
-
     # If the questionnaire is being used in the active period of an assignment, delete existing responses before adding new questions
     if AnswerHelper.check_and_delete_responses(questionnaire_id)
       flash[:success] = 'You have successfully added a new question. Any existing reviews for the questionnaire have been deleted!'
     else
       flash[:success] = 'You have successfully added a new question.'
     end
-    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
-    new_questions_count = params[:question][:total_num].to_i
-    (num_of_existed_questions + 1).upto(num_of_existed_questions + new_questions_count) do |i|
-      question = create_questionnaire_question(params[:question][:type], questionnaire_id, i)
-      configure_questionnaire_question(question, params[:question])
+
+    questionnaire = Questionnaire.find(questionnaire_id)
+    current_num_of_questions = questionnaire.questions.size
+    max_seq = 0
+    Questionnaire.find(questionnaire_id).questions.each do |question|
+      if !question.seq.nil? && question.seq > max_seq
+        max_seq = question.seq
+      end
+    end
+    ((current_num_of_questions + 1)..(current_num_of_questions + params[:question][:total_num].to_i)).each do
+      max_seq += 1
+      # Create question object based on type using question_factory
+      question = question_factory(params[:question][:type], questionnaire_id, max_seq)
+      if question.is_a? ScoredQuestion
+        question.weight = params[:question][:weight]
+        question.max_label = Question::MAX_LABEL
+        question.min_label = Question::MIN_LABEL
+      end
+
+      if Question::SIZES.key?(question.class.name)
+        question.size = Question::SIZES[question.class.name]
+      end
+      if Question::ALTERNATIVES.key?(question.class.name)
+        question.alternatives = Question::ALTERNATIVES[question.class.name]
+      end
+
       begin
         question.save
       rescue StandardError => e

@@ -237,40 +237,55 @@ describe GradesController do
     end
   end
 
+  # This tests the `save_grade_and_comment_for_submission` method when it succeeds
   describe '#save_grade_and_comment_for_submission' do
-    it 'saves grade and comment for submission and refreshes the grades#view_team page' do
-      allow(AssignmentParticipant).to receive(:find_by).with(id: '1').and_return(participant)
-      allow(participant).to receive(:team).and_return(build(:assignment_team, id: 2, parent_id: 8))
-      session = {user: instructor}
-      team = participant.team
-      allow(GradingHistory).to receive(:create).with(instructor_id: session[:user].id,
-                                                     assignment_id: 1,
-                                                     grading_type: "Submission",
-                                                     grade_receiver_id: 2,
-                                                     grade: 100,
-                                                     comment: 'comment')
-      params = {
-        participant_id: 1,
+  it 'saves grade and comment for submission and refreshes the grades#view_team page' do
+    # Stubbing `AssignmentParticipant` and `participant`
+    allow(AssignmentParticipant).to receive(:find_by).with(id: '1').and_return(participant)
+    allow(participant).to receive(:team).and_return(build(:assignment_team, id: 2, parent_id: 8))
+    
+    # Creating a session and defining some variables
+    session = {user: instructor}
+    team = participant.team
+    
+    # Stubbing `GradingHistory.create`
+    allow(GradingHistory).to receive(:create).with(instructor_id: session[:user].id,
+                                                   assignment_id: 1,
+                                                   grading_type: "Submission",
+                                                   grade_receiver_id: 2,
+                                                   grade: 100,
+                                                   comment: 'comment')
+    
+    # Defining some parameters and calling the controller action
+    params = {
+      participant_id: 1,
+      grade_for_submission: 100,
+      comment_for_submission: 'comment'
+    }
+    post :save_grade_and_comment_for_submission, params, session
+    
+    # Expecting that there is no flash error and that the response redirects to the correct page
+    expect(flash[:error]).to be nil
+    expect(response).to redirect_to('/grades/view_team?id=1')
+  end
+
+  context 'save grade and comment for submission failed' do
+    it 'catch error' do
+      # Stubbing `AssignmentParticipant` and `participant4`
+      allow(AssignmentParticipant).to receive(:find_by).with(id: '4').and_return(participant4)
+      allow(participant4).to receive(:team).and_return(team2)
+      
+      # Defining some parameters and calling the controller action
+      request_params = {
+        participant_id: 4,
         grade_for_submission: 100,
         comment_for_submission: 'comment'
       }
-      post :save_grade_and_comment_for_submission, params, session
-      expect(flash[:error]).to be nil
-      expect(response).to redirect_to('/grades/view_team?id=1')
-    end
-
-    context 'save grade and comment for submission failed' do
-      it 'catch error' do
-        allow(AssignmentParticipant).to receive(:find_by).with(id: '4').and_return(participant4)
-        allow(participant4).to receive(:team).and_return(team2)
-        request_params = {
-          participant_id: 4,
-          grade_for_submission: 100,
-          comment_for_submission: 'comment'
-        }
-        post :save_grade_and_comment_for_submission, params: request_params
-        allow(team2).to receive(:save).and_raise StandardError
-        expect { save_grade_and_comment_for_submission }.to raise_error StandardError
+      post :save_grade_and_comment_for_submission, params: request_params
+      
+      # Stubbing `team2.save` to raise an error and expecting that the controller action raises a `StandardError`
+      allow(team2).to receive(:save).and_raise StandardError
+      expect { save_grade_and_comment_for_submission }.to raise_error StandardError
       end
     end
   end

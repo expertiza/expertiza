@@ -178,7 +178,7 @@ module GradesHelper
     questions
   end
   
-    # This method generates a metrics table for a given team and returns it as a hash
+  # This method generates a metrics table for a given team and returns it as a hash
   def metrics_table(team)
     # Find all metrics associated with the given team
     metrics = Metric.where("team_id = ?", team)
@@ -231,7 +231,6 @@ module GradesHelper
       end
     end
 
-    # Return the completed data_array hash
     data_array
   end
 end

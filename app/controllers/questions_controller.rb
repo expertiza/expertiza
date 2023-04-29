@@ -162,6 +162,9 @@ class QuestionsController < ApplicationController
   end
   private
 
-
+  def question_params
+    params.require(:question).permit(:txt, :weight, :questionnaire_id, :seq, :type, :size,
+                                     :alternatives, :break_before, :max_label, :min_label, :id, :question)
+  end
 end
 

@@ -28,19 +28,8 @@ module ReviewChartHelper
     {
       labels: labels,
       datasets: [
-        build_chart_dataset
-        (
-          'vol.',
-          'rgba(255,99,132,0.8)',
-          reviewer_data, 'bar-y-axis1'
-        ),
-        build_chart_dataset
-        (
-          'avg. vol.',
-          'rgba(255,206,86,0.8)',
-          all_reviewers_data,
-          'bar-y-axis2'
-        )
+        build_chart_dataset('vol.','rgba(255,99,132,0.8)',reviewer_data, 'bar-y-axis1'),
+        build_chart_dataset('avg. vol.','rgba(255,206,86,0.8)',all_reviewers_data,'bar-y-axis2')
       ]
     }
   end

@@ -1,7 +1,6 @@
 require 'spec_helper'
 require 'rails_helper'
 
-
 describe ReviewMappingHelper, type: :helper do
   let(:team) { build(:assignment_team, id: 1) }
   let(:test_item) { build(:answer, id: 1, comments: 'https://wiki.archlinux.org/') }

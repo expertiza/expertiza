@@ -91,7 +91,9 @@ class QuestionsController < ApplicationController
     render json: types.to_a
   end
 
-  # save questions that have been added to a questionnaire
+  # save all questions that have been added to a questionnaire
+  # uses the params new_question
+  # if the questionnaire is a quizquestionnaire then use weights given
   def save_new_questions(questionnaire_id, questionnaire_type)
     if params[:new_question]
       # The new_question array contains all the new questions
@@ -103,7 +105,6 @@ class QuestionsController < ApplicationController
         q.type = params[:question_type][question_key][:type]
         q.seq = question_key.to_i
         if questionnaire_type == 'QuizQuestionnaire'
-          # using the weight user enters when creating quiz
           weight_key = "question_#{index + 1}"
           q.weight = params[:question_weights][weight_key.to_sym]
         end
@@ -113,7 +114,9 @@ class QuestionsController < ApplicationController
     return
   end
   # delete questions from a questionnaire
-  # @param [Object] questionnaire_id
+  # uses params questionnaire_id
+  # checks if the questions passed in params belongs to this questionnaire or not
+  # if yes then it is deleted
   def delete_questions(questionnaire_id)
     # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
     questions = Question.where('questionnaire_id = ?', questionnaire_id)
@@ -136,7 +139,10 @@ class QuestionsController < ApplicationController
     return
   end
   # Handles questions whose wording changed as a result of the edit
-  # @param [Object] questionnaire_id
+  # uses params questionnaire_id
+  # uses params questionnaire_type
+  # if the question text is empty then it is deleted
+  # else it is updated
   def save_questions
     questionnaire_id = params[:questionnaire_id]
     questionnaire_type = params[:questionnaire_type]
@@ -145,10 +151,8 @@ class QuestionsController < ApplicationController
     if params[:question]
       params[:question].keys.each do |question_key|
         if params[:question][question_key][:txt].strip.empty?
-          # question text is empty, delete the question
           Question.delete(question_key)
         else
-          # Update existing question.
           question = Question.find(question_key)
           Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
         end
@@ -159,7 +163,8 @@ class QuestionsController < ApplicationController
   private
 
   def question_params
-    params.permit(:id, :question)
+    params.require(:question).permit(:txt, :weight, :questionnaire_id, :seq, :type, :size,
+                                     :alternatives, :break_before, :max_label, :min_label, :id, :question)
   end
 end
 

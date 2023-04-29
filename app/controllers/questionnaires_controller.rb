@@ -135,6 +135,11 @@ class QuestionnairesController < ApplicationController
   end
 
   # Remove a given questionnaire
+  # checks if any assignment uses the current questionnaire or not
+  # checks if there are any answers to the questions in the questionnaire
+  # for each of the question, it deletes the advice first 
+  # and then deletes the question. Only then the questionnaire node
+  # is deleted
   def delete
     @questionnaire = Questionnaire.find(params[:id])
     if @questionnaire
@@ -202,6 +207,7 @@ class QuestionnairesController < ApplicationController
   end
 
   # Zhewei: This method is used to save all questions in current questionnaire.
+  # this calls update_questions on all the questions in present questionnaire
   def save_all_questions
     questionnaire_id = params[:id]
     begin
@@ -223,9 +229,9 @@ class QuestionnairesController < ApplicationController
   private
 
   # save questionnaire object after create or edit
+  # this is a basid CRUD function and is called after every create or edit
   def save
     @questionnaire.save!
-    #save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
     redirect_to controller: 'questions', action: 'save_questions', questionnaire_id: @questionnaire.id, questionnaire_type: @questionnaire.type and return unless @questionnaire.id.nil? || @questionnaire.id <= 0
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
   end

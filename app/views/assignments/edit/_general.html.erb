@@ -135,7 +135,7 @@
       <!--Github-->
   <tr>
     <td style='padding:5px' id='assignment_use_github' colspan="2">
-      <input type="checkbox" name = "use_github" id="use_github" <%= "checked" if GithubMetricUsesController.exist(@assignment_form.assignment.id) %>></input>
+      <input type="checkbox" name = "use_github" id="use_github" <%= "checked" if GithubMetricUsesController.record_exists?(@assignment_form.assignment.id) %>></input>
       <%= label_tag('use_github', 'Use github metrics?') %>
     </td>
   </tr>

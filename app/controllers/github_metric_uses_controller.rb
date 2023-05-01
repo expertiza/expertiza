@@ -2,7 +2,7 @@ class GithubMetricUsesController < ApplicationController
   skip_before_action :authorize
   
   # Check if a record with the given assignment_id exists in the GithubMetricUses table
-  def exist
+  def record_exists?
     assignment_id = params[:assignment_id]
     github_use = GithubMetricUses.find_by(assignment_id: assignment_id)
     render json: !github_use.nil?

@@ -301,7 +301,7 @@
   <% if @map.assignment.team_assignment? %>
     <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id%>
 
-    <% participant = Participant.find(team_member) %>
+   <% participant = Participant.find_by(user_id: team_member) %>
     <div style="float:right">
       <%= link_to "Email the author", author_response_index_path(email: participant.user.email, response: @response.id) %>
     </div>

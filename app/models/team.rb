@@ -15,6 +15,7 @@ class Team < ApplicationRecord
   def participants
     users.where(parent_id: parent_id || current_user_id).flat_map(&:participants)
   end
+
   alias get_participants participants
 
   # Get the response review map
@@ -167,15 +168,44 @@ class Team < ApplicationRecord
   end
 
   # Extract team members from the csv and push to DB,  changed to hash by E1776
-  def import_team_members(row_hash)
-    row_hash[:teammembers].each_with_index do |teammate, _index|
-      user = User.find_by(name: teammate.to_s)
+  def import_team_members(starting_index = 0, row_hash)
+    starting_index
+    index = 0
+    row_hash[:teammembers].each do |teammember|
+      next if index < starting_index
+      user = User.find_by(name: teammember.to_s)
       if user.nil?
-        raise ImportError, "The user '#{teammate}' was not found. <a href='/users/new'>Create</a> this user?"
+        raise ImportError, "The user '#{teammember.to_s}' was not found. <a href='/users/new'>Create</a> this user?"
       else
         add_member(user) if TeamsUser.find_by(team_id: id, user_id: user.id).nil?
       end
+      index += 1
     end
+  end
+
+  # Helper for importing CourseTeam and AssignmentTeam objects. Should not be used to import
+  # pure Team objects.
+  def self.import_helper(row_hash, id, options, teamtype)
+    raise ArgumentError, "Include duplicate handling option." if not options.has_key? :handle_dups
+    if row_hash.has_key? :teamname
+      name = row_hash[:teamname].to_s
+      team = where(["name =? && parent_id =?", name, id]).first
+      team_exists = !team.nil?
+      name = handle_duplicate(team, name, id, options[:handle_dups], teamtype)
+    else
+      if teamtype.is_a?(CourseTeam)
+        name = self.generate_team_name(Course.find(id).name)
+      elsif teamtype.is_a?(AssignmentTeam)
+        name = self.generate_team_name(Assignment.find(id).name)
+      end
+    end
+    if name
+      team = Object.const_get(teamtype.type).create_team_and_node(id)
+      team.name = name
+      team.save
+    end
+    # insert team members into team unless team was pre-existing & we ignore duplicate teams
+    team.import_team_members(row_hash) unless team_exists && options[:handle_dups] == "ignore"
   end
 
   #  changed to hash by E1776
@@ -213,14 +243,15 @@ class Team < ApplicationRecord
     if handle_dups == 'rename' # rename: rename new team
       if teamtype.is_a?(CourseTeam)
         return generate_team_name(Course.find(id).name)
-      elsif  teamtype.is_a?(AssignmentTeam)
+      elsif teamtype.is_a?(AssignmentTeam)
         return generate_team_name(Assignment.find(id).name)
       end
     end
     if handle_dups == 'replace' # replace: delete old team
       team.delete
       return name
-    else # handle_dups = "insert"
+    else
+      # handle_dups = "insert"
       return nil
     end
   end

@@ -72,7 +72,7 @@ class TeamsController < ApplicationController
   # Update the team
   def update
     @team = Team.find(params[:id])
-    parent = parent_from_child(@team.parent_id)
+    parent = parent_from_child(@team)
     begin
       Team.check_for_existing(parent, params[:team][:name], session[:team_type])
       @team.name = params[:team][:name]

@@ -4,9 +4,10 @@
   become: true
 
   vars:
-    user: smaraba
-    user_home: "/home/smaraba"
-    app_root: "/home/smaraba/expertiza"
+    user: expertiza
+    group: expertiza
+    user_home: "/home/{{ user }}"
+    app_root: /var/www/expertiza
     ruby_version: 2.4
 
   tasks:
@@ -106,7 +107,7 @@
     # Expertiza clone repo, install gems
     - name: Clone Expertiza repository
       ansible.builtin.git:
-        repo: https://github.com/srilekha98/expertiza.git
+        repo: https://github.com/mundra-ankur/expertiza.git
         dest: "{{ app_root }}/code"
         clone: yes
         update: no

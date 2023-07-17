@@ -8,12 +8,12 @@
 <div id="tabs">
   <ul>
     <li><a href="#tabs-1" id="General">Teams</a></li>
-    <% if session[:team_type] == 'Assignment' && @assignment.max_team_size > 1 %>
+    <% if @is_valid_assignment %>
       <li><a href="#tabs-2" id="Topics">Students without teams</a></li>
     <% end %>
   </ul>
   <div id="tabs-1"><%= render partial: 'team' %></div>
-    <% if session[:team_type] == 'Assignment'&& @assignment.max_team_size > 1 %>
+    <% if @is_valid_assignment %>
       <% participants_without_team = get_participants_without_team(@assignment) %>
       <div id="tabs-2">
         <table>

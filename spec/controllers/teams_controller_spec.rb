@@ -20,8 +20,7 @@ describe TeamsController do
   describe 'create teams method' do
     context 'when correct parameters are passed' do
       it 'creates teams with random names' do
-        allow(Object).to receive_message_chain(:const_get, :find).with(any_args).and_return(assignment1)
-        allow(Version).to receive_message_chain(:where, :last).with(any_args).and_return(0.1)
+        allow_any_instance_of(TeamsController).to receive(:parent_by_id).and_return(assignment1)
         request_params = { id: assignment1.id, team_size: 2 }
         user_session = { user: instructor, team_type: 'Assignment' }
         result = get :create_teams, params: request_params, session: user_session

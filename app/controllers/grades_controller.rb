@@ -157,18 +157,26 @@ class GradesController < ApplicationController
     redirect_to action: 'edit', id: params[:id]
   end
 
+  # This method saves the grade and comment for a submission.
   def save_grade_and_comment_for_submission
     participant = AssignmentParticipant.find_by(id: params[:participant_id])
     @team = participant.team
-    @team.grade_for_submission = params[:grade_for_submission]
-    @team.comment_for_submission = params[:comment_for_submission]
+    @team.grade_for_submission = params[:grade_for_submission] # set the grade for the team's submission
+    @team.comment_for_submission = params[:comment_for_submission] # set the comment for the team's submission
+    # create a grading history entry for this assignment
     begin
-      @team.save
+      GradingHistory.create!(instructor_id: session[:user].id,
+                            assignment_id: participant.assignment.id,
+                            grading_type: "Submission",
+                            grade_receiver_id: @team.id,
+                            grade: @team.grade_for_submission,
+                            comment: @team.comment_for_submission) # save the grade and comment in the grading history
+      @team.save # save the grade and comment in the team object
       flash[:success] = 'Grade and comment for submission successfully saved.'
     rescue StandardError
-      flash[:error] = $ERROR_INFO
+      flash[:error] = $ERROR_INFO # display an error message if an exception occurs
     end
-    redirect_to controller: 'grades', action: 'view_team', id: participant.id
+    redirect_to controller: 'grades', action: 'view_team', id: participant.id # redirect to the view team page
   end
 
   def bar_chart(scores, width = 100, height = 100, spacing = 1)

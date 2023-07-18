@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Grade History</title>
+  <style>
+    .center {
+      text-align: center;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      padding: 10px;
+      border: solid 1.5px black;
+      word-wrap: break-word;
+    }
+
+    th:nth-child(1), td:nth-child(1) {
+      width: 25%;
+    }
+
+    th:nth-child(2), td:nth-child(2) {
+      width: 15%;
+    }
+
+    th:nth-child(3), td:nth-child(3) {
+      width: 25%;
+    }
+
+    th:nth-child(4), td:nth-child(4) {
+      width: 15%;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="center">Grade History <% @receiver %> <% @assignment %></h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Instructor</th>
+        <th>Grade</th>
+        <th>Comment</th>
+        <th>Graded At</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @grading_histories.each do |record| %>
+        <tr>
+          <td><%= User.where(id: record.instructor_id).pluck(:fullname).first %></td>
+          <td><%= record.grade %></td>
+          <td><%= record.comment %></td>
+          <td><%= record.created_at %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</body>
+</html>

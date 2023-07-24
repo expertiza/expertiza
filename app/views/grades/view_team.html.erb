@@ -39,8 +39,19 @@
   [:assessments].any? && @pscore[:review2][:assessments].any? %>
   <% rscore_review1 = Rscore.new(@pscore,:review1) %>
   <% rscore_review2 = Rscore.new(@pscore,:review2) %>
-  <% average = rscore_review1.my_avg + rscore_review2.my_avg %>
-  <% average /= 2 %>
+<!--Bugfix 2570 -- Added condition to check if my_avg is "N/A" for any review. The reviews with a valid average is considered.
+-->
+  <% average = 0 %>
+  <% number_of_reviews = 0 %>
+  <% if rscore_review1.my_avg != "N/A" %>
+    <% average += rscore_review1.my_avg %>
+    <% number_of_reviews += 1 %>
+  <% end %>
+  <% if rscore_review2.my_avg != "N/A" %>
+    <% average += rscore_review2.my_avg %>
+    <% number_of_reviews += 1 %>
+  <% end %>
+  <% average /= number_of_reviews %>
   <h4><%=t ".average_peer_review"%> <span class = "c5"><%= average.is_a?(Float)? sprintf("%.2f",average): average %></span></h4>
 <% elsif @pscore[:review]  %>
 <% rscore_review = Rscore.new(@pscore,:review)%>

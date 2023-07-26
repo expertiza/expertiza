@@ -134,7 +134,7 @@
           </td>
           <!--Assign grade and write comments-->
           <td align='left'>
-            <%= form_with model: reviewer.review_grade, url: save_grade_and_comment_for_reviewer_review_mapping_index_path, method: 'post' do |form| %>
+            <%= form_with model: reviewer.review_grade ? reviewer.review_grade : ReviewGrade.new, url: save_grade_and_comment_for_reviewer_review_mapping_index_path, method: 'post' do |form| %>
               <%= form.hidden_field :participant_id, :value => reviewer.id %>
               <%= form.hidden_field :assignment_id, :value => @id %>
               <%= form.number_field :grade_for_reviewer, :value => reviewer.review_grade.try(:grade_for_reviewer), min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %>

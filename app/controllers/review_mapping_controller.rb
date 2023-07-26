@@ -425,7 +425,7 @@ class ReviewMappingController < ApplicationController
     end
     respond_to do |format|
       format.js { render action: 'save_grade_and_comment_for_reviewer.js.erb', layout: false }
-      format.html { redirect_to controller: 'reports', action: 'response_report', id: params[:assignment_id] }
+      format.html { redirect_to controller: 'reports', action: 'response_report', id: params[:review_grade][:assignment_id] }
     end
   end
 

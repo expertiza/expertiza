@@ -20,7 +20,7 @@ class ReviewMappingController < ApplicationController
           'assign_quiz_dynamically',
           'start_self_review'
       true
-    else current_user_has_instructor_privileges?
+    else ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name
     end
   end
 

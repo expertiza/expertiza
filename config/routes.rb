@@ -372,7 +372,9 @@ Expertiza::Application.routes.draw do
       get :list_mappings
       get :unsubmit_review
       post :add_reviewer
+      get :select_reviewer
       post :add_metareviewer
+      get :select_metareviewer
       post :add_user_to_assignment
       post :assign_metareviewer_dynamically
       post :automatic_review_mapping

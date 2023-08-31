@@ -62,8 +62,8 @@ describe CourseSurveyResponseMap do
         to: 'expertiza.debugging@gmail.com'
       }
       email = @course_survey_response_map.email(defn, participant, course)
-      expect(email.from[0]).to eq('expertiza.debugging@gmail.com')
-      expect(email.to[0]).to eq('expertiza.debugging@gmail.com')
+      expect(email.from[0]).to eq('expertiza.mailer@gmail.com')
+      expect(email.to[0]).to eq('expertiza.mailer@gmail.com')
     end
   end
 end

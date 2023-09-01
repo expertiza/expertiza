@@ -70,7 +70,7 @@ class PasswordRetrievalController < ApplicationController
       user.password = params[:reset][:password]
       user.password_confirmation = params[:reset][:repassword]
       if user.save
-        PasswordReset.delete_all(user_email: user.email)
+        PasswordReset.where(user_email: user.email).delete_all
         ExpertizaLogger.info LoggerMessage.new(controller_name, user.name, 'Password was reset for the user', request)
         flash[:success] = 'Password was successfully reset'
       else

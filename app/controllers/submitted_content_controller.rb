@@ -120,7 +120,7 @@ class SubmittedContentController < ApplicationController
     file_content = file.read
 
     # check file type
-    unless check_content_type_integrity(file_content)
+    unless check_content_type_integrity(file_content) || file.original_filename.split('.')[-1] == 'rb'
       flash[:error] = 'File type error'
       redirect_to action: 'edit', id: participant.id
       return

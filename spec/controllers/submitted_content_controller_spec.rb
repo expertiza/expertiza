@@ -130,6 +130,7 @@ describe SubmittedContentController do
         allow(SubmittedContentController).to receive(:check_content_type_integrity).and_return(false)
         allow(MimeMagic).to receive(:by_magic).and_return("not valid")
         allow_any_instance_of(Rack::Test::UploadedFile::String).to receive(:read).and_return("")
+        allow_any_instance_of(Rack::Test::UploadedFile::String).to receive(:original_filename).and_return("")
         file = Rack::Test::UploadedFile.new("#{Rails.root}/spec/fixtures/files/helloworld.c")
         params = {uploaded_file: file,
                   id: 1}
@@ -211,6 +212,7 @@ describe SubmittedContentController do
         allow(SubmittedContentController).to receive(:check_content_type_integrity).and_return(false)
         allow(MimeMagic).to receive(:by_magic).and_return("not valid")
         allow_any_instance_of(Rack::Test::UploadedFile::String).to receive(:read).and_return("")
+        allow_any_instance_of(Rack::Test::UploadedFile::String).to receive(:original_filename).and_return("")
         file = Rack::Test::UploadedFile.new("#{Rails.root}/spec/fixtures/files/helloworld.c")
         params = {uploaded_file: file,
                   id: 1}

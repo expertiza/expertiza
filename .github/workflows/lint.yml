@@ -24,8 +24,7 @@ jobs:
         run: |
           codespell --ignore-words=.github/config/codespell.txt \
                     --exclude-file=.github/config/codespell.txt \
-                    --exclude=./db/migrate \
-                    --exclude=./rspec/fixtures
+                    --skip="./db/migrate,./rspec/fixtures"
 
   misspell:
     name: Check spelling all files in commit with misspell

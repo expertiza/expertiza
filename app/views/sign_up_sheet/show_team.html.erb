@@ -10,19 +10,19 @@
     <th width="500">Action</th>
   </tr>
 
-  <% requestors = [] %>
-  <% requestors_names = [] %>
+  <% requesters = [] %>
+  <% requesters_names = [] %>
 
   <%# @results is the ad_info for an assignment's topic %>
   <% @results.each {|result| %>
 
-    <%# Create a list of hashed requestors which have asked to join the team %>
+    <%# Create a list of hashed requesters which have asked to join the team %>
     <% 
       @join_team_requests = JoinTeamRequest.where(team_id: result[:team_id])
       @join_team_requests.each do |join_team_request|
         if join_team_request.status=='P'
-          requestors_names << User.find(Participant.find(join_team_request.participant_id).user_id).name
-          requestors << {name: User.find(Participant.find(join_team_request.participant_id).user_id).name, request_id: join_team_request.id}
+          requesters_names << User.find(Participant.find(join_team_request.participant_id).user_id).name
+          requesters << {name: User.find(Participant.find(join_team_request.participant_id).user_id).name, request_id: join_team_request.id}
         end
       end 
     %>
@@ -38,7 +38,7 @@
         <td align="center" width="500"><%= result[:name] %></td>
         <td align="center" width="500"><%= team_members.join(', ') %></td>
         <td align="center" width="500"><%= result[:comments_for_advertisement] %></td>
-        <% if  Participant.where(parent_id: result[:assignment_id], user_id: session[:user].id).first && !team_members.include?(session[:user].name) && !requestors_names.include?(session[:user].name) %>
+        <% if  Participant.where(parent_id: result[:assignment_id], user_id: session[:user].id).first && !team_members.include?(session[:user].name) && !requesters_names.include?(session[:user].name) %>
           <td align="center"><%= link_to "Request invitation", :controller => 'join_team_requests', :action => 'new',
             :assignment_id=>result[:assignment_id],
             :topic_id=>result[:topic_id],
@@ -52,9 +52,9 @@
           <% else %>
             <%
               desired_id = -1
-              requestors.each do |requestor|
-                if requestor[:name] == session[:user].name
-                  desired_id = requestor[:request_id]
+              requesters.each do |requester|
+                if requester[:name] == session[:user].name
+                  desired_id = requester[:request_id]
                 end
               end
             %>

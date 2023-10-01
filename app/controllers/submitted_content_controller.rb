@@ -120,11 +120,14 @@ class SubmittedContentController < ApplicationController
     file_content = file.read
 
     # check file type
-    unless check_content_type_integrity(file_content) || file.original_filename.split('.')[-1] == 'rb'
-      flash[:error] = 'File type error'
+    unless check_extension_integrity(file.original_filename)
+      flash[:error] = "File extension does not match. "\
+                      "Please upload one of the following: "\
+                      "pdf, png, jpeg, zip, tar, gz, 7z, odt, docx, md, rb, mp4, txt"
       redirect_to action: 'edit', id: participant.id
       return
     end
+
 
     participant.team.set_student_directory_num
     @current_folder = DisplayOption.new
@@ -198,14 +201,16 @@ class SubmittedContentController < ApplicationController
 
   private
 
-  # Verify the integrity of uploaded files.
-  # @param file_content [Object] the content of uploaded file
+  # Verify the extension name of uploaded files.
+  # @param filename [String] the name of uploaded file
   # @return [Boolean] the result of verification
-  def check_content_type_integrity(file_content)
-    limited_types = %w[application/pdf image/png image/jpeg application/zip application/x-tar application/x-gzip-compressed application/x-7z-compressed application/vnd.oasis.opendocument.text application/vnd.openxmlformats-officedocument.wordprocessingml.document]
-    mime = MimeMagic.by_magic(file_content)
-    limited_types.include? mime.to_s
-  end
+  def check_extension_integrity(original_filename)
+    
+  allowed_extensions = ['pdf', 'png', 'jpeg', 'zip', 'tar', 'gz', '7z', 'odt', 'docx','md','rb','mp4','txt']
+  file_extension = original_filename&.split('.')&.last&.downcase
+  allowed_extensions.include?(file_extension)
+end
+
 
   # Verify the size of uploaded file is under specific value.
   # @param file [Object] uploaded file

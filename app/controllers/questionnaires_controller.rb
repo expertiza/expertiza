@@ -52,7 +52,7 @@ class QuestionnairesController < ApplicationController
     flash[:error] = $ERROR_INFO
   end
 
-  # Assigns corrresponding variables to questionnaire object.
+  # Assigns corresponding variables to questionnaire object.
   def set_questionnaire_parameters(private_flag, display)
     @questionnaire.private = private_flag
     @questionnaire.name = params[:questionnaire][:name]

@@ -237,7 +237,7 @@ describe GradesHelper, type: :helper do
         allow(AssignmentParticipant).to receive(:find).with(1).and_return(assignment_participant)
         allow(assignment_participant).to receive(:team).and_return(team)
         # in the for each part, the function finds the AssignmentQuestionnaire by questionnaire id
-        # so, mock all the searhcing result to avoid data not exsting in DB
+        # so, mock all the searhcing result to avoid data not existing in DB
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(aq1)
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 2).and_return(aq2)
         # just test a part of html to ensure the function render the target view successfully
@@ -252,7 +252,7 @@ describe GradesHelper, type: :helper do
         allow(AssignmentParticipant).to receive(:find).with(1).and_return(assignment_participant)
         allow(assignment_participant).to receive(:team).and_return(team)
         # in the for each part, the function finds the AssignmentQuestionnaire by questionnaire id
-        # so, mock all the searhcing result to avoid data not exsting in DB
+        # so, mock all the searhcing result to avoid data not existing in DB
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(aq1)
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 2).and_return(aq2)
         # mock a creating result for testing return value

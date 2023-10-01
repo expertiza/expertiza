@@ -207,7 +207,7 @@ class SubmittedContentController < ApplicationController
   def check_extension_integrity(original_filename)
     
   allowed_extensions = ['pdf', 'png', 'jpeg', 'zip', 'tar', 'gz', '7z', 'odt', 'docx','md','rb','mp4','txt']
-  file_extension = original_filename.split('.')[-1].downcase
+  file_extension = original_filename&.split('.')&.last&.downcase
   allowed_extensions.include?(file_extension)
 end
 

@@ -51,7 +51,7 @@
     <% average += rscore_review2.my_avg %>
     <% number_of_reviews += 1 %>
   <% end %>
-  <% average /= number_of_reviews %>
+  <% average /= number_of_reviews unless number_of_reviews.zero? %>
   <h4><%=t ".average_peer_review"%> <span class = "c5"><%= average.is_a?(Float)? sprintf("%.2f",average): average %></span></h4>
 <% elsif @pscore[:review]  %>
 <% rscore_review = Rscore.new(@pscore,:review)%>

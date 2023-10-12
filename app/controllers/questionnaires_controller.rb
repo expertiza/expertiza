@@ -18,8 +18,13 @@ class QuestionnairesController < ApplicationController
     when 'edit'
       @questionnaire = Questionnaire.find(params[:id])
       current_user_has_admin_privileges? ||
+<<<<<<< HEAD
         (current_user_is_a?('Teaching Assistant') && Ta.find(session[:user].id).instructor_or_co_ta?(@questionnaire)) ||
         (current_user_is_a?('Instructor') && current_user_id?(@questionnaire.try(:instructor_id)))
+=======
+      current_user_has_ta_privileges? ||
+      (current_user_is_a?('Instructor') && current_user_id?(@questionnaire.try(:instructor_id)))
+>>>>>>> 56cd391... Allowing any TA to update questionnaire created by other TA's(#2635)
     else
       current_user_has_student_privileges?
     end

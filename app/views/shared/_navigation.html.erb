@@ -71,6 +71,8 @@
   </div>
 </nav>
 
+#Loading JQuery before the below script to make sure JQuery works correctly.
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function(){
       $('#inputImpersonateBox').keyup(function(){
@@ -87,6 +89,8 @@
 
     $(function() {
         $('button.navbar-toggle').click(function() {
+            let navbarCollapse = $('.navbar-collapse');
+            navbarCollapse.toggleClass('in');
             if ($('.container').css('margin-top') === '-30px') {
                 $('.container').css('margin-top', '+=255');
             } else {

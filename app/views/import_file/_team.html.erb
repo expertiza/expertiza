@@ -43,7 +43,7 @@
     <%= hidden_field_tag('has_teamname', @has_teamname) %>
     <%= hidden_field_tag('model', @model) %>
     <%= hidden_field_tag('id', @id) %>
-    <%= hidden_field_tag('options', @options)%>
+    <%= hidden_field_tag('options', @options.to_json)%>
 
     <div style="text-align:center">
           <button type="button" class="btn btn-primary" onclick="column_form.submit()">Import Teams</button>

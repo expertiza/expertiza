@@ -67,17 +67,17 @@ class UsersController < ApplicationController
     if letter.present? && search_by.present?
       case search_by.to_i
       when 1 # Search by username
-        @paginated_users = paginate_list.where("name LIKE ?", "%#{letter}%")
+        @paginated_users = paginate_list.where('name LIKE ?', '%#{letter}%')
       when 2 # Search by fullname
-        @paginated_users = paginate_list.where("fullname LIKE ?", "%#{letter}%")
+        @paginated_users = paginate_list.where('fullname LIKE ?', '%#{letter}%')
       when 3 # Search by email
-        @paginated_users = paginate_list.where("email LIKE ?", "%#{letter}%")
+        @paginated_users = paginate_list.where('email LIKE ?', '%#{letter}%')
       else
         @paginated_users = paginate_list
       end
     else # Display all users if no search parameters present
       @paginated_users = paginate_list
-    end  
+    end
   end
 
   # for displaying users which are being searched for editing purposes after checking whether current user is authorized to do so

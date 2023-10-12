@@ -61,7 +61,23 @@ class UsersController < ApplicationController
 
   # for displaying the list of users
   def list
-    @paginated_users = paginate_list
+    letter = params[:letter]
+    search_by = params[:search_by]
+    # If search parameters present
+    if letter.present? && search_by.present?
+      case search_by.to_i
+      when 1 # Search by username
+        @paginated_users = paginate_list.where("name LIKE ?", "%#{letter}%")
+      when 2 # Search by fullname
+        @paginated_users = paginate_list.where("fullname LIKE ?", "%#{letter}%")
+      when 3 # Search by email
+        @paginated_users = paginate_list.where("email LIKE ?", "%#{letter}%")
+      else
+        @paginated_users = paginate_list
+      end
+    else # Display all users if no search parameters present
+      @paginated_users = paginate_list
+    end  
   end
 
   # for displaying users which are being searched for editing purposes after checking whether current user is authorized to do so

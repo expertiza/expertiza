@@ -67,11 +67,11 @@ class UsersController < ApplicationController
     if letter.present? && search_by.present?
       case search_by.to_i
       when 1 # Search by username
-        @paginated_users = paginate_list.where('name LIKE ?', '%#{letter}%')
+        @paginated_users = paginate_list.where('name LIKE ?', "%#{letter}%")
       when 2 # Search by fullname
-        @paginated_users = paginate_list.where('fullname LIKE ?', '%#{letter}%')
+        @paginated_users = paginate_list.where('fullname LIKE ?', "%#{letter}%")
       when 3 # Search by email
-        @paginated_users = paginate_list.where('email LIKE ?', '%#{letter}%')
+        @paginated_users = paginate_list.where('email LIKE ?', "%#{letter}%")
       else
         @paginated_users = paginate_list
       end

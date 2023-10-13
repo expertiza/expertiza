@@ -18,7 +18,7 @@ class QuestionnairesController < ApplicationController
     when 'edit'
       @questionnaire = Questionnaire.find(params[:id])
       current_user_has_admin_privileges? ||
-      current_user_has_ta_privileges? ||
+      current_user_is_a?('Teaching Assistant') ||
       (current_user_is_a?('Instructor') && current_user_id?(@questionnaire.try(:instructor_id)))
     else
       current_user_has_student_privileges?

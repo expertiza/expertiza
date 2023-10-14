@@ -1,3 +1,12 @@
+Project E2355 : Improving Search facility
+=========================================
+### Team Members
+
+Ananya M.
+Anvitha Reddy G.
+Nainisha B.
+
+
 Expertiza
 =========
 

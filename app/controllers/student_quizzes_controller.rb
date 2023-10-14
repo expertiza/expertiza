@@ -12,7 +12,7 @@ class StudentQuizzesController < ApplicationController
       current_user_has_ta_privileges?
     end
   end
-
+# TODO: need to comment the index function and explain the functionality
   def index
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)

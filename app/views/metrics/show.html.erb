@@ -1,0 +1,85 @@
+<% status_classes = {"failure" => "failed", "success" => "passed"} %>
+<h2>GitHub Metrics for assignment: <%= @assignment.name %></h2>
+<h4>Team: <%= @team.name %></h4>
+
+<!--Obtain topic name from assignment helper-->
+<% topic_id, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(@team) %>
+<% if @assignment.topics? %>
+  <h4>Topic: <%= topic_id + '. ' + topic_name %></h4>
+<% end %>
+
+<!--Toggle submission-->
+<button onclick="toggleFunction('<%= @participant.id.to_s%>')" class="btn btn-default">Show Submission</button>
+<div id="<%= @participant.id.to_s %>" style="display:none;">
+  <% if @participant.team.hyperlinks.try(:length) %>
+    <%= render :partial => 'submitted_content/hyperlink', :locals => {participant: @participant, stage: @stage} %>
+  <% else %>
+    <b>No Submission</b>
+  <% end %>
+</div><br><br>
+
+
+<% if @parsed_data && @authors.present? && @dates %>
+
+  <table>
+    <tr>
+      <td align="center"><h3>Code Frequency</h3></td>
+      <td align="center"><h3>Total contributions by author</h3></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="chart-container" style="width: 600px; height:450px;display: block;alignment: left">
+          <%= display_github_metrics(@parsed_data, @authors, @dates) %>
+        </div>
+      </td>
+      <td>
+        <img src="<%= display_totals_piechart(@parsed_data, @authors, @dates) %>" style="display: block; alignment: right  ">
+      </td>
+    </tr>
+  </table>
+  <h3>Team Statistics</h3>
+  <ul>
+    <li>Total number of commits:<%= @total_commits %></li>
+    <li>Total number of lines added: <%= @total_additions %></li>
+    <li>Total number of lines removed: <%= @total_deletions %></li>
+    <li>Total number of files changed: <%= @total_files_changed %></li>
+    <% unless @merge_status[-1]%>
+      <li>
+        <div>Merge statuses:</div>
+        <ul>
+          <% @merge_status.each do |k, v| %>
+            <li>Pull Request Number <%= k %> has status: <%= v %> </li>
+          <% end %>
+        </ul>
+      </li>
+      <li>
+        <span>Check Statuses:</span>
+        <% if @check_statuses.empty? %>
+          <span>NA</span>
+        <% else %>
+          <ul>
+            <% @check_statuses.each do |pull_number, check_status| %>
+              <li>
+                <div>Pull request: <%= pull_number %></div>
+                <div>Overall Status: <span class=<%= status_classes[check_status["state"]] %>><%= check_status["state"] %></span></div>
+                <% if check_status["statuses"].present? %>
+                  <div>Results:</div>
+                  <ul>
+                    <% check_status["statuses"].each do |status| %>
+                      <li><strong><%= status["context"] %></strong>
+                        <div>Check status: <span class=<%= status_classes[status["state"]] %>><%= status["state"] %></span></div>
+                        <div>Check description: <%= status["description"] || "NA" %></div>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+    <% end %>
+    </li>
+  </ul>
+<% else %>
+  <h4 style="font-weight:bold;display:inline-block;">No github data to show</h4>
+<% end %>

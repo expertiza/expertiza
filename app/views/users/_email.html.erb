@@ -1,2 +1,4 @@
-<tr><td><label for="user_email"><b><%=t ".email_add"%> </b></label></td><td>
+<tr><td><label for="user_email"><b>E-mail address: </b></label></td><td>
   <%= text_field 'user', 'email', class: "form-control width-250"  %></td></tr>
+<tr><td><label for="user[fullname]"><b>Github.com Email: <img src="/assets/info.png" title="Input the email you use to login to Github.com if your instructor has requested you use Github for your class."/></b></label></td><td>
+  <%= text_field 'user', 'github_id', class: "form-control width-250"%></td></tr>

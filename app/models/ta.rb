@@ -15,6 +15,9 @@ class Ta < User
   def is_instructor_or_co_ta?(questionnaire)
     return false if questionnaire.nil?
     
+    # Check if is TA for any of the courses of a given questionnaire's instructor
+    return true if Ta.get_my_instructors(id).include?(questionnaire.try(:instructor_id))
+    
     ta = Ta.find(id)
     questionnaire_ta = Ta.find(questionnaire.try(:instructor_id))
     

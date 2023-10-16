@@ -97,14 +97,14 @@ class Ta < User
     true
   end
 
-  def self.is_instructor_or_co_ta(questionnaire)
-    return false if session[:user].nil? || questionnaire.nil?
+  def is_instructor_or_co_ta(questionnaire)
+    return false if questionnaire.nil?
     
-    ta = Ta.find(session[:user].id)
+    ta = Ta.find(id)
     questionnaire_ta = Ta.find(questionnaire.try(:instructor_id))
     
     # Check if the TA is a co-TA for any of the courses of a given questionnaire's instructor
-    ta.courses_assisted_with.any? do |course|
+    ta.find.courses_assisted_with.any? do |course|
       course.tas&.include?(questionnaire_ta)
     end
   end

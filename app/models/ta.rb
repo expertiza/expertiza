@@ -12,7 +12,7 @@ class Ta < User
     courses.map { |c| Course.find(c.course_id) }
   end
   
-  def is_instructor_or_co_ta(questionnaire)
+  def is_instructor_or_co_ta?(questionnaire)
     return false if questionnaire.nil?
     
     ta = Ta.find(id)

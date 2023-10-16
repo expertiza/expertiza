@@ -14,15 +14,11 @@ class QuestionnairesController < ApplicationController
 
   # Check role access for edit questionnaire
   def action_allowed?
-    ta = Ta.find(id)
-    if ta.courses_assisted_with.any? do |c|
-      c.tas&.include?(@questionnaire.try(:instructor_id))
-    end
     case params[:action]
     when 'edit'
       @questionnaire = Questionnaire.find(params[:id])
       current_user_has_admin_privileges? ||
-      (current_user_is_a?('Teaching Assistant') && Ta.find(session[:user].id).courses_assisted_with.any? { |c| c.tas&.include?(@questionnaire.try(:instructor_id)) })
+      (current_user_is_a?('Teaching Assistant') && Ta.find(session[:user].id).courses_assisted_with.any? { |c| c.tas&.include?(@questionnaire.try(:instructor_id)) }) ||
       (current_user_is_a?('Instructor') && current_user_id?(@questionnaire.try(:instructor_id)))
     else
       current_user_has_student_privileges?

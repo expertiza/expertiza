@@ -54,35 +54,41 @@ class ReviewMappingController < ApplicationController
   def add_reviewer
     assignment = Assignment.find(params[:id])
     topic_id = params[:topic_id]
-    user_id = User.where(name: params[:user][:name]).first.id
-    # If instructor want to assign one student to review his/her own artifact,
-    # it should be counted as "self-review" and we need to make /app/views/submitted_content/_selfreview.html.erb work.
-    if TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
-      flash[:error] = 'You cannot assign this student to review his/her own artifact.'
-    else
-      # Team lazy initialization
-      SignUpSheet.signup_team(assignment.id, user_id, topic_id)
-      msg = ''
-      begin
-        user = User.from_params(params)
+    begin
+      user = User.from_params(params)
+      participant_temp = Participant.find_by(user_id: user.id, parent_id: params[:id])
+      # If instructor want to assign one student to review his/her own artifact,
+      # it should be counted as "self-review" and we need to make /app/views/submitted_content/_selfreview.html.erb work.
+      if self_review?(team_id: params[:contributor_id], user_id: user.id)
+        flash[:error] = 'You cannot assign this student to review his/her own artifact.'
+      # If user is not allowed to review this assignment
+      elsif !participant_temp&.can_review
+        msg = 'This user is not authorized to review the assignment.'
+      else
+        # Team lazy initialization
+        SignUpSheet.signup_team(assignment.id, user.id, topic_id)
+        msg = ''
+        
         # contributor_id is team_id
         regurl = url_for id: assignment.id,
-                         user_id: user.id,
-                         contributor_id: params[:contributor_id]
+                        user_id: user.id,
+                        contributor_id: params[:contributor_id]
 
         # Get the assignment's participant corresponding to the user
         reviewer = get_reviewer(user, assignment, regurl)
         # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
         # to treat all assignments as team assignments
-        if ReviewResponseMap.where(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id).first.nil?
-          ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
-        else
+        ReviewResponseMap.where().first.nil?
+        if already_reviewer?(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id)
           raise 'The reviewer, "' + reviewer.name + '", is already assigned to this contributor.'
+        else
+          ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
         end
-      rescue StandardError => e
-        msg = e.message
       end
+    rescue StandardError => e
+      msg = e.message
     end
+
     redirect_to action: 'list_mappings', id: assignment.id, msg: msg
   end
 
@@ -578,5 +584,13 @@ class ReviewMappingController < ApplicationController
     params
       .require(:review_grade)
       .permit(:grade_for_reviewer, :comment_for_reviewer, :review_graded_at)
+  end
+
+  def self_review?(team_id, user_id)
+    TeamsUser.exists?(team_id, user_id)
+  end  
+
+  def already_reviewer?(contributor_id, reviewer_id)
+    ReviewResponseMap.where(reviewee_id: contributor_id, reviewer_id: reviewer_id).first.nil?
   end
 end

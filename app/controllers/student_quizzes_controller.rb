@@ -12,7 +12,11 @@ class StudentQuizzesController < ApplicationController
       current_user_has_ta_privileges?
     end
   end
-# TODO: need to comment the index function and explain the functionality
+
+# INDEX
+# Finds an assignment participants
+# Do not show assignment or quizzes if current user not a participant
+# List assignments if participant involved as assignment's submitter or reviewer
   def index
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)

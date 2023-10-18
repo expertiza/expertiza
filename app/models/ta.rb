@@ -11,7 +11,22 @@ class Ta < User
     courses = TaMapping.where(ta_id: id)
     courses.map { |c| Course.find(c.course_id) }
   end
-
+  
+  def is_instructor_or_co_ta?(questionnaire)
+    return false if questionnaire.nil?
+    
+    # Check if is TA for any of the courses of a given questionnaire's instructor
+    return true if Ta.get_my_instructors(id).include?(questionnaire.try(:instructor_id))
+    
+    ta = Ta.find(id)
+    questionnaire_ta = Ta.find(questionnaire.try(:instructor_id))
+    
+    # Check if the TA is a co-TA for any of the courses of a given questionnaire's instructor
+    ta.courses_assisted_with.any? do |course|
+      course.tas&.include?(questionnaire_ta)
+    end
+  end
+  
   def list_all(object_type, user_id)
     object_type.where(['instructor_id = ? OR private = 0', user_id])
   end
@@ -96,7 +111,7 @@ class Ta < User
   def teaching_assistant?
     true
   end
-
+  
   def self.get_user_list(user)
     courses = Ta.get_mapped_courses(user.id)
     participants = []

@@ -74,7 +74,7 @@ class ImportFileController < ApplicationController
                      else
                        CourseTeam
                      end
-          options = eval(params[:options])
+          options = JSON.parse(params[:options])
           options[:has_teamname] = params[:has_teamname]
           Team.import(row_hash, params[:id], options, teamtype)
         end

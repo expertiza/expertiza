@@ -116,25 +116,41 @@ class Team < ApplicationRecord
   # Algorithm
   # Start by adding single members to teams that are one member too small.
   # Add two-member teams to teams that two members too small. etc.
+  # def self.randomize_all_by_parent(parent, team_type, min_team_size)
+  #   participants = Participant.where(parent_id: parent.id, type: parent.class.to_s + 'Participant')
+  #   participants = participants.sort { rand(-1..1) }
+  #   users = participants.map { |p| User.find(p.user_id) }.to_a
+  #   # find teams still need team members and users who are not in any team
+  #   teams = Team.where(parent_id: parent.id, type: parent.class.to_s + 'Team').to_a
+  #   teams.each do |team|
+  #     TeamsUser.where(team_id: team.id).each do |teams_user|
+  #       users.delete(User.find(teams_user.user_id))
+  #     end
+  #   end
+  #   teams.reject! { |team| Team.size(team.id) >= min_team_size }
+  #   # sort teams that still need members by decreasing team size
+  #   teams.sort_by { |team| Team.size(team.id) }.reverse!
+  #   # insert users who are not in any team to teams still need team members
+  #   assign_single_users_to_teams(min_team_size, parent, teams, users) if !users.empty? && !teams.empty?
+  #   # If all the existing teams are fill to the min_team_size and we still have more users, create teams for them.
+  #   create_team_from_single_users(min_team_size, parent, team_type, users) unless users.empty?
+  # end
+
+  # Refactored version of randomize_all_by_parent
+  # Algorithm
+  # Start by adding single members to teams that are one member too small.
+  # Add two-member teams to teams that two members too small. etc.
   def self.randomize_all_by_parent(parent, team_type, min_team_size)
-    participants = Participant.where(parent_id: parent.id, type: parent.class.to_s + 'Participant')
-    participants = participants.sort { rand(-1..1) }
-    users = participants.map { |p| User.find(p.user_id) }.to_a
-    # find teams still need team members and users who are not in any team
-    teams = Team.where(parent_id: parent.id, type: parent.class.to_s + 'Team').to_a
-    teams.each do |team|
-      TeamsUser.where(team_id: team.id).each do |teams_user|
-        users.delete(User.find(teams_user.user_id))
-      end
-    end
-    teams.reject! { |team| Team.size(team.id) >= min_team_size }
-    # sort teams that still need members by decreasing team size
-    teams.sort_by { |team| Team.size(team.id) }.reverse!
-    # insert users who are not in any team to teams still need team members
-    assign_single_users_to_teams(min_team_size, parent, teams, users) if !users.empty? && !teams.empty?
-    # If all the existing teams are fill to the min_team_size and we still have more users, create teams for them.
-    create_team_from_single_users(min_team_size, parent, team_type, users) unless users.empty?
+    participants = fetch_participants(parent)
+    users = extract_users(participants)
+    teams = fetch_teams(parent, team_type)
+    teams = filter_teams(teams, min_team_size)
+    distribute_users(teams, users, min_team_size, parent, team_type)
   end
+
+
+
+
 
   # Creates teams from a list of users based on minimum team size
   # Then assigns the created team to the parent object
@@ -305,6 +321,51 @@ class Team < ApplicationRecord
       team_user.destroy
     rescue StandardError
       nil
+    end
+  end
+
+  private
+
+  def self.fetch_participants(parent)
+    Participant.where(parent_id: parent.id, type: parent.class.to_s + 'Participant')
+  end
+
+  def self.extract_users(participants)
+    participants.shuffle.map { |p| User.find(p.user_id) }
+  end
+
+  def self.fetch_teams(parent, team_type)
+    Team.where(parent_id: parent.id, type: parent.class.to_s + 'Team').to_a
+  end
+
+  def self.filter_teams(teams, min_team_size)
+    teams.reject { |team| Team.size(team.id) >= min_team_size }
+  end
+
+  def self.distribute_users(teams, users, min_team_size, parent, team_type)
+    next_team_member_index = 0
+    teams.each do |team|
+      distribute_users_to_team(team, users, min_team_size, parent, team_type, next_team_member_index)
+    end
+    create_teams_for_remaining_users(users, min_team_size, parent, team_type, next_team_member_index)
+  end
+
+  def self.distribute_users_to_team(team, users, min_team_size, parent, team_type, next_team_member_index)
+    min_team_size.times do
+      break if next_team_member_index >= users.length
+
+      user = users[next_team_member_index]
+      team.add_member(user, parent.id)
+      next_team_member_index += 1
+    end
+  end
+
+  def self.create_teams_for_remaining_users(users, min_team_size, parent, team_type, next_team_member_index)
+    num_of_teams = (users.length / min_team_size.to_f).ceil
+    (1..num_of_teams).each do |i|
+      team = Object.const_get(team_type + 'Team').create(name: "Team_#{i}", parent_id: parent.id)
+      TeamNode.create(parent_id: parent.id, node_object_id: team.id)
+      distribute_users_to_team(team, users, min_team_size, parent, team_type, next_team_member_index)
     end
   end
 end

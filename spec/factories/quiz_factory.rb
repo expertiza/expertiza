@@ -92,4 +92,6 @@ FactoryBot.define do
     s_response_id 1
     s_comments 'test comment'
   end
+
+
 end

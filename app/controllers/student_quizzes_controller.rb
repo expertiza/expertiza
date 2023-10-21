@@ -25,8 +25,9 @@ class StudentQuizzesController < ApplicationController
     @quiz_mappings = QuizResponseMap.mappings_for_reviewer(@participant.id)
   end
 
+
   def finished_quiz
-    @response = Response.where(map_id: params[:map_id]).first
+    @response = Response.where(map_id: params[:map_id]).first #What is the purpose of @response? I don't see it used anywhere else in this file.
     @response_map = QuizResponseMap.find(params[:map_id])
     @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id) # The reviewed_object_id is questionnaire_id for quiz response_map
     @map = ResponseMap.find(params[:map_id])

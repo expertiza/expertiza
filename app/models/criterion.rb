@@ -65,7 +65,7 @@ class Criterion < ScoredQuestion
   # show advice for each criterion question
   def advices_criterion_question(count, question_advices)
     html = '<a id="showAdvice_' + id.to_s + '" onclick="showAdvice(' + id.to_s + ')">Show advice</a><script>'
-    html += 'function showAdvice(i){var element = document.getElementById("showAdivce_" + i.toString());'
+    html += 'function showAdvice(i){var element = document.getElementById("showAdvice_" + i.toString());'
     html += 'var show = element.innerHTML == "Hide advice";'
     html += 'if (show){element.innerHTML="Show advice";} else{element.innerHTML="Hide advice";}toggleAdvice(i);}'
     html += 'function toggleAdvice(i) {var elem = document.getElementById(i.toString() + "_myDiv");'

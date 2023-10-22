@@ -161,33 +161,67 @@ describe StudentQuizzesController do
   end
 
   describe "#finished_quiz" do
+    #let(:response) {create(:response)}
+    let(:quiz_questionnaire) {double(:quiz_questionnaire)}
+    let(:quiz_response) {double(:quiz_response)}
+    let(:quiz_response_map) {double(:quiz_response_map, map_id:1, reviewed_object_id:1, reviewee_id:1, quiz_score:97)}
+    let(:quiz_question) {double(:quiz_question )}
+    let(:participant) {double(:participant)}
+    let(:assignment_team) {double(:assignment_team, participants:participant)}    
+
+    before(:each) do
+      allow(controller).to receive(:params).and_return(map_id:quiz_response_map.map_id)
+      allow(Response).to receive_message_chain(:where,:first).with(map_id: quiz_response_map.map_id).and_return(quiz_response,quiz_response)
+      allow(QuizResponseMap).to receive(:find).with(quiz_response_map.map_id).and_return(quiz_response_map)
+      allow(Question).to receive(:where).with(questionnaire_id:quiz_response_map.reviewed_object_id).and_return(quiz_question)
+      allow(ResponseMap).to receive(:find).with(quiz_response_map.map_id).and_return(quiz_response_map)
+      allow(AssignmentTeam).to receive_message_chain(:find,:participants,:first).and_return(:participant)
+      
+    end
+
     context "when a participant has finished a quiz" do
       it "retrieves the participant's response for the quiz" do
         # Test code
+        params= {:map_id=>quiz_response_map.reviewed_object_id}
+        expect(Response).to receive_message_chain(:where,:first)
+        controller.finished_quiz
       end
-
       it "retrieves the quiz response map for the given map_id" do
         # Test code
+  #      params = {map_id=>quiz_response_map.reviewed_object_id}
+  #      expect(QuizResponseMap).to receive(:find)
+  #      controller.finished_quiz
       end
 
       it "retrieves the quiz questions associated with the quiz response map" do
         # Test code
+   #     expect(Question).to receive(:where)
+   #     controller.finished_quiz
       end
 
       it "retrieves the participant who attempted the quiz" do
         # Test code
+   #     expect(AssignmentTeam).to receive(:find)
+   #     controller.finished_quiz
       end
 
       it "retrieves the quiz score for the participant" do
         # Test code
+   #     expect(@response_map).to receive(:quiz_score)
+   #     controller.finished_quiz
       end
     end
   end
 
   describe ".get_quiz_questionnaire" do
+    let(:assignment) {create(:assignment)}
+    let(:participant) {create(:participant)}
     context "when there are no reviewed_team_response_maps for the reviewer" do
       it "returns an empty array" do
         # test scenario
+       # expect(reviewed_team_response_maps).should be_nil
+       # student_quiz = StudentQuizzesController.take_quiz(assignment.id,participant.id)
+       # controller.take_quiz(assignment.id, participant.id).should be_nil
       end
     end
 

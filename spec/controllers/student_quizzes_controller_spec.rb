@@ -171,13 +171,13 @@ describe StudentQuizzesController do
 
     before(:each) do
       allow(controller).to receive(:params).and_return(map_id:quiz_response_map.map_id)
-      allow(Response).to receive_message_chain(:where,:first).with(map_id: quiz_response_map.map_id).with(no_args).and_return(quiz_response,quiz_response)
+      allow(Response).to receive_message_chain(:where,:first).with(map_id: quiz_response_map.map_id).with(no_args).and_return(quiz_response)
       allow(QuizResponseMap).to receive(:find).with(quiz_response_map.map_id).and_return(quiz_response_map)
       allow(Question).to receive(:where).with(questionnaire_id:quiz_response_map.reviewed_object_id).and_return(quiz_question)
       allow(ResponseMap).to receive(:find).with(quiz_response_map.map_id).and_return(quiz_response_map)
       allow(AssignmentTeam).to receive_message_chain(:find,:participants,:first).and_return(:participant)
-      
-    end
+      allow(quiz_response_map).to receive(:response).and_return(quiz_response_map.quiz_score)
+   end
 
     context "when a participant has finished a quiz" do
       it "retrieves the participant's response for the quiz" do
@@ -193,20 +193,20 @@ describe StudentQuizzesController do
 
       it "retrieves the quiz questions associated with the quiz response map" do
         # Test code
-   #     expect(Question).to receive(:where)
-   #     controller.finished_quiz
+        expect(Question).to receive(:where)
+        controller.finished_quiz
       end
 
       it "retrieves the participant who attempted the quiz" do
         # Test code
-   #     expect(AssignmentTeam).to receive(:find)
-   #     controller.finished_quiz
+        expect(AssignmentTeam).to receive(:find)
+        controller.finished_quiz
       end
 
       it "retrieves the quiz score for the participant" do
         # Test code
-   #     expect(@response_map).to receive(:quiz_score)
-   #     controller.finished_quiz
+        expect(quiz_response_map.quiz_score).to eq(quiz_response_map.quiz_score)
+        controller.finished_quiz
       end
     end
   end

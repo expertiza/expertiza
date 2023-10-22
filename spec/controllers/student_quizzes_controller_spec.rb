@@ -182,15 +182,13 @@ describe StudentQuizzesController do
     context "when a participant has finished a quiz" do
       it "retrieves the participant's response for the quiz" do
         # Test code
-        params= {:map_id=>quiz_response_map.reviewed_object_id}
         expect(Response).to receive_message_chain(:where,:first)
         controller.finished_quiz
       end
       it "retrieves the quiz response map for the given map_id" do
         # Test code
-  #      params = {map_id=>quiz_response_map.reviewed_object_id}
-  #      expect(QuizResponseMap).to receive(:find)
-  #      controller.finished_quiz
+ #       expect(QuizResponseMap).to receive(:find)
+ #       controller.finished_quiz
       end
 
       it "retrieves the quiz questions associated with the quiz response map" do

@@ -171,7 +171,7 @@ describe StudentQuizzesController do
 
     before(:each) do
       allow(controller).to receive(:params).and_return(map_id:quiz_response_map.map_id)
-      allow(Response).to receive_message_chain(:where,:first).with(map_id: quiz_response_map.map_id).and_return(quiz_response,quiz_response)
+      allow(Response).to receive_message_chain(:where,:first).with(map_id: quiz_response_map.map_id).with(no_args).and_return(quiz_response,quiz_response)
       allow(QuizResponseMap).to receive(:find).with(quiz_response_map.map_id).and_return(quiz_response_map)
       allow(Question).to receive(:where).with(questionnaire_id:quiz_response_map.reviewed_object_id).and_return(quiz_question)
       allow(ResponseMap).to receive(:find).with(quiz_response_map.map_id).and_return(quiz_response_map)
@@ -187,8 +187,8 @@ describe StudentQuizzesController do
       end
       it "retrieves the quiz response map for the given map_id" do
         # Test code
- #       expect(QuizResponseMap).to receive(:find)
- #       controller.finished_quiz
+        expect(QuizResponseMap).to receive(:find)
+        controller.finished_quiz
       end
 
       it "retrieves the quiz questions associated with the quiz response map" do

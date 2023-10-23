@@ -53,11 +53,13 @@
                   selected
                   <% end -%>
                   >submitter</option>
-	 <!-- <option value="mentor"
-		  < % if params[:authorization] == "mentor" -%> 
+  <!-- E2351 adding 4th option in drop down per project description, this will allow a user to be changed
+       to a mentor via the gui -->
+	  <option value="mentor"
+		  <% if params[:authorization] == "mentor" -%> 
                   selected
-                  < % end -%>
-                  >submitter</option> -->
+                  <% end -%>
+                  >submitter</option>
         </select>
         <!-- Change to display the Submit button -->
         <%= button_tag "Submit", {:id=>'button'+participant.user_id.to_s,:style=>"font-size:15px; opacity:1;", :class => "btn btn-md btn-default" } %>

@@ -20,7 +20,10 @@
             <th style="text-align:center">
               <%= @contents_hash[:header][3].to_s.capitalize %>
             </th>
-
+	    <!-- Added a new one for duty -->
+            <th style="text-align:center">
+              <%= @contents_hash[:header][4].to_s.capitalize %>
+            </th>
         <% else %>
 
             <th>
@@ -55,6 +58,19 @@
                 <option value="email">Email</option>
               </select>
             </th>
+
+	    <!-- Added 5th for duty  -->
+            <th>
+              <select name="select5" id="select5" class="form-control" style="background-color:lightgrey">
+                <!-- Added duty option value -->
+                <option value="duty">Duty</option>
+		<option value="password">Password</option>
+                <option value="name">Name</option>
+                <option value="fullname">Fullname</option>
+                <option value="email">Email</option>
+              </select>
+            </th>
+
 
         <% end %>
 

@@ -501,6 +501,7 @@ class ReviewMappingController < ApplicationController
 
     teams.each_with_index do |team, iterator|
       selected_participants = []
+      # If condition check for the team not being the last team
       if !team.equal? teams.last
         # need to even out the # of reviews for teams
         while selected_participants.size < review_strategy.reviews_per_team
@@ -511,6 +512,7 @@ class ReviewMappingController < ApplicationController
             temp_participant = Participant.where(user_id: team_user.user_id, parent_id: assignment_id).first
             num_participants_this_team -= 1 unless temp_participant.can_review && temp_participant.can_submit
           end
+          
           # if all outstanding participants are already in selected_participants, just break the loop.
           break if selected_participants.size == participants.size - num_participants_this_team
 
@@ -567,7 +569,9 @@ class ReviewMappingController < ApplicationController
       end
 
       begin
-        selected_participants.each { |index| ReviewResponseMap.where(reviewee_id: team.id, reviewer_id: index, reviewed_object_id: assignment_id).first_or_create }
+        selected_participants.each do |index|
+          ReviewResponseMap.where(reviewee_id: team.id, reviewer_id: index, reviewed_object_id: assignment_id).first_or_create
+        end
       rescue StandardError
         flash[:error] = 'Automatic assignment of reviewer failed.'
       end

@@ -1,7 +1,28 @@
 class DueDate < ApplicationRecord
   validate :due_at_is_valid_datetime
-  #  has_paper_trail
+  # has_paper_trail
 
+  def due_at_is_valid_datetime
+    if due_at.present?
+      errors.add(:due_at, 'must be a valid datetime') if (begin
+                                                            DateTime.strptime(due_at.to_s, '%Y-%m-%d %H:%M:%S')
+                                                          rescue StandardError
+                                                            ArgumentError
+                                                          end) == ArgumentError
+    end
+  end
+
+  def set_flag
+    self.flag = true
+    save
+  end
+
+  include DueDateHelper # Include the DueDateHelper module
+
+end
+
+# Define a DueDateHelper module for due date-related methods
+module DueDateHelper
   def self.default_permission(deadline_type, permission_type)
     DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
   end
@@ -25,21 +46,6 @@ class DueDate < ApplicationRecord
       due_date &&
         (due_date.teammate_review_allowed_id == 3 ||
         due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
-  end
-
-  def set_flag
-    self.flag = true
-    save
-  end
-
-  def due_at_is_valid_datetime
-    if due_at.present?
-      errors.add(:due_at, 'must be a valid datetime') if (begin
-                                                            DateTime.strptime(due_at.to_s, '%Y-%m-%d %H:%M:%S')
-                                                          rescue StandardError
-                                                            ArgumentError
-                                                          end) == ArgumentError
-    end
   end
 
   def self.copy(old_assignment_id, new_assignment_id)
@@ -86,6 +92,7 @@ class DueDate < ApplicationRecord
       round += 1 if due_date.deadline_type_id == 2
     end
     round
+
   end
 
   def self.get_next_due_date(assignment_id, topic_id = nil)
@@ -116,5 +123,7 @@ class DueDate < ApplicationRecord
       next_due_date = AssignmentDueDate.find_by(['parent_id = ? && due_at >= ?', assignment_id, Time.zone.now])
     end
     next_due_date
+
   end
+
 end

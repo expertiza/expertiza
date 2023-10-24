@@ -63,7 +63,7 @@
 		  <% if params[:authorization] == "mentor" -%> 
                   selected
                   <% end -%>
-                  >submitter</option>
+                  >mentor</option>
         </select>
         <!-- Change to display the Submit button -->
         <%= button_tag "Submit", {:id=>'button'+participant.user_id.to_s,:style=>"font-size:15px; opacity:1;", :class => "btn btn-md btn-default" } %>

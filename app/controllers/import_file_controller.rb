@@ -184,7 +184,7 @@ class ImportFileController < ApplicationController
   def hash_rows_with_headers(header, body)
     new_body = []
     if (params[:model] == 'User') || (params[:model] == 'AssignmentParticipant') || (params[:model] == 'CourseParticipant') || (params[:model] == 'SignUpTopic')
-      header.map!(&:to_sym)
+      header.map! { |str| str.strip.downcase.gsub(/\s+/, "").to_sym }
       body.each do |row|
         new_body << header.zip(row).to_h
       end

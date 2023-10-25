@@ -1,0 +1,32 @@
+<h3>Bidding Details for <%= @assignment.name %></h3>
+
+<table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th>Topic Name</th>
+      <th>Bidding Teams</th>
+      <th>Assigned Teams</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @topics.each do |topic| %>
+      <tr>
+        <td><%= topic.topic_name %></td>
+        <td>
+          <% @bids_by_topic[topic.id].each_with_index do |team, index| %>
+            #<%= index + 1 %> <%= team.name %>
+          <% end %>
+        </td>
+        <td>
+          <% if @assigned_teams_by_topic[topic.id].any? %>
+            <% @assigned_teams_by_topic[topic.id].each_with_index do |assigned_team, index| %>
+              <%= assigned_team.name %>
+            <% end %>
+          <% else %>
+            No team assigned
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

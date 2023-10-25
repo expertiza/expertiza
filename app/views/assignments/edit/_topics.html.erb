@@ -10,6 +10,10 @@
       Instructor must specify when topics are assigned, by going to the Due Dates tab and
       entering a due date for &quot;signup&quot;."/>
 <br>
+
+  <%= button_to 'View Bidding Details', {:controller => 'lottery', :action => 'bidding_details', :id => @assignment_form.assignment.id}, :method => :get %>
+
+<br>
 <input name="assignment_form[assignment][can_review_same_topic]" type="hidden" value="false"/>
 <%= check_box_tag('assignment_form[assignment][can_review_same_topic]', 'true', @assignment_form.assignment.can_review_same_topic?)%>
 <%= label_tag('assignment_form[assignment][can_review_same_topic]', 'Enable authors to review others working on same topic?') %>

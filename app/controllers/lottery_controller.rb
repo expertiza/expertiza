@@ -40,6 +40,25 @@ class LotteryController < ApplicationController
     redirect_to controller: 'tree_display', action: 'list'
   end
 
+  def bidding_details
+    @assignment = Assignment.find(params[:id])
+  
+    # Fetch all topics for the assignment
+    @topics = @assignment.sign_up_topics
+  
+    # Fetch all bids for these topics
+    @bids_by_topic = {}
+    @assigned_teams_by_topic = {}  # This will store the assigned teams for each topic
+    @topics.each do |topic|
+      # Assuming bids are stored with a topic_id, and each bid has a team associated with it
+      @bids_by_topic[topic.id] = Bid.where(topic_id: topic.id).map(&:team)
+      
+      # Fetch teams that are not waitlisted for this topic
+      @assigned_teams_by_topic[topic.id] = SignedUpTeam.where(topic_id: topic.id, is_waitlisted: false).map(&:team)
+    end
+  end
+  
+
   private
 
   # Generate user bidding information hash based on students who haven't signed up yet

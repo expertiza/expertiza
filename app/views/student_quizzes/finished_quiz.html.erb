@@ -8,7 +8,7 @@
 <% i = 1 %>
 
 
-<% @questions.each do |question| %>
+<% @quiz_questions.each do |question| %>
   <b>Question <%= i %>: </b><%= label_tag "#{question.id}", question.txt %> <br>
 
     <%user_answer=Answer.where(response_id: @participant_response.id, question_id:  question.id)%>

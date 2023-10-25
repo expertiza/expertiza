@@ -212,14 +212,23 @@ describe StudentQuizzesController do
   end
 
   describe ".get_quiz_questionnaire" do
-    let(:assignment) {create(:assignment)}
-    let(:participant) {create(:participant)}
+    let(:assignment) {double(:assignment, id:1)}
+    let(:submitter) {double(:participant, id:1)}
+    let(:quiz_response) {double(:quiz_response, reviewee_id:submitter_team.id)}
+    let(:quiz_response_map) {double(:quiz_response_map, each: quiz_response)}
+    let(:submitter_team) {double(:assignment_team, participants:submitter, id:123, parent_id:assignment.id)}
+    let(:reviewer) {double(:participant, id:2)}
+    let(:reviewer_team) {double(:assignment_team, participants:reviewer, id:456)}
+    let(:quiz_questionnaire) {double(:quiz_questionnaire,taken_by?:reviewer_team)}
+    let(:stray_team) {double(:assignment_team, id:789)}
+    let(:stray_assignment) {double(:assignement, id:2)}
+
     context "when there are no reviewed_team_response_maps for the reviewer" do
       it "returns an empty array" do
         # test scenario
-       # expect(reviewed_team_response_maps).should be_nil
-       # student_quiz = StudentQuizzesController.take_quiz(assignment.id,participant.id)
-       # controller.take_quiz(assignment.id, participant.id).should be_nil
+        allow(Participant).to receive_message_chain(:where,:first).with(user_id:reviewer.id, parent_id:assignment.id).with(no_args).and_return(reviewer)
+        allow(ReviewResponseMap).to receive(:where).with(reviewer_id:reviewer.id).and_return([])
+        expect(StudentQuizzesController.take_quiz(assignment.id,reviewer.id)).to match_array([])
       end
     end
 
@@ -227,13 +236,28 @@ describe StudentQuizzesController do
       context "when the reviewee team is not associated with the assignment" do
         it "skips the reviewee team and does not include its quiz questionnaire" do
           # test scenario
+          allow(Participant).to receive_message_chain(:where,:first).with(user_id:reviewer.id, parent_id:assignment.id).with(no_args).and_return(reviewer)
+          allow(ReviewResponseMap).to receive(:where).with(reviewer_id:reviewer.id).and_return(quiz_response_map)
+          allow(Team).to receive(:find).with(stray_team.id).and_return(stray_team)
+          expect(StudentQuizzesController.take_quiz(assignment.id,reviewer.id)).to match_array([])
         end
       end
 
       context "when the reviewee team is associated with the assignment" do
+        
+        before(:each) do
+          allow(Participant).to receive_message_chain(:where,:first).with(user_id:reviewer.id, parent_id:assignment.id).with(no_args).and_return(reviewer)
+          allow(ReviewResponseMap).to receive(:where).with(reviewer_id:reviewer.id).and_return(quiz_response_map)
+          allow(Team).to receive(:find).with(submitter_team.id).and_return(submitter_team)
+          allow(QuizQuestionnaire).to receive_message_chain(:where,:first).with(instructor_id:submitter_team.id).with(no_args).and_return(quiz_questionnaire)
+          allow(QuizQuestionnaire).to receive(:taken_by?).and_return(reviewer)
+        end
+
         context "when the reviewee team has not created a quiz questionnaire" do
           it "skips the reviewee team and does not include its quiz questionnaire" do
             # test scenario
+            expect(QuizQuestionnaire).not_to receive(:where)
+            StudentQuizzesController.take_quiz(stray_assignment.id, reviewer_team.id)
           end
         end
 
@@ -241,12 +265,14 @@ describe StudentQuizzesController do
           context "when the quiz questionnaire has not been taken by the reviewer" do
             it "includes the quiz questionnaire in the result" do
               # test scenario
+              # expect(StudentQuizzesController.take_quiz(assignment.id, stray_team.id)).not_to match_array([])
             end
           end
 
           context "when the quiz questionnaire has been taken by the reviewer" do
             it "skips the quiz questionnaire and does not include it in the result" do
               # test scenario
+              expect(StudentQuizzesController.take_quiz(assignment.id, reviewer_team.id)).to match_array([])
             end
           end
         end

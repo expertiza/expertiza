@@ -5,14 +5,14 @@ class TrueFalse < QuizQuestion
     @html += '<tr><td>'
     @html += '<input type="radio" name="quiz_question_choices[' + id.to_s + '][TrueFalse][1][iscorrect]" '
     @html += 'id="quiz_question_choices_' + id.to_s + '_TrueFalse_1_iscorrect_True" value="True" '
-    @html += 'checked="checked" ' if quiz_question_choices[0].iscorrect
+    @html += 'checked="checked" ' if @quiz_question_choices[0].iscorrect
     @html += '/>True'
     @html += '</td></tr>'
 
     @html += '<tr><td>'
     @html += '<input type="radio" name="quiz_question_choices[' + id.to_s + '][TrueFalse][1][iscorrect]" '
     @html += 'id="quiz_question_choices_' + id.to_s + '_TrueFalse_1_iscorrect_True" value="False" '
-    @html += 'checked="checked" ' if quiz_question_choices[1].iscorrect
+    @html += 'checked="checked" ' if @quiz_question_choices[1].iscorrect
     @html += '/>False'
     @html += '</td></tr>'
 
@@ -25,7 +25,7 @@ class TrueFalse < QuizQuestion
     (0..1).each do |i|
       @html += '<input name = ' + "\"#{id}\" "
       @html += 'id = ' + "\"#{id}" + '_' + "#{i + 1}\" "
-      @html += 'value = ' + "\"#{quiz_question_choices[i].txt}\" "
+      @html += 'value = ' + "\"#{@quiz_question_choices[i].txt}\" "
       @html += 'type="radio"/>'
       @html += if i == 0
                 'True'
@@ -38,10 +38,10 @@ class TrueFalse < QuizQuestion
   end
 
   def view_completed_question(user_answer)
-    quiz_question_choices = QuizQuestionChoice.where(question_id: id)
+    @quiz_question_choices = QuizQuestionChoice.where(question_id: id)
     @html = ''
     @html += 'Correct Answer is: <b>'
-    @html += if quiz_question_choices[0].iscorrect
+    @html += if @quiz_question_choices[0].iscorrect
               'True</b><br/>'
             else
               'False</b><br/>'

@@ -10,17 +10,17 @@ class MultipleChoiceCheckbox < QuizQuestion
 
       @html += '<input type="checkbox" name="quiz_question_choices[' + id.to_s + '][MultipleChoiceCheckbox][' + (i + 1).to_s + '][iscorrect]" '
       @html += 'id="quiz_question_choices_' + id.to_s + '_MultipleChoiceCheckbox_' + (i + 1).to_s + '_iscorrect" value="1" '
-      @html += 'checked="checked" ' if quiz_question_choices[i].iscorrect
+      @html += 'checked="checked" ' if @quiz_question_choices[i].iscorrect
       @html += '/>'
 
       @html += '<input type="text" name="quiz_question_choices[' + id.to_s + '][MultipleChoiceCheckbox][' + (i + 1).to_s + '][txt]" '
       @html += 'id="quiz_question_choices_' + id.to_s + '_MultipleChoiceCheckbox_' + (i + 1).to_s + '_txt" '
-      @html += 'value="' + quiz_question_choices[i].txt + '" size="40" />'
+      @html += 'value="' + @quiz_question_choices[i].txt + '" size="40" />'
 
       @html += '</td></tr>'
     end
 
-    @html.@html_safe
+    @html.html_safe
     # safe_join(@html)
   end
 

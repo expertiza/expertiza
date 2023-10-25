@@ -71,8 +71,8 @@ class Invitation < ApplicationRecord
       # It is worth noting that while ultimately, both code paths do call Team#add_member
       # adding this code there would risk a recursive loop since MentorManagement
       # also calls Team#add_member to add a mentor to the team
-      new_team_id = TeamsUser.team_id(assignment_id, inviter_user_id)
-      MentorManagement.assign_mentor(assignment_id, new_team_id)
+      #new_team_id = TeamsUser.team_id(assignment_id, inviter_user_id)
+      #MentorManagement.assign_mentor(assignment_id, new_team_id)
 
       # invited_participant = Participant.where(user_id: invited_user_id, parent_id: assignment_id).first
       # inviter_participant = Participant.where(user_id: inviter_user_id, parent_id: assignment_id).first

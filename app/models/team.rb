@@ -92,9 +92,26 @@ class Team < ApplicationRecord
     can_add_member
   end
 
+#E2351 Added an additional to after add_member is called so that MentorManagement can be ran on the teams
+  def add_member_mentor_check(user, _assignment_id = nil)
+      add_member_return = add_member(user, _assignment_id)
+      if add_member_return
+        MentorManagement.assign_mentor(_assignment_id, id)
+      end
+      add_member_return
+  end
   # Define the size of the team
   def self.size(team_id)
-    TeamsUser.where(team_id: team_id).count
+    #TeamsUser.where(team_id: team_id).count
+    count = 0
+    members = TeamsUser.where(team_id: team_id)
+    members.each do |member|
+      member_name = member.name
+      unless member_name.include?(' (Mentor)') 
+        count = count + 1
+      end
+    end
+    count
   end
 
   # Copy method to copy this team
@@ -117,7 +134,7 @@ class Team < ApplicationRecord
   # Start by adding single members to teams that are one member too small.
   # Add two-member teams to teams that two members too small. etc.
   def self.randomize_all_by_parent(parent, team_type, min_team_size)
-    participants = Participant.where(parent_id: parent.id, type: parent.class.to_s + 'Participant')
+    participants = Participant.where(parent_id: parent.id, type: parent.class.to_s + 'Participant', duty: [nil, ''])
     participants = participants.sort { rand(-1..1) }
     users = participants.map { |p| User.find(p.user_id) }.to_a
     # find teams still need team members and users who are not in any team
@@ -148,7 +165,8 @@ class Team < ApplicationRecord
         break if next_team_member_index >= users.length
 
         user = users[next_team_member_index]
-        team.add_member(user, parent.id)
+#E2351 Swapped the add_memeber to use the new one
+        team.add_member_mentor_check(user, parent.id)
         next_team_member_index += 1
       end
     end
@@ -160,7 +178,8 @@ class Team < ApplicationRecord
       curr_team_size = Team.size(team.id)
       member_num_difference = min_team_size - curr_team_size
       while member_num_difference > 0
-        team.add_member(users.first, parent.id)
+#E2351 Swapped the add_memeber to use the new one
+        team.add_member_mentor_check(users.first, parent.id)
         users.delete(users.first)
         member_num_difference -= 1
         break if users.empty?

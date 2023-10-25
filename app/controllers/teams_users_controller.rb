@@ -54,7 +54,8 @@ class TeamsUsersController < ApplicationController
           flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
         else
           begin
-            add_member_return = team.add_member(user, team.parent_id)
+#E2351 Swapped the add_memeber to use the new one
+            add_member_return = team.add_member_mentor_check(user, team.parent_id)
           rescue
             flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
             redirect_back fallback_location: root_path
@@ -65,11 +66,11 @@ class TeamsUsersController < ApplicationController
           # Kick off the Mentor Management workflow
           # Note: this is _not_ supported for CourseTeams which is why the other
           # half of this if block does not include the same code
-          if add_member_return
-            user = TeamsUser.last
-            undo_link("The team @teams_user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
-            MentorManagement.assign_mentor(assignment.id, team.id)
-          end
+          #if add_member_return
+          #  user = TeamsUser.last
+          #  undo_link("The team @teams_user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
+          #  MentorManagement.assign_mentor(assignment.id, team.id)
+          #end
         end
       else # CourseTeam
         course = Course.find(team.parent_id)

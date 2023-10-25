@@ -6,16 +6,9 @@ class DueDate < ApplicationRecord
     DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
   end
 
+  # Method to find and return the next assignment due from the current time.
   def self.current_due_date(due_dates)
-    # Get the current due date from list of due dates
-    due_dates.each do |due_date|
-      if due_date.due_at > Time.now
-        current_due_date = due_date
-        return current_due_date
-      end
-    end
-    # in case current due date not found
-    nil
+    due_dates.find { |due_date| due_date.due_at > Time.now }
   end
 
   def self.teammate_review_allowed(student)
@@ -32,31 +25,36 @@ class DueDate < ApplicationRecord
     save
   end
 
+  # Validates if 'due_at' is a valid datetime, and raises an error if not.
   def due_at_is_valid_datetime
     if due_at.present?
-      errors.add(:due_at, 'must be a valid datetime') if (begin
-                                                            DateTime.strptime(due_at.to_s, '%Y-%m-%d %H:%M:%S')
-                                                          rescue StandardError
-                                                            ArgumentError
-                                                          end) == ArgumentError
+      begin
+        DateTime.parse(due_at.to_s)
+      rescue ArgumentError, StandardError
+        errors.add(:due_at, 'must be a valid datetime')
+      end
     end
   end
 
   def self.copy(old_assignment_id, new_assignment_id)
     duedates = where(parent_id: old_assignment_id)
-    duedates.each do |orig_due_date|
-      new_due_date = orig_due_date.dup
-      new_due_date.parent_id = new_assignment_id
-      new_due_date.save
+    ActiveRecord::Base.transactions do
+      duedates.each do |orig_due_date|
+        new_due_date = orig_due_date.dup
+        new_due_date.parent_id = new_assignment_id
+        new_due_date.save
+      end
     end
   end
 
   def self.set_duedate(duedate, deadline, assign_id, max_round)
-    submit_duedate = DueDate.new(duedate)
-    submit_duedate.deadline_type_id = deadline
-    submit_duedate.parent_id = assign_id
-    submit_duedate.round = max_round
-    submit_duedate.save
+    ActiveRecord::Base.transactions do
+      submit_duedate = DueDate.new(duedate)
+      submit_duedate.deadline_type_id = deadline
+      submit_duedate.parent_id = assign_id
+      submit_duedate.round = max_round
+      submit_duedate.save
+    end
   end
 
   def self.deadline_sort(due_dates)

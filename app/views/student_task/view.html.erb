@@ -51,6 +51,7 @@ to display the label "Your team" in the student assignment tasks-->
   <!--Your work-->
   <% if @authorization == 'participant' || @can_submit == true %>
     <li>
+      <% if @assignment.max_team_size <= 1 || @team %>
         <% if @topics.size > 0 %>
           <% if @topic_id && @assignment.submission_allowed(@topic_id) %>
             <%= link_to t(".your_work"), :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> <%=t ".submit_work" %>
@@ -65,6 +66,10 @@ to display the label "Your team" in the student assignment tasks-->
             <font color="gray"><%=t ".your_work" %></font> <%=t ".not_allowed" %>
           <% end %>
         <% end %>
+      <% else %>
+        <!-- Must be on a team to click "Your Work" -->
+        <font color="gray"><%=t ".your_work" %></font> <%=t ".not_allowed" %>
+      <% end%>
     </li>
   <% end %>
 

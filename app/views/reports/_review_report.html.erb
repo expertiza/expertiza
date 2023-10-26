@@ -37,6 +37,13 @@
 
   <button onclick="exportTableToCSV('review_scores.csv')">Export Review Scores To CSV File</button>
   <br />
+  <%= form_tag(teams_path, method: :get) do %>
+    <div class="field">
+      <%= label_tag :search, 'Search Team Name' %>
+      <%= text_field_tag :search, params[:search] %>
+    </div>
+    <%= submit_tag('Search') %>
+  <% end %>
   <br />
   <table id="myTable" class="table table-striped" width="100%" cellspacing='0' cellpadding='2' border='0'>
     <thead>

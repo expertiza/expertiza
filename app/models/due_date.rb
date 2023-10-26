@@ -34,11 +34,12 @@ class DueDate < ApplicationRecord
         errors.add(:due_at, 'must be a valid datetime')
       end
     end
+	nil
   end
 
   def self.copy(old_assignment_id, new_assignment_id)
     duedates = where(parent_id: old_assignment_id)
-    ActiveRecord::Base.transactions do
+    ActiveRecord::Base.transaction do
       duedates.each do |orig_due_date|
         new_due_date = orig_due_date.dup
         new_due_date.parent_id = new_assignment_id
@@ -48,7 +49,7 @@ class DueDate < ApplicationRecord
   end
 
   def self.set_duedate(duedate, deadline, assign_id, max_round)
-    ActiveRecord::Base.transactions do
+    ActiveRecord::Base.transaction do
       submit_duedate = DueDate.new(duedate)
       submit_duedate.deadline_type_id = deadline
       submit_duedate.parent_id = assign_id

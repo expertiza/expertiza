@@ -81,4 +81,13 @@ class SignedUpTeam < ApplicationRecord
       signed_up_teams.first.topic_id
     end
   end
+
+  def drop_signup_record(topic_id,team_id)
+    signup_record = SignedUpTeam.find_by(topic_id: topic_id, team_id: team_id)
+    signup_record.destroy unless signup_record.nil?
+  end
+
+  def drop_all_waitlists(team_id)
+    SignedUpTeam.where(team_id: team_id, is_waitlisted: true).destroy_all
+  end
 end

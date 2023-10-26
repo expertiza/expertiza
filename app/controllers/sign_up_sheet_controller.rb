@@ -512,6 +512,6 @@ class SignUpSheetController < ApplicationController
   end
 
   def delete_signup_for_topic(assignment_id, topic_id, user_id)
-    SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
+    SignUpTopic.new.reassign_topic(user_id, assignment_id, topic_id)
   end
 end

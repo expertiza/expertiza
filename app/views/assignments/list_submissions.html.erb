@@ -6,6 +6,25 @@
       sortList: [[0,0]] //E1877: sort First Column by default when page loads
     });
   });
+  function searchTeam() {
+      var input, filter, table, tr, td, i, txtValue;
+      input = document.getElementById("team-search");
+      filter = input.value.toLowerCase();
+      table = document.getElementById("submissionsTable"); // Your table's ID
+
+      tr = table.getElementsByTagName("tr");
+      for (i = 0; i < tr.length; i++) {
+          td = tr[i].getElementsByTagName("td")[0]; // Adjust the index to match the team name column
+          if (td) {
+              txtValue = td.textContent || td.innerText;
+              if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                  tr[i].style.display = "";
+              } else {
+                  tr[i].style.display = "none";
+              }
+          }
+      }
+  }
 </script>
 <% headers = {} %>
 <% headers["Topic_name"] = "16%" if @assignment.topics? %>
@@ -17,6 +36,9 @@
 <% end %>                              
 <% headers["Submitted item(s)"] = nil %>
 <!--E1877: table id changed -->
+<label for="team-search">Search Team Name:</label>
+<input type="text" id="team-search" placeholder="Enter team name">
+<button onclick="searchTeam()">Search</button>
 <table id ="submissionsTable" class="table table-striped" style="margin-top: 50px">
     <thead>
     <!--E1877: class="sorter-true" added to sort all attributes-->

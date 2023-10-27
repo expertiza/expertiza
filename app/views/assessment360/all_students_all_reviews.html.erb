@@ -1,9 +1,33 @@
+<script>
+    function searchTeam() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("student-search");
+        filter = input.value.toLowerCase();
+        table = document.getElementById("myTable"); // Your table's ID
+
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[0]; // Adjust the index to match the team name column
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+</script>
 <style>
   th, td {
     text-align: center;
 }
 </style>
-  <table class="table table-striped">
+<label for="student-search">Search Team Name:</label>
+<input type="text" id="student-search" placeholder="Enter student name">
+<button onclick="searchTeam()">Search</button>
+  <table id="myTable" class="table table-striped">
     <tr>
       <th rowspan=2 width="320">Students</th>
       <th rowspan=2 width="30">Teammate Count</th>

@@ -37,13 +37,9 @@
 
   <button onclick="exportTableToCSV('review_scores.csv')">Export Review Scores To CSV File</button>
   <br />
-  <%= form_tag :action => 'index' do %>
-    <div class="field">
-      <%= label_tag :search, 'Search Team Name' %>
-      <%= text_field_tag :search, params[:search] %>
-    </div>
-    <%= submit_tag('Search') %>
-  <% end %>
+  <label for="team-search">Search Team Name:</label>
+  <input type="text" id="team-search" placeholder="Enter team name">
+  <button onclick="searchTeam()">Search</button>
   <br />
   <table id="myTable" class="table table-striped" width="100%" cellspacing='0' cellpadding='2' border='0'>
     <thead>
@@ -66,7 +62,6 @@
 
     <!-- Set the review data and row span for each reviewer -->
     <% sort_reviewer_by_review_volume_desc.each_with_index do |reviewer, index| %>
-      <% @teams.each do |team| %>
       <% @response_maps, @rspan = get_data_for_review_report(@id, reviewer.id, @type) %>
       <tr>
         <% unless reviewer.id == 1 %>
@@ -116,7 +111,6 @@
                   </div>
                 </div>
               <% end %>
-            <% end %>
             <% end %>
           </td>
           <!--Render partial view corresponding to the overall score awarded to a team-->
@@ -201,6 +195,26 @@
 </script>
 
 <script>
+    function searchTeam() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("team-search");
+        filter = input.value.toLowerCase();
+        table = document.getElementById("myTable"); // Your table's ID
+
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[1]; // Adjust the index to match the team name column
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
 	function downloadCSV(csv, filename) {
 		var csvFile;
 		var downloadLink;

@@ -4,13 +4,7 @@ class ReportsController < ApplicationController
   autocomplete :user, :name
   helper :submitted_content
   include ReportFormatterHelper
-  def index
-    if params[:search]
-      @teams = Team.where('name LIKE ?', "%#{params[:search]}%")
-    else
-      @teams = Team.all
-    end
-  end
+
   # reports are allowed to be viewed by  only by TA, instructor and administrator
   def action_allowed?
     current_user_has_ta_privileges?

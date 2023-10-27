@@ -203,7 +203,7 @@
 
         tr = table.getElementsByTagName("tr");
         for (i = 0; i < tr.length; i++) {
-            td = tr[i].getElementsByTagName("td")[1]; // Adjust the index to match the team name column
+            td = tr[i].getElementsByTagName("td")[2]; // Adjust the index to match the team name column
             if (td) {
                 txtValue = td.textContent || td.innerText;
                 if (txtValue.toLowerCase().indexOf(filter) > -1) {

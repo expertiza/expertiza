@@ -199,14 +199,15 @@
         var input, filter, table, tr, td, i, txtValue;
         input = document.getElementById("team-search");
         filter = input.value.toLowerCase();
-        table = document.getElementById("myTable"); // Your table's ID
+        table = document.getElementById("myTable");
 
         tr = table.getElementsByTagName("tr");
         for (i = 0; i < tr.length; i++) {
-            td = tr[i].getElementsByTagName("td")[2]; // Adjust the index to match the team name column
+            td = tr[i].getElementsByTagName("td")[2]; // Adjust the index to match the "Team reviewed" column
             if (td) {
                 txtValue = td.textContent || td.innerText;
-                if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                var teamName = txtValue.toLowerCase();
+                if (teamName === filter) {
                     tr[i].style.display = "";
                 } else {
                     tr[i].style.display = "none";

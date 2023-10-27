@@ -54,7 +54,6 @@ class StudentQuizzesController < ApplicationController
       # Find the quiz quiz associated with the reviewee team's instructor
       quiz_questionnaire = QuizQuestionnaire.where(instructor_id: reviewee_team.id).first
 
-      # if the reviewee team has created quiz
       if quiz_questionnaire
         quizzes << quiz_questionnaire unless quiz_questionnaire.taken_by? reviewer
       end
@@ -63,11 +62,10 @@ class StudentQuizzesController < ApplicationController
     quizzes
   end
 
-  # the way 'answers' table store the results of quiz
   def calculate_score(map, response)
     quiz = Questionnaire.find(map.reviewed_object_id)
     scores = []
-    valid_flag = true # Flag to track if user responses are valid_flag
+    valid_flag = true # Flag to track if user responses are valid
     questions = Question.where(questionnaire_id: quiz.id) # Get all questions of the quiz
     questions.each do |question|
       score = 0

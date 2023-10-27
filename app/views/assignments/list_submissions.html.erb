@@ -6,25 +6,6 @@
       sortList: [[0,0]] //E1877: sort First Column by default when page loads
     });
   });
-  function searchTeam() {
-      var input, filter, table, tr, td, i, txtValue;
-      input = document.getElementById("team-search");
-      filter = input.value.toLowerCase();
-      table = document.getElementById("submissionsTable"); // Your table's ID
-
-      tr = table.getElementsByTagName("tr");
-      for (i = 0; i < tr.length; i++) {
-          td = tr[i].getElementsByTagName("td")[0]; // Adjust the index to match the team name column
-          if (td) {
-              txtValue = td.textContent || td.innerText;
-              if (txtValue.toLowerCase().indexOf(filter) > -1) {
-                  tr[i].style.display = "";
-              } else {
-                  tr[i].style.display = "none";
-              }
-          }
-      }
-  }
 </script>
 <% headers = {} %>
 <% headers["Topic_name"] = "16%" if @assignment.topics? %>
@@ -36,16 +17,10 @@
 <% end %>                              
 <% headers["Submitted item(s)"] = nil %>
 <!--E1877: table id changed -->
-<label for="team-search">Search Team Name:</label>
-<input type="text" id="team-search" placeholder="Enter team name">
 </br>
 </br>
-<input type="text" id="searchTopic" placeholder="Search Topic Name">
-<input type="text" id="searchTeamName" placeholder="Search Team Name">
-<input type="text" id="searchTeamMembers" placeholder="Search Team Members">
-<input type="text" id="searchPairProgramming" placeholder="Search Pair Programming">
-<input type="text" id="searchLinks" placeholder="Search Links">
-<button onclick="searchTeam()">Search</button>
+<input type="text" id="searchTeamName" placeholder="Search Topic Name">
+<input type="text" id="searchTeamMembers" placeholder="Search Team Name">
 <table id ="submissionsTable" class="table table-striped" style="margin-top: 50px">
     <thead>
     <!--E1877: class="sorter-true" added to sort all attributes-->
@@ -137,20 +112,11 @@
 </div>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("searchTopic").addEventListener("input", function () {
-            searchTable("searchTopic", 0);
-        });
         document.getElementById("searchTeamName").addEventListener("input", function () {
-            searchTable("searchTeamName", 1);
+            searchTable("searchTeamName", 0);
         });
         document.getElementById("searchTeamMembers").addEventListener("input", function () {
-            searchTable("searchTeamMembers", 2);
-        });
-        document.getElementById("searchPairProgramming").addEventListener("input", function () {
-            searchTable("searchPairProgramming", 3);
-        });
-        document.getElementById("searchLinks").addEventListener("input", function () {
-            searchTable("searchLinks", 4);
+            searchTable("searchTeamMembers", 1);
         });
 
         function searchTable(inputId, columnIndex) {

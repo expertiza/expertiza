@@ -25,6 +25,38 @@
           }
       }
   }
+      function searchTable() {
+      var inputTopic = document.getElementById("searchTopic").value.toLowerCase();
+      var inputTeamName = document.getElementById("searchTeamName").value.toLowerCase();
+      var inputTeamMembers = document.getElementById("searchTeamMembers").value.toLowerCase();
+      var inputPairProgramming = document.getElementById("searchPairProgramming").value.toLowerCase();
+      var inputLinks = document.getElementById("searchLinks").value.toLowerCase();
+
+      var table = document.getElementById("submissionsTable");
+      var rows = table.getElementsByTagName("tr");
+
+      for (var i = 1; i < rows.length; i++) {
+      var row = rows[i];
+      var topic = row.getElementsByClassName("topic")[0].textContent.toLowerCase();
+      var teamName = row.getElementsByClassName("team-name")[0].textContent.toLowerCase();
+      var teamMembers = row.getElementsByClassName("team-members")[0].textContent.toLowerCase();
+      var pairProgramming = row.getElementsByClassName("pair-programming")[0].textContent.toLowerCase();
+      var links = row.getElementsByClassName("links")[0].textContent.toLowerCase();
+
+      if (
+      topic.includes(inputTopic) &&
+      teamName.includes(inputTeamName) &&
+      teamMembers.includes(inputTeamMembers) &&
+      pairProgramming.includes(inputPairProgramming) &&
+      links.includes(inputLinks)
+      ) {
+      row.style.display = "";
+  } else {
+      row.style.display = "none";
+  }
+  }
+  }
+
 </script>
 <% headers = {} %>
 <% headers["Topic_name"] = "16%" if @assignment.topics? %>
@@ -60,7 +92,14 @@
         <% end %>  
         <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Links</th> 
         <th class="sorter-false" style="font-weight: bold; font-size: 15px;"></th>
-      </tr>                    
+      </tr>
+      <tr>
+        <input type="text" id="searchTopic" placeholder="Search Topic" onkeyup="searchTable()">
+        <input type="text" id="searchTeamName" placeholder="Search Team Name" onkeyup="searchTable()">
+        <input type="text" id="searchTeamMembers" placeholder="Search Team Members" onkeyup="searchTable()">
+        <input type="text" id="searchPairProgramming" placeholder="Search Pair Programming" onkeyup="searchTable()">
+        <input type="text" id="searchLinks" placeholder="Search Links" onkeyup="searchTable()">
+      </tr>
     </thead>
     <% @teams.each do |team| %>
       <tr>
@@ -68,13 +107,13 @@
 
         <!--Topic name-->
         <% if @assignment.topics? %>
-          <td><%= topic_identifier + '. ' + topic_name %></td>
+          <td class="topic"><%= topic_identifier + '. ' + topic_name %></td>
         <% end %>
 
         <!--Team name-->
         <% if @assignment.max_team_size >= 1 %>
           <% team_name_color = get_team_name_color_in_list_submission(team) %>
-          <td><p style = <%="color:#{team_name_color}"%>><%= team.name(session[:ip]) %></p>
+          <td class="team-name"><p style = <%="color:#{team_name_color}"%>><%= team.name(session[:ip]) %></p>
           <% unless participants.empty? %>
             <!-- “Assign Grade” will show if the final deadline of this assignment pass -->
             <% if @assignment.current_stage == "Finished" %>
@@ -87,7 +126,7 @@
         <% end %>
 
         <!--Team member(s) / Participant name-->
-          <td>
+        <td class="team-members">
               <% users_for_curr_team.each do |user| %>
                   <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
                   (<%= user.fullname(session[:ip])%>)<br>
@@ -96,13 +135,13 @@
 
         <!-- Pair Programming -->
           <% if pair_programming_enabled %>
-            <td>
+          <td class="pair-programming">
               <%= Team.find(team.id).pair_programming_request == 2 ? "Yes": "No" %>
             </td>
           <% end %>
 
         <!--Submitted item(s)-->
-        <td>
+        <td class="links">
         <!--Display submitted hyperlinks-->
           <% participant = participants.compact.first %>
           <% if participant && !team.hyperlinks.empty? %>

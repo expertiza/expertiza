@@ -174,28 +174,45 @@ class SignUpTopic < ApplicationRecord
   end
 
   def reassign_topic(session_user_id, assignment_id, topic_id)
-    # reassigns topic when a delete operation is called
+     # reassigns topic when a delete operation is called
 
-    # if team assignment find the creator id from teamusers table and teams
-    # ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
-    # users_team will contain the team id of the team to which the user belongs
-    users_team = SignedUpTeam.find_team_users(assignment_id, session_user_id)
-    signup_record = SignedUpTeam.where(topic_id: topic_id, team_id:  users_team[0].t_id).first
+      # if team assignment find the creator id from teamusers table and teams
+      # ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
+      # to treat all assignments as team assignments
+      # users_team will contain the team id of the team to which the user belongs
+      users_team = SignedUpTeam.find_team_users(assignment_id, session_user_id)
 
+      unless users_team.empty?
+        signup_record = SignedUpTeam.where(topic_id: topic_id, team_id:  users_team[0].t_id).first
+        # SignUpTeam instance
+        sign_up_team_object = SignedUpTeam.new
+        # if sinup records is a waitlisted
+        unless signup_record.try(:is_waitlisted)
+          # finds longest waiting team
+          longest_waiting_team_id  = longest_waiting_team(topic_id)
+          unless longest_waiting_team_id.nil?
+            # drops all waitlisted records
+            sign_up_team_object.drop_off_waitlists(longest_waiting_team_id)
+          end
+        end
+        # deletes the specific record
+        sign_up_team_object.drop_off_signup_record(topic_id, users_team[0].t_id)
+      end
+  end
+
+  def reassign_topic_when_team_deleted(topic_id,team_id)
+    signup_record = SignedUpTeam.where(topic_id: topic_id, team_id:  team_id).first
     # SignUpTeam instance
     sign_up_team_object = SignedUpTeam.new
-    # if sinup records is a waitlisted
-    unless signup_record.try(:is_waitlisted)
-      # finds longest waiting team
-      longest_waiting_team_id  = longest_waiting_team(topic_id)
-      unless longest_waiting_team_id.nil?
-        # drops all waitlisted records
-        sign_up_team_object.drop_all_waitlists(longest_waiting_team_id)
-      end
+    # if signup records is a waitlisted
+    # finds longest waiting team
+    longest_waiting_team_id  = longest_waiting_team(topic_id)
+    unless longest_waiting_team_id.nil?
+      # drops all waitlisted records
+      sign_up_team_object.drop_off_waitlists(longest_waiting_team_id)
     end
     # deletes the specific record
-    sign_up_team_object.drop_signup_record(topic_id, users_team[0].t_id)
+    sign_up_team_object.drop_off_signup_record(topic_id, team_id)
   end
 
 end

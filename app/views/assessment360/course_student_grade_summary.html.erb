@@ -27,7 +27,7 @@
         });
     });
 </script>
-
+<input type="text" id="searchInput" placeholder="Search for students...">
 <table class="table table-striped sortable">
   <thead>
     <tr>
@@ -63,3 +63,39 @@
       </tr>
   <% end %>
 </table>
+<script>
+    function searchTable() {
+        // Declare variables
+        var input, filter, table, tr, td, i, j, txtValue;
+        input = document.getElementById("searchInput");
+        filter = input.value.toUpperCase();
+        table = document.querySelector(".sortable"); // Assuming you have only one table with the "sortable" class
+
+        // Get all rows in the table
+        tr = table.getElementsByTagName("tr");
+
+        // Loop through all table rows, and hide those that don't match the search query
+        for (i = 0; i < tr.length; i++) {
+            var shouldShow = false;
+            td = tr[i].getElementsByTagName("td");
+            for (j = 0; j < td.length; j++) {
+                if (td[j]) {
+                    txtValue = td[j].textContent || td[j].innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        shouldShow = true;
+                        break;
+                    }
+                }
+            }
+            if (shouldShow) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+
+    // Add an event listener to the search input field
+    var searchInput = document.getElementById("searchInput");
+    searchInput.addEventListener("keyup", searchTable);
+</script>

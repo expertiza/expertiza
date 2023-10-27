@@ -1,3 +1,24 @@
+<script>
+    function searchTable(columnName) {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("search" + columnName);
+        filter = input.value.toUpperCase();
+        table = document.querySelector(".table");
+        tr = table.getElementsByTagName("tr");
+
+        for (i = 1; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[i - 1];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+</script>
 <h1>Manage users</h1>
 
 <br/>
@@ -16,7 +37,15 @@
 <div>
   <table class="table table-hover" style="width: 100%">
     <tr>
-      <th class="head">UserID</th><th class="head">Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Meta-review</th></tr>
+      <th class="head">UserID <input type="text" id="searchUserId" onkeyup="searchTable('UserId')" /></th>
+      <th class="head">Name <input type="text" id="searchName" onkeyup="searchTable('Name')" /></th>
+      <th class="head">Email Address <input type="text" id="searchEmail" onkeyup="searchTable('Email')" /></th>
+      <th class="head">Role <input type="text" id="searchRole" onkeyup="searchTable('Role')" /></th>
+      <th class="head">Parent <input type="text" id="searchParent" onkeyup="searchTable('Parent')" /></th>
+      <th class="head">Review <input type="text" id="searchReview" onkeyup="searchTable('Review')" /></th>
+      <th class="head">Submission <input type="text" id="searchSubmission" onkeyup="searchTable('Submission')" /></th>
+      <th class="head">Meta-review <input type="text" id="searchMetaReview" onkeyup="searchTable('MetaReview')" /></th>
+    </tr>
     <% for user in @paginated_users %>
       <% if (params[:show] != 'true' && !user.name(session[:ip]).include?("_hidden")) || params[:show] == 'true'%>
         <tr>

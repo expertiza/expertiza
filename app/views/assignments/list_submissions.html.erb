@@ -25,38 +25,6 @@
           }
       }
   }
-      function searchTable() {
-      var inputTopic = document.getElementById("searchTopic").value.toLowerCase();
-      var inputTeamName = document.getElementById("searchTeamName").value.toLowerCase();
-      var inputTeamMembers = document.getElementById("searchTeamMembers").value.toLowerCase();
-      var inputPairProgramming = document.getElementById("searchPairProgramming").value.toLowerCase();
-      var inputLinks = document.getElementById("searchLinks").value.toLowerCase();
-
-      var table = document.getElementById("submissionsTable");
-      var rows = table.getElementsByTagName("tr");
-
-      for (var i = 1; i < rows.length; i++) {
-      var row = rows[i];
-      var topic = row.getElementsByClassName("topic")[0].textContent.toLowerCase();
-      var teamName = row.getElementsByClassName("team-name")[0].textContent.toLowerCase();
-      var teamMembers = row.getElementsByClassName("team-members")[0].textContent.toLowerCase();
-      var pairProgramming = row.getElementsByClassName("pair-programming")[0].textContent.toLowerCase();
-      var links = row.getElementsByClassName("links")[0].textContent.toLowerCase();
-
-      if (
-      topic.includes(inputTopic) &&
-      teamName.includes(inputTeamName) &&
-      teamMembers.includes(inputTeamMembers) &&
-      pairProgramming.includes(inputPairProgramming) &&
-      links.includes(inputLinks)
-      ) {
-      row.style.display = "";
-  } else {
-      row.style.display = "none";
-  }
-  }
-  }
-
 </script>
 <% headers = {} %>
 <% headers["Topic_name"] = "16%" if @assignment.topics? %>
@@ -70,6 +38,13 @@
 <!--E1877: table id changed -->
 <label for="team-search">Search Team Name:</label>
 <input type="text" id="team-search" placeholder="Enter team name">
+</br>
+</br>
+<input type="text" id="searchTopic" placeholder="Search Topic Name">
+<input type="text" id="searchTeamName" placeholder="Search Team Name">
+<input type="text" id="searchTeamMembers" placeholder="Search Team Members">
+<input type="text" id="searchPairProgramming" placeholder="Search Pair Programming">
+<input type="text" id="searchLinks" placeholder="Search Links">
 <button onclick="searchTeam()">Search</button>
 <table id ="submissionsTable" class="table table-striped" style="margin-top: 50px">
     <thead>
@@ -93,13 +68,6 @@
         <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Links</th> 
         <th class="sorter-false" style="font-weight: bold; font-size: 15px;"></th>
       </tr>
-      <tr>
-        <input type="text" id="searchTopic" placeholder="Search Topic" onkeyup="searchTable()">
-        <input type="text" id="searchTeamName" placeholder="Search Team Name" onkeyup="searchTable()">
-        <input type="text" id="searchTeamMembers" placeholder="Search Team Members" onkeyup="searchTable()">
-        <input type="text" id="searchPairProgramming" placeholder="Search Pair Programming" onkeyup="searchTable()">
-        <input type="text" id="searchLinks" placeholder="Search Links" onkeyup="searchTable()">
-      </tr>
     </thead>
     <% @teams.each do |team| %>
       <tr>
@@ -107,13 +75,13 @@
 
         <!--Topic name-->
         <% if @assignment.topics? %>
-          <td class="topic"><%= topic_identifier + '. ' + topic_name %></td>
+          <td><%= topic_identifier + '. ' + topic_name %></td>
         <% end %>
 
         <!--Team name-->
         <% if @assignment.max_team_size >= 1 %>
           <% team_name_color = get_team_name_color_in_list_submission(team) %>
-          <td class="team-name"><p style = <%="color:#{team_name_color}"%>><%= team.name(session[:ip]) %></p>
+          <td><p style = <%="color:#{team_name_color}"%>><%= team.name(session[:ip]) %></p>
           <% unless participants.empty? %>
             <!-- “Assign Grade” will show if the final deadline of this assignment pass -->
             <% if @assignment.current_stage == "Finished" %>
@@ -126,7 +94,7 @@
         <% end %>
 
         <!--Team member(s) / Participant name-->
-        <td class="team-members">
+          <td>
               <% users_for_curr_team.each do |user| %>
                   <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
                   (<%= user.fullname(session[:ip])%>)<br>
@@ -135,13 +103,13 @@
 
         <!-- Pair Programming -->
           <% if pair_programming_enabled %>
-          <td class="pair-programming">
+            <td>
               <%= Team.find(team.id).pair_programming_request == 2 ? "Yes": "No" %>
             </td>
           <% end %>
 
         <!--Submitted item(s)-->
-        <td class="links">
+        <td>
         <!--Display submitted hyperlinks-->
           <% participant = participants.compact.first %>
           <% if participant && !team.hyperlinks.empty? %>
@@ -167,3 +135,42 @@
   </table>
   <p> **In "Team name" column, text in <i style = "color:#0984e3">blue</i> indicates that the submission grade is not assigned; text in <i style = "color: #cd6133">brown</i> indicates that the submission grade has been assigned.</p>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("searchTopic").addEventListener("input", function () {
+            searchTable("searchTopic", 0);
+        });
+        document.getElementById("searchTeamName").addEventListener("input", function () {
+            searchTable("searchTeamName", 1);
+        });
+        document.getElementById("searchTeamMembers").addEventListener("input", function () {
+            searchTable("searchTeamMembers", 2);
+        });
+        document.getElementById("searchPairProgramming").addEventListener("input", function () {
+            searchTable("searchPairProgramming", 3);
+        });
+        document.getElementById("searchLinks").addEventListener("input", function () {
+            searchTable("searchLinks", 4);
+        });
+
+        function searchTable(inputId, columnIndex) {
+            var input = document.getElementById(inputId);
+            var filter = input.value.toUpperCase();
+            var table = document.getElementById("submissionsTable");
+            var rows = table.getElementsByTagName("tr");
+
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                var cells = row.getElementsByTagName("td")[columnIndex];
+                if (cells) {
+                    var textValue = cells.textContent || cells.innerText;
+                    if (textValue.toUpperCase().includes(filter)) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                }
+            }
+        }
+    });
+</script>

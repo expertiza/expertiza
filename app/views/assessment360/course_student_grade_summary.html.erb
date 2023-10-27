@@ -75,7 +75,7 @@
         tr = table.getElementsByTagName("tr");
 
         // Loop through all table rows, and hide those that don't match the search query
-        for (i = 0; i < tr.length; i++) {
+        for (i = 2; i < tr.length; i++) {
             var shouldShow = false;
             td = tr[i].getElementsByTagName("td");
             for (j = 0; j < td.length; j++) {

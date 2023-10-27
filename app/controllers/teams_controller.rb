@@ -107,15 +107,26 @@ class TeamsController < ApplicationController
       @signed_up_team = SignedUpTeam.where(team_id: @team.id)
       @teams_users = TeamsUser.where(team_id: @team.id)
 
-      if @signed_up_team == 1 && !@signUps.first.is_waitlisted # if a topic is assigned to this team
-        # if there is another team in waitlist, assign this topic to the new team
-        topic_id = @signed_up_team.first.topic_id
-        next_wait_listed_team = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
-        # Save the topic's new assigned team and delete all waitlists for this team
-        SignUpTopic.assign_to_first_waiting_team(next_wait_listed_team) if next_wait_listed_team
+      unless @signed_up_team.nil?
+        if @signed_up_team.count == 1 && !@signed_up_team.first.is_waitlisted # if a topic is assigned to this team
+          assignment = Assignment.find(@team.parent_id)
+          user = TeamsUser.find_by(team_id: @team.id).user
+          participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
+          SignUpTopic.new.reassign_topic_when_team_deleted(@signed_up_team.first.topic_id,@signed_up_team.first.team_id)
+
+          # # if there is another team in waitlist, assign this topic to the new team
+          # topic_id = @signed_up_team.first.topic_id
+          # next_wait_listed_team = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
+          # # Save the topic's new assigned team and delete all waitlists for this team
+          # SignUpTopic.assign_to_first_waiting_team(next_wait_listed_team) if next_wait_listed_team
+        else
+          SignedUpTeam.new.drop_off_waitlists(params[:id])
+        end
       end
 
-      @sign_up_team.destroy_all if @sign_up_team
+
+
+     # @sign_up_team.destroy_all if @sign_up_team
       @teams_users.destroy_all if @teams_users
       @team.destroy if @team
       undo_link("The team \"#{@team.name}\" has been successfully deleted.")

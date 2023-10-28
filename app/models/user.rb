@@ -43,7 +43,7 @@ class User < ApplicationRecord
     object_type.where(['instructor_id = ?', user_id])
   end
 
-  def get_available_users(name)
+  def get_visible_users_with_lesser_roles(name)
     lesser_roles = role.get_parents
     all_users = User.all(conditions: ['name LIKE ?', "#{name}%"], limit: 20) # higher limit, since we're filtering
     visible_users = all_users.select { |user| lesser_roles.include? user.role }

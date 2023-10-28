@@ -178,8 +178,6 @@ class UsersController < ApplicationController
   def destroy
     begin
       @user = User.find(params[:id])
-      AssignmentParticipant.where(user_id: @user.id).each(&:delete)
-      TeamsUser.where(user_id: @user.id).each(&:delete)
       AssignmentQuestionnaire.where(user_id: @user.id).each(&:destroy)
       # Participant.delete(true)
       @user.destroy

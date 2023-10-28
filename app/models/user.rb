@@ -39,10 +39,6 @@ class User < ApplicationRecord
 
   has_paper_trail
 
-  def salt_first?
-    true
-  end
-
   def list_mine(object_type, user_id)
     object_type.where(['instructor_id = ?', user_id])
   end

@@ -460,8 +460,9 @@ class ReviewMappingController < ApplicationController
     automatic_review_mapping_strategy(assignment_id, participants, teams_with_uncalibrated_artifacts, uncalibrated_artifacts_num, 0)
   end
 
-  # ERROR IN THIS FUNCTION
+  # ERROR IN THIS FUNCTION - no tests written
   def assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
+    puts "ID:" +  assignment_id.to_s
     if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0)
                         .where('created_at > :time',
                                time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
@@ -497,10 +498,11 @@ class ReviewMappingController < ApplicationController
         end
       end
     end
-    # wont work if no participants assigned - configure an error message for the same and have a check
+    # wont work if no participants assigned - configure an error message for the same and have a check - added null safety
+    # idea hide the button if no participants available
     @@time_create_last_review_mapping_record = ReviewResponseMap
                                                .where(reviewed_object_id: assignment_id)
-                                               .last.created_at
+                                               .last&.created_at
   end
 
   def peer_review_strategy(assignment_id, review_strategy, participants_hash)

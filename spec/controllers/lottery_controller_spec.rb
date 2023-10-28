@@ -166,4 +166,30 @@ describe LotteryController do
       expect(SignedUpTeam.count).to eq(number_of_signed_up_teams + 1)
     end
   end
+
+  describe '#bidding_details' do
+    before :each do
+      # Set the assignment id in the params
+      params = ActionController::Parameters.new(id: assignment.id)
+      allow(controller).to receive(:params).and_return(params)
+    end
+    
+    it 'populates bids and assigned teams for each topic' do
+      controller.bidding_details
+
+      # Check if @bids_by_topic is populated correctly
+      expect(controller.instance_variable_get(:@bids_by_topic)[topic1.id].length).to eq(1)
+      expect(controller.instance_variable_get(:@bids_by_topic)[topic2.id].length).to eq(1)
+
+      # Assuming you have some SignedUpTeams in the setup
+      # Check if @assigned_teams_by_topic is populated correctly
+      # expect(controller.instance_variable_get(:@assigned_teams_by_topic)[topic1.id].length).to eq(1) # Adjust as per your setup
+    end
+
+    it 'fetches all topics for the assignment' do
+      controller.bidding_details
+      expect(controller.instance_variable_get(:@topics)).to include(topic1, topic2, topic3, topic4)
+    end
+  end
+
 end

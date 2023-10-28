@@ -24,6 +24,7 @@ class ReviewMappingController < ApplicationController
     end
   end
 
+  # Map the review from an individual or team to a team's assignment if it doesnt exist.
   def add_calibration
     participant = begin
                     AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first
@@ -53,7 +54,7 @@ class ReviewMappingController < ApplicationController
 
   def add_reviewer
     assignment = Assignment.find(params[:id])
-    topic_id = params[:topic_id]
+    topic_id = params[:topic_id] # An assignment can have several topics
     user_id = User.where(name: params[:user][:name]).first.id
     # If instructor want to assign one student to review his/her own artifact,
     # it should be counted as "self-review" and we need to make /app/views/submitted_content/_selfreview.html.erb work.
@@ -332,54 +333,32 @@ class ReviewMappingController < ApplicationController
     @items.sort_by(&:name)
   end
 
+  # Assign reviews to submissions based on automatic_review_mapping_strategy
   def automatic_review_mapping
     assignment_id = params[:id].to_i
-    participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.select(&:can_review).shuffle!
-    teams = AssignmentTeam.where(parent_id: params[:id].to_i).to_a.shuffle!
-    max_team_size = Integer(params[:max_team_size]) # Assignment.find(assignment_id).max_team_size
-    # Create teams if its an individual assignment.
+    participants = AssignmentParticipant.where(parent_id: assignment_id).to_a.select(&:can_review).shuffle!
+    teams = AssignmentTeam.where(parent_id: assignment_id).to_a.shuffle!
+    max_team_size = Integer(params[:max_team_size])
+    student_review_num = params[:num_reviews_per_student].to_i
+    submission_review_num = params[:num_reviews_per_submission].to_i
+    calibrated_artifacts_num = params[:num_calibrated_artifacts].to_i
+    uncalibrated_artifacts_num = params[:num_uncalibrated_artifacts].to_i
+    # Create teams if its an individual assignment
     if teams.empty? && max_team_size == 1
       participants.each do |participant|
         user = participant.user
         next if TeamsUser.team_id(assignment_id, user.id)
-
         team = AssignmentTeam.create_team_and_node(assignment_id)
         ApplicationController.helpers.create_team_users(user, team.id)
         teams << team
       end
     end
-    student_review_num = params[:num_reviews_per_student].to_i
-    submission_review_num = params[:num_reviews_per_submission].to_i
-    calibrated_artifacts_num = params[:num_calibrated_artifacts].to_i
-    uncalibrated_artifacts_num = params[:num_uncalibrated_artifacts].to_i
     if calibrated_artifacts_num.zero? && uncalibrated_artifacts_num.zero?
-      # check for exit paths first
-      if student_review_num.zero? && submission_review_num.zero?
-        flash[:error] = 'Please choose either the number of reviews per student or the number of reviewers per team (student).'
-      elsif !student_review_num.zero? && !submission_review_num.zero?
-        flash[:error] = 'Please choose either the number of reviews per student or the number of reviewers per team (student), not both.'
-      elsif student_review_num >= teams.size
-        # Exception detection: If instructor want to assign too many reviews done
-        # by each student, there will be an error msg.
-        flash[:error] = 'You cannot set the number of reviews done ' \
-                         'by each student to be greater than or equal to total number of teams ' \
-                         '[or "participants" if it is an individual assignment].'
-      else
-        # REVIEW: mapping strategy
-        automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num)
-      end
+      handle_review_assignment(student_review_num, submission_review_num, teams)
     else
-      teams_with_calibrated_artifacts = []
-      ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 1).each do |response_map|
-        teams_with_calibrated_artifacts << AssignmentTeam.find(response_map.reviewee_id)
-      end
-      teams_with_uncalibrated_artifacts = teams - teams_with_calibrated_artifacts
-      # REVIEW: mapping strategy
-      automatic_review_mapping_strategy(assignment_id, participants, teams_with_calibrated_artifacts.shuffle!, calibrated_artifacts_num, 0)
-      # REVIEW: mapping strategy
-      # since after first mapping, participants (delete_at) will be nil
-      participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.select(&:can_review).shuffle!
-      automatic_review_mapping_strategy(assignment_id, participants, teams_with_uncalibrated_artifacts.shuffle!, uncalibrated_artifacts_num, 0)
+      teams_with_calibrated_artifacts, teams_with_uncalibrated_artifacts = divide_teams(assignment_id, teams)
+      assign_reviews_to_calibrated_artifacts(assignment_id, teams_with_calibrated_artifacts, calibrated_artifacts_num)
+      assign_reviews_to_uncalibrated_artifacts(assignment_id, participants, teams_with_uncalibrated_artifacts, uncalibrated_artifacts_num)
     end
     redirect_to action: 'list_mappings', id: assignment_id
   end
@@ -453,7 +432,37 @@ class ReviewMappingController < ApplicationController
 
   private
 
+  def handle_review_assignment(student_review_num, submission_review_num, teams)
+    if student_review_num.zero? && submission_review_num.zero?
+      flash[:error] = 'Please choose either the number of reviews per student or the number of reviewers per team (student).'
+    elsif !student_review_num.zero? && !submission_review_num.zero?
+      flash[:error] = 'Please choose either the number of reviews per student or the number of reviewers per team (student), not both.'
+    elsif student_review_num >= teams.size
+      flash[:error] = 'You cannot set the number of reviews done ' \
+        'by each student to be greater than or equal to total number of teams ' \
+        '[or "participants" if it is an individual assignment].'
+    else
+      automatic_review_mapping_strategy(params[:id].to_i, AssignmentParticipant.where(parent_id: params[:id].to_i).select(&:can_review).shuffle, teams, student_review_num, submission_review_num)
+    end
+  end
+
+  def divide_teams(assignment_id, teams)
+    teams_with_calibrated_artifacts = ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 1).map { |response_map| AssignmentTeam.find(response_map.reviewee_id) }
+    teams_with_uncalibrated_artifacts = teams - teams_with_calibrated_artifacts
+    [teams_with_calibrated_artifacts.shuffle, teams_with_uncalibrated_artifacts.shuffle]
+  end
+
+  def assign_reviews_to_calibrated_artifacts(assignment_id, teams_with_calibrated_artifacts, calibrated_artifacts_num)
+    automatic_review_mapping_strategy(assignment_id, AssignmentParticipant.where(parent_id: params[:id].to_i).select(&:can_review).shuffle, teams_with_calibrated_artifacts, calibrated_artifacts_num, 0)
+  end
+
+  def assign_reviews_to_uncalibrated_artifacts(assignment_id, participants, teams_with_uncalibrated_artifacts, uncalibrated_artifacts_num)
+    automatic_review_mapping_strategy(assignment_id, participants, teams_with_uncalibrated_artifacts, uncalibrated_artifacts_num, 0)
+  end
+
+  # ERROR IN THIS FUNCTION - no tests written
   def assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
+    puts "ID:" +  assignment_id.to_s
     if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0)
                         .where('created_at > :time',
                                time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
@@ -489,9 +498,11 @@ class ReviewMappingController < ApplicationController
         end
       end
     end
+    # wont work if no participants assigned - configure an error message for the same and have a check - added null safety
+    # idea hide the button if no participants available
     @@time_create_last_review_mapping_record = ReviewResponseMap
                                                .where(reviewed_object_id: assignment_id)
-                                               .last.created_at
+                                               .last&.created_at
   end
 
   def peer_review_strategy(assignment_id, review_strategy, participants_hash)

@@ -77,12 +77,6 @@ describe User do
     end
   end
 
-  describe '#salt_first?' do
-    it 'will always return true' do
-      expect(user.salt_first?).to be true
-    end
-  end
-
   describe '#get_visible_users_with_lesser_roles' do
     before(:each) do
       role = Role.new

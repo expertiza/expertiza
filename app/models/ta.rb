@@ -80,7 +80,6 @@ end
     TaMapping.where(ta_id: user_id).map { |map| map.course.instructor.id }
   end
   
-
   # Returns all course IDs for courses that this TA helps teach.
   def self.get_mapped_courses(user_id)
     TaMapping.where(ta_id: user_id).map { |map| map.course.id }
@@ -106,32 +105,8 @@ end
     true
   end
   
-  # Returns a list of users who have the same or lower privilege level as the given user and are participants in the courses that the user is a TA for.
-  def self.get_user_list(user)
-    # Get the IDs of the courses that the user is a TA for.
-    courses = Ta.get_mapped_courses(user.id)
-    participants = []
-    user_list = []
-
-    # For each course, get the participants and add them to the participants array.
-    courses.each do |course_id|
-      course = Course.find(course_id)
-      participants << course.get_participants
-    end
-
-    # For each participant, if they have the same or lower privilege level as the user, add them to the user list.
-    participants.each do |p_s|
-      next if p_s.empty?
-
-      p_s.each do |p|
-        user_list << p.user if user.role.has_all_privileges_of?(p.user.role)
-      end
-    end
-
-    # Return the list of users.
-    user_list
-  end
-
+  # Returns a list of users who have the same or lower privilege level as the given user
+  # and are participants in the courses that the user is a TA for.
   def self.get_user_list(user)
     # Get the roles associated with the user
     user_roles = user.role

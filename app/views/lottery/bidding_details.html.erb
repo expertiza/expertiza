@@ -1,5 +1,12 @@
 <h3>Bidding Details for <%= @assignment.name %></h3>
 
+<style>
+.assigned-team {
+  background-color: yellow; 
+  color: black;             
+}
+</style>
+
 <table class="table table-bordered table-hover">
   <thead>
     <tr>
@@ -16,7 +23,11 @@
         <td><%= topic.topic_name %></td>
         <td>
           <% @bids_by_topic[topic.id].each do |bid_info| %>
-            <%= bid_info[:team].name %> (#<%= bid_info[:priority] %>)
+            <% team = bid_info[:team] %>
+            <% assigned_team = @assigned_teams_by_topic[topic.id].include?(team) %>
+            <span class="<%= assigned_team ? 'assigned-team' : '' %>">
+              <%= team.name %> (#<%= bid_info[:priority] %>)
+            </span>
           <% end %>
         </td>
         <td>

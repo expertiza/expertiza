@@ -52,6 +52,7 @@ class User < ApplicationRecord
   end
 
   def recursively_parent_of(user)
+    # Takes a user object and returns true if the current user is the parent or a recursively higher-level parent of the provided user.
     p = user.parent
     return false if p.nil?
     return true if p == self
@@ -61,6 +62,11 @@ class User < ApplicationRecord
   end
 
   def get_user_list
+    # Returns a list of all users visible to the current user depending on the user's role.
+    # If the user is a super admin, all users are returned. If the user is an instructor,
+    # all users in their course/assignment are returned.
+    # If the user is a TA, all users in their courses are returned.
+    # Otherwise, all children of the current user are returned.
     user_list = []
     # If the user is a super admin, fetch all users
     user_list = SuperAdministrator.get_user_list if role.super_admin?
@@ -101,11 +107,11 @@ class User < ApplicationRecord
   end
 
   def name(ip_address = nil)
-    User.anonymized_view?(ip_address) ? role.name + ' ' + id.to_s : self[:name]
+    User.anonymized_view?(ip_address) ? "#{role.name} #{id.to_s}" : self[:name]
   end
 
   def fullname(ip_address = nil)
-    User.anonymized_view?(ip_address) ? role.name + ', ' + id.to_s : self[:fullname]
+    User.anonymized_view?(ip_address) ? "#{role.name}, #{id.to_s}" : self[:fullname]
   end
 
   def first_name(ip_address = nil)
@@ -113,7 +119,7 @@ class User < ApplicationRecord
   end
 
   def email(ip_address = nil)
-    User.anonymized_view?(ip_address) ? role.name + '_' + id.to_s + '@mailinator.com' : self[:email]
+    User.anonymized_view?(ip_address) ? "#{role.name}_#{id.to_s}@mailinator.com" : self[:email]
   end
 
   def super_admin?
@@ -190,6 +196,7 @@ class User < ApplicationRecord
   end
 
   def set_instructor(new_assignment)
+    # Takes an assignment object and sets the instructor ID to the current user's ID.
     new_assignment.instructor_id = id
   end
 
@@ -303,10 +310,10 @@ class User < ApplicationRecord
     key_word = { '1' => 'name', '2' => 'fullname', '3' => 'email' }
     sql = "(role_id in (?) or id = ?) and #{key_word[search_by]} like ?"
     if key_word.include? search_by
-      search_filter = '%' + letter + '%'
+      search_filter =  "%#{letter}%"
       users = User.order('name').where(sql, role.get_available_roles, user_id, search_filter)
     else # default used when clicking on letters
-      search_filter = letter + '%'
+      search_filter =  "%#{letter}%"
       users = User.order('name').where('(role_id in (?) or id = ?) and name like ?', role.get_available_roles, user_id, search_filter)
     end
     users

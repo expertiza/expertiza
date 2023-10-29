@@ -45,16 +45,17 @@ describe Ta do
     result = ta.list_mine(Assignment, 6)
     expect(result).to eq([assignment])
   end
-    context 'when the object is not an assignment' do
-      it 'finds associated courses with TA' do
-        expected_query = { instructor_id: 6 }
-      
-        allow(Course).to receive(:where).with(expected_query).and_return([course1, course2])
-      
-        result = ta.list_mine(Course, 6)
-        expect(result).to eq([course1, course2])
-      end
+  context 'when the object is not an assignment' do
+    it 'finds associated courses with TA' do
+      expected_query = { instructor_id: 6 }
+  
+      allow(Course).to receive(:where).with(expected_query).and_return([course1, course2])
+  
+      result = ta.list_mine(Course, 6)
+      expect(result).to eq([course1, course2])
     end
+  end
+  
   end
   describe '#get' do
     it 'returns all objects of a given type associated with a user' do

@@ -59,11 +59,12 @@ class LotteryController < ApplicationController
       @bids_by_topic[topic.id] = Bid.where(topic_id: topic.id).map do |bid|
         { team: bid.team, priority: bid.priority }
       end
+
       @bids[topic.id] = Bid.find_by(topic_id: topic.id)
       bid = @bids[topic.id]
       # Fetch teams that are not waitlisted for this topic
       @assigned_teams_by_topic[topic.id] = SignedUpTeam.where(topic_id: topic.id, is_waitlisted: false).map(&:team)
-
+      puts @assigned_teams_by_topic
       @count1[topic.id] += 1 if @bids[topic.id].priority == 1
       @count2[topic.id] += 1 if @bids[topic.id].priority == 2
       @count3[topic.id] += 1 if @bids[topic.id].priority == 3        

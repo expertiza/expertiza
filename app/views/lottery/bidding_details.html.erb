@@ -20,15 +20,6 @@
           <% end %>
         </td>
         <td>
-          <% if @assigned_teams_by_topic[topic.id].any? %>
-            <% @assigned_teams_by_topic[topic.id].each do |assigned_team| %>
-              <%= assigned_team.name %>
-            <% end %>
-          <% else %>
-            No team assigned
-          <% end %>
-        </td> 
-        <td>
           <% if @count1[topic.id] != 0%>
             <%= @count1[topic.id] %>
           <%else%>

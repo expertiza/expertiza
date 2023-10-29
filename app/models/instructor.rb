@@ -24,15 +24,23 @@ class Instructor < User
     object_type.find_by('id = ? AND (instructor_id = ? OR private = 0)', id, user_id)
   end
 
+  # This method retrieves a list of teaching assistant (TA) IDs associated with the courses instructed by a given user.
   def my_tas
+    # Get all courses where the user is an instructor.
     courses = Course.where(instructor_id: id)
+  
+    # Initialize an array to store the TA IDs.
     ta_ids = courses.flat_map do |course|
+      # For each course, get the TA mappings (i.e., associations between TAs and the course).
       ta_mappings = TaMapping.where(course_id: course.id)
+      
+      # Use 'map' to transform each TA mapping into its TA ID.
       ta_mappings.map(&:ta_id)
     end
+  
+    # Return the list of TA IDs.
     ta_ids
   end
-  
 
   # This method retrieves a list of users who are participants in the courses and assignments where the given user is an instructor.
   def self.get_user_list(user)

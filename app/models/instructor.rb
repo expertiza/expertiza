@@ -11,16 +11,20 @@ class Instructor < User
   ASSIGNMENT = [['My assignments', 'list_mine'],
                 ['All public assignments', 'list_all']].freeze
 
+  # This method retrieves all instances of a given type (object_type) where the user (specified by user_id)
+  # is the instructor or the instance is not private.
   def list_all(object_type, user_id)
     object_type.where('instructor_id = ? OR private = 0', user_id)
   end
 
+  # This method retrieves all instances of a given type (object_type) where the user (specified by user_id) is the instructor.
   def list_mine(object_type, user_id)
     object_type.where('instructor_id = ?', user_id)
   end
 
+  # This method retrieves a specific instance of a given type (object_type) by its ID,
+  # where the user (specified by user_id) is the instructor or the instance is not private.
   def get(object_type, id, user_id)
-    # object_type.where("id = ? AND (instructor_id = ? OR private = 0)", id, user_id).first
     object_type.find_by('id = ? AND (instructor_id = ? OR private = 0)', id, user_id)
   end
 

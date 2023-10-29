@@ -75,15 +75,14 @@ class ImpersonateController < ApplicationController
   # warn_for_special_chars takes the output from above method and flashes an error if there are any special characters(/\?<>|&$#) in the string
 
   def check_if_input_is_valid
-    if params[:user] || params[:impersonate]
-      user_name = params[:user] ? params[:user][:name] : params[:impersonate][:name]
-      
-      if warn_for_special_chars(user_name, 'Username')
-        flash[:error] = 'Please enter a valid username'
-        redirect_back fallback_location: root_path
-      end
+    user_name = params.dig(:user, :name) || params.dig(:impersonate, :name)
+    return unless user_name
+
+    if warn_for_special_chars(user_name, 'Username')
+      flash[:error] = 'Please enter a valid username'
+      redirect_back fallback_location: root_path
     end
-  end  
+  end
 
   # Checking if the username provided can be impersonated or not
   # If the user is in anonymized view,then fetch the real user else fetch the user using params

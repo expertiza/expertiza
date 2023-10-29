@@ -528,27 +528,8 @@ class ReviewMappingController < ApplicationController
           break if selected_participants.size == participants.size - num_participants_this_team
 
           # generate random number
-          if iterator.zero?
-            rand_num = rand(0..num_participants - 1)
-          else
-            min_value = participants_hash.values.min
-            # get the temp array including indices of participants, each participant has minimum review number in hash table.
-            participants_with_min_assigned_reviews = []
-            participants.each do |participant|
-              participants_with_min_assigned_reviews << participants.index(participant) if participants_hash[participant.id] == min_value
-            end
-            # if participants_with_min_assigned_reviews is blank
-            if_condition_1 = participants_with_min_assigned_reviews.empty?
-            # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
-            if_condition_2 = ((participants_with_min_assigned_reviews.size == 1) && TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
-            rand_num = if if_condition_1 || if_condition_2
-                         # use original method to get random number
-                         rand(0..num_participants - 1)
-                       else
-                         # rand_num should be the position of this participant in original array
-                         participants_with_min_assigned_reviews[rand(0..participants_with_min_assigned_reviews.size - 1)]
-                       end
-          end
+          rand_num = generate_participant_rand_num(participants,participants_hash,num_participants,iterator)
+
           # prohibit one student to review his/her own artifact
           next if TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
 
@@ -587,6 +568,32 @@ class ReviewMappingController < ApplicationController
         flash[:error] = 'Automatic assignment of reviewer failed.'
       end
     end
+  end
+
+  def generate_participant_rand_num(participants, participants_hash, num_participants, iterator)
+    # generate random number
+    if iterator.zero?
+      rand_num = rand(0..num_participants - 1)
+    else
+      min_value = participants_hash.values.min
+      # get the temp array including indices of participants, each participant has minimum review number in hash table.
+      participants_with_min_assigned_reviews = []
+      participants.each do |participant|
+        participants_with_min_assigned_reviews << participants.index(participant) if participants_hash[participant.id] == min_value
+      end
+      # if participants_with_min_assigned_reviews is blank
+      if_condition_1 = participants_with_min_assigned_reviews.empty?
+      # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
+      if_condition_2 = ((participants_with_min_assigned_reviews.size == 1) && TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
+      rand_num = if if_condition_1 || if_condition_2
+                   # use original method to get random number
+                   rand(0..num_participants - 1)
+                 else
+                   # rand_num should be the position of this participant in original array
+                   participants_with_min_assigned_reviews[rand(0..participants_with_min_assigned_reviews.size - 1)]
+                 end
+    end
+    rand_num
   end
 
   def review_mapping_params

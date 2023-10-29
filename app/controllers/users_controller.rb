@@ -157,7 +157,7 @@ class UsersController < ApplicationController
   def edit
     @user = User.find(params[:id])
     role
-    foreign
+    available_roles
   end
 
   def update

@@ -154,7 +154,7 @@ class SignUpSheetController < ApplicationController
     # to treat all assignments as team assignments
     # Though called participants, @participants are actually records in signed_up_teams table, which
     # is a mapping table between teams and topics (waitlisted recorded are also counted)
-    #refactoring participants variable to team
+    #refactoring participants variable to team for readability
     @team = SignedUpTeam.find_team_participants(assignment_id, session[:ip])
   end
 

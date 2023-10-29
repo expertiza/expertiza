@@ -99,7 +99,7 @@ describe 'criterion' do
   describe '#advices_criterion_question' do
     it 'returns the html' do
       html = criterion.advices_criterion_question(1, []).to_s
-      expect(html).to eq('<a id="showAdvice_1" onclick="showAdvice(1)">Show advice</a><script>function showAdvice(i){var element = document.getElementById("showAdivce_" + i.toString());var show = element.innerHTML == "Hide advice";if (show){element.innerHTML="Show advice";} else{element.innerHTML="Hide advice";}toggleAdvice(i);}function toggleAdvice(i) {var elem = document.getElementById(i.toString() + "_myDiv");if (elem.style.display == "none") {elem.style.display = "";} else {elem.style.display = "none";}}</script><div id="1_myDiv" style="display: none;"></div>')
+      expect(html).to eq('<a id="showAdvice_1" onclick="showAdvice(1)">Show advice</a><script>function showAdvice(i){var element = document.getElementById("showAdvice_" + i.toString());var show = element.innerHTML == "Hide advice";if (show){element.innerHTML="Show advice";} else{element.innerHTML="Hide advice";}toggleAdvice(i);}function toggleAdvice(i) {var elem = document.getElementById(i.toString() + "_myDiv");if (elem.style.display == "none") {elem.style.display = "";} else {elem.style.display = "none";}}</script><div id="1_myDiv" style="display: none;"></div>')
     end
   end
 end

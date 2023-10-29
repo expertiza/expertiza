@@ -119,7 +119,7 @@ class UsersController < ApplicationController
   def new
     @user = User.new
     @rolename = Role.find_by(name: params[:role])
-    get_available_roles
+    available_roles
   end
 
   def create
@@ -146,7 +146,7 @@ class UsersController < ApplicationController
       undo_link("The user \"#{@user.name}\" has been successfully created. ")
       redirect_to action: 'list'
     else
-      get_available_roles
+      available_roles
       error_message = ''
       @user.errors.each { |_field, error| error_message << error }
       flash[:error] = error_message
@@ -203,7 +203,7 @@ class UsersController < ApplicationController
 
   protected
 
-  def get_available_roles
+  def available_roles
     # stores all the roles that are possible
     # when a new user joins or an existing user updates his/her profile they will get to choose
     # from all the roles available

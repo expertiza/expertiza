@@ -59,6 +59,7 @@ class StudentTeamsController < ApplicationController
   end
  #E2351 Adding a new view for mentors
   def mentor
+     return unless current_user_id? student.user_id
   end
 
   def create

@@ -48,6 +48,12 @@ to display the label "Your team" in the student assignment tasks-->
     <% end %>
   <%end%>
 
+  <!-- E2351 if they are mentor they should be able to view all the teams they are on -->
+  <% if @authorization =='mentor' %>
+    <%= link_to t('.all_teams'), mentor_student_teams_path(student_id: @participant.id) %>
+        <%=t ".view_team" %>
+  <% end %>
+
   <!--Your work-->
   <% if @authorization == 'participant' || @can_submit == true %>
     <li>

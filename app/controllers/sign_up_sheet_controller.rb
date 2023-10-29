@@ -278,7 +278,8 @@ class SignUpSheetController < ApplicationController
       flash[:error] = 'You cannot drop your topic after the drop topic deadline!'
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Dropping topic for ended work: ' + params[:topic_id].to_s)
     else
-      delete_signup_for_topic(assignment.id, params[:topic_id], session[:user].id)
+      users_team = SignedUpTeam.find_team_users(assignment.id, session[:user].id)
+      delete_signup_for_topic(params[:topic_id], users_team[0].t_id)
       flash[:success] = 'You have successfully dropped your topic!'
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student has dropped the topic: ' + params[:topic_id].to_s)
     end
@@ -299,7 +300,7 @@ class SignUpSheetController < ApplicationController
       flash[:error] = 'You cannot drop a student after the drop topic deadline!'
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for ended work: ' + params[:topic_id].to_s)
     else
-      delete_signup_for_topic(assignment.id, params[:topic_id], participant.user_id)
+      delete_signup_for_topic(params[:topic_id], team.id)
       flash[:success] = 'You have successfully dropped the student from the topic!'
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Student has been dropped from the topic: ' + params[:topic_id].to_s)
     end
@@ -511,7 +512,8 @@ class SignUpSheetController < ApplicationController
     @ad_information
   end
 
-  def delete_signup_for_topic(assignment_id, topic_id, user_id)
-    SignUpTopic.new.reassign_topic(user_id, assignment_id, topic_id)
+  def delete_signup_for_topic(topic_id, team_id)
+    topic_id.reassign_topic(team_id)
   end
+  
 end

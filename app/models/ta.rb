@@ -14,7 +14,7 @@ class Ta < User
   def courses_assisted_with
     TaMapping.where(ta_id: id).map { |c| Course.find(c.course_id) }
   end
-  
+
   # Checks if the TA is an instructor or co-TA for a given questionnaire.
   def is_instructor_or_co_ta?(questionnaire)
     return false if questionnaire.nil?
@@ -26,7 +26,7 @@ class Ta < User
     questionnaire_ta = Ta.find(instructor_id)
     courses_assisted_with.any? { |course| course.tas.include?(questionnaire_ta) }
   end
-  
+
   # Lists all objects of a certain type that are either owned by the user or are public.
   def list_all(object_type, user_id)
     object_type.where(['instructor_id = ? OR private = 0', user_id])
@@ -46,14 +46,14 @@ class Ta < User
       #### this find method compares the directories of an assignment and a course to find out if the
       #### the assignment is in a subdirectory of a course that the user is a TA for.
       Assignment.find_by_sql(['SELECT assignments.id, assignments.name, assignments.directory_path ' \
-      'FROM assignments ' \
-      'INNER JOIN ta_mappings ON assignments.course_id = ta_mappings.course_id ' \
-      'WHERE ta_mappings.ta_id = ?', user_id])
-  else
-    # Find objects where the user is the instructor
-    object_type.where(instructor_id: user_id)
+                                'FROM assignments ' \
+                                'INNER JOIN ta_mappings ON assignments.course_id = ta_mappings.course_id ' \
+                                'WHERE ta_mappings.ta_id = ?', user_id])
+    else
+      # Find objects where the user is the instructor
+      object_type.where(instructor_id: user_id)
+    end
   end
-end
 
   # Gets an object of a certain type that is either owned by the user or is public.
   def get(object_type, id, user_id)
@@ -74,17 +74,17 @@ end
     instructor_ids = ta_mappings.map { |ta_mapping| Course.find(ta_mapping.course_id).instructor_id }
     instructor_ids
   end
-  
+
   # Returns all instructor IDs for courses that this TA helps teach.
   def self.get_mapped_instructor_ids(user_id)
     TaMapping.where(ta_id: user_id).map { |map| map.course.instructor.id }
   end
-  
+
   # Returns all course IDs for courses that this TA helps teach.
   def self.get_mapped_courses(user_id)
     TaMapping.where(ta_id: user_id).map { |map| map.course.id }
   end
-  
+
   # Returns the instructor ID for the first course that this TA helps teach.
   def get_instructor
     Ta.get_my_instructor(id)
@@ -104,31 +104,31 @@ end
   def teaching_assistant?
     true
   end
-  
+
   # Returns a list of users who have the same or lower privilege level as the given user
   # and are participants in the courses that the user is a TA for.
   def self.get_user_list(user)
     # Get the roles associated with the user
     user_roles = user.role
-  
+
     # Get a list of course IDs associated with the user
     courses = Ta.get_mapped_courses(user.id)
-    
+
     # Initialize an array to store participants
     participants = []
-  
+
     # Iterate through each course to collect participants
     courses.each do |course_id|
       course = Course.find(course_id)
       participants.concat(course.get_participants)
     end
-  
+
     # Select participants whose role has all privileges of the user's role
     selected_participants = participants.select do |participant|
       user_roles.has_all_privileges_of?(participant.user.role)
     end
-  
+
     # Extract the user objects from the selected participants
     selected_participants.map(&:user)
-  end  
+  end
 end

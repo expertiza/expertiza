@@ -51,8 +51,9 @@ class LotteryController < ApplicationController
     @assigned_teams_by_topic = {}  # This will store the assigned teams for each topic
     @topics.each do |topic|
       # Assuming bids are stored with a topic_id, and each bid has a team associated with it
-      @bids_by_topic[topic.id] = Bid.where(topic_id: topic.id).map(&:team)
-      
+      @bids_by_topic[topic.id] = Bid.where(topic_id: topic.id).map do |bid|
+        { team: bid.team, priority: bid.priority }
+      end
       # Fetch teams that are not waitlisted for this topic
       @assigned_teams_by_topic[topic.id] = SignedUpTeam.where(topic_id: topic.id, is_waitlisted: false).map(&:team)
     end

@@ -13,13 +13,13 @@
       <tr>
         <td><%= topic.topic_name %></td>
         <td>
-          <% @bids_by_topic[topic.id].each_with_index do |team, index| %>
-            #<%= index + 1 %> <%= team.name %>
+          <% @bids_by_topic[topic.id].each do |bid_info| %>
+            <%= bid_info[:team].name %> (#<%= bid_info[:priority] %>)
           <% end %>
         </td>
         <td>
           <% if @assigned_teams_by_topic[topic.id].any? %>
-            <% @assigned_teams_by_topic[topic.id].each_with_index do |assigned_team, index| %>
+            <% @assigned_teams_by_topic[topic.id].each do |assigned_team| %>
               <%= assigned_team.name %>
             <% end %>
           <% else %>

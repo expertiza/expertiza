@@ -2,11 +2,11 @@
 <style>
 .custom-button {
     display: inline-block;
-    padding: 10px 10px;
-    background-color: #A90201;
-    color: white;
+    padding: 5px 5px;
+    background-color: white;
+    color: black;
     text-decoration: none;
-    border: none;
+    border: 1px solid black;
     border-radius: 5px;
     font: Arial;
 }
@@ -29,11 +29,7 @@
 <img src="/assets/info.png" title="This feature allow students to &quot;bid&quot; for topics.
       Instructor must specify when topics are assigned, by going to the Due Dates tab and
       entering a due date for &quot;signup&quot;."/>
-<br>
-
-  <%= button_to 'View Bidding Details', {:controller => 'lottery', :action => 'bidding_details', :id => @assignment_form.assignment.id}, :method => :get, class: 'custom-button', id: 'bidding-button' %>
-
-<br>
+<%= button_to 'View Bidding Details', {:controller => 'lottery', :action => 'bidding_details', :id => @assignment_form.assignment.id}, :method => :get, class: 'custom-button', id: 'bidding-button' %>
 <input name="assignment_form[assignment][can_review_same_topic]" type="hidden" value="false"/>
 <%= check_box_tag('assignment_form[assignment][can_review_same_topic]', 'true', @assignment_form.assignment.can_review_same_topic?)%>
 <%= label_tag('assignment_form[assignment][can_review_same_topic]', 'Enable authors to review others working on same topic?') %>

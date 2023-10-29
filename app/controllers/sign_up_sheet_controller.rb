@@ -10,6 +10,10 @@
 
 class SignUpSheetController < ApplicationController
   include AuthorizationHelper
+  # Includes functions for team management. Refer /app/helpers/ManageTeamHelper
+  include ManageTeamHelper
+  # Includes functions for Dead line management. Refer /app/helpers/DeadLineHelper
+  include DeadlineHelper
 
   require 'rgl/adjacency'
   require 'rgl/dot'
@@ -27,10 +31,8 @@ class SignUpSheetController < ApplicationController
     end
   end
 
-  # Includes functions for team management. Refer /app/helpers/ManageTeamHelper
-  include ManageTeamHelper
-  # Includes functions for Dead line management. Refer /app/helpers/DeadLineHelper
-  include DeadlineHelper
+
+
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],
@@ -43,15 +45,16 @@ class SignUpSheetController < ApplicationController
   # Prepares the form for adding a new topic. Used in conjunction with create
   def new
     @id = params[:id]
-    @sign_up_topic = SignUpTopic.new
-    @sign_up_topic.assignment = Assignment.find(params[:id])
-    @topic = @sign_up_topic
+    @signup_topic = SignUpTopic.new
+    @signup_topic.assignment = Assignment.find(params[:id])
+    @topic = @signup_topic
   end
 
   # This method is used to create signup topics
   # In this code params[:id] is the assignment id and not topic id. The intuition is
   # that assignment id will virtually be the signup sheet id as well as we have assumed
   # that every assignment will have only one signup sheet
+
   def create
     topic = SignUpTopic.where(topic_name: params[:topic][:topic_name], assignment_id: params[:id]).first
     if topic.nil?
@@ -63,6 +66,7 @@ class SignUpSheetController < ApplicationController
 
   # This method is used to delete signup topics
   # Renaming delete method to destroy for rails 4 compatible
+
   def destroy
     @topic = SignUpTopic.find(params[:id])
     assignment = Assignment.find(params[:assignment_id])
@@ -148,7 +152,7 @@ class SignUpSheetController < ApplicationController
   # retrieves all the data associated with the given assignment. Includes all topics,
   def load_add_signup_topics(assignment_id)
     @id = assignment_id
-    @sign_up_topics = SignUpTopic.where('assignment_id = ?', assignment_id)
+    @signup_topics = SignUpTopic.where('assignment_id = ?', assignment_id)
     @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment_id)
 
@@ -161,12 +165,12 @@ class SignUpSheetController < ApplicationController
   end
 
   def set_values_for_new_topic
-    @sign_up_topic = SignUpTopic.new
-    @sign_up_topic.topic_identifier = params[:topic][:topic_identifier]
-    @sign_up_topic.topic_name = params[:topic][:topic_name]
-    @sign_up_topic.max_choosers = params[:topic][:max_choosers]
-    @sign_up_topic.category = params[:topic][:category]
-    @sign_up_topic.assignment_id = params[:id]
+    @signup_topic = SignUpTopic.new
+    @signup_topic.topic_identifier = params[:topic][:topic_identifier]
+    @signup_topic.topic_name = params[:topic][:topic_name]
+    @signup_topic.max_choosers = params[:topic][:max_choosers]
+    @signup_topic.category = params[:topic][:category]
+    @signup_topic.assignment_id = params[:id]
     @assignment = Assignment.find(params[:id])
   end
 
@@ -183,51 +187,76 @@ class SignUpSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: assignment_id
   end
 
-  def list
-    @participant = AssignmentParticipant.find(params[:id].to_i)
-    @assignment = @participant.assignment
-    @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
-    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
-    @show_actions = true
-    @priority = 0
-    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
-    @max_team_size = @assignment.max_team_size
-    team_id = @participant.team.try(:id)
-    @use_bookmark = @assignment.use_bookmark
+  --
+  # Controller method
+def list
+  find_participant_and_assignment
+  load_signup_topic_details
+  process_intelligent_topics if @assignment.is_intelligent
+  load_deadlines
+  check_user_signup_topics
+  render_intelligent_topic_selection if @assignment.is_intelligent
+end
 
-    if @assignment.is_intelligent
-      @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
-      signed_up_topics = []
-      @bids.each do |bid|
-        sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
-        signed_up_topics << sign_up_topic if sign_up_topic
-      end
-      signed_up_topics &= @sign_up_topics
-      @sign_up_topics -= signed_up_topics
-      @bids = signed_up_topics
-    end
+private
+# Helper method: Find participant and assignment
+def find_participant_and_assignment
+  @participant = find_participant
+  @assignment = @participant.assignment
+end
 
-    @num_of_topics = @sign_up_topics.size
-    @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
-    @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
-    @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
+# Helper method: Find participant based on the given ID
+def find_participant
+  AssignmentParticipant.find(params[:id].to_i)
+end
 
-    unless @assignment.due_dates.find_by(deadline_type_id: 1).nil?
-      @show_actions = false if !@assignment.staggered_deadline? && (@assignment.due_dates.find_by(deadline_type_id: 1).due_at < Time.now)
+# Helper method: Load sign-up topic details
+def load_signup_topic_details
+  @slots_filled = SignUpTopic.slots_filled_for(@assignment.id)
+  @slots_waitlisted = SignUpTopic.slots_waitlisted_for(@assignment.id)
+  @signup_topics = SignUpTopic.public_topics_for_assignment(@assignment.id)
+  @max_team_size = @assignment.max_team_size
+  @use_bookmark = @assignment.use_bookmark
+end
 
-      # Find whether the user has signed up for any topics; if so the user won't be able to
-      # sign up again unless the former was a waitlisted topic
-      # if team assignment, then team id needs to be passed as parameter else the user's id
-      users_team = SignedUpTeam.find_team_users(@assignment.id, session[:user].id)
-      @selected_topics = if users_team.empty?
-                           nil
-                         else
-                           SignedUpTeam.find_user_signup_topics(@assignment.id, users_team.first.t_id)
-                         end
-    end
-    render('sign_up_sheet/intelligent_topic_selection') && return if @assignment.is_intelligent
+# Helper method: Process intelligent topics
+def process_intelligent_topics
+  @bids, signed_up_topics = retrieve_bids_and_signed_topics
+  @signup_topics -= signed_up_topics
+  @bids = signed_up_topics
+  @num_of_topics = @signup_topics.size
+end
+# Helper method: Retrieve bids and signed topics
+def retrieve_bids_and_signed_topics
+  team_id = @participant.team.try(:id)
+  bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
+  signed_up_topics = bids.each_with_object([]) do |bid, topics|
+    topic = SignUpTopic.find_by(id: bid.topic_id)
+    topics << topic if topic
   end
+  [bids, signed_up_topics & @signup_topics]
+end
+# Helper method: Load deadlines
+def load_deadlines
+  @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
+  @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
+  @student_bids = @participant.team.nil? ? [] : Bid.where(team_id: @participant.team.id)
+end
 
+# Helper method: Check user signup topics
+def check_user_signup_topics
+  return unless (due_date = @assignment.due_dates.find_by(deadline_type_id: 1))
+
+  @show_actions = !@assignment.staggered_deadline? && (due_date.due_at < Time.now)
+  users_team = SignedUpTeam.find_team_users(@assignment.id, session[:user].id)
+  @selected_topics = users_team.empty? ? nil : SignedUpTeam.find_user_signup_topics(@assignment.id, users_team.first.t_id)
+end
+
+# Helper method: Render intelligent topic selection
+def render_intelligent_topic_selection
+  render('sign_up_sheet/intelligent_topic_selection') && return
+end
+--
   def sign_up
     @assignment = AssignmentParticipant.find(params[:id]).assignment
     @user_id = session[:user].id
@@ -241,9 +270,11 @@ class SignUpSheetController < ApplicationController
   # routes to new page to specify student
   def signup_as_instructor; end
 
+  # Signs up a student for a specific topic in an assignment by an instructor
   def signup_as_instructor_action
     user = User.find_by(name: params[:username])
-    if user.nil? # validate invalid user
+  # validate invalid user
+    if user.nil? 
       flash[:error] = 'That student does not exist!'
     else
       if AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id]
@@ -456,10 +487,10 @@ class SignUpSheetController < ApplicationController
 
   def setup_new_topic
     set_values_for_new_topic
-    @sign_up_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
-    if @sign_up_topic.save
-      undo_link "The topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
-      redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + '#tabs-2'
+    @signup_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
+    if @signup_topic.save
+      undo_link "The topic: \"#{@signup_topic.topic_name}\" has been created successfully. "
+      redirect_to edit_assignment_path(@signup_topic.assignment_id) + '#tabs-2'
     else
       render action: 'new', id: params[:id]
     end
@@ -491,6 +522,7 @@ class SignUpSheetController < ApplicationController
 
   # get info related to the ad for partners so that it can be displayed when an assignment_participant
   # clicks to see ads related to a topic
+
   def ad_info(_assignment_id, topic_id)
     @ad_information = []
     @signed_up_teams = SignedUpTeam.where(topic_id: topic_id)

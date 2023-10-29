@@ -5,7 +5,9 @@
     <tr>
       <th>Topic Name</th>
       <th>Bidding Teams</th>
-      <th>Assigned Teams</th>
+      <th>#1 bids</th>
+      <th>#2 bids</th>
+      <th>#3 bids</th>
     </tr>
   </thead>
   <tbody>
@@ -25,6 +27,27 @@
           <% else %>
             No team assigned
           <% end %>
+        </td> 
+        <td>
+          <% if @count1[topic.id] != 0%>
+            <%= @count1[topic.id] %>
+          <%else%>
+            No bids yet
+          <%end%>
+        </td>
+        <td>
+          <% if @count2[topic.id] != 0%>
+            <%= @count2[topic.id] %>
+          <%else%>
+            No bids yet
+          <%end%>
+        </td>
+        <td>
+          <% if @count3[topic.id] != 0%>
+            <%= @count3[topic.id] %>
+          <%else%>
+            No bids yet
+          <%end%>
         </td>
       </tr>
     <% end %>

@@ -308,7 +308,7 @@ class User < ApplicationRecord
 
   def self.search_users(role, user_id, letter, search_by)
     key_word = { '1' => 'name', '2' => 'fullname', '3' => 'email' }
-    sql = "(role_id in (?) or id = ?) and #{key_word[search_by]} like ?"\
+    sql = "(role_id in (?) or id = ?) and #{key_word[search_by]} like ?"
     search_filter = "%#{letter}%"
     if key_word.include? search_by
       users = User.order('name').where(sql, role.get_available_roles, user_id, search_filter)

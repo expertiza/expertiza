@@ -85,7 +85,6 @@ class UsersController < ApplicationController
 
   # for displaying users which are being searched for editing purposes after checking whether current user is authorized to do so
   def show_if_authorized
-    # Shows the user profile if authorized, otherwise redirects to the appropriate page.
     @user = User.find_by(name: params[:user][:name])
     if @user.nil?
       flash[:note] = "#{params[:user][:name]} does not exist."
@@ -120,7 +119,7 @@ class UsersController < ApplicationController
   def new
     @user = User.new
     @rolename = Role.find_by(name: params[:role])
-    foreign
+    get_available_roles
   end
 
   def create
@@ -147,7 +146,7 @@ class UsersController < ApplicationController
       undo_link("The user \"#{@user.name}\" has been successfully created. ")
       redirect_to action: 'list'
     else
-      foreign
+      get_available_roles
       error_message = ''
       @user.errors.each { |_field, error| error_message << error }
       flash[:error] = error_message
@@ -204,7 +203,7 @@ class UsersController < ApplicationController
 
   protected
 
-  def foreign
+  def get_available_roles
     # stores all the roles that are possible
     # when a new user joins or an existing user updates his/her profile they will get to choose
     # from all the roles available

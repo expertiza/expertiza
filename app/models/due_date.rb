@@ -27,7 +27,7 @@ module DueDateHelper
     DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
   end
 
-  def self.current_due_date(due_dates)
+  def self.find_current_due_date(due_dates)
     # Get the current due date from list of due dates
     due_dates.each do |due_date|
       if due_date.due_at > Time.now
@@ -39,9 +39,9 @@ module DueDateHelper
     nil
   end
 
-  def self.teammate_review_allowed(student)
+  def self.is_teammate_review_allowed(student)
     # time when teammate review is allowed
-    due_date = current_due_date(student.assignment.due_dates)
+    due_date = find_current_due_date(student.assignment.due_dates)
     student.assignment.find_current_stage == 'Finished' ||
       due_date &&
         (due_date.teammate_review_allowed_id == 3 ||
@@ -57,7 +57,7 @@ module DueDateHelper
     end
   end
 
-  def self.set_duedate(duedate, deadline, assign_id, max_round)
+  def self.set_due_date(duedate, deadline, assign_id, max_round)
     submit_duedate = DueDate.new(duedate)
     submit_duedate.deadline_type_id = deadline
     submit_duedate.parent_id = assign_id
@@ -77,7 +77,7 @@ module DueDateHelper
     end
   end
 
-  def self.done_in_assignment_round(assignment_id, response)
+  def self.calculate_done_in_assignment_round(assignment_id, response)
     # for author feedback, quiz, teammate review and metareview, Expertiza only support one round, so the round # should be 1
     return 0 if ResponseMap.find(response.map_id).type != 'ReviewResponseMap'
 

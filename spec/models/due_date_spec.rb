@@ -43,7 +43,7 @@ describe 'due_date_functions' do
   end
 
   it 'create new duedate record with values' do
-    DueDate.set_duedate({ id: 999 }, @assignment_due_date.deadline_type_id,
+    DueDate.set_due_date({ id: 999 }, @assignment_due_date.deadline_type_id,
                         @assignment_due_date.parent_id, @assignment_due_date.round)
     new_due_date = DueDate.find_by(id: 999)
     expect(new_due_date).to be_valid
@@ -60,17 +60,17 @@ describe 'due_date_functions' do
     expect(sorted_due_dates.each_cons(2).all? { |m1, m2| (m1.due_at <=> m2.due_at) != 1 }).to eql true
   end
 
-  describe '#done_in_assignment_round' do
+  describe '#calculate_done_in_assignment_round' do
     it 'return 0 when no response map' do
       response = ReviewResponseMap.create
       response.type = 'ResponseMap'
       response.save
-      expect(DueDate.done_in_assignment_round(1, response)).to eql 0
+      expect(DueDate.calculate_done_in_assignment_round(1, response)).to eql 0
     end
 
     it 'return round 1 for single round' do
       response = ReviewResponseMap.create
-      expect(DueDate.done_in_assignment_round(@assignment_due_date.parent_id, response)).to eql 1
+      expect(DueDate.calculate_done_in_assignment_round(@assignment_due_date.parent_id, response)).to eql 1
     end
   end
 

@@ -107,11 +107,11 @@ class User < ApplicationRecord
   end
 
   def name(ip_address = nil)
-    User.anonymized_view?(ip_address) ? "#{role.name} #{id.to_s}" : self[:name]
+    User.anonymized_view?(ip_address) ? "#{role.name} #{id}" : self[:name]
   end
 
   def fullname(ip_address = nil)
-    User.anonymized_view?(ip_address) ? "#{role.name}, #{id.to_s}" : self[:fullname]
+    User.anonymized_view?(ip_address) ? "#{role.name}, #{id}" : self[:fullname]
   end
 
   def first_name(ip_address = nil)
@@ -119,7 +119,7 @@ class User < ApplicationRecord
   end
 
   def email(ip_address = nil)
-    User.anonymized_view?(ip_address) ? "#{role.name}_#{id.to_s}@mailinator.com" : self[:email]
+    User.anonymized_view?(ip_address) ? "#{role.name}_#{id}@mailinator.com" : self[:email]
   end
 
   def super_admin?
@@ -308,12 +308,11 @@ class User < ApplicationRecord
 
   def self.search_users(role, user_id, letter, search_by)
     key_word = { '1' => 'name', '2' => 'fullname', '3' => 'email' }
-    sql = "(role_id in (?) or id = ?) and #{key_word[search_by]} like ?"
+    sql = "(role_id in (?) or id = ?) and #{key_word[search_by]} like ?"\
+    search_filter = "%#{letter}%"
     if key_word.include? search_by
-      search_filter =  "%#{letter}%"
       users = User.order('name').where(sql, role.get_available_roles, user_id, search_filter)
     else # default used when clicking on letters
-      search_filter =  "%#{letter}%"
       users = User.order('name').where('(role_id in (?) or id = ?) and name like ?', role.get_available_roles, user_id, search_filter)
     end
     users

@@ -35,19 +35,27 @@ describe Ta do
     end
   end
   describe '#list_mine' do
-    context 'when the object is an assignment' do
-      it 'finds associated assignments with TA' do
-        allow(Assignment).to receive(:find_by_sql).with(['select assignments.id, assignments.name, assignments.directory_path ' \
-      'from assignments, ta_mappings where assignments.course_id = ta_mappings.course_id and ta_mappings.ta_id=?', 6]).and_return([assignment])
-        expect(ta.list_mine(Assignment, 6)).to eq([assignment])
-      end
+  it 'finds associated assignments with TA' do
+    expected_query = ['SELECT assignments.id, assignments.name, assignments.directory_path ' \
+      'FROM assignments ' \
+      'INNER JOIN ta_mappings ON assignments.course_id = ta_mappings.course_id ' \
+      'WHERE ta_mappings.ta_id = ?', 6]
+  
+    expect(Assignment).to receive(:find_by_sql).with(expected_query).and_return([assignment])
+    result = ta.list_mine(Assignment, 6)
+    expect(result).to eq([assignment])
+  end
+  context 'when the object is not an assignment' do
+    it 'finds associated courses with TA' do
+      expected_query = { instructor_id: 6 }
+  
+      allow(Course).to receive(:where).with(expected_query).and_return([course1, course2])
+  
+      result = ta.list_mine(Course, 6)
+      expect(result).to eq([course1, course2])
     end
-    context 'when the object is not an assignment' do
-      it 'finds associated courses with TA' do
-        allow(Course).to receive(:where).with(['instructor_id = ?', 6]).and_return([course1, course2])
-        expect(ta.list_mine(Course, 6)).to eq([course1, course2])
-      end
-    end
+  end
+  
   end
   describe '#get' do
     it 'returns all objects of a given type associated with a user' do

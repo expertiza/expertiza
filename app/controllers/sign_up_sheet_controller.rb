@@ -513,7 +513,10 @@ class SignUpSheetController < ApplicationController
   end
 
   def delete_signup_for_topic(topic_id, team_id)
-    topic_id.reassign_topic(team_id)
+    @sign_up_topic = SignUpTopic.find_by(id: topic_id)
+    unless @sign_up_topic.nil?
+      @sign_up_topic.reassign_topic(team_id)
+    end 
   end
   
 end

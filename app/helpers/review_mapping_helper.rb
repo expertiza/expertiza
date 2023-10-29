@@ -7,7 +7,7 @@ module ReviewMappingHelper
   #
   # gets the response map data such as reviewer id, reviewed object id and type for the review report
   #
-  def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
+  def revie_report_data(reviewed_object_id, reviewer_id, type)
     rspan = 0
     (1..@assignment.num_review_rounds).each { |round| instance_variable_set('@review_in_round_' + round.to_s, 0) }
 
@@ -25,7 +25,7 @@ module ReviewMappingHelper
   #
   # gets the team name's color according to review and assignment submission status
   #
-  def get_team_color(response_map)
+  def team_color(response_map)
     # Storing redundantly computed value in a variable
     assignment_created = @assignment.created_at
     # Storing redundantly computed value in a variable
@@ -62,7 +62,7 @@ module ReviewMappingHelper
       if link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
         color.push 'green'
       else
-        link_updated_at = get_link_updated_at(link)
+        link_updated_at = link_update_time(link)
         color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
       end
     end
@@ -100,7 +100,7 @@ module ReviewMappingHelper
 
   # returns last modified header date
   # only checks certain links (wiki)
-  def get_link_updated_at(link)
+  def link_update_time(link)
     uri = URI(link)
     res = Net::HTTP.get_response(uri)['last-modified']
     res.to_time
@@ -114,7 +114,7 @@ module ReviewMappingHelper
   end
 
   # For assignments with 1 team member, the following method returns user's fullname else it returns "team name" that a particular reviewee belongs to.
-  def get_team_reviewed_link_name(max_team_size, _response, reviewee_id, ip_address)
+  def team_display_name(max_team_size, _response, reviewee_id, ip_address)
     team_reviewed_link_name = if max_team_size == 1
                                 TeamsUser.where(team_id: reviewee_id).first.user.fullname(ip_address)
                               else
@@ -137,7 +137,7 @@ module ReviewMappingHelper
 
   # gets the review score awarded based on each round of the review
 
-  def get_awarded_review_score(reviewer_id, team_id)
+  def compute_awarded_review_score(reviewer_id, team_id)
     # Storing redundantly computed value in num_rounds variable
     num_rounds = @assignment.num_review_rounds
     # Setting values of instance variables
@@ -215,7 +215,7 @@ module ReviewMappingHelper
   end
 
   # gets review and feedback responses for all rounds for the feedback report
-  def get_each_review_and_feedback_response_map(author)
+  def all_reviews_and_feedback_response_for_author(author)
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     # Calculate how many responses one team received from each round
     # It is the feedback number each team member should make
@@ -240,7 +240,7 @@ module ReviewMappingHelper
   end
 
   # gets review and feedback responses for a certain round for the feedback report
-  def get_certain_review_and_feedback_response_map(author)
+  def feedback_response_for_author(author)
     # Setting values of instance variables
     @feedback_response_maps = FeedbackResponseMap.where(['reviewed_object_id IN (?) and reviewer_id = ?', @all_review_response_ids, author.id])
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
@@ -252,7 +252,7 @@ module ReviewMappingHelper
   #
   # for calibration report
   #
-  def get_css_style_for_calibration_report(diff)
+  def calibration_report_css_class(diff)
     # diff - difference between stu's answer and instructor's answer
     dict = { 0 => 'c5', 1 => 'c4', 2 => 'c3', 3 => 'c2' }
     css_class = if dict.key?(diff.abs)

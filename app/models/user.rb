@@ -25,14 +25,9 @@ class User < ApplicationRecord
             format: { with: /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, allow_blank: true }
   validates :fullname, presence: true
 
-  validates :fullname, presence: true
-
   before_validation :randomize_password, if: ->(user) { user.new_record? && user.password.blank? } # AuthLogic
 
-  scope :superadministrators, -> { where role_id: Role.superadministrator }
-  scope :superadmins, -> { superadministrators }
-  scope :administrators, -> { where role_id: Role.administrator }
-  scope :admins, -> { administrators }
+  scope :admins, -> { where role_id: Role.administrator }
   scope :instructors, -> { where role_id: Role.instructor }
   scope :tas, -> { where role_id: Role.ta }
   scope :students, -> { where role_id: Role.student }

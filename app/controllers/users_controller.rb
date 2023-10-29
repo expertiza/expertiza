@@ -108,7 +108,7 @@ class UsersController < ApplicationController
       @user = User.find(params[:id])
       @role = @user.role
       @assignment_participant_num = AssignmentParticipant.where(user_id: @user.id).count
-      @maps = ResponseMap.where('reviewee_id = ? or reviewer_id = ?', params[:id], params[:id])
+      @maps = ResponseMap.where('reviewee_id = :id OR reviewer_id = :id', id: params[:id])
       @total_user_num = User.count
     end
   end

@@ -116,6 +116,12 @@ describe UsersController do
       expect(response.status).to eq(200)
     end
   end
+
+  context '#search_params' do
+    it 'checks that search_params does not fail with controller' do
+      expect{controller.search_params}.not_to raise_error
+    end
+  end
 	
   context '#show_if_authorized' do
     before(:each) do

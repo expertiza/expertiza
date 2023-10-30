@@ -2,41 +2,13 @@ class DueDate < ApplicationRecord
   validate :due_at_is_valid_datetime
   # has_paper_trail
 
-  def due_at_is_valid_datetime
-    if due_at.present?
-      errors.add(:due_at, 'must be a valid datetime') if (begin
-                                                            DateTime.strptime(due_at.to_s, '%Y-%m-%d %H:%M:%S')
-                                                          rescue StandardError
-                                                            ArgumentError
-                                                          end) == ArgumentError
-    end
-  end
-
-  def set_flag
-    self.flag = true
-    save
-  end
-
-  include DueDateHelper # Include the DueDateHelper module
-
-end
-
-# Define a DueDateHelper module for due date-related methods
-module DueDateHelper
   def self.default_permission(deadline_type, permission_type)
     DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
   end
 
+  # Method to find and return the next assignment due from the current time.
   def self.find_current_due_date(due_dates)
-    # Get the current due date from list of due dates
-    due_dates.each do |due_date|
-      if due_date.due_at > Time.now
-        current_due_date = due_date
-        return current_due_date
-      end
-    end
-    # in case current due date not found
-    nil
+    due_dates.find { |due_date| due_date.due_at > Time.now }
   end
 
   def self.is_teammate_review_allowed(student)
@@ -48,51 +20,42 @@ module DueDateHelper
         due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
   end
 
+  def set_flag
+    self.flag = true
+    save
+  end
+
+  # Validates if 'due_at' is a valid datetime, and raises an error if not.
+  def due_at_is_valid_datetime
+    if due_at.present?
+      begin
+        DateTime.parse(due_at.to_s)
+      rescue ArgumentError, StandardError
+        errors.add(:due_at, 'must be a valid datetime')
+      end
+    end
+	nil
+  end
+
   def self.copy(old_assignment_id, new_assignment_id)
     duedates = where(parent_id: old_assignment_id)
-    duedates.each do |orig_due_date|
-      new_due_date = orig_due_date.dup
-      new_due_date.parent_id = new_assignment_id
-      new_due_date.save
-    end
-  end
-
-  def self.set_due_date(duedate, deadline, assign_id, max_round)
-    submit_duedate = DueDate.new(duedate)
-    submit_duedate.deadline_type_id = deadline
-    submit_duedate.parent_id = assign_id
-    submit_duedate.round = max_round
-    submit_duedate.save
-  end
-
-  def self.deadline_sort(due_dates)
-    due_dates.sort do |m1, m2|
-      if m1.due_at && m2.due_at
-        m1.due_at <=> m2.due_at
-      elsif m1.due_at
-        -1
-      else
-        1
+    ActiveRecord::Base.transaction do
+      duedates.each do |orig_due_date|
+        new_due_date = orig_due_date.dup
+        new_due_date.parent_id = new_assignment_id
+        new_due_date.save
       end
     end
   end
 
-  def self.calculate_done_in_assignment_round(assignment_id, response)
-    # for author feedback, quiz, teammate review and metareview, Expertiza only support one round, so the round # should be 1
-    return 0 if ResponseMap.find(response.map_id).type != 'ReviewResponseMap'
-
-    due_dates = DueDate.where(parent_id: assignment_id)
-    # sorted so that the earliest deadline is at the first
-    sorted_deadlines = deadline_sort(due_dates)
-    due_dates.reject { |due_date| due_date.deadline_type_id != 1 && due_date.deadline_type_id != 2 }
-    round = 1
-    sorted_deadlines.each do |due_date|
-      break if response.created_at < due_date.due_at
-
-      round += 1 if due_date.deadline_type_id == 2
+  def self.set_due_date(duedate, deadline, assign_id, max_round)
+    ActiveRecord::Base.transaction do
+      submit_duedate = DueDate.new(duedate)
+      submit_duedate.deadline_type_id = deadline
+      submit_duedate.parent_id = assign_id
+      submit_duedate.round = max_round
+      submit_duedate.save
     end
-    round
-
   end
 
   def self.get_next_due_date(assignment_id, topic_id = nil)

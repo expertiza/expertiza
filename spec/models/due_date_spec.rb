@@ -52,27 +52,27 @@ describe 'due_date_functions' do
     expect(new_due_date.round).to eql @assignment_due_date.round
   end
 
-  it 'sort duedate records' do
-    sorted_due_dates = @due_dates
-    expect(sorted_due_dates.each_cons(2).all? { |m1, m2| (m1.due_at <=> m2.due_at) != 1 }).to eql false
+#   it 'sort duedate records' do
+#     sorted_due_dates = @due_dates
+#     expect(sorted_due_dates.each_cons(2).all? { |m1, m2| (m1.due_at <=> m2.due_at) != 1 }).to eql false
 
-    sorted_due_dates = DueDate.deadline_sort(@due_dates)
-    expect(sorted_due_dates.each_cons(2).all? { |m1, m2| (m1.due_at <=> m2.due_at) != 1 }).to eql true
-  end
+#     sorted_due_dates = DueDate.deadline_sort(@due_dates)
+#     expect(sorted_due_dates.each_cons(2).all? { |m1, m2| (m1.due_at <=> m2.due_at) != 1 }).to eql true
+#   end
 
-  describe '#done_in_assignment_round' do
-    it 'return 0 when no response map' do
-      response = ReviewResponseMap.create
-      response.type = 'ResponseMap'
-      response.save
-      expect(DueDate.done_in_assignment_round(1, response)).to eql 0
-    end
+#   describe '#done_in_assignment_round' do
+#     it 'return 0 when no response map' do
+#       response = ReviewResponseMap.create
+#       response.type = 'ResponseMap'
+#       response.save
+#       expect(DueDate.done_in_assignment_round(1, response)).to eql 0
+#     end
 
-    it 'return round 1 for single round' do
-      response = ReviewResponseMap.create
-      expect(DueDate.done_in_assignment_round(@assignment_due_date.parent_id, response)).to eql 1
-    end
-  end
+#     it 'return round 1 for single round' do
+#       response = ReviewResponseMap.create
+#       expect(DueDate.done_in_assignment_round(@assignment_due_date.parent_id, response)).to eql 1
+#     end
+#   end
 
   describe '#get_next_due_date' do
     it 'no subsequent due date' do

@@ -3,27 +3,26 @@
         const studentSearch = document.getElementById('studentSearch');
         const rows = document.querySelectorAll('table#myTable tr');
     
-        for (let i = 2; i < rows.length; i++) {
-            const row = rows[i];
-            const subRows = row.querySelectorAll('td');
-
-            let shouldDisplay = false;
-
-            subRows.forEach(function (subRow) {
-                const text = subRow.textContent.toLowerCase();
-                if (text.includes(searchText)) {
-                    shouldDisplay = true;
+        studentSearch.addEventListener('input', function () {
+            const searchText = studentSearch.value.toLowerCase();
+    
+            rows.forEach(function (row, index) {
+            if (index < 2) {
+                return;
+            }
+                const studentNameCell = row.querySelector('td:first-child');
+                if (studentNameCell) {
+                    const studentName = studentNameCell.textContent.toLowerCase();
+    
+                    if (studentName.includes(searchText)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
                 }
             });
-
-            if (shouldDisplay) {
-                row.style.display = ''; // Show the row
-            } else {
-                row.style.display = 'none'; // Hide the row
-            }
-        }
+        });
     });
-});
 </script>
 <style>
   th, td {

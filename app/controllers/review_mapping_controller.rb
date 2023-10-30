@@ -102,32 +102,9 @@ class ReviewMappingController < ApplicationController
         if check_outstanding_reviews?(assignment, reviewer)
           # begin
           if assignment.topics? # assignment with topics
-            topic = if params[:topic_id]
-                      SignUpTopic.find(params[:topic_id])
-                    else
-                      begin
-                        assignment.candidate_topics_to_review(reviewer).to_a.sample
-                      rescue StandardError
-                        nil
-                      end
-                    end
-            if topic.nil?
-              flash[:error] = 'No topics are available to review at this time. Please try later.'
-            else
-              assignment.assign_reviewer_dynamically(reviewer, topic)
-            end
+            assign_reviewer_with_topics(assignment, reviewer, params)
           else # assignment without topic -Yang
-            assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
-            assignment_team = begin
-                                assignment_teams.to_a.sample
-                              rescue StandardError
-                                nil
-                              end
-            if assignment_team.nil?
-              flash[:error] = 'No artifacts are available to review at this time. Please try later.'
-            else
-              assignment.assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
-            end
+            assign_reviewer_without_topic(assignment, reviewer)
           end
         else
           flash[:error] = 'You cannot do more reviews when you have ' + Assignment.max_outstanding_reviews + 'reviews to do'
@@ -135,9 +112,6 @@ class ReviewMappingController < ApplicationController
       else
         flash[:error] = 'You cannot do more than ' + assignment.num_reviews_allowed.to_s + ' reviews based on assignment policy'
       end
-      # rescue Exception => e
-      #   flash[:error] = (e.nil?) ? $! : e
-      # end
     end
     redirect_to controller: 'student_review', action: 'list', id: participant.id
   end
@@ -167,6 +141,37 @@ class ReviewMappingController < ApplicationController
       end
       @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
       @num_reviews_in_progress < Assignment.max_outstanding_reviews
+    end
+  end
+
+  def assign_reviewer_with_topics(assignment, reviewer, params)
+    topic = if params[:topic_id] 
+              SignUpTopic.find(params[:topic_id])
+            else
+              begin
+                assignment.candidate_topics_to_review(reviewer).to_a.sample
+              rescue StandardError
+                nil
+              end
+            end
+    if topic.nil?
+      flash[:error] = 'No topics are available to review at this time. Please try later.'
+    else
+      assignment.assign_reviewer_dynamically(reviewer, topic)
+    end
+  end
+
+  def assign_reviewer_without_topic(assignment, reviewer)
+    assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
+    assignment_team = begin
+                        assignment_teams.to_a.sample
+                      rescue StandardError
+                        nil
+                      end
+    if assignment_team.nil?
+      flash[:error] = 'No artifacts are available to review at this time. Please try later.'
+    else
+      assignment.assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
     end
   end
 

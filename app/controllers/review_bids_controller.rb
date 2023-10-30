@@ -94,14 +94,26 @@ class ReviewBidsController < ApplicationController
 
   # assign bidding topics to reviewers
   def assign_bidding
-    # sets parameters used for running bidding algorithm
-    assignment_id = params[:assignment_id].to_i
-    # list of reviewer id's from a specific assignment
-    reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
-    bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
-    matched_topics = assign_reviewers(bidding_data)
-    ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
-    Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
+    assignment = Assignment.find(params[:assignment_id])
+    reviewer_ids = AssignmentParticipant.where(parent_id: assignment.id).ids
+
+    if ReviewBid.where(assignment_id: assignment.id).empty?
+      # No bids - randomly assign
+      topics = SignUpTopic.where(assignment_id: assignment.id)
+      topics.each do |topic|
+        reviewer_id = reviewer_ids.sample
+        ReviewBid.create(assignment_id: assignment.id,
+                         signuptopic_id: topic.id,
+                         participant_id: reviewer_id)
+      end
+    else
+      bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
+      matched_topics = assign_reviewers(bidding_data)
+      ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
+    end
+
+    Assignment.find(assignment_id).update(can_choose_topic_to_review: false)
+
     redirect_back fallback_location: root_path
   end
 

@@ -5,8 +5,7 @@
     
         studentSearch.addEventListener('input', function () {
             const searchText = studentSearch.value.toLowerCase();
-    
-            // Skip the first row (header row) and start checking from the second row
+
             for (let i = 1; i < rows.length; i++) {
                 const row = rows[i];
                 const studentNameCell = row.querySelector('td:first-child');
@@ -15,9 +14,9 @@
                     const studentName = studentNameCell.textContent.toLowerCase();
     
                     if (studentName.includes(searchText)) {
-                        row.style.display = ''; // Show the row
+                        row.style.display = '';
                     } else {
-                        row.style.display = 'none'; // Hide the row
+                        row.style.display = 'none';
                     }
                 }
             }

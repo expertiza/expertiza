@@ -116,8 +116,6 @@ class Ta < User
     selected_participants.map(&:user)
   end
 
-  private
-
   # This method returns a list of participants in the courses that the input user is associated with.
   def self.get_course_participants(user)
     # Get a list of course IDs associated with the user and for each course ID,
@@ -126,6 +124,7 @@ class Ta < User
       Course.find(course_id).get_participants
     end
   end
+  private_class_method :get_course_participants
 
   # This method returns a list of participants from the input list whose roles have all privileges 
   # of the input user's role.
@@ -137,4 +136,5 @@ class Ta < User
       user_roles.has_all_privileges_of?(participant.user.role)
     end
   end
+  private_class_method :select_participants
 end

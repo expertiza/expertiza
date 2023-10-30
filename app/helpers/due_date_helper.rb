@@ -51,16 +51,6 @@ module DueDateHelper
     	end
   	end
 
-   def self.set_due_date(duedate, deadline, assign_id, max_round)
-		ActiveRecord::Base.transaction do
-		submit_duedate = DueDate.new(duedate)
-		submit_duedate.deadline_type_id = deadline
-		submit_duedate.parent_id = assign_id
-		submit_duedate.round = max_round
-		submit_duedate.save
-		end
-   end
-
    def self.get_next_due_date(assignment_id, topic_id = nil)
     if Assignment.find(assignment_id).staggered_deadline?
       next_due_date = TopicDueDate.find_by(['parent_id = ? and due_at >= ?', topic_id, Time.zone.now])

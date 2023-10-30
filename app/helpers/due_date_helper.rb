@@ -47,7 +47,7 @@ module DueDateHelper
 
 
     def self.copy(old_assignment_id, new_assignment_id)
-		duedates = where(parent_id: old_assignment_id)
+		duedates = DueDate.where(parent_id: old_assignment_id)
 		ActiveRecord::Base.transaction do
 			duedates.each do |orig_due_date|
 				new_due_date = orig_due_date.dup

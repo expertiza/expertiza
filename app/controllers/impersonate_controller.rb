@@ -78,8 +78,7 @@ class ImpersonateController < ApplicationController
     user_name = params.dig(:user, :name) || params.dig(:impersonate, :name)
     return unless user_name
 
-    flash[:error] = 'Please enter a valid username' if warn_for_special_chars(user_name, 'Username')
-    redirect_back fallback_location: root_path
+    flash[:error] = 'Please enter a valid username' and redirect_back fallback_location: root_path if warn_for_special_chars(user_name, 'Username')
   end
 
   # Checking if the username provided can be impersonated or not

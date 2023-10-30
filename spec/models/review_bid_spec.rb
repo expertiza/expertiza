@@ -28,38 +28,47 @@ describe ReviewBid do
   end
 
   describe '#bidding_data validation' do
+    before do
+      @review_bid = ReviewBid.new
+    end
     it 'checks if get_bidding_data returns bidding_data as a hash' do
       test_reviewers = [1]
       allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
       allow(SignedUpTeam).to receive(:topic_id).and_return(1)
       allow(ReviewBid).to receive(:where).and_return([bid1, bid2])
-      expect(ReviewBid.bidding_data(bid1.assignment_id, test_reviewers)).to eq('max_accepted_proposals' => nil, 'tid' => [], 'users' => { 1 => { 'otid' => 1, 'priority' => [3, 2], 'tid' => [123, 124], 'time' => ['2018-01-01 00:00:00.000000000 +0000', nil] } })
+      expect(@review_bid.bidding_data(bid1.assignment_id, test_reviewers)).to eq('max_accepted_proposals' => nil, 'tid' => [], 'users' => { 1 => { 'otid' => 1, 'priority' => [3, 2], 'tid' => [123, 124], 'time' => ['2018-01-01 00:00:00.000000000 +0000', nil] } })
     end
   end
 
   describe '#assign_review_topics' do
+    before do
+      @review_bid = ReviewBid.new
+    end
     it 'calls assigns_topics_to_reviewer for as many topics associated' do
       maps = [response_map]
       matched_topics = { '1' => [topic] }
       allow(ReviewResponseMap).to receive(:where).and_return(maps)
       allow(maps).to receive(:destroy_all).and_return(true)
       expect(ReviewBid).to receive(:assign_topic_to_reviewer).with(1, 1, topic)
-      ReviewBid.assign_review_topics(1, [1], matched_topics)
+      @review_bid.assign_review_topics(1, [1], matched_topics)
     end
   end
 
   describe '#assign_topic_to_reviewer' do
+    before do
+      @review_bid = ReviewBid.new
+    end
     context 'when there are no SignUpTeam' do
       it 'returns an empty array' do
         allow(SignedUpTeam).to receive_message_chain(:where, :pluck, :first).and_return(nil)
-        expect(ReviewBid.assign_topic_to_reviewer(1, 1, topic)).to eq([])
+        expect(@review_bid.assign_topic_to_reviewer(1, 1, topic)).to eq([])
       end
     end
     context 'when there is a team to review' do
       it 'calls ReviewResponseMap' do
         allow(SignedUpTeam).to receive_message_chain(:where, :pluck, :first).and_return(team1)
         expect(ReviewResponseMap).to receive(:create)
-        ReviewBid.assign_topic_to_reviewer(1, 1, topic)
+        @review_bid.assign_topic_to_reviewer(1, 1, topic)
       end
     end
   end

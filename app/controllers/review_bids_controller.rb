@@ -108,9 +108,10 @@ class ReviewBidsController < ApplicationController
                          participant_id: reviewer_id)
       end
     else
-      bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
+      @review_bid = ReviewBid.new
+      bidding_data = @review_bid.bidding_data(assignment_id, reviewer_ids)
       matched_topics = assign_reviewers(bidding_data)
-      ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
+      @review_bid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
     end
 
     Assignment.find(assignment_id).update(can_choose_topic_to_review: false)

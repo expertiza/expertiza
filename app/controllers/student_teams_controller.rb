@@ -57,6 +57,10 @@ class StudentTeamsController < ApplicationController
     @users_on_waiting_list = (SignUpTopic.find(@student.team.topic).users_on_waiting_list if student_team_requirements_met?)
     @teammate_review_allowed = DueDate.teammate_review_allowed(@student)
   end
+ #E2351 Adding a new view for mentors
+  def mentor
+     return unless current_user_id? student.user_id
+  end
 
   def create
     existing_teams = AssignmentTeam.where name: params[:team][:name], parent_id: student.parent_id

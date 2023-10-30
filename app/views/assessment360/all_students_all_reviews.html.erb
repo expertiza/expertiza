@@ -9,7 +9,7 @@
             rows.forEach(function (row) {
                 const studentNameCell = row.querySelector('td:first-child');
                 if (studentNameCell) {
-                    if (index < 2) {
+                    if (row < 2) {
                         row.style.display = 'none';
                         return;
                     }

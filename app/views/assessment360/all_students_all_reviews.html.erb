@@ -40,12 +40,12 @@
       <% end %>
       <th colspan="2" width="300">Aggregate Score</th>
     </tr>
-<!--    <tr>-->
-      <%# (0..@assignments.size).each do %>
-<!--        <td><b>Metareviews</b></td>-->
-<!--        <td><b>Teammate Reviews</b></td>-->
+    <tr>
+      <% (0..@assignments.size).each do %>
+       <td><b>Metareviews</b></td>
+        <td><b>Teammate Reviews</b></td>
       <%# end %>
-<!--    </tr>-->
+    </tr>
 
     <% @course_participants.each do |cp|%>
         <tr>

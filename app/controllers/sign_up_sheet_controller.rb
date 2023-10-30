@@ -513,8 +513,14 @@ class SignUpSheetController < ApplicationController
   end
 
   def delete_signup_for_topic(topic_id, team_id)
+    # Delete a signup record for a specific topic and team.
+
+    # Find the SignUpTopic record with the specified topic_id using the `find_by` method.
     @sign_up_topic = SignUpTopic.find_by(id: topic_id)
+    # Check if the @sign_up_topic record exists (is not nil).
     unless @sign_up_topic.nil?
+       # If the @sign_up_topic record exists, reassign the topic for the specified team by calling the `reassign_topic` 
+       # instance method of SignUpTopic.
       @sign_up_topic.reassign_topic(team_id)
     end 
   end

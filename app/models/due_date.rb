@@ -2,11 +2,6 @@ class DueDate < ApplicationRecord
   validate :due_at_is_valid_datetime
   # has_paper_trail
 
-  def set_flag
-    self.flag = true
-    save
-  end
-
   # Validates if 'due_at' is a valid datetime, and raises an error if not.
   def due_at_is_valid_datetime
     if due_at.present?

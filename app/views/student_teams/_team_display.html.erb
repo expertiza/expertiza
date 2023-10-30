@@ -8,7 +8,7 @@
     <% end %>
     <th class="head">Email address</th>
 
-    <% if @teammate_review_allowed %>
+    <% if @is_teammate_review_allowed %>
       <th class="head"><%=t ".review_action"%></th>
     <% end %>
   </tr>
@@ -35,7 +35,7 @@
       <td><%= member.user.email(session[:ip]) %></td>
 
       <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
-      <% if @teammate_review_allowed &&
+      <% if @is_teammate_review_allowed &&
         ((@student.assignment.duty_based_assignment? && !team_user.duty_id.nil?) || (!@student.assignment.duty_based_assignment?))%>
         <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
           <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
@@ -64,7 +64,7 @@
       <%= link_to t(".leave_team"), remove_participant_student_teams_path(student_id: @student.id, team_id: @student.team.id) %>
     <td>
   </tr>
-  <%# <% if @teammate_review_allowed %>
+  <%# <% if @is_teammate_review_allowed %>
   <%# <tr style="border: 1px outset #000000; padding: 10px 20px" >
         <th class="head">Teammate review question</th>
         <th class="head">Self contribution percentage</th>

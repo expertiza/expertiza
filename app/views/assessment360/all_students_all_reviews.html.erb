@@ -8,15 +8,16 @@
 
             for (let i = 1; i < rows.length; i++) {
                 const row = rows[i];
-                const studentNameCell = row.querySelector('td:first-child');
-                
-                if (studentNameCell) {
-                    const studentName = studentNameCell.textContent.toLowerCase();
+                const subRows = row.querySelectorAll('td');
     
-                    if (studentName.includes(searchText)) {
-                        row.style.display = '';
+                if (subRows.length === 2) {
+                    const programName = subRows[0].textContent.toLowerCase();
+                    const reviews = subRows[1].textContent.toLowerCase();
+    
+                    if (programName.includes(searchText) || reviews.includes(searchText)) {
+                        row.style.display = ''; // Show the row
                     } else {
-                        row.style.display = 'none';
+                        row.style.display = 'none'; // Hide the row
                     }
                 }
             }

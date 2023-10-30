@@ -55,7 +55,6 @@ describe Ta do
         expect(result).to eq([course1, course2])
       end
     end
-
   end
   describe '#get' do
     it 'returns all objects of a given type associated with a user' do

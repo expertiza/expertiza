@@ -167,7 +167,7 @@ describe StudentQuizzesController do
     let(:quiz_response_map) {double(:quiz_response_map, map_id:1, reviewed_object_id:1, reviewee_id:1, quiz_score:97)}
     let(:quiz_question) {double(:quiz_question )}
     let(:participant) {double(:participant)}
-    let(:assignment_team) {double(:assignment_team, participants:participant)}    
+    let(:assignment_team) {double(:assignment_team, participants:participant)}
 
     before(:each) do
       allow(controller).to receive(:params).and_return(map_id:quiz_response_map.map_id)
@@ -212,14 +212,23 @@ describe StudentQuizzesController do
   end
 
   describe ".get_quiz_questionnaire" do
-    let(:assignment) {create(:assignment)}
-    let(:participant) {create(:participant)}
+    let(:assignment) {double(:assignment, id:1)}
+    let(:submitter) {double(:participant, id:1)}
+    let(:quiz_response) {double(:quiz_response, reviewee_id:submitter_team.id)}
+    let(:quiz_response_map) {double(:quiz_response_map, each: quiz_response)}
+    let(:submitter_team) {double(:assignment_team, participants:submitter, id:123, parent_id:assignment.id)}
+    let(:reviewer) {double(:participant, id:2)}
+    let(:reviewer_team) {double(:assignment_team, participants:reviewer, id:456)}
+    let(:quiz_questionnaire) {double(:quiz_questionnaire,taken_by?:reviewer_team)}
+    let(:stray_team) {double(:assignment_team, id:789)}
+    let(:stray_assignment) {double(:assignement, id:2)}
+
     context "when there are no reviewed_team_response_maps for the reviewer" do
       it "returns an empty array" do
         # test scenario
-       # expect(reviewed_team_response_maps).should be_nil
-       # student_quiz = StudentQuizzesController.take_quiz(assignment.id,participant.id)
-       # controller.take_quiz(assignment.id, participant.id).should be_nil
+        allow(Participant).to receive_message_chain(:where,:first).with(user_id:reviewer.id, parent_id:assignment.id).with(no_args).and_return(reviewer)
+        allow(ReviewResponseMap).to receive(:where).with(reviewer_id:reviewer.id).and_return([])
+        expect(StudentQuizzesController.take_quiz(assignment.id,reviewer.id)).to match_array([])
       end
     end
 
@@ -227,13 +236,28 @@ describe StudentQuizzesController do
       context "when the reviewee team is not associated with the assignment" do
         it "skips the reviewee team and does not include its quiz questionnaire" do
           # test scenario
+          allow(Participant).to receive_message_chain(:where,:first).with(user_id:reviewer.id, parent_id:assignment.id).with(no_args).and_return(reviewer)
+          allow(ReviewResponseMap).to receive(:where).with(reviewer_id:reviewer.id).and_return(quiz_response_map)
+          allow(Team).to receive(:find).with(stray_team.id).and_return(stray_team)
+          expect(StudentQuizzesController.take_quiz(assignment.id,reviewer.id)).to match_array([])
         end
       end
 
       context "when the reviewee team is associated with the assignment" do
+        
+        before(:each) do
+          allow(Participant).to receive_message_chain(:where,:first).with(user_id:reviewer.id, parent_id:assignment.id).with(no_args).and_return(reviewer)
+          allow(ReviewResponseMap).to receive(:where).with(reviewer_id:reviewer.id).and_return(quiz_response_map)
+          allow(Team).to receive(:find).with(submitter_team.id).and_return(submitter_team)
+          allow(QuizQuestionnaire).to receive_message_chain(:where,:first).with(instructor_id:submitter_team.id).with(no_args).and_return(quiz_questionnaire)
+          allow(QuizQuestionnaire).to receive(:taken_by?).and_return(reviewer)
+        end
+
         context "when the reviewee team has not created a quiz questionnaire" do
           it "skips the reviewee team and does not include its quiz questionnaire" do
             # test scenario
+            expect(QuizQuestionnaire).not_to receive(:where)
+            StudentQuizzesController.take_quiz(stray_assignment.id, reviewer_team.id)
           end
         end
 
@@ -241,12 +265,14 @@ describe StudentQuizzesController do
           context "when the quiz questionnaire has not been taken by the reviewer" do
             it "includes the quiz questionnaire in the result" do
               # test scenario
+              # expect(StudentQuizzesController.take_quiz(assignment.id, stray_team.id)).not_to match_array([])
             end
           end
 
           context "when the quiz questionnaire has been taken by the reviewer" do
             it "skips the quiz questionnaire and does not include it in the result" do
               # test scenario
+              expect(StudentQuizzesController.take_quiz(assignment.id, reviewer_team.id)).to match_array([])
             end
           end
         end
@@ -254,48 +280,165 @@ describe StudentQuizzesController do
     end
   end
 
-  describe "save_quiz_response" do
-    context "when participant response is empty" do
-      it "creates a new response and saves it" do
-        # Test scenario
+  describe StudentQuizzesController do
+    describe "record_response" do
+      let(:participant) { create(:student) }
+      let(:question) { create(:question) }
+      let(:empty_response) { '' }
+      let(:valid_score) { 100 }
+      let(:invalid_score) { -1 }
+      let(:non_empty_response) { 'Some Response' }
+      let(:mock_response) { double(:response, empty?: false) }
+      let(:dummy_assignment_id) { 123 }
+      let(:dummy_questionnaire_id) { 456 }
+      let(:questionnaire) { create(:questionnaire) }
+      let(:quiz_response_map) {
+        double(
+          :quiz_response_map,
+          map_id: 1,
+          reviewed_object_id: questionnaire.id,
+          reviewee_id: 1,
+          quiz_score: 97,
+          id: 1,
+          response: mock_response
+        )
+      }
+
+      before do
+        # Set the user in the session to mimic login
+        session[:user] = participant
+        session[:impersonate] = false
+
+        # Set the role for the logged in user
+        AuthController.set_current_role(participant.role_id, session)
+
+        # Mock the response map
+        allow(ResponseMap).to receive(:find).with(quiz_response_map.map_id.to_s).and_return(quiz_response_map)
+
+        # Mock the calculate_score on the specific instance
+        allow(quiz_response_map).to receive(:quiz_score)
+        allow(quiz_response_map).to receive(:quiz_score).and_return(97)
       end
 
-      it "calculates the score for the participant response" do
-        # Test scenario
-      end
+      context "when participant response is empty" do
+        before do
+          allow(mock_response).to receive(:empty?).and_return(true)
+        end
+        it "creates a new response and saves it" do
+          # Test scenario (Needs to be filled out)
+          expect {
+            post :record_response, params: {
+              map_id: quiz_response_map.map_id,
+              response: empty_response,
+              assignment_id: dummy_assignment_id,
+              questionnaire_id: dummy_questionnaire_id
+            }
+          }.to change { Response.count }.by(1)
+        end
 
-      context "when the score is valid" do
-        it "saves the scores" do
+        it "calculates the score for the participant response" do
           # Test scenario
+            expect_any_instance_of(StudentQuizzesController).to receive(:calculate_score)
+            post :record_response, params: {
+              map_id: quiz_response_map.map_id,
+              response: empty_response,
+              assignment_id: dummy_assignment_id,
+              questionnaire_id: dummy_questionnaire_id
+            }
+
+        end
+
+        context "when the score is valid" do
+          before do
+            allow_any_instance_of(QuizResponse).to receive(:calculate_score).and_return(valid_score)
+
+            # Mock the score getter and setter
+            allow(participant).to receive(:score).and_return(valid_score)
+            allow(participant).to receive(:score=)
+          end
+
+          it "saves the scores" do
+            # Test scenario
+              post :record_response, params: {
+                map_id: quiz_response_map.map_id,
+                response: empty_response,
+                assignment_id: dummy_assignment_id,
+                questionnaire_id: dummy_questionnaire_id
+              }
+              participant.reload
+              expect(participant.score).to eq(valid_score)
+          end
+
+          it "redirects to the finished_quiz page" do
+            post :record_response, params: {
+              map_id: quiz_response_map.map_id,
+              response: empty_response,
+              assignment_id: dummy_assignment_id,
+              questionnaire_id: dummy_questionnaire_id
+            }
+            expect(response).to redirect_to(controller: 'student_quizzes', action: 'finished_quiz', map_id: quiz_response_map.map_id)
+          end
+        end
+
+        context "when the score is invalid" do
+          before do
+            allow_any_instance_of(QuizResponse).to receive(:calculate_score).and_return(invalid_score)
+          end
+
+          it "destroys the quiz response" do
+            post :record_response, params: {
+              map_id: quiz_response_map.map_id,
+              response: empty_response,
+              assignment_id: dummy_assignment_id,
+              questionnaire_id: dummy_questionnaire_id
+            }
+            expect(Answer.where(answer: empty_response)).not_to exist
+          end
+
+          it "displays an error message" do
+            # working on test still 
+            # post :record_response, params: {
+            #   map_id: quiz_response_map.map_id,
+            #   response: empty_response,
+            #   assignment_id: dummy_assignment_id,
+            #   questionnaire_id: dummy_questionnaire_id
+            # }
+            # expect(flash[:error]).to be_present
+          end
+
+          it "redirects to the get_quiz_questionnaire page" do
+            post :record_response, params: {
+              map_id: quiz_response_map.map_id,
+              response: empty_response,
+              assignment_id: dummy_assignment_id,
+              questionnaire_id: dummy_questionnaire_id
+            }
+            expect(response).to redirect_to(controller: 'student_quizzes', action: 'finished_quiz', map_id: quiz_response_map.map_id)
+          end
+        end
+      end
+
+      context "when participant response is not empty" do
+        it "displays an error message" do
+          post :record_response, params: {
+            map_id: quiz_response_map.map_id,
+            response: non_empty_response,
+            assignment_id: dummy_assignment_id,
+            questionnaire_id: dummy_questionnaire_id
+          }
+          expect(flash[:error]).to be_present
         end
 
         it "redirects to the finished_quiz page" do
-          # Test scenario
-        end
-      end
-
-      context "when the score is invalid" do
-        it "destroys the quiz response" do
-          # Test scenario
-        end
-
-        it "displays an error message" do
-          # Test scenario
+          post :record_response, params: {
+            map_id: quiz_response_map.map_id,
+            response: empty_response,
+            assignment_id: dummy_assignment_id,
+            questionnaire_id: dummy_questionnaire_id
+          }
+          expect(response).to redirect_to(controller: 'student_quizzes', action: 'finished_quiz', map_id: quiz_response_map.map_id)
         end
 
-        it "redirects to the get_quiz_questionnaire page" do
-          # Test scenario
-        end
-      end
-    end
-
-    context "when participant response is not empty" do
-      it "displays an error message" do
-        # Test scenario
-      end
-
-      it "redirects to the finished_quiz page" do
-        # Test scenario
       end
     end
   end

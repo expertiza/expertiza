@@ -128,7 +128,16 @@ class StudentQuizzesController < ApplicationController
       response.updated_at = DateTime.current
       response.save
 
-      calculate_score map, response
+      score = calculate_score map, response
+
+      # Added logic to test for invalid scores to ensure redirect was happening
+      if score.to_i < 0
+        response.destroy  # Assuming you want to destroy the response if the score is invalid
+        flash[:error] = 'An error occurred while calculating your score.'
+
+        redirect_to controller: 'student_quizzes', action: 'get_quiz_questionnaire' # or wherever we need to redirect for invalid score
+      end
+      # end of added logic
     else
       flash[:error] = 'You have already taken this quiz, below are the records for your responses.'
       redirect_to controller: 'student_quizzes', action: 'finished_quiz', map_id: map.id

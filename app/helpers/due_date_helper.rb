@@ -5,7 +5,6 @@ module DueDateHelper
 	def self.deadline_sort(due_dates)
 		# Override the comparator operator to sort due dates by due_at
 		due_dates.sort { |m1, m2| m1.due_at.to_i <=> m2.due_at.to_i}
-	  end
 	end
 
 	def self.default_permission(deadline_type, permission_type)
@@ -90,8 +89,5 @@ module DueDateHelper
       next_due_date = AssignmentDueDate.find_by(['parent_id = ? && due_at >= ?', assignment_id, Time.zone.now])
     end
     next_due_date
-
-  end
-
-  end
-  
+    end
+end

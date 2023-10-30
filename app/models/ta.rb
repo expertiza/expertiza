@@ -16,7 +16,7 @@ class Ta < User
   end
 
   # Checks if the TA is an instructor or co-TA for a given questionnaire.
-  def is_instructor_or_co_ta?(questionnaire)
+  def instructor_or_co_ta?(questionnaire)
     return false if questionnaire.nil?
 
     # Check if is TA for any of the courses of a given questionnaire's instructor
@@ -86,12 +86,12 @@ class Ta < User
   end
 
   # Returns the instructor ID for the first course that this TA helps teach.
-  def get_instructor
+  def instructor
     Ta.get_my_instructor(id)
   end
 
   # Sets the instructor and course ID for a new assignment.
-  def set_instructor(new_assign)
+  def instructor=(new_assign)
     new_assign.instructor_id = Ta.get_my_instructor(id)
     new_assign.course_id = TaMapping.get_course_id(id)
   end
@@ -105,25 +105,36 @@ class Ta < User
     true
   end
 
-  # Returns a list of users who have the same or lower privilege level as the given user
-  # and are participants in the courses that the user is a TA for.
+  # This method returns a list of users who are participants in the same courses as the input user
+  # and whose roles have all privileges of the input user's role.
   def self.get_user_list(user)
-    # Get the roles associated with the user
-    user_roles = user.role
-    # Get a list of course IDs associated with the user
-    courses = Ta.get_mapped_courses(user.id)
-    # Initialize an array to store participants
-    participants = []
-    # Iterate through each course to collect participants
-    courses.each do |course_id|
-      course = Course.find(course_id)
-      participants.concat(course.get_participants)
-    end
+    # Get all participants from the courses the user is associated with
+    participants = get_course_participants(user)
     # Select participants whose role has all privileges of the user's role
-    selected_participants = participants.select do |participant|
-      user_roles.has_all_privileges_of?(participant.user.role)
-    end
-    # Extract the user objects from the selected participants
+    selected_participants = select_participants(user, participants)
+    # Return the list of users associated with the selected participants
     selected_participants.map(&:user)
   end
+
+  # This method returns a list of participants in the courses that the input user is associated with.
+  def self.get_course_participants(user)
+    # Get a list of course IDs associated with the user and for each course ID,
+    # find the course and get its participants. The result is a flat list of all participants.
+    Ta.get_mapped_courses(user.id).flat_map do |course_id|
+      Course.find(course_id).get_participants
+    end
+  end
+  private_class_method :get_course_participants
+
+  # This method returns a list of participants from the input list whose roles have all privileges
+  # of the input user's role.
+  def self.select_participants(user, participants)
+    # Get the roles associated with the user
+    user_roles = user.role
+    # Select participants from the input list whose role has all privileges of the user's role
+    participants.select do |participant|
+      user_roles.has_all_privileges_of?(participant.user.role)
+    end
+  end
+  private_class_method :select_participants
 end

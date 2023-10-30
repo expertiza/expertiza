@@ -181,12 +181,12 @@ class User < ApplicationRecord
     user
   end
 
-  def set_instructor(new_assignment)
+  def instructor=(new_assignment)
     # Takes an assignment object and sets the instructor ID to the current user's ID.
     new_assignment.instructor_id = id
   end
 
-  def get_instructor
+  def instructor
     id
   end
 

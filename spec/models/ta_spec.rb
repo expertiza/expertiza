@@ -89,19 +89,22 @@ describe Ta do
       expect(Ta.get_mapped_instructor_ids(999)).to eq([6])
     end
   end
-  describe '#get_instructor' do
+  describe '#instructor' do
     it 'returns associated instructor' do
       allow(Ta).to receive(:get_my_instructor).with(999).and_return(6)
-      expect(ta.get_instructor).to eq(6)
+      expect(ta.instructor).to eq(6)
     end
   end
-  describe '#set_instructor' do
+  describe '#instructor=' do
     it 'assigns the instructor id and course id' do
       allow(Ta).to receive(:get_my_instructor).with(999).and_return(6)
       allow(TaMapping).to receive(:get_course_id).with(999).and_return(1)
-      expect(ta.set_instructor(assignment)).to eq(1)
+      ta.instructor = assignment
+      expect(assignment.instructor_id).to eq(6)
+      expect(assignment.course_id).to eq(1)
     end
   end
+
   describe '#get_user_list' do
     it 'gets a list of users that belong to the TA' do
       @student_role = build(:role_of_student, id: 1, name: 'Student_role_test', description: '', parent_id: nil, default_page_id: nil)

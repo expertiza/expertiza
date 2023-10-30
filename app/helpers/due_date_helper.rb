@@ -13,7 +13,7 @@ module DueDateHelper
 	  end
 	end
   
-	def self.done_in_assignment_round(assignment_id, response)
+	def self.calculate_done_in_assignment_round(assignment_id, response)
 	  return 0 if ResponseMap.find(response.map_id).type != 'ReviewResponseMap'
   
 	  due_dates = DueDate.where(parent_id: assignment_id)

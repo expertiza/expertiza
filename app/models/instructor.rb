@@ -61,14 +61,14 @@ class Instructor < User
   end
 
   # This method retrieves the participants from the entities (either Course or Assignment) where the given user is an instructor.
-  def self.get_participants_from_instructed_entities(entity, user)
+  def self.get_participants_from_instructed_entities(entity_type, user)
     # Get all entities where the user is an instructor
-    entities = entity.where(instructor_id: user.id)
+    entities = entity_type.where(instructor_id: user.id)
 
     # For each entity, get its participants and filter them based on the user's privileges
-    entities.flat_map do |entity|
+    entities.flat_map do |each_entity|
       # Check if the entity has a get_participants method (as in Course) or directly has a participants association (as in Assignment)
-      participants = entity.respond_to?(:get_participants) ? entity.get_participants : entity.participants
+      participants = each_entity.respond_to?(:get_participants) ? each_entity.get_participants : each_entity.participants
 
       # Filter the participants based on the user's privileges
       filter_participants(participants, user)
@@ -85,5 +85,4 @@ class Instructor < User
     # Map each participant to its associated user and return this list of users
     filtered_participants.map(&:user)
   end
-
 end

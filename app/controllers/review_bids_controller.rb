@@ -62,6 +62,7 @@ class ReviewBidsController < ApplicationController
     @assigned_review_maps = []
     ReviewResponseMap.where(reviewed_object_id: @assignment.id, reviewer_id: @participant.id).each do |review_map|
       @assigned_review_maps << review_map
+    @count= ReviewBid.all.count
     end
 
     # explicitly render view since it's in the sign up sheet views

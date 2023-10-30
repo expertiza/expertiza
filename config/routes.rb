@@ -361,7 +361,7 @@ Expertiza::Application.routes.draw do
       post :assign_bidding
       post :set_priority
       post :index
-      post :run_bidding_algorithm
+      post :assign_reviewers
       get :show
     end
   end

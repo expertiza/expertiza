@@ -27,48 +27,57 @@ class StudentQuizzesController < ApplicationController
 
 
   def finished_quiz
-    @response = Response.where(map_id: params[:map_id]).first #What is the purpose of @response? I don't see it used anywhere else in this file.
+    @participant_response = Response.where(map_id: params[:map_id]).first #What is the purpose of @response? I don't see it used anywhere else in this file.
+    #@participant_response is used in finished_quiz.html.erb
     @response_map = QuizResponseMap.find(params[:map_id])
-    @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id) # The reviewed_object_id is questionnaire_id for quiz response_map
+    @quiz_questions = Question.where(questionnaire_id: @response_map.reviewed_object_id) # The reviewed_object_id is questionnaire_id for quiz response_map
     @map = ResponseMap.find(params[:map_id])
     @participant = AssignmentTeam.find(@map.reviewee_id).participants.first
 
     @quiz_score = @response_map.quiz_score
   end
 
-  # Create an array of candidate quizzes for current reviewer
   def self.take_quiz(assignment_id, reviewer_id)
+    # Initialize an empty array to store quizzes
     quizzes = []
+    # Find the participant with assignment_id and reviewer_id
     reviewer = Participant.where(user_id: reviewer_id, parent_id: assignment_id).first
+    # Find  review response maps of the reviewer
     reviewed_team_response_maps = ReviewResponseMap.where(reviewer_id: reviewer.id)
+    # Iterate each review response map
     reviewed_team_response_maps.each do |team_response_map_record|
       reviewee_id = team_response_map_record.reviewee_id
       reviewee_team = Team.find(reviewee_id) # reviewees should always be teams
+      # Check if the reviewee team is associated with the given assignment_id
       next unless reviewee_team.parent_id == assignment_id
 
+      # Find the quiz quiz associated with the reviewee team's instructor
       quiz_questionnaire = QuizQuestionnaire.where(instructor_id: reviewee_team.id).first
 
-      # if the reviewee team has created quiz
       if quiz_questionnaire
         quizzes << quiz_questionnaire unless quiz_questionnaire.taken_by? reviewer
       end
     end
+    # Return the array available of quizzes
     quizzes
   end
 
-  # the way 'answers' table store the results of quiz
   def calculate_score(map, response)
-    questionnaire = Questionnaire.find(map.reviewed_object_id)
+    quiz = Questionnaire.find(map.reviewed_object_id)
     scores = []
-    valid = true
-    questions = Question.where(questionnaire_id: questionnaire.id)
+    valid_flag = true # Flag to track if user responses are valid
+    questions = Question.where(questionnaire_id: quiz.id) # Get all questions of the quiz
     questions.each do |question|
       score = 0
+      # Get correct answer(s) for the question
       correct_answers = QuizQuestionChoice.where(question_id: question.id, iscorrect: true)
-      ques_type = question.type
-      if ques_type.eql? 'MultipleChoiceCheckbox'
+      #Get the question type to grade (MultipleChoiceCheckbox, MultipleChoiceRadio or True/False)
+      question_type = question.type
+      #Grading logic for MultipleChoiceCheckbox
+      if question_type.eql? 'MultipleChoiceCheckbox'
+        #Checking if answer is blank
         if params[question.id.to_s].nil?
-          valid = false
+          valid_flag = false
         else
           params[question.id.to_s].each do |choice|
             # loop the quiz taker's choices and see if 1)all the correct choice are checked and 2) # of quiz taker's choice matches the # of the correct choices
@@ -76,29 +85,36 @@ class StudentQuizzesController < ApplicationController
               score += 1 if choice.eql? correct.txt
             end
           end
+          # Create Answer objects for each choice selected by the user and validate them
           score = score == correct_answers.count && score == params[question.id.to_s].count ? 1 : 0
-          # for MultipleChoiceCheckbox, score =1 means the quiz taker have done this question correctly, not just make select this choice correctly.
+          # for MultipleChoiceCheckbox, score =1 means the quiz taker have done this question correctly, each_answer_score is set for each of the multiple answers selected
           params[question.id.to_s].each do |choice|
-            new_score = Answer.new comments: choice, question_id: question.id, response_id: response.id, answer: score
-            valid = false unless new_score.valid?
-            scores.push(new_score)
+            each_answer_score = Answer.new comments: choice, question_id: question.id, response_id: response.id, answer: score
+            valid_flag = false unless each_answer_score.valid?
+            # Add the the each_answer_score object to the scores array
+            scores.push(each_answer_score)
           end
         end
-      else # TrueFalse and MultipleChoiceRadio
+        # TrueFalse and MultipleChoiceRadio logic
+      else
+        # Get the correct answer
         correct_answer = correct_answers.first
+        # Check if user's response matches the correct answer, set score to 1 if correct, else 0
         score = correct_answer.txt == params[question.id.to_s] ? 1 : 0
         new_score = Answer.new comments: params[question.id.to_s], question_id: question.id, response_id: response.id, answer: score
-        valid = false if new_score.nil? || new_score.comments.nil? || new_score.comments.empty?
-        scores.push(new_score)
+        valid_flag = false if new_score.nil? || new_score.comments.nil? || new_score.comments.empty?
+        scores.push(new_score) # Add the Answer object to the scores array
       end
     end
-    if valid
+    # Check if all user responses are valid_flag
+    if valid_flag
       scores.each(&:save)
       redirect_to controller: 'student_quizzes', action: 'finished_quiz', map_id: map.id
+      #Show error if not all answers are done
     else
       response.destroy
       flash[:error] = 'Please answer every question.'
-      redirect_to action: :take_quiz, assignment_id: params[:assignment_id], questionnaire_id: questionnaire.id, map_id: map.id
+      redirect_to action: :take_quiz, assignment_id: params[:assignment_id], questionnaire_id: quiz.id, map_id: map.id
     end
   end
 

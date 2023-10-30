@@ -1,21 +1,11 @@
 # app/helpers/due_date_helper.rb
 
 module DueDateHelper
-	 # Override the comparator operator to sort due dates by due_at
-	def <=>(other)
-		if due_at && other.due_at
-		  due_at <=> other.due_at
-			elsif due_at
-				-1
-			else
-		  1
-		end
-	end
 	  
 	def self.deadline_sort(due_dates)
-	  # Sort the due dates by due_at
-	  due_dates.sort { |m1, m2| m1 <=> m2 }
-	end
+		# Override the comparator operator to sort due dates by due_at
+		due_dates.sort { |m1, m2| m1.due_at.to_i <=> m2.due_at.to_i}
+	  end
   
 	def self.done_in_assignment_round(assignment_id, response)
 	  return 0 if ResponseMap.find(response.map_id).type != 'ReviewResponseMap'

@@ -66,9 +66,9 @@ module AssignmentHelper
       due_date = AssignmentDueDate.new
       due_date.deadline_type_id = DeadlineType.find_by(name: type).id
       # creating new round
-      due_date.submission_allowed_id = AssignmentDueDate.default_permission(type, 'submission_allowed')
-      due_date.review_allowed_id = AssignmentDueDate.default_permission(type, 'can_review')
-      due_date.review_of_review_allowed_id = AssignmentDueDate.default_permission(type, 'review_of_review_allowed')
+      due_date.submission_allowed_id = DueDateHelper.default_permission(type, 'submission_allowed')
+      due_date.review_allowed_id = DueDateHelper.default_permission(type, 'can_review')
+      due_date.review_of_review_allowed_id = DueDateHelper.default_permission(type, 'review_of_review_allowed')
       due_date
     else
       due_dates[round]

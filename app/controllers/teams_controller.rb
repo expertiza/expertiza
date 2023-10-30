@@ -104,23 +104,25 @@ class TeamsController < ApplicationController
     # delete records in team, teams_users, signed_up_teams table
     @team = Team.find_by(id: params[:id])
     unless @team.nil?
+      # Find all SignedUpTeam records associated with the found team.
       @signed_up_team = SignedUpTeam.where(team_id: @team.id)
+      # Find all TeamsUser records associated with the found team.
       @teams_users = TeamsUser.where(team_id: @team.id)
-
+      # Check if there are SignedUpTeam records associated with the found team.
       unless @signed_up_team.nil?
+        # If a topic is assigned to this team and there is only one signed up team record, and it's not waitlisted.
         if @signed_up_team.count == 1 && !@signed_up_team.first.is_waitlisted  # if a topic is assigned to this team
-            # fetch topic object 
+            # Fetch the SignUpTopic object associated with the single signed up team.
             @signed_topic = SignUpTopic.find_by(id: @signed_up_team.first.topic_id)
             unless @signed_topic.nil?
-              # call instance method reassign_topic to reassign topic
+              # Call the instance method `reassign_topic` of SignUpTopic to reassign the topic.
               @signed_topic.reassign_topic(@signed_up_team.first.team_id)
             end
         else
-          # drop all waitlists in SignedUpTeam
+          # Drop all waitlists in SignedUpTeam for the specified team ID.
           SignedUpTeam.drop_off_waitlists(params[:id])
         end
       end
-
      # @sign_up_team.destroy_all if @sign_up_team
       @teams_users.destroy_all if @teams_users
       @team.destroy if @team

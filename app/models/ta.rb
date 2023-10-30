@@ -126,7 +126,7 @@ class Ta < User
   end
   private_class_method :get_course_participants
 
-  # This method returns a list of participants from the input list whose roles have all privileges 
+  # This method returns a list of participants from the input list whose roles have all privileges
   # of the input user's role.
   def self.select_participants(user, participants)
     # Get the roles associated with the user

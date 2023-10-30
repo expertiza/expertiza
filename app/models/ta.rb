@@ -10,7 +10,7 @@ class Ta < User
   ASSIGNMENT = [['My assignments', 'list_mine'],
                 ['All public assignments', 'list_all']].freeze
 
-  # Returns the courses that the TA assists with.              
+  # Returns the courses that the TA assists with.
   def courses_assisted_with
     TaMapping.where(ta_id: id).map { |c| Course.find(c.course_id) }
   end
@@ -110,24 +110,19 @@ class Ta < User
   def self.get_user_list(user)
     # Get the roles associated with the user
     user_roles = user.role
-
     # Get a list of course IDs associated with the user
     courses = Ta.get_mapped_courses(user.id)
-
     # Initialize an array to store participants
     participants = []
-
     # Iterate through each course to collect participants
     courses.each do |course_id|
       course = Course.find(course_id)
       participants.concat(course.get_participants)
     end
-
     # Select participants whose role has all privileges of the user's role
     selected_participants = participants.select do |participant|
       user_roles.has_all_privileges_of?(participant.user.role)
     end
-
     # Extract the user objects from the selected participants
     selected_participants.map(&:user)
   end

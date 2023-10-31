@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Represents due dates for a specific task or assignment.
 class DueDate < ApplicationRecord
   validate :due_at_is_valid_datetime
 
@@ -6,10 +9,10 @@ class DueDate < ApplicationRecord
     if due_at.present?
       begin
         DateTime.parse(due_at.to_s)
-      rescue ArgumentError, StandardError => e
-        errors.add(:due_at, "must be a valid datetime: #{e.message}")
+      rescue StandardError
+        errors.add(:due_at, 'must be a valid datetime')
       end
     end
-  nil
+    nil
   end
 end

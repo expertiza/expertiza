@@ -55,7 +55,7 @@ class StudentTeamsController < ApplicationController
 
     # this line generates a list of users on the waiting list for the topic of a student's team,
     @users_on_waiting_list = (SignUpTopic.find(@student.team.topic).users_on_waiting_list if student_team_requirements_met?)
-    @teammate_review_allowed = DueDateHelper.is_teammate_review_allowed(@student)
+    @teammate_review_allowed = DueDateHelper.teammate_review_allowed?(@student)
   end
 
   def create

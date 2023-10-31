@@ -44,6 +44,7 @@ class QuizQuestion < Question
   def isvalid(choice_info)
     @valid = 'valid'
     @valid = 'Please make sure all questions have text' if txt == ''
+    @valid
   end
 
 end

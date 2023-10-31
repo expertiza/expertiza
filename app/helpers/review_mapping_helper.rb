@@ -241,8 +241,10 @@ module ReviewMappingHelper
 
   # gets review and feedback responses for a certain round for the feedback report
   def feedback_response_for_author(author)
-    # Setting values of instance variables
-    @feedback_response_maps = FeedbackResponseMap.where(['reviewed_object_id IN (?) and reviewer_id = ?', @all_review_response_ids, author.id])
+    # This is a lot of logic in the view (gross) and this method is called if the review rounds don't have varying rubrics
+
+    # this variable is used to populate all the feedback response data if the assignments don't vary by round.
+    @feedback_response_maps_with_constant_assignment = FeedbackResponseMap.where(['reviewed_object_id IN (?) and reviewer_id = ?', @all_review_response_ids, author.id])
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     @review_response_map_ids = ReviewResponseMap.where(['reviewed_object_id = ? and reviewee_id = ?', @id, @team_id]).pluck('id')
     @review_responses = Response.where(['map_id IN (?)', @review_response_map_ids])

@@ -4,15 +4,18 @@
 
 # This module contains helper methods related to due dates.
 module DueDateHelper
+  # Sorts a list of due dates by their due_at attribute.
   def self.deadline_sort(due_dates)
     # Override the comparator operator to sort due dates by due_at
     due_dates.sort { |m1, m2| m1.due_at.to_i <=> m2.due_at.to_i }
   end
 
+  # Retrieves the default permission for a specific deadline type and permission type.
   def self.default_permission(deadline_type, permission_type)
     DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
   end
 
+  # Calculates the assignment round for a response within an assignment.
   def self.calculate_assignment_round(assignment_id, response)
     return 0 unless ResponseMap.find(response.map_id).type == 'ReviewResponseMap'
 
@@ -21,6 +24,7 @@ module DueDateHelper
     determine_assignment_round(response, sorted_deadlines)
   end
 
+  # Determines the assignment round for a response based on due dates.
   def self.determine_assignment_round(response, sorted_due_dates)
     round = 1
     sorted_due_dates.each do |due_date|
@@ -31,16 +35,19 @@ module DueDateHelper
     round
   end
 
+  # Finds the current due date that is after the current time.
   def self.find_current_due_date(due_dates)
     due_dates.find { |due_date| due_date.due_at > Time.now }
   end
 
+  # Checks if teammate reviews are allowed for a student's assignment.
   def self.teammate_review_allowed?(student)
     due_date = find_current_due_date(student.assignment.due_dates)
     student.assignment.find_current_stage == 'Finished' ||
       (due_date && [2, 3].include?(due_date.teammate_review_allowed_id))
   end
 
+  # Copies due dates from an old assignment to a new assignment.
   def self.copy(old_assignment_id, new_assignment_id)
     duedates = DueDate.where(parent_id: old_assignment_id)
 
@@ -51,12 +58,14 @@ module DueDateHelper
     end
   end
 
+  # Duplicates a due date for a new assignment.
   def self.duplicate_due_date(orig_due_date, new_assignment_id)
     new_due_date = orig_due_date.dup
     new_due_date.parent_id = new_assignment_id
     new_due_date.save
   end
 
+  # Retrieves the next due date for an assignment, considering staggered deadlines.
   def self.get_next_due_date(assignment_id, topic_id = nil)
     if Assignment.find(assignment_id).staggered_deadline?
       find_next_topic_due_date(assignment_id, topic_id)
@@ -65,6 +74,7 @@ module DueDateHelper
     end
   end
 
+  # Finds the next due date for a specific topic within an assignment or the corresponding assignment due date if no topic due date is available.
   def self.find_next_topic_due_date(assignment_id, topic_id)
     next_due_date = TopicDueDate.find_by(['parent_id = ? and due_at >= ?', topic_id, Time.zone.now])
     # if certion TopicDueDate is not exist, we should query next corresponding AssignmentDueDate.

@@ -17,9 +17,6 @@ pg_data/*
 .initialized
 expertiza-db/*
 
-.tool-versions
-Gemfile.lock
-
 #################
 ## scrubbed_db ##
 #################

@@ -27,4 +27,15 @@ describe QuizQuestion do
       expect(quiz_question.get_formatted_question_type).to eq('Multiple Choice - Radio')
     end
   end
+
+  describe '#isvalid' do
+    it 'returns valid if there is text' do
+      expect(quiz_question.isvalid(quiz_question.quiz_question_choices)).to eq('valid')
+    end
+
+    it 'returns with error if text is empty' do
+      quiz_question.txt=''
+      expect(quiz_question.isvalid(quiz_question.quiz_question_choices)).to eq('Please make sure all questions have text')
+    end
+  end
 end

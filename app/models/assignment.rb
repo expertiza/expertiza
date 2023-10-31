@@ -652,7 +652,7 @@ class Assignment < ApplicationRecord
   end
 
   #Method to drop all the SignedUpRecords of all topics for that assignment once the drop_topic deadline passes
-  def drop_waitlisted_topics
+  def drop_waitlisted_teams
     # Find all the topics (sign_up_topics) under the current assignment (self).
     topics = SignUpTopic.where(assignment_id: self.id)
   

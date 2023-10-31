@@ -500,37 +500,14 @@ class ReviewMappingController < ApplicationController
           break if selected_participants.size == participants.size - num_participants_this_team
 
           # generate random number
-          if iterator.zero?
-            rand_num = rand(0..num_participants - 1)
-          else
-            min_value = participants_hash.values.min
-            # get the temp array including indices of participants, each participant has minimum review number in hash table.
-            participants_with_min_assigned_reviews = []
-            participants.each do |participant|
-              participants_with_min_assigned_reviews << participants.index(participant) if participants_hash[participant.id] == min_value
-            end
-            # if participants_with_min_assigned_reviews is blank
-            if_condition_1 = participants_with_min_assigned_reviews.empty?
-            # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
-            if_condition_2 = ((participants_with_min_assigned_reviews.size == 1) && TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
-            rand_num = if if_condition_1 || if_condition_2
-                         # use original method to get random number
-                         rand(0..num_participants - 1)
-                       else
-                         # rand_num should be the position of this participant in original array
-                         participants_with_min_assigned_reviews[rand(0..participants_with_min_assigned_reviews.size - 1)]
-                       end
-          end
+          rand_num = generate_participant_rand_num(participants,participants_hash,num_participants,iterator)
+
           # prohibit one student to review his/her own artifact
           next if TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
 
-          if_condition_1 = (participants_hash[participants[rand_num].id] < review_strategy.reviews_per_student)
-          if_condition_2 = (!selected_participants.include? participants[rand_num].id)
-          if if_condition_1 && if_condition_2
-            # selected_participants cannot include duplicate num
-            selected_participants << participants[rand_num].id
-            participants_hash[participants[rand_num].id] += 1
-          end
+          # We add the participant assigned with rand_num to the list of selected_participants, selectively
+          update_selected_participants(participants,participants_hash,review_strategy,selected_participants,rand_num)
+
           # remove students who have already been assigned enough num of reviews out of participants array
           participants.each do |participant|
             if participants_hash[participant.id] == review_strategy.reviews_per_student
@@ -552,10 +529,54 @@ class ReviewMappingController < ApplicationController
       end
 
       begin
-        selected_participants.each { |index| ReviewResponseMap.where(reviewee_id: team.id, reviewer_id: index, reviewed_object_id: assignment_id).first_or_create }
+        selected_participants.each do |index|
+          ReviewResponseMap.where(reviewee_id: team.id, reviewer_id: index, reviewed_object_id: assignment_id).first_or_create
+        end
       rescue StandardError
         flash[:error] = 'Automatic assignment of reviewer failed.'
       end
+    end
+  end
+
+  # generates random number for a participant for peer reviewing
+  def generate_participant_rand_num(participants, participants_hash, num_participants, iterator)
+    # generate random number
+    if iterator.zero?
+      rand_num = rand(0..num_participants - 1)
+    else
+      min_value = participants_hash.values.min
+      # get the temp array including indices of participants, each participant has minimum review number in hash table.
+      participants_with_min_assigned_reviews = []
+      participants.each do |participant|
+        participants_with_min_assigned_reviews << participants.index(participant) if participants_hash[participant.id] == min_value
+      end
+      # if participants_with_min_assigned_reviews is blank
+      is_participants_with_min_assigned_reviews_empty = participants_with_min_assigned_reviews.empty?
+      # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
+      if_condition_2 = ((participants_with_min_assigned_reviews.size == 1) && TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
+      rand_num = if is_participants_with_min_assigned_reviews_empty || if_condition_2
+                   # use original method to get random number
+                   rand(0..num_participants - 1)
+                 else
+                   # rand_num should be the position of this participant in original array
+                   participants_with_min_assigned_reviews[rand(0..participants_with_min_assigned_reviews.size - 1)]
+                 end
+    end
+
+    #return the random number that was generated
+    rand_num
+  end
+
+  # We add the participant assigned with rand_num to the list of selected_participants, based on some pre-conditions
+  def update_selected_participants(participants, participants_hash, review_strategy, selected_participants, rand_num)
+    # if participants_hash for that particular participant is less than expected reviews per student
+    if_condition_1 = (participants_hash[participants[rand_num].id] < review_strategy.reviews_per_student)
+    # if selected_participants does not include that particular participant
+    if_condition_2 = (!selected_participants.include? participants[rand_num].id)
+    if if_condition_1 && if_condition_2
+      # selected_participants cannot include duplicate num
+      selected_participants << participants[rand_num].id
+      participants_hash[participants[rand_num].id] += 1
     end
   end
 

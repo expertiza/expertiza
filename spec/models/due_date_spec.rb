@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'support/shared_contexts'
 
 describe 'due_date_functions' do

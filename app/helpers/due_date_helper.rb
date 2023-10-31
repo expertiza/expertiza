@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 # app/helpers/due_date_helper.rb
 
-  module DueDateHelper
-
+# This module contains helper methods related to due dates.
+module DueDateHelper
   def self.deadline_sort(due_dates)
     # Override the comparator operator to sort due dates by due_at
     due_dates.sort { |m1, m2| m1.due_at.to_i <=> m2.due_at.to_i }
@@ -23,6 +25,7 @@
     round = 1
     sorted_due_dates.each do |due_date|
       break if response.created_at < due_date.due_at
+
       round += 1 if due_date.deadline_type_id == 2
     end
     round
@@ -32,18 +35,10 @@
     due_dates.find { |due_date| due_date.due_at > Time.now }
   end
 
-  def self.is_teammate_review_allowed(student)
+  def self.teammate_review_allowed?(student)
     due_date = find_current_due_date(student.assignment.due_dates)
-    return true if student.assignment.find_current_stage == 'Finished'
-    return true if teammate_review_allowed?(due_date)
-
-    false
-  end
-
-  def self.teammate_review_allowed?(due_date)
-    return false unless due_date
-
-    [2, 3].include?(due_date.teammate_review_allowed_id)
+    student.assignment.find_current_stage == 'Finished' ||
+      (due_date && [2, 3].include?(due_date.teammate_review_allowed_id))
   end
 
   def self.copy(old_assignment_id, new_assignment_id)
@@ -64,11 +59,10 @@
 
   def self.get_next_due_date(assignment_id, topic_id = nil)
     if Assignment.find(assignment_id).staggered_deadline?
-      next_due_date = find_next_topic_due_date(assignment_id, topic_id)
+      find_next_topic_due_date(assignment_id, topic_id)
     else
-      next_due_date = AssignmentDueDate.find_by(['parent_id = ? && due_at >= ?', assignment_id, Time.zone.now])
+      AssignmentDueDate.find_by(['parent_id = ? && due_at >= ?', assignment_id, Time.zone.now])
     end
-    next_due_date
   end
 
   def self.find_next_topic_due_date(assignment_id, topic_id)

@@ -26,7 +26,7 @@
 <%= label_tag('assignment_form[assignment][use_bookmark]', 'Allow participants to create bookmarks?') %>
 
 <br>
-<% if @assignment_form.assignment.can_choose_topic_to_review? == true %>
+
   <input name="assignment_form[assignment][bidding_for_reviews_enabled]" type="hidden" value="false"/>
   <%= check_box_tag(
     'assignment_form[assignment][bidding_for_reviews_enabled]',
@@ -40,7 +40,7 @@
   <% if @assignment_form.assignment.bidding_for_reviews_enabled %>
     <%= button_to 'Run Review Algorithm', :controller=>'review_bids', :action=>'assign_bidding', :assignment_id => @assignment_form.assignment.id %>
   <% end %>
-<% end %>
+
 
 <br><br>
 <% if @assignment_form.assignment.staggered_deadline == true %>

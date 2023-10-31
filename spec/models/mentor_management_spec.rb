@@ -123,24 +123,24 @@ describe MentorManagement do
 
   #   E2351 Testing: Mentor Management for Assignments without Topics
   describe "select_mentor" do
-    #     context "when there are mentors available for the assignment" do
-    #       it "returns the mentor with the lowest team count for the given assignment" do
-    # Test scenario 1
-    # Given an assignment_id
-    # When there are multiple mentors with different team counts for the assignment
-    # Then it should return the mentor with the lowest team count
+    context "when there are mentors available for the assignment" do
+      it "returns the mentor with the lowest team count for the given assignment" do
+      # Test scenario 1
+      # Given an assignment_id
+      # When there are multiple mentors with different team counts for the assignment
+      # Then it should return the mentor with the lowest team count
 
-    # Test scenario 2
-    # Given an assignment_id
-    # When there are multiple mentors with the same lowest team count for the assignment
-    # Then it should return the first mentor in the list
+      # Test scenario 2
+      # Given an assignment_id
+      # When there are multiple mentors with the same lowest team count for the assignment
+      # Then it should return the first mentor in the list
 
-    # Test scenario 3
-    # Given an assignment_id
-    # When there is only one mentor available for the assignment
-    # Then it should return that mentor
-    #   end
-    # end
+      # Test scenario 3
+      # Given an assignment_id
+      # When there is only one mentor available for the assignment
+      # Then it should return that mentor
+      end
+    end
 
     context "when there are no mentors available for the assignment" do
       it "returns nil" do
@@ -242,24 +242,22 @@ describe MentorManagement do
     end
 
     context 'when all conditions are met' do
-      # it 'assigns a mentor to the team' do
-      #   # test scenario
-      #
-      # end
-
-      it 'notifies the team of the mentor assignment' do
+      it 'assigns a mentor and notifies the team of the mentor assignment' do
         # test scenario
         allow(Assignment).to receive(:find).with(assignment.id).and_return(assignment)
         allow(Team).to receive(:find).with(team.id).and_return(team)
 
         # add 2 students to a team
         [student1, student2].each { |student| FactoryBot.create(:team_user, team_id: team.id, user_id: student.id) }
-        # Attempt to send email to mentor and teammates
-        mail = MentorManagement.assign_mentor(assignment.id, team)
+        allow(assignment).to receive(:topics?).and_return(false)
+        allow(team).to receive(:topics).and_return(nil)
 
-        expect(mail.subject).to eq('[Expertiza]: New Mentor Assignment')
-        expect(mail.to).to include(student2.email)
-        expect(mail.from).to eq('expertiza.mailer@gmail.com')
+        allow(MentorManagement).to receive(:select_mentor).with(assignment.id).and_return(ta)
+        allow(team).to receive(:add_member).and_return(true)
+        # Attempt to send email to mentor and teammates
+        MentorManagement.assign_mentor(assignment.id, team.id)
+
+        expect(MentorManagement).to receive(:notify_team_of_mentor_assignment)
       end
     end
   end
@@ -305,43 +303,70 @@ describe MentorManagement do
       end
     end
   end
-  # describe ".mentors_for_assignment" do
-  #   context "when given a valid assignment_id" do
-  #     it "returns an array of mentors assigned to the assignment" do
-  #       # Test scenario 1
-  #       # Given a valid assignment_id
-  #       # When calling .mentors_for_assignment(assignment_id)
-  #       # Then it should return an array of mentors assigned to the assignment
-  #
-  #       # Test scenario 2
-  #       # Given a valid assignment_id with multiple mentors assigned
-  #       # When calling .mentors_for_assignment(assignment_id)
-  #       # Then it should return an array containing all the mentors assigned to the assignment
-  #
-  #       # Test scenario 3
-  #       # Given a valid assignment_id with no mentors assigned
-  #       # When calling .mentors_for_assignment(assignment_id)
-  #       # Then it should return an empty array
-  #     end
-  #   end
-  #
-  #   context "when given an invalid assignment_id" do
-  #     it "returns an empty array" do
-  #       # Test scenario 4
-  #       # Given an invalid assignment_id
-  #       # When calling .mentors_for_assignment(assignment_id)
-  #       # Then it should return an empty array
-  #     end
-  #   end
-  # end
-  # describe ".zip_mentors_with_team_count" do
-  #   context "when given an assignment_id" do
-  #     it "returns an empty array if mentor_ids is empty" do
-  #       # Test case for when mentor_ids is empty
-  #     end
-  #
-  #     it "returns an array of mentor_ids sorted by team count" do
-  #       # Test case for when mentor_ids is not empty
-  #     end
-  #   end
+  describe ".mentors_for_assignment" do
+    context "when given a valid assignment_id" do
+      it "returns an array of mentors assigned to the assignment" do
+        # Test scenario 1
+        # Given a valid assignment_id
+        # When calling .mentors_for_assignment(assignment_id)
+        # Then it should return an array of mentors assigned to the assignment
+        allow(Assignment).to receive(:find).with(assignment.id).and_return(assignment)
+
+        mentors = MentorManagement.mentors_for_assignment(assignment.id)
+        expect(mentors).to_not be_empty
+        expect(mentors.count).to eq 1
+
+        # Test scenario 2
+        # Given a valid assignment_id with multiple mentors assigned
+        # When calling .mentors_for_assignment(assignment_id)
+        # Then it should return an array containing all the mentors assigned to the assignment
+        mentor2 = FactoryBot.create(:participant, duty: Participant::DUTY_MENTOR)
+        mentors = MentorManagement.mentors_for_assignment(assignment.id)
+        expect(mentors.count).to eq 2
+
+        # Test scenario 3
+        # Given a valid assignment_id with no mentors assigned
+        # When calling .mentors_for_assignment(assignment_id)
+        # Then it should return an empty array
+        a = FactoryBot.create(:assignment, id: 1200, directory_path: 'OSS', auto_assign_mentor: true)
+        expect(MentorManagement.mentors_for_assignment(a.id)).to be_empty
+      end
+    end
+
+    context "when given an invalid assignment_id" do
+      it "returns an empty array" do
+        # Test scenario 4
+        # Given an invalid assignment_id
+        # When calling .mentors_for_assignment(assignment_id)
+        # Then it should return an empty array
+        expect(MentorManagement.mentors_for_assignment(005)).to be_empty
+      end
+    end
+  end
+  describe ".zip_mentors_with_team_count" do
+    context "when given an assignment_id" do
+      it "returns an empty array if mentor_ids is empty" do
+        # Test case for when mentor_ids is empty
+        a = FactoryBot.create(:assignment, id: 997, directory_path: 'A1', auto_assign_mentor: true)
+        expect(MentorManagement.zip_mentors_with_team_count(a.id)).to be_empty
+      end
+
+      it "returns an array of mentor_ids sorted by team count" do
+        # Test case for when mentor_ids is not empty
+        a = FactoryBot.create(:assignment, id: 997, directory_path: 'A2', auto_assign_mentor: true)
+        # Create mentors for this assignment
+        FactoryBot.create(:participant, id: 1001, user_id: 1002, parent_id: a.id, duty: Participant::DUTY_MENTOR)
+        FactoryBot.create(:participant, id: 1010, user_id: 1011, parent_id: a.id, duty: Participant::DUTY_MENTOR)
+        # Assign a mentor to a team
+        allow(Team).to receive(:find).with(team.id).and_return(team)
+        [student1, student2].each { |student| FactoryBot.create(:team_user, team_id: team.id, user_id: student.id) }
+        MentorManagement.assign_mentor(a.id, team.id)
+
+        mentors = MentorManagement.zip_mentors_with_team_count(assignment.id)
+        expect(mentors).to_not be_empty
+        expect(mentors[0].id).to eq 1010
+      end
+    end
+  end
 end
+

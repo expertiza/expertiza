@@ -93,11 +93,11 @@ class User < ApplicationRecord
   # Zhewei: anonymized view for demo purposes - 1/3/2018
 
   def name(ip_address = nil)
-    User.anonymized_view?(ip_address) ? "#{role.name} #{id.to_s}" : self[:name]
+    User.anonymized_view?(ip_address) ? "#{role.name} #{id}" : self[:name]
   end
 
   def fullname(ip_address = nil)
-    User.anonymized_view?(ip_address) ? "#{role.name}, #{id.to_s}" : self[:fullname]
+    User.anonymized_view?(ip_address) ? "#{role.name}, #{id}" : self[:fullname]
   end
 
   def first_name(ip_address = nil)
@@ -105,7 +105,7 @@ class User < ApplicationRecord
   end
 
   def email(ip_address = nil)
-    User.anonymized_view?(ip_address) ? "#{role.name}_#{id.to_s}@mailinator.com" : self[:email]
+    User.anonymized_view?(ip_address) ? "#{role.name}_#{id}@mailinator.com" : self[:email]
   end
 
   def super_admin?

@@ -5,15 +5,8 @@ module DataMappingHelper
       width: '200',
       height: '125',
       scales: {
-        yAxes: [{
-                  stacked: false,
-                  ticks: {
-                    beginAtZero: true
-                  }
-                }],
-        xAxes: [{
-                  stacked: false
-                }]
+        yAxes: [{ stacked: false, ticks: { beginAtZero: true } }],
+        xAxes: [{ stacked: false }]
       }
     }
   end
@@ -29,31 +22,8 @@ module DataMappingHelper
       width: '200',
       height: '125',
       scales: {
-        yAxes: [
-          { stacked: true,
-            id: 'bar-y-axis1',
-            barThickness: 10
-          }, {
-            display: false,
-            stacked: true,
-            id: 'bar-y-axis2',
-            barThickness: 15,
-            type: 'category',
-            categoryPercentage: 0.8,
-            barPercentage: 0.9,
-            gridLines: {
-              offsetGridLines: true
-            }
-          }],
-        xAxes: [
-          {
-            stacked: false,
-            ticks: {
-              beginAtZero: true,
-              stepSize: 50,
-              max: 400
-            }
-          }]
+        yAxes: [{ stacked: true, id: 'bar-y-axis1', barThickness: 10 }, { display: false, stacked: true, id: 'bar-y-axis2', barThickness: 15, type: 'category', categoryPercentage: 0.8, barPercentage: 0.9, gridLines: { offsetGridLines: true } }],
+        xAxes: [{ stacked: false, ticks: { beginAtZero: true,stepSize: 50, max: 400 } }]
       }
     }
   end

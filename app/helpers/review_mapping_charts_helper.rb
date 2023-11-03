@@ -39,7 +39,7 @@ module ReviewMappingChartsHelper
       interval_mean = intervals.reduce(:+) / intervals.size.to_f
     end
     # build the parameters for the chart
-    data = map_display_tagging_interval_chart_data(intervals)
+    data = map_display_tagging_interval_chart_data(intervals, interval_mean)
     options = provide_tagging_options
     line_chart data, options
   end

@@ -27,10 +27,9 @@ module DataMappingHelper
     {
       labels: [*1..intervals.length],
       datasets: [{ backgroundColor: 'rgba(255,99,132,0.8)', data: intervals, label: 'time intervals' },
-        unless intervals.empty?
-          { data: Array.new(intervals.length, interval_mean), label: 'Mean time spent' }
-        end
-      ]
+                unless intervals.empty?
+                  { data: Array.new(intervals.length, interval_mean), label: 'Mean time spent' }
+                end ]
     }
   end
 

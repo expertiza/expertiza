@@ -478,7 +478,7 @@ describe ReviewMappingHelper, type: :helper do
       @reviewers = Array[@reviewer_1, @reviewer_2, @reviewer_3]
       @reviewers_for_test = Array[@reviewer_2, @reviewer_3, @reviewer_1]
 
-      sort_reviewer_by_review_volume_desc
+      sort_reviewer_desc("review_volume")
       expect(@reviewers).to eq(@reviewers_for_test)
     end
 
@@ -490,7 +490,7 @@ describe ReviewMappingHelper, type: :helper do
       @reviewers = Array[@reviewer_1, @reviewer_2, @reviewer_3]
       @reviewers_for_test = Array[@reviewer_2, @reviewer_1, @reviewer_3]
 
-      sort_reviewer_by_review_volume_desc
+      sort_reviewer_desc("review_volume")
       expect(@reviewers).to eq(@reviewers_for_test)
     end
 
@@ -502,7 +502,7 @@ describe ReviewMappingHelper, type: :helper do
       @reviewers = Array[@reviewer_1, @reviewer_2, @reviewer_3]
       @reviewers_for_test = Array[@reviewer_1, @reviewer_2, @reviewer_3]
 
-      sort_reviewer_by_review_volume_desc
+      sort_reviewer_desc("review_volume")
       expect(@reviewers).to eq(@reviewers_for_test)
     end
   end

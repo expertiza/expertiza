@@ -7,7 +7,7 @@ module ReviewMappingHelper
   #
   # gets the response map data such as reviewer id, reviewed object id and type for the review report
   #
-  def revie_report_data(reviewed_object_id, reviewer_id, type)
+  def review_report_data(reviewed_object_id, reviewer_id, type)
     rspan = 0
     (1..@assignment.num_review_rounds).each { |round| instance_variable_set('@review_in_round_' + round.to_s, 0) }
 
@@ -163,7 +163,10 @@ module ReviewMappingHelper
   end
 
   # sorts the reviewers by the average volume of reviews in each round, in descending order
-  def sort_reviewer_by_review_volume_desc
+  # generalized method that takes in metric parameter which is a string to determine how to sort reviewers
+  def sort_reviewer_desc(metric)
+    case metric
+    when "review_volume"
     @reviewers.each do |r|
       # get the volume of review comments
       review_volumes = Response.volume_of_review_comments(@assignment.id, r.id)
@@ -184,6 +187,10 @@ module ReviewMappingHelper
       @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) { |sum, r| sum + r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
     end
     @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
+    #   other metric cases can be added easily by using "when"
+    else
+      puts "metric not available"
+    end
   end
 
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)

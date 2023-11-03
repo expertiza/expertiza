@@ -171,15 +171,7 @@ module ChartsHelper
     horizontal_bar_chart data, options
   end
 
-  # E2082 Generate chart for review tagging time intervals
-  def display_tagging_interval_chart(intervals)
-    # if someone did not do any tagging in 30 seconds, then ignore this interval
-    threshold = 30
-    intervals = intervals.select { |v| v < threshold }
-    unless intervals.empty?
-      interval_mean = intervals.reduce(:+) / intervals.size.to_f
-    end
-    # build the parameters for the chart
+  def map_display_tagging_interval_chart_data(intervals)
     data = {
       labels: [*1..intervals.length],
       datasets: [
@@ -196,6 +188,8 @@ module ChartsHelper
         end
       ]
     }
+  end
+  def provide_options
     options = {
       width: '200',
       height: '125',
@@ -211,6 +205,19 @@ module ChartsHelper
                 }]
       }
     }
+  end
+
+  # E2082 Generate chart for review tagging time intervals
+  def display_tagging_interval_chart(intervals)
+    # if someone did not do any tagging in 30 seconds, then ignore this interval
+    threshold = 30
+    intervals = intervals.select { |v| v < threshold }
+    unless intervals.empty?
+      interval_mean = intervals.reduce(:+) / intervals.size.to_f
+    end
+    # build the parameters for the chart
+    data = map_display_tagging_interval_chart_data(intervals)
+    options = provide_options
     line_chart data, options
   end
 

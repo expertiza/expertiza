@@ -166,30 +166,30 @@ module ReviewMappingHelper
   # generalized method that takes in metric parameter which is a string to determine how to sort reviewers
   def sort_reviewer_desc(metric)
     case metric
-    when "review_volume"
-    @reviewers.each do |r|
-      # get the volume of review comments
-      review_volumes = Response.volume_of_review_comments(@assignment.id, r.id)
-      r.avg_vol_per_round = []
-      review_volumes.each_index do |i|
-        if i.zero?
-          r.overall_avg_vol = review_volumes[0]
-        else
-          r.avg_vol_per_round.push(review_volumes[i])
+    when 'review_volume'
+      @reviewers.each do |r|
+        # get the volume of review comments
+        review_volumes = Response.volume_of_review_comments(@assignment.id, r.id)
+        r.avg_vol_per_round = []
+        review_volumes.each_index do |i|
+          if i.zero?
+            r.overall_avg_vol = review_volumes[0]
+          else
+            r.avg_vol_per_round.push(review_volumes[i])
+          end
         end
       end
-    end
-    # get the number of review rounds for the assignment
-    @num_rounds = @assignment.num_review_rounds.to_f.to_i
-    @all_reviewers_avg_vol_per_round = []
-    @all_reviewers_overall_avg_vol = @reviewers.inject(0) { |sum, r| sum + r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @num_rounds.times do |round|
-      @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) { |sum, r| sum + r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
-    end
-    @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
-    #   other metric cases can be added easily by using "when"
+      # get the number of review rounds for the assignment
+      @num_rounds = @assignment.num_review_rounds.to_f.to_i
+      @all_reviewers_avg_vol_per_round = []
+      @all_reviewers_overall_avg_vol = @reviewers.inject(0) { |sum, r| sum + r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
+      @num_rounds.times do |round|
+        @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) { |sum, r| sum + r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
+      end
+      @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
+      #   other metric cases can be added easily by using "when"
     else
-      puts "metric not available"
+      puts 'metric not available'
     end
   end
 

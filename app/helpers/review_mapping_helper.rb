@@ -1,5 +1,5 @@
 module ReviewMappingHelper
-  include ChartsHelper
+  include ReviewMappingChartsHelper
   def create_report_table_header(headers = {})
     render partial: 'report_table_header', locals: { headers: headers }
   end

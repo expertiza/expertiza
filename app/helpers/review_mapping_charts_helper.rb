@@ -25,10 +25,11 @@ module ReviewMappingChartsHelper
   # The data of all the reviews is displayed in the form of a bar chart
   def display_volume_metric_chart(reviewer)
     labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
-    data = map_volume_metric_chart_data(labels,reviewer_data,all_reviewers_data)
+    data = map_volume_metric_chart_data(labels, reviewer_data, all_reviewers_data)
     options = provide_volume_metric_options
     horizontal_bar_chart data, options
   end
+
   # E2082 Generate chart for review tagging time intervals
   def display_tagging_interval_chart(intervals)
     # if someone did not do any tagging in 30 seconds, then ignore this interval

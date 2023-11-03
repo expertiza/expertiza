@@ -1,6 +1,7 @@
 module DataMappingHelper
+  # maps data and options in review_mapping_charts_helper for relevant methods
   def provide_tagging_options
-    options = {
+    {
       width: '200',
       height: '125',
       scales: {
@@ -18,7 +19,7 @@ module DataMappingHelper
   end
 
   def provide_volume_metric_options
-    options = {
+    {
       legend: {
         position: 'top',
         labels: {
@@ -58,7 +59,7 @@ module DataMappingHelper
   end
 
   def map_display_tagging_interval_chart_data(intervals)
-    data = {
+    {
       labels: [*1..intervals.length],
       datasets: [
         {
@@ -76,8 +77,8 @@ module DataMappingHelper
     }
   end
 
-  def map_volume_metric_chart_data(labels,reviewer_data,all_reviewers_data)
-    data = {
+  def map_volume_metric_chart_data(labels, reviewer_data, all_reviewers_data)
+    {
       labels: labels,
       datasets: [
         {
@@ -97,4 +98,5 @@ module DataMappingHelper
       ]
     }
   end
+
 end

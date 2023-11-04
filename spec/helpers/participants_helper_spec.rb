@@ -65,7 +65,7 @@ describe ParticipantsHelper do
                 expect(result).to eq(can_submit: true, can_review: false, can_take_quiz: false)
             end
 
-            it 'returns correct authorizations when participant_permissions is called with paricipant authorization' do
+            it 'returns correct authorizations when participant_permissions is called with participant authorization' do
                 #Checking permissions for a participant
                 result = participant_permissions('paricipant')
                 expect(result).to eq(can_submit: true, can_review: true, can_take_quiz: true)

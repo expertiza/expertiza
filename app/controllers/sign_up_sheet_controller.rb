@@ -72,7 +72,7 @@ class SignUpSheetController < ApplicationController
     else
       flash[:error] = 'The topic could not be deleted.'
     end
-    # Akshay - redirect to topics tab if there are still any topics left, otherwise redirect to
+    # redirect to topics tab if there are still any topics left, otherwise redirect to
     # assignment's edit page
     if assignment.topics?
       redirect_to edit_assignment_path(params[:assignment_id]) + '#tabs-2'

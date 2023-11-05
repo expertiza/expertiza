@@ -27,6 +27,79 @@ describe ReviewMappingController do
     allow(reviewer).to receive(:get_reviewer).and_return(reviewer)
   end
 
+  describe "#action_allowed?" do
+    context "when the action is 'add_dynamic_reviewer'" do
+      it "returns true" do
+        params = { action: 'add_dynamic_reviewer' }
+        allow(controller).to receive(:params).and_return(params)
+        expect(controller.action_allowed?).to be true
+      end
+    end
+
+    context "when the action is 'show_available_submissions'" do
+      it "returns true" do
+        params = { action: 'show_available_submissions' }
+        allow(controller).to receive(:params).and_return(params)
+        expect(controller.action_allowed?).to be true
+      end
+    end
+
+    context "when the action is 'assign_reviewer_dynamically'" do
+      it "returns true" do
+        params = { action: 'assign_reviewer_dynamically' }
+        allow(controller).to receive(:params).and_return(params)
+        expect(controller.action_allowed?).to be true
+      end
+    end
+
+    context "when the action is 'assign_metareviewer_dynamically'" do
+      it "returns true" do
+        params = { action: 'assign_metareviewer_dynamically' }
+        allow(controller).to receive(:params).and_return(params)
+        expect(controller.action_allowed?).to be true
+      end
+    end
+
+    context "when the action is 'assign_quiz_dynamically'" do
+      it "returns true" do
+        params = { action: 'assign_quiz_dynamically' }
+        allow(controller).to receive(:params).and_return(params)
+        expect(controller.action_allowed?).to be true
+      end
+    end
+
+    context "when the action is 'start_self_review'" do
+      it "returns true" do
+        params = { action: 'start_self_review' }
+        allow(controller).to receive(:params).and_return(params)
+        expect(controller.action_allowed?).to be true
+      end
+    end
+
+    context "when the action is not one of the allowed actions" do
+      it "returns true if the current role is 'Instructor'" do
+        params = { action: 'some_other_action' }
+        allow(controller).to receive(:params).and_return(params)
+        allow(controller).to receive(:current_role_name).and_return('Instructor')
+        expect(controller.action_allowed?).to eq(true)
+      end
+
+      it "returns true if the current role is 'Teaching Assistant'" do
+        params = { action: 'some_other_action' }
+        allow(controller).to receive(:params).and_return(params)
+        allow(controller).to receive(:current_role_name).and_return('Teaching Assistant')
+        expect(controller.action_allowed?).to eq(true)
+      end
+
+      it "returns true if the current role is 'Administrator'" do
+        params = { action: 'some_other_action' }
+        allow(controller).to receive(:params).and_return(params)
+        allow(controller).to receive(:current_role_name).and_return('Administrator')
+        expect(controller.action_allowed?).to eq(true)
+      end
+    end
+  end
+
   describe '#add_calibration' do
     context 'when both participant and review_response_map have already existed' do
       it 'does not need to create new objects and redirects to responses#new maps' do

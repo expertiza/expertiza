@@ -168,8 +168,7 @@ describe ReviewMappingController do
     context 'when given a valid response map id' do
       it 'should assign the response map to @mapping' do
         # Create a double representing a ResponseMap object
-        response_map = double('ResponseMap', {
-          id: 1,
+        response_map = double('ResponseMap', { id: 1,
           reviewed_object_id: 1,
           reviewer_id: 1,
           reviewee_id: 2,
@@ -177,8 +176,7 @@ describe ReviewMappingController do
           created_at: Time.now,
           updated_at: Time.now,
           calibrate_to: false,
-          team_reviewing_enabled: false
-        })
+          team_reviewing_enabled: false })
 
         allow(ResponseMap).to receive(:find).with('1').and_return(response_map)
         get :select_metareviewer, params: { id: '1' }
@@ -188,8 +186,8 @@ describe ReviewMappingController do
 
     context 'when given an invalid response map id' do
       it 'should raise an error' do
-        allow(ResponseMap).to receive(:find).with("-1").and_return(nil)
-        get :select_metareviewer, params: {id: '-1'}
+        allow(ResponseMap).to receive(:find).with('-1').and_return(nil)
+        get :select_metareviewer, params: { id: '-1' }
         expect(assigns(:mapping)).to be_nil
       end
     end
@@ -383,19 +381,18 @@ describe ReviewMappingController do
     end
   end
 
-
-  describe "#review_allowed?" do
+  describe 'review_allowed?' do
     let(:assignment) { double('Assignment', id: 1, num_reviews_allowed: 3) }
     let(:reviewer) { double('User', id: 1) }
-    context "when the reviewer has not reached the maximum number of reviews allowed for the assignment" do
-      it "returns true" do
+    context 'when the reviewer has not reached the maximum number of reviews allowed for the assignment' do
+      it 'returns true' do
         allow(ReviewResponseMap).to receive(:where).and_return([double, double])
         expect(controller.review_allowed?(assignment, reviewer)).to be_truthy
       end
     end
 
-    context "when the reviewer has reached the maximum number of reviews allowed for the assignment" do
-      it "returns false" do
+    context 'when the reviewer has reached the maximum number of reviews allowed for the assignment' do
+      it 'returns false' do
         allow(ReviewResponseMap).to receive(:where).and_return([double, double])
         allow(assignment).to receive(:num_reviews_allowed).and_return(2)
         expect(controller.review_allowed?(assignment, reviewer)).to be_falsey
@@ -403,40 +400,40 @@ describe ReviewMappingController do
     end
   end
 
-  describe "#check_outstanding_reviews?" do
+  describe '#check_outstanding_reviews?' do
     let(:reviewer) { double('Participant', id: 1, name: 'reviewer') }
     let(:assignment) { double('Assignment', id: 1, num_reviews_allowed: 3) }
-    context "when there are no review mappings for the assignment and reviewer" do
-      it "returns true" do
+    context 'when there are no review mappings for the assignment and reviewer' do
+      it 'returns true' do
         allow(ReviewResponseMap).to receive(:where).with(reviewer_id: reviewer.id, reviewed_object_id: assignment.id).and_return([])
         expect(controller.check_outstanding_reviews?(assignment, reviewer)).to be true
       end
     end
 
-    context "when there are review mappings for the assignment and reviewer" do
+    context 'when there are review mappings for the assignment and reviewer' do
       let(:response) { double('Response', is_submitted: true) }
       let(:in_progress_response) { double('Response', is_submitted: false) }
       let(:review_response_maps_complete) do
         [
           double('ReviewResponseMap', id: 1, response: [response, response]),
-          double('ReviewResponseMap', id: 2, response: [response, response]),
+          double('ReviewResponseMap', id: 2, response: [response, response])
         ]
       end
       let(:review_response_maps_incomplete) do
         [
           double('ReviewResponseMap', id: 1, response: [response, in_progress_response]),
-          double('ReviewResponseMap', id: 2, response: [response, in_progress_response]),
+          double('ReviewResponseMap', id: 2, response: [response, in_progress_response])
         ]
       end
 
-      context "when all reviews are completed" do
-        it "returns false" do
+      context 'when all reviews are completed' do
+        it 'returns false' do
           allow(ReviewResponseMap).to receive(:where).with(reviewer_id: reviewer.id, reviewed_object_id: assignment.id).and_return(review_response_maps_complete)
           expect(controller.check_outstanding_reviews?(assignment, reviewer)).to be false
         end
       end
-      context "when some reviews are in progress" do
-        it "returns true" do
+      context 'when some reviews are in progress' do
+        it 'returns true' do
           allow(ReviewResponseMap).to receive(:where).with(reviewer_id: reviewer.id, reviewed_object_id: assignment.id).and_return(review_response_maps_incomplete)
           expect(controller.check_outstanding_reviews?(assignment, reviewer)).to be true
         end

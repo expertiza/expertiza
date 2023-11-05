@@ -130,6 +130,7 @@ class ReviewMappingController < ApplicationController
 
   # This method checks if the user is allowed to do any more reviews as per the assignment policy.
   # If the number of reviews are less than the allowed reviews for a user, then they are allowed to request for an additional review.
+  # Can be made private?
   def review_allowed?(assignment, reviewer)
     @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
     assignment.num_reviews_allowed > @review_mappings.size
@@ -137,6 +138,7 @@ class ReviewMappingController < ApplicationController
 
   # This method checks if the user that is requesting a review has any outstanding reviews
   # If a user has more than 2 outstanding reviews, he is not allowed to ask for more reviews.
+   # Can be made private?
   def check_outstanding_reviews?(assignment, reviewer)
     @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
     @num_reviews_total = @review_mappings.size
@@ -148,7 +150,8 @@ class ReviewMappingController < ApplicationController
         @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
       end
       @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
-      @num_reviews_in_progress < Assignment.max_outstanding_reviews
+      # if all reviews done => no outstanding reviews - bug fix
+      @num_reviews_in_progress > 0 && @num_reviews_in_progress <= Assignment.max_outstanding_reviews
     end
   end
 

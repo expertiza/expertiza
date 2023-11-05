@@ -6,7 +6,7 @@ class ReviewMappingController < ApplicationController
 
   @@time_create_last_review_mapping_record = nil
 
-# Verify which actions are allowed based on the user type.
+  # Verify which actions are allowed based on the user type.
   def action_allowed?
     case params[:action]
     when 'add_dynamic_reviewer',
@@ -138,7 +138,7 @@ class ReviewMappingController < ApplicationController
 
   # This method checks if the user that is requesting a review has any outstanding reviews
   # If a user has more than 2 outstanding reviews, he is not allowed to ask for more reviews.
-   # Can be made private?
+  # Can be made private?
   def check_outstanding_reviews?(assignment, reviewer)
     @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
     @num_reviews_total = @review_mappings.size
@@ -316,7 +316,6 @@ class ReviewMappingController < ApplicationController
     mapping.delete
     redirect_to action: 'list_mappings', id: assignment_id
   end
-
 
   # Lists all the mappings (AssignmentTeams) associated with a specific assignment.
   # It sets an error flash message if provided via params and retrieves the assignment and
@@ -506,7 +505,7 @@ class ReviewMappingController < ApplicationController
         end
       end
     end
-    
+
     # ERROR DESCRIPTION
     # Will work if no participants assigned
     # SOLUTION

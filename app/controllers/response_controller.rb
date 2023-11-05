@@ -262,7 +262,8 @@ class ResponseController < ApplicationController
     error_id = params[:error_msg]
     message_id = params[:msg]
     flash[:error] = error_id unless error_id.nil? || error_id.empty?
-    flash[:note] = message_id unless message_id&.empty?
+    # Safe navigation operator &. is available from Ruby 2.3. Currently replaced it with nil check conditional statement 
+    flash[:note] = message_id unless message_id.nil? || message_id.empty?
     @map = Response.find_by(map_id: params[:id])
     case params[:return]
     when 'feedback'

@@ -190,19 +190,31 @@ class ResponseController < ApplicationController
   end
 
   def new_feedback
-    review = Response.find(params[:id]) unless params[:id].nil?
+      # Replaced unless params[:id].nil? with if params[:id].present? for a more concise condition, Renamed variables
+    review = Response.find(params[:id]) if params[:id].present?
+  
     if review
-      reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: review.map.assignment.id).first
+      #Assigned session[:user] and  review.map.assignment to variables for clarity
+      current_user = session[:user]
+      assignment = review.map.assignment
+      reviewer = AssignmentParticipant.where(user_id: current_user.id, parent_id: assignment.id).first
       map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: reviewer.id).first
+      
+      # if no feedback exists by dat user den only create for dat particular response/review
       if map.nil?
-        # if no feedback exists by dat user den only create for dat particular response/review
-        map = FeedbackResponseMap.create(reviewed_object_id: review.id, reviewer_id: reviewer.id, reviewee_id: review.map.reviewer.id)
+        map = FeedbackResponseMap.create(
+          reviewed_object_id: review.id,
+          reviewer_id: reviewer.id,
+          reviewee_id: review.map.reviewer.id
+        )
       end
+  
       redirect_to action: 'new', id: map.id, return: 'feedback'
     else
       redirect_back fallback_location: root_path
     end
   end
+  
 
   # view response
   def view

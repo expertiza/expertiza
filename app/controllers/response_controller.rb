@@ -77,10 +77,26 @@ class ResponseController < ApplicationController
 
   # Prepare the parameters when student clicks "Edit"
   # response questions with answers and scores are rendered in the edit page based on the version number
+  # Refactored edit method to recude the number of lines, cognitive complexity
   def edit
     assign_action_parameters
+    load_response_data
+    render action: 'response'
+  end
+  
+  private
+  
+  def handle_team_reviewing
+    return unless @map.team_reviewing_enabled
+  
+    @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
+    response_lock_action if @response.nil?
+  end
+  
+  def load_response_data
     @prev = Response.where(map_id: @map.id)
     @review_scores = @prev.to_a
+  
     if @prev.present?
       @sorted = @review_scores.sort do |m1, m2|
         if m1.version_num.to_i && m2.version_num.to_i
@@ -91,26 +107,18 @@ class ResponseController < ApplicationController
       end
       @largest_version_num = @sorted[0]
     end
-    # Added for E1973, team-based reviewing
+  
     @map = @response.map
-    if @map.team_reviewing_enabled
-      @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
-      if @response.nil?
-        response_lock_action
-        return
-      end
-    end
-
+    handle_team_reviewing
     @modified_object = @response.response_id
-    # set more handy variables for the view
     set_content
     @review_scores = []
     @review_questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
     @questionnaire = questionnaire_from_response
-    render action: 'response'
   end
+  
 
   # Update the response and answers when student "edit" existing response
   def update
@@ -190,7 +198,7 @@ class ResponseController < ApplicationController
   end
 
   def new_feedback
-      # Replaced unless params[:id].nil? with if params[:id].present? for a more concise condition, Renamed variables
+      # Replaced unless params[:id].nil? with if params[:id].present? for a more concise condition
     review = Response.find(params[:id]) if params[:id].present?
   
     if review

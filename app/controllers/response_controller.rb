@@ -284,7 +284,13 @@ class ResponseController < ApplicationController
     flash[:error] = error_id unless error_id.nil? || error_id.empty?
     # Safe navigation operator &. is available from Ruby 2.3. Currently replaced it with nil check conditional statement 
     flash[:note] = message_id unless message_id.nil? || message_id.empty?
+    
     @map = Response.find_by(map_id: params[:id])
+    
+    redirect_based_on_return
+  end
+
+  private def redirect_based_on_return
     case params[:return]
     when 'feedback'
       redirect_to controller: 'grades', action: 'view_my_scores', id: @map.reviewer.id
@@ -304,12 +310,12 @@ class ResponseController < ApplicationController
     when 'ta_review' # Page should be directed to list_submissions if TA/instructor performs the review
       redirect_to controller: 'assignments', action: 'list_submissions', id: @map.response_map.assignment.id
     else
-      # if reviewer is team, then we have to get the id of the participant from the team
-      # the id in reviewer_id is of an AssignmentTeam
+      # if reviewer is team, then we have to get the id of the participant from the team. the id in reviewer_id is of an AssignmentTeam
       reviewer_id = @map.response_map.reviewer.get_logged_in_reviewer_id(current_user.try(:id))
       redirect_to controller: 'student_review', action: 'list', id: reviewer_id
     end
   end
+  
 
   # This method set the appropriate values to the instance variables used in the 'show_calibration_results_for_student' page
   # Responses are fetched using calibration_response_map_id and review_response_map_id params passed in the URL

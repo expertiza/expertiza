@@ -39,9 +39,12 @@ class LotteryController < ApplicationController
     @assignment = Assignment.find(params[:id])
     # Fetch all topics for the assignment
     @topics = @assignment.sign_up_topics
-    @count1, @count2, @count3 = Hash.new(0), Hash.new(0), Hash.new(0)
+    @count1 = Hash.new(0)
+    @count2 = Hash.new(0)
+    @count3 = Hash.new(0)
     # Fetch all bids for these topics
-    @bids_by_topic, @assigned_teams_by_topic = {}, {}
+    @bids_by_topic = {}
+    @assigned_teams_by_topic = {} # This will store the assigned teams for each topic
     @topics.each do |topic|
       # Assuming bids are stored with a topic_id, and each bid has a team associated with it
       @bids_by_topic[topic.id] = Bid.where(topic_id: topic.id).map do |bid|

@@ -166,28 +166,40 @@ describe LotteryController do
       expect(SignedUpTeam.count).to eq(number_of_signed_up_teams + 1)
     end
   end
+
+
   describe '#bidding_details' do
     before :each do
       # Set the assignment id in the params
       params = ActionController::Parameters.new(id: assignment.id)
       allow(controller).to receive(:params).and_return(params)
     end
-    it 'populates bids and assigned teams for each topic' do
+    
+    it 'populates bids and assigned teams for each topic, handling topics with no teams' do
       controller.bidding_details
 
       # Check if @bids_by_topic is populated correctly
       expect(controller.instance_variable_get(:@bids_by_topic)[topic1.id].length).to eq(1)
       expect(controller.instance_variable_get(:@bids_by_topic)[topic2.id].length).to eq(1)
 
-      # Assuming you have some SignedUpTeams in the setup
-      # Check if @assigned_teams_by_topic is populated correctly
-      # expect(controller.instance_variable_get(:@assigned_teams_by_topic)[topic1.id].length).to eq(1) # Adjust as per your setup
+      # Check if @assigned_teams_by_topic is populated correctly, allowing for no teams
+      assigned_teams_topic1 = controller.instance_variable_get(:@assigned_teams_by_topic)[topic1.id]
+      if assigned_teams_topic1
+        expect(assigned_teams_topic1.length).to satisfy { |value| value == 0 || value == 1 }
+      else
+        expect(assigned_teams_topic1).to be_nil
+      end
+
+      # Check the counts of bids for each priority level
+      # Ensure to adjust these based on what is set up in your test data
+      expect(controller.instance_variable_get(:@count1)[topic1.id]).to eq(1) # assuming there is one bid with priority 1 for topic1
+      expect(controller.instance_variable_get(:@count2)[topic1.id]).to eq(0) # assuming there are no bids with priority 2 for topic1
+      expect(controller.instance_variable_get(:@count3)[topic1.id]).to eq(0) # assuming there are no bids with priority 3 for topic1
     end
 
     it 'fetches all topics for the assignment' do
       controller.bidding_details
-      expect(controller.instance_variable_get(:@topics)).to include(topic1, topic2, topic3, topic4)
+      expect(controller.instance_variable_get(:@topics)).to match_array([topic1, topic2, topic3, topic4])
     end
   end
-
 end

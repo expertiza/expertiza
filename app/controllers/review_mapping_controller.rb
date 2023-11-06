@@ -582,26 +582,31 @@ class ReviewMappingController < ApplicationController
     if iterator.zero?
       rand_num = rand(0..num_participants - 1)
     else
-      min_value = participants_hash.values.min
-      # get the temp array including indices of participants, each participant has minimum review number in hash table.
-      participants_with_min_assigned_reviews = []
-      participants.each do |participant|
-        participants_with_min_assigned_reviews << participants.index(participant) if participants_hash[participant.id] == min_value
-      end
-      # if participants_with_min_assigned_reviews is blank
-      is_participants_with_min_assigned_reviews_empty = participants_with_min_assigned_reviews.empty?
-      # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
-      is_one_and_its_own_artifact = ((participants_with_min_assigned_reviews.size == 1) && TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
-      rand_num = if is_participants_with_min_assigned_reviews_empty || is_one_and_its_own_artifact
-                   # use original method to get random number
-                   rand(0..num_participants - 1)
-                 else
-                   # rand_num should be the position of this participant in original array
-                   participants_with_min_assigned_reviews[rand(0..participants_with_min_assigned_reviews.size - 1)]
-                 end
+      rand_num = calculate_rand_num(participants_hash, participants, num_participants)
     end
     # return the random number that was generated
     rand_num
+  end
+
+  # calculates rand_num(random number) based on checks
+  def calculate_rand_num(participants_hash, participants, num_participants)
+    min_value = participants_hash.values.min
+    # get the temp array including indices of participants, each participant has minimum review number in hash table.
+    participants_with_min_assigned_reviews = []
+    participants.each do |participant|
+      participants_with_min_assigned_reviews << participants.index(participant) if participants_hash[participant.id] == min_value
+    end
+    # if participants_with_min_assigned_reviews is blank
+    is_participants_with_min_assigned_reviews_empty = participants_with_min_assigned_reviews.empty?
+    # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
+    is_one_and_its_own_artifact = ((participants_with_min_assigned_reviews.size == 1) && TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
+    if is_participants_with_min_assigned_reviews_empty || is_one_and_its_own_artifact
+      # use original method to get random number
+      rand(0..num_participants - 1)
+    else
+      # rand_num should be the position of this participant in original array
+      participants_with_min_assigned_reviews[rand(0..participants_with_min_assigned_reviews.size - 1)]
+    end
   end
 
   # We add the participant assigned with rand_num to the list of selected_participants, based on some pre-conditions

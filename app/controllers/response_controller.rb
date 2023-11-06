@@ -8,32 +8,39 @@ class ResponseController < ApplicationController
   before_action :authorize_show_calibration_results, only: %i[show_calibration_results_for_student]
   before_action :set_response, only: %i[update delete view]
 
-  # E2218: Method to check if that action is allowed for the user.
+# E2218: Method to check if that action is allowed for the user.
   def action_allowed?
     response = user_id = nil
     action = params[:action]
-    # Initialize response and user id if action is edit or delete or update or view.
-    if %w[edit delete update view].include?(action)
-      response = Response.find(params[:id])
-      user_id = response.map.reviewer.user_id if response.map.reviewer
-    end
+    response = find_response_for_actions(action)
+  
     case action
     when 'edit'
       # If response has been submitted, no further editing allowed.
-      return false if response.is_submitted
-
+      return false if response&.is_submitted
       # Else, return true if the user is a reviewer for that response.
-      current_user_is_reviewer?(response.map, user_id)
-
+      current_user_is_reviewer?(response.map, response_reviewer_user_id(response))
     # Deny access to anyone except reviewer & author's team
     when 'delete', 'update'
-      current_user_is_reviewer?(response.map, user_id)
+      current_user_is_reviewer?(response.map, response_reviewer_user_id(response))
     when 'view'
-      response_edit_allowed?(response.map, user_id)
+      response_edit_allowed?(response.map, response_reviewer_user_id(response))
     else
       user_logged_in?
     end
   end
+  
+  def find_response_for_actions(action)
+    # Initialize response and user id if action is edit or delete or update or view.
+    if %w[edit delete update view].include?(action)
+      Response.find(params[:id])
+    end
+  end
+  
+  def response_reviewer_user_id(response)
+    response.map.reviewer&.user_id
+  end
+  
 
   # E2218: Method to authorize if the reviewer can view the calibration results
   # When user manipulates the URL, the user should be authorized
@@ -119,35 +126,50 @@ class ResponseController < ApplicationController
     @questionnaire = questionnaire_from_response
   end
   
-
   # Update the response and answers when student "edit" existing response
   def update
     render nothing: true unless action_allowed?
     msg = ''
+     # the response to be updated
+     # Locking functionality added for E1973, team-based reviewing
     begin
-      # the response to be updated
-      # Locking functionality added for E1973, team-based reviewing
       if @map.team_reviewing_enabled && !Lock.lock_between?(@response, current_user)
         response_lock_action
         return
       end
-
-      @response.update_attribute('additional_comment', params[:review][:comments])
-      @questionnaire = questionnaire_from_response
-      questions = sort_questions(@questionnaire.questions)
-
-      # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
-      create_answers(params, questions) unless params[:responses].nil?
-      if params['isSubmit'] && params['isSubmit'] == 'Yes'
-        @response.update_attribute('is_submitted', true)
-      end
-
-      if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
-        @response.notify_instructor_on_difference
-      end
+  
+      update_response_attributes
+      process_questionnaire
+      create_answers_if_needed
+      submit_response_if_requested
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
+  
+    log_and_redirect_response_save(msg)
+  end
+  
+  def update_response_attributes
+    @response.update_attribute('additional_comment', params[:review][:comments])
+    @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
+  end
+  
+  def process_questionnaire
+    @questionnaire = questionnaire_from_response
+    @questions = sort_questions(@questionnaire.questions)
+  end
+  
+
+  # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+  def create_answers_if_needed
+    create_answers(params, @questions) unless params[:responses].nil?
+  end
+  
+  def submit_response_if_requested
+    @response.notify_instructor_on_difference if @map.is_a?(ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+  end
+  
+  def log_and_redirect_response_save(msg)
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
     redirect_to controller: 'response', action: 'save', id: @map.map_id,
                 return: params.permit(:return)[:return], msg: msg, review: params.permit(:review)[:review],
@@ -229,46 +251,64 @@ class ResponseController < ApplicationController
     set_content
   end
 
-  def create
-    map_id = params[:id]
-    unless params[:map_id].nil?
-      map_id = params[:map_id]
-    end # pass map_id as a hidden field in the review form
-    @map = ResponseMap.find(map_id)
-    if params[:review][:questionnaire_id]
-      @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
-      @round = params[:review][:round]
-    else
-      @round = nil
-    end
-    is_submitted = (params[:isSubmit] == 'Yes')
+
+def create
+  setup_response
+  process_response
+  finalize_response
+end
+
+def setup_response
+  map_id = params[:map_id].presence || params[:id]
+  @map = ResponseMap.find(map_id)
+
+  if params[:review][:questionnaire_id]
+    @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
+    @round = params[:review][:round]
+  else
+    @round = nil
+  end
+end
+
+def process_response
+  is_submitted = (params[:isSubmit] == 'Yes')
+  @response = find_or_create_response
+  was_submitted = @response.is_submitted
+  # ignore if autoupdate try to save when the response object is not yet created.s
+  @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted)
+  # :version_num=>@version)
+end
+
+def finalize_response
+  # Change the order for displaying questions for editing response views.
+  questions = sort_questions(@questionnaire.questions)
+  create_answers(params, questions) if params[:responses]
+  msg = 'Your response was successfully saved.'
+  error_msg = ''
+
+  # only notify if is_submitted changes from false to true
+  if should_notify_instructor_on_difference?(was_submitted)
+    @response.notify_instructor_on_difference
+    @response.email
+  end
+
+  redirect_to controller: 'response', action: 'save', id: @map.map_id,
+              return: params.permit(:return)[:return], msg: msg, error_msg: error_msg, review: params.permit(:review)[:review], save_options: params.permit(:save_options)[:save_options]
+end
+
+def find_or_create_response
+  round = @round.to_i
+  is_submitted = params[:isSubmit] == 'Yes'
     # There could be multiple responses per round, when re-submission is enabled for that round.
     # Hence we need to pick the latest response.
-    @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first
-    if @response.nil?
-      @response = Response.create(map_id: @map.id, additional_comment: params[:review][:comments],
-                                  round: @round.to_i, is_submitted: is_submitted)
-    end
-    was_submitted = @response.is_submitted
+  @response = Response.where(map_id: @map.id, round: round).order(created_at: :desc).first
+  @response ||= Response.create(map_id: @map.id, additional_comment: params[:review][:comments], round: round, is_submitted: is_submitted)
+end
 
-    # ignore if autoupdate try to save when the response object is not yet created.s
-    @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted)
+def should_notify_instructor_on_difference?(was_submitted)
+  @map.is_a?(ReviewResponseMap) && (!was_submitted && @response.is_submitted) && @response.significant_difference?
+end
 
-    # :version_num=>@version)
-    # Change the order for displaying questions for editing response views.
-    questions = sort_questions(@questionnaire.questions)
-    create_answers(params, questions) if params[:responses]
-    msg = 'Your response was successfully saved.'
-    error_msg = ''
-
-    # only notify if is_submitted changes from false to true
-    if (@map.is_a? ReviewResponseMap) && (!was_submitted && @response.is_submitted) && @response.significant_difference?
-      @response.notify_instructor_on_difference
-      @response.email
-    end
-    redirect_to controller: 'response', action: 'save', id: @map.map_id,
-                return: params.permit(:return)[:return], msg: msg, error_msg: error_msg, review: params.permit(:review)[:review], save_options: params.permit(:save_options)[:save_options]
-  end
 
   def save
     @map = ResponseMap.find(params[:id])

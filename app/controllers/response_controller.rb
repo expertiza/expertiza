@@ -77,10 +77,26 @@ class ResponseController < ApplicationController
 
   # Prepare the parameters when student clicks "Edit"
   # response questions with answers and scores are rendered in the edit page based on the version number
+  # Refactored edit method to recude the number of lines, cognitive complexity
   def edit
     assign_action_parameters
+    load_response_data
+    render action: 'response'
+  end
+  
+  private
+  
+  def handle_team_reviewing
+    return unless @map.team_reviewing_enabled
+  
+    @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
+    response_lock_action if @response.nil?
+  end
+  
+  def load_response_data
     @prev = Response.where(map_id: @map.id)
     @review_scores = @prev.to_a
+  
     if @prev.present?
       @sorted = @review_scores.sort do |m1, m2|
         if m1.version_num.to_i && m2.version_num.to_i
@@ -91,26 +107,18 @@ class ResponseController < ApplicationController
       end
       @largest_version_num = @sorted[0]
     end
-    # Added for E1973, team-based reviewing
+  
     @map = @response.map
-    if @map.team_reviewing_enabled
-      @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
-      if @response.nil?
-        response_lock_action
-        return
-      end
-    end
-
+    handle_team_reviewing
     @modified_object = @response.response_id
-    # set more handy variables for the view
     set_content
     @review_scores = []
     @review_questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
     @questionnaire = questionnaire_from_response
-    render action: 'response'
   end
+  
 
   # Update the response and answers when student "edit" existing response
   def update
@@ -190,19 +198,31 @@ class ResponseController < ApplicationController
   end
 
   def new_feedback
-    review = Response.find(params[:id]) unless params[:id].nil?
+      # Replaced unless params[:id].nil? with if params[:id].present? for a more concise condition
+    review = Response.find(params[:id]) if params[:id].present?
+  
     if review
-      reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: review.map.assignment.id).first
+      #Assigned session[:user] and  review.map.assignment to variables for clarity
+      current_user = session[:user]
+      assignment = review.map.assignment
+      reviewer = AssignmentParticipant.where(user_id: current_user.id, parent_id: assignment.id).first
       map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: reviewer.id).first
+      
+      # if no feedback exists by dat user den only create for dat particular response/review
       if map.nil?
-        # if no feedback exists by dat user den only create for dat particular response/review
-        map = FeedbackResponseMap.create(reviewed_object_id: review.id, reviewer_id: reviewer.id, reviewee_id: review.map.reviewer.id)
+        map = FeedbackResponseMap.create(
+          reviewed_object_id: review.id,
+          reviewer_id: reviewer.id,
+          reviewee_id: review.map.reviewer.id
+        )
       end
+  
       redirect_to action: 'new', id: map.id, return: 'feedback'
     else
       redirect_back fallback_location: root_path
     end
   end
+  
 
   # view response
   def view
@@ -262,8 +282,15 @@ class ResponseController < ApplicationController
     error_id = params[:error_msg]
     message_id = params[:msg]
     flash[:error] = error_id unless error_id.nil? || error_id.empty?
-    flash[:note] = message_id unless message_id&.empty?
+    # Safe navigation operator &. is available from Ruby 2.3. Currently replaced it with nil check conditional statement 
+    flash[:note] = message_id unless message_id.nil? || message_id.empty?
+    
     @map = Response.find_by(map_id: params[:id])
+    
+    redirect_based_on_return
+  end
+
+  private def redirect_based_on_return
     case params[:return]
     when 'feedback'
       redirect_to controller: 'grades', action: 'view_my_scores', id: @map.reviewer.id
@@ -283,12 +310,12 @@ class ResponseController < ApplicationController
     when 'ta_review' # Page should be directed to list_submissions if TA/instructor performs the review
       redirect_to controller: 'assignments', action: 'list_submissions', id: @map.response_map.assignment.id
     else
-      # if reviewer is team, then we have to get the id of the participant from the team
-      # the id in reviewer_id is of an AssignmentTeam
+      # if reviewer is team, then we have to get the id of the participant from the team. the id in reviewer_id is of an AssignmentTeam
       reviewer_id = @map.response_map.reviewer.get_logged_in_reviewer_id(current_user.try(:id))
       redirect_to controller: 'student_review', action: 'list', id: reviewer_id
     end
   end
+  
 
   # This method set the appropriate values to the instance variables used in the 'show_calibration_results_for_student' page
   # Responses are fetched using calibration_response_map_id and review_response_map_id params passed in the URL

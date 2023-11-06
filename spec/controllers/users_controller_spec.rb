@@ -17,9 +17,7 @@ describe UsersController do
   end
   let(:superadmin) { build(:superadmin) }
   let(:assignment) do
-    build(:assignment, id: 1, name: 'test_assignment', instructor_id: 2,
-    participants: [build(:participant, id: 1, user_id: 1, assignment: assignment)],
-    course_id: 1)    
+    build(:assignment, id: 1, name: 'test_assignment', instructor_id: 2, participants: [build(:participant, id: 1, user_id: 1, assignment: assignment)], course_id: 1)    
   end
   before(:each) do
     stub_current_user(instructor, instructor.role.name, instructor.role)

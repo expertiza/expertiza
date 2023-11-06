@@ -238,7 +238,7 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id
   end
 
-  # Deletes all metareview mappings for a given response map. 
+  # Deletes all metareview mappings for a given response map.
   def delete_all_metareviewers
     mapping = ResponseMap.find(params[:id])
     meta_review_mappings = MetareviewResponseMap.where(reviewed_object_id: mapping.map_id)
@@ -277,7 +277,7 @@ class ReviewMappingController < ApplicationController
     render action: 'unsubmit_review.js.erb', layout: false
   end
 
-  # If a valid ReviewResponseMap is found and there is no associated response, 
+# If a valid ReviewResponseMap is found and there is no associated response, 
   # it deletes the mapping. If a response exists, indicating the review has already been done,
   # it prevents the deletion and provides appropriate feedback to the user.
   def delete_reviewer
@@ -459,7 +459,7 @@ class ReviewMappingController < ApplicationController
   end
 
   # Assigns peer reviewers to teams with uncalibrated artifacts for a specific assignment.
-  # It utilizes the automatic review mapping strategy, considering calibrated artifacts and the specified number of reviews per artifact. 
+  # It utilizes the automatic review mapping strategy, considering calibrated artifacts and the specified number of reviews per artifact.
   def assign_reviews_to_uncalibrated_artifacts(assignment_id, participants, teams_with_uncalibrated_artifacts, uncalibrated_artifacts_num)
     automatic_review_mapping_strategy(assignment_id, participants, teams_with_uncalibrated_artifacts, uncalibrated_artifacts_num, 0)
   end
@@ -544,7 +544,7 @@ class ReviewMappingController < ApplicationController
           next if TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
 
           # We add the participant assigned with rand_num to the list of selected_participants, selectively
-          update_selected_participants(participants, participants_hash, review_strategy, selected_participants, rand_num)
+          selected_participants.append(update_selected_participants(participants, participants_hash, review_strategy, rand_num))
 
           # remove students who have already been assigned enough num of reviews out of participants array
           participants.each do |participant|
@@ -591,8 +591,8 @@ class ReviewMappingController < ApplicationController
       # if participants_with_min_assigned_reviews is blank
       is_participants_with_min_assigned_reviews_empty = participants_with_min_assigned_reviews.empty?
       # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
-      if_condition_2 = ((participants_with_min_assigned_reviews.size == 1) && TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
-      rand_num = if is_participants_with_min_assigned_reviews_empty || if_condition_2
+      is_one_and_its_own_artifact = ((participants_with_min_assigned_reviews.size == 1) && TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
+      rand_num = if is_participants_with_min_assigned_reviews_empty || is_one_and_its_own_artifact
                    # use original method to get random number
                    rand(0..num_participants - 1)
                  else
@@ -605,16 +605,19 @@ class ReviewMappingController < ApplicationController
   end
 
   # We add the participant assigned with rand_num to the list of selected_participants, based on some pre-conditions
-  def update_selected_participants(participants, participants_hash, review_strategy, selected_participants, rand_num)
+  def update_selected_participants(participants, participants_hash, review_strategy, rand_num)
+    selected_participants = []
     # if participants_hash for that particular participant is less than expected reviews per student
-    if_condition_1 = (participants_hash[participants[rand_num].id] < review_strategy.reviews_per_student)
+    is_less_reviews = (participants_hash[participants[rand_num].id] < review_strategy.reviews_per_student)
     # if selected_participants does not include that particular participant
-    if_condition_2 = (!selected_participants.include? participants[rand_num].id)
-    if if_condition_1 && if_condition_2
+    is_participant_not_included = (!selected_participants.include? participants[rand_num].id)
+    if is_less_reviews && is_participant_not_included
       # selected_participants cannot include duplicate num
       selected_participants << participants[rand_num].id
       participants_hash[participants[rand_num].id] += 1
     end
+
+    selected_participants
   end
 
   def review_mapping_params

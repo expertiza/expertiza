@@ -77,21 +77,23 @@ describe ReviewMappingController do
     end
 
     context 'when the action is not one of the allowed actions' do
-      it "returns true if the current role is 'Instructor'" do
+      it "returns true if the current role is an 'Instructor'" do
         params = { action: 'some_other_action' }
         allow(controller).to receive(:params).and_return(params)
         allow(controller).to receive(:current_role_name).and_return('Instructor')
+
         expect(controller.action_allowed?).to eq(true)
       end
 
-      it "returns true if the current role is 'Teaching Assistant'" do
+      it "returns true if the current role is a 'Teaching Assistant'" do
         params = { action: 'some_other_action' }
         allow(controller).to receive(:params).and_return(params)
         allow(controller).to receive(:current_role_name).and_return('Teaching Assistant')
+
         expect(controller.action_allowed?).to eq(true)
       end
 
-      it "returns true if the current role is 'Administrator'" do
+      it "returns true if the current role is an 'Administrator'" do
         params = { action: 'some_other_action' }
         allow(controller).to receive(:params).and_return(params)
         allow(controller).to receive(:current_role_name).and_return('Administrator')
@@ -168,15 +170,7 @@ describe ReviewMappingController do
     context 'when given a valid response map id' do
       it 'should assign the response map to @mapping' do
         # Create a double representing a ResponseMap object
-        response_map = double('ResponseMap', { id: 1,
-          reviewed_object_id: 1,
-          reviewer_id: 1,
-          reviewee_id: 2,
-          type: '',
-          created_at: Time.now,
-          updated_at: Time.now,
-          calibrate_to: false,
-          team_reviewing_enabled: false })
+        response_map = double('ResponseMap', { id: 1, reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 2, type: '', created_at: Time.now, updated_at: Time.now, calibrate_to: false, team_reviewing_enabled: false })
 
         allow(ResponseMap).to receive(:find).with('1').and_return(response_map)
         get :select_metareviewer, params: { id: '1' }

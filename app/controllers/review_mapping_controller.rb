@@ -56,17 +56,24 @@ class ReviewMappingController < ApplicationController
     assignment = Assignment.find(params[:id])
     topic_id = params[:topic_id] # An assignment can have several topics
     user_id = User.where(name: params[:user][:name]).first.id
+    # If instructor want to assign one student to review his/her own artifact,
+    # it should be counted as "self-review" and we need to make /app/views/submitted_content/_selfreview.html.erb work.
     if TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
       flash[:error] = 'You cannot assign this student to review his/her own artifact.'
     else
+      # Team lazy initialization
       SignUpSheet.signup_team(assignment.id, user_id, topic_id)
       msg = ''
       begin
         user = User.from_params(params)
+        # contributor_id is team_id
         regurl = url_for id: assignment.id,
                          user_id: user.id,
                          contributor_id: params[:contributor_id]
+        # Get the assignment's participant corresponding to the user
         reviewer = get_reviewer(user, assignment, regurl)
+        # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
+        # to treat all assignments as team assignments
         if ReviewResponseMap.where(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id).first.nil?
           ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
         else

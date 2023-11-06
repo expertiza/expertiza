@@ -82,22 +82,22 @@ class UsersController < ApplicationController
   # Modified the code to provide the search parameters to the list method if they were found in the search textboxes.
   # Creates a list of users to be displayed on the user interface.
   def search_params
-    search_usrname = ".*"
-    search_fulname = ".*"
-    search_email = ".*"
+    search_usrname = '.*'
+    search_fulname = '.*'
+    search_email = '.*'
     # If the user name is discovered in the username text field, it is appended to the search criteria.
     if params[:search_usrid].present?
-      search_usrname = ".*" + params[:search_usrid].strip + ".*"
+      search_usrname = '.*' + params[:search_usrid].strip + '.*'
     end
 
     # If the complete name(full name) is found in the name text field, it is appended to the search criteria.
     if params[:search_fname].present?
-      search_fulname = ".*" + params[:search_fname].strip + ".*"
+      search_fulname = '.*' + params[:search_fname].strip + '.*'
     end
 
     # If the email is found in the email text field, it is appended to the search criteria.
     if params[:search_email].present?
-      search_email = ".*" + params[:search_email].strip + ".*"
+      search_email = '.*' + params[:search_email].strip + '.*'
     end
 
     [search_usrname, search_fulname, search_email]
@@ -273,7 +273,7 @@ class UsersController < ApplicationController
 
   # For filtering the users list with proper search and pagination.
   def paginate_list(users)
-    paginate_options = {"1" => 25, "2" => 50, "3" => 100}
+    paginate_options = { '1' => 25, '2' => 50, '3' => 100 }
 
     # If the above hash does not have a value for the key,
     # it means that we need to show all the users on the page

@@ -36,7 +36,6 @@ describe InstitutionController do
 
       context 'when current user is the instructor' do
         it 'allows certain action' do
-          stub_current_user(instructor, instructor.role.name, instructor.role)
           controller.send(:action_allowed?).should be true
         end
       end
@@ -114,7 +113,6 @@ describe InstitutionController do
     end
     context 'when institution is not updated successfully' do
       it 'renders institution#edit' do
-        stub_current_user(instructor, instructor.role.name, instructor.role)
         request_params = {
           id: 1,
           institution: {

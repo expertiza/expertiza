@@ -22,7 +22,7 @@ describe MultipleChoiceCheckbox do
       # Test for presence of an input for the question weight
       expect(html.css('input[name="question_weights[1][txt]"]')).not_to be_empty
       # Test for the correct number of choices
-      expect(html.css('input[type="checkbox"][name^="quiz_question_choices[1][MultipleChoiceCheckbox]"]')).to have(4).items
+      expect(html.css('input[type="checkbox"][name^="quiz_question_choices[1][MultipleChoiceCheckbox]"]').size).to eq(4)
       # Test for the correct value in checkboxes
       html.css('input[type="checkbox"][name^="quiz_question_choices[1][MultipleChoiceCheckbox]"]').each do |checkbox|
         expect(checkbox['checked']).to eq('checked')

@@ -91,7 +91,6 @@ class ResponseController < ApplicationController
     render action: 'response'
   end
   
-  private
   
   def handle_team_reviewing
     return unless @map.team_reviewing_enabled
@@ -330,7 +329,7 @@ end
     redirect_based_on_return
   end
 
-  private def redirect_based_on_return
+   def redirect_based_on_return
     case params[:return]
     when 'feedback'
       redirect_to controller: 'grades', action: 'view_my_scores', id: @map.reviewer.id
@@ -389,8 +388,6 @@ end
     end
     redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: error_msg
   end
-
-  private
 
   # E2218: Method to initialize response and response map for update, delete and view methods
   def set_response

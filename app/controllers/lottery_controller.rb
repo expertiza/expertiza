@@ -1,14 +1,11 @@
 class LotteryController < ApplicationController
   include AuthorizationHelper
-
   require 'json'
   require 'rest_client'
-
   # Give permission to run the bid to appropriate roles
   def action_allowed?
     current_user_has_ta_privileges?
   end
-
   # This method sends a request to a web service that uses k-means and students' bidding data
   # to build teams automatically.
   # The webservice tries to create teams with sizes close to the max team size
@@ -19,11 +16,9 @@ class LotteryController < ApplicationController
   def run_intelligent_assignment
     assignment = Assignment.find(params[:id])
     teams = assignment.teams
-
     users_bidding_info = construct_users_bidding_info(assignment.sign_up_topics, teams)
     bidding_data = { users: users_bidding_info, max_team_size: assignment.max_team_size }
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Bidding data for assignment #{assignment.name}: #{bidding_data}", request)
-
     begin
       url = WEBSERVICE_CONFIG['topic_bidding_webservice_url']
       response = RestClient.post url, bidding_data.to_json, content_type: :json, accept: :json
@@ -36,23 +31,19 @@ class LotteryController < ApplicationController
     rescue StandardError => e
       flash[:error] = e.message
     end
-
     redirect_to controller: 'tree_display', action: 'list'
   end
 
   def bidding_details
     @assignment = Assignment.find(params[:id])
-  
     # Fetch all topics for the assignment
     @topics = @assignment.sign_up_topics
-  
     @count1 = Hash.new(0)
     @count2 = Hash.new(0)
     @count3 = Hash.new(0)
-
     # Fetch all bids for these topics
     @bids_by_topic = {}
-    @assigned_teams_by_topic = {}  # This will store the assigned teams for each topic
+    @assigned_teams_by_topic = {} # This will store the assigned teams for each topic
     @topics.each do |topic|
       # Assuming bids are stored with a topic_id, and each bid has a team associated with it
       @bids_by_topic[topic.id] = Bid.where(topic_id: topic.id).map do |bid|
@@ -62,12 +53,10 @@ class LotteryController < ApplicationController
       @assigned_teams_by_topic[topic.id] = SignedUpTeam.where(topic_id: topic.id, is_waitlisted: false).map(&:team)
       @count1[topic.id] += @bids_by_topic[topic.id].count { |bid| bid[:priority] == 1 }
       @count2[topic.id] += @bids_by_topic[topic.id].count { |bid| bid[:priority] == 2 }
-      @count3[topic.id] += @bids_by_topic[topic.id].count { |bid| bid[:priority] == 3 }       
-
+      @count3[topic.id] += @bids_by_topic[topic.id].count { |bid| bid[:priority] == 3 }   
     end
   end
   
-
   private
 
   # Generate user bidding information hash based on students who haven't signed up yet
@@ -148,7 +137,6 @@ class LotteryController < ApplicationController
     unassigned_teams = assignment.teams.reload.select do |t|
       SignedUpTeam.where(team_id: t.id, is_waitlisted: 0).blank? && Bid.where(team_id: t.id).any?
     end
-
     # Sorting unassigned_teams by team size desc, number of bids in current team asc
     # again, we need to find a way to to merge bids that came from different previous teams
     # then sorting unassigned_teams by number of bids in current team (less is better)
@@ -158,10 +146,8 @@ class LotteryController < ApplicationController
       [TeamsUser.where(team_id: t2.id).size, Bid.where(team_id: t1.id).size] <=>
         [TeamsUser.where(team_id: t1.id).size, Bid.where(team_id: t2.id).size]
     end
-
     teams_bidding_info = construct_teams_bidding_info(unassigned_teams, sign_up_topics)
     assign_available_slots(teams_bidding_info)
-
     # Remove is_intelligent property from assignment so that it can revert to the default sign-up state
     assignment.update_attributes(is_intelligent: false)
     flash[:success] = 'The intelligent assignment was successfully completed for ' + assignment.name + '.'

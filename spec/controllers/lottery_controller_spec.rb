@@ -166,14 +166,12 @@ describe LotteryController do
       expect(SignedUpTeam.count).to eq(number_of_signed_up_teams + 1)
     end
   end
-
   describe '#bidding_details' do
     before :each do
       # Set the assignment id in the params
       params = ActionController::Parameters.new(id: assignment.id)
       allow(controller).to receive(:params).and_return(params)
     end
-    
     it 'populates bids and assigned teams for each topic' do
       controller.bidding_details
 

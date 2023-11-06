@@ -34,8 +34,8 @@ describe PairProgrammingController do
       expect(controller.send(:action_allowed?)).to be_truthy
     end
 
-    #check if teaching assisstant is able to perform the actions
-    it 'allows teaching assisstant to perform certain action' do
+    #check if teaching assistant is able to perform the actions
+    it 'allows teaching assistant to perform certain action' do
       stub_current_user(ta, ta.role.name, ta.role)
       expect(controller.send(:action_allowed?)).to be_truthy
     end

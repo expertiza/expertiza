@@ -26,10 +26,7 @@ module DataMappingHelper
   def map_display_tagging_interval_chart_data(intervals, interval_mean)
     {
       labels: [*1..intervals.length],
-      datasets: [{ backgroundColor: 'rgba(255,99,132,0.8)', data: intervals, label: 'time intervals' },
-                unless intervals.empty?
-                  { data: Array.new(intervals.length, interval_mean), label: 'Mean time spent' }
-                end ]
+      datasets: [{ backgroundColor: 'rgba(255,99,132,0.8)', data: intervals, label: 'time intervals' }, unless intervals.empty? { data: Array.new(intervals.length, interval_mean), label: 'Mean time spent' } end ]
     }
   end
 

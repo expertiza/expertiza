@@ -43,7 +43,7 @@ class QuizQuestion < Question
   def view_completed_question; end
   def isvalid(choice_info)
     @valid = 'valid'
-    #@valid = 'Please make sure all questions have text' if txt == ''
+    @valid = 'Please make sure all questions have text' if txt == ''
     @valid
   end
 

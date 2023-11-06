@@ -277,7 +277,7 @@ class ReviewMappingController < ApplicationController
     render action: 'unsubmit_review.js.erb', layout: false
   end
 
-# If a valid ReviewResponseMap is found and there is no associated response, 
+  # If a valid ReviewResponseMap is found and there is no associated response,
   # it deletes the mapping. If a response exists, indicating the review has already been done,
   # it prevents the deletion and provides appropriate feedback to the user.
   def delete_reviewer
@@ -453,7 +453,7 @@ class ReviewMappingController < ApplicationController
   end
 
   # Assigns peer reviewers to teams with calibrated artifacts for a specific assignment.
-  # It utilizes the automatic review mapping strategy, considering calibrated artifacts and the specified number of reviews per artifact. 
+  # It utilizes the automatic review mapping strategy, considering calibrated artifacts and the specified number of reviews per artifact.
   def assign_reviews_to_calibrated_artifacts(assignment_id, teams_with_calibrated_artifacts, calibrated_artifacts_num)
     automatic_review_mapping_strategy(assignment_id, AssignmentParticipant.where(parent_id: params[:id].to_i).select(&:can_review).shuffle, teams_with_calibrated_artifacts, calibrated_artifacts_num, 0)
   end
@@ -465,7 +465,7 @@ class ReviewMappingController < ApplicationController
   end
 
   # Assigns additional reviewers to teams based on specific review strategy and insufficient review assignments.
-  # If there are still peer reviewers who have not received enough assignments after the initial strategy, 
+  # If there are still peer reviewers who have not received enough assignments after the initial strategy,
   # this method assigns them to valid teams to ensure all participants receive sufficient reviews.
 
   # ERROR IN THIS FUNCTION - no tests written - can be refactored?

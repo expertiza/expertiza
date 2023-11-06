@@ -14,7 +14,7 @@ describe PublishingController do
   end
 
 	describe '#action_allowed?' do
-    #check if super-admin is able to perform the actions
+  #check if super-admin is able to perform the actions
     it 'allows super_admin to perform certain action' do
       stub_current_user(super_admin, super_admin.role.name, super_admin.role)
       expect(controller.send(:action_allowed?)).to be_truthy

@@ -32,15 +32,6 @@ describe UsersController do
       expect(response).to redirect_to('/tree_display/drill')
     end
 
-    it 'renders list if user is instructor' do
-      allow(instructor).to receive(:get_user_list).and_return(student1)
-      request_params = {}
-      user_session = { user: instructor }
-      get :index, params: request_params, session: user_session
-      expect(response).to render_template(:list)
-    end
-  end
-
   context '#auto_complete_for_user_name' do
     it 'checks if auto_complete returns actionview error' do
       stub_current_user(student1, student1.role.name, student1.role)

@@ -140,7 +140,7 @@ class ReviewMappingController < ApplicationController
   end
 
   def assign_reviewer_with_topics(assignment, reviewer, params)
-    topic = if params[:topic_id] 
+    topic = if params[:topic_id]
               SignUpTopic.find(params[:topic_id])
             else
               begin
@@ -595,12 +595,10 @@ class ReviewMappingController < ApplicationController
   def generate_participant_rand_num(participants, participants_hash, num_participants, iterator)
     # generate random number
     if iterator.zero?
-      rand_num = rand(0..num_participants - 1)
+      rand(0..num_participants - 1)
     else
-      rand_num = calculate_rand_num(participants_hash, participants, num_participants)
+      calculate_rand_num(participants_hash, participants, num_participants)
     end
-    # return the random number that was generated
-    rand_num
   end
 
   # calculates rand_num(random number) based on checks

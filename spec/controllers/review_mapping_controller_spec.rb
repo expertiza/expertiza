@@ -170,7 +170,8 @@ describe ReviewMappingController do
     context 'when given a valid response map id' do
       it 'should assign the response map to @mapping' do
         # Create a double representing a ResponseMap object
-        response_map = double('ResponseMap', { id: 1, reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 2, type: '', created_at: Time.now, updated_at: Time.now, calibrate_to: false, team_reviewing_enabled: false })
+        response_map_value = { id: 1, reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 2, type: '', created_at: Time.now, updated_at: Time.now, calibrate_to: false, team_reviewing_enabled: false }
+        response_map = double('ResponseMap', response_map_value)
 
         allow(ResponseMap).to receive(:find).with('1').and_return(response_map)
         get :select_metareviewer, params: { id: '1' }

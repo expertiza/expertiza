@@ -30,7 +30,7 @@ module ReviewMappingHelper
     assignment_created = @assignment.created_at
     # Storing redundantly computed value in a variable
     assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
-    # Returning colour based on conditions
+    # Returning color based on conditions
     if Response.exists?(map_id: response_map.id)
       if !response_map.try(:reviewer).try(:review_grade).nil?
         'brown'
@@ -44,7 +44,7 @@ module ReviewMappingHelper
     end
   end
 
-  # loops through the number of assignment review rounds and obtains the team colour
+  # loops through the number of assignment review rounds and obtains the team color
   def obtain_team_color(response_map, assignment_created, assignment_due_dates)
     color = []
     (1..@assignment.num_review_rounds).each do |round|
@@ -53,7 +53,7 @@ module ReviewMappingHelper
     color[-1]
   end
 
-  # checks the submission state within each round and assigns team colour
+  # checks the submission state within each round and assigns team color
   def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
     if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
       color.push 'purple'
@@ -82,19 +82,19 @@ module ReviewMappingHelper
   def submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
     submission_due_date = assignment_due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
     submission = SubmissionRecord.where(team_id: response_map.reviewee_id, operation: ['Submit File', 'Submit Hyperlink'])
-    subm_created_at = submission.where(created_at: assignment_created..submission_due_date)
+    submission_created_at = submission.where(created_at: assignment_created..submission_due_date)
     if round > 1
       submission_due_last_round = assignment_due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
-      subm_created_at = submission.where(created_at: submission_due_last_round..submission_due_date)
+      submission_created_at = submission.where(created_at: submission_due_last_round..submission_due_date)
     end
-    !subm_created_at.try(:first).try(:created_at).nil?
+    !submission_created_at.try(:first).try(:created_at).nil?
   end
 
   # returns hyperlink of the assignment that has been submitted on the due date
   def submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
     submission_due_date = assignment_due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
-    subm_hyperlink = SubmissionRecord.where(team_id: response_map.reviewee_id, operation: 'Submit Hyperlink')
-    submitted_h = subm_hyperlink.where(created_at: assignment_created..submission_due_date)
+    submission_hyperlink = SubmissionRecord.where(team_id: response_map.reviewee_id, operation: 'Submit Hyperlink')
+    submitted_h = submission_hyperlink.where(created_at: assignment_created..submission_due_date)
     submitted_h.try(:last).try(:content)
   end
 
@@ -121,9 +121,7 @@ module ReviewMappingHelper
                                 # E1991 : check anonymized view here
                                 Team.find(reviewee_id).name
                               end
-    team_reviewed_link_name = '(' + team_reviewed_link_name + ')'
-    # if !response.empty? and !response.last.is_submitted?
-    team_reviewed_link_name
+    '(' + team_reviewed_link_name + ')'
   end
 
   # if the current stage is "submission" or "review", function returns the current round number otherwise,

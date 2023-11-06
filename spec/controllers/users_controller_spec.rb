@@ -18,7 +18,7 @@ describe UsersController do
   let(:superadmin) { build(:superadmin) }
   let(:assignment) do
     build(:assignment, id: 1, name: 'test_assignment', instructor_id: 2,
-                       participants: [build(:participant, id: 1, user_id: 1, assignment: assignment)], course_id: 1)
+          participants: [build(:participant, id: 1, user_id: 1, assignment: assignment)], course_id: 1)
   end
   before(:each) do
     stub_current_user(instructor, instructor.role.name, instructor.role)
@@ -43,21 +43,21 @@ describe UsersController do
 
   context '#auto_complete_for_user_name' do
     it 'checks if auto_complete returns actionview error' do
-	stub_current_user(student1, student1.role.name, student1.role)
-    	session = { user: student1 }
-    	@params = {user: student1}
-    	allow(controller).to receive(:params).and_return(@params)
-    	expect{controller.auto_complete_for_user_name}.to raise_error(ActionView::Template::Error)
+      stub_current_user(student1, student1.role.name, student1.role)
+      session = { user: student1 }
+      @params = {user: student1}
+      allow(controller).to receive(:params).and_return(@params)
+      expect{controller.auto_complete_for_user_name}.to raise_error(ActionView::Template::Error)
     end
 
     it 'checks if get auto_complete redirects to test host' do
-    	stub_current_user(student1, student1.role.name, student1.role)
-    	session = { user: student1 }
-    	@params = {user: student1}
-    	allow(controller).to receive(:params).and_return(@params)
-    	get :auto_complete_for_user_name, params: @params, session: session
-    	expect(response).to redirect_to("http://test.host/")
-    end  
+      stub_current_user(student1, student1.role.name, student1.role)
+      session = { user: student1 }
+      @params = {user: student1}
+      allow(controller).to receive(:params).and_return(@params)
+      get :auto_complete_for_user_name, params: @params, session: session
+      expect(response).to redirect_to("http://test.host/")
+    end
   end
 
   context '#set_anonymized_view' do
@@ -116,7 +116,13 @@ describe UsersController do
       expect(response.status).to eq(200)
     end
   end
-	
+
+  context '#search_params' do
+    it 'checks that search_params does not fail with controller' do
+      expect{controller.search_params}.not_to raise_error
+    end
+  end
+
   context '#show_if_authorized' do
     before(:each) do
       allow(User).to receive(:find).with(2).and_return(instructor)
@@ -295,20 +301,20 @@ describe UsersController do
       get :edit, params: request_params, session: user_session
       expect(response).to render_template(:edit)
     end
-	  
+
     it 'checks if role renders through edit' do
       new_student = User.new
       new_student = student1
-      new_student.role_id = nil  
+      new_student.role_id = nil
       allow(User).to receive(:find).with(any_args).and_return(new_student)
       get :edit
       expect(response).to render_template(:edit)
     end
-	 
+
     it 'checks if role fails through edit' do
       new_student = User.new
       new_student = student1
-      new_student.role_id = nil  
+      new_student.role_id = nil
       allow(User).to receive(:find).with(any_args).and_return(new_student)
       expect{controller.edit}.not_to raise_error
     end
@@ -331,7 +337,7 @@ describe UsersController do
       expect(response).to render_template(:edit)
     end
   end
-	
+
   context '#destroy' do
     it 'check if user was successfully destroyed' do
       allow(User).to receive(:find).with(any_args).and_return(student1)

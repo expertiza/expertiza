@@ -49,7 +49,7 @@ class TeamsUser < ApplicationRecord
     users_teams.each do |team|
       new_team = AssignmentTeam.where(['id = ? and parent_id = ?', team.team_id, assignment_id]).first
       unless new_team.nil?
-#E2351 Swapped the add_memeber to use the new one
+#E2351 Swapped the add_member to use the new one
         can_add_member = new_team.add_member_mentor_check(User.find(invited_user_id), assignment_id)
       end
     end

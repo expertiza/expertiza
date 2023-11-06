@@ -54,7 +54,7 @@ class TeamsUsersController < ApplicationController
           flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
         else
           begin
-#E2351 Swapped the add_memeber to use the new one
+#E2351 Swapped the add_member to use the new one
             add_member_return = team.add_member_mentor_check(user, team.parent_id)
           rescue
             flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"

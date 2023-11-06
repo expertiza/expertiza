@@ -975,9 +975,9 @@ jQuery(document).ready(function() {
             (creation_date && creation_date.includes(filterText)) ||
             (institution && institution.includes(filterText)) ||
             (updated_date && updated_date.includes(filterText)
-            ) && (private || type === 'FolderNode');
+            ) && (private || type === 'FolderNode'))
       } else {
-        return name && name.toLowerCase().includes(filterTextLower) && (private || type === 'FolderNode');
+        return name && name.toLowerCase().includes(filterTextLower) && (private || type === 'FolderNode')
       }
     },
 

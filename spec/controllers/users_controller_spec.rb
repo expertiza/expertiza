@@ -31,6 +31,7 @@ describe UsersController do
       get :index
       expect(response).to redirect_to('/tree_display/drill')
     end
+  end
 
   context '#auto_complete_for_user_name' do
     it 'checks if auto_complete returns actionview error' do

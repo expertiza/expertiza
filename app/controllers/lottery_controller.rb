@@ -13,6 +13,7 @@ class LotteryController < ApplicationController
   # that have similar bidding info/priorities associated with the assignment's sign-up topics.
   #
   # rubocop:disable Metrics/AbcSize
+
   def run_intelligent_assignment
     assignment = Assignment.find(params[:id])
     teams = assignment.teams
@@ -53,7 +54,7 @@ class LotteryController < ApplicationController
       @assigned_teams_by_topic[topic.id] = SignedUpTeam.where(topic_id: topic.id, is_waitlisted: false).map(&:team)
       @count1[topic.id] += @bids_by_topic[topic.id].count { |bid| bid[:priority] == 1 }
       @count2[topic.id] += @bids_by_topic[topic.id].count { |bid| bid[:priority] == 2 }
-      @count3[topic.id] += @bids_by_topic[topic.id].count { |bid| bid[:priority] == 3 }   
+      @count3[topic.id] += @bids_by_topic[topic.id].count { |bid| bid[:priority] == 3 }
     end
   end
   

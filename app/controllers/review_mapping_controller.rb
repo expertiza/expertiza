@@ -97,11 +97,7 @@ class ReviewMappingController < ApplicationController
     else
       if review_allowed?(assignment, reviewer)
         if check_outstanding_reviews?(assignment, reviewer)
-          if assignment.topics?
-            assign_reviewer_with_topics(assignment, reviewer, params)
-          else
-            assign_reviewer_without_topic(assignment, reviewer)
-          end
+          assign_reviewer(assignment, reviewer, params)
         else
           flash[:error] = 'You cannot do more reviews when you have ' + Assignment.max_outstanding_reviews + 'reviews to do'
         end
@@ -139,6 +135,16 @@ class ReviewMappingController < ApplicationController
     end
   end
 
+  # decide the kind of assignment to choose the reviewer assignment logic
+  def assign_reviewer(assignment, reviewer, params)
+    if assignment.topics?
+      assign_reviewer_with_topics(assignment, reviewer, params)
+    else
+      assign_reviewer_without_topic(assignment, reviewer)
+    end
+  end
+
+  # assign reviewer for assignments with topics
   def assign_reviewer_with_topics(assignment, reviewer, params)
     topic = if params[:topic_id]
               SignUpTopic.find(params[:topic_id])
@@ -156,6 +162,7 @@ class ReviewMappingController < ApplicationController
     end
   end
 
+  # assign reviewer for assignments without topics
   def assign_reviewer_without_topic(assignment, reviewer)
     assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
     assignment_team = begin

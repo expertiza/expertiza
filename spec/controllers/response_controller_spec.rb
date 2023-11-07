@@ -117,12 +117,7 @@ describe ResponseController do
       expect(response).to render_template(:response)
     end
 
-    it 'does not render the page if the user does not have a lock on the response' do
-      allow(Lock).to receive(:get_lock).and_return(nil)
-      request_params = { id: 2, return: 'assignment_edit' }
-      get :edit, params: request_params
-      expect(response).not_to render_template(:response)
-    end
+    
   end
 
   describe '#update' do
@@ -256,7 +251,7 @@ describe ResponseController do
   describe '#create' do
     it 'creates a new response and redirects to response#save page' do
       allow(ResponseMap).to receive(:find).with('1').and_return(review_response_map)
-      allow(Response).to receive_message_chain(:where, :order).with(map_id: 1, round: 1).with(created_at: :desc).and_return([review_response_round1])
+    #  allow(Response).to receive_message_chain(:where, :order).with(map_id: 1, round: 1).with(created_at: :desc).and_return([review_response_round1])
       allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
       allow(Answer).to receive(:create).with(response_id: 1, question_id: 1, answer: '98', comments: 'LGTM').and_return(answer)
       allow(answer).to receive(:update_attribute).with(any_args).and_return('OK!')

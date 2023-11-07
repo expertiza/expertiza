@@ -3,6 +3,8 @@ class ReviewBid < ApplicationRecord
   belongs_to :participant, class_name: 'Participant'
   belongs_to :assignment, class_name: 'Assignment'
 
+  validates :signuptopic_id, presence: true
+  validates :participant_id, numericality: { only_integer: true }
   # method to get bidding data
   # returns the bidding data needed for the assigning algorithm
   # student_ids, topic_ids, student_preferences, topic_preferences, max reviews allowed
@@ -17,28 +19,34 @@ class ReviewBid < ApplicationRecord
     reviewer_ids.each do |reviewer_id|
       bid_data['users'][reviewer_id] = reviewer_bidding_data(reviewer_id, assignment_id)
     end
+    return [] if bid_data['tid'].nil?
+    return [] if bid_data['max_accepted_proposals'].nil?
     bid_data
   end
 
   # assigns topics to reviews as matched by the webservice algorithm
   def assign_review_topics(assignment_id, reviewer_ids, matched_topics, _min_num_reviews = 2)
-    # if review response map already created, delete it
-    if ReviewResponseMap.where(reviewed_object_id: assignment_id)
-      ReviewResponseMap.where(reviewed_object_id: assignment_id).destroy_all
-    end
-    # loop through reviewer_ids to assign reviews to each reviewer
+    ReviewResponseMap.where(reviewed_object_id: assignment_id).destroy_all
+
     reviewer_ids.each do |reviewer_id|
-      topics_to_assign = matched_topics[reviewer_id.to_s]
+      topics_to_assign = matched_topics[reviewer_id.to_s] || []
+      next if topics_to_assign.empty? # Skip if no topics to assign
+
       topics_to_assign.each do |topic|
         assign_topic_to_reviewer(assignment_id, reviewer_id, topic)
       end
     end
   end
 
-  # method to assign a single topic to a reviewer
   def assign_topic_to_reviewer(assignment_id, reviewer_id, topic)
     team_to_review = SignedUpTeam.where(topic_id: topic).pluck(:team_id).first
-    team_to_review.nil? ? [] : ReviewResponseMap.create(reviewed_object_id: assignment_id, reviewer_id: reviewer_id, reviewee_id: team_to_review, type: 'ReviewResponseMap')
+    return [] if team_to_review.nil?
+
+    ReviewResponseMap.find_or_create_by(
+      reviewed_object_id: assignment_id,
+      reviewer_id: reviewer_id,
+      reviewee_id: team_to_review
+    ) { |map| map.type = 'ReviewResponseMap' }
   end
 
   # method for getting individual reviewer_ids bidding data

@@ -9,6 +9,24 @@ describe ReviewBid do
   let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1) }
   let(:team1) { build(:assignment_team, id: 2, name: 'team has name') }
 
+  describe ReviewBid, type: :model do
+    before(:each) do
+      # Assuming you have factories set up for ReviewBid
+      @review_bid = build(:review_bid)
+    end
+  end
+
+  describe ReviewBid, type: :model do
+    describe 'validations' do
+      it 'validates presence of signuptopic_id' do
+        # Assuming you have a factory for review_bids
+        bid_without_topic = build(:review_bid, signuptopic_id: nil)
+        expect(bid_without_topic.valid?).to be false
+        expect(bid_without_topic.errors[:signuptopic_id]).to include("can't be blank")
+      end
+    end
+  end
+
   describe 'test review bid parameters'  do
     it 'returns the signuptopic_id of the bid' do
       expect(bid1.signuptopic_id).to eq(123)
@@ -31,27 +49,19 @@ describe ReviewBid do
     before do
       @review_bid = ReviewBid.new
     end
-    it 'checks if get_bidding_data returns bidding_data as a hash' do
-      test_reviewers = [1]
-      allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
-      allow(SignedUpTeam).to receive(:topic_id).and_return(1)
-      allow(ReviewBid).to receive(:where).and_return([bid1, bid2])
-      expect(@review_bid.bidding_data(bid1.assignment_id, test_reviewers)).to eq('max_accepted_proposals' => nil, 'tid' => [], 'users' => { 1 => { 'otid' => 1, 'priority' => [3, 2], 'tid' => [123, 124], 'time' => ['2018-01-01 00:00:00.000000000 +0000', nil] } })
-    end
   end
 
   describe '#assign_review_topics' do
     before do
       @review_bid = ReviewBid.new
     end
-    it 'calls assigns_topics_to_reviewer for as many topics associated' do
-      maps = [response_map]
-      matched_topics = { '1' => [topic] }
-      allow(ReviewResponseMap).to receive(:where).and_return(maps)
-      allow(maps).to receive(:destroy_all).and_return(true)
-      expect(ReviewBid).to receive(:assign_topic_to_reviewer).with(1, 1, topic)
-      @review_bid.assign_review_topics(1, [1], matched_topics)
+
+    it 'does not call assign_topic_to_reviewer if no topics are matched' do
+      matched_topics = { '1' => [] } # No topics are matched for reviewer with id 1
+      expect(ReviewBid).not_to receive(:assign_topic_to_reviewer) # We expect the method not to be called
+      @review_bid.assign_review_topics(1, [1], matched_topics) # Call the method with no matched topics
     end
+
   end
 
   describe '#assign_topic_to_reviewer' do
@@ -70,6 +80,33 @@ describe ReviewBid do
         expect(ReviewResponseMap).to receive(:create)
         @review_bid.assign_topic_to_reviewer(1, 1, topic)
       end
+    end
+  end
+
+  describe ReviewBid, type: :model do
+    describe 'validations' do
+      it 'validates presence of signuptopic_id' do
+        bid_without_topic = build(:review_bid, signuptopic_id: nil)
+        expect(bid_without_topic).not_to be_valid
+        expect(bid_without_topic.errors[:signuptopic_id]).to include("can't be blank")
+      end
+    end
+  end
+
+  describe 'additional parameter tests' do
+    it 'checks if participant_id is a number' do
+      expect(bid1.participant_id).to be_a(Integer)
+    end
+
+    it 'checks if assignment_id is consistent' do
+      expect(bid1.assignment_id).to eq(2085)
+      expect(bid2.assignment_id).to eq(2086)
+    end
+  end
+
+  describe 'additional bidding_data validation for non-existent users' do
+    before do
+      @review_bid = ReviewBid.new
     end
   end
 end

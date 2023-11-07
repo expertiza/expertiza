@@ -270,6 +270,7 @@ module ReviewMappingHelper
     css_class
   end
 
+  # These classes encapsulate the logic for different review strategies in the system
   class ReviewStrategy
     attr_accessor :participants, :teams
 
@@ -280,6 +281,10 @@ module ReviewMappingHelper
     end
   end
 
+  
+  
+  # Used when student_review_num is not zero and submission_review_num is zero in the ReviewMappingController
+  # Provides specific review strategy calculations for individual students
   class StudentReviewStrategy < ReviewStrategy
     def reviews_per_team
       (@participants.size * @review_num * 1.0 / @teams.size).round
@@ -294,6 +299,8 @@ module ReviewMappingHelper
     end
   end
 
+  # Used when student_review_num is zero and submission_review_num is not zero in the ReviewMappingController
+  # Provides specific review strategy calculations for teams
   class TeamReviewStrategy < ReviewStrategy
     def reviews_per_team
       @review_num

@@ -180,6 +180,8 @@ class SignUpSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: assignment_id
   end
 
+
+  
   def list
     # Fetch the AssignmentParticipant based on the given ID
     @participant = AssignmentParticipant.find(params[:id].to_i)
@@ -191,16 +193,16 @@ class SignUpSheetController < ApplicationController
     
     @show_actions = true
     @priority = 0
+    # Fetch sign-up topics for the assignment
+    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     @max_team_size = @assignment.max_team_size
+    # Fetch the team ID if exists
+    team_id = @participant.team.try(:id)
     @use_bookmark = @assignment.use_bookmark
-  
-    # Handle intelligent assignment scenarios
     if @assignment.is_intelligent
       handle_intelligent_assignment
     end
-  
-    # Fetch sign-up topics for the assignment
-    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
+    # Extract code related to intelligent assignment handling
     # Find the number of sign-up topics available
     @num_of_topics = @sign_up_topics.size
     # Retrieve important deadline information
@@ -211,12 +213,12 @@ class SignUpSheetController < ApplicationController
   
     # Check if certain deadlines have passed to determine whether to show actions
     handle_deadlines
-  
+    
     # Rendering the appropriate view based on the assignment type
     render('sign_up_sheet/intelligent_topic_selection') && return if @assignment.is_intelligent
   end
   
-  # Extract code related to intelligent assignment handling
+  # Handle intelligent assignment scenarios
   def handle_intelligent_assignment
     # Fetch the team ID (if it exists)
     team_id = @participant.team.try(:id)
@@ -248,10 +250,10 @@ class SignUpSheetController < ApplicationController
                          else
                            SignedUpTeam.find_user_signup_topics(@assignment.id, users_team.first.t_id)
                          end
-    end
+    end  
   end
   
-
+ 
   def sign_up
     @assignment = AssignmentParticipant.find(params[:id]).assignment
     @user_id = session[:user].id

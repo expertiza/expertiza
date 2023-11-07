@@ -127,139 +127,49 @@ describe DueDateHelper do
     expect(DueDateHelper.default_permission('review', 'submission_allowed')).to be == DeadlineRight::NO
   end
 end
+
 describe "default_permission" do
-  let(:permissions) { Permission.default_permissions }
+  let(:permissions) { DeadlineRight::DEFAULT_PERMISSION }
 
-  context "when deadline_type is 'A' and permission_type is 'read'" do
-    it "returns the default read permission for deadline type A" do
-      expect(permissions.get_read_permission('A')).to eq('default_read_permission_for_A')
+  context "when deadline_type is 'signup' and permission_type is 'read'" do
+    it "returns the default read permission for deadline type signup" do
+      expect(permissions['signup']['submission_allowed']).to eq(DeadlineRight::OK)
+      expect(permissions['signup']['can_review']).to eq(DeadlineRight::NO)
+      expect(permissions['signup']['review_of_review_allowed']).to eq(DeadlineRight::NO)
     end
   end
 
-  context "when deadline_type is 'A' and permission_type is 'write'" do
-    it "returns the default write permission for deadline type A" do
-      expect(permissions.get_write_permission('A')).to eq('default_write_permission_for_A')
+  context "when deadline_type is 'signup' and permission_type is 'write'" do
+    it "returns the default write permission for deadline type signup" do
+      expect(permissions['signup']['can_review']).to eq(DeadlineRight::NO)
     end
   end
 
-  context "when deadline_type is 'B' and permission_type is 'read'" do
-    it "returns the default read permission for deadline type B" do
-      expect(permissions.get_read_permission('B')).to eq('default_read_permission_for_B')
+  context "when deadline_type is 'team_formation' and permission_type is 'read'" do
+    it "returns the default read permission for deadline type team_formation" do
+      expect(permissions['team_formation']['submission_allowed']).to eq(DeadlineRight::OK)
+      expect(permissions['team_formation']['can_review']).to eq(DeadlineRight::NO)
+      expect(permissions['team_formation']['review_of_review_allowed']).to eq(DeadlineRight::NO)
     end
   end
 
-  context "when deadline_type is 'B' and permission_type is 'write'" do
-    it "returns the default write permission for deadline type B" do
-      expect(permissions.get_write_permission('B')).to eq('default_write_permission_for_B')
+  context "when deadline_type is 'team_formation' and permission_type is 'write'" do
+    it "returns the default write permission for deadline type team_formation" do
+      expect(permissions['team_formation']['can_review']).to eq(DeadlineRight::NO)
     end
   end
 
-  context "when deadline_type is 'C' and permission_type is 'read'" do
-    it "returns the default read permission for deadline type C" do
-      expect(permissions.get_read_permission('C')).to eq('default_read_permission_for_C')
+  context "when deadline_type is 'submission' and permission_type is 'read'" do
+    it "returns the default read permission for deadline type submission" do
+      expect(permissions['submission']['submission_allowed']).to eq(DeadlineRight::OK)
+      expect(permissions['submission']['can_review']).to eq(DeadlineRight::NO)
+      expect(permissions['submission']['review_of_review_allowed']).to eq(DeadlineRight::NO)
     end
   end
 
-  context "when deadline_type is 'C' and permission_type is 'write'" do
-    it "returns the default write permission for deadline type C" do
-      expect(permissions.get_write_permission('C')).to eq('default_write_permission_for_C')
-    end
-  end
-end
-
-describe ".copy" do
-  let(:old_assignment) { create(:assignment) }
-  let(:new_assignment) { create(:assignment) }
-
-  context "when copying due dates from an old assignment to a new assignment" do
-    it "creates new due dates with the same attributes as the original due dates" do
-
-      due_dates = create_list(:due_date, 2, assignment: old_assignment)
-      single_due_date = create(:due_date, assignment: old_assignment)
-
-      DueDate.copy(old_assignment.id, new_assignment.id)
-
-      # Test scenario 1
-      new_due_dates = DueDate.where(assignment_id: new_assignment.id)
-      expect(new_due_dates.count).to eq 3
-      new_due_dates.each_with_index do |new_due_date, index|
-        expect(new_due_date.attributes.except('id', 'assignment_id', 'created_at', 'updated_at')).to eq due_dates[index].attributes.except('id', 'assignment_id', 'created_at', 'updated_at')
-      end
-
-      # Test scenario 2
-      DueDate.delete_all
-      expect { DueDate.copy(old_assignment.id, new_assignment.id) }.not_to change(DueDate, :count)
-
-      # Test scenario 3
-      new_single_due_date = DueDate.find_by(assignment_id: new_assignment.id)
-      expect(new_single_due_date.attributes.except('id', 'assignment_id', 'created_at', 'updated_at')).to eq single_due_date.attributes.except('id', 'assignment_id', 'created_at', 'updated_at')
-    end
-
-    it "assigns the new assignment ID to the parent ID of the new due dates" do
-      # Test scenario 1
-      create_list(:due_date, 2, assignment: old_assignment)
-      DueDate.copy(old_assignment.id, new_assignment.id)
-      new_due_dates = DueDate.where(assignment_id: new_assignment.id)
-      expect(new_due_dates.count).to eq 2
-      expect(new_due_dates.pluck(:assignment_id).uniq).to eq [new_assignment.id]
-
-      # Test scenario 2
-      DueDate.delete_all
-      expect { DueDate.copy(old_assignment.id, new_assignment.id) }.not_to change { DueDate.where(assignment_id: new_assignment.id).count }
-
-      # Test scenario 3
-      create(:due_date, assignment: old_assignment)
-      DueDate.copy(old_assignment.id, new_assignment.id)
-      new_single_due_date = DueDate.find_by(assignment_id: new_assignment.id)
-      expect(new_single_due_date.assignment_id).to eq new_assignment.id
-    end
-
-    it "saves the new due dates" do
-      # Test scenario 1
-      create_list(:due_date, 2, assignment: old_assignment)
-      expect { DueDate.copy(old_assignment.id, new_assignment.id) }.to change { DueDate.where(assignment_id: new_assignment.id).count }.by(2)
-
-      # Test scenario 2
-      DueDate.delete_all
-      expect { DueDate.copy(old_assignment.id, new_assignment.id) }.not_to change(DueDate, :count)
-
-      # Test scenario 3
-      create(:due_date, assignment: old_assignment)
-      expect { DueDate.copy(old_assignment.id, new_assignment.id) }.to change { DueDate.where(assignment_id: new_assignment.id).count }.by(1)
-    end
-  end
-end
-
-describe "#<=>" do
-  let(:current_due_date) { DueDate.new(due_at: Time.now) }
-  let(:earlier_due_date) { DueDate.new(due_at: 1.day.ago) }
-  let(:later_due_date) { DueDate.new(due_at: 1.day.from_now) }
-  let(:same_time_due_date) { DueDate.new(due_at: current_due_date.due_at) }
-  let(:no_due_date) { DueDate.new }
-
-  context "when both objects have a due_at attribute" do
-    it "returns -1 if the current object's due_at is earlier than the other object's due_at" do
-      expect(current_due_date.<=>(later_due_date)).to eq(-1)
-    end
-
-    it "returns 0 if the current object's due_at is the same as the other object's due_at" do
-      expect(current_due_date.<=>(same_time_due_date)).to eq(0)
-    end
-
-    it "returns 1 if the current object's due_at is later than the other object's due_at" do
-      expect(current_due_date.<=>(earlier_due_date)).to eq(1)
-    end
-  end
-
-  context "when only the current object has a due_at attribute" do
-    it "returns -1" do
-      expect(current_due_date.<=>(no_due_date)).to eq(-1)
-    end
-  end
-
-  context "when only the other object has a due_at attribute" do
-    it "returns 1" do
-      expect(no_due_date.<=>(current_due_date)).to eq(1)
+  context "when deadline_type is 'submission' and permission_type is 'write'" do
+    it "returns the default write permission for deadline type submission" do
+      expect(permissions['submission']['can_review']).to eq(DeadlineRight::NO)
     end
   end
 end

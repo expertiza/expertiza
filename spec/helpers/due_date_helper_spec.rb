@@ -127,3 +127,49 @@ describe DueDateHelper do
     expect(DueDateHelper.default_permission('review', 'submission_allowed')).to be == DeadlineRight::NO
   end
 end
+
+describe 'default_permission' do
+  let(:permissions) { DeadlineRight::DEFAULT_PERMISSION }
+
+  context "when deadline_type is 'signup' and permission_type is 'read'" do
+    it 'returns the default read permission for deadline type signup' do
+      expect(permissions['signup']['submission_allowed']).to eq(DeadlineRight::OK)
+      expect(permissions['signup']['can_review']).to eq(DeadlineRight::NO)
+      expect(permissions['signup']['review_of_review_allowed']).to eq(DeadlineRight::NO)
+    end
+  end
+
+  context "when deadline_type is 'signup' and permission_type is 'write'" do
+    it 'returns the default write permission for deadline type signup' do
+      expect(permissions['signup']['can_review']).to eq(DeadlineRight::NO)
+    end
+  end
+
+  context "when deadline_type is 'team_formation' and permission_type is 'read'" do
+    it 'returns the default read permission for deadline type team_formation' do
+      expect(permissions['team_formation']['submission_allowed']).to eq(DeadlineRight::OK)
+      expect(permissions['team_formation']['can_review']).to eq(DeadlineRight::NO)
+      expect(permissions['team_formation']['review_of_review_allowed']).to eq(DeadlineRight::NO)
+    end
+  end
+
+  context "when deadline_type is 'team_formation' and permission_type is 'write'" do
+    it 'returns the default write permission for deadline type team_formation' do
+      expect(permissions['team_formation']['can_review']).to eq(DeadlineRight::NO)
+    end
+  end
+
+  context "when deadline_type is 'submission' and permission_type is 'read'" do
+    it 'returns the default read permission for deadline type submission' do
+      expect(permissions['submission']['submission_allowed']).to eq(DeadlineRight::OK)
+      expect(permissions['submission']['can_review']).to eq(DeadlineRight::NO)
+      expect(permissions['submission']['review_of_review_allowed']).to eq(DeadlineRight::NO)
+    end
+  end
+
+  context "when deadline_type is 'submission' and permission_type is 'write'" do
+    it 'returns the default write permission for deadline type submission' do
+      expect(permissions['submission']['can_review']).to eq(DeadlineRight::NO)
+    end
+  end
+end

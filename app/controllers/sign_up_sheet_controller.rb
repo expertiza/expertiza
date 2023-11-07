@@ -18,7 +18,7 @@ class SignUpSheetController < ApplicationController
  
   def action_allowed?
     case params[:action]
-    when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
+    when 'set_priority', 'sign_up', 'delete_signup', 'list', 'display_team_info', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
       (current_user_has_student_privileges? &&
           (%w[list].include? action_name) &&
           are_needed_authorizations_present?(params[:id], 'reader', 'submitter', 'reviewer')) ||
@@ -56,7 +56,7 @@ class SignUpSheetController < ApplicationController
   def create
     topic = SignUpTopic.where(topic_name: params[:topic][:topic_name], assignment_id: params[:id]).first
     if topic.nil?
-      setup_new_topic
+      create_new_topic
     else
       update_existing_topic topic
     end
@@ -309,11 +309,11 @@ def delete_signup_common(who_user,participant, assignment, drop_topic_deadline, 
     end
   else
     if who_user == "instructor"
-      delete_signup_for_topic(assignment.id, params[:topic_id], participant.user_id)
+      delete_signup_topic(assignment.id, params[:topic_id], participant.user_id)
       flash[:success] = 'You have successfully dropped the student from the topic!'
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Student has been dropped from the topic: ' + params[:topic_id].to_s)
     else
-      delete_signup_for_topic(assignment.id, params[:topic_id], session[:user].id)
+      delete_signup_topic(assignment.id, params[:topic_id], session[:user].id)
       flash[:success] = 'You have successfully dropped your topic!'
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student has dropped the topic: ' + params[:topic_id].to_s)
     end
@@ -440,11 +440,11 @@ end
   end
 
   # This method is called when a student click on the trumpet icon. So this is a bad method name. --Yang
-  def show_team
+  def display_team_info
     assignment = Assignment.find(params[:assignment_id])
     topic = SignUpTopic.find(params[:id])
     if assignment && topic
-      @results = ad_info(assignment.id, topic.id)
+      @results = get_advertisement_info(assignment.id, topic.id)
       @results.each do |result|
         result.keys.each do |key|
           @current_team_name = result[key] if key.equal? :name
@@ -495,7 +495,7 @@ end
 
   private
 
-  def setup_new_topic
+  def create_new_topic
     set_values_for_new_topic
     @sign_up_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
     if @sign_up_topic.save
@@ -532,7 +532,7 @@ end
 
   # get info related to the ad for partners so that it can be displayed when an assignment_participant
   # clicks to see ads related to a topic
-  def ad_info(_assignment_id, topic_id)
+  def get_advertisement_info(_assignment_id, topic_id)
     @ad_information = []
     @signed_up_teams = SignedUpTeam.where(topic_id: topic_id)
     # Iterate through the results of the query and get the required attributes
@@ -552,7 +552,7 @@ end
     @ad_information
   end
 
-  def delete_signup_for_topic(assignment_id, topic_id, user_id)
+  def delete_signup_topic(assignment_id, topic_id, user_id)
     SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
   end
 end

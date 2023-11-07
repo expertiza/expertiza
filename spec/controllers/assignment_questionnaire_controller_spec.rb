@@ -78,7 +78,7 @@ describe AssignmentQuestionnaireController do
   
 
     # context 'when questionnaires related to an assignment are deleted' do
-    #   #When all the questionnaires related to an assignment are deleted the count of assignment_questionnaire records should be 0 for that asssignment
+    #   #When all the questionnaires related to an assignment are deleted the count of assignment_questionnaire records should be 0 for that assignment
     #   it 'should persist that delete in the database' do
     #     assignment3 = create(:assignment)
 

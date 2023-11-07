@@ -93,7 +93,7 @@ class SignUpSheetController < ApplicationController
     if @topic
       update_max_choosers @topic
 
-      #Updating different attrubutes of the topics such as Topic ID, Topic name, Topic category, Number of slots, Micropayment, Topic link and Topic description
+      #Updating different attributes of the topics such as Topic ID, Topic name, Topic category, Number of slots, Micropayment, Topic link and Topic description
       @topic.update_attributes(topic_identifier: params[:topic][:topic_identifier], category: params[:topic][:category], topic_name: params[:topic][:topic_name], micropayment: params[:topic][:micropayment], description: params[:topic][:description],link:params[:topic][:link] )
 
       undo_link("The topic: \"#{@topic.topic_name}\" has been successfully updated. ")

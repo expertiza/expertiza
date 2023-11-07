@@ -87,16 +87,16 @@ describe ReviewMappingController do
 
       it "returns true if the current role is a 'Teaching Assistant'" do
         params = { action: 'some_other_action' }
-        allow(controller).to receive(:params).and_return(params)
         allow(controller).to receive(:current_role_name).and_return('Teaching Assistant')
+        allow(controller).to receive(:params).and_return(params)
 
         expect(controller.action_allowed?).to eq(true)
       end
 
       it "returns true if the current role is an 'Administrator'" do
+        allow(controller).to receive(:current_role_name).and_return('Administrator')
         params = { action: 'some_other_action' }
         allow(controller).to receive(:params).and_return(params)
-        allow(controller).to receive(:current_role_name).and_return('Administrator')
         expect(controller.action_allowed?).to eq(true)
       end
     end

@@ -52,7 +52,6 @@ module ReviewMappingChartsHelper
 
     # Get Metrics once tagging intervals are available
     return nil if intervals.empty?
-    
     metric_information(intervals, interval_precision)
     # if no Hash object is returned, the UI handles it accordingly
   end

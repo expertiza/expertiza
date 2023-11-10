@@ -39,22 +39,19 @@ class LotteryController < ApplicationController
     @assignment = Assignment.find(params[:id])
     # Fetch all topics for the assignment
     @topics = @assignment.sign_up_topics
-    @count1 = Hash.new(0)
-    @count2 = Hash.new(0)
-    @count3 = Hash.new(0)
     # Fetch all bids for these topics
     @bids_by_topic = {}
     @assigned_teams_by_topic = {} # This will store the assigned teams for each topic
     @topics.each do |topic|
       # Assuming bids are stored with a topic_id, and each bid has a team associated with it
-      @bids_by_topic[topic.id] = Bid.where(topic_id: topic.id).map do |bid|
-        { team: bid.team, priority: bid.priority }
-      end
+      @bids_by_topic[topic.id] = Bid.where(topic_id: topic.id).map { |bid| { team: bid.team, priority: bid.priority } }
       # Fetch teams that are not waitlisted for this topic
       @assigned_teams_by_topic[topic.id] = SignedUpTeam.where(topic_id: topic.id, is_waitlisted: false).map(&:team)
-      @count1[topic.id] += @bids_by_topic[topic.id].count { |bid| bid[:priority] == 1 }
-      @count2[topic.id] += @bids_by_topic[topic.id].count { |bid| bid[:priority] == 2 }
-      @count3[topic.id] += @bids_by_topic[topic.id].count { |bid| bid[:priority] == 3 }
+      # Dynamically initializing and updating @count1, @count2, and @count3
+      (1..3).each do |priority|
+        instance_variable_set("@count#{priority}", Hash.new(0)) unless instance_variable_defined?("@count#{priority}")
+        instance_variable_get("@count#{priority}")[topic.id] = @bids_by_topic[topic.id].count { |bid| bid[:priority] == priority }
+      end
     end
   end
 

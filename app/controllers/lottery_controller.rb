@@ -79,17 +79,13 @@ class LotteryController < ApplicationController
   # Generate team bidding information hash based on newly-created teams
   # Structure of team_bidding_info variable: [{team_id1, bids_1}, {team_id2, bids_2}]
   def construct_teams_bidding_info(unassigned_teams, sign_up_topics)
-    teams_bidding_info = []
-    unassigned_teams.each do |team|
-      topic_bids = []
-      sign_up_topics.each do |topic|
+    unassigned_teams.map do |team|
+      bids = sign_up_topics.map do |topic|
         bid = Bid.find_by(team_id: team.id, topic_id: topic.id)
-        topic_bids << { topic_id: topic.id, priority: bid.priority } if bid
-      end
-      topic_bids.sort! { |bid| bid[:priority] }
-      teams_bidding_info << { team_id: team.id, bids: topic_bids }
+        { topic_id: topic.id, priority: bid.priority } if bid
+      end.compact.sort_by { |bid| bid[:priority] }
+      { team_id: team.id, bids: bids }
     end
-    teams_bidding_info
   end
 
   # This method creates new AssignmentTeam objects based on the list of teams
@@ -113,15 +109,11 @@ class LotteryController < ApplicationController
     teams_bidding_info.each do |tb|
       tb[:bids].each do |bid|
         topic_id = bid[:topic_id]
-        num_of_signed_up_teams = SignedUpTeam.where(topic_id: topic_id).count
-        max_choosers = SignUpTopic.find(bid[:topic_id]).try(:max_choosers)
-        if num_of_signed_up_teams < max_choosers
-          SignedUpTeam.create(team_id: tb[:team_id], topic_id: bid[:topic_id])
-          break
-        end
+        max_choosers = SignUpTopic.find(topic_id).try(:max_choosers)
+        SignedUpTeam.create(team_id: tb[:team_id], topic_id: topic_id) if SignedUpTeam.where(topic_id: topic_id).count < max_choosers
       end
     end
-  end
+  end  
 
   # This method is called for assignments which have their is_intelligent property set to 1.
   # It runs a stable match algorithm and assigns topics to strongest contenders (team strength, priority of bids)

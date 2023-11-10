@@ -80,13 +80,17 @@ class LotteryController < ApplicationController
   # Structure of team_bidding_info variable: [{team_id1, bids_1}, {team_id2, bids_2}]
   def construct_teams_bidding_info(unassigned_teams, sign_up_topics)
     unassigned_teams.map do |team|
-      bids = sign_up_topics.map do |topic|
-        bid = Bid.find_by(team_id: team.id, topic_id: topic.id)
-        { topic_id: topic.id, priority: bid.priority } if bid
-      end.compact.sort_by { |bid| bid[:priority] }
-      { team_id: team.id, bids: bids }
+      {
+        team_id: team.id,
+        bids: sign_up_topics.map do |topic|
+          bid = Bid.find_by(team_id: team.id, topic_id: topic.id)
+          { topic_id: topic.id, priority: bid.priority } if bid
+        end
+        .compact
+        .sort_by { |bid| bid[:priority] }
+      }
     end
-  end
+  end  
 
   # This method creates new AssignmentTeam objects based on the list of teams
   # received from the webservice
@@ -113,7 +117,7 @@ class LotteryController < ApplicationController
         SignedUpTeam.create(team_id: tb[:team_id], topic_id: topic_id) if SignedUpTeam.where(topic_id: topic_id).count < max_choosers
       end
     end
-  end  
+  end
 
   # This method is called for assignments which have their is_intelligent property set to 1.
   # It runs a stable match algorithm and assigns topics to strongest contenders (team strength, priority of bids)

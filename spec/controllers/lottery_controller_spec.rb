@@ -181,7 +181,7 @@ describe LotteryController do
       # Check if @assigned_teams_by_topic is populated correctly, allowing for no teams
       assigned_teams_topic1 = controller.instance_variable_get(:@assigned_teams_by_topic)[topic1.id]
       if assigned_teams_topic1
-        expect(assigned_teams_topic1.length).to (satisfy { |value| (value == 0) || (value == 1) })
+        expect(assigned_teams_topic1.length).to(satisfy { |value| (value == 0) || (value == 1) })
       else
         expect(assigned_teams_topic1).to be_nil
       end

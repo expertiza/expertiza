@@ -280,8 +280,6 @@ module ReviewMappingHelper
       @review_num = review_num
     end
   end
-
-  
   
   # Used when student_review_num is not zero and submission_review_num is zero in the ReviewMappingController
   # Provides specific review strategy calculations for individual students

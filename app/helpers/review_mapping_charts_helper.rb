@@ -52,7 +52,12 @@ module ReviewMappingChartsHelper
 
     # Get Metrics once tagging intervals are available
     return nil if intervals.empty?
+    
+    metric_information(intervals, interval_precision)
+    # if no Hash object is returned, the UI handles it accordingly
+  end
 
+  def metric_information(intervals, interval_precision)
     metrics = {}
     metrics[:mean] = (intervals.reduce(:+) / intervals.size.to_f).round(interval_precision)
     metrics[:min] = intervals.min
@@ -61,6 +66,5 @@ module ReviewMappingChartsHelper
     metrics[:variance] = (sum / intervals.size.to_f).round(interval_precision)
     metrics[:stand_dev] = Math.sqrt(metrics[:variance]).round(interval_precision)
     metrics
-    # if no Hash object is returned, the UI handles it accordingly
   end
 end

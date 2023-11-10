@@ -51,16 +51,16 @@ module ReviewMappingChartsHelper
     intervals = intervals.select { |v| v < threshold }
 
     # Get Metrics once tagging intervals are available
-    unless intervals.empty?
-      metrics = {}
-      metrics[:mean] = (intervals.reduce(:+) / intervals.size.to_f).round(interval_precision)
-      metrics[:min] = intervals.min
-      metrics[:max] = intervals.max
-      sum = intervals.inject(0) { |accum, i| accum + (i - metrics[:mean])**2 }
-      metrics[:variance] = (sum / intervals.size.to_f).round(interval_precision)
-      metrics[:stand_dev] = Math.sqrt(metrics[:variance]).round(interval_precision)
-      metrics
-    end
+    return nil if intervals.empty?
+
+    metrics = {}
+    metrics[:mean] = (intervals.reduce(:+) / intervals.size.to_f).round(interval_precision)
+    metrics[:min] = intervals.min
+    metrics[:max] = intervals.max
+    sum = intervals.inject(0) { |accum, i| accum + (i - metrics[:mean])**2 }
+    metrics[:variance] = (sum / intervals.size.to_f).round(interval_precision)
+    metrics[:stand_dev] = Math.sqrt(metrics[:variance]).round(interval_precision)
+    metrics
     # if no Hash object is returned, the UI handles it accordingly
   end
 end

@@ -79,18 +79,18 @@ class LotteryController < ApplicationController
   # Generate team bidding information hash based on newly-created teams
   # Structure of team_bidding_info variable: [{team_id1, bids_1}, {team_id2, bids_2}]
   def construct_teams_bidding_info(unassigned_teams, sign_up_topics)
-    unassigned_teams.map do |team|
-      {
-        team_id: team.id,
-        bids: sign_up_topics.map do |topic|
-          bid = Bid.find_by(team_id: team.id, topic_id: topic.id)
-          { topic_id: topic.id, priority: bid.priority } if bid
-        end
-        .compact
-        .sort_by { |bid| bid[:priority] }
-      }
+    teams_bidding_info = []
+    unassigned_teams.each do |team|
+      topic_bids = []
+      sign_up_topics.each do |topic|
+        bid = Bid.find_by(team_id: team.id, topic_id: topic.id)
+        topic_bids << { topic_id: topic.id, priority: bid.priority } if bid
+      end
+      topic_bids.sort! { |bid| bid[:priority] }
+      teams_bidding_info << { team_id: team.id, bids: topic_bids }
     end
-  end  
+    teams_bidding_info
+  end
 
   # This method creates new AssignmentTeam objects based on the list of teams
   # received from the webservice

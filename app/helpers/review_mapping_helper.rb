@@ -24,24 +24,14 @@ module ReviewMappingHelper
 
   #
   # gets the team name's color according to review and assignment submission status
-  #
   def team_color(response_map)
-    # Storing redundantly computed value in a variable
-    assignment_created = @assignment.created_at
-    # Storing redundantly computed value in a variable
-    assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
-    # Returning color based on conditions
-    if Response.exists?(map_id: response_map.id)
-      if !response_map.try(:reviewer).try(:review_grade).nil?
-        'brown'
-      elsif response_for_each_round?(response_map)
-        'blue'
-      else
-        obtain_team_color(response_map, assignment_created, assignment_due_dates)
-      end
-    else
-      'red'
-    end
+    return 'red' unless Response.exists?(map_id: response_map.id)
+  
+    return 'brown' unless response_map.reviewer&.review_grade.nil?
+  
+    return 'blue' if response_for_each_round?(response_map)
+  
+    obtain_team_color(response_map, @assignment.created_at, DueDate.where(parent_id: response_map.reviewed_object_id))
   end
 
   # loops through the number of assignment review rounds and obtains the team color

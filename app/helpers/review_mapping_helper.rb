@@ -27,7 +27,7 @@ module ReviewMappingHelper
   def team_color(response_map)
     return 'red' unless Response.exists?(map_id: response_map.id)
   
-    return 'brown' unless response_map.reviewer&.review_grade.nil?
+    return 'brown' unless response_map.reviewer.nil? || response_map.reviewer.review_grade.nil?
   
     return 'blue' if response_for_each_round?(response_map)
   

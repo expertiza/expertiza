@@ -60,12 +60,24 @@ module ReviewMappingChartsHelper
 
   def metric_information(intervals, interval_precision)
     metrics = {}
-    metrics[:mean] = (intervals.reduce(:+) / intervals.size.to_f).round(interval_precision)
+    metrics[:mean] = calculate_mean(intervals, interval_precision)
     metrics[:min] = intervals.min
     metrics[:max] = intervals.max
-    sum = intervals.inject(0) { |accum, i| accum + (i - metrics[:mean])**2 }
-    metrics[:variance] = (sum / intervals.size.to_f).round(interval_precision)
-    metrics[:stand_dev] = Math.sqrt(metrics[:variance]).round(interval_precision)
+    metrics[:variance] = calculate_variance(intervals, metrics[:mean], interval_precision)
+    metrics[:stand_dev] = calculate_standard_deviation(variance, interval_precision)
     metrics
+  end
+
+  def calculate_mean(intervals, interval_precision)
+    (intervals.reduce(:+) / intervals.size.to_f).round(interval_precision)
+  end
+
+  def calculate_variance(intervals, mean, interval_precision)
+    sum = intervals.inject(0) { |accum, i| accum + (i - mean)**2 }
+    (sum / intervals.size.to_f).round(interval_precision)
+  end
+
+  def calculate_standard_deviation(variance, interval_precision)
+    Math.sqrt(variance).round(interval_precision)
   end
 end

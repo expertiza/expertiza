@@ -1,8 +1,5 @@
 name: RuboCop
 
-AllCops:
-  TargetRubyVersion: 2.4
-
 on: [push, pull_request]
 
 jobs:

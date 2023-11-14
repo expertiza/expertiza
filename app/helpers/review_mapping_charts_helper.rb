@@ -5,8 +5,15 @@ module ReviewMappingChartsHelper
     labels = []
     reviewer_data = []
     all_reviewers_data = []
+    avg_vol_per_round(reviewer, round, labels, reviewer_data, all_reviewers_data)
+    labels.push 'Total'
+    reviewer_data.push reviewer.overall_avg_vol
+    all_reviewers_data.push @all_reviewers_overall_avg_vol
+    [labels, reviewer_data, all_reviewers_data]
+  end
 
-    # display avg volume for all reviewers per round
+  # display avg volume for all reviewers per round
+  def avg_vol_per_round(reviewer, round, labels, reviewer_data, all_reviewers_data)
     @num_rounds.times do |rnd|
       next unless @all_reviewers_avg_vol_per_round[rnd] > 0
       round += 1
@@ -14,11 +21,6 @@ module ReviewMappingChartsHelper
       reviewer_data.push reviewer.avg_vol_per_round[rnd]
       all_reviewers_data.push @all_reviewers_avg_vol_per_round[rnd]
     end
-
-    labels.push 'Total'
-    reviewer_data.push reviewer.overall_avg_vol
-    all_reviewers_data.push @all_reviewers_overall_avg_vol
-    [labels, reviewer_data, all_reviewers_data]
   end
 
   # The data of all the reviews is displayed in the form of a bar chart

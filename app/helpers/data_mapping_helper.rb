@@ -32,7 +32,7 @@ module DataMappingHelper
 
   def intervals_check(intervals, interval_mean)
     return { data: Array.new(intervals.length, interval_mean), label: 'Mean time spent' } if intervals.empty?
-  end 
+  end
 
   def map_volume_metric_chart_data(labels, reviewer_data, all_reviewers_data)
     {

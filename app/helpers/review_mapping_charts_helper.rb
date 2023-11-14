@@ -51,20 +51,20 @@ module ReviewMappingChartsHelper
     threshold = 30
     interval_precision = 2 # Round to 2 Decimal Places
     intervals = intervals.select { |v| v < threshold }
-
-    # Get Metrics once tagging intervals are available
-    return nil if intervals.empty?
     metric_information(intervals, interval_precision)
     # if no Hash object is returned, the UI handles it accordingly
   end
 
   def metric_information(intervals, interval_precision)
+    # Get Metrics once tagging intervals are available
+    return nil if intervals.empty?
+
     metrics = {}
     metrics[:mean] = calculate_mean(intervals, interval_precision)
     metrics[:min] = intervals.min
     metrics[:max] = intervals.max
     metrics[:variance] = calculate_variance(intervals, metrics[:mean], interval_precision)
-    metrics[:stand_dev] = calculate_standard_deviation(variance, interval_precision)
+    metrics[:stand_dev] = calculate_standard_deviation(metrics[:variance], interval_precision)
     metrics
   end
 

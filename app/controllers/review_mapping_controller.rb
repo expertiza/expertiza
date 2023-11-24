@@ -577,15 +577,9 @@ class ReviewMappingController < ApplicationController
           end
         end
       else
-        # REVIEW: num for last team can be different from other teams.
-        # prohibit one student to review his/her own artifact and selected_participants cannot include duplicate num
-        participants.each do |participant|
-          # avoid last team receives too many peer reviews
-          if !TeamsUser.exists?(team_id: team.id, user_id: participant.user_id) && (selected_participants.size < review_strategy.reviews_per_team)
-            selected_participants << participant.id
-            participants_hash[participant.id] += 1
-          end
-        end
+        # Handle peer review for last team
+        selected_participants.append(peer_review_strategy_for_last_team(participants, team, review_strategy, participants_hash))
+
       end
 
       begin
@@ -640,6 +634,22 @@ class ReviewMappingController < ApplicationController
       # selected_participants cannot include duplicate num
       selected_participants << participants[rand_num].id
       participants_hash[participants[rand_num].id] += 1
+    end
+
+    selected_participants
+  end
+
+  def peer_review_strategy_for_last_team(participants, team, review_strategy, participants_hash)
+    # REVIEW: num for last team can be different from other teams.
+    # prohibit one student to review his/her own artifact and selected_participants cannot include duplicate num
+    selected_participants = []
+
+    participants.each do |participant|
+      # avoid last team receives too many peer reviews
+      if !TeamsUser.exists?(team_id: team.id, user_id: participant.user_id) && (selected_participants.size < review_strategy.reviews_per_team)
+        selected_participants << participant.id
+        participants_hash[participant.id] += 1
+      end
     end
 
     selected_participants

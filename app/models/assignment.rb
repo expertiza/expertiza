@@ -500,8 +500,7 @@ class Assignment < ApplicationRecord
       end
       @questions[questionnaire_symbol] = questionnaire.questions
     end
-    assignment_instance = Assignment.new
-    @scores = assignment_instance.review_grades(@assignment, @questions)
+    @scores = review_grades(@assignment, @questions)
     return csv if @scores[:teams].nil?
 
     export_data(csv, @scores, options)

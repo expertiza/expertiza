@@ -22,24 +22,25 @@ module ReviewMappingHelper
     [response_maps, rspan]
   end
 
-  #
   # gets the team name's color according to review and assignment submission status
   def team_color(response_map)
+    # Red means review is not yet completed
     return 'red' unless Response.exists?(map_id: response_map.id)
-  
+    # if no reviewer assigned
     return 'brown' unless response_map.reviewer.nil? || response_map.reviewer.review_grade.nil?
-  
+    # Blue if review is submitted in each round but grade is not assigned yet
     return 'blue' if response_for_each_round?(response_map)
-  
     obtain_team_color(response_map, @assignment.created_at, DueDate.where(parent_id: response_map.reviewed_object_id))
   end
 
   # loops through the number of assignment review rounds and obtains the team color
   def obtain_team_color(response_map, assignment_created, assignment_due_dates)
+    # color array is kept empty initially
     color = []
     (1..@assignment.num_review_rounds).each do |round|
       check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
     end
+    # the last pused color is the required color code
     color[-1]
   end
 
@@ -49,6 +50,7 @@ module ReviewMappingHelper
       color.push 'purple'
     else
       link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
+      # Green if author didn't update the code, the reviewer doesn't need to re-review the work.
       if link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
         color.push 'green'
       else
@@ -239,7 +241,7 @@ module ReviewMappingHelper
     # This is a lot of logic in the view (gross) and this method is called if the review rounds don't have varying rubrics
 
     # this variable is used to populate all the feedback response data if the assignments don't vary by round.
-    @feedback_response_maps_with_constant_assignment = FeedbackResponseMap.where(['reviewed_object_id IN (?) and reviewer_id = ?', @all_review_response_ids, author.id])
+    @feedback_response_data = FeedbackResponseMap.where(['reviewed_object_id IN (?) and reviewer_id = ?', @all_review_response_ids, author.id])
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     @review_response_map_ids = ReviewResponseMap.where(['reviewed_object_id = ? and reviewee_id = ?', @id, @team_id]).pluck('id')
     @review_responses = Response.where(['map_id IN (?)', @review_response_map_ids])
@@ -270,7 +272,7 @@ module ReviewMappingHelper
       @review_num = review_num
     end
   end
-  
+
   # Used when student_review_num is not zero and submission_review_num is zero in the ReviewMappingController
   # Provides specific review strategy calculations for individual students
   class StudentReviewStrategy < ReviewStrategy

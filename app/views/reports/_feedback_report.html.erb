@@ -128,7 +128,7 @@
       <% else %>
         <!-- if assignment does not vary by round, prepare data: -->
           <% @count = 0 %>
-          <% @feedback_response_maps_with_constant_assignment.each {|response_map| @count += 1 if Response.exists? map_id: response_map.id} %>
+          <% @feedback_response_data.each {|response_map| @count += 1 if Response.exists? map_id: response_map.id} %>
           <!--Rejoinder-->
           <!-- If assignment rubrics vary by round, set row_span equal to rspan of rounds 1, 2, and 3 (hardcoded) -->
           <!-- Otherwise, set row_span equal to the @rspan -->

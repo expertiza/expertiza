@@ -264,64 +264,6 @@ describe User do
     end
   end
 
-  describe '.search_users' do
-    context 'when searching by name' do
-      it 'returns users with matching names' do
-      # Test scenario 1
-      # Description: When searching by name, it should return users whose names contain the specified letter.
-      # Method call: search_users(role, user_id, letter, 1)
-      # Expected result: Returns users with names containing the specified letter.
-
-      # Test scenario 2
-      # Description: When searching by name, it should return an empty array if no users have names containing the specified letter.
-      # Method call: search_users(role, user_id, letter, 1)
-      # Expected result: Returns an empty array.
-      end
-    end
-
-  context 'when searching by fullname' do
-    it 'returns users with matching fullnames' do
-      # Test scenario 1
-      # Description: When searching by fullname, it should return users whose fullnames contain the specified letter.
-      # Method call: search_users(role, user_id, letter, 2)
-      # Expected result: Returns users with fullnames containing the specified letter.
-
-      # Test scenario 2
-      # Description: When searching by fullname, it should return an empty array if no users have fullnames containing the specified letter.
-      # Method call: search_users(role, user_id, letter, 2)
-      # Expected result: Returns an empty array.
-    end
-  end
-
-  context 'when searching by email' do
-    it 'returns users with matching emails' do
-      # Test scenario 1
-      # Description: When searching by email, it should return users whose emails contain the specified letter.
-      # Method call: search_users(role, user_id, letter, 3)
-      # Expected result: Returns users with emails containing the specified letter.
-
-      # Test scenario 2
-      # Description: When searching by email, it should return an empty array if no users have emails containing the specified letter.
-      # Method call: search_users(role, user_id, letter, 3)
-      # Expected result: Returns an empty array.
-    end
-  end
-
-  context 'when searching by default' do
-    it 'returns users with names starting with the specified letter' do
-      # Test scenario 1
-      # Description: When searching by default, it should return users whose names start with the specified letter.
-      # Method call: search_users(role, user_id, letter, 4)
-      # Expected result: Returns users with names starting with the specified letter.
-
-      # Test scenario 2
-      # Description: When searching by default, it should return an empty array if no users have names starting with the specified letter.
-      # Method call: search_users(role, user_id, letter, 4)
-      # Expected result: Returns an empty array.
-    end
-  end
-end
-
   describe '#super_admin?' do
     it 'returns true if role name is Super-Administrator' do
       allow(user).to receive(:role).and_return(double(:role, name: 'Super-Administrator'))
@@ -631,13 +573,6 @@ end
     let(:role) { Role.new } # Replace 'student' with the actual role you are testing
     let(:user_id) { 1 } # Replace 1 with the actual user_id you are testing
     let(:letter) { 'a' } # Replace 'a' with the actual letter you are testing
-
-    before(:each) do
-      allow(User).to receive_message_chain(:order, :where).with('(role_id in (?) or id = ?) and name like ?', role.get_available_roles, @user_id, '%name%')
-      allow(User).to receive_message_chain(:order, :where).with('(role_id in (?) or id = ?) and fullname like ?', role.get_available_roles, @user_id, '%fullname%')
-      allow(User).to receive_message_chain(:order, :where).with('(role_id in (?) or id = ?) and email like ?', role.get_available_roles, @user_id, '%email%')
-      user_id = double
-    end
 
     context 'when searching by name' do
       it 'returns users with matching names' do

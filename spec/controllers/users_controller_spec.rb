@@ -113,7 +113,7 @@ describe UsersController do
       expect{controller.search_params}.not_to raise_error
     end
   end
-
+  
   context '#show_if_authorized' do
     before(:each) do
       allow(User).to receive(:find).with(2).and_return(instructor)

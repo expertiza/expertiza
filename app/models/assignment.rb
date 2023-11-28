@@ -500,7 +500,7 @@ class Assignment < ApplicationRecord
       end
       @questions[questionnaire_symbol] = questionnaire.questions
     end
-    @scores = review_grades(self, @questions)
+    @scores = review_grades(@assignment, @questions)
     return csv if @scores[:teams].nil?
 
     export_data(csv, @scores, options)
@@ -510,6 +510,9 @@ class Assignment < ApplicationRecord
     @scores = scores
     (0..@scores[:teams].length - 1).each do |index|
       team = @scores[:teams][index.to_s.to_sym]
+      first_participant = team[:team].participants[0] unless team[:team].participants[0].nil?
+      next if first_participant.nil?
+      participants_score = @scores[:participants][first_participant.id.to_s.to_sym]
       teams_csv = []
       teams_csv << team[:team].name
       names_of_participants = ''
@@ -517,18 +520,18 @@ class Assignment < ApplicationRecord
         names_of_participants += p.fullname
         names_of_participants += '; ' unless p == team[:team].participants.last
       end
-      tcsv << names_of_participants
-      export_data_fields(options, team, tcsv, pscore)
-      csv << tcsv
+      teams_csv << names_of_participants
+      export_data_fields(options, team, teams_csv, participants_score)
+      csv << teams_csv
     end
   end
 
-  def self.export_data_fields(options, team, tcsv, pscore)
+  def self.export_data_fields(options, team, teams_csv, participants_score)
     if options['team_score'] == 'true'
       if team[:scores]
-        tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg])
+        teams_csv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg])
       else
-        tcsv.push('---', '---', '---')
+        teams_csv.push('---', '---', '---')
       end
     end
     review_hype_mapping_hash = { review: 'submitted_score',
@@ -536,14 +539,14 @@ class Assignment < ApplicationRecord
                                  feedback: 'author_feedback_score',
                                  teammate: 'teammate_review_score' }
     review_hype_mapping_hash.each do |review_type, score_name|
-      export_individual_data_fields(review_type, score_name, tcsv, pscore, options)
+      export_individual_data_fields(review_type, score_name, teams_csv, participants_score, options)
     end
-    teams_csv.push(pscore[:total_score])
+    teams_csv.push(participants_score[:total_score])
   end
 
-  def self.export_individual_data_fields(review_type, score_name, _tcsv, pscore, options)
-    if pscore[review_type]
-      teams_csv.push(pscore[review_type][:scores][:max], pscore[review_type][:scores][:min], pscore[review_type][:scores][:avg])
+  def self.export_individual_data_fields(review_type, score_name, teams_csv, participants_score, options)
+    if participants_score[review_type]
+      teams_csv.push(participants_score[review_type][:scores][:max], participants_score[review_type][:scores][:min], participants_score[review_type][:scores][:avg])
     elsif options[score_name]
       teams_csv.push('---', '---', '---')
     end

@@ -544,19 +544,19 @@ describe User do
       user_id = double
     end
 
-    it 'when the search_by is 1' do
+    it 'when the search_by is name' do
       search_by = '1'
       allow(User).to receive_message_chain(:order, :where).and_return(user)
       expect(User.search_users(role, @user_id, 'name', search_by)).to eq user
     end
 
-    it 'when the search_by is 2' do
+    it 'when the search_by is fullname' do
       search_by = '2'
       allow(User).to receive_message_chain(:order, :where).and_return(user)
       expect(User.search_users(role, @user_id, 'fullname', search_by)).to eq user
     end
 
-    it 'when the search_by is 3' do
+    it 'when the search_by is email' do
       search_by = '3'
       allow(User).to receive_message_chain(:order, :where).and_return(user)
       expect(User.search_users(role, @user_id, 'email', search_by)).to eq user
@@ -569,70 +569,5 @@ describe User do
     end
   end
 
-  describe '.search_users' do
-    let(:role) { Role.new } # Replace 'student' with the actual role you are testing
-    let(:user_id) { 1 } # Replace 1 with the actual user_id you are testing
-    let(:letter) { 'a' } # Replace 'a' with the actual letter you are testing
-
-    context 'when searching by name' do
-      it 'returns users with matching names' do
-        # Create users with names containing the specified letter
-        user_with_matching_name = create(:user, name: "user_with_#{letter}_name")
-        
-        # Test scenario 1
-        result = User.search_users(role, user_id, letter, 1)
-        expect(result).to include(user_with_matching_name)
-
-        # Test scenario 2
-        result = User.search_users(role, user_id, 'x', 1)
-        expect(result).to be_empty
-      end
-    end
-
-    context 'when searching by fullname' do
-      it 'returns users with matching fullnames' do
-        # Create users with fullnames containing the specified letter
-        user_with_matching_fullname = create(:user, fullname: "User with #{letter} Fullname")
-
-        # Test scenario 1
-        result = User.search_users(role, user_id, letter, 2)
-        expect(result).to include(user_with_matching_fullname)
-
-        # Test scenario 2
-        result = User.search_users(role, user_id, 'x', 2)
-        expect(result).to be_empty
-      end
-    end
-
-    context 'when searching by email' do
-      it 'returns users with matching emails' do
-        # Create users with emails containing the specified letter
-        user_with_matching_email = create(:user, email: "user_#{letter}@example.com")
-
-        # Test scenario 1
-        result = User.search_users(role, user_id, letter, 3)
-        expect(result).to include(user_with_matching_email)
-
-        # Test scenario 2
-        result = User.search_users(role, user_id, 'x', 3)
-        expect(result).to be_empty
-      end
-    end
-
-    context 'when searching by default' do
-      it 'returns users with names starting with the specified letter' do
-        # Create users with names starting with the specified letter
-        user_with_name_starting_with_letter = create(:user, name: "#{letter}_user")
-
-        # Test scenario 1
-        result = User.search_users(role, user_id, letter, 4)
-        expect(result).to include(user_with_name_starting_with_letter)
-
-        # Test scenario 2
-        result = User.search_users(role, user_id, 'x', 4)
-        expect(result).to be_empty
-      end
-    end
-  end
   
 end

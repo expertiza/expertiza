@@ -544,30 +544,36 @@ describe User do
       user_id = double
     end
 
-    it 'when the search_by is name' do
-      search_by = '1'
-      allow(User).to receive_message_chain(:order, :where).and_return(user)
-      expect(User.search_users(role, @user_id, 'name', search_by)).to eq user
+    context 'when searching by name' do
+      it 'returns users with matching names' do
+        search_by = '1'
+        allow(User).to receive_message_chain(:order, :where).and_return(user)
+        expect(User.search_users(role, @user_id, 'name', search_by)).to eq user
+      end
     end
 
-    it 'when the search_by is fullname' do
-      search_by = '2'
-      allow(User).to receive_message_chain(:order, :where).and_return(user)
-      expect(User.search_users(role, @user_id, 'fullname', search_by)).to eq user
+    context 'when searching by fullname' do
+      it 'returns users with matching fullnames' do
+        search_by = '2'
+        allow(User).to receive_message_chain(:order, :where).and_return(user)
+        expect(User.search_users(role, @user_id, 'fullname', search_by)).to eq user
+      end
     end
 
-    it 'when the search_by is email' do
-      search_by = '3'
-      allow(User).to receive_message_chain(:order, :where).and_return(user)
-      expect(User.search_users(role, @user_id, 'email', search_by)).to eq user
+    context 'when searching by email' do
+      it 'returns users with matching emails' do
+        search_by = '3'
+        allow(User).to receive_message_chain(:order, :where).and_return(user)
+        expect(User.search_users(role, @user_id, 'email', search_by)).to eq user
+      end
     end
 
-    it 'when the search_by is default value' do
-      search_by = nil
-      allow(User).to receive_message_chain(:order, :where).and_return(user)
-      expect(User.search_users(role, @user_id, '', search_by)).to eq user
+    context 'when searching by default' do
+      it 'returns users with names starting with the specified letter' do
+        search_by = nil
+        allow(User).to receive_message_chain(:order, :where).and_return(user)
+        expect(User.search_users(role, @user_id, '', search_by)).to eq user
+      end
     end
-  end
-
-  
+  end 
 end

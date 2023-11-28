@@ -632,6 +632,13 @@ end
     let(:user_id) { 1 } # Replace 1 with the actual user_id you are testing
     let(:letter) { 'a' } # Replace 'a' with the actual letter you are testing
 
+    before(:each) do
+      allow(User).to receive_message_chain(:order, :where).with('(role_id in (?) or id = ?) and name like ?', role.get_available_roles, @user_id, '%name%')
+      allow(User).to receive_message_chain(:order, :where).with('(role_id in (?) or id = ?) and fullname like ?', role.get_available_roles, @user_id, '%fullname%')
+      allow(User).to receive_message_chain(:order, :where).with('(role_id in (?) or id = ?) and email like ?', role.get_available_roles, @user_id, '%email%')
+      user_id = double
+    end
+
     context 'when searching by name' do
       it 'returns users with matching names' do
         # Create users with names containing the specified letter

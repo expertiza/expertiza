@@ -963,17 +963,24 @@ jQuery(document).ready(function() {
       )
     },
     isEntryValid: function(entry) {
-      if (this.props.selectValue === 'empty' || (this.props.showPublic && isDataTypeCourse)) {
-        return ((entry.name && entry.name.indexOf(this.props.filterText) !== -1) ||
-                (entry.creation_date && entry.creation_date.indexOf(this.props.filterText) !== -1) ||
-                (entry.institution && entry.institution.indexOf(this.props.filterText) !== -1) ||
-                (entry.updated_date && entry.updated_date.indexOf(this.props.filterText) !== -1)) &&
-            (entry.private || entry.type == 'FolderNode')
+      const { name, creation_date, institution, updated_date, type, private } = entry;
+      const { selectValue, showPublic, filterText } = this.props;
+
+      const isDataTypeCourse = type === 'CourseNode';
+      const filterTextLower = filterText.toLowerCase();
+
+      if (selectValue === 'empty' || (showPublic && isDataTypeCourse)) {
+        return (
+            (name && name.includes(filterText)) ||
+            (creation_date && creation_date.includes(filterText)) ||
+            (institution && institution.includes(filterText)) ||
+            (updated_date && updated_date.includes(filterText)
+            ) && (private || type === 'FolderNode'))
       } else {
-        return (entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(this.props.filterText.toLowerCase()) !== -1) &&
-            (entry.private || entry.type == 'FolderNode')
+        return name && name.toLowerCase().includes(filterTextLower) && (private || type === 'FolderNode')
       }
     },
+
     render: function() {
       var _rows = []
       var colWidthArray = [ '30%', '0%', '0%', '0%', '25%', '25%', '20%' ]
@@ -1031,10 +1038,10 @@ jQuery(document).ready(function() {
             _rows.push(<TitleRow title="Others' Public Assignments" />)
             jQuery.each(this.props.data, (i, entry) => {
               if (
-                  ((entry.name && entry.name.indexOf(this.props.filterText) !== -1) ||
-                      (entry.creation_date && entry.creation_date.indexOf(this.props.filterText) !== -1) ||
-                      (entry.updated_date && entry.updated_date.indexOf(this.props.filterText) !== -1)) &&
-                  entry.private == false
+                  ['name', 'creation_date', 'updated_date'].some(
+                      prop => entry[prop] && entry[prop].includes(this.props.filterText)
+                  ) &&
+                  entry.private === false
               ) {
                 this.pushRows(_rows, i, entry)
               }

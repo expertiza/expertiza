@@ -75,7 +75,7 @@ class User < ApplicationRecord
   # generate_regex method generates regex corresponding to the parameter passed
   # returns a regex expression
   def generate_regex(item)
-    return Regexp.new(item)
+    Regexp.new(item)
   end
 
   # get_user_list method generates the user list based on the search criteria entered.

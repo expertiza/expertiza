@@ -10,37 +10,37 @@ describe PairProgrammingController do
   let(:team_user2) { build(:team_user, id: 2, team: team, user: student2, pair_programming_status: "Z") }
   let(:team) { build(:assignment_team, id: 1, parent_id: 1, pair_programming_request: 0) }
   
-  #load student object with id 21
+  # load student object with id 21
   before(:each) do
     allow(User).to receive(:find).with(21).and_return(student1)
   end
 
   describe '#action_allowed?' do
-    #check if super-admin is able to perform the actions
+    # check if super-admin is able to perform the actions
     it 'allows super_admin to perform certain action' do
       stub_current_user(super_admin, super_admin.role.name, super_admin.role)
       expect(controller.send(:action_allowed?)).to be_truthy
     end
 
-    #check if instructor is able to perform the actions
+    # check if instructor is able to perform the actions
     it 'allows instructor to perform certain action' do
       stub_current_user(instructor1, instructor1.role.name, instructor1.role)
       expect(controller.send(:action_allowed?)).to be_truthy
     end
 
-    #check if student is able to perform the actions
+    # check if student is able to perform the actions
     it 'allows student to perform certain action' do
       stub_current_user(student1, student1.role.name, student1.role)
       expect(controller.send(:action_allowed?)).to be_truthy
     end
 
-    #check if teaching assistant is able to perform the actions
+    # check if teaching assistant is able to perform the actions
     it 'allows teaching assistant to perform certain action' do
       stub_current_user(ta, ta.role.name, ta.role)
       expect(controller.send(:action_allowed?)).to be_truthy
     end
 
-    #check if admin is able to perform the actions
+    # check if admin is able to perform the actions
     it 'allows admin to perform certain action' do
       stub_current_user(admin, admin.role.name, admin.role)
       expect(controller.send(:action_allowed?)).to be_truthy

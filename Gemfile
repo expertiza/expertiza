@@ -97,12 +97,12 @@ group :test do
   gem 'launchy'
   gem 'rspec-rails', '4.1.2'
   gem 'rails-controller-testing'
-  gem 'puma'
+  gem 'puma', '5.0'
   gem 'shoulda'
 end
 
 group :development, :test do
-  gem 'capybara'
+  gem 'capybara', '3.33'
   gem 'selenium-webdriver'
   gem 'simplecov', '0.17.1', require: false
 end

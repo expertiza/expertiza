@@ -64,6 +64,10 @@ class Question < ApplicationRecord
     0
   end
 
+  #this method is implemented in quiz_question class to validate that each question has text
+  def isvalid
+    nil
+  end
   # this method return questions (question_ids) in one assignment whose comments field are meaningful (ScoredQuestion and TextArea)
   def self.get_all_questions_with_comments_available(assignment_id)
     question_ids = []

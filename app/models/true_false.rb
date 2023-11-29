@@ -64,7 +64,7 @@ class TrueFalse < QuizQuestion
     correct_count = 0
     choice_info.each do |_idx, value|
       if value[:txt] == ''
-        valid = 'Please make sure every question has text for all options'
+        @valid = 'Please make sure every question has text for all options'
       end
       correct_count += 1 if value[:iscorrect] == 1.to_s
     end

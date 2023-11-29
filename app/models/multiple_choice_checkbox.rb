@@ -77,6 +77,8 @@ class MultipleChoiceCheckbox < QuizQuestion
       @valid = 'Please select a correct answer for all questions'
     elsif correct_count == 1
       @valid = 'A multiple-choice checkbox question should have more than one correct answer.'
+    elsif correct_count == 2
+      @valid = 'valid'
     end
     @valid
   end

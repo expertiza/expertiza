@@ -29,7 +29,9 @@
 <img src="/assets/info.png" title="This feature allow students to &quot;bid&quot; for topics.
       Instructor must specify when topics are assigned, by going to the Due Dates tab and
       entering a due date for &quot;signup&quot;."/>
+
 <%= button_to 'View Bidding Table for Each Topic', {:controller => 'lottery', :action => 'bidding_table_for_each_topic', :id => @assignment_form.assignment.id}, :method => :get, class: 'custom-button', id: 'bidding-button' %>
+
 <input name="assignment_form[assignment][can_review_same_topic]" type="hidden" value="false"/>
 <%= check_box_tag('assignment_form[assignment][can_review_same_topic]', 'true', @assignment_form.assignment.can_review_same_topic?)%>
 <%= label_tag('assignment_form[assignment][can_review_same_topic]', 'Enable authors to review others working on same topic?') %>

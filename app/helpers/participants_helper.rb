@@ -80,7 +80,7 @@ module ParticipantsHelper
     end
   end
 
-  # Authorizations are paricipant, reader, reviewer, submitter (They are not store in Participant table.)
+  # Authorizations are participant, reader, reviewer, submitter (They are not store in Participant table.)
   # Permissions are can_submit, can_review, can_take_quiz.
   # Get permissions form authorizations.
   def participant_permissions(authorization)

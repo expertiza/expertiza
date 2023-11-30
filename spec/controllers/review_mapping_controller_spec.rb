@@ -613,6 +613,109 @@ describe ReviewMappingController do
       post :assign_metareviewer_dynamically, params: request_params
       expect(response).to redirect_to('/student_review/list?id=1')
     end
+	end
+
+  describe 'delete_outstanding_reviewers' do
+    before(:each) do
+      allow(AssignmentTeam).to receive(:find).with('1').and_return(team)
+      allow(team).to receive(:review_mappings).and_return([double('ReviewResponseMap', id: 1)])
+
+      allow(Response).to receive(:exists?).with(map_id: 1).and_return(false)
+      review_response_map = double('ReviewResponseMap')
+      allow(ReviewResponseMap).to receive(:find).with(1).and_return(review_response_map)
+      allow(review_response_map).to receive(:destroy).and_return(true)
+    end
+
+    context 'when there are no outstanding reviewers' do
+      it 'deletes all review mappings for the given team' do
+        # Test setup
+        request_params = {
+          id: 1,
+          contributor_id: 1
+        }
+
+        # Method call
+        post :delete_outstanding_reviewers, params: request_params
+
+        # Assertion
+        expect(ReviewResponseMap.exists?(review_response_map.id)).to be_falsey
+        expect(ReviewResponseMap.exists?(review_response_map.id)).to be_falsey
+      end
+
+      it 'sets a success flash message' do
+        # Test setup
+        request_params = {
+          id: 1,
+          contributor_id: 1
+        }
+
+        # Method call
+        post :delete_outstanding_reviewers, params: request_params
+
+        # Assertion
+        expect(flash[:success]).to eq('All review mappings for \'#{team.name}\' have been deleted.')
+      end
+
+      it 'redirects to the list_mappings action' do
+        request_params = {
+          id: 1,
+          contributor_id: 1
+        }
+
+        # Method call
+        post :delete_outstanding_reviewers, params: request_params
+
+        # Assertion
+        expect(response).to redirect_to(action: 'list_mappings', id: assignment.id)
+      end
+    end
+
+    context 'when there are outstanding reviewers' do
+      it 'deletes only the review mappings without associated responses' do
+        # Test setup
+        allow(Response).to receive(:exists?).with(map_id: 1).and_return(true)
+        request_params = {
+          id: 1,
+          contributor_id: 1
+        }
+
+        # Method call
+        post :delete_outstanding_reviewers, params: request_params
+
+        # Assertion
+        expect(ReviewResponseMap.exists?(review_response_map.id)).to be_falsey
+			end
+
+      it 'sets an error flash message with the number of outstanding reviewers' do
+        # Test setup
+        allow(Response).to receive(:exists?).with(map_id: 1).and_return(true)
+        request_params = {
+          id: 1,
+          contributor_id: 1
+        }
+
+        # Method call
+        post :delete_outstanding_reviewers, params: request_params
+
+        # Assertion
+        expect(flash[:error]).to eq('1 reviewer(s) cannot be deleted because they have already started a review.')
+      end
+
+      it 'redirects to the list_mappings action' do
+        # Test setup
+        allow(Response).to receive(:exists?).with(map_id: 1).and_return(true)
+        request_params = {
+          id: 1,
+          contributor_id: 1
+        }
+
+        # Method call
+        post :delete_outstanding_reviewers, params: request_params
+
+        # Assertion
+        expect(response).to redirect_to(action: 'list_mappings', id: assignment.id)
+      end
+    end
   end
 
   describe '#delete_outstanding_reviewers' do

@@ -178,5 +178,4 @@ describe SignUpTopic do
       end
     end
   end
-
 end

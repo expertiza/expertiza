@@ -814,5 +814,4 @@ describe SignUpSheetController do
       end
     end
   end
-
 end

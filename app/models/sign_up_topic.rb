@@ -50,7 +50,7 @@ class SignUpTopic < ApplicationRecord
     SignedUpTeam.find_by_sql(['SELECT u.id FROM sign_up_topics t, signed_up_teams u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = ? and u.team_id = ?', assignment_id.to_s, team_id.to_s])
   end
 
-  def self.slotAvailable?(topic_id)
+  def self.slot_available?(topic_id)
     topic = SignUpTopic.find(topic_id)
     no_of_students_who_selected_the_topic = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: false)
 

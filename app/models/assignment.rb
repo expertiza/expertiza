@@ -650,4 +650,18 @@ class Assignment < ApplicationRecord
     end
     reviewers = reviewers.sort_by { |a| a[1] }
   end
+
+  #Method to drop all the SignedUpRecords of all topics for that assignment once the drop_topic deadline passes
+  def drop_waitlisted_teams
+    # Find all the topics (sign_up_topics) under the current assignment (self).
+    topics = SignUpTopic.where(assignment_id: self.id)
+  
+    # Iterate through each topic to find and drop waitlisted teams.
+    topics.each do |topic|
+      signed_up_teams = SignedUpTeam.where(topic_id: topic.id, is_waitlisted: true)
+      # Remove all of the waitlisted SignedUpTeam entries for this topic.
+      signed_up_teams.destroy_all
+    end
+  end
+
 end

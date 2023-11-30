@@ -5,6 +5,7 @@ describe SignUpTopic do
   let(:team) { create(:assignment_team, id: 1, name: 'team 1', users: [user, user2]) }
   let(:user) { create(:student) }
   let(:user2) { create(:student, name: 'qwertyui', id: 5) }
+
   describe '.import' do
     context 'when record is empty' do
       it 'raises an ArgumentError' do

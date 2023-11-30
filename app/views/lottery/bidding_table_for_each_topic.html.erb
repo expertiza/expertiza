@@ -14,12 +14,16 @@
   background-color: yellow; 
   color: black;             
 }
+.bids-column {
+    width: 100px; /* Adjust width as needed */
+  }
 </style>
 
 <table class="table table-bordered table-hover">
   <thead>
     <tr>
       <th>Topic Name</th>
+      <th>Topic ID</th>
       <th>Bidding Teams</th>
       <th>#1 bids</th>
       <th>#2 bids</th>
@@ -30,6 +34,7 @@
     <% @topics.each do |topic| %>
       <tr>
         <td><%= topic.topic_name %></td>
+        <td><%= topic.id %></td>
         <td>
           <% @bids_by_topic[topic.id].each do |bid_info| %>
             <% team = bid_info[:team] %>
@@ -39,25 +44,25 @@
             </span>
           <% end %>
         </td>
-        <td>
+        <td class="bids-column">
           <% if @count1[topic.id] != 0%>
             <%= @count1[topic.id] %>
           <%else%>
-            No bids yet
+            &ndash;
           <%end%>
         </td>
-        <td>
+        <td class="bids-column">
           <% if @count2[topic.id] != 0%>
             <%= @count2[topic.id] %>
           <%else%>
-            No bids yet
+            &ndash;
           <%end%>
         </td>
-        <td>
+        <td class="bids-column">
           <% if @count3[topic.id] != 0%>
             <%= @count3[topic.id] %>
           <%else%>
-            No bids yet
+            &ndash;
           <%end%>
         </td>
       </tr>

@@ -167,14 +167,14 @@ describe LotteryController do
     end
   end
 
-  describe '#bidding_details' do
+  describe '#bidding_table_for_each_topic' do
     before :each do
       # Set the assignment id in the params
       params = ActionController::Parameters.new(id: assignment.id)
       allow(controller).to receive(:params).and_return(params)
     end
     it 'populates bids and assigned teams for each topic, handling topics with no teams' do
-      controller.bidding_details
+      controller.bidding_table_for_each_topic
       # Check if @bids_by_topic is populated correctly
       expect(controller.instance_variable_get(:@bids_by_topic)[topic1.id].length).to eq(1)
       expect(controller.instance_variable_get(:@bids_by_topic)[topic2.id].length).to eq(1)
@@ -193,8 +193,34 @@ describe LotteryController do
     end
 
     it 'fetches all topics for the assignment' do
-      controller.bidding_details
+      controller.bidding_table_for_each_topic
       expect(controller.instance_variable_get(:@topics)).to match_array([topic1, topic2, topic3, topic4])
+    end
+
+    it 'correctly calculates priority counts for each topic' do
+      controller.bidding_table_for_each_topic
+  
+      # Assuming you have a way to know the expected counts for each priority
+      expected_priority_counts = { 1 => 0, 
+                                   2 => 0, 
+                                   3 => 0 }
+  
+      priority_counts = controller.instance_variable_get(:@priority_counts)
+      expect(priority_counts).to eq(expected_priority_counts)
+    end
+  
+    it 'correctly calculates percentages for teams getting their choices' do
+      controller.bidding_table_for_each_topic
+  
+      # Assuming you have a way to know the expected percentages
+      expected_percentages = { 1 => Float::NAN, 
+                               2 => Float::NAN, 
+                               3 => Float::NAN }
+  
+      percentages = controller.instance_variable_get(:@percentages)
+      expect(percentages[1].nan?).to be true if expected_percentages[1].nan?
+      expect(percentages[2].nan?).to be true if expected_percentages[2].nan?
+      expect(percentages[3].nan?).to be true if expected_percentages[3].nan?
     end
   end
 end

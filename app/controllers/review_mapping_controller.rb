@@ -229,7 +229,7 @@ class ReviewMappingController < ApplicationController
     rescue StandardError => e
       flash[:error] = e.message
     end
-    redirect_to controller: 'student_review', action: 'list', id: metareviewer.id
+    redirect_to controller: 'student_review', action: 'list', id: (metareviewer.present? ? metareviewer.id : nil)
   end
 
   # Returns the reviewer of the assignment

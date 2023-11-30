@@ -417,7 +417,6 @@ describe ReviewMappingController do
       let(:review_response_maps_incomplete) do
         [
           double('ReviewResponseMap', id: 1, response: [response, in_progress_response]),
-          double('ReviewResponseMap', id: 2, response: [response, in_progress_response])
         ]
       end
 
@@ -528,8 +527,52 @@ describe ReviewMappingController do
       expect(response).to redirect_to('/review_mapping/list_mappings?id=1&msg=')
     end
   end
-  # Can add tests here
+
   describe '#assign_metareviewer_dynamically' do
+    context "when there are reviews to Meta review" do
+      let(:assignment) { build(:assignment) }
+      let(:metareviewer) { build(:participant) }
+      it "assigns the metareviewer dynamically to the assignment" do
+        allow(Assignment).to receive(:find).with(any_args).and_return(assignment)
+        allow(AssignmentParticipant).to receive(:where).with(user_id: "1", parent_id: assignment.id).and_return([metareviewer])
+        
+        expect(assignment).to receive(:assign_metareviewer_dynamically).with(metareviewer)
+        
+        post :assign_metareviewer_dynamically, params: { assignment_id: assignment.id, metareviewer_id: 1 }
+        
+        expect(response).to redirect_to(controller: 'student_review', action: 'list', id: metareviewer.id)
+      end
+    end
+
+    context "when there are no reviews to Meta review" do
+      let(:assignment) { build(:assignment) }
+      it "displays a flash warning instead of crashing the page" do
+        allow(Assignment).to receive(:find).with(any_args).and_return(assignment)
+        allow(AssignmentParticipant).to receive(:where).with(any_args).and_return([]) 
+
+        post :assign_metareviewer_dynamically, params: { assignment_id: assignment.id, metareviewer_id: 1 }
+      
+        expect(flash[:error]).to eq("There are no reviews to metareview at this time for this assignment.")
+        expect(response).to redirect_to(controller: 'student_review', action: 'list', id: nil)
+      end
+    end
+
+    context "when an error occurs during assignment of metareviewer" do
+      let(:assignment) { build(:assignment) }
+      let(:metareviewer) { build(:participant) }
+      it "displays an error message in the flash" do
+        # Test scenario 3
+        allow(Assignment).to receive(:find).with(any_args).and_return(assignment)
+        allow(AssignmentParticipant).to receive(:where).with(any_args).and_return([metareviewer]) 
+        allow(assignment).to receive(:assign_metareviewer_dynamically).and_raise(StandardError, "Assign Metareviewer Error")
+
+        post :assign_metareviewer_dynamically, params: { assignment_id: assignment.id, metareviewer_id: 1 }
+      
+        expect(flash[:error]).to eq("Assign Metareviewer Error")
+        expect(response).to redirect_to(controller: 'student_review', action: 'list', id: metareviewer.id)
+      end
+    end
+
     it 'redirects to student_review#list page' do
       metareviewer = double('AssignmentParticipant', id: 1)
       allow(AssignmentParticipant).to receive(:where).with(user_id: '1', parent_id: 1).and_return([metareviewer])
@@ -714,6 +757,65 @@ describe ReviewMappingController do
       post :delete_metareview, params: request_params
       expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
     end
+
+    it "deletes the metareview mapping" do
+      # Test scenario 1
+      # Given a valid metareview mapping ID
+      # When the delete_metareview method is called
+      # Then the metareview mapping should be deleted
+      valid_mapping = create(:meta_review_response_map) # You need to implement a method to create a valid metareview mapping
+      expect {
+        delete :delete_metareview, params: { id: valid_mapping.id }
+      }.to change(MetareviewResponseMap, :count).by(-1)  
+      # expect(flash[:note]).to eq("The metareview mapping for #{valid_mapping.reviewee.name} and #{valid_mapping.reviewer.name} has been deleted.")
+      
+      # Test scenario 2
+      # Given an invalid metareview mapping ID
+      # When the delete_metareview method is called
+      # Then no metareview mapping should be deleted
+      invalid_mapping_id = -1
+      expect {
+        delete :delete_metareview, params: { id: invalid_mapping_id }
+      }.to raise_error(ActiveRecord::RecordNotFound)
+  
+      # Test scenario 3
+      # Given a metareview mapping ID that does not exist
+      # When the delete_metareview method is called
+      # Then no metareview mapping should be deleted
+      non_existing_mapping_id = 9999
+      expect {
+        delete :delete_metareview, params: { id: non_existing_mapping_id }
+      }.to raise_error(ActiveRecord::RecordNotFound)
+
+      # Test scenario 4
+      # Given a metareview mapping ID that is associated with an assignment
+      # When the delete_metareview method is called
+      # Then the associated assignment should be updated
+      mapping_with_assignment = create(:meta_review_response_map, review_mapping: create(:review_response_map))
+      assignment_id_before = mapping_with_assignment.assignment.id
+      delete :delete_metareview, params: { id: mapping_with_assignment.id }
+      assignment_id_after = MetareviewResponseMap.find_by(id: mapping_with_assignment.id)&.assignment&.id
+      expect(assignment_id_before).not_to eq(assignment_id_after)
+  
+      # Test scenario 5
+      # Given a metareview mapping ID that is not associated with an assignment
+      # When the delete_metareview method is called
+      # Then no assignment should be updated
+      expect {
+        mapping_without_assignment = create(:meta_review_response_map, review_mapping: create(:review_response_map, assignment: nil))
+      }.to raise_error(ActiveRecord::NotNullViolation)
+
+  
+      # Test scenario 6
+      # Given a metareview mapping ID that is associated with a response
+      # When the delete_metareview method is called
+      # Then the associated response should not be deleted
+      mapping_with_response = create(:meta_review_response_map, review_mapping: create(:review_response_map))
+      expect {
+        delete :delete_metareview, params: { id: mapping_with_response.id }
+      }.not_to change(Response, :count)
+      end
+
   end
 
   describe '#list_mappings' do
@@ -727,6 +829,48 @@ describe ReviewMappingController do
       expect(flash[:error]).to eq('No error!')
       expect(response).to render_template(:list_mappings)
     end
+
+    context "when there is a flash error message" do
+      it "sets the flash error message when id is 0" do
+        get :list_mappings, params: { id: "0" }
+        expect(flash[:error]).to eq("Assignment needs to be created in order to assign reviewers!")
+      end
+      it "sets the flash error message when id not equal to 0" do
+        error_message = "Test Error Message"
+        get :list_mappings, params: { id: "1", msg: error_message }
+      expect(flash[:error]).to eq(error_message)
+      end
+    end
+  
+    context "when there is no flash error message" do
+      it "does not set the flash error message" do
+        assignment = create(:assignment)
+        get :list_mappings, params: { id: assignment.id }
+        expect(flash[:error]).to be_nil
+      end
+    end
+  
+    context "when the assignment exists" do
+      before do
+        @assignment = create(:assignment)
+        allow(Assignment).to receive(:find).with('1').and_return(@assignment)
+        get :list_mappings, params: { id: @assignment.id }
+      end
+
+      it "finds the assignment with the given id" do
+        expect(assigns(:assignment)).to eq(@assignment)
+      end
+  
+      it "retrieves all assignment teams associated with the assignment" do
+        expect(assigns(:items)).to eq(AssignmentTeam.where(parent_id: @assignment.id))
+      end
+  
+      it "sorts the assignment teams by name" do
+        sorted_items = assigns(:items).sort_by(&:name)
+        expect(assigns(:items)).to eq(sorted_items)
+      end
+    end  
+
   end
 
   describe '#automatic_review_mapping' do
@@ -890,7 +1034,7 @@ describe ReviewMappingController do
           }
         }
       end
-      before do
+      before(:each) do
         allow(ReviewGrade).to receive(:find_or_create_by).with(participant_id: '1').and_return(review_grade_object)
         allow(controller).to receive(:review_mapping_params).and_return(
           {

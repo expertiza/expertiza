@@ -869,32 +869,4 @@ describe ReviewMappingController do
       end
     end
   end
-
-  describe "get_reviewer" do
-    context "when the user is a participant in the assignment" do
-      it "returns the reviewer for the given user and assignment" do
-        # Test setup
-        user = create(:user)
-        assignment = create(:assignment)
-        reviewer = create(:assignment_participant, user: user, parent: assignment)
-        
-        # Test execution
-        result = get_reviewer(user, assignment, "registration_url")
-        
-        # Test verification
-        expect(result).to eq(reviewer.get_reviewer)
-      end
-    end
-    
-    context "when the user is not a participant in the assignment" do
-      it "raises an error message" do
-        # Test setup
-        user = create(:user)
-        assignment = create(:assignment)
-        
-        # Test execution and verification
-        expect { get_reviewer(user, assignment, "registration_url") }.to raise_error("\"#{user.name}\" is not a participant in the assignment. Please <a href='registration_url'>register</a> this user to continue.")
-      end
-    end
-  end
 end

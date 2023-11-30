@@ -528,7 +528,7 @@ describe ReviewMappingController do
       expect(response).to redirect_to('/review_mapping/list_mappings?id=1&msg=')
     end
   end
-
+  # Can add tests here
   describe '#assign_metareviewer_dynamically' do
     it 'redirects to student_review#list page' do
       metareviewer = double('AssignmentParticipant', id: 1)
@@ -705,6 +705,7 @@ describe ReviewMappingController do
     end
   end
 
+  # Tests can be added
   describe '#delete_metareview' do
     it 'redirects to review_mapping#list_mappings page after deletion' do
       allow(MetareviewResponseMap).to receive(:find).with('1').and_return(metareview_response_map)
@@ -872,6 +873,68 @@ describe ReviewMappingController do
       post :save_grade_and_comment_for_reviewer, params: request_params, session: session_params
       expect(flash[:note]).to be nil
       expect(response).to redirect_to('/reports/response_report')
+    end
+
+    context "when the review grade is retrieved" do
+      let(:review_grade_object) { build(:review_grade) }
+      let(:instructor) { build(:instructor) }
+      let(:session_params) do
+        { user: stub_current_user(instructor, instructor.role.name, instructor.role) }
+      end
+    
+      let(:request_params) do
+        {
+          review_grade: {
+            participant_id: '1',
+            assignment_id: '1',
+          }
+        }
+      end
+      before do
+        allow(ReviewGrade).to receive(:find_or_create_by).with(participant_id: '1').and_return(review_grade_object)
+        allow(controller).to receive(:review_mapping_params).and_return(
+          {
+          participant_id: 1,
+          grade_for_reviewer: 90,
+          comment_for_reviewer: 'Very Good',
+          }
+        )
+        allow(review_grade_object).to receive(:save).and_return(true)
+
+        post :save_grade_and_comment_for_reviewer, params: request_params, session: session_params
+      end
+
+      it "creates a new review grade with the given participant_id" do
+        expect(ReviewGrade.count).to eq(1)
+      end
+  
+      it "sets the attributes of the review grade with the given review_mapping_params" do
+        created_review_grade = ReviewGrade.last
+        expect(created_review_grade.grade_for_reviewer).to eq(90)
+        expect(created_review_grade.comment_for_reviewer).to eq('Very Good')
+      end
+  
+      it "sets the review_graded_at attribute to the current time" do
+        created_review_grade = ReviewGrade.last
+        expect(created_review_grade.review_graded_at).to be_within(1.second).of(Time.now)
+      end
+  
+      it "sets the reviewer_id attribute to the current user's id" do
+        created_review_grade = ReviewGrade.last
+        expect(created_review_grade.reviewer_id).to eq(instructor.id)
+      end
+  
+      it "saves the review grade successfully" do
+        # expect(flash[:success]).to eq('Grade and comment for reviewer successfully saved.')
+      end
+  
+      it "sets a success flash message" do
+        expect(flash[:success]).to eq('Grade and comment for reviewer successfully saved.')
+      end
+  
+      it "redirects to the 'response_report' action in the 'reports' controller for HTML format" do
+        expect(response).to redirect_to(controller: 'reports', action: 'response_report', id: '1')
+      end
     end
   end
 

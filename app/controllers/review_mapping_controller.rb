@@ -55,6 +55,7 @@ class ReviewMappingController < ApplicationController
   def add_reviewer
     assignment = Assignment.find(params[:id])
     topic_id = params[:topic_id] # An assignment can have several topics
+    # IF USER NOT FOUND ------> CRAASH!
     user_id = User.where(name: params[:user][:name]).first.id
     # If instructor want to assign one student to review his/her own artifact,
     # it should be counted as "self-review" and we need to make /app/views/submitted_content/_selfreview.html.erb work.
@@ -130,8 +131,8 @@ class ReviewMappingController < ApplicationController
         @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
       end
       @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
-      # if all reviews done => no outstanding reviews - bug fix
-      @num_reviews_in_progress > 0 && @num_reviews_in_progress <= Assignment.max_outstanding_reviews
+      # if all reviews done => no outstanding reviews
+      @num_reviews_in_progress > 0 && @num_reviews_in_progress < Assignment.max_outstanding_reviews
     end
   end
 
@@ -343,6 +344,11 @@ class ReviewMappingController < ApplicationController
   # It sets an error flash message if provided via params and retrieves the assignment and
   # its associated teams for display.
   def list_mappings
+    if params[:id] == "0"
+      flash[:error] = "Assignment needs to be created in order to assign reviewers!"
+      redirect_to "/assignments/new?private=1"
+      return
+    end
     flash[:error] = params[:msg] if params[:msg]
     @assignment = Assignment.find(params[:id])
     @items = AssignmentTeam.where(parent_id: @assignment.id)

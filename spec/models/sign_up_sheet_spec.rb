@@ -65,12 +65,12 @@ describe '.confirm_topic' do
     allow(Team).to receive(:find).and_return(Team.new)
   end  
   it 'create SignedUpTeam' do
-    allow(SignUpTopic).to receive(:slotAvailable?) { true }
+    allow(SignUpTopic).to receive(:slot_available?) { true }
     expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be(false)
   end
 
   it 'sign_up.is_waitlisted is equal to true' do
-    allow(SignUpTopic).to receive(:slotAvailable?) { false }
+    allow(SignUpTopic).to receive(:slot_available?) { false }
     expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be(false)
   end
 
@@ -80,8 +80,8 @@ describe '.confirm_topic' do
     allow(SignUpSheet).to receive(:otherConfirmedTopicforUser) { [user_signup] }
     expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be(false)
   end
-  it 'sets sign_up.is_waitlisted = true if slotAvailable is false' do
-    allow(SignUpTopic).to receive(:slotAvailable?) { false }
+  it 'sets sign_up.is_waitlisted = true if slot_available is false' do
+    allow(SignUpTopic).to receive(:slot_available?) { false }
     user_signup = SignedUpTeam.new
     user_signup.is_waitlisted = true
     allow(SignUpSheet).to receive(:otherConfirmedTopicforUser) { [user_signup] }
@@ -89,7 +89,7 @@ describe '.confirm_topic' do
   end
 
   it 'returns true for SignUpSheet.confirmTopic ' do
-    allow(SignUpTopic).to receive(:slotAvailable?) { true }
+    allow(SignUpTopic).to receive(:slot_available?) { true }
     user_signup = SignedUpTeam.new
     user_signup.is_waitlisted = true
     allow(SignUpSheet).to receive(:update_attribute) { [user_signup] }

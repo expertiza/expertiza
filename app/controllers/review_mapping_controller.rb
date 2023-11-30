@@ -566,7 +566,7 @@ class ReviewMappingController < ApplicationController
           break if selected_participants.size == participants.size - num_participants_this_team
 
           # generate random number
-          rand_num = generate_participant_rand_num(participants, participants_hash, num_participants, iterator)
+          rand_num = generate_participant_rand_num(participants, participants_hash, num_participants, iterator, team)
 
           # prohibit one student to review his/her own artifact
           next if TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
@@ -599,17 +599,17 @@ class ReviewMappingController < ApplicationController
   end
 
   # Generates random number for a participant for peer reviewing
-  def generate_participant_rand_num(participants, participants_hash, num_participants, iterator)
+  def generate_participant_rand_num(participants, participants_hash, num_participants, iterator, team)
     # generate random number
     if iterator.zero?
       rand(0..num_participants - 1)
     else
-      calculate_rand_num(participants_hash, participants, num_participants)
+      calculate_rand_num(participants_hash, participants, num_participants, team)
     end
   end
 
   # calculates rand_num(random number) based on checks
-  def calculate_rand_num(participants_hash, participants, num_participants)
+  def calculate_rand_num(participants_hash, participants, num_participants, team)
     min_value = participants_hash.values.min
     # get the temp array including indices of participants, each participant has minimum review number in hash table.
     participants_with_min_assigned_reviews = []

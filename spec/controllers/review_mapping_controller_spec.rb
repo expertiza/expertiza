@@ -653,7 +653,7 @@ describe ReviewMappingController do
         post :delete_outstanding_reviewers, params: request_params
 
         # Assertion
-        expect(flash[:success]).to eq('All review mappings for \'#{team.name}\' have been deleted.')
+        expect(flash[:success]).to eq('All review mappings for "' + team.name + '" have been deleted.')
       end
 
       it 'redirects to the list_mappings action' do

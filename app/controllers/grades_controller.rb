@@ -163,7 +163,17 @@ class GradesController < ApplicationController
     @team = participant.team
     @team.grade_for_submission = params[:grade_for_submission]
     @team.comment_for_submission = params[:comment_for_submission]
+    # E2237 - create a grading history entry for this assignment
+    # save the grade, comment, receiver, and instructor
+    # this should be updated to Rails 5 convention at some point
+    # but it works for now
     begin
+      GradingHistory.create(instructor_id: session[:user].id,
+                            assignment_id: participant.assignment.id,
+                            grading_type: "Submission",
+                            grade_receiver_id: @team.id,
+                            grade: @team.grade_for_submission,
+                            comment: @team.comment_for_submission)
       @team.save
       flash[:success] = 'Grade and comment for submission successfully saved.'
     rescue StandardError

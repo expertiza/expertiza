@@ -61,5 +61,9 @@ class QuizQuestion < Question
     else
       "  - #{choice.txt}<br /> "
     end
-  end 
+  end
+
+  def all_choices_have_text?(choice_info)
+    choice_info.all? { |_idx, value|  value[:txt].present? }
+  end
 end

@@ -1,78 +1,30 @@
 class MultipleChoiceCheckbox < QuizQuestion
   def edit
     super
-    # for i in 0..3
-    [0, 1, 2, 3].each do |i|
-      @html += '<tr><td>'
-
-      @html += '<input type="hidden" name="quiz_question_choices[' + id.to_s + '][MultipleChoiceCheckbox][' + (i + 1).to_s + '][iscorrect]" '
-      @html += 'id="quiz_question_choices_' + id.to_s + '_MultipleChoiceCheckbox_' + (i + 1).to_s + '_iscorrect" value="0" />'
-
-      @html += '<input type="checkbox" name="quiz_question_choices[' + id.to_s + '][MultipleChoiceCheckbox][' + (i + 1).to_s + '][iscorrect]" '
-      @html += 'id="quiz_question_choices_' + id.to_s + '_MultipleChoiceCheckbox_' + (i + 1).to_s + '_iscorrect" value="1" '
-      @html += 'checked="checked" ' if @quiz_question_choices[i].iscorrect
-      @html += '/>'
-
-      @html += '<input type="text" name="quiz_question_choices[' + id.to_s + '][MultipleChoiceCheckbox][' + (i + 1).to_s + '][txt]" '
-      @html += 'id="quiz_question_choices_' + id.to_s + '_MultipleChoiceCheckbox_' + (i + 1).to_s + '_txt" '
-      @html += 'value="' + @quiz_question_choices[i].txt + '" size="40" />'
-
-      @html += '</td></tr>'
-    end
-
+    create_choices
     @html.html_safe
-    # safe_join(@html)
   end
 
   def complete
-    # quiz_question_choices = QuizQuestionChoice.where(question_id: id)
-    # @html = '<label for="' + id.to_s + '">' + txt + '</label><br>'
-    # for i in 0..3
-    [0, 1, 2, 3].each do |i|
-      # txt = quiz_question_choices[i].txt
-      @html += '<input name = ' + "\"#{id}[]\" "
-      @html += 'id = ' + "\"#{id}" + '_' + "#{i + 1}\" "
-      @html += 'value = ' + "\"#{quiz_question_choices[i].txt}\" "
-      @html += 'type="checkbox"/>'
-      @html += quiz_question_choices[i].txt.to_s
-      @html += '</br>'
-    end
+    super
+    complete_choices
     @html
   end
 
-  def view_completed_question(user_answer)
+  def view_completed_question(user_answers)
     quiz_question_choices = QuizQuestionChoice.where(question_id: id)
-    @html = ''
-    quiz_question_choices.each do |answer|
-      @html += '<b>' + answer.txt + '</b> -- Correct <br>' if answer.iscorrect
-    end
-    @html += '<br>Your answer is:'
-    @html += if user_answer[0].answer == 1
-              '<img src="/assets/Check-icon.png"/><br>'
-            else
-              '<img src="/assets/delete_icon.png"/><br>'
-            end
-    user_answer.each do |answer|
-      @html += '<b>' + answer.comments.to_s + '</b><br>'
-    end
-    @html += '<br><hr>'
+    view_correct_answers(@quiz_question_choices)
+    view_your_answers(user_answers)
     @html.html_safe
-    # safe_join(html)
   end
 
   def isvalid(choice_info)
     @valid = super(choice_info)
 
-    correct_count = 0
-    # choice_info.each do |_idx, value|
-    choice_info.each_value do |value|
-      if value[:txt] == ''
-        @valid = 'Please make sure every question has text for all options'
-        break
-      end
-      correct_count += 1 if value[:iscorrect] == 1.to_s
-    end
-    # if correct_count == 0
+    return 'Please make sure every question has text for all options' unless all_choices_have_text?(choice_info)
+
+    correct_count = choice_info.count { |_idx, value| value.key?(:iscorrect) }
+
     if correct_count.zero?
       @valid = 'Please select a correct answer for all questions'
     elsif correct_count == 1
@@ -82,4 +34,80 @@ class MultipleChoiceCheckbox < QuizQuestion
     end
     @valid
   end
+
+  private
+  
+  def create_choices
+    (0..3).each do |i|
+      @html << create_choice_row(index)
+    end
+  end 
+
+  def create_choice_row(index)
+    checkbox_button = create_checkbox_input_field(index)
+    text_field = create_text_input_field(index)
+    "<tr><td>#{checkbox_button}#{text_field}</td></tr>"
+  end
+
+  def create_checkbox_input_field(index)
+    checked = @quiz_question_choices[index].iscorrect ? 'checked="checked" ' : ''
+    "<input type='hidden' name='quiz_question_choices[#{id}][MultipleChoiceCheckbox][#{i+1}][iscorrect]' "\
+    "id='quiz_question_choices_#{id}_MultipleChoiceCheckbox_#{index+1}_iscorrect' value='0' /> "\
+    "<input type='checkbox' name='quiz_question_choices[#{id}][MultipleChoiceCheckbox][#{i+1}][iscorrect]' "\
+   "id='quiz_question_choices_#{id}_MultipleChoiceCheckbox_#{index+1}_iscorrect' value='1'#{checked}/>"
+  end
+
+  def create_text_input_field(index)
+    "<input type='text' name='quiz_question_choices[#{id}][MultipleChoiceCheckbox][#{index+1}][txt]' "\
+    "id='quiz_question_choices_#{id}_MultipleChoiceCheckbox_#{index+1}_txt' "\
+    "value= '{@quiz_question_choices[#{index}].txt}' size='40' />"
+  end
+
+  def complete_choices
+    (0..3).each do |i|
+      @html << complete_choice_row(i)
+    end
+  end
+
+  def complete_choice_row(index)
+    # txt = quiz_question_choices[i].txt
+    "<input name = '#{id}' id = '#{id}_#{index + 1}' value = '#{@quiz_question_choices[index].txt}' type='checkbox'/> "\
+    "#{@quiz_question_choices[index].txt.to_s} </br>"
+  end
+
+  def view_correct_answers(choices)
+    @html = ''
+    choices.each do |answer|
+      @html << is_correct_answer_text(answer)
+    end
+  end
+
+  def view_your_answers(user_answers)
+    @html << "<br>Your answer is: #{is_correct_answer_icon(user_answers)}"
+    user_answers.each do |answer|
+      @html << "<b> #{answer.comments} </b> <br>"
+    end
+    @html << "<br><hr>"
+  end
+
+  def is_correct_answer_icon(user_answers)
+    if user_answers.first.answer == 1
+      '<img src="/assets/Check-icon.png"/>'
+    else
+      '<img src="/assets/delete_icon.png"/>'
+    end
+  end
+
+  def is_correct_answer_text(answer)
+    if answer.iscorrect
+      "<b> #{answer.txt} </b> -- Correct <br>"
+    else
+      "#{answer.txt} <br>"
+    end
+  end
+
+  # #checks if each choice has text
+  # def all_choices_have_text?(choice_info)
+  #   choice_info.all? { |_idx, value|  value[:txt].present? }
+  # end
 end

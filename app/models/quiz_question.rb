@@ -43,22 +43,23 @@ class QuizQuestion < Question
   end
 
   def create_label
-    "<label for='#{id}'>#{txt}</label><br>"
+    "<label for='#{id}'>#{txt}</label><br />"
   end
 
-  def build_choices
+  def create_choices
     choices_html = ''
     quiz_question_choices.each do |choice|
       choices_html << choice_html(choice)
     end
+    choices_html << "<br />"
     choices_html
   end
   
   def choice_html(choice)
     if choice.iscorrect?
-      "  - <b>#{choice.txt}</b><br/> "
+      "  - <b>#{choice.txt}</b><br /> "
     else
-      "  - #{choice.txt}<br/> "
+      "  - #{choice.txt}<br /> "
     end
   end 
 end

@@ -1,6 +1,8 @@
 Expertiza::Application.routes.draw do
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
+  #E2383 added path for grading histories
+  resources :grading_histories, only: [:index]
 
   resources :admin, only: [] do
     collection do

@@ -20,10 +20,12 @@ class MultipleChoiceCheckbox < QuizQuestion
 
   def isvalid(choice_info)
     @valid = super(choice_info)
+    
+    return @valid if @valid != 'valid'
 
     return 'Please make sure every question has text for all options' unless all_choices_have_text?(choice_info)
 
-    correct_count = choice_info.count { |_idx, value| value.key?(:iscorrect) }
+    correct_count = choice_info.count { |_idx, value| value[:iscorrect] == 1 }
 
     if correct_count.zero?
       @valid = 'Please select a correct answer for all questions'
@@ -39,28 +41,28 @@ class MultipleChoiceCheckbox < QuizQuestion
   
   def create_choices
     (0..3).each do |i|
-      @html << create_choice_row(index)
+      @html << create_choice_row(i)
     end
   end 
 
-  def create_choice_row(index)
-    checkbox_button = create_checkbox_input_field(index)
-    text_field = create_text_input_field(index)
+  def create_choice_row(i)
+    checkbox_button = create_checkbox_input_field(i)
+    text_field = create_text_input_field(i)
     "<tr><td>#{checkbox_button}#{text_field}</td></tr>"
   end
 
-  def create_checkbox_input_field(index)
-    checked = @quiz_question_choices[index].iscorrect ? 'checked="checked" ' : ''
+  def create_checkbox_input_field(i)
+    checked = @quiz_question_choices[i].iscorrect ? 'checked="checked" ' : ''
     "<input type='hidden' name='quiz_question_choices[#{id}][MultipleChoiceCheckbox][#{i+1}][iscorrect]' "\
-    "id='quiz_question_choices_#{id}_MultipleChoiceCheckbox_#{index+1}_iscorrect' value='0' /> "\
+    "id='quiz_question_choices_#{id}_MultipleChoiceCheckbox_#{i+1}_iscorrect' value='0' /> "\
     "<input type='checkbox' name='quiz_question_choices[#{id}][MultipleChoiceCheckbox][#{i+1}][iscorrect]' "\
-   "id='quiz_question_choices_#{id}_MultipleChoiceCheckbox_#{index+1}_iscorrect' value='1'#{checked}/>"
+   "id='quiz_question_choices_#{id}_MultipleChoiceCheckbox_#{i+1}_iscorrect' value='1'#{checked}/>"
   end
 
-  def create_text_input_field(index)
-    "<input type='text' name='quiz_question_choices[#{id}][MultipleChoiceCheckbox][#{index+1}][txt]' "\
-    "id='quiz_question_choices_#{id}_MultipleChoiceCheckbox_#{index+1}_txt' "\
-    "value= '{@quiz_question_choices[#{index}].txt}' size='40' />"
+  def create_text_input_field(i)
+    "<input type='text' name='quiz_question_choices[#{id}][MultipleChoiceCheckbox][#{i+1}][txt]' "\
+    "id='quiz_question_choices_#{id}_MultipleChoiceCheckbox_#{i+1}_txt' "\
+    "value= '#{@quiz_question_choices[i].txt}' size='40' />"
   end
 
   def complete_choices
@@ -69,10 +71,10 @@ class MultipleChoiceCheckbox < QuizQuestion
     end
   end
 
-  def complete_choice_row(index)
+  def complete_choice_row(i)
     # txt = quiz_question_choices[i].txt
-    "<input name = '#{id}' id = '#{id}_#{index + 1}' value = '#{@quiz_question_choices[index].txt}' type='checkbox'/> "\
-    "#{@quiz_question_choices[index].txt.to_s} </br>"
+    "<input name = '#{id}' id = '#{id}_#{i + 1}' value = '#{@quiz_question_choices[i].txt}' type='checkbox'/> "\
+    "#{@quiz_question_choices[i].txt.to_s} </br>"
   end
 
   def view_correct_answers(choices)

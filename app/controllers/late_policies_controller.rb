@@ -55,25 +55,18 @@ class LatePoliciesController < ApplicationController
     # First this function validates the input then save if the input is valid.
     valid_penalty, error_message = validate_input
     if error_message
-      flash[:error] = error_message
+      handle_error(error_message)
+      redirect_to_policy('new')
     end
 
     # If penalty  is valid then tries to update and save.
     if valid_penalty
-      @late_policy = LatePolicy.new(late_policy_params)
-      @late_policy.instructor_id = instructor_id
-      begin
-        @late_policy.save!
-        flash[:notice] = 'The late policy was successfully created.'
-        redirect_to action: 'index'
-      # If something unexpected happens while saving the record in to database then displays a flash notice and redirect to create a new late policy again.
-      rescue StandardError
-        flash[:error] = 'The following error occurred while saving the late policy: '
-        redirect_to action: 'new'
-      end
+      create_new_late_policy(late_policy_params)
+      save_late_policy
+      redirect_to_policy('index')
     # If any of above checks fails, then redirect to create a new late policy again.
     else
-      redirect_to action: 'new'
+      redirect_to_policy('new')
     end
   end
 
@@ -84,20 +77,18 @@ class LatePoliciesController < ApplicationController
     # First this function validates the input then save if the input is valid.
     _valid_penalty, error_message = validate_input(true)
     if error_message
-      flash[:error] = error_message
-      redirect_to action: 'edit', id: params[:id]
+      handle_error(error_message)
+      redirect_to_policy('edit')
     # If there are no errors, then save the record.
     else
       begin
         penalty_policy.update_attributes(late_policy_params)
-        penalty_policy.save!
-        LatePolicy.update_calculated_penalty_objects(penalty_policy)
-        flash[:notice] = 'The late policy was successfully updated.'
-        redirect_to action: 'index'
+        save_late_policy
+        redirect_to_policy('index')
       # If something unexpected happens while updating, then redirect to the edit page of that policy again.
       rescue StandardError
-        flash[:error] = 'The following error occurred while updating the late policy: '
-        redirect_to action: 'edit', id: params[:id]
+        handle_error('The following error occurred while updating the late policy: ')
+        redirect_to_policy('edit')
       end
     end
   end
@@ -181,5 +172,42 @@ class LatePoliciesController < ApplicationController
     end
 
     return valid_penalty, error_message
+  end
+
+  # Create and save the late policy with the required params
+  def create_new_late_policy(params)
+    @late_policy = LatePolicy.new(params)
+    @late_policy.instructor_id = instructor_id
+  end
+
+  def save_late_policy
+    begin
+      @late_policy.save!
+      if caller_locations(2,1)[0].label == 'update'
+        # If the method that called this is update
+        LatePolicy.update_calculated_penalty_objects(penalty_policy)
+      end
+      # The code at the end of the string gets the name of the last method (create, update) and adds a d (created, updated)
+      flash[:notice] = 'The late policy was successfully #{caller_locations(2,1)[0].label}d.'
+    rescue StandardError
+      # If something unexpected happens while saving the record in to database then displays a flash notice and redirect to create a new late policy again.
+      handle_error('The following error occurred while saving the late policy: ')
+      redirect_to_policy('new')
+    end
+  end
+
+  # A method to extrapolate out the flashing of error messages
+  def handle_error(error_message)
+    flash[:error] = error_message
+  end
+
+  # A method to extrapolate out the redirecting to policy controller states
+  def redirect_to_policy(location)
+    if location == "edit"
+      # If the location is the edit screen, use the old id that was inputted
+      redirect_to action: location, id: params[:id]
+    else
+      redirect_to action: location
+    end
   end
 end

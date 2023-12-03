@@ -419,15 +419,16 @@ class ReviewMappingController < ApplicationController
     review_grade.reviewer_id = session[:user].id
     # E2237 create a grading history entry for this review
     # save the grade, comment, receiver, and instructor
-    # this should be updated to Rails 5 convention at some point
-    # but it works for now
+    # E2383 Update the previous teams creation to match
+    # the current expertiza since it was outdated
     begin
+      puts "Assignment ID: #{Participant.find(params[:review_grade][:participant_id]).parent_id}"
       GradingHistory.create(instructor_id: session[:user].id,
-                            assignment_id: params[:assignment_id],
+                            assignment_id: Participant.find(params[:review_grade][:participant_id]).parent_id,
                             grading_type: "Review",
-                            grade_receiver_id: Participant.find(params[:participant_id]).user_id,
-                            grade: params[:grade_for_reviewer],
-                            comment: params[:comment_for_reviewer])
+                            grade_receiver_id: Participant.find(params[:review_grade][:participant_id]).user_id,
+                            grade: review_grade.grade_for_reviewer,
+                            comment: review_grade.comment_for_reviewer)
       review_grade.save!
       flash[:success] = 'Grade and comment for reviewer successfully saved.'
     rescue StandardError

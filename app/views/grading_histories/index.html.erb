@@ -5,10 +5,10 @@
   else
     if record.grading_type == "Submission"
       receiver = "of " + Team.where(id: record.grade_receiver_id).pluck(:name).first
-      assignment = "for the submission " + Assignment.where(id: record.assignment_id).pluck(:name).first
+      assignment = "for the submission " + Assignment.where(id: record.assignment_id).pluck(:name).first.to_s
     else
       receiver = "of " + User.where(id: record.grade_receiver_id).pluck(:fullname).first
-      assignment = "for review in " + Assignment.where(id: record.assignment_id).pluck(:name).first
+      assignment = "for review in " + Assignment.where(id: record.assignment_id).pluck(:name).first.to_s
     end
 
   end

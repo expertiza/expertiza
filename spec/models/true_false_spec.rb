@@ -1,6 +1,6 @@
 describe TrueFalse do
   let(:true_false) { build(:true_false, id: 1) }
-  describe '#edit' do
+  describe '#edit' do 
     it 'returns html' do
       qc1 = double('QuizQuestionChoice')
       qc2 = double('QuizQuestionChoice')

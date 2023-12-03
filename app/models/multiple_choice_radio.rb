@@ -37,7 +37,7 @@ class MultipleChoiceRadio < QuizQuestion
   private 
 
   def create_choices
-    (0..3).each do |i|
+    (0..3).each do |index|
       @html << create_choice_row(index)
     end
   end
@@ -104,4 +104,5 @@ class MultipleChoiceRadio < QuizQuestion
   # def all_choices_have_text?(choice_info)
   #   choice_info.all? { |_idx, value|  value[:txt].present? }
   # end
+end
 end

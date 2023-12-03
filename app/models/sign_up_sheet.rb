@@ -3,106 +3,19 @@ class SignUpSheet < ApplicationRecord
   def self.signup_team(assignment_id, user_id, topic_id = nil)
     # Find the team ID for the given assignment and user
     team_id = SignedUpTeam.find_team_users(assignment_id, user_id)&.first&.t_id
-  
     # If the team doesn't exist, create a new team and assign the team ID
     if team_id.nil?
       team = AssignmentTeam.create_team_with_users(assignment_id, [user_id])
       team_id = team.id
     end
-  
     # Confirm the signup topic if a topic ID is provided
-    confirmation_status = SignUpSheet.confirm_topic(user_id, team_id, topic_id, assignment_id) if topic_id
-  
+    @signup_topic = SignUpTopic.find_by(id: topic_id)
+    unless @signup_topic.nil?
+      confirmation_status = @signup_topic.signup_team_for_chosen_topic(team_id)
+    end
     # Log the signup topic save status
     ExpertizaLogger.info "The signup topic save status:#{confirmation_status} for assignment #{assignment_id} by #{user_id}"
     confirmation_status
-  end
-
-  # Confirm a topic for a user within a team for a specific assignment
-  def self.confirm_topic(user_id, team_id, topic_id, assignment_id)
-    # Fetch all topics for the user within the team for the assignment
-    user_signup = SignedUpTeam.find_user_signup_topics(assignment_id, team_id)
-    # Fetch users within the team and obtain team details
-    users_team = SignedUpTeam.find_team_users(assignment_id, user_id)
-    team = Team.find(users_team.first.t_id)
-
-    # Check if the topic is already signed up by the team, return false if exists
-    return false if SignedUpTeam.where(team_id: team.id, topic_id: topic_id).any?
-
-    # Create a new SignedUpTeam instance with the provided topic and team details
-    sign_up = SignedUpTeam.new(topic_id: topic_id, team_id: team_id)
-    result = false
-
-    if user_signup.empty?
-      # If there are no topics for the user within the team, proceed with signing up
-      ApplicationRecord.transaction do
-        # Create a signup_team entry for the team if the slot is available or waitlist it
-        team_id, topic_id = create_signup_team(assignment_id, sign_up, topic_id, user_id)
-        result = true if sign_up.save
-      end
-    else
-      # If the user is already signed up for a topic, then return false
-      return false unless user_signup.first&.is_waitlisted == true
-
-      #If the team has a waitlisted topic, then assign it to a 
-      ApplicationRecord.transaction do
-        result = signup_team_for_chosen_topic(assignment_id, sign_up, team_id, topic_id)
-      end
-    end
-
-    result # Return the result of the confirmation process
-  end
-
-  # Method to handle the process when a user signs up and is on the waitlist
-  def self.signup_team_for_chosen_topic(assignment_id, sign_up, team_id, topic_id)
-    if slot_available?(topic_id)
-      # Assign the topic to the team if a slot is available and drop off the team from all waitlists
-      assign_topic_to_team(sign_up, topic_id)
-      #Once assigned, drop all the waitlisted topics for this team
-      result = SignedUpTeam.drop_off_waitlists(team_id)
-    else
-      # Save the team as waitlisted if no slots are available
-      result = save_waitlist_entry(sign_up, team_id)
-    end
-    result
-  end
-
-  # Method to assign a topic to the team and update the waitlist status
-  def self.assign_topic_to_team(sign_up, topic_id)
-    # Set the team's waitlist status to false as they are assigned a topic
-    sign_up.update(is_waitlisted: false)
-    # Update the topic_id in the signed_up_teams table for the user
-    signed_up_team = SignedUpTeam.find_by(topic_id: topic_id)
-    signed_up_team.update(topic_id: topic_id) if signed_up_team
-  end
-
-  # Method to save the user as waitlisted if no slots are available
-  def self.save_waitlist_entry(sign_up, team_id)
-    sign_up.is_waitlisted = true
-    # Save the user's waitlist status
-    result = sign_up.save
-    # Log the creation of the sign-up sheet for the waitlisted user
-    ExpertizaLogger.info(LoggerMessage.new('SignUpSheet', '', "Sign up sheet created for waitlisted with teamId #{team_id}"))
-    result
-  end
-
-  def self.create_signup_team(assignment_id, sign_up, topic_id, user_id)
-    if slot_available?(topic_id)
-      sign_up.is_waitlisted = false
-      # Create new record in signed_up_teams table
-      team_id = TeamsUser.team_id(assignment_id, user_id)
-      topic_id = SignedUpTeam.topic_id(assignment_id, user_id)
-      SignedUpTeam.create(topic_id: topic_id, team_id: team_id, is_waitlisted: 0, preference_priority_number: nil)
-      ExpertizaLogger.info LoggerMessage.new('SignUpSheet', user_id, "Sign up sheet created with teamId #{team_id}")
-    else
-      sign_up.is_waitlisted = true
-    end
-    [team_id, topic_id]
-  end
-
-  # When using this method when creating fields, update race conditions by using db transactions
-  def self.slot_available?(topic_id)
-    SignUpTopic.slot_available?(topic_id)
   end
 
   def self.add_signup_topic(assignment_id)

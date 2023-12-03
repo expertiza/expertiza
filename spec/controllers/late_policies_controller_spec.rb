@@ -5,6 +5,24 @@ describe LatePoliciesController do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
 
+  def create_late_policy(policy_name, max_penalty, penalty_per_unit, instructor_id) 
+    late_policy = LatePolicy.new
+    late_policy.policy_name = policy_name
+    late_policy.max_penalty = max_penalty
+    late_policy.penalty_per_unit = penalty_per_unit
+    late_policy.instructor_id = instructor_id
+    late_policy
+  end
+
+  def request_params(policy_name, max_penalty, penalty_per_unit) {
+    late_policy: {
+      max_penalty: max_penalty
+      penalty_per_unit: penalty_per_unit
+      policy_name: policy_name
+    }
+  }
+  end
+
   describe 'GET #index' do
     context 'when index is called' do
       it 'routes to index page' do
@@ -20,11 +38,7 @@ describe LatePoliciesController do
 
   describe 'GET #show' do
     before(:each) do
-      latePolicy = LatePolicy.new
-      latePolicy.policy_name = 'Policy2'
-      latePolicy.max_penalty = 40
-      latePolicy.penalty_per_unit = 30
-      latePolicy.instructor_id = 6
+      latePolicy = create_late_policy('Policy2', 40, 30, 6)
       allow(LatePolicy).to receive(:find).with('1').and_return(latePolicy)
     end
     context 'when show is called' do
@@ -40,11 +54,7 @@ describe LatePoliciesController do
 
   describe 'GET #edit' do
     before(:each) do
-      latePolicy = LatePolicy.new
-      latePolicy.policy_name = 'Policy2'
-      latePolicy.max_penalty = 40
-      latePolicy.penalty_per_unit = 30
-      latePolicy.instructor_id = 6
+      latePolicy = create_late_policy('Policy2', 40, 30, 6)
       allow(LatePolicy).to receive(:find).with('1').and_return(latePolicy)
     end
     context 'when edit is called' do
@@ -88,14 +98,7 @@ describe LatePoliciesController do
         allow(latePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
       end
       it 'throws a flash error ' do
-        request_params = {
-          late_policy: {
-            max_penalty: 10,
-            penalty_per_unit: 30,
-            policy_name: 'Policy1'
-          }
-        }
-        post :create, params: request_params
+        post :create, params: request_params('Policy1', 10, 30)
         expect(flash[:error]).to eq('The maximum penalty cannot be less than penalty per unit.')
         expect(response).to redirect_to('/late_policies/new')
       end
@@ -107,14 +110,7 @@ describe LatePoliciesController do
         allow(latePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
       end
       it 'throws a flash error ' do
-        request_params = {
-          late_policy: {
-            max_penalty: 101,
-            penalty_per_unit: 30,
-            policy_name: 'Policy1'
-          }
-        }
-        post :create, params: request_params
+        post :create, params: request_params('Policy1', 101, 30)
         expect(flash[:error]).to eq('Maximum penalty cannot be greater than or equal to 100')
         expect(response).to redirect_to('/late_policies/new')
       end
@@ -125,14 +121,7 @@ describe LatePoliciesController do
         allow(LatePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
       end
       it 'throws a flash error ' do
-        request_params = {
-          late_policy: {
-            max_penalty: 30,
-            penalty_per_unit: -10,
-            policy_name: 'Invalid_Policy'
-          }
-        }
-        post :create, params: request_params
+        post :create, params: request_params('Invalid_Policy', 30, -10)
         expect(flash[:error]).to eq('Penalty per unit cannot be negative.')
       end
     end
@@ -143,38 +132,20 @@ describe LatePoliciesController do
         allow(LatePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(true)
       end
       it 'throws a flash error ' do
-        request_params = {
-          late_policy: {
-            max_penalty: 30,
-            penalty_per_unit: 10,
-            policy_name: 'Policy1'
-          }
-        }
-        post :create, params: request_params
+        post :create, params: request_params('Policy1', 30, 10)
         expect(flash[:error]).to eq('A policy with the same name Policy1 already exists.')
       end
     end
 
     context 'when the late_policy is not saved' do
       before(:each) do
-        latePolicy = LatePolicy.new
-        latePolicy.policy_name = 'Policy1'
-        latePolicy.max_penalty = 40
-        latePolicy.penalty_per_unit = 30
-        latePolicy.instructor_id = 6
+        latePolicy = create_late_policy('Policy1', 40, 30, 6)
         allow(latePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
         allow(latePolicy).to receive(:new).with(any_args).and_return(latePolicy)
         allow(latePolicy).to receive(:save!).and_return(false)
       end
       it 'throws a flash error ' do
-        request_params = {
-          late_policy: {
-            max_penalty: 40,
-            penalty_per_unit: 30,
-            policy_name: 'Policy1'
-          }
-        }
-        post :create, params: request_params
+        post :create, params: request_params('Policy1', 40, 30)
         expect(flash[:error]).to eq('The following error occurred while saving the late policy: ')
       end
     end
@@ -182,25 +153,13 @@ describe LatePoliciesController do
 
   describe 'POST #update' do
     before(:each) do
-      latePolicy = LatePolicy.new
-      latePolicy.policy_name = 'Policy2'
-      latePolicy.max_penalty = 40
-      latePolicy.penalty_per_unit = 30
-      latePolicy.instructor_id = 6
+      latePolicy = create_late_policy('Policy2', 40, 30, 6)
       allow(LatePolicy).to receive(:find).with('1').and_return(latePolicy)
       allow(LatePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(true)
     end
     context 'when maximum penalty is less than penalty per unit' do
       it 'throws a flash error ' do
-        request_params = {
-          late_policy: {
-            max_penalty: 30,
-            penalty_per_unit: 100,
-            policy_name: 'Policy2'
-          },
-          id: 1
-        }
-        post :update, params: request_params
+        post :update, params: request_params('Policy2', 30, 100)
         expect(flash[:error]).to eq('Cannot edit the policy. The maximum penalty cannot be less than penalty per unit.')
         expect(response).to redirect_to('/late_policies/1/edit')
       end
@@ -211,15 +170,7 @@ describe LatePoliciesController do
         allow(LatePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(true)
       end
       it 'throws a flash error ' do
-        request_params = {
-          late_policy: {
-            max_penalty: 30,
-            penalty_per_unit: 10,
-            policy_name: 'Policy1'
-          },
-          id: 1
-        }
-        post :update, params: request_params
+        post :update, params: request_params('Policy1', 30, 10)
         expect(flash[:error]).to eq('Cannot edit the policy. A policy with the same name Policy1 already exists.')
       end
     end
@@ -229,15 +180,7 @@ describe LatePoliciesController do
         allow(LatePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
       end
       it 'throws a flash error ' do
-        request_params = {
-          late_policy: {
-            max_penalty: 30,
-            penalty_per_unit: 10,
-            policy_name: 'Invalid_Policy'
-          },
-          id: 1
-        }
-        post :update, params: request_params
+        post :update, params: request_params('Invalid_Policy', 30, 10)
         expect(flash[:error]).to eq('The following error occurred while updating the late policy: ')
       end
     end

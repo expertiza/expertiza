@@ -422,7 +422,6 @@ class ReviewMappingController < ApplicationController
     # E2383 Update the previous teams creation to match
     # the current expertiza since it was outdated
     begin
-      puts "Assignment ID: #{Participant.find(params[:review_grade][:participant_id]).parent_id}"
       GradingHistory.create(instructor_id: session[:user].id,
                             assignment_id: Participant.find(params[:review_grade][:participant_id]).parent_id,
                             grading_type: "Review",

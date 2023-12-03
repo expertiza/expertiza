@@ -51,19 +51,24 @@ class SignUpTopic < ApplicationRecord
   end
 
   def self.slot_available?(topic_id)
+    # Retrieve the SignUpTopic record based on the given topic_id
     topic = SignUpTopic.find(topic_id)
+    
+    # Find the number of students who have selected the topic and are not waitlisted
     no_of_students_who_selected_the_topic = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: false)
-
+  
+    # Check if no students have selected the topic yet
     if no_of_students_who_selected_the_topic.nil?
       return true
     else
+      # Check if the number of students who selected the topic is less than the maximum allowed
       if topic.max_choosers > no_of_students_who_selected_the_topic.size
-        return true
+        return true # There are available slots for this topic
       else
-        return false
+        return false # All slots for this topic are filled
       end
     end
-  end
+  end  
 
   def self.assign_to_first_waiting_team(next_wait_listed_team)
     team_id = next_wait_listed_team.team_id

@@ -47,6 +47,7 @@ class GradesController < ApplicationController
       end
     end
     @scores = review_grades(@assignment, @questions)
+    @num_reviewers_assigned_scores = @scores[:teams].length # After rejecting nil scores need original length to iterate over hash
     averages = vector(@scores)
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)

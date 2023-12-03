@@ -238,7 +238,7 @@ module ReviewMappingHelper
         }
       },
       width: '200',
-      height: '125',
+      height: '225',
       scales: {
         yAxes: [{
           stacked: true,
@@ -266,7 +266,7 @@ module ReviewMappingHelper
         }]
       }
     }
-    horizontal_bar_chart data, options
+    bar_chart data, options
   end
 
   # E2082 Generate chart for review tagging time intervals

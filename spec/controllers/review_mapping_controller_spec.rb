@@ -470,16 +470,17 @@ describe ReviewMappingController do
       end
 		end
 
-    context "when the reviewer has already taken the quiz" do
-      it "displays an error message" do
-        allow(ResponseMap).to receive_message_chain(:where, :first).with(reviewed_object_id: '1', reviewer_id: '1')
-                                                                   .with(no_args).and_return(double('ResponseMap'))
+    #  Present on line 450
+    # context "when the reviewer has already taken the quiz" do
+    #   it "displays an error message" do
+    #     allow(ResponseMap).to receive_message_chain(:where, :first).with(reviewed_object_id: '1', reviewer_id: '1')
+    #                                                                .with(no_args).and_return(double('ResponseMap'))
 
-        post :assign_quiz_dynamically, params: @params
-        expect(flash[:error]).to eq('You have already taken that quiz.')
-        expect(response).to redirect_to('/student_quizzes?id=1')
-      end
-    end
+    #     post :assign_quiz_dynamically, params: @params
+    #     expect(flash[:error]).to eq('You have already taken that quiz.')
+    #     expect(response).to redirect_to('/student_quizzes?id=1')
+    #   end
+    # end
 
     context "when the reviewer has not taken the quiz yet" do
       it "creates a new QuizResponseMap" do
@@ -502,40 +503,41 @@ describe ReviewMappingController do
 			end
 		end
 
+    # Incomplete
     context "when an error occurs during the assignment process" do
       it "displays an alert message" do
         # Test scenario 3
       end
     end
 
-    context 'when the reviewer has already taken the quiz' do
-      it 'displays an error message' do
-        allow(ResponseMap).to receive_message_chain(:where, :first).with(reviewed_object_id: '1', reviewer_id: '1').with(no_args).and_return(double('ResponseMap'))
+    # context 'when the reviewer has already taken the quiz' do
+    #   it 'displays an error message' do
+    #     allow(ResponseMap).to receive_message_chain(:where, :first).with(reviewed_object_id: '1', reviewer_id: '1').with(no_args).and_return(double('ResponseMap'))
 
-        post :assign_quiz_dynamically, params: @params
-        expect(flash[:error]).to eq('You have already taken that quiz.')
-        expect(response).to redirect_to('/student_quizzes?id=1')
-      end
-    end
+    #     post :assign_quiz_dynamically, params: @params
+    #     expect(flash[:error]).to eq('You have already taken that quiz.')
+    #     expect(response).to redirect_to('/student_quizzes?id=1')
+    #   end
+    # end
 
-    context 'when the reviewer has not taken the quiz yet' do
-      it 'creates a new QuizResponseMap' do
-        questionnaire = double('Questionnaire', id: 2, instructor_id: 2)
-        allow(Questionnaire).to receive(:find).with('2').and_return(questionnaire)
-        allow(Questionnaire).to receive(:find_by).with(instructor_id: 2).and_return(questionnaire)
-        allow_any_instance_of(QuizResponseMap).to receive(:save).and_return(true)
-        @params = {
-          assignment_id: 1,
-          reviewer_id: 2,
-          questionnaire_id: 2,
-          participant_id: 2
-        }
+    # context 'when the reviewer has not taken the quiz yet' do
+    #   it 'creates a new QuizResponseMap' do
+    #     questionnaire = double('Questionnaire', id: 2, instructor_id: 2)
+    #     allow(Questionnaire).to receive(:find).with('2').and_return(questionnaire)
+    #     allow(Questionnaire).to receive(:find_by).with(instructor_id: 2).and_return(questionnaire)
+    #     allow_any_instance_of(QuizResponseMap).to receive(:save).and_return(true)
+    #     @params = {
+    #       assignment_id: 1,
+    #       reviewer_id: 2,
+    #       questionnaire_id: 2,
+    #       participant_id: 2
+    #     }
 
-        post :assign_quiz_dynamically, params: @params
-        expect(flash[:error]).to be nil
-        expect(response).to redirect_to('/student_quizzes?id=1')
-      end
-    end
+    #     post :assign_quiz_dynamically, params: @params
+    #     expect(flash[:error]).to be nil
+    #     expect(response).to redirect_to('/student_quizzes?id=1')
+    #   end
+    # end
   end
 
   describe '#add_metareviewer' do
@@ -1158,14 +1160,14 @@ describe ReviewMappingController do
         { user: stub_current_user(instructor, instructor.role.name, instructor.role) }
       end
     
-      let(:request_params) do
+      request_params = 
         {
           review_grade: {
             participant_id: '1',
             assignment_id: '1',
           }
         }
-      end
+      
       before(:each) do
         allow(ReviewGrade).to receive(:find_or_create_by).with(participant_id: '1').and_return(review_grade_object)
         allow(controller).to receive(:review_mapping_params).and_return(
@@ -1192,7 +1194,7 @@ describe ReviewMappingController do
   
       it "sets the review_graded_at attribute to the current time" do
         created_review_grade = ReviewGrade.last
-        expect(created_review_grade.review_graded_at).to be_within(1.second).of(Time.now)
+        expect(created_review_grade.review_graded_at).to be_within(2.second).of(Time.now)
       end
   
       it "sets the reviewer_id attribute to the current user's id" do

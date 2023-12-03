@@ -344,9 +344,9 @@ class ReviewMappingController < ApplicationController
   # It sets an error flash message if provided via params and retrieves the assignment and
   # its associated teams for display.
   def list_mappings
-    if params[:id] == "0"
-      flash[:error] = "Assignment needs to be created in order to assign reviewers!"
-      redirect_to "/assignments/new?private=1"
+    if params[:id] == '0'
+      flash[:error] = 'Assignment needs to be created in order to assign reviewers!'
+      redirect_to '/assignments/new?private=1'
       return
     end
     flash[:error] = params[:msg] if params[:msg]

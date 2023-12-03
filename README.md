@@ -1,5 +1,5 @@
 Expertiza
-=========
+==========
 
 [![Build Status](https://travis-ci.org/expertiza/expertiza.svg?branch=main)](https://travis-ci.org/expertiza/expertiza)
 [![Coverage Status](https://coveralls.io/repos/github/expertiza/expertiza/badge.svg?branch=main)](https://coveralls.io/github/expertiza/expertiza?branch=main)

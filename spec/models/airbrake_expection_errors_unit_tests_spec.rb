@@ -78,8 +78,8 @@ describe 'Airbrake-1766248124300920137' do
   before(:each) do
     allow(Assignment).to receive(:find) {}
     allow(Assignment).to receive(:find).with(1).and_return(build(:assignment))
-    allow(SignedUpTeam).to receive(:find_team_users) {}
-    allow(SignedUpTeam).to receive(:find_team_users).with(1, 1).and_return([double('TeamsUser', t_id: 1)])
+    allow(Team).to receive(:find_team_users) {}
+    allow(Team).to receive(:find_team_users).with(1, 1).and_return([double('TeamsUser', t_id: 1)])
     # users_team = [double("TeamsUser", t_id: 1)]
     # allow(TeamsUser).to receive(:find_by_sql).and_return([double("TeamsUser", t_id: 1)])
     # allow(users_team[0]).to receive(:t_id).and_return(1)

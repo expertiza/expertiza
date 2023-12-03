@@ -149,29 +149,41 @@ class LatePoliciesController < ApplicationController
     # Validates input for create and update forms
     max_penalty = params[:late_policy][:max_penalty].to_i
     penalty_per_unit = params[:late_policy][:penalty_per_unit].to_i
+    valid_penalty = true
+    error_messages = []
 
-    valid_penalty, error_message = duplicate_name_check(is_update)
-    prefix = is_update ? "Cannot edit the policy. " : ""
+    # Validates the name is not a duplicate
+    valid_penalty, name_error = duplicate_name_check(is_update)
+    error_messages << name_error if name_error
 
-    # This check validates the maximum penalty.
-    if max_penalty < penalty_per_unit
-      error_message = prefix + 'The maximum penalty cannot be less than penalty per unit.'
+    # This validates the max_penalty to make sure it's within the correct range
+    if max_penalty_validation(max_penalty, penalty_per_unit)
+      error_messages << "#{error_prefix(is_update)}The maximum penalty must be between the penalty per unit and 100."
       valid_penalty = false
     end
 
-    # This check validates the penalty per unit for a late policy.
-    if penalty_per_unit < 0
-      error_message = 'Penalty per unit cannot be negative.'
+    # This validates the penalty_per_unit and makes sure it's not negative
+    if penalty_per_unit_validation(penalty_per_unit)
+      error_messages << "Penalty per unit cannot be negative."
       valid_penalty = false
     end
 
-    # This checks maximum penalty does not exceed 100.
-    if max_penalty >= 100
-      error_message = prefix + 'Maximum penalty cannot be greater than or equal to 100'
-      valid_penalty = false
-    end
+    [valid_penalty, error_messages.join("\n")]
+  end
 
-    return valid_penalty, error_message
+  # Validate the maximum penalty and ensure it's in the correct range
+  def max_penalty_validation(max_penalty, penalty_per_unit)
+    max_penalty < penalty_per_unit || max_penalty > 100
+  end
+
+  # Validates the penalty per unit
+  def penalty_per_unit_validation(penalty_per_unit)
+    penalty_per_unit < 0
+  end
+
+  # Validation error prefix
+  def error_prefix(is_update)
+    is_update ? "Cannot edit the policy. " : ""
   end
 
   # Create and save the late policy with the required params
@@ -180,6 +192,7 @@ class LatePoliciesController < ApplicationController
     @late_policy.instructor_id = instructor_id
   end
 
+  # Saves the late policy called from create or update
   def save_late_policy
     begin
       @late_policy.save!
@@ -188,7 +201,7 @@ class LatePoliciesController < ApplicationController
         LatePolicy.update_calculated_penalty_objects(penalty_policy)
       end
       # The code at the end of the string gets the name of the last method (create, update) and adds a d (created, updated)
-      flash[:notice] = 'The late policy was successfully #{caller_locations(2,1)[0].label}d.'
+      flash[:notice] = "The late policy was successfully #{caller_locations(2,1)[0].label}d."
     rescue StandardError
       # If something unexpected happens while saving the record in to database then displays a flash notice and redirect to create a new late policy again.
       handle_error('The following error occurred while saving the late policy: ')

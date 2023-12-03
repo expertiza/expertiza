@@ -157,7 +157,6 @@ class SignUpSheetController < ApplicationController
     # to treat all assignments as team assignments
     # Though called participants, @participants are actually records in signed_up_teams table, which
     # is a mapping table between teams and topics (waitlisted recorded are also counted)
-    @participants = SignedUpTeam.find_team_participants(assignment_id, session[:ip])
   end
 
   def set_values_for_new_topic
@@ -218,7 +217,7 @@ class SignUpSheetController < ApplicationController
       # Find whether the user has signed up for any topics; if so the user won't be able to
       # sign up again unless the former was a waitlisted topic
       # if team assignment, then team id needs to be passed as parameter else the user's id
-      users_team = SignedUpTeam.find_team_users(@assignment.id, session[:user].id)
+      users_team = Team.find_team_users(@assignment.id, session[:user].id)
       @selected_topics = if users_team.empty?
                            nil
                          else
@@ -278,7 +277,7 @@ class SignUpSheetController < ApplicationController
       flash[:error] = 'You cannot drop your topic after the drop topic deadline!'
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Dropping topic for ended work: ' + params[:topic_id].to_s)
     else
-      users_team = SignedUpTeam.find_team_users(assignment.id, session[:user].id)
+      users_team = Team.find_team_users(assignment.id, session[:user].id)
       delete_signup_for_topic(params[:topic_id], users_team[0].t_id)
       flash[:success] = 'You have successfully dropped your topic!'
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student has dropped the topic: ' + params[:topic_id].to_s)

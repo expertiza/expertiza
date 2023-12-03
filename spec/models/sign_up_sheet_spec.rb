@@ -60,7 +60,7 @@ end
 
 describe '.confirm_topic' do
   before(:each) do
-    allow(SignedUpTeam).to receive(:find_team_users).and_return([TeamsUser.new])
+    allow(Team).to receive(:find_team_users).and_return([TeamsUser.new])
     allow_any_instance_of(TeamsUser).to receive(:t_id).and_return(1)
     allow(Team).to receive(:find).and_return(Team.new)
   end  

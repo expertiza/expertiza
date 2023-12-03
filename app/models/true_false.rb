@@ -20,7 +20,9 @@ class TrueFalse < QuizQuestion
 
   def isvalid(choice_info)
     @valid = super(choice_info)
-
+    
+    return @valid if @valid != 'valid'
+    
     return 'Please make sure every question has text for all options' unless all_choices_have_text?(choice_info)
 
     #counts the number of choices that are correct

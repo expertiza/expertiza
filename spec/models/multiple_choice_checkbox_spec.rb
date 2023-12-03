@@ -41,24 +41,24 @@ describe MultipleChoiceCheckbox do
      context 'when a choice does not have txt' do
       it 'returns "Please make sure every question has text for all options"' do
        choices = { '1' => { txt: '', iscorrect: '1' }, '2' => { txt: '', iscorrect: '1' }, '3' => { txt: '', iscorrect: '0' }, '4' => { txt: '', iscorrect: '0' } }
-        expect(multiple_choice_checkbox.isvalid(choices)).to eq('Please select a correct answer for all questions')
+        expect(multiple_choice_checkbox.isvalid(choices)).to eq('Please make sure every question has text for all options')
       end
     end
     context 'when no choices are correct' do
       it 'returns "Please select a correct answer for all questions"' do
-        choices = { '1' => { txt: 'choice text', iscorrect: '0' }, '2' => { txt: 'choice text', iscorrect: '0' }, '3' => { txt: 'choice text', iscorrect: '0' }, '4' => { txt: 'choice text', iscorrect: '0' } }
+        choices = { '1' => { txt: 'choice text', iscorrect: 0 }, '2' => { txt: 'choice text', iscorrect: 0 }, '3' => { txt: 'choice text', iscorrect: 0 }, '4' => { txt: 'choice text', iscorrect: 0 } }
         expect(multiple_choice_checkbox.isvalid(choices)).to eq('Please select a correct answer for all questions')
       end
     end
     context 'when only 1 choices are correct' do
       it 'returns "A multiple-choice checkbox question should have more than one correct answer."' do
-        questions = { '1' => { txt: 'question text', iscorrect: '1' }, '2' => { txt: 'question text', iscorrect: '0' }, '3' => { txt: 'question text', iscorrect: '0' }, '4' => { txt: 'question text', iscorrect: '0' } }
+        questions = { '1' => { txt: 'question text', iscorrect: 1 }, '2' => { txt: 'question text', iscorrect: 0 }, '3' => { txt: 'question text', iscorrect: 0 }, '4' => { txt: 'question text', iscorrect: 0 } }
         expect(multiple_choice_checkbox.isvalid(questions)).to eq('A multiple-choice checkbox question should have more than one correct answer.')
       end
     end
     context 'when 2 choices are correct' do
       it 'returns "valid"' do
-        questions = { '1' => { txt: 'question text', iscorrect: '1' }, '2' => { txt: 'question text', iscorrect: '1' }, '3' => { txt: 'question text', iscorrect: '0' }, '4' => { txt: 'question text', iscorrect: '0' } }
+        questions = { '1' => { txt: 'question text', iscorrect: 1 }, '2' => { txt: 'question text', iscorrect: 1 }, '3' => { txt: 'question text', iscorrect: 0 }, '4' => { txt: 'question text', iscorrect: 0 } }
         expect(multiple_choice_checkbox.isvalid(questions)).to eq('valid')
       end
     end

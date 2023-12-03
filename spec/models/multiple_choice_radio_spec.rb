@@ -1,11 +1,11 @@
 describe MultipleChoiceRadio do
   let(:multiple_choice_radio) { build(:multiple_choice_radio, id: 1) }
-  describe '#edit' do 
-    it 'returns the html' do
-      qc = double('QuizQuestionChoice')
+  describe "#edit" do
+    it "returns the html" do
+      qc = double("QuizQuestionChoice")
       allow(QuizQuestionChoice).to receive(:where).with(question_id: 1).and_return([qc, qc, qc, qc])
       allow(qc).to receive(:iscorrect).and_return(true)
-      allow(qc).to receive(:txt).and_return('question text')
+      allow(qc).to receive(:txt).and_return("question text")
 
       html = Nokogiri::HTML(multiple_choice_radio.edit)
 

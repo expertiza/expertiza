@@ -1,4 +1,4 @@
-class ParticipantsController < ApplicationController
+ass ParticipantsController < ApplicationController
   include AuthorizationHelper
   include ParticipantsHelper
   autocomplete :user, :name
@@ -37,9 +37,9 @@ class ParticipantsController < ApplicationController
       can_review = permissions[:can_review]
       can_take_quiz = permissions[:can_take_quiz]
       #E2351 - add corresponding duty fill from permissions
-      duty = permissions[:duty]
+      can_mentor = permissions[:can_mentor]
       if curr_object.is_a?(Assignment)
-        curr_object.add_participant(params[:user][:name], can_submit, can_review, can_take_quiz, duty)
+        curr_object.add_participant(params[:user][:name], can_submit, can_review, can_take_quiz, can_mentor)
       elsif curr_object.is_a?(Course)
         curr_object.add_participant(params[:user][:name])
       end
@@ -61,12 +61,12 @@ class ParticipantsController < ApplicationController
     can_submit = permissions[:can_submit]
     can_review = permissions[:can_review]
     can_take_quiz = permissions[:can_take_quiz]
-    duty = permissions[:duty]
+    can_mentor = permissions[:can_mentor]
     parent_id = participant.parent_id
     # Upon successfully updating the attributes based on user role, a flash message is displayed to the user after the
     # change in the database. This also gives the user the error message if the update fails.
     begin
-      participant.update_attributes(can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz, duty: duty)
+      participant.update_attributes(can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz, can_mentor: can_mentor)
       flash[:success] = 'The role of the selected participants has been successfully updated.'
     rescue StandardError
       flash[:error] = 'The update action failed.'
@@ -198,7 +198,7 @@ class ParticipantsController < ApplicationController
   def participant_params
     params.require(:participant).permit(:can_submit, :can_review, :user_id, :parent_id, :submitted_at,
                                         :permission_granted, :penalty_accumulated, :grade, :type, :handle,
-                                        :time_stamp, :digital_signature, :duty, :can_take_quiz)
+                                        :time_stamp, :digital_signature, :can_mentor, :can_take_quiz)
   end
 
   # Get the user info from the team user
@@ -234,3 +234,4 @@ class ParticipantsController < ApplicationController
     has_topics
   end
 end
+

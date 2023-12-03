@@ -88,7 +88,7 @@ module ParticipantsHelper
     can_review = true
     can_take_quiz = true
   #E2351 pass duty field to match implementation
-    duty = ''
+    can_mentor = false
     case authorization
     when 'reader'
       can_submit = false
@@ -102,20 +102,20 @@ module ParticipantsHelper
       can_submit = true
       can_review = false
       can_take_quiz = false
-  #E2351 - adding a 4th option for mentor, permissions are same as participant but duty field will be filled
-  #with string 'mentor' to match previous project search function
+  #E2351 - adding a 4th option for mentor, permissions are same as participant but has additional permission 'can_mentor'
+  #maintained as a boolean like other permissions
     when 'mentor'
       can_submit = true
       can_review = true
       can_take_quiz = true
-      duty = 'mentor'
+      can_mentor = true
   #end 2351 changes
     else
       can_submit = true
       can_review = true
       can_take_quiz = true
-      duty = ''
+      can_mentor = false
     end
-    { can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz, duty: duty }
+    { can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz, can_mentor: can_mentor }
   end
 end

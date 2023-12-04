@@ -77,8 +77,8 @@ describe TeamsController do
     context 'with two course teams' do
       it 'deletes all the course teams' do
         @course = create(:course)
-        @team1 = create_team_manually(:course_team)
-        @team2 = create_team_manually(:course_team)
+        @team1 = create(:course_team)
+        @team2 = create(:course_team)
         expect { CourseTeam.delete_all }.to change(Team, :count).by(-2)
       end
     end
@@ -102,7 +102,7 @@ describe TeamsController do
         allow(Assignment).to receive(:find).and_return(assignment1)
         request_params = { id: assignment1.id, team: { name: 'no team' } }
         user_session = { user: ta, team_type: 'Assignment' }
-        result = get :create, params: request_params, session: user_session
+        result = get :create_teams, params: request_params, session: user_session
         # status code 302: Redirect url
         expect(result.status).to eq 302
         expect(result).to redirect_to(action: 'list', id: assignment1.id)

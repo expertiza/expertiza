@@ -183,11 +183,13 @@ module ReviewMappingHelper
     end
   end
 
+  # Extracts the files submitted for a particular pair of participant and reviewee
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)
     participant = Participant.find(participant_id)
     team = AssignmentTeam.find(reviewee_team_id)
     html = ''
     unless team.nil? || participant.nil?
+      # Build a path to the review submissions using the team's path and the response map ID
       review_submissions_path = team.path + '_review' + '/' + response_map_id.to_s
       files = team.submitted_files(review_submissions_path)
       html += display_review_files_directory_tree(participant, files) if files.present?

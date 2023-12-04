@@ -424,7 +424,7 @@ class ReviewMappingController < ApplicationController
     begin
       GradingHistory.create(instructor_id: session[:user].id,
                             assignment_id: Participant.find(params[:review_grade][:participant_id]).parent_id,
-                            grading_type: "Review",
+                            grading_type: 'Review',
                             grade_receiver_id: Participant.find(params[:review_grade][:participant_id]).user_id,
                             grade: review_grade.grade_for_reviewer,
                             comment: review_grade.comment_for_reviewer)

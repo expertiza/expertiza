@@ -1,4 +1,4 @@
-ass ParticipantsController < ApplicationController
+class ParticipantsController < ApplicationController
   include AuthorizationHelper
   include ParticipantsHelper
   autocomplete :user, :name

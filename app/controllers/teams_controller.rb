@@ -39,7 +39,7 @@ class TeamsController < ApplicationController
   def list
     init_team_type(params[:type])
     @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == Team.allowed_types[0] or session[:team_type] == Team.allowed_types[2]
-    if @assignment != null
+    unless @assignment.nil?
       if @assignment.auto_assign_mentor
         @model = MentoredTeam
       else

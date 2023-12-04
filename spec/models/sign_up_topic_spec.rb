@@ -186,4 +186,90 @@ describe SignUpTopic do
     end
   end
 
+  describe '#longest_waiting_team' do
+    let(:topic_id) { 1 } # Define topic_id with a suitable value
+
+    context 'when a waitlisted team exists for the topic' do
+      let(:waitlisted_team) { build(:signed_up_team, is_waitlisted: true) }
+
+      before do
+        allow(SignedUpTeam).to receive(:where).with(topic_id: topic_id, is_waitlisted: true).and_return([waitlisted_team])
+      end
+
+      it 'returns the first waitlisted team' do
+        expect(your_class_instance.longest_waiting_team(topic_id)).to eq(waitlisted_team)
+      end
+    end
+
+    context 'when no waitlisted team exists for the topic' do
+      before do
+        allow(SignedUpTeam).to receive(:where).with(topic_id: topic_id, is_waitlisted: true).and_return([])
+      end
+
+      it 'returns nil' do
+        expect(your_class_instance.longest_waiting_team(topic_id)).to be_nil
+      end
+    end
+  end
+
+  describe '#reassign_topic' do
+    context 'when signup record is not waitlisted' do
+      before do
+        allow(SignedUpTeam).to receive(:where).with(topic_id: topic_id, team_id: team_id).and_return([signup_record])
+        allow(signup_record).to receive(:is_waitlisted).and_return(false)
+        allow(your_class_instance).to receive(:longest_waiting_team).with(topic_id).and_return(longest_waiting_team)
+      end
+
+      it 'reassigns the topic to the longest waiting team' do
+        expect(longest_waiting_team).to receive(:is_waitlisted=).with(false)
+        expect(longest_waiting_team).to receive(:save).once
+        expect(SignedUpTeam).to receive(:drop_off_waitlists).with(longest_waiting_team.team_id).once
+        expect(SignedUpTeam).to receive(:drop_off_signup_record).with(topic_id, team_id).once
+
+        your_class_instance.reassign_topic(team_id) # Pass team_id as an argument
+      end
+    end
+
+    context 'when signup record is waitlisted' do
+      before do
+        allow(SignedUpTeam).to receive(:where).with(topic_id: topic_id, team_id: team_id).and_return([signup_record])
+        allow(signup_record).to receive(:is_waitlisted).and_return(true)
+      end
+
+      it 'does not reassign the topic' do
+        expect(your_class_instance).not_to receive(:longest_waiting_team)
+        expect(longest_waiting_team).not_to receive(:is_waitlisted=)
+        expect(longest_waiting_team).not to receive(:save)
+        expect(SignedUpTeam).not_to receive(:drop_off_waitlists)
+
+        expect(SignedUpTeam).to receive(:drop_off_signup_record).with(topic_id, team_id).once
+
+        your_class_instance.reassign_topic(team_id) # Pass team_id as an argument
+      end
+    end
+
+    context 'when no signup record is found' do
+      before do
+        allow(SignedUpTeam).to receive(:where).with(topic_id: topic_id, team_id: team_id).and_return([])
+      end
+
+      it 'does not reassign the topic and handles gracefully' do
+        # Your expectations here
+        your_class_instance.reassign_topic(team_id) # Pass team_id as an argument
+      end
+    end
+
+    context 'when no longest waiting team is found' do
+      before do
+        allow(SignedUpTeam).to receive(:where).with(topic_id: topic_id, team_id: team_id).and_return([signup_record])
+        allow(signup_record).to receive(:is_waitlisted).and_return(false)
+        allow(your_class_instance).to receive(:longest_waiting_team).with(topic_id).and_return(nil)
+      end
+
+      it 'does not reassign the topic and handles gracefully' do
+        # Your expectations here
+        your_class_instance.reassign_topic(team_id) # Pass team_id as an argument
+      end
+    end
+  end
 end

@@ -61,7 +61,7 @@ class MentorManagement
 
     # RuboCop 'use guard clause instead of nested conditionals'
     # return if there's already a mentor in place
-    return if team.participants.any? { |participant| participant.duty == Participant::DUTY_MENTOR }
+    return if team.participants.any? { |participant| participant.can_mentor == true }
 
     mentor_user = select_mentor(assignment_id)
 
@@ -92,7 +92,7 @@ class MentorManagement
   # Checks the Participant relation to see if a row exists with
   # user_id == user.id that also has 'mentor' in the duty attribute.
   def self.user_a_mentor?(user)
-    Participant.exists?(user_id: user.id, duty: Participant::DUTY_MENTOR)
+    Participant.exists?(user_id: user.id, can_mentor: true)
   end
 
   # Select all the participants who's duty in the participant
@@ -101,7 +101,7 @@ class MentorManagement
   #
   # @see participant.rb for the value of DUTY_MENTOR
   def self.mentors_for_assignment(assignment_id)
-    Participant.where(parent_id: assignment_id, duty: Participant::DUTY_MENTOR)
+    Participant.where(parent_id: assignment_id, can_mentor: true)
   end
 
   # Produces a hash mapping mentor's user_ids to the aggregated

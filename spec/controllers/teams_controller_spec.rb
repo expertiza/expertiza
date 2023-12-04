@@ -20,7 +20,7 @@ describe TeamsController do
   describe 'create teams method' do
     context 'when correct parameters are passed' do
       it 'creates teams with random names' do
-        allow_any_instance_of(TeamsController).to receive(:parent_by_id).and_return(assignment1)
+        allow_any_instance_of(TeamsController).to receive(:find_parent_by_id).and_return(assignment1)
         request_params = { id: assignment1.id, team_size: 2 }
         user_session = { user: instructor, team_type: 'Assignment' }
         result = get :create_teams, params: request_params, session: user_session
@@ -77,8 +77,8 @@ describe TeamsController do
     context 'with two course teams' do
       it 'deletes all the course teams' do
         @course = create(:course)
-        @team1 = create(:course_team)
-        @team2 = create(:course_team)
+        @team1 = create_team_manually(:course_team)
+        @team2 = create_team_manually(:course_team)
         expect { CourseTeam.delete_all }.to change(Team, :count).by(-2)
       end
     end
@@ -218,12 +218,12 @@ describe TeamsController do
     end
   end
   
-  describe '#bequeath_all' do
+  describe '#transfer_all' do
     context 'when the team type is user_session' do
       it 'flashes an error' do
         user_session = {team_type: 'Course', user: ta}
         request_params = { id: team5.id }
-        post :bequeath_all, params: request_params, session: user_session 
+        post :transfer_all, params: request_params, session: user_session 
         expect(flash[:error]).to eq('Invalid team type for bequeath all')
       end
     end
@@ -233,7 +233,7 @@ describe TeamsController do
         user_session = {team_type: 'Assignment', user: ta}
         allow(Assignment).to receive(:find).and_return(assignment1)
         allow_any_instance_of(Assignment).to receive(:course_id).and_return(nil)
-        post :bequeath_all, params: request_params, session: user_session
+        post :transfer_all, params: request_params, session: user_session
         expect(flash[:error]).to eq('No course was found for this assignment.')
       end
     end
@@ -245,7 +245,7 @@ describe TeamsController do
         allow_any_instance_of(Assignment).to receive(:course_id).and_return(1)
         allow(Course).to receive(:find).and_return(course1)
         allow_any_instance_of(Course).to receive(:course_teams).and_return([team5, team6])
-        post :bequeath_all, params: request_params, session: user_session
+        post :transfer_all, params: request_params, session: user_session
         expect(flash[:error]).to eq('The course already has associated teams')
       end
     end
@@ -258,7 +258,7 @@ describe TeamsController do
         allow(Course).to receive(:find).and_return(course1)
         allow_any_instance_of(Course).to receive(:course_teams).and_return([])
         allow_any_instance_of(Assignment).to receive(:teams).and_return([team1, team2])
-        post :bequeath_all, params: request_params, session: user_session
+        post :transfer_all, params: request_params, session: user_session
         expect(flash[:note]).to eq("2 teams were successfully copied to \"TestCourse\"")
       end
     end

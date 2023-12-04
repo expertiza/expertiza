@@ -5,7 +5,7 @@ class TeamsController < ApplicationController
 
   # Check if the current user has TA privileges
   def action_allowed?
-    current_user_has_ta_privileges?
+    current_user_has_ta_privileges?  
   end
 
   # attempt to initialize team type in session
@@ -16,12 +16,12 @@ class TeamsController < ApplicationController
   end
 
   # retrieve an object's parent by its ID
-  def parent_by_id(id)
+  def find_parent_by_id(id)
     Object.const_get(session[:team_type]).find(id)
   end
 
   # retrieve an object's parent from the object's parent ID
-  def parent_from_child(child)
+  def find_parent_from_child(child)
     Object.const_get(session[:team_type]).find(child.parent_id)
   end
 
@@ -35,7 +35,7 @@ class TeamsController < ApplicationController
   end
 
   def find_parent(id)
-    parent_by_id(id)
+    find_parent_by_id(id)
   end
   
   def create_random_teams(parent)
@@ -89,7 +89,7 @@ class TeamsController < ApplicationController
   end
 
   # Called when a instructor tries to create an empty team manually
-    def create
+    def create_team_manually
     parent = find_parent(params[:id])
     begin
       create_team(parent)
@@ -102,16 +102,16 @@ class TeamsController < ApplicationController
   end
   
   def find_parent(id)
-    parent_by_id(id)
+    find_parent_by_id(id)
   end
   
   def create_team(parent)
     Team.check_for_existing(parent, params[:team][:name], session[:team_type])
-    @team = Object.const_get(session[:team_type] + 'Team').create(name: params[:team][:name], parent_id: parent.id)
+    @team = Object.const_get(session[:team_type] + 'Team').create_team_manually(name: params[:team][:name], parent_id: parent.id)
   end
   
   def create_team_node(parent)
-    TeamNode.create(parent_id: parent.id, node_object_id: @team.id)
+    TeamNode.create_team_manually(parent_id: parent.id, node_object_id: @team.id)
   end
   
   def set_undo_link_for_team_creation
@@ -126,7 +126,7 @@ class TeamsController < ApplicationController
   # Update the team
   def update
     @team = find_team(params[:id])
-    parent = parent_from_child(@team)
+    parent = find_parent_from_child(@team)
   
     begin
       update_team_name(parent, params[:team][:name])
@@ -232,12 +232,12 @@ class TeamsController < ApplicationController
   end
 
   # Handovers all teams to the course that contains the corresponding assignment
-  def bequeath_all
-    return redirect_with_error if invalid_team_type_for_bequeath?
+  def transfer_all
+    return redirect_with_error if invalid_team_type_for_transfer?
     copy_teams(Team.team_operation[:bequeath])
   end
   
-  def invalid_team_type_for_bequeath?
+  def invalid_team_type_for_transfer?
     session[:team_type] == Team.allowed_types[1]
   end
   
@@ -273,14 +273,14 @@ class TeamsController < ApplicationController
   def choose_copy_type(assignment, operation)
     course = Course.find(assignment.course_id)
     if operation == Team.team_operation[:bequeath]
-      bequeath_copy(assignment, course)
+      transfer_copy(assignment, course)
     else
       inherit_copy(assignment, course)
     end
   end
 
   # Method to perform a copy of assignment teams to course
-  def bequeath_copy(assignment, course)
+  def transfer_copy(assignment, course)
     if course_has_teams?(course)
       set_flash_error('The course already has associated teams')
       return

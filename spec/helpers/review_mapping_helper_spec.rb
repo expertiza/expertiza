@@ -979,7 +979,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(result[:stand_dev]).to eq(1.71)
     end
     it 'returns the mean, min, max, variance, and standard deviation of the intervals' do
-      expect(calculate_key_chart_information([10, 15, 20])).to eq( mean: 15.0, min: 10, max: 20, variance: 16.67, stand_dev: 4.08)
+      expect(calculate_key_chart_information([10, 15, 20])).to eq(mean: 15.0, min: 10, max: 20, variance: 16.67, stand_dev: 4.08)
 
       expect(calculate_key_chart_information([5, 8, 12, 15, 20])).to eq(mean: 12.0, min: 5, max: 20, variance: 27.6, stand_dev: 5.25)
     end
@@ -999,32 +999,32 @@ describe ReviewMappingHelper, type: :helper do
   describe 'test calibration_report_css_class' do
     context 'when the difference is 0' do
       it 'returns c5 as the CSS class' do
-        css_class_0 = helper.calibration_report_css_class(0)
-        expect(css_class_0). to eq('c5')
+        css0 = helper.calibration_report_css_class(0)
+        expect(css0). to eq('c5')
       end
     end
     context 'when the difference is 1' do
       it 'returns c4 as the CSS class' do
-        css_class_1 = helper.calibration_report_css_class(-1)
-        expect(css_class_1). to eq('c4')
+        css1 = helper.calibration_report_css_class(-1)
+        expect(css1). to eq('c4')
       end
     end
     context 'when the difference is 2' do
       it 'returns c3 as the CSS class' do
-        css_class_2 = helper.calibration_report_css_class(-2)
-        expect(css_class_2). to eq('c3')
+        css2 = helper.calibration_report_css_class(-2)
+        expect(css2). to eq('c3')
       end
     end
     context 'when the difference is 3' do
       it 'returns c2 as the CSS class' do
-        css_class_3 = helper.calibration_report_css_class(-3)
-        expect(css_class_3). to eq('c2')
+        css3 = helper.calibration_report_css_class(-3)
+        expect(css3). to eq('c2')
       end
     end
     context 'when the difference is greater than 3' do
       it 'returns c1 as the CSS class' do
-        css_class_3 = helper.calibration_report_css_class(6)
-        expect(css_class_3). to eq('c1')
+        css4 = helper.calibration_report_css_class(6)
+        expect(css4). to eq('c1')
       end
     end
   end

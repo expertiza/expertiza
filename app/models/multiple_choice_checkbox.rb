@@ -101,7 +101,7 @@ class MultipleChoiceCheckbox < QuizQuestion
   end
 
   def is_correct_answer_text(answer)
-    if answer.iscorrect
+    if answer.iscorrect == 1 || answer.iscorrect == "1"
       "<b> #{answer.txt} </b> -- Correct <br>"
     else
       "#{answer.txt} <br>"

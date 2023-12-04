@@ -27,7 +27,7 @@ class MultipleChoiceRadio < QuizQuestion
     return "Please make sure every question has text for all options" unless all_choices_have_text?(choice_info)
 
     #counts the number of choices that are correct
-    correct_count = choice_info.count { |_idx, value| value.key?(:iscorrect) }
+    correct_count = choice_info.count { |_idx, value| value[:iscorrect] == 1 || value[:iscorrect] == "1" }
 
     return "Please select a correct answer for all questions" if correct_count.zero?
 
@@ -93,7 +93,7 @@ class MultipleChoiceRadio < QuizQuestion
     end
 
     def is_correct_answer_text(answer)
-      if answer.iscorrect
+      if answer.iscorrect == 1 || answer.iscorrect == "1"
         "<b> #{answer.txt} </b> -- Correct <br>"
       else
         "#{answer.txt} <br>"

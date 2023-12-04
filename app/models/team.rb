@@ -14,7 +14,7 @@ class Team < ApplicationRecord
   # Allowed types of teams -- ASSIGNMENT teams or COURSE teams
   def self.allowed_types
     # non-interpolated array of single-quoted strings
-    %w[Assignment Course]
+    %w[Assignment Course Mentored]
   end
 
   # Get the participants of the given team
@@ -92,14 +92,6 @@ class Team < ApplicationRecord
     can_add_member
   end
 
-#E2351 Added an additional to after add_member is called so that MentorManagement can be ran on the teams
-  def add_member_mentor_check(user, _assignment_id = nil)
-      add_member_return = add_member(user, _assignment_id)
-      if add_member_return
-        MentorManagement.assign_mentor(_assignment_id, id)
-      end
-      add_member_return
-  end
   # Define the size of the team
   def self.size(team_id)
     #TeamsUser.where(team_id: team_id).count
@@ -165,8 +157,7 @@ class Team < ApplicationRecord
         break if next_team_member_index >= users.length
 
         user = users[next_team_member_index]
-#E2351 Swapped the add_member to use the new one
-        team.add_member_mentor_check(user, parent.id)
+        team.add_member(user, parent.id)
         next_team_member_index += 1
       end
     end
@@ -178,8 +169,7 @@ class Team < ApplicationRecord
       curr_team_size = Team.size(team.id)
       member_num_difference = min_team_size - curr_team_size
       while member_num_difference > 0
-#E2351 Swapped the add_member to use the new one
-        team.add_member_mentor_check(users.first, parent.id)
+        team.add_member(users.first, parent.id)
         users.delete(users.first)
         member_num_difference -= 1
         break if users.empty?

@@ -38,8 +38,8 @@ class TeamsController < ApplicationController
   # Displays list of teams for a parent object(either assignment/course)
   def list
     init_team_type(params[:type])
-    @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == Team.allowed_types[0]
-    @is_valid_assignment = session[:team_type] == Team.allowed_types[0] && @assignment.max_team_size > 1
+    @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == Team.allowed_types[0] or session[:team_type] == Team.allowed_types[2]
+    @is_valid_assignment = (session[:team_type] == Team.allowed_types[0] or session[:team_type] == Team.allowed_types[2]) && @assignment.max_team_size > 1
     begin
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams

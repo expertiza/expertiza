@@ -206,7 +206,12 @@ class LatePoliciesController < ApplicationController
     rescue StandardError
       error_thrown = true
       # If something unexpected happens while saving the record in to database then displays a flash notice and redirect to create a new late policy again.
-      handle_error('The following error occurred while saving the late policy: ')
+      if caller_locations(2,1)[0].label == 'update'
+        message_thrown = 'The following error occurred while updating the late policy: '
+      else
+        message_thrown = 'The following error occurred while saving the late policy: '
+      end
+      handle_error(message_thrown)
     end
     error_thrown
   end

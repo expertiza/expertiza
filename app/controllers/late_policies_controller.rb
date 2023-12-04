@@ -63,7 +63,7 @@ class LatePoliciesController < ApplicationController
       create_new_late_policy(late_policy_params)
       error_thrown = save_late_policy
       if error_thrown
-        redirec_to action: 'new'
+        redirect_to action: 'new'
       else
         redirect_to action: 'index'
       end
@@ -78,8 +78,8 @@ class LatePoliciesController < ApplicationController
     penalty_policy = LatePolicy.find(params[:id])
 
     # First this function validates the input then save if the input is valid.
-    _valid_penalty, error_message = validate_input(true)
-    if error_message
+    valid_penalty, error_message = validate_input(true)
+    if !valid_penalty
       handle_error(error_message)
       redirect_to action: 'edit', id: params[:id]
     # If there are no errors, then save the record.

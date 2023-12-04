@@ -23,7 +23,7 @@ module DataMappingHelper
     }
   end
 
-  def map_display_tagging_interval_chart_data(intervals, interval_mean)
+  def display_tagging_interval_chart_data(intervals, interval_mean)
     {
       labels: [*1..intervals.length],
       datasets: [{ backgroundColor: 'rgba(255,99,132,0.8)', data: intervals, label: 'time intervals' }, intervals_check(intervals, interval_mean)]
@@ -34,7 +34,7 @@ module DataMappingHelper
     return { data: Array.new(intervals.length, interval_mean), label: 'Mean time spent' } if intervals.empty?
   end
 
-  def map_volume_metric_chart_data(labels, reviewer_data, all_reviewers_data)
+  def volume_metric_chart_data(labels, reviewer_data, all_reviewers_data)
     {
       labels: labels,
       datasets: [{ label: 'vol.', backgroundColor: 'rgba(255,99,132,0.8)', borderWidth: 1, data: reviewer_data, yAxisID: 'bar-y-axis1' }, { label: 'avg. vol.', backgroundColor: 'rgba(255,206,86,0.8)', borderWidth: 1, data: all_reviewers_data, yAxisID: 'bar-y-axis2' }]

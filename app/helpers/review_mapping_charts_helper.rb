@@ -26,7 +26,7 @@ module ReviewMappingChartsHelper
   # The data of all the reviews is displayed in the form of a bar chart
   def display_volume_metric_chart(reviewer)
     labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
-    data = map_volume_metric_chart_data(labels, reviewer_data, all_reviewers_data)
+    data = volume_metric_chart_data(labels, reviewer_data, all_reviewers_data)
     options = provide_volume_metric_options
     horizontal_bar_chart data, options
   end
@@ -40,7 +40,7 @@ module ReviewMappingChartsHelper
       interval_mean = intervals.reduce(:+) / intervals.size.to_f
     end
     # build the parameters for the chart
-    data = map_display_tagging_interval_chart_data(intervals, interval_mean)
+    data = display_tagging_interval_chart_data(intervals, interval_mean)
     options = provide_tagging_options
     line_chart data, options
   end
@@ -60,6 +60,7 @@ module ReviewMappingChartsHelper
     return nil if intervals.empty?
 
     metrics = {}
+    # calculate various metric values
     metrics[:mean] = calculate_mean(intervals, interval_precision)
     metrics[:min] = intervals.min
     metrics[:max] = intervals.max

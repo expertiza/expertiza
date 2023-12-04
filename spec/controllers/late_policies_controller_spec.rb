@@ -14,13 +14,16 @@ describe LatePoliciesController do
     late_policy
   end
 
-  def request_params(policy_name, max_penalty, penalty_per_unit) {
-    late_policy: {
-      max_penalty: max_penalty,
-      penalty_per_unit: penalty_per_unit,
-      policy_name: policy_name
+  def request_params(policy_name, max_penalty, penalty_per_unit, do_id=false, id=0)
+    params = {
+      late_policy: {
+        max_penalty: max_penalty,
+        penalty_per_unit: penalty_per_unit,
+        policy_name: policy_name
+      }
     }
-  }
+    params[:late_policy][:id] = id if do_id
+    params
   end
 
   describe 'GET #index' do
@@ -159,7 +162,7 @@ describe LatePoliciesController do
     end
     context 'when maximum penalty is less than penalty per unit' do
       it 'throws a flash error ' do
-        post :update, params: request_params('Policy2', 30, 100)
+        post :update, params: request_params('Policy2', 30, 100, true, 1)
         expect(flash[:error]).to eq('Cannot edit the policy. The maximum penalty must be between the penalty per unit and 100.')
         expect(response).to redirect_to('/late_policies/1/edit')
       end
@@ -170,7 +173,7 @@ describe LatePoliciesController do
         allow(LatePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(true)
       end
       it 'throws a flash error ' do
-        post :update, params: request_params('Policy1', 30, 10)
+        post :update, params: request_params('Policy1', 30, 10, true, 1)
         expect(flash[:error]).to eq('Cannot edit the policy. A policy with the same name Policy1 already exists.')
       end
     end
@@ -180,7 +183,7 @@ describe LatePoliciesController do
         allow(LatePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
       end
       it 'throws a flash error ' do
-        post :update, params: request_params('Invalid_Policy', 30, 10)
+        post :update, params: request_params('Invalid_Policy', 30, 10, true, 1)
         expect(flash[:error]).to eq('The following error occurred while updating the late policy: ')
       end
     end

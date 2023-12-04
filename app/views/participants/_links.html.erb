@@ -12,13 +12,14 @@
   <%= link_to 'Copy participants from course', :action => 'inherit', :id => @root_node.node_object_id %>  |
   <%= link_to 'Copy participants to course', :action => 'bequeath_all', :id => @root_node.node_object_id %><BR/>
 <% end %>
+<!-- E2351 Added a duty field at the end of the expected fields -->
 <%= link_to 'Import '+@model.to_s.downcase+' participants',
             :controller=>'import_file',
             :action=>'start',
             :model => @model+'Participant',
             :title => @model+' Participants',
-            :expected_fields => 'username&nbsp;&nbsp;|&nbsp;&nbsp;full name (first [middle] last)&nbsp;&nbsp;|&nbsp;&nbsp;e-mail address&nbsp;&nbsp;|&nbsp;&nbsp;password',
-            :id => @parent.id %> |
+            :expected_fields => 'username&nbsp;&nbsp;|&nbsp;&nbsp;full name (first [middle] last)&nbsp;&nbsp;|&nbsp;&nbsp;e-mail address&nbsp;&nbsp;|&nbsp;&nbsp;password&nbsp;&nbsp;|&nbsp;&nbsp;duty',
+	    :id => @parent.id %> |
 <%= link_to 'Export '+@model.to_s.downcase+' participants',
             :controller=>'export_file',
             :action=>'start',

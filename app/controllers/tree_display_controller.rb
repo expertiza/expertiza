@@ -78,7 +78,7 @@ class TreeDisplayController < ApplicationController
   # Returns the contents of each top level folder as a json object.
   def get_folder_contents
     # Get all child nodes associated with a top level folder that the logged in user is authorized
-    # to view. Top level folders include Questionaires, Courses, and Assignments.
+    # to view. Top level folders include Questionnaires, Courses, and Assignments.
     folders = {}
     FolderNode.includes(:folder).get.each do |folder_node|
       child_nodes = folder_node.get_children(nil, nil, session[:user].id, nil, nil)
@@ -100,7 +100,7 @@ class TreeDisplayController < ApplicationController
   # Returns the contents of only the specified folder
   def get_specific_folder_contents
     # Get all child nodes associated with a top level folder that the logged in user is authorized
-    # to view. Top level folders include Questionaires, Courses, and Assignments.
+    # to view. Top level folders include Questionnaires, Courses, and Assignments.
     folders = {}
     FolderNode.includes(:folder).get.each do |folder_node|
       child_nodes = folder_node.get_children(nil, nil, session[:user].id, nil, nil)

@@ -14,7 +14,7 @@ class Team < ApplicationRecord
   # Allowed types of teams -- ASSIGNMENT teams or COURSE teams
   def self.allowed_types
     # non-interpolated array of single-quoted strings
-    %w[Assignment Course]
+    %w[Assignment Course Mentored]
   end
 
   # Get the participants of the given team
@@ -94,7 +94,16 @@ class Team < ApplicationRecord
 
   # Define the size of the team
   def self.size(team_id)
-    TeamsUser.where(team_id: team_id).count
+    #TeamsUser.where(team_id: team_id).count
+    count = 0
+    members = TeamsUser.where(team_id: team_id)
+    members.each do |member|
+      member_name = member.name
+      unless member_name.include?(' (Mentor)') 
+        count = count + 1
+      end
+    end
+    count
   end
 
   # Copy method to copy this team
@@ -117,7 +126,7 @@ class Team < ApplicationRecord
   # Start by adding single members to teams that are one member too small.
   # Add two-member teams to teams that two members too small. etc.
   def self.randomize_all_by_parent(parent, team_type, min_team_size)
-    participants = Participant.where(parent_id: parent.id, type: parent.class.to_s + 'Participant')
+    participants = Participant.where(parent_id: parent.id, type: parent.class.to_s + 'Participant', duty: [nil, ''])
     participants = participants.sort { rand(-1..1) }
     users = participants.map { |p| User.find(p.user_id) }.to_a
     # find teams still need team members and users who are not in any team

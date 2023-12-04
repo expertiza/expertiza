@@ -56,17 +56,17 @@ class LatePoliciesController < ApplicationController
     valid_penalty, error_message = validate_input
     if error_message
       handle_error(error_message)
-      redirect_to_policy('new')
+      redirect_to action: 'new'
     end
 
     # If penalty  is valid then tries to update and save.
     if valid_penalty
       create_new_late_policy(late_policy_params)
       save_late_policy
-      redirect_to_policy('index')
+      redirect_to action: 'index'
     # If any of above checks fails, then redirect to create a new late policy again.
     else
-      redirect_to_policy('new')
+      redirect_to action: 'new'
     end
   end
 
@@ -78,17 +78,17 @@ class LatePoliciesController < ApplicationController
     _valid_penalty, error_message = validate_input(true)
     if error_message
       handle_error(error_message)
-      redirect_to_policy('edit')
+      redirect_to action: 'edit', id: params[:id]
     # If there are no errors, then save the record.
     else
       begin
         penalty_policy.update_attributes(late_policy_params)
         save_late_policy
-        redirect_to_policy('index')
+        redirect_to action: 'index'
       # If something unexpected happens while updating, then redirect to the edit page of that policy again.
       rescue StandardError
         handle_error('The following error occurred while updating the late policy: ')
-        redirect_to_policy('edit')
+        redirect_to action: 'edit', id: params[:id]
       end
     end
   end
@@ -205,22 +205,12 @@ class LatePoliciesController < ApplicationController
     rescue StandardError
       # If something unexpected happens while saving the record in to database then displays a flash notice and redirect to create a new late policy again.
       handle_error('The following error occurred while saving the late policy: ')
-      redirect_to_policy('new')
+      redirect_to action: 'new'
     end
   end
 
   # A method to extrapolate out the flashing of error messages
   def handle_error(error_message)
     flash[:error] = error_message
-  end
-
-  # A method to extrapolate out the redirecting to policy controller states
-  def redirect_to_policy(location)
-    if location == "edit"
-      # If the location is the edit screen, use the old id that was inputted
-      redirect_to action: location, id: params[:id]
-    else
-      redirect_to action: location
-    end
   end
 end

@@ -170,7 +170,7 @@ class GradesController < ApplicationController
     begin
       GradingHistory.create(instructor_id: session[:user].id,
                             assignment_id: participant.assignment.id,
-                            grading_type: "Submission",
+                            grading_type: 'Submission',
                             grade_receiver_id: @team.id,
                             grade: @team.grade_for_submission,
                             comment: @team.comment_for_submission)

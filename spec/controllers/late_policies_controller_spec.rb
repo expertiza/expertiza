@@ -16,8 +16,8 @@ describe LatePoliciesController do
 
   def request_params(policy_name, max_penalty, penalty_per_unit) {
     late_policy: {
-      max_penalty: max_penalty
-      penalty_per_unit: penalty_per_unit
+      max_penalty: max_penalty,
+      penalty_per_unit: penalty_per_unit,
       policy_name: policy_name
     }
   }

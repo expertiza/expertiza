@@ -56,14 +56,17 @@ class LatePoliciesController < ApplicationController
     valid_penalty, error_message = validate_input
     if error_message
       handle_error(error_message)
-      redirect_to action: 'new'
     end
 
     # If penalty  is valid then tries to update and save.
     if valid_penalty
       create_new_late_policy(late_policy_params)
-      save_late_policy
-      redirect_to action: 'index'
+      error_thrown = save_late_policy
+      if error_thrown
+        redirec_to action: 'new'
+      else
+        redirect_to action: 'index'
+      end
     # If any of above checks fails, then redirect to create a new late policy again.
     else
       redirect_to action: 'new'
@@ -81,14 +84,12 @@ class LatePoliciesController < ApplicationController
       redirect_to action: 'edit', id: params[:id]
     # If there are no errors, then save the record.
     else
-      begin
-        penalty_policy.update_attributes(late_policy_params)
-        save_late_policy
-        redirect_to action: 'index'
-      # If something unexpected happens while updating, then redirect to the edit page of that policy again.
-      rescue StandardError
-        handle_error('The following error occurred while updating the late policy: ')
+      penalty_policy.update_attributes(late_policy_params)
+      error_thrown = save_late_policy
+      if error_thrown
         redirect_to action: 'edit', id: params[:id]
+      else
+        redirect_to action: 'index'
       end
     end
   end
@@ -149,7 +150,6 @@ class LatePoliciesController < ApplicationController
     # Validates input for create and update forms
     max_penalty = params[:late_policy][:max_penalty].to_i
     penalty_per_unit = params[:late_policy][:penalty_per_unit].to_i
-    valid_penalty = true
     error_messages = []
 
     # Validates the name is not a duplicate
@@ -194,6 +194,7 @@ class LatePoliciesController < ApplicationController
 
   # Saves the late policy called from create or update
   def save_late_policy
+    error_thrown = false
     begin
       @late_policy.save!
       if caller_locations(2,1)[0].label == 'update'
@@ -203,10 +204,11 @@ class LatePoliciesController < ApplicationController
       # The code at the end of the string gets the name of the last method (create, update) and adds a d (created, updated)
       flash[:notice] = "The late policy was successfully #{caller_locations(2,1)[0].label}d."
     rescue StandardError
+      error_thrown = true
       # If something unexpected happens while saving the record in to database then displays a flash notice and redirect to create a new late policy again.
       handle_error('The following error occurred while saving the late policy: ')
-      redirect_to action: 'new'
     end
+    error_thrown
   end
 
   # A method to extrapolate out the flashing of error messages

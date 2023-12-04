@@ -99,7 +99,7 @@ describe LatePoliciesController do
       end
       it 'throws a flash error ' do
         post :create, params: request_params('Policy1', 10, 30)
-        expect(flash[:error]).to eq('The maximum penalty cannot be less than penalty per unit.')
+        expect(flash[:error]).to eq('The maximum penalty must be between the penalty per unit and 100.')
         expect(response).to redirect_to('/late_policies/new')
       end
     end
@@ -111,7 +111,7 @@ describe LatePoliciesController do
       end
       it 'throws a flash error ' do
         post :create, params: request_params('Policy1', 101, 30)
-        expect(flash[:error]).to eq('Maximum penalty cannot be greater than or equal to 100')
+        expect(flash[:error]).to eq('The maximum penalty must be between the penalty per unit and 100.')
         expect(response).to redirect_to('/late_policies/new')
       end
     end
@@ -160,7 +160,7 @@ describe LatePoliciesController do
     context 'when maximum penalty is less than penalty per unit' do
       it 'throws a flash error ' do
         post :update, params: request_params('Policy2', 30, 100)
-        expect(flash[:error]).to eq('Cannot edit the policy. The maximum penalty cannot be less than penalty per unit.')
+        expect(flash[:error]).to eq('Cannot edit the policy. The maximum penalty must be between the penalty per unit and 100.')
         expect(response).to redirect_to('/late_policies/1/edit')
       end
     end

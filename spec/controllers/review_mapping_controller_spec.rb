@@ -1010,13 +1010,10 @@ describe ReviewMappingController do
   describe '#automatic_review_mapping' do
     before(:each) do
       allow(AssignmentParticipant).to receive(:where).with(parent_id: 1).and_return([participant, participant1, participant2])
+      allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team, team1])
     end
 
     context 'when teams is not empty' do
-      before(:each) do
-        allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team, team1])
-      end
-
       context 'when all nums in params are 0' do
         it 'shows an error flash message and redirects to review_mapping#list_mappings page' do
           request_params = {
@@ -1167,7 +1164,7 @@ describe ReviewMappingController do
             assignment_id: '1',
           }
         }
-      
+
       before(:each) do
         allow(ReviewGrade).to receive(:find_or_create_by).with(participant_id: '1').and_return(review_grade_object)
         allow(controller).to receive(:review_mapping_params).and_return(

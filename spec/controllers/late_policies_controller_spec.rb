@@ -31,6 +31,7 @@ describe LatePoliciesController do
     },
     id: id
   }
+  end
 
   describe 'GET #index' do
     context 'when index is called' do

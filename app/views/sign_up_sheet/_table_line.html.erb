@@ -35,6 +35,7 @@
 </script>
 
 <input name="hidden_topic_id" type="hidden" value=<%=topic.id %> >
+<td><input type="checkbox" class="topic-checkbox" name="selected_topics[]" value="<%= topic.id %>"></td>
 
 <td id='topic_id'><%= topic.topic_identifier %></td>
 <td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>

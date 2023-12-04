@@ -13,18 +13,19 @@ class QuizQuestion < Question
 
   def view_question_text
     @html = "<b>#{txt}</b><br />"
-    @html << "Question Type: " + type + "<br />"
-    @html << "Question Weight: " + weight.to_s + "<br />"
+    @html << "Question Type: #{type} <br />"
+    @html << "Question Weight:#{weight.to_s} <br />"
     @html << create_choices if quiz_question_choices.present?
     @html.html_safe
   end
 
   def view_completed_question; end
 
+  #check if a question or choice input is valid 
   def isvalid(choice_info)
-    @valid = "valid"
-    @valid = "Please make sure all questions have text" if txt == ""
-    @valid
+    @validity_message = "valid"
+    @validity_message = "Please make sure all questions have text" if txt == ""
+    @validity_message
   end
 
   private

@@ -63,6 +63,7 @@ class LatePoliciesController < ApplicationController
       create_new_late_policy(late_policy_params)
       error_thrown = save_late_policy
       if error_thrown
+        # If there was an error thrown go to new, otherwise go to index
         redirect_to action: 'new'
       else
         redirect_to action: 'index'
@@ -86,6 +87,7 @@ class LatePoliciesController < ApplicationController
     else
       penalty_policy.update_attributes(late_policy_params)
       error_thrown = save_late_policy
+      # If there was an error thrown, go back to edit, otherwise go to index
       if error_thrown
         redirect_to action: 'edit', id: params[:id]
       else

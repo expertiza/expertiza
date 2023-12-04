@@ -7,7 +7,7 @@ class GradingHistoriesController < ApplicationController
     # admins and superadmins are always allowed
     return true if current_user_has_admin_privileges?
     # populate assignment fields
-    assignment_for_history(params[:grade_type])
+    populate_assignment_fields
     # if not admin/superadmin, check permissions
     if @assignment.instructor_id == current_user.id
       true
@@ -17,6 +17,11 @@ class GradingHistoriesController < ApplicationController
     elsif @assignment.course_id && Course.find(@assignment.course_id).instructor_id == current_user.id
       true
     end
+  end
+
+  private
+  def populate_assignment_fields
+    assignment_for_history(params[:grade_type])
   end
 
   # populate the assignment fields according to type

@@ -57,7 +57,7 @@ module ReviewMappingChartsHelper
 
   def metric_information(intervals, interval_precision)
     # Get Metrics once tagging intervals are available
-    return nil if intervals.empty?
+    return {} if intervals.empty?
 
     metrics = {}
     # calculate various metric values

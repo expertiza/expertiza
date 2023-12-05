@@ -17,7 +17,7 @@ class TeamsController < ApplicationController
     #to be able to separate object creation and the other things that :team_type was also used for. :create_team has been inserted into #create_teams and #create where needed
     session[:create_type] = type
     if type == 'Assignment'
-      parent = parent_by_id(params[:id])
+      parent = Object.const_get(session[:team_type]).find(id)
       if parent.auto_assign_mentor
         session[:create_type] = 'Mentored'
       end

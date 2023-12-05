@@ -470,18 +470,6 @@ describe ReviewMappingController do
       end
 		end
 
-    #  Present on line 450
-    # context "when the reviewer has already taken the quiz" do
-    #   it "displays an error message" do
-    #     allow(ResponseMap).to receive_message_chain(:where, :first).with(reviewed_object_id: '1', reviewer_id: '1')
-    #                                                                .with(no_args).and_return(double('ResponseMap'))
-
-    #     post :assign_quiz_dynamically, params: @params
-    #     expect(flash[:error]).to eq('You have already taken that quiz.')
-    #     expect(response).to redirect_to('/student_quizzes?id=1')
-    #   end
-    # end
-
     context "when the reviewer has not taken the quiz yet" do
       it "creates a new QuizResponseMap" do
         questionnaire = double('Questionnaire', id: 2, instructor_id: 2)
@@ -509,35 +497,6 @@ describe ReviewMappingController do
         # Test scenario 3
       end
     end
-
-    # context 'when the reviewer has already taken the quiz' do
-    #   it 'displays an error message' do
-    #     allow(ResponseMap).to receive_message_chain(:where, :first).with(reviewed_object_id: '1', reviewer_id: '1').with(no_args).and_return(double('ResponseMap'))
-
-    #     post :assign_quiz_dynamically, params: @params
-    #     expect(flash[:error]).to eq('You have already taken that quiz.')
-    #     expect(response).to redirect_to('/student_quizzes?id=1')
-    #   end
-    # end
-
-    # context 'when the reviewer has not taken the quiz yet' do
-    #   it 'creates a new QuizResponseMap' do
-    #     questionnaire = double('Questionnaire', id: 2, instructor_id: 2)
-    #     allow(Questionnaire).to receive(:find).with('2').and_return(questionnaire)
-    #     allow(Questionnaire).to receive(:find_by).with(instructor_id: 2).and_return(questionnaire)
-    #     allow_any_instance_of(QuizResponseMap).to receive(:save).and_return(true)
-    #     @params = {
-    #       assignment_id: 1,
-    #       reviewer_id: 2,
-    #       questionnaire_id: 2,
-    #       participant_id: 2
-    #     }
-
-    #     post :assign_quiz_dynamically, params: @params
-    #     expect(flash[:error]).to be nil
-    #     expect(response).to redirect_to('/student_quizzes?id=1')
-    #   end
-    # end
   end
 
   describe '#add_metareviewer' do

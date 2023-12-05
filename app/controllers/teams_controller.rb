@@ -11,8 +11,12 @@ class TeamsController < ApplicationController
   # attempt to initialize team type in session
   def init_team_type(type)
     return unless type && Team.allowed_types.include?(type)
-
-    session[:team_type] = type
+    session[:create_type] = type
+    if type == 'Mentored'
+      session[:team_type] = 'Assignment'
+    else
+      session[:team_type] = type
+    end
   end
 
   # retrieve an object's parent by its ID
@@ -29,7 +33,7 @@ class TeamsController < ApplicationController
   # Instructors can call by clicking "Create teams" icon and then click "Create teams" at the bottom.
   def create_teams
     parent = parent_by_id(params[:id])
-    Team.randomize_all_by_parent(parent, session[:team_type], params[:team_size].to_i)
+    Team.randomize_all_by_parent(parent, session[:create_type], params[:team_size].to_i)
     undo_link('Random teams have been successfully created.')
     ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Random teams have been successfully created', request)
     redirect_to action: 'list', id: parent.id
@@ -38,7 +42,7 @@ class TeamsController < ApplicationController
   # Displays list of teams for a parent object(either assignment/course)
   def list
     init_team_type(params[:type])
-    @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == Team.allowed_types[0] or session[:team_type] == Team.allowed_types[2]
+    @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == Team.allowed_types[0]
     unless @assignment.nil?
       if @assignment.auto_assign_mentor
         @model = MentoredTeam
@@ -46,7 +50,7 @@ class TeamsController < ApplicationController
         @model = AssignmentTeam
       end
     end
-    @is_valid_assignment = (session[:team_type] == Team.allowed_types[0] or session[:team_type] == Team.allowed_types[2]) && @assignment.max_team_size > 1
+    @is_valid_assignment = (session[:team_type] == Team.allowed_types[0]) && @assignment.max_team_size > 1
     begin
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
@@ -66,7 +70,7 @@ class TeamsController < ApplicationController
     parent = parent_by_id(params[:id])
     begin
       Team.check_for_existing(parent, params[:team][:name], session[:team_type])
-      @team = Object.const_get(session[:team_type] + 'Team').create(name: params[:team][:name], parent_id: parent.id)
+      @team = Object.const_get(session[:create_type] + 'Team').create(name: params[:team][:name], parent_id: parent.id)
       TeamNode.create(parent_id: parent.id, node_object_id: @team.id)
       undo_link("The team \"#{@team.name}\" has been successfully created.")
       redirect_to action: 'list', id: parent.id

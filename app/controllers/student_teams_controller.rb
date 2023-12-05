@@ -63,7 +63,7 @@ class StudentTeamsController < ApplicationController
  # not have been easily adapted to accommodate this.
   def mentor
      return unless current_user_id? student.user_id
-     # Default return to views/student_team/mentor utlized
+     # Default return to views/student_team/mentor utilized
   end
 
   def create
@@ -77,7 +77,7 @@ class StudentTeamsController < ApplicationController
         return
       end
       parent = AssignmentNode.find_by node_object_id: student.parent_id
-      # E2351- a decision needs to be made here whether to create an AssignmentTeam or MentoredTeam depeding on assignment settings
+      # E2351- a decision needs to be made here whether to create an AssignmentTeam or MentoredTeam depending on assignment settings
       if parent.auto_assign_mentor
         team = MentoredTeam.new(name: params[:team][:name], parent_id: student.parent_id)
       else

@@ -40,8 +40,6 @@ class TeamsController < ApplicationController
     handle_team_exists_error(parent.id, e.message)
   end
 
-  
-
   # Displays a list of teams for a parent object (either an assignment or course)
   def list
     init_team_type(params[:type])
@@ -175,6 +173,72 @@ class TeamsController < ApplicationController
   # Checks if the team type is invalid for transfer
   def invalid_team_type_for_transfer?
     session[:team_type] == Team.allowed_types[1]
+  end
+
+  def redirect_with_error
+    flash[:error] = 'Invalid team type for bequeath all'
+    redirect_to controller: 'teams', action: 'list', id: params[:id]
+  end
+
+  # Method to abstract the functionality to copy teams.
+  def copy_teams(operation)
+    assignment = find_assignment_for_copy(params[:id])
+    if assignment.course_id
+      choose_copy_type(assignment, operation)
+    else
+      flash_error_copy
+    end
+    redirect_to_team_list(assignment.id)
+  end
+
+  def find_assignment_for_copy(id)
+    Assignment.find(id)
+  end
+
+  def flash_error_copy
+    flash[:error] = 'No course was found for this assignment.'
+  end
+
+  def redirect_to_team_list_to_copy(assignment_id)
+    redirect_to controller: 'teams', action: 'list', id: assignment_id
+  end
+
+  # Abstraction over different methods
+  def choose_copy_type(assignment, operation)
+    course = Course.find(assignment.course_id)
+    if operation == Team.team_operation[:bequeath]
+      transfer_copy(assignment, course)
+    else
+      inherit_copy(assignment, course)
+    end
+  end
+
+  # Method to perform a copy of assignment teams to course
+  def transfer_copy(assignment, course)
+    if course_has_teams?(course)
+      flash_error('The course already has associated teams')
+      return
+    end
+
+    copy_teams_to_course(assignment.teams, course)
+  end
+
+  # Method to inherit teams from course by copying
+  def inherit_copy(assignment, course)
+    if course_teams_empty?(course)
+      flash_error('No teams were found when trying to inherit.')
+      return
+    end
+
+    copy_teams_to_assignment(course.course_teams, assignment)
+  end
+
+  def course_has_teams?(course)
+    course.course_teams.any?
+  end
+
+  def course_teams_empty?(course)
+    course.course_teams.empty?
   end
 end
  

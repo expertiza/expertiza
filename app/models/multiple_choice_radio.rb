@@ -22,7 +22,7 @@ class MultipleChoiceRadio < QuizQuestion
   end
 
   def isvalid(choice_info)
-    @valid = super(choice_info)
+    @validity_message = super(choice_info)
 
     return "Please make sure every question has text for all options" unless all_choices_have_text?(choice_info)
 
@@ -31,7 +31,7 @@ class MultipleChoiceRadio < QuizQuestion
 
     return "Please select a correct answer for all questions" if correct_count.zero?
 
-    @valid
+    @validity_message
   end
 
   private

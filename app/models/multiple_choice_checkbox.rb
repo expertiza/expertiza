@@ -19,22 +19,22 @@ class MultipleChoiceCheckbox < QuizQuestion
   end
 
   def isvalid(choice_info)
-    @valid = super(choice_info)
+    @validity_message = super(choice_info)
 
-    return @valid if @valid != "valid"
+    return @validity_message if @validity_message != "valid"
 
     return "Please make sure every question has text for all options" unless all_choices_have_text?(choice_info)
 
     correct_count = choice_info.count { |_idx, value| value[:iscorrect] == 1 }
 
     if correct_count.zero?
-      @valid = "Please select a correct answer for all questions"
+      @validity_message = "Please select a correct answer for all questions"
     elsif correct_count == 1
-      @valid = "A multiple-choice checkbox question should have more than one correct answer."
+      @validity_message = "A multiple-choice checkbox question should have more than one correct answer."
     elsif correct_count == 2
-      @valid = "valid"
+      @validity_message = "valid"
     end
-    @valid
+    @validity_message
   end
 
   private

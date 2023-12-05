@@ -19,9 +19,9 @@ class TrueFalse < QuizQuestion
   end
 
   def isvalid(choice_info)
-    @valid = super(choice_info)
+    @validity_message = super(choice_info)
 
-    return @valid if @valid != "valid"
+    return @validity_message if @validity_message != "valid"
 
     return "Please make sure every question has text for all options" unless all_choices_have_text?(choice_info)
 
@@ -30,7 +30,7 @@ class TrueFalse < QuizQuestion
 
     return "Please select a correct answer for all questions" if correct_count.zero?
 
-    @valid
+    @validity_message
   end
 
   private

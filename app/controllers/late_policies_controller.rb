@@ -136,7 +136,7 @@ class LatePoliciesController < ApplicationController
     if should_check_policy_name?(is_update)
       valid_penalty, error_message = check_for_duplicate_name(prefix)
     end
-  
+    
     return valid_penalty, error_message
   end
 
@@ -158,11 +158,10 @@ class LatePoliciesController < ApplicationController
     # Using `exists?` to check if a LatePolicy with the same name already exists for the instructor.
     # It's assumed that `params[:late_policy][:policy_name]` holds the name of the policy and 
     # `instructor_id` is the ID of the instructor.
-    if LatePolicy.exists?(policy_name: params[:late_policy][:policy_name], instructor_id: instructor_id)
-        # Construct an error message indicating the duplicate name, if the policy already exists
-        error_message = prefix + 'A policy with the same name ' + params[:late_policy][:policy_name] + ' already exists.'
-        valid_penalty = false
-    else
+    if LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
+      error_message = prefix + 'A policy with the same name ' + params[:late_policy][:policy_name] + ' already exists.'
+      valid_penalty = false
+    end
         # If no duplicate name is found, set valid_penalty to true
         valid_penalty = true
         error_message = nil

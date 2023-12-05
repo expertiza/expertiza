@@ -110,7 +110,7 @@ describe LatePoliciesController do
       allow(latePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
     end
 
-    if 'throws a flash error' do
+    it 'throws a flash error' do
       post :create, params: request_params(policy_name, max_penalty, penalty_per_unit)
       expect(flash[:error]).to eq(expected_error)
       expect(response).to redirect_to('/late_policies/new')

@@ -36,7 +36,7 @@ class TeamsController < ApplicationController
     create_random_teams(parent)
     log_team_creation
     redirect_to_team_list(parent.id)
-  rescue TeamExistsError => e
+    rescue TeamExistsError => e
     handle_team_exists_error(parent.id, e.message)
   end
 
@@ -166,15 +166,15 @@ class TeamsController < ApplicationController
     return redirect_with_error if invalid_team_type_for_transfer?
 
     copy_teams(Team.team_operation[:bequeath])
-  rescue StandardError => e
-    flash[:error] = "An error occurred: #{e.message}"
+    rescue StandardError => e
+      flash[:error] = "An error occurred: #{e.message}"
     # Log the error for investigation if needed
-    Rails.logger.error("Error in TeamsController#transfer_all: #{e.message}")
+      Rails.logger.error("Error in TeamsController#transfer_all: #{e.message}")
   end
 
   # Checks if the team type is invalid for transfer
   def invalid_team_type_for_transfer?
     session[:team_type] == Team.allowed_types[1]
   end
-
+end
  

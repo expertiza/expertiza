@@ -29,7 +29,7 @@ class MultipleChoiceRadio < QuizQuestion
     #counts the number of choices that are correct
     correct_count = choice_info.count { |_idx, value| value[:iscorrect] == 1 || value[:iscorrect] == "1" }
 
-    return "Please select a correct answer for all questions" if correct_count.zero?
+    return "Please select exactly one correct answer" if correct_count != 1
 
     @validity_message
   end

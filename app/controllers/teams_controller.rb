@@ -9,7 +9,7 @@ class TeamsController < ApplicationController
   end
 
   # attempt to initialize team type in session
-  def init_team_type
+  def init_team_type(type)
     return unless type && Team.allowed_types.include?(type)
     session[:team_type] = type
     session[:create_type] = type

@@ -9,13 +9,15 @@ class TeamsController < ApplicationController
   end
 
   # attempt to initialize team type in session
-  def init_team_type(type)
+  def init_team_type
     return unless type && Team.allowed_types.include?(type)
+    session[:team_type] = type
     session[:create_type] = type
-    if type == 'Mentored'
-      session[:team_type] = 'Assignment'
-    else
-      session[:team_type] = type
+    if type == 'Assignment'
+      parent = parent_by_id(params[:id])
+      if parent.auto_assign_mentor
+        session[:create_type] = 'Mentored'
+      end
     end
   end
 

@@ -99,6 +99,15 @@ class AssignmentTeam < Team
   end
   alias get_participants participants
 
+  # Delete the team
+  def delete
+    if self[:type] == 'AssignmentTeam'
+      sign_up = SignedUpTeam.find_team_participants(parent_id.to_s).select { |p| p.team_id == id }
+      sign_up.each(&:destroy)
+    end
+    super
+  end
+
   # Delete Review response map
   def destroy
     review_response_maps.each(&:destroy)

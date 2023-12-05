@@ -104,7 +104,7 @@ describe LatePoliciesController do
   end
 
   # Create an RSpec example to reduce code duplication
-  RSpec.shared_examples "late policy creation with error" do |policy_name, max_penalty, penalty_per_unit, expected_error|
+  RSpec.shared_examples 'late policy creation with error' do |policy_name, max_penalty, penalty_per_unit, expected_error|
     before(:each) do
       latePolicy = LatePolicy.new
       allow(latePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
@@ -119,11 +119,11 @@ describe LatePoliciesController do
 
   describe 'POST #create' do
     context 'when maximum penalty is less than penalty per unit' do
-      include_examples "late policy creation with error", 'Policy1', 10, 30, 'The maximum penalty must be between the penalty per unit and 100.'
+      include_examples 'late policy creation with error', 'Policy1', 10, 30, 'The maximum penalty must be between the penalty per unit and 100.'
     end
 
     context 'when maximum penalty is greater than 100' do
-      include_examples "late policy creation with error", 'Policy1', 101, 30, 'The maximum penalty must be between the penalty per unit and 100.'
+      include_examples 'late policy creation with error', 'Policy1', 101, 30, 'The maximum penalty must be between the penalty per unit and 100.'
     end
 
     context 'when penalty per unit is negative while creating late policy' do

@@ -33,7 +33,6 @@ class LatePoliciesController < ApplicationController
       format.xml  { render xml: @penalty_policies }
     end
   end
-  
 
   # This method displays a certain record in late_policies table in the database.
   def show
@@ -67,7 +66,8 @@ class LatePoliciesController < ApplicationController
 
     # If penalty  is valid then tries to update and save.
     if valid_penalty
-      create_new_late_policy(late_policy_params)
+      @late_policy = LatePolicy.new(params)
+      @late_policy.instructor_id = instructor_id
       error_thrown = save_late_policy
       # Redirect to new if there's an error, index if not
       redirect_to action: (error_thrown ? 'new' : 'index')
@@ -211,12 +211,6 @@ class LatePoliciesController < ApplicationController
   # Validation error prefix
   def error_prefix(is_update)
     is_update ? "Cannot edit the policy. " : ""
-  end
-
-  # Create and save the late policy with the required params
-  def create_new_late_policy(params)
-    @late_policy = LatePolicy.new(params)
-    @late_policy.instructor_id = instructor_id
   end
 
   # Saves the late policy called from create or update

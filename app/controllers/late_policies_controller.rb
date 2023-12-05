@@ -147,8 +147,6 @@ class LatePoliciesController < ApplicationController
         # Return true if they are different, indicating a need to check the policy name
         return existing_late_policy.policy_name != params[:late_policy][:policy_name]
     end
-    # If not an update, always return true to indicate that the policy name should be checked
-    return true
   end
 
   # This is a helper function for the duplicate name check

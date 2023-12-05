@@ -1,4 +1,6 @@
-require './spec/support/teams_shared.rb'
+# frozen_string_literal: true
+
+require './spec/support/teams_shared'
 
 describe TeamsController do
   # Performs authorization check for user
@@ -34,9 +36,9 @@ describe TeamsController do
         # Expect an error to be raised when incorrect parameters are passed
         request_params = { id: nil, team_size: 'abc' }
         user_session = { user: instructor, team_type: 'Assignment' }
-        expect {
+        expect do
           get :create_teams, params: request_params, session: user_session
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        end.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end
@@ -114,8 +116,8 @@ describe TeamsController do
     it 'updates the team name' do
       allow(Team).to receive(:find).and_return(team1)
       allow(Assignment).to receive(:find).and_return(assignment1)
-      request_params = { id: team1.id, team: { name: 'no team' } }
-      user_session = { user: ta, team_type: 'Assignment' }
+      # request_params = { id: team1.id, team: { name: 'no team' } }
+      # user_session = { user: ta, team_type: 'Assignment' }
       # result = get :update, params: request_params, session: user_session
       # expect(result.status).to eq 302
       # expect(result).to redirect_to(:action => 'list', :id => assignment1.id)
@@ -139,9 +141,9 @@ describe TeamsController do
 
     context 'when team with given id does not exist' do
       it 'raises an ActiveRecord::RecordNotFound error' do
-        expect {
+        expect do
           get :edit, params: { id: 999 }, session: { user: ta }
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        end.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end
@@ -175,7 +177,7 @@ describe TeamsController do
     end
   end
 
-  #the below two tests are for inherit_copy and bequeath_copy respectively
+  # the below two tests are for inherit_copy and bequeath_copy respectively
   describe 'inherit method' do
     context 'called when assignment belongs to course and team is not empty' do
       it 'copies teams from course to the assignment' do
@@ -204,7 +206,8 @@ describe TeamsController do
     end
     context 'called when assignment belongs to no course' do
       let(:fasg) { build_stubbed(:assignment, id: 1074, course_id: -2) }
-      # a temporary assignment object is created with an abnormal course_id so that we can check the fail condition of the method
+      # a temporary assignment object is created with an abnormal course_id
+      # so that we can check the fail condition of the method
       it 'flashes error' do
         allow(Assignment).to receive(:find).and_return(fasg)
         allow(Course).to receive(:find).and_return(course1)
@@ -217,20 +220,20 @@ describe TeamsController do
       end
     end
   end
-  
+
   describe '#transfer_all' do
     context 'when the team type is user_session' do
       it 'flashes an error' do
-        user_session = {team_type: 'Course', user: ta}
+        user_session = { team_type: 'Course', user: ta }
         request_params = { id: team5.id }
-        post :transfer_all, params: request_params, session: user_session 
+        post :transfer_all, params: request_params, session: user_session
         expect(flash[:error]).to eq('Invalid team type for bequeath all')
       end
     end
     context 'when there is no course associated with this assignment' do
       it 'flashes an error' do
         request_params = { id: 1 }
-        user_session = {team_type: 'Assignment', user: ta}
+        user_session = { team_type: 'Assignment', user: ta }
         allow(Assignment).to receive(:find).and_return(assignment1)
         allow_any_instance_of(Assignment).to receive(:course_id).and_return(nil)
         post :transfer_all, params: request_params, session: user_session
@@ -240,7 +243,7 @@ describe TeamsController do
     context 'when the course already has teams associated with it' do
       it 'flashes an error' do
         request_params = { id: 1 }
-        user_session = {team_type: 'Assignment', user: ta}
+        user_session = { team_type: 'Assignment', user: ta }
         allow(Assignment).to receive(:find).and_return(assignment1)
         allow_any_instance_of(Assignment).to receive(:course_id).and_return(1)
         allow(Course).to receive(:find).and_return(course1)
@@ -252,50 +255,49 @@ describe TeamsController do
     context 'when bequeathal is successful in copying 2 teams' do
       it 'flashes a note stating 2 teams were copied' do
         request_params = { id: 1 }
-        user_session = {team_type: 'Assignment', user: ta}
+        user_session = { team_type: 'Assignment', user: ta }
         allow(Assignment).to receive(:find).and_return(assignment1)
         allow_any_instance_of(Assignment).to receive(:course_id).and_return(1)
         allow(Course).to receive(:find).and_return(course1)
         allow_any_instance_of(Course).to receive(:course_teams).and_return([])
         allow_any_instance_of(Assignment).to receive(:teams).and_return([team1, team2])
         post :transfer_all, params: request_params, session: user_session
-        expect(flash[:note]).to eq("2 teams were successfully copied to \"TestCourse\"")
+        expect(flash[:note]).to eq('2 teams were successfully copied to "TestCourse"')
       end
     end
   end
 
-	describe "#action_allowed?" do
-		context "when the current user has TA privileges" do
-		it "returns true" do
-			stub_current_user(ta, ta.role.name, ta.role)
-			expect(controller.send(:action_allowed?)).to be true
-		end
-		end
+  describe '#action_allowed?' do
+    context 'when the current user has TA privileges' do
+      it 'returns true' do
+        stub_current_user(ta, ta.role.name, ta.role)
+        expect(controller.send(:action_allowed?)).to be true
+      end
+    end
 
-		context "when the current user does not have TA privileges" do
-		it "returns false" do
-			stub_current_user(student1, student1.role.name, student1.role)
-			expect(controller.send(:action_allowed?)).to be false
-		end
-		end
-	end
+    context 'when the current user does not have TA privileges' do
+      it 'returns false' do
+        stub_current_user(student1, student1.role.name, student1.role)
+        expect(controller.send(:action_allowed?)).to be false
+      end
+    end
+  end
 
-	describe "create_teams" do
-		context "when called with invalid parameters" do
-		it "does not randomize teams" do
-			invalid_params = { parent_id: nil, team_type: 'InvalidType' }
-	
-			expect(controller).not_to receive(:randomize_teams)
-			post :create_teams, params: invalid_params
-		end
-	
-		it "does not redirect to the list action" do
-			invalid_params = { parent_id: nil, team_type: 'InvalidType' }
-	
-			post :create_teams, params: invalid_params
-			expect(response).not_to redirect_to(action: 'list')
-		end
-		end
-	end
+  describe 'create_teams' do
+    context 'when called with invalid parameters' do
+      it 'does not randomize teams' do
+        invalid_params = { parent_id: nil, team_type: 'InvalidType' }
 
+        expect(controller).not_to receive(:randomize_teams)
+        post :create_teams, params: invalid_params
+      end
+
+      it 'does not redirect to the list action' do
+        invalid_params = { parent_id: nil, team_type: 'InvalidType' }
+
+        post :create_teams, params: invalid_params
+        expect(response).not_to redirect_to(action: 'list')
+      end
+    end
+  end
 end

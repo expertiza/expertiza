@@ -59,7 +59,7 @@
 
     <!-- Set the review data and row span for each reviewer -->
     <% sort_reviewer_desc('review_volume').each_with_index do |reviewer, index| %>
-      <% @response_maps, @rspan = report_review_data(@id, reviewer.id, @type) %>
+      <% @response_maps = response_maps_data(@id, reviewer.id, @type), @rspan = rspan_data(@id, reviewer.id, @type) %>
       <tr>
         <% unless reviewer.id == 1 %>
           <% user = Participant.find(reviewer.id).user %>

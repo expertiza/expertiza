@@ -73,6 +73,7 @@ class LatePoliciesController < ApplicationController
       end
     rescue StandardError
       valid_penalty = false
+      flash[:error] = 'The following error occurred while saving the late policy: '
     end
     # Redirect to new if there's an error, index if not
     redirect_to action: (valid_penalty ? 'index' : 'new')

@@ -158,7 +158,7 @@ class LatePoliciesController < ApplicationController
     if LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
       error_message = prefix + 'A policy with the same name ' + params[:late_policy][:policy_name] + ' already exists.'
       valid_penalty = false
-    end
+    else
         # If no duplicate name is found, set valid_penalty to true
         valid_penalty = true
         error_message = nil

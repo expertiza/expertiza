@@ -17,14 +17,23 @@ class LatePoliciesController < ApplicationController
     end
   end
 
-  # This method lists all the late policies records from late_policies table in database.
+  # # This method lists all the late policies records from late_policies table in database.
+  # def index
+  #   @penalty_policies = LatePolicy.where(['instructor_id = ? OR private = 0', instructor_id])
+  #   respond_to do |format|
+  #     format.html # index.html.erb
+  #     format.xml  { render xml: @penalty_policies }
+  #   end
+  # end
+
   def index
-    @penalty_policies = LatePolicy.where(['instructor_id = ? OR private = 0', instructor_id])
+    @penalty_policies = LatePolicy.includes(:instructor).where(['instructor_id = ? OR private = 0', instructor_id])
     respond_to do |format|
-      format.html # index.html.erb
+      format.html
       format.xml  { render xml: @penalty_policies }
     end
   end
+  
 
   # This method displays a certain record in late_policies table in the database.
   def show

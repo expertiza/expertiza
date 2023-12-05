@@ -19,7 +19,7 @@ describe QuizQuestion do
   end
   describe "#view_question_text" do
     it "returns the text of the questions" do
-      expect(quiz_question.view_question_text).to eq("<b>Question Text</b><br />Question Type: MultipleChoiceRadio<br />Question Weight: <br />  - <b>Choice 1</b><br />   - Choice 2<br />   - Choice 3<br />   - Choice 4<br /> <br />")
+      expect(quiz_question.view_question_text).to eq("<b>Question Text</b><br />Question Type: MultipleChoiceRadio <br />Question Weight: <br />  - <b>Choice 1</b><br />   - Choice 2<br />   - Choice 3<br />   - Choice 4<br /> <br />")
     end
   end
   describe "#get_formatted_question_type" do

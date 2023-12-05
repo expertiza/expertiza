@@ -17,6 +17,34 @@ describe TrueFalse do
       expect(html.css('input[type="radio"][name^="quiz_question_choices[1][TrueFalse]"]').size).to eq(2)
     end
   end
+  describe "#view_completed_question" do
+    context "when correct" do
+      it "returns the html showing correct answer(s)" do
+        allow(true_false).to receive(:txt).and_return("question")
+        qc1 = double("QuizQuestionChoice")
+        qc2 = double("QuizQuestionChoice")
+        allow(QuizQuestionChoice).to receive(:where).with(question_id: 1).and_return([qc1, qc2])
+        allow(qc1).to receive(:iscorrect).and_return(true)
+        allow(qc2).to receive(:iscorrect).and_return(false)
+        answer = [Answer.new(answer: 1, comments: "true text", question_id: 1)]
+        html = true_false.view_completed_question(answer)
+        expect(html).to include("Your answer is: <b> true text<img src=\"/assets/Check-icon.png\"/> </b>")
+      end
+    end
+    context "when incorrect" do
+      it "returns the html showing correct answer(s)" do
+        allow(true_false).to receive(:txt).and_return("question")
+        qc1 = double("QuizQuestionChoice")
+        qc2 = double("QuizQuestionChoice")
+        allow(QuizQuestionChoice).to receive(:where).with(question_id: 1).and_return([qc1, qc2])
+        allow(qc1).to receive(:iscorrect).and_return(true)
+        allow(qc2).to receive(:iscorrect).and_return(false)
+        answer = [Answer.new(answer: 2, comments: "false text", question_id: 1)]
+        html = true_false.view_completed_question(answer)
+        expect(html).to include("Your answer is: <b> false text<img src=\"/assets/delete_icon.png\"/> </b>")
+      end
+    end
+  end
   describe "#isvalid" do
     context "when the question does not have text" do
       it 'returns "Please make sure all questions have text"' do

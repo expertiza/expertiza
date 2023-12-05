@@ -63,6 +63,42 @@ describe MultipleChoiceCheckbox do
       end
     end
   end
+  # describe "#view_completed_question" do
+  #   context "when correct" do
+  #     it "returns the html showing correct answer(s)" do
+  #       allow(multiple_choice_checkbox).to receive(:txt).and_return("question")
+  #       qTrue = double("QuizQuestionChoice")
+  #       qFalse = double("QuizQuestionChoice")
+  #       allow(QuizQuestionChoice).to receive(:where).with(question_id: 1).and_return([qTrue, qFalse, qTrue, qFalse])
+  #       allow(qTrue).to receive(:iscorrect).and_return(true)
+  #       allow(qTrue).to receive(:txt).and_return("true text")
+  #       allow(qFalse).to receive(:iscorrect).and_return(false)
+  #       allow(qFalse).to receive(:txt).and_return("false text")
+  #       answer = [Answer.new(answer: 1, comments: "true text", question_id: 1)]
+  #       html = multiple_choice_checkbox.view_completed_question(answer)
+  #       expect(html).to include("Your answer is: <b> true text<img src=\"/assets/Check-icon.png\"/> </b>")
+  #       expect(html).to include("<b> true text </b> -- Correct <br>")
+  #       expect(html).to include("false text <br>")
+  #     end
+  #   end
+  #   context "when incorrect" do
+  #     it "returns the html showing correct answer(s)" do
+  #       allow(multiple_choice_checkbox).to receive(:txt).and_return("question")
+  #       qTrue = double("QuizQuestionChoice")
+  #       qFalse = double("QuizQuestionChoice")
+  #       allow(QuizQuestionChoice).to receive(:where).with(question_id: 1).and_return([qTrue, qFalse, qTrue, qFalse])
+  #       allow(qTrue).to receive(:iscorrect).and_return(true)
+  #       allow(qTrue).to receive(:txt).and_return("true text")
+  #       allow(qFalse).to receive(:iscorrect).and_return(false)
+  #       allow(qFalse).to receive(:txt).and_return("false text")
+  #       answer = [Answer.new(answer: 2, comments: "false text", question_id: 1)]
+  #       html = multiple_choice_checkbox.view_completed_question(answer)
+  #       expect(html).to include("Your answer is: <b> false text<img src=\"/assets/delete_icon.png\"/> </b>")
+  #       expect(html).to include("<b> true text </b> -- Correct <br>")
+  #       expect(html).to include("false text <br>")
+  #     end
+  #   end
+  # end
   describe "#get_formatted_question_type" do
     it 'returns "Multiple Choice - Checked"' do
       expect(multiple_choice_checkbox.get_formatted_question_type).to eq("Multiple Choice - Checked")

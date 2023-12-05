@@ -159,9 +159,9 @@ class LatePoliciesController < ApplicationController
       error_message = prefix + 'A policy with the same name ' + params[:late_policy][:policy_name] + ' already exists.'
       valid_penalty = false
     else
-        # If no duplicate name is found, set valid_penalty to true
-        valid_penalty = true
-        error_message = nil
+      # If no duplicate name is found, set valid_penalty to true
+      valid_penalty = true
+      error_message = nil
     end
 
     # Return the validity status of the penalty and the corresponding error message, if any

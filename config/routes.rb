@@ -536,7 +536,7 @@ Expertiza::Application.routes.draw do
       post :inherit
       get :delete
       get :delete_all
-      get :bequeath_all
+      get :transfer_all
     end
   end
 

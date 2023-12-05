@@ -68,13 +68,10 @@ class LatePoliciesController < ApplicationController
     if valid_penalty
       @late_policy = LatePolicy.new(params)
       @late_policy.instructor_id = instructor_id
-      error_thrown = save_late_policy
+      valid_penalty = save_late_policy
       # Redirect to new if there's an error, index if not
-      redirect_to action: (error_thrown ? 'new' : 'index')
-    else
-      # If any of above checks fails, then redirect to create a new late policy again.
-      redirect_to action: 'new'
     end
+    redirect_to action: (error_thrown ? 'new' : 'index')
   end
 
   # Update method can update late policy. There are few check points before updating a late policy which are written in the if/else statements.
@@ -219,13 +216,21 @@ class LatePoliciesController < ApplicationController
       # If the method that called this is update
       LatePolicy.update_calculated_penalty_objects(penalty_policy) if from_update
       # The code at the end of the string gets the name of the last method (create, update) and adds a d (created, updated)
-      flash[:notice] = "The late policy was successfully #{from_update ? 'updated' : 'created'}."
+      flash_for_save(from_update)
     rescue StandardError
       error_thrown = true
       # If something unexpected happens while saving the record in to database then displays a flash notice
-      flash[:error] = "The following error occurred while #{from_update ? 'updating' : 'saving'} the late policy: "
+      flash_for_error(from_update)
       return true
     end
     false
+  end
+
+  def flash_for_save(from_update = false)
+    flash[:notice] = "The late policy was successfully #{from_update ? 'updated' : 'created'}."
+  end
+
+  def flash_for_error(from_update)
+    flash[:error] = "The following error occurred while #{from_update ? 'updating' : 'saving'} the late policy: "
   end
 end

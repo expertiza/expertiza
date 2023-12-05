@@ -6,6 +6,38 @@ class SignedUpTeam < ApplicationRecord
   validates :topic_id, :team_id, presence: true
   scope :by_team_id, ->(team_id) { where('team_id = ?', team_id) }
 
+  def self.find_team_participants(assignment_id, ip_address = nil)
+    @participants = SignedUpTeam.joins('INNER JOIN sign_up_topics ON signed_up_teams.topic_id = sign_up_topics.id')
+                                .select('signed_up_teams.id as id, sign_up_topics.id as topic_id, sign_up_topics.topic_name as name,
+                                  sign_up_topics.topic_name as team_name_placeholder, sign_up_topics.topic_name as user_name_placeholder,
+                                  signed_up_teams.is_waitlisted as is_waitlisted, signed_up_teams.team_id as team_id')
+                                .where('sign_up_topics.assignment_id = ?', assignment_id)
+    @participants.each_with_index do |participant, i|
+      participant_names = User.joins('INNER JOIN teams_users ON users.id = teams_users.user_id')
+                              .joins('INNER JOIN teams ON teams.id = teams_users.team_id')
+                              .select('users.name as u_name, teams.name as team_name')
+                              .where('teams.id = ?', participant.team_id)
+
+      team_name_added = false
+      names = '(missing team)'
+
+      participant_names.each do |participant_name|
+        if team_name_added
+          names += User.find_by(name: participant_name.u_name).name(ip_address) + ' '
+          participant.user_name_placeholder += User.find_by(name: participant_name.u_name).name(ip_address) + ' '
+        else
+          names = '[' + participant_name.team_name + '] ' + User.find_by(name: participant_name.u_name).name(ip_address) + ' '
+          participant.team_name_placeholder = participant_name.team_name
+          participant.user_name_placeholder = User.find_by(name: participant_name.u_name).name(ip_address) + ' '
+          team_name_added = true
+        end
+      end
+      @participants[i].name = names
+    end
+
+    @participants
+  end
+
   def self.find_team_users(assignment_id, user_id)
     TeamsUser.joins('INNER JOIN teams ON teams_users.team_id = teams.id')
              .select('teams.id as t_id')

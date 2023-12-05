@@ -14,7 +14,7 @@ class Team < ApplicationRecord
   # Allowed types of teams -- ASSIGNMENT teams or COURSE teams
   def self.allowed_types
     # non-interpolated array of single-quoted strings
-    %w[Assignment Course Mentored]
+    %w[Assignment Course]
   end
 
   # Get the participants of the given team

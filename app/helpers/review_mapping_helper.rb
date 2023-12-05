@@ -138,16 +138,11 @@ module ReviewMappingHelper
   # gets the review score awarded based on each round of the review
 
   def compute_awarded_review_score(reviewer_id, team_id)
-    # Storing redundantly computed value in num_rounds variable
     num_rounds = @assignment.num_review_rounds
-    # Setting values of instance variables
-    (1..num_rounds).each { |round| instance_variable_set('@score_awarded_round_' + round.to_s, '-----') }
-    # Iterating through list
+
     (1..num_rounds).each do |round|
-      # Changing values of instance variable based on below condition
-      if @review_scores[reviewer_id] && @review_scores[reviewer_id][round] && @review_scores[reviewer_id][round][team_id] && @review_scores[reviewer_id][round][team_id] != -1.0
-        instance_variable_set('@score_awarded_round_' + round.to_s, @review_scores[reviewer_id][round][team_id].to_s + '%')
-      end
+      score = @review_scores && @review_scores[reviewer_id] && @review_scores[reviewer_id][round] && @review_scores[reviewer_id][round][team_id]
+      instance_variable_set("@score_awarded_round_#{round}", "#{score}%") unless score.nil? || score == -1.0
     end
   end
 

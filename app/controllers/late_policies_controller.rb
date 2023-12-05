@@ -65,12 +65,16 @@ class LatePoliciesController < ApplicationController
     flash[:error] = error_message if error_message
 
     # If penalty  is valid then tries to update and save.
-    if valid_penalty
-      @late_policy = LatePolicy.new(params)
-      @late_policy.instructor_id = instructor_id
-      valid_penalty = save_late_policy
-      # Redirect to new if there's an error, index if not
+    begin
+      if valid_penalty
+        @late_policy = LatePolicy.new(params)
+        @late_policy.instructor_id = instructor_id
+        valid_penalty = save_late_policy
+      end
+    rescue StandardError
+      valid_penalty = false
     end
+    # Redirect to new if there's an error, index if not
     redirect_to action: (valid_penalty ? 'index' : 'new')
   end
 

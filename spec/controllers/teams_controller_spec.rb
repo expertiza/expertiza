@@ -263,4 +263,39 @@ describe TeamsController do
       end
     end
   end
+
+	describe "#action_allowed?" do
+		context "when the current user has TA privileges" do
+		it "returns true" do
+			stub_current_user(ta, ta.role.name, ta.role)
+			expect(controller.send(:action_allowed?)).to be true
+		end
+		end
+
+		context "when the current user does not have TA privileges" do
+		it "returns false" do
+			stub_current_user(student1, student1.role.name, student1.role)
+			expect(controller.send(:action_allowed?)).to be false
+		end
+		end
+	end
+
+	describe "create_teams" do
+		context "when called with invalid parameters" do
+		it "does not randomize teams" do
+			invalid_params = { parent_id: nil, team_type: 'InvalidType' }
+	
+			expect(controller).not_to receive(:randomize_teams)
+			post :create_teams, params: invalid_params
+		end
+	
+		it "does not redirect to the list action" do
+			invalid_params = { parent_id: nil, team_type: 'InvalidType' }
+	
+			post :create_teams, params: invalid_params
+			expect(response).not_to redirect_to(action: 'list')
+		end
+		end
+	end
+
 end

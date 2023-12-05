@@ -60,7 +60,7 @@ class VmQuestionResponse
       @list_of_reviews = reviews
     elsif @questionnaire_type == 'AuthorFeedbackQuestionnaire' # ISSUE E-1967 updated
       reviews = []
-      # finding feedbacks where current pariticipant of assignment (author) is reviewer
+      # finding feedbacks where current participant of assignment (author) is reviewer
       feedbacks = FeedbackResponseMap.where(reviewer_id: participant.id)
       feedbacks.each do |feedback|
         # finding the participant ids for each reviewee of feedback

@@ -98,7 +98,10 @@
         </td>
         <td width="10%">
 
-          <%= link_to "History", submission_records_path(team_id: team.id) %>
+          <!--E2383 Added the link for Grading History to the View-->
+          <%= link_to "Submission History", submission_records_path(team_id: team.id) %> <br/>
+          <br/>
+          <%= link_to "Grading History", grading_histories_path(grade_receiver_id: team.id, grade_type: "Submission") %>
 
         </td>
       </tr>

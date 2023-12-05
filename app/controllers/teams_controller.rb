@@ -37,8 +37,9 @@ class TeamsController < ApplicationController
   # This function is used to create teams with random names.
   # Instructors can call by clicking "Create teams" icon and then click "Create teams" at the bottom.
   def create_teams
-    init_team_type(params[:type])
+    #init_team_type(params[:type])
     parent = parent_by_id(params[:id])
+    init_team_type(parent.class.name.demodulize)
     Team.randomize_all_by_parent(parent, session[:create_type], params[:team_size].to_i)
     undo_link('Random teams have been successfully created.')
     ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Random teams have been successfully created', request)
@@ -73,8 +74,9 @@ class TeamsController < ApplicationController
 
   # Called when a instructor tries to create an empty team manually
   def create
-    init_team_type(params[:type])
+    #init_team_type(params[:type])
     parent = parent_by_id(params[:id])
+    init_team_type(parent.class.name.demodulize)
     begin
       Team.check_for_existing(parent, params[:team][:name], session[:team_type])
       @team = Object.const_get(session[:create_type] + 'Team').create(name: params[:team][:name], parent_id: parent.id)

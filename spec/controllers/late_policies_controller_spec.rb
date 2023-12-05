@@ -5,7 +5,7 @@ describe LatePoliciesController do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
 
-  def create_late_policy(policy_name, max_penalty, penalty_per_unit, instructor_id) 
+  def create_late_policy(policy_name, max_penalty, penalty_per_unit, instructor_id)
     late_policy = LatePolicy.new
     late_policy.policy_name = policy_name
     late_policy.max_penalty = max_penalty
@@ -14,23 +14,25 @@ describe LatePoliciesController do
     late_policy
   end
 
-  def request_params(policy_name, max_penalty, penalty_per_unit) {
-    late_policy: {
-      max_penalty: max_penalty,
-      penalty_per_unit: penalty_per_unit,
-      policy_name: policy_name
+  def request_params(policy_name, max_penalty, penalty_per_unit)
+    {
+      late_policy: {
+        max_penalty: max_penalty,
+        penalty_per_unit: penalty_per_unit,
+        policy_name: policy_name
+      }
     }
-  }
   end
 
-  def request_params_with_id(policy_name, max_penalty, penalty_per_unit, id) {
-    late_policy: {
-      max_penalty: max_penalty,
-      penalty_per_unit: penalty_per_unit,
-      policy_name: policy_name
-    },
-    id: id
-  }
+  def request_params_with_id(policy_name, max_penalty, penalty_per_unit, id)
+    {
+      late_policy: {
+        max_penalty: max_penalty,
+        penalty_per_unit: penalty_per_unit,
+        policy_name: policy_name
+      },
+      id: id
+    }
   end
 
   describe 'GET #index' do
@@ -101,11 +103,15 @@ describe LatePoliciesController do
     end
   end
 
+  def setup_late_policy_for_create
+    latePolicy = LatePolicy.new
+    allow(latePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
+  end
+
   describe 'POST #create' do
     context 'when maximum penalty is less than penalty per unit' do
       before(:each) do
-        latePolicy = LatePolicy.new
-        allow(latePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
+        setup_late_policy_for_create
       end
       it 'throws a flash error ' do
         post :create, params: request_params('Policy1', 10, 30)
@@ -116,8 +122,7 @@ describe LatePoliciesController do
 
     context 'when maximum penalty is greater than 100' do
       before(:each) do
-        latePolicy = LatePolicy.new
-        allow(latePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
+        setup_late_policy_for_create
       end
       it 'throws a flash error ' do
         post :create, params: request_params('Policy1', 101, 30)

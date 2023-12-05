@@ -12,6 +12,9 @@ class TeamsController < ApplicationController
   def init_team_type(type)
     return unless type && Team.allowed_types.include?(type)
     session[:team_type] = type
+    #E2351 - the current method for creating a team does not expand well for creating a subclass of either Assignment or Course Team so this is added logic to help allow for MentoredTeams to be created.
+    #Team type is using for various purposes including creating nodes, but a MentoredTeam is an AssignmentTeam and still has a parent assignment, not a parent mentored so an additional variable needed to be created
+    #to be able to separate object creation and the other things that :team_type was also used for. :create_team has been inserted into #create_teams and #create where needed
     session[:create_type] = type
     if type == 'Assignment'
       parent = parent_by_id(params[:id])
@@ -34,6 +37,7 @@ class TeamsController < ApplicationController
   # This function is used to create teams with random names.
   # Instructors can call by clicking "Create teams" icon and then click "Create teams" at the bottom.
   def create_teams
+    init_team_type(params[:type])
     parent = parent_by_id(params[:id])
     Team.randomize_all_by_parent(parent, session[:create_type], params[:team_size].to_i)
     undo_link('Random teams have been successfully created.')
@@ -69,6 +73,7 @@ class TeamsController < ApplicationController
 
   # Called when a instructor tries to create an empty team manually
   def create
+    init_team_type(params[:type])
     parent = parent_by_id(params[:id])
     begin
       Team.check_for_existing(parent, params[:team][:name], session[:team_type])

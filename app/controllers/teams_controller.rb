@@ -32,7 +32,7 @@ class TeamsController < ApplicationController
 
   # Creates teams with random names, enabling instructors to create teams through a dedicated interface
   def create_teams
-    parent = find_parent(params[:id])
+    parent = find_parent_by_id(params[:id])
     create_random_teams(parent)
     log_team_creation
     redirect_to_team_list(parent.id)
@@ -83,7 +83,7 @@ class TeamsController < ApplicationController
 
   # Handles creation of a team manually by an instructor
   def create_team_manually
-    parent = find_parent(params[:id])
+    parent = find_parent_by_id(params[:id])
     begin
       create_team(parent)
       create_team_node(parent)

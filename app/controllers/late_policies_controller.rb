@@ -63,22 +63,16 @@ class LatePoliciesController < ApplicationController
   def create
     # First this function validates the input then save if the input is valid.
     valid_penalty, error_message = validate_input
-    if error_message
-      flash[:error] = error_message
-    end
+    flash[:error] = error_message if error_message
 
     # If penalty  is valid then tries to update and save.
     if valid_penalty
       create_new_late_policy(late_policy_params)
       error_thrown = save_late_policy
-      if error_thrown
-        # If there was an error thrown go to new, otherwise go to index
-        redirect_to action: 'new'
-      else
-        redirect_to action: 'index'
-      end
-    # If any of above checks fails, then redirect to create a new late policy again.
+      # Redirect to new if there's an error, index if not
+      redirect_to action: (error_thrown ? 'new' : 'index')
     else
+      # If any of above checks fails, then redirect to create a new late policy again.
       redirect_to action: 'new'
     end
   end
@@ -204,27 +198,19 @@ class LatePoliciesController < ApplicationController
   end
 
   # Saves the late policy called from create or update
-  def save_late_policy(from_update=false)
-    error_thrown = false
+  def save_late_policy(from_update = false)
     begin
       @late_policy.save!
-      if from_update
-        # If the method that called this is update
-        LatePolicy.update_calculated_penalty_objects(penalty_policy)
-      end
+      # If the method that called this is update
+      LatePolicy.update_calculated_penalty_objects(penalty_policy) if from_update
       # The code at the end of the string gets the name of the last method (create, update) and adds a d (created, updated)
-      flash[:notice] = "The late policy was successfully created." if !from_update
-      flash[:notice] = "The late policy was successfully updated." if from_update
+      flash[:notice] = "The late policy was successfully #{from_update ? 'updated' : 'created'}."
     rescue StandardError
       error_thrown = true
-      # If something unexpected happens while saving the record in to database then displays a flash notice and redirect to create a new late policy again.
-      if from_update
-        message_thrown = 'The following error occurred while updating the late policy: '
-      else
-        message_thrown = 'The following error occurred while saving the late policy: '
-      end
-      flash[:error] = message_thrown
+      # If something unexpected happens while saving the record in to database then displays a flash notice
+      flash[:error] = "The following error occurred while #{from_update ? 'updating' : 'saving'} the late policy: "
+      return true
     end
-    error_thrown
+    false
   end
 end

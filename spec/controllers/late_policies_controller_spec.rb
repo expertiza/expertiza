@@ -103,32 +103,27 @@ describe LatePoliciesController do
     end
   end
 
-  def setup_late_policy_for_create
-    latePolicy = LatePolicy.new
-    allow(latePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
+  # Create an RSpec example to reduce code duplication
+  RSpec.shared_examples "late policy creation with error" do |policy_name, max_penalty, penalty_per_unit, expected_error|
+    before(:each) do
+      latePolicy = LatePolicy.new
+      allow(latePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
+    end
+
+    if 'throws a flash error' do
+      post :create, params: request_params(policy_name, max_penalty, penalty_per_unit)
+      expect(flash[:error]).to eq(expected_error)
+      expect(response).to redirect_to('/late_policies/new')
+    end
   end
 
   describe 'POST #create' do
     context 'when maximum penalty is less than penalty per unit' do
-      before(:each) do
-        setup_late_policy_for_create
-      end
-      it 'throws a flash error ' do
-        post :create, params: request_params('Policy1', 10, 30)
-        expect(flash[:error]).to eq('The maximum penalty must be between the penalty per unit and 100.')
-        expect(response).to redirect_to('/late_policies/new')
-      end
+      include_examples "late policy creation with error", 'Policy1', 10, 30, 'The maximum penalty must be between the penalty per unit and 100.'
     end
 
     context 'when maximum penalty is greater than 100' do
-      before(:each) do
-        setup_late_policy_for_create
-      end
-      it 'throws a flash error ' do
-        post :create, params: request_params('Policy1', 101, 30)
-        expect(flash[:error]).to eq('The maximum penalty must be between the penalty per unit and 100.')
-        expect(response).to redirect_to('/late_policies/new')
-      end
+      include_examples "late policy creation with error", 'Policy1', 101, 30, 'The maximum penalty must be between the penalty per unit and 100.'
     end
 
     context 'when penalty per unit is negative while creating late policy' do

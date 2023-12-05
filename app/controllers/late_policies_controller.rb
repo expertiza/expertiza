@@ -27,7 +27,7 @@ class LatePoliciesController < ApplicationController
   # end
 
   def index
-    @penalty_policies = LatePolicy.includes(:instructor).where(['instructor_id = ? OR private = 0', instructor_id])
+    @penalty_policies = LatePolicy.includes([:users]).where(['instructor_id = ? OR private = 0', instructor_id])
     respond_to do |format|
       format.html
       format.xml  { render xml: @penalty_policies }

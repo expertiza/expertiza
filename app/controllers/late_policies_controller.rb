@@ -220,7 +220,7 @@ class LatePoliciesController < ApplicationController
     rescue StandardError
       error_thrown = true
       # If something unexpected happens while saving the record in to database then displays a flash notice
-      flash_for_error(from_update)
+      flash[:error] = 'The following error occurred while saving the late policy: '
       return true
     end
     false
@@ -228,9 +228,5 @@ class LatePoliciesController < ApplicationController
 
   def flash_for_save(from_update = false)
     flash[:notice] = "The late policy was successfully #{from_update ? 'updated' : 'created'}."
-  end
-
-  def flash_for_error(from_update)
-    flash[:error] = "The following error occurred while #{from_update ? 'updating' : 'saving'} the late policy: "
   end
 end

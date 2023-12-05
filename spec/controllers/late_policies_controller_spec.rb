@@ -191,7 +191,7 @@ describe LatePoliciesController do
       end
       it 'throws a flash error ' do
         post :update, params: request_params_with_id('Invalid_Policy', 30, 10, 1)
-        expect(flash[:error]).to eq('The following error occurred while updating the late policy: ')
+        expect(flash[:error]).to eq('The following error occurred while saving the late policy: ')
       end
     end
   end

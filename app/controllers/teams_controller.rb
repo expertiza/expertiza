@@ -36,7 +36,11 @@ class TeamsController < ApplicationController
     create_random_teams(parent)
     log_team_creation
     redirect_to_team_list(parent.id)
+  rescue TeamExistsError => e
+    handle_team_exists_error(parent.id, e.message)
   end
+
+  
 
   # Displays a list of teams for a parent object (either an assignment or course)
   def list
@@ -45,8 +49,10 @@ class TeamsController < ApplicationController
     @is_valid_assignment = valid_assignment?
     begin
       team_nodes(params[:id])
-    rescue StandardError
-      flash[:error] = $ERROR_INFO
+    rescue StandardError => e
+      flash[:error] = "An error occurred: #{e.message}"
+      # Log the error for investigation if needed
+      Rails.logger.error("Error in TeamsController#list: #{e.message}")
     end
   end
 
@@ -160,6 +166,10 @@ class TeamsController < ApplicationController
     return redirect_with_error if invalid_team_type_for_transfer?
 
     copy_teams(Team.team_operation[:bequeath])
+  rescue StandardError => e
+    flash[:error] = "An error occurred: #{e.message}"
+    # Log the error for investigation if needed
+    Rails.logger.error("Error in TeamsController#transfer_all: #{e.message}")
   end
 
   # Checks if the team type is invalid for transfer

@@ -12,7 +12,6 @@
   <%= link_to 'Copy participants from course', :action => 'inherit', :id => @root_node.node_object_id %>  |
   <%= link_to 'Copy participants to course', :action => 'bequeath_all', :id => @root_node.node_object_id %><BR/>
 <% end %>
-<!-- E2351 Added a duty field at the end of the expected fields -->
 <%= link_to 'Import '+@model.to_s.downcase+' participants',
             :controller=>'import_file',
             :action=>'start',

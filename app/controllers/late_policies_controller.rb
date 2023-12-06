@@ -161,7 +161,8 @@ class LatePoliciesController < ApplicationController
     return valid_penalty, error_message
   end
 
-  # This function validates the input.
+  # This function validates the input. The outputs are a boolean, which is true if the input is valid, and the second output
+  # is a string which contains all of the error messages. If there were no error messages, the returned string is ""
   def validate_input(is_update = false)
     # Validates input for create and update forms
     max_penalty = params[:late_policy][:max_penalty].to_i
@@ -173,13 +174,13 @@ class LatePoliciesController < ApplicationController
     error_messages << name_error if name_error
 
     # This validates the max_penalty to make sure it's within the correct range
-    if max_penalty_validation(max_penalty, penalty_per_unit)
+    if max_penalty_valid(max_penalty, penalty_per_unit)
       error_messages << "#{error_prefix(is_update)}The maximum penalty must be between the penalty per unit and 100."
       valid_penalty = false
     end
 
     # This validates the penalty_per_unit and makes sure it's not negative
-    if penalty_per_unit_validation(penalty_per_unit)
+    if penalty_per_unit_valid(penalty_per_unit)
       error_messages << 'Penalty per unit cannot be negative.'
       valid_penalty = false
     end
@@ -188,12 +189,12 @@ class LatePoliciesController < ApplicationController
   end
 
   # Validate the maximum penalty and ensure it's in the correct range
-  def max_penalty_validation(max_penalty, penalty_per_unit)
+  def max_penalty_valid(max_penalty, penalty_per_unit)
     max_penalty < penalty_per_unit || max_penalty > 100
   end
 
   # Validates the penalty per unit
-  def penalty_per_unit_validation(penalty_per_unit)
+  def penalty_per_unit_valid(penalty_per_unit)
     penalty_per_unit < 0
   end
 

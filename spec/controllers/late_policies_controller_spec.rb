@@ -5,6 +5,8 @@ describe LatePoliciesController do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
 
+  # Creates a late policy for various tests. Was duplicated at multiple locations, so the duplicate code was taken out
+  # and placed here for more readability and to satisfy DRY
   def create_late_policy(policy_name, max_penalty, penalty_per_unit, instructor_id)
     late_policy = LatePolicy.new
     late_policy.policy_name = policy_name
@@ -14,6 +16,7 @@ describe LatePoliciesController do
     late_policy
   end
 
+  # This helper method was also created to reduce repeated code
   def request_params(policy_name, max_penalty, penalty_per_unit)
     {
       late_policy: {
@@ -24,6 +27,8 @@ describe LatePoliciesController do
     }
   end
 
+  # This helper method was created to reduce repeated code as well. This is similar to the previous method
+  # but adds a unique id to it on top of the other things
   def request_params_with_id(policy_name, max_penalty, penalty_per_unit, id)
     {
       late_policy: {
@@ -103,7 +108,7 @@ describe LatePoliciesController do
     end
   end
 
-  # Create an RSpec example to reduce code duplication
+  # Create an RSpec example to reduce code duplication in the following tests
   RSpec.shared_examples 'late policy creation with error' do |policy_name, max_penalty, penalty_per_unit, expected_error|
     before(:each) do
       latePolicy = LatePolicy.new

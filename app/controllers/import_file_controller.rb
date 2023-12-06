@@ -136,8 +136,7 @@ class ImportFileController < ApplicationController
       if params[:has_header] == 'true'
         @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
       else
-#E2351 Adding new params[:select4] for the duty 
-        new_header = [params[:select1], params[:select2], params[:select3], params[:select4], params[:select5]]
+        new_header = [params[:select1], params[:select2], params[:select3], params[:select4]]
         @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
       end
       errors = []

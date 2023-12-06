@@ -117,7 +117,7 @@ class AssignmentParticipant < Participant
 
     # if user with provided name in csv file is not present then new user will be created.
     if user.nil?
-      raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 5
+      raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
 
       # define_attributes method will return an element that stores values from the row_hash.
       attributes = ImportFileHelper.define_attributes(row_hash)
@@ -132,9 +132,7 @@ class AssignmentParticipant < Participant
     return if AssignmentParticipant.exists?(user_id: user.id, parent_id: id)
 
     # if user is not already a participant then, user will be added to the assignment.
-    #E2351 - duty added to row hash, grab this and put into creating new participant
-    duty = row_hash[:duty]
-    new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id, duty: duty)
+    new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id)
     new_part.set_handle
   end
 

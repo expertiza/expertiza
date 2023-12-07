@@ -17,6 +17,7 @@ class LatePoliciesController < ApplicationController
     end
   end
 
+  # .includes() call allows for eager loading the associated user models
   def index
     @penalty_policies = LatePolicy.includes([:user]).where(['instructor_id = ? OR private = 0', instructor_id])
     respond_to do |format|

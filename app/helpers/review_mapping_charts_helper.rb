@@ -1,11 +1,8 @@
 # moves data of reviews in each round from a current round
 module ReviewMappingChartsHelper
+  # Provide data for chart elements
   def initialize_chart_elements(reviewer)
-    round = 0
-    labels = []
-    reviewer_data = []
-    all_reviewers_data = []
-    avg_vol_per_round(reviewer, round, labels, reviewer_data, all_reviewers_data)
+    avg_vol_per_round(reviewer)
     labels.push 'Total'
     reviewer_data.push reviewer.overall_avg_vol
     all_reviewers_data.push @all_reviewers_overall_avg_vol
@@ -13,7 +10,10 @@ module ReviewMappingChartsHelper
   end
 
   # display avg volume for all reviewers per round
-  def avg_vol_per_round(reviewer, round, labels, reviewer_data, all_reviewers_data)
+  def avg_vol_per_round(reviewer)
+    labels, round = 0, []
+    reviewer_data = []
+    all_reviewers_data = []
     @num_rounds.times do |rnd|
       next unless @all_reviewers_avg_vol_per_round[rnd] > 0
       round += 1
@@ -55,8 +55,9 @@ module ReviewMappingChartsHelper
     # if no Hash object is returned, the UI handles it accordingly
   end
 
+  # Get Metrics once tagging intervals are available
   def metric_information(intervals, interval_precision)
-    # Get Metrics once tagging intervals are available
+    # if intervals are empty return empty
     return {} if intervals.empty?
 
     metrics = {}
@@ -69,15 +70,18 @@ module ReviewMappingChartsHelper
     metrics
   end
 
+  # calculate means from the intput intervals
   def calculate_mean(intervals, interval_precision)
     (intervals.reduce(:+) / intervals.size.to_f).round(interval_precision)
   end
 
+  # calculate variance from intervals and mean
   def calculate_variance(intervals, mean, interval_precision)
     sum = intervals.inject(0) { |accum, i| accum + (i - mean)**2 }
     (sum / intervals.size.to_f).round(interval_precision)
   end
 
+  # calculate standard deviation
   def calculate_standard_deviation(variance, interval_precision)
     Math.sqrt(variance).round(interval_precision)
   end

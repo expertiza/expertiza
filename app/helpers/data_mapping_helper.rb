@@ -1,5 +1,6 @@
 # maps data and options in review_mapping_charts_helper for relevant methods
 module DataMappingHelper
+  # provide options data for tagging interval chart
   def provide_tagging_options
     {
       width: '200',
@@ -11,6 +12,7 @@ module DataMappingHelper
     }
   end
 
+  # provide volume metric options
   def provide_volume_metric_options
     {
       legend: { position: 'top', labels: { usePointStyle: true } },
@@ -23,6 +25,7 @@ module DataMappingHelper
     }
   end
 
+  # provides data for tagging interval chart
   def display_tagging_interval_chart_data(intervals, interval_mean)
     {
       labels: [*1..intervals.length],
@@ -30,10 +33,12 @@ module DataMappingHelper
     }
   end
 
+  # mapping interval length and mean for display_tagging_interval_chart_data method
   def intervals_check(intervals, interval_mean)
     return { data: Array.new(intervals.length, interval_mean), label: 'Mean time spent' } if intervals.empty?
   end
 
+  # provide data for volume metric chart using reviewer data
   def volume_metric_chart_data(labels, reviewer_data, all_reviewers_data)
     {
       labels: labels,

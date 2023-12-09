@@ -70,7 +70,7 @@ module ReviewMappingChartsHelper
     metrics
   end
 
-  # calculate means from the intput intervals
+  # calculate means from the input intervals
   def calculate_mean(intervals, interval_precision)
     (intervals.reduce(:+) / intervals.size.to_f).round(interval_precision)
   end

@@ -83,7 +83,7 @@ class SignedUpTeam < ApplicationRecord
   end
 
   # Remove a specific signed_up_teams record for a given topic and team.
-  def self.drop_off_signup_record(topic_id,team_id)
+  def self.drop_signup_record(topic_id,team_id)
     # Fetching record for a given topic and team.
     signup_record = SignedUpTeam.find_by(topic_id: topic_id, team_id: team_id)
     # If the signup_record in not nil destroy it.

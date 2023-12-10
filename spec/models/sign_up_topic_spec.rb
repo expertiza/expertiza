@@ -147,7 +147,7 @@ describe SignUpTopic do
     end
   end
 
-  describe '#signup_team_for_chosen_topic' do
+  describe '#sign_team_up' do
     let(:team) { create(:team) }
     let(:topic) { SignUpTopic.new(id: 1, max_choosers: 3) }
 
@@ -157,9 +157,9 @@ describe SignUpTopic do
       end
 
       it 'signs up the team for the chosen topic' do
-        allow(topic).to receive(:signup_team_for_chosen_topic).and_return(true)
+        allow(topic).to receive(:sign_team_up).and_return(true)
         allow(SignUpTopic).to receive(:slot_available?).and_return(true)
-        expect(topic.signup_team_for_chosen_topic(team.id)).to eq(true)
+        expect(topic.sign_team_up(team.id)).to eq(true)
       end
     end
 
@@ -169,8 +169,8 @@ describe SignUpTopic do
       end
 
       it 'does not create a new signup entry' do
-        allow(topic).to receive(:signup_team_for_chosen_topic).and_return(false)
-        expect(topic.signup_team_for_chosen_topic(team.id)).to eq(false)
+        allow(topic).to receive(:sign_team_up).and_return(false)
+        expect(topic.sign_team_up(team.id)).to eq(false)
       end
     end
 
@@ -180,8 +180,8 @@ describe SignUpTopic do
       end
 
       it 'creates a new waitlisted signup entry' do
-        allow(topic).to receive(:signup_team_for_chosen_topic).and_return(true)
-        expect(topic.signup_team_for_chosen_topic(team.id)).to eq(true)
+        allow(topic).to receive(:sign_team_up).and_return(true)
+        expect(topic.sign_team_up(team.id)).to eq(true)
       end
     end
   end
@@ -224,7 +224,7 @@ describe SignUpTopic do
         expect(longest_waiting_team).to receive(:is_waitlisted=).with(false)
         expect(longest_waiting_team).to receive(:save).once
         expect(SignedUpTeam).to receive(:drop_off_waitlists).with(longest_waiting_team.team_id).once
-        expect(SignedUpTeam).to receive(:drop_off_signup_record).with(topic_id, team_id).once
+        expect(SignedUpTeam).to receive(:drop_signup_record).with(topic_id, team_id).once
 
         your_class_instance.reassign_topic(team_id) # Pass team_id as an argument
       end
@@ -242,7 +242,7 @@ describe SignUpTopic do
         expect(longest_waiting_team).not to receive(:save)
         expect(SignedUpTeam).not_to receive(:drop_off_waitlists)
 
-        expect(SignedUpTeam).to receive(:drop_off_signup_record).with(topic_id, team_id).once
+        expect(SignedUpTeam).to receive(:drop_signup_record).with(topic_id, team_id).once
 
         your_class_instance.reassign_topic(team_id) # Pass team_id as an argument
       end

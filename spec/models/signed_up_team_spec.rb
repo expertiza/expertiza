@@ -5,12 +5,12 @@ describe SignUpTopic do
   let(:team) { create(:assignment_team, id: 1, name: 'team 1', users: [user, user2]) }
   let(:user) { create(:student) }
   let(:user2) { create(:student, name: 'qwertyui', id: 5) }
-  describe '.drop_off_signup_record' do
+  describe '.drop_signup_record' do
     context 'when the signup record exists' do
       it 'deletes the signup record' do
         puts "Before: SignedUpTeam count: #{SignedUpTeam.count}"
         expect {
-          SignedUpTeam.drop_off_signup_record(topic.id, team.id)
+          SignedUpTeam.drop_signup_record(topic.id, team.id)
         }.to change { SignedUpTeam.count }.by(-1)
         puts "After: SignedUpTeam count: #{SignedUpTeam.count}"
       end
@@ -20,7 +20,7 @@ describe SignUpTopic do
       it 'does not raise an error' do
         puts "Before: SignedUpTeam count: #{SignedUpTeam.count}"
         expect {
-          SignedUpTeam.drop_off_signup_record(999, 999) # Assuming 999 is not a valid topic_id and team_id
+          SignedUpTeam.drop_signup_record(999, 999) # Assuming 999 is not a valid topic_id and team_id
         }.not_to raise_error
         puts "After: SignedUpTeam count: #{SignedUpTeam.count}"
       end

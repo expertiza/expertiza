@@ -11,7 +11,7 @@ class SignUpSheet < ApplicationRecord
     # Confirm the signup topic if a topic ID is provided
     @signup_topic = SignUpTopic.find_by(id: topic_id)
     unless @signup_topic.nil?
-      confirmation_status = @signup_topic.signup_team_for_chosen_topic(team_id)
+      confirmation_status = @signup_topic.sign_team_up(team_id)
     end
     # Log the signup topic save status
     ExpertizaLogger.info "The signup topic save status:#{confirmation_status} for assignment #{assignment_id} by #{user_id}"

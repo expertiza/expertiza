@@ -142,7 +142,7 @@ describe Team do
 
   describe '.randomize_all_by_parent' do
     it 'forms teams and assigns team members automatically' do
-      allow(Participant).to receive(:where).with(parent_id: 1, type: 'AssignmentParticipant')
+      allow(Participant).to receive(:where).with(parent_id: 1, type: 'AssignmentParticipant', can_mentor: [false, nil])
                                            .and_return([participant, participant2, participant3])
       allow(User).to receive(:find).with(1).and_return(user)
       allow(User).to receive(:find).with(2).and_return(user2)

@@ -363,7 +363,7 @@ describe Assignment do
         allow(User).to receive(:find_by).with(name: 'no one').and_return(student)
         allow(AssignmentParticipant).to receive(:find_by).with(parent_id: 1, user_id: 3).and_return(nil)
         allow(AssignmentParticipant).to receive(:create).with(parent_id: 1, user_id: 3, permission_granted: 0,
-                                                              can_submit: true, can_review: true, can_take_quiz: false).and_return(participant)
+                                                              can_submit: true, can_review: true, can_take_quiz: false, can_mentor: false).and_return(participant)
         expect { assignment.add_participant('no one', true, true, false, false) }.to change { AssignmentParticipant.count }.from(0).to(1)
       end
     end

@@ -39,7 +39,7 @@ class LotteryController < ApplicationController
   # Prepares data for displaying the bidding details for each topic within an assignment.
   # It calculates the number of bids for each priority (1, 2, 3) per topic and also computes
   # the overall percentages of teams that received their first, second, and third choice.
-  def bidding_table_for_each_topic
+  def bidding_table_for_topics
     @assignment = Assignment.find(params[:id])
     # Fetch all topics for the assignment
     @topics = @assignment.sign_up_topics
@@ -50,11 +50,7 @@ class LotteryController < ApplicationController
       # Assuming bids are stored with a topic_id, and each bid has a team associated with it
       @bids_by_topic[topic.id] = Bid.where(topic_id: topic.id).map { |bid| { team: bid.team, priority: bid.priority } }
       # Fetch teams that are not waitlisted for this topic
-      @assigned_teams_by_topic[topic.id] = SignedUpTeam.where(topic_id: topic.id, is_waitlisted: false).map(&:team)
-      # @count1[topic.id] += @bids_by_topic[topic.id].count { |bid| bid[:priority] == 1 }
-      # @count2[topic.id] += @bids_by_topic[topic.id].count { |bid| bid[:priority] == 2 }
-      # @count3[topic.id] += @bids_by_topic[topic.id].count { |bid| bid[:priority] == 3 }       
-
+      @assigned_teams_by_topic[topic.id] = SignedUpTeam.where(topic_id: topic.id, is_waitlisted: false).map(&:team)      
       # Dynamically initializing and updating @count1, @count2, and @count3
       (1..3).each do |priority|
         instance_variable_set("@count#{priority}", Hash.new(0)) unless instance_variable_defined?("@count#{priority}")
@@ -64,18 +60,18 @@ class LotteryController < ApplicationController
     # Calculate the total number of teams and percentages after fetching bid details
     topic_ids = SignUpTopic.where(assignment_id: @assignment.id).pluck(:id)
     @total_teams = SignedUpTeam.where(topic_id: topic_ids).distinct.count(:team_id)
-    @priority_counts = calculate_priority_counts(@assigned_teams_by_topic, @bids_by_topic)
-    @percentages = calculate_percentages(@priority_counts, @total_teams)
+    @priority_counts = compute_priority_counts(@assigned_teams_by_topic, @bids_by_topic)
+    @percentages = compute_percentages(@priority_counts, @total_teams)
 
 
   end
 
   private
 
-  # Calculates the count of assigned teams for each priority level (1, 2, 3) across all topics.
+  # Computes the count of assigned teams for each priority level (1, 2, 3) across all topics.
   # It checks each team associated with a topic and determines if the team's bid matches
   # one of the priority levels, incrementing the respective count if so.
-  def calculate_priority_counts(assigned_teams_by_topic, bids_by_topic)
+  def compute_priority_counts(assigned_teams_by_topic, bids_by_topic)
     priority_counts = { 1 => 0, 2 => 0, 3 => 0 }
     assigned_teams_by_topic.each do |topic_id, teams|
       teams.each do |team|
@@ -88,7 +84,7 @@ class LotteryController < ApplicationController
 
   # Calculates the percentages of teams that received their first, second, and third choice
   # based on the counts of teams at each priority level.
-  def calculate_percentages(priority_counts, total_teams)
+  def compute_percentages(priority_counts, total_teams)
     priority_counts.transform_values { |count| (count.to_f / total_teams * 100).round(2) }
   end
 

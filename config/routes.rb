@@ -664,5 +664,5 @@ Expertiza::Application.routes.draw do
   get 'student_view/flip_view', controller: :student_view, action: :flip_view
   # updated route and added specific controller action upon accessing this route
   get 'lottery/run_intelligent_assignment/:id', to: 'lottery#run_intelligent_assignment', as: 'run_intelligent_assignment'
-  get 'assignments/:id/bidding_table_for_each_topic', to: 'lottery#bidding_table_for_each_topic', as: 'bidding_table_for_each_topic'
+  get 'assignments/:id/bidding_table_for_topics', to: 'lottery#bidding_table_for_topics', as: 'bidding_table_for_topics'
 end

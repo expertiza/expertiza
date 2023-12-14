@@ -1,7 +1,7 @@
 <h3>Bidding Details for <%= @assignment.name %></h3>
 <!-- Displaying percentages in a more visually appealing way -->
 <div class="percentages" style="margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9;">
-  <h4 style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Percentage of Teams Getting Their Choices:</h4>
+  <h4 style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Percentage of teams getting each choice:</h4>
   <ul style="list-style: none; padding: 0;">
     <li><strong>#1 Choice:</strong> <span style="color: #4CAF50;"><%= @percentages[1] || 0 %> %</span></li>
     <li><strong>#2 Choice:</strong> <span style="color: #FF9800;"><%= @percentages[2] || 0 %> %</span></li>
@@ -17,14 +17,17 @@
 .bids-column {
     width: 100px; /* Adjust width as needed */
   }
+.teams-column{
+    width: 950px
+}
 </style>
 
 <table class="table table-bordered table-hover">
   <thead>
     <tr>
-      <th>Topic Name</th>
-      <th>Topic ID</th>
-      <th>Bidding Teams</th>
+      <th>Topic id</th>
+      <th>Topic name</th>
+      <th>Bidding teams</th>
       <th>#1 bids</th>
       <th>#2 bids</th>
       <th>#3 bids</th>
@@ -33,9 +36,9 @@
   <tbody>
     <% @topics.each do |topic| %>
       <tr>
-        <td><%= topic.topic_name %></td>
         <td><%= topic.id %></td>
-        <td>
+        <td><%= topic.topic_name %></td>
+        <td class="teams-column">
           <% @bids_by_topic[topic.id].each do |bid_info| %>
             <% team = bid_info[:team] %>
             <% assigned_team = @assigned_teams_by_topic[topic.id].include?(team) %>

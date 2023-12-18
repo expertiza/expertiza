@@ -17,7 +17,6 @@ describe 'Submissions View' do
         visit "/assignments/list_submissions?id=#{assignment.id}"
         fill_in 'searchTeamName', with: team.name
         fill_in 'searchTeamMembers', with: participant.name
-
         expect(page).to have_css('table#submissionsTable tbody tr', count: 1) 
         expect(page).to have_content(team.name) 
         expect(page).to have_content(participant.name)

@@ -79,29 +79,31 @@ class UsersController < ApplicationController
     @paginated_users = paginate_list(@users)
   end
 
-  # Modified the code to provide the search parameters to the list method if they were found in the search textboxes.
-  # Creates a list of users to be displayed on the user interface.
-  def search_params
-    search_usrname = '.*'
-    search_fulname = '.*'
-    search_email = '.*'
-    # If the user name is discovered in the username text field, it is appended to the search criteria.
-    if params[:search_usrid].present?
-      search_usrname = '.*' + params[:search_usrid].strip + '.*'
-    end
+  # Method to construct search parameters based on user input
+def search_params
+  # Default search values (wildcards)
+  search_usrname = '.*'
+  search_fulname = '.*'
+  search_email = '.*'
 
-    # If the complete name(full name) is found in the name text field, it is appended to the search criteria.
-    if params[:search_fname].present?
-      search_fulname = '.*' + params[:search_fname].strip + '.*'
-    end
-
-    # If the email is found in the email text field, it is appended to the search criteria.
-    if params[:search_email].present?
-      search_email = '.*' + params[:search_email].strip + '.*'
-    end
-
-    [search_usrname, search_fulname, search_email]
+  # If the user name is provided in the username text field, append it to the search criteria.
+  if params[:search_usrid].present?
+    search_usrname = '.*' + params[:search_usrid].strip + '.*'
   end
+
+  # If the complete name (full name) is provided in the name text field, append it to the search criteria.
+  if params[:search_fname].present?
+    search_fulname = '.*' + params[:search_fname].strip + '.*'
+  end
+
+  # If the email is provided in the email text field, append it to the search criteria.
+  if params[:search_email].present?
+    search_email = '.*' + params[:search_email].strip + '.*'
+  end
+
+  # Returning an array containing the constructed search parameters
+  [search_usrname, search_fulname, search_email]
+end
 
   # for displaying users which are being searched for editing purposes after checking whether current user is authorized to do so
   def show_if_authorized

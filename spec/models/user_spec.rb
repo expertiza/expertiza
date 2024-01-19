@@ -213,7 +213,7 @@ describe User do
 
     it 'updates an existing user with info from impor file' do
       create(:student, name: 'abc')
-      row = { name: 'abc', fullname: 'test, test', email: 'test@gmail.com' }
+      row = { username: 'abc', fullname: 'test, test', email: 'test@gmail.com' }
       allow(user).to receive(:id).and_return(6)
       User.import(row, nil, { user: user }, nil)
       updated_user = User.find_by(name: 'abc')

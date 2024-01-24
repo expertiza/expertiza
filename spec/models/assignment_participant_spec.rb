@@ -142,7 +142,7 @@ describe AssignmentParticipant do
       end
 
       context 'when new user needs to be created' do
-        let() do
+        let(:row) do
           { username: 'no one', fullname: 'no one', email: 'name@email.com', role: 'user_role_name', parent: 'user_parent_name' }
         end
         let(:attributes) do

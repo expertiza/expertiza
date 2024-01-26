@@ -240,7 +240,7 @@ describe Assignment do
   describe '#check_condition' do
     context 'when the next due date is nil' do
       it 'returns false ' do
-        allow(DueDate).to receive(:get_next_due_date).with(1, nil).and_return(nil)
+        allow(DueDateHelper).to receive(:get_next_due_date).with(1, nil).and_return(nil)
         expect(assignment.check_condition('review_allowed_id')).to be false
       end
     end
@@ -248,7 +248,7 @@ describe Assignment do
     context 'when the next due date is allowed to review submissions' do
       it 'returns true' do
         assignment_due_date = double('AssignmentDueDate')
-        allow(DueDate).to receive(:get_next_due_date).with(1, nil).and_return(assignment_due_date)
+        allow(DueDateHelper).to receive(:get_next_due_date).with(1, nil).and_return(assignment_due_date)
         allow(assignment_due_date).to receive(:send).with('review_allowed_id').and_return(1)
         allow(DeadlineRight).to receive(:find).with(1).and_return(double('DeadlineRight', name: 'OK'))
         expect(assignment.check_condition('review_allowed_id')).to be true
@@ -384,14 +384,14 @@ describe Assignment do
   describe '#number_of_current_round' do
     context 'when next_due_date is nil' do
       it 'returns 0' do
-        allow(DueDate).to receive(:get_next_due_date).with(1, 1).and_return(nil)
+        allow(DueDateHelper).to receive(:get_next_due_date).with(1, 1).and_return(nil)
         expect(assignment.number_of_current_round(1)).to eq(0)
       end
     end
 
     context 'when next_due_date is not nil' do
       it 'returns the round of next_due_date' do
-        allow(DueDate).to receive(:get_next_due_date).with(1, 1).and_return(double('DueDate', round: 2))
+        allow(DueDateHelper).to receive(:get_next_due_date).with(1, 1).and_return(double('DueDate', round: 2))
         expect(assignment.number_of_current_round(1)).to eq(2)
       end
     end
@@ -493,14 +493,14 @@ describe Assignment do
   describe '#find_current_stage' do
     context 'when next due date is nil' do
       it 'returns Finished' do
-        allow(DueDate).to receive(:get_next_due_date).with(1, 123).and_return(nil)
+        allow(DueDateHelper).to receive(:get_next_due_date).with(1, 123).and_return(nil)
         expect(assignment.find_current_stage(123)).to eq('Finished')
       end
     end
 
     context 'when next due date is nil' do
       it 'returns next due date object' do
-        allow(DueDate).to receive(:get_next_due_date).with(1, 123).and_return(assignment_due_date)
+        allow(DueDateHelper).to receive(:get_next_due_date).with(1, 123).and_return(assignment_due_date)
         expect(assignment.find_current_stage(123)).to eq(assignment_due_date)
       end
     end
@@ -533,7 +533,7 @@ describe Assignment do
       end
 
       it 'returns correct questionnaire id found by topic_id if only topic_id is given and there is no current round used in the due date' do
-        allow(DueDate).to receive(:get_next_due_date).with(assignment.id).and_return(nil)
+        allow(DueDateHelper).to receive(:get_next_due_date).with(assignment.id).and_return(nil)
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: nil, topic_id: 1).and_return(
           [assignment_questionnaire1]
         )
@@ -542,7 +542,7 @@ describe Assignment do
       end
 
       it 'returns correct questionnaire id found by used_in_round and topic_id if only topic_id is given, but current round is found by the due date' do
-        allow(DueDate).to receive(:get_next_due_date).with(assignment.id).and_return(assignment_due_date)
+        allow(DueDateHelper).to receive(:get_next_due_date).with(assignment.id).and_return(assignment_due_date)
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return(
           [assignment_questionnaire1]
         )

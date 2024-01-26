@@ -190,7 +190,7 @@ class Assignment < ApplicationRecord
   # The permissions of TopicDueDate is the same as AssignmentDueDate.
   # Here, column is usually something like 'review_allowed_id'
   def check_condition(column, topic_id = nil)
-    next_due_date = DueDate.get_next_due_date(id, topic_id)
+    next_due_date = DueDateHelper.get_next_due_date(id, topic_id)
     return false if next_due_date.nil?
 
     right_id = next_due_date.send column
@@ -297,7 +297,7 @@ class Assignment < ApplicationRecord
   # if current  stage is submission or review, find the round number
   # otherwise, return 0
   def number_of_current_round(topic_id)
-    next_due_date = DueDate.get_next_due_date(id, topic_id)
+    next_due_date = DueDateHelper.get_next_due_date(id, topic_id)
     return 0 if next_due_date.nil?
 
     next_due_date.round ||= 0
@@ -352,7 +352,7 @@ class Assignment < ApplicationRecord
   end
 
   def find_current_stage(topic_id = nil)
-    next_due_date = DueDate.get_next_due_date(id, topic_id)
+    next_due_date = DueDateHelper.get_next_due_date(id, topic_id)
     return 'Finished' if next_due_date.nil?
 
     next_due_date
@@ -370,7 +370,7 @@ class Assignment < ApplicationRecord
   def review_questionnaire_id(round_number = nil, topic_id = nil)
     # If round is not given, try to retrieve current round from the next due date
     if round_number.nil?
-      next_due_date = DueDate.get_next_due_date(id)
+      next_due_date = DueDateHelper.get_next_due_date(id)
       round_number = next_due_date.try(:round)
     end
     # Create assignment_form that we can use to retrieve AQ with all the same attributes and questionnaire based on AQ

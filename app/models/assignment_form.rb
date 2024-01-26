@@ -428,7 +428,7 @@ class AssignmentForm
     if new_assign.save
       Assignment.record_timestamps = true
       copy_assignment_questionnaire(old_assign, new_assign, user)
-      AssignmentDueDate.copy(old_assign.id, new_assign.id)
+      DueDateHelper.copy(old_assign.id, new_assign.id)
       new_assign.create_node
       new_assign_id = new_assign.id
       # also copy topics from old assignment

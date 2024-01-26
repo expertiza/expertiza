@@ -27,6 +27,81 @@ describe ReviewMappingController do
     allow(reviewer).to receive(:get_reviewer).and_return(reviewer)
   end
 
+  describe '#action_allowed?' do
+    context "when the action is 'add_dynamic_reviewer'" do
+      it 'returns true' do
+        params = { action: 'add_dynamic_reviewer' }
+        allow(controller).to receive(:params).and_return(params)
+        expect(controller.action_allowed?).to be true
+      end
+    end
+
+    context "when the action is 'show_available_submissions'" do
+      it 'returns true' do
+        params = { action: 'show_available_submissions' }
+        allow(controller).to receive(:params).and_return(params)
+        expect(controller.action_allowed?).to be true
+      end
+    end
+
+    context "when the action is 'assign_reviewer_dynamically'" do
+      it 'returns true' do
+        params = { action: 'assign_reviewer_dynamically' }
+        allow(controller).to receive(:params).and_return(params)
+        expect(controller.action_allowed?).to be true
+      end
+    end
+
+    context "when the action is 'assign_metareviewer_dynamically'" do
+      it 'returns true' do
+        params = { action: 'assign_metareviewer_dynamically' }
+        allow(controller).to receive(:params).and_return(params)
+        expect(controller.action_allowed?).to be true
+      end
+    end
+
+    context "when the action is 'assign_quiz_dynamically'" do
+      it 'returns true' do
+        params = { action: 'assign_quiz_dynamically' }
+        allow(controller).to receive(:params).and_return(params)
+        expect(controller.action_allowed?).to be true
+      end
+    end
+
+    context "when the action is 'start_self_review'" do
+      it 'returns true' do
+        params = { action: 'start_self_review' }
+        allow(controller).to receive(:params).and_return(params)
+        expect(controller.action_allowed?).to be true
+      end
+    end
+
+    context 'when the action is not one of the allowed actions' do
+      it "returns true if the current role is an 'Instructor'" do
+        params = { action: 'some_other_action' }
+        allow(controller).to receive(:params).and_return(params)
+        allow(controller).to receive(:current_role_name).and_return('Instructor')
+
+        expect(controller.action_allowed?).to eq(true)
+      end
+
+      it "returns true if the current role is a 'Teaching Assistant'" do
+        params = { action: 'some_other_action' }
+        allow(controller).to receive(:current_role_name).and_return('Teaching Assistant')
+        allow(controller).to receive(:params).and_return(params)
+
+        expect(controller.action_allowed?).to eq(true)
+      end
+
+      it "returns true if the current role is an 'Administrator'" do
+        allow(controller).to receive(:current_role_name).and_return('Administrator')
+        params = { action: 'some_other_action' }
+        allow(controller).to receive(:params).and_return(params)
+        expect(controller.action_allowed?).to eq(true)
+      end
+    end
+  end
+
   describe '#add_calibration' do
     context 'when both participant and review_response_map have already existed' do
       it 'does not need to create new objects and redirects to responses#new maps' do
@@ -55,6 +130,60 @@ describe ReviewMappingController do
         user_session = { user: build(:instructor, id: 1) }
         get :add_calibration, params: request_params, session: user_session
         expect(response).to redirect_to '/response/new?assignment_id=1&id=1&return=assignment_edit'
+      end
+    end
+  end
+
+  describe '#select_reviewer' do
+    context 'when called with a valid contributor_id' do
+      before(:each) do
+        contributor_id = '1'
+        allow(AssignmentTeam).to receive(:find).with(contributor_id).and_return(team)
+        get :select_reviewer, params: { contributor_id: contributor_id }
+      end
+      it 'assigns the corresponding AssignmentTeam to @contributor' do
+        expect(assigns(:contributor)).to eq(team)
+      end
+
+      it 'stores the @contributor in the session' do
+        expect(session[:contributor]).to eq(team)
+      end
+    end
+
+    context 'when called with an invalid contributor_id' do
+      before(:each) do
+        contributor_id = '-1'
+        allow(AssignmentTeam).to receive(:find).with(contributor_id).and_return(nil)
+        get :select_reviewer, params: { contributor_id: contributor_id }
+      end
+      it 'does not assign any value to @contributor' do
+        expect(assigns(:contributor)).to be_nil
+      end
+
+      it 'does not store anything in the session' do
+        expect(session[:contributor]).to be_nil
+      end
+    end
+  end
+
+  describe '#select_metareviewer' do
+    context 'when given a valid response map id' do
+      it 'should assign the response map to @mapping' do
+        # Create a double representing a ResponseMap object
+        response_map_value = { id: 1, reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 2, type: '', created_at: Time.now, updated_at: Time.now, calibrate_to: false, team_reviewing_enabled: false }
+        response_map = double('ResponseMap', response_map_value)
+
+        allow(ResponseMap).to receive(:find).with('1').and_return(response_map)
+        get :select_metareviewer, params: { id: '1' }
+        expect(assigns(:mapping)).to eq(response_map)
+      end
+    end
+
+    context 'when given an invalid response map id' do
+      it 'should raise an error' do
+        allow(ResponseMap).to receive(:find).with('-1').and_return(nil)
+        get :select_metareviewer, params: { id: '-1' }
+        expect(assigns(:mapping)).to be_nil
       end
     end
   end
@@ -247,6 +376,65 @@ describe ReviewMappingController do
     end
   end
 
+  describe 'review_allowed?' do
+    let(:assignment) { double('Assignment', id: 1, num_reviews_allowed: 3) }
+    let(:reviewer) { double('User', id: 1) }
+    context 'when the reviewer has not reached the maximum number of reviews allowed for the assignment' do
+      it 'returns true' do
+        allow(ReviewResponseMap).to receive(:where).and_return([double, double])
+        expect(controller.review_allowed?(assignment, reviewer)).to be_truthy
+      end
+    end
+
+    context 'when the reviewer has reached the maximum number of reviews allowed for the assignment' do
+      it 'returns false' do
+        allow(ReviewResponseMap).to receive(:where).and_return([double, double])
+        allow(assignment).to receive(:num_reviews_allowed).and_return(2)
+        expect(controller.review_allowed?(assignment, reviewer)).to be_falsey
+      end
+    end
+  end
+
+  describe '#check_outstanding_reviews?' do
+    let(:reviewer) { double('Participant', id: 1, name: 'reviewer') }
+    let(:assignment) { double('Assignment', id: 1, num_reviews_allowed: 3) }
+    context 'when there are no review mappings for the assignment and reviewer' do
+      it 'returns true' do
+        allow(ReviewResponseMap).to receive(:where).with(reviewer_id: reviewer.id, reviewed_object_id: assignment.id).and_return([])
+        expect(controller.check_outstanding_reviews?(assignment, reviewer)).to be true
+      end
+    end
+
+    context 'when there are review mappings for the assignment and reviewer' do
+      let(:response) { double('Response', is_submitted: true) }
+      let(:in_progress_response) { double('Response', is_submitted: false) }
+      let(:review_response_maps_complete) do
+        [
+          double('ReviewResponseMap', id: 1, response: [response, response]),
+          double('ReviewResponseMap', id: 2, response: [response, response])
+        ]
+      end
+      let(:review_response_maps_incomplete) do
+        [
+          double('ReviewResponseMap', id: 1, response: [response, in_progress_response]),
+        ]
+      end
+
+      context 'when all reviews are completed' do
+        it 'returns false' do
+          allow(ReviewResponseMap).to receive(:where).with(reviewer_id: reviewer.id, reviewed_object_id: assignment.id).and_return(review_response_maps_complete)
+          expect(controller.check_outstanding_reviews?(assignment, reviewer)).to be false
+        end
+      end
+      context 'when some reviews are in progress' do
+        it 'returns true' do
+          allow(ReviewResponseMap).to receive(:where).with(reviewer_id: reviewer.id, reviewed_object_id: assignment.id).and_return(review_response_maps_incomplete)
+          expect(controller.check_outstanding_reviews?(assignment, reviewer)).to be true
+        end
+      end
+    end
+  end
+
   describe '#assign_quiz_dynamically' do
     before(:each) do
       allow(AssignmentParticipant).to receive_message_chain(:where, :first)
@@ -280,6 +468,34 @@ describe ReviewMappingController do
         expect(flash[:error]).to be nil
         expect(response).to redirect_to('/student_quizzes?id=1')
       end
+		end
+
+    context "when the reviewer has not taken the quiz yet" do
+      it "creates a new QuizResponseMap" do
+        questionnaire = double('Questionnaire', id: 2, instructor_id: 2)
+
+        allow(Questionnaire).to receive(:find).with('2').and_return(questionnaire)
+        allow(Questionnaire).to receive(:find_by).with(instructor_id: 2).and_return(questionnaire)
+        allow_any_instance_of(QuizResponseMap).to receive(:save).and_return(true)
+        @params = {
+          assignment_id: 1,
+          reviewer_id: 2,
+          questionnaire_id: 2,
+          participant_id: 2
+        }
+
+
+        post :assign_quiz_dynamically, params: @params
+        expect(flash[:error]).to be nil
+        expect(response).to redirect_to('/student_quizzes?id=1')
+			end
+		end
+
+    # Incomplete
+    context "when an error occurs during the assignment process" do
+      it "displays an alert message" do
+        # Test scenario 3
+      end
     end
   end
 
@@ -303,6 +519,50 @@ describe ReviewMappingController do
   end
 
   describe '#assign_metareviewer_dynamically' do
+    context "when there are reviews to Meta review" do
+      let(:assignment) { build(:assignment) }
+      let(:metareviewer) { build(:participant) }
+      it "assigns the metareviewer dynamically to the assignment" do
+        allow(Assignment).to receive(:find).with(any_args).and_return(assignment)
+        allow(AssignmentParticipant).to receive(:where).with(user_id: "1", parent_id: assignment.id).and_return([metareviewer])
+        
+        expect(assignment).to receive(:assign_metareviewer_dynamically).with(metareviewer)
+        
+        post :assign_metareviewer_dynamically, params: { assignment_id: assignment.id, metareviewer_id: 1 }
+        
+        expect(response).to redirect_to(controller: 'student_review', action: 'list', id: metareviewer.id)
+      end
+    end
+
+    context "when there are no reviews to Meta review" do
+      let(:assignment) { build(:assignment) }
+      it "displays a flash warning instead of crashing the page" do
+        allow(Assignment).to receive(:find).with(any_args).and_return(assignment)
+        allow(AssignmentParticipant).to receive(:where).with(any_args).and_return([]) 
+
+        post :assign_metareviewer_dynamically, params: { assignment_id: assignment.id, metareviewer_id: 1 }
+      
+        expect(flash[:error]).to eq("There are no reviews to metareview at this time for this assignment.")
+        expect(response).to redirect_to(controller: 'student_review', action: 'list', id: nil)
+      end
+    end
+
+    context "when an error occurs during assignment of metareviewer" do
+      let(:assignment) { build(:assignment) }
+      let(:metareviewer) { build(:participant) }
+      it "displays an error message in the flash" do
+        # Test scenario 3
+        allow(Assignment).to receive(:find).with(any_args).and_return(assignment)
+        allow(AssignmentParticipant).to receive(:where).with(any_args).and_return([metareviewer]) 
+        allow(assignment).to receive(:assign_metareviewer_dynamically).and_raise(StandardError, "Assign Metareviewer Error")
+
+        post :assign_metareviewer_dynamically, params: { assignment_id: assignment.id, metareviewer_id: 1 }
+      
+        expect(flash[:error]).to eq("Assign Metareviewer Error")
+        expect(response).to redirect_to(controller: 'student_review', action: 'list', id: metareviewer.id)
+      end
+    end
+
     it 'redirects to student_review#list page' do
       metareviewer = double('AssignmentParticipant', id: 1)
       allow(AssignmentParticipant).to receive(:where).with(user_id: '1', parent_id: 1).and_return([metareviewer])
@@ -313,6 +573,109 @@ describe ReviewMappingController do
       }
       post :assign_metareviewer_dynamically, params: request_params
       expect(response).to redirect_to('/student_review/list?id=1')
+    end
+	end
+
+  describe 'delete_outstanding_reviewers' do
+    before(:each) do
+      allow(AssignmentTeam).to receive(:find).with('1').and_return(team)
+      allow(team).to receive(:review_mappings).and_return([double('ReviewResponseMap', id: 1)])
+
+      allow(Response).to receive(:exists?).with(map_id: 1).and_return(false)
+      review_response_map = double('ReviewResponseMap')
+      allow(ReviewResponseMap).to receive(:find).with(1).and_return(review_response_map)
+      allow(review_response_map).to receive(:destroy).and_return(true)
+    end
+
+    context 'when there are no outstanding reviewers' do
+      it 'deletes all review mappings for the given team' do
+        # Test setup
+        request_params = {
+          id: 1,
+          contributor_id: 1
+        }
+
+        # Method call
+        post :delete_outstanding_reviewers, params: request_params
+
+        # Assertion
+        expect(ReviewResponseMap.exists?(review_response_map.id)).to be_falsey
+        expect(ReviewResponseMap.exists?(review_response_map.id)).to be_falsey
+      end
+
+      it 'sets a success flash message' do
+        # Test setup
+        request_params = {
+          id: 1,
+          contributor_id: 1
+        }
+
+        # Method call
+        post :delete_outstanding_reviewers, params: request_params
+
+        # Assertion
+        expect(flash[:success]).to eq('All review mappings for "' + team.name + '" have been deleted.')
+      end
+
+      it 'redirects to the list_mappings action' do
+        request_params = {
+          id: 1,
+          contributor_id: 1
+        }
+
+        # Method call
+        post :delete_outstanding_reviewers, params: request_params
+
+        # Assertion
+        expect(response).to redirect_to(action: 'list_mappings', id: assignment.id)
+      end
+    end
+
+    context 'when there are outstanding reviewers' do
+      it 'deletes only the review mappings without associated responses' do
+        # Test setup
+        allow(Response).to receive(:exists?).with(map_id: 1).and_return(true)
+        request_params = {
+          id: 1,
+          contributor_id: 1
+        }
+
+        # Method call
+        post :delete_outstanding_reviewers, params: request_params
+
+        # Assertion
+        expect(ReviewResponseMap.exists?(review_response_map.id)).to be_falsey
+			end
+
+      it 'sets an error flash message with the number of outstanding reviewers' do
+        # Test setup
+        allow(Response).to receive(:exists?).with(map_id: 1).and_return(true)
+        request_params = {
+          id: 1,
+          contributor_id: 1
+        }
+
+        # Method call
+        post :delete_outstanding_reviewers, params: request_params
+
+        # Assertion
+        expect(flash[:error]).to eq('1 reviewer(s) cannot be deleted because they have already started a review.')
+      end
+
+      it 'redirects to the list_mappings action' do
+        # Test setup
+        allow(Response).to receive(:exists?).with(map_id: 1).and_return(true)
+        request_params = {
+          id: 1,
+          contributor_id: 1
+        }
+
+        # Method call
+        post :delete_outstanding_reviewers, params: request_params
+
+        # Assertion
+        expect(response).to redirect_to(action: 'list_mappings', id: assignment.id)
+      end
     end
   end
 
@@ -478,6 +841,7 @@ describe ReviewMappingController do
     end
   end
 
+  # Tests can be added
   describe '#delete_metareview' do
     it 'redirects to review_mapping#list_mappings page after deletion' do
       allow(MetareviewResponseMap).to receive(:find).with('1').and_return(metareview_response_map)
@@ -485,6 +849,64 @@ describe ReviewMappingController do
       request_params = { id: 1 }
       post :delete_metareview, params: request_params
       expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+    end
+
+    context 'when given a valid metareview mapping ID' do
+      it 'deletes the metareview mapping' do
+        valid_mapping = create(:meta_review_response_map) # You need to implement a method to create a valid metareview mapping
+        expect {
+          delete :delete_metareview, params: { id: valid_mapping.id }
+        }.to change(MetareviewResponseMap, :count).by(-1)
+        # expect(flash[:note]).to eq("The metareview mapping for #{valid_mapping.reviewee.name} and #{valid_mapping.reviewer.name} has been deleted.")
+      end
+    end
+
+    context 'when given an invalid metareview mapping ID' do
+      it 'does not delete any metareview mapping' do
+        invalid_mapping_id = -1
+        expect {
+          delete :delete_metareview, params: { id: invalid_mapping_id }
+        }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+
+    context 'when given a metareview mapping ID that does not exist' do
+      it 'does not delete any metareview mapping' do
+        non_existing_mapping_id = 9999
+        expect {
+          delete :delete_metareview, params: { id: non_existing_mapping_id }
+        }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+
+    context 'when given a metareview mapping ID that is associated with an assignment' do
+      it 'updates the associated assignment' do
+        mapping_with_assignment = create(:meta_review_response_map, review_mapping: create(:review_response_map))
+        assignment_id_before = mapping_with_assignment.assignment.id
+        delete :delete_metareview, params: { id: mapping_with_assignment.id }
+        assignment_id_after = MetareviewResponseMap.find_by(id: mapping_with_assignment.id)&.assignment&.id
+        expect(assignment_id_before).not_to eq(assignment_id_after)
+
+      end
+    end
+
+    context 'when given a metareview mapping ID that is not associated with an assignment' do
+      it 'does not update any assignment' do
+        expect {
+          mapping_without_assignment = create(:meta_review_response_map, review_mapping: create(:review_response_map, assignment: nil))
+        }.to raise_error(ActiveRecord::NotNullViolation)
+
+      end
+    end
+
+    context 'when given a metareview mapping ID that is associated with a response' do
+      it 'does not delete the associated response' do
+        mapping_with_response = create(:meta_review_response_map, review_mapping: create(:review_response_map))
+        expect {
+          delete :delete_metareview, params: { id: mapping_with_response.id }
+        }.not_to change(Response, :count)
+
+      end
     end
   end
 
@@ -499,18 +921,57 @@ describe ReviewMappingController do
       expect(flash[:error]).to eq('No error!')
       expect(response).to render_template(:list_mappings)
     end
+
+    context "when there is a flash error message" do
+      it "sets the flash error message when id is 0" do
+        get :list_mappings, params: { id: "0" }
+        expect(flash[:error]).to eq("Assignment needs to be created in order to assign reviewers!")
+      end
+      it "sets the flash error message when id not equal to 0" do
+        error_message = "Test Error Message"
+        get :list_mappings, params: { id: "1", msg: error_message }
+      expect(flash[:error]).to eq(error_message)
+      end
+    end
+  
+    context "when there is no flash error message" do
+      it "does not set the flash error message" do
+        assignment = create(:assignment)
+        get :list_mappings, params: { id: assignment.id }
+        expect(flash[:error]).to be_nil
+      end
+    end
+  
+    context "when the assignment exists" do
+      before do
+        @assignment = create(:assignment)
+        allow(Assignment).to receive(:find).with('1').and_return(@assignment)
+        get :list_mappings, params: { id: @assignment.id }
+      end
+
+      it "finds the assignment with the given id" do
+        expect(assigns(:assignment)).to eq(@assignment)
+      end
+  
+      it "retrieves all assignment teams associated with the assignment" do
+        expect(assigns(:items)).to eq(AssignmentTeam.where(parent_id: @assignment.id))
+      end
+  
+      it "sorts the assignment teams by name" do
+        sorted_items = assigns(:items).sort_by(&:name)
+        expect(assigns(:items)).to eq(sorted_items)
+      end
+    end  
+
   end
 
   describe '#automatic_review_mapping' do
     before(:each) do
       allow(AssignmentParticipant).to receive(:where).with(parent_id: 1).and_return([participant, participant1, participant2])
+      allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team, team1])
     end
 
     context 'when teams is not empty' do
-      before(:each) do
-        allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team, team1])
-      end
-
       context 'when all nums in params are 0' do
         it 'shows an error flash message and redirects to review_mapping#list_mappings page' do
           request_params = {
@@ -645,6 +1106,68 @@ describe ReviewMappingController do
       post :save_grade_and_comment_for_reviewer, params: request_params, session: session_params
       expect(flash[:note]).to be nil
       expect(response).to redirect_to('/reports/response_report')
+    end
+
+    context "when the review grade is retrieved" do
+      let(:review_grade_object) { build(:review_grade) }
+      let(:instructor) { build(:instructor) }
+      let(:session_params) do
+        { user: stub_current_user(instructor, instructor.role.name, instructor.role) }
+      end
+    
+      request_params = 
+        {
+          review_grade: {
+            participant_id: '1',
+            assignment_id: '1',
+          }
+        }
+
+      before(:each) do
+        allow(ReviewGrade).to receive(:find_or_create_by).with(participant_id: '1').and_return(review_grade_object)
+        allow(controller).to receive(:review_mapping_params).and_return(
+          {
+          participant_id: 1,
+          grade_for_reviewer: 90,
+          comment_for_reviewer: 'Very Good',
+          }
+        )
+        allow(review_grade_object).to receive(:save).and_return(true)
+
+        post :save_grade_and_comment_for_reviewer, params: request_params, session: session_params
+      end
+
+      it "creates a new review grade with the given participant_id" do
+        expect(ReviewGrade.count).to eq(1)
+      end
+  
+      it "sets the attributes of the review grade with the given review_mapping_params" do
+        created_review_grade = ReviewGrade.last
+        expect(created_review_grade.grade_for_reviewer).to eq(90)
+        expect(created_review_grade.comment_for_reviewer).to eq('Very Good')
+      end
+  
+      it "sets the review_graded_at attribute to the current time" do
+        created_review_grade = ReviewGrade.last
+        expect(created_review_grade.review_graded_at).to be_within(2.second).of(Time.now)
+      end
+  
+      it "sets the reviewer_id attribute to the current user's id" do
+        created_review_grade = ReviewGrade.last
+        expect(created_review_grade.reviewer_id).to eq(instructor.id)
+      end
+  
+      it "saves the review grade successfully" do
+        # expect(flash[:success]).to eq('Grade and comment for reviewer successfully saved.')
+      end
+  
+      it "sets a success flash message" do
+        expect(flash[:success]).to eq('Grade and comment for reviewer successfully saved.')
+      end
+  
+      it "redirects to the 'response_report' action in the 'reports' controller for HTML format" do
+        expect(response).to redirect_to(controller: 'reports', action: 'response_report', id: '1')
+      end
     end
   end
 

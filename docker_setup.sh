@@ -1,4 +1,5 @@
 apt-get update
+apt-get install -y curl
 curl -sL https://deb.nodesource.com/setup_14.x | sh -
 apt-get install -y nodejs
 apt-get install -y npm

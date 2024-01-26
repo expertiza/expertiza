@@ -1,14 +1,11 @@
 class LotteryController < ApplicationController
   include AuthorizationHelper
-
   require 'json'
   require 'rest_client'
-
   # Give permission to run the bid to appropriate roles
   def action_allowed?
     current_user_has_ta_privileges?
   end
-
   # This method sends a request to a web service that uses k-means and students' bidding data
   # to build teams automatically.
   # The webservice tries to create teams with sizes close to the max team size
@@ -16,14 +13,13 @@ class LotteryController < ApplicationController
   # that have similar bidding info/priorities associated with the assignment's sign-up topics.
   #
   # rubocop:disable Metrics/AbcSize
+
   def run_intelligent_assignment
     assignment = Assignment.find(params[:id])
     teams = assignment.teams
-
     users_bidding_info = construct_users_bidding_info(assignment.sign_up_topics, teams)
     bidding_data = { users: users_bidding_info, max_team_size: assignment.max_team_size }
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Bidding data for assignment #{assignment.name}: #{bidding_data}", request)
-
     begin
       url = WEBSERVICE_CONFIG['topic_bidding_webservice_url']
       response = RestClient.post url, bidding_data.to_json, content_type: :json, accept: :json
@@ -36,11 +32,62 @@ class LotteryController < ApplicationController
     rescue StandardError => e
       flash[:error] = e.message
     end
-
     redirect_to controller: 'tree_display', action: 'list'
   end
 
+
+  # Prepares data for displaying the bidding details for each topic within an assignment.
+  # It calculates the number of bids for each priority (1, 2, 3) per topic and also computes
+  # the overall percentages of teams that received their first, second, and third choice.
+  def bidding_table_for_topics
+    @assignment = Assignment.find(params[:id])
+    # Fetch all topics for the assignment
+    @topics = @assignment.sign_up_topics
+    # Fetch all bids for these topics
+    @bids_by_topic = {}
+    @assigned_teams_by_topic = {} # This will store the assigned teams for each topic
+    @topics.each do |topic|
+      # Assuming bids are stored with a topic_id, and each bid has a team associated with it
+      @bids_by_topic[topic.id] = Bid.where(topic_id: topic.id).map { |bid| { team: bid.team, priority: bid.priority } }
+      # Fetch teams that are not waitlisted for this topic
+      @assigned_teams_by_topic[topic.id] = SignedUpTeam.where(topic_id: topic.id, is_waitlisted: false).map(&:team)      
+      # Dynamically initializing and updating @count1, @count2, and @count3
+      (1..3).each do |priority|
+        instance_variable_set("@count#{priority}", Hash.new(0)) unless instance_variable_defined?("@count#{priority}")
+        instance_variable_get("@count#{priority}")[topic.id] = @bids_by_topic[topic.id].count { |bid| bid[:priority] == priority }
+      end
+    end
+    # Calculate the total number of teams and percentages after fetching bid details
+    topic_ids = SignUpTopic.where(assignment_id: @assignment.id).pluck(:id)
+    @total_teams = SignedUpTeam.where(topic_id: topic_ids).distinct.count(:team_id)
+    @priority_counts = compute_priority_counts(@assigned_teams_by_topic, @bids_by_topic)
+    @percentages = compute_percentages(@priority_counts, @total_teams)
+
+
+  end
+
   private
+
+  # Computes the count of assigned teams for each priority level (1, 2, 3) across all topics.
+  # It checks each team associated with a topic and determines if the team's bid matches
+  # one of the priority levels, incrementing the respective count if so.
+  def compute_priority_counts(assigned_teams_by_topic, bids_by_topic)
+    priority_counts = { 1 => 0, 2 => 0, 3 => 0 }
+    assigned_teams_by_topic.each do |topic_id, teams|
+      teams.each do |team|
+        bid_info = bids_by_topic[topic_id].find { |bid| bid[:team] == team }
+        priority_counts[bid_info[:priority]] += 1 if bid_info
+      end
+    end
+    priority_counts
+  end
+
+  # Calculates the percentages of teams that received their first, second, and third choice
+  # based on the counts of teams at each priority level.
+  def compute_percentages(priority_counts, total_teams)
+    priority_counts.transform_values { |count| (count.to_f / total_teams * 100).round(2) }
+  end
+
 
   # Generate user bidding information hash based on students who haven't signed up yet
   # This associates a list of bids corresponding to sign_up_topics to a user
@@ -98,12 +145,8 @@ class LotteryController < ApplicationController
     teams_bidding_info.each do |tb|
       tb[:bids].each do |bid|
         topic_id = bid[:topic_id]
-        num_of_signed_up_teams = SignedUpTeam.where(topic_id: topic_id).count
-        max_choosers = SignUpTopic.find(bid[:topic_id]).try(:max_choosers)
-        if num_of_signed_up_teams < max_choosers
-          SignedUpTeam.create(team_id: tb[:team_id], topic_id: bid[:topic_id])
-          break
-        end
+        max_choosers = SignUpTopic.find(topic_id).try(:max_choosers)
+        SignedUpTeam.create(team_id: tb[:team_id], topic_id: topic_id) if SignedUpTeam.where(topic_id: topic_id).count < max_choosers
       end
     end
   end
@@ -120,7 +163,6 @@ class LotteryController < ApplicationController
     unassigned_teams = assignment.teams.reload.select do |t|
       SignedUpTeam.where(team_id: t.id, is_waitlisted: 0).blank? && Bid.where(team_id: t.id).any?
     end
-
     # Sorting unassigned_teams by team size desc, number of bids in current team asc
     # again, we need to find a way to to merge bids that came from different previous teams
     # then sorting unassigned_teams by number of bids in current team (less is better)
@@ -130,10 +172,8 @@ class LotteryController < ApplicationController
       [TeamsUser.where(team_id: t2.id).size, Bid.where(team_id: t1.id).size] <=>
         [TeamsUser.where(team_id: t1.id).size, Bid.where(team_id: t2.id).size]
     end
-
     teams_bidding_info = construct_teams_bidding_info(unassigned_teams, sign_up_topics)
     assign_available_slots(teams_bidding_info)
-
     # Remove is_intelligent property from assignment so that it can revert to the default sign-up state
     assignment.update_attributes(is_intelligent: false)
     flash[:success] = 'The intelligent assignment was successfully completed for ' + assignment.name + '.'

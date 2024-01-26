@@ -10,7 +10,7 @@
 <br/>
 <% if params[:model] == 'Assignment' && @parent.course_id %>
   <%= link_to 'Copy participants from course', :action => 'inherit', :id => @root_node.node_object_id %>  |
-  <%= link_to 'Copy participants to course', :action => 'bequeath_all', :id => @root_node.node_object_id %><BR/>
+  <%= link_to 'Copy participants to course', :action => 'transfer_all', :id => @root_node.node_object_id %><BR/>
 <% end %>
 <%= link_to 'Import '+@model.to_s.downcase+' participants',
             :controller=>'import_file',

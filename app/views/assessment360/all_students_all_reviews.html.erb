@@ -1,9 +1,37 @@
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const studentSearch = document.getElementById('studentSearch');
+        const rows = document.querySelectorAll('table#myTable tr');
+    
+        studentSearch.addEventListener('input', function () {
+            const searchText = studentSearch.value.toLowerCase();
+    
+            rows.forEach(function (row, index) {
+            if (index < 2) {
+                return;
+            }
+                const studentNameCell = row.querySelector('td:first-child');
+                if (studentNameCell) {
+                    const studentName = studentNameCell.textContent.toLowerCase();
+    
+                    if (studentName.includes(searchText)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+        });
+    });
+</script>
 <style>
   th, td {
     text-align: center;
 }
 </style>
-  <table class="table table-striped">
+<label for="studentSearch">Search for a student:</label>
+<input type="text" id="studentSearch" placeholder="Search for a student...">
+  <table id="myTable" class="table table-striped">
     <tr>
       <th rowspan=2 width="320">Students</th>
       <th rowspan=2 width="30">Teammate Count</th>
@@ -14,7 +42,7 @@
     </tr>
     <tr>
       <% (0..@assignments.size).each do %>
-        <td><b>Metareviews</b></td>
+       <td><b>Metareviews</b></td>
         <td><b>Teammate Reviews</b></td>
       <% end %>
     </tr>

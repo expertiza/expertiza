@@ -178,6 +178,90 @@ describe User do
         expect(user.get_user_list).to eq([user1, user2])
       end
     end
+
+    context 'when current user is super admin and searches by user name' do
+      it 'fetches all users with the given user name' do
+        allow(user).to receive_message_chain('role.super_admin?') { true }
+        expect(user.get_user_list('abc', '', '')).to eq([user1, user2])
+      end
+    end
+
+    context 'when current user is super admin and searches by incorrect user name' do
+      it 'fetches an empty users list if user with given user name is not found' do
+        allow(user).to receive_message_chain('role.super_admin?') { true }
+        expect(user.get_user_list('abcd', '', '')).to eq([])
+      end
+    end
+
+    context 'when current user is super admin and searches by user full name' do
+      it 'fetches all users with the given full name' do
+        allow(user).to receive_message_chain('role.super_admin?') { true }
+        expect(user.get_user_list('', 'abc bbc', '')).to eq([user1, user2])
+      end
+    end
+
+    context 'when current user is super admin and searches by incorrect user full name' do
+      it 'fetches an empty users list if user with given full name is not found' do
+        allow(user).to receive_message_chain('role.super_admin?') { true }
+        expect(user.get_user_list('', 'abc bbcd', '')).to eq([])
+      end
+    end
+
+    context 'when current user is super admin and searches by user email' do
+      it 'fetches all users with the given email' do
+        allow(user).to receive_message_chain('role.super_admin?') { true }
+        expect(user.get_user_list('', '', 'abcbbe@gmail.com')).to eq([user2])
+      end
+    end
+
+    context 'when current user is super admin and searches by incorrect user email' do
+      it 'fetches an empty users list if user with given email is not found' do
+        allow(user).to receive_message_chain('role.super_admin?') { true }
+        expect(user.get_user_list('', '', 'abcbbcd@gmail.com')).to eq([])
+      end
+    end
+
+    context 'when current user is super admin and searches by user name and email' do
+      it 'fetches all users with given user name and email' do
+        allow(user).to receive_message_chain('role.super_admin?') { true }
+        expect(user.get_user_list('abc', '', 'abcbbc@gmail.com')).to eq([user1])
+      end
+    end
+
+    context 'when current user is super admin and searches by incorrect user name and email' do
+      it 'fetches an empty users list if user with given user name and email is not found' do
+        allow(user).to receive_message_chain('role.super_admin?') { true }
+        expect(user.get_user_list('abc', '', 'abcbdfbc@gmail.com')).to eq([])
+      end
+    end
+
+    context 'when current user is super admin and searches by user full name and email' do
+      it 'fetches all users with given full name and email' do
+        allow(user).to receive_message_chain('role.super_admin?') { true }
+        expect(user.get_user_list('', 'abc bbc', 'abcbbe@gmail.com')).to eq([user2])
+      end
+    end
+
+    context 'when current user is super admin and searches by incorrect user full name and email' do
+      it 'fetches an empty users list if user with given full name and email is not found' do
+        allow(user).to receive_message_chain('role.super_admin?') { true }
+        expect(user.get_user_list('', 'abcsd bbc', 'abcfdbbe@gmail.com')).to eq([])
+      end
+    end
+
+    context 'when current user is super admin and searches by user name and full name' do
+      it 'fetches all users with given user name and full name' do
+        allow(user).to receive_message_chain('role.super_admin?') { true }
+        expect(user.get_user_list('abc', ' bbc', '')).to eq([user1, user2])
+      end
+    end
+
+    context 'when current user is super admin and search by user name, full name and email' do
+      it 'fetches all users with given user name, full name and email' do
+        allow(user).to receive_message_chain('role.super_admin?') { true }
+        expect(user.get_user_list('abc', ' bbc', 'abcbbe@gmail.com')).to eq([user2])
+      end
+    end
   end
 
   describe '#super_admin?' do

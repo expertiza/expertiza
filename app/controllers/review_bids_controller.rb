@@ -60,6 +60,7 @@ class ReviewBidsController < ApplicationController
     @bids = signed_up_topics
     @num_of_topics = @sign_up_topics.size
     @assigned_review_maps = []
+    @count = ReviewBid.all.count
     ReviewResponseMap.where(reviewed_object_id: @assignment.id, reviewer_id: @participant.id).each do |review_map|
       @assigned_review_maps << review_map
     end
@@ -94,14 +95,27 @@ class ReviewBidsController < ApplicationController
 
   # assign bidding topics to reviewers
   def assign_bidding
-    # sets parameters used for running bidding algorithm
-    assignment_id = params[:assignment_id].to_i
-    # list of reviewer id's from a specific assignment
-    reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
-    bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
-    matched_topics = run_bidding_algorithm(bidding_data)
-    ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
-    Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
+    assignment = Assignment.find(params[:assignment_id])
+    reviewer_ids = AssignmentParticipant.where(parent_id: assignment.id).ids
+
+    if ReviewBid.where(assignment_id: assignment.id).empty?
+      # No bids - randomly assign
+      topics = SignUpTopic.where(assignment_id: assignment.id)
+      topics.each do |topic|
+        reviewer_id = reviewer_ids.sample
+        ReviewBid.create(assignment_id: assignment.id,
+                         signuptopic_id: topic.id,
+                         participant_id: reviewer_id)
+      end
+    else
+      @review_bid = ReviewBid.new
+      bidding_data = @review_bid.bidding_data(assignment_id, reviewer_ids)
+      matched_topics = assign_reviewers(bidding_data)
+      @review_bid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
+    end
+
+    Assignment.find(assignment_id).update(can_choose_topic_to_review: false)
+
     redirect_back fallback_location: root_path
   end
 
@@ -109,7 +123,7 @@ class ReviewBidsController < ApplicationController
   # passing webserver: student_ids, topic_ids, student_preferences, time_stamps
   # webserver returns:
   # returns matched assignments as json body
-  def run_bidding_algorithm(bidding_data)
+  def assign_reviewers(bidding_data)
     # begin
     url = 'http://app-csc517.herokuapp.com/match_topics' # hard coding for the time being
     response = RestClient.post url, bidding_data.to_json, content_type: 'application/json', accept: :json

@@ -107,7 +107,7 @@ en_US:
         mico_task: "Micro Task Assignment?"
         review_reviewers: "Reviews visible to all other reviewers?"
         calibrate_training: "Calibration for training?"
-        reputation_algorithm: "Reputation Alogorithm?"
+        reputation_algorithm: "Reputation Algorithm?"
         use_simicheck: "Use simicheck?"
         allow_feedback: "Allow tag prompts so author can tag feedback comments?"
         available: "Available to students?"

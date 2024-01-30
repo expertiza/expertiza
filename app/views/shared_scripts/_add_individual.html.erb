@@ -23,6 +23,11 @@
 		<%= label_tag :role_submitter, "submitter" ,{:style=>"font-size:16px;"} %>
 		<img src="/assets/info.png" title='A submitter can only submit artifacts.'>
 
+<!-- E2351 Added the mentor selection for a mentor -->
+		<%= radio_button"user","role", "mentor", :checked=>params[:authorization]=='mentor' %>
+	        <%= label_tag :role_submitter, "mentor" ,{:style=>"font-size:16px;"} %>
+        	<img src="/assets/info.png" title='A mentor can submit, review, take quizzes, and has mentor permissions.'>
+
 	<% elsif form_action == "add_ta" %>
 		<input type='submit' value='Add TA'/>
 	<% end %>

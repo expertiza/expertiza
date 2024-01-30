@@ -1,6 +1,6 @@
 ###
-###
-### We have spent a lot of time on refactoring this file, PLEASE consult with Expertiza development team before putting code in.
+####
+#### We have spent a lot of time on refactoring this file, PLEASE consult with Expertiza development team before putting code in.
 ###
 ###
 
@@ -269,7 +269,7 @@ class Assignment < ApplicationRecord
   # add a new participant to this assignment
   # manual addition
   # user_name - the user account name of the participant to add
-  def add_participant(user_name, can_submit, can_review, can_take_quiz)
+  def add_participant(user_name, can_submit, can_review, can_take_quiz, can_mentor)
     user = User.find_by(name: user_name)
     if user.nil?
       raise "The user account with the name #{user_name} does not exist. Please <a href='" +
@@ -283,7 +283,8 @@ class Assignment < ApplicationRecord
                                             permission_granted: user.master_permission_granted,
                                             can_submit: can_submit,
                                             can_review: can_review,
-                                            can_take_quiz: can_take_quiz)
+                                            can_take_quiz: can_take_quiz,
+                                            can_mentor: can_mentor)
     new_part.set_handle
   end
 
@@ -654,3 +655,4 @@ class Assignment < ApplicationRecord
     reviewers = reviewers.sort_by { |a| a[1] }
   end
 end
+

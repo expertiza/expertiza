@@ -169,9 +169,24 @@ class SignUpTopic < ApplicationRecord
   end
 
   # Method to handle the process when a user signs up
+  # def sign_team_up(team_id)
+  #   topic_id = self.id
+  #   team = Team.find(team_id)
   def sign_team_up(team_id)
     topic_id = self.id
-    team = Team.find(team_id)
+    team = find_team(team_id)
+    user_signup = find_user_signup(team)
+  end
+
+  private
+
+  def find_team(team_id)
+    Team.find(team_id)
+  end
+
+  def find_user_signup(team)
+    SignedUpTeam.find_user_signup_topics(team.parent_id, team.id)
+  end
     # Fetch all topics for the user within the team for the assignment
     user_signup = SignedUpTeam.find_user_signup_topics(team.parent_id, team_id)
     # Check if the user is already signed up and waitlisted for the topic

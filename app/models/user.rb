@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  extend AnonymizedHelper
   enum locale: Locale.code_name_to_db_encoding(Locale.available_locale_preferences)
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = { if: -> { false } } # Don't validate email uniqueness
@@ -19,36 +20,26 @@ class User < ApplicationRecord
   has_many :track_notifications, dependent: :destroy
   belongs_to :parent, class_name: 'User'
   belongs_to :role
-  validates :name, presence: true
-  validates :name, uniqueness: true
-  validates :name, format: { without: /\s/ }
-
-  validates :email, presence: { message: "can't be blank" }
-  validates :email, format: { with: /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, allow_blank: true }
-
+  validates :name, presence: true, uniqueness: true, format: { without: /\s/ }
+  validates :email,
+            presence: { message: "can't be blank" },
+            format: { with: /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, allow_blank: true }
   validates :fullname, presence: true
 
   before_validation :randomize_password, if: ->(user) { user.new_record? && user.password.blank? } # AuthLogic
 
-  scope :superadministrators, -> { where role_id: Role.superadministrator }
-  scope :superadmins, -> { superadministrators }
-  scope :administrators, -> { where role_id: Role.administrator }
-  scope :admins, -> { administrators }
+  scope :admins, -> { where role_id: Role.administrator }
   scope :instructors, -> { where role_id: Role.instructor }
   scope :tas, -> { where role_id: Role.ta }
   scope :students, -> { where role_id: Role.student }
 
   has_paper_trail
 
-  def salt_first?
-    true
-  end
-
   def list_mine(object_type, user_id)
     object_type.where(['instructor_id = ?', user_id])
   end
 
-  def get_available_users(name)
+  def get_visible_users_with_lesser_roles(name)
     lesser_roles = role.get_parents
     all_users = User.all(conditions: ['name LIKE ?', "#{name}%"], limit: 20) # higher limit, since we're filtering
     visible_users = all_users.select { |user| lesser_roles.include? user.role }
@@ -56,14 +47,13 @@ class User < ApplicationRecord
   end
 
   def can_impersonate?(user)
-    return true if role.super_admin?
-    return true if teaching_assistant_for?(user)
-    return true if recursively_parent_of(user)
-
-    false
+    role.super_admin? ||
+      teaching_assistant_for?(user) ||
+      recursively_parent_of(user)
   end
 
   def recursively_parent_of(user)
+    # Takes a user object and returns true if the current user is the parent or a recursively higher-level parent of the provided user.
     p = user.parent
     return false if p.nil?
     return true if p == self
@@ -71,6 +61,7 @@ class User < ApplicationRecord
 
     recursively_parent_of(p)
   end
+
 
   # generate_regex method generates regex corresponding to the parameter passed
   # returns a regex expression
@@ -82,6 +73,7 @@ class User < ApplicationRecord
   # If no search criteria is entered then this method will return the result having all the users and displays it via Views.
   def get_user_list(username_search = '', fullname_search = '', email_search = '')
     # empty user_list[] created in order to store user list
+
     user_list = []
     # If super admin, then fetch and display all the users
     user_list = SuperAdministrator.get_user_list if role.super_admin?
@@ -122,28 +114,13 @@ class User < ApplicationRecord
   end
 
   # Zhewei: anonymized view for demo purposes - 1/3/2018
-  def self.anonymized_view?(ip_address = nil)
-    anonymized_view_starter_ips = $redis.get('anonymized_view_starter_ips') || ''
-    return true if ip_address && anonymized_view_starter_ips.include?(ip_address)
-
-    false
-  end
-
-  # E1991 : This function returns original name of the user
-  # from their anonymized names. The process of obtaining
-  # real name is exactly opposite of what we'd do to get
-  # anonymized name from their real name.
-  def self.real_user_from_anonymized_name(anonymized_name)
-    user = User.find_by(name: anonymized_name)
-    user
-  end
 
   def name(ip_address = nil)
-    User.anonymized_view?(ip_address) ? role.name + ' ' + id.to_s : self[:name]
+    User.anonymized_view?(ip_address) ? "#{role.name} #{id}" : self[:name]
   end
 
   def fullname(ip_address = nil)
-    User.anonymized_view?(ip_address) ? role.name + ', ' + id.to_s : self[:fullname]
+    User.anonymized_view?(ip_address) ? "#{role.name}, #{id}" : self[:fullname]
   end
 
   def first_name(ip_address = nil)
@@ -151,7 +128,7 @@ class User < ApplicationRecord
   end
 
   def email(ip_address = nil)
-    User.anonymized_view?(ip_address) ? role.name + '_' + id.to_s + '@mailinator.com' : self[:email]
+    User.anonymized_view?(ip_address) ? "#{role.name}_#{id}@mailinator.com" : self[:email]
   end
 
   def super_admin?
@@ -190,7 +167,7 @@ class User < ApplicationRecord
   def self.import(row_hash, _row_header, session, _id = nil)
     raise ArgumentError, "Only #{row_hash.length} column(s) is(are) found. It must contain at least username, full name, email." if row_hash.length < 3
 
-    user = User.find_by_name(row_hash[:name])
+    user = User.find_by_name(row_hash[:username])
     if user.nil?
       attributes = ImportFileHelper.define_attributes(row_hash)
       user = ImportFileHelper.create_new_user(attributes, session)
@@ -227,11 +204,12 @@ class User < ApplicationRecord
     user
   end
 
-  def set_instructor(new_assignment)
+  def instructor=(new_assignment)
+    # Takes an assignment object and sets the instructor ID to the current user's ID.
     new_assignment.instructor_id = id
   end
 
-  def get_instructor
+  def instructor
     id
   end
 
@@ -340,11 +318,10 @@ class User < ApplicationRecord
   def self.search_users(role, user_id, letter, search_by)
     key_word = { '1' => 'name', '2' => 'fullname', '3' => 'email' }
     sql = "(role_id in (?) or id = ?) and #{key_word[search_by]} like ?"
+    search_filter = "%#{letter}%"
     if key_word.include? search_by
-      search_filter = '%' + letter + '%'
       users = User.order('name').where(sql, role.get_available_roles, user_id, search_filter)
     else # default used when clicking on letters
-      search_filter = letter + '%'
       users = User.order('name').where('(role_id in (?) or id = ?) and name like ?', role.get_available_roles, user_id, search_filter)
     end
     users

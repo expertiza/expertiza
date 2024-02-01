@@ -11,7 +11,7 @@ module ImportFileHelper
     attributes['email_on_review'] = 1
     attributes['email_on_review_of_review'] = 1
     # Handle is set to the users' name by default; when a new user is created
-    attributes['handle'] = row_hash[:name]
+    attributes['handle'] = row_hash[:username]
     attributes
   end
 

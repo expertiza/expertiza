@@ -29,7 +29,7 @@ describe 'CourseParticipant' do
 
     it 'raise error if record does not have enough items ' do
       row = { username: 'user_name', fullname: 'user_fullname', email: 'name@email.com' }
-      expect { CourseParticipant.import(row, nil, nil, nil) }.to raise_error("The record containing #{row[:name]} does not have enough items.")
+      expect { CourseParticipant.import(row, nil, nil, nil) }.to raise_error("The record containing #{row[:username]} does not have enough items.")
     end
 
     it 'raise error if course with id not found' do

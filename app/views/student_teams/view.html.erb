@@ -50,7 +50,10 @@
           <th class="head">Role</th>
       <% end %>
       <th class="head">Email address</th>
-
+      <!--E2351 Added new column if the assignment has mentors so that mentors can be identified-->
+      <% if @student.assignment.auto_assign_mentor? %>
+          <th class="head">Mentor</th>
+      <% end %>
       <% if @teammate_review_allowed %>
         <th class="head"><%=t ".review_action"%></th>
       <% end %>
@@ -76,7 +79,14 @@
             <%end%>
         <%end%>
         <td><%= member.user.email(session[:ip]) %></td>
-
+        <!--E2351 check each user so that only the mentor will be identified-->
+        <% if @student.assignment.auto_assign_mentor? %>
+          <% if MentorManagement.user_a_mentor?(member.user) %>
+            <td>Mentor</td>
+          <% else %>
+            <td></td>
+          <% end %>
+        <% end %>
         <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
         <% if @teammate_review_allowed &&
           ((@student.assignment.duty_based_assignment? && !team_user.duty_id.nil?) || (!@student.assignment.duty_based_assignment?))%>

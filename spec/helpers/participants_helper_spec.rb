@@ -22,7 +22,7 @@ describe ParticipantsHelper do
 
     describe '#create_new_user' do
         context 'when create_new_user is called' do
-            #Checking if a user has een correctly created
+            #Checking if a user has been correctly created
             let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, name: 'Instructor1') }
             
             it 'returns correct user when create_new_user is called' do
@@ -65,9 +65,9 @@ describe ParticipantsHelper do
                 expect(result).to eq(can_submit: true, can_review: false, can_take_quiz: false)
             end
 
-            it 'returns correct authorizations when participant_permissions is called with paricipant authorization' do
+            it 'returns correct authorizations when participant_permissions is called with participant authorization' do
                 #Checking permissions for a participant
-                result = participant_permissions('paricipant')
+                result = participant_permissions('participant)
                 expect(result).to eq(can_submit: true, can_review: true, can_take_quiz: true)
             end
         end

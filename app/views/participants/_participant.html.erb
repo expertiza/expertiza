@@ -14,6 +14,10 @@
   <td align = "left"><%= !participant.can_submit ? 'no' : 'yes' %></td>
   <td align = "left"><%= !participant.can_review ? 'no' : 'yes' %></td>
   <td align = "left"><%= !participant.can_take_quiz ? 'no' : 'yes' %></td>
+  <% if  @model == 'Assignment' %>
+    <!-- E2351 - duty column added to participants -->
+    <td align = "left"><%= !participant.can_mentor ? 'no' : 'yes' %></td>
+  <% end %>
   <td align = "left"><%= participant.handle(session[:ip]) %></td>
 
   <td align="left" ><%= link_to 'Remove', {:controller => 'participants', :action => 'destroy', :id => participant.id}, :method => :delete %></td>
@@ -53,6 +57,13 @@
                   selected
                   <% end -%>
                   >submitter</option>
+  <!-- E2351 adding 4th option in drop down per project description, this will allow a user to be changed
+       to a mentor via the gui -->
+	  <option value="mentor"
+		  <% if params[:authorization] == "mentor" -%> 
+                  selected
+                  <% end -%>
+                  >mentor</option>
         </select>
         <!-- Change to display the Submit button -->
         <%= button_tag "Submit", {:id=>'button'+participant.user_id.to_s,:style=>"font-size:15px; opacity:1;", :class => "btn btn-md btn-default" } %>

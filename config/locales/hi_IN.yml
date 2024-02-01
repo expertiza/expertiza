@@ -65,13 +65,13 @@ hi_IN:
     new:
       create_teams_for: "टीम्स बनाना फॉर"
       automatically: "खुद ब खुद"
-      uses_insofar: "जब असाइनमेंट बनाया गया था, निर्दिष्ट किए गए सदस्यों की संख्या का उपयोग करता है."
+      uses_insofar: "जब असाइनमेंट बनाया गया था, निर्दिष्ट किए गए सदस्यों की संख्या का उपयोग करता है|"
       team_size: "टीम का परिमाण:"
       create_teams: "टीम्स बनाना"
       manually: "मैन्युअल रूप से"
-      specify_team_them: "टीम का नाम निर्दिष्ट करें और टीम में सदस्यों को एक एक करके चुने."
-      inherit_teams: "पाठ्यक्रम से निहित टीमों "
-      use_the_teams: "वर्तमान में पाठ्यक्रम के लिए परिभाषित टीमों का प्रयोग करें."
+      specify_team_them: "टीम का नाम निर्दिष्ट करें और टीम में सदस्यों को एक एक करके चुने|"
+      inherit_teams: "कोर्स से टीमें इनहेरिट करें"
+      use_the_teams: "वर्तमान में पाठ्यक्रम के लिए परिभाषित टीमों का प्रयोग करें|"
       team_name: "टीम का नाम"
 
   assignments:
@@ -91,7 +91,7 @@ hi_IN:
         assignment_name: "असाइनमेंट का नाम:"
         course: "कोर्स"
         submission_directory: "सबमिशन निर्देशिका "
-        mandatory_field: "(आवश्यक स्थान. कोई स्थान या विशेष पात्रों की अनुमति नहीं है.)"
+        mandatory_field: "(आवश्यक स्थान| कोई स्थान या विशेष पात्रों की अनुमति नहीं है|)"
         description_url: "यूआरएल विवरण"
         calibration: "अंशांकन "
         has_team: "क्या आपके पास एक टीम है?"
@@ -469,8 +469,8 @@ hi_IN:
     handle:
       handle: "हैंडल"
       default_handle: "डिफ़ॉल्ट हैंडल:"
-      handle_prof: " हैंडल आपका चुना हुआ नाम अन्य लोगों से छिपाता है. यदि आपके पास हैंडल है, आपका विकी अकाउंट वोह हैंडल के नॉम होणा चाहीये. अगर हैंडल नही हैं, आपके एक्सपेर्टीज़ा के यूजर ईद  (चुना हुआ नाम) उपयोग होगा. नीचे के खाली स्तान हैंडल को आपके एक्सपेर्टीज़ा में चुना हुआ नाम में बदल देगा.  "
-      note: "ध्यान दें: इस फ़ॉर्म के माध्यम से आप अपना 'डिफ़ॉल्ट हैंडल' बदल रहे हैं. अब ये आपके भविष्य के असाइनमेंट में इस्तेमाल किया जाएगा. यदि आप अपना हैंडल बदलना चाहते हैं एक विशिष्ट असाइनमेंट के लिय, आप वोह असाइनमेंट का चुनाव करके 'डिफ़ॉल्ट हैंडल' में  परिवर्तन लाये "
+      handle_prof: " हैंडल आपका चुना हुआ नाम अन्य लोगों से छिपाता है| यदि आपके पास हैंडल है, आपका विकी अकाउंट वोह हैंडल के नॉम होणा चाहीये| अगर हैंडल नही हैं, आपके एक्सपेर्टीज़ा के यूजर ईद  (चुना हुआ नाम) उपयोग होगा| नीचे के खाली स्तान हैंडल को आपके एक्सपेर्टीज़ा में चुना हुआ नाम में बदल देगा|  "
+      note: "ध्यान दें: इस फ़ॉर्म के माध्यम से आप अपना 'डिफ़ॉल्ट हैंडल' बदल रहे हैं| अब ये आपके भविष्य के असाइनमेंट में इस्तेमाल किया जाएगा| यदि आप अपना हैंडल बदलना चाहते हैं एक विशिष्ट असाइनमेंट के लिय, आप वोह असाइनमेंट का चुनाव करके 'डिफ़ॉल्ट हैंडल' में  परिवर्तन लाये "
 
   users:
     prefs:
@@ -610,43 +610,103 @@ hi_IN:
     - :year
   datetime:
     distance_in_words:
-      about_x_hours:
-        one: लग - भग एक घंटा
-        other: लग - भग %{count} घंटा
-      about_x_months:
-        one: लग - भग 1 महीना
-        other: लग - भग %{count} महीना
-      about_x_years:
-        one: लग - भग 1 साल
-        other: लग - भग %{count} साल
-      almost_x_years:
-        one: लग - भग एक साल
-        other: लग - भग %{count} साल
-      half_a_minute: एक आधा मिनट
       less_than_x_seconds:
         one: एक सेकंड से कम
         other: "%{count}  सेकंड से कम"
       less_than_x_minutes:
         one: एक मिनट से कम
         other: "%{count} मिनट से कम"
+      less_than_x_hours:
+        one: एक घंटा से कम
+        other: "%{count} घंटा से कम"
+      less_than_x_days:
+        one: एक दिन से कम
+        other: "%{count} दिन से कम"
+      less_than_x_months:
+        one: एक महीना से कम
+        other: "%{count} महीना से कम"
+      less_than_x_years:
+        one: एक साल से कम
+        other: "%{count} साल से कम"
+      about_x_seconds:
+        one: लग - भग एक सेकंड
+        other: लग - भग %{count} सेकंड
+      about_x_minutes:
+        one: लग - भग एक मिनट
+        other: लग - भग %{count} मिनट
+      about_x_hours:
+        one: लग - भग एक घंटा
+        other: लग - भग %{count} घंटा
+      about_x_days:
+        one: लग - भग एक दिन
+        other: लग - भग %{count} दिन
+      about_x_months:
+        one: लग - भग एक महीना
+        other: लग - भग %{count} महीना
+      about_x_years:
+        one: लग - भग एक वर्ष
+        other: लग - भग %{count} वर्ष
+      almost_x_seconds:
+        one: लगभग एक सेकंड
+        other: लगभग %{count} सेकंड
+      almost_x_minutes:
+        one: लगभग एक मिनट
+        other: लगभग %{count} मिनट
+      almost_x_hours:
+        one: लगभग एक घंटा
+        other: लगभग %{count} घंटा
+      almost_x_days:
+        one: लगभग एक दिन
+        other: लगभग %{count} दिन
+      almost_x_months:
+        one: लगभग एक महीना
+        other: लगभग %{count} महीना
+      almost_x_years:
+        one: लगभग एक साल
+        other: लगभग %{count} साल
+      over_x_seconds:
+        one: एक सेकंड से अधिक
+        other: "%{count} सेकंड से अधिक"
+      over_x_minutes:
+        one: एक मिनट से अधिक
+        other: "%{count} मिनट से अधिक"
+      over_x_hours:
+        one: एक घंटा से अधिक
+        other: "%{count} घंटा से अधिक"
+      over_x_days:
+        one: एक दिन से अधिक
+        other: "%{count} दिन से अधिक"
+      over_x_months:
+        one: एक महीना से अधिक
+        other: "%{count} महीना से अधिक"
       over_x_years:
-        one: एक साल के ऊपर
-        other: "%{count} साल के ऊपर"
+        one: एक वर्ष के ऊपर
+        other: "%{count} वर्ष के ऊपर"
       x_seconds:
         one: एक सेकंड
         other: "%{count} सेकंड"
       x_minutes:
         one: एक मिनट
         other: "%{count} मिनट"
+      x_hours:
+        one: एक घंटा
+        other: "%{count} घंटा"
       x_days:
         one: एक दिन
         other: "%{count} दिन"
       x_months:
         one: एक महीना
         other: "%{count} महीना"
+      x_years:
+        one: एक वर्ष
+        other: "%{count} वर्ष"
+      half_a_second: एक आधा सेकंड
+      half_a_minute: एक आधा मिनट
+      half_an_hour: एक आधा घंटा
+      half_a_day: एक आधा दिन
     prompts:
       second: सेकंड
-      minute: क्षण
+      minute: मिनट
       hour: घंटा
       day: दिन
       month: माह

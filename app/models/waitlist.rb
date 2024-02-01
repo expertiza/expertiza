@@ -1,13 +1,8 @@
 class Waitlist < ApplicationRecord
 	def self.cancel_all_waitlists(team_id, assignment_id)
-		waitlisted_topics = SignUpTopic.find_waitlisted_topics(assignment_id, team_id)
-		unless waitlisted_topics.nil?
-			waitlisted_topics.each do |waitlisted_topic|
-				entry = SignedUpTeam.find_by(id: waitlisted_topic.id)
-				next if entry.nil?
-
-				entry.destroy
-			end
+		waitlisted_topics = SignUpTopic.find_waitlisted_topics_for_team(assignment_id, team_id)
+		if not waitlisted_topics.nil?
+			SignedUpTeam.destroy(waitlisted_topics.map(&:id))
 		end
 	end
 

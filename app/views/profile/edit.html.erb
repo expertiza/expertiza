@@ -2,7 +2,7 @@
 
 <br/>
 
-<%= form_for @user, url: '/profile/update' do |f| %>
+<%= form_for @user, url: profile_index_path, method: :patch do |f| %>
 <table class="table borderless table-not-full-width">
   <%= render :partial => 'users/name' %>
   <%= render :partial => 'users/password' %>

@@ -240,14 +240,14 @@ class AssignmentForm
         # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
         return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
       end
-    elsif @assignment.vary_by_round? && @assignment.vary_by_topic?
+    elsif @assignment.varying_rubrics_by_round? && @assignment.vary_by_topic?
       # Get all AQs for the assignment and specified round number and topic
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number, topic_id: topic_id)
       assignment_questionnaires.each do |aq|
         # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
         return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
       end
-    elsif @assignment.vary_by_round?
+    elsif @assignment.varying_rubrics_by_round?
       # Get all AQs for the assignment and specified round number by round #
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number)
       assignment_questionnaires.each do |aq|
@@ -419,7 +419,7 @@ class AssignmentForm
     Assignment.record_timestamps = false
     old_assign = Assignment.find(assignment_id)
     new_assign = old_assign.dup
-    user.set_instructor(new_assign)
+    user.instructor = new_assign
     new_assign.update_attribute('name', 'Copy of ' + new_assign.name)
     new_assign.update_attribute('created_at', Time.now)
     new_assign.update_attribute('updated_at', Time.now)

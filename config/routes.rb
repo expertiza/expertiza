@@ -29,6 +29,7 @@ Expertiza::Application.routes.draw do
     collection do
       post :save_advice
       put :edit_advice
+      get :edit_advice
     end
   end
 
@@ -318,6 +319,8 @@ Expertiza::Application.routes.draw do
   resources :questions do
     collection do
       get :types
+      post :delete_questions
+      post :save_questions
     end
   end
 
@@ -369,7 +372,9 @@ Expertiza::Application.routes.draw do
       get :list_mappings
       get :unsubmit_review
       post :add_reviewer
+      get :select_reviewer
       post :add_metareviewer
+      get :select_metareviewer
       post :add_user_to_assignment
       post :assign_metareviewer_dynamically
       post :automatic_review_mapping
@@ -473,6 +478,8 @@ Expertiza::Application.routes.draw do
   resources :student_teams, only: %i[create edit update] do
     collection do
       get :view
+      #E2351 Added a new route for mentors to view all their teams
+      get :mentor
       get :remove_participant
       get :auto_complete_for_user_name
       get :edit
@@ -576,6 +583,7 @@ Expertiza::Application.routes.draw do
       get :goto_bookmarkrating_rubrics
       get :list
       get :drill
+      get :confirm
     end
   end
 

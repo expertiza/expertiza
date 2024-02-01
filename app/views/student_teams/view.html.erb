@@ -1,5 +1,4 @@
 <h1><%=t ".team_info"%> <%= @student.assignment.name %></h1>
-
 <% if @student.team.nil? %>
   <%=t ".no_team"%>
   <h3><%=t ".name_team"%></h3>
@@ -51,7 +50,10 @@
           <th class="head">Role</th>
       <% end %>
       <th class="head">Email address</th>
-
+      <!--E2351 Added new column if the assignment has mentors so that mentors can be identified-->
+      <% if @student.assignment.auto_assign_mentor? %>
+          <th class="head">Mentor</th>
+      <% end %>
       <% if @teammate_review_allowed %>
         <th class="head"><%=t ".review_action"%></th>
       <% end %>
@@ -77,7 +79,14 @@
             <%end%>
         <%end%>
         <td><%= member.user.email(session[:ip]) %></td>
-
+        <!--E2351 check each user so that only the mentor will be identified-->
+        <% if @student.assignment.auto_assign_mentor? %>
+          <% if MentorManagement.user_a_mentor?(member.user) %>
+            <td>Mentor</td>
+          <% else %>
+            <td></td>
+          <% end %>
+        <% end %>
         <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
         <% if @teammate_review_allowed &&
           ((@student.assignment.duty_based_assignment? && !team_user.duty_id.nil?) || (!@student.assignment.duty_based_assignment?))%>
@@ -116,7 +125,6 @@
     <%# <% end %> <!--end self contribution for Cake questions-->
   </table>
 <% end %>
-
 <% if @student.assignment.pair_programming_enabled? %>
   <% if !@student.team.nil? && Team.find(@student.team.id).pair_programming_request!=0 && !button_enabled %>
     <div>
@@ -124,7 +132,6 @@
         <br/><br/>
         <b><%=t ".Pair Programming Invitations"%></b>
         <br/><br/>
-
         <table style="width:80%" align="center" >
           <tr style="border: 1px outset #000000; padding: 10px 20px" >
             <th class="head">Username</th>
@@ -163,13 +170,11 @@
     </div>
   <% end %>
 <% end %>
-
 <!--render partial for join team request-->
     <%= render :partial => 'join_team_requests/list_received',
     :locals =>{:team_id=>@student.team.id,
                :teams_user_id=>params[:student_id],
                :assignment_id => @student.assignment.id} unless @student.team.nil? %>
-
     <% if @send_invs && @send_invs.any? %>
     <br/><br/>
     <b>Sent invitations</b>
@@ -291,9 +296,7 @@
 
   <% end %>
 <br/>
-
 <!--display the advertisement-->
-
   <% if @student.team && @student.assignment.topics? && @student.team.topic%>
     <b><%=t ".ad_for_team"%></b>
     <br>
@@ -315,9 +318,7 @@
   <% end %>
 
 
-
 <br/>
-
 <!--display a list of sent join-team requests-->
 <%= render :partial => 'join_team_requests/list_sent',
            :locals =>{:teams_user_id=>params[:student_id],
@@ -325,4 +326,3 @@
            } %>
 <br>
    <%= link_to 'Back', :controller => 'student_task', :action => 'list' %>
-

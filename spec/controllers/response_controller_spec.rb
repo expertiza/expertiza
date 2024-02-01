@@ -106,6 +106,7 @@ describe ResponseController do
       allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire)
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire])
+      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
       allow(Answer).to receive(:where).with(response_id: 1, question_id: 1).and_return([answer])
       request_params = { id: 1, return: 'assignment_edit' }
       get :edit, params: request_params
@@ -241,6 +242,7 @@ describe ResponseController do
       allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire)
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire])
+      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
       allow(Answer).to receive(:where).with(response_id: 1, question_id: 1).and_return([answer])
       request_params = { id: 1, return: 'assignment_edit' }
       get :view, params: request_params

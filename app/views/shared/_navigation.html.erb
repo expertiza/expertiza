@@ -87,6 +87,8 @@
 
     $(function() {
         $('button.navbar-toggle').click(function() {
+            let navbarCollapse = $('.navbar-collapse');
+            navbarCollapse.toggleClass('in');
             if ($('.container').css('margin-top') === '-30px') {
                 $('.container').css('margin-top', '+=255');
             } else {

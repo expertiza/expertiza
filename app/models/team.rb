@@ -11,11 +11,29 @@ class Team < ApplicationRecord
     joins(:teams_users).where('teams.parent_id = ? AND teams_users.user_id = ?', assignment_id, user_id)
   }
 
+  # Allowed types of teams -- ASSIGNMENT teams or COURSE teams
+  def self.allowed_types
+    # non-interpolated array of single-quoted strings
+    %w[Assignment Course]
+  end
+
   # Get the participants of the given team
   def participants
     users.where(parent_id: parent_id || current_user_id).flat_map(&:participants)
   end
   alias get_participants participants
+
+  # copies content of one object to the another
+  def self.copy_content(source, destination)
+    source.each do |each_element|
+      each_element.copy(destination.id)
+    end
+  end
+
+  # enum method for team clone operations
+  def self.team_operation
+    { inherit: 'inherit', bequeath: 'bequeath' }.freeze
+  end
 
   # Get the response review map
   def responses
@@ -74,9 +92,18 @@ class Team < ApplicationRecord
     can_add_member
   end
 
-  # Define the size of the team,
+  # Define the size of the team
   def self.size(team_id)
-    TeamsUser.where(team_id: team_id).count
+    #TeamsUser.where(team_id: team_id).count
+    count = 0
+    members = TeamsUser.where(team_id: team_id)
+    members.each do |member|
+      member_name = member.name
+      unless member_name.include?(' (Mentor)') 
+        count = count + 1
+      end
+    end
+    count
   end
 
   # Copy method to copy this team
@@ -99,25 +126,18 @@ class Team < ApplicationRecord
   # Start by adding single members to teams that are one member too small.
   # Add two-member teams to teams that two members too small. etc.
   def self.randomize_all_by_parent(parent, team_type, min_team_size)
-    participants = Participant.where(parent_id: parent.id, type: parent.class.to_s + 'Participant')
+    participants = Participant.where(parent_id: parent.id, type: parent.class.to_s + 'Participant', can_mentor: [false, nil])
     participants = participants.sort { rand(-1..1) }
     users = participants.map { |p| User.find(p.user_id) }.to_a
     # find teams still need team members and users who are not in any team
     teams = Team.where(parent_id: parent.id, type: parent.class.to_s + 'Team').to_a
-    teams_num = teams.size
-    i = 0
-    teams_num.times do
-      teams_users = TeamsUser.where(team_id: teams[i].id)
-      teams_users.each do |teams_user|
+    teams.each do |team|
+      TeamsUser.where(team_id: team.id).each do |teams_user|
         users.delete(User.find(teams_user.user_id))
       end
-      if Team.size(teams.first.id) >= min_team_size
-        teams.delete(teams.first)
-      else
-        i += 1
-      end
     end
-    # sort teams by decreasing team size
+    teams.reject! { |team| Team.size(team.id) >= min_team_size }
+    # sort teams that still need members by decreasing team size
     teams.sort_by { |team| Team.size(team.id) }.reverse!
     # insert users who are not in any team to teams still need team members
     assign_single_users_to_teams(min_team_size, parent, teams, users) if !users.empty? && !teams.empty?
@@ -125,6 +145,8 @@ class Team < ApplicationRecord
     create_team_from_single_users(min_team_size, parent, team_type, users) unless users.empty?
   end
 
+  # Creates teams from a list of users based on minimum team size
+  # Then assigns the created team to the parent object
   def self.create_team_from_single_users(min_team_size, parent, team_type, users)
     num_of_teams = users.length.fdiv(min_team_size).ceil
     next_team_member_index = 0
@@ -141,6 +163,7 @@ class Team < ApplicationRecord
     end
   end
 
+  # Assigns list of users to list of teams based on minimum team size
   def self.assign_single_users_to_teams(min_team_size, parent, teams, users)
     teams.each do |team|
       curr_team_size = Team.size(team.id)

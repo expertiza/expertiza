@@ -13,6 +13,7 @@ describe AssignmentForm do
   let(:questionnaire3) { double('Questionnaire', type: 'TeammateReviewQuestionnaire') }
   before(:each) do
     assignment_form.instance_variable_set(:@assignment, assignment)
+    allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 2).and_return([])
   end
 
   describe '.create_form_object' do

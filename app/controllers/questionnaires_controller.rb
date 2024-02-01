@@ -1,5 +1,9 @@
 class QuestionnairesController < ApplicationController
   include AuthorizationHelper
+  before_action [:create_questionnaire, :save], only: [:list]
+  include QuestionnaireHelper
+  include QuestionHelper
+
 
   # Controller for Questionnaire objects
   # A Questionnaire can be of several types (QuestionnaireType)
@@ -14,8 +18,8 @@ class QuestionnairesController < ApplicationController
     when 'edit'
       @questionnaire = Questionnaire.find(params[:id])
       current_user_has_admin_privileges? ||
-        (current_user_is_a?('Instructor') && current_user_id?(@questionnaire.try(:instructor_id))) ||
-        (current_user_is_a?('Teaching Assistant') && session[:user].instructor_id == @questionnaire.try(:instructor_id))
+        (current_user_is_a?('Teaching Assistant') && Ta.find(session[:user].id).instructor_or_co_ta?(@questionnaire)) ||
+        (current_user_is_a?('Instructor') && current_user_id?(@questionnaire.try(:instructor_id)))
     else
       current_user_has_student_privileges?
     end
@@ -41,9 +45,32 @@ class QuestionnairesController < ApplicationController
   end
 
   def new
-    @questionnaire = Object.const_get(params[:model].split.join).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model].split.join
+    type = params[:model].split.join
+    # Create questionnaire object based on type using questionnaire_factory
+    @questionnaire = questionnaire_factory(type) if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model].split.join
   rescue StandardError
     flash[:error] = $ERROR_INFO
+  end
+
+  # Assigns corresponding variables to questionnaire object.
+  def set_questionnaire_parameters(private_flag, display)
+    @questionnaire.private = private_flag
+    @questionnaire.name = params[:questionnaire][:name]
+    @questionnaire.instructor_id = session[:user].id
+    @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
+    @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
+    @questionnaire.type = params[:questionnaire][:type]
+    @questionnaire.display_type = display
+    @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
+    @questionnaire.save
+  end
+
+  # Creates tree node
+  def create_tree_node
+    tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
+    parent = FolderNode.find_by(node_object_id: tree_folder.id)
+    QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
+    flash[:success] = 'You have successfully created a questionnaire!'
   end
 
   def create
@@ -54,46 +81,27 @@ class QuestionnairesController < ApplicationController
       questionnaire_private = params[:questionnaire][:private] == 'true'
       display_type = params[:questionnaire][:type].split('Questionnaire')[0]
       begin
-        @questionnaire = Object.const_get(params[:questionnaire][:type]).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
+        type = params[:questionnaire][:type]
+        # Create questionnaire object based on type using questionnaire_factory
+        @questionnaire = questionnaire_factory(type) if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
       rescue StandardError
         flash[:error] = $ERROR_INFO
       end
       begin
-        @questionnaire.private = questionnaire_private
-        @questionnaire.name = params[:questionnaire][:name]
-        @questionnaire.instructor_id = session[:user].id
-        @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
-        @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
-        @questionnaire.type = params[:questionnaire][:type]
         # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
-        # In the future, we need to write migration files to make them consistency.
+        # In the future, we need to write migration files to make them have consistency.
         # E1903 : We are not sure of other type of cases, so have added a if statement. If there are only 5 cases, remove the if statement
         if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey BookmarkRating].include?(display_type)
-          display_type = (display_type.split(/(?=[A-Z])/)).join('%')
+          display_type = display_type.split(/(?=[A-Z])/).join('%')
         end
-        @questionnaire.display_type = display_type
-        @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
-        @questionnaire.save
-        # Create node
-        tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
-        parent = FolderNode.find_by(node_object_id: tree_folder.id)
-        QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
-        flash[:success] = 'You have successfully created a questionnaire!'
-      rescue StandardError
-        flash[:error] = $ERROR_INFO
+        # set the parameters for questionnaires object
+        set_questionnaire_parameters(questionnaire_private, display_type)
+        # Create node - adds this questionnaire to the tree_display list
+        create_tree_node
+      rescue StandardError => e
+        flash[:error] = e.message
       end
       redirect_to controller: 'questionnaires', action: 'edit', id: @questionnaire.id
-    end
-  end
-
-  def create_questionnaire
-    @questionnaire = Object.const_get(params[:questionnaire][:type]).new(questionnaire_params)
-    # Create Quiz content has been moved to Quiz Questionnaire Controller
-    if @questionnaire.type != 'QuizQuestionnaire' # checking if it is a quiz questionnaire
-      @questionnaire.instructor_id = Ta.get_my_instructor(session[:user].id) if session[:user].role.name == 'Teaching Assistant'
-      save
-
-      redirect_to controller: 'tree_display', action: 'list'
     end
   end
 
@@ -104,42 +112,36 @@ class QuestionnairesController < ApplicationController
     session[:return_to] = request.original_url
   end
 
+  # Updates a questionnaire's attributes and questions based on form data and redirects to the edit page,
+  # displaying a flash message if the update is successful or not.
   def update
     # If 'Add' or 'Edit/View advice' is clicked, redirect appropriately
     if params[:add_new_questions]
-      # redirect_to action: 'add_new_questions', id: params.permit(:id)[:id], question: params.permit(:new_question)[:new_question]
-      nested_keys = params[:new_question].keys
-      permitted_params = params.permit(:id, :new_question => nested_keys)
+      permitted_params = params.permit(:id, new_question: params[:new_question].keys)
       redirect_to action: 'add_new_questions', id: permitted_params[:id], question: permitted_params[:new_question]
     elsif params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     else
       @questionnaire = Questionnaire.find(params[:id])
-      begin
-        # Save questionnaire information
-        @questionnaire.update_attributes(questionnaire_params)
-
-        # Save all questions
-        unless params[:question].nil?
-          params[:question].each_pair do |k, v|
-            @question = Question.find(k)
-            # example of 'v' value
-            # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
-            v.each_pair do |key, value|
-              @question.send(key + '=', value) unless @question.send(key) == value
-            end
-            @question.save
-          end
-        end
+      if @questionnaire.update_attributes(questionnaire_params)
+        update_questionnaire_questions
         flash[:success] = 'The questionnaire has been successfully updated!'
-      rescue StandardError
-        flash[:error] = $ERROR_INFO
+      else
+        flash[:error] = @questionnaire.errors.full_messages.join(', ')
       end
       redirect_to action: 'edit', id: @questionnaire.id.to_s.to_sym
     end
+  rescue StandardError => e
+    flash[:error] = e.message
+    redirect_to action: 'edit', id: @questionnaire.id.to_s.to_sym
   end
 
   # Remove a given questionnaire
+  # checks if any assignment uses the current questionnaire or not
+  # checks if there are any answers to the questions in the questionnaire
+  # for each of the question, it deletes the advice first 
+  # and then deletes the question. Only then the questionnaire node
+  # is deleted
   def delete
     @questionnaire = Questionnaire.find(params[:id])
     if @questionnaire
@@ -183,7 +185,7 @@ class QuestionnairesController < ApplicationController
 
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
-    questionnaire_id = params[:id] unless params[:id].nil?
+    questionnaire_id = params[:id]
     # If the questionnaire is being used in the active period of an assignment, delete existing responses before adding new questions
     if AnswerHelper.check_and_delete_responses(questionnaire_id)
       flash[:success] = 'You have successfully added a new question. Any existing reviews for the questionnaire have been deleted!'
@@ -191,46 +193,48 @@ class QuestionnairesController < ApplicationController
       flash[:success] = 'You have successfully added a new question.'
     end
 
-    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
-    ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
-      question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
+    questionnaire = Questionnaire.find(questionnaire_id)
+    current_num_of_questions = questionnaire.questions.size
+    max_seq = 0
+    Questionnaire.find(questionnaire_id).questions.each do |question|
+      if !question.seq.nil? && question.seq > max_seq
+        max_seq = question.seq
+      end
+    end
+    ((current_num_of_questions + 1)..(current_num_of_questions + params[:question][:total_num].to_i)).each do
+      max_seq += 1
+      # Create question object based on type using question_factory
+      question = question_factory(params[:question][:type], questionnaire_id, max_seq)
       if question.is_a? ScoredQuestion
         question.weight = params[:question][:weight]
-        question.max_label = 'Strongly agree'
-        question.min_label = 'Strongly disagree'
+        question.max_label = Question::MAX_LABEL
+        question.min_label = Question::MIN_LABEL
       end
 
-      question.size = '50, 3' if question.is_a? Criterion
-      question.size = '50, 3' if question.is_a? Cake
-      question.alternatives = '0|1|2|3|4|5' if question.is_a? Dropdown
-      question.size = '60, 5' if question.is_a? TextArea
-      question.size = '30' if question.is_a? TextField
+      if Question::SIZES.key?(question.class.name)
+        question.size = Question::SIZES[question.class.name]
+      end
+      if Question::ALTERNATIVES.key?(question.class.name)
+        question.alternatives = Question::ALTERNATIVES[question.class.name]
+      end
 
       begin
         question.save
-      rescue StandardError
-        flash[:error] = $ERROR_INFO
+      rescue StandardError => e
+        flash[:error] = e.message
       end
     end
     redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
   end
 
   # Zhewei: This method is used to save all questions in current questionnaire.
+  # this calls update_questions on all the questions in present questionnaire
   def save_all_questions
     questionnaire_id = params[:id]
     begin
       if params[:save]
-        params[:question].each_pair do |k, v|
-          @question = Question.find(k)
-          # example of 'v' value
-          # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
-          v.each_pair do |key, value|
-            @question.send(key + '=', value) unless @question.send(key) == value
-          end
-
-          @question.save
-          flash[:success] = 'All questions have been successfully saved!'
-        end
+        update_questionnaire_questions
+        flash[:success] = 'All questions have been successfully saved!'
       end
     rescue StandardError
       flash[:error] = $ERROR_INFO
@@ -246,74 +250,11 @@ class QuestionnairesController < ApplicationController
   private
 
   # save questionnaire object after create or edit
+  # this is a basid CRUD function and is called after every create or edit
   def save
     @questionnaire.save!
-    save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
+    redirect_to controller: 'questions', action: 'save_questions', questionnaire_id: @questionnaire.id, questionnaire_type: @questionnaire.type and return unless @questionnaire.id.nil? || @questionnaire.id <= 0
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
-  end
-
-  # save questions that have been added to a questionnaire
-  def save_new_questions(questionnaire_id)
-    if params[:new_question]
-      # The new_question array contains all the new questions
-      # that should be saved to the database
-      params[:new_question].keys.each_with_index do |question_key, index|
-        q = Question.new
-        q.txt = params[:new_question][question_key]
-        q.questionnaire_id = questionnaire_id
-        q.type = params[:question_type][question_key][:type]
-        q.seq = question_key.to_i
-        if @questionnaire.type == 'QuizQuestionnaire'
-          # using the weight user enters when creating quiz
-          weight_key = "question_#{index + 1}"
-          q.weight = params[:question_weights][weight_key.to_sym]
-        end
-        q.save unless q.txt.strip.empty?
-      end
-    end
-  end
-
-  # delete questions from a questionnaire
-  # @param [Object] questionnaire_id
-  def delete_questions(questionnaire_id)
-    # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
-    questions = Question.where('questionnaire_id = ?', questionnaire_id)
-    @deleted_questions = []
-    questions.each do |question|
-      should_delete = true
-      unless question_params.nil?
-        params[:question].each_key do |question_key|
-          should_delete = false if question_key.to_s == question.id.to_s
-        end
-      end
-
-      next unless should_delete
-
-      question.question_advices.each(&:destroy)
-      # keep track of the deleted questions
-      @deleted_questions.push(question)
-      question.destroy
-    end
-  end
-
-  # Handles questions whose wording changed as a result of the edit
-  # @param [Object] questionnaire_id
-  def save_questions(questionnaire_id)
-    delete_questions questionnaire_id
-    save_new_questions questionnaire_id
-
-    if params[:question]
-      params[:question].keys.each do |question_key|
-        if params[:question][question_key][:txt].strip.empty?
-          # question text is empty, delete the question
-          Question.delete(question_key)
-        else
-          # Update existing question.
-          question = Question.find(question_key)
-          Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
-        end
-      end
-    end
   end
 
   def questionnaire_params

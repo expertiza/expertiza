@@ -77,13 +77,7 @@ describe User do
     end
   end
 
-  describe '#salt_first?' do
-    it 'will always return true' do
-      expect(user.salt_first?).to be true
-    end
-  end
-
-  describe '#get_available_users' do
+  describe '#get_visible_users_with_lesser_roles' do
     before(:each) do
       role = Role.new
     end
@@ -93,7 +87,7 @@ describe User do
       allow(user2).to receive(:role).and_return('Student')
       expect(user.role.get_parents).to eq(['Student'])
       allow(User).to receive(:all).with(conditions: ['name LIKE ?', 'abc%'], limit: 20).and_return([user1, user2])
-      expect(user.get_available_users(user.name)).to eq([user1, user2])
+      expect(user.get_visible_users_with_lesser_roles(user.name)).to eq([user1, user2])
     end
   end
 
@@ -254,10 +248,10 @@ describe User do
     end
   end
 
-  describe '#get_instructor' do
+  describe '#instructor' do
     it 'gets the instructor id' do
       user.id = 6
-      expect(user.get_instructor).to eq 6
+      expect(user.instructor).to eq 6
     end
   end
 

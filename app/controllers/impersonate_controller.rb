@@ -27,7 +27,7 @@ class ImpersonateController < ApplicationController
   # This function does not seem to work
 
   def auto_complete_for_user_name
-    @users = session[:user].get_available_users(params[:user][:name])
+    @users = session[:user].get_visible_users_with_lesser_roles(params[:user][:name])
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 
@@ -75,13 +75,10 @@ class ImpersonateController < ApplicationController
   # warn_for_special_chars takes the output from above method and flashes an error if there are any special characters(/\?<>|&$#) in the string
 
   def check_if_input_is_valid
-    if params[:user] && warn_for_special_chars(params[:user][:name], 'Username')
-      flash[:error] = 'Please enter valid user name'
-      redirect_back fallback_location: root_path
-    elsif params[:impersonate] && warn_for_special_chars(params[:impersonate][:name], 'Username')
-      flash[:error] = 'Please enter valid user name'
-      redirect_back fallback_location: root_path
-    end
+    user_name = params.dig(:user, :name) || params.dig(:impersonate, :name)
+    return unless user_name
+
+    flash[:error] = 'Please enter a valid username' && (redirect_back(fallback_location: root_path) if warn_for_special_chars(user_name, 'Username'))
   end
 
   # Checking if the username provided can be impersonated or not

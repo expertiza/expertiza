@@ -13,7 +13,7 @@ describe PublishingController do
     allow(User).to receive(:find).with(21).and_return(student1)
   end
 
-	describe '#action_allowed?' do
+  describe '#action_allowed?' do
     #check if super-admin is able to perform the actions
     it 'allows super_admin to perform certain action' do
       stub_current_user(super_admin, super_admin.role.name, super_admin.role)
@@ -33,6 +33,7 @@ describe PublishingController do
     end
 
     # check if teaching assistant is able to perform the actions
+
     it 'allows teaching assistant to perform certain action' do
       stub_current_user(ta, ta.role.name, ta.role)
       expect(controller.send(:action_allowed?)).to be_truthy

@@ -589,6 +589,8 @@ describe ReviewMappingController do
 
     context 'when teams is empty, max team size is 1 and when review params are not 0' do
       it 'shows an error flash message and redirects to review_mapping#list_mappings page' do
+        assignment_double = double('Assignment', auto_assign_mentor: false) 
+        allow(Assignment).to receive(:find).and_return(assignment_double)
         allow(TeamsUser).to receive(:team_id).with(1, 2).and_return(true)
         allow(TeamsUser).to receive(:team_id).with(1, 3).and_return(false)
         allow(AssignmentTeam).to receive(:create_team_and_node).with(1).and_return(double('AssignmentTeam', id: 1))

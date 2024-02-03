@@ -57,6 +57,14 @@ class StudentTeamsController < ApplicationController
     @users_on_waiting_list = (SignUpTopic.find(@student.team.topic).users_on_waiting_list if student_team_requirements_met?)
     @teammate_review_allowed = DueDate.teammate_review_allowed(@student)
   end
+ # E2351 Adding a new view for mentors to be able to see all teams that they are mentoring for the selected assignment
+ # This replaces the typical student view where the team they are on would be displayed
+ # This was necessary because a mentor could be assigned to multiple teams and the view file for that would
+ # not have been easily adapted to accommodate this.
+  def mentor
+     return unless current_user_id? student.user_id
+     # Default return to views/student_team/mentor utilized
+  end
 
   def create
     existing_teams = AssignmentTeam.where name: params[:team][:name], parent_id: student.parent_id
@@ -68,9 +76,15 @@ class StudentTeamsController < ApplicationController
         redirect_to view_student_teams_path student_id: student.id
         return
       end
-      team = AssignmentTeam.new(name: params[:team][:name], parent_id: student.parent_id)
-      team.save
       parent = AssignmentNode.find_by node_object_id: student.parent_id
+      # E2351- a decision needs to be made here whether to create an AssignmentTeam or MentoredTeam depending on assignment settings
+      if parent.assignment != nil && parent.assignment.auto_assign_mentor
+        team = MentoredTeam.new(name: params[:team][:name], parent_id: student.parent_id)
+      else
+        team = AssignmentTeam.new(name: params[:team][:name], parent_id: student.parent_id)
+      end
+      team.save
+      #
       TeamNode.create parent_id: parent.id, node_object_id: team.id
       user = User.find(student.user_id)
       team.add_member(user, team.parent_id)

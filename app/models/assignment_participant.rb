@@ -113,11 +113,11 @@ class AssignmentParticipant < Participant
   def self.import(row_hash, _row_header = nil, session, id)
     raise ArgumentError, 'No user id has been specified.' if row_hash.empty?
 
-    user = User.find_by(name: row_hash[:name])
+    user = User.find_by(name: row_hash[:username])
 
     # if user with provided name in csv file is not present then new user will be created.
     if user.nil?
-      raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
+      raise ArgumentError, "The record containing #{row_hash[:username]} does not have enough items." if row_hash.length < 4
 
       # define_attributes method will return an element that stores values from the row_hash.
       attributes = ImportFileHelper.define_attributes(row_hash)

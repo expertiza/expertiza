@@ -346,7 +346,7 @@ describe Assignment do
       it 'raises an error' do
         allow(User).to receive(:find_by).with(name: 'no one').and_return(nil)
         allow_any_instance_of(Assignment).to receive(:url_for).with(controller: 'users', action: 'new').and_return('users/new/1')
-        expect { assignment.add_participant('no one', nil, nil, nil) }.to raise_error(RuntimeError, %r{a href='users/new/1'>create</a> the user first})
+        expect { assignment.add_participant('no one', nil, nil, nil, nil) }.to raise_error(RuntimeError, %r{a href='users/new/1'>create</a> the user first})
       end
     end
 
@@ -354,7 +354,7 @@ describe Assignment do
       it 'raises an error' do
         allow(User).to receive(:find_by).with(name: 'no one').and_return(student)
         allow(AssignmentParticipant).to receive(:find_by).with(parent_id: 1, user_id: 3).and_return(participant)
-        expect { assignment.add_participant('no one', nil, nil, nil) }.to raise_error(RuntimeError, /The user no one is already a participant/)
+        expect { assignment.add_participant('no one', nil, nil, nil, nil) }.to raise_error(RuntimeError, /The user no one is already a participant/)
       end
     end
 
@@ -363,8 +363,8 @@ describe Assignment do
         allow(User).to receive(:find_by).with(name: 'no one').and_return(student)
         allow(AssignmentParticipant).to receive(:find_by).with(parent_id: 1, user_id: 3).and_return(nil)
         allow(AssignmentParticipant).to receive(:create).with(parent_id: 1, user_id: 3, permission_granted: 0,
-                                                              can_submit: true, can_review: true, can_take_quiz: false).and_return(participant)
-        expect { assignment.add_participant('no one', true, true, false) }.to change { AssignmentParticipant.count }.from(0).to(1)
+                                                              can_submit: true, can_review: true, can_take_quiz: false, can_mentor: false).and_return(participant)
+        expect { assignment.add_participant('no one', true, true, false, false) }.to change { AssignmentParticipant.count }.from(0).to(1)
       end
     end
   end
@@ -727,3 +727,4 @@ describe Assignment do
     end
   end
 end
+

@@ -100,6 +100,25 @@ FactoryBot.define do
     req_id nil
   end
 
+  factory :mentor, class: AssignmentParticipant do
+    sequence(:name) { |n| n = n % 3; "mentor206#{n + 4}" }
+    can_submit true
+    can_review true
+    assignment { Assignment.first || association(:assignment) }
+    association :user, factory: :student
+    submitted_at nil
+    permission_granted nil
+    penalty_accumulated 0
+    grade nil
+    type 'AssignmentParticipant'
+    handle 'handle'
+    time_stamp nil
+    digital_signature nil
+    can_mentor true
+    can_take_quiz true
+  end
+
+
   factory :student, class: User do
     # Zhewei: In order to keep students the same names (2065, 2066, 2064) before each example.
     sequence(:name) { |n| n = n % 3; "student206#{n + 4}" }
@@ -316,7 +335,7 @@ FactoryBot.define do
     handle 'handle'
     time_stamp nil
     digital_signature nil
-    duty nil
+    can_mentor false
     can_take_quiz true
   end
 
@@ -333,7 +352,7 @@ FactoryBot.define do
     handle 'handle'
     time_stamp nil
     digital_signature nil
-    duty nil
+    can_mentor false
     can_take_quiz true
   end
 

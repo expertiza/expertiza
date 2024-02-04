@@ -159,7 +159,9 @@ describe CollusionCycle do
     context 'when the reviewers of current reviewer (ap2) includes current assignment participant' do
       # This before-each function is used to extract out re-appearing code used in three_node_cycle tests
       # More specifically, it is used to extract out the common code used to
+      
       # create a relationship between three reviewing participants.
+
       before(:each) do
         # Sets up stubs for test
         allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team1.id).and_return([response_map_team_1_2])
@@ -224,6 +226,7 @@ describe CollusionCycle do
       # This before-each function is used to extract out re-appearing code used in four_node_cycle tests
       # More specifically, it is used to extract out the common code used to
       # create a relationship between four reviewing participants
+
       before(:each) do
         # Sets up stubs for test
         allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team1.id).and_return([response_map_team_1_2])

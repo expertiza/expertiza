@@ -141,6 +141,7 @@
               <%= form.number_field :grade_for_reviewer, :value => reviewer.review_grade.try(:grade_for_reviewer), min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %>
               <br/>
               <%= form.text_area :comment_for_reviewer, :value => reviewer.review_grade.try(:comment_for_reviewer), placeholder: 'Comment', class: "awesome_input", 'data-multiple' => '', 'data-minchars' => "1" %>
+              <div>
               <table class="inline-transparent">
                 <tr>
                   <td>
@@ -151,8 +152,15 @@
                   <td>
                     <%= form.submit 'Save' %>
                   </td>
+		  <!--E2383 Added the Grading History link to the appropriate place-->
+                </tr>
+                <tr>
+                <td>
+                    <%= link_to "Grading History", grading_histories_path(grade_receiver_id: Participant.where(id: reviewer.id).pluck(:user_id).first, participant_id: reviewer.id, grade_type: "Review")%>
+                  </td>
                 </tr>
               </table>
+              </div>
             <% end %>
           </td>
         <% end %>

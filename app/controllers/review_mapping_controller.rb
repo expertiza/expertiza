@@ -334,6 +334,7 @@ class ReviewMappingController < ApplicationController
 
   def automatic_review_mapping
     assignment_id = params[:id].to_i
+    assignment = Assignment.find(params[:id])
     participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.select(&:can_review).shuffle!
     teams = AssignmentTeam.where(parent_id: params[:id].to_i).to_a.shuffle!
     max_team_size = Integer(params[:max_team_size]) # Assignment.find(assignment_id).max_team_size
@@ -343,7 +344,11 @@ class ReviewMappingController < ApplicationController
         user = participant.user
         next if TeamsUser.team_id(assignment_id, user.id)
 
-        team = AssignmentTeam.create_team_and_node(assignment_id)
+        if assignment.auto_assign_mentor
+          team = MentoredTeam.create_team_and_node(assignment_id)
+        else
+          team = AssignmentTeam.create_team_and_node(assignment_id)
+        end
         ApplicationController.helpers.create_team_users(user, team.id)
         teams << team
       end
@@ -417,7 +422,17 @@ class ReviewMappingController < ApplicationController
     review_grade.attributes = review_mapping_params
     review_grade.review_graded_at = Time.now
     review_grade.reviewer_id = session[:user].id
+    # E2237 create a grading history entry for this review
+    # save the grade, comment, receiver, and instructor
+    # E2383 Update the previous teams creation to match
+    # the current expertiza since it was outdated
     begin
+      GradingHistory.create(instructor_id: session[:user].id,
+                            assignment_id: Participant.find(params[:review_grade][:participant_id]).parent_id,
+                            grading_type: 'Review',
+                            grade_receiver_id: Participant.find(params[:review_grade][:participant_id]).user_id,
+                            grade: review_grade.grade_for_reviewer,
+                            comment: review_grade.comment_for_reviewer)
       review_grade.save!
       flash[:success] = 'Grade and comment for reviewer successfully saved.'
     rescue StandardError

@@ -30,25 +30,25 @@ describe InstitutionController do
       context 'when the role name of current user is super admin or admin' do
         it 'allows certain action' do
           stub_current_user(admin, admin.role.name, admin.role)
-          controller.send(:action_allowed?).should be true
+         expect( controller.send(:action_allowed?)).to be true
         end
       end
 
       context 'when current user is the instructor' do
         it 'allows certain action' do
           stub_current_user(instructor, instructor.role.name, instructor.role)
-          controller.send(:action_allowed?).should be true
+          expect(controller.send(:action_allowed?)).to be true
         end
       end
 
       context 'when current user is the TAs or the students' do
         it 'deny certain action if current user is the TA' do
           stub_current_user(ta, ta.role.name, ta.role)
-          controller.send(:action_allowed?).should be false
+          expect(controller.send(:action_allowed?)).to be false
         end
         it 'deny certain action if current user is the student' do
           stub_current_user(student, student.role.name, student.role)
-          controller.send(:action_allowed?).should be false
+          expect(controller.send(:action_allowed?)).to be false
         end
       end
     end

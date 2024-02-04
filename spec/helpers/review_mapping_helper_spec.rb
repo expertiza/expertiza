@@ -17,7 +17,7 @@ describe ReviewMappingHelper, type: :helper do
     it 'color should be red if response_map does not exist' do
       response_map_dne = create(:review_response_map)
 
-      color = get_team_color(response_map_dne)
+      color = team_color(response_map_dne)
       expect(color).to eq('red')
     end
 
@@ -38,7 +38,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: response_map_with_reviewee)
 
-      color = get_team_color(response_map_with_reviewee)
+      color = team_color(response_map_with_reviewee)
       expect(color).to eq('blue')
     end
 
@@ -53,7 +53,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: @response_map)
 
-      color = get_team_color(@response_map)
+      color = team_color(@response_map)
       expect(color).not_to eq('blue')
     end
 
@@ -63,7 +63,7 @@ describe ReviewMappingHelper, type: :helper do
       response_map_with_grade_reviewer = create(:review_response_map, reviewer: reviewer_with_grade)
       create(:response, response_map: response_map_with_grade_reviewer)
 
-      color = get_team_color(response_map_with_grade_reviewer)
+      color = team_color(response_map_with_grade_reviewer)
       expect(color).to eq('brown')
     end
 
@@ -78,7 +78,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: @response_map)
 
-      color = get_team_color(@response_map)
+      color = team_color(@response_map)
       expect(color).to eq('green')
     end
 
@@ -100,7 +100,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: response_map_with_reviewee)
 
-      color = get_team_color(response_map_with_reviewee)
+      color = team_color(response_map_with_reviewee)
       expect(color).to eq('green')
     end
 
@@ -123,11 +123,11 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: response_map_with_reviewee)
 
-      color = get_team_color(response_map_with_reviewee)
+      color = team_color(response_map_with_reviewee)
       expect(color).to eq('purple')
     end
 
-    xit 'color should be purple if submission link has been updated since due date for a specified round' do
+    it 'color should be purple if submission link has been updated since due date for a specified round' do
       # deadline_right inspired from bookmark_review_spec
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -142,7 +142,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: response_map_with_reviewee)
 
-      color = get_team_color(response_map_with_reviewee)
+      color = team_color(response_map_with_reviewee)
       expect(color).to eq('purple')
     end
   end
@@ -420,7 +420,7 @@ describe ReviewMappingHelper, type: :helper do
       max_team_size = 3
       @response = create(:response, response_map: @response_map)
       ip_address = '0.0.0.0'
-      reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
+      reviewed_team_name = team_display_name(max_team_size, @response, @reviewee.id, ip_address)
       expect(reviewed_team_name).to eq('(Team_1)')
     end
 
@@ -429,7 +429,7 @@ describe ReviewMappingHelper, type: :helper do
       max_team_size = 2
       @response = create(:response, response_map: @response_map)
       ip_address = '0.0.0.0'
-      reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
+      reviewed_team_name = team_display_name(max_team_size, @response, @reviewee.id, ip_address)
       expect(reviewed_team_name).to eq('(Team_1)')
     end
 
@@ -441,7 +441,7 @@ describe ReviewMappingHelper, type: :helper do
 
       @response = create(:response, response_map: @response_map)
       ip_address = '0.0.0.0'
-      reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
+      reviewed_team_name = team_display_name(max_team_size, @response, @reviewee.id, ip_address)
       expect(reviewed_team_name).to eq('(Adam)')
     end
 
@@ -450,7 +450,7 @@ describe ReviewMappingHelper, type: :helper do
       max_team_size = 0
       @response = create(:response, response_map: @response_map)
       ip_address = '0.0.0.0'
-      reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
+      reviewed_team_name = team_display_name(max_team_size, @response, @reviewee.id, ip_address)
       expect(reviewed_team_name).to eq('(Team_1)')
     end
   end
@@ -478,7 +478,7 @@ describe ReviewMappingHelper, type: :helper do
       @reviewers = Array[@reviewer_1, @reviewer_2, @reviewer_3]
       @reviewers_for_test = Array[@reviewer_2, @reviewer_3, @reviewer_1]
 
-      sort_reviewer_by_review_volume_desc
+      sort_reviewer_desc('review_volume')
       expect(@reviewers).to eq(@reviewers_for_test)
     end
 
@@ -490,7 +490,7 @@ describe ReviewMappingHelper, type: :helper do
       @reviewers = Array[@reviewer_1, @reviewer_2, @reviewer_3]
       @reviewers_for_test = Array[@reviewer_2, @reviewer_1, @reviewer_3]
 
-      sort_reviewer_by_review_volume_desc
+      sort_reviewer_desc('review_volume')
       expect(@reviewers).to eq(@reviewers_for_test)
     end
 
@@ -502,15 +502,15 @@ describe ReviewMappingHelper, type: :helper do
       @reviewers = Array[@reviewer_1, @reviewer_2, @reviewer_3]
       @reviewers_for_test = Array[@reviewer_1, @reviewer_2, @reviewer_3]
 
-      sort_reviewer_by_review_volume_desc
+      sort_reviewer_desc('review_volume')
       expect(@reviewers).to eq(@reviewers_for_test)
     end
   end
 
   # I found the test case by internet, and I think it will fail if the website update in future
-  describe 'get_link_updated_at' do
+  describe 'link_update_time' do
     it 'should return ? by input http://www.example.com' do
-      updated_time = get_link_updated_at('http://www.example.com')
+      updated_time = link_update_time('http://www.example.com')
       expect(updated_time).to eq('2019-10-17 03:18:26.000000000 -0400')
     end
   end
@@ -520,7 +520,7 @@ describe ReviewMappingHelper, type: :helper do
   # display_tagging_interval_chart
   # list_review_submissions
   # list_hyperlink_submission
-  # get_certain_review_and_feedback_response_map
+  # feedback_response_for_author
 
   describe 'get_each_review_and_feedback_response' do
     before(:each) do
@@ -561,7 +561,7 @@ describe ReviewMappingHelper, type: :helper do
     end
 
     it 'should return the number of responses given in round 1 reviews' do
-      get_each_review_and_feedback_response_map(@reviewer)
+      author_reviews_and_feedback_response(@reviewer)
 
       # rspan means the all peer reviews one student received, including unfinished one
       # retrieved from method call in review_mapping_helper.rb file
@@ -569,7 +569,7 @@ describe ReviewMappingHelper, type: :helper do
     end
 
     it 'should return the number of responses given in round 2 reviews' do
-      get_each_review_and_feedback_response_map(@reviewer)
+      author_reviews_and_feedback_response(@reviewer)
 
       # rspan means the all peer reviews one student received, including unfinished one
       # retrieved from method call in review_mapping_helper.rb file
@@ -583,7 +583,7 @@ describe ReviewMappingHelper, type: :helper do
       @feedback_response_map_list << FeedbackResponseMap.create(reviewed_object_id: @response_3.id, reviewer_id: @reviewer.id)
       @all_review_response_ids << @response_3.id
 
-      get_each_review_and_feedback_response_map(@reviewer)
+      author_reviews_and_feedback_response(@reviewer)
 
       # rspan means the all peer reviews one student received, including unfinished one
       # retrieved from method call in review_mapping_helper.rb file
@@ -592,7 +592,7 @@ describe ReviewMappingHelper, type: :helper do
 
     it 'should return 0 responses for no round 3 reviews' do
       # no feedback responses set before method call
-      get_each_review_and_feedback_response_map(@reviewer)
+      author_reviews_and_feedback_response(@reviewer)
 
       # rspan means the all peer reviews one student received, including unfinished one
       # retrieved from method call in review_mapping_helper.rb file
@@ -600,7 +600,7 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  # feedback_response_map_record is called within get_each_review_and_feedback_response_map
+  # feedback_response_map_record is called within author_reviews_and_feedback_response
   describe 'feedback_response_map_record' do
     before(:each) do
       @reviewer = create(:participant)
@@ -709,7 +709,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(resp_color).to eq(['green'])
     end
 
-    xit 'should return purple color if the assignment was submitted within the round' do
+    it 'should return purple color if the assignment was submitted within the round' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
@@ -727,7 +727,7 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  describe 'get_awarded_review_score' do
+  describe 'compute_awarded_review_score' do
     before(:each) do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -747,7 +747,7 @@ describe ReviewMappingHelper, type: :helper do
 
       @review_scores = { @reviewer.id => { 1 => { @reviewee.id => 10 }, 2 => { @reviewee.id => 20 }, 3 => { @reviewee.id => 30 } } }
 
-      get_awarded_review_score(@reviewer.id, @reviewee.id)
+      compute_awarded_review_score(@reviewer.id, @reviewee.id)
     end
 
     it 'should return the review score given by a reviewer for round 1 for the defined team' do
@@ -978,24 +978,54 @@ describe ReviewMappingHelper, type: :helper do
       expect(result[:variance]).to eq(2.92)
       expect(result[:stand_dev]).to eq(1.71)
     end
-  end
+    it 'returns the mean, min, max, variance, and standard deviation of the intervals' do
+      expect(calculate_key_chart_information([10, 15, 20])).to eq(mean: 15.0, min: 10, max: 20, variance: 16.67, stand_dev: 4.08)
 
-  describe 'test calculate_key_chart_information' do
-    it 'should return nil if intervals are empty' do
-      intervals = []
-      result = helper.calculate_key_chart_information(intervals)
-      expect(result).to be_nil
+      expect(calculate_key_chart_information([5, 8, 12, 15, 20])).to eq(mean: 12.0, min: 5, max: 20, variance: 27.6, stand_dev: 5.25)
+    end
+    context 'when intervals are empty' do
+      it 'returns an empty hash' do
+        # Test case 4
+        expect(calculate_key_chart_information([])).to eq({})
+      end
+    end
+    context 'when intervals contain values greater than the threshold' do
+      it 'ignores those intervals and returns an empty hash' do
+        expect(calculate_key_chart_information([60, 45, 35])).to eq({})
+      end
     end
   end
 
-  describe 'test get_css_style_for_calibration_report' do
-    it 'should return correct css class' do
-      css_class_0 = helper.get_css_style_for_calibration_report(0)
-      css_class_1 = helper.get_css_style_for_calibration_report(-1)
-      css_class_6 = helper.get_css_style_for_calibration_report(6)
-      expect(css_class_0). to eq('c5')
-      expect(css_class_1). to eq('c4')
-      expect(css_class_6). to eq('c1')
+  describe 'test calibration_report_css_class' do
+    context 'when the difference is 0' do
+      it 'returns c5 as the CSS class' do
+        css0 = helper.calibration_report_css_class(0)
+        expect(css0). to eq('c5')
+      end
+    end
+    context 'when the difference is 1' do
+      it 'returns c4 as the CSS class' do
+        css1 = helper.calibration_report_css_class(-1)
+        expect(css1). to eq('c4')
+      end
+    end
+    context 'when the difference is 2' do
+      it 'returns c3 as the CSS class' do
+        css2 = helper.calibration_report_css_class(-2)
+        expect(css2). to eq('c3')
+      end
+    end
+    context 'when the difference is 3' do
+      it 'returns c2 as the CSS class' do
+        css3 = helper.calibration_report_css_class(-3)
+        expect(css3). to eq('c2')
+      end
+    end
+    context 'when the difference is greater than 3' do
+      it 'returns c1 as the CSS class' do
+        css4 = helper.calibration_report_css_class(6)
+        expect(css4). to eq('c1')
+      end
     end
   end
 

@@ -81,7 +81,7 @@ describe AdvertiseForPartnerController do
     end
   end
 
-  # create advertisement by passing team and paticipant details
+  # create advertisement by passing team and participant details
   describe 'create method called' do
     context 'by a an existing team with advertisement comment' do
       it 'will create an advertisement for the team in current session' do

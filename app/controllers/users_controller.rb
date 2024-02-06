@@ -10,6 +10,7 @@ class UsersController < ApplicationController
          redirect_to: { action: :list }
 
   def action_allowed?
+    # check if action is allowed
     case params[:action]
     when 'list_pending_requested'
       current_user_has_admin_privileges?
@@ -31,6 +32,7 @@ class UsersController < ApplicationController
   end
 
   def index
+    # Redirect to home page if user is a student, otherwise render the user list.
     if current_user_is_a? 'Student'
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
@@ -40,6 +42,7 @@ class UsersController < ApplicationController
   end
 
   def auto_complete_for_user_name
+    # Get available users for the given name input in the user search bar.
     user = session[:user]
     role = Role.find(user.role_id)
     @users = User.where('name LIKE ? and (role_id in (?) or id = ?)', "#{params[:user][:name]}%", role.get_available_roles, user.id)
@@ -48,14 +51,14 @@ class UsersController < ApplicationController
 
   # for anonymized view for demo purposes
   def set_anonymized_view
-    anonymized_view_starter_ips = $redis.get('anonymized_view_starter_ips') || ''
+    anonymized_view_starter_ips = RedisManager.redis.get('anonymized_view_starter_ips') || ''
     session[:ip] = request.remote_ip
     if anonymized_view_starter_ips.include? session[:ip]
       anonymized_view_starter_ips.delete!(" #{session[:ip]}")
     else
       anonymized_view_starter_ips += " #{session[:ip]}"
     end
-    $redis.set('anonymized_view_starter_ips', anonymized_view_starter_ips)
+    RedisManager.redis.set('anonymized_view_starter_ips', anonymized_view_starter_ips)
     redirect_back fallback_location: root_path
   end
 
@@ -84,7 +87,7 @@ class UsersController < ApplicationController
   def show_if_authorized
     @user = User.find_by(name: params[:user][:name])
     if @user.nil?
-      flash[:note] = params[:user][:name] + ' does not exist.'
+      flash[:note] = "#{params[:user][:name]} does not exist."
       redirect_to action: 'list'
     else
       role
@@ -108,7 +111,7 @@ class UsersController < ApplicationController
       @user = User.find(params[:id])
       @role = @user.role
       @assignment_participant_num = AssignmentParticipant.where(user_id: @user.id).count
-      @maps = ResponseMap.where('reviewee_id = ? or reviewer_id = ?', params[:id], params[:id])
+      @maps = ResponseMap.where('reviewee_id = :id OR reviewer_id = :id', id: params[:id])
       @total_user_num = User.count
     end
   end
@@ -116,7 +119,7 @@ class UsersController < ApplicationController
   def new
     @user = User.new
     @rolename = Role.find_by(name: params[:role])
-    foreign
+    available_roles
   end
 
   def create
@@ -143,7 +146,7 @@ class UsersController < ApplicationController
       undo_link("The user \"#{@user.name}\" has been successfully created. ")
       redirect_to action: 'list'
     else
-      foreign
+      available_roles
       error_message = ''
       @user.errors.each { |_field, error| error_message << error }
       flash[:error] = error_message
@@ -154,7 +157,7 @@ class UsersController < ApplicationController
   def edit
     @user = User.find(params[:id])
     role
-    foreign
+    available_roles
   end
 
   def update
@@ -178,8 +181,6 @@ class UsersController < ApplicationController
   def destroy
     begin
       @user = User.find(params[:id])
-      AssignmentParticipant.where(user_id: @user.id).each(&:delete)
-      TeamsUser.where(user_id: @user.id).each(&:delete)
       AssignmentQuestionnaire.where(user_id: @user.id).each(&:destroy)
       # Participant.delete(true)
       @user.destroy
@@ -202,7 +203,7 @@ class UsersController < ApplicationController
 
   protected
 
-  def foreign
+  def available_roles
     # stores all the roles that are possible
     # when a new user joins or an existing user updates his/her profile they will get to choose
     # from all the roles available

@@ -80,13 +80,15 @@ module ParticipantsHelper
     end
   end
 
-  # Authorizations are paricipant, reader, reviewer, submitter (They are not store in Participant table.)
+  # Authorizations are participant, reader, reviewer, submitter (They are not store in Participant table.)
   # Permissions are can_submit, can_review, can_take_quiz.
   # Get permissions form authorizations.
   def participant_permissions(authorization)
     can_submit = true
     can_review = true
     can_take_quiz = true
+  #E2351 pass duty field to match implementation
+    can_mentor = false
     case authorization
     when 'reader'
       can_submit = false
@@ -100,11 +102,20 @@ module ParticipantsHelper
       can_submit = true
       can_review = false
       can_take_quiz = false
+  #E2351 - adding a 4th option for mentor, permissions are same as participant but has additional permission 'can_mentor'
+  #maintained as a boolean like other permissions
+    when 'mentor'
+      can_submit = true
+      can_review = true
+      can_take_quiz = true
+      can_mentor = true
+  #end 2351 changes
     else
       can_submit = true
       can_review = true
       can_take_quiz = true
+      can_mentor = false
     end
-    { can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz }
+    { can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz, can_mentor: can_mentor }
   end
 end

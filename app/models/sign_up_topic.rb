@@ -226,3 +226,4 @@ class SignUpTopic < ApplicationRecord
     ExpertizaLogger.info(LoggerMessage.new('SignUpSheet', '', "Sign up sheet created for waitlisted with teamId #{team_id}"))
     result
   end
+end

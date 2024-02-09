@@ -186,7 +186,6 @@ class SignUpTopic < ApplicationRecord
 
   def find_user_signup(team)
     SignedUpTeam.find_user_signup_topics(team.parent_id, team.id)
-  end
     # Fetch all topics for the user within the team for the assignment
     user_signup = SignedUpTeam.find_user_signup_topics(team.parent_id, team_id)
     # Check if the user is already signed up and waitlisted for the topic

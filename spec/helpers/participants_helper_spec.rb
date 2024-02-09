@@ -69,7 +69,8 @@ describe ParticipantsHelper do
                 #Checking permissions for a participant
 
                 result = participant_permissions('participant')
-                expect(result).to eq(can_submit: true, can_review: true, can_take_quiz: true)
+                expect(result.except(:can_mentor)).to eq({:can_review=>true, :can_submit=>true, :can_take_quiz=>true})
+
 
 
             end

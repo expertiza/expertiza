@@ -422,17 +422,7 @@ class ReviewMappingController < ApplicationController
     review_grade.attributes = review_mapping_params
     review_grade.review_graded_at = Time.now
     review_grade.reviewer_id = session[:user].id
-    # E2237 create a grading history entry for this review
-    # save the grade, comment, receiver, and instructor
-    # E2383 Update the previous teams creation to match
-    # the current expertiza since it was outdated
     begin
-      GradingHistory.create(instructor_id: session[:user].id,
-                            assignment_id: Participant.find(params[:review_grade][:participant_id]).parent_id,
-                            grading_type: 'Review',
-                            grade_receiver_id: Participant.find(params[:review_grade][:participant_id]).user_id,
-                            grade: review_grade.grade_for_reviewer,
-                            comment: review_grade.comment_for_reviewer)
       review_grade.save!
       flash[:success] = 'Grade and comment for reviewer successfully saved.'
     rescue StandardError

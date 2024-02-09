@@ -23,9 +23,9 @@
     <% @authors.each do |rejoinder| %>
       <% next unless rejoinder %>
       <% if @assignment.varying_rubrics_by_round? %>
-        <% author_reviews_and_feedback_response(rejoinder) %>
+        <% get_each_review_and_feedback_response_map(rejoinder) %> 
       <% else %>
-        <% feedback_response_for_author(rejoinder) %>
+        <% get_certain_review_and_feedback_response_map(rejoinder) %>
       <% end %>
 
       <% @first_col_identifier = true %>
@@ -128,11 +128,11 @@
       <% else %>
         <!-- if assignment does not vary by round, prepare data: -->
           <% @count = 0 %>
-          <% @feedback_response_data.each {|response_map| @count += 1 if Response.exists? map_id: response_map.id} %>
+          <% @feedback_response_maps.each {|response_map| @count += 1 if Response.exists? map_id: response_map.id} %>
           <!--Rejoinder-->
           <!-- If assignment rubrics vary by round, set row_span equal to rspan of rounds 1, 2, and 3 (hardcoded) -->
           <!-- Otherwise, set row_span equal to the @rspan -->
-          <!-- @rspan_round_one and @rspan are set in methods author_reviews_and_feedback_response and feedback_response_for_author above -->
+          <!-- @rspan_round_one and @rspan are set in methods get_each_review_and_feedback_response_map and get_certain_review_and_feedback_response_map above -->
            <%row_span= @assignment.varying_rubrics_by_round? ? (@rspan_round_one.to_i + @rspan_round_two.to_i + @rspan_round_three.to_i) : @rspan.to_i %>
            <!-- If row_span is zero, (no reviews completed), then manually set rowspan to 1 to fix formatting -->
            <% if row_span.zero? %>

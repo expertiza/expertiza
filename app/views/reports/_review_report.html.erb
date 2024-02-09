@@ -37,6 +37,7 @@
 
   <button onclick="exportTableToCSV('review_scores.csv')">Export Review Scores To CSV File</button>
   <br />
+  <input type="text" id="team-search" placeholder="Enter team name">
   <br />
   <table id="myTable" class="table table-striped" width="100%" cellspacing='0' cellpadding='2' border='0'>
     <thead>
@@ -58,8 +59,8 @@
     <tbody>
 
     <!-- Set the review data and row span for each reviewer -->
-    <% sort_reviewer_desc('review_volume').each_with_index do |reviewer, index| %>
-      <% @response_maps = response_maps_data(@id, reviewer.id, @type), @rspan = rspan_data(@id, reviewer.id, @type) %>
+    <% sort_reviewer_by_review_volume_desc.each_with_index do |reviewer, index| %>
+      <% @response_maps, @rspan = get_data_for_review_report(@id, reviewer.id, @type) %>
       <tr>
         <% unless reviewer.id == 1 %>
           <% user = Participant.find(reviewer.id).user %>
@@ -83,8 +84,8 @@
           <td align = 'left'>
           <% @response_maps.each_with_index do |reviewer_map, index| %>
             <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
-            <% team_name_color = team_color(reviewer_map) %>
-            <% team_reviewed_link_name = team_display_name(@assignment.max_team_size, reviewer_map.response, reviewer_map.reviewee_id, session[:ip]) %>
+            <% team_name_color = get_team_color(reviewer_map) %>
+            <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, reviewer_map.response, reviewer_map.reviewee_id, session[:ip]) %>
               <% if Team.where(id: reviewer_map.reviewee_id).length > 0 %>
                 <!--Team reviewed-->
                 <% if index == 0 %>
@@ -101,8 +102,7 @@
                         <% end %>
                 <% end %>
                     <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => reviewer_map.reviewee_id, :id2 => reviewer_map.id, :assignment_id=>@id %>
-                    # Following Table entry displays review submissions for specific reviewer and reviewee
-		    <%= list_review_submissions(reviewer.id, reviewer_map.reviewee_id, reviewer_map.id) %>
+                    <%= list_review_submissions(reviewer.id, reviewer_map.reviewee_id, reviewer_map.id) %>
                     <!--Hard-coded Dr.Kidd's question in order to display link.-->
                     <!--later we can create a hyperlink question type to deal with this situation.-->
                     <%= list_hyperlink_submission(reviewer_map.id, 5386) if Assignment.find_by(id: @id.to_i).try(:course).try(:instructor).try(:name) == 'Jkidd' %>
@@ -141,7 +141,6 @@
               <%= form.number_field :grade_for_reviewer, :value => reviewer.review_grade.try(:grade_for_reviewer), min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %>
               <br/>
               <%= form.text_area :comment_for_reviewer, :value => reviewer.review_grade.try(:comment_for_reviewer), placeholder: 'Comment', class: "awesome_input", 'data-multiple' => '', 'data-minchars' => "1" %>
-              <div>
               <table class="inline-transparent">
                 <tr>
                   <td>
@@ -152,15 +151,8 @@
                   <td>
                     <%= form.submit 'Save' %>
                   </td>
-		  <!--E2383 Added the Grading History link to the appropriate place-->
-                </tr>
-                <tr>
-                <td>
-                    <%= link_to "Grading History", grading_histories_path(grade_receiver_id: Participant.where(id: reviewer.id).pluck(:user_id).first, participant_id: reviewer.id, grade_type: "Review")%>
-                  </td>
                 </tr>
               </table>
-              </div>
             <% end %>
           </td>
         <% end %>
@@ -201,6 +193,30 @@
 </script>
 
 <script>
+document.getElementById("team-search").addEventListener("input", function () {
+  searchTeam();
+});
+
+function searchTeam() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("team-search");
+  filter = input.value.toLowerCase();
+  table = document.getElementById("myTable"); // Your table's ID
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[2]; // Adjust the index to match the team name column
+      if (td) {
+          txtValue = td.textContent || td.innerText;
+          if (txtValue.toLowerCase().indexOf(filter) > -1) {
+              tr[i].style.display = "";
+          } else {
+              tr[i].style.display = "none";
+          }
+      }
+  }
+}
+
+
 	function downloadCSV(csv, filename) {
 		var csvFile;
 		var downloadLink;

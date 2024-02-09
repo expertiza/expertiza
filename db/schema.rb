@@ -10,9 +10,6 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
-# ActiveRecord::Schema.define(version: 20231202211644) do
-
 ActiveRecord::Schema.define(version: 20231203230237) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -427,6 +424,7 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.boolean "password_expired"
     t.index ["role_id"], name: "fk_user_role_id"
   end
+
 
   create_table "grading_histories", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "instructor_id"
@@ -1098,5 +1096,3 @@ ActiveRecord::Schema.define(version: 20231203230237) do
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
 end
-
-

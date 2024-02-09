@@ -762,6 +762,7 @@ FactoryBot.define do
     course_id 1
   end
 
+
   factory :user, class: User do
     sequence(:name) { |n| "user#{n}" }
     sequence(:fullname) { |n| "User #{n}" }

@@ -72,8 +72,6 @@ describe ParticipantsHelper do
                 expect(result).to eq(can_submit: true, can_review: true, can_take_quiz: true)
 
 
-
-
             end
         end
     end

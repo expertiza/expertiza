@@ -503,7 +503,7 @@ describe SignUpSheetController do
   describe '#sign_up' do
     context 'when SignUpSheet.signup_team method return nil' do
       it 'shows an error flash message and redirects to sign_up_sheet#list page' do
-        allow(SignedUpTeam).to receive(:find_team_users).with(1, 6).and_return([team])
+        allow(Team).to receive(:find_team_users).with(1, 6).and_return([team])
         request_params = { id: 1 }
         user_session = { user: instructor }
         get :sign_up, params: request_params, session: user_session
@@ -538,7 +538,7 @@ describe SignUpSheetController do
 
         context 'when creating team related objects successfully' do
           it 'shows a flash success message and redirects to assignment#edit page' do
-            allow(SignedUpTeam).to receive(:find_team_users).with('1', 8).and_return([team])
+            allow(Team).to receive(:find_team_users).with('1', 8).and_return([team])
             allow(Team).to receive(:find).and_return(team)
             allow(team).to receive(:t_id).and_return(1)
             allow(TeamsUser).to receive(:team_id).with('1', 8).and_return(1)
@@ -557,7 +557,7 @@ describe SignUpSheetController do
 
         context 'when creating team related objects unsuccessfully' do
           it 'shows a flash error message and redirects to assignment#edit page' do
-            allow(SignedUpTeam).to receive(:find_team_users).with('1', 8).and_return([])
+            allow(Team).to receive(:find_team_users).with('1', 8).and_return([])
             allow(User).to receive(:find).with(8).and_return(student)
             allow(Assignment).to receive(:find).with(1).and_return(assignment)
             allow(TeamsUser).to receive(:create).with(user_id: 8, team_id: 1).and_return(double('TeamsUser', id: 1))
@@ -623,7 +623,7 @@ describe SignUpSheetController do
       it 'shows a flash success message and redirects to sign_up_sheet#list page' do
         allow(team).to receive(:submitted_files).and_return([])
         allow(team).to receive(:hyperlinks).and_return([])
-        allow(SignedUpTeam).to receive(:find_team_users).with(1, 6).and_return([team])
+        allow(Team).to receive(:find_team_users).with(1, 6).and_return([team])
         allow(team).to receive(:t_id).and_return(1)
         request_params = { id: 1, topic_id: 1 }
         user_session = { user: instructor }
@@ -678,7 +678,7 @@ describe SignUpSheetController do
       it 'shows a flash success message and redirects to assignment#edit page' do
         allow(team).to receive(:submitted_files).and_return([])
         allow(team).to receive(:hyperlinks).and_return([])
-        allow(SignedUpTeam).to receive(:find_team_users).with(1, 6).and_return([team])
+        allow(Team).to receive(:find_team_users).with(1, 6).and_return([team])
         allow(team).to receive(:t_id).and_return(1)
         request_params = { id: 1, topic_id: 1 }
         user_session = { user: instructor }
@@ -780,6 +780,38 @@ describe SignUpSheetController do
       user_session = { user: instructor }
       get :switch_original_topic_to_approved_suggested_topic, params: request_params, session: user_session
       expect(response).to redirect_to('/sign_up_sheet/list?id=1')
+    end
+  end
+
+  describe '#delete_signup_for_topic' do
+    context 'when the SignUpTopic record exists' do
+      let(:signup_record) { create(:signed_up_team, team: team, topic: topic) }
+
+      before do
+        allow(SignUpTopic).to receive(:find_by).with(id: topic_id).and_return(topic)
+        allow(topic).to receive(:reassign_topic).with(team_id).and_return(true)
+      end
+
+      it 'reassigns the topic for the specified team' do
+        expect(topic).to receive(:reassign_topic).with(team_id).once
+        post :delete_signup_for_topic, params: { topic_id: topic_id, team_id: team_id }
+        expect(response).to redirect_to(sign_up_sheet_list_path(assignment.id))
+      end
+    end
+
+    context 'when the SignUpTopic record does not exist' do
+      let(:invalid_topic_id) { 999 } # Assuming 999 is not a valid topic_id
+
+      before do
+        allow(SignUpTopic).to receive(:find_by).with(id: invalid_topic_id).and_return(nil)
+      end
+
+      it 'does not raise an error' do
+        expect {
+          post :delete_signup_for_topic, params: { topic_id: invalid_topic_id, team_id: team_id }
+        }.not_to raise_error
+        expect(response).to redirect_to(sign_up_sheet_list_path(assignment.id))
+      end
     end
   end
 end

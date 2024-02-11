@@ -35,24 +35,17 @@ describe Ta do
     end
   end
   describe '#list_mine' do
-    it 'finds associated assignments with TA' do
-      expected_query = ['SELECT assignments.id, assignments.name, assignments.directory_path ' \
-                          'FROM assignments ' \
-                          'INNER JOIN ta_mappings ON assignments.course_id = ta_mappings.course_id ' \
-                          'WHERE ta_mappings.ta_id = ?', 6]
-
-      expect(Assignment).to receive(:find_by_sql).with(expected_query).and_return([assignment])
-      result = ta.list_mine(Assignment, 6)
-      expect(result).to eq([assignment])
+    context 'when the object is an assignment' do
+      it 'finds associated assignments with TA' do
+        allow(Assignment).to receive(:find_by_sql).with(['select assignments.id, assignments.name, assignments.directory_path ' \
+      'from assignments, ta_mappings where assignments.course_id = ta_mappings.course_id and ta_mappings.ta_id=?', 6]).and_return([assignment])
+        expect(ta.list_mine(Assignment, 6)).to eq([assignment])
+      end
     end
     context 'when the object is not an assignment' do
       it 'finds associated courses with TA' do
-        expected_query = { instructor_id: 6 }
-
-        allow(Course).to receive(:where).with(expected_query).and_return([course1, course2])
-
-        result = ta.list_mine(Course, 6)
-        expect(result).to eq([course1, course2])
+        allow(Course).to receive(:where).with(['instructor_id = ?', 6]).and_return([course1, course2])
+        expect(ta.list_mine(Course, 6)).to eq([course1, course2])
       end
     end
   end
@@ -89,22 +82,19 @@ describe Ta do
       expect(Ta.get_mapped_instructor_ids(999)).to eq([6])
     end
   end
-  describe '#instructor' do
+  describe '#get_instructor' do
     it 'returns associated instructor' do
       allow(Ta).to receive(:get_my_instructor).with(999).and_return(6)
-      expect(ta.instructor).to eq(6)
+      expect(ta.get_instructor).to eq(6)
     end
   end
-  describe '#instructor=' do
+  describe '#set_instructor' do
     it 'assigns the instructor id and course id' do
       allow(Ta).to receive(:get_my_instructor).with(999).and_return(6)
       allow(TaMapping).to receive(:get_course_id).with(999).and_return(1)
-      ta.instructor = assignment
-      expect(assignment.instructor_id).to eq(6)
-      expect(assignment.course_id).to eq(1)
+      expect(ta.set_instructor(assignment)).to eq(1)
     end
   end
-
   describe '#get_user_list' do
     it 'gets a list of users that belong to the TA' do
       @student_role = build(:role_of_student, id: 1, name: 'Student_role_test', description: '', parent_id: nil, default_page_id: nil)

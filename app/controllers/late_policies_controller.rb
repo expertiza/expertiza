@@ -17,11 +17,11 @@ class LatePoliciesController < ApplicationController
     end
   end
 
-  # .includes() call allows for eager loading the associated user models
+  # This method lists all the late policies records from late_policies table in database.
   def index
-    @penalty_policies = LatePolicy.includes([:user]).where(['instructor_id = ? OR private = 0', instructor_id])
+    @penalty_policies = LatePolicy.where(['instructor_id = ? OR private = 0', instructor_id])
     respond_to do |format|
-      format.html
+      format.html # index.html.erb
       format.xml  { render xml: @penalty_policies }
     end
   end
@@ -54,21 +54,27 @@ class LatePoliciesController < ApplicationController
   def create
     # First this function validates the input then save if the input is valid.
     valid_penalty, error_message = validate_input
-    flash[:error] = error_message if error_message
+    if error_message
+      flash[:error] = error_message
+    end
 
     # If penalty  is valid then tries to update and save.
-    begin
-      if valid_penalty
-        @late_policy = LatePolicy.new(params)
-        @late_policy.instructor_id = instructor_id
-        valid_penalty = save_late_policy
+    if valid_penalty
+      @late_policy = LatePolicy.new(late_policy_params)
+      @late_policy.instructor_id = instructor_id
+      begin
+        @late_policy.save!
+        flash[:notice] = 'The late policy was successfully created.'
+        redirect_to action: 'index'
+      # If something unexpected happens while saving the record in to database then displays a flash notice and redirect to create a new late policy again.
+      rescue StandardError
+        flash[:error] = 'The following error occurred while saving the late policy: '
+        redirect_to action: 'new'
       end
-    rescue StandardError
-      valid_penalty = false
-      flash[:error] = 'The following error occurred while saving the late policy: '
+    # If any of above checks fails, then redirect to create a new late policy again.
+    else
+      redirect_to action: 'new'
     end
-    # Redirect to new if there's an error, index if not
-    redirect_to action: (valid_penalty ? 'index' : 'new')
   end
 
   # Update method can update late policy. There are few check points before updating a late policy which are written in the if/else statements.
@@ -76,19 +82,22 @@ class LatePoliciesController < ApplicationController
     penalty_policy = LatePolicy.find(params[:id])
 
     # First this function validates the input then save if the input is valid.
-    valid_penalty, error_message = validate_input(true)
-    if !valid_penalty
+    _valid_penalty, error_message = validate_input(true)
+    if error_message
       flash[:error] = error_message
       redirect_to action: 'edit', id: params[:id]
     # If there are no errors, then save the record.
     else
-      penalty_policy.update_attributes(late_policy_params)
-      error_thrown = save_late_policy(true)
-      # If there was an error thrown, go back to edit, otherwise go to index
-      if error_thrown
-        redirect_to action: 'edit', id: params[:id]
-      else
+      begin
+        penalty_policy.update_attributes(late_policy_params)
+        penalty_policy.save!
+        LatePolicy.update_calculated_penalty_objects(penalty_policy)
+        flash[:notice] = 'The late policy was successfully updated.'
         redirect_to action: 'index'
+      # If something unexpected happens while updating, then redirect to the edit page of that policy again.
+      rescue StandardError
+        flash[:error] = 'The following error occurred while updating the late policy: '
+        redirect_to action: 'edit', id: params[:id]
       end
     end
   end
@@ -124,103 +133,53 @@ class LatePoliciesController < ApplicationController
 
   # This function checks if the policy name already exists or not and returns boolean value for penalty and the error message.
   def duplicate_name_check(is_update = false)
-    valid_penalty, error_message = true, nil
+    should_check = true
     prefix = is_update ? "Cannot edit the policy. " : ""
+    valid_penalty, error_message = true, nil
 
-    if should_check_policy_name?(is_update)
-      valid_penalty, error_message = check_for_duplicate_name(prefix)
-    end
-
-    return valid_penalty, error_message
-  end
-
-  # This is a helper function for the duplicate name check
-  def should_check_policy_name?(is_update)
-    # If the function is called in the context of updating a policy
     if is_update
-      # Find the existing late policy by its ID
       existing_late_policy = LatePolicy.find(params[:id])
-      # Check if the policy name in the request is different from the existing policy's name
-      # Return true if they are different, indicating a need to check the policy name
-      return existing_late_policy.policy_name != params[:late_policy][:policy_name]
-    end
-    return true
-  end
-
-  # This is a helper function for the duplicate name check
-  def check_for_duplicate_name(prefix)
-    if LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
-      error_message = prefix + 'A policy with the same name ' + params[:late_policy][:policy_name] + ' already exists.'
-      valid_penalty = false
-    else
-      # If no duplicate name is found, set valid_penalty to true
-      valid_penalty = true
-      error_message = nil
+      if existing_late_policy.policy_name == params[:late_policy][:policy_name]
+        should_check = false
+      end
     end
 
-    # Return the validity status of the penalty and the corresponding error message, if any
+    if should_check
+      if LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
+        error_message = prefix + 'A policy with the same name ' + params[:late_policy][:policy_name] + ' already exists.'
+        valid_penalty = false
+      end
+    end
     return valid_penalty, error_message
   end
 
-  # This function validates the input. The outputs are a boolean, which is true if the input is valid, and the second output
-  # is a string which contains all of the error messages. If there were no error messages, the returned string is ""
+  # This function validates the input.
   def validate_input(is_update = false)
     # Validates input for create and update forms
     max_penalty = params[:late_policy][:max_penalty].to_i
     penalty_per_unit = params[:late_policy][:penalty_per_unit].to_i
-    error_messages = []
 
-    # Validates the name is not a duplicate
-    valid_penalty, name_error = duplicate_name_check(is_update)
-    error_messages << name_error if name_error
+    valid_penalty, error_message = duplicate_name_check(is_update)
+    prefix = is_update ? "Cannot edit the policy. " : ""
 
-    # This validates the max_penalty to make sure it's within the correct range
-    if max_penalty_valid(max_penalty, penalty_per_unit)
-      error_messages << "#{error_prefix(is_update)}The maximum penalty must be between the penalty per unit and 100."
+    # This check validates the maximum penalty.
+    if max_penalty < penalty_per_unit
+      error_message = prefix + 'The maximum penalty cannot be less than penalty per unit.'
       valid_penalty = false
     end
 
-    # This validates the penalty_per_unit and makes sure it's not negative
-    if penalty_per_unit_valid(penalty_per_unit)
-      error_messages << 'Penalty per unit cannot be negative.'
+    # This check validates the penalty per unit for a late policy.
+    if penalty_per_unit < 0
+      error_message = 'Penalty per unit cannot be negative.'
       valid_penalty = false
     end
 
-    [valid_penalty, error_messages.join("\n")]
-  end
-
-  # Validate the maximum penalty and ensure it's in the correct range
-  def max_penalty_valid(max_penalty, penalty_per_unit)
-    max_penalty < penalty_per_unit || max_penalty > 100
-  end
-
-  # Validates the penalty per unit
-  def penalty_per_unit_valid(penalty_per_unit)
-    penalty_per_unit < 0
-  end
-
-  # Validation error prefix
-  def error_prefix(is_update)
-    is_update ? "Cannot edit the policy. " : ""
-  end
-
-  # Saves the late policy called from create or update
-  def save_late_policy(from_update = false)
-    begin
-      @late_policy.save!
-      # If the method that called this is update
-      LatePolicy.update_calculated_penalty_objects(penalty_policy) if from_update
-      # The code at the end of the string gets the name of the last method (create, update) and adds a d (created, updated)
-      flash_for_save(from_update)
-    rescue StandardError
-      # If something unexpected happens while saving the record in to database then displays a flash notice
-      flash[:error] = 'The following error occurred while saving the late policy: '
-      return false
+    # This checks maximum penalty does not exceed 100.
+    if max_penalty >= 100
+      error_message = prefix + 'Maximum penalty cannot be greater than or equal to 100'
+      valid_penalty = false
     end
-    true
-  end
 
-  def flash_for_save(from_update = false)
-    flash[:notice] = "The late policy was successfully #{from_update ? 'updated' : 'created'}."
+    return valid_penalty, error_message
   end
 end

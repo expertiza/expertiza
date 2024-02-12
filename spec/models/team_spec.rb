@@ -156,7 +156,7 @@ describe Team do
 
   describe '.generate_team_name' do
     it 'generates the unused team name' do
-      allow(Team).to receive(:where).with('name LIKE ?', 'Assignment Team_%').and_return(team)
+      allow(Team).to receive(:where).with('name LIKE ?', 'Assignment Team_%').and_return([team])
       expect(Team.generate_team_name('Assignment')).to eq('Assignment Team_1')
     end
   end

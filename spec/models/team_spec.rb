@@ -156,10 +156,8 @@ describe Team do
 
   describe '.generate_team_name' do
     it 'generates the unused team name' do
-      allow(Team).to receive(:find_by).with(name: 'Assignment Team_1').and_return(team)
-
-      allow(Team).to receive(:find_by).with(name: 'Assignment Team_2').and_return(nil)
-      expect(Team.generate_team_name('Assignment')).to eq('Assignment Team_2')
+      allow(Team).to receive(:where).with('name LIKE ?', 'Assignment Team_%').and_return(team)
+      expect(Team.generate_team_name('Assignment')).to eq('Assignment Team_1')
     end
   end
 
@@ -277,7 +275,8 @@ describe Team do
     #   it 'handles duplicated teams and imports team members' do
     #     allow(Team).to receive(:find_by).with(name: 'no team', parent_id: 1).and_return(team)
     #     allow_any_instance_of(Team).to receive(:handle_duplicate)
-    #       .with(team, 'no team', 1, 'rename', AssignmentTeam.new).and_return('new team name')
+    #       .with(team, 'no team', 
+    1, 'rename', AssignmentTeam.new).and_return('new team name')
     #     allow(AssignmentTeam).to receive(:create_team_and_node).with(1).and_return(AssignmentTeam.new)
     #     allow_any_instance_of(Team).to receive(:import_team_members).with(1, ['no team', 'another field']).and_return(true)
     #     expect(Team.import(['no team', 'another field'], 1, {has_column_names: 'true'}, AssignmentTeam.new)).to be true

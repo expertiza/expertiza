@@ -159,7 +159,7 @@ describe Team do
       allow(Team).to receive(:find_by).with(name: 'Team_1').and_return(team)
 
       allow(Team).to receive(:find_by).with(name: 'Team_2').and_return(nil)
-      expect(Team.generate_team_name('no name')).to eq('Team_2')
+      expect(Team.generate_team_name()).to eq('Team_2')
     end
   end
 

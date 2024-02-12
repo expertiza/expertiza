@@ -156,10 +156,7 @@ describe Team do
 
   describe '.generate_team_name' do
     it 'generates the unused team name' do
-      allow(Team).to receive(:find_by).with(name: 'Team_1').and_return(team)
-
-      allow(Team).to receive(:find_by).with(name: 'Team_2').and_return(nil)
-      expect(Team.generate_team_name('no name')).to eq('Team_2')
+      expect(Team.generate_team_name('Assignment')).to eq('Assignment Team_1')
     end
   end
 

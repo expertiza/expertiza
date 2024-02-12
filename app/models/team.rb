@@ -180,13 +180,10 @@ class Team < ApplicationRecord
 
   # Generate the team name
   def self.generate_team_name(_team_name_prefix = '')
-    counter = 1
-    loop do
-      team_name = "Team_#{counter}"
-      return team_name unless Team.find_by(name: team_name)
-
-      counter += 1
-    end
+    last_team = Team.where('name LIKE ?', "#{_team_name_prefix} Team_%").order(name: :desc).first
+    counter = last_team ? last_team.name.scan(/\d+/).first.to_i + 1 : 1
+    team_name = "#{_team_name_prefix} Team_#{counter}"
+    team_name
   end
 
   # Extract team members from the csv and push to DB,  changed to hash by E1776

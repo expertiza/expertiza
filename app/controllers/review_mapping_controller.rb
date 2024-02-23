@@ -355,6 +355,7 @@ class ReviewMappingController < ApplicationController
     end
     student_review_num = params[:num_reviews_per_student].to_i
     submission_review_num = params[:num_reviews_per_submission].to_i
+    exclude_teams = params[:exclude_teams_without_submission]
     calibrated_artifacts_num = params[:num_calibrated_artifacts].to_i
     uncalibrated_artifacts_num = params[:num_uncalibrated_artifacts].to_i
     if calibrated_artifacts_num.zero? && uncalibrated_artifacts_num.zero?
@@ -371,7 +372,7 @@ class ReviewMappingController < ApplicationController
                          '[or "participants" if it is an individual assignment].'
       else
         # REVIEW: mapping strategy
-        automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num)
+        automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num, exclude_teams)
       end
     else
       teams_with_calibrated_artifacts = []
@@ -391,14 +392,17 @@ class ReviewMappingController < ApplicationController
 
   def automatic_review_mapping_strategy(assignment_id,
                                         participants, teams, student_review_num = 0,
-                                        submission_review_num = 0)
+                                        submission_review_num = 0, exclude_teams = false)
     participants_hash = {}
     participants.each { |participant| participants_hash[participant.id] = 0 }
+    #if exclude_teams_without_submission is true check if team has submission if not discard
+    # Filter teams based on the conditions only if exclude_teams is true
+    filtered_teams = exclude_teams ? teams.reject { |team| team[:submitted_hyperlinks].nil? && team[:directory_num].nil? } : teams
     # calculate reviewers for each team
     if !student_review_num.zero? && submission_review_num.zero?
-      review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, student_review_num)
+      review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, filtered_teams, student_review_num)
     elsif student_review_num.zero? && !submission_review_num.zero?
-      review_strategy = ReviewMappingHelper::TeamReviewStrategy.new(participants, teams, submission_review_num)
+      review_strategy = ReviewMappingHelper::TeamReviewStrategy.new(participants, filtered_teams, submission_review_num)
     end
 
     peer_review_strategy(assignment_id, review_strategy, participants_hash)

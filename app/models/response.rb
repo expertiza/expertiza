@@ -104,13 +104,13 @@ class Response < ApplicationRecord
   # or with a new Response object that the controller can use
   # this method is called within the new method in response_controller
   def create_or_get_response(response_map, current_round)
-    response = Response.where(map_id: response_map.id, round: current_round).order(updated_at: :desc).first
+    response = Response.where(map_id: response_map.id, round: current_round.to_i).order(updated_at: :desc).first
     reviewee_team = AssignmentTeam.find_by(id: response_map.reviewee_id)
 
     most_recent_submission_by_reviewee = reviewee_team.most_recent_submission if reviewee_team
 
     if response.nil? || (most_recent_submission_by_reviewee && most_recent_submission_by_reviewee.updated_at > response.updated_at)
-      response = Response.create(map_id: response_map.id, additional_comment: '', round: current_round, is_submitted: 0)
+      response = Response.create(map_id: response_map.id, additional_comment: '', round: current_round.to_i, is_submitted: 0)
     end
     response
   end

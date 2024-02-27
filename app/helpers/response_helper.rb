@@ -50,5 +50,6 @@ module ResponseHelper
       if @response.nil?
         @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round.to_i, is_submitted: 0)
       end
+    end
   end
 end

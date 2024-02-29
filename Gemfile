@@ -28,6 +28,7 @@ gem 'dotenv-rails', :require => 'dotenv/rails-now'
 gem 'dynamic_form'
 gem 'edavis10-ruby-web-search'
 gem 'engtagger'
+gem 'faker', '1.9.3', group: [:test, :development], require: false
 gem 'fastercsv'
 gem 'font-awesome-rails'
 gem 'foreman'

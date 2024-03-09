@@ -1,4 +1,3 @@
-# Test comment for initial PR
 class AnswerTagsController < ApplicationController
   include AuthorizationHelper
 

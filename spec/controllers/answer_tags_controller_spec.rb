@@ -1,4 +1,4 @@
-# TODO: Test each test
+# TODO: Determine which skeleton tests have already been implemented.
 
 describe AnswerTagsController do
   # factory objects required for "action_allowed" test cases
@@ -19,6 +19,8 @@ describe AnswerTagsController do
   let!(:answer) { create(:answer, question: question1, comments: 'test comment', response_id: response_record.id) }
   let(:tag_prompt) { create(:tag_prompt, id: 3, prompt: '??', desc: 'desc', control_type: 'slider') }
   let(:tag_deploy) { create(:tag_prompt_deployment, id: 3, tag_prompt: tag_prompt, question_type: 'Criterion') }
+
+
   # To allow the functionality only if the accessing user is having student privileges
   # params: action
   describe '#action_allowed?' do
@@ -54,6 +56,29 @@ describe AnswerTagsController do
       end
     end
   end
+
+
+  # Test skeletons provided by Vyshnavi Adusumelli
+  describe "action_allowed?" do
+    context "when action is 'index'" do
+      it "returns true if current user has student privileges" do
+        # Test scenario 1
+      end
+    end
+
+    context "when action is 'create_edit'" do
+      it "returns true if current user has student privileges" do
+        # Test scenario 2
+      end
+    end
+
+    context "when action is not 'index' or 'create_edit'" do
+      it "returns false" do
+        # Test scenario 3
+      end
+    end
+  end
+
 
   # Test index method used to return all tag prompt deployments in JSON format
   describe '#index' do
@@ -147,6 +172,63 @@ describe AnswerTagsController do
     end
   end
 
+
+  # Test skeletons provided by Vyshnavi Adusumelli
+  describe "index" do
+    context "when assignment_id and questionnaire_id are not provided" do
+      it "returns all tag prompts" do
+        # Test setup
+        # ...
+
+        # Test execution
+        # ...
+
+        # Assertion
+        # ...
+      end
+    end
+
+    context "when assignment_id is provided" do
+      it "returns tag prompts for the specified assignment" do
+        # Test setup
+        # ...
+
+        # Test execution
+        # ...
+
+        # Assertion
+        # ...
+      end
+    end
+
+    context "when questionnaire_id is provided" do
+      it "returns tag prompts for the specified questionnaire" do
+        # Test setup
+        # ...
+
+        # Test execution
+        # ...
+
+        # Assertion
+        # ...
+      end
+    end
+
+    context "when user_id is provided" do
+      it "returns tag prompts for the specified user" do
+        # Test setup
+        # ...
+
+        # Test execution
+        # ...
+
+        # Assertion
+        # ...
+      end
+    end
+  end
+
+
   # To allow creation if not existing and simultaneously updating the new answer tag.
   # params: answer_id (answer id mapping to which tag is being created)
   # params: tag_prompt_deployment_id (tag_prompt id mapping to which tag is being created)
@@ -184,6 +266,51 @@ describe AnswerTagsController do
         expect do
           post :create_edit, params: request_params
         end.to raise_error(ActiveRecord::RecordInvalid)
+      end
+    end
+  end
+
+
+  # Test skeletons provided by Vyshnavi Adusumelli
+  describe "create_edit" do
+    context "when the AnswerTag does not exist" do
+      it "creates a new AnswerTag with the given parameters" do
+        # Test body
+      end
+
+      it "returns the created AnswerTag as JSON" do
+        # Test body
+      end
+    end
+
+    context "when the AnswerTag already exists" do
+      it "updates the value of the existing AnswerTag with the given parameters" do
+        # Test body
+      end
+
+      it "returns the updated AnswerTag as JSON" do
+        # Test body
+      end
+    end
+  end
+
+  # Test skeletons provided by Vyshnavi Adusumelli
+  describe "#destroy" do
+    context "when called on an object" do
+      it "should delete the object from the database"
+        # Test body
+      end
+      it "should return true if the object is successfully deleted"
+        # Test body
+      end
+      it "should return false if the object does not exist in the database"
+        # Test body
+      end
+    end
+
+    context "when called without an object" do
+      it "should raise an error" do
+        # Test body
       end
     end
   end

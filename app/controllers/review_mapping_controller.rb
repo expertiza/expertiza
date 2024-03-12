@@ -51,10 +51,18 @@ class ReviewMappingController < ApplicationController
     @mapping = ResponseMap.find(params[:id])
   end
 
+  def find_assignment(id)
+    Assignment.find(id)
+  end
+
+  def find_user_by_name(name)
+    User.where(name: name).first.id
+  end
+
   def add_reviewer
-    assignment = Assignment.find(params[:id])
+    assignment = find_assignment(params[:id])
     topic_id = params[:topic_id]
-    user_id = User.where(name: params[:user][:name]).first.id
+    user_id = find_user_by_name(name: params[:user][:name]).first.id
     # If instructor want to assign one student to review his/her own artifact,
     # it should be counted as "self-review" and we need to make /app/views/submitted_content/_selfreview.html.erb work.
     if TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
@@ -91,7 +99,7 @@ class ReviewMappingController < ApplicationController
   # This method is different from 'assignment_reviewer_automatically', which is in 'review_mapping_controller'
   # and is used for instructor assigning reviewers in instructor-selected assignment.
   def assign_reviewer_dynamically
-    assignment = Assignment.find(params[:assignment_id])
+    assignment = find_assignment(params[:assignment_id])
     participant = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
     reviewer = participant.get_reviewer
     if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?

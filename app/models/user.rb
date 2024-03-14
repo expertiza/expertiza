@@ -324,3 +324,9 @@ class User < ApplicationRecord
     users
   end
 end
+
+def get_user_details(name)
+  user = User.where('name = ?', name).first
+end
+
+public :get_user_details

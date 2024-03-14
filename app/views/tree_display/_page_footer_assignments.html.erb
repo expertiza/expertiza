@@ -1,0 +1,32 @@
+<% if @child_nodes.length > 0 %>
+  <table id="theTable" width="80%" cell="5">
+    <tr id="header">
+      <th>Team name</th>
+      <th>Members' name</th>
+      <th colspan="3">Members' User IDs</th>
+      <th>Emails</th>
+      <th>Mentor</th>
+      <th>1st Meeting</th>
+      <th>2nd Meeting</th>
+      <th>3rd Meeting</th>
+      <th>Actions</th>
+    </tr>
+
+    <%= @child_nodes.length %>
+    <%
+    @child_nodes.each_with_index do |node,index|
+      if index.odd?
+        rowtype = "odd"
+      else
+        rowtype = "even"
+      end
+    %>
+
+  <!-- Start Listing -->
+  <%= render :partial=> '/tree_display/entry_assignments', :locals => {:search => @search, :node => node, :prefix => node.node_object_id.to_s+"_"+index.to_s, :depth => 0, :rowtype => rowtype} %>
+  <!-- End Listing -->
+  <%
+    end
+  %>
+</table>
+<% end %>

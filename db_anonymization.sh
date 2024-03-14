@@ -4,11 +4,6 @@ abs_path='/path/to/expertiza/on/server'
 
 cd $abs_path
 
-gem install bundler -v 1.16.6
-gem install pkg-config -v "~> 1.1"
-
-bundle config build.nokogiri --use-system-libraries > /dev/null 2>&1
-bundle 1.16.6 install > /dev/null 2>&1
 bundle -v
 
 script_source="$abs_path/lib/tasks/scrub_database.rake"

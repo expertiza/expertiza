@@ -1,5 +1,10 @@
 <a id="teamsMembers" onclick="showHideTeamMembersInTeamsListPage();">Show all team members</a>
-<%= render :partial => '/tree_display/page_footer' %><br/>
+<% if @root_node.class != AssignmentNode %>
+  <%= render :partial => '/tree_display/page_footer' %><br/>
+<% else %>
+  <%= render :partial => '/tree_display/page_footer_assignments' %><br/>
+<% end %>
+
 <% session[:return_to] = request.url %>
 <% @model %>
 <%= link_to 'Create Team', :action => 'new', :id=> @root_node.node_object_id, :model => @model %>

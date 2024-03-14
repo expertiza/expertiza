@@ -1,0 +1,64 @@
+<% child_nodes = node.get_children(@sortvar,@sortorder,session[:user].id,@show,@search) %>
+
+<%
+  @student_full_names = []
+  @student_email = []
+  @student_names = []
+  child_nodes.each_with_index do |child_node,index|
+    child_node_name = child_node.get_name(session[:ip])
+    if child_node_name.include?("(Mentor)")
+      child_node_name = child_node_name.gsub(" (Mentor)", "")
+    end
+    @user = User.get_user_details(child_node_name)
+    @full_name = @user.fullname.gsub(/(\d+),\s*(\w+)/, '\2 \1')
+    if child_node.get_name(session[:ip]).include?("(Mentor)")
+      @ta_name = @full_name
+    else
+      @student_full_names << @full_name
+      print(@user.handle)
+      @student_email << @user.email
+      @student_names << @user.name
+    end
+  end
+
+  while @student_names.length < 3
+    @student_names << ""
+  end
+  @combined_full_names = @student_full_names.join(", ")
+  @combined_emails = @student_email.join(", ")
+%>
+
+<%= @combined_names %>
+
+<tr
+  <% if rowtype != nil %>class="<%= rowtype %>"
+  <% elsif prefix != nil %>id="<%= prefix %>" style="display: none;" name="team member"
+  <% end %>
+>
+  <td>
+    <%= prefix %>
+  </td>
+  <td>
+    <%= @combined_full_names %>
+  </td>
+  <% @student_names.each do |name| %>
+    <td><%= name %></td>
+  <% end %>
+  <td>
+    <%= @combined_emails %>
+  </td>
+  <td>
+    <%= @ta_name %>
+  </td>
+  <td>
+    <input />
+  </td>
+  <td>
+    <input />
+  </td>
+  <td>
+    <input />
+  </td>
+  <%= render :partial => '/tree_display/actions/'+node.get_partial_name,
+                   :locals => {:node => node} %>
+</tr>

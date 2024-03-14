@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20231203230237) do
+ActiveRecord::Schema.define(version: 20240318200827) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -481,6 +481,12 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.string "name", default: "", null: false
   end
 
+  create_table "mentor_meetings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.integer "team_id", null: false
+    t.string "meeting_date", null: false
+    t.index ["team_id"], name: "fk_mentor_meetings_mapping_team"
+  end
+
   create_table "menu_items", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "parent_id"
     t.string "name", default: "", null: false
@@ -528,7 +534,7 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.float "Hamer", limit: 24, default: 1.0
     t.float "Lauw", limit: 24, default: 0.0
     t.integer "duty_id"
-    t.boolean "can_mentor"
+    t.boolean "can_mentor", default: false
     t.index ["duty_id"], name: "index_participants_on_duty_id"
     t.index ["user_id"], name: "fk_participant_users"
   end
@@ -1044,6 +1050,7 @@ ActiveRecord::Schema.define(version: 20231203230237) do
   add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"
   add_foreign_key "late_policies", "users", column: "instructor_id", name: "fk_instructor_id"
   add_foreign_key "locks", "users"
+  add_foreign_key "mentor_meetings", "teams", name: "fk_mentor_meetings_mapping_team"
   add_foreign_key "participants", "duties"
   add_foreign_key "participants", "users", name: "fk_participant_users"
   add_foreign_key "plagiarism_checker_assignment_submissions", "assignments"

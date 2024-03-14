@@ -88,6 +88,8 @@ class Team < ApplicationRecord
       TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
       add_participant(parent_id, user)
       ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{id}")
+      # Now that a new team member has been added to a team, send an email to them letting them know
+      MailerHelper.send_team_confirmation_mail_to_user(user, "You have been added to the team #{name}.", "team_welcome").deliver
     end
     can_add_member
   end

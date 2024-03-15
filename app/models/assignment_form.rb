@@ -319,14 +319,14 @@ class AssignmentForm
   def delete_from_delayed_queue
     queue = Sidekiq::Queue.new('mailers')
     queue.each do |job|
-      assignmentId = job.args.first
-      job.delete if @assignment.id == assignmentId
+      assignment_id = job.args.first
+      job.delete if @assignment.id == assignment_id
     end
 
     queue = Sidekiq::ScheduledSet.new
     queue.each do |job|
-      assignmentId = job.args.first
-      job.delete if @assignment.id == assignmentId
+      assignment_id = job.args.first
+      job.delete if @assignment.id == assignment_id
     end
   end
 
@@ -401,8 +401,8 @@ class AssignmentForm
   def add_simicheck_to_delayed_queue(simicheck_delay)
     delete_from_delayed_queue
     if simicheck_delay.to_i >= 0
-      duedates = AssignmentDueDate.where(parent_id: @assignment.id)
-      duedates.each do |due_date|
+      due_dates = AssignmentDueDate.where(parent_id: @assignment.id)
+      due_dates.each do |due_date|
         next if DeadlineType.find(due_date.deadline_type_id).name != 'submission'
 
         enqueue_simicheck_task(due_date, simicheck_delay)
@@ -417,33 +417,33 @@ class AssignmentForm
   # Copies the inputted assignment into new one and returns the new assignment id
   def self.copy(assignment_id, user)
     Assignment.record_timestamps = false
-    old_assign = Assignment.find(assignment_id)
-    new_assign = old_assign.dup
-    user.set_instructor(new_assign)
-    new_assign.update_attribute('name', 'Copy of ' + new_assign.name)
-    new_assign.update_attribute('created_at', Time.now)
-    new_assign.update_attribute('updated_at', Time.now)
-    new_assign.update_attribute('directory_path', new_assign.directory_path + '_copy') if new_assign.directory_path.present?
-    new_assign.copy_flag = true
-    if new_assign.save
+    old_assignment = Assignment.find(assignment_id)
+    new_assignment = old_assignment.dup
+    user.set_instructor(new_assignment)
+    new_assignment.update_attribute('name', 'Copy of ' + new_assignment.name)
+    new_assignment.update_attribute('created_at', Time.now)
+    new_assignment.update_attribute('updated_at', Time.now)
+    new_assignment.update_attribute('directory_path', new_assignment.directory_path + '_copy') if new_assignment.directory_path.present?
+    new_assignment.copy_flag = true
+    if new_assignment.save
       Assignment.record_timestamps = true
-      copy_assignment_questionnaire(old_assign, new_assign, user)
-      AssignmentDueDate.copy(old_assign.id, new_assign.id)
-      new_assign.create_node
-      new_assign_id = new_assign.id
+      copy_assignment_questionnaire(old_assignment, new_assignment, user)
+      AssignmentDueDate.copy(old_assignment.id, new_assignment.id)
+      new_assignment.create_node
+      new_assignment_id = new_assignment.id
       # also copy topics from old assignment
-      topics = SignUpTopic.where(assignment_id: old_assign.id)
+      topics = SignUpTopic.where(assignment_id: old_assignment.id)
       topics.each do |topic|
-        SignUpTopic.create(topic_name: topic.topic_name, assignment_id: new_assign_id, max_choosers: topic.max_choosers, category: topic.category, topic_identifier: topic.topic_identifier, micropayment: topic.micropayment)
+        SignUpTopic.create(topic_name: topic.topic_name, assignment_id: new_assignment_id, max_choosers: topic.max_choosers, category: topic.category, topic_identifier: topic.topic_identifier, micropayment: topic.micropayment)
       end
     else
-      new_assign_id = nil
+      new_assignment_id = nil
     end
-    new_assign_id
+    new_assignment_id
   end
 
-  def self.copy_assignment_questionnaire(old_assign, new_assign, user)
-    old_assign.assignment_questionnaires.each do |aq|
+  def self.copy_assignment_questionnaire(old_assignment, new_assign, user)
+    old_assignment.assignment_questionnaires.each do |aq|
       AssignmentQuestionnaire.create(
         assignment_id: new_assign.id,
         questionnaire_id: aq.questionnaire_id,

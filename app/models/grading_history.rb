@@ -1,0 +1,2 @@
+class GradingHistory < ApplicationRecord
+end

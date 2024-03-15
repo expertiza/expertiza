@@ -1,0 +1,15 @@
+%p#notice= notice
+
+%p
+  %b Grading type:
+  = @grading_history.grading_type
+%p
+  %b Grade:
+  = @grading_history.grade
+%p
+  %b Comment:
+  = @grading_history.comment
+
+= link_to 'Edit', edit_grading_history_path(@grading_history)
+\|
+= link_to 'Back', grading_histories_path

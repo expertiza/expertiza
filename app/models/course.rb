@@ -26,7 +26,7 @@ class Course < ApplicationRecord
     Rails.root + '/pg_data/' + FileHelper.clean_path(User.find(instructor_id).name) + '/' + FileHelper.clean_path(directory_path) + '/'
   end
 
-  def get_participants
+  def get_participants #Delete?
     CourseParticipant.where(parent_id: id)
   end
 

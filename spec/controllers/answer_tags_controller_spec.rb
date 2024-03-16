@@ -207,53 +207,13 @@ describe AnswerTagsController do
   # Test skeletons provided by Vyshnavi Adusumelli
   describe "index" do
     context "when assignment_id and questionnaire_id are not provided" do
-      it "returns all tag prompts when assignment_id and questionnaire_id are not provided" do
+      it "returns all tag prompts" do
         #request_params = { user_id: 42, assignment_id: nil, questionnaire_id: nil }
         #get :index, params: request_params
         #output = JSON.parse(response.body)
         #expect(output.length).to eql(0)
       end
     end
-
-    context "when assignment_id is provided" do
-      it "returns tag prompts for the specified assignment" do
-        # Test setup
-        # ...
-
-        # Test execution
-        # ...
-
-        # Assertion
-        # ...
-      end
-    end
-
-    context "when questionnaire_id is provided" do
-      it "returns tag prompts for the specified questionnaire" do
-        # Test setup
-        # ...
-
-        # Test execution
-        # ...
-
-        # Assertion
-        # ...
-      end
-    end
-
-    context "when user_id is provided" do
-      it "returns tag prompts for the specified user" do
-        # Test setup
-        # ...
-
-        # Test execution
-        # ...
-
-        # Assertion
-        # ...
-      end
-    end
-  end
 
 
   # To allow creation if not existing and simultaneously updating the new answer tag.

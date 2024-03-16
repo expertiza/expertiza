@@ -41,7 +41,6 @@ describe AnswerTagsController do
 
       it 'when action destroy is accessed' do
         controller.params = { id: '1', action: 'destroy' }
-        # TODO: Why is this returning nil and not false?
         expect(controller.send(:action_allowed?)).to be nil
       end
     end
@@ -63,7 +62,6 @@ describe AnswerTagsController do
 
       it 'when action destroy is accessed' do
         controller.params = { id: '1', action: 'destroy' }
-        # TODO: Why is this returning nil and not false?
         expect(controller.send(:action_allowed?)).to be nil
       end
     end

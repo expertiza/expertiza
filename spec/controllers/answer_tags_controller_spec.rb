@@ -1,3 +1,5 @@
+# TODO: Determine which skeleton tests have already been implemented.
+
 describe AnswerTagsController do
   # factory objects required for "action_allowed" test cases
   let(:instructor) { build(:instructor, id: 1) }
@@ -17,10 +19,12 @@ describe AnswerTagsController do
   let!(:answer) { create(:answer, question: question1, comments: 'test comment', response_id: response_record.id) }
   let(:tag_prompt) { create(:tag_prompt, id: 3, prompt: '??', desc: 'desc', control_type: 'slider') }
   let(:tag_deploy) { create(:tag_prompt_deployment, id: 3, tag_prompt: tag_prompt, question_type: 'Criterion') }
+
+
   # To allow the functionality only if the accessing user is having student privileges
   # params: action
   describe '#action_allowed?' do
-    context 'when user with student privilege following actions should be allowed' do
+    context 'when user with student privilege, actions index and create_edit should be allowed' do
       before(:each) do
         controller.request.session[:user] = student
       end
@@ -34,9 +38,15 @@ describe AnswerTagsController do
         controller.params = { id: '1', action: 'create_edit' }
         expect(controller.send(:action_allowed?)).to be true
       end
+
+      it 'when action destroy is accessed' do
+        controller.params = { id: '1', action: 'destroy' }
+        # TODO: Why is this returning nil and not false?
+        expect(controller.send(:action_allowed?)).to be nil
+      end
     end
 
-    context 'when the session is a not defined all the actions are restricted' do
+    context 'when the session is not defined, all the actions are restricted' do
       before(:each) do
         controller.request.session[:user] = nil
       end
@@ -50,8 +60,42 @@ describe AnswerTagsController do
         controller.params = { id: '1', action: 'create_edit' }
         expect(controller.send(:action_allowed?)).to be false
       end
+
+      it 'when action destroy is accessed' do
+        controller.params = { id: '1', action: 'destroy' }
+        # TODO: Why is this returning nil and not false?
+        expect(controller.send(:action_allowed?)).to be nil
+      end
     end
   end
+
+
+  # Test skeletons provided by Vyshnavi Adusumelli
+  # describe "action_allowed?" do
+
+
+  #   context "when action is 'index'" do
+  #     it "returns true if current user has student privileges" do
+  #       # Test scenario 1
+  #       # 'when action index is accessed' under 'when user with student privilege...'
+  #     end
+  #   end
+
+  #   context "when action is 'create_edit'" do
+  #     it "returns true if current user has student privileges" do
+  #       # Test scenario 2
+  #       # 'when action create_edit is accessed' from 'when user with student privilege...'
+  #     end
+  #   end
+
+  #   context "when action is not 'index' or 'create_edit' (i.e. 'destroy')" do
+  #     it "returns false" do
+  #       # Test scenario 3
+  #       # Implemented above
+  #     end
+  #   end
+  # end
+
 
   # Test index method used to return all tag prompt deployments in JSON format
   describe '#index' do
@@ -121,6 +165,20 @@ describe AnswerTagsController do
         output = JSON.parse(response.body)
         expect(output.length).to eql(0)
       end
+      
+      it 'when there are no answer tag for given random user_id, assignment_id, questionnaire_id' do
+        request_params = { user_id: 42, assignment_id: 42, questionnaire_id: 42 }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
+      
+      it "when assignment_id and questionnaire_id are not provided" do
+        request_params = { user_id: 42, assignment_id: nil, questionnaire_id: nil }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
 
       it 'when the user_id is nil' do
         request_params = { user_id: nil }
@@ -144,6 +202,59 @@ describe AnswerTagsController do
       end
     end
   end
+
+
+  # Test skeletons provided by Vyshnavi Adusumelli
+  describe "index" do
+    context "when assignment_id and questionnaire_id are not provided" do
+      it "returns all tag prompts when assignment_id and questionnaire_id are not provided" do
+        #request_params = { user_id: 42, assignment_id: nil, questionnaire_id: nil }
+        #get :index, params: request_params
+        #output = JSON.parse(response.body)
+        #expect(output.length).to eql(0)
+      end
+    end
+
+    context "when assignment_id is provided" do
+      it "returns tag prompts for the specified assignment" do
+        # Test setup
+        # ...
+
+        # Test execution
+        # ...
+
+        # Assertion
+        # ...
+      end
+    end
+
+    context "when questionnaire_id is provided" do
+      it "returns tag prompts for the specified questionnaire" do
+        # Test setup
+        # ...
+
+        # Test execution
+        # ...
+
+        # Assertion
+        # ...
+      end
+    end
+
+    context "when user_id is provided" do
+      it "returns tag prompts for the specified user" do
+        # Test setup
+        # ...
+
+        # Test execution
+        # ...
+
+        # Assertion
+        # ...
+      end
+    end
+  end
+
 
   # To allow creation if not existing and simultaneously updating the new answer tag.
   # params: answer_id (answer id mapping to which tag is being created)
@@ -182,6 +293,51 @@ describe AnswerTagsController do
         expect do
           post :create_edit, params: request_params
         end.to raise_error(ActiveRecord::RecordInvalid)
+      end
+    end
+  end
+
+
+  # Test skeletons provided by Vyshnavi Adusumelli
+  describe "create_edit" do
+    context "when the AnswerTag does not exist" do
+      it "creates a new AnswerTag with the given parameters" do
+        # Test body
+      end
+
+      it "returns the created AnswerTag as JSON" do
+        # Test body
+      end
+    end
+
+    context "when the AnswerTag already exists" do
+      it "updates the value of the existing AnswerTag with the given parameters" do
+        # Test body
+      end
+
+      it "returns the updated AnswerTag as JSON" do
+        # Test body
+      end
+    end
+  end
+
+  # Test skeletons provided by Vyshnavi Adusumelli
+  describe "#destroy" do
+    context "when called on an object" do
+      it "should delete the object from the database" do
+        # Test body
+      end
+      it "should return true if the object is successfully deleted" do
+        # Test body
+      end
+      it "should return false if the object does not exist in the database" do
+        # Test body
+      end
+    end
+
+    context "when called without an object" do
+      it "should raise an error" do
+        # Test body
       end
     end
   end

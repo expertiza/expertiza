@@ -14,8 +14,9 @@ describe AnswerTagsController do
   # factory objects required for "create_edit" test cases - since creating answer tags and updating answer tags requires pre mapping of answer and tag deployment key constraints
   let(:student2) { build(:student, id: 2) }
   let!(:assignment3) { create(:assignment, name: 'assignment3', directory_path: 'assignment3', id: 3) }
-  let(:questionnaire1) { create(:questionnaire, id: 2) }
+  let(:questionnaire2) { create(:questionnaire, id: 2) }
   let(:question1) { create(:question, questionnaire: questionnaire, weight: 2, id: 2, type: 'Criterion') }
+  # let(:question3) { create(:question, questionnaire: questionnaire3, weight: 2, id: 3, type: 'Criterion') }
   let(:response_map) { create(:review_response_map, id: 2, reviewed_object_id: 2) }
   let!(:response_record) { create(:response, id: 2, response_map: response_map) }
   let!(:answer) { create(:answer, question: question1, comments: 'test comment', response_id: response_record.id) }
@@ -161,6 +162,20 @@ describe AnswerTagsController do
 
       it 'when there is no answer tag for given assignment_id' do
         request_params = { assignment_id: assignment3.id }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
+
+      # it 'when there is no answer tag for given questionnaire_id' do
+      #   request_params = { questionnaire_id: questionnaire2.id }
+      #   get :index, params: request_params
+      #   output = JSON.parse(response.body)
+      #   expect(output.length).to eql(0)
+      # end
+
+      it 'when there is no answer tag for given user_id, assignment_id, and questionnaire_id' do
+        request_params = { user_id: student2.id, assignment_id: assignment3.id, questionnaire_id: questionnaire.id }
         get :index, params: request_params
         output = JSON.parse(response.body)
         expect(output.length).to eql(0)

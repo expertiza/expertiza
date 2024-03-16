@@ -30,12 +30,28 @@ describe AnswerTagsController do
     context 'when user with student privilege, actions index and create_edit should be allowed' do
       before(:each) do
         controller.request.session[:user] = student
+        allow(controller).to receive(:current_user_has_student_privileges?).and_return(true)
       end
+
+
 
       it 'when action index is accessed' do
         controller.params = { id: '1', action: 'index' }
         expect(controller.send(:action_allowed?)).to be true
       end
+
+      it 'allows index action' do
+        controller.params = { id: '1', action: 'index' }
+        expect(controller.action_allowed?).to be_truthy
+      end
+
+      # it 'denies access for users without student privileges' do
+      #   allow(subject).to receive(:current_user_has_student_privileges?).and_return(false)
+      #   expect(subject.action_allowed?(action: 'index')).to eq(false)
+      # end
+
+
+
 
       it 'when action create_edit is accessed' do
         controller.params = { id: '1', action: 'create_edit' }

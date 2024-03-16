@@ -4,6 +4,7 @@ describe AnswerTagsController do
   # factory objects required for "action_allowed" test cases
   let(:instructor) { build(:instructor, id: 1) }
   let(:student) { build(:student, id: 1) }
+  let(:student2) { build(:student, id: 2) }
   let!(:assignment) { create(:assignment, name: 'assignment', directory_path: 'assignment', id: 1) }
   let!(:assignment2) { create(:assignment, name: 'assignment2', directory_path: 'assignment2', id: 2) }
   let!(:questionnaire) { create(:questionnaire, id: 1) }
@@ -129,6 +130,13 @@ describe AnswerTagsController do
         expect(output.length).to eql(1)
       end
 
+      it 'when there is no answer tag for given user_id' do
+        request_params = { user_id: student2.id }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
+
       it 'when there is one answer tag for given assignment_id' do
         request_params = { assignment_id: assignment.id }
         get :index, params: request_params
@@ -143,28 +151,28 @@ describe AnswerTagsController do
         expect(output.length).to eql(1)
       end
 
-      # it 'when there is one answer tag for given user_id, assignment_id, and questionnaire_id' do
-      #   request_params = { user_id: student.id, assignment_id: assignment.id, questionnaire_id: questionnaire.id }
-      #   get :index, params: request_params
-      #   output = JSON.parse(response.body)
-      #   expect(output.length).to eql(1)
-      # end
+      it 'when there is one answer tag for given user_id, assignment_id, and questionnaire_id' do
+        request_params = { user_id: student.id, assignment_id: assignment.id, questionnaire_id: questionnaire.id }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(1)
+      end
 
-      it 'when there are no answer tags for given random user_id' do
+      it 'when there are no answer tags for given undefined user_id' do
         request_params = { user_id: 42 }
         get :index, params: request_params
         output = JSON.parse(response.body)
         expect(output.length).to eql(0)
       end
 
-      it 'when there are no answer tags for given random assignment_id' do
+      it 'when there are no answer tags for given undefined assignment_id' do
         request_params = { assignment_id: 42 }
         get :index, params: request_params
         output = JSON.parse(response.body)
         expect(output.length).to eql(0)
       end
 
-      it 'when there are no answer tags for given random questionnaire_id' do
+      it 'when there are no answer tags for given undefined questionnaire_id' do
         request_params = { questionnaire_id: 42 }
         get :index, params: request_params
         output = JSON.parse(response.body)

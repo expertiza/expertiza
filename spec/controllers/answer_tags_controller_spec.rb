@@ -14,7 +14,7 @@ describe AnswerTagsController do
   # factory objects required for "create_edit" test cases - since creating answer tags and updating answer tags requires pre mapping of answer and tag deployment key constraints
   let(:student2) { build(:student, id: 2) }
   let!(:assignment3) { create(:assignment, name: 'assignment3', directory_path: 'assignment3', id: 3) }
-  let(:questionnaire2) { create(:questionnaire, id: 2) }
+  let(:asdfasdfasdfasdf) { create(:questionnaire, id: 2) }
   let(:question1) { create(:question, questionnaire: questionnaire, weight: 2, id: 2, type: 'Criterion') }
   # let(:question3) { create(:question, questionnaire: questionnaire3, weight: 2, id: 3, type: 'Criterion') }
   let(:response_map) { create(:review_response_map, id: 2, reviewed_object_id: 2) }
@@ -69,33 +69,6 @@ describe AnswerTagsController do
       end
     end
   end
-
-
-  # Test skeletons provided by Vyshnavi Adusumelli
-  # describe "action_allowed?" do
-
-
-  #   context "when action is 'index'" do
-  #     it "returns true if current user has student privileges" do
-  #       # Test scenario 1
-  #       # 'when action index is accessed' under 'when user with student privilege...'
-  #     end
-  #   end
-
-  #   context "when action is 'create_edit'" do
-  #     it "returns true if current user has student privileges" do
-  #       # Test scenario 2
-  #       # 'when action create_edit is accessed' from 'when user with student privilege...'
-  #     end
-  #   end
-
-  #   context "when action is not 'index' or 'create_edit' (i.e. 'destroy')" do
-  #     it "returns false" do
-  #       # Test scenario 3
-  #       # Implemented above
-  #     end
-  #   end
-  # end
 
 
   # Test index method used to return all tag prompt deployments in JSON format
@@ -168,7 +141,7 @@ describe AnswerTagsController do
       end
 
       # it 'when there is no answer tag for given questionnaire_id' do
-      #   request_params = { questionnaire_id: questionnaire2.id }
+      #   request_params = { questionnaire_id: asdfasdfasdfasdf.id }
       #   get :index, params: request_params
       #   output = JSON.parse(response.body)
       #   expect(output.length).to eql(0)
@@ -230,19 +203,6 @@ describe AnswerTagsController do
   describe "index" do
     context "when assignment_id and questionnaire_id are not provided" do
       it "returns all tag prompts" do
-        # Test setup
-        # ...
-
-        # Test execution
-        # ...
-
-        # Assertion
-        # ...
-      end
-    end
-
-    context "when assignment_id is provided" do
-      it "returns tag prompts for the specified assignment" do
         # Test setup
         # ...
 

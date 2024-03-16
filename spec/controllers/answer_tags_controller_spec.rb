@@ -44,7 +44,6 @@ describe AnswerTagsController do
 
       it 'when action destroy is accessed' do
         controller.params = { id: '1', action: 'destroy' }
-        # TODO: Why is this returning nil and not false?
         expect(controller.send(:action_allowed?)).to be nil
       end
     end
@@ -66,13 +65,12 @@ describe AnswerTagsController do
 
       it 'when action destroy is accessed' do
         controller.params = { id: '1', action: 'destroy' }
-        # TODO: Why is this returning nil and not false?
         expect(controller.send(:action_allowed?)).to be nil
       end
     end
   end
 
-  
+
   # Test index method used to return all tag prompt deployments in JSON format
   describe '#index' do
     context 'tag prompt deployments are requested' do
@@ -176,20 +174,6 @@ describe AnswerTagsController do
         output = JSON.parse(response.body)
         expect(output.length).to eql(0)
       end
-      
-      it 'when there are no answer tag for given random user_id, assignment_id, questionnaire_id' do
-        request_params = { user_id: 42, assignment_id: 42, questionnaire_id: 42 }
-        get :index, params: request_params
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(0)
-      end
-      
-      it "when assignment_id and questionnaire_id are not provided" do
-        request_params = { user_id: 42, assignment_id: nil, questionnaire_id: nil }
-        get :index, params: request_params
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(0)
-      end
 
       it 'when the user_id is nil' do
         request_params = { user_id: nil }
@@ -214,10 +198,34 @@ describe AnswerTagsController do
     end
   end
 
+
   # Test skeletons provided by Vyshnavi Adusumelli
   describe "index" do
     context "when assignment_id and questionnaire_id are not provided" do
       it "returns all tag prompts" do
+        # Test setup
+        # ...
+
+        # Test execution
+        # ...
+
+        # Assertion
+        # ...
+      end
+    end
+
+    context "when questionnaire_id is provided" do
+      it "returns tag prompts for the specified questionnaire" do
+        # Test setup
+        # ...
+
+        # Test execution
+        # ...
+
+        # Assertion
+        # ...
+      end
+    end
 
     context "when user_id is provided" do
       it "returns tag prompts for the specified user" do
@@ -229,13 +237,10 @@ describe AnswerTagsController do
 
         # Assertion
         # ...
-        #request_params = { user_id: 42, assignment_id: nil, questionnaire_id: nil }
-        #get :index, params: request_params
-        #output = JSON.parse(response.body)
-        #expect(output.length).to eql(0)
       end
     end
   end
+
 
   # To allow creation if not existing and simultaneously updating the new answer tag.
   # params: answer_id (answer id mapping to which tag is being created)

@@ -4,7 +4,6 @@ describe AnswerTagsController do
   # factory objects required for "action_allowed" test cases
   let(:instructor) { build(:instructor, id: 1) }
   let(:student) { build(:student, id: 1) }
-  let(:student2) { build(:student, id: 2) }
   let!(:assignment) { create(:assignment, name: 'assignment', directory_path: 'assignment', id: 1) }
   let!(:assignment2) { create(:assignment, name: 'assignment2', directory_path: 'assignment2', id: 2) }
   let!(:questionnaire) { create(:questionnaire, id: 1) }
@@ -13,6 +12,8 @@ describe AnswerTagsController do
   let!(:answer_tag) { create(:answer_tag, id: 1, tag_prompt_deployment_id: 1, user_id: student.id) }
 
   # factory objects required for "create_edit" test cases - since creating answer tags and updating answer tags requires pre mapping of answer and tag deployment key constraints
+  let(:student2) { build(:student, id: 2) }
+  let!(:assignment3) { create(:assignment, name: 'assignment3', directory_path: 'assignment3', id: 3) }
   let(:questionnaire1) { create(:questionnaire, id: 2) }
   let(:question1) { create(:question, questionnaire: questionnaire, weight: 2, id: 2, type: 'Criterion') }
   let(:response_map) { create(:review_response_map, id: 2, reviewed_object_id: 2) }
@@ -130,13 +131,6 @@ describe AnswerTagsController do
         expect(output.length).to eql(1)
       end
 
-      it 'when there is no answer tag for given user_id' do
-        request_params = { user_id: student2.id }
-        get :index, params: request_params
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(0)
-      end
-
       it 'when there is one answer tag for given assignment_id' do
         request_params = { assignment_id: assignment.id }
         get :index, params: request_params
@@ -156,6 +150,20 @@ describe AnswerTagsController do
         get :index, params: request_params
         output = JSON.parse(response.body)
         expect(output.length).to eql(1)
+      end
+
+      it 'when there is no answer tag for given user_id' do
+        request_params = { user_id: student2.id }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
+
+      it 'when there is no answer tag for given assignment_id' do
+        request_params = { assignment_id: assignment3.id }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
       end
 
       it 'when there are no answer tags for given undefined user_id' do

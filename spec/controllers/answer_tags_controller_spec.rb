@@ -44,6 +44,7 @@ describe AnswerTagsController do
 
       it 'when action destroy is accessed' do
         controller.params = { id: '1', action: 'destroy' }
+        # TODO: Why is this returning nil and not false?
         expect(controller.send(:action_allowed?)).to be nil
       end
     end
@@ -65,38 +66,11 @@ describe AnswerTagsController do
 
       it 'when action destroy is accessed' do
         controller.params = { id: '1', action: 'destroy' }
+        # TODO: Why is this returning nil and not false?
         expect(controller.send(:action_allowed?)).to be nil
       end
     end
   end
-
-
-  # Test skeletons provided by Vyshnavi Adusumelli
-  # describe "action_allowed?" do
-
-
-  #   context "when action is 'index'" do
-  #     it "returns true if current user has student privileges" do
-  #       # Test scenario 1
-  #       # 'when action index is accessed' under 'when user with student privilege...'
-  #     end
-  #   end
-
-  #   context "when action is 'create_edit'" do
-  #     it "returns true if current user has student privileges" do
-  #       # Test scenario 2
-  #       # 'when action create_edit is accessed' from 'when user with student privilege...'
-  #     end
-  #   end
-
-  #   context "when action is not 'index' or 'create_edit' (i.e. 'destroy')" do
-  #     it "returns false" do
-  #       # Test scenario 3
-  #       # Implemented above
-  #     end
-  #   end
-  # end
-
 
   # Test index method used to return all tag prompt deployments in JSON format
   describe '#index' do
@@ -201,6 +175,20 @@ describe AnswerTagsController do
         output = JSON.parse(response.body)
         expect(output.length).to eql(0)
       end
+      
+      it 'when there are no answer tag for given random user_id, assignment_id, questionnaire_id' do
+        request_params = { user_id: 42, assignment_id: 42, questionnaire_id: 42 }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
+      
+      it "when assignment_id and questionnaire_id are not provided" do
+        request_params = { user_id: 42, assignment_id: nil, questionnaire_id: nil }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
 
       it 'when the user_id is nil' do
         request_params = { user_id: nil }
@@ -230,56 +218,12 @@ describe AnswerTagsController do
   describe "index" do
     context "when assignment_id and questionnaire_id are not provided" do
       it "returns all tag prompts" do
-        # Test setup
-        # ...
-
-        # Test execution
-        # ...
-
-        # Assertion
-        # ...
+        #request_params = { user_id: 42, assignment_id: nil, questionnaire_id: nil }
+        #get :index, params: request_params
+        #output = JSON.parse(response.body)
+        #expect(output.length).to eql(0)
       end
     end
-
-    context "when assignment_id is provided" do
-      it "returns tag prompts for the specified assignment" do
-        # Test setup
-        # ...
-
-        # Test execution
-        # ...
-
-        # Assertion
-        # ...
-      end
-    end
-
-    context "when questionnaire_id is provided" do
-      it "returns tag prompts for the specified questionnaire" do
-        # Test setup
-        # ...
-
-        # Test execution
-        # ...
-
-        # Assertion
-        # ...
-      end
-    end
-
-    context "when user_id is provided" do
-      it "returns tag prompts for the specified user" do
-        # Test setup
-        # ...
-
-        # Test execution
-        # ...
-
-        # Assertion
-        # ...
-      end
-    end
-  end
 
 
   # To allow creation if not existing and simultaneously updating the new answer tag.

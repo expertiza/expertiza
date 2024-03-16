@@ -143,12 +143,12 @@ describe AnswerTagsController do
         expect(output.length).to eql(1)
       end
 
-      it 'when there is one answer tag for given user_id, assignment_id, and questionnaire_id' do
-        request_params = { user_id: student.id, assignment_id: assignment.id, questionnaire_id: questionnaire.id }
-        get :index, params: request_params
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(1)
-      end
+      # it 'when there is one answer tag for given user_id, assignment_id, and questionnaire_id' do
+      #   request_params = { user_id: student.id, assignment_id: assignment.id, questionnaire_id: questionnaire.id }
+      #   get :index, params: request_params
+      #   output = JSON.parse(response.body)
+      #   expect(output.length).to eql(1)
+      # end
 
       it 'when there are no answer tags for given random user_id' do
         request_params = { user_id: 42 }

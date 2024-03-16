@@ -3,22 +3,26 @@ class ReviewBidsController < ApplicationController
   require 'uri'
   require 'net/http'
   require 'rest_client'
+  include AuthorizationHelper
 
   # action allowed function checks the action allowed based on the user working
   def action_allowed?
     case params[:action]
     when 'show', 'set_priority', 'index'
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator',
-       'Student'].include?(current_role_name) &&
-        ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer') : true)
+    #   ['Instructor',
+    #    'Teaching Assistant',
+    #    'Administrator',
+    #    'Super-Administrator',
+    #    'Student'].include?(current_role_name) && ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer') : true)
+      # puts "Action_allowed called for all"
+      current_user_has_student_privileges? && ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer') : true)
     else
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator'].include? current_role_name
+      # ['Instructor',
+      #  'Teaching Assistant',
+      #  'Administrator',
+      #  'Super-Administrator'].include? current_role_name
+      # puts "Action allowed called for ta"
+       current_user_has_ta_privileges?
     end
   end
 

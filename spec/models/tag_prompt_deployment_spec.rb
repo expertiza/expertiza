@@ -1,3 +1,5 @@
+# TODO: Determine which skeleton tests have already been implemented.
+
 describe TagPromptDeployment do
   let(:tag_dep) { TagPromptDeployment.new id: 1, tag_prompt: tp, tag_prompt_id: 1, question_type: 'Criterion', answer_length_threshold: 5, questionnaire: questionnaire, assignment: assignment }
   let(:tag_dep1) { TagPromptDeployment.new id: 1, tag_prompt: tp, tag_prompt_id: 1, question_type: 'Criterion', answer_length_threshold: nil, assignment_id: 1, assignment: assignment, questionnaire: questionnaire }
@@ -30,6 +32,22 @@ describe TagPromptDeployment do
       expect(tag_dep.tag_prompt).to be(tp)
     end
   end
+
+  # Test skeletons provided by Vyshnavi Adusumelli
+  describe "#tag_prompt" do
+    context "when given a valid tag_prompt_id" do
+      it "returns the corresponding TagPrompt object" do
+        # Test code here
+      end
+    end
+
+    context "when given an invalid tag_prompt_id" do
+      it "returns nil" do
+        # Test code here
+      end
+    end
+  end
+
 
   # get_number_of_taggable_answers calculates total taggable answers assigned to an user who participated in "tag review assignment".
   describe '#get_number_of_taggable_answers' do
@@ -87,6 +105,38 @@ describe TagPromptDeployment do
       end
     end
   end
+
+  # Test skeletons provided by Vyshnavi Adusumelli
+  describe "get_number_of_taggable_answers" do
+    context "when there are taggable answers" do
+      it "returns the number of taggable answers for a given user" do
+        # Test scenario 1
+        # Given a user ID
+        # When there are taggable answers for the user
+        # Then the method should return the correct number of taggable answers
+
+        # Test scenario 2
+        # Given a different user ID
+        # When there are taggable answers for the user
+        # Then the method should return the correct number of taggable answers
+      end
+    end
+
+    context "when there are no taggable answers" do
+      it "returns 0" do
+        # Test scenario 1
+        # Given a user ID
+        # When there are no taggable answers for the user
+        # Then the method should return 0
+
+        # Test scenario 2
+        # Given a different user ID
+        # When there are no taggable answers for the user
+        # Then the method should return 0
+      end
+    end
+  end
+
 
   describe 'assignment_tagging_progress' do
     it 'does nothing when no teams are found' do
@@ -200,6 +250,23 @@ describe TagPromptDeployment do
       expect(user_answer_tagging[1].no_tagged).to eq(0)
       expect(user_answer_tagging[1].no_not_tagged).to eq(2)
       expect(user_answer_tagging[1].percentage).to eq('0.0')
+    end
+  end
+
+  # Test skeletons provided by Vyshnavi Adusumelli
+  describe "assignment_tagging_progress" do
+    describe "#assignment_tagging_progress" do
+      context "when there are teams and questions" do
+        it "returns the tagging progress for each user" do
+          # Test setup
+        end
+      end
+
+      context "when there are no teams or questions" do
+        it "returns an empty array" do
+          # Test setup
+        end
+      end
     end
   end
 end

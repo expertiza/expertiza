@@ -75,10 +75,10 @@ describe ReviewBidsController do
     end
   end
 
-  describe '#run_bidding_algorithm' do
+  describe '#assign_reviewers' do
     render_views
-    it 'connects to the webservice to run bidding algorithm' do
-      post :run_bidding_algorithm
+    it 'connects to the webservice to assign reviewers' do
+      post :assign_reviewers
       expect(response).to have_http_status(302)
     end
   end

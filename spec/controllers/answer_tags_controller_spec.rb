@@ -213,7 +213,6 @@ describe AnswerTagsController do
     end
   end
 
-
   # Test skeletons provided by Vyshnavi Adusumelli
   describe "index" do
     context "when assignment_id and questionnaire_id are not provided" do
@@ -224,7 +223,7 @@ describe AnswerTagsController do
         #expect(output.length).to eql(0)
       end
     end
-
+  end
 
   # To allow creation if not existing and simultaneously updating the new answer tag.
   # params: answer_id (answer id mapping to which tag is being created)

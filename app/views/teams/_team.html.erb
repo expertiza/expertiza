@@ -1,6 +1,6 @@
-<a id="teamsMembers" onclick="showHideTeamMembersInTeamsListPage();">Show all team members</a>
 <% if @root_node.class != AssignmentNode %>
   <%= render :partial => '/tree_display/page_footer' %><br/>
+  <a id="teamsMembers" onclick="showHideTeamMembersInTeamsListPage();">Show all team members</a>
 <% else %>
   <%= render :partial => '/tree_display/page_footer_assignments' %><br/>
 <% end %>

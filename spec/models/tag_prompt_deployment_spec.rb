@@ -33,240 +33,240 @@ describe TagPromptDeployment do
     end
   end
 
-  # # Test skeletons provided by Vyshnavi Adusumelli
-  # describe "#tag_prompt" do
-  #   context "when given a valid tag_prompt_id" do
-  #     it "returns the corresponding TagPrompt object" do
-  #       # Test code here
-  #     end
-  #   end
+  # Test skeletons provided by Vyshnavi Adusumelli
+  describe "#tag_prompt" do
+    context "when given a valid tag_prompt_id" do
+      it "returns the corresponding TagPrompt object" do
+        # Test code here
+      end
+    end
 
-  #   context "when given an invalid tag_prompt_id" do
-  #     it "returns nil" do
-  #       # Test code here
-  #     end
-  #   end
-  # end
-
-
-  # # get_number_of_taggable_answers calculates total taggable answers assigned to an user who participated in "tag review assignment".
-  # describe '#get_number_of_taggable_answers' do
-  #   before(:each) do
-  #     questions_ids = double(1)
-  #     response_ids = double(241)
-  #     allow(Team).to receive(:joins).with(:teams_users).and_return(team)
-  #     allow(team).to receive(:where).with(team_users: { parent_id: tag_dep1.assignment_id }, user_id: 1).and_return(team)
-  #     allow(Response).to receive(:joins).with(:response_maps).and_return(response)
-  #     allow(response).to receive(:where).with(response_maps: { reviewed_object_id: tag_dep1.assignment.id, reviewee_id: team.id }).and_return(rp)
-  #     allow(rp).to receive(:empty?).and_return(false)
-  #     allow(rp).to receive(:map).with(any_args).and_return(response_ids)
-  #     allow(Question).to receive(:where).with(questionnaire_id: tag_dep1.questionnaire.id, type: tag_dep1.question_type).and_return(question)
-  #     allow(question).to receive(:empty?).and_return(false)
-  #     allow(question).to receive(:map).with(any_args).and_return(questions_ids)
-  #     allow(Answer).to receive(:where).with(question_id: questions_ids, response_id: response_ids).and_return(answer)
-  #   end
-  #   context 'when user_id is null' do
-  #     it 'given out an error message' do
-  #       allow(Team).to receive(:joins).with(:teams_users).and_return(team)
-  #       allow(team).to receive(:where).with(team_users: { parent_id: tag_dep1.assignment_id }, user_id: nil).and_raise(ActiveRecord::ActiveRecordError)
-  #       expect { tag_dep1.get_number_of_taggable_answers(nil) }.to raise_error ActiveRecord::ActiveRecordError
-  #     end
-  #   end
-  #   context 'when answer_length_threshold null' do
-  #     it 'count of taggable answers' do
-  #       questions_ids = double(1)
-  #       response_ids = double(241)
-  #       allow(Answer).to receive(:where).with(question_id: questions_ids, response_id: response_ids).and_return(answer)
-  #       allow(answer).to receive(:count)
-  #       expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(answer.count)
-  #     end
-  #   end
-  #   context 'when answer_length_threshold NOT null' do
-  #     it 'count of taggable answers less than answers_one' do
-  #       questions_ids = double(1)
-  #       response_ids = double(241)
-  #       tag_dep1.answer_length_threshold = 15
-  #       allow(Answer).to receive(:where).with(question_id: questions_ids, response_id: response_ids).and_return(answer)
-  #       allow(answer).to receive(:where).with(conditions: "length(comments) < #{tag_dep1.answer_length_threshold}").and_return(answers_one)
-  #       allow(answers_one).to receive(:count)
-  #       expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(answers_one.count)
-  #     end
-  #   end
-  #   context 'when responses empty' do
-  #     it 'count of taggable answers zero' do
-  #       allow(rp).to receive(:empty?).and_return(true)
-  #       expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(0)
-  #     end
-  #   end
-  #   context 'when questions empty' do
-  #     it 'count of taggable answers zero' do
-  #       allow(question).to receive(:empty?).and_return(true)
-  #       expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(0)
-  #     end
-  #   end
-  # end
-
-  # # Test skeletons provided by Vyshnavi Adusumelli
-  # describe "get_number_of_taggable_answers" do
-  #   context "when there are taggable answers" do
-  #     it "returns the number of taggable answers for a given user" do
-  #       # Test scenario 1
-  #       # Given a user ID
-  #       # When there are taggable answers for the user
-  #       # Then the method should return the correct number of taggable answers
-
-  #       # Test scenario 2
-  #       # Given a different user ID
-  #       # When there are taggable answers for the user
-  #       # Then the method should return the correct number of taggable answers
-  #     end
-  #   end
-
-  #   context "when there are no taggable answers" do
-  #     it "returns 0" do
-  #       # Test scenario 1
-  #       # Given a user ID
-  #       # When there are no taggable answers for the user
-  #       # Then the method should return 0
-
-  #       # Test scenario 2
-  #       # Given a different user ID
-  #       # When there are no taggable answers for the user
-  #       # Then the method should return 0
-  #     end
-  #   end
-  # end
+    context "when given an invalid tag_prompt_id" do
+      it "returns nil" do
+        # Test code here
+      end
+    end
+  end
 
 
-  # describe 'assignment_tagging_progress' do
-  #   it 'does nothing when no teams are found' do
-  #     allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([])
-  #     allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])
+  # get_number_of_taggable_answers calculates total taggable answers assigned to an user who participated in "tag review assignment".
+  describe '#get_number_of_taggable_answers' do
+    before(:each) do
+      questions_ids = double(1)
+      response_ids = double(241)
+      allow(Team).to receive(:joins).with(:teams_users).and_return(team)
+      allow(team).to receive(:where).with(team_users: { parent_id: tag_dep1.assignment_id }, user_id: 1).and_return(team)
+      allow(Response).to receive(:joins).with(:response_maps).and_return(response)
+      allow(response).to receive(:where).with(response_maps: { reviewed_object_id: tag_dep1.assignment.id, reviewee_id: team.id }).and_return(rp)
+      allow(rp).to receive(:empty?).and_return(false)
+      allow(rp).to receive(:map).with(any_args).and_return(response_ids)
+      allow(Question).to receive(:where).with(questionnaire_id: tag_dep1.questionnaire.id, type: tag_dep1.question_type).and_return(question)
+      allow(question).to receive(:empty?).and_return(false)
+      allow(question).to receive(:map).with(any_args).and_return(questions_ids)
+      allow(Answer).to receive(:where).with(question_id: questions_ids, response_id: response_ids).and_return(answer)
+    end
+    context 'when user_id is null' do
+      it 'given out an error message' do
+        allow(Team).to receive(:joins).with(:teams_users).and_return(team)
+        allow(team).to receive(:where).with(team_users: { parent_id: tag_dep1.assignment_id }, user_id: nil).and_raise(ActiveRecord::ActiveRecordError)
+        expect { tag_dep1.get_number_of_taggable_answers(nil) }.to raise_error ActiveRecord::ActiveRecordError
+      end
+    end
+    context 'when answer_length_threshold null' do
+      it 'count of taggable answers' do
+        questions_ids = double(1)
+        response_ids = double(241)
+        allow(Answer).to receive(:where).with(question_id: questions_ids, response_id: response_ids).and_return(answer)
+        allow(answer).to receive(:count)
+        expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(answer.count)
+      end
+    end
+    context 'when answer_length_threshold NOT null' do
+      it 'count of taggable answers less than answers_one' do
+        questions_ids = double(1)
+        response_ids = double(241)
+        tag_dep1.answer_length_threshold = 15
+        allow(Answer).to receive(:where).with(question_id: questions_ids, response_id: response_ids).and_return(answer)
+        allow(answer).to receive(:where).with(conditions: "length(comments) < #{tag_dep1.answer_length_threshold}").and_return(answers_one)
+        allow(answers_one).to receive(:count)
+        expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(answers_one.count)
+      end
+    end
+    context 'when responses empty' do
+      it 'count of taggable answers zero' do
+        allow(rp).to receive(:empty?).and_return(true)
+        expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(0)
+      end
+    end
+    context 'when questions empty' do
+      it 'count of taggable answers zero' do
+        allow(question).to receive(:empty?).and_return(true)
+        expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(0)
+      end
+    end
+  end
 
-  #     user_answer_tagging = tag_dep.assignment_tagging_progress
+  # Test skeletons provided by Vyshnavi Adusumelli
+  describe "get_number_of_taggable_answers" do
+    context "when there are taggable answers" do
+      it "returns the number of taggable answers for a given user" do
+        # Test scenario 1
+        # Given a user ID
+        # When there are taggable answers for the user
+        # Then the method should return the correct number of taggable answers
 
-  #     expect(ReviewResponseMap).not_to receive(:get_responses_for_team_round)
-  #     expect(ResponseMap).not_to receive(:assessments_for)
-  #     expect(Answer).not_to receive(:where)
-  #     expect(AnswerTag).not_to receive(:where)
-  #     expect(user_answer_tagging).to be_empty
-  #   end
+        # Test scenario 2
+        # Given a different user ID
+        # When there are taggable answers for the user
+        # Then the method should return the correct number of taggable answers
+      end
+    end
 
-  #   it 'does nothing when no questions are found' do
-  #     allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
-  #     allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([])
+    context "when there are no taggable answers" do
+      it "returns 0" do
+        # Test scenario 1
+        # Given a user ID
+        # When there are no taggable answers for the user
+        # Then the method should return 0
 
-  #     user_answer_tagging = tag_dep.assignment_tagging_progress
+        # Test scenario 2
+        # Given a different user ID
+        # When there are no taggable answers for the user
+        # Then the method should return 0
+      end
+    end
+  end
 
-  #     expect(ReviewResponseMap).not_to receive(:get_responses_for_team_round)
-  #     expect(ResponseMap).not_to receive(:assessments_for)
-  #     expect(Answer).not_to receive(:where)
-  #     expect(AnswerTag).not_to receive(:where)
-  #     expect(user_answer_tagging).to be_empty
-  #   end
 
-  #   it 'does not vary by round' do
-  #     allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
-  #     allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])
-  #     allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
-  #     allow(ResponseMap).to receive(:assessments_for).and_return([response])
-  #     allow(Answer).to receive(:where).and_return(answersObjectArray)
-  #     allow(TeamsUser).to receive(:where).with(team_id: team.id).and_return([team_user1, team_user2])
-  #     allow(User).to receive(:find).with(user1.id).and_return(user1)
-  #     allow(User).to receive(:find).with(user2.id).and_return(user2)
-  #     allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: tag_dep.id, user_id: user1.id, answer_id: [2, 3]).and_return([tagA, tagB])
-  #     allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: tag_dep.id, user_id: user2.id, answer_id: [2, 3]).and_return([tagA, tagB])
+  describe 'assignment_tagging_progress' do
+    it 'does nothing when no teams are found' do
+      allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([])
+      allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])
 
-  #     user_answer_tagging = tag_dep.assignment_tagging_progress
+      user_answer_tagging = tag_dep.assignment_tagging_progress
 
-  #     expect(ReviewResponseMap).not_to receive(:get_responses_for_team_round)
-  #     expect(user_answer_tagging).not_to be_empty
-  #     expect(user_answer_tagging.length).to eq(2)
+      expect(ReviewResponseMap).not_to receive(:get_responses_for_team_round)
+      expect(ResponseMap).not_to receive(:assessments_for)
+      expect(Answer).not_to receive(:where)
+      expect(AnswerTag).not_to receive(:where)
+      expect(user_answer_tagging).to be_empty
+    end
 
-  #     expect(user_answer_tagging[0].user).to eq(user1)
-  #     expect(user_answer_tagging[0].no_tagged).to eq(2)
-  #     expect(user_answer_tagging[0].no_not_tagged).to eq(2)
-  #     expect(user_answer_tagging[0].percentage).to eq('100.0')
+    it 'does nothing when no questions are found' do
+      allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
+      allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([])
 
-  #     expect(user_answer_tagging[1].user).to eq(user2)
-  #     expect(user_answer_tagging[1].no_tagged).to eq(2)
-  #     expect(user_answer_tagging[1].no_not_tagged).to eq(2)
-  #     expect(user_answer_tagging[1].percentage).to eq('100.0')
-  #   end
+      user_answer_tagging = tag_dep.assignment_tagging_progress
 
-  #   it 'varies by round' do
-  #     allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
-  #     allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])
-  #     allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
-  #     allow(ReviewResponseMap).to receive(:get_responses_for_team_round).and_return([response])
-  #     allow(Answer).to receive(:where).and_return(answersObjectArray)
-  #     allow(TeamsUser).to receive(:where).with(team_id: team.id).and_return([team_user1, team_user2])
-  #     allow(User).to receive(:find).with(user1.id).and_return(user1)
-  #     allow(User).to receive(:find).with(user2.id).and_return(user2)
-  #     allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: tag_dep.id, user_id: user1.id, answer_id: [2, 3]).and_return([tagA, tagB])
-  #     allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: tag_dep.id, user_id: user2.id, answer_id: [2, 3]).and_return([tagA, tagB])
+      expect(ReviewResponseMap).not_to receive(:get_responses_for_team_round)
+      expect(ResponseMap).not_to receive(:assessments_for)
+      expect(Answer).not_to receive(:where)
+      expect(AnswerTag).not_to receive(:where)
+      expect(user_answer_tagging).to be_empty
+    end
 
-  #     user_answer_tagging = tag_dep.assignment_tagging_progress
+    it 'does not vary by round' do
+      allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
+      allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])
+      allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
+      allow(ResponseMap).to receive(:assessments_for).and_return([response])
+      allow(Answer).to receive(:where).and_return(answersObjectArray)
+      allow(TeamsUser).to receive(:where).with(team_id: team.id).and_return([team_user1, team_user2])
+      allow(User).to receive(:find).with(user1.id).and_return(user1)
+      allow(User).to receive(:find).with(user2.id).and_return(user2)
+      allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: tag_dep.id, user_id: user1.id, answer_id: [2, 3]).and_return([tagA, tagB])
+      allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: tag_dep.id, user_id: user2.id, answer_id: [2, 3]).and_return([tagA, tagB])
 
-  #     expect(ResponseMap).not_to receive(:assessments_for)
-  #     expect(user_answer_tagging).not_to be_empty
-  #     expect(user_answer_tagging.length).to eq(2)
+      user_answer_tagging = tag_dep.assignment_tagging_progress
 
-  #     expect(user_answer_tagging[0].user).to eq(user1)
-  #     expect(user_answer_tagging[0].no_tagged).to eq(2)
-  #     expect(user_answer_tagging[0].no_not_tagged).to eq(2)
-  #     expect(user_answer_tagging[0].percentage).to eq('100.0')
+      expect(ReviewResponseMap).not_to receive(:get_responses_for_team_round)
+      expect(user_answer_tagging).not_to be_empty
+      expect(user_answer_tagging.length).to eq(2)
 
-  #     expect(user_answer_tagging[1].user).to eq(user2)
-  #     expect(user_answer_tagging[1].no_tagged).to eq(2)
-  #     expect(user_answer_tagging[1].no_not_tagged).to eq(2)
-  #     expect(user_answer_tagging[1].percentage).to eq('100.0')
-  #   end
+      expect(user_answer_tagging[0].user).to eq(user1)
+      expect(user_answer_tagging[0].no_tagged).to eq(2)
+      expect(user_answer_tagging[0].no_not_tagged).to eq(2)
+      expect(user_answer_tagging[0].percentage).to eq('100.0')
 
-  #   it 'varies by round, there are no tags' do
-  #     allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
-  #     allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])
-  #     allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
-  #     allow(ReviewResponseMap).to receive(:get_responses_for_team_round).and_return([response])
-  #     allow(Answer).to receive(:where).and_return(answersObjectArray)
-  #     allow(TeamsUser).to receive(:where).with(team_id: team.id).and_return([team_user1, team_user2])
-  #     allow(User).to receive(:find).with(user1.id).and_return(user1)
-  #     allow(User).to receive(:find).with(user2.id).and_return(user2)
-  #     allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: tag_dep.id, user_id: user1.id, answer_id: [2, 3]).and_return([])
-  #     allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: tag_dep.id, user_id: user2.id, answer_id: [2, 3]).and_return([])
+      expect(user_answer_tagging[1].user).to eq(user2)
+      expect(user_answer_tagging[1].no_tagged).to eq(2)
+      expect(user_answer_tagging[1].no_not_tagged).to eq(2)
+      expect(user_answer_tagging[1].percentage).to eq('100.0')
+    end
 
-  #     user_answer_tagging = tag_dep.assignment_tagging_progress
+    it 'varies by round' do
+      allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
+      allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])
+      allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
+      allow(ReviewResponseMap).to receive(:get_responses_for_team_round).and_return([response])
+      allow(Answer).to receive(:where).and_return(answersObjectArray)
+      allow(TeamsUser).to receive(:where).with(team_id: team.id).and_return([team_user1, team_user2])
+      allow(User).to receive(:find).with(user1.id).and_return(user1)
+      allow(User).to receive(:find).with(user2.id).and_return(user2)
+      allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: tag_dep.id, user_id: user1.id, answer_id: [2, 3]).and_return([tagA, tagB])
+      allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: tag_dep.id, user_id: user2.id, answer_id: [2, 3]).and_return([tagA, tagB])
 
-  #     expect(ResponseMap).not_to receive(:assessments_for)
-  #     expect(user_answer_tagging).not_to be_empty
-  #     expect(user_answer_tagging.length).to eq(2)
+      user_answer_tagging = tag_dep.assignment_tagging_progress
 
-  #     expect(user_answer_tagging[0].user).to eq(user1)
-  #     expect(user_answer_tagging[0].no_tagged).to eq(0)
-  #     expect(user_answer_tagging[0].no_not_tagged).to eq(2)
-  #     expect(user_answer_tagging[0].percentage).to eq('0.0')
+      expect(ResponseMap).not_to receive(:assessments_for)
+      expect(user_answer_tagging).not_to be_empty
+      expect(user_answer_tagging.length).to eq(2)
 
-  #     expect(user_answer_tagging[1].user).to eq(user2)
-  #     expect(user_answer_tagging[1].no_tagged).to eq(0)
-  #     expect(user_answer_tagging[1].no_not_tagged).to eq(2)
-  #     expect(user_answer_tagging[1].percentage).to eq('0.0')
-  #   end
-  # end
+      expect(user_answer_tagging[0].user).to eq(user1)
+      expect(user_answer_tagging[0].no_tagged).to eq(2)
+      expect(user_answer_tagging[0].no_not_tagged).to eq(2)
+      expect(user_answer_tagging[0].percentage).to eq('100.0')
 
-  # # Test skeletons provided by Vyshnavi Adusumelli
-  # describe "assignment_tagging_progress" do
-  #   describe "#assignment_tagging_progress" do
-  #     context "when there are teams and questions" do
-  #       it "returns the tagging progress for each user" do
-  #         # Test setup
-  #       end
-  #     end
+      expect(user_answer_tagging[1].user).to eq(user2)
+      expect(user_answer_tagging[1].no_tagged).to eq(2)
+      expect(user_answer_tagging[1].no_not_tagged).to eq(2)
+      expect(user_answer_tagging[1].percentage).to eq('100.0')
+    end
 
-  #     context "when there are no teams or questions" do
-  #       it "returns an empty array" do
-  #         # Test setup
-  #       end
-  #     end
-  #   end
-  # end
+    it 'varies by round, there are no tags' do
+      allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
+      allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])
+      allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
+      allow(ReviewResponseMap).to receive(:get_responses_for_team_round).and_return([response])
+      allow(Answer).to receive(:where).and_return(answersObjectArray)
+      allow(TeamsUser).to receive(:where).with(team_id: team.id).and_return([team_user1, team_user2])
+      allow(User).to receive(:find).with(user1.id).and_return(user1)
+      allow(User).to receive(:find).with(user2.id).and_return(user2)
+      allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: tag_dep.id, user_id: user1.id, answer_id: [2, 3]).and_return([])
+      allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: tag_dep.id, user_id: user2.id, answer_id: [2, 3]).and_return([])
+
+      user_answer_tagging = tag_dep.assignment_tagging_progress
+
+      expect(ResponseMap).not_to receive(:assessments_for)
+      expect(user_answer_tagging).not_to be_empty
+      expect(user_answer_tagging.length).to eq(2)
+
+      expect(user_answer_tagging[0].user).to eq(user1)
+      expect(user_answer_tagging[0].no_tagged).to eq(0)
+      expect(user_answer_tagging[0].no_not_tagged).to eq(2)
+      expect(user_answer_tagging[0].percentage).to eq('0.0')
+
+      expect(user_answer_tagging[1].user).to eq(user2)
+      expect(user_answer_tagging[1].no_tagged).to eq(0)
+      expect(user_answer_tagging[1].no_not_tagged).to eq(2)
+      expect(user_answer_tagging[1].percentage).to eq('0.0')
+    end
+  end
+
+  # Test skeletons provided by Vyshnavi Adusumelli
+  describe "assignment_tagging_progress" do
+    describe "#assignment_tagging_progress" do
+      context "when there are teams and questions" do
+        it "returns the tagging progress for each user" do
+          # Test setup
+        end
+      end
+
+      context "when there are no teams or questions" do
+        it "returns an empty array" do
+          # Test setup
+        end
+      end
+    end
+  end
 end

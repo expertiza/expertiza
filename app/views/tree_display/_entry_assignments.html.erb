@@ -1,5 +1,4 @@
 <% child_nodes = node.get_children(@sortvar,@sortorder,session[:user].id,@show,@search) %>
-
 <%
   @student_full_names = []
   @student_email = []
@@ -35,7 +34,7 @@
 
 <%# unless @student_count == 0 %>
   <tr
-    <% if rowtype != nil %>class="<%= rowtype %>"
+    <% if rowtype != nil %>class="<%= rowtype %>" id="<%= prefix %>"
     <% elsif prefix != nil %>id="<%= prefix %>" style="display: none;" name="team member"
     <% end %>
   >
@@ -54,7 +53,7 @@
         <td></td>
       <% end %>
     <% end %>
-    <td>
+    <td style="max-width: fit-content">
       <%= @combined_emails %>
     </td>
     <% if @student_count == 3 %>
@@ -67,13 +66,50 @@
     <%= render :partial => '/tree_display/actions/'+node.get_partial_name,
                :locals => {:node => node} %>
     <td>
-      <input />
+      <input style="max-width: 80px" />
     </td>
     <td>
-      <input />
+      <input style="max-width: 80px" />
     </td>
     <td>
-      <input />
+      <input style="max-width: 80px" />
+    </td>
+    <td id="add_row_<%= prefix %>" style="cursor:pointer;">
+      <%= image_tag("plus.png", :border=>0, :alt => "Add new date column", :title => "Add new date column") %>
     </td>
   </tr>
 <%# end %>
+
+<script>
+    var addRow = document.getElementById(`add_row_<%= prefix %>`);
+    addRow.addEventListener('click', function() {
+        var thRow = document.getElementById('header')
+        var thElements = thRow.getElementsByTagName('th');
+
+        var count = -1;
+
+        for (var i = 0; i < thElements.length; i++) {
+            if (thElements[i].textContent.includes('mtg.')) {
+                count++;
+            }
+        }
+
+        var newth = document.createElement('th');
+        newth.innerText = `${count + 1}th mtg.`
+        thRow.insertBefore(newth, thRow.lastElementChild);
+
+        var newTd = document.createElement('td');
+        var input = document.createElement('input');
+        input.setAttribute('style', 'max-width: 80px');
+        newTd.appendChild(input);
+
+        var table = document.getElementById('mentored_assignment_table');
+        var rows = table.getElementsByTagName('tr');
+
+        for (var i = 1; i < rows.length; i++) {
+            var lastTdIndex = rows[i].cells.length - 1;
+            var lastTd = rows[i].cells[lastTdIndex];
+            rows[i].insertBefore(newTd.cloneNode(true), lastTd);
+        }
+    })
+</script>

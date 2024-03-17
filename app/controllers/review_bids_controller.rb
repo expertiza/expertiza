@@ -114,12 +114,17 @@ class ReviewBidsController < ApplicationController
   # webserver returns:
   # returns matched assignments as json body
   def run_bidding_algorithm(bidding_data)
-    # begin
+    
+    url = WEBSERVICE_CONFIG["review_bidding_webservice_url"] #won't work unless ENV variables are configured
     url = 'http://app-csc517.herokuapp.com/match_topics' # hard coding for the time being
-    response = RestClient.post url, bidding_data.to_json, content_type: 'application/json', accept: :json
-    JSON.parse(response.body)
-  rescue StandardError
-    false
-    # end
+    begin 
+      # Sending POST request to the bidding algorithm 
+      response = RestClient.post(url, bidding_data.to_json, content_type: 'application/json', accept: :json)
+      matched_topics= JSON.parse(response.body)
+
+    rescue StandardError => e
+      puts "Error in assigning reviewers: #{e.message}"
+      return nil
+    end
   end
 end

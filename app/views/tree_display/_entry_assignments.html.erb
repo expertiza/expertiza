@@ -4,6 +4,8 @@
   @student_full_names = []
   @student_email = []
   @student_names = []
+  @student_count = 0
+  @student_ids = []
   child_nodes.each_with_index do |child_node,index|
     child_node_name = child_node.get_name(session[:ip])
     if child_node_name.include?("(Mentor)")
@@ -17,9 +19,11 @@
       @student_full_names << @full_name
       @student_email << @user.email
       @student_names << @user.name
+      @student_ids << child_node.node_object_id
     end
   end
 
+  @student_count = @student_names.length
   while @student_names.length < 3
     @student_names << ""
   end
@@ -29,35 +33,47 @@
 
 <%= @combined_names %>
 
-<tr
-  <% if rowtype != nil %>class="<%= rowtype %>"
-  <% elsif prefix != nil %>id="<%= prefix %>" style="display: none;" name="team member"
-  <% end %>
->
-  <td>
-    <%= prefix %>
-  </td>
-  <td>
-    <%= @combined_full_names %>
-  </td>
-  <% @student_names.each do |name| %>
-    <td><%= name %></td>
-  <% end %>
-  <td>
-    <%= @combined_emails %>
-  </td>
-  <td>
-    <%= @ta_name %>
-  </td>
-  <td>
-    <input />
-  </td>
-  <td>
-    <input />
-  </td>
-  <td>
-    <input />
-  </td>
-  <%= render :partial => '/tree_display/actions/'+node.get_partial_name,
-                   :locals => {:node => node} %>
-</tr>
+<%# unless @student_count == 0 %>
+  <tr
+    <% if rowtype != nil %>class="<%= rowtype %>"
+    <% elsif prefix != nil %>id="<%= prefix %>" style="display: none;" name="team member"
+    <% end %>
+  >
+    <td>
+      <%= prefix %>
+    </td>
+    <td style="max-width: 200px">
+      <%= @combined_full_names %>
+    </td>
+    <% @student_names.each_with_index do |name, idx| %>
+      <% if not name.empty? %>
+        <td><%= name %> <br />
+          <%= link_to image_tag("delete_icon.png", :border=>0, :alt => "Delete Team User", :title => "Delete Team User"), :controller=>'teams_users', :action=>'delete', :id => @student_ids[idx] %>
+        </td>
+      <% else %>
+        <td></td>
+      <% end %>
+    <% end %>
+    <td>
+      <%= @combined_emails %>
+    </td>
+    <% if @student_count == 3 %>
+      <td>
+        <%= @ta_name %>
+      </td>
+    <% else %>
+      <td></td>
+    <% end %>
+    <%= render :partial => '/tree_display/actions/'+node.get_partial_name,
+               :locals => {:node => node} %>
+    <td>
+      <input />
+    </td>
+    <td>
+      <input />
+    </td>
+    <td>
+      <input />
+    </td>
+  </tr>
+<%# end %>

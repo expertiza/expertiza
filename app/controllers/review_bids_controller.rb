@@ -52,8 +52,8 @@ class ReviewBidsController < ApplicationController
     my_topic = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     @sign_up_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: my_topic)
     @num_participants = AssignmentParticipant.where(parent_id: @assignment.id).count
-    @selected_topics = nil # this is used to list the topics assigned to review. (ie select == assigned i believe)
-    @bids = ReviewBid.where(participant_id: @participant, assignment_id: @assignment.id)
+    @selected_topics = nil #this is used to list the topics assigned to review. (ie select == assigned i believe)
+    @bids = ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id)
     signed_up_topics = []
     @bids.each do |bid|
       sign_up_topic = SignUpTopic.find_by(id: bid.signuptopic_id)
@@ -64,13 +64,15 @@ class ReviewBidsController < ApplicationController
     @bids = signed_up_topics
     @num_of_topics = @sign_up_topics.size
     @assigned_review_maps = []
-    ReviewResponseMap.where(reviewed_object_id: @assignment.id, reviewer_id: @participant.id).each do |review_map|
+    selected_topics = []
+    ReviewResponseMap.where({:reviewed_object_id => @assignment.id, :reviewer_id => @participant.id}).each do |review_map|
       @assigned_review_maps << review_map
     end
 
     # explicitly render view since it's in the sign up sheet views
     render 'sign_up_sheet/review_bids_show'
   end
+  
 
   # function that assigns and updates priorities for review bids
   def set_priority
@@ -121,10 +123,25 @@ class ReviewBidsController < ApplicationController
       # Sending POST request to the bidding algorithm 
       response = RestClient.post(url, bidding_data.to_json, content_type: 'application/json', accept: :json)
       matched_topics= JSON.parse(response.body)
-
+      bidding_data_with_matches = update_bidding_data_with_matches(bidding_data, matched_topics)
+      return bidding_data_with_matches
     rescue StandardError => e
       puts "Error in assigning reviewers: #{e.message}"
       return nil
     end
   end
+
+  def update_bidding_data_with_matches(bidding_data,matched_topics)
+    assignment_id = bidding_data[:assignment_id]
+    reviewer_ids = bidding_data[:reviewer_ids]
+    unbid_reviewers = reviewer_ids - matched_topics.keys
+    if unbid_reviewers.any?
+      assignment = Assignment.find(assignment_id)
+      unbid_reviewers.each do |reviewer_id|
+        random_topics = SignUpTopic.where(assignment_id: assignment_id).sample(assignment.num_reviews_per_student)
+        ReviewResponseMap.create_reviews_for_reviewer(reviewer_id, random_topics)
+      end
+    end
+  end
+
 end

@@ -1,11 +1,17 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
+  instructor_id: 1
+  assignment_id: 1
   grading_type: MyString
+  grade_receiver_id: 1
   grade: 1
   comment: MyText
 
 two:
+  instructor_id: 1
+  assignment_id: 1
   grading_type: MyString
+  grade_receiver_id: 1
   grade: 1
   comment: MyText

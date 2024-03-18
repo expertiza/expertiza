@@ -1,8 +1,17 @@
 %p#notice= notice
 
 %p
+  %b Instructor:
+  = @grading_history.instructor_id
+%p
+  %b Assignment:
+  = @grading_history.assignment_id
+%p
   %b Grading type:
   = @grading_history.grading_type
+%p
+  %b Grade receiver:
+  = @grading_history.grade_receiver_id
 %p
   %b Grade:
   = @grading_history.grade

@@ -17,7 +17,7 @@ class GradingHistoriesControllerTest < ActionDispatch::IntegrationTest
 
   test "should create grading_history" do
     assert_difference('GradingHistory.count') do
-      post grading_histories_url, params: { grading_history: { comment: @grading_history.comment, grade: @grading_history.grade, grading_type: @grading_history.grading_type } }
+      post grading_histories_url, params: { grading_history: { assignment_id: @grading_history.assignment_id, comment: @grading_history.comment, grade: @grading_history.grade, grade_receiver_id: @grading_history.grade_receiver_id, grading_type: @grading_history.grading_type, instructor_id: @grading_history.instructor_id } }
     end
 
     assert_redirected_to grading_history_url(GradingHistory.last)
@@ -34,7 +34,7 @@ class GradingHistoriesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update grading_history" do
-    patch grading_history_url(@grading_history), params: { grading_history: { comment: @grading_history.comment, grade: @grading_history.grade, grading_type: @grading_history.grading_type } }
+    patch grading_history_url(@grading_history), params: { grading_history: { assignment_id: @grading_history.assignment_id, comment: @grading_history.comment, grade: @grading_history.grade, grade_receiver_id: @grading_history.grade_receiver_id, grading_type: @grading_history.grading_type, instructor_id: @grading_history.instructor_id } }
     assert_redirected_to grading_history_url(@grading_history)
   end
 

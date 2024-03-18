@@ -7,8 +7,17 @@
           %li= message
 
   .field
+    = f.label :instructor_id
+    = f.number_field :instructor_id
+  .field
+    = f.label :assignment_id
+    = f.number_field :assignment_id
+  .field
     = f.label :grading_type
     = f.text_field :grading_type
+  .field
+    = f.label :grade_receiver_id
+    = f.number_field :grade_receiver_id
   .field
     = f.label :grade
     = f.number_field :grade

@@ -3,7 +3,10 @@
 %table
   %thead
     %tr
+      %th Instructor
+      %th Assignment
       %th Grading type
+      %th Grade receiver
       %th Grade
       %th Comment
       %th
@@ -13,7 +16,10 @@
   %tbody
     - @grading_histories.each do |grading_history|
       %tr
+        %td= grading_history.instructor_id
+        %td= grading_history.assignment_id
         %td= grading_history.grading_type
+        %td= grading_history.grade_receiver_id
         %td= grading_history.grade
         %td= grading_history.comment
         %td= link_to 'Show', grading_history

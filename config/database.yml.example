@@ -2,7 +2,7 @@ default: &default
   adapter: mysql2
   host: localhost
   username: root
-  password: 
+  password: expertiza
   encoding: utf8
   collation: utf8_general_ci
 

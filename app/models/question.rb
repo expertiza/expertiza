@@ -14,10 +14,10 @@ class Question < ApplicationRecord
   has_paper_trail
 
   # Class variables - used questionnaires_controller.rb to set the parameters for a question.
-  MAX_LABEL = 'Strongly agree'.freeze
-  MIN_LABEL = 'Strongly disagree'.freeze
-  SIZES = { 'Criterion' => '50, 3', 'Cake' => '50, 3', 'TextArea' => '60, 5', 'TextField' => '30' }.freeze
-  ALTERNATIVES = { 'Dropdown' => '0|1|2|3|4|5' }.freeze
+  MAX_LABEL = "Strongly agree".freeze
+  MIN_LABEL = "Strongly disagree".freeze
+  SIZES = { "Criterion" => "50, 3", "Cake" => "50, 3", "TextArea" => "60, 5", "TextField" => "30" }.freeze
+  ALTERNATIVES = { "Dropdown" => "0|1|2|3|4|5" }.freeze
   attr_accessor :checked
 
   def delete
@@ -28,13 +28,13 @@ class Question < ApplicationRecord
   # for quiz questions, we store 'TrueFalse', 'MultipleChoiceCheckbox', 'MultipleChoiceRadio' in the DB, and the full names are returned below
   def get_formatted_question_type
     type = self.type
-    statement = ''
-    if type == 'TrueFalse'
-      statement = 'True/False'
-    elsif type == 'MultipleChoiceCheckbox'
-      statement = 'Multiple Choice - Checked'
-    elsif type == 'MultipleChoiceRadio'
-      statement = 'Multiple Choice - Radio'
+    statement = ""
+    if type == "TrueFalse"
+      statement = "True/False"
+    elsif type == "MultipleChoiceCheckbox"
+      statement = "Multiple Choice - Checked"
+    elsif type == "MultipleChoiceRadio"
+      statement = "Multiple Choice - Radio"
     end
     statement
   end
@@ -64,10 +64,15 @@ class Question < ApplicationRecord
     0
   end
 
+  #this method is implemented in quiz_question class to validate that each question has text
+  def isvalid
+    nil
+  end
+
   # this method return questions (question_ids) in one assignment whose comments field are meaningful (ScoredQuestion and TextArea)
   def self.get_all_questions_with_comments_available(assignment_id)
     question_ids = []
-    questionnaires = Assignment.find(assignment_id).questionnaires.select { |questionnaire| questionnaire.type == 'ReviewQuestionnaire' }
+    questionnaires = Assignment.find(assignment_id).questionnaires.select { |questionnaire| questionnaire.type == "ReviewQuestionnaire" }
     questionnaires.each do |questionnaire|
       questions = questionnaire.questions.select { |question| question.is_a?(ScoredQuestion) || question.instance_of?(TextArea) }
       questions.each { |question| question_ids << question.id }
@@ -77,12 +82,12 @@ class Question < ApplicationRecord
 
   def self.import(row, _row_header, _session, q_id = nil)
     if row.length != 5
-      raise ArgumentError,  'Not enough items: expect 3 columns: your login name, your full name' \
-                            '(first and last name, not separated with the delimiter), and your email.'
+      raise ArgumentError, "Not enough items: expect 3 columns: your login name, your full name" \
+                           "(first and last name, not separated with the delimiter), and your email."
     end
     # questionnaire = Questionnaire.find_by_id(_id)
     questionnaire = Questionnaire.find_by(id: q_id)
-    raise ArgumentError, 'Questionnaire Not Found' if questionnaire.nil?
+    raise ArgumentError, "Questionnaire Not Found" if questionnaire.nil?
 
     questions = questionnaire.questions
     qid = 0
@@ -97,19 +102,19 @@ class Question < ApplicationRecord
       # question = Question.find_by_id(qid)
       question = Question.find_by(id: qid)
       attributes = {}
-      attributes['txt'] = row[0].strip
-      attributes['type'] = row[1].strip
-      attributes['seq'] = row[2].strip.to_f
-      attributes['size'] = row[3].strip
-      attributes['break_before'] = row[4].strip
+      attributes["txt"] = row[0].strip
+      attributes["type"] = row[1].strip
+      attributes["seq"] = row[2].strip.to_f
+      attributes["size"] = row[3].strip
+      attributes["break_before"] = row[4].strip
       question.questionnaire_id = q_id
       question.update(attributes)
     else
       attributes = {}
-      attributes['txt'] = row[0].strip
-      attributes['type'] = row[1].strip
-      attributes['seq'] = row[2].strip.to_f
-      attributes['size'] = row[3].strip
+      attributes["txt"] = row[0].strip
+      attributes["type"] = row[1].strip
+      attributes["seq"] = row[2].strip.to_f
+      attributes["size"] = row[3].strip
       # attributes["break_before"] = row[4].strip
       question = Question.new(attributes)
       question.questionnaire_id = q_id
@@ -118,7 +123,7 @@ class Question < ApplicationRecord
   end
 
   def self.export_fields(_options)
-    fields = ['Seq', 'Question', 'Type', 'Weight', 'text area size', 'max_label', 'min_label']
+    fields = ["Seq", "Question", "Type", "Weight", "text area size", "max_label", "min_label"]
     fields
   end
 

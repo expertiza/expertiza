@@ -425,6 +425,19 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.index ["role_id"], name: "fk_user_role_id"
   end
 
+
+  create_table "grading_histories", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.integer "instructor_id"
+    t.integer "assignment_id"
+    t.string "grading_type"
+    t.integer "grade_receiver_id"
+    t.integer "grade"
+    t.text "comment"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+
   create_table "institutions", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name", default: "", null: false
   end

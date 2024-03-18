@@ -295,10 +295,11 @@
     <%=t ".late_penalty"%>: <%= label_tag 'late_penalty', @penalties[:submission] %><br/>
   <% end %>
   <% if TaMapping.where(ta_id: @ta_id, course_id: @course_id).exists? || current_user == @assignment.instructor%>
-  <h4 style="font-weight:bold;display:inline-block;">TA Grade-Comment:</h4><br/>
+  <h4 style="font-weight:bold;display:inline-block;">Grade</h4><br/>
     <%= form_tag 'save_grade_and_comment_for_submission' do %>
       <%= hidden_field_tag :participant_id, params[:id] %>
       <%= number_field_tag 'grade_for_submission', @team.try(:grade_for_submission) ,min: 0, max: 100, maxlength: 3, size: 3, class: "form-control width-150", placeholder: t(".grade") %><br/>
+      <h4 style="font-weight:bold;display:inline-block;">Comments</h4><br/>
       <%= text_area_tag 'comment_for_submission', @team.try(:comment_for_submission), size: '75x10', placeholder: t(".Comment"), class: "form-control width-500" %><br>
       <%= submit_tag t(".save") ,class: "btn btn-default" %>
     <% end %>

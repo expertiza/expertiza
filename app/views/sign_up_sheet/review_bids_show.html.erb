@@ -19,7 +19,7 @@
       <% i=1 %>
       <tbody id="topics"  class="connectedSortable">
       <tr class="sort-disabled"><td></td><td></td></tr>
-      <% for topic in @sign_up_topics %>
+      <% for topic in @signup_topics  %>
           <%= get_intelligent_topic_row_review_bids(topic, @selected_topics, @num_participants) %>
           <% is_suggested_topic = false %>
           <%= render :partial => 'sign_up_sheet/review_bids_table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>

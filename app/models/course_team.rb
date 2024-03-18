@@ -10,8 +10,8 @@ class CourseTeam < Team
     'Course'
   end
 
-  def self.parent_model(id)
-    Course.find(id)
+  def self.parent_model(course_id)
+    Course.find(course_id)
   end
 
   # since this team is not an assignment team, the assignment_id is nil.

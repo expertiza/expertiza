@@ -9,19 +9,8 @@ class ReviewBidsController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'show', 'set_priority', 'index'
-    #   ['Instructor',
-    #    'Teaching Assistant',
-    #    'Administrator',
-    #    'Super-Administrator',
-    #    'Student'].include?(current_role_name) && ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer') : true)
-      # puts "Action_allowed called for all"
       current_user_has_student_privileges? && ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer') : true)
     else
-      # ['Instructor',
-      #  'Teaching Assistant',
-      #  'Administrator',
-      #  'Super-Administrator'].include? current_role_name
-      # puts "Action allowed called for ta"
        current_user_has_ta_privileges?
     end
   end
@@ -33,7 +22,6 @@ class ReviewBidsController < ApplicationController
 
     @assignment = @participant.assignment
     @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
-
     # Finding how many reviews have been completed
     @num_reviews_completed = 0
     @review_mappings.each do |map|
@@ -52,8 +40,8 @@ class ReviewBidsController < ApplicationController
     my_topic = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     @sign_up_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: my_topic)
     @num_participants = AssignmentParticipant.where(parent_id: @assignment.id).count
-    @selected_topics = nil #this is used to list the topics assigned to review. (ie select == assigned i believe)
-    @bids = ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id)
+    @selected_topics = nil # this is used to list the topics assigned to review. (ie select == assigned i believe)
+    @bids = ReviewBid.where(participant_id: @participant, assignment_id: @assignment.id)
     signed_up_topics = []
     @bids.each do |bid|
       sign_up_topic = SignUpTopic.find_by(id: bid.signuptopic_id)
@@ -64,11 +52,9 @@ class ReviewBidsController < ApplicationController
     @bids = signed_up_topics
     @num_of_topics = @sign_up_topics.size
     @assigned_review_maps = []
-    selected_topics = []
-    ReviewResponseMap.where({:reviewed_object_id => @assignment.id, :reviewer_id => @participant.id}).each do |review_map|
+    ReviewResponseMap.where(reviewed_object_id: @assignment.id, reviewer_id: @participant.id).each do |review_map|
       @assigned_review_maps << review_map
     end
-
     # explicitly render view since it's in the sign up sheet views
     render 'sign_up_sheet/review_bids_show'
   end

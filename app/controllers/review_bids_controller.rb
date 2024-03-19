@@ -32,18 +32,29 @@ class ReviewBidsController < ApplicationController
     render 'sign_up_sheet/review_bids_others_work'
   end
 
-  
+  # computes important topic sets for displaying bids.
+  # signup_topics is all the topics students could have signed up for.
+  # signed_up_topics is the set of topics students DID sign up for.  [hey, but if the team didn't submit, how can you review it?]
+  # assigned_topics is the set of topics that have been assigned to reviewers
+  # num_participants counts the number of participants in the assignment
 
   # computes important topic sets for displaying bids.
+  # signup_topics is all the topics students could have signed up for.
+  # signed_up_topics is the set of topics students DID sign up for.  [hey, but if the team didn't submit, how can you review it?]
+  # assigned_topics is the set of topics that have been assigned to reviewers
+  # num_participants counts the number of participants in the assignment
   def show
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
-    @signup_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil) #signup_topics is all the topics students could have signed up for.
-    
+    topic_ids_with_team = SignedUpTeam.where.not(team_id: nil).pluck(:topic_id) #Topics which have been selected by teams for submission
+    @signup_topics = SignUpTopic.where(assignment_id: @assignment.id, id: topic_ids_with_team) #signup_topics is all the topics students have signed up for.
     #remove own topic from set of topics to bid on 
     my_topic = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) 
-    @signup_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: my_topic)
+    @signup_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: my_topic) # remove own topic from set of topics to bid on
+    
+ 
     @num_participants = AssignmentParticipant.where(parent_id: @assignment.id).count  # gotta know # participants to determine if topic's hot
+    #@assigned_topics= nil
     @bids = ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id)  # Update bids to be the list of sign-up topics on which the participant has bid
     signed_up_topics = []
     @bids.each do |bid|
@@ -55,13 +66,12 @@ class ReviewBidsController < ApplicationController
     @bids = signed_up_topics
     @num_of_topics = @signup_topics.size # count the remaining sign-up topics
     @assigned_review_maps = []   #fetch review maps for the participant in the current assignment
+    #assigned_topics=[]
     ReviewResponseMap.where({:reviewed_object_id => @assignment.id, :reviewer_id => @participant.id}).each do |review_map|
       @assigned_review_maps << review_map
     end
-    # explicitly render view since it's in the sign up sheet views
     render 'sign_up_sheet/review_bids_show'
   end
-
   # function that assigns and updates priorities for review bids
   def set_priority
     if params[:topic].nil?
@@ -111,8 +121,8 @@ class ReviewBidsController < ApplicationController
       # Sending POST request to the bidding algorithm 
       response = RestClient.post(url, bidding_data.to_json, content_type: 'application/json', accept: :json)
       matched_topics= JSON.parse(response.body)
-      bidding_data_with_matches = update_bidding_data_with_matches(bidding_data, matched_topics)
-      return bidding_data_with_matches
+      #bidding_data_with_matches = update_bidding_data_with_matches(bidding_data, matched_topics)
+      return  matched_topics
     rescue StandardError => e
       puts "Error in assigning reviewers: #{e.message}"
       return nil
@@ -131,9 +141,4 @@ class ReviewBidsController < ApplicationController
       end
     end
   end
-<<<<<<< HEAD
-
 end
-=======
-end
->>>>>>> 53d5305ab3933e1d26aae9dce45df081ffe7d71a

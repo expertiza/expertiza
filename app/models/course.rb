@@ -30,10 +30,6 @@ class Course < ApplicationRecord
     CourseParticipant.where(parent_id: id)
   end
 
-  def get_participant(user_id)
-    CourseParticipant.where(parent_id: id, user_id: user_id)
-  end
-
   def add_participant(user_name)
     user = User.find_by(name: user_name)
     if user.nil?

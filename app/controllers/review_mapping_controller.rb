@@ -1,6 +1,7 @@
 class ReviewMappingController < ApplicationController
   include AuthorizationHelper
 
+  
   autocomplete :user, :name
   # helper :dynamic_review_assignment
   helper :submitted_content

@@ -1,0 +1,3 @@
+// This script will update the modal with the bidding details.
+$("#modal-bid-details .modal-body").html("<%= j(render 'bidding_details', bids: @bids) %>");
+$("#modal-bid-details").modal('show');

@@ -1,3 +1,4 @@
+team.rb
 class Team < ApplicationRecord
   has_many :teams_users, dependent: :destroy
   has_many :users, through: :teams_users
@@ -6,10 +7,21 @@ class Team < ApplicationRecord
   has_many :signed_up_teams, dependent: :destroy
   has_many :bids, dependent: :destroy
   has_paper_trail
-
   scope :find_team_for_assignment_and_user, lambda { |assignment_id, user_id|
     joins(:teams_users).where('teams.parent_id = ? AND teams_users.user_id = ?', assignment_id, user_id)
   }
+
+  # Method to return the associated bids for a given topic.
+  # This assumes there is a model called Bid that responds to ⁠ team_id ⁠ and ⁠ sign_up_topic_id ⁠.
+  def bid_for_topic(sign_up_topic)
+    bids.find_by(topic_id: sign_up_topic.id) # Assuming 'bids' is an association that represents all bids a team has made
+  end
+  
+  # Method to return the associated sign-up topic for the team.
+  # This requires a join operation since the association is not direct.
+  def assigned_topic
+    SignUpTopic.joins(:bids).find_by('bids.team_id': id)
+  end
 
   # Allowed types of teams -- ASSIGNMENT teams or COURSE teams
   def self.allowed_types

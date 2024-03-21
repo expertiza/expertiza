@@ -22,6 +22,30 @@ class AssignmentsController < ApplicationController
     @default_num_metareviews_required = 3
   end
 
+   # Add a new method to display the bidding details for a particular topic
+  def bidding_details
+    @assignment = Assignment.find(params[:id])
+    @bids_by_topic = {}
+    @assignment.sign_up_topics.each do |topic|
+      @bids_by_topic[topic.id] = Bid.where(topic_id: topic.id).order(:priority)
+    end
+    @percentages = @assignment.calculate_percentage_of_teams_getting_choices
+    @bidding_details_by_topic = @assignment.teams_bidding_for_each_topic
+    @assigned_teams = @assignment.assigned_teams_for_topics
+
+    render 'bidding_details'
+  end
+
+  def bidding_details_for_topic
+    @topic = SignUpTopic.includes(:bids).find(params[:topic_id])
+    @bids = @topic.bids.order(:priority)
+
+    respond_to do |format|
+      format.js { render 'bidding_details_for_topic', locals: { topic: @topic, bids: @bids } }
+    end
+  end
+
+
   # creates a new assignment via the assignment form
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
@@ -78,14 +102,18 @@ class AssignmentsController < ApplicationController
     check_questionnaires_usage
     @due_date_all = update_nil_dd_deadline_name(@due_date_all)
     @due_date_all = update_nil_dd_description_url(@due_date_all)
+    @percentages = @assignment_form.assignment.calculate_percentage_of_teams_getting_choices # Use 'calculate_percentage_of_teams_getting_choices' method
+    @bidding_details = @assignment_form.assignment.teams_bidding_for_each_topic
     unassigned_rubrics_warning
     path_warning_and_answer_tag
     update_assignment_badges
+    @teams_bidding_info = @assignment.teams_bidding_for_each_topic
     @assigned_badges = @assignment_form.assignment.badges
     @badges = Badge.all
-    @use_bookmark = @assignment.use_bookmark
+    @use_bookmark = @assignment_form.assignment.use_bookmark # Use 'use_bookmark' attribute
     @duties = Duty.where(assignment_id: @assignment_form.assignment.id)
   end
+
 
   # updates an assignment via an assignment form
   def update
@@ -110,6 +138,13 @@ class AssignmentsController < ApplicationController
   # displays an assignment via ID
   def show
     @assignment = Assignment.find(params[:id])
+  end
+
+  # Action to show bidding details for a specific topic
+  # This needs to include the logic to calculate the percentage and which team was assigned
+  def show_bidding_details
+    @topic = SignUpTopic.find(params[:topic_id])
+    @bidding_info = @topic.calculate_bidding_details
   end
 
   # gets an assignment's path/url

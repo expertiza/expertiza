@@ -26,6 +26,7 @@ class Assignment < ApplicationRecord
   has_many :invitations, class_name: 'Invitation', foreign_key: 'assignment_id', dependent: :destroy # , inverse_of: :assignment
   has_many :assignment_questionnaires, dependent: :destroy
   has_many :questionnaires, through: :assignment_questionnaires
+  has_many :bids, through: :sign_up_topics
   has_many :sign_up_topics, foreign_key: 'assignment_id', dependent: :destroy, inverse_of: :assignment
   has_many :response_maps, foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: :assignment
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: :assignment
@@ -46,6 +47,67 @@ class Assignment < ApplicationRecord
   REVIEW_STRATEGIES = [RS_AUTO_SELECTED, RS_INSTRUCTOR_SELECTED].freeze
   DEFAULT_MAX_REVIEWERS = 3
   DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
+
+# Method to calculate the percentage of teams that got their first, second, third choices
+def percentage_of_teams_getting_choices
+  # The logic to calculate percentages will depend on how you're storing bid information
+  # and how you determine if a team has been awarded their choice.
+  choice_counts = { 1 => 0, 2 => 0, 3 => 0 } # Initialize count for each choice
+  teams.each do |team|
+    if team.assigned_topic
+      choice = team.bid_for_topic(team.assigned_topic)&.priority
+      choice_counts[choice] += 1 if choice
+    end
+  end
+
+  total_teams = teams.count.to_f
+  percentages = choice_counts.transform_values { |count| (count / total_teams * 100).round(2) }
+  percentages
+end
+
+# This method calculates the percentage of teams that got their 1st, 2nd, ... choice
+def calculate_percentage_of_teams_getting_choices
+  sign_up_topics = SignUpTopic.where(assignment_id: id)
+  teams = Team.where(parent_id: id)
+
+  choice_counts = Hash.new(0)
+  teams.each do |team|
+    # Assuming you have a method in team model that gets a bid for a specific topic
+    sign_up_topics.each do |topic|
+      bid = team.bid_for_topic(topic)
+      choice_counts[bid.priority] += 1 if bid
+    end
+  end
+
+  total_teams = teams.count.nonzero? || 1
+  choice_percentages = choice_counts.map { |priority, count| [(count.to_f / total_teams) * 100, priority] }.to_h
+  
+  choice_percentages
+end
+
+# Method to get teams bidding for each topic
+def teams_bidding_for_each_topic
+  sign_up_topics.includes(bids: :team).each_with_object({}) do |topic, hash|
+    hash[topic.id] = topic.bids.map { |bid| [bid.team.name, bid.priority] }
+  end
+end
+
+def bidding_info_by_topic
+  sign_up_topics.includes(:bids).each_with_object({}) do |topic, hash|
+    hash[topic.id] = topic.bids.includes(:team).map do |bid|
+      { team_name: bid.team.name, bid_priority: bid.priority }
+    end
+  end
+end
+
+# Method to determine which teams were assigned to which topics
+def assigned_teams_for_topics
+  # Assuming `assigned_topic_id` is a foreign key in teams table pointing to `sign_up_topics`
+  sign_up_topics.includes(:assigned_teams).each_with_object({}) do |topic, hash|
+    hash[topic.id] = topic.assigned_teams.map(&:name)
+  end
+end
+
 
   def user_on_team?(user)
     teams = self.teams

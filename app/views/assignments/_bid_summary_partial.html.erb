@@ -1,0 +1,36 @@
+<div class="bid-summary-container">
+  <h5>Aggregate Bid Data:</h5>
+  <% if @assignment_form.assignment.sign_up_topics.any? %>
+    <ul class="topic-list">
+      <% @assignment_form.assignment.sign_up_topics.each do |topic| %>
+        <li class="topic-item">
+          <strong><%= topic.topic_name %>:</strong> 
+          <%= topic.bids.size %> bids - 
+          #1 Bids: <%= topic.bids.where(priority: 1).size %>, 
+          #2 Bids: <%= topic.bids.where(priority: 2).size %>,
+          #3 Bids: <%= topic.bids.where(priority: 3).size %>,
+          Teams: <%= topic.bids.includes(:team).map { |bid| bid.team.name }.join(', ') %>
+        </li>
+        <% # Calculating the percentage of teams getting their first choice %>
+        <% total_teams = topic.bids.size.to_f %>
+        <% first_choice_bids = topic.bids.where(priority: 1).size %>
+        <% if total_teams > 0 %>
+          <% percentage_first_choice = (first_choice_bids / total_teams * 100).round(2) %>
+          <% # Color coding percentages based on value ranges %>
+          <% percentage_color = if percentage_first_choice == 0
+                                 "red"
+                               elsif percentage_first_choice == 100
+                                 "green"
+                               else
+                                 "orange"
+                               end %>
+          <li class="percentage-item" style="list-style-type: none;">Percentage of teams getting their first choice for <%= topic.topic_name %>: <span style="color: <%= percentage_color %>;"><%= percentage_first_choice %> %</span></li>
+        <% else %>
+          <li>No bids for <%= topic.topic_name %></li>
+        <% end %>
+      <% end %>
+    </ul>
+  <% else %>
+    <p>No topics have been created for this assignment yet.</p>
+  <% end %>
+</div>

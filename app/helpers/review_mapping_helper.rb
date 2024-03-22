@@ -211,7 +211,13 @@ module ReviewMappingHelper
   # The data of all the reviews is displayed in the form of a bar chart
   def display_volume_metric_chart(reviewer)
     labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
-    data = {
+    data = prepare_chart_data(labels, reviewer_data, all_reviewers_data)
+    options = prepare_chart_options
+    bar_chart data, options
+  end
+
+  def prepare_chart_data(labels, reviewer_data, all_reviewers_data)
+    {
       labels: labels,
       datasets: [
         {
@@ -230,7 +236,10 @@ module ReviewMappingHelper
         }
       ]
     }
-    options = {
+  end
+
+  def prepare_chart_options
+    {
       legend: {
         position: 'top',
         labels: {
@@ -266,7 +275,6 @@ module ReviewMappingHelper
         }]
       }
     }
-    bar_chart data, options
   end
 
   # E2082 Generate chart for review tagging time intervals

@@ -1,5 +1,6 @@
 class TeamsParticipant < ApplicationRecord
   belongs_to :user
+  belongs_to :participant
   belongs_to :team
   has_one :team_user_node, foreign_key: 'node_object_id', dependent: :destroy
   has_paper_trail
@@ -60,17 +61,57 @@ class TeamsParticipant < ApplicationRecord
   def self.team_id(assignment_id, user_id)
     # team_id variable represents the team_id for this user in this assignment
     team_id = nil
-    teams_users = TeamsUser.where(user_id: user_id)
-    teams_users.each do |teams_user|
-      if teams_user.team_id == nil
-        next
-      end
-      team = Team.find(teams_user.team_id)
-      if team.parent_id == assignment_id
-        team_id = teams_user.team_id
-        break
+    unless assignment_id.nil?
+      participant_id = Assignment.find(assignment_id).participants.find_by(user_id: user_id).id
+
+      # E2304: Fetch only based on participant_id after user_id is removed from teams_users table.
+      teams_users = TeamsUser.where(user_id: user_id).or(TeamsUser.where(participant_id: participant_id))
+
+      teams_users.each do |teams_user|
+        team = Team.find(teams_user.team_id)
+        if team.parent_id == assignment_id
+          team_id = teams_user.team_id
+          break
+        end
       end
     end
     team_id
   end
+  
+    # E2404: Returns the User associated with this TeamsUser. Prefers the Participant's User, but falls back to user_id for legacy records.
+  def user
+    participant&.user || User.find_by(id: self[:user_id])
+  end
+
+  # E2404: Provides the ID of the associated User.
+  def user_id
+    user&.id
+  end
+
+  # E2404: Revised method to locate a TeamsUser record by team_id and user_id. It accounts for both legacy and current data models.
+  def self.find_by_team_and_user(team_id, user_id)
+    # Initial attempt to find by user_id for backward compatibility.
+    teams_user = find_by(team_id: team_id, user_id: user_id)
+
+    # If no result and team_id is valid, try finding by participant_id.
+    if teams_user.blank? && team_id != "0"
+      participant_id = Participant.find_by_user_and_assignment(user_id, Team.find(team_id).parent_id)&.id
+      teams_user = find_by(team_id: team_id, participant_id: participant_id) unless participant_id.nil?
+    end
+
+    teams_user
+  end
+
+  # E2404: Fetches TeamsUser records for an array of user_ids within a specific assignment, considering both user_id and participant_id.
+  def self.where_users_and_assignment(user_ids, assignment_id)
+    participants = Participant.where(user_id: user_ids, parent_id: assignment_id)
+    where(user_id: user_ids).or(where(participant_id: participants.pluck(:id)))
+  end
+
+  # Helper method to find a Participant by user_id and assignment_id, encapsulating the query for readability.
+  def self.find_by_user_and_assignment(user_id, assignment_id)
+    Assignment.find_by(id: assignment_id)&.participants&.find_by(user_id: user_id)
+  end
+
+
 end

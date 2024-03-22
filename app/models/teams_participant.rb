@@ -28,7 +28,7 @@ class TeamsParticipant < ApplicationRecord
 
   # Removes entry in the TeamUsers table for the given user and given team id
   def self.remove_team(user_id, team_id)
-    team_user = TeamsUser.where('user_id = ? and team_id = ?', user_id, team_id).first
+    team_user = TeamsUser.find_by_team_id_and_user_id(team_id, user_id)
     team_user&.destroy
   end
 

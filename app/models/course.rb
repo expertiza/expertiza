@@ -71,11 +71,12 @@ class Course < ApplicationRecord
 
   def user_on_team?(user)
     teams = get_teams
-    users = []
+    result = false
     teams.each do |team|
-      users << team.users
+      result ||= team.user?(user)
+      break if result
     end
-    users.flatten.include? user
+    result
   end
 
   require 'analytic/course_analytic'

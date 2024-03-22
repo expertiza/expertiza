@@ -40,6 +40,10 @@ class User < ApplicationRecord
 
   has_paper_trail
 
+  def teams
+    Participant.where(user_id: id).flat_map(&:teams)
+  end
+  
   def salt_first?
     true
   end

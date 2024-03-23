@@ -7,24 +7,14 @@ class DueDate < ApplicationRecord
   end
 
   def self.current(due_dates)
-    # Get the current due date from list of due dates
-    due_dates.each do |due_date|
-      if due_date.due_at > Time.now
-        current_due_date = due_date
-        return current_due_date
-      end
-    end
-    # in case current due date not found
-    nil
+    due_dates.detect { |due_date| due_date.due_at > Time.now }
   end
 
   def self.teammate_review_allowed?(student)
     # time when teammate review is allowed
     due_date = current(student.assignment.due_dates)
     student.assignment.find_current_stage == 'Finished' ||
-      due_date &&
-        (due_date.teammate_review_allowed_id == 3 ||
-        due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
+      (due_date && [2, 3].include?(due_date.teammate_review_allowed_id))
   end
 
   def set_flag
@@ -43,8 +33,7 @@ class DueDate < ApplicationRecord
   end
 
   def self.copy(old_assignment_id, new_assignment_id)
-    duedates = where(parent_id: old_assignment_id)
-    duedates.each do |orig_due_date|
+    where(parent_id: old_assignment_id).each do |orig_due_date|
       new_due_date = orig_due_date.dup
       new_due_date.parent_id = new_assignment_id
       new_due_date.save
@@ -78,7 +67,7 @@ class DueDate < ApplicationRecord
     due_dates = DueDate.where(parent_id: assignment_id)
     # sorted so that the earliest deadline is at the first
     sorted_deadlines = sort_deadlines(due_dates)
-    due_dates.reject { |due_date| due_date.deadline_type_id != 1 && due_date.deadline_type_id != 2 }
+    due_dates.reject { |due_date| ![1, 2].include?(due_date.deadline_type_id) }
     round = 1
     sorted_deadlines.each do |due_date|
       break if response.created_at < due_date.due_at

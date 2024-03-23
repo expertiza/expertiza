@@ -15,9 +15,9 @@ class CourseTeam < Team
   end
 
   # since this team is not an assignment team, the assignment_id is nil.
-  def assignment_id
-    nil
-  end
+ # def assignment_id
+   # nil
+ # end
 
   # Prototype method to implement prototype pattern
   def self.prototype

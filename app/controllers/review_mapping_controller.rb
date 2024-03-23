@@ -82,9 +82,12 @@ class ReviewMappingController < ApplicationController
   end
 
   # Method to find user ID by name
+  # Method to find user ID by name
   def find_user_id_by_name(name)
-    find_user_by_name(name: name).first.id
+    user = find_user_by_name(name: name)
+    user.present? ? user.id : nil
   end
+
 
   # Method to check if the user is trying to review their own artifact
   def user_trying_to_review_own_artifact?(contributor_id, user_id)
@@ -133,11 +136,11 @@ class ReviewMappingController < ApplicationController
   # and is used for instructor assigning reviewers in instructor-selected assignment.
   def assign_reviewer_dynamically
     assignment = find_assignment(params[:assignment_id])
-    participant = find_participant_for_assignment(assignment, params[:reviewer_id])
+    participant = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
     reviewer = participant.get_reviewer
   
     if topic_selection_error?(assignment)
-      flash[:error] = 'No topic is selected. Please go back and select a topic.'
+      flash[:error] = 'No topic is selected. Please go back and select a topic.' # Removed extra space
     else
       if review_allowed?(assignment, reviewer)
         if check_outstanding_reviews?(assignment, reviewer)
@@ -151,7 +154,7 @@ class ReviewMappingController < ApplicationController
     end
   
     redirect_to_student_review_list(participant)
-  end
+  end  
   
   # Method to find assignment participant
   def find_participant_for_assignment(assignment, reviewer_id)
@@ -219,7 +222,6 @@ class ReviewMappingController < ApplicationController
   def redirect_to_student_review_list(participant)
     redirect_to controller: 'student_review', action: 'list', id: participant.id
   end
-  
 
   # This method checks if the user is allowed to do any more reviews.
   # First we find the number of reviews done by that reviewer for that assignment and we compare it with assignment policy

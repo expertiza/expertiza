@@ -40,7 +40,7 @@ class Course < ApplicationRecord
       raise 'No user account exists with the name ' + user_name + ". Please <a href='" + url_for(controller: 'users', action: 'new') + "'>create</a> the user first."
     end
 
-    participant = CourseParticipant.where(parent_id: id, user_id: user.id).first
+    participant = CourseParticipant.find_by(parent_id: id, user_id: user.id)
     if participant # If there is already a participant, raise an error. Otherwise, create it
       raise "The user #{user.name} is already a participant."
     else
@@ -61,7 +61,7 @@ class Course < ApplicationRecord
         errors << $ERROR_INFO
       end
     end
-    unless errors.empty?
+    if errors.any?
       errors.each do |error|
         error_msg = error_msg + '<BR/>' + error if error
       end

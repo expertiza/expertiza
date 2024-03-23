@@ -18,8 +18,7 @@ class DueDate < ApplicationRecord
   end
 
   def set_flag
-    self.flag = true
-    save
+    update_attribute(:flag, true)
   end
 
   def due_at_is_valid_datetime
@@ -42,10 +41,7 @@ class DueDate < ApplicationRecord
 
   def self.set_due_date(duedate, deadline, assign_id, max_round)
     submit_duedate = DueDate.new(duedate)
-    submit_duedate.deadline_type_id = deadline
-    submit_duedate.parent_id = assign_id
-    submit_duedate.round = max_round
-    submit_duedate.save
+    submit_duedate.update(deadline_type_id: deadline, parent_id: assign_id, round: max_round)
   end
 
   def self.sort_deadlines(due_dates)

@@ -56,23 +56,26 @@ class Course < ApplicationRecord
   def copy_assignment_participants(assignment_id)
     participants = AssignmentParticipant.where(parent_id: assignment_id)
     errors = []
-    error_msg = ''
+
     participants.each do |participant|
       user = User.find(participant.user_id)
 
       begin
         add_participant(user.name)
-      rescue StandardError
-        errors << $ERROR_INFO
+      rescue StandardError => e
+        errors << e.message
       end
     end
     if errors.any?
-      errors.each do |error|
-        error_msg = error_msg + '<BR/>' + error if error
-      end
-      raise error_msg
+      handle_errors(errors)
     end
   end
+# Handles the errors
+  def handle_errors(errors)
+    errors.each { |error| puts error }
+    raise "Errors occurred while copying participants"
+  end
+
 # Checks if the user is on a team associated with the assignment.
   def user_on_team?(user)
     teams = get_teams

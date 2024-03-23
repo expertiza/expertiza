@@ -83,6 +83,12 @@ class MentorManagement
     Mailer.delayed_message(bcc: emails,
                            subject: '[Expertiza]: New Mentor Assignment',
                            body: message).deliver_now
+
+    # Send a different message to the Mentor letting them know they have been assigned to a team
+    mentor_message = "You have been assigned as a mentor for assignment #{Assignment.find(team.parent_id).name} for team #{team.name} <br>Current members:<br> #{members_info.join('<br>')}"
+    Mailer.delayed_message(bcc: mentor.email,
+                           subject: '[Expertiza]: New Mentoring Assignment',
+                           body: mentor_message).deliver_now
   end
 
   # Returns true if [user] is a mentor, and false if not.

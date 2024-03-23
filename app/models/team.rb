@@ -89,7 +89,10 @@ class Team < ApplicationRecord
       add_participant(parent_id, user)
       ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{id}")
       # Now that a new team member has been added to a team, send an email to them letting them know
-      MailerHelper.send_team_confirmation_mail_to_user(user, "You have been added to the team #{name}.", "team_welcome").deliver
+      MailerHelper.send_team_confirmation_mail_to_user(user, "[Expertiza] Added to a Team", "user_added_to_team", "#{name}", Assignment.find(_assignment_id).name.to_s).deliver
+      #Mailer.generic_message(to: user,
+      #                       subject: '[Expertiza]: New Mentor Assignment',
+      #                       body: message).deliver_now
     end
     can_add_member
   end

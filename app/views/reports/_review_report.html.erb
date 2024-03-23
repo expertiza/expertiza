@@ -150,12 +150,10 @@
                   <td>
                     <%= form.submit 'Save' %>
                   </td>
-                  <!--E2383 Added the Grading History link to the appropriate place-->
-		              <td>
-                    <%= link_to "Grading history", grading_histories_path(graded_member_id: Participant.where(id: reviewer.id).pluck(:user_id).first, participant_id: reviewer.id, grade_type: "Review")%>
-                  </td>
                 </tr>
               </table>
+              <br>
+              <%= link_to "Grading history", grading_histories_path(graded_member_id: Participant.where(id: reviewer.id).pluck(:user_id).first, participant_id: reviewer.id, grade_type: "Review")%>
             <% end %>
           </td>
         <% end %>

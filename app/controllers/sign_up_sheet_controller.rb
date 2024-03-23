@@ -379,7 +379,7 @@ class SignUpSheetController < ApplicationController
                              nil
                            end
           if topic_due_date.nil? # create a new record
-            due_date_obj=instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1]
+            due_date_obj=instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1]  #applying DRY principle and removing multiple instance_variable_get calls
             TopicDueDate.create(
               due_at: instance_variable_get('@topic_' + deadline_type + '_due_date'),
               deadline_type_id: deadline_type_id,

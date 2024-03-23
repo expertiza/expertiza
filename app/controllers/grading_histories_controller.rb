@@ -6,6 +6,7 @@ class GradingHistoriesController < ApplicationController
   def action_allowed?
     # admins and superadmins are always allowed
     return true if current_user_has_admin_privileges?
+    
     # populate assignment fields
     assignment_team = AssignmentTeam.find(params[:graded_member_id])
     GradingHistory.assignment_for_history(params[:grade_type], assignment_team, params[:participant_id])

@@ -37,13 +37,6 @@ class CourseTeam < Team
     copy_members(new_team)
   end
 
-  # deprecated: the functionality belongs to course
-  def add_participant(course_id, user)
-    if CourseParticipant.find_by(parent_id: course_id, user_id: user.id).nil?
-      CourseParticipant.create(parent_id: course_id, user_id: user.id, permission_granted: user.master_permission_granted)
-    end
-  end
-
   # Import from csv
   def self.import(row, course_id, options)
     raise ImportError, 'The course with the id "' + course_id.to_s + "\" was not found. <a href='/courses/new'>Create</a> this course?" if Course.find(course_id).nil?

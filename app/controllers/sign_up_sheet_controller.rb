@@ -90,14 +90,9 @@ class SignUpSheetController < ApplicationController
   def update
     @topic = SignUpTopic.find(params[:id])
     if @topic
-      @topic.topic_identifier = params[:topic][:topic_identifier]
       update_max_choosers @topic
-      @topic.category = params[:topic][:category]
-      @topic.topic_name = params[:topic][:topic_name]
-      @topic.micropayment = params[:topic][:micropayment]
-      @topic.description = params[:topic][:description]
-      @topic.link = params[:topic][:link]
-      @topic.save
+      @topic.update_attributes(topic_identifier: params[:topic][:topic_identifier], category: params[:topic][:category], topic_name: params[:topic][:topic_name], micropayment: params[:topic][:micropayment], description: params[:topic][:description],link:params[:topic][:link] )
+      flash[:success] = 'The topic has been successfully updated.'
       undo_link("The topic: \"#{@topic.topic_name}\" has been successfully updated. ")
     else
       flash[:error] = 'The topic could not be updated.'
@@ -365,31 +360,33 @@ class SignUpSheetController < ApplicationController
                              nil
                            end
           if topic_due_date.nil? # create a new record
+            due_date_obj=instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1]
             TopicDueDate.create(
               due_at: instance_variable_get('@topic_' + deadline_type + '_due_date'),
               deadline_type_id: deadline_type_id,
               parent_id: topic.id,
-              submission_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,
-              review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
-              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id,
+              submission_allowed_id: due_date_obj.submission_allowed_id,
+              review_allowed_id: due_date_obj.review_allowed_id,
+              review_of_review_allowed_id: due_date_obj.review_of_review_allowed_id,
               round: i,
-              flag: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].flag,
-              threshold: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].threshold,
-              delayed_job_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].delayed_job_id,
-              deadline_name: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].deadline_name,
-              description_url: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].description_url,
-              quiz_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].quiz_allowed_id,
-              teammate_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].teammate_review_allowed_id,
+              flag: due_date_obj.flag,
+              threshold: due_date_obj.threshold,
+              delayed_job_id: due_date_obj.delayed_job_id,
+              deadline_name: due_date_obj.deadline_name,
+              description_url: due_date_obj.description_url,
+              quiz_allowed_id: due_date_obj.quiz_allowed_id,
+              teammate_review_allowed_id: due_date_obj.teammate_review_allowed_id,
               type: 'TopicDueDate'
             )
           else # update an existed record
+            due_date_obj=instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1]
             topic_due_date.update_attributes(
               due_at: instance_variable_get('@topic_' + deadline_type + '_due_date'),
-              submission_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,
-              review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
-              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id,
-              quiz_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].quiz_allowed_id,
-              teammate_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].teammate_review_allowed_id
+              submission_allowed_id: due_date_obj.submission_allowed_id,
+              review_allowed_id: due_date_obj.review_allowed_id,
+              review_of_review_allowed_id: due_date_obj.review_of_review_allowed_id,
+              quiz_allowed_id: due_date_obj.quiz_allowed_id,
+              teammate_review_allowed_id: due_date_obj.teammate_review_allowed_id
             )
           end
         end

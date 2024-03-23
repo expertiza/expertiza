@@ -44,7 +44,7 @@ class Course < ApplicationRecord
     end
   end
 
-  def copy_participants(assignment_id)
+  def copy_assignment_participants(assignment_id)
     participants = AssignmentParticipant.where(parent_id: assignment_id)
     errors = []
     error_msg = ''

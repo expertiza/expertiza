@@ -152,13 +152,36 @@ module ReviewMappingHelper
 
   # gets minimum, maximum and average grade value for all the reviews present
   def review_metrics(round, team_id)
-    %i[max min avg].each { |metric| instance_variable_set('@' + metric.to_s, '-----') }
-    if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? { |k| @avg_and_ranges[team_id][round].key? k }
-      %i[max min avg].each do |metric|
-        metric_value = @avg_and_ranges[team_id][round][metric].nil? ? '-----' : @avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
-        instance_variable_set('@' + metric.to_s, metric_value)
-      end
+    metrics = %i[max min avg]
+    initialize_metrics(metrics)
+  
+    return unless team_data_available?(team_id, round, metrics)
+  
+    update_metrics(team_id, round, metrics)
+  end
+  
+  private
+  
+  def initialize_metrics(metrics)
+    metrics.each { |metric| instance_variable_set("@#{metric}", '-----') }
+  end
+  
+  def team_data_available?(team_id, round, metrics)
+    @avg_and_ranges[team_id] &&
+      @avg_and_ranges[team_id][round] &&
+      metrics.all? { |metric| @avg_and_ranges[team_id][round].key?(metric) }
+  end
+  
+  def update_metrics(team_id, round, metrics)
+    metrics.each do |metric|
+      metric_value = fetch_metric_value(team_id, round, metric)
+      instance_variable_set("@#{metric}", metric_value)
     end
+  end
+  
+  def fetch_metric_value(team_id, round, metric)
+    value = @avg_and_ranges[team_id][round][metric]
+    value.nil? ? '-----' : "#{value.round(0)}%"
   end
 
   # sorts the reviewers by the average volume of reviews in each round, in descending order

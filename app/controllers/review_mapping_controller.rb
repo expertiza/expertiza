@@ -133,54 +133,93 @@ class ReviewMappingController < ApplicationController
   # and is used for instructor assigning reviewers in instructor-selected assignment.
   def assign_reviewer_dynamically
     assignment = find_assignment(params[:assignment_id])
-    participant = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
+    participant = find_participant_for_assignment(assignment, params[:reviewer_id])
     reviewer = participant.get_reviewer
-    if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
-      flash[:error] = 'No topic is selected.  Please go back and select a topic.'
+  
+    if topic_selection_error?(assignment)
+      flash[:error] = 'No topic is selected. Please go back and select a topic.'
     else
       if review_allowed?(assignment, reviewer)
         if check_outstanding_reviews?(assignment, reviewer)
-          # begin
-          if assignment.topics? # assignment with topics
-            topic = if params[:topic_id]
-                      SignUpTopic.find(params[:topic_id])
-                    else
-                      begin
-                        assignment.candidate_topics_to_review(reviewer).to_a.sample
-                      rescue StandardError
-                        nil
-                      end
-                    end
-            if topic.nil?
-              flash[:error] = 'No topics are available to review at this time. Please try later.'
-            else
-              assignment.assign_reviewer_dynamically(reviewer, topic)
-            end
-          else # assignment without topic -Yang
-            assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
-            assignment_team = begin
-                                assignment_teams.to_a.sample
-                              rescue StandardError
-                                nil
-                              end
-            if assignment_team.nil?
-              flash[:error] = 'No artifacts are available to review at this time. Please try later.'
-            else
-              assignment.assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
-            end
-          end
+          dynamically_assign_reviewer(assignment, reviewer)
         else
-          flash[:error] = 'You cannot do more reviews when you have ' + Assignment.max_outstanding_reviews + 'reviews to do'
+          flash[:error] = "You cannot do more reviews when you have #{Assignment.max_outstanding_reviews} reviews to do"
         end
       else
-        flash[:error] = 'You cannot do more than ' + assignment.num_reviews_allowed.to_s + ' reviews based on assignment policy'
+        flash[:error] = "You cannot do more than #{assignment.num_reviews_allowed} reviews based on assignment policy"
       end
-      # rescue Exception => e
-      #   flash[:error] = (e.nil?) ? $! : e
-      # end
     end
+  
+    redirect_to_student_review_list(participant)
+  end
+  
+  # Method to find assignment participant
+  def find_participant_for_assignment(assignment, reviewer_id)
+    AssignmentParticipant.where(user_id: reviewer_id, parent_id: assignment.id).first
+  end
+  
+  # Method to check if there is an error in topic selection
+  def topic_selection_error?(assignment)
+    params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
+  end
+  
+  # Method to dynamically assign a reviewer based on assignment type
+  def dynamically_assign_reviewer(assignment, reviewer)
+    if assignment.topics? # Assignment with topics
+      assign_reviewer_with_topic(assignment, reviewer)
+    else # Assignment without topics
+      assign_reviewer_without_topic(assignment, reviewer)
+    end
+  end
+  
+  # Method to assign a reviewer when the assignment has topics
+  def assign_reviewer_with_topic(assignment, reviewer)
+    topic = select_topic_to_review(assignment, reviewer)
+    if topic.nil?
+      flash[:error] = 'No topics are available to review at this time. Please try later.'
+    else
+      assignment.assign_reviewer_dynamically(reviewer, topic)
+    end
+  end
+  
+  # Method to select a topic for review
+  def select_topic_to_review(assignment, reviewer)
+    if params[:topic_id]
+      SignUpTopic.find(params[:topic_id])
+    else
+      begin
+        assignment.candidate_topics_to_review(reviewer).to_a.sample
+      rescue StandardError
+        nil
+      end
+    end
+  end
+  
+  # Method to assign a reviewer when the assignment has no topics
+  def assign_reviewer_without_topic(assignment, reviewer)
+    assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
+    assignment_team = select_assignment_team_to_review(assignment_teams)
+    if assignment_team.nil?
+      flash[:error] = 'No artifacts are available to review at this time. Please try later.'
+    else
+      assignment.assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
+    end
+  end
+  
+  # Method to select an assignment team for review
+  def select_assignment_team_to_review(assignment_teams)
+    begin
+      assignment_teams.to_a.sample
+    rescue StandardError
+      nil
+    end
+  end
+  
+  # Method to redirect to student review list page
+  def redirect_to_student_review_list(participant)
     redirect_to controller: 'student_review', action: 'list', id: participant.id
   end
+  
 
   # This method checks if the user is allowed to do any more reviews.
   # First we find the number of reviews done by that reviewer for that assignment and we compare it with assignment policy

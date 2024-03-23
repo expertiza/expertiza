@@ -104,39 +104,21 @@ describe TagPromptDeployment do
         expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(0)
       end
     end
-  end
 
-  # Test skeletons provided by Vyshnavi Adusumelli
-  describe "get_number_of_taggable_answers" do
     context "when there are taggable answers" do
       it "returns the number of taggable answers for a given user" do
-        # Test scenario 1
-        # Given a user ID
-        # When there are taggable answers for the user
-        # Then the method should return the correct number of taggable answers
-
-        # Test scenario 2
-        # Given a different user ID
-        # When there are taggable answers for the user
-        # Then the method should return the correct number of taggable answers
-      end
-    end
-
-    context "when there are no taggable answers" do
-      it "returns 0" do
-        # Test scenario 1
-        # Given a user ID
-        # When there are no taggable answers for the user
-        # Then the method should return 0
-
-        # Test scenario 2
-        # Given a different user ID
-        # When there are no taggable answers for the user
-        # Then the method should return 0
+        user_ids = double(1)
+        allow(Team).to receive(:joins).with(:teams_users).and_return(team)
+        allow(team).to receive(:where).with(team_users: { parent_id: tag_dep1.assignment_id }, user_id: user_ids).and_return(user1)
+        
+        expected_count = 2 # This should be the actual expected number of taggable answers
+        allow(answer).to receive(:count).and_return(expected_count)
+        
+        actual_count = tag_dep1.get_number_of_taggable_answers(user_ids)
+        expect(actual_count).to eq(expected_count)
       end
     end
   end
-
 
   describe 'assignment_tagging_progress' do
     it 'does nothing when no teams are found' do

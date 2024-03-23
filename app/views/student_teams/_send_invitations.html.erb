@@ -1,5 +1,5 @@
-<!-- Partial for sending invitations -->
-<% if @student.team.nil? %> <!--dead code-->
+<!--send invitation-->
+<% if @student.team.nil? %>
   <h3><%=t ".name_team"%></h3>
   <%= form_tag :controller => 'student_teams', :action => 'create' do %>
     <%= hidden_field_tag 'student_id', @student.id %>

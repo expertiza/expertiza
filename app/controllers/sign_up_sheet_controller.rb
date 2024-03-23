@@ -252,7 +252,7 @@ class SignUpSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: assignment_id
   end
 
-  def user_registered_for_assignment?(user, assignment_id)
+  def user_registered_for_assignment?(user, assignment_id) # to check if user has registered for the assignment or not.
     if AssignmentParticipant.exists?(user_id: user.id, parent_id: assignment_id)
       true
     else
@@ -261,11 +261,11 @@ class SignUpSheetController < ApplicationController
     end
   end
 
-  def log_message(message)
+  def log_message(message) # function to log the message
     ExpertizaLogger.info LoggerMessage.new(controller_name, '', message)
   end
 
-  def process_signup_as_instructor_request(assignment_id,user,topic_id)
+  def process_signup_as_instructor_request(assignment_id,user,topic_id) # function to add user for a given assignment and given topic
     if SignUpSheet.signup_team(assignment_id, user.id, topic_id)
       flash[:success] = 'You have successfully signed up the student for the topic!'
       log_message("Instructor signed up student for topic: #{topic_id}")

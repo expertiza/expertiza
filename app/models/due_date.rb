@@ -45,7 +45,7 @@ class DueDate < ApplicationRecord
     submit_duedate.update(deadline_type_id: deadline, parent_id: assign_id, round: max_round)
   end
 
-    def <=>(other)
+  def <=>(other)
     return nil unless other.is_a?(DueDate)
 
     if due_at && other.due_at
@@ -75,6 +75,8 @@ class DueDate < ApplicationRecord
   end
 
   def self.get_next_due_date(assignment_id, topic_id = nil)
+    # Gets the next due date for an assignment
+    
     if Assignment.find(assignment_id).staggered_deadline?
       next_due_date = TopicDueDate.find_by(['parent_id = ? and due_at >= ?', topic_id, Time.zone.now])
       # if certion TopicDueDate is not exist, we should query next corresponding AssignmentDueDate.

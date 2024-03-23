@@ -3,7 +3,7 @@
     receiver = ""
     assignment = ""
   else
-    if record.grading_type == "Submission"
+    if record.graded_item_type == "Submission"
       receiver = "of " + Team.where(id: record.graded_member_id).pluck(:name).first
       assignment = "for the submission " + Assignment.where(id: record.assignment_id).pluck(:name).first
     else

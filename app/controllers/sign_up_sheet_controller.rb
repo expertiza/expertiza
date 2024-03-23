@@ -241,21 +241,40 @@ class SignUpSheetController < ApplicationController
     if user.nil? # validate invalid user
       flash[:error] = 'That student does not exist!'
     else
-      if AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id]
-        if SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
-          flash[:success] = 'You have successfully signed up the student for the topic!'
-          ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor signed up student for topic: ' + params[:topic_id].to_s)
-        else
-          flash[:error] = 'The student has already signed up for a topic!'
-          ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor is signing up a student who already has a topic')
-        end
+      assignment_id = params[:assignment_id]
+      topic_id = params[:topic_id]    
+      if user_registered_for_assignment?(user, assignment_id)
+        process_signup_as_instructor_request(assignment_id,user,topic_id)
       else
-        flash[:error] = 'The student is not registered for the assignment!'
-        ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'The student is not registered for the assignment: ' << user.id)
+        log_message("The student is not registered for the assignment: #{user.id}")
       end
     end
-    redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
+    redirect_to controller: 'assignments', action: 'edit', id: assignment_id
   end
+
+  def user_registered_for_assignment?(user, assignment_id)
+    if AssignmentParticipant.exists?(user_id: user.id, parent_id: assignment_id)
+      true
+    else
+      flash[:error] = 'The student is not registered for the assignment!'
+      false
+    end
+  end
+
+  def log_message(message)
+    ExpertizaLogger.info LoggerMessage.new(controller_name, '', message)
+  end
+
+  def process_signup_as_instructor_request(assignment_id,user,topic_id)
+    if SignUpSheet.signup_team(assignment_id, user.id, topic_id)
+      flash[:success] = 'You have successfully signed up the student for the topic!'
+      log_message("Instructor signed up student for topic: #{topic_id}")
+    else
+      flash[:error] = 'The student has already signed up for a topic!'
+      log_message('Instructor is signing up a student who already has a topic')
+    end
+  end
+
 
   # this function is used to delete a previous signup
   def delete_signup

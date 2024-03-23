@@ -1,4 +1,5 @@
 class DueDate < ApplicationRecord
+  include Comparable
   validate :due_at_is_valid_datetime
   #  has_paper_trail
 
@@ -44,15 +45,15 @@ class DueDate < ApplicationRecord
     submit_duedate.update(deadline_type_id: deadline, parent_id: assign_id, round: max_round)
   end
 
-  def self.sort_deadlines(due_dates)
-    due_dates.sort do |m1, m2|
-      if m1.due_at && m2.due_at
-        m1.due_at <=> m2.due_at
-      elsif m1.due_at
-        -1
-      else
-        1
-      end
+    def <=>(other)
+    return nil unless other.is_a?(DueDate)
+
+    if due_at && other.due_at
+      due_at <=> other.due_at
+    elsif due_at
+      -1
+    else
+      1
     end
   end
 
@@ -62,7 +63,7 @@ class DueDate < ApplicationRecord
 
     due_dates = DueDate.where(parent_id: assignment_id)
     # sorted so that the earliest deadline is at the first
-    sorted_deadlines = sort_deadlines(due_dates)
+    sorted_deadlines = due_dates.sort
     due_dates.reject { |due_date| ![1, 2].include?(due_date.deadline_type_id) }
     round = 1
     sorted_deadlines.each do |due_date|

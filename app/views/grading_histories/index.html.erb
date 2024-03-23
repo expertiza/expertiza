@@ -13,24 +13,24 @@
 %>
 <h3 class="center">Grade History <%= assignment %></h3>
 
-<table style="border-collapse:collapse; table-layout:fixed; width:1350px;">
+<table class="table table-striped" width="100%">
   <thead>
   <tr>
-    <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Instructor</th>
-    <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Grade</th>
-    <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Comment</th>
-    <th style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;">Graded At</th>
+    <th width="15%">Instructor</th>
+    <th width="10%">Grade</th>
+    <th width="55%">Comment</th>
+    <th width="20%">Graded At</th>
   </tr>
-
-  <!--This is the main view of the table. This will add table with either hyperlink or the content nased on the operation. -->
+  </thead>
+  <!--This is the main view of the table. -->
   <tbody>
   <% @grading_histories.each do |record| %>
-    <tr>
-      <td style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;"><%= User.where(id: record.instructor_id).pluck(:fullname).first %></td>
-      <td style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;"><%= record.grade %></td>
-      <td style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;"><%= record.comment %></td>
-      <td style="padding:10px; border:solid 1.5px black; width:50px; word-wrap:break-word;"><%= record.created_at %></td>
-    </tr>
+      <tr>
+        <td><%= User.where(id: record.instructor_id).pluck(:fullname).first %></td>
+        <td><%= record.grade %></td>
+        <td><%= record.comment %></td>
+        <td><%= record.created_at %></td>
+      </tr>
   <% end %>
   </tbody>
 </table>

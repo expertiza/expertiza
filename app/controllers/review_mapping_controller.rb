@@ -60,40 +60,72 @@ class ReviewMappingController < ApplicationController
     User.where(name: name).first.id
   end
 
+  # Method to add a reviewer to an assignment
   def add_reviewer
+    # Find the assignment based on the given ID
     assignment = find_assignment(params[:id])
     topic_id = params[:topic_id]
-    user_id = find_user_by_name(name: params[:user][:name]).first.id
-    # If instructor want to assign one student to review his/her own artifact,
-    # it should be counted as "self-review" and we need to make /app/views/submitted_content/_selfreview.html.erb work.
-    if TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
+    user_name = params[:user][:name]
+    # Find the user ID by name
+    user_id = find_user_id_by_name(user_name)
+    
+    # Check if the user is trying to review their own artifact
+    if user_trying_to_review_own_artifact?(params[:contributor_id], user_id)
       flash[:error] = 'You cannot assign this student to review his/her own artifact.'
     else
-      # Team lazy initialization
-      SignUpSheet.signup_team(assignment.id, user_id, topic_id)
-      msg = ''
-      begin
-        user = User.from_params(params)
-        # contributor_id is team_id
-        regurl = url_for id: assignment.id,
-                         user_id: user.id,
-                         contributor_id: params[:contributor_id]
-
-        # Get the assignment's participant corresponding to the user
-        reviewer = get_reviewer(user, assignment, regurl)
-        # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
-        # to treat all assignments as team assignments
-        if ReviewResponseMap.where(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id).first.nil?
-          ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
-        else
-          raise 'The reviewer, "' + reviewer.name + '", is already assigned to this contributor.'
-        end
-      rescue StandardError => e
-        msg = e.message
-      end
+      # Assign the reviewer to the assignment
+      assign_reviewer(assignment, topic_id, user_id, params[:contributor_id])
     end
+
+    # Redirect to list mappings after adding the reviewer
+    redirect_to_list_mappings(assignment)
+  end
+
+  # Method to find user ID by name
+  def find_user_id_by_name(name)
+    find_user_by_name(name: name).first.id
+  end
+
+  # Method to check if the user is trying to review their own artifact
+  def user_trying_to_review_own_artifact?(contributor_id, user_id)
+    TeamsUser.exists?(team_id: contributor_id, user_id: user_id)
+  end
+
+  # Method to assign a reviewer to the assignment
+  def assign_reviewer(assignment, topic_id, user_id, contributor_id)
+    # Sign up the user for the assignment
+    SignUpSheet.signup_team(assignment.id, user_id, topic_id)
+    user = User.from_params(params)
+    # Generate registration URL
+    regurl = registration_url(assignment.id, user.id, contributor_id)
+    # Get the reviewer for the assignment
+    reviewer = get_reviewer(user, assignment, regurl)
+
+    # Create review response map for the assignment
+    create_review_response_map(contributor_id, reviewer.id, assignment.id)
+  end
+
+  # Method to generate registration URL
+  def registration_url(assignment_id, user_id, contributor_id)
+    url_for(id: assignment_id, user_id: user_id, contributor_id: contributor_id)
+  end
+
+  # Method to create review response map for the assignment
+  def create_review_response_map(contributor_id, reviewer_id, assignment_id)
+    if ReviewResponseMap.where(reviewee_id: contributor_id, reviewer_id: reviewer_id).first.nil?
+      # Create review response map if not already assigned
+      ReviewResponseMap.create(reviewee_id: contributor_id, reviewer_id: reviewer_id, reviewed_object_id: assignment_id)
+    else
+      # Raise an exception if the reviewer is already assigned
+      raise 'The reviewer is already assigned to this contributor.'
+    end
+  end
+
+  # Method to redirect to list mappings after adding the reviewer
+  def redirect_to_list_mappings(assignment)
     redirect_to action: 'list_mappings', id: assignment.id, msg: msg
   end
+
 
   # 7/12/2015 -zhewei
   # This method is used for assign submissions to students for peer review.

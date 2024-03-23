@@ -4,16 +4,14 @@
     assignment = ""
   else
     if record.graded_item_type == "Submission"
-      receiver = "of " + Team.where(id: record.graded_member_id).pluck(:name).first
-      assignment = "for the submission " + Assignment.where(id: record.assignment_id).pluck(:name).first
+      assignment = "of " + Assignment.where(id: record.assignment_id).pluck(:name).first
     else
-      receiver = "of " + User.where(id: record.graded_member_id).pluck(:fullname).first
-      assignment = "for review in " + Assignment.where(id: record.assignment_id).pluck(:name).first
+      assignment = "of review for " + Assignment.where(id: record.assignment_id).pluck(:name).first
     end
 
   end
 %>
-<h1 class="center">Grade History <%= receiver %> <%= assignment %></h1>
+<h3 class="center">Grade History <%= assignment %></h3>
 
 <table style="border-collapse:collapse; table-layout:fixed; width:1350px;">
   <thead>

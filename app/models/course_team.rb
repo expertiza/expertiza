@@ -10,8 +10,8 @@ class CourseTeam < Team
     'Course'
   end
 
-  def self.parent_model(id)
-    Course.find(id)
+  def self.parent_model(course_id)
+    Course.find(course_id)
   end
 
   # since this team is not an assignment team, the assignment_id is nil.
@@ -25,7 +25,7 @@ class CourseTeam < Team
   end
 
   # Copy this course team to the assignment team
-  def copy(assignment_id)
+  def copy_to_assignment_team(assignment_id)
     assignment = Assignment.find_by(id: assignment_id)
     if assignment.auto_assign_mentor
       new_team = MentoredTeam.create_team_and_node(assignment_id)

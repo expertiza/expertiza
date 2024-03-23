@@ -29,10 +29,7 @@ class Course < ApplicationRecord
 
     Rails.root + '/pg_data/' + FileHelper.clean_path(User.find(instructor_id).name) + '/' + FileHelper.clean_path(directory_path) + '/'
   end
-# Returns associated participants with the course.
-  def get_participants
-    CourseParticipant.where(parent_id: id)
-  end
+  
 # Adds a participant to the course.
   def add_participant(user_name)
     user = User.find_by(name: user_name)

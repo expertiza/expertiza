@@ -24,8 +24,8 @@ module MailerHelper
         user: user,
         first_name: ApplicationHelper.get_user_first_name(user),
         partial_name: partial_name,
-        team_name: team_name,
-        assignment_name: assignment_name
+        team: team_name,
+        assignment: assignment_name
       }
     )
   end

@@ -27,8 +27,7 @@ class Mailer < ActionMailer::Base
     @team = defn[:body][:team]  # team name
 
     if Rails.env.development? || Rails.env.test?
-      #defn[:to] = 'expertiza.mailer@gmail.com'
-      defn[:to] = 'slkwiatk@ncsu.edu'
+      defn[:to] = 'expertiza.mailer@gmail.com'
     end
     mail(subject: defn[:subject],
          to: defn[:to],

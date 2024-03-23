@@ -43,7 +43,7 @@ describe 'due_date_functions' do
   end
 
   it 'create new duedate record with values' do
-    DueDate.set_duedate({ id: 999 }, @assignment_due_date.deadline_type_id,
+    DueDate.set_due_date({ id: 999 }, @assignment_due_date.deadline_type_id,
                         @assignment_due_date.parent_id, @assignment_due_date.round)
     new_due_date = DueDate.find_by(id: 999)
     expect(new_due_date).to be_valid
@@ -56,7 +56,7 @@ describe 'due_date_functions' do
     sorted_due_dates = @due_dates
     expect(sorted_due_dates.each_cons(2).all? { |m1, m2| (m1.due_at <=> m2.due_at) != 1 }).to eql false
 
-    sorted_due_dates = DueDate.deadline_sort(@due_dates)
+    sorted_due_dates = DueDate.sort_deadlines(@due_dates)
     expect(sorted_due_dates.each_cons(2).all? { |m1, m2| (m1.due_at <=> m2.due_at) != 1 }).to eql true
   end
 

@@ -6,7 +6,7 @@ class DueDate < ApplicationRecord
     DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
   end
 
-  def self.current_due_date(due_dates)
+  def self.current(due_dates)
     # Get the current due date from list of due dates
     due_dates.each do |due_date|
       if due_date.due_at > Time.now
@@ -18,9 +18,9 @@ class DueDate < ApplicationRecord
     nil
   end
 
-  def self.teammate_review_allowed(student)
+  def self.teammate_review_allowed?(student)
     # time when teammate review is allowed
-    due_date = current_due_date(student.assignment.due_dates)
+    due_date = current(student.assignment.due_dates)
     student.assignment.find_current_stage == 'Finished' ||
       due_date &&
         (due_date.teammate_review_allowed_id == 3 ||
@@ -51,7 +51,7 @@ class DueDate < ApplicationRecord
     end
   end
 
-  def self.set_duedate(duedate, deadline, assign_id, max_round)
+  def self.set_due_date(duedate, deadline, assign_id, max_round)
     submit_duedate = DueDate.new(duedate)
     submit_duedate.deadline_type_id = deadline
     submit_duedate.parent_id = assign_id
@@ -59,7 +59,7 @@ class DueDate < ApplicationRecord
     submit_duedate.save
   end
 
-  def self.deadline_sort(due_dates)
+  def self.sort_deadlines(due_dates)
     due_dates.sort do |m1, m2|
       if m1.due_at && m2.due_at
         m1.due_at <=> m2.due_at
@@ -77,7 +77,7 @@ class DueDate < ApplicationRecord
 
     due_dates = DueDate.where(parent_id: assignment_id)
     # sorted so that the earliest deadline is at the first
-    sorted_deadlines = deadline_sort(due_dates)
+    sorted_deadlines = sort_deadlines(due_dates)
     due_dates.reject { |due_date| due_date.deadline_type_id != 1 && due_date.deadline_type_id != 2 }
     round = 1
     sorted_deadlines.each do |due_date|

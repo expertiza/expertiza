@@ -67,7 +67,7 @@ class ReviewMappingController < ApplicationController
     user_name = params[:user][:name]
     # Find the user ID by name
     user_id = find_user_id_by_name(user_name)
-    
+
     # Check if the user is trying to review their own artifact
     if user_trying_to_review_own_artifact?(params[:contributor_id], user_id)
       flash[:error] = 'You cannot assign this student to review his/her own artifact.'
@@ -149,7 +149,7 @@ class ReviewMappingController < ApplicationController
       end
     end
     redirect_to_student_review_list(participant)
-  end  
+  end
 
   # Method to find assignment participant
   def find_participant_for_assignment(assignment, reviewer_id)
@@ -196,7 +196,7 @@ class ReviewMappingController < ApplicationController
   # Method to assign a reviewer when the assignment has no topics
   def assign_reviewer_without_topic(assignment, reviewer)
     assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
-    assignment_team = begin 
+    assignment_team = begin
                         select_assignment_team_to_review(assignment_teams)
                       rescue StandardError
                         nil

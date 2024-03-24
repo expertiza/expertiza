@@ -37,13 +37,6 @@ class CourseTeam < Team
     copy_members(new_team)
   end
 
-  # Add participant to a course team
-  def add_participant(course_id, user)
-    if CourseParticipant.find_by(parent_id: course_id, user_id: user.id).nil?
-      CourseParticipant.create(parent_id: course_id, user_id: user.id, permission_granted: user.master_permission_granted)
-    end
-  end
-
   # Import from csv
   def self.import(row, course_id, options)
     raise ImportError, 'The course with the id "' + course_id.to_s + "\" was not found. <a href='/courses/new'>Create</a> this course?" if Course.find(course_id).nil?
@@ -64,5 +57,35 @@ class CourseTeam < Team
     fields.push('Team Name')
     fields.push('Team members') if options[:team_name] == 'false'
     fields.push('Course Name')
+  end
+
+# Adds a participant to the course.
+  def add_participant(user_name)
+    user = User.find_by(name: user_name)
+    if user.nil?
+      raise 'No user account exists with the name ' + user_name + ". Please <a href='" + url_for(controller: 'users', action: 'new') + "'>create one</a>."
+    end
+    begin
+      participant = CourseParticipant.find_by(parent_id: id, user_id: user.id)
+      if participant # If there is already a participant, raise an error. Otherwise, create it
+        raise "The user #{user.name} is already a participant."
+      else
+				CourseParticipant.create(parent_id: id, user_id: user.id, permission_granted: user.master_permission_granted)
+      end
+    rescue ActiveRecord::RecordNotFound => e
+      raise "Error adding participant: #{e.message}"
+    rescue ActiveRecord::RecordInvalid => e
+      raise "Error adding participant: #{e.message}"
+    end
+  end
+
+  # Add member to the course team
+  def add_member(user, _id = nil)
+    raise "The user \"#{user.name}\" is already a member of the team, \"#{name}\"" if user?(user)
+
+    t_user = TeamsUser.create(user_id: user.id, team_id: id)
+    parent = TeamNode.find_by(node_object_id: id)
+    TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+    add_participant(parent_id, user)
   end
 end

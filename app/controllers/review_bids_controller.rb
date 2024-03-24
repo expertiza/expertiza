@@ -57,8 +57,7 @@ class ReviewBidsController < ApplicationController
     @num_participants = AssignmentParticipant.where(parent_id: @assignment.id).count  # gotta know # participants to determine if topic's hot
     @assigned_topics= nil
     # Create an instance of ReviewBid
-    review_bid = ReviewBid.new
-    @bids = review_bid.where(participant_id:@participant,assignment_id:@assignment.id)  # Update bids to be the list of sign-up topics on which the participant has bid
+    @bids = ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id)  # Update bids to be the list of sign-up topics on which the participant has bid
     signed_up_topics = []
     @bids.each do |bid|
       signup_topic = SignUpTopic.find_by(id: bid.signuptopic_id)
@@ -78,23 +77,22 @@ class ReviewBidsController < ApplicationController
   # function that assigns and updates priorities for review bids
   def set_priority
     # Create an instance of ReviewBid
-    #review_bid = ReviewBid.new
     if params[:topic].nil?
-      review_bid.where(participant_id: params[:id]).destroy_all
+      ReviewBid.where(participant_id: params[:id]).destroy_all
     else
       assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
-      @bids = review_bid.where(participant_id: params[:id])
-      signed_up_topics = review_bid.where(participant_id: params[:id]).map(&:signuptopic_id)
+      @bids = ReviewBid.where(participant_id: params[:id])
+      signed_up_topics = ReviewBid.where(participant_id: params[:id]).map(&:signuptopic_id)
       signed_up_topics -= params[:topic].map(&:to_i)
       signed_up_topics.each do |topic|
-        review_bid.where(signuptopic_id: topic, participant_id: params[:id]).destroy_all
+        ReviewBid.where(signuptopic_id: topic, participant_id: params[:id]).destroy_all
       end
       params[:topic].each_with_index do |topic_id, index|
-        bid_existence = review_bid.where(signuptopic_id: topic_id, participant_id: params[:id])
+        bid_existence = ReviewBid.where(signuptopic_id: topic_id, participant_id: params[:id])
         if bid_existence.empty?
-          review_bid.create(priority: index + 1, signuptopic_id: topic_id, participant_id: params[:id], assignment_id: assignment_id)
+          ReviewBid.create(priority: index + 1, signuptopic_id: topic_id, participant_id: params[:id], assignment_id: assignment_id)
         else
-          review_bid.where(signuptopic_id: topic_id, participant_id: params[:id]).update_all(priority: index + 1)
+          ReviewBid.where(signuptopic_id: topic_id, participant_id: params[:id]).update_all(priority: index + 1)
         end
       end
     end
@@ -105,16 +103,16 @@ class ReviewBidsController < ApplicationController
   def assign_bidding
     # sets parameters used for running bidding algorithm
     assignment_id = params[:assignment_id].to_i
+    assignment = Assignment.find(assignment_id)
     # list of reviewer id's from a specific assignment
-    # Create an instance of ReviewBid
-    review_bid = ReviewBid.new
-    reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
-    bidding_data = review_bid.bidding_data(assignment_id, reviewer_ids)
+    reviewer_ids = assignment.assignment_participants.ids
+    bidding_data = assignment.review_bids.bidding_data(reviewer_ids)
     matched_topics = run_bidding_algorithm(bidding_data)
-    review_bid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
-    Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
+    assignment.review_bids.assign_review_topics(reviewer_ids, matched_topics)
+    assignment.update(can_choose_topic_to_review: false) # turns off bidding for students
     redirect_back fallback_location: root_path
   end
+  
 
   # call webserver for running assigning algorithm
   # passing webserver: student_ids, topic_ids, student_preferences, time_stamps

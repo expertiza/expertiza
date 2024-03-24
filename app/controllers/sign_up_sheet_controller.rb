@@ -378,16 +378,29 @@ class SignUpSheetController < ApplicationController
                            rescue StandardError
                              nil
                            end
+          due_date_obj=instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1]  #applying DRY principle and removing multiple instance_variable_get calls
+          due_at=instance_variable_get('@topic_' + deadline_type + '_due_date')                 
           if topic_due_date.nil? # create a new record
-            due_date_obj=instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1]  #applying DRY principle and removing multiple instance_variable_get calls
-            TopicDueDate.create(
-              due_at: instance_variable_get('@topic_' + deadline_type + '_due_date'),
+            create_topic_due_date(i,topic,deadline_type_id,due_date_obj,due_at)
+          else # update an existed record 
+            topic_due_date.update_attributes(due_at: due_at,submission_allowed_id: due_date_obj.submission_allowed_id,review_allowed_id: due_date_obj.review_allowed_id,
+            review_of_review_allowed_id: due_date_obj.review_of_review_allowed_id,quiz_allowed_id: due_date_obj.quiz_allowed_id,teammate_review_allowed_id: due_date_obj.teammate_review_allowed_id)
+          end
+        end
+      end
+    end
+    redirect_to_assignment_edit(params[:assignment_id])
+  end
+  
+  def create_topic_due_date(index,topic,deadline_type_id,due_date_obj,due_at)
+    TopicDueDate.create(
+              due_at: due_at,
               deadline_type_id: deadline_type_id,
               parent_id: topic.id,
               submission_allowed_id: due_date_obj.submission_allowed_id,
               review_allowed_id: due_date_obj.review_allowed_id,
               review_of_review_allowed_id: due_date_obj.review_of_review_allowed_id,
-              round: i,
+              round: index,
               flag: due_date_obj.flag,
               threshold: due_date_obj.threshold,
               delayed_job_id: due_date_obj.delayed_job_id,
@@ -397,21 +410,6 @@ class SignUpSheetController < ApplicationController
               teammate_review_allowed_id: due_date_obj.teammate_review_allowed_id,
               type: 'TopicDueDate'
             )
-          else # update an existed record
-            due_date_obj=instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1]
-            topic_due_date.update_attributes(
-              due_at: instance_variable_get('@topic_' + deadline_type + '_due_date'),
-              submission_allowed_id: due_date_obj.submission_allowed_id,
-              review_allowed_id: due_date_obj.review_allowed_id,
-              review_of_review_allowed_id: due_date_obj.review_of_review_allowed_id,
-              quiz_allowed_id: due_date_obj.quiz_allowed_id,
-              teammate_review_allowed_id: due_date_obj.teammate_review_allowed_id
-            )
-          end
-        end
-      end
-    end
-    redirect_to_assignment_edit(params[:assignment_id])
   end
 
   # This method is called when a student click on the trumpet icon. So this is a bad method name. --Yang

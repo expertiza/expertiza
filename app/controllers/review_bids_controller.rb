@@ -46,6 +46,7 @@ class ReviewBidsController < ApplicationController
   def show
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
+    @selected_topics= nil
     topic_ids_with_team = SignedUpTeam.where.not(team_id: nil).pluck(:topic_id) #Topics which have been selected by teams for submission
     @signup_topics = SignUpTopic.where(assignment_id: @assignment.id, id: topic_ids_with_team) #signup_topics is all the topics students have signed up for.
     #remove own topic from set of topics to bid on 
@@ -54,7 +55,7 @@ class ReviewBidsController < ApplicationController
     
  
     @num_participants = AssignmentParticipant.where(parent_id: @assignment.id).count  # gotta know # participants to determine if topic's hot
-    #@assigned_topics= nil
+    @assigned_topics= nil
     # Create an instance of ReviewBid
     review_bid = ReviewBid.new
     @bids = review_bid.where(participant_id:@participant,assignment_id:@assignment.id)  # Update bids to be the list of sign-up topics on which the participant has bid
@@ -77,7 +78,7 @@ class ReviewBidsController < ApplicationController
   # function that assigns and updates priorities for review bids
   def set_priority
     # Create an instance of ReviewBid
-    review_bid = ReviewBid.new
+    #review_bid = ReviewBid.new
     if params[:topic].nil?
       review_bid.where(participant_id: params[:id]).destroy_all
     else

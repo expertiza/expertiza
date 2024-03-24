@@ -1,12 +1,12 @@
-<H1><%=t ".edit_team"%></H1>
-<%= form_for '/student_teams/update', method: :put do %>
-  <%= hidden_field_tag 'team_id', @team.id %>
-  <%= hidden_field_tag 'student_id', @student.id %>
-  <label for="team_name"><%=t ".team_name"%></label>&nbsp;
-  <%= text_field 'team', 'name'%>
+<h1><%= t ".edit_team" %></h1>
+<%= form_with url: '/student_teams/update', method: :put, local: true do %>
+  <%= hidden_field_tag :team_id, @team.id %>
+  <%= hidden_field_tag :student_id, @student.id %>
+  <label for="team_name"><%= t ".team_name" %></label>&nbsp;
+  <%= text_field :team, :name %>
   <br>
   <br>
-  <%= submit_tag "Save" %>
+  <%= submit_tag t("Save") %>
 <% end %>
 <br/>
-<a href="javascript:window.history.back()"><%=t ".back"%></a>
+<%= link_to t(".back"), 'javascript:window.history.back()' %>

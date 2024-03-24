@@ -1,44 +1,13 @@
-<!-- Partial for sending invitations -->
-<% if @student.team.nil? %> <!--dead code-->
-  <h3><%=t ".name_team"%></h3>
-  <%= form_tag :controller => 'student_teams', :action => 'create' do %>
-    <%= hidden_field_tag 'student_id', @student.id %>
-    <label for="team_name"><%=t ".team_name"%></label>&nbsp;
-    <%= text_field 'team', 'name' %>
-    <%= submit_tag t(".name_team") %>
+<% if @student.team.present? && !@student.team.full? %>
+  <strong><%= t("student_teams.view.send_invite") %></strong>
+  <%= form_tag(invitations_path, method: :post) do %>
+    <%= hidden_field_tag :team_id, @student.team.id %>
+    <%= hidden_field_tag :student_id, @student.id %>
+    <%= hidden_field_tag :assignment_id, @student.assignment.id %>
+    <div style="width:80%; margin: auto;">
+      <%= t("student_teams.view.enter_user") %>
+      <%= text_field_tag 'user[name]', nil, size: 41 %>
+      <%= submit_tag t("student_teams.view.invite_button") %>
+    </div>
   <% end %>
-<% elsif !@student.team.full?%>
-  <b><%=t ".invite_people"%></b>
-  <%= form_tag :controller => 'invitations', :action => 'create' do %>
-    <%= hidden_field_tag 'team_id', @student.team.id %>
-    <%= hidden_field_tag 'student_id', @student.id %>
-    <%= hidden_field_tag 'session[:dummy][:assignment_id]', @student.parent_id %>
-    <table style="width:80%" align="center" >
-      <tr>
-        <td>
-          <%=t ".enter_user"%><%= text_field_with_auto_complete :user, :name, {:size => 41} %>
-          <input type='submit' value='Invite'/>
-        </td>
-      </tr>
-    </table>
-  <% end %>
-<% end %>
-
-<!--waiting listed users on the same topic-->
-<% if @users_on_waiting_list && @users_on_waiting_list.count>0%>
-  <h3><%=t ".users_waiting"%></h3>
-  <table>
-    <tr>
-      <td><b>&nbsp; <%=t ".user_id"%> &nbsp; </b></td>
-      <td><b>&nbsp; <%=t ".fullname"%> &nbsp; </b></td>
-      <td><b>&nbsp; <%=t ".email"%> &nbsp; </b></td>
-    </tr>
-    <% @users_on_waiting_list.each do |user|%>
-      <tr>
-        <td> &nbsp; <%=user.name(session[:ip])%> &nbsp; </td>
-        <td> &nbsp; <%=user.fullname(session[:ip])%> &nbsp; </td>
-        <td> &nbsp; <%=user.email(session[:ip])%> &nbsp; </td>
-      </tr>
-    <% end%>
-  </table>
 <% end %>

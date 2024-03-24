@@ -31,19 +31,12 @@ describe TagPromptDeployment do
       allow(TagPrompt).to receive(:find).with(1).and_return(tp)
       expect(tag_dep.tag_prompt).to be(tp)
     end
-  end
 
-  # Test skeletons provided by Vyshnavi Adusumelli
-  describe "#tag_prompt" do
-    context "when given a valid tag_prompt_id" do
-      it "returns the corresponding TagPrompt object" do
-        # Test code here
-      end
-    end
-
+    # Test skeleton provided by Vyshnavi Adusumelli
     context "when given an invalid tag_prompt_id" do
       it "returns nil" do
-        # Test code here
+        allow(TagPrompt).to receive(:find).with(-1).and_return(tp)
+        expect(tp.id).to be(nil)
       end
     end
   end
@@ -147,6 +140,21 @@ describe TagPromptDeployment do
       expect(user_answer_tagging).to be_empty
     end
 
+    context "when there are no teams or questions" do
+      it "returns an empty array" do
+        allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([])
+        allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([])
+
+        user_answer_tagging = tag_dep.assignment_tagging_progress
+
+        expect(ReviewResponseMap).not_to receive(:get_responses_for_team_round)
+        expect(ResponseMap).not_to receive(:assessments_for)
+        expect(Answer).not_to receive(:where)
+        expect(AnswerTag).not_to receive(:where)
+        expect(user_answer_tagging).to be_empty
+      end
+    end
+    
     it 'does not vary by round' do
       allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
       allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])
@@ -233,21 +241,11 @@ describe TagPromptDeployment do
       expect(user_answer_tagging[1].no_not_tagged).to eq(2)
       expect(user_answer_tagging[1].percentage).to eq('0.0')
     end
-  end
 
-  # Test skeletons provided by Vyshnavi Adusumelli
-  describe "assignment_tagging_progress" do
-    describe "#assignment_tagging_progress" do
-      context "when there are teams and questions" do
-        it "returns the tagging progress for each user" do
-          # Test setup
-        end
-      end
-
-      context "when there are no teams or questions" do
-        it "returns an empty array" do
-          # Test setup
-        end
+    # Test skeletons provided by Vyshnavi Adusumelli
+    context "when there are no teams or questions" do
+      it "returns an empty array" do
+        # Test setup
       end
     end
   end

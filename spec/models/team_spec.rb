@@ -1,19 +1,22 @@
 describe Team do
   let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
-  let(:participant) { build(:participant, user_id: 1) }
-  let(:participant2) { build(:participant, user_id: 2) }
-  let(:participant3) { build(:participant, user_id: 3) }
+  let(:participant) { build(:participant, user_id: 1, id: 1) }
+  let(:participant2) { build(:participant, user_id: 2, id: 2) }
+  let(:participant3) { build(:participant, user_id: 3, id: 3) }
+  let(:assignment_with_participants) { build(:assignment, id: 1, name: 'no assignment' , participants: [participant])}
   let(:user) { build(:student, id: 1, name: 'no name', fullname: 'no one', participants: [participant]) }
   let(:user2) { build(:student, id: 2) }
   let(:user3) { build(:student, id: 3) }
-  let(:team) { build(:assignment_team, id: 1, name: 'no team', users: [user]) }
+  let(:team_without_participants) { build(:assignment_team, id: 1, name: 'no team')}
+  let(:team) { build(:assignment_team, id: 1, name: 'no team', participants: [participant]) }
+  let(:team_with_participants_mapping) { build(:assignment_team, id: 1, name: 'no team with participants mapping', participants: [participant])}
   let(:team_user) { build(:team_user, id: 1, user: user) }
   before(:each) do
-    allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
+    allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_user])
   end
   describe '#participant' do
     it 'gets the participants of current team, by default returns an empty array' do
-      expect(team.participants).to eq([])
+      expect(team_without_participants.participants).to eq([])
     end
   end
 
@@ -25,7 +28,7 @@ describe Team do
 
   describe '#delete' do
     it 'deletes the current team and related objects and return self' do
-      allow(TeamsUser).to receive_message_chain(:where, :find_each).with(team_id: 1).with(no_args).and_yield(team_user)
+      allow(TeamsParticipant).to receive_message_chain(:where, :find_each).with(team_id: 1).with(no_args).and_yield(team_user)
       allow(team_user).to receive(:destroy).and_return(team_user)
       node = double('TeamNode')
       allow(TeamNode).to receive(:find_by).with(node_object_id: 1).and_return(node)
@@ -42,20 +45,27 @@ describe Team do
 
   describe '#author_names' do
     it 'returns an array of author\'s name' do
+      allow(User).to receive(:find).with(1).and_return(user)
       expect(team.author_names).to eq(['no one'])
     end
   end
 
-  describe '#user?' do
+  describe '#user?with user_id mapping' do
     context 'when users in current team includes the parameterized user' do
       it 'returns true' do
+        it 'returns true when user exists' do
+          allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
+          allow(team).to receive(:participants).and_return([participant])
         expect(team.user?(user)).to be true
       end
     end
 
     context 'when users in current team does not include the parameterized user' do
-      it 'returns false' do
-        expect(team.user?(double('User'))).to be false
+      it 'returns false when user does not exists' do
+        mock_user = double('User')
+        allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
+        allow(mock_user).to receive(:id).and_return(nil)
+        expect(team_without_participants.user?(double('User'))).to be false
       end
     end
   end
@@ -91,6 +101,8 @@ describe Team do
   describe '#add_member' do
     context 'when parameterized user has already joined in current team' do
       it 'raise an error' do
+        allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
+        allow(team).to receive(:participants).and_return([participant])
         expect { team.add_member(user) }.to raise_error(RuntimeError, "The user #{user.name} is already a member of the team #{team.name}")
       end
     end
@@ -100,7 +112,9 @@ describe Team do
         it 'does not raise an error' do
           allow_any_instance_of(Team).to receive(:user?).with(user).and_return(false)
           allow_any_instance_of(Team).to receive(:full?).and_return(false)
-          allow(TeamsUser).to receive(:create).with(user_id: 1, team_id: 1).and_return(team_user)
+          allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
+          allow(TeamsParticipant).to receive(:create).with(participant_id: 1, team_id: 1).and_return(team_user)
+          allow(TeamsParticipant).to receive(:create).with(user_id: 1, team_id: 1).and_return(team_user)
           allow(TeamNode).to receive(:find_by).with(node_object_id: 1).and_return(double('TeamNode', id: 1))
           allow_any_instance_of(Team).to receive(:add_participant).with(1, user).and_return(double('Participant'))
           expect(team.add_member(user)).to be true
@@ -117,7 +131,7 @@ describe Team do
 
   describe '#copy_members' do
     it 'copies members from current team to a new team' do
-      allow(TeamsUser).to receive(:create).with(team_id: 2, user_id: 1).and_return(team_user)
+      allow(TeamsParticipant).to receive(:create).with(team_id: 2, user_id: 1).and_return(team_user)
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       expect(team.copy_members(double('Team', id: 2))).to eq([team_user])
     end
@@ -147,6 +161,9 @@ describe Team do
       allow(User).to receive(:find).with(1).and_return(user)
       allow(User).to receive(:find).with(2).and_return(user2)
       allow(User).to receive(:find).with(3).and_return(user3)
+      allow(Participant).to receive(:find).with(1).and_return(participant)
+      allow(Participant).to receive(:find).with(1).and_return(participant2)
+      allow(Participant).to receive(:find).with(1).and_return(participant3)
       allow(Team).to receive(:where).with(parent_id: 1, type: 'AssignmentTeam').and_return([team])
       allow(Team).to receive(:size).with(any_args).and_return(1)
       allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(true)
@@ -172,7 +189,11 @@ describe Team do
     context 'when can find certain user' do
       it 'adds the user to current team' do
         allow(User).to receive(:find_by).with(name: 'no name').and_return(user)
-        allow(TeamsUser).to receive(:find_by).with(team_id: 1, user_id: 1).and_return(nil)
+        allow(Assignment).to receive(:find).and_return(assignment_with_participants)
+        allow(assignment_with_participants).to receive(:participants).and_return(assignment_with_participants.participants)
+        allow(assignment_with_participants.participants).to receive(:find_by).and_return(participant)
+        allow_any_instance_of(Participant).to receive(:find_by).and_return(participant)
+        allow(TeamsParticipant).to receive(:find_by).with(team_id: 1, user_id: 1).and_return(nil)
         allow_any_instance_of(Team).to receive(:add_member).with(user).and_return(true)
         expect(team.import_team_members(teammembers: ['no name'])).to eq(['no name'])
       end
@@ -350,7 +371,8 @@ describe Team do
   describe '.export' do
     it 'exports teams to csv' do
       allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team])
-      allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_user])
+      allow(User).to receive(:find).with(user.id).and_return(user)
       expect(Team.export([], 1, { team_name: 'false' }, AssignmentTeam.new)).to eq([['no team', 'no name']])
     end
   end

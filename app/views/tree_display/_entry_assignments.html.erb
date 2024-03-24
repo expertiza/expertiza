@@ -1,3 +1,13 @@
+<%
+  team_name = prefix.split('_').first
+  team_id = team_name.to_i
+%>
+<%
+  def find_date(team_id, index)
+    @meeting_map[team_id].length !=0 ? @meeting_map[team_id][index].to_s : ''
+  end
+%>
+
 <% child_nodes = node.get_children(@sortvar,@sortorder,session[:user].id,@show,@search) %>
 <%
   @student_full_names = []
@@ -39,7 +49,7 @@
     <% end %>
   >
     <td>
-      <%= prefix %>
+      <%= team_name %>
     </td>
     <td style="max-width: 200px">
       <%= @combined_full_names %>
@@ -65,15 +75,16 @@
     <% end %>
     <%= render :partial => '/tree_display/actions/'+node.get_partial_name,
                :locals => {:node => node} %>
-    <td class="mtg">
-      <input style="max-width: 80px" id="<%=prefix.split('_').first %>_mtg-1" onkeypress="getInformation(event,'<%=prefix.split('_').first %>_mtg-1')">
-    </td>
-    <td class="mtg">
-      <input style="max-width: 80px" id="<%=prefix.split('_').first %>_mtg-2" onkeypress="getInformation(event,'<%=prefix.split('_').first %>_mtg-2')">
-    </td>
-    <td class="mtg">
-      <input style="max-width: 80px" id="<%=prefix.split('_').first %>_mtg-3" onkeypress="getInformation(event,'<%=prefix.split('_').first %>_mtg-3')">
-    </td>
+      <%
+        (1..@max_dates_length).each do |index|
+      %>
+        <td class="mtg">
+          <input style="max-width: 80px" id="<%= team_name %>_mtg_<%= index %>" value="<%= find_date(team_id, index - 1) %>" onkeypress="
+            addDate(event,'<%= team_name %>_mtg_<%= index %>')" data-prev-val="<%= find_date(team_id, index - 1).to_s %>">
+        </td>
+      <%
+        end
+      %>
     <td id="add_row_<%= prefix %>" style="cursor:pointer;">
       <span onclick="addRow()">
         <%= image_tag("plus.png", :border=>0, :alt => "Add new date column", :title => "Add new date column") %>
@@ -83,59 +94,107 @@
 <%# end %>
 
 <script>
-  $(document).ready(function() {
-      if(parseInt(<%= @mentor_meetings.length %>) > 0) {
-          <% @mentor_meetings.each do | m |
-            if m.team_id == prefix.split('_').first.to_i  %>
-              var row = document.getElementById(rowId);
-          <% end end %>
+  function validateDate(dateString, input) {
+      var parts = dateString.split('/');
+      var month = parseInt(parts[0], 10);
+      var day = parseInt(parts[1], 10);
+
+      // Checking if both parts are valid integers
+      if (isNaN(month) || isNaN(day)) {
+          alert("Please enter a valid date in MM/DD format.");
+          input.value = ""; // Clear the input field
+          return false;
       }
-  })
-  function getInformation(event, inputId) {
+
+      // Checking if the month is within valid range (1-12)
+      if (month < 1 || month > 12) {
+          alert("Invalid month. Please enter a valid month (1-12).");
+          input.value = ""; // Clear the input field
+          return false;
+      }
+
+      // Checking if the day is within valid range for the given month
+      var daysInMonth = new Date(2022, month, 0).getDate(); // Getting the number of days in the month
+      if (day < 1 || day > daysInMonth) {
+          alert("Invalid day for the given month. Please enter a valid day.");
+          input.value = ""; // Clear the input field
+          return false;
+      }
+
+      return true
+  }
+
+  function modifyData(event, inputId) {
       if(event.keyCode === 13) {
           var input = document.getElementById(inputId);
           var team_id = parseInt(input.parentElement.parentElement.getAttribute("id").split('_')[0]);
+          var oldValue = input.getAttribute('data-prev-val')
           var textValue = input.value.trim();
 
-          var parts = textValue.split('/');
-          var month = parseInt(parts[0], 10);
-          var day = parseInt(parts[1], 10);
-
-          // Checking if both parts are valid integers
-          if (isNaN(month) || isNaN(day)) {
-              alert("Please enter a valid date in MM/DD format.");
+          if (textValue === "") {
+              $.ajax({
+                  url: `/delete_date`,
+                  method: 'POST',
+                  contentType: 'application/json',
+                  data: JSON.stringify({ meeting_date: oldValue, team_id: team_id }),
+                  success: function(response) {
+                      console.log(response);
+                      input.setAttribute('data-prev-val', "")
+                      input.blur();
+                  },
+                  error: function(xhr, status, error) {
+                      console.error('Error:', error);
+                  }
+              });
               input.value = ""; // Clear the input field
-              return;
-          }
-
-          // Checking if the month is within valid range (1-12)
-          if (month < 1 || month > 12) {
-              alert("Invalid month. Please enter a valid month (1-12).");
-              input.value = ""; // Clear the input field
-              return;
-          }
-
-          // Checking if the day is within valid range for the given month
-          var daysInMonth = new Date(2022, month, 0).getDate(); // Getting the number of days in the month
-          if (day < 1 || day > daysInMonth) {
-              alert("Invalid day for the given month. Please enter a valid day.");
-              input.value = ""; // Clear the input field
-              return;
-          }
-          $.ajax({
-              url: '/add_date',
-              method: 'POST',
-              contentType: 'application/json',
-              data: JSON.stringify({ meeting_date: textValue, team_id: team_id }),
-              success: function(response) {
-                  console.log(response);
-                  input.disabled = true;
-                  input.blur();
-              },
-              error: function(xhr, status, error) {
-                  console.error('Error:', error);
+          } else {
+              if(validateDate(textValue, input)) {
+                  $.ajax({
+                      url: '/edit_date',
+                      method: 'PATCH',
+                      contentType: 'application/json',
+                      data: JSON.stringify({ old_date: oldValue, new_date: textValue, team_id: team_id }),
+                      success: function(response) {
+                          console.log(response);
+                          input.blur();
+                      },
+                      error: function(xhr, status, error) {
+                          console.error('Error:', error);
+                      }
+                  });
               }
-          });
+          }
+      }
+  }
+
+  function addDate(event, inputId) {
+      if(event.keyCode === 13) {
+          var input = document.getElementById(inputId);
+
+          if (input.getAttribute("data-prev-val") !== "") {
+              modifyData(event, inputId)
+              return
+          }
+
+          var team_id = parseInt(input.parentElement.parentElement.getAttribute("id").split('_')[0]);
+          var textValue = input.value.trim();
+
+          if(validateDate(textValue, input)) {
+              $.ajax({
+                  url: '/add_date',
+                  method: 'POST',
+                  contentType: 'application/json',
+                  data: JSON.stringify({ meeting_date: textValue, team_id: team_id }),
+                  success: function(response) {
+                      console.log(response);
+                      input.setAttribute('data-prev-val', textValue)
+                      input.blur();
+                  },
+                  error: function(xhr, status, error) {
+                      console.error('Error:', error);
+                  }
+              });
+          }
       }
     }
 
@@ -162,11 +221,12 @@
             var newTd = document.createElement('td');
             var input = document.createElement('input');
             var teamId = rows[i].getAttribute("id").split("_")[0]
-            var inputId = `${teamId}_mtg-${count+1}`;
+            var inputId = `${teamId}_mtg_${count+1}`;
 
             input.setAttribute('style', 'max-width: 80px');
             input.setAttribute('id', inputId);
-            input.setAttribute('onfocusout',`getInformation('${inputId}')`);
+            input.setAttribute('data-prev-val', "")
+            input.setAttribute('onkeypress',`addDate(event, "${inputId}")`);
             newTd.appendChild(input);
 
             var lastTdIndex = rows[i].cells.length - 1;

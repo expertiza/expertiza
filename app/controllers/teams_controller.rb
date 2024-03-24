@@ -1,5 +1,6 @@
 class TeamsController < ApplicationController
   include AuthorizationHelper
+  include MentorMeetingsHelper
 
   autocomplete :user, :name
 
@@ -53,7 +54,7 @@ class TeamsController < ApplicationController
     unless @assignment.nil?
       if @assignment.auto_assign_mentor
         @model = MentoredTeam
-
+        # MentorMeeting.delete_all
         @mentor_meetings = MentorMeeting.all
       else
         @model = AssignmentTeam
@@ -63,6 +64,8 @@ class TeamsController < ApplicationController
     begin
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
+
+      @meetings_map = get_dates_for_team(@child_nodes)
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end

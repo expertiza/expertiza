@@ -92,11 +92,11 @@ class Team < ApplicationRecord
       assignment_name = assignment_id ? Assignment.find(assignment_id).name.to_s : ''
       # Now that a new team member has been added to a team, send an email to them letting them know
       if MentorManagement.user_a_mentor?(user)
-        MailerHelper.send_team_confirmation_mail_to_user(user, '[Expertiza] Added to a Team', 'mentor_added_to_team', "#{name}", assignment_name).deliver
+        MailerHelper.send_team_confirmation_mail_to_user(user, '[Expertiza] Added to a Team', 'mentor_added_to_team', name.to_s, assignment_name).deliver
       elsif !user.is_a?(Participant)
         # If the user is a participant, then we don't went to send them emails since that class is something
         # completely out of the scope of this project
-        MailerHelper.send_team_confirmation_mail_to_user(user, '[Expertiza] Added to a Team', 'user_added_to_team', "#{name}", assignment_name).deliver
+        MailerHelper.send_team_confirmation_mail_to_user(user, '[Expertiza] Added to a Team', 'user_added_to_team', name.to_s, assignment_name).deliver
       end
 
     end
@@ -110,7 +110,7 @@ class Team < ApplicationRecord
     members = TeamsUser.where(team_id: team_id)
     members.each do |member|
       member_name = member.name
-      unless member_name.include?(' (Mentor)') 
+      unless member_name.include?(' (Mentor)')
         count = count + 1
       end
     end

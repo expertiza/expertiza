@@ -24,6 +24,7 @@
     @full_name = @user.fullname.gsub(/(\d+),\s*(\w+)/, '\2 \1')
     if child_node.get_name(session[:ip]).include?("(Mentor)")
       @ta_name = @full_name
+      @ta_username = @user.name
     else
       @student_full_names << @full_name
       @student_email << @user.email
@@ -40,58 +41,60 @@
   @combined_emails = @student_email.join(", ")
 %>
 
-<%= @combined_names %>
+<%
+  @can_edit = (session["user"].role_id == 2 or (session["user"].name == @ta_username))
+%>
 
-<%# unless @student_count == 0 %>
-  <tr
-    <% if rowtype != nil %>class="<%= rowtype %>" id="<%= prefix %>"
-    <% elsif prefix != nil %>id="<%= prefix %>" style="display: none;" name="team member"
-    <% end %>
-  >
-    <td>
-      <%= team_name %>
-    </td>
-    <td style="max-width: 200px">
-      <%= @combined_full_names %>
-    </td>
-    <% @student_names.each_with_index do |name, idx| %>
-      <% if not name.empty? %>
-        <td><%= name %> <br />
-          <%= link_to image_tag("delete_icon.png", :border=>0, :alt => "Delete Team User", :title => "Delete Team User"), :controller=>'teams_users', :action=>'delete', :id => @student_ids[idx] %>
-        </td>
-      <% else %>
-        <td></td>
-      <% end %>
-    <% end %>
-    <td style="max-width: fit-content">
-      <%= @combined_emails %>
-    </td>
-    <% if @student_count == 3 %>
-      <td>
-        <%= @ta_name %>
+<tr
+  <% if rowtype != nil %>class="<%= rowtype %>" id="<%= prefix %>"
+  <% elsif prefix != nil %>id="<%= prefix %>" style="display: none;" name="team member"
+  <% end %>
+>
+  <td>
+    <%= team_name %>
+  </td>
+  <td style="max-width: 200px">
+    <%= @combined_full_names %>
+  </td>
+  <% @student_names.each_with_index do |name, idx| %>
+    <% if not name.empty? %>
+      <td><%= name %> <br />
+        <%= link_to image_tag("delete_icon.png", :border=>0, :alt => "Delete Team User", :title => "Delete Team User"), :controller=>'teams_users', :action=>'delete', :id => @student_ids[idx] %>
       </td>
-    <% else %>
+    <% else
+         @can_edit = false
+    %>
       <td></td>
     <% end %>
-    <%= render :partial => '/tree_display/actions/'+node.get_partial_name,
-               :locals => {:node => node} %>
-      <%
-        (1..@max_dates_length).each do |index|
-      %>
-        <td class="mtg">
-          <input style="max-width: 80px" id="<%= team_name %>_mtg_<%= index %>" value="<%= find_date(team_id, index - 1) %>" onkeypress="
-            addDate(event,'<%= team_name %>_mtg_<%= index %>')" data-prev-val="<%= find_date(team_id, index - 1).to_s %>">
-        </td>
-      <%
-        end
-      %>
-    <td id="add_row_<%= prefix %>" style="cursor:pointer;">
-      <span onclick="addRow()">
-        <%= image_tag("plus.png", :border=>0, :alt => "Add new date column", :title => "Add new date column") %>
-      </span>
+  <% end %>
+  <td style="max-width: fit-content">
+    <%= @combined_emails %>
+  </td>
+  <% if @student_count == 3 %>
+    <td>
+      <%= @ta_name %>
     </td>
-  </tr>
-<%# end %>
+  <% else %>
+    <td></td>
+  <% end %>
+  <%= render :partial => '/tree_display/actions/'+node.get_partial_name,
+             :locals => {:node => node} %>
+    <%
+      (1..@max_dates_length).each do |index|
+    %>
+      <td class="mtg">
+        <input style="max-width: 80px" id="<%= team_name %>_mtg_<%= index %>" value="<%= find_date(team_id, index - 1) %>" onkeypress="
+          addDate(event,'<%= team_name %>_mtg_<%= index %>')" data-prev-val="<%= find_date(team_id, index - 1).to_s %>" <%= @can_edit ? '' : 'disabled' %>>
+      </td>
+    <%
+      end
+    %>
+  <td id="add_row_<%= prefix %>" style="cursor:pointer;">
+    <span onclick="addRow()">
+      <%= image_tag("plus.png", :border=>0, :alt => "Add new date column", :title => "Add new date column") %>
+    </span>
+  </td>
+</tr>
 
 <script>
   function validateDate(dateString, input) {

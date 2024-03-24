@@ -46,6 +46,7 @@
 %>
 
 <tr
+  data-editable="<%= @student_count < 3 ? 'false' : 'true' %>"
   <% if rowtype != nil %>class="<%= rowtype %>" id="<%= prefix %>"
   <% elsif prefix != nil %>id="<%= prefix %>" style="display: none;" name="team member"
   <% end %>
@@ -230,6 +231,10 @@
             input.setAttribute('id', inputId);
             input.setAttribute('data-prev-val', "")
             input.setAttribute('onkeypress',`addDate(event, "${inputId}")`);
+            if (rows[i].getAttribute("data-editable") === "false") {
+                input.disabled = true;
+            }
+
             newTd.appendChild(input);
 
             var lastTdIndex = rows[i].cells.length - 1;

@@ -23,7 +23,7 @@
     %>
 
   <!-- Start Listing -->
-  <%= render :partial=> '/tree_display/entry_assignments', :locals => {:search => @search, :node => node, :prefix => node.node_object_id.to_s+"_"+index.to_s, :depth => 0, :rowtype => rowtype} %>
+  <%= render :partial=> '/tree_display/entry_assignments', :locals => {:search => @search, :node => node, :prefix => node.node_object_id.to_s+"_"+index.to_s, :depth => 0, :rowtype => rowtype, :assignment_id => assignment_id, :@mentor_meetings => @mentor_meetings} %>
   <!-- End Listing -->
   <%
     end

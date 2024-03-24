@@ -66,43 +66,23 @@
     <%= render :partial => '/tree_display/actions/'+node.get_partial_name,
                :locals => {:node => node} %>
     <td>
-      <input style="max-width: 80px" id="mtg-1" onfocusout="getInformation('mtg-1')">
+      <input style="max-width: 80px" id="<%=prefix.split('_').first %>_mtg-1" onfocusout="getInformation('<%=prefix.split('_').first %>_mtg-1')">
     </td>
     <td>
-      <input style="max-width: 80px" id="mtg-2" onfocusout="getInformation('mtg-2')">
+      <input style="max-width: 80px" id="<%=prefix.split('_').first %>_mtg-2" onfocusout="getInformation('<%=prefix.split('_').first %>_mtg-2')">
     </td>
     <td>
-      <input style="max-width: 80px" id="mtg-3" onfocusout="getInformation('mtg-3')">
+      <input style="max-width: 80px" id="<%=prefix.split('_').first %>_mtg-3" onfocusout="getInformation('<%=prefix.split('_').first %>_mtg-3')">
     </td>
     <td id="add_row_<%= prefix %>" style="cursor:pointer;">
-      <%= image_tag("plus.png", :border=>0, :alt => "Add new date column", :title => "Add new date column") %>
+      <span onclick="addRow()">
+        <%= image_tag("plus.png", :border=>0, :alt => "Add new date column", :title => "Add new date column") %>
+      </span>
     </td>
   </tr>
 <%# end %>
 
 <script>
-  $(document).ready(function () {
-    fetch('/get_mentor_meeting_dates', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
-      if (response.ok) {
-          return response.text();
-      } else {
-          console.error('Error fetching mentor meeting dates:', response.statusText);
-      }
-    })
-    .then(data => {
-        console.log(data);
-    })
-    .catch(error => {
-        console.error('Error processing data:', error);
-    });
-  });
-
   function getInformation(inputId) {
       var input = document.getElementById(inputId);
       var team_id = parseInt(input.parentElement.parentElement.getAttribute("id").split('_')[0]);
@@ -134,7 +114,7 @@
           return;
       }
       $.ajax({
-          url: '/add_mentor_meeting_date',
+          url: '/add_date',
           method: 'POST',
           contentType: 'application/json',
           data: JSON.stringify({ meeting_date: textValue, team_id: team_id }),
@@ -146,8 +126,8 @@
           }
       });
     }
-    var addRow = document.getElementById(`add_row_<%= prefix %>`);
-    addRow.addEventListener('click', function() {
+
+    function addRow() {
         var thRow = document.getElementById('header')
         var thElements = thRow.getElementsByTagName('th');
 
@@ -163,21 +143,23 @@
         newth.innerText = `${count + 1}th mtg.`
         thRow.insertBefore(newth, thRow.lastElementChild);
 
-        var newTd = document.createElement('td');
-        var input = document.createElement('input');
-        var inputId = `mtg-${count+1}`;
-        input.setAttribute('style', 'max-width: 80px');
-        input.setAttribute('id', inputId);
-        input.setAttribute('onfocusout',`getInformation('${inputId}')`);
-        newTd.appendChild(input);
-
         var table = document.getElementById('mentored_assignment_table');
         var rows = table.getElementsByTagName('tr');
 
         for (var i = 1; i < rows.length; i++) {
+            var newTd = document.createElement('td');
+            var input = document.createElement('input');
+            var teamId = rows[i].getAttribute("id").split("_")[0]
+            var inputId = `${teamId}_mtg-${count+1}`;
+
+            input.setAttribute('style', 'max-width: 80px');
+            input.setAttribute('id', inputId);
+            input.setAttribute('onfocusout',`getInformation('${inputId}')`);
+            newTd.appendChild(input);
+
             var lastTdIndex = rows[i].cells.length - 1;
             var lastTd = rows[i].cells[lastTdIndex];
             rows[i].insertBefore(newTd.cloneNode(true), lastTd);
         }
-    })
+        }
 </script>

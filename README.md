@@ -1,3 +1,5 @@
+Link to wiki page of E2400_Allow_Reviewers_to_Bid_on_What_to_Review: https://wiki.expertiza.ncsu.edu/index.php?title=CSC/ECE_517_Spring_2024/_OSS_E2400_Allow_Reviewers_to_Bid_on_What_to_Review
+
 Expertiza
 =========
 

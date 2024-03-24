@@ -119,6 +119,7 @@ class AssignmentForm
           # calling the full_messages method instead of to_s method
           @errors = @assignment.errors.full_messages
           @has_errors = true
+          next
         end
       end
     end

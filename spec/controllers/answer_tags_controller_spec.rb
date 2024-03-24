@@ -1,7 +1,8 @@
 # TODO: Determine which skeleton tests have already been implemented.
 
 describe AnswerTagsController do
-  # factory objects required for "action_allowed" test cases
+  # Set up factory objects for testing
+  # These objects simulate database records that are needed for the testing.
   let!(:instructor) { build(:instructor, id: 1) }
   let!(:student) { build(:student, id: 1) }
   let!(:assignment) { create(:assignment, name: 'assignment', directory_path: 'assignment', id: 1) }
@@ -11,7 +12,7 @@ describe AnswerTagsController do
   let!(:tag_prompt_deployment2) { create(:tag_prompt_deployment, id: 2, assignment_id: 2, questionnaire_id: 1) }
   let!(:answer_tag) { create(:answer_tag, id: 1, tag_prompt_deployment_id: 1, user_id: student.id) }
 
-  # factory objects required for "create_edit" test cases - since creating answer tags and updating answer tags requires pre mapping of answer and tag deployment key constraints
+  # Factory objects required for "create_edit" test cases - since creating answer tags and updating answer tags requires pre mapping of answer and tag deployment key constraints
   let!(:student2) { build(:student, id: 2) }
   let!(:assignment3) { create(:assignment, name: 'assignment3', directory_path: 'assignment3', id: 3) }
   let!(:questionnaire1) { create(:questionnaire, name: 'questionnaire1', id: 2) }
@@ -22,49 +23,63 @@ describe AnswerTagsController do
   let!(:tag_prompt) { create(:tag_prompt, id: 3, prompt: '??', desc: 'desc', control_type: 'slider') }
   let!(:tag_deploy) { create(:tag_prompt_deployment, id: 3, tag_prompt: tag_prompt, question_type: 'Criterion') }
 
-
+  # Tests for checking permissions based on user roles and session status
   # To allow the functionality only if the accessing user is having student privileges
   # params: action
   describe '#action_allowed?' do
-    context 'when user with student privilege, actions index and create_edit should be allowed' do
+    # Verifies that students can perform certain actions
+    context 'when user with student privileges accesses the controller' do
       before(:each) do
         controller.request.session[:user] = student
       end
 
-      it 'when action index is accessed' do
-        controller.params = { id: '1', action: 'index' }
-        expect(controller.send(:action_allowed?)).to be true
+      context 'accessing index action' do
+        it 'allows access' do
+          controller.params = { id: '1', action: 'index' }
+          expect(controller.send(:action_allowed?)).to be true
+        end
+      end
+      
+      context 'accessing create_edit action' do
+        it 'allows access' do
+          controller.params = { id: '1', action: 'create_edit' }
+          expect(controller.send(:action_allowed?)).to be true
+        end
       end
 
-      it 'when action create_edit is accessed' do
-        controller.params = { id: '1', action: 'create_edit' }
-        expect(controller.send(:action_allowed?)).to be true
-      end
-
-      it 'when action destroy is accessed' do
-        controller.params = { id: '1', action: 'destroy' }
-        expect(controller.send(:action_allowed?)).to be nil
+      context 'accessing destroy action' do
+        it 'allow accessed' do
+          controller.params = { id: '1', action: 'destroy' }
+          expect(controller.send(:action_allowed?)).to be nil
+        end
       end
     end
 
-    context 'when the session is not defined, all the actions are restricted' do
+    # Ensures that actions are restricted when the session is undefined
+    context 'with undefined session' do
       before(:each) do
         controller.request.session[:user] = nil
       end
 
-      it 'when action index is accessed' do
-        controller.params = { id: '1', action: 'index' }
-        expect(controller.send(:action_allowed?)).to be false
+      context 'accessing index action' do
+        it 'denies access' do
+          controller.params = { id: '1', action: 'index' }
+          expect(controller.send(:action_allowed?)).to be false
+        end
+      end
+      
+      context 'accessing index action' do
+        it 'denies access' do
+          controller.params = { id: '1', action: 'create_edit' }
+          expect(controller.send(:action_allowed?)).to be false
+        end
       end
 
-      it 'when action create_edit is accessed' do
-        controller.params = { id: '1', action: 'create_edit' }
-        expect(controller.send(:action_allowed?)).to be false
-      end
-
-      it 'when action destroy is accessed' do
-        controller.params = { id: '1', action: 'destroy' }
-        expect(controller.send(:action_allowed?)).to be nil
+      context 'accessing index action' do
+        it 'denies access' do
+          controller.params = { id: '1', action: 'destroy' }
+          expect(controller.send(:action_allowed?)).to be nil
+        end
       end
     end
   end
@@ -72,127 +87,161 @@ describe AnswerTagsController do
 
   # Test index method used to return all tag prompt deployments in JSON format
   describe '#index' do
-    context 'tag prompt deployments are requested' do
+    context 'tag prompt deployments are requested by user' do
       before(:each) do
         controller.request.session[:user] = student
       end
 
-      it 'when there are no tag prompt deployments' do
-        allow(TagPromptDeployment).to receive(:all).and_return(TagPromptDeployment.none)
-        get :index
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(0)
+      context 'and none are available' do
+        it 'returns no tag prompts' do
+          allow(TagPromptDeployment).to receive(:all).and_return(TagPromptDeployment.none)
+          get :index
+          output = JSON.parse(response.body)
+          expect(output.length).to eql(0)
+        end
       end
 
-      it 'when there is one answer tag' do
-        get :index
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(1)
+      context 'and only one is present' do
+        it 'returns a list with only one tag prompt' do
+          get :index
+          output = JSON.parse(response.body)
+          expect(output.length).to eql(1)
+        end
       end
 
-      it 'when there is one tag prompt deployment but has no answer tag' do
-        request_params = { assignment_id: 2 }
-        get :index, params: request_params
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(0)
+      context 'and only one tag prompt deployment is present but has no answer tag' do
+        it 'returns no tag prompts for that assignment' do
+          request_params = { assignment_id: 2 }
+          get :index, params: request_params
+          output = JSON.parse(response.body)
+          expect(output.length).to eql(0)
+        end
       end
 
-      it 'when there is one answer tag for given user_id' do
-        request_params = { user_id: student.id }
-        get :index, params: request_params
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(1)
+      context 'and only one answer tag is present for the given user_id' do
+        it 'returns a list with one tag prompt' do
+          request_params = { user_id: student.id }
+          get :index, params: request_params
+          output = JSON.parse(response.body)
+          expect(output.length).to eql(1)
+        end
       end
 
-      it 'when there is one answer tag for given assignment_id' do
-        request_params = { assignment_id: assignment.id }
-        get :index, params: request_params
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(1)
+      context 'and only one answer tag is present for the given assignment_id' do
+        it 'returns a list with one tag prompt' do
+          request_params = { assignment_id: assignment.id }
+          get :index, params: request_params
+          output = JSON.parse(response.body)
+          expect(output.length).to eql(1)
+        end
       end
 
-      it 'when there is one answer tag for given questionnaire_id' do
-        request_params = { questionnaire_id: questionnaire.id }
-        get :index, params: request_params
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(1)
+      context 'and only one answer tag is present fo the given questionnaire_id' do
+        it 'returns a list with one tag prompt' do
+          request_params = { questionnaire_id: questionnaire.id }
+          get :index, params: request_params
+          output = JSON.parse(response.body)
+          expect(output.length).to eql(1)
+        end
       end
 
-      it 'when there is one answer tag for given user_id, assignment_id, and questionnaire_id' do
-        request_params = { user_id: student.id, assignment_id: assignment.id, questionnaire_id: questionnaire.id }
-        get :index, params: request_params
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(1)
+      context 'and only one answer tag is present for the given user_id, assignment_id, and questionnaire_id' do
+        it 'returns a list with one tag prompt' do
+          request_params = { user_id: student.id, assignment_id: assignment.id, questionnaire_id: questionnaire.id }
+          get :index, params: request_params
+          output = JSON.parse(response.body)
+          expect(output.length).to eql(1)
+        end
       end
 
-      it 'when there is no answer tag for given user_id' do
-        request_params = { user_id: student2.id }
-        get :index, params: request_params
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(0)
+      context 'and no answer tags are present for the given user_id' do
+        it 'returns no tag prompts' do
+          request_params = { user_id: student2.id }
+          get :index, params: request_params
+          output = JSON.parse(response.body)
+          expect(output.length).to eql(0)
+        end
       end
 
-      it 'when there is no answer tag for given assignment_id' do
-        request_params = { assignment_id: assignment3.id }
-        get :index, params: request_params
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(0)
+      context 'and no answer tags are present for the given assignment_id' do
+        it 'returns no tag prompts' do
+          request_params = { assignment_id: assignment3.id }
+          get :index, params: request_params
+          output = JSON.parse(response.body)
+          expect(output.length).to eql(0)
+        end
       end
 
-      it 'when there is no answer tag for given questionnaire_id' do
-        request_params = { questionnaire_id: questionnaire1.id }
-        get :index, params: request_params
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(0)
+      context 'and no answer tags are present for the given questionnaire_id' do
+        it 'returns no tag prompts' do
+          request_params = { questionnaire_id: questionnaire1.id }
+          get :index, params: request_params
+          output = JSON.parse(response.body)
+          expect(output.length).to eql(0)
+        end
       end
 
-      it 'when there is no answer tag for given user_id, assignment_id, and questionnaire_id' do
-        request_params = { user_id: student2.id, assignment_id: assignment3.id, questionnaire_id: questionnaire.id }
-        get :index, params: request_params
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(0)
+      context 'and no answer tags are present for the given user_id, assignment_id, and questionnaire_id' do
+        it 'returns no tag prompts' do
+          request_params = { user_id: student2.id, assignment_id: assignment3.id, questionnaire_id: questionnaire.id }
+          get :index, params: request_params
+          output = JSON.parse(response.body)
+          expect(output.length).to eql(0)
+        end
       end
 
-      it 'when there are no answer tags for given undefined user_id' do
-        request_params = { user_id: 42 }
-        get :index, params: request_params
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(0)
+      context 'and no answer tags are present for given undefined user_id' do
+        it 'returns no tag prompts' do
+          request_params = { user_id: 42 }
+          get :index, params: request_params
+          output = JSON.parse(response.body)
+          expect(output.length).to eql(0)
+        end
       end
 
-      it 'when there are no answer tags for given undefined assignment_id' do
-        request_params = { assignment_id: 42 }
-        get :index, params: request_params
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(0)
+      context 'and no answer tags are present for given undefined assignment_id' do
+        it 'returns no tag prompts' do
+          request_params = { assignment_id: 42 }
+          get :index, params: request_params
+          output = JSON.parse(response.body)
+          expect(output.length).to eql(0)
+        end
       end
 
-      it 'when there are no answer tags for given undefined questionnaire_id' do
-        request_params = { questionnaire_id: 42 }
-        get :index, params: request_params
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(0)
+      context 'and no answer tags are present for given undefined questionnnaire_id' do
+        it 'returns no tag prompts' do
+          request_params = { questionnaire_id: 42 }
+          get :index, params: request_params
+          output = JSON.parse(response.body)
+          expect(output.length).to eql(0)
+        end
       end
 
-      it 'when the user_id is nil' do
-        request_params = { user_id: nil }
-        get :index, params: request_params
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(0)
+      context 'and user_id is nil' do
+        it 'returns no tag prompts' do
+          request_params = { user_id: nil }
+          get :index, params: request_params
+          output = JSON.parse(response.body)
+          expect(output.length).to eql(0)
+        end
       end
 
-      it 'when the questionnaire_id is nil' do
-        request_params = { questionnaire_id: nil }
-        get :index, params: request_params
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(0)
+      context 'and questionnaire_id is nil' do
+        it 'returns no tag prompts' do
+          request_params = { questionnaire_id: nil }
+          get :index, params: request_params
+          output = JSON.parse(response.body)
+          expect(output.length).to eql(0)
+        end
       end
 
-      it 'when the assignment_id is nil' do
-        request_params = { assignment_id: nil }
-        get :index, params: request_params
-        output = JSON.parse(response.body)
-        expect(output.length).to eql(0)
+      context 'and assignment_id is nil' do
+        it 'returns no tag prompts' do
+          request_params = { assignment_id: nil }
+          get :index, params: request_params
+          output = JSON.parse(response.body)
+          expect(output.length).to eql(0)
+        end
       end
     end
   end
@@ -252,32 +301,40 @@ describe AnswerTagsController do
         controller.request.session[:user] = student
       end
 
-      it 'add entry if not existing and update the old value by new value provided as param' do
-        request_params = { answer_id: answer.id, tag_prompt_deployment_id: tag_deploy.id, value: '0' }
-        post :create_edit, params: request_params
-        expect(response).to have_http_status(200)
-        expect(AnswerTag.find_by(answer_id: answer.id).value).to eql('0')
+      context 'and entry does not exist' do
+        it 'add entry and update the old value by new value provided as param' do
+          request_params = { answer_id: answer.id, tag_prompt_deployment_id: tag_deploy.id, value: '0' }
+          post :create_edit, params: request_params
+          expect(response).to have_http_status(200)
+          expect(AnswerTag.find_by(answer_id: answer.id).value).to eql('0')
+        end
       end
 
-      it 'restricts updating answer tag by student if no mapping is found related to any answer for that tag (foreign key constraint)' do
-        request_params = { answer_id: nil, tag_prompt_deployment_id: tag_deploy.id, value: '0' }
-        expect do
-          post :create_edit, params: request_params
-        end.to raise_error(ActiveRecord::RecordInvalid)
+      context 'and no mapping is found related to any answer for that tag (foreign key contraint)' do
+        it 'restricts updating answer tag by student' do
+          request_params = { answer_id: nil, tag_prompt_deployment_id: tag_deploy.id, value: '0' }
+          expect do
+            post :create_edit, params: request_params
+          end.to raise_error(ActiveRecord::RecordInvalid)
+        end
       end
 
-      it 'restricts updating answer tag by student if no mapping is found related to any tag_prompt_deployment for that tag (foreign key constraint)' do
-        request_params = { answer_id: answer.id, tag_prompt_deployment_id: nil, value: '0' }
-        expect do
-          post :create_edit, params: request_params
-        end.to raise_error(ActiveRecord::RecordInvalid)
+      context 'and no mapping is found related to any tag_prompt_deployment for that tag (foreign key constraint)' do
+        it 'restricts updating answer tag by student' do
+          request_params = { answer_id: answer.id, tag_prompt_deployment_id: nil, value: '0' }
+          expect do
+            post :create_edit, params: request_params
+          end.to raise_error(ActiveRecord::RecordInvalid)
+        end
       end
 
-      it 'restricts updating answer tag by student if no updated value is provided for the answer tag' do
-        request_params = { answer_id: answer.id, tag_prompt_deployment_id: tag_deploy.id, value: nil }
-        expect do
-          post :create_edit, params: request_params
-        end.to raise_error(ActiveRecord::RecordInvalid)
+      context 'and no updated value is provided for the answer tag' do
+        it 'restricts updating answer tag by student' do
+          request_params = { answer_id: answer.id, tag_prompt_deployment_id: tag_deploy.id, value: nil }
+          expect do
+            post :create_edit, params: request_params
+          end.to raise_error(ActiveRecord::RecordInvalid)
+        end
       end
     end
   end

@@ -29,6 +29,7 @@ module MailerHelper
       }
     )
   end
+
   def self.send_mail_to_all_super_users(super_user, user, subject)
     Mailer.request_user_message(
       to: super_user.email,

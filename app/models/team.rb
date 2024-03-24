@@ -77,7 +77,7 @@ class Team < ApplicationRecord
   end
 
   # Add member to the team, changed to hash by E1776
-  def add_member(user, _assignment_id = nil)
+  def add_member(user, assignment_id = nil)
     raise "The user #{user.name} is already a member of the team #{name}" if user?(user)
 
     can_add_member = false
@@ -89,14 +89,14 @@ class Team < ApplicationRecord
       add_participant(parent_id, user)
       ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{id}")
       # if assignment_id is nil, then don't send an assignment name
-      assignment_name = _assignment_id ? Assignment.find(_assignment_id).name.to_s : ""
+      assignment_name = assignment_id ? Assignment.find(assignment_id).name.to_s : ''
       # Now that a new team member has been added to a team, send an email to them letting them know
       if MentorManagement.user_a_mentor?(user)
-        MailerHelper.send_team_confirmation_mail_to_user(user, "[Expertiza] Added to a Team", "mentor_added_to_team", "#{name}", assignment_name).deliver
+        MailerHelper.send_team_confirmation_mail_to_user(user, '[Expertiza] Added to a Team', 'mentor_added_to_team', "#{name}", assignment_name).deliver
       elsif !user.is_a?(Participant)
         # If the user is a participant, then we don't went to send them emails since that class is something
         # completely out of the scope of this project
-        MailerHelper.send_team_confirmation_mail_to_user(user, "[Expertiza] Added to a Team", "user_added_to_team", "#{name}", assignment_name).deliver
+        MailerHelper.send_team_confirmation_mail_to_user(user, '[Expertiza] Added to a Team', 'user_added_to_team', "#{name}", assignment_name).deliver
       end
 
     end

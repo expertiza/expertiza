@@ -83,7 +83,6 @@ class MentorManagement
     Mailer.delayed_message(bcc: emails,
                            subject: '[Expertiza]: New Mentor Assignment',
                            body: message).deliver_now
-
   end
 
   # Returns true if [user] is a mentor, and false if not.

@@ -105,29 +105,27 @@ describe Team do
           allow_any_instance_of(Team).to receive(:add_participant).with(1, user).and_return(double('Participant'))
         end
         it 'sends mail to mentor if user is a mentor' do
-            allow(MentorManagement).to receive(:user_a_mentor?).with(user).and_return(true)
-            allow(Assignment).to receive(:find).with(1).and_return(assignment)
-            allow(MailerHelper).to receive(:send_team_confirmation_mail_to_user).and_return(double('Mail', deliver: true))
+          allow(MentorManagement).to receive(:user_a_mentor?).with(user).and_return(true)
+          allow(Assignment).to receive(:find).with(1).and_return(assignment)
+          allow(MailerHelper).to receive(:send_team_confirmation_mail_to_user).and_return(double('Mail', deliver: true))
 
-            expect(MailerHelper).to receive(:send_team_confirmation_mail_to_user).with(user, "[Expertiza] Added to a Team", "mentor_added_to_team", "#{team.name}", "").and_return(double('Mail', deliver: true))
+          expect(MailerHelper).to receive(:send_team_confirmation_mail_to_user).with(user, '[Expertiza] Added to a Team', 'mentor_added_to_team', team.name.to_s, '').and_return(double('Mail', deliver: true))
 
-            expect(team.add_member(user)).to be true
+          expect(team.add_member(user)).to be true
         end
 
         it 'sends mail to user if user is a user' do
-            allow(MentorManagement).to receive(:user_a_mentor?).with(user).and_return(false)
-            allow(Assignment).to receive(:find).with(1).and_return(assignment)
-            allow(MailerHelper).to receive(:send_team_confirmation_mail_to_user).and_return(double('Mail', deliver: true))
+          allow(MentorManagement).to receive(:user_a_mentor?).with(user).and_return(false)
+          allow(Assignment).to receive(:find).with(1).and_return(assignment)
+          allow(MailerHelper).to receive(:send_team_confirmation_mail_to_user).and_return(double('Mail', deliver: true))
 
-            expect(MailerHelper).to receive(:send_team_confirmation_mail_to_user).with(user, "[Expertiza] Added to a Team", "user_added_to_team", "#{team.name}", "").and_return(double('Mail', deliver: true))
+          expect(MailerHelper).to receive(:send_team_confirmation_mail_to_user).with(user, '[Expertiza] Added to a Team', 'user_added_to_team', team.name.to_s, '').and_return(double('Mail', deliver: true))
 
-            expect(team.add_member(user)).to be true
+          expect(team.add_member(user)).to be true
         end
       end
     end
   end
-
-
 
   describe '.size' do
     it 'returns the size of current team' do

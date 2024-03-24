@@ -59,6 +59,26 @@ class CourseTeam < Team
     fields.push('Course Name')
   end
 
+# Adds a participant to the course.
+  def add_participant(user_name)
+    user = User.find_by(name: user_name)
+    if user.nil?
+      raise 'No user account exists with the name ' + user_name + ". Please <a href='" + url_for(controller: 'users', action: 'new') + "'>create one</a>."
+    end
+    begin
+      participant = CourseParticipant.find_by(parent_id: id, user_id: user.id)
+      if participant # If there is already a participant, raise an error. Otherwise, create it
+        raise "The user #{user.name} is already a participant."
+      else
+				CourseParticipant.create(parent_id: id, user_id: user.id, permission_granted: user.master_permission_granted)
+      end
+    rescue ActiveRecord::RecordNotFound => e
+      raise "Error adding participant: #{e.message}"
+    rescue ActiveRecord::RecordInvalid => e
+      raise "Error adding participant: #{e.message}"
+    end
+  end
+
   # Add member to the course team
   def add_member(user, _id = nil)
     raise "The user \"#{user.name}\" is already a member of the team, \"#{name}\"" if user?(user)

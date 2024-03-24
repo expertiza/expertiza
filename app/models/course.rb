@@ -30,25 +30,7 @@ class Course < ApplicationRecord
     Rails.root + '/pg_data/' + FileHelper.clean_path(User.find(instructor_id).name) + '/' + FileHelper.clean_path(directory_path) + '/'
   end
   
-# Adds a participant to the course.
-  def add_participant(user_name)
-    user = User.find_by(name: user_name)
-    if user.nil?
-      raise 'No user account exists with the name ' + user_name + ". Please <a href='" + url_for(controller: 'users', action: 'new') + "'>create</a> the user first."
-    end
-    begin
-      participant = CourseParticipant.find_by(parent_id: id, user_id: user.id)
-      if participant # If there is already a participant, raise an error. Otherwise, create it
-        raise "The user #{user.name} is already a participant."
-      else
-        CourseParticipant.create(parent_id: id, user_id: user.id, permission_granted: user.master_permission_granted)
-      end
-    rescue ActiveRecord::RecordNotFound => e
-      raise "Error adding participant: #{e.message}"
-    rescue ActiveRecord::RecordInvalid => e
-      raise "Error adding participant: #{e.message}"
-    end
-  end
+
 # Copies assignment participants to the course.
   def copy_assignment_participants(assignment_id)
     participants = AssignmentParticipant.where(parent_id: assignment_id)

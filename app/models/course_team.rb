@@ -1,10 +1,6 @@
 class CourseTeam < Team
   belongs_to :course, class_name: 'Course', foreign_key: 'parent_id'
 
-  # NOTE: inconsistency in naming of users that's in the team
-  #   currently they are being called: member, participant, user, etc...
-  #   suggestion: refactor all to participant
-
   # Get parent course
   def parent_model
     'Course'
@@ -13,11 +9,6 @@ class CourseTeam < Team
   def self.parent_model(course_id)
     Course.find(course_id)
   end
-
-  # since this team is not an assignment team, the assignment_id is nil.
- # def assignment_id
-   # nil
- # end
 
   # Prototype method to implement prototype pattern
   def self.prototype
@@ -37,28 +28,21 @@ class CourseTeam < Team
     copy_members(new_team)
   end
 
-  # Import from csv
-  def self.import(row, course_id, options)
-    raise ImportError, 'The course with the id "' + course_id.to_s + "\" was not found. <a href='/courses/new'>Create</a> this course?" if Course.find(course_id).nil?
-
-    @course_team = prototype
-    Team.import(row, course_id, options, @course_team)
+    # Delegates the import functionality to the TeamCsvHandler.
+  def self.import_from_csv(row, course_id, options = {})
+    TeamCsvHandler.import(row, course_id, options)
   end
 
-  # Export to csv
-  def self.export(csv, parent_id, options)
-    @course_team = prototype
-    Team.export(csv, parent_id, options, @course_team)
+  # Delegates the export functionality to the TeamCsvHandler.
+  def self.export_to_csv(parent_id, options = {})
+    TeamCsvHandler.export(parent_id, options)
   end
 
-  # Export the fields of the csv column
-  def self.export_fields(options)
-    fields = []
-    fields.push('Team Name')
-    fields.push('Team members') if options[:team_name] == 'false'
-    fields.push('Course Name')
+  # Defines the fields to be exported for the CSV, based on options provided.
+  def self.export_fields(options = {})
+    TeamCsvHandler.export_fields(options)
   end
-
+	
 # Adds a participant to the course.
   def add_participant(user_name)
     user = User.find_by(name: user_name)

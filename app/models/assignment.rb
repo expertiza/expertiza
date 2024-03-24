@@ -48,23 +48,6 @@ class Assignment < ApplicationRecord
   DEFAULT_MAX_REVIEWERS = 3
   DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
 
-# Method to calculate the percentage of teams that got their first, second, third choices
-def percentage_of_teams_getting_choices
-  # The logic to calculate percentages will depend on how you're storing bid information
-  # and how you determine if a team has been awarded their choice.
-  choice_counts = { 1 => 0, 2 => 0, 3 => 0 } # Initialize count for each choice
-  teams.each do |team|
-    if team.assigned_topic
-      choice = team.bid_for_topic(team.assigned_topic)&.priority
-      choice_counts[choice] += 1 if choice
-    end
-  end
-
-  total_teams = teams.count.to_f
-  percentages = choice_counts.transform_values { |count| (count / total_teams * 100).round(2) }
-  percentages
-end
-
 # This method calculates the percentage of teams that got their 1st, 2nd, ... choice
 def calculate_percentage_of_teams_getting_choices
   sign_up_topics = SignUpTopic.where(assignment_id: id)

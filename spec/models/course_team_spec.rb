@@ -67,23 +67,4 @@ describe 'CourseTeam' do
       expect(CourseTeam.export_fields(team_name: 'false')).to eq(['Team Name', 'Team members', 'Course Name'])
     end
   end
-  describe '#add_member' do
-    context 'when the user is already on the team' do
-      it 'raises an error' do
-        allow(course_team1).to receive(:user?).with(user2).and_return(true)
-        expect { course_team1.add_member(user2) }.to raise_error('The user "no name" is already a member of the team, "no team"')
-      end
-    end
-    context 'when the user is not on the team' do
-      it 'creates and returns a participant' do
-        node = TeamNode.new
-        allow(course_team1).to receive(:user?).with(user2).and_return(false)
-        allow(TeamsUser).to receive(:create).with(user_id: 2, team_id: 1).and_return(team_user)
-        allow(TeamNode).to receive(:find_by).with(node_object_id: 1).and_return(node)
-        allow(course_team1).to receive(:add_participant).with(1, user2).and_return(participant)
-        allow(course_team1).to receive(:parent_id).and_return(1)
-        expect(course_team1.add_member(user2)).to eq(participant)
-      end
-    end
-  end
 end

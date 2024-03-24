@@ -53,6 +53,8 @@ class TeamsController < ApplicationController
     unless @assignment.nil?
       if @assignment.auto_assign_mentor
         @model = MentoredTeam
+
+        @mentor_meetings = MentorMeeting.all
       else
         @model = AssignmentTeam
       end

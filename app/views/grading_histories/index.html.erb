@@ -1,17 +1,5 @@
-<% record = @grading_histories[0]
-  if record == nil
-    receiver = ""
-    assignment = ""
-  else
-    if record.graded_item_type == "Submission"
-      assignment = "of " + Assignment.where(id: record.assignment_id).pluck(:name).first
-    else
-      assignment = "of review for " + Assignment.where(id: record.assignment_id).pluck(:name).first
-    end
-
-  end
-%>
-<h3 class="center">Grade History <%= assignment %></h3>
+<h3 class="center">Grade History of <%= @assignment %></h3>
+<h5 class="center"><%= @receiver %></h5>
 
 <table class="table table-striped" width="100%">
   <thead>

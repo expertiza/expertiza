@@ -8,8 +8,7 @@ class GradingHistoriesController < ApplicationController
     return true if current_user_has_admin_privileges?
     
     # populate assignment fields
-    assignment_team = AssignmentTeam.find(params[:graded_member_id])
-    GradingHistory.assignment_for_history(params[:grade_type], assignment_team, params[:participant_id])
+    @assignment = GradingHistory.assignment_for_history(params[:grade_type], params[:graded_member_id], params[:participant_id])
     # if not admin/superadmin, check permissions
     if @assignment.instructor_id == current_user.id
       true

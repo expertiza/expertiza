@@ -20,8 +20,8 @@ describe 'Assignment creation topics tab', js: true do
     visit "/assignments/#{assignment.id}/edit"
     click_link 'Due Dates'
     click_link 'New Late Policy'
-    fails if 
-      expect(flash[:error]).to be('Failed to save the assignment: ') 
+    fails if
+      expect(flash[:error]).to be('Failed to save the assignment: ')
     end
   end
 

@@ -51,38 +51,79 @@ class ReviewMappingController < ApplicationController
     @mapping = ResponseMap.find(params[:id])
   end
 
+  def find_assignment(id)
+    Assignment.find(id)
+  end
+
+  def find_user_by_name(name)
+    User.where(name: name).first.id
+  end
+
+  # Method to add a reviewer to an assignment
   def add_reviewer
-    assignment = Assignment.find(params[:id])
+    # Find the assignment based on the given ID
+    assignment = find_assignment(params[:id])
     topic_id = params[:topic_id]
-    user_id = User.where(name: params[:user][:name]).first.id
-    # If instructor want to assign one student to review his/her own artifact,
-    # it should be counted as "self-review" and we need to make /app/views/submitted_content/_selfreview.html.erb work.
-    if TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
+    user_name = params[:user][:name]
+    # Find the user ID by name
+    user_id = find_user_id_by_name(user_name)
+
+    # Check if the user is trying to review their own artifact
+    if user_trying_to_review_own_artifact?(params[:contributor_id], user_id)
       flash[:error] = 'You cannot assign this student to review his/her own artifact.'
     else
-      # Team lazy initialization
-      SignUpSheet.signup_team(assignment.id, user_id, topic_id)
-      msg = ''
-      begin
-        user = User.from_params(params)
-        # contributor_id is team_id
-        regurl = url_for id: assignment.id,
-                         user_id: user.id,
-                         contributor_id: params[:contributor_id]
-
-        # Get the assignment's participant corresponding to the user
-        reviewer = get_reviewer(user, assignment, regurl)
-        # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
-        # to treat all assignments as team assignments
-        if ReviewResponseMap.where(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id).first.nil?
-          ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
-        else
-          raise 'The reviewer, "' + reviewer.name + '", is already assigned to this contributor.'
-        end
-      rescue StandardError => e
-        msg = e.message
-      end
+      # Assign the reviewer to the assignment
+      assign_reviewer(assignment, topic_id, user_id, params[:contributor_id])
     end
+
+    # Redirect to list mappings after adding the reviewer
+    redirect_to_list_mappings(assignment)
+  end
+
+  # Method to find user ID by name
+  # Method to find user ID by name
+  def find_user_id_by_name(name)
+    user = find_user_by_name(name: name)
+    user.present? ? user.id : nil
+  end
+
+  # Method to check if the user is trying to review their own artifact
+  def user_trying_to_review_own_artifact?(contributor_id, user_id)
+    TeamsUser.exists?(team_id: contributor_id, user_id: user_id)
+  end
+
+  # Method to assign a reviewer to the assignment
+  def assign_reviewer(assignment, topic_id, user_id, contributor_id)
+    # Sign up the user for the assignment
+    SignUpSheet.signup_team(assignment.id, user_id, topic_id)
+    user = User.from_params(params)
+    # Generate registration URL
+    regurl = registration_url(assignment.id, user.id, contributor_id)
+    # Get the reviewer for the assignment
+    reviewer = get_reviewer(user, assignment, regurl)
+
+    # Create review response map for the assignment
+    create_review_response_map(contributor_id, reviewer.id, assignment.id)
+  end
+
+  # Method to generate registration URL
+  def registration_url(assignment_id, user_id, contributor_id)
+    url_for(id: assignment_id, user_id: user_id, contributor_id: contributor_id)
+  end
+
+  # Method to create review response map for the assignment
+  def create_review_response_map(contributor_id, reviewer_id, assignment_id)
+    if ReviewResponseMap.where(reviewee_id: contributor_id, reviewer_id: reviewer_id).first.nil?
+      # Create review response map if not already assigned
+      ReviewResponseMap.create(reviewee_id: contributor_id, reviewer_id: reviewer_id, reviewed_object_id: assignment_id)
+    else
+      # Raise an exception if the reviewer is already assigned
+      raise 'The reviewer is already assigned to this contributor.'
+    end
+  end
+
+  # Method to redirect to list mappings after adding the reviewer
+  def redirect_to_list_mappings(assignment)
     redirect_to action: 'list_mappings', id: assignment.id, msg: msg
   end
 
@@ -91,53 +132,89 @@ class ReviewMappingController < ApplicationController
   # This method is different from 'assignment_reviewer_automatically', which is in 'review_mapping_controller'
   # and is used for instructor assigning reviewers in instructor-selected assignment.
   def assign_reviewer_dynamically
-    assignment = Assignment.find(params[:assignment_id])
+    assignment = find_assignment(params[:assignment_id])
     participant = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
     reviewer = participant.get_reviewer
-    if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
-      flash[:error] = 'No topic is selected.  Please go back and select a topic.'
+    if topic_selection_error?(assignment)
+      flash[:error] = 'No topic is selected. Please go back and select a topic.' # Removed extra space
     else
       if review_allowed?(assignment, reviewer)
         if check_outstanding_reviews?(assignment, reviewer)
-          # begin
-          if assignment.topics? # assignment with topics
-            topic = if params[:topic_id]
-                      SignUpTopic.find(params[:topic_id])
-                    else
-                      begin
-                        assignment.candidate_topics_to_review(reviewer).to_a.sample
+          dynamically_assign_reviewer(assignment, reviewer)
+        else
+          flash[:error] = "You cannot do more reviews when you have #{Assignment.max_outstanding_reviews} reviews to do"
+        end
+      else
+        flash[:error] = "You cannot do more than #{assignment.num_reviews_allowed} reviews based on assignment policy"
+      end
+    end
+    redirect_to_student_review_list(participant)
+  end
+
+  # Method to find assignment participant
+  def find_participant_for_assignment(assignment, reviewer_id)
+    AssignmentParticipant.where(user_id: reviewer_id, parent_id: assignment.id).first
+  end
+
+  # Method to check if there is an error in topic selection
+  def topic_selection_error?(assignment)
+    params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
+  end
+
+  # Method to dynamically assign a reviewer based on assignment type
+  def dynamically_assign_reviewer(assignment, reviewer)
+    if assignment.topics? # Assignment with topics
+      assign_reviewer_with_topic(assignment, reviewer)
+    else # Assignment without topics
+      assign_reviewer_without_topic(assignment, reviewer)
+    end
+  end
+
+  # Method to assign a reviewer when the assignment has topics
+  def assign_reviewer_with_topic(assignment, reviewer)
+    topic = select_topic_to_review(assignment, reviewer)
+    if topic.nil?
+      flash[:error] = 'No topics are available to review at this time. Please try later.'
+    else
+      assignment.assign_reviewer_dynamically(reviewer, topic)
+    end
+  end
+
+  # Method to select a topic for review
+  def select_topic_to_review(assignment, reviewer)
+    if params[:topic_id]
+      SignUpTopic.find(params[:topic_id])
+    else
+      begin
+        assignment.candidate_topics_to_review(reviewer).to_a.sample
+      rescue StandardError
+        nil
+      end
+    end
+  end
+
+  # Method to assign a reviewer when the assignment has no topics
+  def assign_reviewer_without_topic(assignment, reviewer)
+    assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
+    assignment_team = begin
+                        select_assignment_team_to_review(assignment_teams)
                       rescue StandardError
                         nil
                       end
-                    end
-            if topic.nil?
-              flash[:error] = 'No topics are available to review at this time. Please try later.'
-            else
-              assignment.assign_reviewer_dynamically(reviewer, topic)
-            end
-          else # assignment without topic -Yang
-            assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
-            assignment_team = begin
-                                assignment_teams.to_a.sample
-                              rescue StandardError
-                                nil
-                              end
-            if assignment_team.nil?
-              flash[:error] = 'No artifacts are available to review at this time. Please try later.'
-            else
-              assignment.assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
-            end
-          end
-        else
-          flash[:error] = 'You cannot do more reviews when you have ' + Assignment.max_outstanding_reviews + 'reviews to do'
-        end
-      else
-        flash[:error] = 'You cannot do more than ' + assignment.num_reviews_allowed.to_s + ' reviews based on assignment policy'
-      end
-      # rescue Exception => e
-      #   flash[:error] = (e.nil?) ? $! : e
-      # end
+    if assignment_team.nil?
+      flash[:error] = 'No artifacts are available to review at this time. Please try later.'
+    else
+      assignment.assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
     end
+  end
+
+  # Method to select an assignment team for review
+  def select_assignment_team_to_review(assignment_teams)
+    assignment_teams.to_a.sample
+  end
+
+  # Method to redirect to student review list page
+  def redirect_to_student_review_list(participant)
     redirect_to controller: 'student_review', action: 'list', id: participant.id
   end
 

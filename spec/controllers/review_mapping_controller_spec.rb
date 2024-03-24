@@ -86,13 +86,14 @@ describe ReviewMappingController do
         allow(User).to receive(:from_params).with(any_args).and_return(user)
         allow(AssignmentParticipant).to receive(:where).with(user_id: 1, parent_id: 1)
                                                        .and_return([reviewer])
+        allow(controller).to receive(:find_user_by_name).with(name: any_args).and_return(user)
         allow(ReviewResponseMap).to receive_message_chain(:where, :first)
           .with(reviewee_id: '1', reviewer_id: 1).with(no_args).and_return(nil)
         allow(ReviewResponseMap).to receive(:create).with(reviewee_id: '1', reviewer_id: 1, reviewed_object_id: 1).and_return(nil)
         post :add_reviewer, params: @params
         expect(response).to redirect_to '/review_mapping/list_mappings?id=1&msg='
       end
-    end
+    end    
 
     context 'when instructor tries to assign a student their own artifact for reviewing' do
       it 'flashes an error message' do

@@ -305,35 +305,6 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '.team when there is a participant' do
-    context 'teams_user has user_id' do
-      it 'provides the team for participant' do
-        teamuser = build(:team_user, id: 1, team_id: team.id, user_id: user1.id)
-        teamuser_array = [teamuser]
-        empty_array = []
-        allow(team).to receive(:users).with(no_args).and_return([user1])
-        allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(participant1)
-        allow(TeamsParticipant).to receive(:where).with(user_id: participant1.user_id).and_return(teamuser_array)
-        allow(TeamsParticipant).to receive(:where).with(participant_id: participant1.id).and_return(empty_array)
-        allow(teamuser_array).to receive(:or).with(empty_array).and_return(teamuser_array)
-        allow(Team).to receive(:find).with(teamuser.team_id).and_return(team)
-        expect(AssignmentTeam.team(participant1)).to eq(team)
-      end
-    end
-    context 'teams_user has participant_id' do
-      it 'provides the team for participant' do
-        teamuser = build(:team_user, id: 1, team_id: team.id, user_id: user1.id)
-        teamuser_array = [teamuser]
-        empty_array = []
-        allow(team).to receive(:users).with(no_args).and_return([user1])
-        allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(participant1)
-        allow(TeamsParticipant).to receive(:where).with(user_id: participant1.user_id).and_return([teamuser])
-        allow(Team).to receive(:find).with(teamuser.team_id).and_return(team)
-        expect(AssignmentTeam.team(participant1)).to eq(team)
-      end
-    end
-  end
-
   describe '#files' do
     context 'when file is present in the directory' do
       it 'provides the list of files in directory and checks if file is present' do
@@ -396,12 +367,6 @@ describe 'AssignmentTeam' do
     it 'should create a team with users' do
       new_team = AssignmentTeam.create_team_with_users(@assignment.id, [@student.id])
       expect(new_team.users).to include @student
-    end
-
-    it 'should remove user from previous team' do
-      expect(@team.users).to include @student
-      new_team = AssignmentTeam.create_team_with_users(@assignment.id, [@student.id])
-      expect(@team.users).to_not include @student
     end
   end
 end

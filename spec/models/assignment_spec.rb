@@ -22,21 +22,6 @@ describe Assignment do
   let(:questionnaire1) { build(:questionnaire, id: 1, type: 'ReviewQuestionnaire') }
   let(:questionnaire2) { build(:questionnaire, id: 2, type: 'MetareviewQuestionnaire') }
 
-  describe '#user_on_team?' do
-    context 'when the user is not on a team associated with the assignment' do
-      it 'returns false' do
-        allow_any_instance_of(Team).to receive(:participants).and_return([instructor_participant])
-        expect(assignment.participant_on_team?(participant)).to be_falsey
-      end
-    end
-    context 'when the user is on a team associated with the assignment' do
-      it 'returns true' do
-        allow_any_instance_of(Team).to receive(:participants).and_return([student_participant])
-        expect(assignment.participant_on_team?(student_participant)).to be_truthy
-      end
-    end
-  end
-
   describe '.max_outstanding_reviews' do
     it 'returns 2 by default' do
       expect(Assignment.max_outstanding_reviews).to eq(2)

@@ -126,13 +126,13 @@
       $('#go_to_tabs2').click(function(){
         $('#Rubrics').click();
       });
-      // Redirect to Due Date Tab  on Back link from late policy
+      # Below javascript will redirect to the due date page
       jQuery(document).ready(function() {
         var referrer =  document.referrer;
-        if(referrer.includes("late_policies")){                     
+        if(referrer.includes("late_policies")){
           $('#DueDates').click();
-        }  
-      }); 
+        }
+      });
     </script>
   <% end %>
 

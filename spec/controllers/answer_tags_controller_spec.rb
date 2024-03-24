@@ -1,5 +1,3 @@
-# TODO: Determine which skeleton tests have already been implemented.
-
 describe AnswerTagsController do
   # factory objects required for "action_allowed" test cases
   let!(:instructor) { build(:instructor, id: 1) }
@@ -198,131 +196,71 @@ describe AnswerTagsController do
   end
 
 
-  # Test skeletons provided by Vyshnavi Adusumelli
-  describe "index" do
-    # context "when assignment_id and questionnaire_id are not provided" do
-    #   it "returns all tag prompts" do
-    #     # Test setup
-    #     # ...
-
-    #     # Test execution
-    #     # ...
-
-    #     # Assertion
-    #     # ...
-    #   end
-    # end
-
-    # context "when questionnaire_id is provided" do
-    #   it "returns tag prompts for the specified questionnaire" do
-    #     # Test setup
-    #     # ...
-
-    #     # Test execution
-    #     # ...
-
-    #     # Assertion
-    #     # ...
-    #   end
-    # end
-
-    # context "when user_id is provided" do
-    #   it "returns tag prompts for the specified user" do
-    #     # Test setup
-    #     # ...
-
-    #     # Test execution
-    #     # ...
-
-    #     # Assertion
-    #     # ...
-    #   end
-    # end
-  end
-
-
   # To allow creation if not existing and simultaneously updating the new answer tag.
   # params: answer_id (answer id mapping to which tag is being created)
   # params: tag_prompt_deployment_id (tag_prompt id mapping to which tag is being created)
   # params: value (new value to be updated)
-
   describe '#create_edit' do
     context 'when student tries to create or update the answer tags' do
       before(:each) do
         controller.request.session[:user] = student
       end
-
-      it 'add entry if not existing and update the old value by new value provided as param' do
-        request_params = { answer_id: answer.id, tag_prompt_deployment_id: tag_deploy.id, value: '0' }
-        post :create_edit, params: request_params
-        expect(response).to have_http_status(200)
-        expect(AnswerTag.find_by(answer_id: answer.id).value).to eql('0')
-      end
-
-      it 'restricts updating answer tag by student if no mapping is found related to any answer for that tag (foreign key constraint)' do
-        request_params = { answer_id: nil, tag_prompt_deployment_id: tag_deploy.id, value: '0' }
-        expect do
+      context "when entry doesn't exist" do
+        it 'adds entry and adds new value provided as param' do
+          request_params = { answer_id: answer.id, tag_prompt_deployment_id: tag_deploy.id, value: '0' }
           post :create_edit, params: request_params
-        end.to raise_error(ActiveRecord::RecordInvalid)
-      end
+          expect(response).to have_http_status(:ok)
+          expect(AnswerTag.find_by(answer_id: answer.id).value).to eql('0')
+        end
 
-      it 'restricts updating answer tag by student if no mapping is found related to any tag_prompt_deployment for that tag (foreign key constraint)' do
-        request_params = { answer_id: answer.id, tag_prompt_deployment_id: nil, value: '0' }
-        expect do
+        it 'adds entry and JSON returns true' do
+          request_params = { answer_id: answer.id, tag_prompt_deployment_id: tag_deploy.id, value: '0' }
           post :create_edit, params: request_params
-        end.to raise_error(ActiveRecord::RecordInvalid)
+          output = JSON.parse(response.body)
+          expect(output).to eql(true)
+        end
       end
 
-      it 'restricts updating answer tag by student if no updated value is provided for the answer tag' do
-        request_params = { answer_id: answer.id, tag_prompt_deployment_id: tag_deploy.id, value: nil }
-        expect do
+      context "when the entry already exists" do
+        it 'updates the old value by new value provided as param' do
+          request_params = { answer_id: answer.id, tag_prompt_deployment_id: tag_deploy.id, value: '0' }
           post :create_edit, params: request_params
-        end.to raise_error(ActiveRecord::RecordInvalid)
-      end
-    end
-  end
+          expect(response).to have_http_status(:ok)
+          expect(AnswerTag.find_by(answer_id: answer.id).value).to eql('0')
 
+          request_params = { answer_id: answer.id, tag_prompt_deployment_id: tag_deploy.id, value: '1' }
+          post :create_edit, params: request_params
+          expect(response).to have_http_status(:ok)
+          expect(AnswerTag.find_by(answer_id: answer.id).value).to eql('1')
+        end
 
-  # Test skeletons provided by Vyshnavi Adusumelli
-  describe "create_edit" do
-    context "when the AnswerTag does not exist" do
-      # it "creates a new AnswerTag with the given parameters" do
-      #   # Test body
-      # end
+        it 'updates the value and JSON returns true' do
+          request_params = { answer_id: answer.id, tag_prompt_deployment_id: tag_deploy.id, value: '0' }
+          post :create_edit, params: request_params
+          output = JSON.parse(response.body)
+          expect(output).to eql(true)
+        end
 
-      it "returns the created AnswerTag as JSON" do
-        # Test body
-      end
-    end
+        it 'restricts updating answer tag by student if no mapping is found related to any answer for that tag (foreign key constraint)' do
+          request_params = { answer_id: nil, tag_prompt_deployment_id: tag_deploy.id, value: '0' }
+          expect do
+            post :create_edit, params: request_params
+          end.to raise_error(ActiveRecord::RecordInvalid)
+        end
 
-    context "when the AnswerTag already exists" do
-      it "updates the value of the existing AnswerTag with the given parameters" do
-        # Test body
-      end
+        it 'restricts updating answer tag by student if no mapping is found related to any tag_prompt_deployment for that tag (foreign key constraint)' do
+          request_params = { answer_id: answer.id, tag_prompt_deployment_id: nil, value: '0' }
+          expect do
+            post :create_edit, params: request_params
+          end.to raise_error(ActiveRecord::RecordInvalid)
+        end
 
-      it "returns the updated AnswerTag as JSON" do
-        # Test body
-      end
-    end
-  end
-
-  # Test skeletons provided by Vyshnavi Adusumelli
-  describe "#destroy" do
-    context "when called on an object" do
-      it "should delete the object from the database" do
-        # Test body
-      end
-      it "should return true if the object is successfully deleted" do
-        # Test body
-      end
-      it "should return false if the object does not exist in the database" do
-        # Test body
-      end
-    end
-
-    context "when called without an object" do
-      it "should raise an error" do
-        # Test body
+        it 'restricts updating answer tag by student if no updated value is provided for the answer tag' do
+          request_params = { answer_id: answer.id, tag_prompt_deployment_id: tag_deploy.id, value: nil }
+          expect do
+            post :create_edit, params: request_params
+          end.to raise_error(ActiveRecord::RecordInvalid)
+        end
       end
     end
   end

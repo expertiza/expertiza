@@ -71,7 +71,7 @@ class ReviewBidsController < ApplicationController
     #assigned_topics=[]
     ReviewResponseMap.where({:reviewed_object_id => @assignment.id, :reviewer_id => @participant.id}).each do |review_map|
       @assigned_review_maps << review_map
-    end
+    end 
     render 'sign_up_sheet/review_bids_show'
   end
   # function that assigns and updates priorities for review bids
@@ -105,10 +105,12 @@ class ReviewBidsController < ApplicationController
     assignment_id = params[:assignment_id].to_i
     assignment = Assignment.find(assignment_id)
     # list of reviewer id's from a specific assignment
-    reviewer_ids = assignment.assignment_participants.ids
-    bidding_data = assignment.review_bids.bidding_data(reviewer_ids)
-    matched_topics = run_bidding_algorithm(bidding_data)
-    assignment.review_bids.assign_review_topics(reviewer_ids, matched_topics)
+    reviewer_ids = assignment.participants.pluck(:id)
+    bidding_data = assignment.review_bid.bidding_data(assignment_id, reviewer_ids)
+    puts bidding_data
+    matched_topics = run_bidding_algorithm(bidding_data,reviewer_ids, assignment_id)
+    puts matched_topics
+    assignment.review_bid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
     assignment.update(can_choose_topic_to_review: false) # turns off bidding for students
     redirect_back fallback_location: root_path
   end
@@ -118,15 +120,26 @@ class ReviewBidsController < ApplicationController
   # passing webserver: student_ids, topic_ids, student_preferences, time_stamps
   # webserver returns:
   # returns matched assignments as json body
-  def run_bidding_algorithm(bidding_data)
+  def run_bidding_algorithm(bidding_data, reviewer_ids, assignment_id)
     
-    url = WEBSERVICE_CONFIG["review_bidding_webservice_url"] #won't work unless ENV variables are configured
-    url = 'http://app-csc517.herokuapp.com/match_topics' # hard coding for the time being
-    begin 
-      # Sending POST request to the bidding algorithm 
-      response = RestClient.post(url, bidding_data.to_json, content_type: 'application/json', accept: :json)
-      matched_topics= JSON.parse(response.body)
-      #bidding_data_with_matches = update_bidding_data_with_matches(bidding_data, matched_topics)
+    #url = WEBSERVICE_CONFIG["review_bidding_webservice_url"] #won't work unless ENV variables are configured
+    begin  
+      #response = RestClient.post(url, bidding_data.to_json, content_type: 'application/json', accept: :json)
+      #matched_topics= JSON.parse(bidding_data)
+      topic_ids_with_team = SignedUpTeam.where.not(team_id: nil).pluck(:topic_id) #Topics which have been selected by teams for submission
+      topics = SignUpTopic.where(assignment_id: assignment_id, id: topic_ids_with_team)
+      
+      unbidded_users = bidding_data["users"].select { |user_id, details| details["tid"].empty? }.keys
+      bidded_users= reviewer_ids - unbidded_users
+      matched_topics = {}
+      bidded_users.each do |reviewer_id|
+        matched_topics[reviewer_id] = bidding_data["users"][reviewer_id]["tid"]
+      end
+      unbidded_users.each do |reviewer_id|
+        # Randomly select 2 distinct topics for this reviewer. Ensuring we have unique topics if possible.
+        selected_topics = topics.sample(2)
+        matched_topics[reviewer_id] = selected_topics.map(&:id)
+      end
       return  matched_topics
     rescue StandardError => e
       puts "Error in assigning reviewers: #{e.message}"
@@ -134,16 +147,5 @@ class ReviewBidsController < ApplicationController
     end
   end
 
-  def update_bidding_data_with_matches(bidding_data,matched_topics)
-    assignment_id = bidding_data[:assignment_id]
-    reviewer_ids = bidding_data[:reviewer_ids]
-    unbid_reviewers = reviewer_ids - matched_topics.keys
-    if unbid_reviewers.any?
-      assignment = Assignment.find(assignment_id)
-      unbid_reviewers.each do |reviewer_id|
-        random_topics = SignUpTopic.where(assignment_id: assignment_id).sample(assignment.num_reviews_per_student)
-        ReviewResponseMap.create_reviews_for_reviewer(reviewer_id, random_topics)
-      end
-    end
-  end
+  
 end

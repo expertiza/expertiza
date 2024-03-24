@@ -28,7 +28,7 @@ class ReviewBid < ApplicationRecord
     end
     # loop through reviewer_ids to assign reviews to each reviewer
     reviewer_ids.each do |reviewer_id|
-      topics_to_assign = matched_topics[reviewer_id.to_s]
+      topics_to_assign = matched_topics[reviewer_id]
       topics_to_assign.each do |topic|
         assign_topic_to_reviewer(assignment_id, reviewer_id, topic)
       end

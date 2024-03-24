@@ -11,10 +11,10 @@
     <!--Topics table-->
     <table style="width: 48%; float: left" class="general">
       <tr><%= render :partial => 'sign_up_sheet/review_bids_table_header' %></tr>
-      <% if !@bids.nil? && @bids.size != 0 %>
+      <% if !@assigned_review_maps.nil? && @assigned_review_maps.size != 0 %>
           <b>Your topic(s) to review:</b>
-          <% for selected_topic in @bids %>
-              <br/><%= selected_topic.topic_name %>
+          <% for selected_topic in @assigned_review_maps %>
+          <br/><%=selected_topic.id %>
           <% end %>
       <% end %>
       <br/><br/>

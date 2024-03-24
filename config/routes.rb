@@ -664,5 +664,9 @@ Expertiza::Application.routes.draw do
   post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
   post 'student_task/publishing_rights_update', controller: :student_task, action: :publishing_rights_update, method: :put
   get 'student_view/flip_view', controller: :student_view, action: :flip_view
+  get 'get_dates', controller: :mentor_meeting, action: :get_dates
+  post 'add_date', controller: :mentor_meeting, action: :add_date
+  patch 'edit_date', controller: :mentor_meeting, action: :edit_date
+  post 'delete_date', controller: :mentor_meeting, action: :delete_date
   # updated route and added specific controller action upon accessing this route
 end

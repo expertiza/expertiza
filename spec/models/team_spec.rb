@@ -97,17 +97,37 @@ describe Team do
 
     context 'when parameterized user did not join in current team yet' do
       context 'when current team is not full' do
-        it 'does not raise an error' do
+        before do
           allow_any_instance_of(Team).to receive(:user?).with(user).and_return(false)
           allow_any_instance_of(Team).to receive(:full?).and_return(false)
           allow(TeamsUser).to receive(:create).with(user_id: 1, team_id: 1).and_return(team_user)
           allow(TeamNode).to receive(:find_by).with(node_object_id: 1).and_return(double('TeamNode', id: 1))
           allow_any_instance_of(Team).to receive(:add_participant).with(1, user).and_return(double('Participant'))
-          expect(team.add_member(user)).to be true
+        end
+        it 'sends mail to mentor if user is a mentor' do
+            allow(MentorManagement).to receive(:user_a_mentor?).with(user).and_return(true)
+            allow(Assignment).to receive(:find).with(1).and_return(assignment)
+            allow(MailerHelper).to receive(:send_team_confirmation_mail_to_user).and_return(double('Mail', deliver: true))
+
+            expect(MailerHelper).to receive(:send_team_confirmation_mail_to_user).with(user, "[Expertiza] Added to a Team", "mentor_added_to_team", "#{team.name}", "").and_return(double('Mail', deliver: true))
+
+            expect(team.add_member(user)).to be true
+        end
+
+        it 'sends mail to user if user is a user' do
+            allow(MentorManagement).to receive(:user_a_mentor?).with(user).and_return(false)
+            allow(Assignment).to receive(:find).with(1).and_return(assignment)
+            allow(MailerHelper).to receive(:send_team_confirmation_mail_to_user).and_return(double('Mail', deliver: true))
+
+            expect(MailerHelper).to receive(:send_team_confirmation_mail_to_user).with(user, "[Expertiza] Added to a Team", "user_added_to_team", "#{team.name}", "").and_return(double('Mail', deliver: true))
+
+            expect(team.add_member(user)).to be true
         end
       end
     end
   end
+
+
 
   describe '.size' do
     it 'returns the size of current team' do

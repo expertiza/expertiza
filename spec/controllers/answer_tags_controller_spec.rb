@@ -2,26 +2,25 @@
 
 describe AnswerTagsController do
   # factory objects required for "action_allowed" test cases
-  let(:instructor) { build(:instructor, id: 1) }
-  let(:student) { build(:student, id: 1) }
+  let!(:instructor) { build(:instructor, id: 1) }
+  let!(:student) { build(:student, id: 1) }
   let!(:assignment) { create(:assignment, name: 'assignment', directory_path: 'assignment', id: 1) }
   let!(:assignment2) { create(:assignment, name: 'assignment2', directory_path: 'assignment2', id: 2) }
-  let!(:questionnaire) { create(:questionnaire, id: 1) }
+  let!(:questionnaire) { create(:questionnaire, name: 'questionnaire', id: 1) }
   let!(:tag_prompt_deployment) { create(:tag_prompt_deployment, id: 1, assignment_id: 1, questionnaire_id: 1) }
   let!(:tag_prompt_deployment2) { create(:tag_prompt_deployment, id: 2, assignment_id: 2, questionnaire_id: 1) }
   let!(:answer_tag) { create(:answer_tag, id: 1, tag_prompt_deployment_id: 1, user_id: student.id) }
 
   # factory objects required for "create_edit" test cases - since creating answer tags and updating answer tags requires pre mapping of answer and tag deployment key constraints
-  let(:student2) { build(:student, id: 2) }
+  let!(:student2) { build(:student, id: 2) }
   let!(:assignment3) { create(:assignment, name: 'assignment3', directory_path: 'assignment3', id: 3) }
-  let(:asdfasdfasdfasdf) { create(:questionnaire, id: 2) }
-  let(:question1) { create(:question, questionnaire: questionnaire, weight: 2, id: 2, type: 'Criterion') }
-  # let(:question3) { create(:question, questionnaire: questionnaire3, weight: 2, id: 3, type: 'Criterion') }
-  let(:response_map) { create(:review_response_map, id: 2, reviewed_object_id: 2) }
+  let!(:questionnaire1) { create(:questionnaire, name: 'questionnaire1', id: 2) }
+  let!(:question1) { create(:question, questionnaire: questionnaire, weight: 2, id: 2, type: 'Criterion') }
+  let!(:response_map) { create(:review_response_map, id: 2, reviewed_object_id: 2) }
   let!(:response_record) { create(:response, id: 2, response_map: response_map) }
   let!(:answer) { create(:answer, question: question1, comments: 'test comment', response_id: response_record.id) }
-  let(:tag_prompt) { create(:tag_prompt, id: 3, prompt: '??', desc: 'desc', control_type: 'slider') }
-  let(:tag_deploy) { create(:tag_prompt_deployment, id: 3, tag_prompt: tag_prompt, question_type: 'Criterion') }
+  let!(:tag_prompt) { create(:tag_prompt, id: 3, prompt: '??', desc: 'desc', control_type: 'slider') }
+  let!(:tag_deploy) { create(:tag_prompt_deployment, id: 3, tag_prompt: tag_prompt, question_type: 'Criterion') }
 
 
   # To allow the functionality only if the accessing user is having student privileges
@@ -140,12 +139,12 @@ describe AnswerTagsController do
         expect(output.length).to eql(0)
       end
 
-      # it 'when there is no answer tag for given questionnaire_id' do
-      #   request_params = { questionnaire_id: asdfasdfasdfasdf.id }
-      #   get :index, params: request_params
-      #   output = JSON.parse(response.body)
-      #   expect(output.length).to eql(0)
-      # end
+      it 'when there is no answer tag for given questionnaire_id' do
+        request_params = { questionnaire_id: questionnaire1.id }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
 
       it 'when there is no answer tag for given user_id, assignment_id, and questionnaire_id' do
         request_params = { user_id: student2.id, assignment_id: assignment3.id, questionnaire_id: questionnaire.id }
@@ -201,44 +200,44 @@ describe AnswerTagsController do
 
   # Test skeletons provided by Vyshnavi Adusumelli
   describe "index" do
-    context "when assignment_id and questionnaire_id are not provided" do
-      it "returns all tag prompts" do
-        # Test setup
-        # ...
+    # context "when assignment_id and questionnaire_id are not provided" do
+    #   it "returns all tag prompts" do
+    #     # Test setup
+    #     # ...
 
-        # Test execution
-        # ...
+    #     # Test execution
+    #     # ...
 
-        # Assertion
-        # ...
-      end
-    end
+    #     # Assertion
+    #     # ...
+    #   end
+    # end
 
-    context "when questionnaire_id is provided" do
-      it "returns tag prompts for the specified questionnaire" do
-        # Test setup
-        # ...
+    # context "when questionnaire_id is provided" do
+    #   it "returns tag prompts for the specified questionnaire" do
+    #     # Test setup
+    #     # ...
 
-        # Test execution
-        # ...
+    #     # Test execution
+    #     # ...
 
-        # Assertion
-        # ...
-      end
-    end
+    #     # Assertion
+    #     # ...
+    #   end
+    # end
 
-    context "when user_id is provided" do
-      it "returns tag prompts for the specified user" do
-        # Test setup
-        # ...
+    # context "when user_id is provided" do
+    #   it "returns tag prompts for the specified user" do
+    #     # Test setup
+    #     # ...
 
-        # Test execution
-        # ...
+    #     # Test execution
+    #     # ...
 
-        # Assertion
-        # ...
-      end
-    end
+    #     # Assertion
+    #     # ...
+    #   end
+    # end
   end
 
 
@@ -287,9 +286,9 @@ describe AnswerTagsController do
   # Test skeletons provided by Vyshnavi Adusumelli
   describe "create_edit" do
     context "when the AnswerTag does not exist" do
-      it "creates a new AnswerTag with the given parameters" do
-        # Test body
-      end
+      # it "creates a new AnswerTag with the given parameters" do
+      #   # Test body
+      # end
 
       it "returns the created AnswerTag as JSON" do
         # Test body

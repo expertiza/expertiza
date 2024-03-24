@@ -168,7 +168,7 @@ describe TagPromptDeployment do
       end
     end
 
-    # Tests that when no teams or querstions are found, an empty result is returned.
+    # Tests that when no teams or questions are found, an empty result is returned.
     context "when there are no teams or questions" do
       it "returns an empty result" do
         allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([])

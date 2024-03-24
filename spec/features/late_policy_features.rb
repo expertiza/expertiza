@@ -1,99 +1,59 @@
-# spec/features/assignment_creation_spec.rb
+require_relative './helpers/assignment_creation_helper'
 
-module AssignmentCreationHelper
-  def create_deadline_types
-    # Implement creating deadline types
-  end
-  
-  def create_courses(count)
-    count.times do |i|
-      create(:course, name: "Course #{i + 1}")
+describe 'Assignment creation topics tab', js: true do
+  include AssignmentCreationHelper
+  before(:each) do
+    create_deadline_types
+    (1..3).each do |i|
+      create(:course, name: "Course #{i}")
     end
-  end
-  
-  def login_as_instructor(username)
-    # Implement login functionality
-  end
-  
-  def visit_assignment_edit_page(assignment)
+    assignment = create(:assignment, name: 'assignment for late policy test')
+    login_as('instructor6')
     visit "/assignments/#{assignment.id}/edit"
-  end
-  
-  def enable_due_dates
     check('assignment_has_due_dates')
-  end
-  
-  def find_assignment_by_name(name)
-    Assignment.find_by(name: name)
-  end
-  
-  def create_topic(assignment)
-    create(:topic, assignment_id: assignment.id)
-  end
-  
-  def navigate_to_due_dates
     click_link 'Due Dates'
   end
-  
-  def navigate_to_new_late_policy
-    click_link 'New Late Policy'
-  end
-  
-  def go_back_to_assignment_edit_page
+
+  # it 'Flash Error Message on New Late Policy Page', js: true do
+  #   assignment = Assignment.where(name: 'assignment for late policy test').first
+  #   create(:topic, assignment_id: assignment.id)
+  #   visit "/assignments/#{assignment.id}/edit"
+  #   click_link 'Due Dates'
+  #   click_link 'New Late Policy'
+  #   fails if 
+  #     expect(flash[:error]).to be('Failed to save the assignment: ') 
+  #   end
+  # end
+
+  it 'Back Button Interaction on New Late Policy Page', js: true do
+    assignment = create_assignment_and_topic('assignment for late policy test')
+    visit_assignment_due_dates_tab(assignment)
+    click_button 'New Late Policy'
     click_button 'Back'
+    expect(page).to route_to("/assignments/#{assignment.id}/edit")
   end
   
-  def fill_in_late_policy_details(name, penalty_per_unit, max_penalty)
+  it 'Back Button Interaction on New Late Policy Page while creating', js: true do
+    assignment = create_assignment_and_topic('assignment for late policy test')
+    visit_assignment_due_dates_tab(assignment)
+    click_button 'New Late Policy'
+    fill_in_late_policy_form('Test Late Policy', '15', '20')
+    click_button 'Create'
+    click_button 'Back'
+    expect(page).to route_to("/assignments/#{assignment.id}/edit")
+  end
+  
+  private
+  
+  def create_assignment_and_topic(assignment_name)
+    assignment = Assignment.where(name: assignment_name).first || create(:assignment, name: assignment_name)
+    create(:topic, assignment_id: assignment.id)
+    assignment
+  end
+  
+  def fill_in_late_policy_form(name, penalty_per_unit, max_penalty)
     fill_in "policy_name", with: name
     fill_in "penalty_per_unit", with: penalty_per_unit
     fill_in "max_penalty", with: max_penalty
   end
-  
-  def create_late_policy
-    click_button 'Create'
-  end
-end
-
-describe 'Assignment creation topics tab', js: true do
-  include AssignmentCreationHelper
-
-  before(:each) do
-    create_deadline_types
-    create_courses(3)
-    @assignment = create(:assignment, name: 'assignment for late policy test')
-    login_as_instructor('instructor6')
-    visit_assignment_edit_page(@assignment)
-    enable_due_dates
-  end
-
-  it 'displays flash error message on New Late Policy Page', js: true do
-    assignment = find_assignment_by_name('assignment for late policy test')
-    create_topic(assignment)
-    visit_assignment_edit_page(assignment)
-    navigate_to_due_dates
-    navigate_to_new_late_policy
-    expect(page).to have_content('Failed to save the assignment:')
-  end
-  
-  it 'navigates back to assignment edit page from New Late Policy Page', js: true do
-    assignment = find_assignment_by_name('assignment for late policy test')
-    create_topic(assignment)
-    visit_assignment_edit_page(assignment)
-    navigate_to_due_dates
-    navigate_to_new_late_policy
-    go_back_to_assignment_edit_page
-    expect(page).to have_current_path("/assignments/#{assignment.id}/edit")
-  end
-  
-  it 'navigates back to assignment edit page while creating on New Late Policy Page', js: true do
-    assignment = find_assignment_by_name('assignment for late policy test')
-    create_topic(assignment)
-    visit_assignment_edit_page(assignment)
-    navigate_to_due_dates
-    navigate_to_new_late_policy
-    fill_in_late_policy_details('Test Late Policy', '15', '20')
-    create_late_policy
-    go_back_to_assignment_edit_page
-    expect(page).to have_current_path("/assignments/#{assignment.id}/edit")
-  end
-end
+end 

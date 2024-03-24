@@ -37,7 +37,7 @@ describe AnswerTagsController do
           expect(controller.send(:action_allowed?)).to be true
         end
       end
-      
+
       context 'accessing create_edit action' do
         it 'allows access' do
           controller.params = { id: '1', action: 'create_edit' }
@@ -65,7 +65,7 @@ describe AnswerTagsController do
           expect(controller.send(:action_allowed?)).to be false
         end
       end
-      
+
       context 'accessing index action' do
         it 'denies access' do
           controller.params = { id: '1', action: 'create_edit' }
@@ -134,7 +134,7 @@ describe AnswerTagsController do
         end
       end
 
-      context 'and only one answer tag is present fo the given questionnaire_id' do
+      context 'and only one answer tag is present of the given questionnaire_id' do
         it 'returns a list with one tag prompt' do
           request_params = { questionnaire_id: questionnaire.id }
           get :index, params: request_params

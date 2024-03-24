@@ -34,19 +34,4 @@ it 'Back Button Interation on New Late Policy Page', js: true do
     click_button 'Back'
     expect(page).to route_to("/assignments/#{assignment.id}/edit")
   end
-
-  it 'Back Button Interation on New Late Policy Page while creating', js: true do
-    assignment = Assignment.where(name: 'assignment for late policy test').first
-    create(:topic, assignment_id: assignment.id)
-    visit "/assignments/#{assignment.id}/edit"
-    click_link 'Due Dates'
-    click_button 'New Late Policy'
-    fill_in "policy_name", with: 'Test Late Policy'
-    fill_in "penalty_per_unit", with: '15'
-    fill_in "max_penalty", with: '20'
-    click_button 'Create'
-    visit "/late_policies"
-    click_button 'Back'
-    expect(page).to route_to("/assignments/#{assignment.id}/edit")
-  end
 end

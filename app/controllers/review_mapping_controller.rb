@@ -57,7 +57,7 @@ class ReviewMappingController < ApplicationController
     user_id = User.where(name: params[:user][:name]).first.id
     # If instructor want to assign one student to review his/her own artifact,
     # it should be counted as "self-review" and we need to make /app/views/submitted_content/_selfreview.html.erb work.
-    if TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
+    if TeamsParticipant.exists?(team_id: params[:contributor_id], user_id: user_id)
       flash[:error] = 'You cannot assign this student to review his/her own artifact.'
     else
       # Team lazy initialization
@@ -342,7 +342,7 @@ class ReviewMappingController < ApplicationController
     if teams.empty? && max_team_size == 1
       participants.each do |participant|
         user = participant.user
-        next if TeamsUser.team_id(assignment_id, user.id)
+        next if TeamsParticipant.team_id(assignment_id, user.id)
 
         if assignment.auto_assign_mentor
           team = MentoredTeam.create_team_and_node(assignment_id)
@@ -485,7 +485,7 @@ class ReviewMappingController < ApplicationController
 
       participants_with_insufficient_review_num.each do |participant_id|
         teams_hash.each_key do |team_id, _num_review_received|
-          next if TeamsUser.exists?(team_id: team_id,
+          next if TeamsParticipant.exists?(team_id: team_id,
                                     user_id: Participant.find(participant_id).user_id)
 
           participant = AssignmentParticipant.find(participant_id)
@@ -513,10 +513,10 @@ class ReviewMappingController < ApplicationController
       if !team.equal? teams.last
         # need to even out the # of reviews for teams
         while selected_participants.size < review_strategy.reviews_per_team
-          num_participants_this_team = TeamsUser.where(team_id: team.id).size
+          num_participants_this_team = TeamsParticipant.where(team_id: team.id).size
           # If there are some submitters or reviewers in this team, they are not treated as normal participants.
           # They should be removed from 'num_participants_this_team'
-          TeamsUser.where(team_id: team.id).each do |team_user|
+          TeamsParticipant.where(team_id: team.id).each do |team_user|
             temp_participant = Participant.where(user_id: team_user.user_id, parent_id: assignment_id).first
             num_participants_this_team -= 1 unless temp_participant.can_review && temp_participant.can_submit
           end
@@ -536,7 +536,7 @@ class ReviewMappingController < ApplicationController
             # if participants_with_min_assigned_reviews is blank
             if_condition_1 = participants_with_min_assigned_reviews.empty?
             # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
-            if_condition_2 = ((participants_with_min_assigned_reviews.size == 1) && TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
+            if_condition_2 = ((participants_with_min_assigned_reviews.size == 1) && TeamsParticipant.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
             rand_num = if if_condition_1 || if_condition_2
                          # use original method to get random number
                          rand(0..num_participants - 1)
@@ -546,7 +546,7 @@ class ReviewMappingController < ApplicationController
                        end
           end
           # prohibit one student to review his/her own artifact
-          next if TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
+          next if TeamsParticipant.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
 
           if_condition_1 = (participants_hash[participants[rand_num].id] < review_strategy.reviews_per_student)
           if_condition_2 = (!selected_participants.include? participants[rand_num].id)

@@ -1,7 +1,6 @@
 class ReviewMappingController < ApplicationController
   include AuthorizationHelper
 
-  
   autocomplete :user, :name
   # helper :dynamic_review_assignment
   helper :submitted_content
@@ -88,7 +87,6 @@ class ReviewMappingController < ApplicationController
     user.present? ? user.id : nil
   end
 
-
   # Method to check if the user is trying to review their own artifact
   def user_trying_to_review_own_artifact?(contributor_id, user_id)
     TeamsUser.exists?(team_id: contributor_id, user_id: user_id)
@@ -129,7 +127,6 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id, msg: msg
   end
 
-
   # 7/12/2015 -zhewei
   # This method is used for assign submissions to students for peer review.
   # This method is different from 'assignment_reviewer_automatically', which is in 'review_mapping_controller'
@@ -138,7 +135,6 @@ class ReviewMappingController < ApplicationController
     assignment = find_assignment(params[:assignment_id])
     participant = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
     reviewer = participant.get_reviewer
-  
     if topic_selection_error?(assignment)
       flash[:error] = 'No topic is selected. Please go back and select a topic.' # Removed extra space
     else
@@ -152,20 +148,19 @@ class ReviewMappingController < ApplicationController
         flash[:error] = "You cannot do more than #{assignment.num_reviews_allowed} reviews based on assignment policy"
       end
     end
-  
     redirect_to_student_review_list(participant)
   end  
-  
+
   # Method to find assignment participant
   def find_participant_for_assignment(assignment, reviewer_id)
     AssignmentParticipant.where(user_id: reviewer_id, parent_id: assignment.id).first
   end
-  
+
   # Method to check if there is an error in topic selection
   def topic_selection_error?(assignment)
     params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
   end
-  
+
   # Method to dynamically assign a reviewer based on assignment type
   def dynamically_assign_reviewer(assignment, reviewer)
     if assignment.topics? # Assignment with topics
@@ -174,7 +169,7 @@ class ReviewMappingController < ApplicationController
       assign_reviewer_without_topic(assignment, reviewer)
     end
   end
-  
+
   # Method to assign a reviewer when the assignment has topics
   def assign_reviewer_with_topic(assignment, reviewer)
     topic = select_topic_to_review(assignment, reviewer)
@@ -184,7 +179,7 @@ class ReviewMappingController < ApplicationController
       assignment.assign_reviewer_dynamically(reviewer, topic)
     end
   end
-  
+
   # Method to select a topic for review
   def select_topic_to_review(assignment, reviewer)
     if params[:topic_id]
@@ -197,27 +192,27 @@ class ReviewMappingController < ApplicationController
       end
     end
   end
-  
+
   # Method to assign a reviewer when the assignment has no topics
   def assign_reviewer_without_topic(assignment, reviewer)
     assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
-    assignment_team = select_assignment_team_to_review(assignment_teams)
+    assignment_team = begin 
+                        select_assignment_team_to_review(assignment_teams)
+                      rescue StandardError
+                        nil
+                      end
     if assignment_team.nil?
       flash[:error] = 'No artifacts are available to review at this time. Please try later.'
     else
       assignment.assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
     end
   end
-  
+
   # Method to select an assignment team for review
   def select_assignment_team_to_review(assignment_teams)
-    begin
-      assignment_teams.to_a.sample
-    rescue StandardError
-      nil
-    end
+    assignment_teams.to_a.sample
   end
-  
+
   # Method to redirect to student review list page
   def redirect_to_student_review_list(participant)
     redirect_to controller: 'student_review', action: 'list', id: participant.id

@@ -666,5 +666,7 @@ Expertiza::Application.routes.draw do
   get 'student_view/flip_view', controller: :student_view, action: :flip_view
   get 'get_dates', controller: :mentor_meeting, action: :get_dates
   post 'add_date', controller: :mentor_meeting, action: :add_date
+  patch 'edit_date', controller: :mentor_meeting, action: :edit_date
+  post 'delete_date', controller: :mentor_meeting, action: :delete_date
   # updated route and added specific controller action upon accessing this route
 end

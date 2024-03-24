@@ -205,6 +205,7 @@ describe AnswerTagsController do
       before(:each) do
         controller.request.session[:user] = student
       end
+
       context "when entry doesn't exist" do
         it 'adds entry and adds new value provided as param' do
           request_params = { answer_id: answer.id, tag_prompt_deployment_id: tag_deploy.id, value: '0' }

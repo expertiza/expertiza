@@ -1,6 +1,58 @@
 # spec/features/assignment_creation_spec.rb
 
-require_relative './helpers/assignment_creation_helper'
+module AssignmentCreationHelper
+  def create_deadline_types
+    # Implement creating deadline types
+  end
+  
+  def create_courses(count)
+    count.times do |i|
+      create(:course, name: "Course #{i + 1}")
+    end
+  end
+  
+  def login_as_instructor(username)
+    # Implement login functionality
+  end
+  
+  def visit_assignment_edit_page(assignment)
+    visit "/assignments/#{assignment.id}/edit"
+  end
+  
+  def enable_due_dates
+    check('assignment_has_due_dates')
+  end
+  
+  def find_assignment_by_name(name)
+    Assignment.find_by(name: name)
+  end
+  
+  def create_topic(assignment)
+    create(:topic, assignment_id: assignment.id)
+  end
+  
+  def navigate_to_due_dates
+    click_link 'Due Dates'
+  end
+  
+  def navigate_to_new_late_policy
+    click_link 'New Late Policy'
+  end
+  
+  def go_back_to_assignment_edit_page
+    click_button 'Back'
+  end
+  
+  def fill_in_late_policy_details(name, penalty_per_unit, max_penalty)
+    fill_in "policy_name", with: name
+    fill_in "penalty_per_unit", with: penalty_per_unit
+    fill_in "max_penalty", with: max_penalty
+  end
+  
+  def create_late_policy
+    click_button 'Create'
+  end
+end
 
 describe 'Assignment creation topics tab', js: true do
   include AssignmentCreationHelper

@@ -37,6 +37,13 @@ class CourseTeam < Team
     copy_members(new_team)
   end
 
+  # Add participant to a course team
+  def add_participant(course_id, user)
+    if CourseParticipant.find_by(parent_id: course_id, user_id: user.id).nil?
+      CourseParticipant.create(parent_id: course_id, user_id: user.id, permission_granted: user.master_permission_granted)
+    end
+  end
+
   # Import from csv
   def self.import(row, course_id, options)
     raise ImportError, 'The course with the id "' + course_id.to_s + "\" was not found. <a href='/courses/new'>Create</a> this course?" if Course.find(course_id).nil?
@@ -57,15 +64,5 @@ class CourseTeam < Team
     fields.push('Team Name')
     fields.push('Team members') if options[:team_name] == 'false'
     fields.push('Course Name')
-  end
-
-  # Add member to the course team
-  def add_member(user, _id = nil)
-    raise "The user \"#{user.name}\" is already a member of the team, \"#{name}\"" if user?(user)
-
-    t_user = TeamsUser.create(user_id: user.id, team_id: id)
-    parent = TeamNode.find_by(node_object_id: id)
-    TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
-    add_participant(parent_id, user)
   end
 end

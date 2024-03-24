@@ -90,14 +90,9 @@ class SignUpSheetController < ApplicationController
   def update
     @topic = SignUpTopic.find(params[:id])
     if @topic
-      @topic.topic_identifier = params[:topic][:topic_identifier]
       update_max_choosers @topic
-      @topic.category = params[:topic][:category]
-      @topic.topic_name = params[:topic][:topic_name]
-      @topic.micropayment = params[:topic][:micropayment]
-      @topic.description = params[:topic][:description]
-      @topic.link = params[:topic][:link]
-      @topic.save
+      @topic.update_attributes(topic_identifier: params[:topic][:topic_identifier], category: params[:topic][:category], topic_name: params[:topic][:topic_name], micropayment: params[:topic][:micropayment], description: params[:topic][:description],link:params[:topic][:link] )
+      flash[:success] = 'The topic has been successfully updated.'
       undo_link("The topic: \"#{@topic.topic_name}\" has been successfully updated. ")
     else
       flash[:error] = 'The topic could not be updated.'
@@ -246,21 +241,40 @@ class SignUpSheetController < ApplicationController
     if user.nil? # validate invalid user
       flash[:error] = 'That student does not exist!'
     else
-      if AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id]
-        if SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
-          flash[:success] = 'You have successfully signed up the student for the topic!'
-          ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor signed up student for topic: ' + params[:topic_id].to_s)
-        else
-          flash[:error] = 'The student has already signed up for a topic!'
-          ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor is signing up a student who already has a topic')
-        end
+      assignment_id = params[:assignment_id]
+      topic_id = params[:topic_id]    
+      if user_registered_for_assignment?(user, assignment_id)
+        process_signup_as_instructor_request(assignment_id,user,topic_id)
       else
-        flash[:error] = 'The student is not registered for the assignment!'
-        ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'The student is not registered for the assignment: ' << user.id)
+        log_message("The student is not registered for the assignment: #{user.id}")
       end
     end
-    redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
+    redirect_to controller: 'assignments', action: 'edit', id: assignment_id
   end
+
+  def user_registered_for_assignment?(user, assignment_id) # to check if user has registered for the assignment or not.
+    if AssignmentParticipant.exists?(user_id: user.id, parent_id: assignment_id)
+      true
+    else
+      flash[:error] = 'The student is not registered for the assignment!'
+      false
+    end
+  end
+
+  def log_message(message) # function to log the message
+    ExpertizaLogger.info LoggerMessage.new(controller_name, '', message)
+  end
+
+  def process_signup_as_instructor_request(assignment_id,user,topic_id) # function to add user for a given assignment and given topic
+    if SignUpSheet.signup_team(assignment_id, user.id, topic_id)
+      flash[:success] = 'You have successfully signed up the student for the topic!'
+      log_message("Instructor signed up student for topic: #{topic_id}")
+    else
+      flash[:error] = 'The student has already signed up for a topic!'
+      log_message('Instructor is signing up a student who already has a topic')
+    end
+  end
+
 
   # this function is used to delete a previous signup
   def delete_signup
@@ -365,31 +379,33 @@ class SignUpSheetController < ApplicationController
                              nil
                            end
           if topic_due_date.nil? # create a new record
+            due_date_obj=instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1]  #applying DRY principle and removing multiple instance_variable_get calls
             TopicDueDate.create(
               due_at: instance_variable_get('@topic_' + deadline_type + '_due_date'),
               deadline_type_id: deadline_type_id,
               parent_id: topic.id,
-              submission_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,
-              review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
-              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id,
+              submission_allowed_id: due_date_obj.submission_allowed_id,
+              review_allowed_id: due_date_obj.review_allowed_id,
+              review_of_review_allowed_id: due_date_obj.review_of_review_allowed_id,
               round: i,
-              flag: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].flag,
-              threshold: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].threshold,
-              delayed_job_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].delayed_job_id,
-              deadline_name: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].deadline_name,
-              description_url: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].description_url,
-              quiz_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].quiz_allowed_id,
-              teammate_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].teammate_review_allowed_id,
+              flag: due_date_obj.flag,
+              threshold: due_date_obj.threshold,
+              delayed_job_id: due_date_obj.delayed_job_id,
+              deadline_name: due_date_obj.deadline_name,
+              description_url: due_date_obj.description_url,
+              quiz_allowed_id: due_date_obj.quiz_allowed_id,
+              teammate_review_allowed_id: due_date_obj.teammate_review_allowed_id,
               type: 'TopicDueDate'
             )
           else # update an existed record
+            due_date_obj=instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1]
             topic_due_date.update_attributes(
               due_at: instance_variable_get('@topic_' + deadline_type + '_due_date'),
-              submission_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,
-              review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
-              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id,
-              quiz_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].quiz_allowed_id,
-              teammate_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].teammate_review_allowed_id
+              submission_allowed_id: due_date_obj.submission_allowed_id,
+              review_allowed_id: due_date_obj.review_allowed_id,
+              review_of_review_allowed_id: due_date_obj.review_of_review_allowed_id,
+              quiz_allowed_id: due_date_obj.quiz_allowed_id,
+              teammate_review_allowed_id: due_date_obj.teammate_review_allowed_id
             )
           end
         end

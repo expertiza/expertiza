@@ -66,13 +66,13 @@
     <%= render :partial => '/tree_display/actions/'+node.get_partial_name,
                :locals => {:node => node} %>
     <td>
-      <input style="max-width: 80px" />
+      <input style="max-width: 80px" id="mtg-1" onfocusout="getInformation('mtg-1')">
     </td>
     <td>
-      <input style="max-width: 80px" />
+      <input style="max-width: 80px" id="mtg-2" onfocusout="getInformation('mtg-2')">
     </td>
     <td>
-      <input style="max-width: 80px" />
+      <input style="max-width: 80px" id="mtg-3" onfocusout="getInformation('mtg-3')">
     </td>
     <td id="add_row_<%= prefix %>" style="cursor:pointer;">
       <%= image_tag("plus.png", :border=>0, :alt => "Add new date column", :title => "Add new date column") %>
@@ -81,6 +81,71 @@
 <%# end %>
 
 <script>
+  $(document).ready(function () {
+    fetch('/get_mentor_meeting_dates', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+      if (response.ok) {
+          return response.text();
+      } else {
+          console.error('Error fetching mentor meeting dates:', response.statusText);
+      }
+    })
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Error processing data:', error);
+    });
+  });
+
+  function getInformation(inputId) {
+      var input = document.getElementById(inputId);
+      var team_id = parseInt(input.parentElement.parentElement.getAttribute("id").split('_')[0]);
+      var textValue = input.value.trim();
+
+      var parts = textValue.split('/');
+      var month = parseInt(parts[0], 10);
+      var day = parseInt(parts[1], 10);
+
+      // Checking if both parts are valid integers
+      if (isNaN(month) || isNaN(day)) {
+          alert("Please enter a valid date in MM/DD format.");
+          input.value = ""; // Clear the input field
+          return;
+      }
+
+      // Checking if the month is within valid range (1-12)
+      if (month < 1 || month > 12) {
+          alert("Invalid month. Please enter a valid month (1-12).");
+          input.value = ""; // Clear the input field
+          return;
+      }
+
+      // Checking if the day is within valid range for the given month
+      var daysInMonth = new Date(2022, month, 0).getDate(); // Getting the number of days in the month
+      if (day < 1 || day > daysInMonth) {
+          alert("Invalid day for the given month. Please enter a valid day.");
+          input.value = ""; // Clear the input field
+          return;
+      }
+      $.ajax({
+          url: '/add_mentor_meeting_date',
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ meeting_date: textValue, team_id: team_id }),
+          success: function(response) {
+              console.log(response);
+          },
+          error: function(xhr, status, error) {
+              console.error('Error:', error);
+          }
+      });
+    }
     var addRow = document.getElementById(`add_row_<%= prefix %>`);
     addRow.addEventListener('click', function() {
         var thRow = document.getElementById('header')
@@ -100,7 +165,10 @@
 
         var newTd = document.createElement('td');
         var input = document.createElement('input');
+        var inputId = `mtg-${count+1}`;
         input.setAttribute('style', 'max-width: 80px');
+        input.setAttribute('id', inputId);
+        input.setAttribute('onfocusout',`getInformation('${inputId}')`);
         newTd.appendChild(input);
 
         var table = document.getElementById('mentored_assignment_table');

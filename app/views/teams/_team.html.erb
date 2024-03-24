@@ -1,10 +1,11 @@
+
+
 <% if @root_node.class != AssignmentNode %>
   <%= render :partial => '/tree_display/page_footer' %><br/>
   <a id="teamsMembers" onclick="showHideTeamMembersInTeamsListPage();">Show all team members</a>
 <% else %>
-  <%= render :partial => '/tree_display/page_footer_assignments' %><br/>
+  <%= render :partial => '/tree_display/page_footer_assignments', :locals => { :assignment_id => @root_node.node_object_id } %><br/>
 <% end %>
-
 <% session[:return_to] = request.url %>
 <% @model %>
 <%= link_to 'Create Team', :action => 'new', :id=> @root_node.node_object_id, :model => @model %>

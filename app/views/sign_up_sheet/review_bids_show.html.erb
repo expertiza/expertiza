@@ -1,17 +1,19 @@
 <h1>Bidding sheet for <%= @assignment.name %> reviews</h1>
+
 <div style="display:block">
   <h3 style="width: 40%; float: left">Topics</h3>
   <h3 style="width: 40%; float:right">Review Bid Selections</h3>
 </div>
+
 
 <div style="display:block">
   <div style="display:inline-block" >
     <!--Topics table-->
     <table style="width: 48%; float: left" class="general">
       <tr><%= render :partial => 'sign_up_sheet/review_bids_table_header' %></tr>
-      <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
+      <% if !@bids.nil? && @bids.size != 0 %>
           <b>Your topic(s) to review:</b>
-          <% for selected_topic in @selected_topics %>
+          <% for selected_topic in @bids %>
               <br/><%= selected_topic.topic_name %>
           <% end %>
       <% end %>

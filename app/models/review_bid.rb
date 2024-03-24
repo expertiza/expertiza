@@ -7,7 +7,7 @@ class ReviewBid < ApplicationRecord
   # returns the bidding data needed for the assigning algorithm
   # student_ids, topic_ids, student_preferences, topic_preferences, max reviews allowed
 
-  def bidding_data(assignment_id, reviewer_ids)
+  def self.bidding_data(assignment_id, reviewer_ids)
     # create basic hash and set basic hash data
     bidding_data = { 'tid' => [], 'users' => {}, 'max_accepted_proposals' => [] }
     bidding_data['tid'] = SignUpTopic.where(assignment_id: assignment_id).ids
@@ -21,7 +21,7 @@ class ReviewBid < ApplicationRecord
   end
 
   # assigns topics to reviews as matched by the webservice algorithm
-  def assign_review_topics(assignment_id, reviewer_ids, matched_topics, _min_num_reviews = 2)
+  def self.assign_review_topics(assignment_id, reviewer_ids, matched_topics, _min_num_reviews = 2)
     # if review response map already created, delete it
     if ReviewResponseMap.where(reviewed_object_id: assignment_id)
       ReviewResponseMap.where(reviewed_object_id: assignment_id).destroy_all
@@ -36,14 +36,14 @@ class ReviewBid < ApplicationRecord
   end
 
   # method to assign a single topic to a reviewer
-  def assign_topic_to_reviewer(assignment_id, reviewer_id, topic)
+  def self.assign_topic_to_reviewer(assignment_id, reviewer_id, topic)
     team_to_review = SignedUpTeam.where(topic_id: topic).pluck(:team_id).first
     team_to_review.nil? ? [] : ReviewResponseMap.create(reviewed_object_id: assignment_id, reviewer_id: reviewer_id, reviewee_id: team_to_review, type: 'ReviewResponseMap')
   end
 
   # method for getting individual reviewer_ids bidding data
   # returns user's bidding data hash
-  def reviewer_bidding_data(reviewer_id, assignment_id)
+  def self.reviewer_bidding_data(reviewer_id, assignment_id)
     reviewer_user_id = AssignmentParticipant.find(reviewer_id).user_id
     self_topic = SignedUpTeam.topic_id(assignment_id, reviewer_user_id)
     bidding_data = { 'tid' => [], 'otid' => self_topic, 'priority' => [], 'time' => [] }

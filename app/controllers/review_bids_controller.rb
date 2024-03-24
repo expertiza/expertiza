@@ -46,6 +46,7 @@ class ReviewBidsController < ApplicationController
   def show
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
+    @selected_topics= nil
     topic_ids_with_team = SignedUpTeam.where.not(team_id: nil).pluck(:topic_id) #Topics which have been selected by teams for submission
     @signup_topics = SignUpTopic.where(assignment_id: @assignment.id, id: topic_ids_with_team) #signup_topics is all the topics students have signed up for.
     #remove own topic from set of topics to bid on 
@@ -54,10 +55,10 @@ class ReviewBidsController < ApplicationController
     
  
     @num_participants = AssignmentParticipant.where(parent_id: @assignment.id).count  # gotta know # participants to determine if topic's hot
-    #@assigned_topics= nil
+    @assigned_topics= nil
     # Create an instance of ReviewBid
-    review_bid = ReviewBid.new
-    @bids = reviewBid.where(participant_id:@participant,assignment_id:@assignment.id)  # Update bids to be the list of sign-up topics on which the participant has bid
+    #review_bid = ReviewBid.new
+    @bids = ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id)  # Update bids to be the list of sign-up topics on which the participant has bid
     signed_up_topics = []
     @bids.each do |bid|
       signup_topic = SignUpTopic.find_by(id: bid.signuptopic_id)
@@ -77,23 +78,23 @@ class ReviewBidsController < ApplicationController
   # function that assigns and updates priorities for review bids
   def set_priority
     # Create an instance of ReviewBid
-    review_bid = ReviewBid.new
+    #review_bid = ReviewBid.new
     if params[:topic].nil?
-      reviewBid.where(participant_id: params[:id]).destroy_all
+      ReviewBid.where(participant_id: params[:id]).destroy_all
     else
       assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
-      @bids = reviewBid.where(participant_id: params[:id])
-      signed_up_topics = reviewBid.where(participant_id: params[:id]).map(&:signuptopic_id)
+      @bids = ReviewBid.where(participant_id: params[:id])
+      signed_up_topics = ReviewBid.where(participant_id: params[:id]).map(&:signuptopic_id)
       signed_up_topics -= params[:topic].map(&:to_i)
       signed_up_topics.each do |topic|
-        reviewBid.where(signuptopic_id: topic, participant_id: params[:id]).destroy_all
+        ReviewBid.where(signuptopic_id: topic, participant_id: params[:id]).destroy_all
       end
       params[:topic].each_with_index do |topic_id, index|
-        bid_existence = reviewBid.where(signuptopic_id: topic_id, participant_id: params[:id])
+        bid_existence = ReviewBid.where(signuptopic_id: topic_id, participant_id: params[:id])
         if bid_existence.empty?
-          reviewBid.create(priority: index + 1, signuptopic_id: topic_id, participant_id: params[:id], assignment_id: assignment_id)
+          ReviewBid.create(priority: index + 1, signuptopic_id: topic_id, participant_id: params[:id], assignment_id: assignment_id)
         else
-          reviewBid.where(signuptopic_id: topic_id, participant_id: params[:id]).update_all(priority: index + 1)
+          ReviewBid.where(signuptopic_id: topic_id, participant_id: params[:id]).update_all(priority: index + 1)
         end
       end
     end
@@ -108,9 +109,9 @@ class ReviewBidsController < ApplicationController
     # Create an instance of ReviewBid
     review_bid = ReviewBid.new
     reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
-    bidding_data = reviewBid.bidding_data(assignment_id, reviewer_ids)
+    bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
     matched_topics = run_bidding_algorithm(bidding_data)
-    reviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
+    ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
     Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
     redirect_back fallback_location: root_path
   end

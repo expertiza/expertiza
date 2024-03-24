@@ -1,4 +1,4 @@
-Link to [E2400 aloow reviewers to bid on wiki page](https://wiki.expertiza.ncsu.edu/index.php?title=CSC/ECE_517_Spring_2024/_OSS_E2400_Allow_Reviewers_to_Bid_on)
+Link to [E2400 allow reviewers to bid on wiki page](https://wiki.expertiza.ncsu.edu/index.php?title=CSC/ECE_517_Spring_2024/_OSS_E2400_Allow_Reviewers_to_Bid_on)
 
 Expertiza
 =========

@@ -198,7 +198,10 @@ class TeamsController < ApplicationController
     if teams.empty?
       flash[:error] = 'No teams were found when trying to inherit.'
     else
-      Team.copy_content(teams, assignment)
+      #Team.copy_content(teams, assignment)
+      teams.each do |team|
+        team.copy_to_assignment_team(assignment.id)
+      end
       flash[:note] = teams.length.to_s + ' teams were successfully copied to "' + assignment.name + '"'
     end
   end

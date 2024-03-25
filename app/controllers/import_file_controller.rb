@@ -1,4 +1,3 @@
-
 class ImportFileController < ApplicationController
   def action_allowed?
     ['Instructor',

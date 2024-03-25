@@ -30,6 +30,16 @@ module AnswerHelper
     end
     response_ids
   end
+  def bid_intensity_class(total_bids)
+    case total_bids
+    when 0..5
+      'bid-low-intensity'
+    when 6..10
+      'bid-medium-intensity'
+    else
+      'bid-high-intensity'
+    end
+  end
 
   # Log info from each response_id to be used in answer deletion
   def self.log_response_info(response_ids)

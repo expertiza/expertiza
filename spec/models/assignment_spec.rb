@@ -102,6 +102,101 @@ describe Assignment do
     end
   end
 
+  describe '#calculate_percentage_of_teams_getting_choices' do
+  it 'calculates the percentage of teams getting their choices' do
+    # Mock necessary objects for the test
+    assignment = build(:assignment)
+    team1 = build(:team)
+    team2 = build(:team)
+    topic1 = build(:sign_up_topic, assignment_id: assignment.id)
+    topic2 = build(:sign_up_topic, assignment_id: assignment.id)
+    bid1 = build(:bid, team: team1, topic: topic1)
+    bid2 = build(:bid, team: team1, topic: topic2)
+    bid3 = build(:bid, team: team2, topic: topic2)
+    allow(assignment).to receive(:sign_up_topics).and_return([topic1, topic2])
+    allow(Team).to receive(:where).and_return([team1, team2])
+    allow(team1).to receive(:bid_for_topic).with(topic1).and_return(bid1)
+    allow(team1).to receive(:bid_for_topic).with(topic2).and_return(bid2)
+    allow(team2).to receive(:bid_for_topic).with(topic2).and_return(bid3)
+
+    # Perform the calculation
+    percentages = assignment.calculate_percentage_of_teams_getting_choices
+
+    # Perform your assertions here
+    expect(percentages[1]).to eq(50.0)
+    expect(percentages[2]).to eq(100.0)
+  end
+end
+
+describe '#teams_bidding_for_each_topic' do
+  it 'returns teams bidding for each topic' do
+    # Mock necessary objects for the test
+    assignment = build(:assignment)
+    topic1 = build(:sign_up_topic, id: 1)
+    topic2 = build(:sign_up_topic, id: 2)
+    team1 = build(:team)
+    team2 = build(:team)
+    bid1 = build(:bid, team: team1, topic: topic1)
+    bid2 = build(:bid, team: team1, topic: topic2)
+    bid3 = build(:bid, team: team2, topic: topic2)
+    allow(assignment).to receive_message_chain(:sign_up_topics, :includes).and_return([topic1, topic2])
+    allow(topic1).to receive_message_chain(:bids, :map).and_return([['Team1', 1]])
+    allow(topic2).to receive_message_chain(:bids, :map).and_return([['Team1', 1], ['Team2', 2]])
+
+    # Call the method
+    result = assignment.teams_bidding_for_each_topic
+
+    # Perform assertions
+    expect(result[1]).to eq([['Team1', 1]])
+    expect(result[2]).to eq([['Team1', 1], ['Team2', 2]])
+  end
+end
+
+describe '#bidding_info_by_topic' do
+  it 'returns bidding information by topic' do
+    # Mock necessary objects for the test
+    assignment = build(:assignment)
+    topic1 = build(:sign_up_topic, id: 1)
+    topic2 = build(:sign_up_topic, id: 2)
+    team1 = build(:team, name: 'Team1')
+    team2 = build(:team, name: 'Team2')
+    bid1 = build(:bid, team: team1, priority: 1)
+    bid2 = build(:bid, team: team2, priority: 2)
+    allow(assignment).to receive_message_chain(:sign_up_topics, :includes).and_return([topic1, topic2])
+    allow(topic1).to receive_message_chain(:bids, :includes, :map).and_return([{ team_name: 'Team1', bid_priority: 1 }])
+    allow(topic2).to receive_message_chain(:bids, :includes, :map).and_return([{ team_name: 'Team2', bid_priority: 2 }])
+
+    # Call the method
+    result = assignment.bidding_info_by_topic
+
+    # Perform assertions
+    expect(result[1]).to eq([{ team_name: 'Team1', bid_priority: 1 }])
+    expect(result[2]).to eq([{ team_name: 'Team2', bid_priority: 2 }])
+  end
+end
+
+describe '#assigned_teams_for_topics' do
+  it 'returns assigned teams for each topic' do
+    # Mock necessary objects for the test
+    assignment = build(:assignment)
+    topic1 = build(:sign_up_topic, id: 1)
+    topic2 = build(:sign_up_topic, id: 2)
+    team1 = build(:team, name: 'Team1')
+    team2 = build(:team, name: 'Team2')
+    allow(assignment).to receive_message_chain(:sign_up_topics, :includes).and_return([topic1, topic2])
+    allow(topic1).to receive_message_chain(:assigned_teams, :map).and_return(['Team1'])
+    allow(topic2).to receive_message_chain(:assigned_teams, :map).and_return(['Team2'])
+
+    # Call the method
+    result = assignment.assigned_teams_for_topics
+
+    # Perform assertions
+    expect(result[1]).to eq(['Team1'])
+    expect(result[2]).to eq(['Team2'])
+  end
+end
+
+
   describe '#vary_rubrics_by_round?' do
     context 'when rubrics varies over rounds' do
       it 'should return true' do

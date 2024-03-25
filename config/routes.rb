@@ -1,3 +1,4 @@
+routes.rb
 Expertiza::Application.routes.draw do
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
@@ -63,6 +64,11 @@ Expertiza::Application.routes.draw do
       patch :edit
       post :delete
     end
+    member do
+      get :bidding_table_for_topics
+      
+    end
+    get 'bidding_details_for_topic', on: :member
   end
 
   resources :assignment_questionnaire do
@@ -647,6 +653,10 @@ Expertiza::Application.routes.draw do
   post :logout, to: 'auth#logout'
   get 'auth/failure', to: 'content_pages#view'
   get '/auth/*path', to: redirect('/')
+
+  # Add a new route for bidding details
+get 'assignments/:id/bidding_details', to: 'assignments#bidding_details', as: :bidding_details_assignment
+
   get '/menu/*name', controller: :menu_items, action: :link
   get ':page_name', controller: :content_pages, action: :view, method: :get
   post 'impersonate/impersonate', to: 'impersonate#impersonate'

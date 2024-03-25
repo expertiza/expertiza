@@ -75,13 +75,18 @@ def teams_bidding_for_each_topic
   end
 end
 
+# Method to gather bidding information grouped by topic
 def bidding_info_by_topic
+  # Iterate over sign-up topics, including associated bids
   sign_up_topics.includes(:bids).each_with_object({}) do |topic, hash|
+    # Map bids for each topic to extract relevant information
     hash[topic.id] = topic.bids.includes(:team).map do |bid|
+      # Extract team name and bid priority for each bid
       { team_name: bid.team.name, bid_priority: bid.priority }
     end
   end
 end
+
 
 # Method to determine which teams were assigned to which topics
 def assigned_teams_for_topics

@@ -21,7 +21,8 @@ class TagPromptDeployment < ApplicationRecord
 
       answers = Answer.where(question_id: questions_ids, response_id: responses_ids)
 
-      answers = answers.where(conditions: "length(comments) < #{answer_length_threshold}") unless answer_length_threshold.nil?
+      # answers = answers.where(conditions: "length(comments) < #{answer_length_threshold}") unless answer_length_threshold.nil?
+      answers = answers.where(conditions: "length(comments) < #{self.answer_length_threshold}" ) unless self.answer_length_threshold.nil?
       return answers.count
     end
     0

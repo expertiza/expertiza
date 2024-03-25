@@ -424,4 +424,56 @@ class ReputationWebServiceController < ApplicationController
     end
     redirect_to action: 'client'
   end
-end
+  # Method: calculate_reputation_score
+  # This method calculates the reputation scores for each reviewer based on the provided input data.
+  # It first parses the input JSON string to extract the submissions and their corresponding scores.
+  # Then, it calculates the average weighted grades per reviewer and the delta R values.
+  # Next, it calculates the weight prime values based on the delta R values.
+  # Finally, it calculates the reputation weights for each reviewer using the weight prime values.
+  # Params
+  #   - input_json: a JSON string representing the input data with submission scores
+  # Returns
+  #   An array of reputation scores, one score per reviewer, indicating their reputation in the system.
+  def calculate_reputation_score(reviews)
+    grades = []
+    delta_r = []
+    weight_prime = []
+    weight = []
+  
+    # Calculate Average Weighted Grades per Reviewer
+    reviews.each do |reviewer_marks|
+      # Skip nil values when calculating the sum
+      reviewer_marks_without_nil = reviewer_marks.compact
+      assignment_grade_average = reviewer_marks_without_nil.sum.to_f / reviewer_marks_without_nil.length
+      grades << assignment_grade_average
+    end
+  
+    # Calculate delta R
+    reviews.each do |reviewer_marks|
+      reviewer_delta_r = 0
+      # Skip nil values when calculating the sum
+      reviewer_marks_without_nil = reviewer_marks.compact
+      reviewer_marks_without_nil.each_with_index do |grade, student_index|
+        reviewer_delta_r += (grade - grades[student_index]) ** 2
+      end
+      delta_r << reviewer_delta_r / reviewer_marks_without_nil.length
+    end
+  
+    # Calculate weight prime
+    average_delta_r = delta_r.sum / delta_r.length.to_f
+  
+    delta_r.each do |reviewer_delta_r|
+      weight_prime << average_delta_r / reviewer_delta_r
+    end
+  
+    # Calculate reputation weight
+    weight_prime.each do |reviewer_weight_prime|
+      if reviewer_weight_prime <= 2
+        weight << reviewer_weight_prime.round(2)
+      else
+        weight << (2 + Math.log(reviewer_weight_prime - 1)).round(2)
+      end
+    end
+    weight
+    end
+  end

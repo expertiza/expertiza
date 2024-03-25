@@ -2,38 +2,68 @@ require "net/http"
 require "json"
 
 INPUTS = {
-    "submission9999": {
-    "stu9999": 10,
-    "stu9998": 10,
-    "stu9997": 9,
-    "stu9996": 5
+    "submission1": {
+        "maxtoall": 10,
+        "mintoall": 1,
+        "mediantoall": 5,
+        "incomplete_review": 4,
+        "max_incomplete": 10,
+        "min_incomplete": nil,
+        "sametoall":3,
+        "passing1": 10,
+        "passing2": 10,
+        "passing3": 9
     },
-      "submission9998": {
-    "stu9999": 3,
-    "stu9998": 2,
-    "stu9997": 4,
-    "stu9996": 5
+    "submission2": {
+        "maxtoall": 10,
+        "mintoall": 1,
+        "mediantoall": 5,
+        "incomplete_review": 2,
+        "max_incomplete": 10,
+        "min_incomplete": 1,
+        "sametoall":3,
+        "passing1": 3,
+        "passing2": 2,
+        "passing3": 4
     },
-      "submission9997": {
-    "stu9999": 7,
-    "stu9998": 4,
-    "stu9997": 5,
-    "stu9996": 5
+    "submission3": {
+        "maxtoall": 10,
+        "mintoall": 1,
+        "mediantoall": 5,
+        "incomplete_review": nil,
+        "max_incomplete": nil,
+        "min_incomplete": nil,
+        "sametoall":3,
+        "passing1": 7,
+        "passing2": 4,
+        "passing3": 5
     },
-      "submission9996": {
-    "stu9999": 6,
-    "stu9998": 4,
-    "stu9997": 5,
-    "stu9996": 5
+    "submission4": {
+        "maxtoall": 10,
+        "mintoall": 1,
+        "mediantoall": 5,
+        "incomplete_review": nil,
+        "max_incomplete": 10,
+        "min_incomplete": 1,
+        "sametoall":3,
+        "passing1": 6,
+        "passing2": 4,
+        "passing3": 5
     }
 }.to_json
 
 EXPECTED = {
     "Hamer": {
-    "9996": 0.6,
-    "9997": 3.6,
-    "9998": 1.1,
-    "9999": 1.1
+        "maxtoall": 2.65,
+        "mintoall": 2.41,
+        "mediantoall": 1.03,
+        "incomplete_review": 2.31,
+        "max_incomplete": 2.57,
+        "min_incomplete": 2.48,
+        "sametoall":1.58,
+        "passing1": 2.17,
+        "passing2": 1.73,
+        "passing3": 1.23,
     }
 }.to_json
 

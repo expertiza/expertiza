@@ -66,16 +66,6 @@ EXPECTED = {
         "passing3": 1.23}
 }.to_json
 
-describe "Expertiza" do
-    it "should return the correct Hamer calculation" do
-        uri = URI('http://peerlogic.csc.ncsu.edu/reputation/calculations/reputation_algorithms')
-    
-        response = Net::HTTP.post(uri, INPUTS, 'Content-Type' => 'application/json')
-    
-        expect(JSON.parse(response.body)["Hamer"]).to eq(JSON.parse(EXPECTED)["Hamer"])
-    end
-end
-
 submissions = JSON.parse(INPUTS)
 maxtoall_marks = []
 mintoall_marks = []
@@ -114,6 +104,8 @@ reviews = [
   passing3_marks
 ]
 
+
+
 describe ReputationWebServiceController do
     it "should calculate correct Hamer calculation" do
       weights = ReputationWebServiceController.new.calculate_reputation_score(reviews)
@@ -121,15 +113,26 @@ describe ReputationWebServiceController do
       rounded_weights = weights.map { |w| w.round(1) }
       result_hash = keys.zip(rounded_weights).to_h
       expect(result_hash).to eq(JSON.parse(EXPECTED)["Hamer"])
-    end
-end
-
-describe "Expertiza Web Service" do
-    it "should return the correct Hamer calculation" do
-        uri = URI('https://4dfaead4-a747-4be4-8683-3b10d1d2e0c0.mock.pstmn.io/reputation_web_service/default')
-    
-        response = Net::HTTP.post(uri, INPUTS, 'Content-Type' => 'application/json')
-        expect(JSON.parse("#{response.body}}")["Hamer"]).to eq(JSON.parse(EXPECTED)["Hamer"])
     end
 end
 
+
+# describe "Expertiza" do
+#     it "should return the correct Hamer calculation" do
+#         uri = URI('http://peerlogic.csc.ncsu.edu/reputation/calculations/reputation_algorithms')
+    
+#         response = Net::HTTP.post(uri, INPUTS, 'Content-Type' => 'application/json')
+    
+#         expect(JSON.parse(response.body)["Hamer"]).to eq(JSON.parse(EXPECTED)["Hamer"])
+#     end
+# end
+
+
+# describe "Expertiza Web Service" do
+#     it "should return the correct Hamer calculation" do
+#         uri = URI('https://4dfaead4-a747-4be4-8683-3b10d1d2e0c0.mock.pstmn.io/reputation_web_service/default')
+    
+#         response = Net::HTTP.post(uri, INPUTS, 'Content-Type' => 'application/json')
+#         expect(JSON.parse("#{response.body}}")["Hamer"]).to eq(JSON.parse(EXPECTED)["Hamer"])
+#     end
+# end

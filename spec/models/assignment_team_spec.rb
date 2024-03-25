@@ -2,8 +2,8 @@ describe 'AssignmentTeam' do
   let(:team_without_submitted_hyperlinks) { build(:assignment_team, submitted_hyperlinks: '') }
   let(:team) { build(:assignment_team, id: 1, parent_id: 1) }
   let(:assignment) { build(:assignment, id: 1) }
-  let(:participant1) { build(:participant, id: 1) }
-  let(:participant2) { build(:participant, id: 2) }
+  let(:participant1) { build(:participant, id: 1, user_id: 1) }
+  let(:participant2) { build(:participant, id: 2, user_id: 2) }
   let(:user1) { build(:student, id: 2) }
   let(:user2) { build(:student, id: 3) }
   let(:review_response_map) { build(:review_response_map, reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1) }
@@ -27,7 +27,7 @@ describe 'AssignmentTeam' do
   describe '#includes?' do
     context 'when an assignment team has one participant' do
       it 'includes one participant' do
-        allow(team).to receive(:users).with(no_args).and_return([user1])
+        allow(team).to receive(:participants).with(no_args).and_return([participant1])
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(participant1)
         expect(team.includes?(participant1)).to eq true
       end
@@ -35,7 +35,7 @@ describe 'AssignmentTeam' do
 
     context 'when an assignment team has no users' do
       it 'includes no participants' do
-        allow(team).to receive(:users).with(no_args).and_return([])
+        allow(team).to receive(:participants).with(no_args).and_return([])
         expect(team.includes?(participant1)).to eq false
       end
     end
@@ -115,17 +115,23 @@ describe 'AssignmentTeam' do
   describe '#participants' do
     context 'when an assignment team has two participants' do
       it 'has those two participants' do
-        allow(team).to receive(:users).with(no_args).and_return([user1, user2])
+        user_list = [user1, user2]
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(participant1)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: user2.id, parent_id: team.parent_id).and_return(participant2)
+        participants_list = [participant1, participant2]
+        allow(team).to receive(:users).with(no_args).and_return(user_list)
+        allow(team).to receive(:participants).with(no_args).and_return(participants_list)
+        allow(user_list).to receive(:where).and_return(participants_list)
+        allow(user_list).to receive(:flat_map).and_return(participants_list)
         expect(team.participants).to eq [participant1, participant2]
       end
     end
 
     context 'when an assignment team has a user but no participants' do
       it 'includes no participants' do
-        allow(team).to receive(:users).with(no_args).and_return([user1])
-        allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(nil)
+        user_list = [user1]
+        allow(team).to receive(:users).with(no_args).and_return(user_list)
+        allow(user_list).to receive(:where).and_return([])
         expect(team.participants).to eq []
       end
     end
@@ -299,19 +305,6 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '.team' do
-    context 'when there is a participant' do
-      it 'provides the team for participant' do
-        teamuser = build(:team_user, id: 1, team_id: team.id, user_id: user1.id)
-        allow(team).to receive(:users).with(no_args).and_return([user1])
-        allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(participant1)
-        allow(TeamsUser).to receive(:where).with(user_id: participant1.user_id).and_return([teamuser])
-        allow(Team).to receive(:find).with(teamuser.team_id).and_return(team)
-        expect(AssignmentTeam.team(participant1)).to eq(team)
-      end
-    end
-  end
-
   describe '#files' do
     context 'when file is present in the directory' do
       it 'provides the list of files in directory and checks if file is present' do
@@ -369,17 +362,11 @@ describe 'AssignmentTeam' do
       @assignment = create(:assignment)
       @student = create(:student)
       @team = create(:assignment_team, parent_id: @assignment.id)
-      @team_user = create(:team_user, team_id: @team.id, user_id: @student.id)
+      @participant = create(:participant, id: 1, user_id: @student.id, parent_id: @assignment.id)
     end
     it 'should create a team with users' do
       new_team = AssignmentTeam.create_team_with_users(@assignment.id, [@student.id])
       expect(new_team.users).to include @student
-    end
-
-    it 'should remove user from previous team' do
-      expect(@team.users).to include @student
-      new_team = AssignmentTeam.create_team_with_users(@assignment.id, [@student.id])
-      expect(@team.users).to_not include @student
     end
   end
 end

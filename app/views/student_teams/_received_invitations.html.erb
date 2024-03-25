@@ -1,28 +1,20 @@
-<!-- Partial for invitations received for collaboration on an assignment -->
 <% if inv.reply_status == 'W' %>
   <tr>
     <td><%= inv.from_user.name(session[:ip]) %></td>
     <td>
-      <% teams_users = TeamsUser.where(['user_id = ?', inv.from_id]) %>
-      <% teams_users.each do |teams_user| %>
-        <% current_team = Team.where(['id = ? and parent_id = ?', teams_user.team_id, @student.assignment.id]).first %>
-        <%= Team.find(current_team.id).name unless current_team.nil?%>
+      <% Team.includes(:teams_participants)
+             .where(teams_participants: { user_id: inv.from_id }, parent_id: @student.assignment.id)
+             .each do |team| %>
+        <%= team.name %>
       <% end %>
     </td>
     <td>
-      <%if @student.team.nil?
-          @team_id = 0
-        else
-          @team_id = @student.team.id
-        end %>
-      <%= link_to "Accept",
-                  {:controller => 'invitations', :action => 'accept', :inv_id => inv.id, :student_id => @student.id, :team_id => @team_id},
-                  {:onClick => "javascript: return confirm('Your topic (or place on waiting lists) will be relinquished if you accept the invitation. Do you want to continue?');"}
-      %>
-      |
-      <%= link_to "Decline",
-                  {:controller => 'invitations', :action => 'decline', :inv_id => inv.id, :student_id => @student.id}
-      %>
+      <% team_id = @student.team&.id || 0 %>
+      <%= link_to 'Accept', accept_invitations_path(inv_id: inv.id, student_id: @student.id, team_id: team_id), 
+      data: { confirm: 'Accepting this invitation will relinquish your current topic or waiting list spot. Continue?' } %>
+|
+      <%= link_to 'Decline', decline_invitations_path(inv_id: inv.id, student_id: @student.id), method: :get %>
+
     </td>
   </tr>
 <% end %>

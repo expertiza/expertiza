@@ -37,7 +37,7 @@ class PopupController < ApplicationController
     @sum = 0
     @team = Team.find(params[:id])
     @assignment = Assignment.find(@team.parent_id)
-    @team_users = TeamsUser.where(team_id: params[:id])
+    @team_users = TeamsParticipant.where(team_id: params[:id])
 
     # id2 is a response_map id
     unless params[:id2].nil?

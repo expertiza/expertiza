@@ -289,7 +289,7 @@ class SignUpSheetController < ApplicationController
     # find participant using assignment using team and topic ids
     team = Team.find(params[:id])
     assignment = Assignment.find(team.parent_id)
-    user = TeamsUser.find_by(team_id: team.id).user
+    user = TeamsParticipant.find_by(team_id: team.id).user
     participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
     drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
     if !participant.team.submitted_files.empty? || !participant.team.hyperlinks.empty?
@@ -411,7 +411,7 @@ class SignUpSheetController < ApplicationController
       end
       @results.each do |result|
         @team_members = ''
-        TeamsUser.where(team_id: result[:team_id]).each do |teamuser|
+        TeamsParticipant.where(team_id: result[:team_id]).each do |teamuser|
           @team_members += User.find(teamuser.user_id).name + ' '
         end
       end
@@ -421,7 +421,7 @@ class SignUpSheetController < ApplicationController
 
   def switch_original_topic_to_approved_suggested_topic
     assignment = AssignmentParticipant.find(params[:id]).assignment
-    team_id = TeamsUser.team_id(assignment.id, session[:user].id)
+    team_id = TeamsParticipant.team_id(assignment.id, session[:user].id)
 
     # Tmp variable to store topic id before change
     original_topic_id = SignedUpTeam.topic_id(assignment.id.to_i, session[:user].id)
@@ -441,7 +441,7 @@ class SignUpSheetController < ApplicationController
     # check the waitlist of original topic. Let the first waitlisted team hold the topic, if exists.
     waitlisted_teams = SignedUpTeam.where(topic_id: original_topic_id, is_waitlisted: 1)
     if waitlisted_teams.present?
-      waitlisted_first_team_first_user_id = TeamsUser.where(team_id: waitlisted_teams.first.team_id).first.user_id
+      waitlisted_first_team_first_user_id = TeamsParticipant.where(team_id: waitlisted_teams.first.team_id).first.user_id
       SignUpSheet.signup_team(assignment.id, waitlisted_first_team_first_user_id, original_topic_id)
     end
     redirect_to action: 'list', id: params[:id]

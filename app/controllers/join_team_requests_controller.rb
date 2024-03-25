@@ -89,7 +89,7 @@ class JoinTeamRequestsController < ApplicationController
 
   def check_team_status
     # check if the advertisement is from a team member and if so disallow requesting invitations
-    team_member = TeamsUser.where(['team_id =? and user_id =?', params[:team_id], session[:user][:id]])
+    team_member = TeamsParticipant.where(['team_id =? and user_id =?', params[:team_id], session[:user][:id]])
     team = Team.find(params[:team_id])
     return flash[:error] = 'This team is full.' if team.full?
     return flash[:error] = 'You are already a member of this team.' unless team_member.empty?

@@ -6,20 +6,24 @@ module ReviewMappingHelper
   #
   # gets the response map data such as reviewer id, reviewed object id and type for the review report
   #
-  def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
-    rspan = 0
-    (1..@assignment.num_review_rounds).each { |round| instance_variable_set('@review_in_round_' + round.to_s, 0) }
-
-    response_maps = ResponseMap.where(['reviewed_object_id = ? AND reviewer_id = ? AND type = ?', reviewed_object_id, reviewer_id, type])
-    response_maps.each do |ri|
-      rspan += 1 if Team.exists?(id: ri.reviewee_id)
-      responses = ri.response
-      (1..@assignment.num_review_rounds).each do |round|
-        instance_variable_set('@review_in_round_' + round.to_s, instance_variable_get('@review_in_round_' + round.to_s) + 1) if responses.exists?(round: round)
-      end
-    end
-    [response_maps, rspan]
+ # Modify get_data_for_review_report method to organize data and return it in a structured format
+def get_data_for_review_report(assignment_id, reviewer_id, type)
+  # Extract necessary data for each component of the review report
+  reviewer = Participant.find(reviewer_id)
+  review_rounds = (1..@assignment.num_review_rounds).map do |round|
+    instance_variable_get("@review_in_round_#{round}")
   end
+  response_maps, rspan = get_data_for_response_maps(assignment_id, reviewer_id, type)
+
+  # Return structured data
+  {
+    reviewer: reviewer,
+    review_rounds: review_rounds,
+    response_maps: response_maps,
+    rspan: rspan
+  }
+end
+
 
   #
   # gets the team name's color according to review and assignment submission status

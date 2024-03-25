@@ -1,22 +1,28 @@
-# <h3>Bidding Details for <%= @topic.topic_name %></h3>
+<!-- Display the title for bidding details -->
 <h3>Bidding Details for <%= @assignment.name %></h3>
+
+<% # Iterate over each topic and its associated bids %>
 <% @bids_by_topic.each do |topic_id, bids| %>
   <% topic = SignUpTopic.find(topic_id) %> <!-- Find the topic by its ID -->
-  <h4><%= topic.topic_name %></h4> <!-- Display the topic name -->
-
-<table>
-  <thead>
-    <tr>
-      <th>Team Name</th>
-      <th>Bid Priority</th>
-    </tr>
-  </thead>
-  <tbody>
-  <% bids.each do |bid_info| %> <!-- Loop through each bid_info for the topic -->
-    <tr>
-      <td><%= bid_info[:team_name] %></td> <!-- Display the team name -->
-      <td><%= bid_info[:bid_priority] %></td> <!-- Display the bid priority -->
-    </tr>
-  <% end %>
-  </tbody>
-</table>
+  
+  <!-- Display the topic name -->
+  <h4><%= topic.topic_name %></h4>
+  
+  <!-- Table to display bid details -->
+  <table>
+    <thead>
+      <tr>
+        <th>Team Name</th> <!-- Column for team name -->
+        <th>Bid Priority</th> <!-- Column for bid priority -->
+      </tr>
+    </thead>
+    <tbody>
+      <% bids.each do |bid_info| %> <!-- Iterate over each bid info -->
+        <tr>
+          <td><%= bid_info[:team_name] %></td> <!-- Display the team name -->
+          <td><%= bid_info[:bid_priority] %></td> <!-- Display the bid priority -->
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

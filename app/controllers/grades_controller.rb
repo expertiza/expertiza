@@ -164,6 +164,13 @@ class GradesController < ApplicationController
     @team.grade_for_submission = params[:grade_for_submission]
     @team.comment_for_submission = params[:comment_for_submission]
     begin
+      # Also save a grading history record for this submission
+      GradingHistory.create(instructor_id: session[:user].id,
+                            assignment_id: participant.assignment.id,
+                            graded_item_type: 'Submission',
+                            graded_member_id: @team.id,
+                            grade: @team.grade_for_submission,
+                            comment: @team.comment_for_submission)
       @team.save
       flash[:success] = 'Grade and comment for submission successfully saved.'
     rescue StandardError

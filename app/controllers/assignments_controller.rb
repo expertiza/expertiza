@@ -36,14 +36,20 @@ class AssignmentsController < ApplicationController
     render 'bidding_details'
   end
 
-  def bidding_details_for_topic
-    @topic = SignUpTopic.includes(:bids).find(params[:topic_id])
-    @bids = @topic.bids.order(:priority)
+# Controller action to fetch bidding details for a specific topic
+def bidding_details_for_topic
+  # Fetch the topic along with its associated bids
+  @topic = SignUpTopic.includes(:bids).find(params[:topic_id])
+  
+  # Order the bids by priority
+  @bids = @topic.bids.order(:priority)
 
-    respond_to do |format|
-      format.js { render 'bidding_details_for_topic', locals: { topic: @topic, bids: @bids } }
-    end
+  # Respond to the request format
+  respond_to do |format|
+    # Render JavaScript template with topic and bids as locals
+    format.js { render 'bidding_details_for_topic', locals: { topic: @topic, bids: @bids } }
   end
+end
 
 
   # creates a new assignment via the assignment form

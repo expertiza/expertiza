@@ -33,7 +33,7 @@ class ImportFileController < ApplicationController
 
     # Read the file
     @current_file = params[:file]
-    contents_grid = parse_to_grid(@current_file.read, delimiter)
+    contents_grid = parse_to_grid(@current_file, delimiter)
     @contents_hash = parse_to_hash(contents_grid, params[:has_header])
   end
 
@@ -69,7 +69,7 @@ class ImportFileController < ApplicationController
     else
       # If there is no header, recover the selected fields in the select* params
       new_header = []
-      params.each_pair do |p, value|
+      params.each_key do |p|
         if p.match(/\Aselect/)
           new_header << params[p]
         end

@@ -53,29 +53,31 @@ describe ImportFileController do
   end
 
   describe '#show' do
-    let(:file) do
-      'user, First Last, email@site.edu'
-    end
+    let(:file_content) { "user, First Last, email@site.edu" }
 
     it 'expects show to render' do
-      params = {id: 1,
-                model: 'User',
-                delim_type: 'comma',
-                has_header: 'false',
-                file: file
-                }
-      session = {user: instructor}
-      allow(file).to receive(:read).and_return(file)
-      get :start, params: params, session: session
+      params = {
+        id: 1,
+        model: 'User',
+        delim_type: 'comma',
+        has_header: 'false',
+        file: file_content
+      }
+      session = { user: instructor }
+
+      get :show, params: params, session: session
+
       expect(response).to render_template(:show)
-      expect(controller.instance_variable_get(:@id)).to eq 1.to_s
-      expect(controller.instance_variable_get(:@model)).to eq "User"
-      expect(controller.instance_variable_get(:@has_header)).to eq "false"
-      expect(controller.instance_variable_get(:@selected_fields)).to be_truthy
-      expect(controller.instance_variable_get(:@field_count)).to eq 3
-      contents_hash = controller.instance_variable_get(:@contents_hash)
+      expect(assigns(:id)).to eq "1"
+      expect(assigns(:model)).to eq "User"
+      expect(assigns(:has_header)).to eq "false"
+      expect(assigns(:selected_fields)).to be_truthy
+      expect(assigns(:field_count)).to eq 3
+      contents_hash = assigns(:contents_hash)
       expect(contents_hash[:header]).to be_nil
       expect(contents_hash[:body]).to eq [["user", "First Last", "email@site.edu"]]
     end
   end
+
+
 end

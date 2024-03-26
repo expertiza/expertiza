@@ -44,14 +44,18 @@ describe 'CourseTeam' do
   describe '#import' do
     context 'when the course does not exist' do
       it 'raises an import error' do
+        allow(Course).to receive(:find).and_return(nil)
+        row_hash = {
+          "teammembers" => "John Doe, Jane Smith, etc."
+        }
         allow(Course).to receive(:find).with(1).and_return(nil)
-        expect { CourseTeam.import({}, 1, nil) }.to raise_error(ImportError)
+        expect { CourseTeam.import(row_hash, 1, nil, nil) }.to raise_error(ImportError)
       end
     end
     context 'when the course does exist' do
       it 'raises an error with empty row hash' do
         allow(Course).to receive(:find).with(1).and_return(course)
-        expect { CourseTeam.import({}, 1, nil) }.to raise_error(ArgumentError)
+        expect { CourseTeam.import({}, 1, nil, nil) }.to raise_error(ArgumentError)
       end
     end
   end

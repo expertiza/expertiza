@@ -4,13 +4,18 @@ class ImportFileController < ApplicationController
     current_user_has_ta_privileges?
   end
 
+  # Security measure to prevent unintended models from being imported
+  ALLOWED_MODELS = ['AssignmentParticipant', 'AssignmentTeam', 'CourseParticipant', 
+  'CourseTeam', 'MetareviewResponseMap', 'Questionnaire', 'ReviewResponseMap', 
+  'SignUpSheet', 'SignUpTopic', 'User'].freeze
+
   def start
     @id = params[:id]
     @model = params[:model]
     @title = params[:title]
-    @required_fields = @model.constantize.required_import_fields
-    @optional_fields = @model.constantize.optional_import_fields(@id)
-    @import_options = @model.constantize.import_options
+    @required_fields = allowed_model.constantize.required_import_fields
+    @optional_fields = allowed_model.constantize.optional_import_fields(@id)
+    @import_options = allowed_model.constantize.import_options
   end
 
   def show
@@ -21,9 +26,9 @@ class ImportFileController < ApplicationController
     delimiter = get_delimiter(params)
 
     # All required fields are selected by default
-    @selected_fields = @model.constantize.required_import_fields
+    @selected_fields = allowed_model.constantize.required_import_fields
     # Add the chosen optional fields from start
-    optional_fields = @model.constantize.optional_import_fields(@id)
+    optional_fields = allowed_model.constantize.optional_import_fields(@id)
     optional_fields.each do |field, display|
       if params[field] == "true"
         @selected_fields.store(field, display)
@@ -165,5 +170,13 @@ class ImportFileController < ApplicationController
     row = []
     items.each { |value| row << value.sub('"', '').sub('"', '').strip }
     row
+  end
+
+  private
+
+  def allowed_model
+    # Ensure the model is whitelisted
+    raise ArgumentError, 'Invalid model' unless ALLOWED_MODELS.include?(@model)
+    @model.constantize
   end
 end

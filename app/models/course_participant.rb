@@ -28,14 +28,12 @@ class CourseParticipant < Participant
     raise ImportError, "The course with the id \"" + id.to_s + "\" was not found." if course.nil?
     raise ImportError, "The course with id " + id.to_s + " was not found." if course.nil?
     unless CourseParticipant.exists?(user_id: user.id, parent_id: id)
-    unless CourseParticipant.exists?(user_id: user.id, parent_id: id)
-      CourseParticipant.create(user_id: user.id, parent_id: id)
-      CourseParticipant.create(user_id: user.id, parent_id: id)
-    end
+      unless CourseParticipant.exists?(user_id: user.id, parent_id: id)
+        CourseParticipant.create(user_id: user.id, parent_id: id)
+        CourseParticipant.create(user_id: user.id, parent_id: id)
+      end
     end
   end
-  end
-
 
   def self.required_import_fields
     {"name" => "Name",

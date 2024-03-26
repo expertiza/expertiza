@@ -188,7 +188,7 @@ class Team < ApplicationRecord
 
   # Extract team members from the csv and push to DB,  changed to hash by E1776
   def import_team_members(row_hash)
-    row_hash[:teammembers].split.each_with_index do |teammate, _index|
+    row_hash[:teammembers].each_with_index do |teammate, _index|
       user = User.find_by(name: teammate.to_s)
       if user.nil?
         raise ImportError, "The user '#{teammate}' was not found. <a href='/users/new'>Create</a> this user?"

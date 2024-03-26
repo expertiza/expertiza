@@ -161,12 +161,12 @@ class Questionnaire < ApplicationRecord
   end
 
   def self.optional_import_fields(id)
-    ques = Questionnaire.find(id)
+    quest = Questionnaire.find(id)
     optional_fields = {"size" => "Size of question",
      "break_before" => "Break before"}
 
-    if !ques.nil?
-      for q in  ques.min_question_score..ques.max_question_score do
+    if !quest.nil?
+      for q in  quest.min_question_score..quest.max_question_score do
         optional_fields["advice_" + q.to_s] = "Advice " + q.to_s
       end
     end

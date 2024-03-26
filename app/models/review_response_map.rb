@@ -44,6 +44,7 @@ class ReviewResponseMap < ResponseMap
   end
 
   def self.import(row_hash, _session, assignment_id)
+    raise ArgumentError, 'Record does not contain required items.' if row_hash.length < self.required_import_fields.length
     reviewee_user_name = row_hash[:reviewee].to_s
     reviewee_user = User.find_by(name: reviewee_user_name)
     raise ArgumentError, 'Cannot find reviewee user.' unless reviewee_user
@@ -59,7 +60,7 @@ class ReviewResponseMap < ResponseMap
       team_node = TeamNode.create(parent_id: assignment_id, node_object_id: reviewee_team.id)
       TeamUserNode.create(parent_id: team_node.id, node_object_id: t_user.id)
     end
-    row_hash[:reviewers].each do |reviewer|
+    row_hash[:reviewers].split.each do |reviewer|
       reviewer_user_name = reviewer.to_s
       reviewer_user = User.find_by(name: reviewer_user_name)
       raise ArgumentError, 'Cannot find reviewer user.' unless reviewer_user

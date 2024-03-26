@@ -12,27 +12,32 @@ class SignUpTopic < ApplicationRecord
   validates :topic_name, :assignment_id, :max_choosers, presence: true
   validates :topic_identifier, length: { maximum: 10 }
 
-  # This method is not used anywhere
-  # def get_team_id_from_topic_id(user_id)
-  #  return find_by_sql("select t.id from teams t,teams_users u where t.id=u.team_id and u.user_id = 5");
-  # end
-
-  def self.import(row_hash, session, _id = nil)
-    if row_hash.length < 3
-      raise ArgumentError, 'The CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category (optional), Topic Description (Optional), Topic Link (optional).'
-    end
-
-    topic = SignUpTopic.where(topic_name: row_hash[:topic_name], assignment_id: session[:assignment_id]).first
+  def self.import(row_hash, session = nil, id)
+    raise ArgumentError, 'Record does not contain required items.' if row_hash.length < self.required_import_fields.length
+    topic = SignUpTopic.where(topic_name: row_hash[:topic_name], assignment_id: id).first
     if topic.nil?
-      attributes = ImportTopicsHelper.define_attributes(row_hash)
-
-      ImportTopicsHelper.create_new_sign_up_topic(attributes, session)
+      get_new_sign_up_topic(get_topic_attributes(row_hash), id)
     else
       topic.max_choosers = row_hash[:max_choosers]
       topic.topic_identifier = row_hash[:topic_identifier]
-      # topic.assignment_id = session[:assignment_id]
       topic.save
     end
+  end
+
+  def self.required_import_fields
+    {"topic_identifier" => "Topic Identifier",
+     "topic_name" => "Topic Name",
+     "max_choosers" => "Max Choosers"}
+  end
+
+  def self.optional_import_fields(id=nil)
+    {"category" => "Category",
+     "description" => "Description",
+     "link" => "Link"}
+  end
+
+  def self.import_options
+    {}
   end
 
   def self.find_slots_filled(assignment_id)
@@ -159,5 +164,24 @@ class SignUpTopic < ApplicationRecord
     else
       return 'failed'
     end
+  end
+
+  private
+
+  def get_topic_attributes(row_hash)
+    attributes = {}
+    attributes["topic_identifier"] = row_hash[:topic_identifier].strip
+    attributes["topic_name"] = row_hash[:topic_name].strip
+    attributes["max_choosers"] = row_hash[:max_choosers].strip
+    attributes["category"] = row_hash[:category].strip unless row_hash[:category].nil?
+    attributes["description"] = row_hash[:description].strip unless row_hash[:description].nil?
+    attributes["link"] = row_hash[:link].strip unless row_hash[:link].nil?
+    attributes
+  end
+
+  def get_new_sign_up_topic(attributes, id)
+    sign_up_topic = SignUpTopic.new(attributes)
+    sign_up_topic.assignment_id = id
+    sign_up_topic.save
   end
 end

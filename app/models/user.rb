@@ -161,13 +161,12 @@ class User < ApplicationRecord
     password
   end
 
-  def self.import(row_hash, _row_header, session, _id = nil)
-    raise ArgumentError, "Only #{row_hash.length} column(s) is(are) found. It must contain at least username, full name, email." if row_hash.length < 3
+  def self.import(row_hash, session, _id = nil)
+    raise ArgumentError, 'Record does not contain required items.' if row_hash.length < self.required_import_fields.length
 
     user = User.find_by_name(row_hash[:username])
     if user.nil?
-      attributes = ImportFileHelper.define_attributes(row_hash)
-      user = ImportFileHelper.create_new_user(attributes, session)
+      user = get_new_user(row_hash, session)
     else
       user.email = row_hash[:email]
       user.fullname = row_hash[:fullname]
@@ -175,6 +174,20 @@ class User < ApplicationRecord
       user.save
     end
     user
+  end
+
+  def self.required_import_fields
+    {"name" => "Name",
+     "fullname" => "Full Name",
+     "email" => "Email"}
+  end
+
+  def self.optional_import_fields(id=nil)
+    {}
+  end
+
+  def self.import_options
+    {}
   end
 
   def self.yesorno(elt)
@@ -322,5 +335,23 @@ class User < ApplicationRecord
       users = User.order('name').where('(role_id in (?) or id = ?) and name like ?', role.get_available_roles, user_id, search_filter)
     end
     users
+  end
+  
+  private
+
+  def self.get_new_user(row_hash, session)
+    attributes = {"role_id" => Role.student.id,
+     "name" => row_hash[:name],
+     "fullname" => row_hash[:fullname],
+     "email" => row_hash[:email],
+     "email_on_submission" => 1,
+     "email_on_review" => 1,
+     "email_on_review_of_review" => 1}
+
+    user = User.new(attributes)
+    user.parent_id = (session[:user]).id
+    user.timezonepref = User.find(user.parent_id).timezonepref
+    user.save!
+    user
   end
 end

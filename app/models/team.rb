@@ -188,7 +188,7 @@ class Team < ApplicationRecord
 
   # Extract team members from the csv and push to DB,  changed to hash by E1776
   def import_team_members(row_hash)
-    row_hash[:teammembers].each_with_index do |teammate, _index|
+    row_hash[:teammembers].split.each_with_index do |teammate, _index|
       user = User.find_by(name: teammate.to_s)
       if user.nil?
         raise ImportError, "The user '#{teammate}' was not found. <a href='/users/new'>Create</a> this user?"
@@ -198,11 +198,11 @@ class Team < ApplicationRecord
     end
   end
 
-  #  changed to hash by E1776
-  def self.import(row_hash, id, options, teamtype)
-    raise ArgumentError, 'Not enough fields on this line.' if row_hash.empty? || (row_hash[:teammembers].empty? && (options[:has_teamname] == 'true_first' || options[:has_teamname] == 'true_last')) || (row_hash[:teammembers].empty? && (options[:has_teamname] == 'true_first' || options[:has_teamname] == 'true_last'))
-
-    if options[:has_teamname] == 'true_first' || options[:has_teamname] == 'true_last'
+  # Helper for importing CourseTeam and AssignmentTeam objects. Should not be used to import
+  # pure Team objects.
+  def self.import_helper(row_hash, id, options, teamtype)
+    raise ArgumentError, 'Include duplicate handling option.' if not options.has_key? :handle_dups
+    if row_hash.has_key? :teamname
       name = row_hash[:teamname].to_s
       team = where(['name =? && parent_id =?', name, id]).first
       team_exists = !team.nil?
@@ -215,13 +215,11 @@ class Team < ApplicationRecord
       end
     end
     if name
-      team = Object.const_get(teamtype.to_s).create_team_and_node(id)
+      team = Object.const_get(teamtype.type).create_team_and_node(id)
       team.name = name
       team.save
     end
-
     # insert team members into team unless team was pre-existing & we ignore duplicate teams
-
     team.import_team_members(row_hash) unless team_exists && options[:handle_dups] == 'ignore'
   end
 

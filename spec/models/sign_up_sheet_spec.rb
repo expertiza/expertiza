@@ -100,9 +100,3 @@ describe '.confirm_topic' do
     expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be(false)
   end
 end
-
-describe '.import' do
-  it 'raises error if import column equal to 1'
-
-  it 'signs up team for assignment with info from import file'
-end

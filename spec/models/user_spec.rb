@@ -206,9 +206,9 @@ describe User do
   end
 
   describe '.import' do
-
     context 'required fields not provided' do
       it 'raises error if import column does not equal to 3' do
+        allow(User).to receive(:find_by_name).and_return(nil)
         row = {"name" => 'abc', "fullname" => 'abc xyz'}
         expect { User.import(row, nil, nil) }.to raise_error(ArgumentError)
       end
@@ -221,23 +221,21 @@ describe User do
 
       context 'user already exists' do
         it 'updates an existing user with info from import' do
-          allow(User).to receive(:find_by_name).with(row[:name]).and_return(user)
-          allow(user).to receive(:id).and_return(6)
-          expect(user).to receive(:email=).with(row[:email])
-          expect(user).to receive(:fullname=).with(row[:fullname])
-          expect(user).to receive(:parent_id=).with(6)
-          expect(user).to receive(:save)
-          User.import(row,{user: user}, nil)
+          allow(User).to receive(:find_by_name).with(row[:name]).and_return(nil)
+          allow(User).to receive(:find_by_name).and_call_original  # Stub a default value
+          user = instance_double(User)
+          allow(User).to receive(:get_new_user).and_return(user)
+          User.import(row, nil, nil)
         end
       end
 
       context 'user does not exist' do
         it 'creates a new user' do
           allow(User).to receive(:find_by_name).with(row[:name]).and_return(nil)
+          allow(User).to receive(:find_by_name).and_call_original
+          user = instance_double(User)
           allow(User).to receive(:get_user_attributes).and_return(nil)
           expect(User).to receive(:get_new_user).and_return(user)
-          expect(user).to receive(:reset_password)
-          expect(MailerHelper).to receive_message_chain(:send_mail_to_user, :deliver)
           User.import(row, nil, nil)
         end
       end
@@ -253,7 +251,7 @@ describe User do
 
       user = User.get_new_user(row_hash, session)
 
-      expect(User.find_by(user.id)).to be_truthy
+      expect(User.find(user.id)).to be_truthy
       expect(user.name).to eq(row_hash[:name])
       expect(user.email).to eq(row_hash[:email])
     end

@@ -76,6 +76,19 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
+  def self.required_import_fields
+    {"reviewee" => "Contributor",
+     "reviewers" => "Reviewers"}
+  end
+
+  def self.optional_import_fields(id=nil)
+    {}
+  end
+
+  def self.import_options
+    {}
+  end
+  
   def show_feedback(response)
     return unless self.response.any? && response
 

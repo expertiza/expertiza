@@ -168,7 +168,7 @@ class SignUpTopic < ApplicationRecord
 
   private
 
-  def get_topic_attributes(row_hash)
+  def self.get_topic_attributes(row_hash)
     attributes = {}
     attributes['topic_identifier'] = row_hash[:topic_identifier].strip
     attributes['topic_name'] = row_hash[:topic_name].strip

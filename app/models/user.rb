@@ -337,9 +337,7 @@ class User < ApplicationRecord
     users
   end  
 
-  private
-
-  def get_new_user(row_hash, session)
+  def self.get_new_user(row_hash, session)
     attributes = { 'role_id' => Role.student.id,
                    'name' => row_hash[:name],
                    'fullname' => row_hash[:fullname],

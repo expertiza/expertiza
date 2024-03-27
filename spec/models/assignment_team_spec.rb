@@ -196,7 +196,7 @@ describe 'AssignmentTeam' do
       it 'raises ImportError' do
         assignment_id = 1
         allow(Assignment).to receive(:find_by).with(id: assignment_id).and_return(nil)
-        error_message = 'The assignment with the id "' + assignment_id.to_s + '\" was not found. <a href=\'/assignment/new\'>Create</a> this assignment?'
+        error_message = 'The assignment with the id "' + assignment_id.to_s + '" was not found. <a href=\'/assignment/new\'>Create</a> this assignment?'
         expect { AssignmentTeam.import(row, nil, assignment_id, nil) }
           .to raise_error(ImportError, error_message)
       end

@@ -65,7 +65,7 @@ class ImportFileController < ApplicationController
   # view. Update the expected columns view in the start page to reflect the optional params.
   def import_from_hash(session, params)
     model = params[:model]
-    contents_hash = eval(params[:contents_hash])
+    contents_hash = JSON.parse(params[:contents_hash])
 
     if params[:has_header] == 'true'
       header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])

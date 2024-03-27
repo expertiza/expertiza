@@ -13,9 +13,9 @@ class ImportFileController < ApplicationController
     @id = params[:id]
     @model = params[:model]
     @title = params[:title]
-    @required_fields = allowed_model.required_import_fields
-    @optional_fields = allowed_model.optional_import_fields(@id)
-    @import_options = allowed_model.import_options
+    @required_fields = allowed_model(@model).required_import_fields
+    @optional_fields = allowed_model(@model).optional_import_fields(@id)
+    @import_options = allowed_model(@model).import_options
   end
 
   def show
@@ -26,9 +26,9 @@ class ImportFileController < ApplicationController
     delimiter = get_delimiter(params)
 
     # All required fields are selected by default
-    @selected_fields = allowed_model.required_import_fields
+    @selected_fields = allowed_model(@model).required_import_fields
     # Add the chosen optional fields from start
-    optional_fields = allowed_model.optional_import_fields(@id)
+    optional_fields = allowed_model(@model).optional_import_fields(@id)
     optional_fields.each do |field, display|
     @selected_fields.store(field, display) if params[field] == 'true'
     end
@@ -82,10 +82,10 @@ class ImportFileController < ApplicationController
     errors = []
     begin
       header_integrated_body.each do |row_hash|
-        if model.constantize.import_options.empty?
-          model.constantize.import(row_hash, session, params[:id])
+        if allowed_model(model).import_options.empty?
+          allowed_model(model).import(row_hash, session, params[:id])
         else
-          model.constantize.import(row_hash, session, params[:id], params[:options])
+          allowed_model(model).import(row_hash, session, params[:id], params[:options])
         end
       end
     rescue StandardError
@@ -171,8 +171,8 @@ class ImportFileController < ApplicationController
   private
 
   # Ensure the model is whitelisted
-  def allowed_model
-    idx = ALLOWED_MODELS.index(@model)
+  def allowed_model(model)
+    idx = ALLOWED_MODELS.index(model)
     raise ArgumentError, 'Invalid model' if idx.nil?
 
     ALLOWED_MODELS[idx].constantize

@@ -13,9 +13,9 @@ class ImportFileController < ApplicationController
     @id = params[:id]
     @model = params[:model]
     @title = params[:title]
-    @required_fields = allowed_model.constantize.required_import_fields
-    @optional_fields = allowed_model.constantize.optional_import_fields(@id)
-    @import_options = allowed_model.constantize.import_options
+    @required_fields = allowed_model.required_import_fields
+    @optional_fields = allowed_model.optional_import_fields(@id)
+    @import_options = allowed_model.import_options
   end
 
   def show
@@ -26,9 +26,9 @@ class ImportFileController < ApplicationController
     delimiter = get_delimiter(params)
 
     # All required fields are selected by default
-    @selected_fields = allowed_model.constantize.required_import_fields
+    @selected_fields = allowed_model.required_import_fields
     # Add the chosen optional fields from start
-    optional_fields = allowed_model.constantize.optional_import_fields(@id)
+    optional_fields = allowed_model.optional_import_fields(@id)
     optional_fields.each do |field, display|
       if params[field] == "true"
         @selected_fields.store(field, display)
@@ -176,7 +176,8 @@ class ImportFileController < ApplicationController
 
   def allowed_model
     # Ensure the model is whitelisted
-    raise ArgumentError, 'Invalid model' unless ALLOWED_MODELS.include?(@model)
-    @model.constantize
+    model = @model
+    raise ArgumentError, 'Invalid model' unless ALLOWED_MODELS.include?(model)
+    model.constantize
   end
 end

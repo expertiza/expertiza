@@ -8,7 +8,7 @@ describe ImportFileController do
   describe '#action_allowed?' do
     context 'when params action is edit or update' do
       before(:each) do
-        controller.params = {id: '1', action: 'edit'}
+        controller.params = { id: '1', action: 'edit' }
       end
 
       context 'when the role name of current user is super admin or admin' do
@@ -43,8 +43,8 @@ describe ImportFileController do
 
   describe '#start' do
     it 'initializes variables to passed parameters' do
-      params = {id: 1, model: 'ReviewResponseMap', title: 'Reviewer Mappings'}
-      session = {user: instructor}
+      params = { id: 1, model: 'ReviewResponseMap', title: 'Reviewer Mappings' }
+      session = { user: instructor }
       get :start, params: params, session: session
       expect(controller.instance_variable_get(:@id)).to eq 1.to_s
       expect(controller.instance_variable_get(:@model)).to eq 'ReviewResponseMap'
@@ -53,7 +53,7 @@ describe ImportFileController do
   end
 
   describe '#show' do
-    let(:file_content) { "user, First Last, email@site.edu" }
+    let(:file_content) { 'user, First Last, email@site.edu' }
 
     it 'expects show to render' do
       params = {
@@ -68,16 +68,14 @@ describe ImportFileController do
       get :show, params: params, session: session
 
       expect(response).to render_template(:show)
-      expect(assigns(:id)).to eq "1"
-      expect(assigns(:model)).to eq "User"
-      expect(assigns(:has_header)).to eq "false"
+      expect(assigns(:id)).to eq '1'
+      expect(assigns(:model)).to eq 'User'
+      expect(assigns(:has_header)).to eq 'false'
       expect(assigns(:selected_fields)).to be_truthy
       expect(assigns(:field_count)).to eq 3
       contents_hash = assigns(:contents_hash)
       expect(contents_hash[:header]).to be_nil
-      expect(contents_hash[:body]).to eq [["user", "First Last", "email@site.edu"]]
+      expect(contents_hash[:body]).to eq [['user', 'First Last', 'email@site.edu']]
     end
   end
-
-
 end

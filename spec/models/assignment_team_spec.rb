@@ -190,22 +190,22 @@ describe 'AssignmentTeam' do
 
   describe '.import' do
     let(:row) do
-      {teammembers: 'none'}
+      { teammembers: 'none' }
     end
-    context "when an assignment team does not exist with id" do
-      it "raises ImportError" do
+    context 'when an assignment team does not exist with id' do
+      it 'raises ImportError' do
         assignment_id = 1
         allow(Assignment).to receive(:find_by).with(id: assignment_id).and_return(nil)
-        error_message = 'The assignment with the id "' + assignment_id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
+        error_message = 'The assignment with the id "' + assignment_id.to_s + '\" was not found. <a href=\'/assignment/new\'>Create</a> this assignment?'
         expect { AssignmentTeam.import(row, nil, assignment_id, nil) }
           .to raise_error(ImportError, error_message)
       end
     end
 
-    context "when the assignment team does not have the required fields" do
-      it "raises ArgumentError" do
-        expect { AssignmentTeam.import([], nil, 1, nil) }.
-          to raise_error(ArgumentError)
+    context 'when the assignment team does not have the required fields' do
+      it 'raises ArgumentError' do
+        expect { AssignmentTeam.import([], nil, 1, nil) }
+          .to raise_error(ArgumentError)
       end
     end
 
@@ -277,8 +277,8 @@ describe 'AssignmentTeam' do
   end
 
   describe '#remove_hyperlink' do
-    context "when the hyperlink is in the assignment team's hyperlinks" do
-      it "is removed from the team's list of hyperlinks" do
+    context 'when the hyperlink is in the assignment team\'s hyperlinks' do
+      it 'is removed from the team\'s list of hyperlinks' do
         allow(team).to receive(:hyperlinks).and_return(%w[https://expertiza.ncsu.edu https://www.ncsu.edu])
         expect(team).to receive(:submitted_hyperlinks=)
         expect(team).to receive(:save)

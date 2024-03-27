@@ -166,7 +166,7 @@ describe Team do
       it 'raises an ImportError' do
         allow(User).to receive(:find_by).with(name: 'no name').and_return(nil)
         expect { team.import_team_members(teammembers: ['no name']) }.to raise_error(ImportError,
-                                                                                     "The user 'no name' was not found. <a href='/users/new'>Create</a> this user?")
+                                                                                     'The user \'no name\' was not found. <a href=\'/users/new\'>Create</a> this user?')
       end
     end
 
@@ -200,13 +200,13 @@ describe Team do
 
   describe '.import_helper' do
     let(:options) do
-      {handle_dups: 'ignore'}
+      { handle_dups: 'ignore' }
     end
 
     context 'when no handle duplicates option provided' do
       it 'raises an ArgumentError' do
-        expect { Team.import_helper({}, 1, {has_column_names: 'false'}, AssignmentTeam.new) }
-          .to raise_error(ArgumentError, "Include duplicate handling option.")
+        expect { Team.import_helper({}, 1, { has_column_names: 'false' }, AssignmentTeam.new) }
+          .to raise_error(ArgumentError, 'Include duplicate handling option.')
       end
     end
 
@@ -218,7 +218,7 @@ describe Team do
         allow(Team).to receive(:where).with(any_args).and_return(team)
         allow(team).to receive(:first).and_return(team)
         allow(team).to receive(:nil?).and_return(false)
-        allow(Team).to receive(:handle_duplicate).and_return("Ruby")
+        allow(Team).to receive(:handle_duplicate).and_return('Ruby')
         allow(team).to receive(:import_team_members).with(any_args).and_return(nil)
         allow(Object).to receive_message_chain(:const_get, :create_team_and_node).and_return(team)
         expect(team).to receive(:save) # Expect the object creation in the database
@@ -229,11 +229,11 @@ describe Team do
 
     context 'when teamname is not provided' do
       let(:row) do
-        {teammembers: 'none'}
+        { teammembers: 'none' }
       end
       it 'generates a teamname' do
         allow(Assignment).to receive(:find).with(any_args).and_return(assignment)
-        allow(Team).to receive(:generate_team_name).with(assignment.name).and_return("Not a team")
+        allow(Team).to receive(:generate_team_name).with(assignment.name).and_return('Not a team')
         allow(AssignmentTeam).to receive(:create_team_and_node).with(any_args).and_return(team)
         allow(Object).to receive_message_chain(:const_get, :create_team_and_node).and_return(team)
         allow(AssignmentTeam).to receive(:is_a?).with(AssignmentTeam).and_return(true)

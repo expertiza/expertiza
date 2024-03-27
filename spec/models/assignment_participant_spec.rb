@@ -134,7 +134,7 @@ describe AssignmentParticipant do
 
     context 'when the record does not have required items' do
       it 'raises an ArgumentError' do
-        row = {name: 'no one', fullname: 'no one'}
+        row = { name: 'no one', fullname: 'no one' }
         expect { AssignmentParticipant.import(row, nil, 1) }.to raise_error(ArgumentError)
       end
     end
@@ -145,30 +145,28 @@ describe AssignmentParticipant do
       end
 
       let(:user) do
-        double("User", :id => 1, :nil? => true)
+        double('User', :id => 1, :nil? => true)
       end
 
       it 'command User to import new user' do
-
         allow(User).to receive(:exists?).with(name: 'no one').and_return(false)
         allow(AssignmentParticipant).to receive(:set_handle).with(no_args).and_return(nil)
         expect(User).to receive(:import).with(row, nil, nil).and_return(user)
-        
-        AssignmentParticipant.import(row, nil, 1)
 
+        AssignmentParticipant.import(row, nil, 1)
       end
     end
 
     context 'when no user is found by providesername' do
       context 'when the record has required itemd us' do
-      let(:row) do
-        {name: 'no one', fullname: 'no one', email: 'name@email.com'}
-      end
-      before(:each) do
-        user = double("User", :id => 1, :nil? => true)
-        allow(User).to receive(:find_by).with(:name => "no one").and_return(user)
-        allow(User).to receive(:import).with(any_args).and_return(user)
-      end
+        let(:row) do
+          { name: 'no one', fullname: 'no one', email: 'name@email.com' }
+        end
+        before(:each) do
+          user = double('User', :id => 1, :nil? => true)
+          allow(User).to receive(:find_by).with(:name => 'no one').and_return(user)
+          allow(User).to receive(:import).with(any_args).and_return(user)
+        end
 
         context 'when assignment cannot be found' do
           it 'creates a new user then raises an ImportError' do

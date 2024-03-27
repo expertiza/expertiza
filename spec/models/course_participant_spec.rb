@@ -23,7 +23,7 @@ describe 'CourseParticipant' do
     end
   end
 
-  describe ".import" do
+  describe '.import' do
     context 'when record is empty' do
       it 'raises an ArgumentError' do
         expect { CourseParticipant.import({}, nil, nil) }.to raise_error(ArgumentError)
@@ -32,7 +32,7 @@ describe 'CourseParticipant' do
 
     context 'when the record does not have required items' do
       it 'raises an ArgumentError' do
-        row = {name: 'no one', fullname: 'no one'}
+        row = { name: 'no one', fullname: 'no one' }
         expect { CourseParticipant.import(row, nil, 1) }.to raise_error(ArgumentError)
       end
     end
@@ -40,11 +40,11 @@ describe 'CourseParticipant' do
     context 'when no user is found by provided username' do
       context 'when the record has required items' do
         let(:row) do
-          {name: 'no one', fullname: 'no one', email: 'name@email.com'}
+          { name: 'no one', fullname: 'no one', email: 'name@email.com' }
         end
         before(:each) do
-          user = double("User", :id => 1, :nil? => true)
-          allow(User).to receive(:find_by).with(:name => "no one").and_return(user)
+          user = double('User', :id => 1, :nil? => true)
+          allow(User).to receive(:find_by).with(:name => 'no one').and_return(user)
           allow(User).to receive(:import).with(any_args).and_return(user)
         end
 

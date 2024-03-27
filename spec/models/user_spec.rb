@@ -209,20 +209,20 @@ describe User do
     context 'required fields not provided' do
       it 'raises error if import column does not equal to 3' do
         allow(User).to receive(:find_by_name).and_return(nil)
-        row = {"name" => 'abc', "fullname" => 'abc xyz'}
+        row = { 'name' => 'abc', 'fullname' => 'abc xyz' }
         expect { User.import(row, nil, nil) }.to raise_error(ArgumentError)
       end
     end
 
     context 'required fields provided' do
       let (:row) do
-        {name: 'abc', fullname: 'test, test', email: 'test@gmail.com'}
+        { name: 'abc', fullname: 'test, test', email: 'test@gmail.com' }
       end
 
       context 'user already exists' do
         it 'updates an existing user with info from import' do
           allow(User).to receive(:find_by_name).with(row[:name]).and_return(nil)
-          allow(User).to receive(:find_by_name).and_call_original  # Stub a default value
+          allow(User).to receive(:find_by_name).and_call_original # Stub a default value
           user = instance_double(User)
           allow(User).to receive(:get_new_user).and_return(user)
           User.import(row, nil, nil)
@@ -244,9 +244,9 @@ describe User do
 
   describe '.get_new_user' do
     it 'gets a user with the provided attributes' do
-      row_hash = {name: "name", fullname: "Full Name", email: "email@mail.com"}
-      session = {user: user}
-      allow(User).to receive_message_chain(:find, :timezonepref).and_return("none")
+      row_hash = { name: 'name', fullname: 'Full Name', email: 'email@mail.com' }
+      session = { user: user }
+      allow(User).to receive_message_chain(:find, :timezonepref).and_return('none')
       allow(Role).to receive_message_chain(:student, :id).and_return(1)
 
       user = User.get_new_user(row_hash, session)

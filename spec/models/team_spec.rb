@@ -212,7 +212,7 @@ describe Team do
 
     context 'when teamname provided' do
       let(:row) do
-        {teamname: 'Ruby', teammembers: 'none'}
+        { teamname: 'Ruby', teammembers: 'none' }
       end
       it 'uses provided teamname' do
         allow(Team).to receive(:where).with(any_args).and_return(team)

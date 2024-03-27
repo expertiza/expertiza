@@ -13,7 +13,7 @@ class SignUpTopic < ApplicationRecord
   validates :topic_identifier, length: { maximum: 10 }
 
   def self.import(row_hash, session = nil, id)
-    raise ArgumentError, 'Record does not contain required items.' if row_hash.length < self.required_import_fields.length
+    raise ArgumentError, 'Record does not contain required items.' if row_hash.length < required_import_fields.length
     topic = SignUpTopic.where(topic_name: row_hash[:topic_name], assignment_id: id).first
     if topic.nil?
       get_new_sign_up_topic(get_topic_attributes(row_hash), id)
@@ -26,14 +26,14 @@ class SignUpTopic < ApplicationRecord
 
   def self.required_import_fields
     { 'topic_identifier' => 'Topic Identifier',
-     'topic_name' => 'Topic Name',
-     'max_choosers' => 'Max Choosers' }
+      'topic_name' => 'Topic Name',
+      'max_choosers' => 'Max Choosers' }
   end
 
-  def self.optional_import_fields(id = nil)
-    {'category' => 'Category',
-     'description' => 'Description',
-     'link' => 'Link'}
+  def self.optional_import_fields(_id = nil)
+    { 'category' => 'Category',
+      'description' => 'Description',
+      'link' => 'Link' }
   end
 
   def self.import_options
@@ -170,12 +170,12 @@ class SignUpTopic < ApplicationRecord
 
   def get_topic_attributes(row_hash)
     attributes = {}
-    attributes["topic_identifier"] = row_hash[:topic_identifier].strip
-    attributes["topic_name"] = row_hash[:topic_name].strip
-    attributes["max_choosers"] = row_hash[:max_choosers].strip
-    attributes["category"] = row_hash[:category].strip unless row_hash[:category].nil?
-    attributes["description"] = row_hash[:description].strip unless row_hash[:description].nil?
-    attributes["link"] = row_hash[:link].strip unless row_hash[:link].nil?
+    attributes['topic_identifier'] = row_hash[:topic_identifier].strip
+    attributes['topic_name'] = row_hash[:topic_name].strip
+    attributes['max_choosers'] = row_hash[:max_choosers].strip
+    attributes['category'] = row_hash[:category].strip unless row_hash[:category].nil?
+    attributes['description'] = row_hash[:description].strip unless row_hash[:description].nil?
+    attributes['link'] = row_hash[:link].strip unless row_hash[:link].nil?
     attributes
   end
 
@@ -187,12 +187,12 @@ class SignUpTopic < ApplicationRecord
 
   def self.get_topic_attributes(row_hash)
     attributes = {}
-    attributes["topic_identifier"] = row_hash[:topic_identifier].strip
-    attributes["topic_name"] = row_hash[:topic_name].strip
-    attributes["max_choosers"] = row_hash[:max_choosers].strip
-    attributes["category"] = row_hash[:category].strip unless row_hash[:category].nil?
-    attributes["description"] = row_hash[:description].strip unless row_hash[:description].nil?
-    attributes["link"] = row_hash[:link].strip unless row_hash[:link].nil?
+    attributes['topic_identifier'] = row_hash[:topic_identifier].strip
+    attributes['topic_name'] = row_hash[:topic_name].strip
+    attributes['max_choosers'] = row_hash[:max_choosers].strip
+    attributes['category'] = row_hash[:category].strip unless row_hash[:category].nil?
+    attributes['description'] = row_hash[:description].strip unless row_hash[:description].nil?
+    attributes['link'] = row_hash[:link].strip unless row_hash[:link].nil?
     attributes
   end
 end

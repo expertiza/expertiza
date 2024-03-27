@@ -115,13 +115,12 @@ class Questionnaire < ApplicationRecord
     errors.add(:name, 'Questionnaire names must be unique.') if results.present?
   end
 
-
   # A row_hash here is a question that gets added to the questionnaire
   #
   # NOTE: Assuming rows have headers :question, :type, :weight, :param
   # in that specific order. Also need advice with string score
   def self.import(row_hash, session = nil, id)
-    raise ArgumentError, 'Record does not contain required items.' if row_hash.length < self.required_import_fields.length
+    raise ArgumentError, 'Record does not contain required items.' if row_hash.length < required_import_fields.length
 
     questionnaire = Questionnaire.find(id)
     raise ImportError, 'Questionnaire with provided ID does not exist.' if questionnaire.nil?
@@ -134,19 +133,18 @@ class Questionnaire < ApplicationRecord
     q.seq = row_hash[:seq].to_i
 
     # Optional fields
-    q.break_before = (row_hash[:break_before] || "true")
+    q.break_before = (row_hash[:break_before] || 'true')
     q.size = row_hash[:size] if row_hash[:size]
 
     # Add question advice
     row_hash.each_key do |k|
       # Check score within range
       k = k.to_s
-      if k.match("advice*")
-        score = k.delete("advice_")
-        if score.to_i >= questionnaire.min_question_score && score.to_i <= questionnaire.max_question_score
-          a = QuestionAdvice.create!(score: k.to_i, advice: row_hash[k])
-          q.question_advices << a
-        end
+      if k =~ 'advice*'
+        score = k.delete('advice_')
+        next unless score.to_i >= questionnaire.min_question_score && score.to_i <= questionnaire.max_question_score
+        a = QuestionAdvice.create!(score: k.to_i, advice: row_hash[k])
+        q.question_advices << a
       end
     end
     q.save!
@@ -155,9 +153,9 @@ class Questionnaire < ApplicationRecord
 
   def self.required_import_fields
     { 'txt' => 'Question text',
-     'type' => 'Question type',
-     'seq' => 'Sequence (for order)',
-     'weight' => 'Point value' }
+      'type' => 'Question type',
+      'seq' => 'Sequence (for order)',
+       'weight' => 'Point value' }
   end
 
   def self.optional_import_fields(id)
@@ -165,8 +163,8 @@ class Questionnaire < ApplicationRecord
     optional_fields = { 'size' => 'Size of question',
      'break_before' => 'Break before' }
 
-    if !quest.nil?
-      for q in  quest.min_question_score..quest.max_question_score do
+    unless quest.nil?
+      for q in quest.min_question_score..quest.max_question_score do
         optional_fields['advice_' + q.to_s] = 'Advice ' + q.to_s
       end
     end

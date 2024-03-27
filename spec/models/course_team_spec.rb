@@ -99,7 +99,7 @@ describe 'CourseTeam' do
       it 'raises ImportError' do
         course_id = 1
         allow(Course).to receive(:find).with(course_id).and_return(nil)
-        error_message = 'The course with the id \"' + course_id.to_s + '\" was not found. <a href='/course/new'>Create</a> this course?'
+        error_message = 'The course with the id \"' + course_id.to_s + '\" was not found. <a href=\'/course/new\'>Create</a> this course?'
         expect { CourseTeam.import(row, nil, course_id, nil) }
           .to raise_error(ImportError, error_message)
       end

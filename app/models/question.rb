@@ -75,9 +75,7 @@ class Question < ApplicationRecord
     question_ids
   end
 
-  def self.import(headers, data, questionnaire_id)
-
-  end
+  def self.import(headers, data, questionnaire_id) end
 
   def self.export_fields(_options)
     fields = ['Seq', 'Question', 'Type', 'Weight', 'text area size', 'max_label', 'min_label']

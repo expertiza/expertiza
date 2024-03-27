@@ -109,7 +109,7 @@ class AssignmentParticipant < Participant
 
   # Note: If user does not exist, it will be created and added to this assignment
   def self.import(row_hash, session, id)
-    raise ArgumentError, 'Record does not contain required items.' if row_hash.length < self.required_import_fields.length
+    raise ArgumentError, 'Record does not contain required items.' if row_hash.length < required_import_fields.length
     user = User.find_by(name: row_hash[:name])
     user = User.import(row_hash, session, nil) if user.nil?
     raise ImportError, "The assignment with id #{id} was not found." if Assignment.find(id).nil?
@@ -121,11 +121,11 @@ class AssignmentParticipant < Participant
 
   def self.required_import_fields
     { 'name' => 'Name',
-     'fullname' => 'Full Name',
-     'email' => 'Email' }
+      'fullname' => 'Full Name',
+      'email' => 'Email' }
   end
 
-  def self.optional_import_fields(id = nil)
+  def self.optional_import_fields(_id = nil)
     {}
   end
 

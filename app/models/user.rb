@@ -162,7 +162,7 @@ class User < ApplicationRecord
   end
 
   def self.import(row_hash, session, _id = nil)
-    raise ArgumentError, 'Record does not contain required items.' if row_hash.length < self.required_import_fields.length
+    raise ArgumentError, 'Record does not contain required items.' if row_hash.length < required_import_fields.length
 
     user = User.find_by_name(row_hash[:username])
     if user.nil?
@@ -182,7 +182,7 @@ class User < ApplicationRecord
      'email' => 'Email' }
   end
 
-  def self.optional_import_fields(id = nil)
+  def self.optional_import_fields(_id = nil)
     {}
   end
 
@@ -335,18 +335,18 @@ class User < ApplicationRecord
       users = User.order('name').where('(role_id in (?) or id = ?) and name like ?', role.get_available_roles, user_id, search_filter)
     end
     users
-  end
-  
+  end  
+
   private
 
-  def self.get_new_user(row_hash, session)
-    attributes = {"role_id" => Role.student.id,
-     "name" => row_hash[:name],
-     "fullname" => row_hash[:fullname],
-     "email" => row_hash[:email],
-     "email_on_submission" => 1,
-     "email_on_review" => 1,
-     "email_on_review_of_review" => 1}
+  def get_new_user(row_hash, session)
+    attributes = { 'role_id' => Role.student.id,
+                   'name' => row_hash[:name],
+                   'fullname' => row_hash[:fullname],
+                   'email' => row_hash[:email],
+                   'email_on_submission' => 1,
+                   'email_on_review' => 1,
+                   'email_on_review_of_review' => 1 }
 
     user = User.new(attributes)
     user.parent_id = (session[:user]).id

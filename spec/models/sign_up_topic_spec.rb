@@ -9,13 +9,13 @@ describe SignUpTopic do
   describe '.import' do
     context 'does not include required fields' do
       it 'raises ArgumentError' do
-        expect { SignUpTopic.import({key: 'val'}, nil, 1) }.to raise_error(ArgumentError)
+        expect { SignUpTopic.import({ key: 'val' }, nil, 1) }.to raise_error(ArgumentError)
       end
     end
 
     context 'required fields provided' do
       let (:row) do
-        { topic_identifier: 'idn', topic_name: 'my_topic', max_choosers: "3" }
+        { topic_identifier: 'idn', topic_name: 'my_topic', max_choosers: '3' }
       end
 
       context 'no existing signup topic' do

@@ -6,8 +6,8 @@ class ImportFileController < ApplicationController
 
   # Security measure to prevent unintended models from being imported
   ALLOWED_MODELS = %w[AssignmentParticipant AssignmentTeam CourseParticipant
-  CourseTeam MetareviewResponseMap Questionnaire ReviewResponseMap 
-  SignUpSheet SignUpTopic User].freeze
+                    CourseTeam MetareviewResponseMap Questionnaire ReviewResponseMap 
+                    SignUpSheet SignUpTopic User].freeze
 
   def start
     @id = params[:id]
@@ -30,9 +30,7 @@ class ImportFileController < ApplicationController
     # Add the chosen optional fields from start
     optional_fields = allowed_model.optional_import_fields(@id)
     optional_fields.each do |field, display|
-      if params[field] == "true"
-        @selected_fields.store(field, display)
-      end
+    @selected_fields.store(field, display) if params[field] == 'true'
     end
     @field_count = @selected_fields.length
 
@@ -75,9 +73,7 @@ class ImportFileController < ApplicationController
       # If there is no header, recover the selected fields in the select* params
       new_header = []
       params.each_key do |p|
-        if p.match(/\Aselect/)
-          new_header << params[p]
-        end
+        new_header << params[p] if p.start_with?('select')
       end
       header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
     end
@@ -92,7 +88,7 @@ class ImportFileController < ApplicationController
           model.constantize.import(row_hash, session, params[:id], params[:options])
         end
       end
-    rescue
+    rescue StandardError
       errors << $ERROR_INFO
     end
     errors
@@ -177,9 +173,7 @@ class ImportFileController < ApplicationController
   # Ensure the model is whitelisted
   def allowed_model
     idx = ALLOWED_MODELS.index(@model)
-    if idx.nil?
-      raise ArgumentError, 'Invalid model'
-    end
+    raise ArgumentError, 'Invalid model' if idx.nil?
 
     ALLOWED_MODELS[idx].constantize
   end

@@ -1,5 +1,5 @@
 describe 'CourseParticipant' do
-  let(:course) {build (:course)}
+  let(:course) { build (:course) }
 
   describe '#copy' do
     before(:each) do

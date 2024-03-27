@@ -69,7 +69,7 @@ class MetareviewResponseMap < ResponseMap
       raise ImportError, "Metareviewer #{row} not found." if muser.nil?
       metareviewer = AssignmentParticipant.where(user_id: muser.id, parent_id: id).first
       raise ImportError, "Metareviewer,  #{row}, for reviewee, #{team_reviewed.name}, and reviewer, #{row_hash[:reviewer]}, was not found." if metareviewer.nil?
-      reviewmapping = ReviewResponseMap.where(reviewee_id: team_reviewed.id, reviewer_id:  reviewer.id).first
+      reviewmapping = ReviewResponseMap.where(reviewee_id: team_reviewed.id, reviewer_id: reviewer.id).first
       raise ImportError, "No review mapping was found for reviewee team, #{team_reviewed.name}, and reviewer, #{row_hash[:reviewer]}." if reviewmapping.nil?
       existing_mappings = MetareviewResponseMap.where(reviewee_id: reviewer.id, reviewer_id: metareviewer.id, reviewed_object_id: reviewmapping.map_id)
       MetareviewResponseMap.create(reviewer_id: metareviewer.id, reviewee_id: reviewer.id, reviewed_object_id: reviewmapping.map_id) if existing_mappings.empty?

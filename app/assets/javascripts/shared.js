@@ -11,10 +11,7 @@ function checkForFile() {
 
 function checkForDuplicates(field_count) {
     var val_array = [];
-    for (var i = 1; i <= field_count; i++) {
-        var sel = document.getElementById("select" + (i).toString());
-        val_array[i] = sel.options[sel.selectedIndex].value;
-    }
+    var i = getElements(field_count, val_array);
 
     var sorted_val_array = val_array.slice().sort();
     var has_duplicates = false;
@@ -29,6 +26,14 @@ function checkForDuplicates(field_count) {
     } else {
         column_form.submit();
     }
+}
+
+function getElements(field_count, val_array) {
+    for (var i = 1; i <= field_count; i++) {
+        var sel = document.getElementById("select" + (i).toString());
+        val_array[i] = sel.options[sel.selectedIndex].value;
+    }
+    return i;
 }
 
 function checkIfFileExists(filename, flag)

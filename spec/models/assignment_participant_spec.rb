@@ -145,7 +145,7 @@ describe AssignmentParticipant do
       end
 
       let(:user) do
-        double('User', :id => 1, :nil? => true)
+        double('User', :id: 1, :nil?: true)
       end
 
       it 'command User to import new user' do
@@ -163,8 +163,8 @@ describe AssignmentParticipant do
           { name: 'no one', fullname: 'no one', email: 'name@email.com' }
         end
         before(:each) do
-          user = double('User', :id => 1, :nil? => true)
-          allow(User).to receive(:find_by).with(:name => 'no one').and_return(user)
+          user = double('User', :id: 1, :nil?: true)
+          allow(User).to receive(:find_by).with(:name: 'no one').and_return(user)
           allow(User).to receive(:import).with(any_args).and_return(user)
         end
 

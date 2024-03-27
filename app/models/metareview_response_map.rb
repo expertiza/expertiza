@@ -77,12 +77,12 @@ class MetareviewResponseMap < ResponseMap
   end
 
   def self.required_import_fields
-    {"team_name" => "Reviewed Team",
-     "reviewer" => "Reviewer",
-     "metareviewers" => "Metareviewer List"}
+    { 'team_name' => 'Reviewed Team',
+     'reviewer' => 'Reviewer',
+     'metareviewers' => 'Metareviewer List' }
   end
 
-  def self.optional_import_fields(id=nil)
+  def self.optional_import_fields(id = nil)
     {}
   end
 

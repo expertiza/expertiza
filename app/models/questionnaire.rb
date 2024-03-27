@@ -154,20 +154,20 @@ class Questionnaire < ApplicationRecord
   end
 
   def self.required_import_fields
-    {"txt" => "Question text",
-     "type" => "Question type",
-     "seq" => "Sequence (for order)",
-     "weight" => "Point value"}
+    { 'txt' => 'Question text',
+     'type' => 'Question type',
+     'seq' => 'Sequence (for order)',
+     'weight' => 'Point value' }
   end
 
   def self.optional_import_fields(id)
     quest = Questionnaire.find(id)
-    optional_fields = {"size" => "Size of question",
-     "break_before" => "Break before"}
+    optional_fields = { 'size' => 'Size of question',
+     'break_before' => 'Break before' }
 
     if !quest.nil?
       for q in  quest.min_question_score..quest.max_question_score do
-        optional_fields["advice_" + q.to_s] = "Advice " + q.to_s
+        optional_fields['advice_' + q.to_s] = 'Advice ' + q.to_s
       end
     end
     optional_fields

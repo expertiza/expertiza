@@ -77,11 +77,11 @@ class ReviewResponseMap < ResponseMap
   end
 
   def self.required_import_fields
-    {"reviewee" => "Contributor",
-     "reviewers" => "Reviewers"}
+    { 'reviewee' => 'Contributor',
+     'reviewers' => 'Reviewers' }
   end
 
-  def self.optional_import_fields(id=nil)
+  def self.optional_import_fields(id = nil)
     {}
   end
 

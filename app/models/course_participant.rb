@@ -24,12 +24,12 @@ class CourseParticipant < Participant
   end
 
   def self.required_import_fields
-    {"name" => "Name",
-     "fullname" => "Full Name",
-     "email" => "Email"}
+    { 'name' => 'Name',
+     'fullname' => 'Full Name',
+     'email' => 'Email' }
   end
 
-  def self.optional_import_fields(id=nil)
+  def self.optional_import_fields(id = nil)
     {}
   end
 

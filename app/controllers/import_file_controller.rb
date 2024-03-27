@@ -176,7 +176,7 @@ class ImportFileController < ApplicationController
 
   def allowed_model
     # Ensure the model is whitelisted
-    model = @model
+    model = @model + ""
     raise ArgumentError, 'Invalid model' unless ALLOWED_MODELS.include?(model)
     model.constantize
   end

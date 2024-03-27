@@ -52,19 +52,19 @@ class CourseTeam < Team
   end
 
   def self.required_import_fields
-    {"teammembers" => "Team Members"}
+    { 'teammembers' => 'Team Members' }
   end
 
-  def self.optional_import_fields(id=nil)
-    {"teamname" => "Team Name"}
+  def self.optional_import_fields(id = nil)
+    { 'teamname' => 'Team Name' }
   end
 
   def self.import_options
-    {"handle_dups" => {"display" => "Handle Duplicates",
-                       "options" => {"ignore" => "Ignore new team name",
-                                     "replace" => "Replace the existing team with the new team",
-                                     "insert" => "Insert any new team members into the existing team",
-                                     "rename" => "Rename the new team and import"}}}
+    { 'handle_dups' => { 'display' => 'Handle Duplicates',
+                       'options' => { 'ignore' => 'Ignore new team name',
+                                     'replace' => 'Replace the existing team with the new team',
+                                     'insert' => 'Insert any new team members into the existing team',
+                                     'rename' => 'Rename the new team and import' }}}
   end
 
   # Export to csv

@@ -25,15 +25,15 @@ class SignUpTopic < ApplicationRecord
   end
 
   def self.required_import_fields
-    {"topic_identifier" => "Topic Identifier",
-     "topic_name" => "Topic Name",
-     "max_choosers" => "Max Choosers"}
+    { 'topic_identifier' => 'Topic Identifier',
+     'topic_name' => 'Topic Name',
+     'max_choosers' => 'Max Choosers' }
   end
 
-  def self.optional_import_fields(id=nil)
-    {"category" => "Category",
-     "description" => "Description",
-     "link" => "Link"}
+  def self.optional_import_fields(id = nil)
+    {'category' => 'Category',
+     'description' => 'Description',
+     'link' => 'Link'}
   end
 
   def self.import_options

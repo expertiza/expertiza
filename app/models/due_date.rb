@@ -1,4 +1,5 @@
 class DueDate < ApplicationRecord
+  include Comparable
   validate :due_at_is_valid_datetime
   #  has_paper_trail
 
@@ -6,30 +7,19 @@ class DueDate < ApplicationRecord
     DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
   end
 
-  def self.current_due_date(due_dates)
-    # Get the current due date from list of due dates
-    due_dates.each do |due_date|
-      if due_date.due_at > Time.now
-        current_due_date = due_date
-        return current_due_date
-      end
-    end
-    # in case current due date not found
-    nil
+  def self.current(due_dates)
+    due_dates.detect { |due_date| due_date.due_at > Time.now }
   end
 
-  def self.teammate_review_allowed(student)
+  def self.teammate_review_allowed?(student)
     # time when teammate review is allowed
-    due_date = current_due_date(student.assignment.due_dates)
+    due_date = current(student.assignment.due_dates)
     student.assignment.find_current_stage == 'Finished' ||
-      due_date &&
-        (due_date.teammate_review_allowed_id == 3 ||
-        due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
+      (due_date && [2, 3].include?(due_date.teammate_review_allowed_id))
   end
 
   def set_flag
-    self.flag = true
-    save
+    update_attribute(:flag, true)
   end
 
   def due_at_is_valid_datetime
@@ -43,31 +33,27 @@ class DueDate < ApplicationRecord
   end
 
   def self.copy(old_assignment_id, new_assignment_id)
-    duedates = where(parent_id: old_assignment_id)
-    duedates.each do |orig_due_date|
+    where(parent_id: old_assignment_id).each do |orig_due_date|
       new_due_date = orig_due_date.dup
       new_due_date.parent_id = new_assignment_id
       new_due_date.save
     end
   end
 
-  def self.set_duedate(duedate, deadline, assign_id, max_round)
+  def self.set_due_date(duedate, deadline, assign_id, max_round)
     submit_duedate = DueDate.new(duedate)
-    submit_duedate.deadline_type_id = deadline
-    submit_duedate.parent_id = assign_id
-    submit_duedate.round = max_round
-    submit_duedate.save
+    submit_duedate.update(deadline_type_id: deadline, parent_id: assign_id, round: max_round)
   end
 
-  def self.deadline_sort(due_dates)
-    due_dates.sort do |m1, m2|
-      if m1.due_at && m2.due_at
-        m1.due_at <=> m2.due_at
-      elsif m1.due_at
-        -1
-      else
-        1
-      end
+  def <=>(other)
+    return nil unless other.is_a?(DueDate)
+
+    if due_at && other.due_at
+      due_at <=> other.due_at
+    elsif due_at
+      -1
+    else
+      1
     end
   end
 
@@ -77,8 +63,8 @@ class DueDate < ApplicationRecord
 
     due_dates = DueDate.where(parent_id: assignment_id)
     # sorted so that the earliest deadline is at the first
-    sorted_deadlines = deadline_sort(due_dates)
-    due_dates.reject { |due_date| due_date.deadline_type_id != 1 && due_date.deadline_type_id != 2 }
+    sorted_deadlines = due_dates.sort
+    due_dates.reject { |due_date| ![1, 2].include?(due_date.deadline_type_id) }
     round = 1
     sorted_deadlines.each do |due_date|
       break if response.created_at < due_date.due_at
@@ -89,6 +75,8 @@ class DueDate < ApplicationRecord
   end
 
   def self.get_next_due_date(assignment_id, topic_id = nil)
+    # Gets the next due date for an assignment
+    
     if Assignment.find(assignment_id).staggered_deadline?
       next_due_date = TopicDueDate.find_by(['parent_id = ? and due_at >= ?', topic_id, Time.zone.now])
       # if certion TopicDueDate is not exist, we should query next corresponding AssignmentDueDate.

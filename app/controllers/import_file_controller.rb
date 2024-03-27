@@ -6,8 +6,8 @@ class ImportFileController < ApplicationController
 
   # Security measure to prevent unintended models from being imported
   ALLOWED_MODELS = %w[AssignmentParticipant AssignmentTeam CourseParticipant
-                    CourseTeam MetareviewResponseMap Questionnaire ReviewResponseMap 
-                    SignUpSheet SignUpTopic User].freeze
+                      CourseTeam MetareviewResponseMap Questionnaire ReviewResponseMap
+                      SignUpSheet SignUpTopic User].freeze
 
   def start
     @id = params[:id]
@@ -30,7 +30,7 @@ class ImportFileController < ApplicationController
     # Add the chosen optional fields from start
     optional_fields = allowed_model(@model).optional_import_fields(@id)
     optional_fields.each do |field, display|
-    @selected_fields.store(field, display) if params[field] == 'true'
+      @selected_fields.store(field, display) if params[field] == 'true'
     end
     @field_count = @selected_fields.length
 

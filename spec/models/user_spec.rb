@@ -215,7 +215,7 @@ describe User do
     end
 
     context 'required fields provided' do
-      let (:row) do
+      let(:row) do
         { name: 'abc', fullname: 'test, test', email: 'test@gmail.com' }
       end
 

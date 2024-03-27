@@ -107,8 +107,8 @@ describe 'CourseTeam' do
 
     context 'when the course team does not have the required fields' do
       it 'raises ArgumentError' do
-        expect { CourseTeam.import([], nil, 1, nil) }.
-          to raise_error(ArgumentError)
+        expect { CourseTeam.import([], nil, 1, nil) }
+          .to raise_error(ArgumentError)
       end
     end
 

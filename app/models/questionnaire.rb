@@ -119,7 +119,7 @@ class Questionnaire < ApplicationRecord
   #
   # NOTE: Assuming rows have headers :question, :type, :weight, :param
   # in that specific order. Also need advice with string score
-  def self.import(row_hash, session = nil, id)
+  def self.import(row_hash, _session = nil, id)
     raise ArgumentError, 'Record does not contain required items.' if row_hash.length < required_import_fields.length
 
     questionnaire = Questionnaire.find(id)
@@ -140,12 +140,11 @@ class Questionnaire < ApplicationRecord
     row_hash.each_key do |k|
       # Check score within range
       k = k.to_s
-      if k =~ 'advice*'
-        score = k.delete('advice_')
-        next unless score.to_i >= questionnaire.min_question_score && score.to_i <= questionnaire.max_question_score
-        a = QuestionAdvice.create!(score: k.to_i, advice: row_hash[k])
-        q.question_advices << a
-      end
+      next unless k =~ 'advice*'
+      score = k.delete('advice_')
+      next unless score.to_i >= questionnaire.min_question_score && score.to_i <= questionnaire.max_question_score
+      a = QuestionAdvice.create!(score: k.to_i, advice: row_hash[k])
+      q.question_advices << a
     end
     q.save!
     questionnaire.questions << q
@@ -155,18 +154,18 @@ class Questionnaire < ApplicationRecord
     { 'txt' => 'Question text',
       'type' => 'Question type',
       'seq' => 'Sequence (for order)',
-       'weight' => 'Point value' }
+      'weight' => 'Point value' }
   end
 
   def self.optional_import_fields(id)
     quest = Questionnaire.find(id)
     optional_fields = { 'size' => 'Size of question',
-     'break_before' => 'Break before' }
+                        'break_before' => 'Break before' }
 
-    unless quest.nil?
-      for q in quest.min_question_score..quest.max_question_score do
-        optional_fields['advice_' + q.to_s] = 'Advice ' + q.to_s
-      end
+    return optional_fields if quest.nil?
+    
+    quest.min_question_score..quest.max_question_score.each do |q|
+      optional_fields['advice_' + q.to_s] = 'Advice ' + q.to_s
     end
     optional_fields
   end

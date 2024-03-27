@@ -12,7 +12,7 @@ class SignUpTopic < ApplicationRecord
   validates :topic_name, :assignment_id, :max_choosers, presence: true
   validates :topic_identifier, length: { maximum: 10 }
 
-  def self.import(row_hash, session = nil, id)
+  def self.import(row_hash, _session = nil, id)
     raise ArgumentError, 'Record does not contain required items.' if row_hash.length < required_import_fields.length
     topic = SignUpTopic.where(topic_name: row_hash[:topic_name], assignment_id: id).first
     if topic.nil?

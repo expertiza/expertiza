@@ -62,9 +62,9 @@ class CourseTeam < Team
   def self.import_options
     { 'handle_dups' => { 'display' => 'Handle Duplicates',
                          'options' => { 'ignore' => 'Ignore new team name',
-                                      'replace' => 'Replace the existing team with the new team',
-                                      'insert' => 'Insert any new team members into the existing team',
-                                      'rename' => 'Rename the new team and import' } } }
+                                        'replace' => 'Replace the existing team with the new team',
+                                        'insert' => 'Insert any new team members into the existing team',
+                                        'rename' => 'Rename the new team and import' } } }
   end
 
   # Export to csv

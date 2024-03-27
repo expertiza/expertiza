@@ -178,8 +178,8 @@ class User < ApplicationRecord
 
   def self.required_import_fields
     { 'name' => 'Name',
-     'fullname' => 'Full Name',
-     'email' => 'Email' }
+      'fullname' => 'Full Name',
+      'email' => 'Email' }
   end
 
   def self.optional_import_fields(_id = nil)
@@ -335,7 +335,7 @@ class User < ApplicationRecord
       users = User.order('name').where('(role_id in (?) or id = ?) and name like ?', role.get_available_roles, user_id, search_filter)
     end
     users
-  end  
+  end
 
   def self.get_new_user(row_hash, session)
     attributes = { 'role_id' => Role.student.id,

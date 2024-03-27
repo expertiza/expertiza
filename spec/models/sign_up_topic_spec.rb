@@ -14,7 +14,7 @@ describe SignUpTopic do
     end
 
     context 'required fields provided' do
-      let (:row) do
+      let(:row) do
         { topic_identifier: 'idn', topic_name: 'my_topic', max_choosers: '3' }
       end
 

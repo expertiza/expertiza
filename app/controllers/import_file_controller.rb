@@ -5,9 +5,9 @@ class ImportFileController < ApplicationController
   end
 
   # Security measure to prevent unintended models from being imported
-  ALLOWED_MODELS = ['AssignmentParticipant', 'AssignmentTeam', 'CourseParticipant', 
-  'CourseTeam', 'MetareviewResponseMap', 'Questionnaire', 'ReviewResponseMap', 
-  'SignUpSheet', 'SignUpTopic', 'User'].freeze
+  ALLOWED_MODELS = %w[AssignmentParticipant AssignmentTeam CourseParticipant
+  CourseTeam MetareviewResponseMap Questionnaire ReviewResponseMap 
+  SignUpSheet SignUpTopic User].freeze
 
   def start
     @id = params[:id]
@@ -174,10 +174,13 @@ class ImportFileController < ApplicationController
 
   private
 
+  # Ensure the model is whitelisted
   def allowed_model
-    # Ensure the model is whitelisted
-    model = @model + ""
-    raise ArgumentError, 'Invalid model' unless ALLOWED_MODELS.include?(model)
-    model.constantize
+    idx = ALLOWED_MODELS.index(@model)
+    if idx.nil?
+      raise ArgumentError, 'Invalid model'
+    end
+
+    ALLOWED_MODELS[idx].constantize
   end
 end

@@ -46,7 +46,7 @@
       <td align="center"><%= topic.micropayment %></td>
   <% end %>
 
-  <% if @assignment.vary_by_topic? %>
+  <% if @assignment.vary_by_topic? && current_user_has_instructor_privileges? %>
     <% table_id = "topic_questionnaire_table" + i.to_s %>
     <td>
       <table id = <%=table_id %>>

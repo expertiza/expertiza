@@ -1,5 +1,4 @@
 require 'faker'
-# require 'i18n'
 
 namespace :db do
   namespace :data do
@@ -7,9 +6,7 @@ namespace :db do
     task scrub: :environment do
       # Require the data migration class
       require './db/data_migrations/scrub_database.rb'
-      # require './db/schema.rb'
       ScrubDatabase.run!
-      # ScrubDatabase.delduplis!
     end
   end
 end

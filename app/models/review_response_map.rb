@@ -44,6 +44,7 @@ class ReviewResponseMap < ResponseMap
   end
 
   def self.import(row_hash, _session, assignment_id)
+    raise ArgumentError, 'Record does not contain required items.' if row_hash.length < required_import_fields.length
     reviewee_user_name = row_hash[:reviewee].to_s
     reviewee_user = User.find_by(name: reviewee_user_name)
     raise ArgumentError, 'Cannot find reviewee user.' unless reviewee_user
@@ -53,13 +54,12 @@ class ReviewResponseMap < ResponseMap
 
     reviewee_team = AssignmentTeam.team(reviewee_participant)
     if reviewee_team.nil? # lazy team creation: if the reviewee does not have team, create one.
-      reviewee_team = AssignmentTeam.create(name: 'Team' + '_' + rand(1000).to_s,
-                                            parent_id: assignment_id, type: 'AssignmentTeam')
+      reviewee_team = AssignmentTeam.create(name: 'Team' + '_' + rand(1000).to_s, parent_id: assignment_id, type: 'AssignmentTeam')
       t_user = TeamsUser.create(team_id: reviewee_team.id, user_id: reviewee_user.id)
       team_node = TeamNode.create(parent_id: assignment_id, node_object_id: reviewee_team.id)
       TeamUserNode.create(parent_id: team_node.id, node_object_id: t_user.id)
     end
-    row_hash[:reviewers].each do |reviewer|
+    row_hash[:reviewers].split.each do |reviewer|
       reviewer_user_name = reviewer.to_s
       reviewer_user = User.find_by(name: reviewer_user_name)
       raise ArgumentError, 'Cannot find reviewer user.' unless reviewer_user
@@ -73,6 +73,19 @@ class ReviewResponseMap < ResponseMap
                                           reviewee_id: reviewee_team.id,
                                           calibrate_to: false)
     end
+  end
+
+  def self.required_import_fields
+    { 'reviewee' => 'Contributor',
+      'reviewers' => 'Reviewers' }
+  end
+
+  def self.optional_import_fields(_id = nil)
+    {}
+  end
+
+  def self.import_options
+    {}
   end
 
   def show_feedback(response)

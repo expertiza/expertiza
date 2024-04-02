@@ -30,7 +30,7 @@ describe ContentPagesController do
     end
 
     context 'when no content page found' do
-      it 'creates new ContentPage object with id=nil and render ontent_pages#view page' do
+      it 'creates new ContentPage object with id = nil and render ontent_pages#view page' do
         request_params = { page_name: 'not found' }
         get :view, params: request_params
         expect(controller.instance_variable_get(:@content_page).content).to eq('(no such page)')

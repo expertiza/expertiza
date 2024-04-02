@@ -97,8 +97,8 @@ class GradesController < ApplicationController
     end
     questionnaires.each do |questionnaire|
       @round = nil
-      
-      #Guard clause to skip questionnaires that have already been populated for topic specific reviewing
+
+      # Guard clause to skip questionnaires that have already been populated for topic specific reviewing
       if @assignment.vary_by_topic? && questionnaire.type == 'ReviewQuestionnaire'
         next # Assignments with topic specific rubrics cannot have multiple rounds of review
       end

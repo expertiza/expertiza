@@ -6,6 +6,7 @@ namespace :db do
     task scrub: :environment do
       # Require the data migration class
       require './db/data_migrations/scrub_database.rb'
+
       ScrubDatabase.run!
     end
   end

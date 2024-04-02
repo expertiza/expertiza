@@ -102,7 +102,7 @@ class GradesController < ApplicationController
       if @assignment.vary_by_topic? && questionnaire.type == 'ReviewQuestionnaire'
         next # Assignments with topic specific rubrics cannot have multiple rounds of review
       end
-      
+
       if @assignment.varying_rubrics_by_round? && questionnaire.type == 'ReviewQuestionnaire'
         questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
         if questionnaires.count > 1

@@ -27,7 +27,7 @@ jobs:
                     --skip="./db/migrate,./spec/fixtures,./spec/controllers/grades_controller_spec.rb,./config/name.yml"
 
   misspell:
-    name: Check spelling all files in commit with misspell
+    name: Check the spelling of all files in commit with misspell
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

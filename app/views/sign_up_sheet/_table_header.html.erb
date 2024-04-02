@@ -2,7 +2,7 @@
   <th width="5%"><%=t ".checkbox"%></th>
 <% end %>
 <th width="5%"><%=t ".topic_id"%></th>
-<% if @assignment.vary_by_topic? %>
+<% if @assignment.vary_by_topic? && current_user_has_instructor_privileges? %>
   <th width="25%"><%=t ".topic_name"%></th>
   <th width="25%"><%=t ".questionnaire"%></th>
 <% else %>
@@ -22,7 +22,9 @@
     <th width="5%"><%=t ".num_bids"%></th>
     <th width="5%"><%=t ".num_1_2_bids"%></th>
   <% end %>
-  <th width="10%"> <%=t ".bookmarks"%>
+  <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>
+    <th width="10%"> <%=t ".bookmarks"%>
+  <% end %>
   <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>
       <th width="10%"><%=t ".actions"%></th>
       <% if SignUpSheet.has_teammate_ads?(@topic_id) %>

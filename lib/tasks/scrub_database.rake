@@ -1,5 +1,3 @@
-require 'faker'
-
 namespace :db do
   namespace :data do
     desc 'Scrubs the database of user information'

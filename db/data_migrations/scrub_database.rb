@@ -2,7 +2,9 @@ require 'yaml'
 
 class ScrubDatabase
   def self.run!
+    # Loop through each user
     User.find_each do |user|
+      # Generate a new fake user record
       loop do
         fake_name = FakeNameGenerator.first_name
         fake_lastname = FakeNameGenerator.last_name
@@ -20,6 +22,7 @@ class ScrubDatabase
           user.save(validate: false)
           break
         end
+        # if record exists, generate new fake record by going through the loop again
       end
     end
 

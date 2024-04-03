@@ -286,14 +286,14 @@ class ReviewMappingController < ApplicationController
     redirect_to controller: 'student_review', action: 'list', id: metareviewer.id
   end
 
-  
+  #if user is not part ps assignment then raise Error
+  #else return the reviewer
   def get_reviewer(user, assignment, reg_url)
     reviewer = AssignmentParticipant.where(user_id: user.id, parent_id: assignment.id).first
-
-    if reviwer.nil?
+    if reviewer.nil?
       raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue."
     end
-    
+
     reviewer.get_reviewer
   rescue StandardError => e
     flash[:error] = e.message

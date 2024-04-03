@@ -382,11 +382,12 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment_id
   end
 
+  #finds metareview using id
+  #delete the mapping
+  #redirect to list_mappings view
   def delete_metareview
     mapping = MetareviewResponseMap.find(params[:id])
     assignment_id = mapping.assignment.id
-    # metareview = mapping.response
-    # metareview.delete
     mapping.delete
     redirect_to action: 'list_mappings', id: assignment_id
   end
@@ -394,8 +395,6 @@ class ReviewMappingController < ApplicationController
   def list_mappings
     flash[:error] = params[:msg] if params[:msg]
     @assignment = Assignment.find(params[:id])
-    # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
     @items = AssignmentTeam.where(parent_id: @assignment.id)
     @items.sort_by(&:name)
   end
@@ -489,6 +488,9 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id
   end
 
+  # args - params {review_grade:{participant_id:int,grade_for_reviewer:int,comment_for_reviewer:str}}
+  # saves the grade for the review
+  # redirects to report/response_report
   def save_grade_and_comment_for_reviewer
     review_grade = ReviewGrade.find_or_create_by(participant_id: params[:review_grade][:participant_id])
     review_grade.attributes = review_mapping_params

@@ -68,12 +68,29 @@ class ReviewMappingController < ApplicationController
     if user_trying_to_review_own_artifact?(params[:contributor_id], user_id)
       flash[:error] = 'You cannot assign this student to review his/her own artifact.'
     else
-      # Assign the reviewer to the assignment
-      assign_reviewer(assignment, topic_id, user_id, params[:contributor_id])
-    end
+      SignUpSheet.signup_team(assignment.id, user_id, topic_id)
+      msg = ''
+      begin
+        user = User.from_params(params)
+        # contributor_id is team_id
+        regurl = url_for id: assignment.id,
+                         user_id: user.id,
+                         contributor_id: params[:contributor_id]
 
-    # Redirect to list mappings after adding the reviewer
-    redirect_to_list_mappings(assignment)
+        # Get the assignment's participant corresponding to the user
+        reviewer = get_reviewer(user, assignment, regurl)
+        # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
+        # to treat all assignments as team assignments
+        if ReviewResponseMap.where(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id).first.nil?
+          ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+        else
+          raise 'The reviewer, "' + reviewer.name + '", is already assigned to this contributor.'
+        end
+      rescue StandardError => e
+        msg = e.message
+      end
+    end
+    redirect_to action: 'list_mappings', id: assignment.id, msg: msg
   end
 
   # Method to find user ID by name

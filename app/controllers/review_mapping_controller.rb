@@ -55,10 +55,6 @@ class ReviewMappingController < ApplicationController
     Assignment.find(id)
   end
 
-  def find_user_by_name(name)
-    User.where(name: name).first.id
-  end
-
   # Method to add a reviewer to an assignment
   def add_reviewer
     # Find the assignment based on the given ID
@@ -83,8 +79,7 @@ class ReviewMappingController < ApplicationController
   # Method to find user ID by name
   # Method to find user ID by name
   def find_user_id_by_name(name)
-    user = find_user_by_name(name: name)
-    user.present? ? user.id : nil
+    User.where(name: name).first.id
   end
 
   # Method to check if the user is trying to review their own artifact
@@ -136,7 +131,7 @@ class ReviewMappingController < ApplicationController
     participant = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
     reviewer = participant.get_reviewer
     if topic_selection_error?(assignment)
-      flash[:error] = 'No topic is selected. Please go back and select a topic.' # Removed extra space
+      flash[:error] = 'No topic is selected.  Please go back and select a topic.'
     else
       if review_allowed?(assignment, reviewer)
         if check_outstanding_reviews?(assignment, reviewer)

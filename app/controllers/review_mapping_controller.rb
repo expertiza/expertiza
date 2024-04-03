@@ -94,7 +94,6 @@ class ReviewMappingController < ApplicationController
   end
 
   # Method to find user ID by name
-  # Method to find user ID by name
   def find_user_id_by_name(name)
     User.where(name: name).first.id
   end
@@ -102,25 +101,6 @@ class ReviewMappingController < ApplicationController
   # Method to check if the user is trying to review their own artifact
   def user_trying_to_review_own_artifact?(contributor_id, user_id)
     TeamsUser.exists?(team_id: contributor_id, user_id: user_id)
-  end
-
-  # Method to assign a reviewer to the assignment
-  def assign_reviewer(assignment, topic_id, user_id, contributor_id)
-    # Sign up the user for the assignment
-    SignUpSheet.signup_team(assignment.id, user_id, topic_id)
-    user = User.from_params(params)
-    # Generate registration URL
-    regurl = registration_url(assignment.id, user.id, contributor_id)
-    # Get the reviewer for the assignment
-    reviewer = get_reviewer(user, assignment, regurl)
-
-    # Create review response map for the assignment
-    create_review_response_map(contributor_id, reviewer.id, assignment.id)
-  end
-
-  # Method to generate registration URL
-  def registration_url(assignment_id, user_id, contributor_id)
-    url_for(id: assignment_id, user_id: user_id, contributor_id: contributor_id)
   end
 
   # Method to create review response map for the assignment
@@ -132,11 +112,6 @@ class ReviewMappingController < ApplicationController
       # Raise an exception if the reviewer is already assigned
       raise 'The reviewer is already assigned to this contributor.'
     end
-  end
-
-  # Method to redirect to list mappings after adding the reviewer
-  def redirect_to_list_mappings(assignment)
-    redirect_to action: 'list_mappings', id: assignment.id, msg: msg
   end
 
   # 7/12/2015 -zhewei
@@ -166,7 +141,7 @@ class ReviewMappingController < ApplicationController
   # Method to find assignment participant
   def find_participant_for_assignment(assignment, reviewer_id)
     AssignmentParticipant.where(user_id: reviewer_id, parent_id: assignment.id).first
-  end
+  end 
 
   # Method to check if there is an error in topic selection
   def topic_selection_error?(assignment)
@@ -311,10 +286,14 @@ class ReviewMappingController < ApplicationController
     redirect_to controller: 'student_review', action: 'list', id: metareviewer.id
   end
 
+  
   def get_reviewer(user, assignment, reg_url)
     reviewer = AssignmentParticipant.where(user_id: user.id, parent_id: assignment.id).first
-    raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue." if reviewer.nil?
 
+    if reviwer.nil?
+      raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue."
+    end
+    
     reviewer.get_reviewer
   rescue StandardError => e
     flash[:error] = e.message

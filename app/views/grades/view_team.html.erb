@@ -135,10 +135,10 @@
               <% vm.list_of_reviews.each_with_index do |review, i| %>
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
-                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i} %>
+                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i, user_name: nil} %>
                   <% else %>
                       <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
-                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i} %>
+                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i, user_name: user_name} %>
                   <% end %>
                   <% i_final = 0%>
               <% end %>

@@ -108,8 +108,10 @@ class ReviewBidsController < ApplicationController
     reviewer_ids = assignment.participants.pluck(:id)
     bidding_data = assignment.review_bid.bidding_data(assignment_id, reviewer_ids)
     puts bidding_data
+    
+    
+    
     matched_topics = run_bidding_algorithm(bidding_data,reviewer_ids, assignment_id)
-    puts matched_topics
     assignment.review_bid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
     assignment.update(can_choose_topic_to_review: false) # turns off bidding for students
     redirect_back fallback_location: root_path
@@ -126,8 +128,64 @@ class ReviewBidsController < ApplicationController
     begin  
       #response = RestClient.post(url, bidding_data.to_json, content_type: 'application/json', accept: :json)
       #matched_topics= JSON.parse(bidding_data)
-      topic_ids_with_team = SignedUpTeam.where.not(team_id: nil).pluck(:topic_id) #Topics which have been selected by teams for submission
-      topics = SignUpTopic.where(assignment_id: assignment_id, id: topic_ids_with_team)
+      topics = bidding_data['tid']  
+    
+      bids_per_topic = {}
+      topic_bids = {}
+      topics.each do |topic_id|
+        # Collect all bids for the current assignment
+        bidding_data['users'].each do |reviewer_id, bid_details|
+          if bid_details['tid'].include?(topic_id)
+            index = bid_details['tid'].index(topic_id)
+            bid_info = { reviewer_id: reviewer_id, timestamp: bid_details['time'][index] }
+            if topic_bids[topic_id].nil?
+              topic_bids[topic_id] = [bid_info]
+            else
+              topic_bids[topic_id] << bid_info
+            end
+          end
+        end
+        total_reviewers = topic_bids.size
+        bids_per_topic[topic_id] = total_reviewers
+      end
+puts bids_per_topic
+puts topic_bids
+  # Check if the number of bids exceeds the max accepted proposals
+  if total_reviewers > max_accepted_proposals
+    # Sort bids by timestamp to prioritize early bids
+    sorted_bids = topic_bids.sort_by { |bid| bid[:timestamp] }
+
+    # Select the earliest bids up to the max accepted proposals
+    accepted_bids = sorted_bids.first(max_accepted_proposals)
+    accepted_reviewer_ids = accepted_bids.map { |bid| bid[:reviewer_id] }
+
+    # Update or remove bids based on acceptance
+    bidding_data['users'].each do |reviewer_id, bid_details|
+      if bid_details['tid'].include?(topic_id)
+        unless accepted_reviewer_ids.include?(reviewer_id)
+          # Remove this topic from the reviewer's bid if not accepted
+          index = bid_details['tid'].index(topic_id)
+          bid_details['tid'].delete_at(index)
+          bid_details['priority'].delete_at(index) if bid_details['priority']
+          bid_details['time'].delete_at(index) if bid_details['time']
+        end
+      end
+    end
+  else
+    # If total reviewers are less than or equal to max accepted proposals,
+    # calculate and store reviews left for this topic
+    reviews_left = max_accepted_proposals - total_reviewers
+    reviews_left_by_topic[topic_id] = reviews_left
+    unbidded_users = bidding_data["users"].select { |user_id, details| details["tid"].empty? }.keys
+    unbidded_users.each do |reviewer_id|
+      # Randomly select distinct topics for this reviewer. Ensuring we have unique topics if possible.
+      selected_topics =  reviews_left_by_topic.sample(max_accepted_proposals)
+      matched_topics[reviewer_id] = selected_topics.map(&:id)
+    end
+  end
+end
+    puts  reviews_left_by_topic
+    puts matched_topics
       
       unbidded_users = bidding_data["users"].select { |user_id, details| details["tid"].empty? }.keys
       bidded_users= reviewer_ids - unbidded_users
@@ -136,8 +194,8 @@ class ReviewBidsController < ApplicationController
         matched_topics[reviewer_id] = bidding_data["users"][reviewer_id]["tid"]
       end
       unbidded_users.each do |reviewer_id|
-        # Randomly select 2 distinct topics for this reviewer. Ensuring we have unique topics if possible.
-        selected_topics = topics.sample(2)
+        # Randomly select distinct topics for this reviewer. Ensuring we have unique topics if possible.
+        selected_topics = topics.sample(max_accepted_proposals)
         matched_topics[reviewer_id] = selected_topics.map(&:id)
       end
       return  matched_topics
@@ -145,7 +203,7 @@ class ReviewBidsController < ApplicationController
       puts "Error in assigning reviewers: #{e.message}"
       return nil
     end
-  end
+  
 
   
 end

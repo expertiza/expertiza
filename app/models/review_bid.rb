@@ -10,7 +10,8 @@ class ReviewBid < ApplicationRecord
   def bidding_data(assignment_id, reviewer_ids)
     # create basic hash and set basic hash data
     bidding_data = { 'tid' => [], 'users' => {}, 'max_accepted_proposals' => [] }
-    bidding_data['tid'] = SignUpTopic.where(assignment_id: assignment_id).ids
+    topic_ids_with_team = SignedUpTeam.where.not(team_id: nil).pluck(:topic_id)
+    bidding_data['tid'] = SignUpTopic.where(assignment_id: assignment_id, id: topic_ids_with_team).ids
     bidding_data['max_accepted_proposals'] = Assignment.where(id: assignment_id).pluck(:num_reviews_allowed).first
 
     # loop through reviewer_ids to get reviewer specific bidding data

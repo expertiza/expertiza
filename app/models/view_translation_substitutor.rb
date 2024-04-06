@@ -1,11 +1,13 @@
 # TODO: Delete this. For first commit.
 
+puts "IN VEW_TRANSLATION_SUBSTITUTOR.rb"
 require 'yaml'
 
 class ViewTranslationSubstitutor
   BLACKLIST = "([a-zA-Z0-9\\._]+|[\"\\'])?".freeze
 
   def substitute(locale)
+    puts "IN SUBSTITUTE"
     stats = {}
     locale.each { |dir_name, view_hash| stats[dir_name] = process_directory(dir_name, view_hash) }
     File.open("translation_stats#{Time.now}.yml", 'w') { |file| file.write(stats.to_yaml) }

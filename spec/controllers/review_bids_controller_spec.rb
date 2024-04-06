@@ -15,11 +15,11 @@ describe ReviewBidsController do
     context 'when different roles call the controller' do
       it 'does not allow Students to run review bidding algorithm' do
         session[:user] = build(:student)
-        controller.params = { action: 'assign_bidding' }
+        controller.params = { action: 'assign_bid_review' }
         expect(controller.action_allowed?).to be false
       end
       it 'does allow Instructors, Teaching Assistants, Administrators to run review bidding algorithm' do
-        controller.params = { action: 'assign_bidding' }
+        controller.params = { action: 'assign_bid_review' }
         session[:user] = build(:instructor)
         expect(controller.action_allowed?).to be true
         session[:user] = build(:teaching_assistant)
@@ -67,10 +67,10 @@ describe ReviewBidsController do
     end
   end
 
-  describe '#assign_bidding' do
+  describe '#assign_bid_review' do
     render_views
     it 'assigns bids' do
-      get :assign_bidding
+      get :assign_bid_review
       expect(response).to have_http_status(302) # a redirect to :back
     end
   end

@@ -9,7 +9,7 @@ class ReviewBidsController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'show', 'set_priority', 'index'
-      current_user_has_student_privileges? && ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer') : true)
+      current_user_has_student_privileges? && are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer')
     else
        current_user_has_ta_privileges?
     end
@@ -92,23 +92,11 @@ class ReviewBidsController < ApplicationController
     # sets parameters used for running bidding algorithm
     assignment_id = params[:assignment_id].to_i
     # list of reviewer id's from a specific assignment
-<<<<<<< HEAD
-    reviewer_ids = assignment.participants.pluck(:id)
-    bidding_data = assignment.review_bid.bidding_data(assignment_id, reviewer_ids)
-    puts bidding_data
-    
-    
-    
-    matched_topics = run_bidding_algorithm(bidding_data,reviewer_ids, assignment_id)
-    assignment.review_bid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
-    assignment.update(can_choose_topic_to_review: false) # turns off bidding for students
-=======
     reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
     bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
     matched_topics = run_bidding_algorithm(bidding_data)
     ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
     Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
->>>>>>> 2d8efebda50f0ea13d4a1cb2bfc03ced57dd35fc
     redirect_back fallback_location: root_path
   end
   
@@ -119,7 +107,6 @@ class ReviewBidsController < ApplicationController
   # returns matched assignments as json body
   def run_bidding_algorithm(bidding_data)
     
-<<<<<<< HEAD
     #url = WEBSERVICE_CONFIG["review_bidding_webservice_url"] #won't work unless ENV variables are configured
     begin  
       #response = RestClient.post(url, bidding_data.to_json, content_type: 'application/json', accept: :json)
@@ -143,46 +130,7 @@ class ReviewBidsController < ApplicationController
         end
         total_reviewers = topic_bids.size
         bids_per_topic[topic_id] = total_reviewers
-      end
-puts bids_per_topic
-puts topic_bids
-  # Check if the number of bids exceeds the max accepted proposals
-  if total_reviewers > max_accepted_proposals
-    # Sort bids by timestamp to prioritize early bids
-    sorted_bids = topic_bids.sort_by { |bid| bid[:timestamp] }
-
-    # Select the earliest bids up to the max accepted proposals
-    accepted_bids = sorted_bids.first(max_accepted_proposals)
-    accepted_reviewer_ids = accepted_bids.map { |bid| bid[:reviewer_id] }
-
-    # Update or remove bids based on acceptance
-    bidding_data['users'].each do |reviewer_id, bid_details|
-      if bid_details['tid'].include?(topic_id)
-        unless accepted_reviewer_ids.include?(reviewer_id)
-          # Remove this topic from the reviewer's bid if not accepted
-          index = bid_details['tid'].index(topic_id)
-          bid_details['tid'].delete_at(index)
-          bid_details['priority'].delete_at(index) if bid_details['priority']
-          bid_details['time'].delete_at(index) if bid_details['time']
-        end
-      end
-    end
-  else
-    # If total reviewers are less than or equal to max accepted proposals,
-    # calculate and store reviews left for this topic
-    reviews_left = max_accepted_proposals - total_reviewers
-    reviews_left_by_topic[topic_id] = reviews_left
-    unbidded_users = bidding_data["users"].select { |user_id, details| details["tid"].empty? }.keys
-    unbidded_users.each do |reviewer_id|
-      # Randomly select distinct topics for this reviewer. Ensuring we have unique topics if possible.
-      selected_topics =  reviews_left_by_topic.sample(max_accepted_proposals)
-      matched_topics[reviewer_id] = selected_topics.map(&:id)
-    end
-  end
-end
-    puts  reviews_left_by_topic
-    puts matched_topics
-      
+      end    
       unbidded_users = bidding_data["users"].select { |user_id, details| details["tid"].empty? }.keys
       bidded_users= reviewer_ids - unbidded_users
       matched_topics = {}
@@ -194,15 +142,6 @@ end
         selected_topics = topics.sample(max_accepted_proposals)
         matched_topics[reviewer_id] = selected_topics.map(&:id)
       end
-=======
-    url = WEBSERVICE_CONFIG["review_bidding_webservice_url"] #won't work unless ENV variables are configured
-    url = 'http://app-csc517.herokuapp.com/match_topics' # hard coding for the time being
-    begin 
-      # Sending POST request to the bidding algorithm 
-      response = RestClient.post(url, bidding_data.to_json, content_type: 'application/json', accept: :json)
-      matched_topics= JSON.parse(response.body)
-      #bidding_data_with_matches = update_bidding_data_with_matches(bidding_data, matched_topics)
->>>>>>> 2d8efebda50f0ea13d4a1cb2bfc03ced57dd35fc
       return  matched_topics
     rescue StandardError => e
       puts "Error in assigning reviewers: #{e.message}"
@@ -210,16 +149,5 @@ end
     end
   
 
-  def update_bidding_data_with_matches(bidding_data,matched_topics)
-    assignment_id = bidding_data[:assignment_id]
-    reviewer_ids = bidding_data[:reviewer_ids]
-    unbid_reviewers = reviewer_ids - matched_topics.keys
-    if unbid_reviewers.any?
-      assignment = Assignment.find(assignment_id)
-      unbid_reviewers.each do |reviewer_id|
-        random_topics = SignUpTopic.where(assignment_id: assignment_id).sample(assignment.num_reviews_per_student)
-        ReviewResponseMap.create_reviews_for_reviewer(reviewer_id, random_topics)
-      end
-    end
-  end
+  
 end

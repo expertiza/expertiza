@@ -1,3 +1,5 @@
+# TODO: Delete this. For first commit.
+
 require 'yaml'
 
 class ViewTranslationSubstitutor

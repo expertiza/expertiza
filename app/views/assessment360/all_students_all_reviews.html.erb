@@ -22,7 +22,8 @@
     <% @course_participants.each do |cp|%>
         <tr>
             <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
-            <td><%= @teamed_count[cp.id] %></td>
+            #renamed from @teamed_count
+            <td><%= @student_team_counts[cp.id] %></td>
             <% @assignments.each do |assignment|%>
                 <td><%= @meta_review[cp.id][assignment.id] unless @meta_review.nil? %></td>
                 <td><%= @teammate_review[cp.id][assignment.id] unless @teammate_review.nil? %></td>

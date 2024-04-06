@@ -18,7 +18,7 @@ class Assessment360Controller < ApplicationController
     # hashes for view
     @meta_review = {}
     @teammate_review = {}
-    @teamed_count = {}
+    @student_team_counts = {} # renamed from @teamed_count
     # for course
     # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
     # @overall_teammate_review_count = {assgt_id1: 1, assgt_id2: 2, ...}
@@ -31,7 +31,7 @@ class Assessment360Controller < ApplicationController
       # [aggregrate_review_grades_per_stu, review_count_per_stu] --> [0, 0]
       %w[teammate meta].each { |type| instance_variable_set("@#{type}_review_info_per_stu", [0, 0]) }
       students_teamed = StudentTask.teamed_students(cp.user)
-      @teamed_count[cp.id] = students_teamed[course.id].try(:size).to_i
+      @student_team_counts[cp.id] = students_teamed[course.id].try(:size).to_i
       @assignments.each do |assignment|
         @meta_review[cp.id] = {} unless @meta_review.key?(cp.id)
         @teammate_review[cp.id] = {} unless @teammate_review.key?(cp.id)

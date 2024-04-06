@@ -26,7 +26,7 @@
 <% def display_assignment_reviews_info(assignment, num_reviews_completed) %>
   <h2>Reviews for "<%= assignment.name %>"</h2>
   <!-- add headers that provide information regarding review numbers -->
-  <% if assignment.num_reviews_allowed.nil? || assignment.num_reviews_allowed == -1 %>
+  <% if assignment.num_reviews_allowed.nil? || assignment.num_reviews_allowed == 0 %>
     <h4>Your instructor expects you to do <%= assignment.num_reviews_required %> reviews. You are not allowed to do any extra reviews. </h4>
   <% elsif assignment.num_reviews_allowed == assignment.num_reviews_required %>
     <h4>You should perform exactly <%= assignment.num_reviews_allowed %> reviews </h4>
@@ -52,7 +52,7 @@
   <% title = 'Review' %>
 
   <% @review_mappings.each do |map| %>
-     # Create sorted_response array to store information from particular map id 
+    <% # Create sorted_response array to store participant information(such as topic_id and topic) %>
     <% @sorted_responses = [] %>
     <% team = AssignmentTeam.find(map.reviewee_id) %>
     <% participant = team.participants.first %>
@@ -66,8 +66,9 @@
         <td>&nbsp;</td>
 
         <% if !map.response.empty? && latest_submission %>
-          <% # Populate sorted response array from corresponding id and set array_not_empty flag %>
+          <% # Queries the database for Response records linked to a specific map by map.id,then converts the retrieved collection into an array. %>
           <% @sorted_responses = Response.where(map_id: map.id).to_a %>
+          <% #Set flag to indicate if the responses array is not empty and populate the map with the topic_id and topic%>
           <% array_not_empty = @sorted_responses.present? ? 1 : 0 %>
 
           <% if array_not_empty == 1 %>

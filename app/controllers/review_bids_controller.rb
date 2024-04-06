@@ -45,7 +45,6 @@ class ReviewBidsController < ApplicationController
 
     @num_participants = AssignmentParticipant.where(parent_id: @assignment.id).count  #number of participants to determine if topic's hot
     @assigned_topics= nil
-    # Create an instance of ReviewBid
     @bids = ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id)  #Update bids to be the list of sign-up topics on which the participant has bid
     signed_up_topics = []
     @bids.each do |bid|
@@ -66,7 +65,6 @@ class ReviewBidsController < ApplicationController
 
   # function that assigns and updates priorities for review bids
   def set_priority
-    # Create an instance of ReviewBid
     if params[:topic].nil?
       ReviewBid.where(participant_id: params[:id]).destroy_all
     else
@@ -89,17 +87,16 @@ class ReviewBidsController < ApplicationController
     redirect_to action: 'show', assignment_id: params[:assignment_id], id: params[:id]
   end
 
-  # assign bidding topics to reviewers
-  def assign_bidding
+  # assign_bid_review function assigns the students with the topics they have bid for 
+  def assign_bid_review
     # sets parameters used for running bidding algorithm
     assignment_id = params[:assignment_id].to_i
-    assignment = Assignment.find(assignment_id)
     # list of reviewer id's from a specific assignment
-    reviewer_ids = assignment.assignment_participants.ids
-    bidding_data = assignment.review_bids.bidding_data(reviewer_ids)
+    reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
+    bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
     matched_topics = run_bidding_algorithm(bidding_data)
-    assignment.review_bids.assign_review_topics(reviewer_ids, matched_topics)
-    assignment.update(can_choose_topic_to_review: false) # turns off bidding for students
+    ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
+    Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
     redirect_back fallback_location: root_path
   end
   

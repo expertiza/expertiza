@@ -9,17 +9,17 @@ class ReviewBidsController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'show', 'set_priority', 'index'
-      current_user_has_student_privileges? && are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer')
+      current_user_has_student_privileges? && ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer') : true)
     else
        current_user_has_ta_privileges?
     end
   end
 
+
   # provides variables for reviewing page located at views/review_bids/others_work.html.erb
   def index
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
-
     @assignment = @participant.assignment
     @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
     # Finding how many reviews have been completed
@@ -65,12 +65,14 @@ class ReviewBidsController < ApplicationController
 
   # function that assigns and updates priorities for review bids
   def set_priority
-    if params[:topic].nil?
+   #if a participant wishes to reset the list of topics to bid, delete all the ReviewBid records of previously selected topics by participant  
+   if params[:topic].nil?
       ReviewBid.where(participant_id: params[:id]).destroy_all
     else
+      #Assign the ID of the assignment associated with the first selected topic to a variable.
       assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
       @bids = ReviewBid.where(participant_id: params[:id])
-      signed_up_topics = ReviewBid.where(participant_id: params[:id]).map(&:signuptopic_id)
+      signed_up_topics = ReviewBid.where(participant_id: params[:id]).map(&:signuptopic_id) 
       signed_up_topics -= params[:topic].map(&:to_i)
       signed_up_topics.each do |topic|
         ReviewBid.where(signuptopic_id: topic, participant_id: params[:id]).destroy_all
@@ -107,47 +109,30 @@ class ReviewBidsController < ApplicationController
   # returns matched assignments as json body
   def run_bidding_algorithm(bidding_data)
     
-    #url = WEBSERVICE_CONFIG["review_bidding_webservice_url"] #won't work unless ENV variables are configured
-    begin  
-      #response = RestClient.post(url, bidding_data.to_json, content_type: 'application/json', accept: :json)
-      #matched_topics= JSON.parse(bidding_data)
-      topics = bidding_data['tid']  
-    
-      bids_per_topic = {}
-      topic_bids = {}
-      topics.each do |topic_id|
-        # Collect all bids for the current assignment
-        bidding_data['users'].each do |reviewer_id, bid_details|
-          if bid_details['tid'].include?(topic_id)
-            index = bid_details['tid'].index(topic_id)
-            bid_info = { reviewer_id: reviewer_id, timestamp: bid_details['time'][index] }
-            if topic_bids[topic_id].nil?
-              topic_bids[topic_id] = [bid_info]
-            else
-              topic_bids[topic_id] << bid_info
-            end
-          end
-        end
-        total_reviewers = topic_bids.size
-        bids_per_topic[topic_id] = total_reviewers
-      end    
-      unbidded_users = bidding_data["users"].select { |user_id, details| details["tid"].empty? }.keys
-      bidded_users= reviewer_ids - unbidded_users
-      matched_topics = {}
-      bidded_users.each do |reviewer_id|
-        matched_topics[reviewer_id] = bidding_data["users"][reviewer_id]["tid"]
-      end
-      unbidded_users.each do |reviewer_id|
-        # Randomly select distinct topics for this reviewer. Ensuring we have unique topics if possible.
-        selected_topics = topics.sample(max_accepted_proposals)
-        matched_topics[reviewer_id] = selected_topics.map(&:id)
-      end
+    url = WEBSERVICE_CONFIG["review_bidding_webservice_url"] #won't work unless ENV variables are configured
+    url = 'http://app-csc517.herokuapp.com/match_topics' # hard coding for the time being
+    begin 
+      # Sending POST request to the bidding algorithm 
+      response = RestClient.post(url, bidding_data.to_json, content_type: 'application/json', accept: :json)
+      matched_topics= JSON.parse(response.body)
+      #bidding_data_with_matches = update_bidding_data_with_matches(bidding_data, matched_topics)
       return  matched_topics
     rescue StandardError => e
       puts "Error in assigning reviewers: #{e.message}"
       return nil
     end
-  
+  end
 
-  
+  def update_bidding_data_with_matches(bidding_data,matched_topics)
+    assignment_id = bidding_data[:assignment_id]
+    reviewer_ids = bidding_data[:reviewer_ids]
+    unbid_reviewers = reviewer_ids - matched_topics.keys
+    if unbid_reviewers.any?
+      assignment = Assignment.find(assignment_id)
+      unbid_reviewers.each do |reviewer_id|
+        random_topics = SignUpTopic.where(assignment_id: assignment_id).sample(assignment.num_reviews_per_student)
+        ReviewResponseMap.create_reviews_for_reviewer(reviewer_id, random_topics)
+      end
+    end
+  end
 end

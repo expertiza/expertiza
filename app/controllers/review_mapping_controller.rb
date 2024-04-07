@@ -286,8 +286,8 @@ class ReviewMappingController < ApplicationController
     redirect_to controller: 'student_review', action: 'list', id: metareviewer.id
   end
 
-  #if user is not part ps assignment then raise Error
-  #else return the reviewer
+  # if user is not part ps assignment then raise Error
+  # else return the reviewer
   def get_reviewer(user, assignment, reg_url)
     reviewer = AssignmentParticipant.where(user_id: user.id, parent_id: assignment.id).first
     if reviewer.nil?
@@ -382,9 +382,9 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment_id
   end
 
-  #finds metareview using id
-  #delete the mapping
-  #redirect to list_mappings view
+  # finds metareview using id
+  # delete the mapping
+  # redirect to list_mappings view
   def delete_metareview
     mapping = MetareviewResponseMap.find(params[:id])
     assignment_id = mapping.assignment.id
@@ -508,16 +508,13 @@ class ReviewMappingController < ApplicationController
     end
   end
 
-  def self_review_does_not_exist(team_id,reviewer_id)
-    SelfReviewResponseMap.where(reviewee_id: team_id, reviewer_id:reviewer_id).first.nil?
+  def self_review_does_not_exist(team_id, reviewer_id)
+    SelfReviewResponseMap.where(reviewee_id: team_id, reviewer_id: reviewer_id).first.nil?
   end
 
-  def create_self_review(reviewee_id,reviewer_id,reviewed_object_id)
-    SelfReviewResponseMap.create(reviewee_id: reviewee_id,
-                                     reviewer_id: reviewer_id,
-                                     reviewed_object_id: reviewed_object_id)
+  def create_self_review(reviewee_id, reviewer_id, reviewed_object_id)
+    SelfReviewResponseMap.create(reviewee_id: reviewee_id,reviewer_id: reviewer_id,reviewed_object_id: reviewed_object_id)
   end
-
 
   # E1600
   # Start self review if not started yet - Creates a self-review mapping when user requests a self-review
@@ -528,8 +525,8 @@ class ReviewMappingController < ApplicationController
     begin
       # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
-      if self_review_does_not_exist(team.id,params[:reviewer_id])
-        create_self_review(team.id,params[:reviewer_id],assignment.id)
+      if self_review_does_not_exist(team.id, params[:reviewer_id])
+        create_self_review(team.id, params[:reviewer_id], assignment.id)
       else
         raise 'Self review already assigned!'
       end

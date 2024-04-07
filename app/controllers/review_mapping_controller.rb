@@ -508,7 +508,7 @@ class ReviewMappingController < ApplicationController
     end
   end
 
-  def self_review_exists(team_id,reviewer_id)
+  def self_review_does_not_exist(team_id,reviewer_id)
     SelfReviewResponseMap.where(reviewee_id: team_id, reviewer_id:reviewer_id).first.nil?
   end
   # E1600
@@ -520,7 +520,7 @@ class ReviewMappingController < ApplicationController
     begin
       # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
-      if self_review_exists(team.id,params[:reviewer_id])
+      if self_review_does_not_exist(team.id,params[:reviewer_id])
         SelfReviewResponseMap.create(reviewee_id: team.id,
                                      reviewer_id: params[:reviewer_id],
                                      reviewed_object_id: assignment.id)

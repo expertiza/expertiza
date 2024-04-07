@@ -511,6 +511,14 @@ class ReviewMappingController < ApplicationController
   def self_review_does_not_exist(team_id,reviewer_id)
     SelfReviewResponseMap.where(reviewee_id: team_id, reviewer_id:reviewer_id).first.nil?
   end
+
+  def create_self_review(reviewee_id,reviewer_id,reviewed_object_id)
+    SelfReviewResponseMap.create(reviewee_id: reviewee_id,
+                                     reviewer_id: reviewer_id,
+                                     reviewed_object_id: reviewed_object_id)
+  end
+
+
   # E1600
   # Start self review if not started yet - Creates a self-review mapping when user requests a self-review
   def start_self_review
@@ -521,9 +529,7 @@ class ReviewMappingController < ApplicationController
       # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
       if self_review_does_not_exist(team.id,params[:reviewer_id])
-        SelfReviewResponseMap.create(reviewee_id: team.id,
-                                     reviewer_id: params[:reviewer_id],
-                                     reviewed_object_id: assignment.id)
+        create_self_review(team.id,params[:reviewer_id],assignment.id)
       else
         raise 'Self review already assigned!'
       end

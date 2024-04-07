@@ -141,7 +141,7 @@ class ReviewMappingController < ApplicationController
   # Method to find assignment participant
   def find_participant_for_assignment(assignment, reviewer_id)
     AssignmentParticipant.where(user_id: reviewer_id, parent_id: assignment.id).first
-  end 
+  end
 
   # Method to check if there is an error in topic selection
   def topic_selection_error?(assignment)
@@ -513,7 +513,7 @@ class ReviewMappingController < ApplicationController
   end
 
   def create_self_review(reviewee_id, reviewer_id, reviewed_object_id)
-    SelfReviewResponseMap.create(reviewee_id: reviewee_id,reviewer_id: reviewer_id,reviewed_object_id: reviewed_object_id)
+    SelfReviewResponseMap.create(reviewee_id: reviewee_id, reviewer_id: reviewer_id, reviewed_object_id: reviewed_object_id)
   end
 
   # E1600

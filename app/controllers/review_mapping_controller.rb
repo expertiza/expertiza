@@ -588,7 +588,6 @@ class ReviewMappingController < ApplicationController
       participants_with_min_assigned_reviews[rand(0..participants_with_min_assigned_reviews.size - 1)]
     end
   end
-  
 
   def peer_review_strategy(assignment_id, review_strategy, participants_hash)
     teams = review_strategy.teams
@@ -624,7 +623,7 @@ class ReviewMappingController < ApplicationController
             participant_with_min_assigned_reviews_is_blank = participants_with_min_assigned_reviews.empty?
             # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
             has_sole_reviewer_trying_to_review_own_artifact = ((participants_with_min_assigned_reviews.size == 1) && user_trying_to_review_own_artifact?(team.id, participants[participants_with_min_assigned_reviews[0]].user_id))
-            rand_num = get_reviewer_index(participant_with_min_assigned_reviews_is_blank, has_sole_reviewer_trying_to_review_own_artifact, num_participants, participants_with_min_assigned_reviews) 
+            rand_num = get_reviewer_index(participant_with_min_assigned_reviews_is_blank, has_sole_reviewer_trying_to_review_own_artifact, num_participants, participants_with_min_assigned_reviews)
           end
           # prohibit one student to review his/her own artifact
           next if user_trying_to_review_own_artifact?(team.id, participants[rand_num].user_id)

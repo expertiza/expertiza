@@ -609,10 +609,10 @@ class ReviewMappingController < ApplicationController
               participants_with_min_assigned_reviews << participants.index(participant) if participants_hash[participant.id] == min_value
             end
             # if participants_with_min_assigned_reviews is blank
-            if_condition_1 = participants_with_min_assigned_reviews.empty?
+            participant_with_min_assigned_reviews_is_blank = participants_with_min_assigned_reviews.empty?
             # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
-            if_condition_2 = ((participants_with_min_assigned_reviews.size == 1) && user_trying_to_review_own_artifact?(team.id, participants[participants_with_min_assigned_reviews[0]].user_id))
-            rand_num = if if_condition_1 || if_condition_2
+            has_sole_reviewer_trying_to_review_own_artifact = ((participants_with_min_assigned_reviews.size == 1) && user_trying_to_review_own_artifact?(team.id, participants[participants_with_min_assigned_reviews[0]].user_id))
+            rand_num = if participant_with_min_assigned_reviews_is_blank || has_sole_reviewer_trying_to_review_own_artifact
                          # use original method to get random number
                          rand(0..num_participants - 1)
                        else
@@ -623,9 +623,9 @@ class ReviewMappingController < ApplicationController
           # prohibit one student to review his/her own artifact
           next if user_trying_to_review_own_artifact?(team.id, participants[rand_num].user_id)
 
-          if_condition_1 = (participants_hash[participants[rand_num].id] < review_strategy.reviews_per_student)
-          if_condition_2 = (!selected_participants.include? participants[rand_num].id)
-          if if_condition_1 && if_condition_2
+          participant_has_capacity_for_review = (participants_hash[participants[rand_num].id] < review_strategy.reviews_per_student)
+          is_new_reviewer = (!selected_participants.include? participants[rand_num].id)
+          if participant_has_capacity_for_review && is_new_reviewer
             # selected_participants cannot include duplicate num
             selected_participants << participants[rand_num].id
             participants_hash[participants[rand_num].id] += 1

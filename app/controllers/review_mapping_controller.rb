@@ -139,8 +139,8 @@ class ReviewMappingController < ApplicationController
   end
 
   # Method to find assignment participant
-  def find_participant_for_assignment(assignment, reviewer_id)
-    AssignmentParticipant.where(user_id: reviewer_id, parent_id: assignment.id).first
+  def find_reviewer(user_id, assignment_id)
+    AssignmentParticipant.where(user_id: user_id, parent_id: assignment_id).first
   end
 
   # Method to check if there is an error in topic selection
@@ -237,7 +237,7 @@ class ReviewMappingController < ApplicationController
   def assign_quiz_dynamically
     begin
       assignment = find_assignment(params[:assignment_id])
-      reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
+      reviewer = find_reviewer(params[:reviewer_id], assignment.id)
       if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id: params[:participant_id]).first
         flash[:error] = 'You have already taken that quiz.'
       else
@@ -276,7 +276,7 @@ class ReviewMappingController < ApplicationController
 
   def assign_metareviewer_dynamically
     assignment = find_assignment(params[:assignment_id])
-    metareviewer = AssignmentParticipant.where(user_id: params[:metareviewer_id], parent_id: assignment.id).first
+    metareviewer = find_reviewer(params[:metareviewer_id], assignment.id)
     # this will prvide a flash warning instead of page crash when there are no review to Meta review.
     begin
       assignment.assign_metareviewer_dynamically(metareviewer)
@@ -289,7 +289,7 @@ class ReviewMappingController < ApplicationController
   # if user is not part ps assignment then raise Error
   # else return the reviewer
   def get_reviewer(user, assignment, reg_url)
-    reviewer = AssignmentParticipant.where(user_id: user.id, parent_id: assignment.id).first
+    reviewer = find_reviewer(user.id, assignment.id)
     if reviewer.nil?
       raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue."
     end

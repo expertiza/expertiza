@@ -9,7 +9,7 @@ class ReviewBidsController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'show', 'set_priority', 'index'
-      current_user_has_student_privileges? && ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer') : true)
+      current_user_has_student_privileges? && are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer')
     else
        current_user_has_ta_privileges?
     end

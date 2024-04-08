@@ -1,11 +1,15 @@
-<% def flash_message %>
-  <% session[:return_to] = request.url %>
-  <% if flash[:notice] != nil and flash[:notice].strip != "" %>
-    <div class="flash_error">
-    <%= flash[:notice] %>
-    </div>
-  <% end %>
-<% end %> 
+# Remember the current web address for later use.
+# Show a styled message if there's a flash notice.
+
+def flash_message
+  # Store the current web address.
+  session[:return_to] = request.url
+
+  # Show a styled message if there's a flash notice.
+  if flash[:notice] != nil and flash[:notice].strip != ""
+    "<div class='flash_error'>#{flash[:notice]}</div>"
+  end
+end
 
 
 <% def display_topic_and_participant(title, review_no, topic_id, assignment, participant) %> 

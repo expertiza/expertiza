@@ -136,16 +136,16 @@ class ReviewBidsController < ApplicationController
 
       unbid_users = bidding_data["users"].select { |user_id, details| details["tid"].empty? }.keys
       bid_users= reviewer_ids - unbid_users
-      matched_topics = {}
+      review_topics_assigned = {}
       bid_users.each do |reviewer_id|
-        matched_topics[reviewer_id] = bidding_data["users"][reviewer_id]["tid"]
+        review_topics_assigned[reviewer_id] = bidding_data["users"][reviewer_id]["tid"]
       end
       unbid_users.each do |reviewer_id|
         # Randomly select distinct topics for this reviewer. Ensuring we have unique topics if possible.
         selected_topics = topics.sample(max_accepted_proposals)
-        matched_topics[reviewer_id] = selected_topics.map(&:id)
+        review_topics_assigned[reviewer_id] = selected_topics.map(&:id)
       end
-      return  matched_topics
+      return  review_topics_assigned
     rescue StandardError => e
       puts "Error in assigning reviewers: #{e.message}"
       return nil

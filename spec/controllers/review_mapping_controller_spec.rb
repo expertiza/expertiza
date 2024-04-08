@@ -683,4 +683,17 @@ describe ReviewMappingController do
       end
     end
   end
+
+  describe '#select_reviewer'
+    context 'when called with a valid contributor_id'
+      it 'contributor in session should be set correctly'
+        allow(AssignmentTeam).to receive(:find).with('1').and_return(team)
+        expect(session[:contributor]).to eq(team)
+      end
+      it 'contributor should be set correctly'
+        allow(AssignmentTeam).to receive(:find).with('1').and_return(team)
+        expect(assigns(:contributor)).to eq(team)
+      end
+    end
+  end
 end

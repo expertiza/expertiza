@@ -3,9 +3,7 @@ module ReviewMappingHelper
     render partial: 'report_table_header', locals: { headers: headers }
   end
 
-  #
   # gets the response map data such as reviewer id, reviewed object id and type for the review report
-  #
   def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
     rspan = 0
     (1..@assignment.num_review_rounds).each { |round| instance_variable_set('@review_in_round_' + round.to_s, 0) }
@@ -21,9 +19,7 @@ module ReviewMappingHelper
     [response_maps, rspan]
   end
 
-  #
   # gets the team name's color according to review and assignment submission status
-  #
   def get_team_color(response_map)
     # Storing redundantly computed value in a variable
     assignment_created = @assignment.created_at
@@ -97,8 +93,7 @@ module ReviewMappingHelper
     submitted_h.try(:last).try(:content)
   end
 
-  # returns last modified header date
-  # only checks certain links (wiki)
+  # returns last modified header date | only checks certain links (wiki)
   def get_link_updated_at(link)
     uri = URI(link)
     res = Net::HTTP.get_response(uri)['last-modified']
@@ -125,17 +120,7 @@ module ReviewMappingHelper
     team_reviewed_link_name
   end
 
-  # if the current stage is "submission" or "review", function returns the current round number otherwise,
-  # if the current stage is "Finished" or "metareview", function returns the number of rounds of review completed.
-  # def get_current_round(reviewer_id)
-  #   user_id = Participant.find(reviewer_id).user.id
-  #   topic_id = SignedUpTeam.topic_id(@assignment.id, user_id)
-  #   @assignment.number_of_current_round(topic_id)
-  #   @assignment.num_review_rounds if @assignment.get_current_stage(topic_id) == "Finished" || @assignment.get_current_stage(topic_id) == "metareview"
-  # end
-
   # gets the review score awarded based on each round of the review
-
   def get_awarded_review_score(reviewer_id, team_id)
     # Storing redundantly computed value in num_rounds variable
     num_rounds = @assignment.num_review_rounds
@@ -376,11 +361,7 @@ module ReviewMappingHelper
     html.html_safe
   end
 
-  # Zhewei - 2016-10-20
-  # This is for Dr.Kidd's assignment (806)
-  # She wanted to quickly see if students pasted in a link (in the text field at the end of the rubric) without opening each review
-  # Since we do not have hyperlink question type, we hacked this requirement
-  # Maybe later we can create a hyperlink question type to deal with this situation.
+  # Zhewei - 2016-10-20 | This is for Dr.Kidd's assignment (806) | She wanted to quickly see if students pasted in a link (in the text field at the end of the rubric) without opening each review | Since we do not have hyperlink question type, we hacked this requirement | Maybe later we can create a hyperlink question type to deal with this situation.
   def list_hyperlink_submission(response_map_id, question_id)
     assignment = Assignment.find(@id)
     curr_round = assignment.try(:num_review_rounds)
@@ -395,8 +376,7 @@ module ReviewMappingHelper
   # gets review and feedback responses for all rounds for the feedback report
   def get_each_review_and_feedback_response_map(author)
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
-    # Calculate how many responses one team received from each round
-    # It is the feedback number each team member should make
+    # Calculate how many responses one team received from each round | It is the feedback number each team member should make
     @review_response_map_ids = ReviewResponseMap.where(['reviewed_object_id = ? and reviewee_id = ?', @id, @team_id]).pluck('id')
     feedback_response_map_record(author)
     # rspan means the all peer reviews one student received, including unfinished one
@@ -427,9 +407,7 @@ module ReviewMappingHelper
     @rspan = @review_responses.length
   end
 
-  #
   # for calibration report
-  #
   def get_css_style_for_calibration_report(diff)
     # diff - difference between stu's answer and instructor's answer
     dict = { 0 => 'c5', 1 => 'c4', 2 => 'c3', 3 => 'c2' }

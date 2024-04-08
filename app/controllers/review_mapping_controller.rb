@@ -236,7 +236,7 @@ class ReviewMappingController < ApplicationController
   # assigns the quiz dynamically to the participant
   def assign_quiz_dynamically
     begin
-      assignment = Assignment.find(params[:assignment_id])
+      assignment = find_assignment(params[:assignment_id])
       reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
       if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id: params[:participant_id]).first
         flash[:error] = 'You have already taken that quiz.'
@@ -275,7 +275,7 @@ class ReviewMappingController < ApplicationController
   end
 
   def assign_metareviewer_dynamically
-    assignment = Assignment.find(params[:assignment_id])
+    assignment = find_assignment(params[:assignment_id])
     metareviewer = AssignmentParticipant.where(user_id: params[:metareviewer_id], parent_id: assignment.id).first
     # this will prvide a flash warning instead of page crash when there are no review to Meta review.
     begin
@@ -300,7 +300,7 @@ class ReviewMappingController < ApplicationController
   end
 
   def delete_outstanding_reviewers
-    assignment = Assignment.find(params[:id])
+    assignment = find_assignment(params[:id])
     team = AssignmentTeam.find(params[:contributor_id])
     review_response_maps = team.review_mappings
     num_remain_review_response_maps = review_response_maps.size
@@ -394,14 +394,14 @@ class ReviewMappingController < ApplicationController
 
   def list_mappings
     flash[:error] = params[:msg] if params[:msg]
-    @assignment = Assignment.find(params[:id])
+    @assignment = find_assignment(params[:id])
     @items = AssignmentTeam.where(parent_id: @assignment.id)
     @items.sort_by(&:name)
   end
 
   def automatic_review_mapping
     assignment_id = params[:id].to_i
-    assignment = Assignment.find(params[:id])
+    assignment = find_assignment(params[:id])
     participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.select(&:can_review).shuffle!
     teams = AssignmentTeam.where(parent_id: params[:id].to_i).to_a.shuffle!
     max_team_size = Integer(params[:max_team_size]) # Assignment.find(assignment_id).max_team_size
@@ -482,7 +482,7 @@ class ReviewMappingController < ApplicationController
 
   # This is for staggered deadline assignment
   def automatic_review_mapping_staggered
-    assignment = Assignment.find(params[:id])
+    assignment = find_assignment(params[:id])
     message = assignment.assign_reviewers_staggered(params[:assignment][:num_reviews], params[:assignment][:num_metareviews])
     flash[:note] = message
     redirect_to action: 'list_mappings', id: assignment.id
@@ -520,7 +520,7 @@ class ReviewMappingController < ApplicationController
   # Start self review if not started yet - Creates a self-review mapping when user requests a self-review
   def start_self_review
     user_id = params[:reviewer_userid]
-    assignment = Assignment.find(params[:assignment_id])
+    assignment = find_assignment(params[:assignment_id])
     team = Team.find_team_for_assignment_and_user(assignment.id, user_id).first
     begin
       # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments

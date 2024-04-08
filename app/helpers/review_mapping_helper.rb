@@ -52,17 +52,14 @@ module ReviewMappingHelper
   def check_submission_state(response_map, assignment_created, assignment_due_dates, round_info)
     round, color = round_info.values_at(:round, :color)
   
-    if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
+    case submission_status(response_map, assignment_created, assignment_due_dates, round)
+    when :submitted_within_round
       color.push 'purple'
+    when :no_link_submitted
+      color.push 'green'
     else
-      link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
-  
-      if link.nil? || (link !~ %r{https\*://wiki(.*)}}) # can be extended for github links in future
-        color.push 'green'
-      else
-        link_updated_at = get_link_updated_at(link)
-        color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
-      end
+      link_updated_at = get_link_updated_at(submission_link(response_map, assignment_created, assignment_due_dates, round))
+      color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
     end
   end
 
@@ -419,6 +416,26 @@ module ReviewMappingHelper
   def average(values)
     return 0 if values.empty?
     values.sum / values.size.to_f
+  end
+
+  # This method determines the submission status based on whether a submission was made within the round, whether a link was submitted, or whether the link format is invalid.
+  def submission_status(response_map, assignment_created, assignment_due_dates, round)
+    if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
+      :submitted_within_round
+    else
+      link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
+      link.nil? || invalid_link_format?(link) ? :no_link_submitted : :link_submitted
+    end
+  end
+  
+  # This method retrieves the submitted hyperlink for the given round.
+  def submission_link(response_map, assignment_created, assignment_due_dates, round)
+    submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
+  end
+  
+  # This method checks if the provided link has an invalid format.
+  def invalid_link_format?(link)
+    link !~ %r{https\*://wiki(.*)} # can be extended for github links in future
   end
 
   class ReviewStrategy

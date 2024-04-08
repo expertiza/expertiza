@@ -43,18 +43,21 @@ module ReviewMappingHelper
   def obtain_team_color(response_map, assignment_created, assignment_due_dates)
     color = []
     (1..@assignment.num_review_rounds).each do |round|
-      check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+      check_submission_state(response_map, assignment_created, assignment_due_dates, {round: round, color: color})
     end
     color[-1]
   end
 
   # checks the submission state within each round and assigns team colour
-  def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+  def check_submission_state(response_map, assignment_created, assignment_due_dates, round_info)
+    round, color = round_info.values_at(:round, :color)
+  
     if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
       color.push 'purple'
     else
       link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
-      if link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
+  
+      if link.nil? || (link !~ %r{https\*://wiki(.*)}}) # can be extended for github links in future
         color.push 'green'
       else
         link_updated_at = get_link_updated_at(link)

@@ -27,7 +27,7 @@ module ReviewMappingHelper
     assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
     # Returning colour based on conditions
     if Response.exists?(map_id: response_map.id)
-      if !response_map.try(:reviewer).try(:review_grade).nil?
+      if response_map.try(:reviewer).try(:review_grade).present?
         'brown'
       elsif response_for_each_round?(response_map)
         'blue'

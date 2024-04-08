@@ -174,27 +174,13 @@ module ReviewMappingHelper
 
   # sorts the reviewers by the average volume of reviews in each round, in descending order
   def sort_reviewer_by_review_volume_desc
-    @reviewers.each do |r|
-      # get the volume of review comments
-      review_volumes = Response.volume_of_review_comments(@assignment.id, r.id)
-      r.avg_vol_per_round = []
-      review_volumes.each_index do |i|
-        if i.zero?
-          r.overall_avg_vol = review_volumes[0]
-        else
-          r.avg_vol_per_round.push(review_volumes[i])
-        end
-      end
-    end
-    # get the number of review rounds for the assignment
-    @num_rounds = @assignment.num_review_rounds.to_f.to_i
-    @all_reviewers_avg_vol_per_round = []
-    @all_reviewers_overall_avg_vol = @reviewers.inject(0) { |sum, r| sum + r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @num_rounds.times do |round|
-      @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) { |sum, r| sum + r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
-    end
-    @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
+    calculate_review_volumes
+    calculate_overall_averages
+    calculate_round_averages
+    sort_reviewers_by_overall_average
   end
+  
+  
 
   # moves data of reviews in each round from a current round
   def initialize_chart_elements(reviewer)
@@ -401,6 +387,39 @@ module ReviewMappingHelper
                 end
     css_class
   end
+  
+  # This method calculates the review volumes for each reviewer.
+  def calculate_review_volumes
+    @reviewers.each do |reviewer|
+      review_volumes = Response.volume_of_review_comments(@assignment.id, reviewer.id)
+      reviewer.overall_avg_vol = review_volumes.shift
+      reviewer.avg_vol_per_round = review_volumes
+    end
+  end
+
+  # This method calculates the overall average review volume across all reviewers.
+  def calculate_overall_averages
+    @all_reviewers_overall_avg_vol = average(@reviewers.map(&:overall_avg_vol))
+  end
+  
+  # This method calculates the average review volume for each round across all reviewers.
+  def calculate_round_averages
+    @num_rounds = @assignment.num_review_rounds.to_f.to_i
+    @all_reviewers_avg_vol_per_round = @num_rounds.times.map do |round|
+      average(@reviewers.map { |reviewer| reviewer.avg_vol_per_round[round] })
+    end
+  end
+  
+  # This method sorts the reviewers in descending order based on their overall average review volume.
+  def sort_reviewers_by_overall_average
+    @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
+  end
+  
+  # This helper method calculates the average of a collection of values.
+  def average(values)
+    return 0 if values.empty?
+    values.sum / values.size.to_f
+  end
 
   class ReviewStrategy
     attr_accessor :participants, :teams
@@ -440,3 +459,4 @@ module ReviewMappingHelper
     end
   end
 end
+

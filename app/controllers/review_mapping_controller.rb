@@ -99,8 +99,8 @@ class ReviewMappingController < ApplicationController
   end
 
   # Method to check if the user is trying to review their own artifact
-  def user_trying_to_review_own_artifact?(contributor_id, user_id)
-    TeamsUser.exists?(team_id: contributor_id, user_id: user_id)
+  def user_trying_to_review_own_artifact?(team_id, user_id)
+    TeamsUser.exists?(team_id: team_id, user_id: user_id)
   end
 
   # Method to create review response map for the assignment
@@ -561,8 +561,7 @@ class ReviewMappingController < ApplicationController
 
       participants_with_insufficient_review_num.each do |participant_id|
         teams_hash.each_key do |team_id, _num_review_received|
-          next if TeamsUser.exists?(team_id: team_id,
-                                    user_id: Participant.find(participant_id).user_id)
+          next if user_trying_to_review_own_artifact?(team_id, Participant.find(participant_id).user_id)
 
           participant = AssignmentParticipant.find(participant_id)
           ReviewResponseMap.where(reviewee_id: team_id, reviewer_id: participant.get_reviewer.id,
@@ -612,7 +611,7 @@ class ReviewMappingController < ApplicationController
             # if participants_with_min_assigned_reviews is blank
             if_condition_1 = participants_with_min_assigned_reviews.empty?
             # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
-            if_condition_2 = ((participants_with_min_assigned_reviews.size == 1) && TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
+            if_condition_2 = ((participants_with_min_assigned_reviews.size == 1) && user_trying_to_review_own_artifact?(team.id, participants[participants_with_min_assigned_reviews[0]].user_id))
             rand_num = if if_condition_1 || if_condition_2
                          # use original method to get random number
                          rand(0..num_participants - 1)
@@ -622,7 +621,7 @@ class ReviewMappingController < ApplicationController
                        end
           end
           # prohibit one student to review his/her own artifact
-          next if TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
+          next if user_trying_to_review_own_artifact?(team.id, participants[rand_num].user_id)
 
           if_condition_1 = (participants_hash[participants[rand_num].id] < review_strategy.reviews_per_student)
           if_condition_2 = (!selected_participants.include? participants[rand_num].id)
@@ -644,7 +643,7 @@ class ReviewMappingController < ApplicationController
         # prohibit one student to review his/her own artifact and selected_participants cannot include duplicate num
         participants.each do |participant|
           # avoid last team receives too many peer reviews
-          if !TeamsUser.exists?(team_id: team.id, user_id: participant.user_id) && (selected_participants.size < review_strategy.reviews_per_team)
+          if !user_trying_to_review_own_artifact?(team.id, participant.user_id) && (selected_participants.size < review_strategy.reviews_per_team)
             selected_participants << participant.id
             participants_hash[participant.id] += 1
           end

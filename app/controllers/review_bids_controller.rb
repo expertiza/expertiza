@@ -109,30 +109,48 @@ class ReviewBidsController < ApplicationController
   # returns matched assignments as json body
   def run_bidding_algorithm(bidding_data)
     
-    url = WEBSERVICE_CONFIG["review_bidding_webservice_url"] #won't work unless ENV variables are configured
-    url = 'http://app-csc517.herokuapp.com/match_topics' # hard coding for the time being
-    begin 
-      # Sending POST request to the bidding algorithm 
-      response = RestClient.post(url, bidding_data.to_json, content_type: 'application/json', accept: :json)
-      matched_topics= JSON.parse(response.body)
-      #bidding_data_with_matches = update_bidding_data_with_matches(bidding_data, matched_topics)
+     #url = WEBSERVICE_CONFIG["review_bidding_webservice_url"] #won't work unless ENV variables are configured
+     begin  
+      #response = RestClient.post(url, bidding_data.to_json, content_type: 'application/json', accept: :json)
+      #matched_topics= JSON.parse(bidding_data)
+      topics = bidding_data['tid']  
+    
+      bids_per_topic = {}
+      topic_bids = {}
+      topics.each do |topic_id|
+        # Collect all bids for the current assignment
+        bidding_data['users'].each do |reviewer_id, bid_details|
+          if bid_details['tid'].include?(topic_id)
+            index = bid_details['tid'].index(topic_id)
+            bid_info = { reviewer_id: reviewer_id, timestamp: bid_details['time'][index] }
+            if topic_bids[topic_id].nil?
+              topic_bids[topic_id] = [bid_info]
+            else
+              topic_bids[topic_id] << bid_info
+            end
+          end
+        end
+        total_reviewers = topic_bids.size
+        bids_per_topic[topic_id] = total_reviewers
+      end
+
+      unbid_users = bidding_data["users"].select { |user_id, details| details["tid"].empty? }.keys
+      bid_users= reviewer_ids - unbid_users
+      matched_topics = {}
+      bid_users.each do |reviewer_id|
+        matched_topics[reviewer_id] = bidding_data["users"][reviewer_id]["tid"]
+      end
+      unbid_users.each do |reviewer_id|
+        # Randomly select distinct topics for this reviewer. Ensuring we have unique topics if possible.
+        selected_topics = topics.sample(max_accepted_proposals)
+        matched_topics[reviewer_id] = selected_topics.map(&:id)
+      end
       return  matched_topics
     rescue StandardError => e
       puts "Error in assigning reviewers: #{e.message}"
       return nil
     end
+
+
   end
 
-  def update_bidding_data_with_matches(bidding_data,matched_topics)
-    assignment_id = bidding_data[:assignment_id]
-    reviewer_ids = bidding_data[:reviewer_ids]
-    unbid_reviewers = reviewer_ids - matched_topics.keys
-    if unbid_reviewers.any?
-      assignment = Assignment.find(assignment_id)
-      unbid_reviewers.each do |reviewer_id|
-        random_topics = SignUpTopic.where(assignment_id: assignment_id).sample(assignment.num_reviews_per_student)
-        ReviewResponseMap.create_reviews_for_reviewer(reviewer_id, random_topics)
-      end
-    end
-  end
-end

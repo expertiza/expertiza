@@ -1,21 +1,18 @@
 class ImportFileController < ApplicationController
-  include AuthorizationHelper
   def action_allowed?
-    current_user_has_ta_privileges?
+    ['Instructor',
+     'Teaching Assistant',
+     'Administrator',
+     'Super-Administrator'].include? current_role_name
   end
-
-  # Security measure to prevent unintended models from being imported
-  ALLOWED_MODELS = %w[AssignmentParticipant AssignmentTeam CourseParticipant
-                      CourseTeam MetareviewResponseMap Questionnaire ReviewResponseMap
-                      SignUpSheet SignUpTopic User].freeze
 
   def start
     @id = params[:id]
     @model = params[:model]
     @title = params[:title]
-    @required_fields = allowed_model(@model).required_import_fields
-    @optional_fields = allowed_model(@model).optional_import_fields(@id)
-    @import_options = allowed_model(@model).import_options
+    @required_fields = @model.constantize.required_import_fields
+    @optional_fields = @model.constantize.optional_import_fields(@id)
+    @import_options = @model.constantize.import_options
   end
 
   def show
@@ -26,30 +23,32 @@ class ImportFileController < ApplicationController
     delimiter = get_delimiter(params)
 
     # All required fields are selected by default
-    @selected_fields = allowed_model(@model).required_import_fields
+    @selected_fields = @model.constantize.required_import_fields
     # Add the chosen optional fields from start
-    optional_fields = allowed_model(@model).optional_import_fields(@id)
+    optional_fields = @model.constantize.optional_import_fields(@id)
     optional_fields.each do |field, display|
-      @selected_fields.store(field, display) if params[field] == 'true'
+      if params[field] == "true"
+        @selected_fields.store(field, display)
+      end
     end
     @field_count = @selected_fields.length
 
     # Read the file
     @current_file = params[:file]
-    contents_grid = parse_to_grid(@current_file, delimiter)
+    contents_grid = parse_to_grid(@current_file.read, delimiter)
     @contents_hash = parse_to_hash(contents_grid, params[:has_header])
   end
 
   def import
     errors = import_from_hash(session, params)
-    err_msg = 'The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>'
+    err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
     errors.each do |error|
-      err_msg = err_msg + '<li>' + error.to_s + '<br/>'
+      err_msg = err_msg + "<li>" + error.to_s + "<br/>"
     end
-    err_msg += '</ul>'
+    err_msg += "</ul>"
     if errors.empty?
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'The file has been successfully imported.', request)
-      undo_link('The file has been successfully imported.')
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "The file has been successfully imported.", request)
+      undo_link("The file has been successfully imported.")
     else
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, err_msg, request)
       flash[:error] = err_msg
@@ -65,15 +64,17 @@ class ImportFileController < ApplicationController
   # view. Update the expected columns view in the start page to reflect the optional params.
   def import_from_hash(session, params)
     model = params[:model]
-    contents_hash = JSON.parse(params[:contents_hash])
+    contents_hash = eval(params[:contents_hash])
 
-    if params[:has_header] == 'true'
+    if params[:has_header] == "true"
       header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
     else
       # If there is no header, recover the selected fields in the select* params
       new_header = []
       params.each_key do |p|
-        new_header << params[p] if p.start_with?('select')
+        if p.match(/\Aselect/)
+          new_header << params[p]
+        end
       end
       header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
     end
@@ -82,13 +83,13 @@ class ImportFileController < ApplicationController
     errors = []
     begin
       header_integrated_body.each do |row_hash|
-        if allowed_model(model).import_options.empty?
-          allowed_model(model).import(row_hash, session, params[:id])
+        if model.constantize.import_options.empty?
+          model.constantize.import(row_hash, session, params[:id])
         else
-          allowed_model(model).import(row_hash, session, params[:id], params[:options])
+          model.constantize.import(row_hash, session, params[:id], params[:options])
         end
       end
-    rescue StandardError
+    rescue
       errors << $ERROR_INFO
     end
     errors
@@ -119,7 +120,7 @@ class ImportFileController < ApplicationController
   #                   ['jdoe', 'Jane Doe', 'jdoe@gmail.com' ] ] }
   #
   def parse_to_hash(import_grid, has_header)
-    file_hash = {}
+    file_hash = Hash.new
     if has_header == 'true'
       file_hash[:header] = import_grid.shift
       file_hash[:body] = import_grid
@@ -141,7 +142,7 @@ class ImportFileController < ApplicationController
   def parse_to_grid(contents, delimiter)
     contents_grid = []
     contents.each_line do |line|
-      contents_grid << parse_line(line, delimiter) unless line.strip == ''
+      contents_grid << parse_line(line, delimiter) unless line.strip == ""
     end
     contents_grid
   end
@@ -149,32 +150,22 @@ class ImportFileController < ApplicationController
   def get_delimiter(params)
     delim_type = params[:delim_type]
     delimiter = case delim_type
-                when 'comma' then ','
-                when 'space' then ' '
-                when 'tab' then "\t"
-                when 'other' then params[:other_char]
+                when "comma" then ","
+                when "space" then " "
+                when "tab" then "\t"
+                when "other" then params[:other_char]
                 end
     delimiter
   end
 
   def parse_line(line, delimiter)
-    items = if delimiter == ','
+    items = if delimiter == ","
               line.split(/,(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))/)
             else
               line.split(delimiter)
             end
     row = []
-    items.each { |value| row << value.sub('"', '').sub('"', '').strip }
+    items.each {|value| row << value.sub("\"", "").sub("\"", "").strip }
     row
-  end
-
-  private
-
-  # Ensure the model is whitelisted
-  def allowed_model(model)
-    idx = ALLOWED_MODELS.index(model)
-    raise ArgumentError, 'Invalid model' if idx.nil?
-
-    ALLOWED_MODELS[idx].constantize
   end
 end

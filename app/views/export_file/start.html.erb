@@ -30,6 +30,9 @@
   <% if @model == 'ReviewResponseMap' %>
     <%= render :partial => 'reviewer_mapping' %>
   <% end %>
+  <% if @model == 'TagPromptDeployment' %>
+    <%= render :partial => 'tag_prompt_deployment' %>
+  <% end %>
   <br/>
   <%= hidden_field_tag('model', @model) %>
   <%= hidden_field_tag('id', @id) %>
@@ -60,7 +63,7 @@
   <% end %>
 <% else %>
   <!-- Hiding Export Details feature from the Course Participant view -->
-  <% if @model != 'CourseParticipant' %>
+  <% if @model == 'Assignment'%>
   <h2>Export Details</h2>
   <%= form_tag({:controller => 'export_file', :action => 'exportdetails'}, {:method => 'post', :multipart => true, :name => 'export_details_form'}) do %>
     <table>

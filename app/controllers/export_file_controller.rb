@@ -9,7 +9,8 @@ class ExportFileController < ApplicationController
   def start
     @model = params[:model]
     titles = { 'Assignment' => 'Grades', 'CourseParticipant' => 'Course Participants', 'AssignmentTeam' => 'Teams',
-               'CourseTeam' => 'Teams', 'User' => 'Users', 'Question' => 'Questions' }
+               'CourseTeam' => 'Teams', 'User' => 'Users', 'Question' => 'Questions', 'SignUpTopic' => 'Topic',
+               'TagPromptDeployment' => 'TagPromptDeployment'}
     @title = titles[@model]
     @id = params[:id]
   end
@@ -69,7 +70,9 @@ class ExportFileController < ApplicationController
                         Question
                         ReviewResponseMap
                         User
-                        Team]
+                        Team
+                        SignUpTopic
+                        TagPromptDeployment]
     csv_data = CSV.generate(col_sep: delimiter) do |csv|
       if allowed_models.include? params[:model]
         csv << Object.const_get(params[:model]).export_fields(params[:options])

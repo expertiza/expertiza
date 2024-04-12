@@ -31,7 +31,9 @@
 <table class="table table-striped sortable">
   <thead>
     <tr>
-      <th rowspan=2 width="320" class="sorter-true">Students</th>
+      #Place student name and student ID in separate columns
+      <th rowspan=2 width="160" class="sorter-true">Student Name</th>
+      <th rowspan=2 width="160" class="sorter-true">Student ID</th>
       <% @assignments.each do |assignment| %>
         <th colspan=3 class="sorter-false"> <%= assignment.name %> </th>
       <% end %>
@@ -49,7 +51,8 @@
 
   <% @course_participants.each do |cp|%>
       <tr>
-          <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
+          <td align="center"><%= cp.name(session[:ip]) %> </td>
+          <td align="center"><%= cp.fullname(session[:ip]) %> </td>
           <% @assignments.each do |assignment|%>
               <% topic = format_topic(@topics[cp.id][assignment.id]) %>
               <td title="<%= topic %>" class="topic topic-tooltip">

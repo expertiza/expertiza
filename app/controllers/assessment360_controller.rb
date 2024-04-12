@@ -189,12 +189,13 @@ class Assessment360Controller < ApplicationController
     participant_scores(participant, questions)
   end
 
+#Replace hyphen with an en-dash
   def format_topic(topic)
-    topic.nil? ? '-' : topic.format_for_display
+    topic.nil? ? '–' : topic.format_for_display
   end
-
+#Replace hyphen with an en-dash
   def format_score(score)
-    score.nil? ? '-' : score
+    score.nil? ? '–' : score
   end
 
   helper_method :format_score

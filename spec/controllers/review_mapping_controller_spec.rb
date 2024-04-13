@@ -654,6 +654,7 @@ describe ReviewMappingController do
   describe '#select_reviewer' do
     it 'session and class variable should be set' do
       allow(AssignmentTeam).to receive(:find).with('1').and_return(team)
+      get :select_reviewer, params: { contributor_id: '1' }
       expect(assigns(:contributor)).to eq(team)
       expect(session[:contributor]).to eq(team)
     end

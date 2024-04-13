@@ -299,6 +299,7 @@ class ReviewMappingController < ApplicationController
     flash[:error] = e.message
   end
 
+  # finds the assignment and deletes review mapping for which no associated response is found
   def delete_outstanding_reviewers
     assignment = find_assignment(params[:id])
     team = AssignmentTeam.find(params[:contributor_id])
@@ -457,6 +458,8 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment_id
   end
 
+  # calculates the reviewers for each team according to the provided criteria
+  # assigns these reviews, and then ensures that any remaining participants requiring reviews are also assigned to teams for review.
   def automatic_review_mapping_strategy(assignment_id,
                                         participants, teams, student_review_num = 0,
                                         submission_review_num = 0, exclude_teams = false)
@@ -538,6 +541,7 @@ class ReviewMappingController < ApplicationController
 
   private
 
+  # find participants with insufficient number of reviews based on the assignment review strategy
   def assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
     if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0)
                         .where('created_at > :time',

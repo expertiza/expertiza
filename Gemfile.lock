@@ -161,6 +161,9 @@ GEM
       activerecord (>= 5.a)
       database_cleaner-core (~> 2.0.0)
     database_cleaner-core (2.0.1)
+    debase (0.2.4.1)
+      debase-ruby_core_source (>= 0.10.2)
+    debase-ruby_core_source (3.3.1)
     delayed_job (4.1.11)
       activesupport (>= 3.0, < 8.0)
     delayed_job_active_record (4.1.4)
@@ -469,6 +472,8 @@ GEM
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.4.1)
       parser (>= 2.7.1.5)
+    ruby-debug-ide (0.7.3)
+      rake (>= 0.8.1)
     ruby-progressbar (1.11.0)
     ruby_parser (3.19.2)
       sexp_processor (~> 4.16)
@@ -595,6 +600,7 @@ DEPENDENCIES
   daemons
   danger!
   database_cleaner
+  debase
   delayed_job_active_record (= 4.1.4)
   dotenv-rails
   dynamic_form
@@ -647,6 +653,7 @@ DEPENDENCIES
   rjb
   rspec-rails (= 4.1.2)
   rubocop
+  ruby-debug-ide
   rubyzip
   rwordnet
   sass-rails (= 5.0.7)

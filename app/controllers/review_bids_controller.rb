@@ -9,7 +9,7 @@ class ReviewBidsController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'show', 'set_priority', 'index'
-      current_user_has_student_privileges? && are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer')
+      current_user_has_student_privileges? && ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer') : true)
     else
        current_user_has_ta_privileges?
     end
@@ -36,13 +36,11 @@ class ReviewBidsController < ApplicationController
   def show
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
-    @selected_topics= nil
     topic_ids_with_team = SignedUpTeam.where.not(team_id: nil).pluck(:topic_id) #Topics which have been selected by teams for submission
     @signup_topics = SignUpTopic.where(assignment_id: @assignment.id, id: topic_ids_with_team) #signup_topics is all the topics students have signed up for
 
     my_topic = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) #topic selected by the team 
     @signup_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: my_topic) #remove own topic from set of topics to bid on
-
     @num_participants = AssignmentParticipant.where(parent_id: @assignment.id).count  #number of participants to determine if topic's hot
     @assigned_topics= nil
     @bids = ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id)  #Update bids to be the list of sign-up topics on which the participant has bid
@@ -55,9 +53,10 @@ class ReviewBidsController < ApplicationController
     @signup_topics -= signed_up_topics
     @bids = signed_up_topics
     @num_of_topics = @signup_topics.size #count the remaining sign-up topics
-    @assigned_review_maps = []   #fetch review maps for the participant in the current assignment
-    ReviewResponseMap.where({:reviewed_object_id => @assignment.id, :reviewer_id => @participant.id}).each do |review_map|
-      @assigned_review_maps << review_map
+    @assigned_review_maps = ReviewResponseMap.where({:reviewed_object_id => @assignment.id, :reviewer_id => @participant.id})   #fetch review maps for the participant in the current assignment
+    @selected_topics= nil   # this is used to list the topics assigned to review.
+    @selected_topics = @assigned_review_maps.map do |review_map|
+      SignUpTopic.find_by(id: SignedUpTeam.find_by(team_id: review_map.reviewee_id)&.topic_id)
     end
     render 'sign_up_sheet/review_bids_show'
   end
@@ -96,8 +95,8 @@ class ReviewBidsController < ApplicationController
     # list of reviewer id's from a specific assignment
     reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
     bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
-    matched_topics = run_bidding_algorithm(bidding_data)
-    ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
+    assigned_topics = run_bidding_algorithm(bidding_data)
+    ReviewBid.assign_review_topics(assignment_id, reviewer_ids, assigned_topics)
     Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
     redirect_back fallback_location: root_path
   end
@@ -113,39 +112,31 @@ class ReviewBidsController < ApplicationController
      begin  
       #response = RestClient.post(url, bidding_data.to_json, content_type: 'application/json', accept: :json)
       #matched_topics= JSON.parse(bidding_data)
-      topics = bidding_data['tid']  
-    
-      bids_per_topic = {}
-      topic_bids = {}
-      topics.each do |topic_id|
-        # Collect all bids for the current assignment
-        bidding_data['users'].each do |reviewer_id, bid_details|
-          if bid_details['tid'].include?(topic_id)
-            index = bid_details['tid'].index(topic_id)
-            bid_info = { reviewer_id: reviewer_id, timestamp: bid_details['time'][index] }
-            if topic_bids[topic_id].nil?
-              topic_bids[topic_id] = [bid_info]
-            else
-              topic_bids[topic_id] << bid_info
-            end
-          end
-        end
-        total_reviewers = topic_bids.size
-        bids_per_topic[topic_id] = total_reviewers
-      end
+      assigned_topics = Hash.new { |h, k| h[k] = [] }
+      available_topics = bidding_data['tid'].dup  # Clone the list of topic IDs to track availability
 
-      unbid_users = bidding_data["users"].select { |user_id, details| details["tid"].empty? }.keys
-      bid_users= reviewer_ids - unbid_users
-      review_topics_assigned = {}
-      bid_users.each do |reviewer_id|
-        review_topics_assigned[reviewer_id] = bidding_data["users"][reviewer_id]["tid"]
+      # Assign topics based on students' bids
+    bidding_data['users'].each do |user_id, data|
+      # Sort bids by priority and try to assign each topic
+      sorted_bids = data['tid'].zip(data['priority']).sort_by { |_, priority| priority }
+      sorted_bids.each do |topic_id, _|
+        if available_topics.include?(topic_id) && assigned_topics[user_id].length <= bidding_data['max_accepted_proposals']
+          assigned_topics[user_id] << topic_id  # Assign topic to student
+        end
       end
-      unbid_users.each do |reviewer_id|
-        # Randomly select distinct topics for this reviewer. Ensuring we have unique topics if possible.
-        selected_topics = topics.sample(max_accepted_proposals)
-        review_topics_assigned[reviewer_id] = selected_topics.map(&:id)
+    end
+    # Handle students who didn't get any topics because they didn't bid or their bids were unavailable
+    unassigned_users = bidding_data['users'].keys - assigned_topics.keys
+    unassigned_users.each do |user_id|
+      assigned_count = 0
+      while assigned_count < 2 && !available_topics.empty?
+        topic_to_assign = available_topics.sample
+        assigned_topics[user_id] << topic_to_assign unless topic_to_assign.nil?
+        assigned_count += 1
       end
-      return  review_topics_assigned
+    end
+    assigned_topics
+    end
     rescue StandardError => e
       puts "Error in assigning reviewers: #{e.message}"
       return nil

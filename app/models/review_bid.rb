@@ -29,7 +29,7 @@ class ReviewBid < ApplicationRecord
     end
     # loop through reviewer_ids to assign reviews to each reviewer
     reviewer_ids.each do |reviewer_id|
-      topics_to_assign = matched_topics[reviewer_id.to_s]
+      topics_to_assign = [matched_topics[reviewer_id]]
       topics_to_assign.each do |topic|
         assign_topic_to_reviewer(assignment_id, reviewer_id, topic)
       end
@@ -38,8 +38,14 @@ class ReviewBid < ApplicationRecord
 
   # method to assign a single topic to a reviewer
   def self.assign_topic_to_reviewer(assignment_id, reviewer_id, topic)
-    team_to_review = SignedUpTeam.where(topic_id: topic).pluck(:team_id).first
-    team_to_review.nil? ? [] : ReviewResponseMap.create(reviewed_object_id: assignment_id, reviewer_id: reviewer_id, reviewee_id: team_to_review, type: 'ReviewResponseMap')
+    team_to_review = SignedUpTeam.where(topic_id: topic).pluck(:team_id)
+    # Iterate over each team_id to create a ReviewResponseMap
+    team_to_review.each do |team_id|
+      # Check if the team_id is present to avoid creating entries with null reviewee_id
+      if team_id.present?
+        ReviewResponseMap.create(reviewed_object_id: assignment_id, reviewer_id: reviewer_id, reviewee_id: team_id, type: 'ReviewResponseMap')
+      end
+    end
   end
 
   # method for getting individual reviewer_ids bidding data

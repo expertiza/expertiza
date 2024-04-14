@@ -1,4 +1,3 @@
-# TODO: Delete this. For first commit.
 puts "File.exist?(./../../spec/test_folder/example_view.html.erb) " + File.exist?("./../../spec/test_folder/example_view.html.erb").to_s
 
 require 'yaml'

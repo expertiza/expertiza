@@ -33,6 +33,9 @@
   <% if @model == 'TagPromptDeployment' %>
     <%= render :partial => 'tag_prompt_deployment' %>
   <% end %>
+  <% if @model == 'SignUpTopic' %>
+    <%= render :partial => 'signup_topics' %>
+  <% end %>
   <br/>
   <%= hidden_field_tag('model', @model) %>
   <%= hidden_field_tag('id', @id) %>
@@ -62,8 +65,8 @@
     <br/><br/>
   <% end %>
 <% else %>
-  <!-- Hiding Export Details feature from the Course Participant view -->
-  <% if @model == 'Assignment'%>
+<!-- Hiding Export Details feature from the Course Participant view and Export topic view  -->
+<% if @model != 'CourseParticipant' and @model != 'SignUpTopic' %>
   <h2>Export Details</h2>
   <%= form_tag({:controller => 'export_file', :action => 'exportdetails'}, {:method => 'post', :multipart => true, :name => 'export_details_form'}) do %>
     <table>

@@ -12,32 +12,27 @@ class SignUpTopic < ApplicationRecord
   validates :topic_name, :assignment_id, :max_choosers, presence: true
   validates :topic_identifier, length: { maximum: 10 }
 
-  def self.import(row_hash, _session = nil, id)
-    raise ArgumentError, 'Record does not contain required items.' if row_hash.length < required_import_fields.length
-    topic = SignUpTopic.where(topic_name: row_hash[:topic_name], assignment_id: id).first
+  # This method is not used anywhere
+  # def get_team_id_from_topic_id(user_id)
+  #  return find_by_sql("select t.id from teams t,teams_users u where t.id=u.team_id and u.user_id = 5");
+  # end
+
+  def self.import(row_hash, session, _id = nil)
+    if row_hash.length < 3
+      raise ArgumentError, 'The CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category (optional), Topic Description (Optional), Topic Link (optional).'
+    end
+
+    topic = SignUpTopic.where(topic_name: row_hash[:topic_name], assignment_id: session[:assignment_id]).first
     if topic.nil?
-      get_new_sign_up_topic(get_topic_attributes(row_hash), id)
+      attributes = ImportTopicsHelper.define_attributes(row_hash)
+
+      ImportTopicsHelper.create_new_sign_up_topic(attributes, session)
     else
       topic.max_choosers = row_hash[:max_choosers]
       topic.topic_identifier = row_hash[:topic_identifier]
+      # topic.assignment_id = session[:assignment_id]
       topic.save
     end
-  end
-
-  def self.required_import_fields
-    { 'topic_identifier' => 'Topic Identifier',
-      'topic_name' => 'Topic Name',
-      'max_choosers' => 'Max Choosers' }
-  end
-
-  def self.optional_import_fields(_id = nil)
-    { 'category' => 'Category',
-      'description' => 'Description',
-      'link' => 'Link' }
-  end
-
-  def self.import_options
-    {}
   end
 
   def self.find_slots_filled(assignment_id)
@@ -165,23 +160,60 @@ class SignUpTopic < ApplicationRecord
       return 'failed'
     end
   end
-
-  private
-
-  def self.get_topic_attributes(row_hash)
-    attributes = {}
-    attributes['topic_identifier'] = row_hash[:topic_identifier].strip
-    attributes['topic_name'] = row_hash[:topic_name].strip
-    attributes['max_choosers'] = row_hash[:max_choosers].strip
-    attributes['category'] = row_hash[:category].strip unless row_hash[:category].nil?
-    attributes['description'] = row_hash[:description].strip unless row_hash[:description].nil?
-    attributes['link'] = row_hash[:link].strip unless row_hash[:link].nil?
-    attributes
+  # Export the fields
+  def self.export_fields(options)
+    fields = []
+    fields.push('Topic Id') if options['topic_identifier'] == 'true'
+    fields.push('Topic Names') if options['topic_name'] == 'true'
+    fields.push('Description') if options['description'] == 'true'
+    fields.push("Participants") if options['participants'] == 'true'
+    fields.push('Num of Slots') if options['num_of_slots'] == 'true'
+    fields.push('Available slots') if options['available_slots'] == 'true'
+    fields.push('Num on waitlist') if options['num_on_waitlist'] == 'true'
+    fields
   end
 
-  def get_new_sign_up_topic(attributes, id)
-    sign_up_topic = SignUpTopic.new(attributes)
-    sign_up_topic.assignment_id = id
-    sign_up_topic.save
+  def self.export(csv, parent_id, options)
+    @assignment = Assignment.find(parent_id.to_i)
+    @signuptopics = SignUpTopic.where(assignment_id: @assignment.id)
+
+    @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
+    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
+
+    @signuptopics.each do |signuptopic|
+      tcsv = []
+      tcsv.push(signuptopic.topic_identifier) if options['topic_identifier'] == 'true'
+      tcsv.push(signuptopic.topic_name) if options['topic_name'] == 'true'
+      tcsv.push(signuptopic.description) if options['description'] == 'true'
+      if SignedUpTeam.where(topic_id: signuptopic.id).first != nil
+        @signedupteam = SignedUpTeam.where(topic_id: signuptopic.id).first
+        @users = TeamsUser.where(team_id: @signedupteam.team_id).all
+        ids = ""
+        @users.each do |user|
+          ids += user.name.to_s + " "
+        end
+      else
+        ids = ""
+        ids = "No Choosers"
+      end
+      tcsv.push(ids) if options['participants'] == 'true'
+      tcsv.push(signuptopic.max_choosers) if options['num_of_slots'] == 'true'
+
+      slots_filled_length = @slots_filled.length()
+      @slots_filled.each do |slot|
+        if slot.topic_id == signuptopic.id
+          tcsv.push(signuptopic.max_choosers.to_i - slot.count.to_i) if options['available_slots'] == 'true'
+        else
+          slots_filled_length -= 1
+        end
+      end
+
+      if slots_filled_length == 0
+        tcsv.push(signuptopic.max_choosers) if options['available_slots'] == 'true'
+      end
+      tcsv.push(tcsv[4].to_i - tcsv[5].to_i) if options['num_on_waitlist'] == 'true'
+
+      csv << tcsv
+    end
   end
 end

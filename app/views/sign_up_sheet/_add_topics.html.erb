@@ -36,6 +36,13 @@
 
     <input type="button" value="Delete selected topics" onclick="deleteTopics()" />|
     <input type="button" value="Delete all topics" onclick="deleteAllTopics()" />|
+
+    <%= link_to 'Export Topics', 
+                :controller=>'export_file',
+                :action=>'start',
+                :model=> 'SignUpTopic',
+                :id => params[:id] %>|
+
 <% end %>
 
 <script>

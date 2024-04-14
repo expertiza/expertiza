@@ -1,6 +1,6 @@
 # TODO: Delete this. For first commit.
+puts "File.exist?(./../../spec/test_folder/example_view.html.erb) " + File.exist?("./../../spec/test_folder/example_view.html.erb").to_s
 
-puts "IN VEW_TRANSLATION_SUBSTITUTOR.rb"
 require 'yaml'
 
 class ViewTranslationSubstitutor
@@ -11,6 +11,7 @@ class ViewTranslationSubstitutor
     stats = {}
     locale.each { |dir_name, view_hash| stats[dir_name] = process_directory(dir_name, view_hash) }
     File.open("translation_stats#{Time.now}.yml", 'w') { |file| file.write(stats.to_yaml) }
+    puts "END"
   end
 
   private
@@ -23,16 +24,20 @@ class ViewTranslationSubstitutor
 
   def process_view(directory_name, view_name, translations)
     path = "./#{directory_name}/#{view_name}.html.erb"
+    puts "IN PROCESS_VIEW: path is #{path}"
+
     unless File.exist?(path)
       path = "./#{directory_name}/_#{view_name}.html.erb"
+
       return '<file not found>' unless File.exist?(path)
     end
 
     view_stats = {}
 
-    file = File.open(path)
-    contents = file.read || ''
-    file.close
+    # file = File.open(path)
+    # contents = file.read || ''
+    # file.close
+    contents = File.open(path, 'w') { |file| file.read } || ''
 
     translations.each { |key, val| view_stats[key], contents = process_translation(contents, key, val) }
     File.open(path, 'w') { |f| f.write contents }

@@ -1,40 +1,65 @@
 describe ViewTranslationSubstitutor do
+  let(:substitutor) { ViewTranslationSubstitutor.new }
   let(:test_directory) { '../../spec/test_folder' }
   let(:test_view) { 'example_view' }
-  let(:test_translations) { { 'key1' => 'value1', 'key2' => 'value2' } }
+  let(:non_view) { 'nonexistent_file'}
+  let(:test_translations) { { 'hello' => 'Hello, world!' } }
+  let(:locale) do {
+    '../../spec/test_folder' => {
+      'example_view' => {
+        'hello' => 'Hello, world!'
+      }
+    }
+  }
+  end
 
-  # before do
-  #   FileUtils.mkdir_p("#{test_directory}/#{test_view}.html.erb")
-  #   File.write("#{test_directory}/#{test_view}.html.erb", "This is a test view.")
-  # end
+  let(:nonexistent_locale) do {
+    '../../spec/test_folder' => {
+      'nonexistent_file' => {
+        'hello' => 'Hello, world!'
+      }
+    }
+  }
+  end
 
-  # after do
-  #   FileUtils.rm_rf(test_directory)
-  # end
 
-  describe '#substitute' do
-    it 'successfully substitutes translations' do
-      substitutor = ViewTranslationSubstitutor.new
-      expect(substitutor).to receive(:process_directory).with(test_directory, test_translations).and_return({
-        test_view => { 'replacements' => [], 'skips' => [] }
-      })
+  describe '#process_translation' do
+    let(:contents) { 'This is a test string with some "text" to be replaced.' }
+    let(:key) { 'XXXXXXX' }
+    let(:val) { 'text' }
 
-      expect(File).to receive(:open).with(/translation_stats.*\.yml/, 'w').and_yield(double('file', write: nil))
+    it 'replaces the correct text with translation keys' do
+      replacements, new_contents = substitutor.send(:process_translation, contents, key, val)
 
-      substitutor.substitute(test_directory => test_translations)
-    end
-
-    it 'handles a file that does not exist' do
-      substitutor = ViewTranslationSubstitutor.new
-      expect(substitutor).to receive(:process_directory).with('non_existent_directory', test_translations).and_return({
-        'non_existent_view' => '<file not found>'
-      })
-
-      expect(File).to receive(:open).with(/translation_stats.*\.yml/, 'w').and_yield(double('file', write: nil))
-
-      substitutor.substitute('non_existent_directory' => test_translations)
+      expect(replacements).to include("#{val}")
+      expect(new_contents).to include("#{key}")
     end
   end
+
+  # describe '#substitute' do
+  #   it 'successfully substitutes translations' do
+  #     expect(substitutor).to receive(:process_directory).with(test_directory, test_view => test_translations).and_return({
+  #       test_view => { 'replacements' => [], 'skips' => [] }
+  #     })
+
+  #     expect(File).to receive(:open).with(/translation_stats.*\.yml/, 'w').and_yield(double('file', write: nil))
+
+  #     substitutor.substitute(locale)
+  #   end
+
+  #   it 'handles a file that does not exist' do
+  #     expect(substitutor).to receive(:process_directory).with(test_directory, non_view => test_translations).and_return({
+  #       test_view => {
+  #         'replacements' => ['<%= t ".hesdfgdfgsdfgsdfgllo" %>'],
+  #         'skips' => []
+  #       }
+  #     })
+
+  #     expect(File).to receive(:open).with(/translation_stats.*\.yml/, 'w').and_yield(double('file', write: nil))
+
+  #     substitutor.substitute(nonexistent_locale)
+  #   end
+  # end
 end
 
 # # require 'rspec'

@@ -2,6 +2,21 @@ describe ViewTranslationSubstitutor do
   let(:test_directory) { '../../spec/test_folder' }
   let(:test_view) { 'example_view' }
   let(:test_translations) { { 'key1' => 'value1', 'key2' => 'value2' } }
+  let(:vts) { ViewTranslationSubstitutor.new }
+
+  let(:locale) {
+  {
+    'views_directory' => {
+      'example_view1' => {
+        'hello' => 'Hello, world!'
+      },
+      'example_view2' => {
+        'goodbye' => 'Goodbye, world!'
+      }
+    }
+  }
+}
+
 
   # before do
   #   FileUtils.mkdir_p("#{test_directory}/#{test_view}.html.erb")
@@ -33,6 +48,15 @@ describe ViewTranslationSubstitutor do
       expect(File).to receive(:open).with(/translation_stats.*\.yml/, 'w').and_yield(double('file', write: nil))
 
       substitutor.substitute('non_existent_directory' => test_translations)
+    end
+  end
+
+  describe '#process_directory' do
+    it 'processes each view in the directory' do
+      # Ensure that the process_view is expected to be called twice with any arguments
+      expect(vts).to receive(:process_view).twice.and_return({})
+      # Trigger the method with the updated locale that includes two separate views
+      vts.send(:process_directory, 'views_directory', locale['views_directory'])
     end
   end
 end

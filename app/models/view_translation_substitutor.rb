@@ -1,8 +1,8 @@
 require 'yaml'
 
 # ViewTranslationSubstitutor is a model responsible for substituting translation keys in view files
-# with their corresponding values from a given locale hash, and generating statistics about the
-# translation process.
+# with their corresponding values from a given locale hash and generating statistics about the
+# translation process. This allows for standardization accross world languages.
 class ViewTranslationSubstitutor
   BLACKLIST = "([a-zA-Z0-9\\._]+|[\"\\'])?".freeze # Regular expression pattern to ignore certain text during translation.
 

@@ -1,4 +1,4 @@
-# Test cases for the ViewTranslationSubstitutor class.
+# Controller for handling view translation substitution and generating translation statistics.
 
 describe ViewTranslationSubstitutor do
   let(:substitutor) { ViewTranslationSubstitutor.new }
@@ -6,6 +6,7 @@ describe ViewTranslationSubstitutor do
   let(:test_view) { 'example_view' }
   let(:test_translations) { { 'hello' => 'Hello, world!' } }
 
+  # Test cases for the substitute method.
   describe '#substitute' do
     let(:substitutor) { ViewTranslationSubstitutor.new }
 
@@ -29,6 +30,7 @@ describe ViewTranslationSubstitutor do
     end
   end
 
+  # Test cases for the process_directory method.
   describe '#process_directory' do
     let(:substitutor) { ViewTranslationSubstitutor.new }
 
@@ -46,6 +48,7 @@ describe ViewTranslationSubstitutor do
     end
 
     context 'when view_hash is empty' do
+      # Local variables
       let(:dir_name) { 'dir2' }
       let(:view_hash) { {} }
 
@@ -57,9 +60,9 @@ describe ViewTranslationSubstitutor do
     end
   end
 
-  # Test cases for the process_view method in the ViewTranslationSubstitutor class.
-
+  # Test cases for the process_view method.
   describe '#process_view' do
+    # Local variables
     let(:substitutor) { ViewTranslationSubstitutor.new }
     let(:directory_name) { 'test_folder' }
     let(:view_name) { 'example_view' }
@@ -79,7 +82,6 @@ describe ViewTranslationSubstitutor do
 
         # Call the process_view method and expect it to return processed view stats.
         view_stats = substitutor.send(:process_view, directory_name, view_name, translations)
-
         expect(view_stats).to eq({ 'key1' => 'stats1', 'key2' => 'stats2' })
 
         # Expect File.open to be called twice with the view file path.
@@ -119,11 +121,11 @@ describe ViewTranslationSubstitutor do
     end
   end
 
-  # Test cases for the process_translation method in the ViewTranslationSubstitutor class.
-
+  # Test cases for the process_translation method
   describe '#process_translation' do
+    # Local variables
     let(:contents) { 'This is a test string with some "text" to be replaced.' }
-    let(:key) { 'XXXXXXX' }
+    let(:key) { 'other word' }
     let(:val) { 'text' }
     let(:key2) { 'skipped key' }
     let(:val2) { 'string' }

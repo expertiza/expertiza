@@ -22,6 +22,54 @@ describe ViewTranslationSubstitutor do
   }
   end
 
+  describe '#process_view' do
+    let(:substitutor) { ViewTranslationSubstitutor.new }
+    let(:directory_name) { 'test_folder' }
+    let(:view_name) { 'example_view' }
+    let(:translations) { { 'key1' => 'value1', 'key2' => 'value2' } }
+
+    context 'when the view file exists' do
+      before do
+        allow(File).to receive(:exist?).with("./#{directory_name}/#{view_name}.html.erb").and_return(true)
+        allow(File).to receive(:open).with("./#{directory_name}/#{view_name}.html.erb", 'w').and_yield(StringIO.new("Existing content"))
+      end
+
+      it 'reads the file, processes translations, and writes back the contents' do
+        expect(substitutor).to receive(:process_translation).with("Existing content", 'key1', 'value1').and_return(['stats1', 'new_content1'])
+        expect(substitutor).to receive(:process_translation).with('new_content1', 'key2', 'value2').and_return(['stats2', 'new_content2'])
+
+        view_stats = substitutor.send(:process_view, directory_name, view_name, translations)
+
+        expect(view_stats).to eq({ 'key1' => 'stats1', 'key2' => 'stats2' })
+        expect(File).to have_received(:open).with("./#{directory_name}/#{view_name}.html.erb", 'w').twice
+      end
+    end
+
+    context 'when the view file does not exist' do
+      it 'returns "<file not found>"' do
+        view_stats = substitutor.send(:process_view, test_directory, test_view, test_translations)
+        expect(view_stats).to eq('<file not found>')
+      end
+    end
+
+    context 'when the alternate view file exists' do
+      before do
+        allow(File).to receive(:exist?).with("./#{directory_name}/#{view_name}.html.erb").and_return(false)
+        allow(File).to receive(:exist?).with("./#{directory_name}/_#{view_name}.html.erb").and_return(true)
+        allow(File).to receive(:open).with("./#{directory_name}/_#{view_name}.html.erb", 'w').and_yield(StringIO.new("Existing content"))
+      end
+
+      it 'reads the alternate file, processes translations, and writes back the contents' do
+        expect(substitutor).to receive(:process_translation).with("Existing content", 'key1', 'value1').and_return(['stats1', 'new_content1'])
+        expect(substitutor).to receive(:process_translation).with('new_content1', 'key2', 'value2').and_return(['stats2', 'new_content2'])
+
+        view_stats = substitutor.send(:process_view, directory_name, view_name, translations)
+
+        expect(view_stats).to eq({ 'key1' => 'stats1', 'key2' => 'stats2' })
+        expect(File).to have_received(:open).with("./#{directory_name}/_#{view_name}.html.erb", 'w').twice
+      end
+    end
+  end
 
   describe '#process_translation' do
     let(:contents) { 'This is a test string with some "text" to be replaced.' }

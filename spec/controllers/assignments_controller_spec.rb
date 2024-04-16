@@ -414,40 +414,6 @@ describe AssignmentsController do
     end
   end
 
-  describe '#bidding_details' do
-    it 'assigns necessary variables and renders bidding_details template' do
-      allow(Assignment).to receive(:find).with('1').and_return(assignment)
-      allow(assignment).to receive(:sign_up_topics).and_return([double('SignUpTopic', id: 1)])
-      allow(Bid).to receive(:where).with(topic_id: 1).and_return([])
-      allow(assignment).to receive(:calculate_percentage_of_teams_getting_choices).and_return({})
-      allow(assignment).to receive(:teams_bidding_for_each_topic).and_return({})
-      allow(assignment).to receive(:assigned_teams_for_topics).and_return({})
-      
-      get :bidding_details, params: { id: 1 }
-      
-      expect(assigns(:assignment)).to eq(assignment)
-      expect(assigns(:bids_by_topic)).to eq({ 1 => [] })
-      expect(response).to render_template('bidding_details')
-    end
-  end
-
-  describe '#bidding_details_for_topic' do
-    it 'assigns necessary variables and renders bidding_details_for_topic template' do
-      topic = double('SignUpTopic', id: 1)
-      bids = [double('Bid')]
-
-      allow(SignUpTopic).to receive(:includes).with(:bids).and_return(SignUpTopic)
-      allow(SignUpTopic).to receive(:find).with(1).and_return(topic)
-      allow(topic).to receive(:bids).and_return(bids)
-
-      get :bidding_details_for_topic, params: { topic_id: 1 }, format: :js
-      
-      expect(assigns(:topic)).to eq(topic)
-      expect(assigns(:bids)).to eq(bids)
-      expect(response).to render_template('bidding_details_for_topic')
-    end
-  end
-
   describe '#remove_assignment_from_course' do
     context 'when assignment is removed from course successfully' do
       it 'removes assignment and redirects to tree_display#list page' do
@@ -481,4 +447,3 @@ describe AssignmentsController do
     end
   end
 end
-

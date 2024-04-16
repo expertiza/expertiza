@@ -110,7 +110,7 @@ module Scoring
       scores[:participants][participant.id.to_s.to_sym] = participant_scores(participant, questions)
     end
     assignment.teams.each_with_index do |team, index|
-      scores[:teams][index.to_s.to_sym] = { team: team, scores: {} }
+      scores[:teams][index.to_s.to_sym] = { team: team, scores: {}, participants: [] }
       if assignment.varying_rubrics_by_round?
         grades_by_rounds, total_num_of_assessments, total_score = compute_grades_by_rounds(assignment, questions, team)
         # merge the grades from multiple rounds
@@ -119,6 +119,34 @@ module Scoring
         assessments = ReviewResponseMap.assessments_for(team)
         scores[:teams][index.to_s.to_sym][:scores] = aggregate_assessment_scores(assessments, questions[:review])
       end
+    end
+    scores
+  end
+
+  def review_grades_export(assignment, questions)
+    scores = []
+    # assignment.participants.each do |participant|
+    #   scores[:participants][participant.id.to_s.to_sym] = participant_scores(participant, questions)
+    # end
+    assignment.teams.each_with_index do |team, index|
+      team_score = { team: team, scores: {}, participants: [] }
+      if assignment.varying_rubrics_by_round?
+        grades_by_rounds, total_num_of_assessments, total_score = compute_grades_by_rounds(assignment, questions, team)
+        # merge the grades from multiple rounds
+        team_score[:scores] = merge_grades_by_rounds(assignment, grades_by_rounds, total_num_of_assessments, total_score)
+      else
+        assessments = ReviewResponseMap.assessments_for(team)
+        team_score[:scores] = aggregate_assessment_scores(assessments, questions[:review])
+      end
+      team_users = TeamsUser.where('team_id = ?', team.id)
+      team_users.each do |team_user|
+        participant = assignment.participants.find_by(user_id: team_user.user_id)
+        # participant_assignment = AssignmentParticipant.includes(:assignment).find(participant.id)
+        team_score[:participants].push(participant_scores(participant, questions))
+        
+      end
+      
+      scores.push(team_score)
     end
     scores
   end

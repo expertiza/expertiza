@@ -103,17 +103,12 @@ class TagPromptDeployment < ApplicationRecord
       end
     end
     sheets = self.export_data(questionnaire_tagging_report, option)
-
-    puts "----------------sheets: #{sheets.inspect}---------------------------------"
     sheets.each do |sheet, rows|
-      puts "----------------sheet: #{sheet.inspect}---------------------------------"
-      puts "----------------rows: #{rows.inspect}---------------------------------"
       csv << [sheet]
       rows.each do |row|
         csv << row
       end
     end
-    
   end
 
   def self.tagged_user_summary(user_tagging_report, line)
@@ -146,7 +141,6 @@ class TagPromptDeployment < ApplicationRecord
           row.push(report_line.no_not_tagged.to_s)
           row.push(report_line.tag_update_intervals)
           key_chart_information = self.calculate_key_chart_information(report_line.tag_update_intervals)
-          puts "----------------line.key_chart_information: #{key_chart_information.inspect}---------------------------------"
           
           row.push(key_chart_information.nil? ? nil : key_chart_information[:mean])
           row.push(key_chart_information.nil? ? nil : key_chart_information[:min])

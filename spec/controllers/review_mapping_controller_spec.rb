@@ -700,16 +700,18 @@ describe ReviewMappingController do
     end
   end
 
-  describe "#select_reviewer" do
-    context "when called with a valid contributor_id" do
-      it "assigns the corresponding AssignmentTeam to @contributor" do
-        allow(AssignmentTeam).to receive(:find).with('1').and_return(team)
+  describe '#select_reviewer' do
+    before(:each) do
+      allow(AssignmentTeam).to receive(:find).with('1').and_return(team)
+    end
+    
+    context 'when called with a valid contributor_id' do
+      it 'assigns the corresponding AssignmentTeam to @contributor' do
         get :select_reviewer, params: { contributor_id: 1 }
         expect(assigns(:contributor)).to eq(team)
       end
 
-      it "stores the @contributor in the session" do
-        allow(AssignmentTeam).to receive(:find).with('1').and_return(team)
+      it 'stores the @contributor in the session' do
         get :select_reviewer, params: { contributor_id: 1 }
         expect(session[:contributor]).to eq(team)
       end

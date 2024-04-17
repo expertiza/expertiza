@@ -9,14 +9,22 @@
     text-align: center;
   }
 
+  td.topic {
+    display:inline-block;
+    margin-top: -1px;
+    white-space:nowrap;
+    position:relative; /* must be relative */
+    width:250px; /* fit to table cell width */
+    overflow:hidden;
+  }
 </style>
 
 <script>
     $(function() {
-      /* Function for sorting the table */
-      $(".sortable").tablesorter({
-          sortList: [[0, 0]] // sort by Student name
-      });
+        /*Function for sorting the table */
+        $(".sortable").tablesorter({
+            sortList: [[0,0]] // sort by Student name
+        });
     });
 </script>
 

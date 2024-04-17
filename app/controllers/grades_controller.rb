@@ -9,6 +9,8 @@ class GradesController < ApplicationController
   include AuthorizationHelper
   include Scoring
 
+  after_action :create_grading_history, only: :save_grade_and_comment_for_submission
+
   def action_allowed?
     case params[:action]
     when 'view_my_scores'
@@ -159,24 +161,17 @@ class GradesController < ApplicationController
   end
 
   def save_grade_and_comment_for_submission
-    participant = AssignmentParticipant.find_by(id: params[:participant_id])
-    @team = participant.team
+    @participant = AssignmentParticipant.find_by(id: params[:participant_id])
+    @team = @participant.team
     @team.grade_for_submission = params[:grade_for_submission]
     @team.comment_for_submission = params[:comment_for_submission]
     begin
-      # Also save a grading history record for this submission
-      GradingHistory.create(instructor_id: session[:user].id,
-                            assignment_id: participant.assignment.id,
-                            graded_item_type: 'Submission',
-                            graded_member_id: @team.id,
-                            grade: @team.grade_for_submission,
-                            comment: @team.comment_for_submission)
       @team.save
       flash[:success] = 'Grade and comment for submission successfully saved.'
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
-    redirect_to controller: 'grades', action: 'view_team', id: participant.id
+    redirect_to controller: 'grades', action: 'view_team', id: @participant.id
   end
 
   def bar_chart(scores, width = 100, height = 100, spacing = 1)
@@ -265,5 +260,14 @@ class GradesController < ApplicationController
     else
       true
     end
+  end
+
+  def create_grading_history
+    GradingHistory.create(instructor_id: session[:user].id,
+                          assignment_id: @participant.assignment.id,
+                          graded_item_type: 'Submission',
+                          graded_member_id: @team.id,
+                          grade: @team.grade_for_submission,
+                          comment: @team.comment_for_submission)
   end
 end

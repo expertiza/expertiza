@@ -683,6 +683,7 @@ describe ReviewMappingController do
       end
     end
   end
+  
   describe "#select_metareviewer" do
     context "when given a valid response map id" do
       it "should assign the response map to @mapping" do
@@ -694,7 +695,6 @@ describe ReviewMappingController do
 
     context "when given an invalid response map id" do
       it "should raise an error" do
-        allow(ResponseMap).to receive(:find).with('1').and_return(review_response_map)
         expect { get :select_metareviewer, params: { id: 2 } }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end

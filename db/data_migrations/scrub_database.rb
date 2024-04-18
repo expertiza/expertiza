@@ -31,7 +31,6 @@ class ScrubDatabase
       participant.save(validate: false)
     end
   end
-
 end
 
 

@@ -720,13 +720,26 @@ describe ReviewMappingController do
 
   describe '#find_assignment' do
     before(:each) do
-      allow(Assignment).to receive(:find).with('1').and_return(assignment)
+      allow(Assignment).to receive(:find).and_return(assignment_double)
     end
     
     context 'when called with a valid assignment_id' do
       it 'returns the corresponding assignment' do
         res = find_assignment(1)
-        expect(res).to eq(assignment)
+        expect(res).to eq(assignment_double)
+      end
+    end
+  end
+
+  describe '#user_trying_to_review_own_artifact' do
+    before(:each) do
+      allow(TeamsUser).to receive(:exists?).with(team_id: '1', user_id: 1).and_return(true)
+    end
+    
+    context 'when user trying to review own artificat' do
+      it 'should return True' do
+        res = user_trying_to_review_own_artifact?('1',1)
+        expect(res).to eq(true)
       end
     end
   end

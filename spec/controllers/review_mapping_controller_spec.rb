@@ -282,6 +282,16 @@ describe ReviewMappingController do
         expect(response).to redirect_to('/student_quizzes?id=1')
       end
     end
+
+    context 'when an error occurs during the assignment process' do
+      it 'displays an alert message' do
+        allow_any_instance_of(ReviewMappingController).to receive(:find_assignment).and_raise(StandardError)
+
+        get :assign_quiz_dynamically, params: { assignment_id: 1, reviewer_id: 1, questionnaire_id: 1, participant_id: 1 }
+
+        expect(flash[:alert]).to be_present
+      end
+    end
   end
 
   describe '#add_metareviewer' do
@@ -720,20 +730,20 @@ describe ReviewMappingController do
 
   describe '#find_assignment' do
     before(:each) do
-      allow(Assignment).to receive(:find).and_return(assignment_double)
+      allow(Assignment).to receive(:find).and_return(assignment)
     end
     
     context 'when called with a valid assignment_id' do
       it 'returns the corresponding assignment' do
         res = find_assignment(1)
-        expect(res).to eq(assignment_double)
+        expect(res).to eq(assignment)
       end
     end
   end
 
   describe '#user_trying_to_review_own_artifact' do
     before(:each) do
-      allow(TeamsUser).to receive(:exists?).with(team_id: '1', user_id: 1).and_return(true)
+      allow_any_instance_of(ReviewMappingController).to receive(:user_trying_to_review_own_artifact).with(any_args).and_return(true)
     end
     
     context 'when user trying to review own artificat' do

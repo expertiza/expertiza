@@ -40,10 +40,10 @@ class FakeNameGenerator
 
   def self.first_name
     gender = [:male_first_name, :female_first_name, :neutral_first_name].sample
-    NAMES[gender].sample
+    NAMES["#{gender}"].sample
   end
 
   def self.last_name
-    NAMES[:last_name].sample
+    NAMES["#{:last_name}"].sample
   end
 end

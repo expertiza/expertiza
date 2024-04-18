@@ -92,11 +92,32 @@ class Team < ApplicationRecord
       assignment_name = assignment_id ? Assignment.find(assignment_id).name.to_s : ''
       # Now that a new team member has been added to a team, send an email to them letting them know
       if MentorManagement.user_a_mentor?(user)
-        MailerHelper.send_team_confirmation_mail_to_user(user, '[Expertiza] Added to a Team', 'mentor_added_to_team', name.to_s, assignment_name).deliver
+        #  send mail to generic user
+        Mailer.team_addition_message(
+          to: user.email,
+          subject: '[Expertiza] Added to a Team',
+          body: {
+            user: user,
+            first_name: ApplicationHelper.get_user_first_name(user),
+            partial_name: 'mentor_added_to_team',
+            team: name.to_s,
+            assignment: assignment_name
+          }
+        ).deliver
       elsif !user.is_a?(Participant)
         # If the user is a participant, then we don't went to send them emails since that class is something
         # completely out of the scope of this project
-        MailerHelper.send_team_confirmation_mail_to_user(user, '[Expertiza] Added to a Team', 'user_added_to_team', name.to_s, assignment_name).deliver
+        Mailer.team_addition_message(
+          to: user.email,
+          subject: '[Expertiza] Added to a Team',
+          body: {
+            user: user,
+            first_name: ApplicationHelper.get_user_first_name(user),
+            partial_name: 'user_added_to_team',
+            team: name.to_s,
+            assignment: assignment_name
+          }
+        ).deliver
       end
 
     end

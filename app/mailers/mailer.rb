@@ -27,14 +27,27 @@ class Mailer < ActionMailer::Base
     @team = defn[:body][:team] # team name
 
     if Rails.env.development? || Rails.env.test?
-      #defn[:to] = 'expertiza.mailer@gmail.com'
-      defn[:to] = 'slkwiatk@ncsu.edu'
+      defn[:to] = 'expertiza.mailer@gmail.com'
     end
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:bcc])
   end
 
+  def team_addition_message(defn)
+    # Function only for when a user is added to a team (mentor or normal user)
+    @partial_name = defn[:body][:partial_name]
+    @user = defn[:body][:user]
+    @first_name = defn[:body][:first_name]
+    @assignment = defn[:body][:assignment]
+    @team = defn[:body][:team] # team name
+
+    if Rails.env.development? || Rails.env.test?
+      defn[:to] = 'expertiza.mailer@gmail.com'
+    end
+    mail(subject: defn[:subject],
+         to: defn[:to])
+  end
   def request_user_message(defn)
     @user = defn[:body][:user]
     @super_user = defn[:body][:super_user]

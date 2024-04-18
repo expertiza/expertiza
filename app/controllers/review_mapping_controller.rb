@@ -344,11 +344,8 @@ class ReviewMappingController < ApplicationController
         user = participant.user
         next if TeamsUser.team_id(assignment_id, user.id)
 
-        if assignment.auto_assign_mentor
-          team = MentoredTeam.create_team_and_node(assignment_id)
-        else
-          team = AssignmentTeam.create_team_and_node(assignment_id)
-        end
+        team = AssignmentTeam.create_team_and_node(assignment_id)
+
         ApplicationController.helpers.create_team_users(user, team.id)
         teams << team
       end

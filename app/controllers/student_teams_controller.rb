@@ -79,7 +79,8 @@ class StudentTeamsController < ApplicationController
       parent = AssignmentNode.find_by node_object_id: student.parent_id
       # E2351- a decision needs to be made here whether to create an AssignmentTeam or MentoredTeam depending on assignment settings
       if parent.assignment != nil && parent.assignment.auto_assign_mentor
-        team = MentoredTeam.new(name: params[:team][:name], parent_id: student.parent_id)
+        team = AssignmentTeam.new(name: params[:team][:name], parent_id: student.parent_id)
+        team = MentoredTeamDecorator.new(team)
       else
         team = AssignmentTeam.new(name: params[:team][:name], parent_id: student.parent_id)
       end

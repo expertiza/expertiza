@@ -53,7 +53,7 @@ class TeamsController < ApplicationController
     @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == Team.allowed_types[0]
     unless @assignment.nil?
       if @assignment.auto_assign_mentor
-        @model = MentoredTeam
+        @model = MentoredTeamDecorator  # not sure if changing this to decorator is correct yet...
         # MentorMeeting.delete_all
         @mentor_meetings = MentorMeeting.all
       else

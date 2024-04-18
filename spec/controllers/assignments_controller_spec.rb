@@ -210,7 +210,7 @@ describe AssignmentsController do
   describe '#edit' do
     context 'when assignment has staggered deadlines' do
       it 'shows an error flash message and renders edit page' do
-        allow(SignUpTopic).to receive(:where).with(assignment_id: assignment.id).and_return([double('SignUpTopic'), double('SignUpTopic')])
+        allow(SignUpTopic).to receive(:where).with(assignment_id: assignment.id.to_i).and_return([double('SignUpTopic'), double('SignUpTopic')])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id)
                                                          .and_return([assignment_questionnaire])
         allow(Questionnaire).to receive(:where).with(id: assignment_questionnaire.questionnaire_id).and_return([double('Questionnaire', type: 'ReviewQuestionnaire')])

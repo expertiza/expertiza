@@ -389,7 +389,7 @@ end
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @user = current_user
 
-    @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
+    @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id].to_i)
     @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
     @due_date_nameurl_not_empty = false
     @due_date_nameurl_not_empty_checkbox = false

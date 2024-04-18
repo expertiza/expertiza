@@ -385,7 +385,7 @@ end
     @num_submissions_round = @assignment.find_due_dates('submission').nil? ? 0 : @assignment.find_due_dates('submission').count
     @num_reviews_round = @assignment.find_due_dates('review').nil? ? 0 : @assignment.find_due_dates('review').count
 
-    @topics = SignUpTopic.where(assignment_id: params[:id])
+    @topics = SignUpTopic.where(assignment_id: params[:id].to_i)
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @user = current_user
 

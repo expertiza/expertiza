@@ -210,14 +210,14 @@ describe AssignmentsController do
   describe '#edit' do
     context 'when assignment has staggered deadlines' do
       it 'shows an error flash message and renders edit page' do
-        allow(SignUpTopic).to receive(:where).with(assignment_id: assignment.id.to_s).and_return([double('SignUpTopic'), double('SignUpTopic')])
+        allow(SignUpTopic).to receive(:where).with(assignment_id: assignment.id).and_return([double('SignUpTopic'), double('SignUpTopic')])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id.to_s)
                                                          .and_return([assignment_questionnaire])
         allow(Questionnaire).to receive(:where).with(id: assignment_questionnaire.questionnaire_id).and_return([double('Questionnaire', type: 'ReviewQuestionnaire')])
         assignment_due_date = build(:assignment_due_date)
         allow(AssignmentDueDate).to receive(:where).with(parent_id: assignment.id.to_s).and_return([assignment_due_date])
         allow(assignment).to receive(:num_review_rounds).and_return(1)
-        request_params = { id: "1" }
+        request_params = { id: 1 }
         user_session = { user: instructor }
         get :edit, params: request_params, session: user_session
         expect(flash.now[:error]).to eq('You did not specify all the necessary rubrics. You need <b>[AuthorFeedback, TeammateReview] '\

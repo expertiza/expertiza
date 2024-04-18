@@ -217,7 +217,7 @@ describe AssignmentsController do
         assignment_due_date = build(:assignment_due_date)
         allow(AssignmentDueDate).to receive(:where).with(parent_id: assignment.id.to_s).and_return([assignment_due_date])
         allow(assignment).to receive(:num_review_rounds).and_return(1)
-        request_params = { id: 1 }
+        request_params = { id: "1" }
         user_session = { user: instructor }
         get :edit, params: request_params, session: user_session
         expect(flash.now[:error]).to eq('You did not specify all the necessary rubrics. You need <b>[AuthorFeedback, TeammateReview] '\

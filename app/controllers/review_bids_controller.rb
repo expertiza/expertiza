@@ -64,24 +64,25 @@ class ReviewBidsController < ApplicationController
 
   # function that assigns and updates priorities for review bids
   def set_priority
-   #if a participant wishes to reset the list of topics to bid, delete all the ReviewBid records of previously selected topics by participant  
-   if params[:topic].nil?
+    # All bids are deselected by the user
+    if params[:topic].blank?
       ReviewBid.where(participant_id: params[:id]).destroy_all
     else
-      #Assign the ID of the assignment associated with the first selected topic to a variable.
       assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
-      @bids = ReviewBid.where(participant_id: params[:id])
-      signed_up_topics = ReviewBid.where(participant_id: params[:id]).map(&:signuptopic_id) 
-      signed_up_topics -= params[:topic].map(&:to_i)
-      signed_up_topics.each do |topic|
-        ReviewBid.where(signuptopic_id: topic, participant_id: params[:id]).destroy_all
-      end
+      existing_bids = ReviewBid.where(participant_id: params[:id])
+      existing_topics = existing_bids.pluck(:signuptopic_id)
+      
+      # Remove bids for topics no longer selected
+      bids_to_remove = existing_topics - params[:topic].map(&:to_i)
+      ReviewBid.where(signuptopic_id: bids_to_remove, participant_id: params[:id]).destroy_all
+      
+      # Update or create bids
       params[:topic].each_with_index do |topic_id, index|
-        bid_existence = ReviewBid.where(signuptopic_id: topic_id, participant_id: params[:id])
-        if bid_existence.empty?
-          ReviewBid.create(priority: index + 1, signuptopic_id: topic_id, participant_id: params[:id], assignment_id: assignment_id)
+        bid = existing_bids.find { |b| b.signuptopic_id == topic_id.to_i }
+        if bid
+          bid.update(priority: index + 1)
         else
-          ReviewBid.where(signuptopic_id: topic_id, participant_id: params[:id]).update_all(priority: index + 1)
+          ReviewBid.create(priority: index + 1, signuptopic_id: topic_id, participant_id: params[:id], assignment_id: assignment_id)
         end
       end
     end
@@ -96,6 +97,7 @@ class ReviewBidsController < ApplicationController
     reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
     bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
     assigned_topics = run_bidding_algorithm(bidding_data)
+    puts assigned_topics
     ReviewBid.assign_review_topics(assignment_id, reviewer_ids, assigned_topics)
     Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
     redirect_back fallback_location: root_path
@@ -112,36 +114,39 @@ class ReviewBidsController < ApplicationController
      begin  
       #response = RestClient.post(url, bidding_data.to_json, content_type: 'application/json', accept: :json)
       #matched_topics= JSON.parse(bidding_data)
+      
       assigned_topics = Hash.new { |h, k| h[k] = [] }
-      available_topics = bidding_data['tid'].dup  # Clone the list of topic IDs to track availability
-
+      available_topics = bidding_data['tid'].dup  # Cloning the list of topic IDs to track availability
+      num_reviews_required= Assignment.where(id: assignment_id).pluck(:num_reviews_required).first
+      
       # Assign topics based on students' bids
-    bidding_data['users'].each do |user_id, data|
-      # Sort bids by priority and try to assign each topic
-      sorted_bids = data['tid'].zip(data['priority']).sort_by { |_, priority| priority }
-      sorted_bids.each do |topic_id, _|
-        if available_topics.include?(topic_id) && assigned_topics[user_id].length <= bidding_data['max_accepted_proposals']
-          assigned_topics[user_id] << topic_id  # Assign topic to student
+      bidding_data['users'].each do |user_id, data|
+        # Sort bids by priority and try to assign each topic
+        sorted_bids = data['tid'].zip(data['priority']).sort_by { |_, priority| priority }
+        sorted_bids.each do |topic_id, _|
+          if available_topics.include?(topic_id) && assigned_topics[user_id].length <= bidding_data['max_accepted_proposals']
+            assigned_topics[user_id] << topic_id  # Assign topic to student
+          end
         end
       end
-    end
-    # Handle students who didn't get any topics because they didn't bid or their bids were unavailable
-    unassigned_users = bidding_data['users'].keys - assigned_topics.keys
-    unassigned_users.each do |user_id|
-      assigned_count = 0
-      while assigned_count < 2 && !available_topics.empty?
-        topic_to_assign = available_topics.sample
-        assigned_topics[user_id] << topic_to_assign unless topic_to_assign.nil?
-        assigned_count += 1
+      
+      # Handling students who didn't get any topics because they didn't bid or their bids were unavailable
+      unassigned_users = bidding_data['users'].keys - assigned_topics.keys
+      unassigned_users.each do |user_id|
+        assigned_count = 0
+        topics=available_topics
+        while assigned_count < num_reviews_required && !available_topics.empty?
+          topic_to_assign = topics.sample
+          assigned_topics[user_id] << topic_to_assign unless topic_to_assign.nil?
+          assigned_count += 1
+          topics-=topic_to_assign
+        end
       end
-    end
-    assigned_topics
+      assigned_topics
     end
     rescue StandardError => e
       puts "Error in assigning reviewers: #{e.message}"
       return nil
     end
-
-
   end
 

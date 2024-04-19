@@ -11,9 +11,8 @@ class DueDate < ApplicationRecord
     due_dates.detect { |due_date| due_date.due_at > Time.now }
   end
 
-  def self.teammate_review_allowed?(student)
-    # time when teammate review is allowed
-    due_date = current(student.assignment.due_dates)
+  def teammate_review_allowed?(student)
+    due_date = self.class.current(student.assignment.due_dates)
     student.assignment.find_current_stage == 'Finished' ||
       (due_date && [2, 3].include?(due_date.teammate_review_allowed_id))
   end

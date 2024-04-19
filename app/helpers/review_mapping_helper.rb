@@ -7,7 +7,7 @@ module ReviewMappingHelper
   # gets the response map data such as reviewer id, reviewed object id and type for the review report
   #
  # Modify get_data_for_review_report method to organize data and return it in a structured format
-def retrive_data_for_review_report(assignment_id, reviewer_id, type)
+def retrieve_data_for_review_report(assignment_id, reviewer_id, type)
   # Extract necessary data for each component of the review report
   reviewer = Participant.find(reviewer_id)
   review_rounds = (1..@assignment.num_review_rounds).map do |round|
@@ -57,6 +57,19 @@ def obtain_team_color(response_map, assignment_created, assignment_due_dates)
   color[-1]
 end
 
+def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+  if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
+    color.push 'purple'
+  else
+    link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
+    if link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
+      color.push 'green'
+    else
+      link_updated_at = get_link_updated_at(link)
+      color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
+    end
+  end
+end
 # Method to check if a review was submitted in every round
 def check_review_completion(response_map)
   num_responses = 0
@@ -68,6 +81,7 @@ def check_review_completion(response_map)
 
   num_responses == total_num_rounds
 end
+
 
 # Method to check if a work was submitted within a given round
 def submission_within_round(round, response_map, assignment_created, assignment_due_dates)
@@ -147,15 +161,17 @@ end
   # gets the review score awarded based on each round of the review
 
   def fetch_awarded_review_score(reviewer_id, team_id)
-    # Storing redundantly computed value in num_rounds variable
     num_rounds = @assignment.num_review_rounds
-    # Setting values of instance variables
-    (1..num_rounds).each { |round| instance_variable_set('@score_awarded_round_' + round.to_s, '-----') }
-    # Iterating through list
+    
+    # Loop through each round
     (1..num_rounds).each do |round|
-      # Changing values of instance variable based on below condition
+      # Check if the score exists for the current round and team
       if @review_scores[reviewer_id] && @review_scores[reviewer_id][round] && @review_scores[reviewer_id][round][team_id] && @review_scores[reviewer_id][round][team_id] != -1.0
-        instance_variable_set('@score_awarded_round_' + round.to_s, @review_scores[reviewer_id][round][team_id].to_s + '%')
+        # If score exists, set it to the respective instance variable
+        instance_variable_set("@score_awarded_round_#{round}", @review_scores[reviewer_id][round][team_id].to_s + '%')
+      else
+        # If score doesn't exist, set a default value
+        instance_variable_set("@score_awarded_round_#{round}", '-----')
       end
     end
   end

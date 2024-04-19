@@ -3,14 +3,17 @@ class DueDate < ApplicationRecord
   validate :due_at_is_valid_datetime
   #  has_paper_trail
 
+  # Retrieves the default permission for a given deadline type and permission type
   def self.default_permission(deadline_type, permission_type)
     DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
   end
 
+  # Retrieves the current due date from a list of due dates
   def self.current(due_dates)
     due_dates.detect { |due_date| due_date.due_at > Time.now }
   end
 
+  # Checks if teammate review is allowed 
   def teammate_review_allowed?(student)
     due_date = self.class.current(student.assignment.due_dates)
     student.assignment.find_current_stage == 'Finished' ||
@@ -21,6 +24,7 @@ class DueDate < ApplicationRecord
     update_attribute(:flag, true)
   end
 
+  # Validates if due_at attribute is a valid datetime
   def due_at_is_valid_datetime
     if due_at.present?
       errors.add(:due_at, 'must be a valid datetime') if (begin
@@ -31,6 +35,7 @@ class DueDate < ApplicationRecord
     end
   end
 
+  # Copies due dates from one assignment to another
   def self.copy(old_assignment_id, new_assignment_id)
     where(parent_id: old_assignment_id).each do |orig_due_date|
       new_due_date = orig_due_date.dup
@@ -39,11 +44,13 @@ class DueDate < ApplicationRecord
     end
   end
 
+  # Sets a due date with specified attributes
   def self.set_due_date(duedate, deadline, assign_id, max_round)
     submit_duedate = DueDate.new(duedate)
     submit_duedate.update(deadline_type_id: deadline, parent_id: assign_id, round: max_round)
   end
 
+  # Compares due dates for sorting purposes
   def <=>(other)
     return nil unless other.is_a?(DueDate)
 
@@ -56,6 +63,7 @@ class DueDate < ApplicationRecord
     end
   end
 
+  # Determines the round of a response within an assignment
   def self.done_in_assignment_round(assignment_id, response)
     # for author feedback, quiz, teammate review and metareview, Expertiza only support one round, so the round # should be 1
     return 0 if ResponseMap.find(response.map_id).type != 'ReviewResponseMap'
@@ -73,8 +81,8 @@ class DueDate < ApplicationRecord
     round
   end
 
+  # Gets the next due date for an assignment
   def self.get_next_due_date(assignment_id, topic_id = nil)
-    # Gets the next due date for an assignment
     
     if Assignment.find(assignment_id).staggered_deadline?
       next_due_date = TopicDueDate.find_by(['parent_id = ? and due_at >= ?', topic_id, Time.zone.now])

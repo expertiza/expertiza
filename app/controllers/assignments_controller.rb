@@ -117,6 +117,12 @@ class AssignmentsController < ApplicationController
 
   # displays an assignment via ID and stores it in the session list
   def show
+    # initial approach to fix "back" link to show list of assignments
+    if params[:id] == "edit"
+      redirect_to student_task_path
+      return
+    end
+    
     session[:assignment_id] = nil
     @assignment = Assignment.find(params[:id])
     session[:assignment_id] = @assignment.id

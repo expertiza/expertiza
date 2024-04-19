@@ -224,23 +224,21 @@ describe  do
 
     ####################################################################
     ###Additional Test cases
-    require 'rails_helper'
-
-describe ExportFileController do
-    let(:user1) do
-        User.new name: 'abc', fullname: 'abc xyz', email: 'abcxyz@gmail.com', password: '12345678', password_confirmation: '12345678',
-                 email_on_submission: 1, email_on_review: 1, email_on_review_of_review: 0, copy_of_emails: 1, handle: 'handle' 
-    end
-    let(:user) { build(:student, id: 1, name: 'student1') }
-    let(:answer_tag) { AnswerTag.new(tag_prompt_deployment_id: 2, answer: an_long, user_id: 1, value: 1)}
-    let(:answers) { build(:answers, id: [1, 2])}
-    let(:super_admin) { build(:superadmin, id: 1, role_id: 5) }
-    let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, name: 'Instructor1') }
-    let(:ta) { build(:teaching_assistant, id: 6) }
-    let(:student1) { build(:student, id: 21, role_id: 1) }
-    let(:assignment) do
-        build(:assignment, id: 843, name: 'test_assignment', instructor_id: 6, course_id: 1)
-    end
+    describe ExportFileController do
+        let(:user1) do
+            User.new name: 'abc', fullname: 'abc xyz', email: 'abcxyz@gmail.com', password: '12345678', password_confirmation: '12345678',
+                     email_on_submission: 1, email_on_review: 1, email_on_review_of_review: 0, copy_of_emails: 1, handle: 'handle' 
+        end
+        let(:user) { build(:student, id: 1, name: 'student1') }
+        let(:answer_tag) { AnswerTag.new(tag_prompt_deployment_id: 2, answer: an_long, user_id: 1, value: 1)}
+        let(:answers) { build(:answers, id: [1, 2])}
+        let(:super_admin) { build(:superadmin, id: 1, role_id: 5) }
+        let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, name: 'Instructor1') }
+        let(:ta) { build(:teaching_assistant, id: 6) }
+        let(:student1) { build(:student, id: 21, role_id: 1) }
+        let(:assignment) do
+            build(:assignment, id: 843, name: 'test_assignment', instructor_id: 6, course_id: 1)
+        end
     describe '#action_allowed?' do
         context 'when someone is logged in' do
         it 'allows certain action for admin' do
@@ -336,3 +334,4 @@ describe ExportFileController do
 
 end
 
+    

@@ -38,6 +38,8 @@
         <th colspan=3 class="sorter-false"> <%= assignment.name %> </th>
       <% end %>
       <th colspan=2>Final Grades</th>
+      <th>Average Instructor Score</th> 
+      <th>Average Peer Review Score</th>
     </tr>
     <tr>
       <% (1..@assignments.size).each do %>
@@ -46,6 +48,8 @@
         <th><b>Instructor Grade</b></th>
     <% end %>
       <th class="sorter-true"><b>Total Instructor Grade</b></th>
+      <th><b>Average Instructor Score</b></th>
+      <th><b>Average Peer Review Score</b></th>
     </tr>
   </thead>
 
@@ -63,6 +67,8 @@
           <% end %>
 
           <td><%= @final_grades[cp.id] %></td>
+          <td><%= @average_instructor_scores[cp.id] %></td>
+          <td><%= @average_peer_review_scores[cp.id] %></td>
       </tr>
   <% end %>
 </table>

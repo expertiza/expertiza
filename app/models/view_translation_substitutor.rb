@@ -6,7 +6,7 @@ require 'yaml'
 class ViewTranslationSubstitutor
   BLACKLIST = "([a-zA-Z0-9\\._]+|[\"\\'])?".freeze # Regular expression pattern to ignore certain text during translation.
 
-  # Substitute method processes the locale hash and generates translation statistics.
+  # Substitute method processes the locale hash and generates translation statistics to a YAML file.
   def substitute(locale)
     stats = {} # Hash to store translation statistics.
     locale.each { |dir_name, view_hash| stats[dir_name] = process_directory(dir_name, view_hash) } # Iterate over each directory and its associated view translations.
@@ -15,14 +15,14 @@ class ViewTranslationSubstitutor
 
   private
 
-  # Process directory method iterates through each view hash within a directory.
+  # Process directory method iterates through each view hash within a directory and returns the directory statistics.
   def process_directory(dir_name, view_hash)
     dir_stats = {} # Hash to store translation statistics for each directory.
     view_hash.each { |view_name, translations| dir_stats[view_name] = process_view(dir_name, view_name, translations) } # Process translations for each view within the directory.
     dir_stats # Return directory statistics.
   end
 
-  # Process view method handles the translation process for a specific view.
+  # Process view method handles the translation process for a specific view and if not such file exists then returns error.
   def process_view(directory_name, view_name, translations)
     path = "./#{directory_name}/#{view_name}.html.erb" # Path to the primary view file.
 
@@ -41,7 +41,7 @@ class ViewTranslationSubstitutor
     view_stats # Return view statistics.
   end
 
-  # Process translation method performs the actual translation within the view contents.
+  # Process translation method performs the actual translation within the view contents for standardization.
   def process_translation(contents, key, val)
     replacements = [] # Array to store text replacements.
     skips = [] # Array to store skipped text.

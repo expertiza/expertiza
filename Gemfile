@@ -85,6 +85,7 @@ group :development do
   gem 'pry-nav'
   gem 'pry-remote'
   gem 'rubocop'
+  gem 'bullet' # Add bullet gem to minimize number of queries to database.
 end
 
 group :test do

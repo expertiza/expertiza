@@ -143,4 +143,51 @@ module SignUpSheetHelper
               type: 'TopicDueDate'
             )
   end
+  class DeleteSignupAction
+
+    def set_error_if_work_submitted
+      raise NotImplementedError
+    end
+
+    def set_error_if_deadline_passed
+      raise NotImplementedError
+    end
+
+    def delete_signup_for_topic(assignment_id, topic_id, user_id)
+      raise NotImplementedError
+    end
+  end
+  
+  class InstructorDeleteSignupAction < DeleteSignupAction
+
+    def set_error_if_work_submitted
+      return 'The student has already submitted their work, so you are not allowed to remove them.'
+    end
+    
+    def set_error_if_deadline_passed
+        return 'You cannot drop a student after the drop topic deadline!'
+    end
+    
+    def delete_signup_for_topic(assignment_id, topic_id, user_id)
+      SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
+      return 'You have successfully dropped the student from the topic.'
+    end
+  end
+
+  class StudentDeleteSignupAction < DeleteSignupAction
+
+    def set_error_if_work_submitted
+      return 'You have already submitted your work, so you are not allowed to drop your topic.'
+    end
+    
+    def set_error_if_deadline_passed
+      return 'You cannot drop your topic after the drop topic deadline!'
+    end
+
+    def delete_signup_for_topic(assignment_id, topic_id, user_id)
+      SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
+      return 'You have successfully dropped your topic.'
+    end
+  end
+
 end

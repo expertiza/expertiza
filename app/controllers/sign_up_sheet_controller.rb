@@ -274,57 +274,41 @@ class SignUpSheetController < ApplicationController
 
 # This method centralizes the shared functionality, reducing redundancy and improving maintainability
 #this function is used to delete a previous signup
-  def delete_signup_common(who_user, participant, assignment, drop_topic_deadline, topic_id)
-  if !participant.team.submitted_files.empty? || !participant.team.hyperlinks.empty?
+  def delete_signup_common(who_user, participant, participant_id_to_be_dropped, assignment, drop_topic_deadline, topic_id)
+    if !participant.team.submitted_files.empty? || !participant.team.hyperlinks.empty?
     # Handle case where participant has already submitted work
-    if who_user == "instructor"
-      flash[:error] = 'The student has already submitted their work, so you are not allowed to remove them.'
-    else
-      flash[:error] = 'You have already submitted your work, so you are not allowed to drop your topic.'
-    end
+    flash[:error] = who_user.set_error_if_work_submitted
     ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, "Dropping topic for already submitted work: #{topic_id}")
   elsif !drop_topic_deadline.nil? && (Time.now > drop_topic_deadline.due_at)
     # Handle case where drop topic deadline has passed
-    if who_user == "instructor"
-      flash[:error] = 'You cannot drop a student after the drop topic deadline!'
-      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for ended work: ' + params[:topic_id].to_s)
-    else
-      flash[:error] = 'You cannot drop your topic after the drop topic deadline!'
-      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Dropping topic for ended work: ' + params[:topic_id].to_s)
-    end
+    flash[:error] = who_user.set_error_if_deadline_passed
+    ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Dropping topic for ended work: ' + params[:topic_id].to_s)
   else
     # No errors, proceed with dropping topic
-    if who_user == "instructor"
-      delete_signup_for_topic(assignment.id, topic_id, participant.user_id)
-      flash[:success] = 'You have successfully dropped the student from the topic.'
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student has been dropped from the topic: ' + topic_id.to_s)
-    else
-      delete_signup_for_topic(assignment.id, topic_id, session[:user].id)
-      flash[:success] = 'You have successfully dropped your topic.'
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student has dropped the topic: ' + topic_id.to_s)
-    end
+    flash[:success] = who_user.delete_signup_for_topic(assignment.id,topic_id,participant_id_to_be_dropped)
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student has dropped the topic: ' + topic_id.to_s)
   end
 end
 
 def delete_signup
-  who_user = "student"
+  who_user = StudentDeleteSignupAction.new
   participant = AssignmentParticipant.find(params[:id])
   assignment = participant.assignment
   drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
   topic_id = params[:topic_id]
-  delete_signup_common(who_user, participant, assignment, drop_topic_deadline, topic_id)
+  delete_signup_common(who_user, participant, session[:user].id, assignment, drop_topic_deadline, topic_id)
   redirect_to action: 'list', id: params[:id]
 end
 
 def delete_signup_as_instructor
-  who_user = "instructor"
+  who_user = InstructorDeleteSignupAction.new
   team = Team.find(params[:id])
   assignment = Assignment.find(team.parent_id)
   user = TeamsUser.find_by(team_id: team.id).user
   participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
   drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
   topic_id = params[:topic_id]
-  delete_signup_common(who_user, participant, assignment, drop_topic_deadline, topic_id)
+  delete_signup_common(who_user, participant ,participant.user_id, assignment, drop_topic_deadline, topic_id)
   redirect_to controller: 'assignments', action: 'edit', id: assignment.id
 end
 
@@ -516,7 +500,4 @@ end
     @ad_information
   end
 
-  def delete_signup_for_topic(assignment_id, topic_id, user_id)
-    SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
-  end
 end

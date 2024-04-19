@@ -528,7 +528,7 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.float "Hamer", limit: 24, default: 1.0
     t.float "Lauw", limit: 24, default: 0.0
     t.integer "duty_id"
-    t.boolean "can_mentor"
+    t.boolean "can_mentor", default: false
     t.index ["duty_id"], name: "index_participants_on_duty_id"
     t.index ["user_id"], name: "fk_participant_users"
   end

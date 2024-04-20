@@ -180,7 +180,7 @@ Expertiza::Application.routes.draw do
 
   resources :invitations, only: %i[new create] do
     collection do
-      get :cancel
+      post :cancel
       get :accept
       get :decline
     end

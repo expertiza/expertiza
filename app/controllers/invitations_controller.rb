@@ -65,10 +65,31 @@ class InvitationsController < ApplicationController
   end
 
   def cancel
-    Invitation.find(params[:inv_id]).destroy
-    ExpertizaLogger.info "Successfully retracted invitation #{params[:inv_id]}"
-    redirect_to view_student_teams_path student_id: params[:student_id]
+    begin
+      # Attempt to find and destroy the invitation
+      invitation = Invitation.find(params[:inv_id])
+      invitation.destroy
+  
+      # Log the successful cancellation
+      ExpertizaLogger.info "Successfully retracted invitation #{params[:inv_id]}"
+      flash[:success] = "Invitation successfully retracted."
+  
+    rescue ActiveRecord::RecordNotFound
+      # Log the error and inform the user if the invitation does not exist
+      ExpertizaLogger.error "Attempt to retract non-existent invitation #{params[:inv_id]}"
+      flash[:error] = "Invitation not found."
+  
+    rescue => e
+      # Handle other potential exceptions and log the detailed error
+      ExpertizaLogger.error "Error retracting invitation #{params[:inv_id]}: #{e.message}"
+      flash[:error] = "An error occurred while retracting the invitation."
+  
+    ensure
+      # Redirect to the student teams view or another appropriate view
+      redirect_to view_student_teams_path(student_id: params[:student_id])
+    end
   end
+  
 
   private
 
@@ -85,23 +106,39 @@ class InvitationsController < ApplicationController
   end
 
   def check_user_before_invitation
-    # user is the student you are inviting to your team
-    @user = User.find_by(name: params[:user][:name].strip)
+    # Extract the user name from the params
+    user_name = params[:user_name].strip
+    @user = User.find_by(name: user_name)
+
     # User/Author has information about the participant
-    @student = AssignmentParticipant.find(params[:student_id])
-    @assignment = Assignment.find(@student.parent_id)
+    @student = AssignmentParticipant.find_by(id: params[:student_id])
+    unless @student
+      flash[:error] = "Student not found."
+      redirect_to some_fallback_path # Replace with your actual fallback path
+      return
+    end
+
+    @assignment = Assignment.find_by(id: @student.parent_id)
+    unless @assignment
+      flash[:error] = "Assignment not found."
+      redirect_to some_fallback_path # Replace with your actual fallback path
+      return
+    end
+
     @user ||= create_coauthor if @assignment.is_conference_assignment
 
     return unless current_user_id?(@student.user_id)
 
-    # check if the invited user is valid
+    # Check if the invited user is valid
     unless @user
-      flash[:error] = "The user \"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
-      redirect_to view_student_teams_path student_id: @student.id
+      flash[:error] = "The user \"#{user_name}\" does not exist. Please make sure the name entered is correct."
+      redirect_to view_student_teams_path(student_id: @student.id)
       return
     end
+
     check_participant_before_invitation
   end
+
 
   def check_participant_before_invitation
     @participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', @user.id, @student.parent_id).first

@@ -61,7 +61,7 @@ Expertiza::Application.routes.draw do
       get :remove_assignment_from_course
       get :instant_flash
       patch :edit
-      post :delete
+      get :delete
     end
   end
 

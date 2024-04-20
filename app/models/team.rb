@@ -91,34 +91,34 @@ class Team < ApplicationRecord
       # if assignment_id is nil, then don't send an assignment name
       assignment_name = assignment_id ? Assignment.find(assignment_id).name.to_s : ''
       # Now that a new team member has been added to a team, send an email to them letting them know
-      if MentorManagement.user_a_mentor?(user)
-        #  send mail to generic user
-        Mailer.team_addition_message(
-          to: user.email,
-          subject: '[Expertiza] Added to a Team',
-          body: {
-            user: user,
-            first_name: ApplicationHelper.get_user_first_name(user),
-            partial_name: 'mentor_added_to_team',
-            team: name.to_s,
-            assignment: assignment_name
-          }
-        ).deliver
-      elsif !user.is_a?(Participant)
-        # If the user is a participant, then we don't went to send them emails since that class is something
-        # completely out of the scope of this project
-        Mailer.team_addition_message(
-          to: user.email,
-          subject: '[Expertiza] Added to a Team',
-          body: {
-            user: user,
-            first_name: ApplicationHelper.get_user_first_name(user),
-            partial_name: 'user_added_to_team',
-            team: name.to_s,
-            assignment: assignment_name
-          }
-        ).deliver
-      end
+      # if MentorManagement.user_a_mentor?(user)
+      #   #  send mail to generic user
+      #   Mailer.team_addition_message(
+      #     to: user.email,
+      #     subject: '[Expertiza] Added to a Team',
+      #     body: {
+      #       user: user,
+      #       first_name: ApplicationHelper.get_user_first_name(user),
+      #       partial_name: 'mentor_added_to_team',
+      #       team: name.to_s,
+      #       assignment: assignment_name
+      #     }
+      #   ).deliver
+      # elsif !user.is_a?(Participant)
+      #   # If the user is a participant, then we don't went to send them emails since that class is something
+      #   # completely out of the scope of this project
+      #   Mailer.team_addition_message(
+      #     to: user.email,
+      #     subject: '[Expertiza] Added to a Team',
+      #     body: {
+      #       user: user,
+      #       first_name: ApplicationHelper.get_user_first_name(user),
+      #       partial_name: 'user_added_to_team',
+      #       team: name.to_s,
+      #       assignment: assignment_name
+      #     }
+      #   ).deliver
+      # end
 
     end
     can_add_member
@@ -183,13 +183,17 @@ class Team < ApplicationRecord
     num_of_teams = users.length.fdiv(min_team_size).ceil
     next_team_member_index = 0
     (1..num_of_teams).to_a.each do |i|
+      if team_type == "Mentored"
+        team_type = "Assignment"
+      end
       team = Object.const_get(team_type + 'Team').create(name: 'Team_' + i.to_s, parent_id: parent.id)
-      TeamNode.create(parent_id: parent.id, node_object_id: team.id)
+      mentoredTeam = MentoredTeamDecorator.new(team)
+      TeamNode.create(parent_id: parent.id, node_object_id: mentoredTeam.id)
       min_team_size.times do
         break if next_team_member_index >= users.length
 
         user = users[next_team_member_index]
-        team.add_member(user, parent.id)
+        mentoredTeam.add_member(user, parent.id)
         next_team_member_index += 1
       end
     end

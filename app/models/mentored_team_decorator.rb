@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 class MentoredTeamDecorator
+  attr_reader :id
   def initialize(assignment_team)
+    @id = assignment_team.id
     @assignment_team = assignment_team
+    @assignment_team.type = "Mentored"
   end
 
   def add_member(user, assignment_id=nil)

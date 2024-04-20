@@ -84,8 +84,14 @@ class TeamsController < ApplicationController
     init_team_type(parent.class.name.demodulize)
     begin
       Team.check_for_existing(parent, params[:team][:name], session[:team_type])
-      @team = Object.const_get(session[:create_type] + 'Team').create(name: params[:team][:name], parent_id: parent.id)
-      TeamNode.create(parent_id: parent.id, node_object_id: @team.id)
+
+      if session[:create_type] == "Mentored"
+        @team = Object.const_get('AssignmentTeam').create(name: params[:team][:name], parent_id: parent.id)
+        @mentoredTeam = MentoredTeamDecorator.new(@team)
+      else
+        @team = Object.const_get(session[:create_type] + 'Team').create(name: params[:team][:name], parent_id: parent.id)
+      end
+      TeamNode.create(parent_id: parent.id, node_object_id: @mentoredTeam.id)
       undo_link("The team \"#{@team.name}\" has been successfully created.")
       redirect_to action: 'list', id: parent.id
     rescue TeamExistsError
@@ -142,6 +148,10 @@ class TeamsController < ApplicationController
 
       @sign_up_team.destroy_all if @sign_up_team
       @teams_users.destroy_all if @teams_users
+      if @team.type == "Mentored"
+        mentoredMeetings = MentorMeeting.where(team_id: @team.id)
+        mentoredMeetings.destroy_all
+      end
       @team.destroy if @team
       undo_link("The team \"#{@team.name}\" has been successfully deleted.")
     end

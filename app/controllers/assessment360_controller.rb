@@ -15,7 +15,7 @@ class Assessment360Controller < ApplicationController
     @assignments = course.assignments.reject(&:is_calibrated).reject { |a| a.participants.empty? }
     @course_participants = course.get_participants
     insure_existence_of(@course_participants, course)
-    # hashes for view
+    # hash for view
     @meta_review = {}
     @teammate_review = {}
     @teamed_count = {}

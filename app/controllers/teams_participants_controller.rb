@@ -30,7 +30,8 @@ class TeamsParticipantsController < ApplicationController
   def list
     @team = Team.find(params[:id])  # Retrieves the team based on the ID provided.
     @assignment = Assignment.find(@team.parent_id)  # Retrieves the assignment linked to the team.
-    @teams_participants = TeamsParticipant.page(params[:page]).per_page(10).where(['team_id = ?', params[:id]])  # Paginates the participants of the team.
+    @teams_participants = TeamsParticipant.where(team_id: params[:id]).page(params[:page]).per_page(10)
+
   end
 
   # Prepares for the creation of a new team participant by initializing required variables.

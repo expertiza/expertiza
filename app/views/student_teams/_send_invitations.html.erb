@@ -6,7 +6,7 @@
     <%= hidden_field_tag :assignment_id, @student.assignment.id %>
     <div style="width:80%; margin: auto;">
       <%= t("student_teams.view.enter_user") %>
-      <%= text_field_tag 'user[name]', nil, size: 41 %>
+      <%= text_field_tag :user_name, nil, size: 41 %>
       <%= submit_tag t("student_teams.view.invite_button") %>
     </div>
   <% end %>

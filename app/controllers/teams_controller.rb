@@ -127,14 +127,21 @@ class TeamsController < ApplicationController
   def delete_all
     root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
     child_nodes = root_node.get_teams.map(&:node_object_id)
-    Team.destroy_all if child_nodes
+    child_nodes.each do |team_id|
+      delete(team_id)
+    end
     redirect_to action: 'list', id: params[:id]
   end
 
   # Deleting a specific team associated with a given parent object
-  def delete
+  def delete(team_id = nil)
     # delete records in team, teams_users, signed_up_teams table
-    @team = Team.find_by(id: params[:id])
+    if team_id
+      id = team_id
+    else
+      id = params[:id]
+    end
+    @team = Team.find_by(id: id)
     unless @team.nil?
       @signed_up_team = SignedUpTeam.where(team_id: @team.id)
       @teams_users = TeamsUser.where(team_id: @team.id)
@@ -150,7 +157,7 @@ class TeamsController < ApplicationController
       @sign_up_team.destroy_all if @sign_up_team
       @teams_users.destroy_all if @teams_users
 
-      parentAssignment = Assignment.find_by(id: @team.parent_id)
+      parentAssignment = parent_from_child(@team)
       if parentAssignment.auto_assign_mentor
         mentoredMeetings = MentorMeeting.where(team_id: @team.id)
         mentoredMeetings.destroy_all
@@ -158,7 +165,7 @@ class TeamsController < ApplicationController
       @team.destroy if @team
       undo_link("The team \"#{@team.name}\" has been successfully deleted.")
     end
-    redirect_back fallback_location: root_path
+    redirect_back fallback_location: root_path unless team_id
   end
 
   # Copies existing teams from a course down to an assignment

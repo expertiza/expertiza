@@ -1,6 +1,6 @@
 <%= error_messages_for 'topic' %>
 
-<table>
+<table id="topic_table">
   <tr>
     <td><label for="topic_identifier">Topic ID: </label></td>
     <td><%= text_field 'topic', 'topic_identifier', size: 4 %></td>
@@ -23,7 +23,11 @@
   </tr>
   <tr>
     <td><label for="topic_name">Topic description:  </label></td>
-    <td><%= text_area 'topic', 'description', cols: 40, rows: 5 %></td>
+    <td><%= text_area 'topic', 'description', cols: 42, rows: 5 %></td>
+  </tr>
+  <tr>
+    <td><label for="mentor_id">Mentor Username:  </label></td>
+    <td><%= text_field 'topic', 'mentor_id', :size => 40 %></td>
   </tr>
 </table> 
 
@@ -34,3 +38,10 @@
 <% end %>
 
 <br/>
+
+<style>
+  #topic_table tr,
+  #topic_table td {
+      padding: 10px
+  }
+</style>

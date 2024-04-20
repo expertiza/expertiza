@@ -80,6 +80,8 @@
     </td>
   <% end %>
 
+  <% @user = User.find(topic.mentor_id) %>
+  <td><%= @user.name %></td>
   <td align="center"><%= topic.max_choosers %></td>
   <%= render :partial => '/sign_up_sheet/available_slots', :locals => {:topic=>topic} %>
   <%= render :partial => '/sign_up_sheet/num_waiting', :locals => {:topic=>topic} %>

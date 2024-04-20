@@ -456,12 +456,54 @@ class SignUpSheetController < ApplicationController
 
   def setup_new_topic
     set_values_for_new_topic
-    @sign_up_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
+
+    @user = User.find_by(name: params[:topic][:mentor_id])
+    if @user
+      courseId = @sign_up_topic.assignment.course_id
+      @course = Course.find(courseId)
+
+      @sign_up_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
+
+      add_user_to_assignment(@user, @sign_up_topic.assignment)
+      add_user_to_course(@user, @course)
+      add_ta_to_course(@user, @course)
+
+      @sign_up_topic.mentor_id = @user.id
+    end
+
     if @sign_up_topic.save
       undo_link "The topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
       redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + '#tabs-2'
     else
       render action: 'new', id: params[:id]
+    end
+  end
+
+  def add_user_to_assignment(user, assignment)
+    can_submit = true
+    can_review = true
+    can_take_quiz = true
+    can_mentor = true
+
+    assignmentParticipant = Participant.find_by(user_id: user.id, parent_id: assignment.id)
+    unless assignmentParticipant
+      assignment.add_participant(user.name, can_submit, can_review, can_take_quiz, can_mentor)
+    end
+  end
+
+  def add_user_to_course(user, course)
+    can_mentor = true
+
+    courseParticipant = Participant.find_by(user_id: user.id, parent_id: course.id)
+    unless courseParticipant
+      course.add_participant(user.name, can_mentor)
+    end
+  end
+
+  def add_ta_to_course(user, course)
+    courseTa = TaMapping.find_by(ta_id: user.id, course_id: course.id)
+    unless courseTa
+      course.add_ta(user.name)
     end
   end
 

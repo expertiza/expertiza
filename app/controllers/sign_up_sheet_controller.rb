@@ -10,20 +10,30 @@
 
 class SignUpSheetController < ApplicationController
   include AuthorizationHelper
+  include SignUpSheetHelper
 
   require 'rgl/adjacency'
   require 'rgl/dot'
   require 'rgl/topsort'
 
   def action_allowed?
-    case params[:action]
-    when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
-      (current_user_has_student_privileges? &&
-          (%w[list].include? action_name) &&
-          are_needed_authorizations_present?(params[:id], 'reader', 'submitter', 'reviewer')) ||
-        current_user_has_student_privileges?
+    action = params[:action]
+    if student_action_allowed?(action)
+      current_user_has_student_privileges?
     else
       current_user_has_ta_privileges?
+    end
+  end
+  
+  private
+  
+  def student_action_allowed?(action)
+    student_actions = %w[set_priority sign_up delete_signup list show_team switch_original_topic_to_approved_suggested_topic publish_approved_suggested_topic]
+    
+    if student_actions.include?(action)
+      return current_user_has_student_privileges? && are_needed_authorizations_present?(params[:id], 'reader', 'submitter', 'reviewer')
+    else
+      return false
     end
   end
 
@@ -156,12 +166,8 @@ class SignUpSheetController < ApplicationController
   end
 
   def set_values_for_new_topic
-    @sign_up_topic = SignUpTopic.new
-    @sign_up_topic.topic_identifier = params[:topic][:topic_identifier]
-    @sign_up_topic.topic_name = params[:topic][:topic_name]
-    @sign_up_topic.max_choosers = params[:topic][:max_choosers]
-    @sign_up_topic.category = params[:topic][:category]
-    @sign_up_topic.assignment_id = params[:id]
+    topic_helper = SignUpTopicHelper.new(params, params[:id])
+    @sign_up_topic = topic_helper.build
     @assignment = Assignment.find(params[:id])
   end
 
@@ -277,57 +283,41 @@ class SignUpSheetController < ApplicationController
 
 # This method centralizes the shared functionality, reducing redundancy and improving maintainability
 #this function is used to delete a previous signup
-  def delete_signup_common(who_user, participant, assignment, drop_topic_deadline, topic_id)
-  if !participant.team.submitted_files.empty? || !participant.team.hyperlinks.empty?
+  def delete_signup_common(who_user, participant, participant_id_to_be_dropped, assignment, drop_topic_deadline, topic_id)
+    if !participant.team.submitted_files.empty? || !participant.team.hyperlinks.empty?
     # Handle case where participant has already submitted work
-    if who_user == "instructor"
-      flash[:error] = 'The student has already submitted their work, so you are not allowed to remove them.'
-    else
-      flash[:error] = 'You have already submitted your work, so you are not allowed to drop your topic.'
-    end
+    flash[:error] = who_user.set_error_if_work_submitted
     ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, "Dropping topic for already submitted work: #{topic_id}")
   elsif !drop_topic_deadline.nil? && (Time.now > drop_topic_deadline.due_at)
     # Handle case where drop topic deadline has passed
-    if who_user == "instructor"
-      flash[:error] = 'You cannot drop a student after the drop topic deadline!'
-      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for ended work: ' + params[:topic_id].to_s)
-    else
-      flash[:error] = 'You cannot drop your topic after the drop topic deadline!'
-      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Dropping topic for ended work: ' + params[:topic_id].to_s)
-    end
+    flash[:error] = who_user.set_error_if_deadline_passed
+    ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Dropping topic for ended work: ' + params[:topic_id].to_s)
   else
     # No errors, proceed with dropping topic
-    if who_user == "instructor"
-      delete_signup_for_topic(assignment.id, topic_id, participant.user_id)
-      flash[:success] = 'You have successfully dropped the student from the topic.'
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student has been dropped from the topic: ' + topic_id.to_s)
-    else
-      delete_signup_for_topic(assignment.id, topic_id, session[:user].id)
-      flash[:success] = 'You have successfully dropped your topic.'
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student has dropped the topic: ' + topic_id.to_s)
-    end
+    flash[:success] = who_user.delete_signup_for_topic(assignment.id,topic_id,participant_id_to_be_dropped)
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student has dropped the topic: ' + topic_id.to_s)
   end
 end
 
 def delete_signup
-  who_user = "student"
+  who_user = StudentDeleteSignupAction.new
   participant = AssignmentParticipant.find(params[:id])
   assignment = participant.assignment
   drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
   topic_id = params[:topic_id]
-  delete_signup_common(who_user, participant, assignment, drop_topic_deadline, topic_id)
+  delete_signup_common(who_user, participant, session[:user].id, assignment, drop_topic_deadline, topic_id)
   redirect_to action: 'list', id: params[:id]
 end
 
 def delete_signup_as_instructor
-  who_user = "instructor"
+  who_user = InstructorDeleteSignupAction.new
   team = Team.find(params[:id])
   assignment = Assignment.find(team.parent_id)
   user = TeamsUser.find_by(team_id: team.id).user
   participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
   drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
   topic_id = params[:topic_id]
-  delete_signup_common(who_user, participant, assignment, drop_topic_deadline, topic_id)
+  delete_signup_common(who_user, participant ,participant.user_id, assignment, drop_topic_deadline, topic_id)
   redirect_to controller: 'assignments', action: 'edit', id: assignment.id
 end
 
@@ -390,13 +380,13 @@ end
                            rescue StandardError
                              nil
                            end
-          due_date_obj=instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1]  #applying DRY principle and removing multiple instance_variable_get calls
+          due_date_instance=instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1]  #applying DRY principle and removing multiple instance_variable_get calls
           due_at=instance_variable_get('@topic_' + deadline_type + '_due_date')                 
           if topic_due_date.nil? # create a new record
-            create_topic_due_date(i,topic,deadline_type_id,due_date_obj,due_at)
+            create_topic_due_date(i,topic,deadline_type_id,due_date_instance,due_at)
           else # update an existed record 
-            topic_due_date.update_attributes(due_at: due_at,submission_allowed_id: due_date_obj.submission_allowed_id,review_allowed_id: due_date_obj.review_allowed_id,
-            review_of_review_allowed_id: due_date_obj.review_of_review_allowed_id,quiz_allowed_id: due_date_obj.quiz_allowed_id,teammate_review_allowed_id: due_date_obj.teammate_review_allowed_id)
+            topic_due_date.update_attributes(due_at: due_at,submission_allowed_id: due_date_instance.submission_allowed_id,review_allowed_id: due_date_instance.review_allowed_id,
+            review_of_review_allowed_id: due_date_instance.review_of_review_allowed_id,quiz_allowed_id: due_date_instance.quiz_allowed_id,teammate_review_allowed_id: due_date_instance.teammate_review_allowed_id)
           end
         end
       end
@@ -404,25 +394,7 @@ end
     redirect_to_assignment_edit(params[:assignment_id])
   end
   
-  def create_topic_due_date(index,topic,deadline_type_id,due_date_obj,due_at)
-    TopicDueDate.create(
-              due_at: due_at,
-              deadline_type_id: deadline_type_id,
-              parent_id: topic.id,
-              submission_allowed_id: due_date_obj.submission_allowed_id,
-              review_allowed_id: due_date_obj.review_allowed_id,
-              review_of_review_allowed_id: due_date_obj.review_of_review_allowed_id,
-              round: index,
-              flag: due_date_obj.flag,
-              threshold: due_date_obj.threshold,
-              delayed_job_id: due_date_obj.delayed_job_id,
-              deadline_name: due_date_obj.deadline_name,
-              description_url: due_date_obj.description_url,
-              quiz_allowed_id: due_date_obj.quiz_allowed_id,
-              teammate_review_allowed_id: due_date_obj.teammate_review_allowed_id,
-              type: 'TopicDueDate'
-            )
-  end
+  
 
   # This method is called when a student click on the trumpet icon. So this is a bad method name. --Yang
   def show_team
@@ -453,24 +425,35 @@ end
     original_topic_id = SignedUpTeam.topic_id(assignment.id.to_i, session[:user].id)
 
     # Check if this sign up topic exists
-    if SignUpTopic.exists?(id: params[:topic_id])
-      SignUpTopic.find_by(id: params[:topic_id]).update_attribute(:private_to, nil)
-    else
-      # Else flash an error
-      flash[:error] = 'Signup topic does not exist.'
-    end
+    update_topic_privacy_status
 
     # Change to dynamic finder method to prevent sql injection
-    if SignedUpTeam.exists?(team_id: team_id, is_waitlisted: 0)
-      SignedUpTeam.where(team_id: team_id, is_waitlisted: 0).first.update_attribute('topic_id', params[:topic_id].to_i)
-    end
+    update_signed_up_team_topic(team_id)
     # check the waitlist of original topic. Let the first waitlisted team hold the topic, if exists.
-    waitlisted_teams = SignedUpTeam.where(topic_id: original_topic_id, is_waitlisted: 1)
-    if waitlisted_teams.present?
-      waitlisted_first_team_first_user_id = TeamsUser.where(team_id: waitlisted_teams.first.team_id).first.user_id
-      SignUpSheet.signup_team(assignment.id, waitlisted_first_team_first_user_id, original_topic_id)
-    end
+    assign_topic_to_waitlisted_team(original_topic_id,assignment.id)
+    
     redirect_to action: 'list', id: params[:id]
+  end
+
+  def update_topic_privacy_status
+    if SignUpTopic.exists?(id: params[:topic_id])
+      SignUpTopic.find(params[:topic_id]).update_attribute(:private_to, nil)
+    else
+      flash[:error] = 'Signup topic does not exist.'
+    end
+  end
+
+  def update_signed_up_team_topic(team_id)
+    signed_up_team = SignedUpTeam.find_by(team_id: team_id, is_waitlisted: 0)
+    signed_up_team.update_attribute('topic_id', params[:topic_id].to_i) if signed_up_team
+  end
+
+  def assign_topic_to_waitlisted_team(original_topic_id,assignment_id)
+    waitlisted_team = SignedUpTeam.where(topic_id: original_topic_id, is_waitlisted: 1).first
+    return unless waitlisted_team
+  
+    waitlisted_first_team_first_user_id = TeamsUser.where(team_id: waitlisted_team.team_id).first.user_id
+    SignUpSheet.signup_team(assignment_id, waitlisted_first_team_first_user_id, original_topic_id)
   end
 
   def publish_approved_suggested_topic
@@ -537,7 +520,4 @@ end
     @ad_information
   end
 
-  def delete_signup_for_topic(assignment_id, topic_id, user_id)
-    SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
-  end
 end

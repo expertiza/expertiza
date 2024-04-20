@@ -105,4 +105,89 @@ module SignUpSheetHelper
       out_string
     end
   end
+
+  class SignUpTopicHelper
+    def initialize(params, assignment_id)
+      @params = params
+      @assignment_id = assignment_id
+    end
+  
+    def build
+      SignUpTopic.new.tap do |topic|
+        puts @params.dig(:topic, :topic_identifier)
+        topic.topic_identifier = @params.dig(:topic, :topic_identifier)
+        topic.topic_name = @params.dig(:topic, :topic_name)
+        topic.max_choosers = @params.dig(:topic, :max_choosers)
+        topic.category = @params.dig(:topic, :category)
+        topic.assignment_id = @assignment_id
+      end
+    end
+  end  
+
+  def create_topic_due_date(index,topic,deadline_type_id,due_date_instance,due_at)
+    TopicDueDate.create(
+              due_at: due_at,
+              deadline_type_id: deadline_type_id,
+              parent_id: topic.id,
+              submission_allowed_id: due_date_instance.submission_allowed_id,
+              review_allowed_id: due_date_instance.review_allowed_id,
+              review_of_review_allowed_id: due_date_instance.review_of_review_allowed_id,
+              round: index,
+              flag: due_date_instance.flag,
+              threshold: due_date_instance.threshold,
+              delayed_job_id: due_date_instance.delayed_job_id,
+              deadline_name: due_date_instance.deadline_name,
+              description_url: due_date_instance.description_url,
+              quiz_allowed_id: due_date_instance.quiz_allowed_id,
+              teammate_review_allowed_id: due_date_instance.teammate_review_allowed_id,
+              type: 'TopicDueDate'
+            )
+  end
+  class DeleteSignupAction
+
+    def set_error_if_work_submitted
+      raise NotImplementedError
+    end
+
+    def set_error_if_deadline_passed
+      raise NotImplementedError
+    end
+
+    def delete_signup_for_topic(assignment_id, topic_id, user_id)
+      raise NotImplementedError
+    end
+  end
+  
+  class InstructorDeleteSignupAction < DeleteSignupAction
+
+    def set_error_if_work_submitted
+      return 'The student has already submitted their work, so you are not allowed to remove them.'
+    end
+    
+    def set_error_if_deadline_passed
+        return 'You cannot drop a student after the drop topic deadline!'
+    end
+    
+    def delete_signup_for_topic(assignment_id, topic_id, user_id)
+      SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
+      return 'You have successfully dropped the student from the topic.'
+    end
+  end
+
+  class StudentDeleteSignupAction < DeleteSignupAction
+
+    def set_error_if_work_submitted
+      return 'You have already submitted your work, so you are not allowed to drop your topic.'
+    end
+    
+    def set_error_if_deadline_passed
+      return 'You cannot drop your topic after the drop topic deadline!'
+    end
+
+    def delete_signup_for_topic(assignment_id, topic_id, user_id)
+      SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
+      return 'You have successfully dropped your topic.'
+    end
+  end
+
 end

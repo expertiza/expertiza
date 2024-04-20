@@ -1,5 +1,11 @@
 <% if @model == MentoredTeamDecorator %>
-  <%= render :partial => '/tree_display/page_footer_assignments', :locals => { :assignment_id => @root_node.node_object_id, :@meeting_map => @meeting_map } %><br/>
+  <%= render :partial => '/tree_display/page_footer_assignments',
+             :locals => {
+               :assignment_id => @root_node.node_object_id,
+               :@meeting_map => @meeting_map,
+               :@max_participants => @max_participants }
+  %>
+  <br/>
 <% else %>
   <%= render :partial => '/tree_display/page_footer' %><br/>
   <a id="teamsMembers" onclick="showHideTeamMembersInTeamsListPage();">Show all team members</a>

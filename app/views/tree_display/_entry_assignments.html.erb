@@ -34,7 +34,7 @@
   end
 
   @student_count = @student_names.length
-  while @student_names.length < 3
+  while @student_names.length < @max_participants
     @student_names << ""
   end
   @combined_full_names = @student_full_names.join(", ")
@@ -46,7 +46,7 @@
 %>
 
 <tr
-  data-editable="<%= @student_count < 3 ? 'false' : 'true' %>"
+  data-editable="<%= @student_count * 2 >= @max_participants ? 'true' : 'false' %>"
   <% if rowtype != nil %>class="<%= rowtype %>" id="<%= prefix %>"
   <% elsif prefix != nil %>id="<%= prefix %>" style="display: none;" name="team member"
   <% end %>
@@ -62,20 +62,18 @@
       <td><%= name %> <br />
         <%= link_to image_tag("delete_icon.png", :border=>0, :alt => "Delete Team User", :title => "Delete Team User"), :controller=>'teams_users', :action=>'delete', :id => @student_ids[idx] %>
       </td>
-    <% else
-         @can_edit = false
-    %>
+    <% else %>
       <td></td>
     <% end %>
   <% end %>
   <td style="max-width: fit-content">
     <%= @combined_emails %>
   </td>
-  <% if @student_count == 3 %>
+  <% if @student_count * 2 >= @max_participants %>
     <td>
       <%= @ta_name %>
     </td>
-  <% else %>
+  <% else @can_edit = false %>
     <td></td>
   <% end %>
   <%= render :partial => '/tree_display/actions/'+node.get_partial_name,

@@ -64,6 +64,7 @@ class TeamsController < ApplicationController
     begin
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
+      @max_participants = @assignment.max_team_size
 
       @meetings_map = get_dates_for_team(@child_nodes)
     rescue StandardError
@@ -148,7 +149,9 @@ class TeamsController < ApplicationController
 
       @sign_up_team.destroy_all if @sign_up_team
       @teams_users.destroy_all if @teams_users
-      if @team.type == "Mentored"
+
+      parentAssignment = Assignment.find_by(id: @team.parent_id)
+      if parentAssignment.auto_assign_mentor
         mentoredMeetings = MentorMeeting.where(team_id: @team.id)
         mentoredMeetings.destroy_all
       end

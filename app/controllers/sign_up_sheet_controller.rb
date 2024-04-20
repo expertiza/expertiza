@@ -17,14 +17,23 @@ class SignUpSheetController < ApplicationController
   require 'rgl/topsort'
 
   def action_allowed?
-    case params[:action]
-    when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
-      (current_user_has_student_privileges? &&
-          (%w[list].include? action_name) &&
-          are_needed_authorizations_present?(params[:id], 'reader', 'submitter', 'reviewer')) ||
-        current_user_has_student_privileges?
+    action = params[:action]
+    if student_action_allowed?(action)
+      current_user_has_student_privileges?
     else
       current_user_has_ta_privileges?
+    end
+  end
+  
+  private
+  
+  def student_action_allowed?(action)
+    student_actions = %w[set_priority sign_up delete_signup list show_team switch_original_topic_to_approved_suggested_topic publish_approved_suggested_topic]
+    
+    if student_actions.include?(action)
+      return current_user_has_student_privileges? && are_needed_authorizations_present?(params[:id], 'reader', 'submitter', 'reviewer')
+    else
+      return false
     end
   end
 
@@ -416,24 +425,35 @@ end
     original_topic_id = SignedUpTeam.topic_id(assignment.id.to_i, session[:user].id)
 
     # Check if this sign up topic exists
-    if SignUpTopic.exists?(id: params[:topic_id])
-      SignUpTopic.find_by(id: params[:topic_id]).update_attribute(:private_to, nil)
-    else
-      # Else flash an error
-      flash[:error] = 'Signup topic does not exist.'
-    end
+    update_topic_privacy_status
 
     # Change to dynamic finder method to prevent sql injection
-    if SignedUpTeam.exists?(team_id: team_id, is_waitlisted: 0)
-      SignedUpTeam.where(team_id: team_id, is_waitlisted: 0).first.update_attribute('topic_id', params[:topic_id].to_i)
-    end
+    update_signed_up_team_topic(team_id)
     # check the waitlist of original topic. Let the first waitlisted team hold the topic, if exists.
-    waitlisted_teams = SignedUpTeam.where(topic_id: original_topic_id, is_waitlisted: 1)
-    if waitlisted_teams.present?
-      waitlisted_first_team_first_user_id = TeamsUser.where(team_id: waitlisted_teams.first.team_id).first.user_id
-      SignUpSheet.signup_team(assignment.id, waitlisted_first_team_first_user_id, original_topic_id)
-    end
+    assign_topic_to_waitlisted_team(original_topic_id,assignment.id)
+    
     redirect_to action: 'list', id: params[:id]
+  end
+
+  def update_topic_privacy_status
+    if SignUpTopic.exists?(id: params[:topic_id])
+      SignUpTopic.find(params[:topic_id]).update_attribute(:private_to, nil)
+    else
+      flash[:error] = 'Signup topic does not exist.'
+    end
+  end
+
+  def update_signed_up_team_topic(team_id)
+    signed_up_team = SignedUpTeam.find_by(team_id: team_id, is_waitlisted: 0)
+    signed_up_team.update_attribute('topic_id', params[:topic_id].to_i) if signed_up_team
+  end
+
+  def assign_topic_to_waitlisted_team(original_topic_id,assignment_id)
+    waitlisted_team = SignedUpTeam.where(topic_id: original_topic_id, is_waitlisted: 1).first
+    return unless waitlisted_team
+  
+    waitlisted_first_team_first_user_id = TeamsUser.where(team_id: waitlisted_team.team_id).first.user_id
+    SignUpSheet.signup_team(assignment_id, waitlisted_first_team_first_user_id, original_topic_id)
   end
 
   def publish_approved_suggested_topic

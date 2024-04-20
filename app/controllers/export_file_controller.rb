@@ -1,6 +1,9 @@
 class ExportFileController < ApplicationController
   include AuthorizationHelper
 
+  TITLES = { 'Assignment' => 'Grades for submission', 'CourseParticipant' => 'Course Participants', 'AssignmentTeam' => 'Assignment Teams',
+               'CourseTeam' => 'Course Teams', 'User' => 'Users', 'Question' => 'Questions', 'SignUpTopic' => 'Sign Up Topics',
+               'TagPromptDeployment' => 'TagPromptDeployment'}.freeze
   def action_allowed?
     current_user_has_ta_privileges?
   end
@@ -8,10 +11,8 @@ class ExportFileController < ApplicationController
   # Assign titles to model for display
   def start
     @model = params[:model]
-    titles = { 'Assignment' => 'Grades', 'CourseParticipant' => 'Course Participants', 'AssignmentTeam' => 'Teams',
-               'CourseTeam' => 'Teams', 'User' => 'Users', 'Question' => 'Questions', 'SignUpTopic' => 'Topic',
-               'TagPromptDeployment' => 'TagPromptDeployment'}
-    @title = titles[@model]
+    
+    @title = TITLES[@model]
     @id = params[:id]
   end
 
@@ -60,7 +61,7 @@ class ExportFileController < ApplicationController
   def export
     @delim_type = params[:delim_type]
     filename, delimiter = find_delim_filename(@delim_type, params[:other_char])
-
+    title = TITLES[params[:model]].to_s
     allowed_models = %w[Assignment
                         AssignmentParticipant
                         AssignmentTeam
@@ -75,6 +76,7 @@ class ExportFileController < ApplicationController
                         TagPromptDeployment]
     csv_data = CSV.generate(col_sep: delimiter) do |csv|
       if allowed_models.include? params[:model]
+        csv << [TITLES[params[:model]]]
         csv << Object.const_get(params[:model]).export_fields(params[:options])
         Object.const_get(params[:model]).export(csv, params[:id], params[:options])
       end

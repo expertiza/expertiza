@@ -52,6 +52,13 @@ class TeamsController < ApplicationController
     init_team_type(params[:type])
     @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == Team.allowed_types[0]
     unless @assignment.nil?
+      @max_participants = @assignment.max_team_size
+      @has_topic = false
+      topics = SignUpTopic.where(assignment_id: @assignment.id)
+      if topics
+        @has_topic = true
+      end
+
       if @assignment.auto_assign_mentor
         @model = MentoredTeamDecorator  # not sure if changing this to decorator is correct yet...
         # MentorMeeting.delete_all
@@ -64,7 +71,6 @@ class TeamsController < ApplicationController
     begin
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
-      @max_participants = @assignment.max_team_size
 
       @meetings_map = get_dates_for_team(@child_nodes)
     rescue StandardError

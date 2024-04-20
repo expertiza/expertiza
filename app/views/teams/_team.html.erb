@@ -1,9 +1,10 @@
-<% if @model == MentoredTeamDecorator %>
+<% if @model == MentoredTeamDecorator or @has_topic %>
   <%= render :partial => '/tree_display/page_footer_assignments',
              :locals => {
                :assignment_id => @root_node.node_object_id,
                :@meeting_map => @meeting_map,
-               :@max_participants => @max_participants }
+               :@max_participants => @max_participants,
+               :@has_topic => @has_topic}
   %>
   <br/>
 <% else %>

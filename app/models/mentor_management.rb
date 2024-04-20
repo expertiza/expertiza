@@ -73,6 +73,26 @@ class MentorManagement
     notify_team_of_mentor_assignment(mentor_user, team)
   end
 
+  def self.assign_mentor_to_topic_team(assignment_id, user_id, topic_id)
+    topic = SignUpTopic.find(topic_id)
+    participant = Participant.where(user_id: user_id, parent_id: assignment_id).first
+    assignmentTeam = AssignmentTeam.team(participant)
+    if assignmentTeam
+      team_id = assignmentTeam.id
+    end
+
+    mentor = User.find(topic.mentor_id)
+
+    t_user_old = TeamsUser.where(user_id: mentor.id, team_id: team_id).first
+    unless t_user_old
+      t_user = TeamsUser.create(user_id: mentor.id, team_id: team_id)
+      parent = TeamNode.find_by(node_object_id: team_id)
+      team_member_added = TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+    end
+
+    return unless team_member_added
+  end
+
   def self.notify_team_of_mentor_assignment(mentor, team)
     members = team.users
     emails = members.map(&:email)

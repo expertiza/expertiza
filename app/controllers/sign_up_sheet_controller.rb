@@ -84,6 +84,8 @@ class SignUpSheetController < ApplicationController
   # prepares the page. shows the form which can be used to enter new values for the different properties of an assignment
   def edit
     @topic = SignUpTopic.find(params[:id])
+    @user = User.find(@topic.mentor_id)
+    @topic.mentor_id = @user.name
   end
 
   # updates the database tables to reflect the new values for the assignment. Used in conjunction with edit
@@ -248,6 +250,9 @@ class SignUpSheetController < ApplicationController
     else
       if AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id]
         if SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
+
+          MentorManagement.assign_mentor_to_topic_team(params[:assignment_id], user.id, params[:topic_id])
+
           flash[:success] = 'You have successfully signed up the student for the topic!'
           ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor signed up student for topic: ' + params[:topic_id].to_s)
         else

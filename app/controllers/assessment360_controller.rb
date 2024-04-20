@@ -91,8 +91,6 @@ class Assessment360Controller < ApplicationController
     @assignment_grades = {}
     @peer_review_scores = {}
     @final_grades = {}
-    @average_instructor_scores = {} # average instructor score for each assignment
-    @average_peer_review_scores = {} # average peer review score for each assignment
     course = Course.find(params[:course_id])
     @assignments = course.assignments.reject(&:is_calibrated).reject { |a| a.participants.empty? }
     @course_participants = course.get_participants
@@ -102,8 +100,6 @@ class Assessment360Controller < ApplicationController
       @assignment_grades[cp.id] = {}
       @peer_review_scores[cp.id] = {}
       @final_grades[cp.id] = 0
-      instructor_scores = [] # store instructor scores for each assignment
-      peer_review_scores = [] # store peer review scores for each assignment
       @assignments.each do |assignment|
         user_id = cp.user_id
         assignment_id = assignment.id
@@ -128,14 +124,7 @@ class Assessment360Controller < ApplicationController
         next if peer_review_score[:review][:scores][:avg].nil?
 
         @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
-        instructor_scores << @assignment_grades[cp.id][assignment_id] # store instructor scores for each assignment
-        peer_review_scores << @peer_review_scores[cp.id][assignment_id] # store peer review scores for each assignment
       end
-
-      # calculate average instructor score for each student
-      @average_instructor_scores[cp.id] = instructor_scores.compact.sum / instructor_scores.size
-      # calculate average peer review score for each student
-      @average_peer_review_scores[cp.id] = peer_review_scores.compact.sum / peer_review_scores.size
     end
   end
 

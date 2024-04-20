@@ -54,8 +54,8 @@ class TeamsController < ApplicationController
     unless @assignment.nil?
       @max_participants = @assignment.max_team_size
       @has_topic = false
-      topics = SignUpTopic.where(assignment_id: @assignment.id)
-      if topics
+      topics = SignUpTopic.where(assignment_id: params[:id]).count
+      if topics > 0
         @has_topic = true
       end
 

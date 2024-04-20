@@ -15,6 +15,7 @@
   @student_names = []
   @student_count = 0
   @student_ids = []
+  @ta_name = ""
   child_nodes.each_with_index do |child_node,index|
     child_node_name = child_node.get_name(session[:ip])
     if child_node_name.include?("(Mentor)")
@@ -42,11 +43,13 @@
 %>
 
 <%
-  @can_edit = (session["user"].role_id == 2 or (session["user"].name == @ta_username))
+  @can_edit = ((session["user"].role_id == 2) or (session["user"].name == @ta_username))
 %>
+<% @can_edit_row = (@can_edit and ((not @has_topic and @student_count * 2 >= @max_participants) or (@has_topic and not @ta_name.empty?))) %>
+<% @can_edit_input = (@can_edit and ((not @has_topic and @student_count * 2 >= @max_participants) or (@has_topic and not @ta_name.empty?))) %>
 
 <tr
-  data-editable="<%= @student_count * 2 >= @max_participants ? 'true' : 'false' %>"
+  data-editable="<%= @can_edit_row ? 'true' : 'false' %>"
   <% if rowtype != nil %>class="<%= rowtype %>" id="<%= prefix %>"
   <% elsif prefix != nil %>id="<%= prefix %>" style="display: none;" name="team member"
   <% end %>
@@ -69,11 +72,11 @@
   <td style="max-width: fit-content">
     <%= @combined_emails %>
   </td>
-  <% if @student_count * 2 >= @max_participants %>
+  <% if @student_count * 2 >= @max_participants or @has_topic %>
     <td>
       <%= @ta_name %>
     </td>
-  <% else @can_edit = false %>
+  <% else @can_edit_input = false %>
     <td></td>
   <% end %>
   <%= render :partial => '/tree_display/actions/'+node.get_partial_name,
@@ -83,7 +86,7 @@
     %>
       <td class="mtg">
         <input style="max-width: 80px" id="<%= team_name %>_mtg_<%= index %>" value="<%= find_date(team_id, index - 1) %>" onkeypress="
-          addDate(event,'<%= team_name %>_mtg_<%= index %>')" data-prev-val="<%= find_date(team_id, index - 1).to_s %>" <%= @can_edit ? '' : 'disabled' %>>
+          addDate(event,'<%= team_name %>_mtg_<%= index %>')" data-prev-val="<%= find_date(team_id, index - 1).to_s %>" <%= @can_edit_input ? '' : 'disabled' %>>
       </td>
     <%
       end

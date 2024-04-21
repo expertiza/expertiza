@@ -63,7 +63,6 @@ class LotteryController < ApplicationController
                          # If there are no bids, the percentage is 0.
                          0
                        end
-    
     # Return a hash containing all the calculated and retrieved data for the topic.
     {
       id: topic.id,

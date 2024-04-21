@@ -94,7 +94,16 @@ class Team < ApplicationRecord
 
   # Define the size of the team
   def self.size(team_id)
-    TeamsUser.where(team_id: team_id).count
+    #TeamsUser.where(team_id: team_id).count
+    count = 0
+    members = TeamsUser.where(team_id: team_id)
+    members.each do |member|
+      member_name = member.name
+      unless member_name.include?(' (Mentor)') 
+        count = count + 1
+      end
+    end
+    count
   end
 
   # Copy method to copy this team
@@ -117,7 +126,7 @@ class Team < ApplicationRecord
   # Start by adding single members to teams that are one member too small.
   # Add two-member teams to teams that two members too small. etc.
   def self.randomize_all_by_parent(parent, team_type, min_team_size)
-    participants = Participant.where(parent_id: parent.id, type: parent.class.to_s + 'Participant')
+    participants = Participant.where(parent_id: parent.id, type: parent.class.to_s + 'Participant', can_mentor: [false, nil])
     participants = participants.sort { rand(-1..1) }
     users = participants.map { |p| User.find(p.user_id) }.to_a
     # find teams still need team members and users who are not in any team
@@ -171,13 +180,10 @@ class Team < ApplicationRecord
 
   # Generate the team name
   def self.generate_team_name(_team_name_prefix = '')
-    counter = 1
-    loop do
-      team_name = "Team_#{counter}"
-      return team_name unless Team.find_by(name: team_name)
-
-      counter += 1
-    end
+    last_team = Team.where('name LIKE ?', "#{_team_name_prefix} Team_%").order(name: :desc).first
+    counter = last_team ? last_team.name.scan(/\d+/).first.to_i + 1 : 1
+    team_name = "#{_team_name_prefix} Team_#{counter}"
+    team_name
   end
 
   # Extract team members from the csv and push to DB,  changed to hash by E1776

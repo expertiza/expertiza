@@ -30,6 +30,7 @@ module AnswerHelper
     end
     response_ids
   end
+
   # Log info from each response_id to be used in answer deletion
   def self.log_response_info(response_ids)
     user_id_to_answers = {}

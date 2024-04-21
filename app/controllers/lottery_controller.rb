@@ -1,5 +1,6 @@
 class LotteryController < ApplicationController
-  include LotteryHelper, AuthorizationHelper
+  include LotteryHelper
+  include  AuthorizationHelper
   require 'json'
   require 'rest_client'
   # Give permission to run the bid to appropriate roles

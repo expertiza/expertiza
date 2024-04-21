@@ -62,12 +62,16 @@ Expertiza::Application.routes.draw do
       get :instant_flash
       patch :edit
       post :delete
-    end
+    end  
+  end
+ 
+  #Routes for Lotteries
+  resources :lotteries do
     member do
-      get :bidding_table_for_topics
-      
+      get :bidding_details
+      get :bidding_details_for_topic
+      get :edit
     end
-    get 'bidding_details_for_topic', on: :member
   end
 
   resources :assignment_questionnaire do
@@ -654,7 +658,9 @@ Expertiza::Application.routes.draw do
   get '/auth/*path', to: redirect('/')
 
   # Add a new route for bidding details
-get 'assignments/:id/bidding_details', to: 'assignments#bidding_details', as: :bidding_details_assignment
+  # get 'assignments/:id/bidding_details', to: 'assignments#bidding_details', as: :bidding_details_assignment
+  get 'lottery/run_intelligent_assignment/:id', to: 'lottery#run_intelligent_assignment', as: 'run_intelligent_assignment'
+  get 'assignments/:id/calculate_bidding_summary_based_on_priority', to: 'lottery#calculate_bidding_summary_based_on_priority', as: 'calculate_bidding_summary_based_on_priority'
 
   get '/menu/*name', controller: :menu_items, action: :link
   get ':page_name', controller: :content_pages, action: :view, method: :get

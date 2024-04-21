@@ -83,10 +83,9 @@ class AssignmentsController < ApplicationController
     update_assignment_badges
     @assigned_badges = @assignment_form.assignment.badges
     @badges = Badge.all
-    @use_bookmark = @assignment_form.assignment.use_bookmark # Use 'use_bookmark' attribute
+    @use_bookmark = @assignment.use_bookmark
     @duties = Duty.where(assignment_id: @assignment_form.assignment.id)
   end
-  
 
   # updates an assignment via an assignment form
   def update
@@ -113,7 +112,6 @@ class AssignmentsController < ApplicationController
     @assignment = Assignment.find(params[:id])
   end
 
- 
   # gets an assignment's path/url
   def path
     begin
@@ -518,4 +516,3 @@ class AssignmentsController < ApplicationController
     params.require(:assignment_form).permit!
   end
 end
-

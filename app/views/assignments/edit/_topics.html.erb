@@ -1,12 +1,24 @@
-<% content_for :head do %>
-  <style>
-    .bid-low-intensity { background-color: #dff0d8; } /* Green for fewer bids */
-    .bid-medium-intensity { background-color: #fcf8e3; } /* Yellow for moderate bids */
-    .bid-high-intensity { background-color: #f2dede; } /* Red for many bids */
-  </style>
-<% end %>
-
 <h3>Topics for <%= @assignment_form.assignment.name %> assignment</h3><br>
+<style>
+.custom-button {
+    display: inline-block;
+    padding: 5px 5px;
+    background-color: white;
+    color: black;
+    text-decoration: none;
+    border: 1px solid black;
+    border-radius: 5px;
+    font: Arial;
+}
+</style>
+<script>
+  const enableBiddingCheckbox = document.getElementById('enable-bidding-checkbox');
+  const biddingButton = document.getElementById('bidding-button');
+
+  enableBiddingCheckbox.addEventListener('change', function() {
+    biddingButton.style.display = enableBiddingCheckbox.checked ? 'inline-block' : 'none';
+  });
+</script>
 <input name="assignment_form[assignment][allow_suggestions]" type="hidden" value="false"/>
 <%= check_box_tag('assignment_form[assignment][allow_suggestions]', 'true', @assignment_form.assignment.allow_suggestions) %>
 <%= label_tag('assignment_form[assignment][allow_suggestions]', 'Allow topic suggestions from students?') %>
@@ -17,7 +29,9 @@
 <img src="/assets/info.png" title="This feature allow students to &quot;bid&quot; for topics.
       Instructor must specify when topics are assigned, by going to the Due Dates tab and
       entering a due date for &quot;signup&quot;."/>
-<br>
+
+<%= button_to 'Show bids by priority', {:controller => 'lottery', :action => 'calculate_bidding_summary_based_on_priority', :id => @assignment_form.assignment.id}, :method => :get, class: 'custom-button', id: 'bidding-button' %>
+
 <input name="assignment_form[assignment][can_review_same_topic]" type="hidden" value="false"/>
 <%= check_box_tag('assignment_form[assignment][can_review_same_topic]', 'true', @assignment_form.assignment.can_review_same_topic?)%>
 <%= label_tag('assignment_form[assignment][can_review_same_topic]', 'Enable authors to review others working on same topic?') %>
@@ -32,8 +46,8 @@
 <input name="assignment_form[assignment][use_bookmark]" type="hidden" value="false"/>
 <%= check_box_tag('assignment_form[assignment][use_bookmark]', 'true', @assignment_form.assignment.use_bookmark, {:onChange => 'useBookmarkChanged()'})%>
 <%= label_tag('assignment_form[assignment][use_bookmark]', 'Allow participants to create bookmarks?') %>
-<br>
 
+<br>
 <% if @assignment_form.assignment.can_choose_topic_to_review? == true %>
   <input name="assignment_form[assignment][bidding_for_reviews_enabled]" type="hidden" value="false"/>
   <%= check_box_tag(
@@ -51,81 +65,8 @@
 <% end %>
 
 <br><br>
-
 <% if @assignment_form.assignment.staggered_deadline == true %>
     <%= render partial: '/sign_up_sheet/add_signup_topics_staggered', locals: {review_rounds: @review_rounds, assignment_submission_due_dates: @assignment_submission_due_dates, assignment_review_due_dates: @assignment_review_due_dates} %>
 <% else %>
     <%= render '/sign_up_sheet/add_signup_topics' %>
 <% end %>
-
-<% if @assignment_form.assignment.is_intelligent? %>
-  <!-- Only show this section if bidding is enabled -->
-  <div id="bid-summary">
-    <h4>Bid Summary</h4>
-    <!-- The summary will show aggregated bid data, possibly from a helper or a model method -->
-    <%= render 'bid_summary_partial' %>
-  </div>
-
-
-  <table id="topic-list" class="table table-striped">
-  <thead>
-    <tr>
-      <th>Topic Name</th>
-      <th>#1 Bids</th>
-      <th>#2 Bids</th>
-      <th>#3 Bids</th> <!-- Added column for #3 bids -->
-      <th>Total Bids</th>
-      <th>Bidding Teams</th> <!-- Added column for Bidding Team names -->
-    </tr>
-  </thead>
-  <tbody>
-    <% @assignment_form.assignment.sign_up_topics.each do |topic| %>
-      <% total_bids = topic.bids.count %>
-      <% number_of_first_bids = topic.bids.where(priority: 1).count %>
-      <% number_of_second_bids = topic.bids.where(priority: 2).count %>
-      <% number_of_third_bids = topic.bids.where(priority: 3).count %> <!-- New variable for third priority bids -->
-      <% bidding_teams = topic.bids.includes(:team).map { |bid| bid.team.name }.join(', ') %> <!-- New variable for team names -->
-      <tr class="<%= bid_intensity_class(total_bids) %>">
-        <td><%= topic.topic_name %></td>
-        <td><%= number_of_first_bids %></td>
-        <td><%= number_of_second_bids %></td>
-        <td><%= number_of_third_bids %></td> <!-- Display for third priority bids -->
-        <td><%= total_bids %></td>
-        <td><%= bidding_teams %></td> <!-- Display for bidding team names -->
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-
-  <% # Generate a modal for each topic for detailed bid information %>
-  <% @assignment_form.assignment.sign_up_topics.each do |topic| %>
-    <div class="modal fade" id="topic<%= topic.id %>-details" tabindex="-1" role="dialog" aria-labelledby="topic<%= topic.id %>-details-label" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="topic<%= topic.id %>-details-label">Detailed Bids for <%= topic.topic_name %></h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">×</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <!-- Content will be loaded here by JavaScript -->
-          </div>
-        </div>
-      </div>
-    </div>
-  <% end %>
-<% end %>
-
-
-<script>
-  $(document).on('click', '.btn-info', function() {
-    var topicId = $(this).data('topicId');
-    // Make an AJAX call to fetch data for topicId and populate the modal body
-    // Example endpoint: /assignments/1/bidding_details?topic_id=123
-    $.get('/assignments/<%= @assignment_form.assignment.id %>/bidding_details', { topic_id: topicId }, function(data) {
-      $('#topic' + topicId + '-details .modal-body').html(data);
-      $('#topic' + topicId + '-details').modal('show');
-    });
-  });
-</script>

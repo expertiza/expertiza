@@ -1,2 +1,0 @@
-// div with an id of ⁠ bidding-details-topic-<%= @topic.id %> ⁠ to display the details.
-$("#bidding-details-topic-<%= @topic.id %>").html("<%= escape_javascript(render partial: 'bidding_details', locals: { topic: @topic, bids: @bids }) %>");

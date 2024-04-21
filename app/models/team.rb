@@ -248,36 +248,29 @@ class Team < ApplicationRecord
     team_parent = nil
   
     # Determine the context and get the teams based on the team type
-    if teamtype == CourseTeam
+    if teamtype.is_a?(CourseTeam)
       team_parent = Course.find_by(id: parent_id)
-      teams = CourseTeam.where(parent_id: parent_id) if team_parent
-    elsif teamtype == AssignmentTeam
+    elsif teamtype.is_a?(AssignmentTeam)
       team_parent = Assignment.find_by(id: parent_id)
-      teams = AssignmentTeam.where(parent_id: parent_id) if team_parent
     end
-  
+    teams = Team.where(parent_id: parent_id)
     return csv if team_parent.nil? # Exit if no team_parent is found
-  
     teams.each do |team|
       # Start with team_parent name (course or assignment) and team name
       output = [team_parent.name, team.name]
-  
       # Append team members' names if options[:team_name] is false
-      unless options[:team_name]
+      if options[:team_name] == 'false'
         team_members = TeamsUser.where(team_id: team.id)
         team_members.each do |user|
           output.push(user.name)
         end
       end
-  
       # Append the output array to the CSV
       csv << output
     end
-  
     csv
   end
   
-
   # Create the team with corresponding tree node
   def self.create_team_and_node(id)
     parent = parent_model id # current_task will be either a course object or an assignment object.

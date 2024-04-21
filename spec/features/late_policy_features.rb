@@ -42,16 +42,18 @@ describe 'Assignment creation topics tab', js: true do
     click_button 'Back'
     expect(page).to route_to("/assignments/#{assignment.id}/edit")
   end
-  
+
   private
+
   def create_assignment_and_topic(assignment_name)
     assignment = Assignment.where(name: assignment_name).first || create(:assignment, name: assignment_name)
     create(:topic, assignment_id: assignment.id)
     assignment
   end
+
   def fill_in_late_policy_form(name, penalty_per_unit, max_penalty)
-    fill_in "policy_name", with: name
-    fill_in "penalty_per_unit", with: penalty_per_unit
-    fill_in "max_penalty", with: max_penalty
+    fill_in 'policy_name', with: name
+    fill_in 'penalty_per_unit', with: penalty_per_unit
+    fill_in 'max_penalty', with: max_penalty
   end
 end

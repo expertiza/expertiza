@@ -160,6 +160,7 @@ class SignUpTopic < ApplicationRecord
       return 'failed'
     end
   end
+  
   # Export the fields
   def self.export_fields(options)
     fields = []
@@ -174,22 +175,22 @@ class SignUpTopic < ApplicationRecord
   end
 
   def self.export(csv, parent_id, options)
-    @assignment = Assignment.find(parent_id.to_i)
-    @signuptopics = SignUpTopic.where(assignment_id: @assignment.id)
+    assignment = Assignment.find(parent_id.to_i)
+    signuptopics = SignUpTopic.where(assignment_id: assignment.id)
 
-    @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
-    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
+    slots_filled = SignUpTopic.find_slots_filled(assignment.id)
+    slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment.id)
 
-    @signuptopics.each do |signuptopic|
+    signuptopics.each do |signuptopic|
       tcsv = []
       tcsv.push(signuptopic.topic_identifier) if options['topic_identifier'] == 'true'
       tcsv.push(signuptopic.topic_name) if options['topic_name'] == 'true'
       tcsv.push(signuptopic.description) if options['description'] == 'true'
       if SignedUpTeam.where(topic_id: signuptopic.id).first != nil
-        @signedupteam = SignedUpTeam.where(topic_id: signuptopic.id).first
-        @users = TeamsUser.where(team_id: @signedupteam.team_id).all
+        signedupteam = SignedUpTeam.where(topic_id: signuptopic.id).first
+        users = TeamsUser.where(team_id: signedupteam.team_id).all
         ids = ""
-        @users.each do |user|
+        users.each do |user|
           ids += user.name.to_s + " "
         end
       else
@@ -199,8 +200,8 @@ class SignUpTopic < ApplicationRecord
       tcsv.push(ids) if options['participants'] == 'true'
       tcsv.push(signuptopic.max_choosers) if options['num_of_slots'] == 'true'
 
-      slots_filled_length = @slots_filled.length()
-      @slots_filled.each do |slot|
+      slots_filled_length = slots_filled.length()
+      slots_filled.each do |slot|
         if slot.topic_id == signuptopic.id
           tcsv.push(signuptopic.max_choosers.to_i - slot.count.to_i) if options['available_slots'] == 'true'
         else

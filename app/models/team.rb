@@ -10,18 +10,6 @@ class Team < ApplicationRecord
     joins(:teams_users).where('teams.parent_id = ? AND teams_users.user_id = ?', assignment_id, user_id)
   }
 
-  # Method to return the associated bids for a given topic.
-  # This assumes there is a model called Bid that responds to ⁠ team_id ⁠ and ⁠ sign_up_topic_id ⁠.
-  def self.bid_for_topic(sign_up_topic)
-    bids.find_by(topic_id: sign_up_topic.id) # Assuming 'bids' is an association that represents all bids a team has made
-  end
-  
-  # Method to return the associated sign-up topic for the team.
-  # This requires a join operation since the association is not direct.
-  def self.assigned_topic
-    SignUpTopic.joins(:bids).find_by('bids.team_id': id)
-  end
-
   # Allowed types of teams -- ASSIGNMENT teams or COURSE teams
   def self.allowed_types
     # non-interpolated array of single-quoted strings
@@ -325,3 +313,4 @@ class Team < ApplicationRecord
     end
   end
 end
+

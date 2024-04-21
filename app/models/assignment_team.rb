@@ -151,8 +151,8 @@ class AssignmentTeam < Team
 
   # Export the existing teams in a csv file
   def self.export(csv, parent_id, options)
-    @assignment_team = prototype
-    Team.export(csv, parent_id, options, @assignment_team)
+    assignment_team = prototype
+    Team.export(csv, parent_id, options, assignment_team)
   end
 
   # Copy the current Assignment team to the CourseTeam
@@ -238,9 +238,10 @@ class AssignmentTeam < Team
   # Export the fields
   def self.export_fields(options)
     fields = []
+    fields.push('Assignment Name')
     fields.push('Team Name')
     fields.push('Team members') if options[:team_name] == 'false'
-    fields.push('Assignment Name')
+    
   end
 
   # Remove a team given the team id

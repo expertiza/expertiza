@@ -76,9 +76,9 @@ class CourseTeam < Team
   # Export the fields of the csv column
   def self.export_fields(options)
     fields = []
+    fields.push('Course Name')
     fields.push('Team Name')
     fields.push('Team members') if options[:team_name] == 'false'
-    fields.push('Course Name')
   end
 
   # Add member to the course team

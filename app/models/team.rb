@@ -245,24 +245,38 @@ class Team < ApplicationRecord
 
   # Export the teams to csv
   def self.export(csv, parent_id, options, teamtype)
-    if teamtype.is_a?(CourseTeam)
-      teams = CourseTeam.where(parent_id: parent_id)
-    elsif teamtype.is_a?(AssignmentTeam)
-      teams = AssignmentTeam.where(parent_id: parent_id)
+    team_parent = nil
+  
+    # Determine the context and get the teams based on the team type
+    if teamtype == CourseTeam
+      team_parent = Course.find_by(id: parent_id)
+      teams = CourseTeam.where(parent_id: parent_id) if team_parent
+    elsif teamtype == AssignmentTeam
+      team_parent = Assignment.find_by(id: parent_id)
+      teams = AssignmentTeam.where(parent_id: parent_id) if team_parent
     end
+  
+    return csv if team_parent.nil? # Exit if no team_parent is found
+  
     teams.each do |team|
-      output = []
-      output.push(team.name)
-      if options[:team_name] == 'false'
+      # Start with team_parent name (course or assignment) and team name
+      output = [team_parent.name, team.name]
+  
+      # Append team members' names if options[:team_name] is false
+      unless options[:team_name]
         team_members = TeamsUser.where(team_id: team.id)
         team_members.each do |user|
           output.push(user.name)
         end
       end
+  
+      # Append the output array to the CSV
       csv << output
     end
+  
     csv
   end
+  
 
   # Create the team with corresponding tree node
   def self.create_team_and_node(id)

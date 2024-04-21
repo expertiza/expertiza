@@ -388,31 +388,122 @@ class Assignment < ApplicationRecord
     nil
   end
 
-  def self.export(csv, parent_id, options)
-    export_assignment = ExportAssignment.new(csv, parent_id, options)
-    csv = export_assignment.export()
-  end
-  def self.export_fields(options)
-
-    fields = ExportAssignment.export_fields(options)
-
-  end
-
   def self.export_details(csv, parent_id, detail_options)
-    export_assignment_details = ExportAssignmentDetails.new(csv, parent_id, detail_options)
-    details_csv = export_assignment_details.export_details()
+    return csv unless detail_options.value?('true')
+
+    @assignment = Assignment.find(parent_id)
+    @answers = {} # Contains all answer objects for this assignment
+    # Find all unique response types
+    @uniq_response_type = ResponseMap.where.not(type: nil).pluck(:type).uniq
+    # Find all unique round numbers
+    @uniq_rounds = Response.pluck(:round).uniq
+    # create the nested hash that holds all the answers organized by round # and response type
+    @uniq_rounds.each do |round_num|
+      @answers[round_num] = {}
+      @uniq_response_type.each do |res_type|
+        @answers[round_num][res_type] = []
+      end
+    end
+    @answers = generate_answer(@answers, @assignment)
+    # Loop through each round and response type and construct a new row to be pushed in CSV
+    @uniq_rounds.each do |round_num|
+      @uniq_response_type.each do |res_type|
+        round_type = check_empty_rounds(@answers, round_num, res_type)
+        csv << [round_type, '---', '---', '---', '---', '---', '---', '---'] unless round_type.nil?
+        @answers[round_num][res_type].each do |answer|
+          csv << csv_row(detail_options, answer)
+        end
+      end
+    end
   end
 
   # This method was refactored to reduce complexity, additional fields could now be added to the list - Rajan, Jasmine, Sreenidhi
   # Now you could add your export fields to the hashmap
-  
+  EXPORT_DETAIL_FIELDS = { team_id: 'Team ID / Author ID', team_name: 'Reviewee (Team / Student Name)', reviewer: 'Reviewer', question: 'Question / Criterion', question_id: 'Question ID', comment_id: 'Answer / Comment ID', comments: 'Answer / Comment', score: 'Score' }.freeze
   def self.export_details_fields(detail_options)
-    fields = ExportAssignmentDetails.export_details_fields(detail_options)
+    fields = []
+    EXPORT_DETAIL_FIELDS.each do |key, value|
+      fields << value if detail_options[key.to_s] == 'true'
+    end
+    fields
+  end
+
+  def self.handle_nil(csv_field)
+    return ' ' if csv_field.nil?
+
+    csv_field
+  end
+
+  # Generates a single row based on the detail_options selected
+  def self.csv_row(detail_options, answer)
+    teams_csv = []
+    @response = Response.find(answer.response_id)
+    map = ResponseMap.find(@response.map_id)
+    @reviewee = Team.find_by id: map.reviewee_id
+    @reviewee = Participant.find(map.reviewee_id).user if @reviewee.nil?
+    reviewer = Participant.find(map.reviewer_id).user
+    teams_csv << handle_nil(@reviewee.id) if detail_options['team_id'] == 'true'
+    teams_csv << handle_nil(@reviewee.name) if detail_options['team_name'] == 'true'
+    teams_csv << handle_nil(reviewer.name) if detail_options['reviewer'] == 'true'
+    teams_csv << handle_nil(answer.question.txt) if detail_options['question'] == 'true'
+    teams_csv << handle_nil(answer.question.id) if detail_options['question_id'] == 'true'
+    teams_csv << handle_nil(answer.id) if detail_options['comment_id'] == 'true'
+    teams_csv << handle_nil(answer.comments) if detail_options['comments'] == 'true'
+    teams_csv << handle_nil(answer.answer) if detail_options['score'] == 'true'
+    teams_csv
+  end
+
+  # Populate answers will review information
+  def self.generate_answer(answers, assignment)
+    # get all response maps for this assignment
+    @response_maps_for_assignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{assignment.id}"])
+    # for each map, get the response & answer associated with it
+    @response_maps_for_assignment.each do |map|
+      @response_for_this_map = Response.find_by_sql(["SELECT * FROM responses WHERE map_id = #{map.id}"])
+      # for this response, get the answer associated with it
+      @response_for_this_map.each do |resp|
+        @associated_answers = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{resp.id}"])
+        @associated_answers.each do |answer|
+          answers[resp.round][map.type].push(answer)
+        end
+      end
+    end
+    answers
+  end
+
+  # Checks if there are rounds with no reviews
+  def self.check_empty_rounds(answers, round_num, res_type)
+    if answers[round_num][res_type].any?
+      round_num.nil? ? 'Round Nil - ' + res_type : 'Round ' + round_num.to_s + ' - ' + res_type.to_s
+    end
   end
 
   # This method is used to set the headers for the csv like Assignment Name and Assignment Instructor
-  def self.export_assignment_title(parent_id)
-    assignment_title = ExportAssignmentDetails.export_headers(parent_id)
+  def self.export_headers(parent_id)
+    @assignment = Assignment.find(parent_id)
+    fields = []
+    fields << 'Assignment Name: ' + @assignment.name.to_s
+    fields << 'Assignment Instructor: ' + User.find(@assignment.instructor_id).name.to_s
+    fields
+  end
+
+  # Instantiates the ExportAssignment class and exports grades for all signed up teams and participants of an assignment.
+  # This method serves as the entry point for initiating the export process.
+  # @param csv [Object] The CSV object where the data will be appended.
+  # @param parent_id [Integer] The ID of the assignment for which grades are being exported.
+  # @param options [Hash] A hash of options determining which additional data fields to export.
+  # @return [Object] The updated CSV object containing the exported data.
+  def self.export(csv, parent_id, options)
+    export_assignment = ExportAssignment.new(csv, parent_id, options)
+    csv = export_assignment.export()
+  end
+
+  # Retrieves the column names for the CSV based on user-selected export options.
+  # This method is used to dynamically generate the headers for the CSV file depending on selected data fields.
+  # @param options [Hash] A hash containing boolean values to specify which additional fields should be included in the export.
+  # @return [Array<String>] An array of strings representing the column headers for the CSV.
+  def self.export_fields(options)
+    fields = ExportAssignment.export_fields(options)
   end
 
   def find_due_dates(type)
@@ -500,30 +591,39 @@ class Assignment < ApplicationRecord
   end
 end
 
+# This class facilitates the export of grades of team scores for an assignment. It allows additional export options 
+# such as meta review score, author feedback score, and teammate review score, which can be selected on the export view page.
 class ExportAssignment
   include Scoring
   
   attr_accessor :options
   attr_reader :parent_id, :csv
 
-  REVIEW_HYPE_MAPPING = { team: 'team_score',
-                                 metareview: 'metareview_score',
-                                 feedback: 'author_feedback_score',
-                                 teammate: 'teammate_review_score' }.freeze
+  # Mapping of review types to their corresponding CSV column headers.
+  REVIEW_HYPE_MAPPING = { review: 'review_score',
+                          teammate: 'teammate_review_score',
+                          metareview: 'metareview_score',
+                          feedback: 'author_feedback_score'
+                          }.freeze
 
-  EXPORT_FIELDS = {team_score: ['Maximum team Score', 'Minimum team score', 'Average Team score received', "Comment for submission"],
+  # Definitions for CSV export fields based on selected options.
+  EXPORT_FIELDS = {review_score: ['Maximum review score', 'Minimum review score', 'Average review score'],
     teammate_review_score: ['Maximum score from teammates', 'Minimum score from teammates', 'Average score from teammates'],
-    metareview_score: ['Maximum eeta review score', 'Minimum meta review score', 'Average meta review score'],
+    metareview_score: ['Maximum meta review score', 'Minimum meta review score', 'Average meta review score'],
     author_feedback_score: ['Maximum author feedback score', 'Minimum author feedback score', 'Average author feedback score']
      }.freeze
 
+  # Initializes an instance of the ExportAssignment class.
+  # @param csv [Object] CSV object to append data to.
+  # @param parent_id [Integer] ID of the assignment being exported.
+  # @param options [Hash] Export options selected by the user.
   def initialize(csv, parent_id, options)
     @parent_id = parent_id
     @options = options
     @csv = csv
   end
 
-  # This method is used for export contents of grade#view.  -Zhewei
+  # Main export method called from the assignment class. It compiles the scores and writes them to the CSV.
   def export
     scores = generate_data
     return @csv if scores.length == 0
@@ -531,14 +631,16 @@ class ExportAssignment
     return @csv
   end
 
-  # This method was refactored by Rajan, Jasmine, Sreenidhi on 03/31/2020
-  # Now you can add groups of fields to the hashmap
+  # Retrieves the appropriate export fields based on user-selected options.
+  # @return [Array<String>] A list of column headers for the CSV.
   def self.export_fields(options)
     @options = options
     fields = []
     fields << 'Team Name'
     fields << 'User ID'
     fields << 'Username'
+    fields << 'Grade for submission'
+    fields << 'Comment for submission'
     EXPORT_FIELDS.each do |key, value|
       next unless @options[key.to_s] == 'true'
       value.each do |f|
@@ -550,6 +652,7 @@ class ExportAssignment
 
   private
   
+  # Generates data for participants based on the assignment and its questionnaires.
   def generate_data
     assignment = Assignment.find(@parent_id)
     questions = {}
@@ -565,46 +668,48 @@ class ExportAssignment
     end
     scores = assignment.review_grades_export(assignment, questions)
   end
-
+  # Generates the CSV from the compiled scores.
   def generate_csv(scores)
     scores.each do |team_score|
-      export_participant(team_score)
+      participant(team_score)
       
     end
   end
-
-  def export_participant(team_score)
+  # Writes individual participant scores to the CSV.
+  def participant(team_score)
     
     team_score[:participants].each do |team_participant|
       csc_row = []
       csc_row.push(team_score[:team].name)
       csc_row.push(team_participant[:participant].user_id)
       csc_row.push(team_participant[:participant].user.fullname)
+      csc_row.push(team_score[:team].grade_for_submission)
+      csc_row.push(team_score[:team].comment_for_submission)
 
       REVIEW_HYPE_MAPPING.each do |key, value|
     
         if @options[value] == 'true'
           if key.to_s == 'team'
-            review_data = export_individual_review_data(key, {team: team_score})
-            append_column_to_row(review_data, csc_row)
+            score_data = individual_score_data(key, {team: team_score})
+            append_column_to_row(score_data, csc_row)
             csv_row << team_score[:team].comment_for_submission
           else
-            review_data = export_individual_review_data(key, team_participant)
-            append_column_to_row(review_data, csc_row)
+            score_data = individual_score_data(key, team_participant)
+            append_column_to_row(score_data, csc_row)
           end
         end
       end
       @csv << csc_row
     end
   end
-
-  def append_column_to_row(review_data, csc_row)
-    csc_row.push(review_data[:max])
-    csc_row.push(review_data[:min])
-    csc_row.push(review_data[:avg])
+  # Appends minimum, maximum, and average scores to the CSV row.
+  def append_column_to_row(score_data, csc_row)
+    csc_row.push(score_data[:max])
+    csc_row.push(score_data[:min])
+    csc_row.push(score_data[:avg])
   end
-
-  def export_individual_review_data(review_type, score_data)
+  # Generates individual score data for export.
+  def individual_score_data(review_type, score_data)
     review_scores = {}
     if score_data[review_type]
       review_scores[:max] = validate_display_score(score_data[review_type][:scores][:max])
@@ -617,10 +722,10 @@ class ExportAssignment
     end
     review_scores
   end
+  # Validates and formats a score for display, ensuring it's within a valid range.
   def validate_display_score(score)
     return nil if (score.nil?) || (score.kind_of?(String))
     return nil if (score > 100.0) || (score < 0.0)  || (score.to_f.nan?)
     return score.to_f.round(2)
   end
 end
-

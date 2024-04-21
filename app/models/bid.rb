@@ -1,7 +1,8 @@
 class Bid < ApplicationRecord
   belongs_to :topic, class_name: 'SignUpTopic'
   belongs_to :team
-
+  has_many :bids, through: :sign_up_topics
+  has_many :sign_up_topics, foreign_key: 'assignment_id', dependent: :destroy, inverse_of: :assignment
   # Create new bids for team based on ranks variable for each team member
   # Structure of users_bidding_info variable:
   # [[topic_1_priority, topic_2_priority, ...], [topic_1_priority, topic_2_priority, ...], ...]
@@ -28,35 +29,6 @@ class Bid < ApplicationRecord
         bidding_matrix[topic.id] << bids[index]
       end
     end
-
-
-  # Calculate the percentages of teams getting their choices for an assignment
-  def self.calculate_percentages_for_team_choices(assignment_id)
-    topics = SignUpTopic.where(assignment_id: assignment_id)
-    teams = Team.where(parent_id: assignment_id)
-
-    choice_counts = {1 => 0, 2 => 0, 3 => 0}
-    teams.each do |team|
-      # Assuming each team has a bid where priority is stored and represents their choice
-      bid = Bid.where(team_id: team.id).order(:priority).first
-      next unless bid
-
-      if bid.priority == 1
-        choice_counts[1] += 1
-      elsif bid.priority == 2
-        choice_counts[2] += 1
-      elsif bid.priority == 3
-        choice_counts[3] += 1
-      end
-    end
-
-    # Calculate percentages based on the counts
-    total_teams = teams.count.nonzero? || 1 # prevent division by zero
-    percentages = choice_counts.transform_values { |count| (count.to_f / total_teams * 100).round(2) }
-
-    percentages
-  end
-
     # Below is the structure of matrix summary
     # The first value is the number of nonzero item, the second value is the sum of priorities, the third value of the topic_id.
     # [

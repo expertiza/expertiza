@@ -1,9 +1,8 @@
 class Bid < ApplicationRecord
   belongs_to :topic, class_name: 'SignUpTopic'
   belongs_to :team
-  has_many :bids, through: :sign_up_topics
-  has_many :sign_up_topics, foreign_key: 'assignment_id', dependent: :destroy, inverse_of: :assignment
-  # Create new bids for team based on ranks variable for each team member
+
+  # Create new bids for team based on `ranks` variable for each team member
   # Structure of users_bidding_info variable:
   # [[topic_1_priority, topic_2_priority, ...], [topic_1_priority, topic_2_priority, ...], ...]
   # Currently, it is possible (already proved by db records) that
@@ -13,7 +12,7 @@ class Bid < ApplicationRecord
   # [Future work]: we need to find a better way to merge bids
   # that came from different previous teams
   def self.merge_bids_from_different_users(team_id, sign_up_topics, users_bidding_info)
-    # Select data from users_bidding_info variable and transpose it.
+    # Select data from `users_bidding_info` variable and transpose it.
     # For example, if users_bidding_infos is [[1, 0, 2, 2], [2, 1, 3, 0], [3, 2, 1, 1]]
     # transformation's result will be matrix with 4 topics (key) and corresponding priorities
     # given by 3 team members (value).
@@ -29,6 +28,7 @@ class Bid < ApplicationRecord
         bidding_matrix[topic.id] << bids[index]
       end
     end
+
     # Below is the structure of matrix summary
     # The first value is the number of nonzero item, the second value is the sum of priorities, the third value of the topic_id.
     # [

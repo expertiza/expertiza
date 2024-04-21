@@ -56,7 +56,6 @@ class LotteryController < ApplicationController
     # Extract the team names for the bids.
     bidding_teams = topic.bids.includes(:team).map { |bid| bid.team.name }
 
-      
     # Calculate the percentage of first priority bids.
     percentage_first = if total_bids > 0
                          # If there are any bids, calculate the percentage.

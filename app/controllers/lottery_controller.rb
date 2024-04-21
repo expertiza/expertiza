@@ -36,7 +36,6 @@ class LotteryController < ApplicationController
     redirect_to controller: 'tree_display', action: 'list'
   end
 
-
   # Prepares data for displaying the bidding details for each topic within an assignment.
   # It calculates the number of bids for each priority (1, 2, 3) per topic and also computes
   # the overall percentages of teams that received their first, second, and third choice.
@@ -46,7 +45,6 @@ class LotteryController < ApplicationController
     @assignment = Assignment.find(params[:id])
     # Retrieve all sign up topics associated with the assignment and include the bids for each topic.
     @topics = @assignment.sign_up_topics.includes(:bids)
-  
     # Map over each topic to create a structured hash of data needed for the view.
     @topic_data = @topics.map do |topic|
     # Count the total number of bids for the topic.
@@ -102,7 +100,6 @@ class LotteryController < ApplicationController
   def compute_percentages(priority_counts, total_teams)
     priority_counts.transform_values { |count| (count.to_f / total_teams * 100).round(2) }
   end
-
 
   # Generate user bidding information hash based on students who haven't signed up yet
   # This associates a list of bids corresponding to sign_up_topics to a user

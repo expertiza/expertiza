@@ -156,6 +156,10 @@ module SignUpSheetHelper
     def delete_signup_for_topic(assignment_id, topic_id, user_id)
       raise NotImplementedError
     end
+
+    def set_success_message_after_delete
+      raise NotImplementedError
+    end
   end
   
   class InstructorDeleteSignupAction < DeleteSignupAction
@@ -170,6 +174,9 @@ module SignUpSheetHelper
     
     def delete_signup_for_topic(assignment_id, topic_id, user_id)
       SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
+    end
+
+    def set_success_message_after_delete
       return 'You have successfully dropped the student from the topic.'
     end
   end
@@ -186,6 +193,9 @@ module SignUpSheetHelper
 
     def delete_signup_for_topic(assignment_id, topic_id, user_id)
       SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
+    end
+
+    def set_success_message_after_delete
       return 'You have successfully dropped your topic.'
     end
   end

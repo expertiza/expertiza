@@ -17,8 +17,11 @@ class Assessment360Controller < ApplicationController
     insure_existence_of(@course_participants, course)
     # hash for view
     @meta_review = {}
+    @meta_review_exists = {}
     @teammate_review = {}
+    @teammate_review_exists = {}
     @teamed_count = {}
+    @assignment_columns = {}
     # for course
     # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
     # @overall_teammate_review_count = {assgt_id1: 1, assgt_id2: 2, ...}
@@ -36,6 +39,10 @@ class Assessment360Controller < ApplicationController
         @meta_review[cp.id] = {} unless @meta_review.key?(cp.id)
         @teammate_review[cp.id] = {} unless @teammate_review.key?(cp.id)
         assignment_participant = assignment.participants.find_by(user_id: cp.user_id)
+        # initializing assignment_columns with default 0 colspan for all the columns
+        @assignment_columns[assignment.id].nil? ? @assignment_columns[assignment.id] = {} : nil
+        @assignment_columns[assignment.id]["meta_review"].nil? ? @assignment_columns[assignment.id]["meta_review"] = 0 : nil
+        @assignment_columns[assignment.id]["teammate_review"].nil? ? @assignment_columns[assignment.id]["teammate_review"] = 0 : nil
         next if assignment_participant.nil?
 
         teammate_reviews = assignment_participant.teammate_reviews
@@ -54,10 +61,20 @@ class Assessment360Controller < ApplicationController
                                  @overall_meta_review_grades,
                                  @overall_meta_review_count,
                                  @meta_review_info_per_stu)
-      end
       # calculate average grade for each student on all assignments in this course
       avg_review_calc_per_student(cp, @teammate_review_info_per_stu, @teammate_review)
       avg_review_calc_per_student(cp, @meta_review_info_per_stu, @meta_review)
+      if !@meta_review[cp.id][assignment.id].nil?
+        @meta_review_exists[assignment.id] = true
+        @assignment_columns[assignment.id]["meta_review"] = 1
+      end
+      # If teammate review exists for particular assignment then update teammate_review_exist to true
+      # and make assignment_columns as 1 to add to colspan
+      if !@teammate_review[cp.id][assignment.id].nil?
+        @teammate_review_exists[assignment.id] = true
+        @assignment_columns[assignment.id]["teammate_review"] = 1
+      end
+    end
     end
     # avoid divide by zero error
     overall_review_count(@assignments, @overall_teammate_review_count, @overall_meta_review_count)

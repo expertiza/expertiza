@@ -206,8 +206,7 @@ class AssignmentForm
         # get deadline for review
         @has_errors = true unless dd.update_attributes(due_date)
       end
-      # calling the full_messages method instead of to_s method
-      @errors += @assignment.errors.full_messages if @has_errors
+      @errors += @assignment.errors.to_s if @has_errors
     end
   end
 

@@ -63,7 +63,7 @@ RSpec.describe ExportFileController do
   end
   describe '#export' do
     context 'when exporting data for User' do
-      let(:csv_string)  { "Users\nname,full name,email,role,parent,email on submission,email on review,email on metareview,copy of emails,preference home flag,handle\nabc,abc xyz,abcxyz@gmail.com,true,true,false,true,handle\n" }
+      let(:csv_string)  { "name,full name,email,role,parent,email on submission,email on review,email on metareview,copy of emails,preference home flag,handle\nabc,abc xyz,abcxyz@gmail.com,true,true,false,true,handle\n" }
       let(:csv_options) { {type: 'text/csv; charset=iso-8859-1; header=present',
           disposition: "attachment; filename=User1.csv"} }
 
@@ -85,7 +85,7 @@ RSpec.describe ExportFileController do
       end    
     end
     context 'when exporting data for Assignment' do
-      let(:csv_string)  { "Grades for submission\nTeam Name,User ID,Username,Grade for submission,Comment for submission,Maximum review score,Minimum review score,Average review score,Maximum score from teammates,Minimum score from teammates,Average score from teammates\n" }
+      let(:csv_string)  { "Team Name,User ID,Username,Grade for submission,Comment for submission,Maximum review score,Minimum review score,Average review score,Maximum score from teammates,Minimum score from teammates,Average score from teammates\n" }
       let(:csv_options) { {type: 'text/csv; charset=iso-8859-1; header=present',
                           disposition: "attachment; filename=Assignment843.csv"} }
 
@@ -106,7 +106,7 @@ RSpec.describe ExportFileController do
       end
     end
     context 'when exporting data for Signup Topic' do
-      let(:csv_string)  { "Sign Up Topics\nTopic Id,Topic Names,Participants\n" }
+      let(:csv_string)  { "Topic Id,Topic Names,Participants\n" }
       let(:csv_options) { {type: 'text/csv; charset=iso-8859-1; header=present',
                           disposition: "attachment; filename=SignUpTopic843.csv"} }
 
@@ -128,7 +128,7 @@ RSpec.describe ExportFileController do
       end
     end
     context 'when exporting data for AssignmentTeam' do
-      let(:csv_string)  { "Assignment Teams\nAssignment Name,Team Name,Team members\n" }
+      let(:csv_string)  { "Assignment Name,Team Name,Team members\n" }
       let(:csv_options) { {type: 'text/csv; charset=iso-8859-1; header=present',
                           disposition: "attachment; filename=AssignmentTeam843.csv"} }
 
@@ -150,7 +150,7 @@ RSpec.describe ExportFileController do
       end
     end
     context 'when exporting data for CourseTeam' do
-      let(:csv_string)  { "Course Teams\nCourse Name,Team Name,Team members\n" }
+      let(:csv_string)  { "Course Name,Team Name,Team members\n" }
       let(:csv_options) { {type: 'text/csv; charset=iso-8859-1; header=present',
                           disposition: "attachment; filename=CourseTeam230.csv"} }
 

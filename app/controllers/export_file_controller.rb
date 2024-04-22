@@ -76,7 +76,6 @@ class ExportFileController < ApplicationController
                         TagPromptDeployment]
     csv_data = CSV.generate(col_sep: delimiter) do |csv|
       if allowed_models.include? params[:model]
-        csv << [TITLES[params[:model]]]
         csv << Object.const_get(params[:model]).export_fields(params[:options])
         Object.const_get(params[:model]).export(csv, params[:id], params[:options])
       end

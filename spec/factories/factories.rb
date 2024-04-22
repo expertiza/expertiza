@@ -14,8 +14,11 @@ FactoryBot.define do
   end 
 
   factory :review_bid, class: ReviewBid do
-    priority 2
-    signuptopic_id 123
+    participant
+    assignment
+    priority { [1, 2, 3].sample }
+    signuptopic { association :signup_topic }
+    updated_at { Time.now }
   end
 
   factory :role_of_administrator, class: Role do
@@ -199,7 +202,7 @@ FactoryBot.define do
     # Help multiple factory-created assignments get unique names
     # Let the first created assignment have the name 'final2' to avoid breaking some fragile existing tests
     name { (Assignment.last ? ('assignment' + (Assignment.last.id + 1).to_s) : 'final2').to_s }
-    directory_path 'final_test'
+    sequence(:directory_path) { |n| "/path/to/assignment_#{n}" }
     submitter_count 0
     course { Course.first || association(:course) }
     instructor { Instructor.first || association(:instructor) }
@@ -288,9 +291,8 @@ FactoryBot.define do
   end
 
   factory :team, class: Team do
-    id 1
-    name 'testteam'
-    parent_id 1
+    sequence(:name) { |n| "Test Team #{n}" }
+    parent_id { nil }
   end
 
   factory :invitation, class: Invitation do
@@ -305,19 +307,18 @@ FactoryBot.define do
     created_at '2020-03-24 12:10:20'
     updated_at '2020-03-24 12:10:20'
   end
-  factory :topic, class: SignUpTopic do
+  factory :signup_topic, class: SignUpTopic do
     topic_name 'Hello world!'
     assignment { Assignment.first || association(:assignment) }
     max_choosers 1
     category nil
-    topic_identifier '1'
-    micropayment 0
+    sequence(:topic_identifier) { |n| "Topic#{n % 1000}" }
     private_to nil
   end
 
   factory :signed_up_team, class: SignedUpTeam do
     topic { SignUpTopic.first || association(:topic) }
-    team_id 1
+    team { create(:team) }
     is_waitlisted false
     preference_priority_number nil
   end

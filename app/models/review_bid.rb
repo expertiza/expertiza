@@ -8,6 +8,9 @@ class ReviewBid < ApplicationRecord
   # student_ids, topic_ids, student_preferences, topic_preferences, max reviews allowed
 
   def self.bidding_data(assignment_id, reviewer_ids)
+    # Return early or set default if reviewer_ids is nil
+    return { 'tid' => [], 'users' => {}, 'max_accepted_proposals' => nil } if reviewer_ids.nil? or assignment_id.nil?
+    
     # create basic hash and set basic hash data
     bidding_data = { 'tid' => [], 'users' => {}, 'max_accepted_proposals' => [] }
     topic_ids_with_team = SignedUpTeam.where.not(team_id: nil).pluck(:topic_id)
@@ -22,7 +25,7 @@ class ReviewBid < ApplicationRecord
   end
 
   # assigns topics to reviews as matched by the webservice algorithm
-  def self.assign_review_topics(assignment_id, reviewer_ids, matched_topics, _min_num_reviews = 2)
+  def self.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
     # if review response map already created, delete it
     if ReviewResponseMap.where(reviewed_object_id: assignment_id)
       ReviewResponseMap.where(reviewed_object_id: assignment_id).destroy_all
@@ -55,7 +58,7 @@ class ReviewBid < ApplicationRecord
     self_topic = SignedUpTeam.topic_id(assignment_id, reviewer_user_id)
     bidding_data = { 'tid' => [], 'otid' => self_topic, 'priority' => [], 'time' => [] }
     bids = ReviewBid.where(participant_id: reviewer_id)
-
+    #puts "Debug: Bids found - #{bids.map(&:signuptopic_id)}"
     # loop through each bid for a topic to get specific data
     bids.each do |bid|
       bidding_data['tid'] << bid.signuptopic_id

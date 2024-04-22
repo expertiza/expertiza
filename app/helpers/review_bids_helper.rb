@@ -27,5 +27,4 @@ module ReviewBidsHelper
     red = (400 * (Math.tanh(2 * (num_bids / num_participants.to_f) - 1) + 1) / 2).to_i.to_s
     'rgb(' + red + ',' + green + ',0)'
   end
-
 end

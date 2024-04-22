@@ -261,9 +261,11 @@ class Team < ApplicationRecord
       # Append team members' names if options[:team_name] is false
       if options[:team_name] == 'false'
         team_members = TeamsUser.where(team_id: team.id)
+        members = []
         team_members.each do |user|
-          output.push(user.name)
+          members.push(user.name)
         end
+        output.push(members.join(' '))
       end
       # Append the output array to the CSV
       csv << output

@@ -54,7 +54,7 @@ to display the label "Your team" in the student assignment tasks-->
         <%=t ".view_team" %>
   <% end %>
 
-  <!--Your work-->
+ <!--Your work-->
   <% if @authorization == 'participant' || @can_submit == true %>
     <li>
       <% if @assignment.max_team_size <= 1 || @team %>

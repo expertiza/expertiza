@@ -4,7 +4,13 @@ describe 'Assignment creation topics tab' do
   include AssignmentCreationHelper
   # This block runs before each test to set up the environment
   before(:each) do
-    setup_assignment_test_environment
+    create_deadline_types
+    (1..3).each { |i| create(:course, name: "Course #{i}") }
+    @assignment = create(:assignment, name: 'assignment for late policy test')
+    login_as('instructor6')
+    visit "/assignments/#{@assignment.id}/edit"
+    check('assignment_form_assignment_calculate_penalty', allow_label_click: true)
+    click_link 'Due dates'
   end
 
   # Test to ensure no flash error message is displayed on the New Late Policy Page
@@ -41,17 +47,4 @@ describe 'Assignment creation topics tab' do
     click_link 'Back'
     expect(page).to have_current_path("/assignments/#{@assignment.id}/edit")
   end
-
-  private
-
-  def setup_assignment_test_environment
-    create_deadline_types
-    (1..3).each { |i| create(:course, name: "Course #{i}") }
-    @assignment = create(:assignment, name: 'assignment for late policy test')
-    login_as('instructor6')
-    visit "/assignments/#{@assignment.id}/edit"
-    check('assignment_form_assignment_calculate_penalty', allow_label_click: true)
-    click_link 'Due dates'
-  end
-
 end

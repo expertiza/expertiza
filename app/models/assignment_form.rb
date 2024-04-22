@@ -102,7 +102,6 @@ class AssignmentForm
       # Update AQ if found, otherwise create new entry
       attributes.each do |attr|
         next if attr[:questionnaire_id].blank?
-
         questionnaire_type = Questionnaire.find(attr[:questionnaire_id]).type
         topic_id = attr[:topic_id] if attr.key?(:topic_id)
         duty_id = attr[:duty_id] if attr.key?(:duty_id) # if duty_id is present in the attributes, save it.

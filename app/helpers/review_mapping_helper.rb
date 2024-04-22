@@ -1,143 +1,119 @@
-module ReviewMappingHelperreviewer_id
-  def render_report_table_header(headers = {})
+module ReviewMappingHelper
+  def create_report_table_header(headers = {})
     render partial: 'report_table_header', locals: { headers: headers }
   end
 
   #
   # gets the response map data such as reviewer id, reviewed object id and type for the review report
   #
- # Modify get_data_for_review_report method to organize data and return it in a structured format
-def retrieve_data_for_review_report(assignment_id, reviewer_id, type)
-  # Extract necessary data for each component of the review report
-  reviewer = Participant.find(reviewer_id)
-  review_rounds = (1..@assignment.num_review_rounds).map do |round|
-    instance_variable_get("@review_in_round_#{round}")
+  def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
+    rspan = 0
+    (1..@assignment.num_review_rounds).each { |round| instance_variable_set('@review_in_round_' + round.to_s, 0) }
+
+    response_maps = ResponseMap.where(['reviewed_object_id = ? AND reviewer_id = ? AND type = ?', reviewed_object_id, reviewer_id, type])
+    response_maps.each do |ri|
+      rspan += 1 if Team.exists?(id: ri.reviewee_id)
+      responses = ri.response
+      (1..@assignment.num_review_rounds).each do |round|
+        instance_variable_set('@review_in_round_' + round.to_s, instance_variable_get('@review_in_round_' + round.to_s) + 1) if responses.exists?(round: round)
+      end
+    end
+    [response_maps, rspan]
   end
-  response_maps, rspan = get_data_for_response_maps(assignment_id, reviewer_id, type)
-
-  # Return structured data
-  {
-    reviewer: reviewer,
-    review_rounds: review_rounds,
-    response_maps: response_maps,
-    rspan: rspan
-  }
-end
-
 
   #
   # gets the team name's color according to review and assignment submission status
   #
- # Method to get team color based on review and assignment submission status
- def determine_team_color(response_map)
-  assignment_created = @assignment.created_at
-  assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
-
-  if Response.exists?(map_id: response_map.id)
-    if !response_map.try(:reviewer).try(:review_grade).nil?
-      'brown' # Review grade assigned
-    elsif response_for_each_round?(response_map)
-      'blue' # Review completed for each round
+  def get_team_color(response_map)
+    # Storing redundantly computed value in a variable
+    assignment_created = @assignment.created_at
+    # Storing redundantly computed value in a variable
+    assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
+    # Returning colour based on conditions
+    if Response.exists?(map_id: response_map.id)
+      if !response_map.try(:reviewer).try(:review_grade).nil?
+        'brown'
+      elsif response_for_each_round?(response_map)
+        'blue'
+      else
+        obtain_team_color(response_map, assignment_created, assignment_due_dates)
+      end
     else
-      obtain_team_color(response_map, assignment_created, assignment_due_dates)
-    end
-  else
-    'red' # No review submitted
-  end
-end
-
-# Method to obtain team color based on specific conditions
-def obtain_team_color(response_map, assignment_created, assignment_due_dates)
-  color = []
-
-  (1..@assignment.num_review_rounds).each do |round|
-    check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
-  end
-
-  color[-1]
-end
-
-def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
-  if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
-    color.push 'purple'
-  else
-    link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
-    if link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
-      color.push 'green'
-    else
-      link_updated_at = get_link_updated_at(link)
-      color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
+      'red'
     end
   end
-end
-# Method to check if a review was submitted in every round
-def check_review_completion(response_map)
-  num_responses = 0
-  total_num_rounds = @assignment.num_review_rounds
 
-  (1..total_num_rounds).each do |round|
-    num_responses += 1 if Response.exists?(map_id: response_map.id, round: round)
+  # loops through the number of assignment review rounds and obtains the team colour
+  def obtain_team_color(response_map, assignment_created, assignment_due_dates)
+    color = []
+    (1..@assignment.num_review_rounds).each do |round|
+      check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+    end
+    color[-1]
   end
 
-  num_responses == total_num_rounds
-end
-
-
-# Method to check if a work was submitted within a given round
-def submission_within_round(round, response_map, assignment_created, assignment_due_dates)
-  submission_due_date = assignment_due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
-  submission = SubmissionRecord.where(team_id: response_map.reviewee_id, operation: ['Submit File', 'Submit Hyperlink'])
-  subm_created_at = submission.where(created_at: assignment_created..submission_due_date)
-
-  if round > 1
-    submission_due_last_round = assignment_due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
-    subm_created_at = submission.where(created_at: submission_due_last_round..submission_due_date)
-  end
-
-  !subm_created_at.try(:first).try(:created_at).nil?
-end
-
-# Method to get team color based on submission status
-def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
-  if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
-    color.push 'purple' # Submission within round
-  else
-    link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
-
-    if link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # Check if link is updated
-      color.push 'green' # No submission or link not updated
+  # checks the submission state within each round and assigns team colour
+  def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+    if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
+      color.push 'purple'
     else
-      link_updated_at = get_link_updated_at(link)
-      color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
+      link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
+      if link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
+        color.push 'green'
+      else
+        link_updated_at = get_link_updated_at(link)
+        color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
+      end
     end
   end
-end
 
-# Method to check if a link was updated since last round submission
-def check_link_updated_since_last_round(round, due_dates, link_updated_at)
-  submission_due_date = due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
-  submission_due_last_round = due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
+  # checks if a review was submitted in every round and gives the total responses count
+  def response_for_each_round?(response_map)
+    num_responses = 0
+    total_num_rounds = @assignment.num_review_rounds
+    (1..total_num_rounds).each do |round|
+      num_responses += 1 if Response.exists?(map_id: response_map.id, round: round)
+    end
+    num_responses == total_num_rounds
+  end
 
-  (link_updated_at < submission_due_date) && (link_updated_at > submission_due_last_round)
-end
+  # checks if a work was submitted within a given round
+  def submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
+    submission_due_date = assignment_due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
+    submission = SubmissionRecord.where(team_id: response_map.reviewee_id, operation: ['Submit File', 'Submit Hyperlink'])
+    subm_created_at = submission.where(created_at: assignment_created..submission_due_date)
+    if round > 1
+      submission_due_last_round = assignment_due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
+      subm_created_at = submission.where(created_at: submission_due_last_round..submission_due_date)
+    end
+    !subm_created_at.try(:first).try(:created_at).nil?
+  end
 
-# Method to get the last modified date of a link
-def fetch_link_updated_at(link)
-  uri = URI(link)
-  res = Net::HTTP.get_response(uri)['last-modified']
-  res.to_time
-end
-end
+  # returns hyperlink of the assignment that has been submitted on the due date
+  def submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
+    submission_due_date = assignment_due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
+    subm_hyperlink = SubmissionRecord.where(team_id: response_map.reviewee_id, operation: 'Submit Hyperlink')
+    submitted_h = subm_hyperlink.where(created_at: assignment_created..submission_due_date)
+    submitted_h.try(:last).try(:content)
+  end
+
+  # returns last modified header date
+  # only checks certain links (wiki)
+  def get_link_updated_at(link)
+    uri = URI(link)
+    res = Net::HTTP.get_response(uri)['last-modified']
+    res.to_time
+  end
 
   # checks if a link was updated since last round submission
-  def check_link_updated_since_last_round(round, due_dates, link_updated_at)
+  def link_updated_since_last?(round, due_dates, link_updated_at)
     submission_due_date = due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
     submission_due_last_round = due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
     (link_updated_at < submission_due_date) && (link_updated_at > submission_due_last_round)
   end
 
   # For assignments with 1 team member, the following method returns user's fullname else it returns "team name" that a particular reviewee belongs to.
-  def get_reviewed_entity_name(max_team_size, _response, reviewee_id, ip_address)
+  def get_team_reviewed_link_name(max_team_size, _response, reviewee_id, ip_address)
     team_reviewed_link_name = if max_team_size == 1
                                 TeamsUser.where(team_id: reviewee_id).first.user.fullname(ip_address)
                               else
@@ -160,24 +136,22 @@ end
 
   # gets the review score awarded based on each round of the review
 
-  def fetch_awarded_review_score(reviewer_id, team_id)
+  def get_awarded_review_score(reviewer_id, team_id)
+    # Storing redundantly computed value in num_rounds variable
     num_rounds = @assignment.num_review_rounds
-    
-    # Loop through each round
+    # Setting values of instance variables
+    (1..num_rounds).each { |round| instance_variable_set('@score_awarded_round_' + round.to_s, '-----') }
+    # Iterating through list
     (1..num_rounds).each do |round|
-      # Check if the score exists for the current round and team
+      # Changing values of instance variable based on below condition
       if @review_scores[reviewer_id] && @review_scores[reviewer_id][round] && @review_scores[reviewer_id][round][team_id] && @review_scores[reviewer_id][round][team_id] != -1.0
-        # If score exists, set it to the respective instance variable
-        instance_variable_set("@score_awarded_round_#{round}", @review_scores[reviewer_id][round][team_id].to_s + '%')
-      else
-        # If score doesn't exist, set a default value
-        instance_variable_set("@score_awarded_round_#{round}", '-----')
+        instance_variable_set('@score_awarded_round_' + round.to_s, @review_scores[reviewer_id][round][team_id].to_s + '%')
       end
     end
   end
 
   # gets minimum, maximum and average grade value for all the reviews present
-  def compute_review_metrics(round, team_id)
+  def review_metrics(round, team_id)
     %i[max min avg].each { |metric| instance_variable_set('@' + metric.to_s, '-----') }
     if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? { |k| @avg_and_ranges[team_id][round].key? k }
       %i[max min avg].each do |metric|
@@ -187,7 +161,7 @@ end
     end
   end
 
-  # # sorts the reviewers by the average volume of reviews in each round, in descending order
+  # sorts the reviewers by the average volume of reviews in each round, in descending order
   # def sort_reviewer_by_review_volume_desc
   #   @reviewers.each do |r|
   #     # get the volume of review comments
@@ -250,23 +224,8 @@ def calculate_reviewer_metric(metric, reviewer)
   end
 end
 
-# Calculate the average metric values per round across all reviewers
-def calculate_average_metric_per_round(metric)
-  num_rounds = @assignment.num_review_rounds.to_f.to_i
-  all_reviewers_avg_metric_per_round = []
-
-  num_rounds.times do |round|
-    # Calculate the average metric value for each round
-    avg_metric_value = @reviewers.inject(0) { |sum, r| sum + r.avg_metric_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length)
-    all_reviewers_avg_metric_per_round.push(avg_metric_value)
-  end
-
-  all_reviewers_avg_metric_per_round
-end
-
-
   # moves data of reviews in each round from a current round
-  def initialize_chart_data(reviewer)
+  def initialize_chart_elements(reviewer)
     round = 0
     labels = []
     reviewer_data = []
@@ -393,7 +352,7 @@ end
   end
 
   # Calculate mean, min, max, variance, and stand deviation for tagging intervals
-  def compute_key_chart_information(intervals)
+  def calculate_key_chart_information(intervals)
     # if someone did not do any tagging in 30 seconds, then ignore this interval
     threshold = 30
     interval_precision = 2 # Round to 2 Decimal Places
@@ -442,7 +401,7 @@ end
   end
 
   # gets review and feedback responses for all rounds for the feedback report
-  def fetch_each_review_and_feedback_response_map(author)
+  def get_each_review_and_feedback_response_map(author)
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     # Calculate how many responses one team received from each round
     # It is the feedback number each team member should make
@@ -467,7 +426,7 @@ end
   end
 
   # gets review and feedback responses for a certain round for the feedback report
-  def fetch_certain_review_and_feedback_response_map(author)
+  def get_certain_review_and_feedback_response_map(author)
     # Setting values of instance variables
     @feedback_response_maps = FeedbackResponseMap.where(['reviewed_object_id IN (?) and reviewer_id = ?', @all_review_response_ids, author.id])
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
@@ -479,7 +438,7 @@ end
   #
   # for calibration report
   #
-  def determine_css_style_for_calibration_report(diff)
+  def get_css_style_for_calibration_report(diff)
     # diff - difference between stu's answer and instructor's answer
     dict = { 0 => 'c5', 1 => 'c4', 2 => 'c3', 3 => 'c2' }
     css_class = if dict.key?(diff.abs)

@@ -5,7 +5,7 @@ describe ReviewMappingHelper, type: :helper do
   let(:team) { build(:assignment_team, id: 1) }
   let(:test_item) { build(:answer, id: 1, comments: 'https://wiki.archlinux.org/') }
   let(:test_response) { build(:response, id: 1) }
-  describe 'determine_team_color' do
+  describe 'get_team_color' do
     before(:each) do
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
       @reviewer = create(:participant, review_grade: nil)
@@ -147,7 +147,7 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  describe 'submission_within_round' do
+  describe 'response_for_each_round?' do
     before(:each) do
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
       @reviewer = create(:participant, review_grade: nil)
@@ -250,7 +250,7 @@ describe ReviewMappingHelper, type: :helper do
   end
 
   # round, response_map, assignment_created, assignment_due_dates
-  describe 'check_submission_state' do
+  describe 'submitted_within_round?' do
     before(:each) do
       @assignment = create(:assignment, name: 'assignment', created_at: DateTime.now.in_time_zone - 13.day)
       @reviewer = create(:participant, review_grade: nil)
@@ -339,7 +339,7 @@ describe ReviewMappingHelper, type: :helper do
   end
 
   # round, response_map, assignment_created, assignment_due_dates
-  describe 'check_link_updated_since_last_round' do
+  describe 'submitted_hyperlink' do
     before(:each) do
       @assignment = create(:assignment, name: 'assignment', created_at: DateTime.now.in_time_zone - 13.day)
       @reviewer = create(:participant, review_grade: nil)
@@ -406,7 +406,7 @@ describe ReviewMappingHelper, type: :helper do
   end
 
   # input max_team_size, response, reviewee_id, ip_address
-  describe 'get_reviewed_entity_name' do
+  describe 'get_team_reviewed_link_name' do
     before(:each) do
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
       @reviewer = create(:participant, review_grade: nil)
@@ -727,7 +727,7 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  describe 'fetch_awarded_review_score' do
+  describe 'get_awarded_review_score' do
     before(:each) do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -747,7 +747,7 @@ describe ReviewMappingHelper, type: :helper do
 
       @review_scores = { @reviewer.id => { 1 => { @reviewee.id => 10 }, 2 => { @reviewee.id => 20 }, 3 => { @reviewee.id => 30 } } }
 
-      rded_review_score(@reviewer.id, @reviewee.id)
+      get_awarded_review_score(@reviewer.id, @reviewee.id)
     end
 
     it 'should return the review score given by a reviewer for round 1 for the defined team' do
@@ -764,7 +764,7 @@ describe ReviewMappingHelper, type: :helper do
   end
 
   # rspec test for link_updated_since_last? method
-  describe 'check_link_updated_since_last_round' do
+  describe 'link_updated_since_last?' do
     before(:each) do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -888,7 +888,7 @@ describe ReviewMappingHelper, type: :helper do
   end
 
   # rspec test for review_metrics method
-  describe 'compute_review_metrics' do
+  describe 'review_metrics' do
     before(:each) do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -967,7 +967,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(@avg).to eq '9%'
     end
   end
-  describe 'test compute_key_chart_information' do
+  describe 'test calculate_key_chart_information' do
     it 'should return new Hash if intervals are not empty' do
       intervals = [1.00, 2.00, 3.00, 4.00, 5.00, 6.00]
       result = helper.calculate_key_chart_information(intervals)
@@ -980,7 +980,7 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  describe 'test compute_key_chart_information' do
+  describe 'test calculate_key_chart_information' do
     it 'should return nil if intervals are empty' do
       intervals = []
       result = helper.calculate_key_chart_information(intervals)
@@ -988,7 +988,7 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  describe 'test determine_css_style_for_calibration_report' do
+  describe 'test get_css_style_for_calibration_report' do
     it 'should return correct css class' do
       css_class_0 = helper.get_css_style_for_calibration_report(0)
       css_class_1 = helper.get_css_style_for_calibration_report(-1)
@@ -1053,6 +1053,19 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
+  describe ReviewMappingHelper do
+    describe "#create_report_table_header" do
+      it "renders the report table header partial with given headers" do
+        # Mock the necessary objects and expectations
+        headers = { key1: 'Header 1', key2: 'Header 2' }
+        allow(self).to receive(:render).with(partial: 'report_table_header', locals: { headers: headers }).and_return("Rendered header")
+        
+        # Call the method and expect the correct rendering
+        expect(create_report_table_header(headers)).to eq("Rendered header")
+      end
+    end
+  end
+
   describe 'test list_hyperlink_submission' do
     before(:each) do
       @assignment1 = create(:assignment, name: 'name1')
@@ -1071,3 +1084,8 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 end
+
+
+
+
+

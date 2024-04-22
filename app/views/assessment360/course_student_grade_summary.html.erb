@@ -1,5 +1,4 @@
 <style>
-
   table {
     border-collapse: collapse;
     width: 100%;
@@ -10,17 +9,21 @@
   }
 
   td.topic {
-    display:inline-block;
     margin-top: -1px;
     white-space:nowrap;
     position:relative; /* must be relative */
     width:250px; /* fit to table cell width */
     overflow:hidden;
   }
+
+  /* used to toggle visibility of columns */
+  .visibility {
+    display: none;
+  }
 </style>
 
 <script>
-    $(function() {
+$(function() {
         /*Function for sorting the table */
         $(".sortable").tablesorter({
             sortList: [[0,0]] // sort by Student name
@@ -28,22 +31,35 @@
     });
 </script>
 
+<p><b>Hide/Unhide Columns:</b></p>
+<input type="checkbox" value="show-hide" checked="checked" id="topic-box"> Topic &emsp;&emsp;
+<input type="checkbox" value="show-hide" checked="checked" id="peer-score-box"> Peer Score &emsp;&emsp;
+<input type="checkbox" value="show-hide" checked="checked" id="meta-box"> Meta reviews &emsp;&emsp;
+<input type="checkbox" value="show-hide" checked="checked" id="number-teammates-box"> No. of Teammates &emsp;&emsp;
+<input type="checkbox" value="show-hide" checked="checked" id="instr-grade-box"> Instructor Grade
+
 <table class="table table-striped sortable">
   <thead>
     <tr>
       <th rowspan=2 width="320" class="sorter-true">Students</th>
       <% @assignments.each do |assignment| %>
-        <th colspan=3 class="sorter-false"> <%= assignment.name %> </th>
+        <!-- check if at least one column is not nil for particular assignment  -->
+        <% if !@topics_present[assignment.id].nil? || !@peer_review_scores_present[assignment.id].nil? || !@assignment_grades_present[assignment.id].nil? %>
+          <!-- total colspan is calculated as sum of assignment_columns for all columns -->
+          <th colspan="<%= @assignment_category[assignment.id]["topics"] + @assignment_category[assignment.id]["peer_review"] + @assignment_category[assignment.id]["assignment_grade"] %>" class="sorter-false assignment-header" id="<%= assignment.id %>"> <%= assignment.name %> </th>
+        <% end %>
       <% end %>
-      <th colspan=2>Final Grades</th>
+      <th colspan=2 id="final-grade-header">Final Grades</th>
     </tr>
     <tr>
-      <% (1..@assignments.size).each do %>
-        <th><b>Topic</b></th>
-        <th><b>Peer Score</b></th>
-        <th><b>Instructor Grade</b></th>
+      <% @assignments.each do |assignment| %>
+        <!-- header is hidden or visible based on the check for existence of data -->
+        <% if !@topics_present[assignment.id].nil? %> <th class="topics" id="topics-<%= assignment.id %>"><b>Topic</b></th> <% end %>
+        <% if !@peer_review_scores_present[assignment.id].nil? %> <th class="peerScores" id="peerScores-<%= assignment.id %>"><b>Peer Score</b></th> <% end %>
+        <% if !@assignment_grades_present[assignment.id].nil? %> <th class="intructorGrades" id="intructorGrades-<%= assignment.id %>"><b>Instructor Grade</b></th> <% end %>
     <% end %>
-      <th class="sorter-true"><b>Total Instructor Grade</b></th>
+      <th class="sorter-true intructorGrades"><b>Total Instructor Grade</b></th>
+      <th class="sorter-true peerScores"><b>Average Peer Score</b></th>
     </tr>
   </thead>
 
@@ -51,15 +67,113 @@
       <tr>
           <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
           <% @assignments.each do |assignment|%>
+              <!-- value is hidden or visible based on the check for existence of data -->
+              <% if !@topics_present[assignment.id].nil? %>
               <% topic = format_topic(@topics[cp.id][assignment.id]) %>
-              <td title="<%= topic %>" class="topic topic-tooltip">
+              <td title="<%= topic %>" class="topic topic-tooltip topics">
                 <%= topic %>
               </td>
-              <td><%= format_score(@peer_review_scores[cp.id][assignment.id]) %></td>
-              <td><%= format_score(@assignment_grades[cp.id][assignment.id]) %> </td>
+              <% end %>
+              <% if !@peer_review_scores_present[assignment.id].nil? %> <td class="peerScores"><%= format_score(@peer_review_scores[cp.id][assignment.id]) %></td> <% end %>
+              <% if !@assignment_grades_present[assignment.id].nil? %> <td class="intructorGrades"><%= format_score(@assignment_grades[cp.id][assignment.id]) %> </td> <% end %>
           <% end %>
 
-          <td><%= @final_grades[cp.id] %></td>
+          <td class="intructorGrades"><%= @total_grade[cp.id] > 0 ? @final_grades[cp.id] : '--'  %></td>
+          <td class="peerScores"><%= @number_of_peer_reviews[cp.id] > 0 ? @avg_peer_review_score[cp.id]/@number_of_peer_reviews[cp.id] : '--' %></td>
       </tr>
   <% end %>
 </table>
+
+<script>
+    // get all the elements that are related to topics
+    const topicClasses = document.querySelectorAll('.topics');
+    // get all the elements that are related to peer scores
+    const peerScoreClasses = document.querySelectorAll('.peerScores');
+    // get all the elements that are related to instructor grade
+    const intructorGradeClasses = document.querySelectorAll('.intructorGrades');
+
+    // get final grader header element to dynamically vary colspan
+    finalGradeHeader = document.getElementById("final-grade-header");
+    finalGradeColSpan = 2;
+    // get all assignment headers to dynamically vary colspan
+    assignmentHeaderClasses = document.querySelectorAll(".assignment-header");
+
+    // when topic checkbox is changed
+    topicCheckBox = document.getElementById('topic-box');
+    topicCheckBox.addEventListener('change', function() {
+      // all elements related to topic are made visible/hidden
+      topicClasses.forEach(el => {
+            el.classList.toggle('visibility');
+            })
+      // colspan is calculated and updated for that particular assignment
+      assignmentHeaderClasses.forEach(el => {
+            assignmentColSpan = Number(el.getAttribute("colspan"));
+            this.checked ? assignmentColSpan += 1 : assignmentColSpan -= 1;
+            var element =  document.getElementById('topics-'+el.id);
+            if (typeof(element) != 'undefined' && element != null){
+              el.setAttribute("colspan", assignmentColSpan);
+              if (assignmentColSpan > 0){
+                el.style.display = null;
+              }
+              else {
+                el.style.display = "none";
+              }
+            }
+            })
+    });
+
+    // when peer score checkbox is changed
+    peerScoreCheckBox = document.getElementById('peer-score-box');
+    peerScoreCheckBox.addEventListener('change', function() {
+      // colspan is calculated and updated for that final grade header
+      this.checked ? finalGradeColSpan += 1 : finalGradeColSpan -= 1;
+      finalGradeHeader.setAttribute("colspan", finalGradeColSpan);
+      // all elements related to peer scores are made visible/hidden
+      peerScoreClasses.forEach(el => {
+            el.classList.toggle('visibility');
+            });
+      // colspan is calculated and updated for that particular assignment
+      assignmentHeaderClasses.forEach(el => {
+            assignmentColSpan = Number(el.getAttribute("colspan"));
+            this.checked ? assignmentColSpan += 1 : assignmentColSpan -= 1;
+            var element =  document.getElementById('peerScores-'+el.id);
+            if (typeof(element) != 'undefined' && element != null){
+              el.setAttribute("colspan", assignmentColSpan);
+              if (assignmentColSpan > 0){
+                el.style.display = null;
+              }
+              else {
+                el.style.display = "none";
+              }
+            }
+            });
+    });
+
+    // when instructor grade checkbox is changed
+    instructorGradeCheckBox = document.getElementById('instr-grade-box');
+    instructorGradeCheckBox.addEventListener('change', function() {
+      // colspan is calculated and updated for that final grade header
+      this.checked ? finalGradeColSpan += 1 : finalGradeColSpan -= 1;
+      finalGradeHeader.setAttribute("colspan", finalGradeColSpan);
+      // all elements related to instructor grades are made visible/hidden
+      intructorGradeClasses.forEach(el => {
+            el.classList.toggle('visibility');
+            });
+      // colspan is calculated and updated for that particular assignment
+      assignmentHeaderClasses.forEach(el => {
+            assignmentColSpan = Number(el.getAttribute("colspan"));
+            this.checked ? assignmentColSpan += 1 : assignmentColSpan -= 1;
+            var element =  document.getElementById("intructorGrades-"+el.id);
+            if (typeof(element) != 'undefined' && element != null){
+              el.setAttribute("colspan", assignmentColSpan);
+              if (assignmentColSpan > 0){
+                el.style.display = null;
+              }
+              else {
+                el.style.display = "none";
+              }
+            }
+            });
+    });
+    
+</script>

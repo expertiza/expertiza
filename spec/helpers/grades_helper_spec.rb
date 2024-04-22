@@ -237,8 +237,8 @@ describe GradesHelper, type: :helper do
   # describe 'view_heatgrid' do
   #   context 'when all questionnaires do not match the target type' do
   #     it 'render the view with empty list of  VmQuestionResponse' do
-  #       allow_any_instance_of(Assignment).to receive(:participants).and_return(assignemnt_with_participants.participants)
-  #       allow(assignemnt_with_participants.participants).to receive(:find_by).and_return(participant)
+  #       allow_any_instance_of(Assignment).to receive(:participants).and_return(assignment_with_participants.participants)
+  #       allow(assignment_with_participants.participants).to receive(:find_by).and_return(participant)
   #       # mock the participant for the  AssignmentParticipant.find
   #       allow(AssignmentParticipant).to receive(:find).with(1).and_return(assignment_participant)
   #       allow(assignment_participant).to receive(:team).and_return(team)
@@ -254,8 +254,8 @@ describe GradesHelper, type: :helper do
   #   end
   #   context 'when all questionnaires match the target type' do
   #     it 'render the view with nonempty list of  VmQuestionResponse' do
-  #       allow_any_instance_of(Assignment).to receive(:participants).and_return(assignemnt_with_participants.participants)
-  #       allow(assignemnt_with_participants.participants).to receive(:find_by).and_return(participant)
+  #       allow_any_instance_of(Assignment).to receive(:participants).and_return(assignment_with_participants.participants)
+  #       allow(assignment_with_participants.participants).to receive(:find_by).and_return(participant)
   #       # mock the participant for the  AssignmentParticipant.find
   #       allow(AssignmentParticipant).to receive(:find).with(1).and_return(assignment_participant)
   #       allow(assignment_participant).to receive(:team).and_return(team)

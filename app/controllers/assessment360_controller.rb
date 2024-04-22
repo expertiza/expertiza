@@ -200,34 +200,28 @@ class Assessment360Controller < ApplicationController
   #   end
   # end
 
-  def calc_overall_review_info(assignment,
-    course_participant,
-    reviews,
-    hash_per_stu,
-    overall_review_grade_hash,
-    overall_review_count_hash,
-    review_info_per_stu)
-overall_review_grade_hash[assignment.id] ||= 0
-overall_review_count_hash[assignment.id] ||= 0
+  def calc_overall_review_info(assignment, course_participant, reviews, hash_per_stu, overall_review_grade_hash, overall_review_count_hash, review_info_per_stu)
+    overall_review_grade_hash[assignment.id] ||= 0
+    overall_review_count_hash[assignment.id] ||= 0
 
-# Do not consider reviews that have not been filled out by teammates when calculating averages.
-reviews = reviews.reject { |review| review.average_score == 'N/A' }
+    # Do not consider reviews that have not been filled out by teammates when calculating averages.
+    reviews = reviews.reject { |review| review.average_score == 'N/A' }
 
-# Check if the student has received any review for the assignment
-if reviews.any?
-grades_sum = reviews.sum { |review| review.average_score.to_i }
-avg_grade = (grades_sum.to_f / reviews.size).round
-hash_per_stu[course_participant.id][assignment.id] = "#{avg_grade}%"
+    # Check if the student has received any review for the assignment
+    if reviews.any?
+      grades_sum = reviews.sum { |review| review.average_score.to_i }
+      avg_grade = (grades_sum.to_f / reviews.size).round
+      hash_per_stu[course_participant.id][assignment.id] = "#{avg_grade}%"
 
-# Update review counts for the student
-review_info_per_stu[0] += avg_grade
-review_info_per_stu[1] += 1
+      # Update review counts for the student
+      review_info_per_stu[0] += avg_grade
+      review_info_per_stu[1] += 1
 
-# Update overall review counts for the assignment
-overall_review_grade_hash[assignment.id] += avg_grade
-overall_review_count_hash[assignment.id] += 1
-end
-end
+      # Update overall review counts for the assignment
+      overall_review_grade_hash[assignment.id] += avg_grade
+      overall_review_count_hash[assignment.id] += 1
+    end
+  end
 
 
   # The peer review score is taken from the questions for the assignment

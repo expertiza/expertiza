@@ -1,15 +1,37 @@
 <h3>Topics for <%= @assignment_form.assignment.name %> assignment</h3><br>
+<style>
+.custom-button {
+    display: inline-block;
+    padding: 5px 5px;
+    background-color: white;
+    color: black;
+    text-decoration: none;
+    border: 1px solid black;
+    border-radius: 5px;
+    font: Arial;
+}
+</style>
+<script>
+  const enableBiddingCheckbox = document.getElementById('enable-bidding-checkbox');
+  const biddingButton = document.getElementById('bidding-button');
+
+  enableBiddingCheckbox.addEventListener('change', function() {
+    biddingButton.style.display = enableBiddingCheckbox.checked ? 'inline-block' : 'none';
+  });
+</script>
 <input name="assignment_form[assignment][allow_suggestions]" type="hidden" value="false"/>
 <%= check_box_tag('assignment_form[assignment][allow_suggestions]', 'true', @assignment_form.assignment.allow_suggestions) %>
 <%= label_tag('assignment_form[assignment][allow_suggestions]', 'Allow topic suggestions from students?') %>
 <br>
 <input name="assignment_form[assignment][is_intelligent]" type="hidden" value="false"/>
-<%= check_box_tag('assignment_form[assignment][is_intelligent]', 'true', @assignment_form.assignment.is_intelligent?)%>
+<%= check_box_tag('assignment_form[assignment][is_intelligent]', 'true', @assignment_form.assignment.is_intelligent?, id: 'enable-bidding-checkbox')%>
 <%= label_tag('assignment_form[assignment][is_intelligent]', 'Enable bidding for topics?') %>
 <img src="/assets/info.png" title="This feature allow students to &quot;bid&quot; for topics.
       Instructor must specify when topics are assigned, by going to the Due Dates tab and
       entering a due date for &quot;signup&quot;."/>
-<br>
+
+<%= button_to 'Show bids by priority', {:controller => 'lottery', :action => 'calculate_bidding_summary_based_on_priority', :id => @assignment_form.assignment.id}, :method => :get, class: 'custom-button', id: 'bidding-button' %>
+
 <input name="assignment_form[assignment][can_review_same_topic]" type="hidden" value="false"/>
 <%= check_box_tag('assignment_form[assignment][can_review_same_topic]', 'true', @assignment_form.assignment.can_review_same_topic?)%>
 <%= label_tag('assignment_form[assignment][can_review_same_topic]', 'Enable authors to review others working on same topic?') %>

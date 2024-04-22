@@ -1,4 +1,4 @@
-module ReviewMappingHelper
+module ReviewMappingHelperreviewer_id
   def render_report_table_header(headers = {})
     render partial: 'report_table_header', locals: { headers: headers }
   end
@@ -187,29 +187,83 @@ end
     end
   end
 
-  # sorts the reviewers by the average volume of reviews in each round, in descending order
-  def sort_reviewer_by_review_volume_desc
-    @reviewers.each do |r|
-      # get the volume of review comments
-      review_volumes = Response.volume_of_review_comments(@assignment.id, r.id)
-      r.avg_vol_per_round = []
-      review_volumes.each_index do |i|
-        if i.zero?
-          r.overall_avg_vol = review_volumes[0]
-        else
-          r.avg_vol_per_round.push(review_volumes[i])
-        end
+  # # sorts the reviewers by the average volume of reviews in each round, in descending order
+  # def sort_reviewer_by_review_volume_desc
+  #   @reviewers.each do |r|
+  #     # get the volume of review comments
+  #     review_volumes = Response.volume_of_review_comments(@assignment.id, r.id)
+  #     r.avg_vol_per_round = []
+  #     review_volumes.each_index do |i|
+  #       if i.zero?
+  #         r.overall_avg_vol = review_volumes[0]
+  #       else
+  #         r.avg_vol_per_round.push(review_volumes[i])
+  #       end
+  #     end
+  #   end
+  #   # get the number of review rounds for the assignment
+  #   @num_rounds = @assignment.num_review_rounds.to_f.to_i
+  #   @all_reviewers_avg_vol_per_round = []
+  #   @all_reviewers_overall_avg_vol = @reviewers.inject(0) { |sum, r| sum + r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
+  #   @num_rounds.times do |round|
+  #     @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) { |sum, r| sum + r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
+  #   end
+  #   @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
+  # end
+
+  # Sorts the reviewers by the specified metric in descending order
+def sort_reviewers_by_metric_desc(metric = :review_volume)
+  @reviewers.each do |r|
+    # Calculate the metric for each reviewer
+    reviewer_metric_values = calculate_reviewer_metric(metric, r)
+    r.avg_metric_per_round = []
+
+    reviewer_metric_values.each_with_index do |value, i|
+      if i.zero?
+        r.overall_avg_metric = value
+      else
+        r.avg_metric_per_round.push(value)
       end
     end
-    # get the number of review rounds for the assignment
-    @num_rounds = @assignment.num_review_rounds.to_f.to_i
-    @all_reviewers_avg_vol_per_round = []
-    @all_reviewers_overall_avg_vol = @reviewers.inject(0) { |sum, r| sum + r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @num_rounds.times do |round|
-      @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) { |sum, r| sum + r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
-    end
-    @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
+
+  # Calculate the average metric values across all reviewers
+  @all_reviewers_avg_metric_per_round = calculate_average_metric_per_round(metric)
+
+  # Sort the reviewers based on the overall average metric value
+  @reviewers.sort! { |r1, r2| r2.overall_avg_metric <=> r1.overall_avg_metric }
+end
+
+# Calculate the metric values for the specified reviewer
+def calculate_reviewer_metric(metric, reviewer)
+  case metric
+  when :review_volume
+    Response.volume_of_review_comments(@assignment.id, reviewer.id)
+  when :number_of_suggestions
+    # Calculate number of suggestions for the reviewer
+    # Replace this with the actual logic for calculating number of suggestions
+  when :total_problems_detected
+    # Calculate total number of problems detected for the reviewer
+    # Replace this with the actual logic for calculating total problems detected
+  else
+    raise ArgumentError, "Unsupported metric: #{metric}"
+  end
+end
+
+# Calculate the average metric values per round across all reviewers
+def calculate_average_metric_per_round(metric)
+  num_rounds = @assignment.num_review_rounds.to_f.to_i
+  all_reviewers_avg_metric_per_round = []
+
+  num_rounds.times do |round|
+    # Calculate the average metric value for each round
+    avg_metric_value = @reviewers.inject(0) { |sum, r| sum + r.avg_metric_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length)
+    all_reviewers_avg_metric_per_round.push(avg_metric_value)
+  end
+
+  all_reviewers_avg_metric_per_round
+end
+
 
   # moves data of reviews in each round from a current round
   def initialize_chart_data(reviewer)

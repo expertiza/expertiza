@@ -17,8 +17,11 @@ class Assessment360Controller < ApplicationController
     insure_existence_of(@course_participants, course)
     # hash for view
     @meta_review = {}
+    @meta_review_exists = {}
     @teammate_review = {}
+    @teammate_review_exists = {}
     @teamed_count = {}
+    @assignment_columns = {}
     # for course
     # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
     # @overall_teammate_review_count = {assgt_id1: 1, assgt_id2: 2, ...}
@@ -36,6 +39,10 @@ class Assessment360Controller < ApplicationController
         @meta_review[cp.id] = {} unless @meta_review.key?(cp.id)
         @teammate_review[cp.id] = {} unless @teammate_review.key?(cp.id)
         assignment_participant = assignment.participants.find_by(user_id: cp.user_id)
+        # initializing assignment_columns with default 0 colspan for all the columns
+        @assignment_columns[assignment.id].nil? ? @assignment_columns[assignment.id] = {} : nil
+        @assignment_columns[assignment.id]["meta_review"].nil? ? @assignment_columns[assignment.id]["meta_review"] = 0 : nil
+        @assignment_columns[assignment.id]["teammate_review"].nil? ? @assignment_columns[assignment.id]["teammate_review"] = 0 : nil
         next if assignment_participant.nil?
 
         teammate_reviews = assignment_participant.teammate_reviews
@@ -54,10 +61,20 @@ class Assessment360Controller < ApplicationController
                                  @overall_meta_review_grades,
                                  @overall_meta_review_count,
                                  @meta_review_info_per_stu)
-      end
       # calculate average grade for each student on all assignments in this course
       avg_review_calc_per_student(cp, @teammate_review_info_per_stu, @teammate_review)
       avg_review_calc_per_student(cp, @meta_review_info_per_stu, @meta_review)
+      if !@meta_review[cp.id][assignment.id].nil?
+        @meta_review_exists[assignment.id] = true
+        @assignment_columns[assignment.id]["meta_review"] = 1
+      end
+      # If teammate review exists for particular assignment then update teammate_review_exist to true
+      # and make assignment_columns as 1 to add to colspan
+      if !@teammate_review[cp.id][assignment.id].nil?
+        @teammate_review_exists[assignment.id] = true
+        @assignment_columns[assignment.id]["teammate_review"] = 1
+      end
+    end
     end
     # avoid divide by zero error
     overall_review_count(@assignments, @overall_teammate_review_count, @overall_meta_review_count)
@@ -152,36 +169,29 @@ class Assessment360Controller < ApplicationController
   # The function populates the hash value for all students for all the reviews that they have gotten.
   # I.e., Teammate and Meta for each of the assignments that they have taken
   # This value is then used to display the overall teammate_review and meta_review grade in the view
-  def calc_overall_review_info(assignment,
-                               course_participant,
-                               reviews,
-                               hash_per_stu,
-                               overall_review_grade_hash,
-                               overall_review_count_hash,
-                               review_info_per_stu)
-    # If a student has not taken an assignment or if they have not received any grade for the same,
-    # assign it as 0 instead of leaving it blank. This helps in easier calculation of overall grade
-    overall_review_grade_hash[assignment.id] = 0 unless overall_review_grade_hash.key?(assignment.id)
-    overall_review_count_hash[assignment.id] = 0 unless overall_review_count_hash.key?(assignment.id)
+  def calc_overall_review_info(assignment, course_participant, reviews, hash_per_stu, overall_review_grade_hash, overall_review_count_hash, review_info_per_stu)
+    overall_review_grade_hash[assignment.id] ||= 0
+    overall_review_count_hash[assignment.id] ||= 0
+
     # Do not consider reviews that have not been filled out by teammates when calculating averages.
     reviews = reviews.reject { |review| review.average_score == 'N/A' }
-    grades = 0
-    # Check if they person has gotten any review for the assignment
-    if reviews.count > 0
-      reviews.each { |review| grades += review.average_score.to_i }
-      avg_grades = (grades * 1.0 / reviews.count).round
-      hash_per_stu[course_participant.id][assignment.id] = avg_grades.to_s + '%'
-    end
-    # Calculate sum of averages to get student's overall grade
-    if avg_grades && (grades >= 0)
-      # for each assignment
-      review_info_per_stu[0] += avg_grades
+
+    # Check if the student has received any review for the assignment
+    if reviews.any?
+      grades_sum = reviews.sum { |review| review.average_score.to_i }
+      avg_grade = (grades_sum.to_f / reviews.size).round
+      hash_per_stu[course_participant.id][assignment.id] = "#{avg_grade}%"
+
+      # Update review counts for the student
+      review_info_per_stu[0] += avg_grade
       review_info_per_stu[1] += 1
-      # for course
-      overall_review_grade_hash[assignment.id] += avg_grades
+
+      # Update overall review counts for the assignment
+      overall_review_grade_hash[assignment.id] += avg_grade
       overall_review_count_hash[assignment.id] += 1
     end
   end
+
 
   # The peer review score is taken from the questions for the assignment
   def find_peer_review_score(user_id, assignment_id)

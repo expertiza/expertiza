@@ -6,18 +6,18 @@ describe ViewTranslationSubstitutor do
   let(:test_view) { 'example_view' }
   let(:test_translations) { { 'hello' => 'Hello, world!' } }
 
-  # Test cases for the substitute method.
+  # The substitute method iterates over the locale hash, processes directories, substitutes translations in views, and generates statistics for each directory.
   describe '#substitute' do
     let(:substitutor) { ViewTranslationSubstitutor.new }
 
     it 'iterates over the locale hash and processes directories' do
-      # Create a sample locale hash.
+      # Create a sample locale hash with directory names and their respective views and translations.
       locale = {
         'dir1' => { 'view1' => { 'key1' => 'val1' } },
         'dir2' => { 'view2' => { 'key2' => 'val2' } }
       }
 
-      # Expect process_directory to be called for each directory in the locale hash.
+      # Expect process_directory to be called for each directory in the locale hash, returning statistics for each directory.
       expect(substitutor).to receive(:process_directory).with('dir1', { 'view1' => { 'key1' => 'val1' } }).and_return('stats1')
       expect(substitutor).to receive(:process_directory).with('dir2', { 'view2' => { 'key2' => 'val2' } }).and_return('stats2')
 
@@ -25,12 +25,12 @@ describe ViewTranslationSubstitutor do
       expect(File).to receive(:open).with(/^translation_stats.*\.yml$/, 'w').and_yield(file = double)
       expect(file).to receive(:write).with({ 'dir1' => 'stats1', 'dir2' => 'stats2' }.to_yaml)
 
-      # Call the substitute method with the sample locale hash.
+      # Call the substitute method with the sample locale hash to substitute translations in views.
       substitutor.substitute(locale)
     end
   end
-
-  # Test cases for the process_directory method.
+  
+  # The process_directory method is responsible for processing each directory in the view hash, substituting translations in the views, and returning statistics for each directory.
   describe '#process_directory' do
     let(:substitutor) { ViewTranslationSubstitutor.new }
 
@@ -39,7 +39,7 @@ describe ViewTranslationSubstitutor do
       let(:view_hash) { { 'view1' => { 'key1' => 'val1' } } }
 
       it 'processes each view in the view_hash' do
-        # Stub process_view method to return 'stats1' and ensure it is called with correct arguments.
+        # Stub process_view method to return 'stats1' and ensure it is called with the correct arguments.
         allow(substitutor).to receive(:process_view).and_return('stats1')
         dir_stats = substitutor.send(:process_directory, dir_name, view_hash)
         expect(dir_stats).to eq({ 'view1' => 'stats1' })
@@ -48,7 +48,7 @@ describe ViewTranslationSubstitutor do
     end
 
     context 'when view_hash is empty' do
-      # Local variables
+      # Local variables for testing
       let(:dir_name) { 'dir2' }
       let(:view_hash) { {} }
 
@@ -60,7 +60,8 @@ describe ViewTranslationSubstitutor do
     end
   end
 
-  # Test cases for the process_view method.
+  # The process_view method reads the content of a view file, processes translations, and writes back the modified contents.
+
   describe '#process_view' do
     # Local variables
     let(:substitutor) { ViewTranslationSubstitutor.new }
@@ -121,7 +122,7 @@ describe ViewTranslationSubstitutor do
     end
   end
 
-  # Test cases for the process_translation method
+  # The process_translation method replaces specific text in the content with translation keys and handles various scenarios.
   describe '#process_translation' do
     # Local variables
     let(:contents) { 'This is a test string with some "text" to be replaced.' }

@@ -233,43 +233,23 @@ module ReviewMappingHelper
   end
 
   def prepare_chart_options
-    {
-      legend: {
-        position: 'top',
-        labels: {
-          usePointStyle: true
-        }
-      },
-      width: '200',
-      height: '225',
-      scales: {
-        yAxes: [{
-          stacked: true,
-          id: 'bar-y-axis1',
-          barThickness: 10
-        }, {
-          display: false,
-          stacked: true,
-          id: 'bar-y-axis2',
-          barThickness: 15,
-          type: 'category',
-          categoryPercentage: 0.8,
-          barPercentage: 0.9,
-          gridLines: {
-            offsetGridLines: true
-          }
-        }],
-        xAxes: [{
-          stacked: false,
-          ticks: {
-            beginAtZero: true,
-            stepSize: 50,
-            max: 400
-          }
-        }]
-      }
-    }
+   {
+     legend: { position: 'top', labels: { usePointStyle: true } },
+     width: '200', height: '225',
+     scales: {
+       yAxes: [
+         { stacked: true, id: 'bar-y-axis1', barThickness: 10 },
+         { display: false, stacked: true, id: 'bar-y-axis2', barThickness: 15,
+           type: 'category', categoryPercentage: 0.8, barPercentage: 0.9,
+           gridLines: { offsetGridLines: true } }
+       ],
+       xAxes: [
+         { stacked: false, ticks: { beginAtZero: true, stepSize: 50, max: 400 } }
+       ]
+     }
+   }
   end
+ 
 
   def display_tagging_interval_chart(intervals)
     threshold = 30

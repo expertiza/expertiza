@@ -169,37 +169,6 @@ class Assessment360Controller < ApplicationController
   # The function populates the hash value for all students for all the reviews that they have gotten.
   # I.e., Teammate and Meta for each of the assignments that they have taken
   # This value is then used to display the overall teammate_review and meta_review grade in the view
-  # def calc_overall_review_info(assignment,
-  #                              course_participant,
-  #                              reviews,
-  #                              hash_per_stu,
-  #                              overall_review_grade_hash,
-  #                              overall_review_count_hash,
-  #                              review_info_per_stu)
-  #   # If a student has not taken an assignment or if they have not received any grade for the same,
-  #   # assign it as 0 instead of leaving it blank. This helps in easier calculation of overall grade
-  #   overall_review_grade_hash[assignment.id] = 0 unless overall_review_grade_hash.key?(assignment.id)
-  #   overall_review_count_hash[assignment.id] = 0 unless overall_review_count_hash.key?(assignment.id)
-  #   # Do not consider reviews that have not been filled out by teammates when calculating averages.
-  #   reviews = reviews.reject { |review| review.average_score == 'N/A' }
-  #   grades = 0
-  #   # Check if they person has gotten any review for the assignment
-  #   if reviews.count > 0
-  #     reviews.each { |review| grades += review.average_score.to_i }
-  #     avg_grades = (grades * 1.0 / reviews.count).round
-  #     hash_per_stu[course_participant.id][assignment.id] = avg_grades.to_s + '%'
-  #   end
-  #   # Calculate sum of averages to get student's overall grade
-  #   if avg_grades && (grades >= 0)
-  #     # for each assignment
-  #     review_info_per_stu[0] += avg_grades
-  #     review_info_per_stu[1] += 1
-  #     # for course
-  #     overall_review_grade_hash[assignment.id] += avg_grades
-  #     overall_review_count_hash[assignment.id] += 1
-  #   end
-  # end
-
   def calc_overall_review_info(assignment, course_participant, reviews, hash_per_stu, overall_review_grade_hash, overall_review_count_hash, review_info_per_stu)
     overall_review_grade_hash[assignment.id] ||= 0
     overall_review_count_hash[assignment.id] ||= 0

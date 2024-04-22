@@ -115,12 +115,7 @@ class AssignmentForm
             next
           end
         end
-        unless aq.update_attributes(attr)
-          # calling the full_messages method instead of to_s method
-          @errors = @assignment.errors.full_messages
-          @has_errors = true
-          next
-        end
+        next unless aq.update_attributes(attr)
       end
     end
   end

@@ -71,7 +71,7 @@ class ImportFileController < ApplicationController
     else
       # If there is no header, recover the selected fields in the select* params
       new_header = []
-      params.each_key do |p|
+      params.each_pair do |p, value|
         if p.match(/\Aselect/)
           new_header << params[p]
         end

@@ -1,72 +1,114 @@
 <style>
   th, td {
     text-align: center;
-}
+  }
+  .visibility {
+    display: none
+  }
 </style>
+
+
+
 <b style="margin-bottom: 40px;">Select columns:</b>
 <tr>
   <td>
     <label for="metareview"><b>Metareviews</b></label>
-    <input type="checkbox" id="metareview" name="metareview">
+    <input type="checkbox" value="show-hide" checked="checked" id="metareviewbox">
   </td>
   <td>
     <label for="teammateReview"><b>Teammate Reviews</b></label>
-    <input type="checkbox" id="teammateReview" name="teammateReview">
+    <input type="checkbox" value="show-hide" checked="checked" id="teammatereviewbox">
   </td>
 </tr> 
 <br> 
 <br>
+
 
 <table class="table table-striped">
   <tr>
     <th rowspan=2 width="320">Students</th>
     <th rowspan=2 width="30">Teammate Count</th>
     <% @assignments.each do |assignment| %>
-      <th colspan=2 width="300"> <%= assignment.name %> </th>
+      <% if !@teammate_review_exists[assignment.id].nil? || !@meta_review_exists[assignment.id].nil? %>
+          <th colspan="<%= @assignment_columns[assignment.id]["meta_review"] + @assignment_columns[assignment.id]["teammate_review"] %>" width="300" class="assignment-header" id="<%= assignment.id %>"> <%= assignment.name %> </th>
+      <% end %>
     <% end %>
-    <th colspan="2" width="300">Aggregate Score</th>
+    <th colspan="2" width="300" id="aggregate-score-header">Aggregate Score</th>
   </tr>
   <tr>
     <% @assignments.each do |assignment| %>
-      <% if @meta_review_exists && !@meta_review_exists[assignment.id].nil? %>
-        <th>Metareview</th>
-      <% end %>
-      <% if @teammate_review_exists && !@teammate_review_exists[assignment.id].nil? %>
-      <th>Teammate Review</th>
-      <% end %>
+      <% if !@meta_review_exists[assignment.id].nil? %> <td class="metaReviews" id="metaReviews-<%= assignment.id %>"><b>Metareviews</b></td> <% end %>
+      <% if !@teammate_review_exists[assignment.id].nil? %> <td class="teammateReviews" id="teammateReviews-<%= assignment.id %>"><b>Teammate Reviews</b></td> <% end %>
     <% end %>
+    <td class="metaReviews"><b>Metareviews</b></td>
+    <td class="teammateReviews"><b>Teammate Reviews</b></td>
   </tr>
 
+
   <% @course_participants.each do |cp|%>
-      <tr>
-          <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
-          <td><%= @teamed_count[cp.id] %></td>
-          <% @assignments.each do |assignment|%>
-              <td><%= @meta_review[cp.id][assignment.id] unless @meta_review.nil? %></td>
-              <td><%= @teammate_review[cp.id][assignment.id] unless @teammate_review.nil? %></td>
-          <% end%>
-          <td><%= @meta_review[cp.id][:avg_grade_for_assgt] unless @meta_review.nil? || @meta_review[cp.id].nil? %></td>
-          <td><%= @teammate_review[cp.id][:avg_grade_for_assgt] unless @teammate_review.nil? || @teammate_review[cp.id].nil?%></td>
-      </tr>
+    <tr>
+        <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
+        <td><%= @teamed_count[cp.id] %></td>
+        <% @assignments.each do |assignment|%>
+            <% if !@meta_review_exists[assignment.id].nil? %> <td class="metaReviews"><%= format_score(@meta_review[cp.id][assignment.id]) unless @meta_review.nil? %></td> <% end %>
+            <% if !@teammate_review_exists[assignment.id].nil? %> <td class="teammateReviews"><%= format_score(@teammate_review[cp.id][assignment.id]) unless @teammate_review.nil? %></td> <% end %>
+        <% end%>
+        <td class="metaReviews"><%= format_score(@meta_review[cp.id][:avg_grade_for_assgt]) unless @meta_review.nil? || @meta_review[cp.id].nil? %></td>
+        <td class="teammateReviews"><%= format_score(@teammate_review[cp.id][:avg_grade_for_assgt]) unless @teammate_review.nil? || @teammate_review[cp.id].nil?%></td>
+    </tr>
   <%end%>
       <tr>
           <td><b>Class Average</b></td>
           <td></td>
           <% @assignments.each do |assignment|%>
-              <td><%= "#{@overall_meta_review_grades[assignment.id] / @overall_meta_review_count[assignment.id]}%" %></td>
-              <td><%= "#{@overall_teammate_review_grades[assignment.id] / @overall_teammate_review_count[assignment.id]}%" %></td>
-          <% end%>
+            <% if !@meta_review_exists[assignment.id].nil? %> <td class="metaReviews"><%= "#{@overall_meta_review_grades[assignment.id] / @overall_meta_review_count[assignment.id]}%" %></td> <% end %>
+            <% if !@teammate_review_exists[assignment.id].nil? %> <td class="teammateReviews"><%= "#{@overall_teammate_review_grades[assignment.id] / @overall_teammate_review_count[assignment.id]}%" %></td> <% end %>
+        <% end%>
           <% total_meta_review_grade = @overall_meta_review_grades.inject(0) {|sum, (k, v)| sum + v } %>
           <% total_meta_review_count = @overall_meta_review_count.inject(0) {|sum, (k, v)| sum + v } %>
-          <td>
+          <td class="metaReviews">
             <%= total_meta_review_count.zero? ? "N/A" : 
             "#{total_meta_review_grade / total_meta_review_count}%" %>
           </td>
           <% total_teammate_review_grade = @overall_teammate_review_grades.inject(0) {|sum, (k, v)| sum + v } %>
           <% total_teammate_review_count = @overall_teammate_review_count.inject(0) {|sum, (k, v)| sum + v } %>
-          <td>
+          <td class="teammateReviews">
             <%= total_meta_review_count.zero? ? "N/A" : 
             "#{total_teammate_review_grade / total_teammate_review_count}%" %>    
           </td>
-      </tr>
-  </table>
+        </tr>
+</table>
+
+
+<script>
+  const aggregateScoreHeader = document.getElementById("aggregate-score-header");
+  let aggregateScoreColSpan = 2;
+  const assignmentHeaderClasses = document.querySelectorAll(".assignment-header");
+
+  function handleCheckboxChange(checkboxId, reviewClassesSelector, reviewPrefix) {
+    const reviewClasses = document.querySelectorAll(reviewClassesSelector);
+    const checkBox = document.getElementById(checkboxId);
+
+    checkBox.addEventListener('change', function() {
+      this.checked ? aggregateScoreColSpan += 1 : aggregateScoreColSpan -= 1;
+      aggregateScoreHeader.setAttribute("colspan", aggregateScoreColSpan);
+
+      reviewClasses.forEach(el => {
+        el.classList.toggle('visibility');
+      });
+
+      assignmentHeaderClasses.forEach(el => {
+        let assignmentColSpan = Number(el.getAttribute("colspan"));
+        this.checked ? assignmentColSpan += 1 : assignmentColSpan -= 1;
+        const element =  document.getElementById(reviewPrefix + '-' + el.id);
+
+        if (element){
+          el.setAttribute("colspan", assignmentColSpan);
+          el.style.display = assignmentColSpan <= 0 ? "none" : null;
+        }
+      });
+    });
+  }
+  handleCheckboxChange('metareviewbox', '.metaReviews', 'metaReviews');
+  handleCheckboxChange('teammatereviewbox', '.teammateReviews', 'teammateReviews');
+</script>

@@ -164,9 +164,8 @@ class Questionnaire < ApplicationRecord
 
     return optional_fields if quest.nil?
 
-    quest.min_question_score..quest.max_question_score.each do |q|
-      optional_fields['advice_' + q.to_s] = 'Advice ' + q.to_s
-    end
+    optional_fields['advice_' + quest.min_question_score.to_s] = 'Advice ' + quest.min_question_score.to_s
+    optional_fields['advice_' + quest.max_question_score.to_s] = 'Advice ' + quest.max_question_score.to_s
     optional_fields
   end
 

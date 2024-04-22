@@ -300,7 +300,7 @@ end
   end
 end
 
-# Follwing method is for student to delete self from any toptic within a assignment
+# Following method is for student to delete self from any toptic within a assignment
 def delete_signup
   user_action = StudentDeleteSignupAction.new
   participant = AssignmentParticipant.find(params[:id])
@@ -311,7 +311,7 @@ def delete_signup
   redirect_to action: 'list', id: params[:id]
 end
 
-# Follwing method is for instructor to delete a student from any toptic within a assignment
+# Following method is for instructor to delete a student from any toptic within a assignment
 def delete_signup_as_instructor
   user_action = InstructorDeleteSignupAction.new
   team = Team.find(params[:id])

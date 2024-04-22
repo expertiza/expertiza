@@ -103,11 +103,18 @@ class Assessment360Controller < ApplicationController
   # This data is used to compute the instructor assigned grade and peer review scores.
   # There are many nuances about how to collect these scores. See our design document for more deails
   # http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2018_E1871_Grade_Summary_By_Student
-  def course_student_grade_summary
+def course_student_grade_summary
     @topics = {}
     @assignment_grades = {}
     @peer_review_scores = {}
     @final_grades = {}
+    @number_of_peer_reviews = {}
+    @avg_peer_review_score = {}
+    @total_grade = {}
+    @topics_present = {}
+    @assignment_grades_present ={}
+    @peer_review_scores_present = {}
+    @assignment_category ={}
     course = Course.find(params[:course_id])
     @assignments = course.assignments.reject(&:is_calibrated).reject { |a| a.participants.empty? }
     @course_participants = course.get_participants
@@ -117,9 +124,17 @@ class Assessment360Controller < ApplicationController
       @assignment_grades[cp.id] = {}
       @peer_review_scores[cp.id] = {}
       @final_grades[cp.id] = 0
+      @number_of_peer_reviews[cp.id] = 0
+      @avg_peer_review_score[cp.id] = 0
+      @total_grade[cp.id] = 0
       @assignments.each do |assignment|
         user_id = cp.user_id
         assignment_id = assignment.id
+        # initializing 0 colspan for all columns
+        @assignment_category[assignment.id].nil? ? @assignment_category[assignment.id] = {} : nil
+        @assignment_category[assignment_id]["topics"].nil? ? @assignment_category[assignment_id]["topics"] = 0 : nil
+        @assignment_category[assignment_id]["peer_review"].nil? ? @assignment_category[assignment_id]["peer_review"] = 0 : nil
+        @assignment_category[assignment_id]["assignment_grade"].nil? ? @assignment_category[assignment_id]["assignment_grade"] = 0 : nil
         # break out of the loop if there are no participants in the assignment
         next if assignment.participants.find_by(user_id: user_id).nil?
         # break out of the loop if the participant has no team
@@ -139,8 +154,12 @@ class Assessment360Controller < ApplicationController
         next if peer_review_score[:review][:scores].nil?
         # Skip if there are is no peer review average score
         next if peer_review_score[:review][:scores][:avg].nil?
-
         @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
+         # Finding average peer scores
+        @avg_peer_review_score[cp.id] += @peer_review_scores[cp.id][assignment_id]
+        @number_of_peer_reviews[cp.id] += 1
+        @peer_review_scores_present[assignment_id] = true
+        @assignment_category[assignment_id]["peer_review"] = 1
       end
     end
   end
@@ -150,13 +169,19 @@ class Assessment360Controller < ApplicationController
     # topic exists if a team signed up for a topic, which can be found via the user and the assignment
     topic_id = SignedUpTeam.topic_id(assignment_id, user_id)
     @topics[cp.id][assignment_id] = SignUpTopic.find_by(id: topic_id)
-    # instructor grade is stored in the team model, which is found by finding the user's team for the assignment
+    if !@topics[cp.id][assignment_id].nil?
+      @topics_present[assignment_id] = true
+      @assignment_category[assignment_id]["topics"] = 1
+    end
     team_id = TeamsUser.team_id(assignment_id, user_id)
     team = Team.find(team_id)
     @assignment_grades[cp.id][assignment_id] = team[:grade_for_submission] ? (team[:grade_for_submission] - penalties[:submission]).round(2) : nil
     return if @assignment_grades[cp.id][assignment_id].nil?
 
     @final_grades[cp.id] += @assignment_grades[cp.id][assignment_id]
+    @total_grade[cp.id] += 1
+    @assignment_grades_present[assignment_id] = true
+    @assignment_category[assignment_id]["assignment_grade"] = 1
   end
 
   def insure_existence_of(course_participants, course)
@@ -169,29 +194,34 @@ class Assessment360Controller < ApplicationController
   # The function populates the hash value for all students for all the reviews that they have gotten.
   # I.e., Teammate and Meta for each of the assignments that they have taken
   # This value is then used to display the overall teammate_review and meta_review grade in the view
-  def calc_overall_review_info(assignment, course_participant, reviews, hash_per_stu, overall_review_grade_hash, overall_review_count_hash, review_info_per_stu)
-    overall_review_grade_hash[assignment.id] ||= 0
-    overall_review_count_hash[assignment.id] ||= 0
-
-    # Do not consider reviews that have not been filled out by teammates when calculating averages.
-    reviews = reviews.reject { |review| review.average_score == 'N/A' }
-
-    # Check if the student has received any review for the assignment
-    if reviews.any?
-      grades_sum = reviews.sum { |review| review.average_score.to_i }
-      avg_grade = (grades_sum.to_f / reviews.size).round
-      hash_per_stu[course_participant.id][assignment.id] = "#{avg_grade}%"
-
-      # Update review counts for the student
-      review_info_per_stu[0] += avg_grade
+  def calc_overall_review_info(assignment,
+                               course_participant,
+                               reviews,
+                               hash_per_stu,
+                               overall_review_grade_hash,
+                               overall_review_count_hash,
+                               review_info_per_stu)
+    # If a student has not taken an assignment or if they have not received any grade for the same,
+    # assign it as 0 instead of leaving it blank. This helps in easier calculation of overall grade
+    overall_review_grade_hash[assignment.id] = 0 unless overall_review_grade_hash.key?(assignment.id)
+    overall_review_count_hash[assignment.id] = 0 unless overall_review_count_hash.key?(assignment.id)
+    grades = 0
+    # Check if they person has gotten any review for the assignment
+    if reviews.count > 0
+      reviews.each { |review| grades += review.average_score.to_i }
+      avg_grades = (grades * 1.0 / reviews.count).round
+      hash_per_stu[course_participant.id][assignment.id] = avg_grades.to_s + '%'
+    end
+    # Calculate sum of averages to get student's overall grade
+    if avg_grades && (grades >= 0)
+      # for each assignment
+      review_info_per_stu[0] += avg_grades
       review_info_per_stu[1] += 1
-
-      # Update overall review counts for the assignment
-      overall_review_grade_hash[assignment.id] += avg_grade
+      # for course
+      overall_review_grade_hash[assignment.id] += avg_grades
       overall_review_count_hash[assignment.id] += 1
     end
   end
-
 
   # The peer review score is taken from the questions for the assignment
   def find_peer_review_score(user_id, assignment_id)

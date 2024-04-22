@@ -12,27 +12,29 @@ RSpec.describe ReviewBidsHelper, type: :helper do
 
     context 'when selected topics are present' do
       it 'returns HTML code for topic row with appropriate background color' do
-        selected_topic = instance_double('SelectedTopic', topic_id: 1, is_waitlisted: false)
-        allow(selected_topic).to receive_message_chain(:topic_id, :==).and_return(true)
+        selected_topic = instance_double('SelectedTopic')
+        allow(selected_topic).to receive(:topic_id).and_return(1)
         allow(selected_topic).to receive(:is_waitlisted).and_return(false)
         selected_topics = [selected_topic]
-    
+
         expect(helper.get_intelligent_topic_row_review_bids(topic, selected_topics, num_participants)).to include('<tr bgcolor="yellow">')
       end
     end
-    
+
+
     context 'when selected topic is waitlisted' do
       it 'returns HTML code for topic row with appropriate background color' do
-        selected_topic = instance_double('SelectedTopic', topic_id: 1, is_waitlisted: true)
-        allow(selected_topic).to receive_message_chain(:topic_id, :==).and_return(true)
+        selected_topic = instance_double('SelectedTopic')
+        allow(selected_topic).to receive(:topic_id).and_return(1)
         allow(selected_topic).to receive(:is_waitlisted).and_return(true)
         selected_topics = [selected_topic]
-    
+
         expect(helper.get_intelligent_topic_row_review_bids(topic, selected_topics, num_participants)).to include('<tr bgcolor="lightgray">')
       end
     end
-    
-    
+
+
+
 
     context 'when selected topics are not present' do
       it 'returns HTML code for topic row with appropriate background color' do

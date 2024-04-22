@@ -188,6 +188,8 @@ GEM
     factory_bot_rails (4.8.2)
       factory_bot (~> 4.8.2)
       railties (>= 3.0.0)
+    fakeredis (0.8.0)
+      redis (~> 4.1)
     faraday (0.17.6)
       multipart-post (>= 1.2, < 3)
     faraday-http-cache (1.3.1)
@@ -601,6 +603,7 @@ DEPENDENCIES
   edavis10-ruby-web-search
   engtagger
   factory_bot_rails (= 4.8.2)
+  fakeredis
   fastercsv
   font-awesome-rails
   foreman

@@ -2,12 +2,10 @@ require_relative './helpers/assignment_creation_helper'
 
 describe 'Assignment creation topics tab' do
   include AssignmentCreationHelper
-
   # This block runs before each test to set up the environment
   before(:each) do
     create_deadline_types
     (1..3).each { |i| create(:course, name: "Course #{i}") }
-
     @assignment = create(:assignment, name: 'assignment for late policy test')
     login_as('instructor6')
     visit "/assignments/#{@assignment.id}/edit"
@@ -42,10 +40,10 @@ describe 'Assignment creation topics tab' do
     click_link 'Due dates'
     click_link 'New late policy'
     fill_in 'late_policy_policy_name', with: 'Test Late Policy'
-    fill_in "late_policy_penalty_per_unit", with: '15'
-    fill_in "late_policy_max_penalty", with: '20'
+    fill_in 'late_policy_penalty_per_unit', with: '15'
+    fill_in 'late_policy_max_penalty', with: '20'
     click_button 'Create'
-    visit "/late_policies"
+    visit '/late_policies'
     click_link 'Back'
     expect(page).to have_current_path("/assignments/#{@assignment.id}/edit")
   end

@@ -47,18 +47,29 @@ RSpec.describe ExportFileController do
     end
 
   describe 'Start' do
-    params = {
-        "model"=>"Assignment",
-        "id"=>"1028"
-      }
-      model = params[:model]
-      title = 'Grades for submission'
-      id = params[:id]
-    it 'given valid parameters' do
-      get :start
-      expect(assigns(:model)).to eq(model)
-      # expect(assigns(:title)).to eq(title)
-      expect(assigns(:id)).to eq(id)
+    context 'with valid parameters' do
+      let(:params) { { "model" => "Assignment", "id" => "1028" } }
+  
+      it 'assigns the correct values' do
+        get :start, params: params
+        expect(assigns(:model)).to eq(params[:model])
+        expect(assigns(:id)).to eq(params[:id])
+      end
+    end
+  
+    context 'with invalid parameters' do
+      let(:invalid_params) { { "model" => "UnknownModel", "id" => "unknown" } }
+      let(:valid_params) { { "model" => "Assignment", "id" => "1028" } }
+  
+      it 'does not assign the expected model' do
+        get :start, params: invalid_params
+        expect(assigns(:model)).to be_nil
+      end
+  
+      it 'does not assign the expected id' do
+        get :start, params: invalid_params
+        expect(assigns(:id)).to be_nil
+      end
     end
   end
   describe '#export' do
@@ -89,7 +100,7 @@ RSpec.describe ExportFileController do
       let(:csv_options) { {type: 'text/csv; charset=iso-8859-1; header=present',
                           disposition: "attachment; filename=Assignment843.csv"} }
 
-      it 'export grades for submission data for an assignment' do
+      it 'export grade data for submissions for an assignment into a CSV file' do
         stub_current_user(ta, ta.role.name, ta.role)
         params = {
                 "delim_type"=>"comma", 
@@ -110,7 +121,7 @@ RSpec.describe ExportFileController do
       let(:csv_options) { {type: 'text/csv; charset=iso-8859-1; header=present',
                           disposition: "attachment; filename=SignUpTopic843.csv"} }
 
-      it 'export sign up topic data for an assignment' do
+      it 'export sign up topic data for an assignment into a CSV file' do
         stub_current_user(ta, ta.role.name, ta.role)
         params = {
                 "delim_type"=>"comma", 
@@ -132,7 +143,7 @@ RSpec.describe ExportFileController do
       let(:csv_options) { {type: 'text/csv; charset=iso-8859-1; header=present',
                           disposition: "attachment; filename=AssignmentTeam843.csv"} }
 
-      it 'export assignment teams for an assignment' do
+      it 'export assignment teams for an assignment into a CSV file' do
         stub_current_user(ta, ta.role.name, ta.role)
         params = {
                 "delim_type"=>"comma", 
@@ -154,7 +165,7 @@ RSpec.describe ExportFileController do
       let(:csv_options) { {type: 'text/csv; charset=iso-8859-1; header=present',
                           disposition: "attachment; filename=CourseTeam230.csv"} }
 
-      it 'export course teams for a course' do
+      it 'export course teams for a course into a CSV file' do
         stub_current_user(ta, ta.role.name, ta.role)
         params = {
                 "delim_type"=>"comma", 

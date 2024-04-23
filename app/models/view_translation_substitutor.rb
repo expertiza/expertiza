@@ -22,7 +22,7 @@ class ViewTranslationSubstitutor
     dir_stats # Return directory statistics.
   end
 
-  # Process view method handles the translation process for a specific view and if not such file exists then returns error.
+  # Process view method handles the translation process for a specific view and if no such file exists then returns error.
   def process_view(directory_name, view_name, translations)
     path = "./#{directory_name}/#{view_name}.html.erb" # Path to the primary view file.
 

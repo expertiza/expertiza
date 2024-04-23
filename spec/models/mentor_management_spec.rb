@@ -148,7 +148,7 @@ describe MentorManagement do
                                      .and_return([[mentor.id, 1], [998, 1],])
         allow(User).to receive(:where).with(id: mentor.id).and_return([mentor])
         selected_mentor = MentorManagement.select_mentor(assignment.id)
-        expect(selected_mentor).to eq mentor  # Can return either mentor in a tie
+        expect(selected_mentor).to eq mentor 
       end
     end
 

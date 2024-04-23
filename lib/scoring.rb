@@ -122,12 +122,10 @@ module Scoring
     end
     scores
   end
-
+  # We refactored the structure of the score object to improve data retrieval for exporting. Initially, 
+  # it was organized as {[participants], [teams]}, but we changed it to {[team_score{team, [participants]}]}.
   def review_grades_export(assignment, questions)
     scores = []
-    # assignment.participants.each do |participant|
-    #   scores[:participants][participant.id.to_s.to_sym] = participant_scores(participant, questions)
-    # end
     assignment.teams.each_with_index do |team, index|
       team_score = { team: team, scores: {}, participants: [] }
       if assignment.varying_rubrics_by_round?

@@ -102,6 +102,7 @@ class AssignmentForm
       # Update AQ if found, otherwise create new entry
       attributes.each do |attr|
         next if attr[:questionnaire_id].blank?
+
         questionnaire_type = Questionnaire.find(attr[:questionnaire_id]).type
         topic_id = attr[:topic_id] if attr.key?(:topic_id)
         duty_id = attr[:duty_id] if attr.key?(:duty_id) # if duty_id is present in the attributes, save it.
@@ -114,7 +115,12 @@ class AssignmentForm
             next
           end
         end
-        next unless aq.update_attributes(attr)
+        unless aq.update_attributes(attr)
+          # calling the full_messages method instead of to_s method
+          @errors = @assignment.errors.full_messages
+          @has_errors = true
+          next
+        end
       end
     end
   end

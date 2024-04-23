@@ -24,7 +24,7 @@ module ReviewMappingHelper
   #
   # gets the team name's color according to review and assignment submission status
   #
-  def get_team_color(response_map)
+  def determine_team_color(response_map)
     # Storing redundantly computed value in a variable
     assignment_created = @assignment.created_at
     # Storing redundantly computed value in a variable
@@ -61,7 +61,7 @@ module ReviewMappingHelper
       if link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
         color.push 'green'
       else
-        link_updated_at = get_link_updated_at(link)
+        link_updated_at = fetch_link_updated_at(link)
         color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
       end
     end
@@ -99,7 +99,7 @@ module ReviewMappingHelper
 
   # returns last modified header date
   # only checks certain links (wiki)
-  def get_link_updated_at(link)
+  def fetch_link_updated_at(link)
     uri = URI(link)
     res = Net::HTTP.get_response(uri)['last-modified']
     res.to_time
@@ -113,7 +113,7 @@ module ReviewMappingHelper
   end
 
   # For assignments with 1 team member, the following method returns user's fullname else it returns "team name" that a particular reviewee belongs to.
-  def get_team_reviewed_link_name(max_team_size, _response, reviewee_id, ip_address)
+  def obtain_team_reviewed_link_name(max_team_size, _response, reviewee_id, ip_address)
     team_reviewed_link_name = if max_team_size == 1
                                 TeamsUser.where(team_id: reviewee_id).first.user.fullname(ip_address)
                               else
@@ -136,7 +136,7 @@ module ReviewMappingHelper
 
   # gets the review score awarded based on each round of the review
 
-  def get_awarded_review_score(reviewer_id, team_id)
+  def determine_awarded_review_score(reviewer_id, team_id)
     # Storing redundantly computed value in num_rounds variable
     num_rounds = @assignment.num_review_rounds
     # Setting values of instance variables
@@ -185,21 +185,21 @@ module ReviewMappingHelper
   #   @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   # end
 
-  # Sorts the reviewers by the specified metric in descending order
+# Sorts the reviewers by the specified metric in descending order
 def sort_reviewers_by_metric_desc(metric = :review_volume)
   @reviewers.each do |r|
     # Calculate the metric for each reviewer
-    reviewer_metric_values = calculate_reviewer_metric(metric, r)
-    r.avg_metric_per_round = []
+  reviewer_metric_values = calculate_reviewer_metric(metric, r)
+  r.avg_metric_per_round = []
 
-    reviewer_metric_values.each_with_index do |value, i|
-      if i.zero?
-        r.overall_avg_metric = value
-      else
-        r.avg_metric_per_round.push(value)
-      end
+  reviewer_metric_values.each_with_index do |value, i|
+  if i.zero?
+    r.overall_avg_metric = value
+  else
+    r.avg_metric_per_round.push(value)
     end
   end
+end
 
   # Calculate the average metric values across all reviewers
   @all_reviewers_avg_metric_per_round = calculate_average_metric_per_round(metric)
@@ -212,11 +212,11 @@ end
 def calculate_reviewer_metric(metric, reviewer)
   case metric
   when :review_volume
-    Response.volume_of_review_comments(@assignment.id, reviewer.id)
-  when :number_of_suggestions
+  Response.volume_of_review_comments(@assignment.id, reviewer.id)
+  # when :number_of_suggestions
     # Calculate number of suggestions for the reviewer
     # Replace this with the actual logic for calculating number of suggestions
-  when :total_problems_detected
+  # when :total_problems_detected
     # Calculate total number of problems detected for the reviewer
     # Replace this with the actual logic for calculating total problems detected
   else
@@ -248,108 +248,108 @@ end
   end
 
   # The data of all the reviews is displayed in the form of a bar chart
-  def display_volume_metric_chart(reviewer)
-    labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
-    data = {
-      labels: labels,
-      datasets: [
-        {
-          label: 'vol.',
-          backgroundColor: 'rgba(255,99,132,0.8)',
-          borderWidth: 1,
-          data: reviewer_data,
-          yAxisID: 'bar-y-axis1'
-        },
-        {
-          label: 'avg. vol.',
-          backgroundColor: 'rgba(255,206,86,0.8)',
-          borderWidth: 1,
-          data: all_reviewers_data,
-          yAxisID: 'bar-y-axis2'
-        }
-      ]
-    }
-    options = {
-      legend: {
-        position: 'top',
-        labels: {
-          usePointStyle: true
-        }
-      },
-      width: '200',
-      height: '225',
-      scales: {
-        yAxes: [{
-          stacked: true,
-          id: 'bar-y-axis1',
-          barThickness: 10
-        }, {
-          display: false,
-          stacked: true,
-          id: 'bar-y-axis2',
-          barThickness: 15,
-          type: 'category',
-          categoryPercentage: 0.8,
-          barPercentage: 0.9,
-          gridLines: {
-            offsetGridLines: true
-          }
-        }],
-        xAxes: [{
-          stacked: false,
-          ticks: {
-            beginAtZero: true,
-            stepSize: 50,
-            max: 400
-          }
-        }]
-      }
-    }
-    bar_chart data, options
-  end
+  # def display_volume_metric_chart(reviewer)
+  #   labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
+  #   data = {
+  #     labels: labels,
+  #     datasets: [
+  #       {
+  #         label: 'vol.',
+  #         backgroundColor: 'rgba(255,99,132,0.8)',
+  #         borderWidth: 1,
+  #         data: reviewer_data,
+  #         yAxisID: 'bar-y-axis1'
+  #       },
+  #       {
+  #         label: 'avg. vol.',
+  #         backgroundColor: 'rgba(255,206,86,0.8)',
+  #         borderWidth: 1,
+  #         data: all_reviewers_data,
+  #         yAxisID: 'bar-y-axis2'
+  #       }
+  #     ]
+  #   }
+  #   options = {
+  #     legend: {
+  #       position: 'top',
+  #       labels: {
+  #         usePointStyle: true
+  #       }
+  #     },
+  #     width: '200',
+  #     height: '225',
+  #     scales: {
+  #       yAxes: [{
+  #         stacked: true,
+  #         id: 'bar-y-axis1',
+  #         barThickness: 10
+  #       }, {
+  #         display: false,
+  #         stacked: true,
+  #         id: 'bar-y-axis2',
+  #         barThickness: 15,
+  #         type: 'category',
+  #         categoryPercentage: 0.8,
+  #         barPercentage: 0.9,
+  #         gridLines: {
+  #           offsetGridLines: true
+  #         }
+  #       }],
+  #       xAxes: [{
+  #         stacked: false,
+  #         ticks: {
+  #           beginAtZero: true,
+  #           stepSize: 50,
+  #           max: 400
+  #         }
+  #       }]
+  #     }
+  #   }
+  #   bar_chart data, options
+  # end
 
-  # E2082 Generate chart for review tagging time intervals
-  def display_tagging_interval_chart(intervals)
-    # if someone did not do any tagging in 30 seconds, then ignore this interval
-    threshold = 30
-    intervals = intervals.select { |v| v < threshold }
-    unless intervals.empty?
-      interval_mean = intervals.reduce(:+) / intervals.size.to_f
-    end
-    # build the parameters for the chart
-    data = {
-      labels: [*1..intervals.length],
-      datasets: [
-        {
-          backgroundColor: 'rgba(255,99,132,0.8)',
-          data: intervals,
-          label: 'time intervals'
-        },
-        unless intervals.empty?
-          {
-            data: Array.new(intervals.length, interval_mean),
-            label: 'Mean time spent'
-          }
-        end
-      ]
-    }
-    options = {
-      width: '200',
-      height: '125',
-      scales: {
-        yAxes: [{
-          stacked: false,
-          ticks: {
-            beginAtZero: true
-          }
-        }],
-        xAxes: [{
-          stacked: false
-        }]
-      }
-    }
-    line_chart data, options
-  end
+  # Generate chart for review tagging time intervals
+  # def display_tagging_interval_chart(intervals)
+  #   # if someone did not do any tagging in 30 seconds, then ignore this interval
+  #   threshold = 30
+  #   intervals = intervals.select { |v| v < threshold }
+  #   unless intervals.empty?
+  #     interval_mean = intervals.reduce(:+) / intervals.size.to_f
+  #   end
+  #   # build the parameters for the chart
+  #   data = {
+  #     labels: [*1..intervals.length],
+  #     datasets: [
+  #       {
+  #         backgroundColor: 'rgba(255,99,132,0.8)',
+  #         data: intervals,
+  #         label: 'time intervals'
+  #       },
+  #       unless intervals.empty?
+  #         {
+  #           data: Array.new(intervals.length, interval_mean),
+  #           label: 'Mean time spent'
+  #         }
+  #       end
+  #     ]
+  #   }
+  #   options = {
+  #     width: '200',
+  #     height: '125',
+  #     scales: {
+  #       yAxes: [{
+  #         stacked: false,
+  #         ticks: {
+  #           beginAtZero: true
+  #         }
+  #       }],
+  #       xAxes: [{
+  #         stacked: false
+  #       }]
+  #     }
+  #   }
+  #   line_chart data, options
+  # end
 
   # Calculate mean, min, max, variance, and stand deviation for tagging intervals
   def calculate_key_chart_information(intervals)
@@ -401,7 +401,7 @@ end
   end
 
   # gets review and feedback responses for all rounds for the feedback report
-  def get_each_review_and_feedback_response_map(author)
+  def fetch_each_review_and_feedback_response_map(author)
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     # Calculate how many responses one team received from each round
     # It is the feedback number each team member should make
@@ -486,4 +486,110 @@ end
       (@teams.size * @review_num * 1.0 / @participants.size).round
     end
   end
+end
+
+module Charts 
+# The data of all the reviews is displayed in the form of a bar chart
+def display_volume_metric_chart(reviewer)
+    labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
+    data = {
+      labels: labels,
+      datasets: [
+        {
+          label: 'vol.',
+          backgroundColor: 'rgba(255,99,132,0.8)',
+          borderWidth: 1,
+          data: reviewer_data,
+          yAxisID: 'bar-y-axis1'
+        },
+        {
+          label: 'avg. vol.',
+          backgroundColor: 'rgba(255,206,86,0.8)',
+          borderWidth: 1,
+          data: all_reviewers_data,
+          yAxisID: 'bar-y-axis2'
+        }
+      ]
+    }
+    options = {
+      legend: {
+        position: 'top',
+        labels: {
+          usePointStyle: true
+        }
+      },
+      width: '200',
+      height: '225',
+      scales: {
+        yAxes: [{
+          stacked: true,
+          id: 'bar-y-axis1',
+          barThickness: 10
+        }, {
+          display: false,
+          stacked: true,
+          id: 'bar-y-axis2',
+          barThickness: 15,
+          type: 'category',
+          categoryPercentage: 0.8,
+          barPercentage: 0.9,
+          gridLines: {
+            offsetGridLines: true
+          }
+        }],
+        xAxes: [{
+          stacked: false,
+          ticks: {
+            beginAtZero: true,
+            stepSize: 50,
+            max: 400
+          }
+        }]
+      }
+    }
+    bar_chart data, options
+end
+
+#  Generate chart for review tagging time intervals
+def display_tagging_interval_chart(intervals)
+    # if someone did not do any tagging in 30 seconds, then ignore this interval
+    threshold = 30
+    intervals = intervals.select { |v| v < threshold }
+    unless intervals.empty?
+      interval_mean = intervals.reduce(:+) / intervals.size.to_f
+end
+# build the parameters for the chart
+data = {
+  labels: [*1..intervals.length],
+  datasets: [
+    {
+      backgroundColor: 'rgba(255,99,132,0.8)',
+      data: intervals,
+      label: 'time intervals'
+    },
+    unless intervals.empty?
+      {
+        data: Array.new(intervals.length, interval_mean),
+        label: 'Mean time spent'
+      }
+    end
+  ]
+}
+options = {
+  width: '200',
+  height: '125',
+  scales: {
+    yAxes: [{
+      stacked: false,
+      ticks: {
+        beginAtZero: true
+      }
+    }],
+    xAxes: [{
+      stacked: false
+    }]
+  }
+}
+line_chart data, options
+end
 end

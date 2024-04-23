@@ -90,38 +90,24 @@ class Team < ApplicationRecord
       ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{id}")
       # if assignment_id is nil, then don't send an assignment name
       assignment_name = assignment_id ? Assignment.find(assignment_id).name.to_s : ''
-      # Now that a new team member has been added to a team, send an email to them letting them know
-      # if MentorManagement.user_a_mentor?(user)
-      #   #  send mail to generic user
-      #   Mailer.team_addition_message(
-      #     to: user.email,
-      #     subject: '[Expertiza] Added to a Team',
-      #     body: {
-      #       user: user,
-      #       first_name: ApplicationHelper.get_user_first_name(user),
-      #       partial_name: 'mentor_added_to_team',
-      #       team: name.to_s,
-      #       assignment: assignment_name
-      #     }
-      #   ).deliver
-      # elsif !user.is_a?(Participant)
-      #   # If the user is a participant, then we don't went to send them emails since that class is something
-      #   # completely out of the scope of this project
-      #   Mailer.team_addition_message(
-      #     to: user.email,
-      #     subject: '[Expertiza] Added to a Team',
-      #     body: {
-      #       user: user,
-      #       first_name: ApplicationHelper.get_user_first_name(user),
-      #       partial_name: 'user_added_to_team',
-      #       team: name.to_s,
-      #       assignment: assignment_name
-      #     }
-      #   ).deliver
-      # end
-
+      # determine which type of email to send
+      partial_name = MentorManagement.user_a_mentor?(user) ? 'mentor_added_to_team' : 'user_added_to_team'
+      # if user is a participant then mail cannot be sent - this is because of some legacy code in the participant class
+      if !user.is_a?(Participant)
+        Mailer.team_addition_message(
+          to: user.email,
+          subject: '[Expertiza] Added to a Team',
+          body: {
+            user: user,
+            first_name: ApplicationHelper.get_user_first_name(user),
+            partial_name: partial_name,
+            team: name.to_s,
+            assignment: assignment_name
+          }
+        ).deliver
+      end
     end
-    can_add_member
+    can_add_member  # return if the add_member function was successful
   end
 
   # Define the size of the team

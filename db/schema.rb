@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20240420071544) do
+ActiveRecord::Schema.define(version: 20240422213933) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -813,7 +813,7 @@ ActiveRecord::Schema.define(version: 20240420071544) do
     t.integer "mentor_id"
     t.index ["assignment_id"], name: "fk_sign_up_categories_sign_up_topics"
     t.index ["assignment_id"], name: "index_sign_up_topics_on_assignment_id"
-    t.index ["mentor_id"], name: "fk_"
+    t.index ["mentor_id"], name: "index_sign_up_topics_on_mentor_id"
   end
 
   create_table "signed_up_teams", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|

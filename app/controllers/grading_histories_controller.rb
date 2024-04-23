@@ -29,14 +29,37 @@ class GradingHistoriesController < ApplicationController
     if record == nil
       @receiver = ""
       @assignment = ""
-    else
+    else # A grading history record exists
       if record.graded_item_type == "Submission"
         @receiver = "Graded Team: " + Team.where(id: record.graded_member_id).pluck(:name).first
         @assignment = Assignment.where(id: record.assignment_id).pluck(:name).first
-      else
+      else # type must be review
         @receiver = "Graded User: " + User.where(id: record.graded_member_id).pluck(:fullname).first
         @assignment = "review for " + Assignment.where(id: record.assignment_id).pluck(:name).first
       end
     end
+  end
+
+  # Write a log message explaining the grade change made
+  def self.log(type, assignment_id, graded_member_id, current_user)
+    assignment = Assignment.find(assignment_id)
+    if type == "Submission"
+      team = Team.find(graded_member_id)
+      ExpertizaLogger.info LoggerMessage.new(controller_name, current_user.name, "#{current_user.name} updated #{assignment.name} grade for team #{team.name} (id  #{team.id})")
+    else # type must be review
+      user = User.find(graded_member_id)
+      ExpertizaLogger.info LoggerMessage.new(controller_name, current_user.name, "#{current_user.name} updated #{assignment.name} review grade for user #{user.fullname} (id  #{user.id})")
+    end
+  end
+
+  # Create a new grading history record, as well as a log record for the change
+  def self.add_grading_history(type, grade, comment, assignment_id, graded_member_id, current_user)
+    GradingHistory.create(instructor_id: current_user.id,
+                          assignment_id: assignment_id,
+                          graded_item_type: type,
+                          graded_member_id: graded_member_id,
+                          grade: grade,
+                          comment: comment)
+    log(type, assignment_id, graded_member_id, current_user)
   end
 end

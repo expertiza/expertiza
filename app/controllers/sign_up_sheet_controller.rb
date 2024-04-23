@@ -384,8 +384,10 @@ end
                              nil
                            end
           due_date_instance=instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1]  #applying DRY principle and removing multiple instance_variable_get calls
+          # Retrieve the due date for the current deadline type
           due_at=instance_variable_get('@topic_' + deadline_type + '_due_date')                 
           if topic_due_date.nil? # create a new record
+            # Create a new record if the topic due date does not exist
             create_topic_due_date(i,topic,deadline_type_id,due_date_instance,due_at)
           else # update an existed record 
             topic_due_date.update_attributes(due_at: due_at,submission_allowed_id: due_date_instance.submission_allowed_id,review_allowed_id: due_date_instance.review_allowed_id,
@@ -446,15 +448,23 @@ end
     end
   end
 
+  # Updates the topic assigned to a signed-up team.
+  #
+  # @param team_id [Integer] The ID of the team whose topic is being updated.
   def update_signed_up_team_topic(team_id)
     signed_up_team = SignedUpTeam.find_by(team_id: team_id, is_waitlisted: 0)
     signed_up_team.update_attribute('topic_id', params[:topic_id].to_i) if signed_up_team
   end
 
+  # Assigns a new topic to a team that was previously waitlisted for another topic.
+  #
+  # @param original_topic_id [Integer] The ID of the original topic the team was waitlisted for.
+  # @param assignment_id [Integer] The ID of the assignment to which the topic is being assigned.
   def assign_topic_to_waitlisted_team(original_topic_id,assignment_id)
     waitlisted_team = SignedUpTeam.where(topic_id: original_topic_id, is_waitlisted: 1).first
     return unless waitlisted_team
   
+    # Find the user ID of the first user in the team.
     waitlisted_first_team_first_user_id = TeamsUser.where(team_id: waitlisted_team.team_id).first.user_id
     SignUpSheet.signup_team(assignment_id, waitlisted_first_team_first_user_id, original_topic_id)
   end

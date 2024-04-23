@@ -121,34 +121,39 @@ describe MentorManagement do
     end
   end
 
-  #   E2351 Testing: Mentor Management for Assignments without Topics
   describe "select_mentor" do
     context "when there are mentors available for the assignment" do
       it "returns the mentor with the lowest team count for the given assignment" do
-      # Test scenario 1
-      # Given an assignment_id
-      # When there are multiple mentors with different team counts for the assignment
-      # Then it should return the mentor with the lowest team count
-   
-      # Test scenario 2
-      # Given an assignment_id
-      # When there are multiple mentors with the same lowest team count for the assignment
-      # Then it should return the first mentor in the list
-   
-      # Test scenario 3
-      # Given an assignment_id
-      # When there is only one mentor available for the assignment
-      # Then it should return that mentor
+        allow(MentorManagement).to receive(:zip_mentors_with_team_count)
+                                     .with(assignment.id)
+                                     .and_return([[mentor.id, 1], [998, 2]])
+        allow(User).to receive(:where).with(id: mentor.id).and_return([mentor])
+        selected_mentor = MentorManagement.select_mentor(assignment.id)
+        expect(selected_mentor).to eq mentor
+      end
+
+      it "should return that mentor if there's only one available" do
+        allow(MentorManagement).to receive(:zip_mentors_with_team_count)
+                                     .with(assignment.id)
+                                     .and_return([[mentor.id, 0]])
+        allow(User).to receive(:where).with(id: mentor.id).and_return([mentor])
+        selected_mentor = MentorManagement.select_mentor(assignment.id)
+        expect(selected_mentor).to eq mentor
+      end
+
+      it "returns the first mentor in the list if there's a tie for lowest team count" do
+        # Arrange
+        allow(MentorManagement).to receive(:zip_mentors_with_team_count)
+                                     .with(assignment.id)
+                                     .and_return([[mentor.id, 1], [998, 1],])
+        allow(User).to receive(:where).with(id: mentor.id).and_return([mentor])
+        selected_mentor = MentorManagement.select_mentor(assignment.id)
+        expect(selected_mentor).to eq mentor  # Can return either mentor in a tie
       end
     end
 
     context "when there are no mentors available for the assignment" do
       it "returns nil" do
-        # Test scenario 4
-        # Given an assignment_id
-        # When there are no mentors available for the assignment
-        # Then it should return nil
-
         # Create a new assignment
         a = FactoryBot.create(:assignment, id: 997, directory_path: 'OSS_project', auto_assign_mentor: true)
         # Since there are no mentors associated with this assignment, should return nil
@@ -362,11 +367,11 @@ describe MentorManagement do
         allow(Team).to receive(:find).with(team.id).and_return(team)
         [student1, student2].each { |student| FactoryBot.create(:team_user, team_id: team.id, user_id: student.id) }
         MentorManagement.assign_mentor(a.id, team.id)
-      
+
         mentors = MentorManagement.zip_mentors_with_team_count(assignment.id)
         expect(mentors).to_not be_empty
         #expect(mentors[0]).to eq [999,1]
-	#expect(mentors[1]).to eq [1002,0]  
+	#expect(mentors[1]).to eq [1002,0]
     end
     end
   end

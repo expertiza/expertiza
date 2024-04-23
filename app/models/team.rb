@@ -191,7 +191,7 @@ class Team < ApplicationRecord
     row_hash[:teammembers].each_with_index do |teammate, _index|
       user = User.find_by(name: teammate.to_s)
       if user.nil?
-        raise ImportError, "The user '#{teammate}' was not found. <a href='/users/new'>Create</a> this user?"
+        raise ImportError, "The user '#{teammate}' was not found. <a href='/users/new?role=Student'>Create</a> this user?"
       else
         add_member(user) if TeamsUser.find_by(team_id: id, user_id: user.id).nil?
       end

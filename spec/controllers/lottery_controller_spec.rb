@@ -76,7 +76,7 @@ describe LotteryController do
     it 'calculates and returns bidding summary data for topics' do
       # Setup test data
       let(:assignment) { create(:assignment, is_intelligent: true, name: 'assignment', directory_path: 'assignment') }
-      topic = create(:topic, assignmen: assignment)
+      topic = create(:topic, assignment: assignment)
       team = create(:team, assignment: assignment)
       bid = create(:bid, topic: topic, team: team, priority: 1)
       team_name = create(:team_name, team: team)

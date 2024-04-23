@@ -1054,14 +1054,14 @@ describe ReviewMappingHelper, type: :helper do
   end
 
   describe ReviewMappingHelper do
-    describe "#create_report_table_header" do
-      it "renders the report table header partial with given headers" do
+    describe '#create_report_table_header' do
+      it 'renders the report table header partial with given headers' do
         # Mock the necessary objects and expectations
         headers = { key1: 'Header 1', key2: 'Header 2' }
-        allow(self).to receive(:render).with(partial: 'report_table_header', locals: { headers: headers }).and_return("Rendered header")
+        allow(self).to receive(:render).with(partial: 'report_table_header', locals: { headers: headers }).and_return('Rendered header')
         
         # Call the method and expect the correct rendering
-        expect(create_report_table_header(headers)).to eq("Rendered header")
+        expect(create_report_table_header(headers)).to eq('Rendered header')
       end
     end
   end

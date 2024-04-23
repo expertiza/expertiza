@@ -175,9 +175,6 @@ module ReviewMappingHelper
   #       end
   #     end
   #   end
-
-
-
   #   # get the number of review rounds for the assignment
   #   @num_rounds = @assignment.num_review_rounds.to_f.to_i
   #   @all_reviewers_avg_vol_per_round = []
@@ -188,21 +185,21 @@ module ReviewMappingHelper
   #   @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   # end
 
-  # Sorts the reviewers by the specified metric in descending order
+# Sorts the reviewers by the specified metric in descending order
 def sort_reviewers_by_metric_desc(metric = :review_volume)
   @reviewers.each do |r|
     # Calculate the metric for each reviewer
-    reviewer_metric_values = calculate_reviewer_metric(metric, r)
-    r.avg_metric_per_round = []
+  reviewer_metric_values = calculate_reviewer_metric(metric, r)
+  r.avg_metric_per_round = []
 
-    reviewer_metric_values.each_with_index do |value, i|
-      if i.zero?
-        r.overall_avg_metric = value
-      else
-        r.avg_metric_per_round.push(value)
-      end
+  reviewer_metric_values.each_with_index do |value, i|
+  if i.zero?
+    r.overall_avg_metric = value
+  else
+    r.avg_metric_per_round.push(value)
     end
   end
+end
 
   # Calculate the average metric values across all reviewers
   @all_reviewers_avg_metric_per_round = calculate_average_metric_per_round(metric)
@@ -215,11 +212,11 @@ end
 def calculate_reviewer_metric(metric, reviewer)
   case metric
   when :review_volume
-    Response.volume_of_review_comments(@assignment.id, reviewer.id)
-  when :number_of_suggestions
+  Response.volume_of_review_comments(@assignment.id, reviewer.id)
+  # when :number_of_suggestions
     # Calculate number of suggestions for the reviewer
     # Replace this with the actual logic for calculating number of suggestions
-  when :total_problems_detected
+  # when :total_problems_detected
     # Calculate total number of problems detected for the reviewer
     # Replace this with the actual logic for calculating total problems detected
   else
@@ -492,74 +489,74 @@ end
 end
 
 module Charts 
-  # The data of all the reviews is displayed in the form of a bar chart
+# The data of all the reviews is displayed in the form of a bar chart
 def display_volume_metric_chart(reviewer)
-labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
-data = {
-  labels: labels,
-  datasets: [
-    {
-      label: 'vol.',
-      backgroundColor: 'rgba(255,99,132,0.8)',
-      borderWidth: 1,
-      data: reviewer_data,
-      yAxisID: 'bar-y-axis1'
-    },
-    {
-      label: 'avg. vol.',
-      backgroundColor: 'rgba(255,206,86,0.8)',
-      borderWidth: 1,
-      data: all_reviewers_data,
-      yAxisID: 'bar-y-axis2'
+    labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
+    data = {
+      labels: labels,
+      datasets: [
+        {
+          label: 'vol.',
+          backgroundColor: 'rgba(255,99,132,0.8)',
+          borderWidth: 1,
+          data: reviewer_data,
+          yAxisID: 'bar-y-axis1'
+        },
+        {
+          label: 'avg. vol.',
+          backgroundColor: 'rgba(255,206,86,0.8)',
+          borderWidth: 1,
+          data: all_reviewers_data,
+          yAxisID: 'bar-y-axis2'
+        }
+      ]
     }
-  ]
-}
-options = {
-  legend: {
-    position: 'top',
-    labels: {
-      usePointStyle: true
+    options = {
+      legend: {
+        position: 'top',
+        labels: {
+          usePointStyle: true
+        }
+      },
+      width: '200',
+      height: '225',
+      scales: {
+        yAxes: [{
+          stacked: true,
+          id: 'bar-y-axis1',
+          barThickness: 10
+        }, {
+          display: false,
+          stacked: true,
+          id: 'bar-y-axis2',
+          barThickness: 15,
+          type: 'category',
+          categoryPercentage: 0.8,
+          barPercentage: 0.9,
+          gridLines: {
+            offsetGridLines: true
+          }
+        }],
+        xAxes: [{
+          stacked: false,
+          ticks: {
+            beginAtZero: true,
+            stepSize: 50,
+            max: 400
+          }
+        }]
+      }
     }
-  },
-  width: '200',
-  height: '225',
-  scales: {
-    yAxes: [{
-      stacked: true,
-      id: 'bar-y-axis1',
-      barThickness: 10
-    }, {
-      display: false,
-      stacked: true,
-      id: 'bar-y-axis2',
-      barThickness: 15,
-      type: 'category',
-      categoryPercentage: 0.8,
-      barPercentage: 0.9,
-      gridLines: {
-        offsetGridLines: true
-      }
-    }],
-    xAxes: [{
-      stacked: false,
-      ticks: {
-        beginAtZero: true,
-        stepSize: 50,
-        max: 400
-      }
-    }]
-  }
-}
-bar_chart data, options
+    bar_chart data, options
 end
 
 #  Generate chart for review tagging time intervals
 def display_tagging_interval_chart(intervals)
-# if someone did not do any tagging in 30 seconds, then ignore this interval
-threshold = 30
-intervals = intervals.select { |v| v < threshold }
-unless intervals.empty?
-  interval_mean = intervals.reduce(:+) / intervals.size.to_f
+    # if someone did not do any tagging in 30 seconds, then ignore this interval
+    threshold = 30
+    intervals = intervals.select { |v| v < threshold }
+    unless intervals.empty?
+      interval_mean = intervals.reduce(:+) / intervals.size.to_f
 end
 # build the parameters for the chart
 data = {
@@ -595,5 +592,4 @@ options = {
 }
 line_chart data, options
 end
-
 end

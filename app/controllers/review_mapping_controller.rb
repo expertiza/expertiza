@@ -591,12 +591,13 @@ class ReviewMappingController < ApplicationController
       .permit(:grade_for_reviewer, :comment_for_reviewer, :review_graded_at)
   end
 
+  # Create a new grading history record, and write log message
   def create_grading_history
-    GradingHistory.create(instructor_id: session[:user].id,
-                          assignment_id: Participant.find(params[:review_grade][:participant_id]).parent_id,
-                          graded_item_type: 'Review',
-                          graded_member_id: Participant.find(params[:review_grade][:participant_id]).user_id,
-                          grade: @review_grade.grade_for_reviewer,
-                          comment: @review_grade.comment_for_reviewer)
+    GradingHistoriesController.add_grading_history("Review",
+                                                    @review_grade.grade_for_reviewer,
+                                                    @review_grade.comment_for_reviewer,
+                                                    Participant.find(params[:review_grade][:participant_id]).parent_id,
+                                                    Participant.find(params[:review_grade][:participant_id]).user_id,
+                                                    session[:user])
   end
 end

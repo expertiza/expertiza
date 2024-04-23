@@ -262,12 +262,13 @@ class GradesController < ApplicationController
     end
   end
 
+  # Create a new grading history record, and write log message
   def create_grading_history
-    GradingHistory.create(instructor_id: session[:user].id,
-                          assignment_id: @participant.assignment.id,
-                          graded_item_type: 'Submission',
-                          graded_member_id: @team.id,
-                          grade: @team.grade_for_submission,
-                          comment: @team.comment_for_submission)
+    GradingHistoriesController.add_grading_history("Submission",
+                                                   @team.grade_for_submission,
+                                                   @team.comment_for_submission,
+                                                   @participant.assignment.id,
+                                                   @team.id,
+                                                   session[:user])
   end
 end

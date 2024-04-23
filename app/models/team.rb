@@ -188,10 +188,10 @@ class Team < ApplicationRecord
 
   # Extract team members from the csv and push to DB,  changed to hash by E1776
   def import_team_members(row_hash)
-    row_hash[:teammembers].each_with_index do |teammate, _index|
+    row_hash[:teammembers].split(',').each do |teammate|
       user = User.find_by(name: teammate.to_s)
       if user.nil?
-        raise ImportError, "The user '#{teammate}' was not found. <a href='/users/new'>Create</a> this user?"
+        raise ImportError, "The user '#{teammate}' was not found. <a href='/users/new?role=Student'>Create</a> this user?"
       else
         add_member(user) if TeamsUser.find_by(team_id: id, user_id: user.id).nil?
       end
@@ -261,9 +261,11 @@ class Team < ApplicationRecord
       # Append team members' names if options[:team_name] is false
       if options[:team_name] == 'false'
         team_members = TeamsUser.where(team_id: team.id)
+        members = []
         team_members.each do |user|
-          output.push(user.name)
+          members.push(user.name)
         end
+        output.push(members.join(' '))
       end
       # Append the output array to the CSV
       csv << output

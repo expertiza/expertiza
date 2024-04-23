@@ -636,6 +636,7 @@ class ExportAssignment
   def self.export_fields(options)
     @options = options
     fields = []
+    fields << 'Assignment Name'
     fields << 'Team Name'
     fields << 'User ID'
     fields << 'Username'
@@ -680,6 +681,7 @@ class ExportAssignment
     
     team_score[:participants].each do |team_participant|
       csc_row = []
+      csc_row.push(team_score[:team].assignment.name)
       csc_row.push(team_score[:team].name)
       csc_row.push(team_participant[:participant].user_id)
       csc_row.push(team_participant[:participant].user.fullname)

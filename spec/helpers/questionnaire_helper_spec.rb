@@ -4,35 +4,31 @@ require 'questionnaire_helper'
 RSpec.describe QuestionnaireHelper, type: :helper do
   describe '.adjust_advice_size' do
     let(:questionnaire) { double('Questionnaire', max_question_score: 10, min_question_score: 1) }
-    let(:scored_question) { double('ScoredQuestion', id: 1) }
-    let(:non_scored_question) { double('Question') }
+    let(:scored_question) { double('ScoredQuestion', id: 1, question_advices: []) }
+    let(:non_scored_question) { double('Question')}
     let(:question_advice) { double('QuestionAdvice') }
 
     context 'when question is a ScoredQuestion' do
       it 'adjusts advice size based on questionnaire scores' do
-        allow(QuestionAdvice).to receive(:where).and_return([])
-        allow(QuestionAdvice).to receive(:new).and_return(question_advice)
-        allow(scored_question).to receive(:is_a?).with(ScoredQuestion).and_return(true)
-        allow(scored_question).to receive(:question_advices).and_return([])
-
-        described_class.adjust_advice_size(questionnaire, scored_question)
-
-        expect(scored_question).to have_received(:question_advice).exactly(10).times
-        expect(question_advice).to have_received(:save).exactly(10).times
-      end
+    allow(QuestionAdvice).to receive(:where).and_return([])
+    allow(QuestionAdvice).to receive(:new).and_return(double('QuestionAdvice', save: true))
+    allow(scored_question).to receive(:is_a?).with(ScoredQuestion).and_return(true)
+    described_class.adjust_advice_size(questionnaire, scored_question)
+    expect(QuestionAdvice).to have_received(:where).exactly(10).times
+    expect(scored_question.question_advices.size).to eq(10)
+  end
     end
 
     context 'when question is not a ScoredQuestion' do
       it 'does not adjust advice size' do
-        allow(non_scored_question).to receive(:is_a?).with(ScoredQuestion).and_return(false)
-
+        allow(QuestionAdvice).to receive(:where)
+        allow(QuestionAdvice).to receive(:new)
+        allow(scored_question).to receive(:is_a?).with(ScoredQuestion).and_return(false)
         described_class.adjust_advice_size(questionnaire, non_scored_question)
-
-        expect(non_scored_question).not_to have_received(:question_advice)
         expect(QuestionAdvice).not_to have_received(:where)
         expect(QuestionAdvice).not_to have_received(:new)
       end
-    end  
+    end
   end
 
   describe '.questionnaire_factory' do

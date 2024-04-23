@@ -24,7 +24,7 @@ module ReviewMappingHelper
   #
   # gets the team name's color according to review and assignment submission status
   #
-  def get_team_color(response_map)
+  def determine_team_color(response_map)
     # Storing redundantly computed value in a variable
     assignment_created = @assignment.created_at
     # Storing redundantly computed value in a variable
@@ -61,7 +61,7 @@ module ReviewMappingHelper
       if link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
         color.push 'green'
       else
-        link_updated_at = get_link_updated_at(link)
+        link_updated_at = fetch_link_updated_at(link)
         color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
       end
     end
@@ -99,7 +99,7 @@ module ReviewMappingHelper
 
   # returns last modified header date
   # only checks certain links (wiki)
-  def get_link_updated_at(link)
+  def fetch_link_updated_at(link)
     uri = URI(link)
     res = Net::HTTP.get_response(uri)['last-modified']
     res.to_time
@@ -113,7 +113,7 @@ module ReviewMappingHelper
   end
 
   # For assignments with 1 team member, the following method returns user's fullname else it returns "team name" that a particular reviewee belongs to.
-  def get_team_reviewed_link_name(max_team_size, _response, reviewee_id, ip_address)
+  def obtain_team_reviewed_link_name(max_team_size, _response, reviewee_id, ip_address)
     team_reviewed_link_name = if max_team_size == 1
                                 TeamsUser.where(team_id: reviewee_id).first.user.fullname(ip_address)
                               else
@@ -136,7 +136,7 @@ module ReviewMappingHelper
 
   # gets the review score awarded based on each round of the review
 
-  def get_awarded_review_score(reviewer_id, team_id)
+  def determine_awarded_review_score(reviewer_id, team_id)
     # Storing redundantly computed value in num_rounds variable
     num_rounds = @assignment.num_review_rounds
     # Setting values of instance variables
@@ -404,7 +404,7 @@ end
   end
 
   # gets review and feedback responses for all rounds for the feedback report
-  def get_each_review_and_feedback_response_map(author)
+  def fetch_each_review_and_feedback_response_map(author)
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     # Calculate how many responses one team received from each round
     # It is the feedback number each team member should make

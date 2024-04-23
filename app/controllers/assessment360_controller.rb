@@ -163,6 +163,8 @@ class Assessment360Controller < ApplicationController
     # assign it as 0 instead of leaving it blank. This helps in easier calculation of overall grade
     overall_review_grade_hash[assignment.id] = 0 unless overall_review_grade_hash.key?(assignment.id)
     overall_review_count_hash[assignment.id] = 0 unless overall_review_count_hash.key?(assignment.id)
+    # Do not consider reviews that have not been filled out by teammates when calculating averages.
+    reviews = reviews.reject { |review| review.average_score == 'N/A' }
     grades = 0
     # Check if they person has gotten any review for the assignment
     if reviews.count > 0

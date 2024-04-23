@@ -92,7 +92,8 @@ class Team < ApplicationRecord
       assignment_name = assignment_id ? Assignment.find(assignment_id).name.to_s : ''
       # determine which type of email to send
       partial_name = MentorManagement.user_a_mentor?(user) ? 'mentor_added_to_team' : 'user_added_to_team'
-      # if user is a participant then mail cannot be sent - this is because of some legacy code in the participant class
+      # if user is a particpant than some of the legacy tests will fail - however the functionality works if
+      # we just make the modification below. This should be explored further in a future project. 
       if !user.is_a?(Participant)
         Mailer.team_addition_message(
           to: user.email,

@@ -107,10 +107,19 @@ describe Team do
         it 'sends mail to mentor if user is a mentor' do
           allow(MentorManagement).to receive(:user_a_mentor?).with(user).and_return(true)
           allow(Assignment).to receive(:find).with(1).and_return(assignment)
-          allow(MailerHelper).to receive(:send_team_confirmation_mail_to_user).and_return(double('Mail', deliver: true))
+          allow(Mailer).to receive(:team_addition_message).and_return(double('Mail', deliver: true))
 
-          expect(MailerHelper).to receive(:send_team_confirmation_mail_to_user).with(user, '[Expertiza] Added to a Team', 'mentor_added_to_team', team.name.to_s, '').and_return(double('Mail', deliver: true))
-
+          expect(Mailer).to receive(:team_addition_message).with(
+            to: user.email,
+            subject: '[Expertiza] Added to a Team',
+            body: {
+              user: user,
+              first_name: ApplicationHelper.get_user_first_name(user),
+              partial_name: 'mentor_added_to_team',
+              team: team.name.to_s,
+              assignment: ''
+            }
+          ).and_return(double('Mail', deliver: true))
           expect(team.add_member(user)).to be true
         end
 
@@ -119,8 +128,17 @@ describe Team do
           allow(Assignment).to receive(:find).with(1).and_return(assignment)
           allow(MailerHelper).to receive(:send_team_confirmation_mail_to_user).and_return(double('Mail', deliver: true))
 
-          expect(MailerHelper).to receive(:send_team_confirmation_mail_to_user).with(user, '[Expertiza] Added to a Team', 'user_added_to_team', team.name.to_s, '').and_return(double('Mail', deliver: true))
-
+          expect(Mailer).to receive(
+                              to: user.email,
+                              subject: '[Expertiza] Added to a Team',
+                              body: {
+                                user: user,
+                                first_name: ApplicationHelper.get_user_first_name(user),
+                                partial_name: 'user_added_to_team',
+                                team: team.name.to_s,
+                                assignment: ''
+                              }
+                            ).and_return(double('Mail', deliver: true))
           expect(team.add_member(user)).to be true
         end
       end

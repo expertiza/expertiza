@@ -164,6 +164,7 @@ class SignUpTopic < ApplicationRecord
   # Export the fields
   def self.export_fields(options)
     fields = []
+    fields.push('Assignment Name')
     fields.push('Topic Id') if options['topic_identifier'] == 'true'
     fields.push('Topic Names') if options['topic_name'] == 'true'
     fields.push('Description') if options['description'] == 'true'
@@ -173,7 +174,11 @@ class SignUpTopic < ApplicationRecord
     fields.push('Num on waitlist') if options['num_on_waitlist'] == 'true'
     fields
   end
-
+  # Exports the signup topic list for a specific assignment.
+  # This method generates CSV data aligned with user-selected columns from the export view page.
+  # @param csv [CSV] The CSV object to which data will be appended.
+  # @param parent_id [Integer] The ID of the assignment from which to retrieve signup topics.
+  # @param options [Hash] User-selected options that determine which columns to include in the export.
   def self.export(csv, parent_id, options)
     assignment = Assignment.find(parent_id.to_i)
     signuptopics = SignUpTopic.where(assignment_id: assignment.id)
@@ -183,6 +188,7 @@ class SignUpTopic < ApplicationRecord
 
     signuptopics.each do |signuptopic|
       tcsv = []
+      tcsv.push(assignment.name)
       tcsv.push(signuptopic.topic_identifier) if options['topic_identifier'] == 'true'
       tcsv.push(signuptopic.topic_name) if options['topic_name'] == 'true'
       tcsv.push(signuptopic.description) if options['description'] == 'true'

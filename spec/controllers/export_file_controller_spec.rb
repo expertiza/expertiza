@@ -106,7 +106,7 @@ RSpec.describe ExportFileController do
       end
     end
     context 'when exporting data for Signup Topic' do
-      let(:csv_string)  { "Topic Id,Topic Names,Participants\n" }
+      let(:csv_string)  { "Assignment Name,Topic Id,Topic Names,Participants\n" }
       let(:csv_options) { {type: 'text/csv; charset=iso-8859-1; header=present',
                           disposition: "attachment; filename=SignUpTopic843.csv"} }
 

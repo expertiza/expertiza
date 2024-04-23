@@ -243,7 +243,14 @@ class Team < ApplicationRecord
     end
   end
 
-  # Export the teams to csv
+  # Exports team data for a specified course or assignment to a CSV file.
+  # This method determines the type of team (CourseTeam or AssignmentTeam) based on the provided `teamtype`,
+  # retrieves the appropriate teams from the database, and then formats and appends each team's data to the CSV.
+  # @param csv [CSV] The CSV object to which data will be appended.
+  # @param parent_id [Integer] The ID of the parent course or assignment.
+  # @param options [Hash] A hash containing options that affect the output such as whether to include team names.
+  # @param teamtype [Class] The class type (CourseTeam or AssignmentTeam) indicating the team context.
+  # @return [CSV] The updated CSV object containing the exported data.
   def self.export(csv, parent_id, options, teamtype)
     team_parent = nil
   

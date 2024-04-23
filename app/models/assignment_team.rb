@@ -148,13 +148,6 @@ class AssignmentTeam < Team
                                         'insert' => 'Insert any new team members into the existing team',
                                         'rename' => 'Rename the new team and import' } } }
   end
-
-  # Export the existing teams in a csv file
-  def self.export(csv, parent_id, options)
-    assignment_team = prototype
-    Team.export(csv, parent_id, options, assignment_team)
-  end
-
   # Copy the current Assignment team to the CourseTeam
   def copy(course_id)
     new_team = CourseTeam.create_team_and_node(course_id)
@@ -235,13 +228,18 @@ class AssignmentTeam < Team
     nil
   end
 
+  # Export the existing teams in a csv file
+  def self.export(csv, parent_id, options)
+    assignment_team = prototype
+    Team.export(csv, parent_id, options, assignment_team)
+  end
+
   # Export the fields
   def self.export_fields(options)
     fields = []
     fields.push('Assignment Name')
     fields.push('Team Name')
     fields.push('Team members') if options[:team_name] == 'false'
-    
   end
 
   # Remove a team given the team id

@@ -107,11 +107,14 @@ module SignUpSheetHelper
   end
 
   class SignUpTopicHelper
+   # Initializes a new SignUpTopicHelper object.
+   # @param params [Hash] The parameters containing information about the sign-up topic.
+   # @param assignment_id [Integer] The ID of the assignment to which the sign-up topic belongs.
     def initialize(params, assignment_id)
       @params = params
       @assignment_id = assignment_id
     end
-  
+  # Builds a new SignUpTopic object based on the parameters provided.
     def build
       SignUpTopic.new.tap do |topic|
         puts @params.dig(:topic, :topic_identifier)
@@ -123,7 +126,14 @@ module SignUpSheetHelper
       end
     end
   end  
-
+  
+  # Creates a new topic due date record.
+  # @param index [Integer] The index of the due date.
+  # @param topic [SignUpTopic] The sign-up topic for which the due date is being created.
+  # @param deadline_type_id [Integer] The ID representing the type of deadline.
+  # @param due_date_instance [DueDateInstance] An instance containing due date information.
+  # @param due_at [DateTime] The date and time at which the deadline is due.
+  # @return [TopicDueDate] A new TopicDueDate object representing the due date record.
   def create_topic_due_date(index,topic,deadline_type_id,due_date_instance,due_at)
     TopicDueDate.create(
               due_at: due_at,

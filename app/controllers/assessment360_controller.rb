@@ -20,7 +20,7 @@ class Assessment360Controller < ApplicationController
     @meta_review_exists = {}
     @teammate_review = {}
     @teammate_review_exists = {}
-    @teamed_count = {}
+    @student_team_counts = {} # renamed from @teamed_count
     @assignment_columns = {}
     # for course
     # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
@@ -34,7 +34,7 @@ class Assessment360Controller < ApplicationController
       # [aggregrate_review_grades_per_stu, review_count_per_stu] --> [0, 0]
       %w[teammate meta].each { |type| instance_variable_set("@#{type}_review_info_per_stu", [0, 0]) }
       students_teamed = StudentTask.teamed_students(cp.user)
-      @teamed_count[cp.id] = students_teamed[course.id].try(:size).to_i
+      @student_team_counts[cp.id] = students_teamed[course.id].try(:size).to_i
       @assignments.each do |assignment|
         @meta_review[cp.id] = {} unless @meta_review.key?(cp.id)
         @teammate_review[cp.id] = {} unless @teammate_review.key?(cp.id)
@@ -231,12 +231,13 @@ def course_student_grade_summary
     participant_scores(participant, questions)
   end
 
+#Replace hyphen with an en-dash
   def format_topic(topic)
-    topic.nil? ? '-' : topic.format_for_display
+    topic.nil? ? '–' : topic.format_for_display
   end
-
+#Replace hyphen with an en-dash
   def format_score(score)
-    score.nil? ? '-' : score
+    score.nil? ? '–' : score
   end
 
   helper_method :format_score

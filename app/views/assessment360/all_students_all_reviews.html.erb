@@ -26,7 +26,8 @@
 <!-- # Table to display the students' reviews -->
 <table class="table table-striped">
   <tr>
-    <th rowspan=2 width="320">Students</th>
+    <th rowspan=2 width="160" class="sorter-true">Student Name</th>
+      <th rowspan=2 width="160" class="sorter-true">Student ID</th>
     <th rowspan=2 width="30">Teammate Count</th>
     <% @assignments.each do |assignment| %>
       <% if !@teammate_review_exists[assignment.id].nil? || !@meta_review_exists[assignment.id].nil? %>
@@ -49,8 +50,10 @@
   <!-- # Iterates through each course participant to display their reviews -->
   <% @course_participants.each do |cp|%>
     <tr>
-        <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
-        <td><%= @teamed_count[cp.id] %></td>
+        <td align="center"><%= cp.fullname(session[:ip]) %> </td>
+            <td align="center"><%= cp.name(session[:ip]) %> </td>
+            
+        <td><%= @student_team_counts[cp.id] %></td>
         <% @assignments.each do |assignment|%>
         <!-- # Displays the Metareviews and Teammate Reviews for each course participant -->
             <% if !@meta_review_exists[assignment.id].nil? %> <td class="metaReviews"><%= format_score(@meta_review[cp.id][assignment.id]) unless @meta_review.nil? %></td> <% end %>

@@ -11,7 +11,7 @@ gem 'airbrake', '5.2.0'
 gem 'authlogic', '4.5.0'
 gem 'awesome_nested_set', '3.3.1'
 gem 'bootstrap3-datetimepicker-rails', '~> 4.17.47'
-gem 'bullet', '~> 5.7.6'
+#gem 'bullet', '~> 5.7.6'
 gem 'capistrano'
 gem 'capistrano-bundler'
 gem 'capistrano-db-tasks', require: false
@@ -85,6 +85,7 @@ group :development do
   gem 'pry-nav'
   gem 'pry-remote'
   gem 'rubocop'
+  gem 'bullet', '~> 5.7.6' # Add bullet gem to minimize number of queries to database.
 end
 
 group :test do

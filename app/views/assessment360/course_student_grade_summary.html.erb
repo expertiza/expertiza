@@ -39,7 +39,9 @@ $(function() {
 <table class="table table-striped sortable">
   <thead>
     <tr>
-      <th rowspan=2 width="320" class="sorter-true">Students</th>
+      
+      <th rowspan=2 width="160" class="sorter-true">Student Name</th>
+      <th rowspan=2 width="160" class="sorter-true">Student ID</th>
       <% @assignments.each do |assignment| %>
         <!-- check if at least one column is not nil for particular assignment  -->
         <% if !@topics_present[assignment.id].nil? || !@peer_review_scores_present[assignment.id].nil? || !@assignment_grades_present[assignment.id].nil? %>
@@ -63,7 +65,8 @@ $(function() {
 
   <% @course_participants.each do |cp|%>
       <tr>
-          <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
+          <td align="center"><%= cp.fullname(session[:ip]) %> </td>
+          <td align="center"><%= cp.name(session[:ip]) %> </td>
           <% @assignments.each do |assignment|%>
               <!-- value is hidden or visible based on the check for existence of data -->
               <% if !@topics_present[assignment.id].nil? %>

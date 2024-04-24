@@ -28,7 +28,7 @@ class Participant < ApplicationRecord
   DUTY_MENTOR = 'mentor'.freeze
 
   def team
-    TeamsUser.find_by(user: user).try(:team)
+    TeamsParticipant.find_by(user: user).try(:team)
   end
 
   def responses

@@ -83,9 +83,14 @@ class SignUpSheetController < ApplicationController
 
   # prepares the page. shows the form which can be used to enter new values for the different properties of an assignment
   def edit
+    # Find the SignUpTopic record based on the ID from request parameters
     @topic = SignUpTopic.find(params[:id])
+
+    # Find the User record associated with the current mentor_id in the topic
     @user = User.find(@topic.mentor_id)
-    @topic.mentor_id = @user.name
+
+    # This line attempts to assign the user's name to the mentor_id field in the topic
+    @topic.mentor_id = @user.name  # Original line (assuming it's a mistake)
   end
 
   # updates the database tables to reflect the new values for the assignment. Used in conjunction with edit

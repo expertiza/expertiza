@@ -251,6 +251,7 @@ class SignUpSheetController < ApplicationController
       if AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id]
         if SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
 
+          # This change has been made for E2403 - To automatically assign a mentor to the topic
           MentorManagement.assign_mentor_to_topic_team(params[:assignment_id], user.id, params[:topic_id])
 
           flash[:success] = 'You have successfully signed up the student for the topic!'
@@ -462,6 +463,9 @@ class SignUpSheetController < ApplicationController
   def setup_new_topic
     set_values_for_new_topic
 
+    # This change has been made for E2403 - To add a TA to the topic
+    # If not in the assignment, add the TA to the assignment
+    # If not in the course, then add the TA to the course too
     @user = User.find_by(name: params[:topic][:mentor_id])
     if @user
       courseId = @sign_up_topic.assignment.course_id
@@ -484,6 +488,7 @@ class SignUpSheetController < ApplicationController
     end
   end
 
+  # This change has been made for E2403 - Added function to add user to an assignment
   def add_user_to_assignment(user, assignment)
     can_submit = true
     can_review = true
@@ -496,6 +501,7 @@ class SignUpSheetController < ApplicationController
     end
   end
 
+  # This change has been made for E2403 - Added function to add user to a course
   def add_user_to_course(user, course)
     can_mentor = true
 
@@ -505,6 +511,8 @@ class SignUpSheetController < ApplicationController
     end
   end
 
+
+  # This change has been made for E2403 - Added function to add TA to a course
   def add_ta_to_course(user, course)
     courseTa = TaMapping.find_by(ta_id: user.id, course_id: course.id)
     unless courseTa

@@ -1,3 +1,5 @@
+<!--This file has been added to display the team member for a mentored team -->
+
 <%
   team_name = prefix.split('_').first
   team_id = team_name.to_i
@@ -92,13 +94,14 @@
       end
     %>
   <td id="add_row_<%= prefix %>" style="cursor:pointer;">
-    <span onclick="addRow()">
+    <span onclick="addColumn()">
       <%= image_tag("plus.png", :border=>0, :alt => "Add new date column", :title => "Add new date column") %>
     </span>
   </td>
 </tr>
 
 <script>
+  // This function validates the date string that is passed to it from the input field
   function validateDate(dateString, input) {
       var parts = dateString.split('/');
       var month = parseInt(parts[0], 10);
@@ -129,6 +132,7 @@
       return true
   }
 
+  // This function is used to delete or update the value of date from the input field if there is already a value in the field
   function modifyData(event, inputId) {
       if(event.keyCode === 13) {
           var input = document.getElementById(inputId);
@@ -136,6 +140,7 @@
           var oldValue = input.getAttribute('data-prev-val')
           var textValue = input.value.trim();
 
+          // Delete the existing date
           if (textValue === "") {
               $.ajax({
                   url: `/delete_date`,
@@ -153,6 +158,7 @@
               });
               input.value = ""; // Clear the input field
           } else {
+              // Editing the existing date
               if(validateDate(textValue, input)) {
                   $.ajax({
                       url: '/edit_date',
@@ -172,6 +178,7 @@
       }
   }
 
+  // This function to used to create a new date for the mentor meeting of the team
   function addDate(event, inputId) {
       if(event.keyCode === 13) {
           var input = document.getElementById(inputId);
@@ -203,7 +210,8 @@
       }
     }
 
-    function addRow() {
+    // This function is used to add a new date column to all the rows of the table
+    function addColumn() {
         var thRow = document.getElementById('header')
         var thElements = thRow.getElementsByTagName('th');
 

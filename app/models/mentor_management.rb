@@ -73,6 +73,8 @@ class MentorManagement
     notify_team_of_mentor_assignment(mentor_user, team)
   end
 
+  # This change has been made for E2403 - Major function to add the mentor of a topic to all the teams that choose this topic
+  # This function finds the team and then assigns the mentor of the topic to this team
   def self.assign_mentor_to_topic_team(assignment_id, user_id, topic_id)
     topic = SignUpTopic.find(topic_id)
     participant = Participant.where(user_id: user_id, parent_id: assignment_id).first

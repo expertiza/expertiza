@@ -54,6 +54,7 @@ class TeamsUsersController < ApplicationController
           flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
         else
           begin
+            # This change has been made for E2403 - To add team to either a mentored team or a normal team
             if team.type == "Mentored" or assignment.auto_assign_mentor
               mentoredTeam = MentoredTeamDecorator.new(team)
               add_member_return = mentoredTeam.add_member(user, team.parent_id)

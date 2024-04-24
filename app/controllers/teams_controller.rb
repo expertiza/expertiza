@@ -53,11 +53,9 @@ class TeamsController < ApplicationController
     @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == Team.allowed_types[0]
     unless @assignment.nil?
       @max_participants = @assignment.max_team_size
-      @has_topic = false
-      topics = SignUpTopic.where(assignment_id: params[:id]).count
-      if topics > 0
-        @has_topic = true
-      end
+
+      # This change has been made for E2403 - Checking if the team has a topic and then display the corresponding view
+      @has_topic = SignUpTopic.where(assignment_id: params[:id]).count > 0
 
       if @assignment.auto_assign_mentor
         @model = MentoredTeamDecorator  # not sure if changing this to decorator is correct yet...
@@ -91,7 +89,7 @@ class TeamsController < ApplicationController
     init_team_type(parent.class.name.demodulize)
     begin
       Team.check_for_existing(parent, params[:team][:name], session[:team_type])
-
+      # This change has been made for E2403 - to create a mentored team or a normal team
       if session[:create_type] == "Mentored"
         @team = Object.const_get('AssignmentTeam').create(name: params[:team][:name], parent_id: parent.id)
         @mentoredTeam = MentoredTeamDecorator.new(@team)
@@ -140,6 +138,8 @@ class TeamsController < ApplicationController
   end
 
   # Deleting a specific team associated with a given parent object
+  # This change has been made for E2403 - This team_id is passed when this function needs to be called as a function
+  # When the function is called from a route, then it acts as the controller for the route
   def delete(team_id = nil)
     # delete records in team, teams_users, signed_up_teams table
     if team_id
@@ -163,8 +163,9 @@ class TeamsController < ApplicationController
       @sign_up_team.destroy_all if @sign_up_team
       @teams_users.destroy_all if @teams_users
 
-      parentAssignment = parent_from_child(@team)
-      if parentAssignment.auto_assign_mentor
+      assignment = parent_from_child(@team)
+      # This change has been made for E2403 - Get the mentor meeting dates only if the team has auto assign mentor on
+      if assignment.auto_assign_mentor
         mentoredMeetings = MentorMeeting.where(team_id: @team.id)
         mentoredMeetings.destroy_all
       end

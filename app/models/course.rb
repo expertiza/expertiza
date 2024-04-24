@@ -44,6 +44,8 @@ class Course < ApplicationRecord
     if participant # If there is already a participant, raise an error. Otherwise, create it
       raise "The user #{user.name} is already a participant."
     else
+
+      # This change has been made for E2403 - Added function to add user to a course
       courseParticipant = CourseParticipant.create(parent_id: id, user_id: user.id, permission_granted: user.master_permission_granted)
       if can_mentor
         courseParticipant.can_mentor = true
@@ -52,6 +54,7 @@ class Course < ApplicationRecord
     end
   end
 
+  # This change has been made for E2403 - Added function to add user to a course needed for assignment of mentor to a topic and automatic assignment fo the mentor to the teams that choose the topic
   def add_ta(username)
     @user = User.find_by(name: username)
     if @user.nil?

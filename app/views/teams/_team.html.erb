@@ -1,3 +1,4 @@
+<!--This is the condition check to determine if the view to display is for mentored teams or normal assingment teams-->
 <% if @model == MentoredTeamDecorator or @has_topic %>
   <%= render :partial => '/tree_display/page_footer_assignments',
              :locals => {

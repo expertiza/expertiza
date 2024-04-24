@@ -25,6 +25,8 @@
     <td><label for="topic_name">Topic description:  </label></td>
     <td><%= text_area 'topic', 'description', cols: 42, rows: 5 %></td>
   </tr>
+
+  <!--This change has been made for E2403 - Added a field to get the mentor name for the topic-->
   <tr>
     <td><label for="mentor_id">Mentor Username:  </label></td>
     <td><%= text_field 'topic', 'mentor_id', :size => 40 %></td>

@@ -61,6 +61,7 @@ Expertiza::Application.routes.draw do
       get :remove_assignment_from_course
       get :instant_flash
       patch :edit
+      # This change has been made for E2403 - changed from post to get to fix delete assignment function
       get :delete
     end
   end

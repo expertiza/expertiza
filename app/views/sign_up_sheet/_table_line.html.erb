@@ -80,6 +80,7 @@
     </td>
   <% end %>
 
+  <!--This change has been made for E2403 - Added a column to display the mentor for the topic-->
   <% @user = User.find(topic.mentor_id) %>
   <td><%= @user.name %></td>
   <td align="center"><%= topic.max_choosers %></td>

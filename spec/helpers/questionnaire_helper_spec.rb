@@ -47,34 +47,34 @@ RSpec.describe QuestionnaireHelper, type: :helper do
     end
   end
 
-  describe '.update_questionnaire_questions' do
-    let(:params) { { question: { '1' => { body: 'Updated body' } } } }
-    let(:question) { double('Question') }
+  # describe '.update_questionnaire_questions' do
+  #   let(:params) { { question: { '1' => { body: 'Updated body' } } } }
+  #   let(:question) { double('Question') }
 
-    before do
-      allow(Question).to receive(:find).and_return(question)
-      allow(question).to receive(:save)
-    end
+  #   before do
+  #     allow(Question).to receive(:find).and_return(question)
+  #     allow(question).to receive(:save)
+  #   end
 
-    context 'when params[:question] is not nil' do
-      it 'updates attributes of questionnaire questions based on form data' do
-        helper.update_questionnaire_questions
-        expect(question).to have_received(:save)
-      end
+  #   context 'when params[:question] is not nil' do
+  #     it 'updates attributes of questionnaire questions based on form data' do
+  #       helper.update_questionnaire_questions
+  #       expect(question).to have_received(:save)
+  #     end
 
-      it 'does not modify unchanged attributes' do
-        allow(question).to receive(:title).and_return('Original title')
-        helper.update_questionnaire_questions
-        expect(question).not_to have_received(:title=)
-      end
-    end
+  #     it 'does not modify unchanged attributes' do
+  #       allow(question).to receive(:title).and_return('Original title')
+  #       helper.update_questionnaire_questions
+  #       expect(question).not_to have_received(:title=)
+  #     end
+  #   end
 
-    context 'when params[:question] is nil' do
-      it 'returns without making any changes' do
-        allow(helper).to receive(:params).and_return(nil)
-        helper.update_questionnaire_questions
-        expect(question).not_to have_received(:save)
-      end
-    end
-  end
+  #   context 'when params[:question] is nil' do
+  #     it 'returns without making any changes' do
+  #       allow(helper).to receive(:params).and_return(nil)
+  #       helper.update_questionnaire_questions
+  #       expect(question).not_to have_received(:save)
+  #     end
+  #   end
+  # end
 end

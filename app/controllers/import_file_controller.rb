@@ -162,7 +162,7 @@ class ImportFileController < ApplicationController
     items = if delimiter == ","
               line.split(/,(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))/)
             else
-              line.split(delimiter)
+              line.scan(/(?:[^#{delimiter}\"]|\"[^\"]*\")+/).map { |item| item.gsub(/\"/, '') }
             end
     row = []
     items.each {|value| row << value.sub("\"", "").sub("\"", "").strip }

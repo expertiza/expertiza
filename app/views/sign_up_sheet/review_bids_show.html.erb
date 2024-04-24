@@ -1,11 +1,5 @@
 <style>
-container {
 
-    display: flex;
-
-    justify-content: space-between;
-
-  }
 
   .review-table {
 
@@ -129,7 +123,7 @@ container {
 
 
 
-<div class="container">
+<div class="container", style="width: 100%">
 
   <% review_no = 1 %>
 
@@ -154,7 +148,7 @@ container {
       <tr>
 
         <td>
-
+          <br>
           <b><%= "#{title} #{review_no}." %></b>
 
           <!-- In ‘review_bids/index’ page, if the topic_identifier is empty, ‘:’ sign should not be displayed. -->
@@ -318,9 +312,12 @@ container {
   <br/>
 
   <br/>
-
+    <br>
+    <br>
+    <br>
   <a href="javascript:history.back()">Back</a>
 
   <br/>
 
 </div>
+

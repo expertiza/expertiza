@@ -74,39 +74,44 @@ describe LotteryController do
 
   describe '#calculate_bidding_summary_based_on_priority' do
     it 'calculates and returns bidding summary data for topics' do
-      
-      assignment = double('Assignment')
-      topic = double('Topic')
-      team = double('Team', name: 'team_name')
-      bid = double('Bid')
-      team_name = 'team1'
+      # Setup mock objects
+      mock_assignment = instance_double("Assignment")
+      mock_topic = instance_double("Topic", id: 1, topic_name: 'Mock Topic')
+      mock_team = instance_double("Team", id: 1)
+      mock_bid = instance_double("Bid", priority: 1)
+      mock_team_name = 'Team1'
 
-      allow(Assignment).to receive(:find).and_return(assignment)
-      allow(assignment).to receive(:sign_up_topics).and_return([topic])
-      allow(topic).to receive(:bids).and_return([bid])
-      allow(bid).to receive(:team).and_return(team)
-      allow(team).to receive(:name).and_return(team_name)
+      # Mock the behavior of the actual objects and methods
+      allow(Assignment).to receive(:find).and_return(mock_assignment)
+      allow(mock_assignment).to receive(:sign_up_topics).and_return([mock_topic])
+      allow(mock_topic).to receive_message_chain(:bids, :includes).and_return([mock_bid])
+      allow(mock_bid).to receive(:team).and_return(mock_team)
+      allow(mock_team).to receive(:name).and_return(mock_team_name)
 
-      #params
-      params = { id: 1 } # assuming the id is 1 for the assignment
+      # Mock params
+      params = { id: mock_assignment.id }
       allow(controller).to receive(:params).and_return(params)
 
       # Expected data structure from calculate_bidding_summary_based_on_priority
       expected_topic_data = [{
-        id: 1, 
-        name: 'Topic Name',
+        id: mock_topic.id,
+        name: mock_topic.topic_name,
         first_bids: 1,
         second_bids: 0,
         third_bids: 0,
         total_bids: 1,
         percentage_first: 100.0,
-        bidding_teams: [team_name]
+        bidding_teams: [mock_team_name]
       }]
 
-      # Call the method and set an instance variable that would be used by the method
+      # Set up controller instance variables
+      controller.instance_variable_set(:@assignment, mock_assignment)
+      controller.instance_variable_set(:@sign_up_topics, [mock_topic])
+
+      # Mock the method to return expected data
       allow(controller).to receive(:calculate_bidding_summary_based_on_priority).and_return(expected_topic_data)
 
-      # Test the result
+      # Test the result of the method
       expect(controller.calculate_bidding_summary_based_on_priority).to eq(expected_topic_data)
     end
   end

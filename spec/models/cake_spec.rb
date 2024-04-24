@@ -71,7 +71,7 @@ describe 'cake' do
     context 'when the review is a Teammate Review Response Map' do
       it 'returns the scores of the team' do
         arr = [answer, answer1]
-        allow(Team).to receive(:joins).with([:teams_users, teams_users: [{ user: :participants }]]).and_return(arr)
+        allow(Team).to receive(:joins).with([:teams_participants, teams_participants: [{ user: :participants }]]).and_return(arr)
         allow(arr).to receive(:where).with('participants.id = ? and teams.parent_id in (?)', 1, 1).and_return([team])
         allow(cake).to receive(:get_answers_for_teammatereview).with(1, 1, 1, 1, 1).and_return(arr)
         expect(cake.get_total_score_for_question('TeammateReviewResponseMap', 1, 1, 1, 1)).to eq(95)
@@ -80,7 +80,7 @@ describe 'cake' do
     context 'when the question is not a teammate review response' do
       it 'returns zero' do
         arr = [answer, answer1]
-        allow(Team).to receive(:joins).with([:teams_users, teams_users: [{ user: :participants }]]).and_return(arr)
+        allow(Team).to receive(:joins).with([:teams_participants, teams_participants: [{ user: :participants }]]).and_return(arr)
         allow(arr).to receive(:where).with('participants.id = ? and teams.parent_id in (?)', 1, 1).and_return([team])
         allow(cake).to receive(:get_answers_for_teammatereview).with(1, 1, 1, 1, 1).and_return(arr)
         expect(cake.get_total_score_for_question('NotTeammateReviewResponseMap', 1, 1, 1, 1)).to eq(nil)
@@ -92,8 +92,8 @@ describe 'cake' do
     it 'gets an array of answers' do
       arr1 = []
       part = [participant]
-      allow(Participant).to receive(:joins).with(user: :teams_users).and_return(arr1)
-      allow(arr1).to receive(:where).with('teams_users.team_id in (?) and participants.parent_id in (?)', 1, 1).and_return(part)
+      allow(Participant).to receive(:joins).with(user: :teams_participants).and_return(arr1)
+      allow(arr1).to receive(:where).with('teams_participants.team_id in (?) and participants.parent_id in (?)', 1, 1).and_return(part)
       allow(part).to receive(:ids).and_return([1])
       allow(Answer).to receive(:joins).with([{ response: :response_map }, :question]).and_return(arr1)
       allow(arr1).to receive(:where).with("response_maps.reviewee_id in (?) and response_maps.reviewed_object_id = (?)

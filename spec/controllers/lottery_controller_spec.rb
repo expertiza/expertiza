@@ -72,49 +72,49 @@ describe LotteryController do
     end
   end
 
- describe '#calculate_bidding_summary_based_on_priority' do
-  it 'calculates and returns bidding summary data for topics' do
-    # Setup mock objects
-    mock_assignment = instance_double("Assignment",id:1)
-    mock_topic = instance_double("Topic", id: 1, topic_name: 'Mock Topic')
-    mock_team = instance_double("Team", id: 1)
-    mock_bid = instance_double("Bid", priority: 1)
-    mock_team_name = 'Team1'
+  describe '#calculate_bidding_summary_based_on_priority' do
+    it 'calculates and returns bidding summary data for topics' do
+      # Setup mock objects
+      mock_assignment = instance_double('Assignment', id: 1)
+      mock_topic = instance_double('Topic', id: 1, topic_name: 'Mock Topic')
+      mock_team = instance_double('Team', id: 1)
+      mock_bid = instance_double('Bid', priority: 1)
+      mock_team_name = 'Team1'
 
-    # Mock the behavior of the actual objects and methods
-    allow(Assignment).to receive(:find).and_return(mock_assignment)
-    allow(mock_assignment).to receive(:sign_up_topics).and_return([mock_topic])
-    allow(mock_topic).to receive_message_chain(:bids, :includes).and_return([mock_bid])
-    allow(mock_bid).to receive(:team).and_return(mock_team)
-    allow(mock_team).to receive(:name).and_return(mock_team_name)
+      # Mock the behavior of the actual objects and methods
+      allow(Assignment).to receive(:find).and_return(mock_assignment)
+      allow(mock_assignment).to receive(:sign_up_topics).and_return([mock_topic])
+      allow(mock_topic).to receive_message_chain(:bids, :includes).and_return([mock_bid])
+      allow(mock_bid).to receive(:team).and_return(mock_team)
+      allow(mock_team).to receive(:name).and_return(mock_team_name)
 
-    # Mock params
-    params = { id: mock_assignment.id }
-    allow(controller).to receive(:params).and_return(params)
+      # Mock params
+      params = { id: mock_assignment.id }
+      allow(controller).to receive(:params).and_return(params)
 
-    # Expected data structure from calculate_bidding_summary_based_on_priority
-    expected_topic_data = [{
-      id: mock_topic.id,
-      name: mock_topic.topic_name,
-      first_bids: 1,
-      second_bids: 0,
-      third_bids: 0,
-      total_bids: 1,
-      percentage_first: 100.0,
-      bidding_teams: [mock_team_name]
-    }]
+      # Expected data structure from calculate_bidding_summary_based_on_priority
+      expected_topic_data = [{
+        id: mock_topic.id,
+        name: mock_topic.topic_name,
+        first_bids: 1,
+        second_bids: 0,
+        third_bids: 0,
+        total_bids: 1,
+        percentage_first: 100.0,
+        bidding_teams: [mock_team_name]
+      }]
 
-    # Set up controller instance variables
-    controller.instance_variable_set(:@assignment, mock_assignment)
-    controller.instance_variable_set(:@sign_up_topics, [mock_topic])
+      # Set up controller instance variables
+      controller.instance_variable_set(:@assignment, mock_assignment)
+      controller.instance_variable_set(:@sign_up_topics, [mock_topic])
 
-    # Mock the method to return expected data
-    allow(controller).to receive(:calculate_bidding_summary_based_on_priority).and_return(expected_topic_data)
+      # Mock the method to return expected data
+      allow(controller).to receive(:calculate_bidding_summary_based_on_priority).and_return(expected_topic_data)
 
-    # Test the result of the method
-    expect(controller.calculate_bidding_summary_based_on_priority).to eq(expected_topic_data)
+      # Test the result of the method
+      expect(controller.calculate_bidding_summary_based_on_priority).to eq(expected_topic_data)
+    end
   end
-end
 
   describe '#construct_users_bidding_info' do
     it 'generate users bidding information hash' do

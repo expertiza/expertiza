@@ -80,5 +80,4 @@ describe ReviewBidsController do
       # Add more asserts for other instance variables as necessary
     end
   end
-
 end

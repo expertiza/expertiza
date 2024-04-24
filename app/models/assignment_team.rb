@@ -128,7 +128,7 @@ class AssignmentTeam < Team
   end
 
   def self.import(row_hash, _session = nil, id, options)
-    raise ArgumentError, 'Record does not contain required items.' if row_hash.length < required_import_fields.length
+    raise ArgumentError, 'Record does not contain enough items.' if row_hash.length < required_import_fields.length
     raise ImportError, 'The assignment with the id "' + id.to_s + '" was not found. <a href=\'/assignment/new\'>Create</a> this assignment?' if Assignment.find_by(id: id).nil?
     Team.import_helper(row_hash, id, options, prototype)
   end

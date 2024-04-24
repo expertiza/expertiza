@@ -107,9 +107,9 @@ class AssignmentParticipant < Participant
     AssignmentTeam.team(self)
   end
 
-  # Note: If user does not exist, it will be created and added to this assignment
+  # Note: If user object does not exist, it will be created and added to this assignment
   def self.import(row_hash, session, id)
-    raise ArgumentError, 'Record does not contain required items.' if row_hash.length < required_import_fields.length
+    raise ArgumentError, 'Record does not contain enough items.' if row_hash.length < required_import_fields.length
     user = User.find_by(name: row_hash[:name])
     user = User.import(row_hash, session, nil) if user.nil?
     raise ImportError, "The assignment with id #{id} was not found." if Assignment.find(id).nil?
@@ -117,20 +117,6 @@ class AssignmentParticipant < Participant
       new_part = AssignmentParticipant.new(user_id: user.id, parent_id: id)
       new_part.set_handle
     end
-  end
-
-  def self.required_import_fields
-    { 'name' => 'Name',
-      'fullname' => 'Full Name',
-      'email' => 'Email' }
-  end
-
-  def self.optional_import_fields(_id = nil)
-    {}
-  end
-
-  def self.import_options
-    {}
   end
 
   # grant publishing rights to one or more assignments. Using the supplied private key,

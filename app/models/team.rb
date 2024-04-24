@@ -198,8 +198,6 @@ class Team < ApplicationRecord
     end
   end
 
-  # Helper for importing CourseTeam and AssignmentTeam objects. Should not be used to import
-  # pure Team objects.
   def self.import_helper(row_hash, id, options, teamtype)
     raise ArgumentError, 'Include duplicate handling option.' unless options.key? :handle_dups
     if row_hash.key? :teamname

@@ -23,20 +23,6 @@ class CourseParticipant < Participant
     end
   end
 
-  def self.required_import_fields
-    { 'name' => 'Name',
-      'fullname' => 'Full Name',
-      'email' => 'Email' }
-  end
-
-  def self.optional_import_fields(_id = nil)
-    {}
-  end
-
-  def self.import_options
-    {}
-  end
-
   def path
     Course.find(parent_id).path + directory_num.to_s + '/'
   end

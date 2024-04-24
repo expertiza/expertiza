@@ -317,7 +317,7 @@ FactoryBot.define do
   end
 
   factory :signed_up_team, class: SignedUpTeam do
-    topic { SignUpTopic.first || association(:topic) }
+    topic { SignUpTopic.first }
     team { create(:team) }
     is_waitlisted false
     preference_priority_number nil

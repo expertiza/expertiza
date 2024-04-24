@@ -73,40 +73,40 @@ describe LotteryController do
   end
 
   describe '#calculate_bidding_summary_based_on_priority' do
-    it 'calculates and returns bidding summary data for topics' do
-      # Setup test data
-      team = create(:team, assignment: assignment)
-      bid = create(:bid, topic: topic, team: team, priority: 1)
-      team_name = create(:team_name, team: team)
+  it 'calculates and returns bidding summary data for topics' do
+    # Setup test data
+    team = create(:team, assignment: assignment)
+    bid = create(:bid, topic: topic1, team: team, priority: 1) # Use topic1 instead of undefined topic
+    team_name = create(:team_name, team: team)
 
-      allow(Assignment).to receive(:find).with(assignment.id).and_return(assignment)
-      allow(assignment).to receive(:sign_up_topics).and_return([topic])
-      allow(topic).to receive_message_chain(:bids, :includes).and_return([bid])
-      allow(bid).to receive_message_chain(:team, :name).and_return(team_name)
+    allow(Assignment).to receive(:find).with(assignment.id).and_return(assignment)
+    allow(assignment).to receive(:sign_up_topics).and_return([topic1]) # Use topic1 instead of undefined topic
+    allow(topic1).to receive_message_chain(:bids, :includes).and_return([bid]) # Use topic1 instead of undefined topic
+    allow(bid).to receive_message_chain(:team, :name).and_return(team_name)
 
-      # Mock params
-      params = { id: assignment.id }
-      allow(controller).to receive(:params).and_return(params)
+    # Mock params
+    params = { id: assignment.id }
+    allow(controller).to receive(:params).and_return(params)
 
-      # Expected data structure from calculate_bidding_summary_based_on_priority
-      expected_topic_data = [
-        {
-          id: topic1.id,
-          name: topic.topic_name,
-          first_bids: 1,
-          second_bids: 1,
-          third_bids: 1,
-          total_bids: 3,
-          percentage_first: 33.33,
-          bidding_teams: [team_user1.haateam_name]
-        }
-      ]
+    # Expected data structure from calculate_bidding_summary_based_on_priority
+    expected_topic_data = [
+      {
+        id: topic1.id,
+        name: topic1.topic_name, # Use topic1 instead of undefined topic
+        first_bids: 1,
+        second_bids: 0, # Adjust according to the test data
+        third_bids: 0, # Adjust according to the test data
+        total_bids: 1, # Adjust according to the test data
+        percentage_first: 100.0, # Adjust according to the test data
+        bidding_teams: [team_name.name] # Adjust according to the test data
+      }
+    ]
 
-      # Call the method
-      controller.instance_variable_set(:@assignment, assignment)
-      expect(controller.calculate_bidding_summary_based_on_priority).to eq(expected_topic_data)
-    end
+    # Call the method
+    controller.instance_variable_set(:@assignment, assignment)
+    expect(controller.calculate_bidding_summary_based_on_priority).to eq(expected_topic_data)
   end
+end
   
   describe '#construct_users_bidding_info' do
     it 'generate users bidding information hash' do

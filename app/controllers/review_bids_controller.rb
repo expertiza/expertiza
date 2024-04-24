@@ -40,6 +40,7 @@ class ReviewBidsController < ApplicationController
     @signup_topics = SignUpTopic.where(assignment_id: @assignment.id, id: topic_ids_with_team) #signup_topics is all the topics students have signed up for
     my_topic = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) #topic selected by the team 
     @signup_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: my_topic) #remove own topic from set of topics to bid on
+    
     @num_participants = AssignmentParticipant.where(parent_id: @assignment.id).count  #number of participants to determine if topic's hot
     @assigned_topics= nil
     @bids = ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id)  #Update bids to be the list of sign-up topics on which the participant has bid
@@ -48,10 +49,12 @@ class ReviewBidsController < ApplicationController
       signup_topic = SignUpTopic.find_by(id: bid.signuptopic_id)
       signed_up_topics << signup_topic if signup_topic
     end
+    
     signed_up_topics &= @signup_topics #signed_up_topics is the set of topics students DID sign up for.  
     @signup_topics -= signed_up_topics
     @bids = signed_up_topics
     @num_of_topics = @signup_topics.size #count the remaining sign-up topics
+    
     @assigned_review_maps = ReviewResponseMap.where({:reviewed_object_id => @assignment.id, :reviewer_id => @participant.id})   #fetch review maps for the participant in the current assignment
     @selected_topics= nil   # this is used to list the topics assigned to review.
     @selected_topics = @assigned_review_maps.map do |review_map|
@@ -93,7 +96,7 @@ class ReviewBidsController < ApplicationController
     assignment_id = params[:assignment_id].to_i # sets parameters used for running bidding algorithm
     reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids # list of reviewer id's from a specific assignment
     bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids) #Retrieving all the existing bids for the assignment
-    puts bidding_data
+    
     #Assigning topics to review for each reviewer
     assigned_topics = run_bidding_algorithm(bidding_data, assignment_id)
     puts assigned_topics
@@ -104,10 +107,7 @@ class ReviewBidsController < ApplicationController
   end
   
 
-  # call webserver for running assigning algorithm
-  # passing webserver: student_ids, topic_ids, student_preferences, time_stamps
-  # webserver returns:
-  # returns matched assignments as json body
+  # Initialy was calling webserver for running assigning algorithm bit server not active
   def run_bidding_algorithm(bidding_data, assignment_id)
     
      #url = WEBSERVICE_CONFIG["review_bidding_webservice_url"] #won't work unless ENV variables are configured
@@ -129,17 +129,19 @@ class ReviewBidsController < ApplicationController
           end
         end
       end
-      
       # Handling students who didn't get any topics because they didn't bid or their bids were unavailable
       unassigned_users = bidding_data['users'].keys - assigned_topics.keys
       unassigned_users.each do |user_id|
         assigned_count = 0 #To count number of topics assigned to the user
+        @participant = AssignmentParticipant.find(user_id)
+        my_topic = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) #topic selected by the team 
+        available_topics -= [my_topic]
         topics=available_topics
         while assigned_count < num_reviews_required && !available_topics.empty?
           topic_to_assign = topics.sample # randomly assigning topics from available topics
           assigned_topics[user_id] << topic_to_assign unless topic_to_assign.nil?
           assigned_count += 1
-          #topics-= topic_to_assign # To avoid duplication of topics assigned
+          topics-= [topic_to_assign] # To avoid duplication of topics assigned
         end
       end
       assigned_topics

@@ -72,10 +72,10 @@ describe LotteryController do
     end
   end
 
-  describe '#calculate_bidding_summary_based_on_priority' do
+ describe '#calculate_bidding_summary_based_on_priority' do
   it 'calculates and returns bidding summary data for topics' do
     # Setup mock objects
-    mock_assignment = instance_double("Assignment")
+    mock_assignment = instance_double("Assignment",id:1)
     mock_topic = instance_double("Topic", id: 1, topic_name: 'Mock Topic')
     mock_team = instance_double("Team", id: 1)
     mock_bid = instance_double("Bid", priority: 1)

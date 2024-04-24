@@ -93,21 +93,20 @@ class Team < ApplicationRecord
       # determine which type of email to send
       # partial_name determines which html file to use for the email
       partial_name = MentorManagement.user_a_mentor?(user) ? 'mentor_added_to_team' : 'user_added_to_team'
-      # if user is a participant than some of the legacy tests will fail - however the functionality works if
-      # we just make the modification below. This should be explored further in a future project.
-      if !user.is_a?(Participant)
-        Mailer.team_addition_message(
-          to: user.email,
-          subject: '[Expertiza] Added to a Team',
-          body: {
-            user: user,
-            first_name: ApplicationHelper.get_user_first_name(user),
-            partial_name: partial_name,
-            team: name.to_s,
-            assignment: assignment_name
-          }
-        ).deliver
-      end
+
+      # calls the mailer function to email the user
+      Mailer.team_addition_message(
+        to: user.email,
+        subject: '[Expertiza] Added to a Team',
+        body: {
+          user: user,
+          first_name: ApplicationHelper.get_user_first_name(user),
+          partial_name: partial_name,
+          team: name.to_s,
+          assignment: assignment_name
+        }
+      ).deliver
+
     end
     can_add_member  # return if the add_member function was successful
   end

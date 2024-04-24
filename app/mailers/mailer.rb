@@ -35,7 +35,7 @@ class Mailer < ActionMailer::Base
   end
 
   def team_addition_message(defn)
-    # Function only for when a user is added to a team (mentor or normal user)
+    # Mail only for when a user is added to a team (mentor or normal user)
     @partial_name = defn[:body][:partial_name]
     @user = defn[:body][:user]
     @first_name = defn[:body][:first_name]

@@ -128,17 +128,17 @@ describe Team do
           allow(Assignment).to receive(:find).with(1).and_return(assignment)
           allow(MailerHelper).to receive(:send_team_confirmation_mail_to_user).and_return(double('Mail', deliver: true))
 
-          expect(Mailer).to receive(
-                              to: user.email,
-                              subject: '[Expertiza] Added to a Team',
-                              body: {
-                                user: user,
-                                first_name: ApplicationHelper.get_user_first_name(user),
-                                partial_name: 'user_added_to_team',
-                                team: team.name.to_s,
-                                assignment: ''
-                              }
-                            ).and_return(double('Mail', deliver: true))
+          expect(Mailer).to receive(:team_addition_message).with(
+            to: user.email,
+            subject: '[Expertiza] Added to a Team',
+            body: {
+              user: user,
+              first_name: ApplicationHelper.get_user_first_name(user),
+              partial_name: 'user_added_to_team',
+              team: team.name.to_s,
+              assignment: ''
+            }
+          ).and_return(double('Mail', deliver: true))
           expect(team.add_member(user)).to be true
         end
       end

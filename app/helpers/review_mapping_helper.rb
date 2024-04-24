@@ -49,18 +49,26 @@ module ReviewMappingHelper
   end
 
   # checks the submission state within each round and assigns team colour
-  def check_submission_state(response_map, assignment_created, assignment_due_dates, round_info)
-    round, color = round_info.values_at(:round, :color)
-  
-    case submission_status(response_map, assignment_created, assignment_due_dates, round)
-    when :submitted_within_round
+  def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+    if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
       color.push 'purple'
-    when :no_link_submitted
-      color.push 'green'
     else
-      link_updated_at = get_link_updated_at(submission_link(response_map, assignment_created, assignment_due_dates, round))
-      color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
+      link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
+      handle_link(link, round, assignment_due_dates, color)
     end
+  end
+
+  def handle_link(link, round, assignment_due_dates, color)
+    if valid_link?(link)
+      link_updated_at = get_link_updated_at(link)
+      color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
+    else
+      color.push 'green'
+    end
+  end
+
+  def valid_link?(link)
+    !link.nil? && link.match?(%r{https*://wiki(.*)})
   end
 
   # checks if a review was submitted in every round and gives the total responses count

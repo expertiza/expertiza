@@ -75,8 +75,6 @@ describe LotteryController do
   describe '#calculate_bidding_summary_based_on_priority' do
     it 'calculates and returns bidding summary data for topics' do
       # Setup test data
-      let(:assignment) { create(:assignment, is_intelligent: true, name: 'assignment', directory_path: 'assignment') }
-      topic = create(:topic, assignment: assignment)
       team = create(:team, assignment: assignment)
       bid = create(:bid, topic: topic, team: team, priority: 1)
       team_name = create(:team_name, team: team)
@@ -93,14 +91,14 @@ describe LotteryController do
       # Expected data structure from calculate_bidding_summary_based_on_priority
       expected_topic_data = [
         {
-          id: topic.id,
+          id: topic1.id,
           name: topic.topic_name,
           first_bids: 1,
-          second_bids: 0,
-          third_bids: 0,
-          total_bids: 1,
-          percentage_first: 100.0,
-          bidding_teams: [team_name]
+          second_bids: 1,
+          third_bids: 1,
+          total_bids: 3,
+          percentage_first: 33.33,
+          bidding_teams: [team_user1.haateam_name]
         }
       ]
 

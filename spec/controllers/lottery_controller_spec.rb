@@ -75,13 +75,14 @@ describe LotteryController do
   describe '#calculate_bidding_summary_based_on_priority' do
   it 'calculates and returns bidding summary data for topics' do
     # Setup test data
-    team = create(:team, assignment: assignment)
-    bid = create(:bid, topic: topic1, team: team, priority: 1) # Use topic1 instead of undefined topic
+    # Instead of using assignment: assignment, use assignment_id: assignment.id to directly set the foreign key
+    team = create(:team, assignment_id: assignment.id) 
+    bid = create(:bid, topic: topic1, team: team, priority: 1)
     team_name = create(:team_name, team: team)
 
     allow(Assignment).to receive(:find).with(assignment.id).and_return(assignment)
-    allow(assignment).to receive(:sign_up_topics).and_return([topic1]) # Use topic1 instead of undefined topic
-    allow(topic1).to receive_message_chain(:bids, :includes).and_return([bid]) # Use topic1 instead of undefined topic
+    allow(assignment).to receive(:sign_up_topics).and_return([topic1])
+    allow(topic1).to receive_message_chain(:bids, :includes).and_return([bid])
     allow(bid).to receive_message_chain(:team, :name).and_return(team_name)
 
     # Mock params
@@ -92,13 +93,13 @@ describe LotteryController do
     expected_topic_data = [
       {
         id: topic1.id,
-        name: topic1.topic_name, # Use topic1 instead of undefined topic
+        name: topic1.topic_name,
         first_bids: 1,
-        second_bids: 0, # Adjust according to the test data
-        third_bids: 0, # Adjust according to the test data
-        total_bids: 1, # Adjust according to the test data
-        percentage_first: 100.0, # Adjust according to the test data
-        bidding_teams: [team_name.name] # Adjust according to the test data
+        second_bids: 0,
+        third_bids: 0,
+        total_bids: 1,
+        percentage_first: 100.0,
+        bidding_teams: [team_name.name]
       }
     ]
 
@@ -107,6 +108,7 @@ describe LotteryController do
     expect(controller.calculate_bidding_summary_based_on_priority).to eq(expected_topic_data)
   end
 end
+
   
   describe '#construct_users_bidding_info' do
     it 'generate users bidding information hash' do

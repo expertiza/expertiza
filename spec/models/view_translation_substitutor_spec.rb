@@ -16,9 +16,9 @@ describe ViewTranslationSubstitutor do
         'dir2' => { 'view2' => { 'key2' => 'val2' } }
       }
 
-      # Expect process_directory to be called for each directory in the locale hash.
-      expect(substitutor).to receive(:process_directory).with('dir1', { 'view1' => { 'key1' => 'val1' } }).and_return('stats1')
-      expect(substitutor).to receive(:process_directory).with('dir2', { 'view2' => { 'key2' => 'val2' } }).and_return('stats2')
+      # Expect process_files_in_directory to be called for each directory in the locale hash.
+      expect(substitutor).to receive(:process_files_in_directory).with('dir1', { 'view1' => { 'key1' => 'val1' } }).and_return('stats1')
+      expect(substitutor).to receive(:process_files_in_directory).with('dir2', { 'view2' => { 'key2' => 'val2' } }).and_return('stats2')
 
       # Expect File.open to be called with a regex matching translation_stats*.yml and write the processed stats to YAML.
       expect(File).to receive(:open).with(/^translation_stats.*\.yml$/, 'w').and_yield(file = double)
@@ -29,7 +29,7 @@ describe ViewTranslationSubstitutor do
     end
   end
 
-  describe '#process_directory' do
+  describe '#process_files_in_directory' do
     let(:substitutor) { ViewTranslationSubstitutor.new }
 
     context 'when view_hash is not empty' do
@@ -39,7 +39,7 @@ describe ViewTranslationSubstitutor do
       it 'processes each view in the view_hash' do
         # Stub process_view method to return 'stats1' and ensure it is called with correct arguments.
         allow(substitutor).to receive(:process_view).and_return('stats1')
-        dir_stats = substitutor.send(:process_directory, dir_name, view_hash)
+        dir_stats = substitutor.send(:process_files_in_directory, dir_name, view_hash)
         expect(dir_stats).to eq({ 'view1' => 'stats1' })
         expect(substitutor).to have_received(:process_view).with(dir_name, 'view1', { 'key1' => 'val1' })
       end
@@ -51,8 +51,8 @@ describe ViewTranslationSubstitutor do
       let(:view_hash) { {} }
 
       it 'returns an empty hash' do
-        # Call the private method process_directory with an empty view_hash and ensure it returns an empty hash.
-        dir_stats = substitutor.send(:process_directory, dir_name, view_hash)
+        # Call the private method process_files_in_directory with an empty view_hash and ensure it returns an empty hash.
+        dir_stats = substitutor.send(:process_files_in_directory, dir_name, view_hash)
         expect(dir_stats).to eq({})
       end
     end

@@ -184,6 +184,8 @@ class ReviewResponseMap < ResponseMap
       (1..rounds_num).each do |round|
         prepare_review_response(assignment, maps, review_final_versions, round)
       end
+    elsif assignment.vary_by_topic?
+      prepare_review_response_by_topic(assignment, maps, review_final_versions)
     else
       prepare_review_response(assignment, maps, review_final_versions, nil)
     end
@@ -206,5 +208,31 @@ class ReviewResponseMap < ResponseMap
       response_ids << responses.last.id unless responses.empty?
     end
     review_final_versions[symbol][:response_ids] = response_ids
+  end
+
+  def self.prepare_review_response_by_topic(assignment, maps, review_final_versions)
+    responses_by_questionnaire = Hash.new { |hash, key| hash[key] = [] }
+
+    maps.each do |map|
+      team = AssignmentTeam.find(map.reviewee_id)
+      topic_id = SignedUpTeam.topic_id_by_team_id(team.id)
+      # Get the questionnaire ID corresponding to the assignment_id and topic_id of the participant
+      questionnaire = AssignmentQuestionnaire.where(assignment_id: assignment.id, topic_id: topic_id).first
+      questionnaire_id = questionnaire.questionnaire_id
+      # Get the responses for the response map
+      where_map = { map_id: map.id, round: 1 }
+      responses = Response.where(where_map)
+      # Append the response ID to the corresponding response_ids array
+      responses_by_questionnaire[questionnaire_id] << responses.last.id unless responses.empty?
+    end
+
+    # Iterate through the grouped responses
+    responses_by_questionnaire.each_with_index do |(questionnaire_id, response_ids), index|
+      symbol = "review for rubric #{index + 1}".to_sym
+      review_final_versions[symbol] = {
+        questionnaire_id: questionnaire_id,
+        response_ids: response_ids
+      }
+    end
   end
 end

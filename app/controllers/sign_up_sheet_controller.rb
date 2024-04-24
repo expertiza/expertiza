@@ -25,10 +25,17 @@ class SignUpSheetController < ApplicationController
     end
   end
   
+  # Checks if a student is allowed to perform a specific action.
+  #
+  # @param action [String] The action to be checked.
+  # @return [Boolean] Returns true if the student is allowed to perform the action, otherwise false.
   def student_action_allowed?(action)
+    # List of actions that students are allowed to perform
     student_actions = %w[set_priority sign_up delete_signup list show_team switch_original_topic_to_approved_suggested_topic publish_approved_suggested_topic]
-    
+
+    # Check if the action is included in the list of student actions
     if student_actions.include?(action)
+      # Check if the current user has student privileges and the needed authorizations are present
       return current_user_has_student_privileges? && are_needed_authorizations_present?(params[:id], 'reader', 'submitter', 'reviewer')
     else
       return false

@@ -318,7 +318,7 @@ FactoryBot.define do
 
   factory :signed_up_team, class: SignedUpTeam do
     topic { SignUpTopic.first }
-    team { create(:team) }
+    team 1
     is_waitlisted false
     preference_priority_number nil
   end

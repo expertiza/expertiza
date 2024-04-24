@@ -10,13 +10,11 @@ class ReviewBid < ApplicationRecord
   def self.bidding_data(assignment_id, reviewer_ids)
     # Return early or set default if reviewer_ids is nil
     return { 'tid' => [], 'users' => {}, 'max_accepted_proposals' => nil } if reviewer_ids.nil? or assignment_id.nil?
-    
     # create basic hash and set basic hash data
     bidding_data = { 'tid' => [], 'users' => {}, 'max_accepted_proposals' => [] }
     topic_ids_with_team = SignedUpTeam.where.not(team_id: nil).pluck(:topic_id)
     bidding_data['tid'] = SignUpTopic.where(assignment_id: assignment_id, id: topic_ids_with_team).ids
     bidding_data['max_accepted_proposals'] = Assignment.where(id: assignment_id).pluck(:num_reviews_allowed).first
-
     # loop through reviewer_ids to get reviewer specific bidding data
     reviewer_ids.each do |reviewer_id|
       bidding_data['users'][reviewer_id] = reviewer_bidding_data(reviewer_id, assignment_id)
@@ -58,7 +56,6 @@ class ReviewBid < ApplicationRecord
     self_topic = SignedUpTeam.topic_id(assignment_id, reviewer_user_id)
     bidding_data = { 'tid' => [], 'otid' => self_topic, 'priority' => [], 'time' => [] }
     bids = ReviewBid.where(participant_id: reviewer_id)
-    #puts "Debug: Bids found - #{bids.map(&:signuptopic_id)}"
     # loop through each bid for a topic to get specific data
     bids.each do |bid|
       bidding_data['tid'] << bid.signuptopic_id

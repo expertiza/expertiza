@@ -96,10 +96,8 @@ class ReviewBidsController < ApplicationController
     assignment_id = params[:assignment_id].to_i # sets parameters used for running bidding algorithm
     reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids # list of reviewer id's from a specific assignment
     bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids) #Retrieving all the existing bids for the assignment
-    
     #Assigning topics to review for each reviewer
     assigned_topics = run_bidding_algorithm(bidding_data, assignment_id)
-    puts assigned_topics
     ReviewBid.assign_review_topics(assignment_id, reviewer_ids, assigned_topics)
     # turns off bidding for students 
     Assignment.find(assignment_id).update(can_choose_topic_to_review: false) 
@@ -108,29 +106,23 @@ class ReviewBidsController < ApplicationController
   
 
   # Initially was calling webserver for running assigning algorithm bit server not active
+  #url = WEBSERVICE_CONFIG["review_bidding_webservice_url"] #won't work unless ENV variables are configured
+  #response = RestClient.post(url, bidding_data.to_json, content_type: 'application/json', accept: :json)
+  #matched_topics= JSON.parse(bidding_data)
   def run_bidding_algorithm(bidding_data, assignment_id)
-    
-     #url = WEBSERVICE_CONFIG["review_bidding_webservice_url"] #won't work unless ENV variables are configured
      begin  
-      #response = RestClient.post(url, bidding_data.to_json, content_type: 'application/json', accept: :json)
-      #matched_topics= JSON.parse(bidding_data)
-      
       assigned_topics = Hash.new { |h, k| h[k] = [] } #To store topics assigned to each user
       available_topics = bidding_data['tid'].dup  # Cloning the list of topic IDs to track availability
       num_reviews_required= Assignment.where(id: assignment_id).pluck(:num_reviews_required).first
-      
-      # Assign topics based on students' bids
       bidding_data['users'].each do |user_id, data|
-        # Sort bids by priority and assign each topic
-        sorted_bids = data['tid'].zip(data['priority']).sort_by { |_, priority| priority }
+        sorted_bids = data['tid'].zip(data['priority']).sort_by { |_, priority| priority } # Sort bids by priority and assign each topic
         sorted_bids.each do |topic_id, _|
           if available_topics.include?(topic_id) && assigned_topics[user_id].length <= bidding_data['max_accepted_proposals']
             assigned_topics[user_id] << topic_id  # Assign topic to student
           end
         end
       end
-      # Handling students who didn't get any topics because they didn't bid or their bids were unavailable
-      unassigned_users = bidding_data['users'].keys - assigned_topics.keys
+      unassigned_users = bidding_data['users'].keys - assigned_topics.keys # Handling students who didn't get any topics because they didn't bid or their bids were unavailable
       unassigned_users.each do |user_id|
         assigned_count = 0 #To count number of topics assigned to the user
         @participant = AssignmentParticipant.find(user_id)

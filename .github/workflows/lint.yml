@@ -24,7 +24,7 @@ jobs:
         run: |
           codespell --ignore-words=.github/config/codespell.txt \
                     --exclude-file=.github/config/codespell.txt \
-                    --skip="./db/migrate,./spec/fixtures,./spec/controllers/grades_controller_spec.rb"
+                    --skip="./db/migrate,./spec/fixtures,./spec/controllers/grades_controller_spec.rb,./config/name.yml"
 
   misspell:
     name: Check spelling all files in commit with misspell

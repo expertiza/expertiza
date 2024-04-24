@@ -264,7 +264,7 @@ class Team < ApplicationRecord
     return csv if team_parent.nil? # Exit if no team_parent is found
     teams.each do |team|
       # Start with team_parent name (course or assignment) and team name
-      output = [team_parent.name, team.name]
+      output = [team.name]
       # Append team members' names if options[:team_name] is false
       if options[:team_name] == 'false'
         team_members = TeamsUser.where(team_id: team.id)

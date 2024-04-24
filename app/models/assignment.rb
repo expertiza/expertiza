@@ -602,14 +602,12 @@ class ExportAssignment
   # Mapping of review types to their corresponding CSV column headers.
   REVIEW_HYPE_MAPPING = { review: 'review_score',
                           teammate: 'teammate_review_score',
-                          metareview: 'metareview_score',
                           feedback: 'author_feedback_score'
                           }.freeze
 
   # Definitions for CSV export fields based on selected options.
   EXPORT_FIELDS = {review_score: ['Maximum review score', 'Minimum review score', 'Average review score'],
     teammate_review_score: ['Maximum score from teammates', 'Minimum score from teammates', 'Average score from teammates'],
-    metareview_score: ['Maximum meta review score', 'Minimum meta review score', 'Average meta review score'],
     author_feedback_score: ['Maximum author feedback score', 'Minimum author feedback score', 'Average author feedback score']
      }.freeze
 
@@ -636,7 +634,6 @@ class ExportAssignment
   def self.export_fields(options)
     @options = options
     fields = []
-    fields << 'Assignment Name'
     fields << 'Team Name'
     fields << 'User ID'
     fields << 'Username'
@@ -681,7 +678,6 @@ class ExportAssignment
     
     team_score[:participants].each do |team_participant|
       csc_row = []
-      csc_row.push(team_score[:team].assignment.name)
       csc_row.push(team_score[:team].name)
       csc_row.push(team_participant[:participant].user_id)
       csc_row.push(team_participant[:participant].user.fullname)

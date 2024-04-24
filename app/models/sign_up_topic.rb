@@ -164,7 +164,6 @@ class SignUpTopic < ApplicationRecord
   # Export the fields
   def self.export_fields(options)
     fields = []
-    fields.push('Assignment Name')
     fields.push('Topic Id') if options['topic_identifier'] == 'true'
     fields.push('Topic Names') if options['topic_name'] == 'true'
     fields.push('Description') if options['description'] == 'true'
@@ -188,7 +187,6 @@ class SignUpTopic < ApplicationRecord
 
     signuptopics.each do |signuptopic|
       tcsv = []
-      tcsv.push(assignment.name)
       tcsv.push(signuptopic.topic_identifier) if options['topic_identifier'] == 'true'
       tcsv.push(signuptopic.topic_name) if options['topic_name'] == 'true'
       tcsv.push(signuptopic.description) if options['description'] == 'true'

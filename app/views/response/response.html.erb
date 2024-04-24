@@ -299,7 +299,7 @@
 <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
 <% if !@map.contributor.nil? && !@map.instance_of?(FeedbackResponseMap) %>
   <% if @map.assignment.team_assignment? %>
-    <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id%>
+    <% team_member = TeamsParticipant.find_by_team_id(@map.contributor).user_id%>
 
    <% participant = Participant.find_by(user_id: team_member) %>
     <div style="float:right">
@@ -307,7 +307,7 @@
     </div>
     <% topic_id = SignedUpTeam.topic_id(@map.assignment.id, team_member) %>
   <% else %>
-    <% participant = Participant.find(TeamsUser.find_by_team_id(@map.contributor).user_id) %>
+    <% participant = Participant.find(TeamsParticipant.find_by_team_id(@map.contributor).user_id) %>
     <div style="float:right">
       <%= link_to "Email the author", author_response_index_path(email: participant.user.email, response: @response.id) %>
     </div>

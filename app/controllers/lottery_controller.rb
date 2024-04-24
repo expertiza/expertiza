@@ -41,11 +41,8 @@ class LotteryController < ApplicationController
   # the overall percentages of teams that received their first, second, and third choice.
   # This method is responsible for calculating the bidding table data for an assignment.
   def calculate_bidding_summary_based_on_priority
-    # Find the assignment by its ID passed in parameters.
     @assignment = Assignment.find(params[:id])
-    # Retrieve all sign up topics associated with the assignment and include the bids for each topic.
     @topics = @assignment.sign_up_topics.includes(:bids)
-    # Map over each topic to create a structured hash of data needed for the view.
     @topic_data = @topics.map do |topic|
     # Count the total number of bids for the topic.
     total_bids = topic.bids.count

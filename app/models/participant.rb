@@ -121,6 +121,20 @@ class Participant < ApplicationRecord
     authorization
   end
 
+  def self.required_import_fields
+    { 'name' => 'Name',
+      'fullname' => 'Full Name',
+      'email' => 'Email' }
+  end
+
+  def self.optional_import_fields(_id = nil)
+    {}
+  end
+
+  def self.import_options
+    {}
+  end
+
   # Sort a set of participants based on their user names.
   # Please make sure there is no duplicated participant in this input array.
   # There should be a more beautiful way to handle this, though.  -Yang

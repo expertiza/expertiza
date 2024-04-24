@@ -237,7 +237,6 @@ class AssignmentTeam < Team
   # Export the fields
   def self.export_fields(options)
     fields = []
-    fields.push('Assignment Name')
     fields.push('Team Name')
     fields.push('Team members') if options[:team_name] == 'false'
   end

@@ -96,7 +96,7 @@ RSpec.describe ExportFileController do
       end    
     end
     context 'when exporting data for Assignment' do
-      let(:csv_string)  { "Assignment Name,Team Name,User ID,Username,Grade for submission,Comment for submission,Maximum review score,Minimum review score,Average review score,Maximum score from teammates,Minimum score from teammates,Average score from teammates\n" }
+      let(:csv_string)  { "Team Name,User ID,Username,Grade for submission,Comment for submission,Maximum review score,Minimum review score,Average review score,Maximum score from teammates,Minimum score from teammates,Average score from teammates\n" }
       let(:csv_options) { {type: 'text/csv; charset=iso-8859-1; header=present',
                           disposition: "attachment; filename=Assignment843.csv"} }
 
@@ -117,7 +117,7 @@ RSpec.describe ExportFileController do
       end
     end
     context 'when exporting data for Signup Topic' do
-      let(:csv_string)  { "Assignment Name,Topic Id,Topic Names,Participants\n" }
+      let(:csv_string)  { "Topic Id,Topic Names,Participants\n" }
       let(:csv_options) { {type: 'text/csv; charset=iso-8859-1; header=present',
                           disposition: "attachment; filename=SignUpTopic843.csv"} }
 
@@ -139,7 +139,7 @@ RSpec.describe ExportFileController do
       end
     end
     context 'when exporting data for AssignmentTeam' do
-      let(:csv_string)  { "Assignment Name,Team Name,Team members\n" }
+      let(:csv_string)  { "Team Name,Team members\n" }
       let(:csv_options) { {type: 'text/csv; charset=iso-8859-1; header=present',
                           disposition: "attachment; filename=AssignmentTeam843.csv"} }
 
@@ -161,7 +161,7 @@ RSpec.describe ExportFileController do
       end
     end
     context 'when exporting data for CourseTeam' do
-      let(:csv_string)  { "Course Name,Team Name,Team members\n" }
+      let(:csv_string)  { "Team Name,Team members\n" }
       let(:csv_options) { {type: 'text/csv; charset=iso-8859-1; header=present',
                           disposition: "attachment; filename=CourseTeam230.csv"} }
 

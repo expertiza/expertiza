@@ -107,7 +107,7 @@ class ReviewBidsController < ApplicationController
   end
   
 
-  # Initialy was calling webserver for running assigning algorithm bit server not active
+  # Initially was calling webserver for running assigning algorithm bit server not active
   def run_bidding_algorithm(bidding_data, assignment_id)
     
      #url = WEBSERVICE_CONFIG["review_bidding_webservice_url"] #won't work unless ENV variables are configured

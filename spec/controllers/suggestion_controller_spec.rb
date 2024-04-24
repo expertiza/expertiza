@@ -76,7 +76,7 @@ describe SuggestionController do
       it 'accept a suggestion' do
         allow(Suggestion).to receive(:find).and_return(suggestion)
         allow(User).to receive(:find_by).and_return(instructor)
-        allow(TeamsUser).to receive(:team_id).and_return(1)
+        allow(TeamsParticipant).to receive(:team_id).and_return(1)
         allow(SignedUpTeam).to receive(:topic_id).and_return(1)
         allow(SignUpTopic).to receive(:new_topic_from_suggestion).and_return(true)
         allow_any_instance_of(SuggestionController).to receive(:notification).and_return(true)

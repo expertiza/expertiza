@@ -568,7 +568,7 @@ class ReviewMappingController < ApplicationController
         # prohibit one student to review his/her own artifact and selected_participants cannot include duplicate num
         participants.each do |participant|
           # avoid last team receives too many peer reviews
-          if !TeamsUser.exists?(team_id: team.id, user_id: participant.user_id) && (selected_participants.size < review_strategy.reviews_per_team)
+          if !TeamsParticipant.exists?(team_id: team.id, user_id: participant.user_id) && (selected_participants.size < review_strategy.reviews_per_team)
             selected_participants << participant.id
             participants_hash[participant.id] += 1
           end

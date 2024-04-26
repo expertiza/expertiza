@@ -478,6 +478,8 @@ Expertiza::Application.routes.draw do
   resources :student_teams, only: %i[create edit update] do
     collection do
       get :view
+      #E2351 Added a new route for mentors to view all their teams
+      get :mentor
       get :remove_participant
       get :auto_complete_for_user_name
       get :edit

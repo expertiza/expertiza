@@ -1,5 +1,8 @@
+<% if current_user_has_instructor_privileges? %>
+  <th width="5%"><%=t ".checkbox"%></th>
+<% end %>
 <th width="5%"><%=t ".topic_id"%></th>
-<% if @assignment.vary_by_topic? %>
+<% if @assignment.vary_by_topic? && current_user_has_instructor_privileges? %>
   <th width="25%"><%=t ".topic_name"%></th>
   <th width="25%"><%=t ".questionnaire"%></th>
 <% else %>
@@ -9,7 +12,9 @@
   <th width="5%"><%=t ".micro_payment"%></th>
 <% end %>
 <% if not @assignment.is_intelligent or  ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? current_user_role?.name %>
-  <th width="5%"><%=t ".num_slots"%></th>
+  <% if current_user_has_instructor_privileges? %>
+    <th width="5%"><%=t ".num_slots"%></th>
+  <% end %>
   <th width="5%"><%=t ".available_slots"%></th>
   <th width="5%"><%=t ".num_waitlist"%></th>
   <!-- Only view the bids metrics to Instructor role and when the "Biddiing for topic" option in Assignment >> Topic is enabled-->
@@ -17,12 +22,14 @@
     <th width="5%"><%=t ".num_bids"%></th>
     <th width="5%"><%=t ".num_1_2_bids"%></th>
   <% end %>
-  <% if @use_bookmark %>
+  <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>
     <th width="10%"> <%=t ".bookmarks"%>
   <% end %>
   <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>
       <th width="10%"><%=t ".actions"%></th>
-      <th width="5%"><%=t ".advertise"%></th>
+      <% if SignUpSheet.has_teammate_ads?(@topic_id) %>
+        <th width="5%"><%=t ".advertise"%></th>
+      <% end %>    
   <% end %>
 
 <% end %>

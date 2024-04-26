@@ -45,7 +45,11 @@ module ResponseHelper
     # The new response is created here so that the controller has access to it in the new method
     # This response object is populated later in the new method
     if new_response
-      @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
+      #Sometimes the response is already created and the new controller is called again (page refresh)
+      @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
+      if @response.nil?
+        @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round.to_i, is_submitted: 0)
+      end
     end
   end
 end

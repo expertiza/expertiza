@@ -106,7 +106,7 @@ class ImportFileController < ApplicationController
   #
   # E.G. [ { :name => 'jsmith', :fullname => 'John Smith' , :email => 'jsmith@gmail.com' },
   #        { :name => 'jdoe', :fullname => 'Jane Doe', :email => 'jdoe@gmail.com' } ]
-  
+
   def hash_rows_with_headers(header, body)
     new_body = []
     header.map! { |column_name| column_name.to_sym }
@@ -167,7 +167,7 @@ class ImportFileController < ApplicationController
     items = if delimiter == ","
               line.split(/,(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))/)
             else
-              line.scan(/(?:[^#{delimiter}\"]|\"[^\"]*\")+/).map { |item| item.gsub(/\"/, '') }
+              line.split(delimiter)
             end
     row = []
     items.each {|value| row << value.sub("\"", "").sub("\"", "").strip }

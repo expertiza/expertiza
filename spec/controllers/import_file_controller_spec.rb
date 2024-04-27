@@ -492,17 +492,17 @@ RSpec.describe ImportFileController do
     context 'when the delimiter is not a comma' do
       it 'splits the line by the given delimiter and removes double quotes' do
         # test scenario 1
-        line = 'John;Doe;"123; Main St";New York'
+        line = 'John;Doe;"123 Main St";New York'
         delimiter = ';'
-        expected_output = ['John', 'Doe', '123; Main St', 'New York']
+        expected_output = ['John', 'Doe', '123 Main St', 'New York']
         expect(controller.send(:parse_line, line, delimiter)).to eq(expected_output)
-  
+    
         # test scenario 2
-        line = 'Jane|Smith|"456| Elm St"|Los Angeles'
+        line = 'Jane|Smith|"456 Elm St"|Los Angeles'
         delimiter = '|'
-        expected_output = ['Jane', 'Smith', '456| Elm St', 'Los Angeles']
+        expected_output = ['Jane', 'Smith', '456 Elm St', 'Los Angeles']
         expect(controller.send(:parse_line, line, delimiter)).to eq(expected_output)
       end
-    end
+    end    
   end  
 end

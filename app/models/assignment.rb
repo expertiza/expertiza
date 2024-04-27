@@ -388,105 +388,6 @@ class Assignment < ApplicationRecord
     nil
   end
 
-  def self.export_details(csv, parent_id, detail_options)
-    return csv unless detail_options.value?('true')
-
-    @assignment = Assignment.find(parent_id)
-    @answers = {} # Contains all answer objects for this assignment
-    # Find all unique response types
-    @uniq_response_type = ResponseMap.where.not(type: nil).pluck(:type).uniq
-    # Find all unique round numbers
-    @uniq_rounds = Response.pluck(:round).uniq
-    # create the nested hash that holds all the answers organized by round # and response type
-    @uniq_rounds.each do |round_num|
-      @answers[round_num] = {}
-      @uniq_response_type.each do |res_type|
-        @answers[round_num][res_type] = []
-      end
-    end
-    @answers = generate_answer(@answers, @assignment)
-    # Loop through each round and response type and construct a new row to be pushed in CSV
-    @uniq_rounds.each do |round_num|
-      @uniq_response_type.each do |res_type|
-        round_type = check_empty_rounds(@answers, round_num, res_type)
-        csv << [round_type, '---', '---', '---', '---', '---', '---', '---'] unless round_type.nil?
-        @answers[round_num][res_type].each do |answer|
-          csv << csv_row(detail_options, answer)
-        end
-      end
-    end
-  end
-
-  # This method was refactored to reduce complexity, additional fields could now be added to the list - Rajan, Jasmine, Sreenidhi
-  # Now you could add your export fields to the hashmap
-  EXPORT_DETAIL_FIELDS = { team_id: 'Team ID / Author ID', team_name: 'Reviewee (Team / Student Name)', reviewer: 'Reviewer', question: 'Question / Criterion', question_id: 'Question ID', comment_id: 'Answer / Comment ID', comments: 'Answer / Comment', score: 'Score' }.freeze
-  def self.export_details_fields(detail_options)
-    fields = []
-    EXPORT_DETAIL_FIELDS.each do |key, value|
-      fields << value if detail_options[key.to_s] == 'true'
-    end
-    fields
-  end
-
-  def self.handle_nil(csv_field)
-    return ' ' if csv_field.nil?
-
-    csv_field
-  end
-
-  # Generates a single row based on the detail_options selected
-  def self.csv_row(detail_options, answer)
-    teams_csv = []
-    @response = Response.find(answer.response_id)
-    map = ResponseMap.find(@response.map_id)
-    @reviewee = Team.find_by id: map.reviewee_id
-    @reviewee = Participant.find(map.reviewee_id).user if @reviewee.nil?
-    reviewer = Participant.find(map.reviewer_id).user
-    teams_csv << handle_nil(@reviewee.id) if detail_options['team_id'] == 'true'
-    teams_csv << handle_nil(@reviewee.name) if detail_options['team_name'] == 'true'
-    teams_csv << handle_nil(reviewer.name) if detail_options['reviewer'] == 'true'
-    teams_csv << handle_nil(answer.question.txt) if detail_options['question'] == 'true'
-    teams_csv << handle_nil(answer.question.id) if detail_options['question_id'] == 'true'
-    teams_csv << handle_nil(answer.id) if detail_options['comment_id'] == 'true'
-    teams_csv << handle_nil(answer.comments) if detail_options['comments'] == 'true'
-    teams_csv << handle_nil(answer.answer) if detail_options['score'] == 'true'
-    teams_csv
-  end
-
-  # Populate answers will review information
-  def self.generate_answer(answers, assignment)
-    # get all response maps for this assignment
-    @response_maps_for_assignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{assignment.id}"])
-    # for each map, get the response & answer associated with it
-    @response_maps_for_assignment.each do |map|
-      @response_for_this_map = Response.find_by_sql(["SELECT * FROM responses WHERE map_id = #{map.id}"])
-      # for this response, get the answer associated with it
-      @response_for_this_map.each do |resp|
-        @associated_answers = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{resp.id}"])
-        @associated_answers.each do |answer|
-          answers[resp.round][map.type].push(answer)
-        end
-      end
-    end
-    answers
-  end
-
-  # Checks if there are rounds with no reviews
-  def self.check_empty_rounds(answers, round_num, res_type)
-    if answers[round_num][res_type].any?
-      round_num.nil? ? 'Round Nil - ' + res_type : 'Round ' + round_num.to_s + ' - ' + res_type.to_s
-    end
-  end
-
-  # This method is used to set the headers for the csv like Assignment Name and Assignment Instructor
-  def self.export_headers(parent_id)
-    @assignment = Assignment.find(parent_id)
-    fields = []
-    fields << 'Assignment Name: ' + @assignment.name.to_s
-    fields << 'Assignment Instructor: ' + User.find(@assignment.instructor_id).name.to_s
-    fields
-  end
-
   # Instantiates the ExportAssignment class and exports grades for all signed up teams and participants of an assignment.
   # This method serves as the entry point for initiating the export process.
   # @param csv [Object] The CSV object where the data will be appended.
@@ -634,7 +535,7 @@ class ExportAssignment
   def self.export_fields(options)
     @options = options
     fields = []
-    fields << 'Team Name'
+    fields << 'Team name'
     fields << 'User ID'
     fields << 'Username'
     fields << 'Grade for submission'

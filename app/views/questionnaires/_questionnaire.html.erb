@@ -82,7 +82,7 @@
     <%= submit_tag "Save all questions", :name=>"save", :class => "btn btn-primary", id: "save_all_questions_button" %>
     <input style="margin-left:36em" type="submit" name="view_advice" value="Edit/View advice" class="btn btn-primary"/>
     <hr/>
-    <%= link_to 'Import questions', :controller=>'import_file', :action=>'start', :model => 'Questionnaire', :id=> @questionnaire.id, :expected_fields => 'txt, type ,seq,size, break_before' %>|
+    <%= link_to 'Import questionnaire', :controller=>'import_file', :action=>'start', :model => 'Question', :id=> @questionnaire.id, :expected_fields => 'txt, type ,seq,size, break_before' %>|
     <%= link_to 'Export questionnaire', :controller=>'export_file',:action=>'start',:model=> 'Question',:id=> @questionnaire.id %>
   <% end %>
 <% end %>

@@ -1,18 +1,15 @@
 class ImportFileController < ApplicationController
   def action_allowed?
-    ['Instructor',
-     'Teaching Assistant',
-     'Administrator',
-     'Super-Administrator'].include? current_role_name
+    ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include?(current_role_name)
   end
 
   def start
     @id = params[:id]
     @model = params[:model]
     @title = params[:title]
-    @required_fields = @model.constantize.required_import_fields
-    @optional_fields = @model.constantize.optional_import_fields(@id)
-    @import_options = @model.constantize.import_options
+    @required_fields = model_class.required_import_fields
+    @optional_fields = model_class.optional_import_fields(@id)
+    @import_options = model_class.import_options
   end
 
   def show
@@ -23,9 +20,9 @@ class ImportFileController < ApplicationController
     delimiter = get_delimiter(params)
 
     # All required fields are selected by default
-    @selected_fields = @model.constantize.required_import_fields
+    @selected_fields = model_class.required_import_fields
     # Add the chosen optional fields from start
-    optional_fields = @model.constantize.optional_import_fields(@id)
+    optional_fields = model_class.optional_import_fields(@id)
     optional_fields.each do |field, display|
       if params[field] == "true"
         @selected_fields.store(field, display)
@@ -56,14 +53,8 @@ class ImportFileController < ApplicationController
     redirect_to session[:return_to]
   end
 
-  # NOTE: Optional columns currently handled with a checkbox in the show that carries into the
-  # import function (after the table appears). Will need to modify for the advice. Should probably
-  # require files to have a header, this will simplify the inclusion of the question advice.
-  #
-  # Also, good way to refactor this in general? Without a header, pass the expected params to the show
-  # view. Update the expected columns view in the start page to reflect the optional params.
   def import_from_hash(session, params)
-    model = params[:model]
+    model = model_class
     contents_hash = eval(params[:contents_hash])
 
     if params[:has_header] == "true"
@@ -83,25 +74,39 @@ class ImportFileController < ApplicationController
     errors = []
     begin
       header_integrated_body.each do |row_hash|
-        if model.constantize.import_options.empty?
-          model.constantize.import(row_hash, session, params[:id])
+        if model.import_options.empty?
+          model.import(row_hash, session, params[:id])
         else
-          model.constantize.import(row_hash, session, params[:id], params[:options])
+          model.import(row_hash, session, params[:id], params[:options])
         end
       end
-    rescue
-      errors << $ERROR_INFO
+    rescue => e
+      errors << e.message
     end
     errors
   end
 
   protected
 
+  def model_class
+    model_name = params[:model]
+    model = find_model_by_name(model_name)
+    unless model
+      raise ArgumentError, "Invalid model name"
+    end
+    model
+  end
+
+  def find_model_by_name(model_name)
+    ActiveRecord::Base.descendants.detect { |model| model.name == model_name }
+  end
+
   # Produces an array, where each entry in the array is a hash.
   # The hash keys are the column titles, and the hash values are the associated values.
   #
   # E.G. [ { :name => 'jsmith', :fullname => 'John Smith' , :email => 'jsmith@gmail.com' },
   #        { :name => 'jdoe', :fullname => 'Jane Doe', :email => 'jdoe@gmail.com' } ]
+  
   def hash_rows_with_headers(header, body)
     new_body = []
     header.map! { |column_name| column_name.to_sym }

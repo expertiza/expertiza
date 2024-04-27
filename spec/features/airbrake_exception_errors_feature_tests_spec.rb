@@ -102,7 +102,7 @@ describe 'Airbrake exception errors' do
     questionnaire = Questionnaire.where(name: 'Review 1').first
     expect(page).to have_current_path("/questionnaires/#{questionnaire.id}/edit")
     expect(page).to have_content('Edit Review')
-    expect(page).to have_content('Import question')
+    expect(page).to have_content('Import questionnaire')
     expect(page).to have_content('Export questionnaire')
 
     click_button('Save review questionnaire')

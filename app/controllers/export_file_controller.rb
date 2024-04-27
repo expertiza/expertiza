@@ -34,30 +34,6 @@ class ExportFileController < ApplicationController
     [filename, delimiter]
   end
 
-  def exportdetails
-    @delim_type = params[:delim_type2]
-    filename, delimiter = find_delim_filename(@delim_type, params[:other_char2], '_Details')
-
-    allowed_models = ['Assignment']
-    # The export_details_fields and export_headers methods are defined in Assignment.rb that packs all the details from
-    # the model in the generated CSV file.
-    csv_data = CSV.generate(col_sep: delimiter) do |csv|
-      if allowed_models.include? params[:model]
-        csv << Object.const_get(params[:model]).export_assignment_title(params[:id])
-        csv << Object.const_get(params[:model]).export_details_fields(params[:details])
-        Object.const_get(params[:model]).export_details(csv, params[:id], params[:details])
-      else
-        flash[:error] = "This operation is not supported for #{params[:model]}"
-        redirect_back fallback_location: root_path
-        return nil
-      end
-    end
-
-    send_data csv_data,
-              type: 'text/csv; charset=iso-8859-1; header=present',
-              disposition: "attachment; filename=#{filename}"
-  end
-
   def export
     @delim_type = params[:delim_type]
     filename, delimiter = find_delim_filename(@delim_type, params[:other_char])

@@ -165,7 +165,7 @@ class SignUpTopic < ApplicationRecord
   def self.export_fields(options)
     fields = []
     fields.push('Topic Id') if options['topic_identifier'] == 'true'
-    fields.push('Topic Names') if options['topic_name'] == 'true'
+    fields.push('Topic name') if options['topic_name'] == 'true'
     fields.push('Description') if options['description'] == 'true'
     fields.push("Participants") if options['participants'] == 'true'
     fields.push('Num of Slots') if options['num_of_slots'] == 'true'

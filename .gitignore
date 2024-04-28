@@ -221,3 +221,4 @@ pg_data
 mysql2psql.yml
 *.pem
 t.csvdb/schema.rb
+db/schema.rb

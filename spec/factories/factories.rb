@@ -318,7 +318,7 @@ FactoryBot.define do
 
   factory :signed_up_team, class: SignedUpTeam do
     topic { SignUpTopic.first }
-    team 1
+    team {  build(:assignment_team) }
     is_waitlisted false
     preference_priority_number nil
   end
@@ -555,7 +555,7 @@ FactoryBot.define do
   end
 
   factory :response, class: Response do
-    response_map { ReviewResponseMap.first || association(:review_response_map) }
+    response_map {association(:review_response_map) }
     additional_comment nil
     version_num nil
     round 1

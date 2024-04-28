@@ -122,25 +122,31 @@ class ReviewBidsController < ApplicationController
           end
         end
       end
-      unassigned_users = bidding_data['users'].keys - assigned_topics.keys # Handling students who didn't get any topics because they didn't bid or their bids were unavailable
-      unassigned_users.each do |user_id|
-        assigned_count = 0 #To count number of topics assigned to the user
-        @participant = AssignmentParticipant.find(user_id)
-        my_topic = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) #topic selected by the team 
-        available_topics -= [my_topic]
-        topics=available_topics
-        while assigned_count < num_reviews_required && !available_topics.empty?
-          topic_to_assign = topics.sample # randomly assigning topics from available topics
-          assigned_topics[user_id] << topic_to_assign unless topic_to_assign.nil?
-          assigned_count += 1
-          topics-= [topic_to_assign] # To avoid duplication of topics assigned
-        end
-      end
-      assigned_topics
-    end
+      handle_unbid_users(assigned_topics, bidding_data, assignment_id, available_topics)
     rescue StandardError => e
       puts "Error in assigning reviewers: #{e.message}"
       return nil
     end
   end
+
+# Handling students who didn't get any topics because they didn't bid or their bids were unavailable
+  def handle_unbid_users(assigned_topics, bidding_data, assignment_id, available_topics)
+    unassigned_users = bidding_data['users'].keys - assigned_topics.keys 
+    num_reviews_required= Assignment.where(id: assignment_id).pluck(:num_reviews_required).first
+    unassigned_users.each do |user_id|
+      assigned_count = 0    #To count number of topics assigned to the user
+      participant = AssignmentParticipant.find(user_id)
+      user_topic = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) #topic selected by the team 
+      available_topics.delete(user_topic)
+      topics=available_topics
+      while assigned_count < num_reviews_required && !available_topics.empty?
+        topic_to_assign = topics.sample # randomly assigning topics from available topics
+        assigned_topics[user_id] << topic_to_assign unless topic_to_assign.nil?
+        assigned_count += 1
+        topics-= [topic_to_assign] # To avoid duplication of topics assigned
+      end
+    end
+    assigned_topics
+  end
+end
 

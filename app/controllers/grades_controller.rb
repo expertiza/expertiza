@@ -47,6 +47,7 @@ class GradesController < ApplicationController
       end
     end
     @scores = review_grades(@assignment, @questions)
+    @num_reviewers_assigned_scores = @scores[:teams].length # After rejecting nil scores need original length to iterate over hash
     averages = vector(@scores)
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)
@@ -89,8 +90,19 @@ class GradesController < ApplicationController
     @vmlist = []
 
     counter_for_same_rubric = 0
+    if @assignment.vary_by_topic?
+      topic_id = SignedUpTeam.topic_id_by_team_id(@team_id)
+      topic_specific_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, topic_id: topic_id).first.questionnaire
+      @vmlist << populate_view_model(topic_specific_questionnaire)
+    end
     questionnaires.each do |questionnaire|
       @round = nil
+
+      # Guard clause to skip questionnaires that have already been populated for topic specific reviewing
+      if @assignment.vary_by_topic? && questionnaire.type == 'ReviewQuestionnaire'
+        next # Assignments with topic specific rubrics cannot have multiple rounds of review
+      end
+
       if @assignment.varying_rubrics_by_round? && questionnaire.type == 'ReviewQuestionnaire'
         questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
         if questionnaires.count > 1

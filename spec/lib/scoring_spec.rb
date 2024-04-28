@@ -109,7 +109,7 @@ describe Scoring do
         expect(ResponseMap.participant_scores(participant, review1: [question]).inspect).to eq('{:participant=>#<AssignmentParticipant id: 1, can_submit: true, can_review: true, '\
           'user_id: 1, parent_id: 1, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, '\
           'type: "AssignmentParticipant", handle: "handle", time_stamp: nil, digital_signature: nil, duty: nil, '\
-          'can_take_quiz: true, Hamer: 1.0, Lauw: 0.0, duty_id: nil>, :review1=>{:assessments=>[#<Response id: nil, '\
+          'can_take_quiz: true, Hamer: 1.0, Lauw: 0.0, duty_id: nil, can_mentor: false>, :review1=>{:assessments=>[#<Response id: nil, '\
           'map_id: 1, additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, '\
           'is_submitted: false, visibility: "private">], :scores=>{:max=>95, :min=>88, :avg=>90}}, :total_score=>100}')
       end
@@ -122,7 +122,7 @@ describe Scoring do
         expect(ResponseMap.participant_scores(participant, review1: [question]).inspect).to eq('{:participant=>#<AssignmentParticipant id: 1, can_submit: true, can_review: true, '\
           'user_id: 1, parent_id: 1, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, '\
           'type: "AssignmentParticipant", handle: "handle", time_stamp: nil, digital_signature: nil, duty: nil, '\
-          'can_take_quiz: true, Hamer: 1.0, Lauw: 0.0, duty_id: nil>, :review1=>{:assessments=>[#<Response id: nil, '\
+          'can_take_quiz: true, Hamer: 1.0, Lauw: 0.0, duty_id: nil, can_mentor: false>, :review1=>{:assessments=>[#<Response id: nil, '\
           'map_id: 1, additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, '\
           'is_submitted: false, visibility: "private">], :scores=>{:max=>95, :min=>88, :avg=>90}}, :total_score=>100, '\
           ':review=>{:assessments=>[#<Response id: nil, map_id: 1, additional_comment: nil, created_at: nil, '\
@@ -139,7 +139,7 @@ describe Scoring do
         expect(ResponseMap.participant_scores(participant, review1: [question]).inspect).to eq('{:participant=>#<AssignmentParticipant id: 1, can_submit: true, can_review: true, '\
           'user_id: 1, parent_id: 1, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, '\
           'type: "AssignmentParticipant", handle: "handle", time_stamp: nil, digital_signature: nil, duty: nil, '\
-          'can_take_quiz: true, Hamer: 1.0, Lauw: 0.0, duty_id: nil>, :review1=>{:assessments=>[#<Response id: nil, '\
+          'can_take_quiz: true, Hamer: 1.0, Lauw: 0.0, duty_id: nil, can_mentor: false>, :review1=>{:assessments=>[#<Response id: nil, '\
           'map_id: 1, additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, '\
           'is_submitted: false, visibility: "private">], :scores=>{:max=>95, :min=>88, :avg=>90}}, :total_score=>100, '\
           ':max_pts_available=>66}')

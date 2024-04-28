@@ -22,9 +22,9 @@ class Criterion < ScoredQuestion
     html += '<td>text area size <input size="3" value="' + size.to_s
     html += '" name="question[' + id.to_s + '][size]" id="question_' + id.to_s + '_size" type="text"></td>'
 
-    html += '<td> max_label <input size="10" value="' + max_label.to_s + '" name="question[' + id.to_s
-    html += '][max_label]" id="question_' + id.to_s + '_max_label" type="text">  min_label <input size="12" value="' + min_label.to_s
-    html += '" name="question[' + id.to_s + '][min_label]" id="question_' + id.to_s + '_min_label" type="text"></td>'
+    html += '<td> min_label <input size="12" value="' + min_label.to_s
+    html += '" name="question[' + id.to_s + '][min_label]" id="question_' + id.to_s + '_min_label" type="text">  max_label <input size="10" value="' + max_label.to_s + '" name="question[' + id.to_s
+    html += '][max_label]" id="question_' + id.to_s + '_max_label" type="text"></td>'
 
     safe_join(['<tr>'.html_safe, '</tr>'.html_safe], html.html_safe)
   end
@@ -65,7 +65,7 @@ class Criterion < ScoredQuestion
   # show advice for each criterion question
   def advices_criterion_question(count, question_advices)
     html = '<a id="showAdvice_' + id.to_s + '" onclick="showAdvice(' + id.to_s + ')">Show advice</a><script>'
-    html += 'function showAdvice(i){var element = document.getElementById("showAdivce_" + i.toString());'
+    html += 'function showAdvice(i){var element = document.getElementById("showAdvice_" + i.toString());'
     html += 'var show = element.innerHTML == "Hide advice";'
     html += 'if (show){element.innerHTML="Show advice";} else{element.innerHTML="Hide advice";}toggleAdvice(i);}'
     html += 'function toggleAdvice(i) {var elem = document.getElementById(i.toString() + "_myDiv");'

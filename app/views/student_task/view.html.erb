@@ -39,7 +39,7 @@
 
 <!--ACS Here we need to know the size of the team to decide whether or not
 to display the label "Your team" in the student assignment tasks-->
-  <%if @assignment.max_team_size > 0 %>
+  <%if @assignment.max_team_size > 1 %>
     <% if @authorization == 'participant' %>
       <li>
         <%= link_to t('.your_team'), view_student_teams_path(student_id: @participant.id) %>
@@ -48,10 +48,16 @@ to display the label "Your team" in the student assignment tasks-->
     <% end %>
   <%end%>
 
+  <!-- E2351 if they are mentor they should be able to view all the teams they are on -->
+  <% if @authorization =='mentor' %>
+    <%= link_to t('.all_teams'), mentor_student_teams_path(student_id: @participant.id) %>
+        <%=t ".view_team" %>
+  <% end %>
+
   <!--Your work-->
   <% if @authorization == 'participant' || @can_submit == true %>
     <li>
-      <% if @team %>
+      <% if @assignment.max_team_size <= 1 || @team %>
         <% if @topics.size > 0 %>
           <% if @topic_id && @assignment.submission_allowed(@topic_id) %>
             <%= link_to t(".your_work"), :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> <%=t ".submit_work" %>

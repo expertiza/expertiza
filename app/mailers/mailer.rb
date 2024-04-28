@@ -65,6 +65,9 @@ class Mailer < ActionMailer::Base
   end
 
   def delayed_message(defn)
+    if Rails.env.development? || Rails.env.test?
+      defn[:bcc] = 'expertiza.mailer@gmail.com'
+    end
     ret = mail(subject: defn[:subject],
                body: defn[:body],
                content_type: 'text/html',

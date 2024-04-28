@@ -135,10 +135,10 @@
               <% vm.list_of_reviews.each_with_index do |review, i| %>
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
-                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i} %>
+                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i, user_name: nil} %>
                   <% else %>
                       <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
-                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i} %>
+                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i, user_name: user_name} %>
                   <% end %>
                   <% i_final = 0%>
               <% end %>
@@ -171,7 +171,7 @@
                   <!-- actual cells with scores and colored background. -->
                   <% row.score_row.each do |score| %>
                       <% score_comment = score.comment.nil? ? '' : score.comment %> 
-                      <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%= strip_tags(score.comment).html_safe%>">
+                      <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%= strip_tags(score_comment).html_safe%>">
                         <span class="<%=  underlined?(score) %>"><%= score.score_value.to_s %></span>
                       </td>
                   <% end %>
@@ -287,7 +287,7 @@
    @course_id = Assignment.find_by(id: @participant.parent_id).course_id
    @ta_id = @participant.user_id
 %>
-
+<% if @assignment.current_stage(topic_id) == "Finished" %>
   <h4 style="font-weight:bold;display:inline-block;"><%=t ".grade_and_comment"%></h4><br/>
   <% if ['Student', 'Teaching Assistant'].include? current_user.role.name %>
     <%=t ".grade"%>: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
@@ -295,13 +295,14 @@
     <%=t ".late_penalty"%>: <%= label_tag 'late_penalty', @penalties[:submission] %><br/>
   <% end %>
   <% if TaMapping.where(ta_id: @ta_id, course_id: @course_id).exists? || current_user == @assignment.instructor%>
-  <h4 style="font-weight:bold;display:inline-block;">TA Grade-Comment:</h4><br/>
+  <h4 style="font-weight:bold;display:inline-block;">Grade</h4><br/>
     <%= form_tag 'save_grade_and_comment_for_submission' do %>
       <%= hidden_field_tag :participant_id, params[:id] %>
       <%= number_field_tag 'grade_for_submission', @team.try(:grade_for_submission) ,min: 0, max: 100, maxlength: 3, size: 3, class: "form-control width-150", placeholder: t(".grade") %><br/>
+      <h4 style="font-weight:bold;display:inline-block;">Comments</h4><br/>
       <%= text_area_tag 'comment_for_submission', @team.try(:comment_for_submission), size: '75x10', placeholder: t(".Comment"), class: "form-control width-500" %><br>
       <%= submit_tag t(".save") ,class: "btn btn-default" %>
     <% end %>
   <% end %>
-
+<% end %>
 <%= link_to 'Back', :back %>

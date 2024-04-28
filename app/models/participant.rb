@@ -112,6 +112,9 @@ class Participant < ApplicationRecord
   # Get authorization from permissions.
   def authorization
     authorization = 'participant'
+    #E2351 - need to change authorization to reflect mentor when importing
+    #otherwise all imported Assignment Participants would be 'participant' even if designated as mentor in import file
+    authorization = 'mentor' if can_mentor
     authorization = 'reader' if !can_submit && can_review && can_take_quiz
     authorization = 'submitter' if can_submit && !can_review && !can_take_quiz
     authorization = 'reviewer' if !can_submit && can_review && !can_take_quiz
@@ -152,3 +155,4 @@ class Participant < ApplicationRecord
     fields
   end
 end
+

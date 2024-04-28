@@ -4,14 +4,14 @@ module ImportFileHelper
   def self.define_attributes(row_hash)
     attributes = {}
     attributes['role_id'] = Role.student.id
-    attributes['name'] = row_hash[:name]
+    attributes['name'] = row_hash[:username]
     attributes['fullname'] = row_hash[:fullname]
     attributes['email'] = row_hash[:email]
     attributes['email_on_submission'] = 1
     attributes['email_on_review'] = 1
     attributes['email_on_review_of_review'] = 1
     # Handle is set to the users' name by default; when a new user is created
-    attributes['handle'] = row_hash[:name]
+    attributes['handle'] = row_hash[:username]
     attributes
   end
 

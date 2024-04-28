@@ -87,9 +87,6 @@ class PopupController < ApplicationController
     @assignment_id = params[:assignment_id]
     @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@assignment_id, @reviewer_id)
     @reviews = []
-
-    assignment = Assignment.find(@assignment_id)
-    flash.now[:error] = 'This report is not implemented for assignments where the rubric varies by topic.' if assignment.vary_by_topic?
   end
 
   # this can be called from "response_report" by clicking reviewer names from instructor end.

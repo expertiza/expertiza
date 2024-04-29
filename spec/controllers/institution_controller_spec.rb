@@ -37,7 +37,7 @@ describe InstitutionController do
       context 'when current user is the instructor' do
         it 'allows certain action' do
             stub_current_user(instructor, instructor.role.name, instructor.role)
-
+          # changed controller.send(:action_allowed?).should be true
 
           stub_current_user(instructor, instructor.role.name, instructor.role)
           expect(controller.send(:action_allowed?)).to be true

@@ -501,15 +501,19 @@ describe SignUpSheetController do
   end
 
   describe '#sign_up' do
-    context 'when SignUpSheet.signup_team method return nil' do
-      it 'shows an error flash message and redirects to sign_up_sheet#list page' do
-        allow(Team).to receive(:find_team_users).with(1, 6).and_return([team])
-        request_params = { id: 1 }
-        user_session = { user: instructor }
-        get :sign_up, params: request_params, session: user_session
-        expect(flash[:error]).to eq('You\'ve already signed up for a topic!')
-        expect(response).to redirect_to('/sign_up_sheet/list?id=1')
-      end
+   context 'when SignUpSheet.signup_team method returns nil' do
+     it 'shows an error flash message and redirects to sign_up_sheet#list page' do
+       allow(Team).to receive(:find_team_users).with(1, 6).and_return([team])
+       request_params = { id: 1 }
+       user_session = { user: instructor }
+       
+       # Stub the method call to return nil
+       allow(SignUpSheet).to receive(:signup_team).and_return(nil)
+       
+       get :sign_up, params: request_params, session: user_session
+       expect(flash[:error]).to eq('You\'ve already signed up for a topic!')
+       expect(response).to redirect_to('/sign_up_sheet/list?id=1')
+     end
     end
   end
 
@@ -543,6 +547,7 @@ describe SignUpSheetController do
             allow(team).to receive(:t_id).and_return(1)
             allow(TeamsUser).to receive(:team_id).with('1', 8).and_return(1)
             allow(SignedUpTeam).to receive(:topic_id).with('1', 8).and_return(1)
+            allow(SignUpSheet).to receive(:signup_team).and_return(true)
             allow_any_instance_of(SignedUpTeam).to receive(:save).and_return(team)
             request_params = {
               username: 'no name',

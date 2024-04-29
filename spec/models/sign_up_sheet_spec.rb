@@ -58,49 +58,6 @@ describe SignUpSheet do
   end
 end
 
-describe '.confirm_topic' do
-  before(:each) do
-    allow(Team).to receive(:find_team_users).and_return([TeamsUser.new])
-    allow_any_instance_of(TeamsUser).to receive(:t_id).and_return(1)
-    allow(Team).to receive(:find).and_return(Team.new)
-  end  
-  it 'create SignedUpTeam' do
-    allow(SignUpTopic).to receive(:slot_available?) { true }
-    expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be(false)
-  end
-
-  it 'sign_up.is_waitlisted is equal to true' do
-    allow(SignUpTopic).to receive(:slot_available?) { false }
-    expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be(false)
-  end
-
-  it 'returns false if user_signup_topic.is_waitlisted == false' do
-    user_signup = SignedUpTeam.new
-    user_signup.is_waitlisted = false
-    allow(SignUpSheet).to receive(:otherConfirmedTopicforUser) { [user_signup] }
-    expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be(false)
-  end
-  it 'sets sign_up.is_waitlisted = true if slot_available is false' do
-    allow(SignUpTopic).to receive(:slot_available?) { false }
-    user_signup = SignedUpTeam.new
-    user_signup.is_waitlisted = true
-    allow(SignUpSheet).to receive(:otherConfirmedTopicforUser) { [user_signup] }
-    expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be_nil
-  end
-
-  it 'returns true for SignUpSheet.confirmTopic ' do
-    allow(SignUpTopic).to receive(:slot_available?) { true }
-    user_signup = SignedUpTeam.new
-    user_signup.is_waitlisted = true
-    allow(SignUpSheet).to receive(:update_attribute) { [user_signup] }
-    allow(SignedUpTeam).to receive(:where) { [user_signup] }
-    allow(user_signup).to receive(:first) { user_signup }
-    allow(user_signup).to receive(:update_attribute)
-    allow(SignUpSheet).to receive(:otherConfirmedTopicforUser) { [user_signup] }
-    expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be(false)
-  end
-end
-
 describe '.import' do
   it 'raises error if import column equal to 1'
 

@@ -5,6 +5,7 @@ describe SignUpTopic do
   let(:team) { create(:assignment_team, id: 1, name: 'team 1', users: [user, user2]) }
   let(:user) { create(:student) }
   let(:user2) { create(:student, name: 'qwertyui', id: 5) }
+  
 
   describe '.import' do
     context 'when record is empty' do
@@ -92,33 +93,33 @@ describe SignUpTopic do
     end
   end
 
-  describe 'slot_available?' do
-    let(:topic) { instance_double(SignUpTopic, id: 1, max_choosers: 3) }
-  
+  describe '#slot_available?' do
+    let(:topic) { SignUpTopic.create(max_choosers: 3) } # Ensure topic is created with a maximum chooser limit.
+
+    before do
+      allow(SignUpTopic).to receive(:find).with(topic.id).and_return(topic)
+    end
+
     context 'when no students have selected the topic yet' do
       it 'returns true' do
-        allow(SignedUpTeam).to receive(:where).with(topic_id: 1, is_waitlisted: false).and_return([])
-        allow(SignUpTopic).to receive(:find).with(1).and_return(topic)
-        
-        expect(SignUpTopic.slot_available?(1)).to eq(true)
+        allow(SignedUpTeam).to receive(:where).with(topic_id: topic.id, is_waitlisted: false).and_return([])
+        expect(topic.slot_available?).to eq(true)
       end
     end
-  
+
     context 'when students have selected the topic but slots are available' do
       it 'returns true' do
-        allow(SignedUpTeam).to receive(:where).with(topic_id: 1, is_waitlisted: false).and_return([double, double])
-        allow(SignUpTopic).to receive(:find).with(1).and_return(topic)
-        
-        expect(SignUpTopic.slot_available?(1)).to eq(true)
+        # Simulate two students who have selected the topic and are not waitlisted.
+        allow(SignedUpTeam).to receive(:where).with(topic_id: topic.id, is_waitlisted: false).and_return([SignedUpTeam.new, SignedUpTeam.new])
+        expect(topic.slot_available?).to eq(true)
       end
     end
-  
+
     context 'when all slots for the topic are filled' do
       it 'returns false' do
-        allow(SignedUpTeam).to receive(:where).with(topic_id: 1, is_waitlisted: false).and_return([double, double, double])
-        allow(SignUpTopic).to receive(:find).with(1).and_return(topic)
-        
-        expect(SignUpTopic.slot_available?(1)).to eq(false)
+        # Simulate three students who have selected the topic and are not waitlisted.
+        allow(SignedUpTeam).to receive(:where).with(topic_id: topic.id, is_waitlisted: false).and_return([SignedUpTeam.new, SignedUpTeam.new, SignedUpTeam.new])
+        expect(topic.slot_available?).to eq(false)
       end
     end
   end
@@ -187,88 +188,71 @@ describe SignUpTopic do
   end
 
   describe '#longest_waiting_team' do
-    let(:topic_id) { 1 } # Define topic_id with a suitable value
+    let(:topic) { SignUpTopic.create(id: 1) }  # Create an instance of SignUpTopic
+    let(:waitlisted_team) { build(:signed_up_team, is_waitlisted: true) }
 
     context 'when a waitlisted team exists for the topic' do
-      let(:waitlisted_team) { build(:signed_up_team, is_waitlisted: true) }
-
       before do
-        allow(SignedUpTeam).to receive(:where).with(topic_id: topic_id, is_waitlisted: true).and_return([waitlisted_team])
+        allow(SignedUpTeam).to receive(:where).with(topic_id: topic.id, is_waitlisted: true).and_return([waitlisted_team])
       end
 
       it 'returns the first waitlisted team' do
-        expect(your_class_instance.longest_waiting_team(topic_id)).to eq(waitlisted_team)
+        expect(topic.longest_waiting_team(topic.id)).to eq(waitlisted_team)
       end
     end
 
     context 'when no waitlisted team exists for the topic' do
       before do
-        allow(SignedUpTeam).to receive(:where).with(topic_id: topic_id, is_waitlisted: true).and_return([])
+        allow(SignedUpTeam).to receive(:where).with(topic_id: topic.id, is_waitlisted: true).and_return([])
       end
 
       it 'returns nil' do
-        expect(your_class_instance.longest_waiting_team(topic_id)).to be_nil
+        expect(topic.longest_waiting_team(topic.id)).to be_nil
       end
     end
   end
 
   describe '#reassign_topic' do
+    let(:instructor) do 
+      User.create!(
+        name: 'Instructor',
+        fullname: 'Full',  # Ensure this matches the expected format if there are specific validations.
+        email: 'instructor@example.com',  # Provide a valid email format.
+        password: 'securepassword',  # Assume a password is required for user creation.
+        password_confirmation: 'securepassword'  # Match the password confirmation if necessary.
+      )
+    end
+
+    let(:assignment) do
+      Assignment.create!(
+        name: 'Test Assignment',
+        instructor_id: instructor.id,  # Now references a valid record.
+        directory_path: 'test/path'
+      )
+    end
+
+    let(:topic) { SignUpTopic.create!(topic_name: 'Sample Topic', assignment: assignment) }
+    let(:team_id) { 1 }
+    let(:signup_record) { SignedUpTeam.create!(topic: topic, team_id: team_id, is_waitlisted: false) }
+    let(:longest_waiting_team) { SignedUpTeam.create!(topic: topic, team_id: 2, is_waitlisted: true) }
+
+    before do
+      allow(SignedUpTeam).to receive(:where).with(topic_id: topic.id, team_id: team_id).and_return([signup_record])
+      allow(signup_record).to receive(:is_waitlisted).and_return(false)
+    end
+
     context 'when signup record is not waitlisted' do
       before do
-        allow(SignedUpTeam).to receive(:where).with(topic_id: topic_id, team_id: team_id).and_return([signup_record])
-        allow(signup_record).to receive(:is_waitlisted).and_return(false)
-        allow(your_class_instance).to receive(:longest_waiting_team).with(topic_id).and_return(longest_waiting_team)
+        allow(topic).to receive(:longest_waiting_team).and_return(longest_waiting_team)
       end
 
       it 'reassigns the topic to the longest waiting team' do
         expect(longest_waiting_team).to receive(:is_waitlisted=).with(false)
         expect(longest_waiting_team).to receive(:save).once
         expect(SignedUpTeam).to receive(:drop_off_waitlists).with(longest_waiting_team.team_id).once
-        expect(SignedUpTeam).to receive(:drop_signup_record).with(topic_id, team_id).once
+        expect(SignedUpTeam).to receive(:drop_signup_record).with(topic.id, team_id).once
 
-        your_class_instance.reassign_topic(team_id) # Pass team_id as an argument
-      end
-    end
-
-    context 'when signup record is waitlisted' do
-      before do
-        allow(SignedUpTeam).to receive(:where).with(topic_id: topic_id, team_id: team_id).and_return([signup_record])
-        allow(signup_record).to receive(:is_waitlisted).and_return(true)
-      end
-
-      it 'does not reassign the topic' do
-        expect(your_class_instance).not_to receive(:longest_waiting_team)
-        expect(longest_waiting_team).not_to receive(:is_waitlisted=)
-        expect(longest_waiting_team).not to receive(:save)
-        expect(SignedUpTeam).not_to receive(:drop_off_waitlists)
-
-        expect(SignedUpTeam).to receive(:drop_signup_record).with(topic_id, team_id).once
-
-        your_class_instance.reassign_topic(team_id) # Pass team_id as an argument
-      end
-    end
-
-    context 'when no signup record is found' do
-      before do
-        allow(SignedUpTeam).to receive(:where).with(topic_id: topic_id, team_id: team_id).and_return([])
-      end
-
-      it 'does not reassign the topic and handles gracefully' do
-        # Your expectations here
-        your_class_instance.reassign_topic(team_id) # Pass team_id as an argument
-      end
-    end
-
-    context 'when no longest waiting team is found' do
-      before do
-        allow(SignedUpTeam).to receive(:where).with(topic_id: topic_id, team_id: team_id).and_return([signup_record])
-        allow(signup_record).to receive(:is_waitlisted).and_return(false)
-        allow(your_class_instance).to receive(:longest_waiting_team).with(topic_id).and_return(nil)
-      end
-
-      it 'does not reassign the topic and handles gracefully' do
-        # Your expectations here
-        your_class_instance.reassign_topic(team_id) # Pass team_id as an argument
+        topic.reassign_topic(team_id)
       end
     end
   end

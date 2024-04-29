@@ -784,33 +784,27 @@ describe SignUpSheetController do
   end
 
   describe '#delete_signup_for_topic' do
-    context 'when the SignUpTopic record exists' do
-      let(:signup_record) { create(:signed_up_team, team: team, topic: topic) }
+    let!(:topic) { create(:topic, id: 30, assignment_id: 30, topic_identifier: 'E1740') }
+    let(:topic_id) { 1 }
+    let(:team_id) { 1 }
+    let(:sign_up_topic) { instance_double('SignUpTopic') }
 
-      before do
-        allow(SignUpTopic).to receive(:find_by).with(id: topic_id).and_return(topic)
-        allow(topic).to receive(:reassign_topic).with(team_id).and_return(true)
-      end
+    before do
+      allow(SignUpTopic).to receive(:find_by).with(id: topic_id).and_return(sign_up_topic)
+    end
 
-      it 'reassigns the topic for the specified team' do
-        expect(topic).to receive(:reassign_topic).with(team_id).once
-        post :delete_signup_for_topic, params: { topic_id: topic_id, team_id: team_id }
-        expect(response).to redirect_to(sign_up_sheet_list_path(assignment.id))
+    context 'when the topic exists' do
+      it 'calls reassign_topic on the found SignUpTopic instance' do
+        expect(sign_up_topic).to receive(:reassign_topic).with(team_id)
+        controller.send(:delete_signup_for_topic, topic_id, team_id)
       end
     end
 
-    context 'when the SignUpTopic record does not exist' do
-      let(:invalid_topic_id) { 999 } # Assuming 999 is not a valid topic_id
-
-      before do
-        allow(SignUpTopic).to receive(:find_by).with(id: invalid_topic_id).and_return(nil)
-      end
-
-      it 'does not raise an error' do
-        expect {
-          post :delete_signup_for_topic, params: { topic_id: invalid_topic_id, team_id: team_id }
-        }.not_to raise_error
-        expect(response).to redirect_to(sign_up_sheet_list_path(assignment.id))
+    context 'when the topic does not exist' do
+      it 'does not call reassign_topic' do
+        allow(SignUpTopic).to receive(:find_by).with(id: topic_id).and_return(nil)
+        expect(sign_up_topic).not_to receive(:reassign_topic)
+        controller.send(:delete_signup_for_topic, topic_id, team_id)
       end
     end
   end

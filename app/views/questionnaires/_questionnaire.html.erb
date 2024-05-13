@@ -23,7 +23,7 @@
     <%= submit_tag "Create", class: "btn btn-default" %>
   <% end %>
   <% if params[:action] == 'edit' %>
-    <%= submit_tag "Update questionnaire parameters", class: "btn btn-default" %>
+    <%= submit_tag "Update questionnaire name and parameters", class: "btn btn-primary" %>
   <% end %>
 <% end %>
 
@@ -40,7 +40,7 @@
         <p class="form-inline">
           <%= submit_tag 'Add',
                           confirm: AnswerHelper.in_active_period(params[:id]) ? "A review period is in progress. All existing reviews for the questionnaire would be deleted. Are you sure you want to continue?" : nil,
-                          class: "btn btn-primary"%>
+                          class: "btn btn-primary", onclick: "saveAllQuestionsBeforeAddItem()", id: "add_button"%>
           <%= text_field 'question', 'total_num', :size => 1, :value => "1", :class => "form-control" %> more
           <%= select "question", "type",
               {"Criterion" =>"Criterion",
@@ -54,21 +54,21 @@
               "SectionHeader"=>"SectionHeader",
               "TableHeader"=>"TableHeader",
               "ColumnHeader"=>"ColumnHeader"
-              }, {}, {class: "form-control", onchange: "checkQuestionType()"} %> question(s)
+              }, {}, {class: "form-control", onchange: "checkQuestionType()"} %> item(s)
           <span id = "new_question_weight">
-            Add question weight <%= text_field 'question', 'weight', :size => 1, :value => "1", :class => "form-control" %>
+            Add item weight <%= text_field 'question', 'weight', :size => 1, :value => "1", :class => "form-control" %>
           </span></p>
         <% end %>
       </td>
     </tr>
   </table>
-  
-  <%= form_tag :action => 'save_all_questions', :id => params[:id],  :questionnaire_type => params[:model], :private => params[:private] do %>
+
+  <%= form_tag :action => 'save_all_questions', :id => params[:id],  :questionnaire_type => params[:model], :private => params[:private], id: 'save_all_questions_form' do %>
     <table id="questions_table">
       <tr>
         <th class="head" align="center" width="30">Action</td>
         <th class="head" align="center" width="30">Seq</td>
-        <th class="head" align="center" width="300">Question</td>
+        <th class="head" align="center" width="300">Items</td>
         <th class="head" align="center" width="100">Type</td>
         <th class="head" align="center">Weight</td>
       </tr>
@@ -79,14 +79,26 @@
         <% i += 1 %>
       <% end %>
     </table>
-    <%= submit_tag "Save all questions", :name=>"save", :class => "btn btn-primary" %>
-    <input style="margin-left:36em" type="submit" name="view_advice" value="Edit/View advice" class="btn btn-default"/>
+    <%= submit_tag "Save all questions", :name=>"save", :class => "btn btn-primary", id: "save_all_questions_button" %>
+    <input style="margin-left:36em" type="submit" name="view_advice" value="Edit/View advice" class="btn btn-primary"/>
     <hr/>
     <%= link_to 'Import Questionnaire', :controller=>'import_file', :action=>'start', :model => 'Question', :id=> @questionnaire.id, :expected_fields => 'txt, type ,seq,size, break_before' %>|
     <%= link_to 'Export Questionnaire', :controller=>'export_file',:action=>'start',:model=> 'Question',:id=> @questionnaire.id %>
   <% end %>
 <% end %>
 <BR/>
+
+<script>
+  document.getElementById('add_button').addEventListener('click', function(event) {
+    event.preventDefault();
+
+    document.getElementById('save_all_questions_button').click();
+
+    setTimeout(function() {
+      event.target.form.submit();
+    }, 100);
+  });
+</script>
 
 <% if AnswerHelper.in_active_period(params[:id]) %>
     <script>

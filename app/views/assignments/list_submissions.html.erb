@@ -55,8 +55,10 @@
           <td><p style = <%="color:#{team_name_color}"%>><%= team.name(session[:ip]) %></p>
           <% unless participants.empty? %>
             <!-- “Assign Grade” will show if the final deadline of this assignment pass -->
-            <% if @assignment.current_stage == "Finished" %>
+            <% if @assignment.current_stage(topic_identifier) == "Finished" %>
               <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
+            <%elsif ["submission", "review"].include?(@assignment.current_stage(topic_identifier)) %>
+              <%= link_to 'View Reviews', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
             <!-- if current user(TA/instructor) is participant in assignment then the user can perform review -->
             <%elsif current_user_is_assignment_participant?(@assignment.id) %>
               <%= render :partial => 'responses', :locals => {:team => team ,:topic_id => topic_identifier, :title => 'Review'} %>

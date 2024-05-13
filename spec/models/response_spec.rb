@@ -175,7 +175,7 @@ describe Response do
       new_response = double('Response')
 
       allow(AssignmentTeam).to receive(:find_by).with(id: response_map.reviewee_id).and_return(team)
-      allow(Response).to receive(:create).with(map_id: response_map.id, additional_comment: '', round: '1', is_submitted: 0).and_return(new_response)
+      allow(Response).to receive(:create).with(map_id: response_map.id, additional_comment: '', round: 1, is_submitted: 0).and_return(new_response)
       expect(response.create_or_get_response(response_map, '1')).to eq(new_response)
     end
 
@@ -185,7 +185,7 @@ describe Response do
       new_response = double('Response', order: {})
       allow(Response).to receive(:where).with(map_id: response_map.id, round: 1).and_return(new_response)
       allow(AssignmentTeam).to receive(:find_by).with(id: response_map.reviewee_id).and_return(team)
-      allow(Response).to receive(:create).with(map_id: response_map.id, additional_comment: '', round: '1', is_submitted: 0).and_return(new_response)
+      allow(Response).to receive(:create).with(map_id: response_map.id, additional_comment: '', round: 1, is_submitted: 0).and_return(new_response)
       expect(response.create_or_get_response(response_map, '1')).to eq(new_response)
     end
   end

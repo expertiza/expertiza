@@ -110,7 +110,7 @@ class Response < ApplicationRecord
     most_recent_submission_by_reviewee = reviewee_team.most_recent_submission if reviewee_team
 
     if response.nil? || (most_recent_submission_by_reviewee && most_recent_submission_by_reviewee.updated_at > response.updated_at)
-      response = Response.create(map_id: response_map.id, additional_comment: '', round: current_round, is_submitted: 0)
+      response = Response.create(map_id: response_map.id, additional_comment: '', round: current_round.to_i, is_submitted: 0)
     end
     response
   end

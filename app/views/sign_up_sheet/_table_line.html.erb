@@ -35,7 +35,9 @@
 </script>
 
 <input name="hidden_topic_id" type="hidden" value=<%=topic.id %> >
-
+<% if current_user_has_instructor_privileges? %>
+  <td><input type="checkbox" class="topic-checkbox" name="selected_topics[]" value="<%= topic.id %>"></td>
+<% end %>
 <td id='topic_id'><%= topic.topic_identifier %></td>
 <td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
 <% if not @assignment.is_intelligent or ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].
@@ -44,7 +46,7 @@
       <td align="center"><%= topic.micropayment %></td>
   <% end %>
 
-  <% if @assignment.vary_by_topic? %>
+  <% if @assignment.vary_by_topic? && current_user_has_instructor_privileges? %>
     <% table_id = "topic_questionnaire_table" + i.to_s %>
     <td>
       <table id = <%=table_id %>>
@@ -79,7 +81,9 @@
     </td>
   <% end %>
 
-  <td align="center"><%= topic.max_choosers %></td>
+  <% if current_user_has_instructor_privileges? %>
+    <td align="center"><%= topic.max_choosers %></td>
+  <% end %>
   <%= render :partial => '/sign_up_sheet/available_slots', :locals => {:topic=>topic} %>
   <%= render :partial => '/sign_up_sheet/num_waiting', :locals => {:topic=>topic} %>
   <!-- Only view the bids metrics to Instructor role and when the "Biddiing for topic" option in Assignment >> Topic is enabled-->

@@ -50,19 +50,19 @@ describe ParticipantsHelper do
             it 'returns correct authorizations when participant_permissions is called with reader authorization' do
                 #Checking permissions for a reader
                 result = participant_permissions('reader')
-                expect(result).to eq(can_submit: false, can_review: true, can_take_quiz: true)
+                expect(result).to eq(can_submit: false, can_review: true, can_take_quiz: true, can_mentor: false)
             end
 
             it 'returns correct authorizations when participant_permissions is called with reviewer authorization' do
                 #Checking permissions for a reviewer
                 result = participant_permissions('reviewer')
-                expect(result).to eq(can_submit: false, can_review: true, can_take_quiz: false)
+                expect(result).to eq(can_submit: false, can_review: true, can_take_quiz: false, can_mentor: false)
             end
 
             it 'returns correct authorizations when participant_permissions is called with submitter authorization' do
                 #Checking permissions for a submitter
                 result = participant_permissions('submitter')
-                expect(result).to eq(can_submit: true, can_review: false, can_take_quiz: false)
+                expect(result).to eq(can_submit: true, can_review: false, can_take_quiz: false, can_mentor: false)
             end
 
             it 'returns correct authorizations when participant_permissions is called with participant authorization' do

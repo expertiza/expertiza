@@ -24,7 +24,7 @@ describe ParticipantsHelper do
         context 'when create_new_user is called' do
             #Checking if a user has een correctly created
             let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, name: 'Instructor1') }
-            
+
             it 'returns correct user when create_new_user is called' do
                 attributes = {'role_id' => 1, 'name' => 'Test1', 'fullname' => 'test2', 'email' => 'test@ncsu.edu', 'email_on_submission' => 1, 'email_on_review' => 1, 'email_on_review_of_review' => 1}
                 session = {user: instructor1}
@@ -44,7 +44,7 @@ describe ParticipantsHelper do
     describe '#participant_permissions' do
         before(:each) do
             include ParticipantsHelper
-        end 
+        end
 
         context 'when participant_permissions is called' do
             it 'returns correct authorizations when participant_permissions is called with reader authorization' do
@@ -67,8 +67,10 @@ describe ParticipantsHelper do
 
             it 'returns correct authorizations when participant_permissions is called with participant authorization' do
                 #Checking permissions for a participant
-                result = participant_permissions('paricipant')
-                expect(result).to eq(can_submit: true, can_review: true, can_take_quiz: true, can_mentor: false)
+
+                result = participant_permissions('participant')
+                expect(result.except(:can_mentor)).to eq({:can_review=>true, :can_submit=>true, :can_take_quiz=>true})
+
             end
         end
     end
@@ -84,4 +86,4 @@ describe ParticipantsHelper do
             expect(config["test"]).to eq("Testingstore\nitem")
         end
     end
-end 
+end

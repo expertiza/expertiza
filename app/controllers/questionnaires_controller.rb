@@ -18,9 +18,10 @@ class QuestionnairesController < ApplicationController
     when 'edit'
       @questionnaire = Questionnaire.find(params[:id])
       current_user_has_admin_privileges? ||
-      (current_user_is_a?('Teaching Assistant') && Ta.find(session[:user].id).is_instructor_or_co_ta?(@questionnaire)) ||
-      (current_user_is_a?('Instructor') && current_user_id?(@questionnaire.try(:instructor_id))) ||
-      (current_user_is_a?('Instructor') && Ta.get_my_instructors(@questionnaire.try(:instructor_id)).include?(session[:user].id))
+        (current_user_is_a?('Teaching Assistant') && Ta.find(session[:user].id).instructor_or_co_ta?(@questionnaire)) ||
+        (current_user_is_a?('Instructor') && current_user_id?(@questionnaire.try(:instructor_id))) ||
+        (current_user_is_a?('Instructor') && current_user_id?(@questionnaire.try(:instructor_id)))
+        (current_user_is_a?('Instructor') && Ta.get_my_instructors(@questionnaire.try(:instructor_id)).include?(session[:user].id))
     else
       current_user_has_student_privileges?
     end
@@ -140,7 +141,7 @@ class QuestionnairesController < ApplicationController
   # Remove a given questionnaire
   # checks if any assignment uses the current questionnaire or not
   # checks if there are any answers to the questions in the questionnaire
-  # for each of the question, it deletes the advice first 
+  # for each of the question, it deletes the advice first
   # and then deletes the question. Only then the questionnaire node
   # is deleted
   def delete

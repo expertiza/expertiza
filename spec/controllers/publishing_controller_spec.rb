@@ -6,22 +6,17 @@ describe PublishingController do
   let(:ta) { build(:teaching_assistant, id: 6) }
   let(:participant) {build(:participant, id: 1)}
   let(:assignment_participant1) { build(:participant, id: 2, user_id: 21)}
-  let(:assignment_participant2) { build(:participant, id: 3, user_id: 21)}   
-	
+  let(:assignment_participant2) { build(:participant, id: 3, user_id: 21)}
+
   # load student object with id 21
   before(:each) do
     allow(User).to receive(:find).with(21).and_return(student1)
   end
 
-<<<<<<< HEAD
-	describe '#action_allowed?' do
-    #check if super-admin is able to perform the actions
-=======
 
 	describe '#action_allowed?' do
     # check if super-admin is able to perform the actions
 
->>>>>>> parent of 2a00dda... Revert "E2353. Further refactoring and improvement of review_mapping_helper"
     it 'allows super_admin to perform certain action' do
       stub_current_user(super_admin, super_admin.role.name, super_admin.role)
       expect(controller.send(:action_allowed?)).to be_truthy
@@ -105,8 +100,8 @@ describe PublishingController do
       end
     end
   end
-    
-    
+
+
   describe 'grant_with_private_key' do
 
     context 'user visits the grant page without id and enters incorrect RSA private key' do
@@ -125,8 +120,8 @@ describe PublishingController do
         expect(response).to redirect_to(action: :grant)
       end
     end
-      
-            
+
+
     context 'user visits the grant page with id and enters correct RSA private key' do
 
       # verify user visits grant page with id and correct RSA key is entered, redirect to view page
@@ -142,8 +137,8 @@ describe PublishingController do
         post :grant_with_private_key, params: params
         expect(response).to redirect_to(action: :view)
       end
-    end 
-      
+    end
+
     context 'user visits the grant page with id and enters incorrect RSA private key' do
 
       # verify user visits the grant page with id but enters incorrect RSA key, verify flash notice
@@ -160,7 +155,7 @@ describe PublishingController do
         expect(flash[:notice]).to eq('The private key you inputted was invalid.')
         expect(response).to redirect_to(action: :grant,params:{id:2})
       end
-    end          
+    end
   end
 
   describe 'update_publish_permissions' do
@@ -175,7 +170,7 @@ describe PublishingController do
         expect(response).to redirect_to(action: :grant)
       end
     end
-      
+
     context 'user clicks on the deny publishing rights to all past assignments button' do
 
       # verify user clicks on deny publishing rights to all assignments and redirects to view page
@@ -190,6 +185,6 @@ describe PublishingController do
         post :update_publish_permissions, params: params
         expect(response).to redirect_to(action: :view)
       end
-    end      
+    end
   end
 end

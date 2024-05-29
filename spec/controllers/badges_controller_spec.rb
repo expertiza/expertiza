@@ -12,24 +12,14 @@ describe BadgesController do
       stub_current_user(super_admin, super_admin.role.name, super_admin.role)
       expect(controller.send(:action_allowed?)).to be_truthy
     end
-<<<<<<< HEAD
 
-    #check if instructor is able to perform the actions
-=======
-  
     # check if instructor is able to perform the actions
->>>>>>> parent of 2a00dda... Revert "E2353. Further refactoring and improvement of review_mapping_helper"
     it 'allows instructor to perform certain action' do
       stub_current_user(instructor1, instructor1.role.name, instructor1.role)
       expect(controller.send(:action_allowed?)).to be_truthy
     end
-<<<<<<< HEAD
 
-    #check if student is restricted from performing the actions
-=======
-  
     # check if student is restricted from performing the actions
->>>>>>> parent of 2a00dda... Revert "E2353. Further refactoring and improvement of review_mapping_helper"
     it 'refuses student from performing certain action' do
       stub_current_user(student1, student1.role.name, student1.role)
       expect(controller.send(:action_allowed?)).to be_falsey
@@ -40,13 +30,8 @@ describe BadgesController do
       stub_current_user(ta, ta.role.name, ta.role)
       expect(controller.send(:action_allowed?)).to be_truthy
     end
-<<<<<<< HEAD
 
-    #check if admin is able to perform the actions
-=======
-  
     # check if admin is able to perform the actions
->>>>>>> parent of 2a00dda... Revert "E2353. Further refactoring and improvement of review_mapping_helper"
     it 'allows admin to perform certain action' do
       stub_current_user(admin, admin.role.name, admin.role)
       expect(controller.send(:action_allowed?)).to be_truthy
@@ -82,13 +67,8 @@ describe BadgesController do
         get :redirect_to_assignment
         expect(get: 'badges/redirect_to_assignment').to route_to('badges#redirect_to_assignment')
       end
-<<<<<<< HEAD
 
-      #verify if it redirects to the assignment page
-=======
-    
       # verify if it redirects to the assignment page
->>>>>>> parent of 2a00dda... Revert "E2353. Further refactoring and improvement of review_mapping_helper"
       it 'redirects to the assignment page' do
         stub_current_user(ta, ta.role.name, ta.role)
         session[:return_to] ||= 'http://test.host/assignments/844/edit'
@@ -123,13 +103,8 @@ describe BadgesController do
     end
 
     context 'when user forgets to enter few of the required badge details' do
-<<<<<<< HEAD
 
-      #verify error thrown when image file is missing and redirect to new template
-=======
-      
       # verify error thrown when image file is missing and redirect to new template
->>>>>>> parent of 2a00dda... Revert "E2353. Further refactoring and improvement of review_mapping_helper"
       it 'throws an error for missing image file' do
         session = { user: instructor1 }
         params = {
@@ -145,13 +120,8 @@ describe BadgesController do
         post :create, params: params, session: session
         expect(response).to render_template('new')
       end
-<<<<<<< HEAD
 
-      #verify error thrown when badge name is missing and redirect to new template
-=======
-    
       # verify error thrown when badge name is missing and redirect to new template
->>>>>>> parent of 2a00dda... Revert "E2353. Further refactoring and improvement of review_mapping_helper"
       it 'throws an error for missing badge name' do
         @file = fixture_file_upload('app/assets/images/badges/test.png', 'image/png')
         allow(@file).to receive(:original_filename).and_return("test.png")
@@ -170,13 +140,8 @@ describe BadgesController do
         post :create, params: params, session: session
         expect(response).to render_template('new')
       end
-<<<<<<< HEAD
 
-      #verify error thrown when image description is missing and redirect to new template
-=======
-    
       # verify error thrown when image description is missing and redirect to new template
->>>>>>> parent of 2a00dda... Revert "E2353. Further refactoring and improvement of review_mapping_helper"
       it 'throws an error for missing badge description' do
         @file = fixture_file_upload('app/assets/images/badges/test.png', 'image/png')
         allow(@file).to receive(:original_filename).and_return("test.png")

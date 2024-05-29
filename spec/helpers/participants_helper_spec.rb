@@ -67,14 +67,8 @@ describe ParticipantsHelper do
 
             it 'returns correct authorizations when participant_permissions is called with participant authorization' do
                 #Checking permissions for a participant
-<<<<<<< HEAD
-
-                result = participant_permissions('participant')
-                expect(result.except(:can_mentor)).to eq({:can_review=>true, :can_submit=>true, :can_take_quiz=>true})
-=======
                 result = participant_permissions('paricipant')
                 expect(result).to eq(can_submit: true, can_review: true, can_take_quiz: true, can_mentor: false)
->>>>>>> parent of 2a00dda... Revert "E2353. Further refactoring and improvement of review_mapping_helper"
 
 
             end

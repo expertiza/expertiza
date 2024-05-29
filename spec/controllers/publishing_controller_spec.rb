@@ -13,8 +13,15 @@ describe PublishingController do
     allow(User).to receive(:find).with(21).and_return(student1)
   end
 
+<<<<<<< HEAD
 	describe '#action_allowed?' do
     #check if super-admin is able to perform the actions
+=======
+
+	describe '#action_allowed?' do
+    # check if super-admin is able to perform the actions
+
+>>>>>>> parent of 2a00dda... Revert "E2353. Further refactoring and improvement of review_mapping_helper"
     it 'allows super_admin to perform certain action' do
       stub_current_user(super_admin, super_admin.role.name, super_admin.role)
       expect(controller.send(:action_allowed?)).to be_truthy
@@ -38,7 +45,7 @@ describe PublishingController do
       expect(controller.send(:action_allowed?)).to be_truthy
     end
 
-    #check if admin is able to perform the actions
+    # check if admin is able to perform the actions
     it 'allows admin to perform certain action' do
       stub_current_user(admin, admin.role.name, admin.role)
       expect(controller.send(:action_allowed?)).to be_truthy

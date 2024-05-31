@@ -762,6 +762,15 @@ FactoryBot.define do
     course_id 1
   end
 
+  factory :grading_history, class: GradingHistory do
+    id 1
+    instructor_id 6
+    assignment_id 1
+    grading_type 'Submission'
+    grade_receiver_id 1
+    grade 100
+    comment 'Good work!'
+  end
 
   factory :user, class: User do
     sequence(:name) { |n| "user#{n}" }

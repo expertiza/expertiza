@@ -771,4 +771,11 @@ FactoryBot.define do
     grade 100
     comment 'Good work!'
   end
+
+  factory :user, class: User do
+    sequence(:name) { |n| "user#{n}" }
+    sequence(:fullname) { |n| "User #{n}" }
+    sequence(:email) { |n| "user#{n}@example.com" }
+  end
+
 end

@@ -9,7 +9,6 @@ class UsersController < ApplicationController
   verify method: :post, only: %i[destroy create update],
          redirect_to: { action: :list }
 
-  # This function checks the access control to perform specific operation
   def action_allowed?
     case params[:action]
     when 'list_pending_requested'
@@ -31,8 +30,6 @@ class UsersController < ApplicationController
     end
   end
 
-  # Redirects to List to display the list requested for users other than students.
-  # If student , redirect and display "Not Authorized page"
   def index
     if current_user_is_a? 'Student'
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
@@ -42,7 +39,6 @@ class UsersController < ApplicationController
     end
   end
 
-  # function name suggests the working of this function.
   def auto_complete_for_user_name
     user = session[:user]
     role = Role.find(user.role_id)
@@ -65,45 +61,24 @@ class UsersController < ApplicationController
 
   # for displaying the list of users
   def list
-    user = session[:user]
-    # @users = user.get_user_list
-    # paginate_list is called with the entire list of users
-    # @paginated_users can be used to display set number of users per page
-
-    # Retrieves the search by user names, full names and or email; all criteria that are available
-    search_usrid, search_fulname, search_email = search_params
-
-    # Passes the above received search criteria to the User model to populate the list accordingly.
-    @users = user.get_user_list(search_usrid, search_fulname, search_email)
-
-    @paginated_users = paginate_list(@users)
+    letter = params[:letter]
+    search_by = params[:search_by]
+    # If search parameters present
+    if letter.present? && search_by.present?
+      case search_by.to_i
+      when 1 # Search by username
+        @paginated_users = paginate_list.where('name LIKE ?', "%#{letter}%")
+      when 2 # Search by fullname
+        @paginated_users = paginate_list.where('fullname LIKE ?', "%#{letter}%")
+      when 3 # Search by email
+        @paginated_users = paginate_list.where('email LIKE ?', "%#{letter}%")
+      else
+        @paginated_users = paginate_list
+      end
+    else # Display all users if no search parameters present
+      @paginated_users = paginate_list
+    end
   end
-
-  # Method to construct search parameters based on user input
-def search_params
-  # Default search values (wildcards)
-  search_usrname = '.*'
-  search_fulname = '.*'
-  search_email = '.*'
-
-  # If the user name is provided in the username text field, append it to the search criteria.
-  if params[:search_usrid].present?
-    search_usrname = '.*' + params[:search_usrid].strip + '.*'
-  end
-
-  # If the complete name (full name) is provided in the name text field, append it to the search criteria.
-  if params[:search_fname].present?
-    search_fulname = '.*' + params[:search_fname].strip + '.*'
-  end
-
-  # If the email is provided in the email text field, append it to the search criteria.
-  if params[:search_email].present?
-    search_email = '.*' + params[:search_email].strip + '.*'
-  end
-
-  # Returning an array containing the constructed search parameters
-  [search_usrname, search_fulname, search_email]
-end
 
   # for displaying users which are being searched for editing purposes after checking whether current user is authorized to do so
   def show_if_authorized
@@ -126,7 +101,6 @@ end
     end
   end
 
-  # If the user is not student,can perform show operations to display the requested list.
   def show
     if params[:id].nil? || ((current_user_is_a? 'Student') && (!current_user_has_id? params[:id]))
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
@@ -238,7 +212,7 @@ end
 
   private
 
-  # add user preference_home_flag
+  # add user etc_icons_on_homepage
   def user_params
     params.require(:user).permit(:name,
                                  :crypted_password,
@@ -261,7 +235,7 @@ end
                                  :public_key,
                                  :copy_of_emails,
                                  :institution_id,
-                                 :preference_home_flag)
+                                 :etc_icons_on_homepage)
   end
 
   # to find the role of a given user object and set the @role accordingly
@@ -274,7 +248,7 @@ end
   end
 
   # For filtering the users list with proper search and pagination.
-  def paginate_list(users)
+  def paginate_list
     paginate_options = { '1' => 25, '2' => 50, '3' => 100 }
 
     # If the above hash does not have a value for the key,
@@ -290,8 +264,12 @@ end
     # users = User.search_users(role, user_id, letter, @search_by)
 
     # paginate
-    @selected_ids = users.map(&:id)
-    User.where(id: @selected_ids).page(params[:page]).per_page(paginate_options[@per_page.to_s])
+    users = if paginate_options[@per_page.to_s].nil? # displaying all - no pagination
+              User.paginate(page: params[:page], per_page: User.count)
+            else # some pagination is active - use the per_page
+              User.paginate(page: params[:page], per_page: paginate_options[@per_page.to_s])
+            end
+    users
   end
 
   # generate the undo link

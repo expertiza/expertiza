@@ -105,7 +105,7 @@ class GradesController < ApplicationController
 
       if @assignment.varying_rubrics_by_round? && questionnaire.type == 'ReviewQuestionnaire'
         questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
-        if questionnaires.count > 1
+        if questionnaires.count > 1 && counter_for_same_rubric < questionnaires.count
           @round = questionnaires[counter_for_same_rubric].used_in_round
           counter_for_same_rubric += 1
         else

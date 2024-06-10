@@ -17,9 +17,12 @@
 <% else %>
     <div class="text-center">
       <h1>Tagging report for assignment "<%= @assignment.name %>"</h1>
+      <div style="float:right;font-size:1.3em; padding:0, 1em, 1em, 0 !important">
+        <%= link_to 'Export tagged Answers', :controller=>'export_file',:action=>'start',:model=> 'TagPromptDeployment',:id=> @assignment.id, :class=> 'btn btn-default' %>
+      </div>
     </div>
 
-    <div class= "chart-table" id="tabs">
+    <div class= "chart-table" id="tabs" style="clear:both;">
       <ul>
       <% @questionnaire_tagging_report.each do |tag_dep, report_lines| %>
         <li><a href="#tab-<%= tag_dep.id %>" id="tabmenu_<%= tag_dep.id %>"><%= tag_dep.questionnaire.name + " (" + tag_dep.tag_prompt.prompt + ")" %></a></li>
@@ -75,10 +78,12 @@
         </div>
         </p>
       <% end %>
+      
       <p>
       <%= form_tag('/tags.csv', method: 'put',:id => 'tst') do %>
       <div id="tab-summary">
         <h4  align="center">Summary for each user</h4>
+        
         <table class="table table-striped sortable">
           <thead>
           <tr>
@@ -107,6 +112,7 @@
       </div>
       <%= submit_tag "Export",:value => 'Export' ,:form => 'tst',method: 'put' %>
       <% end %>
+
       </p>
     </div>
 <% end %>

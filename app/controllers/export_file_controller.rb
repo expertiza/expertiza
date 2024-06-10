@@ -1,6 +1,9 @@
 class ExportFileController < ApplicationController
   include AuthorizationHelper
 
+  TITLES = { 'Assignment' => 'Grades for submission', 'CourseParticipant' => 'Course Participants', 'AssignmentTeam' => 'Assignment Teams',
+               'CourseTeam' => 'Course Teams', 'User' => 'Users', 'Question' => 'Questions', 'SignUpTopic' => 'Sign Up Topics',
+               'TagPromptDeployment' => 'TagPromptDeployment'}.freeze
   def action_allowed?
     current_user_has_ta_privileges?
   end
@@ -8,9 +11,8 @@ class ExportFileController < ApplicationController
   # Assign titles to model for display
   def start
     @model = params[:model]
-    titles = { 'Assignment' => 'Grades', 'CourseParticipant' => 'Course Participants', 'AssignmentTeam' => 'Teams',
-               'CourseTeam' => 'Teams', 'User' => 'Users', 'Question' => 'Questions' }
-    @title = titles[@model]
+    
+    @title = TITLES[@model]
     @id = params[:id]
   end
 
@@ -32,34 +34,10 @@ class ExportFileController < ApplicationController
     [filename, delimiter]
   end
 
-  def exportdetails
-    @delim_type = params[:delim_type2]
-    filename, delimiter = find_delim_filename(@delim_type, params[:other_char2], '_Details')
-
-    allowed_models = ['Assignment']
-    # The export_details_fields and export_headers methods are defined in Assignment.rb that packs all the details from
-    # the model in the generated CSV file.
-    csv_data = CSV.generate(col_sep: delimiter) do |csv|
-      if allowed_models.include? params[:model]
-        csv << Object.const_get(params[:model]).export_headers(params[:id])
-        csv << Object.const_get(params[:model]).export_details_fields(params[:details])
-        Object.const_get(params[:model]).export_details(csv, params[:id], params[:details])
-      else
-        flash[:error] = "This operation is not supported for #{params[:model]}"
-        redirect_back fallback_location: root_path
-        return nil
-      end
-    end
-
-    send_data csv_data,
-              type: 'text/csv; charset=iso-8859-1; header=present',
-              disposition: "attachment; filename=#{filename}"
-  end
-
   def export
     @delim_type = params[:delim_type]
     filename, delimiter = find_delim_filename(@delim_type, params[:other_char])
-
+    title = TITLES[params[:model]].to_s
     allowed_models = %w[Assignment
                         AssignmentParticipant
                         AssignmentTeam
@@ -69,7 +47,9 @@ class ExportFileController < ApplicationController
                         Question
                         ReviewResponseMap
                         User
-                        Team]
+                        Team
+                        SignUpTopic
+                        TagPromptDeployment]
     csv_data = CSV.generate(col_sep: delimiter) do |csv|
       if allowed_models.include? params[:model]
         csv << Object.const_get(params[:model]).export_fields(params[:options])

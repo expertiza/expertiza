@@ -1,4 +1,6 @@
 describe 'CourseParticipant' do
+  let(:course) { build(:course) }
+
   describe '#copy' do
     before(:each) do
       @assignment = build(:assignment)
@@ -21,36 +23,49 @@ describe 'CourseParticipant' do
     end
   end
 
-  describe '#import' do
-    it 'raise error if record is empty' do
-      row = []
-      expect { CourseParticipant.import(row, nil, nil, nil) }.to raise_error('No user id has been specified.')
+  describe '.import' do
+    context 'when record is empty' do
+      it 'raises an ArgumentError' do
+        expect { CourseParticipant.import({}, nil, nil) }.to raise_error(ArgumentError)
+      end
     end
 
-    it 'raise error if record does not have enough items ' do
-      row = { username: 'user_name', fullname: 'user_fullname', email: 'name@email.com' }
-      expect { CourseParticipant.import(row, nil, nil, nil) }.to raise_error("The record containing #{row[:username]} does not have enough items.")
+    context 'when the record does not have required items' do
+      it 'raises an ArgumentError' do
+        row = { name: 'no one', fullname: 'no one' }
+        expect { CourseParticipant.import(row, nil, 1) }.to raise_error(ArgumentError)
+      end
     end
 
-    it 'raise error if course with id not found' do
-      course = build(:course)
-      session = {}
-      row = []
-      allow(Course).to receive(:find).and_return(nil)
-      allow(session[:user]).to receive(:id).and_return(1)
-      row = { username: 'user_name', fullname: 'user_fullname', email: 'name@gmail.com', password: 'user_password' }
-      expect { CourseParticipant.import(row, nil, session, 2) }.to raise_error('The course with the id "2" was not found.')
-    end
+    context 'when no user is found by provided username' do
+      context 'when the record has required items' do
+        let(:row) do
+          { name: 'no one', fullname: 'no one', email: 'name@email.com' }
+        end
+        before(:each) do
+          user = double('User', :id => 1, :nil? => true)
+          allow(User).to receive(:find_by).with(:name => 'no one').and_return(user)
+          allow(User).to receive(:import).with(any_args).and_return(user)
+        end
 
-    it 'creates course participant form record' do
-      course = build(:course)
-      session = {}
-      row = []
-      allow(Course).to receive(:find).and_return(course)
-      allow(session[:user]).to receive(:id).and_return(1)
-      row = { username: 'user_name', fullname: 'user_fullname', email: 'name@email.com', role: 'user_role_name', parent: 'user_parent_name' }
-      course_part = CourseParticipant.import(row, nil, session, 2)
-      expect(course_part).to be_an_instance_of(CourseParticipant)
+        context 'when course cannot be found' do
+          it 'creates a new user then raises an ImportError' do
+            allow(Course).to receive(:find_by).with(1).and_return(nil)
+            expect(User).to receive(:import).with(any_args)
+            expect { CourseParticipant.import(row, nil, 1) }.to raise_error(ImportError, 'The course with id 1 was not found.')
+          end
+        end
+
+        context 'when course found and course participant does not exist' do
+          it 'creates a new user and participant' do
+            allow(Course).to receive(:find_by).with(1).and_return(course)
+            allow(CourseParticipant).to receive(:exists?).with(user_id: 1, parent_id: 1).and_return(false)
+            expect(User).to receive(:import).with(any_args)
+            expect(CourseParticipant).to receive(:create).with(user_id: 1, parent_id: 1)
+            CourseParticipant.import(row, nil, 1)
+          end
+        end
+      end
     end
   end
 

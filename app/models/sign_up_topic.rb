@@ -160,4 +160,65 @@ class SignUpTopic < ApplicationRecord
       return 'failed'
     end
   end
+  
+  # Export the fields
+  def self.export_fields(options)
+    fields = []
+    fields.push('Topic Id') if options['topic_identifier'] == 'true'
+    fields.push('Topic name') if options['topic_name'] == 'true'
+    fields.push('Description') if options['description'] == 'true'
+    fields.push("Participants") if options['participants'] == 'true'
+    fields.push('Num of Slots') if options['num_of_slots'] == 'true'
+    fields.push('Available slots') if options['available_slots'] == 'true'
+    fields.push('Num on waitlist') if options['num_on_waitlist'] == 'true'
+    fields
+  end
+  # Exports the signup topic list for a specific assignment.
+  # This method generates CSV data aligned with user-selected columns from the export view page.
+  # @param csv [CSV] The CSV object to which data will be appended.
+  # @param parent_id [Integer] The ID of the assignment from which to retrieve signup topics.
+  # @param options [Hash] User-selected options that determine which columns to include in the export.
+  def self.export(csv, parent_id, options)
+    assignment = Assignment.find(parent_id.to_i)
+    signuptopics = SignUpTopic.where(assignment_id: assignment.id)
+
+    slots_filled = SignUpTopic.find_slots_filled(assignment.id)
+    slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment.id)
+
+    signuptopics.each do |signuptopic|
+      tcsv = []
+      tcsv.push(signuptopic.topic_identifier) if options['topic_identifier'] == 'true'
+      tcsv.push(signuptopic.topic_name) if options['topic_name'] == 'true'
+      tcsv.push(signuptopic.description) if options['description'] == 'true'
+      if SignedUpTeam.where(topic_id: signuptopic.id).first != nil
+        signedupteam = SignedUpTeam.where(topic_id: signuptopic.id).first
+        users = TeamsUser.where(team_id: signedupteam.team_id).all
+        ids = ""
+        users.each do |user|
+          ids += user.name.to_s + " "
+        end
+      else
+        ids = ""
+        ids = "No Choosers"
+      end
+      tcsv.push(ids) if options['participants'] == 'true'
+      tcsv.push(signuptopic.max_choosers) if options['num_of_slots'] == 'true'
+
+      slots_filled_length = slots_filled.length()
+      slots_filled.each do |slot|
+        if slot.topic_id == signuptopic.id
+          tcsv.push(signuptopic.max_choosers.to_i - slot.count.to_i) if options['available_slots'] == 'true'
+        else
+          slots_filled_length -= 1
+        end
+      end
+
+      if slots_filled_length == 0
+        tcsv.push(signuptopic.max_choosers) if options['available_slots'] == 'true'
+      end
+      tcsv.push(tcsv[4].to_i - tcsv[5].to_i) if options['num_on_waitlist'] == 'true'
+
+      csv << tcsv
+    end
+  end
 end

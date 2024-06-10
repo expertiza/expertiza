@@ -59,6 +59,11 @@
 
     <!-- Set the review data and row span for each reviewer -->
     <% sort_reviewer_by_review_volume_desc.each_with_index do |reviewer, index| %>
+        <% data = get_data_for_review_report(@id, reviewer.id, @type) %>
+    <%= render partial: 'reports/reviewer_info', locals: { data: data } %>
+    <%= render partial: 'reports/review_rounds', locals: { data: data } %>
+    <%= render partial: 'reports/response_maps', locals: { data: data } %>
+    <%= render partial: 'reports/grade_and_comments', locals: { data: data } %>
       <% @response_maps, @rspan = get_data_for_review_report(@id, reviewer.id, @type) %>
       <tr>
         <% unless reviewer.id == 1 %>

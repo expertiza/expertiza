@@ -81,20 +81,4 @@ class SignedUpTeam < ApplicationRecord
       signed_up_teams.first.topic_id
     end
   end
-
-  # Remove a specific signed_up_teams record for a given topic and team.
-  def self.drop_signup_record(topic_id,team_id)
-    # Fetching record for a given topic and team.
-    signup_record = SignedUpTeam.find_by(topic_id: topic_id, team_id: team_id)
-    # If the signup_record in not nil destroy it.
-    signup_record.destroy unless signup_record.nil?
-  end
-
-  # Remove all waitlisted records in signed_up_teams associated with a specific team.
-  def self.drop_off_waitlists(team_id)
-    # Fetch all records that matches the given team_id with is_waitlisted as true
-    # and destroy all the records.
-    SignedUpTeam.where(team_id: team_id, is_waitlisted: true).destroy_all
-  end
-
 end

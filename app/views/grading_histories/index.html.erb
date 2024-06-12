@@ -1,0 +1,24 @@
+<h3 class="center">Grade History of <%= @assignment %></h3>
+<h5 class="center"><%= @receiver %></h5>
+
+<table class="table table-striped" style="width:75%">
+  <thead>
+  <tr>
+    <th style="min-width:150px">Instructor</th>
+    <th style="min-width:75px">Grade</th>
+    <th>Comment</th>
+    <th style="min-width:200px">Graded At</th>
+  </tr>
+  </thead>
+  <!--This is the main view of the table. -->
+  <tbody>
+  <% @grading_histories.each do |record| %>
+      <tr>
+        <td><%= User.where(id: record.instructor_id).pluck(:fullname).first %></td>
+        <td><%= record.grade %></td>
+        <td><%= record.comment %></td>
+        <td><%= record.created_at %></td>
+      </tr>
+  <% end %>
+  </tbody>
+</table>

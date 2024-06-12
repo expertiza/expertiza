@@ -761,4 +761,14 @@ FactoryBot.define do
     ta_id 1
     course_id 1
   end
+
+  factory :grading_history, class: GradingHistory do
+    id 1
+    instructor_id 6
+    assignment_id 1
+    graded_item_type 'Submission'
+    graded_member_id 1
+    grade 100
+    comment 'Good work!'
+  end
 end

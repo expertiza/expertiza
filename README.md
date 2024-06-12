@@ -9,6 +9,23 @@ Expertiza
 
 Expertiza is a web application where students can submit and peer-review learning objects (articles, code, web sites, etc). It is used in select courses at NC State and by professors at several other colleges and universities.
 
+### Expertiza hosted on 
+```bash
+http://152.7.177.124:8080
+```
+
+### Note
+
+Account Info:
+
+Account Username:
+```bash
+ instructor6
+```
+Account Password:
+```bash
+ password
+```
 Setup
 -----
 

@@ -72,6 +72,44 @@ describe LotteryController do
     end
   end
 
+  describe '#calculate_bidding_summary_based_on_priority' do
+    it 'calculates and returns bidding summary data for topics' do
+      # Setup test data
+      assignment = create(:assignment)
+      topic = create(:topic, assignment: assignment)
+      team = create(:team, assignment: assignment)
+      bid = create(:bid, topic: topic, team: team, priority: 1)
+      team_name = create(:team_name, team: team)
+
+      allow(Assignment).to receive(:find).with(assignment.id).and_return(assignment)
+      allow(assignment).to receive(:sign_up_topics).and_return([topic])
+      allow(topic).to receive_message_chain(:bids, :includes).and_return([bid])
+      allow(bid).to receive_message_chain(:team, :name).and_return(team_name)
+
+      # Mock params
+      params = { id: assignment.id }
+      allow(controller).to receive(:params).and_return(params)
+
+      # Expected data structure from calculate_bidding_summary_based_on_priority
+      expected_topic_data = [
+        {
+          id: topic.id,
+          name: topic.topic_name,
+          first_bids: 1,
+          second_bids: 0,
+          third_bids: 0,
+          total_bids: 1,
+          percentage_first: 100.0,
+          bidding_teams: [team_name]
+        }
+      ]
+
+      # Call the method
+      controller.instance_variable_set(:@assignment, assignment)
+      expect(controller.calculate_bidding_summary_based_on_priority).to eq(expected_topic_data)
+    end
+  end
+  
   describe '#construct_users_bidding_info' do
     it 'generate users bidding information hash' do
       # Only members in assignment_team1 and assignment_team2 are involved in the bidding process

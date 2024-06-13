@@ -1,5 +1,17 @@
-<a id="teamsMembers" onclick="showHideTeamMembersInTeamsListPage();">Show all team members</a>
-<%= render :partial => '/tree_display/page_footer' %><br/>
+<!--This is the condition check to determine if the view to display is for mentored teams or normal assingment teams-->
+<% if @model == MentoredTeamDecorator or @has_topic %>
+  <%= render :partial => '/tree_display/page_footer_assignments',
+             :locals => {
+               :assignment_id => @root_node.node_object_id,
+               :@meeting_map => @meeting_map,
+               :@max_participants => @max_participants,
+               :@has_topic => @has_topic}
+  %>
+  <br/>
+<% else %>
+  <%= render :partial => '/tree_display/page_footer' %><br/>
+  <a id="teamsMembers" onclick="showHideTeamMembersInTeamsListPage();">Show all team members</a>
+<% end %>
 <% session[:return_to] = request.url %>
 <% @model %>
 <%= link_to 'Create Team', :action => 'new', :id=> @root_node.node_object_id, :model => @model %>

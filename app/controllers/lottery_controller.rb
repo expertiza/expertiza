@@ -84,11 +84,9 @@ class LotteryController < ApplicationController
   # teams
   def create_new_teams_for_bidding_response(teams, assignment, users_bidding_info)
     teams.each do |user_ids|
-      if assignment.auto_assign_mentor
-        new_team = MentoredTeam.create_team_with_users(assignment.id, user_ids)
-      else
-        new_team = AssignmentTeam.create_team_with_users(assignment.id, user_ids)
-      end
+      
+      new_team = AssignmentTeam.create_team_with_users(assignment.id, user_ids)
+
       # Select data from `users_bidding_info` variable that only related to team members in current team
       current_team_members_info = users_bidding_info.select { |info| user_ids.include? info[:pid] }.map { |info| info[:ranks] }
       Bid.merge_bids_from_different_users(new_team.id, assignment.sign_up_topics, current_team_members_info)

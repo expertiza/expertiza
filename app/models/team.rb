@@ -77,7 +77,7 @@ class Team < ApplicationRecord
   end
 
   # Add member to the team, changed to hash by E1776
-  def add_member(user, _assignment_id = nil)
+  def add_member(user, assignment_id = nil)
     raise "The user #{user.name} is already a member of the team #{name}" if user?(user)
 
     can_add_member = false
@@ -88,8 +88,27 @@ class Team < ApplicationRecord
       TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
       add_participant(parent_id, user)
       ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{id}")
+      # if assignment_id is nil, then don't send an assignment name
+      assignment_name = assignment_id ? Assignment.find(assignment_id).name.to_s : ''
+      # determine which type of email to send
+      # partial_name determines which html file to use for the email
+      partial_name = MentorManagement.user_a_mentor?(user) ? 'mentor_added_to_team' : 'user_added_to_team'
+
+      # calls the mailer function to email the user
+      Mailer.team_addition_message(
+        to: user.email,
+        subject: '[Expertiza] Added to a Team',
+        body: {
+          user: user,
+          first_name: ApplicationHelper.get_user_first_name(user),
+          partial_name: partial_name,
+          team: name.to_s,
+          assignment: assignment_name
+        }
+      ).deliver
+
     end
-    can_add_member
+    can_add_member  # return if the add_member function was successful
   end
 
   # Define the size of the team
@@ -99,7 +118,7 @@ class Team < ApplicationRecord
     members = TeamsUser.where(team_id: team_id)
     members.each do |member|
       member_name = member.name
-      unless member_name.include?(' (Mentor)') 
+      unless member_name.include?(' (Mentor)')
         count = count + 1
       end
     end
@@ -151,13 +170,17 @@ class Team < ApplicationRecord
     num_of_teams = users.length.fdiv(min_team_size).ceil
     next_team_member_index = 0
     (1..num_of_teams).to_a.each do |i|
+      if team_type == "Mentored"
+        team_type = "Assignment"
+      end
       team = Object.const_get(team_type + 'Team').create(name: 'Team_' + i.to_s, parent_id: parent.id)
-      TeamNode.create(parent_id: parent.id, node_object_id: team.id)
+      mentoredTeam = MentoredTeamDecorator.new(team)
+      TeamNode.create(parent_id: parent.id, node_object_id: mentoredTeam.id)
       min_team_size.times do
         break if next_team_member_index >= users.length
 
         user = users[next_team_member_index]
-        team.add_member(user, parent.id)
+        mentoredTeam.add_member(user, parent.id)
         next_team_member_index += 1
       end
     end

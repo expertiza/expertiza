@@ -1,5 +1,6 @@
 class TeamsController < ApplicationController
   include AuthorizationHelper
+  include MentorMeetingsHelper
 
   autocomplete :user, :name
 
@@ -51,8 +52,15 @@ class TeamsController < ApplicationController
     init_team_type(params[:type])
     @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == Team.allowed_types[0]
     unless @assignment.nil?
+      @max_participants = @assignment.max_team_size
+
+      # This change has been made for E2403 - Checking if the team has a topic and then display the corresponding view
+      @has_topic = SignUpTopic.where(assignment_id: params[:id]).count > 0
+
       if @assignment.auto_assign_mentor
-        @model = MentoredTeam
+        @model = MentoredTeamDecorator  # not sure if changing this to decorator is correct yet...
+        # MentorMeeting.delete_all
+        @mentor_meetings = MentorMeeting.all
       else
         @model = AssignmentTeam
       end
@@ -61,6 +69,8 @@ class TeamsController < ApplicationController
     begin
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
+
+      @meetings_map = get_dates_for_team(@child_nodes)
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
@@ -79,8 +89,14 @@ class TeamsController < ApplicationController
     init_team_type(parent.class.name.demodulize)
     begin
       Team.check_for_existing(parent, params[:team][:name], session[:team_type])
-      @team = Object.const_get(session[:create_type] + 'Team').create(name: params[:team][:name], parent_id: parent.id)
-      TeamNode.create(parent_id: parent.id, node_object_id: @team.id)
+      # This change has been made for E2403 - to create a mentored team or a normal team
+      if session[:create_type] == "Mentored"
+        @team = Object.const_get('AssignmentTeam').create(name: params[:team][:name], parent_id: parent.id)
+        @mentoredTeam = MentoredTeamDecorator.new(@team)
+      else
+        @team = Object.const_get(session[:create_type] + 'Team').create(name: params[:team][:name], parent_id: parent.id)
+      end
+      TeamNode.create(parent_id: parent.id, node_object_id: @mentoredTeam.id)
       undo_link("The team \"#{@team.name}\" has been successfully created.")
       redirect_to action: 'list', id: parent.id
     rescue TeamExistsError
@@ -115,14 +131,23 @@ class TeamsController < ApplicationController
   def delete_all
     root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
     child_nodes = root_node.get_teams.map(&:node_object_id)
-    Team.destroy_all if child_nodes
+    child_nodes.each do |team_id|
+      delete(team_id)
+    end
     redirect_to action: 'list', id: params[:id]
   end
 
   # Deleting a specific team associated with a given parent object
-  def delete
+  # This change has been made for E2403 - This team_id is passed when this function needs to be called as a function
+  # When the function is called from a route, then it acts as the controller for the route
+  def delete(team_id = nil)
     # delete records in team, teams_users, signed_up_teams table
-    @team = Team.find_by(id: params[:id])
+    if team_id
+      id = team_id
+    else
+      id = params[:id]
+    end
+    @team = Team.find_by(id: id)
     unless @team.nil?
       @signed_up_team = SignedUpTeam.where(team_id: @team.id)
       @teams_users = TeamsUser.where(team_id: @team.id)
@@ -137,10 +162,17 @@ class TeamsController < ApplicationController
 
       @sign_up_team.destroy_all if @sign_up_team
       @teams_users.destroy_all if @teams_users
+
+      assignment = parent_from_child(@team)
+      # This change has been made for E2403 - Get the mentor meeting dates only if the team has auto assign mentor on
+      if assignment.auto_assign_mentor
+        mentoredMeetings = MentorMeeting.where(team_id: @team.id)
+        mentoredMeetings.destroy_all
+      end
       @team.destroy if @team
       undo_link("The team \"#{@team.name}\" has been successfully deleted.")
     end
-    redirect_back fallback_location: root_path
+    redirect_back fallback_location: root_path unless team_id
   end
 
   # Copies existing teams from a course down to an assignment

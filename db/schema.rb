@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20231203230237) do
+ActiveRecord::Schema.define(version: 20240422213933) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -481,6 +481,12 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.string "name", default: "", null: false
   end
 
+  create_table "mentor_meetings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.integer "team_id", null: false
+    t.string "meeting_date", null: false
+    t.index ["team_id"], name: "fk_mentor_meetings_mapping_team"
+  end
+
   create_table "menu_items", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "parent_id"
     t.string "name", default: "", null: false
@@ -528,7 +534,7 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.float "Hamer", limit: 24, default: 1.0
     t.float "Lauw", limit: 24, default: 0.0
     t.integer "duty_id"
-    t.boolean "can_mentor"
+    t.boolean "can_mentor", default: false
     t.index ["duty_id"], name: "index_participants_on_duty_id"
     t.index ["user_id"], name: "fk_participant_users"
   end
@@ -804,8 +810,10 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.integer "private_to"
     t.text "description"
     t.string "link"
+    t.integer "mentor_id"
     t.index ["assignment_id"], name: "fk_sign_up_categories_sign_up_topics"
     t.index ["assignment_id"], name: "index_sign_up_topics_on_assignment_id"
+    t.index ["mentor_id"], name: "index_sign_up_topics_on_mentor_id"
   end
 
   create_table "signed_up_teams", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -1044,6 +1052,7 @@ ActiveRecord::Schema.define(version: 20231203230237) do
   add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"
   add_foreign_key "late_policies", "users", column: "instructor_id", name: "fk_instructor_id"
   add_foreign_key "locks", "users"
+  add_foreign_key "mentor_meetings", "teams", name: "fk_mentor_meetings_mapping_team"
   add_foreign_key "participants", "duties"
   add_foreign_key "participants", "users", name: "fk_participant_users"
   add_foreign_key "plagiarism_checker_assignment_submissions", "assignments"
@@ -1071,6 +1080,7 @@ ActiveRecord::Schema.define(version: 20231203230237) do
   add_foreign_key "review_scores", "reviews", name: "fk_review_score_reviews"
   add_foreign_key "reviews", "review_mappings", name: "fk_review_mappings"
   add_foreign_key "sign_up_topics", "assignments", name: "fk_sign_up_topics_assignments"
+  add_foreign_key "sign_up_topics", "users", column: "mentor_id", on_delete: :nullify
   add_foreign_key "signed_up_teams", "sign_up_topics", column: "topic_id", name: "fk_signed_up_users_sign_up_topics"
   add_foreign_key "survey_deployments", "questionnaires"
   add_foreign_key "ta_mappings", "courses", name: "fk_ta_mappings_course_id"

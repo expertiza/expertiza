@@ -358,7 +358,7 @@ Expertiza::Application.routes.draw do
 
   resources :review_bids do
     collection do
-      post :assign_bidding
+      post :assign_bid_review
       post :set_priority
       post :index
       post :run_bidding_algorithm

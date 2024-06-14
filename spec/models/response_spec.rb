@@ -4,11 +4,13 @@ describe Response do
   let(:participant) { build(:participant, id: 1, parent_id: 1, user: user) }
   let(:participant2) { build(:participant, id: 2, parent_id: 2, user: user2) }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
-  let(:team) { build(:assignment_team) }
+  let(:assignment2) { build(:assignment, id: 2, name: 'Test Assgt 2') }
+  let(:team) { build(:assignment_team, id: 1) }
+  let(:team) { build(:assignment_team, id: 2) }
   let(:signed_up_team) { build(:signed_up_team, team_id: team.id) }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer]) }
-  let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
+  let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1, response_id: 1) }
   let(:answer2) { Answer.new(answer: 2, comments: 'Answer text', question_id: 2) }
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
   let(:questionnaire1) { create(:questionnaire, id: 1) }
@@ -22,6 +24,7 @@ describe Response do
   let(:tag_prompt) { TagPrompt.new(id: 1, prompt: 'prompt') }
   let(:tag_prompt_deployment) { TagPromptDeployment.new(id: 1, tag_prompt_id: 1, assignment_id: 1, questionnaire_id: 1, question_type: 'Criterion') }
   let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1, reviewee_id: 1) }
+  let(:response_map2) { create(:review_response_map, id: 2, reviewed_object_id: 2, reviewee_id: 2) }
   let!(:response_record) { create(:response, id: 1, map_id: 1, response_map: response_map, updated_at: '2020-03-24 12:10:20') }
   before(:each) do
     allow(response).to receive(:map).and_return(review_response_map)
@@ -353,6 +356,42 @@ describe Response do
       allow(User).to receive(:find).with(1).and_return(user)
       allow(Role).to receive(:find).with(1).and_return(build(:role_of_student))
       expect(response.done_by_staff_participant?).to eq(false)
+    end
+  end
+
+  context 'all entries are persisted in the database before the test' do
+    let(:user3) { create(:student, id: 5, role_id: 1, name: 'student1', fullname: 'no one') }
+    let(:user4) { create(:instructor, id: 6, role_id: 2, name: 'instructor1', fullname: 'no one') }
+
+    let(:assignment3) { create(:assignment, id: 3, name: 'Test Assgt', directory_path: "x", instructor: user4) }
+    let(:assignment4) { create(:assignment, id: 4, name: 'Test Assgt2', directory_path: "y", instructor: user4) }
+
+    let(:team3) { create(:assignment_team, id: 3, assignment: assignment3) }
+    let(:team4) { create(:assignment_team, id: 4, assignment: assignment4) }
+
+    let(:participant3) { create(:participant, id: 3, parent_id: 3, user: user3) }
+    let(:participant4) { create(:participant, id: 4, parent_id: 3, user: user4) }
+    let(:participant5) { create(:participant, id: 5, parent_id: 4, user: user3) }
+    let(:participant6) { create(:participant, id: 6, parent_id: 4, user: user4) }
+
+    let(:response_map3) { create(:review_response_map, id: 3, assignment: assignment3, reviewer: participant4, reviewee: team3) }
+    let(:response_map4) { create(:review_response_map, id: 4, assignment: assignment4, reviewer: participant6, reviewee: team4) }
+
+    let(:response3) { create(:response, id: 3, map_id: 3, response_map: response_map3) }
+
+    let!(:questionnaire3) { create(:questionnaire, id: 3) }
+    let!(:question3) { create(:question, id: 3, weight: 1, questionnaire: questionnaire3) }
+
+    let!(:answer3) { Answer.create(answer: 1, comments: 'Answer text', question: question3, response: response3) }
+    let!(:answer4) { Answer.create(answer: 2, comments: 'Answer text', question: question3, response: response3) }
+
+    describe '#copy_to_response_map' do
+      it 'should copy response to a response map' do
+        new_response = response3.copy_to_another_response_map(response_map4)
+
+        expect(new_response.map_id).to eq(response_map4.id)
+        expect(new_response.scores.size).to eq(response3.scores.size)
+      end
     end
   end
 end

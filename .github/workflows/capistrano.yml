@@ -51,13 +51,20 @@ jobs:
           sudo wg show wg0
 
           echo "Pinging the WireGuard peer to test connectivity..."
-          ping -c 4 10.0.0.1
+          ping -c 4 10.0.0.1 || true 
 
           echo "Checking if wg0 interface is up and running:"
           sudo ip link show wg0
 
           echo "Displaying network routes for wg0:"
           ip route show dev wg0
+
+          echo "Checking if the endpoint is reachable..."
+          ping -c 4 152.14.92.215 || true  
+
+          echo "Checking for any firewall rules that might be blocking WireGuard traffic..."
+          sudo ufw status || echo "UFW not installed or enabled"
+          sudo iptables -L || echo "iptables rules not listed"
 
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -81,7 +88,7 @@ jobs:
           /opt/hostedtoolcache/Ruby/2.4.10/x64/bin/bundle exec cap production deploy
         env:
           SSH_AUTH_SOCK: /tmp/ssh-auth-1718350159636.sock
-        continue-on-error: true
+        continue-on-error: true  
 
   development:
     if: inputs.environment == 'development'
@@ -103,7 +110,7 @@ jobs:
           enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_DEV }}
           deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
         env:
-          DEBUG: true # Enables detailed Capistrano logging
+          DEBUG: true 
 
   test:
     if: inputs.environment == 'test'
@@ -125,4 +132,4 @@ jobs:
           enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_STAGING }}
           deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
         env:
-          DEBUG: true # Enables detailed Capistrano logging
+          DEBUG: true 

@@ -22,54 +22,36 @@ jobs:
     steps:
       - name: Create WireGuard tunnel to deploy Expertiza on private network
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq wireguard
+          sudo apt install wireguard
           echo "${{ secrets.WIREGUARD_PRIVATE_KEY }}" > privatekey
-          chmod 600 privatekey
           sudo ip link add wg0 type wireguard
           sudo ip address add 10.0.0.2/24 dev wg0
           sudo wg set wg0 private-key privatekey
           sudo ip link set wg0 up
           sudo wg set wg0 peer ${{ secrets.WIREGUARD_SERVER_PUBLIC_KEY }} allowed-ips 10.0.0.1/32 endpoint 152.14.92.215:50000
-          sudo wg show wg0
-          ping -c 4 10.0.0.1 || true 
-          sudo ip link show wg0
-          ip route show dev wg0
-          ping -c 4 152.14.92.215 || true  
-          sudo ufw status || echo "UFW not installed or enabled"
-          sudo iptables -L || echo "iptables rules not listed"
-
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Setup Ruby Environment
-        uses: ruby/setup-ruby@v1
+          ping -c 4 10.0.0.1
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.4
           bundler-cache: true
+      - uses: miloserdow/capistrano-deploy@master
+        with:
+          target: production # Defines the environment for the deployment
+          enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_PROD }}
+          deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
 
-      - name: Start Capistrano Deployment
-        run: |
-          /opt/hostedtoolcache/Ruby/2.4.10/x64/bin/bundle exec cap production deploy
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh-auth-1718350159636.sock
-        continue-on-error: true  
-
+# development and test jobs are identical - with different target environment and server keys
   development:
     if: inputs.environment == 'development'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Setup Ruby Environment
-        uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.4
           bundler-cache: true
-
-      - name: Deploy with Capistrano
-        uses: miloserdow/capistrano-deploy@master
+      - uses: miloserdow/capistrano-deploy@master
         with:
           target: development
           enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_DEV }}
@@ -79,17 +61,12 @@ jobs:
     if: inputs.environment == 'test'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Setup Ruby Environment
-        uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.4
           bundler-cache: true
-
-      - name: Deploy with Capistrano
-        uses: miloserdow/capistrano-deploy@master
+      - uses: miloserdow/capistrano-deploy@master
         with:
           target: staging
           enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_STAGING }}

@@ -1,5 +1,7 @@
+# This is a basic workflow that uses Capistrano to deploy Expertiza on Production, Test, and Development servers
 name: Deploy with Capistrano
 
+# Controls when the workflow will run
 on:
   workflow_dispatch:
     inputs:
@@ -25,7 +27,7 @@ jobs:
           echo "Private key (should not be empty):"
           echo "${{ secrets.WIREGUARD_PRIVATE_KEY }}" | grep -o '.*' | wc -l
 
-      - name: create wireguard tunnel to deploy Expertiza on private network
+      - name: Create WireGuard tunnel to deploy Expertiza on private network
         run: |
           echo "Installing WireGuard..."
           sudo apt-get update
@@ -57,6 +59,17 @@ jobs:
           echo "Listing routes:"
           ip route show
 
+          echo "Performing traceroute to peer (10.0.0.1):"
+          sudo apt-get install -y traceroute
+          traceroute 10.0.0.1
+
+          echo "Checking firewall status:"
+          sudo ufw status || echo "UFW not installed/enabled"
+          sudo iptables -L
+
+          echo "Checking if wg0 interface is up and running:"
+          sudo ip link show wg0
+
       - name: Checkout Code
         uses: actions/checkout@v3
 
@@ -86,28 +99,42 @@ jobs:
     if: inputs.environment == 'development'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: ruby/setup-ruby@v1
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Ruby Environment
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.4
           bundler-cache: true
-      - uses: miloserdow/capistrano-deploy@master
+
+      - name: Deploy with Capistrano
+        uses: miloserdow/capistrano-deploy@master
         with:
           target: development
           enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_DEV }}
           deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
+        env:
+          DEBUG: true # Enables detailed Capistrano logging
 
   test:
     if: inputs.environment == 'test'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: ruby/setup-ruby@v1
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Ruby Environment
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.4
           bundler-cache: true
-      - uses: miloserdow/capistrano-deploy@master
+
+      - name: Deploy with Capistrano
+        uses: miloserdow/capistrano-deploy@master
         with:
           target: staging
           enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_STAGING }}
           deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
+        env:
+          DEBUG: true # Enables detailed Capistrano logging

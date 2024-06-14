@@ -24,8 +24,8 @@ jobs:
         run: |
           echo "Deploying to Production"
           echo "WIREGUARD_SERVER_PUBLIC_KEY: ${{ secrets.WIREGUARD_SERVER_PUBLIC_KEY }}"
-          echo "Private key (should not be empty):"
-          echo "${{ secrets.WIREGUARD_PRIVATE_KEY }}" | grep -o '.*' | wc -l
+          echo "Private key length (characters):"
+          echo "${{ secrets.WIREGUARD_PRIVATE_KEY }}" | wc -c
 
       - name: Create WireGuard tunnel to deploy Expertiza on private network
         run: |
@@ -36,8 +36,7 @@ jobs:
 
           echo "Creating private key file..."
           echo "${{ secrets.WIREGUARD_PRIVATE_KEY }}" > privatekey
-          cat privatekey # Debug: Show the contents of the private key (caution: ensure this is safe to show)
-          echo "Private key file created."
+          echo "Private key file created. Contents are sensitive, not displaying for security."
 
           echo "Setting up WireGuard interface wg0..."
           sudo ip link add wg0 type wireguard
@@ -51,7 +50,7 @@ jobs:
           sudo wg show wg0
 
           echo "Pinging the WireGuard peer to test connectivity..."
-          ping -c 4 10.0.0.1
+          ping -c 4 10.0.0.1 || echo "Ping failed"
 
           echo "Checking network interfaces:"
           ip address show wg0
@@ -61,7 +60,7 @@ jobs:
 
           echo "Performing traceroute to peer (10.0.0.1):"
           sudo apt-get install -y traceroute
-          traceroute 10.0.0.1
+          traceroute 10.0.0.1 || echo "Traceroute failed"
 
           echo "Checking firewall status:"
           sudo ufw status || echo "UFW not installed/enabled"
@@ -69,6 +68,15 @@ jobs:
 
           echo "Checking if wg0 interface is up and running:"
           sudo ip link show wg0
+
+          echo "Displaying network routes for wg0:"
+          ip route show dev wg0
+
+          echo "Checking kernel routing table for 10.0.0.0/24:"
+          ip route get 10.0.0.1
+
+          echo "Testing communication through wg0 interface:"
+          sudo curl --interface wg0 http://10.0.0.1 || echo "Curl failed"
 
       - name: Checkout Code
         uses: actions/checkout@v3

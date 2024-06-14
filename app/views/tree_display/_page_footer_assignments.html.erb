@@ -1,0 +1,51 @@
+<%
+  max_dates_length = 0
+
+  @meeting_map.each_value do |value|
+    max_dates_length = value.length if value.length > max_dates_length
+  end
+
+  if max_dates_length < 3
+    max_dates_length = 3
+  end
+%>
+
+<% if @child_nodes.length > 0 %>
+  <table style="display: inline" id="mentored_assignment_table" cell="5">
+    <tr id="header">
+      <th style="min-width: 125px">Team name</th>
+      <th style="min-width: 200px; text-align: center; max-width: 250px">Members' name</th>
+      <th colspan="3">Members' User IDs</th>
+      <th>Emails</th>
+      <th>Mentor</th>
+      <th>Actions</th>
+      <th>1st mtg.</th>
+      <th>2nd mtg.</th>
+      <th>3rd mtg.</th>
+      <%
+        (3..max_dates_length - 1).each do |index|
+      %>
+        <th><%= index + 1 %>th mtg.</th>
+      <%
+        end
+      %>
+      <th>Add mtg.</th>
+    </tr>
+
+    <%
+    @child_nodes.each_with_index do |node,index|
+      if index.odd?
+        rowtype = "odd"
+      else
+        rowtype = "even"
+      end
+    %>
+
+      <!-- Start Listing -->
+      <%= render :partial=> '/tree_display/entry_assignments', :locals => {:search => @search, :node => node, :prefix => node.node_object_id.to_s+"_"+index.to_s, :depth => 0, :rowtype => rowtype, :assignment_id => assignment_id, :@meeting_map => @meeting_map, :@max_dates_length => max_dates_length} %>
+      <!-- End Listing -->
+      <%
+        end
+    %>
+  </table>
+<% end %>

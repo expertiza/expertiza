@@ -95,13 +95,9 @@ jobs:
           bundle --version
 
       - name: Deploy with Capistrano
-        uses: miloserdow/capistrano-deploy@master
-        with:
-          target: production
-          enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_PROD }}
-          deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
-        env:
-          DEBUG: true # Enables detailed Capistrano logging
+        run: |
+          echo "Starting Capistrano deployment..."
+          /opt/hostedtoolcache/Ruby/2.4.10/x64/bin/bundle exec cap production deploy
 
   development:
     if: inputs.environment == 'development'

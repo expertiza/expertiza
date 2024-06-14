@@ -111,7 +111,7 @@ describe SignUpSheetController do
         }
         post :create, params: request_params
         expect(SignedUpTeam.first.is_waitlisted).to be false
-        expect(response).to redirect_to('/sign_up_sheet/add_signup_topics_staggered?id=1')
+        expect(response).to redirect_to('/sign_up_sheet/add_signup_topics?id=1')
       end
     end
   end
@@ -522,7 +522,7 @@ describe SignUpSheetController do
         request_params = { username: 'no name', assignment_id: 1 }
         get :signup_as_instructor_action, params: request_params
         expect(flash[:error]).to eq('That student does not exist!')
-        expect(response).to redirect_to('/assignments/1/edit')
+        expect(response).to redirect_to('/assignments/edit')
       end
     end
 
@@ -753,7 +753,7 @@ describe SignUpSheetController do
     end
   end
 
-  describe '#show_team' do
+  describe '#display_team_info' do
     it 'renders show_team page' do
       allow(SignedUpTeam).to receive(:where).with(topic_id: 1).and_return([signed_up_team])
       allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([double('TeamsUser', user_id: 1)])

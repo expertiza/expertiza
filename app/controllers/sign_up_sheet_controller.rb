@@ -15,9 +15,10 @@ class SignUpSheetController < ApplicationController
   require 'rgl/dot'
   require 'rgl/topsort'
 
+ 
   def action_allowed?
     case params[:action]
-    when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
+    when 'set_priority', 'sign_up', 'delete_signup', 'list', 'display_team_info', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
       (current_user_has_student_privileges? &&
           (%w[list].include? action_name) &&
           are_needed_authorizations_present?(params[:id], 'reader', 'submitter', 'reviewer')) ||
@@ -55,7 +56,7 @@ class SignUpSheetController < ApplicationController
   def create
     topic = SignUpTopic.where(topic_name: params[:topic][:topic_name], assignment_id: params[:id]).first
     if topic.nil?
-      setup_new_topic
+      create_new_topic
     else
       update_existing_topic topic
     end
@@ -72,7 +73,7 @@ class SignUpSheetController < ApplicationController
     else
       flash[:error] = 'The topic could not be deleted.'
     end
-    # Akshay - redirect to topics tab if there are still any topics left, otherwise redirect to
+    # redirect to topics tab if there are still any topics left, otherwise redirect to
     # assignment's edit page
     if assignment.topics?
       redirect_to edit_assignment_path(params[:assignment_id]) + '#tabs-2'
@@ -90,19 +91,16 @@ class SignUpSheetController < ApplicationController
   def update
     @topic = SignUpTopic.find(params[:id])
     if @topic
-      @topic.topic_identifier = params[:topic][:topic_identifier]
       update_max_choosers @topic
-      @topic.category = params[:topic][:category]
-      @topic.topic_name = params[:topic][:topic_name]
-      @topic.micropayment = params[:topic][:micropayment]
-      @topic.description = params[:topic][:description]
-      @topic.link = params[:topic][:link]
-      @topic.save
+
+      #Updating different attributes of the topics such as Topic ID, Topic name, Topic category, Number of slots, Micropayment, Topic link and Topic description
+      @topic.update_attributes(topic_identifier: params[:topic][:topic_identifier], category: params[:topic][:category], topic_name: params[:topic][:topic_name], micropayment: params[:topic][:micropayment], description: params[:topic][:description],link:params[:topic][:link] )
+
       undo_link("The topic: \"#{@topic.topic_name}\" has been successfully updated. ")
+      flash[:success] = 'The topic has been updated.'
     else
       flash[:error] = 'The topic could not be updated.'
     end
-    # Akshay - correctly changing the redirection url to topics tab in edit assignment view.
     redirect_to edit_assignment_path(params[:assignment_id]) + '#tabs-2'
   end
 
@@ -136,13 +134,11 @@ class SignUpSheetController < ApplicationController
   # This displays a page that lists all the available topics for an assignment.
   # Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
   # Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics can have different deadlines.
+  #Resuing the add_signup_topics function for staggered deadlines as well. As the add_signup_topics_staggered function just called the add_signup_topics method.
+
   def add_signup_topics
     load_add_signup_topics(params[:id])
     SignUpSheet.add_signup_topic(params[:id])
-  end
-
-  def add_signup_topics_staggered
-    add_signup_topics
   end
 
   # retrieves all the data associated with the given assignment. Includes all topics,
@@ -157,7 +153,8 @@ class SignUpSheetController < ApplicationController
     # to treat all assignments as team assignments
     # Though called participants, @participants are actually records in signed_up_teams table, which
     # is a mapping table between teams and topics (waitlisted recorded are also counted)
-    @participants = SignedUpTeam.find_team_participants(assignment_id, session[:ip])
+    # Renamed the variable from participants to team for more clarity
+    @team = SignedUpTeam.find_team_participants(assignment_id, session[:ip])
   end
 
   def set_values_for_new_topic
@@ -174,7 +171,7 @@ class SignUpSheetController < ApplicationController
   # staggered means that different topics can have different deadlines.
   def redirect_to_sign_up(assignment_id)
     assignment = Assignment.find(assignment_id)
-    assignment.staggered_deadline == true ? (redirect_to action: 'add_signup_topics_staggered', id: assignment_id) : (redirect_to action: 'add_signup_topics', id: assignment_id)
+    assignment.staggered_deadline == true ? (redirect_to action: 'add_signup_topics', id: assignment_id) : (redirect_to action: 'add_signup_topics', id: assignment_id)
   end
 
   # simple function that redirects to assignment->edit->topic panel to display /add_signup_topics or the /add_signup_topics_staggered page
@@ -183,51 +180,80 @@ class SignUpSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: assignment_id
   end
 
+
+  
   def list
+    # Fetch the AssignmentParticipant based on the given ID
     @participant = AssignmentParticipant.find(params[:id].to_i)
+    # Retrieve the assignment associated with the participant
     @assignment = @participant.assignment
+    # Find the number of slots filled and waitlisted for sign-up topics
     @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
+    
     @show_actions = true
     @priority = 0
+    # Fetch sign-up topics for the assignment
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     @max_team_size = @assignment.max_team_size
+    # Fetch the team ID if exists
     team_id = @participant.team.try(:id)
     @use_bookmark = @assignment.use_bookmark
-
     if @assignment.is_intelligent
-      @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
-      signed_up_topics = []
-      @bids.each do |bid|
-        sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
-        signed_up_topics << sign_up_topic if sign_up_topic
-      end
-      signed_up_topics &= @sign_up_topics
-      @sign_up_topics -= signed_up_topics
-      @bids = signed_up_topics
+      handle_intelligent_assignment
     end
-
+    # Extract code related to intelligent assignment handling
+    # Find the number of sign-up topics available
     @num_of_topics = @sign_up_topics.size
+    # Retrieve important deadline information
     @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
     @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
+    # Fetch student bids if available
     @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
-
+  
+    # Check if certain deadlines have passed to determine whether to show actions
+    handle_deadlines
+    
+    # Rendering the appropriate view based on the assignment type
+    render('sign_up_sheet/intelligent_topic_selection') && return if @assignment.is_intelligent
+  end
+  
+  # Handle intelligent assignment scenarios
+  def handle_intelligent_assignment
+    # Fetch the team ID (if it exists)
+    team_id = @participant.team.try(:id)
+    # Fetch bids for the team (if any) and order them by priority
+    @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
+    signed_up_topics = []
+    @bids.each do |bid|
+      sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
+      signed_up_topics << sign_up_topic if sign_up_topic
+    end
+    # Find topics that have been signed up and update the available sign-up topics
+    signed_up_topics &= @sign_up_topics
+    @sign_up_topics -= signed_up_topics
+    @bids = signed_up_topics
+  end
+  
+  # Extract code related to handling deadlines into a separate method
+  def handle_deadlines
     unless @assignment.due_dates.find_by(deadline_type_id: 1).nil?
-      @show_actions = false if !@assignment.staggered_deadline? && (@assignment.due_dates.find_by(deadline_type_id: 1).due_at < Time.now)
-
-      # Find whether the user has signed up for any topics; if so the user won't be able to
-      # sign up again unless the former was a waitlisted topic
-      # if team assignment, then team id needs to be passed as parameter else the user's id
+      if !@assignment.staggered_deadline? && (@assignment.due_dates.find_by(deadline_type_id: 1).due_at < Time.now)
+        @show_actions = false
+      end
+  
+      # Find whether the user has signed up for any topics; if so, the user won't be able to sign up again
+      # unless the former was a waitlisted topic
       users_team = SignedUpTeam.find_team_users(@assignment.id, session[:user].id)
       @selected_topics = if users_team.empty?
                            nil
                          else
                            SignedUpTeam.find_user_signup_topics(@assignment.id, users_team.first.t_id)
                          end
-    end
-    render('sign_up_sheet/intelligent_topic_selection') && return if @assignment.is_intelligent
+    end  
   end
-
+  
+ 
   def sign_up
     @assignment = AssignmentParticipant.find(params[:id]).assignment
     @user_id = session[:user].id
@@ -239,15 +265,17 @@ class SignUpSheetController < ApplicationController
   end
 
   # routes to new page to specify student
-  def signup_as_instructor; end
+  
 
   def signup_as_instructor_action
     user = User.find_by(name: params[:username])
     if user.nil? # validate invalid user
       flash[:error] = 'That student does not exist!'
     else
-      if AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id]
-        if SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
+      assignment_id=params[:assignment_id]
+      topic_id=params[:topic_id]
+      if AssignmentParticipant.exists? user_id: user.id, parent_id: assignment_id
+        if SignUpSheet.signup_team(assignment_id, user.id, topic_id)
           flash[:success] = 'You have successfully signed up the student for the topic!'
           ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor signed up student for topic: ' + params[:topic_id].to_s)
         else
@@ -259,59 +287,72 @@ class SignUpSheetController < ApplicationController
         ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'The student is not registered for the assignment: ' << user.id)
       end
     end
-    redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
+    redirect_to controller: 'assignments', action: 'edit', id: assignment_id
   end
 
-  # this function is used to delete a previous signup
-  def delete_signup
-    participant = AssignmentParticipant.find(params[:id])
-    assignment = participant.assignment
-    drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
-    # A student who has already submitted work should not be allowed to drop his/her topic!
-    # (A student/team has submitted if participant directory_num is non-null or submitted_hyperlinks is non-null.)
-    # If there is no drop topic deadline, student can drop topic at any time (if all the submissions are deleted)
-    # If there is a drop topic deadline, student cannot drop topic after this deadline.
-    if !participant.team.submitted_files.empty? || !participant.team.hyperlinks.empty?
-      flash[:error] = 'You have already submitted your work, so you are not allowed to drop your topic.'
-      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Dropping topic for already submitted a work: ' + params[:topic_id].to_s)
-    elsif !drop_topic_deadline.nil? && (Time.now > drop_topic_deadline.due_at)
-      flash[:error] = 'You cannot drop your topic after the drop topic deadline!'
-      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Dropping topic for ended work: ' + params[:topic_id].to_s)
-    else
-      delete_signup_for_topic(assignment.id, params[:topic_id], session[:user].id)
-      flash[:success] = 'You have successfully dropped your topic!'
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student has dropped the topic: ' + params[:topic_id].to_s)
-    end
-    redirect_to action: 'list', id: params[:id]
-  end
-
-  def delete_signup_as_instructor
-    # find participant using assignment using team and topic ids
-    team = Team.find(params[:id])
-    assignment = Assignment.find(team.parent_id)
-    user = TeamsUser.find_by(team_id: team.id).user
-    participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
-    drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
-    if !participant.team.submitted_files.empty? || !participant.team.hyperlinks.empty?
+  # A common method for both delete_signup and delete_signup_as_instructor
+def delete_signup_common(who_user,participant, assignment, drop_topic_deadline, topic_id)
+  if !participant.team.submitted_files.empty? || !participant.team.hyperlinks.empty?
+    if who_user == "instructor"
       flash[:error] = 'The student has already submitted their work, so you are not allowed to remove them.'
-      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for already submitted work: ' + params[:topic_id].to_s)
-    elsif !drop_topic_deadline.nil? && (Time.now > drop_topic_deadline.due_at)
+    else
+      flash[:error] = 'You have already submitted your work, so you are not allowed to drop your topic.'
+    end
+    ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, "Dropping topic for already submitted work: #{topic_id}")
+  elsif !drop_topic_deadline.nil? && (Time.now > drop_topic_deadline.due_at)
+    if who_user == "instructor"
       flash[:error] = 'You cannot drop a student after the drop topic deadline!'
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for ended work: ' + params[:topic_id].to_s)
     else
-      delete_signup_for_topic(assignment.id, params[:topic_id], participant.user_id)
+      flash[:error] = 'You cannot drop your topic after the drop topic deadline!'
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Dropping topic for ended work: ' + params[:topic_id].to_s)
+    end
+  else
+    if who_user == "instructor"
+      delete_signup_topic(assignment.id, params[:topic_id], participant.user_id)
       flash[:success] = 'You have successfully dropped the student from the topic!'
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Student has been dropped from the topic: ' + params[:topic_id].to_s)
+    else
+      delete_signup_topic(assignment.id, params[:topic_id], session[:user].id)
+      flash[:success] = 'You have successfully dropped your topic!'
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student has dropped the topic: ' + params[:topic_id].to_s)
     end
-    redirect_to controller: 'assignments', action: 'edit', id: assignment.id
   end
+end
+
+# Refactored delete_signup method
+def delete_signup
+  who_user = "student"
+  participant = AssignmentParticipant.find(params[:id])
+  assignment = participant.assignment
+  drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
+  topic_id = params[:topic_id]
+
+  delete_signup_common(who_user,participant, assignment, drop_topic_deadline, topic_id)
+  redirect_to action: 'list', id: params[:id]
+end
+
+# Refactored delete_signup_as_instructor method
+def delete_signup_as_instructor
+  who_user = "instructor"
+  team = Team.find(params[:id])
+  assignment = Assignment.find(team.parent_id)
+  user = TeamsUser.find_by(team_id: team.id).user
+  participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
+  drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
+  topic_id = params[:topic_id]
+
+  delete_signup_common(who_user,participant, assignment, drop_topic_deadline, topic_id)
+  redirect_to controller: 'assignments', action: 'edit', id: assignment.id
+end
+
+
 
   def set_priority
     participant = AssignmentParticipant.find_by(id: params[:participant_id])
     assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
     team_id = participant.team.try(:id)
     unless team_id
-      # Zhewei: team lazy initialization
       SignUpSheet.signup_team(assignment_id, participant.user.id)
       team_id = participant.team.try(:id)
     end
@@ -399,11 +440,11 @@ class SignUpSheetController < ApplicationController
   end
 
   # This method is called when a student click on the trumpet icon. So this is a bad method name. --Yang
-  def show_team
+  def display_team_info
     assignment = Assignment.find(params[:assignment_id])
     topic = SignUpTopic.find(params[:id])
     if assignment && topic
-      @results = ad_info(assignment.id, topic.id)
+      @results = get_advertisement_info(assignment.id, topic.id)
       @results.each do |result|
         result.keys.each do |key|
           @current_team_name = result[key] if key.equal? :name
@@ -454,7 +495,7 @@ class SignUpSheetController < ApplicationController
 
   private
 
-  def setup_new_topic
+  def create_new_topic
     set_values_for_new_topic
     @sign_up_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
     if @sign_up_topic.save
@@ -491,7 +532,7 @@ class SignUpSheetController < ApplicationController
 
   # get info related to the ad for partners so that it can be displayed when an assignment_participant
   # clicks to see ads related to a topic
-  def ad_info(_assignment_id, topic_id)
+  def get_advertisement_info(_assignment_id, topic_id)
     @ad_information = []
     @signed_up_teams = SignedUpTeam.where(topic_id: topic_id)
     # Iterate through the results of the query and get the required attributes
@@ -511,7 +552,7 @@ class SignUpSheetController < ApplicationController
     @ad_information
   end
 
-  def delete_signup_for_topic(assignment_id, topic_id, user_id)
+  def delete_signup_topic(assignment_id, topic_id, user_id)
     SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
   end
 end

@@ -1,5 +1,8 @@
-<h2>Suggestion</h2>
-
+<% if current_user_role?.name.eql?("Student") or session[:flip_user] %>
+  <h2>View Suggested topic <%= @suggestion.title %></h2>
+<% else %>
+  <h2>Suggestion</h2>
+<%end%>
 <!--displaying suggestion information-->
 <table border=0 cellspacing=10>
 <colgroup>
@@ -14,52 +17,66 @@
   <td><b>Description:</b></td>
   <td><%=h @suggestion.description %></td>
 </tr>
-<tr>
-  <td><b>Submitter's ID:</b></td>
-  <td>
-    <%if @suggestion.unityID != "" %>
-      <%=h @suggestion.unityID %>
-    <%else%>
-      --
-    <%end%>
-  </td>
-</tr>
-<tr>
-  <td><b>Submitter's sign-up preference:</b></td>
-  <td>
-    <%if @suggestion.signup_preference == 'Y' %>
-      Yes
-    <%elsif @suggestion.signup_preference == 'N' %>
-      No
-    <%else%>
-      No preference
-    <%end%>
-  </td>
-</tr>
-<tr>
-  <td><b>Suggestion's status:</b></td>
-  <td><%=h @suggestion.status %></td>
-</tr>
-</table>
-<p>
-  <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' && session[:user] != nil && (session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4) %>
-    <%= form_tag :action => 'submit', :id => @suggestion do %>
-      <%= submit_tag "Approve suggestion", :name => 'approve_suggestion' %>
-      &nbsp; &nbsp;
-      <%= submit_tag "Reject suggestion", :name => 'reject_suggestion' %>
+<% if current_user_role?.name.eql?("Student") or session[:flip_user] %>
+  <tr>
+    <td><b>Approval Status:</b></td>
+    <td><%=h @suggestion.status %></td>
+  </tr>
+<% else %>
+  <tr>
+    <td><b>Submitter's ID:</b></td>
+    <td>
+      <%if @suggestion.unityID != "" %>
+        <%=h @suggestion.unityID %>
+      <%else%>
+        --
+      <%end%>
+    </td>
+  </tr>
+  <tr>
+    <td><b>Submitter's sign-up preference:</b></td>
+    <td>
+      <%if @suggestion.signup_preference == 'Y' %>
+        Yes
+      <%elsif @suggestion.signup_preference == 'N' %>
+        No
+      <%else%>
+        No preference
+      <%end%>
+    </td>
+  </tr>
+  <tr>
+    <td><b>Suggestion's status:</b></td>
+    <td><%=h @suggestion.status %></td>
+  </tr>
+  </table>
+  <p>
+    <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' && session[:user] != nil && (session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4) %>
+      <%= form_tag :action => 'submit', :id => @suggestion do %>
+        <%= submit_tag "Approve suggestion", :name => 'approve_suggestion' %>
+        &nbsp; &nbsp;
+        <%= submit_tag "Reject suggestion", :name => 'reject_suggestion' %>
+      <% end %>
     <% end %>
-  <% end %>
-</p>
+  </p>
+<%end%>
 
 <br><br>
 <!--displaying comments-->
-<h2>Comments</h2>
-<%if @suggestion.suggestion_comments.size > 0 %>
+<% if not current_user_role?.name.eql?("Student") and not session[:flip_user] %>
+  <h2>Comments</h2>
+<%end%>
+<%if @suggestion.suggestion_comments.size > 0 or current_user_role?.name.eql?("Student") or session[:flip_user] %>
   <table class="general" cellpadding=5 border="1">
     <colgroup>
       <col width=15% />
-      <col width=15% />
-      <col width=25% />
+      <% if current_user_role?.name.eql?("Student") or session[:flip_user] %>
+        <col width=5% />
+        <col width=80% />
+      <% else %>
+        <col width=15% />
+        <col width=25% />
+      <%end%>
     </colgroup>
     <tr>
       <th>Commenter</th>
@@ -92,15 +109,27 @@
   <b>Add new comment and vote</b> <br>
   <%= form_tag :action => 'submit', :id => @suggestion do %>
     <%= text_area "suggestion_comment", "comments", :rows => 5, :cols => 50 %>
-    <p>
-      <%= "Vote"%>
-      <%= select("suggestion_comment","vote",{"Yes" =>"Y","No"=>"N","Revise"=>"R"}) %>
-    </p>
+    <% if not current_user_role?.name.eql?("Student") and not session[:flip_user] %>
+      <p>
+        <%= "Vote"%>
+        <%= select("suggestion_comment","vote",{"Yes" =>"Y","No"=>"N","Revise"=>"R"}) %>
+      </p>
 
-    <%= submit_tag "Submit vote", :name => 'add_comment' %>
+      <%= submit_tag "Submit vote", :name => 'add_comment' %>
+    <% else %>
+      <br>
+    
+      <%= submit_tag "Submit comment", :name => 'add_comment' %>
+    <%end%>
   <% end %>
 
 <% end %>
+
+<br><br>
 <p>
-  <%= link_to 'Back', :action => 'list', :id => @suggestion.assignment_id %>
+  <% if current_user_role?.name.eql?("Student") or session[:flip_user]  %>
+    <%= link_to 'Back', :controller => 'suggestion', :action => 'new', :id => @suggestion.assignment_id %>
+  <% else %>
+      <%= link_to 'Back', :action => 'list', :id => @suggestion.assignment_id %>
+  <%end%>
 </p>

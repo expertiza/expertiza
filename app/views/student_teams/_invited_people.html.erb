@@ -1,14 +1,19 @@
-<!-- Partial to display people who have been invited to collaborate -->
 <tr>
   <td><%= inv.to_user.name(session[:ip]) %></td>
   <td><%= inv.to_user.fullname(session[:ip]) %></td>
   <td><%= inv.to_user.email(session[:ip]) %></td>
-  <% if inv.reply_status == 'A' %>
-    <td align = "center"><%=t ".accepted"%></td>
-  <% elsif inv.reply_status == 'D' %>
-    <td align = "center"><%=t ".declined"%></td>
-  <% else %>
-    <td align = "center">Waiting for reply
-      &nbsp;&nbsp;<%= link_to "Retract", {:controller => 'invitations', :action => 'cancel', :inv_id => inv.id, :student_id => @student.id} %></td>
-  <% end %>
+  <tr>
+  <td align="center">
+    <% case inv.reply_status %>
+    <% when 'A' %>
+      <%= t(".accepted") %>
+    <% when 'D' %>
+      <%= t(".declined") %>
+    <% else %>
+      Waiting for reply
+      &nbsp;&nbsp;<%= link_to "Retract", {controller: 'invitations', action: 'cancel', inv_id: inv.id, student_id: @student.id}, method: :post %>
+    <% end %>
+  </td>
+</tr>
+
 </tr>

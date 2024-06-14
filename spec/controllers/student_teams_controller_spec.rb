@@ -46,7 +46,7 @@ describe StudentTeamsController do
       it 'saves the team when all the team name is set correctly' do
         allow(AssignmentNode).to receive(:find_by).with(node_object_id: 1).and_return(node1)
         allow(AssignmentTeam).to receive(:new).with(name: 'test', parent_id: 1).and_return(team7)
-        allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
+        allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
         allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
         allow(User).to receive(:find).with(1).and_return(team_user1)
         allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(true)
@@ -69,7 +69,7 @@ describe StudentTeamsController do
     context 'name already in use' do
       it 'flash notice when the team name is already in use' do
         allow(AssignmentTeam).to receive(:where).with(name: 'test', parent_id: 1).and_return(team7)
-        allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
+        allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
         allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
         allow(student1).to receive(:user_id).with(any_args).and_return(1)
         allow(team7).to receive(:empty?).and_return(false)
@@ -167,28 +167,4 @@ describe StudentTeamsController do
     end
   end
 
-  # Commenting the testcase as the test is failing due to an error in the users controller
-  # describe '#remove_participant' do
-  #  context 'remove team user' do
-  #    it 'remove user' do
-  #   allow(AssignmentParticipant).to receive(:find).and_return(participant)
-  #   allow(TeamsUser).to receive(:where).and_return(team_user1)
-  #   allow(team_user1).to receive(:destroy_all)
-  #   allow(team_user1).to receive_message_chain(:where,:empty?).and_return(false)
-  #   allow_any_instance_of(AssignmentParticipant).to receive(:save).and_return(false)
-  #   user_session = {user:student1}
-  #   request_params = {
-  #     team_id:1,
-  #     user_id:1,
-  #     student_id:1,
-  #     team:{
-  #       name:'test'
-  #     }
-  #   }
-  #   result = post :remove_participant, params: request_params, session: user_session
-  #   expect(result.status).to eq 302
-  #   # expect(result).to redirect_to(view_student_teams_path(:student_id => 1))
-  #    end
-  #  end
-  # end
 end

@@ -1,4 +1,4 @@
-class SignedUpTeam < ApplicationRecord
+class SignedUpTeam < ActiveRecord::Base
   belongs_to :topic, class_name: 'SignUpTopic'
   belongs_to :team, class_name: 'Team'
 
@@ -13,8 +13,8 @@ class SignedUpTeam < ApplicationRecord
                                   signed_up_teams.is_waitlisted as is_waitlisted, signed_up_teams.team_id as team_id')
                                 .where('sign_up_topics.assignment_id = ?', assignment_id)
     @participants.each_with_index do |participant, i|
-      participant_names = User.joins('INNER JOIN teams_users ON users.id = teams_users.user_id')
-                              .joins('INNER JOIN teams ON teams.id = teams_users.team_id')
+      participant_names = User.joins('INNER JOIN teams_participants ON users.id = teams_participants.user_id')
+                              .joins('INNER JOIN teams ON teams.id = teams_participants.team_id')
                               .select('users.name as u_name, teams.name as team_name')
                               .where('teams.id = ?', participant.team_id)
 
@@ -39,9 +39,9 @@ class SignedUpTeam < ApplicationRecord
   end
 
   def self.find_team_users(assignment_id, user_id)
-    TeamsUser.joins('INNER JOIN teams ON teams_users.team_id = teams.id')
+    TeamsParticipant.joins('INNER JOIN teams ON teams_participants.team_id = teams.id')
              .select('teams.id as t_id')
-             .where('teams.parent_id = ? and teams_users.user_id = ?', assignment_id, user_id)
+             .where('teams.parent_id = ? and teams_participants.user_id = ?', assignment_id, user_id)
   end
 
   def self.find_user_signup_topics(assignment_id, team_id)
@@ -69,7 +69,7 @@ class SignedUpTeam < ApplicationRecord
 
   def self.topic_id(assignment_id, user_id)
     # team_id variable represents the team_id for this user in this assignment
-    team_id = TeamsUser.team_id(assignment_id, user_id)
+    team_id = TeamsParticipant.team_id(assignment_id, user_id)
     topic_id_by_team_id(team_id) if team_id
   end
 

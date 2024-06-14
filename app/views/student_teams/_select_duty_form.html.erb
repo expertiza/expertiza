@@ -1,6 +1,7 @@
-<%= form_tag :controller => 'teams_users', :action => 'update_duties' do %>
-    <%= hidden_field_tag 'participant_id', participant_id %>
-    <%= hidden_field_tag 'teams_user_id', teams_user_id %>
-    <%= collection_select(:teams_user, :duty_id, Duty.where("assignment_id = ?", assignment_id).select{|duty| duty.can_be_assigned?(@student.team)} , :id, :name, {:prompt => 'Please select a role'}) %>
+<%= form_tag controller: 'teams_participants', action: 'update_duties' do %>
+    <%= hidden_field_tag :participant_id, participant_id %>
+    <%= hidden_field_tag :teams_user_id, teams_user_id %>
+    <%= collection_select(:teams_participant, :duty_id, Duty.where(assignment_id: assignment_id).select { |duty| duty.can_be_assigned?(@student.team) }, :id, :name, prompt: 'Please select a role') %>
     <%= submit_tag "Save", data: { disable_with: "Submitting..." } %>
-<% end %>
+  <% end %>
+  

@@ -106,7 +106,7 @@
         <% is_teammate = false %>
         <% team = SignedUpTeam.find_by(topic_id: @topic.id) rescue nil %>
         <% if team %>
-          <% teams_users = TeamsUser.where(['team_id = ?', team.team_id]) %>
+          <% teams_users = TeamsParticipant.where(['team_id = ?', team.team_id]) %>
           <% is_teammate = teams_users.select {|tu| tu.user_id == session[:user].id}.size > 0  %>
         <% end %>
         <% if bookmark.user_id == session[:user].id or is_teammate or ['Instructor'].include? @current_role_name %>

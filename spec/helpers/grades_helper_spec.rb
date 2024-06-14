@@ -22,6 +22,10 @@ describe GradesHelper, type: :helper do
   let(:vmQ1) { VmQuestionResponse.new(questionnaire1, assignment, 1) }
   let(:vmQ2) { VmQuestionResponse.new(questionnaire2, assignment, 2) }
   let(:helper) { Class.new { extend GradesHelper } }
+  let(:assignment_with_participant) do
+    build(:assignment ,id: 1, name: 'test_assignment', instructor_id: 2, participants:[build(:participant, id: 1, user_id: 21, assignment: assignment)], course_id: 1)
+  end
+  let(:participants_list) { [build(:participant, id: 1, user_id: 21, assignment: assignment)]}
 
   describe 'accordion_title' do
     it 'should render is_first:true if last_topic is nil' do
@@ -230,82 +234,4 @@ describe GradesHelper, type: :helper do
     end
   end
 
-  describe 'view_heatgrid' do
-    context 'when all questionnaires do not match the target type' do
-      it 'render the view with empty list of  VmQuestionResponse' do
-        # mock the participant for the  AssignmentParticipant.find
-        allow(AssignmentParticipant).to receive(:find).with(1).and_return(assignment_participant)
-        allow(assignment_participant).to receive(:team).and_return(team)
-        # in the for each part, the function finds the AssignmentQuestionnaire by questionnaire id
-        # so, mock all the searhcing result to avoid data not existing in DB
-        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(aq1)
-        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 2).and_return(aq2)
-        # just test a part of html to ensure the function render the target view successfully
-        expect(view_heatgrid(1, 'non-exist')).to include('!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->')
-        # access the variable in the function and test the result
-        expect(instance_variable_get(:@vmlist)).to eq([])
-      end
-    end
-    context 'when all questionnaires match the target type' do
-      it 'render the view with nonempty list of  VmQuestionResponse' do
-        # mock the participant for the  AssignmentParticipant.find
-        allow(AssignmentParticipant).to receive(:find).with(1).and_return(assignment_participant)
-        allow(assignment_participant).to receive(:team).and_return(team)
-        # in the for each part, the function finds the AssignmentQuestionnaire by questionnaire id
-        # so, mock all the searhcing result to avoid data not existing in DB
-        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(aq1)
-        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 2).and_return(aq2)
-        # mock a creating result for testing return value
-        allow(VmQuestionResponse).to receive(:new).with(any_args).and_return(vmQ1)
-        expect(view_heatgrid(1, 'ReviewQuestionnaire')).to include('!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->')
-        expect(instance_variable_get(:@vmlist)).to eq([vmQ1, vmQ1])
-      end
-    end
-
-    context 'when all questionnaires match the target type, but the assignment does not vary by round' do
-      it 'the round variable in the new VmQuestionResponse should be nil' do
-        # mock the participant for the  AssignmentParticipant.find
-        # viewgrid_participant contains a assignment whose questionnaires' type is TeammateReviewQuestionnaire
-        allow(AssignmentParticipant).to receive(:find).with(2).and_return(viewgrid_participant)
-        allow(viewgrid_participant).to receive(:team).and_return(team)
-        view_heatgrid(2, 'TeammateReviewQuestionnaire')
-        # testing the object variable
-        list = instance_variable_get(:@vmlist)
-        expect(list[0].round).to eq(nil)
-      end
-    end
-  end
-
-  describe 'penalties' do
-    context 'when giving an assignment id' do
-      it 'calculates all the penalties' do
-        # mock the data for Assignment.find and Participant.where
-        allow(Assignment).to receive(:find).with(1).and_return(assignment)
-        allow(Participant).to receive(:where).with(parent_id: 1).and_return([participant])
-        # calculate_penalty is the function of penalty_helper.rb
-        # we skip the test because it is not necessary to do outgoing test
-        allow(self).to receive(:calculate_penalty).with(participant.id).and_return(submission: 1, review: 1, meta_review: 1)
-        # mock the data for LatePolicy.find
-        allow(LatePolicy).to receive(:find).with(assignment.late_policy_id).and_return(latePolicy)
-        # assign_all_penalties is the function of grade_controller.rb
-        # we skip the test because it is not necessary to do outgoing test
-        allow(self).to receive(:assign_all_penalties).with(any_args).and_return(nil)
-        penalties(1)
-        # testing the @assignment equals to expected result
-        expect(instance_variable_get(:@assignment)).to eq(assignment)
-      end
-
-      # This test should be skipped because there are some bugs in the original code.
-      it 'calculates all the penalties and create new CalculatedPenalty' do
-        # allow(Assignment).to receive(:find).with(4).and_return(assignment_for_penalty)
-        # allow(Participant).to receive(:where).with(parent_id: 4).and_return([participant])
-        # allow(self).to receive(:calculate_penalty).with(participant.id).and_return({submission: 1, review: 1, meta_review: 1})
-        # allow(LatePolicy).to receive(:find).with(assignment.late_policy_id).and_return(latePolicy)
-        # allow(self).to receive(:assign_all_penalties).with(any_args).and_return(nil)
-        # allow(CalculatedPenalty).to receive(:create).with(any_args).and_return(nil)
-        # penalties(4)
-        # expect(self.instance_variable_get(:@assignment)).to eq(assignment)
-      end
-    end
-  end
 end

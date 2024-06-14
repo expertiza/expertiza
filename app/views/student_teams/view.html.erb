@@ -1,4 +1,5 @@
 <h1><%=t ".team_info"%> <%= @student.assignment.name %></h1>
+
 <% if @student.team.nil? %>
   <%=t ".no_team"%>
   <h3><%=t ".name_team"%></h3>
@@ -20,7 +21,7 @@
       %></button>
     <% else %>
       <% button_enabled = false %>
-      <% users = TeamsUser.where(team_id: @student.team.id) %>
+      <% users = TeamsParticipant.where(team_id: @student.team.id) %>
       <% pair_programming_team_status = true %>
       <% users.each do |user| %>
         <% if user.pair_programming_status == "W" or user.pair_programming_status.nil? %>
@@ -42,89 +43,12 @@
   <b><%=t ".team_members"%></b>
   <br/><br/>
   <!--start team member table-->
-  <table style="width:80%" align="center" >
-    <tr style="border: 1px outset #000000; padding: 10px 20px" >
-      <th class="head">Username</th>
-      <th class="head">Full name</th>
-      <% if @student.assignment.duty_based_assignment? %>
-          <th class="head">Role</th>
-      <% end %>
-      <th class="head">Email address</th>
-      <!--E2351 Added new column if the assignment has mentors so that mentors can be identified-->
-      <% if @student.assignment.auto_assign_mentor? %>
-          <th class="head">Mentor</th>
-      <% end %>
-      <% if @teammate_review_allowed %>
-        <th class="head"><%=t ".review_action"%></th>
-      <% end %>
-    </tr>
 
-    <% @student.team.participants.each do |member| %> <!--start team member content-->
-        <tr>
-        <td><%= member.user.name(session[:ip]) %></td>
-        <td><%= member.user.fullname(session[:ip]) %></td>
-        <%if @student.assignment.duty_based_assignment? %>
-            <% team_user = member.team_user %>
-              <!-- Gets duty of member if the assignment is duty based and member has a duty -->
-            <%unless team_user.duty_id.nil?%>
-               <td><%= Duty.find(team_user.duty_id).name %></td>
-            <%else%>
-                <td>
-                  <%if  member.user.id == session[:user].id%>
-                      <%= render :partial=>'select_duty_form', :locals => {:assignment_id => @student.assignment.id, :participant_id => member.id, :teams_user_id => team_user.id}%>
-                  <%else%>
-                      Not Selected
-                  <%end%>
-                </td>
-            <%end%>
-        <%end%>
-        <td><%= member.user.email(session[:ip]) %></td>
-        <!--E2351 check each user so that only the mentor will be identified-->
-        <% if @student.assignment.auto_assign_mentor? %>
-          <% if MentorManagement.user_a_mentor?(member.user) %>
-            <td>Mentor</td>
-          <% else %>
-            <td></td>
-          <% end %>
-        <% end %>
-        <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
-        <% if @teammate_review_allowed &&
-          ((@student.assignment.duty_based_assignment? && !team_user.duty_id.nil?) || (!@student.assignment.duty_based_assignment?))%>
-          <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
-            <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
-            if map.nil?
-              map = TeammateReviewResponseMap.create(:reviewer_id => @student.id, :reviewee_id => member.id, :reviewed_object_id => @student.assignment.id)
-            end
-            review = map.response.last
-            if review.nil? %>
-            <td>
-              <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "teammate"} %>
-            </td>
-          <% else %>
-            <td>
-              <%= link_to t(".view"), {:controller => 'response', :action => 'view', :id => review.id} %>
-              &nbsp;&nbsp;
-              <%= link_to t(".edit"), {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
-            </td>
-          <% end %>
-        <% end %>
-      <% end %>
-    </tr>
-  <% end %>   <!--end team member content-->
-    <tr>
-      <td colspan="3">
-        <br/>
-        <%= link_to t(".leave_team"), remove_participant_student_teams_path(student_id: @student.id, team_id: @student.team.id) %>
-      <td>
-    </tr>
-    <%# <% if @teammate_review_allowed %>
-      <%# <tr style="border: 1px outset #000000; padding: 10px 20px" >
-        <th class="head">Teammate review question</th>
-        <th class="head">Self contribution percentage</th>
-      </tr> %>
-    <%# <% end %> <!--end self contribution for Cake questions-->
-  </table>
+<%= render :partial => 'team_display' %>
+
+
 <% end %>
+
 <% if @student.assignment.pair_programming_enabled? %>
   <% if !@student.team.nil? && Team.find(@student.team.id).pair_programming_request!=0 && !button_enabled %>
     <div>
@@ -132,6 +56,7 @@
         <br/><br/>
         <b><%=t ".Pair Programming Invitations"%></b>
         <br/><br/>
+
         <table style="width:80%" align="center" >
           <tr style="border: 1px outset #000000; padding: 10px 20px" >
             <th class="head">Username</th>
@@ -144,7 +69,7 @@
               <td><%= member.user.name(session[:ip]) %></td>
               <td><%= member.user.fullname(session[:ip]) %></td>
               <td><%= member.user.email(session[:ip]) %></td>
-              <% status = TeamsUser.find_by(user_id: member.user.id, team_id: member.team.id).pair_programming_status %>
+              <% status = TeamsParticipant.find_by(user_id: member.user.id, team_id: member.team.id).pair_programming_status %>
               <% if (status == "W" || status.nil?) and current_user.id != member.user.id %>
                 <td>Request Pending</td>
               <% elsif  (status == "W" || status.nil? ) and current_user.id == member.user.id%>
@@ -170,11 +95,13 @@
     </div>
   <% end %>
 <% end %>
+
 <!--render partial for join team request-->
     <%= render :partial => 'join_team_requests/list_received',
     :locals =>{:team_id=>@student.team.id,
                :teams_user_id=>params[:student_id],
                :assignment_id => @student.assignment.id} unless @student.team.nil? %>
+
     <% if @send_invs && @send_invs.any? %>
     <br/><br/>
     <b>Sent invitations</b>
@@ -188,19 +115,9 @@
           <th class="head" align="center"><b><%=t ".status"%></b></th>
         </tr>
           <% @send_invs.each do |inv| %>
-            <tr>
-              <td><%= inv.to_user.name(session[:ip]) %></td>
-              <td><%= inv.to_user.fullname(session[:ip]) %></td>
-              <td><%= inv.to_user.email(session[:ip]) %></td>
-                <% if inv.reply_status == 'A' %>
-                  <td align = "center"><%=t ".accepted"%></td>
-                <% elsif inv.reply_status == 'D' %>
-                  <td align = "center"><%=t ".declined"%></td>
-                <% else %>
-                  <td align = "center">Waiting for reply
-                  &nbsp;&nbsp;<%= link_to "Retract", {:controller => 'invitations', :action => 'cancel', :inv_id => inv.id, :student_id => @student.id} %></td>
-                <% end %>
-             </tr>
+
+    <%=render :partial=> 'invited_people', :locals => {:inv => inv, :session_ip => session[:ip], :student => @student} %>
+
           <% end %>
       </table>
       <!-- start invited people table -->
@@ -209,49 +126,10 @@
 
 <!--send invitation-->
 <% if !@student.team.nil? && @student.assignment.max_team_size > 1 %>
-     <% if @student.team.nil? %> <!--dead code-->
-       <h3><%=t ".name_team"%></h3>
-       <%= form_tag :controller => 'student_teams', :action => 'create' do %>
-         <%= hidden_field_tag 'student_id', @student.id %>
-         <label for="team_name"><%=t ".team_name"%></label>&nbsp;
-         <%= text_field 'team', 'name' %>
-         <%= submit_tag t(".name_team") %>
-       <% end %>
-     <% elsif !@student.team.full?%>
-       <b><%=t ".invite_people"%></b>
-       <%= form_tag :controller => 'invitations', :action => 'create' do %>
-         <%= hidden_field_tag 'team_id', @student.team.id %>
-         <%= hidden_field_tag 'student_id', @student.id %>
-         <%= hidden_field_tag 'session[:dummy][:assignment_id]', @student.parent_id %>
-         <table style="width:80%" align="center" >
-           <tr>
-            <td>
-              <%=t ".enter_user"%><%= text_field_with_auto_complete :user, :name, {:size => 41} %>
-              <input type='submit' value='Invite'/>
-            </td>
-           </tr>
-         </table>
-     <% end %>
-   <% end %>
 
-  <!--waiting listed users on the same topic-->
-  <% if @users_on_waiting_list && @users_on_waiting_list.count>0%>
-    <h3><%=t ".users_waiting"%></h3>
-      <table>
-        <tr>
-          <td><b>&nbsp; <%=t ".user_id"%> &nbsp; </b></td>
-          <td><b>&nbsp; <%=t ".fullname"%> &nbsp; </b></td>
-          <td><b>&nbsp; <%=t ".email"%> &nbsp; </b></td>
-        </tr>
-        <% @users_on_waiting_list.each do |user|%>
-          <tr>
-            <td> &nbsp; <%=user.name(session[:ip])%> &nbsp; </td>
-            <td> &nbsp; <%=user.fullname(session[:ip])%> &nbsp; </td>
-            <td> &nbsp; <%=user.email(session[:ip])%> &nbsp; </td>
-          </tr>
-        <% end%>
-      </table>
-  <% end %>
+<%= render :partial=> 'send_invitations', :locals => {:student => @student} %>
+
+
 <% end %>
 
 <!--display a table of received invitation-->
@@ -264,61 +142,29 @@
         <th class="head"><%=t ".reply"%> </th>
       </tr>
       <% @received_invs.each do |inv| %>
-          <% if inv.reply_status == 'W' %>
-              <tr>
-                <td><%= inv.from_user.name(session[:ip]) %></td>
-                <td>
-                  <% teams_users = TeamsUser.where(['user_id = ?', inv.from_id]) %>
-                  <% teams_users.each do |teams_user| %>
-                      <% current_team = Team.where(['id = ? and parent_id = ?', teams_user.team_id, @student.assignment.id]).first %>
-                      <%= Team.find(current_team.id).name unless current_team.nil?%>
-                  <% end %>
-                </td>
-                <td>
-                  <%if @student.team.nil?
-                      @team_id = 0
-                    else
-                      @team_id = @student.team.id
-                    end %>
-                  <%= link_to "Accept",
-                              {:controller => 'invitations', :action => 'accept', :inv_id => inv.id, :student_id => @student.id, :team_id => @team_id},
-                              {:onClick => "javascript: return confirm('Your topic (or place on waiting lists) will be relinquished if you accept the invitation. Do you want to continue?');"}
-                  %>
-                  |
-                  <%= link_to "Decline",
-                              {:controller => 'invitations', :action => 'decline', :inv_id => inv.id, :student_id => @student.id}
-                  %>
-                </td>
-              </tr>
-          <% end %>
+
+    <%= render :partial => 'received_invitations', :locals => {:inv => inv, :session_ip => session[:ip], :student => @student} %>
+
       <% end %>
     </table>
 
   <% end %>
 <br/>
+
 <!--display the advertisement-->
+
   <% if @student.team && @student.assignment.topics? && @student.team.topic%>
     <b><%=t ".ad_for_team"%></b>
     <br>
-    <table style="width:80%" align="center" >
-      <tr>
-        <td>
-        <% if @student.team && @student.team.advertise_for_partner%>
-            <%= @student.team.comments_for_advertisement%>
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <%= link_to 'Edit', :controller => 'advertise_for_partner', :action => 'edit', :team_id=>@student.team.id %>
-            &nbsp;&nbsp;
-            <%= link_to 'Delete', :controller => 'advertise_for_partner', :action => 'remove', :team_id=>@student.team.id %>
-        <% else %>
-            <%= link_to 'Create', :controller => 'advertise_for_partner', :action => 'new', :team_id=>@student.team.id %>
-        <% end %>
-        </td>
-      </tr>
-    </table>
+
+  <%= render :partial => 'display_advertisements' , :locals => {:student_team_id => @student.team.id, :student => @student}%>
+
   <% end %>
 
 
+
 <br/>
+
 <!--display a list of sent join-team requests-->
 <%= render :partial => 'join_team_requests/list_sent',
            :locals =>{:teams_user_id=>params[:student_id],

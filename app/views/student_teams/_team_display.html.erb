@@ -1,6 +1,5 @@
-<!-- Partial to display team -->
-<table style="width:80%" align="center" >
-  <tr style="border: 1px outset #000000; padding: 10px 20px" >
+<table style="width:80%" align="center">
+  <tr style="border: 1px outset #000000; padding: 10px 20px">
     <th class="head">Username</th>
     <th class="head">Full name</th>
     <% if @student.assignment.duty_based_assignment? %>
@@ -9,65 +8,54 @@
     <th class="head">Email address</th>
 
     <% if @teammate_review_allowed %>
-      <th class="head"><%=t ".review_action"%></th>
+      <th class="head"><%= t(".review_action") %></th>
     <% end %>
   </tr>
 
-  <% @student.team.participants.each do |member| %> <!--start team member content-->
+  <% @student.team.participants.each do |member| %>
     <tr>
       <td><%= member.user.name(session[:ip]) %></td>
       <td><%= member.user.fullname(session[:ip]) %></td>
-      <%if @student.assignment.duty_based_assignment? %>
+      <% if @student.assignment.duty_based_assignment? %>
         <% team_user = member.team_user %>
-        <!-- Gets duty of member if the assignment is duty based and member has a duty -->
-        <%unless team_user.duty_id.nil?%>
+        <% unless team_user.duty_id.nil? %>
           <td><%= Duty.find(team_user.duty_id).name %></td>
-        <%else%>
+        <% else %>
           <td>
-            <%if  member.user.id == session[:user].id%>
-              <%= render :partial=>'select_duty_form', :locals => {:assignment_id => @student.assignment.id, :participant_id => member.id, :teams_user_id => team_user.id}%>
-            <%else%>
+            <% if member.user.id == session[:user].id %>
+              <%= render partial: 'select_duty_form', locals: { assignment_id: @student.assignment.id, participant_id: member.id, teams_user_id: team_user.id } %>
+            <% else %>
               Not Selected
-            <%end%>
+            <% end %>
           </td>
-        <%end%>
-      <%end%>
+        <% end %>
+      <% end %>
       <td><%= member.user.email(session[:ip]) %></td>
 
-      <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
-      <% if @teammate_review_allowed &&
-        ((@student.assignment.duty_based_assignment? && !team_user.duty_id.nil?) || (!@student.assignment.duty_based_assignment?))%>
-        <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
-          <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
-             if map.nil?
-               map = TeammateReviewResponseMap.create(:reviewer_id => @student.id, :reviewee_id => member.id, :reviewed_object_id => @student.assignment.id)
-             end
+      <% if @teammate_review_allowed && ((@student.assignment.duty_based_assignment? && !team_user.duty_id.nil?) || (!@student.assignment.duty_based_assignment?)) %>
+        <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil && member.user.id != session[:user].id %>
+          <% map = TeammateReviewResponseMap.where(reviewer_id: @student.id, reviewee_id: member.id).first_or_create(reviewed_object_id: @student.assignment.id)
              review = map.response.last
              if review.nil? %>
             <td>
-              <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "teammate"} %>
+              <%= link_to t(".review"), controller: 'response', action: 'new', id: map.map_id, return: "teammate" %>
             </td>
           <% else %>
             <td>
-              <%= link_to t(".view"), {:controller => 'response', :action => 'view', :id => review.id} %>
+              <%= link_to t(".view"), controller: 'response', action: 'view', id: review.id %>
               &nbsp;&nbsp;
-              <%= link_to t(".edit"), {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
+              <%= link_to t(".edit"), controller: 'response', action: 'edit', id: review.id, return: "teammate" %>
             </td>
           <% end %>
         <% end %>
       <% end %>
     </tr>
-  <% end %>   <!--end team member content-->
+  <% end %>
+
   <tr>
     <td colspan="3">
       <br/>
       <%= link_to t(".leave_team"), remove_participant_student_teams_path(student_id: @student.id, team_id: @student.team.id) %>
-    <td>
+    </td>
   </tr>
-  <%# <% if @teammate_review_allowed %>
-  <%# <tr style="border: 1px outset #000000; padding: 10px 20px" >
-        <th class="head">Teammate review question</th>
-        <th class="head">Self contribution percentage</th>
-      </tr> %>
-  <%# <% end %> <!--end self contribution for Cake questions-->
 </table>

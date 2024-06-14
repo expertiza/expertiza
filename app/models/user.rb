@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  extend AnonymizedHelper
+  extend UserHelper
   enum locale: Locale.code_name_to_db_encoding(Locale.available_locale_preferences)
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = { if: -> { false } } # Don't validate email uniqueness
@@ -19,36 +21,28 @@ class User < ApplicationRecord
   has_many :track_notifications, dependent: :destroy
   belongs_to :parent, class_name: 'User'
   belongs_to :role
-  validates :name, presence: true
-  validates :name, uniqueness: true
-  validates :name, format: { without: /\s/ }
 
-  validates :email, presence: { message: "can't be blank" }
-  validates :email, format: { with: /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, allow_blank: true }
-
+  validates :name, presence: true, uniqueness: true, format: { without: /\s/ }
+  validates :email,
+            presence: { message: "can't be blank" },
+            format: { with: /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, allow_blank: true }
   validates :fullname, presence: true
 
   before_validation :randomize_password, if: ->(user) { user.new_record? && user.password.blank? } # AuthLogic
 
-  scope :superadministrators, -> { where role_id: Role.superadministrator }
-  scope :superadmins, -> { superadministrators }
-  scope :administrators, -> { where role_id: Role.administrator }
-  scope :admins, -> { administrators }
+  scope :admins, -> { where role_id: Role.administrator }
   scope :instructors, -> { where role_id: Role.instructor }
   scope :tas, -> { where role_id: Role.ta }
   scope :students, -> { where role_id: Role.student }
 
   has_paper_trail
 
-  def salt_first?
-    true
-  end
-
   def list_mine(object_type, user_id)
+    # Takes an object type and a user ID and returns a list of objects owned by the user with the provided ID.
     object_type.where(['instructor_id = ?', user_id])
   end
 
-  def get_available_users(name)
+  def get_visible_users_with_lesser_roles(name)
     lesser_roles = role.get_parents
     all_users = User.all(conditions: ['name LIKE ?', "#{name}%"], limit: 20) # higher limit, since we're filtering
     visible_users = all_users.select { |user| lesser_roles.include? user.role }
@@ -56,23 +50,29 @@ class User < ApplicationRecord
   end
 
   def can_impersonate?(user)
-    return true if role.super_admin?
-    return true if teaching_assistant_for?(user)
-    return true if recursively_parent_of(user)
-
-    false
+    # Takes a user object and returns true if the current user has permission to impersonate the provided user.
+    role.super_admin? ||
+      teaching_assistant_for?(user) ||
+      recursively_parent_of(user)
   end
 
   def recursively_parent_of(user)
+    # Takes a user object and returns true if the current user is the parent or a recursively higher-level parent of the provided user.
     p = user.parent
-    return false if p.nil?
-    return true if p == self
-    return false if p.role.super_admin?
-
-    recursively_parent_of(p)
+    unless p.nil? ||
+           p.role&.super_admin?
+      return p == self ||
+             recursively_parent_of(p)
+    end
+    false
   end
 
   def get_user_list
+    # Returns a list of all users visible to the current user depending on the user's role.
+    # If the user is a super admin, all users are returned. If the user is an instructor,
+    # all users in their course/assignment are returned.
+    # If the user is a TA, all users in their courses are returned.
+    # Otherwise, all children of the current user are returned.
     user_list = []
     # If the user is a super admin, fetch all users
     user_list = SuperAdministrator.get_user_list if role.super_admin?
@@ -86,8 +86,8 @@ class User < ApplicationRecord
     # Add the children to the list
     unless role.super_admin?
       User.includes(:parent, :role, parent: %i[parent role]).find_each do |user|
-        if recursively_parent_of(user)
-          user_list << user unless user_list.include?(user)
+        if recursively_parent_of(user) && !user_list.include?(user)
+          user_list << user
         end
       end
     end
@@ -96,28 +96,13 @@ class User < ApplicationRecord
   end
 
   # Zhewei: anonymized view for demo purposes - 1/3/2018
-  def self.anonymized_view?(ip_address = nil)
-    anonymized_view_starter_ips = $redis.get('anonymized_view_starter_ips') || ''
-    return true if ip_address && anonymized_view_starter_ips.include?(ip_address)
-
-    false
-  end
-
-  # E1991 : This function returns original name of the user
-  # from their anonymized names. The process of obtaining
-  # real name is exactly opposite of what we'd do to get
-  # anonymized name from their real name.
-  def self.real_user_from_anonymized_name(anonymized_name)
-    user = User.find_by(name: anonymized_name)
-    user
-  end
 
   def name(ip_address = nil)
-    User.anonymized_view?(ip_address) ? role.name + ' ' + id.to_s : self[:name]
+    User.anonymized_view?(ip_address) ? "#{role.name} #{id.to_s}" : self[:name]
   end
 
   def fullname(ip_address = nil)
-    User.anonymized_view?(ip_address) ? role.name + ', ' + id.to_s : self[:fullname]
+    User.anonymized_view?(ip_address) ? "#{role.name}, #{id.to_s}" : self[:fullname]
   end
 
   def first_name(ip_address = nil)
@@ -125,25 +110,26 @@ class User < ApplicationRecord
   end
 
   def email(ip_address = nil)
-    User.anonymized_view?(ip_address) ? role.name + '_' + id.to_s + '@mailinator.com' : self[:email]
+    User.anonymized_view?(ip_address) ? "#{role.name}_#{id.to_s}@mailinator.com" : self[:email]
   end
 
   def super_admin?
     role.name == 'Super-Administrator'
   end
 
-  delegate :admin?, to: :role
+  def admin?
+    role.name == 'Administrator'
+  end
 
-  delegate :student?, to: :role
-
-  def creator_of?(user)
-    self == user.creator
+  def student?
+    role.name == 'Student'
   end
 
   # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
   def email_welcome
     # this will send an account creation notification to user via email.
-    MailerHelper.send_mail_to_user(self, 'Your Expertiza account and password has been created', 'user_welcome', password).deliver_now
+    MailerHelper.send_mail_to_user(self, 'Your Expertiza account and password has been created', 'user_welcome', 
+                                   password).deliver_now
   end
 
   def valid_password?(password)
@@ -162,7 +148,10 @@ class User < ApplicationRecord
   end
 
   def self.import(row_hash, _row_header, session, _id = nil)
-    raise ArgumentError, "Only #{row_hash.length} column(s) is(are) found. It must contain at least username, full name, email." if row_hash.length < 3
+    if row_hash.length < 3
+      raise ArgumentError, 
+            "Only #{row_hash.length} column(s) is(are) found. It must contain at least username, full name, email."
+    end
 
     user = User.find_by_name(row_hash[:username])
     if user.nil?
@@ -175,16 +164,6 @@ class User < ApplicationRecord
       user.save
     end
     user
-  end
-
-  def self.yesorno(elt)
-    if elt == true
-      'yes'
-    elsif elt == false
-      'no'
-    else
-      ''
-    end
   end
 
   # locate User based on provided login.
@@ -202,6 +181,7 @@ class User < ApplicationRecord
   end
 
   def set_instructor(new_assignment)
+    # Takes an assignment object and sets the instructor ID to the current user's ID.
     new_assignment.instructor_id = id
   end
 
@@ -254,13 +234,17 @@ class User < ApplicationRecord
   end
 
   def self.export(csv, _parent_id, options)
+    # export csv
     users = User.all
     users.each do |user|
       tcsv = []
       tcsv.push(user.name, user.fullname, user.email) if options['personal_details'] == 'true'
       tcsv.push(user.role.name) if options['role'] == 'true'
       tcsv.push(user.parent.name) if options['parent'] == 'true'
-      tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails) if options['email_options'] == 'true'
+      if options['email_options'] == 'true'
+        tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, 
+                  user.copy_of_emails)
+      end
       tcsv.push(user.etc_icons_on_homepage) if options['etc_icons_on_homepage'] == 'true'
       tcsv.push(user.handle) if options['handle'] == 'true'
       csv << tcsv
@@ -272,11 +256,15 @@ class User < ApplicationRecord
   end
 
   def self.export_fields(options)
+    # export the fields in options
     fields = []
     fields.push('name', 'full name', 'email') if options['personal_details'] == 'true'
     fields.push('role') if options['role'] == 'true'
     fields.push('parent') if options['parent'] == 'true'
-    fields.push('email on submission', 'email on review', 'email on metareview', 'copy of emails') if options['email_options'] == 'true'
+    if options['email_options'] == 'true'
+      fields.push('email on submission', 'email on review', 'email on metareview', 
+                  'copy of emails')
+    end
     fields.push('preference home flag') if options['etc_icons_on_homepage'] == 'true'
     fields.push('handle') if options['handle'] == 'true'
     fields
@@ -296,8 +284,10 @@ class User < ApplicationRecord
   end
 
   def teaching_assistant_for?(student)
-    return false unless teaching_assistant?
-    return false unless student.role.name == 'Student'
+    return false unless teaching_assistant? &&
+                        student &&
+                        student.role &&
+                        student.role.name == 'Student'
 
     # We have to use the Ta object instead of User object
     # because single table inheritance is not currently functioning
@@ -315,11 +305,12 @@ class User < ApplicationRecord
     key_word = { '1' => 'name', '2' => 'fullname', '3' => 'email' }
     sql = "(role_id in (?) or id = ?) and #{key_word[search_by]} like ?"
     if key_word.include? search_by
-      search_filter = '%' + letter + '%'
+      search_filter = "%#{letter}%"
       users = User.order('name').where(sql, role.get_available_roles, user_id, search_filter)
     else # default used when clicking on letters
-      search_filter = letter + '%'
-      users = User.order('name').where('(role_id in (?) or id = ?) and name like ?', role.get_available_roles, user_id, search_filter)
+      search_filter = "#{letter}%"
+      users = User.order('name').where('(role_id in (?) or id = ?) and name like ?', role.get_available_roles, user_id, 
+                                       search_filter)
     end
     users
   end

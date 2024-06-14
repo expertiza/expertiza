@@ -23,20 +23,21 @@ jobs:
       - name: Check Environment Variables
         run: |
           echo "Deploying to Production"
-          echo "WIREGUARD_SERVER_PUBLIC_KEY: ${{ secrets.WIREGUARD_SERVER_PUBLIC_KEY }}"
+          echo "WIREGUARD_SERVER_PUBLIC_KEY: ***" # Redacted for security
           echo "Private key length (characters):"
           echo "${{ secrets.WIREGUARD_PRIVATE_KEY }}" | wc -c
 
       - name: Create WireGuard tunnel to deploy Expertiza on private network
         run: |
           echo "Installing WireGuard..."
-          sudo apt-get update
-          sudo apt-get install -y wireguard
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq wireguard
           echo "WireGuard installed."
 
           echo "Creating private key file..."
           echo "${{ secrets.WIREGUARD_PRIVATE_KEY }}" > privatekey
-          echo "Private key file created. Contents are sensitive, not displaying for security."
+          chmod 600 privatekey
+          echo "Private key file created."
 
           echo "Setting up WireGuard interface wg0..."
           sudo ip link add wg0 type wireguard
@@ -50,33 +51,13 @@ jobs:
           sudo wg show wg0
 
           echo "Pinging the WireGuard peer to test connectivity..."
-          ping -c 4 10.0.0.1 || echo "Ping failed"
-
-          echo "Checking network interfaces:"
-          ip address show wg0
-
-          echo "Listing routes:"
-          ip route show
-
-          echo "Performing traceroute to peer (10.0.0.1):"
-          sudo apt-get install -y traceroute
-          traceroute 10.0.0.1 || echo "Traceroute failed"
-
-          echo "Checking firewall status:"
-          sudo ufw status || echo "UFW not installed/enabled"
-          sudo iptables -L
+          ping -c 4 10.0.0.1
 
           echo "Checking if wg0 interface is up and running:"
           sudo ip link show wg0
 
           echo "Displaying network routes for wg0:"
           ip route show dev wg0
-
-          echo "Checking kernel routing table for 10.0.0.0/24:"
-          ip route get 10.0.0.1
-
-          echo "Testing communication through wg0 interface:"
-          sudo curl --interface wg0 http://10.0.0.1 || echo "Curl failed"
 
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -94,10 +75,13 @@ jobs:
           echo "Bundler version:"
           bundle --version
 
-      - name: Deploy with Capistrano
+      - name: Start Capistrano Deployment
         run: |
           echo "Starting Capistrano deployment..."
           /opt/hostedtoolcache/Ruby/2.4.10/x64/bin/bundle exec cap production deploy
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh-auth-1718350159636.sock
+        continue-on-error: true
 
   development:
     if: inputs.environment == 'development'

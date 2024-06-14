@@ -1,7 +1,5 @@
-# This is a basic workflow that uses Capistrano to deploy Expertiza on Production, Test, and Development servers
 name: Deploy with Capistrano
 
-# Controls when the workflow will run
 on:
   workflow_dispatch:
     inputs:
@@ -20,28 +18,70 @@ jobs:
     if: inputs.environment == 'production'
     runs-on: ubuntu-latest
     steps:
+      - name: Check Environment Variables
+        run: |
+          echo "Deploying to Production"
+          echo "WIREGUARD_SERVER_PUBLIC_KEY: ${{ secrets.WIREGUARD_SERVER_PUBLIC_KEY }}"
+          echo "Private key (should not be empty):"
+          echo "${{ secrets.WIREGUARD_PRIVATE_KEY }}" | grep -o '.*' | wc -l
+
       - name: create wireguard tunnel to deploy Expertiza on private network
         run: |
-          sudo apt install wireguard
+          echo "Installing WireGuard..."
+          sudo apt-get update
+          sudo apt-get install -y wireguard
+          echo "WireGuard installed."
+
+          echo "Creating private key file..."
           echo "${{ secrets.WIREGUARD_PRIVATE_KEY }}" > privatekey
+          cat privatekey # Debug: Show the contents of the private key (caution: ensure this is safe to show)
+          echo "Private key file created."
+
+          echo "Setting up WireGuard interface wg0..."
           sudo ip link add wg0 type wireguard
           sudo ip address add 10.0.0.2/24 dev wg0
           sudo wg set wg0 private-key privatekey
           sudo ip link set wg0 up
           sudo wg set wg0 peer ${{ secrets.WIREGUARD_SERVER_PUBLIC_KEY }} allowed-ips 10.0.0.1/32 endpoint 152.14.92.215:50000
+          echo "WireGuard interface wg0 configured."
+
+          echo "Checking WireGuard interface status:"
+          sudo wg show wg0
+
+          echo "Pinging the WireGuard peer to test connectivity..."
           ping -c 4 10.0.0.1
-      - uses: actions/checkout@v3
-      - uses: ruby/setup-ruby@v1
+
+          echo "Checking network interfaces:"
+          ip address show wg0
+
+          echo "Listing routes:"
+          ip route show
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Ruby Environment
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.4
           bundler-cache: true
-      - uses: miloserdow/capistrano-deploy@master
+
+      - name: Debug Ruby Setup
+        run: |
+          echo "Ruby version:"
+          ruby --version
+          echo "Bundler version:"
+          bundle --version
+
+      - name: Deploy with Capistrano
+        uses: miloserdow/capistrano-deploy@master
         with:
-          target: production # Defines the environment for the deployment
+          target: production
           enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_PROD }}
           deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
+        env:
+          DEBUG: true # Enables detailed Capistrano logging
 
-# development and test jobs are identical - with different target environment and server keys
   development:
     if: inputs.environment == 'development'
     runs-on: ubuntu-latest

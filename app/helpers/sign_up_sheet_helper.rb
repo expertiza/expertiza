@@ -105,4 +105,109 @@ module SignUpSheetHelper
       out_string
     end
   end
+
+  class SignUpTopicHelper
+   # Initializes a new SignUpTopicHelper object.
+   # @param params [Hash] The parameters containing information about the sign-up topic.
+   # @param assignment_id [Integer] The ID of the assignment to which the sign-up topic belongs.
+    def initialize(params, assignment_id)
+      @params = params
+      @assignment_id = assignment_id
+    end
+  # Builds a new SignUpTopic object based on the parameters provided.
+    def build
+      SignUpTopic.new.tap do |topic|
+        puts @params.dig(:topic, :topic_identifier)
+        topic.topic_identifier = @params.dig(:topic, :topic_identifier)
+        topic.topic_name = @params.dig(:topic, :topic_name)
+        topic.max_choosers = @params.dig(:topic, :max_choosers)
+        topic.category = @params.dig(:topic, :category)
+        topic.assignment_id = @assignment_id
+      end
+    end
+  end  
+  
+  # Creates a new topic due date record.
+  # @param index [Integer] The index of the due date.
+  # @param topic [SignUpTopic] The sign-up topic for which the due date is being created.
+  # @param deadline_type_id [Integer] The ID representing the type of deadline.
+  # @param due_date_instance [DueDateInstance] An instance containing due date information.
+  # @param due_at [DateTime] The date and time at which the deadline is due.
+  # @return [TopicDueDate] A new TopicDueDate object representing the due date record.
+  def create_topic_due_date(index,topic,deadline_type_id,due_date_instance,due_at)
+    TopicDueDate.create(
+              due_at: due_at,
+              deadline_type_id: deadline_type_id,
+              parent_id: topic.id,
+              submission_allowed_id: due_date_instance.submission_allowed_id,
+              review_allowed_id: due_date_instance.review_allowed_id,
+              review_of_review_allowed_id: due_date_instance.review_of_review_allowed_id,
+              round: index,
+              flag: due_date_instance.flag,
+              threshold: due_date_instance.threshold,
+              delayed_job_id: due_date_instance.delayed_job_id,
+              deadline_name: due_date_instance.deadline_name,
+              description_url: due_date_instance.description_url,
+              quiz_allowed_id: due_date_instance.quiz_allowed_id,
+              teammate_review_allowed_id: due_date_instance.teammate_review_allowed_id,
+              type: 'TopicDueDate'
+            )
+  end
+  class DeleteSignupAction
+
+    def set_error_if_work_submitted
+      raise NotImplementedError
+    end
+
+    def set_error_if_deadline_passed
+      raise NotImplementedError
+    end
+
+    def delete_signup_for_topic(assignment_id, topic_id, user_id)
+      raise NotImplementedError
+    end
+
+    def set_success_message_after_delete
+      raise NotImplementedError
+    end
+  end
+  
+  class InstructorDeleteSignupAction < DeleteSignupAction
+
+    def set_error_if_work_submitted
+      return 'The student has already submitted their work, so you are not allowed to remove them.'
+    end
+    
+    def set_error_if_deadline_passed
+        return 'You cannot drop a student after the drop topic deadline!'
+    end
+    
+    def delete_signup_for_topic(assignment_id, topic_id, user_id)
+      SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
+    end
+
+    def set_success_message_after_delete
+      return 'You have successfully dropped the student from the topic.'
+    end
+  end
+
+  class StudentDeleteSignupAction < DeleteSignupAction
+
+    def set_error_if_work_submitted
+      return 'You have already submitted your work, so you are not allowed to drop your topic.'
+    end
+    
+    def set_error_if_deadline_passed
+      return 'You cannot drop your topic after the drop topic deadline!'
+    end
+
+    def delete_signup_for_topic(assignment_id, topic_id, user_id)
+      SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
+    end
+
+    def set_success_message_after_delete
+      return 'You have successfully dropped your topic.'
+    end
+  end
+
 end

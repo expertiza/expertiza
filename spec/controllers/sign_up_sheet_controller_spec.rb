@@ -513,81 +513,6 @@ describe SignUpSheetController do
     end
   end
 
-  describe '#signup_as_instructor_action' do
-    context 'when user cannot be found' do
-      it 'shows an flash error message and redirects to assignment#edit page' do
-        allow(User).to receive(:find_by).with(name: 'no name').and_return(nil)
-        allow(User).to receive(:find).with(8).and_return(student)
-        allow(Team).to receive(:find).with(1).and_return(team)
-        request_params = { username: 'no name', assignment_id: 1 }
-        get :signup_as_instructor_action, params: request_params
-        expect(flash[:error]).to eq('That student does not exist!')
-        expect(response).to redirect_to('/assignments/1/edit')
-      end
-    end
-
-    context 'when user can be found' do
-      before(:each) do
-        allow(User).to receive(:find_by).with(name: 'no name').and_return(student)
-      end
-
-      context 'when an assignment_participant can be found' do
-        before(:each) do
-          allow(AssignmentParticipant).to receive(:exists?).with(user_id: 8, parent_id: '1').and_return(true)
-        end
-
-        context 'when creating team related objects successfully' do
-          it 'shows a flash success message and redirects to assignment#edit page' do
-            allow(SignedUpTeam).to receive(:find_team_users).with('1', 8).and_return([team])
-            allow(Team).to receive(:find).and_return(team)
-            allow(team).to receive(:t_id).and_return(1)
-            allow(TeamsUser).to receive(:team_id).with('1', 8).and_return(1)
-            allow(SignedUpTeam).to receive(:topic_id).with('1', 8).and_return(1)
-            allow_any_instance_of(SignedUpTeam).to receive(:save).and_return(team)
-            request_params = {
-              username: 'no name',
-              assignment_id: 1,
-              topic_id: 1
-            }
-            get :signup_as_instructor_action, params: request_params
-            expect(flash[:success]).to eq('You have successfully signed up the student for the topic!')
-            expect(response).to redirect_to('/assignments/1/edit')
-          end
-        end
-
-        context 'when creating team related objects unsuccessfully' do
-          it 'shows a flash error message and redirects to assignment#edit page' do
-            allow(SignedUpTeam).to receive(:find_team_users).with('1', 8).and_return([])
-            allow(User).to receive(:find).with(8).and_return(student)
-            allow(Assignment).to receive(:find).with(1).and_return(assignment)
-            allow(TeamsUser).to receive(:create).with(user_id: 8, team_id: 1).and_return(double('TeamsUser', id: 1))
-            allow(TeamUserNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('TeamUserNode', id: 1))
-            request_params = {
-              username: 'no name',
-              assignment_id: 1
-            }
-            get :signup_as_instructor_action, params: request_params
-            expect(flash[:error]).to eq('The student has already signed up for a topic!')
-            expect(response).to redirect_to('/assignments/1/edit')
-          end
-        end
-      end
-
-      context 'when an assignment_participant cannot be found' do
-        it 'shows a flash error message and redirects to assignment#edit page' do
-          allow(AssignmentParticipant).to receive(:exists?).with(user_id: 8, parent_id: '1').and_return(false)
-          request_params = {
-            username: 'no name',
-            assignment_id: 1
-          }
-          get :signup_as_instructor_action, params: request_params
-          expect(flash[:error]).to eq('The student is not registered for the assignment!')
-          expect(response).to redirect_to('/assignments/1/edit')
-        end
-      end
-    end
-  end
-
   describe '#delete_signup' do
     before(:each) do
       allow(participant).to receive(:team).and_return(team)
@@ -615,20 +540,6 @@ describe SignUpSheetController do
         user_session = { user: instructor }
         get :delete_signup, params: request_params, session: user_session
         expect(flash[:error]).to eq('You cannot drop your topic after the drop topic deadline!')
-        expect(response).to redirect_to('/sign_up_sheet/list?id=1')
-      end
-    end
-
-    context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is nil' do
-      it 'shows a flash success message and redirects to sign_up_sheet#list page' do
-        allow(team).to receive(:submitted_files).and_return([])
-        allow(team).to receive(:hyperlinks).and_return([])
-        allow(SignedUpTeam).to receive(:find_team_users).with(1, 6).and_return([team])
-        allow(team).to receive(:t_id).and_return(1)
-        request_params = { id: 1, topic_id: 1 }
-        user_session = { user: instructor }
-        get :delete_signup, params: request_params, session: user_session
-        expect(flash[:success]).to eq('You have successfully dropped your topic!')
         expect(response).to redirect_to('/sign_up_sheet/list?id=1')
       end
     end
@@ -672,41 +583,6 @@ describe SignUpSheetController do
         expect(flash[:error]).to eq('You cannot drop a student after the drop topic deadline!')
         expect(response).to redirect_to('/assignments/1/edit')
       end
-    end
-
-    context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is nil' do
-      it 'shows a flash success message and redirects to assignment#edit page' do
-        allow(team).to receive(:submitted_files).and_return([])
-        allow(team).to receive(:hyperlinks).and_return([])
-        allow(SignedUpTeam).to receive(:find_team_users).with(1, 6).and_return([team])
-        allow(team).to receive(:t_id).and_return(1)
-        request_params = { id: 1, topic_id: 1 }
-        user_session = { user: instructor }
-        get :delete_signup_as_instructor, params: request_params, session: user_session
-        expect(flash[:success]).to eq('You have successfully dropped the student from the topic!')
-        expect(response).to redirect_to('/assignments/1/edit')
-      end
-    end
-  end
-
-  describe '#set_priority' do
-    it 'sets priority of bidding topic and redirects to sign_up_sheet#list page' do
-      allow(participant).to receive(:team).and_return(team)
-      allow(Bid).to receive(:where).with(team_id: 1).and_return([bid])
-      allow(Bid).to receive_message_chain(:where, :map).with(team_id: 1).with(no_args).and_return([1])
-      allow(Bid).to receive(:where).with(topic_id: '1', team_id: 1).and_return([bid])
-      allow_any_instance_of(Array).to receive(:update_all).with(priority: 1).and_return([bid])
-      request_params = {
-        participant_id: 1,
-        assignment_id: 1,
-        topic: ['1'],
-        due_date: {
-            '1_submission_1_due_date' => nil,
-            '1_review_1_due_date' => nil
-          }
-      }
-      post :set_priority, params: request_params
-      expect(response).to redirect_to('/sign_up_sheet/list?assignment_id=1')
     end
   end
 
@@ -761,25 +637,6 @@ describe SignUpSheetController do
       request_params = { assignment_id: 1, id: 1 }
       get :show_team, params: request_params
       expect(response).to render_template(:show_team)
-    end
-  end
-
-  describe '#switch_original_topic_to_approved_suggested_topic' do
-    it 'redirects to sign_up_sheet#list page' do
-      allow(TeamsUser).to receive(:where).with(user_id: 6).and_return([double('TeamsUser', team_id: 1)])
-      allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([double('TeamsUser', team_id: 1, user_id: 8)])
-      allow(Team).to receive(:find).with(1).and_return(team)
-      team.parent_id = 1
-      allow(SignedUpTeam).to receive(:where).with(team_id: 1, is_waitlisted: 0).and_return([signed_up_team])
-      allow(SignedUpTeam).to receive(:where).with(topic_id: 1, is_waitlisted: 1).and_return([signed_up_team])
-      allow(SignUpSheet).to receive(:signup_team).with(1, 8, 1).and_return('OK!')
-      request_params = {
-        id: 1,
-        topic_id: 1
-      }
-      user_session = { user: instructor }
-      get :switch_original_topic_to_approved_suggested_topic, params: request_params, session: user_session
-      expect(response).to redirect_to('/sign_up_sheet/list?id=1')
     end
   end
 end

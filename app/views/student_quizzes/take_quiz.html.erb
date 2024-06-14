@@ -6,7 +6,7 @@
 
 <%= render :partial => 'submitted_content/main', :locals => {:participant => @reviewee_participant, :stage => ""} %>
 
-<%= form_tag :controller => 'student_quizzes', :action => 'record_response',
+<%= form_tag :controller => 'student_quizzes', :action => 'save_quiz_response',
   :assignment_id => params[:assignment_id],
   :participant_id => params[:participant_id],
   :map_id => params[:map_id] do %>

@@ -42,6 +42,13 @@ jobs:
           echo "Pinging the WireGuard server public IP..."
           ping -c 4 152.14.92.215 || echo "Ping to 152.14.92.215 failed. The server might be unreachable."
 
+      - name: Check SSH Connection to the Target
+        run: |
+          echo "Testing SSH connection to 10.0.0.1..."
+          nc -zv 10.0.0.1 22 || echo "Port 22 on 10.0.0.1 is not reachable."
+          echo "Trying SSH..."
+          ssh -o StrictHostKeyChecking=no -i config/deploy_id_rsa -vvv expertiza@10.0.0.1 exit || echo "SSH connection failed."
+
       - name: Checkout Code
         uses: actions/checkout@v3
 
@@ -57,6 +64,8 @@ jobs:
           target: production
           enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_PROD }}
           deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
+          capistrano_commands: ["deploy"]
+          enc_rsa_key_pth: config/deploy_id_rsa_enc
 
   development:
     if: inputs.environment == 'development'

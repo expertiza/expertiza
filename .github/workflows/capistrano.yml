@@ -48,24 +48,17 @@ jobs:
           nc -zv 10.0.0.1 22 || echo "Port 22 on 10.0.0.1 is not reachable."
           echo "Trying SSH..."
           ssh -o StrictHostKeyChecking=no -i config/deploy_id_rsa -vvv expertiza@10.0.0.1 exit || echo "SSH connection failed."
-
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Setup Ruby Environment
-        uses: ruby/setup-ruby@v1
+          
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.4  # Consider updating this to a newer version if possible.
+          ruby-version: 2.4
           bundler-cache: true
-
-      - name: Deploy with Capistrano
-        uses: miloserdow/capistrano-deploy@master
+      - uses: miloserdow/capistrano-deploy@master
         with:
-          target: production
+          target: production # Defines the environment for the deployment
           enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_PROD }}
           deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
-          capistrano_commands: ["deploy"]
-          enc_rsa_key_pth: config/deploy_id_rsa_enc
 
   development:
     if: inputs.environment == 'development'

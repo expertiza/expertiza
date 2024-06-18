@@ -1,0 +1,17 @@
+name: Check WireGuard Server Connectivity
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check_connectivity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if the endpoint IP is reachable
+        run: |
+          ping -c 4 152.14.92.215 || echo "Ping to 152.14.92.215 failed. The server might be unreachable."
+
+      - name: Check if the port 50000 is accessible
+        run: |
+          sudo apt-get install -y netcat  # Ensure netcat is installed
+          nc -zv -u 152.14.92.215 50000 || echo "UDP Port 50000 on 152.14.92.215 is not accessible."

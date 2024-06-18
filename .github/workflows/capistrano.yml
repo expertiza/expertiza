@@ -1,5 +1,7 @@
+# This is a basic workflow that uses Capistrano to deploy Expertiza on Production, Test, and Development servers
 name: Deploy with Capistrano
 
+# Controls when the workflow will run
 on:
   workflow_dispatch:
     inputs:
@@ -18,37 +20,20 @@ jobs:
     if: inputs.environment == 'production'
     runs-on: ubuntu-latest
     steps:
-      - name: Install WireGuard and Create Tunnel
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq wireguard
+      - name: create wireguard tunnel to deploy Expertiza on private network
+        run: |  
+          sudo apt install wireguard
           echo "${{ secrets.WIREGUARD_PRIVATE_KEY }}" > privatekey
-          chmod 600 privatekey
           sudo ip link add wg0 type wireguard
           sudo ip address add 10.0.0.2/24 dev wg0
           sudo wg set wg0 private-key privatekey
           sudo ip link set wg0 up
           sudo wg set wg0 peer ${{ secrets.WIREGUARD_SERVER_PUBLIC_KEY }} allowed-ips 10.0.0.1/32 endpoint 152.14.92.215:50000
+          ping -c 4 10.0.0.1
           sudo wg show wg0
-
-      - name: Verify WireGuard Tunnel
-        run: |
-          echo "Pinging the WireGuard endpoint..."
-          ping -c 4 10.0.0.1 || echo "Ping to 10.0.0.1 failed. The endpoint might be unreachable."
-          echo "Checking the WireGuard interface..."
           sudo ip link show wg0
-          echo "Checking the routes for wg0..."
           ip route show dev wg0
-          echo "Pinging the WireGuard server public IP..."
-          ping -c 4 152.14.92.215 || echo "Ping to 152.14.92.215 failed. The server might be unreachable."
-
-      - name: Check SSH Connection to the Target
-        run: |
-          echo "Testing SSH connection to 10.0.0.1..."
-          nc -zv 10.0.0.1 22 || echo "Port 22 on 10.0.0.1 is not reachable."
-          echo "Trying SSH..."
-          ssh -o StrictHostKeyChecking=no -i config/deploy_id_rsa -vvv expertiza@10.0.0.1 exit || echo "SSH connection failed."
-          
+          ping -c 4 152.14.92.215
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         with:
@@ -60,21 +45,17 @@ jobs:
           enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_PROD }}
           deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
 
+# development and test jobs are identical - with different target environment and server keys
   development:
     if: inputs.environment == 'development'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Setup Ruby Environment
-        uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.4  # Consider updating this to a newer version if possible.
+          ruby-version: 2.4
           bundler-cache: true
-
-      - name: Deploy with Capistrano
-        uses: miloserdow/capistrano-deploy@master
+      - uses: miloserdow/capistrano-deploy@master
         with:
           target: development
           enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_DEV }}
@@ -84,18 +65,13 @@ jobs:
     if: inputs.environment == 'test'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Setup Ruby Environment
-        uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.4  # Consider updating this to a newer version if possible.
+          ruby-version: 2.4
           bundler-cache: true
-
-      - name: Deploy with Capistrano
-        uses: miloserdow/capistrano-deploy@master
+      - uses: miloserdow/capistrano-deploy@master
         with:
-          target: staging  # Assuming 'staging' is your test environment.
+          target: staging
           enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_STAGING }}
           deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}

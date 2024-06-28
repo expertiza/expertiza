@@ -1,7 +1,5 @@
-# This is a basic workflow that uses Capistrano to deploy Expertiza on Production, Test, and Development servers
 name: Deploy with Capistrano
 
-# Controls when the workflow will run
 on:
   workflow_dispatch:
     inputs:
@@ -20,32 +18,48 @@ jobs:
     if: inputs.environment == 'production'
     runs-on: ubuntu-latest
     steps:
-      - name: create wireguard tunnel to deploy Expertiza on private network
-        run: |  
-          sudo apt install wireguard
+      - name: Install WireGuard
+        run: sudo apt update && sudo apt install -y wireguard
+
+      - name: Configure WireGuard
+        run: |
           echo "${{ secrets.WIREGUARD_PRIVATE_KEY }}" > privatekey
           sudo ip link add wg0 type wireguard
           sudo ip address add 10.0.0.2/24 dev wg0
           sudo wg set wg0 private-key privatekey
           sudo ip link set wg0 up
           sudo wg set wg0 peer ${{ secrets.WIREGUARD_SERVER_PUBLIC_KEY }} allowed-ips 10.0.0.1/32 endpoint 152.14.92.215:50000
-          ping -c 4 10.0.0.1
-          sudo wg show wg0
-          sudo ip link show wg0
-          ip route show dev wg0
-          ping -c 4 152.14.92.215
-      - uses: actions/checkout@v3
-      - uses: ruby/setup-ruby@v1
+
+      - name: Verify WireGuard Setup
+        run: |
+          echo "WireGuard Configuration:"
+          sudo wg show
+          echo "Network Interfaces:"
+          sudo ip addr show
+          echo "Routing Table:"
+          sudo ip route show
+          echo "IPTables Rules:"
+          sudo iptables -L -v -n
+
+      - name: Test Connectivity
+        run: ping -c 4 10.0.0.1
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.4
           bundler-cache: true
-      - uses: miloserdow/capistrano-deploy@master
+
+      - name: Deploy with Capistrano
+        uses: miloserdow/capistrano-deploy@master
         with:
-          target: production # Defines the environment for the deployment
+          target: production
           enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_PROD }}
           deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
 
-# development and test jobs are identical - with different target environment and server keys
   development:
     if: inputs.environment == 'development'
     runs-on: ubuntu-latest

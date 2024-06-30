@@ -23,13 +23,17 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y iproute2 iputils-ping
+        run: sudo apt-get update && sudo apt-get install -y iproute2 iputils-ping traceroute
 
       - name: Print network information
         run: |
           echo "Network interfaces:"
           ip a
           echo "Routing table:"
+          route -n
+          echo "Adding route to 10.0.0.0/24 network"
+          sudo ip route add 10.0.0.0/24 via 10.1.0.1
+          echo "Updated routing table:"
           route -n
           echo "Ping test to 10.0.0.1:"
           ping -c 4 10.0.0.1 || true

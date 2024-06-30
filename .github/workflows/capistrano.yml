@@ -1,5 +1,7 @@
+# This is a basic workflow that uses Capistrano to deploy Expertiza on Production, Test, and Development servers
 name: Deploy with Capistrano
 
+# Controls when the workflow will run
 on:
   workflow_dispatch:
     inputs:
@@ -14,45 +16,42 @@ on:
           - test
 
 jobs:
-  production:
-    if: inputs.environment == 'production'
+  setup:
     runs-on: ubuntu-latest
     steps:
-      - name: Install WireGuard
-        run: sudo apt update && sudo apt install -y wireguard
-
-      - name: Configure WireGuard
-        run: |
-          echo "${{ secrets.WIREGUARD_PRIVATE_KEY }}" > privatekey
-          sudo ip link add wg0 type wireguard
-          sudo ip address add 10.0.0.2/24 dev wg0
-          sudo wg set wg0 private-key privatekey
-          sudo ip link set wg0 up
-          sudo wg set wg0 peer ${{ secrets.WIREGUARD_SERVER_PUBLIC_KEY }} allowed-ips 10.0.0.1/32 endpoint 152.14.199.156:50000
-
-      - name: Verify WireGuard Setup
-        run: |
-          echo "WireGuard Configuration:"
-          sudo wg show
-          echo "Network Interfaces:"
-          sudo ip addr show
-          echo "Routing Table:"
-          sudo ip route show
-          echo "IPTables Rules:"
-          sudo iptables -L -v -n
-
-      - name: Test Connectivity
-        run: ping -c 4 10.0.0.1
-
-      - name: Checkout Code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Ruby
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y iproute2 iputils-ping
+
+      - name: Print network information
+        run: |
+          echo "Network interfaces:"
+          ip a
+          echo "Routing table:"
+          route -n
+          echo "Ping test to 10.0.0.1:"
+          ping -c 4 10.0.0.1 || true
+          echo "Traceroute to 10.0.0.1:"
+          traceroute 10.0.0.1 || true
+
+      - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.4
           bundler-cache: true
 
+  production:
+    if: inputs.environment == 'production'
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.4
+          bundler-cache: true
       - name: Deploy with Capistrano
         uses: miloserdow/capistrano-deploy@master
         with:
@@ -62,6 +61,7 @@ jobs:
 
   development:
     if: inputs.environment == 'development'
+    needs: setup
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -69,7 +69,8 @@ jobs:
         with:
           ruby-version: 2.4
           bundler-cache: true
-      - uses: miloserdow/capistrano-deploy@master
+      - name: Deploy with Capistrano
+        uses: miloserdow/capistrano-deploy@master
         with:
           target: development
           enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_DEV }}
@@ -77,6 +78,7 @@ jobs:
 
   test:
     if: inputs.environment == 'test'
+    needs: setup
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -84,7 +86,8 @@ jobs:
         with:
           ruby-version: 2.4
           bundler-cache: true
-      - uses: miloserdow/capistrano-deploy@master
+      - name: Deploy with Capistrano
+        uses: miloserdow/capistrano-deploy@master
         with:
           target: staging
           enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_STAGING }}

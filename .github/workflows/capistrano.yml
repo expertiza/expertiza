@@ -20,16 +20,6 @@ jobs:
     if: inputs.environment == 'production'
     runs-on: ubuntu-latest
     steps:
-      - name: create wireguard tunnel to deploy Expertiza on private network
-        run: |
-          sudo apt install wireguard
-          echo "${{ secrets.WIREGUARD_PRIVATE_KEY }}" > privatekey
-          sudo ip link add wg0 type wireguard
-          sudo ip address add 10.0.0.2/24 dev wg0
-          sudo wg set wg0 private-key privatekey
-          sudo ip link set wg0 up
-          sudo wg set wg0 peer ${{ secrets.WIREGUARD_SERVER_PUBLIC_KEY }} allowed-ips 10.0.0.1/32 endpoint 152.14.199.156:50000
-          ping -c 4 10.0.0.1
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         with:

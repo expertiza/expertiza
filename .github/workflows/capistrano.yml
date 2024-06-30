@@ -30,17 +30,17 @@ jobs:
           echo "Network interfaces:"
           ip a
           echo "Routing table:"
-          route -n
+          ip route
           echo "Adding route to 10.0.0.0/24 network"
           sudo ip route add 10.0.0.0/24 via 10.1.0.1
           echo "Updated routing table:"
-          route -n
+          ip route
           echo "Ping test to 10.0.0.1:"
           ping -c 4 10.0.0.1 || true
           echo "Traceroute to 10.0.0.1:"
           traceroute 10.0.0.1 || true
-          echo "Checking open ports on 10.0.0.1:"
-          nmap -p 22 10.0.0.1 || true
+          echo "Checking open ports on 10.0.0.1 with nmap -Pn:"
+          nmap -Pn -p 22 10.0.0.1 || true
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1

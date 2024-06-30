@@ -23,9 +23,9 @@ set :rvm_ruby_version, '2.4'
 # role :app, %w{deploy@example.com}, my_property: :my_value
 # role :web, %w{user1@primary.com user2@additional.com}, other_property: :other_value
 # role :db,  %w{deploy@example.com}
-role :app, %w[expertiza@10.0.0.1]
-role :web, %w[expertiza@10.0.0.1]
-role :db,  %w[expertiza@10.0.0.1]
+role :app, %w[expertiza@152.14.199.156]
+role :web, %w[expertiza@152.14.199.156]
+role :db,  %w[expertiza@152.14.199.156]
 
 # Configuration
 # =============

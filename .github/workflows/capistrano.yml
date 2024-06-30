@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y iproute2 iputils-ping traceroute
+        run: sudo apt-get update && sudo apt-get install -y iproute2 iputils-ping traceroute nmap
 
       - name: Print network information
         run: |
@@ -39,6 +39,8 @@ jobs:
           ping -c 4 10.0.0.1 || true
           echo "Traceroute to 10.0.0.1:"
           traceroute 10.0.0.1 || true
+          echo "Checking open ports on 10.0.0.1:"
+          nmap -p 22 10.0.0.1 || true
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1

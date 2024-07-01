@@ -1,7 +1,5 @@
-# This is a basic workflow that uses Capistrano to deploy Expertiza on Production, Test, and Development servers
 name: Deploy with Capistrano
 
-# Controls when the workflow will run
 on:
   workflow_dispatch:
     inputs:
@@ -23,17 +21,13 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y iproute2 iputils-ping traceroute nmap
+        run: sudo apt-get update && sudo apt-get install -y iproute2 iputils-ping traceroute nmap wireguard
 
       - name: Print network information
         run: |
           echo "Network interfaces:"
           ip a
           echo "Routing table:"
-          ip route
-          echo "Adding route to 10.0.0.0/24 network"
-          sudo ip route add 10.0.0.0/24 via 10.1.0.1
-          echo "Updated routing table:"
           ip route
           echo "Ping test to 10.0.0.1:"
           ping -c 4 10.0.0.1 || true
@@ -42,22 +36,43 @@ jobs:
           echo "Checking open ports on 10.0.0.1 with nmap -Pn:"
           nmap -Pn -p 22 10.0.0.1 || true
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.4
-          bundler-cache: true
-
   production:
     if: inputs.environment == 'production'
     needs: setup
     runs-on: ubuntu-latest
     steps:
+      - name: Create WireGuard tunnel to deploy Expertiza on private network
+        run: |
+          sudo apt install -y wireguard
+          echo "${{ secrets.WIREGUARD_PRIVATE_KEY }}" > privatekey
+          sudo ip link add wg0 type wireguard
+          sudo ip address add 10.0.0.2/24 dev wg0
+          sudo wg set wg0 private-key privatekey
+          sudo wg set wg0 peer ${{ secrets.WIREGUARD_SERVER_PUBLIC_KEY }} allowed-ips 10.0.0.1/32 endpoint 152.14.199.156:50000
+          sudo ip link set wg0 up
+          sudo ip route add 10.0.0.0/24 dev wg0
+          sudo wg show
+          ping -c 4 10.0.0.1
+
+      - name: Debug Network Configuration
+        run: |
+          echo "Network interfaces after WireGuard setup:"
+          ip a
+          echo "Routing table after WireGuard setup:"
+          ip route
+          echo "Ping test to 10.0.0.1 after WireGuard setup:"
+          ping -c 4 10.0.0.1 || true
+          echo "Traceroute to 10.0.0.1 after WireGuard setup:"
+          traceroute 10.0.0.1 || true
+          echo "Checking open ports on 10.0.0.1 with nmap -Pn after WireGuard setup:"
+          nmap -Pn -p 22 10.0.0.1 || true
+
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.4
           bundler-cache: true
+
       - name: Deploy with Capistrano
         uses: miloserdow/capistrano-deploy@master
         with:
@@ -75,6 +90,7 @@ jobs:
         with:
           ruby-version: 2.4
           bundler-cache: true
+
       - name: Deploy with Capistrano
         uses: miloserdow/capistrano-deploy@master
         with:
@@ -92,6 +108,7 @@ jobs:
         with:
           ruby-version: 2.4
           bundler-cache: true
+
       - name: Deploy with Capistrano
         uses: miloserdow/capistrano-deploy@master
         with:

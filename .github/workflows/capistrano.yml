@@ -43,18 +43,14 @@ jobs:
     steps:
       - name: Create WireGuard tunnel to deploy Expertiza on private network
         run: |
-          sudo apt install -y wireguard
+          sudo apt install wireguard
           echo "${{ secrets.WIREGUARD_PRIVATE_KEY }}" > privatekey
-          sudo ip link show wg0
+          sudo ip link add wg0 type wireguard
           sudo ip address add 10.0.0.2/24 dev wg0
           sudo wg set wg0 private-key privatekey
           sudo ip link set wg0 up
           sudo wg set wg0 peer ${{ secrets.WIREGUARD_SERVER_PUBLIC_KEY }} allowed-ips 10.0.0.1/32 endpoint 152.14.199.156:50000
-          sudo ip link set wg0 up
-          sudo ip route show | grep -q '10.0.0.0/24' || sudo ip route add 10.0.0.0/24 dev wg0
-          sudo wg show
           ping -c 4 10.0.0.1 || true
-
       - name: Debug Network Configuration
         run: |
           echo "Network interfaces after WireGuard setup:"

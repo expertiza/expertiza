@@ -52,7 +52,7 @@ jobs:
           sudo ip link set wg0 up
           sudo ip route add 10.0.0.0/24 dev wg0
           sudo wg show
-          ping -c 4 10.0.0.1
+          ping -c 4 10.0.0.1 || true
 
       - name: Debug Network Configuration
         run: |

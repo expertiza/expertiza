@@ -5,6 +5,7 @@ class TagPromptDeployment < ApplicationRecord
   has_many :answer_tags, dependent: :destroy
 
   require 'time'
+  include ReviewMappingHelper
 
   def tag_prompt
     TagPrompt.find(tag_prompt_id)

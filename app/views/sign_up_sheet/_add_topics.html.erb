@@ -15,18 +15,7 @@
                     :controller => 'import_file',
                     :action => 'start',
                     :model => 'SignUpTopic',
-                    :id => params[:id],
-                    :expected_fields => 'Topic Identifier' +
-                        '&nbsp&nbsp|&nbsp&nbsp' +
-                        'Topic Name' +
-                        '&nbsp&nbsp|&nbsp&nbsp' +
-                        'Max Choosers' +
-                        '&nbsp&nbsp|&nbsp&nbsp' +
-                        'Topic Category <em>(optional)</em>' +
-                        '&nbsp&nbsp|&nbsp&nbsp' +
-                        'Topic Description <em>(optional)</em>' +
-                        '&nbsp&nbsp|&nbsp&nbsp' +
-                        'Topic Link <em>(optional)</em>'
+                    :id => params[:id]
                 },
                 :confirm => "You are adding topics to this assignment.  Students will now have to select a topic before they submit their work.",
                 :topic => @topics,
@@ -43,21 +32,17 @@
                 :controller=>'import_file',
                 :action=>'start',
                 :model => 'SignUpTopic',
-                :id => params[:id],
-                :expected_fields => 'Topic Identifier' +
-                    '&nbsp&nbsp|&nbsp&nbsp' +
-                    'Topic Name' +
-                    '&nbsp&nbsp|&nbsp&nbsp' +
-                    'Max Choosers' +
-                    '&nbsp&nbsp|&nbsp&nbsp' +
-                    'Topic Category <em>(optional)</em>' +
-                    '&nbsp&nbsp|&nbsp&nbsp' +
-                    'Topic Description <em>(optional)</em>' +
-                    '&nbsp&nbsp|&nbsp&nbsp' +
-                    'Topic Link <em>(optional)</em>' %> |
+                :id => params[:id] %> |
 
     <input type="button" value="Delete selected topics" onclick="deleteTopics()" />|
     <input type="button" value="Delete all topics" onclick="deleteAllTopics()" />|
+
+    <%= link_to 'Export Topics', 
+                :controller=>'export_file',
+                :action=>'start',
+                :model=> 'SignUpTopic',
+                :id => params[:id] %>|
+
 <% end %>
 
 <script>

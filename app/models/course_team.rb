@@ -45,11 +45,26 @@ class CourseTeam < Team
   end
 
   # Import from csv
-  def self.import(row, course_id, options)
-    raise ImportError, 'The course with the id "' + course_id.to_s + "\" was not found. <a href='/courses/new'>Create</a> this course?" if Course.find(course_id).nil?
+  def self.import(row_hash, _session, id, options)
+    raise ArgumentError, 'Record does not contain required items.' if row_hash.length < required_import_fields.length
+    raise ImportError, 'The course with the id \"' + id.to_s + '\" was not found. <a href=\'/course/new\'>Create</a> this course?' if Course.find(id).nil?
+    Team.import_helper(row_hash, id, options, prototype)
+  end
 
-    @course_team = prototype
-    Team.import(row, course_id, options, @course_team)
+  def self.required_import_fields
+    { 'teammembers' => 'Team Members' }
+  end
+
+  def self.optional_import_fields(_id = nil)
+    { 'teamname' => 'Team Name' }
+  end
+
+  def self.import_options
+    { 'handle_dups' => { 'display' => 'Handle Duplicates',
+                         'options' => { 'ignore' => 'Ignore new team name',
+                                        'replace' => 'Replace the existing team with the new team',
+                                        'insert' => 'Insert any new team members into the existing team',
+                                        'rename' => 'Rename the new team and import' } } }
   end
 
   # Export to csv
@@ -61,9 +76,8 @@ class CourseTeam < Team
   # Export the fields of the csv column
   def self.export_fields(options)
     fields = []
-    fields.push('Team Name')
+    fields.push('Team name')
     fields.push('Team members') if options[:team_name] == 'false'
-    fields.push('Course Name')
   end
 
   # Add member to the course team

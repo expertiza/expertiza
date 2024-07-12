@@ -188,21 +188,19 @@ class Team < ApplicationRecord
 
   # Extract team members from the csv and push to DB,  changed to hash by E1776
   def import_team_members(row_hash)
-    row_hash[:teammembers].each_with_index do |teammate, _index|
+    row_hash[:teammembers].split(',').each do |teammate|
       user = User.find_by(name: teammate.to_s)
       if user.nil?
-        raise ImportError, "The user '#{teammate}' was not found. <a href='/users/new'>Create</a> this user?"
+        raise ImportError, "The user '#{teammate}' was not found. <a href='/users/new?role=Student'>Create</a> this user?"
       else
         add_member(user) if TeamsUser.find_by(team_id: id, user_id: user.id).nil?
       end
     end
   end
 
-  #  changed to hash by E1776
-  def self.import(row_hash, id, options, teamtype)
-    raise ArgumentError, 'Not enough fields on this line.' if row_hash.empty? || (row_hash[:teammembers].empty? && (options[:has_teamname] == 'true_first' || options[:has_teamname] == 'true_last')) || (row_hash[:teammembers].empty? && (options[:has_teamname] == 'true_first' || options[:has_teamname] == 'true_last'))
-
-    if options[:has_teamname] == 'true_first' || options[:has_teamname] == 'true_last'
+  def self.import_helper(row_hash, id, options, teamtype)
+    raise ArgumentError, 'Include duplicate handling option.' unless options.key? :handle_dups
+    if row_hash.key? :teamname
       name = row_hash[:teamname].to_s
       team = where(['name =? && parent_id =?', name, id]).first
       team_exists = !team.nil?
@@ -215,13 +213,11 @@ class Team < ApplicationRecord
       end
     end
     if name
-      team = Object.const_get(teamtype.to_s).create_team_and_node(id)
+      team = Object.const_get(teamtype.type).create_team_and_node(id)
       team.name = name
       team.save
     end
-
     # insert team members into team unless team was pre-existing & we ignore duplicate teams
-
     team.import_team_members(row_hash) unless team_exists && options[:handle_dups] == 'ignore'
   end
 
@@ -245,27 +241,43 @@ class Team < ApplicationRecord
     end
   end
 
-  # Export the teams to csv
+  # Exports team data for a specified course or assignment to a CSV file.
+  # This method determines the type of team (CourseTeam or AssignmentTeam) based on the provided `teamtype`,
+  # retrieves the appropriate teams from the database, and then formats and appends each team's data to the CSV.
+  # @param csv [CSV] The CSV object to which data will be appended.
+  # @param parent_id [Integer] The ID of the parent course or assignment.
+  # @param options [Hash] A hash containing options that affect the output such as whether to include team names.
+  # @param teamtype [Class] The class type (CourseTeam or AssignmentTeam) indicating the team context.
+  # @return [CSV] The updated CSV object containing the exported data.
   def self.export(csv, parent_id, options, teamtype)
+    team_parent = nil
+  
+    # Determine the context and get the teams based on the team type
     if teamtype.is_a?(CourseTeam)
-      teams = CourseTeam.where(parent_id: parent_id)
+      team_parent = Course.find_by(id: parent_id)
     elsif teamtype.is_a?(AssignmentTeam)
-      teams = AssignmentTeam.where(parent_id: parent_id)
+      team_parent = Assignment.find_by(id: parent_id)
     end
+    teams = Team.where(parent_id: parent_id)
+    return csv if team_parent.nil? # Exit if no team_parent is found
     teams.each do |team|
-      output = []
-      output.push(team.name)
+      # Start with team_parent name (course or assignment) and team name
+      output = [team.name]
+      # Append team members' names if options[:team_name] is false
       if options[:team_name] == 'false'
         team_members = TeamsUser.where(team_id: team.id)
+        members = []
         team_members.each do |user|
-          output.push(user.name)
+          members.push(user.name)
         end
+        output.push(members.join(' '))
       end
+      # Append the output array to the CSV
       csv << output
     end
     csv
   end
-
+  
   # Create the team with corresponding tree node
   def self.create_team_and_node(id)
     parent = parent_model id # current_task will be either a course object or an assignment object.

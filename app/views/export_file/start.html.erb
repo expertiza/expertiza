@@ -30,6 +30,12 @@
   <% if @model == 'ReviewResponseMap' %>
     <%= render :partial => 'reviewer_mapping' %>
   <% end %>
+  <% if @model == 'TagPromptDeployment' %>
+    <%= render :partial => 'tag_prompt_deployment' %>
+  <% end %>
+  <% if @model == 'SignUpTopic' %>
+    <%= render :partial => 'signup_topics' %>
+  <% end %>
   <br/>
   <%= hidden_field_tag('model', @model) %>
   <%= hidden_field_tag('id', @id) %>
@@ -58,30 +64,6 @@
     <input type='submit' value='Export Advices' onclick='{export_advices.submit();}'/>
     <br/><br/>
   <% end %>
-<% else %>
-  <!-- Hiding Export Details feature from the Course Participant view -->
-  <% if @model != 'CourseParticipant' %>
-  <h2>Export Details</h2>
-  <%= form_tag({:controller => 'export_file', :action => 'exportdetails'}, {:method => 'post', :multipart => true, :name => 'export_details_form'}) do %>
-    <table>
-      <tr>
-        <td valign='Top'>Delimiter:</td>
-        <td>
-          <%= radio_button_tag 'delim_type2', 'comma', true %> Comma<br/>
-          <%= radio_button_tag 'delim_type2', 'space' %> Space<br/>
-          <%= radio_button_tag 'delim_type2', 'tab' %> Tab<br/>
-          <%= radio_button_tag 'delim_type2', 'other' %> Other <%= text_field_tag 'other_char2' %>
-          <br/>
-        </td>
-      </tr>
-    </table>
-    <%= render :partial => 'export_file/export_details' %>
-    <br/>
-    <%= hidden_field_tag('id', @id) %>
-    <%= hidden_field_tag('model', @model) %>
-    <input type='submit' value='Export Details' onclick='{export_details_form.submit();}'/>
-    <br/><br/>
-  <% end %>
-  <% end %>
-  <a href="<%= session[:return_to] %>">Back</a>
 <% end %>
+<!-- Hiding Export Details feature from the Course Participant view and Export topic view  -->
+<a href="<%= session[:return_to] %>">Back</a>

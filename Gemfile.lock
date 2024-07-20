@@ -199,6 +199,8 @@ GEM
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
+    figaro (1.2.0)
+      thor (>= 0.14.0, < 2)
     font-awesome-rails (4.7.0.8)
       railties (>= 3.2, < 8.0)
     foreman (0.87.2)
@@ -621,6 +623,7 @@ DEPENDENCIES
   engtagger
   factory_bot_rails (= 4.8.2)
   fastercsv
+  figaro
   font-awesome-rails
   foreman
   gchartrb
@@ -637,6 +640,7 @@ DEPENDENCIES
   jquery-tablesorter
   jquery-ui-sass-rails
   json
+  jwt
   launchy
   lingua
   mimemagic!

@@ -1,68 +1,81 @@
 class LtiController < ApplicationController
+  include AuthHelper # This gives access to AuthController methods
+
   skip_before_action :verify_authenticity_token, only: [:launch]
   skip_before_action :authorize, only: [:launch]
-
-  puts "Load Path:"
-  puts $LOAD_PATH
-
-  puts "Gem Path:"
-  puts Gem.path
-
-  puts "Trying to require 'ims/lti'..."
-  require 'ims/lti'
-  puts "Successfully required 'ims/lti'"
-
-  puts "IN LTI_CONTROLLER"
-  Rails.logger.debug "IN LTI_CONTROLLER"
+  after_action :allow_iframe, only: [:launch]
 
   def launch
-    puts "IN LAUNCH"
-    Rails.logger.debug "IN LAUNCH"
-    # render plain: "LTI Launch Received", status: 200
-
     begin
-
-      # tp = IMS::LTI::ToolProvider.new(
-      #   ENV['LTI_KEY'],
-      #   ENV['LTI_SECRET'],
-      #   params
-      # )
       authenticator = IMS::LTI::Services::MessageAuthenticator.new(
         request.url,
         request.request_parameters,
         Rails.application.secrets.LTI_SHARED_SECRET
       )
-      puts "LTI SECRET: #{Rails.application.secrets.LTI_SHARED_SECRET}"
+
       #Check if the signature is valid
-      return false unless
       if authenticator.valid_signature?
-        puts "VALID LTI SIGNATURE"
-        Rails.logger.debug "VALID LTI SIGNATURE"
-      #   user = User.find_or_create_by(email: tp.lis_person_contact_email_primary) do |u|
-      #     u.name = tp.lis_person_name_full
-      #     u.role = tp.roles.first
-      #   end
 
-      #   session[:user_id] = user.id
-      #   session[:context_id] = tp.context_id
-      #   session[:lti_launch_params] = params.to_unsafe_h
+        # Retrieve user information from LTI parameters
+        user_email = params['lis_person_contact_email_primary']
+        username, domain = separate_email(user_email)
 
-      #   Rails.logger.info "LTI Launch successful for user: #{user.email}"
-
-        # sign_in(user)
-        # redirect_to root_path, notice: 'Logged in successfully via LTI'
+        if check_domain(domain)
+          authenticate_and_login_user(username)
+        else
+          redirect_to root_path, alert: 'Invalid domain'
+        end
       else
-        # Rails.logger.warn "Invalid LTI request"
-        # render plain: "Invalid LTI request", status: 401
-        puts "NOT A VALID LTI SIGNATURE"
-        Rails.logger.debug "NOT A VALID LTI SIGNATURE"
+        redirect_to root_path, alert: 'Invalid LTI signature'
       end
-    rescue NameError => e
-      Rails.logger.error "NameError in LTI launch: #{e.message}"
-      # render plain: "Error processing LTI launch", status: 500
     rescue => e
       Rails.logger.error "Error in LTI launch: #{e.message}"
-      # render plain: "Error processing LTI launch", status: 500
+      redirect_to root_path, alert: 'An error occurred during login'
     end
+  end
+
+  private
+
+  def allow_iframe
+    response.headers.except! 'X-Frame-Options'
+  end
+
+  def separate_email(email)
+    return [nil, nil] if email.nil? || email.empty?
+
+    parts = email.split('@')
+    if parts.length == 2
+      [parts[0], parts[1]]
+    else
+      [nil, nil]
+    end
+  end
+
+  def check_domain(domain)
+    domain == "ncsu.edu"
+  end
+
+  def user_exists?(username)
+    User.exists?(name: username)
+  end
+
+  def authenticate_and_login_user(username)
+    # Gets the user if they exist in Expertiza, else null
+    user = User.find_by(name: username)
+    if user
+      # Log the user in
+      session[:user] = user  # Store the entire user object, not just the username
+      AuthController.set_current_role(user.role_id, session)
+      ExpertizaLogger.info LoggerMessage.new('', user.name, 'Login successful via LTI')
+
+      redirect_to "#{ENV['LTI_BASE_URL']}/student_task/list", notice: 'Logged in successfully via LTI'
+
+    else
+      redirect_to root_path, alert: 'User not found in Expertiza. Please register first.'
+    end
+
+    rescue => e
+      Rails.logger.error "Error in LTI launch.authenticate_and_login: #{e.message}"
+      redirect_to root_path, alert: 'An error occurred during login'
   end
 end

@@ -1,0 +1,11 @@
+development:
+  lti_base_url: "http://152.7.177.3:8080"
+  moodle_base_url: "http://152.7.177.192"
+
+test:
+  lti_base_url: "https://expertiza.ncsu.edu/"
+  moodle_base_url: "http://wolfware.ncsu.edu"
+
+production:
+  lti_base_url: "https://expertiza.ncsu.edu/"
+  moodle_base_url: "http://wolfware.ncsu.edu"

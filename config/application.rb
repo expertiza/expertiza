@@ -31,6 +31,7 @@ module Expertiza
     config.react.addons = true
     config.assets.paths << Rails.root.join('vendor', 'assets', 'components')
     config.cache_store = :redis_store, "redis://#{ENV.fetch('REDIS_HOST', 'localhost')}:6379/0/cache", { raise_errors: false }
+    config.action_dispatch.default_headers.delete('X-Frame-Options')
     # Bower asset paths
     root.join('vendor', 'assets', 'components').to_s.tap do |bower_path|
       config.sass.load_paths << bower_path

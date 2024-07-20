@@ -1,3 +1,18 @@
+require 'erb'
+require 'figaro'
+
+# Ensure Figaro loads the application.yml
+Figaro.application = Figaro::Application.new(
+  environment: Rails.env,
+  path: File.expand_path('../config/application.yml', __FILE__)
+)
+Figaro.load
+
+# Read the environment variable
+lti_base_url = ENV['LTI_BASE_URL'] || 'http://default-url.com'
+
+# Define the XML template with ERB
+xml_template = <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
     xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
@@ -10,8 +25,16 @@
     http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
   <blti:title>Expertiza</blti:title>
   <blti:description>Web application where students can submit and peer-review learning objects</blti:description>
-  <blti:launch_url>https://152.7.177.3/lti/launch</blti:launch_url>
+  <blti:launch_url><%= lti_base_url %>/lti/launch</blti:launch_url>
   <blti:extensions platform="moodle">
-    <lticm:property name="tool_id"7MIPeeAKqrDbV42</lticm:property>
+    <lticm:property name="tool_id">7MIPeeAKqrDbV42</lticm:property>
   </blti:extensions>
 </cartridge_basiclti_link>
+XML
+
+# Render the XML template
+renderer = ERB.new(xml_template)
+xml_content = renderer.result(binding)
+
+# Write the generated XML to a file
+File.write('cartridge_basiclti_link.xml', xml_content)

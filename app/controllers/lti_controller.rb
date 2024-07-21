@@ -1,3 +1,5 @@
+# app/controllers/lti_controller.rb
+
 class LtiController < ApplicationController
   include AuthHelper # This gives access to AuthController methods
 
@@ -13,7 +15,7 @@ class LtiController < ApplicationController
         ENV['LTI_SHARED_ENCODER']
       )
 
-      #Check if the signature is valid
+      # Check if the signature is valid
       if authenticator.valid_signature?
         # Retrieve user information from LTI parameters
         user_email = params['lis_person_contact_email_primary']
@@ -50,22 +52,21 @@ class LtiController < ApplicationController
   end
 
   def authenticate_and_login_user(username)
-    # Gets the user if they exist in Expertiza, else null
-    user = User.find_by(name: username)
-    if user
-      # Log the user in
-      session[:user] = user  # Store the entire user object, not just the username
-      AuthController.set_current_role(user.role_id, session)
-      ExpertizaLogger.info LoggerMessage.new('', user.name, 'Login successful via LTI')
-
-      redirect_to "#{ENV['LTI_BASE_URL']}/student_task/list", notice: 'Logged in successfully via LTI'
-
-    else
-      redirect_to root_path, alert: 'User not found in Expertiza. Please register first.'
-    end
-
+    begin
+      # Gets the user if they exist in Expertiza, else null
+      user = User.find_by(name: username)
+      if user
+        # Log the user in
+        session[:user] = user  # Store the entire user object, not just the username
+        AuthController.set_current_role(user.role_id, session)
+        ExpertizaLogger.info LoggerMessage.new('', user.name, 'Login successful via LTI')
+        redirect_to "#{ENV['LTI_BASE_URL']}/student_task/list", notice: 'Logged in successfully via LTI'
+      else
+        redirect_to root_path, alert: 'User not found in Expertiza. Please register first.'
+      end
     rescue => e
       Rails.logger.error "Error in LTI launch.authenticate_and_login: #{e.message}"
       redirect_to root_path, alert: 'An error occurred during login'
+    end
   end
 end

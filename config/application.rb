@@ -31,6 +31,7 @@ module Expertiza
     config.react.addons = true
     config.assets.paths << Rails.root.join('vendor', 'assets', 'components')
     config.cache_store = :redis_store, "redis://#{ENV.fetch('REDIS_HOST', 'localhost')}:6379/0/cache", { raise_errors: false }
+    config.action_dispatch.default_headers.delete('X-Frame-Options')
     # Bower asset paths
     root.join('vendor', 'assets', 'components').to_s.tap do |bower_path|
       config.sass.load_paths << bower_path
@@ -56,7 +57,9 @@ module Expertiza
       # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
 
       # Languages for the application
-      config.i18n.available_locales = %i[en_US hi_IN]
+
+      config.i18n.enforce_available_locales = true
+      config.i18n.available_locales = %i[en_US hi_IN en]
       config.i18n.default_locale = :en_US # english
 
       # Do not swallow errors in after_commit/after_rollback callbacks.

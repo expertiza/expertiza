@@ -10,17 +10,16 @@ class LtiController < ApplicationController
       authenticator = IMS::LTI::Services::MessageAuthenticator.new(
         request.url,
         request.request_parameters,
-        Rails.application.secrets.LTI_SHARED_SECRET
+        ENV['LTI_SHARED_ENCODER']
       )
 
       #Check if the signature is valid
       if authenticator.valid_signature?
-
         # Retrieve user information from LTI parameters
         user_email = params['lis_person_contact_email_primary']
         username, domain = separate_email(user_email)
 
-        if check_domain(domain)
+        if valid_domain?(domain)
           authenticate_and_login_user(username)
         else
           redirect_to root_path, alert: 'Invalid domain'
@@ -41,22 +40,13 @@ class LtiController < ApplicationController
   end
 
   def separate_email(email)
-    return [nil, nil] if email.nil? || email.empty?
-
+    return [nil, nil] if email.blank?
     parts = email.split('@')
-    if parts.length == 2
-      [parts[0], parts[1]]
-    else
-      [nil, nil]
-    end
+    parts.length == 2 ? parts : [nil, nil]
   end
 
-  def check_domain(domain)
+  def valid_domain?(domain)
     domain == "ncsu.edu"
-  end
-
-  def user_exists?(username)
-    User.exists?(name: username)
   end
 
   def authenticate_and_login_user(username)

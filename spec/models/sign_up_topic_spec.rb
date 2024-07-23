@@ -5,37 +5,36 @@ describe SignUpTopic do
   let(:team) { create(:assignment_team, id: 1, name: 'team 1', users: [user, user2]) }
   let(:user) { create(:student) }
   let(:user2) { create(:student, name: 'qwertyui', id: 5) }
+
   describe '.import' do
-    context 'when record is empty' do
-      it 'raises an ArgumentError' do
-        expect { SignUpTopic.import({}, nil, nil) }.to raise_error(ArgumentError, 'The CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category (optional), Topic Description (Optional), Topic Link (optional).')
+    context 'does not include required fields' do
+      it 'raises ArgumentError' do
+        expect { SignUpTopic.import({ key: 'val' }, nil, 1) }.to raise_error(ArgumentError)
       end
     end
-    context 'when record is not empty' do
+
+    context 'required fields provided' do
       let(:row) do
-        { topic_identifier: 'identifier', topic_name: 'name', max_choosers: 'chooser', category: 'category', description: 'description', link: 'link' }
+        { topic_identifier: 'idn', topic_name: 'my_topic', max_choosers: '3' }
       end
-      let(:session) do
-        { assignment_id: 1 }
-      end
-      let(:attributes) do
-        { topic_identifier: 'identifier', topic_name: 'name', max_choosers: 'chooser', category: 'category', description: 'description', link: 'link' }
-      end
-      context 'when the topic is not found' do
-        it 'creates a new sign up topic' do
-          allow(SignUpTopic).to receive_message_chain(:where, :first).with(topic_name: row[:topic_name], assignment_id: session[:assignment_id]).with(no_args).and_return(nil)
-          allow(ImportTopicsHelper).to receive(:define_attributes).with(row).and_return(attributes)
-          allow(ImportTopicsHelper).to receive(:create_new_sign_up_topic).with(attributes, session).and_return(true)
-          expect(ImportTopicsHelper).to receive(:create_new_sign_up_topic).with(attributes, session)
-          SignUpTopic.import(row, session, nil)
+
+      context 'no existing signup topic' do
+        it 'creates a new signup topic' do
+          allow(SignUpTopic).to receive_message_chain(:where, :first).and_return(nil)
+          expect(SignUpTopic).to receive(:get_new_sign_up_topic).with(any_args)
+          SignUpTopic.import(row, nil, 1)
         end
       end
-      context 'when the topic is found' do
-        it 'changes the max_chooser and topic_identifier of the existing topic' do
-          allow(SignUpTopic).to receive_message_chain(:where, :first).with(topic_name: row[:topic_name], assignment_id: session[:assignment_id]).with(no_args).and_return(topic)
-          allow(topic).to receive(:save).with(no_args).and_return(true)
-          expect(topic).to receive(:save).with(no_args)
-          SignUpTopic.import(row, session, nil)
+
+      context 'has existing signup topic' do
+        it 'overwrites previous values' do
+          allow(SignUpTopic).to receive(:where).with(any_args).and_return(topic)
+          allow(topic).to receive(:first).and_return(topic)
+          # Expect values to be changed and persisted
+          expect(topic).to receive(:topic_identifier=).with('idn')
+          expect(topic).to receive(:max_choosers=).with('3')
+          expect(topic).to receive(:save)
+          SignUpTopic.import(row, nil, 1)
         end
       end
     end

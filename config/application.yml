@@ -1,4 +1,4 @@
-# /config/application.yml
+# /onfig/application.yml
 
 development:
   lti_base_url: "http://152.7.177.3:8080"

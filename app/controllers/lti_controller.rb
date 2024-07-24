@@ -3,9 +3,10 @@
 class LtiController < ApplicationController
   include AuthHelper # This gives access to AuthController methods
 
-  skip_before_action :verify_authenticity_token, only: [:launch]
+  protect_from_forgery with: :exception, except: [:launch]
   skip_before_action :authorize, only: [:launch]
   after_action :allow_iframe, only: [:launch]
+  
 
   def launch
     begin

@@ -2,7 +2,7 @@
 # See http://github.com/svenfuchs/rails-i18n/tree/main/rails%2Flocale for starting points.
 
 en_US:
-  display_name: "English (US)"
+  display_name: "English"
   database_encoding: 1
 
   # This section of keys are for the pages related to Courses

@@ -20,9 +20,12 @@ class LtiController < ApplicationController
       if authenticator.valid_signature?
         # Retrieve user information from LTI parameters
         user_email = params['lis_person_contact_email_primary']
-        username, domain = separate_email(user_email)
+        username, domain = extract_user_and_domain_from_email_address(user_email)
 
-        if valid_domain?(domain)
+        # Log the origin and referer
+        origin = request.headers['Origin']
+
+        if valid_user_domain?(domain) && valid_request_url?(origin)
           authenticate_and_login_user(username)
         else
           redirect_to root_path, alert: 'Invalid domain'
@@ -42,16 +45,23 @@ class LtiController < ApplicationController
     response.headers.except! 'X-Frame-Options'
   end
 
-  def separate_email(email)
+  def extract_user_and_domain_from_email_address(email)
     return [nil, nil] if email.blank?
     parts = email.split('@')
     parts.length == 2 ? parts : [nil, nil]
   end
 
-  def valid_domain?(domain)
+  # Checks if user domain is "ncsu.edu" for authentication purposes
+  def valid_user_domain?(domain)
     domain == "ncsu.edu"
   end
 
+  # Checks that the website requesting the authentication is approved
+  def valid_request_url?(url)
+    url == ENV['LTI_TOOL_URL']
+  end
+
+  # Logs user in if they exist in Expertiza
   def authenticate_and_login_user(username)
     begin
       # Gets the user if they exist in Expertiza, else null

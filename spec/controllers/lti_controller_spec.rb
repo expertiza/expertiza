@@ -16,20 +16,19 @@ RSpec.describe LtiController, type: :controller do
       'other_param' => 'value'
     }
   end
-  # let(:user) { create(:user, name: 'testuser') }
   let(:user) { User.create(name: 'testuser', email: 'testuser@ncsu.edu') }
   let(:shared_secret) { 'shared_secret' }
 
   before do
-    allow(Rails.application.secrets).to receive(:LTI_SHARED_SECRET).and_return(shared_secret)
     allow_any_instance_of(IMS::LTI::Services::MessageAuthenticator).to receive(:valid_signature?).and_return(true)
   end
 
   describe 'POST #launch' do
     context 'with valid LTI signature and valid domain' do
       before do
-        allow(controller).to receive(:separate_email).and_return(['testuser', 'ncsu.edu'])
-        allow(controller).to receive(:valid_domain?).and_return(true)
+        allow(controller).to receive(:extract_user_and_domain_from_email_address).and_return(['testuser', 'ncsu.edu'])
+        allow(controller).to receive(:valid_user_domain?).and_return(true)
+        allow(controller).to receive(:valid_request_url?).and_return(true)
         allow(User).to receive(:find_by).and_return(user)
         allow(AuthController).to receive(:set_current_role)
         allow(ExpertizaLogger).to receive(:info)
@@ -48,8 +47,8 @@ RSpec.describe LtiController, type: :controller do
 
     context 'with valid LTI signature and invalid domain' do
       before do
-        allow(controller).to receive(:separate_email).and_return(['testuser', 'invalid.com'])
-        allow(controller).to receive(:valid_domain?).and_return(false)
+        allow(controller).to receive(:extract_user_and_domain_from_email_address).and_return(['testuser', 'invalid.com'])
+        allow(controller).to receive(:valid_user_domain?).and_return(false)
       end
 
       it 'redirects to root path with an invalid domain alert' do
@@ -95,35 +94,51 @@ RSpec.describe LtiController, type: :controller do
       end
     end
 
-    describe '#separate_email' do
+    describe '#extract_user_and_domain_from_email_address' do
       it 'returns username and domain when email is valid' do
-        result = controller.send(:separate_email, 'user@example.com')
+        result = controller.send(:extract_user_and_domain_from_email_address, 'user@example.com')
         expect(result).to eq(['user', 'example.com'])
       end
 
       it 'returns nils when email is nil or empty' do
-        result = controller.send(:separate_email, nil)
+        result = controller.send(:extract_user_and_domain_from_email_address, nil)
         expect(result).to eq([nil, nil])
 
-        result = controller.send(:separate_email, '')
+        result = controller.send(:extract_user_and_domain_from_email_address, '')
         expect(result).to eq([nil, nil])
       end
 
       it 'returns nils when email format is invalid' do
-        result = controller.send(:separate_email, 'invalidemail')
+        result = controller.send(:extract_user_and_domain_from_email_address, 'invalidemail')
         expect(result).to eq([nil, nil])
       end
     end
 
-    describe '#valid_domain?' do
+    describe '#valid_user_domain?' do
       it 'returns true for valid domain' do
-        expect(controller.send(:valid_domain?, 'ncsu.edu')).to be_truthy
+        expect(controller.send(:valid_user_domain?, 'ncsu.edu')).to be_truthy
       end
 
       it 'returns false for invalid domain' do
-        expect(controller.send(:valid_domain?, 'invalid.com')).to be_falsey
+        expect(controller.send(:valid_user_domain?, 'invalid.com')).to be_falsey
       end
     end
+
+    describe '#valid_request_url?' do
+      it 'returns true for valid domain' do
+        expect(controller.send(:valid_request_url?, 'http://152.7.177.192')).to be_truthy
+      end
+
+      it 'returns false for invalid domain' do
+        expect(controller.send(:valid_request_url?, 'invalid.com')).to be_falsey
+      end
+
+      it 'returns false when domain is nil' do
+        expect(controller.send(:valid_request_url?, nil)).to be_falsey
+      end
+    end
+
+
 
     describe '#authenticate_and_login_user' do
       context 'when user exists' do

@@ -1,4 +1,7 @@
 Expertiza::Application.routes.draw do
+  get 'lti/launch'
+  post 'lti/launch' => 'lti#launch'
+
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
 

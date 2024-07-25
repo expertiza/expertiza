@@ -137,9 +137,7 @@ RSpec.describe LtiController, type: :controller do
         expect(controller.send(:valid_request_url?, nil)).to be_falsey
       end
     end
-
-
-
+    
     describe '#authenticate_and_login_user' do
       context 'when user exists' do
         let(:user) { User.create(name: 'testuser', email: 'testuser@ncsu.edu') }

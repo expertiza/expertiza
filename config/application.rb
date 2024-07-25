@@ -59,6 +59,7 @@ module Expertiza
       # Languages for the application
 
       config.i18n.enforce_available_locales = true
+      # config.i18n.available_locales = %i[en_US hi_IN en]
       config.i18n.available_locales = %i[en_US hi_IN]
       config.i18n.default_locale = :en_US # english
 

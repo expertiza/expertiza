@@ -138,8 +138,6 @@ RSpec.describe LtiController, type: :controller do
       end
     end
 
-
-
     describe '#authenticate_and_login_user' do
       context 'when user exists' do
         let(:user) { User.create(name: 'testuser', email: 'testuser@ncsu.edu') }

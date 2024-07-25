@@ -1,4 +1,4 @@
-# /onfig/application.yml
+# config/application.yml
 
 development:
   lti_base_url: "http://152.7.177.3:8080"
@@ -19,4 +19,5 @@ production:
   moodle_base_url: "http://wolfware.ncsu.edu"
   LTI_CONSUMER_KEY: <%= ENV["LTI_CONSUMER_KEY"] %>
   LTI_SHARED_ENCODER: <%= ENV["LTI_SHARED_SECRET"] %>
-  LTI_TOOL_URL: "https://wolfware.ncsu.edu"
+  LTI_TOOL_URL: "http://152.7.177.192"
+  # LTI_TOOL_URL: "https://wolfware.ncsu.edu"

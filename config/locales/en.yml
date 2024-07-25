@@ -1,0 +1,802 @@
+# Sample localization file for English. Add more files in this directory for other locales.
+# See http://github.com/svenfuchs/rails-i18n/tree/main/rails%2Flocale for starting points.
+
+en:
+  display_name: "English"
+  database_encoding: 1
+
+  # This section of keys are for the pages related to Courses
+  courses:
+
+    edit:
+      course_title: "Edit course"
+
+    course:
+      institute_name: "Institution Name"
+      course_name: "Course Name"
+      course_directory: "Course Directory"
+      directory_warning: "(Mandatory field. No space or special chars.)"
+      course_info: "Course Information"
+      language: "Select language"
+      assignment_name: "Assignment Name"
+
+    view_teaching_assistants:
+      teaching_assistants: "Teaching Assistants"
+      course: "Course"
+      teaching_assistant_name: "Teaching Assistant Name"
+
+    add_individual:
+      enter_user_login: "Enter a user login:"
+      add_ta: "Add TA"
+
+  participant:
+    list:
+      participants: "Participants:"
+
+  shared_scripts:
+    user_list:
+      email: "E-mail on ..."
+      permissions: "Permissions ..."
+      name: "Name"
+      full_name: "Full Name"
+      email_address: "Email Address"
+      role: "Role"
+      parent: "Parent"
+      badges: "Badges"
+      review: "Review"
+      submissions: "Submissions"
+      metareview: "Metareview"
+      submit: "Submit"
+      take_quiz: "Take quiz"
+      handle: "Handle"
+      action: "Action"
+
+    add_individual:
+      enter_login: "Enter a user login:"
+      add: "Add"
+      participant: "participant"
+      reader: "reader"
+      reviewer: "reviewer"
+      submitter: "submitter"
+
+  teams:
+    list:
+      teams_for: "Teams for"
+      teams: "Teams"
+      students_without_team: "Students without teams"
+      name: "name"
+      show_members: "Show all team members"
+
+    new:
+      create_teams_for: "Create Teams for"
+      automatically: "Automatically"
+      uses_insofar: "Uses, insofar as possible, the number of members specified when the assignment was created."
+      team_size: "Team Size:"
+      create_teams: "Create Teams"
+      manually: "Manually"
+      specify_team_them: "Specify Team name, then add members to team, one by one."
+      inherit_teams: "Inherent Teams From Course"
+      use_the_teams: "Use the teams that are currently defined for the course."
+      team_name: "Team Name"
+
+  assignments:
+    new:
+      create_new: "Create New"
+      public: "Public"
+      private: "Private"
+      assignment: "Assignment"
+      general: "General"
+      rubrics: "Rubrics"
+      review_strategy: "Review strategy"
+      due_date: "Due date"
+      create_button: "Create"
+
+
+    edit:
+      general:
+        assignment_name: "Assignment name:"
+        course: "Course"
+        submission_directory: "Submission directory"
+        mandatory_field: "(Mandatory field. No space or special char.)"
+        description_url: "Description URL"
+        calibration: "Calibration"
+        has_team: "Has teams?"
+        has_quiz: "Has quiz?"
+        has_badge: "Has badge?"
+        staggered_deadline: "Staggered deadline assignment?"
+        mico_task: "Micro Task Assignment?"
+        review_reviewers: "Reviews visible to all other reviewers?"
+        calibrate_training: "Calibration for training?"
+        reputation_algorithm: "Reputation Algorithm?"
+        use_simicheck: "Use simicheck?"
+        allow_feedback: "Allow tag prompts so author can tag feedback comments?"
+        available: "Available to students?"
+
+      rubrics:
+        review_varies: "Review varies by round?"
+        questionnaire: "Questionnaire"
+        use_dropdown: "Use dropdown"
+        instead: "instead?"
+        scored_question: "Scored-question"
+        display_style: "display style"
+        weight: "Weight"
+        notification_limit: "Notification Limit"
+        author_feedback: "Author Feedback"
+        review: "Review"
+
+      review_strategy:
+        review_strategy: "Review Strategy:"
+        review_topic: "Review topic Threshold (k):"
+        max_num_reviews: "Maximum number of reviews per submission:"
+        max_review_limit: "Has Max Review Limit?"
+        set_num_reviews: "Set Allowed Number of Reviews per reviewer"
+        set req_reviews: "Set Required Number of Reviews per reviewer"
+        meta_review: "Has Meta Review Limit?"
+        set_num_meta: "Set Allowed Number of MetaReviews per reviewer"
+        set_req_meta: "Set Required Number of MetaReviews per reviewer"
+        anon_review: "Is Anonymous Review?"
+        self_review: "Allow self reviews?"
+
+      due_dates:
+        num_review_rounds: "Number of review rounds:"
+        timezone: "Timezone : "
+        meta_deadline: "Use metareview deadline"
+        show_hide: "Show/Hide Date Updater"
+        deadline_type: "Deadline Type"
+        date_time: "Date & Time"
+        use_updater: "Use Date Updater"
+        submission_allowed: "Submission allowed"
+        review_allowed: "Review allowed"
+        teammate_review: "Teammate review allowed"
+        meta_allowed: "Meta-review allowed"
+        has_quiz: "Has quiz"
+        reminder: "Reminder(hrs)"
+        due_date_names: "Due date name"
+        description_url: "Description URL"
+        round: "Round"
+
+      late_policy:
+        apply_penalty: "Apply penalty policy:"
+        late_policty: "New late policty"
+
+      calibration:
+        particpant_name: "Participant name"
+        action: "Action"
+        submitted_item: "Submitted item(s)"
+        submit_calibration: "Submit reviews for calibrations"
+
+  # end of keys for pages related to Courses
+
+  # keys for pages Student Views
+
+  student_task:
+    list:
+      assignments: "Assignments"
+      tasks_not_started: "Tasks not yet started"
+      revisions: "Revisions"
+      student_team: "Students who have teamed with you"
+      not_associated: "assignments not associated with any course"
+      assignment_name: "Assignment"
+      course: "Course"
+      topic: "Topic"
+      current_stage: "Current Stage"
+      review_grade: "Review Grade"
+      badges: "Badges"
+      stage_deadline: "Stage Deadline"
+      publishing_rights: "Publishing Rights"
+      left: "left"
+
+    publishing_rights:
+      select_assignment: "Select an assignment from the list or set"
+      publishing_rights: "publishing rights"
+      for_work: "for your work."
+
+    view:
+      submit_review: "Submit or Review work for"
+      next_click: "Next: Click the activity you wish to perform on the assignment titled:"
+      assignment_description: "Assignment Description"
+      signup_sheet: "Signup sheet"
+      signup_topic: "(Sign up for a topic)"
+      view_bookmarks: "View bookmarks"
+      view_bookmarks_lengthy: "(View bookmarks others have submitted for your topic)"
+      your_team: "Your team"
+      view_team: "(View and manage your team)"
+      submit_work: "(Submit and view your work)"
+      your_work: "Your work"
+      others_work: "Others' work"
+      your_readings: "Your readings"
+      choose_topic: "(You have to choose a topic first)"
+      not_allowed: "(You are not allowed to submit you work right now)"
+      give_feedback: "(Give feedback to others on their work)"
+      take_quizzes: "Take quizzes"
+      quizzes_read: "(Take quizzes over the work you have read)"
+      your_scores: "Your scores"
+      alternate_view: "Alternate View"
+      view_feedback: "(View feedback on your work)"
+      suggest_topic: "Suggest a topic"
+      take_survey: "Take a survey"
+      change_handle: "Change your handle"
+      self_review: "(You have to submit self-review under 'Your work' before checking 'Your scores'.)"
+      log_you_out: "(This will log you out)"
+      different_handle: "(Provide a different handle for this assignment)"
+      back: "Back"
+
+  sign_up_sheet:
+    list:
+      signup_sheet: "Signup sheet for"
+      assignment_lower: "assignment"
+      your_topics: "Your topic(s):"
+      waitlisted: "(waitlisted)"
+      back: "Back"
+
+    table_header:
+      topic_num: "Topic #"
+      topic_name: "Topic name(s)"
+      micro_payment: "Micro- payment"
+      num_slots: "Num. of slots"
+      available_slots: "Available slots"
+      num_waitlist: "Num. on waitlist"
+      bookmarks: "Bookmarks"
+      actions: "Actions"
+      advertise: "Advertisement(s)"
+      topic_id: "Topic ID"
+      select: "Select"
+      questionnaire: "Questionnaire"
+      disabled: "(disabled)"
+      num_bids: "Total num. of bids"
+      num_1_2_bids: "Num. #1/#2 bids"
+
+
+    suggested_topic:
+      approved_suggestion: "Your approved suggested topic"
+
+  student_teams:
+    edit:
+      edit_team: "Edit Team"
+      team_name: "Team Name:"
+      back: "Back"
+
+    view:
+      team_info: "Team Information for"
+      no_team: "You no longer have a team!"
+      name_team: "Name team"
+      team_name: "Team name:"
+      team_name_up: "Team Name:"
+      team_members: "Team members"
+      username: "Username"
+      fullname: "Full name"
+      email_address: "Email address"
+      review_action: "Review action"
+      send_invite: "Send invitations"
+      status: "Status"
+      accepted: "Accepted"
+      declined: "Declined"
+      wait_reply: "Waiting for replay"
+      invite_people: "Invite people"
+      enter_user: "Enter user login: "
+      users_waiting: "Users waiting for this topic:"
+      user_id: "User id"
+      email: "Email"
+      received_invitation: "Received Invitations"
+      from: "From"
+      team_name_no_colon: "Team Name"
+      reply: "Reply"
+      ad_for_team: "Advertisement for teammates"
+      back: "Back"
+      view: "View"
+      edit: "Edit"
+      leave_team: "Leave team"
+      edit_name: "Edit name"
+
+  submitted_content:
+    edit:
+      back: "Back"
+
+    title:
+      submit_work: "Submit work for"
+
+    self_review:
+      self_review: "Self Review:"
+      work_not_submitted: "(Work has not yet been submitted)"
+
+    hyperlink:
+      hyperlink_action: "Hyperlink Actions:"
+      hide_link: "hide links"
+
+    main:
+      submit_hyperlink: "Submit a hyperlink:"
+      quiz: "Quiz:"
+      view_quiz: "View quiz"
+      edit_quiz: "Edit quiz"
+
+    submitted_files:
+      submit_file: "Submit a file:"
+      or: "or"
+
+  student_review:
+    list:
+      reviews_for: "Reviews for"
+      your_instructor_expects: "Your instructor expects you to do"
+      you_are_not_allowed: "You are not allowed to do any extra reviews."
+      perform_exactly: "You should perform exactly"
+      may_perform_between_1: "You may perform between"
+      may_perform_between_2: "and"
+      required_to_do: "You are required to do"
+      reviews: "reviews."
+      num_reviews_left: "Number of reviews left:"
+      note1: "Note: You can't have more than 2 outstanding reviews. You must complete one of your outstanding reviews before selecting another."
+      note2_1: "Note: You can't do more than"
+      note2_2: "reviews according to assignment policy."
+      reviews_cannot: "Reviews cannot be performed at this time"
+      metareviews_for: "Metareviews for"
+      metareviews_allowed: "Number of Meta-Reviews Allowed:"
+      metareviews: "meta-reviews"
+      metareviews_left: "Number of Meta-Reviews left:"
+      back: "Back"
+
+    responses:
+      view: "View"
+      edit: "Edit"
+      update: "Update"
+      latest_update_at: "  -- latest update at"
+      begin: "Begin"
+      show_calibration_results: "Show calibration results"
+      review_done_at: "Review done at --"
+      no_previous_available: "No previous versions available"
+
+    set_dynamic_review:
+      i_don't_care: "I don't care which topic I review."
+      select_topic: "Select a topic below to begin a new review:"
+      request_new_submission: "Request a new submission to review"
+
+    set_dynamic_metareview:
+      request_new_metareview: "Request a new metareview to perform"
+
+  grades:
+    view_my_scores:
+      score_for: "Score for"
+      reputation: "Reputation"
+      back: "Back"
+      main_view: "Main View"
+
+    view_team:
+      summary_report: "Summary Report for assignment:"
+      team: "Team:"
+      topic: "Topic:"
+      average_peer_review: "Average peer review score:"
+      show_submission: "Show Submission"
+      no_submission: "No Submission"
+      question: "Question"
+      toggle_question_list: "toggle question list"
+      hide_tags: "hide tags"
+      color_legend: "color legend"
+      interaction_legend: "interaction legend"
+      criterion: "Criterion"
+      metric1: "metric-1"
+      review: "Review"
+      score: "Score"
+      comment: "comment"
+      Comment: "Comment"
+      additional_comments: "Additional Comments"
+      no_review_of: "NO REVIEW OF"
+      type_exists: "TYPE EXISTS"
+      grade_and_comment: "Grade and comment for submission"
+      grade: "Grade"
+      comment2: "Comment:"
+      show_tags: "show tags"
+      no_reviews_for_assignment: "There are no reviews for this assignment"
+      round: "Round"
+      of: "of"
+      interaction_legend_tooltip: "Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience."
+      metric_tooltip: "A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback."
+      sort_by_total_review_score: "Sort by total review score"
+      sort_by_total_review_score_tooltip: "Sort reviews in ascending/descending order of the total score. Consecutive clicks will alternate between ascending and descending sort order"
+      save: "Save"
+
+    participant_charts:
+      hide_stats: "hide stats"
+      stats: "Stats"
+
+    participant:
+      show_submission: "show submission"
+      show_review: "show reviews"
+      show_review_summary: "show review summary"
+      show_metareviews: "show metareviews"
+      show_author_feedback: "show author feedback"
+      show_teammate_reviews: "show teammate reviews"
+      view_heatgrid: "view heatgrid"
+      edit_score: "edit score"
+
+    participant_title:
+      submitted_work: "Submitted work"
+      reviewing: "Reviewing"
+      author_feedback: "Author Feedback"
+      teammate_review: "Teammate Review"
+      contributor: "Contributor"
+      average: "Average"
+      range: "Range"
+      final_score: "Final Score"
+
+
+  participants:
+    change_handle:
+      create_or_change: "Create or Change Handle for Current Assignment"
+      your: "Your"
+      handle: "handle"
+      is_the_way: "is the way you will be known to your reviewers."
+      for_example: "For example, if you are writing on a wiki, you might not want to use your Expertiza user-ID to show up on the wiki, because then your reviewers would know who they are reviewing. So, you are allowed to set up a handle instead. If you have a handle, then your wiki account is named after your handle, and your reviewers see your handle, but not your user-ID."
+      if_you_do_not: "If you do not have a handle, your user-ID will be used instead."
+      two_ways: "You can set up a handle in two ways:"
+      handle_for: "You can set up a handle for"
+      only_this_assignment: "only this assignment"
+      by_entering: "by entering a handle below."
+      you_can_set_up_default: "You can set up a \"default\" handle by editing your"
+      note_that: "Note that if you change your handle by editing your"
+      your_new_handle: "your new handle will be used for all"
+      future: "future"
+      assignments_if: "assignments; if you want the change to apply to this assignment too, you must also change it below."
+      change_handle: "Change handle"
+      for_current: "for current assignment"
+      warning: "Warning:"
+      you_must: "You must have a wiki account named after your handle.  If you do not, please e-mail your instructor or the course staff."
+      back: "Back"
+      handle_explanation: "For example, if you are writing on a wiki, you might not want to use your Expertiza user-ID to show up on the
+           wiki, because then your reviewers would know who they are reviewing. So, you are allowed to set up a handle instead.
+           If you have a handle, then your wiki account is named after your handle, and your reviewers see your handle,
+           but not your user-ID."
+
+  popup:
+    self_review_popup:
+      no_review_done: "No review done yet."
+      reviewer_score: "Reviewer's score"
+      self_review_of: "Self Review of"
+      question: " Question "
+      score: "Score"
+      comments: "Comments"
+      other_reviewer_score: "Reviewer Score (Σ weighted score/Σ weighted available score)"
+      additional_comments: "Additional comments"
+      no_comments: "No comments"
+      back: "Back"
+
+  student_quizzes:
+    index:
+      quiz_for: "Quizzes for "
+      assignment_not_support: "This assignment does not support quizzes"
+      back: "Back"
+
+    responses:
+      work_not_submit: "Work has not been submitted yet"
+      begin: "Begin"
+      view: "View"
+
+    set_dynamic_quiz:
+      select_topic: "Select a topic below to take a new quiz"
+      request_new_quiz: "Request a new quiz to take"
+
+    finished_quiz:
+      answers: "Answers"
+      quiz_score: "Quiz score: "
+      back: "Back"
+
+    review_questions:
+      quiz_listings: "Listing of all quiz questions for"
+      quiz_create: "Quiz created by"
+      topic: "Topic:"
+      quiz_taker: "Quiz taker"
+      quiz_score: "Quiz score"
+      avg_score: "Average score for quiz takers: "
+
+    take_quiz:
+      questions: "Questions"
+      submit_quiz: "Submit Quiz"
+
+  profile:
+    edit:
+      user_profile_info: "User Profile Information"
+      password_msg: "If password field is blank, the password will not be updated."
+      preferred_time_zone: "Preferred Time Zone"
+      save: "Save"
+      action_pref: "Action Preference"
+      homepage_cant: "homepage cannot show actions"
+      homepage_can: "homepage can show actions"
+
+
+    handle:
+      handle: "Handle"
+      handle_prof: "A \"handle\" can be used to conceal your username from people who view your wiki pages. If you have a handle,
+                     your wiki account should be named after your handle instead of after your user-ID.  If you do not have a handle,
+                     your Expertiza user-ID will be used instead. A blank entry in the field below will cause the handle to be set back to your Expertiza user-ID."
+      note: "Note: By using this form, you are changing your default handle, which will be used for all future assignments. To change your handle for a specific assignment, select that assignment and choose the Change Handle action."
+      default_handle: "Default handle"
+
+  users:
+    prefs:
+      email: "E-mail Options"
+      email_option: "Check the boxes representing the times when you want to receive e-mail."
+      email_review: "When someone else reviews my work"
+      email_other_review: "When someone else submits work I am assigned to review"
+      see_review: "When someone else reviews one of my reviews (metareviews my work)"
+      send_mail: "Send me copies of emails sent for assignments"
+      when_someone_else: "When someone else"
+      reviews: "reviews"
+      my_work: "my work"
+      submits: "submits"
+      reviews_one: "reviews one of my reviews"
+      work_assigned: "work I am assigned to review"
+      meta_reviews: "meta-reviews"
+
+    password:
+      password_label: "Password: "
+      confirm_password: "Confirm your password: "
+
+    name:
+      name_convention: "Full name (last, first[ middle]):"
+
+    institutions:
+      inst_name: "Institution "
+
+    email:
+      email_add: "E-mail address:"
+
+  datetime:
+    distance_in_words:
+      about_x_hours:
+        one: "about 1 hour"
+        other: "about %{count} hours"
+      about_x_months:
+        one: "about 1 month"
+        other: "about %{count} months"
+      about_x_years:
+        one: "about 1 year"
+        other: "about %{count} years"
+      almost_x_years:
+        one: "about 1 year"
+        other: "about %{count} years"
+      half_a_minute: "half minute"
+      less_than_x_minutes:
+        zero: "less than 0 minute"
+        one: "less than 1 minute"
+        other: "less than %{count} minute"
+      less_than_x_seconds:
+        zero: "less than 0 second"
+        one: "less than 1 second"
+        other: "less than %{count} seconds"
+      over_x_years:
+        one: "less than 1 year"
+        other: "more than %{count} years"
+      x_days:
+        one: "1 day"
+        other: "%{count} days"
+      x_hours:
+        one: "1 hour"
+        other: "%{count} hours"
+      x_minutes:
+        one: "1 minute"
+        other: "%{count} minute"
+      x_months:
+        one: "1 month"
+        other: "%{count} months"
+      x_years:
+        one: "1 year"
+        other: "%{count} years"
+      x_seconds:
+        one: "1 second"
+        other: "%{count} second"
+
+  shared:
+    footer_message:
+      help: "Help"
+      papers: "Papers on Expertiza"
+  activerecord:
+    errors:
+      messages:
+        record_invalid: 'Validation failed: %{errors}'
+        restrict_dependent_destroy:
+          has_one: Cannot delete record because a dependent %{record} exists
+          has_many: Cannot delete record because dependent %{record} exist
+  date:
+    abbr_day_names:
+    - Sun
+    - Mon
+    - Tue
+    - Wed
+    - Thu
+    - Fri
+    - Sat
+    abbr_month_names:
+    - 
+    - Jan
+    - Feb
+    - Mar
+    - Apr
+    - May
+    - Jun
+    - Jul
+    - Aug
+    - Sep
+    - Oct
+    - Nov
+    - Dec
+    day_names:
+    - Sunday
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+    formats:
+      default: "%m-%d-%Y"
+      long: "%B %d, %Y"
+      short: "%b %d"
+    month_names:
+    - 
+    - January
+    - February
+    - March
+    - April
+    - May
+    - June
+    - July
+    - August
+    - September
+    - October
+    - November
+    - December
+    order:
+    - :month
+    - :day
+    - :year
+  datetime:
+    distance_in_words:
+      about_x_hours:
+        one: about 1 hour
+        other: about %{count} hours
+      about_x_months:
+        one: about 1 month
+        other: about %{count} months
+      about_x_years:
+        one: about 1 year
+        other: about %{count} years
+      almost_x_years:
+        one: almost 1 year
+        other: almost %{count} years
+      half_a_minute: half a minute
+      less_than_x_seconds:
+        one: less than 1 second
+        other: less than %{count} seconds
+      less_than_x_minutes:
+        one: less than a minute
+        other: less than %{count} minutes
+      over_x_years:
+        one: over 1 year
+        other: over %{count} years
+      x_seconds:
+        one: 1 second
+        other: "%{count} seconds"
+      x_minutes:
+        one: 1 minute
+        other: "%{count} minutes"
+      x_days:
+        one: 1 day
+        other: "%{count} days"
+      x_months:
+        one: 1 month
+        other: "%{count} months"
+      x_years:
+        one: 1 year
+        other: "%{count} years"
+    prompts:
+      second: Second
+      minute: Minute
+      hour: Hour
+      day: Day
+      month: Month
+      year: Year
+  errors:
+    format: "%{attribute} %{message}"
+    messages:
+      accepted: must be accepted
+      blank: can't be blank
+      confirmation: doesn't match %{attribute}
+      empty: can't be empty
+      equal_to: must be equal to %{count}
+      even: must be even
+      exclusion: is reserved
+      greater_than: must be greater than %{count}
+      greater_than_or_equal_to: must be greater than or equal to %{count}
+      inclusion: is not included in the list
+      invalid: is invalid
+      less_than: must be less than %{count}
+      less_than_or_equal_to: must be less than or equal to %{count}
+      model_invalid: 'Validation failed: %{errors}'
+      not_a_number: is not a number
+      not_an_integer: must be an integer
+      odd: must be odd
+      other_than: must be other than %{count}
+      present: must be blank
+      required: must exist
+      taken: has already been taken
+      too_long:
+        one: is too long (maximum is 1 character)
+        other: is too long (maximum is %{count} characters)
+      too_short:
+        one: is too short (minimum is 1 character)
+        other: is too short (minimum is %{count} characters)
+      wrong_length:
+        one: is the wrong length (should be 1 character)
+        other: is the wrong length (should be %{count} characters)
+    template:
+      body: 'There were problems with the following fields:'
+      header:
+        one: 1 error prohibited this %{model} from being saved
+        other: "%{count} errors prohibited this %{model} from being saved"
+  helpers:
+    select:
+      prompt: Please select
+    submit:
+      create: Create %{model}
+      submit: Save %{model}
+      update: Update %{model}
+  number:
+    currency:
+      format:
+        delimiter: ","
+        format: "%u%n"
+        precision: 2
+        separator: "."
+        significant: false
+        strip_insignificant_zeros: false
+        unit: "$"
+    format:
+      delimiter: ","
+      precision: 3
+      separator: "."
+      significant: false
+      strip_insignificant_zeros: false
+    human:
+      decimal_units:
+        format: "%n %u"
+        units:
+          billion: Billion
+          million: Million
+          quadrillion: Quadrillion
+          thousand: Thousand
+          trillion: Trillion
+          unit: ''
+      format:
+        delimiter: ''
+        precision: 3
+        significant: true
+        strip_insignificant_zeros: true
+      storage_units:
+        format: "%n %u"
+        units:
+          byte:
+            one: Byte
+            other: Bytes
+          eb: EB
+          gb: GB
+          kb: KB
+          mb: MB
+          pb: PB
+          tb: TB
+    percentage:
+      format:
+        delimiter: ''
+        format: "%n%"
+    precision:
+      format:
+        delimiter: ''
+  support:
+    array:
+      last_word_connector: ", and "
+      two_words_connector: " and "
+      words_connector: ", "
+  time:
+    am: am
+    formats:
+      default: "%a, %d %b %Y %I:%M:%S %p %Z"
+      long: "%B %d, %Y %I:%M %p"
+      short: "%d %b %I:%M %p"
+    pm: pm

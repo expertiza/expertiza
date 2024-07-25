@@ -2,24 +2,25 @@
 
 <br/>
 <%= form_tag :action => 'show_if_authorized' do %>
-  <div style="margin: 8px auto; display: grid; grid-template-columns: repeat(3, auto) 1fr; grid-gap: 8px; align-items: center">
-    View user - enter exact login: <%= text_field_with_auto_complete :user, :name, {:size => 41, :class =>'form-control'} %>
-    <button type="submit" class="btn btn-primary">Edit</button>
-  </div>
+  View user - enter exact login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
+<input type='submit' value='Edit'/>
 <% end %>
 
 <%= form_tag :action => 'list', :paginate_show => '1', :num_users => @per_page do %>
-  <%= render :partial => 'search' %>
+  <%= label_tag :letter, 'Search users: ' %><%= text_field_tag(:letter,params[:letter]) %>
+<%= select_tag(:search_by, options_for_select([['Username', 1], ['Full name', 2], ['Email', 3]])) %>
+<%= submit_tag("Search") %>
 <% end %>
 
 <%= render :partial => 'links' %>
-<div>
-  <table class="table table-hover" style="width: 100%">
-    <tr>
-      <th class="head">UserID</th><th class="head">Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Meta-review</th></tr>
-    <% for user in @paginated_users %>
+
+<div class="exp">
+  <table>
+    <tr><th colspan=5></th><th colspan=3 class="head">E-mail on ...</th></tr>
+    <tr><th class="head">Name</th><th class="head">Full Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Meta-review</th><th class="head">Delete</th></tr>
+    <% @paginated_users.each do |user| %>
       <% if (params[:show] != 'true' && !user.name(session[:ip]).include?("_hidden")) || params[:show] == 'true'%>
-        <tr>
+        <tr class="exp">
           <td><%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %></td>
           <td><%= link_to user.fullname(session[:ip]), :controller=> 'users', :action => 'show', :id => user.id %></td>
           <td><%= user.email(session[:ip]) %></td>
@@ -46,7 +47,11 @@
 <div style="clear: both;"></div>
 <p>
   <%
-    session[:return_to] = "#{request.protocol}#{request.host_with_port}#{request.fullpath}"
-  %>
-  <%= render :partial => 'links' %>
+      session[:return_to] = "#{request.protocol}#{request.host_with_port}#{request.fullpath}"
+    %>
+
+  <%= link_to 'New user',:role => "Student", :action => 'new' %> |
+  <%= link_to 'Import users', :controller=>'import_file', :action=>'start', :model => 'User', :expected_fields => 'username&nbsp;&nbsp;|&nbsp;&nbsp;full name (first [middle] last)&nbsp;&nbsp;|&nbsp;&nbsp;e-mail address' %> |
+  <%= link_to 'Export users', :controller=>'export_file',:action=>'start',:model=> 'User',:id=> 1 %>
+
 </p>

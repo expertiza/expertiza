@@ -1,50 +1,9 @@
-<!-- JavaScript code for search functionality -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Getting references to the search input and all rows in the table
-        const studentSearch = document.getElementById('studentSearch');
-        const rows = document.querySelectorAll('table#myTable tr');
-
-        // Adding an event listener for input changes in the search field
-        studentSearch.addEventListener('input', function () {
-            // Getting the lowercase version of the search text
-            const searchText = studentSearch.value.toLowerCase();
-
-            // Iterating through each row in the table
-            rows.forEach(function (row, index) {
-                // Skipping the first two rows (header rows)
-                if (index < 2) {
-                    return;
-                }
-
-                // Getting the student name cell in each row
-                const studentNameCell = row.querySelector('td:first-child');
-
-                if (studentNameCell) {
-                    // Getting the lowercase version of the student name
-                    const studentName = studentNameCell.textContent.toLowerCase();
-
-                    // Checking if the student name includes the search text
-                    // Setting the row display style accordingly
-                    if (studentName.includes(searchText)) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                }
-            });
-        });
-    });
-</script>
-
 <style>
   th, td {
     text-align: center;
 }
 </style>
-<!-- HTML input for the search box -->
-<input type="text" id="studentSearch" placeholder="Search for a student">
-  <table id="myTable" class="table table-striped">
+  <table class="table table-striped">
     <tr>
       <th rowspan=2 width="320">Students</th>
       <th rowspan=2 width="30">Teammate Count</th>
@@ -55,7 +14,7 @@
     </tr>
     <tr>
       <% (0..@assignments.size).each do %>
-       <td><b>Metareviews</b></td>
+        <td><b>Metareviews</b></td>
         <td><b>Teammate Reviews</b></td>
       <% end %>
     </tr>

@@ -17,10 +17,6 @@
 <% end %>                              
 <% headers["Submitted item(s)"] = nil %>
 <!--E1877: table id changed -->
-</br>
-</br>
-<input type="text" id="searchTeamName" placeholder="Search team name" style="margin-right: 10px">
-<input type="text" id="searchTeamMembers" placeholder="Search team member name">
 <table id ="submissionsTable" class="table table-striped" style="margin-top: 50px">
     <thead>
     <!--E1877: class="sorter-true" added to sort all attributes-->
@@ -42,7 +38,7 @@
         <% end %>  
         <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Links</th> 
         <th class="sorter-false" style="font-weight: bold; font-size: 15px;"></th>
-      </tr>
+      </tr>                    
     </thead>
     <% @teams.each do |team| %>
       <tr>
@@ -112,37 +108,3 @@
   </table>
   <p> **In "Team name" column, text in <i style = "color:#0984e3">blue</i> indicates that the submission grade is not assigned; text in <i style = "color: #cd6133">brown</i> indicates that the submission grade has been assigned.</p>
 </div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("searchTeamName").addEventListener("input", function () {
-            searchTable();
-        });
-        document.getElementById("searchTeamMembers").addEventListener("input", function () {
-            searchTable();
-        });
-
-        function searchTable() {
-            var inputTeamName = document.getElementById("searchTeamName").value.toUpperCase();
-            var inputTeamMembers = document.getElementById("searchTeamMembers").value.toUpperCase();
-            var table = document.getElementById("submissionsTable");
-            var rows = table.getElementsByTagName("tr");
-
-            for (var i = 0; i < rows.length; i++) {
-                var row = rows[i];
-                var cellsName = row.getElementsByTagName("td")[0];
-                var cellsMembers = row.getElementsByTagName("td")[1];
-                if (cellsName && cellsMembers) {
-                    var textValueName = cellsName.textContent || cellsName.innerText;
-                    var textValueTeamMembers = cellsMembers.textContent || cellsMembers.innerText;
-                    if (textValueName.toUpperCase().includes(inputTeamName) && textValueTeamMembers.toUpperCase().includes(inputTeamMembers)) {
-                        row.style.display = "";
-                    } else {
-                        row.style.display = "none";
-                    }
-                }
-            }
-        }
-    });
-</script>
-

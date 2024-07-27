@@ -1,7 +1,7 @@
 # spec/controllers/lti_controller_spec.rb
 require 'rails_helper'
 
-ENV['LTI_BASE_URL'] = 'https://expertiza.ncsu.edu/'
+ENV['EXPERTIZA_BASE_URL'] = 'https://expertiza.ncsu.edu/'
 
 RSpec.describe LtiController, type: :controller do
   let(:valid_lti_params) do
@@ -35,12 +35,12 @@ RSpec.describe LtiController, type: :controller do
       end
 
       it 'authenticates and logs in the user' do
-        expect(controller).to receive(:redirect_to).with("#{ENV['LTI_BASE_URL']}/student_task/list", notice: 'Logged in successfully via LTI')
+        expect(controller).to receive(:redirect_to).with("#{ENV['EXPERTIZA_BASE_URL']}/student_task/list", notice: 'Logged in successfully via LTI')
         post :launch, params: valid_lti_params
       end
 
       it 'redirects to the student task list' do
-        expect(controller).to receive(:redirect_to).with("#{ENV['LTI_BASE_URL']}/student_task/list", notice: 'Logged in successfully via LTI')
+        expect(controller).to receive(:redirect_to).with("#{ENV['EXPERTIZA_BASE_URL']}/student_task/list", notice: 'Logged in successfully via LTI')
         post :launch, params: valid_lti_params
       end
     end
@@ -151,7 +151,7 @@ RSpec.describe LtiController, type: :controller do
         end
 
         it 'sets the session user and redirects to student task list' do
-          expect(controller).to receive(:redirect_to).with("#{ENV['LTI_BASE_URL']}/student_task/list", notice: 'Logged in successfully via LTI')
+          expect(controller).to receive(:redirect_to).with("#{ENV['EXPERTIZA_BASE_URL']}/student_task/list", notice: 'Logged in successfully via LTI')
           controller.send(:authenticate_and_login_user, 'testuser')
           expect(controller.session[:user]).to eq(user)
         end

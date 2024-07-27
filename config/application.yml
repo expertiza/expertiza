@@ -1,21 +1,21 @@
 # config/application.yml
 
 development:
-  lti_base_url: "http://152.7.177.3:8080"
+  expertiza_base_url: "http://152.7.177.3:8080"
   moodle_base_url: "http://152.7.177.192"
   LTI_CONSUMER_KEY: "123456"
   LTI_SHARED_ENCODER: "123456"
   LTI_TOOL_URL: "http://152.7.177.192"
 
 test:
-  lti_base_url: "https://expertiza.ncsu.edu/"
+  expertiza_base_url: "https://152.7.177.58/"
   moodle_base_url: "http://152.7.177.192"
   LTI_CONSUMER_KEY: "123456"
   LTI_SHARED_ENCODER: "123456"
   LTI_TOOL_URL: "http://152.7.177.192"
   
 production:
-  lti_base_url: "https://expertiza.ncsu.edu/"
+  expertiza_base_url: "https://expertiza.ncsu.edu/"
   moodle_base_url: "http://152.7.177.192"
   LTI_CONSUMER_KEY: "123456"
   LTI_SHARED_ENCODER: "123456"

@@ -18,7 +18,7 @@ on:
 jobs:
   production:
     if: inputs.environment == 'production'
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1

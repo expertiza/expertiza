@@ -26,14 +26,6 @@ jobs:
         run: |
           echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
           echo "PATH=$JAVA_HOME/bin:$PATH" >> $GITHUB_ENV
-
-      - name: Verify Java version
-        run: java -version
-
-      - name: Install dependencies
-        run: |
-          bundle config build.nokogiri --use-system-libraries
-          bundle install
           
       - uses: ruby/setup-ruby@v1
         with:

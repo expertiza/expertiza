@@ -22,10 +22,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Java
+      - name: Set up Java Path
         run: |
-          sudo apt-get update
-          sudo apt-get install -y openjdk-11-jdk
           echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
           echo "PATH=$JAVA_HOME/bin:$PATH" >> $GITHUB_ENV
 

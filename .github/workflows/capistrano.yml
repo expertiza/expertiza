@@ -29,7 +29,12 @@ jobs:
 
       - name: Verify Java version
         run: java -version
-        
+
+      - name: Install dependencies
+        run: |
+          bundle config build.nokogiri --use-system-libraries
+          bundle install
+          
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.7

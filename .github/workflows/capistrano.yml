@@ -24,7 +24,6 @@ jobs:
       - name: Set up Java Path
         run: |
           echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
-          echo "PATH=$JAVA_HOME/bin:$PATH" >> $GITHUB_ENV
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.4

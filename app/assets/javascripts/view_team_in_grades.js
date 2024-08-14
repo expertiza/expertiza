@@ -283,33 +283,33 @@ function drawTagGrid(rowData) {
 }
 
 // Generates the header rows and cells for the tag heatgrid with "Tags Completed # out of #"
-function drawHeader(table, headerTooltipText, gridWidth) {
-    let tHead = table.createTHead();
-    let row = tHead.insertRow();
-    row.setAttribute("class", "hide-scrollbar tablesorter-headerRow");
+// function drawHeader(table, headerTooltipText, gridWidth) {
+//     let tHead = table.createTHead();
+//     let row = tHead.insertRow();
+//     row.setAttribute("class", "hide-scrollbar tablesorter-headerRow");
 
-    // Create "Tags Completed:" Cell
-    let th = document.createElement("th");
-    let text = document.createTextNode("\u2195 Tags Completed");
-    th.setAttribute("text-align", "center");
-    th.setAttribute("id", "tagsSuperLabel");
-    th.colSpan = gridWidth;
-    addToolTip(th, "Click to collapse/expand");
-    th.appendChild(text);
-    row.appendChild(th);
-    row.setAttribute("onClick", "toggleHeatGridRows()");
+//     // Create "Tags Completed:" Cell
+//     let th = document.createElement("th");
+//     let text = document.createTextNode("\u2195 Tags Completed");
+//     th.setAttribute("text-align", "center");
+//     th.setAttribute("id", "tagsSuperLabel");
+//     th.colSpan = gridWidth;
+//     addToolTip(th, "Click to collapse/expand");
+//     th.appendChild(text);
+//     row.appendChild(th);
+//     row.setAttribute("onClick", "toggleHeatGridRows()");
 
-    // create "# out of #" Cell to show number of completed tags
-    row = tHead.insertRow();
-    th = document.createElement("th");
-    text = document.createTextNode("0 out of 0");
-    th.setAttribute("id", "tagsSuperNumber");
-    th.colSpan = gridWidth;
-    addToolTip(th, headerTooltipText);
-    th.appendChild(text);
-    row.appendChild(th);
-    row.setAttribute("onClick", "toggleHeatGridRows()");
-}
+//     // create "# out of #" Cell to show number of completed tags
+//     row = tHead.insertRow();
+//     th = document.createElement("th");
+//     text = document.createTextNode("0 out of 0");
+//     th.setAttribute("id", "tagsSuperNumber");
+//     th.colSpan = gridWidth;
+//     addToolTip(th, headerTooltipText);
+//     th.appendChild(text);
+//     row.appendChild(th);
+//     row.setAttribute("onClick", "toggleHeatGridRows()");
+// }
 
 // Generate a sub-heading heatgrid row, once per question, format: "Round 2 -- Question 3"
 function drawQuestionRow(priorQuestionNum, questionNum, roundNum, tRow, gridWidth, tooltipText, reviewNum, numRounds, roundPrefix, tBody) {

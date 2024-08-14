@@ -282,7 +282,7 @@ function drawTagGrid(rowData) {
     }
 }
 
-// Commeneted "Tags Completed" view, for clarity and to avoid confusion.
+// Commented out the "Tags Completed" view for clarity and to avoid confusion.
 // Generates the header rows and cells for the tag heatgrid with "Tags Completed # out of #"
 // function drawHeader(table, headerTooltipText, gridWidth) {
 //     let tHead = table.createTHead();

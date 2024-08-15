@@ -59,7 +59,6 @@ class CourseNode < Node
              else
                Ta.get_mapped_courses(user_id)
              end
-    puts"\n\n\n\n "+" values: " + values.inspect + " \n\n\n\n"
     values
   end
 

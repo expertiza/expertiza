@@ -134,12 +134,9 @@ describe TreeDisplayController do
 
       # create a new course
       @course1 = create(:course)
-      # make sure the course is not private
-      @course1.private = false
-      @course1.save
-
+      create(:course_node, course: @course1)
       @assignment_node1 = create(:assignment_node)
-      create(:course_node)
+      
 
       # make a teaching assistant
       user_ta = build(:teaching_assistant)
@@ -148,7 +145,7 @@ describe TreeDisplayController do
       @ta.save!
     end
 
-    it 'returns empty array if the logged in user is not ta' do
+    it 'returns an empty array if the logged in user is not TA' do
       # make a student for testing edge case
       user_student = build(:student)
       student = User.new(user_student.attributes)
@@ -184,8 +181,8 @@ describe TreeDisplayController do
       request_params = { reactParams: { child_nodes: params.to_json, nodeType: 'FolderNode' } }
       user_session = { user: @ta }
       get :get_folder_contents, params: request_params, session: user_session
-
-      # service should return the course as per the ta-course mapping
+    
+      # Service should return the course as per the TA-course mapping
       output = JSON.parse(response.body)['Courses']
       expect(output.length).to eq 1
       expect(output[0]['name']).to eq @course1.name

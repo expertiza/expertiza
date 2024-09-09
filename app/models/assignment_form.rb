@@ -136,29 +136,40 @@ class AssignmentForm
   def update_tag_prompt_deployments(attributes)
     unless attributes.nil?
       attributes.each do |key, value|
-        # We need to use destroy_all to delete all the dependents also.
-        TagPromptDeployment.where(id: value['deleted']).destroy_all if value.key?('deleted')
-        next unless value.key?('tag_prompt')
-
-        (0..value['tag_prompt'].count - 1).each do |i|
-          tag_dep = nil
-          if !((value['id'][i] == 'undefined') || (value['id'][i] == 'null') || value['id'][i].nil?)
-            tag_dep = TagPromptDeployment.find(value['id'][i])
-            if tag_dep
-              tag_dep.update(assignment_id: @assignment.id,
-                             questionnaire_id: key,
-                             tag_prompt_id: value['tag_prompt'][i],
-                             question_type: value['question_type'][i],
-                             answer_length_threshold: value['answer_length_threshold'][i])
-            end
-          else
-            TagPromptDeployment.new(assignment_id: @assignment.id,
-                                    questionnaire_id: key,
-                                    tag_prompt_id: value['tag_prompt'][i],
-                                    question_type: value['question_type'][i],
-                                    answer_length_threshold: value['answer_length_threshold'][i]).save
+        if @assignment.vary_by_topic?
+          @assignment.questionnaires.uniq.each do |questionnaire|
+            # We need to use destroy_all to delete all the dependents also.
+            TagPromptDeployment.where(assignment_id: @assignment.id,questionnaire_id: questionnaire.id).destroy_all if value.key?('deleted')
+            next unless questionnaire.type == 'ReviewQuestionnaire' && value.key?('tag_prompt')
+            create_or_update_tag_prompt_deployments(questionnaire.id,value)
           end
+        else
+          # We need to use destroy_all to delete all the dependents also.
+          TagPromptDeployment.where(id: value['deleted']).destroy_all if value.key?('deleted')
+          next unless value.key?('tag_prompt')
+          create_or_update_tag_prompt_deployments(key,value)
         end
+      end
+    end
+  end
+  
+  def create_or_update_tag_prompt_deployments(questionnaire_id, value)
+    (0..value['tag_prompt'].count - 1).each do |i|
+      tag_dep = nil
+      tag_params = {
+            assignment_id: @assignment.id,
+            questionnaire_id: questionnaire_id,
+            tag_prompt_id: value['tag_prompt'][i],
+            question_type: value['question_type'][i],
+            answer_length_threshold: value['answer_length_threshold'][i]
+        }
+      if !((value['id'][i] == 'undefined') || (value['id'][i] == 'null') || value['id'][i].nil?)
+        tag_dep = TagPromptDeployment.find(value['id'][i])
+        if tag_dep
+          tag_dep.update(tag_params)
+        end
+      else
+        TagPromptDeployment.new(tag_params).save
       end
     end
   end

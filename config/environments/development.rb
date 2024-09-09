@@ -20,7 +20,7 @@ Expertiza::Application.configure do
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
   # Print development logs
-  config.log_level = :error
+  config.log_level = :debug
 
   config.log_tags = %i[remote_ip uuid]
 

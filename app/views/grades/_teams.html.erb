@@ -32,7 +32,7 @@
 </thead>
 <!--E1877: tbody tag added to the table structure-->
 <tbody>
-<% 0.upto(@scores[:teams].length).each do |index| %>   
+<% 0.upto(@num_reviewers_assigned_scores).each do |index| %>   
      <%= render :partial => 'grades/team',
                 :locals => {:prefix => 'team'+index.to_s,
                             :tscore => @scores[:teams][index.to_s.to_sym],

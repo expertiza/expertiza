@@ -50,59 +50,26 @@ class SignUpTopic < ApplicationRecord
     SignedUpTeam.find_by_sql(['SELECT u.id FROM sign_up_topics t, signed_up_teams u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = ? and u.team_id = ?', assignment_id.to_s, team_id.to_s])
   end
 
-  def self.slotAvailable?(topic_id)
+  def slot_available?
+    topic_id = self.id
+    # Retrieve the SignUpTopic record based on the given topic_id
     topic = SignUpTopic.find(topic_id)
+    
+    # Find the number of students who have selected the topic and are not waitlisted
     no_of_students_who_selected_the_topic = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: false)
-
+  
+    # Check if no students have selected the topic yet
     if no_of_students_who_selected_the_topic.nil?
       return true
     else
+      # Check if the number of students who selected the topic is less than the maximum allowed
       if topic.max_choosers > no_of_students_who_selected_the_topic.size
-        return true
+        return true # There are available slots for this topic
       else
-        return false
+        return false # All slots for this topic are filled
       end
     end
-  end
-
-  def self.reassign_topic(session_user_id, assignment_id, topic_id)
-    # find whether assignment is team assignment
-    assignment = Assignment.find(assignment_id)
-
-    # making sure that the drop date deadline hasn't passed
-    dropDate = AssignmentDueDate.where(parent_id: assignment.id, deadline_type_id: '6').first
-    if dropDate.nil? || dropDate.due_at >= Time.now
-      # if team assignment find the creator id from teamusers table and teams
-      # ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
-      # to treat all assignments as team assignments
-      # users_team will contain the team id of the team to which the user belongs
-      users_team = SignedUpTeam.find_team_users(assignment_id, session_user_id)
-      signup_record = SignedUpTeam.where(topic_id: topic_id, team_id:  users_team[0].t_id).first
-      assignment = Assignment.find(assignment_id)
-      # if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
-      unless assignment.is_intelligent?
-        unless signup_record.try(:is_waitlisted)
-          # find the first wait listed user if exists
-          first_waitlisted_user = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
-
-          unless first_waitlisted_user.nil?
-            # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
-            ### Bad policy!  Should be changed! (once users are allowed to specify waitlist priorities) -efg
-            first_waitlisted_user.is_waitlisted = false
-            first_waitlisted_user.save
-
-            # ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
-            # to treat all assignments as team assignments
-            Waitlist.cancel_all_waitlists(first_waitlisted_user.team_id, assignment_id)
-          end
-        end
-      end
-      signup_record.destroy unless signup_record.nil?
-      ExpertizaLogger.info LoggerMessage.new('SignUpTopic', session_user_id, "Topic dropped: #{topic_id}")
-    else
-      # flash[:error] = "You cannot drop this topic because the drop deadline has passed."
-    end # end condition for 'drop deadline' check
-  end
+  end  
 
   def self.assign_to_first_waiting_team(next_wait_listed_team)
     team_id = next_wait_listed_team.team_id
@@ -160,4 +127,89 @@ class SignUpTopic < ApplicationRecord
       return 'failed'
     end
   end
+
+  def longest_waiting_team(topic_id)
+    # Find and return the team that has been waiting the longest for the specified topic.
+
+    # Find the first waitlisted user (team) for the given topic by querying the SignedUpTeam table.
+    # Check for records where the topic_id matches the specified topic_id and is_waitlisted is true.
+    first_waitlisted_user = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first   
+    # If a waitlisted user (team) is found, return it as the team that has been waiting the longest.
+    unless first_waitlisted_user.nil?
+      return first_waitlisted_user
+    end 
+    # If no waitlisted user is found, return nil to indicate that there are no teams waiting.
+    return nil
+  end
+
+  def reassign_topic(team_id)
+    # Reassigns topic when a team is dropped from a topic.
+    # Get the topic ID for reassignment.
+    topic_id = self.id
+    # Fetch the record in SignedUpTeam where topic_id matches the topic that needs reassignment
+    # and team_id matches the provided team_id. Retrieve the first matching record.
+    signup_record = SignedUpTeam.where(topic_id: topic_id, team_id:  team_id).first
+    # If the signup record is not marked as waitlisted (is_waitlisted is either false or nil),
+    # proceed with reassignment.
+    unless signup_record.try(:is_waitlisted)
+      # Find the longest waiting team for the same topic.
+      longest_waiting_team  = longest_waiting_team(topic_id)
+      # If a longest waiting team is found, proceed with reassignment.
+      unless longest_waiting_team.nil?
+        # Assign the topic to the longest waiting team.
+        # Update the is_waitlisted boolean to false for the longest waiting team.
+        longest_waiting_team.is_waitlisted = false
+        longest_waiting_team.save
+        # Drop all waitlisted records for that team.
+        SignedUpTeam.drop_off_waitlists(longest_waiting_team.team_id)
+      end
+    end
+    # Delete the entry for the team that was either previously assigned or waiting.
+    SignedUpTeam.drop_signup_record(topic_id, team_id)
+  end
+
+  # Method to handle the process when a user signs up
+  def sign_team_up(team_id)
+    topic_id = self.id
+    team = Team.find(team_id)
+    # Fetch all topics for the user within the team for the assignment
+    user_signup = SignedUpTeam.find_user_signup_topics(team.parent_id, team_id)
+    # Check if the user is already signed up and waitlisted for the topic
+    if !user_signup.empty?
+      return false unless user_signup.first&.is_waitlisted == true
+    end
+    # Create a new SignedUpTeam instance with the provided topic and team details
+    signup = SignedUpTeam.new(topic_id: topic_id, team_id: team_id)
+    @signed_topic = SignUpTopic.find_by(id: topic_id)
+    if @signed_topic.slot_available?
+      # Assign the topic to the team if a slot is available and drop off the team from all waitlists
+      SignUpTopic.assign_topic_to_team(signup, topic_id)
+      # Once assigned, drop all the waitlisted topics for this team
+      result = SignedUpTeam.drop_off_waitlists(team_id)
+    else
+      # Save the team as waitlisted if no slots are available
+      result = SignUpTopic.save_waitlist_entry(signup, team_id)
+    end
+    result
+  end
+
+  # Method to assign a topic to the team and update the waitlist status
+  def self.assign_topic_to_team(signup, topic_id)
+    # Set the team's waitlist status to false as they are assigned a topic
+    signup.update(is_waitlisted: false)
+    # Update the topic_id in the signed_up_teams table for the user
+    signed_up_team = SignedUpTeam.find_by(topic_id: topic_id)
+    signed_up_team.update(topic_id: topic_id) if signed_up_team
+  end
+
+  # Method to save the user as waitlisted if no slots are available
+  def self.save_waitlist_entry(signup, team_id)
+    signup.is_waitlisted = true
+    # Save the user's waitlist status
+    result = signup.save
+    # Log the creation of the sign-up sheet for the waitlisted user
+    ExpertizaLogger.info(LoggerMessage.new('SignUpSheet', '', "Sign up sheet created for waitlisted with teamId #{team_id}"))
+    result
+  end
+
 end

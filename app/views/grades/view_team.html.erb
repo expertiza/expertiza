@@ -75,7 +75,7 @@
         <% if vm.list_of_reviewers.length > 0 %>
 
           <!-- display the list of questions for this questionnaire -->
-          <div id="hid<%= vm.questionnaire_type + vm.round.to_s %>" class="accordion-body collapse" style="max-width: 80%">
+          <div id="hid<%= vm.questionnaire_type + vm.round.to_s %>" class="accordion-body" style="max-width: 80%; display: none;">
             <table class="table table-striped">
               <thead>
               <th>#</th>
@@ -99,7 +99,7 @@
                     (<%=t ".round"%>: <%= vm.round.to_s  %> <%=t ".of"%> <%= vm.rounds.to_s  %>)
                 <%end %>
               </h4>
-              <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions"><%=t ".toggle_question_list"%></span>
+              <span class="spn_qsttog" onclick="toggleQuestionnaire('hid<%= vm.questionnaire_type + vm.round.to_s %>')" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions"><%=t ".toggle_question_list"%></span>
             <% if @assignment.is_answer_tagging_allowed %>
             <span class="spn_qsttog" id="tag_prompt_toggler" title=""><%=t ".hide_tags"%></span>
             <% end %>

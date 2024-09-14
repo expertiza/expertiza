@@ -3,6 +3,10 @@ class QuizQuestionnairesController < QuestionnairesController
 
   # Quiz questionnaire edit option to be allowed for student
   def action_allowed?
+    if params[:action] == 'review_questions' && current_user_has_ta_privileges?
+      review_questions
+      return true
+    end
     if params[:action] == 'edit'
       @questionnaire = Questionnaire.find(params[:id])
       current_user_has_admin_privileges? || current_user_is_a?('Student')
@@ -282,5 +286,16 @@ class QuizQuestionnairesController < QuestionnairesController
   def questionnaire_params
     params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
                                           :max_question_score, :type, :display_type, :instruction_loc)
+  end
+ 
+  # Return all the quizzes created by team for the assignment.
+  def review_questions
+    @quiz_creator_user_id = params[:aid]
+    @quiz_questionnaires = []
+    Team.where(parent_id: params[:aid]).each do |quiz_creator| #Get all teams of participant who created quizzes
+      Questionnaire.where(instructor_id: quiz_creator.id).each do |questionnaire| #Get all quizzes of the team
+        @quiz_questionnaires.push questionnaire #Populate all the questionnaire of a quiz
+      end
+    end
   end
 end

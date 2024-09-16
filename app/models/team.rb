@@ -180,7 +180,9 @@ class Team < ApplicationRecord
 
   # Generate the team name
   def self.generate_team_name(_team_name_prefix = '')
-    last_team = Team.where('name LIKE ?', "#{_team_name_prefix} Team_%").order(name: :desc).first
+    last_team = Team.where('name LIKE ?', "#{_team_name_prefix} Team_%")
+                  .order("CAST(SUBSTRING(name, LENGTH('#{_team_name_prefix} Team_') + 1) AS UNSIGNED) DESC")
+                  .first
     counter = last_team ? last_team.name.scan(/\d+/).first.to_i + 1 : 1
     team_name = "#{_team_name_prefix} Team_#{counter}"
     team_name

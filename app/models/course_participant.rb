@@ -12,7 +12,7 @@ class CourseParticipant < Participant
 
   # provide import functionality for Course Participants
   # if user does not exist, it will be created and added to this assignment
-  def self.import(row_hash, _row_header = nil, session, id)
+  def self.import(row_hash, _row_header = nil, session, course_id)
     raise ArgumentError, 'No user id has been specified.' if row_hash.empty?
 
     user = User.find_by(name: row_hash[:username])
@@ -22,11 +22,11 @@ class CourseParticipant < Participant
       attributes = ImportFileHelper.define_attributes(row_hash)
       user = ImportFileHelper.create_new_user(attributes, session)
     end
-    course = Course.find(id)
-    raise ImportError, 'The course with the id "' + id.to_s + '" was not found.' if course.nil?
+    course = Course.find(course_id)
+    raise ImportError, 'The course with the id "' + course_id.to_s + '" was not found.' if course.nil?
 
-    unless CourseParticipant.exists?(user_id: user.id, parent_id: id)
-      CourseParticipant.create(user_id: user.id, parent_id: id)
+    unless CourseParticipant.exists?(user_id: user.id, parent_id: course_id)
+      CourseParticipant.create(user_id: user.id, parent_id: course_id)
     end
   end
 

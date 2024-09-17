@@ -1,22 +1,13 @@
 class CourseTeam < Team
   belongs_to :course, class_name: 'Course', foreign_key: 'parent_id'
 
-  # NOTE: inconsistency in naming of users that's in the team
-  #   currently they are being called: member, participant, user, etc...
-  #   suggestion: refactor all to participant
-
   # Get parent course
   def parent_model
     'Course'
   end
 
-  def self.parent_model(id)
-    Course.find(id)
-  end
-
-  # since this team is not an assignment team, the assignment_id is nil.
-  def assignment_id
-    nil
+  def self.parent_model(course_id)
+    Course.find(course_id)
   end
 
   # Prototype method to implement prototype pattern
@@ -25,7 +16,7 @@ class CourseTeam < Team
   end
 
   # Copy this course team to the assignment team
-  def copy(assignment_id)
+  def copy_to_assignment_team(assignment_id)
     assignment = Assignment.find_by(id: assignment_id)
     if assignment.auto_assign_mentor
       new_team = MentoredTeam.create_team_and_node(assignment_id)
@@ -37,33 +28,39 @@ class CourseTeam < Team
     copy_members(new_team)
   end
 
-  # deprecated: the functionality belongs to course
-  def add_participant(course_id, user)
-    if CourseParticipant.find_by(parent_id: course_id, user_id: user.id).nil?
-      CourseParticipant.create(parent_id: course_id, user_id: user.id, permission_granted: user.master_permission_granted)
+    # Delegates the import functionality to the TeamCsvHandler.
+  def self.import_from_csv(row, course_id, options = {})
+    TeamCsvHandler.import(row, course_id, options)
+  end
+
+  # Delegates the export functionality to the TeamCsvHandler.
+  def self.export_to_csv(parent_id, options = {})
+    TeamCsvHandler.export(parent_id, options)
+  end
+
+  # Defines the fields to be exported for the CSV, based on options provided.
+  def self.export_fields(options = {})
+    TeamCsvHandler.export_fields(options)
+  end
+	
+# Adds a participant to the course.
+  def add_participant(user_name)
+    user = User.find_by(name: user_name)
+    if user.nil?
+      raise 'No user account exists with the name ' + user_name + ". Please <a href='" + url_for(controller: 'users', action: 'new') + "'>create one</a>."
     end
-  end
-
-  # Import from csv
-  def self.import(row, course_id, options)
-    raise ImportError, 'The course with the id "' + course_id.to_s + "\" was not found. <a href='/courses/new'>Create</a> this course?" if Course.find(course_id).nil?
-
-    @course_team = prototype
-    Team.import(row, course_id, options, @course_team)
-  end
-
-  # Export to csv
-  def self.export(csv, parent_id, options)
-    @course_team = prototype
-    Team.export(csv, parent_id, options, @course_team)
-  end
-
-  # Export the fields of the csv column
-  def self.export_fields(options)
-    fields = []
-    fields.push('Team Name')
-    fields.push('Team members') if options[:team_name] == 'false'
-    fields.push('Course Name')
+    begin
+      participant = CourseParticipant.find_by(parent_id: id, user_id: user.id)
+      if participant # If there is already a participant, raise an error. Otherwise, create it
+        raise "The user #{user.name} is already a participant."
+      else
+				CourseParticipant.create(parent_id: id, user_id: user.id, permission_granted: user.master_permission_granted)
+      end
+    rescue ActiveRecord::RecordNotFound => e
+      raise "Error adding participant: #{e.message}"
+    rescue ActiveRecord::RecordInvalid => e
+      raise "Error adding participant: #{e.message}"
+    end
   end
 
   # Add member to the course team

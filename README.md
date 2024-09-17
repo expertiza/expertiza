@@ -22,7 +22,7 @@ Life is full of tradeoffs. :-) The good news is that you can start on one enviro
 and switch to another environment if you don't like the one you started with.
 
 Steps after getting a VCL reservation
-  * Clone the code
+  * Cloning the code
   * Run `bash setup.sh`
   * Run `sudo gem install bundler -v 1.16.6`
   * Run `bundle install`

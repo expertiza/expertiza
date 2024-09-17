@@ -201,42 +201,42 @@ class Team < ApplicationRecord
   end
 
   #  changed to hash by E1776
-  def self.import(row_hash, id, options, teamtype)
+  def self.import(row_hash, course_id, options, teamtype)
     raise ArgumentError, 'Not enough fields on this line.' if row_hash.empty? || (row_hash[:teammembers].empty? && (options[:has_teamname] == 'true_first' || options[:has_teamname] == 'true_last')) || (row_hash[:teammembers].empty? && (options[:has_teamname] == 'true_first' || options[:has_teamname] == 'true_last'))
-
+  
     if options[:has_teamname] == 'true_first' || options[:has_teamname] == 'true_last'
       name = row_hash[:teamname].to_s
-      team = where(['name =? && parent_id =?', name, id]).first
+      team = where(['name =? && parent_id =?', name, course_id]).first
       team_exists = !team.nil?
-      name = handle_duplicate(team, name, id, options[:handle_dups], teamtype)
+      name = handle_duplicate(team, name, course_id, options[:handle_dups], teamtype)
     else
       if teamtype.is_a?(CourseTeam)
-        name = generate_team_name(Course.find(id).name)
+        name = generate_team_name(Course.find(course_id).name)
       elsif teamtype.is_a?(AssignmentTeam)
-        name = generate_team_name(Assignment.find(id).name)
+        name = generate_team_name(Assignment.find(course_id).name)
       end
     end
     if name
-      team = Object.const_get(teamtype.to_s).create_team_and_node(id)
+      team = Object.const_get(teamtype.to_s).create_team_and_node(course_id)
       team.name = name
       team.save
     end
-
+  
     # insert team members into team unless team was pre-existing & we ignore duplicate teams
-
+  
     team.import_team_members(row_hash) unless team_exists && options[:handle_dups] == 'ignore'
   end
 
   # Handle existence of the duplicate team
-  def self.handle_duplicate(team, name, id, handle_dups, teamtype)
+  def self.handle_duplicate(team, name, course_id, handle_dups, teamtype)
     return name if team.nil? # no duplicate
     return nil if handle_dups == 'ignore' # ignore: do not create the new team
-
+  
     if handle_dups == 'rename' # rename: rename new team
       if teamtype.is_a?(CourseTeam)
-        return generate_team_name(Course.find(id).name)
+        return generate_team_name(Course.find(course_id).name)
       elsif  teamtype.is_a?(AssignmentTeam)
-        return generate_team_name(Assignment.find(id).name)
+        return generate_team_name(Assignment.find(course_id).name)
       end
     end
     if handle_dups == 'replace' # replace: delete old team

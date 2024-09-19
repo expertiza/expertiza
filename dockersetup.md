@@ -87,12 +87,12 @@ Docker containers allow you to run a much more efficient "virtual machine" or "c
 
 `docker-compose up`
 
-Starts the expertiza services (mysql database, redis, and rails) in attached mode (if you close your terminal it will shudown these services)
+Starts the expertiza services (mysql database, redis, and rails) in attached mode (if you close your terminal it will shutdown these services)
 
 
 `docker-compose up -d `
 
-Starts the expertiza services (mysql database, redis, and rails) in detached mode (if you close your terminal it will **not** shudown these services)
+Starts the expertiza services (mysql database, redis, and rails) in detached mode (if you close your terminal it will **not** shutdown these services)
 
 
 `docker-compose down`

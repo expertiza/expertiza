@@ -4,7 +4,7 @@ describe LockController do
   let(:student1) { build(:student, id: 21, role_id: 1) }
   let(:lock1) { build(:lock, id: 1, user: instructor1, lockable_type: 'test lockable') }
 
-  # Testing the action_allowed function with diffent roles
+  # Testing the action_allowed function with different roles
   # only current role can release the lock
   #
   describe '#action_allowed?' do

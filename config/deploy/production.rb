@@ -6,7 +6,7 @@
 # server "example.com", user: "deploy", roles: %w{app db web}, my_property: :my_value
 # server "example.com", user: "deploy", roles: %w{app web}, other_property: :other_value
 # server "db.example.com", user: "deploy", roles: %w{db}
-server '10.0.0.1', user: 'expertiza', roles: %w[web app]
+server 'lin-res103.csc.ncsu.edu', user: 'expertiza', roles: %w[web app]
 
 set :default_env, 'JAVA_HOME' => '/usr/jdk-11'
 set :branch, 'main'
@@ -23,9 +23,9 @@ set :rvm_ruby_version, '2.4'
 # role :app, %w{deploy@example.com}, my_property: :my_value
 # role :web, %w{user1@primary.com user2@additional.com}, other_property: :other_value
 # role :db,  %w{deploy@example.com}
-role :app, %w[expertiza@10.0.0.1]
-role :web, %w[expertiza@10.0.0.1]
-role :db,  %w[expertiza@10.0.0.1]
+role :app, %w[expertiza@lin-res103.csc.ncsu.edu]
+role :web, %w[expertiza@lin-res103.csc.ncsu.edu]
+role :db,  %w[expertiza@lin-res103.csc.ncsu.edu]
 
 # Configuration
 # =============

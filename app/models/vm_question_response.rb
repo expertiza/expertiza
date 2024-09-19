@@ -10,6 +10,7 @@ class VmQuestionResponse
   def initialize(questionnaire, assignment = nil, round = nil)
     @assignment = assignment
     @questionnaire = questionnaire
+    @round = round
     if questionnaire.type == 'ReviewQuestionnaire'
       @round = round || AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
     end
@@ -24,7 +25,7 @@ class VmQuestionResponse
     @questionnaire_type = questionnaire.type
     @questionnaire_display_type = questionnaire.display_type
     @rounds = rounds
-    @round = round
+
     @name  = questionnaire.name
   end
 
@@ -59,7 +60,7 @@ class VmQuestionResponse
       @list_of_reviews = reviews
     elsif @questionnaire_type == 'AuthorFeedbackQuestionnaire' # ISSUE E-1967 updated
       reviews = []
-      # finding feedbacks where current pariticipant of assignment (author) is reviewer
+      # finding feedbacks where current participant of assignment (author) is reviewer
       feedbacks = FeedbackResponseMap.where(reviewer_id: participant.id)
       feedbacks.each do |feedback|
         # finding the participant ids for each reviewee of feedback
@@ -187,7 +188,7 @@ class VmQuestionResponse
       answers.each do |answer|
         @list_of_rows.each do |row|
           row.metric_hash["> 20 Word Comments"] = 0 if row.metric_hash["> 20 Word Comments"].nil?
-          row.metric_hash["> 20 Word Comments"] = row.metric_hash["> 20 Word Comments"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 1
+          row.metric_hash["> 20 Word Comments"] = row.metric_hash["> 20 Word Comments"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 20
         end
       end
     end

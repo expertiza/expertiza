@@ -107,6 +107,7 @@ class CoursesController < ApplicationController
       flash[:error] = $ERROR_INFO
     end
     @course.destroy
+    flash[:success] = 'The course was successfully deleted.'
     undo_link("The course \"#{@course.name}\" has been successfully deleted.")
     redirect_to controller: 'tree_display', action: 'list'
   end

@@ -127,15 +127,17 @@ describe SubmittedContentController do
         expect(flash[:error]).to be_present # not checking message content since it uses variable size limit
       end
       it 'flashes error for file of unexpected type' do
-        allow(SubmittedContentController).to receive(:check_content_type_integrity).and_return(false)
-        allow(MimeMagic).to receive(:by_magic).and_return("not valid")
+        allow(SubmittedContentController).to receive(:check_extension_integrity).and_return(false)
         allow_any_instance_of(Rack::Test::UploadedFile::String).to receive(:read).and_return("")
+        allow_any_instance_of(Rack::Test::UploadedFile::String).to receive(:original_filename).and_return("")
         file = Rack::Test::UploadedFile.new("#{Rails.root}/spec/fixtures/files/helloworld.c")
         params = {uploaded_file: file,
                   id: 1}
         response = get :submit_file, params: params
         expect(response).to redirect_to(action: :edit, id: 1)
-        expect(flash[:error]).to eq 'File type error'
+        expect(flash[:error]).to eq "File extension does not match. "\
+                                    "Please upload one of the following: "\
+                                    "pdf, png, jpeg, zip, tar, gz, 7z, odt, docx, md, rb, mp4, txt"
       end
       # we could test that file is written and submission record is created, but we could have to
       # make assumptions about how path is formed and user input for path/filename is sanitized.  We don't want
@@ -208,15 +210,17 @@ describe SubmittedContentController do
         expect(flash[:error]).to be_present # not checking message content since it uses variable size limit
       end
       it 'flashes error for file of unexpected type' do
-        allow(SubmittedContentController).to receive(:check_content_type_integrity).and_return(false)
-        allow(MimeMagic).to receive(:by_magic).and_return("not valid")
+        allow(SubmittedContentController).to receive(:check_extension_integrity).and_return(false)
         allow_any_instance_of(Rack::Test::UploadedFile::String).to receive(:read).and_return("")
+        allow_any_instance_of(Rack::Test::UploadedFile::String).to receive(:original_filename).and_return("")
         file = Rack::Test::UploadedFile.new("#{Rails.root}/spec/fixtures/files/helloworld.c")
         params = {uploaded_file: file,
                   id: 1}
         response = get :submit_file, params: params
         expect(response).to redirect_to(action: :edit, id: 1)
-        expect(flash[:error]).to eq 'File type error'
+        expect(flash[:error]).to eq "File extension does not match. "\
+                                    "Please upload one of the following: "\
+                                    "pdf, png, jpeg, zip, tar, gz, 7z, odt, docx, md, rb, mp4, txt"
       end
       # we could test that file is written and submission record is created, but we could have to
       # make assumptions about how path is formed and user input for path/filename is sanitized.  We don't want
@@ -365,7 +369,7 @@ describe SubmittedContentController do
     end
   end
 
-  ### NEED TO DO check_content_type_integrity
+  ### NEED TO DO check_extension_integrity
 
   describe '#check_content_size' do
     it "file size 500 should succeed" do

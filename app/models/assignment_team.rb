@@ -217,6 +217,9 @@ class AssignmentTeam < Team
     return nil unless teams_users
 
     teams_users.each do |teams_user|
+      if teams_user.team_id == nil
+        next
+      end
       team = Team.find(teams_user.team_id)
       return team if team.parent_id == participant.parent_id
     end

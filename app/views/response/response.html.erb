@@ -301,7 +301,7 @@
   <% if @map.assignment.team_assignment? %>
     <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id%>
 
-    <% participant = Participant.find(team_member) %>
+   <% participant = Participant.find_by(user_id: team_member) %>
     <div style="float:right">
       <%= link_to "Email the author", author_response_index_path(email: participant.user.email, response: @response.id) %>
     </div>
@@ -355,7 +355,7 @@
 
 
 <h2>Directions for the reviewer</h2>
-<input type="checkbox" id="autosave_cbx" checked>
+<input type="checkbox" id="autosave_cbx">
 <label id="autosave_cbx_lbl" for="autosave_cbx"></label>
 <div id="save_progress"></div>
 <%= form_tag({ :action => @next_action }, :id => @modified_object, :class => "review_form") do %>

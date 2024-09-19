@@ -63,8 +63,8 @@ describe AssignmentSurveyResponseMap, type: :model do
         to: 'expertiza.debugging@gmail.com'
       }
       email = @assignment_survey_response_map.email(defn, participant, assignment)
-      expect(email.from[0]).to eq('expertiza.debugging@gmail.com')
-      expect(email.to[0]).to eq('expertiza.debugging@gmail.com')
+      expect(email.from[0]).to eq('expertiza.mailer@gmail.com')
+      expect(email.to[0]).to eq('expertiza.mailer@gmail.com')
     end
   end
 end

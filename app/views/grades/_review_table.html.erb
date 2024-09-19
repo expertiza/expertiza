@@ -1,5 +1,5 @@
 <table class="table table-striped grades" class="width: 100%">
-  <%if ctrl=='review' && @assignment.vary_by_round? %>
+  <%if ctrl=='review' && @assignment.varying_rubrics_by_round? %>
       <% reviews = reviews.select{|response| response.round == round}.reverse.uniq{|response| response.map_id}.sort_by{|response| response.map_id} %>
   <%else%>
       <% reviews = reviews.sort_by{|response| response.map_id} %>
@@ -28,7 +28,8 @@
 
 		<% for review in reviews %>
 		   <td align="center">
-             <% score = Response.score(:response => [review], :questions => @questions) %>
+             <% symbol = "review" + review.round.to_s %>
+             <% score = Response.score(:response => [review], :questions => @questions[symbol.to_sym]) %>
              <% unless controller.action_name == "view_my_scores" %>
                <input type="hidden" class="form-control" id="mailer_<%= review.map.reviewer.fullname(session[:ip]) %>_grade" name="mailer[<%= review.map.reviewer.fullname(session[:ip]) %>_grade]" value="<%= score %>">
              <% end %>

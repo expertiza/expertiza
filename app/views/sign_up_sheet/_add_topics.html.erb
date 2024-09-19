@@ -57,7 +57,7 @@
                     'Topic Link <em>(optional)</em>' %> |
 
     <input type="button" value="Delete selected topics" onclick="deleteTopics()" />|
-    <input id='select_all' type="checkbox" onClick="selectAll(this)" />Select All |
+    <input type="button" value="Delete all topics" onclick="deleteAllTopics()" />|
 <% end %>
 
 <script>
@@ -71,7 +71,29 @@
                 topic_identifiers.push(topic_id);
                 
             });
-            
+            jQuery.ajax({
+                url: '/sign_up_sheet/delete_all_selected_topics',
+                method: 'POST',
+                data: {
+                    topic_ids: topic_identifiers,
+                    assignment_id: <%= @assignment.id %>  
+                },
+                success: function() {
+                    location.reload();
+                }
+            });
+        } else {
+            window.location.href = '<%= edit_assignment_path(@assignment.id) + "#tabs-2" %>';
+        }
+    }
+    function deleteAllTopics() {
+        var msg = 'Are you sure? It will delete all topics';
+        if (confirm(msg)) {
+            var topic_identifiers = []
+            $("#topics tr").each(function(topic) {
+                var topic_id = $(this).closest('tr').find('#topic_id').text();
+                topic_identifiers.push(topic_id);
+            });
             jQuery.ajax({
                 url: '/sign_up_sheet/delete_all_selected_topics',
                 method: 'POST',

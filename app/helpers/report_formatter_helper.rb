@@ -13,7 +13,7 @@ module ReportFormatterHelper
   def feedback_response_map(params, _session = nil)
     assign_basics(params)
     # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model
-    if @assignment.vary_by_round?
+    if @assignment.varying_rubrics_by_round?
       @authors, @all_review_response_ids_round_one, @all_review_response_ids_round_two, @all_review_response_ids_round_three =
         FeedbackResponseMap.feedback_response_report(@id, @type)
     else

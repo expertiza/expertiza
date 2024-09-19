@@ -157,7 +157,7 @@ class ResponseController < ApplicationController
     # So do the answers, otherwise the response object can't find the questionnaire when the user hasn't saved his new review and closed the window.
     # A new response has to be created when there hasn't been any reviews done for the current round,
     # or when there has been a submission after the most recent review in this round.
-    @response = @response.create_or_get_response(@map, @current_round)
+    @response = @response.create_or_get_response(@map, @current_round.to_i)
     questions = sort_questions(@questionnaire.questions)
     store_total_cake_score
     init_answers(questions)

@@ -1,55 +1,323 @@
+<style>
+
+
+  .review-table {
+
+    margin-right: 2%;
+
+  }
+
+  .table-header {
+
+    background-color: #F8F8F8;
+
+    font-weight: bold;
+
+  }
+
+  .back-button {
+
+    margin-top: 20px;
+
+  }
+
+</style>
+
 <h1>Bidding sheet for <%= @assignment.name %> reviews</h1>
-<div style="display:block">
-  <h3 style="width: 40%; float: left">Topics</h3>
-  <h3 style="width: 40%; float:right">Review Bid Selections</h3>
-</div>
 
-<div style="display:block">
-  <div style="display:inline-block" >
-    <!--Topics table-->
-    <table style="width: 48%; float: left" class="general">
-      <tr><%= render :partial => 'sign_up_sheet/review_bids_table_header' %></tr>
-      <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
-          <b>Your topic(s) to review:</b>
-          <% for selected_topic in @selected_topics %>
-              <br/><%= selected_topic.topic_name %>
-          <% end %>
-      <% end %>
-      <br/><br/>
-      <% i=1 %>
-      <tbody id="topics"  class="connectedSortable">
-      <tr class="sort-disabled"><td></td><td></td></tr>
-      <% for topic in @sign_up_topics %>
-          <%= get_intelligent_topic_row_review_bids(topic, @selected_topics, @num_participants) %>
+
+
+<div style="display:block; overflow:auto; margin-bottom: 20px;">
+
+  <div style="width: 50%; float: left; padding-right: 10px;">
+
+    <h3>Topics</h3>
+
+    <!-- Topics table -->
+
+    <table class="general">
+
+      <tr>
+
+        <%= render :partial => 'sign_up_sheet/review_bids_table_header' %>
+
+      </tr>
+
+      <tbody id="topics" class="connectedSortable">
+
+        <tr class="sort-disabled">
+
+          <td></td>
+
+          <td></td>
+
+        </tr>
+
+        <% i=1 %>
+
+        <% for topic in @signup_topics %>
+
           <% is_suggested_topic = false %>
+
+          <%= get_intelligent_topic_row_review_bids(topic, @selected_topics, @num_participants) %>
+
           <%= render :partial => 'sign_up_sheet/review_bids_table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
-          </tr>
+
           <% i=i+1 %>
-      <% end %>
+
+        <% end %>
+
       </tbody>
+
     </table>
 
-    <!--Selections table-->
-    <table style="width: 48%; display:block" class="general" align="right">
-      <% i=1 %>
-      <tr><%= render :partial => 'sign_up_sheet/review_bids_table_header' %></tr>
-      <tbody id="selections" data-update-url=<%= "set_priority?id=#{@participant.id}" %> class="connectedSortable">
-        <tr class="sort-disabled"><td></td><td></td></tr>
+  </div>
+
+
+
+  <div style="width: 50%; float: right; padding-left: 10px;">
+
+    <h3>Review Bid Selections</h3>
+
+    <!-- Selections table -->
+
+    <table class="general">
+
+      <tr>
+
+        <%= render :partial => 'sign_up_sheet/review_bids_table_header' %>
+
+      </tr>
+
+      <tbody id="selections" data-update-url="<%= "set_priority?id=#{@participant.id}" %>" class="connectedSortable">
+
+        <tr class="sort-disabled">
+
+          <td></td>
+
+          <td></td>
+
+        </tr>
+
+        <% i=1 %>
+
         <% for topic in @bids %>
-          <tr style= "background-color:<%= get_topic_bg_color_review_bids(topic, @num_participants) %>" id="topic_<%= topic.id %>">
-             <%= render :partial => 'sign_up_sheet/review_bids_table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
+
+          <tr style="background-color: <%= get_topic_bg_color_review_bids(topic, @num_participants) %>" id="topic_<%= topic.id %>">
+
+            <%= render :partial => 'sign_up_sheet/review_bids_table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
+
           </tr>
+
           <% i=i+1 %>
-      <% end %>
+
+        <% end %>
+
       </tbody>
+
     </table>
+
   </div>
 
-  <div>
-    <% session[:return_to] = request.url %>
-    <br/>
-    <br/>
-    <a href="javascript:history.back()">Back</a>
-    <br/>
-  </div>
 </div>
+
+
+
+<div class="container", style="width: 100%">
+
+  <% review_no = 1 %>
+
+  <% title = 'Review' %>
+
+  <!-- loop through each review map -->
+
+  <% @assigned_review_maps.each do |map| %>
+
+    <% @sorted_responses=[] %>
+
+    <% team = AssignmentTeam.find(map.reviewee_id) %>
+
+    <% participant = team.participants.first %>
+
+
+
+    <% if participant %>
+
+      <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
+
+      <tr>
+
+        <td>
+          <br>
+          <b><%= "#{title} #{review_no}." %></b>
+
+          <!-- In ‘review_bids/index’ page, if the topic_identifier is empty, ‘:’ sign should not be displayed. -->
+
+          <% if !topic_id.nil? %>
+
+            <% if SignUpTopic.find(topic_id).topic_identifier != '' %>
+
+              <%= " #{SignUpTopic.find(topic_id).topic_identifier}: #{SignUpTopic.find(topic_id).topic_name}" %>
+
+            <% else %>
+
+              <%= " #{SignUpTopic.find(topic_id).topic_name}" %>
+
+            <% end %>
+
+          <% end %>
+
+          
+
+          <% if !@assignment.is_anonymous %>
+
+            &nbsp; (author: <%= participant.fullname %>)
+
+          <% end %>
+
+        </td>
+
+        <% latest_submission = team.most_recent_submission %>
+
+        <td>&nbsp;</td>
+
+        <% if !map.response.empty? && latest_submission %>
+
+          <% array_not_empty = 0 %>
+
+          <% @sorted_responses = Array.new %>
+
+          <% @prev = Response.where(:map_id => map.id) %>
+
+          <% for element in @prev %>
+
+            <% array_not_empty = 1 %>
+
+            <% @sorted_responses << element %>
+
+          <% end %>
+
+
+
+          <% if array_not_empty == 1 %>
+
+            <% @sorted_responses = @sorted_responses.sort_by {|obj| obj.updated_at} # the latest should be at the last %>
+
+            <% @latest_response = @sorted_responses.last %>
+
+
+
+            <% if @latest_response.round.nil? %>
+
+              <% last_response_round = AssignmentDueDate.done_in_assignment_round(@assignment.id,@latest_response) %>
+
+            <% else %>
+
+              <% last_response_round = @latest_response.round %>
+
+            <% end %>
+
+
+
+            <% current_round = @assignment.number_of_current_round(topic_id) %>
+
+
+
+            <td>
+
+              <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
+
+            </td>
+
+
+
+            <% if @assignment.current_stage(topic_id) != "Finished" %>
+
+              <%- # show the link as 'Edit' when latest review is done in current round -%>
+
+              <%- # show link as 'Update' when latest review is done in different round or there has been a new submission in current round -%>
+
+              <% if last_response_round == current_round %>
+
+
+
+                <td>
+
+                  <%- # If review is not submitted (is still being edited), show an 'Edit' link. -%>
+
+                  <% if !@latest_response.is_submitted %>
+
+                    <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
+
+
+
+                    <%- # If the submission has been updated since it was last reviewed, show an 'Update' link-%>
+
+                  <% elsif @latest_response.updated_at < latest_submission.updated_at %>
+
+                    <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
+
+                  <% end %>
+
+                </td>
+
+              <% else %>
+
+                <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
+
+              <% end %>
+
+            <% end %>
+
+            <td><%= "  -- latest update at #{@latest_response.updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p")}" %></td>
+
+          <% end %>
+
+        <% elsif @assignment.current_stage(topic_id) != "Complete" && @assignment.can_review(topic_id) && latest_submission %>
+
+          <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
+
+          <td>&nbsp;&nbsp;</td>
+
+
+
+        <%- # If the team being reviewed has not submitted yet -%>
+
+        <% else %>
+
+          <td> Work has not yet been submitted for Review
+
+          <%= review_no  %></td>
+
+        <% end %>
+
+        <% review_no+=1 %>
+
+
+
+      </tr>
+
+    <% end %>
+
+  <% end %>
+
+</div>
+
+
+
+<div>
+
+  <% session[:return_to] = request.url %>
+
+  <br/>
+
+  <br/>
+    <br>
+    <br>
+    <br>
+  <a href="javascript:history.back()">Back</a>
+
+  <br/>
+
+</div>
+

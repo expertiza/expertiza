@@ -1,13 +1,13 @@
-describe ReviewBid do
+RSpec.describe ReviewBid, type: :model do
+  let(:assignment) { create(:assignment) }
+  let(:reviewers) { create_list(:participant, 3) }
+  let(:topics) { create_list(:signup_topic, 3, assignment: assignment) }
+  let(:signed_up_teams) do
+    topics.map { |topic| create(:signed_up_team, topic: topic, team: create(:team)) }
+  end
   let(:bid1) { build(:review_bid, priority: 3, participant_id: 7601, signuptopic_id: 123, assignment_id: 2085, updated_at: '2018-01-01 00:00:00') }
   let(:bid2) { build(:review_bid, priority: 2, participant_id: '7602', signuptopic_id: 124, assignment_id: 2086) }
-  let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
-  let(:participant) { build(:participant, id: 1, parent_id: 1, user: student, assignment: assignment1) }
-  let(:topic) { build(:topic, id: 1, topic_name: 'New Topic') }
-  let(:assignment1) { build(:assignment, id: 2, name: 'Test Assgt', rounds_of_reviews: 1) }
-  let(:reviewer1) { double('Participant', id: 1, name: 'reviewer') }
-  let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1) }
-  let(:team1) { build(:assignment_team, id: 2, name: 'team has name') }
+  let(:matched_topics) { { reviewers[0].id => 1, reviewers[1].id => 2, reviewers[2].id => 3 } }
 
   describe 'test review bid parameters'  do
     it 'returns the signuptopic_id of the bid' do
@@ -25,41 +25,114 @@ describe ReviewBid do
     it 'validates that updated_at field should accept a string' do
       expect(bid1.updated_at).to eq('2018-01-01 00:00:00')
     end
-  end
 
-  describe '#bidding_data validation' do
-    it 'checks if get_bidding_data returns bidding_data as a hash' do
-      test_reviewers = [1]
-      allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
-      allow(SignedUpTeam).to receive(:topic_id).and_return(1)
-      allow(ReviewBid).to receive(:where).and_return([bid1, bid2])
-      expect(ReviewBid.bidding_data(bid1.assignment_id, test_reviewers)).to eq('max_accepted_proposals' => nil, 'tid' => [], 'users' => { 1 => { 'otid' => 1, 'priority' => [3, 2], 'tid' => [123, 124], 'time' => ['2018-01-01 00:00:00.000000000 +0000', nil] } })
-    end
-  end
-
-  describe '#assign_review_topics' do
-    it 'calls assigns_topics_to_reviewer for as many topics associated' do
-      maps = [response_map]
-      matched_topics = { '1' => [topic] }
-      allow(ReviewResponseMap).to receive(:where).and_return(maps)
-      allow(maps).to receive(:destroy_all).and_return(true)
-      expect(ReviewBid).to receive(:assign_topic_to_reviewer).with(1, 1, topic)
-      ReviewBid.assign_review_topics(1, [1], matched_topics)
-    end
-  end
-
-  describe '#assign_topic_to_reviewer' do
-    context 'when there are no SignUpTeam' do
-      it 'returns an empty array' do
-        allow(SignedUpTeam).to receive_message_chain(:where, :pluck, :first).and_return(nil)
-        expect(ReviewBid.assign_topic_to_reviewer(1, 1, topic)).to eq([])
+    it 'ensures signed_up_teams have valid team_ids' do
+      signed_up_teams.each do |sut|
+        expect(sut.team_id).not_to be_nil
       end
     end
-    context 'when there is a team to review' do
-      it 'calls ReviewResponseMap' do
-        allow(SignedUpTeam).to receive_message_chain(:where, :pluck, :first).and_return(team1)
-        expect(ReviewResponseMap).to receive(:create)
-        ReviewBid.assign_topic_to_reviewer(1, 1, topic)
+    
+    it 'checks the relation between topics and signed_up_teams' do
+      expect(signed_up_teams.map(&:topic_id)).to include(*topics.map(&:id))
+    end
+  end
+  
+  describe 'bidding_data' do
+    context 'when assignment_id and reviewer_ids are valid' do
+      it 'returns correct topic IDs' do
+        topic_ids = topics.map(&:id)
+        signed_up_teams.map { |sut| { team_id: sut.team_id, topic_id: sut.topic_id } }
+        result = ReviewBid.bidding_data(assignment.id, reviewers.map(&:id))
+        expect(result['tid']).to match_array(topic_ids)
+      end
+
+      it 'returns correct max_accepted_proposals' do
+        max_reviews = assignment.num_reviews_allowed
+        result = ReviewBid.bidding_data(assignment.id, reviewers.map(&:id))
+        expect(result['max_accepted_proposals']).to eq(max_reviews)
+      end
+
+      
+      it 'returns the bidding data for the given assignment and reviewers' do
+        expect(ReviewBid.bidding_data(assignment.id, reviewers.map(&:id))).to be_a(Hash)
+      end
+
+      it 'handles a single reviewer' do
+        expect(ReviewBid.bidding_data(assignment.id, [reviewers.first.id])).to be_a(Hash)
+      end 
+
+      it 'When there are no reviewer_ids and assignment_id has valid data' do
+        result = ReviewBid.bidding_data(assignment.id, [])
+        expect(result).to be_a(Hash)
+        expect(result['tid']).to be_empty
+        expect(result['users']).to be_empty
+      end
+
+      it 'When there are multiple reviewer_ids and assignment_id is nil' do
+        result=ReviewBid.bidding_data(nil, [1, 2, 3])
+        expect(result).to be_a(Hash)
+        expect(result['tid']).to be_empty
+        expect(result['users']).to be_empty
+        expect(result['max_accepted_proposals']).to be_nil
+      end
+ 
+      it 'When assignment_id is valid but reviewer_ids is nil' do
+        result = ReviewBid.bidding_data(assignment.id, nil)
+        expect(result).to be_a(Hash)
+        expect(result['tid']).to be_empty
+        expect(result['users']).to be_empty
+        expect(result['max_accepted_proposals']).to be_nil
+      end
+    end
+
+    context 'when assignment_id or reviewer_ids are invalid' do
+      it 'returns an empty hash when both assignment_id and reviewer_ids are nil' do
+        result = ReviewBid.bidding_data(nil, nil)
+        expect(result).to eq({'tid' => [], 'users' => {}, 'max_accepted_proposals' => nil})
+      end
+
+      it 'returns an empty hash when assignment_id is nil but reviewer_ids has valid data' do
+        result = ReviewBid.bidding_data(nil, [7, 8])
+        expect(result).to eq({'tid' => [], 'users' => {}, 'max_accepted_proposals' => nil})
+      end
+
+      it 'returns an empty hash when assignment_id has valid data but reviewer_ids is an empty array' do
+        result = ReviewBid.bidding_data(5, [])
+        expect(result).to eq({'tid' => [], 'users' => {}, 'max_accepted_proposals' => nil})
+      end
+    end
+  end
+
+  describe ".assign_topic_to_reviewer" do
+    
+    context "When there is a signed up team for the given topic" do
+      it "create a ReviewResponseMap with the correct assignment_id, reviewer_id, and reviewee_id" do
+        signed_up_teams.each_with_index do |signed_up_team, index|
+          ReviewBid.assign_topic_to_reviewer(assignment.id, reviewers[index].id, signed_up_team.topic_id)
+          expect(ReviewResponseMap.last).to have_attributes(
+            reviewed_object_id: assignment.id,
+            reviewer_id: reviewers[index].id,
+            reviewee_id: signed_up_team.team_id
+          )
+        end
+      end
+    end
+    context "When there are no signed up teams for the given topic" do 
+      it "does not create any new review response maps" do
+        expect {
+          ReviewBid.assign_topic_to_reviewer(assignment.id, reviewers.first.id, 'topic3')
+        }.not_to change { ReviewResponseMap.count }
+      end
+    end
+  end
+
+  describe "#reviewer_bidding_data" do
+    
+    context "when reviewer_id is invalid" do
+      it "raises an error" do
+        expect {
+          ReviewBid.reviewer_bidding_data(-1, assignment.id)
+        }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end

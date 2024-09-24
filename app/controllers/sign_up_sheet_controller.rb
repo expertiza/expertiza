@@ -83,7 +83,14 @@ class SignUpSheetController < ApplicationController
 
   # prepares the page. shows the form which can be used to enter new values for the different properties of an assignment
   def edit
+    # Find the SignUpTopic record based on the ID from request parameters
     @topic = SignUpTopic.find(params[:id])
+
+    # Find the User record associated with the current mentor_id in the topic
+    @user = User.find(@topic.mentor_id)
+
+    # This line attempts to assign the user's name to the mentor_id field in the topic
+    @topic.mentor_id = @user.name  # Original line (assuming it's a mistake)
   end
 
   # updates the database tables to reflect the new values for the assignment. Used in conjunction with edit
@@ -249,6 +256,10 @@ class SignUpSheetController < ApplicationController
     else
       if AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id]
         if SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
+
+          # This change has been made for E2403 - To automatically assign a mentor to the topic
+          MentorManagement.assign_mentor_to_topic_team(params[:assignment_id], user.id, params[:topic_id])
+
           flash[:success] = 'You have successfully signed up the student for the topic!'
           ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor signed up student for topic: ' + params[:topic_id].to_s)
         else
@@ -458,12 +469,61 @@ class SignUpSheetController < ApplicationController
 
   def setup_new_topic
     set_values_for_new_topic
-    @sign_up_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
+
+    # This change has been made for E2403 - To add a TA to the topic
+    # If not in the assignment, add the TA to the assignment
+    # If not in the course, then add the TA to the course too
+    @user = User.find_by(name: params[:topic][:mentor_id])
+    if @user
+      courseId = @sign_up_topic.assignment.course_id
+      @course = Course.find(courseId)
+
+      @sign_up_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
+
+      add_user_to_assignment(@user, @sign_up_topic.assignment)
+      add_user_to_course(@user, @course)
+      add_ta_to_course(@user, @course)
+
+      @sign_up_topic.mentor_id = @user.id
+    end
+
     if @sign_up_topic.save
       undo_link "The topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
       redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + '#tabs-2'
     else
       render action: 'new', id: params[:id]
+    end
+  end
+
+  # This change has been made for E2403 - Added function to add user to an assignment
+  def add_user_to_assignment(user, assignment)
+    can_submit = true
+    can_review = true
+    can_take_quiz = true
+    can_mentor = true
+
+    assignmentParticipant = Participant.find_by(user_id: user.id, parent_id: assignment.id)
+    unless assignmentParticipant
+      assignment.add_participant(user.name, can_submit, can_review, can_take_quiz, can_mentor)
+    end
+  end
+
+  # This change has been made for E2403 - Added function to add user to a course
+  def add_user_to_course(user, course)
+    can_mentor = true
+
+    courseParticipant = Participant.find_by(user_id: user.id, parent_id: course.id)
+    unless courseParticipant
+      course.add_participant(user.name, can_mentor)
+    end
+  end
+
+
+  # This change has been made for E2403 - Added function to add TA to a course
+  def add_ta_to_course(user, course)
+    courseTa = TaMapping.find_by(ta_id: user.id, course_id: course.id)
+    unless courseTa
+      course.add_ta(user.name)
     end
   end
 

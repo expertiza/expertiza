@@ -34,7 +34,7 @@ class Course < ApplicationRecord
     CourseParticipant.where(parent_id: id, user_id: user_id)
   end
 
-  def add_participant(user_name)
+  def add_participant(user_name, can_mentor = false)
     user = User.find_by(name: user_name)
     if user.nil?
       raise 'No user account exists with the name ' + user_name + ". Please <a href='" + url_for(controller: 'users', action: 'new') + "'>create</a> the user first."
@@ -44,7 +44,27 @@ class Course < ApplicationRecord
     if participant # If there is already a participant, raise an error. Otherwise, create it
       raise "The user #{user.name} is already a participant."
     else
-      CourseParticipant.create(parent_id: id, user_id: user.id, permission_granted: user.master_permission_granted)
+
+      # This change has been made for E2403 - Added function to add user to a course
+      courseParticipant = CourseParticipant.create(parent_id: id, user_id: user.id, permission_granted: user.master_permission_granted)
+      if can_mentor
+        courseParticipant.can_mentor = true
+        courseParticipant.save
+      end
+    end
+  end
+
+  # This change has been made for E2403 - Added function to add user to a course needed for assignment of mentor to a topic and automatic assignment fo the mentor to the teams that choose the topic
+  def add_ta(username)
+    @user = User.find_by(name: username)
+    if @user.nil?
+      raise 'No user account exists with the name ' + user_name + ". Please <a href='" + url_for(controller: 'users', action: 'new') + "'>create</a> the user first."
+    elsif !TaMapping.where(ta_id: @user.id, course_id: id).empty?
+      raise 'The user inputted "' + username + '" is already a TA for this course.'
+    else
+      @ta_mapping = TaMapping.create(ta_id: @user.id, course_id: id)
+      @user.role = Role.find_by name: 'Teaching Assistant'
+      @user.save
     end
   end
 

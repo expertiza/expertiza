@@ -33,7 +33,7 @@ Steps after getting a VCL reservation
 
 ### Installing locally
 
-See the Google doc on [setting up the Expertiza development environment](https://docs.google.com/document/d/1tXmwju6R7KQbvycku-bdXxa6rXSUN4BMyvjY3ROmMSw/edit).
+See the Google doc on [setting up the Expertiza development environment](https://docs.google.com/document/d/1UbOItBFPga31y1LJcrZDEhQLe_hN1yEQuxKUNoxq3Cs/edit).
 
 
 <sub>Depreciation warning: See the Expertiza wiki for setup instructions. Please update the wiki with corrections or additional helpful information. (http://wiki.expertiza.ncsu.edu/index.php/Development:Setup:OSX, http://wiki.expertiza.ncsu.edu/index.php/Development:Setup:Linux:RHEL, http://wiki.expertiza.ncsu.edu/index.php/Creating_a_Linux_Development_Environment_for_Expertiza_-_Installation_Guide)</sub>

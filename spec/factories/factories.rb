@@ -761,4 +761,12 @@ FactoryBot.define do
     ta_id 1
     course_id 1
   end
+
+
+  factory :user, class: User do
+    sequence(:name) { |n| "user#{n}" }
+    sequence(:fullname) { |n| "User #{n}" }
+    sequence(:email) { |n| "user#{n}@example.com" }
+  end
+
 end

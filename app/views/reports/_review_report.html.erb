@@ -37,6 +37,7 @@
 
   <button onclick="exportTableToCSV('review_scores.csv')">Export Review Scores To CSV File</button>
   <br />
+  <input type="text" id="team-search" placeholder="Enter team name">
   <br />
   <table id="myTable" class="table table-striped" width="100%" cellspacing='0' cellpadding='2' border='0'>
     <thead>
@@ -192,6 +193,30 @@
 </script>
 
 <script>
+document.getElementById("team-search").addEventListener("input", function () {
+  searchTeam();
+});
+
+function searchTeam() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("team-search");
+  filter = input.value.toLowerCase();
+  table = document.getElementById("myTable"); // Your table's ID
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[2]; // Adjust the index to match the team name column
+      if (td) {
+          txtValue = td.textContent || td.innerText;
+          if (txtValue.toLowerCase().indexOf(filter) > -1) {
+              tr[i].style.display = "";
+          } else {
+              tr[i].style.display = "none";
+          }
+      }
+  }
+}
+
+
 	function downloadCSV(csv, filename) {
 		var csvFile;
 		var downloadLink;

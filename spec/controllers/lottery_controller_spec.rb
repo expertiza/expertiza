@@ -109,8 +109,9 @@ describe LotteryController do
     end
     context 'with valid assignment id' do
       it 'should not set any error message in the flash' do
+        allow(controller).to receive(:run_intelligent_assignment).and_call_original
         controller.run_intelligent_assignment
-        expect(controller).not_to set_flash[:error]
+        expect(flash[:error]).to be_nil
       end
       it 'should redirect to list action in tree_display controller' do
         expect(controller).to receive(:redirect_to).with(controller: 'tree_display', action: 'list')

@@ -106,6 +106,7 @@ describe LotteryController do
       params = ActionController::Parameters.new(id: assignment.id)
       allow(controller).to receive(:params).and_return(params)
       allow(controller).to receive(:redirect_to).with(controller: 'tree_display', action: 'list')
+      allow(RestClient).to receive(:post).and_return({ teams: [[1, 2], [3, 4]] }.to_json)
     end
     context 'with valid assignment id' do
       it 'should not set any error message in the flash' do
@@ -120,6 +121,7 @@ describe LotteryController do
     context 'with no participants' do
       before :each do
         allow(controller).to receive(:construct_users_bidding_info).and_return([])
+        allow(RestClient).to receive(:post).and_raise(StandardError.new("No participants available for bidding"))
       end
       it 'should set error message in the flash' do
         controller.run_intelligent_assignment

@@ -46,5 +46,5 @@ class Node < ApplicationRecord
   def get_modified_date; end
 
   # Retrieves the type of children this node has
-  def get_child_type; end
+  def get_folder_child_type; end
 end

@@ -9,6 +9,8 @@ class GradesController < ApplicationController
   include AuthorizationHelper
   include Scoring
 
+  after_action :create_grading_history, only: :save_grade_and_comment_for_submission
+
   def action_allowed?
     case params[:action]
     when 'view_my_scores'
@@ -170,8 +172,8 @@ class GradesController < ApplicationController
   end
 
   def save_grade_and_comment_for_submission
-    participant = AssignmentParticipant.find_by(id: params[:participant_id])
-    @team = participant.team
+    @participant = AssignmentParticipant.find_by(id: params[:participant_id])
+    @team = @participant.team
     @team.grade_for_submission = params[:grade_for_submission]
     @team.comment_for_submission = params[:comment_for_submission]
     begin
@@ -180,7 +182,7 @@ class GradesController < ApplicationController
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
-    redirect_to controller: 'grades', action: 'view_team', id: participant.id
+    redirect_to controller: 'grades', action: 'view_team', id: @participant.id
   end
 
   def bar_chart(scores, width = 100, height = 100, spacing = 1)
@@ -269,5 +271,15 @@ class GradesController < ApplicationController
     else
       true
     end
+  end
+
+  # Create a new grading history record, and write log message
+  def create_grading_history
+    GradingHistoriesController.add_grading_history("Submission",
+                                                   @team.grade_for_submission,
+                                                   @team.comment_for_submission,
+                                                   @participant.assignment.id,
+                                                   @team.id,
+                                                   session[:user])
   end
 end

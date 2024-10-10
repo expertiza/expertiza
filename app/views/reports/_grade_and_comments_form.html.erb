@@ -1,0 +1,20 @@
+<!-- Partial view for rendering grade and comments form -->
+<%= form_with model: data[:review_grade] ? data[:review_grade] : ReviewGrade.new, url: save_grade_and_comment_for_reviewer_review_mapping_index_path, method: 'post' do |form| %>
+  <%= form.hidden_field :participant_id, :value => data[:reviewer].id %>
+  <%= form.hidden_field :assignment_id, :value => assignment_id %>
+  <%= form.number_field :grade_for_reviewer, :value => data[:review_grade].try(:grade_for_reviewer), min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %>
+  <br/>
+  <%= form.text_area :comment_for_reviewer, :value => data[:review_grade].try(:comment_for_reviewer), placeholder: 'Comment', class: "awesome_input", 'data-multiple' => '', 'data-minchars' => "1" %>
+  <table class="inline-transparent">
+    <tr>
+      <td>
+        <%= image_tag 'text_macro.png', :border => 2, :title => 'Text Macro/Pastebin', :style => 'width: 24px; height:30px', :onclick => 'show_text_macros()' %>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <%= form.submit 'Save' %>
+      </td>
+    </tr>
+  </table>
+<

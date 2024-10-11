@@ -155,6 +155,16 @@ describe UsersController do
 
       expect(response).to redirect_to('http://test.host/users/list')
     end
+
+    it 'redirects to list and sets a flash message if the specified user does not exist' do
+      allow(User).to receive(:find_by).with(name: 'instructor6').and_return(nil)
+      user_session = { user: admin }
+      request_params = { user: { name: 'instructor6' } }
+      post :show_if_authorized, params: request_params, session: user_session
+      expect(response).to redirect_to(action: 'list')
+      expect(flash[:note]).to eq('instructor6 does not exist.')
+    end
+
   end
 
   context '#show' do
@@ -390,6 +400,24 @@ describe UsersController do
     it 'when params[:id] is nil' do
       get :keys
       expect(response).to redirect_to('/tree_display/drill')
+    end
+  end
+
+  context '#update' do
+    it 'when user is updated successfully' do
+      allow(User).to receive(:find).with('1').and_return(student1)
+      request_params = { id: 1 }
+      allow(student1).to receive(:update_attributes).with(any_args).and_return(true)
+      post :update, params: request_params
+      expect(flash[:success]).to eq 'The user "lily" has been successfully updated.'
+      expect(response).to redirect_to('/users')
+    end
+    it 'when user is not updated successfully' do
+      allow(User).to receive(:find).with('2').and_return(student2)
+      request_params = { id: 2 }
+      allow(student2).to receive(:update_attributes).with(any_args).and_return(false)
+      post :update, params: request_params
+      expect(response).to render_template(:edit)
     end
   end
 end

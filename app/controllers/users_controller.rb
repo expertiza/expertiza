@@ -10,6 +10,7 @@ class UsersController < ApplicationController
          redirect_to: { action: :list }
 
   def action_allowed?
+    # check if action is allowed
     case params[:action]
     when 'list_pending_requested'
       current_user_has_admin_privileges?
@@ -31,6 +32,7 @@ class UsersController < ApplicationController
   end
 
   def index
+    # Redirect to home page if user is a student, otherwise render the user list.
     if current_user_is_a? 'Student'
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
@@ -40,6 +42,7 @@ class UsersController < ApplicationController
   end
 
   def auto_complete_for_user_name
+    # Get available users for the given name input in the user search bar.
     user = session[:user]
     role = Role.find(user.role_id)
     @users = User.where('name LIKE ? and (role_id in (?) or id = ?)', "#{params[:user][:name]}%", role.get_available_roles, user.id)
@@ -48,6 +51,7 @@ class UsersController < ApplicationController
 
   # for anonymized view for demo purposes
   def set_anonymized_view
+    # view page as anonymized
     anonymized_view_starter_ips = $redis.get('anonymized_view_starter_ips') || ''
     session[:ip] = request.remote_ip
     if anonymized_view_starter_ips.include? session[:ip]
@@ -83,25 +87,31 @@ class UsersController < ApplicationController
   # for displaying users which are being searched for editing purposes after checking whether current user is authorized to do so
   def show_if_authorized
     @user = User.find_by(name: params[:user][:name])
-    if @user.nil?
-      flash[:note] = params[:user][:name] + ' does not exist.'
-      redirect_to action: 'list'
-    else
-      role
-      # check whether current user is authorized to edit the user being searched, call show if true
 
-      if @role.parent_id.nil? || @role.parent_id < session[:user].role_id || @user.id == session[:user].id
-        @total_user_num = User.count
-        @assignment_participant_num = AssignmentParticipant.where(user_id: @user.id).count
-        render action: 'show'
-      else
-        flash[:note] = 'The specified user is not available for editing.'
-        redirect_to action: 'list'
-      end
+    if @user.nil?
+      flash[:note] = "#{params[:user][:name]} does not exist."
+      redirect_to action: 'list'
+      return
+    end
+
+    # check whether current user is authorized \\
+    # to edit the user being searched, call show if true
+    role
+
+    if @role.parent_id.nil? ||
+       @role.parent_id < session[:user].role_id ||
+       @user.id == session[:user].id
+      @total_user_num = User.count
+      @assignment_participant_num = AssignmentParticipant.where(user_id: @user.id).count
+      render action: 'show'
+    else
+      flash[:note] = 'The specified user is not available for editing.'
+      redirect_to action: 'list'
     end
   end
 
   def show
+    # Shows the user profile if authorized, otherwise redirects to the appropriate page.
     if params[:id].nil? || ((current_user_is_a? 'Student') && (!current_user_has_id? params[:id]))
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
@@ -114,53 +124,73 @@ class UsersController < ApplicationController
   end
 
   def new
+    # Initializes a new User object and renders the new user registration form
     @user = User.new
     @rolename = Role.find_by(name: params[:role])
-    foreign
+    get_available_roles
   end
 
   def create
-    # if the user name already exists, register the user by email address
+    # create user
+    check_username_availability
+    create_user
+  end
+
+  def check_username_availability
+    # check if the username is available
     check = User.find_by(name: params[:user][:name])
     if check
       params[:user][:name] = params[:user][:email]
-      flash[:note] = "That username already exists. Username has been set to the user's email address"
+      flash[:note] = "That username already exists.Username has been set to the user's email address"
     end
+  end
+
+  def create_user
     is_user = true
-    # Assign all user params for creating user using assign_user_params function
     @user = assign_user_params(is_user)
     if @user.save
-      password = @user.reset_password # the password is reset
-      prepared_mail = MailerHelper.send_mail_to_user(@user, 'Your Expertiza account and password have been created.', 'user_welcome', password)
-      prepared_mail.deliver
-      flash[:success] = "A new password has been sent to new user's e-mail address."
-      # Instructor and Administrator users need to have a default set for their notifications
-      # the creation of an AssignmentQuestionnaire object with only the User ID field populated
-      # ensures that these users have a default value of 15% for notifications.
-      # TAs and Students do not need a default. TAs inherit the default from the instructor,
-      # Students do not have any checks for this information.
-      AssignmentQuestionnaire.create(user_id: @user.id) if (@user.role.name == 'Instructor') || (@user.role.name == 'Administrator')
-      undo_link("The user \"#{@user.name}\" has been successfully created. ")
+      send_welcome_email
+      create_questionnaire
+      undo_link("The user \"#{@user.name}\" has been successfully created.")
       redirect_to action: 'list'
     else
-      foreign
-      error_message = ''
-      @user.errors.each { |_field, error| error_message << error }
-      flash[:error] = error_message
-      redirect_to action: 'list'
+      handle_user_create_error
     end
+  end
+
+  def send_welcome_email
+    # send welcome email
+    password = @user.reset_password
+    prepared_mail = MailerHelper.send_mail_to_user(@user, 'Your Expertiza account \
+                and password have been created.', 'user_welcome', password)
+    prepared_mail.deliver
+    flash[:success] = "A new password has been sent to new user's e-mail address."
+  end
+
+  def create_questionnaire
+    unless !((@user.role.name == 'Instructor') || (@user.role.name == 'Administrator'))
+      AssignmentQuestionnaire.create(user_id: @user.id)
+    end
+  end
+
+  def handle_user_create_error
+    # handle error while creating users
+    get_available_roles
+    error_message = ''
+    @user.errors.each { |_field, error| error_message << error }
+    flash[:error] = error_message
+    redirect_to action: 'list'
   end
 
   def edit
+    # edit user with the given id
     @user = User.find(params[:id])
     role
-    foreign
+    get_available_roles
   end
 
   def update
-    # TODO: Remove this permit! and replace it with appropriate strong params after testing.
     # method :- user_params
-    params.permit!
     @user = User.find params[:id]
     # update username, when the user cannot be deleted
     # rename occurs in 'show' page, not in 'edit' page
@@ -176,11 +206,9 @@ class UsersController < ApplicationController
   end
 
   def destroy
+    # Delete user with the given id
     begin
       @user = User.find(params[:id])
-      AssignmentParticipant.where(user_id: @user.id).each(&:delete)
-      TeamsUser.where(user_id: @user.id).each(&:delete)
-      AssignmentQuestionnaire.where(user_id: @user.id).each(&:destroy)
       # Participant.delete(true)
       @user.destroy
       flash[:note] = "The user \"#{@user.name}\" has been successfully deleted."
@@ -202,7 +230,7 @@ class UsersController < ApplicationController
 
   protected
 
-  def foreign
+  def get_available_roles
     # stores all the roles that are possible
     # when a new user joins or an existing user updates his/her profile they will get to choose
     # from all the roles available
@@ -219,6 +247,9 @@ class UsersController < ApplicationController
                                  :role_id,
                                  :password_salt,
                                  :fullname,
+                                 :name,
+                                 :password,
+                                 :password_confirmation,
                                  :email,
                                  :parent_id,
                                  :private_by_default,

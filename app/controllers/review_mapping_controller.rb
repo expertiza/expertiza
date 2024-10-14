@@ -7,7 +7,7 @@ class ReviewMappingController < ApplicationController
   # including the following helper to refactor the code in response_report function
   # include ReportFormatterHelper
 
-  @@time_create_last_review_mapping_record = nil
+  @@time_create_last_review_mapping_record = nil 
 
   # E1600
   # start_self_review is a method that is invoked by a student user so it should be allowed accordingly

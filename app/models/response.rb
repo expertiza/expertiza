@@ -15,6 +15,23 @@ class Response < ApplicationRecord
   attr_accessor :difficulty_rating
   delegate :questionnaire, :reviewee, :reviewer, to: :map
 
+  # Sort responses specified by map id 
+  # Sort by largest version number 
+  def sortby_largest_vn()
+    @prev = Response.where(map_id: @map.id)
+    @review_scores = @prev.to_a
+    if @prev.present?
+      @sorted = @review_scores.sort do |m1, m2|
+        if m1.version_num.to_i && m2.version_num.to_i
+          m2.version_num.to_i <=> m1.version_num.to_i
+        else
+          m1.version_num ? -1 : 1
+        end
+      end
+    end
+    return @sorted
+  end
+
   def response_id
     id
   end

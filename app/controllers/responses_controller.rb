@@ -79,18 +79,7 @@ class ResponsesController < ApplicationController
   # response questions with answers and scores are rendered in the edit page based on the version number
   def edit
     assign_action_parameters
-    @prev = Response.where(map_id: @map.id)
-    @review_scores = @prev.to_a
-    if @prev.present?
-      @sorted = @review_scores.sort do |m1, m2|
-        if m1.version_num.to_i && m2.version_num.to_i
-          m2.version_num.to_i <=> m1.version_num.to_i
-        else
-          m1.version_num ? -1 : 1
-        end
-      end
-      @largest_version_num = @sorted[0]
-    end
+  
     # Added for E1973, team-based reviewing
     @map = @response.map
     if @map.team_reviewing_enabled

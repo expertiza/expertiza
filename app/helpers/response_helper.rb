@@ -1,6 +1,18 @@
 module ResponseHelper
   # E2218: this module contains methods that are used in response_controller class
 
+  # The locking was added for E1973, team-based reviewing. See lock.rb for details
+  def authenticate_user(map)
+    if map.team_reviewing_enabled
+      @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
+      if @response.nil?
+        response_lock_action
+        return @response
+      end
+    end
+    return @response
+  end
+
   # E-1973 - helper method to check if the current user is the reviewer
   # if the reviewer is an assignment team, we have to check if the current user is on the team
   def current_user_is_reviewer?(map, _reviewer_id)

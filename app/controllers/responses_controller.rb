@@ -8,62 +8,10 @@ class ResponsesController < ApplicationController
   before_action :authorize_show_calibration_results, only: %i[show_calibration_results_for_student]
   before_action :set_response, only: %i[update delete view]
 
-  # E2218: Method to check if that action is allowed for the user.
-  def action_allowed?
-    response = user_id = nil
-    action = params[:action]
-    # Initialize response and user id if action is edit or delete or update or view.
-    if %w[edit delete update view].include?(action)
-      response = Response.find(params[:id])
-      user_id = response.map.reviewer.user_id if response.map.reviewer
-    end
-    case action
-    when 'edit'
-      # If response has been submitted, no further editing allowed.
-      return false if response.is_submitted
-
-      # Else, return true if the user is a reviewer for that response.
-      current_user_is_reviewer?(response.map, user_id)
-
-    # Deny access to anyone except reviewer & author's team
-    when 'delete', 'update'
-      current_user_is_reviewer?(response.map, user_id)
-    when 'view'
-      response_edit_allowed?(response.map, user_id)
-    else
-      user_logged_in?
-    end
-  end
-
-  # E2218: Method to authorize if the reviewer can view the calibration results
-  # When user manipulates the URL, the user should be authorized
-  def authorize_show_calibration_results
-    response_map = ResponseMap.find(params[:review_response_map_id])
-    user_id = response_map.reviewer.user_id if response_map.reviewer
-    # Deny access to the calibration result page if the current user is not a reviewer.
-    unless current_user_is_reviewer?(response_map, user_id)
-      flash[:error] = 'You are not allowed to view this calibration result'
-      redirect_to controller: 'student_review', action: 'list', id: user_id
-    end
-  end
-
-  # GET /response/json?response_id=xx
-  def json
-    response_id = params[:response_id] if params.key?(:response_id)
-    response = Response.find(response_id)
-    render json: response
-  end
-
   # E2218: Method to delete a response.
   def delete
     # The locking was added for E1973, team-based reviewing. See lock.rb for details
-    if @map.team_reviewing_enabled
-      @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
-      if @response.nil?
-        response_lock_action
-        return
-      end
-    end
+    @response = authenticate_user(@map)
 
     # user cannot delete other people's responses. Needs to be authenticated.
     map_id = @response.map.id
@@ -81,14 +29,7 @@ class ResponsesController < ApplicationController
     assign_action_parameters
   
     # Added for E1973, team-based reviewing
-    @map = @response.map
-    if @map.team_reviewing_enabled
-      @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
-      if @response.nil?
-        response_lock_action
-        return
-      end
-    end
+    @response = authenticate_user(@response.map)
 
     @modified_object = @response.response_id
     # set more handy variables for the view
@@ -153,51 +94,6 @@ class ResponsesController < ApplicationController
     render action: 'response'
   end
 
-  def author; end
-
-  # This method is used to send email from a Reviewer to an Author.
-  # Email body and subject are inputted from Reviewer and passed to send_mail_to_author_reviewers method in MailerHelper.
-  def send_email
-    subject = params['send_email']['subject']
-    body = params['send_email']['email_body']
-    response = params['response']
-    email = params['email']
-
-    respond_to do |format|
-      if subject.blank? || body.blank?
-        flash[:error] = 'Please fill in the subject and the email content.'
-        format.html { redirect_to controller: 'response', action: 'author', response: response, email: email }
-        format.json { head :no_content }
-      else
-        # make a call to method invoking the email process
-        MailerHelper.send_mail_to_author_reviewers(subject, body, email)
-        flash[:success] = 'Email sent to the author.'
-        format.html { redirect_to controller: 'student_task', action: 'list' }
-        format.json { head :no_content }
-      end
-    end
-  end
-
-  def new_feedback
-    review = Response.find(params[:id]) unless params[:id].nil?
-    if review
-      reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: review.map.assignment.id).first
-      map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: reviewer.id).first
-      if map.nil?
-        # if no feedback exists by dat user den only create for dat particular response/review
-        map = FeedbackResponseMap.create(reviewed_object_id: review.id, reviewer_id: reviewer.id, reviewee_id: review.map.reviewer.id)
-      end
-      redirect_to action: 'new', id: map.id, return: 'feedback'
-    else
-      redirect_back fallback_location: root_path
-    end
-  end
-
-  # view response
-  def view
-    set_content
-  end
-
   def create
     map_id = params[:id]
     unless params[:map_id].nil?
@@ -245,6 +141,97 @@ class ResponsesController < ApplicationController
     @map.save
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Response was successfully saved')
     redirect_to action: 'redirect', id: @map.map_id, return: params.permit(:return)[:return], msg: params.permit(:msg)[:msg], error_msg: params.permit(:error_msg)[:error_msg]
+  end
+
+  def author; end
+
+  # view response
+  def view
+    set_content
+  end
+
+  # E2218: Method to check if that action is allowed for the user.
+  def action_allowed?
+    response = user_id = nil
+    action = params[:action]
+    # Initialize response and user id if action is edit or delete or update or view.
+    if %w[edit delete update view].include?(action)
+      response = Response.find(params[:id])
+      user_id = response.map.reviewer.user_id if response.map.reviewer
+    end
+    case action
+    when 'edit'
+      # If response has been submitted, no further editing allowed.
+      return false if response.is_submitted
+
+      # Else, return true if the user is a reviewer for that response.
+      current_user_is_reviewer?(response.map, user_id)
+
+    # Deny access to anyone except reviewer & author's team
+    when 'delete', 'update'
+      current_user_is_reviewer?(response.map, user_id)
+    when 'view'
+      response_edit_allowed?(response.map, user_id)
+    else
+      user_logged_in?
+    end
+  end
+
+  # E2218: Method to authorize if the reviewer can view the calibration results
+  # When user manipulates the URL, the user should be authorized
+  def authorize_show_calibration_results
+    response_map = ResponseMap.find(params[:review_response_map_id])
+    user_id = response_map.reviewer.user_id if response_map.reviewer
+    # Deny access to the calibration result page if the current user is not a reviewer.
+    unless current_user_is_reviewer?(response_map, user_id)
+      flash[:error] = 'You are not allowed to view this calibration result'
+      redirect_to controller: 'student_review', action: 'list', id: user_id
+    end
+  end
+
+  # GET /response/json?response_id=xx
+  def json
+    response_id = params[:response_id] if params.key?(:response_id)
+    response = Response.find(response_id)
+    render json: response
+  end
+
+  # This method is used to send email from a Reviewer to an Author.
+  # Email body and subject are inputted from Reviewer and passed to send_mail_to_author_reviewers method in MailerHelper.
+  def send_email
+    subject = params['send_email']['subject']
+    body = params['send_email']['email_body']
+    response = params['response']
+    email = params['email']
+
+    respond_to do |format|
+      if subject.blank? || body.blank?
+        flash[:error] = 'Please fill in the subject and the email content.'
+        format.html { redirect_to controller: 'response', action: 'author', response: response, email: email }
+        format.json { head :no_content }
+      else
+        # make a call to method invoking the email process
+        MailerHelper.send_mail_to_author_reviewers(subject, body, email)
+        flash[:success] = 'Email sent to the author.'
+        format.html { redirect_to controller: 'student_task', action: 'list' }
+        format.json { head :no_content }
+      end
+    end
+  end
+
+  def new_feedback
+    review = Response.find(params[:id]) unless params[:id].nil?
+    if review
+      reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: review.map.assignment.id).first
+      map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: reviewer.id).first
+      if map.nil?
+        # if no feedback exists by dat user den only create for dat particular response/review
+        map = FeedbackResponseMap.create(reviewed_object_id: review.id, reviewer_id: reviewer.id, reviewee_id: review.map.reviewer.id)
+      end
+      redirect_to action: 'new', id: map.id, return: 'feedback'
+    else
+      redirect_back fallback_location: root_path
+    end
   end
 
   def redirect

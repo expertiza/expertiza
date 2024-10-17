@@ -3,7 +3,7 @@
 class BadgesController < ApplicationController
   include AuthorizationHelper
 
-  def action_allowed?
+  def is_action_permitted?
     current_user_has_ta_privileges?
   end
 

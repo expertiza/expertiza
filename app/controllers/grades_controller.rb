@@ -9,7 +9,7 @@ class GradesController < ApplicationController
   include AuthorizationHelper
   include Scoring
 
-  def action_allowed?
+  def is_action_permitted?
     case params[:action]
     when 'view_my_scores'
       current_user_has_student_privileges? &&
@@ -27,7 +27,7 @@ class GradesController < ApplicationController
     end
   end
 
-  def controller_locale
+  def set_locale_for_student
     locale_for_student
   end
 

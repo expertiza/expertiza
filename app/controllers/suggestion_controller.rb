@@ -1,7 +1,7 @@
 class SuggestionController < ApplicationController
   include AuthorizationHelper
 
-  def action_allowed?
+  def is_action_permitted?
     case params[:action]
     when 'create', 'new', 'student_view', 'student_edit', 'update_suggestion', 'submit'
       current_user_has_student_privileges?

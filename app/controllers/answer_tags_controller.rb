@@ -4,7 +4,7 @@ class AnswerTagsController < ApplicationController
   protect_from_forgery with: :null_session
   skip_before_action :verify_authenticity_token
 
-  def action_allowed?
+  def is_action_permitted?
     case params[:action]
     when 'index', 'create_edit'
       current_user_has_student_privileges?

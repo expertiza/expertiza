@@ -1,5 +1,5 @@
 class AdviceController < ApplicationController
-  # Advice_controller first checks whether current user has TA privileges or not by implementing action_allowed? method. Secondly it sets the number of advices based on score and sort it in descending order. Then it checks four conditions for the advices.
+  # Advice_controller first checks whether current user has TA privileges or not by implementing is_action_permitted? method. Secondly it sets the number of advices based on score and sort it in descending order. Then it checks four conditions for the advices.
   # 1. If number of advices is not equal to given advices
   # 2. If the sorted advices is empty
   # 3. If first advice score of sorted advices is NOT equal to max score
@@ -9,7 +9,7 @@ class AdviceController < ApplicationController
 
   include AuthorizationHelper
   # If current user is TA then only current user can edit and update the advice
-  def action_allowed?
+  def is_action_permitted?
     current_user_has_ta_privileges?
   end
 

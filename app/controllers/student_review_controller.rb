@@ -1,14 +1,14 @@
 class StudentReviewController < ApplicationController
   include AuthorizationHelper
 
-  def action_allowed?
+  def is_action_permitted?
     (current_user_has_student_privileges? &&
         (%w[list].include? action_name) &&
         are_needed_authorizations_present?(params[:id], 'submitter')) ||
       current_user_has_student_privileges?
   end
 
-  def controller_locale
+  def set_locale_for_student
     locale_for_student
   end
 

@@ -2,7 +2,7 @@ class TrackNotificationsController < ApplicationController
   include AuthorizationHelper
 
   # Give permission to manage notifications to appropriate roles
-  def action_allowed?
+  def is_action_permitted?
     current_user_has_student_privileges?
   end
 

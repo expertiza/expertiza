@@ -6,7 +6,7 @@ class ReportsController < ApplicationController
   include ReportFormatterHelper
 
   # reports are allowed to be viewed by  only by TA, instructor and administrator
-  def action_allowed?
+  def is_action_permitted?
     current_user_has_ta_privileges?
   end
 

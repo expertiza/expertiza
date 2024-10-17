@@ -1,7 +1,7 @@
 class InstitutionController < ApplicationController
   include AuthorizationHelper
 
-  def action_allowed?
+  def is_action_permitted?
     current_user_has_instructor_privileges?
   end
 

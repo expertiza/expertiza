@@ -5,7 +5,7 @@ class LotteryController < ApplicationController
   require 'rest_client'
 
   # Give permission to run the bid to appropriate roles
-  def action_allowed?
+  def is_action_permitted?
     current_user_has_ta_privileges?
   end
 

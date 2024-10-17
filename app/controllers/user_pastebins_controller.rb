@@ -5,7 +5,7 @@ class UserPastebinsController < ApplicationController
 
   before_action :set_user_pastebin, only: %i[show edit update destroy]
 
-  def action_allowed?
+  def is_action_permitted?
     case params[:action]
     when 'index', 'create'
       current_user_has_student_privileges?

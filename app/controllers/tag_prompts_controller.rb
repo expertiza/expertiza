@@ -1,7 +1,7 @@
 class TagPromptsController < ApplicationController
   skip_before_action :verify_authenticity_token
 
-  def action_allowed?
+  def is_action_permitted?
     true
   end
 

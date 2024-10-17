@@ -5,7 +5,7 @@ class AssignmentsController < ApplicationController
   before_action :authorize
 
   # determines if an action is allowed for a user
-  def action_allowed?
+  def is_action_permitted?
     if %w[edit update list_submissions].include? params[:action]
       current_user_has_admin_privileges? || current_user_teaching_staff_of_assignment?(params[:id])
     else

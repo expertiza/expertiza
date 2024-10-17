@@ -1,7 +1,7 @@
 class TeamsUsersController < ApplicationController
   include AuthorizationHelper
 
-  def action_allowed?
+  def is_action_permitted?
     # Allow duty updation for a team if current user is student, else require TA or above Privileges.
     if %w[update_duties].include? params[:action]
       current_user_has_student_privileges?

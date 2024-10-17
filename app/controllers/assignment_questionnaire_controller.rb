@@ -6,7 +6,7 @@ class AssignmentQuestionnaireController < ApplicationController
 
   # According to Dr. Gehringer, only the instructor, an ancestor of the instructor,
   # or the TA for the course should be allowed to execute a method of this controller
-  def action_allowed?
+  def is_action_permitted?
     assignment = Assignment.find(params[:assignment_id])
 
     if assignment

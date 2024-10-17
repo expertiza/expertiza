@@ -6,7 +6,7 @@ class ConferenceController < ApplicationController
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],
          redirect_to: { action: :list }
-  def action_allowed?
+  def is_action_permitted?
     case params[:action]
 
     when 'new'

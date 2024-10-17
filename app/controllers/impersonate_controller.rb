@@ -10,7 +10,7 @@ class ImpersonateController < ApplicationController
 
   before_action :check_if_input_is_valid
 
-  def action_allowed?
+  def is_action_permitted?
     # Check for TA privileges first since TA's also have student privileges.
     if ['Student'].include? current_role_name
       !session[:super_user].nil?

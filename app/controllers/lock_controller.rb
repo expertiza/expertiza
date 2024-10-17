@@ -2,7 +2,7 @@
 # The reason this was added was to ensure that a lock was released when a user left the page for
 # review responses. See app/views/response/response.html.erb
 class LockController < ApplicationController
-  def action_allowed?
+  def is_action_permitted?
     case params[:action]
     when 'release_lock'
       # Only the current user should be able to release locks

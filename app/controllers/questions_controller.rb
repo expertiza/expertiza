@@ -12,7 +12,7 @@ class QuestionsController < ApplicationController
     render action: 'list'
   end
 
-  def action_allowed?
+  def is_action_permitted?
     current_user_has_ta_privileges?
   end
 

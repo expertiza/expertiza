@@ -28,7 +28,7 @@ class ReputationWebServiceController < ApplicationController
   #
   # Returns
   #   true if the user has privileges to perform the action else returns false
-  def action_allowed?
+  def is_action_permitted?
     current_user_has_ta_privileges?
   end
 

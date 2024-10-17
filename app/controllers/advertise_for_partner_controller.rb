@@ -1,7 +1,7 @@
 class AdvertiseForPartnerController < ApplicationController
   include AuthorizationHelper
 
-  def action_allowed?
+  def is_action_permitted?
     # Any user with at least a Student role should be able to advertise for a partner
     # For the create, edit, update, and remove actions the current user should also be a participant in the assignment
     # 'create' and 'update' are separated from 'edit' and 'remove' because they use different params

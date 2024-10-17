@@ -9,7 +9,7 @@ class ResponseController < ApplicationController
   before_action :set_response, only: %i[update delete view]
 
   # E2218: Method to check if that action is allowed for the user.
-  def action_allowed?
+  def is_action_permitted?
     response = user_id = nil
     action = params[:action]
     # Initialize response and user id if action is edit or delete or update or view.
@@ -114,7 +114,7 @@ class ResponseController < ApplicationController
 
   # Update the response and answers when student "edit" existing response
   def update
-    render nothing: true unless action_allowed?
+    render nothing: true unless is_action_permitted?
     msg = ''
     begin
       # the response to be updated
@@ -301,7 +301,7 @@ class ResponseController < ApplicationController
   end
 
   def toggle_permission
-    render nothing: true unless action_allowed?
+    render nothing: true unless is_action_permitted?
 
     # the response to be updated
     @response = Response.find(params[:id])

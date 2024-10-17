@@ -1,5 +1,5 @@
 class InstructionsController < ApplicationController
-  def action_allowed?
+  def is_action_permitted?
     true
   end
 

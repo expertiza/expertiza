@@ -13,7 +13,7 @@ class QuestionnairesController < ApplicationController
   before_action :authorize
 
   # Check role access for edit questionnaire
-  def action_allowed?
+  def is_action_permitted?
     case params[:action]
     when 'edit'
       @questionnaire = Questionnaire.find(params[:id])

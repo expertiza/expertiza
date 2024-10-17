@@ -1,7 +1,7 @@
 class RolesController < ApplicationController
   include AuthorizationHelper
 
-  def action_allowed?
+  def is_action_permitted?
     current_user_has_super_admin_privileges?
   end
 

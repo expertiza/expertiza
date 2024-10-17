@@ -11,7 +11,7 @@ class ReviewMappingController < ApplicationController
 
   # E1600
   # start_self_review is a method that is invoked by a student user so it should be allowed accordingly
-  def action_allowed?
+  def is_action_permitted?
     case params[:action]
     when 'add_dynamic_reviewer',
           'show_available_submissions',

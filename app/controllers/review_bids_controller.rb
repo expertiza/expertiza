@@ -5,7 +5,7 @@ class ReviewBidsController < ApplicationController
   require 'rest_client'
 
   # action allowed function checks the action allowed based on the user working
-  def action_allowed?
+  def is_action_permitted?
     case params[:action]
     when 'show', 'set_priority', 'index'
       ['Instructor',

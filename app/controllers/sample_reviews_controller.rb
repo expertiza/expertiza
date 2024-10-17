@@ -1,5 +1,5 @@
 class SampleReviewsController < ApplicationController
-  def action_allowed?
+  def is_action_permitted?
     ['Instructor',
      'Teaching Assistant',
      'Administrator',

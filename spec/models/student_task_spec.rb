@@ -232,11 +232,11 @@ describe StudentTask do
   end
 
   # Gets the due dates of an assignment
-  describe '#get_due_date_data' do
+  describe '#retrieve_due_dates' do
     context 'when called with assignment having empty due dates' do
       it 'return empty time_list array' do
         timeline_list = []
-        StudentTask.get_due_date_data(assignment, timeline_list)
+        StudentTask.retrieve_due_dates(assignment, timeline_list)
         expect(timeline_list).to eq([])
       end
     end
@@ -247,7 +247,7 @@ describe StudentTask do
           timeline_list = []
           due_date.due_at = nil
           assignment.due_dates = [due_date]
-          StudentTask.get_due_date_data(assignment, timeline_list)
+          StudentTask.retrieve_due_dates(assignment, timeline_list)
           expect(timeline_list).to eq([])
         end
       end
@@ -256,7 +256,7 @@ describe StudentTask do
           allow(due_date).to receive(:deadline_type).and_return(deadline_type)
           timeline_list = []
           assignment.due_dates = [due_date]
-          StudentTask.get_due_date_data(assignment, timeline_list)
+          StudentTask.retrieve_due_dates(assignment, timeline_list)
           expect(timeline_list).to eq([{
                                         label: (due_date.deadline_type.name + ' Deadline').humanize,
                                         updated_at: due_date.due_at.strftime('%a, %d %b %Y %H:%M')

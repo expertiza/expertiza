@@ -125,7 +125,7 @@ class StudentTask
     students_teamed
   end
 
-  def self.get_due_date_data(assignment, timeline_list)
+  def self.retrieve_due_dates(assignment, timeline_list)
     assignment.due_dates.each do |dd|
       timeline = { label: (dd.deadline_type.name + ' Deadline').humanize }
       unless dd.due_at.nil?
@@ -177,7 +177,7 @@ class StudentTask
   # static method for the building timeline data
   def self.get_timeline_data(assignment, participant, _team)
     timeline_list = []
-    get_due_date_data(assignment, timeline_list)
+    retrieve_due_dates(assignment, timeline_list)
     # get_submission_data(assignment.try(:id), team.try(:id), timeline_list)
     get_peer_review_data(participant.get_reviewer.try(:id), timeline_list)
     get_author_feedback_data(participant.try(:id), timeline_list)

@@ -10,7 +10,7 @@ class StudentTask
     @topic = args[:topic]
   end
 
-  def self.from_participant(participant)
+  def self.from_participant(participant) # Rename this
     StudentTask.new(
       participant: participant,
       assignment: participant.assignment,
@@ -24,9 +24,6 @@ class StudentTask
     )
   end
 
-  def self.from_participant_id(id)
-    from_participant(AssignmentParticipant.find_by(id: id))
-  end
 
   def self.from_user(user)
     user.assignment_participants.includes(%i[assignment topic]).map do |participant|

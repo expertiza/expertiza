@@ -49,8 +49,8 @@ class StudentTaskController < ApplicationController
   end
 
   def view
-    StudentTask.from_participant_id params[:id]
     @participant = AssignmentParticipant.find(params[:id])
+    StudentTask.from_participant(@participant)
     @can_submit = @participant.can_submit
     @can_review = @participant.can_review
     @can_take_quiz = @participant.can_take_quiz

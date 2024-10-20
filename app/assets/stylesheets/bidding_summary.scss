@@ -1,8 +1,19 @@
-:root {
-    --percentage: 0;
-}
+$percentage:0;
+
+@mixin background-color-by-percentage {
+    @if $percentage < 33 {
+      background-color: #ffcccc;
+    } @else if $percentage < 66 {
+      background-color: #ffcc99;
+    } @else if $percentage <= 100 {
+      background-color: #ccffcc;
+    } @else {
+      background-color: none;
+    }
+  }
+
 span .team-bids {
-    background-color: if(var(--percentage) < 33, #ffcccc, if(var(--percentage) < 66, #ffcc99, if(var(--percentage) <= 100, #ccffcc, none)));
+    @include background-color-by-percentage;
     font-weight: bold; 
     padding: 3px; 
     border-radius: 4px;

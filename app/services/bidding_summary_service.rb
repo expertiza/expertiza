@@ -20,7 +20,7 @@
     second_bids = topic.bids.where(priority: 2).count
     third_bids = topic.bids.where(priority: 3).count
     # Extract the team names for the bids.
-    bidding_teams = topic.bids.includes(:team).map { |bid| bid.team.name }
+    bidding_teams = topic.bids.includes(:team).map { |bid| bid.team.try(:name) }
 
     # Calculate the percentage of first priority bids.
     percentage_first = if total_bids > 0

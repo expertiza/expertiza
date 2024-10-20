@@ -1,0 +1,50 @@
+<!-- Display the assignment name in the bidding summary header -->
+<h3>Assignment Bidding Summary by Priority: <%= @assignment.name %></h3>
+
+<!-- Define the structure of the bidding summary table -->
+<table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <!-- Define the table headers with specified widths for better alignment -->
+      <th>Topic id</th>
+      <th>Topic name</th>
+      <th>#1 bids</th>
+      <th>#2 bids</th>
+      <th>#3 bids</th>
+      <th>Total bids</th>
+      <!-- Set fixed width for the 'Percentage of #1 bids' column -->
+      <th style="width: 200px;">Percentage of #1 bids</th>
+      <!-- Set fixed width for the 'Bidding teams' column -->
+      <th style="width: 200px;">Bidding teams</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Iterate over each topic to display its bidding information -->
+    <% @topic_data.each do |topic| %>
+      <tr>
+        <!-- Display topic id, name, bid counts, total bids and bidding teams -->
+        <td><%= topic[:id] %></td>
+        <td><%= topic[:name] %></td>
+        <td><%= topic[:first_bids] %></td>
+        <td><%= topic[:second_bids] %></td>
+        <td><%= topic[:third_bids] %></td>
+        <td><%= topic[:total_bids] %></td>
+        <!-- Calculate and display the percentage of first bids with tooltip and custom background -->
+        <td title="Calculated as (#1 Bids / Total Bids) * 100">
+          <span class="team-bids" style="$percentage: <%topic[:percentage_first] %>">
+            <%= topic[:percentage_first] %> %
+          </span>
+        </td>
+        <!-- List all the bidding teams for the topic -->
+        <td>
+          <% topic[:bidding_teams].each do |team| %>
+            <%= team %><br>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<!-- Link to navigate back to the previous page -->
+<%= link_to 'Back', :back %>

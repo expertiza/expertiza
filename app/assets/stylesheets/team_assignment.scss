@@ -1,0 +1,6 @@
+span .team-bids {
+    background-color: if($percentage < 33, red, if($percentage < 66, orange, if($percentage <= 100, green, none)));
+    font-weight: bold; 
+    padding: 3px; 
+    border-radius: 4px;
+}

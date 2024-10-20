@@ -1,0 +1,9 @@
+:root {
+    --percentage: 0;
+}
+span .team-bids {
+    background-color: if(var(--percentage) < 33, #ffcccc, if(var(--percentage) < 66, #ffcc99, if(var(--percentage) <= 100, #ccffcc, none)));
+    font-weight: bold; 
+    padding: 3px; 
+    border-radius: 4px;
+}

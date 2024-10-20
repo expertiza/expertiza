@@ -31,5 +31,9 @@ class LotteryController < ApplicationController
 
     redirect_to controller: 'tree_display', action: 'list'
   end
+  def bidding_summary
+    bidding_summary_service = BiddingSummaryService.new()
+    bidding_summary_service.bidding_summary(params[:id])
+  end
   # rubocop:enable Metrics/AbcSize
 end

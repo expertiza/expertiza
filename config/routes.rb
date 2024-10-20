@@ -668,4 +668,7 @@ Expertiza::Application.routes.draw do
   post 'student_task/publishing_rights_update', controller: :student_task, action: :publishing_rights_update, method: :put
   get 'student_view/flip_view', controller: :student_view, action: :flip_view
   # updated route and added specific controller action upon accessing this route
+
+  # Add route for calculating bidding summary based on priorities
+  get 'assignments/:id/bidding_summary', to: 'lottery#bidding_summary', as: 'bidding_summary'
 end

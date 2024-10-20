@@ -13,20 +13,20 @@ class LotteryController < ApplicationController
   # that have similar bidding info/priorities associated with the assignment's sign-up topics.
   #
   # rubocop:disable Metrics/AbcSize
-  
-  def intelligent_assignment
-    assignment = Assignment.find(params[:id])
-    service = IntelligentAssignmentService.new(params[:id])
+  # TODO: Add route
+  def auto_assign_teams
+    assignment = Assignment.find(params[:id]) 
+    service = TeamAssignmentService.new(params[:id])
 
     begin
-      service.perform_intelligent_assignment
-      infoMessage = "Intelligent assignment for '#{assignment.name}' was completed successfully."
+      service.assign_teams_to_topics
+      infoMessage = "Team assignments for '#{assignment.name}' was completed successfully."
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, infoMessage)
-      flash[:success] = 
-    rescue StandardError => e
-      errorMessage = "Intelligent assignment failed for assignment ID #{assignment_id}: #{e.message}"
-      ExpertizaLogger.error.LoggerMessage.new(ontroller_name, ession[:user].name, errorMessage)
-      flash[:error] = errorMessage
+      flash[:success] = infoMessage
+    rescue StandardError => e #TODO: Additional catches to catch specific errors such as Assignment not being found with param ID.
+      errorMessage = "Team assignments failed for assignment ID #{assignment_id}: #{e.message}"
+      ExpertizaLogger.error.LoggerMessage.new(controller_name, session[:user].name, errorMessage)
+      flash[:error] = errorMessage 
     end
 
     redirect_to controller: 'tree_display', action: 'list'

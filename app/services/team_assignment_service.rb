@@ -1,7 +1,8 @@
-# IntelligentAssignmentService automates teams creation from user bids and assigns topics to them.
+# TeamAssignmentService automates teams creation from user bids and assigns topics to them.
 # It uses an external web service to get team information and handles matching teams with topics
 # for an assignment.
-class IntelligentAssignmentService
+#TODO - Add bidding in the name somehow - assign topic based on bids
+class TeamAssignmentService
     require 'json'
     require 'rest_client'
     
@@ -14,7 +15,8 @@ class IntelligentAssignmentService
   
     # The method intelligently assigns teams by generating bid data, fetching team info from a web service,
     # creating new teams with this data, removing empty teams, and matching them to topics
-    def perform_intelligent_assignment
+    #TODO - think of a better name
+    def assign_teams_to_topics
       generate_bidding_data
       fetch_teams_data_from_web_service
       create_new_teams(@teams_response, @bidding_data[:users])
@@ -27,6 +29,7 @@ class IntelligentAssignmentService
     private
   
     # Creates the bidding data from users
+    # TODO - compile_bidding_data - give more of an idea of what kind of data we're working with.
     def generate_bidding_data
       teams = assignment.teams
       users_bidding_info = construct_users_bidding_info(assignment.sign_up_topics, teams)
@@ -49,7 +52,7 @@ class IntelligentAssignmentService
         # Grab student id and list of bids
         bids = []
         sign_up_topics.each do |topic|
-          bid_record = Bid.find_by(team_id: team.id, topic_id: topic.id)
+          bid_record = Bid.find_by(team_id: team.id, topic_id: topic.id) #TODO: Is there a way to do this without loop? Use a single query
           bids << (bid_record.try(:priority) || 0)
         end
         team.users.each { |user| users_bidding_info << { pid: user.id, ranks: bids } } unless bids.uniq == [0]
@@ -59,7 +62,8 @@ class IntelligentAssignmentService
   
     # Fetches team data by calling an external web service that uses students' bidding data to build teams automatically.
     # The web service tries to create teams close to the assignment's maximum team size by combining smaller teams
-    # with similar bidding priorities for the assignment's sign-up topics.   
+    # with similar bidding priorities for the assignment's sign-up topics.  
+    # TODO: simplify the name of the method 
     def fetch_teams_data_from_web_service
       url = WEBSERVICE_CONFIG['topic_bidding_webservice_url']
       response = RestClient.post url, bidding_data.to_json, content_type: :json, accept: :json
@@ -71,7 +75,7 @@ class IntelligentAssignmentService
     end
   
     # Creates new teams based on the response from the web service and the users' bidding data.
-    def create_new_teams(teams_response, users_bidding_info)
+    def create_new_teams(teams_response, users_bidding_info) # TODO - look into if it is getting teams before assigning topics - making that better
       teams_response.each do |user_ids|
         new_team = AssignmentTeam.create_team_with_users(assignment.id, user_ids)
         # Select data from `users_bidding_info` variable that only related to team members in current team
@@ -108,6 +112,7 @@ class IntelligentAssignmentService
     end
   
     # Constructs bidding information for teams including their bids on available topics
+    #TODO - make tables of bids might be clearer
     def construct_teams_bidding_info(unassigned_teams, sign_up_topics)
       teams_bidding_info = []
       unassigned_teams.each do |team|

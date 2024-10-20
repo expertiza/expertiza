@@ -593,7 +593,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  RedCloth (= 4.3.3)
+  RedCloth
   actionpack (= 5.1.6)
   activerecord (= 5.1.6)
   activerecord-session_store (= 1.1.3)

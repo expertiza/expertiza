@@ -14,7 +14,7 @@ class LotteryController < ApplicationController
   #
   # rubocop:disable Metrics/AbcSize
   # TODO: Add route
-  def auto_assign_teams
+  def auto_assign_bidding_teams
     assignment = Assignment.find(params[:id]) 
     service = BiddingTeamAssignmentService.new(params[:id])
 

@@ -1,8 +1,7 @@
 # TeamAssignmentService automates teams creation from user bids and assigns topics to them.
 # It uses an external web service to get team information and handles matching teams with topics
 # for an assignment.
-#TODO - Add bidding in the name somehow - assign topic based on bids
-class TeamAssignmentService
+class BiddingTeamAssignmentService
   require 'json'
   require 'rest_client'
 
@@ -15,10 +14,9 @@ class TeamAssignmentService
 
   # The method intelligently assigns teams by generating bid data, fetching team info from a web service,
   # creating new teams with this data, removing empty teams, and matching them to topics
-  #TODO - think of a better name
-  def assign_teams_to_topics
+  def create_team_topic_matches
     prepare_bidding_data
-    fetch_teams_data_from_web_service
+    fetch_teams_from_api
     create_new_teams(@teams_response, @bidding_data[:users])
     @assignment.remove_empty_teams
     match_new_teams_to_topics(@assignment)
@@ -69,8 +67,7 @@ class TeamAssignmentService
   # Fetches team data by calling an external web service that uses students' bidding data to build teams automatically.
   # The web service tries to create teams close to the assignment's maximum team size by combining smaller teams
   # with similar bidding priorities for the assignment's sign-up topics.
-  # TODO: simplify the name of the method
-  def fetch_teams_data_from_web_service
+  def fetch_teams_from_api
     url = WEBSERVICE_CONFIG['topic_bidding_webservice_url']
     response = RestClient.post url, bidding_data.to_json, content_type: :json, accept: :json
 

@@ -168,29 +168,40 @@ def review_metrics(round, team_id)
 end
 
 
-  # sorts the reviewers by the average volume of reviews in each round, in descending order
-  def sort_reviewer_by_review_volume_desc
-    @reviewers.each do |r|
-      # get the volume of review comments
-      review_volumes = Response.volume_of_review_comments(@assignment.id, r.id)
-      r.avg_vol_per_round = []
-      review_volumes.each_index do |i|
-        if i.zero?
-          r.overall_avg_vol = review_volumes[0]
-        else
-          r.avg_vol_per_round.push(review_volumes[i])
-        end
+# Sorts the reviewers by the average volume of reviews in each round, in descending order
+def sort_reviewers_by_review_volume_desc
+  @reviewers.each do |reviewer|
+    # Get the volume of review comments for the given assignment and reviewer
+    review_comment_volumes = Response.volume_of_review_comments(@assignment.id, reviewer.id)
+    reviewer.avg_volume_per_round = []
+
+    # Loop through the review comment volumes for each round
+    review_comment_volumes.each_with_index do |volume, round|
+      if round.zero?
+        # Set the overall average volume to the first round's review volume
+        reviewer.overall_average_volume = volume
+      else
+        # Store the review volumes for the remaining rounds
+        reviewer.avg_volume_per_round.push(volume)
       end
     end
-    # get the number of review rounds for the assignment
-    @num_rounds = @assignment.num_review_rounds.to_f.to_i
-    @all_reviewers_avg_vol_per_round = []
-    @all_reviewers_overall_avg_vol = @reviewers.inject(0) { |sum, r| sum + r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @num_rounds.times do |round|
-      @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) { |sum, r| sum + r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
-    end
-    @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
+
+  # Get the total number of review rounds for the assignment
+  @num_review_rounds = @assignment.num_review_rounds.to_f.to_i
+  @all_reviewers_avg_volume_per_round = []
+  # Calculate the overall average review volume across all reviewers
+  @all_reviewers_overall_avg_volume = @reviewers.inject(0) { |sum, reviewer| sum + reviewer.overall_average_volume } / (@reviewers.blank? ? 1 : @reviewers.length)
+
+  # For each round, calculate the average volume of reviews across all reviewers
+  @num_review_rounds.times do |round|
+    avg_volume_for_round = @reviewers.inject(0) { |sum, reviewer| sum + reviewer.avg_volume_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @all_reviewers_avg_volume_per_round.push(avg_volume_for_round)
+  end
+  # Sort the reviewers by their overall average review volume in descending order
+  @reviewers.sort! { |r1, r2| r2.overall_average_volume <=> r1.overall_average_volume }
+end
+
 
   # moves data of reviews in each round from a current round
   def initialize_chart_elements(reviewer)

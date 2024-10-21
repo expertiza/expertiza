@@ -1,7 +1,7 @@
 # TeamAssignmentService automates teams creation from user bids and assigns topics to them.
 # It uses an external web service to get team information and handles matching teams with topics
 # for an assignment.
-class BiddingTeamAssignmentService
+class BiddingTeamsAssignmentService
   require 'json'
   require 'rest_client'
 

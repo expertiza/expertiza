@@ -1,4 +1,4 @@
-class LotteryController < ApplicationController
+class BiddingTeamsController < ApplicationController
   include AuthorizationHelper
 
   # Give permission to run the bid to appropriate roles
@@ -16,7 +16,7 @@ class LotteryController < ApplicationController
   # TODO: Add route
   def auto_assign_bidding_teams
     assignment = Assignment.find(params[:id]) 
-    service = BiddingTeamAssignmentService.new(params[:id])
+    service = BiddingTeamsAssignmentService.new(params[:id])
 
     begin
       service.create_team_topic_matches

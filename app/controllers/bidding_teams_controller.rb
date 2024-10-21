@@ -1,4 +1,4 @@
-class LotteryController < ApplicationController
+class BiddingTeamsController < ApplicationController
   include AuthorizationHelper
 
   # Give permission to run the bid to appropriate roles
@@ -14,12 +14,12 @@ class LotteryController < ApplicationController
   #
   # rubocop:disable Metrics/AbcSize
   # TODO: Add route
-  def auto_assign_teams
+  def auto_assign_bidding_teams
     assignment = Assignment.find(params[:id]) 
-    service = TeamAssignmentService.new(params[:id])
+    service = BiddingTeamsAssignmentService.new(params[:id])
 
     begin
-      service.assign_teams_to_topics
+      service.create_team_topic_matches
       infoMessage = "Team assignments for '#{assignment.name}' was completed successfully."
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, infoMessage)
       flash[:success] = infoMessage

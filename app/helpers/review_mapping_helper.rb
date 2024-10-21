@@ -174,11 +174,9 @@ def sort_reviewers_by_review_volume_desc
     # Get the volume of review comments for the given assignment and reviewer
     review_comment_volumes = Response.volume_of_review_comments(@assignment.id, reviewer.id)
     reviewer.avg_volume_per_round = []
-
-    # Loop through the review comment volumes for each round
+    # Loop through the review comment volumes for each round and set the overall average volume to the first round's review volume.
     review_comment_volumes.each_with_index do |volume, round|
       if round.zero?
-        # Set the overall average volume to the first round's review volume
         reviewer.overall_average_volume = volume
       else
         # Store the review volumes for the remaining rounds
@@ -186,13 +184,10 @@ def sort_reviewers_by_review_volume_desc
       end
     end
   end
-
-  # Get the total number of review rounds for the assignment
   @num_review_rounds = @assignment.num_review_rounds.to_f.to_i
   @all_reviewers_avg_volume_per_round = []
   # Calculate the overall average review volume across all reviewers
   @all_reviewers_overall_avg_volume = @reviewers.inject(0) { |sum, reviewer| sum + reviewer.overall_average_volume } / (@reviewers.blank? ? 1 : @reviewers.length)
-
   # For each round, calculate the average volume of reviews across all reviewers
   @num_review_rounds.times do |round|
     avg_volume_for_round = @reviewers.inject(0) { |sum, reviewer| sum + reviewer.avg_volume_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length)

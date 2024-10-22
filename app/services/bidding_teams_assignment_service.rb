@@ -12,8 +12,9 @@ class BiddingTeamsAssignmentService
     @teams_response = []
   end
 
-  # The method intelligently assigns teams by generating bid data, fetching team info from a web service,
-  # creating new teams with this data, removing empty teams, and matching them to topics
+  # The method matches teams by generating bid data, fetching team info from a web service,
+  # creating new teams with this data, removing empty teams, and matching them to topics via
+  # stable match algorithm
   def create_team_topic_matches
     prepare_bidding_data
     fetch_teams_from_api

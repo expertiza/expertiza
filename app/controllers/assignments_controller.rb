@@ -97,7 +97,7 @@ class AssignmentsController < ApplicationController
     assignment_staggered_deadline?
     nil_timezone_update
     update_feedback_attributes
-    query_participants_and_alert
+    query_participants
 
     if params['button'].nil?
       render partial: 'assignments/edit/topics'
@@ -504,11 +504,15 @@ class AssignmentsController < ApplicationController
     ExpertizaLogger.info LoggerMessage.new('', session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)
   end
 
-  def query_participants_and_alert
+  def query_participants
     assignment = Assignment.find(params[:id])
-    if assignment.participants.empty?
-      flash[:error] = %(Saved assignment is missing participants. Add them <a href="/participants/list?id=#{assignment.id}&model=Assignment">here</a>)
+    if assignment.missing_participants?
+      alert_missing_participants(assignment.id)
     end
+  end
+
+  def alert_missing_participants(id)
+    flash[:error] = %(Saved assignment is missing participants. Add them <a href="/participants/list?id=#{id}&model=Assignment">here</a>)
   end
 
   # sets values allowed for the assignment form

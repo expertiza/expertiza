@@ -216,8 +216,8 @@ class AssignmentsController < ApplicationController
     rubrics_list = %w[ReviewQuestionnaire
                       MetareviewQuestionnaire AuthorFeedbackQuestionnaire
                       TeammateReviewQuestionnaire BookmarkRatingQuestionnaire]
-    @assignment_questionnaires.each do |aq|
-      remove_existing_questionnaire(rubrics_list, aq)
+    @assignment_questionnaires.each do |assignment_questionnaire|
+      remove_existing_questionnaire(rubrics_list, assignment_questionnaire)
     end
 
     remove_invalid_questionnaires(rubrics_list)
@@ -225,11 +225,11 @@ class AssignmentsController < ApplicationController
   end
 
   # Removes questionnaire types from the rubric list that are already on the assignment
-  def remove_existing_questionnaire(rubrics_list, aq)
-    return if aq.questionnaire_id.nil?
+  def remove_existing_questionnaire(rubrics_list, assignment_questionnaire)
+    return if assignment_questionnaire.questionnaire_id.nil?
 
     rubrics_list.reject! do |rubric|
-      rubric == Questionnaire.where(id: aq.questionnaire_id).first.type.to_s
+      rubric == Questionnaire.where(id: assignment_questionnaire.questionnaire_id).first.type.to_s
     end
   end
 
@@ -398,8 +398,8 @@ class AssignmentsController < ApplicationController
 
   # checks if each questionnaire in an assignment is used
   def check_questionnaires_usage
-    @assignment_questionnaires.each do |aq|
-      unless aq.used_in_round.nil?
+    @assignment_questionnaires.each do |assignment_questionnaire|
+      unless assignment_questionnaire.used_in_round.nil?
         @reviewvarycheck = 1
         break
       end

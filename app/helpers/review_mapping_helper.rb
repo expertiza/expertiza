@@ -47,24 +47,34 @@ module ReviewMappingHelper
   def obtain_team_color(response_map, assignment_created, assignment_due_dates)
     color = []
     (1..@assignment.num_review_rounds).each do |round|
-      check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+      get_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
     end
     color[-1]
   end
 
   # checks the submission state within each round and assigns team colour
-  def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+  def get_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
     if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
       color.push 'purple'
     else
-      link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
-      if link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
-        color.push 'green'
-      else
-        link_updated_at = get_link_updated_at(link)
-        color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
-      end
+      process_submission_link(response_map, assignment_created, assignment_due_dates, round, color)
     end
+  end
+
+  # checks the submission link to determine if it exists and assigns team colour
+  def process_submission_link(response_map, assignment_created, assignment_due_dates, round, color)
+    link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
+    if valid_submission_link?(link)
+      color.push 'green'
+    else
+      link_updated_at = get_link_updated_at(link)
+      color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
+    end
+  end
+
+  # checks if the submission list exists or fits with standard url format of http:// or https:// and contains keyword "wiki"
+  def valid_submission_link?(link)
+    link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
   end
 
   # checks if a review was submitted in every round and gives the total responses count

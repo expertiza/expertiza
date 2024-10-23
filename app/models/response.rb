@@ -18,10 +18,10 @@ class Response < ApplicationRecord
   # Sort responses specified by map id 
   # Sort by largest version number 
   def sortby_largest_vn()
-    @prev = Response.where(map_id: @map.id)
-    @review_scores = @prev.to_a
-    if @prev.present?
-      @sorted = @review_scores.sort do |m1, m2|
+    prev = Response.where(map_id: @map.id)
+    review_scores = prev.to_a
+    if prev.present?
+      sorted = review_scores.sort do |m1, m2|
         if m1.version_num.to_i && m2.version_num.to_i
           m2.version_num.to_i <=> m1.version_num.to_i
         else
@@ -29,7 +29,7 @@ class Response < ApplicationRecord
         end
       end
     end
-    return @sorted
+    return sorted
   end
 
   def response_id

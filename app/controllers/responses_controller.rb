@@ -11,7 +11,9 @@ class ResponsesController < ApplicationController
   # E2218: Method to delete a response.
   def delete
     # The locking was added for E1973, team-based reviewing. See lock.rb for details
-    @response = authenticate_user(@map)
+    @response = authenticate_user_and_lock(@map)
+    if @response.nil?
+      return
 
     # user cannot delete other people's responses. Needs to be authenticated.
     map_id = @response.map.id
@@ -27,9 +29,11 @@ class ResponsesController < ApplicationController
   # response questions with answers and scores are rendered in the edit page based on the version number
   def edit
     assign_action_parameters
-  
+
     # Added for E1973, team-based reviewing
-    @response = authenticate_user(@response.map)
+    @response = authenticate_user_and_lock(@response.map)
+    if @response.nil?
+      return
 
     @modified_object = @response.response_id
     # set more handy variables for the view

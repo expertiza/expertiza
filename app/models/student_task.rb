@@ -1,6 +1,11 @@
 # Author: Andrew Kofink, 2013-09-28
 class StudentTask
+  include StudentTaskHelper
   attr_accessor :assignment, :current_stage, :participant, :stage_deadline, :topic
+
+  delegate :course, to: :assignment
+  delegate :topic, to: :participant
+  delegate :response_maps, to: :participant
 
   def initialize(args)
     @assignment = args[:assignment]
@@ -43,8 +48,6 @@ class StudentTask
     current_stage == 'submission' && (hyperlinks.present? || recent_submission.present?) 
   end
 
-  delegate :course, to: :assignment
-
   def hyperlinks
     @hyperlinks ||= participant.team.nil? ? [] : participant.team.hyperlinks
   end
@@ -74,8 +77,6 @@ class StudentTask
     time_ago_in_words(stage_deadline) if stage_deadline
   end
 
-  delegate :response_maps, to: :participant
-
   def reviews_given?
     response_maps.inject(nil) { |i, j| i || (j.response && j.class.to_s[/Review/]) }
   end
@@ -100,8 +101,6 @@ class StudentTask
     @started ||= incomplete? && revision?
   end
 
-  delegate :topic, to: :participant
-
   def self.teamed_students(user, ip_address = nil)
     students_teamed = {}
     user.teams.each do |team|
@@ -125,16 +124,6 @@ class StudentTask
     students_teamed
   end
 
-  def self.retrieve_due_dates(assignment, timeline_list)
-    assignment.due_dates.each do |dd|
-      timeline = { label: (dd.deadline_type.name + ' Deadline').humanize }
-      unless dd.due_at.nil?
-        timeline[:updated_at] = dd.due_at.strftime('%a, %d %b %Y %H:%M')
-        timeline_list << timeline
-      end
-    end
-  end
-
   def self.get_submission_data(assignment_id, team_id, timeline_list)
     SubmissionRecord.where(team_id: team_id, assignment_id: assignment_id).find_each do |sr|
       timeline = {
@@ -145,42 +134,5 @@ class StudentTask
       timeline_list << timeline
     end
   end
-
-  def self.get_peer_review_data(participant_id, timeline_list)
-    ReviewResponseMap.where(reviewer_id: participant_id).find_each do |rm|
-      response = Response.where(map_id: rm.id).last
-      next if response.nil?
-
-      timeline = {
-        id: response.id,
-        label: ('Round ' + response.round.to_s + ' Peer Review').humanize,
-        updated_at: response.updated_at.strftime('%a, %d %b %Y %H:%M')
-      }
-      timeline_list << timeline
-    end
-  end
-
-  def self.get_author_feedback_data(participant_id, timeline_list)
-    FeedbackResponseMap.where(reviewer_id: participant_id).find_each do |rm|
-      response = Response.where(map_id: rm.id).last
-      next if response.nil?
-
-      timeline = {
-        id: response.id,
-        label: 'Author feedback',
-        updated_at: response.updated_at.strftime('%a, %d %b %Y %H:%M')
-      }
-      timeline_list << timeline
-    end
-  end
-
-  # static method for the building timeline data
-  def self.get_timeline_data(assignment, participant, _team)
-    timeline_list = []
-    retrieve_due_dates(assignment, timeline_list)
-    # get_submission_data(assignment.try(:id), team.try(:id), timeline_list)
-    get_peer_review_data(participant.get_reviewer.try(:id), timeline_list)
-    get_author_feedback_data(participant.try(:id), timeline_list)
-    timeline_list.sort_by { |f| Time.zone.parse f[:updated_at] }
-  end
+  
 end

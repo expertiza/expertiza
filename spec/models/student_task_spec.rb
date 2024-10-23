@@ -231,86 +231,6 @@ describe StudentTask do
     end
   end
 
-  # Gets the due dates of an assignment
-  describe '#retrieve_due_dates' do
-    context 'when called with assignment having empty due dates' do
-      it 'return empty time_list array' do
-        timeline_list = []
-        StudentTask.retrieve_due_dates(assignment, timeline_list)
-        expect(timeline_list).to eq([])
-      end
-    end
-    context 'when called with assignment having due date' do
-      context 'and due_at value nil' do
-        it 'return empty time_list array' do
-          allow(due_date).to receive(:deadline_type).and_return(deadline_type)
-          timeline_list = []
-          due_date.due_at = nil
-          assignment.due_dates = [due_date]
-          StudentTask.retrieve_due_dates(assignment, timeline_list)
-          expect(timeline_list).to eq([])
-        end
-      end
-      context 'and due_at value not nil' do
-        it 'return time_list array' do
-          allow(due_date).to receive(:deadline_type).and_return(deadline_type)
-          timeline_list = []
-          assignment.due_dates = [due_date]
-          StudentTask.retrieve_due_dates(assignment, timeline_list)
-          expect(timeline_list).to eq([{
-                                        label: (due_date.deadline_type.name + ' Deadline').humanize,
-                                        updated_at: due_date.due_at.strftime('%a, %d %b %Y %H:%M')
-                                      }])
-        end
-      end
-    end
-  end
-
-  # Verifies fetching of peer review data of a user and a timeline
-  describe '#get_peer_review_data' do
-    context 'when no review response mapped' do
-      it 'returns empty' do
-        timeline_list = []
-        StudentTask.get_peer_review_data(user2, timeline_list)
-        expect(timeline_list).to eq([])
-      end
-    end
-    context 'when mapped to review response map' do
-      it 'returns timeline array' do
-        timeline_list = []
-        allow(ReviewResponseMap).to receive_message_chain(:where, :find_each).with(reviewer_id: 1).with(no_args).and_yield(review_response_map)
-        allow(review_response_map).to receive(:id).and_return(1)
-        allow(Response).to receive_message_chain(:where, :last).with(map_id: 1).with(no_args).and_return(response)
-        allow(response).to receive(:round).and_return(1)
-        allow(response).to receive(:updated_at).and_return(Time.new(2019))
-        timevalue = Time.new(2019).strftime('%a, %d %b %Y %H:%M')
-        expect(StudentTask.get_peer_review_data(1, timeline_list)).to eq([{ id: 1, label: 'Round 1 peer review', updated_at: timevalue }])
-      end
-    end
-  end
-
-  # Verifies retrieval of feedback from author
-  describe '#get_author_feedback_data' do
-    context 'when no feedback response mapped' do
-      it 'returns empty' do
-        timeline_list = []
-        StudentTask.get_author_feedback_data(user2, timeline_list)
-        expect(timeline_list).to eq([])
-      end
-    end
-    context 'when mapped to feedback response map' do
-      it 'returns timeline array' do
-        timeline_list = []
-        allow(FeedbackResponseMap).to receive_message_chain(:where, :find_each).with(reviewer_id: 1).with(no_args).and_yield(review_response_map)
-        allow(review_response_map).to receive(:id).and_return(1)
-        allow(Response).to receive_message_chain(:where, :last).with(map_id: 1).with(no_args).and_return(response)
-        allow(response).to receive(:updated_at).and_return(Time.now)
-        timevalue = Time.now.strftime('%a, %d %b %Y %H:%M')
-        expect(StudentTask.get_author_feedback_data(1, timeline_list)).to eq([{ id: 1, label: 'Author feedback', updated_at: timevalue }])
-      end
-    end
-  end
-
   # Verrifies retrieval of submission data from submission
   describe '#get_submission_data' do
     context 'when no submission data mapped' do
@@ -351,13 +271,4 @@ describe StudentTask do
     end
   end
 
-  # Verifies retrieval of timeline data
-  describe '#get_timeline_data' do
-    context 'when no timeline data mapped' do
-      it 'returns nil' do
-        allow(participant).to receive(:get_reviewer).and_return(participant)
-        expect(StudentTask.get_timeline_data(assignment, participant, team)).to eq([])
-      end
-    end
-  end
 end

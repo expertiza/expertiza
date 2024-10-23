@@ -11,15 +11,15 @@ class ResponsesController < ApplicationController
   # E2218: Method to delete a response.
   def delete
     # The locking was added for E1973, team-based reviewing. See lock.rb for details
-    @response = authenticate_user_and_lock(@map)
+    # user cannot delete other people's responses. Needs to be authenticated.
+    @response = lock_response(@map, @response)
     if @response.nil?
       return
+    end
 
-    # user cannot delete other people's responses. Needs to be authenticated.
-    map_id = @response.map.id
     # The lock will be automatically destroyed when the response is destroyed
     @response.delete
-    redirect_to action: 'redirect', id: map_id, return: params[:return], msg: 'The response was deleted.'
+    redirect_to action: 'redirect', id: @response.map.id, return: params[:return], msg: 'The response was deleted.'
   end
 
   # Determining the current phase and check if a review is already existing for this stage.
@@ -31,9 +31,10 @@ class ResponsesController < ApplicationController
     assign_action_parameters
 
     # Added for E1973, team-based reviewing
-    @response = authenticate_user_and_lock(@response.map)
+    @response = lock_response(@response.map, @response)
     if @response.nil?
       return
+    end
 
     @modified_object = @response.response_id
     # set more handy variables for the view

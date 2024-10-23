@@ -26,7 +26,16 @@ module QuestionnaireHelper
     end
   end
 
-# Updates the attributes of questionnaire questions based on form data, without modifying unchanged attributes.
+  # factory method to create the appropriate questionnaire based on the type
+  def questionnaire_factory(type)
+    questionnaire = QUESTIONNAIRE_MAP[type]
+    if questionnaire.nil?
+      flash[:error] = 'Error: Undefined Questionnaire'
+    else
+      questionnaire.new
+    end
+  end
+
   def update_questionnaire_questions
     return if params[:question].nil?
 
@@ -38,6 +47,10 @@ module QuestionnaireHelper
       question.save
     end
   end
+
+
+# Updates the attributes of questionnaire questions based on form data, without modifying unchanged attributes.
+
 
   #Map type to questionnaire
   QUESTIONNAIRE_MAP = {
@@ -53,14 +66,5 @@ module QuestionnaireHelper
     'QuizQuestionnaire' => QuizQuestionnaire
   }.freeze
 
-  # factory method to create the appropriate questionnaire based on the type
-  def questionnaire_factory(type)
-    questionnaire = QUESTIONNAIRE_MAP[type]
-    if questionnaire.nil?
-      flash[:error] = 'Error: Undefined Questionnaire'
-    else
-      questionnaire.new
-    end
-  end
 
 end

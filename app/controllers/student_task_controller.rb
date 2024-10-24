@@ -1,5 +1,6 @@
 class StudentTaskController < ApplicationController
   include AuthorizationHelper
+  include StudentTaskHelper
 
   helper :submitted_content
 
@@ -63,7 +64,7 @@ class StudentTaskController < ApplicationController
     @topics = SignUpTopic.where(assignment_id: @assignment.id)
     @use_bookmark = @assignment.use_bookmark
     # Timeline feature
-    @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
+    @timeline_list = generate_timeline(@assignment, @participant)
     # To get the current active reviewers of a team assignment.
     # Used in the view to disable or enable the link for sending email to reviewers.
     @review_mappings = review_mappings(@assignment, @team.id) if @team

@@ -42,4 +42,46 @@ module StudentTaskHelper
   def review_deadline?(assignment)
     assignment.find_due_dates('review').present?
   end
+
+  def populate_timeline_from(model_class, participant_id, labelLamda, timeline_list)
+    model_class.where(reviewer_id: participant_id).find_each do |rm|
+      response = Response.where(map_id: rm.id).last
+      next if response.nil?
+
+      timeline = {
+        id: response.id,
+        label: labelLamda.call(response),
+        updated_at: response.updated_at.strftime('%a, %d %b %Y %H:%M')
+      }
+
+      timeline_list << timeline
+    end
+  end
+
+  def update_timeline_with_peer_reviews(participant_id, timeline_list)
+    populate_timeline_from(ReviewResponseMap, participant_id, lambda { |response| ('Round ' + response.round.to_s + ' Peer Review').humanize },  timeline_list)
+  end
+
+  def update_timeline_with_author_feedbacks(participant_id, timeline_list)
+    populate_timeline_from(FeedbackResponseMap, participant_id, lambda { |response| 'Author feedback'},  timeline_list)
+  end
+
+  def update_timeline_with_assignment_deadlines(assignment, timeline_list)
+    assignment.due_dates.each do |dd|
+      timeline = { label: (dd.deadline_type.name + ' Deadline').humanize }
+      unless dd.due_at.nil?
+        timeline[:updated_at] = dd.due_at.strftime('%a, %d %b %Y %H:%M')
+        timeline_list << timeline
+      end
+    end
+  end
+
+  def generate_timeline(assignment, participant)
+    timeline_list = []
+    update_timeline_with_assignment_deadlines(assignment, timeline_list)
+    update_timeline_with_peer_reviews(participant.get_reviewer.try(:id), timeline_list)
+    update_timeline_with_author_feedbacks(participant.try(:id), timeline_list)
+    timeline_list.sort_by { |f| Time.zone.parse f[:updated_at] }
+  end
+
 end

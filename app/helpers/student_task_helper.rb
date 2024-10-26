@@ -63,7 +63,7 @@ module StudentTaskHelper
   end
 
   def update_timeline_with_author_feedbacks(participant_id, timeline_list)
-    populate_timeline_from(FeedbackResponseMap, participant_id, ->(_response) { 'Author feedback' },  timeline_list)
+    populate_timeline_from(FeedbackResponseMap, participant_id, ->(_response) { 'Author feedback' }, timeline_list)
   end
 
   def update_timeline_with_assignment_deadlines(assignment, timeline_list)

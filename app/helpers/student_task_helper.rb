@@ -59,11 +59,11 @@ module StudentTaskHelper
   end
 
   def update_timeline_with_peer_reviews(participant_id, timeline_list)
-    populate_timeline_from(ReviewResponseMap, participant_id, lambda { |response| ('Round ' + response.round.to_s + ' Peer Review').humanize }, timeline_list)
+    populate_timeline_from(ReviewResponseMap, participant_id, lambda { |_response| ('Round ' + response.round.to_s + ' Peer Review').humanize }, timeline_list)
   end
 
   def update_timeline_with_author_feedbacks(participant_id, timeline_list)
-    populate_timeline_from(FeedbackResponseMap, participant_id, lambda { |response| 'Author feedback' },  timeline_list)
+    populate_timeline_from(FeedbackResponseMap, participant_id, lambda { |_response| 'Author feedback' },  timeline_list)
   end
 
   def update_timeline_with_assignment_deadlines(assignment, timeline_list)
@@ -83,5 +83,4 @@ module StudentTaskHelper
     update_timeline_with_author_feedbacks(participant.try(:id), timeline_list)
     timeline_list.sort_by { |f| Time.zone.parse f[:updated_at] }
   end
-
 end

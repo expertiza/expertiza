@@ -15,7 +15,7 @@ class StudentTask
     @topic = args[:topic]
   end
 
-  def self.from_participant(participant) # Rename this
+  def self.create_student_task_for_participant(participant) # Rename this
     StudentTask.new(
       participant: participant,
       assignment: participant.assignment,
@@ -30,9 +30,9 @@ class StudentTask
   end
 
 
-  def self.from_user(user)
+  def self.fetch_tasks_for_user(user)
     user.assignment_participants.includes(%i[assignment topic]).map do |participant|
-      StudentTask.from_participant participant
+      StudentTask.create_student_task_for_participant participant
     end.sort_by(&:stage_deadline)
   end
 

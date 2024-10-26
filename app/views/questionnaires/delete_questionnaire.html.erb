@@ -1,12 +1,12 @@
-<h1>Delete an existing questionnaire</h1>
+<h1>Delete an existing itemnaire</h1>
 
-<%= form_tag({:action=>'delete_questionnaire', :id=>@questionnaire.id}) do %>
-  <%= @questionnaire.name.capitalize %> is used by the following assignments.  Are you sure you want to delete it?<br/><br/>
+<%= form_tag({:action=>'delete_itemnaire', :id=>@itemnaire.id}) do %>
+  <%= @itemnaire.name.capitalize %> is used by the following assignments.  Are you sure you want to delete it?<br/><br/>
   <table>
     <tr>
       <th>Name&nbsp;&nbsp;</th><th>Directory path</th>
     </tr>
-    <% for assignment in @questionnaire.assignments %>
+    <% for assignment in @itemnaire.assignments %>
       <tr>
         <td><%= assignment.name %></td>
         <td><%= assignment.directory_path %></td>
@@ -14,7 +14,7 @@
     <% end %>
   </table>
   <br />
-  <%= submit_tag "Delete questionnaire", :name=>"delete" %>
+  <%= submit_tag "Delete itemnaire", :name=>"delete" %>
 
 <% end %>
 <br />

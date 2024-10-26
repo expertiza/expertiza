@@ -4,7 +4,7 @@ class SectionHeader < QuestionnaireHeader
     html.html_safe
   end
 
-  def view_completed_question(_count, _answer)
+  def view_completed_item(_count, _answer)
     html = '<b style="color: #986633; font-size: x-large">' + txt + '</b>'
     html.html_safe
   end

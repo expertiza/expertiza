@@ -7,7 +7,7 @@ You may log into Expertiza and view it now.
   Review Content:
   <% @review_scores.each do | rs | %>
     -----------------------------------------------------------
-    Question: <%=Question.find(rs.question_id).txt %>
+    Question: <%=Question.find(rs.item_id).txt %>
 
     Comment: <%=rs.comments%>
 
@@ -19,7 +19,7 @@ You may log into Expertiza and view it now.
   Review Content:
   <% @ror_review_scores.each do | rs | %>
     -----------------------------------------------------------
-    Question: <%=Question.find(rs.question_id).txt %>
+    Question: <%=Question.find(rs.item_id).txt %>
 
     Comment: <%=rs.comments%>
 

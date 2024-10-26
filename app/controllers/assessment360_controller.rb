@@ -183,12 +183,12 @@ class Assessment360Controller < ApplicationController
     end
   end
 
-  # The peer review score is taken from the questions for the assignment
+  # The peer review score is taken from the items for the assignment
   def find_peer_review_score(user_id, assignment_id)
     participant = AssignmentParticipant.find_by(user_id: user_id, parent_id: assignment_id)
     assignment = participant.assignment
-    questions = retrieve_questions assignment.questionnaires, assignment_id
-    participant_scores(participant, questions)
+    items = retrieve_items assignment.itemnaires, assignment_id
+    participant_scores(participant, items)
   end
 
   def format_topic(topic)

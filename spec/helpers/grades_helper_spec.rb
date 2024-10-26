@@ -1,39 +1,39 @@
 require 'rails_helper'
 describe GradesHelper, type: :helper do
   let(:review_response) { build(:response, id: 1, map_id: 1) }
-  let(:question) { build(:question) }
+  let(:item) { build(:item) }
   let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1, parent_id: 1) }
   let(:team) { build(:assignment_team, id: 1) }
   let(:assignment_participant) { build(:participant, id: 1, assignment: assignment) }
   let(:viewgrid_participant) { build(:participant, id: 2, assignment: assignment_for_viewgrid) }
-  let(:assignment) { build(:assignment, id: 1, max_team_size: 1, questionnaires: questionnaires, late_policy_id: 1, is_penalty_calculated: true, rounds_of_reviews: 1, vary_by_round?: true) }
-  let(:assignment_for_penalty) { build(:assignment, id: 4, max_team_size: 1, questionnaires: questionnaires, late_policy_id: 1, is_penalty_calculated: false, rounds_of_reviews: 1, vary_by_round?: true) }
-  let(:assignment_for_viewgrid) { build(:assignment, id: 5, max_team_size: 1, questionnaires: [questionnaire3], late_policy_id: 1, is_penalty_calculated: false, rounds_of_reviews: 1, vary_by_round?: false) }
-  let(:single_assignment) { build(:assignment, id: 1, max_team_size: 1, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
-  let(:team_assignment) { build(:assignment, id: 2, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
-  let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
-  let(:questionnaire1) { build(:questionnaire, id: 1, questions: [question], type: 'ReviewQuestionnaire') }
-  let(:questionnaire2) { build(:questionnaire, id: 2, questions: [question], type: 'ReviewQuestionnaire') }
-  let(:questionnaire3) { build(:questionnaire, id: 3, questions: [question], type: 'TeammateReviewQuestionnaire') }
-  let(:questionnaires) { [questionnaire1, questionnaire2] }
-  let(:aq1) { build(:assignment_questionnaire, id: 1, used_in_round: 1) }
-  let(:aq2) { build(:assignment_questionnaire, id: 2) }
+  let(:assignment) { build(:assignment, id: 1, max_team_size: 1, itemnaires: itemnaires, late_policy_id: 1, is_penalty_calculated: true, rounds_of_reviews: 1, vary_by_round?: true) }
+  let(:assignment_for_penalty) { build(:assignment, id: 4, max_team_size: 1, itemnaires: itemnaires, late_policy_id: 1, is_penalty_calculated: false, rounds_of_reviews: 1, vary_by_round?: true) }
+  let(:assignment_for_viewgrid) { build(:assignment, id: 5, max_team_size: 1, itemnaires: [itemnaire3], late_policy_id: 1, is_penalty_calculated: false, rounds_of_reviews: 1, vary_by_round?: false) }
+  let(:single_assignment) { build(:assignment, id: 1, max_team_size: 1, itemnaires: [review_itemnaire], is_penalty_calculated: true) }
+  let(:team_assignment) { build(:assignment, id: 2, max_team_size: 2, itemnaires: [review_itemnaire], is_penalty_calculated: true) }
+  let(:review_itemnaire) { build(:itemnaire, id: 1, items: [item]) }
+  let(:itemnaire1) { build(:itemnaire, id: 1, items: [item], type: 'ReviewQuestionnaire') }
+  let(:itemnaire2) { build(:itemnaire, id: 2, items: [item], type: 'ReviewQuestionnaire') }
+  let(:itemnaire3) { build(:itemnaire, id: 3, items: [item], type: 'TeammateReviewQuestionnaire') }
+  let(:itemnaires) { [itemnaire1, itemnaire2] }
+  let(:aq1) { build(:assignment_itemnaire, id: 1, used_in_round: 1) }
+  let(:aq2) { build(:assignment_itemnaire, id: 2) }
   let(:latePolicy) { LatePolicy.new(policy_name: 'late_policy_1', instructor_id: 6, max_penalty: 10, penalty_per_unit: 5, penalty_unit: 1) }
-  let(:vmQ1) { VmQuestionResponse.new(questionnaire1, assignment, 1) }
-  let(:vmQ2) { VmQuestionResponse.new(questionnaire2, assignment, 2) }
+  let(:vmQ1) { VmQuestionResponse.new(itemnaire1, assignment, 1) }
+  let(:vmQ2) { VmQuestionResponse.new(itemnaire2, assignment, 2) }
   let(:helper) { Class.new { extend GradesHelper } }
 
   describe 'accordion_title' do
     it 'should render is_first:true if last_topic is nil' do
-      title_html = accordion_title(nil, 'last question')
-      expect(title_html).to include('last question')
+      title_html = accordion_title(nil, 'last item')
+      expect(title_html).to include('last item')
     end
     it 'should render is_first:false if last_topic is not equal to next_topic' do
-      title_html = accordion_title('last question', 'next question')
-      expect(title_html).to include('next question')
+      title_html = accordion_title('last item', 'next item')
+      expect(title_html).to include('next item')
     end
     it 'should render nothing if last_topic is equal to next_topic' do
-      title_html = accordion_title('next question', 'next question')
+      title_html = accordion_title('next item', 'next item')
       expect(title_html).to eq(nil)
     end
   end
@@ -55,9 +55,9 @@ describe GradesHelper, type: :helper do
   end
 
   describe 'score_vector' do
-    it 'should return the scores from the questions in a vector' do
-      allow(Response).to receive(:score).with(response: [review_response], questions: [question], q_types: []).and_return(75)
-      @questions = { s: [question] }
+    it 'should return the scores from the items in a vector' do
+      allow(Response).to receive(:score).with(response: [review_response], items: [item], q_types: []).and_return(75)
+      @items = { s: [item] }
       expect(score_vector([review_response, review_response], 's')).to eq([75, 75])
     end
   end
@@ -67,11 +67,11 @@ describe GradesHelper, type: :helper do
       symbol = :s
       @grades_bar_charts = { s: nil }
       @participant_score = { symbol => { assessments: [review_response, review_response] } }
-      allow(Response).to receive(:score).with(response: [review_response], questions: [question], q_types: []).and_return(75)
+      allow(Response).to receive(:score).with(response: [review_response], items: [item], q_types: []).and_return(75)
       allow(GradesController).to receive(:bar_chart).with([75, 75]).and_return(
         'http://chart.apis.google.com/chart?chs=800x200&cht=bvg&chco=0000ff,ff0000,00ff00&chd=s:yoeKey,KUeoy9,9yooy9&chdl=Trend+1|Trend+2|Trend+3&chtt=Bar+Chart'
       )
-      @questions = { s: [question] }
+      @items = { s: [item] }
       expect(charts(symbol).class).to eq(String)
       expect(charts(symbol)).to include('http://chart.apis.google.com/chart')
     end
@@ -83,29 +83,29 @@ describe GradesHelper, type: :helper do
   end
 
   describe 'type_and_max' do
-    context 'when the question is a Checkbox' do
+    context 'when the item is a Checkbox' do
       it 'returns 10_003' do
-        row = VmQuestionResponseRow.new('Some question text', 1, 5, 95, 2)
-        allow(Question).to receive(:find).with(1).and_return(question)
-        allow(question).to receive(:type).and_return('Checkbox')
-        allow(question).to receive(:is_a?).and_return(Checkbox)
+        row = VmQuestionResponseRow.new('Some item text', 1, 5, 95, 2)
+        allow(Question).to receive(:find).with(1).and_return(item)
+        allow(item).to receive(:type).and_return('Checkbox')
+        allow(item).to receive(:is_a?).and_return(Checkbox)
         expect(type_and_max(row)).to eq(10_003)
       end
     end
-    context 'when the question is a ScoredQuestion' do
+    context 'when the item is a ScoredQuestion' do
       it 'returns the correct code and the max score' do
-        row = VmQuestionResponseRow.new('Some question text', 1, 5, 95, 2)
-        allow(Question).to receive(:find).with(1).and_return(question)
-        allow(question).to receive(:is_a?).and_return(ScoredQuestion)
-        expect(type_and_max(row)).to eq(9311 + row.question_max_score)
+        row = VmQuestionResponseRow.new('Some item text', 1, 5, 95, 2)
+        allow(Question).to receive(:find).with(1).and_return(item)
+        allow(item).to receive(:is_a?).and_return(ScoredQuestion)
+        expect(type_and_max(row)).to eq(9311 + row.item_max_score)
       end
     end
-    context 'when the question is something else' do
+    context 'when the item is something else' do
       it 'returns 9998' do
-        row = VmQuestionResponseRow.new('Some question text', 1, 5, 95, 2)
-        allow(Question).to receive(:find).with(1).and_return(question)
-        allow(question).to receive(:is_a?).with(ScoredQuestion).and_return(false)
-        question[:type] == 'NotACheckbox'
+        row = VmQuestionResponseRow.new('Some item text', 1, 5, 95, 2)
+        allow(Question).to receive(:find).with(1).and_return(item)
+        allow(item).to receive(:is_a?).with(ScoredQuestion).and_return(false)
+        item[:type] == 'NotACheckbox'
         expect(type_and_max(row)).to eq(9998)
       end
     end
@@ -216,45 +216,45 @@ describe GradesHelper, type: :helper do
     end
   end
 
-  describe 'retrieve_questions' do
-    context 'when give a list of questionnaires' do
-      it 'return the map the questions' do
-        allow(questionnaire1). to receive(:symbol).and_return('test1')
-        allow(questionnaire2). to receive(:symbol).and_return('test2')
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return(aq1)
+  describe 'retrieve_items' do
+    context 'when give a list of itemnaires' do
+      it 'return the map the items' do
+        allow(itemnaire1). to receive(:symbol).and_return('test1')
+        allow(itemnaire2). to receive(:symbol).and_return('test2')
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, itemnaire_id: 1).and_return(aq1)
         allow(aq1).to receive(:first).and_return(aq1)
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 2).and_return(aq2)
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, itemnaire_id: 2).and_return(aq2)
         allow(aq2).to receive(:first).and_return(aq2)
-        expect(retrieve_questions(questionnaires, 1)).to eq(test11: questionnaire1.questions, 'test2' => questionnaire2.questions)
+        expect(retrieve_items(itemnaires, 1)).to eq(test11: itemnaire1.items, 'test2' => itemnaire2.items)
       end
     end
   end
 
   describe 'view_heatgrid' do
-    context 'when all questionnaires do not match the target type' do
+    context 'when all itemnaires do not match the target type' do
       it 'render the view with empty list of  VmQuestionResponse' do
         # mock the participant for the  AssignmentParticipant.find
         allow(AssignmentParticipant).to receive(:find).with(1).and_return(assignment_participant)
         allow(assignment_participant).to receive(:team).and_return(team)
-        # in the for each part, the function finds the AssignmentQuestionnaire by questionnaire id
+        # in the for each part, the function finds the AssignmentQuestionnaire by itemnaire id
         # so, mock all the searhcing result to avoid data not existing in DB
-        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(aq1)
-        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 2).and_return(aq2)
+        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, itemnaire_id: 1).and_return(aq1)
+        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, itemnaire_id: 2).and_return(aq2)
         # just test a part of html to ensure the function render the target view successfully
         expect(view_heatgrid(1, 'non-exist')).to include('!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->')
         # access the variable in the function and test the result
         expect(instance_variable_get(:@vmlist)).to eq([])
       end
     end
-    context 'when all questionnaires match the target type' do
+    context 'when all itemnaires match the target type' do
       it 'render the view with nonempty list of  VmQuestionResponse' do
         # mock the participant for the  AssignmentParticipant.find
         allow(AssignmentParticipant).to receive(:find).with(1).and_return(assignment_participant)
         allow(assignment_participant).to receive(:team).and_return(team)
-        # in the for each part, the function finds the AssignmentQuestionnaire by questionnaire id
+        # in the for each part, the function finds the AssignmentQuestionnaire by itemnaire id
         # so, mock all the searhcing result to avoid data not existing in DB
-        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(aq1)
-        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 2).and_return(aq2)
+        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, itemnaire_id: 1).and_return(aq1)
+        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, itemnaire_id: 2).and_return(aq2)
         # mock a creating result for testing return value
         allow(VmQuestionResponse).to receive(:new).with(any_args).and_return(vmQ1)
         expect(view_heatgrid(1, 'ReviewQuestionnaire')).to include('!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->')
@@ -262,10 +262,10 @@ describe GradesHelper, type: :helper do
       end
     end
 
-    context 'when all questionnaires match the target type, but the assignment does not vary by round' do
+    context 'when all itemnaires match the target type, but the assignment does not vary by round' do
       it 'the round variable in the new VmQuestionResponse should be nil' do
         # mock the participant for the  AssignmentParticipant.find
-        # viewgrid_participant contains a assignment whose questionnaires' type is TeammateReviewQuestionnaire
+        # viewgrid_participant contains a assignment whose itemnaires' type is TeammateReviewQuestionnaire
         allow(AssignmentParticipant).to receive(:find).with(2).and_return(viewgrid_participant)
         allow(viewgrid_participant).to receive(:team).and_return(team)
         view_heatgrid(2, 'TeammateReviewQuestionnaire')

@@ -1,8 +1,8 @@
 class QuestionAdvice < ApplicationRecord
   # attr_accessible :score, :advice
-  belongs_to :question
+  belongs_to :item
 
-  # This method returns an array of fields present in question advice model
+  # This method returns an array of fields present in item advice model
   def self.export_fields(_options)
     fields = []
     QuestionAdvice.columns.each do |column|
@@ -11,13 +11,13 @@ class QuestionAdvice < ApplicationRecord
     fields
   end
 
-  # This method adds the question advice data to CSV for the respective questionnaire
+  # This method adds the item advice data to CSV for the respective itemnaire
   def self.export(csv, parent_id, _options)
-    questionnaire = Questionnaire.find(parent_id)
-    questions = questionnaire.questions
-    questions.each do |question|
-      question_advices = QuestionAdvice.where('question_id = ?', question.id)
-      question_advices.each do |advice|
+    itemnaire = Questionnaire.find(parent_id)
+    items = itemnaire.items
+    items.each do |item|
+      item_advices = QuestionAdvice.where('item_id = ?', item.id)
+      item_advices.each do |advice|
         tcsv = []
         advice.attributes.each_pair do |_name, value|
           tcsv.push(value)

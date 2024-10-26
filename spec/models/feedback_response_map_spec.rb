@@ -1,17 +1,17 @@
 describe FeedbackResponseMap do
-  let(:questionnaire1) { build(:questionnaire, id: 1, type: 'AuthorFeedbackQuestionnaire') }
-  let(:questionnaire2) { build(:questionnaire, id: 2, type: 'MetareviewQuestionnaire') }
+  let(:itemnaire1) { build(:itemnaire, id: 1, type: 'AuthorFeedbackQuestionnaire') }
+  let(:itemnaire2) { build(:itemnaire, id: 2, type: 'MetareviewQuestionnaire') }
   let(:participant) { build(:participant, id: 1) }
   let(:assignment) { build(:assignment, id: 1) }
   let(:team) { build(:assignment_team) }
   let(:assignment_participant) { build(:participant, id: 2, assignment: assignment) }
   let(:feedback_response_map) { build(:feedback_response_map) }
   let(:review_response_map) { build(:review_response_map, id: 2, assignment: assignment, reviewer: participant, reviewee: team) }
-  let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
+  let(:answer) { Answer.new(answer: 1, comments: 'Answer text', item_id: 1) }
   let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer]) }
   let(:user1) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
   before(:each) do
-    questionnaires = [questionnaire1, questionnaire2]
+    itemnaires = [itemnaire1, itemnaire2]
     allow(feedback_response_map).to receive(:reviewee).and_return(participant)
     allow(feedback_response_map).to receive(:review).and_return(response)
     allow(feedback_response_map).to receive(:reviewer).and_return(assignment_participant)
@@ -19,8 +19,8 @@ describe FeedbackResponseMap do
     allow(response).to receive(:reviewee).and_return(assignment_participant)
     allow(review_response_map).to receive(:assignment).and_return(assignment)
     allow(feedback_response_map).to receive(:assignment).and_return(assignment)
-    allow(assignment).to receive(:questionnaires).and_return(questionnaires)
-    allow(questionnaires).to receive(:find_by).with(type: 'AuthorFeedbackQuestionnaire').and_return([questionnaire1])
+    allow(assignment).to receive(:itemnaires).and_return(itemnaires)
+    allow(itemnaires).to receive(:find_by).with(type: 'AuthorFeedbackQuestionnaire').and_return([itemnaire1])
   end
   describe '#assignment' do
     it 'returns the assignment associated with this FeedbackResponseMap' do
@@ -46,9 +46,9 @@ describe FeedbackResponseMap do
       expect(feedback_response_map.get_title).to eq('Feedback')
     end
   end
-  describe '#questionnaire' do
+  describe '#itemnaire' do
     it 'returns an AuthorFeedbackQuestionnaire' do
-      expect(feedback_response_map.questionnaire.first.type).to eq('AuthorFeedbackQuestionnaire')
+      expect(feedback_response_map.itemnaire.first.type).to eq('AuthorFeedbackQuestionnaire')
     end
   end
   describe '#contributor' do

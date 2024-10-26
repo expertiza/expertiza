@@ -1,6 +1,6 @@
 describe VmQuestionResponseScoreCell do
-  let(:questionnaire) { create(:questionnaire, id: 1) }
-  let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
+  let(:itemnaire) { create(:itemnaire, id: 1) }
+  let(:item1) { create(:item, itemnaire: itemnaire, weight: 1, id: 1) }
   let!(:answer) { create(:answer, answer: 5, comments: 'This is a comment. I hope it is a good one') }
   let(:tp) { TagPrompt.new(prompt: 'test prompt', desc: 'test desc', control_type: 'Checkbox') }
   let(:tp2) { TagPrompt.new(prompt: 'test prompt2', desc: 'test desc2', control_type: 'Slider') }

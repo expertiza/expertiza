@@ -13,8 +13,8 @@ describe AssignmentsController do
   let(:instructor2) { build(:instructor, id: 66) }
   let(:ta) { build(:teaching_assistant, id: 8) }
   let(:student) { build(:student) }
-  let(:questionnaire) { build(:questionnaire, id: 666) }
-  let(:assignment_questionnaire) { build(:assignment_questionnaire, id: 1, questionnaire: questionnaire) }
+  let(:itemnaire) { build(:itemnaire, id: 666) }
+  let(:assignment_itemnaire) { build(:assignment_itemnaire, id: 1, itemnaire: itemnaire) }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -106,8 +106,8 @@ describe AssignmentsController do
       @used_params = {
         button: true,
         assignment_form: {
-          assignment_questionnaire: [{ 'assignment_id' => '1', 'questionnaire_id' => '666', 'dropdown' => 'true',
-                                       'questionnaire_weight' => '100', 'notification_limit' => '15', 'used_in_round' => '1' }],
+          assignment_itemnaire: [{ 'assignment_id' => '1', 'itemnaire_id' => '666', 'dropdown' => 'true',
+                                       'itemnaire_weight' => '100', 'notification_limit' => '15', 'used_in_round' => '1' }],
           due_date: [{ 'id' => '', 'parent_id' => '', 'round' => '1', 'deadline_type_id' => '1', 'due_at' => '2017/12/05 00:00', 'submission_allowed_id' => '3', 'review_allowed_id' => '1', 'teammate_review_allowed_id' => '3', 'review_of_review_allowed_id' => '1', 'threshold' => '1' },
                      { 'id' => '', 'parent_id' => '', 'round' => '1', 'deadline_type_id' => '2', 'due_at' => '2017/12/02 00:00', 'submission_allowed_id' => '1', 'review_allowed_id' => '3', 'teammate_review_allowed_id' => '3', 'review_of_review_allowed_id' => '1', 'threshold' => '1' }],
           assignment: {
@@ -121,7 +121,7 @@ describe AssignmentsController do
             private: false,
             show_teammate_reviews: false,
             require_quiz: false,
-            num_quiz_questions: 0,
+            num_quiz_items: 0,
             staggered_deadline: false,
             microtask: false,
             reviews_visible_to_all: false,
@@ -136,8 +136,8 @@ describe AssignmentsController do
       @new_params = {
         button: true,
         assignment_form: {
-          assignment_questionnaire: [{ 'assignment_id' => '1', 'questionnaire_id' => '666', 'dropdown' => 'true',
-                                       'questionnaire_weight' => '100', 'notification_limit' => '15', 'used_in_round' => '1' }],
+          assignment_itemnaire: [{ 'assignment_id' => '1', 'itemnaire_id' => '666', 'dropdown' => 'true',
+                                       'itemnaire_weight' => '100', 'notification_limit' => '15', 'used_in_round' => '1' }],
           due_date: [{ 'id' => '', 'parent_id' => '', 'round' => '1', 'deadline_type_id' => '1', 'due_at' => '2017/12/05 00:00', 'submission_allowed_id' => '3', 'review_allowed_id' => '1', 'teammate_review_allowed_id' => '3', 'review_of_review_allowed_id' => '1', 'threshold' => '1' },
                      { 'id' => '', 'parent_id' => '', 'round' => '1', 'deadline_type_id' => '2', 'due_at' => '2017/12/02 00:00', 'submission_allowed_id' => '1', 'review_allowed_id' => '3', 'teammate_review_allowed_id' => '3', 'review_of_review_allowed_id' => '1', 'threshold' => '1' }],
           assignment: {
@@ -151,7 +151,7 @@ describe AssignmentsController do
             private: false,
             show_teammate_reviews: false,
             require_quiz: false,
-            num_quiz_questions: 0,
+            num_quiz_items: 0,
             staggered_deadline: false,
             microtask: false,
             reviews_visible_to_all: false,
@@ -212,8 +212,8 @@ describe AssignmentsController do
       it 'shows an error flash message and renders edit page' do
         allow(SignUpTopic).to receive(:where).with(assignment_id: assignment.id.to_s).and_return([double('SignUpTopic'), double('SignUpTopic')])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id.to_s)
-                                                         .and_return([assignment_questionnaire])
-        allow(Questionnaire).to receive(:where).with(id: assignment_questionnaire.questionnaire_id).and_return([double('Questionnaire', type: 'ReviewQuestionnaire')])
+                                                         .and_return([assignment_itemnaire])
+        allow(Questionnaire).to receive(:where).with(id: assignment_itemnaire.itemnaire_id).and_return([double('Questionnaire', type: 'ReviewQuestionnaire')])
         assignment_due_date = build(:assignment_due_date)
         allow(AssignmentDueDate).to receive(:where).with(parent_id: assignment.id.to_s).and_return([assignment_due_date])
         allow(assignment).to receive(:num_review_rounds).and_return(1)
@@ -264,14 +264,14 @@ describe AssignmentsController do
 
     context 'when params has key :assignment_form' do
       before(:each) do
-        new_assignment_questionnaire = AssignmentQuestionnaire.new
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: '1').and_return([assignment_questionnaire])
+        new_assignment_itemnaire = AssignmentQuestionnaire.new
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: '1').and_return([assignment_itemnaire])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 2).and_return([])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 2, used_in_round: anything).and_return([])
-        allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
-        allow(AssignmentQuestionnaire).to receive(:new).and_return(new_assignment_questionnaire)
-        allow(Questionnaire).to receive(:find).with('666').and_return(questionnaire)
-        allow(new_assignment_questionnaire).to receive(:save).and_return(true)
+        allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, itemnaire_id: nil).and_return([])
+        allow(AssignmentQuestionnaire).to receive(:new).and_return(new_assignment_itemnaire)
+        allow(Questionnaire).to receive(:find).with('666').and_return(itemnaire)
+        allow(new_assignment_itemnaire).to receive(:save).and_return(true)
         @params = {
           vary_by_topic?: true,
           id: 1,
@@ -280,8 +280,8 @@ describe AssignmentsController do
             bool: 'true'
           },
           assignment_form: {
-            assignment_questionnaire: [{ 'assignment_id' => '1', 'questionnaire_id' => '666', 'dropdown' => 'true',
-                                         'questionnaire_weight' => '0', 'notification_limit' => '15', 'used_in_round' => '1' }],
+            assignment_itemnaire: [{ 'assignment_id' => '1', 'itemnaire_id' => '666', 'dropdown' => 'true',
+                                         'itemnaire_weight' => '0', 'notification_limit' => '15', 'used_in_round' => '1' }],
             assignment: {
               instructor_id: 2,
               course_id: 1,
@@ -292,7 +292,7 @@ describe AssignmentsController do
               spec_location: '',
               show_teammate_reviews: false,
               require_quiz: false,
-              num_quiz_questions: 0,
+              num_quiz_items: 0,
               staggered_deadline: false,
               microtask: false,
               reviews_visible_to_all: false,
@@ -328,9 +328,9 @@ describe AssignmentsController do
         end
       end
 
-      context 'when update assignment_form is called on an empty questionnaire of non-zero weight' do
+      context 'when update assignment_form is called on an empty itemnaire of non-zero weight' do
         it 'shows an error message and redirects to assignments#edit page' do
-          @params[:assignment_form][:assignment_questionnaire][0]['questionnaire_weight'] = '100'
+          @params[:assignment_form][:assignment_itemnaire][0]['itemnaire_weight'] = '100'
           user_session = { user: instructor }
           post :update, params: @params, session: user_session
           expect(flash[:note]).to eq('The assignment was successfully saved....')

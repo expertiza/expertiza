@@ -23,7 +23,7 @@ class TreeDisplayController < ApplicationController
     @node_type = params[:nodeType]
   end
 
-  def goto_questionnaires
+  def goto_itemnaires
     goto_controller('Questionnaires', '3')
   end
 
@@ -168,12 +168,12 @@ class TreeDisplayController < ApplicationController
   #   end
   # end
   # ^^^ original method for "handleExpandClick"
-  # For the questionnaire's handleExpandClick function, it appears that the get_sub_folder_contents method is not capable of returning the data.
+  # For the itemnaire's handleExpandClick function, it appears that the get_sub_folder_contents method is not capable of returning the data.
   # We fixed the courses by rendering the json properly on the return to the jquery post request from the front-end
   # The assignments tab did not have any data when we used the react debugging extension (i.e. the childNodes attribute was null)
   # From this, we assumed there was no data to display underneath each assignment
   # After debugging, we found that the "nodeType" attribute in the :reactParams field of the post request identifies the type of childNodes to be retrieved (i.e. "courses" or "Questionnaires")
-  # We found that a "FolderNode" value for this attribute equates to a questionnaire
+  # We found that a "FolderNode" value for this attribute equates to a itemnaire
 
   # check if nodetype is coursenode
   def course_node_for_current_ta?(ta_mappings, node)

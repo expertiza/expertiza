@@ -1,12 +1,12 @@
 describe AssignmentHelper do
   let(:assignment_helper) { Class.new { extend AssignmentHelper } }
-  let(:questionnaire) { create(:questionnaire, id: 1) }
-  let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
+  let(:itemnaire) { create(:itemnaire, id: 1) }
+  let(:item1) { create(:item, itemnaire: itemnaire, weight: 1, id: 1) }
   let(:response) { build(:response, id: 1, map_id: 1, scores: [answer]) }
-  let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
+  let(:answer) { Answer.new(answer: 1, comments: 'Answer text', item_id: 1) }
   let(:team) { build(:assignment_team) }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
-  let(:questionnaire1) { build(:questionnaire, name: 'abc', private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234) }
+  let(:itemnaire1) { build(:itemnaire, name: 'abc', private: 0, min_item_score: 0, max_item_score: 10, instructor_id: 1234) }
   let(:contributor) { build(:assignment_team, id: 1) }
   let(:signed_up_team) { build(:signed_up_team, team_id: contributor.id) }
   let(:teaching_assistant) { build(:teaching_assistant, id: 1) }
@@ -17,9 +17,9 @@ describe AssignmentHelper do
   let(:course3) { build(:course, id: 3, name: 'ECE216') }
   let(:ta_mapping1) { build(:ta_mapping, id: 1, course_id: 1)}
   let(:ta_mapping2) { build(:ta_mapping, id: 2, course_id: 2)}
-  describe '#questionnaire_options' do
+  describe '#itemnaire_options' do
     it 'throws exception if type argument nil' do
-      expect { questionnaire_options(nil) }.to raise_exception(NoMethodError)
+      expect { itemnaire_options(nil) }.to raise_exception(NoMethodError)
     end
   end
   describe '#course_options' do

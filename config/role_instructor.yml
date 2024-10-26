@@ -44,14 +44,14 @@ development:
       suggestion:
         create: true
         new: true
-      questionnaire:
+      itemnaire:
         list: true
-        create_questionnaire: true
-        edit_questionnaire: true
-        copy_questionnaire: true
-        save_questionnaire: true
+        create_itemnaire: true
+        edit_itemnaire: true
+        copy_itemnaire: true
+        save_itemnaire: true
         new_quiz: true
-        create_quiz_questionnaire: true
+        create_quiz_itemnaire: true
         update_quiz: true
         edit_quiz: true
         view_quiz: true
@@ -89,7 +89,7 @@ development:
       tree_display:
         list: true
         drill: true
-        goto_questionnaires: true
+        goto_itemnaires: true
         goto_author_feedbacks: true
         goto_review_rubrics: true
         goto_courses: true
@@ -146,7 +146,7 @@ development:
       admin: false
       course: true
       assignment: true
-      questionnaire: true
+      itemnaire: true
       participants: true
       reports: true
       institution: false
@@ -301,11 +301,11 @@ development:
         controller_action_id: 60
         id: 38
         label: Questionnaires
-        name: manage/questionnaires
+        name: manage/itemnaires
         parent:
         parent_id: 37
         site_controller_id: 38
-        url: "/tree_display/goto_questionnaires"
+        url: "/tree_display/goto_itemnaires"
         children:
         - 39
         - 48
@@ -346,7 +346,7 @@ development:
         controller_action_id: 62
         id: 39
         label: Review rubrics
-        name: manage/questionnaires/review rubrics
+        name: manage/itemnaires/review rubrics
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -356,7 +356,7 @@ development:
         controller_action_id: 72
         id: 48
         label: Metareview rubrics
-        name: manage/questionnaires/metareview rubrics
+        name: manage/itemnaires/metareview rubrics
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -366,7 +366,7 @@ development:
         controller_action_id: 73
         id: 49
         label: Teammate review rubrics
-        name: manage/questionnaires/teammate review rubrics
+        name: manage/itemnaires/teammate review rubrics
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -376,7 +376,7 @@ development:
         controller_action_id: 61
         id: 40
         label: Author feedbacks
-        name: manage/questionnaires/author feedbacks
+        name: manage/itemnaires/author feedbacks
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -420,14 +420,14 @@ development:
       credits: *9
       show: *10
       manage/users: *12
-      manage/questionnaires: *13
+      manage/itemnaires: *13
       manage/courses: *14
       manage/assignments: *15
       impersonate: *16
-      manage/questionnaires/review rubrics: *17
-      manage/questionnaires/metareview rubrics: *18
-      manage/questionnaires/teammate review rubrics: *19
-      manage/questionnaires/author feedbacks: *20
+      manage/itemnaires/review rubrics: *17
+      manage/itemnaires/metareview rubrics: *18
+      manage/itemnaires/teammate review rubrics: *19
+      manage/itemnaires/author feedbacks: *20
       anonymized_view: *24
       student_view: *58
       instructor_view : *59
@@ -495,12 +495,12 @@ test:
         list_folders: true
       assignment:
         list: true
-      questionnaire:
+      itemnaire:
         list: true
-        create_questionnaire: true
-        edit_questionnaire: true
-        copy_questionnaire: true
-        save_questionnaire: true
+        create_itemnaire: true
+        edit_itemnaire: true
+        copy_itemnaire: true
+        save_itemnaire: true
       participants:
         add_student: true
         edit_team_members: true
@@ -534,7 +534,7 @@ test:
       tree_display:
         list: true
         drill: true
-        goto_questionnaires: true
+        goto_itemnaires: true
         goto_author_feedbacks: true
         goto_review_rubrics: true
         goto_global_survey: true
@@ -586,7 +586,7 @@ test:
       admin: false
       course: true
       assignment: true
-      questionnaire: true
+      itemnaire: true
       advice: true
       participants: true
       reports: true
@@ -716,13 +716,13 @@ test:
       20: &10 !ruby/object:Menu::Node
         parent:
         parent_id: 3
-        name: manage/questionnaires
+        name: manage/itemnaires
         id: 20
         label: Questionnaires
         site_controller_id: 33
         controller_action_id: 53
         content_page_id:
-        url: "/tree_display/goto_questionnaires"
+        url: "/tree_display/goto_itemnaires"
         children:
         - 24
         - 25
@@ -772,7 +772,7 @@ test:
       24: &16 !ruby/object:Menu::Node
         parent:
         parent_id: 20
-        name: manage/questionnaires/review rubrics
+        name: manage/itemnaires/review rubrics
         id: 24
         label: Review rubrics
         site_controller_id: 33
@@ -782,7 +782,7 @@ test:
       25: &17 !ruby/object:Menu::Node
         parent:
         parent_id: 20
-        name: manage/questionnaires/metareview rubrics
+        name: manage/itemnaires/metareview rubrics
         id: 25
         label: Metareview rubrics
         site_controller_id: 33
@@ -792,7 +792,7 @@ test:
       26: &18 !ruby/object:Menu::Node
         parent:
         parent_id: 20
-        name: manage/questionnaires/teammate review rubrics
+        name: manage/itemnaires/teammate review rubrics
         id: 26
         label: Teammate review rubrics
         site_controller_id: 33
@@ -802,7 +802,7 @@ test:
       27: &19 !ruby/object:Menu::Node
         parent:
         parent_id: 20
-        name: manage/questionnaires/author feedbacks
+        name: manage/itemnaires/author feedbacks
         id: 27
         label: Author feedbacks
         site_controller_id: 33
@@ -814,7 +814,7 @@ test:
         controller_action_id: 64
         id: 52
         label: Bookmark Rating rubrics
-        name: manage/questionnaires/bookmark rating rubrics
+        name: manage/itemnaires/bookmark rating rubrics
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -847,16 +847,16 @@ test:
       contact_us: *6
       show: *8
       manage/users: *9
-      manage/questionnaires: *10
+      manage/itemnaires: *10
       manage/courses: *11
       manage/assignments: *12
       impersonate: *13
       credits: *15
-      manage/questionnaires/review rubrics: *16
-      manage/questionnaires/metareview rubrics: *17
-      manage/questionnaires/teammate review rubrics: *18
-      manage/questionnaires/author feedbacks: *19
-      manage/questionnaires/bookmark rating rubrics: *38
+      manage/itemnaires/review rubrics: *16
+      manage/itemnaires/metareview rubrics: *17
+      manage/itemnaires/teammate review rubrics: *18
+      manage/itemnaires/author feedbacks: *19
+      manage/itemnaires/bookmark rating rubrics: *38
       student_view: *58
       instructor_view: *59
     selected:
@@ -912,14 +912,14 @@ production:
       suggestion:
         create: true
         new: true
-      questionnaire:
+      itemnaire:
         list: true
-        create_questionnaire: true
-        edit_questionnaire: true
-        copy_questionnaire: true
-        save_questionnaire: true
+        create_itemnaire: true
+        edit_itemnaire: true
+        copy_itemnaire: true
+        save_itemnaire: true
         new_quiz: true
-        create_quiz_questionnaire: true
+        create_quiz_itemnaire: true
         update_quiz: true
         edit_quiz: true
         view_quiz: true
@@ -959,7 +959,7 @@ production:
       tree_display:
         list: true
         drill: true
-        goto_questionnaires: true
+        goto_itemnaires: true
         goto_author_feedbacks: true
         goto_review_rubrics: true
         goto_courses: true
@@ -1016,7 +1016,7 @@ production:
       admin: false
       course: true
       assignment: true
-      questionnaire: true
+      itemnaire: true
       participants: true
       reports: true
       institution: false
@@ -1173,11 +1173,11 @@ production:
         controller_action_id: 60
         id: 38
         label: Questionnaires
-        name: manage/questionnaires
+        name: manage/itemnaires
         parent:
         parent_id: 37
         site_controller_id: 38
-        url: "/tree_display/goto_questionnaires"
+        url: "/tree_display/goto_itemnaires"
         children:
         - 39
         - 48
@@ -1222,7 +1222,7 @@ production:
         controller_action_id: 62
         id: 39
         label: Review rubrics
-        name: manage/questionnaires/review rubrics
+        name: manage/itemnaires/review rubrics
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -1232,7 +1232,7 @@ production:
         controller_action_id: 72
         id: 48
         label: Metareview rubrics
-        name: manage/questionnaires/metareview rubrics
+        name: manage/itemnaires/metareview rubrics
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -1242,7 +1242,7 @@ production:
         controller_action_id: 73
         id: 49
         label: Teammate review rubrics
-        name: manage/questionnaires/teammate review rubrics
+        name: manage/itemnaires/teammate review rubrics
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -1252,7 +1252,7 @@ production:
         controller_action_id: 61
         id: 40
         label: Author feedbacks
-        name: manage/questionnaires/author feedbacks
+        name: manage/itemnaires/author feedbacks
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -1272,7 +1272,7 @@ production:
         controller_action_id: 64
         id: 52
         label: Bookmark Rating rubrics
-        name: manage/questionnaires/bookmark rating rubrics
+        name: manage/itemnaires/bookmark rating rubrics
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -1306,15 +1306,15 @@ production:
       credits: *9
       show: *10
       manage/users: *12
-      manage/questionnaires: *13
+      manage/itemnaires: *13
       manage/courses: *14
       manage/assignments: *15
       impersonate: *16
-      manage/questionnaires/review rubrics: *17
-      manage/questionnaires/metareview rubrics: *18
-      manage/questionnaires/teammate review rubrics: *19
-      manage/questionnaires/author feedbacks: *20
-      manage/questionnaires/bookmark rating rubrics: *38
+      manage/itemnaires/review rubrics: *17
+      manage/itemnaires/metareview rubrics: *18
+      manage/itemnaires/teammate review rubrics: *19
+      manage/itemnaires/author feedbacks: *20
+      manage/itemnaires/bookmark rating rubrics: *38
       anonymized_view: *24
       student_view: *58
       instructor_view: *59

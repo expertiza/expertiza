@@ -1,26 +1,26 @@
 include InstructorInterfaceHelperSpec
 
-def create_assignment_questionnaire(survey_name)
-  visit '/questionnaires/new?model=Assignment+SurveyQuestionnaire&private=0'
-  fill_in 'questionnaire_name', with: survey_name
+def create_assignment_itemnaire(survey_name)
+  visit '/itemnaires/new?model=Assignment+SurveyQuestionnaire&private=0'
+  fill_in 'itemnaire_name', with: survey_name
   find('input[name="commit"]').click
 end
 
 def deploy_assignment_survey(start_date, end_date, survey_name)
   login_as('instructor6')
   expect(page).to have_content('Manage content')
-  create_assignment_questionnaire survey_name
+  create_assignment_itemnaire survey_name
   survey = Questionnaire.where(name: survey_name)
   visit '/survey_deployment/new?id=' + \
         Assignment.where(instructor_id: User.where(name: 'instructor6').first.id).first.id.to_s + '&type=AssignmentSurveyDeployment'
   expect(page).to have_content('New Survey Deployment')
   fill_in 'survey_deployment_start_date', with: start_date
   fill_in 'survey_deployment_end_date', with: end_date
-  select survey.name, from: 'survey_deployment_questionnaire_id'
+  select survey.name, from: 'survey_deployment_itemnaire_id'
   find('input[name="commit"]').click
 end
 
-describe 'Survey questionnaire tests for instructor interface' do
+describe 'Survey itemnaire tests for instructor interface' do
   before(:each) do
     assignment_setup
     @previous_day = (Time.now.getlocal - 1 * 86_400).strftime('%Y-%m-%d %H:%M:%S')
@@ -31,7 +31,7 @@ describe 'Survey questionnaire tests for instructor interface' do
   it 'is able to create an assignment survey' do
     login_as('instructor6')
     survey_name = 'Assignment Survey Questionnaire 1'
-    create_assignment_questionnaire survey_name
+    create_assignment_itemnaire survey_name
     expect(Questionnaire.where(name: survey_name)).to exist
   end
 
@@ -54,37 +54,37 @@ describe 'Survey questionnaire tests for instructor interface' do
     survey_name = 'Assignment Survey Questionnaire 1'
     deploy_assignment_survey(@next_day, @next_to_next_day, survey_name)
 
-    survey_questionnaire_1 = Questionnaire.where(name: survey_name).first
+    survey_itemnaire_1 = Questionnaire.where(name: survey_name).first
 
-    # adding some questions for the deployed survey
-    visit '/questionnaires/' + survey_questionnaire_1.id.to_s + '/edit'
-    fill_in('question_total_num', with: '1')
-    select('Criterion', from: 'question_type')
+    # adding some items for the deployed survey
+    visit '/itemnaires/' + survey_itemnaire_1.id.to_s + '/edit'
+    fill_in('item_total_num', with: '1')
+    select('Criterion', from: 'item_type')
     click_button 'Add'
     expect(page).to have_content('Remove')
 
-    fill_in 'Edit question content here', with: 'Test question 1'
-    click_button 'Save assignment survey questionnaire'
-    expect(page).to have_content('All questions have been successfully saved!')
+    fill_in 'Edit item content here', with: 'Test item 1'
+    click_button 'Save assignment survey itemnaire'
+    expect(page).to have_content('All items have been successfully saved!')
 
-    survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_1.id).first
-    question = Question.find_by_sql(\
-      'select * from questions where questionnaire_id = ' + survey_questionnaire_1.id.to_s + " and (type = 'Criterion' OR type = 'Checkbox')"
+    survey_deployment = SurveyDeployment.where(itemnaire_id: survey_itemnaire_1.id).first
+    item = Question.find_by_sql(\
+      'select * from items where itemnaire_id = ' + survey_itemnaire_1.id.to_s + " and (type = 'Criterion' OR type = 'Checkbox')"
     )
 
     visit '/survey_deployment/generate_statistics/' + survey_deployment.id.to_s
-    question.each do |q|
+    item.each do |q|
       expect(page).to have_content(q.txt)
     end
-    expect(page).to have_content('No responses for this question')
+    expect(page).to have_content('No responses for this item')
   end
 
   it 'is able to view responses of a survey' do
     survey_name = 'Assignment Survey Questionnaire 1'
     deploy_assignment_survey(@next_day, @next_to_next_day, survey_name)
 
-    survey_questionnaire_1 = Questionnaire.where(name: survey_name).first
-    survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_1.id).first
+    survey_itemnaire_1 = Questionnaire.where(name: survey_name).first
+    survey_deployment = SurveyDeployment.where(itemnaire_id: survey_itemnaire_1.id).first
 
     # after adding a response:
     visit '/survey_deployment/view_responses/' + survey_deployment.id.to_s
@@ -94,7 +94,7 @@ describe 'Survey questionnaire tests for instructor interface' do
   it 'is able to add a second survey' do
     login_as('instructor6')
     survey_name = 'Assignment Survey Questionnaire 2'
-    create_assignment_questionnaire survey_name
+    create_assignment_itemnaire survey_name
     expect(Questionnaire.where(name: survey_name)).to exist
   end
 
@@ -110,8 +110,8 @@ describe 'Survey questionnaire tests for instructor interface' do
     survey_name = 'Assignment Survey Questionnaire 2'
     deploy_assignment_survey(@next_day, @next_to_next_day, survey_name)
 
-    survey_questionnaire_2 = Questionnaire.where(name: survey_name).first
-    survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_2.id).first
+    survey_itemnaire_2 = Questionnaire.where(name: survey_name).first
+    survey_deployment = SurveyDeployment.where(itemnaire_id: survey_itemnaire_2.id).first
 
     # after adding a response:
     visit '/survey_deployment/view_responses/' + survey_deployment.id.to_s

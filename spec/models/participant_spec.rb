@@ -10,12 +10,12 @@ describe Participant do
   let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
   let(:participant5) { build(:participant, user: user, assignment: assignment) }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
-  let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
+  let(:answer) { Answer.new(answer: 1, comments: 'Answer text', item_id: 1) }
   let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer]) }
-  let(:question1) { Criterion.new(id: 1, weight: 2, break_before: true) }
-  let(:question2) { Criterion.new(id: 2, weight: 2, break_before: true) }
-  let(:questionnaire1) { ReviewQuestionnaire.new(id: 1, questions: [question1], max_question_score: 5) }
-  let(:questionnaire2) { ReviewQuestionnaire.new(id: 2, questions: [question2], max_question_score: 5) }
+  let(:item1) { Criterion.new(id: 1, weight: 2, break_before: true) }
+  let(:item2) { Criterion.new(id: 2, weight: 2, break_before: true) }
+  let(:itemnaire1) { ReviewQuestionnaire.new(id: 1, items: [item1], max_item_score: 5) }
+  let(:itemnaire2) { ReviewQuestionnaire.new(id: 2, items: [item2], max_item_score: 5) }
 
   after(:each) do
     ActionMailer::Base.deliveries.clear

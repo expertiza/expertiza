@@ -101,8 +101,8 @@ function checkDeadlines()
   }
 }
 
-function updateDropDownMenu(advice,question,min){			
-  var id = 'responses_' + question + '_score'			
+function updateDropDownMenu(advice,item,min){			
+  var id = 'responses_' + item + '_score'			
     document.getElementById(id).selectedIndex = advice - min
 }
 

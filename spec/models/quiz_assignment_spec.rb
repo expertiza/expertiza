@@ -4,7 +4,7 @@ describe QuizAssignment do
   let(:student) { build(:student, id: 3, name: 'no one') }
   let(:participant) { build(:participant, id: 1) }
   let(:team) { build(:assignment_team, id: 1, parent_id: 1) }
-  let(:questionnaire1) { build(:questionnaire, id: 1, type: 'ReviewQuestionnaire') }
+  let(:itemnaire1) { build(:itemnaire, id: 1, type: 'ReviewQuestionnaire') }
   let(:teammate_review_response_map) { build(:review_response_map, type: 'TeammateReviewResponseMap') }
   let(:topic) { build(:topic) }
   describe '#candidate_topics_for_quiz' do
@@ -35,7 +35,7 @@ describe QuizAssignment do
   describe '#quiz_taken_by?' do
     context 'when the participant has taken one quizzes' do
       it 'returns true' do
-        allow(QuizQuestionnaire).to receive(:find_by).with(instructor_id: 6).and_return(questionnaire1)
+        allow(QuizQuestionnaire).to receive(:find_by).with(instructor_id: 6).and_return(itemnaire1)
         allow(QuizResponseMap).to receive(:where).with('reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 6, 1, 1).and_return([teammate_review_response_map])
         expect(assignment.quiz_taken_by?(instructor, participant)).to eq(true)
       end

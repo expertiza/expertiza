@@ -19,8 +19,8 @@ class FeedbackResponseMap < ResponseMap
     'Feedback'
   end
 
-  def questionnaire
-    assignment.questionnaires.find_by(type: 'AuthorFeedbackQuestionnaire')
+  def itemnaire
+    assignment.itemnaires.find_by(type: 'AuthorFeedbackQuestionnaire')
   end
 
   def contributor

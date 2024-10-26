@@ -1,7 +1,7 @@
 <script type="text/javascript">
-    function addQuestionnaireTableRow(questionnaire_type, assignment_questionnaire, questionnaire, questionnaire_options, round_no, duty_id, duty_name) {
-        var questionnaire_table = jQuery('#assignment_questionnaire_table>tbody>tr');
-        var row_id = 'questionnaire_table_' + questionnaire_type;
+    function addQuestionnaireTableRow(itemnaire_type, assignment_itemnaire, itemnaire, itemnaire_options, round_no, duty_id, duty_name) {
+        var itemnaire_table = jQuery('#assignment_itemnaire_table>tbody>tr');
+        var row_id = 'itemnaire_table_' + itemnaire_type;
         // E2147 : If duty_id is not undefined, add duty_id with the row_id to create a unique row id
         if (duty_id != undefined){
             row_id = row_id + duty_id
@@ -9,35 +9,35 @@
 
         var i;
         var html = '<tr id=' + row_id + '>';
-        html += '<input name="assignment_form[assignment_questionnaire][][assignment_id]" type="hidden" value="' + '<%= @assignment_form.assignment.id %>' +'">';
+        html += '<input name="assignment_form[assignment_itemnaire][][assignment_id]" type="hidden" value="' + '<%= @assignment_form.assignment.id %>' +'">';
 
-        // E2147 : Add duty_id as hidden input for this particular row so that it can be saved in assignment_questionnaire table
+        // E2147 : Add duty_id as hidden input for this particular row so that it can be saved in assignment_itemnaire table
         if (duty_id != undefined) {
-            html += '<input name="assignment_form[assignment_questionnaire][][duty_id]" type="hidden" value="' + duty_id +'">';
+            html += '<input name="assignment_form[assignment_itemnaire][][duty_id]" type="hidden" value="' + duty_id +'">';
         }
         //Rubric name
         if (round_no == null && duty_id == undefined) {
-            html += '<td><label for="questionnaire_id">' + questionnaire.display_type + ':</label></td>';
+            html += '<td><label for="itemnaire_id">' + itemnaire.display_type + ':</label></td>';
         } else if (round_no == null && duty_id != undefined) {
-            // E2147 : Add name of duty infront of the questionnaire type to select for which duty the questionnaire is being selected
-            html += '<td><label for="questionnaire_id">' + questionnaire.display_type +  ' Role ' + duty_name + ':</label></td>';
+            // E2147 : Add name of duty infront of the itemnaire type to select for which duty the itemnaire is being selected
+            html += '<td><label for="itemnaire_id">' + itemnaire.display_type +  ' Role ' + duty_name + ':</label></td>';
         }
         else if (round_no!=null && duty_id == undefined) {
-            html += '<td><label for="questionnaire_id">' + questionnaire.display_type + ' Round '+ round_no + ':</label></td>';
+            html += '<td><label for="itemnaire_id">' + itemnaire.display_type + ' Round '+ round_no + ':</label></td>';
         }
         //Rubric options
         html +=     '<td align="center">' +
-        '<select id="questionnaire_id" name="assignment_form[assignment_questionnaire][][questionnaire_id]" style="width:300px" class="form-control">' +
+        '<select id="itemnaire_id" name="assignment_form[assignment_itemnaire][][itemnaire_id]" style="width:300px" class="form-control">' +
         '<option value="">--None--</option>';
-        for (i = 0; i < questionnaire_options.length; i++) {
-            html += '<option value="' + questionnaire_options[i][1] + '">' + questionnaire_options[i][0] + '</option>';
+        for (i = 0; i < itemnaire_options.length; i++) {
+            html += '<option value="' + itemnaire_options[i][1] + '">' + itemnaire_options[i][0] + '</option>';
         }
         html += '</select></td>';
         //Use dropdown instead
         html += '<td align="center"><input type="checkbox" name="dropdown" id="dropdown" value="true"></td>';
-        //Scored question display type (Dropdown or Scale)
-        html += '<td align="center"><select id="scored_question_display_type", name="assignment_form[assignment_questionnaire][][dropdown]" class="form-control">';
-          if (assignment_questionnaire.dropdown == true) {
+        //Scored item display type (Dropdown or Scale)
+        html += '<td align="center"><select id="scored_item_display_type", name="assignment_form[assignment_itemnaire][][dropdown]" class="form-control">';
+          if (assignment_itemnaire.dropdown == true) {
             html += '<option value=true selected="selected">Dropdown</option>';
             html += '<option value=false>Scale</option>';
           } else {
@@ -47,36 +47,36 @@
         html += '</select></td>';
         //Weight
         if (round_no == null || round_no == 1) {
-            html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][questionnaire_weight]" style="width:40px" type="text" value="' +
-                assignment_questionnaire.questionnaire_weight + '">% </td>' +
-                '<td align="center"><input name="assignment_form[assignment_questionnaire][][notification_limit]" style="width:40px" type="text" value="' +
-                assignment_questionnaire.notification_limit + '">% </td>';
+            html += '<td align="center"><input name="assignment_form[assignment_itemnaire][][itemnaire_weight]" style="width:40px" type="text" value="' +
+                assignment_itemnaire.itemnaire_weight + '">% </td>' +
+                '<td align="center"><input name="assignment_form[assignment_itemnaire][][notification_limit]" style="width:40px" type="text" value="' +
+                assignment_itemnaire.notification_limit + '">% </td>';
         } else {
-            html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][questionnaire_weight]" style="width:40px" type="text" value="' +
+            html += '<td align="center"><input name="assignment_form[assignment_itemnaire][][itemnaire_weight]" style="width:40px" type="text" value="' +
                 0 + '">% </td>' +
-                '<td align="center"><input name="assignment_form[assignment_questionnaire][][notification_limit]" style="width:40px" type="text" value="' +
-                assignment_questionnaire.notification_limit + '">% </td>';
+                '<td align="center"><input name="assignment_form[assignment_itemnaire][][notification_limit]" style="width:40px" type="text" value="' +
+                assignment_itemnaire.notification_limit + '">% </td>';
         }
         //Notification Limit 
         if (round_no == null) {
-             html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][used_in_round]" style="width:30px" type="hidden" value=""' + '"> </td>';
+             html += '<td align="center"><input name="assignment_form[assignment_itemnaire][][used_in_round]" style="width:30px" type="hidden" value=""' + '"> </td>';
         } else {
-             html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][used_in_round]" style="width:30px" type="hidden" value="' + round_no + '"> </td>';
+             html += '<td align="center"><input name="assignment_form[assignment_itemnaire][][used_in_round]" style="width:30px" type="hidden" value="' + round_no + '"> </td>';
         }
         //insert menu for adding & selecting tag prompts
         <%if @assignment_form.assignment.is_answer_tagging_allowed %>
           tag_dropdown_index = 0
-          placeholder_id = 'tag_prompt_placeholder_' + questionnaire.id
-          deleted_input_id = getIdPrefix(questionnaire.id) + '[deleted][]'
+          placeholder_id = 'tag_prompt_placeholder_' + itemnaire.id
+          deleted_input_id = getIdPrefix(itemnaire.id) + '[deleted][]'
           html += "<tr id='" + row_id + "_add_tag_prompt'>"
           html += "<td>Add tag prompts</td>"
           html += "<td colspan='6'><div id='" + placeholder_id + "'></div>"
-          html += "<button type='button' class='btn btn-default' onClick='addTagPromptDropdown(\"" + placeholder_id + "\", undefined, " + questionnaire.id + ", " + null + ", " + 0 + ", " + 0 +")'>+Tag prompt+</button>"
+          html += "<button type='button' class='btn btn-default' onClick='addTagPromptDropdown(\"" + placeholder_id + "\", undefined, " + itemnaire.id + ", " + null + ", " + 0 + ", " + 0 +")'>+Tag prompt+</button>"
           html += "<button type='button' class='btn btn-default' onClick='removeLastTagPromptDropdown(\"" + placeholder_id + "\",\"" + deleted_input_id + "\")'>-Tag prompt-</button>"
           html += "</td></tr>"
         <% end %>
-        questionnaire_table.last().after(html);
-        jQuery('#questionnaire_id').val(questionnaire.id).attr('id', '');
+        itemnaire_table.last().after(html);
+        jQuery('#itemnaire_id').val(itemnaire.id).attr('id', '');
     }
     // start used for tag prompt
     var tag_prompts = null
@@ -88,14 +88,14 @@
       else
         return prefix + ']'
     }
-    async function addTagPromptDropdown(placeholder_id, tag_dep_id, questionnaire_id, tag_prompt_id, question_type, text_len){
+    async function addTagPromptDropdown(placeholder_id, tag_dep_id, itemnaire_id, tag_prompt_id, item_type, text_len){
       $( "#" + placeholder_id ).append("<div id='loading_image'><img src='/assets/loading.gif' /></div>")
       q_types_filled = false
       tag_prompts_filled = false
       if(!q_types){
         $.ajax({
           dataType: "json",
-          url: "../../questions/types",
+          url: "../../items/types",
           data: "",
           success: function(types){
             q_types = types
@@ -119,7 +119,7 @@
         await sleep(2000);
       }
       $('#loading_image').remove()
-      var id_prefix = getIdPrefix(questionnaire_id)
+      var id_prefix = getIdPrefix(itemnaire_id)
       var html = "<table><tr><td><div id='container_" + id_prefix + "'>"
       html += "<input type='hidden' name='" + id_prefix + "[id][]' value='" + tag_dep_id + "'>"
       html += "<div style='float: left;'>Tag prompt</div>"
@@ -134,12 +134,12 @@
         html += ">" + tag_prompts[i].prompt + "</option>"
       }
       html += "</select>"
-      html += "<div style='float: left;'>&nbsp;&nbsp; apply to question type </div>"
-      html += "<img src='/assets/info.png' title='The tag prompt will only be shown below the answers of this particular question type. It is useful to exclude types of question that the tags are not relevant to' style='float: left;'/>"
-      html += "&nbsp;<select name='" + id_prefix + "[question_type][]' class='form-control' style='float: left;max-width: 150px;'>"
+      html += "<div style='float: left;'>&nbsp;&nbsp; apply to item type </div>"
+      html += "<img src='/assets/info.png' title='The tag prompt will only be shown below the answers of this particular item type. It is useful to exclude types of item that the tags are not relevant to' style='float: left;'/>"
+      html += "&nbsp;<select name='" + id_prefix + "[item_type][]' class='form-control' style='float: left;max-width: 150px;'>"
       for (i=0; i<q_types.length; i++) {
         html += "<option value=" + q_types[i]
-        if (q_types[i] == question_type)
+        if (q_types[i] == item_type)
           html += " selected "
         html += ">" + q_types[i] + "</option>"
       }
@@ -205,14 +205,14 @@
     <% unless @assignment_form.tag_prompt_deployments == nil %>
     function initTagPrompts(){
     	<% @assignment_form.tag_prompt_deployments.each do |tag_dep| %>
-    		addTagPromptDropdown('tag_prompt_placeholder_' + <%= tag_dep.questionnaire_id %>, <%= tag_dep.id %>, <%= tag_dep.questionnaire_id %>, <%= tag_dep.tag_prompt_id %>, '<%= tag_dep.question_type.to_s %>', <%= tag_dep.answer_length_threshold %>)
+    		addTagPromptDropdown('tag_prompt_placeholder_' + <%= tag_dep.itemnaire_id %>, <%= tag_dep.id %>, <%= tag_dep.itemnaire_id %>, <%= tag_dep.tag_prompt_id %>, '<%= tag_dep.item_type.to_s %>', <%= tag_dep.answer_length_threshold %>)
     	<% end %>
     }
     initTagPrompts();
     <%end%>
     // end tag prompt code
-    function removeQuestionnaireTableRow(questionnaire_type, duty_id='') {
-      var row_id = 'questionnaire_table_' + questionnaire_type + duty_id;
+    function removeQuestionnaireTableRow(itemnaire_type, duty_id='') {
+      var row_id = 'itemnaire_table_' + itemnaire_type + duty_id;
       jQuery('#' + row_id).remove();
       <%if @assignment_form.assignment.is_answer_tagging_allowed %>
       jQuery('#' + row_id + '_add_tag_prompt').remove();
@@ -230,31 +230,31 @@
     }
 
     function addRubricsTableRows() {
-        <% assignment_questionnaire = @assignment_form.assignment_questionnaire('MetareviewQuestionnaire', nil, nil) %>
-        <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'MetareviewQuestionnaire') %>
+        <% assignment_itemnaire = @assignment_form.assignment_itemnaire('MetareviewQuestionnaire', nil, nil) %>
+        <% itemnaire = @assignment_form.itemnaire(assignment_itemnaire, 'MetareviewQuestionnaire') %>
         addQuestionnaireTableRow(
             'MetareviewQuestionnaire',
-            <%= assignment_questionnaire.to_json.html_safe %>,
-            <%= questionnaire.to_json.html_safe %>,
-            <%= questionnaire_options('MetareviewQuestionnaire').to_json.html_safe %>,
+            <%= assignment_itemnaire.to_json.html_safe %>,
+            <%= itemnaire.to_json.html_safe %>,
+            <%= itemnaire_options('MetareviewQuestionnaire').to_json.html_safe %>,
             null, null, null
         );
-        <% assignment_questionnaire = @assignment_form.assignment_questionnaire('AuthorFeedbackQuestionnaire', nil, nil) %>
-        <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'AuthorFeedbackQuestionnaire') %>
+        <% assignment_itemnaire = @assignment_form.assignment_itemnaire('AuthorFeedbackQuestionnaire', nil, nil) %>
+        <% itemnaire = @assignment_form.itemnaire(assignment_itemnaire, 'AuthorFeedbackQuestionnaire') %>
         addQuestionnaireTableRow(
             'AuthorFeedbackQuestionnaire',
-            <%= assignment_questionnaire.to_json.html_safe %>,
-            <%= questionnaire.to_json.html_safe %>,
-            <%= questionnaire_options('AuthorFeedbackQuestionnaire').to_json.html_safe %>,
+            <%= assignment_itemnaire.to_json.html_safe %>,
+            <%= itemnaire.to_json.html_safe %>,
+            <%= itemnaire_options('AuthorFeedbackQuestionnaire').to_json.html_safe %>,
             null, null, null
         );
-        <% assignment_questionnaire = @assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil) %>
-        <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'TeammateReviewQuestionnaire') %>
+        <% assignment_itemnaire = @assignment_form.assignment_itemnaire('TeammateReviewQuestionnaire', nil, nil) %>
+        <% itemnaire = @assignment_form.itemnaire(assignment_itemnaire, 'TeammateReviewQuestionnaire') %>
         addQuestionnaireTableRow(
             'TeammateReviewQuestionnaire',
-            <%= assignment_questionnaire.to_json.html_safe %>,
-            <%= questionnaire.to_json.html_safe %>,
-            <%= questionnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>,
+            <%= assignment_itemnaire.to_json.html_safe %>,
+            <%= itemnaire.to_json.html_safe %>,
+            <%= itemnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>,
             null, null, null
         );
     }
@@ -271,13 +271,13 @@
                 removeQuestionnaireTableRow(item);
             });
             <% 1.upto(@assignment_form.assignment.rounds_of_reviews) do |i| %>
-            <% assignment_questionnaire = @assignment_form.assignment_questionnaire('ReviewQuestionnaire', i, nil) %>
-            <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire') %>
+            <% assignment_itemnaire = @assignment_form.assignment_itemnaire('ReviewQuestionnaire', i, nil) %>
+            <% itemnaire = @assignment_form.itemnaire(assignment_itemnaire, 'ReviewQuestionnaire') %>
             addQuestionnaireTableRow(
                 'ReviewQuestionnaire',
-                <%= assignment_questionnaire.to_json.html_safe %>,
-                <%= questionnaire.to_json.html_safe %>,
-                <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>,
+                <%= assignment_itemnaire.to_json.html_safe %>,
+                <%= itemnaire.to_json.html_safe %>,
+                <%= itemnaire_options('ReviewQuestionnaire').to_json.html_safe %>,
                 <%= i %>, null, null
             );
             <% end %>
@@ -296,13 +296,13 @@
                     }
                 else removeQuestionnaireTableRow(item);
             });
-            <% assignment_questionnaire = @assignment_form.assignment_questionnaire('ReviewQuestionnaire', nil, nil) %>
-            <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire') %>
+            <% assignment_itemnaire = @assignment_form.assignment_itemnaire('ReviewQuestionnaire', nil, nil) %>
+            <% itemnaire = @assignment_form.itemnaire(assignment_itemnaire, 'ReviewQuestionnaire') %>
             addQuestionnaireTableRow(
                 'ReviewQuestionnaire',
-                <%= assignment_questionnaire.to_json.html_safe %>,
-                <%= questionnaire.to_json.html_safe %>,
-                <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>,
+                <%= assignment_itemnaire.to_json.html_safe %>,
+                <%= itemnaire.to_json.html_safe %>,
+                <%= itemnaire_options('ReviewQuestionnaire').to_json.html_safe %>,
                 null, null, null
             );
             addRubricsTableRows();
@@ -328,16 +328,16 @@
     function addDutyBasedQuestionnaires() {
         <%unless @duties.nil? or @duties.empty?%>
         // iterate over the available duties (roles) for the
-        // for the assignment and add questionnaire table row.
+        // for the assignment and add itemnaire table row.
           <% @duties.each do |duty| %>
-            <% assignment_questionnaire = @assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil, duty.id) %>
-            <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'TeammateReviewQuestionnaire') %>
+            <% assignment_itemnaire = @assignment_form.assignment_itemnaire('TeammateReviewQuestionnaire', nil, nil, duty.id) %>
+            <% itemnaire = @assignment_form.itemnaire(assignment_itemnaire, 'TeammateReviewQuestionnaire') %>
 
             addQuestionnaireTableRow(
                 'TeammateReviewQuestionnaire',
-                <%= assignment_questionnaire.to_json.html_safe %>,
-                <%= questionnaire.to_json.html_safe %>,
-                <%= questionnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>,
+                <%= assignment_itemnaire.to_json.html_safe %>,
+                <%= itemnaire.to_json.html_safe %>,
+                <%= itemnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>,
                 null,
                 '<%= duty.id %>',
                 '<%= duty.name %>'
@@ -357,21 +357,21 @@
 
     function addDefaultTeammateReviewQuestionnaire() {
         // add the default TeammateReviewQuestionnaire
-        <% assignment_questionnaire = @assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil) %>
-        <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'TeammateReviewQuestionnaire') %>
+        <% assignment_itemnaire = @assignment_form.assignment_itemnaire('TeammateReviewQuestionnaire', nil, nil) %>
+        <% itemnaire = @assignment_form.itemnaire(assignment_itemnaire, 'TeammateReviewQuestionnaire') %>
         addQuestionnaireTableRow(
             'TeammateReviewQuestionnaire',
-            <%= assignment_questionnaire.to_json.html_safe %>,
-            <%= questionnaire.to_json.html_safe %>,
-            <%= questionnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>,
+            <%= assignment_itemnaire.to_json.html_safe %>,
+            <%= itemnaire.to_json.html_safe %>,
+            <%= itemnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>,
             null
         );
     }
     function toggleTeammateReviewDutyQuestionnaires(isVaryByDutyChecked) {
         if (isVaryByDutyChecked) {
-            // remove existing default teammate review questionnaire
+            // remove existing default teammate review itemnaire
             removeQuestionnaireTableRow('TeammateReviewQuestionnaire');
-            // add duty based questionnaires
+            // add duty based itemnaires
             addDutyBasedQuestionnaires();
         } else {
             removeDutyBasedQuestionnaires();
@@ -404,22 +404,22 @@
 <%= label_tag('assignment_form[assignment][vary_by_topic?]', 'Review rubric varies by topic?') %>
 <br>
 <!--Add a review varies by duties (role in the UI) checkbox if teams is allowed -->
-<!-- This is questionnaire_varies_by_duty attribute of assignment created by migration -->
+<!-- This is itemnaire_varies_by_duty attribute of assignment created by migration -->
 <div id="vary_by_duty" <% 'hidden' unless @assignment_form.assignment.team_assignment? %> >
-    <input name="assignment_form[assignment][questionnaire_varies_by_duty]" type="hidden" value="false" />
-    <%= check_box_tag('assignment_form[assignment][questionnaire_varies_by_duty]', 'true', @assignment_form.assignment.questionnaire_varies_by_duty, {:id => "vary_by_duty_checkbox", onclick: "toggleTeammateReviewDutyQuestionnaires(this.checked)"}) %>
-    <%= label_tag('assignment_form[assignment][questionnaire_varies_by_duty]', 'Review rubric varies by role?') %>
+    <input name="assignment_form[assignment][itemnaire_varies_by_duty]" type="hidden" value="false" />
+    <%= check_box_tag('assignment_form[assignment][itemnaire_varies_by_duty]', 'true', @assignment_form.assignment.itemnaire_varies_by_duty, {:id => "vary_by_duty_checkbox", onclick: "toggleTeammateReviewDutyQuestionnaires(this.checked)"}) %>
+    <%= label_tag('assignment_form[assignment][itemnaire_varies_by_duty]', 'Review rubric varies by role?') %>
 </div>
 <div>
-<table class='exp table table-striped' id='assignment_questionnaire_table' style='padding:20px; font-size: 15px; width: 100%'>
+<table class='exp table table-striped' id='assignment_itemnaire_table' style='padding:20px; font-size: 15px; width: 100%'>
   <tr class='heading'>
     <th width="10%"></th>
     <th style="text-align: center;" width="30%">Questionnaire</th>
     <th style="text-align: center;" width="15%">Use dropdown<br/>instead
-      <img src="/assets/info.png" title="If instructor choose 'Use dropdown instead', a simple dropdown will be used for student to do peer review instead of the corresponding questionnare.">
+      <img src="/assets/info.png" title="If instructor choose 'Use dropdown instead', a simple dropdown will be used for student to do peer review instead of the corresponding itemnare.">
     </th>
-    <th style="text-align: center;" width="15%">Scored-question<br/>display style
-      <img src="/assets/info.png" title="Instructor can decide for scored questions, should they be displayed as scaled questions (the scores are displayed in the next line as a set of radio buttons) or criterion questions (the scores displayed as dropdown).">
+    <th style="text-align: center;" width="15%">Scored-item<br/>display style
+      <img src="/assets/info.png" title="Instructor can decide for scored items, should they be displayed as scaled items (the scores are displayed in the next line as a set of radio buttons) or criterion items (the scores displayed as dropdown).">
     </th>
     <th style="text-align: center;" width="15%">Weight</th>
     <th style="text-align: center;" width="15%">Notification Limit
@@ -435,46 +435,46 @@
 
           <% if @assignment_form.assignment.varying_rubrics_by_round? %>
           <% 1.upto(@assignment_form.assignment.rounds_of_reviews) do |i| %>
-          <% assignment_questionnaire = @assignment_form.assignment_questionnaire('ReviewQuestionnaire', i, nil) %>
-          <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire') %>
+          <% assignment_itemnaire = @assignment_form.assignment_itemnaire('ReviewQuestionnaire', i, nil) %>
+          <% itemnaire = @assignment_form.itemnaire(assignment_itemnaire, 'ReviewQuestionnaire') %>
           addQuestionnaireTableRow(
               'ReviewQuestionnaire',
-              <%= assignment_questionnaire.to_json.html_safe %>,
-              <%= questionnaire.to_json.html_safe %>,
-              <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>,
+              <%= assignment_itemnaire.to_json.html_safe %>,
+              <%= itemnaire.to_json.html_safe %>,
+              <%= itemnaire_options('ReviewQuestionnaire').to_json.html_safe %>,
               <%= i %>
           );
           <% end %>
           <% else %>
-          <% assignment_questionnaire = @assignment_form.assignment_questionnaire('ReviewQuestionnaire', nil, nil) %>
-          <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire') %>
+          <% assignment_itemnaire = @assignment_form.assignment_itemnaire('ReviewQuestionnaire', nil, nil) %>
+          <% itemnaire = @assignment_form.itemnaire(assignment_itemnaire, 'ReviewQuestionnaire') %>
           addQuestionnaireTableRow(
               'ReviewQuestionnaire',
-              <%= assignment_questionnaire.to_json.html_safe %>,
-              <%= questionnaire.to_json.html_safe %>,
-              <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>,
+              <%= assignment_itemnaire.to_json.html_safe %>,
+              <%= itemnaire.to_json.html_safe %>,
+              <%= itemnaire_options('ReviewQuestionnaire').to_json.html_safe %>,
               null
           );
           <% end %>
           var metareview_allowed_checkbox = jQuery('#metareview_allowed');
           if (metareview_allowed_checkbox.is(':checked')) {
-              <% assignment_questionnaire = @assignment_form.assignment_questionnaire('MetareviewQuestionnaire', nil, nil) %>
-              <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'MetareviewQuestionnaire') %>
+              <% assignment_itemnaire = @assignment_form.assignment_itemnaire('MetareviewQuestionnaire', nil, nil) %>
+              <% itemnaire = @assignment_form.itemnaire(assignment_itemnaire, 'MetareviewQuestionnaire') %>
               addQuestionnaireTableRow(
                   'MetareviewQuestionnaire',
-                  <%= assignment_questionnaire.to_json.html_safe %>,
-                  <%= questionnaire.to_json.html_safe %>,
-                  <%= questionnaire_options('MetareviewQuestionnaire').to_json.html_safe %>,
+                  <%= assignment_itemnaire.to_json.html_safe %>,
+                  <%= itemnaire.to_json.html_safe %>,
+                  <%= itemnaire_options('MetareviewQuestionnaire').to_json.html_safe %>,
                   null
               );
           }
-          <% assignment_questionnaire = @assignment_form.assignment_questionnaire('AuthorFeedbackQuestionnaire', nil, nil) %>
-          <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'AuthorFeedbackQuestionnaire') %>
+          <% assignment_itemnaire = @assignment_form.assignment_itemnaire('AuthorFeedbackQuestionnaire', nil, nil) %>
+          <% itemnaire = @assignment_form.itemnaire(assignment_itemnaire, 'AuthorFeedbackQuestionnaire') %>
           addQuestionnaireTableRow(
               'AuthorFeedbackQuestionnaire',
-              <%= assignment_questionnaire.to_json.html_safe %>,
-              <%= questionnaire.to_json.html_safe %>,
-              <%= questionnaire_options('AuthorFeedbackQuestionnaire').to_json.html_safe %>,
+              <%= assignment_itemnaire.to_json.html_safe %>,
+              <%= itemnaire.to_json.html_safe %>,
+              <%= itemnaire_options('AuthorFeedbackQuestionnaire').to_json.html_safe %>,
               null
           );
 
@@ -483,13 +483,13 @@
 
           var bookmark_checkbox = jQuery('#assignment_form_assignment_use_bookmark');
           if (bookmark_checkbox.is(':checked')) {
-              <% assignment_questionnaire = @assignment_form.assignment_questionnaire('BookmarkRatingQuestionnaire', nil, nil) %>
-              <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'BookmarkRatingQuestionnaire') %>
+              <% assignment_itemnaire = @assignment_form.assignment_itemnaire('BookmarkRatingQuestionnaire', nil, nil) %>
+              <% itemnaire = @assignment_form.itemnaire(assignment_itemnaire, 'BookmarkRatingQuestionnaire') %>
               addQuestionnaireTableRow(
                   'BookmarkRatingQuestionnaire',
-                  <%= assignment_questionnaire.to_json.html_safe %>,
-                  <%= questionnaire.to_json.html_safe %>,
-                  <%= questionnaire_options('BookmarkRatingQuestionnaire').to_json.html_safe %>,
+                  <%= assignment_itemnaire.to_json.html_safe %>,
+                  <%= itemnaire.to_json.html_safe %>,
+                  <%= itemnaire_options('BookmarkRatingQuestionnaire').to_json.html_safe %>,
                   null
               );
           }

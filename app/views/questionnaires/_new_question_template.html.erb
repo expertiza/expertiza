@@ -1,13 +1,13 @@
-<% (1..Assignment.find(@assignment_id).num_quiz_questions).each do |i| %>
-  <div id="question<%= i %>">
+<% (1..Assignment.find(@assignment_id).num_quiz_items).each do |i| %>
+  <div id="item<%= i %>">
     <label for="text_area">Question <%= i %>: <br></label>
-    <textarea name="new_question[<%= i %>]" id="text_area" placeholder='Enter question...' cols = "60" rows = "2"></textarea>
+    <textarea name="new_item[<%= i %>]" id="text_area" placeholder='Enter item...' cols = "60" rows = "2"></textarea>
 
   </div>
 
-  <div id="question_weight_<%= i %>">
-    Add question weight 
-    <input name="question_weights[question_<%= i %>]" value="1" type="number" min="0">
+  <div id="item_weight_<%= i %>">
+    Add item weight 
+    <input name="item_weights[item_<%= i %>]" value="1" type="number" min="0">
   </div>
   <div id="radio_buttons<%= i %>" style="display: none;">
     <%= radio_button("new_choices[#{i}][MultipleChoiceRadio][1]",:iscorrect, '1') %> <%= text_field "new_choices[#{i}][MultipleChoiceRadio][1]", :txt, size: 50 %> <br>
@@ -26,9 +26,9 @@
     <%= check_box("new_choices[#{i}][MultipleChoiceCheckbox][4]",:iscorrect) %> <%= text_field "new_choices[#{i}][MultipleChoiceCheckbox][4]", :txt, size: 50 %> <br><br>
   </div>
   <div id="qtype<%= i %>">
-    <%= radio_button("question_type[#{i}]","type", "MultipleChoiceRadio") %> Multiple Choice - Radio button<br>
-    <%= radio_button("question_type[#{i}]","type", "MultipleChoiceCheckbox") %> Multiple Choice - Checkboxes <br>
-    <%= radio_button("question_type[#{i}]","type", "TrueFalse") %> TrueFalse <br>
+    <%= radio_button("item_type[#{i}]","type", "MultipleChoiceRadio") %> Multiple Choice - Radio button<br>
+    <%= radio_button("item_type[#{i}]","type", "MultipleChoiceCheckbox") %> Multiple Choice - Checkboxes <br>
+    <%= radio_button("item_type[#{i}]","type", "TrueFalse") %> TrueFalse <br>
   </div>
 
 <% end %>

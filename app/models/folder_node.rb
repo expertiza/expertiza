@@ -14,7 +14,7 @@ class FolderNode < Node
     if parent_id.nil?
       get_name.downcase + '_folder_actions'
     else
-      'questionnaire_types_actions'
+      'itemnaire_types_actions'
     end
   end
 

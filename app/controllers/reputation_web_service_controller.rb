@@ -32,15 +32,15 @@ class ReputationWebServiceController < ApplicationController
     current_user_has_ta_privileges?
   end
 
-  # Method: get_max_question_score
-  # This method receives a set of answers and gets the maximum question score
+  # Method: get_max_item_score
+  # This method receives a set of answers and gets the maximum item score
   # Params
   #   answers: set of answers
   # Returns
-  #   if no error returns max_question_score of first question else 1
-  def get_max_question_score(answers)
+  #   if no error returns max_item_score of first item else 1
+  def get_max_item_score(answers)
     begin
-      answers.first.question.questionnaire.max_question_score
+      answers.first.item.itemnaire.max_item_score
     rescue StandardError
       1
     end
@@ -55,21 +55,21 @@ class ReputationWebServiceController < ApplicationController
   #   set of valid answers (returns nil if empty)
   def get_valid_answers_for_response(response)
     answers = Answer.where(response_id: response.id)
-    valid_answer = answers.select { |answer| (answer.question.type == 'Criterion') && !answer.answer.nil? }
+    valid_answer = answers.select { |answer| (answer.item.type == 'Criterion') && !answer.answer.nil? }
     valid_answer.empty? ? nil : valid_answer
   end
 
   # Method: calculate_peer_review_grade
   # This method calculates a cumulative review grade with respect to the set of valid answers
   # Params
-  #   valid_answer: valid answer to get weight of the answer's question
-  #   max_question_score: used to calculate maximum score for peer review grade
+  #   valid_answer: valid answer to get weight of the answer's item
+  #   max_item_score: used to calculate maximum score for peer review grade
   # Returns
   #   peer_review_grade
-  def calculate_peer_review_grade(valid_answer, max_question_score)
-    weighted_score_sum = valid_answer.map { |answer| answer.answer * answer.question.weight }.inject(:+)
-    question_weight_sum = valid_answer.sum { |answer| answer.question.weight }
-    peer_review_grade = 100.0 * weighted_score_sum / (question_weight_sum * max_question_score)
+  def calculate_peer_review_grade(valid_answer, max_item_score)
+    weighted_score_sum = valid_answer.map { |answer| answer.answer * answer.item.weight }.inject(:+)
+    item_weight_sum = valid_answer.sum { |answer| answer.item.weight }
+    peer_review_grade = 100.0 * weighted_score_sum / (item_weight_sum * max_item_score)
     peer_review_grade.round(4)
   end
 
@@ -87,7 +87,7 @@ class ReputationWebServiceController < ApplicationController
       valid_answer = get_valid_answers_for_response(response)
       next if valid_answer.nil?
 
-      review_grade = calculate_peer_review_grade(valid_answer, get_max_question_score(valid_answer))
+      review_grade = calculate_peer_review_grade(valid_answer, get_max_item_score(valid_answer))
       peer_review_grades_list << [reviewer_id, team_id, review_grade]
     end
     peer_review_grades_list
@@ -134,10 +134,10 @@ class ReputationWebServiceController < ApplicationController
   # Returns
   #   raw_data_array: which is a list of participant, reviewee and the participant's quiz score
   def get_scores(team_ids)
-    quiz_questionnnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
-    quiz_questionnnaire_ids = get_ids_list(quiz_questionnnaires)
+    quiz_itemnnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
+    quiz_itemnnaire_ids = get_ids_list(quiz_itemnnaires)
     raw_data_array = []
-    QuizResponseMap.where('reviewed_object_id in (?)', quiz_questionnnaire_ids).each do |response_map|
+    QuizResponseMap.where('reviewed_object_id in (?)', quiz_itemnnaire_ids).each do |response_map|
       quiz_score = response_map.quiz_score
       participant = Participant.find(response_map.reviewer_id)
       raw_data_array << [participant.user_id, response_map.reviewee_id, quiz_score]

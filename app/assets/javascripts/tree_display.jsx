@@ -15,7 +15,7 @@ const node_attributes = {
     return name === 'course' || name === 'courses'
   },
   isQuestionnaire(name) {
-    return name === 'questionnaire' || name === 'questionnaires'
+    return name === 'itemnaire' || name === 'itemnaires'
   },
   assignment: {
     plural: 'assignments',
@@ -52,9 +52,9 @@ const node_attributes = {
       (props) =>
         props.require_quiz
           ? {
-              title: 'View quiz questions',
+              title: 'View quiz items',
               href:
-                '/student_quizzes/review_questions?id=' +
+                '/student_quizzes/review_items?id=' +
                 `${parseInt(props.id) / 2}` +
                 '&type=Assignment',
               src: '/assets/tree_view/view-survey-24.png'
@@ -180,8 +180,8 @@ const node_attributes = {
       )
     }
   },
-  questionnaire: {
-    plural: 'questionnaires',
+  itemnaire: {
+    plural: 'itemnaires',
     colWidthArray: [ '30%', '0%', '0%', '0%', '20%', '20%', '30%' ],
     getActions: function(handleButtonClick, parent_name) {
       return (
@@ -192,12 +192,12 @@ const node_attributes = {
               padding: 0,
               display: 'inline'
             }}
-            action={'/questionnaires/new'}
+            action={'/itemnaires/new'}
             method="GET"
           >
             <input type="hidden" name="model" value={parent_name + 'Questionnaire'} />
             <input type="hidden" name="private" value={1} />
-            <button type="submit" className="btn btn-primary questionnaire-button">
+            <button type="submit" className="btn btn-primary itemnaire-button">
               <b>+</b>
             </button>
           </form>
@@ -291,7 +291,7 @@ jQuery(document).ready(function() {
         padding: '0 2px'
       }
       if (node_attributes.isQuestionnaire(this.props.dataType)) {
-        return node_attributes.questionnaire.getActions(this.handleButtonClick, this.props.parent_name)
+        return node_attributes.itemnaire.getActions(this.handleButtonClick, this.props.parent_name)
       }
       if (this.state.showDetails) {
         /** only running this check after the state changes to show the details (which currently is on any click on the row) */
@@ -300,7 +300,7 @@ jQuery(document).ready(function() {
         moreButtonStyle.display = 'none'
         if (this.props.is_available || node_attributes.isQuestionnaire(this.props.nodeType)) {
           // check if the user id exists
-          // check if the current user id matches the user/instructor id associated with a questionnaire/survey
+          // check if the current user id matches the user/instructor id associated with a itemnaire/survey
           // show edit button only for the items which are associated to that user
           // if (app_variables.currentUserId == null || this.props.instructor_id == app_variables.currentUserId) {
             moreContent.push(
@@ -354,8 +354,8 @@ jQuery(document).ready(function() {
         moreContent.push(
           <span>
             <a
-              title="View questionnaire"
-              href={'/questionnaires/view?id=' + (parseInt(this.props.id) / 2).toString()}
+              title="View itemnaire"
+              href={'/itemnaires/view?id=' + (parseInt(this.props.id) / 2).toString()}
             >
               <img src="/assets/tree_view/view-survey-24.png" />
             </a>
@@ -385,7 +385,7 @@ jQuery(document).ready(function() {
       var colDisplayStyle = {
         display: ''
       }
-      if (this.props.dataType === 'questionnaire') {
+      if (this.props.dataType === 'itemnaire') {
         colWidthArray = [ '30%', '0%', '0%', '0%', '20%', '20%', '30%' ]
         colDisplayStyle = {
           display: 'none'
@@ -471,8 +471,8 @@ jQuery(document).ready(function() {
       var colDisplayStyle = {
         display: ''
       }
-      var firstColText = (this.props.dataType === 'questionnaire' ? 'Item' : 'Assignment') + ' name'
-      if (this.props.dataType === 'questionnaire') {
+      var firstColText = (this.props.dataType === 'itemnaire' ? 'Item' : 'Assignment') + ' name'
+      if (this.props.dataType === 'itemnaire') {
         colWidthArray = [ '30%', '0%', '0%', '0%', '20%', '20%', '30%' ]
         colDisplayStyle = {
           display: 'none'
@@ -592,7 +592,7 @@ jQuery(document).ready(function() {
         'Teammate Review',
       ]
 
-      //selectedMenuItem then takes the clicked rubric from the panel under questionnaire
+      //selectedMenuItem then takes the clicked rubric from the panel under itemnaire
       //selectedMenuItemIndex finds the corresponding index of the click rubric from the above buffer
       selectedMenuItem = document.getElementById('tree_display').getAttribute('data-menu-item')
       selectedMenuItemIndex = rubricBuffer.indexOf(selectedMenuItem)
@@ -635,7 +635,7 @@ jQuery(document).ready(function() {
         display: '',
         'word-wrap': 'break-word'
       }
-      if (this.props.dataType === 'questionnaire') {
+      if (this.props.dataType === 'itemnaire') {
         colWidthArray = [ '70%', '0%', '0%', '0%', '0%', '0%', '30%' ]
         colDisplayStyle = {
           display: 'none'
@@ -738,7 +738,7 @@ jQuery(document).ready(function() {
       var colDisplayStyle = {
         display: ''
       }
-      if (this.props.dataType === 'questionnaire') {
+      if (this.props.dataType === 'itemnaire') {
         colSpan = '6'
         colDisplayStyle = {
           display: 'none'
@@ -788,7 +788,7 @@ jQuery(document).ready(function() {
     },
     render: function() {
       return (
-        <span style={{ display: this.props.dataType === 'questionnaire' ? 'none' : '' }}>
+        <span style={{ display: this.props.dataType === 'itemnaire' ? 'none' : '' }}>
           <input
             type="text"
             placeholder="Search..."
@@ -809,7 +809,7 @@ jQuery(document).ready(function() {
       return (
         <span
           className="show-checkbox"
-          style={{ display: this.props.dataType === 'questionnaire' ? 'none' : '' }}
+          style={{ display: this.props.dataType === 'itemnaire' ? 'none' : '' }}
         >
           <input
             type="checkbox"
@@ -833,7 +833,7 @@ jQuery(document).ready(function() {
         display: 'inline'
       }
       if (this.props.dataType.length > 0) {
-        if (this.props.dataType != 'questionnaire') {
+        if (this.props.dataType != 'itemnaire') {
           renderContent.push(
             <form
               style={formStyle}
@@ -939,7 +939,7 @@ jQuery(document).ready(function() {
         display: ''
       }
       if (this.props) {
-        if (this.props.dataType === 'questionnaire') {
+        if (this.props.dataType === 'itemnaire') {
           colWidthArray = [ '70%', '0%', '0%', '0%', '0%', '0%', '30%' ]
           colDisplayStyle = {
             display: 'none'
@@ -1448,7 +1448,7 @@ jQuery(document).ready(function() {
           <ReactSimpleTabs.Panel title="Questionnaires">
             <FilterableTable
               key="table2"
-              dataType="questionnaire"
+              dataType="itemnaire"
               data={this.state.tableContent.Questionnaires}
             />
           </ReactSimpleTabs.Panel>

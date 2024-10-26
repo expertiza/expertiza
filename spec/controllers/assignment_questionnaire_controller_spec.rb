@@ -28,7 +28,7 @@ describe AssignmentQuestionnaireController do
       end
     end
     context 'instructor is the instructor for the assignment found' do
-      ## If no questionnaire is associated with the id in database, then appropriate missing record error should be flashed
+      ## If no itemnaire is associated with the id in database, then appropriate missing record error should be flashed
       it 'allows instructor to perform action wrt the assignment' do
         stub_current_user(instructor1, instructor1.role.name, instructor1.role)
         allow(Assignment).to receive(:find).and_return(assignment1)
@@ -77,18 +77,18 @@ describe AssignmentQuestionnaireController do
     end
   
 
-    # context 'when questionnaires related to an assignment are deleted' do
-    #   #When all the questionnaires related to an assignment are deleted the count of assignment_questionnaire records should be 0 for that assignment
+    # context 'when itemnaires related to an assignment are deleted' do
+    #   #When all the itemnaires related to an assignment are deleted the count of assignment_itemnaire records should be 0 for that assignment
     #   it 'should persist that delete in the database' do
     #     assignment3 = create(:assignment)
 
-    #     questionnaire1 = create(:questionnaire)
-    #     questionnaire2 = create(:questionnaire)
-    #     questionnaire3 = create(:questionnaire)
+    #     itemnaire1 = create(:itemnaire)
+    #     itemnaire2 = create(:itemnaire)
+    #     itemnaire3 = create(:itemnaire)
 
-    #     assignment_questionnaire1 = create(:assignment_questionnaire, assignment_id: assignment3.id, questionnaire_id: questionnaire1.id)
-    #     assignment_questionnaire2 = create(:assignment_questionnaire, assignment_id: assignment3.id, questionnaire_id: questionnaire2.id)
-    #     assignment_questionnaire3 = create(:assignment_questionnaire, assignment_id: assignment3.id, questionnaire_id: questionnaire3.id)
+    #     assignment_itemnaire1 = create(:assignment_itemnaire, assignment_id: assignment3.id, itemnaire_id: itemnaire1.id)
+    #     assignment_itemnaire2 = create(:assignment_itemnaire, assignment_id: assignment3.id, itemnaire_id: itemnaire2.id)
+    #     assignment_itemnaire3 = create(:assignment_itemnaire, assignment_id: assignment3.id, itemnaire_id: itemnaire3.id)
 
     #     allow(Assignment).to receive(:find).and_return(assignment3)
     #     allow(controller).to receive(:params).and_return({assignment_id: assignment3.id})
@@ -109,14 +109,14 @@ describe AssignmentQuestionnaireController do
           stub_current_user(super_admin, super_admin.role.name, super_admin.role)
           allow(Assignment).to receive(:find).and_return(nil)      
           post :create, params: request_params
-          expect(flash[:error]).to be_eql('Missing questionnaire')
+          expect(flash[:error]).to be_eql('Missing itemnaire')
         end
       end
 
-      context 'when questionnaire id is entered as nil' do
-        ## If questionnaire id is nil, then appropriate missing questionnaire id error should be flashed. 
-        it 'flashes a response of missing questionnaire id' do
-          request_params = {  assignment_id: 1, questionnaire_id: nil }
+      context 'when itemnaire id is entered as nil' do
+        ## If itemnaire id is nil, then appropriate missing itemnaire id error should be flashed. 
+        it 'flashes a response of missing itemnaire id' do
+          request_params = {  assignment_id: 1, itemnaire_id: nil }
           stub_current_user(super_admin, super_admin.role.name, super_admin.role)
           allow(Assignment).to receive(:find).and_return(assignment)
           allow(Questionnaire).to receive(:find).and_return(nil)
@@ -128,20 +128,20 @@ describe AssignmentQuestionnaireController do
       context 'when no assignment is associated with the id in the database' do
         ## If no assignment is associated with the id in database, then appropriate missing record error should be flashed
         it 'throws an error that the assignment does not exist in the db' do
-          questionnaire1 = create(:questionnaire)
-          request_params = {  assignment_id: 7, questionnaire_id: questionnaire1.id}
+          itemnaire1 = create(:itemnaire)
+          request_params = {  assignment_id: 7, itemnaire_id: itemnaire1.id}
           stub_current_user(super_admin, super_admin.role.name, super_admin.role)
           allow(Assignment).to receive(:find).with('7').and_return(nil)
-          allow(Questionnaire).to receive(:find).and_return(questionnaire1)
+          allow(Questionnaire).to receive(:find).and_return(itemnaire1)
           post :create, params: request_params
           expect(flash[:error]).to be_eql('Assignment #7 does not currently exist.')
         end
       end
 
-      context 'when no questionnaire is associated with the id in the database' do
-         ## If no questionnaire is associated with the id in database, then appropriate missing record error should be flashed
-        it 'throws an error that the questionnaire does not exist in the db' do
-          request_params = { assignment_id: assignment.id, questionnaire_id: 7}
+      context 'when no itemnaire is associated with the id in the database' do
+         ## If no itemnaire is associated with the id in database, then appropriate missing record error should be flashed
+        it 'throws an error that the itemnaire does not exist in the db' do
+          request_params = { assignment_id: assignment.id, itemnaire_id: 7}
           stub_current_user(super_admin, super_admin.role.name, super_admin.role)
           allow(Assignment).to receive(:find).and_return(assignment)
           allow(Questionnaire).to receive(:find).with("7").and_return(nil)
@@ -150,16 +150,16 @@ describe AssignmentQuestionnaireController do
         end
       end
 
-      # context 'when saving a new assignment questionnaire' do
-      #   ## Checking if the assignment question is saved correctly to the database. 
+      # context 'when saving a new assignment itemnaire' do
+      #   ## Checking if the assignment item is saved correctly to the database. 
       #   it 'should save and redirect appropriatley' do
       #     assignment5 = create(:assignment)
-      #     questionnaire1 = create(:questionnaire)
-      #     params = { assignment_id: assignment5.id, questionnaire_id: questionnaire1.id }
+      #     itemnaire1 = create(:itemnaire)
+      #     params = { assignment_id: assignment5.id, itemnaire_id: itemnaire1.id }
 
       #     stub_current_user(super_admin, super_admin.role.name, super_admin.role)
       #     allow(Assignment).to receive(:find).and_return(assignment5)
-      #     allow(Questionnaire).to receive(:find).and_return(questionnaire1)
+      #     allow(Questionnaire).to receive(:find).and_return(itemnaire1)
       #     allow(controller).to receive(:params).and_return(params)
       #     controller.send(:create)
 

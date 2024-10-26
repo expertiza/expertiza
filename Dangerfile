@@ -43,7 +43,7 @@ This repository is being automatically checked for code-quality issues using `Co
 You can see results for this analysis in the PR status below. Newly introduced issues should be fixed before a pull request is considered ready to review.
 
 Also, please spend some time looking at the instructions at the top of your course project writeup.
-If you have any questions, please send email to <a href="mailto:expertiza-support@lists.ncsu.edu">expertiza-support@lists.ncsu.edu</a>.
+If you have any items, please send email to <a href="mailto:expertiza-support@lists.ncsu.edu">expertiza-support@lists.ncsu.edu</a>.
       MARKDOWN
 
     message(WELCOME_MESSAGE_COURSE_PROJECT)
@@ -57,7 +57,7 @@ Please make sure the PR passes all checks and you have run `rubocop -a` to autoc
 This repository is being automatically checked for code quality issues using `Code Climate`.
 You can see results for this analysis in the PR status below. Newly introduced issues should be fixed before a pull request is considered ready to review.
 
-If you have any questions, please send email to <a href="mailto:expertiza-support@lists.ncsu.edu">expertiza-support@lists.ncsu.edu</a>.
+If you have any items, please send email to <a href="mailto:expertiza-support@lists.ncsu.edu">expertiza-support@lists.ncsu.edu</a>.
       MARKDOWN
 
     message(WELCOME_MESSAGE)

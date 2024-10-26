@@ -11,15 +11,15 @@ class PopupController < ApplicationController
   def author_feedback_popup
     @response_id = params[:response_id]
     @reviewee_id = params[:reviewee_id]
-    first_question_in_questionnaire = Answer.where(response_id: @response_id).first
-    unless @response_id.nil? || first_question_in_questionnaire.nil?
-      questionnaire_id = Question.find(first_question_in_questionnaire.question_id).questionnaire_id
-      questionnaire = Questionnaire.find(questionnaire_id)
-      @maxscore = questionnaire.max_question_score
+    first_item_in_itemnaire = Answer.where(response_id: @response_id).first
+    unless @response_id.nil? || first_item_in_itemnaire.nil?
+      itemnaire_id = Question.find(first_item_in_itemnaire.item_id).itemnaire_id
+      itemnaire = Questionnaire.find(itemnaire_id)
+      @maxscore = itemnaire.max_item_score
       @scores = Answer.where(response_id: @response_id)
       @response = Response.find(@response_id)
       @total_percentage = @response.average_score
-      @sum = @response.aggregate_questionnaire_score
+      @sum = @response.aggregate_itemnaire_score
       @total_possible = @response.maximum_score
     end
 
@@ -60,12 +60,12 @@ class PopupController < ApplicationController
 
         instance_variable_set('@response_id_round_' + round.to_s, response.id)
         instance_variable_set('@scores_round_' + round.to_s, Answer.where(response_id: response.id))
-        questionnaire = Response.find(response.id).questionnaire_by_answer(instance_variable_get('@scores_round_' + round.to_s).first)
-        instance_variable_set('@max_score_round_' + round.to_s, questionnaire.max_question_score ||= 5)
+        itemnaire = Response.find(response.id).itemnaire_by_answer(instance_variable_get('@scores_round_' + round.to_s).first)
+        instance_variable_set('@max_score_round_' + round.to_s, itemnaire.max_item_score ||= 5)
         total_percentage = response.average_score
         total_percentage += '%' if total_percentage.is_a? Float
         instance_variable_set('@total_percentage_round_' + round.to_s, total_percentage)
-        instance_variable_set('@sum_round_' + round.to_s, response.aggregate_questionnaire_score)
+        instance_variable_set('@sum_round_' + round.to_s, response.aggregate_itemnaire_score)
         instance_variable_set('@total_possible_round_' + round.to_s, response.maximum_score)
       end
     end
@@ -101,14 +101,14 @@ class PopupController < ApplicationController
     @response_id = params[:response_id]
     @user_fullname = params[:user_fullname]
     unless @response_id.nil?
-      first_question_in_questionnaire = Answer.where(response_id: @response_id).first.question_id
-      questionnaire_id = Question.find(first_question_in_questionnaire).questionnaire_id
-      questionnaire = Questionnaire.find(questionnaire_id)
-      @maxscore = questionnaire.max_question_score
+      first_item_in_itemnaire = Answer.where(response_id: @response_id).first.item_id
+      itemnaire_id = Question.find(first_item_in_itemnaire).itemnaire_id
+      itemnaire = Questionnaire.find(itemnaire_id)
+      @maxscore = itemnaire.max_item_score
       @scores = Answer.where(response_id: @response_id)
       @response = Response.find(@response_id)
       @total_percentage = @response.average_score
-      @sum = @response.aggregate_questionnaire_score
+      @sum = @response.aggregate_itemnaire_score
       @total_possible = @response.maximum_score
     end
     @maxscore = 5 if @maxscore.nil?

@@ -3,7 +3,7 @@ describe AuthorizationHelper do
   # Inspired by spec/controllers/users_controller_spec.rb
   # Makes use of spec/factories/factories.rb
   # Use create instead of build so that these users get IDs
-  # https://stackoverflow.com/questions/41149787/how-do-i-create-an-user-id-for-a-factorygirl-build
+  # https://stackoverflow.com/items/41149787/how-do-i-create-an-user-id-for-a-factorygirl-build
   let(:student) { create(:student) }
   let(:teaching_assistant) { create(:teaching_assistant) }
   let(:instructor) { create(:instructor) }

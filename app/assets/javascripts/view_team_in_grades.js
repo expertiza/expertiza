@@ -133,7 +133,7 @@ function tagActionOnLoad() {
         // (special rounding) integer form to associate with existing heatgrid color classes.
         let countMap = calcTagRatio(tagPrompts);
 
-        // Get a HashMap containing all review rows, their round, question, and review numbers, whether they have tags,
+        // Get a HashMap containing all review rows, their round, item, and review numbers, whether they have tags,
         // and a reference to an array containing the tag prompt object references.
         let rowData = getRowData();
 
@@ -168,19 +168,19 @@ function getTagPrompts() {
     return document.getElementsByName("tag_checkboxes[]");
 }
 
-// Populate an array with all review rows, their question and review number, whether they have tag prompts,
+// Populate an array with all review rows, their item and review number, whether they have tag prompts,
 // and a reference to the tag prompts.
 function getRowData() {
     // Get all valid review rows
     let rowsList = $("[id^=rr]");
-    // Set up matrix of questionNumber, reviewNumber, hasTag?, and reference to tags if true
+    // Set up matrix of itemNumber, reviewNumber, hasTag?, and reference to tags if true
     let rowData = new Array(rowsList.length);
     $.each(rowsList, function (i) {
         rowData[i] = new Map();
         //Round Number
         rowData[i].set('round_num', $(this).data("round"));
         // Question Number
-        rowData[i].set('question_num', $(this).data("question_num"));
+        rowData[i].set('item_num', $(this).data("item_num"));
         // Review Number
         rowData[i].set('review_num', $(this).data("review_num"));
         // Has tag bool?
@@ -267,7 +267,7 @@ function drawTagGrid(rowData) {
     //create table body
     let tBody = table.appendChild(document.createElement('tbody'));
 
-    // Need to keep track of the question number of the previous row generated using priorQuestionNum
+    // Need to keep track of the item number of the previous row generated using priorQuestionNum
     let priorQuestionNum = -1;
     let roundNum = 1;
 
@@ -275,12 +275,12 @@ function drawTagGrid(rowData) {
     for (let rIndex = 0; rIndex < rowData.length; ++rIndex) {
         let tRow = tBody.insertRow();
         // Handle the backend inconsistency, Question Indices start with One and Review Indices start with Zero
-        let questionNum = rowData[rIndex].get('question_num');
+        let itemNum = rowData[rIndex].get('item_num');
         let reviewNum = rowData[rIndex].get('review_num') + 1;
 
-        // If this review is for a new question number, add a question label row, eg "Round 2 -- Question 3"
-        if (questionNum !== priorQuestionNum) {
-            let labelRowData = drawQuestionRow(priorQuestionNum, questionNum, roundNum, tRow, gridWidth, tooltipText,
+        // If this review is for a new item number, add a item label row, eg "Round 2 -- Question 3"
+        if (itemNum !== priorQuestionNum) {
+            let labelRowData = drawQuestionRow(priorQuestionNum, itemNum, roundNum, tRow, gridWidth, tooltipText,
                 reviewNum, numRounds, roundPrefix, tBody);
             priorQuestionNum = labelRowData.priorQuestionNum;
             tRow = labelRowData.tRow;
@@ -288,41 +288,41 @@ function drawTagGrid(rowData) {
         }
 
         // Generate a table row for this review containing tag status cells
-        drawReviewRow(tRow, questionNum, reviewNum, gridWidth, rowData, rIndex, tooltipText);
+        drawReviewRow(tRow, itemNum, reviewNum, gridWidth, rowData, rIndex, tooltipText);
     }
 }
 
-// Generate a sub-heading heatgrid row, once per question, format: "Round 2 -- Question 3"
-function drawQuestionRow(priorQuestionNum, questionNum, roundNum, tRow, gridWidth, tooltipText, reviewNum, numRounds, roundPrefix, tBody) {
-    // Determine if this question row belongs to a new round
-    if (priorQuestionNum !== -1 && priorQuestionNum > questionNum) {
+// Generate a sub-heading heatgrid row, once per item, format: "Round 2 -- Question 3"
+function drawQuestionRow(priorQuestionNum, itemNum, roundNum, tRow, gridWidth, tooltipText, reviewNum, numRounds, roundPrefix, tBody) {
+    // Determine if this item row belongs to a new round
+    if (priorQuestionNum !== -1 && priorQuestionNum > itemNum) {
         ++roundNum;
     }
-    // Update prior question index
-    priorQuestionNum = questionNum;
+    // Update prior item index
+    priorQuestionNum = itemNum;
     // Draw a "Question: # " Row that spans all columns
     let cell = tRow.insertCell();
     cell.colSpan = gridWidth;
     cell.className = "tag_heat_grid_criterion";
     addToolTip(cell, tooltipText);
-    tRow.id = "hg_row" + questionNum + "_" + reviewNum;
-    tRow.setAttribute("data-questionnum", questionNum);
+    tRow.id = "hg_row" + itemNum + "_" + reviewNum;
+    tRow.setAttribute("data-itemnum", itemNum);
     if (numRounds > 1) {
         roundPrefix = "Round " + roundNum + " -- ";
     }
-    let text = document.createTextNode(roundPrefix + "Question " + questionNum);
+    let text = document.createTextNode(roundPrefix + "Question " + itemNum);
     cell.appendChild(text);
     // Initialize new row to be used by the inner loop for reviews.
     tRow = tBody.insertRow();
     let reviewNumZeroIndex = reviewNum - 1;
-    tRow.id = "hg_row" + questionNum + "_" + reviewNumZeroIndex;
+    tRow.id = "hg_row" + itemNum + "_" + reviewNumZeroIndex;
     return { priorQuestionNum, tRow, roundNum };
 }
 
 // Draws a row of grid cells containing information from a single review's tags.
-function drawReviewRow(tRow, questionNum, reviewNum, gridWidth, rowData, rIndex, tooltipText) {
-    tRow.id = "hg_row" + questionNum + "_" + reviewNum;
-    tRow.setAttribute("data-questionnum", questionNum);
+function drawReviewRow(tRow, itemNum, reviewNum, gridWidth, rowData, rIndex, tooltipText) {
+    tRow.id = "hg_row" + itemNum + "_" + reviewNum;
+    tRow.setAttribute("data-itemnum", itemNum);
     for (let cIndex = 0; cIndex < gridWidth; ++cIndex) {
         let cell = tRow.insertCell();
         // Set the text value of the grid cell
@@ -409,15 +409,15 @@ function calcTagRatio(tagPrompts) {
 }
 
 // Determine number of rounds in this review dataset
-// For now, because of the broken round numbers in the backend, use changes in question number to find rounds
+// For now, because of the broken round numbers in the backend, use changes in item number to find rounds
 function countRounds(rowData) {
     let numRounds = 1;
-    let questionNum = 1;
+    let itemNum = 1;
     for (const row of rowData) {
-        if (row.get('question_num') < questionNum) {
+        if (row.get('item_num') < itemNum) {
             ++numRounds;
         }
-        questionNum = row.get('question_num');
+        itemNum = row.get('item_num');
     }
     return numRounds;
 }

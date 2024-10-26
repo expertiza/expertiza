@@ -11,9 +11,9 @@ class ReviewResponseMap < ResponseMap
     assignment.team_reviewing_enabled
   end
 
-  # Find a review questionnaire associated with this review response map's assignment
-  def questionnaire(round_number = nil, topic_id = nil)
-    Questionnaire.find(assignment.review_questionnaire_id(round_number, topic_id))
+  # Find a review itemnaire associated with this review response map's assignment
+  def itemnaire(round_number = nil, topic_id = nil)
+    Questionnaire.find(assignment.review_itemnaire_id(round_number, topic_id))
   end
 
   def get_title
@@ -123,7 +123,7 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  # wrap latest version of responses in each response map, together with the questionnaire_id
+  # wrap latest version of responses in each response map, together with the itemnaire_id
   # will be used to display the reviewer summary
   def self.final_versions_from_reviewer(assignment_id, reviewer_id)
     reviewer = ReviewResponseMap.get_reviewer_with_id(assignment_id, reviewer_id)
@@ -199,7 +199,7 @@ class ReviewResponseMap < ResponseMap
                ('review round' + ' ' + round.to_s).to_sym
              end
     review_final_versions[symbol] = {}
-    review_final_versions[symbol][:questionnaire_id] = assignment.review_questionnaire_id(round)
+    review_final_versions[symbol][:itemnaire_id] = assignment.review_itemnaire_id(round)
     response_ids = []
     maps.each do |map|
       where_map = { map_id: map.id }
@@ -211,26 +211,26 @@ class ReviewResponseMap < ResponseMap
   end
 
   def self.prepare_review_response_by_topic(assignment, maps, review_final_versions)
-    responses_by_questionnaire = Hash.new { |hash, key| hash[key] = [] }
+    responses_by_itemnaire = Hash.new { |hash, key| hash[key] = [] }
 
     maps.each do |map|
       team = AssignmentTeam.find(map.reviewee_id)
       topic_id = SignedUpTeam.topic_id_by_team_id(team.id)
-      # Get the questionnaire ID corresponding to the assignment_id and topic_id of the participant
-      questionnaire = AssignmentQuestionnaire.where(assignment_id: assignment.id, topic_id: topic_id).first
-      questionnaire_id = questionnaire.questionnaire_id
+      # Get the itemnaire ID corresponding to the assignment_id and topic_id of the participant
+      itemnaire = AssignmentQuestionnaire.where(assignment_id: assignment.id, topic_id: topic_id).first
+      itemnaire_id = itemnaire.itemnaire_id
       # Get the responses for the response map
       where_map = { map_id: map.id, round: 1 }
       responses = Response.where(where_map)
       # Append the response ID to the corresponding response_ids array
-      responses_by_questionnaire[questionnaire_id] << responses.last.id unless responses.empty?
+      responses_by_itemnaire[itemnaire_id] << responses.last.id unless responses.empty?
     end
 
     # Iterate through the grouped responses
-    responses_by_questionnaire.each_with_index do |(questionnaire_id, response_ids), index|
+    responses_by_itemnaire.each_with_index do |(itemnaire_id, response_ids), index|
       symbol = "review for rubric #{index + 1}".to_sym
       review_final_versions[symbol] = {
-        questionnaire_id: questionnaire_id,
+        itemnaire_id: itemnaire_id,
         response_ids: response_ids
       }
     end

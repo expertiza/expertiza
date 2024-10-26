@@ -5,15 +5,15 @@ describe ResponseController do
   let(:review_response) { build(:response, id: 1, map_id: 1) }
   let(:review_response_round1) { build(:response, id: 1, map_id: 1, round: 1, is_submitted: 0) }
   let(:review_response_map) { build(:review_response_map, id: 1, reviewer: participant) }
-  let(:questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
-  let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
-  let(:assignment_questionnaire) { build(:assignment_questionnaire) }
+  let(:itemnaire) { build(:itemnaire, id: 1, items: [item]) }
+  let(:item) { Criterion.new(id: 1, weight: 2, break_before: true) }
+  let(:assignment_itemnaire) { build(:assignment_itemnaire) }
   let(:answer) { double('Answer') }
   let(:assignment_due_date) { build(:assignment_due_date) }
   let(:bookmark) { build(:bookmark) }
   let(:team_response) { build(:response, id: 2, map_id: 2) }
   let(:team_response_map) { build(:review_response_map, id: 2, reviewer: participant, team_reviewing_enabled: true) }
-  let(:team_questionnaire) { build(:questionnaire, id: 2) }
+  let(:team_itemnaire) { build(:itemnaire, id: 2) }
   let(:team_assignment) { build(:assignment, id: 2) }
   let(:assignment_team) { build(:assignment_team, id: 1) }
   let(:signed_up_team) { build(:signed_up_team, team_id: assignment_team.id) }
@@ -102,12 +102,12 @@ describe ResponseController do
       allow(ResponseMap).to receive(:find).with(1).and_return(review_response_map)
       allow(review_response_map).to receive(:reviewer_id).and_return(1)
       allow(Participant).to receive(:find).with(1).and_return(participant)
-      allow(assignment).to receive(:review_questionnaire_id).and_return(1)
-      allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire)
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire])
+      allow(assignment).to receive(:review_itemnaire_id).and_return(1)
+      allow(Questionnaire).to receive(:find).with(1).and_return(itemnaire)
+      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, itemnaire_id: 1).and_return([assignment_itemnaire])
+      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_itemnaire])
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
-      allow(Answer).to receive(:where).with(response_id: 1, question_id: 1).and_return([answer])
+      allow(Answer).to receive(:where).with(response_id: 1, item_id: 1).and_return([answer])
       request_params = { id: 1, return: 'assignment_edit' }
       get :edit, params: request_params
       expect(controller.instance_variable_get(:@review_scores)).to eq([answer])
@@ -166,9 +166,9 @@ describe ResponseController do
         allow(review_response_map).to receive(:assignment).and_return(assignment)
         allow(Participant).to receive(:find).with(1).and_return(participant)
         allow(participant).to receive(:assignment).and_return(assignment)
-        allow(assignment).to receive(:review_questionnaire_id).and_return(1)
-        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire)
-        allow(Answer).to receive(:create).with(response_id: 1, question_id: 1, answer: '98', comments: 'LGTM').and_return(answer)
+        allow(assignment).to receive(:review_itemnaire_id).and_return(1)
+        allow(Questionnaire).to receive(:find).with(1).and_return(itemnaire)
+        allow(Answer).to receive(:create).with(response_id: 1, item_id: 1, answer: '98', comments: 'LGTM').and_return(answer)
         allow(answer).to receive(:update_attribute).with(any_args).and_return('OK!')
         request_params = {
           id: 1,
@@ -190,11 +190,11 @@ describe ResponseController do
   describe '#new' do
     it 'renders response#response page' do
       allow(AssignmentForm).to receive(:create_form_object).with(1).and_return(assignment_form)
-      allow(assignment_form).to receive(:assignment_questionnaire).with('ReviewQuestionnaire', 1, 1).and_return(assignment_questionnaire)
+      allow(assignment_form).to receive(:assignment_itemnaire).with('ReviewQuestionnaire', 1, 1).and_return(assignment_itemnaire)
       allow(SignedUpTeam).to receive(:where).with(team_id: 1, is_waitlisted: 0).and_return([double('SignedUpTeam', topic_id: 1)])
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow(AssignmentDueDate).to receive(:find_by).with(any_args).and_return(assignment_due_date)
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
+      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, itemnaire_id: 1).and_return([assignment_itemnaire])
       request_params = {
         id: 1,
         feedback: '',
@@ -238,12 +238,12 @@ describe ResponseController do
       allow(ResponseMap).to receive(:find).with(1).and_return(review_response_map)
       allow(review_response_map).to receive(:reviewer_id).and_return(1)
       allow(Participant).to receive(:find).with(1).and_return(participant)
-      allow(assignment).to receive(:review_questionnaire_id).and_return(1)
-      allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire)
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire])
+      allow(assignment).to receive(:review_itemnaire_id).and_return(1)
+      allow(Questionnaire).to receive(:find).with(1).and_return(itemnaire)
+      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, itemnaire_id: 1).and_return([assignment_itemnaire])
+      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_itemnaire])
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
-      allow(Answer).to receive(:where).with(response_id: 1, question_id: 1).and_return([answer])
+      allow(Answer).to receive(:where).with(response_id: 1, item_id: 1).and_return([answer])
       request_params = { id: 1, return: 'assignment_edit' }
       get :view, params: request_params
       expect(controller.instance_variable_get(:@dropdown_or_scale)).to eq('dropdown')
@@ -257,14 +257,14 @@ describe ResponseController do
     it 'creates a new response and redirects to response#save page' do
       allow(ResponseMap).to receive(:find).with('1').and_return(review_response_map)
       allow(Response).to receive_message_chain(:where, :order).with(map_id: 1, round: 1).with(created_at: :desc).and_return([review_response_round1])
-      allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
-      allow(Answer).to receive(:create).with(response_id: 1, question_id: 1, answer: '98', comments: 'LGTM').and_return(answer)
+      allow(Questionnaire).to receive(:find).with('1').and_return(itemnaire)
+      allow(Answer).to receive(:create).with(response_id: 1, item_id: 1, answer: '98', comments: 'LGTM').and_return(answer)
       allow(answer).to receive(:update_attribute).with(any_args).and_return('OK!')
       allow_any_instance_of(Response).to receive(:email).and_return('OK!')
       request_params = {
         id: 1,
         review: {
-          questionnaire_id: '1',
+          itemnaire_id: '1',
           round: 1,
           comments: 'no comment'
         },

@@ -8,7 +8,7 @@ describe Checkbox do
   describe '#edit' do
     it 'returns the html ' do
       html = checkbox.edit(0).to_s
-      expect(html).to eq('<tr><td align="center"><a rel="nofollow" data-method="delete" href="/questions/10">Remove</a></td><td><input size="6" value="1.0" name="question[10][seq]" id="question_10_seq" type="text"></td><td><textarea cols="50" rows="1" name="question[10][txt]" id="question_10_txt" placeholder="Edit question content here">test txt</textarea></td><td><input size="10" disabled="disabled" value="Checkbox" name="question[10][type]" id="question_10_type" type="text"></td><td><!--placeholder (UnscoredQuestion does not need weight)--></td></tr>')
+      expect(html).to eq('<tr><td align="center"><a rel="nofollow" data-method="delete" href="/items/10">Remove</a></td><td><input size="6" value="1.0" name="item[10][seq]" id="item_10_seq" type="text"></td><td><textarea cols="50" rows="1" name="item[10][txt]" id="item_10_txt" placeholder="Edit item content here">test txt</textarea></td><td><input size="10" disabled="disabled" value="Checkbox" name="item[10][type]" id="item_10_type" type="text"></td><td><!--placeholder (UnscoredQuestion does not need weight)--></td></tr>')
     end
   end
 
@@ -19,16 +19,16 @@ describe Checkbox do
     end
   end
 
-  describe '#view_question_text' do
+  describe '#view_item_text' do
     it 'returns the html ' do
-      html = checkbox2.view_question_text.to_s
+      html = checkbox2.view_item_text.to_s
       expect(html).to eq('<TR><TD align="left"> test txt3 </TD><TD align="left">Checkbox</TD><td align="center">12</TD><TD align="center">Checked/Unchecked</TD></TR>')
     end
   end
 
-  describe '#view_completed_question' do
+  describe '#view_completed_item' do
     it 'returns the html ' do
-      html = checkbox2.view_completed_question(0, answer).to_s
+      html = checkbox2.view_completed_item(0, answer).to_s
       expect(html).to eq('<b>0. &nbsp;&nbsp;<img src="/assets/Check-icon.png">test txt3</b>')
     end
   end

@@ -8,11 +8,11 @@
 <% i = 1 %>
 
 
-<% @questions.each do |question| %>
-  <b>Question <%= i %>: </b><%= label_tag "#{question.id}", question.txt %> <br>
+<% @items.each do |item| %>
+  <b>Question <%= i %>: </b><%= label_tag "#{item.id}", item.txt %> <br>
 
-    <%user_answer=Answer.where(response_id: @response.id, question_id:  question.id)%>
-    <%= question.view_completed_question(user_answer) %><br>
+    <%user_answer=Answer.where(response_id: @response.id, item_id:  item.id)%>
+    <%= item.view_completed_item(user_answer) %><br>
     <% i += 1 %>
 <%end%>
 <%= link_to t(".back"), student_quizzes_path(:id => @response_map.reviewer_id) %>

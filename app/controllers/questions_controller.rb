@@ -1,7 +1,7 @@
 class QuestionsController < ApplicationController
   include AuthorizationHelper
 
-  # A question is a single entry within a questionnaire
+  # A item is a single entry within a itemnaire
   # Questions provide a way of scoring an object
   # based on either a numeric value or a true/false
   # state.
@@ -20,69 +20,69 @@ class QuestionsController < ApplicationController
   verify method: :post, only: %i[destroy create update],
          redirect_to: { action: :list }
 
-  # List all questions in paginated view
+  # List all items in paginated view
   def list
-    @questions = Question.paginate(page: params[:page], per_page: 10)
+    @items = Question.paginate(page: params[:page], per_page: 10)
   end
 
-  # Display a given question
+  # Display a given item
   def show
-    @question = Question.find(params[:id])
+    @item = Question.find(params[:id])
   end
 
   # Provide the user with the ability to define
-  # a new question
+  # a new item
   def new
-    @question = Question.new
+    @item = Question.new
   end
 
-  # Save a question created by the user
+  # Save a item created by the user
   # follows from new
   def create
-    @question = Question.new(question_params[:question])
-    if @question.save
-      flash[:notice] = 'The question was successfully created.'
+    @item = Question.new(item_params[:item])
+    if @item.save
+      flash[:notice] = 'The item was successfully created.'
       redirect_to action: 'list'
     else
       render action: 'new'
     end
   end
 
-  # edit an existing question
+  # edit an existing item
   def edit
-    @question = Question.find(params[:id])
+    @item = Question.find(params[:id])
   end
 
-  # save the update to an existing question
+  # save the update to an existing item
   # follows from edit
   def update
-    @question = Question.find(question_params[:id])
-    if @question.update_attributes(question_params[:question])
-      flash[:notice] = 'The question was successfully updated.'
-      redirect_to action: 'show', id: @question
+    @item = Question.find(item_params[:id])
+    if @item.update_attributes(item_params[:item])
+      flash[:notice] = 'The item was successfully updated.'
+      redirect_to action: 'show', id: @item
     else
       render action: 'edit'
     end
   end
 
-  # Remove question from database and
+  # Remove item from database and
   # return to list
   def destroy
-    question = Question.find(params[:id])
-    questionnaire_id = question.questionnaire_id
+    item = Question.find(params[:id])
+    itemnaire_id = item.itemnaire_id
 
-    if AnswerHelper.check_and_delete_responses(questionnaire_id)
-      flash[:success] = 'You have successfully deleted the question. Any existing reviews for the questionnaire have been deleted!'
+    if AnswerHelper.check_and_delete_responses(itemnaire_id)
+      flash[:success] = 'You have successfully deleted the item. Any existing reviews for the itemnaire have been deleted!'
     else
-      flash[:success] = 'You have successfully deleted the question!'
+      flash[:success] = 'You have successfully deleted the item!'
     end
 
     begin
-      question.destroy
+      item.destroy
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
-    redirect_to edit_questionnaire_path(questionnaire_id.to_s.to_sym)
+    redirect_to edit_itemnaire_path(itemnaire_id.to_s.to_sym)
   end
 
   # required for answer tagging
@@ -91,70 +91,70 @@ class QuestionsController < ApplicationController
     render json: types.to_a
   end
 
-  # save all questions that have been added to a questionnaire
-  # uses the params new_question
-  # if the questionnaire is a quizquestionnaire then use weights given
-  def save_new_questions(questionnaire_id, questionnaire_type)
-    if params[:new_question]
-      # The new_question array contains all the new questions
+  # save all items that have been added to a itemnaire
+  # uses the params new_item
+  # if the itemnaire is a quizitemnaire then use weights given
+  def save_new_items(itemnaire_id, itemnaire_type)
+    if params[:new_item]
+      # The new_item array contains all the new items
       # that should be saved to the database
-      params[:new_question].keys.each_with_index do |question_key, index|
+      params[:new_item].keys.each_with_index do |item_key, index|
         q = Question.new
-        q.txt = params[:new_question][question_key]
-        q.questionnaire_id = questionnaire_id
-        q.type = params[:question_type][question_key][:type]
-        q.seq = question_key.to_i
-        if questionnaire_type == 'QuizQuestionnaire'
-          weight_key = "question_#{index + 1}"
-          q.weight = params[:question_weights][weight_key.to_sym]
+        q.txt = params[:new_item][item_key]
+        q.itemnaire_id = itemnaire_id
+        q.type = params[:item_type][item_key][:type]
+        q.seq = item_key.to_i
+        if itemnaire_type == 'QuizQuestionnaire'
+          weight_key = "item_#{index + 1}"
+          q.weight = params[:item_weights][weight_key.to_sym]
         end
         q.save unless q.txt.strip.empty?
       end
     end
     return
   end
-  # delete questions from a questionnaire
-  # uses params questionnaire_id
-  # checks if the questions passed in params belongs to this questionnaire or not
+  # delete items from a itemnaire
+  # uses params itemnaire_id
+  # checks if the items passed in params belongs to this itemnaire or not
   # if yes then it is deleted
-  def delete_questions(questionnaire_id)
-    # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
-    questions = Question.where('questionnaire_id = ?', questionnaire_id)
-    @deleted_questions = []
-    questions.each do |question|
+  def delete_items(itemnaire_id)
+    # Deletes any items that, as a result of the edit, are no longer in the itemnaire
+    items = Question.where('itemnaire_id = ?', itemnaire_id)
+    @deleted_items = []
+    items.each do |item|
       should_delete = true
-      unless question_params.nil?
-        params[:question].each_key do |question_key|
-          should_delete = false if question_key.to_s == question.id.to_s
+      unless item_params.nil?
+        params[:item].each_key do |item_key|
+          should_delete = false if item_key.to_s == item.id.to_s
         end
       end
 
       next unless should_delete
 
-      question.question_advices.each(&:destroy)
-      # keep track of the deleted questions
-      @deleted_questions.push(question)
-      question.destroy
+      item.item_advices.each(&:destroy)
+      # keep track of the deleted items
+      @deleted_items.push(item)
+      item.destroy
     end
     return
   end
-  # Handles questions whose wording changed as a result of the edit
-  # uses params questionnaire_id
-  # uses params questionnaire_type
-  # if the question text is empty then it is deleted
+  # Handles items whose wording changed as a result of the edit
+  # uses params itemnaire_id
+  # uses params itemnaire_type
+  # if the item text is empty then it is deleted
   # else it is updated
-  def save_questions
-    questionnaire_id = params[:questionnaire_id]
-    questionnaire_type = params[:questionnaire_type]
-    delete_questions questionnaire_id
-    save_new_questions(questionnaire_id, questionnaire_type)
-    if params[:question]
-      params[:question].keys.each do |question_key|
-        if params[:question][question_key][:txt].strip.empty?
-          Question.delete(question_key)
+  def save_items
+    itemnaire_id = params[:itemnaire_id]
+    itemnaire_type = params[:itemnaire_type]
+    delete_items itemnaire_id
+    save_new_items(itemnaire_id, itemnaire_type)
+    if params[:item]
+      params[:item].keys.each do |item_key|
+        if params[:item][item_key][:txt].strip.empty?
+          Question.delete(item_key)
         else
-          question = Question.find(question_key)
-          Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
+          item = Question.find(item_key)
+          Rails.logger.info(item.errors.messages.inspect) unless item.update_attributes(params[:item][item_key])
         end
       end
     end
@@ -162,9 +162,9 @@ class QuestionsController < ApplicationController
   end
   private
 
-  def question_params
-    params.require(:question).permit(:txt, :weight, :questionnaire_id, :seq, :type, :size,
-                                     :alternatives, :break_before, :max_label, :min_label, :id, :question)
+  def item_params
+    params.require(:item).permit(:txt, :weight, :itemnaire_id, :seq, :type, :size,
+                                     :alternatives, :break_before, :max_label, :min_label, :id, :item)
   end
 end
 

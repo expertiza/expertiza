@@ -26,8 +26,8 @@
     <% unless @scores.nil? %>
       <% @scores.each do |s|%>
         <tr>
-          <td align = 'left'> <%= Question.find(s.question_id).txt %></td>
-          <%if Question.find(s.question_id).is_a?(ScoredQuestion) %>
+          <td align = 'left'> <%= Question.find(s.item_id).txt %></td>
+          <%if Question.find(s.item_id).is_a?(ScoredQuestion) %>
             <td align = 'center'> <%= s.answer %>/<%= @maxscore %></td>
           <%else%>
             <td align = 'center'> <%= s.answer %></td>

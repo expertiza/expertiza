@@ -1,9 +1,9 @@
 class Instructor < User
-  # has_many :questionnaires
-  has_many :questionnaires, dependent: :nullify
+  # has_many :itemnaires
+  has_many :itemnaires, dependent: :nullify
 
-  QUESTIONNAIRE = [['My questionnaires', 'list_mine'],
-                   ['All public questionnaires', 'list_all']].freeze
+  QUESTIONNAIRE = [['My itemnaires', 'list_mine'],
+                   ['All public itemnaires', 'list_all']].freeze
 
   SIGNUPSHEET = [['My signups', 'list_mine'],
                  ['All public signups', 'list_all']].freeze

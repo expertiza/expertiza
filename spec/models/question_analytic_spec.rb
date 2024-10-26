@@ -1,6 +1,6 @@
 class QuestionAnalyticTestDummyClass
   attr_accessor :txt
-  require 'analytic/question_analytic'
+  require 'analytic/item_analytic'
   include QuestionAnalytic
 
   def initialize(txt)

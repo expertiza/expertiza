@@ -13,13 +13,13 @@ class CollusionCycle
       if assignment_participant.reviews_by_reviewer(ap).nil?
         next
       else
-        s01 = assignment_participant.reviews_by_reviewer(ap).aggregate_questionnaire_score
+        s01 = assignment_participant.reviews_by_reviewer(ap).aggregate_itemnaire_score
       end
 
       if ap.reviews_by_reviewer(assignment_participant).nil?
         next
       else
-        s10 = ap.reviews_by_reviewer(assignment_participant).aggregate_questionnaire_score
+        s10 = ap.reviews_by_reviewer(assignment_participant).aggregate_itemnaire_score
       end
 
       collusion_cycles.push([[assignment_participant, s01], [ap, s10]])
@@ -35,19 +35,19 @@ class CollusionCycle
         if assignment_participant.reviews_by_reviewer(ap1).nil?
           next
         else
-          s01 = assignment_participant.reviews_by_reviewer(ap1).aggregate_questionnaire_score
+          s01 = assignment_participant.reviews_by_reviewer(ap1).aggregate_itemnaire_score
         end
 
         if ap1.reviews_by_reviewer(ap2).nil?
           next
         else
-          s12 = ap1.reviews_by_reviewer(ap2).aggregate_questionnaire_score
+          s12 = ap1.reviews_by_reviewer(ap2).aggregate_itemnaire_score
         end
 
         if ap2.reviews_by_reviewer(assignment_participant).nil?
           next
         else
-          s20 = ap2.reviews_by_reviewer(assignment_participant).aggregate_questionnaire_score
+          s20 = ap2.reviews_by_reviewer(assignment_participant).aggregate_itemnaire_score
         end
 
         collusion_cycles.push([[assignment_participant, s01], [ap1, s12], [ap2, s20]])
@@ -67,25 +67,25 @@ class CollusionCycle
           if assignment_participant.reviews_by_reviewer(ap1).nil?
             next
           else
-            s01 = assignment_participant.reviews_by_reviewer(ap1).aggregate_questionnaire_score
+            s01 = assignment_participant.reviews_by_reviewer(ap1).aggregate_itemnaire_score
           end
 
           if ap1.reviews_by_reviewer(ap2).nil?
             next
           else
-            s12 = ap1.reviews_by_reviewer(ap2).aggregate_questionnaire_score
+            s12 = ap1.reviews_by_reviewer(ap2).aggregate_itemnaire_score
           end
 
           if ap2.reviews_by_reviewer(ap3).nil?
             next
           else
-            s23 = ap2.reviews_by_reviewer(ap3).aggregate_questionnaire_score
+            s23 = ap2.reviews_by_reviewer(ap3).aggregate_itemnaire_score
           end
 
           if ap3.reviews_by_reviewer(assignment_participant).nil?
             next
           else
-            s30 = ap3.reviews_by_reviewer(assignment_participant).aggregate_questionnaire_score
+            s30 = ap3.reviews_by_reviewer(assignment_participant).aggregate_itemnaire_score
           end
 
           collusion_cycles.push([[assignment_participant, s01], [ap1, s12], [ap2, s23], [ap3, s30]])

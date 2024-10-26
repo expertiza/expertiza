@@ -10,12 +10,12 @@ class TextField < TextResponse
     html.html_safe
   end
 
-  def view_completed_question(count, answer)
+  def view_completed_item(count, answer)
     if (type == 'TextField') && (break_before == true)
       html = '<b>' + count.to_s + '. ' + txt + '</b>'
       html += '&nbsp;&nbsp;&nbsp;&nbsp;'
       html += answer.comments.to_s
-      html += '<BR/><BR/>' if Question.exists?(answer.question_id + 1) && Question.find(answer.question_id + 1).break_before == true
+      html += '<BR/><BR/>' if Question.exists?(answer.item_id + 1) && Question.find(answer.item_id + 1).break_before == true
     else
       html = txt
       html += answer.comments

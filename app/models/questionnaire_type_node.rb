@@ -18,7 +18,7 @@ class QuestionnaireTypeNode < FolderNode
   end
 
   def get_partial_name
-    'questionnaire_type_actions'
+    'itemnaire_type_actions'
   end
 
   def get_name

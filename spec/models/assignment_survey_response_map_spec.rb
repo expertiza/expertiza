@@ -1,12 +1,12 @@
 describe AssignmentSurveyResponseMap, type: :model do
   let(:participant) { build(:participant, user_id: 1, user: build(:student, name: 'Jane', fullname: 'Doe, Jane', id: 1)) }
-  let(:assignment_questionnaire1) { build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 1) }
+  let(:assignment_itemnaire1) { build(:assignment_itemnaire, id: 1, assignment_id: 1, itemnaire_id: 1) }
   let(:previous_day) { (Time.now.getlocal - 1 * 86_400).strftime('%Y-%m-%d %H:%M:%S') }
   let(:next_day) { (Time.now.getlocal + 1 * 86_400).strftime('%Y-%m-%d %H:%M:%S') }
   let(:assignment) { build(:assignment, id: 1, name: 'Assignment1') }
   let(:user) { build(:student, email: 'expertiza.debugging@gmail.com', name: 'Jane', fullname: 'Doe, Jane', id: 1) }
   before(:each) do
-    survey_deployment = AssignmentSurveyDeployment.new questionnaire_id: 1, start_date: previous_day, end_date: next_day, parent_id: '12345678', type: 'AssignmentSurveyDeployment'
+    survey_deployment = AssignmentSurveyDeployment.new itemnaire_id: 1, start_date: previous_day, end_date: next_day, parent_id: '12345678', type: 'AssignmentSurveyDeployment'
     @assignment_survey_response_map = AssignmentSurveyResponseMap.new
     @assignment_survey_response_map.reviewer = participant
     @assignment_survey_response_map.survey_deployment = survey_deployment
@@ -18,10 +18,10 @@ describe AssignmentSurveyResponseMap, type: :model do
   it { should belong_to :assignment }
   it { should belong_to :reviewer }
 
-  describe '#questionnaire' do
-    it 'returns the associated assignment survey questionnaire' do
-      allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(assignment_questionnaire1)
-      expect(@assignment_survey_response_map.questionnaire).to eq(assignment_questionnaire1)
+  describe '#itemnaire' do
+    it 'returns the associated assignment survey itemnaire' do
+      allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(assignment_itemnaire1)
+      expect(@assignment_survey_response_map.itemnaire).to eq(assignment_itemnaire1)
     end
   end
 

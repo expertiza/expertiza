@@ -1,15 +1,15 @@
 require 'rails_helper'
 
 describe AnswerTag do
-  let(:questionnaire) { create(:questionnaire, id: 1) }
-  let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1, type: 'Criterion') }
+  let(:itemnaire) { create(:itemnaire, id: 1) }
+  let(:item1) { create(:item, itemnaire: itemnaire, weight: 1, id: 1, type: 'Criterion') }
   let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1) }
   let!(:response_record) { create(:response, id: 1, response_map: response_map) }
-  let!(:answer) { create(:answer, question: question1, comments: 'test comment', response_id: 1) }
+  let!(:answer) { create(:answer, item: item1, comments: 'test comment', response_id: 1) }
   let(:tag_prompt) { TagPrompt.create id: 1, prompt: '??', desc: 'desc', control_type: 'slider' }
   let(:tag_prompt_cb) { TagPrompt.create id: 1, prompt: '??', desc: 'desc', control_type: 'checkbox' }
-  let(:tag_deploy) { TagPromptDeployment.create id: 1, tag_prompt: tag_prompt, question_type: 'Criterion' }
-  let(:tag_deploy_cb) { TagPromptDeployment.create id: 1, tag_prompt: tag_prompt_cb, question_type: 'Criterion' }
+  let(:tag_deploy) { TagPromptDeployment.create id: 1, tag_prompt: tag_prompt, item_type: 'Criterion' }
+  let(:tag_deploy_cb) { TagPromptDeployment.create id: 1, tag_prompt: tag_prompt_cb, item_type: 'Criterion' }
   let(:user) { User.new name: 'abc', fullname: 'abc xyz', email: 'abcxyz@gmail.com', password: '12345678', password_confirmation: '12345678' }
 
   it 'is invalid without valid attributes' do

@@ -1,22 +1,22 @@
 class QuestionnaireHeader < Question
-  # This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
+  # This method returns what to display if an instructor (etc.) is creating or editing a itemnaire (itemnaires_controller.rb)
   def edit(_count)
     html = '<tr>'
-    html += '<td align="center"><a rel="nofollow" data-method="delete" href="/questions/' + id.to_s + '">Remove</a></td>'
-    html += '<td><input size="6" value="' + seq.to_s + '" name="question[' + id.to_s
-    html += '][seq]" id="question_' + id.to_s + '_seq" type="text"></td>'
-    html += '<td><textarea cols="50" rows="1" name="question[' + id.to_s + '][txt]" id="question_' + id.to_s
-    html += '_txt" placeholder="Edit question content here">' + txt + '</textarea></td>'
-    html += '<td><input size="10" disabled="disabled" value="' + type + '" name="question[' + id.to_s
-    html += '][type]" id="question_' + id.to_s + '_type" type="text"></td>'
+    html += '<td align="center"><a rel="nofollow" data-method="delete" href="/items/' + id.to_s + '">Remove</a></td>'
+    html += '<td><input size="6" value="' + seq.to_s + '" name="item[' + id.to_s
+    html += '][seq]" id="item_' + id.to_s + '_seq" type="text"></td>'
+    html += '<td><textarea cols="50" rows="1" name="item[' + id.to_s + '][txt]" id="item_' + id.to_s
+    html += '_txt" placeholder="Edit item content here">' + txt + '</textarea></td>'
+    html += '<td><input size="10" disabled="disabled" value="' + type + '" name="item[' + id.to_s
+    html += '][type]" id="item_' + id.to_s + '_type" type="text"></td>'
     html += '<td><!--placeholder (QuestionnaireHeader does not need weight)--></td>'
     html += '</tr>'
 
     html.html_safe
   end
 
-  # This method returns what to display if an instructor (etc.) is viewing a questionnaire
-  def view_question_text
+  # This method returns what to display if an instructor (etc.) is viewing a itemnaire
+  def view_item_text
     html = '<TR><TD align="left"> ' + txt + ' </TD>'
     html += '<TD align="left">' + type + '</TD>'
     html += '<td align="center">' + weight.to_s + '</TD>'
@@ -29,5 +29,5 @@ class QuestionnaireHeader < Question
     txt
   end
 
-  def view_completed_question; end
+  def view_completed_item; end
 end

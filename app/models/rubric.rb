@@ -3,7 +3,7 @@
 
 # This implements Rubric(type) specific model methods ( Rubric does not have any type specific
 # functionality). These methods are invoked when called by any activeRecord object(row) of
-# questionnaires table with type 'Rubric'
+# itemnaires table with type 'Rubric'
 
 class Rubric < Questionnaire
   # for doc on why we do it this way,
@@ -11,6 +11,6 @@ class Rubric < Questionnaire
 
   # can these be inherited too?
   validates :name, presence: true
-  validates :max_question_score, numericality: true
-  validates :min_question_score, numericality: true
+  validates :max_item_score, numericality: true
+  validates :min_item_score, numericality: true
 end

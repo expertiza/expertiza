@@ -1,36 +1,36 @@
 <script type="text/javascript">
-    function addQuestionnaireTableRowInTopics(questionnaire_type, questionnaire, questionnaire_options, round_no, topic_no) {
-        var table_name = "#topic_questionnaire_table" + topic_no + ">tbody>tr";
-        var questionnaire_table = jQuery(table_name);
-        var row_id = 'topic_questionnaire_table_' + topic_no + "_" + questionnaire_type;
+    function addQuestionnaireTableRowInTopics(itemnaire_type, itemnaire, itemnaire_options, round_no, topic_no) {
+        var table_name = "#topic_itemnaire_table" + topic_no + ">tbody>tr";
+        var itemnaire_table = jQuery(table_name);
+        var row_id = 'topic_itemnaire_table_' + topic_no + "_" + itemnaire_type;
         var i;
         var html = '<tr id=' + row_id + '>';
         var t_id = "ti_id" + topic_no
 
-        html += '<input name="assignment_form[topic_questionnaire][][topic_id]" type="hidden" value="';
+        html += '<input name="assignment_form[topic_itemnaire][][topic_id]" type="hidden" value="';
         html += '<%= topic.id %>';
         html += '">';
         //Rubric name
         if (round_no == null) {
-            html += '<td><label for=t_id>' + questionnaire.display_type + ':</label></td>';
+            html += '<td><label for=t_id>' + itemnaire.display_type + ':</label></td>';
         } else {
-            html += '<td><label for=t_id>' + questionnaire.display_type + ' Round '+ round_no + ':</label></td>';
+            html += '<td><label for=t_id>' + itemnaire.display_type + ' Round '+ round_no + ':</label></td>';
         }
         //Rubric options
         html += '<td align="center">' +
-            '<select id=t_id name="assignment_form[topic_questionnaire][][questionnaire_id]" style="width:300px" class="form-control">' +
+            '<select id=t_id name="assignment_form[topic_itemnaire][][itemnaire_id]" style="width:300px" class="form-control">' +
             '<option value="">--Default rubric--</option>';
-        for (i = 0; i < questionnaire_options.length; i++) {
-            html += '<option value="' + questionnaire_options[i][1] + '">' + questionnaire_options[i][0] + '</option>';
+        for (i = 0; i < itemnaire_options.length; i++) {
+            html += '<option value="' + itemnaire_options[i][1] + '">' + itemnaire_options[i][0] + '</option>';
         }
         html += '</select></td>';
         if (round_no == null) {
-            html += '<td align="center"><input name="assignment_form[topic_questionnaire][][used_in_round]" style="width:30px" type="hidden" value=""' + '"> </td>';
+            html += '<td align="center"><input name="assignment_form[topic_itemnaire][][used_in_round]" style="width:30px" type="hidden" value=""' + '"> </td>';
         } else {
-            html += '<td align="center"><input name="assignment_form[topic_questionnaire][][used_in_round]" style="width:30px" type="hidden" value="' + round_no + '"> </td>';
+            html += '<td align="center"><input name="assignment_form[topic_itemnaire][][used_in_round]" style="width:30px" type="hidden" value="' + round_no + '"> </td>';
         }
-        questionnaire_table.last().after(html);
-        jQuery('#t_id').val(questionnaire.id).attr('id', '');
+        itemnaire_table.last().after(html);
+        jQuery('#t_id').val(itemnaire.id).attr('id', '');
     }
 </script>
 

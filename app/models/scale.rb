@@ -1,40 +1,40 @@
 class Scale < ScoredQuestion
-  # This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
+  # This method returns what to display if an instructor (etc.) is creating or editing a itemnaire (itemnaires_controller.rb)
   def edit(_count)
     html = '<tr>'
-    html += '<td align="center"><a rel="nofollow" data-method="delete" href="/questions/' + id.to_s + '">Remove</a></td>'
-    html += '<td><input size="6" value="' + seq.to_s + '" name="question[' + id.to_s + '][seq]" id="question_' + id.to_s
-    html += '_seq" type="text"></td><td><textarea cols="50" rows="1" name="question[' + id.to_s + '][txt]" id="question_' + id.to_s
-    html += '_txt" placeholder="Edit question content here">' + txt + '</textarea></td>'
-    html += '<td><input size="10" disabled="disabled" value="' + type + '" name="question[' + id.to_s
-    html += '][type]" id="question_' + id.to_s + '_type" type="text"></td>'
-    html += '<td><input size="2" value="' + weight.to_s + '" name="question[' + id.to_s
-    html += '][weight]" id="question_' + id.to_s + '_weight" type="text"></td>'
-    html += '<td> max_label <input size="10" value="' + max_label.to_s + '" name="question[' + id.to_s + '][max_label]" id="question_' + id.to_s
-    html += '_max_label" type="text">  min_label <input size="12" value="' + min_label.to_s + '" name="question[' + id.to_s
-    html += '][min_label]" id="question_' + id.to_s + '_min_label" type="text"></td>'
+    html += '<td align="center"><a rel="nofollow" data-method="delete" href="/items/' + id.to_s + '">Remove</a></td>'
+    html += '<td><input size="6" value="' + seq.to_s + '" name="item[' + id.to_s + '][seq]" id="item_' + id.to_s
+    html += '_seq" type="text"></td><td><textarea cols="50" rows="1" name="item[' + id.to_s + '][txt]" id="item_' + id.to_s
+    html += '_txt" placeholder="Edit item content here">' + txt + '</textarea></td>'
+    html += '<td><input size="10" disabled="disabled" value="' + type + '" name="item[' + id.to_s
+    html += '][type]" id="item_' + id.to_s + '_type" type="text"></td>'
+    html += '<td><input size="2" value="' + weight.to_s + '" name="item[' + id.to_s
+    html += '][weight]" id="item_' + id.to_s + '_weight" type="text"></td>'
+    html += '<td> max_label <input size="10" value="' + max_label.to_s + '" name="item[' + id.to_s + '][max_label]" id="item_' + id.to_s
+    html += '_max_label" type="text">  min_label <input size="12" value="' + min_label.to_s + '" name="item[' + id.to_s
+    html += '][min_label]" id="item_' + id.to_s + '_min_label" type="text"></td>'
     html += '</tr>'
 
     html.html_safe
   end
 
-  # This method returns what to display if an instructor (etc.) is viewing a questionnaire
-  def view_question_text
+  # This method returns what to display if an instructor (etc.) is viewing a itemnaire
+  def view_item_text
     html = '<TR><TD align="left"> ' + txt + ' </TD>'
     html += '<TD align="left">' + type + '</TD>'
     html += '<td align="center">' + weight.to_s + '</TD>'
-    questionnaire = self.questionnaire
+    itemnaire = self.itemnaire
     if max_label.nil? || min_label.nil?
-      html += '<TD align="center">' + questionnaire.min_question_score.to_s + ' to ' + questionnaire.max_question_score.to_s + '</TD>'
+      html += '<TD align="center">' + itemnaire.min_item_score.to_s + ' to ' + itemnaire.max_item_score.to_s + '</TD>'
     else
-      html += '<TD align="center"> (' + min_label + ') ' + questionnaire.min_question_score.to_s + ' to '
-      html += questionnaire.max_question_score.to_s + ' (' + max_label + ')</TD>'
+      html += '<TD align="center"> (' + min_label + ') ' + itemnaire.min_item_score.to_s + ' to '
+      html += itemnaire.max_item_score.to_s + ' (' + max_label + ')</TD>'
     end
     html += '</TR>'
     html.html_safe
   end
 
-  def complete(count, questionnaire_min, questionnaire_max, answer = nil)
+  def complete(count, itemnaire_min, itemnaire_max, answer = nil)
     html = '<div><label for="responses_' + count.to_s + '">' + txt + '</label></div>'
     html += '<input id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" type="hidden"'
     html += 'value="' + answer.answer.to_s + '"' unless answer.nil?
@@ -43,7 +43,7 @@ class Scale < ScoredQuestion
 
     html += '<table>'
     html += '<tr><td width="10%"></td>'
-    (questionnaire_min..questionnaire_max).each do |j|
+    (itemnaire_min..itemnaire_max).each do |j|
       html += '<td width="10%"><label>' + j.to_s + '</label></td>'
     end
     html += '<td width="10%"></td></tr><tr>'
@@ -53,10 +53,10 @@ class Scale < ScoredQuestion
             else
               '<td width="10%">' + min_label + '</td>'
             end
-    (questionnaire_min..questionnaire_max).each do |j|
+    (itemnaire_min..itemnaire_max).each do |j|
       html += '<td width="10%"><input type="radio" id="' + j.to_s
       html += '" value="' + j.to_s + '" name="Radio_' + id.to_s + '"'
-      html += 'checked="checked"' unless (answer.nil? || (answer.answer != j)) && (answer || (questionnaire_min != j))
+      html += 'checked="checked"' unless (answer.nil? || (answer.answer != j)) && (answer || (itemnaire_min != j))
       html += '></td>'
     end
     html += '<script>jQuery("input[name=Radio_' + id.to_s + ']:radio").change(function() {'
@@ -74,9 +74,9 @@ class Scale < ScoredQuestion
     html.html_safe
   end
 
-  def view_completed_question(count, answer, questionnaire_max)
+  def view_completed_item(count, answer, itemnaire_max)
     html = '<b>' + count.to_s + '. ' + txt + '</b><BR/><BR/>'
-    html += '<B>Score:</B> <FONT style="BACKGROUND-COLOR:gold">' + answer.answer.to_s + '</FONT> out of <B>' + questionnaire_max.to_s + '</B></TD>'
+    html += '<B>Score:</B> <FONT style="BACKGROUND-COLOR:gold">' + answer.answer.to_s + '</FONT> out of <B>' + itemnaire_max.to_s + '</B></TD>'
     html.html_safe
   end
 end

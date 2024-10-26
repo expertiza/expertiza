@@ -1,17 +1,17 @@
 describe QuestionsController do
   let(:instructor) { build(:instructor, id: 6) }
-  let!(:questionnaire) { create(:questionnaire, id: 1) }
-  let!(:question) { create(:question, id: 1, questionnaire_id: 1) }
+  let!(:itemnaire) { create(:itemnaire, id: 1) }
+  let!(:item) { create(:item, id: 1, itemnaire_id: 1) }
 
   before(:each) do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
   describe '#destroy' do
     context 'success' do
-      it 'deletes the question' do
+      it 'deletes the item' do
         request_params = { id: 1 }
         post :destroy, params: request_params
-        expect(flash[:success]).to eq('You have successfully deleted the question!')
+        expect(flash[:success]).to eq('You have successfully deleted the item!')
         expect(flash[:error]).to eq nil
       end
 

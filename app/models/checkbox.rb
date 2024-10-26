@@ -1,33 +1,33 @@
 class Checkbox < UnscoredQuestion
   include ActionView::Helpers
-  # This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
+  # This method returns what to display if an instructor (etc.) is creating or editing a itemnaire (itemnaires_controller.rb)
   def edit(count)
-    html = edit_remove_button(count) + edit_seq(count) + edit_question(count)
+    html = edit_remove_button(count) + edit_seq(count) + edit_item(count)
     html += edit_type(count) + edit_weight(count)
     safe_join(['<tr>'.html_safe, '</tr>'.html_safe], html.html_safe)
   end
 
   def edit_remove_button(_count)
-    html = '<td align="center"><a rel="nofollow" data-method="delete" href="/questions/'
+    html = '<td align="center"><a rel="nofollow" data-method="delete" href="/items/'
     html += id.to_s + '">Remove</a></td>'
     html
   end
 
   def edit_seq(_count)
-    html = '<td><input size="6" value="' + seq.to_s + '" name="question['
-    html += id.to_s + '][seq]" id="question_' + id.to_s + '_seq" type="text"></td>'
+    html = '<td><input size="6" value="' + seq.to_s + '" name="item['
+    html += id.to_s + '][seq]" id="item_' + id.to_s + '_seq" type="text"></td>'
     html
   end
 
-  def edit_question(_count)
-    html = '<td><textarea cols="50" rows="1" name="question[' + id.to_s + '][txt]" id="question_'
-    html += id.to_s + '_txt" placeholder="Edit question content here">' + txt + '</textarea></td>'
+  def edit_item(_count)
+    html = '<td><textarea cols="50" rows="1" name="item[' + id.to_s + '][txt]" id="item_'
+    html += id.to_s + '_txt" placeholder="Edit item content here">' + txt + '</textarea></td>'
     html
   end
 
   def edit_type(_count)
-    html = '<td><input size="10" disabled="disabled" value="' + type + '" name="question['
-    html += id.to_s + '][type]" id="question_' + id.to_s + '_type" type="text"></td>'
+    html = '<td><input size="10" disabled="disabled" value="' + type + '" name="item['
+    html += id.to_s + '][type]" id="item_' + id.to_s + '_type" type="text"></td>'
     html
   end
 
@@ -36,8 +36,8 @@ class Checkbox < UnscoredQuestion
     html
   end
 
-  # This method returns what to display if an instructor (etc.) is viewing a questionnaire
-  def view_question_text
+  # This method returns what to display if an instructor (etc.) is viewing a itemnaire
+  def view_item_text
     html = '<TR><TD align="left"> ' + txt + ' </TD>'
     html += '<TD align="left">' + type + '</TD>'
     html += '<td align="center">' + weight.to_s + '</TD>'
@@ -47,7 +47,7 @@ class Checkbox < UnscoredQuestion
   end
 
   def complete(count, answer = nil)
-    html = check_previous_question + complete_first_second_input(count, answer)
+    html = check_previous_item + complete_first_second_input(count, answer)
     html += complete_third_input(count, answer)
     html += '<label for="responses_' + count.to_s + '">&nbsp;&nbsp;' + txt + '</label>'
     html += complete_script(count)
@@ -55,10 +55,10 @@ class Checkbox < UnscoredQuestion
     safe_join([''.html_safe, ''.html_safe], html.html_safe)
   end
 
-  def check_previous_question
-    curr_question = Question.find(id)
-    prev_question = Question.where('seq < ?', curr_question.seq).order(:seq).last
-    html = if prev_question.type == 'ColumnHeader'
+  def check_previous_item
+    curr_item = Question.find(id)
+    prev_item = Question.where('seq < ?', curr_item.seq).order(:seq).last
+    html = if prev_item.type == 'ColumnHeader'
              '<td style="padding: 15px;">'
            else
              ''
@@ -98,11 +98,11 @@ class Checkbox < UnscoredQuestion
   end
 
   def complete_if_column_header
-    curr_question = Question.find(id)
-    next_question = Question.where('seq > ?', curr_question.seq).order(:seq).first
-    html = if next_question.type == 'ColumnHeader'
+    curr_item = Question.find(id)
+    next_item = Question.where('seq > ?', curr_item.seq).order(:seq).first
+    html = if next_item.type == 'ColumnHeader'
              '</td></tr>'
-           elsif (next_question.type == 'SectionHeader') || (next_question.type == 'TableHeader')
+           elsif (next_item.type == 'SectionHeader') || (next_item.type == 'TableHeader')
              '</td></tr></table><br/>'
            else
              '<BR/>'
@@ -110,15 +110,15 @@ class Checkbox < UnscoredQuestion
     html
   end
 
-  # This method returns what to display if a student is viewing a filled-out questionnaire
-  def view_completed_question(count, answer)
-    html = check_previous_question
-    html += view_completed_question_answer(count, answer)
-    html += view_completed_question_if_column_header
+  # This method returns what to display if a student is viewing a filled-out itemnaire
+  def view_completed_item(count, answer)
+    html = check_previous_item
+    html += view_completed_item_answer(count, answer)
+    html += view_completed_item_if_column_header
     safe_join([''.html_safe, ''.html_safe], html.html_safe)
   end
 
-  def view_completed_question_answer(count, answer)
+  def view_completed_item_answer(count, answer)
     html = if answer.answer == 1
              '<b>' + count.to_s + '. &nbsp;&nbsp;<img src="/assets/Check-icon.png">' + txt + '</b>'
            else
@@ -127,12 +127,12 @@ class Checkbox < UnscoredQuestion
     html
   end
 
-  def view_completed_question_if_column_header
-    curr_question = Question.find(id)
-    next_question = Question.where('seq > ?', curr_question.seq).order(:seq).first
-    html = if next_question.type == 'ColumnHeader'
+  def view_completed_item_if_column_header
+    curr_item = Question.find(id)
+    next_item = Question.where('seq > ?', curr_item.seq).order(:seq).first
+    html = if next_item.type == 'ColumnHeader'
              '</td></tr>'
-           elsif next_question.type == 'TableHeader'
+           elsif next_item.type == 'TableHeader'
              '</td></tr></table>'
            else
              ''

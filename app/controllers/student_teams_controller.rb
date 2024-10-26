@@ -160,7 +160,7 @@ class StudentTeamsController < ApplicationController
   # This method is used to show the Author Feedback Questionnaire of current assignment
   def review
     @assignment = Assignment.find params[:assignment_id]
-    redirect_to view_questionnaires_path id: @assignment.questionnaires.find_by(type: 'AuthorFeedbackQuestionnaire').id
+    redirect_to view_itemnaires_path id: @assignment.itemnaires.find_by(type: 'AuthorFeedbackQuestionnaire').id
   end
 
   # used to check student team requirements

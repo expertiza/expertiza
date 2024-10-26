@@ -1,13 +1,13 @@
 class QuizQuestion < Question
-  has_many :quiz_question_choices, class_name: 'QuizQuestionChoice', foreign_key: 'question_id', inverse_of: false, dependent: :nullify
+  has_many :quiz_item_choices, class_name: 'QuizQuestionChoice', foreign_key: 'item_id', inverse_of: false, dependent: :nullify
   def edit; end
 
-  def view_question_text
+  def view_item_text
     html = '<b>' + txt + '</b><br />'
     html += 'Question Type: ' + type + '<br />'
     html += 'Question Weight: ' + weight.to_s + '<br />'
-    if quiz_question_choices
-      quiz_question_choices.each do |choices|
+    if quiz_item_choices
+      quiz_item_choices.each do |choices|
         html += if choices.iscorrect?
                   '  - <b>' + choices.txt + '</b><br /> '
                 else
@@ -21,5 +21,5 @@ class QuizQuestion < Question
 
   def complete; end
 
-  def view_completed_question; end
+  def view_completed_item; end
 end

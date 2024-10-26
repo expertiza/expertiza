@@ -5,30 +5,30 @@ th, td {
 </style>
 <% @calibration_response_maps.each_with_index do |response_map, index| %>
 	<% team = Team.find(response_map.reviewee_id) %>
-	<% min_question_score = @assignment_questionnaire.questionnaire.min_question_score %>
-	<% max_question_score = @assignment_questionnaire.questionnaire.max_question_score %>
+	<% min_item_score = @assignment_itemnaire.itemnaire.min_item_score %>
+	<% max_item_score = @assignment_itemnaire.itemnaire.max_item_score %>
 	<% current_responses = @responses.select{|response|response.response_map.reviewee_id == response_map.reviewee_id} %>
 	<% response_ids = [] %>
 	<% current_responses.each { |curr_response| response_ids << curr_response.id } %>
 	<% participant_num = current_responses.count %>
 	
 	<h3> <%= "Calibration #{index+1} (team name:  #{team.name(session[:ip])})" %></h3>
-	<% @questions.each_with_index do |question, index| %>
-		<% instructor_answer = Answer.select('answer').where(["question_id = ? and response_id = ?", question.id, response_map.response[0].id]).first.answer ||= 0 %>
-		<b><%= "Question #{index+1}: " %></b><%= question.txt %>
+	<% @items.each_with_index do |item, index| %>
+		<% instructor_answer = Answer.select('answer').where(["item_id = ? and response_id = ?", item.id, response_map.response[0].id]).first.answer ||= 0 %>
+		<b><%= "Question #{index+1}: " %></b><%= item.txt %>
 		<table border="1">
 			<tr>
 				<th width = "20%"> Assigned Score </th>
-				<% (min_question_score..max_question_score).each do |answer| %>
-					<th width = <%= (80.0 / (max_question_score - min_question_score + 1)).to_s + '%'%>><%= answer %></th>
+				<% (min_item_score..max_item_score).each do |answer| %>
+					<th width = <%= (80.0 / (max_item_score - min_item_score + 1)).to_s + '%'%>><%= answer %></th>
 				<% end %>
 			</tr>
 			<tr>
 				<td> Number of students </td>
 				<% max_count = 0 %>
 				<% count_hash = {} %>
-				<% (min_question_score..max_question_score).each do |answer| %>
-					<% count = Answer.where(["question_id = ? and response_id IN (?) and answer = ?", question.id, response_ids, answer]).size %>
+				<% (min_item_score..max_item_score).each do |answer| %>
+					<% count = Answer.where(["item_id = ? and response_id IN (?) and answer = ?", item.id, response_ids, answer]).size %>
 					<% count_hash[answer] = count %>
 					<% max_count = count if count > max_count %>
 				<% end %>
@@ -48,7 +48,7 @@ th, td {
 	<% end %>
 <% end %>
 
-<p> ** The <b>bolded</b> percentages are the highest ones for each question. <br>
+<p> ** The <b>bolded</b> percentages are the highest ones for each item. <br>
   The scores in <i class = "c5">green cells</i> are the review scores that given by the teaching staff (expert-review); <br>
   the scores in <i class = "c4">light green cells</i> are the review scores that 1 point away from the expert-review; <br>
   the scores in <i class = "c3">yellow cells</i> are the review scores that 2 points away from the expert-review; <br>

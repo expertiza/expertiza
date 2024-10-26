@@ -9,37 +9,37 @@ module QuestionnaireHelper
   CSV_PARAM = 2
   CSV_WEIGHT = 3
 
-  def self.adjust_advice_size(questionnaire, question)
-    # now we only support question advices for scored questions
-    if question.is_a?(ScoredQuestion)
+  def self.adjust_advice_size(itemnaire, item)
+    # now we only support item advices for scored items
+    if item.is_a?(ScoredQuestion)
 
-      max = questionnaire.max_question_score
-      min = questionnaire.min_question_score
+      max = itemnaire.max_item_score
+      min = itemnaire.min_item_score
 
-      QuestionAdvice.delete(['question_id = ? AND (score > ? OR score < ?)', question.id, max, min]) if !max.nil? && !min.nil?
+      QuestionAdvice.delete(['item_id = ? AND (score > ? OR score < ?)', item.id, max, min]) if !max.nil? && !min.nil?
 
-      (questionnaire.min_question_score..questionnaire.max_question_score).each do |i|
-        qas = QuestionAdvice.where('question_id = ? AND score = ?', question.id, i)
-        question.question_advices << QuestionAdvice.new(score: i) if qas.first.nil?
-        QuestionAdvice.delete(['question_id = ? AND score = ?', question.id, i]) if qas.size > 1
+      (itemnaire.min_item_score..itemnaire.max_item_score).each do |i|
+        qas = QuestionAdvice.where('item_id = ? AND score = ?', item.id, i)
+        item.item_advices << QuestionAdvice.new(score: i) if qas.first.nil?
+        QuestionAdvice.delete(['item_id = ? AND score = ?', item.id, i]) if qas.size > 1
       end
     end
   end
 
-# Updates the attributes of questionnaire questions based on form data, without modifying unchanged attributes.
-  def update_questionnaire_questions
-    return if params[:question].nil?
+# Updates the attributes of itemnaire items based on form data, without modifying unchanged attributes.
+  def update_itemnaire_items
+    return if params[:item].nil?
 
-    params[:question].each_pair do |k, v|
-      question = Question.find(k)
+    params[:item].each_pair do |k, v|
+      item = Question.find(k)
       v.each_pair do |key, value|
-        question.send(key + '=', value) unless question.send(key) == value
+        item.send(key + '=', value) unless item.send(key) == value
       end
-      question.save
+      item.save
     end
   end
 
-  #Map type to questionnaire
+  #Map type to itemnaire
   QUESTIONNAIRE_MAP = {
     'ReviewQuestionnaire' => ReviewQuestionnaire,
     'MetareviewQuestionnaire' => MetareviewQuestionnaire,
@@ -53,13 +53,13 @@ module QuestionnaireHelper
     'QuizQuestionnaire' => QuizQuestionnaire
   }.freeze
 
-  # factory method to create the appropriate questionnaire based on the type
-  def questionnaire_factory(type)
-    questionnaire = QUESTIONNAIRE_MAP[type]
-    if questionnaire.nil?
+  # factory method to create the appropriate itemnaire based on the type
+  def itemnaire_factory(type)
+    itemnaire = QUESTIONNAIRE_MAP[type]
+    if itemnaire.nil?
       flash[:error] = 'Error: Undefined Questionnaire'
     else
-      questionnaire.new
+      itemnaire.new
     end
   end
 

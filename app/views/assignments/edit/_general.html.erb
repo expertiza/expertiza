@@ -120,8 +120,8 @@
             <%= label_tag('assignment_form[assignment][require_quiz]', 'Has quiz?') %>
         </td>
         <td style='padding:5px' id='assignment_numbers_of_quiz_field' <%= 'hidden' unless @assignment_form.assignment.require_quiz %>>
-            <%= label_tag('assignment_form[assignment][num_quiz_questions]', 'Number of Quiz questions:') %>
-            <%= text_field_tag('assignment_form[assignment][num_quiz_questions]', @assignment_form.assignment.num_quiz_questions, { :style => 'width:20px'}) %>
+            <%= label_tag('assignment_form[assignment][num_quiz_items]', 'Number of Quiz items:') %>
+            <%= text_field_tag('assignment_form[assignment][num_quiz_items]', @assignment_form.assignment.num_quiz_items, { :style => 'width:20px'}) %>
         </td>
     </tr>
     <!--Badge-->
@@ -292,7 +292,7 @@
         var teammate_reviews_field = jQuery('#assignment_show_teammate_reviews');
         var team_formation_due_date_checkbox = jQuery('#team_formation_due_date_checkbox')
     
-        jQuery("#questionnaire_table_TeammateReviewQuestionnaire").remove()
+        jQuery("#itemnaire_table_TeammateReviewQuestionnaire").remove()
         if (checkbox.is(':checked')) {
           team_count_field.removeAttr('hidden');
           team_formation_due_date_checkbox.removeAttr('hidden')

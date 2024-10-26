@@ -7,7 +7,7 @@ just been entered or revised. You may log into Expertiza and review the work now
   Review Content:
   <% for @rs in @review_scores %>
     -----------------------------------------------------------
-    Question: <%=Question.find(@rs.question_id).txt %>
+    Question: <%=Question.find(@rs.item_id).txt %>
 
   Comment: <%=@rs.comments%>
 
@@ -19,7 +19,7 @@ Score: <%=@rs.answer%>
   Review Content:
   <% for @rs in @ror_review_scores %>
     -----------------------------------------------------------
-    Question: <%=Question.find(@rs.question_id).txt %>
+    Question: <%=Question.find(@rs.item_id).txt %>
 
   Comment: <%=@rs.comments%>
 

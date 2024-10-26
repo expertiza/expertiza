@@ -9,13 +9,13 @@ class ResponseAnalyticTestDummyClass
 end
 
 describe ResponseAnalytic do
-  let(:questionnaire) { create(:questionnaire, id: 1) }
-  let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
+  let(:itemnaire) { create(:itemnaire, id: 1) }
+  let(:item1) { create(:item, itemnaire: itemnaire, weight: 1, id: 1) }
   let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1) }
   let!(:response_record) { create(:response, id: 1, response_map: response_map) }
-  let!(:answer1) { create(:answer, question: question1, response_id: 1, id: 1) }
-  let!(:answer2) { create(:answer, question: question1, response_id: 1, id: 2) }
-  let!(:answer3) { create(:answer, question: question1, response_id: 1, id: 3) }
+  let!(:answer1) { create(:answer, item: item1, response_id: 1, id: 1) }
+  let!(:answer2) { create(:answer, item: item1, response_id: 1, id: 2) }
+  let!(:answer3) { create(:answer, item: item1, response_id: 1, id: 3) }
   before(:each) do
     @scores = [answer1, answer2, answer3]
   end
@@ -54,20 +54,20 @@ describe ResponseAnalytic do
       end
     end
   end
-  describe '#question_score_list' do
+  describe '#item_score_list' do
     context 'there are no answers associated with the response' do
       it 'will return [0]' do
         dc = ResponseAnalyticTestDummyClass.new([])
-        expect(dc.question_score_list).to eq([0])
+        expect(dc.item_score_list).to eq([0])
       end
     end
-    context 'there are three answers associated with the response, with question scores of 50, 75, and 100' do
+    context 'there are three answers associated with the response, with item scores of 50, 75, and 100' do
       it 'will return [50, 75, 100]' do
         dc = ResponseAnalyticTestDummyClass.new(@scores)
         allow(answer1).to receive(:score).and_return(50)
         allow(answer2).to receive(:score).and_return(75)
         allow(answer3).to receive(:score).and_return(100)
-        expect(dc.question_score_list).to eq([50, 75, 100])
+        expect(dc.item_score_list).to eq([50, 75, 100])
       end
     end
   end
@@ -245,11 +245,11 @@ describe ResponseAnalytic do
       end
     end
   end
-  describe '#max_question_score' do
+  describe '#max_item_score' do
     context 'there are no answers associated with the response' do
       it 'will return 0' do
         dc = ResponseAnalyticTestDummyClass.new([])
-        expect(dc.max_question_score).to eq(0)
+        expect(dc.max_item_score).to eq(0)
       end
     end
     context 'there are three answers associated with the response, with scores of 50, 75, and 100' do
@@ -258,15 +258,15 @@ describe ResponseAnalytic do
         allow(answer1).to receive(:score).and_return(50)
         allow(answer2).to receive(:score).and_return(75)
         allow(answer3).to receive(:score).and_return(100)
-        expect(dc.max_question_score).to eq(100)
+        expect(dc.max_item_score).to eq(100)
       end
     end
   end
-  describe '#min_question_score' do
+  describe '#min_item_score' do
     context 'there are no answers associated with the response' do
       it 'will return 0' do
         dc = ResponseAnalyticTestDummyClass.new([])
-        expect(dc.min_question_score).to eq(0)
+        expect(dc.min_item_score).to eq(0)
       end
     end
     context 'there are three answers associated with the response, with scores of 50, 75, and 100' do
@@ -275,21 +275,21 @@ describe ResponseAnalytic do
         allow(answer1).to receive(:score).and_return(50)
         allow(answer2).to receive(:score).and_return(75)
         allow(answer3).to receive(:score).and_return(100)
-        expect(dc.min_question_score).to eq(50)
+        expect(dc.min_item_score).to eq(50)
       end
     end
   end
-  describe '#num_questions' do
+  describe '#num_items' do
     context 'there are no answers associated with the response' do
       it 'will return 0' do
         dc = ResponseAnalyticTestDummyClass.new([])
-        expect(dc.num_questions).to eq(0)
+        expect(dc.num_items).to eq(0)
       end
     end
     context 'there are three answers associated with the response' do
       it 'will return 3' do
         dc = ResponseAnalyticTestDummyClass.new(@scores)
-        expect(dc.num_questions).to eq(3)
+        expect(dc.num_items).to eq(3)
       end
     end
   end

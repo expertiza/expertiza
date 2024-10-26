@@ -21,7 +21,7 @@ class HttpRequest
         res
 
       when Net::HTTPRedirection then
-        # http://stackoverflow.com/questions/6934185/ruby-net-http-following-redirects
+        # http://stackoverflow.com/items/6934185/ruby-net-http-following-redirects
         new_uri = URI.parse(res['Location'])
         if new_uri.relative?
           new_uri.scheme = uri.scheme

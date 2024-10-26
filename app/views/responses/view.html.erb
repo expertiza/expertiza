@@ -25,7 +25,7 @@
 <%= @response.display_as_html(nil, nil, file_url) %>
 <br/>
 
-<!--Check whether there is a UploadFile question.-->
+<!--Check whether there is a UploadFile item.-->
 <%if @map.instance_of?(ReviewResponseMap)%>
   <% current_folder = DisplayOption.new %>
   <% current_folder.name = "~/" %>
@@ -33,8 +33,8 @@
   <% files = @participant.files(@participant.review_file_path(response_map_id).to_s + current_folder.name) %>
   <% session_participant = AssignmentParticipant.where(parent_id: @assignment.id, user_id: session[:user].id).first %>
   <% session_participants_team = AssignmentTeam.team(session_participant) %>
-  <% @review_questions.each do |question| %>
-    <% if question.instance_of? UploadFile %>
+  <% @review_items.each do |item| %>
+    <% if item.instance_of? UploadFile %>
       <%= display_directory_tree(@participant, files, true).html_safe %>
     <% end %>
   <% end %>

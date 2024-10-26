@@ -1,19 +1,19 @@
 class QuizQuestionnairesController < QuestionnairesController
   include AuthorizationHelper
 
-  # Quiz questionnaire edit option to be allowed for student
+  # Quiz itemnaire edit option to be allowed for student
   def action_allowed?
     if params[:action] == 'edit'
-      @questionnaire = Questionnaire.find(params[:id])
+      @itemnaire = Questionnaire.find(params[:id])
       current_user_has_admin_privileges? || current_user_is_a?('Student')
     else
       current_user_has_student_privileges?
     end
   end
 
-  # View a quiz questionnaire
+  # View a quiz itemnaire
   def view
-    @questionnaire = Questionnaire.find(params[:id])
+    @itemnaire = Questionnaire.find(params[:id])
     @participant = Participant.find(params[:pid]) # creating an instance variable since it needs to be sent to submitted_content/edit
     render :view
   end
@@ -30,37 +30,37 @@ class QuizQuestionnairesController < QuestionnairesController
       valid_request = false
     end
     if valid_request && Questionnaire::QUESTIONNAIRE_TYPES.include?(params[:model])
-      @questionnaire = QuizQuestionnaire.new
-      @questionnaire.private = params[:private]
-      render 'questionnaires/new_quiz'
+      @itemnaire = QuizQuestionnaire.new
+      @itemnaire.private = params[:private]
+      render 'itemnaires/new_quiz'
     else
       redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
     end
   end
 
-  # create quiz questionnaire
+  # create quiz itemnaire
   def create
     valid = validate_quiz
     if valid.eql?('valid') # The value of valid could either be "valid" or a string indicating why the quiz cannot be created
-      @questionnaire = QuizQuestionnaire.new(questionnaire_params)
+      @itemnaire = QuizQuestionnaire.new(itemnaire_params)
       participant_id = params[:pid] # Gets the participant id to be used when finding team and editing submitted content
-      @questionnaire.min_question_score = params[:questionnaire][:min_question_score] # 0
-      @questionnaire.max_question_score = params[:questionnaire][:max_question_score] # 1
+      @itemnaire.min_item_score = params[:itemnaire][:min_item_score] # 0
+      @itemnaire.max_item_score = params[:itemnaire][:max_item_score] # 1
 
       author_team = AssignmentTeam.team(Participant.find(participant_id)) # Gets the participant's team for the assignment
 
-      @questionnaire.instructor_id = author_team.id # for a team assignment, set the instructor id to the team_id
+      @itemnaire.instructor_id = author_team.id # for a team assignment, set the instructor id to the team_id
 
-      if @questionnaire.min_question_score < 0 || @questionnaire.max_question_score < 0
-        flash[:error] = 'Minimum and/or maximum question score cannot be less than 0.'
+      if @itemnaire.min_item_score < 0 || @itemnaire.max_item_score < 0
+        flash[:error] = 'Minimum and/or maximum item score cannot be less than 0.'
         redirect_back fallback_location: root_path
-      elsif @questionnaire.max_question_score < @questionnaire.min_question_score
-        flash[:error] = 'Maximum question score cannot be less than minimum question score.'
+      elsif @itemnaire.max_item_score < @itemnaire.min_item_score
+        flash[:error] = 'Maximum item score cannot be less than minimum item score.'
         redirect_back fallback_location: root_path
       else
         @successful_create = true
         save
-        save_choices @questionnaire.id
+        save_choices @itemnaire.id
         flash[:note] = 'The quiz was successfully created.' if @successful_create
         redirect_to controller: 'submitted_content', action: 'edit', id: participant_id
       end
@@ -70,57 +70,57 @@ class QuizQuestionnairesController < QuestionnairesController
     end
   end
 
-  # edit a quiz questionnaire
+  # edit a quiz itemnaire
   def edit
-    @questionnaire = Questionnaire.find(params[:id])
-    if @questionnaire.taken_by_anyone?
+    @itemnaire = Questionnaire.find(params[:id])
+    if @itemnaire.taken_by_anyone?
       flash[:error] = 'Your quiz has been taken by one or more students; you cannot edit it anymore.'
       redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
     else # quiz can be edited only if its not taken by anyone
-      render :'questionnaires/edit'
+      render :'itemnaires/edit'
     end
   end
 
-  # save an updated quiz questionnaire to the database
+  # save an updated quiz itemnaire to the database
   def update
-    @questionnaire = Questionnaire.find(params[:id])
-    if @questionnaire.nil?
+    @itemnaire = Questionnaire.find(params[:id])
+    if @itemnaire.nil?
       redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
       return
     end
-    if params['save'] && params[:question].try(:keys)
-      @questionnaire.update_attributes(questionnaire_params)
-      params[:question].each_pair do |qid, _|
-        @question = Question.find(qid)
-        @question.txt = params[:question][qid.to_sym][:txt]
-        @question.weight = params[:question_weights][qid.to_sym][:txt]
-        @question.save
-        @quiz_question_choices = QuizQuestionChoice.where(question_id: qid)
-        question_index = 1
-        @quiz_question_choices.each do |question_choice| # Updates state of each question choice for selected question
-          # Call private methods to handle question types
-          update_checkbox(question_choice, question_index) if @question.type == 'MultipleChoiceCheckbox'
-          update_radio(question_choice, question_index) if @question.type == 'MultipleChoiceRadio'
-          update_truefalse(question_choice) if @question.type == 'TrueFalse'
-          question_index += 1
+    if params['save'] && params[:item].try(:keys)
+      @itemnaire.update_attributes(itemnaire_params)
+      params[:item].each_pair do |qid, _|
+        @item = Question.find(qid)
+        @item.txt = params[:item][qid.to_sym][:txt]
+        @item.weight = params[:item_weights][qid.to_sym][:txt]
+        @item.save
+        @quiz_item_choices = QuizQuestionChoice.where(item_id: qid)
+        item_index = 1
+        @quiz_item_choices.each do |item_choice| # Updates state of each item choice for selected item
+          # Call private methods to handle item types
+          update_checkbox(item_choice, item_index) if @item.type == 'MultipleChoiceCheckbox'
+          update_radio(item_choice, item_index) if @item.type == 'MultipleChoiceRadio'
+          update_truefalse(item_choice) if @item.type == 'TrueFalse'
+          item_index += 1
         end
       end
     end
     redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
   end
 
-  # validate quiz name, questions, answers
+  # validate quiz name, items, answers
   # Returns "valid" if there are no issues, or a string indicating why the quiz is invalid
   def validate_quiz
-    num_questions = Assignment.find(params[:aid]).num_quiz_questions
+    num_items = Assignment.find(params[:aid]).num_quiz_items
     valid = 'valid'
-    if params[:questionnaire][:name] == '' # questionnaire name is not specified
+    if params[:itemnaire][:name] == '' # itemnaire name is not specified
       valid = 'Please specify quiz name (please do not use your name or id).'
     end
-    (1..num_questions).each do |i|
+    (1..num_items).each do |i|
       break unless valid == 'valid'
 
-      valid = validate_question(i)
+      valid = validate_item(i)
     end
     valid
   end
@@ -140,147 +140,147 @@ class QuizQuestionnairesController < QuestionnairesController
     end
   end
 
-  # A question is valid if it has a valid type ('TrueFalse', 'MultipleChoiceCheckbox', 'MultipleChoiceRadio') and a correct answer selected
-  def validate_question(i)
-    if params.key?(:question_type) && params[:question_type].key?(i.to_s) && params[:question_type][i.to_s][:type]
-      # The question type is dynamic, so const_get is necessary
-      type = params[:question_type][i.to_s][:type]
-      @new_question = Object.const_get(type).create(txt: '', type: type, break_before: true)
-      @new_question.update_attributes(txt: params[:new_question][i.to_s])
-      choice_info = params[:new_choices][i.to_s][type] # choice info for one question of its type
+  # A item is valid if it has a valid type ('TrueFalse', 'MultipleChoiceCheckbox', 'MultipleChoiceRadio') and a correct answer selected
+  def validate_item(i)
+    if params.key?(:item_type) && params[:item_type].key?(i.to_s) && params[:item_type][i.to_s][:type]
+      # The item type is dynamic, so const_get is necessary
+      type = params[:item_type][i.to_s][:type]
+      @new_item = Object.const_get(type).create(txt: '', type: type, break_before: true)
+      @new_item.update_attributes(txt: params[:new_item][i.to_s])
+      choice_info = params[:new_choices][i.to_s][type] # choice info for one item of its type
       valid = if choice_info.nil?
-                'Please select a correct answer for all questions'
+                'Please select a correct answer for all items'
               else
-                @new_question.isvalid(choice_info)
+                @new_item.isvalid(choice_info)
               end
     else
-      # A type isn't selected for a question
-      valid = 'Please select a type for each question'
+      # A type isn't selected for a item
+      valid = 'Please select a type for each item'
     end
     valid
   end
 
   # create multiple choice (radio or checkbox) item(s)
-  def create_multchoice(question, choice_key, q_answer_choices)
+  def create_multchoice(item, choice_key, q_answer_choices)
     # this method combines the functionality of create_radio and create_checkbox, so that all mult choice items are create by 1 func
-    question_choice = if q_answer_choices[choice_key][:iscorrect] == 1.to_s
-                        QuizQuestionChoice.new(txt: q_answer_choices[choice_key][:txt], iscorrect: 'true', question_id: question.id)
+    item_choice = if q_answer_choices[choice_key][:iscorrect] == 1.to_s
+                        QuizQuestionChoice.new(txt: q_answer_choices[choice_key][:txt], iscorrect: 'true', item_id: item.id)
                       else
-                        QuizQuestionChoice.new(txt: q_answer_choices[choice_key][:txt], iscorrect: 'false', question_id: question.id)
+                        QuizQuestionChoice.new(txt: q_answer_choices[choice_key][:txt], iscorrect: 'false', item_id: item.id)
                       end
-    question_choice.save
+    item_choice.save
   end
 
   # create true/false item
-  def create_truefalse(question, choice_key, q_answer_choices)
+  def create_truefalse(item, choice_key, q_answer_choices)
     if q_answer_choices[1.to_s][:iscorrect] == choice_key
-      question_choice = QuizQuestionChoice.new(txt: 'True', iscorrect: 'true', question_id: question.id)
-      question_choice.save
-      question_choice = QuizQuestionChoice.new(txt: 'False', iscorrect: 'false', question_id: question.id)
-      question_choice.save
+      item_choice = QuizQuestionChoice.new(txt: 'True', iscorrect: 'true', item_id: item.id)
+      item_choice.save
+      item_choice = QuizQuestionChoice.new(txt: 'False', iscorrect: 'false', item_id: item.id)
+      item_choice.save
     else
-      question_choice = QuizQuestionChoice.new(txt: 'True', iscorrect: 'false', question_id: question.id)
-      question_choice.save
-      question_choice = QuizQuestionChoice.new(txt: 'False', iscorrect: 'true', question_id: question.id)
-      question_choice.save
+      item_choice = QuizQuestionChoice.new(txt: 'True', iscorrect: 'false', item_id: item.id)
+      item_choice.save
+      item_choice = QuizQuestionChoice.new(txt: 'False', iscorrect: 'true', item_id: item.id)
+      item_choice.save
     end
   end
 
   # update checkbox item
-  def update_checkbox(question_choice, question_index)
-    if params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s]
-      question_choice.update_attributes(
-        iscorrect: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:iscorrect],
-        txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt]
+  def update_checkbox(item_choice, item_index)
+    if params[:quiz_item_choices][@item.id.to_s][@item.type][item_index.to_s]
+      item_choice.update_attributes(
+        iscorrect: params[:quiz_item_choices][@item.id.to_s][@item.type][item_index.to_s][:iscorrect],
+        txt: params[:quiz_item_choices][@item.id.to_s][@item.type][item_index.to_s][:txt]
       )
     else
-      question_choice.update_attributes(
+      item_choice.update_attributes(
         iscorrect: '0',
-        txt: params[:quiz_question_choices][question_choice.id.to_s][:txt]
+        txt: params[:quiz_item_choices][item_choice.id.to_s][:txt]
       )
     end
   end
 
   # update radio item
-  def update_radio(question_choice, question_index)
-    if params[:quiz_question_choices][@question.id.to_s][@question.type][:correctindex] == question_index.to_s
-      question_choice.update_attributes(
+  def update_radio(item_choice, item_index)
+    if params[:quiz_item_choices][@item.id.to_s][@item.type][:correctindex] == item_index.to_s
+      item_choice.update_attributes(
         iscorrect: '1',
-        txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt]
+        txt: params[:quiz_item_choices][@item.id.to_s][@item.type][item_index.to_s][:txt]
       )
     else
-      question_choice.update_attributes(
+      item_choice.update_attributes(
         iscorrect: '0',
-        txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt]
+        txt: params[:quiz_item_choices][@item.id.to_s][@item.type][item_index.to_s][:txt]
       )
     end
   end
 
   # update true/false item
-  def update_truefalse(question_choice)
-    if params[:quiz_question_choices][@question.id.to_s][@question.type][1.to_s][:iscorrect] == 'True' # the statement is correct
-      question_choice.txt == 'True' ? question_choice.update_attributes(iscorrect: '1') : question_choice.update_attributes(iscorrect: '0')
+  def update_truefalse(item_choice)
+    if params[:quiz_item_choices][@item.id.to_s][@item.type][1.to_s][:iscorrect] == 'True' # the statement is correct
+      item_choice.txt == 'True' ? item_choice.update_attributes(iscorrect: '1') : item_choice.update_attributes(iscorrect: '0')
       # the statement is correct so "True" is the right answer
     else # the statement is not correct
-      question_choice.txt == 'True' ? question_choice.update_attributes(iscorrect: '0') : question_choice.update_attributes(iscorrect: '1')
+      item_choice.txt == 'True' ? item_choice.update_attributes(iscorrect: '0') : item_choice.update_attributes(iscorrect: '1')
       # the statement is not correct so "False" is the right answer
     end
   end
 
-  # save questionnaire
+  # save itemnaire
   def save
-    @questionnaire.save!
-    undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
+    @itemnaire.save!
+    undo_link("Questionnaire \"#{@itemnaire.name}\" has been updated successfully. ")
   end
 
-  # save questions
-  def save_questions(questionnaire_id)
-    redirect_to controller: 'questions', action: 'delete_questions', questionnaire_id: @questionnaire.id and return
-    redirect_to controller: 'question', action: 'save_new_questions', questionnaire_id: @questionnaire.id, questionnaire_type: @questionnaire.type
-    if params[:question]
-      params[:question].each_key do |question_key|
-        if params[:question][question_key][:txt].strip.empty?
-          # question text is empty, delete the question
-          Question.delete(question_key)
+  # save items
+  def save_items(itemnaire_id)
+    redirect_to controller: 'items', action: 'delete_items', itemnaire_id: @itemnaire.id and return
+    redirect_to controller: 'item', action: 'save_new_items', itemnaire_id: @itemnaire.id, itemnaire_type: @itemnaire.type
+    if params[:item]
+      params[:item].each_key do |item_key|
+        if params[:item][item_key][:txt].strip.empty?
+          # item text is empty, delete the item
+          Question.delete(item_key)
         else
-          # Update existing question.
-          question = Question.find(question_key)
-          Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
+          # Update existing item.
+          item = Question.find(item_key)
+          Rails.logger.info(item.errors.messages.inspect) unless item.update_attributes(params[:item][item_key])
         end
       end
     end
   end
 
-  # Saves either True/False or Multiple Choice questions to a quiz questionnaire
-  # Only scorable questions can be added to a quiz, but future projects could consider relaxing this constraint
-  def save_choices(questionnaire_id)
-    return unless params[:new_question] || params[:new_choices]
+  # Saves either True/False or Multiple Choice items to a quiz itemnaire
+  # Only scorable items can be added to a quiz, but future projects could consider relaxing this constraint
+  def save_choices(itemnaire_id)
+    return unless params[:new_item] || params[:new_choices]
 
-    questions = Question.where(questionnaire_id: questionnaire_id)
-    question_num = 1
+    items = Question.where(itemnaire_id: itemnaire_id)
+    item_num = 1
 
-    questions.each do |question|
-      q_type = params[:question_type][question_num.to_s][:type]
-      q_answer_choices = params[:new_choices][question_num.to_s][q_type]
+    items.each do |item|
+      q_type = params[:item_type][item_num.to_s][:type]
+      q_answer_choices = params[:new_choices][item_num.to_s][q_type]
       q_answer_choices.each_pair do |choice_key, _| # _ is dummy variable
-        question_factory(q_type, question, choice_key, q_answer_choices) # allow factory method to create appropriate question
+        item_factory(q_type, item, choice_key, q_answer_choices) # allow factory method to create appropriate item
       end
-      question_num += 1
-      question.weight = 1
+      item_num += 1
+      item.weight = 1
     end
   end
 
-  # factory method to create the appropriate question based on the question type (true/false or multiple choice)
-  def question_factory(q_type, question, choice_key, q_answer_choices)
+  # factory method to create the appropriate item based on the item type (true/false or multiple choice)
+  def item_factory(q_type, item, choice_key, q_answer_choices)
     if q_type == 'TrueFalse'
-      create_truefalse(question, choice_key, q_answer_choices)
+      create_truefalse(item, choice_key, q_answer_choices)
     else # create MultipleChoice of either type, rather than creating them separately based on q_type
-      create_multchoice(question, choice_key, q_answer_choices)
+      create_multchoice(item, choice_key, q_answer_choices)
     end
   end
 
-  def questionnaire_params
-    params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
-                                          :max_question_score, :type, :display_type, :instruction_loc)
+  def itemnaire_params
+    params.require(:itemnaire).permit(:name, :instructor_id, :private, :min_item_score,
+                                          :max_item_score, :type, :display_type, :instruction_loc)
   end
 end

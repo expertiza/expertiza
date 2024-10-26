@@ -7,15 +7,15 @@ class ProfileController < ApplicationController
 
   def edit
     @user = session[:user]
-    @assignment_questionnaire = AssignmentQuestionnaire.where('user_id = ? and assignment_id is null and questionnaire_id is null', @user.id).first
+    @assignment_itemnaire = AssignmentQuestionnaire.where('user_id = ? and assignment_id is null and itemnaire_id is null', @user.id).first
   end
 
   def update
     @user = session[:user]
 
-    unless params[:assignment_questionnaire].nil? || params[:assignment_questionnaire][:notification_limit].blank?
-      aq = AssignmentQuestionnaire.where(['user_id = ? and assignment_id is null and questionnaire_id is null', @user.id]).first
-      aq.update_attribute('notification_limit', params[:assignment_questionnaire][:notification_limit])
+    unless params[:assignment_itemnaire].nil? || params[:assignment_itemnaire][:notification_limit].blank?
+      aq = AssignmentQuestionnaire.where(['user_id = ? and assignment_id is null and itemnaire_id is null', @user.id]).first
+      aq.update_attribute('notification_limit', params[:assignment_itemnaire][:notification_limit])
     end
     if @user.update_attributes(user_params)
       ExpertizaLogger.info LoggerMessage.new(controller_name, @user.name, 'Your profile was successfully updated.', request)

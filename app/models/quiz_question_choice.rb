@@ -1,3 +1,3 @@
 class QuizQuestionChoice < ApplicationRecord
-  belongs_to :question, dependent: :destroy
+  belongs_to :item, dependent: :destroy
 end

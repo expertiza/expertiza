@@ -68,7 +68,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :assignment_questionnaire do
+  resources :assignment_itemnaire do
     collection do
       post :create
     end
@@ -274,17 +274,17 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :questionnaires, only: %i[new create edit update] do
+  resources :itemnaires, only: %i[new create edit update] do
     collection do
       get :copy
-      get :select_questionnaire_type
-      post :select_questionnaire_type
+      get :select_itemnaire_type
+      post :select_itemnaire_type
       get :toggle_access
       get :view
-      post :add_new_questions
-      post :save_all_questions
+      post :add_new_items
+      post :save_all_items
       get :delete
-      post :create_questionnaire
+      post :create_itemnaire
     end
   end
 
@@ -294,7 +294,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :quiz_questionnaires do
+  resources :quiz_itemnaires do
     collection do
       get :edit
       get :edit_quiz
@@ -305,25 +305,25 @@ Expertiza::Application.routes.draw do
       post :update_quiz
       post :update
       post :create
-      post :create_quiz_questionnaire
+      post :create_quiz_itemnaire
     end
   end
 
-  resources :author_feedback_questionnaires, controller: :questionnaires
-  resources :review_questionnaires, controller: :questionnaires
-  resources :metareview_questionnaires, controller: :questionnaires
-  resources :teammate_review_questionnaires, controller: :questionnaires
-  resources :survey_questionnaires, controller: :questionnaires
-  resources :assignment_survey_questionnaires, controller: :questionnaires
-  resources :global_survey_questionnaires, controller: :questionnaires
-  resources :course_survey_questionnaires, controller: :questionnaires
-  resources :bookmark_rating_questionnaires, controller: :questionnaires
+  resources :author_feedback_itemnaires, controller: :itemnaires
+  resources :review_itemnaires, controller: :itemnaires
+  resources :metareview_itemnaires, controller: :itemnaires
+  resources :teammate_review_itemnaires, controller: :itemnaires
+  resources :survey_itemnaires, controller: :itemnaires
+  resources :assignment_survey_itemnaires, controller: :itemnaires
+  resources :global_survey_itemnaires, controller: :itemnaires
+  resources :course_survey_itemnaires, controller: :itemnaires
+  resources :bookmark_rating_itemnaires, controller: :itemnaires
 
-  resources :questions do
+  resources :items do
     collection do
       get :types
-      post :delete_questions
-      post :save_questions
+      post :delete_items
+      post :save_items
     end
   end
 
@@ -444,7 +444,7 @@ Expertiza::Application.routes.draw do
       post :record_response
       get :finished_quiz
       get :take_quiz
-      get :review_questions
+      get :review_items
     end
   end
 
@@ -575,7 +575,7 @@ Expertiza::Application.routes.draw do
       get :set_session_last_open_tab
       get :goto_courses
       get :goto_assignments
-      get :goto_questionnaires
+      get :goto_itemnaires
       get :goto_review_rubrics
       get :goto_metareview_rubrics
       get :goto_teammatereview_rubrics

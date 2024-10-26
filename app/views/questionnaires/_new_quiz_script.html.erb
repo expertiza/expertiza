@@ -4,44 +4,44 @@
       jQuery("input[type='radio'][value='MultipleChoiceRadio']").each(function(index, button){
         // Give the button a certain click behaviour:
           jQuery(button).change(function(){
-            var question_num = index + 1;
-              $('#check_boxes' + question_num).hide();
-              $('#essay' + question_num).hide();
-              $('#true_false' + question_num).hide();
-              $('#radio_buttons' + question_num).show();
+            var item_num = index + 1;
+              $('#check_boxes' + item_num).hide();
+              $('#essay' + item_num).hide();
+              $('#true_false' + item_num).hide();
+              $('#radio_buttons' + item_num).show();
           });
       });
 
       jQuery("input[type='radio'][value='TrueFalse']").each(function(index, button){
         // Give the button a certain click behaviour:
           jQuery(button).change(function(){
-            var question_num = index + 1;
-              $('#check_boxes' + question_num).hide();
-              $('#radio_buttons' + question_num).hide();
-              $('#essay' + question_num).hide();
-              $('#true_false' + question_num).show();
+            var item_num = index + 1;
+              $('#check_boxes' + item_num).hide();
+              $('#radio_buttons' + item_num).hide();
+              $('#essay' + item_num).hide();
+              $('#true_false' + item_num).show();
           });
       });
 
       jQuery("input[type='radio'][value='Essay']").each(function(index, button){
         // Give the button a certain click behaviour:
           jQuery(button).change(function(){
-            var question_num = index + 1;
-              $('#check_boxes' + question_num).hide();
-              $('#true_false' + question_num).hide();
-              $('#radio_buttons' + question_num).hide();
-              $('#essay' + question_num).show();
+            var item_num = index + 1;
+              $('#check_boxes' + item_num).hide();
+              $('#true_false' + item_num).hide();
+              $('#radio_buttons' + item_num).hide();
+              $('#essay' + item_num).show();
           });
       });
 
       jQuery("input[type='radio'][value='MultipleChoiceCheckbox']").each(function(index, button){
         // Give the button a certain click behaviour:
           jQuery(button).change(function(){
-            var question_num = index + 1;
-              $('#radio_buttons' + question_num).hide();
-              $('#true_false' + question_num).hide();
-              $('#essay' + question_num).hide();
-              $('#check_boxes' + question_num).show();
+            var item_num = index + 1;
+              $('#radio_buttons' + item_num).hide();
+              $('#true_false' + item_num).hide();
+              $('#essay' + item_num).hide();
+              $('#check_boxes' + item_num).show();
           });
       });
   });

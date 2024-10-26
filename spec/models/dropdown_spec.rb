@@ -1,20 +1,20 @@
 describe Dropdown do
   let(:dropdown) { build(:dropdown, id: 1) }
-  let(:questionnaire) { create(:questionnaire, id: 1) }
-  let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1, type: 'Criterion') }
+  let(:itemnaire) { create(:itemnaire, id: 1) }
+  let(:item1) { create(:item, itemnaire: itemnaire, weight: 1, id: 1, type: 'Criterion') }
   let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1) }
   let!(:response_record) { create(:response, id: 1, response_map: response_map) }
-  let!(:answer) { create(:answer, question: question1, comments: 'Alternative 1', response_id: 1) }
-  describe '#view_question_text' do
+  let!(:answer) { create(:answer, item: item1, comments: 'Alternative 1', response_id: 1) }
+  describe '#view_item_text' do
     it 'returns the html' do
-      html = dropdown.view_question_text
-      expect(html).to eq('<TR><TD align="left"> Test question: </TD><TD align="left">TrueFalse</TD><td align="center">1</TD><TD align="center">&mdash;</TD></TR>')
+      html = dropdown.view_item_text
+      expect(html).to eq('<TR><TD align="left"> Test item: </TD><TD align="left">TrueFalse</TD><td align="center">1</TD><TD align="center">&mdash;</TD></TR>')
     end
   end
-  describe '#view_completed_question' do
+  describe '#view_completed_item' do
     it 'returns the html' do
-      html = dropdown.view_completed_question(1, answer)
-      expect(html).to eq('<b>1. Test question:</b><BR>&nbsp&nbsp&nbsp&nbspAlternative 1')
+      html = dropdown.view_completed_item(1, answer)
+      expect(html).to eq('<b>1. Test item:</b><BR>&nbsp&nbsp&nbsp&nbspAlternative 1')
     end
   end
   describe '#complete_for_alternatives' do
@@ -30,7 +30,7 @@ describe Dropdown do
       allow(dropdown).to receive(:alternatives).and_return(alternatives)
       allow(dropdown).to receive(:complete_for_alternatives).and_return('')
       html = dropdown.complete(1, answer)
-      expect(html).to eq('<p style="width: 80%;"><label for="responses_1"">Test question:&nbsp;&nbsp;</label><input id="responses_1_score" name="responses[1][score]" type="hidden" value="" style="min-width: 100px;"><select id="responses_1_comments" label=Test question: name="responses[1][comment]"></select></p>')
+      expect(html).to eq('<p style="width: 80%;"><label for="responses_1"">Test item:&nbsp;&nbsp;</label><input id="responses_1_score" name="responses[1][score]" type="hidden" value="" style="min-width: 100px;"><select id="responses_1_comments" label=Test item: name="responses[1][comment]"></select></p>')
     end
   end
 end

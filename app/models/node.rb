@@ -23,7 +23,7 @@ class Node < ApplicationRecord
   end
 
   # Most objects are not leaves
-  # Currently only assignment and questionnaire are a leaf
+  # Currently only assignment and itemnaire are a leaf
   # type node
   def is_leaf
     false

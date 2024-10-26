@@ -28,87 +28,87 @@ describe AdviceController do
   end
 
   describe '#invalid_advice?' do
-    context "when invalid_advice? is called with question advice score > max score of questionnaire" do
+    context "when invalid_advice? is called with item advice score > max score of itemnaire" do
       # max score of advice = 3 (!=2)
-      let(:questionAdvice1) {build(:question_advice, id:1, score: 1, question_id: 1, advice: "Advice1")}
-      let(:questionAdvice2) {build(:question_advice, id:2, score: 3, question_id: 1, advice: "Advice2")}
-      let(:questionnaire) do
-        build(:questionnaire, id: 1, min_question_score: 1,
-          questions: [build(:question, id: 1, weight: 2, question_advices: [questionAdvice1,questionAdvice2])], max_question_score: 2)
+      let(:itemAdvice1) {build(:item_advice, id:1, score: 1, item_id: 1, advice: "Advice1")}
+      let(:itemAdvice2) {build(:item_advice, id:2, score: 3, item_id: 1, advice: "Advice2")}
+      let(:itemnaire) do
+        build(:itemnaire, id: 1, min_item_score: 1,
+          items: [build(:item, id: 1, weight: 2, item_advices: [itemAdvice1,itemAdvice2])], max_item_score: 2)
       end
 
-      it "invalid_advice? returns true when called with incorrect maximum score for a question advice" do
-        sorted_advice = questionnaire.questions[0].question_advices.sort_by { |x| x.score }.reverse
-        num_advices = questionnaire.max_question_score - questionnaire.min_question_score + 1          
-        controller.instance_variable_set(:@questionnaire,questionnaire)
-        expect(controller.invalid_advice?(sorted_advice,num_advices,questionnaire.questions[0])).to eq(true)
+      it "invalid_advice? returns true when called with incorrect maximum score for a item advice" do
+        sorted_advice = itemnaire.items[0].item_advices.sort_by { |x| x.score }.reverse
+        num_advices = itemnaire.max_item_score - itemnaire.min_item_score + 1          
+        controller.instance_variable_set(:@itemnaire,itemnaire)
+        expect(controller.invalid_advice?(sorted_advice,num_advices,itemnaire.items[0])).to eq(true)
       end
     end
 
-    context "when invalid_advice? is called with question advice score < min score of questionnaire" do
+    context "when invalid_advice? is called with item advice score < min score of itemnaire" do
       # min score of advice = 0 (!=1)
-      let(:questionAdvice1) {build(:question_advice, id:1, score: 0, question_id: 1, advice: "Advice1")}
-      let(:questionAdvice2) {build(:question_advice, id:2, score: 2, question_id: 1, advice: "Advice2")}
-      let(:questionnaire) do
-        build(:questionnaire, id: 1, min_question_score: 1,
-          questions: [build(:question, id: 1, weight: 2, question_advices: [questionAdvice1,questionAdvice2])], max_question_score: 2)
+      let(:itemAdvice1) {build(:item_advice, id:1, score: 0, item_id: 1, advice: "Advice1")}
+      let(:itemAdvice2) {build(:item_advice, id:2, score: 2, item_id: 1, advice: "Advice2")}
+      let(:itemnaire) do
+        build(:itemnaire, id: 1, min_item_score: 1,
+          items: [build(:item, id: 1, weight: 2, item_advices: [itemAdvice1,itemAdvice2])], max_item_score: 2)
       end
 
-      it "invalid_advice? returns true when called with incorrect minimum score for a question advice" do
-        sorted_advice = questionnaire.questions[0].question_advices.sort_by { |x| x.score }.reverse
-        num_advices = questionnaire.max_question_score - questionnaire.min_question_score + 1         
-        controller.instance_variable_set(:@questionnaire,questionnaire)
-        expect(controller.invalid_advice?(sorted_advice,num_advices,questionnaire.questions[0])).to eq(true)
+      it "invalid_advice? returns true when called with incorrect minimum score for a item advice" do
+        sorted_advice = itemnaire.items[0].item_advices.sort_by { |x| x.score }.reverse
+        num_advices = itemnaire.max_item_score - itemnaire.min_item_score + 1         
+        controller.instance_variable_set(:@itemnaire,itemnaire)
+        expect(controller.invalid_advice?(sorted_advice,num_advices,itemnaire.items[0])).to eq(true)
       end
     end
 
-    context "when invalid_advice? is called with number of advices > (max-min) score of questionnaire" do
+    context "when invalid_advice? is called with number of advices > (max-min) score of itemnaire" do
       # number of advices > 2
-      let(:questionAdvice1) {build(:question_advice, id:1, score: 1, question_id: 1, advice: "Advice1")}
-      let(:questionAdvice2) {build(:question_advice, id:2, score: 2, question_id: 1, advice: "Advice2")}
-      let(:questionAdvice3) {build(:question_advice, id:3, score: 2, question_id: 1, advice: "Advice3")}
-      let(:questionnaire) do
-        build(:questionnaire, id: 1, min_question_score: 1,
-          questions: [build(:question, id: 1, weight: 2, question_advices: [questionAdvice1,questionAdvice2,questionAdvice3])], max_question_score: 2)
+      let(:itemAdvice1) {build(:item_advice, id:1, score: 1, item_id: 1, advice: "Advice1")}
+      let(:itemAdvice2) {build(:item_advice, id:2, score: 2, item_id: 1, advice: "Advice2")}
+      let(:itemAdvice3) {build(:item_advice, id:3, score: 2, item_id: 1, advice: "Advice3")}
+      let(:itemnaire) do
+        build(:itemnaire, id: 1, min_item_score: 1,
+          items: [build(:item, id: 1, weight: 2, item_advices: [itemAdvice1,itemAdvice2,itemAdvice3])], max_item_score: 2)
       end
 
-      it "invalid_advice? returns true when called with incorrect number of question advices" do
-        sorted_advice = questionnaire.questions[0].question_advices.sort_by { |x| x.score }.reverse
-        num_advices = questionnaire.max_question_score - questionnaire.min_question_score + 1         
-        controller.instance_variable_set(:@questionnaire,questionnaire)
-        expect(controller.invalid_advice?(sorted_advice,num_advices,questionnaire.questions[0])).to eq(true)
+      it "invalid_advice? returns true when called with incorrect number of item advices" do
+        sorted_advice = itemnaire.items[0].item_advices.sort_by { |x| x.score }.reverse
+        num_advices = itemnaire.max_item_score - itemnaire.min_item_score + 1         
+        controller.instance_variable_set(:@itemnaire,itemnaire)
+        expect(controller.invalid_advice?(sorted_advice,num_advices,itemnaire.items[0])).to eq(true)
       end
     end
 
-    context "when invalid_advice? is called with no advices for a question in questionnaire" do
+    context "when invalid_advice? is called with no advices for a item in itemnaire" do
       # 0 advices - empty list scenario
-      let(:questionnaire) do
-        build(:questionnaire, id: 1, min_question_score: 1,
-          questions: [build(:question, id: 1, weight: 2, question_advices: [])], max_question_score: 2)
+      let(:itemnaire) do
+        build(:itemnaire, id: 1, min_item_score: 1,
+          items: [build(:item, id: 1, weight: 2, item_advices: [])], max_item_score: 2)
       end
 
       it "invalid_advice? returns true when called with an empty advice list " do
-        sorted_advice = questionnaire.questions[0].question_advices.sort_by { |x| x.score }.reverse
-        num_advices = questionnaire.max_question_score - questionnaire.min_question_score + 1         
-        controller.instance_variable_set(:@questionnaire,questionnaire)
-        expect(controller.invalid_advice?(sorted_advice,num_advices,questionnaire.questions[0])).to eq(true)
+        sorted_advice = itemnaire.items[0].item_advices.sort_by { |x| x.score }.reverse
+        num_advices = itemnaire.max_item_score - itemnaire.min_item_score + 1         
+        controller.instance_variable_set(:@itemnaire,itemnaire)
+        expect(controller.invalid_advice?(sorted_advice,num_advices,itemnaire.items[0])).to eq(true)
       end
     end
 
     context "when invalid_advice? is called with all conditions satisfied" do
       # Question Advices passing all conditions
-      let(:questionAdvice1) {build(:question_advice, id:1, score: 1, question_id: 1, advice: "Advice1")}
-      let(:questionAdvice2) {build(:question_advice, id:2, score: 2, question_id: 1, advice: "Advice2")}
-      let(:questionnaire) do
-        build(:questionnaire, id: 1, min_question_score: 1,
-          questions: [build(:question, id: 1, weight: 2, question_advices: [questionAdvice1,questionAdvice2])], max_question_score: 2)
+      let(:itemAdvice1) {build(:item_advice, id:1, score: 1, item_id: 1, advice: "Advice1")}
+      let(:itemAdvice2) {build(:item_advice, id:2, score: 2, item_id: 1, advice: "Advice2")}
+      let(:itemnaire) do
+        build(:itemnaire, id: 1, min_item_score: 1,
+          items: [build(:item, id: 1, weight: 2, item_advices: [itemAdvice1,itemAdvice2])], max_item_score: 2)
       end
 
       it "invalid_advice? returns false when called with all correct pre-conditions " do
-        sorted_advice = questionnaire.questions[0].question_advices.sort_by { |x| x.score }.reverse
-        num_advices = questionnaire.max_question_score - questionnaire.min_question_score + 1         
-        controller.instance_variable_set(:@questionnaire,questionnaire)
-        expect(controller.invalid_advice?(sorted_advice,num_advices,questionnaire.questions[0])).to eq(false)
+        sorted_advice = itemnaire.items[0].item_advices.sort_by { |x| x.score }.reverse
+        num_advices = itemnaire.max_item_score - itemnaire.min_item_score + 1         
+        controller.instance_variable_set(:@itemnaire,itemnaire)
+        expect(controller.invalid_advice?(sorted_advice,num_advices,itemnaire.items[0])).to eq(false)
       end
     end
   end
@@ -117,15 +117,15 @@ describe AdviceController do
 
     context "when edit_advice is called and invalid_advice? evaluates to true" do
       # edit advice called
-      let(:questionAdvice1) {build(:question_advice, id:1, score: 1, question_id: 1, advice: "Advice1")}
-      let(:questionAdvice2) {build(:question_advice, id:2, score: 2, question_id: 1, advice: "Advice2")}
-      let(:questionnaire) do
-        build(:questionnaire, id: 1, min_question_score: 1,
-          questions: [build(:question, id: 1, weight: 2, question_advices: [questionAdvice1,questionAdvice2])], max_question_score: 2)
+      let(:itemAdvice1) {build(:item_advice, id:1, score: 1, item_id: 1, advice: "Advice1")}
+      let(:itemAdvice2) {build(:item_advice, id:2, score: 2, item_id: 1, advice: "Advice2")}
+      let(:itemnaire) do
+        build(:itemnaire, id: 1, min_item_score: 1,
+          items: [build(:item, id: 1, weight: 2, item_advices: [itemAdvice1,itemAdvice2])], max_item_score: 2)
       end
 
       it "edit advice redirects correctly when called" do
-        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
+        allow(Questionnaire).to receive(:find).with('1').and_return(itemnaire)
         params = {id: 1}
         session = {user: instructor1}
         result = get :edit_advice, params: params, session: session
@@ -138,16 +138,16 @@ describe AdviceController do
   describe '#save_advice' do
     context "when save_advice is called" do
       # When ad advice is saved
-      let(:questionAdvice1) {build(:question_advice, id:1, score: 1, question_id: 1, advice: "Advice1")}
-      let(:questionAdvice2) {build(:question_advice, id:2, score: 2, question_id: 1, advice: "Advice2")}
-      let(:questionnaire) do
-        build(:questionnaire, id: 1, min_question_score: 1,
-          questions: [build(:question, id: 1, weight: 2, question_advices: [questionAdvice1,questionAdvice2])], max_question_score: 2)
+      let(:itemAdvice1) {build(:item_advice, id:1, score: 1, item_id: 1, advice: "Advice1")}
+      let(:itemAdvice2) {build(:item_advice, id:2, score: 2, item_id: 1, advice: "Advice2")}
+      let(:itemnaire) do
+        build(:itemnaire, id: 1, min_item_score: 1,
+          items: [build(:item, id: 1, weight: 2, item_advices: [itemAdvice1,itemAdvice2])], max_item_score: 2)
       end
       
       it "saves advice successfully" do
         # When an advice is saved successfully
-        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
+        allow(Questionnaire).to receive(:find).with('1').and_return(itemnaire)
         allow(QuestionAdvice).to receive(:update).with('1',{:advice => "Hello"}).and_return("Ok")
         params = {advice: {"1" => {:advice => "Hello"}}, id: 1}
         session = {user: instructor1}
@@ -159,7 +159,7 @@ describe AdviceController do
 
       it "does not save the advice" do
         # When an advice is not saved
-        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
+        allow(Questionnaire).to receive(:find).with('1').and_return(itemnaire)
         allow(QuestionAdvice).to receive(:update).with(any_args).and_return("Ok")
         params = {id: 1}
         session = {user: instructor1}

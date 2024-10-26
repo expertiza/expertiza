@@ -21,15 +21,15 @@ describe 'peer review testing' do
     create(:team_user, user: User.where(role_id: 1).third, team: AssignmentTeam.second)
     create(:signed_up_team)
     create(:signed_up_team, team_id: 2, topic: SignUpTopic.second)
-    create(:assignment_questionnaire)
-    create(:question)
+    create(:assignment_itemnaire)
+    create(:item)
     create(:submission_record, team_id: 2)
     create(:review_response_map, reviewer_id: User.where(role_id: 1).third.id)
     create(:review_response_map, reviewer_id: User.where(role_id: 1).second.id, reviewee: AssignmentTeam.second)
     # sleep(10000)
   end
 
-  def load_questionnaire
+  def load_itemnaire
     login_as('student2064')
     expect(page).to have_content 'User: student2064'
     expect(page).to have_content 'TestAssignment'
@@ -48,8 +48,8 @@ describe 'peer review testing' do
   end
 
   it 'fills in a single textbox and saves' do
-    # Load questionnaire with generic setup
-    load_questionnaire
+    # Load itemnaire with generic setup
+    load_itemnaire
 
     # Fill in a textbox and a dropdown
     fill_in 'responses[0][comment]', with: 'HelloWorld'
@@ -59,8 +59,8 @@ describe 'peer review testing' do
   end
 
   it 'fills in a single comment with multi word text and saves' do
-    # Load questionnaire with generic setup
-    load_questionnaire
+    # Load itemnaire with generic setup
+    load_itemnaire
     # Fill in a textbox with a multi word comment
     fill_in 'responses[0][comment]', with: 'Excellent Work'
     click_button 'Submit Review'
@@ -68,8 +68,8 @@ describe 'peer review testing' do
   end
 
   it 'fills in a single comment with single word and saves' do
-    # Load questionnaire with generic setup
-    load_questionnaire
+    # Load itemnaire with generic setup
+    load_itemnaire
     # Fill in a textbox with a single word comment
     fill_in 'responses[0][comment]', with: 'Excellent'
     click_button 'Submit Review'
@@ -77,8 +77,8 @@ describe 'peer review testing' do
   end
 
   it 'fills in only points and saves' do
-    # Load questionnaire with generic setup
-    load_questionnaire
+    # Load itemnaire with generic setup
+    load_itemnaire
     # Fill in a dropdown with some points
     select 5, from: 'responses[0][score]'
     click_button 'Submit Review'
@@ -86,15 +86,15 @@ describe 'peer review testing' do
   end
 
   it 'saves an empty review without any points and comments' do
-    # Load questionnaire with generic setup
-    load_questionnaire
+    # Load itemnaire with generic setup
+    load_itemnaire
     click_button 'Submit Review'
     expect(page).to have_content 'Your response was successfully saved.'
   end
 
   it 'saves a review with only additional comments' do
-    # Load questionnaire with generic setup
-    load_questionnaire
+    # Load itemnaire with generic setup
+    load_itemnaire
 
     # Filling in Additional Comments only
     fill_in 'review[comments]', with: 'Excellent work done!'

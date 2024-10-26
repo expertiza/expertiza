@@ -37,15 +37,15 @@ class AssignmentsController < ApplicationController
         if assignment_form_params[:assignment][:directory_path].blank?
           assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
         end
-        ques_array = assignment_form_params[:assignment_questionnaire]
+        ques_array = assignment_form_params[:assignment_itemnaire]
         due_array = assignment_form_params[:due_date]
-        ques_array.each do |cur_questionnaire|
-          cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
+        ques_array.each do |cur_itemnaire|
+          cur_itemnaire[:assignment_id] = exist_assignment.id.to_s
         end
         due_array.each do |cur_due|
           cur_due[:parent_id] = exist_assignment.id.to_s
         end
-        assignment_form_params[:assignment_questionnaire] = ques_array
+        assignment_form_params[:assignment_itemnaire] = ques_array
         assignment_form_params[:due_date] = due_array
         @assignment_form.update(assignment_form_params, current_user)
         aid = Assignment.find(@assignment_form.assignment.id).id
@@ -75,7 +75,7 @@ class AssignmentsController < ApplicationController
     edit_params_setting
     assignment_staggered_deadline?
     update_due_date
-    check_questionnaires_usage
+    check_itemnaires_usage
     @due_date_all = update_nil_dd_deadline_name(@due_date_all)
     @due_date_all = update_nil_dd_description_url(@due_date_all)
     unassigned_rubrics_warning
@@ -216,26 +216,26 @@ class AssignmentsController < ApplicationController
     rubrics_list = %w[ReviewQuestionnaire
                       MetareviewQuestionnaire AuthorFeedbackQuestionnaire
                       TeammateReviewQuestionnaire BookmarkRatingQuestionnaire]
-    @assignment_questionnaires.each do |aq|
-      remove_existing_questionnaire(rubrics_list, aq)
+    @assignment_itemnaires.each do |aq|
+      remove_existing_itemnaire(rubrics_list, aq)
     end
 
-    remove_invalid_questionnaires(rubrics_list)
+    remove_invalid_itemnaires(rubrics_list)
     rubrics_list
   end
 
-  # Removes questionnaire types from the rubric list that are already on the assignment
-  def remove_existing_questionnaire(rubrics_list, aq)
-    return if aq.questionnaire_id.nil?
+  # Removes itemnaire types from the rubric list that are already on the assignment
+  def remove_existing_itemnaire(rubrics_list, aq)
+    return if aq.itemnaire_id.nil?
 
     rubrics_list.reject! do |rubric|
-      rubric == Questionnaire.where(id: aq.questionnaire_id).first.type.to_s
+      rubric == Questionnaire.where(id: aq.itemnaire_id).first.type.to_s
     end
   end
 
-  # Removes questionnaire types from the rubric list that shouldn't be there
-  # e.g. remove teammate review questionnaire if the maximum team size is one person (there are no teammates)
-  def remove_invalid_questionnaires(rubrics_list)
+  # Removes itemnaire types from the rubric list that shouldn't be there
+  # e.g. remove teammate review itemnaire if the maximum team size is one person (there are no teammates)
+  def remove_invalid_itemnaires(rubrics_list)
     rubrics_list.delete('TeammateReviewQuestionnaire') if @assignment_form.assignment.max_team_size == 1
     rubrics_list.delete('MetareviewQuestionnaire') unless @metareview_allowed
     rubrics_list.delete('BookmarkRatingQuestionnaire') unless @assignment_form.assignment.use_bookmark
@@ -313,11 +313,11 @@ class AssignmentsController < ApplicationController
     if assignment_form_params[:assignment][:directory_path].blank?
   end
 
-  # update assignment_form with assignment_questionnaire and due_date
+  # update assignment_form with assignment_itemnaire and due_date
   def update_assignment_form(exist_assignment)
-    questionnaire_array = assignment_form_params[:assignment_questionnaire]
-    questionnaire_array.each { |cur_questionnaire| cur_questionnaire[:assignment_id] = exist_assignment.id.to_s }
-    assignment_form_params[:assignment_questionnaire]
+    itemnaire_array = assignment_form_params[:assignment_itemnaire]
+    itemnaire_array.each { |cur_itemnaire| cur_itemnaire[:assignment_id] = exist_assignment.id.to_s }
+    assignment_form_params[:assignment_itemnaire]
     due_array = assignment_form_params[:due_date]
     due_array.each { |cur_due| cur_due[:parent_id] = exist_assignment.id.to_s }
     assignment_form_params[:due_date]
@@ -348,7 +348,7 @@ class AssignmentsController < ApplicationController
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @user = current_user
 
-    @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
+    @assignment_itemnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
     @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
     @due_date_nameurl_not_empty = false
     @due_date_nameurl_not_empty_checkbox = false
@@ -396,9 +396,9 @@ class AssignmentsController < ApplicationController
       (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
   end
 
-  # checks if each questionnaire in an assignment is used
-  def check_questionnaires_usage
-    @assignment_questionnaires.each do |aq|
+  # checks if each itemnaire in an assignment is used
+  def check_itemnaires_usage
+    @assignment_itemnaires.each do |aq|
       unless aq.used_in_round.nil?
         @reviewvarycheck = 1
         break
@@ -470,8 +470,8 @@ class AssignmentsController < ApplicationController
   def retrieve_assignment_form
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @assignment_form.assignment.instructor ||= current_user
-    params[:assignment_form][:assignment_questionnaire].reject! do |q|
-      q[:questionnaire_id].empty?
+    params[:assignment_form][:assignment_itemnaire].reject! do |q|
+      q[:itemnaire_id].empty?
     end
     # Deleting Due date info from table if meta-review is unchecked. - UNITY ID: ralwan and vsreeni
     @due_date_info = DueDate.where(parent_id: params[:id])

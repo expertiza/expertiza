@@ -1,34 +1,34 @@
-require 'analytic/question_analytic'
+require 'analytic/item_analytic'
 module QuestionnaireAnalytic
-  # return all possible question types
+  # return all possible item types
   def types
     type_list = []
-    questions.each do |question|
-      type_list << question.type unless type_list.include?(question.type)
+    items.each do |item|
+      type_list << item.type unless type_list.include?(item.type)
     end
     type_list
   end
 
-  def num_questions
-    questions.count
+  def num_items
+    items.count
   end
 
-  def questions_text_list
-    question_list = []
-    questions.each do |question|
-      question_list << question.txt
+  def items_text_list
+    item_list = []
+    items.each do |item|
+      item_list << item.txt
     end
-    if question_list.empty?
+    if item_list.empty?
       [0]
     else
-      question_list
+      item_list
     end
   end
 
   def word_count_list
     word_count_list = []
-    questions.each do |question|
-      word_count_list << question.word_count
+    items.each do |item|
+      word_count_list << item.word_count
     end
     if word_count_list.empty?
       [0]
@@ -42,15 +42,15 @@ module QuestionnaireAnalytic
   end
 
   def average_word_count
-    return total_word_count.to_f / num_questions unless num_questions == 0
+    return total_word_count.to_f / num_items unless num_items == 0
 
     0
   end
 
   def character_count_list
     character_count_list = []
-    questions.each do |question|
-      character_count_list << question.character_count
+    items.each do |item|
+      character_count_list << item.character_count
     end
     if character_count_list.empty?
       [0]
@@ -64,7 +64,7 @@ module QuestionnaireAnalytic
   end
 
   def average_character_count
-    return total_character_count.to_f / num_questions unless num_questions == 0
+    return total_character_count.to_f / num_items unless num_items == 0
 
     0
   end

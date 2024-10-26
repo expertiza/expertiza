@@ -4,8 +4,8 @@ describe ProfileController do
   # initialize objects using factories.rb required for stubbing in test cases
   let(:super_admin) { build(:superadmin, id: 1) }
   let(:instructor1) { build(:instructor, id: 10, name: 'Instructor1') }
-  let(:questionnaire) { build(:questionnaire, id: 666) }
-  let(:assignment_questionnaire) { build(:assignment_questionnaire, id: 1, questionnaire: questionnaire) }
+  let(:itemnaire) { build(:itemnaire, id: 666) }
+  let(:assignment_itemnaire) { build(:assignment_itemnaire, id: 1, itemnaire: itemnaire) }
 
   # To allow the functionality only if the accessing user is logged in
   describe '#action_allowed?' do
@@ -28,7 +28,7 @@ describe ProfileController do
     it 'renders edit page' do
       stub_current_user(instructor1, instructor1.role.name, instructor1.role)
       allow(AssignmentQuestionnaire).to receive(:where).with(any_args)
-                                                       .and_return([assignment_questionnaire])
+                                                       .and_return([assignment_itemnaire])
 
       get :edit
       expect(response).to render_template(:edit)
@@ -55,19 +55,19 @@ describe ProfileController do
       end
     end
 
-    # Test for case where the update_attributes method works as expected but assignment_questionnaire is not nil
-    context 'when profile is saved successfully and assignment_questionnaire is not nil' do
+    # Test for case where the update_attributes method works as expected but assignment_itemnaire is not nil
+    context 'when profile is saved successfully and assignment_itemnaire is not nil' do
       it 'shows a success flash message and redirects to profile#edit page' do
         stub_current_user(instructor1, instructor1.role.name, instructor1.role)
         allow(instructor1).to receive(:update_attributes).with(any_args).and_return(true)
         allow(instructor1).to receive(:save!).and_return(true)
-        allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])
+        allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_itemnaire])
         params = {
           user: {
             id: 1,
             no_show_action: 'not_show_actions',
-            assignment_questionnaire: { 'assignment_id' => '1', 'questionnaire_id' => '666', 'dropdown' => 'true',
-                                      'questionnaire_weight' => '0', 'notification_limit' => '15', 'used_in_round' => '1' 
+            assignment_itemnaire: { 'assignment_id' => '1', 'itemnaire_id' => '666', 'dropdown' => 'true',
+                                      'itemnaire_weight' => '0', 'notification_limit' => '15', 'used_in_round' => '1' 
                                       }
           }
         }

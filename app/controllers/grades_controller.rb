@@ -37,16 +37,16 @@ class GradesController < ApplicationController
   # in the scores of all the reviews.
   def view
     @assignment = Assignment.find(params[:id])
-    questionnaires = @assignment.questionnaires
+    itemnaires = @assignment.itemnaires
     if @assignment.varying_rubrics_by_round?
-      @questions = retrieve_questions questionnaires, @assignment.id
+      @items = retrieve_items itemnaires, @assignment.id
     else
-      @questions = {}
-      questionnaires.each do |questionnaire|
-        @questions[questionnaire.symbol] = questionnaire.questions
+      @items = {}
+      itemnaires.each do |itemnaire|
+        @items[itemnaire.symbol] = itemnaire.items
       end
     end
-    @scores = review_grades(@assignment, @questions)
+    @scores = review_grades(@assignment, @items)
     @num_reviewers_assigned_scores = @scores[:teams].length # After rejecting nil scores need original length to iterate over hash
     averages = vector(@scores)
     @average_chart = bar_chart(averages, 300, 100, 5)
@@ -61,17 +61,17 @@ class GradesController < ApplicationController
     return if redirect_when_disallowed
 
     @assignment = @participant.assignment
-    questionnaires = @assignment.questionnaires
-    @questions = retrieve_questions questionnaires, @assignment.id
+    itemnaires = @assignment.itemnaires
+    @items = retrieve_items itemnaires, @assignment.id
     # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
-    @pscore = participant_scores(@participant, @questions)
+    @pscore = participant_scores(@participant, @items)
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
     @stage = @participant.assignment.current_stage(@topic_id)
     penalties(@assignment.id)
     # prepare feedback summaries
     summary_ws_url = WEBSERVICE_CONFIG['summary_webservice_url']
-    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewee(@questions, @assignment, @team_id, summary_ws_url, session)
+    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewee(@items, @assignment, @team_id, summary_ws_url, session)
     @summary = sum.summary
     @avg_scores_by_round = sum.avg_scores_by_round
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
@@ -83,37 +83,37 @@ class GradesController < ApplicationController
     @assignment = @participant.assignment
     @team = @participant.team
     @team_id = @team.id
-    questionnaires = @assignment.questionnaires
-    @questions = retrieve_questions(questionnaires, @assignment.id)
-    @pscore = participant_scores(@participant, @questions)
+    itemnaires = @assignment.itemnaires
+    @items = retrieve_items(itemnaires, @assignment.id)
+    @pscore = participant_scores(@participant, @items)
     @penalties = calculate_penalty(@participant.id)
     @vmlist = []
 
     counter_for_same_rubric = 0
     if @assignment.vary_by_topic?
       topic_id = SignedUpTeam.topic_id_by_team_id(@team_id)
-      topic_specific_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, topic_id: topic_id).first.questionnaire
-      @vmlist << populate_view_model(topic_specific_questionnaire)
+      topic_specific_itemnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, topic_id: topic_id).first.itemnaire
+      @vmlist << populate_view_model(topic_specific_itemnaire)
     end
-    questionnaires.each do |questionnaire|
+    itemnaires.each do |itemnaire|
       @round = nil
 
-      # Guard clause to skip questionnaires that have already been populated for topic specific reviewing
-      if @assignment.vary_by_topic? && questionnaire.type == 'ReviewQuestionnaire'
+      # Guard clause to skip itemnaires that have already been populated for topic specific reviewing
+      if @assignment.vary_by_topic? && itemnaire.type == 'ReviewQuestionnaire'
         next # Assignments with topic specific rubrics cannot have multiple rounds of review
       end
 
-      if @assignment.varying_rubrics_by_round? && questionnaire.type == 'ReviewQuestionnaire'
-        questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
-        if questionnaires.count > 1
-          @round = questionnaires[counter_for_same_rubric].used_in_round
+      if @assignment.varying_rubrics_by_round? && itemnaire.type == 'ReviewQuestionnaire'
+        itemnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, itemnaire_id: itemnaire.id)
+        if itemnaires.count > 1
+          @round = itemnaires[counter_for_same_rubric].used_in_round
           counter_for_same_rubric += 1
         else
-          @round = questionnaires[0].used_in_round
+          @round = itemnaires[0].used_in_round
           counter_for_same_rubric = 0
         end
       end
-      @vmlist << populate_view_model(questionnaire)
+      @vmlist << populate_view_model(itemnaire)
     end
     @current_role_name = current_role_name
   end
@@ -121,8 +121,8 @@ class GradesController < ApplicationController
   def edit
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
-    @questions = list_questions(@assignment)
-    @scores = participant_scores(@participant, @questions)
+    @items = list_items(@assignment)
+    @scores = participant_scores(@participant, @items)
   end
 
   def instructor_review
@@ -145,13 +145,13 @@ class GradesController < ApplicationController
   end
 
   # This method is used from edit methods
-  def list_questions(assignment)
-    questions = {}
-    questionnaires = assignment.questionnaires
-    questionnaires.each do |questionnaire|
-      questions[questionnaire.symbol] = questionnaire.questions
+  def list_items(assignment)
+    items = {}
+    itemnaires = assignment.itemnaires
+    itemnaires.each do |itemnaire|
+      items[itemnaire.symbol] = itemnaire.items
     end
-    questions
+    items
   end
 
   def update
@@ -200,10 +200,10 @@ class GradesController < ApplicationController
 
   private
 
-  def populate_view_model(questionnaire)
-    vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
-    vmquestions = questionnaire.questions
-    vm.add_questions(vmquestions)
+  def populate_view_model(itemnaire)
+    vm = VmQuestionResponse.new(itemnaire, @assignment, @round)
+    vmitems = itemnaire.items
+    vm.add_items(vmitems)
     vm.add_team_members(@team)
     qn = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: 2).size >= 1
     vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)

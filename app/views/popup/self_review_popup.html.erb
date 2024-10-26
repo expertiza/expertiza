@@ -15,14 +15,14 @@
   <h3> <%=t ".self_review_of"%> <%= @user_fullname %></h3>
   <table>
     <tr>
-      <th align = 'left' width = "50%"><%=t ".question"%></th>
+      <th align = 'left' width = "50%"><%=t ".item"%></th>
       <th width = "5%"> <%=t ".score"%> </th>
       <th width = "45%"> <%=t ".comments"%> </th>
     </tr>
     <% @scores.each do |s|%>
       <tr>
-        <td align = 'left'> <%= Question.find(s.question_id).txt %></td>
-        <%if Question.find(s.question_id).is_a?(ScoredQuestion) %>
+        <td align = 'left'> <%= Question.find(s.item_id).txt %></td>
+        <%if Question.find(s.item_id).is_a?(ScoredQuestion) %>
           <td align = 'center'> <%= s.answer %>/<%= @maxscore %></td>
         <%else%>
           <td align = 'center'> <%= sanitize s.answer %></td>

@@ -11,12 +11,12 @@ describe "check 'Begin review' showing up before due date and 'Assign grade' aft
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: DateTime.now.in_time_zone + 10.day)
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'team_formation').first, due_at: DateTime.now.in_time_zone .day)
 
-    questionnaire1 = create(:questionnaire, name: 'TestQuestionnaire1')
-    create(:questionnaire, name: 'TestQuestionnaire2')
-    create(:question, txt: 'Question1', questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first)
-    create(:question, txt: 'Question2', questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first)
-    create(:assignment_questionnaire, questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, used_in_round: 1)
-    create(:assignment_questionnaire, questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first, used_in_round: 2)
+    itemnaire1 = create(:itemnaire, name: 'TestQuestionnaire1')
+    create(:itemnaire, name: 'TestQuestionnaire2')
+    create(:item, txt: 'Question1', itemnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first)
+    create(:item, txt: 'Question2', itemnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first)
+    create(:assignment_itemnaire, itemnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, used_in_round: 1)
+    create(:assignment_itemnaire, itemnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first, used_in_round: 2)
 
     expect(assignment_test.instructor_id).to eql(instructor6.id)
     expect(assignment_test.course_id).to eql(nil)
@@ -55,7 +55,7 @@ describe "check 'Begin review' showing up before due date and 'Assign grade' aft
     expect(page).to have_content('student6666')
     expect(page).to have_content('https://www.expertiza.ncsu.edu')
 
-    visit("/response/new?id=#{questionnaire1.id}&return=ta_review")
+    visit("/response/new?id=#{itemnaire1.id}&return=ta_review")
     expect(page).to have_content('E2086')
 
     fill_in 'responses[0][comment]', with: 'Excellent Work'
@@ -84,12 +84,12 @@ describe "check 'Begin review' showing up before due date and 'Assign grade' aft
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'submission').first, due_at: DateTime.now.in_time_zone - 10.day)
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: DateTime.now.in_time_zone - 5.day)
 
-    create(:questionnaire, name: 'TestQuestionnaire1')
-    create(:questionnaire, name: 'TestQuestionnaire2')
-    create(:question, txt: 'Question1', questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first)
-    create(:question, txt: 'Question2', questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first)
-    create(:assignment_questionnaire, questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, used_in_round: 1)
-    create(:assignment_questionnaire, questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first, used_in_round: 2)
+    create(:itemnaire, name: 'TestQuestionnaire1')
+    create(:itemnaire, name: 'TestQuestionnaire2')
+    create(:item, txt: 'Question1', itemnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first)
+    create(:item, txt: 'Question2', itemnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first)
+    create(:assignment_itemnaire, itemnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, used_in_round: 1)
+    create(:assignment_itemnaire, itemnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first, used_in_round: 2)
 
     expect(assignment_test.instructor_id).to eql(instructor6.id)
     expect(assignment_test.course_id).to eql(nil)

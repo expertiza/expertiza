@@ -341,12 +341,12 @@ div.survey_wrapper {
 	clear:both;
 }
 
-div.empty_question_wrapper, div.question_wrapper {
+div.empty_item_wrapper, div.item_wrapper {
 	float: left;
 	padding: 0 .5em;
 }
 
-div.question_wrapper {
+div.item_wrapper {
 	border: .1em solid #DADADA;
 	width: 450px;
 	height: 200px;

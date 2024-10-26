@@ -30,12 +30,12 @@
         - instance_variable_get('@scores_round_' + round.to_s).each do |answer|
           %tr
             %td{:align => "left"}
-              = answer.question.txt.html_safe
-            - if answer.question.is_a?(ScoredQuestion)
+              = answer.item.txt.html_safe
+            - if answer.item.is_a?(ScoredQuestion)
               %td{:align => "center"}
                 = answer.answer
                 \/#{instance_variable_get('@max_score_round_' + round.to_s)}
-            - elsif answer.question.is_a?(Checkbox)
+            - elsif answer.item.is_a?(Checkbox)
               %td{:align => "center"}
                 =answer.answer==0 ? image_tag("delete_icon.png"): image_tag("Check-icon.png")
             -else

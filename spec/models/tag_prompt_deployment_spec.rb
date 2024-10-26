@@ -1,15 +1,15 @@
 describe TagPromptDeployment do
-  let(:tag_dep) { TagPromptDeployment.new id: 1, tag_prompt: tp, tag_prompt_id: 1, question_type: 'Criterion', answer_length_threshold: 5, questionnaire: questionnaire, assignment: assignment }
-  let(:tag_dep1) { TagPromptDeployment.new id: 1, tag_prompt: tp, tag_prompt_id: 1, question_type: 'Criterion', answer_length_threshold: nil, assignment_id: 1, assignment: assignment, questionnaire: questionnaire }
+  let(:tag_dep) { TagPromptDeployment.new id: 1, tag_prompt: tp, tag_prompt_id: 1, item_type: 'Criterion', answer_length_threshold: 5, itemnaire: itemnaire, assignment: assignment }
+  let(:tag_dep1) { TagPromptDeployment.new id: 1, tag_prompt: tp, tag_prompt_id: 1, item_type: 'Criterion', answer_length_threshold: nil, assignment_id: 1, assignment: assignment, itemnaire: itemnaire }
   let(:tp) { TagPrompt.new(prompt: 'test prompt', desc: 'test desc', control_type: 'Checkbox') }
   let(:team) { Team.new(id: 1) }
   let(:assignment) { Assignment.new(id: 1) }
-  let(:questionnaire) { Questionnaire.new(id: 1, name: 'question1') }
+  let(:itemnaire) { Questionnaire.new(id: 1, name: 'item1') }
   let(:rp) { Response.new(map_id: 1, round: 1, additional_comment: 'improvement scope') }
   let(:response) { Response.new(map_id: [1, 2], round: [1, 1], additional_comment: ['improvement scope', 'through comments']) }
-  let(:question) { Question.new(questionnaire: questionnaire) }
-  let(:answer) { Answer.new(id: [1, 2, 3], question_id: [1, 1, 1], answer: [3, 3, 3], comments: ['comment', 'comment is lengthy', 'comment is too lengthy'], response_id: [241, 241, 241]) }
-  let(:answers_one) { Answer.new(id: [1], question_id: [1], answer: [3], comments: ['comment'], response_id: [241]) }
+  let(:item) { Question.new(itemnaire: itemnaire) }
+  let(:answer) { Answer.new(id: [1, 2, 3], item_id: [1, 1, 1], answer: [3, 3, 3], comments: ['comment', 'comment is lengthy', 'comment is too lengthy'], response_id: [241, 241, 241]) }
+  let(:answers_one) { Answer.new(id: [1], item_id: [1], answer: [3], comments: ['comment'], response_id: [241]) }
   let(:user1) { User.new(id: 1) }
   let(:user2) { User.new(id: 2) }
   let(:team_user1) { TeamsUser.new(user_id: user1.id, team_id: team.id) }
@@ -18,10 +18,10 @@ describe TagPromptDeployment do
   let(:tagB) { AnswerTag.new(tag_prompt_deployment_id: tag_dep.id, user_id: user2.id, answer: answer, updated_at: Date.new.to_s) }
 
   answersObjectArray = [
-    Answer.new(id: 1, question_id: 1, answer: 3, comments: 'comm', response_id: 2313),
-    Answer.new(id: 2, question_id: 1, answer: 3, comments: 'comment length exceeds threshold', response_id: 2313),
-    Answer.new(id: 3, question_id: 1, answer: 3, comments: 'comment length within threshold', response_id: 2313),
-    Answer.new(id: 4, question_id: 2, answer: 1, comments: 'com1', response_id: 241)
+    Answer.new(id: 1, item_id: 1, answer: 3, comments: 'comm', response_id: 2313),
+    Answer.new(id: 2, item_id: 1, answer: 3, comments: 'comment length exceeds threshold', response_id: 2313),
+    Answer.new(id: 3, item_id: 1, answer: 3, comments: 'comment length within threshold', response_id: 2313),
+    Answer.new(id: 4, item_id: 2, answer: 1, comments: 'com1', response_id: 241)
   ]
 
   describe '#tag_prompt' do
@@ -34,7 +34,7 @@ describe TagPromptDeployment do
   # get_number_of_taggable_answers calculates total taggable answers assigned to an user who participated in "tag review assignment".
   describe '#get_number_of_taggable_answers' do
     before(:each) do
-      questions_ids = double(1)
+      items_ids = double(1)
       response_ids = double(241)
       allow(Team).to receive(:joins).with(:teams_users).and_return(team)
       allow(team).to receive(:where).with(team_users: { parent_id: tag_dep1.assignment_id }, user_id: 1).and_return(team)
@@ -42,10 +42,10 @@ describe TagPromptDeployment do
       allow(response).to receive(:where).with(response_maps: { reviewed_object_id: tag_dep1.assignment.id, reviewee_id: team.id }).and_return(rp)
       allow(rp).to receive(:empty?).and_return(false)
       allow(rp).to receive(:map).with(any_args).and_return(response_ids)
-      allow(Question).to receive(:where).with(questionnaire_id: tag_dep1.questionnaire.id, type: tag_dep1.question_type).and_return(question)
-      allow(question).to receive(:empty?).and_return(false)
-      allow(question).to receive(:map).with(any_args).and_return(questions_ids)
-      allow(Answer).to receive(:where).with(question_id: questions_ids, response_id: response_ids).and_return(answer)
+      allow(Question).to receive(:where).with(itemnaire_id: tag_dep1.itemnaire.id, type: tag_dep1.item_type).and_return(item)
+      allow(item).to receive(:empty?).and_return(false)
+      allow(item).to receive(:map).with(any_args).and_return(items_ids)
+      allow(Answer).to receive(:where).with(item_id: items_ids, response_id: response_ids).and_return(answer)
     end
     context 'when user_id is null' do
       it 'given out an error message' do
@@ -56,19 +56,19 @@ describe TagPromptDeployment do
     end
     context 'when answer_length_threshold null' do
       it 'count of taggable answers' do
-        questions_ids = double(1)
+        items_ids = double(1)
         response_ids = double(241)
-        allow(Answer).to receive(:where).with(question_id: questions_ids, response_id: response_ids).and_return(answer)
+        allow(Answer).to receive(:where).with(item_id: items_ids, response_id: response_ids).and_return(answer)
         allow(answer).to receive(:count)
         expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(answer.count)
       end
     end
     context 'when answer_length_threshold NOT null' do
       it 'count of taggable answers less than answers_one' do
-        questions_ids = double(1)
+        items_ids = double(1)
         response_ids = double(241)
         tag_dep1.answer_length_threshold = 15
-        allow(Answer).to receive(:where).with(question_id: questions_ids, response_id: response_ids).and_return(answer)
+        allow(Answer).to receive(:where).with(item_id: items_ids, response_id: response_ids).and_return(answer)
         allow(answer).to receive(:where).with(conditions: "length(comments) < #{tag_dep1.answer_length_threshold}").and_return(answers_one)
         allow(answers_one).to receive(:count)
         expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(answers_one.count)
@@ -80,9 +80,9 @@ describe TagPromptDeployment do
         expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(0)
       end
     end
-    context 'when questions empty' do
+    context 'when items empty' do
       it 'count of taggable answers zero' do
-        allow(question).to receive(:empty?).and_return(true)
+        allow(item).to receive(:empty?).and_return(true)
         expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(0)
       end
     end
@@ -91,7 +91,7 @@ describe TagPromptDeployment do
   describe 'assignment_tagging_progress' do
     it 'does nothing when no teams are found' do
       allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([])
-      allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])
+      allow(Question).to receive(:where).with(itemnaire_id: item.itemnaire.id, type: tag_dep.item_type).and_return([item])
 
       user_answer_tagging = tag_dep.assignment_tagging_progress
 
@@ -102,9 +102,9 @@ describe TagPromptDeployment do
       expect(user_answer_tagging).to be_empty
     end
 
-    it 'does nothing when no questions are found' do
+    it 'does nothing when no items are found' do
       allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
-      allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([])
+      allow(Question).to receive(:where).with(itemnaire_id: item.itemnaire.id, type: tag_dep.item_type).and_return([])
 
       user_answer_tagging = tag_dep.assignment_tagging_progress
 
@@ -117,7 +117,7 @@ describe TagPromptDeployment do
 
     it 'does not vary by round' do
       allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
-      allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])
+      allow(Question).to receive(:where).with(itemnaire_id: item.itemnaire.id, type: tag_dep.item_type).and_return([item])
       allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
       allow(ResponseMap).to receive(:assessments_for).and_return([response])
       allow(Answer).to receive(:where).and_return(answersObjectArray)
@@ -146,7 +146,7 @@ describe TagPromptDeployment do
 
     it 'varies by round' do
       allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
-      allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])
+      allow(Question).to receive(:where).with(itemnaire_id: item.itemnaire.id, type: tag_dep.item_type).and_return([item])
       allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
       allow(ReviewResponseMap).to receive(:get_responses_for_team_round).and_return([response])
       allow(Answer).to receive(:where).and_return(answersObjectArray)
@@ -175,7 +175,7 @@ describe TagPromptDeployment do
 
     it 'varies by round, there are no tags' do
       allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
-      allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])
+      allow(Question).to receive(:where).with(itemnaire_id: item.itemnaire.id, type: tag_dep.item_type).and_return([item])
       allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
       allow(ReviewResponseMap).to receive(:get_responses_for_team_round).and_return([response])
       allow(Answer).to receive(:where).and_return(answersObjectArray)

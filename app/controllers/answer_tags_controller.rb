@@ -11,13 +11,13 @@ class AnswerTagsController < ApplicationController
     end
   end
 
-  # GET /answer_tags?assignment_id=xx&user_id=xx&questionnaire_id=xx
+  # GET /answer_tags?assignment_id=xx&user_id=xx&itemnaire_id=xx
   def index
     @tag_prompts = []
 
     tag_deployments = TagPromptDeployment.all
     tag_deployments = tag_deployments.where(assignment_id: params[:assignment_id]) if params.key?(:assignment_id)
-    tag_deployments = tag_deployments.where(questionnaire_id: params[:questionnaire_id]) if params.key?(:questionnaire_id)
+    tag_deployments = tag_deployments.where(itemnaire_id: params[:itemnaire_id]) if params.key?(:itemnaire_id)
 
     tag_deployments.each do |tag_dep|
       stored_tags_records = AnswerTag.where(tag_prompt_deployment_id: tag_dep.id)

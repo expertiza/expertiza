@@ -70,22 +70,22 @@
 </div><br><br>
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% @vmlist.each_with_index do |vm, table_count| %>
-    <% if (vm.questionnaire_display_type == "Metareview" || vm.questionnaire_display_type == "Author Feedback" || vm.questionnaire_display_type == "Teammate Review") and @current_role_name.eql?'Student' %>
+    <% if (vm.itemnaire_display_type == "Metareview" || vm.itemnaire_display_type == "Author Feedback" || vm.itemnaire_display_type == "Teammate Review") and @current_role_name.eql?'Student' %>
     <% else %>
         <% if vm.list_of_reviewers.length > 0 %>
 
-          <!-- display the list of questions for this questionnaire -->
-          <div id="hid<%= vm.questionnaire_type + vm.round.to_s %>" class="accordion-body" style="max-width: 80%; display: none;">
+          <!-- display the list of items for this itemnaire -->
+          <div id="hid<%= vm.itemnaire_type + vm.round.to_s %>" class="accordion-body" style="max-width: 80%; display: none;">
             <table class="table table-striped">
               <thead>
               <th>#</th>
-              <th><%=t ".question"%></th>
+              <th><%=t ".item"%></th>
               </thead>
               <% vm.list_of_rows.each_with_index do |row, count| %>
                   <% if row.score_row.count > 0  %>
                       <tr style="background-color: #ffffff;">
                         <td><%= count %></td>
-                        <td><%= row.question_text %></td>
+                        <td><%= row.item_text %></td>
                       </tr>
                   <% end %>
               <% end %>
@@ -94,12 +94,12 @@
 
           <!-- display the table title and tooltips -->
           <span style="width:100%;">
-              <h4 style="display:inline-block;"><%= vm.questionnaire_display_type %>
-                <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
+              <h4 style="display:inline-block;"><%= vm.itemnaire_display_type %>
+                <% if vm.itemnaire_type == "ReviewQuestionnaire" %>
                     (<%=t ".round"%>: <%= vm.round.to_s  %> <%=t ".of"%> <%= vm.rounds.to_s  %>)
                 <%end %>
               </h4>
-              <span class="spn_qsttog" onclick="toggleQuestionnaire('hid<%= vm.questionnaire_type + vm.round.to_s %>')" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions"><%=t ".toggle_question_list"%></span>
+              <span class="spn_qsttog" onclick="toggleQuestionnaire('hid<%= vm.itemnaire_type + vm.round.to_s %>')" data-toggle="tooltip" data-placement="right" title="Click to display/hide items"><%=t ".toggle_item_list"%></span>
             <% if @assignment.is_answer_tagging_allowed %>
             <span class="spn_qsttog" id="tag_prompt_toggler" title=""><%=t ".hide_tags"%></span>
             <% end %>
@@ -165,8 +165,8 @@
             <!-- additionally, there are hidden rows (expandable) which are also generated via iteration. -->
             <% vm.list_of_rows.each_with_index do |row, j| %>
                 <!-- notice the data-target. because we're toggling via looped code, we need to dynamically generate the identifier. -->
-                <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= row.question_id.to_s + vm.round.to_s %>">
-                  <td class = 'cf' data-toggle="tooltip" title="<%= row.question_text %>"> <div style='float: left'><%= (j+1).to_s %></div><div style='float: right'> &#<%= type_and_max(row) %>;</div>  </td>
+                <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= row.item_id.to_s + vm.round.to_s %>">
+                  <td class = 'cf' data-toggle="tooltip" title="<%= row.item_text %>"> <div style='float: left'><%= (j+1).to_s %></div><div style='float: right'> &#<%= type_and_max(row) %>;</div>  </td>
 
                   <!-- actual cells with scores and colored background. -->
                   <% row.score_row.each do |score| %>
@@ -200,8 +200,8 @@
                 </tr>
                 <!--loop that creates the collapsed-by-default row, which lists all comments. -->
                 <tr class="tablesorter-childRow">
-                  <td colspan="<%= (i_final+1).to_s %>" class="hiddenRow" ><div id="hid<%= row.question_id.to_s + vm.round.to_s %>" class="accordion-body collapse" style="margin-left:10px;">
-                    <div style="padding-top: 10px; padding-bottom: 10px;"><%=  sanitize row.question_text %></div>
+                  <td colspan="<%= (i_final+1).to_s %>" class="hiddenRow" ><div id="hid<%= row.item_id.to_s + vm.round.to_s %>" class="accordion-body collapse" style="margin-left:10px;">
+                    <div style="padding-top: 10px; padding-bottom: 10px;"><%=  sanitize row.item_text %></div>
                     <div>
                       <table class="table tbl_questlist">
                         <thead>
@@ -213,17 +213,17 @@
                             <tr>
                               <td><%=t ".review"%> <%=index + 1%></td>
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
-                              <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
+                              <% if vm.itemnaire_type == "ReviewQuestionnaire" %>
                                 <!-- E2100 : Set id and data of this <td> to be queried by jQuery for the tagging report
                                      HTML "id" format: "rr3_13" == ReviewRow Question 3 Review 13
                                      "j" "index" and "round" are legacy variables from past projects; populate jQueryable
                                             data- fields with these data to be queried later.
                                      "round" represents number of this review round
-                                     "j"     represents number of this question
+                                     "j"     represents number of this item
                                      "index" represents number of this review
                                 -->
                                 <td id="<%= 'rr'+ (j+1).to_s + '_' + index.to_s %>" data-round="<%= vm.round.to_s %>="
-                                    data-question_num="<%= (j+1).to_s %>" data-review_num="<%= index.to_s %>"
+                                    data-item_num="<%= (j+1).to_s %>" data-review_num="<%= index.to_s %>"
                                     data-has_tag="<%= row.score_row[index].vm_prompts.count > 0 ? "true":"false"%>">
                               <% else %>
                                 <td>
@@ -249,7 +249,7 @@
             <!--displays the row for the addl comments, by default: collapsed. -->
             <tr>
               <td colspan="<%= (i_final+1).to_s %>" class="hiddenRow" >
-                <div id="hid<%= vm.questionnaire_type + vm.round.to_s + "comment" %>" class="accordion-body collapse" style="margin-left:10px;">
+                <div id="hid<%= vm.itemnaire_type + vm.round.to_s + "comment" %>" class="accordion-body collapse" style="margin-left:10px;">
                   <div style="background-color:#A9A9F5;padding:4px;">
                     <table class="table tbl_addlcmt">
                       <thead>
@@ -274,8 +274,8 @@
           <input class="btn btn-default" type="button" href="#" onclick="col_sort(<%=table_count%>)" data-toggle="tooltip" title="Sort reviews in ascending/descending order of the total score. Consecutive clicks will alternate between ascending and descending sort order" value="Sort by total review score"/>
           <span> <%= vm.display_team_members(session[:ip]) %></span>
           <!-- this elsif terminates the heatgrid code.  -->
-        <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
-            <br><div class="alert alert-warning"><%=t ".no_review_of"%> <%= vm.questionnaire_type %> TYPE EXISTS. </div>
+        <% elsif vm.itemnaire_type != "ReviewQuestionnaire" %>
+            <br><div class="alert alert-warning"><%=t ".no_review_of"%> <%= vm.itemnaire_type %> TYPE EXISTS. </div>
         <% end %>
         <br/>  
     <% end %>

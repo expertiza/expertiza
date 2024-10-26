@@ -31,8 +31,8 @@ class MetareviewResponseMap < ResponseMap
     AssignmentTeam.find(team_review_map.reviewee_id)
   end
 
-  def questionnaire
-    assignment.questionnaires.find_by(type: 'MetareviewQuestionnaire') # filter for MetaReview Questionnaire
+  def itemnaire
+    assignment.itemnaires.find_by(type: 'MetareviewQuestionnaire') # filter for MetaReview Questionnaire
   end
 
   def get_title

@@ -348,16 +348,16 @@ module ReviewMappingHelper
   # Zhewei - 2016-10-20
   # This is for Dr.Kidd's assignment (806)
   # She wanted to quickly see if students pasted in a link (in the text field at the end of the rubric) without opening each review
-  # Since we do not have hyperlink question type, we hacked this requirement
-  # Maybe later we can create a hyperlink question type to deal with this situation.
-  def list_hyperlink_submission(response_map_id, question_id)
+  # Since we do not have hyperlink item type, we hacked this requirement
+  # Maybe later we can create a hyperlink item type to deal with this situation.
+  def list_hyperlink_submission(response_map_id, item_id)
     assignment = Assignment.find(@id)
     curr_round = assignment.try(:num_review_rounds)
     curr_response = Response.where(map_id: response_map_id, round: curr_round).first
-    answer_with_link = Answer.where(response_id: curr_response.id, question_id: question_id).first if curr_response
+    answer_with_link = Answer.where(response_id: curr_response.id, item_id: item_id).first if curr_response
     comments = answer_with_link.try(:comments)
     html = ''
-    html += display_hyperlink_in_peer_review_question(comments) if comments.present? && comments.start_with?('http')
+    html += display_hyperlink_in_peer_review_item(comments) if comments.present? && comments.start_with?('http')
     html.html_safe
   end
 

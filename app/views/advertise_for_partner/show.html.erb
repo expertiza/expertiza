@@ -21,7 +21,7 @@
       <td><%= member.user.name(session[:ip]) %></td>
       <td><%= member.user.fullname(session[:ip]) %></td>
       <td><%= member.user.email(session[:ip]) %></td>
-      <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
+      <% if @student.assignment.itemnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
 
         <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
         if map.nil?

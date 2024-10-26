@@ -43,14 +43,14 @@ module StudentTaskHelper
     assignment.find_due_dates('review').present?
   end
 
-  def populate_timeline_from(model_class, participant_id, labelLamda, timeline_list)
+  def populate_timeline_from(model_class, participant_id, label_lamda, timeline_list)
     model_class.where(reviewer_id: participant_id).find_each do |rm|
       response = Response.where(map_id: rm.id).last
       next if response.nil?
 
       timeline = {
         id: response.id,
-        label: labelLamda.call(response),
+        label: label_lamda.call(response),
         updated_at: response.updated_at.strftime('%a, %d %b %Y %H:%M')
       }
 
@@ -59,11 +59,11 @@ module StudentTaskHelper
   end
 
   def update_timeline_with_peer_reviews(participant_id, timeline_list)
-    populate_timeline_from(ReviewResponseMap, participant_id, lambda { |_response| ('Round ' + response.round.to_s + ' Peer Review').humanize }, timeline_list)
+    populate_timeline_from(ReviewResponseMap, participant_id, ->(_response) { ('Round ' + response.round.to_s + ' Peer Review').humanize }, timeline_list)
   end
 
   def update_timeline_with_author_feedbacks(participant_id, timeline_list)
-    populate_timeline_from(FeedbackResponseMap, participant_id, lambda { |_response| 'Author feedback' },  timeline_list)
+    populate_timeline_from(FeedbackResponseMap, participant_id, ->(_response) { 'Author feedback' },  timeline_list)
   end
 
   def update_timeline_with_assignment_deadlines(assignment, timeline_list)

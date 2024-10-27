@@ -504,6 +504,7 @@ class AssignmentsController < ApplicationController
     ExpertizaLogger.info LoggerMessage.new('', session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)
   end
 
+  # This method checks whether an assignment is missing participants.
   def query_participants
     assignment = Assignment.find(params[:id])
     if assignment.missing_participants?
@@ -511,6 +512,7 @@ class AssignmentsController < ApplicationController
     end
   end
 
+  # This methods send out an alert to add participants to an assignment.
   def alert_missing_participants(id)
     flash[:error] = %(Saved assignment is missing participants. Add them <a href="/participants/list?id=#{id}&model=Assignment">here</a>)
   end

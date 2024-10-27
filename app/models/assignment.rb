@@ -669,7 +669,7 @@ class Assignment < ApplicationRecord
   end
 
   def missing_participants?
-    participants.blank?
+    participants.empty?
   end
 
 end

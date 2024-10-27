@@ -105,4 +105,43 @@ module SignUpSheetHelper
       out_string
     end
   end
+
+  #to fetch assignment details
+  def fetch_assignment_details(participant)
+    @assignment = participant.assignment
+    {
+      assignment: assignment,
+      slots_filled: SignUpTopic.find_slots_filled(@assignment.id),
+      slots_waitlisted: SignUpTopic.find_slots_waitlisted(@assignment.id),
+      sign_up_topics: SignUpTopic.where(assignment_id: @assignment.id, private_to: nil),
+      max_team_size: @assignment.max_team_size,
+      use_bookmark: @assignment.use_bookmark
+    }
+  end
+
+  def fetch_deadlines(assignment)
+    {
+      signup_topic_deadline: assignment.due_dates.find_by(deadline_type_id: 7),
+      drop_topic_deadline: assignment.due_dates.find_by(deadline_type_id: 6)
+    }
+  end
+
+  def set_action_display_status(assignment)
+          # Find whether the user has signed up for any topics; if so the user won't be able to
+      # sign up again unless the former was a waitlisted topic
+      # if team assignment, then team id needs to be passed as parameter else the user's id
+    signup_deadline = assignment.due_dates.find_by(deadline_type_id: 1)
+    return true if signup_deadline.nil?
+    !assignment.staggered_deadline? && (signup_deadline.due_at < Time.now)
+  end
+
+  def user_sign_up_status(assignment, user_id)
+    users_team = Team.find_team_users(assignment.id, user_id)
+    if users_team.empty?
+      nil
+    else
+      SignedUpTeam.find_user_signup_topics(assignment.id, users_team.first.t_id)
+    end
+  end
+
 end

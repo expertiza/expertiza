@@ -37,16 +37,15 @@ class AssignmentsController < ApplicationController
         if assignment_form_params[:assignment][:directory_path].blank?
           assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
         end
-        ques_array = assignment_form_params[:assignment_questionnaire]
-        due_array = assignment_form_params[:due_date]
-        ques_array.each do |cur_questionnaire|
+
+        assignment_form_params[:assignment_questionnaire].each do |cur_questionnaire|
           cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
         end
-        due_array.each do |cur_due|
+
+        assignment_form_params[:due_date].each do |cur_due|
           cur_due[:parent_id] = exist_assignment.id.to_s
         end
-        assignment_form_params[:assignment_questionnaire] = ques_array
-        assignment_form_params[:due_date] = due_array
+
         @assignment_form.update(assignment_form_params, current_user)
         aid = Assignment.find(@assignment_form.assignment.id).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
@@ -318,9 +317,9 @@ class AssignmentsController < ApplicationController
     questionnaire_array = assignment_form_params[:assignment_questionnaire]
     questionnaire_array.each { |cur_questionnaire| cur_questionnaire[:assignment_id] = exist_assignment.id.to_s }
     assignment_form_params[:assignment_questionnaire]
-    due_array = assignment_form_params[:due_date]
-    due_array.each { |cur_due| cur_due[:parent_id] = exist_assignment.id.to_s }
-    assignment_form_params[:due_date]
+    assignment_form_params[:due_date].each do |cur_due|
+      cur_due[:parent_id] = exist_assignment.id.to_s
+    end
     @assignment_form.update(assignment_form_params, current_user)
   end
 

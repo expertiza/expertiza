@@ -83,4 +83,30 @@ module StudentTaskHelper
     update_timeline_with_author_feedbacks(participant.try(:id), timeline_list)
     timeline_list.sort_by { |f| Time.zone.parse f[:updated_at] }
   end
+
+  def create_student_task_for_participant(participant)
+    StudentTask.new(
+      participant: participant,
+      assignment: participant.assignment,
+      topic: participant.topic,
+      current_stage: participant.current_stage,
+      stage_deadline: get_stage_deadline(participant.stage_deadline)
+    )
+  end
+
+  def retrieve_tasks_for_user(user)
+    user.assignment_participants.includes(%i[assignment topic]).map do |participant|
+      create_student_task_for_participant participant
+    end.sort_by(&:stage_deadline)
+  end
+
+  def get_stage_deadline(part)
+    begin
+      Time.parse(part)
+    rescue StandardError
+      Time.now + 1.year
+    end
+  end
+
+
 end

@@ -29,7 +29,7 @@ class StudentTaskController < ApplicationController
       redirect_to(controller: 'eula', action: 'display')
     end
     session[:user] = User.find_by(id: current_user.id)
-    @student_tasks = StudentTask.fetch_tasks_for_user current_user
+    @student_tasks = retrieve_tasks_for_user current_user
     if session[:impersonate] && !impersonating_as_admin?
 
       if impersonating_as_ta?
@@ -51,7 +51,7 @@ class StudentTaskController < ApplicationController
 
   def view
     @participant = AssignmentParticipant.find(params[:id])
-    StudentTask.create_student_task_for_participant(@participant)
+    create_student_task_for_participant(@participant)
     @can_submit = @participant.can_submit
     @can_review = @participant.can_review
     @can_take_quiz = @participant.can_take_quiz

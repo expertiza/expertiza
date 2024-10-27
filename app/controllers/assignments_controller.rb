@@ -32,8 +32,8 @@ class AssignmentsController < ApplicationController
       find_existing_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
       if !assignment_by_name && !find_existing_directory && @assignment_form.save # No existing names/directories
         @assignment_form.create_assignment_node
-        exist_assignment = Assignment.find(@assignment_form.assignment.id)
-        assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
+        assignment_created = Assignment.find(@assignment_form.assignment.id)
+        assignment_form_params[:assignment][:id] = assignment_created.id.to_s
         if assignment_form_params[:assignment][:directory_path].blank?
           assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
         end
@@ -109,16 +109,6 @@ class AssignmentsController < ApplicationController
   # displays an assignment via ID
   def show
     @assignment = Assignment.find(params[:id])
-  end
-
-  # gets an assignment's path/url
-  def path
-    begin
-      file_path = @assignment.path
-    rescue StandardError
-      file_path = nil
-    end
-    file_path
   end
 
   # makes a copy of an assignment

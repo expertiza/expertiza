@@ -632,6 +632,10 @@ class Assignment < ApplicationRecord
     self.enable_pair_programming
   end
 
+  def missing_participants?
+    participants.empty?
+  end
+
   private
 
   # returns true if assignment has staggered deadline and topic_id is nil
@@ -672,10 +676,5 @@ class Assignment < ApplicationRecord
       signed_up_teams.destroy_all
     end
   end
-
-  def missing_participants?
-    participants.empty?
-  end
-
 end
 

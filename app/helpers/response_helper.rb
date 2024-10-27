@@ -80,13 +80,14 @@ module ResponseHelper
 
   # Assigns total contribution for cake question across all reviewers to a hash map
   # Key : question_id, Value : total score for cake question
-  def store_total_cake_score
-    reviewee = ResponseMap.select(:reviewee_id, :type).where(id: @response.map_id.to_s).first
-    @total_score = Cake.get_total_score_for_questions(reviewee.type,
+  def get_total_cake_score(response,participant,assignment)
+    reviewee = ResponseMap.select(:reviewee_id, :type).where(id: response.map_id.to_s).first
+    total_score = Cake.get_total_score_for_questions(reviewee.type,
                                                       @review_questions,
-                                                      @participant.id,
-                                                      @assignment.id,
+                                                      participant.id,
+                                                      assignment.id,
                                                       reviewee.reviewee_id)
+    return total_score
   end
 
   # new_response if a flag parameter indicating that if user is requesting a new rubric to fill

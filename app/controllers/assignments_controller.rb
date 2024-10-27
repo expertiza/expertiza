@@ -112,16 +112,6 @@ class AssignmentsController < ApplicationController
     @assignment = Assignment.find(params[:id])
   end
 
-  # gets an assignment's path/url
-  def path
-    begin
-      file_path = @assignment.path
-    rescue StandardError
-      file_path = nil
-    end
-    file_path
-  end
-
   # makes a copy of an assignment
   def copy
     update_copy_session

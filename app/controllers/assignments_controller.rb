@@ -37,16 +37,15 @@ class AssignmentsController < ApplicationController
         if assignment_form_params[:assignment][:directory_path].blank?
           assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
         end
-        ques_array = assignment_form_params[:assignment_questionnaire]
-        due_array = assignment_form_params[:due_date]
-        ques_array.each do |cur_questionnaire|
-          cur_questionnaire[:assignment_id] = assignment_created.id.to_s
+
+        assignment_form_params[:assignment_questionnaire].each do |cur_questionnaire|
+          cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
         end
-        due_array.each do |cur_due|
-          cur_due[:parent_id] = assignment_created.id.to_s
+
+        assignment_form_params[:due_date].each do |cur_due|
+          cur_due[:parent_id] = exist_assignment.id.to_s
         end
-        assignment_form_params[:assignment_questionnaire] = ques_array
-        assignment_form_params[:due_date] = due_array
+
         @assignment_form.update(assignment_form_params, current_user)
         aid = Assignment.find(@assignment_form.assignment.id).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
@@ -75,7 +74,7 @@ class AssignmentsController < ApplicationController
     edit_params_setting
     assignment_staggered_deadline?
     update_due_date
-    check_questionnaires_usage
+    validate_questionnaires_usage
     @due_date_all = update_nil_dd_deadline_name(@due_date_all)
     @due_date_all = update_nil_dd_description_url(@due_date_all)
     unassigned_rubrics_warning
@@ -118,7 +117,7 @@ class AssignmentsController < ApplicationController
     # check new assignment submission directory and old assignment submission directory
     new_assign_id = AssignmentForm.copy(params[:id], @user)
     if new_assign_id
-      if check_same_directory?(params[:id], new_assign_id)
+      if validate_same_directory?(params[:id], new_assign_id)
         flash[:note] = 'Warning: The submission directory for the copy of this assignment will be the same as the submission directory '\
           'for the existing assignment. This will allow student submissions to one assignment to overwrite submissions to the other assignment. '\
           'If you do not want this to happen, change the submission directory in the new copy of the assignment.'
@@ -308,15 +307,15 @@ class AssignmentsController < ApplicationController
     questionnaire_array = assignment_form_params[:assignment_questionnaire]
     questionnaire_array.each { |cur_questionnaire| cur_questionnaire[:assignment_id] = exist_assignment.id.to_s }
     assignment_form_params[:assignment_questionnaire]
-    due_array = assignment_form_params[:due_date]
-    due_array.each { |cur_due| cur_due[:parent_id] = exist_assignment.id.to_s }
-    assignment_form_params[:due_date]
+    assignment_form_params[:due_date].each do |cur_due|
+      cur_due[:parent_id] = exist_assignment.id.to_s
+    end
     @assignment_form.update(assignment_form_params, current_user)
   end
 
   # helper methods for copy
   # checks if two assignments are in the same directory
-  def check_same_directory?(old_id, new_id)
+  def validate_same_directory?(old_id, new_id)
     Assignment.find(old_id).directory_path == Assignment.find(new_id).directory_path
   end
 
@@ -387,7 +386,7 @@ class AssignmentsController < ApplicationController
   end
 
   # checks if each questionnaire in an assignment is used
-  def check_questionnaires_usage
+  def validate_questionnaires_usage
     @assignment_questionnaires.each do |assignment_questionnaire|
       unless assignment_questionnaire.used_in_round.nil?
         @reviewvarycheck = 1

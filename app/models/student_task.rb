@@ -80,7 +80,7 @@ class StudentTask
     @started ||= incomplete? && revision?
   end
 
-  def self.teamed_students(user, ip_address = nil)
+  def self.find_teammates_by_user(user, ip_address = nil)
     students_teamed = {}
     user.teams.each do |team|
       next unless team.is_a?(AssignmentTeam)

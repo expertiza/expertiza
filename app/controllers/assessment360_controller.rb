@@ -30,7 +30,7 @@ class Assessment360Controller < ApplicationController
       # for each assignment
       # [aggregrate_review_grades_per_stu, review_count_per_stu] --> [0, 0]
       %w[teammate meta].each { |type| instance_variable_set("@#{type}_review_info_per_stu", [0, 0]) }
-      students_teamed = StudentTask.teamed_students(cp.user)
+      students_teamed = StudentTask.find_teammates_by_user(cp.user)
       @teamed_count[cp.id] = students_teamed[course.id].try(:size).to_i
       @assignments.each do |assignment|
         @meta_review[cp.id] = {} unless @meta_review.key?(cp.id)

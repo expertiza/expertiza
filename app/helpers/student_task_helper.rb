@@ -59,7 +59,7 @@ module StudentTaskHelper
   end
 
   def update_timeline_with_peer_reviews(participant_id, timeline_list)
-    populate_timeline_from(ReviewResponseMap, participant_id, ->(_response) { ('Round ' + _response.round.to_s + ' Peer Review').humanize }, timeline_list)
+    populate_timeline_from(ReviewResponseMap, participant_id, ->(response) { ('Round ' + response.round.to_s + ' Peer Review').humanize }, timeline_list)
   end
 
   def update_timeline_with_author_feedbacks(participant_id, timeline_list)

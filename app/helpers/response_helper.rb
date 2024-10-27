@@ -51,6 +51,16 @@ module ResponseHelper
     return current_questionnaire
   end
 
+  # checks if the questionnaire is nil and opens drop down or rating accordingly
+  def get_dropdown_or_scale(assignment,questionnaire)
+    use_dropdown = AssignmentQuestionnaire.where(assignment_id: assignment.try(:id),
+                                                 questionnaire_id: questionnaire.try(:id))
+                                          .first.try(:dropdown)
+    dropdown_or_scale = (use_dropdown ? 'dropdown' : 'scale')
+
+    return dropdown_or_scale
+  end
+
   # E-1973 - helper method to check if the current user is the reviewer
   # if the reviewer is an assignment team, we have to check if the current user is on the team
   def current_user_is_reviewer?(map, _reviewer_id)
@@ -88,7 +98,7 @@ module ResponseHelper
     @participant = @map.reviewer
     @contributor = @map.contributor
     new_response ? questionnaire_from_response_map(@map,@contributor,@assignment) : questionnaire_from_response(@response)
-    set_dropdown_or_scale
+    @dropdown_or_scale = get_dropdown_or_scale(@assignment,@questionnaire)
     @review_questions = sort_questions(@questionnaire.questions)
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score

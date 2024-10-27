@@ -337,15 +337,6 @@ class ResponsesController < ApplicationController
       @modified_object = @map.id
     end
     @return = params[:return]
-  end
-
-  # checks if the questionnaire is nil and opens drop down or rating accordingly
-  def set_dropdown_or_scale
-    use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.try(:id),
-                                                 questionnaire_id: @questionnaire.try(:id))
-                                          .first.try(:dropdown)
-    @dropdown_or_scale = (use_dropdown ? 'dropdown' : 'scale')
-  end
 
   # For each question in the list, starting with the first one, you update the comment and score
   def create_answers(params, questions)

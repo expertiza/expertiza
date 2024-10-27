@@ -14,17 +14,23 @@ class BiddingTeamsController < ApplicationController
   #
   # rubocop:disable Metrics/AbcSize
   # TODO: Add route
-  def auto_assign_bidding_teams
-    assignment = Assignment.find(params[:id]) 
+  def auto_assign_bidding_teams    
+
+    @assignment = Assignment.find(params[:id]) 
+
     service = BiddingTeamsAssignmentService.new(params[:id])
 
     begin
       service.create_team_topic_matches
-      infoMessage = "Team assignments for '#{assignment.name}' was completed successfully."
+      infoMessage = "Team assignments for '#{@assignment.name}' was completed successfully."
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, infoMessage)
       flash[:success] = infoMessage
+    rescue ActiveRecord::RecordNotFound => e
+      errorMessage = "Assignment with ID #{params[:id]} not found: #{e.message}"
+      ExpertizaLogger.error.LoggerMessage.new(controller_name, session[:user].name, errorMessage)
+      flash[:error] = errorMessage 
     rescue StandardError => e #TODO: Additional catches to catch specific errors such as Assignment not being found with param ID.
-      errorMessage = "Team assignments failed for assignment ID #{assignment_id}: #{e.message}"
+      errorMessage = "Team assignments failed for assignment ID #{@assignment_id}: #{e.message}"
       ExpertizaLogger.error.LoggerMessage.new(controller_name, session[:user].name, errorMessage)
       flash[:error] = errorMessage 
     end

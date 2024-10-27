@@ -15,27 +15,6 @@ class StudentTask
     @topic = args[:topic]
   end
 
-  def self.create_student_task_for_participant(participant) # Rename this
-    StudentTask.new(
-      participant: participant,
-      assignment: participant.assignment,
-      topic: participant.topic,
-      current_stage: participant.current_stage,
-      stage_deadline: (begin
-                         Time.parse(participant.stage_deadline)
-                       rescue StandardError
-                         Time.now + 1.year
-                       end)
-    )
-  end
-
-
-  def self.fetch_tasks_for_user(user)
-    user.assignment_participants.includes(%i[assignment topic]).map do |participant|
-      StudentTask.create_student_task_for_participant participant
-    end.sort_by(&:stage_deadline)
-  end
-
   def topic_name
     topic.try(:topic_name) || '-'
   end

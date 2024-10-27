@@ -148,7 +148,7 @@ class AssignmentsController < ApplicationController
       # Issue 1017 - allow instructor to delete assignment created by TA.
       # FixA : TA can only delete assignment created by itself.
       # FixB : Instrucor will be able to delete any assignment belonging to his/her courses.
-      if (user.role.name == 'Instructor') || ((user.role.name == 'Teaching Assistant') && (user.id == assignment_form.assignment.instructor_id))
+      if current_user_has_instructor_privileges? || (current_user_has_ta_privileges? && (user.id == assignment_form.assignment.instructor_id))
         assignment_form.delete(params[:force])
         ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Assignment #{assignment_form.assignment.id} was deleted.", request)
         flash[:success] = 'The assignment was successfully deleted.'

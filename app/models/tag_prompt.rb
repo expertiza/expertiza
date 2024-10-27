@@ -15,7 +15,7 @@ class TagPrompt < ApplicationRecord
         length_valid = true unless answer.comments.nil? || answer.comments.length <= tag_prompt_deployment.answer_length_threshold
       end
 
-      if length_valid && answer.item.type.eql?(tag_prompt_deployment.item_type)
+      if length_valid && answer.question.type.eql?(tag_prompt_deployment.question_type)
         case control_type.downcase
         when 'slider'
           html = slider_control(answer, tag_prompt_deployment, stored_tags)

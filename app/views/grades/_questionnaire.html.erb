@@ -1,16 +1,16 @@
 <%
    current_topic = nil
-   items = Question.where(itemnaire_id: @itemnaire.id)
-   items.each { | item |
+   questions = Question.where(questionnaire_id: @questionnaire.id)
+   questions.each { | question |
      i = 0
-     # Get score given by the reviewer for each item in this review
-     score = Answer.where(response_id: review.id, item_id:  item.id).first
+     # Get score given by the reviewer for each question in this review
+     score = Answer.where(response_id: review.id, question_id:  question.id).first
      unless score.nil?
-       ques_type = QuestionType.where(item_id: item.id)%>
+       ques_type = QuestionType.where(question_id: question.id)%>
         <%#- Render accordion title -%>
         <%= get_accordion_title(current_topic, ques_type[0].parameters.split("::")[0]) %>
-        <%#- Render item, score and response -%>
-        <%= find_item_type(item, ques_type[0], i, true, file_url, score, (@itemnaire.min_item_score..@itemnaire.max_item_score).to_a) %>
+        <%#- Render question, score and response -%>
+        <%= find_question_type(question, ques_type[0], i, true, file_url, score, (@questionnaire.min_question_score..@questionnaire.max_question_score).to_a) %>
     <% current_topic = ques_type[0].parameters.split("::")[0]
        end
        i += 1

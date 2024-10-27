@@ -1,24 +1,24 @@
 <%= render :partial => 'new_quiz_script' %>
-<h1>New <%= @itemnaire.display_type %></h1>
-<% if @itemnaire.type == "QuizQuestionnaire" %>    <!--handle a itemnaire differently if it is a quiz-->
-  <%= form_tag :controller => 'quiz_itemnaires', :action => 'create',
+<h1>New <%= @questionnaire.display_type %></h1>
+<% if @questionnaire.type == "QuizQuestionnaire" %>    <!--handle a questionnaire differently if it is a quiz-->
+  <%= form_tag :controller => 'quiz_questionnaires', :action => 'create',
                :pid => @participant_id, :aid => @assignment_id do %>
-    <% if @itemnaire.errors.any? %>
+    <% if @questionnaire.errors.any? %>
       <div id="error_explanation">
-        <h2><%= pluralize(@itemnaire.errors.count, "error") %> prohibited this article from being saved:</h2>
+        <h2><%= pluralize(@questionnaire.errors.count, "error") %> prohibited this article from being saved:</h2>
         <ul>
-          <% @itemnaire.errors.full_messages.each do |msg| %>
+          <% @questionnaire.errors.full_messages.each do |msg| %>
             <li><%= msg %></li>
           <% end %>
         </ul>
       </div>
     <% end %>
     <% $disp_flag = 1 %>
-    <%= render :partial => 'quiz_itemnaire' %>
+    <%= render :partial => 'quiz_questionnaire' %>
 
     <% $disp_flag = 0 %>
 
-    <%= render :partial => 'new_item_template' %>
+    <%= render :partial => 'new_question_template' %>
 
     <br>
     <%= submit_tag "Create Quiz", :name => "save" %>

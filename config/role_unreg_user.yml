@@ -44,14 +44,14 @@ development:
       suggestion:
         create: false
         new: false
-      itemnaire:
+      questionnaire:
         list: false
-        create_itemnaire: false
-        edit_itemnaire: false
-        copy_itemnaire: false
-        save_itemnaire: false
+        create_questionnaire: false
+        edit_questionnaire: false
+        copy_questionnaire: false
+        save_questionnaire: false
         new_quiz: false
-        create_quiz_itemnaire: false
+        create_quiz_questionnaire: false
         update_quiz: false
         edit_quiz: false
         view_quiz: false
@@ -98,7 +98,7 @@ development:
       tree_display:
         list: false
         drill: false
-        goto_itemnaires: false
+        goto_questionnaires: false
         goto_author_feedbacks: false
         goto_review_rubrics: false
         goto_global_survey: false
@@ -157,7 +157,7 @@ development:
       admin: false
       course: false
       assignment: false
-      itemnaire: false
+      questionnaire: false
       participants: false
       reports: false
       institution: false
@@ -312,14 +312,14 @@ test:
       suggestion:
         create: false
         new: false
-      itemnaire:
+      questionnaire:
         list: false
-        create_itemnaire: false
-        edit_itemnaire: false
-        copy_itemnaire: false
-        save_itemnaire: false
+        create_questionnaire: false
+        edit_questionnaire: false
+        copy_questionnaire: false
+        save_questionnaire: false
         new_quiz: false
-        create_quiz_itemnaire: false
+        create_quiz_questionnaire: false
         update_quiz: false
         edit_quiz: false
         view_quiz: false
@@ -366,7 +366,7 @@ test:
       tree_display:
         list: false
         drill: false
-        goto_itemnaires: false
+        goto_questionnaires: false
         goto_author_feedbacks: false
         goto_review_rubrics: false
         goto_global_survey: false
@@ -425,7 +425,7 @@ test:
       admin: false
       course: false
       assignment: false
-      itemnaire: false
+      questionnaire: false
       participants: false
       reports: false
       institution: false
@@ -580,14 +580,14 @@ production:
       suggestion:
         create: false
         new: false
-      itemnaire:
+      questionnaire:
         list: false
-        create_itemnaire: false
-        edit_itemnaire: false
-        copy_itemnaire: false
-        save_itemnaire: false
+        create_questionnaire: false
+        edit_questionnaire: false
+        copy_questionnaire: false
+        save_questionnaire: false
         new_quiz: false
-        create_quiz_itemnaire: false
+        create_quiz_questionnaire: false
         update_quiz: false
         edit_quiz: false
         view_quiz: false
@@ -634,7 +634,7 @@ production:
       tree_display:
         list: false
         drill: false
-        goto_itemnaires: false
+        goto_questionnaires: false
         goto_author_feedbacks: false
         goto_review_rubrics: false
         goto_global_survey: false
@@ -693,7 +693,7 @@ production:
       admin: false
       course: false
       assignment: false
-      itemnaire: false
+      questionnaire: false
       participants: false
       reports: false
       institution: false

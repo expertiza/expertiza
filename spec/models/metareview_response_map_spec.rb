@@ -27,21 +27,21 @@ describe MetareviewResponseMap do
   let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
   let(:student1) { build(:student, id: 2, name: 'name1', fullname: 'no one', email: 'expertiza@mailinator.com') }
   let(:student2) { build(:student, id: 3, name: 'name2', fullname: 'no one', email: 'expertiza@mailinator.com') }
-  let(:assignment_itemnaire1) { build(:assignment_itemnaire, id: 1, assignment_id: 1, itemnaire_id: 1) }
-  let(:assignment_itemnaire2) { build(:assignment_itemnaire, id: 2, assignment_id: 1, itemnaire_id: 2) }
-  let(:itemnaire1) { build(:itemnaire, type: 'ReviewQuestionnaire') }
-  let(:itemnaire2) { build(:itemnaire, type: 'MetareviewQuestionnaire') }
+  let(:assignment_questionnaire1) { build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 1) }
+  let(:assignment_questionnaire2) { build(:assignment_questionnaire, id: 2, assignment_id: 1, questionnaire_id: 2) }
+  let(:questionnaire1) { build(:questionnaire, type: 'ReviewQuestionnaire') }
+  let(:questionnaire2) { build(:questionnaire, type: 'MetareviewQuestionnaire') }
   let(:next_due_date) { build(:assignment_due_date, round: 1) }
-  let(:item) { double('Question') }
-  let(:review_itemnaire) { build(:itemnaire, id: 1) }
+  let(:question) { double('Question') }
+  let(:review_questionnaire) { build(:questionnaire, id: 1) }
   let(:response3) { build(:response) }
   let(:response_map) { build(:review_response_map, reviewer_id: 2, response: [response3]) }
-  let(:assignment3) { build(:assignment, id: 4, itemnaires: []) }
+  let(:assignment3) { build(:assignment, id: 4, questionnaires: []) }
   let(:participant2) { build(:participant, id: 3, parent_id: 4, user: student2) }
   let(:qmetareview_response_map) { build(:meta_review_response_map, id: 3, review_mapping: review_response_map3, reviewee: participant2) }
   let(:review_response_map3) { build(:review_response_map, id: 3, assignment: assignment3, reviewer: participant, reviewee: team) }
   
-  let(:assignment_itemnaire3) { build(:assignment_itemnaire, id: 3, assignment_id: 4, itemnaire: itemnaire2) }
+  let(:assignment_questionnaire3) { build(:assignment_questionnaire, id: 3, assignment_id: 4, questionnaire: questionnaire2) }
   before(:each) do
     allow(review_response_map).to receive(:response).and_return(response)
     allow(response_map).to receive(:response).and_return(response3)
@@ -63,11 +63,11 @@ describe MetareviewResponseMap do
         expect(metareview_response_map.contributor).to eq(team)
       end
 
-      it 'finds the nil itemaire' do
-        # itemnaire should return nil correctly if no itemnaire in assignment, rather than garbage result
+      it 'finds the nil questionaire' do
+        # questionnaire should return nil correctly if no questionnaire in assignment, rather than garbage result
         participant2.assignment = assignment3
         allow(MetareviewResponseMap).to receive(:where).and_return([metareview_response_map])
-        expect(qmetareview_response_map.itemnaire).to eq(nil)
+        expect(qmetareview_response_map.questionnaire).to eq(nil)
       end
 
       it 'finds title' do

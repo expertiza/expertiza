@@ -63,7 +63,7 @@
 
       <tr>
 
-        <td align = 'left'> <%= Question.find(s.item_id).txt%></td>
+        <td align = 'left'> <%= Question.find(s.question_id).txt%></td>
         <td align = 'center'> <%= s.score%>/<%=@maxscore%></td>
         <td align = 'left'> <%= sanitize s.comments %> </td>
 

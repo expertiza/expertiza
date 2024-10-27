@@ -72,42 +72,42 @@ module AssignmentAnalytic
     end
   end
 
-  # return all itemnaire types associated this assignment
-  def itemnaire_types
-    itemnaire_type_list = []
-    itemnaires.each do |itemnaire|
-      itemnaire_type_list << itemnaire.type unless itemnaires.include?(itemnaire.type)
+  # return all questionnaire types associated this assignment
+  def questionnaire_types
+    questionnaire_type_list = []
+    questionnaires.each do |questionnaire|
+      questionnaire_type_list << questionnaire.type unless questionnaires.include?(questionnaire.type)
     end
-    itemnaire_type_list
+    questionnaire_type_list
   end
 
-  # return itemnaire of a type related to the assignment
-  # assumptions: only 1 itemnaire of each type exist which should be the case
-  def itemnaire_of_type(type_name_in_string)
-    itemnaires.each do |itemnaire|
-      return itemnaire if itemnaire.type == type_name_in_string
+  # return questionnaire of a type related to the assignment
+  # assumptions: only 1 questionnaire of each type exist which should be the case
+  def questionnaire_of_type(type_name_in_string)
+    questionnaires.each do |questionnaire|
+      return questionnaire if questionnaire.type == type_name_in_string
     end
   end
 
   # helper function do to verify the assumption made above
-  def self.itemnaire_unique?
+  def self.questionnaire_unique?
     find_each do |assignment|
-      assignment.itemnaire_types.each do |itemnaire_type|
-        itemnaire_list = []
-        assignment.itemnaires.each do |itemnaire|
-          itemnaire_list << itemnaire if itemnaire.type == itemnaire_type
-          return false if itemnaire_list.count > 1
+      assignment.questionnaire_types.each do |questionnaire_type|
+        questionnaire_list = []
+        assignment.questionnaires.each do |questionnaire|
+          questionnaire_list << questionnaire if questionnaire.type == questionnaire_type
+          return false if questionnaire_list.count > 1
         end
       end
     end
     true
   end
 
-  def has_review_itemnaire?
-    itemnaire_types.include?('ReviewQuestionnaire')
+  def has_review_questionnaire?
+    questionnaire_types.include?('ReviewQuestionnaire')
   end
 
-  def review_itemnaire
-    itemnaire_of_type('ReviewQuestionnaire')
+  def review_questionnaire
+    questionnaire_of_type('ReviewQuestionnaire')
   end
 end

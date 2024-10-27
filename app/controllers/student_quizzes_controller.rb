@@ -24,7 +24,7 @@ class StudentQuizzesController < ApplicationController
   def finished_quiz
     @response = Response.where(map_id: params[:map_id]).first
     @response_map = QuizResponseMap.find(params[:map_id])
-    @items = Question.where(itemnaire_id: @response_map.reviewed_object_id) # for quiz response map, the reivewed_object_id is itemnaire id
+    @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id) # for quiz response map, the reivewed_object_id is questionnaire id
     @map = ResponseMap.find(params[:map_id])
     @participant = AssignmentTeam.find(@map.reviewee_id).participants.first
 
@@ -41,11 +41,11 @@ class StudentQuizzesController < ApplicationController
       reviewee_team = Team.find(reviewee_id) # reviewees should always be teams
       next unless reviewee_team.parent_id == assignment_id
 
-      quiz_itemnaire = QuizQuestionnaire.where(instructor_id: reviewee_team.id).first
+      quiz_questionnaire = QuizQuestionnaire.where(instructor_id: reviewee_team.id).first
 
       # if the reviewee team has created quiz
-      if quiz_itemnaire
-        quizzes << quiz_itemnaire unless quiz_itemnaire.taken_by? reviewer
+      if quiz_questionnaire
+        quizzes << quiz_questionnaire unless quiz_questionnaire.taken_by? reviewer
       end
     end
     quizzes
@@ -53,36 +53,36 @@ class StudentQuizzesController < ApplicationController
 
   # the way 'answers' table store the results of quiz
   def calculate_score(map, response)
-    itemnaire = Questionnaire.find(map.reviewed_object_id)
+    questionnaire = Questionnaire.find(map.reviewed_object_id)
     scores = []
     valid = true
-    items = Question.where(itemnaire_id: itemnaire.id)
-    items.each do |item|
+    questions = Question.where(questionnaire_id: questionnaire.id)
+    questions.each do |question|
       score = 0
-      correct_answers = QuizQuestionChoice.where(item_id: item.id, iscorrect: true)
-      ques_type = item.type
+      correct_answers = QuizQuestionChoice.where(question_id: question.id, iscorrect: true)
+      ques_type = question.type
       if ques_type.eql? 'MultipleChoiceCheckbox'
-        if params[item.id.to_s].nil?
+        if params[question.id.to_s].nil?
           valid = false
         else
-          params[item.id.to_s].each do |choice|
+          params[question.id.to_s].each do |choice|
             # loop the quiz taker's choices and see if 1)all the correct choice are checked and 2) # of quiz taker's choice matches the # of the correct choices
             correct_answers.each do |correct|
               score += 1 if choice.eql? correct.txt
             end
           end
-          score = score == correct_answers.count && score == params[item.id.to_s].count ? 1 : 0
-          # for MultipleChoiceCheckbox, score =1 means the quiz taker have done this item correctly, not just make select this choice correctly.
-          params[item.id.to_s].each do |choice|
-            new_score = Answer.new comments: choice, item_id: item.id, response_id: response.id, answer: score
+          score = score == correct_answers.count && score == params[question.id.to_s].count ? 1 : 0
+          # for MultipleChoiceCheckbox, score =1 means the quiz taker have done this question correctly, not just make select this choice correctly.
+          params[question.id.to_s].each do |choice|
+            new_score = Answer.new comments: choice, question_id: question.id, response_id: response.id, answer: score
             valid = false unless new_score.valid?
             scores.push(new_score)
           end
         end
       else # TrueFalse and MultipleChoiceRadio
         correct_answer = correct_answers.first
-        score = correct_answer.txt == params[item.id.to_s] ? 1 : 0
-        new_score = Answer.new comments: params[item.id.to_s], item_id: item.id, response_id: response.id, answer: score
+        score = correct_answer.txt == params[question.id.to_s] ? 1 : 0
+        new_score = Answer.new comments: params[question.id.to_s], question_id: question.id, response_id: response.id, answer: score
         valid = false if new_score.nil? || new_score.comments.nil? || new_score.comments.empty?
         scores.push(new_score)
       end
@@ -92,8 +92,8 @@ class StudentQuizzesController < ApplicationController
       redirect_to controller: 'student_quizzes', action: 'finished_quiz', map_id: map.id
     else
       response.destroy
-      flash[:error] = 'Please answer every item.'
-      redirect_to action: :take_quiz, assignment_id: params[:assignment_id], itemnaire_id: itemnaire.id, map_id: map.id
+      flash[:error] = 'Please answer every question.'
+      redirect_to action: :take_quiz, assignment_id: params[:assignment_id], questionnaire_id: questionnaire.id, map_id: map.id
     end
   end
 
@@ -114,17 +114,17 @@ class StudentQuizzesController < ApplicationController
     end
   end
 
-  def graded?(response, item)
-    Answer.where(item_id: item.id, response_id: response.id).first
+  def graded?(response, question)
+    Answer.where(question_id: question.id, response_id: response.id).first
   end
 
-  # This method is only for quiz itemnaires, it is called when instructors click "view quiz items" on the pop-up panel.
-  def review_items
+  # This method is only for quiz questionnaires, it is called when instructors click "view quiz questions" on the pop-up panel.
+  def review_questions
     @assignment_id = params[:id]
-    @quiz_itemnaires = []
+    @quiz_questionnaires = []
     Team.where(parent_id: params[:id]).each do |quiz_creator|
-      Questionnaire.where(instructor_id: quiz_creator.id).each do |itemnaire|
-        @quiz_itemnaires.push itemnaire
+      Questionnaire.where(instructor_id: quiz_creator.id).each do |questionnaire|
+        @quiz_questionnaires.push questionnaire
       end
     end
   end

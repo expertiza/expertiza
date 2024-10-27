@@ -9,10 +9,10 @@ describe SuggestionController do
   let(:instructor2) { build(:instructor, id: 66) }
   let(:ta) { build(:teaching_assistant, id: 8) }
   let(:student) { build(:student, id: 1) }
-  let(:itemnaire) { build(:itemnaire, id: 666) }
+  let(:questionnaire) { build(:questionnaire, id: 666) }
   let(:suggestion) { build(:suggestion, id: 1, assignment_id: 1) }
   let(:comment) { build(:comment) }
-  let(:assignment_itemnaire) { build(:assignment_itemnaire, id: 1, itemnaire: itemnaire) }
+  let(:assignment_questionnaire) { build(:assignment_questionnaire, id: 1, questionnaire: questionnaire) }
   let(:suggestion_comment) { build(:suggestion_comment) }
 
   before(:each) do

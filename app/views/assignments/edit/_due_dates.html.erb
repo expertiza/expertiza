@@ -364,17 +364,17 @@
     function removeOrAddMetareview() {
         if (document.getElementById("metareview")) {
             removeDueDateTableElement('metareview', 0);
-            jQuery("#itemnaire_table_MetareviewQuestionnaire").remove()
+            jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
         } else {
             addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
-            jQuery("#itemnaire_table_MetareviewQuestionnaire").remove()
-            <% assignment_itemnaire = @assignment_form.assignment_itemnaire('MetareviewQuestionnaire', nil, nil) %>
-            <% itemnaire = @assignment_form.itemnaire(assignment_itemnaire, 'MetareviewQuestionnaire') %>
+            jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
+            <% assignment_questionnaire = @assignment_form.assignment_questionnaire('MetareviewQuestionnaire', nil, nil) %>
+            <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'MetareviewQuestionnaire') %>
             addQuestionnaireTableRow(
                 'MetareviewQuestionnaire',
-                <%= assignment_itemnaire.to_json.html_safe %>,
-                <%= itemnaire.to_json.html_safe %>,
-                <%= itemnaire_options('MetareviewQuestionnaire').to_json.html_safe %>,
+                <%= assignment_questionnaire.to_json.html_safe %>,
+                <%= questionnaire.to_json.html_safe %>,
+                <%= questionnaire_options('MetareviewQuestionnaire').to_json.html_safe %>,
                 null
             );
         }
@@ -416,17 +416,17 @@
     function removeOrAddMetareview() {
         if (document.getElementById("metareview")) {
             removeDueDateTableElement('metareview', 0);
-            jQuery("#itemnaire_table_MetareviewQuestionnaire").remove()
+            jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
         } else {
             addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
-            jQuery("#itemnaire_table_MetareviewQuestionnaire").remove()
-            <% assignment_itemnaire = @assignment_form.assignment_itemnaire('MetareviewQuestionnaire', nil, nil) %>
-            <% itemnaire = @assignment_form.itemnaire(assignment_itemnaire, 'MetareviewQuestionnaire') %>
+            jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
+            <% assignment_questionnaire = @assignment_form.assignment_questionnaire('MetareviewQuestionnaire', nil, nil) %>
+            <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'MetareviewQuestionnaire') %>
             addQuestionnaireTableRow(
                 'MetareviewQuestionnaire',
-                <%= assignment_itemnaire.to_json.html_safe %>,
-                <%= itemnaire.to_json.html_safe %>,
-                <%= itemnaire_options('MetareviewQuestionnaire').to_json.html_safe %>,
+                <%= assignment_questionnaire.to_json.html_safe %>,
+                <%= questionnaire.to_json.html_safe %>,
+                <%= questionnaire_options('MetareviewQuestionnaire').to_json.html_safe %>,
                 null
             );
         }
@@ -555,7 +555,7 @@
           <% end %>
           <% end %>
           <% 1.upto @assignment_form.assignment.rounds_of_reviews do |i| %>
-          addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'submission', <%=i%>, <%= due_date(@assignment_form.assignment, 'submission', i-1).to_json.html_safe %>); // or use itemnaire_options(@assignment, nil).to_json
+          addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'submission', <%=i%>, <%= due_date(@assignment_form.assignment, 'submission', i-1).to_json.html_safe %>); // or use questionnaire_options(@assignment, nil).to_json
           addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'review', <%=i%>, <%= due_date(@assignment_form.assignment, 'review', i-1).to_json.html_safe %>);
           <% end %>
           <% if @metareview_allowed %>

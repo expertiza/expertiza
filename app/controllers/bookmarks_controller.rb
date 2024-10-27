@@ -76,19 +76,19 @@ class BookmarksController < ApplicationController
     redirect_to action: 'list', id: @bookmark.topic_id
   end
 
-  # calculate average itemnaire score for 'Your rating' for specific bookmark
+  # calculate average questionnaire score for 'Your rating' for specific bookmark
   def specific_average_score(bookmark)
     if bookmark.nil?
       '-'
     else
       assessment = SignUpTopic.find(bookmark.topic_id).assignment
-      items = assessment.itemnaires.where(type: 'BookmarkRatingQuestionnaire').flat_map(&:items)
+      questions = assessment.questionnaires.where(type: 'BookmarkRatingQuestionnaire').flat_map(&:questions)
       responses = BookmarkRatingResponseMap.where(
         reviewed_object_id: assessment.id,
         reviewee_id: bookmark.id,
         reviewer_id: AssignmentParticipant.find_by(user_id: current_user.id).id
       ).flat_map { |r| Response.where(map_id: r.id) }
-      score = assessment_score(response: responses, items: items)
+      score = assessment_score(response: responses, questions: questions)
       if score.nil?
         return '-'
       else
@@ -97,18 +97,18 @@ class BookmarksController < ApplicationController
     end
   end
 
-  # calculate average itemnaire score for 'Avg. rating' for specific bookmark
+  # calculate average questionnaire score for 'Avg. rating' for specific bookmark
   def total_average_score(bookmark)
     if bookmark.nil?
       '-'
     else
       assessment = SignUpTopic.find(bookmark.topic_id).assignment
-      items = assessment.itemnaires.where(type: 'BookmarkRatingQuestionnaire').flat_map(&:items)
+      questions = assessment.questionnaires.where(type: 'BookmarkRatingQuestionnaire').flat_map(&:questions)
       responses = BookmarkRatingResponseMap.where(
         reviewed_object_id: assessment.id,
         reviewee_id: bookmark.id
       ).flat_map { |r| Response.where(map_id: r.id) }
-      totalScore = aggregate_assessment_scores(responses, items)
+      totalScore = aggregate_assessment_scores(responses, questions)
       if totalScore[:avg].nil?
         return '-'
       else

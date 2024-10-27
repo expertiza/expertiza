@@ -52,17 +52,17 @@ describe 'Assignment creation page', js: true do
     )
   end
 
-  # instructor can check "has quiz" box and set the number of quiz items
+  # instructor can check "has quiz" box and set the number of quiz questions
   it 'is able to create with quiz' do
     assignment_creation_setup(1, 'private assignment for test')
     check('assignment_form_assignment_require_quiz')
     click_button 'Create'
-    fill_in 'assignment_form_assignment_num_quiz_items', with: 3
+    fill_in 'assignment_form_assignment_num_quiz_questions', with: 3
     click_button 'submit_btn'
 
     assignment = Assignment.where(name: 'private assignment for test').first
     expect(assignment).to have_attributes(
-      num_quiz_items: 3,
+      num_quiz_questions: 3,
       require_quiz: true
     )
   end

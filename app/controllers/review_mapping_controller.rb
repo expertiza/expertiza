@@ -174,11 +174,11 @@ class ReviewMappingController < ApplicationController
     begin
       assignment = Assignment.find(params[:assignment_id])
       reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
-      if ResponseMap.where(reviewed_object_id: params[:itemnaire_id], reviewer_id: params[:participant_id]).first
+      if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id: params[:participant_id]).first
         flash[:error] = 'You have already taken that quiz.'
       else
         @map = QuizResponseMap.new
-        @map.reviewee_id = Questionnaire.find(params[:itemnaire_id]).instructor_id
+        @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
         @map.reviewer_id = params[:participant_id]
         @map.reviewed_object_id = Questionnaire.find_by(instructor_id: @map.reviewee_id).id
         @map.save

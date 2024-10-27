@@ -14,7 +14,7 @@ module GradesHelper
   def score_vector(reviews, symbol)
     scores = []
     reviews.each do |review|
-      scores << Response.score(response: [review], items: @items[symbol.to_sym], q_types: [])
+      scores << Response.score(response: [review], questions: @questions[symbol.to_sym], q_types: [])
     end
     scores
   end
@@ -120,26 +120,26 @@ module GradesHelper
   end
 
   def view_heatgrid(participant_id, type)
-    # get participant, team, itemnaires for assignment.
+    # get participant, team, questionnaires for assignment.
     @participant = AssignmentParticipant.find(participant_id)
     @assignment = @participant.assignment
     @team = @participant.team
     @team_id = @team.id
     @type = type
-    itemnaires = @assignment.itemnaires
+    questionnaires = @assignment.questionnaires
     @vmlist = []
 
-    # loop through each itemnaire, and populate the view model for all data necessary
+    # loop through each questionnaire, and populate the view model for all data necessary
     # to render the html tables.
-    itemnaires.each do |itemnaire|
-      @round = if @assignment.varying_rubrics_by_round? && itemnaire.type == 'ReviewQuestionnaire'
-                 AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, itemnaire_id: itemnaire.id).used_in_round
+    questionnaires.each do |questionnaire|
+      @round = if @assignment.varying_rubrics_by_round? && questionnaire.type == 'ReviewQuestionnaire'
+                 AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
                end
-      next unless itemnaire.type == type
+      next unless questionnaire.type == type
 
-      vm = VmQuestionResponse.new(itemnaire, @assignment, @round)
-      items = itemnaire.items
-      vm.add_items(items)
+      vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
+      questions = questionnaire.questions
+      vm.add_questions(questions)
       vm.add_team_members(@team)
       vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
       vm.number_of_comments_greater_than_10_words
@@ -150,11 +150,11 @@ module GradesHelper
   end
 
   def type_and_max(row)
-    item = Question.find(row.item_id)
-    if item.type == 'Checkbox'
+    question = Question.find(row.question_id)
+    if question.type == 'Checkbox'
       10_003
-    elsif item.is_a? ScoredQuestion
-      return 9311 + row.item_max_score
+    elsif question.is_a? ScoredQuestion
+      return 9311 + row.question_max_score
     else
       9998
     end
@@ -164,17 +164,17 @@ module GradesHelper
     'underlined' if score.comment.present?
   end
 
-  def retrieve_items(itemnaires, assignment_id)
-    items = {}
-    itemnaires.each do |itemnaire|
-      round = AssignmentQuestionnaire.where(assignment_id: assignment_id, itemnaire_id: itemnaire.id).first.used_in_round
-      itemnaire_symbol = if round.nil?
-                               itemnaire.symbol
+  def retrieve_questions(questionnaires, assignment_id)
+    questions = {}
+    questionnaires.each do |questionnaire|
+      round = AssignmentQuestionnaire.where(assignment_id: assignment_id, questionnaire_id: questionnaire.id).first.used_in_round
+      questionnaire_symbol = if round.nil?
+                               questionnaire.symbol
                              else
-                               (itemnaire.symbol.to_s + round.to_s).to_sym
+                               (questionnaire.symbol.to_s + round.to_s).to_sym
                              end
-      items[itemnaire_symbol] = itemnaire.items
+      questions[questionnaire_symbol] = questionnaire.questions
     end
-    items
+    questions
   end
 end

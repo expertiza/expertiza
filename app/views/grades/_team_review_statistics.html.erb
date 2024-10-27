@@ -3,19 +3,19 @@
     <td colspan="10">
 <% if rscore and rscore[:assessments].length > 0 %>
     <%flag_varying_rubrics=false%>
-    <%if @items.include?("review1".to_sym)%>
+    <%if @questions.include?("review1".to_sym)%>
         <b> Round 1:</b>
         <%flag_varying_rubrics=true%>
         <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review1".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer", :round=>1 }%>
     <%end%>
 
-    <%if @items.include?("review2".to_sym)%>
+    <%if @questions.include?("review2".to_sym)%>
         <b> Round 2:</b>
         <%flag_varying_rubrics=true%>
         <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review2".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" , :round=>2 }%>
     <%end%>
 
-    <%if @items.include?("review3".to_sym)%>
+    <%if @questions.include?("review3".to_sym)%>
         <b> Round 3:</b>
         <%flag_varying_rubrics=true%>
         <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review3".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" , :round=>3 }%>

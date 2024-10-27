@@ -1,36 +1,36 @@
 <script type="text/javascript">
-    function addQuestionnaireTableRowInTopics(itemnaire_type, itemnaire, itemnaire_options, round_no, topic_no) {
-        var table_name = "#topic_itemnaire_table" + topic_no + ">tbody>tr";
-        var itemnaire_table = jQuery(table_name);
-        var row_id = 'topic_itemnaire_table_' + topic_no + "_" + itemnaire_type;
+    function addQuestionnaireTableRowInTopics(questionnaire_type, questionnaire, questionnaire_options, round_no, topic_no) {
+        var table_name = "#topic_questionnaire_table" + topic_no + ">tbody>tr";
+        var questionnaire_table = jQuery(table_name);
+        var row_id = 'topic_questionnaire_table_' + topic_no + "_" + questionnaire_type;
         var i;
         var html = '<tr id=' + row_id + '>';
         var t_id = "ti_id" + topic_no
 
-        html += '<input name="assignment_form[topic_itemnaire][][topic_id]" type="hidden" value="';
+        html += '<input name="assignment_form[topic_questionnaire][][topic_id]" type="hidden" value="';
         html += '<%= topic.id %>';
         html += '">';
         //Rubric name
         if (round_no == null) {
-            html += '<td><label for=t_id>' + itemnaire.display_type + ':</label></td>';
+            html += '<td><label for=t_id>' + questionnaire.display_type + ':</label></td>';
         } else {
-            html += '<td><label for=t_id>' + itemnaire.display_type + ' Round '+ round_no + ':</label></td>';
+            html += '<td><label for=t_id>' + questionnaire.display_type + ' Round '+ round_no + ':</label></td>';
         }
         //Rubric options
         html += '<td align="center">' +
-            '<select id=t_id name="assignment_form[topic_itemnaire][][itemnaire_id]" style="width:300px" class="form-control">' +
+            '<select id=t_id name="assignment_form[topic_questionnaire][][questionnaire_id]" style="width:300px" class="form-control">' +
             '<option value="">--Default rubric--</option>';
-        for (i = 0; i < itemnaire_options.length; i++) {
-            html += '<option value="' + itemnaire_options[i][1] + '">' + itemnaire_options[i][0] + '</option>';
+        for (i = 0; i < questionnaire_options.length; i++) {
+            html += '<option value="' + questionnaire_options[i][1] + '">' + questionnaire_options[i][0] + '</option>';
         }
         html += '</select></td>';
         if (round_no == null) {
-            html += '<td align="center"><input name="assignment_form[topic_itemnaire][][used_in_round]" style="width:30px" type="hidden" value=""' + '"> </td>';
+            html += '<td align="center"><input name="assignment_form[topic_questionnaire][][used_in_round]" style="width:30px" type="hidden" value=""' + '"> </td>';
         } else {
-            html += '<td align="center"><input name="assignment_form[topic_itemnaire][][used_in_round]" style="width:30px" type="hidden" value="' + round_no + '"> </td>';
+            html += '<td align="center"><input name="assignment_form[topic_questionnaire][][used_in_round]" style="width:30px" type="hidden" value="' + round_no + '"> </td>';
         }
-        itemnaire_table.last().after(html);
-        jQuery('#t_id').val(itemnaire.id).attr('id', '');
+        questionnaire_table.last().after(html);
+        jQuery('#t_id').val(questionnaire.id).attr('id', '');
     }
 </script>
 
@@ -47,30 +47,30 @@
   <% end %>
 
   <% if @assignment.vary_by_topic? && current_user_has_instructor_privileges? %>
-    <% table_id = "topic_itemnaire_table" + i.to_s %>
+    <% table_id = "topic_questionnaire_table" + i.to_s %>
     <td>
       <table id = <%=table_id %>>
         <tr>
           <script>
               <% if @assignment.varying_rubrics_by_round? %>
               <% 1.upto(@assignment.rounds_of_reviews) do |round| %>
-              <% assignment_itemnaire = @assignment_form.assignment_itemnaire('ReviewQuestionnaire', round, topic.id) %>
-              <% itemnaire = @assignment_form.itemnaire(assignment_itemnaire, 'ReviewQuestionnaire') %>
+              <% assignment_questionnaire = @assignment_form.assignment_questionnaire('ReviewQuestionnaire', round, topic.id) %>
+              <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire') %>
               addQuestionnaireTableRowInTopics(
                   'ReviewQuestionnaire',
-                  <%= itemnaire.to_json.html_safe %>,
-                  <%= itemnaire_options('ReviewQuestionnaire').to_json.html_safe %>,
+                  <%= questionnaire.to_json.html_safe %>,
+                  <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>,
                   <%= round %>,
                   <%= i %>
               );
               <% end %>
               <% else %>
-              <% assignment_itemnaire = @assignment_form.assignment_itemnaire('ReviewQuestionnaire', nil, topic.id) %>
-              <% itemnaire = @assignment_form.itemnaire(assignment_itemnaire, 'ReviewQuestionnaire') %>
+              <% assignment_questionnaire = @assignment_form.assignment_questionnaire('ReviewQuestionnaire', nil, topic.id) %>
+              <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire') %>
               addQuestionnaireTableRowInTopics(
                   'ReviewQuestionnaire',
-                  <%= itemnaire.to_json.html_safe %>,
-                  <%= itemnaire_options('ReviewQuestionnaire').to_json.html_safe %>,
+                  <%= questionnaire.to_json.html_safe %>,
+                  <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>,
                   null,
                   <%= i %>
               );

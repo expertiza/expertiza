@@ -1,8 +1,8 @@
 class Ta < User
   has_many :ta_mappings, dependent: :destroy
 
-  QUESTIONNAIRE = [['My itemnaires', 'list_mine'],
-                   ['All public itemnaires', 'list_all']].freeze
+  QUESTIONNAIRE = [['My questionnaires', 'list_mine'],
+                   ['All public questionnaires', 'list_all']].freeze
 
   ASSIGNMENT = [['My assignments', 'list_mine'],
                 ['All public assignments', 'list_all']].freeze
@@ -12,18 +12,18 @@ class Ta < User
     courses.map { |c| Course.find(c.course_id) }
   end
   
-  def is_instructor_or_co_ta?(itemnaire)
-    return false if itemnaire.nil?
+  def is_instructor_or_co_ta?(questionnaire)
+    return false if questionnaire.nil?
     
-    # Check if is TA for any of the courses of a given itemnaire's instructor
-    return true if Ta.get_my_instructors(id).include?(itemnaire.try(:instructor_id))
+    # Check if is TA for any of the courses of a given questionnaire's instructor
+    return true if Ta.get_my_instructors(id).include?(questionnaire.try(:instructor_id))
     
     ta = Ta.find(id)
-    itemnaire_ta = Ta.find(itemnaire.try(:instructor_id))
+    questionnaire_ta = Ta.find(questionnaire.try(:instructor_id))
     
-    # Check if the TA is a co-TA for any of the courses of a given itemnaire's instructor
+    # Check if the TA is a co-TA for any of the courses of a given questionnaire's instructor
     ta.courses_assisted_with.any? do |course|
-      course.tas&.include?(itemnaire_ta)
+      course.tas&.include?(questionnaire_ta)
     end
   end
   

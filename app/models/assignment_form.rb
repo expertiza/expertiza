@@ -2,7 +2,7 @@ require 'active_support/time_with_zone'
 
 class AssignmentForm
   attr_accessor :assignment,
-                :assignment_itemnaires,
+                :assignment_questionnaires,
                 :due_dates,
                 :tag_prompt_deployments,
                 :is_conference_assignment,
@@ -20,7 +20,7 @@ class AssignmentForm
       @assignment.max_team_size = DEFAULT_MAX_TEAM_SIZE
     end
     @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
-    @assignment_itemnaires = Array(args[:assignment_itemnaires])
+    @assignment_questionnaires = Array(args[:assignment_questionnaires])
     @due_dates = Array(args[:due_dates])
   end
 
@@ -28,7 +28,7 @@ class AssignmentForm
   def self.create_form_object(assignment_id)
     assignment_form = AssignmentForm.new
     assignment_form.assignment = Assignment.find(assignment_id)
-    assignment_form.assignment_itemnaires = AssignmentQuestionnaire.where(assignment_id: assignment_id)
+    assignment_form.assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment_id)
     assignment_form.due_dates = AssignmentDueDate.where(parent_id: assignment_id)
     assignment_form.set_up_assignment_review
     assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: assignment_id)
@@ -37,15 +37,15 @@ class AssignmentForm
 
   def rubric_weight_error(attributes)
     error = false
-    attributes[:assignment_itemnaire].each do |assignment_itemnaire|
+    attributes[:assignment_questionnaire].each do |assignment_questionnaire|
       # Check rubrics to make sure weight is 0 if there are no Scored Questions
-      scored_itemnaire = false
-      itemnaire = Questionnaire.find(assignment_itemnaire[:itemnaire_id])
-      items = Question.where(itemnaire_id: itemnaire.id)
-      items.each do |item|
-        scored_itemnaire = true if item.is_a? ScoredQuestion
+      scored_questionnaire = false
+      questionnaire = Questionnaire.find(assignment_questionnaire[:questionnaire_id])
+      questions = Question.where(questionnaire_id: questionnaire.id)
+      questions.each do |question|
+        scored_questionnaire = true if question.is_a? ScoredQuestion
       end
-      unless scored_itemnaire || assignment_itemnaire[:itemnaire_weight].to_i.zero?
+      unless scored_questionnaire || assignment_questionnaire[:questionnaire_weight].to_i.zero?
         error = true
       end
     end
@@ -61,8 +61,8 @@ class AssignmentForm
       attributes[:assignment][:late_policy_id] = nil
     end
     update_assignment(attributes[:assignment])
-    update_assignment_itemnaires(attributes[:assignment_itemnaire]) unless @has_errors
-    update_assignment_itemnaires(attributes[:topic_itemnaire]) unless @has_errors || attributes[:assignment][:vary_by_topic?] == 'false'
+    update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
+    update_assignment_questionnaires(attributes[:topic_questionnaire]) unless @has_errors || attributes[:assignment][:vary_by_topic?] == 'false'
     update_due_dates(attributes[:due_date], user) unless @has_errors
     update_assigned_badges(attributes[:badge], attributes[:assignment]) unless @has_errors
     add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck])
@@ -87,24 +87,24 @@ class AssignmentForm
     @assignment.num_reviews = @assignment.num_reviews_allowed
   end
 
-  # code to save assignment itemnaires updated in the Rubrics and Topics tabs
-  def update_assignment_itemnaires(attributes)
+  # code to save assignment questionnaires updated in the Rubrics and Topics tabs
+  def update_assignment_questionnaires(attributes)
     return if attributes.nil? || attributes.empty?
 
-    if attributes[0].key?(:itemnaire_weight)
-      validate_assignment_itemnaires_weights(attributes)
+    if attributes[0].key?(:questionnaire_weight)
+      validate_assignment_questionnaires_weights(attributes)
       @errors = @assignment.errors.to_s
       topic_id = nil
     end
     unless @has_errors
       # Update AQ if found, otherwise create new entry
       attributes.each do |attr|
-        next if attr[:itemnaire_id].blank?
+        next if attr[:questionnaire_id].blank?
 
-        itemnaire_type = Questionnaire.find(attr[:itemnaire_id]).type
+        questionnaire_type = Questionnaire.find(attr[:questionnaire_id]).type
         topic_id = attr[:topic_id] if attr.key?(:topic_id)
         duty_id = attr[:duty_id] if attr.key?(:duty_id) # if duty_id is present in the attributes, save it.
-        aq = assignment_itemnaire(itemnaire_type, attr[:used_in_round], topic_id, duty_id)
+        aq = assignment_questionnaire(questionnaire_type, attr[:used_in_round], topic_id, duty_id)
         if aq.id.nil?
           unless aq.save
             @errors = @assignment.errors.to_s
@@ -121,10 +121,10 @@ class AssignmentForm
   end
 
   # checks to see if the sum of weights of all rubrics add up to either 0 or 100%
-  def validate_assignment_itemnaires_weights(attributes)
+  def validate_assignment_questionnaires_weights(attributes)
     total_weight = 0
-    attributes.each do |assignment_itemnaire|
-      total_weight += assignment_itemnaire[:itemnaire_weight].to_i
+    attributes.each do |assignment_questionnaire|
+      total_weight += assignment_questionnaire[:questionnaire_weight].to_i
     end
     unless total_weight.zero? || total_weight == 100
       @assignment.errors.add(:message, 'Total weight of rubrics should add up to either 0 or 100%')
@@ -137,11 +137,11 @@ class AssignmentForm
     unless attributes.nil?
       attributes.each do |key, value|
         if @assignment.vary_by_topic?
-          @assignment.itemnaires.uniq.each do |itemnaire|
+          @assignment.questionnaires.uniq.each do |questionnaire|
             # We need to use destroy_all to delete all the dependents also.
-            TagPromptDeployment.where(assignment_id: @assignment.id,itemnaire_id: itemnaire.id).destroy_all if value.key?('deleted')
-            next unless itemnaire.type == 'ReviewQuestionnaire' && value.key?('tag_prompt')
-            create_or_update_tag_prompt_deployments(itemnaire.id,value)
+            TagPromptDeployment.where(assignment_id: @assignment.id,questionnaire_id: questionnaire.id).destroy_all if value.key?('deleted')
+            next unless questionnaire.type == 'ReviewQuestionnaire' && value.key?('tag_prompt')
+            create_or_update_tag_prompt_deployments(questionnaire.id,value)
           end
         else
           # We need to use destroy_all to delete all the dependents also.
@@ -153,14 +153,14 @@ class AssignmentForm
     end
   end
   
-  def create_or_update_tag_prompt_deployments(itemnaire_id, value)
+  def create_or_update_tag_prompt_deployments(questionnaire_id, value)
     (0..value['tag_prompt'].count - 1).each do |i|
       tag_dep = nil
       tag_params = {
             assignment_id: @assignment.id,
-            itemnaire_id: itemnaire_id,
+            questionnaire_id: questionnaire_id,
             tag_prompt_id: value['tag_prompt'][i],
-            item_type: value['item_type'][i],
+            question_type: value['question_type'][i],
             answer_length_threshold: value['answer_length_threshold'][i]
         }
       if !((value['id'][i] == 'undefined') || (value['id'][i] == 'null') || value['id'][i].nil?)
@@ -237,47 +237,47 @@ class AssignmentForm
   end
 
   # Find an AQ based on the given values
-  def assignment_itemnaire(itemnaire_type, round_number, topic_id, duty_id = nil)
+  def assignment_questionnaire(questionnaire_type, round_number, topic_id, duty_id = nil)
     round_number = nil if round_number.blank?
     topic_id = nil if topic_id.blank?
 
     # Default value of duty_id is nil, and when duty_id is not nil, then it means that the function call
-    # is made to access assignment_itemnaire of that particular duty. If itemnaires varies by duty,
-    # then find the relevant itemnaire and return.
-    if duty_id && @assignment.itemnaire_varies_by_duty
+    # is made to access assignment_questionnaire of that particular duty. If questionnaires varies by duty,
+    # then find the relevant questionnaire and return.
+    if duty_id && @assignment.questionnaire_varies_by_duty
       # Get all AQs for the assignment and specified duty_id
-      assignment_itemnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, duty_id: duty_id)
-      assignment_itemnaires.each do |aq|
-        # If the AQ itemnaire matches the type of the itemnaire that needs to be updated, return it
-        return aq if aq.itemnaire_id && Questionnaire.find(aq.itemnaire_id).type == itemnaire_type
+      assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, duty_id: duty_id)
+      assignment_questionnaires.each do |aq|
+        # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
+        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
       end
     elsif @assignment.varying_rubrics_by_round? && @assignment.vary_by_topic?
       # Get all AQs for the assignment and specified round number and topic
-      assignment_itemnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number, topic_id: topic_id)
-      assignment_itemnaires.each do |aq|
-        # If the AQ itemnaire matches the type of the itemnaire that needs to be updated, return it
-        return aq if aq.itemnaire_id && Questionnaire.find(aq.itemnaire_id).type == itemnaire_type
+      assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number, topic_id: topic_id)
+      assignment_questionnaires.each do |aq|
+        # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
+        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
       end
     elsif @assignment.varying_rubrics_by_round?
       # Get all AQs for the assignment and specified round number by round #
-      assignment_itemnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number)
-      assignment_itemnaires.each do |aq|
-        # If the AQ itemnaire matches the type of the itemnaire that needs to be updated, return it
-        return aq if aq.itemnaire_id && Questionnaire.find(aq.itemnaire_id).type == itemnaire_type
+      assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number)
+      assignment_questionnaires.each do |aq|
+        # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
+        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
       end
     elsif @assignment.vary_by_topic?
       # Get all AQs for the assignment and specified round number by topic
-      assignment_itemnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, topic_id: topic_id)
-      assignment_itemnaires.each do |aq|
-        # If the AQ itemnaire matches the type of the itemnaire that needs to be updated, return it
-        return aq if aq.itemnaire_id && Questionnaire.find(aq.itemnaire_id).type == itemnaire_type
+      assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, topic_id: topic_id)
+      assignment_questionnaires.each do |aq|
+        # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
+        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
       end
     else
       # Get all AQs for the assignment
-      assignment_itemnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
-      assignment_itemnaires.each do |aq|
-        # If the AQ itemnaire matches the type of the itemnaire that needs to be updated, return it
-        return aq if aq.itemnaire_id && Questionnaire.find(aq.itemnaire_id).type == itemnaire_type
+      assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
+      assignment_questionnaires.each do |aq|
+        # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
+        return aq if aq.questionnaire_id && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
       end
     end
 
@@ -288,7 +288,7 @@ class AssignmentForm
     default_weight['AuthorFeedbackQuestionnaire'] = 0
     default_weight['TeammateReviewQuestionnaire'] = 0
     default_weight['BookmarkRatingQuestionnaire'] = 0
-    default_aq = AssignmentQuestionnaire.where(user_id: @assignment.instructor_id, assignment_id: nil, itemnaire_id: nil).first
+    default_aq = AssignmentQuestionnaire.where(user_id: @assignment.instructor_id, assignment_id: nil, questionnaire_id: nil).first
     default_limit = if default_aq.blank?
                       15
                     else
@@ -296,20 +296,20 @@ class AssignmentForm
                     end
 
     aq = AssignmentQuestionnaire.new
-    aq.itemnaire_weight = default_weight[itemnaire_type]
+    aq.questionnaire_weight = default_weight[questionnaire_type]
     aq.notification_limit = default_limit
     aq.assignment = @assignment
     aq
   end
 
-  # Find a itemnaire for the given AQ and itemnaire type
-  def itemnaire(assignment_itemnaire, itemnaire_type)
-    return Object.const_get(itemnaire_type).new if assignment_itemnaire.nil?
+  # Find a questionnaire for the given AQ and questionnaire type
+  def questionnaire(assignment_questionnaire, questionnaire_type)
+    return Object.const_get(questionnaire_type).new if assignment_questionnaire.nil?
 
-    itemnaire = Questionnaire.find_by(id: assignment_itemnaire.itemnaire_id)
-    return itemnaire unless itemnaire.nil?
+    questionnaire = Questionnaire.find_by(id: assignment_questionnaire.questionnaire_id)
+    return questionnaire unless questionnaire.nil?
 
-    Object.const_get(itemnaire_type).new
+    Object.const_get(questionnaire_type).new
   end
 
   def get_time_diff_btw_due_date_and_now(due_date)
@@ -395,7 +395,7 @@ class AssignmentForm
   def require_quiz
     if @assignment.require_quiz.nil?
       @assignment.require_quiz = false
-      @assignment.num_quiz_items = 0
+      @assignment.num_quiz_questions = 0
     end
   end
 
@@ -438,7 +438,7 @@ class AssignmentForm
     new_assign.copy_flag = true
     if new_assign.save
       Assignment.record_timestamps = true
-      copy_assignment_itemnaire(old_assign, new_assign, user)
+      copy_assignment_questionnaire(old_assign, new_assign, user)
       AssignmentDueDate.copy(old_assign.id, new_assign.id)
       new_assign.create_node
       new_assign_id = new_assign.id
@@ -453,14 +453,14 @@ class AssignmentForm
     new_assign_id
   end
 
-  def self.copy_assignment_itemnaire(old_assign, new_assign, user)
-    old_assign.assignment_itemnaires.each do |aq|
+  def self.copy_assignment_questionnaire(old_assign, new_assign, user)
+    old_assign.assignment_questionnaires.each do |aq|
       AssignmentQuestionnaire.create(
         assignment_id: new_assign.id,
-        itemnaire_id: aq.itemnaire_id,
+        questionnaire_id: aq.questionnaire_id,
         user_id: user.id,
         notification_limit: aq.notification_limit,
-        itemnaire_weight: aq.itemnaire_weight,
+        questionnaire_weight: aq.questionnaire_weight,
         used_in_round: aq.used_in_round,
         dropdown: aq.dropdown,
         topic_id: aq.topic_id

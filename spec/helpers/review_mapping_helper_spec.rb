@@ -1002,13 +1002,13 @@ describe ReviewMappingHelper, type: :helper do
   describe 'test list_review_submissions' do
     before(:each) do
       @assignment1 = create(:assignment, name: 'name1')
-      @itemnaire = create(:itemnaire)
-      @item = create(:item, itemnaire_id: @itemnaire.id)
+      @questionnaire = create(:questionnaire)
+      @question = create(:question, questionnaire_id: @questionnaire.id)
       @user = create(:student, name: 'name', fullname: 'name')
       @participant = create(:participant, user_id: @user.id, parent_id: @assignment1.id)
       @response_map = create(:review_response_map, reviewer: @participant, assignment: @assignment1)
       @response = create(:response, response_map: @response_map, created_at: '2019-11-01 23:30:00')
-      @answer = create(:answer, response_id: @response.id, item_id: @item.id, comments: 'comment')
+      @answer = create(:answer, response_id: @response.id, question_id: @question.id, comments: 'comment')
       @team = create(:assignment_team)
     end
     it 'should return an empty string when the file does not exist' do
@@ -1020,13 +1020,13 @@ describe ReviewMappingHelper, type: :helper do
   describe 'test list_review_submissions' do
     before(:each) do
       @assignment1 = create(:assignment, name: 'name1')
-      @itemnaire = create(:itemnaire)
-      @item = create(:item, itemnaire_id: @itemnaire.id)
+      @questionnaire = create(:questionnaire)
+      @question = create(:question, questionnaire_id: @questionnaire.id)
       @user = create(:student, name: 'name', fullname: 'name')
       @participant = create(:participant, user_id: @user.id, parent_id: @assignment1.id)
       @response_map = create(:review_response_map, reviewer: @participant, assignment: @assignment1)
       @response = create(:response, response_map: @response_map, created_at: '2019-11-01 23:30:00')
-      @answer = create(:answer, response_id: @response.id, item_id: @item.id, comments: 'comment')
+      @answer = create(:answer, response_id: @response.id, question_id: @question.id, comments: 'comment')
       @team = create(:assignment_team)
       allow(AssignmentTeam).to receive(:find).with(@team.id).and_return(team)
       allow(team).to receive(:submitted_files).with(any_args).and_return(['./.rspec'])
@@ -1040,15 +1040,15 @@ describe ReviewMappingHelper, type: :helper do
   describe 'test list_hyperlink_submission' do
     before(:each) do
       @assignment1 = create(:assignment, name: 'name1')
-      @itemnaire = create(:itemnaire)
-      @item = create(:item, itemnaire_id: @itemnaire.id)
+      @questionnaire = create(:questionnaire)
+      @question = create(:question, questionnaire_id: @questionnaire.id)
       @user = create(:student, name: 'name', fullname: 'name')
       @participant = create(:participant, user_id: @user.id, parent_id: @assignment1.id)
       @response_map = create(:review_response_map, reviewer: @participant, assignment: @assignment1)
       @id = @assignment1.id
     end
     it 'should return an empty string when comment does not exist' do
-      result = helper.list_hyperlink_submission(@response_map.id, @item.id)
+      result = helper.list_hyperlink_submission(@response_map.id, @question.id)
       expect(result).to eq('')
     end
   end
@@ -1056,8 +1056,8 @@ describe ReviewMappingHelper, type: :helper do
   describe 'test list_hyperlink_submission' do
     before(:each) do
       @assignment1 = create(:assignment, name: 'name1')
-      @itemnaire = create(:itemnaire)
-      @item = create(:item, itemnaire_id: @itemnaire.id)
+      @questionnaire = create(:questionnaire)
+      @question = create(:question, questionnaire_id: @questionnaire.id)
       @user = create(:student, name: 'name', fullname: 'name')
       @participant = create(:participant, user_id: @user.id, parent_id: @assignment1.id)
       @response_map = create(:review_response_map, reviewer: @participant, assignment: @assignment1)
@@ -1066,7 +1066,7 @@ describe ReviewMappingHelper, type: :helper do
       allow(Answer).to receive(:where).with(any_args).and_return([test_item])
     end
     it 'should return correct html a tag' do
-      result = helper.list_hyperlink_submission(@response_map.id, @item.id)
+      result = helper.list_hyperlink_submission(@response_map.id, @question.id)
       expect(result).to start_with('<a target="_blank"')
     end
   end

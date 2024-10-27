@@ -1,8 +1,8 @@
 describe QuestionnaireTypeNode do
-  let(:itemnaire_type_node) { build(:itemnaire_type_node) }
-  let(:itemnaire) { build(:itemnaire) }
-  let(:itemnaire2) { build(:itemnaire) }
-  let(:itemnaire3) { build(:itemnaire) }
+  let(:questionnaire_type_node) { build(:questionnaire_type_node) }
+  let(:questionnaire) { build(:questionnaire) }
+  let(:questionnaire2) { build(:questionnaire) }
+  let(:questionnaire3) { build(:questionnaire) }
   it { should belong_to(:table) }
   it { should belong_to(:node_object) }
   describe '#table' do
@@ -20,8 +20,8 @@ describe QuestionnaireTypeNode do
     end
   end
   describe '#get_partial_name' do
-    it 'returns itemnaire_type_actions' do
-      expect(itemnaire_type_node.get_partial_name).to eq('itemnaire_type_actions')
+    it 'returns questionnaire_type_actions' do
+      expect(questionnaire_type_node.get_partial_name).to eq('questionnaire_type_actions')
     end
   end
   describe '#get_name' do
@@ -29,14 +29,14 @@ describe QuestionnaireTypeNode do
       tree_folder = double('TreeFolder', id: 1)
       allow(TreeFolder).to receive(:find).with(1).and_return(tree_folder)
       allow(tree_folder).to receive(:name).and_return('No folder')
-      expect(itemnaire_type_node.get_name).to eq('No folder')
+      expect(questionnaire_type_node.get_name).to eq('No folder')
     end
   end
   describe '#get_children' do
     it 'returns the children objects' do
-      arr = [itemnaire, itemnaire2, itemnaire3]
+      arr = [questionnaire, questionnaire2, questionnaire3]
       allow(QuestionnaireNode).to receive(:get).and_return(arr)
-      expect(itemnaire_type_node.get_children.first).to be(itemnaire)
+      expect(questionnaire_type_node.get_children.first).to be(questionnaire)
     end
   end
 end

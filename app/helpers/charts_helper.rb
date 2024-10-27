@@ -41,7 +41,7 @@ module ChartsHelper
   def self.get_bar_chart_url(labels, values, max)
     return  '' if labels.length != values.length
 
-    address = 'http://chart.apis.google.com/chart?cht=bhs&chxt=x,y&chf=bg,s,dddddd&chtt=Average+response+score+by+item&chs=600x' + (labels.length * 25 + 60).to_s
+    address = 'http://chart.apis.google.com/chart?cht=bhs&chxt=x,y&chf=bg,s,dddddd&chtt=Average+response+score+by+question&chs=600x' + (labels.length * 25 + 60).to_s
 
     value_string = '&chd=t:'
     label_string = '&chxl=0:|'

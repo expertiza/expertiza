@@ -26,7 +26,7 @@ class ResponsesController < ApplicationController
   # If so, edit that version otherwise create a new version.
 
   # Prepare the parameters when student clicks "Edit"
-  # response items with answers and scores are rendered in the edit page based on the version number
+  # response questions with answers and scores are rendered in the edit page based on the version number
   def edit
     assign_action_parameters
 
@@ -40,10 +40,10 @@ class ResponsesController < ApplicationController
     # set more handy variables for the view
     set_content
     @review_scores = []
-    @review_items.each do |item|
-      @review_scores << Answer.where(response_id: @response.response_id, item_id: item.id).first
+    @review_questions.each do |question|
+      @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
-    @itemnaire = itemnaire_from_response
+    @questionnaire = questionnaire_from_response
     render action: 'response'
   end
 
@@ -60,11 +60,11 @@ class ResponsesController < ApplicationController
       end
 
       @response.update_attribute('additional_comment', params[:review][:comments])
-      @itemnaire = itemnaire_from_response
-      items = sort_items(@itemnaire.items)
+      @questionnaire = questionnaire_from_response
+      questions = sort_questions(@questionnaire.questions)
 
-      # for some rubrics, there might be no items but only file submission (Dr. Ayala's rubric)
-      create_answers(params, items) unless params[:responses].nil?
+      # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+      create_answers(params, questions) unless params[:responses].nil?
       if params['isSubmit'] && params['isSubmit'] == 'Yes'
         @response.update_attribute('is_submitted', true)
       end
@@ -89,13 +89,13 @@ class ResponsesController < ApplicationController
     end
     # Because of the autosave feature and the javascript that sync if two reviewing windows are opened
     # The response must be created when the review begin.
-    # So do the answers, otherwise the response object can't find the itemnaire when the user hasn't saved his new review and closed the window.
+    # So do the answers, otherwise the response object can't find the questionnaire when the user hasn't saved his new review and closed the window.
     # A new response has to be created when there hasn't been any reviews done for the current round,
     # or when there has been a submission after the most recent review in this round.
     @response = @response.create_or_get_response(@map, @current_round.to_i)
-    items = sort_items(@itemnaire.items)
+    questions = sort_questions(@questionnaire.questions)
     store_total_cake_score
-    init_answers(items)
+    init_answers(questions)
     render action: 'response'
   end
 
@@ -105,8 +105,8 @@ class ResponsesController < ApplicationController
       map_id = params[:map_id]
     end # pass map_id as a hidden field in the review form
     @map = ResponseMap.find(map_id)
-    if params[:review][:itemnaire_id]
-      @itemnaire = Questionnaire.find(params[:review][:itemnaire_id])
+    if params[:review][:questionnaire_id]
+      @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
       @round = params[:review][:round]
     else
       @round = nil
@@ -125,9 +125,9 @@ class ResponsesController < ApplicationController
     @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted)
 
     # :version_num=>@version)
-    # Change the order for displaying items for editing response views.
-    items = sort_items(@itemnaire.items)
-    create_answers(params, items) if params[:responses]
+    # Change the order for displaying questions for editing response views.
+    questions = sort_questions(@questionnaire.questions)
+    create_answers(params, questions) if params[:responses]
     msg = 'Your response was successfully saved.'
     error_msg = ''
 
@@ -273,12 +273,12 @@ class ResponsesController < ApplicationController
 
   # This method set the appropriate values to the instance variables used in the 'show_calibration_results_for_student' page
   # Responses are fetched using calibration_response_map_id and review_response_map_id params passed in the URL
-  # Questions are fetched by querying AssignmentQuestionnaire table to get the valid items
+  # Questions are fetched by querying AssignmentQuestionnaire table to get the valid questions
   def show_calibration_results_for_student
     @assignment = Assignment.find(params[:assignment_id])
     @calibration_response = ReviewResponseMap.find(params[:calibration_response_map_id]).response[0]
     @review_response = ReviewResponseMap.find(params[:review_response_map_id]).response[0]
-    @review_items = AssignmentQuestionnaire.get_items_by_assignment_id(params[:assignment_id])
+    @review_questions = AssignmentQuestionnaire.get_questions_by_assignment_id(params[:assignment_id])
   end
 
   def toggle_permission
@@ -340,14 +340,14 @@ class ResponsesController < ApplicationController
   end
 
   # This method is called within set_content and when the new_response flag is set to true
-  # Depending on what type of response map corresponds to this response, the method gets the reference to the proper itemnaire
+  # Depending on what type of response map corresponds to this response, the method gets the reference to the proper questionnaire
   # This is called after assign_instance_vars in the new method
-  def itemnaire_from_response_map
+  def questionnaire_from_response_map
     case @map.type
     when 'ReviewResponseMap', 'SelfReviewResponseMap'
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.number_of_current_round(reviewees_topic)
-      @itemnaire = @map.itemnaire(@current_round, reviewees_topic)
+      @questionnaire = @map.questionnaire(@current_round, reviewees_topic)
     when
       'MetareviewResponseMap',
       'TeammateReviewResponseMap',
@@ -357,49 +357,49 @@ class ResponsesController < ApplicationController
       'GlobalSurveyResponseMap',
       'BookmarkRatingResponseMap'
       if @assignment.duty_based_assignment?
-        # E2147 : gets itemnaire of a particular duty in that assignment rather than generic itemnaire
-        @itemnaire = @map.itemnaire_by_duty(@map.reviewee.duty_id)
+        # E2147 : gets questionnaire of a particular duty in that assignment rather than generic questionnaire
+        @questionnaire = @map.questionnaire_by_duty(@map.reviewee.duty_id)
       else
-        @itemnaire = @map.itemnaire
+        @questionnaire = @map.questionnaire
       end
     end
   end
 
   # This method is called within set_content when the new_response flag is set to False
-  # This method gets the itemnaire directly from the response object since it is available.
-  def itemnaire_from_response
+  # This method gets the questionnaire directly from the response object since it is available.
+  def questionnaire_from_response
     # if user is not filling a new rubric, the @response object should be available.
-    # we can find the itemnaire from the item_id in answers
+    # we can find the questionnaire from the question_id in answers
     answer = @response.scores.first
-    @itemnaire = @response.itemnaire_by_answer(answer)
+    @questionnaire = @response.questionnaire_by_answer(answer)
   end
 
-  # checks if the itemnaire is nil and opens drop down or rating accordingly
+  # checks if the questionnaire is nil and opens drop down or rating accordingly
   def set_dropdown_or_scale
     use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.try(:id),
-                                                 itemnaire_id: @itemnaire.try(:id))
+                                                 questionnaire_id: @questionnaire.try(:id))
                                           .first.try(:dropdown)
     @dropdown_or_scale = (use_dropdown ? 'dropdown' : 'scale')
   end
 
-  # For each item in the list, starting with the first one, you update the comment and score
-  def create_answers(params, items)
+  # For each question in the list, starting with the first one, you update the comment and score
+  def create_answers(params, questions)
     params[:responses].each_pair do |k, v|
-      score = Answer.where(response_id: @response.id, item_id: items[k.to_i].id).first
-      score ||= Answer.create(response_id: @response.id, item_id: items[k.to_i].id, answer: v[:score], comments: v[:comment])
+      score = Answer.where(response_id: @response.id, question_id: questions[k.to_i].id).first
+      score ||= Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])
       score.update_attribute('answer', v[:score])
       score.update_attribute('comments', v[:comment])
     end
   end
 
-  # This method initialize answers for the items in the response
-  # Iterates over each items and create corresponding answer for that
-  def init_answers(items)
-    items.each do |q|
+  # This method initialize answers for the questions in the response
+  # Iterates over each questions and create corresponding answer for that
+  def init_answers(questions)
+    questions.each do |q|
       # it's unlikely that these answers exist, but in case the user refresh the browser some might have been inserted.
-      answer = Answer.where(response_id: @response.id, item_id: q.id).first
+      answer = Answer.where(response_id: @response.id, question_id: q.id).first
       if answer.nil?
-        Answer.create(response_id: @response.id, item_id: q.id, answer: nil, comments: '')
+        Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '')
       end
     end
   end

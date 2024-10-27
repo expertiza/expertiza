@@ -29,7 +29,7 @@
 		<% for review in reviews %>
 		   <td align="center">
              <% symbol = "review" + review.round.to_s %>
-             <% score = Response.score(:response => [review], :items => @items[symbol.to_sym]) %>
+             <% score = Response.score(:response => [review], :questions => @questions[symbol.to_sym]) %>
              <% unless controller.action_name == "view_my_scores" %>
                <input type="hidden" class="form-control" id="mailer_<%= review.map.reviewer.fullname(session[:ip]) %>_grade" name="mailer[<%= review.map.reviewer.fullname(session[:ip]) %>_grade]" value="<%= score %>">
              <% end %>

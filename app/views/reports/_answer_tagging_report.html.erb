@@ -12,7 +12,7 @@
   } );
 </script>
 
-<% if @itemnaire_tagging_report.nil? or @itemnaire_tagging_report.count < 1 %>
+<% if @questionnaire_tagging_report.nil? or @questionnaire_tagging_report.count < 1 %>
       <h1 align="center">No answer tags are found for this assignment</h1>
 <% else %>
     <div class="text-center">
@@ -21,15 +21,15 @@
 
     <div class= "chart-table" id="tabs">
       <ul>
-      <% @itemnaire_tagging_report.each do |tag_dep, report_lines| %>
-        <li><a href="#tab-<%= tag_dep.id %>" id="tabmenu_<%= tag_dep.id %>"><%= tag_dep.itemnaire.name + " (" + tag_dep.tag_prompt.prompt + ")" %></a></li>
+      <% @questionnaire_tagging_report.each do |tag_dep, report_lines| %>
+        <li><a href="#tab-<%= tag_dep.id %>" id="tabmenu_<%= tag_dep.id %>"><%= tag_dep.questionnaire.name + " (" + tag_dep.tag_prompt.prompt + ")" %></a></li>
       <% end %>
         <li><a href="#tab-summary" id="tabmenu_summary">Report tags done by each user</a></li>
       </ul>
-      <% @itemnaire_tagging_report.each do |tag_dep, report_lines| %>
+      <% @questionnaire_tagging_report.each do |tag_dep, report_lines| %>
         <p>
         <div id="tab-<%= tag_dep.id %>">
-          <h4  align="center">Tagging Report for itemnaire "<%= tag_dep.itemnaire.name %>" and Tag "<%= tag_dep.tag_prompt.prompt %>"</h4>
+          <h4  align="center">Tagging Report for questionnaire "<%= tag_dep.questionnaire.name %>" and Tag "<%= tag_dep.tag_prompt.prompt %>"</h4>
           <table class="table table-striped sortable">
             <thead>
             <tr>
@@ -40,7 +40,7 @@
               <th class="sorter-true"># answers not tagged</th>
               <th class="sorter-true"># intervals</th>
               <th class="sorter-true">Key Graph Info</th>
-              <th class="sorter-true"># taggable answers<img src='/assets/info.png' title='As set up in the assignment setting, the authors can only tag answers of <%= tag_dep.item_type %> item type that are more than <%= tag_dep.answer_length_threshold %> character(s).'/></th>
+              <th class="sorter-true"># taggable answers<img src='/assets/info.png' title='As set up in the assignment setting, the authors can only tag answers of <%= tag_dep.question_type %> question type that are more than <%= tag_dep.answer_length_threshold %> character(s).'/></th>
             </tr>
             </thead>
             <% report_lines.each do |report_line| %>
@@ -87,7 +87,7 @@
             <th class="sorter-true">Percentage of tags done</th>
             <th class="sorter-true"># tags done</th>
             <th class="sorter-true"># tags not done</th>
-            <th class="sorter-true"># possible tags to do<img src='/assets/info.png' title='Number of answers that fulfil the prerequisite setup for each tags (Answer of certain item types and has a length of greater than the threshold).'/></th>
+            <th class="sorter-true"># possible tags to do<img src='/assets/info.png' title='Number of answers that fulfil the prerequisite setup for each tags (Answer of certain question types and has a length of greater than the threshold).'/></th>
             <th>Tags export</th>
           </tr>
           </thead>

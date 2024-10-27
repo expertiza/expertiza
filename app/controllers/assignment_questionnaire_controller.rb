@@ -26,47 +26,47 @@ class AssignmentQuestionnaireController < ApplicationController
       return
     end
 
-    @assignment_itemnaires = AssignmentQuestionnaire.where(assignment_id: params[:assignment_id])
-    @assignment_itemnaires.each(&:delete)
+    @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:assignment_id])
+    @assignment_questionnaires.each(&:delete)
 
     respond_to do |format|
-      format.json { render json: @assignment_itemnaires }
+      format.json { render json: @assignment_questionnaires }
     end
   end
 
   def create
-    if assignment_itemnaire_params[:assignment_id].nil?
+    if assignment_questionnaire_params[:assignment_id].nil?
       flash[:error] = "Missing assignment"
       return
-    elsif assignment_itemnaire_params[:itemnaire_id].nil?
-      flash[:error] = "Missing itemnaire"
+    elsif assignment_questionnaire_params[:questionnaire_id].nil?
+      flash[:error] = "Missing questionnaire"
       return
     end
 
-    assignment = Assignment.find(assignment_itemnaire_params[:assignment_id])
+    assignment = Assignment.find(assignment_questionnaire_params[:assignment_id])
     if assignment.nil?
       flash[:error] = 'Assignment #' + params[:assignment_id].to_s + ' does not currently exist.'
       return
     end
 
-    itemnaire = Questionnaire.find(assignment_itemnaire_params[:itemnaire_id])
-    if itemnaire.nil?
-      flash[:error] = 'Questionnaire #' + params[:itemnaire_id].to_s + ' does not currently exist.'
+    questionnaire = Questionnaire.find(assignment_questionnaire_params[:questionnaire_id])
+    if questionnaire.nil?
+      flash[:error] = 'Questionnaire #' + params[:questionnaire_id].to_s + ' does not currently exist.'
       return
     end
-    @assignment_itemnaire = AssignmentQuestionnaire.new(assignment_itemnaire_params)
-    @assignment_itemnaire.save
+    @assignment_questionnaire = AssignmentQuestionnaire.new(assignment_questionnaire_params)
+    @assignment_questionnaire.save
 
     respond_to do |format|
-      format.json { render json: @assignment_itemnaire }
+      format.json { render json: @assignment_questionnaire }
     end
   end
 
   private
 
-  def assignment_itemnaire_params
-    params.permit(:assignment_id, :itemnaire_id,
-                  :user_id, :notification_limit, :itemnaire_weight,
+  def assignment_questionnaire_params
+    params.permit(:assignment_id, :questionnaire_id,
+                  :user_id, :notification_limit, :questionnaire_weight,
                   :used_in_round, :dropdown, :topic_id, :duty_id)
   end
 end

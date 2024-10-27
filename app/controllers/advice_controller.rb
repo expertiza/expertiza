@@ -13,45 +13,45 @@ class AdviceController < ApplicationController
     current_user_has_ta_privileges?
   end
 
-  # checks whether the advices for a item in itemnaire have valid attributes
+  # checks whether the advices for a question in questionnaire have valid attributes
   # return true if the number of advices and their scores are invalid, else returns false
-  def invalid_advice?(sorted_advice, num_advices, item)
-    return ((item.item_advices.length != num_advices) ||
+  def invalid_advice?(sorted_advice, num_advices, question)
+    return ((question.question_advices.length != num_advices) ||
     sorted_advice.empty? ||
-    (sorted_advice[0].score != @itemnaire.max_item_score) ||
-    (sorted_advice[sorted_advice.length - 1].score != @itemnaire.min_item_score))
+    (sorted_advice[0].score != @questionnaire.max_question_score) ||
+    (sorted_advice[sorted_advice.length - 1].score != @questionnaire.min_question_score))
   end
 
-  # Modify the advice associated with a itemnaire
+  # Modify the advice associated with a questionnaire
   def edit_advice
-    # Stores the itemnaire with given id in URL
-    @itemnaire = Questionnaire.find(params[:id])
+    # Stores the questionnaire with given id in URL
+    @questionnaire = Questionnaire.find(params[:id])
 
-    # For each item in a quentionnaire, this method adjusts the advice size if the advice size is <,> number of advices or
-    # the max or min score of the advices does not correspond to the max or min score of itemnaire respectively.
-    @itemnaire.items.each do |item|
-      # if the item is a scored item, store the number of advices corresponding to that item (max_score - min_score), else 0
-      num_advices = if item.is_a?(ScoredQuestion)
-                      @itemnaire.max_item_score - @itemnaire.min_item_score + 1
+    # For each question in a quentionnaire, this method adjusts the advice size if the advice size is <,> number of advices or
+    # the max or min score of the advices does not correspond to the max or min score of questionnaire respectively.
+    @questionnaire.questions.each do |question|
+      # if the question is a scored question, store the number of advices corresponding to that question (max_score - min_score), else 0
+      num_advices = if question.is_a?(ScoredQuestion)
+                      @questionnaire.max_question_score - @questionnaire.min_question_score + 1
                     else
                       0
                     end
 
-      # sorting item advices in descending order by score
-      sorted_advice = item.item_advices.sort_by { |x| x.score }.reverse
+      # sorting question advices in descending order by score
+      sorted_advice = question.question_advices.sort_by { |x| x.score }.reverse
 
       # Checks the condition for adjusting the advice size
-      if invalid_advice?(sorted_advice, num_advices, item)
-        # The number of advices for this item has changed.
-        QuestionnaireHelper.adjust_advice_size(@itemnaire, item)
+      if invalid_advice?(sorted_advice, num_advices, question)
+        # The number of advices for this question has changed.
+        QuestionnaireHelper.adjust_advice_size(@questionnaire, question)
       end
     end
   end
 
-  # save the advice for a itemnaire
+  # save the advice for a questionnaire
   def save_advice
-    # Stores the itemnaire with given id in URL
-    @itemnaire = Questionnaire.find(params[:id])
+    # Stores the questionnaire with given id in URL
+    @questionnaire = Questionnaire.find(params[:id])
     begin
       # checks if advice is present or not
       unless params[:advice].nil?

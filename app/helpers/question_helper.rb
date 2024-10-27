@@ -1,6 +1,6 @@
 module QuestionHelper
 
-  # Maps type to item
+  # Maps type to question
   QUESTION_MAP = {
     'Criterion' => Criterion,
     'Scale' => Scale,
@@ -15,14 +15,14 @@ module QuestionHelper
     'ColumnHeader' => ColumnHeader
   }.freeze
 
-  # factory method to create the appropriate item based on the type
-  def item_factory(type, itemnaire_id, seq)
-    item_class = QUESTION_MAP[type]
+  # factory method to create the appropriate question based on the type
+  def question_factory(type, questionnaire_id, seq)
+    question_class = QUESTION_MAP[type]
 
-    if item_class.nil?
+    if question_class.nil?
       flash[:error] = 'Error: Undefined Question'
     else
-      item_class.create(txt: '', itemnaire_id: itemnaire_id, seq: seq, type: type, break_before: true)
+      question_class.create(txt: '', questionnaire_id: questionnaire_id, seq: seq, type: type, break_before: true)
     end
   end
 end

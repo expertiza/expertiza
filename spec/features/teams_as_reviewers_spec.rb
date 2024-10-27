@@ -11,7 +11,7 @@ describe 'teams as reviewers' do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create(:assignment_itemnaire, assignment_id: @assignment.id)
+    create(:assignment_questionnaire, assignment_id: @assignment.id)
 
     (1..10).each do |i|
       student = create :student, name: 'student' + i.to_s

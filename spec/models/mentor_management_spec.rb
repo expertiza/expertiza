@@ -82,7 +82,7 @@ describe MentorManagement do
       allow(team).to receive(:add_member).and_return(true)
 
       # if we've made it this far without failing, then there's nothing
-      # left for Mentor Management to test. The only item left to answer
+      # left for Mentor Management to test. The only question left to answer
       # is "does Team#add_member work as expected?," and that is tested elsewhere.
       # From The Magic Tricks of Testing Video (Week 9), it is not this class's job
       # to test whether Team works properly.

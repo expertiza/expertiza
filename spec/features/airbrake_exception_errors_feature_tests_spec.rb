@@ -22,8 +22,8 @@ describe 'Airbrake exception errors' do
     create(:team_user, user: User.where(role_id: 1).third, team: AssignmentTeam.second)
     create(:signed_up_team)
     create(:signed_up_team, team_id: 2, topic: SignUpTopic.second)
-    create(:assignment_itemnaire)
-    create(:item)
+    create(:assignment_questionnaire)
+    create(:question)
   end
 
   # Airbrake-1806782678925052472
@@ -36,7 +36,7 @@ describe 'Airbrake exception errors' do
   end
 
   # Airbrake-1780737855340413304
-  it 'will redirect to submitted_content#view page if trying to save quiz but w/o items' do
+  it 'will redirect to submitted_content#view page if trying to save quiz but w/o questions' do
     assignment = Assignment.first
     assignment.update_attributes(require_quiz: true)
     login_as 'student2064'
@@ -47,7 +47,7 @@ describe 'Airbrake exception errors' do
     click_link 'Your work'
     click_link 'Create a quiz'
     expect(page).to have_content('New Quiz')
-    fill_in 'itemnaire_name', with: 'Test quiz'
+    fill_in 'questionnaire_name', with: 'Test quiz'
     click_button 'Create Quiz'
 
     expect(page).to have_content 'View quiz'
@@ -94,20 +94,20 @@ describe 'Airbrake exception errors' do
   end
 
   # Airbrake-1817691804353957801
-  it 'will not raise error when saving itemnaire w/o item' do
+  it 'will not raise error when saving questionnaire w/o question' do
     login_as 'instructor6'
-    visit '/itemnaires/new?model=ReviewQuestionnaire&private=0'
-    fill_in('itemnaire_name', with: 'Review 1')
+    visit '/questionnaires/new?model=ReviewQuestionnaire&private=0'
+    fill_in('questionnaire_name', with: 'Review 1')
     click_button 'Create'
-    itemnaire = Questionnaire.where(name: 'Review 1').first
-    expect(page).to have_current_path("/itemnaires/#{itemnaire.id}/edit")
+    questionnaire = Questionnaire.where(name: 'Review 1').first
+    expect(page).to have_current_path("/questionnaires/#{questionnaire.id}/edit")
     expect(page).to have_content('Edit Review')
     expect(page).to have_content('Import Questionnaire')
     expect(page).to have_content('Export Questionnaire')
 
-    click_button('Save review itemnaire')
+    click_button('Save review questionnaire')
     expect { page }.not_to raise_error
-    expect(page).to have_current_path("/itemnaires/#{itemnaire.id}/edit")
+    expect(page).to have_current_path("/questionnaires/#{questionnaire.id}/edit")
   end
 end
 

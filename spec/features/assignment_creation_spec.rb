@@ -1,17 +1,17 @@
-def itemnaire_options(type)
-  itemnaires = Questionnaire.where(['private = 0 or instructor_id = ?', session[:user].id]).order('name')
+def questionnaire_options(type)
+  questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', session[:user].id]).order('name')
   options = []
-  itemnaires.select { |x| x.type == type }.each do |itemnaire|
-    options << [itemnaire.name, itemnaire.id]
+  questionnaires.select { |x| x.type == type }.each do |questionnaire|
+    options << [questionnaire.name, questionnaire.id]
   end
   options
 end
 
-def get_itemnaire(finder_var = nil)
+def get_questionnaire(finder_var = nil)
   if finder_var.nil?
     AssignmentQuestionnaire.find_by(assignment_id: @assignment.id)
   else
-    AssignmentQuestionnaire.where(assignment_id: @assignment.id).where(itemnaire_id: get_selected_id(finder_var))
+    AssignmentQuestionnaire.where(assignment_id: @assignment.id).where(questionnaire_id: get_selected_id(finder_var))
   end
 end
 
@@ -123,7 +123,7 @@ describe 'assignment function' do
         show_teammate_reviews: true
       )
     end
-    # instructor can check "has quiz" box and set the number of quiz items
+    # instructor can check "has quiz" box and set the number of quiz questions
     it 'is able to create with quiz' do
       login_as('instructor6')
       visit '/assignments/new?private=1'
@@ -133,12 +133,12 @@ describe 'assignment function' do
       fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
       check('assignment_form_assignment_require_quiz')
       click_button 'Create'
-      fill_in 'assignment_form_assignment_num_quiz_items', with: 3
+      fill_in 'assignment_form_assignment_num_quiz_questions', with: 3
       click_button 'submit_btn'
 
       assignment = Assignment.where(name: 'private assignment for test').first
       expect(assignment).to have_attributes(
-        num_quiz_items: 3,
+        num_quiz_questions: 3,
         require_quiz: true
       )
     end
@@ -380,7 +380,7 @@ describe 'assignment function' do
       fill_assignment_form
       check('assignment_form_assignment_require_quiz')
       click_button 'Save'
-      fill_in 'assignment_form_assignment_num_quiz_items', with: 5
+      fill_in 'assignment_form_assignment_num_quiz_questions', with: 5
       click_button 'Save'
       assignment = Assignment.where(name: 'edit assignment for test').first
       expect(assignment).to have_attributes(
@@ -388,7 +388,7 @@ describe 'assignment function' do
         course_id: Course.find_by(name: 'Course 2').id,
         directory_path: 'testDirectory1',
         spec_location: 'testLocation1',
-        num_quiz_items: 5,
+        num_quiz_questions: 5,
         require_quiz: true
       )
     end
@@ -539,13 +539,13 @@ describe 'assignment function' do
       @review_deadline_type = create(:deadline_type, name: 'review')
       create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1), deadline_type: @review_deadline_type
       create(:assignment_node)
-      create(:item)
-      create(:itemnaire)
-      create(:assignment_itemnaire)
+      create(:question)
+      create(:questionnaire)
+      create(:assignment_questionnaire)
       (1..3).each do |i|
-        create(:itemnaire, name: "ReviewQuestionnaire#{i}")
-        create(:itemnaire, name: "AuthorFeedbackQuestionnaire#{i}", type: 'AuthorFeedbackQuestionnaire')
-        create(:itemnaire, name: "TeammateReviewQuestionnaire#{i}", type: 'TeammateReviewQuestionnaire')
+        create(:questionnaire, name: "ReviewQuestionnaire#{i}")
+        create(:questionnaire, name: "AuthorFeedbackQuestionnaire#{i}", type: 'AuthorFeedbackQuestionnaire')
+        create(:questionnaire, name: "TeammateReviewQuestionnaire#{i}", type: 'TeammateReviewQuestionnaire')
       end
       login_as('instructor6')
       visit "/assignments/#{@assignment.id}/edit"
@@ -554,59 +554,59 @@ describe 'assignment function' do
 
     # First row of rubric
     describe 'Edit review rubric' do
-      it 'updates review itemnaire' do
-        within(:css, 'tr#itemnaire_table_ReviewQuestionnaire') do
-          select 'ReviewQuestionnaire2', from: 'assignment_form[assignment_itemnaire][][itemnaire_id]'
+      it 'updates review questionnaire' do
+        within(:css, 'tr#questionnaire_table_ReviewQuestionnaire') do
+          select 'ReviewQuestionnaire2', from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           uncheck('dropdown')
-          select 'Scale', from: 'assignment_form[assignment_itemnaire][][dropdown]'
-          fill_in 'assignment_form[assignment_itemnaire][][notification_limit]', with: '50'
+          select 'Scale', from: 'assignment_form[assignment_questionnaire][][dropdown]'
+          fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
         end
         click_button 'Save'
         sleep 1
-        itemnaire = get_itemnaire('ReviewQuestionnaire2').first
-        expect(itemnaire).to have_attributes(
+        questionnaire = get_questionnaire('ReviewQuestionnaire2').first
+        expect(questionnaire).to have_attributes(
           notification_limit: 50
         )
       end
 
-      it 'should update scored item dropdown' do
-        within('tr#itemnaire_table_ReviewQuestionnaire') do
-          select 'ReviewQuestionnaire2', from: 'assignment_form[assignment_itemnaire][][itemnaire_id]'
-          select 'Scale', from: 'assignment_form[assignment_itemnaire][][dropdown]'
+      it 'should update scored question dropdown' do
+        within('tr#questionnaire_table_ReviewQuestionnaire') do
+          select 'ReviewQuestionnaire2', from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+          select 'Scale', from: 'assignment_form[assignment_questionnaire][][dropdown]'
         end
         click_button 'Save'
-        itemnaire = Questionnaire.where(name: 'ReviewQuestionnaire2').first
-        assignment_itemnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, itemnaire_id: itemnaire.id).first
-        expect(assignment_itemnaire.dropdown).to eq(false)
+        questionnaire = Questionnaire.where(name: 'ReviewQuestionnaire2').first
+        assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
+        expect(assignment_questionnaire.dropdown).to eq(false)
       end
 
       # Second row of rubric
-      it 'updates author feedback itemnaire' do
-        within(:css, 'tr#itemnaire_table_AuthorFeedbackQuestionnaire') do
-          select 'AuthorFeedbackQuestionnaire2', from: 'assignment_form[assignment_itemnaire][][itemnaire_id]'
+      it 'updates author feedback questionnaire' do
+        within(:css, 'tr#questionnaire_table_AuthorFeedbackQuestionnaire') do
+          select 'AuthorFeedbackQuestionnaire2', from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           uncheck('dropdown')
-          select 'Scale', from: 'assignment_form[assignment_itemnaire][][dropdown]'
-          fill_in 'assignment_form[assignment_itemnaire][][notification_limit]', with: '50'
+          select 'Scale', from: 'assignment_form[assignment_questionnaire][][dropdown]'
+          fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
         end
         click_button 'Save'
-        itemnaire = get_itemnaire('AuthorFeedbackQuestionnaire2').first
-        expect(itemnaire).to have_attributes(
+        questionnaire = get_questionnaire('AuthorFeedbackQuestionnaire2').first
+        expect(questionnaire).to have_attributes(
           notification_limit: 50
         )
       end
 
       ##
       # Third row of rubric
-      it 'updates teammate review itemnaire' do
-        within('tr#itemnaire_table_TeammateReviewQuestionnaire') do
-          select 'TeammateReviewQuestionnaire2', from: 'assignment_form[assignment_itemnaire][][itemnaire_id]'
+      it 'updates teammate review questionnaire' do
+        within('tr#questionnaire_table_TeammateReviewQuestionnaire') do
+          select 'TeammateReviewQuestionnaire2', from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           uncheck('dropdown')
-          select 'Scale', from: 'assignment_form[assignment_itemnaire][][dropdown]'
-          fill_in 'assignment_form[assignment_itemnaire][][notification_limit]', with: '50'
+          select 'Scale', from: 'assignment_form[assignment_questionnaire][][dropdown]'
+          fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
         end
         click_button 'Save'
-        itemnaire = get_itemnaire('TeammateReviewQuestionnaire2').first
-        expect(itemnaire).to have_attributes(
+        questionnaire = get_questionnaire('TeammateReviewQuestionnaire2').first
+        expect(questionnaire).to have_attributes(
           notification_limit: 50
         )
       end

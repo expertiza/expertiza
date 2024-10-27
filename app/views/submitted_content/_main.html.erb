@@ -24,17 +24,17 @@
   <!-- If quiz is required for the assignment, find out if the quiz has already been created -->
   <% unless controller.action_name == "view_my_scores" || (@map && @map.reviewer_id != session[:user].id) %>
     <br/><b><%=t ".quiz"%></b><br/>
-    <% if !t_id.nil? && itemnaire = QuizQuestionnaire.where(["instructor_id = ?", t_id]).first %>
-      <%= link_to t(".view_quiz"), :controller => :quiz_itemnaires, :action => :view, :id => itemnaire.id, :pid => participant.id %>
+    <% if !t_id.nil? && questionnaire = QuizQuestionnaire.where(["instructor_id = ?", t_id]).first %>
+      <%= link_to t(".view_quiz"), :controller => :quiz_questionnaires, :action => :view, :id => questionnaire.id, :pid => participant.id %>
       <br/>
-      <% unless itemnaire.taken_by_anyone?%>
-        <%= link_to t(".edit_quiz"), :controller => :quiz_itemnaires, :action => :edit, :id => itemnaire.id, :pid => participant.id %>
+      <% unless questionnaire.taken_by_anyone?%>
+        <%= link_to t(".edit_quiz"), :controller => :quiz_questionnaires, :action => :edit, :id => questionnaire.id, :pid => participant.id %>
       <% end %>
       <br/>
 
     <% else %>
       <br/>
-      <%= link_to 'Create a quiz', :controller => :quiz_itemnaires, :action => :new, :model => "QuizQuestionnaire", :private => 0, :aid => @assignment.id, :pid => participant.id %>
+      <%= link_to 'Create a quiz', :controller => :quiz_questionnaires, :action => :new, :model => "QuizQuestionnaire", :private => 0, :aid => @assignment.id, :pid => participant.id %>
       <br/>
     <% end %>
   <% end %>

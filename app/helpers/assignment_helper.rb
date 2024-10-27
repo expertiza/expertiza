@@ -34,11 +34,11 @@ module AssignmentHelper
   end
 
   # round=0 added by E1450
-  def itemnaire_options(type)
-    itemnaires = Questionnaire.where(['private = 0 or instructor_id = ?', session[:user].id]).order('name')
+  def questionnaire_options(type)
+    questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', session[:user].id]).order('name')
     options = []
-    itemnaires.select { |x| x.type == type }.each do |itemnaire|
-      options << [itemnaire.name, itemnaire.id]
+    questionnaires.select { |x| x.type == type }.each do |questionnaire|
+      options << [questionnaire.name, questionnaire.id]
     end
     options
   end

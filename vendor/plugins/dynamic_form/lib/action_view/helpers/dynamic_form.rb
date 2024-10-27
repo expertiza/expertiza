@@ -178,7 +178,7 @@ module ActionView
       # If the objects cannot be located as instance variables, you can add an extra <tt>:object</tt> parameter which gives the actual
       # object (or array of objects to use):
       #
-      #   error_messages_for 'user', :object => @item.user
+      #   error_messages_for 'user', :object => @question.user
       #
       # NOTE: This is a pre-packaged presentation of the errors with embedded strings and a certain HTML structure. If what
       # you need is significantly different from the default presentation, it makes plenty of sense to access the <tt>object.errors</tt>

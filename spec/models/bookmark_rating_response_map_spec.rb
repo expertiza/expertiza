@@ -1,7 +1,7 @@
 describe BookmarkRatingResponseMap do
   let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
-  let(:itemnaire1) { build(:itemnaire, id: 1, type: 'MetareviewQuestionnaire') }
-  let(:itemnaire2) { build(:itemnaire, id: 2, type: 'BookmarkRatingQuestionnaire') }
+  let(:questionnaire1) { build(:questionnaire, id: 1, type: 'MetareviewQuestionnaire') }
+  let(:questionnaire2) { build(:questionnaire, id: 2, type: 'BookmarkRatingQuestionnaire') }
   let(:model) { BookmarkRatingResponseMap.new }
   describe '#reviewee' do
     # check if class belongs to reviewee
@@ -18,13 +18,13 @@ describe BookmarkRatingResponseMap do
       expect(model.get_title).to eq('Bookmark Review')
     end
   end
-  describe '#itemnaire' do
-    it 'returns bookmark rating itemnaires associated with the assignment' do
+  describe '#questionnaire' do
+    it 'returns bookmark rating questionnaires associated with the assignment' do
       model.assignment = assignment
-      itemnaires = [itemnaire1, itemnaire2]
-      allow(assignment).to receive(:itemnaires).and_return(itemnaires)
-      allow(itemnaires).to receive(:find_by).with(type: 'BookmarkRatingQuestionnaire').and_return(itemnaire2)
-      expect(model.itemnaire).to eq(itemnaire2)
+      questionnaires = [questionnaire1, questionnaire2]
+      allow(assignment).to receive(:questionnaires).and_return(questionnaires)
+      allow(questionnaires).to receive(:find_by).with(type: 'BookmarkRatingQuestionnaire').and_return(questionnaire2)
+      expect(model.questionnaire).to eq(questionnaire2)
     end
   end
   describe '#bookmark_response_report' do

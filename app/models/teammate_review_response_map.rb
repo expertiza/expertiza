@@ -2,18 +2,18 @@ class TeammateReviewResponseMap < ResponseMap
   belongs_to :reviewee, class_name: 'Participant', foreign_key: 'reviewee_id'
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
 
-  def itemnaire
-    assignment.itemnaires.find_by(type: 'TeammateReviewQuestionnaire')
+  def questionnaire
+    assignment.questionnaires.find_by(type: 'TeammateReviewQuestionnaire')
   end
 
-  # E2147 : gets itemnaire for a particular duty. If no itemnaire is found for the given duty, returns the
-  # default itemnaire set for TeammateReviewQuestionnaire type.
-  def itemnaire_by_duty(duty_id)
-    duty_itemnaire = AssignmentQuestionnaire.where(assignment_id: assignment.id, duty_id: duty_id).first
-    if duty_itemnaire.nil?
-      itemnaire
+  # E2147 : gets questionnaire for a particular duty. If no questionnaire is found for the given duty, returns the
+  # default questionnaire set for TeammateReviewQuestionnaire type.
+  def questionnaire_by_duty(duty_id)
+    duty_questionnaire = AssignmentQuestionnaire.where(assignment_id: assignment.id, duty_id: duty_id).first
+    if duty_questionnaire.nil?
+      questionnaire
     else
-      Questionnaire.find(duty_itemnaire.itemnaire_id)
+      Questionnaire.find(duty_questionnaire.questionnaire_id)
     end
   end
 

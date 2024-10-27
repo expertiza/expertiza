@@ -1,10 +1,10 @@
 # E1924 Spring 2019 Addition
 
 module AnswerHelper
-  # Delete responses for given itemnaire
-  def self.delete_existing_responses(item_ids, itemnaire_id)
-    # For each of the item's answers, log the response_id if in active period
-    response_ids = log_answer_responses(item_ids, itemnaire_id)
+  # Delete responses for given questionnaire
+  def self.delete_existing_responses(question_ids, questionnaire_id)
+    # For each of the question's answers, log the response_id if in active period
+    response_ids = log_answer_responses(question_ids, questionnaire_id)
 
     # For each of the response_ids, log info to be used in answer deletion
     user_id_to_answers = log_response_info(response_ids)
@@ -20,12 +20,12 @@ module AnswerHelper
     end
   end
 
-  # Log the response_id if in active period for each of the item's answers
-  def self.log_answer_responses(item_ids, itemnaire_id)
+  # Log the response_id if in active period for each of the question's answers
+  def self.log_answer_responses(question_ids, questionnaire_id)
     response_ids = []
-    item_ids.each do |item|
-      Answer.where(item_id: item).each do |answer| # For each of the item's answers, log the response_id if in active period
-        response_ids << answer.response_id if in_active_period(itemnaire_id, answer)
+    question_ids.each do |question|
+      Answer.where(question_id: question).each do |answer| # For each of the question's answers, log the response_id if in active period
+        response_ids << answer.response_id if in_active_period(questionnaire_id, answer)
       end
     end
     response_ids
@@ -64,7 +64,7 @@ module AnswerHelper
     raise $ERROR_INFO
   end
 
-  # Delete the users response to the modified itemnaire
+  # Delete the users response to the modified questionnaire
   def self.delete_answers(response_id)
     response = Response.find(response_id)
     response.is_submitted = false
@@ -73,13 +73,13 @@ module AnswerHelper
   end
 
   # The in_active_period method returns true if the start & end range includes the current time
-  def self.in_active_period(itemnaire_id, answer = nil)
-    assignment, round_number = AssignmentQuestionnaire.get_latest_assignment(itemnaire_id)
+  def self.in_active_period(questionnaire_id, answer = nil)
+    assignment, round_number = AssignmentQuestionnaire.get_latest_assignment(questionnaire_id)
     unless assignment.nil? # If the assignment doesn't exist, return false
       start_dates, end_dates = assignment.find_review_period(round_number)
       time_now = Time.zone.now
       time_now = answer.response.created_at unless answer.nil?
-      # There can be multiple possible review periods: If round_number is nil, all rounds of reviews use the same itemnaire.
+      # There can be multiple possible review periods: If round_number is nil, all rounds of reviews use the same questionnaire.
       # If it is in any of the possible review period now, return true.
       start_dates.zip(end_dates).each do |start_date, end_date|
         return true if start_date.due_at < time_now && end_date.due_at > time_now
@@ -88,11 +88,11 @@ module AnswerHelper
     false
   end
 
-  # Given a itemnaire id, delete all responses to that itemnaire if the current period accepts reviews and return true/false of success
-  def self.check_and_delete_responses(itemnaire_id)
-    item_ids = Questionnaire.find(itemnaire_id).items.ids
-    if AnswerHelper.in_active_period(itemnaire_id) # confirm current period accepts reviews
-      AnswerHelper.delete_existing_responses(item_ids, itemnaire_id) # delete all responses for current itemnaire
+  # Given a questionnaire id, delete all responses to that questionnaire if the current period accepts reviews and return true/false of success
+  def self.check_and_delete_responses(questionnaire_id)
+    question_ids = Questionnaire.find(questionnaire_id).questions.ids
+    if AnswerHelper.in_active_period(questionnaire_id) # confirm current period accepts reviews
+      AnswerHelper.delete_existing_responses(question_ids, questionnaire_id) # delete all responses for current questionnaire
       true
     else
       false

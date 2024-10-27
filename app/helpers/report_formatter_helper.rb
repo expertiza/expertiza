@@ -42,9 +42,9 @@ module ReportFormatterHelper
                     nil
                   end
     create_participant(@id, user.id) if participant.nil?
-    @review_itemnaire_ids = ReviewQuestionnaire.select('id')
-    @assignment_itemnaire = AssignmentQuestionnaire.retrieve_itemnaire_for_assignment(@id).first
-    @items = @assignment_itemnaire.itemnaire.items.select { |q| q.type == 'Criterion' || q.type == 'Scale' }
+    @review_questionnaire_ids = ReviewQuestionnaire.select('id')
+    @assignment_questionnaire = AssignmentQuestionnaire.retrieve_questionnaire_for_assignment(@id).first
+    @questions = @assignment_questionnaire.questionnaire.questions.select { |q| q.type == 'Criterion' || q.type == 'Scale' }
     @calibration_response_maps = ReviewResponseMap.where(reviewed_object_id: @id, calibrate_to: 1)
     @review_response_map_ids = ReviewResponseMap.select('id').where(reviewed_object_id: @id, calibrate_to: 0)
     @responses = Response.where(map_id: @review_response_map_ids)
@@ -59,11 +59,11 @@ module ReportFormatterHelper
   def answer_tagging_report(params, _session = nil)
     assign_basics(params)
     tag_prompt_deployments = TagPromptDeployment.where(assignment_id: @id)
-    @itemnaire_tagging_report = {}
+    @questionnaire_tagging_report = {}
     @user_tagging_report = {}
     tag_prompt_deployments.each do |tag_dep|
-      @itemnaire_tagging_report[tag_dep] = tag_dep.assignment_tagging_progress
-      @itemnaire_tagging_report[tag_dep].each do |line|
+      @questionnaire_tagging_report[tag_dep] = tag_dep.assignment_tagging_progress
+      @questionnaire_tagging_report[tag_dep].each do |line|
         user_summary_report(line)
       end
     end

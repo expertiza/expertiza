@@ -114,10 +114,10 @@ en_US:
 
       rubrics:
         review_varies: "Review varies by round?"
-        itemnaire: "Questionnaire"
+        questionnaire: "Questionnaire"
         use_dropdown: "Use dropdown"
         instead: "instead?"
-        scored_item: "Scored-item"
+        scored_question: "Scored-question"
         display_style: "display style"
         weight: "Weight"
         notification_limit: "Notification Limit"
@@ -242,7 +242,7 @@ en_US:
       advertise: "Advertisement(s)"
       topic_id: "Topic ID"
       select: "Select"
-      itemnaire: "Questionnaire"
+      questionnaire: "Questionnaire"
       disabled: "(disabled)"
       num_bids: "Total num. of bids"
       num_1_2_bids: "Num. #1/#2 bids"
@@ -367,8 +367,8 @@ en_US:
       average_peer_review: "Average peer review score:"
       show_submission: "Show Submission"
       no_submission: "No Submission"
-      item: "Question"
-      toggle_item_list: "toggle item list"
+      question: "Question"
+      toggle_question_list: "toggle question list"
       hide_tags: "hide tags"
       color_legend: "color legend"
       interaction_legend: "interaction legend"
@@ -388,8 +388,8 @@ en_US:
       no_reviews_for_assignment: "There are no reviews for this assignment"
       round: "Round"
       of: "of"
-      interaction_legend_tooltip: "Click a row to see the comments for the respective item. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience."
-      metric_tooltip: "A count of comments, for the respective item, which have word count > 10. The purpose of this metric is to represent how many comments for the item are of a substantial length to provide quality feedback."
+      interaction_legend_tooltip: "Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience."
+      metric_tooltip: "A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback."
       sort_by_total_review_score: "Sort by total review score"
       sort_by_total_review_score_tooltip: "Sort reviews in ascending/descending order of the total score. Consecutive clicks will alternate between ascending and descending sort order"
       save: "Save"
@@ -451,7 +451,7 @@ en_US:
       no_review_done: "No review done yet."
       reviewer_score: "Reviewer's score"
       self_review_of: "Self Review of"
-      item: " Question "
+      question: " Question "
       score: "Score"
       comments: "Comments"
       other_reviewer_score: "Reviewer Score (Σ weighted score/Σ weighted available score)"
@@ -479,8 +479,8 @@ en_US:
       quiz_score: "Quiz score: "
       back: "Back"
 
-    review_items:
-      quiz_listings: "Listing of all quiz items for"
+    review_questions:
+      quiz_listings: "Listing of all quiz questions for"
       quiz_create: "Quiz created by"
       topic: "Topic:"
       quiz_taker: "Quiz taker"
@@ -488,7 +488,7 @@ en_US:
       avg_score: "Average score for quiz takers: "
 
     take_quiz:
-      items: "Questions"
+      questions: "Questions"
       submit_quiz: "Submit Quiz"
 
   profile:

@@ -13,7 +13,7 @@ class Response < ApplicationRecord
   has_many :metareview_response_maps, class_name: 'MetareviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: false
   alias map response_map
   attr_accessor :difficulty_rating
-  delegate :itemnaire, :reviewee, :reviewer, to: :map
+  delegate :questionnaire, :reviewee, :reviewer, to: :map
 
   # Sort responses specified by map id 
   # Sort by largest version number 
@@ -55,14 +55,14 @@ class Response < ApplicationRecord
   end
 
   # Computes the total score awarded for a review
-  def aggregate_itemnaire_score
-    # only count the scorable items, only when the answer is not nil
-    # we accept nil as answer for scorable items, and they will not be counted towards the total score
+  def aggregate_questionnaire_score
+    # only count the scorable questions, only when the answer is not nil
+    # we accept nil as answer for scorable questions, and they will not be counted towards the total score
     sum = 0
     scores.each do |s|
-      item = Question.find(s.item_id)
+      question = Question.find(s.question_id)
       # For quiz responses, the weights will be 1 or 0, depending on if correct
-      sum += s.answer * item.weight unless s.answer.nil? || !item.is_a?(ScoredQuestion)
+      sum += s.answer * question.weight unless s.answer.nil? || !question.is_a?(ScoredQuestion)
     end
     sum
   end
@@ -78,25 +78,25 @@ class Response < ApplicationRecord
     if maximum_score.zero?
       'N/A'
     else
-      ((aggregate_itemnaire_score.to_f / maximum_score.to_f) * 100).round
+      ((aggregate_questionnaire_score.to_f / maximum_score.to_f) * 100).round
     end
   end
 
   # Returns the maximum possible score for this response
   def maximum_score
-    # only count the scorable items, only when the answer is not nil (we accept nil as
-    # answer for scorable items, and they will not be counted towards the total score)
+    # only count the scorable questions, only when the answer is not nil (we accept nil as
+    # answer for scorable questions, and they will not be counted towards the total score)
     total_weight = 0
     scores.each do |s|
-      item = Question.find(s.item_id)
-      total_weight += item.weight unless s.answer.nil? || !item.is_a?(ScoredQuestion)
+      question = Question.find(s.question_id)
+      total_weight += question.weight unless s.answer.nil? || !question.is_a?(ScoredQuestion)
     end
-    itemnaire = if scores.empty?
-                      itemnaire_by_answer(nil)
+    questionnaire = if scores.empty?
+                      questionnaire_by_answer(nil)
                     else
-                      itemnaire_by_answer(scores.first)
+                      questionnaire_by_answer(scores.first)
                     end
-    total_weight * itemnaire.max_item_score
+    total_weight * questionnaire.max_question_score
   end
 
   # only two types of responses more should be added
@@ -106,7 +106,7 @@ class Response < ApplicationRecord
     defn[:body][:partial_name] = partial
     response_map = ResponseMap.find map_id
     participant = Participant.find(response_map.reviewer_id)
-    # parent is used as a common variable name for either an assignment or course depending on what the itemnaire is associated with
+    # parent is used as a common variable name for either an assignment or course depending on what the questionnaire is associated with
     parent = if response_map.survey?
                response_map.survey_parent
              else
@@ -132,10 +132,10 @@ class Response < ApplicationRecord
     response
   end
 
-  def itemnaire_by_answer(answer)
+  def questionnaire_by_answer(answer)
     if answer.nil?
-      # there is small possibility that the answers is empty: when the itemnaire only have 1 item and it is a upload file item
-      # the reason is that for this item type, there is no answer record, and this item is handled by a different form
+      # there is small possibility that the answers is empty: when the questionnaire only have 1 question and it is a upload file question
+      # the reason is that for this question type, there is no answer record, and this question is handled by a different form
       map = ResponseMap.find(map_id)
       # E-1973 either get the assignment from the participant or the map itself
       assignment = if map.is_a? ReviewResponseMap
@@ -143,11 +143,11 @@ class Response < ApplicationRecord
                    else
                      Participant.find(map.reviewer_id).assignment
                    end
-      itemnaire = Questionnaire.find(assignment.review_itemnaire_id)
-    else # for all the cases except the case that  file submission is the only item in the rubric.
-      itemnaire = Question.find(answer.item_id).itemnaire
+      questionnaire = Questionnaire.find(assignment.review_questionnaire_id)
+    else # for all the cases except the case that  file submission is the only question in the rubric.
+      questionnaire = Question.find(answer.question_id).questionnaire
     end
-    itemnaire
+    questionnaire
   end
 
   def self.concatenate_all_review_comments(assignment_id, reviewer_id)
@@ -156,7 +156,7 @@ class Response < ApplicationRecord
     @comments_in_round = []
     @counter_in_round = []
     assignment = Assignment.find(assignment_id)
-    item_ids = Question.get_all_items_with_comments_available(assignment_id)
+    question_ids = Question.get_all_questions_with_comments_available(assignment_id)
 
     ReviewResponseMap.where(reviewed_object_id: assignment_id, reviewer_id: reviewer_id).find_each do |response_map|
       (1..assignment.num_review_rounds + 1).each do |round|
@@ -166,7 +166,7 @@ class Response < ApplicationRecord
         next if last_response_in_current_round.nil?
 
         last_response_in_current_round.scores.each do |answer|
-          comments += answer.comments if item_ids.include? answer.item_id
+          comments += answer.comments if question_ids.include? answer.question_id
           @comments_in_round[round] += (answer.comments ||= '')
         end
         additional_comment = last_response_in_current_round.additional_comment
@@ -207,13 +207,13 @@ class Response < ApplicationRecord
     # if this response is the first on this artifact, there's no grade conflict
     return false if count.zero?
 
-    # This score has already skipped the unfilled scorable item(s)
-    score = aggregate_itemnaire_score.to_f / maximum_score
-    itemnaire = itemnaire_by_answer(scores.first)
+    # This score has already skipped the unfilled scorable question(s)
+    score = aggregate_questionnaire_score.to_f / maximum_score
+    questionnaire = questionnaire_by_answer(scores.first)
     assignment = map.assignment
-    assignment_itemnaire = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, itemnaire_id: itemnaire.id)
+    assignment_questionnaire = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: questionnaire.id)
     # notification_limit can be specified on 'Rubrics' tab on assignment edit page.
-    allowed_difference_percentage = assignment_itemnaire.notification_limit.to_f
+    allowed_difference_percentage = assignment_questionnaire.notification_limit.to_f
     # the range of average_score_on_same_artifact_from_others and score is [0,1]
     # the range of allowed_difference_percentage is [0, 100]
     (average_score_on_same_artifact_from_others - score).abs * 100 > allowed_difference_percentage
@@ -225,7 +225,7 @@ class Response < ApplicationRecord
     existing_responses.each do |existing_response|
       unless existing_response.id == current_response.id # the current_response is also in existing_responses array
         count += 1
-        scores_assigned << existing_response.aggregate_itemnaire_score.to_f / existing_response.maximum_score
+        scores_assigned << existing_response.aggregate_questionnaire_score.to_f / existing_response.maximum_score
       end
     end
     [scores_assigned.sum / scores_assigned.size.to_f, count]
@@ -247,7 +247,7 @@ class Response < ApplicationRecord
         reviewer_name: reviewer_name,
         type: 'review',
         reviewee_name: reviewee_name,
-        new_score: aggregate_itemnaire_score.to_f / maximum_score,
+        new_score: aggregate_questionnaire_score.to_f / maximum_score,
         assignment: assignment,
         conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s,
         summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
@@ -291,12 +291,12 @@ class Response < ApplicationRecord
     code += '<table id="review_' + self_id + '" class="table table-bordered">'
     answers = Answer.where(response_id: response_id)
     unless answers.empty?
-      itemnaire = itemnaire_by_answer(answers.first)
-      itemnaire_max = itemnaire.max_item_score
-      items = itemnaire.items.sort_by(&:seq)
-      # get the tag settings this itemnaire
-      tag_prompt_deployments = show_tags ? TagPromptDeployment.where(itemnaire_id: itemnaire.id, assignment_id: map.assignment.id) : nil
-      code = add_table_rows itemnaire_max, items, answers, code, tag_prompt_deployments, current_user
+      questionnaire = questionnaire_by_answer(answers.first)
+      questionnaire_max = questionnaire.max_question_score
+      questions = questionnaire.questions.sort_by(&:seq)
+      # get the tag settings this questionnaire
+      tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: map.assignment.id) : nil
+      code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, current_user
     end
     comment = if additional_comment.nil?
                 ''
@@ -308,23 +308,23 @@ class Response < ApplicationRecord
     code
   end
 
-  def add_table_rows(itemnaire_max, items, answers, code, tag_prompt_deployments = nil, current_user = nil)
+  def add_table_rows(questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, current_user = nil)
     count = 0
-    # loop through items so the the items are displayed in order based on seq (sequence number)
-    items.each do |item|
-      count += 1 if !item.is_a?(QuestionnaireHeader) && (item.break_before == true)
-      answer = answers.find { |a| a.item_id == item.id }
+    # loop through questions so the the questions are displayed in order based on seq (sequence number)
+    questions.each do |question|
+      count += 1 if !question.is_a?(QuestionnaireHeader) && (question.break_before == true)
+      answer = answers.find { |a| a.question_id == question.id }
       row_class = count.even? ? 'info' : 'warning'
-      row_class = '' if item.is_a? QuestionnaireHeader
+      row_class = '' if question.is_a? QuestionnaireHeader
       code += '<tr class="' + row_class + '"><td>'
-      if !answer.nil? || item.is_a?(QuestionnaireHeader)
-        code += if item.instance_of? Criterion
-                  # Answer Tags are enabled only for Criterion items at the moment.
-                  item.view_completed_item(count, answer, itemnaire_max, tag_prompt_deployments, current_user) || ''
-                elsif item.instance_of? Scale
-                  item.view_completed_item(count, answer, itemnaire_max) || ''
+      if !answer.nil? || question.is_a?(QuestionnaireHeader)
+        code += if question.instance_of? Criterion
+                  # Answer Tags are enabled only for Criterion questions at the moment.
+                  question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments, current_user) || ''
+                elsif question.instance_of? Scale
+                  question.view_completed_question(count, answer, questionnaire_max) || ''
                 else
-                  item.view_completed_item(count, answer) || ''
+                  question.view_completed_question(count, answer) || ''
                 end
       end
       code += '</td></tr>'

@@ -7,8 +7,8 @@
     <h4><b><%= roundtitle.titlecase %></b></h4>
 
     <table class="general" border="1">
-      <% itemnaire_id = Questionnaire.find(@review_final_versions[key][:itemnaire_id]) %>
-      <% items = Question.where(itemnaire_id: itemnaire_id) %>
+      <% questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id]) %>
+      <% questions = Question.where(questionnaire_id: questionnaire_id) %>
       <% num_responses = @review_final_versions[key][:response_ids].length %>
       <% responses = @review_final_versions[key][:response_ids] %>
       
@@ -28,28 +28,28 @@
       </tr>
 
       <!-- Questions and Responses Row -->
-      <% items.each do |item| %>
-        <% unless item.is_a?(QuestionnaireHeader) && num_responses > 0 %>
+      <% questions.each do |question| %>
+        <% unless question.is_a?(QuestionnaireHeader) && num_responses > 0 %>
           <tr>
-            <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <%= item.txt %></th>
-            <!-- Show review summary of checkbox item -->
-            <% if item.instance_of? Checkbox %>
+            <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <%= question.txt %></th>
+            <!-- Show review summary of checkbox question -->
+            <% if question.instance_of? Checkbox %>
               
               <% responses.each do |response_id| %>  
                 <td align="center" width="<%= item_width %>%">
-                  <% answer = Answer.where(response_id: response_id, item_id: item.id).first %>
+                  <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
                   <% unless answer.nil? %>
                     <%= answer.answer == 0 ? image_tag("delete_icon.png") : image_tag("Check-icon.png") %>
                   <% end %>
                 </td>
               <% end %>
 
-            <!-- Show review summary of a non checkbox item -->  
+            <!-- Show review summary of a non checkbox question -->  
             <% else %>
             
               <% responses.each do |response_id| %>  
                 <td width="<%= item_width %>%">
-                  <% answer = Answer.where(response_id: response_id, item_id: item.id).first %>
+                  <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
                   <% unless answer.nil? %>
                   <div>
                     <div class="c<%= answer.answer %> grade-circle" ><p><%= answer.answer %></p></div>

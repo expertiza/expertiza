@@ -24,8 +24,8 @@ class Assignment < ApplicationRecord
   has_many :due_dates, class_name: 'AssignmentDueDate', foreign_key: 'parent_id', dependent: :destroy, inverse_of: :assignment
   has_many :teams, class_name: 'AssignmentTeam', foreign_key: 'parent_id', dependent: :destroy, inverse_of: :assignment
   has_many :invitations, class_name: 'Invitation', foreign_key: 'assignment_id', dependent: :destroy # , inverse_of: :assignment
-  has_many :assignment_itemnaires, dependent: :destroy
-  has_many :itemnaires, through: :assignment_itemnaires
+  has_many :assignment_questionnaires, dependent: :destroy
+  has_many :questionnaires, through: :assignment_questionnaires
   has_many :sign_up_topics, foreign_key: 'assignment_id', dependent: :destroy, inverse_of: :assignment
   has_many :response_maps, foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: :assignment
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: :assignment
@@ -236,7 +236,7 @@ class Assignment < ApplicationRecord
 
     # destroy instances of invitations, teams, participants, etc, refactored by Rajan, Jasmine, Sreenidhi 3/30/2020
     # You can now add the instances to be deleted into the list.
-    delete_instances = %w[invitations teams participants due_dates assignment_itemnaires]
+    delete_instances = %w[invitations teams participants due_dates assignment_questionnaires]
     delete_instances.each do |instance|
       instance_eval(instance).each(&:destroy)
     end
@@ -367,23 +367,23 @@ class Assignment < ApplicationRecord
     due_date.nil? || due_date == 'Finished' ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
   end
 
-  # Find the ID of a review itemnaire for this assignment
-  def review_itemnaire_id(round_number = nil, topic_id = nil)
+  # Find the ID of a review questionnaire for this assignment
+  def review_questionnaire_id(round_number = nil, topic_id = nil)
     # If round is not given, try to retrieve current round from the next due date
     if round_number.nil?
       next_due_date = DueDate.get_next_due_date(id)
       round_number = next_due_date.try(:round)
     end
-    # Create assignment_form that we can use to retrieve AQ with all the same attributes and itemnaire based on AQ
+    # Create assignment_form that we can use to retrieve AQ with all the same attributes and questionnaire based on AQ
     assignment_form = AssignmentForm.create_form_object(id)
-    assignment_itemnaire = assignment_form.assignment_itemnaire('ReviewQuestionnaire', round_number, topic_id)
-    itemnaire = assignment_form.itemnaire(assignment_itemnaire, 'ReviewQuestionnaire')
-    return itemnaire.id unless itemnaire.id.nil?
+    assignment_questionnaire = assignment_form.assignment_questionnaire('ReviewQuestionnaire', round_number, topic_id)
+    questionnaire = assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire')
+    return questionnaire.id unless questionnaire.id.nil?
 
-    # If correct itemnaire is not found, find it by type
+    # If correct questionnaire is not found, find it by type
     AssignmentQuestionnaire.where(assignment_id: id).select do |aq|
-      !aq.itemnaire_id.nil? && Questionnaire.find(aq.itemnaire_id).type == 'ReviewQuestionnaire'
-      return aq.itemnaire_id
+      !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == 'ReviewQuestionnaire'
+      return aq.questionnaire_id
     end
     nil
   end
@@ -419,7 +419,7 @@ class Assignment < ApplicationRecord
 
   # This method was refactored to reduce complexity, additional fields could now be added to the list - Rajan, Jasmine, Sreenidhi
   # Now you could add your export fields to the hashmap
-  EXPORT_DETAIL_FIELDS = { team_id: 'Team ID / Author ID', team_name: 'Reviewee (Team / Student Name)', reviewer: 'Reviewer', item: 'Question / Criterion', item_id: 'Question ID', comment_id: 'Answer / Comment ID', comments: 'Answer / Comment', score: 'Score' }.freeze
+  EXPORT_DETAIL_FIELDS = { team_id: 'Team ID / Author ID', team_name: 'Reviewee (Team / Student Name)', reviewer: 'Reviewer', question: 'Question / Criterion', question_id: 'Question ID', comment_id: 'Answer / Comment ID', comments: 'Answer / Comment', score: 'Score' }.freeze
   def self.export_details_fields(detail_options)
     fields = []
     EXPORT_DETAIL_FIELDS.each do |key, value|
@@ -445,8 +445,8 @@ class Assignment < ApplicationRecord
     teams_csv << handle_nil(@reviewee.id) if detail_options['team_id'] == 'true'
     teams_csv << handle_nil(@reviewee.name) if detail_options['team_name'] == 'true'
     teams_csv << handle_nil(reviewer.name) if detail_options['reviewer'] == 'true'
-    teams_csv << handle_nil(answer.item.txt) if detail_options['item'] == 'true'
-    teams_csv << handle_nil(answer.item.id) if detail_options['item_id'] == 'true'
+    teams_csv << handle_nil(answer.question.txt) if detail_options['question'] == 'true'
+    teams_csv << handle_nil(answer.question.id) if detail_options['question_id'] == 'true'
     teams_csv << handle_nil(answer.id) if detail_options['comment_id'] == 'true'
     teams_csv << handle_nil(answer.comments) if detail_options['comments'] == 'true'
     teams_csv << handle_nil(answer.answer) if detail_options['score'] == 'true'
@@ -490,18 +490,18 @@ class Assignment < ApplicationRecord
   # This method is used for export contents of grade#view.  -Zhewei
   def self.export(csv, parent_id, options)
     @assignment = Assignment.find(parent_id)
-    @items = {}
-    itemnaires = @assignment.itemnaires
-    itemnaires.each do |itemnaire|
+    @questions = {}
+    questionnaires = @assignment.questionnaires
+    questionnaires.each do |questionnaire|
       if @assignment.varying_rubrics_by_round?
-        round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, itemnaire_id: @itemnaire.id).used_in_round
-        itemnaire_symbol = round.nil? ? itemnaire.symbol : (itemnaire.symbol.to_s + round.to_s).to_sym
+        round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: @questionnaire.id).used_in_round
+        questionnaire_symbol = round.nil? ? questionnaire.symbol : (questionnaire.symbol.to_s + round.to_s).to_sym
       else
-        itemnaire_symbol = itemnaire.symbol
+        questionnaire_symbol = questionnaire.symbol
       end
-      @items[itemnaire_symbol] = itemnaire.items
+      @questions[questionnaire_symbol] = questionnaire.questions
     end
-    @scores = @assignment.review_grades(@assignment, @items)
+    @scores = @assignment.review_grades(@assignment, @questions)
     return csv if @scores[:teams].nil?
 
     export_data(csv, @scores, options)
@@ -577,7 +577,7 @@ class Assignment < ApplicationRecord
 
   # Method find_review_period is used in answer_helper.rb to get the start and end dates of a round
   def find_review_period(round)
-    # If round is nil, it means the same itemnaire is used for every round. Thus, we return all periods.
+    # If round is nil, it means the same questionnaire is used for every round. Thus, we return all periods.
     # If round is not nil, we return only the period of that round.
 
     submission_type = DeadlineType.find_by(name: 'submission').id
@@ -606,21 +606,21 @@ class Assignment < ApplicationRecord
   end
 
   # for program 1 like assignment, if same rubric is used in both rounds,
-  # the 'used_in_round' field in 'assignment_itemnaires' will be null,
+  # the 'used_in_round' field in 'assignment_questionnaires' will be null,
   # since one field can only store one integer
-  # if itemnaire_ids is empty, Expertiza will try to find itemnaire whose type is 'ReviewQuestionnaire'.
-  def itemnaire_ids(round)
-    itemnaire_ids = if round.nil?
+  # if questionnaire_ids is empty, Expertiza will try to find questionnaire whose type is 'ReviewQuestionnaire'.
+  def questionnaire_ids(round)
+    questionnaire_ids = if round.nil?
                           AssignmentQuestionnaire.where(assignment_id: id)
                         else
                           AssignmentQuestionnaire.where(assignment_id: id, used_in_round: round)
                         end
-    if itemnaire_ids.empty?
+    if questionnaire_ids.empty?
       AssignmentQuestionnaire.where(assignment_id: id).find_each do |aq|
-        itemnaire_ids << aq if aq.itemnaire.type == 'ReviewQuestionnaire'
+        questionnaire_ids << aq if aq.questionnaire.type == 'ReviewQuestionnaire'
       end
     end
-    itemnaire_ids
+    questionnaire_ids
   end
 
   def pair_programming_enabled?

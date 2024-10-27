@@ -254,7 +254,7 @@ describe ReviewMappingController do
       @params = {
         assignment_id: 1,
         reviewer_id: 1,
-        itemnaire_id: 1,
+        questionnaire_id: 1,
         participant_id: 1
       }
     end
@@ -272,9 +272,9 @@ describe ReviewMappingController do
 
     context 'when corresponding response map does not exist' do
       it 'creates a new QuizResponseMap and redirects to student_quizzes page' do
-        itemnaire = double('Questionnaire', id: 1, instructor_id: 1)
-        allow(Questionnaire).to receive(:find).with('1').and_return(itemnaire)
-        allow(Questionnaire).to receive(:find_by).with(instructor_id: 1).and_return(itemnaire)
+        questionnaire = double('Questionnaire', id: 1, instructor_id: 1)
+        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
+        allow(Questionnaire).to receive(:find_by).with(instructor_id: 1).and_return(questionnaire)
         allow_any_instance_of(QuizResponseMap).to receive(:save).and_return(true)
         post :assign_quiz_dynamically, params: @params
         expect(flash[:error]).to be nil

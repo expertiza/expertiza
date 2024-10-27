@@ -1,18 +1,18 @@
 describe GradesController do
   let(:review_response) { build(:response) }
-  let(:assignment) { build(:assignment, id: 1, max_team_size: 2, itemnaires: [review_itemnaire], is_penalty_calculated: true) }
-  let(:assignment2) { build(:assignment, id: 2, max_team_size: 2, itemnaires: [review_itemnaire], is_penalty_calculated: true) }
-  let(:assignment3) { build(:assignment, id: 3, max_team_size: 0, itemnaires: [review_itemnaire], is_penalty_calculated: true) }
-  let(:assignment_itemnaire) { build(:assignment_itemnaire, used_in_round: 1, assignment: assignment) }
+  let(:assignment) { build(:assignment, id: 1, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
+  let(:assignment2) { build(:assignment, id: 2, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
+  let(:assignment3) { build(:assignment, id: 3, max_team_size: 0, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
+  let(:assignment_questionnaire) { build(:assignment_questionnaire, used_in_round: 1, assignment: assignment) }
   let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
   let(:participant2) { build(:participant, id: 2, assignment: assignment, user_id: 1) }
   let(:participant3) { build(:participant, id: 3, assignment: assignment, user_id: 1, grade: 98) }
   let(:participant4) { build(:participant, id: 4, assignment: assignment2, user_id: 1) }
   let(:participant5) { build(:participant, id: 5, assignment: assignment3, user_id: 1) }
-  let(:review_itemnaire) { build(:itemnaire, id: 1, items: [item]) }
+  let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
-  let(:item) { build(:item) }
+  let(:question) { build(:question) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment, users: [instructor]) }
   let(:team2) { build(:assignment_team, id: 2, parent_id: 8) }
   let(:student) { build(:student, id: 2) }
@@ -21,14 +21,14 @@ describe GradesController do
   let(:ta) { build(:teaching_assistant, id: 8) }
   let(:late_policy) { build(:late_policy) }
   score_view_setup_query = '
-  CREATE OR REPLACE VIEW score_views AS SELECT ques.weight item_weight,ques.type AS type,
+  CREATE OR REPLACE VIEW score_views AS SELECT ques.weight question_weight,ques.type AS type,
       q1.id "q1_id",q1.NAME AS q1_name,q1.instructor_id AS q1_instructor_id,q1.private AS q1_private,
-      q1.min_item_score AS q1_min_item_score,q1.max_item_score AS q1_max_item_score,
+      q1.min_question_score AS q1_min_question_score,q1.max_question_score AS q1_max_question_score,
       q1.created_at AS q1_created_at,q1.updated_at AS q1_updated_at,
       q1.TYPE AS q1_type,q1.display_type AS q1_display_type,
-      ques.id as ques_id,ques.itemnaire_id as ques_itemnaire_id, s.id AS s_id,s.item_id AS s_item_id,
+      ques.id as ques_id,ques.questionnaire_id as ques_questionnaire_id, s.id AS s_id,s.question_id AS s_question_id,
       s.answer AS s_score,s.comments AS s_comments,s.response_id AS s_response_id
-      FROM items ques left join itemnaires q1 on ques.itemnaire_id = q1.id left join answers s on ques.id = s.item_id'
+      FROM questions ques left join questionnaires q1 on ques.questionnaire_id = q1.id left join answers s on ques.id = s.question_id'
   ActiveRecord::Base.connection.execute(score_view_setup_query)
   before(:each) do
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
@@ -46,7 +46,7 @@ describe GradesController do
 
   describe '#view' do
     before(:each) do
-      allow(Answer).to receive(:compute_scores).with([review_response], [item]).and_return(max: 95, min: 88, avg: 90)
+      allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
       allow(Participant).to receive(:where).with(parent_id: 1).and_return([participant])
       allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
       allow(assignment).to receive(:late_policy_id).and_return(false)
@@ -54,13 +54,13 @@ describe GradesController do
     end
 
     context 'when current assignment varies rubrics by round' do
-      it 'retrieves items, calculates scores and renders grades#view page' do
+      it 'retrieves questions, calculates scores and renders grades#view page' do
         allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([assignment_itemnaire])
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, itemnaire_id: 1).and_return([assignment_itemnaire])
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([assignment_questionnaire])
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
         request_params = { id: 1 }
         get :view, params: request_params
-        expect(controller.instance_variable_get(:@items)[:review1].size).to eq(1)
+        expect(controller.instance_variable_get(:@questions)[:review1].size).to eq(1)
         expect(response).to render_template(:view)
       end
     end
@@ -71,7 +71,7 @@ describe GradesController do
         allow(ReviewResponseMap).to receive(:assessments_for).with(team).and_return([review_response])
         request_params = { id: 1 }
         get :view, params: request_params
-        expect(controller.instance_variable_get(:@items).size).to eq(1)
+        expect(controller.instance_variable_get(:@questions).size).to eq(1)
         expect(response).to render_template(:view)
       end
     end
@@ -96,10 +96,10 @@ describe GradesController do
       it 'renders grades#view_my_scores page' do
         allow(TeamsUser).to receive(:where).with(any_args).and_return([double('TeamsUser', team_id: 1)])
         allow(Team).to receive(:find).with(1).and_return(team)
-        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, itemnaire_id: 1).and_return(assignment_itemnaire)
-        allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_itemnaire])
-        allow(review_itemnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([review_response])
-        allow(Answer).to receive(:compute_scores).with([review_response], [item]).and_return(max: 95, min: 88, avg: 90)
+        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
+        allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])
+        allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([review_response])
+        allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
         allow(Participant).to receive(:where).with(parent_id: 1).and_return([participant])
         allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
         allow(assignment).to receive(:late_policy_id).and_return(false)
@@ -128,13 +128,13 @@ describe GradesController do
       it 'renders grades#view_team page' do
         allow(participant).to receive(:team).and_return(team)
         allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
-        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, itemnaire_id: 1).and_return(assignment_itemnaire)
-        allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_itemnaire])
+        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
+        allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])
         allow(assignment).to receive(:late_policy_id).and_return(false)
         allow(assignment).to receive(:calculate_penalty).and_return(false)
         allow_any_instance_of(GradesController).to receive(:compute_total_score).with(assignment, any_args).and_return(100)
-        allow(review_itemnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([review_response])
-        allow(Answer).to receive(:compute_scores).with([review_response], [item]).and_return(max: 95, min: 88, avg: 90)
+        allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([review_response])
+        allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
         request_params = { id: 1 }
         allow(TaMapping).to receive(:exists?).with(ta_id: 1, course_id: 1).and_return(true)
         stub_current_user(ta, ta.role.name, ta.role)
@@ -147,10 +147,10 @@ describe GradesController do
   describe '#edit' do
     it 'renders grades#edit page' do
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
-      assignment_itemnaire.used_in_round = nil
-      allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, itemnaire_id: 1).and_return(assignment_itemnaire)
-      allow(review_itemnaire).to receive(:get_assessments_for).with(participant).and_return([review_response])
-      allow(Answer).to receive(:compute_scores).with([review_response], [item]).and_return(max: 95, min: 88, avg: 90)
+      assignment_questionnaire.used_in_round = nil
+      allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
+      allow(review_questionnaire).to receive(:get_assessments_for).with(participant).and_return([review_response])
+      allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
       allow_any_instance_of(GradesController).to receive(:compute_total_score).with(assignment, any_args).and_return(100)
       request_params = { id: 1 }
       get :edit, params: request_params

@@ -1,7 +1,7 @@
 class TagPromptDeployment < ApplicationRecord
   belongs_to :tag_prompt
   belongs_to :assignment
-  belongs_to :itemnaire
+  belongs_to :questionnaire
   has_many :answer_tags, dependent: :destroy
 
   require 'time'
@@ -13,13 +13,13 @@ class TagPromptDeployment < ApplicationRecord
   def get_number_of_taggable_answers(user_id)
     team = Team.joins(:teams_users).where(team_users: { parent_id: assignment_id }, user_id: user_id)
     responses = Response.joins(:response_maps).where(response_maps: { reviewed_object_id: assignment.id, reviewee_id: team.id })
-    items = Question.where(itemnaire_id: itemnaire.id, type: item_type)
+    questions = Question.where(questionnaire_id: questionnaire.id, type: question_type)
 
-    unless responses.empty? || items.empty?
+    unless responses.empty? || questions.empty?
       responses_ids = responses.map(&:id)
-      items_ids = items.map(&:id)
+      questions_ids = questions.map(&:id)
 
-      answers = Answer.where(item_id: items_ids, response_id: responses_ids)
+      answers = Answer.where(question_id: questions_ids, response_id: responses_ids)
 
       answers = answers.where(conditions: "length(comments) < #{answer_length_threshold}") unless answer_length_threshold.nil?
       return answers.count
@@ -29,10 +29,10 @@ class TagPromptDeployment < ApplicationRecord
 
   def assignment_tagging_progress
     teams = Team.where(parent_id: assignment_id)
-    items = Question.where(itemnaire_id: itemnaire.id, type: item_type)
-    items_ids = items.map(&:id)
+    questions = Question.where(questionnaire_id: questionnaire.id, type: question_type)
+    questions_ids = questions.map(&:id)
     user_answer_tagging = []
-    unless teams.empty? || items.empty?
+    unless teams.empty? || questions.empty?
       teams.each do |team|
         if assignment.varying_rubrics_by_round?
           responses = []
@@ -43,7 +43,7 @@ class TagPromptDeployment < ApplicationRecord
           responses = ResponseMap.assessments_for(team)
         end
         responses_ids = responses.map(&:id)
-        answers = Answer.where(item_id: items_ids, response_id: responses_ids)
+        answers = Answer.where(question_id: questions_ids, response_id: responses_ids)
 
         answers = answers.select { |answer| answer.comments.length > answer_length_threshold } unless answer_length_threshold.nil?
         answers_ids = answers.map(&:id)

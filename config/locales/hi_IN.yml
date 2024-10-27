@@ -108,10 +108,10 @@ hi_IN:
 
       rubrics:
         review_varies: "क्या समीक्षा दौर से भिन्न होती है?"
-        itemnaire: "प्रश्नावली"
+        questionnaire: "प्रश्नावली"
         use_dropdown: "ड्रॉप डाउन का उपयोग करें"
         instead: " इसके बजाय क्या ?"
-        scored_item: "रन बनाए-सवाल"
+        scored_question: "रन बनाए-सवाल"
         display_style: "प्रदर्शन शैली"
         weight: "वजन"
         notification_limit: "विज्ञापन का हद"
@@ -235,7 +235,7 @@ hi_IN:
       advertise: "अद्वेर्तीसे - मेन्ट(स)"
       topic_id: "Topic ID"
       select: "Select"
-      itemnaire: "Questionnaire"
+      questionnaire: "Questionnaire"
       disabled: "(disabled)"
 
     suggested_topic:
@@ -356,8 +356,8 @@ hi_IN:
       average_peer_review: "औसत सहकर्मी समीक्षा स्कोर:"
       show_submission: "सबमिशन दिखाएं"
       no_submission: "कोई सबमिशन नहीं"
-      item: "सवाल"
-      toggle_item_list: "प्रश्न सूची टॉगल करें"
+      question: "सवाल"
+      toggle_question_list: "प्रश्न सूची टॉगल करें"
       hide_tags: "टैग छुपाएं"
       color_legend: "कलर लीजेंड"
       interaction_legend: "इंटरेक्शन लीजेंड"
@@ -418,7 +418,7 @@ hi_IN:
       no_review_done: "अभी तक कोई समीक्षा नहीं की गई है"
       reviewer_score: "समीक्षक दिया हुआ अंक"
       self_review_of: "की समीक्षा"
-      item: "प्रश्न"
+      question: "प्रश्न"
       score: "अंक"
       comments: "प्रतिक्रिया"
       other_reviewer_score: "समीक्षक के अंक (Σ भारित अंक / Σ भारित उपलब्ध अंक)"
@@ -444,7 +444,7 @@ hi_IN:
       quiz_score: "प्रश्नोत्तरी के लिए अंक"
       back: "वापस पीछे"
 
-    review_items:
+    review_questions:
       quiz_listings: "सभी प्रश्नोत्तरी इसके लिए :"
       quiz_create: "यह प्रश्नोत्तरी उनके द्वारा बनाई गई थी: "
       topic: "विषय :"
@@ -453,7 +453,7 @@ hi_IN:
       avg_score: "प्रश्नोत्तरी लेने वाले के लिए औसत अंक"
 
     take_quiz:
-      items: "प्रशन"
+      questions: "प्रशन"
       submit_quiz: "कृपया प्रश्नोत्तरी जमा करें"
 
   profile:

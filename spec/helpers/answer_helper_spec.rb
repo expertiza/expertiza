@@ -2,10 +2,10 @@ describe AnswerHelper do
   before(:each) do
     @assignment1 = create(:assignment, name: 'name1', directory_path: 'name1')
     @assignment2 = create(:assignment, name: 'name2', directory_path: 'name2')
-    @itemnaire1 = create(:itemnaire)
-    @itemnaire2 = create(:itemnaire)
-    @itemnaire3 = create(:itemnaire)
-    @item = create(:item, itemnaire_id: @itemnaire2.id)
+    @questionnaire1 = create(:questionnaire)
+    @questionnaire2 = create(:questionnaire)
+    @questionnaire3 = create(:questionnaire)
+    @question = create(:question, questionnaire_id: @questionnaire2.id)
     @deadline_type_sub = create(:deadline_type, name: 'submission')
     @deadline_type_rev = create(:deadline_type, name: 'review')
     @deadline_right = create(:deadline_right)
@@ -17,33 +17,33 @@ describe AnswerHelper do
     @duedate6 = create(:assignment_due_date, id: 6, due_at: '2019-01-31 23:30:00', deadline_type: @deadline_type_rev, review_allowed_id: @deadline_right.id, review_of_review_allowed_id: @deadline_right.id, submission_allowed_id: @deadline_right.id, parent_id: @assignment2.id, round: 1)
     @duedate7 = create(:assignment_due_date, id: 7, due_at: '2019-02-01 23:30:00', deadline_type: @deadline_type_sub, review_allowed_id: @deadline_right.id, review_of_review_allowed_id: @deadline_right.id, submission_allowed_id: @deadline_right.id, parent_id: @assignment2.id, round: 2)
     @duedate8 = create(:assignment_due_date, id: 8, due_at: '3000-01-31 23:30:00', deadline_type: @deadline_type_rev, review_allowed_id: @deadline_right.id, review_of_review_allowed_id: @deadline_right.id, submission_allowed_id: @deadline_right.id, parent_id: @assignment2.id, round: 2)
-    @assignment_itemnaire1 = create(:assignment_itemnaire, id: 1, assignment_id: @assignment1.id, itemnaire_id: @itemnaire1.id, used_in_round: 1)
-    @assignment_itemnaire2 = create(:assignment_itemnaire, id: 2, assignment_id: @assignment1.id, itemnaire_id: @itemnaire2.id, used_in_round: 2)
-    @assignment_itemnaire3 = create(:assignment_itemnaire, id: 3, assignment_id: @assignment2.id, itemnaire_id: @itemnaire3.id, used_in_round: nil)
+    @assignment_questionnaire1 = create(:assignment_questionnaire, id: 1, assignment_id: @assignment1.id, questionnaire_id: @questionnaire1.id, used_in_round: 1)
+    @assignment_questionnaire2 = create(:assignment_questionnaire, id: 2, assignment_id: @assignment1.id, questionnaire_id: @questionnaire2.id, used_in_round: 2)
+    @assignment_questionnaire3 = create(:assignment_questionnaire, id: 3, assignment_id: @assignment2.id, questionnaire_id: @questionnaire3.id, used_in_round: nil)
     @user = create(:student, name: 'name', fullname: 'name')
     @participant = create(:participant, user_id: @user.id, parent_id: @assignment1.id)
     @response_map = create(:review_response_map, reviewer: @participant, assignment: @assignment1)
     @response = create(:response, response_map: @response_map, created_at: '2019-11-01 23:30:00')
-    @answer = create(:answer, response_id: @response.id, item_id: @item.id, comments: 'comment')
+    @answer = create(:answer, response_id: @response.id, question_id: @question.id, comments: 'comment')
   end
 
   describe '#delete_existing_responses' do
     context 'when the response is in reviewing period' do
       it 'deletes the answers' do
-        allow(AnswerHelper).to receive(:log_answer_responses).with([@item.id], @itemnaire2.id).and_return([@answer.response_id])
+        allow(AnswerHelper).to receive(:log_answer_responses).with([@question.id], @questionnaire2.id).and_return([@answer.response_id])
         allow(AnswerHelper).to receive(:log_response_info).with([@answer.response_id]).and_return(@answer.response_id => { email: @user.email, answers: @answer.comments, name: @user.name, assignment_name: @assignment1.name })
         expect(AnswerHelper).to receive(:review_mailer).with(@user.email, @answer.comments, @user.name, @assignment1.name).and_return(true)
         expect(Answer.exists?(response_id: @answer.response_id)).to eql(true) # verify the answer exists before deleting
-        AnswerHelper.delete_existing_responses([@item.id], @itemnaire2.id)
+        AnswerHelper.delete_existing_responses([@question.id], @questionnaire2.id)
         expect(Answer.exists?(response_id: @answer.response_id)).to eql(false)
       end
     end
   end
 
   describe '#log_answer_responses' do
-    it 'logs the response_id if in active period for each of the items answers' do
-      AnswerHelper.log_answer_responses([@item.id], @itemnaire2.id)
-      expect(AnswerHelper.log_answer_responses([@item.id], @itemnaire2.id)).to eql([1])
+    it 'logs the response_id if in active period for each of the questions answers' do
+      AnswerHelper.log_answer_responses([@question.id], @questionnaire2.id)
+      expect(AnswerHelper.log_answer_responses([@question.id], @questionnaire2.id)).to eql([1])
     end
   end
 
@@ -81,13 +81,13 @@ describe AnswerHelper do
 
   describe '#in_active_period' do
     it 'returns false when the current time is not in active period' do
-      expect(AnswerHelper.in_active_period(@itemnaire1.id)).to eql(false)
+      expect(AnswerHelper.in_active_period(@questionnaire1.id)).to eql(false)
     end
     it 'returns true when the current time is in active period' do
-      expect(AnswerHelper.in_active_period(@itemnaire2.id)).to eql(true)
+      expect(AnswerHelper.in_active_period(@questionnaire2.id)).to eql(true)
     end
     it 'returns true when the current time is in any active period (multiple periods when round number is nil)' do
-      expect(AnswerHelper.in_active_period(@itemnaire3.id)).to eql(true)
+      expect(AnswerHelper.in_active_period(@questionnaire3.id)).to eql(true)
     end
   end
 end

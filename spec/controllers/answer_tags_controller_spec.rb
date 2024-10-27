@@ -4,19 +4,19 @@ describe AnswerTagsController do
   let(:student) { build(:student, id: 1) }
   let!(:assignment) { create(:assignment, name: 'assignment', directory_path: 'assignment', id: 1) }
   let!(:assignment2) { create(:assignment, name: 'assignment2', directory_path: 'assignment2', id: 2) }
-  let!(:itemnaire) { create(:itemnaire, id: 1) }
-  let!(:tag_prompt_deployment) { create(:tag_prompt_deployment, id: 1, assignment_id: 1, itemnaire_id: 1) }
-  let!(:tag_prompt_deployment2) { create(:tag_prompt_deployment, id: 2, assignment_id: 2, itemnaire_id: 1) }
+  let!(:questionnaire) { create(:questionnaire, id: 1) }
+  let!(:tag_prompt_deployment) { create(:tag_prompt_deployment, id: 1, assignment_id: 1, questionnaire_id: 1) }
+  let!(:tag_prompt_deployment2) { create(:tag_prompt_deployment, id: 2, assignment_id: 2, questionnaire_id: 1) }
   let!(:answer_tag) { create(:answer_tag, id: 1, tag_prompt_deployment_id: 1, user_id: student.id) }
 
   # factory objects required for "create_edit" test cases - since creating answer tags and updating answer tags requires pre mapping of answer and tag deployment key constraints
-  let(:itemnaire1) { create(:itemnaire, id: 2) }
-  let(:item1) { create(:item, itemnaire: itemnaire, weight: 2, id: 2, type: 'Criterion') }
+  let(:questionnaire1) { create(:questionnaire, id: 2) }
+  let(:question1) { create(:question, questionnaire: questionnaire, weight: 2, id: 2, type: 'Criterion') }
   let(:response_map) { create(:review_response_map, id: 2, reviewed_object_id: 2) }
   let!(:response_record) { create(:response, id: 2, response_map: response_map) }
-  let!(:answer) { create(:answer, item: item1, comments: 'test comment', response_id: response_record.id) }
+  let!(:answer) { create(:answer, question: question1, comments: 'test comment', response_id: response_record.id) }
   let(:tag_prompt) { create(:tag_prompt, id: 3, prompt: '??', desc: 'desc', control_type: 'slider') }
-  let(:tag_deploy) { create(:tag_prompt_deployment, id: 3, tag_prompt: tag_prompt, item_type: 'Criterion') }
+  let(:tag_deploy) { create(:tag_prompt_deployment, id: 3, tag_prompt: tag_prompt, question_type: 'Criterion') }
   # To allow the functionality only if the accessing user is having student privileges
   # params: action
   describe '#action_allowed?' do
@@ -94,8 +94,8 @@ describe AnswerTagsController do
         expect(output.length).to eql(1)
       end
 
-      it 'when there is one answer tag for given itemnaire_id' do
-        request_params = { itemnaire_id: itemnaire.id }
+      it 'when there is one answer tag for given questionnaire_id' do
+        request_params = { questionnaire_id: questionnaire.id }
         get :index, params: request_params
         output = JSON.parse(response.body)
         expect(output.length).to eql(1)
@@ -115,8 +115,8 @@ describe AnswerTagsController do
         expect(output.length).to eql(0)
       end
 
-      it 'when there are no answer tags for given random itemnaire_id' do
-        request_params = { itemnaire_id: 42 }
+      it 'when there are no answer tags for given random questionnaire_id' do
+        request_params = { questionnaire_id: 42 }
         get :index, params: request_params
         output = JSON.parse(response.body)
         expect(output.length).to eql(0)
@@ -129,8 +129,8 @@ describe AnswerTagsController do
         expect(output.length).to eql(0)
       end
 
-      it 'when the itemnaire_id is nil' do
-        request_params = { itemnaire_id: nil }
+      it 'when the questionnaire_id is nil' do
+        request_params = { questionnaire_id: nil }
         get :index, params: request_params
         output = JSON.parse(response.body)
         expect(output.length).to eql(0)

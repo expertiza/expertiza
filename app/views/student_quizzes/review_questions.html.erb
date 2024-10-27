@@ -1,7 +1,7 @@
 <h1 xmlns="http://www.w3.org/1999/html"> <%=t ".quiz_listings"%> <%= Assignment.find(@assignment_id).name %> </h1>
 <table>
-  <%@quiz_itemnaires.each do |itemnaire|%>
-      <%author_team = Team.find(itemnaire.instructor_id)%>
+  <%@quiz_questionnaires.each do |questionnaire|%>
+      <%author_team = Team.find(questionnaire.instructor_id)%>
       <h2> <%=t ".quiz_create"%> <%=author_team.name%></h2>
 
       <%topic_id = SignedUpTeam.topic_id_by_team_id(author_team.id)%>
@@ -12,7 +12,7 @@
           <h4><%=t ".topic"%><%=topic_name%></h4>
       <%end%>
 
-      <% response_maps = QuizResponseMap.where(reviewed_object_id:itemnaire.id) %>
+      <% response_maps = QuizResponseMap.where(reviewed_object_id:questionnaire.id) %>
       <% unless response_maps.empty? %>
         <table border="2">
           <tr>
@@ -41,9 +41,9 @@
         <% end %>
       <% end %>
 
-      <%items = itemnaire.items%>
-      <% items.each do |item| %>
-        <%= item.view_item_text%>
+      <%questions = questionnaire.questions%>
+      <% questions.each do |question| %>
+        <%= question.view_question_text%>
 
       <% end %><hr>
   <% end %>

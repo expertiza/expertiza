@@ -26,13 +26,13 @@ describe ReviewResponseMap do
   let(:metareview_response_map) { build(:meta_review_response_map, reviewed_object_id: 1) }
   let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
   let(:student1) { build(:student, id: 2, name: 'name1', fullname: 'no one', email: 'expertiza@mailinator.com') }
-  let(:assignment_itemnaire1) { build(:assignment_itemnaire, id: 1, assignment_id: 1, itemnaire_id: 1) }
-  let(:assignment_itemnaire2) { build(:assignment_itemnaire, id: 2, assignment_id: 1, itemnaire_id: 2) }
-  let(:itemnaire1) { build(:itemnaire, type: 'ReviewQuestionnaire') }
-  let(:itemnaire2) { build(:itemnaire, type: 'MetareviewQuestionnaire') }
+  let(:assignment_questionnaire1) { build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 1) }
+  let(:assignment_questionnaire2) { build(:assignment_questionnaire, id: 2, assignment_id: 1, questionnaire_id: 2) }
+  let(:questionnaire1) { build(:questionnaire, type: 'ReviewQuestionnaire') }
+  let(:questionnaire2) { build(:questionnaire, type: 'MetareviewQuestionnaire') }
   let(:next_due_date) { build(:assignment_due_date, round: 1) }
-  let(:item) { double('Question') }
-  let(:review_itemnaire) { build(:itemnaire, id: 1) }
+  let(:question) { double('Question') }
+  let(:review_questionnaire) { build(:questionnaire, id: 1) }
   let(:response3) { build(:response) }
   let(:response_map) { build(:review_response_map, reviewer_id: 2, response: [response3]) }
   before(:each) do
@@ -41,69 +41,69 @@ describe ReviewResponseMap do
     allow(response_map).to receive(:id).and_return(1)
   end
 
-  describe '#itemnaire' do
-    # This method is little more than a wrapper for assignment.review_itemnaire_id()
+  describe '#questionnaire' do
+    # This method is little more than a wrapper for assignment.review_questionnaire_id()
     # Test how it responds to the combinations of various arguments it could receive
 
-    context 'when corresponding active record for assignment_itemnaire is found' do
+    context 'when corresponding active record for assignment_questionnaire is found' do
       before(:each) do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
-          [assignment_itemnaire1, assignment_itemnaire2]
+          [assignment_questionnaire1, assignment_questionnaire2]
         )
-        allow(Questionnaire).to receive(:find).with(1).and_return(itemnaire1)
+        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire1)
       end
 
-      it 'returns correct itemnaire found by used_in_round and topic_id if both used_in_round and topic_id are given' do
+      it 'returns correct questionnaire found by used_in_round and topic_id if both used_in_round and topic_id are given' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return(
-          [assignment_itemnaire1]
+          [assignment_questionnaire1]
         )
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
-        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(itemnaire1)
-        expect(review_response_map.itemnaire(1, 1)).to eq(itemnaire1)
+        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
+        expect(review_response_map.questionnaire(1, 1)).to eq(questionnaire1)
       end
 
-      it 'returns correct itemnaire found by used_in_round if only used_in_round is given' do
+      it 'returns correct questionnaire found by used_in_round if only used_in_round is given' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: nil).and_return(
-          [assignment_itemnaire1]
+          [assignment_questionnaire1]
         )
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
-        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(itemnaire1)
-        expect(review_response_map.itemnaire(1, nil)).to eq(itemnaire1)
+        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
+        expect(review_response_map.questionnaire(1, nil)).to eq(questionnaire1)
       end
 
-      it 'returns correct itemnaire found by topic_id if only topic_id is given and there is no current round used in the due date' do
+      it 'returns correct questionnaire found by topic_id if only topic_id is given and there is no current round used in the due date' do
         allow(DueDate).to receive(:get_next_due_date).with(assignment.id).and_return(nil)
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: nil, topic_id: 1).and_return(
-          [assignment_itemnaire1]
+          [assignment_questionnaire1]
         )
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
-        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(itemnaire1)
-        expect(review_response_map.itemnaire(nil, 1)).to eq(itemnaire1)
+        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
+        expect(review_response_map.questionnaire(nil, 1)).to eq(questionnaire1)
       end
 
-      it 'returns correct itemnaire found by used_in_round and topic_id if only topic_id is given, but current round is found by the due date' do
+      it 'returns correct questionnaire found by used_in_round and topic_id if only topic_id is given, but current round is found by the due date' do
         allow(DueDate).to receive(:get_next_due_date).with(assignment.id).and_return(next_due_date)
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return(
-          [assignment_itemnaire1]
+          [assignment_questionnaire1]
         )
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
-        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(itemnaire1)
-        expect(review_response_map.itemnaire(nil, 1)).to eq(itemnaire1)
+        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
+        expect(review_response_map.questionnaire(nil, 1)).to eq(questionnaire1)
       end
     end
 
-    context 'when corresponding active record for assignment_itemnaire is not found' do
-      it 'returns correct itemnaire found by type' do
+    context 'when corresponding active record for assignment_questionnaire is not found' do
+      it 'returns correct questionnaire found by type' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
-          [assignment_itemnaire1, assignment_itemnaire2]
+          [assignment_questionnaire1, assignment_questionnaire2]
         )
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return([])
-        allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, itemnaire_id: nil).and_return([])
+        allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
         allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(nil)
-        allow(Questionnaire).to receive(:find).with(1).and_return(itemnaire1)
-        allow(Questionnaire).to receive(:find).with(2).and_return(itemnaire2)
-        expect(review_response_map.itemnaire(1, 1)).to eq(itemnaire1)
+        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire1)
+        allow(Questionnaire).to receive(:find).with(2).and_return(questionnaire2)
+        expect(review_response_map.questionnaire(1, 1)).to eq(questionnaire1)
       end
     end
   end
@@ -205,11 +205,11 @@ describe ReviewResponseMap do
     allow(participant).to receive(:parent_id).and_return(1)
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
     allow(Response).to receive(:where).with(map_id: 1, round: 1).and_return([response])
-    allow(assignment).to receive(:review_itemnaire_id).with(1).and_return(1)
+    allow(assignment).to receive(:review_questionnaire_id).with(1).and_return(1)
     allow(Response).to receive(:where).with(map_id: 1, round: 2).and_return([response1])
-    allow(assignment).to receive(:review_itemnaire_id).with(2).and_return(1)
+    allow(assignment).to receive(:review_questionnaire_id).with(2).and_return(1)
     expect(ReviewResponseMap.final_versions_from_reviewer(1, 1))
-      .to eq("review round 1": { itemnaire_id: 1, response_ids: [1] }, "review round 2": { itemnaire_id: 1, response_ids: [2] })
+      .to eq("review round 1": { questionnaire_id: 1, response_ids: [1] }, "review round 2": { questionnaire_id: 1, response_ids: [2] })
   end
 
   it '#review_response_report' do
@@ -252,24 +252,24 @@ describe ReviewResponseMap do
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
     allow(MetareviewResponseMap).to receive(:where).with(reviewed_object_id: 1).and_return([metareview_response_map])
     allow(Response).to receive(:where).with(map_id: 1, round: 1).and_return([response])
-    allow(assignment).to receive(:review_itemnaire_id).with(1).and_return(1)
+    allow(assignment).to receive(:review_questionnaire_id).with(1).and_return(1)
     allow(Response).to receive(:where).with(map_id: 1, round: 2).and_return([response1])
-    allow(assignment).to receive(:review_itemnaire_id).with(2).and_return(1)
+    allow(assignment).to receive(:review_questionnaire_id).with(2).and_return(1)
     current_assignment = Assignment.find(Participant.find(reviewer_id).parent_id)
     meta_review_response_maps = MetareviewResponseMap.where(reviewed_object_id: 1)
     expect(ReviewResponseMap.prepare_final_review_versions(current_assignment, meta_review_response_maps))
-      .to eq("review round 1": { itemnaire_id: 1, response_ids: [1] }, "review round 2": { itemnaire_id: 1, response_ids: [2] })
+      .to eq("review round 1": { questionnaire_id: 1, response_ids: [1] }, "review round 2": { questionnaire_id: 1, response_ids: [2] })
     # when round = nil
     reviewer_id = 2
     allow(Participant).to receive(:find).with(2).and_return(participant1)
     allow(Assignment).to receive(:find).with(2).and_return(assignment1)
     allow(MetareviewResponseMap).to receive(:where).with(reviewed_object_id: 1).and_return([metareview_response_map])
-    allow(assignment).to receive(:review_itemnaire_id).with(nil).and_return(1)
+    allow(assignment).to receive(:review_questionnaire_id).with(nil).and_return(1)
     allow(Response).to receive(:where).with(map_id: 1).and_return([response2])
     current_assignment = Assignment.find(Participant.find(reviewer_id).parent_id)
     meta_review_response_maps = MetareviewResponseMap.where(reviewed_object_id: 1)
     expect(ReviewResponseMap.prepare_final_review_versions(current_assignment, meta_review_response_maps))
-      .to eq(review: { itemnaire_id: nil, response_ids: [3] })
+      .to eq(review: { questionnaire_id: nil, response_ids: [3] })
   end
 
   it '#prepare_review_response' do

@@ -26,9 +26,9 @@
                 <% else %>
                     <% review_symbol = 'review' %>
                 <% end %>
-                <% @items[review_symbol.to_sym].each do |item| %>
-                    <% if item.instance_of? UploadFile %>
-                        <!-- Display FileUpload item type -->
+                <% @questions[review_symbol.to_sym].each do |question| %>
+                    <% if question.instance_of? UploadFile %>
+                        <!-- Display FileUpload question type -->
                         <% current_folder = DisplayOption.new %>
                         <% current_folder.name = "" %>
                         <% files = @participant.files(@participant.review_file_path(review.response_map.id).to_s + current_folder.name) %>

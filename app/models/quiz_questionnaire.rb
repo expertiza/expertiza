@@ -1,5 +1,5 @@
 class QuizQuestionnaire < Questionnaire
-  attr_accessor :itemnaire
+  attr_accessor :questionnaire
   after_initialize :post_initialization
   def post_initialization
     self.display_type = 'Quiz'

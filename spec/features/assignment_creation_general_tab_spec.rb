@@ -36,7 +36,7 @@ describe 'Assignment creation general tab', js: true do
     fill_assignment_form
     check('assignment_form_assignment_require_quiz')
     click_button 'Save'
-    fill_in 'assignment_form_assignment_num_quiz_items', with: 5
+    fill_in 'assignment_form_assignment_num_quiz_questions', with: 5
     click_button 'Save'
     assignment = Assignment.where(name: 'edit assignment for test').first
     expect(assignment).to have_attributes(
@@ -44,7 +44,7 @@ describe 'Assignment creation general tab', js: true do
       course_id: Course.find_by(name: 'Course 2').id,
       directory_path: 'testDirectory1',
       spec_location: 'testLocation1',
-      num_quiz_items: 5,
+      num_quiz_questions: 5,
       require_quiz: true
     )
   end

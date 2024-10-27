@@ -15,12 +15,12 @@ describe 'Staggered deadline test' do
     create(:topic, topic_name: 'Topic_3')
 
     # rubric
-    create(:itemnaire, name: 'TestQuestionnaire1')
-    create(:itemnaire, name: 'TestQuestionnaire2')
-    create(:item, txt: 'Question1', itemnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first)
-    create(:item, txt: 'Question2', itemnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first)
-    create(:assignment_itemnaire, itemnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, used_in_round: 1)
-    create(:assignment_itemnaire, itemnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first, used_in_round: 2)
+    create(:questionnaire, name: 'TestQuestionnaire1')
+    create(:questionnaire, name: 'TestQuestionnaire2')
+    create(:question, txt: 'Question1', questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first)
+    create(:question, txt: 'Question2', questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first)
+    create(:assignment_questionnaire, questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, used_in_round: 1)
+    create(:assignment_questionnaire, questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first, used_in_round: 2)
 
     # deadline type
     create(:deadline_type, name: 'submission')

@@ -118,7 +118,7 @@ module AuthorizationHelper
   # The application controller method session[:user]
   # will return a user even if session[:user] has been explicitly cleared out
   # because it is "sticky" in that it uses "@session[:user] ||= session[:user]"
-  # So, this method can be used to answer a controller's item
+  # So, this method can be used to answer a controller's question
   # "is anyone CURRENTLY logged in"
   def user_logged_in?
     !session[:user].nil?

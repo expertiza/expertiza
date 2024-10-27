@@ -6,10 +6,10 @@ describe AssignmentParticipant do
   let(:participant) { build(:participant, id: 1, assignment: assignment) }
   let(:participant2) { build(:participant, id: 2, grade: 100) }
   let(:assignment) { build(:assignment, id: 1) }
-  let(:review_itemnaire) { build(:itemnaire, id: 1) }
-  let(:item) { double('Question') }
+  let(:review_questionnaire) { build(:questionnaire, id: 1) }
+  let(:question) { double('Question') }
   before(:each) do
-    allow(assignment).to receive(:itemnaires).and_return([review_itemnaire])
+    allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
     allow(participant).to receive(:team).and_return(team)
   end
 

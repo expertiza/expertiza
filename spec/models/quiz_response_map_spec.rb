@@ -1,14 +1,14 @@
 describe QuizResponseMap do
-  let(:quiz_itemnaire) { QuizQuestionnaire.new }
+  let(:quiz_questionnaire) { QuizQuestionnaire.new }
   let(:team) { build(:assignment_team, id: 1, parent_id: 1) }
-  let(:quiz_response_map) { build(:quiz_response_map, quiz_itemnaire: quiz_itemnaire, reviewee_id: 1) }
+  let(:quiz_response_map) { build(:quiz_response_map, quiz_questionnaire: quiz_questionnaire, reviewee_id: 1) }
   let(:participant) { build(:participant, id: 1, assignment: assignment) }
   let(:response) { build(:response, id: 1) }
   let(:assignment) { build(:assignment, id: 1) }
   let(:score) { double }
-  describe '#itemnaire' do
-    it 'returns the itemnaire' do
-      expect(quiz_response_map.itemnaire).to eq(quiz_itemnaire)
+  describe '#questionnaire' do
+    it 'returns the questionnaire' do
+      expect(quiz_response_map.questionnaire).to eq(quiz_questionnaire)
     end
   end
   describe '#get_title' do

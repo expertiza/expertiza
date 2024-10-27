@@ -132,8 +132,8 @@
                     tinymce.get('review_comments').setContent(data.additional_comment);
                 }
             });
-            //update the items
-            $.get("../../../answer?response_id=<%= @response.id %>&itemnaire_id=<%= @itemnaire.id %>", function (data) {
+            //update the questions
+            $.get("../../../answer?response_id=<%= @response.id %>&questionnaire_id=<%= @questionnaire.id %>", function (data) {
                 var index, len;
                 $("[type=radio]").each(function () {
                     $(this).removeAttr("checked");
@@ -147,7 +147,7 @@
                                 <% if @dropdown_or_scale == "dropdown" %>
                                 $('#responses_' + index + '_score').barrating('set', data[index].answer);
                                 <% else %>
-                                $("input[name='Radio_" + data[index].item_id + "']").each(function () {
+                                $("input[name='Radio_" + data[index].question_id + "']").each(function () {
                                     if (data[index].answer == $(this).val())
                                         $(this).prop("checked", "true");
                                     else
@@ -176,7 +176,7 @@
                             }
                             break;
                         case "Scale":
-                            $("input[name='Radio_" + data[index].item_id + "']").each(function () {
+                            $("input[name='Radio_" + data[index].question_id + "']").each(function () {
                                 if (data[index].answer == $(this).val())
                                     $(this).prop("checked", "true");
                                 else
@@ -365,21 +365,21 @@
     <input name="_method" type="hidden" value="put"/>
   <% end %>
   <table width="100%">
-    <% @review_items.each_with_index do |item, i| %>
+    <% @review_questions.each_with_index do |question, i| %>
       <tr>
         <td>
-            <% answer = Answer.where(item_id: item.id, response_id: @response.id).first unless @response.nil? %>
-            <% if item.instance_of? Criterion %>
-              <%= item.complete(i, answer, @itemnaire.min_item_score, @itemnaire.max_item_score, @dropdown_or_scale) %>
-            <% elsif item.instance_of? Scale %>
-              <%= item.complete(i, @itemnaire.min_item_score, @itemnaire.max_item_score, answer) %>
-            <% elsif item.instance_of? Cake %>
-              <%= item.complete(i, answer, @total_score[item.id].to_s) %>
+            <% answer = Answer.where(question_id: question.id, response_id: @response.id).first unless @response.nil? %>
+            <% if question.instance_of? Criterion %>
+              <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
+            <% elsif question.instance_of? Scale %>
+              <%= question.complete(i, @questionnaire.min_question_score, @questionnaire.max_question_score, answer) %>
+            <% elsif question.instance_of? Cake %>
+              <%= question.complete(i, answer, @total_score[question.id].to_s) %>
             <% else %>
-              <%= item.complete(i, answer) %>
+              <%= question.complete(i, answer) %>
             <% end %>
 
-            <% if [Criterion, TextArea].include? item.class %>
+            <% if [Criterion, TextArea].include? question.class %>
               <div id="analysis_<%= i.to_s %>_comments"></div>
             <% end %>
         </td>
@@ -400,7 +400,7 @@
     </tr>
 
     <!-- Add a Good Teammate badge to the Teammate Review Questionnaire if the assignment has badges -->
-    <% if @assignment.badge? and (@itemnaire.type == 'TeammateReviewQuestionnaire' or @itemnaire.type == 'Teammate ReviewQuestionnaire') and AssignmentBadge.where(assignment_id: @assignment.id, badge_id: Badge.get_id_from_name('Good Teammate')).any? %>
+    <% if @assignment.badge? and (@questionnaire.type == 'TeammateReviewQuestionnaire' or @questionnaire.type == 'Teammate ReviewQuestionnaire') and AssignmentBadge.where(assignment_id: @assignment.id, badge_id: Badge.get_id_from_name('Good Teammate')).any? %>
       <tr>
         <td>
           <img width="100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Teammate")}" %> title="GoodTeammate">
@@ -411,7 +411,7 @@
     <% end %>
 
     <!-- Add a Good Reviewer badge to the Feedback Review Questionnaire if the assignment has badges -->
-    <% if @assignment.badge? and (@itemnaire.type == 'AuthorFeedbackQuestionnaire' or @itemnaire.type == 'Author FeedbackQuestionnaire') and AssignmentBadge.where(assignment_id: @assignment.id, badge_id: Badge.get_id_from_name('Good Reviewer')).any? %>
+    <% if @assignment.badge? and (@questionnaire.type == 'AuthorFeedbackQuestionnaire' or @questionnaire.type == 'Author FeedbackQuestionnaire') and AssignmentBadge.where(assignment_id: @assignment.id, badge_id: Badge.get_id_from_name('Good Reviewer')).any? %>
       <tr>
         <td>
           <img width="100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Reviewer")}" %> title="GoodReviewer">
@@ -425,7 +425,7 @@
   <% if @current_round %>
     <%= hidden_field_tag "review[round]", @current_round %>
   <% end %>
-  <%= hidden_field_tag "review[itemnaire_id]", @itemnaire.id %>
+  <%= hidden_field_tag "review[questionnaire_id]", @questionnaire.id %>
 
   <br/>
   <br>
@@ -440,9 +440,9 @@
   <%= hidden_field_tag "isSubmit", :id => "isSubmit" %>
 <% end %>
 
-<!--Check whether there is a UploadFile item.-->
-<% @review_items.each do |item| %>
-  <% if item.instance_of? UploadFile %>
+<!--Check whether there is a UploadFile question.-->
+<% @review_questions.each do |question| %>
+  <% if question.instance_of? UploadFile %>
     <!--params[:origin] means from where do the files upload-->
     <!--If the files uploaded from submitted_work (students hand in assignment), params[:origin] will be nil-->
     <!--If the files uploaded from peer review, params[:origin] will be 'review'-->

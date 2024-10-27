@@ -121,8 +121,8 @@
 		         .replace(jsonLine, library.json.replacer);
 		      }
 		   };
-		// http://stackoverflow.com/items/5410682/parsing-a-json-string-in-ruby
-		// http://stackoverflow.com/items/9244824/how-to-remove-quot-from-my-json-in-javascript
+		// http://stackoverflow.com/questions/5410682/parsing-a-json-string-in-ruby
+		// http://stackoverflow.com/questions/9244824/how-to-remove-quot-from-my-json-in-javascript
 		// &quot; is not valid in a JSON object, and g in replace means replace globally
 		var request = JSON.parse('<%= flash[:request_body] %>'.replace(/&quot;/g,'"'));
 		var response = JSON.parse('<%= flash[:response_body] %>'.replace(/&quot;/g,'"'));

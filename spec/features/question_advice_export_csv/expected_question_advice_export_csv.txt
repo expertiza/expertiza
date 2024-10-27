@@ -1,2 +1,2 @@
-id,item_id,score,advice
+id,question_id,score,advice
 1,1,5,LGTM

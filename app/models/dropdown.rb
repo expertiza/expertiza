@@ -3,25 +3,25 @@ class Dropdown < UnscoredQuestion
   validates :alternatives, presence: true
 
   def edit(_count)
-    html = '<td align="center"><a rel="nofollow" data-method="delete" href="/items/' + id.to_s + '">Remove</a></td>'
+    html = '<td align="center"><a rel="nofollow" data-method="delete" href="/questions/' + id.to_s + '">Remove</a></td>'
 
     html += '<td><input size="6" value="' + seq.to_s
-    html += '" name="item[' + id.to_s + '][seq]" id="item_' + id.to_s + '_seq" type="text"></td>'
+    html += '" name="question[' + id.to_s + '][seq]" id="question_' + id.to_s + '_seq" type="text"></td>'
 
-    html += '<td><textarea cols="50" rows="1" name="item[' + id.to_s + '][txt]"'
-    html += ' id="item_' + id.to_s + '_txt" placeholder="Edit item content here">' + txt + '</textarea></td>'
+    html += '<td><textarea cols="50" rows="1" name="question[' + id.to_s + '][txt]"'
+    html += ' id="question_' + id.to_s + '_txt" placeholder="Edit question content here">' + txt + '</textarea></td>'
 
     html += '<td><input size="10" disabled="disabled" value="' + type
-    html += '" name="item[' + id.to_s + '][type]" id="item_' + id.to_s + '_type" type="text"></td>'
+    html += '" name="question[' + id.to_s + '][type]" id="question_' + id.to_s + '_type" type="text"></td>'
 
     html += '<td><!--placeholder (UnscoredQuestion does not need weight)--></td>'
     html += '<td> alternatives <input size="8" value="' + alternatives
-    html += '" name="item[' + id.to_s + '][alternatives]" id="item_' + id.to_s + '_alternatives" type="text"></td>'
+    html += '" name="question[' + id.to_s + '][alternatives]" id="question_' + id.to_s + '_alternatives" type="text"></td>'
 
     safe_join(['<tr>'.html_safe, '</tr>'.html_safe], html.html_safe)
   end
 
-  def view_item_text
+  def view_question_text
     html = '<TD align="left"> ' + txt + ' </TD>'
     html += '<TD align="left">' + type + '</TD>'
     html += '<td align="center">' + weight.to_s + '</TD><TD align="center">&mdash;</TD>'
@@ -50,7 +50,7 @@ class Dropdown < UnscoredQuestion
     html
   end
 
-  def view_completed_item(count, answer)
+  def view_completed_question(count, answer)
     html = '<b>' + count.to_s + '. ' + txt + '</b>'
     html += '<BR>&nbsp&nbsp&nbsp&nbsp' + answer.comments.to_s
 

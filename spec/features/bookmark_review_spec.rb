@@ -23,8 +23,8 @@ describe 'bookmark review testing' do
     create(:assignment_team)
     create(:team_user, user: User.where(role_id: 1).third, team: AssignmentTeam.second)
     create(:signed_up_team, team_id: 2, topic: SignUpTopic.second)
-    create(:bookmark_itemnaire)
-    create(:item)
+    create(:bookmark_questionnaire)
+    create(:question)
     create(:bookmark_review_response_map, reviewer_id: User.where(role_id: 1).second.id, reviewee: Bookmark.first)
   end
 

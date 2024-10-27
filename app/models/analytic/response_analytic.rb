@@ -1,22 +1,22 @@
 require 'analytic/score_analytic'
 module ResponseAnalytic
-  def num_items
+  def num_questions
     scores.count
   end
 
   #====== score =======#
   def average_score
-    return item_score_list.inject(:+) / num_items unless num_items == 0
+    return question_score_list.inject(:+) / num_questions unless num_questions == 0
 
     0
   end
 
-  def max_item_score
-    item_score_list.max
+  def max_question_score
+    question_score_list.max
   end
 
-  def min_item_score
-    item_score_list.min
+  def min_question_score
+    question_score_list.min
   end
 
   #====== word count ======#
@@ -25,7 +25,7 @@ module ResponseAnalytic
   end
 
   def average_word_count
-    return total_word_count.to_f / num_items unless num_items == 0
+    return total_word_count.to_f / num_questions unless num_questions == 0
 
     0
   end
@@ -44,7 +44,7 @@ module ResponseAnalytic
   end
 
   def average_character_count
-    return total_character_count.to_f / num_items unless num_items == 0
+    return total_character_count.to_f / num_questions unless num_questions == 0
 
     0
   end
@@ -82,8 +82,8 @@ module ResponseAnalytic
     end
   end
 
-  # return score for all of the items in an array
-  def item_score_list
+  # return score for all of the questions in an array
+  def question_score_list
     list = []
     scores.each do |score|
       list << score.score

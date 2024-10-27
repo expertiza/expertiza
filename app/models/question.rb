@@ -1,19 +1,19 @@
 class Question < ApplicationRecord
-  belongs_to :itemnaire # each item belongs to a specific itemnaire
+  belongs_to :questionnaire # each question belongs to a specific questionnaire
   belongs_to :review_of_review_score # ditto
-  has_many :item_advices, dependent: :destroy # for each item, there is separate advice about each possible score
-  has_many :signup_choices # ?? this may reference signup type itemnaires
+  has_many :question_advices, dependent: :destroy # for each question, there is separate advice about each possible score
+  has_many :signup_choices # ?? this may reference signup type questionnaires
   has_many :answers, dependent: :destroy
 
-  validates :seq, presence: true # user must define sequence for a item
+  validates :seq, presence: true # user must define sequence for a question
   validates :seq, numericality: true # sequence must be numeric
-  validates :txt, length: { minimum: 0, allow_nil: false, message: "can't be nil" } # user must define text content for a item
-  validates :type, presence: true # user must define type for a item
+  validates :txt, length: { minimum: 0, allow_nil: false, message: "can't be nil" } # user must define text content for a question
+  validates :type, presence: true # user must define type for a question
   validates :break_before, presence: true
 
   has_paper_trail
 
-  # Class variables - used itemnaires_controller.rb to set the parameters for a item.
+  # Class variables - used questionnaires_controller.rb to set the parameters for a question.
   MAX_LABEL = 'Strongly agree'.freeze
   MIN_LABEL = 'Strongly disagree'.freeze
   SIZES = { 'Criterion' => '50, 3', 'Cake' => '50, 3', 'TextArea' => '60, 5', 'TextField' => '30' }.freeze
@@ -21,12 +21,12 @@ class Question < ApplicationRecord
   attr_accessor :checked
 
   def delete
-    QuestionAdvice.where(item_id: id).find_each(&:destroy)
+    QuestionAdvice.where(question_id: id).find_each(&:destroy)
     destroy
   end
 
-  # for quiz items, we store 'TrueFalse', 'MultipleChoiceCheckbox', 'MultipleChoiceRadio' in the DB, and the full names are returned below
-  def get_formatted_item_type
+  # for quiz questions, we store 'TrueFalse', 'MultipleChoiceCheckbox', 'MultipleChoiceRadio' in the DB, and the full names are returned below
+  def get_formatted_question_type
     type = self.type
     statement = ''
     if type == 'TrueFalse'
@@ -40,39 +40,39 @@ class Question < ApplicationRecord
   end
 
   # Placeholder methods, override in derived classes if required.
-  # this method decide what to display if an instructor (etc.) is creating or editing a itemnaire
+  # this method decide what to display if an instructor (etc.) is creating or editing a questionnaire
   def edit
     nil
   end
 
-  # this method decide what to display if an instructor (etc.) is viewing a itemnaire
-  def view_item_text
+  # this method decide what to display if an instructor (etc.) is viewing a questionnaire
+  def view_question_text
     nil
   end
 
-  # this method decide what to display if a student is filling out a itemnaire
-  def view_completed_item
+  # this method decide what to display if a student is filling out a questionnaire
+  def view_completed_question
     nil
   end
 
-  # this method decide what to display if a student is viewing a filled-out itemnaire
+  # this method decide what to display if a student is viewing a filled-out questionnaire
   def complete
     nil
   end
 
-  def self.compute_item_score
+  def self.compute_question_score
     0
   end
 
-  # this method return items (item_ids) in one assignment whose comments field are meaningful (ScoredQuestion and TextArea)
-  def self.get_all_items_with_comments_available(assignment_id)
-    item_ids = []
-    itemnaires = Assignment.find(assignment_id).itemnaires.select { |itemnaire| itemnaire.type == 'ReviewQuestionnaire' }
-    itemnaires.each do |itemnaire|
-      items = itemnaire.items.select { |item| item.is_a?(ScoredQuestion) || item.instance_of?(TextArea) }
-      items.each { |item| item_ids << item.id }
+  # this method return questions (question_ids) in one assignment whose comments field are meaningful (ScoredQuestion and TextArea)
+  def self.get_all_questions_with_comments_available(assignment_id)
+    question_ids = []
+    questionnaires = Assignment.find(assignment_id).questionnaires.select { |questionnaire| questionnaire.type == 'ReviewQuestionnaire' }
+    questionnaires.each do |questionnaire|
+      questions = questionnaire.questions.select { |question| question.is_a?(ScoredQuestion) || question.instance_of?(TextArea) }
+      questions.each { |question| question_ids << question.id }
     end
-    item_ids
+    question_ids
   end
 
   def self.import(row, _row_header, _session, q_id = nil)
@@ -80,13 +80,13 @@ class Question < ApplicationRecord
       raise ArgumentError,  'Not enough items: expect 3 columns: your login name, your full name' \
                             '(first and last name, not separated with the delimiter), and your email.'
     end
-    # itemnaire = Questionnaire.find_by_id(_id)
-    itemnaire = Questionnaire.find_by(id: q_id)
-    raise ArgumentError, 'Questionnaire Not Found' if itemnaire.nil?
+    # questionnaire = Questionnaire.find_by_id(_id)
+    questionnaire = Questionnaire.find_by(id: q_id)
+    raise ArgumentError, 'Questionnaire Not Found' if questionnaire.nil?
 
-    items = itemnaire.items
+    questions = questionnaire.questions
     qid = 0
-    items.each do |q|
+    questions.each do |q|
       if q.seq == row[2].strip.to_f
         qid = q.id
         break
@@ -94,16 +94,16 @@ class Question < ApplicationRecord
     end
 
     if qid > 0
-      # item = Question.find_by_id(qid)
-      item = Question.find_by(id: qid)
+      # question = Question.find_by_id(qid)
+      question = Question.find_by(id: qid)
       attributes = {}
       attributes['txt'] = row[0].strip
       attributes['type'] = row[1].strip
       attributes['seq'] = row[2].strip.to_f
       attributes['size'] = row[3].strip
       attributes['break_before'] = row[4].strip
-      item.itemnaire_id = q_id
-      item.update(attributes)
+      question.questionnaire_id = q_id
+      question.update(attributes)
     else
       attributes = {}
       attributes['txt'] = row[0].strip
@@ -111,9 +111,9 @@ class Question < ApplicationRecord
       attributes['seq'] = row[2].strip.to_f
       attributes['size'] = row[3].strip
       # attributes["break_before"] = row[4].strip
-      item = Question.new(attributes)
-      item.itemnaire_id = q_id
-      item.save
+      question = Question.new(attributes)
+      question.questionnaire_id = q_id
+      question.save
     end
   end
 
@@ -123,11 +123,11 @@ class Question < ApplicationRecord
   end
 
   def self.export(csv, parent_id, _options)
-    itemnaire = Questionnaire.find(parent_id)
-    itemnaire.items.each do |item|
-      csv << [item.seq, item.txt, item.type,
-              item.weight, item.size, item.max_label,
-              item.min_label]
+    questionnaire = Questionnaire.find(parent_id)
+    questionnaire.questions.each do |question|
+      csv << [question.seq, question.txt, question.type,
+              question.weight, question.size, question.max_label,
+              question.min_label]
     end
   end
 end

@@ -8,19 +8,19 @@ describe Response do
   let(:signed_up_team) { build(:signed_up_team, team_id: team.id) }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer]) }
-  let(:answer) { Answer.new(answer: 1, comments: 'Answer text', item_id: 1) }
-  let(:answer2) { Answer.new(answer: 2, comments: 'Answer text', item_id: 2) }
-  let(:item) { Criterion.new(id: 1, weight: 2, break_before: true) }
-  let(:itemnaire1) { create(:itemnaire, id: 1) }
-  let(:item1) { create(:item, itemnaire: itemnaire1, weight: 1, id: 1) }
-  let(:item2) { TextArea.new(id: 1, weight: 2, break_before: true) }
-  let(:item3) { build(:itemnaire_header) }
-  let(:itemnaire) { ReviewQuestionnaire.new(id: 1, items: [item], max_item_score: 5) }
-  let(:itemnaire2) { ReviewQuestionnaire.new(id: 2, items: [item2], max_item_score: 5) }
-  let(:itemnaire3) { ReviewQuestionnaire.new(id: 3, items: [item, item3], max_item_score: 5) }
-  let(:assignment_itemnaire) { build(:assignment_itemnaire, assignment: assignment, itemnaire: itemnaire3) }
+  let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
+  let(:answer2) { Answer.new(answer: 2, comments: 'Answer text', question_id: 2) }
+  let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
+  let(:questionnaire1) { create(:questionnaire, id: 1) }
+  let(:question1) { create(:question, questionnaire: questionnaire1, weight: 1, id: 1) }
+  let(:question2) { TextArea.new(id: 1, weight: 2, break_before: true) }
+  let(:question3) { build(:questionnaire_header) }
+  let(:questionnaire) { ReviewQuestionnaire.new(id: 1, questions: [question], max_question_score: 5) }
+  let(:questionnaire2) { ReviewQuestionnaire.new(id: 2, questions: [question2], max_question_score: 5) }
+  let(:questionnaire3) { ReviewQuestionnaire.new(id: 3, questions: [question, question3], max_question_score: 5) }
+  let(:assignment_questionnaire) { build(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire3) }
   let(:tag_prompt) { TagPrompt.new(id: 1, prompt: 'prompt') }
-  let(:tag_prompt_deployment) { TagPromptDeployment.new(id: 1, tag_prompt_id: 1, assignment_id: 1, itemnaire_id: 1, item_type: 'Criterion') }
+  let(:tag_prompt_deployment) { TagPromptDeployment.new(id: 1, tag_prompt_id: 1, assignment_id: 1, questionnaire_id: 1, question_type: 'Criterion') }
   let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1, reviewee_id: 1) }
   let!(:response_record) { create(:response, id: 1, map_id: 1, response_map: response_map, updated_at: '2020-03-24 12:10:20') }
   before(:each) do
@@ -40,11 +40,11 @@ describe Response do
 
     context 'when prefix is not nil, which means view_score page in instructor end' do
       it 'returns corresponding html code' do
-        allow(response).to receive(:itemnaire_by_answer).with(answer).and_return(itemnaire)
-        allow(itemnaire).to receive(:max_item_score).and_return(5)
-        allow(itemnaire).to receive(:id).and_return(1)
+        allow(response).to receive(:questionnaire_by_answer).with(answer).and_return(questionnaire)
+        allow(questionnaire).to receive(:max_question_score).and_return(5)
+        allow(questionnaire).to receive(:id).and_return(1)
         allow(assignment).to receive(:id).and_return(1)
-        allow(item).to receive(:view_completed_item).with(1, answer, 5, nil, nil).and_return('Question HTML code')
+        allow(question).to receive(:view_completed_question).with(1, answer, 5, nil, nil).and_return('Question HTML code')
         expect(response.display_as_html('Instructor end', 0)).to eq('<h4><B>Review 0</B></h4><B>Reviewer: </B>no one (no name)&nbsp;&nbsp;&nbsp;'\
           "<a href=\"#\" name= \"review_Instructor end_1Link\" onClick=\"toggleElement('review_Instructor end_1','review');return false;\">"\
           'hide review</a><BR/><table id="review_Instructor end_1" class="table table-bordered">'\
@@ -52,11 +52,11 @@ describe Response do
       end
     end
 
-    context 'when prefix is nil, which means view_score page in student end and item type is TextArea' do
+    context 'when prefix is nil, which means view_score page in student end and question type is TextArea' do
       it 'returns corresponding html code' do
-        allow(response).to receive(:itemnaire_by_answer).with(answer).and_return(itemnaire2)
-        allow(itemnaire2).to receive(:max_item_score).and_return(5)
-        allow(item2).to receive(:view_completed_item).with(1, answer).and_return('Question HTML code')
+        allow(response).to receive(:questionnaire_by_answer).with(answer).and_return(questionnaire2)
+        allow(questionnaire2).to receive(:max_question_score).and_return(5)
+        allow(question2).to receive(:view_completed_question).with(1, answer).and_return('Question HTML code')
         expect(response.display_as_html(nil, 0)).to eq('<table width="100%"><tr><td align="left" width="70%"><b>Review 0</b>'\
           "&nbsp;&nbsp;&nbsp;<a href=\"#\" name= \"review_1Link\" onClick=\"toggleElement('review_1','review');return false;\">"\
           'hide review</a></td><td align="left"><b>Last Reviewed:</b><span>Not available</span></td></tr></table><table id="review_1"'\
@@ -67,11 +67,11 @@ describe Response do
 
     it 'if additional comment is not empty' do
       response.additional_comment = "Test:\nadditional comment"
-      allow(response).to receive(:itemnaire_by_answer).with(answer).and_return(itemnaire)
-      allow(itemnaire).to receive(:max_item_score).and_return(5)
-      allow(itemnaire).to receive(:id).and_return(1)
+      allow(response).to receive(:questionnaire_by_answer).with(answer).and_return(questionnaire)
+      allow(questionnaire).to receive(:max_question_score).and_return(5)
+      allow(questionnaire).to receive(:id).and_return(1)
       allow(assignment).to receive(:id).and_return(1)
-      allow(item).to receive(:view_completed_item).with(1, answer, 5, nil, nil).and_return('Question HTML code')
+      allow(question).to receive(:view_completed_question).with(1, answer, 5, nil, nil).and_return('Question HTML code')
       expect(response.display_as_html('Instructor end', 0)).to eq('<h4><B>Review 0</B></h4><B>Reviewer: </B>no one (no name)&nbsp;&nbsp;&nbsp;'\
           "<a href=\"#\" name= \"review_Instructor end_1Link\" onClick=\"toggleElement('review_Instructor end_1','review');return false;\">"\
           'hide review</a><BR/><table id="review_Instructor end_1" class="table table-bordered">'\
@@ -79,13 +79,13 @@ describe Response do
     end
   end
 
-  describe '#aggregate_itemnaire_score' do
+  describe '#aggregate_questionnaire_score' do
     it 'computes the total score of a review' do
-      item2 = double('ScoredQuestion', weight: 2)
-      allow(Question).to receive(:find).with(1).and_return(item2)
-      allow(item2).to receive(:is_a?).with(ScoredQuestion).and_return(true)
-      allow(item2).to receive(:answer).and_return(answer)
-      expect(response.aggregate_itemnaire_score).to eq(2)
+      question2 = double('ScoredQuestion', weight: 2)
+      allow(Question).to receive(:find).with(1).and_return(question2)
+      allow(question2).to receive(:is_a?).with(ScoredQuestion).and_return(true)
+      allow(question2).to receive(:answer).and_return(answer)
+      expect(response.aggregate_questionnaire_score).to eq(2)
     end
   end
 
@@ -107,7 +107,7 @@ describe Response do
 
     context 'when maximum_score does not return 0' do
       it 'calculates the maximum score' do
-        allow(response).to receive(:aggregate_itemnaire_score).and_return(4)
+        allow(response).to receive(:aggregate_questionnaire_score).and_return(4)
         allow(response).to receive(:maximum_score).and_return(5)
         expect(response.average_score).to eq(80)
       end
@@ -116,21 +116,21 @@ describe Response do
 
   describe '#maximum_score' do
     it 'returns the maximum possible score for current response' do
-      item2 = double('ScoredQuestion', weight: 2)
-      allow(Question).to receive(:find).with(1).and_return(item2)
-      allow(item2).to receive(:is_a?).with(ScoredQuestion).and_return(true)
-      allow(response).to receive(:itemnaire_by_answer).with(answer).and_return(itemnaire)
-      allow(itemnaire).to receive(:max_item_score).and_return(5)
+      question2 = double('ScoredQuestion', weight: 2)
+      allow(Question).to receive(:find).with(1).and_return(question2)
+      allow(question2).to receive(:is_a?).with(ScoredQuestion).and_return(true)
+      allow(response).to receive(:questionnaire_by_answer).with(answer).and_return(questionnaire)
+      allow(questionnaire).to receive(:max_question_score).and_return(5)
       expect(response.maximum_score).to eq(10)
     end
 
     it 'returns the maximum possible score for current response without score' do
       response.scores = []
-      item2 = double('ScoredQuestion', weight: 2)
-      allow(Question).to receive(:find).with(1).and_return(item2)
-      allow(item2).to receive(:is_a?).with(ScoredQuestion).and_return(false)
-      allow(response).to receive(:itemnaire_by_answer).with(nil).and_return(itemnaire)
-      allow(itemnaire).to receive(:max_item_score).and_return(5)
+      question2 = double('ScoredQuestion', weight: 2)
+      allow(Question).to receive(:find).with(1).and_return(question2)
+      allow(question2).to receive(:is_a?).with(ScoredQuestion).and_return(false)
+      allow(response).to receive(:questionnaire_by_answer).with(nil).and_return(questionnaire)
+      allow(questionnaire).to receive(:max_question_score).and_return(5)
       expect(response.maximum_score).to eq(0)
     end
   end
@@ -190,34 +190,34 @@ describe Response do
     end
   end
 
-  describe '#itemnaire_by_answer' do
+  describe '#questionnaire_by_answer' do
     before(:each) do
       allow(SignedUpTeam).to receive(:find_by).with(team_id: team.id).and_return(signed_up_team)
     end
     context 'when answer is not nil' do
-      it 'returns the itemnaire of the item of current answer' do
-        allow(Question).to receive(:find).with(1).and_return(item)
-        allow(item).to receive(:itemnaire).and_return(itemnaire2)
-        expect(response.itemnaire_by_answer(answer)).to eq(itemnaire2)
+      it 'returns the questionnaire of the question of current answer' do
+        allow(Question).to receive(:find).with(1).and_return(question)
+        allow(question).to receive(:questionnaire).and_return(questionnaire2)
+        expect(response.questionnaire_by_answer(answer)).to eq(questionnaire2)
       end
     end
     context 'when answer is nil' do
-      it 'returns review itemnaire of current assignment from map itself' do
+      it 'returns review questionnaire of current assignment from map itself' do
         allow(ResponseMap).to receive(:find).with(1).and_return(review_response_map)
         allow(Participant).to receive(:find).with(1).and_return(participant)
         allow(participant).to receive(:assignment).and_return(assignment)
-        allow(assignment).to receive(:review_itemnaire_id).and_return(1)
-        allow(Questionnaire).to receive(:find).with(1).and_return(itemnaire2)
-        expect(response.itemnaire_by_answer(nil)).to eq(itemnaire2)
+        allow(assignment).to receive(:review_questionnaire_id).and_return(1)
+        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire2)
+        expect(response.questionnaire_by_answer(nil)).to eq(questionnaire2)
       end
-      it 'returns review itemnaire of current assignment from participant' do
+      it 'returns review questionnaire of current assignment from participant' do
         assignment_survey_response_map = double('AssignmentSurveyResponseMap', reviewer_id: 1, reviewee_id: team.id)
         allow(ResponseMap).to receive(:find).with(1).and_return(assignment_survey_response_map)
         allow(Participant).to receive(:find).with(1).and_return(participant)
         allow(participant).to receive(:assignment).and_return(assignment)
-        allow(assignment).to receive(:review_itemnaire_id).and_return(1)
-        allow(Questionnaire).to receive(:find).with(1).and_return(itemnaire2)
-        expect(response.itemnaire_by_answer(nil)).to eq(itemnaire2)
+        allow(assignment).to receive(:review_questionnaire_id).and_return(1)
+        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire2)
+        expect(response.questionnaire_by_answer(nil)).to eq(questionnaire2)
       end
     end
   end
@@ -226,7 +226,7 @@ describe Response do
     it 'returns concatenated review comments and # of reviews in each round' do
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow(assignment).to receive(:num_review_rounds).and_return(2)
-      allow(Question).to receive(:get_all_items_with_comments_available).with(1).and_return([1, 2])
+      allow(Question).to receive(:get_all_questions_with_comments_available).with(1).and_return([1, 2])
       allow(ReviewResponseMap).to receive_message_chain(:where, :find_each).with(reviewed_object_id: 1, reviewer_id: 1)
         .with(no_args).and_yield(review_response_map)
       response1 = double('Response', round: 1, additional_comment: '')
@@ -262,10 +262,10 @@ describe Response do
       context 'when the difference between average score on same artifact from others and current score is bigger than allowed percentage' do
         it 'returns true' do
           allow(Response).to receive(:avg_scores_and_count_for_prev_reviews).with([response], response).and_return([0.8, 2])
-          allow(response).to receive(:aggregate_itemnaire_score).and_return(93)
+          allow(response).to receive(:aggregate_questionnaire_score).and_return(93)
           allow(response).to receive(:maximum_score).and_return(100)
-          allow(response).to receive(:itemnaire_by_answer).with(answer).and_return(itemnaire)
-          allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, itemnaire_id: 1)
+          allow(response).to receive(:questionnaire_by_answer).with(answer).and_return(questionnaire)
+          allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
                                                              .and_return(double('AssignmentQuestionnaire', notification_limit: 5.0))
           expect(response.significant_difference?).to be true
         end
@@ -276,7 +276,7 @@ describe Response do
   describe '.avg_scores_and_count_for_prev_reviews' do
     context 'when current response is not in current response array' do
       it 'returns the average score and count of previous reviews' do
-        allow(response).to receive(:aggregate_itemnaire_score).and_return(96)
+        allow(response).to receive(:aggregate_questionnaire_score).and_return(96)
         allow(response).to receive(:maximum_score).and_return(100)
         expect(Response.avg_scores_and_count_for_prev_reviews([response], double('Response', id: 6))).to eq([0.96, 1])
       end
@@ -284,7 +284,7 @@ describe Response do
   end
 
   describe '.calibration_results_info' do
-    it 'returns references to a calibration response, review response, and items' do
+    it 'returns references to a calibration response, review response, and questions' do
       calibration_response_map = double('review_response_map')
       calibration_response = double('response', review_response_map: calibration_response_map)
       allow(ReviewResponseMap).to receive(:find).with(1).and_return(calibration_response_map)
@@ -292,8 +292,8 @@ describe Response do
       allow(calibration_response_map).to receive(:response).and_return([calibration_response])
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow(AssignmentQuestionnaire).to receive(:find_by)
-        .with(['assignment_id = ? and itemnaire_id IN (?)', 1, ReviewQuestionnaire.select('id')])
-        .and_return(assignment_itemnaire)
+        .with(['assignment_id = ? and questionnaire_id IN (?)', 1, ReviewQuestionnaire.select('id')])
+        .and_return(assignment_questionnaire)
     end
   end
 
@@ -306,7 +306,7 @@ describe Response do
       allow(AssignmentTeam).to receive(:find).with(1).and_return(team)
       allow(User).to receive(:find).with(2).and_return(user2)
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
-      allow(response).to receive(:aggregate_itemnaire_score).and_return(1)
+      allow(response).to receive(:aggregate_questionnaire_score).and_return(1)
       allow(response).to receive(:maximum_score).and_return(2)
       mail = double
       allow(mail).to receive(:deliver_now)

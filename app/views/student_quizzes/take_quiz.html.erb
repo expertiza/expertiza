@@ -1,6 +1,6 @@
-<h2><%=t ".items"%></h2>
+<h2><%=t ".questions"%></h2>
 <% @map = ResponseMap.find(params[:map_id]) %>
-<% @itemnaire = Questionnaire.find(@map.reviewed_object_id) %>
+<% @questionnaire = Questionnaire.find(@map.reviewed_object_id) %>
 <% @reviewee_participant=AssignmentTeam.find(@map.reviewee_id).participants.first%>
 <%  @assignment = Assignment.find(params[:assignment_id])%>
 
@@ -12,11 +12,11 @@
   :map_id => params[:map_id] do %>
 
 
-  <%= hidden_field_tag :itemnaire_id, "#{@itemnaire.id}" %>
+  <%= hidden_field_tag :questionnaire_id, "#{@questionnaire.id}" %>
   <%= hidden_field_tag :assignment_id, "#{params[:assignment_id]}" %>
-    <% items = Question.where(itemnaire_id: @itemnaire.id) %><br><br>
-    <% items.each do |item| %>
-      <%= item.complete.html_safe %>
+    <% questions = Question.where(questionnaire_id: @questionnaire.id) %><br><br>
+    <% questions.each do |question| %>
+      <%= question.complete.html_safe %>
       <br>
     <% end %>
   <%= submit_tag t(".submit_quiz"), :name=>"save" %>

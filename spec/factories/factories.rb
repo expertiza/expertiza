@@ -222,7 +222,7 @@ FactoryBot.define do
     vary_by_topic? false
     microtask false
     require_quiz false
-    num_quiz_items 0
+    num_quiz_questions 0
     is_coding_assignment false
     is_intelligent false
     calculate_penalty false
@@ -414,7 +414,7 @@ FactoryBot.define do
     type 'AssignmentNode'
   end
 
-  factory :itemnaire_type_node, class: QuestionnaireTypeNode do
+  factory :questionnaire_type_node, class: QuestionnaireTypeNode do
     node_object_id 1
     type 'QuestionnaireTypeNode'
   end
@@ -431,40 +431,40 @@ FactoryBot.define do
     type 'CourseNode'
   end
 
-  factory :itemnaire, class: ReviewQuestionnaire do
-    name 'Test itemnaire'
+  factory :questionnaire, class: ReviewQuestionnaire do
+    name 'Test questionnaire'
     # Beware: it is fragile to assume that role_id of instructor is 1 (or any other unchanging value)
     instructor { Instructor.first || association(:instructor) }
     private 0
-    min_item_score 0
-    max_item_score 5
+    min_question_score 0
+    max_question_score 5
     type 'ReviewQuestionnaire'
     display_type 'Review'
     instruction_loc nil
   end
 
-  factory :teammate_itemnaire, class: TeammateReviewQuestionnaire do
-    name 'Test itemnaire'
+  factory :teammate_questionnaire, class: TeammateReviewQuestionnaire do
+    name 'Test questionnaire'
     # Beware: it is fragile to assume that role_id of instructor is 1 (or any other unchanging value)
     instructor { Instructor.first || association(:instructor) }
     private 0
-    min_item_score 0
-    max_item_score 5
+    min_question_score 0
+    max_question_score 5
     type 'TeammateReviewQuestionnaire'
     display_type 'Review'
     instruction_loc nil
   end
 
-  factory :itemnaire_node, class: QuestionnaireNode do
+  factory :questionnaire_node, class: QuestionnaireNode do
     parent_id 0
     node_object_id 0
     type 'QuestionnaireNode'
   end
 
-  factory :item, class: Criterion do
-    txt 'Test item:'
+  factory :question, class: Criterion do
+    txt 'Test question:'
     weight 1
-    itemnaire { Questionnaire.first || association(:itemnaire) }
+    questionnaire { Questionnaire.first || association(:questionnaire) }
     seq 1.00
     type 'Criterion'
     size '70,1'
@@ -474,37 +474,37 @@ FactoryBot.define do
     min_label nil
   end
 
-  factory :item_advice, class: QuestionAdvice do
-    item { Question.first || association(:item) }
+  factory :question_advice, class: QuestionAdvice do
+    question { Question.first || association(:question) }
     score 5
     advice 'LGTM'
   end
 
-  factory :assignment_itemnaire, class: AssignmentQuestionnaire do
+  factory :assignment_questionnaire, class: AssignmentQuestionnaire do
     assignment { Assignment.first || association(:assignment) }
-    itemnaire { ReviewQuestionnaire.first || association(:itemnaire) }
+    questionnaire { ReviewQuestionnaire.first || association(:questionnaire) }
     user_id 1
-    itemnaire_weight 100
+    questionnaire_weight 100
     used_in_round nil
     topic_id nil
     dropdown 1
   end
 
-  factory :assignment_teammate_itemnaire, class: AssignmentQuestionnaire do
+  factory :assignment_teammate_questionnaire, class: AssignmentQuestionnaire do
     assignment { Assignment.first || association(:assignment) }
-    itemnaire { TeammateReviewQuestionnaire.first || association(:teammate_itemnaire) }
+    questionnaire { TeammateReviewQuestionnaire.first || association(:teammate_questionnaire) }
     user_id 1
-    itemnaire_weight 100
+    questionnaire_weight 100
     used_in_round nil
     topic_id nil
     dropdown 1
   end
 
-  factory :bookmark_itemnaire, class: BookmarkRatingQuestionnaire do
+  factory :bookmark_questionnaire, class: BookmarkRatingQuestionnaire do
     name 'BookmarkRatingQuestionnaire'
     assignments { [Assignment.first || association(:assignment)] }
-    min_item_score 0
-    max_item_score 5
+    min_question_score 0
+    max_question_score 5
     type 'BookmarkRatingQuestionnaire'
   end
 
@@ -650,63 +650,63 @@ FactoryBot.define do
   end
 
   factory :multiple_choice_checkbox, class: MultipleChoiceCheckbox do
-    txt 'Test item:'
+    txt 'Test question:'
     weight 1
-    itemnaire { Questionnaire.first || association(:itemnaire) }
+    questionnaire { Questionnaire.first || association(:questionnaire) }
     seq 1.00
     type 'MultipleChoiceCheckbox'
     size '70,1'
   end
 
   factory :true_false, class: TrueFalse do
-    txt 'Test item:'
+    txt 'Test question:'
     weight 1
-    itemnaire { Questionnaire.first || association(:itemnaire) }
+    questionnaire { Questionnaire.first || association(:questionnaire) }
     seq 1.00
     type 'TrueFalse'
     size '70,1'
   end
 
-  factory :scored_item, class: ScoredQuestion do
-    txt 'Test item:'
+  factory :scored_question, class: ScoredQuestion do
+    txt 'Test question:'
     weight 1
-    itemnaire { Questionnaire.first || association(:itemnaire) }
+    questionnaire { Questionnaire.first || association(:questionnaire) }
     seq 1.00
     type 'ScoredQuestion'
     size '70,1'
   end
 
-  factory :itemnaire_header, class: QuestionnaireHeader do
-    txt 'Test item:'
+  factory :questionnaire_header, class: QuestionnaireHeader do
+    txt 'Test question:'
     weight 1
-    itemnaire { Questionnaire.first || association(:itemnaire) }
+    questionnaire { Questionnaire.first || association(:questionnaire) }
     seq 1.00
     type 'QuestionnaireHeader'
     size '70,1'
   end
 
   factory :section_header, class: SectionHeader do
-    txt 'Test item:'
+    txt 'Test question:'
     weight 1
-    itemnaire { Questionnaire.first || association(:itemnaire) }
+    questionnaire { Questionnaire.first || association(:questionnaire) }
     seq 1.00
     type 'SectionHeader'
     size '70,1'
   end
 
   factory :dropdown, class: Dropdown do
-    txt 'Test item:'
+    txt 'Test question:'
     weight 1
-    itemnaire { Questionnaire.first || association(:itemnaire) }
+    questionnaire { Questionnaire.first || association(:questionnaire) }
     seq 1.00
     type 'TrueFalse'
     size '70,1'
   end
 
   factory :text_area, class: TextArea do
-    txt 'Test item:'
+    txt 'Test question:'
     weight 1
-    itemnaire { Questionnaire.first || association(:itemnaire) }
+    questionnaire { Questionnaire.first || association(:questionnaire) }
     seq 1.00
     type 'TextArea'
     size '70,1'
@@ -751,8 +751,8 @@ FactoryBot.define do
   factory :tag_prompt_deployment, class: TagPromptDeployment do
     tag_prompt { TagPrompt.first || association(:tag_prompt) }
     assignment { Assignment.first || association(:assignment) }
-    itemnaire { Questionnaire.first || association(:itemnaire) }
-    item_type 'Criterion'
+    questionnaire { Questionnaire.first || association(:questionnaire) }
+    question_type 'Criterion'
     answer_length_threshold 6
   end
 

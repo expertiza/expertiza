@@ -39,11 +39,11 @@ class AssignmentsController < ApplicationController
         end
 
         assignment_form_params[:assignment_questionnaire].each do |cur_questionnaire|
-          cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
+          cur_questionnaire[:assignment_id] = assignment_created.id.to_s
         end
 
         assignment_form_params[:due_date].each do |cur_due|
-          cur_due[:parent_id] = exist_assignment.id.to_s
+          cur_due[:parent_id] = assignment_created.id.to_s
         end
 
         @assignment_form.update(assignment_form_params, current_user)

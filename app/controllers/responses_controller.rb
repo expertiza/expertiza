@@ -43,7 +43,7 @@ class ResponsesController < ApplicationController
     @review_questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
-    @questionnaire = questionnaire_from_response
+    @questionnaire = questionnaire_from_response(@response)
     render action: 'response'
   end
 
@@ -54,13 +54,13 @@ class ResponsesController < ApplicationController
     begin
       # the response to be updated
       # Locking functionality added for E1973, team-based reviewing
-      if @map.team_reviewing_enabled && !Lock.lock_between?(@response, current_user)
+      if map_team_reviewing_enabled?(@map.team_reviewing_enabled) && !Lock.lock_between?(@response, current_user)
         response_lock_action
         return
       end
 
       @response.update_attribute('additional_comment', params[:review][:comments])
-      @questionnaire = questionnaire_from_response
+      @questionnaire = questionnaire_from_response(@response)
       questions = sort_questions(@questionnaire.questions)
 
       # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
@@ -337,41 +337,6 @@ class ResponsesController < ApplicationController
       @modified_object = @map.id
     end
     @return = params[:return]
-  end
-
-  # This method is called within set_content and when the new_response flag is set to true
-  # Depending on what type of response map corresponds to this response, the method gets the reference to the proper questionnaire
-  # This is called after assign_instance_vars in the new method
-  def questionnaire_from_response_map
-    case @map.type
-    when 'ReviewResponseMap', 'SelfReviewResponseMap'
-      reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
-      @current_round = @assignment.number_of_current_round(reviewees_topic)
-      @questionnaire = @map.questionnaire(@current_round, reviewees_topic)
-    when
-      'MetareviewResponseMap',
-      'TeammateReviewResponseMap',
-      'FeedbackResponseMap',
-      'CourseSurveyResponseMap',
-      'AssignmentSurveyResponseMap',
-      'GlobalSurveyResponseMap',
-      'BookmarkRatingResponseMap'
-      if @assignment.duty_based_assignment?
-        # E2147 : gets questionnaire of a particular duty in that assignment rather than generic questionnaire
-        @questionnaire = @map.questionnaire_by_duty(@map.reviewee.duty_id)
-      else
-        @questionnaire = @map.questionnaire
-      end
-    end
-  end
-
-  # This method is called within set_content when the new_response flag is set to False
-  # This method gets the questionnaire directly from the response object since it is available.
-  def questionnaire_from_response
-    # if user is not filling a new rubric, the @response object should be available.
-    # we can find the questionnaire from the question_id in answers
-    answer = @response.scores.first
-    @questionnaire = @response.questionnaire_by_answer(answer)
   end
 
   # checks if the questionnaire is nil and opens drop down or rating accordingly

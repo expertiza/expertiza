@@ -13,6 +13,44 @@ module ResponseHelper
     return curr_response
   end
 
+  # This method is called within set_content and when the new_response flag is set to true
+  # Depending on what type of response map corresponds to this response, the method gets the reference to the proper questionnaire
+  # This is called after assign_instance_vars in the new method
+  def questionnaire_from_response_map(map,contributor,assignment)
+    case map.type
+    when 'ReviewResponseMap', 'SelfReviewResponseMap'
+      reviewees_topic = SignedUpTeam.topic_id_by_team_id(contributor.id)
+      current_round = assignment.number_of_current_round(reviewees_topic)
+      current_questionnaire = map.questionnaire(current_round, reviewees_topic)
+    when
+      'MetareviewResponseMap',
+      'TeammateReviewResponseMap',
+      'FeedbackResponseMap',
+      'CourseSurveyResponseMap',
+      'AssignmentSurveyResponseMap',
+      'GlobalSurveyResponseMap',
+      'BookmarkRatingResponseMap'
+      if assignment.duty_based_assignment?
+        # E2147 : gets questionnaire of a particular duty in that assignment rather than generic questionnaire
+        current_questionnaire = map.questionnaire_by_duty(map.reviewee.duty_id)
+      else
+        current_questionnaire = map.questionnaire
+      end
+    end
+    return current_questionnaire
+  end
+
+  # This method is called within set_content when the new_response flag is set to False
+  # This method gets the questionnaire directly from the response object since it is available.
+  def questionnaire_from_response(response)
+    # if user is not filling a new rubric, the @response object should be available.
+    # we can find the questionnaire from the question_id in answers
+    answer = response.scores.first
+    current_questionnaire = response.questionnaire_by_answer(answer)
+
+    return current_questionnaire
+  end
+
   # E-1973 - helper method to check if the current user is the reviewer
   # if the reviewer is an assignment team, we have to check if the current user is on the team
   def current_user_is_reviewer?(map, _reviewer_id)
@@ -49,7 +87,7 @@ module ResponseHelper
     end
     @participant = @map.reviewer
     @contributor = @map.contributor
-    new_response ? questionnaire_from_response_map : questionnaire_from_response
+    new_response ? questionnaire_from_response_map(@map,@contributor,@assignment) : questionnaire_from_response(@response)
     set_dropdown_or_scale
     @review_questions = sort_questions(@questionnaire.questions)
     @min = @questionnaire.min_question_score

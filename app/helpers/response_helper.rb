@@ -61,6 +61,12 @@ module ResponseHelper
     return dropdown_or_scale
   end
 
+  #this method gets the current_round parameter given an assignment and returns it to the caller
+  #this is used to set the @current_round parameter inside the controller"
+  def get_current_round(assignment)
+    current_round = assignment.number_of_current_round(reviewees_topic)
+  end
+
   # E-1973 - helper method to check if the current user is the reviewer
   # if the reviewer is an assignment team, we have to check if the current user is on the team
   def current_user_is_reviewer?(map, _reviewer_id)

@@ -1,20 +1,18 @@
-$percentage:0;
-
-@mixin background-color-by-percentage {
-    @if $percentage < 33 {
-      background-color: #ffcccc;
-    } @else if $percentage < 66 {
-      background-color: #ffcc99;
-    } @else if $percentage <= 100 {
-      background-color: #ccffcc;
-    } @else {
-      background-color: none;
-    }
+.team-bids {
+  font-weight: bold;
+  padding: 3px;
+  border-radius: 4px;
+  
+  &.low-bids {
+    background-color: #ffcccc;
   }
-
-span .team-bids {
-    @include background-color-by-percentage;
-    font-weight: bold; 
-    padding: 3px; 
-    border-radius: 4px;
+  
+  &.medium-bids {
+    background-color: #ffcc99;
+  }
+  
+  &.high-bids {
+    background-color: #ccffcc;
+  }
 }
+

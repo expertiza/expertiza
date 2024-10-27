@@ -44,5 +44,9 @@ class BiddingTeamsController < ApplicationController
     
     @assignment = result[:assignment]
     @topic_data = result[:topic_data]
+    
+    respond_to do |format|
+      format.html 
+    end
   end
 end

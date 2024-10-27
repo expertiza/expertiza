@@ -32,18 +32,18 @@ class AssignmentsController < ApplicationController
       find_existing_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
       if !assignment_by_name && !find_existing_directory && @assignment_form.save # No existing names/directories
         @assignment_form.create_assignment_node
-        exist_assignment = Assignment.find(@assignment_form.assignment.id)
-        assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
+        assignment_created = Assignment.find(@assignment_form.assignment.id)
+        assignment_form_params[:assignment][:id] = assignment_created.id.to_s
         if assignment_form_params[:assignment][:directory_path].blank?
           assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
         end
         ques_array = assignment_form_params[:assignment_questionnaire]
         due_array = assignment_form_params[:due_date]
         ques_array.each do |cur_questionnaire|
-          cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
+          cur_questionnaire[:assignment_id] = assignment_created.id.to_s
         end
         due_array.each do |cur_due|
-          cur_due[:parent_id] = exist_assignment.id.to_s
+          cur_due[:parent_id] = assignment_created.id.to_s
         end
         assignment_form_params[:assignment_questionnaire] = ques_array
         assignment_form_params[:due_date] = due_array
@@ -112,16 +112,6 @@ class AssignmentsController < ApplicationController
     @assignment = Assignment.find(params[:id])
   end
 
-  # gets an assignment's path/url
-  def path
-    begin
-      file_path = @assignment.path
-    rescue StandardError
-      file_path = nil
-    end
-    file_path
-  end
-
   # makes a copy of an assignment
   def copy
     update_copy_session
@@ -148,7 +138,7 @@ class AssignmentsController < ApplicationController
       # Issue 1017 - allow instructor to delete assignment created by TA.
       # FixA : TA can only delete assignment created by itself.
       # FixB : Instrucor will be able to delete any assignment belonging to his/her courses.
-      if (user.role.name == 'Instructor') || ((user.role.name == 'Teaching Assistant') && (user.id == assignment_form.assignment.instructor_id))
+      if current_user_has_instructor_privileges? || (current_user_has_ta_privileges? && (user.id == assignment_form.assignment.instructor_id))
         assignment_form.delete(params[:force])
         ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Assignment #{assignment_form.assignment.id} was deleted.", request)
         flash[:success] = 'The assignment was successfully deleted.'
@@ -216,8 +206,8 @@ class AssignmentsController < ApplicationController
     rubrics_list = %w[ReviewQuestionnaire
                       MetareviewQuestionnaire AuthorFeedbackQuestionnaire
                       TeammateReviewQuestionnaire BookmarkRatingQuestionnaire]
-    @assignment_questionnaires.each do |aq|
-      remove_existing_questionnaire(rubrics_list, aq)
+    @assignment_questionnaires.each do |assignment_questionnaire|
+      remove_existing_questionnaire(rubrics_list, assignment_questionnaire)
     end
 
     remove_invalid_questionnaires(rubrics_list)
@@ -225,11 +215,11 @@ class AssignmentsController < ApplicationController
   end
 
   # Removes questionnaire types from the rubric list that are already on the assignment
-  def remove_existing_questionnaire(rubrics_list, aq)
-    return if aq.questionnaire_id.nil?
+  def remove_existing_questionnaire(rubrics_list, assignment_questionnaire)
+    return if assignment_questionnaire.questionnaire_id.nil?
 
     rubrics_list.reject! do |rubric|
-      rubric == Questionnaire.where(id: aq.questionnaire_id).first.type.to_s
+      rubric == Questionnaire.where(id: assignment_questionnaire.questionnaire_id).first.type.to_s
     end
   end
 
@@ -398,8 +388,8 @@ class AssignmentsController < ApplicationController
 
   # checks if each questionnaire in an assignment is used
   def check_questionnaires_usage
-    @assignment_questionnaires.each do |aq|
-      unless aq.used_in_round.nil?
+    @assignment_questionnaires.each do |assignment_questionnaire|
+      unless assignment_questionnaire.used_in_round.nil?
         @reviewvarycheck = 1
         break
       end

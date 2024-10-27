@@ -42,6 +42,9 @@
       bidding_teams: bidding_teams
     }
     end
+    
+    # Return both assignment and topic_data
+    return { assignment: @assignment, topic_data: @topic_data }
   end
 
   # Computes the count of assigned teams for each priority level (1, 2, 3) across all topics.

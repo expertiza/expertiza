@@ -670,5 +670,5 @@ Expertiza::Application.routes.draw do
   # updated route and added specific controller action upon accessing this route
 
   # Add route for calculating bidding summary based on priorities
-  get 'assignments/:id/bidding_summary', to: 'lottery#bidding_summary', as: 'bidding_summary'
+  get 'assignments/:id/bidding_summary', to: 'bidding_teams#bidding_summary', as: 'bidding_summary'
 end

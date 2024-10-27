@@ -94,7 +94,7 @@ class ResponsesController < ApplicationController
     # or when there has been a submission after the most recent review in this round.
     @response = @response.create_or_get_response(@map, @current_round.to_i)
     questions = sort_questions(@questionnaire.questions)
-    store_total_cake_score
+    @total_score=get_total_cake_score(@response,@participant,@assignment)
     init_answers(questions)
     render action: 'response'
   end

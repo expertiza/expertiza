@@ -672,5 +672,10 @@ class Assignment < ApplicationRecord
       signed_up_teams.destroy_all
     end
   end
+
+  def missing_participants?
+    participants.empty?
+  end
+
 end
 

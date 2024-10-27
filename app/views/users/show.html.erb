@@ -1,4 +1,4 @@
-<h1>User: <%=h @user.name(session[:ip]) %></h1>
+<h1>User: <%=h @user.username(session[:ip]) %></h1>
 
 <table>
 
@@ -25,7 +25,7 @@
   <!--If session user can impersonate certain user, session user can also try to delete certain user.-->
   <% if @total_user_num > 1 %>
     <%= link_to 'Delete', {:action => 'destroy', :id => @user}, :confirm => "Do you want to delete this user?", :method => :delete if session[:user].can_impersonate? @user%>
-    <%= link_to 'rename', {:action => 'update', :name => @user},:method => :update, :id => 'rename', :style => 'color: #FFFFFF; margin-left: 80%;'%>
+    <%= link_to 'rename', {:action => 'update', :username => @user},:method => :update, :id => 'rename', :style => 'color: #FFFFFF; margin-left: 80%;'%>
   <% end %>
 </p>
 

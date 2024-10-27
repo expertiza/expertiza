@@ -1,5 +1,5 @@
 describe VmUserAnswerTagging do
-  let(:user1) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
+  let(:user1) { User.new username: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
   describe '#initialize' do
     it 'sets the instance variables' do
       vm_user_answer_tagging = VmUserAnswerTagging.new(user1, 75, true, true, true, '3000-01-31')

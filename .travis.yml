@@ -58,7 +58,7 @@ after_script:
   - ls -lah coverage/
   - cd $HOME
   - git config --global user.email "zhu6@ncsu.edu"
-  - git config --global user.name "Winbobob"
+  - git config --global user.username "Winbobob"
   - git clone --quiet https://$TOKEN@github.com/expertiza/$REPORT_REPO_NAME.git
   - cd $REPORT_REPO_NAME
   - if [ ! -d "./$TRAVIS_PULL_REQUEST" ]; then mkdir $TRAVIS_PULL_REQUEST; fi

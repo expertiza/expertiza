@@ -14,7 +14,7 @@ describe 'Integration tests for instructor interface' do
 
     it 'with invalid username and password' do
       visit root_path
-      fill_in 'login_name', with: 'instructor6'
+      fill_in 'login_username', with: 'instructor6'
       fill_in 'login_password', with: 'something'
       click_button 'Sign in'
       expect(page).to have_text('Your username or password is incorrect.')
@@ -60,7 +60,7 @@ describe 'Integration tests for instructor interface' do
       expect(page).to have_content('Action Preference')
       choose 'no_show_action_not_show_actions'
       click_button 'Save'
-      expect(User.where(name: 'instructor6').first.etc_icons_on_homepage).to eq(false)
+      expect(User.where(username: 'instructor6').first.etc_icons_on_homepage).to eq(false)
     end
   end
 

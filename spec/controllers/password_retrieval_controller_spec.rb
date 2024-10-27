@@ -4,7 +4,7 @@ describe PasswordRetrievalController do
       @user = User.new
       @user.email = 'example@example.edu'
       @user.fullname = 'John Bumgardner'
-      @user.name = 'ex'
+      @user.username = 'exe'
       @user.save!
       request_params = { user: { email: 'example@example.edu' } }
       post :send_password, params: request_params
@@ -14,7 +14,7 @@ describe PasswordRetrievalController do
       @user = User.new
       @user.email = 'example@example.edu'
       @user.fullname = 'John Bumgardner'
-      @user.name = 'Shubham'
+      @user.username = 'Shubham'
       @user.save!
       @password_retrival = PasswordReset.new
       @local_token = 'some random string'
@@ -28,7 +28,7 @@ describe PasswordRetrievalController do
     it 'if no user no entry is created' do
       @user = User.new
       @user.email = 'aexample@example.edu'
-      @user.name = 'Shubham'
+      @user.username = 'Shubham'
       @user.fullname = 'John Bumgardner'
       @user.save!
       request_params = { user: { email: 'example@example.edu' } }

@@ -15,7 +15,7 @@
 
   <% @student.team.participants.each do |member| %> <!--start team member content-->
     <tr>
-      <td><%= member.user.name(session[:ip]) %></td>
+      <td><%= member.user.username(session[:ip]) %></td>
       <td><%= member.user.fullname(session[:ip]) %></td>
       <%if @student.assignment.duty_based_assignment? %>
         <% team_user = member.team_user %>

@@ -7,7 +7,7 @@
       <% (@l % 2 == 0) ? @bgcolor = "#ffffff" : @bgcolor = "#DDDDBB" %>
       <!--Reviewer-->
       <td id = "green" bgcolor=<%= @bgcolor %> align='left'>
-        <%= link_to @user_name = Participant.find(sr.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => @user_name}), :method => :post, :title => "Click here to impersonate this user" %>
+        <%= link_to @user_name = Participant.find(sr.reviewer_id).user.username(session[:ip]), impersonate_impersonate_path(:user => {:username => @user_name}), :method => :post, :title => "Click here to impersonate this user" %>
       </td>
       <!--Self review-->
       <td id = "green" bgcolor=<%= @bgcolor %> align='left'>

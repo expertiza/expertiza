@@ -13,8 +13,8 @@ describe TeammateReviewResponseMap do
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt', rounds_of_reviews: 2) }
   let(:assignment1) { build(:assignment, id: 2, name: 'Test Assgt', rounds_of_reviews: 1) }
   let(:response) { build(:response, id: 1, map_id: 1, round: 1, response_map: teammate_review_response_map1,  is_submitted: true) }
-  let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
-  let(:student1) { build(:student, id: 2, name: 'name1', fullname: 'no one', email: 'expertiza@mailinator.com') }
+  let(:student) { build(:student, id: 1, username: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
+  let(:student1) { build(:student, id: 2, username: 'name1', fullname: 'no one', email: 'expertiza@mailinator.com') }
   #  let(:assignment_teammate_questionnaire1) { build(:assignment_teammate_questionnaire, id: 1, assignment: assignment1, questionnaire: teammate_questionnaire1) }
   #  let(:assignment_teammate_questionnaire2) { build(:assignment_teammate_questionnaire, id: 2, assignment_id: 2, questionnaire_id: 2) }
   #  let(:teammate_questionnaire1) { build(:teammate_questionnaire, id: 1, type: 'TeammateReviewQuestionnaire') }

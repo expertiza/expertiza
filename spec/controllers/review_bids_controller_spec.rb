@@ -1,7 +1,7 @@
 describe ReviewBidsController do
   # let(:assignment) { double('Assignment', id: 1) }
   # let(:participant) { double('AssignmentParticipant', id: 1, can_review: false, user: double('User', id: 1)) }
-  let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
+  let(:student) { build(:student, id: 1, username: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt', rounds_of_reviews: 2) }
   let(:participant) { build(:participant, id: 1, parent_id: 1, user: student) }
 

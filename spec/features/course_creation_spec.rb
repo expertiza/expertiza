@@ -9,7 +9,7 @@ describe 'add TA', js: true do
     student = create(:student)
     login_as('instructor6')
     visit "/course/view_teaching_assistants?id=#{@course.id}&model=Course"
-    fill_in 'user_name', with: student.name
+    fill_in 'user_name', with: student.username
 
     expect do
       click_button 'Add TA'

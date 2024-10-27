@@ -6,7 +6,7 @@ class TeamsUser < ApplicationRecord
   # attr_accessible :user_id, :team_id # unnecessary protected attributes
 
   def name(ip_address = nil)
-    name = user.name(ip_address)
+    name = user.username(ip_address)
 
     # E2115 Mentor Management
     # Indicate that someone is a Mentor in the UI. The view code is

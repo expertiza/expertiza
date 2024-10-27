@@ -2,17 +2,17 @@ describe UsersController do
   let(:admin) { build(:admin, id: 3) }
   let(:super_admin) { build(:superadmin) }
   let(:instructor) { build(:instructor, id: 2) }
-  let(:student1) { build(:student, id: 1, name: :lily) }
+  let(:student1) { build(:student, id: 1, username: :lily) }
   let(:student2) { build(:student) }
   let(:student3) { build(:student, id: 10, role_id: 1, parent_id: nil) }
   let(:student4) { build(:student, id: 20, role_id: 4) }
   let(:student5) { build(:student, role_id: 4, parent_id: 3) }
-  let(:student6) { build(:student, role_id: nil, name: :lilith) }
-  let(:student7) { build(:student, id: 30, name: :amanda) }
+  let(:student6) { build(:student, role_id: nil, username: :lilith) }
+  let(:student7) { build(:student, id: 30, username: :amanda) }
 
   let(:institution1) { build(:institution, id: 1) }
   let(:requested_user1) do
-    AccountRequest.new id: 4, name: 'requester1', role_id: 2, fullname: 're, requester1',
+    AccountRequest.new id: 4, username: 'requester1', role_id: 2, fullname: 're, requester1',
                        institution_id: 1, email: 'requester1@test.com', status: nil, self_introduction: 'no one'
   end
   let(:superadmin) { build(:superadmin) }
@@ -122,19 +122,19 @@ describe UsersController do
       allow(User).to receive(:find).with(2).and_return(instructor)
     end
     it 'user is nil' do
-      allow(User).to receive(:find_by).with(name: 'instructor6').and_return(nil)
+      allow(User).to receive(:find_by).with(username: 'instructor6').and_return(nil)
       user_session = { user: admin }
       request_params = {
-        user: { name: 'instructor6' }
+        user: { username: 'instructor6' }
       }
       post :show_if_authorized, params: request_params, session: user_session
       expect(response).to redirect_to('http://test.host/users/list')
     end
 
     it 'user is not nil and user is available for editing' do
-      allow(User).to receive(:find_by).with(name: 'instructor6').and_return(student3)
+      allow(User).to receive(:find_by).with(username: 'instructor6').and_return(student3)
       request_params = {
-        user: { name: 'instructor6' }
+        user: { username: 'instructor6' }
       }
       get :show_if_authorized, params: request_params
       expect(response).to render_template(:show)
@@ -148,7 +148,7 @@ describe UsersController do
       instructor = create(:instructor)
       stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
       request_params = {
-        user: { name: instructor.name }
+        user: { username: instructor.username }
       }
       user_session = { user: teaching_assistant }
       post :show_if_authorized, params: request_params, session: user_session
@@ -197,10 +197,10 @@ describe UsersController do
       allow(User).to receive(:find).with(3).and_return(admin)
     end
     it 'save successfully with email as name' do
-      allow(User).to receive(:find_by).with(name: 'lily').and_return(student1)
+      allow(User).to receive(:find_by).with(username: 'lily').and_return(student1)
       user_session = { user: admin }
       request_params = {
-        user: { name: 'lily',
+        user: { username: 'lily',
                 crypted_password: 'password',
                 role_id: 2,
                 password_salt: 1,
@@ -230,7 +230,7 @@ describe UsersController do
     it 'save successfully without the same name' do
       user_session = { user: admin }
       request_params = {
-        user: { name: 'instructor6',
+        user: { username: 'instructor6',
                 crypted_password: 'password',
                 role_id: 2,
                 password_salt: 1,
@@ -261,7 +261,7 @@ describe UsersController do
       expect_any_instance_of(User).to receive(:save).and_return(false)
       user_session = { user: admin }
       request_params = {
-        user: { name: 'instructor6',
+        user: { username: 'instructor6',
                 crypted_password: 'password',
                 role_id: 2,
                 password_salt: 1,

@@ -9,7 +9,7 @@
   <% @requested_users.each do |requested_user| %>
     <%= form_tag action: :create_approved_user, id: requested_user.id do %>
       <tr class="exp">
-        <td><%= requested_user.name %></td>
+        <td><%= requested_user.username %></td>
         <td><%= requested_user.fullname %></td>
         <td><%= mail_to requested_user.email, requested_user.email %></td>
         <td><%= Role.find_by(id: requested_user.role_id).try(:name) %></td>

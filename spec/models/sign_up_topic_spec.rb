@@ -4,7 +4,7 @@ describe SignUpTopic do
   let(:signed_up_team) { build(:signed_up_team) }
   let(:team) { create(:assignment_team, id: 1, name: 'team 1', users: [user, user2]) }
   let(:user) { create(:student) }
-  let(:user2) { create(:student, name: 'qwertyui', id: 5) }
+  let(:user2) { create(:student, username: 'qwertyui', id: 5) }
   
 
   describe '.import' do
@@ -215,7 +215,7 @@ describe SignUpTopic do
   describe '#reassign_topic' do
     let(:instructor) do 
       User.create!(
-        name: 'Instructor',
+        username: 'Instructor',
         fullname: 'Full',  # Ensure this matches the expected format if there are specific validations.
         email: 'instructor@example.com',  # Provide a valid email format.
         password: 'securepassword',  # Assume a password is required for user creation.

@@ -9,7 +9,7 @@ describe ParticipantsHelper do
                 allow(Role).to receive(:find_by).with({:name=>'Student'}).and_return(1)
                 attribute = ParticipantsHelper.define_attributes(line_split,config)
                 expect(attribute['role_id']).to eq(1)
-                expect(attribute['name']).to eq('Test1')
+                expect(attribute['username']).to eq('Test1')
                 expect(attribute['fullname']).to eq('test2')
                 expect(attribute['email']).to eq('test@ncsu.edu')
                 expect(attribute['password'].length).to eq(8)
@@ -23,14 +23,14 @@ describe ParticipantsHelper do
     describe '#create_new_user' do
         context 'when create_new_user is called' do
             #Checking if a user has een correctly created
-            let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, name: 'Instructor1') }
+            let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, username: 'Instructor1') }
             
             it 'returns correct user when create_new_user is called' do
-                attributes = {'role_id' => 1, 'name' => 'Test1', 'fullname' => 'test2', 'email' => 'test@ncsu.edu', 'email_on_submission' => 1, 'email_on_review' => 1, 'email_on_review_of_review' => 1}
+                attributes = {'role_id' => 1, 'username' => 'Test1', 'fullname' => 'test2', 'email' => 'test@ncsu.edu', 'email_on_submission' => 1, 'email_on_review' => 1, 'email_on_review_of_review' => 1}
                 session = {user: instructor1}
                 user = ParticipantsHelper.create_new_user(attributes, session)
                 expect(user['role_id']).to eq(1)
-                expect(user['name']).to eq('Test1')
+                expect(user['username']).to eq('Test1')
                 expect(user['fullname']).to eq('test2')
                 expect(user['email']).to eq('test@ncsu.edu')
                 expect(user['email_on_submission']).to eq(true)

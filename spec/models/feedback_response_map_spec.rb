@@ -9,7 +9,7 @@ describe FeedbackResponseMap do
   let(:review_response_map) { build(:review_response_map, id: 2, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
   let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer]) }
-  let(:user1) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
+  let(:user1) { User.new username: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
   before(:each) do
     questionnaires = [questionnaire1, questionnaire2]
     allow(feedback_response_map).to receive(:reviewee).and_return(participant)

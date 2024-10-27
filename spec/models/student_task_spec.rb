@@ -3,8 +3,8 @@ describe StudentTask do
   let(:participant) { build(:participant, id: 1, user_id: user.id, parent_id: assignment.id) }
   let(:participant2) { build(:participant, id: 2, user_id: user2.id, parent_id: assignment.id) }
   let(:user) { create(:student) }
-  let(:user2) { create(:student, name: 'qwertyui', id: 5) }
-  let(:user3) { create(:student, name: 'qwertyui1234', id: 6) }
+  let(:user2) { create(:student, username: 'qwertyui', id: 5) }
+  let(:user3) { create(:student, username: 'qwertyui1234', id: 6) }
   let(:course) { build(:course) }
   let(:assignment) { build(:assignment, name: 'assignment', directory_path: 'assignment') }
   let(:assignment2) { build(:assignment, name: 'assignment2', directory_path: 'assignment2') }

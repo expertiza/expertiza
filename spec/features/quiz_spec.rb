@@ -20,7 +20,7 @@ def create_default_test_data(num_qs)
 end
 
 def login_and_create_quiz
-  login_as @student.name
+  login_as @student.username
   click_link 'Assignments'
   click_link @assignment.name
   click_link 'Your work'
@@ -195,7 +195,7 @@ describe 'appropriate quiz taking times', js: true do
   # [S3] - Students may not take quizzes on a phase that does not allow them to do so. When on a stage that does allow
   # for quizzes, they may take quizzes on work that they have reviewed.
   it 'should not be able to take quiz before doing review' do
-    login_as @student2.name
+    login_as @student2.username
     click_link @assignment.name
     expect(page).to have_content('Take quizzes')
     click_link 'Take quizzes'
@@ -206,7 +206,7 @@ describe 'appropriate quiz taking times', js: true do
   it 'should be able to take quiz after doing review' do
     create :team_user, team: @team2, user: @student2
     create :review_response_map, assignment: @assignment, reviewee: @team1, reviewer_id: 2
-    login_as @student2.name
+    login_as @student2.username
     click_link @assignment.name
     expect(page).to have_content('Take quizzes')
     click_link 'Take quizzes'
@@ -306,7 +306,7 @@ describe 'Instructor', js: true do
   # Verify that an instructor can see all quiz questions,
   # answers, and scores on the review questions page.
   it 'can view quiz questions and scores' do
-    login_as @instructor.name
+    login_as @instructor.username
     visit "/student_quizzes/review_questions?id=#{@assignment.id}&type=Assignment"
     student = all('tr > td')[0]
     score = all('tr > td')[1]
@@ -338,7 +338,7 @@ describe 'Student reviewers can not take the quizzes before request artifact', j
   end
 
   it 'can not take quiz' do
-    login_as @student2.name
+    login_as @student2.username
     click_link @assignment.name
     click_link 'Take quizzes'
     expect(page).to have_no_content('Begin')
@@ -359,7 +359,7 @@ describe 'Student reviewers can take the quizzes', js: true do
   end
 
   it 'can take quiz' do
-    login_as @student2.name
+    login_as @student2.username
     click_link @assignment.name
     click_link 'Take quizzes'
     expect(page).to have_link('Begin')
@@ -391,7 +391,7 @@ describe 'Grading of quizzes takes weights into consideration', js: true do
   end
 
   it 'can take quiz' do
-    login_as @student2.name
+    login_as @student2.username
     click_link @assignment.name
     click_link 'Take quizzes'
     expect(page).to have_link('Begin')
@@ -414,7 +414,7 @@ describe 'Student reviewers can view the quizzes they take', js: true do
   end
 
   it 'can view quiz' do
-    login_as @student2.name
+    login_as @student2.username
     click_link @assignment.name
     click_link 'Take quizzes'
     expect(page).to have_link('View')

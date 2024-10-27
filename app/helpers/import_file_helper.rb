@@ -4,7 +4,7 @@ module ImportFileHelper
   def self.define_attributes(row_hash)
     attributes = {}
     attributes['role_id'] = Role.student.id
-    attributes['name'] = row_hash[:username]
+    attributes['username'] = row_hash[:username]
     attributes['fullname'] = row_hash[:fullname]
     attributes['email'] = row_hash[:email]
     attributes['email_on_submission'] = 1

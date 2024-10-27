@@ -5,8 +5,8 @@ describe Instructor do
   let(:participant2) { build(:participant, id: 2) }
   let(:team) { build(:assignment_team, id: 1, name: 'no team') }
   let(:course) { build(:course) }
-  let(:user1) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
-  let(:user2) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbe@gmail.com', password: '123456789', password_confirmation: '123456789' }
+  let(:user1) { User.new username: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
+  let(:user2) { User.new username: 'abc', fullname: 'abc bbc', email: 'abcbbe@gmail.com', password: '123456789', password_confirmation: '123456789' }
   let(:ta_mapping1) { TaMapping.new }
   let(:ta_mapping2) { TaMapping.new }
   before(:each) do

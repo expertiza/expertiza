@@ -31,7 +31,7 @@ describe 'teams as reviewers' do
   end
 
   xit 'can allow team mates to edit the response' do
-    user = User.where(name: 'student10').first
+    user = User.where(username: 'student10').first
     student = AssignmentParticipant.where(user_id: user.id).first
 
     # login as student 10 and start working on the review

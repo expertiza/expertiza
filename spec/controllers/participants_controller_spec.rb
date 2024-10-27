@@ -1,7 +1,7 @@
 describe ParticipantsController do
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student) }
-  let(:student1) { build_stubbed(:student, id: 1, name: 'student') }
+  let(:student1) { build_stubbed(:student, id: 1, username: 'student') }
   let(:course_participant) { build(:course_participant) }
   let(:participant) { build(:participant) }
   let(:assignment_node) { build(:assignment_node) }
@@ -108,15 +108,15 @@ describe ParticipantsController do
   describe '#add' do
     it 'adds a participant' do
       allow(Assignment).to receive(:find).with('1').and_return(assignment)
-      allow(User).to receive(:find_by).with(name: student.name).and_return(student)
-      request_params = { model: 'Assignment', authorization: 'participant', id: 1, user: { name: student.name } }
+      allow(User).to receive(:find_by).with(username: student.username).and_return(student)
+      request_params = { model: 'Assignment', authorization: 'participant', id: 1, user: { username: student.username } }
       user_session = { user: instructor }
       get :add, params: request_params, session: user_session, xhr: true
       expect(response).to render_template('add.js.erb')
     end
     it 'does not add a participant for a non-existing user' do
       allow(Assignment).to receive(:find).with('1').and_return(assignment)
-      request_params = { model: 'Assignment', authorization: 'participant', id: 1, user: { name: 'Aaa' } }
+      request_params = { model: 'Assignment', authorization: 'participant', id: 1, user: { username: 'Aaa' } }
       user_session = { user: instructor }
       get :add, params: request_params, session: user_session, xhr: true
       expect(flash[:error]).to eq 'The user <b>Aaa</b> does not exist or has already been added.'
@@ -235,10 +235,10 @@ describe ParticipantsController do
       allow(assignment).to receive(:participants).and_return([participant])
       allow(participant).to receive(:permission_granted?).and_return(true)
       allow(participant).to receive(:user).and_return(student)
-      allow(student).to receive(:name).and_return('name')
+      allow(student).to receive(:username).and_return('name')
       allow(student).to receive(:fullname).and_return('fullname')
       pc = ParticipantsController.new
-      expect(pc.send(:get_user_info, student, assignment)).to eq(name: 'name', fullname: 'fullname', pub_rights: 'Granted', verified: false)
+      expect(pc.send(:get_user_info, student, assignment)).to eq(username: 'name', fullname: 'fullname', pub_rights: 'Granted', verified: false)
     end
   end
 

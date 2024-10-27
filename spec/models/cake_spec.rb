@@ -4,7 +4,7 @@ describe 'cake' do
   let(:answer) { Answer.new answer: 45 }
   let(:answer1) { Answer.new answer: 50 }
   let(:team) { build(:assignment_team, id: 1, name: 'no team', users: [user]) }
-  let(:user) { build(:student, id: 1, name: 'no name', fullname: 'no one', participants: [participant]) }
+  let(:user) { build(:student, id: 1, username: 'no name', fullname: 'no one', participants: [participant]) }
   let(:participant) { build(:participant, user_id: 1) }
   describe '#edit' do
     it 'returns the html ' do

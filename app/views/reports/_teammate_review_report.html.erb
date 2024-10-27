@@ -66,7 +66,7 @@
               <% @reviewee = rm.reviewee.user %>
                 <!--Teammate reviewed-->
                 <td id = "green" align = 'left' colspan=1>
-                  <%= link_to @reviewee.name(session[:ip]), impersonate_impersonate_path(:user => {:name => @reviewee.name}), :method => :post, :title => "Click here to impersonate this user" %>
+                  <%= link_to @reviewee.name(session[:ip]), impersonate_impersonate_path(:user => {:username => @reviewee.name}), :method => :post, :title => "Click here to impersonate this user" %>
                   (<%= @reviewee.fullname(session[:ip]) %>)
                 </td>
                 <!--Last reviewed at-->
@@ -80,7 +80,7 @@
                   <%= 'N/A' %>
                 <% else %>
                   <% @reviewee = rm.reviewee.user %>
-                  <%= link_to @reviewee.name(session[:ip]), impersonate_impersonate_path(:user => {:name => @reviewee.name}), :method => :post, :title => "Click here to impersonate this user" %>
+                  <%= link_to @reviewee.name(session[:ip]), impersonate_impersonate_path(:user => {:username => @reviewee.name}), :method => :post, :title => "Click here to impersonate this user" %>
                   (<%= @reviewee.fullname(session[:ip]) %>)
                 <% end %>
               </td>

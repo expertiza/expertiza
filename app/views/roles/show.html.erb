@@ -12,7 +12,7 @@
 <% if @users and @users.length > 0 -%>
   <ul>
     <% for user in @users do -%>
-      <li><%= link_to user.name(session[:ip]), :controller => 'users',
+      <li><%= link_to user.username(session[:ip]), :controller => 'users',
         :action => 'show', :id => user.id %></li>
     <% end -%>
   </ul>

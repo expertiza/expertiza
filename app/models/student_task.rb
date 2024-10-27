@@ -114,7 +114,7 @@ class StudentTask
 
       teammates = []
       course_id = Assignment.find_by(id: team.parent_id).course_id
-      team_participants = Team.find(team.id).participants.reject { |p| p.name == user.name }
+      team_participants = Team.find(team.id).participants.reject { |p| p.name == user.username }
       team_participants.each { |p| teammates << p.user.fullname(ip_address) }
       next if teammates.empty?
 

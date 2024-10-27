@@ -9,9 +9,9 @@
             <td><%= label_tag(:user, "User:") %></td>
             <td><%= select("post", "user_id",
                     if current_user_role?.name == 'Super-Administrator'
-                        (User.all.collect {|u| [ u.name(session[:ip]), u.id ] }.insert(0, ['Any', 0]))
+                        (User.all.collect {|u| [ u.username(session[:ip]), u.id ] }.insert(0, ['Any', 0]))
                     else
-                        (User.where("id = #{current_user.id}").collect {|u| [ u.name(session[:ip]), u.id ] })
+                        (User.where("id = #{current_user.id}").collect {|u| [ u.username(session[:ip]), u.id ] })
                     end,
                     ) %></td>
           </tr>

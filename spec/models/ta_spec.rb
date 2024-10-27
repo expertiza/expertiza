@@ -6,7 +6,7 @@ describe Ta do
   let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
   let(:participant) { build(:participant, id: 1) }
   let(:team) { build(:assignment_team, id: 1, name: 'no team') }
-  let(:user) { build(:student, id: 4, name: 'no name', fullname: 'no two') }
+  let(:user) { build(:student, id: 4, username: 'no name', fullname: 'no two') }
 
   describe '#teaching_assistant?' do
     it 'returns true for a teaching assistant' do

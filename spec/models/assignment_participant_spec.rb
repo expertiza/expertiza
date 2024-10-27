@@ -156,7 +156,7 @@ describe AssignmentParticipant do
           ActionMailer::Base.deliveries.clear
           allow(ImportFileHelper).to receive(:define_attributes).with(row).and_return(attributes)
           allow(ImportFileHelper).to receive(:create_new_user) do
-            test_user = User.new(name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com')
+            test_user = User.new(username: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com')
             test_user.id = 123
             test_user.save!
             password = test_user.reset_password # the password is reset
@@ -166,7 +166,7 @@ describe AssignmentParticipant do
           end
           # allow(ImportFileHelper).to receive(:create_new_user).with(attributes, {}).and_return()
           allow(Assignment).to receive(:find).with(1).and_return(assignment)
-          allow(User).to receive(:exists?).with(name: 'no one').and_return(false)
+          allow(User).to receive(:exists?).with(username: 'no one').and_return(false)
           allow(participant).to receive(:set_handle).and_return('handle')
           allow(AssignmentParticipant).to receive(:exists?).and_return(false)
           allow(AssignmentParticipant).to receive(:create).and_return(participant)
@@ -213,7 +213,7 @@ describe AssignmentParticipant do
   describe '.export' do
     it 'exports all participants in current assignment' do
       allow(AssignmentParticipant).to receive_message_chain(:where, :find_each).with(parent_id: 1).with(no_args).and_yield(participant)
-      allow(participant).to receive(:user).and_return(build(:student, name: 'student2065', fullname: '2065, student'))
+      allow(participant).to receive(:user).and_return(build(:student, username: 'student2065', fullname: '2065, student'))
       options = { 'personal_details' => 'true', 'role' => 'true', 'handle' => 'true', 'parent' => 'true', 'email_options' => 'true' }
       expect(AssignmentParticipant.export([], 1, options)).to eq(
         [['student2065',
@@ -230,7 +230,7 @@ describe AssignmentParticipant do
   end
 
   describe '#set_handle' do
-    let(:student) { build(:student, name: 'no one') }
+    let(:student) { build(:student, username: 'no one') }
     before(:each) do
       allow(participant).to receive(:user).and_return(student)
     end

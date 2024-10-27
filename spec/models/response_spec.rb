@@ -1,6 +1,6 @@
 describe Response do
-  let(:user) { build(:student, id: 1, role_id: 1, name: 'no name', fullname: 'no one') }
-  let(:user2) { build(:student, id: 2, role_id: 2, name: 'no name2', fullname: 'no one2') }
+  let(:user) { build(:student, id: 1, role_id: 1, username: 'no name', fullname: 'no one') }
+  let(:user2) { build(:student, id: 2, role_id: 2, username: 'no name2', fullname: 'no one2') }
   let(:participant) { build(:participant, id: 1, parent_id: 1, user: user) }
   let(:participant2) { build(:participant, id: 2, parent_id: 2, user: user2) }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }

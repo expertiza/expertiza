@@ -1,9 +1,9 @@
 describe CourseSurveyResponseMap do
-  let(:participant) { build(:participant, user_id: 1, user: build(:student, name: 'Jane', fullname: 'Doe, Jane', id: 1)) }
+  let(:participant) { build(:participant, user_id: 1, user: build(:student, username: 'Jane', fullname: 'Doe, Jane', id: 1)) }
   let(:course_survey_questionnaire) { CourseSurveyQuestionnaire.new id: 985, name: 'course_survey', private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234 }
   let(:previous_day) { (Time.now.getlocal - 1 * 86_400).strftime('%Y-%m-%d %H:%M:%S') }
   let(:next_day) { (Time.now.getlocal + 1 * 86_400).strftime('%Y-%m-%d %H:%M:%S') }
-  let(:user) { build(:student, email: 'expertiza.debugging@gmail.com', name: 'Jane', fullname: 'Doe, Jane', id: 1) }
+  let(:user) { build(:student, email: 'expertiza.debugging@gmail.com', username: 'Jane', fullname: 'Doe, Jane', id: 1) }
   let(:course) { build(:course, id: 1, name: 'ECE517') }
   before(:each) do
     survey_deployment = CourseSurveyDeployment.new questionnaire_id: 985, start_date: previous_day, end_date: next_day, parent_id: '12345678', type: 'CourseSurveyDeployment'

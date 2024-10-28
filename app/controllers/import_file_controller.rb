@@ -178,8 +178,8 @@ class ImportFileController < ApplicationController
   # Produces an array, where each entry in the array is a hash.
   # The hash keys are the column titles, and the hash values are the associated values.
   #
-  # E.G. [ { :name => 'jsmith', :fullname => 'John Smith' , :email => 'jsmith@gmail.com' },
-  #        { :name => 'jdoe', :fullname => 'Jane Doe', :email => 'jdoe@gmail.com' } ]
+  # E.G. [ { :name => 'jsmith', :name => 'John Smith' , :email => 'jsmith@gmail.com' },
+  #        { :name => 'jdoe', :name => 'Jane Doe', :email => 'jdoe@gmail.com' } ]
   #
   def hash_rows_with_headers(header, body)
     new_body = []
@@ -243,7 +243,7 @@ class ImportFileController < ApplicationController
   # and :body refers to the contents of the file except the header.
   # :header is an array, and :body is a two-dimensional array.
   #
-  # E.G. { :header => ['name', 'fullname', 'email'],
+  # E.G. { :header => ['name', 'name', 'email'],
   #        :body => [ ['jsmith', 'John Smith', 'jsmith@gmail.com'],
   #                   ['jdoe', 'Jane Doe', 'jdoe@gmail.com' ] ] }
   #
@@ -263,7 +263,7 @@ class ImportFileController < ApplicationController
   # The outer array contains "rows".
   # The inner arrays contain "elements of rows" or "columns".
   #
-  # E.G. [ [ 'name', 'fullname', 'email' ],
+  # E.G. [ [ 'name', 'name', 'email' ],
   #        [ 'jsmith', 'John Smith', 'jsmith@gmail.com' ],
   #        [ 'jdoe', 'Jane Doe', 'jdoe@gmail.com' ] ]
   #

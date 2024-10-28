@@ -236,9 +236,9 @@ describe ParticipantsController do
       allow(participant).to receive(:permission_granted?).and_return(true)
       allow(participant).to receive(:user).and_return(student)
       allow(student).to receive(:username).and_return('name')
-      allow(student).to receive(:fullname).and_return('fullname')
+      allow(student).to receive(:name).and_return('name')
       pc = ParticipantsController.new
-      expect(pc.send(:get_user_info, student, assignment)).to eq(username: 'name', fullname: 'fullname', pub_rights: 'Granted', verified: false)
+      expect(pc.send(:get_user_info, student, assignment)).to eq(username: 'name', name: 'name', pub_rights: 'Granted', verified: false)
     end
   end
 

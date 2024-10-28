@@ -12,7 +12,7 @@
         <%= tscore[:team].name(session[:ip]) + ' (' + SignUpTopic.find(topic_id).topic_identifier + ')' %>
       <% else %>
         <% if @assignment.max_team_size == 1 %>
-          <%= tscore[:team].users.first.username(session[:ip]) + ' (' + tscore[:team].users.first.fullname(session[:ip]) + ')' rescue '' %>
+          <%= tscore[:team].users.first.username(session[:ip]) + ' (' + tscore[:team].users.first.name(session[:ip]) + ')' rescue '' %>
         <% else %>
           <%= tscore[:team].name(session[:ip]) %> |
           <% for index in 0..tscore[:team].users.length - 2 %>

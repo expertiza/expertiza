@@ -216,7 +216,7 @@ describe SignUpTopic do
     let(:instructor) do 
       User.create!(
         username: 'Instructor',
-        fullname: 'Full',  # Ensure this matches the expected format if there are specific validations.
+        name: 'Full',  # Ensure this matches the expected format if there are specific validations.
         email: 'instructor@example.com',  # Provide a valid email format.
         password: 'securepassword',  # Assume a password is required for user creation.
         password_confirmation: 'securepassword'  # Match the password confirmation if necessary.

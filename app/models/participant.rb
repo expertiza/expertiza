@@ -40,7 +40,7 @@ class Participant < ApplicationRecord
   end
 
   def fullname(ip_address = nil)
-    user.fullname(ip_address)
+    user.name(ip_address)
   end
 
   def handle(ip_address = nil)
@@ -136,7 +136,7 @@ class Participant < ApplicationRecord
     where(parent_id: parent_id).find_each do |part|
       tcsv = []
       user = part.user
-      tcsv.push(user.username, user.fullname, user.email) if options['personal_details'] == 'true'
+      tcsv.push(user.username, user.name, user.email) if options['personal_details'] == 'true'
       tcsv.push(user.role.name) if options['role'] == 'true'
       tcsv.push(user.parent.username) if options['parent'] == 'true'
       tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review) if options['email_options'] == 'true'

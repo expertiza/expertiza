@@ -518,7 +518,7 @@ class Assignment < ApplicationRecord
       teams_csv << team[:team].name
       names_of_participants = ''
       team[:team].participants.each do |p|
-        names_of_participants += p.fullname
+        names_of_participants += p.name
         names_of_participants += '; ' unless p == team[:team].participants.last
       end
       teams_csv << names_of_participants

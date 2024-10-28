@@ -205,7 +205,7 @@ class ParticipantsController < ApplicationController
   def get_user_info(team_user, assignment)
     user = {}
     user[:username] = team_user.username
-    user[:fullname] = team_user.fullname
+    user[:name] = team_user.name
     # set by default
     permission_granted = false
     assignment.participants.each do |participant|

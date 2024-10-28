@@ -57,7 +57,7 @@ class Team < ApplicationRecord
   def author_names
     names = []
     users.each do |user|
-      names << user.fullname
+      names << user.name
     end
     names
   end

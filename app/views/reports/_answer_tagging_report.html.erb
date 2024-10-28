@@ -46,7 +46,7 @@
             <% report_lines.each do |report_line| %>
                 <tr>
                   <td><%= report_line.user.username(session[:ip]) %></td>
-                  <td><%= report_line.user.fullname(session[:ip]) %></td>
+                  <td><%= report_line.user.name(session[:ip]) %></td>
                   <td><%= report_line.percentage.to_s %>%</td>
                   <td><%= report_line.no_tagged.to_s %></td>
                   <td><%= report_line.no_not_tagged.to_s %></td>
@@ -95,7 +95,7 @@
           <% @user_tagging_report.each do |key, val| %>
               <tr>
                 <td><%= val.user.username(session[:ip]) %></td>
-                <td><%= val.user.fullname(session[:ip]) %></td>
+                <td><%= val.user.name(session[:ip]) %></td>
                 <td><%= val.percentage.to_s %>%</td>
                 <td><%= val.no_tagged.to_s %></td>
                 <td><%= val.no_not_tagged.to_s %></td>

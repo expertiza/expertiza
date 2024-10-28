@@ -3,7 +3,7 @@ describe PasswordRetrievalController do
     it 'create new entry in password_resets table' do
       @user = User.new
       @user.email = 'example@example.edu'
-      @user.fullname = 'John Bumgardner'
+      @user.name = 'John Bumgardner'
       @user.username = 'exe'
       @user.save!
       request_params = { user: { email: 'example@example.edu' } }
@@ -13,7 +13,7 @@ describe PasswordRetrievalController do
     it 'modifies the token in password_resets_table' do
       @user = User.new
       @user.email = 'example@example.edu'
-      @user.fullname = 'John Bumgardner'
+      @user.name = 'John Bumgardner'
       @user.username = 'Shubham'
       @user.save!
       @password_retrival = PasswordReset.new
@@ -29,7 +29,7 @@ describe PasswordRetrievalController do
       @user = User.new
       @user.email = 'aexample@example.edu'
       @user.username = 'Shubham'
-      @user.fullname = 'John Bumgardner'
+      @user.name = 'John Bumgardner'
       @user.save!
       request_params = { user: { email: 'example@example.edu' } }
       post :send_password, params: request_params

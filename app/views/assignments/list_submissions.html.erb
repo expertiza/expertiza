@@ -70,7 +70,7 @@
           <td>
               <% users_for_curr_team.each do |user| %>
                   <%= link_to user.username(session[:ip]), impersonate_impersonate_path(:user => {:username => user.username(session[:ip])}), :method => :post %>
-                  (<%= user.fullname(session[:ip])%>)<br>
+                  (<%= user.name(session[:ip])%>)<br>
               <% end %>
           </td>
 

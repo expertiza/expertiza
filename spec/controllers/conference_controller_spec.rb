@@ -49,7 +49,7 @@ describe ConferenceController do
         user: { username: 'lily',
                 role_id: 2,
                 email: 'chenzy@gmail.com',
-                fullname: 'John Bumgardner',
+                name: 'John Bumgardner',
                 assignment: '2' }
       }
       allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
@@ -78,7 +78,7 @@ describe ConferenceController do
         user: { username: 'lily',
                 role_id: 2,
                 email: 'chenzy@gmail.com',
-                fullname: 'John Bumgardner',
+                name: 'John Bumgardner',
                 assignment: '2' }
       }
       allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
@@ -91,7 +91,7 @@ describe ConferenceController do
         user: { username: 'lily23',
                 role_id: 2,
                 email: 'chenzy@gmail.com',
-                fullname: 'John Bumgardner',
+                name: 'John Bumgardner',
                 assignment: '2' }
       }
       allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
@@ -110,7 +110,7 @@ describe ConferenceController do
                 crypted_password: 'password',
                 role_id: 1,
                 password_salt: 1,
-                fullname: '6, instructor',
+                name: '6, instructor',
                 email: 'chenzy@gmail.com',
                 parent_id: 1,
                 private_by_default: false,
@@ -140,7 +140,7 @@ describe ConferenceController do
                 crypted_password: 'password',
                 role_id: 1,
                 password_salt: 1,
-                fullname: '6, instructor',
+                name: '6, instructor',
                 email: 'chenzy2@gmail.com',
                 parent_id: 1,
                 private_by_default: false,

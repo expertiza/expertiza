@@ -3,10 +3,10 @@ describe CourseTeam do
   let(:course_team1) { build(:course_team, id: 1) }
   let(:course_team2) { build(:course_team, id: 2) }
   let(:instructor) { build(:instructor, id: 6) }
-  let(:user1) { User.new username: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
-  let(:user2) { User.new username: 'bcd', fullname: 'cbd ccd', email: 'bcdccd@gmail.com', password: '123456789', password_confirmation: '123456789' }
-  let(:participant) { build(:participant, user: build(:student, username: 'Jane', fullname: 'Doe, Jane', id: 1)) }
-  let(:participant2) { build(:participant, user: build(:student, username: 'John', fullname: 'Doe, John', id: 2)) }
+  let(:user1) { User.new username: 'abc', name: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
+  let(:user2) { User.new username: 'bcd', name: 'cbd ccd', email: 'bcdccd@gmail.com', password: '123456789', password_confirmation: '123456789' }
+  let(:participant) { build(:participant, user: build(:student, username: 'Jane', name: 'Doe, Jane', id: 1)) }
+  let(:participant2) { build(:participant, user: build(:student, username: 'John', name: 'Doe, John', id: 2)) }
   let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
 
   describe 'validations' do

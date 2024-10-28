@@ -15,7 +15,7 @@ ActiveRecord::Schema.define(version: 20241009142307) do
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "username"
     t.integer "role_id"
-    t.string "fullname"
+    t.string "name"
     t.string "institution_id"
     t.string "email"
     t.string "status"
@@ -977,7 +977,7 @@ ActiveRecord::Schema.define(version: 20241009142307) do
     t.string "crypted_password", limit: 40, default: "", null: false
     t.integer "role_id", default: 0, null: false
     t.string "password_salt"
-    t.string "fullname"
+    t.string "name"
     t.string "email"
     t.integer "parent_id"
     t.boolean "private_by_default", default: false

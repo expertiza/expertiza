@@ -44,7 +44,7 @@
         <% @team_member_count > 1 ? @rspan = @team_member_count : @rspan = 1 %>      
         <!-- for a valid reviewer -->
         <%if Participant.exists?(id: reviewer.reviewer_id) %>
-          <% @reviewer_name = @user.fullname(session[:ip]) %>
+          <% @reviewer_name = @user.name(session[:ip]) %>
           <!--Reviewer-->
           <td rowspan= <%= @rspan %>>
             <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => reviewer.reviewer_id, :assignment_id => @id%>

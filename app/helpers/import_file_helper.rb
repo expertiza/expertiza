@@ -5,7 +5,7 @@ module ImportFileHelper
     attributes = {}
     attributes['role_id'] = Role.student.id
     attributes['username'] = row_hash[:username]
-    attributes['fullname'] = row_hash[:fullname]
+    attributes['name'] = row_hash[:name]
     attributes['email'] = row_hash[:email]
     attributes['email_on_submission'] = 1
     attributes['email_on_review'] = 1

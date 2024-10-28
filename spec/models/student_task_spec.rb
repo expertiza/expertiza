@@ -226,7 +226,7 @@ describe StudentTask do
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: assignment.id).and_return(participant)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: 5, parent_id: assignment.id).and_return(participant2)
         allow(Assignment).to receive(:find_by).with(id: team.parent_id).and_return(assignment)
-        expect(StudentTask.teamed_students(user)).to eq(assignment.course_id => [user2.fullname])
+        expect(StudentTask.teamed_students(user)).to eq(assignment.course_id => [user2.name])
       end
     end
   end

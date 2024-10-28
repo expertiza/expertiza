@@ -26,7 +26,7 @@ class User < ApplicationRecord
   validates :email, presence: { message: "can't be blank" }
   validates :email, format: { with: /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, allow_blank: true }
 
-  validates :fullname, presence: true
+  validates :name, presence: true
 
   before_validation :randomize_password, if: ->(user) { user.new_record? && user.password.blank? } # AuthLogic
 
@@ -116,12 +116,12 @@ class User < ApplicationRecord
     User.anonymized_view?(ip_address) ? role.name + ' ' + id.to_s : self[:username]
   end
 
-  def fullname(ip_address = nil)
-    User.anonymized_view?(ip_address) ? role.name + ', ' + id.to_s : self[:fullname]
+  def name(ip_address = nil)
+    User.anonymized_view?(ip_address) ? role.name + ', ' + id.to_s : self[:name]
   end
 
   def first_name(ip_address = nil)
-    User.anonymized_view?(ip_address) ? role.name : fullname.try(:[], /,.+/).try(:[], /\w+/) || ''
+    User.anonymized_view?(ip_address) ? role.name : name.try(:[], /,.+/).try(:[], /\w+/) || ''
   end
 
   def email(ip_address = nil)
@@ -170,7 +170,7 @@ class User < ApplicationRecord
       user = ImportFileHelper.create_new_user(attributes, session)
     else
       user.email = row_hash[:email]
-      user.fullname = row_hash[:fullname]
+      user.name = row_hash[:name]
       user.parent_id = (session[:user]).id
       user.save
     end
@@ -257,7 +257,7 @@ class User < ApplicationRecord
     users = User.all
     users.each do |user|
       tcsv = []
-      tcsv.push(user.username, user.fullname, user.email) if options['personal_details'] == 'true'
+      tcsv.push(user.username, user.name, user.email) if options['personal_details'] == 'true'
       tcsv.push(user.role.name) if options['role'] == 'true'
       tcsv.push(user.parent.username) if options['parent'] == 'true'
       tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails) if options['email_options'] == 'true'
@@ -312,7 +312,7 @@ class User < ApplicationRecord
   end
 
   def self.search_users(role, user_id, letter, search_by)
-    key_word = { '1' => 'username', '2' => 'fullname', '3' => 'email' }
+    key_word = { '1' => 'username', '2' => 'name', '3' => 'email' }
     sql = "(role_id in (?) or id = ?) and #{key_word[search_by]} like ?"
     if key_word.include? search_by
       search_filter = '%' + letter + '%'

@@ -3,7 +3,7 @@ describe Team do
   let(:participant) { build(:participant, user_id: 1) }
   let(:participant2) { build(:participant, user_id: 2) }
   let(:participant3) { build(:participant, user_id: 3) }
-  let(:user) { build(:student, id: 1, username: 'no name', fullname: 'no one', participants: [participant]) }
+  let(:user) { build(:student, id: 1, username: 'no name', name: 'no one', participants: [participant]) }
   let(:user2) { build(:student, id: 2) }
   let(:user3) { build(:student, id: 3) }
   let(:team) { build(:assignment_team, id: 1, name: 'no team', users: [user]) }

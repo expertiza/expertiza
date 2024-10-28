@@ -1,10 +1,10 @@
 describe User do
   let(:user) do
-    User.new username: 'abc', fullname: 'abc xyz', email: 'abcxyz@gmail.com', password: '12345678', password_confirmation: '12345678',
+    User.new username: 'abc', name: 'abc xyz', email: 'abcxyz@gmail.com', password: '12345678', password_confirmation: '12345678',
              email_on_submission: 1, email_on_review: 1, email_on_review_of_review: 0, copy_of_emails: 1, handle: 'handle'
   end
-  let(:user1) { User.new username: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
-  let(:user2) { User.new username: 'abc', fullname: 'abc bbc', email: 'abcbbe@gmail.com', password: '123456789', password_confirmation: '123456789' }
+  let(:user1) { User.new username: 'abc', name: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
+  let(:user2) { User.new username: 'abc', name: 'abc bbc', email: 'abcbbe@gmail.com', password: '123456789', password_confirmation: '123456789' }
 
   describe '#username' do
     it 'returns the username of the user' do
@@ -25,18 +25,18 @@ describe User do
     end
   end
 
-  describe '#fullname' do
+  describe '#name' do
     it 'returns the full name of the user' do
-      expect(user.fullname).to eq('abc xyz')
+      expect(user.name).to eq('abc xyz')
     end
 
-    it 'Validate presence of fullname which cannot be blank' do
-      user.fullname = '  '
+    it 'Validate presence of name which cannot be blank' do
+      user.name = '  '
       expect(user).not_to be_valid
     end
 
     it 'Validate the email format correctness' do
-      user.fullname = 'John Bumgardner'
+      user.name = 'John Bumgardner'
       expect(user).to be_valid
     end
   end
@@ -207,18 +207,18 @@ describe User do
 
   describe '.import' do
     it 'raises error if import column does not equal to 3' do
-      row = { 'username' => 'abc', 'fullname' => 'abc xyz' }
+      row = { 'username' => 'abc', 'name' => 'abc xyz' }
       expect { User.import(row, nil, nil, nil) }.to raise_error(ArgumentError)
     end
 
     it 'updates an existing user with info from impor file' do
       create(:student, username: 'abc')
-      row = { username: 'abc', fullname: 'test, test', email: 'test@gmail.com' }
+      row = { username: 'abc', name: 'test, test', email: 'test@gmail.com' }
       allow(user).to receive(:id).and_return(6)
       User.import(row, nil, { user: user }, nil)
       updated_user = User.find_by(username: 'abc')
       expect(updated_user.email).to eq 'test@gmail.com'
-      expect(updated_user.fullname).to eq 'test, test'
+      expect(updated_user.name).to eq 'test, test'
       expect(updated_user.parent_id).to eq 6
     end
   end
@@ -455,7 +455,7 @@ describe User do
 
     before(:each) do
       allow(User).to receive_message_chain(:order, :where).with('(role_id in (?) or id = ?) and username like ?', role.get_available_roles, @user_id, '%username%')
-      allow(User).to receive_message_chain(:order, :where).with('(role_id in (?) or id = ?) and fullname like ?', role.get_available_roles, @user_id, '%fullname%')
+      allow(User).to receive_message_chain(:order, :where).with('(role_id in (?) or id = ?) and name like ?', role.get_available_roles, @user_id, '%name%')
       allow(User).to receive_message_chain(:order, :where).with('(role_id in (?) or id = ?) and email like ?', role.get_available_roles, @user_id, '%email%')
       user_id = double
     end
@@ -469,7 +469,7 @@ describe User do
     it 'when the search_by is 2' do
       search_by = '2'
       allow(User).to receive_message_chain(:order, :where).and_return(user)
-      expect(User.search_users(role, @user_id, 'fullname', search_by)).to eq user
+      expect(User.search_users(role, @user_id, 'name', search_by)).to eq user
     end
 
     it 'when the search_by is 3' do

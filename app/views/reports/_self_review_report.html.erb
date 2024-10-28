@@ -12,7 +12,7 @@
       <!--Self review-->
       <td id = "green" bgcolor=<%= @bgcolor %> align='left'>
         <% if sr.response.first %>
-          <%= link_to @user_name, controller: 'popup', action: 'self_review_popup', response_id: sr.response.first.id, user_fullname: Participant.find(sr.reviewer_id).user.fullname(session[:ip]) %>
+          <%= link_to @user_name, controller: 'popup', action: 'self_review_popup', response_id: sr.response.first.id, user_name: Participant.find(sr.reviewer_id).user.name(session[:ip]) %>
         <% else %>
           <%= @user_name %>
         <% end %> 

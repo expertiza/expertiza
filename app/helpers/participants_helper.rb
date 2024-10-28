@@ -16,7 +16,7 @@ module ParticipantsHelper
     attributes = {}
     attributes['role_id'] = Role.find_by name: 'Student'
     attributes['username'] = line_split[config['username'].to_i]
-    attributes['fullname'] = config['fullname']
+    attributes['name'] = config['name']
     attributes['email'] = line_split[config['email'].to_i]
     attributes['password'] = (0...8).map { (65 + rand(26)).chr }.join
     attributes['email_on_submission'] = 1
@@ -65,7 +65,7 @@ module ParticipantsHelper
       while (line = infile.gets)
         store_item(line, 'dlm', config)
         store_item(line, 'username', config)
-        store_item(line, 'fullname', config)
+        store_item(line, 'name', config)
         store_item(line, 'email', config)
       end
     end

@@ -59,7 +59,7 @@ describe InvitationsController do
       allow(User).to receive(:skip_callback).with(:create, :after, :email_welcome).and_return(true)
       request_params = {
         user: { username: 'testuser@gmail.com',
-                fullname: 'John Bumgardner',
+                name: 'John Bumgardner',
                 parent_id: 1,
                 institution_id: 1 },
         student_id: 1,

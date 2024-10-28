@@ -12,7 +12,7 @@ describe UsersController do
 
   let(:institution1) { build(:institution, id: 1) }
   let(:requested_user1) do
-    AccountRequest.new id: 4, username: 'requester1', role_id: 2, fullname: 're, requester1',
+    AccountRequest.new id: 4, username: 'requester1', role_id: 2, name: 're, requester1',
                        institution_id: 1, email: 'requester1@test.com', status: nil, self_introduction: 'no one'
   end
   let(:superadmin) { build(:superadmin) }
@@ -204,7 +204,7 @@ describe UsersController do
                 crypted_password: 'password',
                 role_id: 2,
                 password_salt: 1,
-                fullname: '6, instructor',
+                name: '6, instructor',
                 email: 'chenzy@gmail.com',
                 parent_id: 1,
                 private_by_default: false,
@@ -234,7 +234,7 @@ describe UsersController do
                 crypted_password: 'password',
                 role_id: 2,
                 password_salt: 1,
-                fullname: '6, instructor',
+                name: '6, instructor',
                 email: 'chenzy@gmail.com',
                 parent_id: 1,
                 private_by_default: false,
@@ -265,7 +265,7 @@ describe UsersController do
                 crypted_password: 'password',
                 role_id: 2,
                 password_salt: 1,
-                fullname: '6, instructor',
+                name: '6, instructor',
                 email: 'chenzy@gmail.com',
                 parent_id: 1,
                 private_by_default: false,

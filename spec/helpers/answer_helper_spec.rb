@@ -20,7 +20,7 @@ describe AnswerHelper do
     @assignment_questionnaire1 = create(:assignment_questionnaire, id: 1, assignment_id: @assignment1.id, questionnaire_id: @questionnaire1.id, used_in_round: 1)
     @assignment_questionnaire2 = create(:assignment_questionnaire, id: 2, assignment_id: @assignment1.id, questionnaire_id: @questionnaire2.id, used_in_round: 2)
     @assignment_questionnaire3 = create(:assignment_questionnaire, id: 3, assignment_id: @assignment2.id, questionnaire_id: @questionnaire3.id, used_in_round: nil)
-    @user = create(:student, username: 'name', fullname: 'name')
+    @user = create(:student, username: 'name', name: 'name')
     @participant = create(:participant, user_id: @user.id, parent_id: @assignment1.id)
     @response_map = create(:review_response_map, reviewer: @participant, assignment: @assignment1)
     @response = create(:response, response_map: @response_map, created_at: '2019-11-01 23:30:00')

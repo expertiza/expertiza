@@ -218,10 +218,10 @@ class Response < ApplicationRecord
     response_map = map
     reviewer_participant_id = response_map.reviewer_id
     reviewer_participant = AssignmentParticipant.find(reviewer_participant_id)
-    reviewer_name = User.find(reviewer_participant.user_id).fullname
+    reviewer_name = User.find(reviewer_participant.user_id).name
     reviewee_team = AssignmentTeam.find(response_map.reviewee_id)
     reviewee_participant = reviewee_team.participants.first # for team assignment, use the first member's name.
-    reviewee_name = User.find(reviewee_participant.user_id).fullname
+    reviewee_name = User.find(reviewee_participant.user_id).name
     assignment = Assignment.find(reviewer_participant.parent_id)
     Mailer.notify_grade_conflict_message(
       to: assignment.instructor.email,

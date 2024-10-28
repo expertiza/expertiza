@@ -310,7 +310,7 @@ describe 'Instructor', js: true do
     visit "/student_quizzes/review_questions?id=#{@assignment.id}&type=Assignment"
     student = all('tr > td')[0]
     score = all('tr > td')[1]
-    expect(student).to have_text(@student2.fullname)
+    expect(student).to have_text(@student2.name)
     expect(score).to have_text('100.0')
     expect(page).to have_text('Average score for quiz takers: 100.0')
     expect(page).to have_text('1')

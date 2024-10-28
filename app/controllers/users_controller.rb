@@ -68,8 +68,8 @@ class UsersController < ApplicationController
       case search_by.to_i
       when 1 # Search by username
         @paginated_users = paginate_list.where('username LIKE ?', "%#{letter}%")
-      when 2 # Search by fullname
-        @paginated_users = paginate_list.where('fullname LIKE ?', "%#{letter}%")
+      when 2 # Search by name
+        @paginated_users = paginate_list.where('name LIKE ?', "%#{letter}%")
       when 3 # Search by email
         @paginated_users = paginate_list.where('email LIKE ?', "%#{letter}%")
       else
@@ -218,7 +218,7 @@ class UsersController < ApplicationController
                                  :crypted_password,
                                  :role_id,
                                  :password_salt,
-                                 :fullname,
+                                 :name,
                                  :email,
                                  :parent_id,
                                  :private_by_default,

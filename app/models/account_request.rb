@@ -7,5 +7,5 @@ class AccountRequest < ApplicationRecord
                     format: { with: VALID_EMAIL_REGEX, message: 'format is wrong' },
                     uniqueness: { case_sensitive: false, message: 'has already existed in Expertiza' }
 
-  validates :fullname, presence: true, length: { maximum: 100, message: 'is too long' }
+  validates :name, presence: true, length: { maximum: 100, message: 'is too long' }
 end

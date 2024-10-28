@@ -64,7 +64,7 @@ class AccountRequestController < ApplicationController
     new_user.username = requested_user.username
     new_user.role_id = requested_user.role_id
     new_user.institution_id = requested_user.institution_id
-    new_user.fullname = requested_user.fullname
+    new_user.name = requested_user.name
     new_user.email = requested_user.email
     new_user.parent_id = session[:user].id
     new_user.timezonepref = User.find_by(id: new_user.parent_id).timezonepref
@@ -148,7 +148,7 @@ class AccountRequestController < ApplicationController
   def notify_supers_new_request(requested_user)
     super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')
     super_users.each do |super_user|
-      prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, requested_user, 'New Account Request: ' + requested_user.fullname)
+      prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, requested_user, 'New Account Request: ' + requested_user.name)
       prepared_mail.deliver
     end
     # Notifying an email to the administrator regarding the new user request!
@@ -163,7 +163,7 @@ class AccountRequestController < ApplicationController
   end
 
   def requested_user_params
-    params.require(:user).permit(:username, :role_id, :fullname, :institution_id, :email)
+    params.require(:user).permit(:username, :role_id, :name, :institution_id, :email)
           .merge(self_introduction: params[:requested_user][:self_introduction])
   end
 end

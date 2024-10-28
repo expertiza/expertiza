@@ -76,8 +76,8 @@ class MentorManagement
   def self.notify_team_of_mentor_assignment(mentor, team)
     members = team.users
     emails = members.map(&:email)
-    members_info = members.map { |mem| "#{mem.fullname} - #{mem.email}" }
-    mentor_info = "#{mentor.fullname} (#{mentor.email})"
+    members_info = members.map { |mem| "#{mem.name} - #{mem.email}" }
+    mentor_info = "#{mentor.name} (#{mentor.email})"
     message = "#{mentor_info} has been assigned as your mentor for assignment #{Assignment.find(team.parent_id).name} <br>Current members:<br> #{members_info.join('<br>')}"
 
     Mailer.delayed_message(bcc: emails,

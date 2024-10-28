@@ -12,7 +12,7 @@ describe Scoring do
   let(:signed_up_team) { build(:signed_up_team, team_id: contributor.id) }
 
   # ReviewResponseMap Spec Additions
-  let(:student) { build(:student, id: 1, username: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
+  let(:student) { build(:student, id: 1, username: 'name', name: 'no one', email: 'expertiza@mailinator.com') }
   let(:participant) { build(:participant, id: 1, parent_id: 1, user: student) }
   let(:response3) { build(:response) }
   let(:question) { double('Question') }

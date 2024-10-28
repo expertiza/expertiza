@@ -116,21 +116,39 @@ class TeamAssignmentService
   end
 
   # Constructs bidding information for teams including their bids on available topics
-  #TODO - make tables of bids might be clearer
   def construct_teams_bidding_info(unassigned_teams, sign_up_topics)
     teams_bidding_info = []
+    bids = fetch_bids(unassigned_teams, sign_up_topics)    
+
     unassigned_teams.each do |team|
-      topic_bids = []
-      sign_up_topics.each do |topic|
-        bid = Bid.find_by(team_id: team.id, topic_id: topic.id)
-        topic_bids << { topic_id: topic.id, priority: bid.priority } if bid
-      end
-      topic_bids.sort! { |bid| bid[:priority] }
-      teams_bidding_info << { team_id: team.id, bids: topic_bids }
+        team_bids = construct_team_bids(team, bids)
+        sorted_bids = sort_bids_by_priority(team, bids)
+        teams_bidding_info << { team_id: team.id, bids: sorted_bids }
     end
     teams_bidding_info
   end
 
+   # Fetches all bids associated with the specific unassigned teams and sign-up topics
+  def fetch_bids(unassigned_teams, sign_up_topics)
+    Bid.where(
+      team_id: unassigned_teams.map(&:id),
+      topic_id: sign_up_topics.map(&:id)
+    )
+  end
+
+  # Constructions a list of bids specific to a given team
+  def construct_team_bids(team, bids)
+    team_bids = bids.select { |bid| bid.team_id == team.id }
+    team_bids.map do |bid|
+      { topic_id: bid.topic_id, priority: bid.priority }
+    end
+  end
+  
+  # Sorts an array of bids in assendnig order based on their priority
+  def sort_bids_by_priority(bids)
+    bids.sort_by { |bid| bid[:priority] }
+  end
+  
   # Assigns available topic slots to teams based on their bidding information.
   # If a certain topic has available slot(s), the team with biggest size and most bids get its first-priority topic.
   # Then the loop breaks to the next team.

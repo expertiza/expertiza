@@ -1,0 +1,109 @@
+{
+  "name": "C:\\Users\\jacck\\Documents\\Github\\expertiza\\app\\models\\vm_question_response.py",
+  "start_line": 4,
+  "end_line": 5,
+  "kind": "class",
+  "spaces": [],
+  "metrics": {
+    "nargs": {
+      "total_functions": 0.0,
+      "total_closures": 0.0,
+      "average_functions": 0.0,
+      "average_closures": 0.0,
+      "total": 0.0,
+      "average": 0.0,
+      "functions_min": 0.0,
+      "functions_max": 0.0,
+      "closures_min": 0.0,
+      "closures_max": 0.0
+    },
+    "nexits": {
+      "sum": 0.0,
+      "average": null,
+      "min": 0.0,
+      "max": 0.0
+    },
+    "cognitive": {
+      "sum": 0.0,
+      "average": null,
+      "min": 0.0,
+      "max": 0.0
+    },
+    "cyclomatic": {
+      "sum": 12.0,
+      "average": 12.0,
+      "min": 1.0,
+      "max": 11.0
+    },
+    "halstead": {
+      "n1": 15.0,
+      "N1": 341.0,
+      "n2": 134.0,
+      "N2": 482.0,
+      "length": 823.0,
+      "estimated_program_length": 1005.4593104554692,
+      "purity_ratio": 1.2217002557174597,
+      "vocabulary": 149.0,
+      "volume": 5941.375692340359,
+      "difficulty": 26.97761194029851,
+      "level": 0.03706777316735823,
+      "effort": 160284.12781948058,
+      "time": 8904.673767748922,
+      "bugs": 0.9835710955064811
+    },
+    "loc": {
+      "sloc": 2.0,
+      "ploc": 147.0,
+      "lloc": 9.0,
+      "cloc": 26.0,
+      "blank": -169.0,
+      "sloc_average": 2.0,
+      "ploc_average": 147.0,
+      "lloc_average": 9.0,
+      "cloc_average": 26.0,
+      "blank_average": -169.0,
+      "sloc_min": 2.0,
+      "sloc_max": 2.0,
+      "cloc_min": 0.0,
+      "cloc_max": 0.0,
+      "ploc_min": 2.0,
+      "ploc_max": 2.0,
+      "lloc_min": 1.0,
+      "lloc_max": 1.0,
+      "blank_min": 0.0,
+      "blank_max": 0.0
+    },
+    "nom": {
+      "functions": 0.0,
+      "closures": 0.0,
+      "functions_average": 0.0,
+      "closures_average": 0.0,
+      "total": 0.0,
+      "average": 0.0,
+      "functions_min": 0.0,
+      "functions_max": 0.0,
+      "closures_min": 0.0,
+      "closures_max": 0.0
+    },
+    "mi": {
+      "mi_original": 111.82459656031754,
+      "mi_sei": 54.73500914728665,
+      "mi_visual_studio": 65.3945009124664
+    },
+    "abc": {
+      "assignments": 0.0,
+      "branches": 0.0,
+      "conditions": 0.0,
+      "magnitude": 0.0,
+      "assignments_average": 0.0,
+      "branches_average": 0.0,
+      "conditions_average": 0.0,
+      "assignments_min": 0.0,
+      "assignments_max": 0.0,
+      "branches_min": 0.0,
+      "branches_max": 0.0,
+      "conditions_min": 0.0,
+      "conditions_max": 0.0
+    }
+  }
+}

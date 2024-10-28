@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20231203230237) do
+ActiveRecord::Schema.define(version: 20241028235312) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -937,13 +937,13 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.integer "pair_programming_request", limit: 1
   end
 
-  create_table "teams_users", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "teams_participants", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "team_id"
     t.integer "user_id"
     t.integer "duty_id"
     t.string "pair_programming_status", limit: 1
     t.integer "participant_id"
-    t.index ["duty_id"], name: "index_teams_users_on_duty_id"
+    t.index ["duty_id"], name: "index_teams_participants_on_duty_id"
     t.index ["participant_id"], name: "fk_rails_7192605c92"
     t.index ["team_id"], name: "fk_users_teams"
     t.index ["user_id"], name: "fk_teams_users"
@@ -1078,8 +1078,8 @@ ActiveRecord::Schema.define(version: 20231203230237) do
   add_foreign_key "tag_prompt_deployments", "assignments"
   add_foreign_key "tag_prompt_deployments", "questionnaires"
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
-  add_foreign_key "teams_users", "duties"
-  add_foreign_key "teams_users", "participants"
-  add_foreign_key "teams_users", "teams", name: "fk_users_teams"
-  add_foreign_key "teams_users", "users", name: "fk_teams_users"
+  add_foreign_key "teams_participants", "duties"
+  add_foreign_key "teams_participants", "participants", name: "fk_teams_participants"
+  add_foreign_key "teams_participants", "teams", name: "fk_users_teams"
+  add_foreign_key "teams_participants", "users", name: "fk_teams_users"
 end

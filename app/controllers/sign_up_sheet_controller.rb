@@ -344,6 +344,21 @@ class SignUpSheetController < ApplicationController
   # If the instructor needs to explicitly change the start/due dates of the topics
   # This is true in case of a staggered deadline type assignment. Individual deadlines can
   # be set on a per topic and per round basis
+
+  # This method saves or updates the due dates for submission and review associated
+  # with topics for a specified assignment. The following refactoring changes have
+  # been implemented to improve code quality:
+  #
+  # 1. Use of Local Variables: Local variables are used instead of instance 
+  #    variables to enhance clarity and encapsulate the method's state.
+  #
+  # 2. Safe Navigation Operator: The code utilizes the safe navigation operator
+  #    (`&.`) to avoid potential nil errors when accessing due dates from the assignment's
+  #    due dates, ensuring more robust error handling.
+  #
+  # 3. Enhanced Readability: Overall structure and variable naming are 
+  #    maintained to promote readability and maintainability.
+
   def save_topic_deadlines
     assignment = Assignment.find(params[:assignment_id])
     assignment_submission_due_dates = assignment.due_dates.select { |due_date| due_date.deadline_type_id == 1 }

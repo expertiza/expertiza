@@ -43,44 +43,57 @@ module StudentTaskHelper
     assignment.find_due_dates('review').present?
   end
 
-  def populate_timeline_from(model_class, participant_id, label_lamda, timeline_list)
+  def for_each_due_date_of_assignment(assignment)
+    assignment.due_dates.each do |dd|
+      yield dd
+    end
+  end
+
+  def fetch_response_from(model_class, participant_id)
     model_class.where(reviewer_id: participant_id).find_each do |rm|
       response = Response.where(map_id: rm.id).last
-      next if response.nil?
-
-      timeline = {
-        id: response.id,
-        label: label_lamda.call(response),
-        updated_at: response.updated_at.strftime('%a, %d %b %Y %H:%M')
-      }
-
-      timeline_list << timeline
+      yield response unless response.nil?
     end
   end
 
-  def update_timeline_with_peer_reviews(participant_id, timeline_list)
-    populate_timeline_from(ReviewResponseMap, participant_id, ->(response) { ('Round ' + response.round.to_s + ' Peer Review').humanize }, timeline_list)
+  def for_each_peer_review(participant_id)
+    fetch_response_from(ReviewResponseMap, participant_id)
   end
 
-  def update_timeline_with_author_feedbacks(participant_id, timeline_list)
-    populate_timeline_from(FeedbackResponseMap, participant_id, ->(_response) { 'Author feedback' }, timeline_list)
-  end
-
-  def update_timeline_with_assignment_deadlines(assignment, timeline_list)
-    assignment.due_dates.each do |dd|
-      timeline = { label: (dd.deadline_type.name + ' Deadline').humanize }
-      unless dd.due_at.nil?
-        timeline[:updated_at] = dd.due_at.strftime('%a, %d %b %Y %H:%M')
-        timeline_list << timeline
-      end
-    end
+  def for_each_author_feedback(participant_id)
+    fetch_response_from(FeedbackResponseMap, participant_id)
   end
 
   def generate_timeline(assignment, participant)
+
+    due_date_modifier = ->(dd) {
+      { label: (dd.deadline_type.name + ' Deadline').humanize,
+        updated_at: dd.due_at&.strftime('%a, %d %b %Y %H:%M')
+      }.compact
+    }
+
+    response_modifier = ->(response, label) {
+      {
+        id: response.id,
+        label: label,
+        updated_at: response.updated_at.strftime('%a, %d %b %Y %H:%M')
+      }
+    }
+
     timeline_list = []
-    update_timeline_with_assignment_deadlines(assignment, timeline_list)
-    update_timeline_with_peer_reviews(participant.get_reviewer.try(:id), timeline_list)
-    update_timeline_with_author_feedbacks(participant.try(:id), timeline_list)
+
+    for_each_due_date_of_assignment(assignment) do |due_date|
+      timeline_list << due_date_modifier.call(due_date)
+    end
+    
+    for_each_peer_review(participant.get_reviewer.try(:id)) do |response|
+      timeline_list << response_modifier.call(response, "Round #{response.round} Peer Review".humanize)
+    end
+
+    for_each_author_feedback(participant.try(:id)) do |response|
+      timeline_list << response_modifier.call(response, "Author feedback")
+    end
+    
     timeline_list.sort_by { |f| Time.zone.parse f[:updated_at] }
   end
 
@@ -103,6 +116,6 @@ module StudentTaskHelper
   def get_stage_deadline(part)
     Time.parse(part)
   rescue StandardError
-      Time.now + 1.year
+    Time.now + 1.year
   end
 end

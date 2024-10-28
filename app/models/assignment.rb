@@ -170,24 +170,19 @@ class Assignment < ApplicationRecord
     review_assignment_strategy == RS_AUTO_SELECTED
   end
   alias is_using_dynamic_reviewer_assignment? dynamic_reviewer_assignment?
-  # This method constructs and creates file path. If the path cannot be created,
-  # an exception is raised and handled and nil is returned.
+  
   def path
-    begin
-      if course_id.nil? && instructor_id.nil?
-        raise 'The path cannot be created. The assignment must be associated with either a course or an instructor.'
-      end
-
-      path_text = if !course_id.nil? && course_id > 0
-                    Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(instructor[:name]) + '/' +
-                      FileHelper.clean_path(course.directory_path) + '/'
-                  else
-                    Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(instructor[:name]) + '/'
-                  end
-      path_text += FileHelper.clean_path(directory_path)
-    rescue StandardError
-      path_text = nil
+    if course_id.nil? && instructor_id.nil?
+      raise 'The path cannot be created. The assignment must be associated with either a course or an instructor.'
     end
+
+    path_text = if !course_id.nil? && course_id > 0
+                  Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(instructor[:name]) + '/' +
+                    FileHelper.clean_path(course.directory_path) + '/'
+                else
+                  Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(instructor[:name]) + '/'
+                end
+    path_text += FileHelper.clean_path(directory_path)
     path_text
   end
 

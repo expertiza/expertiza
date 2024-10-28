@@ -37,5 +37,18 @@ class BiddingController < ApplicationController
 
     redirect_to controller: 'tree_display', action: 'list'
   end
+  
+  def bidding_summary
+    bidding_summary_service = BiddingSummaryService.new()
+    result = bidding_summary_service.bidding_summary(params[:id])
+    
+    @assignment = result[:assignment]
+    @topic_data = result[:topic_data]
+    
+    respond_to do |format|
+      format.html 
+    end
+  end  
+  
   # rubocop:enable Metrics/AbcSize
 end

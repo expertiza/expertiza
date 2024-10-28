@@ -669,4 +669,7 @@ Expertiza::Application.routes.draw do
   get 'student_view/flip_view', controller: :student_view, action: :flip_view
   get 'bidding/auto_assign_teams/:id', to: 'bidding#auto_assign_teams ', as: 'auto_assign_teams'
   # updated route and added specific controller action upon accessing this route
+
+  # Add route for calculating bidding summary based on priorities
+  get 'assignments/:id/bidding_summary', to: 'bidding_teams#bidding_summary', as: 'bidding_summary'
 end

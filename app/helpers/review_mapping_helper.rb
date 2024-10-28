@@ -225,43 +225,58 @@ def initialize_chart_elements(reviewer)
 end
 
 
-  # The data of all the reviews is displayed in the form of a bar chart
-  def display_volume_metric_chart(reviewer)
-    labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
-    data = {
-      labels: labels,
-      datasets: [
-        {
-          label: 'vol.',
-          backgroundColor: 'rgba(255,99,132,0.8)',
-          borderWidth: 1,
-          data: reviewer_data,
-          yAxisID: 'bar-y-axis1'
-        },
-        {
-          label: 'avg. vol.',
-          backgroundColor: 'rgba(255,206,86,0.8)',
-          borderWidth: 1,
-          data: all_reviewers_data,
-          yAxisID: 'bar-y-axis2'
-        }
-      ]
-    }
-    options = {
-      legend: {
-        position: 'top',
-        labels: {
-          usePointStyle: true
-        }
+ # Generates the bar chart displaying reviewer volume metrics
+def display_volume_metric_chart(reviewer)
+  labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
+  data = chart_data(labels, reviewer_data, all_reviewers_data)
+  options = chart_options
+  bar_chart data, options
+end
+
+# Prepares the chart data, including labels and datasets for reviewer volume metrics
+def chart_data(labels, reviewer_data, all_reviewers_data)
+  {
+    labels: labels,
+    datasets: [
+      {
+        # Individual reviewer's volume
+        label: 'vol.', 
+        backgroundColor: 'rgba(255,99,132,0.8)',
+        borderWidth: 1,
+        data: reviewer_data,
+        yAxisID: 'bar-y-axis1'
       },
-      width: '200',
-      height: '225',
-      scales: {
-        yAxes: [{
+      {
+        # Average volume for all reviewers
+        label: 'avg. vol.', 
+        backgroundColor: 'rgba(255,206,86,0.8)',
+        borderWidth: 1,
+        data: all_reviewers_data,
+        yAxisID: 'bar-y-axis2'
+      }
+    ]
+  }
+end
+
+# Configures chart display options, including axes, legends, and grid lines
+def chart_options
+  {
+    legend: {
+      position: 'top',
+      labels: {
+        usePointStyle: true
+      }
+    },
+    width: '200',
+    height: '225',
+    scales: {
+      yAxes: [
+        {
           stacked: true,
           id: 'bar-y-axis1',
           barThickness: 10
-        }, {
+        },
+        {
           display: false,
           stacked: true,
           id: 'bar-y-axis2',
@@ -272,19 +287,22 @@ end
           gridLines: {
             offsetGridLines: true
           }
-        }],
-        xAxes: [{
+        }
+      ],
+      xAxes: [
+        {
           stacked: false,
           ticks: {
             beginAtZero: true,
             stepSize: 50,
             max: 400
           }
-        }]
-      }
+        }
+      ]
     }
-    bar_chart data, options
-  end
+  }
+end
+
 
   # E2082 Generate chart for review tagging time intervals
   def display_tagging_interval_chart(intervals)

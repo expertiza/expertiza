@@ -1,0 +1,18 @@
+.team-bids {
+  font-weight: bold;
+  padding: 3px;
+  border-radius: 4px;
+  
+  &.low-bids {
+    background-color: #ffcccc;
+  }
+  
+  &.medium-bids {
+    background-color: #ffcc99;
+  }
+  
+  &.high-bids {
+    background-color: #ccffcc;
+  }
+}
+

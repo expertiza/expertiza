@@ -74,4 +74,4 @@ ssh into expertiza.csc.ncsu.edu
 On production server, run mysqldump -uroot -p --databases expertiza_production > dump.sql #exports database from production 
 On VCL, run sudo iptables -I INPUT -p TCP -s <IP_OF_PRODUCTION> -j ACCEPT #allows SCP requests 
 Run SCP to your VCL scp dump.sql <unity_id>@<VCL_IP>:/home/<unity_id> 
-mysql -uroot -p expertiza_development < dump.sql #loads database into production
+mysql -uroot -p expertiza_development < dump.sql #loads database into production.

@@ -138,13 +138,13 @@ class TeamAssignmentService
 
   # Constructions a list of bids specific to a given team
   def construct_team_bids(team, bids)
-    team_bids = bids.select { |bid| bid.team_id == team.id }
-    team_bids.map do |bid|
+    team_specific_bids = bids.select { |bid| bid.team_id == team.id }
+    team_specific_bids.map do |bid|
       { topic_id: bid.topic_id, priority: bid.priority }
     end
   end
   
-  # Sorts an array of bids in assendnig order based on their priority
+  # Sorts an array of bids in ascending order based on their priority
   def sort_bids_by_priority(bids)
     bids.sort_by { |bid| bid[:priority] }
   end

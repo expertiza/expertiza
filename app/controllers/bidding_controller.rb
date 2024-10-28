@@ -13,7 +13,8 @@ class BiddingController < ApplicationController
   # that have similar bidding info/priorities associated with the assignment's sign-up topics.
   #
   # rubocop:disable Metrics/AbcSize
-  # TODO: Add route
+  
+  # GET /bidding/auto_assign_teams/:id
   def auto_assign_teams    
 
     @assignment = Assignment.find(params[:id]) 

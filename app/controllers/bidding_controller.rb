@@ -14,7 +14,7 @@ class BiddingController < ApplicationController
   #
   # rubocop:disable Metrics/AbcSize
   
-  # GET /bidding/auto_assign_teams/:id
+  # GET /biddings/:id/auto_assign_teams
   def auto_assign_teams    
 
     @assignment = Assignment.find(params[:id]) 
@@ -38,7 +38,8 @@ class BiddingController < ApplicationController
 
     redirect_to controller: 'tree_display', action: 'list'
   end
-
+  
+  # GET /biddings/:id/bidding_summary
   def bidding_summary
     bidding_summary_service = BiddingSummaryService.new()
     result = bidding_summary_service.bidding_summary(params[:id])
@@ -50,6 +51,6 @@ class BiddingController < ApplicationController
       format.html 
     end
   end  
-    
+
   # rubocop:enable Metrics/AbcSize
 end

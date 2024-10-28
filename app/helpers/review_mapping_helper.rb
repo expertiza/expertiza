@@ -303,49 +303,69 @@ def chart_options
   }
 end
 
+# Generates a line chart displaying time intervals for review tagging
+def display_tagging_interval_chart(intervals)
+  intervals = filter_intervals(intervals)
+  return if intervals.empty?  # Skip chart generation if there are no valid intervals
+  
+  interval_mean = calculate_mean(intervals)
+  data = chart_data(intervals, interval_mean)
+  options = chart_options
+  
+  line_chart data, options
+end
 
-  # E2082 Generate chart for review tagging time intervals
-  def display_tagging_interval_chart(intervals)
-    # if someone did not do any tagging in 30 seconds, then ignore this interval
-    threshold = 30
-    intervals = intervals.select { |v| v < threshold }
-    unless intervals.empty?
-      interval_mean = intervals.reduce(:+) / intervals.size.to_f
-    end
-    # build the parameters for the chart
-    data = {
-      labels: [*1..intervals.length],
-      datasets: [
+# Filters out intervals exceeding the threshold time
+def filter_intervals(intervals, threshold = 30)
+  intervals.select { |interval| interval < threshold }
+end
+
+# Calculates the mean of the intervals
+def calculate_mean(intervals)
+  intervals.reduce(:+) / intervals.size.to_f
+end
+
+# Prepares the data for the chart, including intervals and mean if applicable
+def chart_data(intervals, interval_mean)
+  {
+    labels: (1..intervals.length).to_a, # Labels each interval sequentially
+    datasets: [
+      {
+        backgroundColor: 'rgba(255,99,132,0.8)',
+        data: intervals,
+        label: 'time intervals'
+      },
+      {
+        data: Array.new(intervals.length, interval_mean),
+        label: 'Mean time spent'
+      }
+    ]
+  }
+end
+
+# Configures chart display options, including axis settings
+def chart_options
+  {
+    width: '200',
+    height: '125',
+    scales: {
+      yAxes: [
         {
-          backgroundColor: 'rgba(255,99,132,0.8)',
-          data: intervals,
-          label: 'time intervals'
-        },
-        unless intervals.empty?
-          {
-            data: Array.new(intervals.length, interval_mean),
-            label: 'Mean time spent'
-          }
-        end
-      ]
-    }
-    options = {
-      width: '200',
-      height: '125',
-      scales: {
-        yAxes: [{
           stacked: false,
           ticks: {
             beginAtZero: true
           }
-        }],
-        xAxes: [{
+        }
+      ],
+      xAxes: [
+        {
           stacked: false
-        }]
-      }
+        }
+      ]
     }
-    line_chart data, options
-  end
+  }
+end
+
 
   # Calculate mean, min, max, variance, and stand deviation for tagging intervals
   def calculate_key_chart_information(intervals)

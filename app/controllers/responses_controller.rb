@@ -28,22 +28,55 @@ class ResponsesController < ApplicationController
   # Prepare the parameters when student clicks "Edit"
   # response questions with answers and scores are rendered in the edit page based on the version number
   def edit
-    assign_action_parameters
-
-    # Added for E1973, team-based reviewing
-    @response = lock_response(@response.map, @response)
-    if @response.nil?
+    #Added for E1973, team-based reviewing
+    #Lock a response if the user is authorized to edit the current response
+    current_response = Response.find(params[:id])
+    current_map = current_response.map
+    current_response = lock_response(current_map, current_response)
+    if current_response.nil?
       return
     end
-
-    @modified_object = @response.response_id
-    # set more handy variables for the view
-    set_content
+ 
+    #setting variables for rendering view
+    @header = 'Edit'
+    @next_action = 'update'
+    @return = params[:return]
+    @map = current_response.map
+    @modified_object = current_response.response_id
+    @title = current_map.get_title
+    if current_map.survey?
+      @survey_parent = current_map.survey_parent
+    else
+      @assignment = current_map.assignment
+    end
+    @participant = current_map.reviewer
+    @contributor = current_map.contributor
+    
+    # if user is not filling a new rubric, the @response object should be available.
+    # we can find the questionnaire from the question_id in answers
+    current_questionnaire = questionnaire_from_response(current_response)
+    @dropdown_or_scale = get_dropdown_or_scale(@assignment,current_questionnaire)
+    @min = current_questionnaire.min_question_score
+    @max = current_questionnaire.max_question_score
+    
+    # The new response is created here so that the controller has access to it in the new method
+    # This response object is populated later in the new method 
+    if current_questionnaire
+      #Sometimes the response is already created and the new controller is called again (page refresh)
+      @response = Response.where(map_id: current_map.id, round: @current_round.to_i).order(updated_at: :desc).first
+      if @response.nil?
+        @response = Response.create(map_id: current_map.id, additional_comment: '', round: @current_round.to_i, is_submitted: 0)
+      end
+    end
+    
+    questions = current_questionnaire.questions
     @review_scores = []
-    @review_questions.each do |question|
+    questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
+    
     @questionnaire = questionnaire_from_response(@response)
+    
     render action: 'response'
   end
 
@@ -82,20 +115,52 @@ class ResponsesController < ApplicationController
   end
 
   def new
-    assign_action_parameters
-    set_content(true)
+    @header = 'New'
+    @next_action = 'create'
+    @return = params[:return]
+    @map = ResponseMap.find(params[:id])
+    @modified_object = @map.id
+    @title = @map.get_title
+    if @map.survey?
+      @survey_parent = @map.survey_parent
+    else
+      @assignment = @map.assignment
+    end
+    @participant = @map.reviewer
+    @contributor = @map.contributor
+    
+    #get the questionnaire from the response map -> new_response=questionnaire_from_response_map
+    current_questionnaire=questionnaire_from_response_map(@map,@contributor,@assignment)
+    @dropdown_or_scale = get_dropdown_or_scale(@assignment,current_questionnaire)
+    @min = current_questionnaire.min_question_score
+    @max = current_questionnaire.max_question_score
+    
+    # The new response is created here so that the controller has access to it in the new method
+    # This response object is populated later in the new method
+    if current_questionnaire
+      #Sometimes the response is already created and the new controller is called again (page refresh)
+      @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
+      if @response.nil?
+        @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round.to_i, is_submitted: 0)
+      end
+    end
+    
+    @feedback = params[:feedback]
     if @assignment
       @stage = @assignment.current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
     end
+    
     # Because of the autosave feature and the javascript that sync if two reviewing windows are opened
     # The response must be created when the review begin.
     # So do the answers, otherwise the response object can't find the questionnaire when the user hasn't saved his new review and closed the window.
     # A new response has to be created when there hasn't been any reviews done for the current round,
     # or when there has been a submission after the most recent review in this round.
+    @current_round=get_current_round(@assignment)
     @response = @response.create_or_get_response(@map, @current_round.to_i)
-    questions = sort_questions(@questionnaire.questions)
+    @review_questions = @questionnaire.questions
     @total_score=get_total_cake_score(@response,@participant,@assignment)
-    init_answers(questions)
+    init_answers(@review_questions)
+    
     render action: 'response'
   end
 
@@ -152,7 +217,27 @@ class ResponsesController < ApplicationController
 
   # view response
   def view
-    set_content
+    @title = @map.get_title
+    if @map.survey?
+      @survey_parent = @map.survey_parent
+    else
+      @assignment = @map.assignment
+    end
+    @participant = @map.reviewer
+    @contributor = @map.contributor
+    current_questionnaire = questionnaire_from_response(current_response)
+    @dropdown_or_scale = get_dropdown_or_scale(@assignment,current_questionnaire)
+    @min = current_questionnaire.min_question_score
+    @max = current_questionnaire.max_question_score
+    # The new response is created here so that the controller has access to it in the new method
+    # This response object is populated later in the new method
+    if current_questionnaire
+      #Sometimes the response is already created and the new controller is called again (page refresh)
+      @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
+      if @response.nil?
+        @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round.to_i, is_submitted: 0)
+      end
+    end
   end
 
   # E2218: Method to check if that action is allowed for the user.
@@ -317,35 +402,6 @@ class ResponsesController < ApplicationController
   # Taken if the response is locked and cannot be edited right now
   def response_lock_action
     redirect_to action: 'redirect', id: @map.map_id, return: 'locked', error_msg: 'Another user is modifying this response or has modified this response. Try again later.'
-  end
-
-  # This method is called within the Edit or New actions
-  # It will create references to the objects that the controller will need when a user creates a new response or edits an existing one.
-  def assign_action_parameters
-    case params[:action]
-    when 'edit'
-      @header = 'Edit'
-      @next_action = 'update'
-      @response = Response.find(params[:id])
-      @map = @response.map
-      @contributor = @map.contributor
-    when 'new'
-      @header = 'New'
-      @next_action = 'create'
-      @feedback = params[:feedback]
-      @map = ResponseMap.find(params[:id])
-      @modified_object = @map.id
-    end
-    @return = params[:return]
-
-  # For each question in the list, starting with the first one, you update the comment and score
-  def create_answers(params, questions)
-    params[:responses].each_pair do |k, v|
-      score = Answer.where(response_id: @response.id, question_id: questions[k.to_i].id).first
-      score ||= Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])
-      score.update_attribute('answer', v[:score])
-      score.update_attribute('comments', v[:comment])
-    end
   end
 
   # This method initialize answers for the questions in the response

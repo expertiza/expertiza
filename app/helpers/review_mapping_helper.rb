@@ -77,12 +77,12 @@ module ReviewMappingHelper
 
   # checks if a review was submitted in every round
   def response_for_each_round?(response_map)
-    num_responses = 0
+    response_count = 0
     total_num_rounds = @assignment.num_review_rounds
     (1..total_num_rounds).each do |round|
-      num_responses += 1 if Response.exists?(map_id: response_map.id, round: round)
+      response_count += 1 if Response.exists?(map_id: response_map.id, round: round)
     end
-    num_responses == total_num_rounds
+    response_count == total_num_rounds
   end
 
   # checks if a work was submitted within a given round

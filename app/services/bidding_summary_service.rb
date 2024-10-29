@@ -16,7 +16,7 @@
     # Count the total number of bids for the topic.
     total_bids = topic.bids.count
     # Count the number of first, second, and third priority bids.
-    first_bids = topic.bids.where(priority: 1).count
+    first_bids = topic.bids.where(priority: 1).count # TODO: First, second, third Choice Bids etc...
     second_bids = topic.bids.where(priority: 2).count
     third_bids = topic.bids.where(priority: 3).count
     # Extract the team names for the bids.

@@ -247,9 +247,18 @@ class UsersController < ApplicationController
     end
   end
 
+  def pagination_options
+    {
+      '1' => 25,
+      '2' => 50,
+      '3' => 100,
+      '4' => User.count
+    }
+  end
+
   # For filtering the users list with proper search and pagination.
   def paginate_list
-    paginate_options = { '1' => 25, '2' => 50, '3' => 100, '4' => User.count}
+    paginate_options = pagination_options
 
     # If the above hash does not have a value for the key,
     # it means that we need to show all the users on the page

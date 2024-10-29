@@ -299,18 +299,6 @@ class ResponsesController < ApplicationController
     redirect_to action: 'redirect', id: @map.map_id, return: 'locked', error_msg: 'Another user is modifying this response or has modified this response. Try again later.'
   end
 
-  # This method initialize answers for the questions in the response
-  # Iterates over each questions and create corresponding answer for that
-  def init_answers(items)
-    items.each do |q|
-      # it's unlikely that these answers exist, but in case the user refresh the browser some might have been inserted.
-      answer = Answer.where(response_id: @response.id, question_id: q.id).first
-      if answer.nil?
-        Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '')
-      end
-    end
-  end
-
   #this method is called within the view,new,edit actions to set vaariables for the view
   def set_action_parameters(header,next_action,params_return,current_response,current_map,modified_object)
     #setting variables for rendering view

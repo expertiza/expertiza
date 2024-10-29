@@ -13,7 +13,7 @@ module ResponseHelper
     return curr_response
   end
 
-  # This method is called within set_content and when the new_response flag is set to true
+  # This method is called within set_action_parameters and when the header='New'
   # Depending on what type of response map corresponds to this response, the method gets the reference to the proper questionnaire
   # This is called after assign_instance_vars in the new method
   def questionnaire_from_response_map(map,contributor,assignment)

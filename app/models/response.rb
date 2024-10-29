@@ -266,4 +266,16 @@ class Response < ApplicationRecord
     end
     code
   end
+
+  # This method initialize answers for the questions in the response
+  # Iterates over each questions and create corresponding answer for that
+  def init_answers(items)
+    items.each do |q|
+      # it's unlikely that these answers exist, but in case the user refresh the browser some might have been inserted.
+      answer = Answer.where(response_id: @response.id, question_id: q.id).first
+      if answer.nil?
+        Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '')
+      end
+    end
+  end
 end

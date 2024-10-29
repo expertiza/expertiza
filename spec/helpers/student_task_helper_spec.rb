@@ -28,14 +28,13 @@ describe StudentTaskHelper do
       }
     }
   end
-  
+
   # Gets the due dates of an assignment
   describe '#for_each_due_date_of_assignment' do
     let(:due_date_modifier) do
       ->(dd) {
         { label: (dd.deadline_type.name + ' Deadline').humanize,
-          updated_at: dd.due_at.strftime('%a, %d %b %Y %H:%M')
-        }
+          updated_at: dd.due_at.strftime('%a, %d %b %Y %H:%M') }
       }
     end
     context 'when called with assignment having empty due dates' do
@@ -111,7 +110,7 @@ describe StudentTaskHelper do
       it 'returns empty' do
         timeline_list = []
         for_each_author_feedback(user2) do |response|
-          timeline_list << response_modifier.call(response, "Author feedback")
+          timeline_list << response_modifier.call(response, 'Author feedback')
         end
         expect(timeline_list).to eq([])
       end
@@ -126,7 +125,7 @@ describe StudentTaskHelper do
         timevalue = Time.now.strftime('%a, %d %b %Y %H:%M')
         timeline_list = []
         for_each_author_feedback(1) do |response|
-          timeline_list << response_modifier.call(response, "Author feedback")
+          timeline_list << response_modifier.call(response, 'Author feedback')
         end
         expect(timeline_list).to eq([{ id: 1, label: 'Author feedback', updated_at: timevalue }])
       end
@@ -143,7 +142,7 @@ describe StudentTaskHelper do
     end
   end
 
-    describe '#create_student_task_for_participant' do
+  describe '#create_student_task_for_participant' do
     it 'creates a StudentTask with the correct attributes' do
       student_task = student_task_helper.create_student_task_for_participant(participant3)
       expect(student_task).to be_an_instance_of(StudentTask)
@@ -161,16 +160,14 @@ describe StudentTaskHelper do
     end
 
     it 'retrieves and sorts tasks by stage_deadline' do
-      tasks = student_task_helper.retrieve_tasks_for_user(user)
-      
+      tasks = student_task_helper.retrieve_tasks_for_user(user)      
       expect(tasks.size).to eq(2)
       expect(tasks.first.stage_deadline).to eq(Time.parse('2024-11-01 12:00:00'))
       expect(tasks.last.stage_deadline).to eq(Time.parse('2024-12-01 12:00:00'))
     end
 
     it 'creates StudentTask objects for each participant' do
-      tasks = student_task_helper.retrieve_tasks_for_user(user)
-      
+      tasks = student_task_helper.retrieve_tasks_for_user(user)      
       tasks.each do |task|
         expect(task).to be_an_instance_of(StudentTask)
         expect(task.participant).to be_in([participant4, participant5])
@@ -181,23 +178,23 @@ describe StudentTaskHelper do
   end
 
   describe '#parse_stage_deadline' do
-  context 'If a valid time value is given' do
-    it 'parse the provided time correctly' do
-      given_time = '2024-12-31 12:00:00'
-      parsed_time = student_task_helper.parse_stage_deadline(given_time)
-      expect(parsed_time).to eq(Time.parse(given_time))
+    context 'If a valid time value is given' do
+      it 'parse the provided time correctly' do
+        given_time = '2024-12-31 12:00:00'
+        parsed_time = student_task_helper.parse_stage_deadline(given_time)
+        expect(parsed_time).to eq(Time.parse(given_time))
+      end
     end
-  end
 
-  context 'If given time string is invalid' do
-    it 'return current time plus 1 year' do
-      given_time = 'invalid-time-string'
-      overhead_time = Time.now + 1.year
-      parsed_time = student_task_helper.parse_stage_deadline(given_time)
-      expect(parsed_time).to be_within(1.second).of(overhead_time)
+    context 'If given time string is invalid' do
+      it 'return current time plus 1 year' do
+        given_time = 'invalid-time-string'
+        overhead_time = Time.now + 1.year
+        parsed_time = student_task_helper.parse_stage_deadline(given_time)
+        expect(parsed_time).to be_within(1.second).of(overhead_time)
+      end
     end
   end
-end
 
   # Tests teamed students method which returns the unique students that are paired with the student at some point
   # within their course

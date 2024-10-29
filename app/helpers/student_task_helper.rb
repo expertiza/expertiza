@@ -65,12 +65,7 @@ module StudentTaskHelper
   end
 
   def generate_timeline(assignment, participant)
-
-    due_date_modifier = ->(dd) {
-      { label: (dd.deadline_type.name + ' Deadline').humanize,
-        updated_at: dd.due_at.strftime('%a, %d %b %Y %H:%M')
-      }
-    }
+    due_date_modifier = ->(dd) { { label: (dd.deadline_type.name + ' Deadline').humanize, updated_at: dd.due_at.strftime('%a, %d %b %Y %H:%M') } }
 
     response_modifier = ->(response, label) {
       {
@@ -85,15 +80,15 @@ module StudentTaskHelper
     for_each_due_date_of_assignment(assignment) do |due_date|
       timeline_list << due_date_modifier.call(due_date)
     end
-    
+
     for_each_peer_review(participant.get_reviewer.try(:id)) do |response|
       timeline_list << response_modifier.call(response, "Round #{response.round} Peer Review".humanize)
     end
 
     for_each_author_feedback(participant.try(:id)) do |response|
-      timeline_list << response_modifier.call(response, "Author feedback")
+      timeline_list << response_modifier.call(response, 'Author feedback')
     end
-    
+
     timeline_list.sort_by { |f| Time.zone.parse f[:updated_at] }
   end
 
@@ -124,7 +119,7 @@ module StudentTaskHelper
       # Teammates not in an assignment or in calibration assignment should not be counted in teaming requirement.
       next if !team.is_a?(AssignmentTeam) || Assignment.find_by(id: team.parent_id).is_calibrated
       course_id = Assignment.find_by(id: team.parent_id).course_id
-      teammate_names = Team.find(team.id).participants.reject { |p| p.name == user.name }.map { |p| p.user.fullname(ip_address)}
+      teammate_names = Team.find(team.id).participants.reject { |p| p.name == user.name }.map { |p| p.user.fullname(ip_address) }
 
       yield(course_id, teammate_names) unless teammate_names.nil? || teammate_names.empty?
     end

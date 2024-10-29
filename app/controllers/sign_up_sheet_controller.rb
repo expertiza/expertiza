@@ -10,7 +10,7 @@
 
 class SignUpSheetController < ApplicationController
   include AuthorizationHelper
-
+  include SignUpSheetHelper
   require 'rgl/adjacency'
   require 'rgl/dot'
   require 'rgl/topsort'

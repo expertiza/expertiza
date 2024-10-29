@@ -110,7 +110,7 @@ module SignUpSheetHelper
   def fetch_assignment_details(participant)
     @assignment = participant.assignment
     {
-      assignment: assignment,
+      assignment: @assignment,
       slots_filled: SignUpTopic.find_slots_filled(@assignment.id),
       slots_waitlisted: SignUpTopic.find_slots_waitlisted(@assignment.id),
       sign_up_topics: SignUpTopic.where(assignment_id: @assignment.id, private_to: nil),
